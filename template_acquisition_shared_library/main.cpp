@@ -16,6 +16,7 @@ unsigned short cycle=0;
 
 char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
 {
+    fprintf(stderr,"Reading template file %s \n",filename);
     char * pixels=0;
     FILE *pf=0;
     pf = fopen(filename,"rb");
@@ -43,6 +44,7 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
 
         *width=w;
         *height=h;
+        pixels= (char*) malloc(w*h*3*sizeof(char));
 
         if ( pixels != 0 )
         {
@@ -50,16 +52,74 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
           fclose(pf);
           if ( rd < w*h ) { return 0; }
           return pixels;
+        } else
+        {
+            fprintf(stderr,"Could not Allocate enough memory for file %s \n",filename);
         }
         fclose(pf);
+    } else
+    {
+      fprintf(stderr,"File %s does not exist \n",filename);
     }
+
   return 0;
 }
 
 
 
 
+char * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
+{
+    fprintf(stderr,"Reading template file %s \n",filename);
+    short * pixels=0;
+    FILE *pf=0;
+    pf = fopen(filename,"rb");
 
+    if (pf!=0 )
+    {
+        char buf[PPMREADBUFLEN], *t;
+        unsigned int w=0, h=0, d=0;
+        int r=0;
+
+        t = fgets(buf, PPMREADBUFLEN, pf);
+        if ( (t == 0) || ( strncmp(buf, "P5\n", 3) != 0 ) ) { fclose(pf); return 0; }
+        do
+        { /* Px formats can have # comments after first line */
+           t = fgets(buf, PPMREADBUFLEN, pf);
+           if ( t == 0 ) { fclose(pf); return 0; }
+        } while ( strncmp(buf, "#", 1) == 0 );
+        r = sscanf(buf, "%u %u", &w, &h);
+        if ( r < 2 ) { fclose(pf); return 0; }
+        // The program fails if the first byte of the image is equal to 32. because
+        // the fscanf eats the space and the image is read with some bit less
+        r = fscanf(pf, "%u\n", &d);
+        if ( (r < 1) /*|| ( d != 255 )*/ ) { fclose(pf); return 0; }
+
+
+        *width=w;
+        *height=h;
+        pixels= (short*) malloc(w*h*3*sizeof(short));
+
+        if ( pixels != 0 )
+        {
+          fprintf(stderr,"Depth going for the read\n");
+          size_t rd = fread(pixels,sizeof(short), w*h, pf);
+          fprintf(stderr,"Survived read\n");
+          fclose(pf);
+          //if ( rd < w*h ) { return 0; }
+          return (char*) pixels;
+        } else
+        {
+            fprintf(stderr,"Could not Allocate enough memory for file %s \n",filename);
+        }
+        fclose(pf);
+    } else
+    {
+      fprintf(stderr,"File %s does not exist \n",filename);
+    }
+
+  return 0;
+}
 
 
 
@@ -81,10 +141,27 @@ int createTemplateDevice(int devID,unsigned int width,unsigned int height,unsign
         templateWIDTH=width;
    }
 
-  // if templateColorFrame is zero the next function behaves like a malloc
-  templateColorFrame= (char*) realloc(templateColorFrame,templateWIDTH*templateHEIGHT*3*sizeof(char));
-  // if templateColorFrame is zero the next function behaves like a malloc
-  templateDepthFrame= (short*) realloc(templateDepthFrame,templateWIDTH*templateHEIGHT*1*sizeof(short));
+  unsigned int widthInternal; unsigned int heightInternal;
+  char * tmp = ReadPPM((char*) "templateColor.pnm",&widthInternal,&heightInternal);
+  if ( (widthInternal!=width) || (heightInternal!=height) )
+   { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
+
+  if (tmp!=0) { templateColorFrame=tmp; } else
+  {
+   // if templateColorFrame is zero the next function behaves like a malloc
+   templateColorFrame= (char*) realloc(templateColorFrame,templateWIDTH*templateHEIGHT*3*sizeof(char));
+  }
+
+
+  tmp = ReadPPMD((char*) "templateDepth.pnm",&widthInternal,&heightInternal);
+  if ( (widthInternal!=width) || (heightInternal!=height) )
+   { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
+
+  if (tmp!=0) { templateColorFrame=tmp; } else
+  {
+   // if templateColorFrame is zero the next function behaves like a malloc
+   templateDepthFrame= (short*) realloc(templateDepthFrame,templateWIDTH*templateHEIGHT*1*sizeof(short));
+  }
 
   return ((templateColorFrame!=0)&&(templateDepthFrame!=0));
 }
@@ -101,20 +178,7 @@ int snapTemplateFrames(int devID)
 {
   ++cycle;
   if (cycle>65534) { cycle=0; }
-
-  unsigned int rgb_cycle = (unsigned int ) (65535-cycle)/255;
-  unsigned int i =0 ;
-  unsigned int j =0 ;
-  while ( i < templateWIDTH*templateHEIGHT*3 )
-    {
-        templateColorFrame[i]=rgb_cycle;
-        templateColorFrame[i+1]=rgb_cycle;
-        templateColorFrame[i+2]=rgb_cycle;
-        i+=3;
-
-        templateDepthFrame[j]=cycle;
-        ++j;
-    }
+    //TODO HERE MAYBE LOAD NEW BUFFERS
   return 1;
 }
 

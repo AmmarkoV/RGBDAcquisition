@@ -1,9 +1,13 @@
 This is the RGBD project.. :P
 
-If you want OpenNI , OpenNI2 , LibFreenect , please issue 
+If you want to download OpenNI , OpenNI2 , LibFreenect , please issue 
 cd 3dparty && ./get_third_party_libs.sh
 
-To make the library issue 
+
+One very basic thing about setting up what you want is the acquisition/acquisition_setup.h file..
+It controls what modules get linked during the compilation in order to keep your dependencies at a minimum..  Of course you will need the appropriate 3dparty libs if you enable a module that uses them.. 
+
+To compile the library issue 
 
 make
 
