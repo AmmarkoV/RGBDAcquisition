@@ -10,10 +10,11 @@
      THIS COULD ALSO  BE AUTOMATICALLY GENERATED...
 */
 
-//#define USE_DUMMY 0 <- A disabled module should look like this :P
-#define USE_OPENNI1 1
-#define USE_OPENNI2 1
-#define USE_FREENECT 1
+////#define USE_DUMMY 0 <- A disabled module should look like this :P
+
+//#define USE_OPENNI1 0
+//#define USE_OPENNI2 0
+#define USE_FREENECT 0
 #define USE_OPENGL 1
 #define USE_TEMPLATE 1
 

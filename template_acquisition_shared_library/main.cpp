@@ -14,6 +14,21 @@ unsigned short cycle=0;
 
 #define PPMREADBUFLEN 256
 
+
+
+char FileExists(char * filename)
+{
+ FILE *fp = fopen(filename,"r");
+ if( fp ) { /* exists */
+            fclose(fp);
+            return 1;
+          }
+          else
+          { /* doesnt exist */ }
+ return 0;
+}
+
+
 char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
 {
     fprintf(stderr,"Reading template file %s \n",filename);
@@ -28,18 +43,18 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
         int r=0;
 
         t = fgets(buf, PPMREADBUFLEN, pf);
-        if ( (t == 0) || ( strncmp(buf, "P6\n", 3) != 0 ) ) { fclose(pf); return 0; }
+        if ( (t == 0) || ( strncmp(buf, "P6\n", 3) != 0 ) ) { fprintf(stderr,"ReadPPM only undertsands P6 format\n"); fclose(pf); return 0; }
         do
         { /* Px formats can have # comments after first line */
            t = fgets(buf, PPMREADBUFLEN, pf);
            if ( t == 0 ) { fclose(pf); return 0; }
         } while ( strncmp(buf, "#", 1) == 0 );
         r = sscanf(buf, "%u %u", &w, &h);
-        if ( r < 2 ) { fclose(pf); return 0; }
+        if ( r < 2 ) { fclose(pf); fprintf(stderr,"Incoherent dimensions received %ux%u \n",w,h); return 0; }
         // The program fails if the first byte of the image is equal to 32. because
         // the fscanf eats the space and the image is read with some bit less
         r = fscanf(pf, "%u\n", &d);
-        if ( (r < 1) || ( d != 255 ) ) { fclose(pf); return 0; }
+        if ( (r < 1) || ( d != 255 ) ) { fprintf(stderr,"Incoherent payload received %u bits per pixel \n",d); fclose(pf); return 0; }
 
 
         *width=w;
@@ -68,7 +83,7 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
 
 
 
-char * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
+short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
 {
     fprintf(stderr,"Reading template file %s \n",filename);
     short * pixels=0;
@@ -102,12 +117,12 @@ char * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
 
         if ( pixels != 0 )
         {
-          fprintf(stderr,"Depth going for the read\n");
+          fprintf(stderr,"Depth going for the read %ux%u\n",w,h);
           size_t rd = fread(pixels,sizeof(short), w*h, pf);
           fprintf(stderr,"Survived read\n");
           fclose(pf);
           //if ( rd < w*h ) { return 0; }
-          return (char*) pixels;
+          return pixels;
         } else
         {
             fprintf(stderr,"Could not Allocate enough memory for file %s \n",filename);
@@ -142,24 +157,24 @@ int createTemplateDevice(int devID,unsigned int width,unsigned int height,unsign
    }
 
   unsigned int widthInternal; unsigned int heightInternal;
-  char * tmp = ReadPPM((char*) "templateColor.pnm",&widthInternal,&heightInternal);
+  char * tmpColor = ReadPPM((char*) "frames/colorFrame_0_00000.pnm",&widthInternal,&heightInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
-  if (tmp!=0) { templateColorFrame=tmp; } else
+  if (tmpColor!=0) { templateColorFrame=tmpColor; } else
   {
    // if templateColorFrame is zero the next function behaves like a malloc
    templateColorFrame= (char*) realloc(templateColorFrame,templateWIDTH*templateHEIGHT*3*sizeof(char));
   }
 
 
-  tmp = ReadPPMD((char*) "templateDepth.pnm",&widthInternal,&heightInternal);
+  short * tmpDepth = ReadPPMD((char*) "frames/depthFrame_0_00000.pnm",&widthInternal,&heightInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
-  if (tmp!=0) { templateColorFrame=tmp; } else
+  if (tmpDepth!=0) { templateDepthFrame=tmpDepth; } else
   {
-   // if templateColorFrame is zero the next function behaves like a malloc
+   // if templateDepthFrame is zero the next function behaves like a malloc
    templateDepthFrame= (short*) realloc(templateDepthFrame,templateWIDTH*templateHEIGHT*1*sizeof(short));
   }
 
@@ -176,9 +191,31 @@ int destroyTemplateDevice(int devID)
 
 int snapTemplateFrames(int devID)
 {
+    //TODO HERE MAYBE LOAD NEW BUFFERS
+    int found_frames = 0;
+
+    unsigned int widthInternal; unsigned int heightInternal;
+    char file_name_test[512];
+    sprintf(file_name_test,"frames/colorFrame_%u_%05u.pnm",devID,cycle);
+    if (FileExists(file_name_test))
+     {
+       if (templateColorFrame!=0) { free(templateColorFrame); }
+       templateColorFrame = ReadPPM((char*) file_name_test,&widthInternal,&heightInternal);
+       ++found_frames;
+     }
+
+    sprintf(file_name_test,"frames/depthFrame_%u_%05u.pnm",devID,cycle);
+    if (FileExists(file_name_test))
+     {
+      if (templateDepthFrame!=0) { free(templateDepthFrame); }
+      templateDepthFrame = ReadPPMD((char*) file_name_test,&widthInternal,&heightInternal);
+      ++found_frames;
+     }
+
   ++cycle;
   if (cycle>65534) { cycle=0; }
-    //TODO HERE MAYBE LOAD NEW BUFFERS
+  if (found_frames!=2) { cycle = 0; }
+
   return 1;
 }
 

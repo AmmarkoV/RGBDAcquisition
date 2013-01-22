@@ -67,7 +67,7 @@ int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsi
         n = (unsigned int) tmp_n;
 
         fwrite(pixels, 1 , n , fd);
-        fwrite(pixels, 1 , n , fd);
+        //fwrite(pixels, 1 , n , fd);
         fflush(fd);
         fclose(fd);
         return 1;

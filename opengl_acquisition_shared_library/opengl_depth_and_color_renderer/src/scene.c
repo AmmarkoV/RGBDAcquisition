@@ -85,7 +85,7 @@ int tickScene()
    // addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
    addToModelCoordinates(spatoula,0.0 /*X*/,0.0/*Y*/,0.0/*Z*/,(float) 0.01/*HEADING*/,(float) 0.01/*PITCH*/,(float) 0.006/*ROLL*/);
    //fprintf(stderr,".");
-   usleep(30000);
+   usleep(20000);
 }
 
 
