@@ -1,0 +1,7 @@
+varying float depth;
+void main()
+{
+    gl_FragColor.r = depth;
+    gl_FragColor.g = depth;
+    gl_FragColor.b = depth;
+}

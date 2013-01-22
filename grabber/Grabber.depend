@@ -1,0 +1,26 @@
+# depslib dependency file v1.0
+1358245654 source:/home/ammar/Documents/Programming/openni2_acquisition/grabber/main.c
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	"../acquisition/Acquisition.h"
+
+1358245564 /home/ammar/Documents/Programming/openni2_acquisition/acquisition/Acquisition.h
+
+1358274118 source:/home/ammar/Documents/Programming/input_acquisition/grabber/main.c
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	"../acquisition/Acquisition.h"
+
+1358266677 /home/ammar/Documents/Programming/input_acquisition/acquisition/Acquisition.h
+
+1358774499 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/grabber/main.c
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	<string.h>
+	"../acquisition/Acquisition.h"
+
+1358774302 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
+

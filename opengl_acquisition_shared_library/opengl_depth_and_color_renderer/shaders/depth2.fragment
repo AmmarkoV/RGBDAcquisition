@@ -1,0 +1,10 @@
+
+varying vec4 vPosLS;
+
+void main(void)
+
+{
+
+   gl_FragColor = vec4(vec3(vPosLS.z*.5+.5), -sign(abs(vPosLS.x)) );
+
+}

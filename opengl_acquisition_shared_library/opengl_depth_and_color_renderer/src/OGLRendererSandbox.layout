@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Release" />
+	<File name="OGLRendererSandbox.h" open="1" top="0" tabpos="15">
+		<Cursor position="119" topLine="0" />
+	</File>
+	<File name="glx.c" open="1" top="0" tabpos="19">
+		<Cursor position="0" topLine="90" />
+	</File>
+	<File name="main.c" open="1" top="0" tabpos="14">
+		<Cursor position="1618" topLine="30" />
+	</File>
+	<File name="model_loader_obj.c" open="1" top="0" tabpos="20">
+		<Cursor position="40406" topLine="1177" />
+	</File>
+	<File name="save_to_file.c" open="1" top="0" tabpos="16">
+		<Cursor position="402" topLine="0" />
+	</File>
+	<File name="scene.c" open="1" top="0" tabpos="18">
+		<Cursor position="130" topLine="0" />
+	</File>
+	<File name="scene.h" open="1" top="0" tabpos="17">
+		<Cursor position="112" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1358801637 source:/home/ammar/Documents/Programming/FORTH/opengl_depth_and_color_renderer/src/Renderer/main.c
+	<stdio.h>
+	<stdlib.h>
+	"../OGLRendererSandbox.h"
+
+1358801851 /home/ammar/Documents/Programming/FORTH/opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
+

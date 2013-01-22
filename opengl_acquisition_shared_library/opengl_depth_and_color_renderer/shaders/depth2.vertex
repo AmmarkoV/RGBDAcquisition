@@ -1,0 +1,18 @@
+
+#version 120 // GL 2.1
+varying vec4 vPosLS;
+
+void main(void)
+{
+
+   //vertex position in light space 
+
+   gl_Position = gl_ModelViewProjectionMatrix*gl_Vertex;
+   //texture_coordinate = vec2(gl_MultiTexCoord0);
+
+  // vPosLS = gl_ProjectionMatrix  * gl_Vertex;
+  // vPosLS /= vPosLS.wwww;
+  // gl_Position = vPosLS;
+
+}
+

@@ -1,0 +1,274 @@
+==8944== Memcheck, a memory error detector
+==8944== Copyright (C) 2002-2011, and GNU GPL'd, by Julian Seward et al.
+==8944== Using Valgrind-3.7.0 and LibVEX; rerun with -h for copyright info
+==8944== Command: ./TestLoader
+==8944== 
+Starting to load object spatoula 
+TODO : proper string allocation here for filename spatoula 
+Allocating memory for faces
+Allocating memory for vertices
+Second pass of the file
+Calc 1 
+Calc 2 
+Calc 3 
+Calc 4 
+Calc 5 
+Calc 6 
+Calc 7 
+Calc 8 
+Calc 9 
+Calc 10 
+Calc 11 
+Calc 12 
+Calc 13 
+Calc 14 
+Calc 15 
+Calc 16 
+Calc 17 
+Calc 18 
+Calc 19 
+Calc 20 
+Calc 21 
+Calc 22 
+Calc 23 
+Calc 24 
+Calc 25 
+Calc 26 
+Calc 27 
+Calc 28 
+Calc 29 
+Calc 30 
+Calc 31 
+Calc 32 
+Calc 33 
+Calc 34 
+Calc 35 
+Calc 36 
+Calc 37 
+Calc 38 
+Calc 39 
+Calc 40 
+Calc 41 
+Calc 42 
+Calc 43 
+Calc 44 
+Calc 45 
+Calc 46 
+Calc 47 
+Calc 48 
+Calc 49 
+Calc 50 
+Calc 51 
+Calc 52 
+Calc 53 
+Calc 54 
+Calc 55 
+Calc 56 
+Calc 57 
+Calc 58 
+Calc 59 
+Calc 60 
+Calc 61 
+Calc 62 
+Calc 63 
+Calc 64 
+Calc 65 
+Calc 66 
+Calc 67 
+Calc 68 
+Calc 69 
+Calc 70 
+Calc 71 
+Calc 72 
+Calc 73 
+Calc 74 
+Calc 75 
+Calc 76 
+Calc 77 
+Calc 78 
+Calc 79 
+Calc 80 
+Calc 81 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x402428: calculateBoundingBox (model_loader_obj.c:370)
+==8944==    by 0x407F4B: loadObj (model_loader_obj.c:1268)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x40247B: calculateBoundingBox (model_loader_obj.c:371)
+==8944==    by 0x407F4B: loadObj (model_loader_obj.c:1268)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x4024D0: calculateBoundingBox (model_loader_obj.c:372)
+==8944==    by 0x407F4B: loadObj (model_loader_obj.c:1268)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x402524: calculateBoundingBox (model_loader_obj.c:373)
+==8944==    by 0x407F4B: loadObj (model_loader_obj.c:1268)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x402578: calculateBoundingBox (model_loader_obj.c:374)
+==8944==    by 0x407F4B: loadObj (model_loader_obj.c:1268)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x4025CD: calculateBoundingBox (model_loader_obj.c:375)
+==8944==    by 0x407F4B: loadObj (model_loader_obj.c:1268)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+Calc 1 
+Calc 2 
+Calc 3 
+Calc 4 
+Calc 5 
+Calc 6 
+Calc 7 
+Calc 8 
+Calc 9 
+Calc 10 
+Calc 11 
+Calc 12 
+Calc 13 
+Calc 14 
+Calc 15 
+Calc 16 
+Calc 17 
+Calc 18 
+Calc 19 
+Calc 20 
+Calc 21 
+Calc 22 
+Calc 23 
+Calc 24 
+Calc 25 
+Calc 26 
+Calc 27 
+Calc 28 
+Calc 29 
+Calc 30 
+Calc 31 
+Calc 32 
+Calc 33 
+Calc 34 
+Calc 35 
+Calc 36 
+Calc 37 
+Calc 38 
+Calc 39 
+Calc 40 
+Calc 41 
+Calc 42 
+Calc 43 
+Calc 44 
+Calc 45 
+Calc 46 
+Calc 47 
+Calc 48 
+Calc 49 
+Calc 50 
+Calc 51 
+Calc 52 
+Calc 53 
+Calc 54 
+Calc 55 
+Calc 56 
+Calc 57 
+Calc 58 
+Calc 59 
+Calc 60 
+Calc 61 
+Calc 62 
+Calc 63 
+Calc 64 
+Calc 65 
+Calc 66 
+Calc 67 
+Calc 68 
+Calc 69 
+Calc 70 
+Calc 71 
+Calc 72 
+Calc 73 
+Calc 74 
+Calc 75 
+Calc 76 
+Calc 77 
+Calc 78 
+Calc 79 
+Calc 80 
+Calc 81 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x402428: calculateBoundingBox (model_loader_obj.c:370)
+==8944==    by 0x407FCE: loadObj (model_loader_obj.c:1270)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x40247B: calculateBoundingBox (model_loader_obj.c:371)
+==8944==    by 0x407FCE: loadObj (model_loader_obj.c:1270)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x4024D0: calculateBoundingBox (model_loader_obj.c:372)
+==8944==    by 0x407FCE: loadObj (model_loader_obj.c:1270)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x402524: calculateBoundingBox (model_loader_obj.c:373)
+==8944==    by 0x407FCE: loadObj (model_loader_obj.c:1270)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x402578: calculateBoundingBox (model_loader_obj.c:374)
+==8944==    by 0x407FCE: loadObj (model_loader_obj.c:1270)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Conditional jump or move depends on uninitialised value(s)
+==8944==    at 0x4025CD: calculateBoundingBox (model_loader_obj.c:375)
+==8944==    by 0x407FCE: loadObj (model_loader_obj.c:1270)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== Invalid free() / delete / delete[] / realloc()
+==8944==    at 0x4C2A739: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==8944==    by 0x407E05: unloadObj (model_loader_obj.c:1245)
+==8944==    by 0x401197: main (main.c:16)
+==8944==  Address 0x77480e6 is 166 bytes inside a block of size 232 alloc'd
+==8944==    at 0x4C2B3F8: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==8944==    by 0x407E4B: loadObj (model_loader_obj.c:1256)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== 
+==8944== FILE DESCRIPTORS: 3 open at exit.
+==8944== Open file descriptor 2: /home/ammar/Documents/Programming/FORTH/opengl_depth_and_color_renderer/objloader_test/error.txt
+==8944==    <inherited from parent>
+==8944== 
+==8944== Open file descriptor 1: /dev/pts/0
+==8944==    <inherited from parent>
+==8944== 
+==8944== Open file descriptor 0: /dev/pts/0
+==8944==    <inherited from parent>
+==8944== 
+==8944== 
+==8944== HEAP SUMMARY:
+==8944==     in use at exit: 4,000 bytes in 1 blocks
+==8944==   total heap usage: 6 allocs, 6 frees, 19,752 bytes allocated
+==8944== 
+==8944== 4,000 bytes in 1 blocks are definitely lost in loss record 1 of 1
+==8944==    at 0x4C2B3F8: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==8944==    by 0x4017C6: AddFacetoG (model_loader_obj.c:170)
+==8944==    by 0x404C72: readOBJ (model_loader_obj.c:739)
+==8944==    by 0x407F08: loadObj (model_loader_obj.c:1267)
+==8944==    by 0x40117D: main (main.c:10)
+==8944== 
+==8944== LEAK SUMMARY:
+==8944==    definitely lost: 4,000 bytes in 1 blocks
+==8944==    indirectly lost: 0 bytes in 0 blocks
+==8944==      possibly lost: 0 bytes in 0 blocks
+==8944==    still reachable: 0 bytes in 0 blocks
+==8944==         suppressed: 0 bytes in 0 blocks
+==8944== 
+==8944== For counts of detected and suppressed errors, rerun with: -v
+==8944== Use --track-origins=yes to see where uninitialised values come from
+==8944== ERROR SUMMARY: 14 errors from 14 contexts (suppressed: 2 from 2)

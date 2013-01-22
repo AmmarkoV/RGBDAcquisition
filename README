@@ -1,0 +1,20 @@
+This is the RGBD project.. :P
+
+If you want OpenNI , OpenNI2 , LibFreenect , please issue 
+cd 3dparty && ./get_third_party_libs.sh
+
+To make the library issue 
+
+make
+
+
+To test it issue 
+
+./run_grabber.sh 10
+
+You can select from the modules linked by using  them as a parameter..
+For example
+./run_grabber.sh 10 OPENNI1 will use the  OpenNI1 module
+./run_grabber.sh 10 OPENNI2 will use the  OpenNI2 module
+./run_grabber.sh 10 OPENGL will use the  OpenGL  module
+./run_grabber.sh 10 FREENECT will use the  FREENECT module

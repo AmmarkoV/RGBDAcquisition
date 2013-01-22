@@ -1,0 +1,10 @@
+ 
+varying float depth;
+void main()
+{
+    vec4 viewPos = gl_ModelViewMatrix * gl_Vertex; // this will transform the vertex into eyespace
+    //depth = -viewPos.z; // minus because in OpenGL we are looking in the negative z-direction
+    depth = (-viewPos.z-gl_DepthRange.near)/(gl_DepthRange.far-gl_DepthRange.near); // will map near..far to 0..1
+    gl_Position = ftransform();
+}
+ 
