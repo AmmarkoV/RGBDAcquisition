@@ -30,7 +30,7 @@ else
   fi
 fi
 
-if [ -d OpenNI1 ]
+if [ -d OpenNI ]
 then
 echo "OpenNI1 appears to already exist .."
 else
@@ -40,14 +40,14 @@ else
   read answer
   if test "$answer" != "Y" -a "$answer" != "y";
   then
-     git clone git://github.com/OpenNI/OpenNI.git
-     cd OpenNI
-     mkdir build
-     cd build
-     cmake ..
-     make
-     cd ../../  
-
+     git clone git://github.com/OpenNI/OpenNI.git 
+     cd OpenNI/Platform/Linux/CreateRedist
+     ./RedistMaker
+     
+     cd ../Redist
+     #sudo ./install.sh 
+ 
+     cd ../../../../
   fi
 fi
 
@@ -56,7 +56,7 @@ if [ -d OpenNI2 ]
 then
 echo "OpenNI2 appears to already exist .."
 else
-  echo "Do you want to download freenect ? " 
+  echo "Do you want to download it ? " 
   echo
   echo -n " (Y/N)?"
   read answer
@@ -64,15 +64,14 @@ else
   then
      git clone git://github.com/OpenNI/OpenNI2.git
      cd OpenNI2
-     mkdir build
-     cd build
-     cmake ..
-     make
-     cd ../../ 
-     ln -s OpenNI2/Redist/OpenNI2 ../grabber/OpenNI2 
-     ln -s OpenNI2/Redist/OpenNI.ini ../grabber/OpenNI.ini 
-     ln -s OpenNI2/Redist/PS1080.ini ../grabber/PS1080.ini
-     ln -s OpenNI2/Redist/libOpenNI2.so ../grabber/libOpenNI2.so
+     make 
+     cd ..
+     
+     #should be at 3dparty dir  
+     ln -s OpenNI2/Bin/x64-Release/OpenNI2 ../grabber/OpenNI2 
+     ln -s OpenNI2/Config/OpenNI.ini ../grabber/OpenNI.ini 
+     ln -s OpenNI2/Config/PS1080.ini ../grabber/PS1080.ini
+     ln -s OpenNI2/Bin/x64-Release/libOpenNI2.so ../grabber/libOpenNI2.so
 
   fi
 fi

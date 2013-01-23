@@ -36,10 +36,10 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add option="-fPIC" />
-			<Add directory="../3dparty/OpenNI-2.0.0/Include/" />
+			<Add directory="../3dparty/OpenNI2/Include/" />
 		</Compiler>
 		<Linker>
-			<Add library="../3dparty/OpenNI-2.0.0/Redist/libOpenNI2.so" />
+			<Add library="../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so" />
 		</Linker>
 		<Unit filename="OpenNI2Acquisition.h" />
 		<Unit filename="main.cpp" />
