@@ -20,6 +20,7 @@
 
 #include "OGLRendererSandbox.h"
 
+#define FLIP_OPEN_GL_IMAGES 1
 
 unsigned int simplePow(unsigned int base,unsigned int exp)
 {
@@ -72,49 +73,76 @@ int saveRawImageToFile(char * filename,void * pixels , unsigned int width , unsi
 }
 
 
-void WriteOpenGLDepthShort(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
-{
-
-    short * zbuffer = (short *) malloc((width-x)*(height-y)*sizeof(short));
-
-    glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT,zbuffer);
-    saveRawImageToFile(depthfile,zbuffer,(width-x),(height-y),1,16);
-
-    if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
-
-    return ;
-}
 
 int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
-
     double depth_bias=0.0; double depth_scale=1.0;
     glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
     glGetDoublev(GL_DEPTH_SCALE, &depth_scale); // Returns 1.0
 
-
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
 
-
-
-
     float multiplier = 65536 / (farPlane-nearPlane);
 
+
+    #if FLIP_OPEN_GL_IMAGES
+     unsigned int yp = 0;
+     int i=0;
+     unsigned int stride = (width-x)*1;
+
+     for (yp=0; yp<height; yp++)
+       {
+         for ( i =0 ; i < (width-x); i ++ )
+            {
+               if (zbuffer[(height-1-yp)*stride+i]>=farPlane-nearPlane)  { depth[yp*stride+i]= 0.0f; } else
+                                                                         { depth[yp*stride+i]=  65536 - zbuffer[(height-1-yp)*stride+i] * multiplier; }
+
+            }
+       }
+    #else
     int i=0;
     for ( i =0 ; i < (width-x)*(height-y); i ++ )
       {
         if (zbuffer[i]>=farPlane-nearPlane)  { depth[i]= 0.0f; } else
                                              { depth[i]=  65536 - zbuffer[i] * multiplier; }
       }
+    #endif
 
     if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
     return 1;
 }
 
+
+
+int getOpenGLColor(char * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+{
+    #if FLIP_OPEN_GL_IMAGES
+       char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
+       glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
+
+      //SLOW INVERSION CODE :P
+       unsigned int yp = 0;
+       unsigned int stride = (width-x)*3;
+
+       for (yp=0; yp<height; yp++)
+       {
+         char * where_to = &depth[yp*stride];
+         char * where_from = &inverter[(height-1-yp)*stride];
+         memcpy(where_to , where_from , stride * sizeof(char));
+       }
+      free(inverter);
+    #else
+       glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,depth);
+    #endif
+
+   return 1;
+}
+
+
+
 void WriteOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
-
     short * zshortbuffer = (short *) malloc((width-x)*(height-y)*sizeof(short));
 
     getOpenGLDepth(zshortbuffer,x,y,width,height);
@@ -126,13 +154,6 @@ void WriteOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned in
     return ;
 }
 
-
-
-int getOpenGLColor(char * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
-{
-     glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,depth);
-     return 1;
-}
 
 void redraw(void)
 {
@@ -177,6 +198,11 @@ int startOGLRendererSandbox()
   char test[12]={0};
   char * testP = test;
   start_glx_stuff(WIDTH,HEIGHT,0,&testP);
+
+
+  #if FLIP_OPEN_GL_IMAGES
+    fprintf(stderr,"This version of OGLRendererSandbox is compiled to flip OpenGL frames to their correct orientation\n");
+  #endif
 
   initScene();
   return 1;

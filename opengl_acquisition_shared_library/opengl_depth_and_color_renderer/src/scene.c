@@ -86,7 +86,7 @@ int initScene()
 
 
   float x,y,z,heading,pitch,roll;
-  x=0.0; y=0.0; z=0.0; heading=00; pitch=90; roll=90;
+  x=0.0; y=5.0; z=-5.0; heading=00; pitch=90; roll=90;
   fprintf(stderr,"passing %0.2f %0.2f %0.2f - %0.2f %0.2f %0.2f \n",x,y,z,heading,pitch,roll);
   //setModelCoordinates(spatoula,x,y,z,heading,pitch,roll);
   setModelCoordinatesNoSTACK(spatoula,&x,&y,&z,&heading,&pitch,&roll);
