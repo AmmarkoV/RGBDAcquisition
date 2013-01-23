@@ -86,13 +86,13 @@ int initScene()
 
 
   float x,y,z,heading,pitch,roll;
-  x=1.0; y=0.0; z=1.0; heading=372; pitch=372; roll=80;
+  x=0.0; y=0.0; z=0.0; heading=00; pitch=90; roll=90;
   fprintf(stderr,"passing %0.2f %0.2f %0.2f - %0.2f %0.2f %0.2f \n",x,y,z,heading,pitch,roll);
   //setModelCoordinates(spatoula,x,y,z,heading,pitch,roll);
   setModelCoordinatesNoSTACK(spatoula,&x,&y,&z,&heading,&pitch,&roll);
 
 
-  x=3.0; y=-4.0; z=0.0; heading=4; pitch=4; roll=4;
+  x=3.0; y=-4.0; z=0.0; heading=14; pitch=4; roll=4;
   fprintf(stderr,"passing %0.2f %0.2f %0.2f - %0.2f %0.2f %0.2f \n",x,y,z,heading,pitch,roll);
   //setModelCoordinates(duck,x,y,z,heading,pitch,roll);
   setModelCoordinatesNoSTACK(duck,&x,&y,&z,&heading,&pitch,&roll);
@@ -116,7 +116,7 @@ int tickScene()
    float x,y,z,heading,pitch,roll;
    //addToModelCoordinates(spatoula,0.0 /*X*/,0.0/*Y*/,0.0/*Z*/,(float) 0.01/*HEADING*/,(float) 0.01/*PITCH*/,(float) 0.006/*ROLL*/);
 
-   x=0.0; y=0.0; z=0.0; heading=1.01; pitch=1.01; roll=1.006;
+   x=0.0; y=0.0; z=0.0; heading=1.21; pitch=1.01; roll=1.006;
    addToModelCoordinatesNoSTACK(spatoula,&x,&y,&z,&heading,&pitch,&roll);
 
    //fprintf(stderr,".");
