@@ -219,7 +219,7 @@ int snapTemplateFrames(int devID)
        ++found_frames;
      }
 
-    sprintf(file_name_test,"frames/depthFrame_%u_%05u.pnm",readFromDir,devID,cycle);
+    sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",readFromDir,devID,cycle);
     if (FileExists(file_name_test))
      {
       if (templateDepthFrame!=0) { free(templateDepthFrame); }

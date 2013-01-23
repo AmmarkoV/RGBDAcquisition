@@ -21,9 +21,14 @@ int mapFreenectDepthToRGB(int devID)
 int startFreenectModule(unsigned int max_devs)
 {
   uint32_t ts;
-  char * rgb;
+  char * rgb, * depth;
+  fprintf(stderr,"Please hang on while starting Freenect module.. \n");
   int ret = freenect_sync_get_video((void**)&rgb, &ts, 0 , FREENECT_VIDEO_RGB);
   if (ret < 0) { fprintf(stderr,"There doesnt seem to exist a Freenect compatible device with index 0\n"); return 0; }
+
+  freenect_sync_get_video((void**)&rgb, &ts, 0 , FREENECT_VIDEO_RGB);
+  freenect_sync_get_depth((void**)&depth, &ts, 0 ,FREENECT_DEPTH_11BIT);
+
   return 1;
 }
 
