@@ -27,8 +27,10 @@ const GLfloat high_shininess[] = { 100.0f };
 float camera_pos_x = 0.0f; float camera_pos_y = -3.0f; float camera_pos_z = 8.0f;
 float camera_angle_x = 10.0f; float camera_angle_y = 3.0f; float camera_angle_z = 0.0f;
 
+unsigned int ticks = 0;
 
 struct Model * spatoula=0;
+struct Model * duck=0;
 
 
 int initScene()
@@ -55,6 +57,8 @@ int initScene()
   /* pedantic, full window size is default viewport */
   glViewport(0, 0, WIDTH, HEIGHT);
 
+  glEnable(GL_COLOR);
+  glEnable(GL_COLOR_MATERIAL);
 
   glEnable(GL_LIGHT0);
   glEnable(GL_LIGHTING);
@@ -68,14 +72,31 @@ int initScene()
 
 
 
+  float R,G,B,trans;
   spatoula = loadModel("spatoula.obj");
-  setModelColor(spatoula,0.0,1.0,1.0);
+  R=0.0f; G=0.0f;  B=1.0f; trans=0.0f;
+  setModelColor(spatoula,&R,&G,&B,&trans);
+
+  duck  = loadModel("duck.obj");
+  R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
+  setModelColor(duck,&R,&G,&B,&trans);
+  fprintf(stderr,"Passed %0.2f %0.2f %0.2f \n",R,G,B);
+
+  float x,y,z,heading,pitch,roll;
+  x=1.0; y=-4.0; z=0.0; heading=4; pitch=4; roll=4;
+  fprintf(stderr,"passing %0.2f %0.2f %0.2f - %0.2f %0.2f %0.2f \n",x,y,z,heading,pitch,roll);
+  //setModelCoordinates(duck,x,y,z,heading,pitch,roll);
+  setModelCoordinatesNoSTACK(duck,&x,&y,&z,&heading,&pitch,&roll);
+
+  //exit (0);
 }
 
 
 int closeScene()
 {
   unloadModel(spatoula);
+  unloadModel(duck);
+  return 1;
 }
 
 
@@ -83,15 +104,26 @@ int closeScene()
 int tickScene()
 {
    // addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
-   addToModelCoordinates(spatoula,0.0 /*X*/,0.0/*Y*/,0.0/*Z*/,(float) 0.01/*HEADING*/,(float) 0.01/*PITCH*/,(float) 0.006/*ROLL*/);
+   float x,y,z,heading,pitch,roll;
+   //addToModelCoordinates(spatoula,0.0 /*X*/,0.0/*Y*/,0.0/*Z*/,(float) 0.01/*HEADING*/,(float) 0.01/*PITCH*/,(float) 0.006/*ROLL*/);
+
+   x=0.0; y=0.0; z=0.0; heading=14.01; pitch=14.01; roll=14.006;
+   addToModelCoordinatesNoSTACK(spatoula,&x,&y,&z,&heading,&pitch,&roll);
+
    //fprintf(stderr,".");
    usleep(20000);
+   ++ticks;
+   return 1;
 }
 
 
 
 int renderScene()
 {
+  glEnable (GL_DEPTH_TEST);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
   glPushMatrix();
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -103,6 +135,34 @@ int renderScene()
 
       drawModel(spatoula);
 
+      drawModel(duck);
+
+      float tick_disp =  ticks / 10000 ;
+      if ( ticks > 100 ) { ticks =0 ; }
+
+      float distance= -15.0-ticks;
+      float dims = 15.0;
+
+    glBegin(GL_QUADS);
+      glColor3f(1.0, 0.0, 0.0);  /* red */
+      glVertex3f(-dims, dims, distance);
+      glVertex3f(dims, dims, distance);
+      glVertex3f(dims, -dims, distance);
+      glVertex3f(-dims, -dims, distance);
+    glEnd();
+
+   dims = 125.0;
+   distance=-50;
+    glBegin(GL_QUADS);
+      glColor3f(0.4, 0.4, 0.4);  /* red */
+      glVertex3f(-dims, dims, distance);
+      glVertex3f(dims, dims, distance);
+      glVertex3f(dims, -dims, distance);
+      glVertex3f(-dims, -dims, distance);
+    glEnd();
+
+
   glPopMatrix();
+  return 1;
 }
 

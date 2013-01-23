@@ -1,11 +1,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
 
 #include "model_loader.h"
+#include "model_loader_obj.h"
 #include "tools.h"
 
 
@@ -63,11 +65,15 @@ void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float 
       { // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
         glDisable(GL_COLOR_MATERIAL); //Required for the glMaterial calls to work
       } else
-      { if (mod->transparency==0) { glColor3f(mod->colorR,mod->colorG,mod->colorB); } else
-                                  { glEnable(GL_BLEND);			// Turn Blending On
-                                    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-                                    glColor4f(mod->colorR,mod->colorG,mod->colorB,mod->transparency);
-                                  }
+      { if (mod->transparency==0.0)
+         {
+          fprintf(stderr,"Only Seting color %0.2f %0.2f %0.2f \n",mod->colorR,mod->colorG,mod->colorB);
+          glColor3f(mod->colorR,mod->colorG,mod->colorB);
+         } else
+         { glEnable(GL_BLEND);			// Turn Blending On
+           glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+           glColor4f(mod->colorR,mod->colorG,mod->colorB,mod->transparency);
+         }
       }
 
 
@@ -117,14 +123,58 @@ int addToModelCoordinates(struct Model * mod,float x,float y,float z,float headi
   return 1;
 }
 
-int setModelColor(struct Model * mod,float R,float G,float B)
+int addToModelCoordinatesNoSTACK(struct Model * mod,float *x,float *y,float *z,float *heading,float *pitch,float *roll)
+{
+  if (mod==0) { return 0; }
+  mod->x+=*x; mod->y+=*y; mod->z+=*z;
+
+  mod->heading+=degreeToRad(*heading); mod->pitch+=degreeToRad(*pitch); mod->roll+=degreeToRad(*roll);
+  fprintf(stderr,"Model(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+  return 1;
+}
+
+int setModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
+{
+  if (mod==0) { return 0; }
+  fprintf(stderr,"Model SET Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",x,y,z,heading,pitch,roll);
+  float stack_x=x;
+  float stack_y=y;
+  float stack_z=z;
+  float stack_heading=heading;
+  float stack_pitch=pitch;
+  float stack_roll=roll;
+
+  mod->x=stack_x; mod->y=stack_y; mod->z=stack_z;
+
+  mod->heading=degreeToRad(stack_heading); mod->pitch=degreeToRad(stack_pitch); mod->roll=degreeToRad(stack_roll);
+  fprintf(stderr,"Model SET (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+  return 1;
+}
+
+int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,float *heading,float *pitch,float* roll)
+{
+  if (mod==0) { return 0; }
+  fprintf(stderr,"Model SET Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",x,y,z,heading,pitch,roll);
+
+  mod->x=*x; mod->y=*y; mod->z=*z;
+
+  mod->heading=degreeToRad(*heading); mod->pitch=degreeToRad(*pitch); mod->roll=degreeToRad(*roll);
+  fprintf(stderr,"Model SET (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+  return 1;
+}
+
+
+
+int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transparency)
 {
  if (mod==0) { return 0; }
 
- mod->colorR = R;
- mod->colorG = G;
- mod->colorB = B;
-
+ fprintf(stderr,"Seting color to  %0.2f %0.2f %0.2f trans %0.2f \n",*R,*G,*B,*transparency);
+ mod->colorR = *R;
+ mod->colorG = *G;
+ mod->colorB = *B;
+ mod->transparency = *transparency;
+ fprintf(stderr,"Seting color to  %0.2f %0.2f %0.2f trans %0.2f \n",mod->colorR,mod->colorG,mod->colorB,mod->transparency);
  return 1;
 }
 
@@ -161,5 +211,9 @@ int drawCube()
       glVertex3f(-1.0, -1.0, -1.0);
     glEnd();
     glEndList();
+    return 1;
 }
+
+
+
 

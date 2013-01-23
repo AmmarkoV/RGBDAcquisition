@@ -1,5 +1,6 @@
 #include "save_to_file.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 
 void WriteOpenGLColor(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {

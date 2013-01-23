@@ -32,7 +32,6 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int argc, char **argv)
   Colormap             cmap;
   XSetWindowAttributes swa;
   GLXContext           cx;
-  XEvent               event;
   int                  dummy;
 
 
@@ -91,6 +90,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int argc, char **argv)
 
 
   /*** (9) dispatch X events ***/
+  return 1;
 }
 
 
@@ -99,6 +99,7 @@ int glx_endRedraw()
 {
   if (doubleBuffer) glXSwapBuffers(dpy, win);/* buffer swap does implicit glFlush */
   else glFlush();  /* explicit flush for single buffered case */
+  return 1;
 }
 
 

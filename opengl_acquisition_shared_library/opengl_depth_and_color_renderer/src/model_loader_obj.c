@@ -173,7 +173,11 @@ void AddFacetoG(Group *g,long unsigned int fc)
 	if(g->malloced<=g->numFaces)
 	{
 
-
+		fprintf(stderr,"New Reallocation code..\n");
+	    g->malloced+=reallocationStep;
+	    g->faceList=(long unsigned int*) realloc(g->faceList, sizeof(long unsigned int)*(g->malloced));
+		fprintf(stderr,"New Reallocation code survived..\n");
+/*
 	    fprintf(stderr,"Stupid Reallocation code..\n");
 	    long unsigned int * tmpin;
 	    tmpin= (long unsigned int*)malloc(sizeof(long unsigned int)*(g->numFaces));
@@ -186,7 +190,7 @@ void AddFacetoG(Group *g,long unsigned int fc)
 		memcpy(g->faceList,tmpin,sizeof(long unsigned int)*(g->numFaces));
 		free(tmpin);
 		g->malloced+=reallocationStep;
-	    fprintf(stderr,"Stupid Reallocation code survived..\n");
+	    fprintf(stderr,"Stupid Reallocation code survived..\n");*/
 	}
 	g->faceList[g->numFaces]=fc;
 	g->numFaces++;
@@ -402,7 +406,6 @@ int readOBJ(struct OBJ_Model * obj)
   /* Read the .obj model from file FILENAME */
   /* All faces are converted to be triangles */
   FILE *file;
-  GLboolean chk = 0;
   char buf[128];
   char buf1[128];
   long unsigned int    numvertices;		/* number of vertices in model */

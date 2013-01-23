@@ -11,6 +11,7 @@
 #include <X11/X.h>    /* X11 constant (e.g. TrueColor) */
 #include <X11/keysym.h>
 
+#include "glx.h"
 #include "model_loader_obj.h"
 #include "scene.h"
 
@@ -108,6 +109,7 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
       }
 
     if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
+    return 1;
 }
 
 void WriteOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
@@ -129,15 +131,12 @@ void WriteOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned in
 int getOpenGLColor(char * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
      glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,depth);
+     return 1;
 }
 
 void redraw(void)
 {
-    glEnable (GL_DEPTH_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     renderScene();
-
     glx_endRedraw();
 }
 
@@ -175,7 +174,9 @@ double getOpenGLPixelSize()
 
 int startOGLRendererSandbox()
 {
-  start_glx_stuff(WIDTH,HEIGHT,0,"");
+  char test[12]={0};
+  char * testP = test;
+  start_glx_stuff(WIDTH,HEIGHT,0,&testP);
 
   initScene();
   return 1;
@@ -188,7 +189,9 @@ int snapOGLRendererSandbox()
     {
       tickScene();
       redraw();
+      return 1;
     }
+   return 0;
 }
 
 int stopOGLRendererSandbox()

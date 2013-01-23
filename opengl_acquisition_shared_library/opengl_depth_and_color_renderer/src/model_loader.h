@@ -38,7 +38,12 @@ void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float 
 void drawModel(struct Model * mod);
 
 int addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
-int setModelColor(struct Model * mod,float R,float G,float B);
+int addToModelCoordinatesNoSTACK(struct Model * mod,float *x,float *y,float *z,float *heading,float *pitch,float *roll);
+
+int setModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
+int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,float *heading,float *pitch,float* roll);
+int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transparency);
 
 int drawCube();
+
 #endif // MODEL_LOADER_H_INCLUDED
