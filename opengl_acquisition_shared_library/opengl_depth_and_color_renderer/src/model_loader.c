@@ -12,7 +12,7 @@
 
 
 #define PIE 3.14159265358979323846
-#define degreeToRad(deg) (deg)*(PIE/180)
+#define degreeToRadOLD(deg) (deg)*(PIE/180)
 
 struct Model * loadModel(char * modelname)
 {
@@ -118,7 +118,7 @@ int addToModelCoordinates(struct Model * mod,float x,float y,float z,float headi
   if (mod==0) { return 0; }
   mod->x+=x; mod->y+=y; mod->z+=z;
 
-  mod->heading+=degreeToRad(heading); mod->pitch+=degreeToRad(pitch); mod->roll+=degreeToRad(roll);
+  mod->heading+=heading; mod->pitch+=pitch; mod->roll+=roll;
   fprintf(stderr,"Model(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
   return 1;
 }
@@ -128,7 +128,7 @@ int addToModelCoordinatesNoSTACK(struct Model * mod,float *x,float *y,float *z,f
   if (mod==0) { return 0; }
   mod->x+=*x; mod->y+=*y; mod->z+=*z;
 
-  mod->heading+=degreeToRad(*heading); mod->pitch+=degreeToRad(*pitch); mod->roll+=degreeToRad(*roll);
+  mod->heading+=*heading; mod->pitch+=*pitch; mod->roll+=*roll;
   fprintf(stderr,"Model(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
   return 1;
 }
@@ -137,16 +137,10 @@ int setModelCoordinates(struct Model * mod,float x,float y,float z,float heading
 {
   if (mod==0) { return 0; }
   fprintf(stderr,"Model SET Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",x,y,z,heading,pitch,roll);
-  float stack_x=x;
-  float stack_y=y;
-  float stack_z=z;
-  float stack_heading=heading;
-  float stack_pitch=pitch;
-  float stack_roll=roll;
 
-  mod->x=stack_x; mod->y=stack_y; mod->z=stack_z;
+  mod->x=x; mod->y=y; mod->z=z;
 
-  mod->heading=degreeToRad(stack_heading); mod->pitch=degreeToRad(stack_pitch); mod->roll=degreeToRad(stack_roll);
+  mod->heading=heading; mod->pitch=pitch; mod->roll=roll;
   fprintf(stderr,"Model SET (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
   return 1;
 }
@@ -154,12 +148,12 @@ int setModelCoordinates(struct Model * mod,float x,float y,float z,float heading
 int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,float *heading,float *pitch,float* roll)
 {
   if (mod==0) { return 0; }
-  fprintf(stderr,"Model SET Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",x,y,z,heading,pitch,roll);
+  fprintf(stderr,"Model SET NoSTACK Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",*x,*y,*z,*heading,*pitch,*roll);
 
   mod->x=*x; mod->y=*y; mod->z=*z;
 
-  mod->heading=degreeToRad(*heading); mod->pitch=degreeToRad(*pitch); mod->roll=degreeToRad(*roll);
-  fprintf(stderr,"Model SET (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+  mod->heading=*heading; mod->pitch=*pitch; mod->roll=*roll;
+  fprintf(stderr,"Model SET NoSTACK (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
   return 1;
 }
 
