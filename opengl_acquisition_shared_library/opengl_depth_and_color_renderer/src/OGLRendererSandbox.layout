@@ -1,25 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release" />
-	<File name="OGLRendererSandbox.h" open="1" top="0" tabpos="15">
+	<ActiveTarget name="Debug" />
+	<File name="OGLRendererSandbox.h" open="1" top="0" tabpos="2">
 		<Cursor position="119" topLine="0" />
 	</File>
-	<File name="glx.c" open="1" top="0" tabpos="19">
-		<Cursor position="0" topLine="90" />
+	<File name="glx.c" open="1" top="0" tabpos="6">
+		<Cursor position="2679" topLine="72" />
 	</File>
-	<File name="main.c" open="1" top="0" tabpos="14">
-		<Cursor position="1618" topLine="30" />
+	<File name="glx.h" open="1" top="0" tabpos="11">
+		<Cursor position="50" topLine="0" />
 	</File>
-	<File name="model_loader_obj.c" open="1" top="0" tabpos="20">
-		<Cursor position="40406" topLine="1177" />
+	<File name="main.c" open="1" top="0" tabpos="1">
+		<Cursor position="3272" topLine="76" />
 	</File>
-	<File name="save_to_file.c" open="1" top="0" tabpos="16">
-		<Cursor position="402" topLine="0" />
+	<File name="model_loader.c" open="1" top="0" tabpos="9">
+		<Cursor position="614" topLine="0" />
 	</File>
-	<File name="scene.c" open="1" top="0" tabpos="18">
-		<Cursor position="130" topLine="0" />
+	<File name="model_loader.h" open="1" top="0" tabpos="10">
+		<Cursor position="834" topLine="7" />
 	</File>
-	<File name="scene.h" open="1" top="0" tabpos="17">
+	<File name="model_loader_obj.c" open="1" top="0" tabpos="7">
+		<Cursor position="3450" topLine="156" />
+	</File>
+	<File name="save_to_file.c" open="1" top="0" tabpos="3">
+		<Cursor position="64" topLine="0" />
+	</File>
+	<File name="scene.c" open="1" top="1" tabpos="5">
+		<Cursor position="3112" topLine="74" />
+	</File>
+	<File name="scene.h" open="1" top="0" tabpos="4">
 		<Cursor position="112" topLine="0" />
+	</File>
+	<File name="tools.c" open="1" top="0" tabpos="12">
+		<Cursor position="53" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

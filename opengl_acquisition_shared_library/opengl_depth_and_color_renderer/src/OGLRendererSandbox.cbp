@@ -38,6 +38,7 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
 		<Linker>
