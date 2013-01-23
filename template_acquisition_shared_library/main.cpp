@@ -9,6 +9,8 @@ unsigned int templateHEIGHT=480;
 char * templateColorFrame = 0;
 short * templateDepthFrame = 0;
 
+
+char readFromDir[1024]={0}; // <- this sucks i know :P
 unsigned short cycle=0;
 
 
@@ -138,7 +140,16 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
 
 
 
-int startTemplate(unsigned int max_devs) { return 1; }
+int startTemplate(unsigned int max_devs,char * settings)
+{
+    if (settings==0) { strcpy(readFromDir,""); }
+       else
+     {
+       if (strlen(settings)==0)  { strcpy(readFromDir,""); } else
+                                 { strcpy(readFromDir,settings);  }
+     }
+    return 1;
+}
 int getTemplateNumberOfDevices() { return 1; }
 
 int stopTemplate()
@@ -157,7 +168,10 @@ int createTemplateDevice(int devID,unsigned int width,unsigned int height,unsign
    }
 
   unsigned int widthInternal; unsigned int heightInternal;
-  char * tmpColor = ReadPPM((char*) "frames/colorFrame_0_00000.pnm",&widthInternal,&heightInternal);
+
+  char file_name_test[1024];
+  sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",readFromDir,devID,0);
+  char * tmpColor = ReadPPM(file_name_test,&widthInternal,&heightInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
@@ -168,7 +182,8 @@ int createTemplateDevice(int devID,unsigned int width,unsigned int height,unsign
   }
 
 
-  short * tmpDepth = ReadPPMD((char*) "frames/depthFrame_0_00000.pnm",&widthInternal,&heightInternal);
+  sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",readFromDir,devID,0);
+  short * tmpDepth = ReadPPMD(file_name_test,&widthInternal,&heightInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
@@ -195,8 +210,8 @@ int snapTemplateFrames(int devID)
     int found_frames = 0;
 
     unsigned int widthInternal; unsigned int heightInternal;
-    char file_name_test[512];
-    sprintf(file_name_test,"frames/colorFrame_%u_%05u.pnm",devID,cycle);
+    char file_name_test[1024];
+    sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",readFromDir,devID,cycle);
     if (FileExists(file_name_test))
      {
        if (templateColorFrame!=0) { free(templateColorFrame); }
@@ -204,7 +219,7 @@ int snapTemplateFrames(int devID)
        ++found_frames;
      }
 
-    sprintf(file_name_test,"frames/depthFrame_%u_%05u.pnm",devID,cycle);
+    sprintf(file_name_test,"frames/depthFrame_%u_%05u.pnm",readFromDir,devID,cycle);
     if (FileExists(file_name_test))
      {
       if (templateDepthFrame!=0) { free(templateDepthFrame); }

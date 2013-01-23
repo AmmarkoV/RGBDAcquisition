@@ -11,7 +11,7 @@
 float farPlane = 259;
 float nearPlane= 1.0;
 
-GLfloat    xAngle = 42.0, yAngle = 82.0, zAngle = 112.0;
+GLfloat    xAngle = 0.0, yAngle = 82.0, zAngle = 112.0;
 
 
 const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -86,7 +86,7 @@ int initScene()
 
 
   float x,y,z,heading,pitch,roll;
-  x=0.0; y=5.0; z=-5.0; heading=00; pitch=90; roll=90;
+  x=0.0; y=-7.0; z=-4.0; heading=0; pitch=90; roll=-90;
   fprintf(stderr,"passing %0.2f %0.2f %0.2f - %0.2f %0.2f %0.2f \n",x,y,z,heading,pitch,roll);
   //setModelCoordinates(spatoula,x,y,z,heading,pitch,roll);
   setModelCoordinatesNoSTACK(spatoula,&x,&y,&z,&heading,&pitch,&roll);
@@ -149,21 +149,26 @@ int renderScene()
       float tick_disp =  ticks / 10000 ;
       if ( ticks > 100 ) { ticks =0 ; }
 
-      float distance= -15.0-ticks;
-      float dims = 15.0;
 
+
+
+    float distance= -15.0-ticks;
+    float dims = 15.0;
+    float displace_x = -25;
     glBegin(GL_QUADS);
-      glColor3f(1.0, 0.0, 0.0);  /* red */
-      glVertex3f(-dims, dims, distance);
-      glVertex3f(dims, dims, distance);
-      glVertex3f(dims, -dims, distance);
-      glVertex3f(-dims, -dims, distance);
+      glColor3f(0.0, 1.0, 0.0);  /* red */
+      glVertex3f(-dims+displace_x, dims, distance);
+      glVertex3f(dims+displace_x, dims, distance);
+      glVertex3f(dims+displace_x, -dims, distance);
+      glVertex3f(-dims+displace_x, -dims, distance);
     glEnd();
 
+
+   //BOTTOM :P
    dims = 125.0;
    distance=-50;
     glBegin(GL_QUADS);
-      glColor3f(0.4, 0.4, 0.4);  /* red */
+      glColor3f(0.4, 0.4, 0.4);
       glVertex3f(-dims, dims, distance);
       glVertex3f(dims, dims, distance);
       glVertex3f(dims, -dims, distance);

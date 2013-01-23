@@ -72,14 +72,14 @@ char * getOpenGLColorPixels(int devID)
 double getOpenGLColorFocalLength(int devID)
 {
    fprintf(stderr,"getOpenGLDepthFocalLength returns fixed values.. \n");
-   return 120.0;
+   //return 120.0;
    return getOpenGLFocalLength();
 }
 
 double getOpenGLColorPixelSize(int devID)
 {
     fprintf(stderr,"getOpenGLDepthPixelSize returns fixed values.. \n");
-    return 0.1052;
+    //return 0.1052;
     return getOpenGLPixelSize();
 }
 
@@ -101,14 +101,14 @@ char * getOpenGLDepthPixels(int devID)
 double getOpenGLDepthFocalLength(int devID)
 {
    fprintf(stderr,"getOpenGLDepthFocalLength returns fixed values.. \n");
-   return 120.0;
+   //return 120.0;
    return getOpenGLFocalLength();
 }
 
 double getOpenGLDepthPixelSize(int devID)
 {
     fprintf(stderr,"getOpenGLDepthPixelSize returns fixed values.. \n");
-    return 0.1052;
+    //return 0.1052;
     return getOpenGLPixelSize();
 }
 

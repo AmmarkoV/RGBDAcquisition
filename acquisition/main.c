@@ -114,6 +114,19 @@ int acquisitionGetModulesCount()
 
 }
 
+
+ModuleIdentifier getModuleIdFromModuleName(char * moduleName)
+{
+   ModuleIdentifier moduleID = 0;
+          if (strcasecmp("FREENECT",moduleName)==0 )  { moduleID = FREENECT_ACQUISITION_MODULE; } else
+          if (strcasecmp("OPENNI1",moduleName)==0 )  { moduleID = OPENNI1_ACQUISITION_MODULE;  } else
+          if (strcasecmp("OPENNI2",moduleName)==0 )  { moduleID = OPENNI2_ACQUISITION_MODULE;  } else
+          if (strcasecmp("OPENGL",moduleName)==0 )   { moduleID = OPENGL_ACQUISITION_MODULE;   } else
+          if (strcasecmp("TEMPLATE",moduleName)==0 )  { moduleID = TEMPLATE_ACQUISITION_MODULE; }
+   return moduleID;
+}
+
+
 char * getModuleStringName(ModuleIdentifier moduleID)
 {
   switch (moduleID)
@@ -181,7 +194,7 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
 /*! ------------------------------------------
     BASIC START STOP MECHANISMS FOR MODULES..
    ------------------------------------------*/
-int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices)
+int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings)
 {
     switch (moduleID)
     {
@@ -193,7 +206,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices)
       break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
-          return startTemplate(maxDevices);
+          return startTemplate(maxDevices,settings);
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
@@ -836,5 +849,4 @@ double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetPixelSize");
     return 0.0;
 }
-
 

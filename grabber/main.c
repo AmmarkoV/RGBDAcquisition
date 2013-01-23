@@ -5,6 +5,28 @@
 #include "../acquisition/Acquisition.h"
 
 
+char outputfoldername[512]={0};
+
+
+
+
+int makepath(char * path)
+{
+     FILE *fp;
+    /* Open the command for reading. */
+    char command[1024];
+    sprintf(command,"mkdir -p %s",outputfoldername);
+    fprintf(stderr,"Executing .. %s \n",command);
+
+    return system(command);
+}
+
+
+
+
+
+
+
 int main(int argc, char *argv[])
 {
  fprintf(stderr,"Generic Grabber Application based on Acquisition lib .. \n");
@@ -29,13 +51,16 @@ int main(int argc, char *argv[])
      }
     if (argc>2)
      {
-          if (strcmp("FREENECT",argv[2])==0 )  { moduleID = FREENECT_ACQUISITION_MODULE; } else
-          if (strcmp("OPENNI1", argv[2])==0 )  { moduleID = OPENNI1_ACQUISITION_MODULE;  } else
-          if (strcmp("OPENNI2", argv[2])==0 )  { moduleID = OPENNI2_ACQUISITION_MODULE;  } else
-          if (strcmp("OPENGL", argv[2])==0 )   { moduleID = OPENGL_ACQUISITION_MODULE;   } else
-          if (strcmp("TEMPLATE",argv[2])==0 )  { moduleID = TEMPLATE_ACQUISITION_MODULE; }
-
+          moduleID = getModuleIdFromModuleName(argv[2]);
           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
+     }
+
+    strcpy(outputfoldername,"frames/");
+    if (argc>3)
+     {
+          strcat(outputfoldername,argv[3]);
+          makepath(outputfoldername);
+          fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
      }
 
   if (!acquisitionIsModuleLinked(moduleID))
@@ -45,7 +70,7 @@ int main(int argc, char *argv[])
    }
 
   //We need to initialize our module before calling any related calls to the specific module..
-  if (!acquisitionStartModule(moduleID,16 /*maxDevices*/))
+  if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
   {
        fprintf(stderr,"Could not start module..\n");
        return 1;
@@ -80,11 +105,11 @@ int main(int argc, char *argv[])
         acquisitionSnapFrames(moduleID,devID);
 
         //fprintf(stderr,"Color frame is %ux%u:3 - %u \n",getOpenNI2ColorWidth(devID) , getOpenNI2ColorHeight(devID) , getOpenNI2ColorDataSize(devID));
-        sprintf(outfilename,"frames/colorFrame_%u_%05u.pnm",devID,frameNum);
+        sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
         //fprintf(stderr,"Depth frame is %ux%u:1 - %u \n",getOpenNI2DepthWidth(devID) , getOpenNI2DepthHeight(devID) , getOpenNI2DepthDataSize(devID));
-        sprintf(outfilename,"frames/depthFrame_%u_%05u.pnm",devID,frameNum);
+        sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         acquisitionSaveDepthFrame(moduleID,devID,outfilename);
       }
     }

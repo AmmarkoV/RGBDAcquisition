@@ -23,11 +23,12 @@ typedef unsigned int ModuleIdentifier;
 typedef unsigned int DeviceIdentifier;
 
 
+ModuleIdentifier getModuleIdFromModuleName(char * moduleName);
 int acquisitionGetModulesCount();
 char * getModuleStringName(ModuleIdentifier moduleID);
 int acquisitionIsModuleLinked(ModuleIdentifier moduleID);
 
-int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices);
+int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings);
 int acquisitionStopModule(ModuleIdentifier moduleID);
 int acquisitionGetModuleDevices(ModuleIdentifier moduleID);
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int width,unsigned int height,unsigned int framerate);

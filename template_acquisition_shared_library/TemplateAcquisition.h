@@ -7,7 +7,7 @@ extern "C"
 {
 #endif
    //Initialization of Template
-   int startTemplate(unsigned int max_devs);
+   int startTemplate(unsigned int max_devs,char * settings);
    int getTemplateNumberOfDevices(); // This has to be called AFTER startTemplate
    int stopTemplate();
 
