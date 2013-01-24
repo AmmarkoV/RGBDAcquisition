@@ -100,6 +100,9 @@ int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigne
 		return 0;
 	}
 
+   imageGenerators[devID].GetMirrorCap().SetMirror(false);
+   depthGenerators[devID].GetMirrorCap().SetMirror(false);
+
  return 1;
 }
 

@@ -146,6 +146,8 @@ int initializeOpenNIDevice(int deviceID , Device &device , VideoStream &color , 
 
   device.setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
 
+  device.setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
+
 if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
     {
         Status rc = depth.create(device, SENSOR_DEPTH);
@@ -188,6 +190,9 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
     depth.getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,&zpd);
     depth.getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
 
+
+    depth.setMirroringEnabled (false);
+    color.setMirroringEnabled (false);
 
     fprintf(stdout,"Device Initialized.\n");
     fprintf(stdout,"Depth ZPD: %u ",zpd);

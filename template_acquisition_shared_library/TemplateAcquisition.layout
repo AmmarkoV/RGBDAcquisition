@@ -2,9 +2,9 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="TemplateAcquisition.h" open="1" top="0" tabpos="2">
-		<Cursor position="715" topLine="0" />
+		<Cursor position="214" topLine="0" />
 	</File>
-	<File name="main.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="6402" topLine="208" />
+	<File name="main.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="6770" topLine="169" />
 	</File>
 </CodeBlocks_layout_file>

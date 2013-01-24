@@ -114,6 +114,7 @@ int main(int argc, char *argv[])
       }
     }
 
+    fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
 
     for (devID=0; devID<maxDevID; devID++)
      {
