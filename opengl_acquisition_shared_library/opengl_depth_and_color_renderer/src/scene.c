@@ -121,6 +121,7 @@ int tickScene()
   unsigned int i=0;
   for (i=0; i<scene->numberOfObjects; i++)
     {
+       pos[0]=0; pos[1]=0; pos[2]=0; pos[3]=0; pos[4]=0; pos[5]=0; pos[6]=0;
        calculateVirtualStreamPos(scene,i,ticks*100,pos);
        setModelCoordinatesNoSTACK(models[i],&pos[0],&pos[1],&pos[2],&pos[3],&pos[4],&pos[5]);
     }

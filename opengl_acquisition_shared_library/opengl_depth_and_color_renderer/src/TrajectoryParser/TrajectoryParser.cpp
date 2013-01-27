@@ -275,7 +275,7 @@ struct VirtualStream * readVirtualStream(char * filename)
     } //End of getting a line while reading the file
   }
 
-
+  fclose(fp);
   InputParser_Destroy(ipc);
 
   return newstream;
@@ -378,6 +378,13 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
 
 int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAbsMilliseconds,float * pos)
 {
+   if (stream==0) { fprintf(stderr,"calculateVirtualStreamPos called with null stream\n"); return 0; }
+   if (stream->object==0) { fprintf(stderr,"calculateVirtualStreamPos called with null object array\n"); return 0; }
+   if (stream->numberOfObjects<=ObjID) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u is out of bounds (%u)\n",ObjID,stream->numberOfObjects); return 0; }
+   if (stream->object[ObjID].frame == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u does not have a frame array allocated\n",ObjID); return 0; }
+   if (stream->object[ObjID].numberOfFrames == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u has 0 frames\n",ObjID); return 0; }
+
+
    unsigned int FrameIDToReturn = 0;
    unsigned int FrameIDLast = 0;
    unsigned int FrameIDNext = 0;
@@ -415,14 +422,14 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
        //timeAbsMilliseconds should contain a valid value now somewhere from 0->MAX_timeOfFrames
      }
 
+     fprintf(stderr,"Object %u has %u frames , lets search where we are",ObjID,stream->object[ObjID].numberOfFrames);
      //We scan all the frames to find out the "last one" and the "next one"
      unsigned int i =0;
-     for ( i=0; i <stream->object[ObjID].MAX_numberOfFrames-1; i++ )
+     for ( i=0; i <stream->object[ObjID].numberOfFrames-1; i++ )
       {
-       if
-        (  ( stream->object[ObjID].frame[i].time <= timeAbsMilliseconds )
+       if (( stream->object[ObjID].frame[i].time <= timeAbsMilliseconds )
                  &&
-          ( timeAbsMilliseconds <= stream->object[ObjID].frame[i+1].time )  )
+           ( timeAbsMilliseconds <= stream->object[ObjID].frame[i+1].time )  )
             {
                //This is the "next" frame!
                FrameIDLast = i;
