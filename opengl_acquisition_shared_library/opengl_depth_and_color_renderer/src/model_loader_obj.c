@@ -405,7 +405,7 @@ int readOBJ(struct OBJ_Model * obj)
   if (obj->filename == 0 ) { fprintf(stderr,"readOBJ called with a null filename , cannot continue \n"); return 0; }
   /* Read the .obj model from file FILENAME */
   /* All faces are converted to be triangles */
-  FILE *file;
+  FILE *file=0;
   char buf[128];
   char buf1[128];
   long unsigned int    numvertices;		/* number of vertices in model */
@@ -421,7 +421,8 @@ int readOBJ(struct OBJ_Model * obj)
   char fname[60]={0};
   strncpy(fname,obj->filename,60);
 
-  if((file=fopen(fname,"r"))==0) { fprintf(stderr,"File %s is corrupt or does not exist.\n",fname); return 0;  }
+  file=fopen(fname,"r");
+  if(file==0) { fprintf(stderr,"Could not open file %s for reading Object\n",fname); return 0;  }
  // strcpy(name,filename);
   strcpy(obj->matLib,"");
   //Group Pass
