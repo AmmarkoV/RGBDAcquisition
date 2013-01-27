@@ -66,10 +66,23 @@ int growVirtualStreamObjects(struct VirtualStream * stream,unsigned int objectsT
   return 1;
 }
 
+/*!
+    ------------------------------------------------------------------------------------------
+                       /\   /\   /\   /\   /\   /\   /\   /\   /\   /\   /\
+                                 GROWING MEMORY ALLOCATIONS
+    ------------------------------------------------------------------------------------------
+
+    ------------------------------------------------------------------------------------------
+                                 SEARCHING OF OBJECT ID's , TYPES etc
+                       \/   \/   \/   \/   \/   \/   \/   \/   \/   \/   \/
+    ------------------------------------------------------------------------------------------
+
+*/
 
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found)
 {
   if (stream==0) { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",name); }
+  if (stream->object==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object array\n",name); }
 
   *found=0;
   unsigned int i=0;
@@ -84,6 +97,48 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned 
 
    return 0;
 }
+
+ObjectTypeID getObjectTypeID(struct VirtualStream * stream,char * typeName,unsigned int * found)
+{
+  if (stream==0) { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",typeName); }
+  if (stream->objectTypes==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object type array\n",typeName); }
+
+  *found=0;
+  unsigned int i=0;
+  for (i=0; i<stream->numberOfObjectTypes; i++ )
+   {
+       if (strcasecmp(typeName,stream->objectTypes[i].name)==0)
+         {
+              *found=1;
+              return i;
+         }
+   }
+
+   return 0;
+}
+
+char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID)
+{
+  if (stream==0) { fprintf(stderr,"Can't get object id (%u) for un allocated stream\n",typeID); return 0; }
+  if (stream->objectTypes==0) { fprintf(stderr,"Can't get object id (%u) for un allocated object type array\n",typeID); return 0;  }
+  if (typeID>=stream->numberOfObjectTypes) { fprintf(stderr,"Can't get object id (%u) we only got %u Object Types \n",typeID,stream->numberOfObjectTypes); return 0; }
+
+  return stream->objectTypes[typeID].model;
+}
+
+
+/*!
+    ------------------------------------------------------------------------------------------
+                       /\   /\   /\   /\   /\   /\   /\   /\   /\   /\   /\
+                                 SEARCHING OF OBJECT ID's , TYPES etc
+    ------------------------------------------------------------------------------------------
+
+    ------------------------------------------------------------------------------------------
+                                   READING FILES , CREATING CONTEXT
+                       \/   \/   \/   \/   \/   \/   \/   \/   \/   \/   \/
+    ------------------------------------------------------------------------------------------
+
+*/
 
 
 struct VirtualStream * readVirtualStream(char * filename)
@@ -128,8 +183,6 @@ struct VirtualStream * readVirtualStream(char * filename)
       unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
       if ( words_count > 0 )
          {
-
-
             /*! REACHED AN OBJECT TYPE DECLERATION ( OBJECTTYPE(spatoula_type,"spatoula.obj") )
               argument 0 = OBJECTTYPE , argument 1 = name ,  argument 2 = value */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECTTYPE",10)==1)
@@ -158,7 +211,13 @@ struct VirtualStream * readVirtualStream(char * filename)
                    //We have the space so lets fill our new object spot ..!
                    unsigned int pos = newstream->numberOfObjects;
                     InputParser_GetWord(ipc,1,newstream->object[pos].name,15);
-                    InputParser_GetWord(ipc,2,newstream->object[pos].value,15);
+                    InputParser_GetWord(ipc,2,newstream->object[pos].typeStr,15);
+                    InputParser_GetWord(ipc,3,newstream->object[pos].value,15);
+
+                    unsigned int found=0;
+                    newstream->object[pos].type = getObjectTypeID(newstream,newstream->object[pos].typeStr,&found);
+                    if (!found) { fprintf(stderr,"Please note that type %s couldn't be found for object %s \n",newstream->object[pos].typeStr,newstream->object[pos].name); }
+
                    ++newstream->numberOfObjects;
                  }
             } else
@@ -212,8 +271,8 @@ struct VirtualStream * readVirtualStream(char * filename)
                  }
                }
             }
-         }
-    }
+         } // End of line containing tokens
+    } //End of getting a line while reading the file
   }
 
 
@@ -251,6 +310,18 @@ int destroyVirtualStream(struct VirtualStream * stream)
 }
 
 
+/*!
+    ------------------------------------------------------------------------------------------
+                       /\   /\   /\   /\   /\   /\   /\   /\   /\   /\   /\
+                                 READING FILES , CREATING CONTEXT
+    ------------------------------------------------------------------------------------------
+
+    ------------------------------------------------------------------------------------------
+                                     GETTING AN OBJECT POSITION
+                       \/   \/   \/   \/   \/   \/   \/   \/   \/   \/   \/
+    ------------------------------------------------------------------------------------------
+
+*/
 
 
 int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int FrameIDToReturn,float * pos)

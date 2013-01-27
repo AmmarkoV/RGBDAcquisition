@@ -33,6 +33,7 @@ struct ObjectType
 struct VirtualObject
 {
    char name[15];
+   char typeStr[15];
    char value[15];
    ObjectTypeID type;
 
@@ -70,6 +71,7 @@ struct VirtualStream
 };
 
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);
+char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID);
 
 struct VirtualStream * readVirtualStream(char * filename);
 int destroyVirtualStream(struct VirtualStream * stream);

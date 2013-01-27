@@ -5,10 +5,11 @@
 
 
 #include "TrajectoryParser/TrajectoryParser.h"
+#include "model_loader.h"
 #include "scene.h"
 
 struct VirtualStream * scene = 0;
-struct Model * models=0;
+struct Model ** models=0;
 
 float farPlane = 259;
 float nearPlane= 1.0;
@@ -75,45 +76,33 @@ int initScene()
 
 
   float R,G,B,trans;
-  spatoula = loadModel("spatoula.obj");
-  R=0.0f; G=0.0f;  B=1.0f; trans=0.0f;
-  setModelColor(spatoula,&R,&G,&B,&trans);
-
-  duck  = loadModel("duck.obj");
-  R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
-  setModelColor(duck,&R,&G,&B,&trans);
-  fprintf(stderr,"Passed %0.2f %0.2f %0.2f \n",R,G,B);
-
-
-
   scene = readVirtualStream("scene.conf");
+  if (scene==0) { fprintf(stderr,"Could not read scene data \n"); return 0; }
+  models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 
+  unsigned int i=0;
+  for (i=0; i<scene->numberOfObjectTypes; i++)
+    {
+         models[i] = loadModel(getObjectTypeModel(scene,i));
 
-  float x,y,z,heading,pitch,roll;
-  x=0.0; y=-7.0; z=-4.0; heading=0; pitch=90; roll=-90;
-  fprintf(stderr,"passing %0.2f %0.2f %0.2f - %0.2f %0.2f %0.2f \n",x,y,z,heading,pitch,roll);
-  //setModelCoordinates(spatoula,x,y,z,heading,pitch,roll);
-  setModelCoordinatesNoSTACK(spatoula,&x,&y,&z,&heading,&pitch,&roll);
+         R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
+         setModelColor(models[i],&R,&G,&B,&trans);
+    }
 
-
-  x=3.0; y=-4.0; z=0.0; heading=14; pitch=4; roll=4;
-  fprintf(stderr,"passing %0.2f %0.2f %0.2f - %0.2f %0.2f %0.2f \n",x,y,z,heading,pitch,roll);
-  //setModelCoordinates(duck,x,y,z,heading,pitch,roll);
-  setModelCoordinatesNoSTACK(duck,&x,&y,&z,&heading,&pitch,&roll);
-
-  //exit (0);
+  return 1;
 }
 
 
 int closeScene()
 {
+  unsigned int i=0;
+  for (i=0; i<scene->numberOfObjectTypes; i++)
+    {
+       unloadModel(models[i]);
+    }
+  free(models);
 
   destroyVirtualStream(scene);
-
-  unloadModel(spatoula);
-  unloadModel(duck);
-
-
 
   return 1;
 }
@@ -126,11 +115,17 @@ int tickScene()
    float x,y,z,heading,pitch,roll;
    //addToModelCoordinates(spatoula,0.0 /*X*/,0.0/*Y*/,0.0/*Z*/,(float) 0.01/*HEADING*/,(float) 0.01/*PITCH*/,(float) 0.006/*ROLL*/);
 
-   x=0.0; y=0.0; z=0.0; heading=1.21; pitch=1.01; roll=1.006;
-   addToModelCoordinatesNoSTACK(spatoula,&x,&y,&z,&heading,&pitch,&roll);
+  float posStack[7];
+  float * pos = &posStack;
 
-   //fprintf(stderr,".");
-   usleep(20000);
+  unsigned int i=0;
+  for (i=0; i<scene->numberOfObjects; i++)
+    {
+       calculateVirtualStreamPos(scene,i,ticks*100,pos);
+       setModelCoordinatesNoSTACK(models[i],&pos[0],&pos[1],&pos[2],&pos[3],&pos[4],&pos[5]);
+    }
+
+   usleep(100);
    ++ticks;
    return 1;
 }
@@ -152,38 +147,14 @@ int renderScene()
   glRotatef(camera_angle_z,0,0,-1.0);
   glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
 
-      drawModel(spatoula);
-
-      drawModel(duck);
-
-      float tick_disp =  ticks / 10000 ;
-      if ( ticks > 100 ) { ticks =0 ; }
 
 
 
-
-    float distance= -15.0-ticks;
-    float dims = 15.0;
-    float displace_x = -25;
-    glBegin(GL_QUADS);
-      glColor3f(0.0, 1.0, 0.0);  /* red */
-      glVertex3f(-dims+displace_x, dims, distance);
-      glVertex3f(dims+displace_x, dims, distance);
-      glVertex3f(dims+displace_x, -dims, distance);
-      glVertex3f(-dims+displace_x, -dims, distance);
-    glEnd();
-
-
-   //BOTTOM :P
-   dims = 125.0;
-   distance=-50;
-    glBegin(GL_QUADS);
-      glColor3f(0.4, 0.4, 0.4);
-      glVertex3f(-dims, dims, distance);
-      glVertex3f(dims, dims, distance);
-      glVertex3f(dims, -dims, distance);
-      glVertex3f(-dims, -dims, distance);
-    glEnd();
+  unsigned int i=0;
+  for (i=0; i<scene->numberOfObjects; i++)
+    {
+       drawModel(models[i]);
+    }
 
 
   glPopMatrix();
