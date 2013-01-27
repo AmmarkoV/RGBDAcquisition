@@ -3,10 +3,12 @@
 
 #include <stdio.h>
 
+
+#include "TrajectoryParser/TrajectoryParser.h"
 #include "scene.h"
 
-
-
+struct VirtualStream * scene = 0;
+struct Model * models=0;
 
 float farPlane = 259;
 float nearPlane= 1.0;
@@ -84,6 +86,8 @@ int initScene()
 
 
 
+  scene = readVirtualStream("scene.conf");
+
 
   float x,y,z,heading,pitch,roll;
   x=0.0; y=-7.0; z=-4.0; heading=0; pitch=90; roll=-90;
@@ -103,8 +107,14 @@ int initScene()
 
 int closeScene()
 {
+
+  destroyVirtualStream(scene);
+
   unloadModel(spatoula);
   unloadModel(duck);
+
+
+
   return 1;
 }
 

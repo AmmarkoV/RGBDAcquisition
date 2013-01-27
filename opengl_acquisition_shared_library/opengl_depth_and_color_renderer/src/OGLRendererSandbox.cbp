@@ -46,6 +46,10 @@
 			<Add library="X11" />
 		</Linker>
 		<Unit filename="OGLRendererSandbox.h" />
+		<Unit filename="TrajectoryParser/InputParser_C.cpp" />
+		<Unit filename="TrajectoryParser/InputParser_C.h" />
+		<Unit filename="TrajectoryParser/TrajectoryParser.cpp" />
+		<Unit filename="TrajectoryParser/TrajectoryParser.h" />
 		<Unit filename="glx.c">
 			<Option compilerVar="CC" />
 		</Unit>
