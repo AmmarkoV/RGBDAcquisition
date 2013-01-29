@@ -1,30 +1,28 @@
-// The functions contained in this file are pretty dummy
-// and are included only as a placeholder. Nevertheless,
-// they *will* get included in the shared library if you
-// don't remove them :)
-// 
-// Obviously, you 'll have to write yourself the super-duper
-// functions to include in the resulting library...
-// Also, it's not necessary to write every function in this file.
-// Feel free to add more files in this project. They will be
-// included in the resulting library.
+#include "AcquisitionMux.h"
 
-// A function adding two integers and returning the result
-int SampleAddInt(int i1, int i2)
+
+char * mux2RGBAndDepthFrames( char * rgb1, char * rgb2 , char * rgbOut , short * depth1, short * depth2 , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
 {
-    return i1 + i2;
+   char * rgb_p1 = rgb1;  char * rgb_p1_limit=rgb1 + width * height * 3;
+   char * rgb_p2 = rgb2;  char * rgb_p2_limit=rgb2 + width * height * 3;
+   char * rgb_pOut = rgbOut; char * rgb_pOut_limit=rgb_pOut + width * height * 3;
+
+   char * depth_p1 = depth1;  char * depth_p1_limit=rgb1 + width * height * 2;
+   char * depth_p2 = depth2;  char * depth_p2_limit=rgb2 + width * height * 2;
+   char * depth_pOut = depthOut; char * depth_pOut_limit=rgb_pOut + width * height * 2;
+
+   while (rgb_p1<rgb_p1_limit)
+    {
+
+        //if ()
+
+
+    }
+
+
+
+
+
 }
 
-// A function doing nothing ;)
-void SampleFunction1()
-{
-    // insert code here
-}
 
-// A function always returning zero
-int SampleFunction2()
-{
-    // insert code here
-    
-    return 0;
-}
