@@ -37,6 +37,11 @@ struct VirtualObject
    char value[15];
    ObjectTypeID type;
 
+   float R;
+   float G;
+   float B;
+   float Transparency;
+
 
    unsigned int MAX_timeOfFrames;
    unsigned int MAX_numberOfFrames;
@@ -72,6 +77,7 @@ struct VirtualStream
 
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);
 char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID);
+int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency);
 
 struct VirtualStream * readVirtualStream(char * filename);
 int destroyVirtualStream(struct VirtualStream * stream);

@@ -20,6 +20,11 @@ int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int frames
     {
        fprintf(stderr,"Cannot add %u frames to our currently %u sized frame buffer\n",framesToAdd,streamObj->MAX_numberOfFrames);
        return 0;
+    } else
+     {
+      //Clean up all new object types allocated
+      void * clear_from_here  = (void*) new_frame+streamObj->MAX_numberOfFrames;
+      memset(clear_from_here,0,framesToAdd * sizeof(struct KeyFrame));
     }
 
    streamObj->MAX_numberOfFrames+=framesToAdd;
@@ -39,6 +44,11 @@ int growVirtualStreamObjectsTypes(struct VirtualStream * stream,unsigned int obj
     {
        fprintf(stderr,"Cannot add %u object types to our currently %u sized object type buffer\n",objectsTypesToAdd,stream->MAX_numberOfObjectTypes);
        return 0;
+    } else
+     {
+      //Clean up all new object types allocated
+      void * clear_from_here  = (void*) new_objectTypes+stream->MAX_numberOfObjectTypes;
+      memset(clear_from_here,0,objectsTypesToAdd * sizeof(struct ObjectType));
     }
 
    stream->MAX_numberOfObjectTypes+=objectsTypesToAdd;
@@ -59,7 +69,14 @@ int growVirtualStreamObjects(struct VirtualStream * stream,unsigned int objectsT
     {
        fprintf(stderr,"Cannot add %u objects to our currently %u sized object buffer\n",objectsToAdd,stream->MAX_numberOfObjects);
        return 0;
+    } else
+    {
+      //Clean up all new objects allocated
+      void * clear_from_here  = (void*) new_object+stream->MAX_numberOfObjects;
+      memset(clear_from_here,0,objectsToAdd * sizeof(struct VirtualObject));
     }
+
+
 
    stream->MAX_numberOfObjects+=objectsToAdd;
    stream->object = new_object ;
@@ -127,6 +144,16 @@ char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID)
 }
 
 
+int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency)
+{
+  *R = stream->object[ObjID].R;
+  *G = stream->object[ObjID].G;
+  *B = stream->object[ObjID].B;
+  *Transparency = stream->object[ObjID].Transparency;
+  return 1;
+}
+
+
 /*!
     ------------------------------------------------------------------------------------------
                        /\   /\   /\   /\   /\   /\   /\   /\   /\   /\   /\
@@ -169,6 +196,7 @@ struct VirtualStream * readVirtualStream(char * filename)
   if (newstream==0)  {  InputParser_Destroy(ipc); //We dont need it any more
                         fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
 
+  //Clear the whole damn thing..
   memset(newstream,0,sizeof(struct VirtualStream));
 
 
@@ -199,8 +227,8 @@ struct VirtualStream * readVirtualStream(char * filename)
                    ++newstream->numberOfObjectTypes;
                  }
             } else
-            /*! REACHED AN OBJECT DECLERATION ( OBJECT(hand,"hand_something") )
-              argument 0 = OBJECT , argument 1 = name ,  argument 2 = value */
+            /*! REACHED AN OBJECT DECLERATION ( OBJECT(something,spatoula_type,0,255,0,0,spatoula_something) )
+              argument 0 = OBJECT , argument 1 = name ,  argument 2 = type ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = Data */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECT",6)==1)
             {
                if (newstream->MAX_numberOfObjects<=newstream->numberOfObjects+1) { growVirtualStreamObjects(newstream,OBJECTS_TO_ADD_STEP); }
@@ -212,7 +240,13 @@ struct VirtualStream * readVirtualStream(char * filename)
                    unsigned int pos = newstream->numberOfObjects;
                     InputParser_GetWord(ipc,1,newstream->object[pos].name,15);
                     InputParser_GetWord(ipc,2,newstream->object[pos].typeStr,15);
-                    InputParser_GetWord(ipc,3,newstream->object[pos].value,15);
+
+                    newstream->object[pos].R = (float) InputParser_GetWordInt(ipc,3)  /  255;
+                    newstream->object[pos].G = (float) InputParser_GetWordInt(ipc,4)  /  255;
+                    newstream->object[pos].B = (float) InputParser_GetWordInt(ipc,5)  /  255;
+                    newstream->object[pos].Transparency = (float) InputParser_GetWordInt(ipc,6)  /  255;
+
+                    InputParser_GetWord(ipc,7,newstream->object[pos].value,15);
 
                     unsigned int found=0;
                     newstream->object[pos].type = getObjectTypeID(newstream,newstream->object[pos].typeStr,&found);

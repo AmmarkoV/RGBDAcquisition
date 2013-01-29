@@ -14,7 +14,6 @@ struct Model ** models=0;
 float farPlane = 259;
 float nearPlane= 1.0;
 
-GLfloat    xAngle = 0.0, yAngle = 82.0, zAngle = 112.0;
 
 
 const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -27,8 +26,9 @@ const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
 const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat high_shininess[] = { 100.0f };
 
-float camera_pos_x = 0.0f; float camera_pos_y = -3.0f; float camera_pos_z = 8.0f;
-float camera_angle_x = 10.0f; float camera_angle_y = 3.0f; float camera_angle_z = 0.0f;
+
+float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;
+float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z = 0.0f;
 
 unsigned int ticks = 0;
 
@@ -81,11 +81,12 @@ int initScene()
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 
   unsigned int i=0;
-  for (i=0; i<scene->numberOfObjectTypes; i++)
+  for (i=0; i<scene->numberOfObjects; i++)
     {
          models[i] = loadModel(getObjectTypeModel(scene,i));
 
          R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
+         getObjectColorsTrans(scene,i,&R,&G,&B,&trans);
          setModelColor(models[i],&R,&G,&B,&trans);
     }
 
@@ -116,7 +117,7 @@ int tickScene()
    //addToModelCoordinates(spatoula,0.0 /*X*/,0.0/*Y*/,0.0/*Z*/,(float) 0.01/*HEADING*/,(float) 0.01/*PITCH*/,(float) 0.006/*ROLL*/);
 
   float posStack[7];
-  float * pos = &posStack;
+  float * pos = (float*) &posStack;
 
   unsigned int i=0;
   for (i=0; i<scene->numberOfObjects; i++)
