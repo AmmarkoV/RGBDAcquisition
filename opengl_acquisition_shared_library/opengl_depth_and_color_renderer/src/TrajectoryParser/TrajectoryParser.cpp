@@ -334,10 +334,10 @@ int destroyVirtualStreamInternal(struct VirtualStream * stream,int also_destrstr
 {
    if (stream==0) { return 1; }
    if (stream->object==0) { return 1; }
-   unsigned int totalObjects = stream->MAX_numberOfObjects;
    unsigned int i =0 ;
 
-   for ( i=0; i<totalObjects; i++)
+  //CLEAR OBJECTS , AND THEIR FRAMES
+   for ( i=0; i<stream->MAX_numberOfObjects; i++)
     {
        if ( stream->object[i].frame!= 0 )
          {
@@ -345,11 +345,19 @@ int destroyVirtualStreamInternal(struct VirtualStream * stream,int also_destrstr
             stream->object[i].frame=0;
          }
     }
-
    stream->MAX_numberOfObjects=0;
    stream->numberOfObjects=0;
    free(stream->object);
    stream->object=0;
+
+   //CLEAR TYPES OF OBJECTS
+    if ( stream->objectTypes!= 0 )
+         {
+            free(stream->objectTypes);
+            stream->objectTypes=0;
+         }
+    stream->MAX_numberOfObjectTypes=0;
+    stream->numberOfObjectTypes=0;
 
    if (also_destrstream_struct) { free(stream); }
    return 1;
@@ -367,6 +375,9 @@ int refreshVirtualStream(struct VirtualStream * newstream)
 {
    fprintf(stderr,"refreshingVirtualStream\n");
    destroyVirtualStreamInternal(newstream,0);
+   //Please note that the newstream structure does not get a memset operation anywhere around here
+   //thats in order to keep the initial time / frame configuration
+   //Object numbers , Object type numbers,  Frame numbers are cleaned by the destroyVirtualStreamInternal call
 
    return readVirtualStream(newstream);
 }
@@ -379,7 +390,7 @@ struct VirtualStream * createVirtualStream(char * filename)
 
   //Clear the whole damn thing..
   memset(newstream,0,sizeof(struct VirtualStream));
-  strncpy(newstream->filename,filename,15);
+  strncpy(newstream->filename,filename,250);
 
   if (!readVirtualStream(newstream))
     {

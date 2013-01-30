@@ -78,7 +78,7 @@ struct VirtualStream
     char ignoreTime;
     char reverseLoop;
 
-    char filename[20];
+    char filename[250];
 };
 
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);
