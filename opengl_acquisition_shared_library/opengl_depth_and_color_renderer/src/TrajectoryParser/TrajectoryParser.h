@@ -71,15 +71,22 @@ struct VirtualStream
 
     unsigned int playback;
 
+    unsigned int autoRefresh;
+    unsigned int lastRefresh;
+    unsigned int fileSize;
+
     char ignoreTime;
     char reverseLoop;
+
+    char filename[20];
 };
 
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);
 char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID);
 int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency);
 
-struct VirtualStream * readVirtualStream(char * filename);
+int readVirtualStream(struct VirtualStream * newstream , char * filename);
+struct VirtualStream * createVirtualStream(char * filename);
 int destroyVirtualStream(struct VirtualStream * stream);
 
 int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeMilliseconds,float * pos);

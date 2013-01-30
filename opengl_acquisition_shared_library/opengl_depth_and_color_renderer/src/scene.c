@@ -76,7 +76,7 @@ int initScene()
 
 
   float R,G,B,trans;
-  scene = readVirtualStream("scene.conf");
+  scene = createVirtualStream("scene.conf");
   if (scene==0) { fprintf(stderr,"Could not read scene data \n"); return 0; }
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 

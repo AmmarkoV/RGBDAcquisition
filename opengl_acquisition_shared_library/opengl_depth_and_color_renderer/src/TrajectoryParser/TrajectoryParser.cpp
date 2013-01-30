@@ -23,7 +23,7 @@ int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int frames
     } else
      {
       //Clean up all new object types allocated
-      void * clear_from_here  = (void*) new_frame+streamObj->MAX_numberOfFrames;
+      void * clear_from_here  =  new_frame+streamObj->MAX_numberOfFrames;
       memset(clear_from_here,0,framesToAdd * sizeof(struct KeyFrame));
     }
 
@@ -47,7 +47,7 @@ int growVirtualStreamObjectsTypes(struct VirtualStream * stream,unsigned int obj
     } else
      {
       //Clean up all new object types allocated
-      void * clear_from_here  = (void*) new_objectTypes+stream->MAX_numberOfObjectTypes;
+      void * clear_from_here  = new_objectTypes+stream->MAX_numberOfObjectTypes;
       memset(clear_from_here,0,objectsTypesToAdd * sizeof(struct ObjectType));
     }
 
@@ -72,7 +72,7 @@ int growVirtualStreamObjects(struct VirtualStream * stream,unsigned int objectsT
     } else
     {
       //Clean up all new objects allocated
-      void * clear_from_here  = (void*) new_object+stream->MAX_numberOfObjects;
+      void * clear_from_here  =  new_object+stream->MAX_numberOfObjects;
       memset(clear_from_here,0,objectsToAdd * sizeof(struct VirtualObject));
     }
 
@@ -167,38 +167,44 @@ int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,flo
 
 */
 
-
-struct VirtualStream * readVirtualStream(char * filename)
+unsigned long getFileSize(char * filename)
 {
-  fprintf(stderr,"readVirtualStream(%s) called \n",filename);
+  FILE * fp = fopen(filename,"r");
+  if (fp == 0 ) { fprintf(stderr,"getFileSize cannot open %s \n",filename); return 0; }
+
+  //Find out the size of the file..!
+  fseek (fp , 0 , SEEK_END);
+  unsigned long lSize = ftell (fp);
+  fclose(fp);
+
+  return lSize;
+}
+
+
+int readVirtualStream(struct VirtualStream * newstream)
+{
+  fprintf(stderr,"readVirtualStream(%s) called \n",newstream->filename);
 
   //Our stack variables ..
   unsigned int readOpResult = 0;
   char line [LINE_MAX_LENGTH]={0};
 
   //Try and open filename
-  FILE * fp = fopen(filename,"r");
-  if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
+  FILE * fp = fopen(newstream->filename,"r");
+  if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",newstream->filename); return 0; }
 
   //Find out the size of the file..!
   fseek (fp , 0 , SEEK_END);
   unsigned long lSize = ftell (fp);
   rewind (fp);
-  fprintf(stderr,"Opening a %lu byte file %s \n",lSize,filename);
+  fprintf(stderr,"Opening a %lu byte file %s \n",lSize,newstream->filename);
 
   //Allocate a token parser
   struct InputParserC * ipc=0;
   ipc = InputParser_Create(LINE_MAX_LENGTH,5);
   if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
 
-  //Allocate a virtual stream structure
-  struct VirtualStream * newstream = (struct VirtualStream *) malloc(sizeof(struct VirtualStream));
-  if (newstream==0)  {  InputParser_Destroy(ipc); //We dont need it any more
-                        fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
-
-  //Clear the whole damn thing..
-  memset(newstream,0,sizeof(struct VirtualStream));
-
+  newstream->fileSize = lSize;
 
  //Everything is set , Lets read the file!
   while (!feof(fp))
@@ -211,6 +217,12 @@ struct VirtualStream * readVirtualStream(char * filename)
       unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
       if ( words_count > 0 )
          {
+            /*! REACHED AN AUTO REFRESH DECLERATION ( AUTOREFRESH(1500) )
+              argument 0 = AUTOREFRESH , argument 1 = value in milliseconds (0 = off ) */
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"AUTOREFRESH",11)==1)
+            {
+                newstream->autoRefresh = InputParser_GetWordInt(ipc,1);
+            } else
             /*! REACHED AN OBJECT TYPE DECLERATION ( OBJECTTYPE(spatoula_type,"spatoula.obj") )
               argument 0 = OBJECTTYPE , argument 1 = name ,  argument 2 = value */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECTTYPE",10)==1)
@@ -312,13 +324,13 @@ struct VirtualStream * readVirtualStream(char * filename)
   fclose(fp);
   InputParser_Destroy(ipc);
 
-  return newstream;
-
+  return 1;
 }
 
 
 
-int destroyVirtualStream(struct VirtualStream * stream)
+
+int destroyVirtualStreamInternal(struct VirtualStream * stream,int also_destrstream_struct)
 {
    if (stream==0) { return 1; }
    if (stream->object==0) { return 1; }
@@ -339,10 +351,45 @@ int destroyVirtualStream(struct VirtualStream * stream)
    free(stream->object);
    stream->object=0;
 
-   free(stream);
+   if (also_destrstream_struct) { free(stream); }
    return 1;
 }
 
+
+int destroyVirtualStream(struct VirtualStream * stream)
+{
+    return destroyVirtualStreamInternal(stream,1);
+}
+
+
+
+int refreshVirtualStream(struct VirtualStream * newstream)
+{
+   fprintf(stderr,"refreshingVirtualStream\n");
+   destroyVirtualStreamInternal(newstream,0);
+
+   return readVirtualStream(newstream);
+}
+
+struct VirtualStream * createVirtualStream(char * filename)
+{
+  //Allocate a virtual stream structure
+  struct VirtualStream * newstream = (struct VirtualStream *) malloc(sizeof(struct VirtualStream));
+  if (newstream==0)  {  fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
+
+  //Clear the whole damn thing..
+  memset(newstream,0,sizeof(struct VirtualStream));
+  strncpy(newstream->filename,filename,15);
+
+  if (!readVirtualStream(newstream))
+    {
+      fprintf(stderr,"Could not read Virtual Stream from file %s \n",filename);
+      destroyVirtualStream(newstream);
+      return 0;
+    }
+
+  return newstream;
+}
 
 /*!
     ------------------------------------------------------------------------------------------
@@ -419,6 +466,20 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    if (stream->object[ObjID].numberOfFrames == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u has 0 frames\n",ObjID); return 0; }
 
 
+   if (stream->autoRefresh != 0 )
+    {
+         //Check for refreshed version ?
+       if (stream->autoRefresh < timeAbsMilliseconds-stream->lastRefresh )
+          {
+            unsigned long current_size = getFileSize(stream->filename);
+            if (current_size != stream->fileSize)
+             {
+              refreshVirtualStream(stream);
+              stream->lastRefresh = timeAbsMilliseconds;
+             }
+          }
+    }
+
    unsigned int FrameIDToReturn = 0;
    unsigned int FrameIDLast = 0;
    unsigned int FrameIDNext = 0;
@@ -456,7 +517,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
        //timeAbsMilliseconds should contain a valid value now somewhere from 0->MAX_timeOfFrames
      }
 
-     fprintf(stderr,"Object %u has %u frames , lets search where we are",ObjID,stream->object[ObjID].numberOfFrames);
+     fprintf(stderr,"Object %u has %u frames , lets search where we are \n",ObjID,stream->object[ObjID].numberOfFrames);
      //We scan all the frames to find out the "last one" and the "next one"
      unsigned int i =0;
      for ( i=0; i <stream->object[ObjID].numberOfFrames-1; i++ )
