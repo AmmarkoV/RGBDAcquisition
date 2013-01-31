@@ -11,7 +11,7 @@
 struct VirtualStream * scene = 0;
 struct Model ** models=0;
 
-float farPlane = 259;
+float farPlane = 255;
 float nearPlane= 1.0;
 
 

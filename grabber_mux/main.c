@@ -161,11 +161,11 @@ int main(int argc, char *argv[])
         acquisitionSaveColorFrame(moduleID_1,devID_1,outfilename);
         sprintf(outfilename,"%s/BASEdepthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         acquisitionSaveDepthFrame(moduleID_1,devID_1,outfilename);
-   */
+
         sprintf(outfilename,"%s/OVERLAYcolorFrame_%u_%05u.pnm",outputfoldername,devID_2,frameNum);
         acquisitionSaveColorFrame(moduleID_2,devID_2,outfilename);
         sprintf(outfilename,"%s/OVERLAYdepthFrame_%u_%05u.pnm",outputfoldername,devID_2,frameNum);
-        acquisitionSaveDepthFrame(moduleID_2,devID_2,outfilename);
+        acquisitionSaveDepthFrame(moduleID_2,devID_2,outfilename);*/
 
     }
 

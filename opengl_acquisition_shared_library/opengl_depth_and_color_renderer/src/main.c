@@ -83,7 +83,8 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
 
-    float multiplier = 65535 / (farPlane-nearPlane);
+    float max_distance = farPlane-nearPlane;
+    float multiplier = (float) 65535 / max_distance;
 
     memset(depth,0 , (width-x)*(height-y)*2 );
 
@@ -97,13 +98,11 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
        {
          for ( i =0 ; i < (width-x); i ++ )
             {
-               if (zbuffer[(height-1-yp)*stride+i]>=farPlane-nearPlane)  { depth[yp*stride+i]=  (short) 0;  depth[yp*stride+i+1]=  (short) 0; } else
+               if (zbuffer[(height-1-yp)*stride+i]>=max_distance)  { depth[yp*stride+i]=  (short) 0;  } else
                                                                          {
-
-                                                                           depth[yp*stride+i]=  (short) 65535 - zbuffer[(height-1-yp)*stride+i] * multiplier;
-                                                                           //SOMETHING CRAZY IS HAPPENING HERE :
-                                                                           //TODO :
-                                                                           //if (depth[yp*stride+i]<=1) { depth[yp*stride+i]=0; }
+                                                                           float tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) * multiplier;
+                                                                           unsigned short tmp = (unsigned short) tmpF;
+                                                                           depth[yp*stride+i]= tmp ;
                                                                          }
 
             }
@@ -112,8 +111,12 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     int i=0;
     for ( i =0 ; i < (width-x)*(height-y); i ++ )
       {
-        if (zbuffer[i]>=farPlane-nearPlane)  { depth[i]=   (unsigned short) 0; depth[i+1]=   (short) 0; } else
-                                             { depth[i]=   (unsigned short) 65535 - zbuffer[i] * multiplier; }
+        if (zbuffer[i]>=max_distance)  { depth[i]=  (short) 0; } else
+                                       {
+                                         float tmpF  = (1.0f - zbuffer[i]) * multiplier;
+                                         unsigned short tmp = tmpF;
+                                         depth[i]= tmp;
+                                       }
       }
     #endif
 

@@ -87,8 +87,7 @@ int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char 
    unsigned int loops=0;
    while (rgb_pOut<rgb_pOut_limit)
     {
-        //if ( (*rgb_pOverlay == 0) && (*rgb_pOverlay+1 == 0) && (*rgb_pOverlay+2 == 0) )
-        if ( (depthOverlay[loops]==0  ) || (depthOverlay[loops]==255) )    /* || (loops>640*480/2)*/
+        if (depthOverlay[loops]==0)
          {
            //Overlay has a zero depth on this pixel! that means we will completely discard it and go along with our base
            *rgb_pOut = *rgb_pBase;  ++rgb_pOut; ++rgb_pBase;
