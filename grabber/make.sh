@@ -14,6 +14,11 @@ then
  OPENNI1_LIBS=""
 else
  echo "OpenNI1 activated " 
+
+ cd ../openni1_acquisition_shared_library
+ make -f OpenNI1Aquisition.cbp.mak
+ cd ../grabber
+
   OPENNI1_DIR="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release"
 OPENNI1_LIBS="$OPENNI1_DIR/libOpenNI.so $OPENNI1_DIR/libOpenNI.jni.so $OPENNI1_DIR/libnimRecorder.so $OPENNI1_DIR/libnimMockNodes.so $OPENNI1_DIR/libnimCodecs.so ../openni1_acquisition_shared_library/libOpenNI1Acquisition.so"
 fi
@@ -27,6 +32,11 @@ then
  OPENNI2_LIBS=""
 else
  echo "OpenNI2 activated " 
+
+ cd ../openni2_acquisition_shared_library
+ make -f OpenNI2Aquisition.cbp.mak
+ cd ../grabber
+
  OPENNI2_LIBS="../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so ../openni2_acquisition_shared_library/libOpenNI2Acquisition.so"
 fi
 
@@ -38,6 +48,11 @@ then
  FREENECT_LIBS=""
 else
  echo "Freenect activated " 
+
+ cd ../libfreenect_acquisition_shared_library
+ make -f FreenectAcquisition.cbp.mak
+ cd ../grabber
+
  FREENECT_LIBS="../3dparty/libfreenect/build/lib/libfreenect_sync.so ../3dparty/libfreenect/build/lib/libfreenect.so ../libfreenect_acquisition_shared_library/libFreenectAcquisition.so"
 fi
 
@@ -49,6 +64,11 @@ then
  OPENGL_SANDBOX_LIBS=""
 else
  echo "OpenGL sandbox activated " 
+
+ cd ../opengl_acquisition_shared_library 
+ make -f OpenGLAcquisition.cbp.mak
+ cd ../grabber
+
  OPENGL_SANDBOX_LIBS="-lGL -lX11 ../opengl_acquisition_shared_library/libOpenGLAcquisition.so"
 fi
 
@@ -60,6 +80,11 @@ then
  TEMPLATE_LIBS=""
 else
  echo "Template activated " 
+
+ cd ../template_acquisition_shared_library
+ make -f TemplateAcquisition.cbp.mak
+ cd ../grabber
+
  TEMPLATE_LIBS="../template_acquisition_shared_library/libTemplateAcquisition.so"
 fi
 
