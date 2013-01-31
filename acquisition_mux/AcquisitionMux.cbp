@@ -34,6 +34,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-fPIC" />
 		</Compiler>
 		<Unit filename="AcquisitionMux.h" />
 		<Unit filename="main.c">

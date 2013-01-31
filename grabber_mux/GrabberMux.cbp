@@ -35,6 +35,7 @@
 			<Add library="GL" />
 			<Add library="X11" />
 			<Add library="../acquisition/libAcquisition.so" />
+			<Add library="../acquisition_mux/libAcquisitionMux.so" />
 			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so" />
 			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so" />
 			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so" />

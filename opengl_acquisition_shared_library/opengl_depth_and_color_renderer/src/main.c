@@ -83,7 +83,9 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
 
-    float multiplier = 65536 / (farPlane-nearPlane);
+    float multiplier = 65535 / (farPlane-nearPlane);
+
+    memset(depth,0 , (width-x)*(height-y)*2 );
 
 
     #if FLIP_OPEN_GL_IMAGES
@@ -95,8 +97,12 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
        {
          for ( i =0 ; i < (width-x); i ++ )
             {
-               if (zbuffer[(height-1-yp)*stride+i]>=farPlane-nearPlane)  { depth[yp*stride+i]=  0; } else
-                                                                         { depth[yp*stride+i]=  65535 - zbuffer[(height-1-yp)*stride+i] * multiplier; }
+               if (zbuffer[(height-1-yp)*stride+i]>=farPlane-nearPlane)  { depth[yp*stride+i]=  (short) 0;  depth[yp*stride+i+1]=  (short) 0; } else
+                                                                         { depth[yp*stride+i]=  65535 - zbuffer[(height-1-yp)*stride+i] * multiplier;
+                                                                           //SOMETHING CRAZY IS HAPPENING HERE :
+                                                                           //TODO :
+                                                                           if (depth[yp*stride+i]<=1) { depth[yp*stride+i]=0; }
+                                                                         }
 
             }
        }
@@ -104,7 +110,7 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     int i=0;
     for ( i =0 ; i < (width-x)*(height-y); i ++ )
       {
-        if (zbuffer[i]>=farPlane-nearPlane)  { depth[i]=  0; } else
+        if (zbuffer[i]>=farPlane-nearPlane)  { depth[i]=   (short) 0; depth[i+1]=   (short) 0; } else
                                              { depth[i]=  65535 - zbuffer[i] * multiplier; }
       }
     #endif
