@@ -104,11 +104,9 @@ int main(int argc, char *argv[])
       {
         acquisitionSnapFrames(moduleID,devID);
 
-        //fprintf(stderr,"Color frame is %ux%u:3 - %u \n",getOpenNI2ColorWidth(devID) , getOpenNI2ColorHeight(devID) , getOpenNI2ColorDataSize(devID));
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
-        //fprintf(stderr,"Depth frame is %ux%u:1 - %u \n",getOpenNI2DepthWidth(devID) , getOpenNI2DepthHeight(devID) , getOpenNI2DepthDataSize(devID));
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         acquisitionSaveDepthFrame(moduleID,devID,outfilename);
       }

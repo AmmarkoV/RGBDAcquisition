@@ -505,7 +505,7 @@ char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID
 }
 
 
-char * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
+short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   switch (moduleID)
     {

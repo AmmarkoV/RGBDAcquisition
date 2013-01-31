@@ -121,17 +121,37 @@ int main(int argc, char *argv[])
     usleep(1000); // Waiting a while for the glitch frames to pass
     char outfilename[512]={0};
 
+
+    unsigned int width , height , channels , bitsperpixel;
+    acquisitionGetColorFrameDimensions(moduleID_1,devID_1,&width,&height ,&channels , &bitsperpixel );
+    //Todo , check with module 2 bla bla
+    char * rgbOut = ( char* )  malloc(width*height*channels * (bitsperpixel/8 ) );
+
+    acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&width,&height ,&channels , &bitsperpixel );
+    short * depthOut = ( short* )  malloc(width*height*channels * (bitsperpixel/8 ) );
+
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
-        /*
-        acquisitionSnapFrames(moduleID,devID);
 
-        //fprintf(stderr,"Color frame is %ux%u:3 - %u \n",getOpenNI2ColorWidth(devID) , getOpenNI2ColorHeight(devID) , getOpenNI2ColorDataSize(devID));
+        acquisitionSnapFrames(moduleID_1,devID_1);
+        acquisitionSnapFrames(moduleID_2,devID_2);
+
+
+        mux2RGBAndDepthFrames
+          (
+           acquisitionGetColorFrame(moduleID_1,devID_1) ,
+           acquisitionGetColorFrame(moduleID_2,devID_2) ,
+           rgbOut ,
+           acquisitionGetDepthFrame(moduleID_1,devID_1) ,
+           acquisitionGetDepthFrame(moduleID_2,devID_2) ,
+           depthOut ,
+           width , height , 0 );
+  /*
+
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
-        //fprintf(stderr,"Depth frame is %ux%u:1 - %u \n",getOpenNI2DepthWidth(devID) , getOpenNI2DepthHeight(devID) , getOpenNI2DepthDataSize(devID));
-        sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
+         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         acquisitionSaveDepthFrame(moduleID,devID,outfilename);
 */
     }

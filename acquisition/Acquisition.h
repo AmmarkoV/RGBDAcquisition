@@ -36,7 +36,7 @@ int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID);
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
-char * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
+short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
 int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel );
 int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel );
 

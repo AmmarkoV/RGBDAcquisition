@@ -2,7 +2,7 @@
 
 
 
-char * mux2RGBAndDepthFramesNonZeroDepth( char * rgb1, char * rgb2 , char * rgbOut , short * depth1, short * depth2 , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
+int mux2RGBAndDepthFramesNonZeroDepth( char * rgb1, char * rgb2 , char * rgbOut , short * depth1, short * depth2 , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
 {
    char * rgb_p1 = rgb1;  char * rgb_p1_limit=rgb1 + width * height * 3;
    char * rgb_p2 = rgb2;  char * rgb_p2_limit=rgb2 + width * height * 3;
@@ -54,17 +54,21 @@ char * mux2RGBAndDepthFramesNonZeroDepth( char * rgb1, char * rgb2 , char * rgbO
          }
 
     }
+
+    return 1;
 }
 
 
-char * mux2RGBAndDepthFrames( char * rgb1, char * rgb2 , char * rgbOut , short * depth1, short * depth2 , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
+int mux2RGBAndDepthFrames( char * rgb1, char * rgb2 , char * rgbOut , short * depth1, short * depth2 , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
 {
-
-
-
-
-
-
+ if (mux_type==0)
+  {
+    return mux2RGBAndDepthFramesNonZeroDepth(rgb1,rgb2,rgbOut, depth1,depth2,depthOut , width,height,mux_type);
+  }
+  return 0;
 }
+
+
+
 
 
