@@ -104,13 +104,16 @@ void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float 
   glTranslated(-x,-y,-z);
   glDisable(GL_NORMALIZE);
   glPopMatrix();
+} else
+{
+    fprintf(stderr,"Cannot draw model , it doesnt exist \n");
 }
 }
 
 
 void drawModel(struct Model * mod)
 {
-    if (mod == 0) { return ; } //If mod = 0 accesing the fields below will lead in crashing..
+    if (mod == 0) { fprintf(stderr,"Cannot draw model , it doesnt exist \n"); return ; } //If mod = 0 accesing the fields below will lead in crashing..
     drawModelAt(mod,mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
 }
 

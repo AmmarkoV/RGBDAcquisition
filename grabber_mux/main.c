@@ -122,13 +122,14 @@ int main(int argc, char *argv[])
     char outfilename[512]={0};
 
 
-    unsigned int width , height , channels , bitsperpixel;
-    acquisitionGetColorFrameDimensions(moduleID_1,devID_1,&width,&height ,&channels , &bitsperpixel );
+    unsigned int widthRGB , heightRGB , channelsRGB , bitsperpixelRGB;
+    acquisitionGetColorFrameDimensions(moduleID_1,devID_1,&widthRGB,&heightRGB ,&channelsRGB , &bitsperpixelRGB );
     //Todo , check with module 2 bla bla
-    char * rgbOut = ( char* )  malloc(width*height*channels * (bitsperpixel/8 ) );
+    char * rgbOut = ( char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
 
-    acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&width,&height ,&channels , &bitsperpixel );
-    short * depthOut = ( short* )  malloc(width*height*channels * (bitsperpixel/8 ) );
+    unsigned int widthDepth , heightDepth , channelsDepth , bitsperpixelDepth;
+    acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&widthDepth,&heightDepth ,&channelsDepth , &bitsperpixelDepth );
+    short * depthOut = ( short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
@@ -145,15 +146,15 @@ int main(int argc, char *argv[])
            acquisitionGetDepthFrame(moduleID_1,devID_1) ,
            acquisitionGetDepthFrame(moduleID_2,devID_2) ,
            depthOut ,
-           width , height , 0 );
-  /*
+           widthRGB , heightRGB , 0 );
 
-        sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
-        acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
-         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
-        acquisitionSaveDepthFrame(moduleID,devID,outfilename);
-*/
+        sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+        saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+
+         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+        saveMuxImageToFile(outfilename,(char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+
     }
 
 
