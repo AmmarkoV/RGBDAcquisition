@@ -11,12 +11,12 @@ AR = ar
 LD = g++
 WINDRES = windres
 
-INC =  -I../3dparty/OpenNI/Include/
-CFLAGS =  -Wall -fexceptions -fPIC
+INC = 
+CFLAGS =  -Wall -fPIC
 RESINC = 
 LIBDIR = 
 LIB = 
-LDFLAGS =  ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.jni.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so
+LDFLAGS = 
 
 INC_DEBUG =  $(INC)
 CFLAGS_DEBUG =  $(CFLAGS) -g
@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG =  $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = libOpenNI1Acquisition.so
+OUT_DEBUG = libAcquisitionMux.so
 
 INC_RELEASE =  $(INC)
 CFLAGS_RELEASE =  $(CFLAGS) -O2
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = libOpenNI1Acquisition.so
+OUT_RELEASE = libAcquisitionMux.so
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o
 
@@ -58,8 +58,8 @@ debug: before_debug out_debug after_debug
 out_debug: $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) -shared $(LDFLAGS_DEBUG) $(LIBDIR_DEBUG) $(OBJ_DEBUG) $(LIB_DEBUG) -o $(OUT_DEBUG)
 
-$(OBJDIR_DEBUG)/main.o: main.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.cpp -o $(OBJDIR_DEBUG)/main.o
+$(OBJDIR_DEBUG)/main.o: main.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.c -o $(OBJDIR_DEBUG)/main.o
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
@@ -75,8 +75,8 @@ release: before_release out_release after_release
 out_release: $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) -shared $(LDFLAGS_RELEASE) $(LIBDIR_RELEASE) $(OBJ_RELEASE) $(LIB_RELEASE) -o $(OUT_RELEASE)
 
-$(OBJDIR_RELEASE)/main.o: main.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.cpp -o $(OBJDIR_RELEASE)/main.o
+$(OBJDIR_RELEASE)/main.o: main.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.c -o $(OBJDIR_RELEASE)/main.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)

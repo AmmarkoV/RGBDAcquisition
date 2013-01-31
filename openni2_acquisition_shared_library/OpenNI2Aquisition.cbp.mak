@@ -11,11 +11,11 @@ AR = ar
 LD = g++
 WINDRES = windres
 
-INC =  -I../3dparty/OpenNI-2.0.0/Include/
+INC =  -I../3dparty/OpenNI2/Include/
 CFLAGS =  -Wall -fexceptions -fPIC
 RESINC = 
 LIBDIR = 
-LIB =  ../3dparty/OpenNI-2.0.0/Redist/libOpenNI2.so
+LIB =  ../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so
 LDFLAGS = 
 
 INC_DEBUG =  $(INC)

@@ -15,7 +15,7 @@ INC =
 CFLAGS =  -Wall
 RESINC = 
 LIBDIR = 
-LIB =  -lGL -lX11 ../acquisition/libAcquisition.so ../3dparty/OpenNI-Bin-Dev-Linux-x64-v1.5.4.0/Lib/libnimCodecs.so ../3dparty/OpenNI-Bin-Dev-Linux-x64-v1.5.4.0/Lib/libnimMockNodes.so ../3dparty/OpenNI-Bin-Dev-Linux-x64-v1.5.4.0/Lib/libnimRecorder.so ../3dparty/OpenNI-Bin-Dev-Linux-x64-v1.5.4.0/Lib/libOpenNI.jni.so ../3dparty/OpenNI-Bin-Dev-Linux-x64-v1.5.4.0/Lib/libOpenNI.so ../3dparty/OpenNI-2.0.0/Redist/libOpenNI2.so ../3dparty/libfreenect/build/lib/libfreenect_sync.so ../3dparty/libfreenect/build/lib/libfreenect.so ../libfreenect_acquisition_shared_library/libFreenectAcquisition.so ../openni1_acquisition_shared_library/libOpenNI1Acquisition.so ../openni2_acquisition_shared_library/libOpenNI2Acquisition.so ../opengl_acquisition_shared_library/libOpenGLAcquisition.so ../template_acquisition_shared_library/libTemplateAcquisition.so
+LIB =  -lGL -lX11 ../acquisition/libAcquisition.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.jni.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.so ../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so ../3dparty/libfreenect/build/lib/libfreenect_sync.so ../3dparty/libfreenect/build/lib/libfreenect.so ../libfreenect_acquisition_shared_library/libFreenectAcquisition.so ../openni1_acquisition_shared_library/libOpenNI1Acquisition.so ../openni2_acquisition_shared_library/libOpenNI2Acquisition.so ../opengl_acquisition_shared_library/libOpenGLAcquisition.so ../template_acquisition_shared_library/libTemplateAcquisition.so
 LDFLAGS = 
 
 INC_DEBUG =  $(INC)

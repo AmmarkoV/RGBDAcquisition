@@ -101,7 +101,7 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
                                                                          { depth[yp*stride+i]=  65535 - zbuffer[(height-1-yp)*stride+i] * multiplier;
                                                                            //SOMETHING CRAZY IS HAPPENING HERE :
                                                                            //TODO :
-                                                                           if (depth[yp*stride+i]<=1) { depth[yp*stride+i]=0; }
+                                                                           //if (depth[yp*stride+i]<=1) { depth[yp*stride+i]=0; }
                                                                          }
 
             }
