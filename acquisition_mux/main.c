@@ -81,10 +81,12 @@ int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char 
    short * depth_pOut = depthOut; short * depth_pOut_limit=rgb_pOut + width * height * 2;
 
 
+   unsigned int TookBaseloops=0;
    unsigned int loops=0;
    while (rgb_pOut<rgb_pOut_limit)
     {
-        if ( (*depth_pOverlay == 0  )/* || (loops>640*480/2)*/ )
+        //if ( (*rgb_pOverlay == 0) && (*rgb_pOverlay+1 == 0) && (*rgb_pOverlay+2 == 0) )
+        if ( (depthOverlay[loops]==0  ) || (depthOverlay[loops]==255) )    /* || (loops>640*480/2)*/
          {
            //Overlay has a zero depth on this pixel! that means we will completely discard it and go along with our base
            *rgb_pOut = *rgb_pBase;  ++rgb_pOut; ++rgb_pBase;
@@ -98,6 +100,8 @@ int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char 
             ++depth_pOut; ++depth_pBase;
             //DEPTH overlay bytes are also just ignored
             ++depth_pOverlay;
+
+            ++TookBaseloops;
          } else
          {
             //Overlay has a non zero value so we "augment it" ignoring Base
@@ -115,6 +119,8 @@ int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char 
          }
        ++loops;
     }
+
+    fprintf(stderr,"Total of %u pixels ( base are %u , %0.2f %% ) \n",loops,TookBaseloops,TookBaseloops*100/loops);
 
     return 1;
 }

@@ -95,8 +95,8 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
        {
          for ( i =0 ; i < (width-x); i ++ )
             {
-               if (zbuffer[(height-1-yp)*stride+i]>=farPlane-nearPlane)  { depth[yp*stride+i]= 0.0f; } else
-                                                                         { depth[yp*stride+i]=  65536 - zbuffer[(height-1-yp)*stride+i] * multiplier; }
+               if (zbuffer[(height-1-yp)*stride+i]>=farPlane-nearPlane)  { depth[yp*stride+i]=  0; } else
+                                                                         { depth[yp*stride+i]=  65535 - zbuffer[(height-1-yp)*stride+i] * multiplier; }
 
             }
        }
@@ -104,8 +104,8 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     int i=0;
     for ( i =0 ; i < (width-x)*(height-y); i ++ )
       {
-        if (zbuffer[i]>=farPlane-nearPlane)  { depth[i]= 0.0f; } else
-                                             { depth[i]=  65536 - zbuffer[i] * multiplier; }
+        if (zbuffer[i]>=farPlane-nearPlane)  { depth[i]=  0; } else
+                                             { depth[i]=  65535 - zbuffer[i] * multiplier; }
       }
     #endif
 
