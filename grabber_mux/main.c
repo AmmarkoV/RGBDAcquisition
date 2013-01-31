@@ -47,12 +47,12 @@ int main(int argc, char *argv[])
     if (argc>2)
      {
           moduleID_1 = getModuleIdFromModuleName(argv[2]);
-          fprintf(stderr,"Overriding Module Used as device A , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
+          fprintf(stderr,"Overriding Module Used as device A (BASE) , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
      }
     if (argc>3)
      {
           moduleID_2 = getModuleIdFromModuleName(argv[3]);
-          fprintf(stderr,"Overriding Module Used as device B , set to %s ( %u ) \n",getModuleStringName(moduleID_2),moduleID_2);
+          fprintf(stderr,"Overriding Module Used as device B (OVERLAY), set to %s ( %u ) \n",getModuleStringName(moduleID_2),moduleID_2);
      }
     strcpy(outputfoldername,"frames/");
     if (argc>4)
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
 
-         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+        sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         saveMuxImageToFile(outfilename,(char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
 
     }

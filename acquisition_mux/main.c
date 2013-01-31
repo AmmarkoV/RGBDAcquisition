@@ -70,68 +70,63 @@ int saveMuxImageToFile(char * filename,char * pixels , unsigned int width , unsi
 
 
 
-int mux2RGBAndDepthFramesNonZeroDepth( char * rgb1, char * rgb2 , char * rgbOut , short * depth1, short * depth2 , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
+int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char * rgbOut , short * depthBase, short * depthOverlay , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
 {
-   char * rgb_p1 = rgb1;  char * rgb_p1_limit=rgb1 + width * height * 3;
-   char * rgb_p2 = rgb2;  char * rgb_p2_limit=rgb2 + width * height * 3;
+   char * rgb_pBase = rgbBase;
+   char * rgb_pOverlay = rgbOverlay;
    char * rgb_pOut = rgbOut; char * rgb_pOut_limit=rgb_pOut + width * height * 3;
 
-   short * depth_p1 = depth1;     short * depth_p1_limit=rgb1 + width * height * 2;
-   short * depth_p2 = depth2;     short * depth_p2_limit=rgb2 + width * height * 2;
+   short * depth_pBase = depthBase;
+   short * depth_pOverlay = depthOverlay;
    short * depth_pOut = depthOut; short * depth_pOut_limit=rgb_pOut + width * height * 2;
 
-   while (rgb_p1<rgb_p1_limit)
+
+   unsigned int loops=0;
+   while (rgb_pOut<rgb_pOut_limit)
     {
-        if (*depth_p2==0)
+        if ( (*depth_pOverlay == 0  )/* || (loops>640*480/2)*/ )
          {
-           //IF DEPTH2 is not set we just ignore it an make a direct copy of the pixel data from RGB1/DEPTH1
-           *rgb_pOut = *rgb_p1;
-            rgb_pOut++; rgb_p1++;
-           *rgb_pOut = *rgb_p1;
-            rgb_pOut++; rgb_p1++;
-           *rgb_pOut = *rgb_p1;
-            rgb_pOut++; rgb_p1++;
-
-            //RGB2 is just ignored
-            rgb_p2+=3;
+           //Overlay has a zero depth on this pixel! that means we will completely discard it and go along with our base
+           *rgb_pOut = *rgb_pBase;  ++rgb_pOut; ++rgb_pBase;
+           *rgb_pOut = *rgb_pBase;  ++rgb_pOut; ++rgb_pBase;
+           *rgb_pOut = *rgb_pBase;  ++rgb_pOut; ++rgb_pBase;
+            //RGB Overlay bytes are just ignored
+            rgb_pOverlay+=3;
 
 
-           *depth_pOut = *depth1;
-            depth_pOut++; depth1++;
-
-
-            //DEPTH2 is just ignored
-            ++depth2;
+           *depth_pOut = *depth_pBase;
+            ++depth_pOut; ++depth_pBase;
+            //DEPTH overlay bytes are also just ignored
+            ++depth_pOverlay;
          } else
          {
-            //if depth 2 is not null we keep it as an overlay on RGB1 and depth1
-           *rgb_pOut = *rgb_p2;
-            rgb_pOut++; rgb_p2++;
-           *rgb_pOut = *rgb_p2;
-            rgb_pOut++; rgb_p2++;
-           *rgb_pOut = *rgb_p2;
-            rgb_pOut++; rgb_p2++;
-
-            //RGB1 is just ignored
-            rgb_p1+=3;
+            //Overlay has a non zero value so we "augment it" ignoring Base
+           *rgb_pOut = *rgb_pOverlay;  ++rgb_pOut; ++rgb_pOverlay;
+           *rgb_pOut = *rgb_pOverlay;  ++rgb_pOut; ++rgb_pOverlay;
+           *rgb_pOut = *rgb_pOverlay;  ++rgb_pOut; ++rgb_pOverlay;
+            //RGB Base is just ignored
+            rgb_pBase+=3;
 
 
-           *depth_pOut = *depth1;
-           *depth_pOut += *depth2;
-            depth_pOut++; depth1++;  ++depth2;
+           *depth_pOut = *depth_pBase + *depth_pOverlay;
+            ++depth_pOut;  ++depth_pOverlay;
+            //DEPTH base bytes are also just ignored
+            ++depth_pBase;
          }
-
+       ++loops;
     }
 
     return 1;
 }
 
 
-int mux2RGBAndDepthFrames( char * rgb1, char * rgb2 , char * rgbOut , short * depth1, short * depth2 , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
+int mux2RGBAndDepthFrames( char * rgbBase, char * rgbOverlay , char * rgbOut , short * depthBase, short * depthOverlay , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
 {
  if (mux_type==0)
   {
-    return mux2RGBAndDepthFramesNonZeroDepth(rgb1,rgb2,rgbOut, depth1,depth2,depthOut , width,height,mux_type);
+    return mux2RGBAndDepthFramesNonZeroDepth(rgbBase,rgbOverlay,rgbOut,
+                                             depthBase,depthOverlay,depthOut ,
+                                             width,height,mux_type);
   }
   return 0;
 }
