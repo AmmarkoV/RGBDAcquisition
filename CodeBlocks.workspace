@@ -4,11 +4,11 @@
 		<Project filename="libfreenect_acquisition_shared_library/FreenectAcquisition.cbp" />
 		<Project filename="openni1_acquisition_shared_library/OpenNI1Acquisition.cbp" />
 		<Project filename="openni2_acquisition_shared_library/OpenNI2Aquisition.cbp" />
-		<Project filename="opengl_acquisition_shared_library/OpenGLAcquisition.cbp" />
+		<Project filename="opengl_acquisition_shared_library/OpenGLAcquisition.cbp" active="1" />
 		<Project filename="template_acquisition_shared_library/TemplateAcquisition.cbp" />
 		<Project filename="acquisition/Acquisition.cbp" />
 		<Project filename="acquisition_mux/AcquisitionMux.cbp" />
-		<Project filename="grabber/Grabber.cbp" active="1" />
+		<Project filename="grabber/Grabber.cbp" />
 		<Project filename="grabber_mux/GrabberMux.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

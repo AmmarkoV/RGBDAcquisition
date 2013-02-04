@@ -223,6 +223,16 @@ int readVirtualStream(struct VirtualStream * newstream)
             {
                 newstream->autoRefresh = InputParser_GetWordInt(ipc,1);
             } else
+            /*! REACHED AN INTERPOLATE TIME SWITCH DECLERATION ( INTERPOLATE_TIME(1) )
+              argument 0 = INTERPOLATE_TIME , argument 1 = (0 = off ) ( 1 = on )*/
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"INTERPOLATE_TIME",16)==1)
+            {
+                //The configuration INTERPOLATE_TIME is the "opposite" of this flag ignore time
+                newstream->ignoreTime = InputParser_GetWordInt(ipc,1);
+                // so we flip it here.. , the default is not ignoring time..
+                if (newstream->ignoreTime == 0 ) { newstream->ignoreTime=1; } else
+                                                 { newstream->ignoreTime=0; }
+            } else
             /*! REACHED AN OBJECT TYPE DECLERATION ( OBJECTTYPE(spatoula_type,"spatoula.obj") )
               argument 0 = OBJECTTYPE , argument 1 = name ,  argument 2 = value */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECTTYPE",10)==1)
@@ -448,13 +458,25 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
 
 
     interPos[0]=(float) ( stream->object[ObjID].frame[NextFrame].x-stream->object[ObjID].frame[PrevFrame].x ) * our_stepTime / MAX_stepTime;
-    interPos[1]=(float) ( stream->object[ObjID].frame[NextFrame].y-stream->object[ObjID].frame[PrevFrame].y ) * our_stepTime / MAX_stepTime;
-    interPos[2]=(float) ( stream->object[ObjID].frame[NextFrame].z-stream->object[ObjID].frame[PrevFrame].z ) * our_stepTime / MAX_stepTime;
-    interPos[3]=(float) ( stream->object[ObjID].frame[NextFrame].rot1-stream->object[ObjID].frame[PrevFrame].rot1 ) * our_stepTime / MAX_stepTime;
-    interPos[4]=(float) ( stream->object[ObjID].frame[NextFrame].rot2-stream->object[ObjID].frame[PrevFrame].rot2 ) * our_stepTime / MAX_stepTime;
-    interPos[5]=(float) ( stream->object[ObjID].frame[NextFrame].rot3-stream->object[ObjID].frame[PrevFrame].rot3 ) * our_stepTime / MAX_stepTime;
-    interPos[6]=(float) ( stream->object[ObjID].frame[NextFrame].rot4-stream->object[ObjID].frame[PrevFrame].rot4 ) * our_stepTime / MAX_stepTime;
+    interPos[0]+=stream->object[ObjID].frame[PrevFrame].x;
 
+    interPos[1]=(float) ( stream->object[ObjID].frame[NextFrame].y-stream->object[ObjID].frame[PrevFrame].y ) * our_stepTime / MAX_stepTime;
+    interPos[1]+=stream->object[ObjID].frame[PrevFrame].y;
+
+    interPos[2]=(float) ( stream->object[ObjID].frame[NextFrame].z-stream->object[ObjID].frame[PrevFrame].z ) * our_stepTime / MAX_stepTime;
+    interPos[2]+=stream->object[ObjID].frame[PrevFrame].z;
+
+    interPos[3]=(float) ( stream->object[ObjID].frame[NextFrame].rot1-stream->object[ObjID].frame[PrevFrame].rot1 ) * our_stepTime / MAX_stepTime;
+    interPos[3]+=stream->object[ObjID].frame[PrevFrame].rot1;
+
+    interPos[4]=(float) ( stream->object[ObjID].frame[NextFrame].rot2-stream->object[ObjID].frame[PrevFrame].rot2 ) * our_stepTime / MAX_stepTime;
+    interPos[4]+=stream->object[ObjID].frame[PrevFrame].rot2;
+
+    interPos[5]=(float) ( stream->object[ObjID].frame[NextFrame].rot3-stream->object[ObjID].frame[PrevFrame].rot3 ) * our_stepTime / MAX_stepTime;
+    interPos[5]+=stream->object[ObjID].frame[PrevFrame].rot3;
+
+    interPos[6]=(float) ( stream->object[ObjID].frame[NextFrame].rot4-stream->object[ObjID].frame[PrevFrame].rot4 ) * our_stepTime / MAX_stepTime;
+    interPos[6]+=stream->object[ObjID].frame[PrevFrame].rot4;
 
     pos[0]=interPos[0]; pos[1]=interPos[1]; pos[2]=interPos[2];
     pos[3]=interPos[3]; pos[4]=interPos[4]; pos[5]=interPos[5];
