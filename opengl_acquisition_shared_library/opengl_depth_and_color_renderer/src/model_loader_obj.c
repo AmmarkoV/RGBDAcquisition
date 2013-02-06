@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "TextureLoader/bmp.h"
+#include "TextureLoader/texture_loader.h"
 
 #define reallocationStep 500
 
@@ -181,45 +181,6 @@ void AddFacetoG(Group *g,long unsigned int fc)
 	g->numFaces++;
 }
 
-GLuint make_texture(int type,const char *fname)
-{
-    fprintf(stderr,"Making Texture , Type %u , Name %s \n",type , fname);
-
-	GLuint tex=0;
-	GLubyte *bits;
-	BITMAPINFO *info;
-	bits=LoadDIBitmap(fname,&info);
-    if (bits==0) { printf("Cannot Make Texture of %s \n",fname); return 0;}
-
-    glGenTextures(1,&tex);
-	glBindTexture(GL_TEXTURE_2D,tex);
-
-
-	// define what happens if given (s,t) outside [0,1] {REPEAT, CLAMP}
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, type);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, type);
-	glTexImage2D ( GL_TEXTURE_2D, 0, 3,
-				   info->bmiHeader.biWidth, info->bmiHeader.biHeight,
-				   0, GL_BGR_EXT, GL_UNSIGNED_BYTE, bits);
-
-
-
-    // mip mapping
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_NEAREST);
-//	gluBuild2DMipmaps( GL_TEXTURE_2D, 3,
-	//	               info->bmiHeader.biWidth, info->bmiHeader.biHeight,
-		//			   GL_BGR_EXT, GL_UNSIGNED_BYTE, bits );
-
-
-
-    free(bits);
-    fprintf(stderr,"Survived and made texture %u ",tex);
-	return tex;
-}
 
 
 
@@ -329,7 +290,7 @@ int loadMTL(struct OBJ_Model * obj,char *filename)
 		{
 			fscanf(file,"%s",obj->matList[mat_num].texture);
 			obj->matList[mat_num].hasTex =  1;
-		    obj->matList[mat_num].ldText = make_texture(GL_LINEAR, obj->matList[mat_num].texture);
+		    obj->matList[mat_num].ldText = loadTexture(GL_LINEAR, obj->matList[mat_num].texture);
 			printf("%d \t   \n\n", obj->matList[mat_num].ldText);
 			printf("%s \t   \n\n", obj->matList[mat_num].texture);
 		} else

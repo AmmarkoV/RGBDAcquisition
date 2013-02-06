@@ -36,6 +36,8 @@ struct Model * spatoula=0;
 struct Model * duck=0;
 
 
+GLuint sample_Tex=0;
+
 int initScene()
 {
  glEnable(GL_DEPTH_TEST); /* enable depth buffering */
@@ -90,6 +92,9 @@ int initScene()
          setModelColor(models[i],&R,&G,&B,&trans);
     }
 
+
+  sample_Tex = loadTexture(GL_LINEAR,"tracks.ppm");
+
   return 1;
 }
 
@@ -141,7 +146,7 @@ int renderScene()
 
 
   glPushMatrix();
-  glMatrixMode(GL_MODELVIEW);
+  glMatrixMode(GL_MODELVIEW );
   glLoadIdentity();
 
   glRotatef(camera_angle_x,-1.0,0,0); // Peristrofi gyrw apo ton x
@@ -149,7 +154,68 @@ int renderScene()
   glRotatef(camera_angle_z,0,0,-1.0);
   glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
 
+ // setup texture mapping
+      glEnable( GL_TEXTURE_2D );
+      glBindTexture( GL_TEXTURE_2D, sample_Tex );
 
+    glBegin(GL_QUADS);
+        /* front face */
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, 1.0f);
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, 1.0f);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, 1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, 1.0f);
+        /* back face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, -1.0f);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, -1.0f);
+        /* right face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, -1.0f);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, 1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, 1.0f);
+        /* left face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, 1.0f);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, 1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, -1.0f);
+        /* top face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(1.0f, 1.0f, 1.0f);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-1.0f, 1.0f, 1.0f);
+        /* bottom face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, -1.0f);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(1.0f, -1.0f, 1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-1.0f, -1.0f, 1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, -1.0f);
+    glEnd();
+
+      //glDisable( GL_TEXTURE_2D );
 
 
   unsigned int i=0;
