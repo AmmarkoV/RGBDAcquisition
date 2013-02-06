@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
+#include "TextureLoader/bmp.h"
 
 #define reallocationStep 500
 
@@ -172,25 +172,10 @@ void AddFacetoG(Group *g,long unsigned int fc)
 	}
 	if(g->malloced<=g->numFaces)
 	{
-
 		fprintf(stderr,"New Reallocation code..\n");
 	    g->malloced+=reallocationStep;
 	    g->faceList=(long unsigned int*) realloc(g->faceList, sizeof(long unsigned int)*(g->malloced));
 		fprintf(stderr,"New Reallocation code survived..\n");
-/*
-	    fprintf(stderr,"Stupid Reallocation code..\n");
-	    long unsigned int * tmpin;
-	    tmpin= (long unsigned int*)malloc(sizeof(long unsigned int)*(g->numFaces));
-		if( tmpin == 0) { fprintf(stderr,"Could not make a temp buffer \n"); return ; }
-		memcpy(tmpin,g->faceList,sizeof(long unsigned int)*(g->numFaces));
-		free(g->faceList); g->faceList=0;
-
-		g->faceList=(long unsigned int*)malloc(sizeof(long unsigned int)*(g->malloced+reallocationStep));
-		if( g->faceList == 0) { fprintf(stderr,"Could not make a new glist buffer \n"); return ; }
-		memcpy(g->faceList,tmpin,sizeof(long unsigned int)*(g->numFaces));
-		free(tmpin);
-		g->malloced+=reallocationStep;
-	    fprintf(stderr,"Stupid Reallocation code survived..\n");*/
 	}
 	g->faceList[g->numFaces]=fc;
 	g->numFaces++;
@@ -198,20 +183,20 @@ void AddFacetoG(Group *g,long unsigned int fc)
 
 GLuint make_texture(int type,const char *fname)
 {
-    fprintf(stderr,"MakeTextures call is a stub ( for now .. ) \n");
-    return 0;
+    fprintf(stderr,"Making Texture , Type %u , Name %s \n",type , fname);
 
-	GLuint tex;
+	GLuint tex=0;
 	GLubyte *bits;
-//	BITMAPINFO *info;
-//	bits=LoadDIBitmap(fname,&info);
+	BITMAPINFO *info;
+	bits=LoadDIBitmap(fname,&info);
     if (bits==0) { printf("Cannot Make Texture of %s \n",fname); return 0;}
 
     glGenTextures(1,&tex);
 	glBindTexture(GL_TEXTURE_2D,tex);
 
- /*
+
 	// define what happens if given (s,t) outside [0,1] {REPEAT, CLAMP}
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, type);
@@ -219,12 +204,12 @@ GLuint make_texture(int type,const char *fname)
 	glTexImage2D ( GL_TEXTURE_2D, 0, 3,
 				   info->bmiHeader.biWidth, info->bmiHeader.biHeight,
 				   0, GL_BGR_EXT, GL_UNSIGNED_BYTE, bits);
-*/
+
 
 
     // mip mapping
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_NEAREST);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_NEAREST);
 //	gluBuild2DMipmaps( GL_TEXTURE_2D, 3,
 	//	               info->bmiHeader.biWidth, info->bmiHeader.biHeight,
 		//			   GL_BGR_EXT, GL_UNSIGNED_BYTE, bits );
@@ -232,6 +217,7 @@ GLuint make_texture(int type,const char *fname)
 
 
     free(bits);
+    fprintf(stderr,"Survived and made texture %u ",tex);
 	return tex;
 }
 
@@ -452,11 +438,12 @@ int readOBJ(struct OBJ_Model * obj)
   while(fscanf(file, "%s", buf) != EOF)
   {
 
-	  if(!strcmp(buf, "mtllib")){
+	  if(!strcmp(buf, "mtllib"))
+	  {
 		  fscanf(file, "%s", buf1);
 		  strcpy(obj->matLib, buf1);
 		  loadMTL(obj,buf1);
-		  printf("loadmtl %s\n", obj->matLib);
+		  printf("loadmtl %s survived\n", obj->matLib);
 	  }
     switch(buf[0]) {
     case '#':	fgets(buf, sizeof(buf), file);	 break;		// comment   eat up rest of line
@@ -790,7 +777,7 @@ void  drawOBJMesh(struct OBJ_Model * obj)
         if (obj == 0 ) { fprintf(stderr,"drawOBJMesh called with unloaded object \n"); return; }
         long unsigned int i,j;
 
-  glDisable(GL_CULL_FACE);
+        glDisable(GL_CULL_FACE);
 		//for every group
 		for(i=0; i<obj->numGroups; i++)
 		{

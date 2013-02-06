@@ -67,7 +67,7 @@ void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float 
       } else
       { if (mod->transparency==0.0)
          {
-          fprintf(stderr,"Only Seting color %0.2f %0.2f %0.2f \n",mod->colorR,mod->colorG,mod->colorB);
+          //fprintf(stderr,"Only Seting color %0.2f %0.2f %0.2f \n",mod->colorR,mod->colorG,mod->colorB);
           glColor3f(mod->colorR,mod->colorG,mod->colorB);
          } else
          { glEnable(GL_BLEND);			// Turn Blending On
@@ -75,6 +75,8 @@ void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float 
            glColor4f(mod->colorR,mod->colorG,mod->colorB,mod->transparency);
          }
       }
+
+
 
 
     switch ( mod->type )
@@ -152,12 +154,12 @@ int setModelCoordinates(struct Model * mod,float x,float y,float z,float heading
 int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,float *heading,float *pitch,float* roll)
 {
   if (mod==0) { return 0; }
-  fprintf(stderr,"Model SET NoSTACK Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",*x,*y,*z,*heading,*pitch,*roll);
+  //fprintf(stderr,"Model SET NoSTACK Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",*x,*y,*z,*heading,*pitch,*roll);
 
   mod->x=*x; mod->y=*y; mod->z=*z;
 
   mod->heading=*heading; mod->pitch=*pitch; mod->roll=*roll;
-  fprintf(stderr,"Model SET NoSTACK (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+  //fprintf(stderr,"Model SET NoSTACK (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
   return 1;
 }
 
@@ -167,12 +169,12 @@ int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transpare
 {
  if (mod==0) { return 0; }
 
- fprintf(stderr,"Seting color to  %0.2f %0.2f %0.2f trans %0.2f \n",*R,*G,*B,*transparency);
+ //fprintf(stderr,"Seting color to  %0.2f %0.2f %0.2f trans %0.2f \n",*R,*G,*B,*transparency);
  mod->colorR = *R;
  mod->colorG = *G;
  mod->colorB = *B;
  mod->transparency = *transparency;
- fprintf(stderr,"Seting color to  %0.2f %0.2f %0.2f trans %0.2f \n",mod->colorR,mod->colorG,mod->colorB,mod->transparency);
+ //fprintf(stderr,"Seting color to  %0.2f %0.2f %0.2f trans %0.2f \n",mod->colorR,mod->colorG,mod->colorB,mod->transparency);
  return 1;
 }
 
