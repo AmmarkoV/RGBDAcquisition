@@ -7,10 +7,10 @@
 	<File name="main.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="2151" topLine="56" />
 	</File>
-	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp" open="1" top="1" tabpos="15">
-		<Cursor position="21892" topLine="491" />
+	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="19361" topLine="451" />
 	</File>
-	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h" open="1" top="0" tabpos="16">
+	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h" open="1" top="0" tabpos="7">
 		<Cursor position="1345" topLine="45" />
 	</File>
 	<File name="opengl_depth_and_color_renderer/src/main.c" open="1" top="0" tabpos="4">

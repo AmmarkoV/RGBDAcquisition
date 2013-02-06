@@ -23,6 +23,9 @@ typedef unsigned int ModuleIdentifier;
 typedef unsigned int DeviceIdentifier;
 
 
+int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
+
+
 ModuleIdentifier getModuleIdFromModuleName(char * moduleName);
 int acquisitionGetModulesCount();
 char * getModuleStringName(ModuleIdentifier moduleID);

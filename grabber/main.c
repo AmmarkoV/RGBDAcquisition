@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
   {
-       fprintf(stderr,"Could not start module..\n");
+       fprintf(stderr,"Could not start module %s ..\n",getModuleStringName(moduleID));
        return 1;
    }
 

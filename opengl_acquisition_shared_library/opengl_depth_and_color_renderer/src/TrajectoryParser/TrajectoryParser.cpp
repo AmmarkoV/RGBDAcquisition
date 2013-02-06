@@ -9,6 +9,8 @@
 #define OBJECTS_TO_ADD_STEP 10
 #define FRAMES_TO_ADD_STEP 100
 
+#define PRINT_DEBUGGING_INFO 0
+
 int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int framesToAdd)
 {
   if (framesToAdd == 0) { return 0 ; }
@@ -183,7 +185,9 @@ unsigned long getFileSize(char * filename)
 
 int readVirtualStream(struct VirtualStream * newstream)
 {
+  #if PRINT_DEBUGGING_INFO
   fprintf(stderr,"readVirtualStream(%s) called \n",newstream->filename);
+  #endif
 
   //Our stack variables ..
   unsigned int readOpResult = 0;
@@ -319,9 +323,12 @@ int readVirtualStream(struct VirtualStream * newstream)
                          fprintf(stderr,"Error in configuration file , object positions not in correct time order .. \n");
                       }
 
+                   #if PRINT_DEBUGGING_INFO
                    fprintf(stderr,"String %s resolves to : \n",line);
                    fprintf(stderr,"X %02f Y %02f Z %02f ROT %02f %02f %02f %02f\n",newstream->object[ObjID].frame[pos].x,newstream->object[ObjID].frame[pos].y,newstream->object[ObjID].frame[pos].z ,
                                  newstream->object[ObjID].frame[pos].rot1 , newstream->object[ObjID].frame[pos].rot2 , newstream->object[ObjID].frame[pos].rot3 , newstream->object[ObjID].frame[pos].rot4 );
+                   #endif
+
 
                    ++newstream->object[ObjID].numberOfFrames;
                  }
@@ -383,7 +390,10 @@ int destroyVirtualStream(struct VirtualStream * stream)
 
 int refreshVirtualStream(struct VirtualStream * newstream)
 {
+   #if PRINT_DEBUGGING_INFO
    fprintf(stderr,"refreshingVirtualStream\n");
+   #endif
+
    destroyVirtualStreamInternal(newstream,0);
    //Please note that the newstream structure does not get a memset operation anywhere around here
    //thats in order to keep the initial time / frame configuration
@@ -428,7 +438,10 @@ struct VirtualStream * createVirtualStream(char * filename)
 
 int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int FrameIDToReturn,float * pos)
 {
+    #if PRINT_DEBUGGING_INFO
     fprintf(stderr,"Returning frame %u \n",FrameIDToReturn);
+    #endif
+
     pos[0]=stream->object[ObjID].frame[FrameIDToReturn].x;
     pos[1]=stream->object[ObjID].frame[FrameIDToReturn].y;
     pos[2]=stream->object[ObjID].frame[FrameIDToReturn].z;
@@ -449,7 +462,9 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
     }
 
 
+    #if PRINT_DEBUGGING_INFO
     fprintf(stderr,"Interpolating frames @  %u , between %u and %u \n",time,PrevFrame,NextFrame);
+    #endif
     float interPos[7];
 
     unsigned int MAX_stepTime= stream->object[ObjID].frame[NextFrame].time - stream->object[ObjID].frame[PrevFrame].time;
@@ -550,7 +565,10 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
        //timeAbsMilliseconds should contain a valid value now somewhere from 0->MAX_timeOfFrames
      }
 
+     #if PRINT_DEBUGGING_INFO
      fprintf(stderr,"Object %u has %u frames , lets search where we are \n",ObjID,stream->object[ObjID].numberOfFrames);
+     #endif
+
      //We scan all the frames to find out the "last one" and the "next one"
      unsigned int i =0;
      for ( i=0; i <stream->object[ObjID].numberOfFrames-1; i++ )

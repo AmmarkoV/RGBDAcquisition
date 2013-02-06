@@ -2,12 +2,12 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="Acquisition.h" open="1" top="0" tabpos="3">
-		<Cursor position="1342" topLine="15" />
+		<Cursor position="688" topLine="12" />
 	</File>
 	<File name="acquisition_setup.h" open="1" top="0" tabpos="2">
 		<Cursor position="205" topLine="0" />
 	</File>
-	<File name="main.c" open="1" top="0" tabpos="1">
-		<Cursor position="1646" topLine="42" />
+	<File name="main.c" open="1" top="1" tabpos="1">
+		<Cursor position="1604" topLine="40" />
 	</File>
 </CodeBlocks_layout_file>
