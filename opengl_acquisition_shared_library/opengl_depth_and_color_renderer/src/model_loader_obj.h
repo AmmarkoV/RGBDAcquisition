@@ -25,6 +25,7 @@
 #define PI 3.1415936
 #define GL_BGR_EXT 0x80E0
 
+#define MAX_MODEL_PATHS 120
 
 /* Vector Structure*/  typedef struct { GLfloat n1, n2, n3;  } Vector;
 
@@ -54,8 +55,8 @@ typedef struct
 		GLfloat ambient[4];
 		GLfloat diffuse[4];
 		GLfloat specular[4];
-		char name[40];
-		char texture[40];
+		char name[MAX_MODEL_PATHS];
+		char texture[MAX_MODEL_PATHS];
 		GLuint ldText;
 		GLboolean hasTex; //has texture file
 } Material;
@@ -69,7 +70,7 @@ typedef struct
 		GLboolean hasNormals;
 		GLboolean hasTex; //has texture coords
 		long unsigned int malloced;
-		char name[30];
+		char name[MAX_MODEL_PATHS];
 } Group;
 
 
@@ -109,12 +110,10 @@ struct OBJ_Model
 		long unsigned int numMaterials;
 
 
-		//char name[30];
-
 		//the name of the mtl file for the model
-		char matLib[30];
+		char matLib[MAX_MODEL_PATHS];
 		//the obj's filename
-		char filename[61];
+		char filename[MAX_MODEL_PATHS];
 		//the display list id
 		GLuint dispList;
 };

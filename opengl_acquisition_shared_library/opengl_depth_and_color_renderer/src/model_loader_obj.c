@@ -365,8 +365,8 @@ int readOBJ(struct OBJ_Model * obj)
   int grp;
 
   fprintf(stderr,"TODO : proper string allocation here for filename %s \n",obj->filename);
-  char fname[60]={0};
-  strncpy(fname,obj->filename,60);
+  char fname[MAX_MODEL_PATHS]={0};
+  strncpy(fname,obj->filename,MAX_MODEL_PATHS);
 
   file=fopen(fname,"r");
   if(file==0) { fprintf(stderr,"Could not open file %s for reading Object\n",fname); return 0;  }
@@ -755,13 +755,13 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 				}
 			}
 			else
-			 {	glDisable(GL_TEXTURE_2D); }
+			 {	/*glDisable(GL_TEXTURE_2D);*/ }
 
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  obj->matList[ obj->groups[i].material].ambient);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  obj->matList[ obj->groups[i].material].diffuse);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, obj->matList[ obj->groups[i].material].specular);
 			glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, obj->matList[ obj->groups[i].material].shine);
-		 }
+
 
 
 			//if the group has texture coordinates
@@ -770,7 +770,13 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 			                                 glDisable(GL_TEXTURE_GEN_S);
                                              glDisable(GL_TEXTURE_GEN_T);
 			                               }
-
+		}   else
+        {
+              //No Matterials , No Textures
+			   glDisable(GL_TEXTURE_GEN_S);
+               glDisable(GL_TEXTURE_GEN_T);
+               glDisable(GL_TEXTURE_2D);
+        }
 
 			glBegin(GL_TRIANGLES);
 			for(j=0; j<obj->groups[i].numFaces; j++)
@@ -1052,24 +1058,31 @@ int compileOBJList(struct OBJ_Model * obj)
 				}
 			}
 			else
-				glDisable(GL_TEXTURE_2D);
+			{
+			  //glDisable(GL_TEXTURE_2D);
+			}
 
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  obj->matList[ obj->groups[i].material].ambient);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  obj->matList[ obj->groups[i].material].diffuse);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, obj->matList[ obj->groups[i].material].specular);
 			glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, obj->matList[ obj->groups[i].material].shine);
-		 }
-
 
 			if(  ( obj->groups[i].hasTex) ==0 )
 			{
 				InitAutoTex();
 			}
-			else{
+			else
+			{
 				glDisable(GL_TEXTURE_GEN_S);
                 glDisable(GL_TEXTURE_GEN_T);
 			}
-
+          } else
+          {
+              //No Matterials , No Textures
+			   glDisable(GL_TEXTURE_GEN_S);
+               glDisable(GL_TEXTURE_GEN_T);
+               glDisable(GL_TEXTURE_2D);
+          }
 
 			glBegin(GL_TRIANGLES);
            for(j=0; j<obj->groups[i].numFaces; j++)

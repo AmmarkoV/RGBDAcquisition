@@ -46,6 +46,18 @@
 			<Add library="X11" />
 		</Linker>
 		<Unit filename="OGLRendererSandbox.h" />
+		<Unit filename="TextureLoader/bmp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TextureLoader/bmp.h" />
+		<Unit filename="TextureLoader/ppm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TextureLoader/ppm.h" />
+		<Unit filename="TextureLoader/texture_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TextureLoader/texture_loader.h" />
 		<Unit filename="TrajectoryParser/InputParser_C.cpp" />
 		<Unit filename="TrajectoryParser/InputParser_C.h" />
 		<Unit filename="TrajectoryParser/TrajectoryParser.cpp" />

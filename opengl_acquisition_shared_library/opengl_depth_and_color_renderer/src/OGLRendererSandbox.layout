@@ -4,13 +4,25 @@
 	<File name="OGLRendererSandbox.h" open="1" top="0" tabpos="2">
 		<Cursor position="119" topLine="0" />
 	</File>
+	<File name="TextureLoader/ppm.c" open="1" top="0" tabpos="17">
+		<Cursor position="1590" topLine="53" />
+	</File>
+	<File name="TextureLoader/ppm.h" open="1" top="0" tabpos="21">
+		<Cursor position="189" topLine="0" />
+	</File>
+	<File name="TextureLoader/texture_loader.c" open="1" top="1" tabpos="18">
+		<Cursor position="770" topLine="25" />
+	</File>
+	<File name="TextureLoader/texture_loader.h" open="1" top="0" tabpos="19">
+		<Cursor position="90" topLine="0" />
+	</File>
 	<File name="TrajectoryParser/InputParser_C.cpp" open="1" top="0" tabpos="15">
 		<Cursor position="27" topLine="0" />
 	</File>
 	<File name="TrajectoryParser/InputParser_C.h" open="1" top="0" tabpos="14">
 		<Cursor position="162" topLine="0" />
 	</File>
-	<File name="TrajectoryParser/TrajectoryParser.cpp" open="1" top="1" tabpos="12">
+	<File name="TrajectoryParser/TrajectoryParser.cpp" open="1" top="0" tabpos="12">
 		<Cursor position="97" topLine="0" />
 	</File>
 	<File name="TrajectoryParser/TrajectoryParser.h" open="1" top="0" tabpos="13">
@@ -23,27 +35,33 @@
 		<Cursor position="50" topLine="0" />
 	</File>
 	<File name="main.c" open="1" top="0" tabpos="1">
-		<Cursor position="3272" topLine="76" />
+		<Cursor position="3272" topLine="57" />
 	</File>
 	<File name="model_loader.c" open="1" top="0" tabpos="8">
-		<Cursor position="614" topLine="12" />
+		<Cursor position="2147" topLine="37" />
 	</File>
 	<File name="model_loader.h" open="1" top="0" tabpos="9">
 		<Cursor position="940" topLine="9" />
 	</File>
 	<File name="model_loader_obj.c" open="1" top="0" tabpos="7">
-		<Cursor position="10754" topLine="395" />
+		<Cursor position="6424" topLine="272" />
+	</File>
+	<File name="model_loader_obj.h" open="1" top="0" tabpos="20">
+		<Cursor position="1279" topLine="27" />
 	</File>
 	<File name="save_to_file.c" open="1" top="0" tabpos="3">
 		<Cursor position="64" topLine="0" />
 	</File>
 	<File name="scene.c" open="1" top="0" tabpos="5">
-		<Cursor position="2308" topLine="22" />
+		<Cursor position="6399" topLine="191" />
 	</File>
 	<File name="scene.h" open="1" top="0" tabpos="4">
 		<Cursor position="112" topLine="0" />
 	</File>
+	<File name="shader_loader.c" open="1" top="0" tabpos="22">
+		<Cursor position="0" topLine="48" />
+	</File>
 	<File name="tools.c" open="1" top="0" tabpos="11">
-		<Cursor position="53" topLine="0" />
+		<Cursor position="53" topLine="39" />
 	</File>
 </CodeBlocks_layout_file>
