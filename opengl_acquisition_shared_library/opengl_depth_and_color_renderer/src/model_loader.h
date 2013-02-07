@@ -31,7 +31,9 @@ struct Model
 };
 
 
-struct Model * loadModel(char * modelname);
+#define MAX_MODEL_PATHS 120
+
+struct Model * loadModel(char * directory,char * modelname);
 void unloadModel(struct Model * mod);
 
 void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);

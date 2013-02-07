@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
 
+#include "../model_loader.h"
 #include "texture_loader.h"
 #include "bmp.h"
 #include "ppm.h"
@@ -12,9 +14,14 @@
 // TODO HERE : CHECK FOR DUPLICATE TEXTURES , ETC ...
 
 
-GLuint loadTexture(int type,const char *fname)
+GLuint loadTexture(int type,char * directory ,char *fname)
 {
-    fprintf(stderr,"Making Texture , Type %u , Name %s \n",type , fname);
+    char fullPath[MAX_MODEL_PATHS*2 + 2 ]={0};
+    strncpy(fullPath,directory,MAX_MODEL_PATHS);
+    strcat(fullPath,"/");
+    strncat(fullPath,fname,MAX_MODEL_PATHS);
+
+    fprintf(stderr,"Making Texture , Type %u , Name %s , Path %s \n",type , fname , fullPath);
 
 	GLuint tex=0;
 	GLubyte *bits;
@@ -22,17 +29,22 @@ GLuint loadTexture(int type,const char *fname)
 	unsigned int height=0;
 
 
-    /* BMP LOADER HERE
-	BITMAPINFO *info;
-	bits=LoadDIBitmap(fname,&info);
-    if (bits==0) { printf("Cannot Make Texture of %s \n",fname); return 0;}
-    width = info->bmiHeader.biWidth ;
-    height = info->bmiHeader.biHeight;
-    */
+  if ( strstr(fname,".bmp") != 0 )
+    {
+      //BMP LOADER HERE
+	  BITMAPINFO *info;
+	  bits=LoadDIBitmap(fname,&info);
+      if (bits==0) { printf("Cannot Make Texture of %s \n",fname); return 0;}
+      width = info->bmiHeader.biWidth ;
+      height = info->bmiHeader.biHeight;
+    }
+     else
+  if ( strstr(fname,".ppm") != 0 )
+    {
+      //PPM LOADER
+      bits = ( GLubyte * ) ReadPPM((char *) fullPath,&width,&height);
+    }
 
-
-    //PPM LOADER
-    bits = ( GLubyte * ) ReadPPM((char *) fname,&width,&height);
 
     glGenTextures(1,&tex);
 	glBindTexture(GL_TEXTURE_2D,tex);
@@ -61,69 +73,6 @@ GLuint loadTexture(int type,const char *fname)
     fprintf(stderr,"Survived and made texture %u ",tex);
 	return tex;
 }
-
-
-
-
-
-
-
-
-
-// load a 256x256 RGB .RAW file as a texture
-GLuint LoadTextureRAW( const char * filename, int wrap )
-{
-  GLuint texture;
-  int width, height;
-  unsigned char * data;
-  FILE * file;
-
-  // open texture data
-  file = fopen( filename, "rb" );
-  if ( file == NULL ) return 0;
-
-  // allocate buffer
-  width = 256;
-  height = 256;
-  data = malloc( width * height * 3 );
-
-  // read texture data
-  fread( data, width * height * 3, 1, file );
-  fclose( file );
-
-  // allocate a texture name
-  glGenTextures( 1, &texture );
-
-  // select our current texture
-  glBindTexture( GL_TEXTURE_2D, texture );
-
-  // select modulate to mix texture with color for shading
-  glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-  // when texture area is small, bilinear filter the closest MIP map
-  glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                   GL_LINEAR_MIPMAP_NEAREST );
-  // when texture area is large, bilinear filter the first MIP map
-  glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-  // if wrap is true, the texture wraps over at the edges (repeat)
-  //       ... false, the texture ends at the edges (clamp)
-  glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                   wrap ? GL_REPEAT : GL_CLAMP );
-  glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                   wrap ? GL_REPEAT : GL_CLAMP );
-
-  // build our texture MIP maps
-
-	glTexImage2D ( GL_TEXTURE_2D, 0, 3, width, height , 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
-  // free buffer
-  free( data );
-
-  return texture;
-
-}
-
 
 
 

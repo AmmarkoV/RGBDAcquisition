@@ -14,7 +14,7 @@
 #define PIE 3.14159265358979323846
 #define degreeToRadOLD(deg) (deg)*(PIE/180)
 
-struct Model * loadModel(char * modelname)
+struct Model * loadModel(char * directory,char * modelname)
 {
   struct Model * mod = ( struct Model * ) malloc(sizeof(struct Model));
   if ( mod == 0 )  { fprintf(stderr,"Could not allocate enough space for model %s \n",modelname);  return 0; }
@@ -23,7 +23,7 @@ struct Model * loadModel(char * modelname)
   if ( strstr(modelname,".obj") != 0 )
     {
       mod->type = OBJMODEL;
-      mod->model = (struct  OBJ_Model * ) loadObj(modelname);
+      mod->model = (struct  OBJ_Model * ) loadObj(directory,modelname);
     }
 
   if (mod->model ==0 ) { free(mod); return 0 ;}

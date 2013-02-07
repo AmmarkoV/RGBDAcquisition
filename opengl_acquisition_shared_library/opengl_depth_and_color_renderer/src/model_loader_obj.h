@@ -4,6 +4,8 @@
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
 
+#include "model_loader.h"
+
 #define AlmostEqual(v1, v2, tol)                                                    \
 	( (fabs(v1.x-v2.x)<tol) && (fabs(v1.y-v2.y)<tol) && (fabs(v1.z-v2.z)<tol) )     \
 
@@ -25,7 +27,6 @@
 #define PI 3.1415936
 #define GL_BGR_EXT 0x80E0
 
-#define MAX_MODEL_PATHS 120
 
 /* Vector Structure*/  typedef struct { GLfloat n1, n2, n3;  } Vector;
 
@@ -114,12 +115,14 @@ struct OBJ_Model
 		char matLib[MAX_MODEL_PATHS];
 		//the obj's filename
 		char filename[MAX_MODEL_PATHS];
+		//the obj's directory
+		char directory[MAX_MODEL_PATHS];
 		//the display list id
 		GLuint dispList;
 };
 GLuint getObjOGLList(struct OBJ_Model * obj);
 
-struct OBJ_Model * loadObj(char * filename);
+struct OBJ_Model * loadObj(char * directory,char * filename);
 int unloadObj(struct OBJ_Model * obj);
 
 void  drawOBJMesh(struct OBJ_Model * obj);

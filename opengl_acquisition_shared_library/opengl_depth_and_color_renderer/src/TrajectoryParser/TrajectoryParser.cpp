@@ -3,13 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../model_loader.h"
 
 #define LINE_MAX_LENGTH 1024
 #define OBJECT_TYPES_TO_ADD_STEP 10
 #define OBJECTS_TO_ADD_STEP 10
 #define FRAMES_TO_ADD_STEP 100
 
-#define PRINT_DEBUGGING_INFO 0
+#define PRINT_DEBUGGING_INFO 1
 
 int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int framesToAdd)
 {
@@ -210,6 +211,25 @@ int readVirtualStream(struct VirtualStream * newstream)
 
   newstream->fileSize = lSize;
 
+  //Add a dummy CAMERA Object here!
+  growVirtualStreamObjectsTypes(newstream,OBJECT_TYPES_TO_ADD_STEP);
+  strcpy( newstream->objectTypes[0].name , "camera" );
+  strcpy( newstream->objectTypes[0].model , "camera" );
+  ++newstream->numberOfObjectTypes;
+
+  growVirtualStreamObjects(newstream,OBJECTS_TO_ADD_STEP);
+  strcpy( newstream->object[0].name, "camera");
+  strcpy( newstream->object[0].typeStr, "camera");
+  strcpy( newstream->object[0].value, "camera");
+  newstream->object[0].type = 0; //Camera
+  newstream->object[0].R =0;
+  newstream->object[0].G =0;
+  newstream->object[0].B =0;
+  newstream->object[0].Transparency=0;
+  ++newstream->numberOfObjects;
+  // CAMERA OBJECT ADDED
+
+
  //Everything is set , Lets read the file!
   while (!feof(fp))
   {
@@ -248,8 +268,8 @@ int readVirtualStream(struct VirtualStream * newstream)
                  {
                    //We have the space so lets fill our new object spot ..!
                    unsigned int pos = newstream->numberOfObjectTypes;
-                    InputParser_GetWord(ipc,1,newstream->objectTypes[pos].name,15);
-                    InputParser_GetWord(ipc,2,newstream->objectTypes[pos].model,15);
+                    InputParser_GetWord(ipc,1,newstream->objectTypes[pos].name,MAX_MODEL_PATHS);
+                    InputParser_GetWord(ipc,2,newstream->objectTypes[pos].model,MAX_MODEL_PATHS);
                    ++newstream->numberOfObjectTypes;
                  }
             } else
@@ -264,8 +284,8 @@ int readVirtualStream(struct VirtualStream * newstream)
                  {
                    //We have the space so lets fill our new object spot ..!
                    unsigned int pos = newstream->numberOfObjects;
-                    InputParser_GetWord(ipc,1,newstream->object[pos].name,15);
-                    InputParser_GetWord(ipc,2,newstream->object[pos].typeStr,15);
+                    InputParser_GetWord(ipc,1,newstream->object[pos].name,MAX_MODEL_PATHS);
+                    InputParser_GetWord(ipc,2,newstream->object[pos].typeStr,MAX_MODEL_PATHS);
 
                     newstream->object[pos].R = (float) InputParser_GetWordInt(ipc,3)  /  255;
                     newstream->object[pos].G = (float) InputParser_GetWordInt(ipc,4)  /  255;
@@ -436,11 +456,39 @@ struct VirtualStream * createVirtualStream(char * filename)
 */
 
 
+
+
+
+int fillPosWithNull(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos)
+{
+    #if PRINT_DEBUGGING_INFO
+    fprintf(stderr,"Returning null frame for obj %u \n",ObjID);
+    #endif
+
+    pos[0]=0.0;
+    pos[1]=0.0;
+    pos[2]=0.0;
+    pos[3]=0.0;
+    pos[4]=0.0;
+    pos[5]=0.0;
+    pos[6]=0.0;
+
+    return 1;
+}
+
+
+
 int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int FrameIDToReturn,float * pos)
 {
     #if PRINT_DEBUGGING_INFO
     fprintf(stderr,"Returning frame %u \n",FrameIDToReturn);
     #endif
+
+    if (FrameIDToReturn >= stream->object[ObjID].numberOfFrames )
+     {
+         fprintf(stderr,"fillPosWithFrame asked to return frame out of bounds\n");
+         return 0;
+     }
 
     pos[0]=stream->object[ObjID].frame[FrameIDToReturn].x;
     pos[1]=stream->object[ObjID].frame[FrameIDToReturn].y;
@@ -497,6 +545,10 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
     pos[3]=interPos[3]; pos[4]=interPos[4]; pos[5]=interPos[5];
     pos[6]=interPos[6];
 
+    #if PRINT_DEBUGGING_INFO
+    fprintf(stderr,"ok \n");
+    #endif
+
     return 1;
 }
 
@@ -533,8 +585,12 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    unsigned int FrameIDNext = 0;
 
 
-/*!OK , Two major cases here..! The one is a simple Next frame getter , the second is a more complicated interpolated frame getter..! */
-
+   /*!OK , Two major cases here..! The one is a simple Next frame getter , the second is a more complicated interpolated frame getter..! */
+   if ( (stream->object[ObjID].MAX_numberOfFrames == 0 ) )
+   {
+       fillPosWithNull(stream,ObjID,pos);
+       return 1;
+   } else
    if  ( (stream->ignoreTime) || (stream->object[ObjID].MAX_numberOfFrames == 1 ) )
    {
     //We might want to ignore time and just return frame after frame on each call!
@@ -547,7 +603,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
 
     FrameIDLast = FrameIDToReturn;
     FrameIDNext = FrameIDToReturn+1;
-    if ( FrameIDNext >= stream->object[ObjID].MAX_numberOfFrames )
+    if ( FrameIDNext >= stream->object[ObjID].numberOfFrames )
      {
        FrameIDNext  = 0;
      }
@@ -571,7 +627,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
 
      //We scan all the frames to find out the "last one" and the "next one"
      unsigned int i =0;
-     for ( i=0; i <stream->object[ObjID].numberOfFrames-1; i++ )
+     for ( i=0; i <stream->object[ObjID].MAX_numberOfFrames-1; i++ )
       {
        if (( stream->object[ObjID].frame[i].time <= timeAbsMilliseconds )
                  &&

@@ -32,11 +32,7 @@ float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z =
 
 unsigned int ticks = 0;
 
-struct Model * spatoula=0;
-struct Model * duck=0;
 
-
-GLuint sample_Tex=0;
 
 int initScene()
 {
@@ -83,17 +79,15 @@ int initScene()
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 
   unsigned int i=0;
-  for (i=0; i<scene->numberOfObjects; i++)
+  //Object 0 is camera
+  for (i=1; i<scene->numberOfObjects; i++)
     {
-         models[i] = loadModel(getObjectTypeModel(scene,i));
+         models[i] = loadModel("Models/",getObjectTypeModel(scene,i));
 
          R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
          getObjectColorsTrans(scene,i,&R,&G,&B,&trans);
          setModelColor(models[i],&R,&G,&B,&trans);
     }
-
-
-  sample_Tex = loadTexture(GL_LINEAR,"tracks.ppm");
 
   return 1;
 }
@@ -102,7 +96,8 @@ int initScene()
 int closeScene()
 {
   unsigned int i=0;
-  for (i=0; i<scene->numberOfObjectTypes; i++)
+  //Object 0 is camera
+  for (i=1; i<scene->numberOfObjectTypes; i++)
     {
        unloadModel(models[i]);
     }
@@ -125,12 +120,18 @@ int tickScene()
   float * pos = (float*) &posStack;
 
   unsigned int i=0;
-  for (i=0; i<scene->numberOfObjects; i++)
+  //Object 0 is camera
+  for (i=1; i<scene->numberOfObjects; i++)
     {
        pos[0]=0; pos[1]=0; pos[2]=0; pos[3]=0; pos[4]=0; pos[5]=0; pos[6]=0;
        calculateVirtualStreamPos(scene,i,ticks*100,pos);
        setModelCoordinatesNoSTACK(models[i],&pos[0],&pos[1],&pos[2],&pos[3],&pos[4],&pos[5]);
     }
+
+   //Camera information
+   calculateVirtualStreamPos(scene,0,ticks*100,pos);
+   camera_pos_x = pos[0];  camera_pos_y = pos[1]; camera_pos_z = pos[2];
+   camera_angle_x = pos[3]; camera_angle_y = pos[4]; camera_angle_z = pos[5];
 
    usleep(100);
    ++ticks;
@@ -154,72 +155,9 @@ int renderScene()
   glRotatef(camera_angle_z,0,0,-1.0);
   glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
 
- // setup texture mapping
-      glEnable( GL_TEXTURE_2D );
-      glBindTexture( GL_TEXTURE_2D, sample_Tex );
-
-    glBegin(GL_QUADS);
-        /* front face */
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-1.0f, -1.0f, 1.0f);
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(1.0f, -1.0f, 1.0f);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(1.0f, 1.0f, 1.0f);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(-1.0f, 1.0f, 1.0f);
-        /* back face */
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(-1.0f, -1.0f, -1.0f);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(-1.0f, 1.0f, -1.0f);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(1.0f, 1.0f, -1.0f);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(1.0f, -1.0f, -1.0f);
-        /* right face */
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(1.0f, -1.0f, -1.0f);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(1.0f, 1.0f, -1.0f);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(1.0f, 1.0f, 1.0f);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(1.0f, -1.0f, 1.0f);
-        /* left face */
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(-1.0f, -1.0f, 1.0f);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(-1.0f, 1.0f, 1.0f);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(-1.0f, 1.0f, -1.0f);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-1.0f, -1.0f, -1.0f);
-        /* top face */
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(1.0f, 1.0f, 1.0f);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(1.0f, 1.0f, -1.0f);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(-1.0f, 1.0f, -1.0f);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-1.0f, 1.0f, 1.0f);
-        /* bottom face */
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(1.0f, -1.0f, -1.0f);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(1.0f, -1.0f, 1.0f);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(-1.0f, -1.0f, 1.0f);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-1.0f, -1.0f, -1.0f);
-    glEnd();
-
-      //glDisable( GL_TEXTURE_2D );
-
-
-  unsigned int i=0;
-  for (i=0; i<scene->numberOfObjects; i++)
+  unsigned int i;
+  //Object 0 is camera
+  for (i=1; i<scene->numberOfObjects; i++)
     {
        drawModel(models[i]);
     }

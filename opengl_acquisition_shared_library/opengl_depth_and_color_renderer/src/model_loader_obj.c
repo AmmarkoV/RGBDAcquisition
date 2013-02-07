@@ -172,10 +172,10 @@ void AddFacetoG(Group *g,long unsigned int fc)
 	}
 	if(g->malloced<=g->numFaces)
 	{
-		fprintf(stderr,"New Reallocation code..\n");
+		//fprintf(stderr,"New Reallocation code..\n");
 	    g->malloced+=reallocationStep;
 	    g->faceList=(long unsigned int*) realloc(g->faceList, sizeof(long unsigned int)*(g->malloced));
-		fprintf(stderr,"New Reallocation code survived..\n");
+		//fprintf(stderr,"New Reallocation code survived..\n");
 	}
 	g->faceList[g->numFaces]=fc;
 	g->numFaces++;
@@ -184,24 +184,27 @@ void AddFacetoG(Group *g,long unsigned int fc)
 
 
 
-int loadMTL(struct OBJ_Model * obj,char *filename)
+int loadMTL(struct OBJ_Model * obj,char * directory,char *filename)
 {
 
   FILE *file;
   char buf[128];
   char buf1[128];
-  char fname[60];
   GLuint tex_id;
   GLuint mat_num;
   float   r,g,b;
  int i;
 
-  strcpy(fname,filename);
+
+  char fname[2*MAX_MODEL_PATHS+2];
+  strncpy(fname,directory,MAX_MODEL_PATHS);
+  strcat(fname,"/");
+  strncat(fname,filename,MAX_MODEL_PATHS);
 
 
   mat_num = 1;
 
-  if((file=fopen(fname,"r"))==0) { printf("File %s is corrupt or does not exist.\n",filename); return 0; }
+  if((file=fopen(fname,"r"))==0) { printf("File %s is corrupt or does not exist.\n",fname); return 0; }
 
   rewind(file);
 	//1st pass - count materials
@@ -290,7 +293,7 @@ int loadMTL(struct OBJ_Model * obj,char *filename)
 		{
 			fscanf(file,"%s",obj->matList[mat_num].texture);
 			obj->matList[mat_num].hasTex =  1;
-		    obj->matList[mat_num].ldText = loadTexture(GL_LINEAR, obj->matList[mat_num].texture);
+		    obj->matList[mat_num].ldText = loadTexture(GL_LINEAR , obj->directory , obj->matList[mat_num].texture);
 			printf("%d \t   \n\n", obj->matList[mat_num].ldText);
 			printf("%s \t   \n\n", obj->matList[mat_num].texture);
 		} else
@@ -365,8 +368,10 @@ int readOBJ(struct OBJ_Model * obj)
   int grp;
 
   fprintf(stderr,"TODO : proper string allocation here for filename %s \n",obj->filename);
-  char fname[MAX_MODEL_PATHS]={0};
-  strncpy(fname,obj->filename,MAX_MODEL_PATHS);
+  char fname[2*MAX_MODEL_PATHS+2]={0};
+  strncpy(fname,obj->directory,MAX_MODEL_PATHS);
+  strcat(fname,"/");
+  strncat(fname,obj->filename,MAX_MODEL_PATHS);
 
   file=fopen(fname,"r");
   if(file==0) { fprintf(stderr,"Could not open file %s for reading Object\n",fname); return 0;  }
@@ -402,8 +407,8 @@ int readOBJ(struct OBJ_Model * obj)
 	  if(!strcmp(buf, "mtllib"))
 	  {
 		  fscanf(file, "%s", buf1);
-		  strcpy(obj->matLib, buf1);
-		  loadMTL(obj,buf1);
+		  strcpy(obj->matLib,  buf1);
+		  loadMTL(obj,obj->directory ,buf1);
 		  printf("loadmtl %s survived\n", obj->matLib);
 	  }
     switch(buf[0]) {
@@ -1220,7 +1225,7 @@ int unloadObj(struct OBJ_Model * obj)
 
 }
 
-struct OBJ_Model * loadObj(char * filename)
+struct OBJ_Model * loadObj(char * directory,char * filename)
 {
     fprintf(stderr,"Starting to load object %s \n",filename);
     struct OBJ_Model * obj = ( struct OBJ_Model * ) malloc(sizeof(struct OBJ_Model));
@@ -1230,9 +1235,14 @@ struct OBJ_Model * loadObj(char * filename)
     memset (obj,0,sizeof(struct OBJ_Model));
 	obj->scale=1.0f;
 
+
+    unsigned int directory_length = strlen(directory);
+    if (directory_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge directory filename provided , will not loadObject ( %u char limit ) \n",MAX_MODEL_PATHS); return 0; }
+	strncpy(obj->directory, directory, MAX_MODEL_PATHS );
+
     unsigned int file_name_length = strlen(filename);
-    if (file_name_length > 60 ) { fprintf(stderr,"Huge filename provided , will not loadObject ( 60 char limit ) \n"); return 0; }
-	strncpy(obj->filename, filename, 60 );
+    if (file_name_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge filename provided , will not loadObject ( %u char limit ) \n",MAX_MODEL_PATHS); return 0; }
+	strncpy(obj->filename, filename, MAX_MODEL_PATHS );
 
     if (!readOBJ(obj) ) { fprintf(stderr," Could not read object %s \n",filename); unloadObj(obj); return 0;}
     if (!calculateBoundingBox(obj)) { fprintf(stderr," Could not calculate bounding box for object %s \n",filename); unloadObj(obj); return 0;}
