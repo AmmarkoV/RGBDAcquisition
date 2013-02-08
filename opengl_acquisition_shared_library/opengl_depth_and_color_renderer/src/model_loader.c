@@ -47,11 +47,6 @@ void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float 
 {
  if (mod!=0)
  {
-  int NoColor = 0;
-  if ( ( mod->colorR==0.482f ) &&
-       ( mod->colorG==0.482f ) &&
-       ( mod->colorB==0.0f   )  )   { NoColor = 1; }
-
   glPushMatrix();
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
   glEnable(GL_NORMALIZE);
@@ -61,7 +56,7 @@ void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float 
   if ( heading!=0 ) { glRotated(heading,0.0,1.0,0.0); }
   if ( pitch!=0 ) { glRotated(pitch,1.0,0.0,0.0); }
 
-   if (NoColor)
+   if (mod->nocolor)
       { // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
         glDisable(GL_COLOR_MATERIAL); //Required for the glMaterial calls to work
       } else
@@ -100,7 +95,7 @@ void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float 
 
 
        if (mod->transparency!=0) {glDisable(GL_BLEND);  }
-       if (  NoColor ) {glEnable(GL_COLOR_MATERIAL);   }
+       if (mod->nocolor) {glEnable(GL_COLOR_MATERIAL);   }
        if (mod->nocull) { glEnable(GL_CULL_FACE); }
 
   glTranslated(-x,-y,-z);

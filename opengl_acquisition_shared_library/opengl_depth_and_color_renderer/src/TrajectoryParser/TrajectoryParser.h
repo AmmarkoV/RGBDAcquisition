@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+
+#define MAX_PATH 250
+
 typedef unsigned int ObjectIDHandler;
 typedef unsigned int ObjectTypeID;
 
@@ -25,23 +28,23 @@ struct KeyFrame
 
 struct ObjectType
 {
-   char name[15];
-   char model[15];
+   char name[MAX_PATH];
+   char model[MAX_PATH];
 };
 
 
 struct VirtualObject
 {
-   char name[15];
-   char typeStr[15];
-   char value[15];
+   char name[MAX_PATH];
+   char typeStr[MAX_PATH];
+   char value[MAX_PATH];
    ObjectTypeID type;
 
    float R;
    float G;
    float B;
    float Transparency;
-
+   unsigned char nocolor;
 
    unsigned int MAX_timeOfFrames;
    unsigned int MAX_numberOfFrames;
@@ -78,7 +81,7 @@ struct VirtualStream
     char ignoreTime;
     char reverseLoop;
 
-    char filename[250];
+    char filename[MAX_PATH];
 };
 
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);

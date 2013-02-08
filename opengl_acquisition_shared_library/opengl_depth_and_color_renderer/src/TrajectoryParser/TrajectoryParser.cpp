@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../model_loader.h"
 
 #define LINE_MAX_LENGTH 1024
 #define OBJECT_TYPES_TO_ADD_STEP 10
@@ -268,8 +267,8 @@ int readVirtualStream(struct VirtualStream * newstream)
                  {
                    //We have the space so lets fill our new object spot ..!
                    unsigned int pos = newstream->numberOfObjectTypes;
-                    InputParser_GetWord(ipc,1,newstream->objectTypes[pos].name,MAX_MODEL_PATHS);
-                    InputParser_GetWord(ipc,2,newstream->objectTypes[pos].model,MAX_MODEL_PATHS);
+                    InputParser_GetWord(ipc,1,newstream->objectTypes[pos].name,MAX_PATH);
+                    InputParser_GetWord(ipc,2,newstream->objectTypes[pos].model,MAX_PATH);
                    ++newstream->numberOfObjectTypes;
                  }
             } else
@@ -284,15 +283,16 @@ int readVirtualStream(struct VirtualStream * newstream)
                  {
                    //We have the space so lets fill our new object spot ..!
                    unsigned int pos = newstream->numberOfObjects;
-                    InputParser_GetWord(ipc,1,newstream->object[pos].name,MAX_MODEL_PATHS);
-                    InputParser_GetWord(ipc,2,newstream->object[pos].typeStr,MAX_MODEL_PATHS);
+                    InputParser_GetWord(ipc,1,newstream->object[pos].name,MAX_PATH);
+                    InputParser_GetWord(ipc,2,newstream->object[pos].typeStr,MAX_PATH);
 
                     newstream->object[pos].R = (float) InputParser_GetWordInt(ipc,3)  /  255;
                     newstream->object[pos].G = (float) InputParser_GetWordInt(ipc,4)  /  255;
                     newstream->object[pos].B = (float) InputParser_GetWordInt(ipc,5)  /  255;
                     newstream->object[pos].Transparency = (float) InputParser_GetWordInt(ipc,6)  /  255;
+                    newstream->object[pos].nocolor = (float) InputParser_GetWordInt(ipc,7);
 
-                    InputParser_GetWord(ipc,7,newstream->object[pos].value,15);
+                    InputParser_GetWord(ipc,8,newstream->object[pos].value,15);
 
                     unsigned int found=0;
                     newstream->object[pos].type = getObjectTypeID(newstream,newstream->object[pos].typeStr,&found);
@@ -430,7 +430,7 @@ struct VirtualStream * createVirtualStream(char * filename)
 
   //Clear the whole damn thing..
   memset(newstream,0,sizeof(struct VirtualStream));
-  strncpy(newstream->filename,filename,250);
+  strncpy(newstream->filename,filename,MAX_PATH);
 
   if (!readVirtualStream(newstream))
     {

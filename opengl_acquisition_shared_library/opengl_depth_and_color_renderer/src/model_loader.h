@@ -26,7 +26,8 @@ struct Model
     float colorB;
 
     float transparency;
-    int nocull;
+    unsigned char nocull;
+    unsigned char nocolor;
 
 };
 

@@ -31,8 +31,7 @@ void calcFaceNormal(Normal *nrm,Vertex v1,Vertex v2,Vertex v3,int normalized)
   if(normalized==0)
   {
 	  length = (float)sqrt((ret.n1*ret.n1)+(ret.n2*ret.n2)+(ret.n3*ret.n3));
-	  if(length==0.0f)
-		  length=1.0f;
+	  if(length==0.0f) length=1.0f;
 	  ret.n1=(GLfloat)(ret.n1/(GLfloat)length);
 	  ret.n2=(GLfloat)(ret.n2/(GLfloat)length);
 	  ret.n3=(GLfloat)(ret.n3/(GLfloat)length);
@@ -337,6 +336,11 @@ int calculateBoundingBox(struct OBJ_Model * obj)
 
 int prepareObject(struct OBJ_Model * obj)
 {
+    if (obj==0) { fprintf(stderr,"Cannot Prepare empty object \n"); return 0; }
+    if (obj->numFaces==0) { fprintf(stderr,"Object has zero faces \n"); return 0; }
+    if (obj->faceList==0) { fprintf(stderr,"Object has a null face list \n"); return 0; }
+    if (obj->vertexList==0) { fprintf(stderr,"Object has a null vertex list \n"); return 0; }
+
 	long unsigned int i;
 	Normal tmpnrm;
 	for(i=0;i<obj->numFaces;i++)

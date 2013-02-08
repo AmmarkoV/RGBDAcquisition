@@ -7,7 +7,7 @@
 */
 
 
-const char * _ipc_ver=" 0.356 written from scratch - 8/2/10 \0";
+char _ipc_ver[]=" 0.356 written from scratch - 8/2/10 \0";
 
 char * InputParserC_Version()
 {

@@ -87,6 +87,7 @@ int initScene()
          R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
          getObjectColorsTrans(scene,i,&R,&G,&B,&trans);
          setModelColor(models[i],&R,&G,&B,&trans);
+         models[i]->nocolor = scene->object[i].nocolor;
     }
 
   return 1;
