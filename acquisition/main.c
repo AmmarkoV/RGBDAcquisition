@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if USE_OPENNI1
 #include "../openni1_acquisition_shared_library/OpenNI1Acquisition.h"
@@ -44,6 +45,7 @@ unsigned int simplePow(unsigned int base,unsigned int exp)
 
 int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
+    //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);
     if(pixels==0) { fprintf(stderr,"saveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
     if (bitsperpixel>16) { fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n"); return 0; }
 
@@ -514,12 +516,12 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
       case V4L2_ACQUISITION_MODULE    :   break;
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
-          return getOpenGLDepthPixels(devID);
+          return (short*) getOpenGLDepthPixels(devID);
         #endif
       break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
-          return getTemplateDepthPixels(devID);
+          return (short*) getTemplateDepthPixels(devID);
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:

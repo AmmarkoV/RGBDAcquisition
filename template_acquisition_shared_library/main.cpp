@@ -9,8 +9,8 @@ unsigned int templateHEIGHT=480;
 char * templateColorFrame = 0;
 short * templateDepthFrame = 0;
 
-
-char readFromDir[1024]={0}; // <- this sucks i know :P
+#define MAX_DIR_PATH 1024
+char readFromDir[MAX_DIR_PATH]={0}; // <- this sucks i know :P
 unsigned short cycle=0;
 
 
@@ -18,15 +18,14 @@ unsigned short cycle=0;
 
 
 
-char FileExists(char * filename)
+int FileExists(char * filename)
 {
  FILE *fp = fopen(filename,"r");
  if( fp ) { /* exists */
             fclose(fp);
             return 1;
           }
-          else
-          { /* doesnt exist */ }
+ /* doesnt exist */
  return 0;
 }
 
@@ -66,6 +65,8 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
         if ( pixels != 0 )
         {
           size_t rd = fread(pixels,3, w*h, pf);
+          if (rd < w*h ) { fprintf(stderr,"Note : Incomplete read while reading file %s (%u instead of %u)\n",filename,(unsigned int) rd, w*h);  }
+
           fclose(pf);
           if ( rd < w*h ) { return 0; }
           return pixels;
@@ -119,11 +120,10 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
 
         if ( pixels != 0 )
         {
-          fprintf(stderr,"Depth going for the read %ux%u\n",w,h);
           size_t rd = fread(pixels,sizeof(short), w*h, pf);
-          fprintf(stderr,"Survived read\n");
+          if (rd < w*h) { fprintf(stderr,"Note : Incomplete read while reading file %s (%u instead of %u)\n",filename,(unsigned int) rd,w*h);  }
+
           fclose(pf);
-          //if ( rd < w*h ) { return 0; }
           return pixels;
         } else
         {
@@ -146,7 +146,7 @@ int startTemplate(unsigned int max_devs,char * settings)
        else
      {
        if (strlen(settings)==0)  { strcpy(readFromDir,""); } else
-                                 { strcpy(readFromDir,settings);  }
+                                 { strncpy(readFromDir,settings,MAX_DIR_PATH);  }
      }
     return 1;
 }
@@ -209,13 +209,15 @@ int snapTemplateFrames(int devID)
     //TODO HERE MAYBE LOAD NEW BUFFERS
     int found_frames = 0;
 
-    unsigned int widthInternal; unsigned int heightInternal;
-    char file_name_test[1024];
+    unsigned int widthInternal=0; unsigned int heightInternal=0;
+    char * file_name_test = (char* ) malloc(2048 * sizeof(char));
+    if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
+
     sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",readFromDir,devID,cycle);
     if (FileExists(file_name_test))
      {
        if (templateColorFrame!=0) { free(templateColorFrame); }
-       templateColorFrame = ReadPPM((char*) file_name_test,&widthInternal,&heightInternal);
+       templateColorFrame = ReadPPM(file_name_test,&widthInternal,&heightInternal);
        ++found_frames;
      }
 
@@ -223,9 +225,12 @@ int snapTemplateFrames(int devID)
     if (FileExists(file_name_test))
      {
       if (templateDepthFrame!=0) { free(templateDepthFrame); }
-      templateDepthFrame = ReadPPMD((char*) file_name_test,&widthInternal,&heightInternal);
+      templateDepthFrame = ReadPPMD(file_name_test,&widthInternal,&heightInternal);
       ++found_frames;
      }
+
+  free(file_name_test);
+  file_name_test=0;
 
   ++cycle;
   if (cycle>65534) { cycle=0; }
