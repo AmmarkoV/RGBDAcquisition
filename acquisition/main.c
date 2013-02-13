@@ -28,9 +28,6 @@
 #include "../template_acquisition_shared_library/TemplateAcquisition.h"
 #endif
 
-
-
-
 unsigned int simplePow(unsigned int base,unsigned int exp)
 {
     if (exp==0) return 1;
@@ -71,7 +68,6 @@ int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsi
         n = (unsigned int) tmp_n;
 
         fwrite(pixels, 1 , n , fd);
-        //fwrite(pixels, 1 , n , fd);
         fflush(fd);
         fclose(fd);
         return 1;
@@ -86,7 +82,7 @@ int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsi
 
 //Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
 //depth is casted to char to simplify things , but that adds sizeof(short) to the pointer arethemetic!
-char * DepthToRGB(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
+char * DepthToRGB(short * depth,unsigned int width , unsigned int height)
 {
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
   char * depthPTR= (char*) depth; // This will be the traversing pointer for input
@@ -102,6 +98,37 @@ char * DepthToRGB(short * depth,unsigned int width , unsigned int height , unsig
      * outFramePTR = *depthPTR; ++outFramePTR; ++depthPTR;
      * outFramePTR = *depthPTR; ++outFramePTR; ++depthPTR;
      * outFramePTR = 0;         ++outFramePTR;
+  }
+ return outFrame;
+}
+
+
+//Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
+//depth is casted to char to simplify things , but that adds sizeof(short) to the pointer arethemetic!
+char * DepthShortToChar(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
+{
+  if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
+  short * depthPTR= depth; // This will be the traversing pointer for input
+  short * depthLimit =  depth + width*height; //<- we use sizeof(short) because we have casted to char !
+
+
+  char * outFrame = (char*) malloc(width*height*1*sizeof(char));
+  if (outFrame==0) { fprintf(stderr,"Could not perform DepthToRGB transformation\nNo memory for new frame\n"); return 0; }
+
+  float depth_range = max_depth-min_depth;
+  if (depth_range ==0 ) { depth_range = 1; }
+  float multiplier = 255 / depth_range;
+
+
+  char * outFramePTR = outFrame; // This will be the traversing pointer for output
+  while ( depthPTR<depthLimit )
+  {
+     unsigned int scaled = (unsigned int) (*depthPTR) * multiplier;
+     unsigned char scaledChar = (unsigned char) scaled;
+     * outFramePTR = scaledChar;
+
+     ++outFramePTR;
+     ++depthPTR;
   }
  return outFrame;
 }
@@ -504,41 +531,11 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
     short * inFrame = 0;
     char * outFrame = 0 ;
 
-    switch (moduleID)
-    {
-      case V4L2_ACQUISITION_MODULE    :   break;
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          inFrame = (short*) getOpenGLDepthPixels(devID);
-        #endif
-      break;
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          inFrame = (short*) getTemplateDepthPixels(devID);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-          inFrame = (short*) getFreenectDepthPixels(devID);
-        #endif
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-            inFrame = (short*) getOpenNI1DepthPixels(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-            inFrame = (short*) getOpenNI2DepthPixels(devID);
-        #endif
-      break;
-    };
-
-
+    inFrame = acquisitionGetDepthFrame(moduleID,devID);
     if (inFrame!=0)
       {
-       acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-       outFrame = DepthToRGB(inFrame,width,height,0,7000);
+       acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+       outFrame = DepthToRGB(inFrame,width,height);
        if (outFrame!=0)
         {
          saveRawImageToFile(filename,outFrame,width,height,3,8);
@@ -550,6 +547,34 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColoredDepthFrame");
     return 0;
 }
+
+
+int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+{
+    unsigned int width = 0 ;
+    unsigned int height = 0 ;
+    unsigned int channels = 0 ;
+    unsigned int bitsperpixel = 0 ;
+    short * inFrame = 0;
+    char * outFrame = 0 ;
+
+    inFrame = acquisitionGetDepthFrame(moduleID,devID);
+    if (inFrame!=0)
+      {
+       acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+       outFrame = DepthShortToChar(inFrame,width,height,0,7000);
+       if (outFrame!=0)
+        {
+         saveRawImageToFile(filename,outFrame,width,height,1,8);
+         free(outFrame);
+         return 1;
+        }
+      }
+
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColoredDepthFrame");
+    return 0;
+}
+
 
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
