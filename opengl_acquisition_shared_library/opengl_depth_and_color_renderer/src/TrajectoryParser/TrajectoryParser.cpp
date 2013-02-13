@@ -2,6 +2,7 @@
 #include "InputParser_C.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 
 #define LINE_MAX_LENGTH 1024
@@ -9,7 +10,8 @@
 #define OBJECTS_TO_ADD_STEP 10
 #define FRAMES_TO_ADD_STEP 100
 
-#define PRINT_DEBUGGING_INFO 1
+#define PRINT_DEBUGGING_INFO 0
+#define CASE_SENSITIVE_OBJECT_NAMES 0
 
 int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int framesToAdd)
 {
@@ -98,6 +100,43 @@ int growVirtualStreamObjects(struct VirtualStream * stream,unsigned int objectsT
 
 */
 
+static int dummy_strcasecmp_internal(char * input1, char * input2)
+{
+  #if CASE_SENSITIVE_OBJECT_NAMES
+    return strcmp(input1,input2);
+  #endif
+
+    if ( (input1==0) || (input2==0) )
+     {
+         fprintf(stderr,"Error , calling strcasecmp_internal with null parameters \n");
+         return 1;
+     }
+    unsigned int len1 = strlen(input1);
+    unsigned int len2 = strlen(input2);
+    if (len1!=len2)
+     {
+         //mismatched lengths of strings , they can't be equal..!
+         return 1;
+     }
+
+   char A; //<- character buffer for input1
+   char B; //<- character buffer for input2
+
+   int i=0;
+   while (i<len1) //len1 and len2 are equal
+    {
+       A = toupper(input1[i]);
+       B = toupper(input2[i]);
+       if (A!=B) { return 1; }
+       ++i;
+    }
+  //if we reached this point , there where no reasons
+  //why input1 and input2 could not be equal..
+  return 0;
+}
+
+
+
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found)
 {
   if (stream==0) { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",name); }
@@ -107,7 +146,7 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned 
   unsigned int i=0;
   for (i=0; i<stream->numberOfObjects; i++ )
    {
-       if (strcasecmp(name,stream->object[i].name)==0)
+       if (dummy_strcasecmp_internal(name,stream->object[i].name)==0)
          {
               *found=1;
               return i;
@@ -126,7 +165,7 @@ ObjectTypeID getObjectTypeID(struct VirtualStream * stream,char * typeName,unsig
   unsigned int i=0;
   for (i=0; i<stream->numberOfObjectTypes; i++ )
    {
-       if (strcasecmp(typeName,stream->objectTypes[i].name)==0)
+       if (dummy_strcasecmp_internal(typeName,stream->objectTypes[i].name)==0)
          {
               *found=1;
               return i;

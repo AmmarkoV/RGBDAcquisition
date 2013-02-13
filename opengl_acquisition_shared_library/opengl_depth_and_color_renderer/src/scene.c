@@ -83,11 +83,18 @@ int initScene()
   for (i=1; i<scene->numberOfObjects; i++)
     {
          models[i] = loadModel("Models/",getObjectTypeModel(scene,i));
+         if (models[i]!=0)
+          {
+           R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
+           getObjectColorsTrans(scene,i,&R,&G,&B,&trans);
+           setModelColor(models[i],&R,&G,&B,&trans);
+           models[i]->nocolor = scene->object[i].nocolor;
+          }
+            else
+          {
+            fprintf(stderr,"Failed loading model %u \n",i);
+          }
 
-         R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
-         getObjectColorsTrans(scene,i,&R,&G,&B,&trans);
-         setModelColor(models[i],&R,&G,&B,&trans);
-         models[i]->nocolor = scene->object[i].nocolor;
     }
 
   return 1;

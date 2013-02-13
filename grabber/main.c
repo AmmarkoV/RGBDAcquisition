@@ -109,6 +109,9 @@ int main(int argc, char *argv[])
 
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+
+        sprintf(outfilename,"%s/coloreddepthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
+        acquisitionSaveColoredDepthFrame(moduleID,devID,outfilename);
       }
     }
 

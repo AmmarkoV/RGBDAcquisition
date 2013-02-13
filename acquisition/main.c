@@ -84,6 +84,29 @@ int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsi
     return 0;
 }
 
+//Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
+//depth is casted to char to simplify things , but that adds sizeof(short) to the pointer arethemetic!
+char * DepthToRGB(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
+{
+  if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
+  char * depthPTR= (char*) depth; // This will be the traversing pointer for input
+  char * depthLimit = (char*) depth + width*height * sizeof(short); //<- we use sizeof(short) because we have casted to char !
+
+
+  char * outFrame = (char*) malloc(width*height*3*sizeof(char));
+  if (outFrame==0) { fprintf(stderr,"Could not perform DepthToRGB transformation\nNo memory for new frame\n"); return 0; }
+
+  char * outFramePTR = outFrame; // This will be the traversing pointer for output
+  while ( depthPTR<depthLimit )
+  {
+     * outFramePTR = *depthPTR; ++outFramePTR; ++depthPTR;
+     * outFramePTR = *depthPTR; ++outFramePTR; ++depthPTR;
+     * outFramePTR = 0;         ++outFramePTR;
+  }
+ return outFrame;
+}
+
+
 
 int acquisitionGetModulesCount()
 {
@@ -123,6 +146,7 @@ ModuleIdentifier getModuleIdFromModuleName(char * moduleName)
 {
    ModuleIdentifier moduleID = 0;
           if (strcasecmp("FREENECT",moduleName)==0 )  { moduleID = FREENECT_ACQUISITION_MODULE; } else
+          if (strcasecmp("OPENNI",moduleName)==0 )  { moduleID = OPENNI1_ACQUISITION_MODULE;  } else
           if (strcasecmp("OPENNI1",moduleName)==0 )  { moduleID = OPENNI1_ACQUISITION_MODULE;  } else
           if (strcasecmp("OPENNI2",moduleName)==0 )  { moduleID = OPENNI2_ACQUISITION_MODULE;  } else
           if (strcasecmp("OPENGL",moduleName)==0 )   { moduleID = OPENGL_ACQUISITION_MODULE;   } else
@@ -471,6 +495,61 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
     return 0;
 }
 
+ int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+{
+    unsigned int width = 0 ;
+    unsigned int height = 0 ;
+    unsigned int channels = 0 ;
+    unsigned int bitsperpixel = 0 ;
+    short * inFrame = 0;
+    char * outFrame = 0 ;
+
+    switch (moduleID)
+    {
+      case V4L2_ACQUISITION_MODULE    :   break;
+      case OPENGL_ACQUISITION_MODULE    :
+        #if USE_OPENGL
+          inFrame = (short*) getOpenGLDepthPixels(devID);
+        #endif
+      break;
+      case TEMPLATE_ACQUISITION_MODULE:
+        #if USE_TEMPLATE
+          inFrame = (short*) getTemplateDepthPixels(devID);
+        #endif
+      break;
+      case FREENECT_ACQUISITION_MODULE:
+        #if USE_FREENECT
+          inFrame = (short*) getFreenectDepthPixels(devID);
+        #endif
+      break;
+      case OPENNI1_ACQUISITION_MODULE :
+        #if USE_OPENNI1
+            inFrame = (short*) getOpenNI1DepthPixels(devID);
+        #endif
+      break;
+      case OPENNI2_ACQUISITION_MODULE :
+        #if USE_OPENNI2
+            inFrame = (short*) getOpenNI2DepthPixels(devID);
+        #endif
+      break;
+    };
+
+
+    if (inFrame!=0)
+      {
+       acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+       outFrame = DepthToRGB(inFrame,width,height,0,7000);
+       if (outFrame!=0)
+        {
+         saveRawImageToFile(filename,outFrame,width,height,3,8);
+         free(outFrame);
+         return 1;
+        }
+      }
+
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColoredDepthFrame");
+    return 0;
+}
 
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
@@ -526,17 +605,17 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
       break;
       case FREENECT_ACQUISITION_MODULE:
         #if USE_FREENECT
-          return getFreenectDepthPixels(devID);
+          return (short*) getFreenectDepthPixels(devID);
         #endif
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
-            return getOpenNI1DepthPixels(devID);
+            return (short*) getOpenNI1DepthPixels(devID);
         #endif
       break;
       case OPENNI2_ACQUISITION_MODULE :
         #if USE_OPENNI2
-            return getOpenNI2DepthPixels(devID);
+            return (short*) getOpenNI2DepthPixels(devID);
         #endif
       break;
     };
