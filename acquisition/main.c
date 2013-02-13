@@ -82,7 +82,7 @@ int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsi
 
 //Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
 //depth is casted to char to simplify things , but that adds sizeof(short) to the pointer arethemetic!
-char * DepthToRGB(short * depth,unsigned int width , unsigned int height)
+char * convertShortDepthToRGBDepth(short * depth,unsigned int width , unsigned int height)
 {
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
   char * depthPTR= (char*) depth; // This will be the traversing pointer for input
@@ -105,7 +105,7 @@ char * DepthToRGB(short * depth,unsigned int width , unsigned int height)
 
 //Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
 //depth is casted to char to simplify things , but that adds sizeof(short) to the pointer arethemetic!
-char * DepthShortToChar(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
+char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
 {
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
   short * depthPTR= depth; // This will be the traversing pointer for input
@@ -535,7 +535,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
     if (inFrame!=0)
       {
        acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-       outFrame = DepthToRGB(inFrame,width,height);
+       outFrame = convertShortDepthToRGBDepth(inFrame,width,height);
        if (outFrame!=0)
         {
          saveRawImageToFile(filename,outFrame,width,height,3,8);
@@ -562,7 +562,7 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
     if (inFrame!=0)
       {
        acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-       outFrame = DepthShortToChar(inFrame,width,height,0,7000);
+       outFrame = convertShortDepthToCharDepth(inFrame,width,height,0,7000);
        if (outFrame!=0)
         {
          saveRawImageToFile(filename,outFrame,width,height,1,8);
