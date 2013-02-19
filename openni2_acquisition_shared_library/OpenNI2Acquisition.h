@@ -11,6 +11,9 @@ extern "C"
    int getOpenNI2NumberOfDevices(); // This has to be called AFTER startOpenNI2
    int stopOpenNI2();
 
+   int mapOpenNI2DepthToRGB(int devID);
+   int mapOpenNI2RGBToDepth(int devID);
+
    //Basic Per Device Operations
    int createOpenNI2Device(int devID,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyOpenNI2Device(int devID);

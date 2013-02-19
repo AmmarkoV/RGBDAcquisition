@@ -800,6 +800,7 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
       break;
       case OPENNI2_ACQUISITION_MODULE :
         #if USE_OPENNI2
+          return mapOpenNI2DepthToRGB(devID);
         #endif
       break;
     };
@@ -823,6 +824,7 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
       break;
       case OPENNI2_ACQUISITION_MODULE :
         #if USE_OPENNI2
+          return mapOpenNI2RGBToDepth(devID);
         #endif
       break;
     };

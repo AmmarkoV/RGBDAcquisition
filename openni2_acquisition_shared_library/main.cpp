@@ -36,6 +36,9 @@ VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES];
    --------------------------------------------------------------------------------
    --------------------------------------------------------------------------------
 */
+
+
+
 int initializeOpenNI(unsigned int MAX_DEVICES_NEEDED)
 {
    //Startup Everything!
@@ -202,6 +205,8 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
 }
 
 
+
+
 int closeOpenNIDevice(Device &device , VideoStream &color , VideoStream &depth)
 {
     fprintf(stderr,"Stopping depth and color streams\n");
@@ -265,6 +270,22 @@ int readOpenNiColorAndDepth(VideoStream &color , VideoStream &depth,VideoFrameRe
 
 
 */
+int mapOpenNI2DepthToRGB(int devID)
+{
+  device[devID].setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
+  return 1;
+}
+
+
+int mapOpenNI2RGBToDepth(int devID)
+{
+  return 0;
+  //device[devID].setImageRegistrationMode(IMAGE_REGISTRATION_COLOR_TO_DEPTH);
+  return 1;
+}
+
+
+
 
 int startOpenNI2(unsigned int max_devs)
 {
