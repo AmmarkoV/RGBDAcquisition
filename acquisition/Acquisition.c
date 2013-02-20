@@ -499,22 +499,22 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
       break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
-          return saveRawImageToFile(filename,getTemplateDepthPixels(devID),getTemplateDepthWidth(devID),getTemplateDepthHeight(devID) ,getTemplateDepthChannels(devID),getTemplateDepthBitsPerPixel(devID));
+          return saveRawImageToFile(filename,(char*) getTemplateDepthPixels(devID),getTemplateDepthWidth(devID),getTemplateDepthHeight(devID) ,getTemplateDepthChannels(devID),getTemplateDepthBitsPerPixel(devID));
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
         #if USE_FREENECT
-          return saveRawImageToFile(filename,getFreenectDepthPixels(devID),getFreenectDepthWidth(devID),getFreenectDepthHeight(devID) ,getFreenectDepthChannels(devID),getFreenectDepthBitsPerPixel(devID));
+          return saveRawImageToFile(filename,(char*) getFreenectDepthPixels(devID),getFreenectDepthWidth(devID),getFreenectDepthHeight(devID) ,getFreenectDepthChannels(devID),getFreenectDepthBitsPerPixel(devID));
         #endif
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
-            return saveRawImageToFile(filename,getOpenNI1DepthPixels(devID),getOpenNI1DepthWidth(devID),getOpenNI1DepthHeight(devID) ,getOpenNI1DepthChannels(devID),getOpenNI1DepthBitsPerPixel(devID));
+            return saveRawImageToFile(filename,(char*) getOpenNI1DepthPixels(devID),getOpenNI1DepthWidth(devID),getOpenNI1DepthHeight(devID) ,getOpenNI1DepthChannels(devID),getOpenNI1DepthBitsPerPixel(devID));
         #endif
       break;
       case OPENNI2_ACQUISITION_MODULE :
         #if USE_OPENNI2
-            return saveRawImageToFile(filename,getOpenNI2DepthPixels(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID) ,getOpenNI2DepthChannels(devID),getOpenNI2DepthBitsPerPixel(devID));
+            return saveRawImageToFile(filename,(char*) getOpenNI2DepthPixels(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID) ,getOpenNI2DepthChannels(devID),getOpenNI2DepthBitsPerPixel(devID));
         #endif
       break;
     };

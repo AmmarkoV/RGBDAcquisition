@@ -41,8 +41,8 @@
 			<Add library="GL" />
 			<Add library="X11" />
 		</Linker>
+		<Unit filename="OpenGLAcquisition.cpp" />
 		<Unit filename="OpenGLAcquisition.h" />
-		<Unit filename="main.cpp" />
 		<Unit filename="opengl_depth_and_color_renderer/src/OGLRendererSandbox.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/bmp.c">
 			<Option compilerVar="CC" />

@@ -8,8 +8,6 @@
 char outputfoldername[512]={0};
 
 
-
-
 int makepath(char * path)
 {
      FILE *fp;

@@ -36,11 +36,11 @@
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
-		<Unit filename="Acquisition.h" />
-		<Unit filename="acquisition_setup.h" />
-		<Unit filename="main.c">
+		<Unit filename="Acquisition.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="Acquisition.h" />
+		<Unit filename="acquisition_setup.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

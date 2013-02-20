@@ -45,8 +45,8 @@
 			<Add option="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so" />
 			<Add option="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so" />
 		</Linker>
+		<Unit filename="OpenNI1Acquisition.cpp" />
 		<Unit filename="OpenNI1Acquisition.h" />
-		<Unit filename="main.cpp" />
 		<Extensions>
 			<envvars />
 			<code_completion />

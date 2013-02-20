@@ -37,8 +37,8 @@
 			<Add option="-fexceptions" />
 			<Add option="-fPIC" />
 		</Compiler>
+		<Unit filename="TemplateAcquisition.cpp" />
 		<Unit filename="TemplateAcquisition.h" />
-		<Unit filename="main.cpp" />
 		<Extensions>
 			<envvars />
 			<code_completion />

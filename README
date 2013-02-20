@@ -1,4 +1,4 @@
-This is the RGBD project.. :P
+This is the RGBD project.. 
 
 If you want to download OpenNI , OpenNI2 , LibFreenect , please issue 
 cd 3dparty && ./get_third_party_libs.sh
@@ -10,6 +10,8 @@ It controls what modules get linked during the compilation in order to keep your
 To compile the library issue 
 
 make
+there also exists a bash script called
+./make.sh , you could use it if you run into problems
 
 
 To test it issue 
@@ -18,7 +20,11 @@ To test it issue
 
 You can select from the modules linked by using  them as a parameter..
 For example
-./run_grabber.sh 10 OPENNI1 will use the  OpenNI1 module
-./run_grabber.sh 10 OPENNI2 will use the  OpenNI2 module
-./run_grabber.sh 10 OPENGL will use the  OpenGL  module
-./run_grabber.sh 10 FREENECT will use the  FREENECT module
+./run_grabber.sh 10 OPENNI1 outdir will use the  OpenNI1 module
+./run_grabber.sh 10 OPENNI2 outdir will use the  OpenNI2 module
+./run_grabber.sh 10 OPENGL outdir will use the  OpenGL  module
+./run_grabber.sh 10 FREENECT outdir will use the  FREENECT module
+
+outdir is converted to grabber/frames/outdir
+
+

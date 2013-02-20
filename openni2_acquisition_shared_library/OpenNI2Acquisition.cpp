@@ -49,9 +49,9 @@ int initializeOpenNI(unsigned int MAX_DEVICES_NEEDED)
     }
 
 
-    if (MAX_DEVICES_NEEDED!=MAX_OPENNI2_DEVICES)
+    if (MAX_DEVICES_NEEDED>=MAX_OPENNI2_DEVICES)
       {
-          fprintf(stderr,"Please note that the current version of OpenNI2Aquisition  has a static limit of %u devices\n",MAX_OPENNI2_DEVICES);
+          fprintf(stderr,"\n\n\n\nPlease note that the current version of OpenNI2Aquisition  has a static limit of %u devices\n\n\n",MAX_OPENNI2_DEVICES);
       }
   return 1;
 }
@@ -149,8 +149,6 @@ int initializeOpenNIDevice(int deviceID , Device &device , VideoStream &color , 
 
   device.setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
 
-  device.setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
-
 if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
     {
         Status rc = depth.create(device, SENSOR_DEPTH);
@@ -198,10 +196,7 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
     color.setMirroringEnabled (false);
 
     fprintf(stdout,"Device Initialized.\n");
-    fprintf(stdout,"Depth ZPD: %u ",zpd);
-    fprintf(stdout,"Depth ZPPS: %0.2f\n",zpps);
-
-  return 1;
+   return 1;
 }
 
 
@@ -267,8 +262,6 @@ int readOpenNiColorAndDepth(VideoStream &color , VideoStream &depth,VideoFrameRe
 
    EXTERNAL EXPOSED FUNCTIONS
 
-
-
 */
 int mapOpenNI2DepthToRGB(int devID)
 {
@@ -305,7 +298,20 @@ int snapOpenNI2Frames(int devID)
 
 int createOpenNI2Device(int devID,unsigned int width,unsigned int height,unsigned int framerate)
   {
-      return initializeOpenNIDevice(devID,device[devID],color[devID],depth[devID]);
+    if (! initializeOpenNIDevice(devID,device[devID],color[devID],depth[devID]) )
+     {
+         fprintf(stderr,"Could not initialize device with ID %u \n",devID);
+         return 0;
+     }
+
+    fprintf(stdout,"Color Frames : %u x %u , channels %u , bitsperpixel %u \n",getOpenNI2ColorWidth(devID), getOpenNI2ColorHeight(devID) , getOpenNI2ColorChannels(devID) , getOpenNI2ColorBitsPerPixel(devID));
+    fprintf(stdout,"Color Focal Length : %0.2f\n",getOpenNI2ColorFocalLength(devID));
+    fprintf(stdout,"Color Pixel Size : %0.2f\n",getOpenNI2ColorPixelSize(devID));
+
+    fprintf(stdout,"Depth Frames : %u x %u , channels %u , bitsperpixel %u \n",getOpenNI2DepthWidth(devID), getOpenNI2DepthHeight(devID), getOpenNI2DepthChannels(devID) , getOpenNI2DepthBitsPerPixel(devID));
+    fprintf(stdout,"Depth Focal Length : %0.2f\n",getOpenNI2DepthFocalLength(devID));
+    fprintf(stdout,"Depth Pixel Size : %0.2f\n",getOpenNI2DepthPixelSize(devID));
+    return 1;
   }
 
 

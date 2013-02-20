@@ -36,10 +36,10 @@
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
-		<Unit filename="AcquisitionMux.h" />
-		<Unit filename="main.c">
+		<Unit filename="AcquisitionMux.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="AcquisitionMux.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

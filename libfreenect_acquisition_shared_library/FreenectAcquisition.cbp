@@ -42,10 +42,10 @@
 			<Add library="../3dparty/libfreenect/build/lib/libfreenect.so" />
 			<Add library="../3dparty/libfreenect/build/lib/libfreenect_sync.so" />
 		</Linker>
-		<Unit filename="FreenectAcquisition.h" />
-		<Unit filename="main.c">
+		<Unit filename="FreenectAcquisition.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="FreenectAcquisition.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

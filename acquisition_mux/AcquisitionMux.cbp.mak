@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = libAcquisitionMux.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/AcquisitionMux.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/AcquisitionMux.o
 
 all: debug release
 
@@ -58,8 +58,8 @@ debug: before_debug out_debug after_debug
 out_debug: $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) -shared $(LDFLAGS_DEBUG) $(LIBDIR_DEBUG) $(OBJ_DEBUG) $(LIB_DEBUG) -o $(OUT_DEBUG)
 
-$(OBJDIR_DEBUG)/main.o: main.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.c -o $(OBJDIR_DEBUG)/main.o
+$(OBJDIR_DEBUG)/AcquisitionMux.o: AcquisitionMux.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c AcquisitionMux.c -o $(OBJDIR_DEBUG)/AcquisitionMux.o
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
@@ -75,8 +75,8 @@ release: before_release out_release after_release
 out_release: $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) -shared $(LDFLAGS_RELEASE) $(LIBDIR_RELEASE) $(OBJ_RELEASE) $(LIB_RELEASE) -o $(OUT_RELEASE)
 
-$(OBJDIR_RELEASE)/main.o: main.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.c -o $(OBJDIR_RELEASE)/main.o
+$(OBJDIR_RELEASE)/AcquisitionMux.o: AcquisitionMux.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c AcquisitionMux.c -o $(OBJDIR_RELEASE)/AcquisitionMux.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
