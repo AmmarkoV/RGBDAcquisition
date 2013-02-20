@@ -381,9 +381,9 @@ int getOpenNI2DepthBitsPerPixel(int devID)
 {
     return 16;
 }
-char * getOpenNI2DepthPixels(int devID)
+short * getOpenNI2DepthPixels(int devID)
 {
-   return (char *) depthFrame[devID].getData();
+   return (short *) depthFrame[devID].getData();
 }
 
 

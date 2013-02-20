@@ -2,9 +2,9 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="OpenNI2Acquisition.h" open="1" top="0" tabpos="2">
-		<Cursor position="688" topLine="0" />
+		<Cursor position="337" topLine="0" />
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="6038" topLine="166" />
+		<Cursor position="8060" topLine="261" />
 	</File>
 </CodeBlocks_layout_file>

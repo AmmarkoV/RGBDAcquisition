@@ -36,7 +36,7 @@ extern "C"
    int getOpenNI1DepthDataSize(int devID);
    int getOpenNI1DepthChannels(int devID);
    int getOpenNI1DepthBitsPerPixel(int devID);
-   char * getOpenNI1DepthPixels(int devID);
+   short * getOpenNI1DepthPixels(int devID);
 
    double getOpenNI1DepthFocalLength(int devID);
    double getOpenNI1DepthPixelSize(int devID);

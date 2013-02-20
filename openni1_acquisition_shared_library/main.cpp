@@ -155,7 +155,7 @@ int getOpenNI1DepthHeight(int devID) { return depthGeneratorsMetaData[devID].Ful
 int getOpenNI1DepthDataSize(int devID) { return getOpenNI1DepthWidth(devID)*getOpenNI1DepthHeight(devID); }
 int getOpenNI1DepthChannels(int devID) { return 1; }
 int getOpenNI1DepthBitsPerPixel(int devID) { return 16; }
-char * getOpenNI1DepthPixels(int devID) { return (char*) depthGeneratorsMetaData[devID].Data(); }
+short * getOpenNI1DepthPixels(int devID) { return (short*) depthGeneratorsMetaData[devID].Data(); }
 
 double getOpenNI1DepthFocalLength(int devID)
 {
