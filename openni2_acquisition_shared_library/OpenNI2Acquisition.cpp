@@ -138,7 +138,7 @@ const char * getURIForDeviceNumber(int deviceNumber)
    return openni::ANY_DEVICE;
 }
 
-int initializeOpenNIDevice(int deviceID , Device &device , VideoStream &color , VideoStream &depth)
+int initializeOpenNIDevice(int deviceID , Device &device , VideoStream &color , VideoStream &depth ,unsigned int width ,unsigned int height , unsigned int fps)
 {
 
     if (device.open(getURIForDeviceNumber(deviceID)) != STATUS_OK)
@@ -154,6 +154,13 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
         Status rc = depth.create(device, SENSOR_DEPTH);
         if (rc == STATUS_OK)
         {
+
+            VideoMode depthMode = depth.getVideoMode();
+            depthMode.setResolution(width,height);
+            depthMode.setFps(fps);
+            depth.setVideoMode(depthMode);
+
+
             if(depth.start()!= STATUS_OK)
             {
                 fprintf(stderr,"Couldn't start the color stream: %s \n",OpenNI::getExtendedError());
@@ -172,6 +179,11 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
         Status rc = color.create(device, SENSOR_COLOR);
         if (rc == STATUS_OK)
         {
+            VideoMode colorMode = color.getVideoMode();
+            colorMode.setResolution(width,height);
+            colorMode.setFps(fps);
+            color.setVideoMode(colorMode);
+
             if(color.start() != STATUS_OK)
             {
                 fprintf(stderr,"Couldn't start the color stream: %s \n",OpenNI::getExtendedError());
@@ -186,14 +198,9 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
         }
     }
 
-    int zpd;
-    double zpps;
-    depth.getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,&zpd);
-    depth.getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
-
-
     depth.setMirroringEnabled (false);
     color.setMirroringEnabled (false);
+
 
     fprintf(stdout,"Device Initialized.\n");
    return 1;
@@ -298,11 +305,12 @@ int snapOpenNI2Frames(int devID)
 
 int createOpenNI2Device(int devID,unsigned int width,unsigned int height,unsigned int framerate)
   {
-    if (! initializeOpenNIDevice(devID,device[devID],color[devID],depth[devID]) )
+    if (! initializeOpenNIDevice(devID,device[devID],color[devID],depth[devID],width,height,framerate) )
      {
          fprintf(stderr,"Could not initialize device with ID %u \n",devID);
          return 0;
      }
+
 
      //Snapping an initial frame to populate Image Sizes , etc..
     if ( ! snapOpenNI2Frames(devID) )
@@ -313,6 +321,7 @@ int createOpenNI2Device(int devID,unsigned int width,unsigned int height,unsigne
       //we will return 1!
     } else
     {
+
      //Frame Width/Height /Focal length , etc should be ok..
      fprintf(stdout,"Color Frames : %u x %u , channels %u , bitsperpixel %u \n",getOpenNI2ColorWidth(devID), getOpenNI2ColorHeight(devID) , getOpenNI2ColorChannels(devID) , getOpenNI2ColorBitsPerPixel(devID));
      fprintf(stdout,"Color Focal Length : %0.2f\n",getOpenNI2ColorFocalLength(devID));
@@ -362,14 +371,14 @@ char * getOpenNI2ColorPixels(int devID)
 
 double getOpenNI2ColorFocalLength(int devID)
 {
-    int zpd;
+    int zpd=0;
     color[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,&zpd);
     return (double) zpd;
 }
 
 double getOpenNI2ColorPixelSize(int devID)
 {
-    double zpps;
+    double zpps=0.0;
     color[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
     return (double) zpps;
 }
@@ -406,14 +415,14 @@ short * getOpenNI2DepthPixels(int devID)
 
 double getOpenNI2DepthFocalLength(int devID)
 {
-    int zpd;
+    int zpd=0;
     depth[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,&zpd);
     return (double) zpd;
 }
 
 double getOpenNI2DepthPixelSize(int devID)
 {
-    double zpps;
+    double zpps=0.0;
     depth[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
     return (double) zpps;
 }
