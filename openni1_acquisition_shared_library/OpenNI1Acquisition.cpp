@@ -28,7 +28,7 @@ Context ctx;
 int mapOpenNI1DepthToRGB(int devID)
 {
   if (!depthGenerators[devID]) { return 0; }
-  depthGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(imageGenerators[devID]);
+  depthGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(depthGenerators[devID]);
   return 1;
 }
 
@@ -36,7 +36,7 @@ int mapOpenNI1DepthToRGB(int devID)
 int mapOpenNI1RGBToDepth(int devID)
 {
   if (!imageGenerators[devID]) { return 0; }
-  imageGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(depthGenerators[devID]);
+  imageGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(imageGenerators[devID]);
   return 1;
 }
 
@@ -61,28 +61,6 @@ if (rc != XN_STATUS_OK)
    return 0;
   }
 
-
-/*
-    xn::HandsGenerator handsGen;
-    unsigned int nRetVal = ctx.CreateAnyProductionTree(XN_NODE_TYPE_HANDS, NULL, handsGen, &errors);
-    if (nRetVal == XN_STATUS_NO_NODE_PRESENT)
-        {
-           // Iterate over enumeration errors, and print each one
-           for (xn::EnumerationErrors::Iterator it = errors.Begin(); it != errors.End(); ++it)
-             {
-                XnChar strDesc[512];
-                xnProductionNodeDescriptionToString(&it.Description(), strDesc,512);
-                printf("%s failed to enumerate: %s\n",xnGetStatusString(it.Error()));
-             }
-           return (nRetVal);
-        } else
-    if (nRetVal != XN_STATUS_OK)
-        {
-           printf("Create failed: %s\n", xnGetStatusString(nRetVal));
-           return (nRetVal);
-        }
-*/
-
  return 1;
 }
 
@@ -98,26 +76,51 @@ int stopOpenNI1()
   return 1;
 }
 
+
+int SignalOpenNIError(char * description , XnStatus rc)
+{
+  if (rc != XN_STATUS_OK) { printf("Error : %s ( %s )\n",description,xnGetStatusString(rc)); return 1; }
+  return 0;
+}
+
+
    //Basic Per Device Operations
 int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigned int framerate)
 {
     XnStatus rc;
-    depthGenerators[devID].Create(ctx);
+    rc = depthGenerators[devID].Create(ctx);
+    if ( SignalOpenNIError("Could not create a new depth generator",rc) ) { return 0; }
     rc = ctx.FindExistingNode(XN_NODE_TYPE_DEPTH, depthGenerators[devID]);
-    if (rc != XN_STATUS_OK) { printf("No depth node exists! Check your XML.\n"); return 0; }
+    if ( SignalOpenNIError("No depth node exists! Check your XML.",rc) ) { return 0; }
 
-    imageGenerators[devID].Create(ctx);
+    rc = imageGenerators[devID].Create(ctx);
+    if ( SignalOpenNIError("Could not create a new image generator",rc) ) { return 0; }
     rc = ctx.FindExistingNode(XN_NODE_TYPE_IMAGE, imageGenerators[devID]);
-    if (rc != XN_STATUS_OK) { printf("No image node exists! Check your XML.\n"); return 0; }
+    if ( SignalOpenNIError("No image node exists! Check your XML.",rc) ) { return 0; }
 
     XnMapOutputMode mapMode;
-    mapMode.nXRes = XN_VGA_X_RES;//width;
-    mapMode.nYRes = XN_VGA_Y_RES;//height;
+    mapMode.nXRes = width;//XN_VGA_X_RES;
+    mapMode.nYRes = height;//XN_VGA_Y_RES;
     mapMode.nFPS = framerate;
-    if (imageGenerators[devID]) { imageGenerators[devID].SetMapOutputMode(mapMode); }
-    if (depthGenerators[devID]) { depthGenerators[devID].SetMapOutputMode(mapMode); }
+    if (imageGenerators[devID])
+         { rc = imageGenerators[devID].SetMapOutputMode(mapMode);
+           SignalOpenNIError("Could not set output mode for image ",rc);
+         }
 
-    ctx.StartGeneratingAll();
+
+    mapMode.nXRes = width;
+    mapMode.nYRes = height;
+    mapMode.nFPS = framerate;
+    if (depthGenerators[devID])
+        {  rc = depthGenerators[devID].SetMapOutputMode(mapMode);
+           SignalOpenNIError("Could not set output mode for depth ",rc);
+        }
+
+    rc = depthGenerators[devID].StartGenerating();
+    if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not start generating depth output",rc);  }
+
+    rc = imageGenerators[devID].StartGenerating();
+    if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not start generating image output",rc);  }
 
 
     depthGenerators[devID].GetMetaData(depthGeneratorsMetaData[devID]);
@@ -155,11 +158,16 @@ int snapOpenNI1Frames(int devID)
 {
   XnStatus rc = XN_STATUS_OK;
  // Read a new frame
- rc = ctx.WaitAnyUpdateAll();
- if (rc != XN_STATUS_OK) { printf("Read failed: %s\n", xnGetStatusString(rc)); return 0; }
+ //rc = ctx.WaitAnyUpdateAll();
+ //if (rc != XN_STATUS_OK) { printf("Read failed: %s\n", xnGetStatusString(rc)); return 0; }
 
-  depthGenerators[devID].GetMetaData(depthGeneratorsMetaData[devID]);
-  imageGenerators[devID].GetMetaData(imageGeneratorsMetaData[devID]);
+    rc = imageGenerators[devID].WaitAndUpdateData();
+    if (rc != XN_STATUS_OK) { printf("Image Generator could not wait for new data ( %s )\n",xnGetStatusString(rc)); return 0; }
+    imageGenerators[devID].GetMetaData(imageGeneratorsMetaData[devID]);
+
+    rc = depthGenerators[devID].WaitAndUpdateData();
+    if (rc != XN_STATUS_OK) { printf("Depth Generator could not wait for new data ( %s )\n",xnGetStatusString(rc)); return 0; }
+    depthGenerators[devID].GetMetaData(depthGeneratorsMetaData[devID]);
 
  return 1;
 }
