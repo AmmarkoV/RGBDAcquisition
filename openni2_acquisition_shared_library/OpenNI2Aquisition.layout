@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
+	<File name="OpenNI2Acquisition.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="4951" topLine="131" />
+	</File>
 	<File name="OpenNI2Acquisition.h" open="1" top="0" tabpos="1">
 		<Cursor position="1219" topLine="8" />
 	</File>

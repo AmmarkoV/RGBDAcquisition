@@ -84,17 +84,19 @@ int main(int argc, char *argv[])
       return 1;
   }
 
+
     //Initialize Every OpenNI Device
     for (devID=0; devID<maxDevID; devID++)
      {
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
-        acquisitionOpenDevice(moduleID,devID,640,480,25);
+        acquisitionOpenDevice(moduleID,devID,640,480,30);
         acquisitionMapDepthToRGB(moduleID,devID);
         //acquisitionMapRGBToDepth(moduleID,devID);
      }
     usleep(1000); // Waiting a while for the glitch frames to pass
     char outfilename[512]={0};
 
+   if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
 
@@ -108,8 +110,8 @@ int main(int argc, char *argv[])
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         acquisitionSaveDepthFrame(moduleID,devID,outfilename);
 
-        sprintf(outfilename,"%s/depthFrame1C_%u_%05u.pnm",outputfoldername,devID,frameNum);
-        acquisitionSaveDepthFrame1C(moduleID,devID,outfilename);
+        //sprintf(outfilename,"%s/depthFrame1C_%u_%05u.pnm",outputfoldername,devID,frameNum);
+        //acquisitionSaveDepthFrame1C(moduleID,devID,outfilename);
 
         //sprintf(outfilename,"%s/coloreddepthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         //acquisitionSaveColoredDepthFrame(moduleID,devID,outfilename);
