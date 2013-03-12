@@ -35,6 +35,7 @@ int mapOpenNI1DepthToRGB(int devID)
 
 int mapOpenNI1RGBToDepth(int devID)
 {
+  if (!imageGenerators[devID]) { return 0; }
   imageGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(depthGenerators[devID]);
   return 1;
 }
@@ -87,7 +88,7 @@ if (rc != XN_STATUS_OK)
 
 
 
-int getOpenNI1NumberOfDevices()  {  fprintf(stderr,"getOpenNI1NumberOfDevices is a stub it always returns 1");  return 1; }
+int getOpenNI1NumberOfDevices()  {  fprintf(stderr,"getOpenNI1NumberOfDevices is a stub it always returns 1\n");  return 1; }
 
 
 int stopOpenNI1()
@@ -103,18 +104,18 @@ int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigne
     XnStatus rc;
     depthGenerators[devID].Create(ctx);
     rc = ctx.FindExistingNode(XN_NODE_TYPE_DEPTH, depthGenerators[devID]);
-    if (rc != XN_STATUS_OK) { printf("No depth node exists! Check your XML."); return 0; }
+    if (rc != XN_STATUS_OK) { printf("No depth node exists! Check your XML.\n"); return 0; }
 
     imageGenerators[devID].Create(ctx);
     rc = ctx.FindExistingNode(XN_NODE_TYPE_IMAGE, imageGenerators[devID]);
-    if (rc != XN_STATUS_OK) { printf("No image node exists! Check your XML."); return 0; }
+    if (rc != XN_STATUS_OK) { printf("No image node exists! Check your XML.\n"); return 0; }
 
     XnMapOutputMode mapMode;
     mapMode.nXRes = XN_VGA_X_RES;//width;
     mapMode.nYRes = XN_VGA_Y_RES;//height;
     mapMode.nFPS = framerate;
-    if (depthGenerators[devID]) { depthGenerators[devID].SetMapOutputMode(mapMode); }
     if (imageGenerators[devID]) { imageGenerators[devID].SetMapOutputMode(mapMode); }
+    if (depthGenerators[devID]) { depthGenerators[devID].SetMapOutputMode(mapMode); }
 
     ctx.StartGeneratingAll();
 
@@ -122,9 +123,13 @@ int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigne
     depthGenerators[devID].GetMetaData(depthGeneratorsMetaData[devID]);
     imageGenerators[devID].GetMetaData(imageGeneratorsMetaData[devID]);
 
+
+    fprintf(stderr,"Depth grabber @ %ux%u\n",depthGeneratorsMetaData[devID].FullXRes(),depthGeneratorsMetaData[devID].FullYRes());
+    fprintf(stderr,"Image grabber @ %ux%u\n",imageGeneratorsMetaData[devID].FullXRes(),imageGeneratorsMetaData[devID].FullYRes());
+
     // Hybrid mode isn't supported in this sample
 if ( ( imageGeneratorsMetaData[devID].FullXRes() != depthGeneratorsMetaData[devID].FullXRes()) ||
-     (imageGeneratorsMetaData[devID].FullYRes() != depthGeneratorsMetaData[devID].FullYRes())  )
+      (imageGeneratorsMetaData[devID].FullYRes() != depthGeneratorsMetaData[devID].FullYRes())  )
    {
       printf ("The device depth and image resolution must be equal!\n");
       return 0;
