@@ -76,8 +76,6 @@ int main(int argc, char *argv[])
 
   //We want to initialize all possible devices in this example..
   unsigned int devID=0,maxDevID=acquisitionGetModuleDevices(moduleID);
-
-
   if (maxDevID==0)
   {
       fprintf(stderr,"No devices found for Module used \n");
@@ -89,7 +87,7 @@ int main(int argc, char *argv[])
     for (devID=0; devID<maxDevID; devID++)
      {
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
-        acquisitionOpenDevice(moduleID,devID,640,480,30);
+        acquisitionOpenDevice(moduleID,devID,640,480,25);
         acquisitionMapDepthToRGB(moduleID,devID);
         //acquisitionMapRGBToDepth(moduleID,devID);
      }

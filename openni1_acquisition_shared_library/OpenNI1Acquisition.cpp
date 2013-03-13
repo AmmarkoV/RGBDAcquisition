@@ -28,7 +28,17 @@ Context ctx;
 int mapOpenNI1DepthToRGB(int devID)
 {
   if (!depthGenerators[devID]) { return 0; }
-  depthGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(depthGenerators[devID]);
+
+  XnBool isSupported = depthGenerators[devID].IsCapabilitySupported("AlternativeViewPoint");
+  if(isSupported)
+   {
+      XnStatus res = depthGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(imageGenerators[devID]);
+      if(XN_STATUS_OK != res)
+      {
+         printf("Getting and setting AlternativeViewPoint failed: %s\n", xnGetStatusString(res));
+      }
+   }
+
   return 1;
 }
 
@@ -36,7 +46,17 @@ int mapOpenNI1DepthToRGB(int devID)
 int mapOpenNI1RGBToDepth(int devID)
 {
   if (!imageGenerators[devID]) { return 0; }
-  imageGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(imageGenerators[devID]);
+
+  XnBool isSupported = imageGenerators[devID].IsCapabilitySupported("AlternativeViewPoint");
+  if(isSupported)
+   {
+      XnStatus res = imageGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(depthGenerators[devID]);
+      if(XN_STATUS_OK != res)
+      {
+         printf("Getting and setting AlternativeViewPoint failed: %s\n", xnGetStatusString(res));
+      }
+   }
+
   return 1;
 }
 
@@ -60,6 +80,8 @@ int startOpenNI1(unsigned int max_devs)
    printf("Open failed: %s\n", xnGetStatusString(rc));
    return 0;
   }
+
+
 
  return 1;
 }
@@ -95,12 +117,11 @@ int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigne
   ------------------------------------------------------------------------------------------------------ */
     rc = depthGenerators[devID].Create(ctx);
     if ( SignalOpenNIError("Could not create a new depth generator",rc) ) { return 0; }
-    rc = ctx.FindExistingNode(XN_NODE_TYPE_DEPTH, depthGenerators[devID]);
-    if ( SignalOpenNIError("No depth node exists!",rc) ) { return 0; }
+   // rc = ctx.FindExistingNode(XN_NODE_TYPE_DEPTH, depthGenerators[devID]);
+   // if ( SignalOpenNIError("No depth node exists!",rc) ) { return 0; }
 
 
     mapMode.nXRes = width; mapMode.nYRes = height; mapMode.nFPS = framerate;
-    //if (depthGenerators[devID]) {
     rc = depthGenerators[devID].SetMapOutputMode(mapMode);
     SignalOpenNIError("Could not set output mode for depth ",rc);
 
@@ -118,28 +139,19 @@ int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigne
   ------------------------------------------------------------------------------------------------------ */
     rc = imageGenerators[devID].Create(ctx);
     if ( SignalOpenNIError("Could not create a new image generator",rc) ) { return 0; }
-    rc = ctx.FindExistingNode(XN_NODE_TYPE_IMAGE, imageGenerators[devID]);
-    if ( SignalOpenNIError("No image node exists!",rc) ) { return 0; }
+  //  rc = ctx.FindExistingNode(XN_NODE_TYPE_IMAGE, imageGenerators[devID]);
+  //  if ( SignalOpenNIError("No image node exists!",rc) ) { return 0; }
 
     mapMode.nXRes = width; mapMode.nYRes = height; mapMode.nFPS = framerate;
-    //if (imageGenerators[devID]) {
     rc = imageGenerators[devID].SetMapOutputMode(mapMode);
     SignalOpenNIError("Could not set output mode for image ",rc);
-
-    XnPixelFormat pixelFormat = imageGenerators[devID].GetPixelFormat();
-
-    if (pixelFormat == XN_PIXEL_FORMAT_RGB24 ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_RGB24\n"); }
-    if (pixelFormat == XN_PIXEL_FORMAT_YUV422 ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_YUV422\n"); }
-    if (pixelFormat == XN_PIXEL_FORMAT_GRAYSCALE_8_BIT ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_GRAYSCALE_8_BIT\n"); }
-    if (pixelFormat == XN_PIXEL_FORMAT_GRAYSCALE_16_BIT ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_GRAYSCALE_16_BIT\n"); }
-    if (pixelFormat == XN_PIXEL_FORMAT_MJPEG ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_MJPEG\n"); }
 
     if ( imageGenerators[devID].IsPixelFormatSupported(XN_PIXEL_FORMAT_RGB24) )
     {
       rc = imageGenerators[devID].SetPixelFormat(XN_PIXEL_FORMAT_RGB24);
       if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not set format to RGB24 ",rc);  }
     } else
-    { fprintf(stderr,"Device does not Supprot RGB24 output \n"); }
+    { fprintf(stderr,"Device does not Support RGB24 output \n"); }
 
     rc = imageGenerators[devID].StartGenerating();
     if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not start generating image output",rc);  }
@@ -150,6 +162,11 @@ int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigne
 
 
     fprintf(stderr,"Image grabber @ %ux%u\n",imageGeneratorsMetaData[devID].FullXRes(),imageGeneratorsMetaData[devID].FullYRes());
+
+
+    //rc = ctx.StartGeneratingAll();
+    //if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not start generating everything",rc);  }
+
 
     // Hybrid mode isn't supported in this sample
 if ( ( imageGeneratorsMetaData[devID].FullXRes() != depthGeneratorsMetaData[devID].FullXRes()) ||
@@ -196,7 +213,9 @@ int getOpenNI1ColorChannels(int devID) { return 3; }
 int getOpenNI1ColorBitsPerPixel(int devID) { return 8; }
 char * getOpenNI1ColorPixels(int devID)
 {
-    return (char*) imageGenerators[devID].GetRGB24ImageMap();
+    return (char*) imageGenerators[devID].GetImageMap();
+    //return (char*) imageGeneratorsMetaData[devID].Data();
+    //return (char*) imageGenerators[devID].GetRGB24ImageMap();
     //return (char*) imageGeneratorsMetaData[devID].RGB24Data();
 }
 
@@ -228,6 +247,8 @@ int getOpenNI1DepthBitsPerPixel(int devID) { return 16; }
 short * getOpenNI1DepthPixels(int devID)
 {
   return (short*) depthGenerators[devID].GetDepthMap();
+  //return (short*) depthGeneratorsMetaData[devID].Data();
+  //return (short*) depthGenerators[devID].GetDepthMap();
   //return (short*) depthGeneratorsMetaData[devID].Data();
 }
 
