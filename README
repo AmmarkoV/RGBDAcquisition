@@ -28,3 +28,12 @@ For example
 outdir is converted to grabber/frames/outdir
 
 
+Without beeing 100% certain OpenNI installed via ROS may conflict with it being downloaded as a standalone package
+If you install sudo apt-get install ros-groovy-openni-camera ros-groovy-openni-launch  
+If you want to use it you should initiate :
+
+roscore 
+roslaunch openni_launch openni.launch &
+rosrun rqt_reconfigure rqt_reconfigure 
+
+After this OpenNI should be operational
