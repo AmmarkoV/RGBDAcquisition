@@ -11,13 +11,13 @@ using namespace std;
 using namespace xn;
 
 
-#define SAMPLE_XML_PATH "OpenNIConfig.xml"
+//#define SAMPLE_XML_PATH "OpenNIConfig.xml"
 #define MAX_OPENNI_DEVICES 16
 #define ANY_OPENNI_DEVICE MAX_OPENNI_DEVICES*2
 
 Device devices[MAX_OPENNI_DEVICES];
-DepthGenerator depthGenerators[MAX_OPENNI_DEVICES];
-ImageGenerator imageGenerators[MAX_OPENNI_DEVICES];
+DepthGenerator depthGenerators[MAX_OPENNI_DEVICES]={0};
+ImageGenerator imageGenerators[MAX_OPENNI_DEVICES]={0};
 
 DepthMetaData depthGeneratorsMetaData[MAX_OPENNI_DEVICES];
 ImageMetaData imageGeneratorsMetaData[MAX_OPENNI_DEVICES];
@@ -42,21 +42,21 @@ int mapOpenNI1RGBToDepth(int devID)
 
 int startOpenNI1(unsigned int max_devs)
 {
-EnumerationErrors errors;
-XnStatus rc;
-//rc = ctx.InitFromXmlFile("SamplesConfig.xml");
-rc = ctx.Init();
+ EnumerationErrors errors;
+ XnStatus rc;
+ //rc = ctx.InitFromXmlFile("SamplesConfig.xml");
+ rc = ctx.Init();
 
-if (rc == XN_STATUS_NO_NODE_PRESENT)
-{
-   XnChar strError[1024];
-   errors.ToString(strError, 1024);
-   printf("%s\n", strError);
-   return 0;
-  }
-else
-if (rc != XN_STATUS_OK)
- {
+ if (rc == XN_STATUS_NO_NODE_PRESENT)
+  {
+    XnChar strError[1024];
+    errors.ToString(strError, 1024);
+    printf("No devices present : %s\n", strError);
+    return 0;
+   }
+    else
+ if (rc != XN_STATUS_OK)
+  {
    printf("Open failed: %s\n", xnGetStatusString(rc));
    return 0;
   }
@@ -88,66 +88,82 @@ int SignalOpenNIError(char * description , XnStatus rc)
 int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigned int framerate)
 {
     XnStatus rc;
+    XnMapOutputMode mapMode;
+
+/*------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------ */
     rc = depthGenerators[devID].Create(ctx);
     if ( SignalOpenNIError("Could not create a new depth generator",rc) ) { return 0; }
     rc = ctx.FindExistingNode(XN_NODE_TYPE_DEPTH, depthGenerators[devID]);
-    if ( SignalOpenNIError("No depth node exists! Check your XML.",rc) ) { return 0; }
-
-    rc = imageGenerators[devID].Create(ctx);
-    if ( SignalOpenNIError("Could not create a new image generator",rc) ) { return 0; }
-    rc = ctx.FindExistingNode(XN_NODE_TYPE_IMAGE, imageGenerators[devID]);
-    if ( SignalOpenNIError("No image node exists! Check your XML.",rc) ) { return 0; }
-
-    XnMapOutputMode mapMode;
-    mapMode.nXRes = width;//XN_VGA_X_RES;
-    mapMode.nYRes = height;//XN_VGA_Y_RES;
-    mapMode.nFPS = framerate;
-    if (imageGenerators[devID])
-         { rc = imageGenerators[devID].SetMapOutputMode(mapMode);
-           SignalOpenNIError("Could not set output mode for image ",rc);
-         }
+    if ( SignalOpenNIError("No depth node exists!",rc) ) { return 0; }
 
 
-    mapMode.nXRes = width;
-    mapMode.nYRes = height;
-    mapMode.nFPS = framerate;
-    if (depthGenerators[devID])
-        {  rc = depthGenerators[devID].SetMapOutputMode(mapMode);
-           SignalOpenNIError("Could not set output mode for depth ",rc);
-        }
+    mapMode.nXRes = width; mapMode.nYRes = height; mapMode.nFPS = framerate;
+    //if (depthGenerators[devID]) {
+    rc = depthGenerators[devID].SetMapOutputMode(mapMode);
+    SignalOpenNIError("Could not set output mode for depth ",rc);
 
     rc = depthGenerators[devID].StartGenerating();
     if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not start generating depth output",rc);  }
+
+    depthGenerators[devID].GetMirrorCap().SetMirror(false);
+    depthGenerators[devID].GetMetaData(depthGeneratorsMetaData[devID]);
+
+    fprintf(stderr,"Depth grabber @ %ux%u\n",depthGeneratorsMetaData[devID].FullXRes(),depthGeneratorsMetaData[devID].FullYRes());
+
+
+/*------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------ */
+    rc = imageGenerators[devID].Create(ctx);
+    if ( SignalOpenNIError("Could not create a new image generator",rc) ) { return 0; }
+    rc = ctx.FindExistingNode(XN_NODE_TYPE_IMAGE, imageGenerators[devID]);
+    if ( SignalOpenNIError("No image node exists!",rc) ) { return 0; }
+
+    mapMode.nXRes = width; mapMode.nYRes = height; mapMode.nFPS = framerate;
+    //if (imageGenerators[devID]) {
+    rc = imageGenerators[devID].SetMapOutputMode(mapMode);
+    SignalOpenNIError("Could not set output mode for image ",rc);
+
+    XnPixelFormat pixelFormat = imageGenerators[devID].GetPixelFormat();
+
+    if (pixelFormat == XN_PIXEL_FORMAT_RGB24 ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_RGB24\n"); }
+    if (pixelFormat == XN_PIXEL_FORMAT_YUV422 ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_YUV422\n"); }
+    if (pixelFormat == XN_PIXEL_FORMAT_GRAYSCALE_8_BIT ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_GRAYSCALE_8_BIT\n"); }
+    if (pixelFormat == XN_PIXEL_FORMAT_GRAYSCALE_16_BIT ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_GRAYSCALE_16_BIT\n"); }
+    if (pixelFormat == XN_PIXEL_FORMAT_MJPEG ) { fprintf(stderr,"Pixel Format was XN_PIXEL_FORMAT_MJPEG\n"); }
+
+    if ( imageGenerators[devID].IsPixelFormatSupported(XN_PIXEL_FORMAT_RGB24) )
+    {
+      rc = imageGenerators[devID].SetPixelFormat(XN_PIXEL_FORMAT_RGB24);
+      if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not set format to RGB24 ",rc);  }
+    } else
+    { fprintf(stderr,"Device does not Supprot RGB24 output \n"); }
 
     rc = imageGenerators[devID].StartGenerating();
     if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not start generating image output",rc);  }
 
 
-    depthGenerators[devID].GetMetaData(depthGeneratorsMetaData[devID]);
+    imageGenerators[devID].GetMirrorCap().SetMirror(false);
     imageGenerators[devID].GetMetaData(imageGeneratorsMetaData[devID]);
 
 
-    fprintf(stderr,"Depth grabber @ %ux%u\n",depthGeneratorsMetaData[devID].FullXRes(),depthGeneratorsMetaData[devID].FullYRes());
     fprintf(stderr,"Image grabber @ %ux%u\n",imageGeneratorsMetaData[devID].FullXRes(),imageGeneratorsMetaData[devID].FullYRes());
 
     // Hybrid mode isn't supported in this sample
 if ( ( imageGeneratorsMetaData[devID].FullXRes() != depthGeneratorsMetaData[devID].FullXRes()) ||
       (imageGeneratorsMetaData[devID].FullYRes() != depthGeneratorsMetaData[devID].FullYRes())  )
-   {
-      printf ("The device depth and image resolution must be equal!\n");
-      return 0;
-   }
+   { printf ("The device depth and image resolution are not equal!\n"); }
 
 
 // RGB is the only image format supported.
 if (imageGeneratorsMetaData[devID].PixelFormat() != XN_PIXEL_FORMAT_RGB24)
   {
-    printf("The device image format must be RGB24\n");
+    printf("The device image format is not RGB24\n");
     return 0;
   }
 
-   imageGenerators[devID].GetMirrorCap().SetMirror(false);
-   depthGenerators[devID].GetMirrorCap().SetMirror(false);
 
  return 1;
 }
@@ -178,7 +194,11 @@ int getOpenNI1ColorHeight(int devID) { return imageGeneratorsMetaData[devID].Ful
 int getOpenNI1ColorDataSize(int devID) { return getOpenNI1ColorWidth(devID)*getOpenNI1ColorHeight(devID)*3; }
 int getOpenNI1ColorChannels(int devID) { return 3; }
 int getOpenNI1ColorBitsPerPixel(int devID) { return 8; }
-char * getOpenNI1ColorPixels(int devID) { return (char*) imageGeneratorsMetaData[devID].RGB24Data(); }
+char * getOpenNI1ColorPixels(int devID)
+{
+    return (char*) imageGenerators[devID].GetRGB24ImageMap();
+    //return (char*) imageGeneratorsMetaData[devID].RGB24Data();
+}
 
 
 double getOpenNI1ColorFocalLength(int devID)
@@ -205,7 +225,11 @@ int getOpenNI1DepthHeight(int devID) { return depthGeneratorsMetaData[devID].Ful
 int getOpenNI1DepthDataSize(int devID) { return getOpenNI1DepthWidth(devID)*getOpenNI1DepthHeight(devID); }
 int getOpenNI1DepthChannels(int devID) { return 1; }
 int getOpenNI1DepthBitsPerPixel(int devID) { return 16; }
-short * getOpenNI1DepthPixels(int devID) { return (short*) depthGeneratorsMetaData[devID].Data(); }
+short * getOpenNI1DepthPixels(int devID)
+{
+  return (short*) depthGenerators[devID].GetDepthMap();
+  //return (short*) depthGeneratorsMetaData[devID].Data();
+}
 
 double getOpenNI1DepthFocalLength(int devID)
 {
