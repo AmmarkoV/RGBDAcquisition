@@ -40,6 +40,78 @@ unsigned int simplePow(unsigned int base,unsigned int exp)
     return retres;
 }
 
+
+
+int acquisitionsavePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame , unsigned int width , unsigned int height ,
+                                  float cx , float cy , float fx , float fy )
+{
+    if(depthFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) depth frame , will not write any file output\n",filename); return 0; }
+    if(colorFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) color frame , will not write any file output\n",filename); return 0; }
+
+    FILE *fd=0;
+    fd = fopen(filename,"wb");
+    if (fd!=0)
+    {
+        fprintf(fd, "# .PCD v.5 - Point Cloud Data file format\n");
+        fprintf(fd, "FIELDS x y z rgb\n");
+        fprintf(fd, "SIZE 4 4 4 1 1 1\n");
+        fprintf(fd, "TYPE F F F U U U\n");
+        fprintf(fd, "WIDTH %u\n",width);
+        fprintf(fd, "HEIGHT %u\n",height);
+        fprintf(fd, "POINTS %u\n",height*width);
+        fprintf(fd, "DATA ascii\n");
+
+        short * depthPTR = depthFrame;
+        char  * colorPTR = colorFrame;
+
+        unsigned int px=0,py=0;
+        float x=0.0,y=0.0,z=0.0;
+        unsigned char * r , * b , * g;
+
+        float minDistance = -10;
+        float scaleFactor = 0.0021;
+
+        for (py=0; py<height; py++)
+        {
+         for (px=0; px<width; px++)
+         {
+
+           z = * depthPTR; ++depthPTR;
+           x = (px - cx) * (z + minDistance) * scaleFactor * (width/height) ;
+           y = (py - cy) * (z + minDistance) * scaleFactor;
+
+           r=colorPTR; ++colorPTR;
+           g=colorPTR; ++colorPTR;
+           b=colorPTR; ++colorPTR;
+
+           fprintf(fd, "%0.4f %0.4f %0.4f %u %u %u\n",x,y,z,*r,*g,*b);
+         }
+        }
+        fclose(fd);
+        return 1;
+    }
+    else
+    {
+        fprintf(stderr,"SaveRawImageToFile could not open output file %s\n",filename);
+        return 0;
+    }
+
+   return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
     //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);

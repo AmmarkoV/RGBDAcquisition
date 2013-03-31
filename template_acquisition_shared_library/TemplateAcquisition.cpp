@@ -65,10 +65,13 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
         if ( pixels != 0 )
         {
           size_t rd = fread(pixels,3, w*h, pf);
-          if (rd < w*h ) { fprintf(stderr,"Note : Incomplete read while reading file %s (%u instead of %u)\n",filename,(unsigned int) rd, w*h);  }
+          if (rd < w*h )
+             {
+               fprintf(stderr,"Note : Incomplete read while reading file %s (%u instead of %u)\n",filename,(unsigned int) rd, w*h);
+             }
 
           fclose(pf);
-          if ( rd < w*h ) { return 0; }
+          //if ( rd < w*h ) { return 0; }
           return pixels;
         } else
         {
