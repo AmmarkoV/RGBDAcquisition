@@ -42,8 +42,7 @@ unsigned int simplePow(unsigned int base,unsigned int exp)
 
 
 
-int acquisitionsavePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame , unsigned int width , unsigned int height ,
-                                  float cx , float cy , float fx , float fy )
+int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
 {
     if(depthFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) depth frame , will not write any file output\n",filename); return 0; }
     if(colorFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) color frame , will not write any file output\n",filename); return 0; }
@@ -54,8 +53,8 @@ int acquisitionsavePCD_PointCloud(char * filename , short * depthFrame , char * 
     {
         fprintf(fd, "# .PCD v.5 - Point Cloud Data file format\n");
         fprintf(fd, "FIELDS x y z rgb\n");
-        fprintf(fd, "SIZE 4 4 4 1 1 1\n");
-        fprintf(fd, "TYPE F F F U U U\n");
+        fprintf(fd, "SIZE 4 4 4 4\n");
+        fprintf(fd, "TYPE F F F U\n");
         fprintf(fd, "WIDTH %u\n",width);
         fprintf(fd, "HEIGHT %u\n",height);
         fprintf(fd, "POINTS %u\n",height*width);
@@ -67,6 +66,16 @@ int acquisitionsavePCD_PointCloud(char * filename , short * depthFrame , char * 
         unsigned int px=0,py=0;
         float x=0.0,y=0.0,z=0.0;
         unsigned char * r , * b , * g;
+        unsigned int rgb=0;
+
+        /* To pack it :
+            int rgb = ((int)r) << 16 | ((int)g) << 8 | ((int)b);
+
+           To unpack it :
+            int rgb = ...;
+            uint8_t r = (rgb >> 16) & 0x0000ff;
+            uint8_t g = (rgb >> 8) & 0x0000ff;
+            uint8_t b = (rgb) & 0x0000ff; */
 
         float minDistance = -10;
         float scaleFactor = 0.0021;
@@ -75,7 +84,6 @@ int acquisitionsavePCD_PointCloud(char * filename , short * depthFrame , char * 
         {
          for (px=0; px<width; px++)
          {
-
            z = * depthPTR; ++depthPTR;
            x = (px - cx) * (z + minDistance) * scaleFactor * (width/height) ;
            y = (py - cy) * (z + minDistance) * scaleFactor;
@@ -84,7 +92,9 @@ int acquisitionsavePCD_PointCloud(char * filename , short * depthFrame , char * 
            g=colorPTR; ++colorPTR;
            b=colorPTR; ++colorPTR;
 
-           fprintf(fd, "%0.4f %0.4f %0.4f %u %u %u\n",x,y,z,*r,*g,*b);
+           rgb = ((int)*r) << 16 | ((int)*g) << 8 | ((int)*b);
+
+           fprintf(fd, "%0.4f %0.4f %0.4f %u\n",x,y,z,rgb);
          }
         }
         fclose(fd);
@@ -98,11 +108,6 @@ int acquisitionsavePCD_PointCloud(char * filename , short * depthFrame , char * 
 
    return 0;
 }
-
-
-
-
-
 
 
 
@@ -558,6 +563,22 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColorFrame");
     return 0;
 }
+
+
+
+ int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+{
+  unsigned int width;
+  unsigned int height;
+  unsigned int channels;
+  unsigned int bitsperpixel;
+  acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+
+  return savePCD_PointCloud(filename,acquisitionGetDepthFrame(moduleID,devID),acquisitionGetColorFrame(moduleID,devID),
+                            width,height,width/2,height/2, 1.0 /*DUMMY fx*/, 1.0 /*DUMMY fy*/ );
+}
+
+
 
  int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {

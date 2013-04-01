@@ -108,6 +108,9 @@ int main(int argc, char *argv[])
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
         acquisitionSaveDepthFrame(moduleID,devID,outfilename);
 
+        sprintf(outfilename,"%s/pointCloud_%u_%05u.pcd",outputfoldername,devID,frameNum);
+        acquisitionSavePCDPointCoud(moduleID,devID,outfilename);
+
         //sprintf(outfilename,"%s/depthFrame1C_%u_%05u.pnm",outputfoldername,devID,frameNum);
         //acquisitionSaveDepthFrame1C(moduleID,devID,outfilename);
 
