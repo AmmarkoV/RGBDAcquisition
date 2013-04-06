@@ -42,8 +42,11 @@ int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID);
 int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID);
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
 short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
+int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  );
 int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel );
 int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel );
+
+
 
 int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
 int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);

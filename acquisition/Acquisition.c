@@ -28,6 +28,12 @@
 #include "../template_acquisition_shared_library/TemplateAcquisition.h"
 #endif
 
+
+//This should probably pass on to each of the sub modules
+float minDistance = -10;
+float scaleFactor = 0.0021;
+
+
 unsigned int simplePow(unsigned int base,unsigned int exp)
 {
     if (exp==0) return 1;
@@ -77,8 +83,6 @@ int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame 
             uint8_t g = (rgb >> 8) & 0x0000ff;
             uint8_t b = (rgb) & 0x0000ff; */
 
-        float minDistance = -10;
-        float scaleFactor = 0.0021;
 
         for (py=0; py<height; py++)
         {
@@ -108,11 +112,6 @@ int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame 
 
    return 0;
 }
-
-
-
-
-
 
 
 
@@ -739,6 +738,28 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrame");
     return 0;
+}
+
+
+
+int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  )
+{
+    short * depthFrame = acquisitionGetDepthFrame(moduleID,devID);
+    if (depthFrame == 0 ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXY , getting depth frame"); return 0; }
+
+    unsigned int width; unsigned int height; unsigned int channels; unsigned int bitsperpixel;
+    if (! acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) ) {  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXY getting depth frame dims"); return 0; }
+
+    if ( (x2d>=width) || (y2d>=height) ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXY incorrect 2d x,y coords"); return 0; }
+
+    float cx = width / 2;
+    float cy = height/ 2;
+    short * depthValue = depthFrame + (y2d * width + x2d );
+    *z = * depthValue;
+    *x = (x2d - cx) * (*z + minDistance) * scaleFactor * (width/height) ;
+    *y = (y2d - cy) * (*z + minDistance) * scaleFactor;
+
+    return 1;
 }
 
 
