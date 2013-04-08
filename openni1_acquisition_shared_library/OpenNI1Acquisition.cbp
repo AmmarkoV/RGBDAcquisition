@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="libOpenNI1Acquisition" prefix_auto="1" extension_auto="1" />
+				<Option output="OpenNI1Acquisition" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -18,7 +18,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="libOpenNI1Acquisition" prefix_auto="1" extension_auto="1" />
+				<Option output="OpenNI1Acquisition" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -39,11 +39,11 @@
 			<Add directory="../3dparty/OpenNI/Include/" />
 		</Compiler>
 		<Linker>
-			<Add option="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.so" />
-			<Add option="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.jni.so" />
-			<Add option="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so" />
-			<Add option="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so" />
-			<Add option="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so" />
+			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.so" />
+			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.jni.so" />
+			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so" />
+			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so" />
+			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so" />
 		</Linker>
 		<Unit filename="OpenNI1Acquisition.cpp" />
 		<Unit filename="OpenNI1Acquisition.h" />
