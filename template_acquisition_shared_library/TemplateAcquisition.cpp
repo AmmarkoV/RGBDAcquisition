@@ -217,6 +217,7 @@ int snapTemplateFrames(int devID)
     if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
 
     sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",readFromDir,devID,cycle);
+    //fprintf(stderr,"Snap color %s",file_name_test);
     if (FileExists(file_name_test))
      {
        if (templateColorFrame!=0) { free(templateColorFrame); }
@@ -225,6 +226,7 @@ int snapTemplateFrames(int devID)
      }
 
     sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",readFromDir,devID,cycle);
+    //fprintf(stderr,"Snap depth %s",file_name_test);
     if (FileExists(file_name_test))
      {
       if (templateDepthFrame!=0) { free(templateDepthFrame); }

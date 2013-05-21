@@ -48,6 +48,7 @@
 			<Add library="../openni2_acquisition_shared_library/libOpenNI2Acquisition.so" />
 			<Add library="../opengl_acquisition_shared_library/libOpenGLAcquisition.so" />
 			<Add library="../template_acquisition_shared_library/libTemplateAcquisition.so" />
+			<Add library="AmmarServer/src/AmmServerlib/libAmmServerlib.a" />
 		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
