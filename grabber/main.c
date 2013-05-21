@@ -10,7 +10,7 @@ char outputfoldername[512]={0};
 
 int makepath(char * path)
 {
-     FILE *fp;
+    // FILE *fp;
     /* Open the command for reading. */
     char command[1024];
     sprintf(command,"mkdir -p %s",outputfoldername);

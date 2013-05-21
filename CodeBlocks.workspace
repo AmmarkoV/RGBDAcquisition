@@ -7,6 +7,7 @@
 		<Project filename="openni1_acquisition_shared_library/OpenNI1Acquisition.cbp" />
 		<Project filename="template_acquisition_shared_library/TemplateAcquisition.cbp" />
 		<Project filename="acquisition/Acquisition.cbp" />
+		<Project filename="acquisitionBroadcast/acquisitionBroadcast.cbp" />
 		<Project filename="acquisition_mux/AcquisitionMux.cbp" />
 		<Project filename="grabber/Grabber.cbp" />
 		<Project filename="grabber_mux/GrabberMux.cbp" />

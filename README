@@ -27,6 +27,13 @@ For example
 
 outdir is converted to grabber/frames/outdir
 
+----------------------------
+
+In order to keep repository sizes small , and If you want to use acquisitionBroadcast you should run ./getBroadcastDependencies.sh to clone the full AmmarServer library instead of the NULL version of the library currently installed
+
+
+----------------------------
+
 
 Without beeing 100% certain OpenNI installed via ROS may conflict with it being downloaded as a standalone package
 If you install sudo apt-get install ros-groovy-openni-camera ros-groovy-openni-launch  

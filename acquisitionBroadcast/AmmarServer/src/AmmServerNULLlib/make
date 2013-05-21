@@ -1,0 +1,42 @@
+#!/bin/bash
+  
+red=$(printf "\033[31m")
+green=$(printf "\033[32m") 
+normal=$(printf "\033[m")
+ 
+LIBNAME="libAmmServerlib.a"
+SOLIBNAME="libAmmServerlib.so"
+
+if [ -e $LIBNAME ]
+then
+  rm $LIBNAME
+fi   
+
+# -O3 -fexpensive-optimizations
+CFLAGS="-s"
+
+gcc -c $CFLAGS main.c -o main.o 
+gcc -shared main.c -fPIC -o $SOLIBNAME
+
+PARTS_OF_LIB="main.o"
+
+ar  rcs $LIBNAME $PARTS_OF_LIB
+
+rm $PARTS_OF_LIB
+
+if [ -e $LIBNAME ]
+then
+  echo "$green Success building static AmmarServerNull $LIBNAME .. $normal"
+else
+  echo "$red Failure building static AmmarServerNull $LIBNAME .. $normal"
+fi
+
+
+if [ -e $SOLIBNAME ]
+then
+  echo "$green Success building dynamic AmmarServerNull $SOLIBNAME .. $normal"
+else
+  echo "$red Failure building dynamic AmmarServerNull $SOLIBNAME .. $normal"
+fi
+
+exit 0

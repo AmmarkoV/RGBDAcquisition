@@ -9,7 +9,7 @@ char outputfoldername[512]={0};
 
 int makepath(char * path)
 {
-     FILE *fp;
+    //FILE *fp;
     /* Open the command for reading. */
     char command[1024];
     sprintf(command,"mkdir -p %s",outputfoldername);
@@ -17,7 +17,6 @@ int makepath(char * path)
 
     return system(command);
 }
-
 
 
 int main(int argc, char *argv[])
@@ -31,7 +30,6 @@ int main(int argc, char *argv[])
        fprintf(stderr,"Acquisition Library is linked to zero modules , can't possibly do anything..\n");
        return 1;
     }
-
 
  //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
   unsigned int frameNum=0,maxFramesToGrab=10;
