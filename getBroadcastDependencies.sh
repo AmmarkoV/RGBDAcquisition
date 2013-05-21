@@ -20,5 +20,9 @@ fi
 
 cd ..
 
+ln -s acquisitionBroadcast/AmmarServer/public_html
+cd acquisitionBroadcast
+ln -s AmmarServer/public_html
+cd ..
 
 exit 0

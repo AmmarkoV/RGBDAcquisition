@@ -704,6 +704,34 @@ char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID
     return 0;
 }
 
+unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength)
+{
+  char * color = acquisitionGetColorFrame(moduleID,devID);
+  if (color==0) { return 0; }
+  unsigned int width , height , channels , bitsperpixel;
+  acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+  unsigned int copySize = width*height*channels*(bitsperpixel/8);
+  memcpy(mem,color,copySize);
+  return copySize;
+}
+
+
+unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength)
+{
+  char * color = acquisitionGetColorFrame(moduleID,devID);
+  if (color==0) { return 0; }
+  unsigned int width , height , channels , bitsperpixel;
+  acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+
+  sprintf(mem, "P6%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
+  unsigned int payloadStart = strlen(mem);
+
+  char * memPayload = mem + payloadStart ;
+  memcpy(memPayload,color,width*height*channels*(bitsperpixel/8));
+
+  payloadStart += width*height*channels*(bitsperpixel/8);
+  return payloadStart;
+}
 
 short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
@@ -740,6 +768,36 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
     return 0;
 }
 
+
+unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength)
+{
+  short * depth = acquisitionGetDepthFrame(moduleID,devID);
+  if (depth==0) { return 0; }
+  unsigned int width , height , channels , bitsperpixel;
+  acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+  unsigned int copySize = width*height*channels*(bitsperpixel/8);
+  memcpy(mem,depth,copySize);
+  return copySize;
+}
+
+
+unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength)
+{
+  short * depth = acquisitionGetDepthFrame(moduleID,devID);
+  if (depth==0) { return 0; }
+
+  unsigned int width , height , channels , bitsperpixel;
+  acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+
+  sprintf(mem, "P5%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
+  unsigned int payloadStart = strlen(mem);
+
+  short * memPayload = mem + payloadStart ;
+  memcpy(memPayload,depth,width*height*channels*(bitsperpixel/8));
+
+  payloadStart += width*height*channels*(bitsperpixel/8);
+  return payloadStart;
+}
 
 
 int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  )

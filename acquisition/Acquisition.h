@@ -40,8 +40,15 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
 int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID);
+
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
+unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength);
+unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength);
+
 short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
+unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength);
+unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength);
+
 int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  );
 int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel );
 int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel );

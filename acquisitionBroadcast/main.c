@@ -22,44 +22,54 @@ char templates_root[MAX_FILE_PATH]="public_html/templates/";
 char outputfoldername[512]={0};
 
 struct AmmServer_Instance * default_server=0;
-struct AmmServer_RH_Context rgbFrame={0};
-struct AmmServer_RH_Context depthFrame={0};
+struct AmmServer_RH_Context rgbRAWFrame={0};
+struct AmmServer_RH_Context rgbPPMFrame={0};
+struct AmmServer_RH_Context depthRAWFrame={0};
+struct AmmServer_RH_Context depthPPMFrame={0};
 
 
-void * prepare_RGB_frame_content_callback(char * content)
+void * prepare_RGB_RAW_frame_content_callback(char * content)
 {
-  unsigned int width , height , channels , bitsperpixel , copySize;
-  acquisitionGetColorFrameDimensions(moduleID,0,&width,&height,&channels,&bitsperpixel);
-  copySize = width * height * channels * (bitsperpixel/8);
-  strncpy(content,acquisitionGetColorFrame(moduleID,0),copySize);
-  rgbFrame.content_size=copySize;
+  rgbRAWFrame.content_size = acquisitionCopyColorFrame(moduleID,0,content,rgbRAWFrame.MAX_content_size);
   return 0;
 }
 
-void * prepare_Depth_frame_content_callback(char * content)
+void * prepare_RGB_PPM_frame_content_callback(char * content)
 {
-  unsigned int width , height , channels , bitsperpixel , copySize;
-  acquisitionGetDepthFrameDimensions(moduleID,0,&width,&height,&channels,&bitsperpixel);
-  copySize = width * height * channels * (bitsperpixel/8);
-  strncpy(content,acquisitionGetDepthFrame(moduleID,0),copySize);
-  depthFrame.content_size=copySize;
+  rgbPPMFrame.content_size =  acquisitionCopyColorFramePPM(moduleID,0,content,rgbPPMFrame.MAX_content_size);
   return 0;
 }
+
+void * prepare_Depth_RAW_frame_content_callback(char * content)
+{
+  depthRAWFrame.content_size = acquisitionCopyDepthFrame(moduleID,0,content,depthRAWFrame.MAX_content_size);
+  return 0;
+}
+
+void * prepare_Depth_PPM_frame_content_callback(char * content)
+{
+  depthPPMFrame.content_size =  acquisitionCopyDepthFramePPM(moduleID,0,content,depthPPMFrame.MAX_content_size);
+  return 0;
+}
+
+//
 
 void init_dynamic_content()
 {
   unsigned int RGB_FRAME_SIZE =  MAX_RGB_FRAME_WIDTH * MAX_RGB_FRAME_HEIGHT * 3 ;
-  if (! AmmServer_AddResourceHandler(default_server,&rgbFrame,"/rgb.raw",webserver_root,RGB_FRAME_SIZE,0,&prepare_RGB_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding rgbFrame page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&rgbRAWFrame,"/rgb.raw",webserver_root,RGB_FRAME_SIZE,0,&prepare_RGB_RAW_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding rgbRAWFrame page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&rgbPPMFrame,"/rgb.ppm",webserver_root,RGB_FRAME_SIZE+100,0,&prepare_RGB_PPM_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding rgbPPMFrame page\n"); }
 
   unsigned int DEPTH_FRAME_SIZE =  MAX_DEPTH_FRAME_WIDTH * MAX_DEPTH_FRAME_HEIGHT * 2 ;
-  if (! AmmServer_AddResourceHandler(default_server,&depthFrame,"/depth.raw",webserver_root,RGB_FRAME_SIZE,0,&prepare_Depth_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&depthRAWFrame,"/depth.raw",webserver_root,RGB_FRAME_SIZE,0,&prepare_Depth_RAW_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&depthPPMFrame,"/depth.ppm",webserver_root,RGB_FRAME_SIZE+100,0,&prepare_Depth_PPM_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
 }
 
 //This function destroys all Resource Handlers and free's all allocated memory..!
 void close_dynamic_content()
 {
-    AmmServer_RemoveResourceHandler(default_server,&rgbFrame,1);
-    AmmServer_RemoveResourceHandler(default_server,&depthFrame,1);
+    AmmServer_RemoveResourceHandler(default_server,&rgbRAWFrame,1);
+    AmmServer_RemoveResourceHandler(default_server,&depthRAWFrame,1);
 }
 
 int main(int argc, char *argv[])
