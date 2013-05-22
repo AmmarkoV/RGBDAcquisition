@@ -70,17 +70,9 @@ cd UnitTests
 cd ..
 fi
 
-
+#AmmarServer main executable in the end
 ./make $@
 cd ..
-
-if [ -e "src/ammarserver" ]; then
-  echo "$green Success creating ammarserver executable.. $normal" 
-  strip src/ammarserver
-else
-  echo "$red Error : Compilation of ammarserver executable failed..! $normal" 
-fi
- 
 
 
 exit 0

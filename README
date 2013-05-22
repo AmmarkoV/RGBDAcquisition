@@ -30,6 +30,10 @@ outdir is converted to grabber/frames/outdir
 ----------------------------
 
 In order to keep repository sizes small , and If you want to use acquisitionBroadcast you should run ./getBroadcastDependencies.sh to clone the full AmmarServer library instead of the NULL version of the library currently installed
+To test it try 
+wget http://127.0.0.1:8080/rgb.ppm -O rgb.ppm
+wget http://127.0.0.1:8080/depth.ppm -O depth.ppm
+wget -qO- http://127.0.0.1:8080/control.html?seek=10
 
 
 ----------------------------

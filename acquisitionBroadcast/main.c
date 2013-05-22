@@ -60,7 +60,6 @@ void * prepare_control_content_callback(char * content)
    sprintf(content,"<html><body>OK</body></html>");
    control.content_size =  strlen(content);
 
-
    char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
    if (bufferCommand!=0)
           {
@@ -68,14 +67,14 @@ void * prepare_control_content_callback(char * content)
                 {
                   unsigned int seekFrame = atoi(bufferCommand);
                   acquisitionSeekFrame(moduleID,0,seekFrame);
+                  acquisitionSnapFrames(moduleID,0);
                 }
             if ( _GET(default_server,&control,"pause",bufferCommand,256) ) { autoSnapFeed = 0; }
             if ( _GET(default_server,&control,"play",bufferCommand,256) )  { autoSnapFeed = 1; }
+            if ( _GET(default_server,&control,"snap",bufferCommand,256) )  { acquisitionSnapFrames(moduleID,0); }
           }
   return 0;
 }
-
-
 
 
 void init_dynamic_content()
@@ -88,7 +87,7 @@ void init_dynamic_content()
   if (! AmmServer_AddResourceHandler(default_server,&depthRAWFrame,"/depth.raw",webserver_root,RGB_FRAME_SIZE,0,&prepare_Depth_RAW_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
   if (! AmmServer_AddResourceHandler(default_server,&depthPPMFrame,"/depth.ppm",webserver_root,RGB_FRAME_SIZE+100,0,&prepare_Depth_PPM_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
 
-  if (! AmmServer_AddResourceHandler(default_server,&control,"/control.html",webserver_root,RGB_FRAME_SIZE+100,0,&prepare_Depth_PPM_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&control,"/control.html",webserver_root,100,0,&prepare_control_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding control page\n"); }
 
 }
 
