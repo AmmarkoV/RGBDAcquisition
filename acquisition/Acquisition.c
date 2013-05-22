@@ -497,6 +497,26 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
 }
 
 
+ int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame)
+{
+    switch (moduleID)
+    {
+      case V4L2_ACQUISITION_MODULE    :   break;
+      case OPENGL_ACQUISITION_MODULE    :  break;
+      case TEMPLATE_ACQUISITION_MODULE:
+        #if USE_TEMPLATE
+          return seekTemplateFrame(devID,seekFrame);
+        #endif
+      break;
+      case FREENECT_ACQUISITION_MODULE:   break;
+      case OPENNI1_ACQUISITION_MODULE :   break;
+      case OPENNI2_ACQUISITION_MODULE : break;
+    };
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionSeekFrame");
+    return 0;
+}
+
+
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
     switch (moduleID)

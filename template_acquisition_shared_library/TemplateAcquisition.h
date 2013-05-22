@@ -14,6 +14,8 @@ extern "C"
    //Basic Per Device Operations
    int createTemplateDevice(int devID,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyTemplateDevice(int devID);
+
+   int seekTemplateFrame(int devID,unsigned int seekFrame);
    int snapTemplateFrames(int devID);
 
    //Color Frame getters

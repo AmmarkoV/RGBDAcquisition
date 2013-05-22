@@ -39,6 +39,7 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID);
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int width,unsigned int height,unsigned int framerate);
 int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
+ int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame);
 int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);

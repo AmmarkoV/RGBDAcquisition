@@ -27,6 +27,10 @@ struct AmmServer_RH_Context rgbPPMFrame={0};
 struct AmmServer_RH_Context depthRAWFrame={0};
 struct AmmServer_RH_Context depthPPMFrame={0};
 
+struct AmmServer_RH_Context control={0};
+
+int autoSnapFeed=1;
+
 void * prepare_RGB_RAW_frame_content_callback(char * content)
 {
   rgbRAWFrame.content_size = acquisitionCopyColorFrame(moduleID,0,content,rgbRAWFrame.MAX_content_size);
@@ -51,6 +55,29 @@ void * prepare_Depth_PPM_frame_content_callback(char * content)
   return 0;
 }
 
+void * prepare_control_content_callback(char * content)
+{
+   sprintf(content,"<html><body>OK</body></html>");
+   control.content_size =  strlen(content);
+
+
+   char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
+   if (bufferCommand!=0)
+          {
+            if ( _GET(default_server,&control,"seek",bufferCommand,256) )
+                {
+                  unsigned int seekFrame = atoi(bufferCommand);
+                  acquisitionSeekFrame(moduleID,0,seekFrame);
+                }
+            if ( _GET(default_server,&control,"pause",bufferCommand,256) ) { autoSnapFeed = 0; }
+            if ( _GET(default_server,&control,"play",bufferCommand,256) )  { autoSnapFeed = 1; }
+          }
+  return 0;
+}
+
+
+
+
 void init_dynamic_content()
 {
   unsigned int RGB_FRAME_SIZE =  MAX_RGB_FRAME_WIDTH * MAX_RGB_FRAME_HEIGHT * 3 ;
@@ -60,6 +87,9 @@ void init_dynamic_content()
   unsigned int DEPTH_FRAME_SIZE =  MAX_DEPTH_FRAME_WIDTH * MAX_DEPTH_FRAME_HEIGHT * 2 ;
   if (! AmmServer_AddResourceHandler(default_server,&depthRAWFrame,"/depth.raw",webserver_root,RGB_FRAME_SIZE,0,&prepare_Depth_RAW_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
   if (! AmmServer_AddResourceHandler(default_server,&depthPPMFrame,"/depth.ppm",webserver_root,RGB_FRAME_SIZE+100,0,&prepare_Depth_PPM_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
+
+  if (! AmmServer_AddResourceHandler(default_server,&control,"/control.html",webserver_root,RGB_FRAME_SIZE+100,0,&prepare_Depth_PPM_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
+
 }
 
 //This function destroys all Resource Handlers and free's all allocated memory..!
@@ -97,7 +127,10 @@ int main(int argc, char *argv[])
    init_dynamic_content();
    while ( (AmmServer_Running(default_server)) )
    { //Do sampling here
-     for (devID=0; devID<maxDevID; devID++) { acquisitionSnapFrames(moduleID,devID); }
+     if (!autoSnapFeed)
+     {
+       for (devID=0; devID<maxDevID; devID++) { acquisitionSnapFrames(moduleID,devID); }
+     }
      usleep(35000);
    }
 

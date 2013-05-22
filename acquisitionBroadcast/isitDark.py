@@ -14,3 +14,6 @@ while (count < 640*480*3):
 print "Counted " +str(darkPixels)+" dark pixels from total of "+str(count)+" pixels"
 print "Counted " +str(brightPixels)+" bright pixels from total of "+str(count)+" pixels"
 
+
+#from array import array
+#a = array("h") # h = signed short, H = unsigned short

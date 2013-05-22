@@ -207,6 +207,11 @@ int destroyTemplateDevice(int devID)
 }
 
 
+int seekTemplateFrame(int devID,unsigned int seekFrame)
+{
+  cycle = seekFrame;
+}
+
 int snapTemplateFrames(int devID)
 {
     //TODO HERE MAYBE LOAD NEW BUFFERS
