@@ -107,9 +107,13 @@ int main(int argc, char *argv[])
  unsigned int possibleModules = acquisitionGetModulesCount();
  fprintf(stderr,"Linked to %u modules.. \n",possibleModules);
 
+ char * readPass=0;
+ char readFrom[128]={0};
+ if (argc>1) {strncpy(readFrom,argv[1],128); readPass=readFrom; }
+
  if (possibleModules==0) { AmmServer_Error("Acquisition Library is linked to zero modules , can't possibly do anything..\n"); return 1; }
  if (!acquisitionIsModuleLinked(moduleID)) {AmmServer_Error("The module you are trying to use is not linked in this build of the Acquisition library..\n"); return 1; }
- if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 )) { AmmServer_Error("Could not start module %s ..\n",getModuleStringName(moduleID)); return 1; }
+ if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , readPass )) { AmmServer_Error("Could not start module %s ..\n",getModuleStringName(moduleID)); return 1; }
 
   //We want to initialize all possible devices in this example..
   unsigned int devID=0,maxDevID=acquisitionGetModuleDevices(moduleID);
