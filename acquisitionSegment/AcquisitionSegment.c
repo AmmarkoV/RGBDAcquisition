@@ -35,6 +35,7 @@ char * segmentRGBFrame(char * source , unsigned int width , unsigned int height 
      targetPixels+=targetWidthStep;
    } else
    {
+     x=0;
       while (sourcePixels<sourcePixelsLineEnd)
       {
         R = sourcePixels++;
@@ -44,7 +45,9 @@ char * segmentRGBFrame(char * source , unsigned int width , unsigned int height 
        if  (
              (segConf->minR <= *R) && (*R <= segConf->maxR)  &&
               (segConf->minG <= *G) && (*G <= segConf->maxG)  &&
-               (segConf->minB <= *B) && (*B <= segConf->maxB)
+               (segConf->minB <= *B) && (*B <= segConf->maxB) &&
+
+               (segConf->minX <= x) && ( x<= segConf->maxX)
            )
        {
          *targetPixels=*R; targetPixels++;
@@ -63,7 +66,51 @@ char * segmentRGBFrame(char * source , unsigned int width , unsigned int height 
    ++y;
  }
 
+ return target;
+}
 
+short * segmentDepthFrame(short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf)
+{
+ short * target = (short *) malloc( width * height * sizeof(short));
+ if ( target == 0) { return 0; }
+ memset(target,0,width*height*sizeof(short));
+
+ unsigned int sourceWidthStep = width;
+ unsigned int targetWidthStep = width;
+ unsigned int posX = segConf->minX;
+ unsigned int posY = segConf->minY;
+ width = segConf->maxX-segConf->minX;
+ height = segConf->maxY-segConf->minY;
+
+ short * sourcePixelsStart   = (short*) source + ( (posX) + posY * sourceWidthStep );
+ short * sourcePixelsLineEnd = sourcePixelsStart + (width);
+ short * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
+ short * sourcePixels = sourcePixelsStart;
+
+ short * targetPixelsStart   = (short*) target + ( (posX) + posY * targetWidthStep );
+ short * targetPixelsLineEnd = targetPixelsStart + (width);
+ short * targetPixelsEnd     = targetPixelsLineEnd + ((height-1) * targetWidthStep );
+ short * targetPixels = targetPixelsStart;
+
+ short * depth;
+ while (sourcePixels<sourcePixelsEnd)
+ {
+   while (sourcePixels<sourcePixelsLineEnd)
+    {
+     depth = sourcePixels++;
+
+     if  ( (segConf->minDepth <= *depth) && (*depth <= segConf->maxDepth) )
+       {
+         *targetPixels=*depth; targetPixels++;
+       } else
+       {
+         targetPixels++;
+       }
+
+     }
+   sourcePixelsLineEnd+=sourceWidthStep;
+   targetPixelsLineEnd+=targetWidthStep;
+ }
 
  return target;
 }

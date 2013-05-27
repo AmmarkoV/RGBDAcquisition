@@ -98,26 +98,33 @@ int main(int argc, char *argv[])
     short * depthOut = ( short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
 
-   struct SegmentationFeaturesRGB segConf={0};
-   segConf.minX=75;  segConf.maxX=563;
-   segConf.minY=0; segConf.maxY=300;
+   struct SegmentationFeaturesRGB segConfRGB={0};
+   segConfRGB.minX=79;  segConfRGB.maxX=500;
+   segConfRGB.minY=180; segConfRGB.maxY=358;
 
-   segConf.minR=20; segConf.minG=20; segConf.minB=100;
-   segConf.maxR=100; segConf.maxG=100; segConf.maxB=200;
+   segConfRGB.minR=20; segConfRGB.minG=20; segConfRGB.minB=50;
+   segConfRGB.maxR=130; segConfRGB.maxG=130; segConfRGB.maxB=210;
+
+   struct SegmentationFeaturesDepth segConfDepth={0};
+   segConfDepth.minX=79;  segConfDepth.maxX=500;
+   segConfDepth.minY=180; segConfDepth.maxY=358;
+   segConfDepth.minDepth=10; segConfDepth.maxDepth=1000;
 
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
 
         acquisitionSnapFrames(moduleID_1,devID_1);
-        char * segmented = segmentRGBFrame(acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB , heightRGB, &segConf);
-
-
+        char * segmentedRGB = segmentRGBFrame(acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB , heightRGB, &segConfRGB);
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
-        saveRawImageToFile(outfilename,segmented,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+        saveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+        free (segmentedRGB);
 
-        free (segmented);
 
+        short * segmentedDepth = segmentDepthFrame(acquisitionGetDepthFrame(moduleID_1,devID_1), widthDepth,heightDepth,&segConfDepth);
+        sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+        saveRawImageToFile(outfilename,segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
+        free (segmentedDepth);
     }
 
 
