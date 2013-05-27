@@ -3,8 +3,6 @@
 #include <stdlib.h>
 
 
-
-
 static unsigned int simplePow(unsigned int base,unsigned int exp)
 {
     if (exp==0) return 1;

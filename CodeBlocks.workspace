@@ -9,7 +9,9 @@
 		<Project filename="acquisition/Acquisition.cbp" />
 		<Project filename="acquisitionBroadcast/acquisitionBroadcast.cbp" />
 		<Project filename="acquisition_mux/AcquisitionMux.cbp" />
+		<Project filename="acquisitionSegment/acquisitionSegment.cbp" />
 		<Project filename="grabber/Grabber.cbp" />
 		<Project filename="grabber_mux/GrabberMux.cbp" />
+		<Project filename="grabber_segment/GrabberSegment.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
