@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     for (devID=0; devID<maxDevID; devID++)
      {
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
-        acquisitionOpenDevice(moduleID,devID,640,480,25);
+        acquisitionOpenDevice(moduleID,devID,0,640,480,25);
         acquisitionMapDepthToRGB(moduleID,devID);
         //acquisitionMapRGBToDepth(moduleID,devID);
      }

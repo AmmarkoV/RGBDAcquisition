@@ -253,6 +253,7 @@ ModuleIdentifier getModuleIdFromModuleName(char * moduleName)
           if (strcasecmp("OPENNI1",moduleName)==0 )  { moduleID = OPENNI1_ACQUISITION_MODULE;  } else
           if (strcasecmp("OPENNI2",moduleName)==0 )  { moduleID = OPENNI2_ACQUISITION_MODULE;  } else
           if (strcasecmp("OPENGL",moduleName)==0 )   { moduleID = OPENGL_ACQUISITION_MODULE;   } else
+          if (strcasecmp("V4L2",moduleName)==0 )   { moduleID = V4L2_ACQUISITION_MODULE;   } else
           if (strcasecmp("TEMPLATE",moduleName)==0 )  { moduleID = TEMPLATE_ACQUISITION_MODULE; }
    return moduleID;
 }
@@ -434,7 +435,7 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
 /*! ------------------------------------------
     FRAME SNAPPING MECHANISMS FOR MODULES..
    ------------------------------------------*/
-int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int width,unsigned int height,unsigned int framerate)
+int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     switch (moduleID)
     {
@@ -446,7 +447,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
       break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
-          return createTemplateDevice(devID,width,height,framerate);
+          return createTemplateDevice(devID,devName,width,height,framerate);
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:   break;

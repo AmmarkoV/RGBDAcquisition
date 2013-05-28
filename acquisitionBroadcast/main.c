@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 
   for (devID=0; devID<maxDevID; devID++)
      {
-        acquisitionOpenDevice(moduleID,devID,MAX_RGB_FRAME_WIDTH,MAX_RGB_FRAME_HEIGHT,25);
+        acquisitionOpenDevice(moduleID,devID,readPass,MAX_RGB_FRAME_WIDTH,MAX_RGB_FRAME_HEIGHT,25);
         acquisitionMapDepthToRGB(moduleID,devID);
      }
 

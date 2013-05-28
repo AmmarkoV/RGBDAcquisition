@@ -36,7 +36,7 @@ int acquisitionIsModuleLinked(ModuleIdentifier moduleID);
 int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings);
 int acquisitionStopModule(ModuleIdentifier moduleID);
 int acquisitionGetModuleDevices(ModuleIdentifier moduleID);
-int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int width,unsigned int height,unsigned int framerate);
+int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
 int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
  int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame);

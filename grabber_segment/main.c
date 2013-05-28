@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
 
   //We need to initialize our module before calling any related calls to the specific module..
-  if (!acquisitionStartModule(moduleID_1,16 /*maxDevices*/ , "trident2" ))
+  if (!acquisitionStartModule(moduleID_1,16 /*maxDevices*/ , 0 ))
   {
        fprintf(stderr,"Could not start module A %s ..\n",getModuleStringName(moduleID_1));
        return 1;
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 
 
     //Initialize Every OpenNI Device
-    acquisitionOpenDevice(moduleID_1,devID_1,640,480,25);
+    acquisitionOpenDevice(moduleID_1,devID_1,"trident2",640,480,25);
     acquisitionMapDepthToRGB(moduleID_1,devID_1);
 
 

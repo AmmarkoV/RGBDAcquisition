@@ -108,10 +108,10 @@ int main(int argc, char *argv[])
 
 
     //Initialize Every OpenNI Device
-    acquisitionOpenDevice(moduleID_1,devID_1,640,480,25);
+    acquisitionOpenDevice(moduleID_1,devID_1,0,640,480,25);
     acquisitionMapDepthToRGB(moduleID_1,devID_1);
 
-    acquisitionOpenDevice(moduleID_2,devID_2,640,480,25);
+    acquisitionOpenDevice(moduleID_2,devID_2,0,640,480,25);
     acquisitionMapDepthToRGB(moduleID_2,devID_2);
 
 
