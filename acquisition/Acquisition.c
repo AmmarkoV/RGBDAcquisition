@@ -5,6 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+
+#if USE_V4L2
+#include "../v4l2_acquisition_shared_library/V4L2Acquisition.h"
+#include "../v4l2stereo_acquisition_shared_library/V4L2StereoAcquisition.h"
+#endif
+
 #if USE_OPENNI1
 #include "../openni1_acquisition_shared_library/OpenNI1Acquisition.h"
 #endif
@@ -215,6 +222,13 @@ int acquisitionGetModulesCount()
 {
   unsigned int modules_linked = 0;
 
+
+  #if USE_V4L2
+   modules_linked+=2;
+   fprintf(stderr,"V4L2 code linked\n");
+   fprintf(stderr,"V4L2Stereo code linked\n");
+  #endif
+
   #if USE_OPENGL
    ++modules_linked;
    fprintf(stderr,"OpenGL code linked\n");
@@ -254,6 +268,7 @@ ModuleIdentifier getModuleIdFromModuleName(char * moduleName)
           if (strcasecmp("OPENNI2",moduleName)==0 )  { moduleID = OPENNI2_ACQUISITION_MODULE;  } else
           if (strcasecmp("OPENGL",moduleName)==0 )   { moduleID = OPENGL_ACQUISITION_MODULE;   } else
           if (strcasecmp("V4L2",moduleName)==0 )   { moduleID = V4L2_ACQUISITION_MODULE;   } else
+          if (strcasecmp("V4L2STEREO",moduleName)==0 )   { moduleID = V4L2STEREO_ACQUISITION_MODULE;   } else
           if (strcasecmp("TEMPLATE",moduleName)==0 )  { moduleID = TEMPLATE_ACQUISITION_MODULE; }
    return moduleID;
 }
@@ -264,6 +279,7 @@ char * getModuleStringName(ModuleIdentifier moduleID)
   switch (moduleID)
     {
       case V4L2_ACQUISITION_MODULE    :  return (char*) "V4L2 MODULE"; break;
+      case V4L2STEREO_ACQUISITION_MODULE    :  return (char*) "V4L2STEREO MODULE"; break;
       case FREENECT_ACQUISITION_MODULE:  return (char*) "FREENECT MODULE"; break;
       case OPENNI1_ACQUISITION_MODULE :  return (char*) "OPENNI1 MODULE"; break;
       case OPENNI2_ACQUISITION_MODULE :  return (char*) "OPENNI2 MODULE"; break;
@@ -439,7 +455,14 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+           return createV4L2Device(devID,devName,width,height,framerate);
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+           return createV4L2StereoDevice(devID,devName,width,height,framerate);
+      break;
+      #endif // USE_V4L2
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return createOpenGLDevice(devID,width,height,framerate);
