@@ -38,6 +38,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="V4L2Acquisition.h" />
+		<Unit filename="V4L2Wrapper.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="V4L2Wrapper.h" />
+		<Unit filename="V4L2_c.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="V4L2_c.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

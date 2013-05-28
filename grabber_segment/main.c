@@ -64,10 +64,6 @@ int main(int argc, char *argv[])
 
 
 
-
-
-
-
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID_1,16 /*maxDevices*/ , 0 ))
   {

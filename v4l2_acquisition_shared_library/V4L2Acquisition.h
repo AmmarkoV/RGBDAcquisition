@@ -13,7 +13,7 @@ extern "C"
    int getDevIDForV4L2Name(char * devName);
 
    //Basic Per Device Operations
-   int createV4L2Device(int devID,unsigned int width,unsigned int height,unsigned int framerate);
+   int createV4L2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyV4L2Device(int devID);
 
    int seekV4L2Frame(int devID,unsigned int seekFrame);
