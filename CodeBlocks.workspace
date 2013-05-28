@@ -9,9 +9,9 @@
 		<Project filename="v4l2_acquisition_shared_library/V4L2Acquisition.cbp" />
 		<Project filename="v4l2stereo_acquisition_shared_library/V4L2StereoAcquisition.cbp" />
 		<Project filename="acquisition/Acquisition.cbp" />
-		<Project filename="acquisitionBroadcast/acquisitionBroadcast.cbp" />
 		<Project filename="acquisition_mux/AcquisitionMux.cbp" />
 		<Project filename="acquisitionSegment/acquisitionSegment.cbp" />
+		<Project filename="acquisitionBroadcast/acquisitionBroadcast.cbp" />
 		<Project filename="grabber/Grabber.cbp" />
 		<Project filename="grabber_mux/GrabberMux.cbp" />
 		<Project filename="grabber_segment/GrabberSegment.cbp" />
