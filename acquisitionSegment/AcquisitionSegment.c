@@ -114,3 +114,37 @@ short * segmentDepthFrame(short * source , unsigned int width , unsigned int hei
 
  return target;
 }
+
+
+
+
+int getDepthBlobAverage(float * centerX , float * centerY , float * centerZ , short * frame , unsigned int width , unsigned int height)
+{
+  unsigned int x=0,y=0;
+
+
+  unsigned long sumX=0,sumY=0,sumZ=0,samples=0;
+
+   short * sourcePixels   = (short*) frame ;
+   short * sourcePixelsEnd   =  sourcePixels + width * height ;
+
+   while (sourcePixels<sourcePixelsEnd)
+   {
+     if (*sourcePixels != 0)
+     {
+       sumX+=x;
+       sumY+=y;
+       sumZ+=*sourcePixels;
+       ++samples;
+     }
+     ++sourcePixels;
+     ++x;
+     if (x==width) { ++y; x=0;}
+   }
+
+   *centerX = (float) sumX / samples;
+   *centerY = (float) sumY / samples;
+   *centerZ = (float) sumZ / samples;
+   return 1;
+}
+

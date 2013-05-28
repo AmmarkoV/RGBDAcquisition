@@ -6,6 +6,7 @@
 		<Project filename="opengl_acquisition_shared_library/OpenGLAcquisition.cbp" />
 		<Project filename="openni1_acquisition_shared_library/OpenNI1Acquisition.cbp" />
 		<Project filename="template_acquisition_shared_library/TemplateAcquisition.cbp" />
+		<Project filename="v4l2_acquisition_shared_library/V4L2Acquisition.cbp" />
 		<Project filename="acquisition/Acquisition.cbp" />
 		<Project filename="acquisitionBroadcast/acquisitionBroadcast.cbp" />
 		<Project filename="acquisition_mux/AcquisitionMux.cbp" />

@@ -108,22 +108,32 @@ int main(int argc, char *argv[])
    struct SegmentationFeaturesDepth segConfDepth={0};
    segConfDepth.minX=79;  segConfDepth.maxX=500;
    segConfDepth.minY=180; segConfDepth.maxY=358;
-   segConfDepth.minDepth=10; segConfDepth.maxDepth=1000;
+   segConfDepth.minDepth=10; segConfDepth.maxDepth=790;
 
+
+   float centerX;
+   float centerY;
+   float centerZ;
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
-
         acquisitionSnapFrames(moduleID_1,devID_1);
+
+       /*
         char * segmentedRGB = segmentRGBFrame(acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB , heightRGB, &segConfRGB);
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         saveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
-        free (segmentedRGB);
+        free (segmentedRGB);*/
 
 
         short * segmentedDepth = segmentDepthFrame(acquisitionGetDepthFrame(moduleID_1,devID_1), widthDepth,heightDepth,&segConfDepth);
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         saveRawImageToFile(outfilename,segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
+
+        getDepthBlobAverage(&centerX,&centerY,&centerZ,segmentedDepth,widthDepth,heightDepth);
+        fprintf(stderr,"AVG!%0.2f#%0.2f#%0.2f\n",centerX,centerY,centerZ);
+
+
         free (segmentedDepth);
     }
 

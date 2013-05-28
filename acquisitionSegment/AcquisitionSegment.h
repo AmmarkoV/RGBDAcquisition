@@ -26,5 +26,7 @@ struct SegmentationFeaturesDepth
 char * segmentRGBFrame(char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf);
 short * segmentDepthFrame(short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf);
 
+int getDepthBlobAverage(float * centerX , float * centerY , float * centerZ , short * frame , unsigned int width , unsigned int height);
+
 
 #endif // ACQUISITIONSEGMENT_H_INCLUDED
