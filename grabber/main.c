@@ -113,10 +113,10 @@ int main(int argc, char *argv[])
       {
         acquisitionSnapFrames(moduleID,devID);
 
-        sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
+        sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID,frameNum);
         acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
-        sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
+        sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID,frameNum);
         acquisitionSaveDepthFrame(moduleID,devID,outfilename);
 
         //sprintf(outfilename,"%s/pointCloud_%u_%05u.pcd",outputfoldername,devID,frameNum);

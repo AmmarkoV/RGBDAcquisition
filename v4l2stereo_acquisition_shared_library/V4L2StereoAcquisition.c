@@ -20,7 +20,7 @@ int stopV4L2Stereo()
 
 int getV4L2StereoNumberOfDevices()
 {
-    return 0;
+    return 1;
 }
 
 int getDevIDForV4L2StereoName(char * devName)
@@ -57,30 +57,11 @@ int snapV4L2StereoFrames(int devID)
 }
 
 //Color Frame getters
-int getV4L2StereoColorWidth(int devID)
-{
- return 0;
-}
-
-int getV4L2StereoColorHeight(int devID)
-{
- return 0;
-}
-
-int getV4L2StereoColorDataSize(int devID)
-{
- return 0;
-}
-
-int getV4L2StereoColorChannels(int devID)
-{
- return 0;
-}
-
-int getV4L2StereoColorBitsPerPixel(int devID)
-{
- return 0;
-}
+int getV4L2StereoColorWidth(int devID) { return getV4L2ColorWidth(devID); }
+int getV4L2StereoColorHeight(int devID) { return getV4L2ColorHeight(devID); }
+int getV4L2StereoColorDataSize(int devID) { return getV4L2ColorDataSize(devID); }
+int getV4L2StereoColorChannels(int devID) {  return getV4L2ColorChannels(devID); }
+int getV4L2StereoColorBitsPerPixel(int devID) {  return getV4L2ColorBitsPerPixel(devID); }
 
 char * getV4L2StereoColorPixels(int devID)
 {

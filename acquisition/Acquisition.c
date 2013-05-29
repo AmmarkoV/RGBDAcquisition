@@ -126,6 +126,8 @@ int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame 
 int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
     //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);
+
+    if ( (width==0) || (height==0) || (channels==0) || (bitsperpixel==0) ) { fprintf(stderr,"saveRawImageToFile(%s) called with zero dimensions\n"); return 0;}
     if(pixels==0) { fprintf(stderr,"saveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
     if (bitsperpixel>16) { fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n"); return 0; }
 
@@ -725,6 +727,10 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
+
+    char filenameFull[1024]={0};
+    sprintf(filenameFull,"%s.pnm",filename);
+
     unsigned int width = 0 ;
     unsigned int height = 0 ;
     unsigned int channels = 0 ;
@@ -739,7 +745,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
        outFrame = convertShortDepthToRGBDepth(inFrame,width,height);
        if (outFrame!=0)
         {
-         saveRawImageToFile(filename,outFrame,width,height,3,8);
+         saveRawImageToFile(filenameFull,outFrame,width,height,3,8);
          free(outFrame);
          return 1;
         }
@@ -752,6 +758,10 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
 int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
+
+    char filenameFull[1024]={0};
+    sprintf(filenameFull,"%s.pnm",filename);
+
     unsigned int width = 0 ;
     unsigned int height = 0 ;
     unsigned int channels = 0 ;
@@ -766,7 +776,7 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
        outFrame = convertShortDepthToCharDepth(inFrame,width,height,0,7000);
        if (outFrame!=0)
         {
-         saveRawImageToFile(filename,outFrame,width,height,1,8);
+         saveRawImageToFile(filenameFull,outFrame,width,height,1,8);
          free(outFrame);
          return 1;
         }

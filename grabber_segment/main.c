@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
 
         short * segmentedDepth = segmentDepthFrame(acquisitionGetDepthFrame(moduleID_1,devID_1), widthDepth,heightDepth,&segConfDepth);
-        sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+        sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
         saveRawImageToFile(outfilename,segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
 
         getDepthBlobAverage(&centerX,&centerY,&centerZ,segmentedDepth,widthDepth,heightDepth);
