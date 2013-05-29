@@ -49,40 +49,30 @@ int seekV4L2Frame(int devID,unsigned int seekFrame)
 
 int snapV4L2Frames(int devID)
 {
+    /*
+ if ( camera_feeds[devID].frame_decoded!=0)
+    {
+      free(camera_feeds[devID].decoded_pixels);
+      camera_feeds[devID].decoded_pixels=0;
+      camera_feeds[devID].frame_decoded=0;
+    }*/
+
+      camera_feeds[devID].frame_decoded=0;
  camera_feeds[devID].frame=getFrame_v4l2intf(&camera_feeds[devID].v4l2_interface);
  return 0;
 }
 
 //Color Frame getters
-int getV4L2ColorWidth(int devID)
-{
- return camera_feeds[devID].width;
-}
-
-int getV4L2ColorHeight(int devID)
-{
- return camera_feeds[devID].height;
-}
-
-int getV4L2ColorChannels(int devID)
-{
- return 3;//camera_feeds[devID].depth;
-}
-
-int getV4L2ColorBitsPerPixel(int devID)
-{
- return 8;
-}
-
-int getV4L2ColorDataSize(int devID)
-{
- return getV4L2ColorWidth(devID)*getV4L2ColorHeight(devID)*getV4L2ColorChannels(devID)*((unsigned int) getV4L2ColorBitsPerPixel(devID)/8);
-}
+int getV4L2ColorWidth(int devID) { return camera_feeds[devID].width; }
+int getV4L2ColorHeight(int devID) { return camera_feeds[devID].height; }
+int getV4L2ColorChannels(int devID) { return 3;/*camera_feeds[devID].depth;*/ }
+int getV4L2ColorBitsPerPixel(int devID) { return 8; }
+int getV4L2ColorDataSize(int devID) { return getV4L2ColorWidth(devID)*getV4L2ColorHeight(devID)*getV4L2ColorChannels(devID)*((unsigned int) getV4L2ColorBitsPerPixel(devID)/8); }
 
 char * getV4L2ColorPixels(int devID)
 {
- camera_feeds[devID].frame=getFrame_v4l2intf(&camera_feeds[devID].v4l2_interface);
- return camera_feeds[devID].frame;
+ return ReturnDecodedLiveFrame(devID);
+ //return camera_feeds[devID].frame;
 }
 
 double getV4L2ColorFocalLength(int devID)
@@ -95,43 +85,12 @@ double getV4L2ColorPixelSize(int devID)
  return 0;
 }
 
-   //Depth Frame getters
-int getV4L2DepthWidth(int devID)
-{
- return 0;
-}
-
-int getV4L2DepthHeight(int devID)
-{
- return 0;
-}
-
-int getV4L2DepthDataSize(int devID)
-{
- return 0;
-}
-
-int getV4L2DepthChannels(int devID)
-{
- return 0;
-}
-
-int getV4L2DepthBitsPerPixel(int devID)
-{
- return 0;
-}
-
-char * getV4L2DepthPixels(int devID)
-{
- return 0;
-}
-
-double getV4L2DepthFocalLength(int devID)
-{
- return 0;
-}
-
-double getV4L2DepthPixelSize(int devID)
-{
- return 0;
-}
+//V4L2 doesnt have any specific dDepth frame getters , so we just return null
+int getV4L2DepthWidth(int devID) { return 0; }
+int getV4L2DepthHeight(int devID) { return 0; }
+int getV4L2DepthDataSize(int devID) { return 0; }
+int getV4L2DepthChannels(int devID) { return 0; }
+int getV4L2DepthBitsPerPixel(int devID) {  return 0; }
+char * getV4L2DepthPixels(int devID) { return 0; }
+double getV4L2DepthFocalLength(int devID) {  return 0; }
+double getV4L2DepthPixelSize(int devID) { return 0; }

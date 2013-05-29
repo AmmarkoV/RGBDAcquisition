@@ -104,6 +104,7 @@ extern unsigned int largest_feed_y;
 
 extern struct Video * camera_feeds;
 
+char * ReturnDecodedLiveFrame(int webcam_id);
 
 int VideoInput_InitializeLibrary(int numofinputs);
 int VideoInput_DeinitializeLibrary();

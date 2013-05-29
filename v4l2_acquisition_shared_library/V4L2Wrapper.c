@@ -1,6 +1,8 @@
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "PixelFormatConversions.h"
 #include "V4L2Wrapper.h"
 
@@ -16,6 +18,54 @@ struct Video * camera_feeds=0;
 
 
 io_method io=IO_METHOD_MMAP; /*IO_METHOD_MMAP;  IO_METHOD_READ; IO_METHOD_USERPTR;*/
+
+
+
+int DecodePixels(int webcam_id)
+{
+ if ( camera_feeds[webcam_id].frame_decoded==0)
+     { /*THIS FRAME HASN`T BEEN DECODED YET!*/
+       int i=Convert2RGB24( (unsigned char*)camera_feeds[webcam_id].frame,
+                            (unsigned char*)camera_feeds[webcam_id].decoded_pixels,
+                            camera_feeds[webcam_id].width,
+                            camera_feeds[webcam_id].height,
+                            camera_feeds[webcam_id].input_pixel_format,
+                            camera_feeds[webcam_id].input_pixel_format_bitdepth );
+       if ( i == 0 ) { /* UNABLE TO PERFORM CONVERSION */ return 0; } else
+                     { /* SUCCESSFUL CONVERSION */
+                       camera_feeds[webcam_id].frame_decoded=1;
+                     }
+    }
+ return 1;
+}
+
+
+char * ReturnDecodedLiveFrame(int webcam_id)
+{
+   /*
+          THIS FRAME DECIDES IF THE VIDEO FORMAT NEEDS DECODING OR CAN BE RETURNED RAW FROM THE DEVICE
+          SEE PixelFormats.cpp / PixelFormatConversions.cpp
+   */
+
+   if (VideoFormatNeedsDecoding(camera_feeds[webcam_id].input_pixel_format,camera_feeds[webcam_id].input_pixel_format_bitdepth)==1)
+    {
+     /*VIDEO COMES IN A FORMAT THAT NEEDS DECODING TO RGB 24*/
+     if ( DecodePixels(webcam_id)==0 ) return empty_frame;
+     return (char *) camera_feeds[webcam_id].decoded_pixels;
+    } else
+    {
+      /* The frame is ready so we mark it as decoded*/
+      camera_feeds[webcam_id].frame_decoded=1;
+      if ( camera_feeds[webcam_id].frame == 0 )
+         {
+           /*Handler for when the frame does not exist */
+           return empty_frame;
+         }
+     return (char *) camera_feeds[webcam_id].frame;
+    }
+   return empty_frame;
+}
+
 
 
 int VideoInput_InitializeLibrary(int numofinputs)
@@ -56,7 +106,6 @@ int VideoInput_InitializeLibrary(int numofinputs)
     }
 
 
-    if ( VIDEOINPUT_INCREASEPRIORITY ) { IncreasePriority(); }
 
     total_cameras=numofinputs;
 
@@ -78,10 +127,7 @@ int VideoInput_DeinitializeLibrary()
         fprintf(stderr,"Video %u Stopping\n",i);
         camera_feeds[i].stop_snap_loop=1;
 
-        if ( pthread_join( camera_feeds[i].loop_thread, NULL) != 0 )
-          {
-              fprintf(stderr,"Error rejoining VideoInput thread \n");
-          }
+        //if ( pthread_join( camera_feeds[i].loop_thread, NULL) != 0 )           { fprintf(stderr,"Error rejoining VideoInput thread \n"); }
 
         usleep(30);
         //camera_feeds[i].v4l2_intf->stopCapture();
@@ -151,6 +197,7 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
 
    camera_feeds[inpt].frame_decoded=0;
    camera_feeds[inpt].decoded_pixels=0;
+
 
    CLEAR (camera_feeds[inpt].fmt);
    camera_feeds[inpt].fmt.fmt.pix.width       = width;

@@ -34,6 +34,10 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="PixelFormatConversions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="PixelFormatConversions.h" />
 		<Unit filename="V4L2Acquisition.c">
 			<Option compilerVar="CC" />
 		</Unit>

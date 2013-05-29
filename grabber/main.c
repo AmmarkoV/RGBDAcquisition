@@ -4,7 +4,7 @@
 #include <string.h>
 #include "../acquisition/Acquisition.h"
 
-
+char inputname[512]={0};
 char outputfoldername[512]={0};
 
 
@@ -61,6 +61,15 @@ int main(int argc, char *argv[])
           fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
      }
 
+    strcpy(inputname,"");
+    if (argc>4)
+     {
+          strcat(inputname,argv[4]);
+          fprintf(stderr,"Input , set to %s  \n",inputname);
+     }
+
+
+
   if (!acquisitionIsModuleLinked(moduleID))
    {
        fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
@@ -83,11 +92,13 @@ int main(int argc, char *argv[])
   }
 
 
+  char * devName = inputname;
+  if (strlen(inputname)<1) { devName=0; }
     //Initialize Every OpenNI Device
     for (devID=0; devID<maxDevID; devID++)
      {
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
-        acquisitionOpenDevice(moduleID,devID,0,640,480,25);
+        acquisitionOpenDevice(moduleID,devID,devName,640,480,25);
         acquisitionMapDepthToRGB(moduleID,devID);
         //acquisitionMapRGBToDepth(moduleID,devID);
      }
