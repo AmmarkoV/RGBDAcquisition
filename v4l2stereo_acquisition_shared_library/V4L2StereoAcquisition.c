@@ -15,6 +15,12 @@ int stopV4L2Stereo()
  return 0;
 }
 
+
+int getV4L2StereoNumberOfDevices()
+{
+    return 0;
+}
+
 int getDevIDForV4L2StereoName(char * devName)
 {
  return 0;

@@ -7,9 +7,11 @@ extern "C"
 {
 #endif
    //Initialization of V4L2
-   int startV4L2StereoStereo(unsigned int max_devs,char * settings);
+   int startV4L2Stereo(unsigned int max_devs,char * settings);
    int getV4L2Stereo(); // This has to be called AFTER startV4L2Stereo
    int stopV4L2Stereo();
+
+   int getV4L2StereoNumberOfDevices();
 
    int getDevIDForV4L2StereoName(char * devName);
 

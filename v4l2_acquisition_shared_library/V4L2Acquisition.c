@@ -1,8 +1,10 @@
 #include "V4L2Acquisition.h"
+#include "V4L2Wrapper.h"
+#include <linux/videodev2.h>
 
 int startV4L2(unsigned int max_devs,char * settings)
 {
- return 0;
+ return VideoInput_InitializeLibrary(10);
 }
 
 int getV4L2()
@@ -12,7 +14,13 @@ int getV4L2()
 
 int stopV4L2()
 {
- return 0;
+ return VideoInput_DeinitializeLibrary();
+}
+
+
+int getV4L2NumberOfDevices()
+{
+ return 1;
 }
 
 int getDevIDForV4L2Name(char * devName)
@@ -23,7 +31,10 @@ int getDevIDForV4L2Name(char * devName)
    //Basic Per Device Operations
 int createV4L2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
- return 0;
+ struct VideoFeedSettings videosettings={0};
+ char BITRATE=32;
+ videosettings.PixelFormat=V4L2_PIX_FMT_YUYV; BITRATE=16;// <- Common setting for UVC
+ return VideoInput_OpenFeed(devID,devName,width,height,BITRATE,framerate,0,videosettings);
 }
 
 int destroyV4L2Device(int devID)
@@ -38,38 +49,40 @@ int seekV4L2Frame(int devID,unsigned int seekFrame)
 
 int snapV4L2Frames(int devID)
 {
+ camera_feeds[devID].frame=getFrame_v4l2intf(&camera_feeds[devID].v4l2_interface);
  return 0;
 }
 
 //Color Frame getters
 int getV4L2ColorWidth(int devID)
 {
- return 0;
+ return camera_feeds[devID].width;
 }
 
 int getV4L2ColorHeight(int devID)
 {
- return 0;
-}
-
-int getV4L2ColorDataSize(int devID)
-{
- return 0;
+ return camera_feeds[devID].height;
 }
 
 int getV4L2ColorChannels(int devID)
 {
- return 0;
+ return 3;//camera_feeds[devID].depth;
 }
 
 int getV4L2ColorBitsPerPixel(int devID)
 {
- return 0;
+ return 8;
+}
+
+int getV4L2ColorDataSize(int devID)
+{
+ return getV4L2ColorWidth(devID)*getV4L2ColorHeight(devID)*getV4L2ColorChannels(devID)*((unsigned int) getV4L2ColorBitsPerPixel(devID)/8);
 }
 
 char * getV4L2ColorPixels(int devID)
 {
- return 0;
+ camera_feeds[devID].frame=getFrame_v4l2intf(&camera_feeds[devID].v4l2_interface);
+ return camera_feeds[devID].frame;
 }
 
 double getV4L2ColorFocalLength(int devID)

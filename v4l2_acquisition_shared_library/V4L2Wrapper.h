@@ -2,6 +2,7 @@
 #define V4L2WRAPPER_H_INCLUDED
 
 
+#include "V4L2_c.h"
 
 #include <linux/types.h>
 #include <linux/videodev2.h>
@@ -46,35 +47,6 @@ struct VideoFeedSettings
    unsigned int FieldType;
 };
 
-enum v4l2_method_used
-{
-    READ ,
-    MMAP ,
-    USERPTR
-};
-
-typedef enum
-{
-  IO_METHOD_READ,
-  IO_METHOD_MMAP,
-  IO_METHOD_USERPTR,
-} io_method;
-
-
-struct buffer
-{
-  void * start;
-  size_t length;
-};
-
-struct V4L2_c_interface
-{
-  char device[MAX_DEVICE_FILENAME];
-  io_method io;
-  int fd;
-  struct buffer *buffers;
-  unsigned int n_buffers;
-};
 
 
 struct Video
@@ -131,6 +103,12 @@ extern unsigned int largest_feed_x;
 extern unsigned int largest_feed_y;
 
 extern struct Video * camera_feeds;
+
+
+int VideoInput_InitializeLibrary(int numofinputs);
+int VideoInput_DeinitializeLibrary();
+
+int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth,int framespersecond,char snapshots_on,struct VideoFeedSettings videosettings);
 
 
 #endif // V4L2WRAPPER_H_INCLUDED

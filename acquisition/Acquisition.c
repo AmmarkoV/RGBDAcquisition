@@ -295,7 +295,14 @@ int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+          return 1;
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          return 1;
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return 1;
@@ -346,7 +353,14 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+          return startV4L2(maxDevices,settings);
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          return startV4L2Stereo(maxDevices,settings);
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return 1;
@@ -383,7 +397,14 @@ int acquisitionStopModule(ModuleIdentifier moduleID)
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+          return stopV4L2();
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          return stopV4L2Stereo();
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return 1;
@@ -415,7 +436,14 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+          return getV4L2NumberOfDevices();
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          return getV4L2StereoNumberOfDevices();
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return getOpenGLNumberOfDevices();
@@ -493,7 +521,14 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+          return destroyV4L2Device(devID);
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          return destroyV4L2StereoDevice(devID);
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return destroyOpenGLDevice(devID);
@@ -525,7 +560,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
       case OPENGL_ACQUISITION_MODULE    :  break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
@@ -545,7 +579,14 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+          return snapV4L2Frames(devID);
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          return snapV4L2StereoFrames(devID);
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return snapOpenGLFrames(devID) ;
@@ -576,7 +617,14 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+          return saveRawImageToFile(filename,getV4L2ColorPixels(devID),getV4L2ColorWidth(devID),getV4L2ColorHeight(devID),getV4L2ColorChannels(devID),getV4L2ColorBitsPerPixel(devID));
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          return saveRawImageToFile(filename,getV4L2StereoColorPixels(devID),getV4L2StereoColorWidth(devID),getV4L2StereoColorHeight(devID),getV4L2StereoColorChannels(devID),getV4L2StereoColorBitsPerPixel(devID));
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return saveRawImageToFile(filename,getOpenGLColorPixels(devID),getOpenGLColorWidth(devID),getOpenGLColorHeight(devID),getOpenGLColorChannels(devID),getOpenGLColorBitsPerPixel(devID));
@@ -627,7 +675,14 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+           fprintf(stderr,"V4L2 Does not have a depth frame\n");
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          return saveRawImageToFile(filename,getV4L2StereoDepthPixels(devID),getV4L2StereoDepthWidth(devID),getV4L2StereoDepthHeight(devID),getV4L2StereoDepthChannels(devID),getV4L2StereoDepthBitsPerPixel(devID));
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return saveRawImageToFile(filename,(char*) getOpenGLDepthPixels(devID),getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID),getOpenGLDepthChannels(devID),getOpenGLDepthBitsPerPixel(devID));
@@ -717,7 +772,14 @@ char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID
 {
   switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+            return getV4L2ColorPixels(devID);
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+            return getV4L2StereoColorPixels(devID);
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return getOpenGLColorPixels(devID);
@@ -781,7 +843,14 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
 {
   switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+            return getV4L2DepthPixels(devID);
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+            return getV4L2StereoDepthPixels(devID);
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return (short*) getOpenGLDepthPixels(devID);
@@ -877,7 +946,22 @@ int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
   switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+          *width = getV4L2ColorWidth(devID);
+          *height = getV4L2ColorHeight(devID);
+          *channels = getV4L2ColorChannels(devID);
+          *bitsperpixel = getV4L2ColorBitsPerPixel(devID);
+          return 1;
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          *width = getV4L2StereoColorWidth(devID);
+          *height = getV4L2StereoColorHeight(devID);
+          *channels = getV4L2StereoColorChannels(devID);
+          *bitsperpixel = getV4L2StereoColorBitsPerPixel(devID);
+          return 1;
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           *width = getOpenGLColorWidth(devID);
@@ -941,7 +1025,22 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
   switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+          *width = getV4L2DepthWidth(devID);
+          *height = getV4L2DepthHeight(devID);
+          *channels = getV4L2DepthChannels(devID);
+          *bitsperpixel = getV4L2DepthBitsPerPixel(devID);
+          return 1;
+      break;
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          *width = getV4L2StereoDepthWidth(devID);
+          *height = getV4L2StereoDepthHeight(devID);
+          *channels = getV4L2StereoDepthChannels(devID);
+          *bitsperpixel = getV4L2StereoDepthBitsPerPixel(devID);
+          return 1;
+      break;
+      #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           *width = getOpenGLDepthWidth(devID);
@@ -997,7 +1096,6 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 {
     switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :   break;
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
           return 0;

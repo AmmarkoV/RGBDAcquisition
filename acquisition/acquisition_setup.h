@@ -18,7 +18,7 @@
 #define USE_FREENECT 0
 #define USE_OPENGL 0
 #define USE_TEMPLATE 1
-#define USE_V4L2 0
+#define USE_V4L2 1
 
 //todo add more acquisition modules here..
 

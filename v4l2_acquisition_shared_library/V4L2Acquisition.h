@@ -10,6 +10,8 @@ extern "C"
    int getV4L2(); // This has to be called AFTER startV4L2
    int stopV4L2();
 
+   int getV4L2NumberOfDevices();
+
    int getDevIDForV4L2Name(char * devName);
 
    //Basic Per Device Operations

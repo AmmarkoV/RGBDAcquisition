@@ -1,18 +1,16 @@
-#include "V4L2Wrapper.h"
-
 
 #include <stdio.h>
 #include <string.h>
+#include "PixelFormatConversions.h"
 #include "V4L2Wrapper.h"
-
 
 char video_simulation_path[256]={0};
 
 
 int total_cameras=0;
 unsigned char * empty_frame=0;
-unsigned int largest_feed_x=320;
-unsigned int largest_feed_y=240;
+unsigned int largest_feed_x=640;
+unsigned int largest_feed_y=480;
 
 struct Video * camera_feeds=0;
 
@@ -24,7 +22,7 @@ int VideoInput_InitializeLibrary(int numofinputs)
 {
     //if (total_cameras>0) { fprintf(stderr,"Error , Video Inputs already active ?\n total_cameras=%u\n",total_cameras); return 0;}
 
-    ReallocEmptyFrame(320,240);
+    //ReallocEmptyFrame(largest_feed_x,largest_feed_y);
 
 
     /*First allocate memory for V4L2 Structures  , etc*/
@@ -120,14 +118,25 @@ int VideoInput_DeinitializeLibrary()
 
 
 
+char FileExistsVideoInput(char * filename)
+{
+ FILE *fp = fopen(filename,"r");
+ if( fp ) { /* exists */
+            fclose(fp);
+            return 1;
+          }
+          else
+          { /* doesnt exist */ }
+ return 0;
+}
 
 int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth,int framespersecond,char snapshots_on,struct VideoFeedSettings videosettings)
 {
    camera_feeds[inpt].video_simulation=NO_VIDEO_AVAILIABLE;
    printf("Initializing Video Feed %u ( %s ) @ %u/%u \n",inpt,viddev,width,height);
-   ReallocEmptyFrame(width,height);
+   //ReallocEmptyFrame(width,height);
 
-   if (!VideoInputsOk()) return 0;
+   //if (!VideoInputsOk()) return 0;
    if ( (!FileExistsVideoInput(viddev)) ) { fprintf(stderr,"\n\nCheck for the webcam (%s) returned false..\n PLEASE CONNECT V4L2 COMPATIBLE CAMERA!!!!!\n\n\n",viddev); return 0; }
 
 
@@ -229,7 +238,7 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
     camera_feeds[inpt].stop_snap_loop=0;
     camera_feeds[inpt].loop_thread=0;
 
-    ChooseDifferentSoftFramerate(inpt,framespersecond); // Go for a good old solid PAL 25 fps , ( the PS3 cameras may be snapping at 120fps , but VisualCortex without
+   // ChooseDifferentSoftFramerate(inpt,framespersecond); // Go for a good old solid PAL 25 fps , ( the PS3 cameras may be snapping at 120fps , but VisualCortex without
                                            // hardware acceleration can`t go more than 6-8 fps )
 
   /*  struct ThreadPassParam param={0};
