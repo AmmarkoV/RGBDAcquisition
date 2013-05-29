@@ -29,6 +29,9 @@ extern "C"
    int getV4L2StereoColorChannels(int devID);
    int getV4L2StereoColorBitsPerPixel(int devID);
    char * getV4L2StereoColorPixels(int devID);
+   char * getV4L2StereoColorPixelsLeft(int devID);
+   char * getV4L2StereoColorPixelsRight(int devID);
+
    double getV4L2StereoColorFocalLength(int devID);
    double getV4L2StereoColorPixelSize(int devID);
 

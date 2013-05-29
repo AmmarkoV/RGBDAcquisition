@@ -1,8 +1,10 @@
 #include "V4L2StereoAcquisition.h"
+#include "../acquisition/Acquisition.h"
+#include "../v4l2_acquisition_shared_library/V4L2Acquisition.h"
 
 int startV4L2Stereo(unsigned int max_devs,char * settings)
 {
- return 0;
+ return startV4L2(max_devs,settings);
 }
 
 int getV4L2Stereo()
@@ -12,7 +14,7 @@ int getV4L2Stereo()
 
 int stopV4L2Stereo()
 {
- return 0;
+ return stopV4L2();
 }
 
 
@@ -29,11 +31,16 @@ int getDevIDForV4L2StereoName(char * devName)
    //Basic Per Device Operations
 int createV4L2StereoDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
- return 0;
+ createV4L2Device(0,"/dev/video1",width,height,framerate);
+ createV4L2Device(1,"/dev/video2",width,height,framerate);
+
+ return 1;
 }
 
 int destroyV4L2StereoDevice(int devID)
 {
+ destroyV4L2Device(0);
+ destroyV4L2Device(1);
  return 0;
 }
 
@@ -44,6 +51,8 @@ int seekV4L2StereoFrame(int devID,unsigned int seekFrame)
 
 int snapV4L2StereoFrames(int devID)
 {
+ snapV4L2Frames(0);
+ snapV4L2Frames(1);
  return 0;
 }
 
@@ -75,7 +84,17 @@ int getV4L2StereoColorBitsPerPixel(int devID)
 
 char * getV4L2StereoColorPixels(int devID)
 {
- return 0;
+ return getV4L2StereoColorPixels(devID);
+}
+
+char * getV4L2StereoColorPixelsLeft(int devID)
+{
+ return getV4L2StereoColorPixels(devID);
+}
+
+char * getV4L2StereoColorPixelsRight(int devID)
+{
+ return getV4L2StereoColorPixels(devID+1);
 }
 
 double getV4L2StereoColorFocalLength(int devID)

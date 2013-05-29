@@ -49,15 +49,7 @@ int seekV4L2Frame(int devID,unsigned int seekFrame)
 
 int snapV4L2Frames(int devID)
 {
-    /*
- if ( camera_feeds[devID].frame_decoded!=0)
-    {
-      free(camera_feeds[devID].decoded_pixels);
-      camera_feeds[devID].decoded_pixels=0;
-      camera_feeds[devID].frame_decoded=0;
-    }*/
-
-      camera_feeds[devID].frame_decoded=0;
+ camera_feeds[devID].frame_decoded=0;
  camera_feeds[devID].frame=getFrame_v4l2intf(&camera_feeds[devID].v4l2_interface);
  return 0;
 }

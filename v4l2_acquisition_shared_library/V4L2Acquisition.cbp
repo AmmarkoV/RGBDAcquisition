@@ -12,6 +12,9 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
 				<Option compiler="gcc" />
+				<Option parameters="0 V4L2 v4l2test /dev/video0" />
+				<Option host_application="/home/ammar/Documents/Programming/FORTH/input_acquisition/grabber/Grabber" />
+				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
 				<Compiler>
 					<Add option="-Wall" />

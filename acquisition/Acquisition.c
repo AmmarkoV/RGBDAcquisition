@@ -615,6 +615,9 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
+    char filenameFull[1024]={0};
+    sprintf(filenameFull,"%s.pnm",filename);
+
     switch (moduleID)
     {
       #if USE_V4L2
@@ -622,32 +625,36 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
           return saveRawImageToFile(filename,getV4L2ColorPixels(devID),getV4L2ColorWidth(devID),getV4L2ColorHeight(devID),getV4L2ColorChannels(devID),getV4L2ColorBitsPerPixel(devID));
       break;
       case V4L2STEREO_ACQUISITION_MODULE    :
-          return saveRawImageToFile(filename,getV4L2StereoColorPixels(devID),getV4L2StereoColorWidth(devID),getV4L2StereoColorHeight(devID),getV4L2StereoColorChannels(devID),getV4L2StereoColorBitsPerPixel(devID));
+         sprintf(filenameFull,"%s_0.pnm",filename);
+         saveRawImageToFile(filenameFull,getV4L2StereoColorPixelsLeft(devID),getV4L2StereoColorWidth(devID),getV4L2StereoColorHeight(devID),getV4L2StereoColorChannels(devID),getV4L2StereoColorBitsPerPixel(devID));
+         sprintf(filenameFull,"%s_1.pnm",filename);
+         saveRawImageToFile(filenameFull,getV4L2StereoColorPixelsRight(devID),getV4L2StereoColorWidth(devID),getV4L2StereoColorHeight(devID),getV4L2StereoColorChannels(devID),getV4L2StereoColorBitsPerPixel(devID));
+        return 1;
       break;
       #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
-          return saveRawImageToFile(filename,getOpenGLColorPixels(devID),getOpenGLColorWidth(devID),getOpenGLColorHeight(devID),getOpenGLColorChannels(devID),getOpenGLColorBitsPerPixel(devID));
+          return saveRawImageToFile(filenameFull,getOpenGLColorPixels(devID),getOpenGLColorWidth(devID),getOpenGLColorHeight(devID),getOpenGLColorChannels(devID),getOpenGLColorBitsPerPixel(devID));
         #endif
       break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
-          return saveRawImageToFile(filename,getTemplateColorPixels(devID),getTemplateColorWidth(devID),getTemplateColorHeight(devID) ,getTemplateColorChannels(devID),getTemplateColorBitsPerPixel(devID));
+          return saveRawImageToFile(filenameFull,getTemplateColorPixels(devID),getTemplateColorWidth(devID),getTemplateColorHeight(devID) ,getTemplateColorChannels(devID),getTemplateColorBitsPerPixel(devID));
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
         #if USE_FREENECT
-          return saveRawImageToFile(filename,getFreenectColorPixels(devID),getFreenectColorWidth(devID),getFreenectColorHeight(devID) ,getFreenectColorChannels(devID),getFreenectColorBitsPerPixel(devID));
+          return saveRawImageToFile(filenameFull,getFreenectColorPixels(devID),getFreenectColorWidth(devID),getFreenectColorHeight(devID) ,getFreenectColorChannels(devID),getFreenectColorBitsPerPixel(devID));
         #endif
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
-          return saveRawImageToFile(filename,getOpenNI1ColorPixels(devID),getOpenNI1ColorWidth(devID),getOpenNI1ColorHeight(devID) ,getOpenNI1ColorChannels(devID),getOpenNI1ColorBitsPerPixel(devID));
+          return saveRawImageToFile(filenameFull,getOpenNI1ColorPixels(devID),getOpenNI1ColorWidth(devID),getOpenNI1ColorHeight(devID) ,getOpenNI1ColorChannels(devID),getOpenNI1ColorBitsPerPixel(devID));
         #endif
       break;
       case OPENNI2_ACQUISITION_MODULE :
         #if USE_OPENNI2
-          return saveRawImageToFile(filename,getOpenNI2ColorPixels(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID) ,getOpenNI2ColorChannels(devID),getOpenNI2ColorBitsPerPixel(devID));
+          return saveRawImageToFile(filenameFull,getOpenNI2ColorPixels(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID) ,getOpenNI2ColorChannels(devID),getOpenNI2ColorBitsPerPixel(devID));
         #endif
       break;
     };
@@ -673,6 +680,9 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
+    char filenameFull[1024]={0};
+    sprintf(filenameFull,"%s.pnm",filename);
+
     switch (moduleID)
     {
       #if USE_V4L2
@@ -680,32 +690,32 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
            fprintf(stderr,"V4L2 Does not have a depth frame\n");
       break;
       case V4L2STEREO_ACQUISITION_MODULE    :
-          return saveRawImageToFile(filename,getV4L2StereoDepthPixels(devID),getV4L2StereoDepthWidth(devID),getV4L2StereoDepthHeight(devID),getV4L2StereoDepthChannels(devID),getV4L2StereoDepthBitsPerPixel(devID));
+          return saveRawImageToFile(filenameFull,getV4L2StereoDepthPixels(devID),getV4L2StereoDepthWidth(devID),getV4L2StereoDepthHeight(devID),getV4L2StereoDepthChannels(devID),getV4L2StereoDepthBitsPerPixel(devID));
       break;
       #endif
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
-          return saveRawImageToFile(filename,(char*) getOpenGLDepthPixels(devID),getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID),getOpenGLDepthChannels(devID),getOpenGLDepthBitsPerPixel(devID));
+          return saveRawImageToFile(filenameFull,(char*) getOpenGLDepthPixels(devID),getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID),getOpenGLDepthChannels(devID),getOpenGLDepthBitsPerPixel(devID));
         #endif
       break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
-          return saveRawImageToFile(filename,(char*) getTemplateDepthPixels(devID),getTemplateDepthWidth(devID),getTemplateDepthHeight(devID) ,getTemplateDepthChannels(devID),getTemplateDepthBitsPerPixel(devID));
+          return saveRawImageToFile(filenameFull,(char*) getTemplateDepthPixels(devID),getTemplateDepthWidth(devID),getTemplateDepthHeight(devID) ,getTemplateDepthChannels(devID),getTemplateDepthBitsPerPixel(devID));
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
         #if USE_FREENECT
-          return saveRawImageToFile(filename,(char*) getFreenectDepthPixels(devID),getFreenectDepthWidth(devID),getFreenectDepthHeight(devID) ,getFreenectDepthChannels(devID),getFreenectDepthBitsPerPixel(devID));
+          return saveRawImageToFile(filenameFull,(char*) getFreenectDepthPixels(devID),getFreenectDepthWidth(devID),getFreenectDepthHeight(devID) ,getFreenectDepthChannels(devID),getFreenectDepthBitsPerPixel(devID));
         #endif
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
-            return saveRawImageToFile(filename,(char*) getOpenNI1DepthPixels(devID),getOpenNI1DepthWidth(devID),getOpenNI1DepthHeight(devID) ,getOpenNI1DepthChannels(devID),getOpenNI1DepthBitsPerPixel(devID));
+            return saveRawImageToFile(filenameFull,(char*) getOpenNI1DepthPixels(devID),getOpenNI1DepthWidth(devID),getOpenNI1DepthHeight(devID) ,getOpenNI1DepthChannels(devID),getOpenNI1DepthBitsPerPixel(devID));
         #endif
       break;
       case OPENNI2_ACQUISITION_MODULE :
         #if USE_OPENNI2
-            return saveRawImageToFile(filename,(char*) getOpenNI2DepthPixels(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID) ,getOpenNI2DepthChannels(devID),getOpenNI2DepthBitsPerPixel(devID));
+            return saveRawImageToFile(filenameFull,(char*) getOpenNI2DepthPixels(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID) ,getOpenNI2DepthChannels(devID),getOpenNI2DepthBitsPerPixel(devID));
         #endif
       break;
     };
