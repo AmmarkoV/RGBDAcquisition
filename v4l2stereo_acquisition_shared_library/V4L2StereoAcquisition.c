@@ -63,20 +63,9 @@ int getV4L2StereoColorDataSize(int devID) { return getV4L2ColorDataSize(devID); 
 int getV4L2StereoColorChannels(int devID) {  return getV4L2ColorChannels(devID); }
 int getV4L2StereoColorBitsPerPixel(int devID) {  return getV4L2ColorBitsPerPixel(devID); }
 
-char * getV4L2StereoColorPixels(int devID)
-{
- return getV4L2StereoColorPixels(devID);
-}
-
-char * getV4L2StereoColorPixelsLeft(int devID)
-{
- return getV4L2StereoColorPixels(devID);
-}
-
-char * getV4L2StereoColorPixelsRight(int devID)
-{
- return getV4L2StereoColorPixels(devID+1);
-}
+char * getV4L2StereoColorPixels(int devID) { return getV4L2ColorPixels(devID); }
+char * getV4L2StereoColorPixelsLeft(int devID) {  return getV4L2ColorPixels(devID); }
+char * getV4L2StereoColorPixelsRight(int devID) {  return getV4L2ColorPixels(devID+1); }
 
 double getV4L2StereoColorFocalLength(int devID)
 {
