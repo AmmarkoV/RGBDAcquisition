@@ -66,9 +66,16 @@ struct Video
   //V4L2 *v4l2_intf;
   struct V4L2_c_interface v4l2_interface;
 
+  int enableIntrinsicResectioning;
+  unsigned int * resectionPrecalculations;
   /* CAMERA INTRINSIC PARAMETERS */
-  double fx,fy,cx,cy;
-  double k1,k2,p1,p2,k3;
+  float fx,fy,cx,cy;
+  float k1,k2,p1,p2,k3;
+
+  /* CAMERA EXTRINSIC PARAMETERS */
+  float extrinsicR[9];
+  float extrinsicT[3];
+
 
   /* DATA NEEDED FOR DECODERS TO WORK */
   unsigned int input_pixel_format;

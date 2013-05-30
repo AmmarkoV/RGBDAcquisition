@@ -1,0 +1,6 @@
+#!/bin/bash
+rm *.jpg
+convert *.ppm *.jpg
+ls | grep jpg > cam1_images
+./calibration -w 6 -h 8 -o cam1_output cam1_images
+exit 0

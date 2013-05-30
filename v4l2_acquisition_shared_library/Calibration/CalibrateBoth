@@ -1,0 +1,9 @@
+#!/bin/bash
+cd cam0 
+./CalibrateThis
+cd ..
+cd cam1 
+./CalibrateThis
+cd ..
+
+exit 0

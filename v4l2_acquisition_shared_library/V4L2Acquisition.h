@@ -21,6 +21,14 @@ extern "C"
    int seekV4L2Frame(int devID,unsigned int seekFrame);
    int snapV4L2Frames(int devID);
 
+int setV4L2IntrinsicParameters(int devID
+                               float fx,float fy,float cx,float cy ,
+                               float k1,float k2,float p1,float p2,float k3);
+
+int getV4L2IntrinsicParameters(int devID
+                               float *fx,float *fy,float *cx,float *cy ,
+                               float *k1,float *k2,float *p1,float *p2,float *k3);
+
    //Color Frame getters
    int getV4L2ColorWidth(int devID);
    int getV4L2ColorHeight(int devID);

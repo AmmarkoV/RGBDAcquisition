@@ -77,6 +77,32 @@ double getV4L2ColorPixelSize(int devID)
  return 0;
 }
 
+
+int setV4L2IntrinsicParameters(int devID
+                               float fx,float fy,float cx,float cy ,
+                               float k1,float k2,float p1,float p2,float k3)
+{
+   camera_feeds[devID].fx=fx; camera_feeds[devID].fy=fy; camera_feeds[devID].cx=cx; camera_feeds[devID].cy=cy;
+   camera_feeds[devID].k1=k1; camera_feeds[devID].k2=k2; camera_feeds[devID].p1=p1; camera_feeds[devID].p2=p2;
+   camera_feeds[devID].k3=k3;
+   camera_feeds[devID].enableIntrinsicResectioning=1;
+
+
+   camera_feeds[devID].resectionPrecalculations = (unsigned int *) malloc( camera_feeds[devID].width * camera_feeds[devID].height * sizeof(unsigned int) );
+   PrecalcResectioning(camera_feeds[devID].resectionPrecalculations,fx,fy,cx,cy,k1,k2,p1,p2,k3);
+}
+
+int getV4L2IntrinsicParameters(int devID
+                               float *fx,float *fy,float *cx,float *cy ,
+                               float *k1,float *k2,float *p1,float *p2,float *k3)
+{
+   *fx=camera_feeds[devID].fx; *fy=camera_feeds[devID].fy; *cx=camera_feeds[devID].cx; *cy=camera_feeds[devID].cy;
+   *k1=camera_feeds[devID].k1; *k2=camera_feeds[devID].k2; *p1=camera_feeds[devID].p1; *p2=camera_feeds[devID].p2;
+   *k3=camera_feeds[devID].k3;
+}
+
+
+
 //V4L2 doesnt have any specific dDepth frame getters , so we just return null
 int getV4L2DepthWidth(int devID) { return 0; }
 int getV4L2DepthHeight(int devID) { return 0; }
