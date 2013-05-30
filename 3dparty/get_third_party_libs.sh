@@ -8,7 +8,7 @@ else
   echo
   echo -n " (Y/N)?"
   read answer
-  if test "$answer" != "Y" -a "$answer" != "y";
+  if test "$answer" != "N" -a "$answer" != "n";
   then
      git clone git://github.com/OpenKinect/libfreenect.git
      cd libfreenect
@@ -38,7 +38,7 @@ else
   echo
   echo -n " (Y/N)?"
   read answer
-  if test "$answer" != "Y" -a "$answer" != "y";
+  if test "$answer" != "N" -a "$answer" != "n";
   then
      git clone git://github.com/OpenNI/OpenNI.git 
      cd OpenNI/Platform/Linux/CreateRedist
@@ -60,7 +60,7 @@ else
   echo
   echo -n " (Y/N)?"
   read answer
-  if test "$answer" != "Y" -a "$answer" != "y";
+  if test "$answer" != "N" -a "$answer" != "n";
   then
      git clone git://github.com/OpenNI/OpenNI2.git
      cd OpenNI2
