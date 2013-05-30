@@ -45,13 +45,13 @@ void * prepare_RGB_PPM_frame_content_callback(char * content)
 
 void * prepare_Depth_RAW_frame_content_callback(char * content)
 {
-  depthRAWFrame.content_size = acquisitionCopyDepthFrame(moduleID,0,content,depthRAWFrame.MAX_content_size);
+  depthRAWFrame.content_size = acquisitionCopyDepthFrame(moduleID,0,(short*) content,depthRAWFrame.MAX_content_size);
   return 0;
 }
 
 void * prepare_Depth_PPM_frame_content_callback(char * content)
 {
-  depthPPMFrame.content_size =  acquisitionCopyDepthFramePPM(moduleID,0,content,depthPPMFrame.MAX_content_size);
+  depthPPMFrame.content_size =  acquisitionCopyDepthFramePPM(moduleID,0,(short*) content,depthPPMFrame.MAX_content_size);
   return 0;
 }
 

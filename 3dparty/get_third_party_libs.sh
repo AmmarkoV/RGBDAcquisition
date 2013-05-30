@@ -1,5 +1,7 @@
 #!/bin/bash
 
+BINARIES_THAT_NEED_LIBS="grabber grabber_mux grabber_segment acquisitionBroadcast"
+
 if [ -d libfreenect ]
 then
 echo "Freenect appears to already exist .."
@@ -20,12 +22,21 @@ else
 
      if [ -e libfreenect/build/lib/libfreenect.so ]
        then
-         ln -s libfreenect/build/lib/libfreenect.so ../grabber/libfreenect.so
-       fi
+
+         for f in BINARIES_THAT_NEED_LIBS
+           do  
+             ln -s libfreenect/build/lib/libfreenect.so ../$f/libfreenect.so
+           done
+ 
+     fi
      if [ -e libfreenect/build/lib/libfreenect_sync.so ]
        then
-         ln -s libfreenect/build/lib/libfreenect_sync.so ../grabber/libfreenect_sync.so
-       fi
+
+         for f in BINARIES_THAT_NEED_LIBS
+           do  
+             ln -s libfreenect/build/lib/libfreenect_sync.so ../$f/libfreenect_sync.so
+           done
+     fi
 
   fi
 fi
@@ -68,10 +79,14 @@ else
      cd ..
      
      #should be at 3dparty dir  
-     ln -s OpenNI2/Bin/x64-Release/OpenNI2 ../grabber/OpenNI2 
-     ln -s OpenNI2/Config/OpenNI.ini ../grabber/OpenNI.ini 
-     ln -s OpenNI2/Config/PS1080.ini ../grabber/PS1080.ini
-     ln -s OpenNI2/Bin/x64-Release/libOpenNI2.so ../grabber/libOpenNI2.so
+     for f in BINARIES_THAT_NEED_LIBS
+           do  
+               ln -s OpenNI2/Bin/x64-Release/OpenNI2 ../$f/OpenNI2 
+               ln -s OpenNI2/Config/OpenNI.ini ../$f/OpenNI.ini 
+               ln -s OpenNI2/Config/PS1080.ini ../$f/PS1080.ini
+               ln -s OpenNI2/Bin/x64-Release/libOpenNI2.so ../$f/libOpenNI2.so
+           done
+
 
   fi
 fi
