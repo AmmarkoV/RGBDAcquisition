@@ -1,13 +1,13 @@
+#include <unistd.h>
+#include "OpenNI2Acquisition.h"
 
+#if USE_OPENNI2
 #include <OpenNI.h>
 #include <PS1080.h>
-#include <unistd.h>
-
-
-#include "OpenNI2Acquisition.h"
 
 #define MAX_OPENNI2_DEVICES 16
 #define ANY_OPENNI2_DEVICE MAX_OPENNI2_DEVICES*2
+
 
 using namespace std;
 using namespace openni;
@@ -15,7 +15,6 @@ using namespace openni;
 Device device[MAX_OPENNI2_DEVICES];
 VideoStream depth[MAX_OPENNI2_DEVICES] , color[MAX_OPENNI2_DEVICES];
 VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES];
-
 
 
 
@@ -415,3 +414,5 @@ double getOpenNI2DepthPixelSize(int devID)
     return (double) zpps;
 }
 
+
+#endif

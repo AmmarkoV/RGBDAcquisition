@@ -1,11 +1,14 @@
 #ifndef OPENNI2ACQUISITION_H_INCLUDED
 #define OPENNI2ACQUISITION_H_INCLUDED
 
+#include "../acquisition/acquisition_setup.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+#if USE_OPENNI2
    //Initialization of OpenNI2
    int startOpenNI2(unsigned int max_devs);
    int getOpenNI2NumberOfDevices(); // This has to be called AFTER startOpenNI2
@@ -40,6 +43,7 @@ extern "C"
 
    double getOpenNI2DepthFocalLength(int devID);
    double getOpenNI2DepthPixelSize(int devID);
+#endif
 
 #ifdef __cplusplus
 }

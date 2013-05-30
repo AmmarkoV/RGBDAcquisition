@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "OpenNI1Acquisition.h"
+
+
+#if USE_OPENNI1
 #include <XnOS.h>
 #include <XnCppWrapper.h>
 #include <XnLog.h>
 
-#include "OpenNI1Acquisition.h"
 
 using namespace std;
 using namespace xn;
@@ -267,4 +270,4 @@ double getOpenNI1DepthPixelSize(int devID)
 	depthGenerators[devID].GetRealProperty ("ZPPS", pixelSize);
     return (double) pixelSize;
 }
-
+#endif
