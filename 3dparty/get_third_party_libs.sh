@@ -20,24 +20,24 @@ else
      make
      cd ../../ 
 
-     if [ -e libfreenect/build/lib/libfreenect.so ]
-       then
 
-         for f in BINARIES_THAT_NEED_LIBS
+     #should be at 3dparty dir
+     cd ..  
+     #should be at root dir
+     for f in BINARIES_THAT_NEED_LIBS
            do  
-             ln -s libfreenect/build/lib/libfreenect.so ../$f/libfreenect.so
+             if [ -d $f ]
+              then
+               cd $f 
+               ln -s ../3dparty/libfreenect/build/lib/libfreenect.so
+               ln -s ../3dparty/libfreenect/build/lib/libfreenect_sync.so 
+               cd ..
+             fi
            done
- 
-     fi
-     if [ -e libfreenect/build/lib/libfreenect_sync.so ]
-       then
 
-         for f in BINARIES_THAT_NEED_LIBS
-           do  
-             ln -s libfreenect/build/lib/libfreenect_sync.so ../$f/libfreenect_sync.so
-           done
-     fi
-
+     #should be at 3dparty dir
+     cd 3dparty   
+  
   fi
 fi
 
@@ -59,6 +59,28 @@ else
      #sudo ./install.sh 
  
      cd ../../../../
+
+
+     #should be at 3dparty dir
+     cd ..  
+     #should be at root dir
+     for f in BINARIES_THAT_NEED_LIBS
+           do  
+             if [ -d $f ]
+              then
+               cd $f 
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.so
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.jni.so  
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so 
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so 
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so 
+               cd ..
+             fi
+           done
+
+     #should be at 3dparty dir
+     cd 3dparty   
+
   fi
 fi
 
@@ -78,15 +100,24 @@ else
      make 
      cd ..
      
-     #should be at 3dparty dir  
+     #should be at 3dparty dir
+     cd ..  
+     #should be at root dir
      for f in BINARIES_THAT_NEED_LIBS
            do  
-               ln -s OpenNI2/Bin/x64-Release/OpenNI2 ../$f/OpenNI2 
-               ln -s OpenNI2/Config/OpenNI.ini ../$f/OpenNI.ini 
-               ln -s OpenNI2/Config/PS1080.ini ../$f/PS1080.ini
-               ln -s OpenNI2/Bin/x64-Release/libOpenNI2.so ../$f/libOpenNI2.so
+             if [ -d $f ]
+              then
+               cd $f 
+               ln -s ../3dparty/OpenNI2/Bin/x64-Release/OpenNI2/  
+               ln -s ../3dparty/OpenNI2/Config/OpenNI.ini   
+               ln -s ../3dparty/OpenNI2/Config/PS1080.ini 
+               ln -s ../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so 
+               cd ..
+             fi
            done
 
+     #should be at 3dparty dir
+     cd 3dparty   
 
   fi
 fi
