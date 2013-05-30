@@ -1,6 +1,6 @@
 #!/bin/bash
-rm *.jpg
-convert *.ppm *.jpg
+convert *.pnm *.jpg
 ls | grep jpg > cam0_images
-./calibration -w 6 -h 8 -o cam0_output cam0_images
+./calibration -w 6 -h 9 -o cam0_output cam0_images
+rm *.jpg
 exit 0

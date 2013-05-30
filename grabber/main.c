@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
   ModuleIdentifier moduleID = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
- if (possibleModules==0)
+  if (possibleModules==0)
     {
        fprintf(stderr,"Acquisition Library is linked to zero modules , can't possibly do anything..\n");
        return 1;
@@ -69,7 +69,6 @@ int main(int argc, char *argv[])
                                              framerate=atoi(argv[i+1]);
                                              fprintf(stderr,"Framerate , set to %u  \n",framerate);
                                          }
-
   }
 
 
@@ -112,7 +111,7 @@ int main(int argc, char *argv[])
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
 
-    for (devID=0; devID<maxDevID; devID++)
+     for (devID=0; devID<maxDevID; devID++)
       {
         acquisitionSnapFrames(moduleID,devID);
 

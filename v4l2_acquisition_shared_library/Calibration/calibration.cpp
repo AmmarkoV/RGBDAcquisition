@@ -9,11 +9,11 @@
 
 /* The list of views may look as following (discard the starting and ending ------ separators):
 -------------------
-view000.png
-view001.png
-#view002.png
-view003.png
-view010.png
+view00000.png
+view00001.png
+#view00002.png
+view00003.png
+view00010.png
 one_extra_view.jpg
 -------------------
 that is, the file will contain 6 lines, view002.png will not be used for calibration,
@@ -420,7 +420,7 @@ int main( int argc, char** argv )
 #if 1
             if( capture )
             {
-                sprintf( imagename, "view%03d.png", image_points_seq->total - 1 );
+                sprintf( imagename, "view%05d.png", image_points_seq->total - 1 );
                 cvSaveImage( imagename, view );
             }
 #endif

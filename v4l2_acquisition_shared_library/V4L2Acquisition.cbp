@@ -45,6 +45,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="V4L2Acquisition.h" />
+		<Unit filename="V4L2IntrinsicCalibration.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="V4L2IntrinsicCalibration.h" />
 		<Unit filename="V4L2Wrapper.c">
 			<Option compilerVar="CC" />
 		</Unit>

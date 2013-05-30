@@ -1,8 +1,13 @@
 #!/bin/bash
 echo "Compiling calibration.cpp using OpenCV libs"
  g++ -ggdb `pkg-config --cflags opencv` -o calibration "calibration.cpp" `pkg-config --libs opencv`;
-cp calibration cam0/calibration
-cp calibration cam1/calibration
-rm calibration
+cd cam0
+ln -s ../calibration
+cd ..
+
+cd cam1
+ln -s ../calibration
+cd ..
+ 
 echo "Done"
 exit 0
