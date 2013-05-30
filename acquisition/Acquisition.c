@@ -127,7 +127,7 @@ int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsi
 {
     //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);
 
-    if ( (width==0) || (height==0) || (channels==0) || (bitsperpixel==0) ) { fprintf(stderr,"saveRawImageToFile(%s) called with zero dimensions\n"); return 0;}
+    if ( (width==0) || (height==0) || (channels==0) || (bitsperpixel==0) ) { fprintf(stderr,"saveRawImageToFile(%s) called with zero dimensions\n",filename); return 0;}
     if(pixels==0) { fprintf(stderr,"saveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
     if (bitsperpixel>16) { fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n"); return 0; }
 
@@ -922,8 +922,8 @@ unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdenti
   unsigned int width , height , channels , bitsperpixel;
   acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
 
-  sprintf(mem, "P5%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
-  unsigned int payloadStart = strlen(mem);
+  sprintf((char*) mem, "P5%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
+  unsigned int payloadStart = strlen((char*) mem);
 
   short * memPayload = mem + payloadStart ;
   memcpy(memPayload,depth,width*height*channels*(bitsperpixel/8));
