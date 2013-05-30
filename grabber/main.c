@@ -8,6 +8,8 @@ char inputname[512]={0};
 char outputfoldername[512]={0};
 
 
+
+
 int makepath(char * path)
 {
     // FILE *fp;
@@ -40,34 +42,35 @@ int main(int argc, char *argv[])
        return 1;
     }
 
-    //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
-    unsigned int frameNum=0,maxFramesToGrab=10;
-    if (argc>1)
-     {
-          maxFramesToGrab=atoi(argv[1]);
-          fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
-     }
-    if (argc>2)
-     {
-          moduleID = getModuleIdFromModuleName(argv[2]);
-          fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
-     }
+  unsigned int width=640,height=480,framerate=25;
+  unsigned int frameNum=0,maxFramesToGrab=10;
+  int i=0;
+  for (i=0; i<argc; i++)
+  {
+    if (strcmp(argv[i],"-maxFrames")==0) {
+                                           maxFramesToGrab=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
+                                         } else
+    if (strcmp(argv[i],"-module")==0)    {
+                                           moduleID = getModuleIdFromModuleName(argv[i+1]);
+                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
+                                         } else
+    if (strcmp(argv[i],"-o")==0)         {
+                                           strcpy(outputfoldername,"frames/");
+                                           strcat(outputfoldername,argv[i+1]);
+                                           makepath(outputfoldername);
+                                           fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
+                                         } else
+    if (strcmp(argv[i],"-i")==0)         {
+                                           strcat(inputname,argv[i+1]);
+                                           fprintf(stderr,"Input , set to %s  \n",inputname);
+                                         } else
+    if (strcmp(argv[i],"-fps")==0)       {
+                                             framerate=atoi(argv[i+1]);
+                                             fprintf(stderr,"Framerate , set to %u  \n",framerate);
+                                         }
 
-    strcpy(outputfoldername,"frames/");
-    if (argc>3)
-     {
-          strcat(outputfoldername,argv[3]);
-          makepath(outputfoldername);
-          fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
-     }
-
-    strcpy(inputname,"");
-    if (argc>4)
-     {
-          strcat(inputname,argv[4]);
-          fprintf(stderr,"Input , set to %s  \n",inputname);
-     }
-
+  }
 
 
   if (!acquisitionIsModuleLinked(moduleID))
@@ -98,7 +101,7 @@ int main(int argc, char *argv[])
     for (devID=0; devID<maxDevID; devID++)
      {
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
-        acquisitionOpenDevice(moduleID,devID,devName,640,480,25);
+        acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate);
         acquisitionMapDepthToRGB(moduleID,devID);
         //acquisitionMapRGBToDepth(moduleID,devID);
      }

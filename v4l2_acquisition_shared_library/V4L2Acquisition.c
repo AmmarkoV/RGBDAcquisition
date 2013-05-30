@@ -1,5 +1,6 @@
 #include "V4L2Acquisition.h"
 #include "V4L2Wrapper.h"
+#include "V4L2IntrinsicCalibration.h"
 #include <linux/videodev2.h>
 
 int startV4L2(unsigned int max_devs,char * settings)
@@ -78,7 +79,7 @@ double getV4L2ColorPixelSize(int devID)
 }
 
 
-int setV4L2IntrinsicParameters(int devID
+int setV4L2IntrinsicParameters(int devID,
                                float fx,float fy,float cx,float cy ,
                                float k1,float k2,float p1,float p2,float k3)
 {
@@ -89,10 +90,10 @@ int setV4L2IntrinsicParameters(int devID
 
 
    camera_feeds[devID].resectionPrecalculations = (unsigned int *) malloc( camera_feeds[devID].width * camera_feeds[devID].height * sizeof(unsigned int) );
-   PrecalcResectioning(camera_feeds[devID].resectionPrecalculations,fx,fy,cx,cy,k1,k2,p1,p2,k3);
+   PrecalcResectioning(camera_feeds[devID].resectionPrecalculations,camera_feeds[devID].width,camera_feeds[devID].height,fx,fy,cx,cy,k1,k2,p1,p2,k3);
 }
 
-int getV4L2IntrinsicParameters(int devID
+int getV4L2IntrinsicParameters(int devID,
                                float *fx,float *fy,float *cx,float *cy ,
                                float *k1,float *k2,float *p1,float *p2,float *k3)
 {
