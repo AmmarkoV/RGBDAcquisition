@@ -7,9 +7,9 @@ cd grabber
 cd ..
 fi
 
-if [ -d acquisitionBroadacst ]
+if [ -d acquisitionBroadcast ]
 then  
-cd acquisitionBroadacst
+cd acquisitionBroadcast
 ./make.sh
 cd ..
 fi
