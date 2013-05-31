@@ -24,7 +24,7 @@ else
      #should be at 3dparty dir
      cd ..  
      #should be at root dir
-     for f in BINARIES_THAT_NEED_LIBS
+     for f in $BINARIES_THAT_NEED_LIBS
            do  
              if [ -d $f ]
               then
@@ -32,6 +32,8 @@ else
                ln -s ../3dparty/libfreenect/build/lib/libfreenect.so
                ln -s ../3dparty/libfreenect/build/lib/libfreenect_sync.so 
                cd ..
+             else
+              echo "Could not create links for $f"
              fi
            done
 
@@ -64,7 +66,7 @@ else
      #should be at 3dparty dir
      cd ..  
      #should be at root dir
-     for f in BINARIES_THAT_NEED_LIBS
+     for f in $BINARIES_THAT_NEED_LIBS
            do  
              if [ -d $f ]
               then
@@ -75,6 +77,8 @@ else
                ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so 
                ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so 
                cd ..
+             else
+              echo "Could not create links for $f"
              fi
            done
 
@@ -103,7 +107,7 @@ else
      #should be at 3dparty dir
      cd ..  
      #should be at root dir
-     for f in BINARIES_THAT_NEED_LIBS
+     for f in $BINARIES_THAT_NEED_LIBS
            do  
              if [ -d $f ]
               then
@@ -113,6 +117,8 @@ else
                ln -s ../3dparty/OpenNI2/Config/PS1080.ini 
                ln -s ../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so 
                cd ..
+             else
+              echo "Could not create links for $f"
              fi
            done
 
