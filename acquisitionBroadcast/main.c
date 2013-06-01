@@ -31,47 +31,47 @@ struct AmmServer_RH_Context control={0};
 
 int autoSnapFeed=1;
 
-void * prepare_RGB_RAW_frame_content_callback(char * content)
+void * prepare_RGB_RAW_frame_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
 {
-  rgbRAWFrame.content_size = acquisitionCopyColorFrame(moduleID,0,content,rgbRAWFrame.MAX_content_size);
+  rqst->content_size = acquisitionCopyColorFrame(moduleID,0,rqst->content,rqst->MAX_content_size);
   return 0;
 }
 
-void * prepare_RGB_PPM_frame_content_callback(char * content)
+void * prepare_RGB_PPM_frame_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
 {
-  rgbPPMFrame.content_size =  acquisitionCopyColorFramePPM(moduleID,0,content,rgbPPMFrame.MAX_content_size);
+  rqst->content_size =  acquisitionCopyColorFramePPM(moduleID,0,rqst->content,rqst->MAX_content_size);
   return 0;
 }
 
-void * prepare_Depth_RAW_frame_content_callback(char * content)
+void * prepare_Depth_RAW_frame_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
 {
-  depthRAWFrame.content_size = acquisitionCopyDepthFrame(moduleID,0,(short*) content,depthRAWFrame.MAX_content_size);
+  rqst->content_size = acquisitionCopyDepthFrame(moduleID,0,(short*) rqst->content,rqst->MAX_content_size);
   return 0;
 }
 
-void * prepare_Depth_PPM_frame_content_callback(char * content)
+void * prepare_Depth_PPM_frame_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
 {
-  depthPPMFrame.content_size =  acquisitionCopyDepthFramePPM(moduleID,0,(short*) content,depthPPMFrame.MAX_content_size);
+  rqst->content_size =  acquisitionCopyDepthFramePPM(moduleID,0,(short*) rqst->content,rqst->MAX_content_size);
   return 0;
 }
 
-void * prepare_control_content_callback(char * content)
+void * prepare_control_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
 {
-   sprintf(content,"<html><body>OK</body></html>");
-   control.content_size =  strlen(content);
+   sprintf(rqst->content,"<html><body>OK</body></html>");
+   rqst->content_size =  strlen(rqst->content);
 
    char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
    if (bufferCommand!=0)
           {
-            if ( _GET(default_server,&control,"seek",bufferCommand,256) )
+            if ( _GET(default_server,rqst,"seek",bufferCommand,256) )
                 {
                   unsigned int seekFrame = atoi(bufferCommand);
                   acquisitionSeekFrame(moduleID,0,seekFrame);
                   acquisitionSnapFrames(moduleID,0);
                 }
-            if ( _GET(default_server,&control,"pause",bufferCommand,256) ) { autoSnapFeed = 0; }
-            if ( _GET(default_server,&control,"play",bufferCommand,256) )  { autoSnapFeed = 1; }
-            if ( _GET(default_server,&control,"snap",bufferCommand,256) )  { acquisitionSnapFrames(moduleID,0); }
+            if ( _GET(default_server,rqst,"pause",bufferCommand,256) ) { autoSnapFeed = 0; }
+            if ( _GET(default_server,rqst,"play",bufferCommand,256) )  { autoSnapFeed = 1; }
+            if ( _GET(default_server,rqst,"snap",bufferCommand,256) )  { acquisitionSnapFrames(moduleID,0); }
           }
   return 0;
 }

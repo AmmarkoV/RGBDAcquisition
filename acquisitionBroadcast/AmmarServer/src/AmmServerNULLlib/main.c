@@ -116,33 +116,33 @@ int AmmServer_GetInfo(struct AmmServer_Instance * instance,unsigned int info_typ
 }
 
 
-int AmmServer_POSTArg(struct AmmServer_Instance * instance,struct AmmServer_RH_Context * context,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
+int AmmServer_POSTArg(struct AmmServer_Instance * instance,struct AmmServer_DynamicRequestContext * rqst,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
 { 
   return 0;
 }
 
-int AmmServer_GETArg(struct AmmServer_Instance * instance,struct AmmServer_RH_Context * context,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
+int AmmServer_GETArg(struct AmmServer_Instance * instance,struct AmmServer_DynamicRequestContext * rqst,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
 { 
   return 0;
 }
 
-int AmmServer_FILES(struct AmmServer_Instance * instance,struct AmmServer_RH_Context * context,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
+int AmmServer_FILES(struct AmmServer_Instance * instance,struct AmmServer_DynamicRequestContext * rqst,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
 { 
   return 0;
 }
  
 
-int _POST(struct AmmServer_Instance * instance,struct AmmServer_RH_Context * context,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
+int _POST(struct AmmServer_Instance * instance,struct AmmServer_DynamicRequestContext * rqst,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
 {
     return 0;
 }
 
-int _GET(struct AmmServer_Instance * instance,struct AmmServer_RH_Context * context,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
+int _GET(struct AmmServer_Instance * instance,struct AmmServer_DynamicRequestContext * rqst,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
 {
     return 0;
 }
 
-int _FILES(struct AmmServer_Instance * instance,struct AmmServer_RH_Context * context,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
+int _FILES(struct AmmServer_Instance * instance,struct AmmServer_DynamicRequestContext * rqst,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT)
 {
     return 0;
 }

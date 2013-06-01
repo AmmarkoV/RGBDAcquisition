@@ -33,6 +33,14 @@ cd AmmServerNULLlib
 cd ..
 fi
  
+# Third the Captcha library that might be used by other projects 
+if [ -d AmmCaptcha ]
+then 
+cd AmmCaptcha
+./make $@
+cd ..
+fi
+
 # Mini Clients go afterwards ----------------
 if [ -d MyURL ]
 then 
