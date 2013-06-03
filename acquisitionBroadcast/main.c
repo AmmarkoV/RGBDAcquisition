@@ -31,31 +31,31 @@ struct AmmServer_RH_Context control={0};
 
 int autoSnapFeed=1;
 
-void * prepare_RGB_RAW_frame_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
+void * prepare_RGB_RAW_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   rqst->content_size = acquisitionCopyColorFrame(moduleID,0,rqst->content,rqst->MAX_content_size);
   return 0;
 }
 
-void * prepare_RGB_PPM_frame_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
+void * prepare_RGB_PPM_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   rqst->content_size =  acquisitionCopyColorFramePPM(moduleID,0,rqst->content,rqst->MAX_content_size);
   return 0;
 }
 
-void * prepare_Depth_RAW_frame_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
+void * prepare_Depth_RAW_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   rqst->content_size = acquisitionCopyDepthFrame(moduleID,0,(short*) rqst->content,rqst->MAX_content_size);
   return 0;
 }
 
-void * prepare_Depth_PPM_frame_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
+void * prepare_Depth_PPM_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   rqst->content_size =  acquisitionCopyDepthFramePPM(moduleID,0,(short*) rqst->content,rqst->MAX_content_size);
   return 0;
 }
 
-void * prepare_control_content_callback(struct AmmServer_DynamicRequestContext  * rqst)
+void * prepare_control_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
    sprintf(rqst->content,"<html><body>OK</body></html>");
    rqst->content_size =  strlen(rqst->content);
