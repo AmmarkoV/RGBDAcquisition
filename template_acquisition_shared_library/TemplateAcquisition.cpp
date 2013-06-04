@@ -5,7 +5,7 @@
 #include <math.h>
 
 
-#define MAX_TEMPLATE_DEVICES 32
+#define MAX_TEMPLATE_DEVICES 12
 #define MAX_DIR_PATH 1024
 #define PPMREADBUFLEN 256
 
@@ -20,7 +20,7 @@ struct TemplateVirtualDevice
  short * templateDepthFrame;
 };
 
-struct TemplateVirtualDevice device[MAX_TEMPLATE_DEVICES];
+struct TemplateVirtualDevice device[MAX_TEMPLATE_DEVICES]={0};
 
 
 
@@ -149,21 +149,31 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
   return 0;
 }
 
-//device[devID].
+
 
 int startTemplate(unsigned int max_devs,char * settings)
 {
-    memset(device,0,sizeof(struct TemplateVirtualDevice)*MAX_TEMPLATE_DEVICES);
-
     unsigned int devID = 0;
     for (devID=0; devID<MAX_TEMPLATE_DEVICES; devID++)
     {
+        //fprintf(stderr,"Zeroing device %u\n",devID);
         device[devID].templateWIDTH = 640;
         device[devID].templateHEIGHT = 480;
+
+        device[devID].readFromDir[0]=0; // <- this sucks i know :P
+        device[devID].cycle=0;
+
+        device[devID].templateColorFrame=0;
+        device[devID].templateDepthFrame=0;
     }
 
+    fprintf(stderr,"startTemplate done \n");
     return 1;
 }
+
+
+
+
 int getTemplateNumberOfDevices() { return 1; }
 
 int stopTemplate()

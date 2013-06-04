@@ -89,12 +89,12 @@ struct AmmServer_DynamicRequest
    unsigned int headerResponse;
 
    char * content;
-   unsigned long content_size;
-   unsigned long MAX_content_size;
+   unsigned long contentSize;
+   unsigned long MAXcontentSize;
 
    char * compressedContent;
    unsigned long compressedContentSize;
-   unsigned long MAX_compressedContentSize;
+   unsigned long MAXcompressedContentSize;
 
    char * GET_request;
    unsigned int GET_request_length;
@@ -102,6 +102,8 @@ struct AmmServer_DynamicRequest
    char * POST_request;
    unsigned int POST_request_length;
 
+
+   unsigned int clientID;
 };
 
 
@@ -210,7 +212,17 @@ int AmmServer_Running(struct AmmServer_Instance * instance);
 
 int AmmServer_AddRequestHandler(struct AmmServer_Instance * instance,struct AmmServer_RequestOverride_Context * RequestOverrideContext,char * request_type,void * callback);
 
-int AmmServer_AddResourceHandler(struct AmmServer_Instance * instance,struct AmmServer_RH_Context * context, char * resource_name , char * web_root, unsigned int allocate_mem_bytes,unsigned int callback_every_x_msec,void * callback,unsigned int scenario);
+int AmmServer_AddResourceHandler
+     ( struct AmmServer_Instance * instance,
+       struct AmmServer_RH_Context * context,
+       char * resource_name ,
+       char * web_root,
+       unsigned int allocate_mem_bytes,
+       unsigned int callback_every_x_msec,
+       void * callback,
+       unsigned int scenario
+    );
+
 int AmmServer_RemoveResourceHandler(struct AmmServer_Instance * instance,struct AmmServer_RH_Context * context,unsigned char free_mem);
 
 int AmmServer_GetInfo(struct AmmServer_Instance * instance,unsigned int info_type);
@@ -226,7 +238,7 @@ int _POST (struct AmmServer_Instance * instance,struct AmmServer_DynamicRequest 
 int _GET  (struct AmmServer_Instance * instance,struct AmmServer_DynamicRequest * rqst,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT);
 int _FILES(struct AmmServer_Instance * instance,struct AmmServer_DynamicRequest * rqst,char * var_id_IN,char * var_value_OUT,unsigned int max_var_value_OUT);
 
-int AmmServer_SignalCountAsBadRequest(struct AmmServer_Instance * instance,struct AmmServer_DynamicRequest * rqst);
+int AmmServer_SignalCountAsBadClientBehaviour(struct AmmServer_Instance * instance,struct AmmServer_DynamicRequest * rqst);
 
 int AmmServer_DoNOTCacheResourceHandler(struct AmmServer_Instance * instance,struct AmmServer_RH_Context * context);
 int AmmServer_DoNOTCacheResource(struct AmmServer_Instance * instance,char * resource_name);

@@ -33,32 +33,32 @@ int autoSnapFeed=1;
 
 void * prepare_RGB_RAW_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  rqst->content_size = acquisitionCopyColorFrame(moduleID,0,rqst->content,rqst->MAX_content_size);
+  rqst->contentSize = acquisitionCopyColorFrame(moduleID,0,rqst->content,rqst->MAXcontentSize);
   return 0;
 }
 
 void * prepare_RGB_PPM_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  rqst->content_size =  acquisitionCopyColorFramePPM(moduleID,0,rqst->content,rqst->MAX_content_size);
+  rqst->contentSize =  acquisitionCopyColorFramePPM(moduleID,0,rqst->content,rqst->MAXcontentSize);
   return 0;
 }
 
 void * prepare_Depth_RAW_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  rqst->content_size = acquisitionCopyDepthFrame(moduleID,0,(short*) rqst->content,rqst->MAX_content_size);
+  rqst->contentSize = acquisitionCopyDepthFrame(moduleID,0,(short*) rqst->content,rqst->MAXcontentSize);
   return 0;
 }
 
 void * prepare_Depth_PPM_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  rqst->content_size =  acquisitionCopyDepthFramePPM(moduleID,0,(short*) rqst->content,rqst->MAX_content_size);
+  rqst->contentSize =  acquisitionCopyDepthFramePPM(moduleID,0,(short*) rqst->content,rqst->MAXcontentSize);
   return 0;
 }
 
 void * prepare_control_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
    sprintf(rqst->content,"<html><body>OK</body></html>");
-   rqst->content_size =  strlen(rqst->content);
+   rqst->contentSize =  strlen(rqst->content);
 
    char * bufferCommand = (char *) malloc ( 256 * sizeof(char) );
    if (bufferCommand!=0)
@@ -109,11 +109,18 @@ int main(int argc, char *argv[])
 
  char * readPass=0;
  char readFrom[128]={0};
- if (argc>1) {strncpy(readFrom,argv[1],128); readPass=readFrom; }
+ if (argc>1)
+     {
+      strncpy(readFrom,argv[1],128); readPass=readFrom;
+      fprintf(stderr,"Will Try to open %s\n",readFrom);
+     }
 
  if (possibleModules==0) { AmmServer_Error("Acquisition Library is linked to zero modules , can't possibly do anything..\n"); return 1; }
  if (!acquisitionIsModuleLinked(moduleID)) {AmmServer_Error("The module you are trying to use is not linked in this build of the Acquisition library..\n"); return 1; }
- if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , readPass )) { AmmServer_Error("Could not start module %s ..\n",getModuleStringName(moduleID)); return 1; }
+
+ fprintf(stderr,"Will Try to open module\n");
+ if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 )) { AmmServer_Error("Could not start module %s ..\n",getModuleStringName(moduleID)); return 1; }
+ fprintf(stderr,"OK\n");
 
   //We want to initialize all possible devices in this example..
   unsigned int devID=0,maxDevID=acquisitionGetModuleDevices(moduleID);
@@ -130,7 +137,7 @@ int main(int argc, char *argv[])
    init_dynamic_content();
    while ( (AmmServer_Running(default_server)) )
    { //Do sampling here
-     if (!autoSnapFeed)
+     if (autoSnapFeed)
      {
        for (devID=0; devID<maxDevID; devID++) { acquisitionSnapFrames(moduleID,devID); }
      }
