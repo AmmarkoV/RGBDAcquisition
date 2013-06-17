@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
         acquisitionMapDepthToRGB(moduleID,devID);
      }
 
-   default_server = AmmServer_Start ( DEFAULT_BINDING_IP, DEFAULT_BINDING_PORT, 0 /*don't want a configuration file*/ , webserver_root, templates_root );
+   default_server = AmmServer_Start ( "acquisitionBroadcast",DEFAULT_BINDING_IP, DEFAULT_BINDING_PORT, 0 /*don't want a configuration file*/ , webserver_root, templates_root );
    if (!default_server) { AmmServer_Error("Could not start server , shutting down everything.."); exit(1); }
    init_dynamic_content();
    while ( (AmmServer_Running(default_server)) )
