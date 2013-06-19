@@ -55,16 +55,23 @@ int main(int argc, char *argv[])
                                            moduleID = getModuleIdFromModuleName(argv[i+1]);
                                            fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
                                          } else
-    if (strcmp(argv[i],"-o")==0)         {
-                                           strcpy(outputfoldername,"frames/");
-                                           strcat(outputfoldername,argv[i+1]);
-                                           makepath(outputfoldername);
-                                           fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
-                                         } else
-    if (strcmp(argv[i],"-i")==0)         {
-                                           strcat(inputname,argv[i+1]);
-                                           fprintf(stderr,"Input , set to %s  \n",inputname);
-                                         } else
+    if (
+         (strcmp(argv[i],"-to")==0) ||
+         (strcmp(argv[i],"-o")==0)
+        )
+        {
+          strcpy(outputfoldername,"frames/");
+          strcat(outputfoldername,argv[i+1]);
+          makepath(outputfoldername);
+          fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
+         }
+       else
+    if (
+        (strcmp(argv[i],"-from")==0) ||
+        (strcmp(argv[i],"-i")==0)
+       )
+       { strcat(inputname,argv[i+1]); fprintf(stderr,"Input , set to %s  \n",inputname); }
+      else
     if (strcmp(argv[i],"-fps")==0)       {
                                              framerate=atoi(argv[i+1]);
                                              fprintf(stderr,"Framerate , set to %u  \n",framerate);

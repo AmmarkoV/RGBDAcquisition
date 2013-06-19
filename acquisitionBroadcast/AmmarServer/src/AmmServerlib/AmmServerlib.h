@@ -36,15 +36,24 @@ enum TypesOfRequests
 #define MAX_QUERY 512
 #define MAX_RESOURCE 512
 #define MAX_FILE_PATH 1024
+#define MAX_INSTANCE_NAME_STRING 128
 
 
-struct HTTPRequest
+
+
+struct HTTPHeader
 {
+   char * headerRAW;
+   unsigned int headerRAWSize;
+
    int  requestType; //See enum TypesOfRequests
    char resource[MAX_RESOURCE+1];
    char verified_local_resource[MAX_FILE_PATH+1];
    char GETquery[MAX_QUERY+1];
-   char POSTquery[4*MAX_QUERY+1];
+
+   char * POSTrequest;
+   unsigned long POSTrequestSize;
+
    unsigned char authorized;
    unsigned char keepalive;
    unsigned char supports_compression;
@@ -53,19 +62,43 @@ struct HTTPRequest
    unsigned long range_start;
    unsigned long range_end;
 
-   /*! IMPORTANT update FIELDS_TO_CLEAR_FROM_HTTP_REQUEST when I add something here.. */
-   char * ETag; //<-   *THIS SHOULD BE CLEARED AFTER USAGE*
-   char * Cookie; //<-   *THIS SHOULD BE CLEARED AFTER USAGE*
-   char * Host; //<-     *THIS SHOULD BE CLEARED AFTER USAGE*
-   char * Referer; //<-  *THIS SHOULD BE CLEARED AFTER USAGE*
-   char * UserAgent;//<- *THIS SHOULD BE CLEARED AFTER USAGE*
-   char * ContentType; //<- for POST requests *THIS SHOULD BE CLEARED AFTER USAGE*
+
    unsigned long ContentLength; //<- for POST requests
-   //Languages etc here..!
+
+   //The next strings point directly on the header to keep memory usage on a minimum
+   //and performance on the maximum :P
+   char * cookie; //<-   *THIS POINTS SOMEWHERE INSIDE headerRAW , or is 0 *
+   unsigned int cookieLength;
+
+   char * host; //<-     *THIS POINTS SOMEWHERE INSIDE headerRAW , or is 0 *
+   unsigned int hostLength;
+
+   char * referer; //<-  *THIS POINTS SOMEWHERE INSIDE headerRAW , or is 0 *
+   unsigned int refererLength;
+
+   char * eTag; //<-    *THIS POINTS SOMEWHERE INSIDE headerRAW , or is 0 *
+   unsigned int eTagLength;
+
+   char * userAgent; //<-    *THIS POINTS SOMEWHERE INSIDE headerRAW , or is 0 *
+   unsigned int userAgentLength;
+
+   char * contentType; //<-    *THIS POINTS SOMEWHERE INSIDE headerRAW , or is 0 *
+   unsigned int contentTypeLength;
+
+   char * contentDisposition;  //<-    *THIS POINTS SOMEWHERE INSIDE headerRAW , or is 0 *
+   unsigned int contentDispositionLength;
+
+   char * boundary;  //<-    *THIS POINTS SOMEWHERE INSIDE headerRAW , or is 0 *
+   unsigned int boundaryLength;
+
 };
-/*! IMPORTANT @@@ */
-#define FIELDS_TO_CLEAR_FROM_HTTP_REQUEST 6
-/*! IMPORTANT @@@*/
+
+
+struct HTTPOutHeader
+{
+  unsigned int responseNumber;
+};
+
 
 
 
@@ -78,7 +111,7 @@ enum RHScenarios
 struct AmmServer_RequestOverride_Context
 {
    char requestHeader[64]; //Initial request ( GET , HEAD , CONNECT )
-   struct HTTPRequest * request;
+   struct HTTPHeader * request;
    void * request_override_callback;
 };
 
@@ -143,6 +176,7 @@ struct AmmServer_Instance_Settings
 
 struct AmmServer_Instance
 {
+    char instanceName[MAX_INSTANCE_NAME_STRING];
     struct AmmServer_Instance_Settings settings;
 
     unsigned int prespawn_turn_to_serve;
@@ -169,13 +203,36 @@ struct AmmServer_Instance
 
     pthread_t server_thread_id;
     pthread_t * threads_pool;
+    //pthread_attr_t attr;
 
     void * prespawned_pool; //Actually struct PreSpawnedThread * but declared as a void pointer here
 
     struct AmmServer_RequestOverride_Context * clientRequestHandlerOverrideContext;
+
+    char webserver_root[MAX_FILE_PATH];
+    char templates_root[MAX_FILE_PATH];
 };
 
 
+
+
+struct HTTPTransaction
+{
+  struct AmmServer_Instance * instance;
+
+  struct HTTPHeader incomingHeader;
+
+  struct HTTPOutHeader outgoingHeader;
+  char * outgoingBody;
+  unsigned int outgoingBodySize;
+
+  unsigned int resourceCacheID;
+
+  int clientSock;
+  unsigned int clientListID;
+  unsigned int threadID;
+  int prespawnedThreadFlag;
+};
 
 
 enum AmmServInfos
@@ -205,7 +262,7 @@ void AmmServer_Warning( const char *format , ... );
 void AmmServer_Error( const char *format , ... );
 void AmmServer_Success( const char *format , ... );
 
-struct AmmServer_Instance * AmmServer_Start(char * ip,unsigned int port,char * conf_file,char * web_root_path,char * templates_root_path);
+struct AmmServer_Instance * AmmServer_Start(char * name ,char * ip,unsigned int port,char * conf_file,char * web_root_path,char * templates_root_path);
 int AmmServer_Stop(struct AmmServer_Instance * instance);
 int AmmServer_Running(struct AmmServer_Instance * instance);
 
@@ -252,6 +309,7 @@ int AmmServer_SelfCheck(struct AmmServer_Instance * instance);
 
 int AmmServer_ReplaceVarInMemoryFile(char * page,unsigned int pageLength,char * var,char * value);
 char * AmmServer_ReadFileToMemory(char * filename,unsigned int *length );
+int AmmServer_WriteFileFromMemory(char * filename,char * memory , unsigned int memoryLength);
 
 int AmmServer_RegisterTerminationSignal(void * callback);
 

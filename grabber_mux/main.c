@@ -7,6 +7,10 @@
 
 char outputfoldername[512]={0};
 
+
+char inputname1[512]={0};
+char inputname2[512]={0};
+
 int makepath(char * path)
 {
     //FILE *fp;
@@ -35,30 +39,49 @@ int main(int argc, char *argv[])
   unsigned int frameNum=0,maxFramesToGrab=10;
   ModuleIdentifier moduleID_1 = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
   ModuleIdentifier moduleID_2 = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
+  strcpy(outputfoldername,"frames/");
 
   /*! --------------------------------- INITIALIZATION FROM COMMAND LINE PARAMETERS --------------------------------- */
-    if (argc>1)
-     {
-          maxFramesToGrab=atoi(argv[1]);
-          fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
-     }
-    if (argc>2)
-     {
-          moduleID_1 = getModuleIdFromModuleName(argv[2]);
-          fprintf(stderr,"Overriding Module Used as device A (BASE) , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
-     }
-    if (argc>3)
-     {
-          moduleID_2 = getModuleIdFromModuleName(argv[3]);
-          fprintf(stderr,"Overriding Module Used as device B (OVERLAY), set to %s ( %u ) \n",getModuleStringName(moduleID_2),moduleID_2);
-     }
-    strcpy(outputfoldername,"frames/");
-    if (argc>4)
-     {
-          strcat(outputfoldername,argv[4]);
-          makepath(outputfoldername);
-          fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
-     }
+
+  int i=0;
+  for (i=0; i<argc; i++)
+  {
+    if (strcmp(argv[i],"-maxFrames")==0) {
+                                           maxFramesToGrab=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
+                                         } else
+    if (strcmp(argv[i],"-module1")==0)    {
+                                           moduleID_1 = getModuleIdFromModuleName(argv[i+1]);
+                                           fprintf(stderr,"Overriding Module 1 Used , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
+                                         } else
+    if (strcmp(argv[i],"-module2")==0)   {
+                                           moduleID_2 = getModuleIdFromModuleName(argv[i+1]);
+                                           fprintf(stderr,"Overriding Module 2 Used , set to %s ( %u ) \n",getModuleStringName(moduleID_2),moduleID_2);
+                                         } else
+    if (
+        (strcmp(argv[i],"-from1")==0) ||
+        (strcmp(argv[i],"-i1")==0)
+       )
+       { strcat(inputname1,argv[i+1]); fprintf(stderr,"Input , set to %s  \n",inputname1); }
+      else
+    if (
+         (strcmp(argv[i],"-from2")==0)||
+         (strcmp(argv[i],"-i2")==0)
+       )
+       { strcat(inputname2,argv[i+1]); fprintf(stderr,"Input , set to %s  \n",inputname2); }
+      else
+    if (
+        (strcmp(argv[i],"-o")==0) ||
+        (strcmp(argv[i],"-to")==0)
+       )
+                                         {
+                                           strcpy(outputfoldername,"frames/");
+                                           strcat(outputfoldername,argv[i+1]);
+                                           makepath(outputfoldername);
+                                           fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
+                                         }
+  }
+
 
   if (!acquisitionIsModuleLinked(moduleID_1))
    {
@@ -72,19 +95,6 @@ int main(int argc, char *argv[])
        return 1;
    }
   /*! --------------------------------- INITIALIZATION FROM COMMAND LINE PARAMETERS END --------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -105,13 +115,16 @@ int main(int argc, char *argv[])
   //We want to initialize all possible devices in this example..
   unsigned int devID_1=0 , devID_2=0;
 
-
+  char * devName1 = inputname1;
+  if (strlen(inputname1)<1) { devName1=0; }
+  char * devName2 = inputname2;
+  if (strlen(inputname2)<1) { devName2=0; }
 
     //Initialize Every OpenNI Device
-    acquisitionOpenDevice(moduleID_1,devID_1,0,640,480,25);
+    acquisitionOpenDevice(moduleID_1,devID_1,devName1,640,480,25);
     acquisitionMapDepthToRGB(moduleID_1,devID_1);
 
-    acquisitionOpenDevice(moduleID_2,devID_2,0,640,480,25);
+    acquisitionOpenDevice(moduleID_2,devID_2,devName2,640,480,25);
     acquisitionMapDepthToRGB(moduleID_2,devID_2);
 
 

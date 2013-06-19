@@ -58,7 +58,7 @@ int AmmServer_Stop(struct AmmServer_Instance * instance)
   return 0;
 }
 
-struct AmmServer_Instance * AmmServer_Start(char * ip,unsigned int port,char * conf_file,char * web_root_path,char * templates_root_path)
+struct AmmServer_Instance * AmmServer_Start(char * name,char * ip,unsigned int port,char * conf_file,char * web_root_path,char * templates_root_path)
 {
   fprintf(stderr,"Binding Null AmmarServer to %s:%u\n",ip,port);
 

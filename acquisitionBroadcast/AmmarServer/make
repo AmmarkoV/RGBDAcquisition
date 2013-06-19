@@ -16,6 +16,17 @@ echo " "
 echo "Starting build process"
 echo "---------------------------------"
 
+
+# Make the automatic string scanners 
+if [ -d StringRecognizer ]
+then 
+cd StringRecognizer
+./make $@
+./generateAmmServerScanners.sh
+cd ..
+fi
+
+
 # Make each of the parts of the project!
 # First of all the main library
 if [ -d AmmServerlib ]
