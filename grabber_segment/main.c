@@ -6,6 +6,7 @@
 #include "../acquisitionSegment/AcquisitionSegment.h"
 
 char outputfoldername[512]={0};
+char inputname[512]={0};
 
 int makepath(char * path)
 {
@@ -36,23 +37,36 @@ int main(int argc, char *argv[])
   ModuleIdentifier moduleID_1 = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
   /*! --------------------------------- INITIALIZATION FROM COMMAND LINE PARAMETERS --------------------------------- */
-    if (argc>1)
-     {
-          maxFramesToGrab=atoi(argv[1]);
-          fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
-     }
-    if (argc>2)
-     {
-          moduleID_1 = getModuleIdFromModuleName(argv[2]);
-          fprintf(stderr,"Overriding Module Used as device A (BASE) , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
-     }
-    strcpy(outputfoldername,"frames/");
-    if (argc>3)
-     {
-          strcat(outputfoldername,argv[3]);
+
+  int i=0;
+  for (i=0; i<argc; i++)
+  {
+    if (strcmp(argv[i],"-maxFrames")==0) {
+                                           maxFramesToGrab=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
+                                         } else
+    if (strcmp(argv[i],"-module")==0)    {
+                                           moduleID_1 = getModuleIdFromModuleName(argv[i+1]);
+                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
+                                         } else
+    if (
+         (strcmp(argv[i],"-to")==0) ||
+         (strcmp(argv[i],"-o")==0)
+        )
+        {
+          strcpy(outputfoldername,"frames/");
+          strcat(outputfoldername,argv[i+1]);
           makepath(outputfoldername);
           fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
-     }
+         }
+       else
+    if (
+        (strcmp(argv[i],"-from")==0) ||
+        (strcmp(argv[i],"-i")==0)
+       )
+       { strcat(inputname,argv[i+1]); fprintf(stderr,"Input , set to %s  \n",inputname); }
+  }
+
 
   if (!acquisitionIsModuleLinked(moduleID_1))
    {
@@ -74,9 +88,11 @@ int main(int argc, char *argv[])
    unsigned int devID_1=0 ;
 
 
+   char * devName = inputname;
+   if (strlen(inputname)<1) { devName=0; }
 
     //Initialize Every OpenNI Device
-    acquisitionOpenDevice(moduleID_1,devID_1,"trident2",640,480,25);
+    acquisitionOpenDevice(moduleID_1,devID_1,devName,640,480,25);
     acquisitionMapDepthToRGB(moduleID_1,devID_1);
 
 
