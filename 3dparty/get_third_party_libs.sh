@@ -47,7 +47,7 @@ if [ -d OpenNI ]
 then
 echo "OpenNI1 appears to already exist .."
 else
-  echo "Do you want to download freenect ? " 
+  echo "Do you want to download OpenNI1 ? " 
   echo
   echo -n " (Y/N)?"
   read answer
@@ -93,7 +93,7 @@ if [ -d OpenNI2 ]
 then
 echo "OpenNI2 appears to already exist .."
 else
-  echo "Do you want to download it ? " 
+  echo "Do you want to download OpenNI2 ? " 
   echo
   echo -n " (Y/N)?"
   read answer
