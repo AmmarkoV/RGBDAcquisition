@@ -4,13 +4,15 @@
 
 struct SegmentationFeaturesRGB
 {
-   unsigned char minR ,  minG ,  minB;
-   unsigned char maxR , maxG , maxB;
+   unsigned int minR ,  minG ,  minB;
+   unsigned int maxR , maxG , maxB;
 
    unsigned int minX , maxX;
    unsigned int minY , maxY;
 
 
+   unsigned char replaceR , replaceG , replaceB;
+   char enableReplacingColors;
 };
 
 

@@ -25,7 +25,7 @@ char * segmentRGBFrame(char * source , unsigned int width , unsigned int height 
  char * targetPixels = targetPixelsStart;
 
  unsigned int x=0 , y=0;
- char * R , * G , * B;
+ unsigned char * R , * G , * B;
  while (sourcePixels<sourcePixelsEnd)
  {
 
@@ -50,9 +50,18 @@ char * segmentRGBFrame(char * source , unsigned int width , unsigned int height 
                (segConf->minX <= x) && ( x<= segConf->maxX)
            )
        {
-         *targetPixels=*R; targetPixels++;
-         *targetPixels=*G; targetPixels++;
-         *targetPixels=*B; targetPixels++;
+         if (segConf->enableReplacingColors)
+         {
+           *targetPixels=segConf->replaceR; targetPixels++;
+           *targetPixels=segConf->replaceG; targetPixels++;
+           *targetPixels=segConf->replaceB; targetPixels++;
+         }
+          else
+         {
+          *targetPixels=*R; targetPixels++;
+          *targetPixels=*G; targetPixels++;
+          *targetPixels=*B; targetPixels++;
+         }
        } else
        {
          targetPixels+=3;
