@@ -579,6 +579,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    //fprintf(stderr,"acquisitionSnapFrames called moduleID=%u devID=%u\n",moduleID,devID);
     switch (moduleID)
     {
       #if USE_V4L2

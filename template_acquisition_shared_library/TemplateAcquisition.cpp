@@ -4,15 +4,17 @@
 #include <string.h>
 #include <math.h>
 
-
-#define MAX_TEMPLATE_DEVICES 12
+#define SAFEGUARD_VALUE 123123
+#define MAX_TEMPLATE_DEVICES 5
 #define MAX_DIR_PATH 1024
 #define PPMREADBUFLEN 256
 
 struct TemplateVirtualDevice
 {
  char readFromDir[MAX_DIR_PATH]; // <- this sucks i know :P
- unsigned short cycle;
+ unsigned int cycle;
+ unsigned int safeGUARD;
+
 
  unsigned int templateWIDTH;
  unsigned int templateHEIGHT;
@@ -163,6 +165,8 @@ int startTemplate(unsigned int max_devs,char * settings)
         device[devID].readFromDir[0]=0; // <- this sucks i know :P
         device[devID].cycle=0;
 
+        device[devID].safeGUARD = SAFEGUARD_VALUE;
+
         device[devID].templateColorFrame=0;
         device[devID].templateDepthFrame=0;
     }
@@ -276,8 +280,11 @@ int snapTemplateFrames(int devID)
   file_name_test=0;
 
   ++device[devID].cycle;
+  if ( device[devID].safeGUARD != SAFEGUARD_VALUE ) { fprintf(stderr,"\n\n\n\nERROR , memory corruption \n\n\n\n"); }
+
   if (device[devID].cycle>65534) { device[devID].cycle=0; }
-  if (found_frames!=2) { device[devID].cycle = 0; }
+  if (found_frames==0) { fprintf(stderr,"Could not find any frames , we finished stream \n");  device[devID].cycle = 0; } else
+  if (found_frames!=2) { fprintf(stderr,"\n Warning: Did not find both frames\n");   }
 
   return 1;
 }
