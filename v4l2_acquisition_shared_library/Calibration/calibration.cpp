@@ -249,11 +249,11 @@ void save_camera_params( const char* out_filename, int image_count, CvSize img_s
  
     if( extr_params )
     {
-      fprintf( fp, "%%Translation T.X, T.Y, T.Z\n");
+      fprintf( fp, "%%Translation T.X, T.Y, T.Z  %ux%u\n",extr_params->rows,extr_params->cols);
       fprintf( fp, "%%T\n");
       fprintf( fp, "%0.13f\n",extr_params->data.fl[1]); fprintf( fp, "%0.13f\n",extr_params->data.fl[2]); fprintf( fp, "%0.13f\n",extr_params->data.fl[3]);
 
-      fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z\n");
+      fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z  %ux%u\n",extr_params->rows,extr_params->cols);
       fprintf( fp, "%%R\n");
       fprintf( fp, "%0.13f\n",extr_params->data.fl[0]); fprintf( fp, "%0.13f\n",extr_params->data.fl[1]); fprintf( fp, "%0.13f\n",extr_params->data.fl[2]);
       //cvWrite( fs, "extrinsic_parameters", extr_params );

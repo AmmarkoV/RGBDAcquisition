@@ -2,6 +2,6 @@
 rm *.jpg
 convert *.pnm *.jpg
 ls | grep jpg > cam1_images
-./calibration -w 6 -h 9 -o cam1_output cam1_images
+./calibration -w 6 -h 9 -oe -o cam1_output cam1_images
 rm *.jpg
 exit 0
