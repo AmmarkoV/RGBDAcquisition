@@ -9,6 +9,9 @@
 #define MAX_DIR_PATH 1024
 #define PPMREADBUFLEN 256
 
+
+#define PRINT_COMMENTS 1
+
 struct TemplateVirtualDevice
 {
  char readFromDir[MAX_DIR_PATH]; // <- this sucks i know :P
@@ -57,8 +60,14 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
         if ( (t == 0) || ( strncmp(buf, "P6\n", 3) != 0 ) ) { fprintf(stderr,"ReadPPM only undertsands P6 format\n"); fclose(pf); return 0; }
         do
         { /* Px formats can have # comments after first line */
+           #if PRINT_COMMENTS
+             memset(buf,0,PPMREADBUFLEN);
+           #endif
            t = fgets(buf, PPMREADBUFLEN, pf);
            if ( t == 0 ) { fclose(pf); return 0; }
+           #if PRINT_COMMENTS
+             if (buf[0]=='#') { printf("%s\n",buf+1); } //<- Printout Comment!
+           #endif
         } while ( strncmp(buf, "#", 1) == 0 );
         r = sscanf(buf, "%u %u", &w, &h);
         if ( r < 2 ) { fclose(pf); fprintf(stderr,"Incoherent dimensions received %ux%u \n",w,h); return 0; }
@@ -116,8 +125,14 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
         if ( (t == 0) || ( strncmp(buf, "P5\n", 3) != 0 ) ) { fclose(pf); return 0; }
         do
         { /* Px formats can have # comments after first line */
+           #if PRINT_COMMENTS
+             memset(buf,0,PPMREADBUFLEN);
+           #endif
            t = fgets(buf, PPMREADBUFLEN, pf);
            if ( t == 0 ) { fclose(pf); return 0; }
+           #if PRINT_COMMENTS
+             if (buf[0]=='#') { printf("%s\n",buf+1); } //<- Printout Comment!
+           #endif
         } while ( strncmp(buf, "#", 1) == 0 );
         r = sscanf(buf, "%u %u", &w, &h);
         if ( r < 2 ) { fclose(pf); return 0; }

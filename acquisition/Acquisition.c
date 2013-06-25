@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 
 
@@ -36,9 +37,52 @@
 #endif
 
 
+#define EPOCH_YEAR_IN_TM_YEAR 1900
+
 //This should probably pass on to each of the sub modules
 float minDistance = -10;
 float scaleFactor = 0.0021;
+
+const char *days[] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+const char *months[] = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+
+unsigned long tickBase = 0;
+
+unsigned long GetTickCount()
+{
+   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
+   struct timespec ts;
+   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { fprintf(stderr,"Error Getting Tick Count\n"); return 0; }
+
+   if (tickBase==0)
+   {
+     tickBase = ts.tv_sec*1000 + ts.tv_nsec/1000000;
+     return 0;
+   }
+
+
+   return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBase;
+}
+
+int GetDateString(char * output,char * label,unsigned int now,unsigned int dayofweek,unsigned int day,unsigned int month,unsigned int year,unsigned int hour,unsigned int minute,unsigned int second)
+{
+   //Date: Sat, 29 May 2010 12:31:35 GMT
+   //Last-Modified: Sat, 29 May 2010 12:31:35 GMT
+   if ( now )
+      {
+        time_t clock = time(NULL);
+        struct tm * ptm = gmtime ( &clock );
+
+        sprintf(output,"%s: %s, %u %s %u %02u:%02u:%02u GMT\n",label,days[ptm->tm_wday],ptm->tm_mday,months[ptm->tm_mon],EPOCH_YEAR_IN_TM_YEAR+ptm->tm_year,ptm->tm_hour,ptm->tm_min,ptm->tm_sec);
+
+      } else
+      {
+        sprintf(output,"%s: %s, %u %s %u %02u:%02u:%02u GMT\n",label,days[dayofweek],day,months[month],year,hour,minute,second);
+      }
+    return 1;
+}
+
+
 
 
 unsigned int simplePow(unsigned int base,unsigned int exp)
@@ -145,6 +189,13 @@ int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsi
             fclose(fd);
             return 1;
         }
+
+        char output[256]={0};
+      /*GetDateString(output,"TIMESTAMP",1,0,0,0,0,0,0,0);
+        fprintf(fd, "#%s\n", output );*/
+
+        fprintf(fd, "#TIMESTAMP %u\n",GetTickCount());
+
 
         fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
 
