@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // example command line (for copy-n-paste):
 // calibration -w 6 -h 8 -s 2 -n 10 -o camera.yml -op -oe [<list_of_views.txt>]
@@ -131,7 +133,7 @@ int run_calibration( CvSeq* image_points_seq, CvSize img_size, CvSize board_size
     return code;
 }
 
-
+/*
 void save_camera_params( const char* out_filename, int image_count, CvSize img_size,
                          CvSize board_size, float square_size,
                          float aspect_ratio, int flags,
@@ -196,6 +198,68 @@ void save_camera_params( const char* out_filename, int image_count, CvSize img_s
     }
 
     cvReleaseFileStorage( &fs );
+}*/
+
+
+void save_camera_params( const char* out_filename, int image_count, CvSize img_size,
+                         CvSize board_size, float square_size,
+                         float aspect_ratio, int flags,
+                         const CvMat* camera_matrix, CvMat* dist_coeffs,
+                         const CvMat* extr_params, const CvSeq* image_points_seq,
+                         const CvMat* reproj_errs, double avg_reproj_err )
+{
+    FILE * fp=0; 
+    fp= fopen(out_filename,"w");
+    if (fp==0) { fprintf(stderr,"Could not open output file\n"); return; }
+    
+         
+    fprintf( fp, "%%Calibration File\n");
+    fprintf( fp, "%%CameraID=nothing\n");
+
+    time_t t;
+    time( &t );
+    struct tm *t2 = localtime( &t );
+    char buf[1024];
+    strftime( buf, sizeof(buf)-1, "%c", t2 );
+    fprintf( fp, "%%Date=%s\n",buf);
+
+
+    fprintf( fp, "%%ImageWidth=%u\n",img_size.width);
+    fprintf( fp, "%%ImageHeight=%u\n",img_size.height);
+    fprintf( fp, "%%Description=After %u images , board is %ux%u , square size is %u , aspect ratio %0.2f\n",image_count,board_size.width,board_size.height,square_size,aspect_ratio);
+    fprintf( fp, "%%Calibration File\n");
+ 
+  
+    fprintf( fp, "%%Intrinsics I[1,1], I[1,2], I[1,3], I[2,1], I[2,2], I[2,3], I[3,1], I[3,2] I[3,3] %ux%u\n",camera_matrix->rows,camera_matrix->cols);
+    fprintf( fp, "%%I\n"); 
+    fprintf( fp, "%0.13f\n",camera_matrix->data.fl[0]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[1]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[2]);
+    fprintf( fp, "%0.13f\n",camera_matrix->data.fl[3]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[4]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[5]);
+    fprintf( fp, "%0.13f\n",camera_matrix->data.fl[6]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[7]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[8]);
+    //cvWrite( fs, "camera_matrix", camera_matrix );
+     
+    fprintf( fp, "%%Distortion D[1], D[2], D[3], D[4] D[5] %ux%u\n",dist_coeffs->rows,dist_coeffs->cols);
+    fprintf( fp, "%%D\n"); 
+    if (dist_coeffs->cols>=1) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[0]); } else {  fprintf( fp, "0.0\n"); }
+    if (dist_coeffs->cols>=2) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[1]); } else {  fprintf( fp, "0.0\n"); }
+    if (dist_coeffs->cols>=3) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[2]); } else {  fprintf( fp, "0.0\n"); }
+    if (dist_coeffs->cols>=4) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[3]); } else {  fprintf( fp, "0.0\n"); }
+    if (dist_coeffs->cols>=5) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[4]); } else {  fprintf( fp, "0.0\n"); }
+    //cvWrite( fs, "distortion_coefficients", dist_coeffs );
+
+ 
+    if( extr_params )
+    {
+      fprintf( fp, "%%Translation T.X, T.Y, T.Z\n");
+      fprintf( fp, "%%T\n");
+      fprintf( fp, "%0.13f\n",extr_params->data.fl[1]); fprintf( fp, "%0.13f\n",extr_params->data.fl[2]); fprintf( fp, "%0.13f\n",extr_params->data.fl[3]);
+
+      fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z\n");
+      fprintf( fp, "%%R\n");
+      fprintf( fp, "%0.13f\n",extr_params->data.fl[0]); fprintf( fp, "%0.13f\n",extr_params->data.fl[1]); fprintf( fp, "%0.13f\n",extr_params->data.fl[2]);
+      //cvWrite( fs, "extrinsic_parameters", extr_params );
+    }
+    
+   fclose(fp);
 }
 
 

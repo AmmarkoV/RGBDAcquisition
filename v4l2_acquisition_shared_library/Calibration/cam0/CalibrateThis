@@ -1,6 +1,14 @@
 #!/bin/bash
 convert *.pnm *.jpg
 ls | grep jpg > cam0_images
-./calibration -w 6 -h 9 -o cam0_output cam0_images
+echo "Trying first intrinsic calibration"
+./calibration -w 6 -h 9 -oe -o cam0_output cam0_images
+
+#echo "Trying second extrinsic calibration"
+#./calibration -w 6 -h 9 -oe -o cam0_extrinsic "*-0.jpg"
+
+ 
+
+
 rm *.jpg
 exit 0

@@ -111,7 +111,14 @@ int main(int argc, char *argv[])
         acquisitionMapDepthToRGB(moduleID,devID);
         //acquisitionMapRGBToDepth(moduleID,devID);
      }
-    usleep(1000); // Waiting a while for the glitch frames to pass
+    fprintf(stderr,"3\n");
+    usleep(1000*1000); // Waiting a while for the glitch frames to pass
+    fprintf(stderr,"2\n");
+    usleep(1000*1000); // Waiting a while for the glitch frames to pass
+    fprintf(stderr,"1\n");
+    usleep(1000*1000); // Waiting a while for the glitch frames to pass
+    fprintf(stderr,"Starting \n");
+
     char outfilename[512]={0};
 
    if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
