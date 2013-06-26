@@ -12,52 +12,38 @@ char inputname[512]={0};
 #include <highgui.h>
 
 
-int RGB2BGR(char * pixels , unsigned int width , unsigned int height)
-{
-  if ( (pixels==0) || (width==0) || (height==0)) { return 0; }
-  char * curPixel = pixels;
-  char * limitPixel = pixels + ( (width-1) * height * 3 );
-
-  char * r ;
-  char * g ;
-  char tmp;
-  char * b ;
-  while (curPixel < limitPixel)
-  {
-    r = curPixel++;
-    g = curPixel++;
-    b = curPixel++;
-
-    tmp = *r;
-    *r = *b;
-    *b = tmp;
-  }
-
- return 1;
-}
-
-
-
 int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-  unsigned int depth=IPL_DEPTH_8U;
-  //if (img->bitsPerPixel==8) { depth=IPL_DEPTH_8U; } else
-  //if (img->bitsPerPixel==16) { depth=IPL_DEPTH_16U; } else
-  //                            { fprintf(stderr,"viewImage called with incorrect depth\n");  return 0; }
+    unsigned int depth=IPL_DEPTH_8U;
+    unsigned int width , height , channels , bitsperpixel;
 
-/*  IplImage  *image = cvCreateImage( cvSize(img->width,img->height), depth,img->channels);
-  if (image==0) { fprintf(stderr,"Could not create a new OpenCV Image\n");  return 0; }
+    //DRAW RGB FRAME -------------------------------------------------------------------------------------
+    acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    IplImage  *imageRGB = cvCreateImage( cvSize(width , height), depth,channels);
+    if (imageRGB==0) { fprintf(stderr,"Could not create a new RGB OpenCV Image\n");  return 0; }
+    char * opencv_color_pointer_retainer = imageRGB->imageData; // UGLY HACK
+    imageRGB->imageData = (char *) acquisitionGetColorFrame(moduleID,devID);
+    if ( (bitsperpixel==8) && (channels==3) ) { cvCvtColor( imageRGB, imageRGB, CV_RGB2BGR); }
+    cvShowImage("RGBDAcquisition RGB ",imageRGB);
+    imageRGB->imageData = opencv_color_pointer_retainer; // UGLY HACK
+    cvReleaseImage( &imageRGB );
 
-  char * opencv_color_pointer_retainer = image->imageData; // UGLY HACK
-  image->imageData = (char *) img->pixels;
 
-  if ( (img->bitsPerPixel==8) && (img->channels==3) ) { cvCvtColor( image, image, CV_RGB2BGR); }
+    //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
+    depth=IPL_DEPTH_16U;
+    acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    IplImage  *imageDepth = cvCreateImage( cvSize(width , height), depth,channels);
+    if (imageDepth==0) { fprintf(stderr,"Could not create a new Depth OpenCV Image\n");  return 0; }
+    opencv_color_pointer_retainer = imageDepth->imageData; // UGLY HACK
+    imageDepth->imageData = (char *) acquisitionGetDepthFrame(moduleID,devID);
 
-  cvShowImage(name,image);
-  cvWaitKey(4);
+    cvShowImage("RGBDAcquisition Depth ",imageDepth);
+    imageDepth->imageData = opencv_color_pointer_retainer; // UGLY HACK
+    cvReleaseImage( &imageDepth );
 
-  image->imageData = opencv_color_pointer_retainer; // UGLY HACK
-  cvReleaseImage( &image );*/
+    //GIVE TIME FOR REDRAW EVENTS ETC -------------------------------------------------------------------------
+    cvWaitKey(4);
+
   return 1;
 }
 
@@ -78,7 +64,7 @@ int main(int argc, char *argv[])
     }
 
   unsigned int width=640,height=480,framerate=25;
-  unsigned int frameNum=0,maxFramesToGrab=10;
+  unsigned int frameNum=0,maxFramesToGrab=0;
   int i=0;
   for (i=0; i<argc; i++)
   {
@@ -102,6 +88,7 @@ int main(int argc, char *argv[])
                                          }
   }
 
+  if (framerate==0) { fprintf(stderr,"Zero is an invalid value for framerate , using 1\n"); framerate=1; }
 
   if (!acquisitionIsModuleLinked(moduleID))
    {
@@ -148,6 +135,9 @@ int main(int argc, char *argv[])
 
         acquisitionDisplayFrames(moduleID,devID);
       }
+
+      float usleepTime = ((float) 1000*1000/framerate) ;
+      usleep((unsigned int) usleepTime);
     }
 
     fprintf(stderr,"Done viewing %u frames! \n",maxFramesToGrab);
