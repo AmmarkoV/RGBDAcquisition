@@ -64,6 +64,7 @@ unsigned long GetTickCount()
    return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBase;
 }
 
+/*
 int GetDateString(char * output,char * label,unsigned int now,unsigned int dayofweek,unsigned int day,unsigned int month,unsigned int year,unsigned int hour,unsigned int minute,unsigned int second)
 {
    //Date: Sat, 29 May 2010 12:31:35 GMT
@@ -80,7 +81,7 @@ int GetDateString(char * output,char * label,unsigned int now,unsigned int dayof
         sprintf(output,"%s: %s, %u %s %u %02u:%02u:%02u GMT\n",label,days[dayofweek],day,months[month],year,hour,minute,second);
       }
     return 1;
-}
+}*/
 
 
 

@@ -50,6 +50,7 @@
 			<Add library="../template_acquisition_shared_library/libTemplateAcquisition.so" />
 			<Add library="../v4l2_acquisition_shared_library/libV4L2Acquisition.a" />
 			<Add library="../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.a" />
+			<Add library="rt" />
 		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />

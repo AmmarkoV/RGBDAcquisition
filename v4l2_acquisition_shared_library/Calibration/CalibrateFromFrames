@@ -47,6 +47,7 @@ ls | grep jpg > imageList
 ln -s $DIR/calibration
 ./calibration -w 6 -h 9 -oe -o colorCalibration imageList
 mv colorCalibration $DIR_WITH_FRAMES/color.calib
+cp $DIR_WITH_FRAMES/color.calib $DIR_WITH_FRAMES/depth.calib
 
 rm *.jpg
 
