@@ -15,5 +15,6 @@
 		<Project filename="grabber/Grabber.cbp" />
 		<Project filename="grabber_mux/GrabberMux.cbp" />
 		<Project filename="grabber_segment/GrabberSegment.cbp" />
+		<Project filename="viewer/Viewer.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

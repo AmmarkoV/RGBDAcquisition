@@ -1,4 +1,5 @@
 #include "TemplateAcquisition.h"
+#include "../acquisition/Acquisition.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +9,7 @@
 #define MAX_TEMPLATE_DEVICES 5
 #define MAX_DIR_PATH 1024
 #define PPMREADBUFLEN 256
+#define MAX_LINE_CALIBRATION 1024
 
 
 #define PRINT_COMMENTS 1
@@ -23,6 +25,10 @@ struct TemplateVirtualDevice
  unsigned int templateHEIGHT;
  char * templateColorFrame;
  short * templateDepthFrame;
+
+ struct calibration calibRGB;
+ struct calibration calibDepth;
+
 };
 
 struct TemplateVirtualDevice device[MAX_TEMPLATE_DEVICES]={0};
@@ -41,6 +47,58 @@ int FileExists(char * filename)
  /* doesnt exist */
  return 0;
 }
+
+
+
+int ReadCalibration(char * filename,struct calibration * calib)
+{
+  FILE * fp = 0;
+  fp = fopen(filename,"r");
+  if (fp == 0 ) {  return 0; }
+
+  char line[MAX_LINE_CALIBRATION]={0};
+  unsigned int lineLength=0;
+
+  unsigned int i=0;
+
+  unsigned int category=0;
+  unsigned int linesAtCurrentCategory=0;
+
+
+  while ( fgets(line,MAX_LINE_CALIBRATION,fp)!=0 )
+   {
+     unsigned int lineLength = strlen ( line );
+     if ( lineLength > 0 ) {
+                                 if (line[lineLength-1]==10) { line[lineLength-1]=0; /*fprintf(stderr,"-1 newline \n");*/ }
+                                 if (line[lineLength-1]==13) { line[lineLength-1]=0; /*fprintf(stderr,"-1 newline \n");*/ }
+                           }
+     if ( lineLength > 1 )
+                           {
+                                 if (line[lineLength-2]==10) { line[lineLength-2]=0; /*fprintf(stderr,"-2 newline \n");*/ }
+                                 if (line[lineLength-2]==13) { line[lineLength-2]=0; /*fprintf(stderr,"-2 newline \n");*/ }
+                           }
+
+
+
+     if ( (line[0]=='%') && (line[1]=='I') && (line[2]==0) ) { category=1; linesAtCurrentCategory=0;   } else
+     if ( (line[0]=='%') && (line[1]=='D') && (line[2]==0) ) { category=2; linesAtCurrentCategory=0;   } else
+     if ( (line[0]=='%') && (line[1]=='I') && (line[2]==0) ) { category=3; linesAtCurrentCategory=0;   } else
+     if ( (line[0]=='%') && (line[1]=='I') && (line[2]==0) ) { category=4; linesAtCurrentCategory=0;   } else
+        {
+
+          fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
+        }
+
+     ++linesAtCurrentCategory;
+     ++i;
+     line[0]=0;
+   }
+
+  return 1;
+}
+
+
+
 
 
 char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
@@ -246,6 +304,15 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
    // if templateDepthFrame is zero the next function behaves like a malloc
    device[devID].templateDepthFrame= (short*) realloc(device[devID].templateDepthFrame,device[devID].templateWIDTH*device[devID].templateHEIGHT*1*sizeof(short));
   }
+
+
+
+  sprintf(file_name_test,"frames/%s/color.calib",device[devID].readFromDir);
+  if ( ! ReadCalibration(file_name_test,&device[devID].calibRGB) ) { fprintf(stderr,"Could not read color calibration\n"); }
+
+  sprintf(file_name_test,"frames/%s/depth.calib",device[devID].readFromDir);
+  if ( ! ReadCalibration(file_name_test,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
+
 
   return ((device[devID].templateColorFrame!=0)&&(device[devID].templateDepthFrame!=0));
 }

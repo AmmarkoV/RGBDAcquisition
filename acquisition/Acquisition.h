@@ -24,6 +24,18 @@ typedef unsigned int ModuleIdentifier;
 typedef unsigned int DeviceIdentifier;
 
 
+struct calibration
+{
+  /* CAMERA INTRINSIC PARAMETERS */
+  float intrinsic[9];
+  float k1,k2,p1,p2,k3;
+
+  /* CAMERA EXTRINSIC PARAMETERS */
+  float extrinsicRotationRodriguez[9];
+  float extrinsicTranslation[3];
+};
+
+
 int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
 char * convertShortDepthToRGBDepth(short * depth,unsigned int width , unsigned int height);
