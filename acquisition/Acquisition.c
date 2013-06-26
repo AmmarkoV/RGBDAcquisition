@@ -840,6 +840,35 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
 
 
 
+int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
+{
+   switch (moduleID)
+    {
+      case TEMPLATE_ACQUISITION_MODULE:
+        #if USE_TEMPLATE
+          return getTemplateColorCalibration(devID,calib);
+        #endif
+      break;
+    };
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
+    return 0;
+}
+
+int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
+{
+   switch (moduleID)
+    {
+      case TEMPLATE_ACQUISITION_MODULE:
+        #if USE_TEMPLATE
+          return getTemplateDepthCalibration(devID,calib);
+        #endif
+      break;
+    };
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
+    return 0;
+}
+
+
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   switch (moduleID)

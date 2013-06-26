@@ -1,0 +1,58 @@
+#!/bin/bash
+ 
+
+DIR_WITH_FRAMES="./"
+if [ $# -ne 1 ]
+then 
+  echo "Please provide a path argument to the path that contains the directory with your frames"
+else
+ DIR_WITH_FRAMES=$1 
+fi
+
+
+
+
+STARTDIR=`pwd`
+#Switch to this directory
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$DIR"
+
+
+mkdir temp
+cd temp
+TEMPDIR=`pwd` 
+rm *.jpg
+
+
+FILES=$DIR_WITH_FRAMES/*
+COUNTER=0
+for f in $FILES
+do
+   ISITACOLORFRAME=`echo $f | grep "color"` 
+   if [ -n "$ISITACOLORFRAME" ] 
+    then
+     echo "Processing $f file..."
+     convert $f "$TEMPDIR/$COUNTER.jpg"
+     COUNTER=$[$COUNTER +1]
+    fi
+
+    if [ $COUNTER -gt 20 ] 
+     then 
+      break
+    fi
+done
+
+cd $TEMPDIR
+ls | grep jpg > imageList
+ln -s $DIR/calibration
+./calibration -w 6 -h 9 -oe -o colorCalibration imageList
+mv colorCalibration $DIR_WITH_FRAMES/color.calib
+
+rm *.jpg
+
+cd $DIR
+rmdir temp
+ 
+cd "$STARTDIR"
+
+exit 0

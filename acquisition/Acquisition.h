@@ -31,7 +31,7 @@ struct calibration
   float k1,k2,p1,p2,k3;
 
   /* CAMERA EXTRINSIC PARAMETERS */
-  float extrinsicRotationRodriguez[9];
+  float extrinsicRotationRodriguez[3];
   float extrinsicTranslation[3];
 };
 
@@ -54,6 +54,11 @@ int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
  int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame);
 int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID);
+
+
+int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
+int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
+
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
 unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength);

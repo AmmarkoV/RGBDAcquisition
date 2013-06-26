@@ -18,6 +18,10 @@ extern "C"
    int seekTemplateFrame(int devID,unsigned int seekFrame);
    int snapTemplateFrames(int devID);
 
+
+   int getTemplateColorCalibration(int devID,struct calibration * calib);
+   int getTemplateDepthCalibration(int devID,struct calibration * calib);
+
    //Color Frame getters
    int getTemplateColorWidth(int devID);
    int getTemplateColorHeight(int devID);

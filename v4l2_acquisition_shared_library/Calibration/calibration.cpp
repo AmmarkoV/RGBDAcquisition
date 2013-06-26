@@ -389,6 +389,8 @@ int main( int argc, char** argv )
 
     if( input_filename )
     {
+        fprintf( stderr, "Trying to open %s \n" , input_filename );
+              
         capture = cvCreateFileCapture( input_filename );
         if( !capture )
         {
