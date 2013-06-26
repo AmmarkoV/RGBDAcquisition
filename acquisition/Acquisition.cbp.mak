@@ -15,7 +15,7 @@ INC =
 CFLAGS =  -Wall -fPIC
 RESINC = 
 LIBDIR = 
-LIB = 
+LIB =  -lrt
 LDFLAGS = 
 
 INC_DEBUG =  $(INC)
@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG =  $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = libAcquisition.so
+OUT_DEBUG = Acquisition.so
 
 INC_RELEASE =  $(INC)
 CFLAGS_RELEASE =  $(CFLAGS) -O2
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = libAcquisition.so
+OUT_RELEASE = Acquisition.so
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/Acquisition.o
 
