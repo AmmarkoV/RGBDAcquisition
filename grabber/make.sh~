@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 
 cd ../acquisition
 echo "Refreshing acquisition.so to reflect acquisition_setup.h"
@@ -88,14 +88,18 @@ else
  TEMPLATE_LIBS="../template_acquisition_shared_library/libTemplateAcquisition.so"
 fi
 
-
+ 
 ACQUISITION_LIBRARY="../acquisition/libAcquisition.so"
 
 
 CFLAGS="-O3 -fexpensive-optimizations"
  
-echo "LIBS TO LINK $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $TEMPLATE_LIBS"
+echo "LIBS TO LINK $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $TEMPLATE_LIBS $AMMAR_SERVER_LIBS"
 
-gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS -L. -o Grabber
+echo "gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS -lpthread -lrt -L. -o Grabber"
+
+gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS -lpthread -lrt -L. -o Grabber
+
+
 
 exit 0

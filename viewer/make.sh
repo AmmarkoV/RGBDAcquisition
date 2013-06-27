@@ -1,25 +1,5 @@
 #!/bin/bash
-
-
-if [ -d "AmmarServer/" ] 
-then
- cd AmmarServer
- ./make
- cd .. 
-fi
-
-
-AMMAR_SERVER_LIBS=""
-if [ -e "AmmarServer/src/AmmServerlib/libAmmServerlib.a" ] 
-then
- AMMAR_SERVER_LIBS="AmmarServer/src/AmmServerlib/libAmmServerlib.a"
-elif [ -e "AmmarServer/src/AmmServerNULLlib/libAmmServerlib.a" ] 
-then
- AMMAR_SERVER_LIBS="AmmarServer/src/AmmServerNULLlib/libAmmServerlib.a"
-fi
-
-
-
+ 
 
 cd ../acquisition
 echo "Refreshing acquisition.so to reflect acquisition_setup.h"
@@ -116,9 +96,9 @@ CFLAGS="-O3 -fexpensive-optimizations"
  
 echo "LIBS TO LINK $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $TEMPLATE_LIBS $AMMAR_SERVER_LIBS"
 
-echo "gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS $AMMAR_SERVER_LIBS -lpthread -lrt -L. -o acquisitionBroadcast"
+echo "gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS -lpthread -lrt -L. -o Viewer"
 
-gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS $AMMAR_SERVER_LIBS -lpthread -lrt -L. -o acquisitionBroadcast
+gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS -lpthread -lrt -L. -o Viewer
 
 
 
