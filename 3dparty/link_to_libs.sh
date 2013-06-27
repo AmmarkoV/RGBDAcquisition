@@ -11,9 +11,11 @@ fi
 
 if [ -d "$DIR_WITH_3D_PARTY_PLUGINS/libfreenect" ]
 then
-echo "Linking to freenect libs"
+echo "Linking to freenect libs"  
 ln -s "$DIR_WITH_3D_PARTY_PLUGINS/libfreenect/build/lib/libfreenect.so"
 ln -s "$DIR_WITH_3D_PARTY_PLUGINS/libfreenect/build/lib/libfreenect_sync.so"  
+ln -s "$DIR_WITH_3D_PARTY_PLUGINS/libfreenect/build/lib/libfreenect.so.0.1"
+ln -s "$DIR_WITH_3D_PARTY_PLUGINS/libfreenect/build/lib/libfreenect_sync.so.0.1"  
 else
  echo "Could not find libfreenect directory"
 fi
