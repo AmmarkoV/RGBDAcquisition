@@ -248,7 +248,7 @@ save_camera_paramsOriginal(oldFilename,image_count,img_size,board_size,square_si
 
 //cvWrite( fs, "camera_matrix", camera_matrix );
 
-    std::cout << "camera_matrix type = " << camera_matrix->type << " and CV_32FC1 = " << CV_32FC1 << " and " << (camera_matrix->type == CV_32FC1) << std::endl;
+   // std::cout << "camera_matrix type = " << camera_matrix->type << " and CV_32FC1 = " << CV_32FC1 << " and " << (camera_matrix->type == CV_32FC1) << std::endl;
 
 
     fprintf( fp, "%%Distortion D[1], D[2], D[3], D[4] D[5] %ux%u\n",dist_coeffs->rows,dist_coeffs->cols);
