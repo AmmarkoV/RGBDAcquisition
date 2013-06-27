@@ -12,6 +12,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then
+     sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  
      git clone git://github.com/OpenKinect/libfreenect.git
      cd libfreenect
      mkdir build
@@ -43,6 +44,19 @@ else
   fi
 fi
 
+
+#wget http://www.openni.org/wp-content/uploads/2012/12/OpenNI-Bin-Dev-Linux-Arm-v1.5.4.0.tar.zip
+#unzip OpenNI-Bin-Dev-Linux-Arm-v1.5.4.0.tar.zip
+#rm OpenNI-Bin-Dev-Linux-Arm-v1.5.4.0.tar.zip
+#tar xvjf OpenNI-Bin-Dev-Linux-Arm-v1.5.4.0.tar.bz2 
+#--
+#ln -s OpenNI-Bin-Dev-Linux-Arm-v1.5.4.0/ OpenNI
+#mkdir -p Platform/Linux/Bin/
+#cd Platform/Linux/Bin/
+#ln -s ../../../Lib/ x64-Release
+#cd ../../../../
+
+
 if [ -d OpenNI ]
 then
 echo "OpenNI1 appears to already exist .."
@@ -53,6 +67,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then
+     sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  
      git clone git://github.com/OpenNI/OpenNI.git 
      cd OpenNI/Platform/Linux/CreateRedist
      ./RedistMaker
@@ -88,6 +103,16 @@ else
   fi
 fi
 
+#wget http://www.openni.org/wp-content/uploads/2013/01/OpenNI-Linux-Arm-2.1.0.tar.zip
+#unzip OpenNI-Linux-Arm-2.1.0.tar.zip 
+#rm OpenNI-Linux-Arm-2.1.0.tar.zip 
+#tar xvjf OpenNI-Linux-Arm-2.1.0.tar.bz2 
+#--
+#ln -s OpenNI-2.1.0-arm/ OpenNI2
+#mkdir Bin 
+#cd Bin
+#ln -s ../Redist/ x64-Release
+#cd ..
 
 if [ -d OpenNI2 ]
 then
@@ -99,6 +124,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then
+     sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  
      git clone git://github.com/OpenNI/OpenNI2.git
      cd OpenNI2
      make 

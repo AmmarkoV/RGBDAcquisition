@@ -11,6 +11,9 @@
 #define PPMREADBUFLEN 256
 #define MAX_LINE_CALIBRATION 1024
 
+#define DEFAULT_FOCAL_LENGTH 120.0
+#define DEFAULT_PIXEL_SIZE 0.1052
+
 
 #define PRINT_COMMENTS 1
 
@@ -50,6 +53,49 @@ int FileExists(char * filename)
 
 
 
+double getTemplateColorPixelSize(int devID)   { return DEFAULT_PIXEL_SIZE; }
+double getTemplateColorFocalLength(int devID)
+{
+  if (device[devID].calibRGB.intrinsicParametersSet) { return (double) device[devID].calibRGB.intrinsic[0]*getTemplateColorPixelSize(devID); }
+  return DEFAULT_FOCAL_LENGTH;
+}
+
+double getTemplateDepthFocalLength(int devID)
+{ if (device[devID].calibDepth.intrinsicParametersSet) { return (double) device[devID].calibDepth.intrinsic[0]*getTemplateColorPixelSize(devID); }
+  return DEFAULT_FOCAL_LENGTH;
+}
+double getTemplateDepthPixelSize(int devID) { return DEFAULT_PIXEL_SIZE; }
+
+
+int NullCalibration(unsigned int width,unsigned int height, struct calibration * calib)
+{
+  calib->intrinsicParametersSet=0;
+  calib->extrinsicParametersSet=0;
+
+  calib->intrinsic[0]=0.0;  calib->intrinsic[1]=0.0;  calib->intrinsic[2]=0.0;
+  calib->intrinsic[3]=0.0;  calib->intrinsic[4]=0.0;  calib->intrinsic[5]=0.0;
+  calib->intrinsic[6]=0.0;  calib->intrinsic[7]=0.0;  calib->intrinsic[8]=0.0;
+
+  float * fx = &calib->intrinsic[0]; float * fy = &calib->intrinsic[4];
+  float * cx = &calib->intrinsic[2]; float * cy = &calib->intrinsic[5];
+  float * one = &calib->intrinsic[8];
+
+  calib->k1=0.0;  calib->k2=0.0; calib->p1=0.0; calib->p2=0.0; calib->k3=0.0;
+
+  calib->extrinsicRotationRodriguez[0]=0.0; calib->extrinsicRotationRodriguez[1]=0.0; calib->extrinsicRotationRodriguez[2]=0.0;
+  calib->extrinsicTranslation[0]=0.0; calib->extrinsicTranslation[1]=0.0; calib->extrinsicTranslation[2]=0.0;
+
+  *cx = (float) width/2;
+  *cy = (float) height/2;
+
+  //-This is a bad initial estimation i guess :P
+  *fx = (float) DEFAULT_FOCAL_LENGTH/(2*DEFAULT_PIXEL_SIZE);    //<- these might be wrong
+  *fy = (float) DEFAULT_FOCAL_LENGTH/(2*DEFAULT_PIXEL_SIZE);    //<- these might be wrong
+  //--------------------------------------------
+
+  return 1;
+}
+
 int ReadCalibration(char * filename,struct calibration * calib)
 {
   FILE * fp = 0;
@@ -87,6 +133,7 @@ int ReadCalibration(char * filename,struct calibration * calib)
           fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
           if (category==1)
           {
+           calib->intrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
              case 1 :  calib->intrinsic[0] = atof(line); break;
@@ -102,6 +149,7 @@ int ReadCalibration(char * filename,struct calibration * calib)
           } else
           if (category==2)
           {
+           calib->intrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
              case 1 :  calib->k1 = atof(line); break;
@@ -113,6 +161,7 @@ int ReadCalibration(char * filename,struct calibration * calib)
           } else
           if (category==3)
           {
+           calib->extrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
              case 1 :  calib->extrinsicTranslation[0] = atof(line); break;
@@ -122,6 +171,7 @@ int ReadCalibration(char * filename,struct calibration * calib)
           } else
           if (category==4)
           {
+           calib->extrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
              case 1 :  calib->extrinsicTranslation[3] = atof(line); break;
@@ -360,10 +410,12 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
    device[devID].templateDepthFrame= (short*) realloc(device[devID].templateDepthFrame,device[devID].templateWIDTH*device[devID].templateHEIGHT*1*sizeof(short));
   }
 
-
+  NullCalibration(device[devID].templateWIDTH,device[devID].templateHEIGHT,&device[devID].calibRGB);
 
   sprintf(file_name_test,"frames/%s/color.calib",device[devID].readFromDir);
   if ( ! ReadCalibration(file_name_test,&device[devID].calibRGB) ) { fprintf(stderr,"Could not read color calibration\n"); }
+
+  NullCalibration(device[devID].templateWIDTH,device[devID].templateHEIGHT,&device[devID].calibDepth);
 
   sprintf(file_name_test,"frames/%s/depth.calib",device[devID].readFromDir);
   if ( ! ReadCalibration(file_name_test,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
@@ -436,8 +488,7 @@ int getTemplateColorBitsPerPixel(int devID) { return 8; }
 // Frame Grabber should call this function for color frames
 char * getTemplateColorPixels(int devID)    { return device[devID].templateColorFrame; }
 
-double getTemplateColorFocalLength(int devID) { return 120.0; }
-double getTemplateColorPixelSize(int devID)   { return 0.1052; }
+
 
 
    //Depth Frame getters
@@ -449,7 +500,4 @@ int getTemplateDepthBitsPerPixel(int devID) { return 16; }
 
 // Frame Grabber should call this function for depth frames
 char * getTemplateDepthPixels(int devID) { return (char *) device[devID].templateDepthFrame; }
-
-double getTemplateDepthFocalLength(int devID) { return 120.0; }
-double getTemplateDepthPixelSize(int devID) { return 0.1052; }
 

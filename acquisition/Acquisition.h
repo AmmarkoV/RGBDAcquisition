@@ -27,10 +27,12 @@ typedef unsigned int DeviceIdentifier;
 struct calibration
 {
   /* CAMERA INTRINSIC PARAMETERS */
+  char intrinsicParametersSet;
   float intrinsic[9];
   float k1,k2,p1,p2,k3;
 
   /* CAMERA EXTRINSIC PARAMETERS */
+  char extrinsicParametersSet;
   float extrinsicRotationRodriguez[3];
   float extrinsicTranslation[3];
 };
