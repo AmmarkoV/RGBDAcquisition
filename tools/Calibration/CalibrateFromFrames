@@ -36,7 +36,7 @@ do
      COUNTER=$[$COUNTER +1]
     fi
 
-    if [ $COUNTER -gt 20 ] 
+    if [ $COUNTER -gt 30 ] 
      then 
       break
     fi

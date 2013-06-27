@@ -34,19 +34,16 @@ double compute_reprojection_error( const CvMat* object_points,
         image_points->cols, image_points->type );
     int i, image_count = rot_vects->rows, points_so_far = 0;
     double total_err = 0, err;
-    
+
     for( i = 0; i < image_count; i++ )
     {
         CvMat object_points_i, image_points_i, image_points2_i;
         int point_count = point_counts->data.i[i];
         CvMat rot_vect, trans_vect;
 
-        cvGetCols( object_points, &object_points_i,
-            points_so_far, points_so_far + point_count );
-        cvGetCols( image_points, &image_points_i,
-            points_so_far, points_so_far + point_count );
-        cvGetCols( image_points2, &image_points2_i,
-            points_so_far, points_so_far + point_count );
+        cvGetCols( object_points, &object_points_i,points_so_far, points_so_far + point_count );
+        cvGetCols( image_points, &image_points_i,  points_so_far, points_so_far + point_count );
+        cvGetCols( image_points2, &image_points2_i, points_so_far, points_so_far + point_count );
         points_so_far += point_count;
 
         cvGetRow( rot_vects, &rot_vect, i );
@@ -60,7 +57,7 @@ double compute_reprojection_error( const CvMat* object_points,
             per_view_errors->data.db[i] = err/point_count;
         total_err += err;
     }
-    
+
     cvReleaseMat( &image_points2 );
     return total_err/points_so_far;
 }
@@ -133,8 +130,8 @@ int run_calibration( CvSeq* image_points_seq, CvSize img_size, CvSize board_size
     return code;
 }
 
-/*
-void save_camera_params( const char* out_filename, int image_count, CvSize img_size,
+
+void save_camera_paramsOriginal( const char* out_filename, int image_count, CvSize img_size,
                          CvSize board_size, float square_size,
                          float aspect_ratio, int flags,
                          const CvMat* camera_matrix, CvMat* dist_coeffs,
@@ -142,7 +139,7 @@ void save_camera_params( const char* out_filename, int image_count, CvSize img_s
                          const CvMat* reproj_errs, double avg_reproj_err )
 {
     CvFileStorage* fs = cvOpenFileStorage( out_filename, 0, CV_STORAGE_WRITE );
-    
+
     time_t t;
     time( &t );
     struct tm *t2 = localtime( &t );
@@ -150,14 +147,14 @@ void save_camera_params( const char* out_filename, int image_count, CvSize img_s
     strftime( buf, sizeof(buf)-1, "%c", t2 );
 
     cvWriteString( fs, "calibration_time", buf );
-    
+
     cvWriteInt( fs, "image_count", image_count );
     cvWriteInt( fs, "image_width", img_size.width );
     cvWriteInt( fs, "image_height", img_size.height );
     cvWriteInt( fs, "board_width", board_size.width );
     cvWriteInt( fs, "board_height", board_size.height );
     cvWriteReal( fs, "square_size", square_size );
-    
+
     if( flags & CV_CALIB_FIX_ASPECT_RATIO )
         cvWriteReal( fs, "aspect_ratio", aspect_ratio );
 
@@ -170,7 +167,7 @@ void save_camera_params( const char* out_filename, int image_count, CvSize img_s
             flags & CV_CALIB_ZERO_TANGENT_DIST ? "+zero_tangent_dist" : "" );
         cvWriteComment( fs, buf, 0 );
     }
-    
+
     cvWriteInt( fs, "flags", flags );
 
     cvWrite( fs, "camera_matrix", camera_matrix );
@@ -198,7 +195,7 @@ void save_camera_params( const char* out_filename, int image_count, CvSize img_s
     }
 
     cvReleaseFileStorage( &fs );
-}*/
+}
 
 
 void save_camera_params( const char* out_filename, int image_count, CvSize img_size,
@@ -208,11 +205,24 @@ void save_camera_params( const char* out_filename, int image_count, CvSize img_s
                          const CvMat* extr_params, const CvSeq* image_points_seq,
                          const CvMat* reproj_errs, double avg_reproj_err )
 {
-    FILE * fp=0; 
+
+
+char oldFilename[512]={0};
+sprintf(oldFilename,"old%s",out_filename);
+save_camera_paramsOriginal(oldFilename,image_count,img_size,board_size,square_size,aspect_ratio,flags,camera_matrix,dist_coeffs,
+                           extr_params,image_points_seq,reproj_errs,avg_reproj_err );
+
+
+
+
+
+
+
+    FILE * fp=0;
     fp= fopen(out_filename,"w");
     if (fp==0) { fprintf(stderr,"Could not open output file\n"); return; }
-    
-         
+
+
     fprintf( fp, "%%Calibration File\n");
     fprintf( fp, "%%CameraID=nothing\n");
 
@@ -228,37 +238,41 @@ void save_camera_params( const char* out_filename, int image_count, CvSize img_s
     fprintf( fp, "%%ImageHeight=%u\n",img_size.height);
     fprintf( fp, "%%Description=After %u images , board is %ux%u , square size is %u , aspect ratio %0.2f\n",image_count,board_size.width,board_size.height,square_size,aspect_ratio);
     fprintf( fp, "%%Calibration File\n");
- 
-  
+
+
     fprintf( fp, "%%Intrinsics I[1,1], I[1,2], I[1,3], I[2,1], I[2,2], I[2,3], I[3,1], I[3,2] I[3,3] %ux%u\n",camera_matrix->rows,camera_matrix->cols);
-    fprintf( fp, "%%I\n"); 
-    fprintf( fp, "%0.13f\n",camera_matrix->data.fl[0]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[1]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[2]);
-    fprintf( fp, "%0.13f\n",camera_matrix->data.fl[3]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[4]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[5]);
-    fprintf( fp, "%0.13f\n",camera_matrix->data.fl[6]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[7]); fprintf( fp, "%0.13f\n",camera_matrix->data.fl[8]);
-    //cvWrite( fs, "camera_matrix", camera_matrix );
-     
+    fprintf( fp, "%%I\n");
+    fprintf( fp, "%f\n",camera_matrix->data.db[0]); fprintf( fp, "%f\n",camera_matrix->data.db[1]); fprintf( fp, "%f\n",camera_matrix->data.db[2]);
+    fprintf( fp, "%f\n",camera_matrix->data.db[3]); fprintf( fp, "%f\n",camera_matrix->data.db[4]); fprintf( fp, "%f\n",camera_matrix->data.db[5]);
+    fprintf( fp, "%f\n",camera_matrix->data.db[6]); fprintf( fp, "%f\n",camera_matrix->data.db[7]); fprintf( fp, "%f\n",camera_matrix->data.db[8]);
+
+//cvWrite( fs, "camera_matrix", camera_matrix );
+
+    std::cout << "camera_matrix type = " << camera_matrix->type << " and CV_32FC1 = " << CV_32FC1 << " and " << (camera_matrix->type == CV_32FC1) << std::endl;
+
+
     fprintf( fp, "%%Distortion D[1], D[2], D[3], D[4] D[5] %ux%u\n",dist_coeffs->rows,dist_coeffs->cols);
-    fprintf( fp, "%%D\n"); 
-    if (dist_coeffs->cols>=1) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[0]); } else {  fprintf( fp, "0.0\n"); }
-    if (dist_coeffs->cols>=2) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[1]); } else {  fprintf( fp, "0.0\n"); }
-    if (dist_coeffs->cols>=3) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[2]); } else {  fprintf( fp, "0.0\n"); }
-    if (dist_coeffs->cols>=4) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[3]); } else {  fprintf( fp, "0.0\n"); }
-    if (dist_coeffs->cols>=5) {  fprintf( fp, "%0.13f\n",dist_coeffs->data.fl[4]); } else {  fprintf( fp, "0.0\n"); }
+    fprintf( fp, "%%D\n");
+    if (dist_coeffs->cols>=1) {  fprintf( fp, "%f\n",dist_coeffs->data.db[0]); } else {  fprintf( fp, "0.0\n"); }
+    if (dist_coeffs->cols>=2) {  fprintf( fp, "%f\n",dist_coeffs->data.db[1]); } else {  fprintf( fp, "0.0\n"); }
+    if (dist_coeffs->cols>=3) {  fprintf( fp, "%f\n",dist_coeffs->data.db[2]); } else {  fprintf( fp, "0.0\n"); }
+    if (dist_coeffs->cols>=4) {  fprintf( fp, "%f\n",dist_coeffs->data.db[3]); } else {  fprintf( fp, "0.0\n"); }
+    if (dist_coeffs->cols>=5) {  fprintf( fp, "%f\n",dist_coeffs->data.db[4]); } else {  fprintf( fp, "0.0\n"); }
     //cvWrite( fs, "distortion_coefficients", dist_coeffs );
 
- 
+
     if( extr_params )
     {
       fprintf( fp, "%%Translation T.X, T.Y, T.Z  %ux%u\n",extr_params->rows,extr_params->cols);
       fprintf( fp, "%%T\n");
-      fprintf( fp, "%0.13f\n",extr_params->data.fl[1]); fprintf( fp, "%0.13f\n",extr_params->data.fl[2]); fprintf( fp, "%0.13f\n",extr_params->data.fl[3]);
+      fprintf( fp, "%f\n",extr_params->data.fl[1]); fprintf( fp, "%f\n",extr_params->data.fl[2]); fprintf( fp, "%f\n",extr_params->data.fl[3]);
 
       fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z  %ux%u\n",extr_params->rows,extr_params->cols);
       fprintf( fp, "%%R\n");
-      fprintf( fp, "%0.13f\n",extr_params->data.fl[0]); fprintf( fp, "%0.13f\n",extr_params->data.fl[1]); fprintf( fp, "%0.13f\n",extr_params->data.fl[2]);
+      fprintf( fp, "%f\n",extr_params->data.fl[0]); fprintf( fp, "%f\n",extr_params->data.fl[1]); fprintf( fp, "%f\n",extr_params->data.fl[2]);
       //cvWrite( fs, "extrinsic_parameters", extr_params );
     }
-    
+
    fclose(fp);
 }
 
@@ -290,7 +304,7 @@ int main( int argc, char** argv )
     int mode = DETECTION;
     int undistort_image = 0;
     CvSize img_size = {0,0};
-    const char* live_capture_help = 
+    const char* live_capture_help =
         "When the live video from camera is used as input, the following hot-keys may be used:\n"
             "  <ESC>, 'q' - quit the program\n"
             "  'g' - start capturing images\n"
@@ -390,7 +404,7 @@ int main( int argc, char** argv )
     if( input_filename )
     {
         fprintf( stderr, "Trying to open %s \n" , input_filename );
-              
+
         capture = cvCreateFileCapture( input_filename );
         if( !capture )
         {
@@ -426,7 +440,7 @@ int main( int argc, char** argv )
         int base_line = 0;
         char s[100];
         int key;
-        
+
         if( f && fgets( imagename, sizeof(imagename)-2, f ))
         {
             int l = strlen(imagename);
@@ -528,7 +542,7 @@ int main( int argc, char** argv )
 
         if( key == 27 )
             break;
-        
+
         if( key == 'u' && mode == CALIBRATED )
             undistort_image = !undistort_image;
 
