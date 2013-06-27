@@ -123,6 +123,11 @@ int run_calibration( CvSeq* image_points_seq, CvSize img_size, CvSize board_size
         compute_reprojection_error( object_points, &rot_vects, &trans_vects,
             camera_matrix, dist_coeffs, image_points, point_counts, *reproj_errs );
 
+
+    //fprintf( stderr, " Rot : %f\n",rot_vects.data.fl[0]); fprintf( stderr, "%f\n",rot_vects.data.fl[1]); fprintf( stderr, "%f\n",rot_vects.data.fl[2]);
+    //fprintf( stderr, " Tra : %f\n",trans_vects.data.fl[0]); fprintf( stderr, "%f\n",trans_vects.data.fl[1]); fprintf( stderr, "%f\n",trans_vects.data.fl[2]);
+
+
     cvReleaseMat( &object_points );
     cvReleaseMat( &image_points );
     cvReleaseMat( &point_counts );
@@ -263,15 +268,28 @@ save_camera_paramsOriginal(oldFilename,image_count,img_size,board_size,square_si
 
     if( extr_params )
     {
-      fprintf( fp, "%%Translation T.X, T.Y, T.Z  %ux%u\n",extr_params->rows,extr_params->cols);
-      fprintf( fp, "%%T\n");
-      fprintf( fp, "%f\n",extr_params->data.fl[1]); fprintf( fp, "%f\n",extr_params->data.fl[2]); fprintf( fp, "%f\n",extr_params->data.fl[3]);
+      /*CvMat* rot_vects;
+      CvMat* trans_vects;
+      cvGetRow( rot_vects, &rot_vect, i );
+      cvGetRow( trans_vects, &trans_vect, i );*/
 
-      fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z  %ux%u\n",extr_params->rows,extr_params->cols);
-      fprintf( fp, "%%R\n");
-      fprintf( fp, "%f\n",extr_params->data.fl[0]); fprintf( fp, "%f\n",extr_params->data.fl[1]); fprintf( fp, "%f\n",extr_params->data.fl[2]);
-      //cvWrite( fs, "extrinsic_parameters", extr_params );
+
+      int i=0;
+      for (i=0; i<1; i++)
+      {
+       fprintf( fp, "%%Translation T.X, T.Y, T.Z  %ux%u\n",extr_params->rows,extr_params->cols);
+       fprintf( fp, "%%T\n");
+       //Translation because cvGetCols( *extr_params, &trans_vects, 3, 6 );
+       fprintf( fp, "%f\n",extr_params->data.fl[6*i+3]); fprintf( fp, "%f\n",extr_params->data.fl[6*i+4]); fprintf( fp, "%f\n",extr_params->data.fl[6*i+5]);
+
+       fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z  %ux%u\n",extr_params->rows,extr_params->cols);
+       fprintf( fp, "%%R\n");
+       //Rotation because -> cvGetCols( *extr_params, &rot_vects, 0, 3 );
+       fprintf( fp, "%f\n",extr_params->data.fl[6*i+0]); fprintf( fp, "%f\n",extr_params->data.fl[6*i+1]); fprintf( fp, "%f\n",extr_params->data.fl[6*i+2]);
+      }
+
     }
+
 
    fclose(fp);
 }
