@@ -1,7 +1,7 @@
 #!/bin/bash
  
-$THISDIR="grabber"
-$THISOUT="Grabber"
+THISDIR="grabber"
+THISOUT="Grabber"
 
 cd ../acquisition
 echo "Refreshing acquisition.so to reflect acquisition_setup.h"
