@@ -14,12 +14,11 @@ char inputname[512]={0};
 
 int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-    unsigned int depth=IPL_DEPTH_8U;
     unsigned int width , height , channels , bitsperpixel;
 
     //DRAW RGB FRAME -------------------------------------------------------------------------------------
     acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-    IplImage  *imageRGB = cvCreateImage( cvSize(width , height), depth,channels);
+    IplImage  *imageRGB = cvCreateImage( cvSize(width , height), IPL_DEPTH_8U ,channels);
     if (imageRGB==0) { fprintf(stderr,"Could not create a new RGB OpenCV Image\n");  return 0; }
     char * opencv_color_pointer_retainer = imageRGB->imageData; // UGLY HACK
     imageRGB->imageData = (char *) acquisitionGetColorFrame(moduleID,devID);
@@ -30,15 +29,20 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 
 
     //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
-    depth=IPL_DEPTH_16U;
     acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-    IplImage  *imageDepth = cvCreateImage( cvSize(width , height), depth,channels);
+    IplImage  *imageDepth = cvCreateImage( cvSize(width , height), IPL_DEPTH_16U ,channels);
     if (imageDepth==0) { fprintf(stderr,"Could not create a new Depth OpenCV Image\n");  return 0; }
-    opencv_color_pointer_retainer = imageDepth->imageData; // UGLY HACK
+    char *opencv_depth_pointer_retainer = imageDepth->imageData; // UGLY HACK
     imageDepth->imageData = (char *) acquisitionGetDepthFrame(moduleID,devID);
 
-    cvShowImage("RGBDAcquisition Depth ",imageDepth);
-    imageDepth->imageData = opencv_color_pointer_retainer; // UGLY HACK
+
+    IplImage *rdepth8  = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 1);
+    cvConvertScaleAbs(imageDepth, rdepth8, 255.0/2048,0);
+    cvShowImage("RGBDAcquisition Depth", rdepth8);
+    cvReleaseImage( &rdepth8 );
+
+    //cvShowImage("RGBDAcquisition Depth RAW",imageDepth);
+    imageDepth->imageData = opencv_depth_pointer_retainer; // UGLY HACK
     cvReleaseImage( &imageDepth );
 
     //GIVE TIME FOR REDRAW EVENTS ETC -------------------------------------------------------------------------

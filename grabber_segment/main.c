@@ -121,18 +121,18 @@ int main(int argc, char *argv[])
    int doNotSegmentDepth=1;
 
    struct SegmentationFeaturesRGB segConfRGB={0};
-   segConfRGB.minX=170;  segConfRGB.maxX=530;
-   segConfRGB.minY=20; segConfRGB.maxY=380;
+   segConfRGB.minX=23;  segConfRGB.maxX=556;
+   segConfRGB.minY=101; segConfRGB.maxY=358;
 
-   segConfRGB.minR=210; segConfRGB.minG=210; segConfRGB.minB=170;
+   segConfRGB.minR=75; segConfRGB.minG=75; segConfRGB.minB=75;
    segConfRGB.maxR=256; segConfRGB.maxG=256; segConfRGB.maxB=256;
 
    segConfRGB.replaceR=92; segConfRGB.replaceG=45; segConfRGB.replaceB=36;
-   segConfRGB.enableReplacingColors=1;
+   segConfRGB.enableReplacingColors=0;
 
    struct SegmentationFeaturesDepth segConfDepth={0};
-   segConfDepth.minX=170;  segConfDepth.maxX=500;
-   segConfDepth.minY=20; segConfDepth.maxY=358;
+   segConfDepth.minX=23;  segConfDepth.maxX=556;
+   segConfDepth.minY=101; segConfDepth.maxY=358;
    segConfDepth.minDepth=10; segConfDepth.maxDepth=790;
    //------------------------------------------------------------------
    //------------------------------------------------------------------

@@ -124,8 +124,8 @@ int run_calibration( CvSeq* image_points_seq, CvSize img_size, CvSize board_size
             camera_matrix, dist_coeffs, image_points, point_counts, *reproj_errs );
 
 
-    //fprintf( stderr, " Rot : %f\n",rot_vects.data.fl[0]); fprintf( stderr, "%f\n",rot_vects.data.fl[1]); fprintf( stderr, "%f\n",rot_vects.data.fl[2]);
-    //fprintf( stderr, " Tra : %f\n",trans_vects.data.fl[0]); fprintf( stderr, "%f\n",trans_vects.data.fl[1]); fprintf( stderr, "%f\n",trans_vects.data.fl[2]);
+    fprintf( stderr, " Rot : %f\n",rot_vects.data.fl[0]); fprintf( stderr, "%f\n",rot_vects.data.fl[1]); fprintf( stderr, "%f\n",rot_vects.data.fl[2]);
+    fprintf( stderr, " Tra : %f\n",trans_vects.data.fl[0]); fprintf( stderr, "%f\n",trans_vects.data.fl[1]); fprintf( stderr, "%f\n",trans_vects.data.fl[2]);
 
 
     cvReleaseMat( &object_points );
@@ -218,18 +218,14 @@ save_camera_paramsOriginal(oldFilename,image_count,img_size,board_size,square_si
                            extr_params,image_points_seq,reproj_errs,avg_reproj_err );
 
 
-
-
-
-
-
     FILE * fp=0;
     fp= fopen(out_filename,"w");
     if (fp==0) { fprintf(stderr,"Could not open output file\n"); return; }
 
 
     fprintf( fp, "%%Calibration File\n");
-    fprintf( fp, "%%CameraID=nothing\n");
+    fprintf( fp, "%%CameraID=0\n");
+    fprintf( fp, "%%CameraNo=0\n");
 
     time_t t;
     time( &t );
@@ -242,7 +238,6 @@ save_camera_paramsOriginal(oldFilename,image_count,img_size,board_size,square_si
     fprintf( fp, "%%ImageWidth=%u\n",img_size.width);
     fprintf( fp, "%%ImageHeight=%u\n",img_size.height);
     fprintf( fp, "%%Description=After %u images , board is %ux%u , square size is %u , aspect ratio %0.2f\n",image_count,board_size.width,board_size.height,square_size,aspect_ratio);
-    fprintf( fp, "%%Calibration File\n");
 
 
     fprintf( fp, "%%Intrinsics I[1,1], I[1,2], I[1,3], I[2,1], I[2,2], I[2,3], I[3,1], I[3,2] I[3,3] %ux%u\n",camera_matrix->rows,camera_matrix->cols);
@@ -268,12 +263,6 @@ save_camera_paramsOriginal(oldFilename,image_count,img_size,board_size,square_si
 
     if( extr_params )
     {
-      /*CvMat* rot_vects;
-      CvMat* trans_vects;
-      cvGetRow( rot_vects, &rot_vect, i );
-      cvGetRow( trans_vects, &trans_vect, i );*/
-
-
       int i=0;
       for (i=0; i<1; i++)
       {

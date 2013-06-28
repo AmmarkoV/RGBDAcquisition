@@ -36,7 +36,7 @@ do
      COUNTER=$[$COUNTER +1]
     fi
 
-    if [ $COUNTER -gt 40 ] 
+    if [ $COUNTER -gt 80 ] 
      then 
       break
     fi
@@ -45,7 +45,7 @@ done
 cd $TEMPDIR
 ls | grep jpg > imageList
 ln -s $DIR/calibration
-./calibration -w 6 -h 9 -s 1 -oe -o colorCalibration imageList
+./calibration -w 6 -h 9 -s 0.02 -oe -o colorCalibration imageList
 mv colorCalibration $DIR_WITH_FRAMES/color.calib
 cp $DIR_WITH_FRAMES/color.calib $DIR_WITH_FRAMES/depth.calib
 

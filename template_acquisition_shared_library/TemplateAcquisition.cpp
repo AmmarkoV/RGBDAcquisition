@@ -174,9 +174,9 @@ int ReadCalibration(char * filename,struct calibration * calib)
            calib->extrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->extrinsicTranslation[3] = atof(line); break;
-             case 2 :  calib->extrinsicTranslation[4] = atof(line); break;
-             case 3 :  calib->extrinsicTranslation[5] = atof(line); break;
+             case 1 :  calib->extrinsicRotationRodriguez[0] = atof(line); break;
+             case 2 :  calib->extrinsicRotationRodriguez[1] = atof(line); break;
+             case 3 :  calib->extrinsicRotationRodriguez[2] = atof(line); break;
            };
           }
 
