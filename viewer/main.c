@@ -36,7 +36,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
     imageDepth->imageData = (char *) acquisitionGetDepthFrame(moduleID,devID);
 
 
-    IplImage *rdepth8  = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 1);
+    IplImage *rdepth8  = cvCreateImage(cvSize(width , height), IPL_DEPTH_8U, 1);
     cvConvertScaleAbs(imageDepth, rdepth8, 255.0/2048,0);
     cvShowImage("RGBDAcquisition Depth", rdepth8);
     cvReleaseImage( &rdepth8 );

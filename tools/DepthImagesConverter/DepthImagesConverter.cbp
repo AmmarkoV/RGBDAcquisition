@@ -7,16 +7,17 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/DepthImagesConverter" prefix_auto="1" extension_auto="1" />
+				<Option output="DepthImagesConverter" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="8492037-00_00005.png test.pnm" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/DepthImagesConverter" prefix_auto="1" extension_auto="1" />
+				<Option output="DepthImagesConverter" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -31,7 +32,11 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add option="`pkg-config --cflags opencv`" />
 		</Compiler>
+		<Linker>
+			<Add option="`pkg-config --libs opencv`" />
+		</Linker>
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<envvars />
