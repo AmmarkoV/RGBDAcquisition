@@ -72,18 +72,19 @@ unsigned short * convert24bitTo16bit(void * input24bit,unsigned int width , unsi
   unsigned short * outputPointer=output;
 
   unsigned char * endOfMem = traverser + width * height * 3;
+  unsigned short * endOfOutMem = output + width * height;
 
   unsigned char * byte1;
     unsigned char * byte2;
       unsigned char * byte3;
 
-  while ( traverser < endOfMem)
+  while ( ( traverser < endOfMem) && (  outputPointer < endOfOutMem ) )
   {
     byte1 = traverser ++ ;
     byte2 = traverser ++ ;
     byte3 = traverser ++ ;
 
-   // if ( (*byte1!=*byte2) || (*byte2!=*byte3) ) { fprintf(stderr,"!"); }
+  // if ( (*byte1!=*byte2) || (*byte2!=*byte3) ) { fprintf(stderr,"!"); }
 
     casterUshort = (unsigned short*) byte1;
     casterUint = (unsigned int *) byte1;
