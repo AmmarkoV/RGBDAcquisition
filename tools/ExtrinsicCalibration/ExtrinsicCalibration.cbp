@@ -2,22 +2,21 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="DepthImagesConverter" />
+		<Option title="ExtrinsicCalibration" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="DepthImagesConverter" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/ExtrinsicCalibration" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="8492037-00_00005.png test.pnm" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="DepthImagesConverter" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/ExtrinsicCalibration" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -36,29 +35,7 @@
 		</Compiler>
 		<Linker>
 			<Add option="`pkg-config --libs opencv`" />
-			<Add option="-ljpeg" />
-			<Add option="-lpng" />
 		</Linker>
-		<Unit filename="codecs/codecs.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="codecs/codecs.h" />
-		<Unit filename="codecs/jpgExiforient_embed.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="codecs/jpgExiforient_embed.h" />
-		<Unit filename="codecs/jpgInput.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="codecs/jpgInput.h" />
-		<Unit filename="codecs/pngInput.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="codecs/pngInput.h" />
-		<Unit filename="codecs/ppmInput.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="codecs/ppmInput.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<envvars />
