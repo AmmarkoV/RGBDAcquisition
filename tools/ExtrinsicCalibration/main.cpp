@@ -131,11 +131,8 @@ int ReadCalibration(char * filename,struct calibration * calib)
 
 void append_camera_params( const char* out_filename, struct calibration * calib )
 {
-
-
-char oldFilename[512]={0};
-sprintf(oldFilename,"old%s",out_filename);
-
+  char oldFilename[512]={0};
+  sprintf(oldFilename,"old%s",out_filename);
 
     FILE * fp=0;
     fp= fopen(out_filename,"a");
@@ -153,15 +150,8 @@ sprintf(oldFilename,"old%s",out_filename);
     fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[1]);
     fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[2]);
 
-
-
    fclose(fp);
 }
-
-
-
-
-
 
 
 
@@ -197,12 +187,6 @@ int calibrateExtrinsicOnly( CvPoint2D32f* image_points_buf, CvSize img_size, CvS
     *extr_params = cvCreateMat( image_count, 6, CV_32FC1 );
     cvGetCols( *extr_params, rot_vects, 0, 3 );
     cvGetCols( *extr_params, trans_vects, 3, 6 );
-
-    //cvZero( camera_matrix );
-    //cvZero( dist_coeffs );
-
-    //cvCalibrateCamera2( object_points, image_points, point_counts, img_size, camera_matrix, dist_coeffs, &rot_vects, &trans_vects, 0 );
-
 
     cvFindExtrinsicCameraParams2( object_points, image_points,camera_matrix,dist_coeffs,rot_vects, trans_vects);
 
