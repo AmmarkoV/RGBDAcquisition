@@ -129,10 +129,46 @@ int ReadCalibration(char * filename,struct calibration * calib)
 }
 
 
+void append_camera_params( const char* out_filename, struct calibration * calib )
+{
+
+
+char oldFilename[512]={0};
+sprintf(oldFilename,"old%s",out_filename);
+
+
+    FILE * fp=0;
+    fp= fopen(out_filename,"a");
+    if (fp==0) { fprintf(stderr,"Could not open output file\n"); return; }
+
+    fprintf( fp, "%%Translation T.X, T.Y, T.Z\n");
+    fprintf( fp, "%%T\n");
+    fprintf( fp, "%f\n",calib->extrinsicTranslation[0]);
+    fprintf( fp, "%f\n",calib->extrinsicTranslation[1]);
+    fprintf( fp, "%f\n",calib->extrinsicTranslation[2]);
+
+    fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z\n");
+    fprintf( fp, "%%R\n");
+    fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[0]);
+    fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[1]);
+    fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[2]);
+
+
+
+   fclose(fp);
+}
+
+
+
+
+
+
+
+
 int calibrateExtrinsicOnly( CvPoint2D32f* image_points_buf, CvSize img_size, CvSize board_size,
                      float square_size, float aspect_ratio,
                      CvMat* camera_matrix, CvMat* dist_coeffs, CvMat** extr_params,
-                     CvMat** reproj_errs, double* avg_reproj_err )
+                     CvMat * rot_vects, CvMat * trans_vects )
 {
     int code;
     int image_count = 1;
@@ -141,7 +177,7 @@ int calibrateExtrinsicOnly( CvPoint2D32f* image_points_buf, CvSize img_size, CvS
     CvMat* image_points = cvCreateMat( 1, image_count*point_count, CV_32FC2 );
     CvMat* object_points = cvCreateMat( 1, image_count*point_count, CV_32FC3 );
     CvMat* point_counts = cvCreateMat( 1, image_count, CV_32SC1 );
-    CvMat rot_vects, trans_vects;
+    ;
     int i, j, k;
     CvSeqReader reader;
 
@@ -159,8 +195,8 @@ int calibrateExtrinsicOnly( CvPoint2D32f* image_points_buf, CvSize img_size, CvS
     cvSet( point_counts, cvScalar(point_count) );
 
     *extr_params = cvCreateMat( image_count, 6, CV_32FC1 );
-    cvGetCols( *extr_params, &rot_vects, 0, 3 );
-    cvGetCols( *extr_params, &trans_vects, 3, 6 );
+    cvGetCols( *extr_params, rot_vects, 0, 3 );
+    cvGetCols( *extr_params, trans_vects, 3, 6 );
 
     //cvZero( camera_matrix );
     //cvZero( dist_coeffs );
@@ -168,16 +204,12 @@ int calibrateExtrinsicOnly( CvPoint2D32f* image_points_buf, CvSize img_size, CvS
     //cvCalibrateCamera2( object_points, image_points, point_counts, img_size, camera_matrix, dist_coeffs, &rot_vects, &trans_vects, 0 );
 
 
-    cvFindExtrinsicCameraParams2( object_points, image_points,camera_matrix,dist_coeffs,&rot_vects, &trans_vects);
+    cvFindExtrinsicCameraParams2( object_points, image_points,camera_matrix,dist_coeffs,rot_vects, trans_vects);
 
     code = cvCheckArr( camera_matrix, CV_CHECK_QUIET ) &&
         cvCheckArr( dist_coeffs, CV_CHECK_QUIET ) &&
         cvCheckArr( *extr_params, CV_CHECK_QUIET );
 
-
-
-    fprintf( stderr, " Rot : %f ",rot_vects.data.fl[0]); fprintf( stderr, "%f ",rot_vects.data.fl[1]); fprintf( stderr, "%f\n",rot_vects.data.fl[2]);
-    fprintf( stderr, " Tra : %f ",trans_vects.data.fl[0]); fprintf( stderr, "%f ",trans_vects.data.fl[1]); fprintf( stderr, "%f\n",trans_vects.data.fl[2]);
 
 
     cvReleaseMat( &object_points );
@@ -194,6 +226,7 @@ int main( int argc, char** argv )
 {
     CvSize img_size = {640,480};
     CvSize board_size = {6,9};
+    CvMat rot_vects, trans_vects;
     float square_size = 1.0 , aspect_ratio = 1.0;
 
     IplImage *view = 0, *view_gray = 0;
@@ -227,10 +260,23 @@ int main( int argc, char** argv )
     CvMat *extr_params = 0, *reproj_errs = 0;
     double avg_reproj_err = 0;
 
-    int code = calibrateExtrinsicOnly( image_points_buf, img_size, board_size, square_size, aspect_ratio, &camera, &dist_coeffs, &extr_params, &reproj_errs, &avg_reproj_err );
+    int code = calibrateExtrinsicOnly( image_points_buf, img_size, board_size, square_size, aspect_ratio, &camera, &dist_coeffs, &extr_params, &rot_vects, &trans_vects );
 
 
-     waitKey(0);
+    fprintf( stderr, " Rot : %f ",rot_vects.data.fl[0]); fprintf( stderr, "%f ",rot_vects.data.fl[1]); fprintf( stderr, "%f\n",rot_vects.data.fl[2]);
+    fprintf( stderr, " Tra : %f ",trans_vects.data.fl[0]); fprintf( stderr, "%f ",trans_vects.data.fl[1]); fprintf( stderr, "%f\n",trans_vects.data.fl[2]);
+
+    calib.extrinsicRotationRodriguez[0]=rot_vects.data.fl[0];
+    calib.extrinsicRotationRodriguez[1]=rot_vects.data.fl[1];
+    calib.extrinsicRotationRodriguez[2]=rot_vects.data.fl[2];
+
+    calib.extrinsicTranslation[0]=trans_vects.data.fl[0];
+    calib.extrinsicTranslation[1]=trans_vects.data.fl[1];
+    calib.extrinsicTranslation[2]=trans_vects.data.fl[2];
+
+
+    append_camera_params("color.calib",&calib);
+    // waitKey(0);
 
 
     return 0;
