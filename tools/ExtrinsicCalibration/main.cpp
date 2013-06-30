@@ -138,6 +138,7 @@ void append_camera_params( const char* out_filename, struct calibration * calib 
     fp= fopen(out_filename,"a");
     if (fp==0) { fprintf(stderr,"Could not open output file\n"); return; }
 
+    fprintf( fp, "%%New extrinsic data\n");
     fprintf( fp, "%%Translation T.X, T.Y, T.Z\n");
     fprintf( fp, "%%T\n");
     fprintf( fp, "%f\n",calib->extrinsicTranslation[0]);
@@ -208,15 +209,53 @@ int calibrateExtrinsicOnly( CvPoint2D32f* image_points_buf, CvSize img_size, CvS
 
 int main( int argc, char** argv )
 {
+
+    if( argc < 2 )
+    {
+        printf( "This is a camera calibration sample.\n"
+            "Usage: calibration\n"
+            "     -w <board_width>         # the number of inner corners per one of board dimension\n"
+            "     -h <board_height>        # the number of inner corners per another board dimension\n"
+            "     [-s <square_size>]       # square size in some user-defined units (1 by default)\n"
+            "     -i  # the output filename for image \n"
+            "     -c  input/output calibration file\n"
+            "\n" );
+        return 0;
+    }
+
+
     CvSize img_size = {640,480};
     CvSize board_size = {6,9};
     CvMat rot_vects, trans_vects;
     float square_size = 1.0 , aspect_ratio = 1.0;
 
+    char calibFile[512]={0};
+    char imageFile[512]={0};
+
+  int i=0;
+  for (i=0; i<argc; i++)
+  {
+    if (strcmp(argv[i],"-w")==0) { board_size.width=atoi(argv[i+1]);  } else
+    if (strcmp(argv[i],"-h")==0) { board_size.height=atoi(argv[i+1]); } else
+    //Size of unit
+    if (strcmp(argv[i],"-s")==0) { square_size=atof(argv[i+1]);      } else
+    if (strcmp(argv[i],"-c")==0) { strcpy(calibFile,argv[i+1]);      } else
+    if (strcmp(argv[i],"-i")==0) { strcpy(imageFile,argv[i+1]);      }
+  }
+
+
+
+
+
+
+
+
+
+
     IplImage *view = 0, *view_gray = 0;
     int count = 0, found;
 
-    view = cvLoadImage( argv[1], 1 );
+    view = cvLoadImage( imageFile, 1 );
 
     int elem_size = board_size.width*board_size.height*sizeof(CvPoint2D32f);
 
@@ -236,7 +275,7 @@ int main( int argc, char** argv )
     cvShowImage( "Image View", view );
 
     struct calibration calib;
-    ReadCalibration("color.calib",&calib);
+    ReadCalibration(calibFile,&calib);
 
     double _dist_coeffs[4]={0}; _dist_coeffs[0]=calib.k1; _dist_coeffs[1]=calib.k2; _dist_coeffs[2]=calib.p1; _dist_coeffs[3]=calib.p2;
     CvMat camera = cvMat( 3, 3, CV_64F, calib.intrinsic );
@@ -259,7 +298,7 @@ int main( int argc, char** argv )
     calib.extrinsicTranslation[2]=trans_vects.data.fl[2];
 
 
-    append_camera_params("color.calib",&calib);
+    append_camera_params(calibFile,&calib);
     // waitKey(0);
 
 

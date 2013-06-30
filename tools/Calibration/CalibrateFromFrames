@@ -46,6 +46,7 @@ cd $TEMPDIR
 ls | grep jpg > imageList
 ln -s $DIR/calibration
 ./calibration -w 6 -h 9 -s 0.02 -oe -o colorCalibration imageList
+#../ExtrinsicCalibration/extrinsicCalibration -w 6 -h 9 -s 0.02 -c colorCalibration -i $DIR_WITH_FRAMES/colorFrame_0_00000.pnm
 mv colorCalibration $DIR_WITH_FRAMES/color.calib
 cp $DIR_WITH_FRAMES/color.calib $DIR_WITH_FRAMES/depth.calib
 
