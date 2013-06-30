@@ -21,10 +21,10 @@ int calicrateExtrinsicOnly( CvSeq* image_points_seq, CvSize img_size, CvSize boa
                      CvMat* camera_matrix, CvMat* dist_coeffs, CvMat** extr_params,
                      CvMat** reproj_errs, double* avg_reproj_err )
 {
-
     int code;
     int image_count = image_points_seq->total;
     int point_count = board_size.width*board_size.height;
+    fprintf(stderr,"Calibrate , image points total %u , images total %u \n",point_count,image_count);
     CvMat* image_points = cvCreateMat( 1, image_count*point_count, CV_32FC2 );
     CvMat* object_points = cvCreateMat( 1, image_count*point_count, CV_32FC3 );
     CvMat* point_counts = cvCreateMat( 1, image_count, CV_32SC1 );
@@ -113,6 +113,8 @@ int main( int argc, char** argv )
     cvCvtColor( view, view_gray, CV_BGR2GRAY );
     cvFindCornerSubPix( view_gray, image_points_buf, count, cvSize(11,11),cvSize(-1,-1), cvTermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1 ));
     cvReleaseImage( &view_gray );
+
+    cvSeqPush( image_points_seq, image_points_buf );
 
     cvDrawChessboardCorners( view, board_size, image_points_buf, count, found );
     cvShowImage( "Image View", view );
