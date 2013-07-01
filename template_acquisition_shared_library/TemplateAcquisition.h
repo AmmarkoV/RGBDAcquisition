@@ -22,6 +22,9 @@ extern "C"
    int getTemplateColorCalibration(int devID,struct calibration * calib);
    int getTemplateDepthCalibration(int devID,struct calibration * calib);
 
+   int setTemplateColorCalibration(int devID,struct calibration * calib);
+   int setTemplateDepthCalibration(int devID,struct calibration * calib);
+
    //Color Frame getters
    int getTemplateColorWidth(int devID);
    int getTemplateColorHeight(int devID);

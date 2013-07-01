@@ -158,6 +158,9 @@ int renderScene()
   glMatrixMode(GL_MODELVIEW );
   glLoadIdentity();
 
+  //TODO if calibration is given , change this with the calibration matrix
+  //http://www.khronos.org/opengles/sdk/1.1/docs/man/glLoadMatrix.xml
+
   glRotatef(camera_angle_x,-1.0,0,0); // Peristrofi gyrw apo ton x
   glRotatef(camera_angle_y,0,-1.0,0); // Peristrofi gyrw apo ton y
   glRotatef(camera_angle_z,0,0,-1.0);

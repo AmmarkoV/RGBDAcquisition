@@ -205,6 +205,19 @@ int getTemplateDepthCalibration(int devID,struct calibration * calib)
 }
 
 
+int setTemplateColorCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) &device[devID].calibRGB , (void*) calib,sizeof(struct calibration));
+    return 1;
+}
+
+int setTemplateDepthCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) &device[devID].calibDepth , (void*) calib,sizeof(struct calibration));
+    return 1;
+}
+
+
 
 char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
 {
