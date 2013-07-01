@@ -1,6 +1,8 @@
 #include "OpenGLAcquisition.h"
+#include "../acquisition/Acquisition.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "opengl_depth_and_color_renderer/src/OGLRendererSandbox.h"
 
@@ -8,6 +10,9 @@ unsigned int openGL_WIDTH=640;
 unsigned int openGL_HEIGHT=480;
 char * openGLColorFrame = 0;
 short * openGLDepthFrame = 0;
+
+struct calibration calibRGB;
+struct calibration calibDepth;
 
 
 int startOpenGL(unsigned int max_devs)
@@ -81,6 +86,31 @@ double getOpenGLColorPixelSize(int devID)
     fprintf(stderr,"getOpenGLDepthPixelSize returns fixed values.. \n");
     //return 0.1052;
     return getOpenGLPixelSize();
+}
+
+
+int getOpenGLColorCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) calib,(void*) &calibRGB,sizeof(struct calibration));
+    return 1;
+}
+
+int getOpenGLDepthCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) calib,(void*) &calibDepth,sizeof(struct calibration));
+    return 1;
+}
+
+int setOpenGLColorCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) &calibRGB , (void*) calib,sizeof(struct calibration));
+    return 1;
+}
+
+int setOpenGLDepthCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) &calibDepth , (void*) calib,sizeof(struct calibration));
+    return 1;
 }
 
 

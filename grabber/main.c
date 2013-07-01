@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
     usleep(1000*1000); // Waiting a while for the glitch frames to pass
     fprintf(stderr,"Starting \n");
 
-    char outfilename[512]={0};
+    char outfilename[1024]={0};
 
    if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)

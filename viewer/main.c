@@ -5,6 +5,7 @@
 #include "../acquisition/Acquisition.h"
 
 char inputname[512]={0};
+unsigned int frameNum=0;
 
 
 #include <cv.h>
@@ -12,8 +13,40 @@ char inputname[512]={0};
 #include <highgui.h>
 
 
-int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
+int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int framerate)
 {
+
+
+    //GIVE TIME FOR REDRAW EVENTS ETC -------------------------------------------------------------------------
+    float msWaitTime = ((float) 1000/framerate) ;
+    int key = cvWaitKey(msWaitTime );
+    if (key != -1)
+			{
+                char outfilename[1024]={0};
+				key = 0x000000FF & key;
+				switch (key)
+				{
+                  case 'S' :
+				  case 's' :
+                      sprintf(outfilename,"colorFrame_%u_%05u",devID,frameNum);
+                      acquisitionSaveColorFrame(moduleID,devID,outfilename);
+
+                      sprintf(outfilename,"depthFrame_%u_%05u",devID,frameNum);
+                      acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+                      ++frameNum;
+                  break;
+
+                  case 'Q' :
+				  case 'q' :
+                      exit (0);
+                  break;
+				}
+			}
+
+
+
+
+
     unsigned int width , height , channels , bitsperpixel;
 
     //DRAW RGB FRAME -------------------------------------------------------------------------------------
@@ -45,8 +78,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
     imageDepth->imageData = opencv_depth_pointer_retainer; // UGLY HACK
     cvReleaseImage( &imageDepth );
 
-    //GIVE TIME FOR REDRAW EVENTS ETC -------------------------------------------------------------------------
-    cvWaitKey(4);
+
 
   return 1;
 }
@@ -137,11 +169,11 @@ int main(int argc, char *argv[])
       {
         acquisitionSnapFrames(moduleID,devID);
 
-        acquisitionDisplayFrames(moduleID,devID);
+        acquisitionDisplayFrames(moduleID,devID,framerate);
       }
 
-      float usleepTime = ((float) 1000*1000/framerate) ;
-      usleep((unsigned int) usleepTime);
+      //float usleepTime = ((float) 1000*1000/framerate) ;
+      //usleep((unsigned int) usleepTime);
     }
 
     fprintf(stderr,"Done viewing %u frames! \n",maxFramesToGrab);

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <opencv2/core/core.hpp>
@@ -205,6 +206,62 @@ int calibrateExtrinsicOnly( CvPoint2D32f* image_points_buf, CvSize img_size, CvS
 
 }
 
+int convertRodriguezTo3x3(float * rodriguez , float * result)
+{
+  if ( (rodriguez==0) ||  (result==0) ) { return 0; }
+  float x = rodriguez[0] , y = rodriguez[1] , z = rodriguez[2];
+  float th = sqrt( x*x + y*y + z*z );
+  float cosTh = cos(th);
+  x = x / th; y = y / th; z = z / th;
+
+  /*
+  //REAL RESULT
+  result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
+  result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
+  result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
+  */
+
+
+  //  0 1 2    0 3 6
+  //  3 4 5    1 4 7
+  //  6 7 8    2 5 8
+
+  //TRANSPOSED RESULT
+  result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
+  result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
+  result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
+
+  return 1;
+}
+
+
+int multiplyVectorWith3x3Matrix(float * matrix, float * result)
+{
+  if ( (rodriguez==0) ||  (result==0) ) { return 0; }
+  float x = rodriguez[0] , y = rodriguez[1] , z = rodriguez[2];
+  float th = sqrt( x*x + y*y + z*z );
+  float cosTh = cos(th);
+  x = x / th; y = y / th; z = z / th;
+
+  /*
+  //REAL RESULT
+  result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
+  result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
+  result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
+  */
+
+
+  //  0 1 2    0 3 6
+  //  3 4 5    1 4 7
+  //  6 7 8    2 5 8
+
+  //TRANSPOSED RESULT
+  result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
+  result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
+  result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
+
+  return 1;
+}
 
 
 int main( int argc, char** argv )
@@ -228,6 +285,8 @@ int main( int argc, char** argv )
     CvSize board_size = {6,9};
     CvMat rot_vects, trans_vects;
     float square_size = 1.0 , aspect_ratio = 1.0;
+    int viewResult = 0;
+    int writeResult = 1;
 
     char calibFile[512]={0};
     char imageFile[512]={0};
@@ -240,14 +299,10 @@ int main( int argc, char** argv )
     //Size of unit
     if (strcmp(argv[i],"-s")==0) { square_size=atof(argv[i+1]);      } else
     if (strcmp(argv[i],"-c")==0) { strcpy(calibFile,argv[i+1]);      } else
-    if (strcmp(argv[i],"-i")==0) { strcpy(imageFile,argv[i+1]);      }
+    if (strcmp(argv[i],"-i")==0) { strcpy(imageFile,argv[i+1]);      } else
+    if (strcmp(argv[i],"-v")==0) { viewResult=1;   } else
+    if (strcmp(argv[i],"-n")==0) { writeResult=0;   }
   }
-
-
-
-
-
-
 
 
 
@@ -272,9 +327,9 @@ int main( int argc, char** argv )
     cvReleaseImage( &view_gray );
 
     cvDrawChessboardCorners( view, board_size, image_points_buf, count, found );
-    cvShowImage( "Image View", view );
+    if ( viewResult ) cvShowImage( "Image View", view );
 
-    struct calibration calib;
+    struct calibration calib={0};
     ReadCalibration(calibFile,&calib);
 
     double _dist_coeffs[4]={0}; _dist_coeffs[0]=calib.k1; _dist_coeffs[1]=calib.k2; _dist_coeffs[2]=calib.p1; _dist_coeffs[3]=calib.p2;
@@ -298,9 +353,18 @@ int main( int argc, char** argv )
     calib.extrinsicTranslation[2]=trans_vects.data.fl[2];
 
 
-    append_camera_params(calibFile,&calib);
+    if (writeResult) { append_camera_params(calibFile,&calib); }
     // waitKey(0);
 
+    float result[9]={0};
+    convertRodriguezTo3x3(calib.extrinsicRotationRodriguez,(float*) &result);
+    fprintf( stderr, "  %f ",result[0]); fprintf( stderr, "%f ",result[1]); fprintf( stderr, "%f\n",result[2]);
+    fprintf( stderr, "  %f ",result[3]); fprintf( stderr, "%f ",result[4]); fprintf( stderr, "%f\n",result[5]);
+    fprintf( stderr, "  %f ",result[6]); fprintf( stderr, "%f ",result[7]); fprintf( stderr, "%f\n",result[8]);
+
+
+
+    if ( viewResult ) { cvWaitKey(0); }
 
     return 0;
 }
