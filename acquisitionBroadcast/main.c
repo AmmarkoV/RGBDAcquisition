@@ -80,12 +80,12 @@ void * prepare_control_content_callback(struct AmmServer_DynamicRequest  * rqst)
 void init_dynamic_content()
 {
   unsigned int RGB_FRAME_SIZE =  MAX_RGB_FRAME_WIDTH * MAX_RGB_FRAME_HEIGHT * 3 ;
-  if (! AmmServer_AddResourceHandler(default_server,&rgbRAWFrame,"/rgb.raw",webserver_root,RGB_FRAME_SIZE,0,&prepare_RGB_RAW_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding rgbRAWFrame page\n"); }
-  if (! AmmServer_AddResourceHandler(default_server,&rgbPPMFrame,"/rgb.ppm",webserver_root,RGB_FRAME_SIZE+100,0,&prepare_RGB_PPM_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding rgbPPMFrame page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&rgbRAWFrame,"/rgb.raw",webserver_root,RGB_FRAME_SIZE,0,&prepare_RGB_RAW_frame_content_callback,DIFFERENT_PAGE_FOR_EACH_CLIENT) ) { AmmServer_Warning("Failed adding rgbRAWFrame page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&rgbPPMFrame,"/rgb.ppm",webserver_root,RGB_FRAME_SIZE+100,0,&prepare_RGB_PPM_frame_content_callback,DIFFERENT_PAGE_FOR_EACH_CLIENT) ) { AmmServer_Warning("Failed adding rgbPPMFrame page\n"); }
 
   unsigned int DEPTH_FRAME_SIZE =  MAX_DEPTH_FRAME_WIDTH * MAX_DEPTH_FRAME_HEIGHT * 2 ;
-  if (! AmmServer_AddResourceHandler(default_server,&depthRAWFrame,"/depth.raw",webserver_root,RGB_FRAME_SIZE,0,&prepare_Depth_RAW_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
-  if (! AmmServer_AddResourceHandler(default_server,&depthPPMFrame,"/depth.ppm",webserver_root,RGB_FRAME_SIZE+100,0,&prepare_Depth_PPM_frame_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&depthRAWFrame,"/depth.raw",webserver_root,DEPTH_FRAME_SIZE,0,&prepare_Depth_RAW_frame_content_callback,DIFFERENT_PAGE_FOR_EACH_CLIENT) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
+  if (! AmmServer_AddResourceHandler(default_server,&depthPPMFrame,"/depth.ppm",webserver_root,DEPTH_FRAME_SIZE+100,0,&prepare_Depth_PPM_frame_content_callback,DIFFERENT_PAGE_FOR_EACH_CLIENT) ) { AmmServer_Warning("Failed adding depthFrame page\n"); }
 
   if (! AmmServer_AddResourceHandler(default_server,&control,"/control.html",webserver_root,100,0,&prepare_control_content_callback,SAME_PAGE_FOR_ALL_CLIENTS) ) { AmmServer_Warning("Failed adding control page\n"); }
 

@@ -12,7 +12,7 @@ do
      echo "Loop $COUNTER"
      (time wget -qO- $rgbFrames > "rgb$COUNTER.pnm" ) 1> /dev/null 2>> times.txt& 
      (time wget -qO- $depthFrames > "depth$COUNTER.pnm" ) 1> /dev/null 2>> times.txt&
-     sleep 0.10 
+     sleep 0.50 
      COUNTER=$((COUNTER+1))
 done
 
