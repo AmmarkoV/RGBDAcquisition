@@ -6,6 +6,8 @@
 
 extern float farPlane;
 extern float nearPlane;
+extern int useCustomMatrix;
+extern float customMatrix[16];
 
 int renderScene();
 int initScene();

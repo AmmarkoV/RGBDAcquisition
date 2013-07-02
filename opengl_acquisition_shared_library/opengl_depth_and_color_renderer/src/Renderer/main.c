@@ -11,6 +11,12 @@ int main(int argc, char **argv)
 {
   startOGLRendererSandbox();
 
+
+  float rodriguez[3]={ 1.911447 , 0.000701 , -0.028548};
+  float translation[3]={ -0.062989 , 0.159865 , 0.703045 };
+
+  setOpenGLExtrinsicCalibration( (float*) rodriguez, (float*) translation );
+
    while (1)
     {
       snapOGLRendererSandbox();

@@ -6,6 +6,8 @@ extern "C"
 {
 #endif
 
+int setOpenGLExtrinsicCalibration(float * rodriguez,float * translation);
+
 int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
 int getOpenGLColor(char * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
 

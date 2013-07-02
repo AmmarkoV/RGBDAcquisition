@@ -16,7 +16,7 @@
 #include "scene.h"
 
 #include "shader_loader.h"
-
+#include "matrixCalculations.h"
 
 #include "OGLRendererSandbox.h"
 
@@ -192,6 +192,14 @@ int entry(int argc, char **argv)
 
   return 0;
 }
+
+int setOpenGLExtrinsicCalibration(float * rodriguez,float * translation)
+{
+  useCustomMatrix=1;
+  convertRodriguezAndTransTo4x4(rodriguez , translation , (float*) customMatrix );
+  return 1;
+}
+
 
 double getOpenGLFocalLength()
 {

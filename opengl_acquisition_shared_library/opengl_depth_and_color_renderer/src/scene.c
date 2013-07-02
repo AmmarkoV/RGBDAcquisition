@@ -14,6 +14,13 @@ struct Model ** models=0;
 float farPlane = 255;
 float nearPlane= 1.0;
 
+int useCustomMatrix=0;
+float customMatrix[16]={
+                        1.0 , 0.0 , 0.0 , 0.0 ,
+                        0.0 , 1.0 , 0.0 , 0.0 ,
+                        0.0 , 0.0 , 1.0 , 0.0 ,
+                        0.0 , 0.0 , 0.0 , 1.0
+                       };
 
 
 const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -31,7 +38,6 @@ float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;
 float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z = 0.0f;
 
 unsigned int ticks = 0;
-
 
 
 int initScene()
@@ -156,7 +162,15 @@ int renderScene()
 
   glPushMatrix();
   glMatrixMode(GL_MODELVIEW );
-  glLoadIdentity();
+
+  if (useCustomMatrix)
+  {
+    glLoadMatrixf(customMatrix);
+  } else
+  {
+    glLoadIdentity();
+  }
+
 
   //TODO if calibration is given , change this with the calibration matrix
   //http://www.khronos.org/opengles/sdk/1.1/docs/man/glLoadMatrix.xml

@@ -69,6 +69,10 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="matrixCalculations.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="matrixCalculations.h" />
 		<Unit filename="model_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -60,6 +60,8 @@ int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
 int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
+int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
+int acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
 
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);

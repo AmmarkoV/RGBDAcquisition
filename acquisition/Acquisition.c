@@ -850,6 +850,11 @@ int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
           return getTemplateColorCalibration(devID,calib);
         #endif
       break;
+      case OPENGL_ACQUISITION_MODULE:
+        #if USE_OPENGL
+          return getOpenGLColorCalibration(devID,calib);
+        #endif
+      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
     return 0;
@@ -864,10 +869,60 @@ int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
           return getTemplateDepthCalibration(devID,calib);
         #endif
       break;
+      case OPENGL_ACQUISITION_MODULE:
+        #if USE_OPENGL
+          return getOpenGLDepthCalibration(devID,calib);
+        #endif
+      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
     return 0;
 }
+
+
+
+
+
+int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
+{
+   switch (moduleID)
+    {
+      case TEMPLATE_ACQUISITION_MODULE:
+        #if USE_TEMPLATE
+          return setTemplateColorCalibration(devID,calib);
+        #endif
+      break;
+      case OPENGL_ACQUISITION_MODULE:
+        #if USE_OPENGL
+          return setOpenGLColorCalibration(devID,calib);
+        #endif
+      break;
+    };
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
+    return 0;
+}
+
+int acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
+{
+   switch (moduleID)
+    {
+      case TEMPLATE_ACQUISITION_MODULE:
+        #if USE_TEMPLATE
+          return setTemplateDepthCalibration(devID,calib);
+        #endif
+      break;
+      case OPENGL_ACQUISITION_MODULE:
+        #if USE_OPENGL
+          return setOpenGLDepthCalibration(devID,calib);
+        #endif
+      break;
+    };
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
+    return 0;
+}
+
+
+
 
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)

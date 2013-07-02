@@ -7,7 +7,7 @@
 
 char outputfoldername[512]={0};
 
-
+int enforceCalibrationSharing = 1;
 char inputname1[512]={0};
 char inputname2[512]={0};
 
@@ -128,6 +128,14 @@ int main(int argc, char *argv[])
     acquisitionMapDepthToRGB(moduleID_2,devID_2);
 
 
+    if ( enforceCalibrationSharing )
+    {
+      struct calibration calib={0};
+      acquisitionGetColorCalibration(moduleID_1,devID_1,&calib);
+      acquisitionSetColorCalibration(moduleID_2,devID_2,&calib);
+      acquisitionGetDepthCalibration(moduleID_1,devID_1,&calib);
+      acquisitionSetDepthCalibration(moduleID_2,devID_2,&calib);
+    }
 
     usleep(1000); // Waiting a while for the glitch frames to pass
     char outfilename[512]={0};
