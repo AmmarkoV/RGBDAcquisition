@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
      {
        for (devID=0; devID<maxDevID; devID++) { acquisitionSnapFrames(moduleID,devID); }
      }
-     usleep(35000);
+     usleep(25000);
    }
 
    for (devID=0; devID<maxDevID; devID++) {  acquisitionCloseDevice(moduleID,devID); }
