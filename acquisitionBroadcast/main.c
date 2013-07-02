@@ -109,11 +109,22 @@ int main(int argc, char *argv[])
 
  char * readPass=0;
  char readFrom[128]={0};
- if (argc>1)
-     {
-      strncpy(readFrom,argv[1],128); readPass=readFrom;
-      fprintf(stderr,"Will Try to open %s\n",readFrom);
-     }
+
+  int i=0;
+  for (i=0; i<argc; i++)
+  {
+    if (strcmp(argv[i],"-module")==0)    {
+                                           moduleID = getModuleIdFromModuleName(argv[i+1]);
+                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
+                                         } else
+    if (
+        (strcmp(argv[i],"-from")==0) ||
+        (strcmp(argv[i],"-i")==0)
+       )
+       { strcat(readFrom,argv[i+1]); readPass=readFrom; fprintf(stderr,"Input , set to %s  \n",readFrom); }
+  }
+
+
 
  if (possibleModules==0) { AmmServer_Error("Acquisition Library is linked to zero modules , can't possibly do anything..\n"); return 1; }
  if (!acquisitionIsModuleLinked(moduleID)) {AmmServer_Error("The module you are trying to use is not linked in this build of the Acquisition library..\n"); return 1; }
