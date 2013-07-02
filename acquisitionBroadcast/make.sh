@@ -1,5 +1,7 @@
 #!/bin/bash
 
+THISDIR="acquisitionBroadcast"
+THISOUT="acquisitionBroadcast"
 
 if [ -d "AmmarServer/" ] 
 then
@@ -24,7 +26,7 @@ fi
 cd ../acquisition
 echo "Refreshing acquisition.so to reflect acquisition_setup.h"
 make -f Acquisition.cbp.mak
-cd ../grabber
+cd ../$THISDIR
 
 
 OPENNI1_EXISTANCE=`cat ../acquisition/acquisition_setup.h | grep "#define USE_OPENNI1 1"` 
@@ -37,7 +39,7 @@ else
 
  cd ../openni1_acquisition_shared_library
  make -f OpenNI1Aquisition.cbp.mak
- cd ../grabber
+ cd ../$THISDIR
 
   OPENNI1_DIR="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release"
 OPENNI1_LIBS="$OPENNI1_DIR/libOpenNI.so $OPENNI1_DIR/libOpenNI.jni.so $OPENNI1_DIR/libnimRecorder.so $OPENNI1_DIR/libnimMockNodes.so $OPENNI1_DIR/libnimCodecs.so ../openni1_acquisition_shared_library/libOpenNI1Acquisition.so"
@@ -55,7 +57,7 @@ else
 
  cd ../openni2_acquisition_shared_library
  make -f OpenNI2Aquisition.cbp.mak
- cd ../grabber
+ cd ../$THISDIR
 
  OPENNI2_LIBS="../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so ../openni2_acquisition_shared_library/libOpenNI2Acquisition.so"
 fi
@@ -71,7 +73,7 @@ else
 
  cd ../libfreenect_acquisition_shared_library
  make -f FreenectAcquisition.cbp.mak
- cd ../grabber
+ cd ../$THISDIR
 
  FREENECT_LIBS="../3dparty/libfreenect/build/lib/libfreenect_sync.so ../3dparty/libfreenect/build/lib/libfreenect.so ../libfreenect_acquisition_shared_library/libFreenectAcquisition.so"
 fi
@@ -87,7 +89,7 @@ else
 
  cd ../opengl_acquisition_shared_library 
  make -f OpenGLAcquisition.cbp.mak
- cd ../grabber
+ cd ../$THISDIR
 
  OPENGL_SANDBOX_LIBS="-lGL -lX11 ../opengl_acquisition_shared_library/libOpenGLAcquisition.so"
 fi
@@ -103,7 +105,7 @@ else
 
  cd ../template_acquisition_shared_library
  make -f TemplateAcquisition.cbp.mak
- cd ../grabber
+ cd ../$THISDIR
 
  TEMPLATE_LIBS="../template_acquisition_shared_library/libTemplateAcquisition.so"
 fi
@@ -116,9 +118,9 @@ CFLAGS="-O3 -fexpensive-optimizations"
  
 echo "LIBS TO LINK $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $TEMPLATE_LIBS $AMMAR_SERVER_LIBS"
 
-echo "gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS $AMMAR_SERVER_LIBS -lpthread -lrt -L. -o acquisitionBroadcast"
+echo "gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS $AMMAR_SERVER_LIBS -lpthread -lrt -L. -o $THISOUT"
 
-gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS $AMMAR_SERVER_LIBS -lpthread -lrt -L. -o acquisitionBroadcast
+gcc -s main.c  $CFLAGS $ACQUISITION_LIBRARY $OPENNI1_LIBS $OPENNI2_LIBS $FREENECT_LIBS $OPENGL_SANDBOX_LIBS $TEMPLATE_LIBS $AMMAR_SERVER_LIBS -lpthread -lrt -L. -o $THISOUT
 
 
 
