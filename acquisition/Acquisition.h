@@ -37,6 +37,7 @@ struct calibration
   float extrinsicTranslation[3];
 };
 
+int acquisitionSimulateTime(unsigned long timeInMillisecs);
 
 int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 

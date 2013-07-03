@@ -150,8 +150,8 @@ int main(int argc, char *argv[])
     short * depthOut = ( short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
 
-
-
+   //TODO : Add this
+   //acquisitionSimulateTime(unsigned long timeInMillisecs)
 
 
    float centerX;
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
         }
 
 
-        sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+        sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         if (doNotSegmentDepth)
         { saveRawImageToFile(outfilename,(char*) acquisitionGetDepthFrame(moduleID_1,devID_1),widthDepth,heightDepth,channelsDepth,bitsperpixelDepth); }
          else

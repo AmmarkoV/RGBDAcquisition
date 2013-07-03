@@ -242,7 +242,7 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
            t = fgets(buf, PPMREADBUFLEN, pf);
            if ( t == 0 ) { fclose(pf); return 0; }
            #if PRINT_COMMENTS
-             if (buf[0]=='#') { printf("%s\n",buf+1); } //<- Printout Comment!
+             if (buf[0]=='#') { printf("COLOR %s\n",buf+1); } //<- Printout Comment!
            #endif
         } while ( strncmp(buf, "#", 1) == 0 );
         r = sscanf(buf, "%u %u", &w, &h);
@@ -307,7 +307,7 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
            t = fgets(buf, PPMREADBUFLEN, pf);
            if ( t == 0 ) { fclose(pf); return 0; }
            #if PRINT_COMMENTS
-             if (buf[0]=='#') { printf("%s\n",buf+1); } //<- Printout Comment!
+             if (buf[0]=='#') { printf("DEPTH %s\n",buf+1); } //<- Printout Comment!
            #endif
         } while ( strncmp(buf, "#", 1) == 0 );
         r = sscanf(buf, "%u %u", &w, &h);
