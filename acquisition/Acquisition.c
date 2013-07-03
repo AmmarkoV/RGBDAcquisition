@@ -934,7 +934,33 @@ int acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 }
 
 
+unsigned long acquisitionGetColorTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+   switch (moduleID)
+    {
+      case TEMPLATE_ACQUISITION_MODULE:
+        #if USE_TEMPLATE
+          return getLastTemplateColorTimestamp(devID);
+        #endif
+      break;
+    };
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorTimestamp");
+    return 0;
+}
 
+unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+   switch (moduleID)
+    {
+      case TEMPLATE_ACQUISITION_MODULE:
+        #if USE_TEMPLATE
+          return getLastTemplateDepthTimestamp(devID);
+        #endif
+      break;
+    };
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthTimestamp");
+    return 0;
+}
 
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)

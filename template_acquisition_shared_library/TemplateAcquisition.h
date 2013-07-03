@@ -26,6 +26,7 @@ extern "C"
    int setTemplateDepthCalibration(int devID,struct calibration * calib);
 
    //Color Frame getters
+   unsigned long getLastTemplateColorTimestamp(int devID);
    int getTemplateColorWidth(int devID);
    int getTemplateColorHeight(int devID);
    int getTemplateColorDataSize(int devID);
@@ -36,6 +37,7 @@ extern "C"
    double getTemplateColorPixelSize(int devID);
 
    //Depth Frame getters
+   unsigned long getLastTemplateDepthTimestamp(int devID);
    int getTemplateDepthWidth(int devID);
    int getTemplateDepthHeight(int devID);
    int getTemplateDepthDataSize(int devID);

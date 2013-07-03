@@ -26,7 +26,9 @@ struct TemplateVirtualDevice
 
  unsigned int templateWIDTH;
  unsigned int templateHEIGHT;
+ unsigned long lastColorTimestamp;
  char * templateColorFrame;
+ unsigned long lastDepthTimestamp;
  short * templateDepthFrame;
 
  struct calibration calibRGB;
@@ -219,7 +221,7 @@ int setTemplateDepthCalibration(int devID,struct calibration * calib)
 
 
 
-char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
+char * ReadPPM(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     fprintf(stderr,"Reading template file %s \n",filename);
     char * pixels=0;
@@ -240,6 +242,12 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
              memset(buf,0,PPMREADBUFLEN);
            #endif
            t = fgets(buf, PPMREADBUFLEN, pf);
+           if (strstr(buf,"TIMESTAMP")!=0)
+              {
+                char * timestampPayloadStr = buf + 10;
+                *timestamp = atoi(timestampPayloadStr);
+              }
+
            if ( t == 0 ) { fclose(pf); return 0; }
            #if PRINT_COMMENTS
              if (buf[0]=='#') { printf("COLOR %s\n",buf+1); } //<- Printout Comment!
@@ -284,7 +292,7 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
 
 
 
-short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
+short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     fprintf(stderr,"Reading template file %s \n",filename);
     short * pixels=0;
@@ -305,6 +313,13 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height)
              memset(buf,0,PPMREADBUFLEN);
            #endif
            t = fgets(buf, PPMREADBUFLEN, pf);
+
+           if (strstr(buf,"TIMESTAMP")!=0)
+              {
+                char * timestampPayloadStr = buf + 10;
+                *timestamp = atoi(timestampPayloadStr);
+              }
+
            if ( t == 0 ) { fclose(pf); return 0; }
            #if PRINT_COMMENTS
              if (buf[0]=='#') { printf("DEPTH %s\n",buf+1); } //<- Printout Comment!
@@ -397,11 +412,11 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                                 { strncpy(device[devID].readFromDir,devName,MAX_DIR_PATH);  }
      }
 
-  unsigned int widthInternal; unsigned int heightInternal;
+  unsigned int widthInternal; unsigned int heightInternal; unsigned long timestampInternal;
 
   char file_name_test[1024];
   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
-  char * tmpColor = ReadPPM(file_name_test,&widthInternal,&heightInternal);
+  char * tmpColor = ReadPPM(file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
@@ -413,7 +428,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
 
   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
-  short * tmpDepth = ReadPPMD(file_name_test,&widthInternal,&heightInternal);
+  short * tmpDepth = ReadPPMD(file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
@@ -465,7 +480,7 @@ int snapTemplateFrames(int devID)
     if (FileExists(file_name_test))
      {
        if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); }
-       device[devID].templateColorFrame = ReadPPM(file_name_test,&widthInternal,&heightInternal);
+       device[devID].templateColorFrame = ReadPPM(file_name_test,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
        ++found_frames;
      }
 
@@ -474,7 +489,7 @@ int snapTemplateFrames(int devID)
     if (FileExists(file_name_test))
      {
       if (device[devID].templateDepthFrame!=0) { free(device[devID].templateDepthFrame); }
-      device[devID].templateDepthFrame = ReadPPMD(file_name_test,&widthInternal,&heightInternal);
+      device[devID].templateDepthFrame = ReadPPMD(file_name_test,&widthInternal,&heightInternal,&device[devID].lastDepthTimestamp);
       ++found_frames;
      }
 
@@ -492,6 +507,7 @@ int snapTemplateFrames(int devID)
 }
 
 //Color Frame getters
+unsigned long getLastTemplateColorTimestamp(int devID) { return device[devID].lastColorTimestamp; }
 int getTemplateColorWidth(int devID)        { return device[devID].templateWIDTH; }
 int getTemplateColorHeight(int devID)       { return device[devID].templateHEIGHT; }
 int getTemplateColorDataSize(int devID)     { return device[devID].templateHEIGHT*device[devID].templateWIDTH * 3; }
@@ -505,6 +521,7 @@ char * getTemplateColorPixels(int devID)    { return device[devID].templateColor
 
 
    //Depth Frame getters
+unsigned long getLastTemplateDepthTimestamp(int devID) { return device[devID].lastDepthTimestamp; }
 int getTemplateDepthWidth(int devID)    { return device[devID].templateWIDTH; }
 int getTemplateDepthHeight(int devID)   { return device[devID].templateHEIGHT; }
 int getTemplateDepthDataSize(int devID) { return device[devID].templateWIDTH*device[devID].templateHEIGHT; }

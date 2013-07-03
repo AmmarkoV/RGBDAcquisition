@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
     {
         acquisitionSnapFrames(moduleID_1,devID_1);
 
-
+        acquisitionSimulateTime( acquisitionGetColorTimestamp(moduleID_1,devID_1) );
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         if (doNotSegmentRGB)
         { saveRawImageToFile(outfilename,acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB,heightRGB,channelsRGB,bitsperpixelRGB); }
@@ -174,6 +174,7 @@ int main(int argc, char *argv[])
         }
 
 
+        acquisitionSimulateTime( acquisitionGetDepthTimestamp(moduleID_1,devID_1) );
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         if (doNotSegmentDepth)
         { saveRawImageToFile(outfilename,(char*) acquisitionGetDepthFrame(moduleID_1,devID_1),widthDepth,heightDepth,channelsDepth,bitsperpixelDepth); }
