@@ -222,6 +222,124 @@ unsigned long getFileSize(char * filename)
 }
 
 
+
+
+
+int addPositionToObject(
+                              struct VirtualStream * stream ,
+                              char * name  ,
+                              unsigned int time ,
+                              float * coord ,
+                              unsigned int coordLength
+                       )
+{
+
+ unsigned int ObjFound = 0;
+ unsigned int ObjID = getObjectID(stream,name,&ObjFound);
+
+  if (!ObjFound) {
+                   fprintf(stderr,"Could not Find object %s \n",name);
+                   return 0;
+                 }
+
+
+  if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { growVirtualStreamFrames(&stream->object[ObjID],FRAMES_TO_ADD_STEP); }
+  //Now we should definately have enough space for our new frame
+  if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { fprintf(stderr,"Cannot add new POS instruction to Object %u \n",ObjID); return 0; }
+
+  //We have the space so lets fill our new frame spot ..!
+  unsigned int pos = stream->object[ObjID].numberOfFrames;
+
+  // 1 is object name
+  stream->object[ObjID].frame[pos].time = time;
+  if (coordLength > 0 ) {  stream->object[ObjID].frame[pos].x = coord[0]; }
+  if (coordLength > 1 ) {  stream->object[ObjID].frame[pos].y = coord[1]; }
+  if (coordLength > 2 ) {  stream->object[ObjID].frame[pos].z = coord[2]; }
+
+  if (coordLength > 3 ) {stream->object[ObjID].frame[pos].rot1 = coord[3]; }
+  if (coordLength > 4 ) {stream->object[ObjID].frame[pos].rot2 = coord[4]; }
+  if (coordLength > 5 ) {stream->object[ObjID].frame[pos].rot3 = coord[5]; }
+  if (coordLength > 6 ) {stream->object[ObjID].frame[pos].rot4 = coord[6]; }
+
+  if (stream->object[ObjID].MAX_timeOfFrames <= stream->object[ObjID].frame[pos].time)
+    {
+     stream->object[ObjID].MAX_timeOfFrames = stream->object[ObjID].frame[pos].time;
+    } else
+    {
+     fprintf(stderr,"Error in configuration file , object positions not in correct time order .. \n");
+    }
+
+  #if PRINT_DEBUGGING_INFO
+   fprintf(stderr,"String %s resolves to : \n",line);
+   fprintf(stderr,"X %02f Y %02f Z %02f ROT %02f %02f %02f %02f\n",stream->object[ObjID].frame[pos].x,stream->object[ObjID].frame[pos].y,stream->object[ObjID].frame[pos].z ,
+   stream->object[ObjID].frame[pos].rot1 , stream->object[ObjID].frame[pos].rot2 , stream->object[ObjID].frame[pos].rot3 , stream->object[ObjID].frame[pos].rot4 );
+  #endif
+
+
+  ++stream->object[ObjID].numberOfFrames;
+  return 1;
+}
+
+
+
+
+
+
+int addObjectToVirtualStream(
+                              struct VirtualStream * stream ,
+                              char * name , char * type ,
+                              unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
+                              float * coords ,
+                              unsigned int coordLength
+                            )
+{
+   if (stream->MAX_numberOfObjects<=stream->numberOfObjects+1) { growVirtualStreamObjects(stream,OBJECTS_TO_ADD_STEP); }
+   //Now we should definately have enough space for our new frame
+   if (stream->MAX_numberOfObjects<=stream->numberOfObjects+1) { fprintf(stderr,"Cannot add new OBJECT instruction\n"); return 0; }
+
+   //We have the space so lets fill our new object spot ..!
+   unsigned int pos = stream->numberOfObjects;
+   strcpy(stream->object[pos].name,name);
+   strcpy(stream->object[pos].typeStr,type);
+   stream->object[pos].R = R;
+   stream->object[pos].G = G;
+   stream->object[pos].B = B;
+   stream->object[pos].Transparency = Alpha;
+   stream->object[pos].nocolor = 0;
+
+   unsigned int found=0;
+   stream->object[pos].type = getObjectTypeID(stream,stream->object[pos].typeStr,&found);
+   if (!found) {
+                 fprintf(stderr,"Please note that type %s couldn't be found for object %s \n",stream->object[pos].typeStr,stream->object[pos].name);
+               }
+
+   ++stream->numberOfObjects;
+
+   return 1; // <- we always return
+   return found;
+}
+
+
+
+int addObjectTypeToVirtualStream(
+                                 struct VirtualStream * stream ,
+                                 char * type , char * model
+                                )
+{
+    if (stream->MAX_numberOfObjectTypes<=stream->numberOfObjectTypes+1) { growVirtualStreamObjectsTypes(stream,OBJECT_TYPES_TO_ADD_STEP); }
+    //Now we should definately have enough space for our new frame
+    if (stream->MAX_numberOfObjectTypes<=stream->numberOfObjectTypes+1) { fprintf(stderr,"Cannot add new OBJECTTYPE instruction\n"); }
+
+    //We have the space so lets fill our new object spot ..!
+    unsigned int pos = stream->numberOfObjectTypes;
+    strcpy(stream->objectTypes[pos].name,type);
+    strcpy(stream->objectTypes[pos].model,model);
+    ++stream->numberOfObjectTypes;
+
+    return 1; // <- we a
+}
+
+
 int readVirtualStream(struct VirtualStream * newstream)
 {
   #if PRINT_DEBUGGING_INFO
@@ -299,99 +417,51 @@ int readVirtualStream(struct VirtualStream * newstream)
               argument 0 = OBJECTTYPE , argument 1 = name ,  argument 2 = value */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECTTYPE",10)==1)
             {
-               if (newstream->MAX_numberOfObjectTypes<=newstream->numberOfObjectTypes+1) { growVirtualStreamObjectsTypes(newstream,OBJECT_TYPES_TO_ADD_STEP); }
-               //Now we should definately have enough space for our new frame
-               if (newstream->MAX_numberOfObjectTypes<=newstream->numberOfObjectTypes+1) { fprintf(stderr,"Cannot add new OBJECTTYPE instruction\n"); }
-                 else
-                 {
-                   //We have the space so lets fill our new object spot ..!
-                   unsigned int pos = newstream->numberOfObjectTypes;
-                    InputParser_GetWord(ipc,1,newstream->objectTypes[pos].name,MAX_PATH);
-                    InputParser_GetWord(ipc,2,newstream->objectTypes[pos].model,MAX_PATH);
-                   ++newstream->numberOfObjectTypes;
-                 }
+               char name[MAX_PATH]={0};
+               char model[MAX_PATH]={0};
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,model,MAX_PATH);
+
+               addObjectTypeToVirtualStream( newstream , name, model );
+
             } else
             /*! REACHED AN OBJECT DECLERATION ( OBJECT(something,spatoula_type,0,255,0,0,spatoula_something) )
               argument 0 = OBJECT , argument 1 = name ,  argument 2 = type ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = Data */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECT",6)==1)
             {
-               if (newstream->MAX_numberOfObjects<=newstream->numberOfObjects+1) { growVirtualStreamObjects(newstream,OBJECTS_TO_ADD_STEP); }
-               //Now we should definately have enough space for our new frame
-               if (newstream->MAX_numberOfObjects<=newstream->numberOfObjects+1) { fprintf(stderr,"Cannot add new OBJECT instruction\n"); }
-                 else
-                 {
-                   //We have the space so lets fill our new object spot ..!
-                   unsigned int pos = newstream->numberOfObjects;
-                    InputParser_GetWord(ipc,1,newstream->object[pos].name,MAX_PATH);
-                    InputParser_GetWord(ipc,2,newstream->object[pos].typeStr,MAX_PATH);
+               char name[MAX_PATH]={0} , typeStr[MAX_PATH]={0};
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
 
-                    newstream->object[pos].R = (float) InputParser_GetWordInt(ipc,3)  /  255;
-                    newstream->object[pos].G = (float) InputParser_GetWordInt(ipc,4)  /  255;
-                    newstream->object[pos].B = (float) InputParser_GetWordInt(ipc,5)  /  255;
-                    newstream->object[pos].Transparency = (float) InputParser_GetWordInt(ipc,6)  /  255;
-                    newstream->object[pos].nocolor = (float) InputParser_GetWordInt(ipc,7);
+               unsigned char R = (float) InputParser_GetWordInt(ipc,3)  /  255;
+               unsigned char G = (float) InputParser_GetWordInt(ipc,4)  /  255;
+               unsigned char B = (float) InputParser_GetWordInt(ipc,5)  /  255;
+               unsigned char Alpha = (float) InputParser_GetWordInt(ipc,6)  /  255;
+               int nocolor = (float) InputParser_GetWordInt(ipc,7);
 
-                    InputParser_GetWord(ipc,8,newstream->object[pos].value,15);
+               //Value , not used : InputParser_GetWord(ipc,8,newstream->object[pos].value,15);
+               addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,0,0);
 
-                    unsigned int found=0;
-                    newstream->object[pos].type = getObjectTypeID(newstream,newstream->object[pos].typeStr,&found);
-                    if (!found) { fprintf(stderr,"Please note that type %s couldn't be found for object %s \n",newstream->object[pos].typeStr,newstream->object[pos].name); }
-
-                   ++newstream->numberOfObjects;
-                 }
             } else
             /*! REACHED A POSITION DECLERATION ( POS(hand,0,   0.0,0.0,0.0 , 0.0,0.0,0.0,0.0 ) )
               argument 0 = POS , argument 1 = name ,  argument 2 = time in MS , argument 3-5 = X,Y,Z , argument 6-9 = Rotations*/
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"POS",3)==1)
             {
-               char Name[123];
-               InputParser_GetWord(ipc,1,Name,123);
-               unsigned int ObjFound = 0;
-               unsigned int ObjID = getObjectID(newstream,Name,&ObjFound);
+               char name[MAX_PATH];
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               unsigned int time = InputParser_GetWordInt(ipc,2);
 
-               if (!ObjFound)
-               {
-                  fprintf(stderr,"Could not Find object %s , line `%s` is skipped\n",Name , line);
-               } else
-               {
-                 fprintf(stderr,"Get ObjID %u from String %s \n",ObjID,Name);
-                 //We came across a POS command , lets see if it fits
-               if (newstream->object[ObjID].MAX_numberOfFrames<=newstream->object[ObjID].numberOfFrames+1) { growVirtualStreamFrames(&newstream->object[ObjID],FRAMES_TO_ADD_STEP); }
-               //Now we should definately have enough space for our new frame
-               if (newstream->object[ObjID].MAX_numberOfFrames<=newstream->object[ObjID].numberOfFrames+1) { fprintf(stderr,"Cannot add new POS instruction to Object %u \n",ObjID); }
-                 else
-                 {
-                   //We have the space so lets fill our new frame spot ..!
-                   unsigned int pos = newstream->object[ObjID].numberOfFrames;
+               float pos[7]={0};
+               pos[0] = InputParser_GetWordFloat(ipc,3);
+               pos[1] = InputParser_GetWordFloat(ipc,4);
+               pos[2] = InputParser_GetWordFloat(ipc,5);
+               pos[3] = InputParser_GetWordFloat(ipc,6);
+               pos[4] = InputParser_GetWordFloat(ipc,7);
+               pos[5] = InputParser_GetWordFloat(ipc,8);
+               pos[6] = InputParser_GetWordFloat(ipc,9);
+               int coordLength=7;
 
-                   // 1 is object name
-                   newstream->object[ObjID].frame[pos].time = InputParser_GetWordInt(ipc,2);
-                   newstream->object[ObjID].frame[pos].x = InputParser_GetWordFloat(ipc,3);
-                   newstream->object[ObjID].frame[pos].y = InputParser_GetWordFloat(ipc,4);
-                   newstream->object[ObjID].frame[pos].z = InputParser_GetWordFloat(ipc,5);
-                   newstream->object[ObjID].frame[pos].rot1 = InputParser_GetWordFloat(ipc,6);
-                   newstream->object[ObjID].frame[pos].rot2 = InputParser_GetWordFloat(ipc,7);
-                   newstream->object[ObjID].frame[pos].rot3 = InputParser_GetWordFloat(ipc,8);
-                   newstream->object[ObjID].frame[pos].rot4 = InputParser_GetWordFloat(ipc,9);
-
-                   if (newstream->object[ObjID].MAX_timeOfFrames <= newstream->object[ObjID].frame[pos].time)
-                      {
-                         newstream->object[ObjID].MAX_timeOfFrames = newstream->object[ObjID].frame[pos].time;
-                      } else
-                      {
-                         fprintf(stderr,"Error in configuration file , object positions not in correct time order .. \n");
-                      }
-
-                   #if PRINT_DEBUGGING_INFO
-                   fprintf(stderr,"String %s resolves to : \n",line);
-                   fprintf(stderr,"X %02f Y %02f Z %02f ROT %02f %02f %02f %02f\n",newstream->object[ObjID].frame[pos].x,newstream->object[ObjID].frame[pos].y,newstream->object[ObjID].frame[pos].z ,
-                                 newstream->object[ObjID].frame[pos].rot1 , newstream->object[ObjID].frame[pos].rot2 , newstream->object[ObjID].frame[pos].rot3 , newstream->object[ObjID].frame[pos].rot4 );
-                   #endif
-
-
-                   ++newstream->object[ObjID].numberOfFrames;
-                 }
-               }
+              addPositionToObject( newstream , name  , time , (float*) pos , coordLength );
             }
          } // End of line containing tokens
     } //End of getting a line while reading the file

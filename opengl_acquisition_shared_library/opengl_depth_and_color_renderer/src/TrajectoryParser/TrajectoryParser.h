@@ -92,6 +92,30 @@ int readVirtualStream(struct VirtualStream * newstream , char * filename);
 struct VirtualStream * createVirtualStream(char * filename);
 int destroyVirtualStream(struct VirtualStream * stream);
 
+int addObjectToVirtualStream(
+                              struct VirtualStream * stream ,
+                              char * name , char * type ,
+                              unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
+                              float * coords ,
+                              unsigned int coordLength
+                            );
+
+int addPositionToObject(
+                              struct VirtualStream * stream ,
+                              char * name  ,
+                              unsigned int time ,
+                              float * coord ,
+                              unsigned int coordLength
+                       );
+
+
+
+int addObjectTypeToVirtualStream(
+                                 struct VirtualStream * stream ,
+                                 char * type , char * model
+                                );
+
+
 int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeMilliseconds,float * pos);
 int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos);
 

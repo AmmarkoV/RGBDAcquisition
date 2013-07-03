@@ -41,6 +41,33 @@ int main(int argc, char *argv[])
 
   /*! --------------------------------- INITIALIZATION FROM COMMAND LINE PARAMETERS --------------------------------- */
 
+
+   //------------------------------------------------------------------
+   //                        CONFIGURATION
+   //------------------------------------------------------------------
+   int doNotSegmentRGB=1;
+   int doNotSegmentDepth=1;
+
+   struct SegmentationFeaturesRGB segConfRGB={0};
+   segConfRGB.minX=0;  segConfRGB.maxX=640;
+   segConfRGB.minY=0; segConfRGB.maxY=480;
+
+   segConfRGB.minR=0; segConfRGB.minG=0; segConfRGB.minB=0;
+   segConfRGB.maxR=256; segConfRGB.maxG=256; segConfRGB.maxB=256;
+
+   segConfRGB.enableReplacingColors=0;
+   segConfRGB.replaceR=92; segConfRGB.replaceG=45; segConfRGB.replaceB=36;
+
+   struct SegmentationFeaturesDepth segConfDepth={0};
+   segConfDepth.minX=0;  segConfDepth.maxX=640;
+   segConfDepth.minY=0; segConfDepth.maxY=480;
+   segConfDepth.minDepth=0; segConfDepth.maxDepth=32500;
+   //------------------------------------------------------------------
+   //------------------------------------------------------------------
+
+
+
+
   int i=0;
   for (i=0; i<argc; i++)
   {
@@ -52,6 +79,16 @@ int main(int argc, char *argv[])
                                            moduleID_1 = getModuleIdFromModuleName(argv[i+1]);
                                            fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
                                          } else
+
+    if (strcmp(argv[i],"-cropRGB")==0)    { segConfRGB.minX = atoi(argv[i+1]); segConfRGB.minY = atoi(argv[i+2]);
+                                            segConfRGB.maxX = atoi(argv[i+3]); segConfRGB.maxY = atoi(argv[i+4]);  doNotSegmentRGB=0; } else
+    if (strcmp(argv[i],"-cropDepth")==0)  { segConfDepth.minX = atoi(argv[i+1]); segConfDepth.minY = atoi(argv[i+2]);
+                                            segConfDepth.maxX = atoi(argv[i+3]); segConfDepth.maxY = atoi(argv[i+4]);  doNotSegmentDepth=0; } else
+    if (strcmp(argv[i],"-minRGB")==0)     { segConfRGB.minR = atoi(argv[i+1]); segConfRGB.minG = atoi(argv[i+2]); segConfRGB.minB = atoi(argv[i+3]); doNotSegmentRGB=0; } else
+    if (strcmp(argv[i],"-maxRGB")==0)     { segConfRGB.maxR = atoi(argv[i+1]); segConfRGB.maxG = atoi(argv[i+2]); segConfRGB.maxB = atoi(argv[i+3]); doNotSegmentRGB=0; } else
+    if (strcmp(argv[i],"-replaceRGB")==0) { segConfRGB.replaceR = atoi(argv[i+1]); segConfRGB.replaceG = atoi(argv[i+2]); segConfRGB.replaceB = atoi(argv[i+3]); segConfRGB.enableReplacingColors=1; } else
+    if (strcmp(argv[i],"-minDepth")==0)   { segConfDepth.minDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
+    if (strcmp(argv[i],"-maxDepth")==0)   { segConfDepth.maxDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
     if (
          (strcmp(argv[i],"-to")==0) ||
          (strcmp(argv[i],"-o")==0)
@@ -114,28 +151,7 @@ int main(int argc, char *argv[])
 
 
 
-   //------------------------------------------------------------------
-   //                        CONFIGURATION
-   //------------------------------------------------------------------
-   int doNotSegmentRGB=0;
-   int doNotSegmentDepth=1;
 
-   struct SegmentationFeaturesRGB segConfRGB={0};
-   segConfRGB.minX=0;  segConfRGB.maxX=611;
-   segConfRGB.minY=230; segConfRGB.maxY=472;
-
-   segConfRGB.minR=110; segConfRGB.minG=110; segConfRGB.minB=110;
-   segConfRGB.maxR=256; segConfRGB.maxG=256; segConfRGB.maxB=256;
-
-   segConfRGB.replaceR=92; segConfRGB.replaceG=45; segConfRGB.replaceB=36;
-   segConfRGB.enableReplacingColors=1;
-
-   struct SegmentationFeaturesDepth segConfDepth={0};
-   segConfDepth.minX=23;  segConfDepth.maxX=556;
-   segConfDepth.minY=101; segConfDepth.maxY=358;
-   segConfDepth.minDepth=10; segConfDepth.maxDepth=790;
-   //------------------------------------------------------------------
-   //------------------------------------------------------------------
 
 
    float centerX;
