@@ -37,7 +37,7 @@
 		<Linker>
 			<Add library="GL" />
 			<Add library="X11" />
-			<Add library="../../OGLRendererSandbox.so" />
+			<Add library="./OGLRendererSandbox.so" />
 			<Add directory="../../" />
 		</Linker>
 		<Unit filename="main.c">

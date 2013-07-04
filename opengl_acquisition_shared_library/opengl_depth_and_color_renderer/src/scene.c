@@ -152,7 +152,31 @@ int tickScene()
    return 1;
 }
 
+int drawPlane()
+{
 
+glColor3f(.3,.3,.3);
+glBegin(GL_QUADS);
+glVertex3f( 0,-0.001, 0);
+glVertex3f( 0,-0.001,10);
+glVertex3f(10,-0.001,10);
+glVertex3f(10,-0.001, 0);
+glEnd();
+
+glBegin(GL_LINES);
+int i;
+for(i=0; i<=100; i++)
+{
+    if (i==0) { glColor3f(.6,.3,.3); } else { glColor3f(.25,.25,.25); };
+    glVertex3f(i,0,0);
+    glVertex3f(i,0,10);
+    if (i==0) { glColor3f(.3,.3,.6); } else { glColor3f(.25,.25,.25); };
+    glVertex3f(0,0,i);
+    glVertex3f(10,0,i);
+};
+glEnd();
+
+}
 
 int renderScene()
 {
@@ -163,23 +187,24 @@ int renderScene()
   glPushMatrix();
   glMatrixMode(GL_MODELVIEW );
 
+  useCustomMatrix=0;
   if (useCustomMatrix)
   {
+  //TODO if calibration is given , change this with the calibration matrix
+  //http://www.khronos.org/opengles/sdk/1.1/docs/man/glLoadMatrix.xml
     glLoadMatrixf(customMatrix);
   } else
   {
     glLoadIdentity();
+    glRotatef(camera_angle_x,-1.0,0,0); // Peristrofi gyrw apo ton x
+    glRotatef(camera_angle_y,0,-1.0,0); // Peristrofi gyrw apo ton y
+    glRotatef(camera_angle_z,0,0,-1.0);
+    glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
   }
 
 
-  //TODO if calibration is given , change this with the calibration matrix
-  //http://www.khronos.org/opengles/sdk/1.1/docs/man/glLoadMatrix.xml
 
-  glRotatef(camera_angle_x,-1.0,0,0); // Peristrofi gyrw apo ton x
-  glRotatef(camera_angle_y,0,-1.0,0); // Peristrofi gyrw apo ton y
-  glRotatef(camera_angle_z,0,0,-1.0);
-  glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
-
+  drawPlane();
   unsigned int i;
   //Object 0 is camera
   for (i=1; i<scene->numberOfObjects; i++)

@@ -1,1 +1,140 @@
 # depslib dependency file v1.0
+1358941958 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.c
+	<X11/X.h>
+	<X11/keysym.h>
+	<stdio.h>
+	<stdlib.h>
+	<GL/glx.h>
+	<GL/gl.h>
+	"glx.h"
+
+1358790696 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.h
+
+1372797696 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/main.c
+	<stdio.h>
+	<stdlib.h>
+	<GL/glx.h>
+	<GL/gl.h>
+	<X11/X.h>
+	<X11/keysym.h>
+	"glx.h"
+	"model_loader_obj.h"
+	"scene.h"
+	"shader_loader.h"
+	"matrixCalculations.h"
+	"OGLRendererSandbox.h"
+
+1360240001 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader_obj.h
+	<GL/gl.h>
+	<GL/glx.h>
+	"model_loader.h"
+
+1360345827 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader.h
+
+1372796853 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.h
+
+1358725400 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/shader_loader.h
+	<GL/glx.h>
+	<GL/gl.h>
+	<GL/glext.h>
+
+1372945014 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/matrixCalculations.h
+
+1372797651 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
+
+1372945049 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/matrixCalculations.c
+	"matrixCalculations.h"
+	<stdio.h>
+
+1360345797 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	"model_loader.h"
+	"model_loader_obj.h"
+	"tools.h"
+
+1358780847 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/tools.h
+
+1360344811 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader_obj.c
+	"model_loader_obj.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"TextureLoader/texture_loader.h"
+
+1360239459 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h
+
+1358942127 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/save_to_file.c
+	"save_to_file.h"
+	<stdio.h>
+	<stdlib.h>
+
+1358800469 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/save_to_file.h
+
+1358725425 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/shader_loader.c
+	<stdio.h>
+	<stdlib.h>
+	<GL/glx.h>
+	<GL/gl.h>
+	<GL/glext.h>
+	"shader_loader.h"
+	"tools.h"
+
+1360177729 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/bmp.c
+	"bmp.h"
+	<stdio.h>
+	<stdlib.h>
+	<errno.h>
+
+1360177921 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/bmp.h
+	<GL/glut.h>
+	<windows.h>
+	<wingdi.h>
+
+1360238579 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/ppm.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"ppm.h"
+
+1360189243 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/ppm.h
+
+1360243178 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	"../model_loader.h"
+	"texture_loader.h"
+	"bmp.h"
+	"ppm.h"
+
+1358942088 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/tools.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"tools.h"
+
+1360246105 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp
+	"InputParser_C.h"
+
+1359114838 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+
+1372926809 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp
+	"TrajectoryParser.h"
+	"InputParser_C.h"
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+
+1372842571 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h
+

@@ -340,6 +340,9 @@ int addObjectTypeToVirtualStream(
 }
 
 
+
+
+
 int readVirtualStream(struct VirtualStream * newstream)
 {
   #if PRINT_DEBUGGING_INFO
@@ -539,14 +542,21 @@ struct VirtualStream * createVirtualStream(char * filename)
 
   //Clear the whole damn thing..
   memset(newstream,0,sizeof(struct VirtualStream));
-  strncpy(newstream->filename,filename,MAX_PATH);
 
-  if (!readVirtualStream(newstream))
+  if (filename!=0)
+  {
+   strncpy(newstream->filename,filename,MAX_PATH);
+
+   if (!readVirtualStream(newstream))
     {
       fprintf(stderr,"Could not read Virtual Stream from file %s \n",filename);
       destroyVirtualStream(newstream);
       return 0;
     }
+  } else
+  {
+    fprintf(stderr,"Created an empty virtual stream\n");
+  }
 
   return newstream;
 }
