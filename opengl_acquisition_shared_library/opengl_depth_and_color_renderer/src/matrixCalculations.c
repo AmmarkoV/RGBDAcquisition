@@ -88,11 +88,12 @@ int multiplyVectorWith3x3Matrix(float * matrix, float * result)
 int convertRodriguezAndTransTo4x4(float * rodriguez , float * translation , float * matrix4x4 )
 {
   //return 0;
-  //float matrix3x3[9]={0};
-  //convertRodriguezTo3x3(rodriguez,(float*) matrix3x3);
-  //upscale3x3to4x4((float*) matrix3x3,matrix4x4);
+  float matrix3x3[9]={0};
+  convertRodriguezTo3x3(rodriguez,(float*) matrix3x3);
+  upscale3x3to4x4((float*) matrix3x3,matrix4x4);
+  matrix4x4[3]=translation[0]; matrix4x4[7]=translation[1]; matrix4x4[11]=translation[2];
 
-  convertTranslationTo4x4(translation,matrix4x4);
+  //convertTranslationTo4x4(translation,matrix4x4);
 
   fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
   fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);

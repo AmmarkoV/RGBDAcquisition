@@ -11,7 +11,7 @@
 struct VirtualStream * scene = 0;
 struct Model ** models=0;
 
-float farPlane = 255;
+float farPlane = 1000;
 float nearPlane= 1.0;
 
 int useCustomMatrix=0;
@@ -152,31 +152,51 @@ int tickScene()
    return 1;
 }
 
-int drawPlane()
+int drawPlane(float scale)
 {
 
 glColor3f(.3,.3,.3);
-glBegin(GL_QUADS);
-glVertex3f( 0,-0.001, 0);
-glVertex3f( 0,-0.001,10);
-glVertex3f(10,-0.001,10);
-glVertex3f(10,-0.001, 0);
-glEnd();
-
 glBegin(GL_LINES);
-int i;
-for(i=0; i<=100; i++)
+signed int i;
+
+float floorWidth = 500;
+for(i=-floorWidth; i<=floorWidth; i++)
 {
-    if (i==0) { glColor3f(.6,.3,.3); } else { glColor3f(.25,.25,.25); };
-    glVertex3f(i,0,0);
-    glVertex3f(i,0,10);
-    if (i==0) { glColor3f(.3,.3,.6); } else { glColor3f(.25,.25,.25); };
-    glVertex3f(0,0,i);
-    glVertex3f(10,0,i);
+    glVertex3f(-floorWidth*scale,0,i*scale);
+    glVertex3f(floorWidth*scale,0,i*scale);
+
+    glVertex3f(i*scale,0,-floorWidth*scale);
+    glVertex3f(i*scale,0,floorWidth*scale);
 };
 glEnd();
 
 }
+
+
+
+int drawAxis(float scale)
+{
+ glBegin(GL_LINES);
+
+ glColor3f(1.0,0.0,0.0);
+ glVertex3f(0,0,0);
+ glVertex3f(1.0*scale,0,0);
+
+
+ glColor3f(0.0,1.0,0.0);
+ glVertex3f(0,0,0);
+ glVertex3f(0,1.0*scale,0);
+
+ glColor3f(0.0,0.0,1.0);
+ glVertex3f(0,0,0);
+ glVertex3f(0,0,1.0*scale);
+
+glEnd();
+
+ return 1;
+}
+
+
 
 int renderScene()
 {
@@ -203,8 +223,8 @@ int renderScene()
   }
 
 
-
-  drawPlane();
+  drawAxis(1.0);
+  drawPlane(0.01);
   unsigned int i;
   //Object 0 is camera
   for (i=1; i<scene->numberOfObjects; i++)
