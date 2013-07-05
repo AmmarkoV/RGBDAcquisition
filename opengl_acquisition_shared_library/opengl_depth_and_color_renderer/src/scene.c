@@ -86,7 +86,7 @@ int initScene()
 
   unsigned int i=0;
   //Object 0 is camera
-  for (i=1; i<scene->numberOfObjects; i++)
+  for (i=1; i<scene->numberOfObjectTypes; i++)
     {
          models[i] = loadModel("Models/",getObjectTypeModel(scene,i));
          if (models[i]!=0)
@@ -95,6 +95,7 @@ int initScene()
            getObjectColorsTrans(scene,i,&R,&G,&B,&trans);
            setModelColor(models[i],&R,&G,&B,&trans);
            models[i]->nocolor = scene->object[i].nocolor;
+           fprintf(stderr,"Model %s , is now loaded as model[%u] \n",getObjectTypeModel(scene,i) ,i );
           }
             else
           {
@@ -135,12 +136,13 @@ int tickScene()
 
   unsigned int i=0;
   //Object 0 is camera
+  /*
   for (i=1; i<scene->numberOfObjects; i++)
     {
        pos[0]=0; pos[1]=0; pos[2]=0; pos[3]=0; pos[4]=0; pos[5]=0; pos[6]=0;
        calculateVirtualStreamPos(scene,i,ticks*100,pos);
        setModelCoordinatesNoSTACK(models[i],&pos[0],&pos[1],&pos[2],&pos[3],&pos[4],&pos[5]);
-    }
+    }*/
 
    //Camera information
    calculateVirtualStreamPos(scene,0,ticks*100,pos);
@@ -156,6 +158,7 @@ int drawPlane(float scale)
 {
 
 glColor3f(.3,.3,.3);
+glColor3f(1.0,1.0,1.0);
 glBegin(GL_LINES);
 signed int i;
 
@@ -176,6 +179,7 @@ glEnd();
 
 int drawAxis(float scale)
 {
+ glLineWidth(15.0);
  glBegin(GL_LINES);
 
  glColor3f(1.0,0.0,0.0);
@@ -192,6 +196,7 @@ int drawAxis(float scale)
  glVertex3f(0,0,1.0*scale);
 
 glEnd();
+glLineWidth(1.0);
 
  return 1;
 }
@@ -223,13 +228,28 @@ int renderScene()
   }
 
 
-  drawAxis(1.0);
-  drawPlane(0.01);
-  unsigned int i;
+  //drawAxis(10.0);
+  drawPlane(2.01);
+  float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
+unsigned int i;
   //Object 0 is camera
   for (i=1; i<scene->numberOfObjects; i++)
     {
-       drawModel(models[i]);
+       struct Model * mod = models[scene->object[i].type];
+       float posStack[7]={0};
+       float * pos = (float*) &posStack;
+       calculateVirtualStreamPos(scene,i,ticks*100,pos);
+
+        R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
+        getObjectColorsTrans(scene,i,&R,&G,&B,&trans);
+        setModelColor(mod,&R,&G,&B,&trans);
+        mod->nocolor = scene->object[i].nocolor;
+
+
+       if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
+       {
+         fprintf(stderr,"Could not draw object %u , type %u \n",i , scene->object[i].type );
+       }
     }
 
 

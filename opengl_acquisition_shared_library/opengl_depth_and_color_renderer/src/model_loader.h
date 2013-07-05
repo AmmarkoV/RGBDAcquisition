@@ -37,8 +37,8 @@ struct Model
 struct Model * loadModel(char * directory,char * modelname);
 void unloadModel(struct Model * mod);
 
-void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
-void drawModel(struct Model * mod);
+int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
+int drawModel(struct Model * mod);
 
 int addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
 int addToModelCoordinatesNoSTACK(struct Model * mod,float *x,float *y,float *z,float *heading,float *pitch,float *roll);

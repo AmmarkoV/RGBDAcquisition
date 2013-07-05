@@ -29,7 +29,7 @@
 	<GL/glx.h>
 	"model_loader.h"
 
-1360345827 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader.h
+1373030059 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader.h
 
 1372796853 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.h
 
@@ -46,7 +46,7 @@
 	"matrixCalculations.h"
 	<stdio.h>
 
-1360345797 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader.c
+1373030071 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -129,7 +129,7 @@
 	<string.h>
 	<ctype.h>
 
-1372926809 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp
+1373024453 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp
 	"TrajectoryParser.h"
 	"InputParser_C.h"
 	<stdio.h>
@@ -137,12 +137,4 @@
 	<ctype.h>
 
 1372842571 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h
-
-1373018317 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
-	<GL/gl.h>
-	<GL/glx.h>
-	<stdio.h>
-	"TrajectoryParser/TrajectoryParser.h"
-	"model_loader.h"
-	"scene.h"
 

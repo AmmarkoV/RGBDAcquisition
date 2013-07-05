@@ -313,7 +313,7 @@ int addObjectToVirtualStream(
                  fprintf(stderr,"Please note that type %s couldn't be found for object %s \n",stream->object[pos].typeStr,stream->object[pos].name);
                }
 
-   fprintf(stderr,"addedObjec(%s,%s) with ID %u ,typeID %u \n",name,type,pos,stream->object[pos].type);
+   fprintf(stderr,"addedObject(%s,%s) with ID %u ,typeID %u \n",name,type,pos,stream->object[pos].type);
    ++stream->numberOfObjects;
 
    return 1; // <- we always return

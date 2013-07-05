@@ -43,7 +43,7 @@ void unloadModel(struct Model * mod)
     };
 }
 
-void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
+int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
 {
  if (mod!=0)
  {
@@ -103,16 +103,19 @@ void drawModelAt(struct Model * mod,float x,float y,float z,float heading,float 
   glPopMatrix();
 } else
 {
-    fprintf(stderr,"Cannot draw model , it doesnt exist \n");
+    fprintf(stderr,"Cannot draw model at position %0.2f %0.2f %0.2f , it doesnt exist \n",x,y,z);
+    return 0;
 }
+ return 1;
 }
 
 
-void drawModel(struct Model * mod)
+int drawModel(struct Model * mod)
 {
-    if (mod == 0) { fprintf(stderr,"Cannot draw model , it doesnt exist \n"); return ; } //If mod = 0 accesing the fields below will lead in crashing..
-    drawModelAt(mod,mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+    if (mod == 0) { fprintf(stderr,"Cannot draw model , it doesnt exist \n"); return 0; } //If mod = 0 accesing the fields below will lead in crashing..
+    return drawModelAt(mod,mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
 }
+
 
 int addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
 {
