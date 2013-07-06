@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="libOpenGLAcquisition" prefix_auto="1" extension_auto="1" />
+				<Option output="OpenGLAcquisition" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -18,7 +18,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="libOpenGLAcquisition" prefix_auto="1" extension_auto="1" />
+				<Option output="OpenGLAcquisition" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -67,6 +67,10 @@
 		<Unit filename="opengl_depth_and_color_renderer/src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="opengl_depth_and_color_renderer/src/matrixCalculations.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="opengl_depth_and_color_renderer/src/matrixCalculations.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/model_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

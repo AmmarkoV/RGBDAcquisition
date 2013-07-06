@@ -27,6 +27,10 @@ int saveOpenGLColorFramePNM(int devID,char * filename) ;
 double getOpenGLColorFocalLength(int devID);
 double getOpenGLColorPixelSize(int devID);
 
+
+int getOpenGLColorCalibration(int devID,struct calibration * calib);
+int getOpenGLDepthCalibration(int devID,struct calibration * calib);
+
 int setOpenGLColorCalibration(int devID,struct calibration * calib);
 int setOpenGLDepthCalibration(int devID,struct calibration * calib);
 

@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG =  $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = libOpenGLAcquisition.so
+OUT_DEBUG = OpenGLAcquisition.so
 
 INC_RELEASE =  $(INC)
 CFLAGS_RELEASE =  $(CFLAGS) -O2
@@ -38,11 +38,11 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = libOpenGLAcquisition.so
+OUT_RELEASE = OpenGLAcquisition.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/shader_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/scene.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/save_to_file.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o $(OBJDIR_DEBUG)/OpenGLAcquisition.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/glx.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/shader_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/scene.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/save_to_file.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/matrixCalculations.o $(OBJDIR_DEBUG)/OpenGLAcquisition.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/glx.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/shader_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/scene.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/save_to_file.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader_obj.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o $(OBJDIR_RELEASE)/OpenGLAcquisition.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/glx.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/shader_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/scene.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/save_to_file.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader_obj.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/matrixCalculations.o $(OBJDIR_RELEASE)/OpenGLAcquisition.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/glx.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o
 
 all: debug release
 
@@ -60,6 +60,9 @@ debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
+
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o: opengl_depth_and_color_renderer/src/main.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/main.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o
 
 $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o: opengl_depth_and_color_renderer/src/tools.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/tools.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o
@@ -79,8 +82,8 @@ $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o: opengl_d
 $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o: opengl_depth_and_color_renderer/src/model_loader.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/model_loader.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o
 
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o: opengl_depth_and_color_renderer/src/main.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/main.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/matrixCalculations.o: opengl_depth_and_color_renderer/src/matrixCalculations.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/matrixCalculations.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/matrixCalculations.o
 
 $(OBJDIR_DEBUG)/OpenGLAcquisition.o: OpenGLAcquisition.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c OpenGLAcquisition.cpp -o $(OBJDIR_DEBUG)/OpenGLAcquisition.o
@@ -123,6 +126,9 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o: opengl_depth_and_color_renderer/src/main.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/main.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o
+
 $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o: opengl_depth_and_color_renderer/src/tools.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/tools.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o
 
@@ -141,8 +147,8 @@ $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader_obj.o: opengl
 $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o: opengl_depth_and_color_renderer/src/model_loader.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/model_loader.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o
 
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o: opengl_depth_and_color_renderer/src/main.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/main.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/matrixCalculations.o: opengl_depth_and_color_renderer/src/matrixCalculations.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/matrixCalculations.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/matrixCalculations.o
 
 $(OBJDIR_RELEASE)/OpenGLAcquisition.o: OpenGLAcquisition.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c OpenGLAcquisition.cpp -o $(OBJDIR_RELEASE)/OpenGLAcquisition.o
