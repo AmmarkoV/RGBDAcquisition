@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
+		<Project filename="DepthImagesConverter/DepthImagesConverter.cbp" />
 		<Project filename="Calibration/Calibration.cbp" />
 		<Project filename="ExtrinsicCalibration/ExtrinsicCalibration.cbp" />
+		<Project filename="Undistort/Undistort.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

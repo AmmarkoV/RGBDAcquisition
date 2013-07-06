@@ -1,16 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../Codecs/codecs.h"
 
-unsigned int * resection_left_precalc = 0;
-unsigned int * resection_right_precalc = 0;
-
-//unsigned int resection_left_precalc[(ABSOLUTE_MAX_WIDTH+1)*(ABSOLUTE_MAX_HEIGHT+1)*3];
-//unsigned int resection_right_precalc[(ABSOLUTE_MAX_WIDTH+1)*(ABSOLUTE_MAX_HEIGHT+1)*3];
-
-//unsigned int precalc_group_block_belong[ABSOLUTE_MAX_WIDTH+1][ABSOLUTE_MAX_HEIGHT+1];
-
-
+struct resectionData
+{
+  unsigned int * directMapping;
+  unsigned int * pointsListThatNeedInterpolation;
+};
 
 /*
 
@@ -23,25 +20,24 @@ unsigned int * resection_right_precalc = 0;
    M =   |0   fy  cy|       d   e   f
          |0   0   1 |       g   h   i
 */
-unsigned int precalculateResectioning(unsigned int * frame ,  unsigned int width , unsigned int height,
-                                                                 double fx,double fy , double cx,double cy ,
-                                                                   double k1,double k2 , double p1,double p2 , double k3   )
+struct resectionData * precalculateResectioning( unsigned int width , unsigned int height,
+                                                                    double fx,double fy , double cx,double cy ,
+                                                                    double k1,double k2 , double p1,double p2 , double k3   )
 {
-  if ( frame == 0 )
-    {
-       fprintf(stderr , "WARNING : PrecalcResectioning called with a zero frame to work on..!\n");
-       fprintf(stderr , "WARNING : This means that precalculations haven't been made..!\n");
-       fprintf(stderr , "WARNING : PrecalcResectioning code will now return without doing anything..\n");
-       return 0;
-    }
+   struct resectionData * res = (struct resectionData *) malloc (sizeof(struct resectionData));
+   if  (res==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
+   res->directMapping = (unsigned int *) malloc (width * height * sizeof(unsigned int));
+   if  (res->directMapping==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
 
 
-  fprintf(stderr,"Calibrating fx=%f fy=%f cx=%f cy=%f\n",fx,fy,cx,cy);
+  unsigned int * frame = res->directMapping;
+
+  fprintf(stderr,"Calibrating for fx=%f fy=%f cx=%f cy=%f\n",fx,fy,cx,cy);
   fprintf(stderr,"k1=%f k2=%f p1=%f p2=%f k3=%f \n",k1,k2,p1,p2,k3);
 
   if ( ( fx == 0.0) || ( fy == 0.0) || ( (k1==0.0)&&(k2==0.0)&&(k3==0.0) )) { fprintf(stderr,"Erroneous parameters calibration canceled\n"); return 0; }
 
-  unsigned int i,x = width ,y= height , mem , new_mem , interpolation_mem;
+  unsigned int i,x = width ,y= height , mem , new_mem , addressForErrors;
   unsigned int undistorted_x,undistorted_y;
 
   mem = 0;
@@ -72,7 +68,7 @@ unsigned int precalculateResectioning(unsigned int * frame ,  unsigned int width
 
   for (y=0; y<height; y++)
   {
-     interpolation_mem=0;
+     addressForErrors=0;
      for (x=0; x<width; x++)
         {
           //Well this is supposed to rectify lens distortions based on calibration done with my image sets
@@ -153,7 +149,7 @@ unsigned int precalculateResectioning(unsigned int * frame ,  unsigned int width
              /* ACCURACY ERROR , This means that we have a percision error in the way math is done*/
              //fprintf(stderr,"$%u,%u to %u,%u",x,y,undistorted_x,undistorted_y);
              new_mem = 0;
-                 new_mem=interpolation_mem ; //TEST THIS USESTHE INTERPOLATED TO GET RID OF SOME BLANK SPOT ARTIFACTS
+                 new_mem=addressForErrors ; //TEST THIS USESTHE INTERPOLATED TO GET RID OF SOME BLANK SPOT ARTIFACTS
              ++PrecisionErrors;
           }
 
@@ -162,12 +158,12 @@ unsigned int precalculateResectioning(unsigned int * frame ,  unsigned int width
                  // OFF RESULTS SHOULD BE INTERPOLATED WITH CLOSE MEMORY SPOTS
                  //fprintf(stderr,"!%u,%u to %u,%u",x,y,undistorted_x,undistorted_y);
                  new_mem = 0;
-                 new_mem=interpolation_mem ; //TEST THIS USESTHE INTERPOLATED TO GET RID OF SOME BLANK SPOT ARTIFACTS
+                 new_mem=addressForErrors ; //TEST THIS USESTHE INTERPOLATED TO GET RID OF SOME BLANK SPOT ARTIFACTS
                  ++OffFrame;
              } else
              {
                 new_mem = undistorted_y * (width * 3) + undistorted_x * 3 ;
-                interpolation_mem = new_mem;
+
                 if ( new_mem>= (width * height * 3) )
                  {
                    new_mem = 0;
@@ -192,8 +188,7 @@ unsigned int precalculateResectioning(unsigned int * frame ,  unsigned int width
 
  fprintf(stderr,"PrecalculationErrors - Precision=%u , OffFrame=%u , OutOfMemory=%u\n",PrecisionErrors,OffFrame,OutOfMemory);
 
- return 1;
-
+ return res;
 }
 
 
@@ -227,8 +222,25 @@ int calibrateImage(unsigned char * input , unsigned char * output , unsigned int
 
 
 
-int main()
+int main(int argc, char** argv )
 {
-    printf("Hello world!\n");
-    return 0;
+   if( argc < 2)
+   {
+     printf(" Usage: undistort ImageToLoadAndUndistort Output fx fy cx cy k1 k2 p1 p2 k3\n");
+     return 1;
+   }
+
+  struct Image * img  = readImage(argv[1],PPM_CODEC,0);
+  if (img==0) { fprintf(stderr,"Could not open file %s \n",argv[1]); return 1; }
+
+  double fx = 535.784106 , fy = 534.223354 , cx = 312.428312 , cy = 243.889369;
+  double k1 = 0.021026 , k2 = -0.069355 , p1 = 0.000598 , p2 = 0.001729 , k3 = 0.0;
+
+  struct resectionData *   res = precalculateResectioning(img->width,img->height,fx,fy,cx,cy,k1,k2,p1,p2,k3);
+  if (res==0) { fprintf(stderr,"Could not generate resection data for file %s \n",argv[1]); return 1; }
+
+
+
+
+  return 0;
 }

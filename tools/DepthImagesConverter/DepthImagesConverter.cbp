@@ -39,26 +39,30 @@
 			<Add option="-ljpeg" />
 			<Add option="-lpng" />
 		</Linker>
-		<Unit filename="codecs/codecs.c">
+		<Unit filename="../Codecs/codecs.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="codecs/codecs.h" />
-		<Unit filename="codecs/jpgExiforient_embed.c">
+		<Unit filename="../Codecs/codecs.h" />
+		<Unit filename="../Codecs/jpgExifexternal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="codecs/jpgExiforient_embed.h" />
-		<Unit filename="codecs/jpgInput.c">
+		<Unit filename="../Codecs/jpgExifexternal.h" />
+		<Unit filename="../Codecs/jpgExiforient_embed.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="codecs/jpgInput.h" />
-		<Unit filename="codecs/pngInput.c">
+		<Unit filename="../Codecs/jpgExiforient_embed.h" />
+		<Unit filename="../Codecs/jpgInput.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="codecs/pngInput.h" />
-		<Unit filename="codecs/ppmInput.c">
+		<Unit filename="../Codecs/jpgInput.h" />
+		<Unit filename="../Codecs/pngInput.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="codecs/ppmInput.h" />
+		<Unit filename="../Codecs/pngInput.h" />
+		<Unit filename="../Codecs/ppmInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Codecs/ppmInput.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<envvars />

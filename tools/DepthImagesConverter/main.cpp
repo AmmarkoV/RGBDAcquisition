@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdio.h>
 
-#include "codecs/codecs.h"
+#include "../Codecs/codecs.h"
 
 using namespace cv;
 using namespace std;

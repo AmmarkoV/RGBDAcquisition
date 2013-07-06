@@ -31,6 +31,34 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add option="-ljpeg" />
+			<Add option="-lpng" />
+		</Linker>
+		<Unit filename="../Codecs/codecs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Codecs/codecs.h" />
+		<Unit filename="../Codecs/jpgExifexternal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Codecs/jpgExifexternal.h" />
+		<Unit filename="../Codecs/jpgExiforient_embed.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Codecs/jpgExiforient_embed.h" />
+		<Unit filename="../Codecs/jpgInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Codecs/jpgInput.h" />
+		<Unit filename="../Codecs/pngInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Codecs/pngInput.h" />
+		<Unit filename="../Codecs/ppmInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Codecs/ppmInput.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
