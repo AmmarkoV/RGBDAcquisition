@@ -219,13 +219,11 @@ int calibrateImage(unsigned char * input , unsigned char * output , unsigned int
 
 
 
-
-
-
-int main(int argc, char** argv )
+int main(int argc, char** argv)
 {
-   if( argc < 2)
+   if( argc < 12)
    {
+     fprintf(stderr,"Provided %u arguments\n",argc);
      printf(" Usage: undistort ImageToLoadAndUndistort Output fx fy cx cy k1 k2 p1 p2 k3\n");
      return 1;
    }
@@ -239,8 +237,11 @@ int main(int argc, char** argv )
   struct resectionData *   res = precalculateResectioning(img->width,img->height,fx,fy,cx,cy,k1,k2,p1,p2,k3);
   if (res==0) { fprintf(stderr,"Could not generate resection data for file %s \n",argv[1]); return 1; }
 
+  struct Image * undistortedImg = createImage(img->width,img->height , img->channels , img->bitsperpixel );
+  if (undistortedImg==0) { fprintf(stderr,"Could not generate output image file to hold %s \n",argv[2]); return 1; }
 
-
+  destroyImage(img);
+  destroyImage(undistortedImg);
 
   return 0;
 }

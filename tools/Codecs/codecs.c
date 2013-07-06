@@ -121,6 +121,22 @@ int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned lon
 }
 
 
+struct Image * createImage( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel)
+{
+  struct Image * img = 0;
+  img = (struct Image *) malloc( sizeof(struct Image) );
+
+  img->width = width;
+  img->height = height;
+  img->channels = channels;
+  img->bitsperpixel = bitsPerPixel;
+
+  img->pixels = ( unsigned char * ) malloc(width * height * channels * (bitsPerPixel/8) * sizeof(unsigned char) );
+  memset(img,0,sizeof(struct Image));
+  return  img; // :P just to make sure
+}
+
+
 int destroyImage(struct Image * img)
 {
     if (img->pixels!=0) { free(img->pixels); img->pixels=0; }
