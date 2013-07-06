@@ -91,7 +91,8 @@ int convertRodriguezAndTransTo4x4(float * rodriguez , float * translation , floa
   float matrix3x3[9]={0};
   convertRodriguezTo3x3(rodriguez,(float*) matrix3x3);
   upscale3x3to4x4((float*) matrix3x3,matrix4x4);
-  matrix4x4[3]=translation[0]; matrix4x4[7]=translation[1]; matrix4x4[11]=translation[2];
+
+  //Append Translation -> matrix4x4[3]=translation[0]; matrix4x4[7]=translation[1]; matrix4x4[11]=translation[2];
 
   //convertTranslationTo4x4(translation,matrix4x4);
 

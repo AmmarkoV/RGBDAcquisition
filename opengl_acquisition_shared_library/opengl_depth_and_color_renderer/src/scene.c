@@ -21,6 +21,8 @@ float customMatrix[16]={
                         0.0 , 0.0 , 1.0 , 0.0 ,
                         0.0 , 0.0 , 0.0 , 1.0
                        };
+float customTranslation[3]={0};
+
 
 
 const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -156,21 +158,22 @@ int tickScene()
 
 int drawPlane(float scale)
 {
+ float y = - 3.0;
 
-glColor3f(.3,.3,.3);
-glColor3f(1.0,1.0,1.0);
-glBegin(GL_LINES);
-signed int i;
+ glColor3f(.3,.3,.3);
+ glColor3f(1.0,1.0,1.0);
+ glBegin(GL_LINES);
+ signed int i;
 
-float floorWidth = 500;
-for(i=-floorWidth; i<=floorWidth; i++)
-{
-    glVertex3f(-floorWidth*scale,0,i*scale);
-    glVertex3f(floorWidth*scale,0,i*scale);
+ float floorWidth = 500;
+ for(i=-floorWidth; i<=floorWidth; i++)
+ {
+    glVertex3f(-floorWidth*scale,y,i*scale);
+    glVertex3f(floorWidth*scale,y,i*scale);
 
-    glVertex3f(i*scale,0,-floorWidth*scale);
-    glVertex3f(i*scale,0,floorWidth*scale);
-};
+    glVertex3f(i*scale,y,-floorWidth*scale);
+    glVertex3f(i*scale,y,floorWidth*scale);
+ };
 glEnd();
 
 }
@@ -212,12 +215,13 @@ int renderScene()
   glPushMatrix();
   glMatrixMode(GL_MODELVIEW );
 
-  useCustomMatrix=0;
+  //useCustomMatrix=0; //<- uncomment to disable custom matrixes
   if (useCustomMatrix)
   {
   //TODO if calibration is given , change this with the calibration matrix
   //http://www.khronos.org/opengles/sdk/1.1/docs/man/glLoadMatrix.xml
     glLoadMatrixf(customMatrix);
+    glTranslatef(customTranslation[0], customTranslation[1] , customTranslation[2]);
   } else
   {
     glLoadIdentity();
@@ -229,7 +233,7 @@ int renderScene()
 
 
   //drawAxis(10.0);
-  drawPlane(2.01);
+  drawPlane(0.1);
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 unsigned int i;
   //Object 0 is camera
