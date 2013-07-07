@@ -14,6 +14,27 @@ there also exists a bash script called
 ./make.sh , you could use it if you run into problems
 
 
+The project is divided in libraries applications and tools
+
+Applications include :
+a Grabber , which can grab frames from the inputs and save them to disk 
+a Muxer   , which can combine 2 frame streams in to a new one and save it to disk
+a Broadcaster , which can transmit a stream through HTTP protocol
+a Viewer   , which can view a stream
+a Segmenter , which can discard or label parts of a stream
+
+Tools include :
+Intrinsic / Extrinsic calibration using opencv
+Undistorting images ( intrinsic )
+Converting from 16bit PNG depths to PNM
+
+Libraries include :
+V4L2 acquisition
+V4L2 Stereo acquisition
+OpenNI1 acquisition
+OpenNI2 acquisition
+libFreenect acquisition
+
 To test it issue 
 
 ./run_grabber.sh 10

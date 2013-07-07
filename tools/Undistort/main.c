@@ -26,9 +26,9 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
 {
    struct resectionData * res = (struct resectionData *) malloc (sizeof(struct resectionData));
    if (res==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
-   res->directMapping = (unsigned int *) malloc (width * height /** 3*/ * sizeof(unsigned int));
+   res->directMapping = (unsigned int *) malloc (width * height * sizeof(unsigned int));
    if (res->directMapping==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
-   memset(res->directMapping,0,width * height /** 3*/ * sizeof(unsigned int));
+   memset(res->directMapping,0,width * height * sizeof(unsigned int));
    res->pointsListThatNeedInterpolation = 0;
 
   unsigned int * frame = res->directMapping;
@@ -174,16 +174,8 @@ archived at 3dpartylibs/code/undistort_point.cpp
                 //fprintf(stderr,"%u,%u -> %u,%u .. \n",x,y,undistorted_x,undistorted_y);
              }
 
-
-
           frame [mem] = new_mem;
-          ++mem; ++new_mem;
-/*
-          frame [mem] = new_mem;
-          ++mem; ++new_mem;
-
-          frame [mem] = new_mem;
-          ++mem; ++new_mem;*/
+          ++mem;
 
        }
    }
