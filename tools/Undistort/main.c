@@ -9,6 +9,46 @@ struct resectionData
   unsigned int * pointsListThatNeedInterpolation;
 };
 
+
+
+
+int interpolateHolesInResectioning( struct resectionData * res , unsigned int width , unsigned int height)
+{
+ unsigned int * M = res->directMapping;
+ unsigned int holes=0,filled=0;
+
+ fprintf(stderr,"Interpolating holes in generated resectioning\n");
+ unsigned int i=0,x=0,y=0;
+ for (y=0; y<height; y++)
+ {
+   i=y * width;
+   for (x=1; x<width-1; x++)
+   {
+     ++i;
+     if (M[i]==0)
+       {
+         if (M[i-1]==0) { fprintf(stderr,"DEL"); } else
+                        { M[i] = M[i-1]; fprintf(stderr,"L(%u,%u)",x,y); ++holes; }
+
+         if (M[i+1]==0) { fprintf(stderr,"DER"); } else
+                        { M[i] = M[i+1]; fprintf(stderr,"R(%u,%u)",x,y); ++holes; }
+
+       } else
+     if ( (M[i-1]!=0) && (M[i]==0) && (M[i+1]!=0) ) { fprintf(stderr,"(%u,%u)",x,y); ++holes; } else
+     if ( (M[i-1]!=0) && (M[i]!=0) && (M[i+1]!=0) ) { ++filled; }
+   }
+ }
+ fprintf(stderr,"Found %u holes , %u filled pixels\n",holes,filled);
+ fprintf(stderr,"Total holes should be %u \n",(width*height)-filled);
+ fprintf(stderr,"Unaccounted holes remaining %u \n",(width*height)-filled-holes);
+
+ return 1;
+}
+
+
+
+
+
 /*
 
    RectifiedPoint = M * OriginalPoint
@@ -181,6 +221,8 @@ archived at 3dpartylibs/code/undistort_point.cpp
    }
 
  fprintf(stderr,"PrecalculationErrors - Precision=%u , OffFrame=%u , OutOfMemory=%u\n",PrecisionErrors,OffFrame,OutOfMemory);
+ interpolateHolesInResectioning(res,width,height);
+
 
  return res;
 }
