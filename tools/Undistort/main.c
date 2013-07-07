@@ -204,31 +204,33 @@ int freeResectioning( struct resectionData * res)
   return 1;
 }
 
-
 int undistortImage(unsigned char * input , unsigned char * output , unsigned int width , unsigned int height , struct resectionData * res)
 {
- unsigned int * M = res->directMapping;
+ if ( (input==0) || (output==0) )  { fprintf(stderr,"Cannot undistortImage , image is null\n"); return 0; }
+ if ( (width==0) || (height==0) )  { fprintf(stderr,"Cannot undistortImage , image input/output has null dimensions\n"); return 0; }
+ if ( res==0)                      { fprintf(stderr,"Cannot undistortImage , resectionData is null\n"); return 0; }
 
  unsigned int memLimit = width * height * 3;
+ unsigned int * M = res->directMapping;
  unsigned int ptr=0 , new_ptr = 0, ptr_end = memLimit;
- memset(output,0,memLimit*sizeof(unsigned char));
+
+  memset(output,0,memLimit*sizeof(unsigned char));
 
     while (ptr < ptr_end)
      {
          new_ptr = M[ptr];
-         output = input[ptr];
+         output[new_ptr] = input[ptr];
          ++new_ptr; ++ptr;
 
-         output = input[ptr];
+         output[new_ptr] = input[ptr];
          ++new_ptr; ++ptr;
 
-         output = input[ptr];
+         output[new_ptr] = input[ptr];
          ++ptr;
      }
 
-   return 1;
+return 1;
 }
-
 
 
 int main(int argc, char** argv)
