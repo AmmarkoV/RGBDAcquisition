@@ -28,7 +28,7 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
    if  (res==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
    res->directMapping = (unsigned int *) malloc (width * height * 3 * sizeof(unsigned int));
    if  (res->directMapping==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
-
+   res->pointsListThatNeedInterpolation = 0;
 
   unsigned int * frame = res->directMapping;
 
@@ -192,10 +192,20 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
 }
 
 
+int freeResectioning( struct resectionData * res)
+{
+  if (res!=0)
+  {
+    if (res->directMapping!=0 )  { free(res->directMapping); res->directMapping=0; }
+    if (res->pointsListThatNeedInterpolation!=0 )  { free(res->pointsListThatNeedInterpolation); res->pointsListThatNeedInterpolation=0; }
+    free(res);
+    res = 0;
+  }
+  return 1;
+}
 
 
-
-int calibrateImage(unsigned char * input , unsigned char * output , unsigned int width , unsigned int height , struct resectionData * res)
+int undistortImage(unsigned char * input , unsigned char * output , unsigned int width , unsigned int height , struct resectionData * res)
 {
  unsigned int * M = res->directMapping;
 
@@ -243,13 +253,17 @@ int main(int argc, char** argv)
   if (undistortedImg==0) { fprintf(stderr,"Could not generate output image file to hold %s \n",argv[2]); return 1; }
 
 
-
-  calibrateImage(img->pixels, undistortedImg->pixels , img->width , img->height , res );
+  undistortImage(img->pixels, undistortedImg->pixels , img->width , img->height , res );
 
   writeImageFile(undistortedImg,PPM_CODEC,argv[2]);
 
   destroyImage(img);
   destroyImage(undistortedImg);
+
+
+  freeResectioning(res);
+
+  printf(" done.. \n");
 
   return 0;
 }
