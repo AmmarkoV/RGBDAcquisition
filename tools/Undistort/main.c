@@ -22,12 +22,13 @@ struct resectionData
 */
 struct resectionData * precalculateResectioning( unsigned int width , unsigned int height,
                                                                     double fx,double fy , double cx,double cy ,
-                                                                    double k1,double k2 , double p1,double p2 , double k3   )
+                                                                    double k1,double k2 , double p1,double p2 , double k3 )
 {
    struct resectionData * res = (struct resectionData *) malloc (sizeof(struct resectionData));
-   if  (res==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
-   res->directMapping = (unsigned int *) malloc (width * height * 3 * sizeof(unsigned int));
-   if  (res->directMapping==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
+   if (res==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
+   res->directMapping = (unsigned int *) malloc (width * height /** 3*/ * sizeof(unsigned int));
+   if (res->directMapping==0) { fprintf(stderr,"Could not allocate memory for resectioning structure\n"); return 0; }
+   memset(res->directMapping,0,width * height /** 3*/ * sizeof(unsigned int));
    res->pointsListThatNeedInterpolation = 0;
 
   unsigned int * frame = res->directMapping;
@@ -44,8 +45,8 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
   double ifx=1.f/fx,ify=1.f/fy;
   double dstdx,dstdy , distx,disty;
   double dx,dy;
-  double r_sq  = 0;  // R Squared
-  double r_cu = 0;   // R Cubed
+  double r_sq = 0; // R Squared
+  double r_cu = 0; // R Cubed
   double k_coefficient = 0;
   double new_x,new_y;
 
@@ -56,11 +57,11 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
   // Also Learning OpenCV page 375-377
   /*
 
-        Finaly fixed using code from Philip Gruebele @
-            http://tech.groups.yahoo.com/group/OpenCV/message/26019
+Finaly fixed using code from Philip Gruebele @
+http://tech.groups.yahoo.com/group/OpenCV/message/26019
 
-            archived at 3dpartylibs/code/undistort_point.cpp
-  */
+archived at 3dpartylibs/code/undistort_point.cpp
+*/
   unsigned int PrecisionErrors=0;
   unsigned int OffFrame=0;
   unsigned int OutOfMemory=0;
@@ -74,17 +75,17 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
           //Well this is supposed to rectify lens distortions based on calibration done with my image sets
           //but the values returned are way off ..
           dstdx = ( x - cx );
-          dstdx *=  ifx;
+          dstdx *= ifx;
 
           dstdy = ( y - cy );
-          dstdy *=  ify;
+          dstdy *= ify;
 
           new_x = dstdx;
           new_y = dstdy;
 
           for ( i=0; i<5; i++)
            {
-               r_sq =  new_x*new_x;
+               r_sq = new_x*new_x;
                r_sq += new_y*new_y;
 
                r_cu = r_sq*r_sq;
@@ -94,10 +95,10 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
                k_coefficient += k2 * r_cu;
                k_coefficient += k3 * r_cu * r_sq ;
 
-               dx =  2 * p1 * new_x * new_y;
+               dx = 2 * p1 * new_x * new_y;
                dx += p2 * ( r_sq + 2 * new_x * new_x);
 
-               dy =  2 * p2 * new_x * new_y;
+               dy = 2 * p2 * new_x * new_y;
                dy += p1 * ( r_sq + 2 * new_y * new_y);
 
                new_x = ( dstdx - dx );
@@ -114,8 +115,8 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
           dstdy *= fy; dstdy += cy;
 
 
-          undistorted_x  = (unsigned int) round(dstdx);
-          undistorted_y  = (unsigned int) round(dstdy);
+          undistorted_x = (unsigned int) round(dstdx);
+          undistorted_y = (unsigned int) round(dstdy);
 
 
 
@@ -162,26 +163,27 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
                  ++OffFrame;
              } else
              {
-                new_mem = undistorted_y * (width * 3) + undistorted_x * 3 ;
+                //We need the memory to point to the ->RGB address of the value
+                new_mem = (undistorted_y * width * 3) + undistorted_x * 3 ;
 
                 if ( new_mem>= (width * height * 3) )
                  {
                    new_mem = 0;
                    ++OutOfMemory;
-                  }
+                 }
                 //fprintf(stderr,"%u,%u -> %u,%u .. \n",x,y,undistorted_x,undistorted_y);
              }
 
 
 
           frame [mem] = new_mem;
-          ++mem;  ++new_mem;
+          ++mem; ++new_mem;
+/*
+          frame [mem] = new_mem;
+          ++mem; ++new_mem;
 
           frame [mem] = new_mem;
-          ++mem;  ++new_mem;
-
-          frame [mem] = new_mem;
-          ++mem;  ++new_mem;
+          ++mem; ++new_mem;*/
 
        }
    }
@@ -190,7 +192,6 @@ struct resectionData * precalculateResectioning( unsigned int width , unsigned i
 
  return res;
 }
-
 
 int freeResectioning( struct resectionData * res)
 {
@@ -206,28 +207,26 @@ int freeResectioning( struct resectionData * res)
 
 int undistortImage(unsigned char * input , unsigned char * output , unsigned int width , unsigned int height , struct resectionData * res)
 {
- if ( (input==0) || (output==0) )  { fprintf(stderr,"Cannot undistortImage , image is null\n"); return 0; }
- if ( (width==0) || (height==0) )  { fprintf(stderr,"Cannot undistortImage , image input/output has null dimensions\n"); return 0; }
- if ( res==0)                      { fprintf(stderr,"Cannot undistortImage , resectionData is null\n"); return 0; }
+ if ( (input==0) || (output==0) ) { fprintf(stderr,"Cannot undistortImage , image is null\n"); return 0; }
+ if ( (width==0) || (height==0) ) { fprintf(stderr,"Cannot undistortImage , image input/output has null dimensions\n"); return 0; }
+ if ( res==0) { fprintf(stderr,"Cannot undistortImage , resectionData is null\n"); return 0; }
 
- unsigned int memLimit = width * height * 3;
+ unsigned int memLimit = width * height ;
  unsigned int * M = res->directMapping;
- unsigned int ptr=0 , new_ptr = 0, ptr_end = memLimit;
+ unsigned int ptr=0 , oldSource = 0, newTarget = 0, ptr_end = memLimit;
+ memset(output,0,memLimit*3*sizeof(unsigned char));
 
-  memset(output,0,memLimit*sizeof(unsigned char));
 
-    while (ptr < ptr_end)
-     {
-         new_ptr = M[ptr];
-         output[new_ptr] = input[ptr];
-         ++new_ptr; ++ptr;
-
-         output[new_ptr] = input[ptr];
-         ++new_ptr; ++ptr;
-
-         output[new_ptr] = input[ptr];
-         ++ptr;
-     }
+ for (ptr=0; ptr<ptr_end; ptr++)
+ {
+  newTarget = M[ptr];
+  oldSource  = ptr*3;
+  output[newTarget] = input[oldSource]; //Move R
+  ++newTarget; ++oldSource;
+  output[newTarget] = input[oldSource]; //Move G
+  ++newTarget; ++oldSource ;
+  output[newTarget] = input[oldSource]; //Move B
+ }
 
 return 1;
 }
