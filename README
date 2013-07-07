@@ -37,16 +37,22 @@ libFreenect acquisition
 
 To test it issue 
 
-./run_grabber.sh 10
+./run_grabber.sh -maxFrames 10
 
 You can select from the modules linked by using  them as a parameter..
 For example
-./run_grabber.sh 10 OPENNI1 outdir will use the  OpenNI1 module
-./run_grabber.sh 10 OPENNI2 outdir will use the  OpenNI2 module
-./run_grabber.sh 10 OPENGL outdir will use the  OpenGL  module
-./run_grabber.sh 10 FREENECT outdir will use the  FREENECT module
+./run_grabber.sh -maxFrames 10 -module OPENNI1 -to outdir 
+this will grab 10 frames from module OpenNI ( provided it is compiled in ) and write them to grabber/frames/outdir
 
-outdir is converted to grabber/frames/outdir
+Possible choices for modules are :
+FREENECT  
+OPENNI1 
+OPENNI2 
+OPENGL 
+V4L2 
+V4L2STEREO 
+TEMPLATE 
+ 
 
 ----------------------------
 
