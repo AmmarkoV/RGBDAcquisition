@@ -34,6 +34,8 @@ V4L2 Stereo acquisition
 OpenNI1 acquisition
 OpenNI2 acquisition
 libFreenect acquisition
+OpenGL simulation acquistiion
+Template acquisition ( from images )
 
 To test it issue 
 
