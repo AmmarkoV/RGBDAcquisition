@@ -125,6 +125,8 @@ struct Image * createImage( unsigned int width , unsigned int height , unsigned 
 {
   struct Image * img = 0;
   img = (struct Image *) malloc( sizeof(struct Image) );
+  if (img == 0 ) { fprintf(stderr,"Could not allocate a new image %ux%u %u channels %u bitsperpixel\n",width,height,channels,bitsPerPixel); return 0; }
+  memset(img,0,sizeof(struct Image));
 
   img->width = width;
   img->height = height;
@@ -132,7 +134,8 @@ struct Image * createImage( unsigned int width , unsigned int height , unsigned 
   img->bitsperpixel = bitsPerPixel;
 
   img->pixels = ( unsigned char * ) malloc(width * height * channels * (bitsPerPixel/8) * sizeof(unsigned char) );
-  memset(img,0,sizeof(struct Image));
+  memset(img->pixels,0,width * height * channels * (bitsPerPixel/8) * sizeof(unsigned char));
+
   return  img; // :P just to make sure
 }
 
