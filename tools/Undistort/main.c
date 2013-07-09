@@ -35,30 +35,11 @@ int interpolateHolesInResectioning( struct resectionData * res , unsigned int wi
 {
  //This should populate res->pointsListThatNeedInterpolation
  //For now i am just trying to fill some holes with stupid uninterpolated values
-/*
-
-
-  unsigned int memLimit = width * height ;
-  unsigned int * M = res->directMapping;
-  unsigned int ptr=0 , oldSource = 0, newTarget = 0, ptr_end = memLimit;
-  memset(output,255,memLimit*3*sizeof(unsigned char));
-
-
-  for (ptr=0; ptr<ptr_end; ptr++)
-   {
-    newTarget = M[ptr];
-    oldSource  = ptr*3;
-    output[newTarget] = input[oldSource]; //Move R
-    ++newTarget; ++oldSource;
-    output[newTarget] = input[oldSource]; //Move G
-    ++newTarget; ++oldSource ;
-    output[newTarget] = input[oldSource]; //Move B
-   }
-*/
-
 
  unsigned int * M = res->directMapping;
- unsigned int holes=0,filled=0;
+ unsigned int holes=0,filled=0,totalHoles=0;
+ unsigned int i=0,x=0,y=0;
+
 
   /*
       A B C   A is i-width , B is i-1-width , C is i+1-width
@@ -69,7 +50,6 @@ int interpolateHolesInResectioning( struct resectionData * res , unsigned int wi
  unsigned int convElements[9]={0};
 
  fprintf(stderr,"Interpolating holes in generated resectioning\n");
- unsigned int i=0,x=0,y=0;
  for (y=1; y<height-1; y++)
  {
    i=y * width;
@@ -103,6 +83,32 @@ int interpolateHolesInResectioning( struct resectionData * res , unsigned int wi
  fprintf(stderr,"Unaccounted holes remaining %u \n", holes-filled);
  printOutDirectMap(res,width,height,"directMap.txt");
 
+
+
+
+ //After correcting what we could in the direct map , its time to add points that do not exist at all
+ //We try to unfold the directMapping on an out buffer and fill all the holes
+ unsigned int memLimit = width * height ;
+ unsigned char * output = (unsigned char *) malloc( sizeof(unsigned char) * memLimit * 3);
+ if (output==0) { fprintf(stderr,"Could not allocate memory for finding out holes\n"); return 0; }
+ unsigned int ptr=0 , oldSource = 0, newTarget = 0, ptr_end =  memLimit , M_Ptr = 0;
+ memset(output, 0 , memLimit * 3 *sizeof(unsigned char));
+ for (ptr=0; ptr<ptr_end; ptr++)
+    {
+       M_Ptr = M[ptr];
+       if ( (M_Ptr!=0) && (M_Ptr< memLimit ) )  { output[M_Ptr] = 1;  output[M_Ptr+1] = 1;  output[M_Ptr+2] = 1;}
+    }
+
+ for (i=0; i< memLimit; i+=3) { if (output[i]==0) { ++totalHoles; } }
+ fprintf(stderr,"Final unfolding reveals %u holes \n", totalHoles);
+
+
+
+
+
+
+
+ free(output);
  return 1;
 }
 
