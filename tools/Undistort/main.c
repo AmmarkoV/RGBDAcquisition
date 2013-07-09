@@ -3,17 +3,24 @@
 
 #include "../Codecs/codecs.h"
 
+
+struct pointToAdd
+{
+    unsigned int source;
+    unsigned int target;
+};
+
 struct resectionData
 {
   unsigned int * directMapping;
 
   unsigned int MAXPoints;
   unsigned int curPoints;
-  unsigned int * pointsListThatNeedInterpolation;
+  struct pointToAdd * pointsListThatNeedInterpolation;
 };
 
 
-
+/*
 int printOutDirectMap( struct resectionData * res , unsigned int width ,unsigned int height , char * filename )
 {
     FILE * fp = fopen(filename,"w");
@@ -27,11 +34,11 @@ int printOutDirectMap( struct resectionData * res , unsigned int width ,unsigned
    fclose(fp);
 
     return 1;
-}
+}*/
 
 
 
-int interpolateHolesInResectioning( struct resectionData * res , unsigned int width , unsigned int height)
+int randNeigborFillForHolesInResectioning( struct resectionData * res , unsigned int width , unsigned int height)
 {
  //This should populate res->pointsListThatNeedInterpolation
  //For now i am just trying to fill some holes with stupid uninterpolated values
@@ -49,6 +56,7 @@ int interpolateHolesInResectioning( struct resectionData * res , unsigned int wi
 
  unsigned int convElements[9]={0};
 
+/*
  fprintf(stderr,"Interpolating holes in generated resectioning\n");
  for (y=1; y<height-1; y++)
  {
@@ -65,11 +73,11 @@ int interpolateHolesInResectioning( struct resectionData * res , unsigned int wi
      if (M[i]==0)
        {
          ++holes;
+         if (M[convElements[0]]!=0) { M[i] = M[convElements[0]]; ++filled; } else
          if (M[convElements[1]]!=0) { M[i] = M[convElements[1]]; ++filled; } else
          if (M[convElements[2]]!=0) { M[i] = M[convElements[2]]; ++filled; } else
-         if (M[convElements[3]]!=0) { M[i] = M[convElements[3]]; ++filled; } else
 
-         if (M[convElements[4]]!=0) { M[i] = M[convElements[4]]; ++filled; } else
+         if (M[convElements[3]]!=0) { M[i] = M[convElements[3]]; ++filled; } else
 
          if (M[convElements[5]]!=0) { M[i] = M[convElements[5]]; ++filled; } else
 
@@ -81,9 +89,8 @@ int interpolateHolesInResectioning( struct resectionData * res , unsigned int wi
  }
  fprintf(stderr,"Found %u holes , %u filled pixels\n",holes,filled);
  fprintf(stderr,"Unaccounted holes remaining %u \n", holes-filled);
- printOutDirectMap(res,width,height,"directMap.txt");
 
-
+*/
 
 
  //After correcting what we could in the direct map , its time to add points that do not exist at all
@@ -96,17 +103,80 @@ int interpolateHolesInResectioning( struct resectionData * res , unsigned int wi
  for (ptr=0; ptr<ptr_end; ptr++)
     {
        M_Ptr = M[ptr];
-       if ( (M_Ptr!=0) && (M_Ptr< memLimit ) )  { output[M_Ptr] = 1;  output[M_Ptr+1] = 1;  output[M_Ptr+2] = 1;}
+       if ( (M_Ptr!=0) && (M_Ptr< memLimit*3 ) )  { output[M_Ptr] = 1;  output[M_Ptr+1] = 1;  output[M_Ptr+2] = 1;}
     }
 
- for (i=0; i< memLimit; i+=3) { if (output[i]==0) { ++totalHoles; } }
+ for (i=0; i< memLimit*3; i+=3) { if (output[i]==0) { ++totalHoles;  } }
+ fprintf(stderr,"Unfolding reveals %u holes \n", totalHoles);
+
+
+ res->MAXPoints=totalHoles;
+ res->curPoints=0;
+ res->pointsListThatNeedInterpolation = (struct pointToAdd *) malloc(sizeof (struct pointToAdd)  * (totalHoles+1) );
+ if (res->pointsListThatNeedInterpolation==0) { fprintf(stderr,"Could not allocate memory for %u points added \n",totalHoles); return 0; }
+ struct pointToAdd * newPoint = res->pointsListThatNeedInterpolation ;
+
+
+for (y=1; y<height-1; y++)
+ {
+   i=y * width *3 ;
+   for (x=1; x<width-1; x++)
+   {
+     i+=3;
+
+     convElements[4]=i-3; convElements[5]=i; convElements[6]=i+3;
+     convElements[1]=convElements[4]-(width*3); convElements[2]=convElements[5]-(width*3); convElements[3]=convElements[6]-(width*3);
+     convElements[7]=convElements[4]+(width*3); convElements[8]=convElements[5]+(width*3); convElements[9]=convElements[6]+(width*3);
+
+     if (res->curPoints>=totalHoles)
+     {
+       fprintf(stderr,"!"); //This should be impossible to happen :P  since we've already counted our holes and we know exactly how many there are
+     } else
+     if (output[i]==0)
+       {
+         ++holes;
+         if (output[convElements[0]]!=0) { newPoint[res->curPoints].source = convElements[0];
+                                           newPoint[res->curPoints].target = i;
+                                           ++res->curPoints;  output[i]=1;
+                                         } else
+         if (output[convElements[1]]!=0) { newPoint[res->curPoints].source = convElements[1];
+                                           newPoint[res->curPoints].target = i;
+                                           ++res->curPoints;  output[i]=1;
+                                         } else
+         if (output[convElements[2]]!=0) { newPoint[res->curPoints].source = convElements[2];
+                                           newPoint[res->curPoints].target = i;
+                                           ++res->curPoints;  output[i]=1;
+                                          } else
+
+         if (output[convElements[3]]!=0) { newPoint[res->curPoints].source = convElements[3];
+                                           newPoint[res->curPoints].target = i;
+                                           ++res->curPoints;  output[i]=1;
+                                         }  else
+
+         if (output[convElements[5]]!=0) { newPoint[res->curPoints].source = convElements[5];
+                                           newPoint[res->curPoints].target = i;
+                                           ++res->curPoints;  output[i]=1;
+                                         } else
+
+         if (output[convElements[6]]!=0) { newPoint[res->curPoints].source = convElements[6];
+                                           newPoint[res->curPoints].target = i;
+                                           ++res->curPoints;  output[i]=1;
+                                         } else
+         if (output[convElements[7]]!=0) { newPoint[res->curPoints].source = convElements[7];
+                                           newPoint[res->curPoints].target = i;
+                                           ++res->curPoints;  output[i]=1;
+                                         } else
+         if (output[convElements[8]]!=0) { newPoint[res->curPoints].source = convElements[8];
+                                           newPoint[res->curPoints].target = i;
+                                           ++res->curPoints;  output[i]=1;
+                                         }
+       }
+   }
+ }
+
+ totalHoles=0;
+ for (i=0; i< memLimit*3; i+=3) { if (output[i]==0) { ++totalHoles;  } }
  fprintf(stderr,"Final unfolding reveals %u holes \n", totalHoles);
-
-
-
-
-
-
 
  free(output);
  return 1;
@@ -281,7 +351,7 @@ archived at 3dpartylibs/code/undistort_point.cpp
  for (x=0; x<height*width; x++) { if (frame[x]==0) { ++totalHoles; } }
 
  fprintf(stderr,"PrecalculationErrors -Total %u ,  Precision=%u , OffFrame=%u\n",totalHoles,PrecisionErrors,OffFrame);
- interpolateHolesInResectioning(res,width,height);
+ randNeigborFillForHolesInResectioning(res,width,height);
 
  totalHoles =0 ;
  for (x=0; x<height*width; x++) { if (frame[x]==0) { ++totalHoles; } }
@@ -311,7 +381,9 @@ int undistortImage(unsigned char * input , unsigned char * output , unsigned int
  unsigned int memLimit = width * height ;
  unsigned int * M = res->directMapping;
  unsigned int ptr=0 , oldSource = 0, newTarget = 0, ptr_end = memLimit;
- memset(output,255,memLimit*3*sizeof(unsigned char));
+
+ unsigned int ClearValue=0;//255; //0 filters out empty things , 255 is white so they can be seen and debugged :P
+ memset(output,ClearValue,memLimit*3*sizeof(unsigned char));
 
 
  for (ptr=0; ptr<ptr_end; ptr++)
@@ -324,6 +396,23 @@ int undistortImage(unsigned char * input , unsigned char * output , unsigned int
   ++newTarget; ++oldSource ;
   output[newTarget] = input[oldSource]; //Move B
  }
+
+ fprintf(stderr,"also undistorting %u new points \n",res->curPoints);
+ for (ptr=0; ptr<res->curPoints; ptr++)
+ {
+  newTarget = res->pointsListThatNeedInterpolation[ptr].target;
+  oldSource = res->pointsListThatNeedInterpolation[ptr].source;
+  output[newTarget] = input[oldSource]; //Move R
+  ++newTarget; ++oldSource;
+  output[newTarget] = input[oldSource]; //Move G
+  ++newTarget; ++oldSource ;
+  output[newTarget] = input[oldSource]; //Move B
+ }
+
+
+
+
+
 
 return 1;
 }
