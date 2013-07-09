@@ -6,6 +6,9 @@
 struct resectionData
 {
   unsigned int * directMapping;
+
+  unsigned int MAXPoints;
+  unsigned int curPoints;
   unsigned int * pointsListThatNeedInterpolation;
 };
 
@@ -32,6 +35,28 @@ int interpolateHolesInResectioning( struct resectionData * res , unsigned int wi
 {
  //This should populate res->pointsListThatNeedInterpolation
  //For now i am just trying to fill some holes with stupid uninterpolated values
+/*
+
+
+  unsigned int memLimit = width * height ;
+  unsigned int * M = res->directMapping;
+  unsigned int ptr=0 , oldSource = 0, newTarget = 0, ptr_end = memLimit;
+  memset(output,255,memLimit*3*sizeof(unsigned char));
+
+
+  for (ptr=0; ptr<ptr_end; ptr++)
+   {
+    newTarget = M[ptr];
+    oldSource  = ptr*3;
+    output[newTarget] = input[oldSource]; //Move R
+    ++newTarget; ++oldSource;
+    output[newTarget] = input[oldSource]; //Move G
+    ++newTarget; ++oldSource ;
+    output[newTarget] = input[oldSource]; //Move B
+   }
+*/
+
+
  unsigned int * M = res->directMapping;
  unsigned int holes=0,filled=0;
 
@@ -60,30 +85,26 @@ int interpolateHolesInResectioning( struct resectionData * res , unsigned int wi
      if (M[i]==0)
        {
          ++holes;
-         if (M[convElements[1]]!=0) { M[i] = M[convElements[1]]; ++filled; }
-         if (M[convElements[2]]!=0) { M[i] = M[convElements[2]]; ++filled; }
-         if (M[convElements[3]]!=0) { M[i] = M[convElements[3]]; ++filled; }
+         if (M[convElements[1]]!=0) { M[i] = M[convElements[1]]; ++filled; } else
+         if (M[convElements[2]]!=0) { M[i] = M[convElements[2]]; ++filled; } else
+         if (M[convElements[3]]!=0) { M[i] = M[convElements[3]]; ++filled; } else
 
-         if (M[convElements[4]]!=0) { M[i] = M[convElements[4]]; ++filled; }
+         if (M[convElements[4]]!=0) { M[i] = M[convElements[4]]; ++filled; } else
 
-         if (M[convElements[5]]!=0) { M[i] = M[convElements[5]]; ++filled; }
+         if (M[convElements[5]]!=0) { M[i] = M[convElements[5]]; ++filled; } else
 
-         if (M[convElements[6]]!=0) { M[i] = M[convElements[6]]; ++filled; }
-         if (M[convElements[7]]!=0) { M[i] = M[convElements[7]]; ++filled; }
+         if (M[convElements[6]]!=0) { M[i] = M[convElements[6]]; ++filled; } else
+         if (M[convElements[7]]!=0) { M[i] = M[convElements[7]]; ++filled; } else
          if (M[convElements[8]]!=0) { M[i] = M[convElements[8]]; ++filled; }
-
        }
    }
  }
  fprintf(stderr,"Found %u holes , %u filled pixels\n",holes,filled);
- fprintf(stderr,"Total holes should be %u \n",(width*height)-filled);
- fprintf(stderr,"Unaccounted holes remaining %u \n",(width*height)-filled-holes);
+ fprintf(stderr,"Unaccounted holes remaining %u \n", holes-filled);
  printOutDirectMap(res,width,height,"directMap.txt");
 
  return 1;
 }
-
-
 
 
 
@@ -142,7 +163,6 @@ archived at 3dpartylibs/code/undistort_point.cpp
 */
   unsigned int PrecisionErrors=0;
   unsigned int OffFrame=0;
-  unsigned int OutOfMemory=0;
 
 
   for (y=0; y<height; y++)
@@ -223,7 +243,7 @@ archived at 3dpartylibs/code/undistort_point.cpp
       double diffx = x - distx;
       double diffy = y - disty;
 
-         if ( (diffx> 0.1) || (diffy>0.1) )
+         if ( (diffx> 0.2) || (diffy>0.2) )
           {
              /* ACCURACY ERROR , This means that we have a percision error in the way math is done*/
              //fprintf(stderr,"$%u,%u to %u,%u",x,y,undistorted_x,undistorted_y);
@@ -234,33 +254,32 @@ archived at 3dpartylibs/code/undistort_point.cpp
 
           if ( ( undistorted_x >= width ) || ( undistorted_y >= height ) )
              {
-                 // OFF RESULTS SHOULD BE INTERPOLATED WITH CLOSE MEMORY SPOTS
-                 //fprintf(stderr,"!%u,%u to %u,%u",x,y,undistorted_x,undistorted_y);
-                 new_mem = 0;
-                 new_mem=addressForErrors ; //TEST THIS USESTHE INTERPOLATED TO GET RID OF SOME BLANK SPOT ARTIFACTS
-                 ++OffFrame;
+               // OFF RESULTS SHOULD BE INTERPOLATED WITH CLOSE MEMORY SPOTS
+               new_mem=addressForErrors ; //TEST THIS USESTHE INTERPOLATED TO GET RID OF SOME BLANK SPOT ARTIFACTS
+               ++OffFrame;
              } else
              {
                 //We need the memory to point to the ->RGB address of the value
                 new_mem = (undistorted_y * width * 3) + undistorted_x * 3 ;
-
-                if ( new_mem>= (width * height * 3) )
-                 {
-                   new_mem = 0;
-                   ++OutOfMemory;
-                 }
                 //fprintf(stderr,"%u,%u -> %u,%u .. \n",x,y,undistorted_x,undistorted_y);
              }
 
+          if(new_mem!=0) { addressForErrors=new_mem; }
           frame [mem] = new_mem;
           ++mem;
 
-       }
+       } /*END OF X LOOP*/
    }
 
- fprintf(stderr,"PrecalculationErrors - Precision=%u , OffFrame=%u , OutOfMemory=%u\n",PrecisionErrors,OffFrame,OutOfMemory);
+ int totalHoles =0 ;
+ for (x=0; x<height*width; x++) { if (frame[x]==0) { ++totalHoles; } }
+
+ fprintf(stderr,"PrecalculationErrors -Total %u ,  Precision=%u , OffFrame=%u\n",totalHoles,PrecisionErrors,OffFrame);
  interpolateHolesInResectioning(res,width,height);
 
+ totalHoles =0 ;
+ for (x=0; x<height*width; x++) { if (frame[x]==0) { ++totalHoles; } }
+ fprintf(stderr,"After interpolation Total %u \n",totalHoles);
 
  return res;
 }
@@ -286,7 +305,7 @@ int undistortImage(unsigned char * input , unsigned char * output , unsigned int
  unsigned int memLimit = width * height ;
  unsigned int * M = res->directMapping;
  unsigned int ptr=0 , oldSource = 0, newTarget = 0, ptr_end = memLimit;
- memset(output,0,memLimit*3*sizeof(unsigned char));
+ memset(output,255,memLimit*3*sizeof(unsigned char));
 
 
  for (ptr=0; ptr<ptr_end; ptr++)
