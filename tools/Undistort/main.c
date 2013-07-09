@@ -11,36 +11,74 @@ struct resectionData
 
 
 
+int printOutDirectMap( struct resectionData * res , unsigned int width ,unsigned int height , char * filename )
+{
+    FILE * fp = fopen(filename,"w");
+    if (fp==0) { return 0; }
+
+   int  i=0;
+   for (i=0; i<width*height; i++)
+   {
+     fprintf(fp,"%u ",res->directMapping[i]);
+   }
+   fclose(fp);
+
+    return 1;
+}
+
+
 
 int interpolateHolesInResectioning( struct resectionData * res , unsigned int width , unsigned int height)
 {
+ //This should populate res->pointsListThatNeedInterpolation
+ //For now i am just trying to fill some holes with stupid uninterpolated values
  unsigned int * M = res->directMapping;
  unsigned int holes=0,filled=0;
 
+  /*
+      A B C   A is i-width , B is i-1-width , C is i+1-width
+      D E F   E is i       , D is i-1       , F is i+1
+      G H I   G is i+width , H is i-1+width , I is i+1+width
+  */
+
+ unsigned int convElements[9]={0};
+
  fprintf(stderr,"Interpolating holes in generated resectioning\n");
  unsigned int i=0,x=0,y=0;
- for (y=0; y<height; y++)
+ for (y=1; y<height-1; y++)
  {
    i=y * width;
    for (x=1; x<width-1; x++)
    {
      ++i;
+
+     convElements[4]=i-1; convElements[5]=i; convElements[6]=i+1;
+     convElements[1]=convElements[4]-width; convElements[2]=convElements[5]-width; convElements[3]=convElements[6]-width;
+     convElements[7]=convElements[4]+width; convElements[8]=convElements[5]+width; convElements[9]=convElements[6]+width;
+
+
      if (M[i]==0)
        {
-         if (M[i-1]==0) { fprintf(stderr,"DEL"); } else
-                        { M[i] = M[i-1]; fprintf(stderr,"L(%u,%u)",x,y); ++holes; }
+         ++holes;
+         if (M[convElements[1]]!=0) { M[i] = M[convElements[1]]; ++filled; }
+         if (M[convElements[2]]!=0) { M[i] = M[convElements[2]]; ++filled; }
+         if (M[convElements[3]]!=0) { M[i] = M[convElements[3]]; ++filled; }
 
-         if (M[i+1]==0) { fprintf(stderr,"DER"); } else
-                        { M[i] = M[i+1]; fprintf(stderr,"R(%u,%u)",x,y); ++holes; }
+         if (M[convElements[4]]!=0) { M[i] = M[convElements[4]]; ++filled; }
 
-       } else
-     if ( (M[i-1]!=0) && (M[i]==0) && (M[i+1]!=0) ) { fprintf(stderr,"(%u,%u)",x,y); ++holes; } else
-     if ( (M[i-1]!=0) && (M[i]!=0) && (M[i+1]!=0) ) { ++filled; }
+         if (M[convElements[5]]!=0) { M[i] = M[convElements[5]]; ++filled; }
+
+         if (M[convElements[6]]!=0) { M[i] = M[convElements[6]]; ++filled; }
+         if (M[convElements[7]]!=0) { M[i] = M[convElements[7]]; ++filled; }
+         if (M[convElements[8]]!=0) { M[i] = M[convElements[8]]; ++filled; }
+
+       }
    }
  }
  fprintf(stderr,"Found %u holes , %u filled pixels\n",holes,filled);
  fprintf(stderr,"Total holes should be %u \n",(width*height)-filled);
  fprintf(stderr,"Unaccounted holes remaining %u \n",(width*height)-filled-holes);
+ printOutDirectMap(res,width,height,"directMap.txt");
 
  return 1;
 }
@@ -298,7 +336,7 @@ int main(int argc, char** argv)
 
   freeResectioning(res);
 
-  printf(" done.. \n");
+  printf("done.. \n");
 
   return 0;
 }
