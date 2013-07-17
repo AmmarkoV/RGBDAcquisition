@@ -1,7 +1,8 @@
 /* TrajectoryParser..
    A small generic library for keeping an array of 3d Objects their positions and orientations
    moving through time and interpolating/extrapolating them for generating sequences of synthetic data
-   typically rendered using OpenGL or something ese!
+   typically rendered using OpenGL or something else!
+
    GITHUB Repo : https://github.com/AmmarkoV/RGBDAcquisition/blob/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp
    my URLs: http://ammar.gr
    Written by Ammar Qammaz a.k.a. AmmarkoV 2013
@@ -12,9 +13,10 @@
    addObjectToVirtualStream
     or
    addPositionToObject
+   populate the Virtual stream with objects and their positions
 
    after that we can query the positions of the objects using calculateVirtualStreamPos orcalculateVirtualStreamPosAfterTime and get back our object position
-   for an arbitrary moment
+   for an arbitrary moment of our world
 
    After finishing with the VirtualObject stream  it should be destroyed using destroyVirtualStream in order for the memory to be gracefully freed
 */

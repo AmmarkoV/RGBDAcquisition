@@ -3,6 +3,8 @@
 
 #include "OpenNI1Acquisition.h"
 
+#define USE_OPENNI1 1
+
 
 #if USE_OPENNI1
 #include <XnOS.h>
@@ -83,6 +85,53 @@ int startOpenNI1(unsigned int max_devs)
    printf("Open failed: %s\n", xnGetStatusString(rc));
    return 0;
   }
+
+
+
+  // find devices
+  NodeInfoList list;
+  XnStatus nRetVal = XN_STATUS_OK;
+  nRetVal = ctx.EnumerateProductionTrees(XN_NODE_TYPE_DEVICE, NULL, list, &errors);
+  XN_IS_STATUS_OK(nRetVal);
+
+  printf("The following devices were found:\n");
+  int i = 1;
+  for (NodeInfoList::Iterator it = list.Begin(); it != list.End(); ++it, ++i)
+   {
+    NodeInfo deviceNodeInfo = *it;
+
+    Device deviceNode;
+    deviceNodeInfo.GetInstance(deviceNode);
+    XnBool bExists = deviceNode.IsValid();
+    if (!bExists)
+     {
+       ctx.CreateProductionTree(deviceNodeInfo, deviceNode); // this might fail.
+     }
+
+    if (deviceNode.IsValid() && deviceNode.IsCapabilitySupported(XN_CAPABILITY_DEVICE_IDENTIFICATION))
+     {
+      const XnUInt32 nStringBufferSize = 200;
+      XnChar strDeviceName[nStringBufferSize];
+      XnChar strSerialNumber[nStringBufferSize];
+
+      XnUInt32 nLength = nStringBufferSize;
+      deviceNode.GetIdentificationCap().GetDeviceName(strDeviceName, nLength);
+      nLength = nStringBufferSize;
+      deviceNode.GetIdentificationCap().GetSerialNumber(strSerialNumber, nLength);
+      printf("[%d] %s (%s)\n", i, strDeviceName, strSerialNumber);
+    }
+     else
+   {
+    printf("[%d] %s\n", i, deviceNodeInfo.GetCreationInfo());
+   }
+
+   // release the device if we created it
+  /*
+   if (!bExists && deviceNode.IsValid())
+    {
+     deviceNode.Release();
+    }*/
+ }
 
 
 
