@@ -1,3 +1,24 @@
+/* TrajectoryParser..
+   A small generic library for keeping an array of 3d Objects their positions and orientations
+   moving through time and interpolating/extrapolating them for generating sequences of synthetic data
+   typically rendered using OpenGL or something ese!
+   GITHUB Repo : https://github.com/AmmarkoV/RGBDAcquisition/blob/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp
+   my URLs: http://ammar.gr
+   Written by Ammar Qammaz a.k.a. AmmarkoV 2013
+
+   The idea here is create a struct VirtualObject * pointer by issuing
+   readVirtualStream(struct VirtualStream * newstream , char * filename); or  createVirtualStream(char * filename);
+   and then using a file that contains objects and their virtual coordinates , or calls like
+   addObjectToVirtualStream
+    or
+   addPositionToObject
+
+   after that we can query the positions of the objects using calculateVirtualStreamPos orcalculateVirtualStreamPosAfterTime and get back our object position
+   for an arbitrary moment
+
+   After finishing with the VirtualObject stream  it should be destroyed using destroyVirtualStream in order for the memory to be gracefully freed
+*/
+
 #include "TrajectoryParser.h"
 #include "InputParser_C.h"
 #include <stdio.h>

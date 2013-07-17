@@ -2,7 +2,7 @@
 /* InputParser..
    A small generic library for parsing a string and tokenizing it!
    GITHUB Repo : http://github.com/AmmarkoV/InputParser
-   my URLs: http://ammarkov.ath.cx
+   my URLs: http://ammar.gr
    Written by Ammar Qammaz a.k.a. AmmarkoV 2006-2010
 */
 
