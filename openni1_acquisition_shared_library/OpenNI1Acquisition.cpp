@@ -3,9 +3,6 @@
 
 #include "OpenNI1Acquisition.h"
 
-#define USE_OPENNI1 1
-
-
 #if USE_OPENNI1
 #include <XnOS.h>
 #include <XnCppWrapper.h>
@@ -87,7 +84,7 @@ int startOpenNI1(unsigned int max_devs)
   }
 
 
-
+ /*
   // find devices
   NodeInfoList list;
   XnStatus nRetVal = XN_STATUS_OK;
@@ -126,12 +123,15 @@ int startOpenNI1(unsigned int max_devs)
    }
 
    // release the device if we created it
-  /*
+
    if (!bExists && deviceNode.IsValid())
     {
      deviceNode.Release();
-    }*/
+    }
+
  }
+
+ */
 
 
 
