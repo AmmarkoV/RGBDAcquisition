@@ -58,6 +58,12 @@ struct VirtualObject
    unsigned int lastFrameTime;
    unsigned int nextFrameTime;
 
+
+   // 0-6  low bounds          X Y Z    A B C D
+   // 7-13 high bounds         X Y Z    A B C D
+   // 14-20 resample variances X Y Z    A B C D
+   float limits[ 7 * 3];
+
 };
 
 struct VirtualStream
@@ -108,7 +114,13 @@ int addPositionToObject(
                               unsigned int coordLength
                        );
 
-
+int addLimitsToObject(
+                       struct VirtualStream * stream ,
+                       char * name  ,
+                       float * low , unsigned int lowLength ,
+                       float * high , unsigned int highLength ,
+                       float * var , unsigned int varLength
+                     );
 
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,

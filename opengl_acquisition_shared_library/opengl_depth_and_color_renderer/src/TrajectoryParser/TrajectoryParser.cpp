@@ -103,8 +103,6 @@ int growVirtualStreamObjects(struct VirtualStream * stream,unsigned int objectsT
       memset(clear_from_here,0,objectsToAdd * sizeof(struct VirtualObject));
     }
 
-
-
    stream->MAX_numberOfObjects+=objectsToAdd;
    stream->object = new_object ;
   return 1;
@@ -304,6 +302,42 @@ int addPositionToObject(
 }
 
 
+
+int addLimitsToObject(
+                       struct VirtualStream * stream ,
+                       char * name  ,
+                       float * low , unsigned int lowLength ,
+                       float * high , unsigned int highLength ,
+                       float * var , unsigned int varLength
+                     )
+{
+ if (stream==0)  { fprintf(stderr,"No Stream provided , cannot add limits \n"); return 0; }
+ if (name==0)    { fprintf(stderr,"No Name provided , cannot add limits \n"); return 0; }
+ if ( (low==0)||(lowLength<1) )  { fprintf(stderr,"Low Bounds are invalid\n"); return 0; }
+ if ( (high==0)||(highLength<1)) { fprintf(stderr,"High Bounds are invalid\n"); return 0; }
+ if ( (var==0)||(varLength<1) )  { fprintf(stderr,"Var Bounds are invalid\n"); return 0; }
+
+ unsigned int ObjFound = 0;
+ unsigned int ObjID = getObjectID(stream,name,&ObjFound);
+
+  if (!ObjFound) {
+                   fprintf(stderr,"Could not Find object %s \n",name);
+                   return 0;
+                 }
+
+
+  int i=0;
+  if (lowLength>7) {  lowLength=7;  fprintf(stderr,"Cannot accomodate more than 7 coordinates for lowLength\n"); }
+  for (i=0; i<lowLength;  i++)  { stream->object[ObjID].limits[i]=low[i];   }
+
+  if (highLength>7) {  highLength=7;  fprintf(stderr,"Cannot accomodate more than 7 coordinates for highLength\n"); }
+  for (i=0; i<highLength; i++)  { stream->object[ObjID].limits[7+i]=high[i];  }
+
+  if (varLength>7) {  varLength=7;  fprintf(stderr,"Cannot accomodate more than 7 coordinates for varLength\n"); }
+  for (i=0; i<varLength;  i++)  { stream->object[ObjID].limits[14+i]=var[i];   }
+
+ return 1;
+}
 
 
 
