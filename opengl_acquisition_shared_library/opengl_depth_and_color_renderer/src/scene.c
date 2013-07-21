@@ -205,7 +205,7 @@ int tickScene()
 
 int drawPlane(float scale)
 {
- float y = - 3.0;
+ float y = -0.50;
 
  glColor3f(.3,.3,.3);
  glColor3f(1.0,1.0,1.0);
@@ -229,7 +229,7 @@ glEnd();
 
 int drawAxis(float x, float y , float z, float scale)
 {
- glLineWidth(15.0);
+ glLineWidth(scale);
  glBegin(GL_LINES);
 
  glColor3f(1.0,0.0,0.0);
@@ -267,8 +267,8 @@ int renderScene()
   {
   //TODO if calibration is given , change this with the calibration matrix
   //http://www.khronos.org/opengles/sdk/1.1/docs/man/glLoadMatrix.xml
-    glLoadIdentity();
     glLoadMatrixf(customMatrix);
+    //glScalef( 1.0f, 1.0f, -1.0f);
     glRotatef(90,-1.0,0,0);
     glRotatef(90,0,-1.0,0);
     //glRotatef(customRotation[2],0,0,-1.0);
@@ -285,12 +285,11 @@ int renderScene()
 
   drawPlane(0.1);
 
-  drawAxis(0,0,0, 10.0);
-
-  drawAxis(-10,0,-10, 5.0);
-  drawAxis(+10,0,+10, 5.0);
-  drawAxis(-10,0,+10, 5.0);
-  drawAxis(10,0,-10, 5.0);
+  drawAxis(0.0,0.0,0.0, 10.0);
+  drawAxis(-10,0.0,-10, 2.0);
+  drawAxis(+10,0.0,+10, 2.0);
+  drawAxis(-10,0.0,+10, 2.0);
+  drawAxis(+10,0.0,-10, 2.0);
 
 
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;

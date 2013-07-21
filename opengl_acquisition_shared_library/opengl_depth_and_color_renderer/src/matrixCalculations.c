@@ -2,6 +2,91 @@
 #include <stdio.h>
 #include <math.h>
 
+// Pre-calculated value of PI / 180.
+#define kPI180   0.017453
+
+// Pre-calculated value of 180 / PI.
+#define k180PI  57.295780
+
+// Converts degrees to radians.
+#define degreesToRadians(x) (x * kPI180)
+
+// Converts radians to degrees.
+#define radiansToDegrees(x) (x * k180PI)
+
+/*
+inline float degreesToRadians(float degrees)
+{
+  return tan(0.25 * 3.141592653589793 );
+}*/
+
+void matrix4x4Identity(float * m)
+{
+    m[0] = m[5] = m[10] = m[15] = 1.0;
+    m[1] = m[2] = m[3] = m[4] = 0.0;
+    m[6] = m[7] = m[8] = m[9] = 0.0;
+    m[11] = m[12] = m[13] = m[14] = 0.0;
+}
+
+void matrix4x4Translate(float x, float y, float z, float * matrix)
+{
+    matrix4x4Identity(matrix);
+
+    // Translate slots.
+    matrix[12] = x;
+    matrix[13] = y;
+    matrix[14] = z;
+}
+
+void matrix4x4Scale(float sx, float sy, float sz, float * matrix)
+{
+    matrix4x4Identity(matrix);
+
+    // Scale slots.
+    matrix[0] = sx;
+    matrix[5] = sy;
+    matrix[10] = sz;
+}
+
+void matrix4x4RotateX(float degrees, float * matrix)
+{
+    float radians = degreesToRadians(degrees);
+
+    matrix4x4Identity(matrix);
+
+    // Rotate X formula.
+    matrix[5] = cosf(radians);
+    matrix[6] = -sinf(radians);
+    matrix[9] = -matrix[6];
+    matrix[10] = matrix[5];
+}
+
+void matrix4x4RotateY(float degrees, float * matrix)
+{
+    float radians = degreesToRadians(degrees);
+
+    matrix4x4Identity(matrix);
+
+    // Rotate Y formula.
+    matrix[0] = cosf(radians);
+    matrix[2] = sinf(radians);
+    matrix[8] = -matrix[2];
+    matrix[10] = matrix[0];
+}
+
+void matrixRotateZ(float degrees, float * matrix)
+{
+    float radians = degreesToRadians(degrees);
+
+    matrix4x4Identity(matrix);
+
+    // Rotate Z formula.
+    matrix[0] = cosf(radians);
+    matrix[1] = sinf(radians);
+    matrix[4] = -matrix[1];
+    matrix[5] = matrix[0];
+}
+
 int upscale3x3to4x4(float * mat3x3,float * mat4x4)
 {
   if  ( (mat3x3==0)||(mat4x4==0) )   { return 0; }
@@ -86,26 +171,6 @@ int multiplyVectorWith3x3Matrix(float * matrix, float * result)
   return 1;
 }
 
-int convertRodriguezAndTransTo4x4(float * rodriguez , float * translation , float * matrix4x4 )
-{
-  //return 0;
-  float matrix3x3[9]={0};
-  convertRodriguezTo3x3(rodriguez,(float*) matrix3x3);
-  upscale3x3to4x4((float*) matrix3x3,matrix4x4);
-
-  //Append Translation -> matrix4x4[3]=translation[0]; matrix4x4[7]=translation[1]; matrix4x4[11]=translation[2];
-
-  //convertTranslationTo4x4(translation,matrix4x4);
-
-  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
-  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
-  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
-  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
-
- return 1;
-}
-
-
 
 void print4x4DMatrix(char * str , double * matrix4x4)
 {
@@ -118,16 +183,33 @@ void print4x4DMatrix(char * str , double * matrix4x4)
   fprintf( stderr, "--------------------------------------\n");
 }
 
+int convertRodriguezAndTransTo4x4(float * rodriguez , float * translation , float * matrix4x4 )
+{
+  //return 0;
+  float matrix3x3[9]={0};
+  convertRodriguezTo3x3(rodriguez,(float*) matrix3x3);
+  upscale3x3to4x4((float*) matrix3x3,matrix4x4);
+
+  //Append Translation -> matrix4x4[3]=translation[0]; matrix4x4[7]=translation[1]; matrix4x4[11]=translation[2];
+
+  //convertTranslationTo4x4(translation,matrix4x4);
+
+  print4x4DMatrix("Rodriguez", matrix4x4);
+ return 1;
+}
+
+
+
+
 
 int transpose4x4MatrixD(double * mat)
 {
   if (mat==0) { return 0; }
-  /*
+  /*       -------  TRANSPOSE ------->
       0   1   2   3           0  4  8   12
       4   5   6   7           1  5  9   13
       8   9   10  11          2  6  10  14
-      12  13  14  15          3  7  11  15
-  */
+      12  13  14  15          3  7  11  15   */
   double tmp;
   tmp = mat[1]; mat[1]=mat[4];  mat[4]=tmp;
   tmp = mat[2]; mat[2]=mat[8];  mat[8]=tmp;
@@ -146,7 +228,7 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
 {
   if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }
 
-
+  fprintf(stderr,"Multiplying A and B \n");
   print4x4DMatrix("A", matrixA);
   print4x4DMatrix("B", matrixA);
 
@@ -173,34 +255,26 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
   result[14]=matrixA[12] * matrixB[2] + matrixA[13] * matrixB[6]  + matrixA[14] * matrixB[10]   + matrixA[15] * matrixB[14];
   result[15]=matrixA[12] * matrixB[3] + matrixA[13] * matrixB[7]  + matrixA[14] * matrixB[11]   + matrixA[15] * matrixB[15];
 
-
-
   print4x4DMatrix("AxB", result);
-
 
   return 1;
 }
 
 
+void InvertYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
+{
+  fprintf(stderr,"Invert Y and Z axis\n");
+  double modelView[16] = {1  ,  0  ,  0  , 0 ,
+                          0  , -1  ,  0  , 0 ,
+                          0  ,  0  , -1  , 0 ,
+                          0  ,  0  ,  0  , 1 };
 
-/**
- From http://jamesgregson.blogspot.gr/2011/11/matching-calibrated-cameras-with-opengl.html
+  multiplyTwo4x4Matrices(result,  modelView,matrix);
+}
 
- @brief basic function to produce an OpenGL projection matrix and associated viewport parameters
- which match a given set of camera intrinsics. This is currently written for the Eigen linear
- algebra library, however it should be straightforward to port to any 4x4 matrix class.
- @param[out] frustum Eigen::Matrix4d projection matrix.  Eigen stores these matrices in column-major (i.e. OpenGL) order.
- @param[out] viewport 4-component OpenGL viewport values, as might be retrieved by glGetIntegerv( GL_VIEWPORT, &viewport[0] )
- @param[in]  alpha x-axis focal length, from camera intrinsic matrix
- @param[in]  alpha y-axis focal length, from camera intrinsic matrix
- @param[in]  skew  x and y axis skew, from camera intrinsic matrix
- @param[in]  u0 image origin x-coordinate, from camera intrinsic matrix
- @param[in]  v0 image origin y-coordinate, from camera intrinsic matrix
- @param[in]  width image width, in pixels
- @param[in]  height image height, in pixels
- @param[in]  near_clip near clipping plane z-location, can be set arbitrarily > 0, controls the mapping of z-coordinates for OpenGL
- @param[in]  far_clip  far clipping plane z-location, can be set arbitrarily > near_clip, controls the mapping of z-coordinate for OpenGL
-*/
+
+
+
 void buildOpenGLProjectionForIntrinsics   (
                                              double * frustum,
                                              int * viewport ,
@@ -208,19 +282,20 @@ void buildOpenGLProjectionForIntrinsics   (
                                              double fy,
                                              double skew,
                                              double cx, double cy,
-                                             int width, int height,
+                                             int imageWidth, int imageHeight,
                                              double nearPlane,
                                              double farPlane
                                            )
 {
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsics Image ( %u x %u )\n",width,height);
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsics Image ( %u x %u )\n",imageWidth,imageHeight);
    fprintf(stderr,"fx %0.2f fy %0.2f , cx %0.2f , cy %0.2f , skew %0.2f \n",fx,fy,cx,cy,skew);
    fprintf(stderr,"Near %0.2f Far %0.2f \n",nearPlane,farPlane);
 
 
     // These parameters define the final viewport that is rendered into by
     // the camera.
-    double L = 0 , B = 0  , R = width , T = height;
+    //     Left    Bottom   Right       Top
+    double L = 0 , B = 0  , R = imageWidth , T = imageHeight;
 
     // near and far clipping planes, these only matter for the mapping from
     // world-space z-coordinate into the depth coordinate for OpenGL
@@ -242,52 +317,23 @@ void buildOpenGLProjectionForIntrinsics   (
     viewport[2] = R_sub_L;
     viewport[3] = T_sub_B;
 
-    // construct an orthographic matrix which maps from projected
-    // coordinates to normalized device coordinates in the range
-    // [-1, 1].  OpenGL then maps coordinates in NDC to the current
-    // viewport
-    /*
-    Eigen::Matrix4d ortho = Eigen::Matrix4d::Zero();
-    ortho(0,0) =  2.0/(R-L);    0,1     0,2                             ortho(0,3) = -(R+L)/(R-L);
-          1,0                 ortho(1,1) =  2.0/(T-B);    1,2           ortho(1,3) = -(T+B)/(T-B);
-          2,0                   2,1     ortho(2,2) = -2.0/(F-N);        ortho(2,3) = -(F+N)/(F-N);
-          3,0                   3,1            3,2                      ortho(3,3) =  1.0;*/
 
-    double ortho[4*4]={0};
-    ortho[0] =2.0/(R_sub_L);  ortho[1] =0.0;              ortho[2] =0.0;                   ortho[3] = -(R+L)/(R_sub_L);
-    ortho[4] =0.0;            ortho[5] =2.0/(T_sub_B);    ortho[6] =0.0;                   ortho[7] = -(T+B)/(T_sub_B);
-    ortho[8] =0.0;            ortho[9] =0.0;              ortho[10]=-2.0/(F_sub_N);        ortho[11]= -(F+N)/(F_sub_N);
-    ortho[12]=0.0;            ortho[13]=0.0;              ortho[14]=0.0;                   ortho[15]= 1.0;
-
-
-    // construct a projection matrix, this is identical to the
-    // projection matrix computed for the intrinsicx, except an
-    // additional row is inserted to map the z-coordinate to
-    // OpenGL.
-    /*
-    Eigen::Matrix4d tproj = Eigen::Matrix4d::Zero();
-    tproj(0,0) = alpha; tproj(0,1) = skew; tproj(0,2) = u0;
-                        tproj(1,1) = beta; tproj(1,2) = v0;
-                                           tproj(2,2) = -(N+F); tproj(2,3) = -N*F;
-                                           tproj(3,2) = 1.0; */
-    double tproj[4*4]={0};
-    tproj[0] =fx;             tproj[1] =skew;             tproj[2] =cx;                    tproj[3] = 0.0;
-    tproj[4] =0.0;            tproj[5] =fy;               tproj[6] =cy;                    tproj[7] = 0.0;
-    tproj[8] =0.0;            tproj[9] =0.0;              tproj[10]=-(N+F);                tproj[11]= -N*F;
-    tproj[12]=0.0;            tproj[13]=0.0;              tproj[14]=1.0;                   tproj[15]= 0.0;
-    // resulting OpenGL frustum is the product of the orthographic
-    // mapping to normalized device coordinates and the augmented
-    // camera intrinsic matrix
-    //frustum = ortho*tproj;
-
-
-    transpose4x4MatrixD(ortho);
-    transpose4x4MatrixD(tproj);
-
-    multiplyTwo4x4Matrices(frustum,ortho,tproj);
-    //transpose4x4MatrixD(frustum);
+ frustum[0]=2.0 * fx / imageWidth; frustum[1]=0.0;                    frustum[2]=2.0 * ( cx / imageWidth ) - 1.0;                     frustum[3]=0.0;
+ frustum[4]=0.0;                   frustum[5]=2.0 * fy / imageHeight; frustum[6]=2.0 * ( cy / imageHeight ) - 1.0;                    frustum[7]=0.0;
+ frustum[8]=0.0;                   frustum[9]=0.0;                    frustum[10]=-( farPlane+nearPlane ) / ( farPlane - nearPlane ); frustum[11]=-2.0 * farPlane * nearPlane / ( farPlane - nearPlane );
+ frustum[12]=0.0;                  frustum[13]=0.0;                   frustum[14]=-1.0;                                               frustum[15]=0.0;
 
 }
+
+
+
+
+
+
+
+
+
+
 
 
 void testMatrices()

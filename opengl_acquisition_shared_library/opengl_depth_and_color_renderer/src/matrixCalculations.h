@@ -14,7 +14,7 @@ void buildOpenGLProjectionForIntrinsics   (
                                              double fy,
                                              double skew,
                                              double cx, double cy,
-                                             int width, int height,
+                                             int imageWidth, int imageHeight,
                                              double nearPlane,
                                              double farPlane
                                            );
