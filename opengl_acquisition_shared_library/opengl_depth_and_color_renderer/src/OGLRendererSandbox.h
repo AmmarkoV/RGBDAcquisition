@@ -6,6 +6,7 @@ extern "C"
 {
 #endif
 
+int setOpenGLIntrinsicCalibration(float * camera);
 int setOpenGLExtrinsicCalibration(float * rodriguez,float * translation);
 
 int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height);

@@ -60,7 +60,8 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       { // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
         glDisable(GL_COLOR_MATERIAL); //Required for the glMaterial calls to work
       } else
-      { if (mod->transparency==0.0)
+      {
+          if (mod->transparency==0.0)
          {
           //fprintf(stderr,"Only Seting color %0.2f %0.2f %0.2f \n",mod->colorR,mod->colorG,mod->colorB);
           glColor3f(mod->colorR,mod->colorG,mod->colorB);

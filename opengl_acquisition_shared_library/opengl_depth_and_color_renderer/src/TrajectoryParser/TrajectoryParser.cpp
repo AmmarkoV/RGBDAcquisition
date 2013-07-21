@@ -358,9 +358,9 @@ int addObjectToVirtualStream(
    unsigned int pos = stream->numberOfObjects;
    strcpy(stream->object[pos].name,name);
    strcpy(stream->object[pos].typeStr,type);
-   stream->object[pos].R = R;
-   stream->object[pos].G = G;
-   stream->object[pos].B = B;
+   stream->object[pos].R = (float) R/255;
+   stream->object[pos].G = (float) G/255;
+   stream->object[pos].B = (float) B/255;
    stream->object[pos].Transparency = Alpha;
    stream->object[pos].nocolor = 0;
 
@@ -497,10 +497,10 @@ int readVirtualStream(struct VirtualStream * newstream)
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
 
-               unsigned char R = (float) InputParser_GetWordInt(ipc,3)  /  255;
-               unsigned char G = (float) InputParser_GetWordInt(ipc,4)  /  255;
-               unsigned char B = (float) InputParser_GetWordInt(ipc,5)  /  255;
-               unsigned char Alpha = (float) InputParser_GetWordInt(ipc,6)  /  255;
+               unsigned char R = (unsigned char) InputParser_GetWordInt(ipc,3);
+               unsigned char G = (unsigned char)  InputParser_GetWordInt(ipc,4);
+               unsigned char B = (unsigned char)  InputParser_GetWordInt(ipc,5);
+               unsigned char Alpha = (unsigned char)  InputParser_GetWordInt(ipc,6) ;
                int nocolor = (float) InputParser_GetWordInt(ipc,7);
 
                //Value , not used : InputParser_GetWord(ipc,8,newstream->object[pos].value,15);

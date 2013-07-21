@@ -4,6 +4,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/gl.h>
@@ -193,10 +194,36 @@ int entry(int argc, char **argv)
   return 0;
 }
 
+
+
+int setOpenGLIntrinsicCalibration(float * camera)
+{
+  useIntrinsicMatrix=1;
+  cameraMatrix[0]=camera[0];
+  cameraMatrix[1]=camera[1];
+  cameraMatrix[2]=camera[2];
+  cameraMatrix[3]=camera[3];
+  cameraMatrix[4]=camera[4];
+  cameraMatrix[5]=camera[5];
+  cameraMatrix[6]=camera[6];
+  cameraMatrix[7]=camera[7];
+  cameraMatrix[8]=camera[8];
+  return 1;
+}
+
+
 int setOpenGLExtrinsicCalibration(float * rodriguez,float * translation)
 {
   useCustomMatrix=1;
   convertRodriguezAndTransTo4x4(rodriguez , translation , (float*) customMatrix );
+
+  customTranslation[0] = translation[0];
+  customTranslation[1] = translation[1];
+  customTranslation[2] = translation[2];
+
+  customRotation[0] = rodriguez[0];
+  customRotation[1] = rodriguez[1];
+  customRotation[2] = rodriguez[2];
   return 1;
 }
 
@@ -214,6 +241,9 @@ double getOpenGLPixelSize()
 
 int startOGLRendererSandbox()
 {
+
+  testMatrices();
+
   char test[12]={0};
   char * testP = test;
   start_glx_stuff(WIDTH,HEIGHT,0,&testP);

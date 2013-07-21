@@ -14,6 +14,18 @@ struct Model ** models=0;
 float farPlane = 1000;
 float nearPlane= 1.0;
 
+int WIDTH=640;
+int HEIGHT=480;
+
+
+int useIntrinsicMatrix=0;
+double cameraMatrix[9]={
+                        0.0 , 0.0 , 0.0 ,
+                        0.0 , 0.0 , 0.0 ,
+                        0.0 , 0.0 , 0.0
+                       };
+
+
 int useCustomMatrix=0;
 float customMatrix[16]={
                         1.0 , 0.0 , 0.0 , 0.0 ,
@@ -22,6 +34,7 @@ float customMatrix[16]={
                         0.0 , 0.0 , 0.0 , 1.0
                        };
 float customTranslation[3]={0};
+float customRotation[3]={0};
 
 
 
@@ -60,11 +73,45 @@ int initScene()
 
   /* set up projection transform */
   glMatrixMode(GL_PROJECTION);
+
+
+  if (useIntrinsicMatrix)
+  {
+   double frustum[4*4]={0};
+   int viewport[4]={0};
+
+   fprintf(stderr,"Width %u x Height %u \n",WIDTH,HEIGHT);
+   buildOpenGLProjectionForIntrinsics   (
+                                             frustum  ,
+                                             viewport ,
+                                             cameraMatrix[0],
+                                             cameraMatrix[4],
+                                             0.0,
+                                             cameraMatrix[2],
+                                             cameraMatrix[5],
+                                             WIDTH,
+                                             HEIGHT,
+                                             0.5,
+                                             30500.0
+                                           );
+
+   print4x4DMatrix("OpenGL Projection Matrix", frustum );
+
+   glMatrixMode(GL_PROJECTION);
+   glLoadMatrixd(frustum);
+   glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+  }
+    else
+  {
+
   glLoadIdentity();
   glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
+  glViewport(0, 0, WIDTH, HEIGHT);
+ }
+
+
   /* establish initial viewport */
   /* pedantic, full window size is default viewport */
-  glViewport(0, 0, WIDTH, HEIGHT);
 
   glEnable(GL_COLOR);
   glEnable(GL_COLOR_MATERIAL);
@@ -180,23 +227,23 @@ glEnd();
 
 
 
-int drawAxis(float scale)
+int drawAxis(float x, float y , float z, float scale)
 {
  glLineWidth(15.0);
  glBegin(GL_LINES);
 
  glColor3f(1.0,0.0,0.0);
- glVertex3f(0,0,0);
- glVertex3f(1.0*scale,0,0);
+ glVertex3f(x,y,z);
+ glVertex3f(x+1.0*scale,y,z);
 
 
  glColor3f(0.0,1.0,0.0);
- glVertex3f(0,0,0);
- glVertex3f(0,1.0*scale,0);
+ glVertex3f(x,y,z);
+ glVertex3f(x,y+1.0*scale,z);
 
  glColor3f(0.0,0.0,1.0);
- glVertex3f(0,0,0);
- glVertex3f(0,0,1.0*scale);
+ glVertex3f(x,y,z);
+ glVertex3f(x,y,z+1.0*scale);
 
 glEnd();
 glLineWidth(1.0);
@@ -220,7 +267,11 @@ int renderScene()
   {
   //TODO if calibration is given , change this with the calibration matrix
   //http://www.khronos.org/opengles/sdk/1.1/docs/man/glLoadMatrix.xml
+    glLoadIdentity();
     glLoadMatrixf(customMatrix);
+    glRotatef(90,-1.0,0,0);
+    glRotatef(90,0,-1.0,0);
+    //glRotatef(customRotation[2],0,0,-1.0);
     glTranslatef(customTranslation[0], customTranslation[1] , customTranslation[2]);
   } else
   {
@@ -232,8 +283,16 @@ int renderScene()
   }
 
 
-  //drawAxis(10.0);
   drawPlane(0.1);
+
+  drawAxis(0,0,0, 10.0);
+
+  drawAxis(-10,0,-10, 5.0);
+  drawAxis(+10,0,+10, 5.0);
+  drawAxis(-10,0,+10, 5.0);
+  drawAxis(10,0,-10, 5.0);
+
+
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 unsigned int i;
   //Object 0 is camera
