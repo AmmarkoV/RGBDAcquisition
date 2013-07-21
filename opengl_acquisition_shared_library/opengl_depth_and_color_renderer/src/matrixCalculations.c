@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 
+
 // Pre-calculated value of PI / 180.
 #define kPI180   0.017453
 
@@ -15,20 +16,54 @@
 #define radiansToDegrees(x) (x * k180PI)
 
 /*
-inline float degreesToRadians(float degrees)
+inline double degreesToRadians(double degrees)
 {
   return tan(0.25 * 3.141592653589793 );
 }*/
 
-void matrix4x4Identity(float * m)
+void print3x3DMatrix(char * str , double * matrix4x4)
 {
-    m[0] = m[5] = m[10] = m[15] = 1.0;
-    m[1] = m[2] = m[3] = m[4] = 0.0;
-    m[6] = m[7] = m[8] = m[9] = 0.0;
-    m[11] = m[12] = m[13] = m[14] = 0.0;
+  fprintf( stderr, "  3x3 double %s \n",str);
+  fprintf( stderr, "--------------------------------------\n");
+  fprintf( stderr, "%f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f\n",matrix4x4[2]);
+  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f\n",matrix4x4[5]);
+  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f\n",matrix4x4[8]);
+  fprintf( stderr, "--------------------------------------\n");
 }
 
-void matrix4x4Translate(float x, float y, float z, float * matrix)
+
+void print4x4DMatrix(char * str , double * matrix4x4)
+{
+  fprintf( stderr, " 4x4 double %s \n",str);
+  fprintf( stderr, "--------------------------------------\n");
+  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
+  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
+  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
+  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
+  fprintf( stderr, "--------------------------------------\n");
+}
+
+
+void copy4x4Matrix(double * out,double * in)
+{
+  out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
+  out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
+  out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
+  out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
+}
+
+
+void matrix4x4Identity(double * m)
+{
+    //Diagonal
+    m[0] = 1.0;  m[5] = 1.0;  m[10] = 1.0;  m[15] = 1.0;
+    //Everything else is zero
+    m[1] = 0.0; m[2] = 0.0;   m[3] = 0.0;   m[4] = 0.0;
+    m[6] = 0.0; m[7] = 0.0;   m[8] = 0.0;   m[9] = 0.0;
+    m[11] =0.0; m[12]= 0.0;   m[13]= 0.0;   m[14] = 0.0;
+}
+
+void matrix4x4Translate(double x, double y, double z, double * matrix)
 {
     matrix4x4Identity(matrix);
 
@@ -38,7 +73,7 @@ void matrix4x4Translate(float x, float y, float z, float * matrix)
     matrix[14] = z;
 }
 
-void matrix4x4Scale(float sx, float sy, float sz, float * matrix)
+void matrix4x4Scale(double sx, double sy, double sz, double * matrix)
 {
     matrix4x4Identity(matrix);
 
@@ -48,9 +83,9 @@ void matrix4x4Scale(float sx, float sy, float sz, float * matrix)
     matrix[10] = sz;
 }
 
-void matrix4x4RotateX(float degrees, float * matrix)
+void matrix4x4RotateX(double degrees, double * matrix)
 {
-    float radians = degreesToRadians(degrees);
+    double radians = degreesToRadians(degrees);
 
     matrix4x4Identity(matrix);
 
@@ -61,9 +96,9 @@ void matrix4x4RotateX(float degrees, float * matrix)
     matrix[10] = matrix[5];
 }
 
-void matrix4x4RotateY(float degrees, float * matrix)
+void matrix4x4RotateY(double degrees, double * matrix)
 {
-    float radians = degreesToRadians(degrees);
+    double radians = degreesToRadians(degrees);
 
     matrix4x4Identity(matrix);
 
@@ -74,9 +109,9 @@ void matrix4x4RotateY(float degrees, float * matrix)
     matrix[10] = matrix[0];
 }
 
-void matrixRotateZ(float degrees, float * matrix)
+void matrixRotateZ(double degrees, double * matrix)
 {
-    float radians = degreesToRadians(degrees);
+    double radians = degreesToRadians(degrees);
 
     matrix4x4Identity(matrix);
 
@@ -87,7 +122,7 @@ void matrixRotateZ(float degrees, float * matrix)
     matrix[5] = matrix[0];
 }
 
-int upscale3x3to4x4(float * mat3x3,float * mat4x4)
+int upscale3x3to4x4(double * mat3x3,double * mat4x4)
 {
   if  ( (mat3x3==0)||(mat4x4==0) )   { return 0; }
 
@@ -101,12 +136,12 @@ int upscale3x3to4x4(float * mat3x3,float * mat4x4)
 }
 
 
-int convertRodriguezTo3x3(float * rodriguez , float * result)
+int convertRodriguezTo3x3(double * rodriguez , double * result)
 {
   if ( (rodriguez==0) ||  (result==0) ) { return 0; }
-  float x = rodriguez[0] , y = rodriguez[1] , z = rodriguez[2];
-  float th = sqrt( x*x + y*y + z*z );
-  float cosTh = cos(th);
+  double x = rodriguez[0] , y = rodriguez[1] , z = rodriguez[2];
+  double th = sqrt( x*x + y*y + z*z );
+  double cosTh = cos(th);
   x = x / th; y = y / th; z = z / th;
 
   /*
@@ -126,13 +161,17 @@ int convertRodriguezTo3x3(float * rodriguez , float * result)
   result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
   result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
 
+
+  fprintf(stderr,"rodriguez %0.2f %0.2f %0.2f\n ",rodriguez[0],rodriguez[1],rodriguez[2]);
+  print3x3DMatrix("Rodriguez Initial", result);
+
   return 1;
 }
 
-int convertTranslationTo4x4(float * translation, float * result)
+int convertTranslationTo4x4(double * translation, double * result)
 {
   if ( (translation==0) ||  (result==0) ) { return 0; }
-  float x = translation[0] , y = translation[1] , z = translation[2];
+  double x = translation[0] , y = translation[1] , z = translation[2];
 
   result[0]=1.0; result[1]=0;   result[2]=0;    result[3]=x;
   result[4]=0;   result[5]=1.0; result[6]=0;    result[7]=y;
@@ -140,62 +179,6 @@ int convertTranslationTo4x4(float * translation, float * result)
   result[12]=0;  result[13]=0;  result[14]=0;   result[15]=1.0;
 
   return 1;
-}
-
-
-
-int multiplyVectorWith3x3Matrix(float * matrix, float * result)
-{
-  if ( (matrix==0) ||  (result==0) ) { return 0; }
-  float x = matrix[0] , y = matrix[1] , z = matrix[2];
-  float th = sqrt( x*x + y*y + z*z );
-  float cosTh = cos(th);
-  x = x / th; y = y / th; z = z / th;
-
-  /*
-  //REAL RESULT
-  result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
-  result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
-  result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
-  */
-
-  //  0 1 2    0 3 6
-  //  3 4 5    1 4 7
-  //  6 7 8    2 5 8
-
-  //TRANSPOSED RESULT
-  result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
-  result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
-  result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
-
-  return 1;
-}
-
-
-void print4x4DMatrix(char * str , double * matrix4x4)
-{
-  fprintf( stderr, "  %s \n",str);
-  fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
-  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
-  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
-  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
-  fprintf( stderr, "--------------------------------------\n");
-}
-
-int convertRodriguezAndTransTo4x4(float * rodriguez , float * translation , float * matrix4x4 )
-{
-  //return 0;
-  float matrix3x3[9]={0};
-  convertRodriguezTo3x3(rodriguez,(float*) matrix3x3);
-  upscale3x3to4x4((float*) matrix3x3,matrix4x4);
-
-  //Append Translation -> matrix4x4[3]=translation[0]; matrix4x4[7]=translation[1]; matrix4x4[11]=translation[2];
-
-  //convertTranslationTo4x4(translation,matrix4x4);
-
-  print4x4DMatrix("Rodriguez", matrix4x4);
- return 1;
 }
 
 
@@ -230,7 +213,7 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
 
   fprintf(stderr,"Multiplying A and B \n");
   print4x4DMatrix("A", matrixA);
-  print4x4DMatrix("B", matrixA);
+  print4x4DMatrix("B", matrixB);
 
   //MULTIPLICATION_RESULT FIRST ROW
   result[0]=matrixA[0] * matrixB[0] + matrixA[1] * matrixB[4]  + matrixA[2] * matrixB[8]  + matrixA[3] * matrixB[12];
@@ -259,6 +242,67 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
 
   return 1;
 }
+int multiplyVectorWith3x3Matrix(double * matrix, double * result)
+{
+  if ( (matrix==0) ||  (result==0) ) { return 0; }
+  double x = matrix[0] , y = matrix[1] , z = matrix[2];
+  double th = sqrt( x*x + y*y + z*z );
+  double cosTh = cos(th);
+  x = x / th; y = y / th; z = z / th;
+
+  /*
+  //REAL RESULT
+  result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
+  result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
+  result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
+  */
+
+  //  0 1 2    0 3 6
+  //  3 4 5    1 4 7
+  //  6 7 8    2 5 8
+
+  //TRANSPOSED RESULT
+  result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
+  result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
+  result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
+
+  return 1;
+}
+
+
+int convertRodriguezAndTransTo4x4(double * rodriguez , double * translation , double * matrix4x4 )
+{
+  double * matrix4x4Translation = (double * ) malloc ( sizeof(double) * 16 ); if (matrix4x4Translation==0) { return 0; }
+  //double * matrix4x4Translation[16]={0}; <-- This produces w/e compiled code :P wtf
+  matrix4x4Translate(translation[0],translation[1],translation[2],matrix4x4Translation);
+  print4x4DMatrix("A Should be ", matrix4x4Translation);
+
+
+  double * matrix4x4Rotation = (double * ) malloc ( sizeof(double) * 16 ); if (matrix4x4Rotation==0) { return 0; }
+  double * matrix3x3Rotation = (double * ) malloc ( sizeof(double) * 9 );  if (matrix3x3Rotation==0) { return 0; }
+  //double matrix4x4Rotation[16]={0};   <-- This produces w/e compiled code :P wtf
+  //double matrix3x3Rotation[9]={0};
+  convertRodriguezTo3x3(rodriguez,(double*) matrix3x3Rotation);
+  upscale3x3to4x4((double*) matrix3x3Rotation,(double*)matrix4x4Rotation);
+  print4x4DMatrix("B Should be ", matrix4x4Rotation);
+
+  //Translate first rotate after
+
+  multiplyTwo4x4Matrices((double*) matrix4x4, (double*) matrix4x4Translation , (double*) matrix4x4Rotation);
+
+  //Append Translation
+  //matrix4x4[3]=translation[0]; matrix4x4[7]=translation[1]; matrix4x4[11]=translation[2];
+
+  //convertTranslationTo4x4(translation,matrix4x4);
+
+  print4x4DMatrix("Rodriguez", matrix4x4);
+
+  free(matrix4x4Translation);
+  free(matrix4x4Rotation);
+ return 1;
+}
+
+
 
 
 void InvertYandZAxisOpenGL4x4Matrix(double * result,double * matrix)

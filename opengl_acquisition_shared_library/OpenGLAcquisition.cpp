@@ -103,13 +103,13 @@ int getOpenGLDepthCalibration(int devID,struct calibration * calib)
 
 int setOpenGLColorCalibration(int devID,struct calibration * calib)
 {
-    setOpenGLExtrinsicCalibration((float*) calib->extrinsicRotationRodriguez,(float*) calib->extrinsicTranslation);
+    setOpenGLExtrinsicCalibration((double*) calib->extrinsicRotationRodriguez,(double*) calib->extrinsicTranslation);
     return 1;
 }
 
 int setOpenGLDepthCalibration(int devID,struct calibration * calib)
 {
-    setOpenGLExtrinsicCalibration((float*) calib->extrinsicRotationRodriguez,(float*) calib->extrinsicTranslation);
+    setOpenGLExtrinsicCalibration((double*) calib->extrinsicRotationRodriguez,(double*) calib->extrinsicTranslation);
     return 1;
 }
 

@@ -267,12 +267,16 @@ int renderScene()
   {
   //TODO if calibration is given , change this with the calibration matrix
   //http://www.khronos.org/opengles/sdk/1.1/docs/man/glLoadMatrix.xml
+
+  // <- I should probably do the translation , rotation manually and only load the matrix here
+  //Also the sequence should be translation -> rotation
     glLoadMatrixf(customMatrix);
     //glScalef( 1.0f, 1.0f, -1.0f);
     glRotatef(90,-1.0,0,0);
     glRotatef(90,0,-1.0,0);
-    //glRotatef(customRotation[2],0,0,-1.0);
-    glTranslatef(customTranslation[0], customTranslation[1] , customTranslation[2]);
+
+
+    //glTranslatef(customTranslation[0], customTranslation[1] , customTranslation[2]);
   } else
   {
     glLoadIdentity();

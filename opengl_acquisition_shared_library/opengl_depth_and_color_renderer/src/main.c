@@ -196,7 +196,7 @@ int entry(int argc, char **argv)
 
 
 
-int setOpenGLIntrinsicCalibration(float * camera)
+int setOpenGLIntrinsicCalibration(double * camera)
 {
   useIntrinsicMatrix=1;
   cameraMatrix[0]=camera[0];
@@ -212,7 +212,7 @@ int setOpenGLIntrinsicCalibration(float * camera)
 }
 
 
-int setOpenGLExtrinsicCalibration(float * rodriguez,float * translation)
+int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation)
 {
   useCustomMatrix=1;
   convertRodriguezAndTransTo4x4(rodriguez , translation , (float*) customMatrix );
