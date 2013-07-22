@@ -47,6 +47,14 @@
 			<Add library="GL" />
 			<Add library="X11" />
 		</Linker>
+		<Unit filename="AmMatrix/matrixCalculations.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/matrixCalculations.h" />
+		<Unit filename="AmMatrix/matrixTools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/matrixTools.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="TextureLoader/bmp.c">
 			<Option compilerVar="CC" />
@@ -71,10 +79,6 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="matrixCalculations.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="matrixCalculations.h" />
 		<Unit filename="model_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

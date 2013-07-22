@@ -272,8 +272,8 @@ int renderScene()
   //Also the sequence should be translation -> rotation
     glLoadMatrixf(customMatrix);
     //glScalef( 1.0f, 1.0f, -1.0f);
-    glRotatef(90,-1.0,0,0);
-    glRotatef(90,0,-1.0,0);
+    //glRotatef(90,-1.0,0,0);
+    //glRotatef(90,0,-1.0,0);
 
 
     //glTranslatef(customTranslation[0], customTranslation[1] , customTranslation[2]);

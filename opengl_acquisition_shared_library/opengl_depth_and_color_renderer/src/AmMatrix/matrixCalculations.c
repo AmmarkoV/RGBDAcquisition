@@ -15,6 +15,8 @@
 // Converts radians to degrees.
 #define radiansToDegrees(x) (x * k180PI)
 
+const float DEG2RAD = 3.141592653589793f / 180;
+
 /*
 inline double degreesToRadians(double degrees)
 {
@@ -68,9 +70,9 @@ void matrix4x4Translate(double x, double y, double z, double * matrix)
     matrix4x4Identity(matrix);
 
     // Translate slots.
-    matrix[12] = x;
-    matrix[13] = y;
-    matrix[14] = z;
+    matrix[3] = x;
+    matrix[7] = y;
+    matrix[11] = z;
 }
 
 void matrix4x4Scale(double sx, double sy, double sz, double * matrix)
@@ -82,6 +84,42 @@ void matrix4x4Scale(double sx, double sy, double sz, double * matrix)
     matrix[5] = sy;
     matrix[10] = sz;
 }
+
+
+
+void matrix4x4Rotate(double angle, double x, double y, double z ,  double * m)
+{
+    double c = cosf(angle * DEG2RAD);
+    double s = sinf(angle * DEG2RAD);
+    double xx = x * x;
+    double xy = x * y;
+    double xz = x * z;
+    double yy = y * y;
+    double yz = y * z;
+    double zz = z * z;
+
+    m[0] = xx * (1 - c) + c;
+    m[1] = xy * (1 - c) - z * s;
+    m[2] = xz * (1 - c) + y * s;
+    m[3] = 0;
+    m[4] = xy * (1 - c) + z * s;
+    m[5] = yy * (1 - c) + c;
+    m[6] = yz * (1 - c) - x * s;
+    m[7] = 0;
+    m[8] = xz * (1 - c) - y * s;
+    m[9] = yz * (1 - c) + x * s;
+    m[10]= zz * (1 - c) + c;
+    m[11]= 0;
+    m[12]= 0;
+    m[13]= 0;
+    m[14]= 0;
+    m[15]= 1;
+}
+
+
+
+
+
 
 void matrix4x4RotateX(double degrees, double * matrix)
 {
@@ -250,21 +288,26 @@ int multiplyVectorWith3x3Matrix(double * matrix, double * result)
   double cosTh = cos(th);
   x = x / th; y = y / th; z = z / th;
 
-  /*
-  //REAL RESULT
-  result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
-  result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
-  result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
-  */
 
+  //Switch to control what kind of a result to give :P
+  #define PRODUCE_TRANSPOSED_RESULT 1
   //  0 1 2    0 3 6
   //  3 4 5    1 4 7
   //  6 7 8    2 5 8
 
-  //TRANSPOSED RESULT
-  result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
-  result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
-  result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
+
+  #if PRODUCE_TRANSPOSED_RESULT
+    //TRANSPOSED RESULT
+    result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
+    result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
+    result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
+  #else
+   //NORMAL RESULT
+   result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
+   result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
+   result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
+
+  #endif
 
   return 1;
 }
@@ -288,13 +331,14 @@ int convertRodriguezAndTransTo4x4(double * rodriguez , double * translation , do
 
   //Translate first rotate after
 
+  //copy4x4Matrix((double*) matrix4x4, (double*) matrix4x4Rotation);
+
   multiplyTwo4x4Matrices((double*) matrix4x4, (double*) matrix4x4Translation , (double*) matrix4x4Rotation);
 
   //Append Translation
   //matrix4x4[3]=translation[0]; matrix4x4[7]=translation[1]; matrix4x4[11]=translation[2];
 
   //convertTranslationTo4x4(translation,matrix4x4);
-
   print4x4DMatrix("Rodriguez", matrix4x4);
 
   free(matrix4x4Translation);

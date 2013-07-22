@@ -17,7 +17,7 @@
 #include "scene.h"
 
 #include "shader_loader.h"
-#include "matrixCalculations.h"
+#include "AmMatrix/matrixCalculations.h"
 
 #include "OGLRendererSandbox.h"
 
