@@ -146,8 +146,8 @@ void append_camera_params( const char* out_filename, struct calibration * calib 
     fprintf( fp, "%f\n",calib->extrinsicTranslation[1]);
     fprintf( fp, "%f\n",calib->extrinsicTranslation[2]);
 
-    fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z\n");
-    fprintf( fp, "%%R\n");
+    fprintf( fp, "%%%% Rotation Vector (Rodrigues) R.X, R.Y, R.Z\n");
+    fprintf( fp, "%%%%R\n");
     fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[0]);
     fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[1]);
     fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[2]);
@@ -214,22 +214,24 @@ int convertRodriguezTo3x3(float * rodriguez , float * result)
   float cosTh = cos(th);
   x = x / th; y = y / th; z = z / th;
 
-  /*
-  //REAL RESULT
-  result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
-  result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
-  result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
-  */
+  //Switch to control what kind of a result to give :P
+  #define PRODUCE_TRANSPOSED_RESULT 0
+  // REGULAR  TRANSPOSED
+  //  0 1 2     0 3 6
+  //  3 4 5     1 4 7
+  //  6 7 8     2 5 8
 
-
-  //  0 1 2    0 3 6
-  //  3 4 5    1 4 7
-  //  6 7 8    2 5 8
-
-  //TRANSPOSED RESULT
-  result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
-  result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
-  result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
+  #if PRODUCE_TRANSPOSED_RESULT
+    //TRANSPOSED RESULT
+    result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
+    result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
+    result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
+  #else
+   //NORMAL RESULT
+   result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
+   result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
+   result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
+  #endif
 
   return 1;
 }
@@ -332,6 +334,15 @@ int main( int argc, char** argv )
     fprintf( stderr, "  %f ",result[0]); fprintf( stderr, "%f ",result[1]); fprintf( stderr, "%f\n",result[2]);
     fprintf( stderr, "  %f ",result[3]); fprintf( stderr, "%f ",result[4]); fprintf( stderr, "%f\n",result[5]);
     fprintf( stderr, "  %f ",result[6]); fprintf( stderr, "%f ",result[7]); fprintf( stderr, "%f\n",result[8]);
+
+    fprintf(stderr,"\n\n\n");
+
+    float out[9]={0};
+    CvMat rotM = cvMat( 3, 3, CV_32F , out );
+    cvRodrigues2(&rot_vects,&rotM);
+    fprintf( stderr, "  %f ",rotM.data.fl[0]); fprintf( stderr, "%f ",rotM.data.fl[1]); fprintf( stderr, "%f\n",rotM.data.fl[2]);
+    fprintf( stderr, "  %f ",rotM.data.fl[3]); fprintf( stderr, "%f ",rotM.data.fl[4]); fprintf( stderr, "%f\n",rotM.data.fl[5]);
+    fprintf( stderr, "  %f ",rotM.data.fl[6]); fprintf( stderr, "%f ",rotM.data.fl[7]); fprintf( stderr, "%f\n",rotM.data.fl[8]);
 
 
 

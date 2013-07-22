@@ -1,210 +1,49 @@
 #include "matrixCalculations.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
+#include "matrix3x3Tools.h"
+#include "matrix4x4Tools.h"
 
 
-// Pre-calculated value of PI / 180.
-#define kPI180   0.017453
 
-// Pre-calculated value of 180 / PI.
-#define k180PI  57.295780
 
-// Converts degrees to radians.
-#define degreesToRadians(x) (x * kPI180)
 
-// Converts radians to degrees.
-#define radiansToDegrees(x) (x * k180PI)
-
-const float DEG2RAD = 3.141592653589793f / 180;
-
-/*
-inline double degreesToRadians(double degrees)
+int convertRodriguezTo3x3(double * matrix, double * result)
 {
-  return tan(0.25 * 3.141592653589793 );
-}*/
-
-void print3x3DMatrix(char * str , double * matrix4x4)
-{
-  fprintf( stderr, "  3x3 double %s \n",str);
-  fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "%f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f\n",matrix4x4[2]);
-  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f\n",matrix4x4[5]);
-  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f\n",matrix4x4[8]);
-  fprintf( stderr, "--------------------------------------\n");
-}
-
-
-void print4x4DMatrix(char * str , double * matrix4x4)
-{
-  fprintf( stderr, " 4x4 double %s \n",str);
-  fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
-  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
-  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
-  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
-  fprintf( stderr, "--------------------------------------\n");
-}
-
-
-void copy4x4Matrix(double * out,double * in)
-{
-  out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
-  out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
-  out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
-  out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
-}
-
-
-void matrix4x4Identity(double * m)
-{
-    //Diagonal
-    m[0] = 1.0;  m[5] = 1.0;  m[10] = 1.0;  m[15] = 1.0;
-    //Everything else is zero
-    m[1] = 0.0; m[2] = 0.0;   m[3] = 0.0;   m[4] = 0.0;
-    m[6] = 0.0; m[7] = 0.0;   m[8] = 0.0;   m[9] = 0.0;
-    m[11] =0.0; m[12]= 0.0;   m[13]= 0.0;   m[14] = 0.0;
-}
-
-void matrix4x4Translate(double x, double y, double z, double * matrix)
-{
-    matrix4x4Identity(matrix);
-
-    // Translate slots.
-    matrix[3] = x;
-    matrix[7] = y;
-    matrix[11] = z;
-}
-
-void matrix4x4Scale(double sx, double sy, double sz, double * matrix)
-{
-    matrix4x4Identity(matrix);
-
-    // Scale slots.
-    matrix[0] = sx;
-    matrix[5] = sy;
-    matrix[10] = sz;
-}
-
-
-
-void matrix4x4Rotate(double angle, double x, double y, double z ,  double * m)
-{
-    double c = cosf(angle * DEG2RAD);
-    double s = sinf(angle * DEG2RAD);
-    double xx = x * x;
-    double xy = x * y;
-    double xz = x * z;
-    double yy = y * y;
-    double yz = y * z;
-    double zz = z * z;
-
-    m[0] = xx * (1 - c) + c;
-    m[1] = xy * (1 - c) - z * s;
-    m[2] = xz * (1 - c) + y * s;
-    m[3] = 0;
-    m[4] = xy * (1 - c) + z * s;
-    m[5] = yy * (1 - c) + c;
-    m[6] = yz * (1 - c) - x * s;
-    m[7] = 0;
-    m[8] = xz * (1 - c) - y * s;
-    m[9] = yz * (1 - c) + x * s;
-    m[10]= zz * (1 - c) + c;
-    m[11]= 0;
-    m[12]= 0;
-    m[13]= 0;
-    m[14]= 0;
-    m[15]= 1;
-}
-
-
-
-
-
-
-void matrix4x4RotateX(double degrees, double * matrix)
-{
-    double radians = degreesToRadians(degrees);
-
-    matrix4x4Identity(matrix);
-
-    // Rotate X formula.
-    matrix[5] = cosf(radians);
-    matrix[6] = -sinf(radians);
-    matrix[9] = -matrix[6];
-    matrix[10] = matrix[5];
-}
-
-void matrix4x4RotateY(double degrees, double * matrix)
-{
-    double radians = degreesToRadians(degrees);
-
-    matrix4x4Identity(matrix);
-
-    // Rotate Y formula.
-    matrix[0] = cosf(radians);
-    matrix[2] = sinf(radians);
-    matrix[8] = -matrix[2];
-    matrix[10] = matrix[0];
-}
-
-void matrixRotateZ(double degrees, double * matrix)
-{
-    double radians = degreesToRadians(degrees);
-
-    matrix4x4Identity(matrix);
-
-    // Rotate Z formula.
-    matrix[0] = cosf(radians);
-    matrix[1] = sinf(radians);
-    matrix[4] = -matrix[1];
-    matrix[5] = matrix[0];
-}
-
-int upscale3x3to4x4(double * mat3x3,double * mat4x4)
-{
-  if  ( (mat3x3==0)||(mat4x4==0) )   { return 0; }
-
-  //TRANSPOSED RESULT
-  mat4x4[0]=mat3x3[0]; mat4x4[1]=mat3x3[1]; mat4x4[2]=mat3x3[2];  mat4x4[3]=0.0;
-  mat4x4[4]=mat3x3[3]; mat4x4[5]=mat3x3[4]; mat4x4[6]=mat3x3[5];  mat4x4[7]=0.0;
-  mat4x4[8]=mat3x3[6]; mat4x4[9]=mat3x3[7]; mat4x4[10]=mat3x3[8]; mat4x4[11]=0.0;
-  mat4x4[12]=0.0;      mat4x4[13]=0.0;      mat4x4[14]=0.0;       mat4x4[15]=1.0;
-
-  return 1;
-}
-
-
-int convertRodriguezTo3x3(double * rodriguez , double * result)
-{
-  if ( (rodriguez==0) ||  (result==0) ) { return 0; }
-  double x = rodriguez[0] , y = rodriguez[1] , z = rodriguez[2];
+  if ( (matrix==0) ||  (result==0) ) { return 0; }
+  double x = matrix[0] , y = matrix[1] , z = matrix[2];
   double th = sqrt( x*x + y*y + z*z );
   double cosTh = cos(th);
   x = x / th; y = y / th; z = z / th;
 
-  /*
-  //REAL RESULT
-  result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
-  result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
-  result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
-  */
 
+  //Switch to control what kind of a result to give :P
+  #define PRODUCE_TRANSPOSED_RESULT 0
+  // REGULAR  TRANSPOSED
+  //  0 1 2     0 3 6
+  //  3 4 5     1 4 7
+  //  6 7 8     2 5 8
 
-  //  0 1 2    0 3 6
-  //  3 4 5    1 4 7
-  //  6 7 8    2 5 8
+  #if PRODUCE_TRANSPOSED_RESULT
+    //TRANSPOSED RESULT
+    result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
+    result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
+    result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
+  #else
+   //NORMAL RESULT
+   result[0]=x*x * (1 - cosTh) + cosTh;          result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
+   result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
+   result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
+  #endif
 
-  //TRANSPOSED RESULT
-  result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
-  result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
-  result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
-
-
-  fprintf(stderr,"rodriguez %0.2f %0.2f %0.2f\n ",rodriguez[0],rodriguez[1],rodriguez[2]);
+  fprintf(stderr,"rodriguez %0.2f %0.2f %0.2f\n ",matrix[0],matrix[1],matrix[2]);
   print3x3DMatrix("Rodriguez Initial", result);
 
   return 1;
 }
+
+
 
 int convertTranslationTo4x4(double * translation, double * result)
 {
@@ -221,144 +60,51 @@ int convertTranslationTo4x4(double * translation, double * result)
 
 
 
-
-
-int transpose4x4MatrixD(double * mat)
+void InvertYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
 {
-  if (mat==0) { return 0; }
-  /*       -------  TRANSPOSE ------->
-      0   1   2   3           0  4  8   12
-      4   5   6   7           1  5  9   13
-      8   9   10  11          2  6  10  14
-      12  13  14  15          3  7  11  15   */
-  double tmp;
-  tmp = mat[1]; mat[1]=mat[4];  mat[4]=tmp;
-  tmp = mat[2]; mat[2]=mat[8];  mat[8]=tmp;
-  tmp = mat[3]; mat[3]=mat[12]; mat[12]=tmp;
+  fprintf(stderr,"Invert Y and Z axis\n");
+  double * invertOp = (double * ) malloc ( sizeof(double) * 16 );
+  if (invertOp==0) { return; }
 
-
-  tmp = mat[6]; mat[6]=mat[9]; mat[9]=tmp;
-  tmp = mat[13]; mat[13]=mat[7]; mat[7]=tmp;
-  tmp = mat[14]; mat[14]=mat[11]; mat[11]=tmp;
-
-  return 1;
-}
-
-
-int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB)
-{
-  if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }
-
-  fprintf(stderr,"Multiplying A and B \n");
-  print4x4DMatrix("A", matrixA);
-  print4x4DMatrix("B", matrixB);
-
-  //MULTIPLICATION_RESULT FIRST ROW
-  result[0]=matrixA[0] * matrixB[0] + matrixA[1] * matrixB[4]  + matrixA[2] * matrixB[8]  + matrixA[3] * matrixB[12];
-  result[1]=matrixA[0] * matrixB[1] + matrixA[1] * matrixB[5]  + matrixA[2] * matrixB[9]  + matrixA[3] * matrixB[13];
-  result[2]=matrixA[0] * matrixB[2] + matrixA[1] * matrixB[6]  + matrixA[2] * matrixB[10] + matrixA[3] * matrixB[14];
-  result[3]=matrixA[0] * matrixB[3] + matrixA[1] * matrixB[7]  + matrixA[2] * matrixB[11] + matrixA[3] * matrixB[15];
-
-  //MULTIPLICATION_RESULT SECOND ROW
-  result[4]=matrixA[4] * matrixB[0] + matrixA[5] * matrixB[4]  + matrixA[6] * matrixB[8]  + matrixA[7] * matrixB[12];
-  result[5]=matrixA[4] * matrixB[1] + matrixA[5] * matrixB[5]  + matrixA[6] * matrixB[9]  + matrixA[7] * matrixB[13];
-  result[6]=matrixA[4] * matrixB[2] + matrixA[5] * matrixB[6]  + matrixA[6] * matrixB[10] + matrixA[7] * matrixB[14];
-  result[7]=matrixA[4] * matrixB[3] + matrixA[5] * matrixB[7]  + matrixA[6] * matrixB[11] + matrixA[7] * matrixB[15];
-
-  //MULTIPLICATION_RESULT FOURTH ROW
-  result[8] =matrixA[8] * matrixB[0] + matrixA[9] * matrixB[4]  + matrixA[10] * matrixB[8]   + matrixA[11] * matrixB[12];
-  result[9] =matrixA[8] * matrixB[1] + matrixA[9] * matrixB[5]  + matrixA[10] * matrixB[9]   + matrixA[11] * matrixB[13];
-  result[10]=matrixA[8] * matrixB[2] + matrixA[9] * matrixB[6]  + matrixA[10] * matrixB[10]  + matrixA[11] * matrixB[14];
-  result[11]=matrixA[8] * matrixB[3] + matrixA[9] * matrixB[7]  + matrixA[10] * matrixB[11]  + matrixA[11] * matrixB[15];
-
-  result[12]=matrixA[12] * matrixB[0] + matrixA[13] * matrixB[4]  + matrixA[14] * matrixB[8]    + matrixA[15] * matrixB[12];
-  result[13]=matrixA[12] * matrixB[1] + matrixA[13] * matrixB[5]  + matrixA[14] * matrixB[9]    + matrixA[15] * matrixB[13];
-  result[14]=matrixA[12] * matrixB[2] + matrixA[13] * matrixB[6]  + matrixA[14] * matrixB[10]   + matrixA[15] * matrixB[14];
-  result[15]=matrixA[12] * matrixB[3] + matrixA[13] * matrixB[7]  + matrixA[14] * matrixB[11]   + matrixA[15] * matrixB[15];
-
-  print4x4DMatrix("AxB", result);
-
-  return 1;
-}
-int multiplyVectorWith3x3Matrix(double * matrix, double * result)
-{
-  if ( (matrix==0) ||  (result==0) ) { return 0; }
-  double x = matrix[0] , y = matrix[1] , z = matrix[2];
-  double th = sqrt( x*x + y*y + z*z );
-  double cosTh = cos(th);
-  x = x / th; y = y / th; z = z / th;
-
-
-  //Switch to control what kind of a result to give :P
-  #define PRODUCE_TRANSPOSED_RESULT 1
-  //  0 1 2    0 3 6
-  //  3 4 5    1 4 7
-  //  6 7 8    2 5 8
-
-
-  #if PRODUCE_TRANSPOSED_RESULT
-    //TRANSPOSED RESULT
-    result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
-    result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
-    result[2]=x*z*(1 - cosTh) - y*sin(th);        result[5]=y*z*(1 - cosTh) + x*sin(th);     result[8]=z*z*(1 - cosTh) + cosTh;
-  #else
-   //NORMAL RESULT
-   result[0]=x*x * (1 - cosTh) + cosTh;        result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
-   result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
-   result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
-
-  #endif
-
-  return 1;
+  create4x4IdentityMatrix(invertOp);
+  invertOp[5]=-1;   invertOp[10]=-1;
+  multiplyTwo4x4Matrices(result, matrix, invertOp);
+  free(invertOp);
 }
 
 
 int convertRodriguezAndTransTo4x4(double * rodriguez , double * translation , double * matrix4x4 )
 {
-  double * matrix4x4Translation = (double * ) malloc ( sizeof(double) * 16 ); if (matrix4x4Translation==0) { return 0; }
-  //double * matrix4x4Translation[16]={0}; <-- This produces w/e compiled code :P wtf
-  matrix4x4Translate(translation[0],translation[1],translation[2],matrix4x4Translation);
-  print4x4DMatrix("A Should be ", matrix4x4Translation);
-
-
   double * matrix4x4Rotation = (double * ) malloc ( sizeof(double) * 16 ); if (matrix4x4Rotation==0) { return 0; }
   double * matrix3x3Rotation = (double * ) malloc ( sizeof(double) * 9 );  if (matrix3x3Rotation==0) { return 0; }
-  //double matrix4x4Rotation[16]={0};   <-- This produces w/e compiled code :P wtf
-  //double matrix3x3Rotation[9]={0};
+
+  fprintf(stderr,"translation %0.2f %0.2f %0.2f\n ",translation[0],translation[1],translation[2]);
   convertRodriguezTo3x3(rodriguez,(double*) matrix3x3Rotation);
-  upscale3x3to4x4((double*) matrix3x3Rotation,(double*)matrix4x4Rotation);
-  print4x4DMatrix("B Should be ", matrix4x4Rotation);
 
-  //Translate first rotate after
+  double * rm = matrix3x3Rotation;
+  double * tm = translation;
 
-  //copy4x4Matrix((double*) matrix4x4, (double*) matrix4x4Rotation);
+  //Compose a 4x4 matrix with the translation and rotation , Normal ,
+  matrix4x4[0]= rm[0];    matrix4x4[1]=rm[1];      matrix4x4[2]=rm[2];      matrix4x4[3]=tm[0];
+  matrix4x4[4]= rm[3];    matrix4x4[5]=rm[4];      matrix4x4[6]=rm[5];      matrix4x4[7]=-tm[1];
+  matrix4x4[8]= rm[6];    matrix4x4[9]=rm[7];      matrix4x4[10]=rm[8];     matrix4x4[11]=-tm[2];
+  matrix4x4[12]= 0.0;     matrix4x4[13]=0.0;       matrix4x4[14]=0.0;       matrix4x4[15]=1.0;
+  print4x4DMatrix("Rodriguez ModelView Result", matrix4x4);
 
-  multiplyTwo4x4Matrices((double*) matrix4x4, (double*) matrix4x4Translation , (double*) matrix4x4Rotation);
+  //Compose a 4x4 matrix with the translation and rotation , OPENGL row /column major setting
+  matrix4x4[0]= rm[0];    matrix4x4[1]=rm[3];      matrix4x4[2]=rm[6];      matrix4x4[3]=0.0;
+  matrix4x4[4]= rm[1];    matrix4x4[5]=rm[4];      matrix4x4[6]=rm[7];      matrix4x4[7]=0.0;
+  matrix4x4[8]= rm[2];    matrix4x4[9]=rm[5];      matrix4x4[10]=rm[8];     matrix4x4[11]=0.0;
+  matrix4x4[12]=tm[0];    matrix4x4[13]=-tm[1];    matrix4x4[14]=-tm[2];    matrix4x4[15]=1.0;
+  print4x4DMatrix("Rodriguez ModelView Result OpenGL", matrix4x4);
 
-  //Append Translation
-  //matrix4x4[3]=translation[0]; matrix4x4[7]=translation[1]; matrix4x4[11]=translation[2];
-
-  //convertTranslationTo4x4(translation,matrix4x4);
-  print4x4DMatrix("Rodriguez", matrix4x4);
-
-  free(matrix4x4Translation);
   free(matrix4x4Rotation);
+  free(matrix3x3Rotation);
+
  return 1;
 }
 
 
-
-
-void InvertYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
-{
-  fprintf(stderr,"Invert Y and Z axis\n");
-  double modelView[16] = {1  ,  0  ,  0  , 0 ,
-                          0  , -1  ,  0  , 0 ,
-                          0  ,  0  , -1  , 0 ,
-                          0  ,  0  ,  0  , 1 };
-
-  multiplyTwo4x4Matrices(result,  modelView,matrix);
-}
 
 
 

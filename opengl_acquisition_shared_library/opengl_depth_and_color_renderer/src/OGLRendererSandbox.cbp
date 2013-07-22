@@ -47,14 +47,18 @@
 			<Add library="GL" />
 			<Add library="X11" />
 		</Linker>
+		<Unit filename="AmMatrix/matrix3x3Tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/matrix3x3Tools.h" />
+		<Unit filename="AmMatrix/matrix4x4Tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/matrix4x4Tools.h" />
 		<Unit filename="AmMatrix/matrixCalculations.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AmMatrix/matrixCalculations.h" />
-		<Unit filename="AmMatrix/matrixTools.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="AmMatrix/matrixTools.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="TextureLoader/bmp.c">
 			<Option compilerVar="CC" />

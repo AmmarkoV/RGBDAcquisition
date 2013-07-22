@@ -91,8 +91,8 @@ int initScene()
                                              cameraMatrix[5],
                                              WIDTH,
                                              HEIGHT,
-                                             0.5,
-                                             30500.0
+                                             nearPlane ,
+                                             farPlane
                                            );
 
    print4x4DMatrix("OpenGL Projection Matrix", frustum );
@@ -203,12 +203,11 @@ int tickScene()
    return 1;
 }
 
-int drawPlane(float scale)
-{
- float y = -0.50;
 
- glColor3f(.3,.3,.3);
- glColor3f(1.0,1.0,1.0);
+
+int drawAnyPlane(float y , float scale , float r , float g , float b)
+{
+ glColor3f(r,g,b);
  glBegin(GL_LINES);
  signed int i;
 
@@ -223,6 +222,25 @@ int drawPlane(float scale)
  };
 glEnd();
 
+}
+
+
+
+
+
+int drawPlane(float scale)
+{
+ return drawAnyPlane(-0.50,scale,1.0,1.0,1.0);
+}
+
+int drawBottom(float scale)
+{
+ return drawAnyPlane(-100,scale,0.0,1.0,0.0);
+}
+
+int drawCeiling(float scale)
+{
+ return drawAnyPlane(100,scale,1.0,0.0,0.0);
 }
 
 
@@ -271,12 +289,6 @@ int renderScene()
   // <- I should probably do the translation , rotation manually and only load the matrix here
   //Also the sequence should be translation -> rotation
     glLoadMatrixf(customMatrix);
-    //glScalef( 1.0f, 1.0f, -1.0f);
-    //glRotatef(90,-1.0,0,0);
-    //glRotatef(90,0,-1.0,0);
-
-
-    //glTranslatef(customTranslation[0], customTranslation[1] , customTranslation[2]);
   } else
   {
     glLoadIdentity();
@@ -287,7 +299,9 @@ int renderScene()
   }
 
 
+  drawBottom(-20);
   drawPlane(0.1);
+  drawCeiling(20);
 
   drawAxis(0.0,0.0,0.0, 10.0);
   drawAxis(-10,0.0,-10, 2.0);

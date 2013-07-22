@@ -25,12 +25,15 @@ int main(int argc, char **argv)
  camera[6]=0.0;          camera[7]=0.0;         camera[8]=1.0;
 
  //boxNew Calib
- translation[0]=-0.062989;  translation[1]=0.159865; translation[2]=0.703045;
- rodriguez[0]=1.911447;     rodriguez[1]=0.000701;   rodriguez[2]=-0.028548;
+ //translation[0]=-0.062989;  translation[1]=0.159865; translation[2]=0.703045;
+ //rodriguez[0]=1.911447;     rodriguez[1]=0.000701;   rodriguez[2]=-0.028548;
 
+ //Test Calib
+ translation[0]=0.056651;  translation[1]=-0.000811; translation[2]=0.601942;
+ rodriguez[0]=0.829308;    rodriguez[1]=2.251753;    rodriguez[2]=-1.406462;
 
  setOpenGLIntrinsicCalibration( (double*) camera);
- //setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
+ setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
 
 
   startOGLRendererSandbox();
