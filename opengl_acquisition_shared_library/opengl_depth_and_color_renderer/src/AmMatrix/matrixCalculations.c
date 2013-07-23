@@ -6,26 +6,31 @@
 #include "matrix4x4Tools.h"
 
 
-
-
-
-int convertRodriguezTo3x3(double * matrix, double * result)
+int convertRodriguezTo3x3(double * result,double * matrix)
 {
   if ( (matrix==0) ||  (result==0) ) { return 0; }
+
+
   double x = matrix[0] , y = matrix[1] , z = matrix[2];
   double th = sqrt( x*x + y*y + z*z );
   double cosTh = cos(th);
   x = x / th; y = y / th; z = z / th;
 
+  if ( th < 0.00001 )
+    {
+       create3x3IdentityMatrix(result);
+       return 1;
+    }
 
   //Switch to control what kind of a result to give :P
-  #define PRODUCE_TRANSPOSED_RESULT 0
+  #define PRODUCE_INVERSE_ROATATION_RESULT 0
   // REGULAR  TRANSPOSED
   //  0 1 2     0 3 6
   //  3 4 5     1 4 7
   //  6 7 8     2 5 8
 
-  #if PRODUCE_TRANSPOSED_RESULT
+  #if PRODUCE_INVERSE_ROATATION_RESULT
+    //The great thing is that to inverse the rotation you just need to transpose this matrix
     //TRANSPOSED RESULT
     result[0]=x*x*(1 - cosTh) + cosTh;            result[3]=x*y*(1 - cosTh) - z*sin(th);     result[6]=x*z*(1 - cosTh) + y*sin(th);
     result[1]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;         result[7]=y*z*(1 - cosTh) - x*sin(th);
@@ -37,30 +42,14 @@ int convertRodriguezTo3x3(double * matrix, double * result)
    result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
   #endif
 
-  fprintf(stderr,"rodriguez %0.2f %0.2f %0.2f\n ",matrix[0],matrix[1],matrix[2]);
+  fprintf(stderr,"rodriguez %f %f %f\n ",matrix[0],matrix[1],matrix[2]);
   print3x3DMatrix("Rodriguez Initial", result);
 
   return 1;
 }
 
 
-
-int convertTranslationTo4x4(double * translation, double * result)
-{
-  if ( (translation==0) ||  (result==0) ) { return 0; }
-  double x = translation[0] , y = translation[1] , z = translation[2];
-
-  result[0]=1.0; result[1]=0;   result[2]=0;    result[3]=x;
-  result[4]=0;   result[5]=1.0; result[6]=0;    result[7]=y;
-  result[8]=0;   result[9]=0;   result[10]=1.0; result[11]=z;
-  result[12]=0;  result[13]=0;  result[14]=0;   result[15]=1.0;
-
-  return 1;
-}
-
-
-
-void InvertYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
+void invertYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
 {
   fprintf(stderr,"Invert Y and Z axis\n");
   double * invertOp = (double * ) malloc ( sizeof(double) * 16 );
@@ -73,35 +62,48 @@ void InvertYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
 }
 
 
-int convertRodriguezAndTransTo4x4(double * rodriguez , double * translation , double * matrix4x4 )
+int convertRodriguezAndTransTo4x4(double * result4x4, double * rodriguez , double * translation  )
 {
-  double * matrix4x4Rotation = (double * ) malloc ( sizeof(double) * 16 ); if (matrix4x4Rotation==0) { return 0; }
-  double * matrix3x3Rotation = (double * ) malloc ( sizeof(double) * 9 );  if (matrix3x3Rotation==0) { return 0; }
+  double * tmpResult = alloc4x4Matrix();         if (tmpResult==0)         { return 0; }
+  double * matrix4x4Rotation = alloc4x4Matrix(); if (matrix4x4Rotation==0) { return 0; }
+  double * matrix3x3Rotation = alloc4x4Matrix(); if (matrix3x3Rotation==0) { return 0; }
 
-  fprintf(stderr,"translation %0.2f %0.2f %0.2f\n ",translation[0],translation[1],translation[2]);
-  convertRodriguezTo3x3(rodriguez,(double*) matrix3x3Rotation);
+  //Our translation vector is ready to be used!
+  fprintf(stderr,"translation %f %f %f\n ",translation[0],translation[1],translation[2]);
 
+  //Our rodriguez vector should be first converted to a 3x3 Rotation matrix
+  convertRodriguezTo3x3((double*) matrix3x3Rotation , rodriguez);
+
+  //Shorthand variables for readable code :P
   double * rm = matrix3x3Rotation;
   double * tm = translation;
 
-  //Compose a 4x4 matrix with the translation and rotation , Normal ,
-  matrix4x4[0]= rm[0];    matrix4x4[1]=rm[1];      matrix4x4[2]=rm[2];      matrix4x4[3]=tm[0];
-  matrix4x4[4]= rm[3];    matrix4x4[5]=rm[4];      matrix4x4[6]=rm[5];      matrix4x4[7]=-tm[1];
-  matrix4x4[8]= rm[6];    matrix4x4[9]=rm[7];      matrix4x4[10]=rm[8];     matrix4x4[11]=-tm[2];
-  matrix4x4[12]= 0.0;     matrix4x4[13]=0.0;       matrix4x4[14]=0.0;       matrix4x4[15]=1.0;
-  print4x4DMatrix("Rodriguez ModelView Result", matrix4x4);
+  //Compose a 4x4 matrix with the translation and rotation , As theory would suggest ,
+  result4x4[0]= rm[0];    result4x4[1]=rm[1];      result4x4[2]= rm[2];     result4x4[3]= tm[0];
+  result4x4[4]= rm[3];    result4x4[5]=rm[4];      result4x4[6]= rm[5];     result4x4[7]= tm[1];
+  result4x4[8]= rm[6];    result4x4[9]=rm[7];      result4x4[10]=rm[8];     result4x4[11]=tm[2];
+  result4x4[12]= 0.0;     result4x4[13]=0.0;       result4x4[14]=0.0;       result4x4[15]=1.0;
+  print4x4DMatrix("ModelView Theory Result", result4x4);
+  //Ok so now result4x4 should contain the transformation that leads from our "chessboard" to the camera position
+  //But we don't want that , we want the inverse transformation
 
-  //Compose a 4x4 matrix with the translation and rotation , OPENGL row /column major setting
-  matrix4x4[0]= rm[0];    matrix4x4[1]=rm[3];      matrix4x4[2]=rm[6];      matrix4x4[3]=0.0;
-  matrix4x4[4]= rm[1];    matrix4x4[5]=rm[4];      matrix4x4[6]=rm[7];      matrix4x4[7]=0.0;
-  matrix4x4[8]= rm[2];    matrix4x4[9]=rm[5];      matrix4x4[10]=rm[8];     matrix4x4[11]=0.0;
-  matrix4x4[12]=tm[0];    matrix4x4[13]=-tm[1];    matrix4x4[14]=-tm[2];    matrix4x4[15]=1.0;
-  print4x4DMatrix("Rodriguez ModelView Result OpenGL", matrix4x4);
+  invert4x4MatrixD(tmpResult,result4x4);
+  print4x4DMatrix("ModelView Theory Inverted", tmpResult);
+  //Now tmpResult holds the inverse transformation
 
-  free(matrix4x4Rotation);
-  free(matrix3x3Rotation);
+  invertYandZAxisOpenGL4x4Matrix(result4x4,tmpResult);
+  //copy4x4Matrix(result4x4,tmpResult);
+  print4x4DMatrix("Rodriguez ModelView Result Inverted and FixedAxis", result4x4);
 
- return 1;
+  //Convert matrix to OpenGL Column-major format
+  transpose4x4MatrixD(result4x4) ;
+  print4x4DMatrix("Rodriguez ModelView Result FixedAxis and inverted transposed", result4x4);
+
+  //copy4x4Matrix(result4x4,tmpResult);
+  free4x4Matrix(&tmpResult);
+  free4x4Matrix(&matrix4x4Rotation);
+  free4x4Matrix(&matrix3x3Rotation);
+  return 1;
 }
 
 
@@ -152,11 +154,13 @@ void buildOpenGLProjectionForIntrinsics   (
     viewport[3] = T_sub_B;
 
 
- frustum[0]=2.0 * fx / imageWidth; frustum[1]=0.0;                    frustum[2]=2.0 * ( cx / imageWidth ) - 1.0;                     frustum[3]=0.0;
- frustum[4]=0.0;                   frustum[5]=2.0 * fy / imageHeight; frustum[6]=2.0 * ( cy / imageHeight ) - 1.0;                    frustum[7]=0.0;
- frustum[8]=0.0;                   frustum[9]=0.0;                    frustum[10]=-( farPlane+nearPlane ) / ( farPlane - nearPlane ); frustum[11]=-2.0 * farPlane * nearPlane / ( farPlane - nearPlane );
- frustum[12]=0.0;                  frustum[13]=0.0;                   frustum[14]=-1.0;                                               frustum[15]=0.0;
+   frustum[0]=2.0 * fx / imageWidth; frustum[1]=0.0;                    frustum[2]=2.0 * ( cx / imageWidth ) - 1.0;                     frustum[3]=0.0;
+   frustum[4]=0.0;                   frustum[5]=2.0 * fy / imageHeight; frustum[6]=2.0 * ( cy / imageHeight ) - 1.0;                    frustum[7]=0.0;
+   frustum[8]=0.0;                   frustum[9]=0.0;                    frustum[10]=-( farPlane+nearPlane ) / ( farPlane - nearPlane ); frustum[11]=-2.0 * farPlane * nearPlane / ( farPlane - nearPlane );
+   frustum[12]=0.0;                  frustum[13]=0.0;                   frustum[14]=-1.0;                                               frustum[15]=0.0;
 
+   //Convert matrix to OpenGL  Column-major format
+   transpose4x4MatrixD(frustum) ;
 }
 
 

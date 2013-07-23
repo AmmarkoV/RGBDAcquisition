@@ -1,7 +1,6 @@
 #include "matrix4x4Tools.h"
 
 
-#include "matrixTools.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -43,6 +42,20 @@ enum mat4x4Item
 */
 
 
+double * alloc4x4Matrix()
+{
+  return malloc ( sizeof(double) * 16 );
+}
+
+void free4x4Matrix(double ** mat)
+{
+  if (mat==0) { return ; }
+  if (*mat==0) { return ; }
+  free(*mat);
+  *mat=0;
+}
+
+
 void print4x4DMatrix(char * str , double * matrix4x4)
 {
   fprintf( stderr, " 4x4 double %s \n",str);
@@ -74,7 +87,7 @@ void create4x4IdentityMatrix(double * m)
 
 
 
-void create4x4RotationMatrix(double angle, double x, double y, double z ,  double * m)
+void create4x4RotationMatrix(double * m , double angle, double x, double y, double z)
 {
     double c = cosf(angle * DEG2RAD);
     double s = sinf(angle * DEG2RAD);
@@ -108,14 +121,14 @@ void create4x4RotationMatrix(double angle, double x, double y, double z ,  doubl
 }
 
 
-void create4x4TranslationMatrix(double x, double y, double z, double * matrix)
+void create4x4TranslationMatrix(double * matrix , double x, double y, double z)
 {
     create4x4IdentityMatrix(matrix);
     // Translate slots.
     matrix[3] = x; matrix[7] = y; matrix[11] = z;
 }
 
-void create4x4ScalingMatrix(double sx, double sy, double sz, double * matrix)
+void create4x4ScalingMatrix(double * matrix , double sx, double sy, double sz)
 {
     create4x4IdentityMatrix(matrix);
     // Scale slots.
@@ -123,7 +136,7 @@ void create4x4ScalingMatrix(double sx, double sy, double sz, double * matrix)
 }
 
 
-void create4x4RotationX(double degrees, double * matrix)
+void create4x4RotationX(double * matrix,double degrees)
 {
     double radians = degreesToRadians(degrees);
 
@@ -136,7 +149,7 @@ void create4x4RotationX(double degrees, double * matrix)
     matrix[10] = matrix[5];
 }
 
-void create4x4RotationY(double degrees, double * matrix)
+void create4x4RotationY(double * matrix,double degrees)
 {
     double radians = degreesToRadians(degrees);
 
@@ -149,7 +162,7 @@ void create4x4RotationY(double degrees, double * matrix)
     matrix[10] = matrix[0];
 }
 
-void create4x4RotationZ(double degrees, double * matrix)
+void create4x4RotationZ(double * matrix,double degrees)
 {
     double radians = degreesToRadians(degrees);
 
@@ -162,7 +175,7 @@ void create4x4RotationZ(double degrees, double * matrix)
     matrix[5] = matrix[0];
 }
 
-int det4x4Matrix(double * mat)
+double det4x4Matrix(double * mat)
 {
  double * a = mat;
 
@@ -204,11 +217,18 @@ int det4x4Matrix(double * mat)
 }
 
 
-int invert4x4MatrixD(double * mat,double * result)
+int invert4x4MatrixD(double * result,double * mat)
 {
  double * a = mat;
  double * b = result;
- double one_div_detA = (double) 1 / det4x4Matrix(mat);
+ double detA = det4x4Matrix(mat);
+ if (detA==0.0)
+    {
+      copy4x4Matrix(result,mat);
+      fprintf(stderr,"Matrix 4x4 cannot be inverted (det = 0)\n");
+      return 0;
+    }
+ double one_div_detA = (double) 1 / detA;
 
  //FIRST LINE
  b[I11]  = a[I22] * a[I33] * a[I44] +  a[I23] * a[I34] * a[I42]  + a[I24] * a[I32] * a[I43];
@@ -278,6 +298,10 @@ int invert4x4MatrixD(double * mat,double * result)
  b[I44] -= a[I11] * a[I23] * a[I32] +  a[I12] * a[I21] * a[I33]  + a[I13] * a[I22] * a[I31];
  b[I44] *= one_div_detA;
 
+
+ print4x4DMatrix("Inverted Matrix From Source",a);
+ print4x4DMatrix("Inverted Matrix To Target",b);
+
  return 1;
 }
 
@@ -289,6 +313,7 @@ int transpose4x4MatrixD(double * mat)
       4   5   6   7           1  5  9   13
       8   9   10  11          2  6  10  14
       12  13  14  15          3  7  11  15   */
+
   double tmp;
   tmp = mat[1]; mat[1]=mat[4];  mat[4]=tmp;
   tmp = mat[2]; mat[2]=mat[8];  mat[8]=tmp;
@@ -306,7 +331,7 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
 {
   if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }
 
-  fprintf(stderr,"Multiplying A and B \n");
+  fprintf(stderr,"Multiplying 4x4 A and B \n");
   print4x4DMatrix("A", matrixA);
   print4x4DMatrix("B", matrixB);
 

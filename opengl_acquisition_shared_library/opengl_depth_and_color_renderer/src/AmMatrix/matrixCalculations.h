@@ -2,7 +2,7 @@
 #define MATRIXCALCULATIONS_H_INCLUDED
 
 
-int convertRodriguezAndTransTo4x4(double * rodriguez , double * translation , double * matrix4x4 );
+int convertRodriguezAndTransTo4x4(double * result4x4, double * rodriguez , double * translation );
 int convertTranslationTo4x4(double * translation, double * result);
 
 void print4x4DMatrix(char * str , double * matrix4x4);

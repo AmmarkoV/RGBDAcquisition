@@ -215,7 +215,7 @@ int setOpenGLIntrinsicCalibration(double * camera)
 int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation)
 {
   useCustomMatrix=1;
-  convertRodriguezAndTransTo4x4(rodriguez , translation , (float*) customMatrix );
+  convertRodriguezAndTransTo4x4(customMatrix , rodriguez , translation );
 
   customTranslation[0] = translation[0];
   customTranslation[1] = translation[1];

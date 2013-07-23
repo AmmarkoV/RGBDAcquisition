@@ -12,9 +12,9 @@ extern double cameraMatrix[9];
 
 
 extern int useCustomMatrix;
-extern float customMatrix[16];
-extern float customTranslation[3];
-extern float customRotation[3];
+extern double customMatrix[16];
+extern double customTranslation[3];
+extern double customRotation[3];
 
 int renderScene();
 int initScene();

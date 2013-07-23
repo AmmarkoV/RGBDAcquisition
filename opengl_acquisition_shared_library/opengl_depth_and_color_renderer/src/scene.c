@@ -11,7 +11,7 @@
 struct VirtualStream * scene = 0;
 struct Model ** models=0;
 
-float farPlane = 1000;
+float farPlane = 10000;
 float nearPlane= 1.0;
 
 int WIDTH=640;
@@ -27,14 +27,14 @@ double cameraMatrix[9]={
 
 
 int useCustomMatrix=0;
-float customMatrix[16]={
+double customMatrix[16]={
                         1.0 , 0.0 , 0.0 , 0.0 ,
                         0.0 , 1.0 , 0.0 , 0.0 ,
                         0.0 , 0.0 , 1.0 , 0.0 ,
                         0.0 , 0.0 , 0.0 , 1.0
                        };
-float customTranslation[3]={0};
-float customRotation[3]={0};
+double customTranslation[3]={0};
+double customRotation[3]={0};
 
 
 
@@ -103,7 +103,6 @@ int initScene()
   }
     else
   {
-
   glLoadIdentity();
   glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
   glViewport(0, 0, WIDTH, HEIGHT);
@@ -127,6 +126,13 @@ int initScene()
   glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
 
 
+  //HQ settings
+  glEnable(GL_NORMALIZE);
+  glShadeModel(GL_SMOOTH);
+  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+  glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+  glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
   float R,G,B,trans;
   scene = createVirtualStream("scene.conf");
@@ -240,7 +246,7 @@ int drawBottom(float scale)
 
 int drawCeiling(float scale)
 {
- return drawAnyPlane(100,scale,1.0,0.0,0.0);
+ return drawAnyPlane(100,scale,0.0,0.5,1.0);
 }
 
 
@@ -288,7 +294,7 @@ int renderScene()
 
   // <- I should probably do the translation , rotation manually and only load the matrix here
   //Also the sequence should be translation -> rotation
-    glLoadMatrixf(customMatrix);
+    glLoadMatrixd(customMatrix);
   } else
   {
     glLoadIdentity();
@@ -299,9 +305,9 @@ int renderScene()
   }
 
 
-  drawBottom(-20);
+  drawBottom(100);
   drawPlane(0.1);
-  drawCeiling(20);
+  drawCeiling(100);
 
   drawAxis(0.0,0.0,0.0, 10.0);
   drawAxis(-10,0.0,-10, 2.0);
@@ -311,7 +317,7 @@ int renderScene()
 
 
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
-unsigned int i;
+  unsigned int i;
   //Object 0 is camera
   for (i=1; i<scene->numberOfObjects; i++)
     {
