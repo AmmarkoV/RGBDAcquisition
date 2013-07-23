@@ -316,6 +316,7 @@ int renderScene()
   drawAxis(+10,0.0,-10, 2.0);
 
 
+
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
   unsigned int i;
   //Object 0 is camera

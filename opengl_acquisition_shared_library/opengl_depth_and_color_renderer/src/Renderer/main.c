@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 
 
  setOpenGLIntrinsicCalibration( (double*) camera);
- //setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
+ setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
 
 
   startOGLRendererSandbox();
