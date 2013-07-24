@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = OpenGLAcquisition.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/shader_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/scene.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/save_to_file.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/matrixCalculations.o $(OBJDIR_DEBUG)/OpenGLAcquisition.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/glx.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/save_to_file.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/glx.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/scene.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/shader_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_DEBUG)/OpenGLAcquisition.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/shader_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/scene.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/save_to_file.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader_obj.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/matrixCalculations.o $(OBJDIR_RELEASE)/OpenGLAcquisition.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/glx.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/save_to_file.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/glx.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader_obj.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/scene.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/shader_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_RELEASE)/OpenGLAcquisition.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o
 
 all: debug release
 
@@ -50,9 +50,10 @@ clean: clean_debug clean_release
 
 before_debug: 
 	test -d $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src || mkdir -p $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src
-	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 	test -d $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser || mkdir -p $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser
 	test -d $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader || mkdir -p $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader
+	test -d $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix || mkdir -p $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix
+	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 
 after_debug: 
 
@@ -61,63 +62,71 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o: opengl_depth_and_color_renderer/src/main.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/main.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o
-
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o: opengl_depth_and_color_renderer/src/tools.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/tools.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o
-
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/shader_loader.o: opengl_depth_and_color_renderer/src/shader_loader.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/shader_loader.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/shader_loader.o
-
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/scene.o: opengl_depth_and_color_renderer/src/scene.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/scene.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/scene.o
-
 $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/save_to_file.o: opengl_depth_and_color_renderer/src/save_to_file.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/save_to_file.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/save_to_file.o
-
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o: opengl_depth_and_color_renderer/src/model_loader_obj.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/model_loader_obj.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o
-
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o: opengl_depth_and_color_renderer/src/model_loader.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/model_loader.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o
-
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/matrixCalculations.o: opengl_depth_and_color_renderer/src/matrixCalculations.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/matrixCalculations.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/matrixCalculations.o
-
-$(OBJDIR_DEBUG)/OpenGLAcquisition.o: OpenGLAcquisition.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c OpenGLAcquisition.cpp -o $(OBJDIR_DEBUG)/OpenGLAcquisition.o
 
 $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/glx.o: opengl_depth_and_color_renderer/src/glx.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/glx.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/glx.o
 
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o: opengl_depth_and_color_renderer/src/main.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/main.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o
+
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o: opengl_depth_and_color_renderer/src/model_loader.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/model_loader.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o
+
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o: opengl_depth_and_color_renderer/src/model_loader_obj.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/model_loader_obj.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o
+
 $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o: opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o
 
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o: opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/scene.o: opengl_depth_and_color_renderer/src/scene.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/scene.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/scene.o
 
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o: opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/shader_loader.o: opengl_depth_and_color_renderer/src/shader_loader.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/shader_loader.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/shader_loader.o
 
-$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o: opengl_depth_and_color_renderer/src/TextureLoader/ppm.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/TextureLoader/ppm.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o: opengl_depth_and_color_renderer/src/tools.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/tools.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o
 
 $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o: opengl_depth_and_color_renderer/src/TextureLoader/bmp.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/TextureLoader/bmp.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o
 
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o: opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o
+
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o: opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o
+
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o: opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o
+
+$(OBJDIR_DEBUG)/OpenGLAcquisition.o: OpenGLAcquisition.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c OpenGLAcquisition.cpp -o $(OBJDIR_DEBUG)/OpenGLAcquisition.o
+
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o: opengl_depth_and_color_renderer/src/TextureLoader/ppm.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/TextureLoader/ppm.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o
+
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o: opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o
+
+$(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o: opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp -o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o
+
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src
-	rm -rf $(OBJDIR_DEBUG)
 	rm -rf $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser
 	rm -rf $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader
+	rm -rf $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix
+	rm -rf $(OBJDIR_DEBUG)
 
 before_release: 
 	test -d $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src || mkdir -p $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src
-	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 	test -d $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser || mkdir -p $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser
 	test -d $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader || mkdir -p $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader
+	test -d $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix || mkdir -p $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix
+	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 
 after_release: 
 
@@ -126,57 +135,64 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o: opengl_depth_and_color_renderer/src/main.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/main.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o
-
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o: opengl_depth_and_color_renderer/src/tools.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/tools.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o
-
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/shader_loader.o: opengl_depth_and_color_renderer/src/shader_loader.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/shader_loader.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/shader_loader.o
-
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/scene.o: opengl_depth_and_color_renderer/src/scene.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/scene.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/scene.o
-
 $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/save_to_file.o: opengl_depth_and_color_renderer/src/save_to_file.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/save_to_file.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/save_to_file.o
-
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader_obj.o: opengl_depth_and_color_renderer/src/model_loader_obj.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/model_loader_obj.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader_obj.o
-
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o: opengl_depth_and_color_renderer/src/model_loader.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/model_loader.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o
-
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/matrixCalculations.o: opengl_depth_and_color_renderer/src/matrixCalculations.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/matrixCalculations.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/matrixCalculations.o
-
-$(OBJDIR_RELEASE)/OpenGLAcquisition.o: OpenGLAcquisition.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c OpenGLAcquisition.cpp -o $(OBJDIR_RELEASE)/OpenGLAcquisition.o
 
 $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/glx.o: opengl_depth_and_color_renderer/src/glx.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/glx.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/glx.o
 
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o: opengl_depth_and_color_renderer/src/main.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/main.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/main.o
+
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o: opengl_depth_and_color_renderer/src/model_loader.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/model_loader.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader.o
+
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader_obj.o: opengl_depth_and_color_renderer/src/model_loader_obj.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/model_loader_obj.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/model_loader_obj.o
+
 $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o: opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o
 
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o: opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/scene.o: opengl_depth_and_color_renderer/src/scene.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/scene.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/scene.o
 
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o: opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/shader_loader.o: opengl_depth_and_color_renderer/src/shader_loader.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/shader_loader.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/shader_loader.o
 
-$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o: opengl_depth_and_color_renderer/src/TextureLoader/ppm.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/TextureLoader/ppm.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o: opengl_depth_and_color_renderer/src/tools.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/tools.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/tools.o
 
 $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o: opengl_depth_and_color_renderer/src/TextureLoader/bmp.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/TextureLoader/bmp.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o
 
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o: opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o
+
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o: opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o
+
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o: opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o
+
+$(OBJDIR_RELEASE)/OpenGLAcquisition.o: OpenGLAcquisition.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c OpenGLAcquisition.cpp -o $(OBJDIR_RELEASE)/OpenGLAcquisition.o
+
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o: opengl_depth_and_color_renderer/src/TextureLoader/ppm.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/TextureLoader/ppm.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o
+
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o: opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o
+
+$(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o: opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp -o $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o
+
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src
-	rm -rf $(OBJDIR_RELEASE)
 	rm -rf $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TrajectoryParser
 	rm -rf $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/TextureLoader
+	rm -rf $(OBJDIR_RELEASE)/opengl_depth_and_color_renderer/src/AmMatrix
+	rm -rf $(OBJDIR_RELEASE)
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release
 

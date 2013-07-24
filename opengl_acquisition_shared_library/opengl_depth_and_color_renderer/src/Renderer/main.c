@@ -22,7 +22,7 @@ int main(int argc, char **argv)
  camera[6]=0.0;          camera[7]=0.0;         camera[8]=1.0;
 
 
- #define USE_TEST 3
+ #define USE_TEST 2
 
  #if   USE_TEST == 0
   translation[0]=0.0;  translation[1]=0.0; translation[2]=0.0;
