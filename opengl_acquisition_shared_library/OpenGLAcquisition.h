@@ -2,6 +2,8 @@
 #define OPENGL_ACQUISITION_H_INCLUDED
 
 
+#include "../tools/Calibration/calibration.h"
+
 #ifdef __cplusplus
 extern "C"
 {

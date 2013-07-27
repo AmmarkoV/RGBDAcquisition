@@ -1,6 +1,7 @@
 #ifndef TEMPLATEACQUISITION_H_INCLUDED
 #define TEMPLATEACQUISITION_H_INCLUDED
 
+#include "../tools/Calibration/calibration.h"
 
 #ifdef __cplusplus
 extern "C"

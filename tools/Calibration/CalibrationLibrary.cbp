@@ -2,29 +2,31 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Acquisition" />
+		<Option title="CalibrationLibrary" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="Acquisition" prefix_auto="1" extension_auto="1" />
+				<Option output="CalibrationLibrary" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
-				<Option type="3" />
+				<Option type="2" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="Acquisition" prefix_auto="1" extension_auto="1" />
+				<Option output="CalibrationLibrary" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Release/" />
-				<Option type="3" />
+				<Option type="2" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>
@@ -33,18 +35,12 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
-		<Linker>
-			<Add library="rt" />
-			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
-		</Linker>
-		<Unit filename="Acquisition.c">
+		<Unit filename="calibration.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="Acquisition.h" />
-		<Unit filename="acquisition_setup.h" />
+		<Unit filename="calibration.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

@@ -22,7 +22,7 @@ int main(int argc, char **argv)
  camera[6]=0.0;          camera[7]=0.0;         camera[8]=1.0;
 
 
- #define USE_TEST 3
+ #define USE_TEST 5
 
  #if   USE_TEST == 0
   translation[0]=0.0;  translation[1]=0.0; translation[2]=0.0;
@@ -43,10 +43,14 @@ int main(int argc, char **argv)
  //Test Calib
   translation[0]=-0.041674;  translation[1]=-0.076036; translation[2]=2.355294;
   rodriguez[0]=-0.733111;    rodriguez[1]=0.155142;    rodriguez[2]=0.172950;
+ #elif USE_TEST == 5
+  // ARTest
+  translation[0]=-0.413148;  translation[1]=0.208111; translation[2]=1.987205;
+  rodriguez[0]=2.052258;    rodriguez[1]=0.642598;    rodriguez[2]=-0.246993;
  #endif // USE_TEST
 
 
- setOpenGLNearFarPlanes(0.01,100);
+ setOpenGLNearFarPlanes(0.1,100);
  setOpenGLIntrinsicCalibration( (double*) camera);
  setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
 

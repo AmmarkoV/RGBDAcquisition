@@ -1,6 +1,9 @@
 #ifndef ACQUISITION_H_INCLUDED
 #define ACQUISITION_H_INCLUDED
 
+#include "../tools/Calibration/calibration.h"
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -24,18 +27,7 @@ typedef unsigned int ModuleIdentifier;
 typedef unsigned int DeviceIdentifier;
 
 
-struct calibration
-{
-  /* CAMERA INTRINSIC PARAMETERS */
-  char intrinsicParametersSet;
-  double intrinsic[9];
-  double k1,k2,p1,p2,k3;
 
-  /* CAMERA EXTRINSIC PARAMETERS */
-  char extrinsicParametersSet;
-  double extrinsicRotationRodriguez[3];
-  double extrinsicTranslation[3];
-};
 
 int acquisitionSimulateTime(unsigned long timeInMillisecs);
 

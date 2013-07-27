@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
+		<Project filename="tools/Calibration/CalibrationLibrary.cbp" />
 		<Project filename="libfreenect_acquisition_shared_library/FreenectAcquisition.cbp" />
 		<Project filename="openni2_acquisition_shared_library/OpenNI2Aquisition.cbp" />
 		<Project filename="opengl_acquisition_shared_library/OpenGLAcquisition.cbp" />

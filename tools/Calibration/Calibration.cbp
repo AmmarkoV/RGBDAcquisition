@@ -37,7 +37,7 @@
 		<Linker>
 			<Add option="`pkg-config --libs opencv`" />
 		</Linker>
-		<Unit filename="calibration.cpp" />
+		<Unit filename="calibrate.cpp" />
 		<Extensions>
 			<envvars />
 			<code_completion />

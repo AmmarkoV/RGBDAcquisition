@@ -7,7 +7,8 @@
 char inputname[512]={0};
 char outputfoldername[512]={0};
 
-
+struct calibration color;
+struct calibration depth;
 
 
 int makepath(char * path)
@@ -47,6 +48,8 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcmp(argv[i],"-intrinsics")==0) {
+                                          } else
     if (strcmp(argv[i],"-maxFrames")==0) {
                                            maxFramesToGrab=atoi(argv[i+1]);
                                            fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
@@ -84,6 +87,10 @@ int main(int argc, char *argv[])
        fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
        return 1;
    }
+
+   //acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
+   //acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
+
 
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))

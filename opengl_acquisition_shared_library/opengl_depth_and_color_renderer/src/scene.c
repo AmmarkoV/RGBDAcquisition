@@ -288,16 +288,17 @@ int renderScene()
     glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
   }
 
-  drawBottom(100);
-  drawPlane(0.1);
-  drawCeiling(100);
+//  drawBottom(100);
+//  drawPlane(0.1);
+//  drawCeiling(100);
 
 
-  drawAxis(0.0,0.0,0.0, 10.0);
-  drawAxis(-10,0.0,-10, 2.0);
-  drawAxis(+10,0.0,+10, 2.0);
-  drawAxis(-10,0.0,+10, 2.0);
-  drawAxis(+10,0.0,-10, 2.0);
+//  drawAxis(0.0,0.0,0.0, 10.0);
+
+//  drawAxis(-10,0.0,-10, 2.0);
+//  drawAxis(+10,0.0,+10, 2.0);
+//  drawAxis(-10,0.0,+10, 2.0);
+//  drawAxis(+10,0.0,-10, 2.0);
 
 
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
