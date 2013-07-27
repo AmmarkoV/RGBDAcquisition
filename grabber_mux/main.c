@@ -11,6 +11,14 @@ int enforceCalibrationSharing = 1;
 char inputname1[512]={0};
 char inputname2[512]={0};
 
+
+
+int calibrationSetA = 0;
+struct calibration calibA;
+int calibrationSetB = 0;
+struct calibration calibB;
+
+
 int makepath(char * path)
 {
     //FILE *fp;
@@ -46,6 +54,22 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcmp(argv[i],"-calibration1")==0) {
+                                             calibrationSetA=1;
+                                             if (!ReadCalibration(argv[i+1],&calibA) )
+                                             {
+                                               fprintf(stderr,"Could not read calibration file for file 1 `%s`\n",argv[i+1]);
+                                               return 1;
+                                             }
+                                           } else
+    if (strcmp(argv[i],"-calibration2")==0) {
+                                             calibrationSetB=1;
+                                             if (!ReadCalibration(argv[i+1],&calibB) )
+                                             {
+                                               fprintf(stderr,"Could not read calibration file for file 2 `%s`\n",argv[i+1]);
+                                               return 1;
+                                             }
+                                           } else
     if (strcmp(argv[i],"-maxFrames")==0) {
                                            maxFramesToGrab=atoi(argv[i+1]);
                                            fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
@@ -99,6 +123,7 @@ int main(int argc, char *argv[])
 
 
 
+
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID_1,16 /*maxDevices*/ , 0 ))
   {
@@ -114,6 +139,22 @@ int main(int argc, char *argv[])
 
   //We want to initialize all possible devices in this example..
   unsigned int devID_1=0 , devID_2=0;
+
+
+   if ( calibrationSetA )
+   {
+    fprintf(stderr,"Set Far/Near to %f/%f\n",calibA.farPlane,calibA.nearPlane);
+    acquisitionSetColorCalibration(moduleID_1,devID_1,&calibA);
+    acquisitionSetDepthCalibration(moduleID_1,devID_1,&calibA);
+   }
+
+   if ( calibrationSetB )
+   {
+    fprintf(stderr,"Set Far/Near to %f/%f\n",calibB.farPlane,calibB.nearPlane);
+    acquisitionSetColorCalibration(moduleID_2,devID_2,&calibB);
+    acquisitionSetDepthCalibration(moduleID_2,devID_2,&calibB);
+   }
+
 
   char * devName1 = inputname1;
   if (strlen(inputname1)<1) { devName1=0; }
