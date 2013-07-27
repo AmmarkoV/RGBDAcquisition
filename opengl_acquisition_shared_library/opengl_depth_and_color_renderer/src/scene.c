@@ -288,9 +288,9 @@ int renderScene()
     glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
   }
 
-//  drawBottom(100);
-//  drawPlane(0.1);
-//  drawCeiling(100);
+  //drawBottom(100);
+  //drawPlane(0.1);
+  //drawCeiling(100);
 
 
 //  drawAxis(0.0,0.0,0.0, 10.0);

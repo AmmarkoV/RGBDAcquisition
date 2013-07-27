@@ -3,13 +3,14 @@
 #include <unistd.h>
 #include <string.h>
 #include "../acquisition/Acquisition.h"
+#include "../tools/Calibration/calibration.h"
 
 char inputname[512]={0};
 char outputfoldername[512]={0};
 
-struct calibration color;
-struct calibration depth;
 
+int calibrationSet = 0;
+struct calibration calib;
 
 int makepath(char * path)
 {
@@ -48,8 +49,14 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
-    if (strcmp(argv[i],"-intrinsics")==0) {
-                                          } else
+    if (strcmp(argv[i],"-calibration")==0) {
+                                             calibrationSet=1;
+                                             if (!ReadCalibration(argv[i+1],&calib) )
+                                             {
+                                               fprintf(stderr,"Could not read calibration file `%s`\n",argv[i+1]);
+                                               return 1;
+                                             }
+                                           } else
     if (strcmp(argv[i],"-maxFrames")==0) {
                                            maxFramesToGrab=atoi(argv[i+1]);
                                            fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
@@ -88,10 +95,6 @@ int main(int argc, char *argv[])
        return 1;
    }
 
-   //acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
-   //acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
-
-
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
   {
@@ -106,6 +109,14 @@ int main(int argc, char *argv[])
       fprintf(stderr,"No devices found for Module used \n");
       return 1;
   }
+
+   if ( calibrationSet )
+   {
+    fprintf(stderr,"Set Far/Near to %f/%f\n",calib.farPlane,calib.nearPlane);
+    acquisitionSetColorCalibration(moduleID,devID,&calib);
+    acquisitionSetDepthCalibration(moduleID,devID,&calib);
+   }
+
 
 
   char * devName = inputname;

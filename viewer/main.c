@@ -3,10 +3,14 @@
 #include <unistd.h>
 #include <string.h>
 #include "../acquisition/Acquisition.h"
+#include "../tools/Calibration/calibration.h"
 
 char inputname[512]={0};
 unsigned int frameNum=0;
 
+
+int calibrationSet = 0;
+struct calibration calib;
 
 #include <cv.h>
 #include <cxcore.h>
@@ -104,7 +108,14 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
-
+    if (strcmp(argv[i],"-calibration")==0) {
+                                             calibrationSet=1;
+                                             if (!ReadCalibration(argv[i+1],&calib) )
+                                             {
+                                               fprintf(stderr,"Could not read calibration file `%s`\n",argv[i+1]);
+                                               return 1;
+                                             }
+                                           } else
     if (strcmp(argv[i],"-maxFrames")==0) {
                                            maxFramesToGrab=atoi(argv[i+1]);
                                            fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
@@ -148,6 +159,13 @@ int main(int argc, char *argv[])
       return 1;
   }
 
+
+   if ( calibrationSet )
+   {
+    fprintf(stderr,"Set Far/Near to %f/%f\n",calib.farPlane,calib.nearPlane);
+    acquisitionSetColorCalibration(moduleID,devID,&calib);
+    acquisitionSetDepthCalibration(moduleID,devID,&calib);
+   }
 
   char * devName = inputname;
   if (strlen(inputname)<1) { devName=0; }

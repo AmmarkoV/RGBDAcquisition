@@ -69,6 +69,7 @@ int main(int argc, char **argv)
 
   free(rodriguez);
   free(translation);
+  free(camera);
 
   stopOGLRendererSandbox();
   return 0;

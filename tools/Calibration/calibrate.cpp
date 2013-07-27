@@ -271,7 +271,7 @@ save_camera_paramsOriginal(oldFilename,image_count,img_size,board_size,square_si
        //Translation because cvGetCols( *extr_params, &trans_vects, 3, 6 );
        fprintf( fp, "%f\n",extr_params->data.fl[6*i+3]); fprintf( fp, "%f\n",extr_params->data.fl[6*i+4]); fprintf( fp, "%f\n",extr_params->data.fl[6*i+5]);
 
-       fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z  %ux%u\n",extr_params->rows,extr_params->cols);
+       fprintf( fp, "%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z  %ux%u\n",extr_params->rows,extr_params->cols);
        fprintf( fp, "%%R\n");
        //Rotation because -> cvGetCols( *extr_params, &rot_vects, 0, 3 );
        fprintf( fp, "%f\n",extr_params->data.fl[6*i+0]); fprintf( fp, "%f\n",extr_params->data.fl[6*i+1]); fprintf( fp, "%f\n",extr_params->data.fl[6*i+2]);

@@ -12,8 +12,15 @@
 
 int NullCalibration(unsigned int width,unsigned int height, struct calibration * calib)
 {
+  calib->width;
+  calib->height;
+
   calib->intrinsicParametersSet=0;
   calib->extrinsicParametersSet=0;
+
+
+  calib->nearPlane=0.1;
+  calib->farPlane=100.0;
 
   calib->intrinsic[0]=0.0;  calib->intrinsic[1]=0.0;  calib->intrinsic[2]=0.0;
   calib->intrinsic[3]=0.0;  calib->intrinsic[4]=0.0;  calib->intrinsic[5]=0.0;
@@ -41,6 +48,9 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
 
 int ReadCalibration(char * filename,struct calibration * calib)
 {
+  //First free
+  NullCalibration(0,0,calib);
+
   FILE * fp = 0;
   fp = fopen(filename,"r");
   if (fp == 0 ) {  return 0; }
@@ -68,10 +78,11 @@ int ReadCalibration(char * filename,struct calibration * calib)
 
 
      if (line[0]=='%') { linesAtCurrentCategory=0; }
-     if ( (line[0]=='%') && (line[1]=='I') && (line[2]==0) ) { category=1;    } else
-     if ( (line[0]=='%') && (line[1]=='D') && (line[2]==0) ) { category=2;    } else
-     if ( (line[0]=='%') && (line[1]=='T') && (line[2]==0) ) { category=3;    } else
-     if ( (line[0]=='%') && (line[1]=='R') && (line[2]==0) ) { category=4;    } else
+     if ( (line[0]=='%') && (line[1]=='I') && (line[2]==0) )                   { category=1;    } else
+     if ( (line[0]=='%') && (line[1]=='D') && (line[2]==0) )                   { category=2;    } else
+     if ( (line[0]=='%') && (line[1]=='T') && (line[2]==0) )                   { category=3;    } else
+     if ( (line[0]=='%') && (line[1]=='R') && (line[2]==0) )                   { category=4;    } else
+     if ( (line[0]=='%') && (line[1]=='F') && (line[2]=='N') && (line[3]==0) ) { category=5;    } else
         {
           fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
           if (category==1)
@@ -120,6 +131,15 @@ int ReadCalibration(char * filename,struct calibration * calib)
              case 1 :  calib->extrinsicRotationRodriguez[0] = atof(line); break;
              case 2 :  calib->extrinsicRotationRodriguez[1] = atof(line); break;
              case 3 :  calib->extrinsicRotationRodriguez[2] = atof(line); break;
+           };
+          }else
+          if (category==5)
+          {
+           calib->extrinsicParametersSet=1;
+           switch(linesAtCurrentCategory)
+           {
+             case 1 :  calib->nearPlane = atof(line); break;
+             case 2 :  calib->farPlane  = atof(line); break;
            };
           }
 
@@ -195,7 +215,7 @@ int WriteCalibration(char * filename,struct calibration * calib)
        fprintf( fp, "%f\n",calib->extrinsicTranslation[1]);
        fprintf( fp, "%f\n",calib->extrinsicTranslation[2]);
 
-       fprintf( fp, "%%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z \n");
+       fprintf( fp, "%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z \n");
        fprintf( fp, "%%R\n");
        fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[0]);
        fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[1]);

@@ -103,13 +103,48 @@ int getOpenGLDepthCalibration(int devID,struct calibration * calib)
 
 int setOpenGLColorCalibration(int devID,struct calibration * calib)
 {
-    setOpenGLExtrinsicCalibration((double*) calib->extrinsicRotationRodriguez,(double*) calib->extrinsicTranslation);
+    /*
+    setOpenGLNearFarPlanes( calib->nearPlane , calib->farPlane );
+    setOpenGLIntrinsicCalibration((double*) calib->intrinsic);
+    setOpenGLExtrinsicCalibration((double*) calib->extrinsicRotationRodriguez,(double*) calib->extrinsicTranslation);*/
+
+    double * rodriguez = (double*) malloc(sizeof(double) * 3 );
+    double * translation = (double*) malloc(sizeof(double) * 3 );
+    double * camera = (double*) malloc(sizeof(double) * 9 );
+
+    int i=0;
+    for (i=0; i<3; i++) { rodriguez[i]=calib->extrinsicRotationRodriguez[i]; }
+    for (i=0; i<3; i++) { translation[i]=calib->extrinsicTranslation[i]; }
+    for (i=0; i<9; i++) { camera[i]=calib->intrinsic[i]; }
+
+    setOpenGLNearFarPlanes( calib->nearPlane , calib->farPlane );
+    setOpenGLIntrinsicCalibration(camera);
+    setOpenGLExtrinsicCalibration(rodriguez,translation);
+
+    free(rodriguez);
+    free(translation);
+    free(camera);
     return 1;
 }
 
 int setOpenGLDepthCalibration(int devID,struct calibration * calib)
 {
-    setOpenGLExtrinsicCalibration((double*) calib->extrinsicRotationRodriguez,(double*) calib->extrinsicTranslation);
+    double * rodriguez = (double*) malloc(sizeof(double) * 3 );
+    double * translation = (double*) malloc(sizeof(double) * 3 );
+    double * camera = (double*) malloc(sizeof(double) * 9 );
+
+    int i=0;
+    for (i=0; i<3; i++) { rodriguez[i]=calib->extrinsicRotationRodriguez[i]; }
+    for (i=0; i<3; i++) { translation[i]=calib->extrinsicTranslation[i]; }
+    for (i=0; i<9; i++) { camera[i]=calib->intrinsic[i]; }
+
+    setOpenGLNearFarPlanes( calib->nearPlane , calib->farPlane );
+    setOpenGLIntrinsicCalibration(camera);
+    setOpenGLExtrinsicCalibration(rodriguez,translation);
+
+    free(rodriguez);
+    free(translation);
+    free(camera);
     return 1;
 }
 
