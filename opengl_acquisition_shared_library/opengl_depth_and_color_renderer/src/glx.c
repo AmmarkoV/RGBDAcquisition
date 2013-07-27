@@ -10,8 +10,8 @@
 
 #include "glx.h"
 
-static int snglBuf[] = {GLX_RGBA, GLX_DEPTH_SIZE, 16, None};
-static int dblBuf[]  = {GLX_RGBA, GLX_DEPTH_SIZE, 16, GLX_DOUBLEBUFFER, None};
+static int snglBuf[] = {GLX_RGBA, GLX_DEPTH_SIZE, 24, None};
+static int dblBuf[]  = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None};
 
 Display   *dpy;
 Window     win;

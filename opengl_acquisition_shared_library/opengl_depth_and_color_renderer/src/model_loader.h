@@ -21,6 +21,8 @@ struct Model
     float pitch;
     float roll;
 
+    float scale;
+
     float colorR;
     float colorG;
     float colorB;

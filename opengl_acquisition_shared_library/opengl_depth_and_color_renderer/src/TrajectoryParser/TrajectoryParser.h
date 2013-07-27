@@ -58,11 +58,13 @@ struct VirtualObject
    unsigned int lastFrameTime;
    unsigned int nextFrameTime;
 
+   double scale;
+
 
    // 0-6  low bounds          X Y Z    A B C D
    // 7-13 high bounds         X Y Z    A B C D
    // 14-20 resample variances X Y Z    A B C D
-   float limits[ 7 * 3];
+   double limits[ 7 * 3];
 
 };
 
@@ -93,6 +95,7 @@ struct VirtualStream
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);
 char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID);
 int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency);
+char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler id);
 
 int readVirtualStream(struct VirtualStream * newstream , char * filename);
 struct VirtualStream * createVirtualStream(char * filename);
@@ -103,7 +106,8 @@ int addObjectToVirtualStream(
                               char * name , char * type ,
                               unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
                               float * coords ,
-                              unsigned int coordLength
+                              unsigned int coordLength ,
+                              float scale
                             );
 
 int addPositionToObject(

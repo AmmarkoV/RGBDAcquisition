@@ -55,6 +55,16 @@ void free4x4Matrix(double ** mat)
   *mat=0;
 }
 
+void print4x4FMatrix(char * str , float * matrix4x4)
+{
+  fprintf( stderr, " 4x4 float %s \n",str);
+  fprintf( stderr, "--------------------------------------\n");
+  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
+  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
+  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
+  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
+  fprintf( stderr, "--------------------------------------\n");
+}
 
 void print4x4DMatrix(char * str , double * matrix4x4)
 {

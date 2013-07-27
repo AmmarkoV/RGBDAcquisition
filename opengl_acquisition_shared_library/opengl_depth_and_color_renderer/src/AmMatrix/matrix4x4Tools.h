@@ -4,6 +4,7 @@
 double * alloc4x4Matrix();
 void free4x4Matrix(double ** mat);
 
+void print4x4FMatrix(char * str , float * matrix4x4);
 void print4x4DMatrix(char * str , double * matrix4x4);
 void copy4x4Matrix(double * out,double * in) ;
 void create4x4IdentityMatrix(double * m) ;

@@ -6,11 +6,15 @@ extern "C"
 {
 #endif
 
+int setOpenGLNearFarPlanes(double near , double far);
 int setOpenGLIntrinsicCalibration(double * camera);
 int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation);
 
 int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
 int getOpenGLColor(char * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
+
+void writeOpenGLColor(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height);
+void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height);
 
 double getOpenGLFocalLength();
 double getOpenGLPixelSize();

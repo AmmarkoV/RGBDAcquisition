@@ -206,6 +206,21 @@ char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID)
 }
 
 
+
+char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler id)
+{
+  if (stream==0) { fprintf(stderr,"Can't get object (%u) for un allocated stream\n",id); return 0; }
+  if (stream->object==0) { fprintf(stderr,"Can't get model of object id (%u) for un allocated object array\n",id); return 0;  }
+  if (stream->objectTypes==0) { fprintf(stderr,"Can't get model of object id (%u) for un allocated object type array\n",id); return 0;  }
+  if (id>=stream->numberOfObjects ) { fprintf(stderr,"Can't get object id (%u) we only got %u Objects \n",id,stream->numberOfObjects); return 0; }
+
+  ObjectTypeID typeID = stream->object[id].type;
+  if (typeID>=stream->numberOfObjectTypes) { fprintf(stderr,"Can't get object id (%u) we only got %u Object Types \n",typeID,stream->numberOfObjectTypes); return 0; }
+
+  return stream->objectTypes[typeID].model;
+}
+
+
 int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency)
 {
   *R = stream->object[ObjID].R;
@@ -347,7 +362,8 @@ int addObjectToVirtualStream(
                               char * name , char * type ,
                               unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
                               float * coords ,
-                              unsigned int coordLength
+                              unsigned int coordLength ,
+                              float scale
                             )
 {
    if (stream->MAX_numberOfObjects<=stream->numberOfObjects+1) { growVirtualStreamObjects(stream,OBJECTS_TO_ADD_STEP); }
@@ -363,6 +379,7 @@ int addObjectToVirtualStream(
    stream->object[pos].B = (float) B/255;
    stream->object[pos].Transparency = Alpha;
    stream->object[pos].nocolor = 0;
+   stream->object[pos].scale = scale;
 
    unsigned int found=0;
    stream->object[pos].type = getObjectTypeID(stream,stream->object[pos].typeStr,&found);
@@ -489,8 +506,9 @@ int readVirtualStream(struct VirtualStream * newstream)
                addObjectTypeToVirtualStream( newstream , name, model );
 
             } else
-            /*! REACHED AN OBJECT DECLERATION ( OBJECT(something,spatoula_type,0,255,0,0,spatoula_something) )
-              argument 0 = OBJECT , argument 1 = name ,  argument 2 = type ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = Data */
+            /*! REACHED AN OBJECT DECLERATION ( OBJECT(something,spatoula_type,0,255,0,0,1.0,spatoula_something) )
+              argument 0 = OBJECT , argument 1 = name ,  argument 2 = type ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = No Color , argument 8 = Scale
+              argument 9 = Data */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECT",6)==1)
             {
                char name[MAX_PATH]={0} , typeStr[MAX_PATH]={0};
@@ -502,9 +520,10 @@ int readVirtualStream(struct VirtualStream * newstream)
                unsigned char B = (unsigned char)  InputParser_GetWordInt(ipc,5);
                unsigned char Alpha = (unsigned char)  InputParser_GetWordInt(ipc,6) ;
                int nocolor = (float) InputParser_GetWordInt(ipc,7);
+               float scale = (float) InputParser_GetWordFloat(ipc,8);
 
                //Value , not used : InputParser_GetWord(ipc,8,newstream->object[pos].value,15);
-               addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,0,0);
+               addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,0,0,scale);
 
             } else
             /*! REACHED A POSITION DECLERATION ( POS(hand,0,   0.0,0.0,0.0 , 0.0,0.0,0.0,0.0 ) )

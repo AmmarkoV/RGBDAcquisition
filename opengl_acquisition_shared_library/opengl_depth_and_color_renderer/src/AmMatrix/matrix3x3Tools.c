@@ -9,6 +9,17 @@ enum mat3x3Item
     I31     , I32 , I33
 };
 
+
+void print3x3FMatrix(char * str , float * matrix4x4)
+{
+  fprintf( stderr, "  3x3 float %s \n",str);
+  fprintf( stderr, "--------------------------------------\n");
+  fprintf( stderr, "%f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f\n",matrix4x4[2]);
+  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f\n",matrix4x4[5]);
+  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f\n",matrix4x4[8]);
+  fprintf( stderr, "--------------------------------------\n");
+}
+
 void print3x3DMatrix(char * str , double * matrix4x4)
 {
   fprintf( stderr, "  3x3 double %s \n",str);
