@@ -8,6 +8,12 @@
 #include "model_loader.h"
 #include "scene.h"
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
 struct VirtualStream * scene = 0;
 struct Model ** models=0;
 
@@ -130,31 +136,22 @@ int initScene()
   glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
 
 
-
+  char noColor=0;
   float R,G,B,trans;
   scene = createVirtualStream("scene.conf");
-  if (scene==0) { fprintf(stderr,"Could not read scene data \n"); return 0; }
+  if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 
   unsigned int i=0;
+
+
   //Object 0 is camera
   for (i=1; i<scene->numberOfObjectTypes; i++)
     {
+         fprintf(stderr,"Loading Model %s ( %u )\n",scene->object[i].name,i);
          models[i] = loadModel("Models/",getObjectTypeModel(scene,i));
-         if (models[i]!=0)
-          {
-           R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
-           getObjectColorsTrans(scene,i,&R,&G,&B,&trans);
-           setModelColor(models[i],&R,&G,&B,&trans);
-
-           models[i]->scale = scene->object[i].scale;
-           models[i]->nocolor = scene->object[i].nocolor;
-           fprintf(stderr,"Model %s , is now loaded as model[%u] \n",getObjectTypeModel(scene,i) ,i );
-          }
-            else
-          {
-            fprintf(stderr,"Failed loading model %u \n",i);
-          }
+         if (models[i]!=0) {  fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,getObjectTypeModel(scene,i) ,i ); } else
+                           {  fprintf(stderr,RED "Failed loading model %s ( %u ) \n" NORMAL,getObjectTypeModel(scene,i),i);          }
 
     }
 
@@ -181,24 +178,14 @@ int closeScene()
 
 int tickScene()
 {
-   // addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
+   //ALL positions should be calculated here!
+   //i dont like the way this is working now
    float x,y,z,heading,pitch,roll;
-   //addToModelCoordinates(spatoula,0.0 /*X*/,0.0/*Y*/,0.0/*Z*/,(float) 0.01/*HEADING*/,(float) 0.01/*PITCH*/,(float) 0.006/*ROLL*/);
+   float posStack[7];
+   float * pos = (float*) &posStack;
 
-  float posStack[7];
-  float * pos = (float*) &posStack;
-
-  unsigned int i=0;
-  //Object 0 is camera
-  /*
-  for (i=1; i<scene->numberOfObjects; i++)
-    {
-       pos[0]=0; pos[1]=0; pos[2]=0; pos[3]=0; pos[4]=0; pos[5]=0; pos[6]=0;
-       calculateVirtualStreamPos(scene,i,ticks*100,pos);
-       setModelCoordinatesNoSTACK(models[i],&pos[0],&pos[1],&pos[2],&pos[3],&pos[4],&pos[5]);
-    }*/
-
-   //Camera information
+   unsigned int i=0;
+  //Object 0 is camera  lets calculate its position
    calculateVirtualStreamPos(scene,0,ticks*100,pos);
    camera_pos_x = pos[0];  camera_pos_y = pos[1]; camera_pos_z = pos[2];
    camera_angle_x = pos[3]; camera_angle_y = pos[4]; camera_angle_z = pos[5];
@@ -209,58 +196,49 @@ int tickScene()
 }
 
 
-
-int drawAnyPlane(float y , float scale , float r , float g , float b)
+int drawAllObjectsAtPositionsFromTrajectoryParser()
 {
- glColor3f(r,g,b);
- glBegin(GL_LINES);
- signed int i;
+  char noColor=0;
+  float posStack[7]={0};
+  float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
+  unsigned int i;
+  //Object 0 is camera , so we draw object 1 To numberOfObjects-1
+  for (i=1; i<scene->numberOfObjects; i++)
+    {
 
- float floorWidth = 500;
- for(i=-floorWidth; i<=floorWidth; i++)
- {
-    glVertex3f(-floorWidth*scale,y,i*scale);
-    glVertex3f(floorWidth*scale,y,i*scale);
+      glEnable(GL_LIGHT0);
+      glEnable(GL_LIGHTING);
+      glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+      glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+      glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+      glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+      glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
 
-    glVertex3f(i*scale,y,-floorWidth*scale);
-    glVertex3f(i*scale,y,floorWidth*scale);
- };
-glEnd();
 
+
+
+
+       struct Model * mod = models[scene->object[i].type];
+       float * pos = (float*) &posStack;
+       if ( calculateVirtualStreamPos(scene,i,ticks*100,pos) )
+       {
+         //This is a stupid way of passing stuff to be drawn
+         R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
+         getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
+         //fprintf(stderr,"Object %s should be RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name,R,G,B,trans,noColor);
+         setModelColor(mod,&R,&G,&B,&trans,&noColor);
+         mod->scale = scene->object[i].scale;
+         //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
+         if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
+             { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , scene->object[i].type ); }
+       } else
+       { fprintf(stderr,YELLOW "Could not determine position of object %s (%u) , so not drawing it\n" NORMAL,scene->object[i].name,i); }
+    }
+  return 1;
 }
 
 
 
-
-
-int drawPlane(float scale)
-{
- return drawAnyPlane(-0.50,scale,1.0,1.0,1.0);
-}
-
-int drawBottom(float scale)
-{
- return drawAnyPlane(-100,scale,0.0,1.0,0.0);
-}
-
-int drawCeiling(float scale)
-{
- return drawAnyPlane(100,scale,0.0,0.5,1.0);
-}
-
-
-
-int drawAxis(float x, float y , float z, float scale)
-{
- glLineWidth(scale);
- glBegin(GL_LINES);
-  glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+1.0*scale,y,z);
-  glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+1.0*scale,z);
-  glColor3f(0.0,0.0,1.0); glVertex3f(x,y,z); glVertex3f(x,y,z+1.0*scale);
- glEnd();
- glLineWidth(1.0);
- return 1;
-}
 
 
 
@@ -288,44 +266,9 @@ int renderScene()
     glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
   }
 
-  //drawBottom(100);
-  //drawPlane(0.1);
-  //drawCeiling(100);
+  drawAllObjectsAtPositionsFromTrajectoryParser();
 
-
-//  drawAxis(0.0,0.0,0.0, 10.0);
-
-//  drawAxis(-10,0.0,-10, 2.0);
-//  drawAxis(+10,0.0,+10, 2.0);
-//  drawAxis(-10,0.0,+10, 2.0);
-//  drawAxis(+10,0.0,-10, 2.0);
-
-
-  float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
-  unsigned int i;
-  //Object 0 is camera
-  for (i=1; i<scene->numberOfObjects; i++)
-    {
-       struct Model * mod = models[scene->object[i].type];
-       float posStack[7]={0};
-       float * pos = (float*) &posStack;
-       calculateVirtualStreamPos(scene,i,ticks*100,pos);
-
-        R=1.0f; G=1.0f;  B=0.0f; trans=0.0f;
-        getObjectColorsTrans(scene,i,&R,&G,&B,&trans);
-        setModelColor(mod,&R,&G,&B,&trans);
-        mod->nocolor = scene->object[i].nocolor;
-        mod->scale = scene->object[i].scale;
-
-
-       if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
-       {
-         fprintf(stderr,"Could not draw object %u , type %u \n",i , scene->object[i].type );
-       }
-    }
-
-
- ++framesRendered;
+  ++framesRendered;
 
  return 1;
 }

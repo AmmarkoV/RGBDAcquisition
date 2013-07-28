@@ -24,8 +24,6 @@
 #define FLIP_OPEN_GL_IMAGES 1
 
 
-
-
 int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
     double depth_bias=0.0; double depth_scale=1.0;
@@ -138,27 +136,6 @@ void redraw(void)
 {
     renderScene();
     glx_endRedraw();
-}
-
-int entry(int argc, char **argv)
-{
-  startOGLRendererSandbox();
-
-  /*** (9) dispatch X events ***/
-  while (1)
-  {
-    if (glx_checkEvents())
-    {
-      tickScene();
-      redraw();
-    }
-  }
-
-  closeScene();
-
-  //unloadShader(depthShaders);
-
-  return 0;
 }
 
 

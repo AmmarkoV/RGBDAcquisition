@@ -14,19 +14,119 @@
 #define PIE 3.14159265358979323846
 #define degreeToRadOLD(deg) (deg)*(PIE/180)
 
+
+int drawAxis(float x, float y , float z, float scale)
+{
+ glLineWidth(10.0);
+ glBegin(GL_LINES);
+  glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+scale,y,z);
+  glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+scale,z);
+  glColor3f(0.0,0.0,1.0); glVertex3f(x,y,z); glVertex3f(x,y,z+scale);
+ glEnd();
+ glLineWidth(1.0);
+ return 1;
+}
+
+int drawObjPlane(float x,float y,float z,float dimension)
+{
+   // glNewList(1, GL_COMPILE_AND_EXECUTE);
+    /* front face */
+    glBegin(GL_QUADS);
+      glVertex3f(x-dimension, 0.0, z-dimension);
+      glVertex3f(x+dimension, 0.0, z-dimension);
+      glVertex3f(x+dimension, 0.0, z+dimension);
+      glVertex3f(x-dimension, 0.0, z+dimension);
+    glEnd();
+    //glEndList();
+    return 1;
+}
+
+
+
+int drawGridPlane(float x,float y,float z , float scale)
+{
+ glBegin(GL_LINES);
+ signed int i;
+
+ float floorWidth = 500;
+ for(i=-floorWidth; i<=floorWidth; i++)
+ {
+    glVertex3f(x+-floorWidth*scale,y,z+i*scale);
+    glVertex3f(x+floorWidth*scale,y,z+i*scale);
+
+    glVertex3f(x+i*scale,y,z-floorWidth*scale);
+    glVertex3f(x+i*scale,y,z+floorWidth*scale);
+ };
+glEnd();
+
+}
+
+
+int drawCube()
+{
+   // glNewList(1, GL_COMPILE_AND_EXECUTE);
+    /* front face */
+    glBegin(GL_QUADS);
+      glColor3f(0.0, 0.7, 0.1);  /* green */
+      glVertex3f(-1.0, 1.0, 1.0);
+      glVertex3f(1.0, 1.0, 1.0);
+      glVertex3f(1.0, -1.0, 1.0);
+      glVertex3f(-1.0, -1.0, 1.0);
+
+      /* back face */
+      glColor3f(0.9, 1.0, 0.0);  /* yellow */
+      glVertex3f(-1.0, 1.0, -1.0);
+      glVertex3f(1.0, 1.0, -1.0);
+      glVertex3f(1.0, -1.0, -1.0);
+      glVertex3f(-1.0, -1.0, -1.0);
+
+      /* top side face */
+      glColor3f(0.2, 0.2, 1.0);  /* blue */
+      glVertex3f(-1.0, 1.0, 1.0);
+      glVertex3f(1.0, 1.0, 1.0);
+      glVertex3f(1.0, 1.0, -1.0);
+      glVertex3f(-1.0, 1.0, -1.0);
+
+      /* bottom side face */
+      glColor3f(0.7, 0.0, 0.1);  /* red */
+      glVertex3f(-1.0, -1.0, 1.0);
+      glVertex3f(1.0, -1.0, 1.0);
+      glVertex3f(1.0, -1.0, -1.0);
+      glVertex3f(-1.0, -1.0, -1.0);
+    glEnd();
+   // glEndList();
+    return 1;
+}
+
+
+
 struct Model * loadModel(char * directory,char * modelname)
 {
+  if ( (directory==0) || (modelname==0) )
+  {
+    fprintf(stderr,"loadModel failing , no modelname given");
+    return 0;
+  }
+
   struct Model * mod = ( struct Model * ) malloc(sizeof(struct Model));
   if ( mod == 0 )  { fprintf(stderr,"Could not allocate enough space for model %s \n",modelname);  return 0; }
   memset(mod , 0 , sizeof(struct Model));
 
+  if ( strcmp(modelname,"plane") == 0 ) {  mod->type = OBJ_PLANE; mod->model = 0; }  else
+  if ( strcmp(modelname,"cube") == 0 ) {  mod->type = OBJ_CUBE; mod->model = 0; }  else
+  if ( strcmp(modelname,"axis") == 0 ) {  mod->type = OBJ_AXIS; mod->model = 0; }  else
   if ( strstr(modelname,".obj") != 0 )
     {
       mod->type = OBJMODEL;
       mod->model = (struct  OBJ_Model * ) loadObj(directory,modelname);
+      if (mod->model ==0 ) { free(mod); return 0 ;}
+    } else
+    {
+      fprintf(stderr,"Could not understand how to load object %s \n",modelname);
+      fprintf(stderr,"Searched in directory %s \n",directory);
+      fprintf(stderr,"Object %s was also not one of the hardcoded shapes\n",modelname);
+      if (mod->model ==0 ) { free(mod); return 0 ;}
     }
-
-  if (mod->model ==0 ) { free(mod); return 0 ;}
 
   return mod;
 }
@@ -57,48 +157,54 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   if ( heading!=0 ) { glRotated(heading,0.0,1.0,0.0); }
   if ( pitch!=0 ) { glRotated(pitch,1.0,0.0,0.0); }
 
-   if (mod->nocolor)
-      { // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
-        glDisable(GL_COLOR_MATERIAL); //Required for the glMaterial calls to work
-      } else
-      {
-          if (mod->transparency==0.0)
-         {
-          //fprintf(stderr,"Only Seting color %0.2f %0.2f %0.2f \n",mod->colorR,mod->colorG,mod->colorB);
-          glColor3f(mod->colorR,mod->colorG,mod->colorB);
-         } else
-         { glEnable(GL_BLEND);			// Turn Blending On
-           glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-           glColor4f(mod->colorR,mod->colorG,mod->colorB,mod->transparency);
-         }
+       // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
+   //if (mod->nocolor!=0)  { glDisable(GL_COLOR_MATERIAL);   } else
+      {//We Have a color to set
+        glEnable(GL_COLOR);
+        glEnable(GL_COLOR_MATERIAL);
+        if (mod->transparency==0.0)
+        {
+          //fprintf(stderr,"SET RGB(%0.2f,%0.2f,%0.2f)\n",mod->colorR, mod->colorG, mod->colorB);
+          glColor3f(mod->colorR,mod->colorG,mod->colorB); }
+        else
+        { glEnable(GL_BLEND);			// Turn Blending On
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+          //fprintf(stderr,"SET RGBA(%0.2f,%0.2f,%0.2f,%0.2f)\n",mod->colorR, mod->colorG, mod->colorB, mod->transparency);
+          glColor4f(mod->colorR,mod->colorG,mod->colorB,mod->transparency);
+        }
       }
 
-
-
+    //fprintf(stderr,"Drawing RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
     switch ( mod->type )
     {
+      case OBJ_PLANE : drawObjPlane(0,0,0, 0.5); break;
+      case OBJ_AXIS :  drawAxis(0,0,0,1);        break;
+      case OBJ_CUBE :  drawCube();               break;
       case OBJMODEL :
       {
-         GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->model);
-         if (objlist!=0)
-          {
-              //We have compiled a list of the triangles for better performance
-              glCallList(objlist);
-          }  else
-          {
-              //Just feed the triangles to open gl one by one ( slow )
-              drawOBJMesh( ( struct OBJ_Model * ) mod->model);
-          }
+         if (mod->model!=0)
+         {
+           //A model has been created , and it can be served
+           GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->model);
+           if (objlist!=0)
+             { //We have compiled a list of the triangles for better performance
+               glCallList(objlist);
+             }  else
+             { //Just feed the triangles to open gl one by one ( slow )
+               drawOBJMesh( ( struct OBJ_Model * ) mod->model);
+             }
+         } else
+         { fprintf(stderr,"Could not draw unspecified model\n"); }
 
+         glDisable(GL_TEXTURE_2D); //TODO : <-- change drawOBJMesh , Calllist so that they dont leave textures on! :P
       }
       break;
     };
 
-
-       if (mod->transparency!=0) {glDisable(GL_BLEND);  }
-       if (mod->nocolor) {glEnable(GL_COLOR_MATERIAL);   }
-       if (mod->nocull) { glEnable(GL_CULL_FACE); }
+  if (mod->transparency!=0) {glDisable(GL_BLEND);  }
+  if (mod->nocolor) {glEnable(GL_COLOR); glEnable(GL_COLOR_MATERIAL);   }
+  if (mod->nocull)  {glEnable(GL_CULL_FACE); }
 
   glTranslated(-x,-y,-z);
   glDisable(GL_NORMALIZE);
@@ -165,7 +271,7 @@ int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,fl
 
 
 
-int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transparency)
+int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transparency,unsigned char * noColor)
 {
  if (mod==0) { return 0; }
 
@@ -174,44 +280,9 @@ int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transpare
  mod->colorG = *G;
  mod->colorB = *B;
  mod->transparency = *transparency;
+ mod->nocolor = *noColor;
  //fprintf(stderr,"Seting color to  %0.2f %0.2f %0.2f trans %0.2f \n",mod->colorR,mod->colorG,mod->colorB,mod->transparency);
  return 1;
-}
-
-int drawCube()
-{
-    glNewList(1, GL_COMPILE_AND_EXECUTE);
-    /* front face */
-    glBegin(GL_QUADS);
-      glColor3f(0.0, 0.7, 0.1);  /* green */
-      glVertex3f(-1.0, 1.0, 1.0);
-      glVertex3f(1.0, 1.0, 1.0);
-      glVertex3f(1.0, -1.0, 1.0);
-      glVertex3f(-1.0, -1.0, 1.0);
-
-      /* back face */
-      glColor3f(0.9, 1.0, 0.0);  /* yellow */
-      glVertex3f(-1.0, 1.0, -1.0);
-      glVertex3f(1.0, 1.0, -1.0);
-      glVertex3f(1.0, -1.0, -1.0);
-      glVertex3f(-1.0, -1.0, -1.0);
-
-      /* top side face */
-      glColor3f(0.2, 0.2, 1.0);  /* blue */
-      glVertex3f(-1.0, 1.0, 1.0);
-      glVertex3f(1.0, 1.0, 1.0);
-      glVertex3f(1.0, 1.0, -1.0);
-      glVertex3f(-1.0, 1.0, -1.0);
-
-      /* bottom side face */
-      glColor3f(0.7, 0.0, 0.1);  /* red */
-      glVertex3f(-1.0, -1.0, 1.0);
-      glVertex3f(1.0, -1.0, 1.0);
-      glVertex3f(1.0, -1.0, -1.0);
-      glVertex3f(-1.0, -1.0, -1.0);
-    glEnd();
-    glEndList();
-    return 1;
 }
 
 

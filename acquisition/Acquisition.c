@@ -682,7 +682,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
-    char filenameFull[1024]={0};
+    char filenameFull[2048]={0};
     sprintf(filenameFull,"%s.pnm",filename);
 
     switch (moduleID)
@@ -747,7 +747,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
-    char filenameFull[1024]={0};
+    char filenameFull[2048]={0};
     sprintf(filenameFull,"%s.pnm",filename);
 
     switch (moduleID)

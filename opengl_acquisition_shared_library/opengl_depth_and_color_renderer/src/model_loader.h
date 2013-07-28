@@ -4,6 +4,9 @@
 enum ModelTypes
 {
     NOTYPE = 0 ,
+    OBJ_AXIS,
+    OBJ_PLANE,
+    OBJ_CUBE,
     OBJMODEL
 };
 
@@ -47,7 +50,7 @@ int addToModelCoordinatesNoSTACK(struct Model * mod,float *x,float *y,float *z,f
 
 int setModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
 int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,float *heading,float *pitch,float* roll);
-int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transparency);
+int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transparency,unsigned char * noColor);
 
 int drawCube();
 

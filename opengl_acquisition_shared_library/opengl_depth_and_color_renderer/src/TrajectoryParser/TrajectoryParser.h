@@ -94,7 +94,7 @@ struct VirtualStream
 
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);
 char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID);
-int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency);
+int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency, char * noColor);
 char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler id);
 
 int readVirtualStream(struct VirtualStream * newstream , char * filename);
@@ -105,6 +105,7 @@ int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
                               char * name , char * type ,
                               unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
+                              unsigned char noColor ,
                               float * coords ,
                               unsigned int coordLength ,
                               float scale
