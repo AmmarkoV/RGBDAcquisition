@@ -53,8 +53,8 @@ const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
 
 const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
-const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
-const GLfloat high_shininess[] = { 100.0f };
+const GLfloat mat_specular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
+const GLfloat mat_shininess[] = { 5.0f };
 
 
 float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;
@@ -130,22 +130,19 @@ int initScene()
   glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-  //glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+  glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
-  glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+  glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,    mat_ambient);
+  glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    mat_diffuse);
+  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   mat_specular);
+  glMateriali(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess);
 
-
-  char noColor=0;
-  float R,G,B,trans;
   scene = createVirtualStream("scene.conf");
   if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
+
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 
-  unsigned int i=0;
-
-
-  //Object 0 is camera
+  unsigned int i=0;  //Object 0 is camera so we don't need to load a model or something for it
   for (i=1; i<scene->numberOfObjectTypes; i++)
     {
          fprintf(stderr,"Loading Model %s ( %u )\n",scene->object[i].name,i);
@@ -205,19 +202,6 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<scene->numberOfObjects; i++)
     {
-
-      glEnable(GL_LIGHT0);
-      glEnable(GL_LIGHTING);
-      glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-      glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-      glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-      glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
-      glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
-
-
-
-
-
        struct Model * mod = models[scene->object[i].type];
        float * pos = (float*) &posStack;
        if ( calculateVirtualStreamPos(scene,i,ticks*100,pos) )
@@ -229,6 +213,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          setModelColor(mod,&R,&G,&B,&trans,&noColor);
          mod->scale = scene->object[i].scale;
          //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
+
          if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
              { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , scene->object[i].type ); }
        } else

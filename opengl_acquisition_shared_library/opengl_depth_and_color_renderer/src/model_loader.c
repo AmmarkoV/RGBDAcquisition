@@ -14,6 +14,12 @@
 #define PIE 3.14159265358979323846
 #define degreeToRadOLD(deg) (deg)*(PIE/180)
 
+const GLfloat defaultAmbient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat defaultDiffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat defaultSpecular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
+const GLfloat defaultShininess[] = { 5.0f };
+
+
 
 int drawAxis(float x, float y , float z, float scale)
 {
@@ -32,6 +38,7 @@ int drawObjPlane(float x,float y,float z,float dimension)
    // glNewList(1, GL_COMPILE_AND_EXECUTE);
     /* front face */
     glBegin(GL_QUADS);
+      glNormal3f(0.0,1.0,0.0);
       glVertex3f(x-dimension, 0.0, z-dimension);
       glVertex3f(x+dimension, 0.0, z-dimension);
       glVertex3f(x+dimension, 0.0, z+dimension);
@@ -46,7 +53,9 @@ int drawObjPlane(float x,float y,float z,float dimension)
 int drawGridPlane(float x,float y,float z , float scale)
 {
  glBegin(GL_LINES);
- signed int i;
+ glNormal3f(0.0,1.0,0.0);
+
+  signed int i;
 
  float floorWidth = 500;
  for(i=-floorWidth; i<=floorWidth; i++)
@@ -149,7 +158,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
  {
   glPushMatrix();
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-  glEnable(GL_NORMALIZE);
+  //glEnable(GL_NORMALIZE);
   if (mod->nocull) { glDisable(GL_CULL_FACE); }
   if (mod->scale!=1.0) { glScaled(mod->scale,mod->scale,mod->scale); }
   glTranslated(x,y,z);
@@ -158,10 +167,16 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   if ( pitch!=0 ) { glRotated(pitch,1.0,0.0,0.0); }
 
        // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
-   //if (mod->nocolor!=0)  { glDisable(GL_COLOR_MATERIAL);   } else
+      if (mod->nocolor!=0)  { glDisable(GL_COLOR_MATERIAL);   } else
       {//We Have a color to set
         glEnable(GL_COLOR);
         glEnable(GL_COLOR_MATERIAL);
+
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,    defaultAmbient);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    defaultDiffuse);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   defaultSpecular);
+        glMateriali(GL_FRONT_AND_BACK, GL_SHININESS,   defaultShininess);
+
         if (mod->transparency==0.0)
         {
           //fprintf(stderr,"SET RGB(%0.2f,%0.2f,%0.2f)\n",mod->colorR, mod->colorG, mod->colorB);
@@ -196,18 +211,17 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
              }
          } else
          { fprintf(stderr,"Could not draw unspecified model\n"); }
-
          glDisable(GL_TEXTURE_2D); //TODO : <-- change drawOBJMesh , Calllist so that they dont leave textures on! :P
       }
       break;
     };
 
-  if (mod->transparency!=0) {glDisable(GL_BLEND);  }
-  if (mod->nocolor) {glEnable(GL_COLOR); glEnable(GL_COLOR_MATERIAL);   }
+  if (mod->transparency!=0.0) {glDisable(GL_BLEND);  }
+  if (mod->nocolor) {glEnable(GL_COLOR); glEnable(GL_COLOR_MATERIAL); }
   if (mod->nocull)  {glEnable(GL_CULL_FACE); }
 
   glTranslated(-x,-y,-z);
-  glDisable(GL_NORMALIZE);
+  //glDisable(GL_NORMALIZE);
   glPopMatrix();
 } else
 {

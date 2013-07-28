@@ -744,6 +744,7 @@ GLuint getDispList(struct OBJ_Model * obj)
 
 void  drawOBJMesh(struct OBJ_Model * obj)
 {
+        glPushAttrib(GL_ALL_ATTRIB_BITS); //We dont want the attributes we use here to poison the rest of the drawing
         if (obj == 0 ) { fprintf(stderr,"drawOBJMesh called with unloaded object \n"); return; }
         long unsigned int i,j;
 
@@ -765,6 +766,7 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 			}
 			else
 			 {	/*glDisable(GL_TEXTURE_2D);*/ }
+
 
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  obj->matList[ obj->groups[i].material].ambient);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  obj->matList[ obj->groups[i].material].diffuse);
@@ -889,6 +891,7 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 			}//FOR J
 			glEnd();
     }//FOR I
+glPopAttrib();
 
 }
 
@@ -1045,7 +1048,7 @@ int compileOBJList(struct OBJ_Model * obj)
 	  glGenLists
 	*/
 
-
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
 	long unsigned int i,j;
 
 	//generate an empty display list, and save its id in dispList
@@ -1071,7 +1074,7 @@ int compileOBJList(struct OBJ_Model * obj)
 			  //glDisable(GL_TEXTURE_2D);
 			}
 
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  obj->matList[ obj->groups[i].material].ambient);
+            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  obj->matList[ obj->groups[i].material].ambient);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  obj->matList[ obj->groups[i].material].diffuse);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, obj->matList[ obj->groups[i].material].specular);
 			glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, obj->matList[ obj->groups[i].material].shine);
@@ -1197,8 +1200,7 @@ int compileOBJList(struct OBJ_Model * obj)
 
 		}//FOR I
 	glEndList();
-
-
+glPopAttrib();
 }
 
 

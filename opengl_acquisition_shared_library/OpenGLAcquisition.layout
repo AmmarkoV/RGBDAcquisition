@@ -1,24 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="opengl_depth_and_color_renderer/src/main.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5748" topLine="179" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/model_loader.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
-	</File>
 	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="0" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/scene.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2208" topLine="34" />
 		</Cursor>
 	</File>
 	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -26,9 +11,24 @@
 			<Cursor1 position="11768" topLine="0" />
 		</Cursor>
 	</File>
+	<File name="opengl_depth_and_color_renderer/src/model_loader.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/main.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5748" topLine="179" />
+		</Cursor>
+	</File>
 	<File name="opengl_depth_and_color_renderer/src/model_loader_obj.c" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="22363" topLine="671" />
+		</Cursor>
+	</File>
+	<File name="OpenGLAcquisition.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4529" topLine="125" />
 		</Cursor>
 	</File>
 	<File name="opengl_depth_and_color_renderer/src/OGLRendererSandbox.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -36,9 +36,9 @@
 			<Cursor1 position="124" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="OpenGLAcquisition.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="opengl_depth_and_color_renderer/src/scene.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4529" topLine="125" />
+			<Cursor1 position="2208" topLine="34" />
 		</Cursor>
 	</File>
 	<File name="OpenGLAcquisition.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
