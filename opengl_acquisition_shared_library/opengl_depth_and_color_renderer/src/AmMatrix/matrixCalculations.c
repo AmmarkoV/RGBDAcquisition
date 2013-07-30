@@ -105,6 +105,13 @@ int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double 
 
 
 
+int move3DPoint(double * resultPoint3D, double * transformation4x4, double * point3D  )
+{
+  return transform3DPointUsing4x4Matrix(resultPoint3D,transformation4x4,point3D);
+}
+
+
+
 void buildOpenGLProjectionForIntrinsics   (
                                              double * frustum,
                                              int * viewport ,

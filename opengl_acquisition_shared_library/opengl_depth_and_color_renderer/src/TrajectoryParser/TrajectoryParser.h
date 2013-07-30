@@ -65,6 +65,8 @@ struct VirtualObject
    // 7-13 high bounds         X Y Z    A B C D
    // 14-20 resample variances X Y Z    A B C D
    double limits[ 7 * 3];
+   int generations;
+   int particles;
 
 };
 
@@ -118,14 +120,6 @@ int addPositionToObject(
                               float * coord ,
                               unsigned int coordLength
                        );
-
-int addLimitsToObject(
-                       struct VirtualStream * stream ,
-                       char * name  ,
-                       float * low , unsigned int lowLength ,
-                       float * high , unsigned int highLength ,
-                       float * var , unsigned int varLength
-                     );
 
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,

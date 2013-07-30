@@ -138,16 +138,6 @@ int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame 
         unsigned char * r , * b , * g;
         unsigned int rgb=0;
 
-        /* To pack it :
-            int rgb = ((int)r) << 16 | ((int)g) << 8 | ((int)b);
-
-           To unpack it :
-            int rgb = ...;
-            uint8_t r = (rgb >> 16) & 0x0000ff;
-            uint8_t g = (rgb >> 8) & 0x0000ff;
-            uint8_t b = (rgb) & 0x0000ff; */
-
-
         for (py=0; py<height; py++)
         {
          for (px=0; px<width; px++)
@@ -160,6 +150,15 @@ int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame 
            g=colorPTR; ++colorPTR;
            b=colorPTR; ++colorPTR;
 
+
+        /* To pack it :
+            int rgb = ((int)r) << 16 | ((int)g) << 8 | ((int)b);
+
+           To unpack it :
+            int rgb = ...;
+            uint8_t r = (rgb >> 16) & 0x0000ff;
+            uint8_t g = (rgb >> 8) & 0x0000ff;
+            uint8_t b = (rgb) & 0x0000ff; */
            rgb = ((int)*r) << 16 | ((int)*g) << 8 | ((int)*b);
 
            fprintf(fd, "%0.4f %0.4f %0.4f %u\n",x,y,z,rgb);

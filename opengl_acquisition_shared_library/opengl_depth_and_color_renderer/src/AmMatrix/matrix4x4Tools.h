@@ -18,5 +18,6 @@ double det4x4Matrix(double * mat) ;
 int invert4x4MatrixD(double * result,double * mat) ;
 int transpose4x4MatrixD(double * mat) ;
 int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB);
+int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D);
 
 #endif // MATRIX4X4TOOLS_H_INCLUDED

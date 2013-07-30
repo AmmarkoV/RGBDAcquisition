@@ -35,6 +35,18 @@ enum mat4x4Item
 };
 
 
+
+enum mat4x4RTItem
+{
+    r0 = 0 , r1, r2 , t0 ,
+    r3     , r4, r5 , t1 ,
+    r6     , r7 ,r8 , t2 ,
+    zero0  , zero1 , zero2 , one0
+};
+
+
+
+
 /* OUR MATRICES STORAGE
     0   1   2   3
     4   5   6   7
@@ -372,5 +384,20 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
   print4x4DMatrix("AxB", result);
 
   return 1;
+}
+
+int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)
+{
+  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0) ) { return 0; }
+
+  double * m = transformation4x4;
+  double X=point3D[0],Y=point3D[1],Z=point3D[2];
+
+  resultPoint3D[0] = m[t0] + m[r0] * X + m[r1] *  Y + m[r2] * Z;
+  resultPoint3D[1] = m[t1] + m[r3] * X + m[r4] *  Y + m[r5] * Z;
+  resultPoint3D[2] = m[t2] + m[r6] * X + m[r7] *  Y + m[r8] * Z;
+  resultPoint3D[3] = 1;
+
+ return 1;
 }
 
