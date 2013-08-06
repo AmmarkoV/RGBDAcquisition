@@ -65,6 +65,7 @@ struct VirtualObject
    // 7-13 high bounds         X Y Z    A B C D
    // 14-20 resample variances X Y Z    A B C D
    double limits[ 7 * 3];
+
    int generations;
    int particles;
 
@@ -99,6 +100,7 @@ char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID);
 int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency, char * noColor);
 char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler id);
 
+int writeVirtualStream(struct VirtualStream * newstream,char * filename);
 int readVirtualStream(struct VirtualStream * newstream , char * filename);
 struct VirtualStream * createVirtualStream(char * filename);
 int destroyVirtualStream(struct VirtualStream * stream);
@@ -129,8 +131,8 @@ int addObjectTypeToVirtualStream(
 
 int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeMilliseconds,float * pos);
 int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos);
-
-
+int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos);
+int getVirtualStreamLastPosD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos);
 
 
 #ifdef __cplusplus

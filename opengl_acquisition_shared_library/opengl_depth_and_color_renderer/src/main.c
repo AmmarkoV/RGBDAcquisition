@@ -189,7 +189,7 @@ double getOpenGLPixelSize()
 }
 
 
-int startOGLRendererSandbox()
+int startOGLRendererSandbox(char * sceneFile)
 {
 
   testMatrices();
@@ -203,7 +203,7 @@ int startOGLRendererSandbox()
     fprintf(stderr,"This version of OGLRendererSandbox is compiled to flip OpenGL frames to their correct orientation\n");
   #endif
 
-  initScene();
+  initScene(sceneFile);
   return 1;
 }
 

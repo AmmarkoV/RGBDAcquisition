@@ -17,7 +17,7 @@ extern double customTranslation[3];
 extern double customRotation[3];
 
 int renderScene();
-int initScene();
+int initScene(char * confFile);
 int tickScene();
 int closeScene();
 #endif // VISUALS_H_INCLUDED

@@ -55,7 +55,7 @@ int main(int argc, char **argv)
  setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
 
 
-  startOGLRendererSandbox();
+  startOGLRendererSandbox("scene.conf");
 
   snapOGLRendererSandbox(); // Snap a frame
   writeOpenGLColor("color.pnm",0,0,640,480);

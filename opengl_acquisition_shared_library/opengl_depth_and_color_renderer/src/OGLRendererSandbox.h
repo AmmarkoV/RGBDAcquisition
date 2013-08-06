@@ -20,7 +20,7 @@ double getOpenGLFocalLength();
 double getOpenGLPixelSize();
 
 
-int startOGLRendererSandbox();
+int startOGLRendererSandbox(char * sceneFile);
 int snapOGLRendererSandbox();
 int stopOGLRendererSandbox();
 

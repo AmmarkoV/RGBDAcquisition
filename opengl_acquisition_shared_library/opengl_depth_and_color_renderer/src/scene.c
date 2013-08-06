@@ -63,7 +63,7 @@ float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z =
 unsigned int ticks = 0;
 
 
-int initScene()
+int initScene(char * confFile)
 {
   glEnable(GL_DEPTH_TEST); /* enable depth buffering */
   glDepthFunc(GL_LESS);    /* pedantic, GL_LESS is the default */
@@ -137,7 +137,7 @@ int initScene()
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   mat_specular);
   glMateriali(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess);
 
-  scene = createVirtualStream("scene.conf");
+  scene = createVirtualStream(confFile);
   if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
 
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));

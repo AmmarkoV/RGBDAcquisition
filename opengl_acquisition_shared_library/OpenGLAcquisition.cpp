@@ -44,7 +44,7 @@ int createOpenGLDevice(int devID,unsigned int width,unsigned int height,unsigned
   if(openGLDepthFrame!=0) { openGLDepthFrame= (short*) realloc(openGLDepthFrame,sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); } else
                           { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); }
 
-  startOGLRendererSandbox();
+  startOGLRendererSandbox("scene.conf");
 
   return ((openGLColorFrame!=0) && (openGLDepthFrame!=0)) ;
 }

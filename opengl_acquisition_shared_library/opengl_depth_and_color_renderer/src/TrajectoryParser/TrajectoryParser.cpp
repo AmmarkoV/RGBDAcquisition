@@ -21,10 +21,11 @@
    After finishing with the VirtualObject stream  it should be destroyed using destroyVirtualStream in order for the memory to be gracefully freed
 */
 
+
 #include "TrajectoryParser.h"
-#include "InputParser_C.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 
@@ -34,7 +35,20 @@
 #define FRAMES_TO_ADD_STEP 100
 
 #define PRINT_DEBUGGING_INFO 0
+#define PRINT_WARNING_INFO 0
+
 #define CASE_SENSITIVE_OBJECT_NAMES 0
+
+
+//If you want Trajectory parser to be able to READ
+//and parse files you should set  USE_FILE_INPUT  to 1
+#define USE_FILE_INPUT 1
+//-------------------------------------------------------
+
+#if USE_FILE_INPUT
+  #include "InputParser_C.h"
+#endif
+
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -47,6 +61,8 @@ int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int frames
 {
   if (framesToAdd == 0) { return 0 ; }
   if (streamObj == 0) { fprintf(stderr,"Given an empty stream to grow \n"); return 0 ; }
+
+
   struct KeyFrame * new_frame;
   new_frame = (struct KeyFrame *) realloc( streamObj->frame, sizeof(struct KeyFrame)*( streamObj->MAX_numberOfFrames+framesToAdd ));
 
@@ -149,7 +165,6 @@ static int dummy_strcasecmp_internal(char * input1, char * input2)
 
    char A; //<- character buffer for input1
    char B; //<- character buffer for input2
-
    int i=0;
    while (i<len1) //len1 and len2 are equal
     {
@@ -219,8 +234,6 @@ char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID)
   return stream->objectTypes[typeID].model;
 }
 
-
-
 char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler id)
 {
   if (stream==0) { fprintf(stderr,"Can't get object (%u) for un allocated stream\n",id); return 0; }
@@ -234,7 +247,6 @@ char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler id)
   return stream->objectTypes[typeID].model;
 }
 
-
 int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency, char * noColor)
 {
   *R = stream->object[ObjID].R;
@@ -244,7 +256,6 @@ int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,flo
   *noColor = stream->object[ObjID].nocolor;
   return 1;
 }
-
 
 /*!
     ------------------------------------------------------------------------------------------
@@ -317,7 +328,9 @@ int addPositionToObject(
      stream->object[ObjID].MAX_timeOfFrames = stream->object[ObjID].frame[pos].time;
     } else
     {
-     fprintf(stderr,"Error in configuration file , object positions not in correct time order .. \n");
+     fprintf(stderr,"Error in configuration file , object positions not in correct time order (this %u , last max %u).. \n",
+             stream->object[ObjID].frame[pos].time,
+             stream->object[ObjID].MAX_timeOfFrames);
     }
 
   #if PRINT_DEBUGGING_INFO
@@ -349,6 +362,10 @@ int addObjectToVirtualStream(
 
    //We have the space so lets fill our new object spot ..!
    unsigned int pos = stream->numberOfObjects;
+
+   //Clearing  everything is done in growVirtualStreamObjects so no need to do it here
+   //memset((void*) &stream->object[pos],0,sizeof(struct VirtualObject));
+
    strcpy(stream->object[pos].name,name);
    strcpy(stream->object[pos].typeStr,type);
    stream->object[pos].R = (float) R/255;
@@ -357,6 +374,8 @@ int addObjectToVirtualStream(
    stream->object[pos].Transparency = Alpha;
    stream->object[pos].nocolor = noColor;
    stream->object[pos].scale = scale;
+
+   stream->object[pos].frame=0;
 
    unsigned int found=0;
    stream->object[pos].type = getObjectTypeID(stream,stream->object[pos].typeStr,&found);
@@ -396,11 +415,66 @@ int addObjectTypeToVirtualStream(
 }
 
 
+int writeVirtualStream(struct VirtualStream * newstream,char * filename)
+{
+  if (newstream==0) { fprintf(stderr,"Cannot writeVirtualStream(%s) , virtual stream does not exist\n"); return 0; }
+  FILE * fp = fopen(filename,"w");
+  if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream output file %s \n",filename); return 0; }
 
+  fprintf(fp,"#Automatically generated virtualStream(initial file was %s)\n\n",newstream->filename);
+  fprintf(fp,"#Some generic settings\n");
+  fprintf(fp,"AUTOREFRESH(%u)\n",newstream->autoRefresh);
+
+  if (newstream->ignoreTime) { fprintf(fp,"INTERPOLATE_TIME(0)\n"); } else
+                             { fprintf(fp,"INTERPOLATE_TIME(1)\n"); }
+  fprintf(fp,"\n\n#List of object-types\n");
+
+  int i=0;
+  for (i=1; i<newstream->numberOfObjectTypes; i++) { fprintf(fp,"OBJECTTYPE(%s,\"%s\")\n",newstream->objectTypes[i].name,newstream->objectTypes[i].model); }
+
+
+  fprintf(fp,"\n\n#List of objects and their positions");
+  int pos=0;
+  for (i=1; i<newstream->numberOfObjects; i++)
+    {
+      fprintf(fp,"\nOBJECT(%s,%s,%u,%u,%u,%u,%u,%0.2f,%s)\n",
+              newstream->object[i].name,
+              newstream->object[i].typeStr,
+              (int) newstream->object[i].R/255,
+              (int) newstream->object[i].G/255,
+              (int) newstream->object[i].B/255,
+              (int) newstream->object[i].Transparency/255,
+              newstream->object[i].nocolor,
+              newstream->object[i].scale,
+              newstream->object[i].value);
+
+      for (pos=0; pos < newstream->object[i].numberOfFrames; pos++)
+      {
+         fprintf(fp,"POS(%s,%u,%f,%f,%f,%f,%f,%f,%f)\n",
+                     newstream->object[i].name ,
+                     newstream->object[i].frame[pos].time,
+
+                     newstream->object[i].frame[pos].x,
+                     newstream->object[i].frame[pos].y,
+                     newstream->object[i].frame[pos].z,
+
+                     newstream->object[i].frame[pos].rot1,
+                     newstream->object[i].frame[pos].rot2,
+                     newstream->object[i].frame[pos].rot3,
+                     newstream->object[i].frame[pos].rot4
+                );
+      }
+    }
+
+  fclose(fp);
+  return 1;
+}
 
 
 int readVirtualStream(struct VirtualStream * newstream)
 {
+  #if USE_FILE_INPUT
+
   #if PRINT_DEBUGGING_INFO
   fprintf(stderr,"readVirtualStream(%s) called \n",newstream->filename);
   #endif
@@ -532,6 +606,14 @@ int readVirtualStream(struct VirtualStream * newstream)
   InputParser_Destroy(ipc);
 
   return 1;
+  #else
+    fprintf(stderr,RED "This build of Trajectory parser does not have File Input compiled in!\n" NORMAL);
+    fprintf(stderr,YELLOW "Please rebuild after setting USE_FILE_INPUT to 1 on file TrajectoryParser.cpp or .c\n" NORMAL);
+    fprintf(stderr,YELLOW "also note that by enabling file input you will also need to link with InputParser_C.cpp or .c \n" NORMAL);
+    fprintf(stderr,YELLOW "It can be found here https://github.com/AmmarkoV/InputParser/ \n" NORMAL);
+  #endif
+
+ return 0;
 }
 
 
@@ -654,9 +736,70 @@ int fillPosWithNull(struct VirtualStream * stream,ObjectIDHandler ObjID,float * 
 }
 
 
+int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos)
+{
+   if (stream->object[ObjID].frame==0)
+    {
+      #if PRINT_WARNING_INFO
+       fprintf(stderr,"Cannot Access frames for object %u \n",ObjID);
+      #endif
+      return 0;
+    }
+
+    #if PRINT_DEBUGGING_INFO
+    fprintf(stderr,"Returning frame %u \n",FrameIDToReturn);
+    #endif
+
+    unsigned int FrameIDToReturn = stream->object[ObjID].numberOfFrames;
+    if (FrameIDToReturn>0) { --FrameIDToReturn; } //We have FrameIDToReturn frames so we grab the last one ( FrameIDToReturn -1 )
+    pos[0]=stream->object[ObjID].frame[FrameIDToReturn].x;
+    pos[1]=stream->object[ObjID].frame[FrameIDToReturn].y;
+    pos[2]=stream->object[ObjID].frame[FrameIDToReturn].z;
+    pos[3]=stream->object[ObjID].frame[FrameIDToReturn].rot1;
+    pos[4]=stream->object[ObjID].frame[FrameIDToReturn].rot2;
+    pos[5]=stream->object[ObjID].frame[FrameIDToReturn].rot3;
+    pos[6]=stream->object[ObjID].frame[FrameIDToReturn].rot4;
+    return 1;
+}
+
+
+int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos)
+{
+   if (stream->object[ObjID].frame==0)
+    {
+      #if PRINT_WARNING_INFO
+      fprintf(stderr,"Cannot Access frames for object %u \n",ObjID);
+      #endif
+      return 0;
+    }
+
+    #if PRINT_DEBUGGING_INFO
+    fprintf(stderr,"Returning frame %u \n",FrameIDToReturn);
+    #endif
+
+    unsigned int FrameIDToReturn = stream->object[ObjID].numberOfFrames;
+    if (FrameIDToReturn>0) { --FrameIDToReturn; } //We have FrameIDToReturn frames so we grab the last one ( FrameIDToReturn -1 )
+    pos[0]=(double) stream->object[ObjID].frame[FrameIDToReturn].x;
+    pos[1]=(double) stream->object[ObjID].frame[FrameIDToReturn].y;
+    pos[2]=(double) stream->object[ObjID].frame[FrameIDToReturn].z;
+    pos[3]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot1;
+    pos[4]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot2;
+    pos[5]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot3;
+    pos[6]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot4;
+    return 1;
+}
+
 
 int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int FrameIDToReturn,float * pos)
 {
+   if (stream->object[ObjID].frame==0)
+    {
+      #if PRINT_WARNING_INFO
+      fprintf(stderr,"Cannot Access frames for object %u \n",ObjID);
+      #endif
+      return 0;
+    }
+
     #if PRINT_DEBUGGING_INFO
     fprintf(stderr,"Returning frame %u \n",FrameIDToReturn);
     #endif
@@ -681,6 +824,14 @@ int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigne
 int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,
                                  unsigned int PrevFrame,unsigned int NextFrame , unsigned int time )
 {
+   if (stream->object[ObjID].frame==0)
+    {
+      #if PRINT_WARNING_INFO
+      fprintf(stderr,"Cannot Access interpolated frames for object %u \n",ObjID);
+      #endif
+      return 0;
+    }
+
    if (PrevFrame==NextFrame)
     {
        return fillPosWithFrame(stream,ObjID,PrevFrame,pos);
@@ -739,7 +890,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    if (stream==0) { fprintf(stderr,"calculateVirtualStreamPos called with null stream\n"); return 0; }
    if (stream->object==0) { fprintf(stderr,"calculateVirtualStreamPos called with null object array\n"); return 0; }
    if (stream->numberOfObjects<=ObjID) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u is out of bounds (%u)\n",ObjID,stream->numberOfObjects); return 0; }
-   if (stream->object[ObjID].frame == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u does not have a frame array allocated\n",ObjID); return 0; }
+   if (stream->object[ObjID].frame == 0 )  { fprintf(stderr,"calculateVirtualStreamPos ObjID %u does not have a frame array allocated\n",ObjID); return 0; }
    if (stream->object[ObjID].numberOfFrames == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u has 0 frames\n",ObjID); return 0; }
 
 
@@ -834,3 +985,19 @@ int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHan
    stream->object[ObjID].lastCalculationTime+=timeAfterMilliseconds;
    return calculateVirtualStreamPos(stream,ObjID,stream->object[ObjID].lastCalculationTime,pos);
 }
+
+
+int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos)
+{
+    return fillPosWithLastFrame(stream,ObjID,pos);
+}
+
+int getVirtualStreamLastPosD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos)
+{
+    return fillPosWithLastFrameD(stream,ObjID,pos);
+}
+
+
+
+
+
