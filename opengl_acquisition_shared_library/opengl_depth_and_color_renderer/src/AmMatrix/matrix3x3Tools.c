@@ -1,5 +1,6 @@
 #include "matrix3x3Tools.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 enum mat3x3Item
@@ -8,6 +9,19 @@ enum mat3x3Item
     I21     , I22 , I23 ,
     I31     , I32 , I33
 };
+
+double * alloc3x3Matrix()
+{
+  return malloc ( sizeof(double) * 16 );
+}
+
+void free3x3Matrix(double ** mat)
+{
+  if (mat==0) { return ; }
+  if (*mat==0) { return ; }
+  free(*mat);
+  *mat=0;
+}
 
 
 void print3x3FMatrix(char * str , float * matrix4x4)

@@ -67,7 +67,7 @@ int drawGridPlane(float x,float y,float z , float scale)
     glVertex3f(x+i*scale,y,z+floorWidth*scale);
  };
 glEnd();
-
+ return 1;
 }
 
 

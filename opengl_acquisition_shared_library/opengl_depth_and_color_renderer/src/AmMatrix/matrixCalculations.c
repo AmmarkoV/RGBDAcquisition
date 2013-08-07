@@ -4,7 +4,7 @@
 #include <math.h>
 #include "matrix3x3Tools.h"
 #include "matrix4x4Tools.h"
-
+#include "solveLinearSystemGJ.h"
 
 int convertRodriguezTo3x3(double * result,double * matrix)
 {
@@ -158,9 +158,18 @@ void buildOpenGLProjectionForIntrinsics   (
 
 
 
+
+
+
+
+
+
 void testMatrices()
 {
+  testGJSolver();
   return ;
+
+
   double A[16]={ 1 ,2 ,3 ,4,
                  5 ,6 ,7 ,8,
                  9 ,10,11,12,

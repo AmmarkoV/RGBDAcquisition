@@ -1,6 +1,9 @@
 #ifndef MATRIX3X3TOOLS_H_INCLUDED
 #define MATRIX3X3TOOLS_H_INCLUDED
 
+double * alloc3x3Matrix();
+void free3x3Matrix(double ** mat);
+
 void print3x3FMatrix(char * str , float * matrix4x4);
 void print3x3DMatrix(char * str , double * matrix4x4);
 
