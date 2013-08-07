@@ -558,7 +558,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
       #endif // USE_V4L2
       case OPENGL_ACQUISITION_MODULE    :
         #if USE_OPENGL
-          return createOpenGLDevice(devID,width,height,framerate);
+          return createOpenGLDevice(devID,devName,width,height,framerate);
         #endif
       break;
       case TEMPLATE_ACQUISITION_MODULE:

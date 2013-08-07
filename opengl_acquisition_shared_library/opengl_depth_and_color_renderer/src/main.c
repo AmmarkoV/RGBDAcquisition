@@ -203,7 +203,8 @@ int startOGLRendererSandbox(char * sceneFile)
     fprintf(stderr,"This version of OGLRendererSandbox is compiled to flip OpenGL frames to their correct orientation\n");
   #endif
 
-  initScene(sceneFile);
+  if (sceneFile == 0 ) { initScene("scene.conf");  } else
+                       { initScene(sceneFile);    }
   return 1;
 }
 

@@ -23,7 +23,7 @@ const GLfloat defaultShininess[] = { 5.0f };
 
 int drawAxis(float x, float y , float z, float scale)
 {
- glLineWidth(10.0);
+ glLineWidth(5.0);
  glBegin(GL_LINES);
   glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+scale,y,z);
   glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+scale,z);
@@ -122,6 +122,7 @@ struct Model * loadModel(char * directory,char * modelname)
   memset(mod , 0 , sizeof(struct Model));
 
   if ( strcmp(modelname,"plane") == 0 ) {  mod->type = OBJ_PLANE; mod->model = 0; }  else
+  if ( strcmp(modelname,"grid") == 0 ) {  mod->type = OBJ_GRIDPLANE; mod->model = 0; }  else
   if ( strcmp(modelname,"cube") == 0 ) {  mod->type = OBJ_CUBE; mod->model = 0; }  else
   if ( strcmp(modelname,"axis") == 0 ) {  mod->type = OBJ_AXIS; mod->model = 0; }  else
   if ( strstr(modelname,".obj") != 0 )
@@ -193,9 +194,10 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
 
     switch ( mod->type )
     {
-      case OBJ_PLANE : drawObjPlane(0,0,0, 0.5); break;
-      case OBJ_AXIS :  drawAxis(0,0,0,1);        break;
-      case OBJ_CUBE :  drawCube();               break;
+      case OBJ_PLANE :     drawObjPlane(0,0,0, 0.5);             break;
+      case OBJ_GRIDPLANE : drawGridPlane( 0.0 , 0.0 , 0.0, 1.0); break;
+      case OBJ_AXIS :      drawAxis(0,0,0,1.0);                  break;
+      case OBJ_CUBE :      drawCube();                           break;
       case OBJMODEL :
       {
          if (mod->model!=0)

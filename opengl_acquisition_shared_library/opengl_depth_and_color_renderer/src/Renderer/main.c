@@ -22,7 +22,7 @@ int main(int argc, char **argv)
  camera[6]=0.0;          camera[7]=0.0;         camera[8]=1.0;
 
 
- #define USE_TEST 5
+ #define USE_TEST 0
 
  #if   USE_TEST == 0
   translation[0]=0.0;  translation[1]=0.0; translation[2]=0.0;
@@ -50,12 +50,18 @@ int main(int argc, char **argv)
  #endif // USE_TEST
 
 
- setOpenGLNearFarPlanes(0.1,100);
- setOpenGLIntrinsicCalibration( (double*) camera);
- setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
+ #if USE_TEST == 0
+  setOpenGLNearFarPlanes(1,255);
+  setOpenGLIntrinsicCalibration( (double*) camera);
+  //setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
+ #else
+  setOpenGLNearFarPlanes(0.1,100);
+  setOpenGLIntrinsicCalibration( (double*) camera);
+  setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
+ #endif
 
-
-  startOGLRendererSandbox("scene.conf");
+ if (argc>1) {   startOGLRendererSandbox(argv[1]); } else
+             {   startOGLRendererSandbox(0); /*0 defaults to scene.conf*/ }
 
   snapOGLRendererSandbox(); // Snap a frame
   writeOpenGLColor("color.pnm",0,0,640,480);

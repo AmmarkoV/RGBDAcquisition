@@ -6,6 +6,7 @@ enum ModelTypes
     NOTYPE = 0 ,
     OBJ_AXIS,
     OBJ_PLANE,
+    OBJ_GRIDPLANE,
     OBJ_CUBE,
     OBJMODEL
 };

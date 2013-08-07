@@ -30,7 +30,7 @@ int stopOpenGL()
    return 1;
 }
 
-int createOpenGLDevice(int devID,unsigned int width,unsigned int height,unsigned int framerate)
+int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
   if ( ( openGL_WIDTH < width ) &&  ( openGL_HEIGHT < height ) )
    {
@@ -44,7 +44,7 @@ int createOpenGLDevice(int devID,unsigned int width,unsigned int height,unsigned
   if(openGLDepthFrame!=0) { openGLDepthFrame= (short*) realloc(openGLDepthFrame,sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); } else
                           { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); }
 
-  startOGLRendererSandbox("scene.conf");
+   startOGLRendererSandbox(devName);
 
   return ((openGLColorFrame!=0) && (openGLDepthFrame!=0)) ;
 }

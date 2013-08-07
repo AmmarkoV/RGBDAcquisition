@@ -17,7 +17,7 @@
 struct VirtualStream * scene = 0;
 struct Model ** models=0;
 
-float farPlane = 256; //<--be aware that this has an effect on the depth maps generated
+float farPlane = 255; //<--be aware that this has an effect on the depth maps generated
 float nearPlane= 1; //<--this also
 
 int WIDTH=640;

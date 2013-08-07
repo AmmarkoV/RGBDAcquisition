@@ -13,7 +13,7 @@ extern "C"
 int startOpenGL(unsigned int max_devs) ;
 int getOpenGLNumberOfDevices() ;
 int stopOpenGL() ;
-int createOpenGLDevice(int devID,unsigned int width,unsigned int height,unsigned int framerate) ;
+int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate) ;
 int destroyOpenGLDevice(int devID) ;
 int snapOpenGLFrames(int devID) ;
 
