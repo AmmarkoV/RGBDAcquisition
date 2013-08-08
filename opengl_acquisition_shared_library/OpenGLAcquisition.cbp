@@ -55,6 +55,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/OGLRendererSandbox.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/bmp.c">
 			<Option compilerVar="CC" />

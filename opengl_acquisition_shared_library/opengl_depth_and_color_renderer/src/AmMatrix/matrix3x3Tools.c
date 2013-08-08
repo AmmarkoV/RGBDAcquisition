@@ -45,6 +45,15 @@ void print3x3DMatrix(char * str , double * matrix4x4)
 }
 
 
+void print3x3DScilabMatrix(char * str , double * matrix4x4)
+{
+  fprintf( stderr, "str = [ %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ; ",matrix4x4[2]);
+  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f ; ",matrix4x4[5]);
+  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f ]\n\n",matrix4x4[8]);
+
+}
+
+
 void copy3x3Matrix(double * out,double * in)
 {
   out[0]=in[0];   out[1]=in[1];   out[2]=in[2];
