@@ -101,12 +101,9 @@ int getOpenGLDepthCalibration(int devID,struct calibration * calib)
     return 1;
 }
 
-int setOpenGLColorCalibration(int devID,struct calibration * calib)
+int setOpenGLCalibration(int devID,struct calibration * calib)
 {
-    /*
-    setOpenGLNearFarPlanes( calib->nearPlane , calib->farPlane );
-    setOpenGLIntrinsicCalibration((double*) calib->intrinsic);
-    setOpenGLExtrinsicCalibration((double*) calib->extrinsicRotationRodriguez,(double*) calib->extrinsicTranslation);*/
+    fprintf(stderr,"setOpenGLCalibration(0,calib) called \n");
 
     double * rodriguez = (double*) malloc(sizeof(double) * 3 );
     double * translation = (double*) malloc(sizeof(double) * 3 );
@@ -117,9 +114,21 @@ int setOpenGLColorCalibration(int devID,struct calibration * calib)
     for (i=0; i<3; i++) { translation[i]=calib->extrinsicTranslation[i]; }
     for (i=0; i<9; i++) { camera[i]=calib->intrinsic[i]; }
 
+    fprintf(stderr,"Setting OpenGL near/far planes\n");
     setOpenGLNearFarPlanes( calib->nearPlane , calib->farPlane );
+    fprintf(stderr,"Setting Intrinsics for OpenGL\n");
     setOpenGLIntrinsicCalibration(camera);
-    setOpenGLExtrinsicCalibration(rodriguez,translation);
+
+
+    if ( (rodriguez[0]!=0.0) || (rodriguez[1]!=0.0) || (rodriguez[2]!=0.0) ||
+         (translation[0]!=0.0) || (translation[1]!=0.0) || (translation[2]!=0.0)   )
+      {
+        fprintf(stderr,"Setting Extrinsics for OpenGL\n");
+        setOpenGLExtrinsicCalibration(rodriguez,translation);
+      } else
+      {
+        fprintf(stderr,"NOT setting Extrinsics for OpenGL\n");
+      }
 
     free(rodriguez);
     free(translation);
@@ -127,25 +136,17 @@ int setOpenGLColorCalibration(int devID,struct calibration * calib)
     return 1;
 }
 
+
+int setOpenGLColorCalibration(int devID,struct calibration * calib)
+{
+    fprintf(stderr,"setOpenGLColorCalibration(0,calib) called \n");
+    return setOpenGLCalibration(devID,calib);
+}
+
 int setOpenGLDepthCalibration(int devID,struct calibration * calib)
 {
-    double * rodriguez = (double*) malloc(sizeof(double) * 3 );
-    double * translation = (double*) malloc(sizeof(double) * 3 );
-    double * camera = (double*) malloc(sizeof(double) * 9 );
-
-    int i=0;
-    for (i=0; i<3; i++) { rodriguez[i]=calib->extrinsicRotationRodriguez[i]; }
-    for (i=0; i<3; i++) { translation[i]=calib->extrinsicTranslation[i]; }
-    for (i=0; i<9; i++) { camera[i]=calib->intrinsic[i]; }
-
-    setOpenGLNearFarPlanes( calib->nearPlane , calib->farPlane );
-    setOpenGLIntrinsicCalibration(camera);
-    setOpenGLExtrinsicCalibration(rodriguez,translation);
-
-    free(rodriguez);
-    free(translation);
-    free(camera);
-    return 1;
+    fprintf(stderr,"setOpenGLDepthCalibration(0,calib) called \n");
+    return setOpenGLCalibration(devID,calib);
 }
 
 

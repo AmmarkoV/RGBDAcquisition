@@ -546,6 +546,16 @@ int readVirtualStream(struct VirtualStream * newstream)
                 if (newstream->ignoreTime == 0 ) { newstream->ignoreTime=1; } else
                                                  { newstream->ignoreTime=0; }
             } else
+              /*! REACHED AN BACKGROUND DECLERATION ( BACKGROUND(0,0,0) )
+              argument 0 = BACKGROUND , argument 1 = R , argument 2 = G , argument 3 = B , */
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"BACKGROUND",10)==1)
+            {
+                //The configuration INTERPOLATE_TIME is the "opposite" of this flag ignore time
+                newstream->backgroundR = (float) InputParser_GetWordInt(ipc,1) / 255;
+                newstream->backgroundG = (float) InputParser_GetWordInt(ipc,2) / 255;
+                newstream->backgroundB = (float) InputParser_GetWordInt(ipc,3) / 255;
+                // so we flip it here.. , the default is not ignoring time..
+            } else
             /*! REACHED AN OBJECT TYPE DECLERATION ( OBJECTTYPE(spatoula_type,"spatoula.obj") )
               argument 0 = OBJECTTYPE , argument 1 = name ,  argument 2 = value */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECTTYPE",10)==1)

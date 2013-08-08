@@ -73,6 +73,9 @@ struct VirtualObject
 
 struct VirtualStream
 {
+
+    float backgroundR,backgroundG,backgroundB;
+
     unsigned int MAX_numberOfObjectTypes;
     unsigned int numberOfObjectTypes;
     struct ObjectType * objectTypes;

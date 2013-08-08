@@ -230,6 +230,8 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
 int renderScene()
 {
+  glClearColor(scene->backgroundR,scene->backgroundG,scene->backgroundB,0.0);
+
   glEnable (GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW );
