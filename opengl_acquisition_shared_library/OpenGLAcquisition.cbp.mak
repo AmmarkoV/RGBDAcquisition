@@ -15,7 +15,7 @@ INC =
 CFLAGS =  -Wall -fexceptions -fPIC
 RESINC = 
 LIBDIR = 
-LIB =  -lGL -lX11
+LIB =  -lGL -lGLU -lX11
 LDFLAGS = 
 
 INC_DEBUG =  $(INC)

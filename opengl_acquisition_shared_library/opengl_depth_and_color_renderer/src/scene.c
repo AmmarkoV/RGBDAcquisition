@@ -195,6 +195,8 @@ int tickScene()
 
 int drawAllObjectsAtPositionsFromTrajectoryParser()
 {
+ if (scene==0) { return 0; }
+
   char noColor=0;
   float posStack[7]={0};
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
@@ -230,7 +232,9 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
 int renderScene()
 {
-  glClearColor(scene->backgroundR,scene->backgroundG,scene->backgroundB,0.0);
+
+  if (scene!=0) { glClearColor(scene->backgroundR,scene->backgroundG,scene->backgroundB,0.0); } else
+                { glClearColor(0.0,0.0,0.0,0.0); }
 
   glEnable (GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -254,6 +258,7 @@ int renderScene()
   }
 
   drawAllObjectsAtPositionsFromTrajectoryParser();
+
 
   ++framesRendered;
 

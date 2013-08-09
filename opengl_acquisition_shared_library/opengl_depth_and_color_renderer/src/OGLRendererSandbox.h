@@ -11,9 +11,9 @@ int setOpenGLIntrinsicCalibration(double * camera);
 int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation);
 
 int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
-int getOpenGLColor(char * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
+int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
 
-void writeOpenGLColor(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height);
+void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height);
 void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height);
 
 double getOpenGLFocalLength();

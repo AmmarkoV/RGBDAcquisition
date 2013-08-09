@@ -24,23 +24,26 @@
 #define FLIP_OPEN_GL_IMAGES 1
 
 
-int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+
+int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
     double depth_bias=0.0; double depth_scale=1.0;
     glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
     glGetDoublev(GL_DEPTH_SCALE, &depth_scale); // Returns 1.0
 
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
+    if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
-
+    /*
+       Not sure I am calculating the correct depth here..
+    */
     float max_distance = farPlane-nearPlane;
     float multiplier = (float) 65535 / max_distance;
 
     memset(depth,0 , (width-x)*(height-y)*2 );
 
-
     #if FLIP_OPEN_GL_IMAGES
-     unsigned int yp = 0;
+     unsigned int   yp = 0;
      int i=0;
      unsigned int stride = (width-x)*1;
 
@@ -48,9 +51,12 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
        {
          for ( i =0 ; i < (width-x); i ++ )
             {
+
                if (zbuffer[(height-1-yp)*stride+i]>=max_distance)  { depth[yp*stride+i]=  (short) 0;  } else
                                                                          {
-                                                                           float tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) * multiplier;
+                                                                           float tmpF=zbuffer[(height-1-yp)*stride+i];
+
+                                                                           tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) * multiplier;
                                                                            unsigned short tmp = (unsigned short) tmpF;
                                                                            depth[yp*stride+i]= tmp ;
                                                                          }
@@ -76,10 +82,60 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
 
 
 
-int getOpenGLColor(char * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+{
+    double depth_bias=0.0; double depth_scale=1.0;
+    glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
+    glGetDoublev(GL_DEPTH_SCALE, &depth_scale); // Returns 1.0
+
+    float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
+    if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
+    glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
+    /*
+       Not sure I am calculating the correct depth here..
+    */
+    float max_distance = farPlane-nearPlane;
+    float multiplier = (float) 65535 / max_distance;
+
+    memset(depth,0 , (width-x)*(height-y)*2 );
+
+
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLdouble posX, posY, posZ=0.0;
+
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+    glGetDoublev( GL_PROJECTION_MATRIX, projection );
+    glGetIntegerv( GL_VIEWPORT, viewport );
+
+     unsigned int xp = 0, yp = 0;
+
+     for (yp=0; yp<height; yp++)
+       {
+         for ( xp=0 ; xp<width; xp++)
+            {
+                float tmpF=zbuffer[yp*width+xp];
+                if (tmpF!=1.0)
+                {
+                 gluUnProject((double) xp , (double) yp, (double) tmpF , modelview, projection, viewport, &posX, &posY, &posZ);
+                 depth[(height-yp-1)*width+xp]=(unsigned short) posZ;
+                }
+            }
+       }
+
+    if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
+    return 1;
+}
+
+
+
+int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
     #if FLIP_OPEN_GL_IMAGES
        char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
+       if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
+
        glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
 
       //SLOW INVERSION CODE :P
@@ -88,29 +144,29 @@ int getOpenGLColor(char * depth , unsigned int x,unsigned int y,unsigned int wid
 
        for (yp=0; yp<height; yp++)
        {
-         char * where_to = &depth[yp*stride];
+         char * where_to = &color[yp*stride];
          char * where_from = &inverter[(height-1-yp)*stride];
          memcpy(where_to , where_from , stride * sizeof(char));
        }
       free(inverter);
     #else
-       glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,depth);
+       glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,color);
     #endif
 
    return 1;
 }
 
 
-void writeOpenGLColor(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
 
-    char * zbuffer = (char *) malloc((width-x)*(height-y)*sizeof(char)*3);
+    char * rgb = (char *) malloc((width-x)*(height-y)*sizeof(char)*3);
+    if (rgb==0) { fprintf(stderr,"Could not allocate a buffer to write color to file %s \n",colorfile); return 0; }
 
-    getOpenGLColor(zbuffer, x, y, width,  height);
-    saveRawImageToFile(depthfile,zbuffer,(width-x),(height-y),3,8);
+    getOpenGLColor(rgb, x, y, width,  height);
+    saveRawImageToFile(colorfile,rgb,(width-x),(height-y),3,8);
 
-    if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
-
+    if (rgb!=0) { free(rgb); rgb=0; }
     return ;
 }
 
@@ -119,6 +175,7 @@ void writeOpenGLColor(char * depthfile,unsigned int x,unsigned int y,unsigned in
 void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
     short * zshortbuffer = (short *) malloc((width-x)*(height-y)*sizeof(short));
+    if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth to file %s \n",depthfile); return 0; }
 
     getOpenGLDepth(zshortbuffer,x,y,width,height);
 

@@ -34,6 +34,7 @@
 		<Linker>
 			<Add option="-pthread" />
 			<Add library="GL" />
+			<Add library="GLU" />
 			<Add library="X11" />
 			<Add library="../acquisition/libAcquisition.so" />
 			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so" />
