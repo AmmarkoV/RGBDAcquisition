@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
 
  #if USE_TEST == 0
-  setOpenGLNearFarPlanes(1,1000);
+  setOpenGLNearFarPlanes(1,5000);
   setOpenGLIntrinsicCalibration( (double*) camera);
   //setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
  #else

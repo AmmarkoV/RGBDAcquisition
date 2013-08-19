@@ -221,16 +221,16 @@ int setOpenGLIntrinsicCalibration(double * camera)
 
 int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation)
 {
-  useCustomMatrix=1;
-  convertRodriguezAndTranslationToOpenGL4x4DMatrix(customMatrix , rodriguez , translation );
+  useCustomModelViewMatrix=1;
+  convertRodriguezAndTranslationToOpenGL4x4DMatrix(customModelViewMatrix , rodriguez , translation );
 
   customTranslation[0] = translation[0];
   customTranslation[1] = translation[1];
   customTranslation[2] = translation[2];
 
-  customRotation[0] = rodriguez[0];
-  customRotation[1] = rodriguez[1];
-  customRotation[2] = rodriguez[2];
+  customRodriguezRotation[0] = rodriguez[0];
+  customRodriguezRotation[1] = rodriguez[1];
+  customRodriguezRotation[2] = rodriguez[2];
   return 1;
 }
 

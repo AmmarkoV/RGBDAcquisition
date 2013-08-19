@@ -11,10 +11,10 @@ extern int useIntrinsicMatrix;
 extern double cameraMatrix[9];
 
 
-extern int useCustomMatrix;
-extern double customMatrix[16];
+extern int useCustomModelViewMatrix;
+extern double customModelViewMatrix[16];
 extern double customTranslation[3];
-extern double customRotation[3];
+extern double customRodriguezRotation[3];
 
 int renderScene();
 int initScene(char * confFile);

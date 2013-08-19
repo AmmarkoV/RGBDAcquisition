@@ -73,14 +73,22 @@ struct VirtualObject
 
 struct VirtualStream
 {
+    int projectionMatrixDeclared;
+    double projectionMatrix[16];
+
+    int modelViewMatrixDeclared;
+    double modelViewMatrix[16];
+
+    int extrinsicsDeclared;
+    double extrinsicTranslation[3];
+    double extrinsicRodriguezRotation[3];
+
 
     float backgroundR,backgroundG,backgroundB;
 
     unsigned int MAX_numberOfObjectTypes;
     unsigned int numberOfObjectTypes;
     struct ObjectType * objectTypes;
-
-
 
     unsigned int MAX_numberOfObjects;
     unsigned int numberOfObjects;

@@ -33,16 +33,20 @@ double cameraMatrix[9]={
                        };
 
 
-int useCustomMatrix=0;
+double customProjectionMatrix[16]={0};
 
-double customMatrix[16]={
-                        1.0 , 0.0 , 0.0 , 0.0 ,
-                        0.0 , 1.0 , 0.0 , 0.0 ,
-                        0.0 , 0.0 , 1.0 , 0.0 ,
-                        0.0 , 0.0 , 0.0 , 1.0
-                       };
+
+
+
+int useCustomModelViewMatrix=0;
+double customModelViewMatrix[16]={
+                                   1.0 , 0.0 , 0.0 , 0.0 ,
+                                   0.0 , 1.0 , 0.0 , 0.0 ,
+                                   0.0 , 0.0 , 1.0 , 0.0 ,
+                                   0.0 , 0.0 , 0.0 , 1.0
+                                 };
 double customTranslation[3]={0};
-double customRotation[3]={0};
+double customRodriguezRotation[3]={0};
 
 
 
@@ -63,8 +67,67 @@ float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z =
 unsigned int ticks = 0;
 
 
+
+
+int updateProjectionMatrix()
+{
+  fprintf(stderr,"updateProjectionMatrix activated \n");
+
+  if ( scene->projectionMatrixDeclared )
+  { //Scene configuration overwrites local configuration
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixd( scene->projectionMatrix ); // we load a matrix of Doubles
+    glViewport(0,0,WIDTH,HEIGHT);
+
+   print4x4DMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix );
+
+  } else
+  if (useIntrinsicMatrix)
+  {
+   int viewport[4]={0};
+
+   fprintf(stderr,"Width %u x Height %u \n",WIDTH,HEIGHT);
+   buildOpenGLProjectionForIntrinsics   (
+                                             customProjectionMatrix  ,
+                                             viewport ,
+                                             cameraMatrix[0],
+                                             cameraMatrix[4],
+                                             0.0,
+                                             cameraMatrix[2],
+                                             cameraMatrix[5],
+                                             WIDTH,
+                                             HEIGHT,
+                                             nearPlane ,
+                                             farPlane
+                                           );
+
+   print4x4DMatrix("OpenGL Projection Matrix", customProjectionMatrix );
+
+   glMatrixMode(GL_PROJECTION);
+   glLoadMatrixd(customProjectionMatrix); // we load a matrix of Doubles
+   glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+  }
+    else
+  {
+  glLoadIdentity();
+  glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
+  glViewport(0, 0, WIDTH, HEIGHT);
+ }
+}
+
+
+
+
+
+
+
+
+
 int initScene(char * confFile)
 {
+  scene = createVirtualStream(confFile);
+  if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
+
   glEnable(GL_DEPTH_TEST); /* enable depth buffering */
   glDepthFunc(GL_LESS);    /* pedantic, GL_LESS is the default */
   glDepthMask(GL_TRUE);
@@ -84,40 +147,7 @@ int initScene(char * confFile)
   /* set up projection transform */
   glMatrixMode(GL_PROJECTION);
 
-
-  if (useIntrinsicMatrix)
-  {
-   double frustum[4*4]={0};
-   int viewport[4]={0};
-
-   fprintf(stderr,"Width %u x Height %u \n",WIDTH,HEIGHT);
-   buildOpenGLProjectionForIntrinsics   (
-                                             frustum  ,
-                                             viewport ,
-                                             cameraMatrix[0],
-                                             cameraMatrix[4],
-                                             0.0,
-                                             cameraMatrix[2],
-                                             cameraMatrix[5],
-                                             WIDTH,
-                                             HEIGHT,
-                                             nearPlane ,
-                                             farPlane
-                                           );
-
-   print4x4DMatrix("OpenGL Projection Matrix", frustum );
-
-   glMatrixMode(GL_PROJECTION);
-   glLoadMatrixd(frustum); // we load a matrix of Doubles
-   glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
-  }
-    else
-  {
-  glLoadIdentity();
-  glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
-  glViewport(0, 0, WIDTH, HEIGHT);
- }
-
+  updateProjectionMatrix();
 
   /* establish initial viewport */
   /* pedantic, full window size is default viewport */
@@ -137,8 +167,7 @@ int initScene(char * confFile)
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   mat_specular);
   glMateriali(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess);
 
-  scene = createVirtualStream(confFile);
-  if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
+
 
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 
@@ -240,11 +269,17 @@ int renderScene()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW );
 
+
+  if ( (scene!=0) && ( scene->modelViewMatrixDeclared ) )
+  { //Scene configuration overwrites local configuration
+   glLoadMatrixd( scene->modelViewMatrix ); // we load a matrix of Doubles
+   //print4x4DMatrix("OpenGL ModelView Matrix Given by Trajectory Parser", scene->modelViewMatrix );
+  } else
   //If setOpenGLExtrinsicCalibration has set a custom MODELVIEW matrix we will use it
-  if (useCustomMatrix)
+  if (useCustomModelViewMatrix)
   {
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
-    glLoadMatrixd((const GLdouble*) customMatrix);
+    glLoadMatrixd((const GLdouble*) customModelViewMatrix);
     // We flip our coordinate system so it comes straight
     glRotatef(90,-1.0,0,0);
   } else

@@ -42,7 +42,7 @@
 
 //If you want Trajectory parser to be able to READ
 //and parse files you should set  USE_FILE_INPUT  to 1
-#define USE_FILE_INPUT 1
+#define USE_FILE_INPUT 0
 //-------------------------------------------------------
 
 #if USE_FILE_INPUT
@@ -387,6 +387,17 @@ int addObjectToVirtualStream(
    fprintf(stderr,"addedObject(%s,%s) with ID %u ,typeID %u \n",name,type,pos,stream->object[pos].type);
    ++stream->numberOfObjects;
 
+
+   if (coords!=0)
+   {
+    if (! addPositionToObject(stream,name,0,coords,coordLength) )
+    {
+       fprintf(stderr,"Cannot add initial position to new object\n");
+    }
+   }
+
+
+
    return 1; // <- we always return
    return found;
 }
@@ -607,6 +618,26 @@ int readVirtualStream(struct VirtualStream * newstream)
                int coordLength=7;
 
               addPositionToObject( newstream , name  , time , (float*) pos , coordLength );
+            }
+             else
+            /*! REACHED A PROJECTION MATRIX DECLERATION ( PROJECTION_MATRIX( ... 16 values ... ) )
+              argument 0 = PROJECTION_MATRIX , argument 1-16 matrix values*/
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"PROJECTION_MATRIX",17)==1)
+            {
+               newstream->projectionMatrixDeclared=1;
+               int i=1;
+               for (i=1; i<=16; i++) { newstream->projectionMatrix[i-1] = (double)  InputParser_GetWordFloat(ipc,i); }
+               fprintf(stderr,"Projection Matrix given to TrajectoryParser\n");
+            }
+             else
+            /*! REACHED A MODELVIEW MATRIX DECLERATION ( MODELVIEW_MATRIX( ... 16 values ... ) )
+              argument 0 = MODELVIEW_MATRIX , argument 1-16 matrix values*/
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"MODELVIEW_MATRIX",16)==1)
+            {
+               newstream->modelViewMatrixDeclared=1;
+               int i=1;
+               for (i=1; i<=16; i++) { newstream->modelViewMatrix[i-1] = (double) InputParser_GetWordFloat(ipc,i); }
+               fprintf(stderr,"ModelView Matrix given to TrajectoryParser\n");
             }
          } // End of line containing tokens
     } //End of getting a line while reading the file

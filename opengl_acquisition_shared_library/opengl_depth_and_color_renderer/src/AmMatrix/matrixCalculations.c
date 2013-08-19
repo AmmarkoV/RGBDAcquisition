@@ -157,6 +157,64 @@ void buildOpenGLProjectionForIntrinsics   (
 
 
 
+//Iasonas code
+void buildOpenGLProjectionForIntrinsicsIasonas (
+                                             double * frustum,
+                                             int * viewport ,
+                                             double fx,
+                                             double fy,
+                                             double skew,
+                                             double cx, double cy,
+                                             int imageWidth, int imageHeight,
+                                             double nearPlane,
+                                             double farPlane
+                                           )
+{
+
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsics Image ( %u x %u )\n",imageWidth,imageHeight);
+   fprintf(stderr,"fx %0.2f fy %0.2f , cx %0.2f , cy %0.2f , skew %0.2f \n",fx,fy,cx,cy,skew);
+   fprintf(stderr,"Near %0.2f Far %0.2f \n",nearPlane,farPlane);
+
+
+    // These parameters define the final viewport that is rendered into by
+    // the camera.
+    //     Left    Bottom   Right       Top
+    double L = 0 , B = 0  , R = imageWidth , T = imageHeight;
+
+    // near and far clipping planes, these only matter for the mapping from
+    // world-space z-coordinate into the depth coordinate for OpenGL
+    double N = nearPlane , F = farPlane;
+    double w = (double) imageWidth;
+    double h = (double) imageHeight;
+
+    double R_sub_L = R-L;
+    double T_sub_B = T-B;
+    double F_sub_N = F-N;
+
+    if  (R_sub_L==0) { fprintf(stderr,"R-L is negative (%0.2f-0) \n",R); }
+    if  (T_sub_B==0) { fprintf(stderr,"T-B is negative (%0.2f-0) \n",T); }
+    if  (F_sub_N==0) { fprintf(stderr,"F-N is negative (%0.2f-%0.2f) \n",F,N); }
+
+
+   // set the viewport parameters
+   viewport[0] = L;
+   viewport[1] = B;
+   viewport[2] = R_sub_L;
+   viewport[3] = T_sub_B;
+
+   frustum[0]=2.0 * (fx / w);     frustum[1]=0.0;             frustum[2]=2.0 * ( cx / w );                     frustum[3]=0.0;
+   frustum[4]=0.0;                frustum[5]=-2.0 * (fy / h); frustum[6]=1 - ( 2.0 * ( cy / h ));              frustum[7]=0.0;
+   frustum[8]=0.0;                frustum[9]=0.0;             frustum[10]=farPlane / ( farPlane - nearPlane);  frustum[11]=-farPlane * nearPlane / ( farPlane - nearPlane );
+   frustum[12]=0.0;               frustum[13]=0.0;            frustum[14]=1.0;                                 frustum[15]=0.0;
+
+   //Convert matrix to OpenGL  Column-major format
+   transpose4x4MatrixD(frustum) ;
+}
+
+
+
+
+
 
 
 

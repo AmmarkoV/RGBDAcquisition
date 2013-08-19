@@ -1,7 +1,12 @@
 #ifndef TEMPLATEACQUISITION_H_INCLUDED
 #define TEMPLATEACQUISITION_H_INCLUDED
 
+
+#define USE_CALIBRATION 1
+
+#if USE_CALIBRATION
 #include "../tools/Calibration/calibration.h"
+#endif 
 
 #ifdef __cplusplus
 extern "C"
