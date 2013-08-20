@@ -1,10 +1,12 @@
-#include "cv.h"
-#include "highgui.h"
+//#include <cv.h>
+//#include <highgui.h>
+#include <opencv2/opencv.hpp>
+
+
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // example command line (for copy-n-paste):
 // calibration -w 6 -h 8 -s 2 -n 10 -o camera.yml -op -oe [<list_of_views.txt>]

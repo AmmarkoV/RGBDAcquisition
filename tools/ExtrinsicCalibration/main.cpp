@@ -1,14 +1,16 @@
+
+//#include <cv.h>
+//#include <highgui.h>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #include <iostream>
-#include "cv.h"
-#include "highgui.h"
-#include <stdio.h>
-#include <string.h>
 #include <time.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <string.h>
 
 
 
