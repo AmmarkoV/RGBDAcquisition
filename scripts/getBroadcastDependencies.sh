@@ -11,7 +11,9 @@ git clone git://github.com/AmmarkoV/AmmarServer
 
 if [ -d AmmarServer ]
 then
- cd AmmarServer
+ cd AmmarServer 
+ scripts/get_dependencies.sh
+
  ./make
  cd ..
 else
@@ -24,5 +26,8 @@ ln -s acquisitionBroadcast/AmmarServer/public_html
 cd acquisitionBroadcast
 ln -s AmmarServer/public_html
 cd ..
+
+
+
 
 exit 0

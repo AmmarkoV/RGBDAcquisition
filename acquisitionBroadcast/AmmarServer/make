@@ -53,33 +53,57 @@ cd ..
 fi
 
 # Mini Clients go afterwards ----------------
-if [ -d MyURL ]
+if [ -d Services/SimpleTemplate ]
 then 
-cd SimpleTemplate
+cd Services/SimpleTemplate
 ./make $@
+cd ..
 cd ..
 fi
 
-if [ -d MyURL ]
+
+
+if [ -d Services/AmmarServer ]
 then 
-cd MyURL
+cd Services/AmmarServer
 ./make $@
+cd ..
 cd ..
 fi 
 
-if [ -d MyLoader ]
+if [ -d Services/MyURL ]
 then 
-cd MyLoader
+cd Services/MyURL
 ./make $@
+cd ..
+cd ..
+fi 
+
+if [ -d Services/MyLoader ]
+then 
+cd Services/MyLoader
+./make $@
+cd ..
 cd ..
 fi
 
-if [ -d ScriptRunner ]
+if [ -d Services/ScriptRunner ]
 then 
-cd ScriptRunner
+cd Services/ScriptRunner
 ./make $@
 cd ..
+cd ..
 fi
+
+if [ -d Services/GeoPosShare ]
+then 
+cd Services/GeoPosShare
+./make $@
+cd ..
+cd ..
+fi
+
+
 
 # Unit Tests go in the end so that everything else is already there
 if [ -d UnitTests ]
@@ -89,9 +113,7 @@ cd UnitTests
 cd ..
 fi
 
-#AmmarServer main executable in the end
-./make $@
-cd ..
+
 
 
 exit 0

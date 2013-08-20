@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ -d Calibration ]
+then
+cd Calibration
+./make
+cd ..
+fi
+
+if [ -d ExtrinsicCalibration ]
+then
+cd ExtrinsicCalibration
+./make
+cd ..
+fi
+
+exit 0

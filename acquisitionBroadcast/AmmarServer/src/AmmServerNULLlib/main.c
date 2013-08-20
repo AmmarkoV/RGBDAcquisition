@@ -66,6 +66,13 @@ struct AmmServer_Instance * AmmServer_Start(char * name,char * ip,unsigned int p
 }
 
 
+struct AmmServer_Instance * AmmServer_StartWithArgs(char * name , int argc, char ** argv ,
+                                                                  char * ip,unsigned int port,char * conf_file,char * web_root_path,char * templates_root_path)
+{
+  return 0;
+}
+
+
 int AmmServer_Running(struct AmmServer_Instance * instance)
 {
   return 0;

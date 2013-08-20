@@ -1,5 +1,15 @@
 #!/bin/bash
 
+
+if [ -d tools ]
+then  
+cd tools
+./make
+cd ..
+fi
+
+
+
 if [ -d openni1_acquisition_shared_library ]
 then  
 cd openni1_acquisition_shared_library
