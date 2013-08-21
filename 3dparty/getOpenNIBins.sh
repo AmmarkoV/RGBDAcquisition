@@ -15,14 +15,20 @@ OPENNI2BINS="OpenNI-Linux-x64-2.2"
 
 mkdir -p OpenNI2/Bin/x64-Release
 cd OpenNI2/Bin/x64-Release
-ln -s ../../../../$OPENNI2BINS/Redist/libOpenNI2.so
-ln -s ../../../../$OPENNI2BINS/Redist/libOpenNI2.jni.so 
-ln -s ../../../../$OPENNI2BINS/Redist/OpenNI2
-ln -s ../../../../$OPENNI2BINS/Redist/OpenNI.ini
+ln -s ../../../$OPENNI2BINS/Redist/libOpenNI2.so
+ln -s ../../../$OPENNI2BINS/Redist/libOpenNI2.jni.so 
+ln -s ../../../$OPENNI2BINS/Redist/OpenNI2
+ln -s ../../../$OPENNI2BINS/Redist/OpenNI.ini
 
+ln -s ../../../OpenNI-Linux-x64-2.2/Redist/libOpenNI2.so
+ln -s ../../../OpenNI-Linux-x64-2.2/Redist/libOpenNI2.jni.so 
+ln -s ../../../OpenNI-Linux-x64-2.2/Redist/OpenNI2
+ln -s ../../../OpenNI-Linux-x64-2.2/Redist/OpenNI.ini
+ 
 cd .. 
 cd ..
 cd ..
+
 
 
 

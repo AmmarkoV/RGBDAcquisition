@@ -247,7 +247,7 @@ char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler id)
   return stream->objectTypes[typeID].model;
 }
 
-int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency, char * noColor)
+int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency, unsigned char * noColor)
 {
   *R = stream->object[ObjID].R;
   *G = stream->object[ObjID].G;

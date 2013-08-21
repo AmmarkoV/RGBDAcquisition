@@ -176,7 +176,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,    defaultAmbient);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    defaultDiffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   defaultSpecular);
-        glMateriali(GL_FRONT_AND_BACK, GL_SHININESS,   defaultShininess);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS,   defaultShininess);
 
         if (mod->transparency==0.0)
         {

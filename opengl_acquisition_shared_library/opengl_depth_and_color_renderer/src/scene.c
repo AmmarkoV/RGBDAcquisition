@@ -226,7 +226,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 {
  if (scene==0) { return 0; }
 
-  char noColor=0;
+  unsigned char noColor=0;
   float posStack[7]={0};
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
   unsigned int i;

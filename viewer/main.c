@@ -12,6 +12,8 @@ unsigned int frameNum=0;
 int calibrationSet = 0;
 struct calibration calib;
 
+//#include <opencv2/opencv.hpp>
+
 #include <cv.h>
 #include <cxcore.h>
 #include <highgui.h>
