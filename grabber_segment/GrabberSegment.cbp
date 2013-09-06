@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-from XP-08-no-translation -to XP-08-no-translationSegmented -maxFrames 10 -cropRGB 159 106 612 387 -minRGB 140 122 100 -maxRGB 255 255 255 -replaceRGB 92 45 36 -floodEraseSource 175 150 15 -floodEraseSource 580 280 15 " />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -20,6 +21,7 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-from XP-08-no-translation -to XP-08-no-translationSegmented -maxFrames 10 -cropRGB 159 106 612 387 -minRGB 140 122 100 -maxRGB 255 255 255 -replaceRGB 92 45 36 -floodErase 175 150 15" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>

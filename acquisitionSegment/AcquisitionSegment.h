@@ -2,6 +2,17 @@
 #define ACQUISITIONSEGMENT_H_INCLUDED
 
 
+struct floodErasePoints
+{
+  int totalPoints ;
+  int source;
+  int target;
+  unsigned int pX[32];
+  unsigned int pY[32];
+  unsigned int threshold[32];
+};
+
+
 struct SegmentationFeaturesRGB
 {
    unsigned int minR ,  minG ,  minB;
@@ -13,6 +24,8 @@ struct SegmentationFeaturesRGB
 
    unsigned char replaceR , replaceG , replaceB;
    char enableReplacingColors;
+
+   struct floodErasePoints floodErase;
 };
 
 

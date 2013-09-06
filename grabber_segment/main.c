@@ -7,7 +7,6 @@
 
 
 
-
 char outputfoldername[512]={0};
 char inputname[512]={0};
 
@@ -48,7 +47,12 @@ int main(int argc, char *argv[])
    int doNotSegmentRGB=1;
    int doNotSegmentDepth=1;
 
+
+
    struct SegmentationFeaturesRGB segConfRGB={0};
+
+   segConfRGB.floodErase.totalPoints = 0;
+
    segConfRGB.minX=0;  segConfRGB.maxX=640;
    segConfRGB.minY=0; segConfRGB.maxY=480;
 
@@ -79,7 +83,21 @@ int main(int argc, char *argv[])
                                            moduleID_1 = getModuleIdFromModuleName(argv[i+1]);
                                            fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
                                          } else
-
+    if (strcmp(argv[i],"-floodEraseSource")==0)
+                                                {
+                                                  segConfRGB.floodErase.pX[segConfRGB.floodErase.totalPoints] = atoi(argv[i+1]);
+                                                  segConfRGB.floodErase.pY[segConfRGB.floodErase.totalPoints] = atoi(argv[i+2]);
+                                                  segConfRGB.floodErase.threshold[segConfRGB.floodErase.totalPoints] = atoi(argv[i+3]);
+                                                  segConfRGB.floodErase.source=1;
+                                                  ++segConfRGB.floodErase.totalPoints;
+                                                } else
+    if (strcmp(argv[i],"-floodEraseTarget")==0) {
+                                                  segConfRGB.floodErase.pX[segConfRGB.floodErase.totalPoints] = atoi(argv[i+1]);
+                                                  segConfRGB.floodErase.pY[segConfRGB.floodErase.totalPoints] = atoi(argv[i+2]);
+                                                  segConfRGB.floodErase.threshold[segConfRGB.floodErase.totalPoints] = atoi(argv[i+3]);
+                                                  segConfRGB.floodErase.target=1;
+                                                  ++segConfRGB.floodErase.totalPoints;
+                                                 } else
     if (strcmp(argv[i],"-cropRGB")==0)    { segConfRGB.minX = atoi(argv[i+1]); segConfRGB.minY = atoi(argv[i+2]);
                                             segConfRGB.maxX = atoi(argv[i+3]); segConfRGB.maxY = atoi(argv[i+4]);  doNotSegmentRGB=0; } else
     if (strcmp(argv[i],"-cropDepth")==0)  { segConfDepth.minX = atoi(argv[i+1]); segConfDepth.minY = atoi(argv[i+2]);
