@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG =  $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = OpenGLAcquisition.so
+OUT_DEBUG = libOpenGLAcquisition.so
 
 INC_RELEASE =  $(INC)
 CFLAGS_RELEASE =  $(CFLAGS) -O2
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = OpenGLAcquisition.so
+OUT_RELEASE = libOpenGLAcquisition.so
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/glx.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/main.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/model_loader_obj.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/save_to_file.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/scene.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/shader_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/tools.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_DEBUG)/OpenGLAcquisition.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/bmp.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/ppm.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.o $(OBJDIR_DEBUG)/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.o
 

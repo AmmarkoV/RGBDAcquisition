@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG =  $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = V4L2StereoAcquisition.a
+OUT_DEBUG = libV4L2StereoAcquisition.a
 
 INC_RELEASE =  $(INC)
 CFLAGS_RELEASE =  $(CFLAGS) -Wall -O2
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = V4L2StereoAcquisition.a
+OUT_RELEASE = libV4L2StereoAcquisition.a
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/V4L2StereoAcquisition.o
 

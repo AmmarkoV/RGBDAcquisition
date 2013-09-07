@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG =  $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = CalibrationLibrary.a
+OUT_DEBUG = libCalibrationLibrary.a
 
 INC_RELEASE =  $(INC)
 CFLAGS_RELEASE =  $(CFLAGS) -Wall -O2
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = CalibrationLibrary.a
+OUT_RELEASE = libCalibrationLibrary.a
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/calibration.o
 

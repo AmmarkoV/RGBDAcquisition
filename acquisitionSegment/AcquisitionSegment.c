@@ -221,6 +221,16 @@ short * segmentDepthFrame(short * source , unsigned int width , unsigned int hei
  short * targetPixelsEnd     = targetPixelsLineEnd + ((height-1) * targetWidthStep );
  short * targetPixels = targetPixelsStart;
 
+
+//acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  );
+
+ unsigned int x =0;
+ unsigned int y =0;
+
+ float x3D;
+ float y3D;
+ float z3D;
+
  short * depth;
  while (sourcePixels<sourcePixelsEnd)
  {
@@ -236,6 +246,9 @@ short * segmentDepthFrame(short * source , unsigned int width , unsigned int hei
          targetPixels++;
        }
 
+
+       ++x;
+       if (x>=width) { x=0; ++y;}
      }
    sourcePixelsLineEnd+=sourceWidthStep;
    targetPixelsLineEnd+=targetWidthStep;
