@@ -28,6 +28,36 @@ typedef unsigned int DeviceIdentifier;
 
 
 
+struct acquisitionPluginInterface
+{
+   void *handle;
+
+   int (*startModule) (unsigned int);
+   int (*stopModule) ();
+
+   int (*mapDepthToRGB) (int);
+
+   int (*getNumberOfDevices) ();
+
+   int (*getColorWidth) (int);
+   int (*getColorHeight) (int);
+   int (*getColorDataSize) (int);
+   int (*getColorChannels) (int);
+   int (*getColorBitsPerPixel) (int);
+   char * (*getColorPixels) (int);
+
+   int (*getDepthWidth) (int);
+   int (*getDepthHeight) (int);
+   int (*getDepthDataSize) (int);
+   int (*getDepthChannels) (int);
+   int (*getDepthBitsPerPixel) (int);
+   char * (*getDepthPixels) (int);
+
+
+};
+
+extern struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES];
+
 
 int acquisitionSimulateTime(unsigned long timeInMillisecs);
 

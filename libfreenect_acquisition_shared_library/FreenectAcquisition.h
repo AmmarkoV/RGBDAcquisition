@@ -8,6 +8,7 @@ extern "C"
 #endif
 
 int startFreenectModule(unsigned int max_devs);
+int stopFreenectModule();
 
 int mapFreenectDepthToRGB(int devID);
 

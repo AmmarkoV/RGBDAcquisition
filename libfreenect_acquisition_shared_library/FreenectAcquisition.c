@@ -43,7 +43,13 @@ int startFreenectModule(unsigned int max_devs)
   return 0;
 }
 
-int getFreenectNumberOfDevices()  { fprintf(stderr,"getFreenectNumberOfDevices is a stub it always returns 1"); return 1; }
+
+int stopFreenectModule()
+{
+
+}
+
+int getFreenectNumberOfDevices()  { fprintf(stderr,"New getFreenectNumberOfDevices is a stub it always returns 1"); return 1; }
 
 //Color Frame getters
 int getFreenectColorWidth(int devID) { return 640; }

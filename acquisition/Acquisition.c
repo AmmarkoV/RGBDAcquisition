@@ -6,6 +6,7 @@
 #include <string.h>
 #include <time.h>
 
+#include <dlfcn.h>
 
 
 #if USE_V4L2
@@ -50,6 +51,9 @@ unsigned long tickBase = 0;
 
 unsigned int simulateTick=0;
 unsigned long simulatedTickValue=0;
+
+struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES];
+
 
 int acquisitionSimulateTime(unsigned long timeInMillisecs)
 {
@@ -411,6 +415,91 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
 }
 
 
+
+int linkToPlugin(char * moduleName,char * modulePath, ModuleIdentifier moduleID)
+{
+   char functionNameStr[1024]={0};
+   char *error;
+   plugins[moduleID].handle = dlopen (modulePath, RTLD_LAZY);
+   if (!plugins[moduleID].handle)
+       {
+        fprintf (stderr, "Failed while loading %s  - %s\n", moduleName , dlerror());
+        return 0;
+       }
+
+    dlerror();    /* Clear any existing error */
+
+
+  //Start Stop ================================================================================================================
+  sprintf(functionNameStr,"start%sModule",moduleName);
+  plugins[moduleID].startModule = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
+  sprintf(functionNameStr,"stop%sModule",moduleName);
+  plugins[moduleID].stopModule = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
+  //================================================================================================================
+  sprintf(functionNameStr,"map%sDepthToRGB",moduleName);
+  plugins[moduleID].mapDepthToRGB = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
+  sprintf(functionNameStr,"get%sNumberOfDevices",moduleName);
+  plugins[moduleID].getNumberOfDevices = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
+  sprintf(functionNameStr,"get%sColorWidth",moduleName);
+  plugins[moduleID].getColorWidth = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sColorHeight",moduleName);
+  plugins[moduleID].getColorHeight = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sColorDataSize",moduleName);
+  plugins[moduleID].getColorDataSize = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sColorChannels",moduleName);
+  plugins[moduleID].getColorChannels = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sColorBitsPerPixel",moduleName);
+  plugins[moduleID].getColorBitsPerPixel = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sColorPixels",moduleName);
+  plugins[moduleID].getColorPixels = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
+
+  sprintf(functionNameStr,"get%sDepthWidth",moduleName);
+  plugins[moduleID].getDepthWidth = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sDepthHeight",moduleName);
+  plugins[moduleID].getDepthHeight = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sDepthDataSize",moduleName);
+  plugins[moduleID].getDepthDataSize = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sDepthChannels",moduleName);
+  plugins[moduleID].getDepthChannels = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sDepthBitsPerPixel",moduleName);
+  plugins[moduleID].getDepthBitsPerPixel = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sDepthPixels",moduleName);
+  plugins[moduleID].getDepthPixels = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
+  return 1;
+}
+
+int unlinkPlugin(ModuleIdentifier moduleID)
+{
+    if (plugins[moduleID].handle==0) { return 1; }
+    dlclose(plugins[moduleID].handle);
+    plugins[moduleID].handle=0;
+    return 1;
+}
+
+
+
 /*! ------------------------------------------
     BASIC START STOP MECHANISMS FOR MODULES..
    ------------------------------------------*/
@@ -437,6 +526,8 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
+          linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/libFreenectAcquisition.so",moduleID);
+          fprintf(stderr,"Freenect devices %u \n",(*plugins[moduleID].getNumberOfDevices)() );
         #if USE_FREENECT
           return startFreenectModule(maxDevices);
         #endif
@@ -480,7 +571,9 @@ int acquisitionStopModule(ModuleIdentifier moduleID)
           return stopTemplate();
         #endif
       break;
-      case FREENECT_ACQUISITION_MODULE: break;
+      case FREENECT_ACQUISITION_MODULE:
+        unlinkPlugin(moduleID);
+      break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
           return stopOpenNI1();

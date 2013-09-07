@@ -15,7 +15,7 @@
 //You should manually set them to reflect your 3d party configuration
 #define USE_OPENNI1 0
 #define USE_OPENNI2 0
-#define USE_FREENECT 0
+#define USE_FREENECT 1
 #define USE_OPENGL 1
 #define USE_TEMPLATE 1
 #define USE_V4L2 0
