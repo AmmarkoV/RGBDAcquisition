@@ -448,6 +448,13 @@ int linkToPlugin(char * moduleName,char * modulePath, ModuleIdentifier moduleID)
   plugins[moduleID].getNumberOfDevices = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
 
+
+
+
+  sprintf(functionNameStr,"seek%sFrame",moduleName);
+  plugins[moduleID].seekFrame = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
   sprintf(functionNameStr,"snap%sFrames",moduleName);
   plugins[moduleID].snapFrames = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
@@ -724,7 +731,9 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
           return seekTemplateFrame(devID,seekFrame);
         #endif
       break;
-      case FREENECT_ACQUISITION_MODULE:   break;
+      case FREENECT_ACQUISITION_MODULE:
+         if (*plugins[moduleID].seekFrame!=0) { return (*plugins[moduleID].seekFrame) (devID,seekFrame); }
+      break;
       case OPENNI1_ACQUISITION_MODULE :   break;
       case OPENNI2_ACQUISITION_MODULE : break;
     };

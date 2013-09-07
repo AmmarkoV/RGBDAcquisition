@@ -40,6 +40,7 @@ struct acquisitionPluginInterface
    int (*getNumberOfDevices) ();
 
    int (*snapFrames) (int);
+   int (*seekFrame)  (int,unsigned int);
 
    int (*getColorWidth) (int);
    int (*getColorHeight) (int);

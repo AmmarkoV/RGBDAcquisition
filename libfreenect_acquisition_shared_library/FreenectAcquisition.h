@@ -14,6 +14,7 @@ int mapFreenectDepthToRGB(int devID);
 
 int getFreenectNumberOfDevices();
 
+int seekFreenectFrame(int devID,unsigned int seekFrame);
 int snapFreenectFrames(int devID);
 
 int getFreenectColorWidth(int devID);

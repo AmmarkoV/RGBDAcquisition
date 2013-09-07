@@ -33,11 +33,15 @@ int startFreenectModule(unsigned int max_devs,char * settings)
   return 1;
 }
 
-
 int stopFreenectModule() { return 1; }
 
 int getFreenectNumberOfDevices()  { fprintf(stderr,"New getFreenectNumberOfDevices is a stub it always returns 1"); return 1; }
 
+
+int seekFreenectFrame(int devID,unsigned int seekFrame)
+{
+  return 0;
+}
 
 int snapFreenectFrames(int devID)
 {
@@ -50,6 +54,7 @@ int getFreenectColorHeight(int devID) { return 480; }
 int getFreenectColorDataSize(int devID) { return getFreenectColorWidth(devID)*getFreenectColorHeight(devID)*3; }
 int getFreenectColorChannels(int devID) { return 3; }
 int getFreenectColorBitsPerPixel(int devID) { return 8; }
+
 char * getFreenectColorPixels(int devID)
 {
   uint32_t ts;
@@ -66,6 +71,7 @@ int getFreenectDepthHeight(int devID) { return 480; }
 int getFreenectDepthDataSize(int devID) { return getFreenectDepthWidth(devID)*getFreenectDepthHeight(devID); }
 int getFreenectDepthChannels(int devID) { return 1; }
 int getFreenectDepthBitsPerPixel(int devID) { return 16; }
+
 char * getFreenectDepthPixels(int devID)
 {
   uint32_t ts;
