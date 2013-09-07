@@ -32,12 +32,14 @@ struct acquisitionPluginInterface
 {
    void *handle;
 
-   int (*startModule) (unsigned int);
+   int (*startModule) (unsigned int,char *);
    int (*stopModule) ();
 
    int (*mapDepthToRGB) (int);
 
    int (*getNumberOfDevices) ();
+
+   int (*snapFrames) (int);
 
    int (*getColorWidth) (int);
    int (*getColorHeight) (int);

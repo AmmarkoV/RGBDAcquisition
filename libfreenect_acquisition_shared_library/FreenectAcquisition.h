@@ -7,12 +7,14 @@ extern "C"
 {
 #endif
 
-int startFreenectModule(unsigned int max_devs);
+int startFreenectModule(unsigned int max_devs,char * settings);
 int stopFreenectModule();
 
 int mapFreenectDepthToRGB(int devID);
 
 int getFreenectNumberOfDevices();
+
+int snapFreenectFrames(int devID);
 
 int getFreenectColorWidth(int devID);
 int getFreenectColorHeight(int devID);

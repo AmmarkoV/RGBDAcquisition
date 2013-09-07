@@ -448,6 +448,10 @@ int linkToPlugin(char * moduleName,char * modulePath, ModuleIdentifier moduleID)
   plugins[moduleID].getNumberOfDevices = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
 
+  sprintf(functionNameStr,"snap%sFrames",moduleName);
+  plugins[moduleID].snapFrames = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
   sprintf(functionNameStr,"get%sColorWidth",moduleName);
   plugins[moduleID].getColorWidth = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
@@ -528,9 +532,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
       case FREENECT_ACQUISITION_MODULE:
           linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/libFreenectAcquisition.so",moduleID);
           fprintf(stderr,"Freenect devices %u \n",(*plugins[moduleID].getNumberOfDevices)() );
-        #if USE_FREENECT
-          return startFreenectModule(maxDevices);
-        #endif
+          return (*plugins[moduleID].startModule) (maxDevices,settings);
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
@@ -613,9 +615,7 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-         return getFreenectNumberOfDevices();
-        #endif
+         if (plugins[moduleID].getNumberOfDevices!=0) { return (*plugins[moduleID].getNumberOfDevices) (); }
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
@@ -756,7 +756,9 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
           return snapTemplateFrames(devID);
         #endif
       break;
-      case FREENECT_ACQUISITION_MODULE:   break;
+      case FREENECT_ACQUISITION_MODULE:
+         if (*plugins[moduleID].snapFrames!=0) { return (*plugins[moduleID].snapFrames) (devID); }
+      break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
           return snapOpenNI1Frames(devID);
@@ -802,9 +804,20 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-          return saveRawImageToFile(filenameFull,getFreenectColorPixels(devID),getFreenectColorWidth(devID),getFreenectColorHeight(devID) ,getFreenectColorChannels(devID),getFreenectColorBitsPerPixel(devID));
-        #endif
+         if (
+              (*plugins[moduleID].getColorPixels!=0) && (*plugins[moduleID].getColorWidth!=0) && (*plugins[moduleID].getColorHeight!=0) &&
+              (*plugins[moduleID].getColorChannels!=0) && (*plugins[moduleID].getColorBitsPerPixel!=0)
+            )
+         {
+            return saveRawImageToFile(
+                                      filenameFull,
+                                      (*plugins[moduleID].getColorPixels)      (devID),
+                                      (*plugins[moduleID].getColorWidth)       (devID),
+                                      (*plugins[moduleID].getColorHeight)      (devID),
+                                      (*plugins[moduleID].getColorChannels)    (devID),
+                                      (*plugins[moduleID].getColorBitsPerPixel)(devID)
+                                     );
+         }
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
@@ -863,9 +876,20 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-          return saveRawImageToFile(filenameFull,(char*) getFreenectDepthPixels(devID),getFreenectDepthWidth(devID),getFreenectDepthHeight(devID) ,getFreenectDepthChannels(devID),getFreenectDepthBitsPerPixel(devID));
-        #endif
+          if (
+              (*plugins[moduleID].getDepthPixels!=0) && (*plugins[moduleID].getDepthWidth!=0) && (*plugins[moduleID].getDepthHeight!=0) &&
+              (*plugins[moduleID].getDepthChannels!=0) && (*plugins[moduleID].getDepthBitsPerPixel!=0)
+             )
+         {
+            return saveRawImageToFile(
+                                      filenameFull,
+                                      (*plugins[moduleID].getDepthPixels)      (devID),
+                                      (*plugins[moduleID].getDepthWidth)       (devID),
+                                      (*plugins[moduleID].getDepthHeight)      (devID),
+                                      (*plugins[moduleID].getDepthChannels)    (devID),
+                                      (*plugins[moduleID].getDepthBitsPerPixel)(devID)
+                                     );
+         }
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
@@ -1078,9 +1102,7 @@ char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-          return getFreenectColorPixels(devID);
-        #endif
+         if (*plugins[moduleID].getColorPixels!=0) { return (*plugins[moduleID].getColorPixels) (devID); }
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
@@ -1149,9 +1171,7 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-          return (short*) getFreenectDepthPixels(devID);
-        #endif
+          if (*plugins[moduleID].getDepthPixels!=0) { return (short*) (*plugins[moduleID].getDepthPixels) (devID); }
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
@@ -1268,13 +1288,17 @@ int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-          *width = getFreenectColorWidth(devID);
-          *height = getFreenectColorHeight(devID);
-          *channels = getFreenectColorChannels(devID);
-          *bitsperpixel = getFreenectColorBitsPerPixel(devID);
-          return 1;
-        #endif
+         if (
+              (*plugins[moduleID].getColorWidth!=0) && (*plugins[moduleID].getColorHeight!=0) &&
+              (*plugins[moduleID].getColorChannels!=0) && (*plugins[moduleID].getColorBitsPerPixel!=0)
+            )
+            {
+              *width        = (*plugins[moduleID].getColorWidth)        (devID);
+              *height       = (*plugins[moduleID].getColorHeight)       (devID);
+              *channels     = (*plugins[moduleID].getColorChannels)     (devID);
+              *bitsperpixel = (*plugins[moduleID].getColorBitsPerPixel) (devID);
+              return 1;
+            }
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
@@ -1347,13 +1371,17 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
         #endif
       break;
       case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-          *width = getFreenectDepthWidth(devID);
-          *height = getFreenectDepthHeight(devID);
-          *channels = getFreenectDepthChannels(devID);
-          *bitsperpixel = getFreenectDepthBitsPerPixel(devID);
-          return 1;
-        #endif
+         if (
+              (*plugins[moduleID].getDepthWidth!=0) && (*plugins[moduleID].getDepthHeight!=0) &&
+              (*plugins[moduleID].getDepthChannels!=0) && (*plugins[moduleID].getDepthBitsPerPixel!=0)
+            )
+            {
+              *width        = (*plugins[moduleID].getDepthWidth)        (devID);
+              *height       = (*plugins[moduleID].getDepthHeight)       (devID);
+              *channels     = (*plugins[moduleID].getDepthChannels)     (devID);
+              *bitsperpixel = (*plugins[moduleID].getDepthBitsPerPixel) (devID);
+              return 1;
+            }
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
@@ -1390,9 +1418,7 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
       break;
       case TEMPLATE_ACQUISITION_MODULE: /*TEMPLATE MODULE DOESNT MAP ANYTHING TO ANYTHING :P */ break;
       case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-          return  mapFreenectDepthToRGB(devID);
-        #endif
+          if  (*plugins[moduleID].mapDepthToRGB!=0) { return  (*plugins[moduleID].mapDepthToRGB) (devID); }
       break;
       case OPENNI1_ACQUISITION_MODULE :
         #if USE_OPENNI1
