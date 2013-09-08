@@ -12,14 +12,14 @@ LD = g++
 WINDRES = windres
 
 INC = 
-CFLAGS = 
+CFLAGS =  -Wall -fPIC
 RESINC = 
 LIBDIR = 
 LIB = 
 LDFLAGS = 
 
 INC_DEBUG =  $(INC)
-CFLAGS_DEBUG =  $(CFLAGS) -Wall -g
+CFLAGS_DEBUG =  $(CFLAGS) -g
 RESINC_DEBUG =  $(RESINC)
 RCFLAGS_DEBUG =  $(RCFLAGS)
 LIBDIR_DEBUG =  $(LIBDIR)
@@ -27,10 +27,10 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG =  $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = libV4L2Acquisition.a
+OUT_DEBUG = libV4L2Acquisition.so
 
 INC_RELEASE =  $(INC)
-CFLAGS_RELEASE =  $(CFLAGS) -Wall -O2
+CFLAGS_RELEASE =  $(CFLAGS) -O2
 RESINC_RELEASE =  $(RESINC)
 RCFLAGS_RELEASE =  $(RCFLAGS)
 LIBDIR_RELEASE =  $(LIBDIR)
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = libV4L2Acquisition.a
+OUT_RELEASE = libV4L2Acquisition.so
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/PixelFormatConversions.o $(OBJDIR_DEBUG)/V4L2Acquisition.o $(OBJDIR_DEBUG)/V4L2IntrinsicCalibration.o $(OBJDIR_DEBUG)/V4L2Wrapper.o $(OBJDIR_DEBUG)/V4L2_c.o
 
@@ -56,7 +56,7 @@ after_debug:
 debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
-	$(AR) rcs $(OUT_DEBUG) $(OBJ_DEBUG)
+	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
 $(OBJDIR_DEBUG)/PixelFormatConversions.o: PixelFormatConversions.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c PixelFormatConversions.c -o $(OBJDIR_DEBUG)/PixelFormatConversions.o
@@ -85,7 +85,7 @@ after_release:
 release: before_release out_release after_release
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
-	$(AR) rcs $(OUT_RELEASE) $(OBJ_RELEASE)
+	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
 $(OBJDIR_RELEASE)/PixelFormatConversions.o: PixelFormatConversions.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c PixelFormatConversions.c -o $(OBJDIR_RELEASE)/PixelFormatConversions.o

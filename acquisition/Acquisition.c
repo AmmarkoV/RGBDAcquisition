@@ -8,36 +8,6 @@
 
 #include <dlfcn.h>
 
-
-#if USE_V4L2
-#include "../v4l2_acquisition_shared_library/V4L2Acquisition.h"
-#include "../v4l2stereo_acquisition_shared_library/V4L2StereoAcquisition.h"
-#endif
-
-#if USE_OPENNI1
-#include "../openni1_acquisition_shared_library/OpenNI1Acquisition.h"
-#endif
-
-#if USE_OPENNI2
-#include "../openni2_acquisition_shared_library/OpenNI2Acquisition.h"
-#endif
-
-#if USE_FREENECT
-#include "../libfreenect_acquisition_shared_library/FreenectAcquisition.h"
-#endif
-
-
-#if USE_OPENGL
-#include "../opengl_acquisition_shared_library/OpenGLAcquisition.h"
-//#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/OGLRendererSandbox.h"
-#endif
-
-
-#if USE_TEMPLATE
-#include "../template_acquisition_shared_library/TemplateAcquisition.h"
-#endif
-
-
 #define EPOCH_YEAR_IN_TM_YEAR 1900
 
 //This should probably pass on to each of the sub modules
@@ -572,14 +542,14 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
 {
     switch (moduleID)
     {
-      #if USE_V4L2
       case V4L2_ACQUISITION_MODULE    :
-          return startV4L2(maxDevices,settings);
+          linkToPlugin("V4L2","../v4l2_acquisition_shared_library/libV4L2Acquisition.so",moduleID);
+          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case V4L2STEREO_ACQUISITION_MODULE    :
-          return startV4L2Stereo(maxDevices,settings);
+          linkToPlugin("V4L2Stereo","../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so",moduleID);
+          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
-      #endif
       case OPENGL_ACQUISITION_MODULE    :
           linkToPlugin("OpenGL","../opengl_acquisition_shared_library/libOpenGLAcquisition.so",moduleID);
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
@@ -609,21 +579,9 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
 
 int acquisitionStopModule(ModuleIdentifier moduleID)
 {
-
     if (*plugins[moduleID].stopModule!=0) { return (*plugins[moduleID].stopModule) (); }
     unlinkPlugin(moduleID);
 
-    switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-          return stopV4L2();
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          return stopV4L2Stereo();
-      break;
-      #endif
-    };
     MeaningfullWarningMessage(moduleID,0,"acquisitionStopModule");
     return 0;
 }
@@ -632,20 +590,7 @@ int acquisitionStopModule(ModuleIdentifier moduleID)
 int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
 {
     printCall(moduleID,0,"acquisitionGetModuleDevices");
-
     if (plugins[moduleID].getNumberOfDevices!=0) { return (*plugins[moduleID].getNumberOfDevices) (); }
-
-    switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-          return getV4L2NumberOfDevices();
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          return getV4L2StereoNumberOfDevices();
-      break;
-      #endif
-    };
     MeaningfullWarningMessage(moduleID,0,"acquisitionGetModuleDevices");
     return 0;
 }
@@ -659,18 +604,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 {
     printCall(moduleID,devID,"acquisitionOpenDevice");
     if (plugins[moduleID].createDevice!=0) { return (*plugins[moduleID].createDevice) (devID,devName,width,height,framerate); }
-
-    switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-           return createV4L2Device(devID,devName,width,height,framerate);
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-           return createV4L2StereoDevice(devID,devName,width,height,framerate);
-      break;
-      #endif // USE_V4L2
-    };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionOpenDevice");
     return 0;
 }
@@ -892,7 +825,6 @@ int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 {
    printCall(moduleID,devID,"acquisitionGetColorCalibration");
    if (*plugins[moduleID].getColorCalibration!=0) { return (*plugins[moduleID].getColorCalibration) (devID,calib); }
-
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
    return 0;
 }
@@ -901,7 +833,6 @@ int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 {
    printCall(moduleID,devID,"acquisitionGetDepthCalibration");
    if (*plugins[moduleID].getDepthCalibration!=0) { return (*plugins[moduleID].getDepthCalibration) (devID,calib); }
-
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
    return 0;
 }
@@ -948,20 +879,8 @@ char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID
 {
   printCall(moduleID,devID,"acquisitionGetColorFrame");
   if (*plugins[moduleID].getColorPixels!=0) { return (*plugins[moduleID].getColorPixels) (devID); }
-
-  switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-            return getV4L2ColorPixels(devID);
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-            return getV4L2StereoColorPixels(devID);
-      break;
-      #endif
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorFrame");
-    return 0;
+  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorFrame");
+  return 0;
 }
 
 unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength)
@@ -997,20 +916,8 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
 {
   printCall(moduleID,devID,"acquisitionGetDepthFrame");
   if (*plugins[moduleID].getDepthPixels!=0) { return (short*) (*plugins[moduleID].getDepthPixels) (devID); }
-
-  switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-            return getV4L2DepthPixels(devID);
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-            return getV4L2StereoDepthPixels(devID);
-      break;
-      #endif
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrame");
-    return 0;
+  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrame");
+  return 0;
 }
 
 
@@ -1091,27 +998,8 @@ int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
               return 1;
             }
 
-  switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-          *width = getV4L2ColorWidth(devID);
-          *height = getV4L2ColorHeight(devID);
-          *channels = getV4L2ColorChannels(devID);
-          *bitsperpixel = getV4L2ColorBitsPerPixel(devID);
-          return 1;
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          *width = getV4L2StereoColorWidth(devID);
-          *height = getV4L2StereoColorHeight(devID);
-          *channels = getV4L2StereoColorChannels(devID);
-          *bitsperpixel = getV4L2StereoColorBitsPerPixel(devID);
-          return 1;
-      break;
-      #endif
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorFrameDimensions");
-    return 0;
+  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorFrameDimensions");
+  return 0;
 }
 
 
@@ -1139,28 +1027,8 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
               *bitsperpixel = (*plugins[moduleID].getDepthBitsPerPixel) (devID);
               return 1;
             }
-
-  switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-          *width = getV4L2DepthWidth(devID);
-          *height = getV4L2DepthHeight(devID);
-          *channels = getV4L2DepthChannels(devID);
-          *bitsperpixel = getV4L2DepthBitsPerPixel(devID);
-          return 1;
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          *width = getV4L2StereoDepthWidth(devID);
-          *height = getV4L2StereoDepthHeight(devID);
-          *channels = getV4L2StereoDepthChannels(devID);
-          *bitsperpixel = getV4L2StereoDepthBitsPerPixel(devID);
-          return 1;
-      break;
-      #endif
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrameDimensions");
-    return 0;
+   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrameDimensions");
+   return 0;
 }
 
 

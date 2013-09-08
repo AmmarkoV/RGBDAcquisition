@@ -1,14 +1,20 @@
 #ifndef V4L2ACQUISITION_H_INCLUDED
 #define V4L2ACQUISITION_H_INCLUDED
 
+#define USE_CALIBRATION 1
+
+#if USE_CALIBRATION
+#include "../tools/Calibration/calibration.h"
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
    //Initialization of V4L2
-   int startV4L2(unsigned int max_devs,char * settings);
+   int startV4L2Module(unsigned int max_devs,char * settings);
    int getV4L2(); // This has to be called AFTER startV4L2
-   int stopV4L2();
+   int stopV4L2Module();
 
    int getV4L2NumberOfDevices();
 
@@ -21,13 +27,13 @@ extern "C"
    int seekV4L2Frame(int devID,unsigned int seekFrame);
    int snapV4L2Frames(int devID);
 
-int setV4L2IntrinsicParameters(int devID,
-                               float fx,float fy,float cx,float cy ,
-                               float k1,float k2,float p1,float p2,float k3);
 
-int getV4L2IntrinsicParameters(int devID,
-                               float *fx,float *fy,float *cx,float *cy ,
-                               float *k1,float *k2,float *p1,float *p2,float *k3);
+
+   int getV4L2ColorCalibration(int devID,struct calibration * calib);
+   int getV4L2DepthCalibration(int devID,struct calibration * calib);
+
+   int setV4L2ColorCalibration(int devID,struct calibration * calib);
+   int setV4L2DepthCalibration(int devID,struct calibration * calib);
 
    //Color Frame getters
    int getV4L2ColorWidth(int devID);

@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-int startV4L2Stereo(unsigned int max_devs,char * settings)
+int startV4L2StereoModule(unsigned int max_devs,char * settings)
 {
- return startV4L2(max_devs,settings);
+ return startV4L2Module(max_devs,settings);
 }
 
 int getV4L2Stereo()
@@ -14,9 +14,9 @@ int getV4L2Stereo()
  return 0;
 } // This has to be called AFTER startV4L2Stereo
 
-int stopV4L2Stereo()
+int stopV4L2StereoModule()
 {
- return stopV4L2();
+ return stopV4L2Module();
 }
 
 

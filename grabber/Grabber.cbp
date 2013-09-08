@@ -38,8 +38,6 @@
 			<Add library="GLU" />
 			<Add library="X11" />
 			<Add library="../acquisition/libAcquisition.so" />
-			<Add library="../v4l2_acquisition_shared_library/libV4L2Acquisition.a" />
-			<Add library="../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.a" />
 			<Add library="rt" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="dl" />

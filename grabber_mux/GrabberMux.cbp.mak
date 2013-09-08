@@ -15,7 +15,7 @@ INC =
 CFLAGS =  -Wall
 RESINC = 
 LIBDIR = 
-LIB =  -lGL -lGLU -lX11 ../acquisition/libAcquisition.so ../acquisition_mux/libAcquisitionMux.so ../v4l2_acquisition_shared_library/libV4L2Acquisition.a ../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.a ../tools/Calibration/libCalibrationLibrary.a -ldl
+LIB =  -lGL -lGLU -lX11 ../acquisition/libAcquisition.so ../acquisition_mux/libAcquisitionMux.so ../tools/Calibration/libCalibrationLibrary.a -ldl
 LDFLAGS = 
 
 INC_DEBUG =  $(INC)

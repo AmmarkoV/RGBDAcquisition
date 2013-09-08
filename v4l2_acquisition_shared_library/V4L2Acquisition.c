@@ -2,8 +2,9 @@
 #include "V4L2Wrapper.h"
 #include "V4L2IntrinsicCalibration.h"
 #include <linux/videodev2.h>
+#include <stdlib.h>
 
-int startV4L2(unsigned int max_devs,char * settings)
+int startV4L2Module(unsigned int max_devs,char * settings)
 {
  return VideoInput_InitializeLibrary(10);
 }
@@ -13,7 +14,7 @@ int getV4L2()
  return 0;
 } // This has to be called AFTER startV4L2
 
-int stopV4L2()
+int stopV4L2Module()
 {
  return VideoInput_DeinitializeLibrary();
 }
@@ -79,28 +80,64 @@ double getV4L2ColorPixelSize(int devID)
 }
 
 
-int setV4L2IntrinsicParameters(int devID,
-                               float fx,float fy,float cx,float cy ,
-                               float k1,float k2,float p1,float p2,float k3)
-{
-   camera_feeds[devID].fx=fx; camera_feeds[devID].fy=fy; camera_feeds[devID].cx=cx; camera_feeds[devID].cy=cy;
-   camera_feeds[devID].k1=k1; camera_feeds[devID].k2=k2; camera_feeds[devID].p1=p1; camera_feeds[devID].p2=p2;
-   camera_feeds[devID].k3=k3;
-   camera_feeds[devID].enableIntrinsicResectioning=1;
 
+int setV4L2Calibration(int devID,struct calibration * calib)
+{
+  camera_feeds[devID].fx=calib->intrinsic[0];
+  camera_feeds[devID].fy=calib->intrinsic[4];
+
+  camera_feeds[devID].cx=calib->intrinsic[2];
+  camera_feeds[devID].cy=calib->intrinsic[5];
+
+  camera_feeds[devID].k1=calib->k1;
+  camera_feeds[devID].k2=calib->k2;
+  camera_feeds[devID].p1=calib->p1;
+  camera_feeds[devID].p2=calib->p2;
+  camera_feeds[devID].k3=calib->k3;
+  camera_feeds[devID].enableIntrinsicResectioning=1;
 
    camera_feeds[devID].resectionPrecalculations = (unsigned int *) malloc( camera_feeds[devID].width * camera_feeds[devID].height * sizeof(unsigned int) );
-   PrecalcResectioning(camera_feeds[devID].resectionPrecalculations,camera_feeds[devID].width,camera_feeds[devID].height,fx,fy,cx,cy,k1,k2,p1,p2,k3);
+   PrecalcResectioning(
+                        camera_feeds[devID].resectionPrecalculations,
+                        camera_feeds[devID].width,
+                        camera_feeds[devID].height,
+                        camera_feeds[devID].fx,
+                        camera_feeds[devID].fy,
+                        camera_feeds[devID].cx,
+                        camera_feeds[devID].cy,
+                        camera_feeds[devID].k1,
+                        camera_feeds[devID].k2,
+                        camera_feeds[devID].p1,
+                        camera_feeds[devID].p2,
+                        camera_feeds[devID].k3
+                      );
+  return 1;
 }
 
-int getV4L2IntrinsicParameters(int devID,
-                               float *fx,float *fy,float *cx,float *cy ,
-                               float *k1,float *k2,float *p1,float *p2,float *k3)
+
+
+int getV4L2Calibration(int devID,struct calibration * calib)
 {
-   *fx=camera_feeds[devID].fx; *fy=camera_feeds[devID].fy; *cx=camera_feeds[devID].cx; *cy=camera_feeds[devID].cy;
-   *k1=camera_feeds[devID].k1; *k2=camera_feeds[devID].k2; *p1=camera_feeds[devID].p1; *p2=camera_feeds[devID].p2;
-   *k3=camera_feeds[devID].k3;
+  calib->intrinsic[0]=camera_feeds[devID].fx;
+  calib->intrinsic[4]=camera_feeds[devID].fy;
+
+  calib->intrinsic[2]=camera_feeds[devID].cx;
+  calib->intrinsic[5]=camera_feeds[devID].cy;
+
+  calib->k1=camera_feeds[devID].k1;
+  calib->k2=camera_feeds[devID].k2;
+  calib->p1=camera_feeds[devID].p1;
+  calib->p2=camera_feeds[devID].p2;
+  calib->k3=camera_feeds[devID].k3;
+  return 1;
 }
+
+int getV4L2ColorCalibration(int devID,struct calibration * calib) { return getV4L2Calibration(devID,calib); }
+int getV4L2DepthCalibration(int devID,struct calibration * calib) { return getV4L2Calibration(devID,calib); }
+
+int setV4L2ColorCalibration(int devID,struct calibration * calib) { return setV4L2Calibration(devID,calib); }
+int setV4L2DepthCalibration(int devID,struct calibration * calib) { return setV4L2Calibration(devID,calib); }
+
 
 
 
