@@ -236,7 +236,7 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsign
 
 
 
-int startTemplate(unsigned int max_devs,char * settings)
+int startTemplateModule(unsigned int max_devs,char * settings)
 {
     unsigned int devID = 0;
     for (devID=0; devID<MAX_TEMPLATE_DEVICES; devID++)
@@ -263,7 +263,7 @@ int startTemplate(unsigned int max_devs,char * settings)
 
 int getTemplateNumberOfDevices() { return 1; }
 
-int stopTemplate()
+int stopTemplateModule()
 {
    unsigned int devID = 0;
    for (devID=0; devID<MAX_TEMPLATE_DEVICES; devID++)

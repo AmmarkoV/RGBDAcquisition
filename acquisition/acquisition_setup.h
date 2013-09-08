@@ -20,6 +20,8 @@
 #define USE_TEMPLATE 1
 #define USE_V4L2 0
 
+#define PRINT_DEBUG_EACH_CALL 0
+
 //todo add more acquisition modules here..
 
 #endif // ACQUISITION_SETUP_H_INCLUDED

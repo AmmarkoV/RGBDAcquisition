@@ -1,14 +1,1 @@
 # depslib dependency file v1.0
-1374952236 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/grabber/main.c
-	<stdio.h>
-	<stdlib.h>
-	<unistd.h>
-	<string.h>
-	"../acquisition/Acquisition.h"
-	"../tools/Calibration/calibration.h"
-
-1378597622 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
-	"../tools/Calibration/calibration.h"
-
-1376910583 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
-

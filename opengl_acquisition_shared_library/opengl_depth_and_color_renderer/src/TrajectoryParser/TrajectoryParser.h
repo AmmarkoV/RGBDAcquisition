@@ -28,16 +28,16 @@ struct KeyFrame
 
 struct ObjectType
 {
-   char name[MAX_PATH];
-   char model[MAX_PATH];
+   char name[MAX_PATH+1];
+   char model[MAX_PATH+1];
 };
 
 
 struct VirtualObject
 {
-   char name[MAX_PATH];
-   char typeStr[MAX_PATH];
-   char value[MAX_PATH];
+   char name[MAX_PATH+1];
+   char typeStr[MAX_PATH+1];
+   char value[MAX_PATH+1];
    ObjectTypeID type;
 
    float R;
@@ -103,7 +103,7 @@ struct VirtualStream
     char ignoreTime;
     char reverseLoop;
 
-    char filename[MAX_PATH];
+    char filename[MAX_PATH+1];
 };
 
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);

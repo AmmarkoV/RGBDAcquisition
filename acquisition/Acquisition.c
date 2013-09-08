@@ -52,7 +52,7 @@ unsigned long tickBase = 0;
 unsigned int simulateTick=0;
 unsigned long simulatedTickValue=0;
 
-struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES];
+struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES]={0};
 
 
 int acquisitionSimulateTime(unsigned long timeInMillisecs)
@@ -402,6 +402,16 @@ int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
     return 0;
 }
 
+
+void printCall(ModuleIdentifier moduleID,DeviceIdentifier devID,char * fromFunction)
+{
+   #if PRINT_DEBUG_EACH_CALL
+    fprintf(stderr,"called %s module %u , device %u ..\n",fromFunction,moduleID,devID);
+   #endif
+}
+
+
+
 void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier devFailed,char * fromFunction)
 {
   if (!acquisitionIsModuleLinked(moduleFailed))
@@ -411,7 +421,6 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
    }
 
    fprintf(stderr,"%s hasn't got an implementation for function %s ..\n",getModuleStringName(moduleFailed),fromFunction);
-
 }
 
 
@@ -467,6 +476,15 @@ int linkToPlugin(char * moduleName,char * modulePath, ModuleIdentifier moduleID)
   sprintf(functionNameStr,"snap%sFrames",moduleName);
   plugins[moduleID].snapFrames = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
+
+  sprintf(functionNameStr,"getLast%sColorTimestamp",moduleName);
+  plugins[moduleID].getLastColorTimestamp = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"getLast%DepthTimestamp",moduleName);
+  plugins[moduleID].getLastDepthTimestamp = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
 
   sprintf(functionNameStr,"get%sColorWidth",moduleName);
   plugins[moduleID].getColorWidth = dlsym(plugins[moduleID].handle, functionNameStr );
@@ -567,9 +585,8 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return startTemplate(maxDevices,settings);
-        #endif
+          linkToPlugin("Template","../template_acquisition_shared_library/libTemplateAcquisition.so",moduleID);
+          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case FREENECT_ACQUISITION_MODULE:
           linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/libFreenectAcquisition.so",moduleID);
@@ -606,11 +623,6 @@ int acquisitionStopModule(ModuleIdentifier moduleID)
           return stopV4L2Stereo();
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return stopTemplate();
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,0,"acquisitionStopModule");
     return 0;
@@ -619,6 +631,8 @@ int acquisitionStopModule(ModuleIdentifier moduleID)
 
 int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
 {
+    printCall(moduleID,0,"acquisitionGetModuleDevices");
+
     if (plugins[moduleID].getNumberOfDevices!=0) { return (*plugins[moduleID].getNumberOfDevices) (); }
 
     switch (moduleID)
@@ -631,11 +645,6 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
           return getV4L2StereoNumberOfDevices();
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return getTemplateNumberOfDevices();
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,0,"acquisitionGetModuleDevices");
     return 0;
@@ -648,7 +657,8 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
    ------------------------------------------*/
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
-    if (plugins[moduleID].createDevice!=0) { return (*plugins[moduleID].createDevice) (devID,width,height,framerate); }
+    printCall(moduleID,devID,"acquisitionOpenDevice");
+    if (plugins[moduleID].createDevice!=0) { return (*plugins[moduleID].createDevice) (devID,devName,width,height,framerate); }
 
     switch (moduleID)
     {
@@ -660,11 +670,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
            return createV4L2StereoDevice(devID,devName,width,height,framerate);
       break;
       #endif // USE_V4L2
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return createTemplateDevice(devID,devName,width,height,framerate);
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionOpenDevice");
     return 0;
@@ -672,6 +677,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    printCall(moduleID,devID,"acquisitionCloseDevice");
     if (plugins[moduleID].destroyDevice!=0) { return (*plugins[moduleID].destroyDevice) (devID); }
 
     switch (moduleID)
@@ -684,11 +690,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
           return destroyV4L2StereoDevice(devID);
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return destroyTemplateDevice(devID);
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionCloseDevice");
     return 0;
@@ -697,16 +698,9 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame)
 {
+    printCall(moduleID,devID,"acquisitionSeekFrame");
     if (*plugins[moduleID].seekFrame!=0) { return (*plugins[moduleID].seekFrame) (devID,seekFrame); }
 
-    switch (moduleID)
-    {
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return seekTemplateFrame(devID,seekFrame);
-        #endif
-      break;
-    };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSeekFrame");
     return 0;
 }
@@ -714,6 +708,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    printCall(moduleID,devID,"acquisitionSnapFrames");
     //fprintf(stderr,"acquisitionSnapFrames called moduleID=%u devID=%u\n",moduleID,devID);
     if (*plugins[moduleID].snapFrames!=0) { return (*plugins[moduleID].snapFrames) (devID); }
 
@@ -727,11 +722,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
           return snapV4L2StereoFrames(devID);
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return snapTemplateFrames(devID);
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSnapFrames");
     return 0;
@@ -739,6 +729,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
+    printCall(moduleID,devID,"acquisitionSaveColorFrame");
     char filenameFull[2048]={0};
     sprintf(filenameFull,"%s.pnm",filename);
 
@@ -774,11 +765,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
         return 1;
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return saveRawImageToFile(filenameFull,getTemplateColorPixels(devID),getTemplateColorWidth(devID),getTemplateColorHeight(devID) ,getTemplateColorChannels(devID),getTemplateColorBitsPerPixel(devID));
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColorFrame");
     return 0;
@@ -802,6 +788,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
+    printCall(moduleID,devID,"acquisitionSaveDepthFrame");
     char filenameFull[2048]={0};
     sprintf(filenameFull,"%s.pnm",filename);
 
@@ -831,11 +818,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
           return saveRawImageToFile(filenameFull,getV4L2StereoDepthPixels(devID),getV4L2StereoDepthWidth(devID),getV4L2StereoDepthHeight(devID),getV4L2StereoDepthChannels(devID),getV4L2StereoDepthBitsPerPixel(devID));
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return saveRawImageToFile(filenameFull,(char*) getTemplateDepthPixels(devID),getTemplateDepthWidth(devID),getTemplateDepthHeight(devID) ,getTemplateDepthChannels(devID),getTemplateDepthBitsPerPixel(devID));
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveDepthFrame");
     return 0;
@@ -843,6 +825,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
+    printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame");
 
     char filenameFull[1024]={0};
     sprintf(filenameFull,"%s.pnm",filename);
@@ -874,6 +857,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
 int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
+    printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame");
 
     char filenameFull[1024]={0};
     sprintf(filenameFull,"%s.pnm",filename);
@@ -906,34 +890,20 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
 
 int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
+   printCall(moduleID,devID,"acquisitionGetColorCalibration");
    if (*plugins[moduleID].getColorCalibration!=0) { return (*plugins[moduleID].getColorCalibration) (devID,calib); }
 
-   switch (moduleID)
-    {
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return getTemplateColorCalibration(devID,calib);
-        #endif
-      break;
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
-    return 0;
+   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
+   return 0;
 }
 
 int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
+   printCall(moduleID,devID,"acquisitionGetDepthCalibration");
    if (*plugins[moduleID].getDepthCalibration!=0) { return (*plugins[moduleID].getDepthCalibration) (devID,calib); }
 
-   switch (moduleID)
-    {
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return getTemplateDepthCalibration(devID,calib);
-        #endif
-      break;
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
-    return 0;
+   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
+   return 0;
 }
 
 
@@ -942,68 +912,41 @@ int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
+   printCall(moduleID,devID,"acquisitionGetColorCalibration");
    if (*plugins[moduleID].setColorCalibration!=0) { return (*plugins[moduleID].setColorCalibration) (devID,calib); }
-
-   switch (moduleID)
-    {
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return setTemplateColorCalibration(devID,calib);
-        #endif
-      break;
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
-    return 0;
+   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
+   return 0;
 }
 
 int acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
+   printCall(moduleID,devID,"acquisitionGetDepthCalibration");
    if (*plugins[moduleID].setDepthCalibration!=0) { return (*plugins[moduleID].setDepthCalibration) (devID,calib); }
-
-   switch (moduleID)
-    {
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return setTemplateDepthCalibration(devID,calib);
-        #endif
-      break;
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
-    return 0;
+   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
+   return 0;
 }
 
 
 unsigned long acquisitionGetColorTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-   switch (moduleID)
-    {
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return getLastTemplateColorTimestamp(devID);
-        #endif
-      break;
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorTimestamp");
-    return 0;
+   printCall(moduleID,devID,"acquisitionGetColorTimestamp");
+   if (*plugins[moduleID].getLastColorTimestamp!=0) { return (*plugins[moduleID].getLastColorTimestamp) (devID); }
+   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorTimestamp");
+   return 0;
 }
 
 unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-   switch (moduleID)
-    {
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return getLastTemplateDepthTimestamp(devID);
-        #endif
-      break;
-    };
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthTimestamp");
-    return 0;
+   printCall(moduleID,devID,"acquisitionGetDepthTimestamp");
+   if (*plugins[moduleID].getLastDepthTimestamp!=0) { return (*plugins[moduleID].getLastDepthTimestamp) (devID); }
+   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthTimestamp");
+   return 0;
 }
 
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+  printCall(moduleID,devID,"acquisitionGetColorFrame");
   if (*plugins[moduleID].getColorPixels!=0) { return (*plugins[moduleID].getColorPixels) (devID); }
 
   switch (moduleID)
@@ -1016,11 +959,6 @@ char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID
             return getV4L2StereoColorPixels(devID);
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return getTemplateColorPixels(devID);
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorFrame");
     return 0;
@@ -1057,6 +995,7 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
 
 short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+  printCall(moduleID,devID,"acquisitionGetDepthFrame");
   if (*plugins[moduleID].getDepthPixels!=0) { return (short*) (*plugins[moduleID].getDepthPixels) (devID); }
 
   switch (moduleID)
@@ -1069,11 +1008,6 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
             return getV4L2StereoDepthPixels(devID);
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return (short*) getTemplateDepthPixels(devID);
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrame");
     return 0;
@@ -1136,6 +1070,8 @@ int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier de
 int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID ,
                                        unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel )
 {
+  printCall(moduleID,devID,"acquisitionGetColorFrameDimensions");
+
   if ( (width==0)||(height==0)||(channels==0)||(bitsperpixel==0) )
     {
         fprintf(stderr,"acquisitionGetColorFrameDimensions called with invalid arguments .. \n");
@@ -1173,15 +1109,6 @@ int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
           return 1;
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          *width = getTemplateColorWidth(devID);
-          *height = getTemplateColorHeight(devID);
-          *channels = getTemplateColorChannels(devID);
-          *bitsperpixel = getTemplateColorBitsPerPixel(devID);
-          return 1;
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorFrameDimensions");
     return 0;
@@ -1192,6 +1119,8 @@ int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID ,
                                        unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel )
 {
+  printCall(moduleID,devID,"acquisitionGetDepthFrameDimensions");
+
   if ( (width==0)||(height==0)||(channels==0)||(bitsperpixel==0) )
     {
         fprintf(stderr,"acquisitionGetDepthFrameDimensions called with invalid arguments .. \n");
@@ -1229,15 +1158,6 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
           return 1;
       break;
       #endif
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          *width = getTemplateDepthWidth(devID);
-          *height = getTemplateDepthHeight(devID);
-          *channels = getTemplateDepthChannels(devID);
-          *bitsperpixel = getTemplateDepthBitsPerPixel(devID);
-          return 1;
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrameDimensions");
     return 0;
@@ -1246,17 +1166,8 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
  int acquisitionMapDepthToRGB(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    printCall(moduleID,devID,"acquisitionMapDepthToRGB");
     if  (*plugins[moduleID].mapDepthToRGB!=0) { return  (*plugins[moduleID].mapDepthToRGB) (devID); }
-
-    switch (moduleID)
-    {
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return 0;
-        #endif
-      break;
-      case TEMPLATE_ACQUISITION_MODULE: /*TEMPLATE MODULE DOESNT MAP ANYTHING TO ANYTHING :P */ break;
-    };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionMapDepthToRGB");
     return 0;
 }
@@ -1264,13 +1175,8 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
  int acquisitionMapRGBToDepth(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    printCall(moduleID,devID,"acquisitionMapRGBToDepth");
     if  (*plugins[moduleID].mapRGBToDepth!=0) { return  (*plugins[moduleID].mapRGBToDepth) (devID); }
-    switch (moduleID)
-    {
-      case V4L2_ACQUISITION_MODULE    :   break;
-      case OPENGL_ACQUISITION_MODULE    :  break;
-      case TEMPLATE_ACQUISITION_MODULE: /*TEMPLATE MODULE DOESNT MAP ANYTHING TO ANYTHING :P */ break;
-    };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionMapRGBToDepth");
     return 0;
 }
@@ -1279,34 +1185,16 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
 double acqusitionGetColorFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+   printCall(moduleID,devID,"acqusitionGetColorFocalLength");
    if  (*plugins[moduleID].getColorFocalLength!=0) { return  (*plugins[moduleID].getColorFocalLength) (devID); }
-
-    switch (moduleID)
-    {
-      case V4L2_ACQUISITION_MODULE    :   break;
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return  getTemplateColorFocalLength(devID);
-        #endif
-      break;
-    };
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetColorFocalLength");
     return 0.0;
 }
 
 double acqusitionGetColorPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    printCall(moduleID,devID,"acqusitionGetColorPixelSize");
     if  (*plugins[moduleID].getColorPixelSize!=0) { return  (*plugins[moduleID].getColorPixelSize) (devID); }
-
-    switch (moduleID)
-    {
-      case V4L2_ACQUISITION_MODULE    :   break;
-      case TEMPLATE_ACQUISITION_MODULE: /*TEMPLATE MODULE DOESNT MAP ANYTHING TO ANYTHING :P */
-        #if USE_TEMPLATE
-          return  getTemplateColorPixelSize(devID);
-        #endif
-      break;
-    };
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetColorPixelSize");
     return 0.0;
 }
@@ -1315,35 +1203,16 @@ double acqusitionGetColorPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
 
 double acqusitionGetDepthFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    printCall(moduleID,devID,"acqusitionGetFocalLength");
     if  (*plugins[moduleID].getDepthFocalLength!=0) { return  (*plugins[moduleID].getDepthFocalLength) (devID); }
-
-    switch (moduleID)
-    {
-      case V4L2_ACQUISITION_MODULE    :   break;
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return  getTemplateDepthFocalLength(devID);
-        #endif
-      break;
-    };
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetFocalLength");
     return 0.0;
 }
 
 double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    printCall(moduleID,devID,"acqusitionGetPixelSize");
     if  (*plugins[moduleID].getDepthPixelSize!=0) { return  (*plugins[moduleID].getDepthPixelSize) (devID); }
-
-
-    switch (moduleID)
-    {
-      case V4L2_ACQUISITION_MODULE    :   break;
-      case TEMPLATE_ACQUISITION_MODULE: /*TEMPLATE MODULE DOESNT MAP ANYTHING TO ANYTHING :P */
-        #if USE_TEMPLATE
-          return  getTemplateDepthPixelSize(devID);
-        #endif
-      break;
-    };
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetPixelSize");
     return 0.0;
 }

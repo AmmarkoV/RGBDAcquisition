@@ -289,7 +289,7 @@ int snapOpenNI2Frames(int devID)
   return readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
 }
 
-int createOpenNI2Device(int devID,unsigned int width,unsigned int height,unsigned int framerate)
+int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
   {
     if (! initializeOpenNIDevice(devID,device[devID],color[devID],depth[devID],width,height,framerate) )
      {

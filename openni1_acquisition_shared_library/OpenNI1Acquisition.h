@@ -17,7 +17,7 @@ extern "C"
    int mapOpenNI1RGBToDepth(int devID);
 
    //Basic Per Device Operations
-   int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigned int framerate);
+   int createOpenNI1Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyOpenNI1Device(int devID);
    int snapOpenNI1Frames(int devID);
 

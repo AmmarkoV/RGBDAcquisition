@@ -42,7 +42,7 @@
 
 //If you want Trajectory parser to be able to READ
 //and parse files you should set  USE_FILE_INPUT  to 1
-#define USE_FILE_INPUT 0
+#define USE_FILE_INPUT 1
 //-------------------------------------------------------
 
 #if USE_FILE_INPUT
@@ -715,18 +715,32 @@ int refreshVirtualStream(struct VirtualStream * newstream)
    return readVirtualStream(newstream);
 }
 
+
+
+
+void myStrCpy(char * destination,char * source,unsigned int maxDestinationSize)
+{
+  int i=0;
+  while ( (i<maxDestinationSize) && (source[i]!=0) ) { destination[i]=source[i]; ++i; }
+}
+
 struct VirtualStream * createVirtualStream(char * filename)
 {
   //Allocate a virtual stream structure
   struct VirtualStream * newstream = (struct VirtualStream *) malloc(sizeof(struct VirtualStream));
   if (newstream==0)  {  fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
 
+
   //Clear the whole damn thing..
   memset(newstream,0,sizeof(struct VirtualStream));
 
   if (filename!=0)
   {
-   strncpy(newstream->filename,filename,MAX_PATH);
+
+  fprintf(stderr,"strncpy from %p to %p \n",filename,newstream->filename);
+   //strncpy(newstream->filename,filename,MAX_PATH);
+     myStrCpy(newstream->filename,filename,MAX_PATH);
+  fprintf(stderr,"strncpy returned\n");
 
    if (!readVirtualStream(newstream))
     {

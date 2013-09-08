@@ -38,11 +38,15 @@ struct acquisitionPluginInterface
    int (*mapDepthToRGB) (int);
    int (*mapRGBToDepth) (int);
 
-   int (*createDevice)  (int,unsigned int,unsigned int,unsigned int);
+   int (*createDevice)  (int,char * devName,unsigned int,unsigned int,unsigned int);
    int (*destroyDevice) (int);
 
 
    int (*getNumberOfDevices) ();
+
+
+   unsigned long (*getLastColorTimestamp) (int);
+   unsigned long (*getLastDepthTimestamp) (int);
 
    int (*snapFrames) (int);
    int (*seekFrame)  (int,unsigned int);

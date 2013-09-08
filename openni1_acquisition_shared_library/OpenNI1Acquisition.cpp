@@ -158,7 +158,7 @@ int SignalOpenNIError(char * description , XnStatus rc)
 
 
    //Basic Per Device Operations
-int createOpenNI1Device(int devID,unsigned int width,unsigned int height,unsigned int framerate)
+int createOpenNI1Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     XnStatus rc;
     XnMapOutputMode mapMode;

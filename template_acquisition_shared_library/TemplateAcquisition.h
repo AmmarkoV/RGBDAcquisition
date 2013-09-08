@@ -13,9 +13,9 @@ extern "C"
 {
 #endif
    //Initialization of Template
-   int startTemplate(unsigned int max_devs,char * settings);
+   int startTemplateModule(unsigned int max_devs,char * settings);
    int getTemplateNumberOfDevices(); // This has to be called AFTER startTemplate
-   int stopTemplate();
+   int stopTemplateModule();
 
    //Basic Per Device Operations
    int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);

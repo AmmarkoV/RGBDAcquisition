@@ -125,7 +125,9 @@ int updateProjectionMatrix()
 
 int initScene(char * confFile)
 {
+  fprintf(stderr,"Initializing Scene\n");
   scene = createVirtualStream(confFile);
+  fprintf(stderr,"createVirtualStream returned \n");
   if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
 
   glEnable(GL_DEPTH_TEST); /* enable depth buffering */
