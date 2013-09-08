@@ -38,39 +38,9 @@ int removeFloodFillBeforeProcessing(unsigned char * source , unsigned char * tar
   return 1;
 }
 
-/*
-int removeFloodFillAfterProcessing(unsigned char * source  , unsigned char * target  , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf  )
-{
-  if (segConf->floodErase.totalPoints==0) { return 0; }
-  unsigned char sR , sG, sB ;
-
-  int i=0;
-  for (i=0; i<segConf->floodErase.totalPoints; i++)
-  {
-     //fprintf(stderr,"Flood Filling After %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
-     if (segConf->floodErase.target)
-     {
-
-       unsigned char * srcColor = (unsigned char *) target  + ( (segConf->floodErase.pX[i]*3) + segConf->floodErase.pY[i] * width*3 );
-       sR = *srcColor; ++srcColor;
-       sG = *srcColor; ++srcColor;
-       sB = *srcColor; ++srcColor;
-
-       floodFill(target , width, height ,
-                 segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i],
-                 sR,sG,sB , 0 , 0 , 0    , 0);
-     }
-
-     //fprintf(stderr,"Flood Filled After %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
-  }
-
-  return 1;
-}
-*/
 
 
-
-unsigned char * selectSegmentationForRGBFrame(char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
+unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
 {
  unsigned char * sourceCopy = (unsigned char *) malloc( width * height * 3 * sizeof( unsigned char));
  if ( sourceCopy == 0) { return 0; }
@@ -146,7 +116,7 @@ unsigned char * selectSegmentationForRGBFrame(char * source , unsigned int width
 
 
 
-unsigned char * selectSegmentationForDepthFrame(short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf)
+unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf)
 {
  short * target = (short *) malloc( width * height * sizeof(short));
  if ( target == 0) { return 0; }
@@ -206,7 +176,7 @@ unsigned char * selectSegmentationForDepthFrame(short * source , unsigned int wi
 }
 
 
-int   segmentRGBAndDepthFrame (    char * RGB ,
+int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
                                    unsigned short * Depth ,
                                    unsigned int width , unsigned int height ,
                                    struct SegmentationFeaturesRGB * segConfRGB ,

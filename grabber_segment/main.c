@@ -21,6 +21,22 @@ int makepath(char * path)
     return system(command);
 }
 
+unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
+{
+  unsigned char * output = (unsigned char*) malloc(width*height*3*sizeof(unsigned char));
+  if (output==0) { return 0; }
+  memcpy(output , source , width*height*3*sizeof(unsigned char));
+  return output;
+}
+
+unsigned short * copyDepth(unsigned short * source , unsigned int width , unsigned int height)
+{
+  unsigned short * output = (unsigned short*) malloc(width*height*sizeof(unsigned short));
+  if (output==0) { return 0; }
+  memcpy(output , source , width*height*sizeof(unsigned short));
+  return output;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -170,8 +186,6 @@ int main(int argc, char *argv[])
     short * depthOut = ( short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
 
-   //TODO : Add this
-   //acquisitionSimulateTime(unsigned long timeInMillisecs)
 
 
    float centerX;
@@ -182,10 +196,12 @@ int main(int argc, char *argv[])
     {
         acquisitionSnapFrames(moduleID_1,devID_1);
 
+        unsigned char * segmentedRGB = copyRGB(acquisitionGetColorFrame(moduleID_1,devID_1) ,widthRGB , heightRGB);
+        unsigned short * segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID_1,devID_1) ,widthDepth , heightDepth);
 
         segmentRGBAndDepthFrame (
-                                   acquisitionGetColorFrame(moduleID_1,devID_1) ,
-                                   acquisitionGetDepthFrame(moduleID_1,devID_1) ,
+                                   segmentedRGB ,
+                                   segmentedDepth ,
                                    widthRGB , heightRGB,
                                    &segConfRGB ,
                                    &segConfDepth ,
@@ -197,14 +213,8 @@ int main(int argc, char *argv[])
         acquisitionSimulateTime( acquisitionGetColorTimestamp(moduleID_1,devID_1) );
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         if (doNotSegmentRGB)
-        { saveRawImageToFile(outfilename,acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB,heightRGB,channelsRGB,bitsperpixelRGB); }
-         else
-        {
-            /*
-         char * segmentedRGB = segmentRGBFrame(acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB , heightRGB, &segConfRGB);
-         saveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
-         free (segmentedRGB);*/
-        }
+        { saveRawImageToFile(outfilename,acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB,heightRGB,channelsRGB,bitsperpixelRGB); } else
+        { saveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB); }
 
 
         acquisitionSimulateTime( acquisitionGetDepthTimestamp(moduleID_1,devID_1) );
@@ -212,24 +222,19 @@ int main(int argc, char *argv[])
         if (doNotSegmentDepth)
         { saveRawImageToFile(outfilename,(char*) acquisitionGetDepthFrame(moduleID_1,devID_1),widthDepth,heightDepth,channelsDepth,bitsperpixelDepth); }
          else
-        {/*
-         short * segmentedDepth = segmentDepthFrame(acquisitionGetDepthFrame(moduleID_1,devID_1), widthDepth,heightDepth,&segConfDepth);
+        {
          saveRawImageToFile(outfilename,(char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
-         getDepthBlobAverage(&centerX,&centerY,&centerZ,segmentedDepth,widthDepth,heightDepth);
-         fprintf(stderr,"AVG!%0.2f#%0.2f#%0.2f\n",centerX,centerY,centerZ);
-         free (segmentedDepth);*/
+         //getDepthBlobAverage(&centerX,&centerY,&centerZ,segmentedDepth,widthDepth,heightDepth);
         }
 
-
+       free (segmentedRGB);
+       free (segmentedDepth);
     }
 
 
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
     acquisitionCloseDevice(moduleID_1,devID_1);
 
-
     acquisitionStopModule(moduleID_1);
-
-
     return 0;
 }

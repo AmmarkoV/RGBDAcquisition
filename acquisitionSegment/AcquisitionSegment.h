@@ -51,10 +51,10 @@ struct SegmentationFeaturesDepth
 
 };
 
-unsigned char * selectSegmentationForRGBFrame(char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf);
-unsigned char * selectSegmentationForDepthFrame(short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf);
+unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf);
+unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf);
 
-int   segmentRGBAndDepthFrame (    char * RGB ,
+int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
                                    unsigned short * Depth ,
                                    unsigned int width , unsigned int height ,
                                    struct SegmentationFeaturesRGB * segConfRGB ,
