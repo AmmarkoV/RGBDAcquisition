@@ -38,7 +38,7 @@ int removeFloodFillBeforeProcessing(unsigned char * source , unsigned char * tar
   return 1;
 }
 
-
+/*
 int removeFloodFillAfterProcessing(unsigned char * source  , unsigned char * target  , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf  )
 {
   if (segConf->floodErase.totalPoints==0) { return 0; }
@@ -66,7 +66,7 @@ int removeFloodFillAfterProcessing(unsigned char * source  , unsigned char * tar
 
   return 1;
 }
-
+*/
 
 
 
@@ -87,17 +87,16 @@ unsigned char * selectSegmentationForRGBFrame(char * source , unsigned int width
  unsigned int posX = 0;
  unsigned int posY = 0;
  unsigned int sourceWidthStep = width * 3;
- unsigned int targetWidthStep = width * 3;
 
  char * sourcePixelsStart   = (char*) sourceCopy + ( (posX*3) + posY * sourceWidthStep );
  char * sourcePixelsLineEnd = sourcePixelsStart + (width*3);
  char * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
  char * sourcePixels = sourcePixelsStart;
 
- char * targetPixelsStart   = (char*) target + ( (posX*3) + posY * targetWidthStep );
- char * targetPixelsLineEnd = targetPixelsStart + (width*3);
- char * targetPixelsEnd     = targetPixelsLineEnd + ((height-1) * targetWidthStep );
- char * targetPixels = targetPixelsStart;
+ unsigned char * selectedRGB   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
+ memset(selectedRGB,0,width*height*sizeof(unsigned char));
+
+ unsigned char * selectedPtr   = selectedRGB;
 
  unsigned int x=0 , y=0;
  unsigned char * R , * G , * B;
@@ -107,7 +106,7 @@ unsigned char * selectSegmentationForRGBFrame(char * source , unsigned int width
    if ( (y<segConf->minY) || (y>segConf->maxY) )
    {
      sourcePixels+=sourceWidthStep;
-     targetPixels+=targetWidthStep;
+     selectedPtr+=width;
    } else
    {
      x=0;
@@ -125,36 +124,24 @@ unsigned char * selectSegmentationForRGBFrame(char * source , unsigned int width
                (segConf->minX <= x) && ( x<= segConf->maxX)
            )
        {
-         if (segConf->enableReplacingColors)
-         {
-           *targetPixels=segConf->replaceR; targetPixels++;
-           *targetPixels=segConf->replaceG; targetPixels++;
-           *targetPixels=segConf->replaceB; targetPixels++;
-         }
-          else
-         {
-          *targetPixels=*R; targetPixels++;
-          *targetPixels=*G; targetPixels++;
-          *targetPixels=*B; targetPixels++;
-         }
+          *selectedPtr=1;
        } else
        {
-         targetPixels+=3;
+          *selectedPtr=0;
        }
 
+        ++selectedPtr;
         ++x;
       }
    }
    sourcePixelsLineEnd+=sourceWidthStep;
-   targetPixelsLineEnd+=targetWidthStep;
+   selectedPtr+=width;
    ++y;
  }
 
 
- removeFloodFillAfterProcessing(sourceCopy , target,width,height,segConf  );
-
  free(sourceCopy);
- return target;
+ return selectedRGB;
 }
 
 
