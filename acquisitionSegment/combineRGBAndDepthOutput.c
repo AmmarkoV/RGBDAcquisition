@@ -15,13 +15,14 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
   unsigned char * tmpRGB;
   unsigned char * ptrRGB = RGB;
   unsigned char * ptrRGBLimit = RGB + ( width * height * 3 );
+  unsigned char * selectedPtr = selectedRGB;
 
   if (segConf->enableReplacingColors)
   { //We replace colors with something
     while (ptrRGB < ptrRGBLimit )
     {
       tmpRGB=ptrRGB;
-      if ( *selectedRGB )
+      if ( *selectedPtr!=0 )
          {
             *tmpRGB=segConf->replaceR; ++tmpRGB;
             *tmpRGB=segConf->replaceG; ++tmpRGB;
@@ -33,14 +34,14 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
             *tmpRGB=segConf->eraseColorB;
          }
 
-      ++selectedRGB;
+      ++selectedPtr;
       ptrRGB+=3;
     }
   }  else
   {
     while (ptrRGB < ptrRGBLimit )
     {
-      if ( ! *selectedRGB )
+      if ( *selectedPtr==0 )
          {
             tmpRGB=ptrRGB;
             *tmpRGB=segConf->eraseColorR; ++tmpRGB;
@@ -48,11 +49,11 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
             *tmpRGB=segConf->eraseColorB;
          }
 
-      ++selectedRGB;
+      ++selectedPtr;
       ptrRGB+=3;
     }
   }
-
+  return 1;
 }
 
 
@@ -63,14 +64,19 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
 
 int executeSegmentationDepth(unsigned short * Depth , unsigned char * selectedDepth , unsigned int width , unsigned int height ,  struct SegmentationFeaturesDepth * segConf )
 {
+  if (Depth==0) { fprintf(stderr,"Wrong Depth Array while @ executeSegmentationDepth\n"); return 0; }
+  if (selectedDepth==0) { fprintf(stderr,"Wrong selectedDepth Array while @ executeSegmentationDepth\n"); return 0; }
+
   unsigned short * ptrDepth = Depth;
   unsigned short * ptrDepthLimit = Depth + ( width * height );
+  unsigned char * selectedPtr = selectedDepth;
 
 
   while (ptrDepth < ptrDepthLimit )
     {
-      if (!*selectedDepth) { *ptrDepth = (unsigned short) 0 ; }
-      ++selectedDepth; ++ptrDepth;
+      if (*selectedPtr==0) { *ptrDepth = (unsigned short) 0 ; }
+                           // else  { *ptrDepth = (unsigned short) 40000 ; }
+      ++selectedPtr; ++ptrDepth;
     }
   return 1;
 }
@@ -132,5 +138,5 @@ unsigned char * combineRGBAndDepthToOutput( unsigned char * selectedRGB , unsign
   };
 
 
-  return 0;
+  return result;
 }

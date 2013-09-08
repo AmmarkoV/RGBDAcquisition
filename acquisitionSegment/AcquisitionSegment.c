@@ -134,13 +134,11 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  short * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
  short * sourcePixels = sourcePixelsStart;
 
- short * targetPixelsStart   = (short*) target + ( (posX) + posY * targetWidthStep );
- short * targetPixelsLineEnd = targetPixelsStart + (width);
- short * targetPixelsEnd     = targetPixelsLineEnd + ((height-1) * targetWidthStep );
- short * targetPixels = targetPixelsStart;
+ unsigned char * selectedDepth   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
+ if (selectedDepth==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
+ memset(selectedDepth,0,width*height*sizeof(unsigned char));
 
-
-//acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  );
+ unsigned char * selectedPtr   = selectedDepth;
 
  unsigned int x =0;
  unsigned int y =0;
@@ -148,31 +146,26 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  float x3D;
  float y3D;
  float z3D;
+//acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x3D, float *y3D , float *z3D  );
 
- short * depth;
+ unsigned short * depth;
  while (sourcePixels<sourcePixelsEnd)
  {
    while (sourcePixels<sourcePixelsLineEnd)
     {
      depth = sourcePixels++;
 
-     if  ( (segConf->minDepth <= *depth) && (*depth <= segConf->maxDepth) )
-       {
-         *targetPixels=*depth; targetPixels++;
-       } else
-       {
-         targetPixels++;
-       }
+     if  ( (segConf->minDepth <= *depth) && (*depth <= segConf->maxDepth) ) { *selectedPtr=1; } else
+                                                                            { *selectedPtr=0; }
 
-
-       ++x;
-       if (x>=width) { x=0; ++y;}
-     }
+     ++selectedPtr;
+     ++x;
+     if (x>=width) { x=0; ++y;}
+    }
    sourcePixelsLineEnd+=sourceWidthStep;
-   targetPixelsLineEnd+=targetWidthStep;
  }
 
- return target;
+ return selectedDepth;
 }
 
 
@@ -208,13 +201,18 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
      //the combinationMode switch ( see enum combinationModesEnumerator ) , we first make a new selection
      //and then execute the segmentation using it
      unsigned char *  combinedSelection = combineRGBAndDepthToOutput(selectedRGB,selectedDepth,combinationMode,width,height);
+     if (combinedSelection==0)
+     {
+       fprintf(stderr,"Failed to combine outputs using method %u\Cannot execute segmentation\n",combinationMode);
+     } else
+     {
+      //We use the combinedSelection for both RGB and Depth
+      executeSegmentationRGB(RGB,combinedSelection,width,height,segConfRGB);
+      executeSegmentationDepth(Depth,combinedSelection,width,height,segConfDepth);
 
-     //We use the combinedSelection for both RGB and Depth
-     executeSegmentationRGB(RGB,combinedSelection,width,height,segConfRGB);
-     executeSegmentationDepth(Depth,combinedSelection,width,height,segConfDepth);
-
-     //And we dont forget to free our memory
-     if (combinedSelection!=0) { free(combinedSelection); combinedSelection=0; }
+      //And we dont forget to free our memory
+      if (combinedSelection!=0) { free(combinedSelection); combinedSelection=0; }
+     }
   }
 
 

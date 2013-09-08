@@ -38,6 +38,20 @@ unsigned short * copyDepth(unsigned short * source , unsigned int width , unsign
 }
 
 
+int pickCombinationModeFromString(char * str)
+{
+  if (strcmp(str,"and")==0) { return COMBINE_AND; } else
+  if (strcmp(str,"or")==0)  { return COMBINE_OR; } else
+  if (strcmp(str,"xor")==0) { return COMBINE_XOR; } else
+  if (strcmp(str,"rgb")==0) { return COMBINE_KEEP_ONLY_RGB; } else
+  if (strcmp(str,"depth")==0) { return COMBINE_KEEP_ONLY_DEPTH; }
+
+  fprintf(stderr,"Could not understand combination method %s\n",str);
+  return DONT_COMBINE;
+}
+
+
+
 int main(int argc, char *argv[])
 {
  fprintf(stderr,"Generic Multiplexed Grabber Application based on Acquisition lib .. \n");
@@ -125,6 +139,7 @@ int main(int argc, char *argv[])
     if (strcmp(argv[i],"-replaceRGB")==0) { segConfRGB.replaceR = atoi(argv[i+1]); segConfRGB.replaceG = atoi(argv[i+2]); segConfRGB.replaceB = atoi(argv[i+3]); segConfRGB.enableReplacingColors=1; } else
     if (strcmp(argv[i],"-minDepth")==0)   { segConfDepth.minDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
     if (strcmp(argv[i],"-maxDepth")==0)   { segConfDepth.maxDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
+    if (strcmp(argv[i],"-combine")==0)    { combinationMode=pickCombinationModeFromString(argv[i+1]); }     else
     if (
          (strcmp(argv[i],"-to")==0) ||
          (strcmp(argv[i],"-o")==0)
@@ -212,20 +227,13 @@ int main(int argc, char *argv[])
 
         acquisitionSimulateTime( acquisitionGetColorTimestamp(moduleID_1,devID_1) );
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
-        if (doNotSegmentRGB)
-        { saveRawImageToFile(outfilename,acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB,heightRGB,channelsRGB,bitsperpixelRGB); } else
-        { saveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB); }
+         saveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
 
 
         acquisitionSimulateTime( acquisitionGetDepthTimestamp(moduleID_1,devID_1) );
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
-        if (doNotSegmentDepth)
-        { saveRawImageToFile(outfilename,(char*) acquisitionGetDepthFrame(moduleID_1,devID_1),widthDepth,heightDepth,channelsDepth,bitsperpixelDepth); }
-         else
-        {
-         saveRawImageToFile(outfilename,(char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
-         //getDepthBlobAverage(&centerX,&centerY,&centerZ,segmentedDepth,widthDepth,heightDepth);
-        }
+        saveRawImageToFile(outfilename,(char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
+        //getDepthBlobAverage(&centerX,&centerY,&centerZ,segmentedDepth,widthDepth,heightDepth);
 
        free (segmentedRGB);
        free (segmentedDepth);
