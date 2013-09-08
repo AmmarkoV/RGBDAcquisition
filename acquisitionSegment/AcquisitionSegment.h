@@ -15,11 +15,15 @@ struct floodErasePoints
 
 struct SegmentationFeaturesRGB
 {
+   unsigned char eraseColorR , eraseColorG , eraseColorB;
+
    unsigned int minR ,  minG ,  minB;
    unsigned int maxR , maxG , maxB;
 
    unsigned int minX , maxX;
    unsigned int minY , maxY;
+
+
 
 
    unsigned char replaceR , replaceG , replaceB;
