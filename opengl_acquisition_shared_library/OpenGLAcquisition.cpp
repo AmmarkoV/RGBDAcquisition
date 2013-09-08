@@ -15,7 +15,7 @@ struct calibration calibRGB;
 struct calibration calibDepth;
 
 
-int startOpenGL(unsigned int max_devs)
+int startOpenGLModule(unsigned int max_devs)
 {
   return 1;
 }
@@ -25,7 +25,7 @@ int getOpenGLNumberOfDevices()
    return 1;
 }
 
-int stopOpenGL()
+int stopOpenGLModule()
 {
    return 1;
 }

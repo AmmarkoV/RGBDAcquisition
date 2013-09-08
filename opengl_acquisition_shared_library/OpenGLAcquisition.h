@@ -10,9 +10,9 @@ extern "C"
 #endif
 
 
-int startOpenGL(unsigned int max_devs) ;
+int startOpenGLModule(unsigned int max_devs) ;
 int getOpenGLNumberOfDevices() ;
-int stopOpenGL() ;
+int stopOpenGLModule() ;
 int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate) ;
 int destroyOpenGLDevice(int devID) ;
 int snapOpenGLFrames(int devID) ;

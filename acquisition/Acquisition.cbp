@@ -39,6 +39,7 @@
 		<Linker>
 			<Add library="rt" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="dl" />
 		</Linker>
 		<Unit filename="Acquisition.c">
 			<Option compilerVar="CC" />

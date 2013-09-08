@@ -44,6 +44,7 @@
 			<Add library="AmmarServer/src/AmmServerlib/libAmmServerlib.a" />
 			<Add library="rt" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="dl" />
 		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />

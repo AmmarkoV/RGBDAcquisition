@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="OpenNI1Acquisition.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="OpenNI1Acquisition.h" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3226" topLine="64" />
+			<Cursor1 position="351" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="OpenNI1Acquisition.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="OpenNI1Acquisition.cpp" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="506" topLine="0" />
+			<Cursor1 position="3551" topLine="124" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
