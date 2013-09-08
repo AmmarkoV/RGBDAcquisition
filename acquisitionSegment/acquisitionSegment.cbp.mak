@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = libacquisitionSegment.a
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/AcquisitionSegment.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/AcquisitionSegment.o $(OBJDIR_DEBUG)/combineRGBAndDepthOutput.o $(OBJDIR_DEBUG)/imageProcessing.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/AcquisitionSegment.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/AcquisitionSegment.o $(OBJDIR_RELEASE)/combineRGBAndDepthOutput.o $(OBJDIR_RELEASE)/imageProcessing.o
 
 all: debug release
 
@@ -61,6 +61,12 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 $(OBJDIR_DEBUG)/AcquisitionSegment.o: AcquisitionSegment.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c AcquisitionSegment.c -o $(OBJDIR_DEBUG)/AcquisitionSegment.o
 
+$(OBJDIR_DEBUG)/combineRGBAndDepthOutput.o: combineRGBAndDepthOutput.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c combineRGBAndDepthOutput.c -o $(OBJDIR_DEBUG)/combineRGBAndDepthOutput.o
+
+$(OBJDIR_DEBUG)/imageProcessing.o: imageProcessing.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c imageProcessing.c -o $(OBJDIR_DEBUG)/imageProcessing.o
+
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf $(OBJDIR_DEBUG)
@@ -77,6 +83,12 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 
 $(OBJDIR_RELEASE)/AcquisitionSegment.o: AcquisitionSegment.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c AcquisitionSegment.c -o $(OBJDIR_RELEASE)/AcquisitionSegment.o
+
+$(OBJDIR_RELEASE)/combineRGBAndDepthOutput.o: combineRGBAndDepthOutput.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c combineRGBAndDepthOutput.c -o $(OBJDIR_RELEASE)/combineRGBAndDepthOutput.o
+
+$(OBJDIR_RELEASE)/imageProcessing.o: imageProcessing.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c imageProcessing.c -o $(OBJDIR_RELEASE)/imageProcessing.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
