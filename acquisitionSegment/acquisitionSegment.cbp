@@ -39,6 +39,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AcquisitionSegment.h" />
+		<Unit filename="combineRGBAndDepthOutput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="combineRGBAndDepthOutput.h" />
+		<Unit filename="imageProcessing.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="imageProcessing.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

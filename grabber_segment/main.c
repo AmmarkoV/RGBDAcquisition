@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
    int doNotSegmentDepth=1;
 
 
+   int combinationMode=DONT_COMBINE;
+
 
    struct SegmentationFeaturesRGB segConfRGB={0};
 
@@ -180,15 +182,28 @@ int main(int argc, char *argv[])
     {
         acquisitionSnapFrames(moduleID_1,devID_1);
 
+
+        segmentRGBAndDepthFrame (
+                                   acquisitionGetColorFrame(moduleID_1,devID_1) ,
+                                   acquisitionGetDepthFrame(moduleID_1,devID_1) ,
+                                   widthRGB , heightRGB,
+                                   &segConfRGB ,
+                                   &segConfDepth ,
+                                   combinationMode
+                                );
+
+
+
         acquisitionSimulateTime( acquisitionGetColorTimestamp(moduleID_1,devID_1) );
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         if (doNotSegmentRGB)
         { saveRawImageToFile(outfilename,acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB,heightRGB,channelsRGB,bitsperpixelRGB); }
          else
         {
+            /*
          char * segmentedRGB = segmentRGBFrame(acquisitionGetColorFrame(moduleID_1,devID_1),widthRGB , heightRGB, &segConfRGB);
          saveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
-         free (segmentedRGB);
+         free (segmentedRGB);*/
         }
 
 
@@ -197,12 +212,12 @@ int main(int argc, char *argv[])
         if (doNotSegmentDepth)
         { saveRawImageToFile(outfilename,(char*) acquisitionGetDepthFrame(moduleID_1,devID_1),widthDepth,heightDepth,channelsDepth,bitsperpixelDepth); }
          else
-        {
+        {/*
          short * segmentedDepth = segmentDepthFrame(acquisitionGetDepthFrame(moduleID_1,devID_1), widthDepth,heightDepth,&segConfDepth);
          saveRawImageToFile(outfilename,(char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
          getDepthBlobAverage(&centerX,&centerY,&centerZ,segmentedDepth,widthDepth,heightDepth);
          fprintf(stderr,"AVG!%0.2f#%0.2f#%0.2f\n",centerX,centerY,centerZ);
-         free (segmentedDepth);
+         free (segmentedDepth);*/
         }
 
 

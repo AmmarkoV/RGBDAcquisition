@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "combineRGBAndDepthOutput.h"
+
+
 #include "AcquisitionSegment.h"
 
 #include "imageProcessing.h"
@@ -66,7 +70,7 @@ int removeFloodFillAfterProcessing(unsigned char * source  , unsigned char * tar
 
 
 
-char * segmentRGBFrame(char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
+unsigned char * selectSegmentationForRGBFrame(char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
 {
  unsigned char * sourceCopy = (unsigned char *) malloc( width * height * 3 * sizeof( unsigned char));
  if ( sourceCopy == 0) { return 0; }
@@ -153,7 +157,9 @@ char * segmentRGBFrame(char * source , unsigned int width , unsigned int height 
  return target;
 }
 
-short * segmentDepthFrame(short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf)
+
+
+unsigned char * selectSegmentationForDepthFrame(short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf)
 {
  short * target = (short *) malloc( width * height * sizeof(short));
  if ( target == 0) { return 0; }
@@ -213,4 +219,32 @@ short * segmentDepthFrame(short * source , unsigned int width , unsigned int hei
 }
 
 
+int   segmentRGBAndDepthFrame (    char * RGB ,
+                                   unsigned short * Depth ,
+                                   unsigned int width , unsigned int height ,
+                                   struct SegmentationFeaturesRGB * segConfRGB ,
+                                   struct SegmentationFeaturesDepth * segConfDepth,
+                                   int combinationMode
+                               )
+{
+  unsigned char * selectedRGB = selectSegmentationForRGBFrame(RGB , width , height , segConfRGB);
+  unsigned char * selectedDepth = selectSegmentationForDepthFrame(Depth , width , height , segConfDepth);
 
+  if ( combinationMode != DONT_COMBINE )
+  {
+     unsigned char *  combinedSelection = combineRGBAndDepthToOutput(selectedRGB,selectedDepth,combinationMode,width,height);
+     executeSegmentationRGB(RGB,combinedSelection,width,height,segConfRGB);
+     executeSegmentationDepth(Depth,combinedSelection,width,height,segConfDepth);
+     if (combinedSelection!=0) { free(combinedSelection); combinedSelection=0; }
+  } else
+  {
+     executeSegmentationRGB(RGB,selectedRGB,width,height,segConfRGB);
+     executeSegmentationDepth(Depth,selectedDepth,width,height,segConfDepth);
+  }
+
+
+  if (selectedRGB!=0) { free(selectedRGB); selectedRGB=0; }
+  if (selectedDepth!=0) { free(selectedDepth); selectedDepth=0; }
+
+  return 1;
+}

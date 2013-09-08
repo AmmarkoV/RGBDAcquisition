@@ -2,6 +2,18 @@
 #define ACQUISITIONSEGMENT_H_INCLUDED
 
 
+enum combinationModesEnumerator
+{
+  DONT_COMBINE=0,
+  COMBINE_AND   ,
+  COMBINE_OR    ,
+  COMBINE_XOR   ,
+  COMBINE_KEEP_ONLY_RGB  ,
+  COMBINE_KEEP_ONLY_DEPTH ,
+  //-----------------------------
+  NUMBER_OF_COMBINATION_MODES
+};
+
 
 struct floodErasePoints
 {
@@ -23,9 +35,6 @@ struct SegmentationFeaturesRGB
    unsigned int minX , maxX;
    unsigned int minY , maxY;
 
-
-
-
    unsigned char replaceR , replaceG , replaceB;
    char enableReplacingColors;
 
@@ -42,10 +51,17 @@ struct SegmentationFeaturesDepth
 
 };
 
-char * segmentRGBFrame(char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf);
-short * segmentDepthFrame(short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf);
+unsigned char * selectSegmentationForRGBFrame(char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf);
+unsigned char * selectSegmentationForDepthFrame(short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf);
 
-int getDepthBlobAverage(float * centerX , float * centerY , float * centerZ , short * frame , unsigned int width , unsigned int height);
+int   segmentRGBAndDepthFrame (    char * RGB ,
+                                   unsigned short * Depth ,
+                                   unsigned int width , unsigned int height ,
+                                   struct SegmentationFeaturesRGB * segConfRGB ,
+                                   struct SegmentationFeaturesDepth * segConfDepth,
+                                   int combinationMode
+                               );
+
 
 
 #endif // ACQUISITIONSEGMENT_H_INCLUDED

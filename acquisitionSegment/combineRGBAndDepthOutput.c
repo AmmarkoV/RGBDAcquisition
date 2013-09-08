@@ -13,8 +13,8 @@
 int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , unsigned int width , unsigned int height ,  struct SegmentationFeaturesRGB * segConf )
 {
   unsigned char * tmpRGB;
-  unsigned char * ptrRGB = selectedRGB;
-  unsigned char * ptrRGBLimit = selectedRGB + ( width * height );
+  unsigned char * ptrRGB = RGB;
+  unsigned char * ptrRGBLimit = RGB + ( width * height );
 
   if (segConf->enableReplacingColors)
   { //We replace colors with something
@@ -56,6 +56,24 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
 }
 
 
+
+
+
+
+
+int executeSegmentationDepth(unsigned short * Depth , unsigned char * selectedDepth , unsigned int width , unsigned int height ,  struct SegmentationFeaturesDepth * segConf )
+{
+  unsigned short * ptrDepth = Depth;
+  unsigned short * ptrDepthLimit = Depth + ( width * height );
+
+
+  while (ptrDepth < ptrDepthLimit )
+    {
+      if (!*selectedDepth) { *ptrDepth = (unsigned short) 0 ; }
+      ++selectedDepth; ++ptrDepth;
+    }
+  return 1;
+}
 
 
 
