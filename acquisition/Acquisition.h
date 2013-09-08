@@ -36,6 +36,11 @@ struct acquisitionPluginInterface
    int (*stopModule) ();
 
    int (*mapDepthToRGB) (int);
+   int (*mapRGBToDepth) (int);
+
+   int (*createDevice)  (int,unsigned int,unsigned int,unsigned int);
+   int (*destroyDevice) (int);
+
 
    int (*getNumberOfDevices) ();
 
@@ -48,6 +53,11 @@ struct acquisitionPluginInterface
    int (*getColorChannels) (int);
    int (*getColorBitsPerPixel) (int);
    char * (*getColorPixels) (int);
+   double (*getColorFocalLength) (int);
+   double (*getColorPixelSize)   (int);
+   int (*getColorCalibration) (int,struct calibration *);
+   int (*setColorCalibration) (int,struct calibration *);
+
 
    int (*getDepthWidth) (int);
    int (*getDepthHeight) (int);
@@ -55,6 +65,10 @@ struct acquisitionPluginInterface
    int (*getDepthChannels) (int);
    int (*getDepthBitsPerPixel) (int);
    char * (*getDepthPixels) (int);
+   double (*getDepthFocalLength) (int);
+   double (*getDepthPixelSize)   (int);
+   int (*getDepthCalibration) (int,struct calibration *);
+   int (*setDepthCalibration) (int,struct calibration *);
 
 
 };

@@ -443,18 +443,27 @@ int linkToPlugin(char * moduleName,char * modulePath, ModuleIdentifier moduleID)
   sprintf(functionNameStr,"map%sDepthToRGB",moduleName);
   plugins[moduleID].mapDepthToRGB = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"map%sRGBToDepth",moduleName);
+  plugins[moduleID].mapRGBToDepth = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
+
+  sprintf(functionNameStr,"create%sDevice",moduleName);
+  plugins[moduleID].createDevice = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"destroy%sDevice",moduleName);
+  plugins[moduleID].destroyDevice = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
 
   sprintf(functionNameStr,"get%sNumberOfDevices",moduleName);
   plugins[moduleID].getNumberOfDevices = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
 
 
-
-
   sprintf(functionNameStr,"seek%sFrame",moduleName);
   plugins[moduleID].seekFrame = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
-
   sprintf(functionNameStr,"snap%sFrames",moduleName);
   plugins[moduleID].snapFrames = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
@@ -477,6 +486,19 @@ int linkToPlugin(char * moduleName,char * modulePath, ModuleIdentifier moduleID)
   sprintf(functionNameStr,"get%sColorPixels",moduleName);
   plugins[moduleID].getColorPixels = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sColorFocalLength",moduleName);
+  plugins[moduleID].getColorFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sColorPixelSize",moduleName);
+  plugins[moduleID].getColorPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sColorCalibration",moduleName);
+  plugins[moduleID].getColorCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"set%sColorCalibration",moduleName);
+  plugins[moduleID].setColorCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
 
 
   sprintf(functionNameStr,"get%sDepthWidth",moduleName);
@@ -497,6 +519,20 @@ int linkToPlugin(char * moduleName,char * modulePath, ModuleIdentifier moduleID)
   sprintf(functionNameStr,"get%sDepthPixels",moduleName);
   plugins[moduleID].getDepthPixels = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sDepthFocalLength",moduleName);
+  plugins[moduleID].getDepthFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sDepthPixelSize",moduleName);
+  plugins[moduleID].getDepthPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"get%sDepthCalibration",moduleName);
+  plugins[moduleID].getDepthCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  sprintf(functionNameStr,"set%sDepthCalibration",moduleName);
+  plugins[moduleID].setDepthCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+
+
 
   return 1;
 }
@@ -527,9 +563,8 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
       break;
       #endif
       case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return 1;
-        #endif
+          linkToPlugin("OpenGL","../opengl_acquisition_shared_library/libOpenGLAcquisition.so",moduleID);
+          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
@@ -538,18 +573,15 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
       break;
       case FREENECT_ACQUISITION_MODULE:
           linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/libFreenectAcquisition.so",moduleID);
-          fprintf(stderr,"Freenect devices %u \n",(*plugins[moduleID].getNumberOfDevices)() );
-          return (*plugins[moduleID].startModule) (maxDevices,settings);
+          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return startOpenNI1(maxDevices);
-        #endif
+          linkToPlugin("OpenNI1","../openni1_acquisition_shared_library/libOpenNI1Acquisition.so",moduleID);
+          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return startOpenNI2(maxDevices);
-        #endif
+          linkToPlugin("OpenNI2","../openni2_acquisition_shared_library/libOpenNI2Acquisition.so",moduleID);
+          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
     };
 
@@ -560,6 +592,10 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
 
 int acquisitionStopModule(ModuleIdentifier moduleID)
 {
+
+    if (*plugins[moduleID].stopModule!=0) { return (*plugins[moduleID].stopModule) (); }
+    unlinkPlugin(moduleID);
+
     switch (moduleID)
     {
       #if USE_V4L2
@@ -570,27 +606,9 @@ int acquisitionStopModule(ModuleIdentifier moduleID)
           return stopV4L2Stereo();
       break;
       #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return 1;
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return stopTemplate();
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-        unlinkPlugin(moduleID);
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return stopOpenNI1();
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return stopOpenNI2();
         #endif
       break;
     };
@@ -601,6 +619,8 @@ int acquisitionStopModule(ModuleIdentifier moduleID)
 
 int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
 {
+    if (plugins[moduleID].getNumberOfDevices!=0) { return (*plugins[moduleID].getNumberOfDevices) (); }
+
     switch (moduleID)
     {
       #if USE_V4L2
@@ -611,27 +631,9 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
           return getV4L2StereoNumberOfDevices();
       break;
       #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return getOpenGLNumberOfDevices();
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return getTemplateNumberOfDevices();
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-         if (plugins[moduleID].getNumberOfDevices!=0) { return (*plugins[moduleID].getNumberOfDevices) (); }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return getOpenNI1NumberOfDevices();
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return getOpenNI2NumberOfDevices();
         #endif
       break;
     };
@@ -646,6 +648,8 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
    ------------------------------------------*/
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
+    if (plugins[moduleID].createDevice!=0) { return (*plugins[moduleID].createDevice) (devID,width,height,framerate); }
+
     switch (moduleID)
     {
       #if USE_V4L2
@@ -656,25 +660,9 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
            return createV4L2StereoDevice(devID,devName,width,height,framerate);
       break;
       #endif // USE_V4L2
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return createOpenGLDevice(devID,devName,width,height,framerate);
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return createTemplateDevice(devID,devName,width,height,framerate);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:   break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return createOpenNI1Device(devID,width,height,framerate);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return createOpenNI2Device(devID,width,height,framerate);
         #endif
       break;
     };
@@ -684,6 +672,8 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    if (plugins[moduleID].destroyDevice!=0) { return (*plugins[moduleID].destroyDevice) (devID); }
+
     switch (moduleID)
     {
       #if USE_V4L2
@@ -694,25 +684,9 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
           return destroyV4L2StereoDevice(devID);
       break;
       #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return destroyOpenGLDevice(devID);
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return destroyTemplateDevice(devID);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:   break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return destroyOpenNI1Device(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return destroyOpenNI2Device(devID);
         #endif
       break;
     };
@@ -723,19 +697,15 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame)
 {
+    if (*plugins[moduleID].seekFrame!=0) { return (*plugins[moduleID].seekFrame) (devID,seekFrame); }
+
     switch (moduleID)
     {
-      case OPENGL_ACQUISITION_MODULE    :  break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return seekTemplateFrame(devID,seekFrame);
         #endif
       break;
-      case FREENECT_ACQUISITION_MODULE:
-         if (*plugins[moduleID].seekFrame!=0) { return (*plugins[moduleID].seekFrame) (devID,seekFrame); }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :   break;
-      case OPENNI2_ACQUISITION_MODULE : break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSeekFrame");
     return 0;
@@ -745,6 +715,8 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
     //fprintf(stderr,"acquisitionSnapFrames called moduleID=%u devID=%u\n",moduleID,devID);
+    if (*plugins[moduleID].snapFrames!=0) { return (*plugins[moduleID].snapFrames) (devID); }
+
     switch (moduleID)
     {
       #if USE_V4L2
@@ -755,27 +727,9 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
           return snapV4L2StereoFrames(devID);
       break;
       #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return snapOpenGLFrames(devID) ;
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return snapTemplateFrames(devID);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-         if (*plugins[moduleID].snapFrames!=0) { return (*plugins[moduleID].snapFrames) (devID); }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return snapOpenNI1Frames(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return snapOpenNI2Frames(devID);
         #endif
       break;
     };
@@ -787,6 +741,24 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 {
     char filenameFull[2048]={0};
     sprintf(filenameFull,"%s.pnm",filename);
+
+
+
+         if (
+              (*plugins[moduleID].getColorPixels!=0) && (*plugins[moduleID].getColorWidth!=0) && (*plugins[moduleID].getColorHeight!=0) &&
+              (*plugins[moduleID].getColorChannels!=0) && (*plugins[moduleID].getColorBitsPerPixel!=0)
+            )
+         {
+            return saveRawImageToFile(
+                                      filenameFull,
+                                      (*plugins[moduleID].getColorPixels)      (devID),
+                                      (*plugins[moduleID].getColorWidth)       (devID),
+                                      (*plugins[moduleID].getColorHeight)      (devID),
+                                      (*plugins[moduleID].getColorChannels)    (devID),
+                                      (*plugins[moduleID].getColorBitsPerPixel)(devID)
+                                     );
+         }
+
 
     switch (moduleID)
     {
@@ -802,40 +774,9 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
         return 1;
       break;
       #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return saveRawImageToFile(filenameFull,getOpenGLColorPixels(devID),getOpenGLColorWidth(devID),getOpenGLColorHeight(devID),getOpenGLColorChannels(devID),getOpenGLColorBitsPerPixel(devID));
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return saveRawImageToFile(filenameFull,getTemplateColorPixels(devID),getTemplateColorWidth(devID),getTemplateColorHeight(devID) ,getTemplateColorChannels(devID),getTemplateColorBitsPerPixel(devID));
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-         if (
-              (*plugins[moduleID].getColorPixels!=0) && (*plugins[moduleID].getColorWidth!=0) && (*plugins[moduleID].getColorHeight!=0) &&
-              (*plugins[moduleID].getColorChannels!=0) && (*plugins[moduleID].getColorBitsPerPixel!=0)
-            )
-         {
-            return saveRawImageToFile(
-                                      filenameFull,
-                                      (*plugins[moduleID].getColorPixels)      (devID),
-                                      (*plugins[moduleID].getColorWidth)       (devID),
-                                      (*plugins[moduleID].getColorHeight)      (devID),
-                                      (*plugins[moduleID].getColorChannels)    (devID),
-                                      (*plugins[moduleID].getColorBitsPerPixel)(devID)
-                                     );
-         }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return saveRawImageToFile(filenameFull,getOpenNI1ColorPixels(devID),getOpenNI1ColorWidth(devID),getOpenNI1ColorHeight(devID) ,getOpenNI1ColorChannels(devID),getOpenNI1ColorBitsPerPixel(devID));
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return saveRawImageToFile(filenameFull,getOpenNI2ColorPixels(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID) ,getOpenNI2ColorChannels(devID),getOpenNI2ColorBitsPerPixel(devID));
         #endif
       break;
     };
@@ -864,27 +805,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
     char filenameFull[2048]={0};
     sprintf(filenameFull,"%s.pnm",filename);
 
-    switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-           fprintf(stderr,"V4L2 Does not have a depth frame\n");
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          return saveRawImageToFile(filenameFull,getV4L2StereoDepthPixels(devID),getV4L2StereoDepthWidth(devID),getV4L2StereoDepthHeight(devID),getV4L2StereoDepthChannels(devID),getV4L2StereoDepthBitsPerPixel(devID));
-      break;
-      #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return saveRawImageToFile(filenameFull,(char*) getOpenGLDepthPixels(devID),getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID),getOpenGLDepthChannels(devID),getOpenGLDepthBitsPerPixel(devID));
-        #endif
-      break;
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return saveRawImageToFile(filenameFull,(char*) getTemplateDepthPixels(devID),getTemplateDepthWidth(devID),getTemplateDepthHeight(devID) ,getTemplateDepthChannels(devID),getTemplateDepthBitsPerPixel(devID));
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
+
           if (
               (*plugins[moduleID].getDepthPixels!=0) && (*plugins[moduleID].getDepthWidth!=0) && (*plugins[moduleID].getDepthHeight!=0) &&
               (*plugins[moduleID].getDepthChannels!=0) && (*plugins[moduleID].getDepthBitsPerPixel!=0)
@@ -899,15 +820,20 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
                                       (*plugins[moduleID].getDepthBitsPerPixel)(devID)
                                      );
          }
+
+    switch (moduleID)
+    {
+      #if USE_V4L2
+      case V4L2_ACQUISITION_MODULE    :
+           fprintf(stderr,"V4L2 Does not have a depth frame\n");
       break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-            return saveRawImageToFile(filenameFull,(char*) getOpenNI1DepthPixels(devID),getOpenNI1DepthWidth(devID),getOpenNI1DepthHeight(devID) ,getOpenNI1DepthChannels(devID),getOpenNI1DepthBitsPerPixel(devID));
-        #endif
+      case V4L2STEREO_ACQUISITION_MODULE    :
+          return saveRawImageToFile(filenameFull,getV4L2StereoDepthPixels(devID),getV4L2StereoDepthWidth(devID),getV4L2StereoDepthHeight(devID),getV4L2StereoDepthChannels(devID),getV4L2StereoDepthBitsPerPixel(devID));
       break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-            return saveRawImageToFile(filenameFull,(char*) getOpenNI2DepthPixels(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID) ,getOpenNI2DepthChannels(devID),getOpenNI2DepthBitsPerPixel(devID));
+      #endif
+      case TEMPLATE_ACQUISITION_MODULE:
+        #if USE_TEMPLATE
+          return saveRawImageToFile(filenameFull,(char*) getTemplateDepthPixels(devID),getTemplateDepthWidth(devID),getTemplateDepthHeight(devID) ,getTemplateDepthChannels(devID),getTemplateDepthBitsPerPixel(devID));
         #endif
       break;
     };
@@ -980,16 +906,13 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
 
 int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
+   if (*plugins[moduleID].getColorCalibration!=0) { return (*plugins[moduleID].getColorCalibration) (devID,calib); }
+
    switch (moduleID)
     {
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return getTemplateColorCalibration(devID,calib);
-        #endif
-      break;
-      case OPENGL_ACQUISITION_MODULE:
-        #if USE_OPENGL
-          return getOpenGLColorCalibration(devID,calib);
         #endif
       break;
     };
@@ -999,16 +922,13 @@ int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
+   if (*plugins[moduleID].getDepthCalibration!=0) { return (*plugins[moduleID].getDepthCalibration) (devID,calib); }
+
    switch (moduleID)
     {
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return getTemplateDepthCalibration(devID,calib);
-        #endif
-      break;
-      case OPENGL_ACQUISITION_MODULE:
-        #if USE_OPENGL
-          return getOpenGLDepthCalibration(devID,calib);
         #endif
       break;
     };
@@ -1022,16 +942,13 @@ int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
+   if (*plugins[moduleID].setColorCalibration!=0) { return (*plugins[moduleID].setColorCalibration) (devID,calib); }
+
    switch (moduleID)
     {
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return setTemplateColorCalibration(devID,calib);
-        #endif
-      break;
-      case OPENGL_ACQUISITION_MODULE:
-        #if USE_OPENGL
-          return setOpenGLColorCalibration(devID,calib);
         #endif
       break;
     };
@@ -1041,16 +958,13 @@ int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
+   if (*plugins[moduleID].setDepthCalibration!=0) { return (*plugins[moduleID].setDepthCalibration) (devID,calib); }
+
    switch (moduleID)
     {
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return setTemplateDepthCalibration(devID,calib);
-        #endif
-      break;
-      case OPENGL_ACQUISITION_MODULE:
-        #if USE_OPENGL
-          return setOpenGLDepthCalibration(devID,calib);
         #endif
       break;
     };
@@ -1090,6 +1004,8 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+  if (*plugins[moduleID].getColorPixels!=0) { return (*plugins[moduleID].getColorPixels) (devID); }
+
   switch (moduleID)
     {
       #if USE_V4L2
@@ -1100,27 +1016,9 @@ char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID
             return getV4L2StereoColorPixels(devID);
       break;
       #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return getOpenGLColorPixels(devID);
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return getTemplateColorPixels(devID);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-         if (*plugins[moduleID].getColorPixels!=0) { return (*plugins[moduleID].getColorPixels) (devID); }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-            return getOpenNI1ColorPixels(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-            return getOpenNI2ColorPixels(devID);
         #endif
       break;
     };
@@ -1159,6 +1057,8 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
 
 short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+  if (*plugins[moduleID].getDepthPixels!=0) { return (short*) (*plugins[moduleID].getDepthPixels) (devID); }
+
   switch (moduleID)
     {
       #if USE_V4L2
@@ -1169,27 +1069,9 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
             return getV4L2StereoDepthPixels(devID);
       break;
       #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return (short*) getOpenGLDepthPixels(devID);
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return (short*) getTemplateDepthPixels(devID);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-          if (*plugins[moduleID].getDepthPixels!=0) { return (short*) (*plugins[moduleID].getDepthPixels) (devID); }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-            return (short*) getOpenNI1DepthPixels(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-            return (short*) getOpenNI2DepthPixels(devID);
         #endif
       break;
     };
@@ -1260,6 +1142,19 @@ int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
         return 0;
     }
 
+
+         if (
+              (*plugins[moduleID].getColorWidth!=0) && (*plugins[moduleID].getColorHeight!=0) &&
+              (*plugins[moduleID].getColorChannels!=0) && (*plugins[moduleID].getColorBitsPerPixel!=0)
+            )
+            {
+              *width        = (*plugins[moduleID].getColorWidth)        (devID);
+              *height       = (*plugins[moduleID].getColorHeight)       (devID);
+              *channels     = (*plugins[moduleID].getColorChannels)     (devID);
+              *bitsperpixel = (*plugins[moduleID].getColorBitsPerPixel) (devID);
+              return 1;
+            }
+
   switch (moduleID)
     {
       #if USE_V4L2
@@ -1278,52 +1173,12 @@ int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
           return 1;
       break;
       #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          *width = getOpenGLColorWidth(devID);
-          *height = getOpenGLColorHeight(devID);
-          *channels = getOpenGLColorChannels(devID);
-          *bitsperpixel = getOpenGLColorBitsPerPixel(devID);
-          return 1;
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           *width = getTemplateColorWidth(devID);
           *height = getTemplateColorHeight(devID);
           *channels = getTemplateColorChannels(devID);
           *bitsperpixel = getTemplateColorBitsPerPixel(devID);
-          return 1;
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-         if (
-              (*plugins[moduleID].getColorWidth!=0) && (*plugins[moduleID].getColorHeight!=0) &&
-              (*plugins[moduleID].getColorChannels!=0) && (*plugins[moduleID].getColorBitsPerPixel!=0)
-            )
-            {
-              *width        = (*plugins[moduleID].getColorWidth)        (devID);
-              *height       = (*plugins[moduleID].getColorHeight)       (devID);
-              *channels     = (*plugins[moduleID].getColorChannels)     (devID);
-              *bitsperpixel = (*plugins[moduleID].getColorBitsPerPixel) (devID);
-              return 1;
-            }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          *width = getOpenNI1ColorWidth(devID);
-          *height = getOpenNI1ColorHeight(devID);
-          *channels = getOpenNI1ColorChannels(devID);
-          *bitsperpixel = getOpenNI1ColorBitsPerPixel(devID);
-          return 1;
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          *width = getOpenNI2ColorWidth(devID);
-          *height = getOpenNI2ColorHeight(devID);
-          *channels = getOpenNI2ColorChannels(devID);
-          *bitsperpixel = getOpenNI2ColorBitsPerPixel(devID);
           return 1;
         #endif
       break;
@@ -1343,6 +1198,19 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
         return 0;
     }
 
+
+         if (
+              (*plugins[moduleID].getDepthWidth!=0) && (*plugins[moduleID].getDepthHeight!=0) &&
+              (*plugins[moduleID].getDepthChannels!=0) && (*plugins[moduleID].getDepthBitsPerPixel!=0)
+            )
+            {
+              *width        = (*plugins[moduleID].getDepthWidth)        (devID);
+              *height       = (*plugins[moduleID].getDepthHeight)       (devID);
+              *channels     = (*plugins[moduleID].getDepthChannels)     (devID);
+              *bitsperpixel = (*plugins[moduleID].getDepthBitsPerPixel) (devID);
+              return 1;
+            }
+
   switch (moduleID)
     {
       #if USE_V4L2
@@ -1361,52 +1229,12 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
           return 1;
       break;
       #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          *width = getOpenGLDepthWidth(devID);
-          *height = getOpenGLDepthHeight(devID);
-          *channels = getOpenGLDepthChannels(devID);
-          *bitsperpixel = getOpenGLDepthBitsPerPixel(devID);
-          return 1;
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           *width = getTemplateDepthWidth(devID);
           *height = getTemplateDepthHeight(devID);
           *channels = getTemplateDepthChannels(devID);
           *bitsperpixel = getTemplateDepthBitsPerPixel(devID);
-          return 1;
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-         if (
-              (*plugins[moduleID].getDepthWidth!=0) && (*plugins[moduleID].getDepthHeight!=0) &&
-              (*plugins[moduleID].getDepthChannels!=0) && (*plugins[moduleID].getDepthBitsPerPixel!=0)
-            )
-            {
-              *width        = (*plugins[moduleID].getDepthWidth)        (devID);
-              *height       = (*plugins[moduleID].getDepthHeight)       (devID);
-              *channels     = (*plugins[moduleID].getDepthChannels)     (devID);
-              *bitsperpixel = (*plugins[moduleID].getDepthBitsPerPixel) (devID);
-              return 1;
-            }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          *width = getOpenNI1DepthWidth(devID);
-          *height = getOpenNI1DepthHeight(devID);
-          *channels = getOpenNI1DepthChannels(devID);
-          *bitsperpixel = getOpenNI1DepthBitsPerPixel(devID);
-          return 1;
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          *width = getOpenNI2DepthWidth(devID);
-          *height = getOpenNI2DepthHeight(devID);
-          *channels = getOpenNI2DepthChannels(devID);
-          *bitsperpixel = getOpenNI2DepthBitsPerPixel(devID);
           return 1;
         #endif
       break;
@@ -1418,6 +1246,8 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
  int acquisitionMapDepthToRGB(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    if  (*plugins[moduleID].mapDepthToRGB!=0) { return  (*plugins[moduleID].mapDepthToRGB) (devID); }
+
     switch (moduleID)
     {
       case OPENGL_ACQUISITION_MODULE    :
@@ -1426,19 +1256,6 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
         #endif
       break;
       case TEMPLATE_ACQUISITION_MODULE: /*TEMPLATE MODULE DOESNT MAP ANYTHING TO ANYTHING :P */ break;
-      case FREENECT_ACQUISITION_MODULE:
-          if  (*plugins[moduleID].mapDepthToRGB!=0) { return  (*plugins[moduleID].mapDepthToRGB) (devID); }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return  mapOpenNI1DepthToRGB(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return mapOpenNI2DepthToRGB(devID);
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionMapDepthToRGB");
     return 0;
@@ -1447,22 +1264,12 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
  int acquisitionMapRGBToDepth(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    if  (*plugins[moduleID].mapRGBToDepth!=0) { return  (*plugins[moduleID].mapRGBToDepth) (devID); }
     switch (moduleID)
     {
       case V4L2_ACQUISITION_MODULE    :   break;
       case OPENGL_ACQUISITION_MODULE    :  break;
       case TEMPLATE_ACQUISITION_MODULE: /*TEMPLATE MODULE DOESNT MAP ANYTHING TO ANYTHING :P */ break;
-      case FREENECT_ACQUISITION_MODULE:   break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return  mapOpenNI1RGBToDepth(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return mapOpenNI2RGBToDepth(devID);
-        #endif
-      break;
     };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionMapRGBToDepth");
     return 0;
@@ -1472,28 +1279,14 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
 double acqusitionGetColorFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+   if  (*plugins[moduleID].getColorFocalLength!=0) { return  (*plugins[moduleID].getColorFocalLength) (devID); }
+
     switch (moduleID)
     {
       case V4L2_ACQUISITION_MODULE    :   break;
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return getOpenGLColorFocalLength(devID);
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return  getTemplateColorFocalLength(devID);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:   break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return  getOpenNI1ColorFocalLength(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return  getOpenNI2ColorFocalLength(devID);
         #endif
       break;
     };
@@ -1503,28 +1296,14 @@ double acqusitionGetColorFocalLength(ModuleIdentifier moduleID,DeviceIdentifier 
 
 double acqusitionGetColorPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    if  (*plugins[moduleID].getColorPixelSize!=0) { return  (*plugins[moduleID].getColorPixelSize) (devID); }
+
     switch (moduleID)
     {
       case V4L2_ACQUISITION_MODULE    :   break;
-      case OPENGL_ACQUISITION_MODULE    :  break;
-        #if USE_OPENGL
-          return getOpenGLColorPixelSize(devID);
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE: /*TEMPLATE MODULE DOESNT MAP ANYTHING TO ANYTHING :P */
         #if USE_TEMPLATE
           return  getTemplateColorPixelSize(devID);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:   break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return  getOpenNI1ColorPixelSize(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return  getOpenNI2ColorPixelSize(devID);
         #endif
       break;
     };
@@ -1536,28 +1315,14 @@ double acqusitionGetColorPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
 
 double acqusitionGetDepthFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    if  (*plugins[moduleID].getDepthFocalLength!=0) { return  (*plugins[moduleID].getDepthFocalLength) (devID); }
+
     switch (moduleID)
     {
       case V4L2_ACQUISITION_MODULE    :   break;
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return getOpenGLDepthFocalLength(devID);
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE:
         #if USE_TEMPLATE
           return  getTemplateDepthFocalLength(devID);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:   break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return  getOpenNI1DepthFocalLength(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return  getOpenNI2DepthFocalLength(devID);
         #endif
       break;
     };
@@ -1567,28 +1332,15 @@ double acqusitionGetDepthFocalLength(ModuleIdentifier moduleID,DeviceIdentifier 
 
 double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    if  (*plugins[moduleID].getDepthPixelSize!=0) { return  (*plugins[moduleID].getDepthPixelSize) (devID); }
+
+
     switch (moduleID)
     {
       case V4L2_ACQUISITION_MODULE    :   break;
-      case OPENGL_ACQUISITION_MODULE    :  break;
-        #if USE_OPENGL
-          return getOpenGLDepthPixelSize(devID);
-        #endif
-      break;
       case TEMPLATE_ACQUISITION_MODULE: /*TEMPLATE MODULE DOESNT MAP ANYTHING TO ANYTHING :P */
         #if USE_TEMPLATE
           return  getTemplateDepthPixelSize(devID);
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:   break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return  getOpenNI1DepthPixelSize(devID);
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return  getOpenNI2DepthPixelSize(devID);
         #endif
       break;
     };

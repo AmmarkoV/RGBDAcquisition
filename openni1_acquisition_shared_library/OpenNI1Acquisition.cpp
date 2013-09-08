@@ -3,7 +3,6 @@
 
 #include "OpenNI1Acquisition.h"
 
-#if USE_OPENNI1
 #include <XnOS.h>
 #include <XnCppWrapper.h>
 #include <XnLog.h>
@@ -62,7 +61,7 @@ int mapOpenNI1RGBToDepth(int devID)
   return 1;
 }
 
-int startOpenNI1(unsigned int max_devs)
+int startOpenNI1Module(unsigned int max_devs)
 {
  EnumerationErrors errors;
  XnStatus rc;
@@ -143,7 +142,7 @@ int startOpenNI1(unsigned int max_devs)
 int getOpenNI1NumberOfDevices()  {  fprintf(stderr,"getOpenNI1NumberOfDevices is a stub it always returns 1\n");  return 1; }
 
 
-int stopOpenNI1()
+int stopOpenNI1Module()
 {
   ctx.Release();
 
@@ -319,4 +318,3 @@ double getOpenNI1DepthPixelSize(int devID)
 	depthGenerators[devID].GetRealProperty ("ZPPS", pixelSize);
     return (double) pixelSize;
 }
-#endif

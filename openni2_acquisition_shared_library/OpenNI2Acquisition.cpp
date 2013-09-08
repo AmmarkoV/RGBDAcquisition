@@ -1,7 +1,6 @@
 #include <unistd.h>
 #include "OpenNI2Acquisition.h"
 
-#if USE_OPENNI2
 #include <OpenNI.h>
 #include <PS1080.h>
 
@@ -274,12 +273,12 @@ int mapOpenNI2RGBToDepth(int devID)
 
 
 
-int startOpenNI2(unsigned int max_devs)
+int startOpenNI2Module(unsigned int max_devs)
 {
     return initializeOpenNI(max_devs);
 }
 
-int stopOpenNI2()
+int stopOpenNI2Module()
 {
     return closeOpenNI();
 }
@@ -413,6 +412,3 @@ double getOpenNI2DepthPixelSize(int devID)
     depth[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
     return (double) zpps;
 }
-
-
-#endif
