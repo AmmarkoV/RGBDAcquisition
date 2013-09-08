@@ -15,7 +15,7 @@ INC =
 CFLAGS =  -Wall -fPIC
 RESINC = 
 LIBDIR = 
-LIB = 
+LIB =  ../tools/Calibration/libCalibrationLibrary.a
 LDFLAGS = 
 
 INC_DEBUG =  $(INC)
