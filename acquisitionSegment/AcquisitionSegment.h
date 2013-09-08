@@ -2,6 +2,7 @@
 #define ACQUISITIONSEGMENT_H_INCLUDED
 
 
+
 struct floodErasePoints
 {
   int totalPoints ;
@@ -11,7 +12,6 @@ struct floodErasePoints
   unsigned int pY[32];
   unsigned int threshold[32];
 };
-
 
 struct SegmentationFeaturesRGB
 {
