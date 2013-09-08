@@ -64,6 +64,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
  char * sourcePixels = sourcePixelsStart;
 
  unsigned char * selectedRGB   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
+ if (selectedRGB==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
  memset(selectedRGB,0,width*height*sizeof(unsigned char));
 
  unsigned char * selectedPtr   = selectedRGB;
@@ -105,7 +106,6 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
       }
    }
    sourcePixelsLineEnd+=sourceWidthStep;
-   selectedPtr+=width;
    ++y;
  }
 

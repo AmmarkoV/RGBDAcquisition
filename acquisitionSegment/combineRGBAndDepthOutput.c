@@ -14,7 +14,7 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
 {
   unsigned char * tmpRGB;
   unsigned char * ptrRGB = RGB;
-  unsigned char * ptrRGBLimit = RGB + ( width * height );
+  unsigned char * ptrRGBLimit = RGB + ( width * height * 3 );
 
   if (segConf->enableReplacingColors)
   { //We replace colors with something
