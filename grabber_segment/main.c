@@ -211,7 +211,11 @@ int main(int argc, char *argv[])
     {
         acquisitionSnapFrames(moduleID_1,devID_1);
 
+
+        unsigned long colorTimestamp = acquisitionGetColorTimestamp(moduleID_1,devID_1);
         unsigned char * segmentedRGB = copyRGB(acquisitionGetColorFrame(moduleID_1,devID_1) ,widthRGB , heightRGB);
+
+        unsigned long depthTimestamp = acquisitionGetDepthTimestamp(moduleID_1,devID_1);
         unsigned short * segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID_1,devID_1) ,widthDepth , heightDepth);
 
         segmentRGBAndDepthFrame (
@@ -225,13 +229,13 @@ int main(int argc, char *argv[])
 
 
 
-        acquisitionSimulateTime( acquisitionGetColorTimestamp(moduleID_1,devID_1) );
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+        acquisitionSimulateTime( colorTimestamp );
         saveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
 
 
-        acquisitionSimulateTime( acquisitionGetDepthTimestamp(moduleID_1,devID_1) );
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+        acquisitionSimulateTime( depthTimestamp );
         saveRawImageToFile(outfilename,(char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
         //getDepthBlobAverage(&centerX,&centerY,&centerZ,segmentedDepth,widthDepth,heightDepth);
 

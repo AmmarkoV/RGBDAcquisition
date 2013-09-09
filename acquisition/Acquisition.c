@@ -10,6 +10,13 @@
 
 #define EPOCH_YEAR_IN_TM_YEAR 1900
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
 //This should probably pass on to each of the sub modules
 float minDistance = -10;
 float scaleFactor = 0.0021;
@@ -424,113 +431,113 @@ int linkToPlugin(char * moduleName,char * modulePath ,  ModuleIdentifier moduleI
   //Start Stop ================================================================================================================
   sprintf(functionNameStr,"start%sModule",moduleName);
   plugins[moduleID].startModule = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
   sprintf(functionNameStr,"stop%sModule",moduleName);
   plugins[moduleID].stopModule = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
   //================================================================================================================
   sprintf(functionNameStr,"map%sDepthToRGB",moduleName);
   plugins[moduleID].mapDepthToRGB = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"map%sRGBToDepth",moduleName);
   plugins[moduleID].mapRGBToDepth = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 
   sprintf(functionNameStr,"create%sDevice",moduleName);
   plugins[moduleID].createDevice = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"destroy%sDevice",moduleName);
   plugins[moduleID].destroyDevice = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 
   sprintf(functionNameStr,"get%sNumberOfDevices",moduleName);
   plugins[moduleID].getNumberOfDevices = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 
   sprintf(functionNameStr,"seek%sFrame",moduleName);
   plugins[moduleID].seekFrame = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"snap%sFrames",moduleName);
   plugins[moduleID].snapFrames = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 
   sprintf(functionNameStr,"getLast%sColorTimestamp",moduleName);
   plugins[moduleID].getLastColorTimestamp = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
-  sprintf(functionNameStr,"getLast%DepthTimestamp",moduleName);
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+  sprintf(functionNameStr,"getLast%sDepthTimestamp",moduleName);
   plugins[moduleID].getLastDepthTimestamp = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 
   sprintf(functionNameStr,"get%sColorWidth",moduleName);
   plugins[moduleID].getColorWidth = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sColorHeight",moduleName);
   plugins[moduleID].getColorHeight = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sColorDataSize",moduleName);
   plugins[moduleID].getColorDataSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sColorChannels",moduleName);
   plugins[moduleID].getColorChannels = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sColorBitsPerPixel",moduleName);
   plugins[moduleID].getColorBitsPerPixel = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sColorPixels",moduleName);
   plugins[moduleID].getColorPixels = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sColorFocalLength",moduleName);
   plugins[moduleID].getColorFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sColorPixelSize",moduleName);
   plugins[moduleID].getColorPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sColorCalibration",moduleName);
   plugins[moduleID].getColorCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"set%sColorCalibration",moduleName);
   plugins[moduleID].setColorCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 
 
   sprintf(functionNameStr,"get%sDepthWidth",moduleName);
   plugins[moduleID].getDepthWidth = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sDepthHeight",moduleName);
   plugins[moduleID].getDepthHeight = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sDepthDataSize",moduleName);
   plugins[moduleID].getDepthDataSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sDepthChannels",moduleName);
   plugins[moduleID].getDepthChannels = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sDepthBitsPerPixel",moduleName);
   plugins[moduleID].getDepthBitsPerPixel = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sDepthPixels",moduleName);
   plugins[moduleID].getDepthPixels = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sDepthFocalLength",moduleName);
   plugins[moduleID].getDepthFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sDepthPixelSize",moduleName);
   plugins[moduleID].getDepthPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sDepthCalibration",moduleName);
   plugins[moduleID].getDepthCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"set%sDepthCalibration",moduleName);
   plugins[moduleID].setDepthCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, "Could not find a definition of %s : %s\n",functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 
 
@@ -560,7 +567,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
                 linkToPlugin("V4L2","../v4l2_acquisition_shared_library/libV4L2Acquisition.so",moduleID); else
           if (fileExists("libV4L2Acquisition.so"))
                 linkToPlugin("V4L2","libV4L2Acquisition.so",moduleID); else
-          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL ,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
@@ -569,7 +576,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
                 linkToPlugin("V4L2Stereo","../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so",moduleID); else
           if (fileExists("libV4L2StereoAcquisition.so"))
                 linkToPlugin("V4L2Stereo","libV4L2StereoAcquisition.so",moduleID); else
-          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
@@ -578,7 +585,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
                  linkToPlugin("OpenGL","../opengl_acquisition_shared_library/libOpenGLAcquisition.so",moduleID); else
           if (fileExists("libOpenGLAcquisition.so"))
                  linkToPlugin("OpenGL","libOpenGLAcquisition.so",moduleID); else
-          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
@@ -587,7 +594,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
                  linkToPlugin("Template","../template_acquisition_shared_library/libTemplateAcquisition.so",moduleID); else
           if (fileExists("libTemplateAcquisition.so"))
                  linkToPlugin("Template","libTemplateAcquisition.so",moduleID); else
-          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
@@ -596,7 +603,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
                  linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/libFreenectAcquisition.so",moduleID); else
           if (fileExists("libFreenectAcquisition.so"))
                  linkToPlugin("Freenect","libFreenectAcquisition.so",moduleID); else
-          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
@@ -605,7 +612,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
                  linkToPlugin("OpenNI1","../openni1_acquisition_shared_library/libOpenNI1Acquisition.so",moduleID); else
           if (fileExists("libOpenNI1Acquisition.so"))
                  linkToPlugin("OpenNI1","libOpenNI1Acquisition.so",moduleID); else
-          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
@@ -614,7 +621,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
                  linkToPlugin("OpenNI2","../openni2_acquisition_shared_library/libOpenNI2Acquisition.so",moduleID); else
           if (fileExists("libOpenNI2Acquisition.so"))
                  linkToPlugin("OpenNI2","libOpenNI2Acquisition.so",moduleID); else
-          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
