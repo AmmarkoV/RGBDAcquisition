@@ -412,16 +412,56 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
    fprintf(stderr,"%s hasn't got an implementation for function %s ..\n",getModuleStringName(moduleFailed),fromFunction);
 }
 
-
-
-int linkToPlugin(char * moduleName,char * modulePath ,  ModuleIdentifier moduleID)
+int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
 {
-   char functionNameStr[1024]={0};
+
+   char* ldPreloadPath;
+   ldPreloadPath= getenv("LD_PRELOAD");
+   if (ldPreloadPath!=0) { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPreloadPath); }
+
+
+   char pathTester[2048]={0};
+   sprintf(pathTester,"%s/%s",possiblePath,libName);
+   if (fileExists(pathTester))   {
+                                   fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
+                                   strncpy(pathOut,pathTester,pathOutLength);
+                                   return 1;
+                                 } else
+   if (fileExists(libName))      {
+                                   fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
+                                   strncpy(pathOut,libName,pathOutLength);
+                                   return 1;
+                                 }
+
+
+
+   //TODO HANDLE LIBRARY PATH STRINGS
+   // They look like /opt/ros/groovy/lib:/usr/local/cuda-4.2/cuda/lib64:/usr/local/cuda-4.2/cuda/lib
+   char* ldPath;
+   ldPath= getenv("LD_LIBRARY_PATH");
+   if (ldPath!=0)        { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPath);  }
+
+   return 0;
+}
+
+
+
+int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
+{
+
    char *error;
-   plugins[moduleID].handle = dlopen (modulePath, RTLD_LAZY);
+   char functionNameStr[1024]={0};
+
+   if (!getPluginPath(modulePossiblePath,moduleLib,functionNameStr,1024))
+       {
+          fprintf(stderr,RED "Could not find %s (try adding it to current directory)\n" NORMAL , moduleLib);
+          return 0;
+       }
+
+   plugins[moduleID].handle = dlopen (functionNameStr, RTLD_LAZY);
    if (!plugins[moduleID].handle)
        {
-        fprintf (stderr, "Failed while loading %s  - %s\n", moduleName , dlerror());
+        fprintf (stderr,RED "Failed while loading %s from %s - %s\n" NORMAL, moduleName , functionNameStr , dlerror());
         return 0;
        }
 
@@ -539,8 +579,6 @@ int linkToPlugin(char * moduleName,char * modulePath ,  ModuleIdentifier moduleI
   plugins[moduleID].setDepthCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
-
-
   return 1;
 }
 
@@ -562,66 +600,44 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
     switch (moduleID)
     {
       case V4L2_ACQUISITION_MODULE    :
-
-          if (fileExists("../v4l2_acquisition_shared_library/libV4L2Acquisition.so"))
-                linkToPlugin("V4L2","../v4l2_acquisition_shared_library/libV4L2Acquisition.so",moduleID); else
-          if (fileExists("libV4L2Acquisition.so"))
-                linkToPlugin("V4L2","libV4L2Acquisition.so",moduleID); else
-          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL ,getModuleStringName(moduleID)); return 0; }
+          if (!linkToPlugin("V4L2","../v4l2_acquisition_shared_library/","libV4L2Acquisition.so",moduleID) )
+                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL ,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case V4L2STEREO_ACQUISITION_MODULE    :
-          if (fileExists("../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so"))
-                linkToPlugin("V4L2Stereo","../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so",moduleID); else
-          if (fileExists("libV4L2StereoAcquisition.so"))
-                linkToPlugin("V4L2Stereo","libV4L2StereoAcquisition.so",moduleID); else
-          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
+          if (!linkToPlugin("V4L2Stereo","../v4l2stereo_acquisition_shared_library/","libV4L2StereoAcquisition.so",moduleID) )
+                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENGL_ACQUISITION_MODULE    :
-          if (fileExists("../opengl_acquisition_shared_library/libOpenGLAcquisition.so"))
-                 linkToPlugin("OpenGL","../opengl_acquisition_shared_library/libOpenGLAcquisition.so",moduleID); else
-          if (fileExists("libOpenGLAcquisition.so"))
-                 linkToPlugin("OpenGL","libOpenGLAcquisition.so",moduleID); else
-          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
+          if (!linkToPlugin("OpenGL","../opengl_acquisition_shared_library/","libOpenGLAcquisition.so",moduleID) )
+                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case TEMPLATE_ACQUISITION_MODULE:
-          if (fileExists("../template_acquisition_shared_library/libTemplateAcquisition.so"))
-                 linkToPlugin("Template","../template_acquisition_shared_library/libTemplateAcquisition.so",moduleID); else
-          if (fileExists("libTemplateAcquisition.so"))
-                 linkToPlugin("Template","libTemplateAcquisition.so",moduleID); else
-          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
+          if (!linkToPlugin("Template","../template_acquisition_shared_library/","libTemplateAcquisition.so",moduleID) )
+                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case FREENECT_ACQUISITION_MODULE:
-          if (fileExists("../libfreenect_acquisition_shared_library/libFreenectAcquisition.so"))
-                 linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/libFreenectAcquisition.so",moduleID); else
-          if (fileExists("libFreenectAcquisition.so"))
-                 linkToPlugin("Freenect","libFreenectAcquisition.so",moduleID); else
-          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
+          if (!linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/","libFreenectAcquisition.so",moduleID) )
+                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENNI1_ACQUISITION_MODULE :
-          if (fileExists("../openni1_acquisition_shared_library/libOpenNI1Acquisition.so"))
-                 linkToPlugin("OpenNI1","../openni1_acquisition_shared_library/libOpenNI1Acquisition.so",moduleID); else
-          if (fileExists("libOpenNI1Acquisition.so"))
-                 linkToPlugin("OpenNI1","libOpenNI1Acquisition.so",moduleID); else
-          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
+          if (!linkToPlugin("OpenNI1","../openni1_acquisition_shared_library/","libOpenNI1Acquisition.so",moduleID) )
+                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENNI2_ACQUISITION_MODULE :
-          if (fileExists("../openni2_acquisition_shared_library/libOpenNI2Acquisition.so"))
-                 linkToPlugin("OpenNI2","../openni2_acquisition_shared_library/libOpenNI2Acquisition.so",moduleID); else
-          if (fileExists("libOpenNI2Acquisition.so"))
-                 linkToPlugin("OpenNI2","libOpenNI2Acquisition.so",moduleID); else
-          { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
+          if (!linkToPlugin("OpenNI2","../openni2_acquisition_shared_library/","libOpenNI2Acquisition.so",moduleID) )
+                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
