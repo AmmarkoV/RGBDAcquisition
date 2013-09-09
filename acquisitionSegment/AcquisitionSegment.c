@@ -143,10 +143,13 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  unsigned int x =0;
  unsigned int y =0;
 
+ /* Todo add accurate 3d point segmentation
  float x3D;
  float y3D;
  float z3D;
-//acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x3D, float *y3D , float *z3D  );
+ acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x3D, float *y3D , float *z3D  );
+ */
+
 
  unsigned short * depth;
  while (sourcePixels<sourcePixelsEnd)
@@ -155,8 +158,13 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
     {
      depth = sourcePixels++;
 
-     if  ( (segConf->minDepth <= *depth) && (*depth <= segConf->maxDepth) ) { *selectedPtr=1; } else
-                                                                            { *selectedPtr=0; }
+
+     if (*depth != 0)
+     { //If there is a depth given for point
+       if  ( (segConf->minDepth <= *depth) && (*depth <= segConf->maxDepth) ) { *selectedPtr=1; } else
+                                                                              { *selectedPtr=0; }
+     }
+
 
      ++selectedPtr;
      ++x;
