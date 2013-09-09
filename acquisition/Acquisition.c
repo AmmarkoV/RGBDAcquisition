@@ -32,6 +32,18 @@ int acquisitionSimulateTime(unsigned long timeInMillisecs)
   return 1;
 }
 
+int fileExists(char * filename)
+{
+  FILE * fp  = fopen(filename,"r");
+    if (fp!=0)
+    {
+      fclose(fp);
+      return 1;
+    }
+
+  return 0;
+}
+
 
 unsigned long GetTickCount()
 {
@@ -395,7 +407,7 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
 
 
 
-int linkToPlugin(char * moduleName,char * modulePath, ModuleIdentifier moduleID)
+int linkToPlugin(char * moduleName,char * modulePath ,  ModuleIdentifier moduleID)
 {
    char functionNameStr[1024]={0};
    char *error;
@@ -543,31 +555,67 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
     switch (moduleID)
     {
       case V4L2_ACQUISITION_MODULE    :
-          linkToPlugin("V4L2","../v4l2_acquisition_shared_library/libV4L2Acquisition.so",moduleID);
+
+          if (fileExists("../v4l2_acquisition_shared_library/libV4L2Acquisition.so"))
+                linkToPlugin("V4L2","../v4l2_acquisition_shared_library/libV4L2Acquisition.so",moduleID); else
+          if (fileExists("libV4L2Acquisition.so"))
+                linkToPlugin("V4L2","libV4L2Acquisition.so",moduleID); else
+          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case V4L2STEREO_ACQUISITION_MODULE    :
-          linkToPlugin("V4L2Stereo","../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so",moduleID);
+          if (fileExists("../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so"))
+                linkToPlugin("V4L2Stereo","../v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so",moduleID); else
+          if (fileExists("libV4L2StereoAcquisition.so"))
+                linkToPlugin("V4L2Stereo","libV4L2StereoAcquisition.so",moduleID); else
+          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENGL_ACQUISITION_MODULE    :
-          linkToPlugin("OpenGL","../opengl_acquisition_shared_library/libOpenGLAcquisition.so",moduleID);
+          if (fileExists("../opengl_acquisition_shared_library/libOpenGLAcquisition.so"))
+                 linkToPlugin("OpenGL","../opengl_acquisition_shared_library/libOpenGLAcquisition.so",moduleID); else
+          if (fileExists("libOpenGLAcquisition.so"))
+                 linkToPlugin("OpenGL","libOpenGLAcquisition.so",moduleID); else
+          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case TEMPLATE_ACQUISITION_MODULE:
-          linkToPlugin("Template","../template_acquisition_shared_library/libTemplateAcquisition.so",moduleID);
+          if (fileExists("../template_acquisition_shared_library/libTemplateAcquisition.so"))
+                 linkToPlugin("Template","../template_acquisition_shared_library/libTemplateAcquisition.so",moduleID); else
+          if (fileExists("libTemplateAcquisition.so"))
+                 linkToPlugin("Template","libTemplateAcquisition.so",moduleID); else
+          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case FREENECT_ACQUISITION_MODULE:
-          linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/libFreenectAcquisition.so",moduleID);
+          if (fileExists("../libfreenect_acquisition_shared_library/libFreenectAcquisition.so"))
+                 linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/libFreenectAcquisition.so",moduleID); else
+          if (fileExists("libFreenectAcquisition.so"))
+                 linkToPlugin("Freenect","libFreenectAcquisition.so",moduleID); else
+          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENNI1_ACQUISITION_MODULE :
-          linkToPlugin("OpenNI1","../openni1_acquisition_shared_library/libOpenNI1Acquisition.so",moduleID);
+          if (fileExists("../openni1_acquisition_shared_library/libOpenNI1Acquisition.so"))
+                 linkToPlugin("OpenNI1","../openni1_acquisition_shared_library/libOpenNI1Acquisition.so",moduleID); else
+          if (fileExists("libOpenNI1Acquisition.so"))
+                 linkToPlugin("OpenNI1","libOpenNI1Acquisition.so",moduleID); else
+          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENNI2_ACQUISITION_MODULE :
-          linkToPlugin("OpenNI2","../openni2_acquisition_shared_library/libOpenNI2Acquisition.so",moduleID);
+          if (fileExists("../openni2_acquisition_shared_library/libOpenNI2Acquisition.so"))
+                 linkToPlugin("OpenNI2","../openni2_acquisition_shared_library/libOpenNI2Acquisition.so",moduleID); else
+          if (fileExists("libOpenNI2Acquisition.so"))
+                 linkToPlugin("OpenNI2","libOpenNI2Acquisition.so",moduleID); else
+          { fprintf(stderr,"Could not find %s plugin shared object \n",getModuleStringName(moduleID)); return 0; }
+
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
     };
