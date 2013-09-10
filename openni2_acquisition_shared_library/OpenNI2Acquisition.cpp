@@ -1,5 +1,11 @@
-#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "OpenNI2Acquisition.h"
+
+#if BUILD_OPENNI2
+
+#include <unistd.h>
 
 #include <OpenNI.h>
 #include <PS1080.h>
@@ -412,3 +418,16 @@ double getOpenNI2DepthPixelSize(int devID)
     depth[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
     return (double) zpps;
 }
+
+
+#else
+
+//Null build
+int startOpenNI2Module(unsigned int max_devs,char * settings)
+{
+    fprintf(stderr,"startOpenNI2Module called on a dummy build of OpenNI2Acquisition!\n");
+    fprintf(stderr,"Please consider enabling #define BUILD_OPENNI2 1 on acquisition/acquisition_setup.h\n");
+    return 0;
+  return 1;
+}
+#endif

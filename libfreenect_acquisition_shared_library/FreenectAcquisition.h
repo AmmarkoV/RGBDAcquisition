@@ -10,7 +10,7 @@ extern "C"
 
 int startFreenectModule(unsigned int max_devs,char * settings);
 
-#if USE_FREENECT
+#if BUILD_FREENECT
 int stopFreenectModule();
 
 int mapFreenectDepthToRGB(int devID);

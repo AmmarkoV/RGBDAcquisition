@@ -2,6 +2,9 @@
 #define OPENGL_ACQUISITION_H_INCLUDED
 
 
+#include "../acquisition/acquisition_setup.h"
+
+
 #include "../tools/Calibration/calibration.h"
 
 #ifdef __cplusplus
@@ -11,6 +14,8 @@ extern "C"
 
 
 int startOpenGLModule(unsigned int max_devs) ;
+
+#if BUILD_OPENGL
 int getOpenGLNumberOfDevices() ;
 int stopOpenGLModule() ;
 int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate) ;
@@ -47,6 +52,7 @@ int saveOpenGLDepthFramePNM(int devID,char * filename) ;
 
 double getOpenGLDepthFocalLength(int devID);
 double getOpenGLDepthPixelSize(int devID);
+#endif // BUILD_OPENGL
 
 
 #ifdef __cplusplus

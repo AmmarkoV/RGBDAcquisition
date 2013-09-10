@@ -1,8 +1,11 @@
-#include "TemplateAcquisition.h"
-#include "../acquisition/Acquisition.h"
-
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "TemplateAcquisition.h"
+
+#if BUILD_TEMPLATE
+#include "../acquisition/Acquisition.h"
+
 #include <string.h>
 #include <math.h>
 
@@ -100,7 +103,10 @@ int setTemplateDepthCalibration(int devID,struct calibration * calib)
 
 char * ReadPPM(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
-    fprintf(stderr,"Reading template file %s \n",filename);
+    #if PRINT_DEBUG_EACH_CALL
+     fprintf(stderr,"TemplateAcquisition : Reading file %s \n",filename);
+    #endif // PRINT_DEBUG_EACH_CALL
+
     char * pixels=0;
     FILE *pf=0;
     pf = fopen(filename,"rb");
@@ -171,7 +177,10 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height,unsigned
 
 short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
-    fprintf(stderr,"Reading template file %s \n",filename);
+    #if PRINT_DEBUG_EACH_CALL
+     fprintf(stderr,"TemplateAcquisition : Reading file %s \n",filename);
+    #endif // PRINT_DEBUG_EACH_CALL
+
     short * pixels=0;
     FILE *pf=0;
     pf = fopen(filename,"rb");
@@ -408,3 +417,13 @@ int getTemplateDepthBitsPerPixel(int devID) { return 16; }
 // Frame Grabber should call this function for depth frames
 char * getTemplateDepthPixels(int devID) { return (char *) device[devID].templateDepthFrame; }
 
+#else
+//Null build
+int startTemplateModule(unsigned int max_devs,char * settings)
+{
+    fprintf(stderr,"startTemplateModule called on a dummy build of TemplateAcquisition!\n");
+    fprintf(stderr,"Please consider enabling #define BUILD_TEMPLATE 1 on acquisition/acquisition_setup.h\n");
+    return 0;
+  return 1;
+}
+#endif

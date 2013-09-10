@@ -1,7 +1,11 @@
-#include "OpenGLAcquisition.h"
-#include "../acquisition/Acquisition.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "OpenGLAcquisition.h"
+
+#if BUILD_OPENGL
+
+#include "../acquisition/Acquisition.h"
 #include <string.h>
 
 #include "opengl_depth_and_color_renderer/src/OGLRendererSandbox.h"
@@ -178,3 +182,13 @@ double getOpenGLDepthPixelSize(int devID)
     return getOpenGLPixelSize();
 }
 
+#else
+//Null build
+int startOpenGLModule(unsigned int max_devs,char * settings)
+{
+    fprintf(stderr,"startOpenGLModule called on a dummy build of OpenGLAcquisition!\n");
+    fprintf(stderr,"Please consider enabling #define BUILD_OPENGL 1 on acquisition/acquisition_setup.h\n");
+    return 0;
+  return 1;
+}
+#endif

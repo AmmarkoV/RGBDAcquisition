@@ -10,15 +10,17 @@
      THIS COULD ALSO  BE AUTOMATICALLY GENERATED...
 */
 
-//#define USE_DUMMY 0 <- A disabled module should look like this :P
+//#define BUILD_DUMMY 0 <- A disabled module should look like this :P
 
 //You should manually set them to reflect your 3d party configuration
-#define USE_OPENNI1 1
-#define USE_OPENNI2 1
-#define USE_FREENECT 1
-#define USE_OPENGL 1
-#define USE_TEMPLATE 1
-#define USE_V4L2 0
+//if something is disabled the plugin will be compiled as a stub , it will
+//basically do nothing.. :P
+#define BUILD_OPENNI1 1
+#define BUILD_OPENNI2 1
+#define BUILD_FREENECT 1
+#define BUILD_OPENGL 1
+#define BUILD_TEMPLATE 1
+#define BUILD_V4L2 1
 
 #define PRINT_DEBUG_EACH_CALL 0
 

@@ -1,7 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "V4L2StereoAcquisition.h"
+
+#if BUILD_V4L2
 #include "../acquisition/Acquisition.h"
 #include "../v4l2_acquisition_shared_library/V4L2Acquisition.h"
-#include <stdio.h>
 #include <string.h>
 
 int startV4L2StereoModule(unsigned int max_devs,char * settings)
@@ -118,3 +121,13 @@ int getV4L2StereoDepthBitsPerPixel(int devID) { return 0; }
 char * getV4L2StereoDepthPixels(int devID) {  return 0; }
 double getV4L2StereoDepthFocalLength(int devID) { return 0; }
 double getV4L2StereoDepthPixelSize(int devID) { return 0; }
+#else
+//Null build
+int start4L2StereoModule(unsigned int max_devs,char * settings)
+{
+    fprintf(stderr,"start4L2StereoModule called on a dummy build of V4L2StereoAcquisition!\n");
+    fprintf(stderr,"Please consider enabling #define BUILD_V4L2STEREO 1 on acquisition/acquisition_setup.h\n");
+    return 0;
+  return 1;
+}
+#endif

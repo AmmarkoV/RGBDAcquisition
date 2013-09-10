@@ -3,6 +3,8 @@
 
 #include "OpenNI1Acquisition.h"
 
+#if BUILD_OPENNI1
+
 #include <XnOS.h>
 #include <XnCppWrapper.h>
 #include <XnLog.h>
@@ -26,40 +28,6 @@ ScriptNode script;
 Context ctx;
 
 
-int mapOpenNI1DepthToRGB(int devID)
-{
-  if (!depthGenerators[devID]) { return 0; }
-
-  XnBool isSupported = depthGenerators[devID].IsCapabilitySupported("AlternativeViewPoint");
-  if(isSupported)
-   {
-      XnStatus res = depthGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(imageGenerators[devID]);
-      if(XN_STATUS_OK != res)
-      {
-         printf("Getting and setting AlternativeViewPoint failed: %s\n", xnGetStatusString(res));
-      }
-   }
-
-  return 1;
-}
-
-
-int mapOpenNI1RGBToDepth(int devID)
-{
-  if (!imageGenerators[devID]) { return 0; }
-
-  XnBool isSupported = imageGenerators[devID].IsCapabilitySupported("AlternativeViewPoint");
-  if(isSupported)
-   {
-      XnStatus res = imageGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(depthGenerators[devID]);
-      if(XN_STATUS_OK != res)
-      {
-         printf("Getting and setting AlternativeViewPoint failed: %s\n", xnGetStatusString(res));
-      }
-   }
-
-  return 1;
-}
 
 int startOpenNI1Module(unsigned int max_devs)
 {
@@ -137,6 +105,44 @@ int startOpenNI1Module(unsigned int max_devs)
  return 1;
 }
 
+
+
+
+
+int mapOpenNI1DepthToRGB(int devID)
+{
+  if (!depthGenerators[devID]) { return 0; }
+
+  XnBool isSupported = depthGenerators[devID].IsCapabilitySupported("AlternativeViewPoint");
+  if(isSupported)
+   {
+      XnStatus res = depthGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(imageGenerators[devID]);
+      if(XN_STATUS_OK != res)
+      {
+         printf("Getting and setting AlternativeViewPoint failed: %s\n", xnGetStatusString(res));
+      }
+   }
+
+  return 1;
+}
+
+
+int mapOpenNI1RGBToDepth(int devID)
+{
+  if (!imageGenerators[devID]) { return 0; }
+
+  XnBool isSupported = imageGenerators[devID].IsCapabilitySupported("AlternativeViewPoint");
+  if(isSupported)
+   {
+      XnStatus res = imageGenerators[devID].GetAlternativeViewPointCap().SetViewPoint(depthGenerators[devID]);
+      if(XN_STATUS_OK != res)
+      {
+         printf("Getting and setting AlternativeViewPoint failed: %s\n", xnGetStatusString(res));
+      }
+   }
+
+  return 1;
+}
 
 
 int getOpenNI1NumberOfDevices()  {  fprintf(stderr,"getOpenNI1NumberOfDevices is a stub it always returns 1\n");  return 1; }
@@ -318,3 +324,15 @@ double getOpenNI1DepthPixelSize(int devID)
 	depthGenerators[devID].GetRealProperty ("ZPPS", pixelSize);
     return (double) pixelSize;
 }
+
+
+#else
+//Null build
+int startOpenNI1Module(unsigned int max_devs,char * settings)
+{
+    fprintf(stderr,"startOpenNI1Module called on a dummy build of OpenNI1Acquisition!\n");
+    fprintf(stderr,"Please consider enabling #define BUILD_OPENNI1 1 on acquisition/acquisition_setup.h\n");
+    return 0;
+  return 1;
+}
+#endif

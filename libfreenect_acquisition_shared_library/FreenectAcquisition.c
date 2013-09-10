@@ -4,7 +4,7 @@
 
 
 
-#if USE_FREENECT
+#if BUILD_FREENECT
 #include "../3dparty/libfreenect/include/libfreenect.h"
 #include "../3dparty/libfreenect/wrappers/c_sync/libfreenect_sync.h"
 
@@ -13,11 +13,8 @@
 int rgb_mode[MAX_DEVS]={FREENECT_VIDEO_RGB};
 int depth_mode[MAX_DEVS]={FREENECT_DEPTH_11BIT};
 
-#endif
-
 int startFreenectModule(unsigned int max_devs,char * settings)
 {
-  #if USE_FREENECT
   uint32_t ts;
   char * rgb, * depth;
   fprintf(stderr,"Please hang on while starting Freenect module.. \n");
@@ -26,15 +23,9 @@ int startFreenectModule(unsigned int max_devs,char * settings)
 
   freenect_sync_get_video((void**)&rgb, &ts, 0 , FREENECT_VIDEO_RGB);
   freenect_sync_get_depth((void**)&depth, &ts, 0 ,FREENECT_DEPTH_11BIT);
-  #else
-    fprintf(stderr,"startFreenectModule called on a dummy build of FreenectAcquisition!\n");
-    fprintf(stderr,"Please consider enabling #define USE_FREENECT 1 on acquisition/acquisition_setup.h\n");
-    return 0;
-  #endif
   return 1;
 }
 
-#if USE_FREENECT
 
 int stopFreenectModule() { return 1; }
 
@@ -90,4 +81,14 @@ char * getFreenectDepthPixels(int devID)
   return depth;
 }
 
+
+#else
+//Null build
+int startFreenectModule(unsigned int max_devs,char * settings)
+{
+    fprintf(stderr,"startFreenectModule called on a dummy build of FreenectAcquisition!\n");
+    fprintf(stderr,"Please consider enabling #define BUILD_FREENECT 1 on acquisition/acquisition_setup.h\n");
+    return 0;
+  return 1;
+}
 #endif

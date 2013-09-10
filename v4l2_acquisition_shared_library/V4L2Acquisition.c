@@ -1,8 +1,13 @@
+
+#include <stdio.h>
+#include <stdlib.h>
 #include "V4L2Acquisition.h"
+
+
+#if BUILD_V4L2
 #include "V4L2Wrapper.h"
 #include "V4L2IntrinsicCalibration.h"
 #include <linux/videodev2.h>
-#include <stdlib.h>
 
 int startV4L2Module(unsigned int max_devs,char * settings)
 {
@@ -150,3 +155,14 @@ int getV4L2DepthBitsPerPixel(int devID) {  return 0; }
 char * getV4L2DepthPixels(int devID) { return 0; }
 double getV4L2DepthFocalLength(int devID) {  return 0; }
 double getV4L2DepthPixelSize(int devID) { return 0; }
+
+#else
+//Null build
+int startV4L2Module(unsigned int max_devs,char * settings)
+{
+    fprintf(stderr,"startV4L2Module called on a dummy build of V4L2Acquisition!\n");
+    fprintf(stderr,"Please consider enabling #define BUILD_V4L2 1 on acquisition/acquisition_setup.h\n");
+    return 0;
+  return 1;
+}
+#endif

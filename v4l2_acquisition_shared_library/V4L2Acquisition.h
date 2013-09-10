@@ -1,6 +1,8 @@
 #ifndef V4L2ACQUISITION_H_INCLUDED
 #define V4L2ACQUISITION_H_INCLUDED
 
+#include "../acquisition/acquisition_setup.h"
+
 #define USE_CALIBRATION 1
 
 #if USE_CALIBRATION
@@ -13,6 +15,8 @@ extern "C"
 #endif
    //Initialization of V4L2
    int startV4L2Module(unsigned int max_devs,char * settings);
+
+   #if BUILD_V4L2
    int getV4L2(); // This has to be called AFTER startV4L2
    int stopV4L2Module();
 
@@ -55,6 +59,7 @@ extern "C"
    char * getV4L2DepthPixels(int devID);
    double getV4L2DepthFocalLength(int devID);
    double getV4L2DepthPixelSize(int devID);
+   #endif
 
 #ifdef __cplusplus
 }

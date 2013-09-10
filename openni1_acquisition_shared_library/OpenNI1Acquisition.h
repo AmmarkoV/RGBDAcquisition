@@ -10,6 +10,10 @@ extern "C"
 
    //Initialization of OpenNI1
    int startOpenNI1Module(unsigned int max_devs);
+
+   #if BUILD_OPENNI1
+
+
    int getOpenNI1NumberOfDevices(); // This has to be called AFTER startOpenNI1
    int stopOpenNI1Module();
 
@@ -43,6 +47,7 @@ extern "C"
    double getOpenNI1DepthFocalLength(int devID);
    double getOpenNI1DepthPixelSize(int devID);
 
+   #endif
 
 #ifdef __cplusplus
 }

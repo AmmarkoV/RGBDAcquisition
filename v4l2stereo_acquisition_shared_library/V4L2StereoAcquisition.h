@@ -2,12 +2,16 @@
 #define V4L2STEREOACQUISITION_H_INCLUDED
 
 
+#include "../acquisition/acquisition_setup.h"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
    //Initialization of V4L2
    int startV4L2StereoModule(unsigned int max_devs,char * settings);
+
+   #if BUILD_V4L2
    int getV4L2Stereo(); // This has to be called AFTER startV4L2Stereo
    int stopV4L2StereoModule();
 
@@ -45,6 +49,7 @@ extern "C"
    char * getV4L2StereoDepthPixels(int devID);
    double getV4L2StereoDepthFocalLength(int devID);
    double getV4L2StereoDepthPixelSize(int devID);
+   #endif
 
 #ifdef __cplusplus
 }

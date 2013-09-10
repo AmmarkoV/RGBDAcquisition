@@ -643,18 +643,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 {
     printCall(moduleID,devID,"acquisitionCloseDevice");
     if (plugins[moduleID].destroyDevice!=0) { return (*plugins[moduleID].destroyDevice) (devID); }
-
-    switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-          return destroyV4L2Device(devID);
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          return destroyV4L2StereoDevice(devID);
-      break;
-      #endif
-    };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionCloseDevice");
     return 0;
 }
@@ -675,18 +663,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
     printCall(moduleID,devID,"acquisitionSnapFrames");
     //fprintf(stderr,"acquisitionSnapFrames called moduleID=%u devID=%u\n",moduleID,devID);
     if (*plugins[moduleID].snapFrames!=0) { return (*plugins[moduleID].snapFrames) (devID); }
-
-    switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-          return snapV4L2Frames(devID);
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          return snapV4L2StereoFrames(devID);
-      break;
-      #endif
-    };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSnapFrames");
     return 0;
 }
@@ -715,21 +691,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
          }
 
 
-    switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-          return saveRawImageToFile(filename,getV4L2ColorPixels(devID),getV4L2ColorWidth(devID),getV4L2ColorHeight(devID),getV4L2ColorChannels(devID),getV4L2ColorBitsPerPixel(devID));
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-         sprintf(filenameFull,"%s_0.pnm",filename);
-         saveRawImageToFile(filenameFull,getV4L2StereoColorPixelsLeft(devID),getV4L2StereoColorWidth(devID),getV4L2StereoColorHeight(devID),getV4L2StereoColorChannels(devID),getV4L2StereoColorBitsPerPixel(devID));
-         sprintf(filenameFull,"%s_1.pnm",filename);
-         saveRawImageToFile(filenameFull,getV4L2StereoColorPixelsRight(devID),getV4L2StereoColorWidth(devID),getV4L2StereoColorHeight(devID),getV4L2StereoColorChannels(devID),getV4L2StereoColorBitsPerPixel(devID));
-        return 1;
-      break;
-      #endif
-    };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColorFrame");
     return 0;
 }
@@ -772,17 +733,6 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
                                      );
          }
 
-    switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-           fprintf(stderr,"V4L2 Does not have a depth frame\n");
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          return saveRawImageToFile(filenameFull,getV4L2StereoDepthPixels(devID),getV4L2StereoDepthWidth(devID),getV4L2StereoDepthHeight(devID),getV4L2StereoDepthChannels(devID),getV4L2StereoDepthBitsPerPixel(devID));
-      break;
-      #endif
-    };
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveDepthFrame");
     return 0;
 }

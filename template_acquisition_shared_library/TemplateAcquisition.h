@@ -2,6 +2,9 @@
 #define TEMPLATEACQUISITION_H_INCLUDED
 
 
+#include "../acquisition/acquisition_setup.h"
+
+
 #define USE_CALIBRATION 1
 
 #if USE_CALIBRATION
@@ -14,6 +17,8 @@ extern "C"
 #endif
    //Initialization of Template
    int startTemplateModule(unsigned int max_devs,char * settings);
+
+   #if BUILD_TEMPLATE
    int getTemplateNumberOfDevices(); // This has to be called AFTER startTemplate
    int stopTemplateModule();
 
@@ -55,6 +60,8 @@ extern "C"
    char * getTemplateDepthPixels(int devID);
    double getTemplateDepthFocalLength(int devID);
    double getTemplateDepthPixelSize(int devID);
+   #endif
+
 
 #ifdef __cplusplus
 }
