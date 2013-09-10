@@ -21,7 +21,7 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-module OPENGL -from scene.conf -to testOGL -maxFrames 200 " />
+				<Option parameters="-module OPENNI -to Hand -maxFrames 600  " />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
