@@ -32,6 +32,16 @@ unsigned long simulatedTickValue=0;
 struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES]={0};
 
 
+const char V4L2Path[] = "../v4l2_acquisition_shared_library/";             const char V4L2Lib[] = "libV4L2Acquisition.so";
+const char V4L2StereoPath[] = "../v4l2stereo_acquisition_shared_library/"; const char V4L2StereoLib[] = "libV4L2StereoAcquisition.so";
+const char OpenGLPath[] = "../opengl_acquisition_shared_library/";         const char OpenGLLib[] = "libOpenGLAcquisition.so";
+const char TemplatePath[] = "../template_acquisition_shared_library/";     const char TemplateLib[] = "libTemplateAcquisition.so";
+const char FreenectPath[] = "../libfreenect_acquisition_shared_library/";  const char FreenectLib[] = "libFreenectAcquisition.so";
+const char OpenNI1Path[] = "../openni1_acquisition_shared_library/";       const char OpenNI1Lib[] = "libOpenNI1Acquisition.so";
+const char OpenNI2Path[] = "../openni2_acquisition_shared_library/";       const char OpenNI2Lib[] = "libOpenNI2Acquisition.so";
+
+
+
 int acquisitionSimulateTime(unsigned long timeInMillisecs)
 {
   simulateTick=1;
@@ -275,45 +285,70 @@ char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned 
 }
 
 
+int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
+{
+
+   char* ldPreloadPath;
+   ldPreloadPath= getenv("LD_PRELOAD");
+   if (ldPreloadPath!=0) { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPreloadPath); }
+
+
+   char pathTester[2048]={0};
+   sprintf(pathTester,"%s/%s",possiblePath,libName);
+   if (fileExists(pathTester))   {
+                                   fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
+                                   strncpy(pathOut,pathTester,pathOutLength);
+                                   return 1;
+                                 } else
+   if (fileExists(libName))      {
+                                   fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
+                                   strncpy(pathOut,libName,pathOutLength);
+                                   return 1;
+                                 }
+
+
+
+   //TODO HANDLE LIBRARY PATH STRINGS
+   // They look like /opt/ros/groovy/lib:/usr/local/cuda-4.2/cuda/lib64:/usr/local/cuda-4.2/cuda/lib
+   char* ldPath;
+   ldPath= getenv("LD_LIBRARY_PATH");
+   if (ldPath!=0)        { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPath);  }
+
+   return 0;
+}
+
+
+int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
+{
+  char tmp[1024];
+    switch (moduleID)
+    {
+      case V4L2_ACQUISITION_MODULE       :     return getPluginPath(V4L2Path,V4L2Lib,tmp,1024);               break;
+      case V4L2STEREO_ACQUISITION_MODULE :     return getPluginPath(V4L2StereoPath,V4L2StereoLib,tmp,1024);   break;
+      case OPENGL_ACQUISITION_MODULE     :     return getPluginPath(OpenGLPath,OpenGLLib,tmp,1024);           break;
+      case TEMPLATE_ACQUISITION_MODULE   :     return getPluginPath(TemplatePath,TemplateLib,tmp,1024);       break;
+      case FREENECT_ACQUISITION_MODULE   :     return getPluginPath(FreenectPath,FreenectLib,tmp,1024);       break;
+      case OPENNI1_ACQUISITION_MODULE    :     return getPluginPath(OpenNI1Path,OpenNI1Lib,tmp,1024);         break;
+      case OPENNI2_ACQUISITION_MODULE    :     return getPluginPath(OpenNI2Path,OpenNI2Lib,tmp,1024);         break;
+    };
+
+  return 0;
+}
+
 
 int acquisitionGetModulesCount()
 {
-  unsigned int modules_linked = 0;
+  unsigned int modules = 0;
 
+  if ( acquisitionIsModuleLinked(V4L2_ACQUISITION_MODULE) )          { fprintf(stderr,"V4L2 module found \n");       ++modules; }
+  if ( acquisitionIsModuleLinked(V4L2STEREO_ACQUISITION_MODULE) )    { fprintf(stderr,"V4L2Stereo module found \n"); ++modules; }
+  if ( acquisitionIsModuleLinked(OPENGL_ACQUISITION_MODULE) )        { fprintf(stderr,"OpenGL module found \n");     ++modules; }
+  if ( acquisitionIsModuleLinked(TEMPLATE_ACQUISITION_MODULE) )      { fprintf(stderr,"Template module found \n");   ++modules; }
+  if ( acquisitionIsModuleLinked(FREENECT_ACQUISITION_MODULE) )      { fprintf(stderr,"Freenect module found \n");   ++modules; }
+  if ( acquisitionIsModuleLinked(OPENNI1_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI1 module found \n");    ++modules; }
+  if ( acquisitionIsModuleLinked(OPENNI2_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI2 module found \n");    ++modules; }
 
-  #if USE_V4L2
-   modules_linked+=2;
-   fprintf(stderr,"V4L2 code linked\n");
-   fprintf(stderr,"V4L2Stereo code linked\n");
-  #endif
-
-  #if USE_OPENGL
-   ++modules_linked;
-   fprintf(stderr,"OpenGL code linked\n");
-  #endif
-
-  #if USE_OPENNI1
-   ++modules_linked;
-   fprintf(stderr,"OpenNI1 code linked\n");
-  #endif
-
-  #if USE_OPENNI2
-   ++modules_linked;
-   fprintf(stderr,"OpenNI2 code linked\n");
-  #endif
-
-  #if USE_FREENECT
-   ++modules_linked;
-   fprintf(stderr,"Freenect code linked\n");
-  #endif
-
-  #if USE_TEMPLATE
-   ++modules_linked;
-   fprintf(stderr,"Template code linked\n");
-  #endif
-
-  return modules_linked;
-
+  return modules;
 }
 
 
@@ -349,47 +384,6 @@ char * getModuleStringName(ModuleIdentifier moduleID)
 
 
 
-int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
-{
-    switch (moduleID)
-    {
-      #if USE_V4L2
-      case V4L2_ACQUISITION_MODULE    :
-          return 1;
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          return 1;
-      break;
-      #endif
-      case OPENGL_ACQUISITION_MODULE    :
-        #if USE_OPENGL
-          return 1;
-        #endif
-      break;
-      case TEMPLATE_ACQUISITION_MODULE:
-        #if USE_TEMPLATE
-          return 1;
-        #endif
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-        #if USE_FREENECT
-          return 1;
-        #endif
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-        #if USE_OPENNI1
-          return 1;
-        #endif
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-        #if USE_OPENNI2
-          return 1;
-        #endif
-      break;
-    };
-
-    return 0;
-}
 
 
 void printCall(ModuleIdentifier moduleID,DeviceIdentifier devID,char * fromFunction)
@@ -411,40 +405,6 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
 
    fprintf(stderr,"%s hasn't got an implementation for function %s ..\n",getModuleStringName(moduleFailed),fromFunction);
 }
-
-int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
-{
-
-   char* ldPreloadPath;
-   ldPreloadPath= getenv("LD_PRELOAD");
-   if (ldPreloadPath!=0) { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPreloadPath); }
-
-
-   char pathTester[2048]={0};
-   sprintf(pathTester,"%s/%s",possiblePath,libName);
-   if (fileExists(pathTester))   {
-                                   fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
-                                   strncpy(pathOut,pathTester,pathOutLength);
-                                   return 1;
-                                 } else
-   if (fileExists(libName))      {
-                                   fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
-                                   strncpy(pathOut,libName,pathOutLength);
-                                   return 1;
-                                 }
-
-
-
-   //TODO HANDLE LIBRARY PATH STRINGS
-   // They look like /opt/ros/groovy/lib:/usr/local/cuda-4.2/cuda/lib64:/usr/local/cuda-4.2/cuda/lib
-   char* ldPath;
-   ldPath= getenv("LD_LIBRARY_PATH");
-   if (ldPath!=0)        { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPath);  }
-
-   return 0;
-}
-
-
 
 int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
 {
@@ -600,43 +560,43 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
     switch (moduleID)
     {
       case V4L2_ACQUISITION_MODULE    :
-          if (!linkToPlugin("V4L2","../v4l2_acquisition_shared_library/","libV4L2Acquisition.so",moduleID) )
+          if (!linkToPlugin("V4L2",V4L2Path,V4L2Lib,moduleID) )
                     { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL ,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case V4L2STEREO_ACQUISITION_MODULE    :
-          if (!linkToPlugin("V4L2Stereo","../v4l2stereo_acquisition_shared_library/","libV4L2StereoAcquisition.so",moduleID) )
+          if (!linkToPlugin("V4L2Stereo",V4L2StereoPath,V4L2StereoLib,moduleID) )
                     { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENGL_ACQUISITION_MODULE    :
-          if (!linkToPlugin("OpenGL","../opengl_acquisition_shared_library/","libOpenGLAcquisition.so",moduleID) )
+          if (!linkToPlugin("OpenGL",OpenGLPath,OpenGLLib,moduleID) )
                     { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case TEMPLATE_ACQUISITION_MODULE:
-          if (!linkToPlugin("Template","../template_acquisition_shared_library/","libTemplateAcquisition.so",moduleID) )
+          if (!linkToPlugin("Template",TemplatePath,TemplateLib,moduleID) )
                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case FREENECT_ACQUISITION_MODULE:
-          if (!linkToPlugin("Freenect","../libfreenect_acquisition_shared_library/","libFreenectAcquisition.so",moduleID) )
+          if (!linkToPlugin("Freenect",FreenectPath,FreenectLib,moduleID) )
                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENNI1_ACQUISITION_MODULE :
-          if (!linkToPlugin("OpenNI1","../openni1_acquisition_shared_library/","libOpenNI1Acquisition.so",moduleID) )
+          if (!linkToPlugin("OpenNI1",OpenNI1Path,OpenNI1Lib,moduleID) )
                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
       break;
       case OPENNI2_ACQUISITION_MODULE :
-          if (!linkToPlugin("OpenNI2","../openni2_acquisition_shared_library/","libOpenNI2Acquisition.so",moduleID) )
+          if (!linkToPlugin("OpenNI2",OpenNI2Path,OpenNI2Lib,moduleID) )
                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }

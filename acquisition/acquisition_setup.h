@@ -13,8 +13,8 @@
 //#define USE_DUMMY 0 <- A disabled module should look like this :P
 
 //You should manually set them to reflect your 3d party configuration
-#define USE_OPENNI1 0
-#define USE_OPENNI2 0
+#define USE_OPENNI1 1
+#define USE_OPENNI2 1
 #define USE_FREENECT 1
 #define USE_OPENGL 1
 #define USE_TEMPLATE 1
