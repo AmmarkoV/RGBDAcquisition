@@ -1,6 +1,7 @@
 #ifndef FREENECTACQUISITION_H_INCLUDED
 #define FREENECTACQUISITION_H_INCLUDED
 
+#include "../acquisition/acquisition_setup.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -8,6 +9,8 @@ extern "C"
 #endif
 
 int startFreenectModule(unsigned int max_devs,char * settings);
+
+#if USE_FREENECT
 int stopFreenectModule();
 
 int mapFreenectDepthToRGB(int devID);
@@ -30,6 +33,7 @@ int getFreenectDepthDataSize(int devID);
 int getFreenectDepthChannels(int devID);
 int getFreenectDepthBitsPerPixel(int devID);
 char * getFreenectDepthPixels(int devID);
+#endif
 
 #ifdef __cplusplus
 }

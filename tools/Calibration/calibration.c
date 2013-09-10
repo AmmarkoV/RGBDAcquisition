@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 
+#define DEBUG_PRINT_EACH_CALIBRATION_LINE_READ 0
 
 #define DEFAULT_FOCAL_LENGTH 120.0
 #define DEFAULT_PIXEL_SIZE 0.1052
@@ -84,7 +85,10 @@ int ReadCalibration(char * filename,struct calibration * calib)
      if ( (line[0]=='%') && (line[1]=='R') && (line[2]==0) )                   { category=4;    } else
      if ( (line[0]=='%') && (line[1]=='F') && (line[2]=='N') && (line[3]==0) ) { category=5;    } else
         {
-          fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
+          #if DEBUG_PRINT_EACH_CALIBRATION_LINE_READ
+           fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
+          #endif
+
           if (category==1)
           {
            calib->intrinsicParametersSet=1;
