@@ -2,8 +2,9 @@
 #define TEMPLATEACQUISITION_H_INCLUDED
 
 
-#include "../acquisition/acquisition_setup.h"
-
+//#include "../acquisition/acquisition_setup.h"
+//TemplateAcquisition does not conflict with anything so we default to building it
+#define BUILD_TEMPLATE 1
 
 #define USE_CALIBRATION 1
 

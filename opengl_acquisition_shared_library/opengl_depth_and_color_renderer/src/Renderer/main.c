@@ -7,6 +7,12 @@
 
 #include "../OGLRendererSandbox.h"
 
+int readFromArg=0;
+int photoShootOBJ=0;
+float angleX=0.0,angleY=0.0,angleZ=0.0;
+unsigned int width=640;
+unsigned int height=480;
+
 int main(int argc, char **argv)
 {
 
@@ -60,12 +66,50 @@ int main(int argc, char **argv)
   setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
  #endif
 
- if (argc>1) {   startOGLRendererSandbox(argv[1]); } else
-             {   startOGLRendererSandbox(0); /*0 defaults to scene.conf*/ }
+
+
+  int i=0;
+  for (i=0; i<argc; i++)
+  {
+    if (strcmp(argv[i],"-size")==0) {
+                                        if (i+2<argc)
+                                        {
+                                         width=atof(argv[i+1]);
+                                         height=atof(argv[i+2]);
+                                        }
+                                     } else
+    if (strcmp(argv[i],"-photo")==0) {
+                                        if (i+4<argc)
+                                        {
+                                         photoShootOBJ=atoi(argv[i+1]);
+                                         angleX=atof(argv[i+2]);
+                                         angleY=atof(argv[i+3]);
+                                         angleZ=atof(argv[i+4]);
+                                        }
+                                     } else
+    if (strcmp(argv[i],"-from")==0) {
+                                        if (i+1<argc)
+                                          readFromArg = i+1 ;
+                                    }
+  }
+
+ if (readFromArg!=0) {   startOGLRendererSandbox(width,height,argv[readFromArg]); } else
+                     {   startOGLRendererSandbox(width,height,0); /*0 defaults to scene.conf*/ }
+
+
+  if (photoShootOBJ)
+   {
+     //fprintf(stderr,"Making a photoshoot of object %u",photoShootOBJ);
+     snapOGLRendererPhotoshootSandbox(photoShootOBJ,angleX,angleY,angleZ);
+     writeOpenGLColor("color.pnm",0,0,width,height);
+     writeOpenGLDepth("depth.pnm",0,0,width,height);
+     return 0;
+   }
+
 
   snapOGLRendererSandbox(); // Snap a frame
-  writeOpenGLColor("color.pnm",0,0,640,480);
-  writeOpenGLDepth("depth.pnm",0,0,640,480);
+  writeOpenGLColor("color.pnm",0,0,width,height);
+  writeOpenGLDepth("depth.pnm",0,0,width,height);
 
    while (1)
     {

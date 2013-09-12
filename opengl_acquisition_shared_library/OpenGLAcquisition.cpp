@@ -36,7 +36,7 @@ int stopOpenGLModule()
 
 int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
-  if ( ( openGL_WIDTH < width ) &&  ( openGL_HEIGHT < height ) )
+  if ( ( openGL_WIDTH <= width ) &&  ( openGL_HEIGHT <= height ) )
    {
         openGL_HEIGHT=height;
         openGL_WIDTH=width;
@@ -48,7 +48,7 @@ int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int 
   if(openGLDepthFrame!=0) { openGLDepthFrame= (short*) realloc(openGLDepthFrame,sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); } else
                           { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); }
 
-   startOGLRendererSandbox(devName);
+   startOGLRendererSandbox(openGL_WIDTH,openGL_HEIGHT,devName);
 
   return ((openGLColorFrame!=0) && (openGLDepthFrame!=0)) ;
 }

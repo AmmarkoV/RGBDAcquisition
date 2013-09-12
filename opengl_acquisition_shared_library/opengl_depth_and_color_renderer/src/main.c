@@ -129,6 +129,16 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
 }
 
 
+unsigned int getOpenGLWidth()
+{
+    return WIDTH;
+}
+
+unsigned int getOpenGLHeight()
+{
+    return HEIGHT;
+}
+
 
 int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
@@ -246,14 +256,16 @@ double getOpenGLPixelSize()
 }
 
 
-int startOGLRendererSandbox(char * sceneFile)
+int startOGLRendererSandbox(unsigned int width,unsigned int height ,char * sceneFile)
 {
 
   testMatrices();
 
   char test[12]={0};
   char * testP = test;
-  start_glx_stuff(WIDTH,HEIGHT,0,&testP);
+  start_glx_stuff(width,height,0,&testP);
+  WIDTH=width;
+  HEIGHT=height;
 
 
   #if FLIP_OPEN_GL_IMAGES
@@ -284,6 +296,17 @@ int snapOGLRendererSandbox()
     }
    return 0;
 }
+
+int snapOGLRendererPhotoshootSandbox(int objID, float angleX,float angleY,float angleZ)
+{
+    if (glx_checkEvents())
+    {
+      renderPhotoshoot(objID,angleX,angleY,angleZ);
+      return 1;
+    }
+   return 0;
+}
+
 
 int stopOGLRendererSandbox()
 {

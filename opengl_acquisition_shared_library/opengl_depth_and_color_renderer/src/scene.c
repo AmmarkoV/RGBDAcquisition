@@ -58,7 +58,7 @@ const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
 const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
 const GLfloat mat_specular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
-const GLfloat mat_shininess[] = { 5.0f };
+      GLfloat mat_shininess = 5.0f;
 
 
 float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;
@@ -167,7 +167,7 @@ int initScene(char * confFile)
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,    mat_ambient);
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    mat_diffuse);
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   mat_specular);
-  glMateriali(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess);
+  glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess); // <- this was glMateriali
 
 
 
@@ -301,4 +301,80 @@ int renderScene()
 
  return 1;
 }
+
+int renderPhotoshoot(int objID, float angleX,float angleY,float angleZ)
+{
+  fprintf(stderr,"Photoshooting Object %u -> %s \n",objID,scene->object[objID].name);
+  if (scene!=0) { glClearColor(scene->backgroundR,scene->backgroundG,scene->backgroundB,0.0); } else
+                { glClearColor(0.0,0.0,0.0,0.0); }
+
+  glEnable (GL_DEPTH_TEST);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode(GL_MODELVIEW );
+
+
+  glLoadIdentity();
+  /*
+  glRotatef(0,-1.0,0,0); // Peristrofi gyrw apo ton x
+  glRotatef(0,0,-1.0,0); // Peristrofi gyrw apo ton y
+  glRotatef(0,0,0,-1.0);
+  glTranslatef(0,0,0);*/
+
+
+  if (scene!=0)
+    {
+       unsigned char noColor=0;
+       float posStack[7]={0};
+       float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
+       unsigned int i=objID;
+
+       struct Model * mod = models[scene->object[i].type];
+       float * pos = (float*) &posStack;
+         //This is a stupid way of passing stuff to be drawn
+         R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
+         getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
+
+         setModelColor(mod,&R,&G,&B,&trans,&noColor);
+         mod->scale = scene->object[i].scale;
+
+
+        int x,y,z;
+
+        posStack[5]=angleZ;
+
+
+        posStack[3]=angleX-30;
+        posStack[0]=-15.0;
+        for (x=0; x<12; x++)
+        {
+         posStack[0]+=2.5;
+         posStack[1]=-15.0;
+
+         posStack[3]+=5;
+
+         posStack[4]=angleY;
+         for (y=0; y<=12; y++)
+          {
+           posStack[1]+=2.5;
+           posStack[2]=-30.0;
+
+           posStack[4]+=5;
+           // for (z=0; z<=3; z++)
+             {
+              // posStack[2]+=10;
+               drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+             }
+          }
+         }
+
+        }
+
+
+  ++framesRendered;
+  return 1 ;
+}
+
+
+
+
 
