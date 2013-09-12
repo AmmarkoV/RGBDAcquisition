@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
                                             segConfDepth.maxX = atoi(argv[i+3]); segConfDepth.maxY = atoi(argv[i+4]);  doNotSegmentDepth=0; } else
     if (strcmp(argv[i],"-minRGB")==0)     { segConfRGB.minR = atoi(argv[i+1]); segConfRGB.minG = atoi(argv[i+2]); segConfRGB.minB = atoi(argv[i+3]); doNotSegmentRGB=0; } else
     if (strcmp(argv[i],"-maxRGB")==0)     { segConfRGB.maxR = atoi(argv[i+1]); segConfRGB.maxG = atoi(argv[i+2]); segConfRGB.maxB = atoi(argv[i+3]); doNotSegmentRGB=0; } else
+    if (strcmp(argv[i],"-eraseRGB")==0) { segConfRGB.eraseColorR = atoi(argv[i+1]); segConfRGB.eraseColorG = atoi(argv[i+2]); segConfRGB.eraseColorB = atoi(argv[i+3]);  } else
     if (strcmp(argv[i],"-replaceRGB")==0) { segConfRGB.replaceR = atoi(argv[i+1]); segConfRGB.replaceG = atoi(argv[i+2]); segConfRGB.replaceB = atoi(argv[i+3]); segConfRGB.enableReplacingColors=1; } else
     if (strcmp(argv[i],"-minDepth")==0)   { segConfDepth.minDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
     if (strcmp(argv[i],"-maxDepth")==0)   { segConfDepth.maxDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else

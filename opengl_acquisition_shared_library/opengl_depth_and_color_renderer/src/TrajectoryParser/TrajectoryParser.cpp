@@ -57,6 +57,9 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 
+//int (*saveSnapshot) (int,struct calibration *);
+
+
 int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int framesToAdd)
 {
   if (framesToAdd == 0) { return 0 ; }
