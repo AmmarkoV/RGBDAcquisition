@@ -256,14 +256,14 @@ double getOpenGLPixelSize()
 }
 
 
-int startOGLRendererSandbox(unsigned int width,unsigned int height ,char * sceneFile)
+int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,char * sceneFile)
 {
-
+  fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
   testMatrices();
 
   char test[12]={0};
   char * testP = test;
-  start_glx_stuff(width,height,0,&testP);
+  start_glx_stuff(width,height,viewWindow,0,&testP);
   WIDTH=width;
   HEIGHT=height;
 
@@ -297,11 +297,14 @@ int snapOGLRendererSandbox()
    return 0;
 }
 
-int snapOGLRendererPhotoshootSandbox(int objID, float angleX,float angleY,float angleZ)
+int snapOGLRendererPhotoshootSandbox(int objID, unsigned int columns , unsigned int rows , float distance,
+                                     float angleX,float angleY,float angleZ,
+                                     float angXVariance ,float angYVariance , float angZVariance
+                                    )
 {
     if (glx_checkEvents())
     {
-      renderPhotoshoot(objID,angleX,angleY,angleZ);
+      renderPhotoshoot(objID,columns,rows,distance,angleX,angleY,angleZ,angXVariance,angYVariance,angZVariance);
       return 1;
     }
    return 0;

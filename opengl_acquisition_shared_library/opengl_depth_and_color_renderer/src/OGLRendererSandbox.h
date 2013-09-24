@@ -24,9 +24,12 @@ double getOpenGLFocalLength();
 double getOpenGLPixelSize();
 
 
-int startOGLRendererSandbox(unsigned int width,unsigned int height , char * sceneFile);
+int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,char * sceneFile);
 int snapOGLRendererSandbox();
-int snapOGLRendererPhotoshootSandbox(int objID, float angleX,float angleY,float angleZ);
+int snapOGLRendererPhotoshootSandbox(int objID, unsigned int columns , unsigned int rows , float distance,
+                                     float angleX,float angleY,float angleZ,
+                                     float angXVariance ,float angYVariance , float angZVariance
+                                    );
 int stopOGLRendererSandbox();
 
 #ifdef __cplusplus

@@ -25,23 +25,19 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
 
   calib->intrinsic[0]=0.0;  calib->intrinsic[1]=0.0;  calib->intrinsic[2]=0.0;
   calib->intrinsic[3]=0.0;  calib->intrinsic[4]=0.0;  calib->intrinsic[5]=0.0;
-  calib->intrinsic[6]=0.0;  calib->intrinsic[7]=0.0;  calib->intrinsic[8]=0.0;
-
-  double * fx = &calib->intrinsic[0]; double * fy = &calib->intrinsic[4];
-  double * cx = &calib->intrinsic[2]; double * cy = &calib->intrinsic[5];
-  double * one = &calib->intrinsic[8];
+  calib->intrinsic[6]=0.0;  calib->intrinsic[7]=0.0;  calib->intrinsic[8]=1.0;
 
   calib->k1=0.0;  calib->k2=0.0; calib->p1=0.0; calib->p2=0.0; calib->k3=0.0;
 
   calib->extrinsicRotationRodriguez[0]=0.0; calib->extrinsicRotationRodriguez[1]=0.0; calib->extrinsicRotationRodriguez[2]=0.0;
   calib->extrinsicTranslation[0]=0.0; calib->extrinsicTranslation[1]=0.0; calib->extrinsicTranslation[2]=0.0;
 
-  *cx = (double) width/2;
-  *cy = (double) height/2;
+  /*cx*/calib->intrinsic[2]  = (double) width/2;
+  /*cy*/calib->intrinsic[5]  = (double) height/2;
 
   //-This is a bad initial estimation i guess :P
-  *fx = (double) DEFAULT_FOCAL_LENGTH/(2*DEFAULT_PIXEL_SIZE);    //<- these might be wrong
-  *fy = (double) DEFAULT_FOCAL_LENGTH/(2*DEFAULT_PIXEL_SIZE);    //<- these might be wrong
+  /*fx*/ calib->intrinsic[0] = (double) DEFAULT_FOCAL_LENGTH/(2*DEFAULT_PIXEL_SIZE);    //<- these might be wrong
+  /*fy*/ calib->intrinsic[4] = (double) DEFAULT_FOCAL_LENGTH/(2*DEFAULT_PIXEL_SIZE);    //<- these might be wrong
   //--------------------------------------------
 
   return 1;

@@ -4,12 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <time.h>
 
 #include <dlfcn.h>
 
 #define EPOCH_YEAR_IN_TM_YEAR 1900
 
+#define PRINT_DEBUG_EACH_CALL 0
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -288,12 +290,19 @@ char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned 
 int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
 {
 
+
    char* ldPreloadPath;
    ldPreloadPath= getenv("LD_PRELOAD");
    if (ldPreloadPath!=0) { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPreloadPath); }
 
 
    char pathTester[2048]={0};
+
+
+   if (getcwd(pathTester, sizeof(pathTester)) != 0)
+         fprintf(stdout, "Current working dir: %s\n", pathTester);
+
+
    sprintf(pathTester,"%s/%s",possiblePath,libName);
    if (fileExists(pathTester))   {
                                    fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
@@ -302,7 +311,11 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
                                  } else
    if (fileExists(libName))      {
                                    fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
-                                   strncpy(pathOut,libName,pathOutLength);
+                                   //strncpy(pathOut,libName,pathOutLength);
+
+                                   strcpy(pathOut,"./"); //<-TODO CHECK BOUNDS HERE ETC..
+                                   strcat(pathOut,libName);
+
                                    return 1;
                                  }
 
@@ -421,7 +434,7 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
    plugins[moduleID].handle = dlopen (functionNameStr, RTLD_LAZY);
    if (!plugins[moduleID].handle)
        {
-        fprintf (stderr,RED "Failed while loading %s from %s - %s\n" NORMAL, moduleName , functionNameStr , dlerror());
+        fprintf (stderr,RED "Failed while loading code for %s plugin from %s\n Error : %s\n" NORMAL, moduleName , functionNameStr , dlerror());
         return 0;
        }
 

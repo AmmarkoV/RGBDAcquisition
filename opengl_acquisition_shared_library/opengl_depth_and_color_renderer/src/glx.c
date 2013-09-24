@@ -25,7 +25,7 @@ void fatalError(char *message)
 }
 
 
-int start_glx_stuff(int WIDTH,int HEIGHT,int argc, char **argv)
+int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 {
 
   XVisualInfo         *vi;
@@ -86,7 +86,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int argc, char **argv)
 
   /*** (7) request the X window to be displayed on the screen ***/
 
-  XMapWindow(dpy, win);
+  if (viewWindow) { XMapWindow(dpy, win); }
 
 
   /*** (9) dispatch X events ***/

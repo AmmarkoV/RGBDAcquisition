@@ -25,6 +25,20 @@ int HEIGHT=480;
 
 int framesRendered =0 ;
 
+enum POS_COORDS
+{
+    POS_X=0,
+    POS_Y,
+    POS_Z,
+    POS_ANGLEX,
+    POS_ANGLEY,
+    POS_ANGLEZ
+};
+
+
+
+
+
 int useIntrinsicMatrix=0;
 double cameraMatrix[9]={
                         0.0 , 0.0 , 0.0 ,
@@ -302,7 +316,10 @@ int renderScene()
  return 1;
 }
 
-int renderPhotoshoot(int objID, float angleX,float angleY,float angleZ)
+int renderPhotoshoot(int objID,unsigned int columns , unsigned int rows , float distance,
+                     float angleX,float angleY,float angleZ ,
+                     float angXVariance ,float angYVariance , float angZVariance
+                    )
 {
   fprintf(stderr,"Photoshooting Object %u -> %s \n",objID,scene->object[objID].name);
   if (scene!=0) { glClearColor(scene->backgroundR,scene->backgroundG,scene->backgroundB,0.0); } else
@@ -314,11 +331,10 @@ int renderPhotoshoot(int objID, float angleX,float angleY,float angleZ)
 
 
   glLoadIdentity();
-  /*
   glRotatef(0,-1.0,0,0); // Peristrofi gyrw apo ton x
   glRotatef(0,0,-1.0,0); // Peristrofi gyrw apo ton y
   glRotatef(0,0,0,-1.0);
-  glTranslatef(0,0,0);*/
+  glTranslatef(0,0,0);
 
 
   if (scene!=0)
@@ -340,33 +356,50 @@ int renderPhotoshoot(int objID, float angleX,float angleY,float angleZ)
 
         int x,y,z;
 
-        posStack[5]=angleZ;
+
+        float OGLUnitWidth=2.5 , OGLUnitHeight =2.4;
+
+        int snapsHorizontal=columns;
+        int snapsVertical=rows;
 
 
-        posStack[3]=angleX-30;
-        posStack[0]=-15.0;
-        for (x=0; x<12; x++)
-        {
-         posStack[0]+=2.5;
-         posStack[1]=-15.0;
+        float posOffsetX = 0;// -4;
+        float posOffsetY = 0;//  4;
 
-         posStack[3]+=5;
+        float posXBegining= -1*(posOffsetX+(float) snapsHorizontal/2)*OGLUnitWidth;
+        float posYBegining= -1*(posOffsetY+(float) snapsVertical/2)*OGLUnitHeight;
 
-         posStack[4]=angleY;
-         for (y=0; y<=12; y++)
+        float angXStep = (float)(2*angXVariance)/snapsHorizontal;
+        float angYStep = (float)(2*angYVariance)/snapsVertical  ;
+        float angZStep=0;
+
+        posStack[POS_Z]=-distance;
+
+        posStack[POS_ANGLEZ]=angleZ;
+
+
+      fprintf(stderr,"Drawing starts @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",posXBegining,posYBegining  ,  angleX-angXVariance , angleY-angYVariance , angleZ);
+
+       posStack[POS_ANGLEY]=(float) angleY-angYVariance;
+       posStack[POS_Y]=posYBegining;
+       for (y=0; y<=snapsVertical; y++)
           {
-           posStack[1]+=2.5;
-           posStack[2]=-30.0;
+           posStack[POS_ANGLEY]+=angYStep;
+           posStack[POS_Y]+=OGLUnitHeight;
 
-           posStack[4]+=5;
-           // for (z=0; z<=3; z++)
-             {
-              // posStack[2]+=10;
-               drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
-             }
-          }
-         }
 
+            posStack[POS_ANGLEX]=(float) angleX-angXVariance;
+            posStack[POS_X]=posXBegining;
+            for (x=0; x<snapsHorizontal; x++)
+               {
+                 posStack[POS_ANGLEX]+=angXStep;
+                 posStack[POS_X]+=OGLUnitWidth;
+
+
+                   drawModelAt(mod,pos[POS_X],pos[POS_Y],pos[POS_Z],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
+                }
+            }
+          fprintf(stderr,"Drawing stopped  @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
         }
 
 

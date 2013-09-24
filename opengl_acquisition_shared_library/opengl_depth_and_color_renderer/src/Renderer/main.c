@@ -13,6 +13,9 @@ float angleX=0.0,angleY=0.0,angleZ=0.0;
 unsigned int width=640;
 unsigned int height=480;
 
+unsigned int columns=22,rows=21;
+float distance = 30;
+
 int main(int argc, char **argv)
 {
 
@@ -27,7 +30,7 @@ int main(int argc, char **argv)
  camera[3]=0.0;          camera[4]=534.223354;  camera[5]=243.889369;
  camera[6]=0.0;          camera[7]=0.0;         camera[8]=1.0;
 
-
+ #define USE_CAMERA_CALIBRATION 0
  #define USE_TEST 0
 
  #if   USE_TEST == 0
@@ -58,8 +61,9 @@ int main(int argc, char **argv)
 
  #if USE_TEST == 0
   setOpenGLNearFarPlanes(1,5000);
-  setOpenGLIntrinsicCalibration( (double*) camera);
-  //setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
+  #if USE_CAMERA_CALIBRATION
+   setOpenGLIntrinsicCalibration( (double*) camera);
+  #endif
  #else
   setOpenGLNearFarPlanes(0.1,100);
   setOpenGLIntrinsicCalibration( (double*) camera);
@@ -89,18 +93,19 @@ int main(int argc, char **argv)
                                      } else
     if (strcmp(argv[i],"-from")==0) {
                                         if (i+1<argc)
-                                          readFromArg = i+1 ;
+                                          { readFromArg = i+1 ; }
                                     }
   }
 
- if (readFromArg!=0) {   startOGLRendererSandbox(width,height,argv[readFromArg]); } else
-                     {   startOGLRendererSandbox(width,height,0); /*0 defaults to scene.conf*/ }
+ if (readFromArg!=0) {   startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,argv[readFromArg]); } else
+                     {   startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/ }
 
 
   if (photoShootOBJ)
    {
+     float angXVariance=60,angYVariance=60,angZVariance=30;
      //fprintf(stderr,"Making a photoshoot of object %u",photoShootOBJ);
-     snapOGLRendererPhotoshootSandbox(photoShootOBJ,angleX,angleY,angleZ);
+     snapOGLRendererPhotoshootSandbox(photoShootOBJ,columns,rows,distance,angleX,angleY,angleZ,angXVariance,angYVariance,angZVariance);
      writeOpenGLColor("color.pnm",0,0,width,height);
      writeOpenGLDepth("depth.pnm",0,0,width,height);
      return 0;

@@ -17,7 +17,10 @@ extern double customTranslation[3];
 extern double customRodriguezRotation[3];
 
 int renderScene();
-int renderPhotoshoot(int objID, float angleX,float angleY,float angleZ);
+int renderPhotoshoot(int objID,unsigned int columns , unsigned int rows , float distance,
+                     float angleX,float angleY,float angleZ ,
+                     float angXVariance ,float angYVariance , float angZVariance
+                    );
 int initScene(char * confFile);
 int tickScene();
 int closeScene();
