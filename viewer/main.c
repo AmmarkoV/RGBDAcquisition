@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
   {
     if (strcmp(argv[i],"-calibration")==0) {
                                              calibrationSet=1;
-                                             if (!ReadCalibration(argv[i+1],&calib) )
+                                             if (!ReadCalibration(argv[i+1],width,height,&calib) )
                                              {
                                                fprintf(stderr,"Could not read calibration file `%s`\n",argv[i+1]);
                                                return 1;

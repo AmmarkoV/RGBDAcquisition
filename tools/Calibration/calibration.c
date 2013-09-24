@@ -7,8 +7,16 @@
 
 #define DEBUG_PRINT_EACH_CALIBRATION_LINE_READ 0
 
+#define DEFAULT_WIDTH 640
+#define DEFAULT_HEIGHT 480
+
+#define DEFAULT_FX 535.423874
+#define DEFAULT_FY 533.484654
+
+//Default Kinect things for reference
 #define DEFAULT_FOCAL_LENGTH 120.0
 #define DEFAULT_PIXEL_SIZE 0.1052
+
 #define MAX_LINE_CALIBRATION 1024
 
 int NullCalibration(unsigned int width,unsigned int height, struct calibration * calib)
@@ -36,17 +44,17 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
   /*cy*/calib->intrinsic[5]  = (double) height/2;
 
   //-This is a bad initial estimation i guess :P
-  /*fx*/ calib->intrinsic[0] = (double) DEFAULT_FOCAL_LENGTH/(2*DEFAULT_PIXEL_SIZE);    //<- these might be wrong
-  /*fy*/ calib->intrinsic[4] = (double) DEFAULT_FOCAL_LENGTH/(2*DEFAULT_PIXEL_SIZE);    //<- these might be wrong
+  /*fx*/ calib->intrinsic[0] = (double) (DEFAULT_FX * width) / DEFAULT_WIDTH;   //<- these might be wrong
+  /*fy*/ calib->intrinsic[4] = (double) (DEFAULT_FY * height)  / DEFAULT_HEIGHT;    //<- these might be wrong
   //--------------------------------------------
 
   return 1;
 }
 
-int ReadCalibration(char * filename,struct calibration * calib)
+int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib)
 {
   //First free
-  NullCalibration(0,0,calib);
+  NullCalibration(width,height,calib);
 
   FILE * fp = 0;
   fp = fopen(filename,"r");

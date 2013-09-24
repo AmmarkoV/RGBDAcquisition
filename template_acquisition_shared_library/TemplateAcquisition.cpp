@@ -327,12 +327,12 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   NullCalibration(device[devID].templateWIDTH,device[devID].templateHEIGHT,&device[devID].calibRGB);
 
   sprintf(file_name_test,"frames/%s/color.calib",device[devID].readFromDir);
-  if ( ! ReadCalibration(file_name_test,&device[devID].calibRGB) ) { fprintf(stderr,"Could not read color calibration\n"); }
+  if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibRGB) ) { fprintf(stderr,"Could not read color calibration\n"); }
 
   NullCalibration(device[devID].templateWIDTH,device[devID].templateHEIGHT,&device[devID].calibDepth);
 
   sprintf(file_name_test,"frames/%s/depth.calib",device[devID].readFromDir);
-  if ( ! ReadCalibration(file_name_test,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
+  if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
 
 
   return ((device[devID].templateColorFrame!=0)&&(device[devID].templateDepthFrame!=0));

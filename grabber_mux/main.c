@@ -12,6 +12,9 @@ char inputname1[512]={0};
 char inputname2[512]={0};
 
 
+unsigned int defaultWidth=640;
+unsigned int defaultHeight=480;
+
 
 int calibrationSetA = 0;
 struct calibration calibA;
@@ -56,7 +59,7 @@ int main(int argc, char *argv[])
   {
     if (strcmp(argv[i],"-calibration1")==0) {
                                              calibrationSetA=1;
-                                             if (!ReadCalibration(argv[i+1],&calibA) )
+                                             if (!ReadCalibration(argv[i+1],defaultWidth,defaultHeight,&calibA) )
                                              {
                                                fprintf(stderr,"Could not read calibration file for file 1 `%s`\n",argv[i+1]);
                                                return 1;
@@ -64,7 +67,7 @@ int main(int argc, char *argv[])
                                            } else
     if (strcmp(argv[i],"-calibration2")==0) {
                                              calibrationSetB=1;
-                                             if (!ReadCalibration(argv[i+1],&calibB) )
+                                             if (!ReadCalibration(argv[i+1],defaultWidth,defaultHeight,&calibB) )
                                              {
                                                fprintf(stderr,"Could not read calibration file for file 2 `%s`\n",argv[i+1]);
                                                return 1;
@@ -162,10 +165,10 @@ int main(int argc, char *argv[])
   if (strlen(inputname2)<1) { devName2=0; }
 
     //Initialize Every OpenNI Device
-    acquisitionOpenDevice(moduleID_1,devID_1,devName1,640,480,25);
+    acquisitionOpenDevice(moduleID_1,devID_1,devName1,defaultWidth,defaultHeight,25);
     acquisitionMapDepthToRGB(moduleID_1,devID_1);
 
-    acquisitionOpenDevice(moduleID_2,devID_2,devName2,640,480,25);
+    acquisitionOpenDevice(moduleID_2,devID_2,devName2,defaultWidth,defaultHeight,25);
     acquisitionMapDepthToRGB(moduleID_2,devID_2);
 
 
