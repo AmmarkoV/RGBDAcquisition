@@ -2,7 +2,9 @@
 #include <GL/glx.h>    /* this includes the necessary X headers */
 
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "tiledRenderer.h"
 
 #include "TrajectoryParser/TrajectoryParser.h"
 #include "model_loader.h"
@@ -309,12 +311,40 @@ int renderScene()
 
 
 
-int renderPhotoshoot(int objID,unsigned int columns , unsigned int rows , float distance,
+int renderPhotoshoot(
+                     int objID,
+                     unsigned int columns , unsigned int rows ,
+                     float distance,
                      float angleX,float angleY,float angleZ ,
                      float angXVariance ,float angYVariance , float angZVariance
                     )
 {
-  return tiledRenderer_Render( scene  , models , objID, columns ,  rows ,  distance, angleX, angleY, angleZ , angXVariance , angYVariance ,  angZVariance );
+
+  fprintf(stderr," renderPhotoshoot Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",rows,columns,distance,angleX,angleY,angleZ);
+  fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",angXVariance,angYVariance,angZVariance);
+
+  struct tiledRendererConfiguration configuration;
+
+  configuration.columns=columns;
+  configuration.rows=rows;
+  configuration.objID=objID;
+  configuration.distance=distance;
+  configuration.angleX=angleX;
+  configuration.angleY=angleY;
+  configuration.angleZ=angleZ;
+  configuration.angXVariance=angXVariance;
+  configuration.angYVariance=angYVariance;
+  configuration.angZVariance=angZVariance;
+
+  configuration.scenePTR = (void *) scene;
+  configuration.modelPTR = (void *) models;
+
+  //In the old version of  tiledRenderer_Render calling with float arguments caused them to be Zeros :S crazy
+
+  int i= tiledRenderer_Render(&configuration);
+
+  if (i) { framesRendered++; return 1; }
+  return 0;
 }
 
 

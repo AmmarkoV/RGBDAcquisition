@@ -89,6 +89,7 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     glGetDoublev(GL_DEPTH_SCALE, &depth_scale); // Returns 1.0
 
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
+    memset(zbuffer,0,(width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
     /*

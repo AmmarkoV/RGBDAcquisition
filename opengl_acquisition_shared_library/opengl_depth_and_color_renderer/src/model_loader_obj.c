@@ -309,7 +309,7 @@ int loadMTL(struct OBJ_Model * obj,char * directory,char *filename)
 int calculateBoundingBox(struct OBJ_Model * obj)
 {
   /* Scan all model vertices to find the maximum and minimum coordinates of each dimension */
-  long unsigned int i;
+  long unsigned int i=0;
 
 	  obj->boundBox.min.x=obj->vertexList[1].x;
 	  obj->boundBox.min.y=obj->vertexList[1].y;
@@ -509,19 +509,19 @@ int readOBJ(struct OBJ_Model * obj)
   fprintf(stderr,"Allocating memory for faces\n");
   obj->faceList = (Face*) malloc(sizeof(Face)*(obj->numFaces+2));
   if (obj->faceList == 0) { fprintf(stderr,"Could not allocate enough memory for face struct\n"); }
-  memset (obj->faceList,0,sizeof(Face)*(obj->numFaces+1));
+  memset (obj->faceList,0,sizeof(Face)*(obj->numFaces+2));
 
   fprintf(stderr,"Allocating memory for vertices\n");
   obj->vertexList = (Vertex*) malloc(sizeof(Vertex)*(obj->numVertices+2));
   if (obj->vertexList == 0) { fprintf(stderr,"Could not allocate enough memory for vertex struct\n"); }
-  memset (obj->vertexList,0,sizeof(Vertex)*(obj->numVertices+1));
+  memset (obj->vertexList,0,sizeof(Vertex)*(obj->numVertices+2));
 
   if(obj->numNormals!=0)
   {
     fprintf(stderr,"Allocating memory for normals\n");
     obj->normalList=(Normal*)malloc(sizeof(Normal)*(obj->numNormals+2));
     if (obj->normalList == 0) { fprintf(stderr,"Could not allocate enough memory for normal struct\n"); }
-    memset (obj->normalList,0,sizeof(Normal)*(obj->numNormals+1));
+    memset (obj->normalList,0,sizeof(Normal)*(obj->numNormals+2));
   }
 
   if(obj->numTexs!=0)
@@ -529,7 +529,7 @@ int readOBJ(struct OBJ_Model * obj)
     fprintf(stderr,"Allocating memory for textures\n");
     obj->texList=(TexCoords*)malloc(sizeof(TexCoords)*(obj->numTexs+2));
     if (obj->texList == 0) { fprintf(stderr,"Could not allocate enough memory for texture struct\n"); }
-    memset (obj->texList,0,sizeof(TexCoords)*(obj->numTexs+1));
+    memset (obj->texList,0,sizeof(TexCoords)*(obj->numTexs+2));
   }
 
 

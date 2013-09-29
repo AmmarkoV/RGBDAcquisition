@@ -16,7 +16,8 @@ enum POS_COORDS
     POS_Z,
     POS_ANGLEX,
     POS_ANGLEY,
-    POS_ANGLEZ
+    POS_ANGLEZ,
+    POS_COORD_LENGTH
 };
 
 
@@ -52,27 +53,43 @@ void setupTiledRendererOGL(float backgroundR,float backgroundG,float backgroundB
   glRotatef(0,0,-1.0,0); // Peristrofi gyrw apo ton y
   glRotatef(0,0,0,-1.0);
   glTranslatef(0,0,0);
+
 }
 
 
-int tiledRenderer_Render(
-                             struct VirtualStream * scene  ,
-                             struct Model ** models ,
-                             int objID,unsigned int columns , unsigned int rows , float distance,
-                             float angleX,float angleY,float angleZ ,
-                             float angXVariance ,float angYVariance , float angZVariance
-                         )
-{
-  fprintf(stderr,"Photoshooting Object %u -> %s \n",objID,scene->object[objID].name);
 
-  if (scene!=0) { setupTiledRendererOGL(scene->backgroundR,scene->backgroundG,scene->backgroundB); } else
+int tiledRenderer_Render( struct tiledRendererConfiguration * configuration)
+{
+  unsigned int columns=configuration->columns;
+  unsigned int rows=configuration->rows;
+  unsigned int objID=configuration->objID;
+  float distance=configuration->distance;
+  float angleX=configuration->angleX;
+  float angleY=configuration->angleY;
+  float angleZ=configuration->angleZ;
+  float angXVariance=configuration->angXVariance;
+  float angYVariance=configuration->angYVariance;
+  float angZVariance=configuration->angZVariance;
+
+
+
+  struct VirtualStream * scene = (struct VirtualStream *)  configuration->scenePTR;
+  struct Model ** models = ( struct Model ** ) configuration->modelPTR;
+
+
+  fprintf(stderr,"Photoshooting Object %u -> %s \n",objID,scene->object[objID].name);
+  fprintf(stderr,"Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",rows,columns,distance,angleX,angleY,angleZ);
+  fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",angXVariance,angYVariance,angZVariance);
+
+
+  if (scene!=0) { setupTiledRendererOGL((float)scene->backgroundR,(float)scene->backgroundG,(float)scene->backgroundB); } else
                 { setupTiledRendererOGL(0.0,0.0,0.0); }
 
 
   if (scene!=0)
     {
        unsigned char noColor=0;
-       float posStack[7]={0};
+       float posStack[POS_COORD_LENGTH]={0};
        float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
        unsigned int i=objID;
 
@@ -105,7 +122,7 @@ int tiledRenderer_Render(
         float angYStep = (float)(2*angYVariance)/snapsVertical  ;
         float angZStep=0;
 
-        posStack[POS_Z]=-distance;
+        posStack[POS_Z]= 0 - distance ;
 
         posStack[POS_ANGLEZ]=angleZ;
 
@@ -129,6 +146,7 @@ int tiledRenderer_Render(
                  posStack[POS_ANGLEX]+=angXStep;
                  posStack[POS_X]+=OGLUnitWidth;
 
+                   fprintf(stderr,"Drawing model  @ %0.2f %0.2f %0.2f   %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],posStack[POS_Z],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
 
                    drawModelAt(mod,pos[POS_X],pos[POS_Y],pos[POS_Z],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
                 }
@@ -136,6 +154,6 @@ int tiledRenderer_Render(
           fprintf(stderr,"Drawing stopped  @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
         }
 
-
+   glPopMatrix();
   return 1 ;
 }

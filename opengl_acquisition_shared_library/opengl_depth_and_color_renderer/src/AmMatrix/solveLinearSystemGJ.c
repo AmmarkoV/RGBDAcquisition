@@ -24,7 +24,7 @@ enum packedPointPrecalcs
 void printSystemMatlab(double * mat,unsigned int totalLines)
 {
   fprintf(stderr,"\n\n { ");
-    int i=0;
+    unsigned int  i=0;
     for (i=0; i< totalLines; i++)
     {
      fprintf(stderr,"{ %0.2f , ",mat[i*elements + xBxA] );
@@ -46,7 +46,7 @@ void printSystemScilab(double * mat,unsigned int totalLines)
 {
 //M = [8 1 6; 3 5 7; 4 9 2]
   fprintf(stderr,"M=[");
-    int i=0;
+    unsigned int i=0;
     for (i=0; i< totalLines; i++)
     {
      fprintf(stderr,"%0.2f ",mat[i*elements + xBxA] );
@@ -69,7 +69,7 @@ void printSystemPlain(double * mat,char * label , unsigned int totalLines)
 {
   fprintf(stderr,"System Printout of %s \n",label);
   fprintf(stderr,"---------------------------------------------\n");
-    int i=0;
+    unsigned int i=0;
     for (i=0; i<totalLines; i++)
     {
      fprintf(stderr,"%0.2f ",mat[i*elements + xBxA] );
@@ -172,7 +172,7 @@ int gatherResult(double * result , double * mat  , unsigned int totalLines )
   unsigned int i=0;
 
   line=totalLines-1;
-  while (line>=0)
+  while (line>0)
   {
     calculatedItem = 0.0;
     if (line<totalLines-1)
@@ -211,7 +211,7 @@ int gatherResult(double * result , double * mat  , unsigned int totalLines )
 
 
 
-int solveLinearSystemGJ(double * result , double * coefficients , int variables , int totalLines )
+int solveLinearSystemGJ(double * result , double * coefficients , unsigned int variables , unsigned int totalLines )
 {
     //Make the system upper diagonal
     unsigned int i=0;
@@ -236,7 +236,7 @@ int solveLinearSystemGJ(double * result , double * coefficients , int variables 
 
 
 
-int calculateFundamentalMatrix(double * result3x3Matrix , int pointsNum ,  double * pointsA,  double * pointsB )
+int calculateFundamentalMatrix(double * result3x3Matrix , unsigned int pointsNum ,  double * pointsA,  double * pointsB )
 {
     double * pxA , * pyA , * pxB , * pyB ;
     int elements=10;
@@ -286,9 +286,13 @@ int calculateFundamentalMatrix(double * result3x3Matrix , int pointsNum ,  doubl
 
 void testGJSolver()
 {
+  return ;
+
   double * F3x3 = alloc3x3Matrix();    if (F3x3 ==0) { return; }
   double * pointsA = (double *) malloc(sizeof(double) * 2 * 8);
+  memset(pointsA , 0 ,sizeof(double) * 2 * 8 );
   double * pointsB = (double *) malloc(sizeof(double) * 2 * 8);
+  memset(pointsB , 0 ,sizeof(double) * 2 * 8 );
 
 
 //          SOURCE FRAME POINTS                                 TARGET FRAME POINTS
