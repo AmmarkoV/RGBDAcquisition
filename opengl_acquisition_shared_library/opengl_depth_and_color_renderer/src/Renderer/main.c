@@ -3,6 +3,7 @@
  * X64 compilation: gcc -o -L/usr/X11/lib64 main main.c -lGL -lX11
  */
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include "../OGLRendererSandbox.h"

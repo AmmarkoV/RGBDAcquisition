@@ -15,7 +15,7 @@ INC =
 CFLAGS =  -Wall -fPIC
 RESINC = 
 LIBDIR = 
-LIB =  -lGL -lX11
+LIB =  -lGL -lGLU -lX11
 LDFLAGS = 
 
 INC_DEBUG =  $(INC)
@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG =  $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = ../OGLRendererSandbox.so
+OUT_DEBUG = ../libOGLRendererSandbox.so
 
 INC_RELEASE =  $(INC)
 CFLAGS_RELEASE =  $(CFLAGS) -O2 -pedantic -Wall
@@ -38,11 +38,11 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = ../OGLRendererSandbox.so
+OUT_RELEASE = ../libOGLRendererSandbox.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/tools.o $(OBJDIR_DEBUG)/shader_loader.o $(OBJDIR_DEBUG)/scene.o $(OBJDIR_DEBUG)/save_to_file.o $(OBJDIR_DEBUG)/model_loader_obj.o $(OBJDIR_DEBUG)/model_loader.o $(OBJDIR_DEBUG)/glx.o $(OBJDIR_DEBUG)/TrajectoryParser/TrajectoryParser.o $(OBJDIR_DEBUG)/TrajectoryParser/InputParser_C.o $(OBJDIR_DEBUG)/TextureLoader/texture_loader.o $(OBJDIR_DEBUG)/TextureLoader/ppm.o $(OBJDIR_DEBUG)/TextureLoader/bmp.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/save_to_file.o $(OBJDIR_DEBUG)/glx.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/model_loader.o $(OBJDIR_DEBUG)/model_loader_obj.o $(OBJDIR_DEBUG)/TrajectoryParser/TrajectoryParser.o $(OBJDIR_DEBUG)/scene.o $(OBJDIR_DEBUG)/shader_loader.o $(OBJDIR_DEBUG)/tools.o $(OBJDIR_DEBUG)/TextureLoader/bmp.o $(OBJDIR_DEBUG)/AmMatrix/matrix4x4Tools.o $(OBJDIR_DEBUG)/AmMatrix/matrixCalculations.o $(OBJDIR_DEBUG)/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_DEBUG)/AmMatrix/matrix3x3Tools.o $(OBJDIR_DEBUG)/TextureLoader/ppm.o $(OBJDIR_DEBUG)/TextureLoader/texture_loader.o $(OBJDIR_DEBUG)/TrajectoryParser/InputParser_C.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/tools.o $(OBJDIR_RELEASE)/shader_loader.o $(OBJDIR_RELEASE)/scene.o $(OBJDIR_RELEASE)/save_to_file.o $(OBJDIR_RELEASE)/model_loader_obj.o $(OBJDIR_RELEASE)/model_loader.o $(OBJDIR_RELEASE)/glx.o $(OBJDIR_RELEASE)/TrajectoryParser/TrajectoryParser.o $(OBJDIR_RELEASE)/TrajectoryParser/InputParser_C.o $(OBJDIR_RELEASE)/TextureLoader/texture_loader.o $(OBJDIR_RELEASE)/TextureLoader/ppm.o $(OBJDIR_RELEASE)/TextureLoader/bmp.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/save_to_file.o $(OBJDIR_RELEASE)/glx.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/model_loader.o $(OBJDIR_RELEASE)/model_loader_obj.o $(OBJDIR_RELEASE)/TrajectoryParser/TrajectoryParser.o $(OBJDIR_RELEASE)/scene.o $(OBJDIR_RELEASE)/shader_loader.o $(OBJDIR_RELEASE)/tools.o $(OBJDIR_RELEASE)/TextureLoader/bmp.o $(OBJDIR_RELEASE)/AmMatrix/matrix4x4Tools.o $(OBJDIR_RELEASE)/AmMatrix/matrixCalculations.o $(OBJDIR_RELEASE)/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_RELEASE)/AmMatrix/matrix3x3Tools.o $(OBJDIR_RELEASE)/TextureLoader/ppm.o $(OBJDIR_RELEASE)/TextureLoader/texture_loader.o $(OBJDIR_RELEASE)/TrajectoryParser/InputParser_C.o
 
 all: debug release
 
@@ -53,6 +53,7 @@ before_debug:
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 	test -d $(OBJDIR_DEBUG)/TrajectoryParser || mkdir -p $(OBJDIR_DEBUG)/TrajectoryParser
 	test -d $(OBJDIR_DEBUG)/TextureLoader || mkdir -p $(OBJDIR_DEBUG)/TextureLoader
+	test -d $(OBJDIR_DEBUG)/AmMatrix || mkdir -p $(OBJDIR_DEBUG)/AmMatrix
 
 after_debug: 
 
@@ -61,44 +62,56 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
-$(OBJDIR_DEBUG)/main.o: main.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.c -o $(OBJDIR_DEBUG)/main.o
-
-$(OBJDIR_DEBUG)/tools.o: tools.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c tools.c -o $(OBJDIR_DEBUG)/tools.o
-
-$(OBJDIR_DEBUG)/shader_loader.o: shader_loader.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c shader_loader.c -o $(OBJDIR_DEBUG)/shader_loader.o
-
-$(OBJDIR_DEBUG)/scene.o: scene.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c scene.c -o $(OBJDIR_DEBUG)/scene.o
-
 $(OBJDIR_DEBUG)/save_to_file.o: save_to_file.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c save_to_file.c -o $(OBJDIR_DEBUG)/save_to_file.o
-
-$(OBJDIR_DEBUG)/model_loader_obj.o: model_loader_obj.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c model_loader_obj.c -o $(OBJDIR_DEBUG)/model_loader_obj.o
-
-$(OBJDIR_DEBUG)/model_loader.o: model_loader.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c model_loader.c -o $(OBJDIR_DEBUG)/model_loader.o
 
 $(OBJDIR_DEBUG)/glx.o: glx.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c glx.c -o $(OBJDIR_DEBUG)/glx.o
 
+$(OBJDIR_DEBUG)/main.o: main.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.c -o $(OBJDIR_DEBUG)/main.o
+
+$(OBJDIR_DEBUG)/model_loader.o: model_loader.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c model_loader.c -o $(OBJDIR_DEBUG)/model_loader.o
+
+$(OBJDIR_DEBUG)/model_loader_obj.o: model_loader_obj.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c model_loader_obj.c -o $(OBJDIR_DEBUG)/model_loader_obj.o
+
 $(OBJDIR_DEBUG)/TrajectoryParser/TrajectoryParser.o: TrajectoryParser/TrajectoryParser.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c TrajectoryParser/TrajectoryParser.cpp -o $(OBJDIR_DEBUG)/TrajectoryParser/TrajectoryParser.o
 
-$(OBJDIR_DEBUG)/TrajectoryParser/InputParser_C.o: TrajectoryParser/InputParser_C.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c TrajectoryParser/InputParser_C.cpp -o $(OBJDIR_DEBUG)/TrajectoryParser/InputParser_C.o
+$(OBJDIR_DEBUG)/scene.o: scene.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c scene.c -o $(OBJDIR_DEBUG)/scene.o
 
-$(OBJDIR_DEBUG)/TextureLoader/texture_loader.o: TextureLoader/texture_loader.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c TextureLoader/texture_loader.c -o $(OBJDIR_DEBUG)/TextureLoader/texture_loader.o
+$(OBJDIR_DEBUG)/shader_loader.o: shader_loader.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c shader_loader.c -o $(OBJDIR_DEBUG)/shader_loader.o
+
+$(OBJDIR_DEBUG)/tools.o: tools.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c tools.c -o $(OBJDIR_DEBUG)/tools.o
+
+$(OBJDIR_DEBUG)/TextureLoader/bmp.o: TextureLoader/bmp.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c TextureLoader/bmp.c -o $(OBJDIR_DEBUG)/TextureLoader/bmp.o
+
+$(OBJDIR_DEBUG)/AmMatrix/matrix4x4Tools.o: AmMatrix/matrix4x4Tools.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c AmMatrix/matrix4x4Tools.c -o $(OBJDIR_DEBUG)/AmMatrix/matrix4x4Tools.o
+
+$(OBJDIR_DEBUG)/AmMatrix/matrixCalculations.o: AmMatrix/matrixCalculations.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c AmMatrix/matrixCalculations.c -o $(OBJDIR_DEBUG)/AmMatrix/matrixCalculations.o
+
+$(OBJDIR_DEBUG)/AmMatrix/solveLinearSystemGJ.o: AmMatrix/solveLinearSystemGJ.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c AmMatrix/solveLinearSystemGJ.c -o $(OBJDIR_DEBUG)/AmMatrix/solveLinearSystemGJ.o
+
+$(OBJDIR_DEBUG)/AmMatrix/matrix3x3Tools.o: AmMatrix/matrix3x3Tools.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c AmMatrix/matrix3x3Tools.c -o $(OBJDIR_DEBUG)/AmMatrix/matrix3x3Tools.o
 
 $(OBJDIR_DEBUG)/TextureLoader/ppm.o: TextureLoader/ppm.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c TextureLoader/ppm.c -o $(OBJDIR_DEBUG)/TextureLoader/ppm.o
 
-$(OBJDIR_DEBUG)/TextureLoader/bmp.o: TextureLoader/bmp.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c TextureLoader/bmp.c -o $(OBJDIR_DEBUG)/TextureLoader/bmp.o
+$(OBJDIR_DEBUG)/TextureLoader/texture_loader.o: TextureLoader/texture_loader.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c TextureLoader/texture_loader.c -o $(OBJDIR_DEBUG)/TextureLoader/texture_loader.o
+
+$(OBJDIR_DEBUG)/TrajectoryParser/InputParser_C.o: TrajectoryParser/InputParser_C.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c TrajectoryParser/InputParser_C.cpp -o $(OBJDIR_DEBUG)/TrajectoryParser/InputParser_C.o
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
@@ -106,12 +119,14 @@ clean_debug:
 	rm -rf $(OBJDIR_DEBUG)
 	rm -rf $(OBJDIR_DEBUG)/TrajectoryParser
 	rm -rf $(OBJDIR_DEBUG)/TextureLoader
+	rm -rf $(OBJDIR_DEBUG)/AmMatrix
 
 before_release: 
 	test -d .. || mkdir -p ..
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 	test -d $(OBJDIR_RELEASE)/TrajectoryParser || mkdir -p $(OBJDIR_RELEASE)/TrajectoryParser
 	test -d $(OBJDIR_RELEASE)/TextureLoader || mkdir -p $(OBJDIR_RELEASE)/TextureLoader
+	test -d $(OBJDIR_RELEASE)/AmMatrix || mkdir -p $(OBJDIR_RELEASE)/AmMatrix
 
 after_release: 
 
@@ -120,44 +135,56 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
-$(OBJDIR_RELEASE)/main.o: main.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.c -o $(OBJDIR_RELEASE)/main.o
-
-$(OBJDIR_RELEASE)/tools.o: tools.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c tools.c -o $(OBJDIR_RELEASE)/tools.o
-
-$(OBJDIR_RELEASE)/shader_loader.o: shader_loader.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c shader_loader.c -o $(OBJDIR_RELEASE)/shader_loader.o
-
-$(OBJDIR_RELEASE)/scene.o: scene.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c scene.c -o $(OBJDIR_RELEASE)/scene.o
-
 $(OBJDIR_RELEASE)/save_to_file.o: save_to_file.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c save_to_file.c -o $(OBJDIR_RELEASE)/save_to_file.o
-
-$(OBJDIR_RELEASE)/model_loader_obj.o: model_loader_obj.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c model_loader_obj.c -o $(OBJDIR_RELEASE)/model_loader_obj.o
-
-$(OBJDIR_RELEASE)/model_loader.o: model_loader.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c model_loader.c -o $(OBJDIR_RELEASE)/model_loader.o
 
 $(OBJDIR_RELEASE)/glx.o: glx.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c glx.c -o $(OBJDIR_RELEASE)/glx.o
 
+$(OBJDIR_RELEASE)/main.o: main.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.c -o $(OBJDIR_RELEASE)/main.o
+
+$(OBJDIR_RELEASE)/model_loader.o: model_loader.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c model_loader.c -o $(OBJDIR_RELEASE)/model_loader.o
+
+$(OBJDIR_RELEASE)/model_loader_obj.o: model_loader_obj.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c model_loader_obj.c -o $(OBJDIR_RELEASE)/model_loader_obj.o
+
 $(OBJDIR_RELEASE)/TrajectoryParser/TrajectoryParser.o: TrajectoryParser/TrajectoryParser.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c TrajectoryParser/TrajectoryParser.cpp -o $(OBJDIR_RELEASE)/TrajectoryParser/TrajectoryParser.o
 
-$(OBJDIR_RELEASE)/TrajectoryParser/InputParser_C.o: TrajectoryParser/InputParser_C.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c TrajectoryParser/InputParser_C.cpp -o $(OBJDIR_RELEASE)/TrajectoryParser/InputParser_C.o
+$(OBJDIR_RELEASE)/scene.o: scene.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c scene.c -o $(OBJDIR_RELEASE)/scene.o
 
-$(OBJDIR_RELEASE)/TextureLoader/texture_loader.o: TextureLoader/texture_loader.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c TextureLoader/texture_loader.c -o $(OBJDIR_RELEASE)/TextureLoader/texture_loader.o
+$(OBJDIR_RELEASE)/shader_loader.o: shader_loader.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c shader_loader.c -o $(OBJDIR_RELEASE)/shader_loader.o
+
+$(OBJDIR_RELEASE)/tools.o: tools.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c tools.c -o $(OBJDIR_RELEASE)/tools.o
+
+$(OBJDIR_RELEASE)/TextureLoader/bmp.o: TextureLoader/bmp.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c TextureLoader/bmp.c -o $(OBJDIR_RELEASE)/TextureLoader/bmp.o
+
+$(OBJDIR_RELEASE)/AmMatrix/matrix4x4Tools.o: AmMatrix/matrix4x4Tools.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c AmMatrix/matrix4x4Tools.c -o $(OBJDIR_RELEASE)/AmMatrix/matrix4x4Tools.o
+
+$(OBJDIR_RELEASE)/AmMatrix/matrixCalculations.o: AmMatrix/matrixCalculations.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c AmMatrix/matrixCalculations.c -o $(OBJDIR_RELEASE)/AmMatrix/matrixCalculations.o
+
+$(OBJDIR_RELEASE)/AmMatrix/solveLinearSystemGJ.o: AmMatrix/solveLinearSystemGJ.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c AmMatrix/solveLinearSystemGJ.c -o $(OBJDIR_RELEASE)/AmMatrix/solveLinearSystemGJ.o
+
+$(OBJDIR_RELEASE)/AmMatrix/matrix3x3Tools.o: AmMatrix/matrix3x3Tools.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c AmMatrix/matrix3x3Tools.c -o $(OBJDIR_RELEASE)/AmMatrix/matrix3x3Tools.o
 
 $(OBJDIR_RELEASE)/TextureLoader/ppm.o: TextureLoader/ppm.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c TextureLoader/ppm.c -o $(OBJDIR_RELEASE)/TextureLoader/ppm.o
 
-$(OBJDIR_RELEASE)/TextureLoader/bmp.o: TextureLoader/bmp.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c TextureLoader/bmp.c -o $(OBJDIR_RELEASE)/TextureLoader/bmp.o
+$(OBJDIR_RELEASE)/TextureLoader/texture_loader.o: TextureLoader/texture_loader.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c TextureLoader/texture_loader.c -o $(OBJDIR_RELEASE)/TextureLoader/texture_loader.o
+
+$(OBJDIR_RELEASE)/TrajectoryParser/InputParser_C.o: TrajectoryParser/InputParser_C.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c TrajectoryParser/InputParser_C.cpp -o $(OBJDIR_RELEASE)/TrajectoryParser/InputParser_C.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
@@ -165,6 +192,7 @@ clean_release:
 	rm -rf $(OBJDIR_RELEASE)
 	rm -rf $(OBJDIR_RELEASE)/TrajectoryParser
 	rm -rf $(OBJDIR_RELEASE)/TextureLoader
+	rm -rf $(OBJDIR_RELEASE)/AmMatrix
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release
 

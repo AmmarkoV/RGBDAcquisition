@@ -6,10 +6,11 @@
 
 1358801851 /home/ammar/Documents/Programming/FORTH/opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
 
-1379019229 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/main.c
+1380477967 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/main.c
 	<stdio.h>
+	<string.h>
 	<stdlib.h>
 	"../OGLRendererSandbox.h"
 
-1379019481 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
+1380007064 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
 

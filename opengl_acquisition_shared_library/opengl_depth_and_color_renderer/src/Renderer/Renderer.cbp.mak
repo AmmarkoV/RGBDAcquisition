@@ -15,7 +15,7 @@ INC =  -I../../
 CFLAGS =  -Wall
 RESINC = 
 LIBDIR =  -L../../
-LIB =  -lGL -lX11 ./OGLRendererSandbox.so
+LIB =  -lGL -lGLU -lX11 ./libOGLRendererSandbox.so
 LDFLAGS = 
 
 INC_DEBUG =  $(INC)
