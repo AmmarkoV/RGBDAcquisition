@@ -21,6 +21,14 @@ enum POS_COORDS
 };
 
 
+
+int getPhotoshootTile3DCoords(unsigned int column, unsigned int row , double * x3D , double *y3D , double * z3D)
+{
+
+      return 0;
+}
+
+
 int getPhotoshootTile2DCoords(unsigned int column, unsigned int row , double * x2D , double *y2D , double * z2D)
 {
       GLint viewport[4];
@@ -55,6 +63,19 @@ void setupTiledRendererOGL(float backgroundR,float backgroundG,float backgroundB
   glTranslatef(0,0,0);
 
 }
+
+
+
+
+int tiledRenderer_get3DPointCenterForTile(struct tiledRendererConfiguration * configuration , unsigned int column,unsigned int row , float * x3D , float * y3D , float * z3D)
+{
+
+  return 0;
+}
+
+
+
+
 
 
 
@@ -146,7 +167,7 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * configuration)
                  posStack[POS_ANGLEX]+=angXStep;
                  posStack[POS_X]+=OGLUnitWidth;
 
-                   fprintf(stderr,"Drawing model  @ %0.2f %0.2f %0.2f   %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],posStack[POS_Z],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
+                   //fprintf(stderr,"Drawing model  @ %0.2f %0.2f %0.2f   %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],posStack[POS_Z],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
 
                    drawModelAt(mod,pos[POS_X],pos[POS_Y],pos[POS_Z],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
                 }

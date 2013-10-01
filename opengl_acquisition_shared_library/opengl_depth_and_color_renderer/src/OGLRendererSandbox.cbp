@@ -12,7 +12,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option parameters="synergy.conf" />
+				<Option parameters="-from dragon.conf -photo 1 1 2 3 -size 1048 1048 " />
 				<Option host_application="/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/Renderer" />
 				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
@@ -41,6 +41,7 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Wextra" />
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
@@ -109,6 +110,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="shader_loader.h" />
+		<Unit filename="tiledRenderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tiledRenderer.h" />
 		<Unit filename="tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
