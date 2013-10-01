@@ -24,7 +24,12 @@ cd "$DIR"
 
 cd ..
 
-toCheck="tools 3dparty scripts synergiesAdapter viewer libfreenect_acquisition_shared_library openni2_acquisition_shared_library openni1_acquisition_shared_library opengl_acquisition_shared_library opengl_acquisition_shared_library/opengl_depth_and_color_renderer openni1_acquisition_shared_library openni2_acquisition_shared_library template_acquisition_shared_library v4l2_acquisition_shared_library v4l2stereo_acquisition_shared_library viewer"
+#---------------------------------------------------------------------------------------------- 
+echo
+echo "$blue Checking directory structure $normal"
+echo
+
+toCheck="tools 3dparty scripts synergiesAdapter viewer libfreenect_acquisition_shared_library opengl_acquisition_shared_library opengl_acquisition_shared_library/opengl_depth_and_color_renderer openni1_acquisition_shared_library openni2_acquisition_shared_library template_acquisition_shared_library v4l2_acquisition_shared_library v4l2stereo_acquisition_shared_library viewer"
 
  for f in $toCheck
            do  
@@ -36,10 +41,11 @@ toCheck="tools 3dparty scripts synergiesAdapter viewer libfreenect_acquisition_s
              fi
   done 
 
-
-  echo "\n\n\n"
-
-toCheck="tools/Undistort/undistort tools/ExtrinsicCalibration/extrinsicCalibration tools/DepthImagesConverter/DepthImagesConverter tools/Calibration/calibration tools/Calibration/libCalibrationLibrary.a acquisition/Acquisition.so  acquisition_mux/libAcquisitionMux.so acquisitionSegment/libacquisitionSegment.a"
+#---------------------------------------------------------------------------------------------- 
+echo
+echo "$blue Checking libs $normal"
+echo 
+toCheck="tools/Undistort/undistort tools/ExtrinsicCalibration/extrinsicCalibration tools/DepthImagesConverter/DepthImagesConverter tools/Calibration/calibration tools/Calibration/libCalibrationLibrary.a acquisition/Acquisition.so  acquisition_mux/libAcquisitionMux.so acquisitionSegment/libacquisitionSegment.a  libfreenect_acquisition_shared_library/libFreenectAcquisition.so openni2_acquisition_shared_library/libOpenNI2Acquisition.so openni1_acquisition_shared_library/libOpenNI1Acquisition.so opengl_acquisition_shared_library/libOpenGLAcquisition.so opengl_acquisition_shared_library/opengl_depth_and_color_renderer/libOGLRendererSandbox.so template_acquisition_shared_library/libTemplateAcquisition.so v4l2_acquisition_shared_library/libV4L2Acquisition.so v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so"
 
  for f in $toCheck
            do  
@@ -51,7 +57,11 @@ toCheck="tools/Undistort/undistort tools/ExtrinsicCalibration/extrinsicCalibrati
              fi
   done 
 
-toCheck="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_mux/GrabberMux acquisitionBroadcast/acquisitionBroadcast synergiesAdapter/Adapter"
+#---------------------------------------------------------------------------------------------- 
+echo
+echo "$blue Checking binaries $normal"
+echo
+toCheck="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_mux/GrabberMux acquisitionBroadcast/acquisitionBroadcast opengl_acquisition_shared_library/opengl_depth_and_color_renderer/Renderer synergiesAdapter/Adapter"
 
  for f in $toCheck
            do  

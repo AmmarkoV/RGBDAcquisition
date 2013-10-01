@@ -20,7 +20,12 @@ enum POS_COORDS
     POS_COORD_LENGTH
 };
 
+int tiledRenderer(struct tiledRendererConfiguration * conf , unsigned int column , unsigned int row , double * x2D , double * y2D )
+{
 
+
+  return 0;
+}
 
 int getPhotoshootTile3DCoords(unsigned int column, unsigned int row , double * x3D , double *y3D , double * z3D)
 {
