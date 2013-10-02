@@ -35,6 +35,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-fPIC" />
 		</Compiler>
 		<Unit filename="AcquisitionSegment.c">
 			<Option compilerVar="CC" />

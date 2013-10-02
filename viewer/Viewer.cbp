@@ -31,6 +31,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="`pkg-config --cflags opencv`" />
+			<Add option="-fPIC" />
 		</Compiler>
 		<Linker>
 			<Add option="`pkg-config --libs opencv`" />

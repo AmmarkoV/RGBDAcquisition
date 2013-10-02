@@ -12,7 +12,7 @@ LD = g++
 WINDRES = windres
 
 INC = 
-CFLAGS =  -Wall
+CFLAGS =  -Wall -fPIC
 RESINC = 
 LIBDIR = 
 LIB =  -lGL -lGLU -lX11 ../acquisition/libAcquisition.so -lrt ../tools/Calibration/libCalibrationLibrary.a -ldl
