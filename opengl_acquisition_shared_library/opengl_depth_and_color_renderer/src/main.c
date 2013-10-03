@@ -19,6 +19,8 @@
 #include "shader_loader.h"
 #include "AmMatrix/matrixCalculations.h"
 
+#include "tiledRenderer.h"
+
 #include "OGLRendererSandbox.h"
 
 #define FLIP_OPEN_GL_IMAGES 1
@@ -298,18 +300,6 @@ int snapOGLRendererSandbox()
    return 0;
 }
 
-int snapOGLRendererPhotoshootSandbox(int objID, unsigned int columns , unsigned int rows , float distance,
-                                     float angleX,float angleY,float angleZ,
-                                     float angXVariance ,float angYVariance , float angZVariance
-                                    )
-{
-    if (glx_checkEvents())
-    {
-      renderPhotoshoot(objID,columns,rows,distance,angleX,angleY,angleZ,angXVariance,angYVariance,angZVariance);
-      return 1;
-    }
-   return 0;
-}
 
 
 int stopOGLRendererSandbox()
@@ -317,3 +307,70 @@ int stopOGLRendererSandbox()
   closeScene();
   return 1;
 }
+
+
+
+/*
+   --------------------------------------------------------------------------------------
+                                    PHOTOSHOOT SPECIFIC
+   --------------------------------------------------------------------------------------
+*/
+
+
+
+
+void * createOGLRendererPhotoshootSandbox(
+                                           int objID, unsigned int columns , unsigned int rows , float distance,
+                                           float angleX,float angleY,float angleZ,
+                                           float angXVariance ,float angYVariance , float angZVariance
+                                         )
+{
+  return createPhotoshoot(
+                           objID,
+                           columns , rows ,
+                           distance,
+                           angleX,angleY,angleZ ,
+                           angXVariance ,angYVariance , angZVariance
+                         );
+}
+
+int destroyOGLRendererPhotoshootSandbox( void * photoConf )
+{
+   return 0;
+}
+
+
+int getOGLPhotoshootTileXY(void * photoConf , unsigned int column , unsigned int row ,
+                                              float * X , float * Y)
+{
+  float x2D , y2D , z2D;
+  tiledRenderer_get2DCenter(photoConf,column,row,&x2D,&y2D,&z2D);
+
+  //fprintf(stderr,"Column/Row %u/%u -> %0.2f %0.2f %0.2f\n",column,row , x2D , y2D , z2D);
+  *X = x2D;
+  *Y = y2D;
+  return 1;
+}
+
+
+
+int snapOGLRendererPhotoshootSandbox(
+                                     void * photoConf ,
+                                     int objID, unsigned int columns , unsigned int rows , float distance,
+                                     float angleX,float angleY,float angleZ,
+                                     float angXVariance ,float angYVariance , float angZVariance
+                                    )
+{
+
+    setupPhotoshoot( photoConf , objID, columns , rows , distance,
+                     angleX, angleY, angleZ , angXVariance , angYVariance , angZVariance );
+
+
+    if (glx_checkEvents())
+    {
+      renderPhotoshoot(photoConf);
+      return 1;
+    }
+   return 0;
+}
+

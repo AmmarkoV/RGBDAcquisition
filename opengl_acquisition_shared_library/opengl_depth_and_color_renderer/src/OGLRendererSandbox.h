@@ -26,10 +26,27 @@ double getOpenGLPixelSize();
 
 int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,char * sceneFile);
 int snapOGLRendererSandbox();
-int snapOGLRendererPhotoshootSandbox(int objID, unsigned int columns , unsigned int rows , float distance,
+
+
+
+void * createOGLRendererPhotoshootSandbox(
+                                           int objID, unsigned int columns , unsigned int rows , float distance,
+                                           float angleX,float angleY,float angleZ,
+                                           float angXVariance ,float angYVariance , float angZVariance
+                                         );
+int destroyOGLRendererPhotoshootSandbox( void * photoConf );
+
+
+int getOGLPhotoshootTileXY(void * photoConf , unsigned int column , unsigned int row ,
+                                              float * X , float * Y);
+int snapOGLRendererPhotoshootSandbox(
+                                     void * photoConf ,
+                                     int objID, unsigned int columns , unsigned int rows , float distance,
                                      float angleX,float angleY,float angleZ,
                                      float angXVariance ,float angYVariance , float angZVariance
                                     );
+
+
 int stopOGLRendererSandbox();
 
 #ifdef __cplusplus

@@ -311,43 +311,85 @@ int renderScene()
 
 
 
-int renderPhotoshoot(
-                     int objID,
-                     unsigned int columns , unsigned int rows ,
-                     float distance,
-                     float angleX,float angleY,float angleZ ,
-                     float angXVariance ,float angYVariance , float angZVariance
-                    )
+
+int setupPhotoshoot(
+                        void * context,
+                        int objID,
+                        unsigned int columns , unsigned int rows ,
+                        float distance,
+                        float angleX,float angleY,float angleZ ,
+                        float angXVariance ,float angYVariance , float angZVariance
+                       )
 {
 
-  fprintf(stderr," renderPhotoshoot Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",rows,columns,distance,angleX,angleY,angleZ);
-  fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",angXVariance,angYVariance,angZVariance);
+  struct tiledRendererConfiguration * configuration = (struct tiledRendererConfiguration *) context;
 
-  struct tiledRendererConfiguration configuration;
+  configuration->columns=columns;
+  configuration->rows=rows;
+  configuration->objID=objID;
+  configuration->distance=distance;
+  configuration->angleX=angleX;
+  configuration->angleY=angleY;
+  configuration->angleZ=angleZ;
+  configuration->angXVariance=angXVariance;
+  configuration->angYVariance=angYVariance;
+  configuration->angZVariance=angZVariance;
 
-  configuration.columns=columns;
-  configuration.rows=rows;
-  configuration.objID=objID;
-  configuration.distance=distance;
-  configuration.angleX=angleX;
-  configuration.angleY=angleY;
-  configuration.angleZ=angleZ;
-  configuration.angXVariance=angXVariance;
-  configuration.angYVariance=angYVariance;
-  configuration.angZVariance=angZVariance;
+  configuration->scenePTR = (void *) scene;
+  configuration->modelPTR = (void *) models;
+  return 1;
+}
 
-  configuration.scenePTR = (void *) scene;
-  configuration.modelPTR = (void *) models;
+void * createPhotoshoot(
+                        int objID,
+                        unsigned int columns , unsigned int rows ,
+                        float distance,
+                        float angleX,float angleY,float angleZ ,
+                        float angXVariance ,float angYVariance , float angZVariance
+                       )
+{
 
-  //In the old version of  tiledRenderer_Render calling with float arguments caused them to be Zeros :S crazy
+  struct tiledRendererConfiguration * configuration = 0;
 
-  int i= tiledRenderer_Render(&configuration);
+  configuration = (struct tiledRendererConfiguration * ) malloc(sizeof( struct tiledRendererConfiguration));
+  if (configuration == 0) { fprintf(stderr,"Could not allocate a configuration structure\n"); return 0; }
+
+
+  configuration->columns=columns;
+  configuration->rows=rows;
+  configuration->objID=objID;
+  configuration->distance=distance;
+  configuration->angleX=angleX;
+  configuration->angleY=angleY;
+  configuration->angleZ=angleZ;
+  configuration->angXVariance=angXVariance;
+  configuration->angYVariance=angYVariance;
+  configuration->angZVariance=angZVariance;
+
+  configuration->scenePTR = (void *) scene;
+  configuration->modelPTR = (void *) models;
+
+
+
+  return (void*) configuration;
+
+}
+
+
+
+int renderPhotoshoot( void * context  )
+{
+  struct tiledRendererConfiguration * configuration=context;
+
+  fprintf(stderr," renderPhotoshoot Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",configuration->rows,configuration->columns,configuration->distance,configuration->angleX,configuration->angleY,configuration->angleZ);
+  fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",configuration->angXVariance,configuration->angYVariance,configuration->angZVariance);
+
+
+  int i= tiledRenderer_Render(configuration);
 
   if (i) { framesRendered++; return 1; }
   return 0;
 }
-
-
 
 
 

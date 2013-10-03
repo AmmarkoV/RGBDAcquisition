@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 
   //We want to initialize all possible devices in this example..
   unsigned int devID_1=0 , devID_2=0;
-
+  if (moduleID_1==moduleID_2) { ++devID_2; }
 
    if ( calibrationSetA )
    {

@@ -83,7 +83,11 @@ int main(int argc, char **argv)
                                          height=atof(argv[i+2]);
                                         }
                                      } else
-    if (strcmp(argv[i],"-photo")==0) {
+    if (
+         (strcmp(argv[i],"-photo")==0) ||
+         (strcmp(argv[i],"-photoshoot")==0)
+        )
+                                     {
                                         if (i+4<argc)
                                         {
                                          photoShootOBJ=atoi(argv[i+1]);
@@ -106,9 +110,14 @@ int main(int argc, char **argv)
    {
      float angXVariance=60,angYVariance=60,angZVariance=30;
      //fprintf(stderr,"Making a photoshoot of object %u",photoShootOBJ);
-     snapOGLRendererPhotoshootSandbox(photoShootOBJ,columns,rows,distance,angleX,angleY,angleZ,angXVariance,angYVariance,angZVariance);
+
+     void * oglPhotoShoot = createOGLRendererPhotoshootSandbox( photoShootOBJ,columns,rows,distance,angleX,angleY,angleZ,angXVariance,angYVariance,angZVariance );
+
+     snapOGLRendererPhotoshootSandbox(oglPhotoShoot , photoShootOBJ,columns,rows,distance,angleX,angleY,angleZ,angXVariance,angYVariance,angZVariance);
      writeOpenGLColor("color.pnm",0,0,width,height);
      writeOpenGLDepth("depth.pnm",0,0,width,height);
+
+     destroyOGLRendererPhotoshootSandbox( oglPhotoShoot );
      return 0;
    }
 

@@ -9,37 +9,35 @@
 #include "scene.h"
 
 
-enum POS_COORDS
+
+int tiledRenderer_get3DCenterForTile(struct tiledRendererConfiguration * trConf , unsigned int column,unsigned int row ,
+                                     float * x3D , float * y3D , float * z3D ,
+                                     float * angleX , float * angleY , float * angleZ)
 {
-    POS_X=0,
-    POS_Y,
-    POS_Z,
-    POS_ANGLEX,
-    POS_ANGLEY,
-    POS_ANGLEZ,
-    POS_COORD_LENGTH
-};
+  *x3D = trConf->op.posXBegining + column * trConf->op.OGLUnitWidth;
+  *y3D = trConf->op.posYBegining + row * trConf->op.OGLUnitHeight;
+  *z3D = 0 - trConf->distance ;
 
-int tiledRenderer(struct tiledRendererConfiguration * conf , unsigned int column , unsigned int row , double * x2D , double * y2D )
-{
+  *angleX = trConf->angleX - trConf->angXVariance + (trConf->op.angXStep *  column);
+  *angleY = trConf->angleY-trConf->angYVariance  + (trConf->op.angYStep *  row);
+  *angleZ = trConf->angleZ;
 
-
-  return 0;
-}
-
-int getPhotoshootTile3DCoords(unsigned int column, unsigned int row , double * x3D , double *y3D , double * z3D)
-{
-
-      return 0;
+  return 1;
 }
 
 
-int getPhotoshootTile2DCoords(unsigned int column, unsigned int row , double * x2D , double *y2D , double * z2D)
+int tiledRenderer_get2DCenter(void * trConf ,
+                              unsigned int column, unsigned int row ,
+                              float * x2D , float *y2D , float * z2D)
 {
       GLint viewport[4];
       GLdouble modelview[16];
       GLdouble projection[16];
-      GLdouble posX, posY, posZ=0.0;
+
+
+      float x3D , y3D , z3D , angleX , angleY , angleZ;
+      tiledRenderer_get3DCenterForTile(trConf , column, row ,&x3D , &y3D , &z3D , &angleX , &angleY , &angleZ);
+      GLdouble posX = x3D , posY = y3D , posZ = z3D;
       GLdouble winX, winY, winZ=0.0;
 
       glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
@@ -47,8 +45,17 @@ int getPhotoshootTile2DCoords(unsigned int column, unsigned int row , double * x
       glGetIntegerv( GL_VIEWPORT, viewport );
 
       gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
+
+      //fprintf(stderr,"Column/Row %u/%u ( %0.2f,%0.2f,%0.2f ) -> %0.2f %0.2f %0.2f\n",column, x3D , y3D , z3D , row , winX , winY , winZ);
+
+      *x2D = winX;
+      *y2D = winY;
+      *z2D = winZ;
       return 0;
 }
+
+
+
 
 
 
@@ -59,7 +66,6 @@ void setupTiledRendererOGL(float backgroundR,float backgroundG,float backgroundB
   glEnable (GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW );
-
 
   glLoadIdentity();
   glRotatef(0,-1.0,0,0); // Peristrofi gyrw apo ton x
@@ -72,40 +78,40 @@ void setupTiledRendererOGL(float backgroundR,float backgroundG,float backgroundB
 
 
 
-int tiledRenderer_get3DPointCenterForTile(struct tiledRendererConfiguration * configuration , unsigned int column,unsigned int row , float * x3D , float * y3D , float * z3D)
+int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
 {
+        trConf->op.OGLUnitWidth=2.5;
+        trConf->op.OGLUnitHeight=2.4;
 
-  return 0;
+        trConf->op.snapsHorizontal=trConf->columns;
+        trConf->op.snapsVertical=trConf->rows;
+
+        trConf->op.posOffsetX = 0;
+        trConf->op.posOffsetY = 0;
+
+        trConf->op.posXBegining= -1*(trConf->op.posOffsetX+(float) trConf->op.snapsHorizontal/2)*trConf->op.OGLUnitWidth;
+        trConf->op.posYBegining= -1*(trConf->op.posOffsetY+(float) trConf->op.snapsVertical/2)*trConf->op.OGLUnitHeight;
+
+        trConf->op.angXStep = (float)(2*trConf->angXVariance)/trConf->op.snapsHorizontal;
+        trConf->op.angYStep = (float)(2*trConf->angYVariance)/trConf->op.snapsVertical  ;
+        trConf->op.angZStep=0;
+
+      fprintf(stderr,"Drawing starts @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",trConf->op.posXBegining,trConf->op.posYBegining  ,  trConf->angleX-trConf->angXVariance , trConf->angleY-trConf->angYVariance , trConf->angleZ);
 }
 
 
 
 
-
-
-
-int tiledRenderer_Render( struct tiledRendererConfiguration * configuration)
+int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
 {
-  unsigned int columns=configuration->columns;
-  unsigned int rows=configuration->rows;
-  unsigned int objID=configuration->objID;
-  float distance=configuration->distance;
-  float angleX=configuration->angleX;
-  float angleY=configuration->angleY;
-  float angleZ=configuration->angleZ;
-  float angXVariance=configuration->angXVariance;
-  float angYVariance=configuration->angYVariance;
-  float angZVariance=configuration->angZVariance;
+
+  struct VirtualStream * scene = (struct VirtualStream *)  trConf->scenePTR;
+  struct Model ** models = ( struct Model ** ) trConf->modelPTR;
 
 
-
-  struct VirtualStream * scene = (struct VirtualStream *)  configuration->scenePTR;
-  struct Model ** models = ( struct Model ** ) configuration->modelPTR;
-
-
-  fprintf(stderr,"Photoshooting Object %u -> %s \n",objID,scene->object[objID].name);
-  fprintf(stderr,"Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",rows,columns,distance,angleX,angleY,angleZ);
-  fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",angXVariance,angYVariance,angZVariance);
+  fprintf(stderr,"Photoshooting Object %u -> %s \n",trConf->objID,scene->object[trConf->objID].name);
+  fprintf(stderr,"Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",trConf->rows,trConf->columns,trConf->distance,trConf->angleX,trConf->angleY,trConf->angleZ);
+  fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",trConf->angXVariance,trConf->angYVariance,trConf->angZVariance);
 
 
   if (scene!=0) { setupTiledRendererOGL((float)scene->backgroundR,(float)scene->backgroundG,(float)scene->backgroundB); } else
@@ -117,7 +123,7 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * configuration)
        unsigned char noColor=0;
        float posStack[POS_COORD_LENGTH]={0};
        float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
-       unsigned int i=objID;
+       unsigned int i=trConf->objID;
 
        struct Model * mod = models[scene->object[i].type];
        float * pos = (float*) &posStack;
@@ -128,51 +134,18 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * configuration)
          setModelColor(mod,&R,&G,&B,&trans,&noColor);
          mod->scale = scene->object[i].scale;
 
-
         int x,y,z;
 
+        tiledRenderer_CalculateLoops(trConf);
 
-        float OGLUnitWidth=2.5 , OGLUnitHeight =2.4;
-
-        int snapsHorizontal=columns;
-        int snapsVertical=rows;
-
-
-        float posOffsetX = 0;// -4;
-        float posOffsetY = 0;//  4;
-
-        float posXBegining= -1*(posOffsetX+(float) snapsHorizontal/2)*OGLUnitWidth;
-        float posYBegining= -1*(posOffsetY+(float) snapsVertical/2)*OGLUnitHeight;
-
-        float angXStep = (float)(2*angXVariance)/snapsHorizontal;
-        float angYStep = (float)(2*angYVariance)/snapsVertical  ;
-        float angZStep=0;
-
-        posStack[POS_Z]= 0 - distance ;
-
-        posStack[POS_ANGLEZ]=angleZ;
-
-
-      fprintf(stderr,"Drawing starts @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",posXBegining,posYBegining  ,  angleX-angXVariance , angleY-angYVariance , angleZ);
-
-
-
-       posStack[POS_ANGLEY]=(float) angleY-angYVariance;
-       posStack[POS_Y]=posYBegining;
-       for (y=0; y<=snapsVertical; y++)
+       for (y=0; y<=trConf->op.snapsVertical; y++)
           {
-           posStack[POS_ANGLEY]+=angYStep;
-           posStack[POS_Y]+=OGLUnitHeight;
-
-
-            posStack[POS_ANGLEX]=(float) angleX-angXVariance;
-            posStack[POS_X]=posXBegining;
-            for (x=0; x<snapsHorizontal; x++)
+            for (x=0; x<trConf->op.snapsHorizontal; x++)
                {
-                 posStack[POS_ANGLEX]+=angXStep;
-                 posStack[POS_X]+=OGLUnitWidth;
+                   tiledRenderer_get3DCenterForTile( trConf , x , y ,
+                                                     &pos[POS_X],&pos[POS_Y],&pos[POS_Z],
+                                                     &pos[POS_ANGLEX],&pos[POS_ANGLEY],&pos[POS_ANGLEZ]);
 
-                   //fprintf(stderr,"Drawing model  @ %0.2f %0.2f %0.2f   %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],posStack[POS_Z],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
 
                    drawModelAt(mod,pos[POS_X],pos[POS_Y],pos[POS_Z],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
                 }
@@ -183,3 +156,8 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * configuration)
    glPopMatrix();
   return 1 ;
 }
+
+
+
+
+
