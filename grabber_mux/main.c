@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
         sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
         saveMuxImageToFile(outfilename,(char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
 
-
+        #if SAVE_ALL_STREAMS
         sprintf(outfilename,"%s/BASEcolorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
         acquisitionSaveColorFrame(moduleID_1,devID_1,outfilename);
         sprintf(outfilename,"%s/BASEdepthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
@@ -231,6 +231,7 @@ int main(int argc, char *argv[])
         acquisitionSaveColorFrame(moduleID_2,devID_2,outfilename);
         sprintf(outfilename,"%s/OVERLAYdepthFrame_%u_%05u",outputfoldername,devID_2,frameNum);
         acquisitionSaveDepthFrame(moduleID_2,devID_2,outfilename);
+        #endif
 
     }
 

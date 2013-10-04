@@ -3,7 +3,6 @@
 
 #include "TemplateAcquisition.h"
 
-#define  BUILD_TEMPLATE 1
 
 #if BUILD_TEMPLATE
 #include "../acquisition/Acquisition.h"
@@ -22,7 +21,7 @@
 
 
 #define PRINT_COMMENTS 1
-#define PRINT_DEBUG_EACH_CALL 1
+#define PRINT_DEBUG_EACH_CALL 0
 
 struct TemplateVirtualDevice
 {
@@ -368,8 +367,28 @@ int snapTemplateFrames(int devID)
     char * file_name_test = (char* ) malloc(2048 * sizeof(char));
     if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
 
-    sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,device[devID].cycle);
-    fprintf(stderr,"Snap color %s\n",file_name_test);
+
+    //-----------------------------------------------------------------
+    //Extra check , stupid case with mixed signals
+    //-----------------------------------------------------------------
+    int decided=0;
+    int devIDRead=devID;
+    int devIDInc=devID;
+    while ( (devIDInc >=0 ) && (!decided) )
+    {
+      sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devIDInc,device[devID].cycle);
+      if (FileExists(file_name_test)) { devIDRead=devIDInc; decided=1; }
+      sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devIDInc,device[devID].cycle);
+      if (FileExists(file_name_test)) { devIDRead=devIDInc; decided=1; }
+
+      if (devIDInc==0) { break; decided=1; } else
+                       { --devIDInc; }
+    }
+    //-----------------------------------------------------------------
+
+
+    sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devIDRead,device[devID].cycle);
+    //fprintf(stderr,"Snap color %s\n",file_name_test);
     if (FileExists(file_name_test))
      {
        if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); }
@@ -377,7 +396,7 @@ int snapTemplateFrames(int devID)
        ++found_frames;
      }
 
-    sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devID,device[devID].cycle);
+    sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devIDRead,device[devID].cycle);
     //fprintf(stderr,"Snap depth %s",file_name_test);
     if (FileExists(file_name_test))
      {
