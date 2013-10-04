@@ -22,6 +22,8 @@ struct Model ** models=0;
 float farPlane = 255; //<--be aware that this has an effect on the depth maps generated
 float nearPlane= 1; //<--this also
 
+float depthUnit = 1;
+
 int WIDTH=640;
 int HEIGHT=480;
 

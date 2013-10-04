@@ -58,7 +58,7 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
                                                                          {
                                                                            float tmpF=zbuffer[(height-1-yp)*stride+i];
 
-                                                                           tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) * multiplier;
+                                                                           tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) * depthUnit /*This scales depth*/ * multiplier;
                                                                            unsigned short tmp = (unsigned short) tmpF;
                                                                            depth[yp*stride+i]= tmp ;
                                                                          }
@@ -206,6 +206,14 @@ void redraw(void)
 {
     renderScene();
     glx_endRedraw();
+}
+
+int setOpenGLDepthUnit(float unit)
+{
+ if (unit == 0) { fprintf(stderr,"DEPTH UNIT SET TO 0 !!!!!!!!!!!!!!!!!!!!!!!!!!!\n"); }
+
+ depthUnit = unit ;
+ return 1;
 }
 
 

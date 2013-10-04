@@ -48,6 +48,8 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
   /*fy*/ calib->intrinsic[4] = (double) (DEFAULT_FY * height)  / DEFAULT_HEIGHT;    //<- these might be wrong
   //--------------------------------------------
 
+  calib->depthUnit=1.0;
+
   return 1;
 }
 
@@ -87,7 +89,9 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
      if ( (line[0]=='%') && (line[1]=='D') && (line[2]==0) )                   { category=2;    } else
      if ( (line[0]=='%') && (line[1]=='T') && (line[2]==0) )                   { category=3;    } else
      if ( (line[0]=='%') && (line[1]=='R') && (line[2]==0) )                   { category=4;    } else
-     if ( (line[0]=='%') && (line[1]=='F') && (line[2]=='N') && (line[3]==0) ) { category=5;    } else
+     if ( (line[0]=='%') && (line[1]=='N') && (line[2]=='F') && (line[3]==0) ) { category=5;    } else
+     if ( (line[0]=='%') && (line[1]=='U') && (line[2]=='N') && (line[3]=='I')
+                         && (line[4]=='T') && (line[5]==0) )                   { category=6;    } else
         {
           #if DEBUG_PRINT_EACH_CALIBRATION_LINE_READ
            fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
@@ -148,6 +152,13 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            {
              case 1 :  calib->nearPlane = atof(line); break;
              case 2 :  calib->farPlane  = atof(line); break;
+           };
+          }else
+          if (category==6)
+          {
+           switch(linesAtCurrentCategory)
+           {
+             case 1 :  calib->depthUnit = atof(line); break;
            };
           }
 

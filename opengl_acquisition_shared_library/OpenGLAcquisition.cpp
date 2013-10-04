@@ -118,7 +118,10 @@ int setOpenGLCalibration(int devID,struct calibration * calib)
     for (i=0; i<3; i++) { translation[i]=calib->extrinsicTranslation[i]; }
     for (i=0; i<9; i++) { camera[i]=calib->intrinsic[i]; }
 
-    fprintf(stderr,"Setting OpenGL near/far planes\n");
+    fprintf(stderr,"Setting OpenGL depth Unit to %0.2f\n",calib->depthUnit);
+    setOpenGLDepthUnit(calib->depthUnit);
+
+    fprintf(stderr,"Setting OpenGL near(%0.2f)/far(%0.2f) planes\n",calib->nearPlane , calib->farPlane);
     setOpenGLNearFarPlanes( calib->nearPlane , calib->farPlane );
     fprintf(stderr,"Setting Intrinsics for OpenGL\n");
     setOpenGLIntrinsicCalibration(camera);
@@ -164,7 +167,11 @@ int getOpenGLDepthBitsPerPixel(int devID) { return 16; }
 
 char * getOpenGLDepthPixels(int devID)
 {
-  getOpenGLDepth(openGLDepthFrame,0,0,getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID));
+  getOpenGLZBuffer(openGLDepthFrame,0,0,getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID));
+
+  //Real depth gets returned using the next function , problem is that
+  //most times we dont want real depth..
+  //getOpenGLDepth(openGLDepthFrame,0,0,getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID));
   return (char*) openGLDepthFrame;
 }
 

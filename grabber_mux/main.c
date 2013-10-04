@@ -203,8 +203,8 @@ int main(int argc, char *argv[])
 
         mux2RGBAndDepthFrames
           (
-           acquisitionGetColorFrame(moduleID_1,devID_1) ,
-           acquisitionGetColorFrame(moduleID_2,devID_2) ,
+           acquisitionGetColorFrame(moduleID_1,devID_1) , //Module 1 is Base
+           acquisitionGetColorFrame(moduleID_2,devID_2) , //Module 2 is Overlay
            rgbOut ,
            acquisitionGetDepthFrame(moduleID_1,devID_1) ,
            acquisitionGetDepthFrame(moduleID_2,devID_2) ,

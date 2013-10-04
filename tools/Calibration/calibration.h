@@ -24,6 +24,8 @@ struct calibration
   unsigned int width;
   unsigned int height;
 
+  float depthUnit;
+
   /*CONFIGURATION*/
   int imagesUsed;
   int boardWidth;
