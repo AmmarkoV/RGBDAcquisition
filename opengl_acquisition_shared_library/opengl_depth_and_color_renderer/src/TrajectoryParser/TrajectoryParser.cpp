@@ -532,7 +532,7 @@ int readVirtualStream(struct VirtualStream * newstream)
   ++newstream->numberOfObjects;
   // CAMERA OBJECT ADDED
 
-
+  newstream->debug=0;
  //Everything is set , Lets read the file!
   while (!feof(fp))
   {
@@ -544,6 +544,12 @@ int readVirtualStream(struct VirtualStream * newstream)
       unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
       if ( words_count > 0 )
          {
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
+            {
+              fprintf(stderr,"DEBUG Mode on\n");
+              newstream->debug=1;
+            } else
+
             /*! REACHED AN AUTO REFRESH DECLERATION ( AUTOREFRESH(1500) )
               argument 0 = AUTOREFRESH , argument 1 = value in milliseconds (0 = off ) */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"AUTOREFRESH",11)==1)

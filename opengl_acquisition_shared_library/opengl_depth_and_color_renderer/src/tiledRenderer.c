@@ -14,12 +14,12 @@ int tiledRenderer_get3DCenterForTile(struct tiledRendererConfiguration * trConf 
                                      float * x3D , float * y3D , float * z3D ,
                                      float * angleX , float * angleY , float * angleZ)
 {
-  *x3D = trConf->op.posXBegining + column * trConf->op.OGLUnitWidth;
-  *y3D = trConf->op.posYBegining + row * trConf->op.OGLUnitHeight;
+  *x3D = trConf->op.posXBegining + (column * trConf->op.OGLUnitWidth);
+  *y3D = trConf->op.posYBegining + (row * trConf->op.OGLUnitHeight);
   *z3D = 0 - trConf->distance ;
 
   *angleX = trConf->angleX - trConf->angXVariance + (trConf->op.angXStep *  column);
-  *angleY = trConf->angleY-trConf->angYVariance  + (trConf->op.angYStep *  row);
+  *angleY = trConf->angleY - trConf->angYVariance  + (trConf->op.angYStep *  row);
   *angleZ = trConf->angleZ;
 
   return 1;
@@ -48,6 +48,7 @@ int tiledRenderer_get2DCenter(void * trConf ,
 
       //fprintf(stderr,"Column/Row %u/%u ( %0.2f,%0.2f,%0.2f ) -> %0.2f %0.2f %0.2f\n",column, x3D , y3D , z3D , row , winX , winY , winZ);
 
+      struct tiledRendererConfiguration * trConfPTR = (struct tiledRendererConfiguration *) trConf;
       *x2D = winX;
       *y2D = winY;
       *z2D = winZ;
@@ -81,7 +82,7 @@ void setupTiledRendererOGL(float backgroundR,float backgroundG,float backgroundB
 int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
 {
         trConf->op.OGLUnitWidth=2.5;
-        trConf->op.OGLUnitHeight=2.4;
+        trConf->op.OGLUnitHeight=2.5;
 
         trConf->op.snapsHorizontal=trConf->columns;
         trConf->op.snapsVertical=trConf->rows;
@@ -90,7 +91,7 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
         trConf->op.posOffsetY = 0;
 
         trConf->op.posXBegining= -1*(trConf->op.posOffsetX+(float) trConf->op.snapsHorizontal/2)*trConf->op.OGLUnitWidth;
-        trConf->op.posYBegining= -1*(trConf->op.posOffsetY+(float) trConf->op.snapsVertical/2)*trConf->op.OGLUnitHeight;
+        trConf->op.posYBegining= -1*(trConf->op.posOffsetY+(float) trConf->op.snapsVertical/2)  *trConf->op.OGLUnitHeight;
 
         trConf->op.angXStep = (float)(2*trConf->angXVariance)/trConf->op.snapsHorizontal;
         trConf->op.angYStep = (float)(2*trConf->angYVariance)/trConf->op.snapsVertical  ;

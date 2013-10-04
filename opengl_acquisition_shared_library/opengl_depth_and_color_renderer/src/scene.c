@@ -228,6 +228,35 @@ int tickScene()
 }
 
 
+
+
+
+int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
+{
+      GLint viewport[4];
+      GLdouble modelview[16];
+      GLdouble projection[16];
+
+      GLdouble posX = x3D , posY = y3D , posZ = z3D;
+      GLdouble winX, winY, winZ=0.0;
+
+      glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+      glGetDoublev( GL_PROJECTION_MATRIX, projection );
+      glGetIntegerv( GL_VIEWPORT, viewport );
+
+      gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
+
+      if  (
+            (winX < 0) || (winX >= WIDTH) ||
+            (winY < 0) || (winY >= HEIGHT)
+          )
+      {
+         fprintf(stderr,"Warn : Object %u offscreen ( %0.2f , %0.2f , %0.2f ) will end up at %0.2f,%0.2f(%0.2f)\n" , objID , x3D , y3D , z3D , winX,winY , winZ);
+      }
+
+}
+
+
 int drawAllObjectsAtPositionsFromTrajectoryParser()
 {
  if (scene==0) { return 0; }
@@ -250,6 +279,9 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          setModelColor(mod,&R,&G,&B,&trans,&noColor);
          mod->scale = scene->object[i].scale;
          //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
+
+         if (scene->debug)
+                { print3DPoint2DWindowPosition(i , pos[0],pos[1],pos[2] ); }
 
          if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
              { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , scene->object[i].type ); }
