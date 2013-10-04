@@ -148,8 +148,8 @@ void append_camera_params( const char* out_filename, struct calibration * calib 
     fprintf( fp, "%f\n",calib->extrinsicTranslation[1]);
     fprintf( fp, "%f\n",calib->extrinsicTranslation[2]);
 
-    fprintf( fp, "%%%% Rotation Vector (Rodrigues) R.X, R.Y, R.Z\n");
-    fprintf( fp, "%%%%R\n");
+    fprintf( fp, "%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z\n");
+    fprintf( fp, "%%R\n");
     fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[0]);
     fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[1]);
     fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[2]);
