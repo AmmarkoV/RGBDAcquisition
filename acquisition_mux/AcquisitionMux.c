@@ -74,15 +74,15 @@ int saveMuxImageToFile(char * filename,char * pixels , unsigned int width , unsi
 
 
 
-int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char * rgbOut , short * depthBase, short * depthOverlay , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
+int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
 {
    char * rgb_pBase = rgbBase;
    char * rgb_pOverlay = rgbOverlay;
    char * rgb_pOut = rgbOut; char * rgb_pOut_limit=rgb_pOut + width * height * 3;
 
-   short * depth_pBase = depthBase;
-   short * depth_pOverlay = depthOverlay;
-   short * depth_pOut = depthOut; short * depth_pOut_limit=rgb_pOut + width * height * 2;
+   unsigned short * depth_pBase = depthBase;
+   unsigned short * depth_pOverlay = depthOverlay;
+   unsigned short * depth_pOut = depthOut; short * depth_pOut_limit=rgb_pOut + width * height * 2;
 
 
    unsigned int TookBaseloops=0;
@@ -129,7 +129,7 @@ int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char 
 }
 
 
-int mux2RGBAndDepthFrames( char * rgbBase, char * rgbOverlay , char * rgbOut , short * depthBase, short * depthOverlay , short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
+int mux2RGBAndDepthFrames( char * rgbBase, char * rgbOverlay , char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
 {
  if (mux_type==0)
   {

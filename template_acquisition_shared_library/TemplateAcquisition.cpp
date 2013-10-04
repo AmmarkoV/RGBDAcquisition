@@ -3,6 +3,8 @@
 
 #include "TemplateAcquisition.h"
 
+#define  BUILD_TEMPLATE 1
+
 #if BUILD_TEMPLATE
 #include "../acquisition/Acquisition.h"
 
@@ -20,6 +22,7 @@
 
 
 #define PRINT_COMMENTS 1
+#define PRINT_DEBUG_EACH_CALL 1
 
 struct TemplateVirtualDevice
 {
@@ -354,6 +357,10 @@ int seekTemplateFrame(int devID,unsigned int seekFrame)
 
 int snapTemplateFrames(int devID)
 {
+    #if PRINT_DEBUG_EACH_CALL
+     fprintf(stderr,"snapTemplateFrames (%u) \n",devID);
+    #endif // PRINT_DEBUG_EACH_CALL
+
     //TODO HERE MAYBE LOAD NEW BUFFERS
     int found_frames = 0;
 
@@ -362,7 +369,7 @@ int snapTemplateFrames(int devID)
     if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
 
     sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,device[devID].cycle);
-    //fprintf(stderr,"Snap color %s",file_name_test);
+    fprintf(stderr,"Snap color %s\n",file_name_test);
     if (FileExists(file_name_test))
      {
        if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); }

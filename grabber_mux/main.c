@@ -194,6 +194,9 @@ int main(int argc, char *argv[])
     acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&widthDepth,&heightDepth ,&channelsDepth , &bitsperpixelDepth );
     short * depthOut = ( short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
+
+    fprintf(stderr,"Base Module is %s , device %u , Overlay Module is %s , device %u\n",getModuleStringName(moduleID_1),devID_1, getModuleStringName(moduleID_2),devID_2);
+
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
 
@@ -219,7 +222,6 @@ int main(int argc, char *argv[])
         saveMuxImageToFile(outfilename,(char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
 
 
-        /*
         sprintf(outfilename,"%s/BASEcolorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
         acquisitionSaveColorFrame(moduleID_1,devID_1,outfilename);
         sprintf(outfilename,"%s/BASEdepthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
@@ -228,7 +230,7 @@ int main(int argc, char *argv[])
         sprintf(outfilename,"%s/OVERLAYcolorFrame_%u_%05u",outputfoldername,devID_2,frameNum);
         acquisitionSaveColorFrame(moduleID_2,devID_2,outfilename);
         sprintf(outfilename,"%s/OVERLAYdepthFrame_%u_%05u",outputfoldername,devID_2,frameNum);
-        acquisitionSaveDepthFrame(moduleID_2,devID_2,outfilename);*/
+        acquisitionSaveDepthFrame(moduleID_2,devID_2,outfilename);
 
     }
 
