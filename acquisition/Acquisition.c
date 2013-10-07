@@ -1090,3 +1090,40 @@ double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
     return 0.0;
 }
 
+
+
+/*
+   LAST BUT NOT LEAST acquisition can also relay its state through a TCP/IP network
+*/
+int acquisitionInitiateTransmission(ModuleIdentifier moduleID,DeviceIdentifier devID,char * ip , int port)
+{
+  fprintf(stderr,RED "acquisitionInitiateTransmission not implemented yet!\n");
+  return 0;
+}
+
+
+int acquisitionStopTransmission(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+  fprintf(stderr,RED "acquisitionStopTransmission not implemented yet!\n");
+  return 0;
+}
+
+
+int acquisitionTransmitSnap(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+  fprintf(stderr,RED "acquisitionTransmitSnap not implemented yet!\n");
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

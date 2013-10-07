@@ -145,7 +145,7 @@ char * getNetworkDepthPixels(int devID) { return (char *) device[devID].template
 int startNetworkModule(unsigned int max_devs,char * settings)
 {
     fprintf(stderr,"startNetworkModule called on a dummy build of NetworkAcquisition!\n");
-    fprintf(stderr,"Please consider enabling #define BUILD_TEMPLATE 1 on acquisition/acquisition_setup.h\n");
+    fprintf(stderr,"Please consider enabling #define BUILD_NETWORK 1 on acquisition/acquisition_setup.h\n");
     return 0;
   return 1;
 }

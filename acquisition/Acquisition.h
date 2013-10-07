@@ -140,6 +140,19 @@ double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionMapDepthToRGB(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
+
+
+
+/*   ------------------------------------------------------------
+             Acquisition transmission to other machines
+     ------------------------------------------------------------ */
+int acquisitionInitiateTransmission(ModuleIdentifier moduleID,DeviceIdentifier devID,char * ip , int port);
+int acquisitionStopTransmission(ModuleIdentifier moduleID,DeviceIdentifier devID);
+int acquisitionTransmitSnap(ModuleIdentifier moduleID,DeviceIdentifier devID);
+
+
+
+
 #ifdef __cplusplus
 }
 #endif
