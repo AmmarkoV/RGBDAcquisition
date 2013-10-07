@@ -19,6 +19,7 @@ enum Acquisition_Possible_Modules
     OPENNI2_ACQUISITION_MODULE  ,
     OPENGL_ACQUISITION_MODULE  ,
     TEMPLATE_ACQUISITION_MODULE  ,
+    NETWORK_ACQUISITION_MODULE  ,
    //--------------------------------------------
     NUMBER_OF_POSSIBLE_MODULES
 };

@@ -19,6 +19,7 @@
 #define BUILD_OPENNI2 1
 #define BUILD_FREENECT 1
 #define BUILD_OPENGL 1
+#define BUILD_NETWORK 1
 //This is on by default #define BUILD_TEMPLATE 1
 #define BUILD_V4L2 1
 

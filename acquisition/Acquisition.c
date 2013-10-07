@@ -41,6 +41,7 @@ const char TemplatePath[] = "../template_acquisition_shared_library/";     const
 const char FreenectPath[] = "../libfreenect_acquisition_shared_library/";  const char FreenectLib[] = "libFreenectAcquisition.so";
 const char OpenNI1Path[] = "../openni1_acquisition_shared_library/";       const char OpenNI1Lib[] = "libOpenNI1Acquisition.so";
 const char OpenNI2Path[] = "../openni2_acquisition_shared_library/";       const char OpenNI2Lib[] = "libOpenNI2Acquisition.so";
+const char NetworkPath[] = "../network_acquisition_shared_library/";       const char NetworkLib[] = "libNetworkAcquisition.so";
 
 
 
@@ -343,6 +344,7 @@ int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
       case FREENECT_ACQUISITION_MODULE   :     return getPluginPath(FreenectPath,FreenectLib,tmp,1024);       break;
       case OPENNI1_ACQUISITION_MODULE    :     return getPluginPath(OpenNI1Path,OpenNI1Lib,tmp,1024);         break;
       case OPENNI2_ACQUISITION_MODULE    :     return getPluginPath(OpenNI2Path,OpenNI2Lib,tmp,1024);         break;
+      case NETWORK_ACQUISITION_MODULE    :     return getPluginPath(NetworkPath,NetworkLib,tmp,1024);         break;
     };
 
   return 0;
@@ -360,6 +362,7 @@ int acquisitionGetModulesCount()
   if ( acquisitionIsModuleLinked(FREENECT_ACQUISITION_MODULE) )      { fprintf(stderr,"Freenect module found \n");   ++modules; }
   if ( acquisitionIsModuleLinked(OPENNI1_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI1 module found \n");    ++modules; }
   if ( acquisitionIsModuleLinked(OPENNI2_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI2 module found \n");    ++modules; }
+  if ( acquisitionIsModuleLinked(NETWORK_ACQUISITION_MODULE) )       { fprintf(stderr,"Network module found \n");    ++modules; }
 
   return modules;
 }
@@ -375,7 +378,8 @@ ModuleIdentifier getModuleIdFromModuleName(char * moduleName)
           if (strcasecmp("OPENGL",moduleName)==0 )   { moduleID = OPENGL_ACQUISITION_MODULE;   } else
           if (strcasecmp("V4L2",moduleName)==0 )   { moduleID = V4L2_ACQUISITION_MODULE;   } else
           if (strcasecmp("V4L2STEREO",moduleName)==0 )   { moduleID = V4L2STEREO_ACQUISITION_MODULE;   } else
-          if (strcasecmp("TEMPLATE",moduleName)==0 )  { moduleID = TEMPLATE_ACQUISITION_MODULE; }
+          if (strcasecmp("TEMPLATE",moduleName)==0 )  { moduleID = TEMPLATE_ACQUISITION_MODULE; } else
+          if (strcasecmp("NETWORK",moduleName)==0 )   { moduleID = NETWORK_ACQUISITION_MODULE; }
    return moduleID;
 }
 
@@ -391,6 +395,7 @@ char * getModuleStringName(ModuleIdentifier moduleID)
       case OPENNI2_ACQUISITION_MODULE :  return (char*) "OPENNI2 MODULE"; break;
       case OPENGL_ACQUISITION_MODULE :  return (char*) "OPENGL MODULE"; break;
       case TEMPLATE_ACQUISITION_MODULE    :  return (char*) "TEMPLATE MODULE"; break;
+      case NETWORK_ACQUISITION_MODULE    :  return (char*) "NETWORK MODULE"; break;
     };
     return (char*) "UNKNOWN MODULE";
 }
@@ -610,6 +615,12 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
       break;
       case OPENNI2_ACQUISITION_MODULE :
           if (!linkToPlugin("OpenNI2",OpenNI2Path,OpenNI2Lib,moduleID) )
+                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
+
+          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
+      break;
+      case NETWORK_ACQUISITION_MODULE :
+          if (!linkToPlugin("Network",NetworkPath,NetworkLib,moduleID) )
                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
           if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
