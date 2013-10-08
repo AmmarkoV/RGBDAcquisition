@@ -42,7 +42,7 @@ struct NetworkVirtualDevice device[MAX_NETWORK_DEVICES]={0};
 
 int networkBackbone_startPushingToRemote(char * ip , int port)
 {
-
+  fprintf(stderr,"networkBackbone_startPushingToRemote(%s,%u) called \n",ip,port);
   return 0;
 }
 

@@ -86,7 +86,7 @@ void countdownDelay(int seconds)
 
     for (secCounter=seconds; secCounter>0; secCounter--)
     {
-      fprintf(stderr,"%u\n",seconds);
+      fprintf(stderr,"%u\n",secCounter);
       usleep(1000*1000); // Waiting a while for the glitch frames to pass
 
     }
@@ -1170,8 +1170,12 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
         fprintf(stderr,RED "Cannot link to network transmission framework , so will not be able to transmit output..!\n" NORMAL);
       } else
       {
-        module[moduleID].device[devID].networkOutput=1;
-        return 1;
+       if  (*startPushingToRemoteNetwork!=0)
+         {
+           (*startPushingToRemoteNetwork) ("0.0.0.0",1234);
+            module[moduleID].device[devID].networkOutput=1;
+            return 1;
+         }
       }
   } else
   {
