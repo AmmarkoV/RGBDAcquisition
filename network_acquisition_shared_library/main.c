@@ -38,6 +38,46 @@ struct NetworkVirtualDevice device[MAX_NETWORK_DEVICES]={0};
 
 #if BUILD_NETWORK
 
+
+
+int networkBackbone_startPushingToRemote(char * ip , int port)
+{
+
+  return 0;
+}
+
+int networkBackbone_stopPushingToRemote(int sock)
+{
+
+  return 0;
+}
+
+
+int networkBackbone_pushImageToRemote(int sock , int streamNumber , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
+{
+
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 double getNetworkColorPixelSize(int devID)   { return DEFAULT_PIXEL_SIZE; }
 double getNetworkColorFocalLength(int devID)
 {

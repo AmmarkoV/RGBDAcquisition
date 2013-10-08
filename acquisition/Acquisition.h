@@ -9,6 +9,8 @@ extern "C"
 {
 #endif
 
+
+
 enum Acquisition_Possible_Modules
 {
     NO_ACQUISITION_MODULE = 0,
@@ -24,8 +26,33 @@ enum Acquisition_Possible_Modules
     NUMBER_OF_POSSIBLE_MODULES
 };
 
+#define NUMBER_OF_POSSIBLE_DEVICES 20
+
+
 typedef unsigned int ModuleIdentifier;
 typedef unsigned int DeviceIdentifier;
+
+
+struct acquisitionDeviceStates
+{
+  char outputString[1024];
+
+  unsigned char fileOutput;
+
+  unsigned char networkOutput;
+  int port;
+};
+
+
+
+struct acquisitionModuleStates
+{
+  struct acquisitionDeviceStates device[NUMBER_OF_POSSIBLE_DEVICES];
+};
+
+//This holds all the info on states of modules and devices
+struct acquisitionModuleStates module[NUMBER_OF_POSSIBLE_MODULES];
+
 
 
 
@@ -80,7 +107,7 @@ struct acquisitionPluginInterface
 
 extern struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES];
 
-
+void countdownDelay(int seconds);
 int acquisitionSimulateTime(unsigned long timeInMillisecs);
 
 int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
@@ -146,9 +173,9 @@ int acquisitionMapDepthToRGB(ModuleIdentifier moduleID,DeviceIdentifier devID);
 /*   ------------------------------------------------------------
              Acquisition transmission to other machines
      ------------------------------------------------------------ */
-int acquisitionInitiateTransmission(ModuleIdentifier moduleID,DeviceIdentifier devID,char * ip , int port);
-int acquisitionStopTransmission(ModuleIdentifier moduleID,DeviceIdentifier devID);
-int acquisitionTransmitSnap(ModuleIdentifier moduleID,DeviceIdentifier devID);
+int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,char * target);
+int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID);
+int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber);
 
 
 

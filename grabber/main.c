@@ -12,20 +12,6 @@ char outputfoldername[512]={0};
 int calibrationSet = 0;
 struct calibration calib;
 
-int makepath(char * path)
-{
-    // FILE *fp;
-    /* Open the command for reading. */
-    char command[1024];
-    sprintf(command,"mkdir -p %s",outputfoldername);
-    fprintf(stderr,"Executing .. %s \n",command);
-
-    return system(command);
-}
-
-
-
-
 
 
 
@@ -72,7 +58,6 @@ int main(int argc, char *argv[])
         {
           strcpy(outputfoldername,"frames/");
           strcat(outputfoldername,argv[i+1]);
-          makepath(outputfoldername);
           fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
          }
        else
@@ -127,17 +112,16 @@ int main(int argc, char *argv[])
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
         acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate);
         acquisitionMapDepthToRGB(moduleID,devID);
-        //acquisitionMapRGBToDepth(moduleID,devID);
-     }
-    fprintf(stderr,"3\n");
-    usleep(1000*1000); // Waiting a while for the glitch frames to pass
-    fprintf(stderr,"2\n");
-    usleep(1000*1000); // Waiting a while for the glitch frames to pass
-    fprintf(stderr,"1\n");
-    usleep(1000*1000); // Waiting a while for the glitch frames to pass
-    fprintf(stderr,"Starting \n");
+        //acquisitionMapRGBToDepth(moduleID,devID); <- an alternate registration mode
 
-    char outfilename[1024]={0};
+         //We initialize the target for our frames ( can be network or files )
+         acquisitionInitiateTargetForFrames(moduleID,devID,outputfoldername);
+     }
+
+   //Countdown 3 -> 2 -> 1 -> Action!
+   countdownDelay(3);
+   fprintf(stderr,"Starting Grabbing!\n");
+
 
    if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
@@ -147,20 +131,28 @@ int main(int argc, char *argv[])
       {
         acquisitionSnapFrames(moduleID,devID);
 
-        sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID,frameNum);
-        acquisitionSaveColorFrame(moduleID,devID,outfilename);
+        acquisitionPassFramesToTarget(moduleID,devID,frameNum);
 
-        sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID,frameNum);
-        acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+        /*
+         If someone would like to manually save things instead of using acquisitionPassFramesToTarget he could call the following calls ,left here for future reference
+         ------------------------------------------------------------------------------------------------------------------------------
+         char outfilename[1024]={0};
 
-        //sprintf(outfilename,"%s/pointCloud_%u_%05u.pcd",outputfoldername,devID,frameNum);
-        //acquisitionSavePCDPointCoud(moduleID,devID,outfilename);
+         sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID,frameNum);
+         acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
-        //sprintf(outfilename,"%s/depthFrame1C_%u_%05u.pnm",outputfoldername,devID,frameNum);
-        //acquisitionSaveDepthFrame1C(moduleID,devID,outfilename);
+         sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID,frameNum);
+         acquisitionSaveDepthFrame(moduleID,devID,outfilename);
 
-        //sprintf(outfilename,"%s/coloreddepthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
-        //acquisitionSaveColoredDepthFrame(moduleID,devID,outfilename);
+         sprintf(outfilename,"%s/pointCloud_%u_%05u.pcd",outputfoldername,devID,frameNum);
+         acquisitionSavePCDPointCoud(moduleID,devID,outfilename);
+
+         sprintf(outfilename,"%s/depthFrame1C_%u_%05u.pnm",outputfoldername,devID,frameNum);
+         acquisitionSaveDepthFrame1C(moduleID,devID,outfilename);
+
+         sprintf(outfilename,"%s/coloreddepthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
+         acquisitionSaveColoredDepthFrame(moduleID,devID,outfilename);
+        */
       }
     }
 
@@ -168,6 +160,8 @@ int main(int argc, char *argv[])
 
     for (devID=0; devID<maxDevID; devID++)
      {
+        //Stop our target ( can be network or files )
+        acquisitionStopTargetForFrames(moduleID,devID);
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
         acquisitionCloseDevice(moduleID,devID);
      }

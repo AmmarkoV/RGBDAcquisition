@@ -15,6 +15,16 @@
 extern "C"
 {
 #endif
+
+   int networkBackbone_startPushingToRemote(char * ip , int port);
+   int networkBackbone_stopPushingToRemote(int sock);
+   int networkBackbone_pushImageToRemote(int sock , int streamNumber , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
+
+
+
+
+
+
    //Initialization of Network
    int startNetworkModule(unsigned int max_devs,char * settings);
 

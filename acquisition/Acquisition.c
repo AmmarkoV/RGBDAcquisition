@@ -44,6 +44,12 @@ const char OpenNI2Path[] = "../openni2_acquisition_shared_library/";       const
 const char NetworkPath[] = "../network_acquisition_shared_library/";       const char NetworkLib[] = "libNetworkAcquisition.so";
 
 
+void * remoteNetworkDLhandle;
+int (*startPushingToRemoteNetwork) (char * , int);
+int (*stopPushingToRemoteNetwork) (int);
+int (*pushImageToRemoteNetwork) (int,int,char *,unsigned int,unsigned int,unsigned int,unsigned int);
+
+
 
 int acquisitionSimulateTime(unsigned long timeInMillisecs)
 {
@@ -62,6 +68,29 @@ int fileExists(char * filename)
     }
 
   return 0;
+}
+
+int makepath(char * path)
+{
+    char command[2048];
+    sprintf(command,"mkdir -p %s",path);
+    fprintf(stderr,"Executing .. %s \n",command);
+
+    return system(command);
+}
+
+
+void countdownDelay(int seconds)
+{
+    int secCounter=seconds;
+
+    for (secCounter=seconds; secCounter>0; secCounter--)
+    {
+      fprintf(stderr,"%u\n",seconds);
+      usleep(1000*1000); // Waiting a while for the glitch frames to pass
+
+    }
+    usleep(1000*1000); // Waiting a while for the glitch frames to pass
 }
 
 
@@ -423,6 +452,43 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
 
    fprintf(stderr,"%s hasn't got an implementation for function %s ..\n",getModuleStringName(moduleFailed),fromFunction);
 }
+
+
+int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
+{
+   char *error;
+   char functionNameStr[1024]={0};
+
+   if (!getPluginPath(modulePossiblePath,moduleLib,functionNameStr,1024))
+       {
+          fprintf(stderr,RED "Could not find %s (try adding it to current directory)\n" NORMAL , moduleLib);
+          return 0;
+       }
+
+   remoteNetworkDLhandle = dlopen (functionNameStr, RTLD_LAZY);
+   if (!remoteNetworkDLhandle)
+       {
+        fprintf (stderr,RED "Failed while loading code for %s plugin from %s\n Error : %s\n" NORMAL, moduleName , functionNameStr , dlerror());
+        return 0;
+       }
+
+  dlerror();    /* Clear any existing error */
+
+
+  //Start Stop ================================================================================================================
+  startPushingToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_startPushingToRemote" );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_startPushingToRemote : %s\n" NORMAL,error); }
+
+  stopPushingToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_stopPushingToRemote" );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_stopPushingToRemote : %s\n" NORMAL,error); }
+
+  pushImageToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_pushImageToRemote" );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_pushImageToRemote : %s\n" NORMAL,error); }
+
+  return 1;
+}
+
+
 
 int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
 {
@@ -1095,25 +1161,69 @@ double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
 /*
    LAST BUT NOT LEAST acquisition can also relay its state through a TCP/IP network
 */
-int acquisitionInitiateTransmission(ModuleIdentifier moduleID,DeviceIdentifier devID,char * ip , int port)
+int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,char * target)
 {
-  fprintf(stderr,RED "acquisitionInitiateTransmission not implemented yet!\n");
+  if ( strstr(target,"tcp://")!=0 )
+  {
+    if (!linkToNetworkTransmission("Network",NetworkPath,NetworkLib,moduleID) )
+      {
+        fprintf(stderr,RED "Cannot link to network transmission framework , so will not be able to transmit output..!\n" NORMAL);
+      } else
+      {
+        module[moduleID].device[devID].networkOutput=1;
+        return 1;
+      }
+  } else
+  {
+    module[moduleID].device[devID].fileOutput=1;
+    strcpy(module[moduleID].device[devID].outputString , target);
+
+    //fprintf(stderr,"acquisitionInitiateTargetForFrames! Module %u , Device %u = %s \n",moduleID,devID, module[moduleID].device[devID].outputString);
+    //Prepare path
+    makepath(target);
+    return 1;
+  }
+
+  fprintf(stderr,RED "acquisitionInitiateTargetForFrames did not decide on a method for passing frames to target\n" NORMAL);
   return 0;
 }
 
 
-int acquisitionStopTransmission(ModuleIdentifier moduleID,DeviceIdentifier devID)
+int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-  fprintf(stderr,RED "acquisitionStopTransmission not implemented yet!\n");
-  return 0;
+  return 1;
 }
 
 
-int acquisitionTransmitSnap(ModuleIdentifier moduleID,DeviceIdentifier devID)
+int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber)
 {
-  fprintf(stderr,RED "acquisitionTransmitSnap not implemented yet!\n");
-  return 0;
+  //fprintf(stderr,"acquisitionPassFramesToTarget not fully implemented yet! Module %u , Device %u = %s \n",moduleID,devID, module[moduleID].device[devID].outputString);
+  if (module[moduleID].device[devID].fileOutput)
+  {
+   char outfilename[2048]={0};
+   sprintf(outfilename,"%s/colorFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
+   acquisitionSaveColorFrame(moduleID,devID,outfilename);
+
+   sprintf(outfilename,"%s/depthFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
+   acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+  } else
+  if (module[moduleID].device[devID].networkOutput)
+  {
+
+
+  } else
+  {
+    fprintf(stderr,RED "acquisitionPassFramesToTarget cannot find a method to use for module %u , device %u , has acquisitionInitiateTargetForFrames been called?\n" NORMAL , moduleID , devID );
+    return 0;
+  }
+
+
+
+  return 1;
 }
+
+
+
 
 
 

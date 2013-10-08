@@ -27,8 +27,8 @@
 
 struct transportImage
 {
-    unsigned char headerT;
     unsigned char headerI;
+    unsigned char headerT;
     unsigned char version;
 
     unsigned char streamID;
@@ -82,8 +82,8 @@ int sendImageSocket(int sock , char * pixels , unsigned int width , unsigned int
   struct transportBorder trBorder={0}; trBorder.headerN = 'N'; trBorder.headerE = 'E'; trBorder.headerX = 'X'; trBorder.headerT = 'T';
 
   struct transportImage trImage={0};
-  trImage.headerT='T';
   trImage.headerI='I';
+  trImage.headerT='T';
   trImage.version=TRANSPORT_STRUCTURE_VERSION;
 
   trImage.width=width;

@@ -37,9 +37,17 @@
 			<Add option="-fPIC" />
 		</Compiler>
 		<Unit filename="NetworkAcquisition.h" />
+		<Unit filename="daemon.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="daemon.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="networkFramework.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="networkFramework.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

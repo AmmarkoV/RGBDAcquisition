@@ -34,6 +34,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 				{
                   case 'S' :
 				  case 's' :
+				      fprintf(stderr,"S Key pressed , Saving Color/Depth frames\n");
                       sprintf(outfilename,"colorFrame_%u_%05u",devID,frameNum);
                       acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
@@ -44,6 +45,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
                   case 'Q' :
 				  case 'q' :
+				      fprintf(stderr,"Q Key pressed , quitting\n");
                       exit (0);
                   break;
 				}
@@ -185,16 +187,12 @@ int main(int argc, char *argv[])
    if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
-
      for (devID=0; devID<maxDevID; devID++)
       {
         acquisitionSnapFrames(moduleID,devID);
 
         acquisitionDisplayFrames(moduleID,devID,framerate);
       }
-
-      //float usleepTime = ((float) 1000*1000/framerate) ;
-      //usleep((unsigned int) usleepTime);
     }
 
     fprintf(stderr,"Done viewing %u frames! \n",maxFramesToGrab);
