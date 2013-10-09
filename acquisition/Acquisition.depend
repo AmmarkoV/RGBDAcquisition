@@ -1,1 +1,18 @@
 # depslib dependency file v1.0
+1381318129 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.c
+	"Acquisition.h"
+	"acquisition_setup.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<unistd.h>
+	<time.h>
+	<dlfcn.h>
+
+1381317626 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
+	"../tools/Calibration/calibration.h"
+
+1380900664 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
+
+1381143568 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
+

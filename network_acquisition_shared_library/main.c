@@ -29,7 +29,6 @@ struct NetworkVirtualDevice
 
  struct calibration calibRGB;
  struct calibration calibDepth;
-
 };
 
 struct NetworkVirtualDevice device[MAX_NETWORK_DEVICES]={0};
@@ -43,12 +42,20 @@ struct NetworkVirtualDevice device[MAX_NETWORK_DEVICES]={0};
 int networkBackbone_startPushingToRemote(char * ip , int port)
 {
   fprintf(stderr,"networkBackbone_startPushingToRemote(%s,%u) called \n",ip,port);
+  StartFrameServer(0,ip,port);
   return 0;
 }
 
+
+int networkBackbone_getSocket(int devID)
+{
+  return 0;
+}
+
+
 int networkBackbone_stopPushingToRemote(int sock)
 {
-
+  StopFrameServer(0);
   return 0;
 }
 

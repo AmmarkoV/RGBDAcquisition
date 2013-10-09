@@ -15,25 +15,55 @@
 #define MAX_CLIENTS_LISTENING_FOR 100
 
 
-struct serverState
-{
-   int sock;
-   int serversock;
-
-   int port;
-
-   int serverThreadId;
-   int serverRunning;
-   int stopServer;
-};
-
-struct passToServerThread
-{
-   int id;
-};
-
-
 struct serverState serverDevices[MAX_CLIENTS_LISTENING_FOR]={0};
+
+
+
+
+void * ServeClient(void * ptr)
+{
+  fprintf(stderr,"Serve Client called ..\n");
+  struct PassToHTTPThread * context = (struct PassToHTTPThread *) ptr;
+  if (context->keep_var_on_stack!=1)
+   {
+     error("KeepVarOnStack is not properly set , this is a bug .. \n Will not serve request");
+     fprintf(stderr,"Bad new thread context is pointing to %p\n",context);
+     return 0;
+   }
+
+  int close_connection=0; // <- if this is set it means Serve Client must stop
+}
+
+
+
+
+
+
+int SpawnThreadToServeNewClient(unsigned int instanceID , int clientsock,struct sockaddr_in client,unsigned int clientlen)
+{
+
+  volatile struct PassToHTTPThread context={{0}};
+  //memset((void*) &context,0,sizeof(struct PassToHTTPThread));
+
+  context.keep_var_on_stack=1;
+
+  context.clientsock=clientsock;
+  context.client=client;
+  context.clientlen=clientlen;
+  context.pre_spawned_thread = 0; // THIS IS A !!!NEW!!! THREAD , NOT A PRESPAWNED ONE
+
+  pthread_t server_thread_id;
+
+  int retres = pthread_create(&server_thread_id,0/*&instance->attr*/,ServeClient,(void*) &context);
+
+  if (retres!=0) { retres = 0; } else { retres = 1; }
+
+
+  return retres;
+}
+
+
+
 
 
 
@@ -49,6 +79,7 @@ void * mainServerThread (void * ptr)
   struct sockaddr_in client;
 
   int instanceID = context->id;
+  context.doneWaiting=1;
 
   int serversock = socket(AF_INET, SOCK_STREAM, 0);
     if ( serversock < 0 ) { fprintf(stderr,"Server Thread : Opening socket"); return 0; }
@@ -60,34 +91,24 @@ void * mainServerThread (void * ptr)
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
   server.sin_port = htons(serverDevices[instanceID].port);
-/*
+
 
   //We bind to our port..!
   if ( bind(serversock,(struct sockaddr *) &server,serverlen) < 0 )
     {
       fprintf(stderr,"Server Thread : Error binding master port!\nThe server may already be running ..\n");
-      instance->server_running=0;
+      serverDevices[instanceID].serverRunning=0;
       return 0;
     }
 
-  //MAX_CLIENT_THREADS <- this could also be used instead of MAX_CLIENTS_LISTENING_FOR
-  //I am trying a larger listen queue to hold incoming connections regardless of the serving threads
-  //so that they will be used later
   if ( listen(serversock,MAX_CLIENTS_LISTENING_FOR ) < 0 )  //Note that we are listening for a max number of clients as big as our maximum thread number..!
-         {
-           fprintf(stderr,"Server Thread : Failed to listen on server socket");
-           instance->server_running=0;
-           return 0;
-         }
+    {
+      fprintf(stderr,"Server Thread : Failed to listen on server socket");
+      serverDevices[instanceID].serverRunning=0;
+      return 0;
+    }
 
-
-
-  //If we made it this far , it means we got ourselves the port we wanted and we can start serving requests , but before we do that..
-  //The next call Pre"forks" a number of threads specified in configuration.h ( MAX_CLIENT_PRESPAWNED_THREADS )
-  //They can reduce latency by up tp 10ms on a Raspberry Pi , without any side effects..
-  PreSpawnThreads(instance);
-
-  while ( (instance->server_running) && (instance->stop_server==0) && (GLOBAL_KILL_SERVER_SWITCH==0) )
+  while ( (serverDevices[instanceID].serverRunning) && (serverDevices[instanceID].stopServer==0) )
   {
     fprintf(stderr,"\nServer Thread : Waiting for a new client\n");
     // Wait for client connection
@@ -97,8 +118,7 @@ void * mainServerThread (void * ptr)
       {
            fprintf(stderr,"Server Thread : Accepted new client , now deciding on prespawned vs freshly spawned.. \n");
 
-
-            if (SpawnThreadToServeNewClient(instance,clientsock,client,clientlen,instance->webserver_root,instance->templates_root))
+            if (SpawnThreadToServeNewClient(instanceID,clientsock,client,clientlen))
             {
               // This request got served by a freshly spawned thread..!
               // Nothing to do here , proceeding to the next incoming connection..
@@ -111,21 +131,12 @@ void * mainServerThread (void * ptr)
 
       }
  }
-  instance->server_running=0;
-  instance->stop_server=2;
-
+  serverDevices[instanceID].serverRunning=0;
+  serverDevices[instanceID].stopServer=1;
   fprintf(stderr,"Server Stopped..");
-  //It should already be closed so skipping this : close(serversock);
-  pthread_exit(0);*/
+  pthread_exit(0);
   return 0;
 }
-
-
-
-
-
-
-
 
 
 
@@ -136,15 +147,18 @@ int StartFrameServer(unsigned int devID , char * bindAddr , int bindPort)
   //It will bind the ports and start receiving requests and pass them over to new and prespawned threads
    pthread_t server_thread_id;
    int retres = pthread_create( &server_thread_id , 0 , mainServerThread,(void*) &context);
-  // instance->server_thread_id = server_thread_id;
+
+   while (!context.doneWaiting)
+   {
+     usleep(100);
+   }
 
  return retres;
 }
 
 
-int StopFrameServer(unsigned int devID , char * bindAddr , int bindPort)
+int StopFrameServer(unsigned int devID)
 {
-
  return 0;
 }
 

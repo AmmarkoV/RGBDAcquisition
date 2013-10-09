@@ -40,6 +40,7 @@ struct acquisitionDeviceStates
   unsigned char fileOutput;
 
   unsigned char networkOutput;
+  int serverID;
   int port;
 };
 

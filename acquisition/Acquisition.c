@@ -46,6 +46,7 @@ const char NetworkPath[] = "../network_acquisition_shared_library/";       const
 
 void * remoteNetworkDLhandle;
 int (*startPushingToRemoteNetwork) (char * , int);
+int (*getSocketNetwork) (int);
 int (*stopPushingToRemoteNetwork) (int);
 int (*pushImageToRemoteNetwork) (int,int,char *,unsigned int,unsigned int,unsigned int,unsigned int);
 
@@ -478,6 +479,10 @@ int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char 
   //Start Stop ================================================================================================================
   startPushingToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_startPushingToRemote" );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_startPushingToRemote : %s\n" NORMAL,error); }
+
+
+  getSocketNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_getSocket" );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_getSocket : %s\n" NORMAL,error); }
 
   stopPushingToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_stopPushingToRemote" );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_stopPushingToRemote : %s\n" NORMAL,error); }
@@ -1172,7 +1177,7 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
       {
        if  (*startPushingToRemoteNetwork!=0)
          {
-           (*startPushingToRemoteNetwork) ("0.0.0.0",1234);
+            module[moduleID].device[devID].serverID = (*startPushingToRemoteNetwork) ("0.0.0.0",1234);
             module[moduleID].device[devID].networkOutput=1;
             return 1;
          }
@@ -1195,6 +1200,7 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
 
 int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+  (*stopPushingToRemoteNetwork) (module[moduleID].device[devID].serverID);
   return 1;
 }
 
@@ -1213,8 +1219,12 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
   } else
   if (module[moduleID].device[devID].networkOutput)
   {
+    unsigned int width, height , channels , bitsperpixel;
+    acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    pushImageToRemoteNetwork(getSocketNetwork(module[moduleID].device[devID].serverID) , 0 , acquisitionGetColorFrame(moduleID,devID) , width , height , channels , bitsperpixel);
 
-
+    acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    pushImageToRemoteNetwork(getSocketNetwork(module[moduleID].device[devID].serverID) , 1 , acquisitionGetDepthFrame(moduleID,devID) , width , height , channels , bitsperpixel);
   } else
   {
     fprintf(stderr,RED "acquisitionPassFramesToTarget cannot find a method to use for module %u , device %u , has acquisitionInitiateTargetForFrames been called?\n" NORMAL , moduleID , devID );
