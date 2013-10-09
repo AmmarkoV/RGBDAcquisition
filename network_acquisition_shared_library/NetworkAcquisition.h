@@ -40,12 +40,7 @@ struct NetworkVirtualDevice
  struct calibration calibDepth;
 };
 
-struct NetworkVirtualDevice device[MAX_NETWORK_DEVICES]={0};
-
-
-
-
-
+extern struct NetworkVirtualDevice networkDevice[MAX_NETWORK_DEVICES];
 
 
    int networkBackbone_startPushingToRemote(char * ip , int port);

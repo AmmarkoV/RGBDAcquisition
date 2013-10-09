@@ -37,14 +37,20 @@ void * ServeClient(void * ptr)
 
   while (serverDevices[instanceID].serverRunning)
    {
-         if (device[0].okToSendColorFrame)
+         if (networkDevice[0].okToSendColorFrame)
          {
-           sendImageSocket( clientsock ,device[0].colorFrame, device[0].colorWidth , device[0].colorHeight , device[0].colorChannels , device[0].colorBitsperpixel );
-           device[0].okToSendColorFrame=0;
+           sendImageSocket( clientsock ,networkDevice[0].colorFrame, networkDevice[0].colorWidth , networkDevice[0].colorHeight , networkDevice[0].colorChannels , networkDevice[0].colorBitsperpixel );
+           networkDevice[0].okToSendColorFrame=0;
          }
 
+         if (networkDevice[0].okToSendDepthFrame)
+         {
+           sendImageSocket( clientsock ,networkDevice[0].depthFrame, networkDevice[0].depthWidth , networkDevice[0].depthHeight , networkDevice[0].depthChannels , networkDevice[0].depthBitsperpixel );
+           networkDevice[0].okToSendDepthFrame=0;
+         }
         // sendImageSocket(clientsock , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel );
-     usleep(1000);
+     fprintf(stderr,"Serve Client looped\n");
+     usleep(10000);
    }
 
 
@@ -126,9 +132,13 @@ void * mainServerThread (void * ptr)
       return 0;
     }
 
+
+  serverDevices[instanceID].serverRunning=1;
+  serverDevices[instanceID].stopServer=0;
+
   while ( (serverDevices[instanceID].serverRunning) && (serverDevices[instanceID].stopServer==0) )
   {
-    fprintf(stderr,"\nServer Thread : Waiting for a new client\n");
+    fprintf(stderr,"\nServer Thread : Waiting for a new client @ port %u \n",serverDevices[instanceID].port);
     // Wait for client connection
     int clientsock=0;
     if ( (clientsock = accept(serversock,(struct sockaddr *) &client, &clientlen)) < 0) { error("Server Thread : Failed to accept client connection"); }
@@ -161,6 +171,9 @@ void * mainServerThread (void * ptr)
 int StartFrameServer(unsigned int devID , char * bindAddr , int bindPort)
 {
   volatile struct passToServerThread context={ 0 };
+
+  context.id=0;
+  serverDevices[0].port=1234;
   //Creating the main WebServer thread..
   //It will bind the ports and start receiving requests and pass them over to new and prespawned threads
    pthread_t server_thread_id;

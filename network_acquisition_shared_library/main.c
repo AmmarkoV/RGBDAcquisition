@@ -21,6 +21,7 @@
 
 #if BUILD_NETWORK
 
+struct NetworkVirtualDevice networkDevice[MAX_NETWORK_DEVICES]={0};
 
 /*
    This library is unique in the sense that instead of only having the regular calls all the other plugin acquisition modules have
@@ -49,37 +50,39 @@ int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void
 {
   if (streamNumber==0) //Color
   {
-      device[streamNumber].okToSendColorFrame=0;
-      device[streamNumber].colorWidth=width;
-      device[streamNumber].colorHeight=height;
-      device[streamNumber].colorChannels=channels;
-      device[streamNumber].colorBitsperpixel=bitsperpixel;
-      device[streamNumber].colorFrame = (char*) pixels;
+      networkDevice[0].okToSendColorFrame=0;
+      networkDevice[0].colorWidth=width;
+      networkDevice[0].colorHeight=height;
+      networkDevice[0].colorChannels=channels;
+      networkDevice[0].colorBitsperpixel=bitsperpixel;
+      networkDevice[0].colorFrame = (char*) pixels;
 
-      device[streamNumber].okToSendColorFrame=1;
+      networkDevice[0].okToSendColorFrame=1;
 
 
-      while (device[streamNumber].okToSendColorFrame==1)
+      while (networkDevice[0].okToSendColorFrame==1)
        {
-         usleep(100);
+         usleep(100000);
+         fprintf(stderr,"Cf.");
        }
   }
    else
  if (streamNumber==1) //Depth
   {
-      device[streamNumber].okToSendDepthFrame=0;
-      device[streamNumber].depthWidth=width;
-      device[streamNumber].depthHeight=height;
-      device[streamNumber].depthChannels=channels;
-      device[streamNumber].depthBitsperpixel=bitsperpixel;
-      device[streamNumber].depthFrame = (char*) pixels;
+      networkDevice[0].okToSendDepthFrame=0;
+      networkDevice[0].depthWidth=width;
+      networkDevice[0].depthHeight=height;
+      networkDevice[0].depthChannels=channels;
+      networkDevice[0].depthBitsperpixel=bitsperpixel;
+      networkDevice[0].depthFrame = (char*) pixels;
 
-      device[streamNumber].okToSendDepthFrame=1;
+      networkDevice[0].okToSendDepthFrame=1;
 
 
-      while (device[streamNumber].okToSendDepthFrame==1)
+      while (networkDevice[0].okToSendDepthFrame==1)
        {
-         usleep(100);
+         usleep(100000);
+         fprintf(stderr,"Df.");
        }
   }
 
@@ -143,29 +146,29 @@ int seekNetworkFrame(int devID,unsigned int seekFrame) { return 1; }
 int snapNetworkFrames(int devID) { return 1; }
 
 //Color Frame getters
-unsigned long getLastNetworkColorTimestamp(int devID) { return device[devID].lastColorTimestamp; }
-int getNetworkColorWidth(int devID)        { return device[devID].colorWidth; }
-int getNetworkColorHeight(int devID)       { return device[devID].colorHeight; }
-int getNetworkColorDataSize(int devID)     { return device[devID].colorWidth*device[devID].colorHeight * 3; }
+unsigned long getLastNetworkColorTimestamp(int devID) { return networkDevice[devID].lastColorTimestamp; }
+int getNetworkColorWidth(int devID)        { return networkDevice[devID].colorWidth; }
+int getNetworkColorHeight(int devID)       { return networkDevice[devID].colorHeight; }
+int getNetworkColorDataSize(int devID)     { return networkDevice[devID].colorWidth * networkDevice[devID].colorHeight * 3; }
 int getNetworkColorChannels(int devID)     { return 3; }
 int getNetworkColorBitsPerPixel(int devID) { return 8; }
 
 // Frame Grabber should call this function for color frames
-char * getNetworkColorPixels(int devID)    { return device[devID].colorFrame; }
+char * getNetworkColorPixels(int devID)    { return networkDevice[devID].colorFrame; }
 
 
 
 
    //Depth Frame getters
-unsigned long getLastNetworkDepthTimestamp(int devID) { return device[devID].lastDepthTimestamp; }
-int getNetworkDepthWidth(int devID)    { return device[devID].depthWidth; }
-int getNetworkDepthHeight(int devID)   { return device[devID].depthHeight; }
-int getNetworkDepthDataSize(int devID) { return device[devID].depthWidth*device[devID].depthHeight; }
+unsigned long getLastNetworkDepthTimestamp(int devID) { return networkDevice[devID].lastDepthTimestamp; }
+int getNetworkDepthWidth(int devID)    { return networkDevice[devID].depthWidth; }
+int getNetworkDepthHeight(int devID)   { return networkDevice[devID].depthHeight; }
+int getNetworkDepthDataSize(int devID) { return networkDevice[devID].depthWidth * networkDevice[devID].depthHeight; }
 int getNetworkDepthChannels(int devID)     { return 1; }
 int getNetworkDepthBitsPerPixel(int devID) { return 16; }
 
 // Frame Grabber should call this function for depth frames
-char * getNetworkDepthPixels(int devID) { return (char *) device[devID].depthFrame; }
+char * getNetworkDepthPixels(int devID) { return (char *) networkDevice[devID].depthFrame; }
 
 #else
 //Null build
