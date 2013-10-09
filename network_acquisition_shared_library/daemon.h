@@ -31,6 +31,7 @@ struct PassToHTTPThread
 
      int clientsock;
 
+   int id;
      int pre_spawned_thread;
 };
 

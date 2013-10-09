@@ -16,10 +16,41 @@ extern "C"
 {
 #endif
 
+
+#define MAX_NETWORK_DEVICES 5
+
+
+struct NetworkVirtualDevice
+{
+ unsigned int cycle;
+
+
+ unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
+ unsigned long lastColorTimestamp;
+ char * colorFrame;
+ volatile int okToSendColorFrame;
+
+
+ unsigned int depthWidth , depthHeight , depthChannels , depthBitsperpixel;
+ unsigned long lastDepthTimestamp;
+ short * depthFrame;
+ volatile int okToSendDepthFrame;
+
+ struct calibration calibRGB;
+ struct calibration calibDepth;
+};
+
+struct NetworkVirtualDevice device[MAX_NETWORK_DEVICES]={0};
+
+
+
+
+
+
+
    int networkBackbone_startPushingToRemote(char * ip , int port);
-   int networkBackbone_getSocket(int frameServerID);
    int networkBackbone_stopPushingToRemote(int frameServerID);
-   int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
+   int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void*  pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
 
 

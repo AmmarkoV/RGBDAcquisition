@@ -2,9 +2,13 @@
 
 COUNTER=0
 
-snapFrames="http://139.91.185.49:8080/control.html?snap=1"
-rgbFrames="http://139.91.185.49:8080/rgb.ppm"
-depthFrames="http://139.91.185.49:8080/depth.ppm"
+SERVERUSED="139.91.185.49"
+SERVERUSED="127.0.0.1"
+
+
+snapFrames="http://$SERVERUSED:8080/control.html?snap=1"
+rgbFrames="http://$SERVERUSED:8080/rgb.ppm"
+depthFrames="http://$SERVERUSED:8080/depth.ppm"
 
 
 

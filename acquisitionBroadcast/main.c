@@ -104,6 +104,14 @@ int main(int argc, char *argv[])
 {
  AmmServer_RegisterTerminationSignal(&close_dynamic_content);
 
+
+  AmmServer_Warning("This build of acquisitionBroadcast has a known bug , crashing because of asynchronous calls on some of the plugins that are not thread safe");
+  countdownDelay(10);
+  AmmServer_Warning("Needless to say , this needs to be fixed..!");
+  countdownDelay(5);
+
+
+
  unsigned int possibleModules = acquisitionGetModulesCount();
  fprintf(stderr,"Linked to %u modules.. \n",possibleModules);
 

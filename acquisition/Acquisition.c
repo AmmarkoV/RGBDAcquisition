@@ -11,8 +11,6 @@
 
 #define EPOCH_YEAR_IN_TM_YEAR 1900
 
-#define PRINT_DEBUG_EACH_CALL 0
-
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -46,9 +44,8 @@ const char NetworkPath[] = "../network_acquisition_shared_library/";       const
 
 void * remoteNetworkDLhandle;
 int (*startPushingToRemoteNetwork) (char * , int);
-int (*getSocketNetwork) (int);
 int (*stopPushingToRemoteNetwork) (int);
-int (*pushImageToRemoteNetwork) (int,int,char *,unsigned int,unsigned int,unsigned int,unsigned int);
+int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsigned int,unsigned int);
 
 
 
@@ -479,10 +476,6 @@ int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char 
   //Start Stop ================================================================================================================
   startPushingToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_startPushingToRemote" );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_startPushingToRemote : %s\n" NORMAL,error); }
-
-
-  getSocketNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_getSocket" );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_getSocket : %s\n" NORMAL,error); }
 
   stopPushingToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_stopPushingToRemote" );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_stopPushingToRemote : %s\n" NORMAL,error); }
@@ -964,7 +957,7 @@ unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifie
   printCall(moduleID,devID,"acquisitionCopyColorFrame");
   if ( (mem==0) || (memlength==0) )
   {
-    fprintf(stderr,RED "acquisitionCopyColorFrame called with incorrect target for memcpy" NORMAL);
+    fprintf(stderr,RED "acquisitionCopyColorFrame called with incorrect target for memcpy, %u bytes size" NORMAL,memlength);
     return 0;
   }
 
@@ -984,7 +977,7 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
   printCall(moduleID,devID,"acquisitionCopyColorFramePPM");
   if ( (mem==0) || (memlength==0) )
   {
-    fprintf(stderr,RED "acquisitionCopyColorFramePPM called with incorrect target for memcpy" NORMAL);
+    fprintf(stderr,RED "acquisitionCopyColorFramePPM called with incorrect target for memcpy, %u bytes size" NORMAL,memlength);
     return 0;
   }
 
@@ -1018,7 +1011,7 @@ unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifie
   printCall(moduleID,devID,"acquisitionCopyDepthFrame");
   if ( (mem==0) || (memlength==0) )
   {
-    fprintf(stderr,RED "acquisitionCopyDepthFrame called with incorrect target for memcpy" NORMAL);
+    fprintf(stderr,RED "acquisitionCopyDepthFrame called with incorrect target for memcpy , %u bytes size" NORMAL,memlength);
     return 0;
   }
 
@@ -1037,7 +1030,7 @@ unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdenti
   printCall(moduleID,devID,"acquisitionCopyDepthFramePPM");
   if ( (mem==0) || (memlength==0) )
   {
-    fprintf(stderr,RED "acquisitionCopyDepthFramePPM called with incorrect target for memcpy" NORMAL);
+    fprintf(stderr,RED "acquisitionCopyDepthFramePPM called with incorrect target for memcpy , %u bytes size" NORMAL,memlength);
     return 0;
   }
 
@@ -1207,7 +1200,7 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
       {
        if  (*startPushingToRemoteNetwork!=0)
          {
-            module[moduleID].device[devID].serverID = (*startPushingToRemoteNetwork) ("0.0.0.0",1234);
+            module[moduleID].device[devID].frameServerID = (*startPushingToRemoteNetwork) ("0.0.0.0",1234);
             module[moduleID].device[devID].networkOutput=1;
             return 1;
          }
@@ -1230,7 +1223,7 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
 
 int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-  (*stopPushingToRemoteNetwork) (module[moduleID].device[devID].serverID);
+  (*stopPushingToRemoteNetwork) (module[moduleID].device[devID].frameServerID);
   return 1;
 }
 
@@ -1251,10 +1244,10 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
   {
     unsigned int width, height , channels , bitsperpixel;
     acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-    pushImageToRemoteNetwork(getSocketNetwork(module[moduleID].device[devID].serverID) , 0 , acquisitionGetColorFrame(moduleID,devID) , width , height , channels , bitsperpixel);
+    pushImageToRemoteNetwork(module[moduleID].device[devID].frameServerID , 0 , (void*) acquisitionGetColorFrame(moduleID,devID) , width , height , channels , bitsperpixel);
 
     acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-    pushImageToRemoteNetwork(getSocketNetwork(module[moduleID].device[devID].serverID) , 1 , acquisitionGetDepthFrame(moduleID,devID) , width , height , channels , bitsperpixel);
+    pushImageToRemoteNetwork(module[moduleID].device[devID].frameServerID , 1 , (void*) acquisitionGetDepthFrame(moduleID,devID) , width , height , channels , bitsperpixel);
   } else
   {
     fprintf(stderr,RED "acquisitionPassFramesToTarget cannot find a method to use for module %u , device %u , has acquisitionInitiateTargetForFrames been called?\n" NORMAL , moduleID , devID );

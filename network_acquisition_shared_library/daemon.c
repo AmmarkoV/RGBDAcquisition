@@ -1,5 +1,7 @@
 #include "daemon.h"
 
+#include "NetworkAcquisition.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -30,6 +32,22 @@ void * ServeClient(void * ptr)
      fprintf(stderr,"Bad new thread context is pointing to %p\n",context);
      return 0;
    }
+  int instanceID = context->id;
+  int clientsock = context->clientsock;
+
+  while (serverDevices[instanceID].serverRunning)
+   {
+         if (device[0].okToSendColorFrame)
+         {
+           sendImageSocket( clientsock ,device[0].colorFrame, device[0].colorWidth , device[0].colorHeight , device[0].colorChannels , device[0].colorBitsperpixel );
+           device[0].okToSendColorFrame=0;
+         }
+
+        // sendImageSocket(clientsock , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel );
+     usleep(1000);
+   }
+
+
 
   int close_connection=0; // <- if this is set it means Serve Client must stop
 }
