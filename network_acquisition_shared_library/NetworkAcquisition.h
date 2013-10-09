@@ -17,9 +17,9 @@ extern "C"
 #endif
 
    int networkBackbone_startPushingToRemote(char * ip , int port);
-   int networkBackbone_getSocket(int devID);
-   int networkBackbone_stopPushingToRemote(int sock);
-   int networkBackbone_pushImageToRemote(int sock , int streamNumber , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
+   int networkBackbone_getSocket(int frameServerID);
+   int networkBackbone_stopPushingToRemote(int frameServerID);
+   int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
 
 

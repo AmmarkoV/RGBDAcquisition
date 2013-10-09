@@ -961,6 +961,14 @@ char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID
 
 unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength)
 {
+  printCall(moduleID,devID,"acquisitionCopyColorFrame");
+  if ( (mem==0) || (memlength==0) )
+  {
+    fprintf(stderr,RED "acquisitionCopyColorFrame called with incorrect target for memcpy" NORMAL);
+    return 0;
+  }
+
+
   char * color = acquisitionGetColorFrame(moduleID,devID);
   if (color==0) { return 0; }
   unsigned int width , height , channels , bitsperpixel;
@@ -973,6 +981,14 @@ unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifie
 
 unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength)
 {
+  printCall(moduleID,devID,"acquisitionCopyColorFramePPM");
+  if ( (mem==0) || (memlength==0) )
+  {
+    fprintf(stderr,RED "acquisitionCopyColorFramePPM called with incorrect target for memcpy" NORMAL);
+    return 0;
+  }
+
+
   char * color = acquisitionGetColorFrame(moduleID,devID);
   if (color==0) { return 0; }
   unsigned int width , height , channels , bitsperpixel;
@@ -999,6 +1015,13 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
 
 unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength)
 {
+  printCall(moduleID,devID,"acquisitionCopyDepthFrame");
+  if ( (mem==0) || (memlength==0) )
+  {
+    fprintf(stderr,RED "acquisitionCopyDepthFrame called with incorrect target for memcpy" NORMAL);
+    return 0;
+  }
+
   short * depth = acquisitionGetDepthFrame(moduleID,devID);
   if (depth==0) { return 0; }
   unsigned int width , height , channels , bitsperpixel;
@@ -1011,6 +1034,13 @@ unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifie
 
 unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength)
 {
+  printCall(moduleID,devID,"acquisitionCopyDepthFramePPM");
+  if ( (mem==0) || (memlength==0) )
+  {
+    fprintf(stderr,RED "acquisitionCopyDepthFramePPM called with incorrect target for memcpy" NORMAL);
+    return 0;
+  }
+
   short * depth = acquisitionGetDepthFrame(moduleID,devID);
   if (depth==0) { return 0; }
 

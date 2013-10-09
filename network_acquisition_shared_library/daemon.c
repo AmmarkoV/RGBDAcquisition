@@ -79,7 +79,7 @@ void * mainServerThread (void * ptr)
   struct sockaddr_in client;
 
   int instanceID = context->id;
-  context.doneWaiting=1;
+  context->doneWaiting=1;
 
   int serversock = socket(AF_INET, SOCK_STREAM, 0);
     if ( serversock < 0 ) { fprintf(stderr,"Server Thread : Opening socket"); return 0; }

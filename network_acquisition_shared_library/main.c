@@ -47,20 +47,20 @@ int networkBackbone_startPushingToRemote(char * ip , int port)
 }
 
 
-int networkBackbone_getSocket(int devID)
+int networkBackbone_getSocket(int frameServerID)
 {
   return 0;
 }
 
 
-int networkBackbone_stopPushingToRemote(int sock)
+int networkBackbone_stopPushingToRemote(int frameServerID)
 {
   StopFrameServer(0);
   return 0;
 }
 
 
-int networkBackbone_pushImageToRemote(int sock , int streamNumber , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
+int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
 
   return 0;
