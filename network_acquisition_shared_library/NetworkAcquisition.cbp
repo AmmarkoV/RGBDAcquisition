@@ -36,6 +36,9 @@
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
+		<Linker>
+			<Add option="-pthread" />
+		</Linker>
 		<Unit filename="NetworkAcquisition.h" />
 		<Unit filename="daemon.c">
 			<Option compilerVar="CC" />
