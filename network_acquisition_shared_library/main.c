@@ -62,7 +62,7 @@ int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void
 
       while (networkDevice[0].okToSendColorFrame==1)
        {
-         usleep(100000);
+         usleep(1000);
          fprintf(stderr,"Cf.");
        }
   }
@@ -81,7 +81,7 @@ int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void
 
       while (networkDevice[0].okToSendDepthFrame==1)
        {
-         usleep(100000);
+         usleep(1000);
          fprintf(stderr,"Df.");
        }
   }
