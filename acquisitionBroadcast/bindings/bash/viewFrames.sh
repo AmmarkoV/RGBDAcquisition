@@ -2,8 +2,8 @@
 
 COUNTER=0
 
-SERVERUSED="139.91.185.49"
 SERVERUSED="127.0.0.1"
+SERVERUSED="139.91.185.49"
 
 
 snapFrames="http://$SERVERUSED:8080/control.html?snap=1"
@@ -18,7 +18,7 @@ do
      wget -qO- $snapFrames >  /dev/null 
      (time wget -qO- $rgbFrames > "rgb$COUNTER.pnm" ) 1> /dev/null 2>> times.txt& 
      (time wget -qO- $depthFrames > "depth$COUNTER.pnm" ) 1> /dev/null 2>> times.txt&
-     sleep 0.1 
+     sleep 1.1 
      COUNTER=$((COUNTER+1))
 done
 

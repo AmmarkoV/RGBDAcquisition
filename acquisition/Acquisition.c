@@ -1031,17 +1031,3 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-

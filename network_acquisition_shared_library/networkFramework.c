@@ -64,16 +64,16 @@ unsigned int simplePowNet(unsigned int base,unsigned int exp)
 int transmitPart(int sock,char * message,unsigned int message_size)
 {
   int opres=send(sock,message,message_size,MSG_WAITALL|MSG_NOSIGNAL);
-  if (opres<=0) { fprintf(stderr,"Failed sending `%s`..!\n",message); return 0; } else
-  if ((unsigned int) opres!=message_size) { fprintf(stderr,"Failed sending the whole message (%s)..!\n",message); return 0; }
+  if (opres<=0) { fprintf(stderr,"Failed sending `%u bytes`..!\n",message_size); return 0; } else
+  if ((unsigned int) opres!=message_size) { fprintf(stderr,"Failed sending the whole message `%u bytes`..!\n",message_size); return 0; }
   return 1;
 }
 
 int receivePart(int sock,char * message,unsigned int message_size)
 {
   int opres=recv(sock,message,message_size,MSG_WAITALL|MSG_NOSIGNAL);
-  if (opres<=0) { fprintf(stderr,"Failed receiving `%s`..!\n",message); return 0; } else
-  if ((unsigned int) opres!=message_size) { fprintf(stderr,"Failed receiving the whole message (%s)..!\n",message); return 0; }
+  if (opres<=0) { fprintf(stderr,"Failed receiving `%u bytes`..!\n",message_size); return 0; } else
+  if ((unsigned int) opres!=message_size) { fprintf(stderr,"Failed receiving the whole message `%u bytes`..!\n",message_size); return 0; }
   return 1;
 }
 

@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
      }
 
    //Countdown 3 -> 2 -> 1 -> Action!
-   countdownDelay(3);
+   //countdownDelay(3);
    fprintf(stderr,"Starting Grabbing!\n");
 
 

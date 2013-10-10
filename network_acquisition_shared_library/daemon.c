@@ -34,6 +34,7 @@ void * ServeClient(void * ptr)
    }
   int instanceID = context->id;
   int clientsock = context->clientsock;
+  context->keep_var_on_stack=2;
 
   while (serverDevices[0/*instanceID*/].serverRunning)
    {
@@ -79,6 +80,8 @@ int SpawnThreadToServeNewClient(unsigned int instanceID , int clientsock,struct 
   pthread_t server_thread_id;
 
   int retres = pthread_create(&server_thread_id,0/*&instance->attr*/,ServeClient,(void*) &context);
+
+  while ( context.keep_var_on_stack !=2 ) { usleep(1000); fprintf(stderr,"."); }
 
   if (retres!=0) { retres = 0; } else { retres = 1; }
 
