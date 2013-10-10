@@ -35,7 +35,7 @@ void * ServeClient(void * ptr)
   int instanceID = context->id;
   int clientsock = context->clientsock;
 
-  while (serverDevices[instanceID].serverRunning)
+  while (serverDevices[0/*instanceID*/].serverRunning)
    {
          if (networkDevice[0].okToSendColorFrame)
          {

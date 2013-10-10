@@ -1,13 +1,12 @@
 #include "Acquisition.h"
 #include "acquisition_setup.h"
+#include "pluginLinker.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
-
-#include <dlfcn.h>
 
 #define EPOCH_YEAR_IN_TM_YEAR 1900
 
@@ -29,7 +28,6 @@ unsigned long tickBase = 0;
 unsigned int simulateTick=0;
 unsigned long simulatedTickValue=0;
 
-struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES]={0};
 
 
 const char V4L2Path[] = "../v4l2_acquisition_shared_library/";             const char V4L2Lib[] = "libV4L2Acquisition.so";
@@ -41,11 +39,6 @@ const char OpenNI1Path[] = "../openni1_acquisition_shared_library/";       const
 const char OpenNI2Path[] = "../openni2_acquisition_shared_library/";       const char OpenNI2Lib[] = "libOpenNI2Acquisition.so";
 const char NetworkPath[] = "../network_acquisition_shared_library/";       const char NetworkLib[] = "libNetworkAcquisition.so";
 
-
-void * remoteNetworkDLhandle;
-int (*startPushingToRemoteNetwork) (char * , int);
-int (*stopPushingToRemoteNetwork) (int);
-int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsigned int,unsigned int);
 
 
 
@@ -315,48 +308,6 @@ char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned 
 }
 
 
-int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
-{
-
-
-   char* ldPreloadPath;
-   ldPreloadPath= getenv("LD_PRELOAD");
-   if (ldPreloadPath!=0) { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPreloadPath); }
-
-
-   char pathTester[2048]={0};
-
-
-   if (getcwd(pathTester, sizeof(pathTester)) != 0)
-         fprintf(stdout, "Current working dir: %s\n", pathTester);
-
-
-   sprintf(pathTester,"%s/%s",possiblePath,libName);
-   if (fileExists(pathTester))   {
-                                   fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
-                                   strncpy(pathOut,pathTester,pathOutLength);
-                                   return 1;
-                                 } else
-   if (fileExists(libName))      {
-                                   fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
-                                   //strncpy(pathOut,libName,pathOutLength);
-
-                                   strcpy(pathOut,"./"); //<-TODO CHECK BOUNDS HERE ETC..
-                                   strcat(pathOut,libName);
-
-                                   return 1;
-                                 }
-
-
-
-   //TODO HANDLE LIBRARY PATH STRINGS
-   // They look like /opt/ros/groovy/lib:/usr/local/cuda-4.2/cuda/lib64:/usr/local/cuda-4.2/cuda/lib
-   char* ldPath;
-   ldPath= getenv("LD_LIBRARY_PATH");
-   if (ldPath!=0)        { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPath);  }
-
-   return 0;
-}
 
 
 int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
@@ -431,10 +382,10 @@ char * getModuleStringName(ModuleIdentifier moduleID)
 
 
 
-void printCall(ModuleIdentifier moduleID,DeviceIdentifier devID,char * fromFunction)
+void printCall(ModuleIdentifier moduleID,DeviceIdentifier devID,char * fromFunction , char * file , int line)
 {
    #if PRINT_DEBUG_EACH_CALL
-    fprintf(stderr,"called %s module %u , device %u ..\n",fromFunction,moduleID,devID);
+    fprintf(stderr,"called %s module %u , device %u  , file %s , line %d ..\n",fromFunction,moduleID,devID,file,line);
    #endif
 }
 
@@ -451,186 +402,6 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
    fprintf(stderr,"%s hasn't got an implementation for function %s ..\n",getModuleStringName(moduleFailed),fromFunction);
 }
 
-
-int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
-{
-   char *error;
-   char functionNameStr[1024]={0};
-
-   if (!getPluginPath(modulePossiblePath,moduleLib,functionNameStr,1024))
-       {
-          fprintf(stderr,RED "Could not find %s (try adding it to current directory)\n" NORMAL , moduleLib);
-          return 0;
-       }
-
-   remoteNetworkDLhandle = dlopen (functionNameStr, RTLD_LAZY);
-   if (!remoteNetworkDLhandle)
-       {
-        fprintf (stderr,RED "Failed while loading code for %s plugin from %s\n Error : %s\n" NORMAL, moduleName , functionNameStr , dlerror());
-        return 0;
-       }
-
-  dlerror();    /* Clear any existing error */
-
-
-  //Start Stop ================================================================================================================
-  startPushingToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_startPushingToRemote" );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_startPushingToRemote : %s\n" NORMAL,error); }
-
-  stopPushingToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_stopPushingToRemote" );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_stopPushingToRemote : %s\n" NORMAL,error); }
-
-  pushImageToRemoteNetwork = dlsym(remoteNetworkDLhandle, "networkBackbone_pushImageToRemote" );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of networkBackbone_pushImageToRemote : %s\n" NORMAL,error); }
-
-  return 1;
-}
-
-
-
-int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
-{
-
-   char *error;
-   char functionNameStr[1024]={0};
-
-   if (!getPluginPath(modulePossiblePath,moduleLib,functionNameStr,1024))
-       {
-          fprintf(stderr,RED "Could not find %s (try adding it to current directory)\n" NORMAL , moduleLib);
-          return 0;
-       }
-
-   plugins[moduleID].handle = dlopen (functionNameStr, RTLD_LAZY);
-   if (!plugins[moduleID].handle)
-       {
-        fprintf (stderr,RED "Failed while loading code for %s plugin from %s\n Error : %s\n" NORMAL, moduleName , functionNameStr , dlerror());
-        return 0;
-       }
-
-    dlerror();    /* Clear any existing error */
-
-
-  //Start Stop ================================================================================================================
-  sprintf(functionNameStr,"start%sModule",moduleName);
-  plugins[moduleID].startModule = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-
-  sprintf(functionNameStr,"stop%sModule",moduleName);
-  plugins[moduleID].stopModule = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-
-  //================================================================================================================
-  sprintf(functionNameStr,"map%sDepthToRGB",moduleName);
-  plugins[moduleID].mapDepthToRGB = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"map%sRGBToDepth",moduleName);
-  plugins[moduleID].mapRGBToDepth = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-
-
-  sprintf(functionNameStr,"create%sDevice",moduleName);
-  plugins[moduleID].createDevice = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"destroy%sDevice",moduleName);
-  plugins[moduleID].destroyDevice = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-
-
-  sprintf(functionNameStr,"get%sNumberOfDevices",moduleName);
-  plugins[moduleID].getNumberOfDevices = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-
-
-  sprintf(functionNameStr,"seek%sFrame",moduleName);
-  plugins[moduleID].seekFrame = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"snap%sFrames",moduleName);
-  plugins[moduleID].snapFrames = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-
-
-  sprintf(functionNameStr,"getLast%sColorTimestamp",moduleName);
-  plugins[moduleID].getLastColorTimestamp = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"getLast%sDepthTimestamp",moduleName);
-  plugins[moduleID].getLastDepthTimestamp = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-
-
-  sprintf(functionNameStr,"get%sColorWidth",moduleName);
-  plugins[moduleID].getColorWidth = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorHeight",moduleName);
-  plugins[moduleID].getColorHeight = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorDataSize",moduleName);
-  plugins[moduleID].getColorDataSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorChannels",moduleName);
-  plugins[moduleID].getColorChannels = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorBitsPerPixel",moduleName);
-  plugins[moduleID].getColorBitsPerPixel = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorPixels",moduleName);
-  plugins[moduleID].getColorPixels = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorFocalLength",moduleName);
-  plugins[moduleID].getColorFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorPixelSize",moduleName);
-  plugins[moduleID].getColorPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorCalibration",moduleName);
-  plugins[moduleID].getColorCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"set%sColorCalibration",moduleName);
-  plugins[moduleID].setColorCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-
-
-
-  sprintf(functionNameStr,"get%sDepthWidth",moduleName);
-  plugins[moduleID].getDepthWidth = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthHeight",moduleName);
-  plugins[moduleID].getDepthHeight = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthDataSize",moduleName);
-  plugins[moduleID].getDepthDataSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthChannels",moduleName);
-  plugins[moduleID].getDepthChannels = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthBitsPerPixel",moduleName);
-  plugins[moduleID].getDepthBitsPerPixel = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthPixels",moduleName);
-  plugins[moduleID].getDepthPixels = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthFocalLength",moduleName);
-  plugins[moduleID].getDepthFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthPixelSize",moduleName);
-  plugins[moduleID].getDepthPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthCalibration",moduleName);
-  plugins[moduleID].getDepthCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"set%sDepthCalibration",moduleName);
-  plugins[moduleID].setDepthCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-
-  return 1;
-}
-
-int unlinkPlugin(ModuleIdentifier moduleID)
-{
-    if (plugins[moduleID].handle==0) { return 1; }
-    dlclose(plugins[moduleID].handle);
-    plugins[moduleID].handle=0;
-    return 1;
-}
 
 
 
@@ -708,7 +479,7 @@ int acquisitionStopModule(ModuleIdentifier moduleID)
 
 int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
 {
-    printCall(moduleID,0,"acquisitionGetModuleDevices");
+    printCall(moduleID,0,"acquisitionGetModuleDevices", __FILE__, __LINE__);
     if (plugins[moduleID].getNumberOfDevices!=0) { return (*plugins[moduleID].getNumberOfDevices) (); }
     MeaningfullWarningMessage(moduleID,0,"acquisitionGetModuleDevices");
     return 0;
@@ -721,7 +492,7 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
    ------------------------------------------*/
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
-    printCall(moduleID,devID,"acquisitionOpenDevice");
+    printCall(moduleID,devID,"acquisitionOpenDevice", __FILE__, __LINE__);
     if (plugins[moduleID].createDevice!=0) { return (*plugins[moduleID].createDevice) (devID,devName,width,height,framerate); }
     MeaningfullWarningMessage(moduleID,devID,"acquisitionOpenDevice");
     return 0;
@@ -729,7 +500,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-    printCall(moduleID,devID,"acquisitionCloseDevice");
+    printCall(moduleID,devID,"acquisitionCloseDevice", __FILE__, __LINE__);
     if (plugins[moduleID].destroyDevice!=0) { return (*plugins[moduleID].destroyDevice) (devID); }
     MeaningfullWarningMessage(moduleID,devID,"acquisitionCloseDevice");
     return 0;
@@ -738,7 +509,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame)
 {
-    printCall(moduleID,devID,"acquisitionSeekFrame");
+    printCall(moduleID,devID,"acquisitionSeekFrame", __FILE__, __LINE__);
     if (*plugins[moduleID].seekFrame!=0) { return (*plugins[moduleID].seekFrame) (devID,seekFrame); }
 
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSeekFrame");
@@ -748,7 +519,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-    printCall(moduleID,devID,"acquisitionSnapFrames");
+    printCall(moduleID,devID,"acquisitionSnapFrames", __FILE__, __LINE__);
     //fprintf(stderr,"acquisitionSnapFrames called moduleID=%u devID=%u\n",moduleID,devID);
     if (*plugins[moduleID].snapFrames!=0) { return (*plugins[moduleID].snapFrames) (devID); }
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSnapFrames");
@@ -757,7 +528,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
-    printCall(moduleID,devID,"acquisitionSaveColorFrame");
+    printCall(moduleID,devID,"acquisitionSaveColorFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
     sprintf(filenameFull,"%s.pnm",filename);
 
@@ -801,7 +572,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
-    printCall(moduleID,devID,"acquisitionSaveDepthFrame");
+    printCall(moduleID,devID,"acquisitionSaveDepthFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
     sprintf(filenameFull,"%s.pnm",filename);
 
@@ -827,7 +598,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
  int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
-    printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame");
+    printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame", __FILE__, __LINE__);
 
     char filenameFull[1024]={0};
     sprintf(filenameFull,"%s.pnm",filename);
@@ -859,7 +630,7 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 
 int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
-    printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame");
+    printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame", __FILE__, __LINE__);
 
     char filenameFull[1024]={0};
     sprintf(filenameFull,"%s.pnm",filename);
@@ -892,7 +663,7 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
 
 int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
-   printCall(moduleID,devID,"acquisitionGetColorCalibration");
+   printCall(moduleID,devID,"acquisitionGetColorCalibration", __FILE__, __LINE__);
    if (*plugins[moduleID].getColorCalibration!=0) { return (*plugins[moduleID].getColorCalibration) (devID,calib); }
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
    return 0;
@@ -900,7 +671,7 @@ int acquisitionGetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
-   printCall(moduleID,devID,"acquisitionGetDepthCalibration");
+   printCall(moduleID,devID,"acquisitionGetDepthCalibration", __FILE__, __LINE__);
    if (*plugins[moduleID].getDepthCalibration!=0) { return (*plugins[moduleID].getDepthCalibration) (devID,calib); }
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
    return 0;
@@ -912,7 +683,7 @@ int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
-   printCall(moduleID,devID,"acquisitionGetColorCalibration");
+   printCall(moduleID,devID,"acquisitionGetColorCalibration", __FILE__, __LINE__);
    if (*plugins[moduleID].setColorCalibration!=0) { return (*plugins[moduleID].setColorCalibration) (devID,calib); }
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
    return 0;
@@ -920,7 +691,7 @@ int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
-   printCall(moduleID,devID,"acquisitionGetDepthCalibration");
+   printCall(moduleID,devID,"acquisitionGetDepthCalibration", __FILE__, __LINE__);
    if (*plugins[moduleID].setDepthCalibration!=0) { return (*plugins[moduleID].setDepthCalibration) (devID,calib); }
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
    return 0;
@@ -929,7 +700,7 @@ int acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 unsigned long acquisitionGetColorTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-   printCall(moduleID,devID,"acquisitionGetColorTimestamp");
+   printCall(moduleID,devID,"acquisitionGetColorTimestamp", __FILE__, __LINE__);
    if (*plugins[moduleID].getLastColorTimestamp!=0) { return (*plugins[moduleID].getLastColorTimestamp) (devID); }
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorTimestamp");
    return 0;
@@ -937,7 +708,7 @@ unsigned long acquisitionGetColorTimestamp(ModuleIdentifier moduleID,DeviceIdent
 
 unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-   printCall(moduleID,devID,"acquisitionGetDepthTimestamp");
+   printCall(moduleID,devID,"acquisitionGetDepthTimestamp", __FILE__, __LINE__);
    if (*plugins[moduleID].getLastDepthTimestamp!=0) { return (*plugins[moduleID].getLastDepthTimestamp) (devID); }
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthTimestamp");
    return 0;
@@ -946,7 +717,7 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
 
 char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-  printCall(moduleID,devID,"acquisitionGetColorFrame");
+  printCall(moduleID,devID,"acquisitionGetColorFrame", __FILE__, __LINE__);
   if (*plugins[moduleID].getColorPixels!=0) { return (*plugins[moduleID].getColorPixels) (devID); }
   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorFrame");
   return 0;
@@ -954,7 +725,7 @@ char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID
 
 unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength)
 {
-  printCall(moduleID,devID,"acquisitionCopyColorFrame");
+  printCall(moduleID,devID,"acquisitionCopyColorFrame", __FILE__, __LINE__);
   if ( (mem==0) || (memlength==0) )
   {
     fprintf(stderr,RED "acquisitionCopyColorFrame called with incorrect target for memcpy, %u bytes size" NORMAL,memlength);
@@ -974,7 +745,7 @@ unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifie
 
 unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength)
 {
-  printCall(moduleID,devID,"acquisitionCopyColorFramePPM");
+  printCall(moduleID,devID,"acquisitionCopyColorFramePPM", __FILE__, __LINE__);
   if ( (mem==0) || (memlength==0) )
   {
     fprintf(stderr,RED "acquisitionCopyColorFramePPM called with incorrect target for memcpy, %u bytes size" NORMAL,memlength);
@@ -999,7 +770,7 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
 
 short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-  printCall(moduleID,devID,"acquisitionGetDepthFrame");
+  printCall(moduleID,devID,"acquisitionGetDepthFrame", __FILE__, __LINE__);
   if (*plugins[moduleID].getDepthPixels!=0) { return (short*) (*plugins[moduleID].getDepthPixels) (devID); }
   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrame");
   return 0;
@@ -1008,7 +779,7 @@ short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devI
 
 unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength)
 {
-  printCall(moduleID,devID,"acquisitionCopyDepthFrame");
+  printCall(moduleID,devID,"acquisitionCopyDepthFrame", __FILE__, __LINE__);
   if ( (mem==0) || (memlength==0) )
   {
     fprintf(stderr,RED "acquisitionCopyDepthFrame called with incorrect target for memcpy , %u bytes size" NORMAL,memlength);
@@ -1027,7 +798,7 @@ unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifie
 
 unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength)
 {
-  printCall(moduleID,devID,"acquisitionCopyDepthFramePPM");
+  printCall(moduleID,devID,"acquisitionCopyDepthFramePPM", __FILE__, __LINE__);
   if ( (mem==0) || (memlength==0) )
   {
     fprintf(stderr,RED "acquisitionCopyDepthFramePPM called with incorrect target for memcpy , %u bytes size" NORMAL,memlength);
@@ -1076,7 +847,7 @@ int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier de
 int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID ,
                                        unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel )
 {
-  printCall(moduleID,devID,"acquisitionGetColorFrameDimensions");
+  printCall(moduleID,devID,"acquisitionGetColorFrameDimensions", __FILE__, __LINE__);
 
   if ( (width==0)||(height==0)||(channels==0)||(bitsperpixel==0) )
     {
@@ -1106,7 +877,7 @@ int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID ,
                                        unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel )
 {
-  printCall(moduleID,devID,"acquisitionGetDepthFrameDimensions");
+  printCall(moduleID,devID,"acquisitionGetDepthFrameDimensions", __FILE__, __LINE__);
 
   if ( (width==0)||(height==0)||(channels==0)||(bitsperpixel==0) )
     {
@@ -1133,7 +904,7 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
  int acquisitionMapDepthToRGB(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-    printCall(moduleID,devID,"acquisitionMapDepthToRGB");
+    printCall(moduleID,devID,"acquisitionMapDepthToRGB", __FILE__, __LINE__);
     if  (*plugins[moduleID].mapDepthToRGB!=0) { return  (*plugins[moduleID].mapDepthToRGB) (devID); }
     MeaningfullWarningMessage(moduleID,devID,"acquisitionMapDepthToRGB");
     return 0;
@@ -1142,7 +913,7 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
  int acquisitionMapRGBToDepth(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-    printCall(moduleID,devID,"acquisitionMapRGBToDepth");
+    printCall(moduleID,devID,"acquisitionMapRGBToDepth", __FILE__, __LINE__);
     if  (*plugins[moduleID].mapRGBToDepth!=0) { return  (*plugins[moduleID].mapRGBToDepth) (devID); }
     MeaningfullWarningMessage(moduleID,devID,"acquisitionMapRGBToDepth");
     return 0;
@@ -1152,7 +923,7 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 
 double acqusitionGetColorFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-   printCall(moduleID,devID,"acqusitionGetColorFocalLength");
+   printCall(moduleID,devID,"acqusitionGetColorFocalLength", __FILE__, __LINE__);
    if  (*plugins[moduleID].getColorFocalLength!=0) { return  (*plugins[moduleID].getColorFocalLength) (devID); }
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetColorFocalLength");
     return 0.0;
@@ -1160,7 +931,7 @@ double acqusitionGetColorFocalLength(ModuleIdentifier moduleID,DeviceIdentifier 
 
 double acqusitionGetColorPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-    printCall(moduleID,devID,"acqusitionGetColorPixelSize");
+    printCall(moduleID,devID,"acqusitionGetColorPixelSize", __FILE__, __LINE__);
     if  (*plugins[moduleID].getColorPixelSize!=0) { return  (*plugins[moduleID].getColorPixelSize) (devID); }
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetColorPixelSize");
     return 0.0;
@@ -1170,7 +941,7 @@ double acqusitionGetColorPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
 
 double acqusitionGetDepthFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-    printCall(moduleID,devID,"acqusitionGetFocalLength");
+    printCall(moduleID,devID,"acqusitionGetFocalLength", __FILE__, __LINE__);
     if  (*plugins[moduleID].getDepthFocalLength!=0) { return  (*plugins[moduleID].getDepthFocalLength) (devID); }
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetFocalLength");
     return 0.0;
@@ -1178,7 +949,7 @@ double acqusitionGetDepthFocalLength(ModuleIdentifier moduleID,DeviceIdentifier 
 
 double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-    printCall(moduleID,devID,"acqusitionGetPixelSize");
+    printCall(moduleID,devID,"acqusitionGetPixelSize", __FILE__, __LINE__);
     if  (*plugins[moduleID].getDepthPixelSize!=0) { return  (*plugins[moduleID].getDepthPixelSize) (devID); }
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetPixelSize");
     return 0.0;

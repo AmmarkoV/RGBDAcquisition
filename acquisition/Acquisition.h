@@ -57,56 +57,6 @@ struct acquisitionModuleStates module[NUMBER_OF_POSSIBLE_MODULES];
 
 
 
-struct acquisitionPluginInterface
-{
-   void *handle;
-
-   int (*startModule) (unsigned int,char *);
-   int (*stopModule) ();
-
-   int (*mapDepthToRGB) (int);
-   int (*mapRGBToDepth) (int);
-
-   int (*createDevice)  (int,char * devName,unsigned int,unsigned int,unsigned int);
-   int (*destroyDevice) (int);
-
-
-   int (*getNumberOfDevices) ();
-
-
-   unsigned long (*getLastColorTimestamp) (int);
-   unsigned long (*getLastDepthTimestamp) (int);
-
-   int (*snapFrames) (int);
-   int (*seekFrame)  (int,unsigned int);
-
-   int (*getColorWidth) (int);
-   int (*getColorHeight) (int);
-   int (*getColorDataSize) (int);
-   int (*getColorChannels) (int);
-   int (*getColorBitsPerPixel) (int);
-   char * (*getColorPixels) (int);
-   double (*getColorFocalLength) (int);
-   double (*getColorPixelSize)   (int);
-   int (*getColorCalibration) (int,struct calibration *);
-   int (*setColorCalibration) (int,struct calibration *);
-
-
-   int (*getDepthWidth) (int);
-   int (*getDepthHeight) (int);
-   int (*getDepthDataSize) (int);
-   int (*getDepthChannels) (int);
-   int (*getDepthBitsPerPixel) (int);
-   char * (*getDepthPixels) (int);
-   double (*getDepthFocalLength) (int);
-   double (*getDepthPixelSize)   (int);
-   int (*getDepthCalibration) (int,struct calibration *);
-   int (*setDepthCalibration) (int,struct calibration *);
-
-
-};
-
-extern struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES];
 
 void countdownDelay(int seconds);
 int acquisitionSimulateTime(unsigned long timeInMillisecs);
