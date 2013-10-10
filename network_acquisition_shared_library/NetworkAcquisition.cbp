@@ -38,7 +38,16 @@
 		</Compiler>
 		<Linker>
 			<Add option="-pthread" />
+			<Add option="-ljpeg" />
 		</Linker>
+		<Unit filename="../tools/Codecs/codecs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/Codecs/codecs.h" />
+		<Unit filename="../tools/Codecs/jpgInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/Codecs/jpgInput.h" />
 		<Unit filename="NetworkAcquisition.h" />
 		<Unit filename="daemon.c">
 			<Option compilerVar="CC" />
