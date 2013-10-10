@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <errno.h>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -64,14 +66,20 @@ unsigned int simplePowNet(unsigned int base,unsigned int exp)
 int transmitPart(int sock,char * message,unsigned int message_size)
 {
   int opres=send(sock,message,message_size,MSG_WAITALL|MSG_NOSIGNAL);
-  if (opres<=0) { fprintf(stderr,"Failed sending `%u bytes`..!\n",message_size); return 0; } else
-  if ((unsigned int) opres!=message_size) { fprintf(stderr,"Failed sending the whole message `%u bytes`..!\n",message_size); return 0; }
+  if (opres<=0) { fprintf(stderr,"Failed sending `%u bytes` , error %s ..!\n",message_size,strerror(errno)); return 0; }
+              else
+  if ((unsigned int) opres!=message_size)
+                {
+                  fprintf(stderr,"Failed sending the whole message wanted to send %u bytes\n",message_size);
+                  fprintf(stderr,"Sent %0.2f %% , remaining `%u bytes`..!\n", (float) ( (100*(message_size-opres))/message_size ) , message_size-opres);
+                  return 0;
+                }
   return 1;
 }
 
 int receivePart(int sock,char * message,unsigned int message_size)
 {
-  int opres=recv(sock,message,message_size,MSG_WAITALL|MSG_NOSIGNAL);
+  int opres=recv(sock,message,message_size,0);
   if (opres<=0) { fprintf(stderr,"Failed receiving `%u bytes`..!\n",message_size); return 0; } else
   if ((unsigned int) opres!=message_size) { fprintf(stderr,"Failed receiving the whole message `%u bytes`..!\n",message_size); return 0; }
   return 1;
@@ -79,6 +87,8 @@ int receivePart(int sock,char * message,unsigned int message_size)
 
 int sendImageSocket(int sock , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel )
 {
+  //fprintf(stderr,"sendImageSocket %ux%u %u channels %u bitsperpixel , %u bytes per pixel\n",width,height,channels,bitsperpixel, (bitsperpixel/8));
+
   struct transportBorder trBorder={0}; trBorder.headerN = 'N'; trBorder.headerE = 'E'; trBorder.headerX = 'X'; trBorder.headerT = 'T';
 
   struct transportImage trImage={0};
@@ -91,7 +101,7 @@ int sendImageSocket(int sock , char * pixels , unsigned int width , unsigned int
   trImage.channels=channels;
   trImage.bitsperpixel=bitsperpixel;
 
-  unsigned int messageSize = width * height * channels * simplePowNet(2,bitsperpixel);
+  unsigned int messageSize = width * height * channels * (bitsperpixel/8);
 
   transmitPart(sock,(char*) &trImage,sizeof(struct transportImage));
 
@@ -115,7 +125,7 @@ char * recvImageSocket(int sock , unsigned int * width , unsigned int * height ,
 
   receivePart(sock,&trImage,sizeof(struct transportImage));
 
-  unsigned int messageSize = trImage.width * trImage.height * trImage.channels * simplePowNet(2,trImage.bitsperpixel);
+  unsigned int messageSize = trImage.width * trImage.height * trImage.channels * (simplePowNet(2,trImage.bitsperpixel)/8);
 
   imgPtr = (unsigned  char* ) malloc(sizeof(unsigned char) * messageSize);
   if (imgPtr==0)

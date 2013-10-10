@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = libAcquisition.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/Acquisition.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/Acquisition.o $(OBJDIR_DEBUG)/pluginLinker.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/Acquisition.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/Acquisition.o $(OBJDIR_RELEASE)/pluginLinker.o
 
 all: debug release
 
@@ -61,6 +61,9 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 $(OBJDIR_DEBUG)/Acquisition.o: Acquisition.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Acquisition.c -o $(OBJDIR_DEBUG)/Acquisition.o
 
+$(OBJDIR_DEBUG)/pluginLinker.o: pluginLinker.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c pluginLinker.c -o $(OBJDIR_DEBUG)/pluginLinker.o
+
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf $(OBJDIR_DEBUG)
@@ -77,6 +80,9 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 
 $(OBJDIR_RELEASE)/Acquisition.o: Acquisition.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Acquisition.c -o $(OBJDIR_RELEASE)/Acquisition.o
+
+$(OBJDIR_RELEASE)/pluginLinker.o: pluginLinker.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c pluginLinker.c -o $(OBJDIR_RELEASE)/pluginLinker.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)

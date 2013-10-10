@@ -47,6 +47,10 @@
 		</Unit>
 		<Unit filename="Acquisition.h" />
 		<Unit filename="acquisition_setup.h" />
+		<Unit filename="pluginLinker.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pluginLinker.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

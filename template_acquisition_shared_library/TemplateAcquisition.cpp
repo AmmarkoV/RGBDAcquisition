@@ -223,7 +223,7 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsign
 
         *width=w;
         *height=h;
-        pixels= (short*) malloc(w*h*3*sizeof(short));
+        pixels= (short*) malloc(w*h*sizeof(short)); /*Only 1 channel in depth images 3*/
 
         if ( pixels != 0 )
         {

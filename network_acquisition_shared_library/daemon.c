@@ -50,8 +50,8 @@ void * ServeClient(void * ptr)
            networkDevice[0].okToSendDepthFrame=0;
          }
         // sendImageSocket(clientsock , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel );
-     fprintf(stderr,"Serve Client looped\n");
-     usleep(10000);
+     //fprintf(stderr,"Serve Client looped\n");
+     usleep(1000);
    }
 
 
