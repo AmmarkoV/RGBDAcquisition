@@ -28,7 +28,8 @@ extern "C"
 
 
 #define USE_JPG_FILES 1
-#define USE_PNG_FILES 1
+#define USE_PNG_FILES 0
+#define USE_PPM_FILES 0
 
 
 #define READ_CREATES_A_NEW_PIXEL_BUFFER 1
@@ -57,6 +58,7 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 int writeImageFile(struct Image * pic,unsigned int type,char *filename);
 int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned long * mem_size);
 
+struct Image * createImageUsingExistingBuffer( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel , unsigned char * pixels);
 struct Image * createImage( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel);
 int destroyImage(struct Image * img);
 

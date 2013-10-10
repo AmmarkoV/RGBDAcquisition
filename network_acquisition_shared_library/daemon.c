@@ -40,7 +40,7 @@ void * ServeClient(void * ptr)
    {
          if (networkDevice[0].okToSendColorFrame)
          {
-           sendImageSocket( clientsock ,networkDevice[0].colorFrame, networkDevice[0].colorWidth , networkDevice[0].colorHeight , networkDevice[0].colorChannels , networkDevice[0].colorBitsperpixel );
+           sendImageSocket( clientsock ,networkDevice[0].colorFrame, networkDevice[0].colorWidth , networkDevice[0].colorHeight , networkDevice[0].colorChannels , networkDevice[0].colorBitsperpixel , networkDevice[0].compressedColorSize );
            networkDevice[0].okToSendColorFrame=0;
          }
 

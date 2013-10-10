@@ -65,9 +65,12 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
       break;
      #endif
 
+     #if USE_PPM_FILES
        case PPM_CODEC :
+       case PNM_CODEC :
        if (!ReadPPM(filename,img,read_only_header)) { free(img); img=0; }
        break;
+     #endif
 
       default :
        free(img);
@@ -89,10 +92,12 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
      #endif // USE_JPG_FILES
 
 
+     #if USE_PPM_FILES
       case PPM_CODEC :
       case PNM_CODEC :
        WritePPM(filename,pic);
       break;
+    #endif
 
 
 
@@ -121,7 +126,7 @@ int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned lon
 }
 
 
-struct Image * createImage( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel)
+struct Image * createImageUsingExistingBuffer( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel , unsigned char * pixels)
 {
   struct Image * img = 0;
   img = (struct Image *) malloc( sizeof(struct Image) );
@@ -133,10 +138,21 @@ struct Image * createImage( unsigned int width , unsigned int height , unsigned 
   img->channels = channels;
   img->bitsperpixel = bitsPerPixel;
 
-  img->pixels = ( unsigned char * ) malloc(width * height * channels * (bitsPerPixel/8) * sizeof(unsigned char) );
-  memset(img->pixels,0,width * height * channels * (bitsPerPixel/8) * sizeof(unsigned char));
+  img->pixels = pixels;
+  return  img;
+}
 
-  return  img; // :P just to make sure
+
+struct Image * createImage( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel)
+{
+  unsigned char * pixels = ( unsigned char * ) malloc(width * height * channels * (bitsPerPixel/8) * sizeof(unsigned char) );
+  if (pixels==0) { fprintf(stderr,"Could not allocate a new %ux%u image \n",width,height); return 0; }
+  memset(pixels,0,width * height * channels * (bitsPerPixel/8) * sizeof(unsigned char));
+
+  struct Image * img =  createImageUsingExistingBuffer(width , height , channels , bitsPerPixel , pixels);
+  if (img==0) { free(pixels); return 0; }
+
+  return  img;
 }
 
 

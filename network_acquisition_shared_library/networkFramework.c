@@ -38,6 +38,7 @@ struct transportImage
     unsigned int height;
     unsigned char channels;
     unsigned char bitsperpixel;
+    unsigned int compressedSize;
 };
 
 struct transportBorder
@@ -85,7 +86,7 @@ int receivePart(int sock,char * message,unsigned int message_size)
   return 1;
 }
 
-int sendImageSocket(int sock , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel )
+int sendImageSocket(int sock , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel , unsigned int compressedSize )
 {
   //fprintf(stderr,"sendImageSocket %ux%u %u channels %u bitsperpixel , %u bytes per pixel\n",width,height,channels,bitsperpixel, (bitsperpixel/8));
 
@@ -100,8 +101,10 @@ int sendImageSocket(int sock , char * pixels , unsigned int width , unsigned int
   trImage.height=height;
   trImage.channels=channels;
   trImage.bitsperpixel=bitsperpixel;
+  trImage.compressedSize = compressedSize;
 
   unsigned int messageSize = width * height * channels * (bitsperpixel/8);
+  if (compressedSize!=0) { messageSize=compressedSize; }
 
   transmitPart(sock,(char*) &trImage,sizeof(struct transportImage));
 

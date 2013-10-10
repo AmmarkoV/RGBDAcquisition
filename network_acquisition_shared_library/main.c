@@ -4,6 +4,9 @@
 #include "NetworkAcquisition.h"
 
 
+#include "../tools/Codecs/codecs.h"
+#include "../tools/Codecs/jpgInput.h"
+
 #include "../acquisition/Acquisition.h"
 
 #include <string.h>
@@ -56,6 +59,14 @@ int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void
       networkDevice[0].colorChannels=channels;
       networkDevice[0].colorBitsperpixel=bitsperpixel;
       networkDevice[0].colorFrame = (char*) pixels;
+      networkDevice[0].compressedColorSize=0; // Not using compression
+
+      struct Image * img = createImageUsingExistingBuffer(width,height,channels,bitsperpixel,pixels);
+      networkDevice[0].compressedColorSize=64*1024; //64KBmax
+      char * compressedPixels = (char* ) malloc(sizeof(char) * networkDevice[0].compressedColorSize);
+      WriteJPEGInternal("dummyName.jpg",img,compressedPixels,&networkDevice[0].compressedColorSize);
+      networkDevice[0].colorFrame = (char*) compressedPixels;
+
 
       networkDevice[0].okToSendColorFrame=1;
 

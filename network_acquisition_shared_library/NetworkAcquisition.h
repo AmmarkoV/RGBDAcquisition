@@ -27,6 +27,7 @@ struct NetworkVirtualDevice
 
  unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
  unsigned long lastColorTimestamp;
+ unsigned long compressedColorSize;
  char * colorFrame;
  volatile int okToSendColorFrame;
 
