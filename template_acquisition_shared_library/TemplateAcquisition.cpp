@@ -3,6 +3,7 @@
 
 #include "TemplateAcquisition.h"
 
+#define BUILD_TEMPLATE 1
 
 #if BUILD_TEMPLATE
 #include "../acquisition/Acquisition.h"

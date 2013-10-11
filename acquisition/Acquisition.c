@@ -962,6 +962,11 @@ double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
 */
 int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,char * target)
 {
+  if (strstr(target,"/dev/null")!=0)
+  {
+    module[moduleID].device[devID].dryRunOutput=1;
+    return 1;
+  } else
   if ( strstr(target,"tcp://")!=0 )
   {
     if (!linkToNetworkTransmission("Network",NetworkPath,NetworkLib,moduleID) )
@@ -994,7 +999,12 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
 
 int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-  (*stopPushingToRemoteNetwork) (module[moduleID].device[devID].frameServerID);
+  if (module[moduleID].device[devID].networkOutput)
+  {
+    //If we were using networkOutput lets stop using it!
+    if (stopPushingToRemoteNetwork==0) { fprintf(stderr,RED "stopPushingToRemoteNetwork has not been linked to network plugin\n" NORMAL); return 0; }
+    return (*stopPushingToRemoteNetwork) (module[moduleID].device[devID].frameServerID);
+  }
   return 1;
 }
 
@@ -1002,6 +1012,11 @@ int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier de
 int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber)
 {
   //fprintf(stderr,"acquisitionPassFramesToTarget not fully implemented yet! Module %u , Device %u = %s \n",moduleID,devID, module[moduleID].device[devID].outputString);
+
+  if (module[moduleID].device[devID].dryRunOutput)
+  {
+    fprintf(stderr,"Grabber Running on Dry Run mode , doing nothing\n");
+  } else
   if (module[moduleID].device[devID].fileOutput)
   {
    char outfilename[2048]={0};

@@ -19,7 +19,7 @@
 
 struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES]={0};
 
-void * remoteNetworkDLhandle;
+void * remoteNetworkDLhandle=0;
 int (*startPushingToRemoteNetwork) (char * , int);
 int (*stopPushingToRemoteNetwork) (int);
 int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsigned int,unsigned int);

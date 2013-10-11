@@ -1,5 +1,9 @@
 #include "daemon.h"
 
+
+#include "../tools/Codecs/codecs.h"
+#include "../tools/Codecs/jpgInput.h"
+
 #include "NetworkAcquisition.h"
 
 #include <stdio.h>
@@ -40,7 +44,18 @@ void * ServeClient(void * ptr)
    {
          if (networkDevice[0].okToSendColorFrame)
          {
+           struct Image * img = createImageUsingExistingBuffer(networkDevice[0].colorWidth,networkDevice[0].colorHeight,networkDevice[0].colorChannels,
+                                                               networkDevice[0].colorBitsperpixel,networkDevice[0].colorFrame);
+           networkDevice[0].compressedColorSize=64*1024; //64KBmax
+           char * compressedPixels = (char* ) malloc(sizeof(char) * networkDevice[0].compressedColorSize);
+           WriteJPEGInternal("dummyName.jpg",img,compressedPixels,&networkDevice[0].compressedColorSize);
+           networkDevice[0].colorFrame = (char*) compressedPixels;
+           fprintf(stderr,"Compressed from %u bytes\n",networkDevice[0].compressedColorSize);
+
+
            sendImageSocket( clientsock ,networkDevice[0].colorFrame, networkDevice[0].colorWidth , networkDevice[0].colorHeight , networkDevice[0].colorChannels , networkDevice[0].colorBitsperpixel , networkDevice[0].compressedColorSize );
+
+           free(compressedPixels);
            networkDevice[0].okToSendColorFrame=0;
          }
 
@@ -107,6 +122,8 @@ void * mainServerThread (void * ptr)
 
   int instanceID = context->id;
   context->doneWaiting=1;
+  serverDevices[instanceID].serverRunning=0;
+  serverDevices[instanceID].stopServer=1;
 
   int serversock = socket(AF_INET, SOCK_STREAM, 0);
     if ( serversock < 0 ) { fprintf(stderr,"Server Thread : Opening socket"); return 0; }
@@ -181,13 +198,28 @@ int StartFrameServer(unsigned int devID , char * bindAddr , int bindPort)
   //It will bind the ports and start receiving requests and pass them over to new and prespawned threads
    pthread_t server_thread_id;
    int retres = pthread_create( &server_thread_id , 0 , mainServerThread,(void*) &context);
+   if (retres!=0) { fprintf(stderr,"Cannot create thread for server\n"); return 0; }
 
+   fprintf(stderr,"Waiting for server thread creation\n");
    while (!context.doneWaiting)
    {
-     usleep(100);
+     usleep(1000);
+     fprintf(stderr,".");
    }
 
- return retres;
+
+   unsigned int waitTime = 0; unsigned int maxWaitTime = 100;
+   fprintf(stderr,"\nWaiting for server to bind ports etc \n");
+   while ( ( ! serverDevices[0].serverRunning ) && (waitTime<maxWaitTime) )
+   {
+     fprintf(stderr,".");
+     usleep(1000*1000);
+     ++waitTime;
+   }
+   fprintf(stderr,"\n");
+
+
+  return serverDevices[0].serverRunning;
 }
 
 

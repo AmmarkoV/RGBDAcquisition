@@ -37,11 +37,16 @@ struct acquisitionDeviceStates
 {
   char outputString[1024];
 
+  //File output
   unsigned char fileOutput;
 
+  //Network output
   unsigned char networkOutput;
   int frameServerID ;
   int port;
+
+  //Dry Run
+  unsigned char dryRunOutput;
 };
 
 

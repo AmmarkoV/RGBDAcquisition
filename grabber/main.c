@@ -115,7 +115,10 @@ int main(int argc, char *argv[])
         //acquisitionMapRGBToDepth(moduleID,devID); <- an alternate registration mode
 
          //We initialize the target for our frames ( can be network or files )
-         acquisitionInitiateTargetForFrames(moduleID,devID,outputfoldername);
+         if (! acquisitionInitiateTargetForFrames(moduleID,devID,outputfoldername) )
+         {
+           return 1;
+         }
      }
 
    //Countdown 3 -> 2 -> 1 -> Action!

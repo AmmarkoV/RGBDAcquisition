@@ -37,14 +37,12 @@ struct NetworkVirtualDevice networkDevice[MAX_NETWORK_DEVICES]={0};
 int networkBackbone_startPushingToRemote(char * ip , int port)
 {
   fprintf(stderr,"networkBackbone_startPushingToRemote(%s,%u) called \n",ip,port);
-  StartFrameServer(0,ip,port);
-  return 0;
+  return StartFrameServer(0,ip,port);
 }
 
 int networkBackbone_stopPushingToRemote(int frameServerID)
 {
-  StopFrameServer(0);
-  return 0;
+  return StopFrameServer(frameServerID);
 }
 
 //This call pushes an image to be made available to the clients connected to our frameserver
@@ -61,11 +59,13 @@ int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void
       networkDevice[0].colorFrame = (char*) pixels;
       networkDevice[0].compressedColorSize=0; // Not using compression
 
+      /*
       struct Image * img = createImageUsingExistingBuffer(width,height,channels,bitsperpixel,pixels);
       networkDevice[0].compressedColorSize=64*1024; //64KBmax
       char * compressedPixels = (char* ) malloc(sizeof(char) * networkDevice[0].compressedColorSize);
       WriteJPEGInternal("dummyName.jpg",img,compressedPixels,&networkDevice[0].compressedColorSize);
       networkDevice[0].colorFrame = (char*) compressedPixels;
+      fprintf(stderr,"Compressed from %u bytes\n",networkDevice[0].compressedColorSize);*/
 
 
       networkDevice[0].okToSendColorFrame=1;
