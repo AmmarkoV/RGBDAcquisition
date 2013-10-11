@@ -35,6 +35,12 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+
+    if (strcmp(argv[i],"-resolution")==0) {
+                                             width=atoi(argv[i+1]);
+                                             height=atoi(argv[i+2]);
+                                             fprintf(stderr,"Resolution set to %u x %u \n",width,height);
+                                           } else
     if (strcmp(argv[i],"-calibration")==0) {
                                              calibrationSet=1;
                                              if (!ReadCalibration(argv[i+1],width,height,&calib) )
@@ -111,8 +117,10 @@ int main(int argc, char *argv[])
      {
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
         acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate);
-        acquisitionMapDepthToRGB(moduleID,devID);
-        //acquisitionMapRGBToDepth(moduleID,devID); <- an alternate registration mode
+
+        if ( strstr(inputname,"noRegistration")!=0 )         {  } else
+        if ( strstr(inputname,"rgbToDepthRegistration")!=0 ) { acquisitionMapRGBToDepth(moduleID,devID); } else
+                                                             { acquisitionMapDepthToRGB(moduleID,devID);  }
 
          //We initialize the target for our frames ( can be network or files )
          if (! acquisitionInitiateTargetForFrames(moduleID,devID,outputfoldername) )

@@ -12,6 +12,7 @@
 
 #define MAX_OPENNI2_DEVICES 16
 #define ANY_OPENNI2_DEVICE MAX_OPENNI2_DEVICES*2
+#define MAX_TRIES_FOR_EACH_FRAME 10
 
 
 using namespace std;
@@ -237,8 +238,8 @@ int readFrameBlocking(VideoStream &stream,VideoFrameRef &frame , unsigned int ma
 
 int readOpenNiColorAndDepth(VideoStream &color , VideoStream &depth,VideoFrameRef &colorFrame,VideoFrameRef &depthFrame)
 {
-    readFrameBlocking(depth,depthFrame,100/*MAX TRIES*/); // depth.readFrame(&depthFrame);
-    readFrameBlocking(color,colorFrame,100/*MAX TRIES*/); // color.readFrame(&colorFrame);
+    readFrameBlocking(depth,depthFrame,MAX_TRIES_FOR_EACH_FRAME); // depth.readFrame(&depthFrame);
+    readFrameBlocking(color,colorFrame,MAX_TRIES_FOR_EACH_FRAME); // color.readFrame(&colorFrame);
 
     if(depthFrame.isValid() && colorFrame.isValid()) { return 1; }
 

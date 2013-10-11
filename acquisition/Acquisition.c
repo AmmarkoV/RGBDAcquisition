@@ -1041,7 +1041,6 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
   }
 
 
-
   return 1;
 }
 
