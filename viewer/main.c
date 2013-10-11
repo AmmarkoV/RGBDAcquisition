@@ -112,6 +112,11 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcmp(argv[i],"-resolution")==0) {
+                                             width=atoi(argv[i+1]);
+                                             height=atoi(argv[i+2]);
+                                             fprintf(stderr,"Resolution set to %u x %u \n",width,height);
+                                           } else
     if (strcmp(argv[i],"-calibration")==0) {
                                              calibrationSet=1;
                                              if (!ReadCalibration(argv[i+1],width,height,&calib) )

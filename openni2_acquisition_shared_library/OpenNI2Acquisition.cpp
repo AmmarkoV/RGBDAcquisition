@@ -3,6 +3,8 @@
 
 #include "OpenNI2Acquisition.h"
 
+#define  BUILD_OPENNI2 1
+
 #if BUILD_OPENNI2
 
 #include <unistd.h>
@@ -142,7 +144,7 @@ int initializeOpenNIDevice(int deviceID , Device &device , VideoStream &color , 
         return 0;
     }
 
-  device.setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
+  //device.setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
 
 if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
     {
@@ -152,7 +154,8 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
             VideoMode depthMode = depth.getVideoMode();
             depthMode.setResolution(width,height);
             depthMode.setFps(fps);
-            depth.setVideoMode(depthMode);
+            Status rc = depth.setVideoMode(depthMode);
+            if (rc != STATUS_OK) { fprintf(stderr,"Error getting color at video mode requested %u x %u @ %u fps\n%s\n",width,height,fps,OpenNI::getExtendedError()); }
 
             if(depth.start()!= STATUS_OK)
             {
@@ -175,7 +178,8 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
             VideoMode colorMode = color.getVideoMode();
             colorMode.setResolution(width,height);
             colorMode.setFps(fps);
-            color.setVideoMode(colorMode);
+            Status rc = color.setVideoMode(colorMode);
+            if (rc != STATUS_OK) { fprintf(stderr,"Error getting depth at video mode requested %u x %u @ %u fps\n%s\n",width,height,fps,OpenNI::getExtendedError()); }
 
             if(color.start() != STATUS_OK)
             {
@@ -195,7 +199,7 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
     color.setMirroringEnabled (false);
 
 
-    fprintf(stdout,"Device Initialized.\n");
+    fprintf(stdout,"Device Initialization Requested %u x %u @ %u fps \n",width,height,fps);
    return 1;
 }
 
