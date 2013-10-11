@@ -1051,9 +1051,10 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
     fprintf(stderr,RED "acquisitionPassFramesToTarget cannot find a method to use for module %u , device %u , has acquisitionInitiateTargetForFrames been called?\n" NORMAL , moduleID , devID );
     return 0;
   }
-
+  //usleep(1000*1000);
   EndTimer(FRAME_PASS_TO_TARGET_DELAY);
   fprintf(stderr,"%0.2f FPS ( last %u microseconds , avg %u microseconds ) \n",GetFPSTimer(FRAME_SNAP_DELAY) , GetLastTimer(FRAME_SNAP_DELAY) , GetAverageTimer(FRAME_SNAP_DELAY));
+  //fprintf(stderr,"PASStoTarg : %0.2f FPS ( last %u microseconds , avg %u microseconds ) \n",GetFPSTimer(FRAME_PASS_TO_TARGET_DELAY) , GetLastTimer(FRAME_PASS_TO_TARGET_DELAY) , GetAverageTimer(FRAME_PASS_TO_TARGET_DELAY));
 
   return 1;
 }

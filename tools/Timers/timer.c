@@ -9,9 +9,9 @@ struct TimerArrItem
    struct timeval endtime;
    struct timeval timediff;
 
-   unsigned int last_time;
-   unsigned int total_time;
-   unsigned int times_counted;
+   unsigned int lastTimeMicroseconds;
+   unsigned int totalTimeMicroseconds;
+   unsigned int timesCounted;
 };
 
 
@@ -50,42 +50,42 @@ unsigned int EndTimer( unsigned int timer_num )
   gettimeofday(&timers_array[timer_num].endtime,0x0);
 
 
-  timers_array[timer_num].last_time = timeval_diff(&timers_array[timer_num].timediff,&timers_array[timer_num].endtime,&timers_array[timer_num].starttime);
+  timers_array[timer_num].lastTimeMicroseconds = timeval_diff(&timers_array[timer_num].timediff,&timers_array[timer_num].endtime,&timers_array[timer_num].starttime);
 
-  timers_array[timer_num].total_time+=timers_array[timer_num].last_time;
-  ++timers_array[timer_num].times_counted;
+  timers_array[timer_num].totalTimeMicroseconds+=timers_array[timer_num].lastTimeMicroseconds;
+  ++timers_array[timer_num].timesCounted;
 
 
-  if ( timers_array[timer_num].total_time > 900000 )
+  if ( timers_array[timer_num].totalTimeMicroseconds > 9000000 )
     {
-          timers_array[timer_num].total_time = timers_array[timer_num].total_time / 2;
-          timers_array[timer_num].times_counted = timers_array[timer_num].times_counted / 2;
+          timers_array[timer_num].totalTimeMicroseconds = timers_array[timer_num].totalTimeMicroseconds / 2;
+          timers_array[timer_num].timesCounted = timers_array[timer_num].timesCounted / 2;
     }
 
 
-  return timers_array[timer_num].last_time;
+  return timers_array[timer_num].lastTimeMicroseconds;
 }
 
 unsigned int GetLastTimer( unsigned int timer_num )
 {
-  return timers_array[timer_num].last_time;
+  return timers_array[timer_num].lastTimeMicroseconds;
 }
 
 unsigned int GetAverageTimer( unsigned int timer_num )
 {
-  if (timers_array[timer_num].times_counted == 0 ) { return 0; }
-  return (unsigned int) timers_array[timer_num].total_time/timers_array[timer_num].times_counted;
+  if (timers_array[timer_num].timesCounted == 0 ) { return 0; }
+  return (unsigned int) timers_array[timer_num].totalTimeMicroseconds/timers_array[timer_num].timesCounted;
 }
 
 unsigned int GetTimesTimerTimed( unsigned int timer_num )
 {
-  return  timers_array[timer_num].times_counted;
+  return  timers_array[timer_num].timesCounted;
 }
 
 float GetFPSTimer( unsigned int timer_num )
 {
- if (timers_array[timer_num].last_time  == 0 ) { return 0.0; }
- return (float) ( 60*1000*1000 / timers_array[timer_num].last_time    );
+ if (timers_array[timer_num].lastTimeMicroseconds  == 0 ) { return 0.0; }
+ return (float)  1000000 / timers_array[timer_num].lastTimeMicroseconds ;
 }
 
 void VisCortxMillisecondsSleep(unsigned int milliseconds)
