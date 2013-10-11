@@ -19,6 +19,9 @@
 #define DEFAULT_FOCAL_LENGTH 120.0
 #define DEFAULT_PIXEL_SIZE 0.1052
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
 
 #define BUILD_NETWORK 1
 
@@ -141,7 +144,14 @@ int setNetworkDepthCalibration(int devID,struct calibration * calib) {     retur
 
 int startNetworkModule(unsigned int max_devs,char * settings)
 {
-    return 1;
+    fprintf(stderr,"\n\n\n\n\n\n");
+    fprintf(stderr,RED "The library that you are trying to use is not implemented (YET) ;P !\n" NORMAL );
+    fprintf(stderr,RED "Please note that most of the Network module is a stub\n" NORMAL );
+    fprintf(stderr,RED "If you really want it consider commenting or requesting it on the github repository https://github.com/AmmarkoV/RGBDAcquisition/issues/2 !\n" NORMAL );
+    fprintf(stderr,RED "For now and unless there is interest from someone else this is a low priority !\n" NORMAL );
+
+    fprintf(stderr,"\n\n\n\n\n\n");
+    return 0;
 }
 
 

@@ -3,8 +3,6 @@
 
 #include "OpenNI2Acquisition.h"
 
-#define  BUILD_OPENNI2 1
-
 #if BUILD_OPENNI2
 
 #include <unistd.h>
