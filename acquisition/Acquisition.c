@@ -123,6 +123,20 @@ int GetDateString(char * output,char * label,unsigned int now,unsigned int dayof
     return 1;
 }*/
 
+void acquisitionStartTimer(unsigned int timerID)
+{
+    StartTimer(timerID);
+}
+
+unsigned int acquisitionStopTimer(unsigned int timerID)
+{
+    return EndTimer(timerID);
+}
+
+float acquisitionGetTimerFPS(unsigned int timerID)
+{
+    return GetFPSTimer(timerID);
+}
 
 
 
@@ -1023,38 +1037,52 @@ int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier de
 int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber)
 {
   //fprintf(stderr,"acquisitionPassFramesToTarget not fully implemented yet! Module %u , Device %u = %s \n",moduleID,devID, module[moduleID].device[devID].outputString);
-  StartTimer(FRAME_PASS_TO_TARGET_DELAY);
+
 
   if (module[moduleID].device[devID].dryRunOutput)
   {
-    fprintf(stderr,"Grabber Running on Dry Run mode , doing nothing\n");
+    fprintf(stderr,"Grabber Running on Dry Run mode , ,grabbing frames and doing nothing\n");
+    //Lets access the frames like we want to use them but not use them..
+
+    StartTimer(FRAME_PASS_TO_TARGET_DELAY);
+    unsigned int width, height , channels , bitsperpixel;
+    acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    acquisitionGetColorFrame(moduleID,devID);
+
+    acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    acquisitionGetDepthFrame(moduleID,devID);
+    //Done doing nothing with our input..!
+    EndTimer(FRAME_PASS_TO_TARGET_DELAY);
   } else
   if (module[moduleID].device[devID].fileOutput)
   {
+   StartTimer(FRAME_PASS_TO_TARGET_DELAY);
    char outfilename[2048]={0};
    sprintf(outfilename,"%s/colorFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
    acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
    sprintf(outfilename,"%s/depthFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
    acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+   EndTimer(FRAME_PASS_TO_TARGET_DELAY);
+
   } else
   if (module[moduleID].device[devID].networkOutput)
   {
+    StartTimer(FRAME_PASS_TO_TARGET_DELAY);
+
     unsigned int width, height , channels , bitsperpixel;
     acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
     pushImageToRemoteNetwork(module[moduleID].device[devID].frameServerID , 0 , (void*) acquisitionGetColorFrame(moduleID,devID) , width , height , channels , bitsperpixel);
 
     acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
     pushImageToRemoteNetwork(module[moduleID].device[devID].frameServerID , 1 , (void*) acquisitionGetDepthFrame(moduleID,devID) , width , height , channels , bitsperpixel);
+
+    EndTimer(FRAME_PASS_TO_TARGET_DELAY);
   } else
   {
     fprintf(stderr,RED "acquisitionPassFramesToTarget cannot find a method to use for module %u , device %u , has acquisitionInitiateTargetForFrames been called?\n" NORMAL , moduleID , devID );
     return 0;
   }
-  //usleep(1000*1000);
-  EndTimer(FRAME_PASS_TO_TARGET_DELAY);
-  fprintf(stderr,"%0.2f FPS ( last %u microseconds , avg %u microseconds ) \n",GetFPSTimer(FRAME_SNAP_DELAY) , GetLastTimer(FRAME_SNAP_DELAY) , GetAverageTimer(FRAME_SNAP_DELAY));
-  //fprintf(stderr,"PASStoTarg : %0.2f FPS ( last %u microseconds , avg %u microseconds ) \n",GetFPSTimer(FRAME_PASS_TO_TARGET_DELAY) , GetLastTimer(FRAME_PASS_TO_TARGET_DELAY) , GetAverageTimer(FRAME_PASS_TO_TARGET_DELAY));
 
   return 1;
 }

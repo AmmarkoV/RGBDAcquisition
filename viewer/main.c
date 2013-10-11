@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
        return 1;
     }
 
-  unsigned int width=640,height=480,framerate=25;
+  unsigned int width=640,height=480,framerate=30;
   unsigned int frameNum=0,maxFramesToGrab=0;
   int i=0;
   for (i=0; i<argc; i++)
@@ -194,9 +194,15 @@ int main(int argc, char *argv[])
     {
      for (devID=0; devID<maxDevID; devID++)
       {
+        acquisitionStartTimer(0);
+
         acquisitionSnapFrames(moduleID,devID);
 
         acquisitionDisplayFrames(moduleID,devID,framerate);
+
+        acquisitionStopTimer(0);
+        if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
+
       }
     }
 

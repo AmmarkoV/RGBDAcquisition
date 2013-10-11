@@ -20,6 +20,7 @@ struct TimerArrItem timers_array[TOTAL_TIMERS];
 
 long timeval_diff ( struct timeval *difference, struct timeval *end_time, struct timeval *start_time )
 {
+  //This returns Microseconds!
 
    struct timeval temp_diff;
 
@@ -85,7 +86,7 @@ unsigned int GetTimesTimerTimed( unsigned int timer_num )
 float GetFPSTimer( unsigned int timer_num )
 {
  if (timers_array[timer_num].lastTimeMicroseconds  == 0 ) { return 0.0; }
- return (float)  1000000 / timers_array[timer_num].lastTimeMicroseconds ;
+ return (float)  1000*1000 / timers_array[timer_num].lastTimeMicroseconds ;
 }
 
 void VisCortxMillisecondsSleep(unsigned int milliseconds)

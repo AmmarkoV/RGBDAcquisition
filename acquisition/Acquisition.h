@@ -61,7 +61,9 @@ struct acquisitionModuleStates module[NUMBER_OF_POSSIBLE_MODULES];
 
 
 
-
+void acquisitionStartTimer(unsigned int timerID);
+unsigned int acquisitionStopTimer(unsigned int timerID);
+float acquisitionGetTimerFPS(unsigned int timerID);
 
 void countdownDelay(int seconds);
 int acquisitionSimulateTime(unsigned long timeInMillisecs);

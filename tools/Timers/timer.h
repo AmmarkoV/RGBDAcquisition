@@ -5,7 +5,14 @@
 
 enum VisCortTimerList
 {
-   FRAME_SNAP_DELAY = 0 ,
+   UNUSED_TIMER_0 = 0 ,
+   UNUSED_TIMER_1 ,
+   UNUSED_TIMER_2 ,
+   UNUSED_TIMER_3 ,
+   UNUSED_TIMER_4 ,
+   UNUSED_TIMER_5 ,
+   //<- 0-5 reserved for use by clients :P
+   FRAME_SNAP_DELAY  ,
    FRAME_PASS_TO_TARGET_DELAY ,
    TOTAL_TIMERS
 };

@@ -210,6 +210,8 @@ int main(int argc, char *argv[])
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
+        acquisitionStartTimer(0);
+
         acquisitionSnapFrames(moduleID_1,devID_1);
 
 
@@ -242,6 +244,10 @@ int main(int argc, char *argv[])
 
        free (segmentedRGB);
        free (segmentedDepth);
+
+
+       acquisitionStopTimer(0);
+       if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
     }
 
 
