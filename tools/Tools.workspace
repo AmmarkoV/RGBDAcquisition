@@ -6,5 +6,6 @@
 		<Project filename="ExtrinsicCalibration/ExtrinsicCalibration.cbp" />
 		<Project filename="Undistort/Undistort.cbp" />
 		<Project filename="Calibration/CalibrationLibrary.cbp" />
+		<Project filename="Timers/Timers.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

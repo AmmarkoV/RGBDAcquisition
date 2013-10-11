@@ -6,7 +6,7 @@
 WRKDIR = `pwd`
 MAKE = make
 
-all: depthimagesconverter_depthimagesconverter calibration_calibration extrinsiccalibration_extrinsiccalibration undistort_undistort calibration_calibrationlibrary
+all: depthimagesconverter_depthimagesconverter calibration_calibration extrinsiccalibration_extrinsiccalibration undistort_undistort calibration_calibrationlibrary timers_timers
 
 depthimagesconverter_depthimagesconverter: 
 	$(MAKE) -C DepthImagesConverter all -f DepthImagesConverter.cbp.mak
@@ -23,7 +23,10 @@ undistort_undistort:
 calibration_calibrationlibrary: 
 	$(MAKE) -C Calibration all -f CalibrationLibrary.cbp.mak
 
-clean: clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary
+timers_timers: 
+	$(MAKE) -C Timers all -f Timers.cbp.mak
+
+clean: clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary clean_timers_timers
 
 clean_depthimagesconverter_depthimagesconverter: 
 	$(MAKE) -C DepthImagesConverter clean -f DepthImagesConverter.cbp.mak
@@ -40,5 +43,8 @@ clean_undistort_undistort:
 clean_calibration_calibrationlibrary: 
 	$(MAKE) -C Calibration clean -f CalibrationLibrary.cbp.mak
 
-.PHONY: clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary
+clean_timers_timers: 
+	$(MAKE) -C Timers clean -f Timers.cbp.mak
+
+.PHONY: clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary clean_timers_timers
 

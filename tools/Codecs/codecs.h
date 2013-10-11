@@ -28,7 +28,7 @@ extern "C"
 
 
 #define USE_JPG_FILES 1
-#define USE_PNG_FILES 0
+#define USE_PNG_FILES 1
 #define USE_PPM_FILES 0
 
 

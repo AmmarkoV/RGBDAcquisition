@@ -39,6 +39,7 @@
 		<Linker>
 			<Add option="-pthread" />
 			<Add option="-ljpeg" />
+			<Add option="-lpng" />
 		</Linker>
 		<Unit filename="../tools/Codecs/codecs.c">
 			<Option compilerVar="CC" />

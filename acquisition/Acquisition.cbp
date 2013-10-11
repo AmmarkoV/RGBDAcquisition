@@ -38,8 +38,8 @@
 			<Add option="-fPIC" />
 		</Compiler>
 		<Linker>
-			<Add library="../tools/Timers/libTimers.a" />
 			<Add library="rt" />
+			<Add library="../tools/Timers/libTimers.a" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="dl" />
 		</Linker>

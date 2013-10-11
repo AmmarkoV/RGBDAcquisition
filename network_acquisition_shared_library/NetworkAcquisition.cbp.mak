@@ -16,7 +16,7 @@ CFLAGS = -Wall -fPIC
 RESINC = 
 LIBDIR = 
 LIB = 
-LDFLAGS = -pthread -ljpeg
+LDFLAGS = -pthread -ljpeg -lpng
 
 INC_DEBUG = $(INC)
 CFLAGS_DEBUG = $(CFLAGS) -g
