@@ -43,6 +43,7 @@
 			<Add library="rt" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="dl" />
+			<Add library="../tools/Timers/libTimers.a" />
 		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />

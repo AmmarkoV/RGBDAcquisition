@@ -27,4 +27,7 @@ float GetFPSTimer( unsigned int timer_num );
 
 void VisCortxMillisecondsSleep(unsigned int milliseconds);
 void VisCortxMicrosecondsSleep(unsigned int microseconds);
+
+unsigned long GetTickCountInternal();
+
 #endif // VISCORTEXTIMER_H_INCLUDED

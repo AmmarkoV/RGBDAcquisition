@@ -8,6 +8,13 @@
            This is the mechanism that loads and provides access to the calls of all the plugins that Acquisition uses
 */
 
+enum pluginStrEnum
+{
+  PLUGIN_NAME_STR = 0,
+  PLUGIN_PATH_STR  ,
+  PLUGIN_LIBNAME_STR
+};
+
 
 struct acquisitionPluginInterface
 {
@@ -66,9 +73,10 @@ extern int (*stopPushingToRemoteNetwork) (int);
 extern int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsigned int,unsigned int);
 
 
+char * getPluginStr(int moduleID,int strID);
 int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength);
 
-int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID);
+int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char * moduleLib);
 
 int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID);
 

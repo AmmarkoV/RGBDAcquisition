@@ -16,6 +16,35 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 
+char * pluginStrings[] = {   "dummyName" , "dummyPath "                                 , " dummyPath.so"               ,
+                             //----------------------------------------------------------------------------
+                             "V4L2"      ,"../v4l2_acquisition_shared_library/"        , "libV4L2Acquisition.so"       ,
+                             "V4L2Stereo","../v4l2stereo_acquisition_shared_library/"  , "libV4L2StereoAcquisition.so" ,
+                             "Freenect"  ,"../libfreenect_acquisition_shared_library/" , "libFreenectAcquisition.so"   ,
+                             "OpenNI1"   ,"../openni1_acquisition_shared_library/"     ,"libOpenNI1Acquisition.so"     ,
+                             "OpenNI2"   ,"../openni2_acquisition_shared_library/"     , "libOpenNI2Acquisition.so"    ,
+                             "OpenGL"    ,"../opengl_acquisition_shared_library/"      , "libOpenGLAcquisition.so"     ,
+                             "Template"  ,"../template_acquisition_shared_library/"    , "libTemplateAcquisition.so"   ,
+                             "Network"   ,"../network_acquisition_shared_library/"    , "libNetworkAcquisition.so"     ,
+                             //----------------------------------------------------------------------------
+                             "Dont Erase the following!! they serve as a working warning if a new plugin is introduced but not specified here"  ,
+                             "Dont Forget to add name for new plugin here "  ,
+                             "Dont Forget to add paths for new plugins here "  ,
+                             "Dont Forget to add library names for new plugins here "
+                        };
+
+
+char * getPluginStr(int moduleID,int strID)
+{
+    if (3 * moduleID + strID > NUMBER_OF_POSSIBLE_MODULES *3  )
+    {
+       fprintf(stderr,"getPluginStr(%u,%u) cannot return a result , plugin not declared correctly\n",moduleID,strID);
+    }
+
+    fprintf(stderr,"getPluginStr(%u,%u) returning %s\n",moduleID,strID,pluginStrings[  3 * moduleID + strID ]);
+    return pluginStrings[  3 * moduleID + strID ];
+}
+
 
 struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES]={0};
 
@@ -77,7 +106,7 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
 
 
 
-int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
+int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char * moduleLib)
 {
    char *error;
    char functionNameStr[1024]={0};

@@ -15,7 +15,7 @@ INC =
 CFLAGS = -fPIC
 RESINC = 
 LIBDIR = 
-LIB = 
+LIB = -lrt
 LDFLAGS = 
 
 INC_DEBUG = $(INC)

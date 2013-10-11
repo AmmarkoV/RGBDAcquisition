@@ -41,6 +41,7 @@
 			<Add library="../acquisition/libAcquisition.so" />
 			<Add library="rt" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="../tools/Timers/libTimers.a" />
 			<Add library="dl" />
 		</Linker>
 		<Unit filename="main.c">

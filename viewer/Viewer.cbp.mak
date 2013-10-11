@@ -15,7 +15,7 @@ INC =
 CFLAGS = -Wall `pkg-config --cflags opencv` -fPIC
 RESINC = 
 LIBDIR = 
-LIB = -lGL -lGLU -lX11 ../acquisition/libAcquisition.so -lrt ../tools/Calibration/libCalibrationLibrary.a -ldl
+LIB = -lGL -lGLU -lX11 ../acquisition/libAcquisition.so -lrt ../tools/Calibration/libCalibrationLibrary.a ../tools/Timers/libTimers.a -ldl
 LDFLAGS = `pkg-config --libs opencv`
 
 INC_DEBUG = $(INC)

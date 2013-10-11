@@ -15,7 +15,7 @@ INC =
 CFLAGS = -Wall
 RESINC = 
 LIBDIR = 
-LIB = -lGL -lGLU -lX11 ../acquisition/libAcquisition.so ../acquisition_mux/libAcquisitionMux.so ../acquisitionSegment/libacquisitionSegment.a ../tools/Calibration/libCalibrationLibrary.a -ldl
+LIB = -lGL -lGLU -lX11 ../acquisition/libAcquisition.so ../acquisition_mux/libAcquisitionMux.so ../acquisitionSegment/libacquisitionSegment.a ../tools/Calibration/libCalibrationLibrary.a ../tools/Timers/libTimers.a -ldl -lrt
 LDFLAGS = 
 
 INC_DEBUG = $(INC)

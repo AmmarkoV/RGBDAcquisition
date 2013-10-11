@@ -41,7 +41,9 @@
 			<Add library="../acquisition_mux/libAcquisitionMux.so" />
 			<Add library="../acquisitionSegment/libacquisitionSegment.a" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="../tools/Timers/libTimers.a" />
 			<Add library="dl" />
+			<Add library="rt" />
 		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />

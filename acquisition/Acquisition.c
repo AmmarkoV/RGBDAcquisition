@@ -8,9 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <time.h>
-
-#define EPOCH_YEAR_IN_TM_YEAR 1900
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -22,33 +19,20 @@
 float minDistance = -10;
 float scaleFactor = 0.0021;
 
-const char *days[] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
-const char *months[] = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-
-unsigned long tickBase = 0;
-
 unsigned int simulateTick=0;
 unsigned long simulatedTickValue=0;
-
-
-
-const char V4L2Path[] = "../v4l2_acquisition_shared_library/";             const char V4L2Lib[] = "libV4L2Acquisition.so";
-const char V4L2StereoPath[] = "../v4l2stereo_acquisition_shared_library/"; const char V4L2StereoLib[] = "libV4L2StereoAcquisition.so";
-const char OpenGLPath[] = "../opengl_acquisition_shared_library/";         const char OpenGLLib[] = "libOpenGLAcquisition.so";
-const char TemplatePath[] = "../template_acquisition_shared_library/";     const char TemplateLib[] = "libTemplateAcquisition.so";
-const char FreenectPath[] = "../libfreenect_acquisition_shared_library/";  const char FreenectLib[] = "libFreenectAcquisition.so";
-const char OpenNI1Path[] = "../openni1_acquisition_shared_library/";       const char OpenNI1Lib[] = "libOpenNI1Acquisition.so";
-const char OpenNI2Path[] = "../openni2_acquisition_shared_library/";       const char OpenNI2Lib[] = "libOpenNI2Acquisition.so";
-const char NetworkPath[] = "../network_acquisition_shared_library/";       const char NetworkLib[] = "libNetworkAcquisition.so";
-
-
-
 
 int acquisitionSimulateTime(unsigned long timeInMillisecs)
 {
   simulateTick=1;
   simulatedTickValue=timeInMillisecs;
   return 1;
+}
+
+unsigned long GetTickCount()
+{
+   if (simulateTick) { return simulatedTickValue; }
+   return GetTickCountInternal();
 }
 
 int fileExists(char * filename)
@@ -86,42 +70,6 @@ void countdownDelay(int seconds)
     usleep(1000*1000); // Waiting a while for the glitch frames to pass
 }
 
-
-unsigned long GetTickCount()
-{
-   if (simulateTick) { return simulatedTickValue; }
-
-   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
-   struct timespec ts;
-   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { fprintf(stderr,"Error Getting Tick Count\n"); return 0; }
-
-   if (tickBase==0)
-   {
-     tickBase = ts.tv_sec*1000 + ts.tv_nsec/1000000;
-     return 0;
-   }
-
-   return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBase;
-}
-
-/*
-int GetDateString(char * output,char * label,unsigned int now,unsigned int dayofweek,unsigned int day,unsigned int month,unsigned int year,unsigned int hour,unsigned int minute,unsigned int second)
-{
-   //Date: Sat, 29 May 2010 12:31:35 GMT
-   //Last-Modified: Sat, 29 May 2010 12:31:35 GMT
-   if ( now )
-      {
-        time_t clock = time(NULL);
-        struct tm * ptm = gmtime ( &clock );
-
-        sprintf(output,"%s: %s, %u %s %u %02u:%02u:%02u GMT\n",label,days[ptm->tm_wday],ptm->tm_mday,months[ptm->tm_mon],EPOCH_YEAR_IN_TM_YEAR+ptm->tm_year,ptm->tm_hour,ptm->tm_min,ptm->tm_sec);
-
-      } else
-      {
-        sprintf(output,"%s: %s, %u %s %u %02u:%02u:%02u GMT\n",label,days[dayofweek],day,months[month],year,hour,minute,second);
-      }
-    return 1;
-}*/
 
 void acquisitionStartTimer(unsigned int timerID)
 {
@@ -328,19 +276,16 @@ char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned 
 
 int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
 {
-  char tmp[1024];
-    switch (moduleID)
-    {
-      case V4L2_ACQUISITION_MODULE       :     return getPluginPath(V4L2Path,V4L2Lib,tmp,1024);               break;
-      case V4L2STEREO_ACQUISITION_MODULE :     return getPluginPath(V4L2StereoPath,V4L2StereoLib,tmp,1024);   break;
-      case OPENGL_ACQUISITION_MODULE     :     return getPluginPath(OpenGLPath,OpenGLLib,tmp,1024);           break;
-      case TEMPLATE_ACQUISITION_MODULE   :     return getPluginPath(TemplatePath,TemplateLib,tmp,1024);       break;
-      case FREENECT_ACQUISITION_MODULE   :     return getPluginPath(FreenectPath,FreenectLib,tmp,1024);       break;
-      case OPENNI1_ACQUISITION_MODULE    :     return getPluginPath(OpenNI1Path,OpenNI1Lib,tmp,1024);         break;
-      case OPENNI2_ACQUISITION_MODULE    :     return getPluginPath(OpenNI2Path,OpenNI2Lib,tmp,1024);         break;
-      case NETWORK_ACQUISITION_MODULE    :     return getPluginPath(NetworkPath,NetworkLib,tmp,1024);         break;
-    };
-
+  if (moduleID < NUMBER_OF_POSSIBLE_MODULES)
+  {
+   char tmp[1024];
+   return getPluginPath (
+                         getPluginStr(V4L2_ACQUISITION_MODULE,PLUGIN_PATH_STR) ,
+                         getPluginStr(V4L2_ACQUISITION_MODULE,PLUGIN_LIBNAME_STR) ,
+                         tmp,
+                         1024
+                         );
+  }
   return 0;
 }
 
@@ -426,57 +371,18 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
    ------------------------------------------*/
 int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings)
 {
-    switch (moduleID)
-    {
-      case V4L2_ACQUISITION_MODULE    :
-          if (!linkToPlugin("V4L2",V4L2Path,V4L2Lib,moduleID) )
-                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL ,getModuleStringName(moduleID)); return 0; }
+  if (moduleID < NUMBER_OF_POSSIBLE_MODULES)
+  {
+    if (
+         !linkToPlugin(getPluginStr(moduleID,PLUGIN_NAME_STR),
+                       getPluginStr(moduleID,PLUGIN_PATH_STR),
+                       getPluginStr(moduleID,PLUGIN_LIBNAME_STR),
+                       moduleID)
+        )
+        { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
-          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
-      break;
-      case V4L2STEREO_ACQUISITION_MODULE    :
-          if (!linkToPlugin("V4L2Stereo",V4L2StereoPath,V4L2StereoLib,moduleID) )
-                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
-
-          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
-      break;
-      case OPENGL_ACQUISITION_MODULE    :
-          if (!linkToPlugin("OpenGL",OpenGLPath,OpenGLLib,moduleID) )
-                    { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
-
-          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
-      break;
-      case TEMPLATE_ACQUISITION_MODULE:
-          if (!linkToPlugin("Template",TemplatePath,TemplateLib,moduleID) )
-                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
-
-          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
-      break;
-      case FREENECT_ACQUISITION_MODULE:
-          if (!linkToPlugin("Freenect",FreenectPath,FreenectLib,moduleID) )
-                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
-
-          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
-      break;
-      case OPENNI1_ACQUISITION_MODULE :
-          if (!linkToPlugin("OpenNI1",OpenNI1Path,OpenNI1Lib,moduleID) )
-                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
-
-          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
-      break;
-      case OPENNI2_ACQUISITION_MODULE :
-          if (!linkToPlugin("OpenNI2",OpenNI2Path,OpenNI2Lib,moduleID) )
-                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
-
-          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
-      break;
-      case NETWORK_ACQUISITION_MODULE :
-          if (!linkToPlugin("Network",NetworkPath,NetworkLib,moduleID) )
-                   { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
-
-          if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
-      break;
-    };
+    if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
+  }
 
     MeaningfullWarningMessage(moduleID,0,"acquisitionStartModule");
     return 0;
@@ -981,7 +887,6 @@ double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
 }
 
 
-
 /*
    LAST BUT NOT LEAST acquisition can also relay its state through a TCP/IP network
 */
@@ -994,7 +899,13 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
   } else
   if ( strstr(target,"tcp://")!=0 )
   {
-    if (!linkToNetworkTransmission("Network",NetworkPath,NetworkLib,moduleID) )
+    if (
+         !linkToNetworkTransmission(
+                                     getPluginStr(NETWORK_ACQUISITION_MODULE,PLUGIN_NAME_STR) ,
+                                     getPluginStr(NETWORK_ACQUISITION_MODULE,PLUGIN_PATH_STR)  ,
+                                     getPluginStr(NETWORK_ACQUISITION_MODULE,PLUGIN_LIBNAME_STR)
+                                   )
+        )
       {
         fprintf(stderr,RED "Cannot link to network transmission framework , so will not be able to transmit output..!\n" NORMAL);
       } else
@@ -1086,5 +997,3 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
 
   return 1;
 }
-
-

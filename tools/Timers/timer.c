@@ -2,6 +2,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include <time.h>
+
+#define EPOCH_YEAR_IN_TM_YEAR 1900
 
 struct TimerArrItem
 {
@@ -14,6 +17,30 @@ struct TimerArrItem
    unsigned int timesCounted;
 };
 
+
+unsigned long tickBase = 0;
+
+
+const char *days[] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+const char *months[] = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+/*
+int GetDateString(char * output,char * label,unsigned int now,unsigned int dayofweek,unsigned int day,unsigned int month,unsigned int year,unsigned int hour,unsigned int minute,unsigned int second)
+{
+   //Date: Sat, 29 May 2010 12:31:35 GMT
+   //Last-Modified: Sat, 29 May 2010 12:31:35 GMT
+   if ( now )
+      {
+        time_t clock = time(NULL);
+        struct tm * ptm = gmtime ( &clock );
+
+        sprintf(output,"%s: %s, %u %s %u %02u:%02u:%02u GMT\n",label,days[ptm->tm_wday],ptm->tm_mday,months[ptm->tm_mon],EPOCH_YEAR_IN_TM_YEAR+ptm->tm_year,ptm->tm_hour,ptm->tm_min,ptm->tm_sec);
+
+      } else
+      {
+        sprintf(output,"%s: %s, %u %s %u %02u:%02u:%02u GMT\n",label,days[dayofweek],day,months[month],year,hour,minute,second);
+      }
+    return 1;
+}*/
 
 struct TimerArrItem timers_array[TOTAL_TIMERS];
 
@@ -98,3 +125,21 @@ void VisCortxMicrosecondsSleep(unsigned int microseconds)
 {
     usleep(microseconds);
 }
+
+
+
+unsigned long GetTickCountInternal()
+{
+   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
+   struct timespec ts;
+   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
+
+   if (tickBase==0)
+   {
+     tickBase = ts.tv_sec*1000 + ts.tv_nsec/1000000;
+     return 0;
+   }
+
+   return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBase;
+}
+
