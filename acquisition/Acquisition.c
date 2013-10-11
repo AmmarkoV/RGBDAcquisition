@@ -2,6 +2,8 @@
 #include "acquisition_setup.h"
 #include "pluginLinker.h"
 
+#include "../tools/Timers/timer.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -520,8 +522,17 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
     printCall(moduleID,devID,"acquisitionSnapFrames", __FILE__, __LINE__);
-    //fprintf(stderr,"acquisitionSnapFrames called moduleID=%u devID=%u\n",moduleID,devID);
-    if (*plugins[moduleID].snapFrames!=0) { return (*plugins[moduleID].snapFrames) (devID); }
+
+    int retres=0;
+    StartTimer(FRAME_SNAP_DELAY);
+
+    if (*plugins[moduleID].snapFrames!=0)
+    {
+      EndTimer(FRAME_SNAP_DELAY);
+      return (*plugins[moduleID].snapFrames) (devID);
+    }
+
+    EndTimer(FRAME_SNAP_DELAY);
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSnapFrames");
     return 0;
 }
@@ -1012,6 +1023,7 @@ int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier de
 int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber)
 {
   //fprintf(stderr,"acquisitionPassFramesToTarget not fully implemented yet! Module %u , Device %u = %s \n",moduleID,devID, module[moduleID].device[devID].outputString);
+  StartTimer(FRAME_PASS_TO_TARGET_DELAY);
 
   if (module[moduleID].device[devID].dryRunOutput)
   {
@@ -1040,6 +1052,8 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
     return 0;
   }
 
+  EndTimer(FRAME_PASS_TO_TARGET_DELAY);
+  fprintf(stderr,"%0.2f FPS ( last %u microseconds , avg %u microseconds ) \n",GetFPSTimer(FRAME_SNAP_DELAY) , GetLastTimer(FRAME_SNAP_DELAY) , GetAverageTimer(FRAME_SNAP_DELAY));
 
   return 1;
 }

@@ -2,31 +2,32 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Acquisition" />
+		<Option title="Timers" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="libAcquisition" prefix_auto="0" extension_auto="1" />
+				<Option output="libTimers" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
-				<Option type="3" />
+				<Option type="2" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="libAcquisition" prefix_auto="0" extension_auto="1" />
+				<Option output="libTimers" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Release/" />
-				<Option type="3" />
+				<Option type="2" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-O2" />
-					<Add option="-fPIC" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -34,24 +35,12 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
-		<Linker>
-			<Add library="../tools/Timers/libTimers.a" />
-			<Add library="rt" />
-			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
-			<Add library="dl" />
-		</Linker>
-		<Unit filename="Acquisition.c">
+		<Unit filename="timer.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="Acquisition.h" />
-		<Unit filename="acquisition_setup.h" />
-		<Unit filename="pluginLinker.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="pluginLinker.h" />
+		<Unit filename="timer.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
