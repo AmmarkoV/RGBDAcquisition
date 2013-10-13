@@ -183,7 +183,12 @@ int main(int argc, char *argv[])
      {
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
         acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate);
-        acquisitionMapDepthToRGB(moduleID,devID);
+
+        if ( strstr(inputname,"noRegistration")!=0 )         {  } else
+        if ( strstr(inputname,"rgbToDepthRegistration")!=0 ) { acquisitionMapRGBToDepth(moduleID,devID); } else
+                                                             { acquisitionMapDepthToRGB(moduleID,devID);  }
+
+        //acquisitionMapDepthToRGB(moduleID,devID);
         //acquisitionMapRGBToDepth(moduleID,devID);
      }
 

@@ -82,3 +82,51 @@ int floodFill(unsigned char * target , unsigned int width , unsigned int height 
 
    return 1;
 }
+
+
+
+
+
+
+int floodFillUShort(unsigned short * target , unsigned int width , unsigned int height ,
+                    signed int pX , signed int pY , int threshold,
+                    unsigned short sourceDepth ,
+                    unsigned short replaceDepth , int depth)
+{
+ if ( (pX<0) || (pY<0) || (pX>=width) || (pY>=height) ) { return 0; }
+ if (depth>2000) { return 0; }
+
+ if (target==0) { return 0; }
+ if (width==0) { return 0; }
+ if (height==0) { return 0; }
+
+ unsigned short * source = (unsigned short *) target  + ( pX + pY * width );
+
+ unsigned short * tDepth = source; ++source;
+
+
+  if (  *tDepth == replaceDepth    ) { return 0; }
+
+
+  if (
+       (( *tDepth > sourceDepth-threshold ) && ( *tDepth < sourceDepth+threshold ))
+     )
+      {
+        *tDepth = replaceDepth ;
+
+        floodFill(target,width,height, pX+1 , pY ,   threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFill(target,width,height, pX-1 , pY ,   threshold, sourceDepth ,replaceDepth ,depth+1);
+
+        floodFill(target,width,height, pX , pY+1 ,   threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFill(target,width,height, pX , pY-1 ,   threshold, sourceDepth ,replaceDepth ,depth+1);
+
+        floodFill(target,width,height, pX+1 , pY+1 , threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFill(target,width,height, pX-1 , pY-1 , threshold, sourceDepth ,replaceDepth ,depth+1);
+
+        floodFill(target,width,height, pX-1 , pY+1 , threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFill(target,width,height, pX+1 , pY-1 , threshold, sourceDepth ,replaceDepth ,depth+1);
+      }
+
+   return 1;
+}
+

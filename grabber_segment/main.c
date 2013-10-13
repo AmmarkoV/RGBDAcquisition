@@ -115,7 +115,15 @@ int main(int argc, char *argv[])
                                            moduleID_1 = getModuleIdFromModuleName(argv[i+1]);
                                            fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
                                          } else
-    if (strcmp(argv[i],"-floodEraseSource")==0)
+    if (strcmp(argv[i],"-floodEraseDepthSource")==0)
+                                                    {
+                                                     segConfDepth.floodErase.pX[segConfDepth.floodErase.totalPoints] = atoi(argv[i+1]);
+                                                     segConfDepth.floodErase.pY[segConfDepth.floodErase.totalPoints] = atoi(argv[i+2]);
+                                                     segConfDepth.floodErase.threshold[segConfDepth.floodErase.totalPoints] = atoi(argv[i+3]);
+                                                     segConfDepth.floodErase.source=1;
+                                                     ++segConfDepth.floodErase.totalPoints;
+                                                    } else
+    if (strcmp(argv[i],"-floodEraseRGBSource")==0)
                                                 {
                                                   segConfRGB.floodErase.pX[segConfRGB.floodErase.totalPoints] = atoi(argv[i+1]);
                                                   segConfRGB.floodErase.pY[segConfRGB.floodErase.totalPoints] = atoi(argv[i+2]);
@@ -123,7 +131,7 @@ int main(int argc, char *argv[])
                                                   segConfRGB.floodErase.source=1;
                                                   ++segConfRGB.floodErase.totalPoints;
                                                 } else
-    if (strcmp(argv[i],"-floodEraseTarget")==0) {
+    if (strcmp(argv[i],"-floodEraseRGBTarget")==0) {
                                                   segConfRGB.floodErase.pX[segConfRGB.floodErase.totalPoints] = atoi(argv[i+1]);
                                                   segConfRGB.floodErase.pY[segConfRGB.floodErase.totalPoints] = atoi(argv[i+2]);
                                                   segConfRGB.floodErase.threshold[segConfRGB.floodErase.totalPoints] = atoi(argv[i+3]);

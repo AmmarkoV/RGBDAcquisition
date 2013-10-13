@@ -49,6 +49,8 @@ struct SegmentationFeaturesDepth
    unsigned int minX , maxX;
    unsigned int minY , maxY;
 
+   struct floodErasePoints floodErase;
+
 };
 
 unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf);

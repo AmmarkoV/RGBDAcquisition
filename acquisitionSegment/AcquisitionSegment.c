@@ -40,6 +40,34 @@ int removeFloodFillBeforeProcessing(unsigned char * source , unsigned char * tar
 
 
 
+int removeDepthFloodFillBeforeProcessing(unsigned short * source , unsigned short * target , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf  )
+{
+  if (segConf->floodErase.totalPoints==0) { return 0; }
+  unsigned short sDepth ;
+
+  int i=0;
+  for (i=0; i<segConf->floodErase.totalPoints; i++)
+  {
+     if (segConf->floodErase.source)
+     {
+
+       unsigned short * srcDepth = (unsigned short *) source  + ( (segConf->floodErase.pX[i]) + segConf->floodErase.pY[i] * width );
+       sDepth = *srcDepth; ++srcDepth;
+       //fprintf(stderr,"Flood Filling Before %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
+       //fprintf(stderr,"Src Color %u,%u,%u \n",sR,sG,sB);
+
+       floodFillUShort(source , width, height ,
+                       segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i],
+                       sDepth, 0    , 0 );
+     }
+     //fprintf(stderr,"Flood Filled Before %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
+  }
+
+  return 1;
+}
+
+
+
 unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
 {
  unsigned char * sourceCopy = (unsigned char *) malloc( width * height * 3 * sizeof( unsigned char));
@@ -118,9 +146,17 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
 
 unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf)
 {
+ short * sourceCopy = (short *) malloc( width * height * sizeof(unsigned short));
+ if ( sourceCopy == 0) { return 0; }
+ memset(sourceCopy,0,width*height*sizeof(short));
+
+
  short * target = (short *) malloc( width * height * sizeof(short));
- if ( target == 0) { return 0; }
+ if ( target == 0) { free(sourceCopy); return 0; }
  memset(target,0,width*height*sizeof(short));
+
+ removeDepthFloodFillBeforeProcessing(sourceCopy,target,width,height,segConf);
+
 
  unsigned int sourceWidthStep = width;
  unsigned int targetWidthStep = width;
@@ -173,6 +209,7 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
    sourcePixelsLineEnd+=sourceWidthStep;
  }
 
+ free(sourceCopy);
  return selectedDepth;
 }
 
