@@ -281,8 +281,8 @@ int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
   {
    char tmp[1024];
    return getPluginPath (
-                         getPluginStr(V4L2_ACQUISITION_MODULE,PLUGIN_PATH_STR) ,
-                         getPluginStr(V4L2_ACQUISITION_MODULE,PLUGIN_LIBNAME_STR) ,
+                         getPluginStr(moduleID,PLUGIN_PATH_STR) ,
+                         getPluginStr(moduleID,PLUGIN_LIBNAME_STR) ,
                          tmp,
                          1024
                          );
