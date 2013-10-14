@@ -59,6 +59,7 @@ int makepath(char * path)
 
 void countdownDelay(int seconds)
 {
+    if (seconds==0) { return; } //No delay do nothing!
     int secCounter=seconds;
 
     for (secCounter=seconds; secCounter>0; secCounter--)

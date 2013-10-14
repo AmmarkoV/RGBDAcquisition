@@ -51,6 +51,9 @@ struct SegmentationFeaturesDepth
 
    struct floodErasePoints floodErase;
 
+   unsigned char enableBBox;
+   double bboxX1,bboxY1,bboxZ1,bboxX2,bboxY2,bboxZ2;
+
 };
 
 unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf);

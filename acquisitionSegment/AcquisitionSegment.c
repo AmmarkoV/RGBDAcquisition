@@ -9,6 +9,8 @@
 
 #include "imageProcessing.h"
 
+float fx = 537.479600 , fy = 536.572920 , cx = 317.389787 ,cy = 236.118093;
+
 
 int removeFloodFillBeforeProcessing(unsigned char * source , unsigned char * target , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf  )
 {
@@ -53,8 +55,8 @@ int removeDepthFloodFillBeforeProcessing(unsigned short * source , unsigned shor
 
        unsigned short * srcDepth = (unsigned short *) source  + ( (segConf->floodErase.pX[i]) + segConf->floodErase.pY[i] * width );
        sDepth = *srcDepth; ++srcDepth;
-       //fprintf(stderr,"Flood Filling Before %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
-       //fprintf(stderr,"Src Color %u,%u,%u \n",sR,sG,sB);
+       fprintf(stderr,"Flood Filling Before %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
+       fprintf(stderr,"Src Depth is %u \n",sDepth);
 
        floodFillUShort(source , width, height ,
                        segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i],
@@ -148,7 +150,7 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
 {
  short * sourceCopy = (short *) malloc( width * height * sizeof(unsigned short));
  if ( sourceCopy == 0) { return 0; }
- memset(sourceCopy,0,width*height*sizeof(short));
+ memcpy(sourceCopy,source,width*height*sizeof(short));
 
 
  short * target = (short *) malloc( width * height * sizeof(short));
@@ -165,7 +167,7 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  width = segConf->maxX-segConf->minX;
  height = segConf->maxY-segConf->minY;
 
- short * sourcePixelsStart   = (short*) source + ( (posX) + posY * sourceWidthStep );
+ short * sourcePixelsStart   = (short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
  short * sourcePixelsLineEnd = sourcePixelsStart + (width);
  short * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
  short * sourcePixels = sourcePixelsStart;
@@ -208,6 +210,58 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
     }
    sourcePixelsLineEnd+=sourceWidthStep;
  }
+
+
+// -------------------------------------------------------------------------------------------------
+// --------------------------------- BOUNDING BOX SEGMENTATION -------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+
+if (segConf->enableBBox)
+{
+ fprintf(stderr,"Selecting Bounding Box %0.2f %0.2f %0.2f -> %0.2f %0.2f %0.2f  \n",segConf->bboxX1,segConf->bboxY1,segConf->bboxZ1,segConf->bboxX2,segConf->bboxY2,segConf->bboxZ2);
+
+ selectedPtr   = selectedDepth;
+ sourcePixels = sourcePixelsStart;
+ sourcePixelsLineEnd = sourcePixelsStart + (width);
+ x=0; y=0;
+ while (sourcePixels<sourcePixelsEnd)
+ {
+   while (sourcePixels<sourcePixelsLineEnd)
+    {
+     depth = sourcePixels++;
+
+     if ( (*selectedPtr) &&  (*depth != 0) )
+     {
+      double x3D = (x - cx) * (*depth) / fx;
+      double y3D = (y - cy) * (*depth) / fy;
+      double z3D = *depth;
+      /*! TODO ADD MATRIX MULTIPLICATION WITH EXTRINSICS HERE!*/
+
+       if (
+           (segConf->bboxX1<x3D)&& (segConf->bboxX2>x3D) &&
+           (segConf->bboxY1<y3D)&& (segConf->bboxY2>y3D) &&
+           (segConf->bboxZ1<z3D)&& (segConf->bboxZ2>x3D)
+          )
+     {  /*If it was selected keep it selected*/ } else
+     { *selectedPtr=0; } //Denied
+     }//If it was selected and not null project it into 3d Space
+
+     ++selectedPtr;
+     ++x;
+     if (x>=width) { x=0; ++y;}
+    }
+   sourcePixelsLineEnd+=sourceWidthStep;
+ }
+}
+// -------------------------------------------------------------------------------------------------
+// --------------------------------- BOUNDING BOX SEGMENTATION -------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+
+
+
+
 
  free(sourceCopy);
  return selectedDepth;

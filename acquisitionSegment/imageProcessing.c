@@ -114,19 +114,37 @@ int floodFillUShort(unsigned short * target , unsigned int width , unsigned int 
       {
         *tDepth = replaceDepth ;
 
-        floodFill(target,width,height, pX+1 , pY ,   threshold, sourceDepth ,replaceDepth ,depth+1);
-        floodFill(target,width,height, pX-1 , pY ,   threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFillUShort(target,width,height, pX+1 , pY ,   threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFillUShort(target,width,height, pX-1 , pY ,   threshold, sourceDepth ,replaceDepth ,depth+1);
 
-        floodFill(target,width,height, pX , pY+1 ,   threshold, sourceDepth ,replaceDepth ,depth+1);
-        floodFill(target,width,height, pX , pY-1 ,   threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFillUShort(target,width,height, pX , pY+1 ,   threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFillUShort(target,width,height, pX , pY-1 ,   threshold, sourceDepth ,replaceDepth ,depth+1);
 
-        floodFill(target,width,height, pX+1 , pY+1 , threshold, sourceDepth ,replaceDepth ,depth+1);
-        floodFill(target,width,height, pX-1 , pY-1 , threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFillUShort(target,width,height, pX+1 , pY+1 , threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFillUShort(target,width,height, pX-1 , pY-1 , threshold, sourceDepth ,replaceDepth ,depth+1);
 
-        floodFill(target,width,height, pX-1 , pY+1 , threshold, sourceDepth ,replaceDepth ,depth+1);
-        floodFill(target,width,height, pX+1 , pY-1 , threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFillUShort(target,width,height, pX-1 , pY+1 , threshold, sourceDepth ,replaceDepth ,depth+1);
+        floodFillUShort(target,width,height, pX+1 , pY-1 , threshold, sourceDepth ,replaceDepth ,depth+1);
       }
 
    return 1;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

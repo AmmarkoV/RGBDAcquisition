@@ -8,6 +8,7 @@
 char inputname[512]={0};
 char outputfoldername[512]={0};
 
+unsigned int delay = 0;
 
 int calibrationSet = 0;
 struct calibration calib;
@@ -35,7 +36,10 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
-
+    if (strcmp(argv[i],"-delay")==0) {
+                                       delay=atoi(argv[i+1]);
+                                       fprintf(stderr,"Delay set to %u seconds \n",delay);
+                                      } else
     if (strcmp(argv[i],"-resolution")==0) {
                                              width=atoi(argv[i+1]);
                                              height=atoi(argv[i+2]);
@@ -129,8 +133,8 @@ int main(int argc, char *argv[])
          }
      }
 
-   //Countdown 3 -> 2 -> 1 -> Action!
-   //countdownDelay(3);
+
+   countdownDelay(delay);
    fprintf(stderr,"Starting Grabbing!\n");
 
 

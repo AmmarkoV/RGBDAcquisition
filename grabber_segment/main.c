@@ -40,11 +40,11 @@ unsigned short * copyDepth(unsigned short * source , unsigned int width , unsign
 
 int pickCombinationModeFromString(char * str)
 {
-  if (strcmp(str,"and")==0) { return COMBINE_AND; } else
-  if (strcmp(str,"or")==0)  { return COMBINE_OR; } else
-  if (strcmp(str,"xor")==0) { return COMBINE_XOR; } else
-  if (strcmp(str,"rgb")==0) { return COMBINE_KEEP_ONLY_RGB; } else
-  if (strcmp(str,"depth")==0) { return COMBINE_KEEP_ONLY_DEPTH; }
+  if (strcasecmp(str,"and")==0) { return COMBINE_AND; } else
+  if (strcasecmp(str,"or")==0)  { return COMBINE_OR; } else
+  if (strcasecmp(str,"xor")==0) { return COMBINE_XOR; } else
+  if (strcasecmp(str,"rgb")==0) { return COMBINE_KEEP_ONLY_RGB; } else
+  if (strcasecmp(str,"depth")==0) { return COMBINE_KEEP_ONLY_DEPTH; }
 
   fprintf(stderr,"Could not understand combination method %s\n",str);
   return DONT_COMBINE;
@@ -146,6 +146,15 @@ int main(int argc, char *argv[])
     if (strcmp(argv[i],"-maxRGB")==0)     { segConfRGB.maxR = atoi(argv[i+1]); segConfRGB.maxG = atoi(argv[i+2]); segConfRGB.maxB = atoi(argv[i+3]); doNotSegmentRGB=0; } else
     if (strcmp(argv[i],"-eraseRGB")==0) { segConfRGB.eraseColorR = atoi(argv[i+1]); segConfRGB.eraseColorG = atoi(argv[i+2]); segConfRGB.eraseColorB = atoi(argv[i+3]);  } else
     if (strcmp(argv[i],"-replaceRGB")==0) { segConfRGB.replaceR = atoi(argv[i+1]); segConfRGB.replaceG = atoi(argv[i+2]); segConfRGB.replaceB = atoi(argv[i+3]); segConfRGB.enableReplacingColors=1; } else
+    if (strcmp(argv[i],"-bbox")==0)       {
+                                            segConfDepth.enableBBox=1;
+                                            segConfDepth.bboxX1=atof(argv[i+1]);
+                                            segConfDepth.bboxY1=atof(argv[i+2]);
+                                            segConfDepth.bboxZ1=atof(argv[i+3]);
+                                            segConfDepth.bboxX2=atof(argv[i+4]);
+                                            segConfDepth.bboxY2=atof(argv[i+5]);
+                                            segConfDepth.bboxZ2=atof(argv[i+6]);
+                                          } else
     if (strcmp(argv[i],"-minDepth")==0)   { segConfDepth.minDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
     if (strcmp(argv[i],"-maxDepth")==0)   { segConfDepth.maxDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
     if (strcmp(argv[i],"-combine")==0)    { combinationMode=pickCombinationModeFromString(argv[i+1]); }     else
