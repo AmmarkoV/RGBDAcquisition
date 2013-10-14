@@ -2,6 +2,9 @@
 #define ACQUISITIONSEGMENT_H_INCLUDED
 
 
+#include "../tools/Calibration/calibration.h"
+
+
 enum combinationModesEnumerator
 {
   DONT_COMBINE=0,
@@ -56,14 +59,15 @@ struct SegmentationFeaturesDepth
 
 };
 
-unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf);
-unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf);
+unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib);
+unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf, struct calibration * calib);
 
 int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
                                    unsigned short * Depth ,
                                    unsigned int width , unsigned int height ,
                                    struct SegmentationFeaturesRGB * segConfRGB ,
                                    struct SegmentationFeaturesDepth * segConfDepth,
+                                   struct calibration * calib ,
                                    int combinationMode
                                );
 

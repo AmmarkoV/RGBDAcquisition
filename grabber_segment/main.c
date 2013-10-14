@@ -6,6 +6,9 @@
 #include "../acquisitionSegment/AcquisitionSegment.h"
 
 
+int calibrationSet = 0;
+char calibrationFile[2048]={0};
+struct calibration calib;
 
 char outputfoldername[512]={0};
 char inputname[512]={0};
@@ -107,6 +110,10 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcmp(argv[i],"-calibration")==0) {
+                                             calibrationSet=1;
+                                             strncpy(calibrationFile,argv[i+1],2048);
+                                           } else
     if (strcmp(argv[i],"-maxFrames")==0) {
                                            maxFramesToGrab=atoi(argv[i+1]);
                                            fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
@@ -220,6 +227,15 @@ int main(int argc, char *argv[])
 
 
 
+    if (calibrationSet)
+    {
+      if (!ReadCalibration(calibrationFile,widthDepth,heightDepth,&calib) )
+                                             {
+                                               fprintf(stderr,"Could not read calibration file `%s`\n",calibrationFile);
+                                               return 1;
+                                             }
+    }
+
 
    float centerX;
    float centerY;
@@ -244,6 +260,7 @@ int main(int argc, char *argv[])
                                    widthRGB , heightRGB,
                                    &segConfRGB ,
                                    &segConfDepth ,
+                                   &calib ,
                                    combinationMode
                                 );
 

@@ -40,12 +40,12 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
   calib->extrinsicRotationRodriguez[0]=0.0; calib->extrinsicRotationRodriguez[1]=0.0; calib->extrinsicRotationRodriguez[2]=0.0;
   calib->extrinsicTranslation[0]=0.0; calib->extrinsicTranslation[1]=0.0; calib->extrinsicTranslation[2]=0.0;
 
-  /*cx*/calib->intrinsic[2]  = (double) width/2;
-  /*cy*/calib->intrinsic[5]  = (double) height/2;
+  /*cx*/calib->intrinsic[CALIB_INTR_CX]  = (double) width/2;
+  /*cy*/calib->intrinsic[CALIB_INTR_CY]  = (double) height/2;
 
   //-This is a bad initial estimation i guess :P
-  /*fx*/ calib->intrinsic[0] = (double) (DEFAULT_FX * width) / DEFAULT_WIDTH;   //<- these might be wrong
-  /*fy*/ calib->intrinsic[4] = (double) (DEFAULT_FY * height)  / DEFAULT_HEIGHT;    //<- these might be wrong
+  /*fx*/ calib->intrinsic[CALIB_INTR_FX] = (double) (DEFAULT_FX * width) / DEFAULT_WIDTH;   //<- these might be wrong
+  /*fy*/ calib->intrinsic[CALIB_INTR_FY] = (double) (DEFAULT_FY * height)  / DEFAULT_HEIGHT;    //<- these might be wrong
   //--------------------------------------------
 
   calib->depthUnit=1.0;

@@ -4,12 +4,12 @@
 
 #include "combineRGBAndDepthOutput.h"
 
-
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h"
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h"
 #include "AcquisitionSegment.h"
 
 #include "imageProcessing.h"
 
-float fx = 537.479600 , fy = 536.572920 , cx = 317.389787 ,cy = 236.118093;
 
 
 int removeFloodFillBeforeProcessing(unsigned char * source , unsigned char * target , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf  )
@@ -70,7 +70,7 @@ int removeDepthFloodFillBeforeProcessing(unsigned short * source , unsigned shor
 
 
 
-unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
+unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib)
 {
  unsigned char * sourceCopy = (unsigned char *) malloc( width * height * 3 * sizeof( unsigned char));
  if ( sourceCopy == 0) { return 0; }
@@ -146,7 +146,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
 
 
 
-unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf)
+unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf , struct calibration * calib)
 {
  short * sourceCopy = (short *) malloc( width * height * sizeof(unsigned short));
  if ( sourceCopy == 0) { return 0; }
@@ -221,6 +221,24 @@ if (segConf->enableBBox)
 {
  fprintf(stderr,"Selecting Bounding Box %0.2f %0.2f %0.2f -> %0.2f %0.2f %0.2f  \n",segConf->bboxX1,segConf->bboxY1,segConf->bboxZ1,segConf->bboxX2,segConf->bboxY2,segConf->bboxZ2);
 
+ float fx = 537.479600 , fy = 536.572920 , cx = 317.389787 ,cy = 236.118093;
+ if ( calib->intrinsicParametersSet )
+ {
+   fx = calib->intrinsic[CALIB_INTR_FX];
+   fy = calib->intrinsic[CALIB_INTR_FY];
+   cx = calib->intrinsic[CALIB_INTR_CX];
+   cy = calib->intrinsic[CALIB_INTR_CY];
+ } else {fprintf(stderr,"No intrinsic parameters provided , bounding box segmentation will use default intrinsic values ( you probably dont want this )\n"); }
+
+ double * m = alloc4x4Matrix();
+ create4x4IdentityMatrix(m);
+ if ( calib->extrinsicParametersSet ) { convertRodriguezAndTranslationToOpenGL4x4DMatrix(&m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
+ else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
+
+
+ double raw3D[4]={0};
+ double world3D[4]={0};
+
  selectedPtr   = selectedDepth;
  sourcePixels = sourcePixelsStart;
  sourcePixelsLineEnd = sourcePixelsStart + (width);
@@ -233,15 +251,17 @@ if (segConf->enableBBox)
 
      if ( (*selectedPtr) &&  (*depth != 0) )
      {
-      double x3D = (x - cx) * (*depth) / fx;
-      double y3D = (y - cy) * (*depth) / fy;
-      double z3D = *depth;
-      /*! TODO ADD MATRIX MULTIPLICATION WITH EXTRINSICS HERE!*/
+      raw3D[0] = (double) (x - cx) * (*depth) / fx;
+      raw3D[1] = (double) (y - cy) * (*depth) / fy;
+      raw3D[2] = (double) *depth;
+      raw3D[3] = (double) 1.0;
+
+      transform3DPointUsing4x4Matrix(&world3D,m,&raw3D);
 
        if (
-           (segConf->bboxX1<x3D)&& (segConf->bboxX2>x3D) &&
-           (segConf->bboxY1<y3D)&& (segConf->bboxY2>y3D) &&
-           (segConf->bboxZ1<z3D)&& (segConf->bboxZ2>x3D)
+           (segConf->bboxX1<world3D[0])&& (segConf->bboxX2>world3D[0]) &&
+           (segConf->bboxY1<world3D[1])&& (segConf->bboxY2>world3D[1]) &&
+           (segConf->bboxZ1<world3D[2])&& (segConf->bboxZ2>world3D[2])
           )
      {  /*If it was selected keep it selected*/ } else
      { *selectedPtr=0; } //Denied
@@ -253,6 +273,10 @@ if (segConf->enableBBox)
     }
    sourcePixelsLineEnd+=sourceWidthStep;
  }
+
+  fprintf(stderr,"Done\n");
+  free4x4Matrix(&m);
+
 }
 // -------------------------------------------------------------------------------------------------
 // --------------------------------- BOUNDING BOX SEGMENTATION -------------------------------------
@@ -273,6 +297,7 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
                                    unsigned int width , unsigned int height ,
                                    struct SegmentationFeaturesRGB * segConfRGB ,
                                    struct SegmentationFeaturesDepth * segConfDepth,
+                                   struct calibration * calib ,
                                    int combinationMode
                                )
 {
@@ -281,10 +306,10 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
   //the areas we want and the areas we don't want ..
 
   //We select the area for segmentation from RGB frame
-  unsigned char * selectedRGB = selectSegmentationForRGBFrame(RGB , width , height , segConfRGB);
+  unsigned char * selectedRGB = selectSegmentationForRGBFrame(RGB , width , height , segConfRGB , calib);
 
   //We select the area for segmentation from Depth frame
-  unsigned char * selectedDepth = selectSegmentationForDepthFrame(Depth , width , height , segConfDepth);
+  unsigned char * selectedDepth = selectSegmentationForDepthFrame(Depth , width , height , segConfDepth , calib);
 
   //We may chose to combine , or make a different selection for the RGB and Depth Frame
   if ( combinationMode == DONT_COMBINE )

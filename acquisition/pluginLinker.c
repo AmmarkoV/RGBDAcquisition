@@ -16,6 +16,7 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 
+
 char * pluginStrings[] = {   "dummyName" , "dummyPath "                                 , " dummyPath.so"               ,
                              //----------------------------------------------------------------------------
                              "V4L2"      ,"../v4l2_acquisition_shared_library/"        , "libV4L2Acquisition.so"       ,
@@ -79,7 +80,9 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
                                    fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
                                    strncpy(pathOut,pathTester,pathOutLength);
                                    return 1;
-                                 } else
+                                 }
+
+   sprintf(pathTester,"./%s",libName);
    if (fileExists(libName))      {
                                    fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
                                    //strncpy(pathOut,libName,pathOutLength);
@@ -87,6 +90,12 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
                                    strcpy(pathOut,"./"); //<-TODO CHECK BOUNDS HERE ETC..
                                    strcat(pathOut,libName);
 
+                                   return 1;
+                                 }
+
+   if (fileExists(libName))      {
+                                   fprintf(stderr,"Found plugin %s at standard dir \n",libName);
+                                   strcat(pathOut,libName);
                                    return 1;
                                  }
 

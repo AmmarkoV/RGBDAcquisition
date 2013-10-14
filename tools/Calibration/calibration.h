@@ -6,6 +6,14 @@ extern "C"
 {
 #endif
 
+enum calibIntrinsics
+{
+  CALIB_INTR_FX = 0 ,
+  CALIB_INTR_FY = 4 ,
+  CALIB_INTR_CX = 2 ,
+  CALIB_INTR_CY = 5
+};
+
 
 struct calibration
 {
