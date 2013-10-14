@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-from XP-08-no-translation -to XP-08-no-translationSegmented -maxFrames 5 -cropRGB 159 106 612 387 -minRGB 140 122 100 -maxRGB 255 255 255 -replaceRGB 92 45 36 -floodEraseSource 175 150 15 -floodEraseSource 580 280 15" />
+				<Option parameters="-from fuse03 -to fuse03Segmented -maxFrames 10 -floodEraseDepthSource 529 290 10 -floodEraseDepthSource 529 330 10 -floodEraseDepthSource 529 350 10 -floodEraseDepthSource 529 390 10 -floodEraseDepthSource 529 430 10 -eraseRGB 255 255 255 -maxDepth 500 -bbox -200 -100 100 200 150 500 -combine depth" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

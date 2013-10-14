@@ -42,7 +42,7 @@ char * getPluginStr(int moduleID,int strID)
        fprintf(stderr,"getPluginStr(%u,%u) cannot return a result , plugin not declared correctly\n",moduleID,strID);
     }
 
-    fprintf(stderr,"getPluginStr(%u,%u) returning %s\n",moduleID,strID,pluginStrings[  3 * moduleID + strID ]);
+    //fprintf(stderr,"getPluginStr(%u,%u) returning %s\n",moduleID,strID,pluginStrings[  3 * moduleID + strID ]);
     return pluginStrings[  3 * moduleID + strID ];
 }
 

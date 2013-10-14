@@ -148,12 +148,12 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
 
 unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf , struct calibration * calib)
 {
- short * sourceCopy = (short *) malloc( width * height * sizeof(unsigned short));
+ unsigned short * sourceCopy = (unsigned short *) malloc( width * height * sizeof(unsigned short));
  if ( sourceCopy == 0) { return 0; }
- memcpy(sourceCopy,source,width*height*sizeof(short));
+ memcpy(sourceCopy,source,width*height*sizeof(unsigned short));
 
 
- short * target = (short *) malloc( width * height * sizeof(short));
+ unsigned short * target = (unsigned short *) malloc( width * height * sizeof(unsigned short));
  if ( target == 0) { free(sourceCopy); return 0; }
  memset(target,0,width*height*sizeof(short));
 
@@ -167,10 +167,10 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  width = segConf->maxX-segConf->minX;
  height = segConf->maxY-segConf->minY;
 
- short * sourcePixelsStart   = (short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
- short * sourcePixelsLineEnd = sourcePixelsStart + (width);
- short * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
- short * sourcePixels = sourcePixelsStart;
+ unsigned short * sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
+ unsigned short * sourcePixelsLineEnd = sourcePixelsStart + (width);
+ unsigned short * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
+ unsigned short * sourcePixels = sourcePixelsStart;
 
  unsigned char * selectedDepth   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
  if (selectedDepth==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
@@ -181,28 +181,19 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  unsigned int x =0;
  unsigned int y =0;
 
- /* Todo add accurate 3d point segmentation
- float x3D;
- float y3D;
- float z3D;
- acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x3D, float *y3D , float *z3D  );
- */
 
-
- unsigned short * depth;
+ unsigned short * depth=0;
  while (sourcePixels<sourcePixelsEnd)
  {
    while (sourcePixels<sourcePixelsLineEnd)
     {
      depth = sourcePixels++;
 
-
      if (*depth != 0)
      { //If there is a depth given for point
        if  ( (segConf->minDepth <= *depth) && (*depth <= segConf->maxDepth) ) { *selectedPtr=1; } else
                                                                               { *selectedPtr=0; }
      }
-
 
      ++selectedPtr;
      ++x;
@@ -228,42 +219,54 @@ if (segConf->enableBBox)
    fy = calib->intrinsic[CALIB_INTR_FY];
    cx = calib->intrinsic[CALIB_INTR_CX];
    cy = calib->intrinsic[CALIB_INTR_CY];
+
+   if (fx==0) { fx=1;}
+   if (fy==0) { fy=1;}
  } else {fprintf(stderr,"No intrinsic parameters provided , bounding box segmentation will use default intrinsic values ( you probably dont want this )\n"); }
 
  double * m = alloc4x4Matrix();
- create4x4IdentityMatrix(m);
- if ( calib->extrinsicParametersSet ) { convertRodriguezAndTranslationToOpenGL4x4DMatrix(&m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
- else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
-
-
- double raw3D[4]={0};
- double world3D[4]={0};
-
- selectedPtr   = selectedDepth;
- sourcePixels = sourcePixelsStart;
- sourcePixelsLineEnd = sourcePixelsStart + (width);
- x=0; y=0;
- while (sourcePixels<sourcePixelsEnd)
+ if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
  {
+  create4x4IdentityMatrix(m);
+  if ( calib->extrinsicParametersSet ) { convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
+  else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
+
+  double raw3D[4]={0};
+  double world3D[4]={0};
+
+
+  sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
+  sourcePixelsLineEnd = sourcePixelsStart + (width);
+  sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
+  sourcePixels = sourcePixelsStart;
+
+  selectedPtr   = selectedDepth;
+  sourcePixels = sourcePixelsStart;
+  sourcePixelsLineEnd = sourcePixelsStart + (width);
+  x=0; y=0;
+  depth=0;
+  while (sourcePixels<sourcePixelsEnd)
+  {
    while (sourcePixels<sourcePixelsLineEnd)
     {
      depth = sourcePixels++;
 
-     if ( (*selectedPtr) &&  (*depth != 0) )
+     if (  (*selectedPtr!=0)  )  //  &&  (*depth != 0)
      {
+
       raw3D[0] = (double) (x - cx) * (*depth) / fx;
       raw3D[1] = (double) (y - cy) * (*depth) / fy;
       raw3D[2] = (double) *depth;
       raw3D[3] = (double) 1.0;
 
-      transform3DPointUsing4x4Matrix(&world3D,m,&raw3D);
+      transform3DPointUsing4x4Matrix(world3D,m,raw3D);
 
        if (
            (segConf->bboxX1<world3D[0])&& (segConf->bboxX2>world3D[0]) &&
            (segConf->bboxY1<world3D[1])&& (segConf->bboxY2>world3D[1]) &&
            (segConf->bboxZ1<world3D[2])&& (segConf->bboxZ2>world3D[2])
           )
-     {  /*If it was selected keep it selected*/ } else
+     {   } else // If it was selected keep it selected
      { *selectedPtr=0; } //Denied
      }//If it was selected and not null project it into 3d Space
 
@@ -273,9 +276,10 @@ if (segConf->enableBBox)
     }
    sourcePixelsLineEnd+=sourceWidthStep;
  }
+  free4x4Matrix(&m); // This is the same as free(m); m=0;
+ } //End of M allocated!
 
-  fprintf(stderr,"Done\n");
-  free4x4Matrix(&m);
+
 
 }
 // -------------------------------------------------------------------------------------------------

@@ -390,8 +390,8 @@ int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformati
 {
   if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0) ) { return 0; }
 
-  fprintf(stderr,"%0.2f %0.2f %0.2f %0.2f  \n * \n",point3D[0],point3D[1],point3D[2],point3D[3]);
-  print4x4DMatrix("M", transformation4x4);
+  //fprintf(stderr,"%0.2f %0.2f %0.2f %0.2f  \n * \n",point3D[0],point3D[1],point3D[2],point3D[3]);
+  //print4x4DMatrix("M", transformation4x4);
 
 
   double * m = transformation4x4;
