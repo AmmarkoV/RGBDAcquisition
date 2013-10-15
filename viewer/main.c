@@ -25,7 +25,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
     //GIVE TIME FOR REDRAW EVENTS ETC -------------------------------------------------------------------------
     float msWaitTime = ((float) 1000/framerate) ;
-    int key = cvWaitKey(msWaitTime );
+    int key = cvWaitKey(msWaitTime/3);
     if (key != -1)
 			{
                 char outfilename[1024]={0};
