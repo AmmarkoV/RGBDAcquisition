@@ -59,6 +59,8 @@ extern "C"
    int getTemplateDepthBitsPerPixel(int devID);
 
    char * getTemplateDepthPixels(int devID);
+   char * getTemplateDepthPixelsFlipped(int devID);
+
    double getTemplateDepthFocalLength(int devID);
    double getTemplateDepthPixelSize(int devID);
    #endif

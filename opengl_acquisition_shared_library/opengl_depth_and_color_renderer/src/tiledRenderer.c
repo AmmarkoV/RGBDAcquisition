@@ -81,8 +81,16 @@ void setupTiledRendererOGL(float backgroundR,float backgroundG,float backgroundB
 
 int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
 {
-        trConf->op.OGLUnitWidth=2.5;
-        trConf->op.OGLUnitHeight=2.5;
+        struct VirtualStream * scene = (struct VirtualStream *)  trConf->scenePTR;
+        struct Model ** models = ( struct Model ** ) trConf->modelPTR;
+        unsigned int i=trConf->objID;
+        struct Model * mod = models[scene->object[i].type];
+
+        float sizeX , sizeY , sizeZ;
+        getModel3dSize(mod , &sizeX , &sizeY , &sizeZ );
+
+        trConf->op.OGLUnitWidth=3.8;
+        trConf->op.OGLUnitHeight=3.8;
 
         trConf->op.snapsHorizontal=trConf->columns;
         trConf->op.snapsVertical=trConf->rows;

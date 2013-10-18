@@ -48,7 +48,6 @@ struct TemplateVirtualDevice device[MAX_TEMPLATE_DEVICES]={0};
 
 
 
-
 int FileExists(char * filename)
 {
  FILE *fp = fopen(filename,"r");
@@ -248,6 +247,27 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsign
 
 
 
+int flipDepth(unsigned short * depth,unsigned int width , unsigned int height )
+{
+  unsigned char tmp ;
+  unsigned char * depthPtr=depth;
+  unsigned char * depthPtrNext=depth+1;
+  unsigned char * depthPtrLimit =  depth + width * height * 2 ;
+  while ( depthPtr < depthPtrLimit )
+  {
+     tmp=*depthPtr;
+     *depthPtr=*depthPtrNext;
+     *depthPtrNext=tmp;
+
+     ++depthPtr;
+     ++depthPtrNext;
+  }
+
+ return 0;
+}
+
+
+
 int startTemplateModule(unsigned int max_devs,char * settings)
 {
     unsigned int devID = 0;
@@ -443,6 +463,11 @@ int getTemplateDepthBitsPerPixel(int devID) { return 16; }
 
 // Frame Grabber should call this function for depth frames
 char * getTemplateDepthPixels(int devID) { return (char *) device[devID].templateDepthFrame; }
+
+char * getTemplateDepthPixelsFlipped(int devID) {
+                                                  flipDepth(device[devID].templateDepthFrame,device[devID].templateWIDTH, device[devID].templateHEIGHT);
+                                                  return (char *) device[devID].templateDepthFrame;
+                                                }
 
 #else
 //Null build

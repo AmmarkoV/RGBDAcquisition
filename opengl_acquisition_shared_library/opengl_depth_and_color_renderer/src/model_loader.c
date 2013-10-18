@@ -301,6 +301,23 @@ int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transpare
  return 1;
 }
 
+int getModelBBox(struct Model *mod , float * minX,  float * minY , float * minZ , float * maxX , float * maxY , float * maxZ)
+{
+//    * minX,  float * minY , float * minZ , float * maxX , float * maxY , float * maxZ
+ return 0;
+}
 
+
+int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * sizeZ )
+{
+  float minX,minY,minZ,maxX,maxY,maxZ;
+  getModelBBox(mod,&minX,&minY,&minZ,&maxX,&maxY,&maxZ);
+
+  *sizeX = maxX - minX;
+  *sizeY = maxY - minY;
+  *sizeZ = maxZ - minZ;
+
+ return 1;
+}
 
 

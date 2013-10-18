@@ -53,6 +53,9 @@ int setModelCoordinates(struct Model * mod,float x,float y,float z,float heading
 int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,float *heading,float *pitch,float* roll);
 int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transparency,unsigned char * noColor);
 
+int getModelBBox(struct Model *mod , float * minX,  float * minY , float * minZ , float * maxX , float * maxY , float * maxZ);
+int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * sizeZ );
+
 int drawCube();
 
 #endif // MODEL_LOADER_H_INCLUDED
