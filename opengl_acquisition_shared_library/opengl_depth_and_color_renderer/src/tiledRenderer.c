@@ -89,8 +89,12 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
         float sizeX , sizeY , sizeZ;
         getModel3dSize(mod , &sizeX , &sizeY , &sizeZ );
 
-        trConf->op.OGLUnitWidth=3.8;
-        trConf->op.OGLUnitHeight=3.8;
+        float widthToUse = sizeX;
+        if (sizeY>widthToUse) { widthToUse = sizeY; }
+        if (sizeZ>widthToUse) { widthToUse = sizeY; }
+
+        trConf->op.OGLUnitWidth=widthToUse+2.0;
+        trConf->op.OGLUnitHeight=widthToUse+2.0;
 
         trConf->op.snapsHorizontal=trConf->columns;
         trConf->op.snapsVertical=trConf->rows;

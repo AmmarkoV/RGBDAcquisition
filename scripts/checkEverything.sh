@@ -74,6 +74,17 @@ toCheck="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_mu
   done 
 
 
+#quirks!
+toCheck="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/libOGLRendererSandbox.so"
+for f in $toCheck
+if [ -e $f ]
+              then
+              echo "$green $f quirk ok.. $normal" 
+             else
+              echo "$red $f failed ( running scripts/createRedist.sh might solve this )  .. $normal" 
+             fi
+done 
+
 
 cd "$STARTDIR"
 

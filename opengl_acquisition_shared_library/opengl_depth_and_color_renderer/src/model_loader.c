@@ -303,8 +303,14 @@ int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transpare
 
 int getModelBBox(struct Model *mod , float * minX,  float * minY , float * minZ , float * maxX , float * maxY , float * maxZ)
 {
-//    * minX,  float * minY , float * minZ , float * maxX , float * maxY , float * maxZ
- return 0;
+ struct OBJ_Model * objMod = (struct OBJ_Model * ) mod->model;
+ * minX = objMod->boundBox.min.x;
+ * minY = objMod->boundBox.min.y;
+ * minZ = objMod->boundBox.min.z;
+ * maxX = objMod->boundBox.max.x;
+ * maxY = objMod->boundBox.max.y;
+ * maxZ = objMod->boundBox.max.z;
+ return 1;
 }
 
 

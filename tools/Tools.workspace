@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
+		<Project filename="QuaternionsToEuler/QuaternionsToEuler.cbp" />
 		<Project filename="EulerToQuaternions/EulerToQuaternions.cbp" />
 		<Project filename="DepthImagesConverter/DepthImagesConverter.cbp" />
 		<Project filename="Calibration/Calibration.cbp" />

@@ -6,7 +6,10 @@
 WRKDIR = `pwd`
 MAKE = make
 
-all: eulertoquaternions_eulertoquaternions depthimagesconverter_depthimagesconverter calibration_calibration extrinsiccalibration_extrinsiccalibration undistort_undistort calibration_calibrationlibrary timers_timers
+all: quaternionstoeuler_quaternionstoeuler eulertoquaternions_eulertoquaternions depthimagesconverter_depthimagesconverter calibration_calibration extrinsiccalibration_extrinsiccalibration undistort_undistort calibration_calibrationlibrary timers_timers
+
+quaternionstoeuler_quaternionstoeuler: 
+	$(MAKE) -C QuaternionsToEuler all -f QuaternionsToEuler.cbp.mak
 
 eulertoquaternions_eulertoquaternions: 
 	$(MAKE) -C EulerToQuaternions all -f EulerToQuaternions.cbp.mak
@@ -29,7 +32,10 @@ calibration_calibrationlibrary:
 timers_timers: 
 	$(MAKE) -C Timers all -f Timers.cbp.mak
 
-clean: clean_eulertoquaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary clean_timers_timers
+clean: clean_quaternionstoeuler_quaternionstoeuler clean_eulertoquaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary clean_timers_timers
+
+clean_quaternionstoeuler_quaternionstoeuler: 
+	$(MAKE) -C QuaternionsToEuler clean -f QuaternionsToEuler.cbp.mak
 
 clean_eulertoquaternions_eulertoquaternions: 
 	$(MAKE) -C EulerToQuaternions clean -f EulerToQuaternions.cbp.mak
@@ -52,5 +58,5 @@ clean_calibration_calibrationlibrary:
 clean_timers_timers: 
 	$(MAKE) -C Timers clean -f Timers.cbp.mak
 
-.PHONY: clean_eulertoquaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary clean_timers_timers
+.PHONY: clean_quaternionstoeuler_quaternionstoeuler clean_eulertoquaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary clean_timers_timers
 
