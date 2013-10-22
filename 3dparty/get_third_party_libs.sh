@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BINARIES_THAT_NEED_LIBS="grabber viewer grabber_mux grabber_segment acquisitionBroadcast redist"
+BINARIES_THAT_NEED_LIBS="grabber viewer grabber_mux grabber_segment acquisitionBroadcast editor redist"
 
 if [ -d libfreenect ]
 then

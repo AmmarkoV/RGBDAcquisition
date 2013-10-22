@@ -1,7 +1,6 @@
 #ifndef V4L2ACQUISITION_H_INCLUDED
 #define V4L2ACQUISITION_H_INCLUDED
 
-#include "../acquisition/acquisition_setup.h"
 
 #define USE_CALIBRATION 1
 
@@ -13,6 +12,9 @@
 extern "C"
 {
 #endif
+
+   #include "../acquisition/acquisition_setup.h"
+
    //Initialization of V4L2
    int startV4L2Module(unsigned int max_devs,char * settings);
 

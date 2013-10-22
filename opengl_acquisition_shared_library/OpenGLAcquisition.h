@@ -2,7 +2,6 @@
 #define OPENGL_ACQUISITION_H_INCLUDED
 
 
-#include "../acquisition/acquisition_setup.h"
 
 
 #include "../tools/Calibration/calibration.h"
@@ -11,6 +10,9 @@
 extern "C"
 {
 #endif
+
+
+#include "../acquisition/acquisition_setup.h"
 
 
 int startOpenGLModule(unsigned int max_devs) ;

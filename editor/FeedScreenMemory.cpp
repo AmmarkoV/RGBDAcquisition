@@ -39,15 +39,15 @@ void memcpy_1bit_2_3bit(unsigned char * dest,unsigned char * src,unsigned int le
 }
 
 
-void PassVideoRegisterToFeed(unsigned int feednum,void * framedata,unsigned int bitsperpixel)
+void passVideoRegisterToFeed(unsigned int feednum,void * framedata,unsigned int width , unsigned int height , unsigned int bitsperpixel , unsigned int channels)
 {
-  void *frame=0;
-
   if ( live_feeds[feednum].bmp == 0 ) {  return;  } else
-  if ( live_feeds[feednum].bmp_allocated ) { delete live_feeds[feednum].bmp; live_feeds[feednum].bmp_allocated = false; }
-  frame = framedata;
+  if ( live_feeds[feednum].bmp_allocated ) { delete live_feeds[feednum].bmp; live_feeds[feednum].bmp_allocated = false; live_feeds[feednum].bmp=0;}
 
- if ( frame != 0)
+  live_feeds[feednum].width=width;
+  live_feeds[feednum].height=height;
+
+ if ( framedata != 0)
  {
     live_feeds[feednum].img.SetData((unsigned char *)framedata,live_feeds[feednum].width,live_feeds[feednum].height,true);
     if ( resc_width != live_feeds[feednum].width ) { live_feeds[feednum].img.Rescale(resc_width,resc_height); }
@@ -133,75 +133,7 @@ int SaveRegisterToFile(char * filename , unsigned int reg_num)
 //   return VisCortX_SaveVideoRegisterToFile(reg_num,filename);
 }
 
-int SnapWebCams()
-{
 
- if (has_init==0) { fprintf(stderr,"!"); VideoFeedsNotAccessible=1; return 0; }
-
-/*
- if ( (!VisCortx_VideoRegistersSynced(LEFT_EYE,CALIBRATED_LEFT_EYE)) ||
-      (!VisCortx_VideoRegistersSynced(RIGHT_EYE,CALIBRATED_RIGHT_EYE))
-     )
-  {
-       fprintf(stderr,"Feeds not synchronized , not copying frame \n");
-       return 0;
-  }
-
- if (last_viscrtx_pass==VisCortx_GetTime()) { return 0; }
- last_viscrtx_pass=VisCortx_GetTime();*/
-
- VideoFeedsNotAccessible=0;
-
- if ( live_feeds[0].bmp_allocated ) { live_feeds[0].bmp_allocated = false; delete live_feeds[0].bmp;  live_feeds[0].bmp=0; }
- if ( live_feeds[1].bmp_allocated ) { live_feeds[1].bmp_allocated = false; delete live_feeds[1].bmp;  live_feeds[1].bmp=0; }
-
-/*
- if ( GetVideoRegister(CALIBRATED_LEFT_EYE) != 0)
- {                                                //
-    live_feeds[0].img.SetData(GetVideoRegister(CALIBRATED_LEFT_EYE),GetCortexMetric(RESOLUTION_X),GetCortexMetric(RESOLUTION_Y),true);
-    if ( resc_width != GetCortexMetric(RESOLUTION_X) ) { live_feeds[0].img.Rescale(resc_width,resc_height); }
-    live_feeds[0].bmp= new wxBitmap(live_feeds[0].img);
-    live_feeds[0].bmp_allocated = true;
- }
-
- if ( GetVideoRegister(CALIBRATED_RIGHT_EYE) != 0)
- {                                               //
-  live_feeds[1].img.SetData(GetVideoRegister(CALIBRATED_RIGHT_EYE),GetCortexMetric(RESOLUTION_X),GetCortexMetric(RESOLUTION_Y),true);
-  if ( resc_width != GetCortexMetric(RESOLUTION_X) ) { live_feeds[1].img.Rescale(resc_width,resc_height); }
-  live_feeds[1].bmp= new wxBitmap(live_feeds[1].img);
-  live_feeds[1].bmp_allocated = true;
- }
-
-
-
-if ( last_time_of_left_operation != VisCortx_GetVideoRegisterData(LAST_LEFT_OPERATION,0) )
-    {
-         last_time_of_left_operation= VisCortx_GetVideoRegisterData(LAST_LEFT_OPERATION,0);
-         PassVideoRegisterToFeed ( 2 , VisCortx_ReadFromVideoRegister(LAST_LEFT_OPERATION,GetCortexMetric(RESOLUTION_X),GetCortexMetric(RESOLUTION_Y),3),3 );
-    } else
-  if ( last_time_of_left_depth_map != VisCortx_GetVideoRegisterData(DEPTH_LEFT_VIDEO,0) )
-    {
-         last_time_of_left_depth_map= VisCortx_GetVideoRegisterData(DEPTH_LEFT_VIDEO,0);
-         PassVideoRegisterToFeed ( 2 , VisCortx_ReadFromVideoRegister(DEPTH_LEFT_VIDEO,GetCortexMetric(RESOLUTION_X),GetCortexMetric(RESOLUTION_Y),3),3 );
-    }
-
-
-  if ( last_time_of_right_operation != VisCortx_GetVideoRegisterData(LAST_RIGHT_OPERATION,0) )
-    {
-         last_time_of_right_operation= VisCortx_GetVideoRegisterData(LAST_RIGHT_OPERATION,0);
-         PassVideoRegisterToFeed ( 3 , VisCortx_ReadFromVideoRegister(LAST_RIGHT_OPERATION,GetCortexMetric(RESOLUTION_X),GetCortexMetric(RESOLUTION_Y),3),3 );
-    } else
-    if ( last_time_of_right_depth_map != VisCortx_GetVideoRegisterData(DEPTH_RIGHT_VIDEO,0) )
-    {
-         last_time_of_right_depth_map= VisCortx_GetVideoRegisterData(DEPTH_RIGHT_VIDEO,0);
-         PassVideoRegisterToFeed ( 3 , VisCortx_ReadFromVideoRegister(DEPTH_RIGHT_VIDEO,GetCortexMetric(RESOLUTION_X),GetCortexMetric(RESOLUTION_Y),3),3 );
-    }
-
-
-*/
-
-  return 1 ;
-}
 
 
 inline wxString _U(const char String[] = "")

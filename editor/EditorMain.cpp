@@ -11,10 +11,17 @@
 #include "FeedScreenMemory.h"
 #include <wx/msgdlg.h>
 
+#include "../acquisition/Acquisition.h"
+
+ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
+
+
 //(*InternalHeaders(EditorFrame)
 #include <wx/string.h>
 #include <wx/intl.h>
 //*)
+
+
 
 //helper functions
 enum wxbuildinfoformat {
@@ -57,6 +64,7 @@ const long EditorFrame::ID_MENUITEM1 = wxNewId();
 const long EditorFrame::idMenuQuit = wxNewId();
 const long EditorFrame::idMenuAbout = wxNewId();
 const long EditorFrame::ID_STATUSBAR1 = wxNewId();
+const long EditorFrame::ID_TIMER1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(EditorFrame,wxFrame)
@@ -109,9 +117,12 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Status->SetFieldsCount(1,__wxStatusBarWidths_1);
     Status->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(Status);
+    Timer.SetOwner(this, ID_TIMER1);
+    Timer.Start(1000, false);
 
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
+    Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
     //*)
 
     initFeeds();
@@ -128,6 +139,32 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
 
     feed_3_x=feed_1_x;
     feed_3_y=feed_2_y;
+
+
+
+
+   if (!acquisitionIsModuleLinked(moduleID))
+    {
+        fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
+        //return 1;
+    }
+
+   //We need to initialize our module before calling any related calls to the specific module..
+   if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
+   {
+       fprintf(stderr,"Could not start module %s ..\n",getModuleStringName(moduleID));
+       //return 1;
+    }
+
+   //We want to initialize all possible devices in this example..
+   unsigned int devID=0,maxDevID=acquisitionGetModuleDevices(moduleID);
+   if (maxDevID==0)
+   {
+      fprintf(stderr,"No devices found for Module used \n");
+     // return 1;
+   }
+
+   acquisitionOpenDevice(moduleID,devID,"test",640,480,25);
 }
 
 EditorFrame::~EditorFrame()
@@ -154,6 +191,20 @@ void EditorFrame::OnAbout(wxCommandEvent& event)
 void EditorFrame::OnPaint(wxPaintEvent& event)
 {
     wxPaintDC dc(this); // OnPaint events should always create a wxPaintDC
+
+  unsigned int devID=0;
+  unsigned int width , height , channels , bitsperpixel;
+
+
+  //DRAW RGB FRAME -------------------------------------------------------------------------------------
+  acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+  passVideoRegisterToFeed(0,acquisitionGetColorFrame(moduleID,devID),width,height,bitsperpixel,channels);
+//    ++tick_count;
+
+  //DRAW RGB FRAME -------------------------------------------------------------------------------------
+  acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+ // passVideoRegisterToFeed(0,acquisitionGetDepthFrame(moduleID,devID),width,height,bitsperpixel,channels);
+//    ++tick_count;
 
     dc.DrawBitmap(*live_feeds[0].bmp,feed_0_x,feed_0_y,0); //FEED 1
     dc.DrawBitmap(*live_feeds[1].bmp,feed_1_x,feed_1_y,0); //FEED 2
@@ -225,16 +276,22 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 }
 
 
-/*
 void EditorFrame::OnTimer(wxTimerEvent& event)
 {
+  /*
    if ( SnapWebCams() == 1 ) { } else
                              { return; }
 
+*/
+}
 
+void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
+{
+  unsigned int devID=0;
+  acquisitionSnapFrames(moduleID,devID);
 
-    ++tick_count;
 
   Refresh(); // <- This draws the window!
- // RedrawWindow();
-}*/
+//  RedrawWindow();
+
+}

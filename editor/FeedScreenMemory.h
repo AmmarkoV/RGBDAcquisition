@@ -25,4 +25,5 @@ extern int VideoFeedsNotAccessible;
 void initFeeds();
 void closeFeeds();
 
+void passVideoRegisterToFeed(unsigned int feednum,void * framedata,unsigned int width , unsigned int height , unsigned int bitsperpixel , unsigned int channels);
 #endif // FEEDSCREENMEMORY_H_INCLUDED

@@ -2,12 +2,14 @@
 #define V4L2STEREOACQUISITION_H_INCLUDED
 
 
-#include "../acquisition/acquisition_setup.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+   #include "../acquisition/acquisition_setup.h"
+
    //Initialization of V4L2
    int startV4L2StereoModule(unsigned int max_devs,char * settings);
 

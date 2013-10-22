@@ -23,7 +23,7 @@
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
 
-#define BUILD_NETWORK 1
+//#define BUILD_NETWORK 1
 
 #if BUILD_NETWORK
 

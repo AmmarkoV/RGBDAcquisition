@@ -47,7 +47,11 @@ ln -s ../acquisitionBroadcast/AmmarServer/public_html
  
 ../3dparty/link_to_libs.sh ../3dparty/
 
-cd ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/
+cd ..
+#At root dir
+ln -s grabber/frames grabbed_frames
+
+cd opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/
 ln -s ../../libOpenGLAcquisition.so
 
 

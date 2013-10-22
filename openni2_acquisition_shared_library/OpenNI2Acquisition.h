@@ -1,12 +1,13 @@
 #ifndef OPENNI2ACQUISITION_H_INCLUDED
 #define OPENNI2ACQUISITION_H_INCLUDED
 
-#include "../acquisition/acquisition_setup.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+   #include "../acquisition/acquisition_setup.h"
 
    //Initialization of OpenNI2
    int startOpenNI2Module(unsigned int max_devs);

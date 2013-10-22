@@ -18,6 +18,7 @@
 #include <wx/frame.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/timer.h>
 //*)
 
 class EditorFrame: public wxFrame
@@ -37,6 +38,7 @@ class EditorFrame: public wxFrame
         //(*Handlers(EditorFrame)
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
+        void OnTimerTrigger(wxTimerEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -54,6 +56,7 @@ class EditorFrame: public wxFrame
         static const long idMenuQuit;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
+        static const long ID_TIMER1;
         //*)
 
         //(*Declarations(EditorFrame)
@@ -70,11 +73,13 @@ class EditorFrame: public wxFrame
         wxMenu* Menu4;
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;
+        wxTimer Timer;
         //*)
 
 
         void OnPaint(wxPaintEvent& event);
         void OnMotion(wxMouseEvent& event);
+        void OnTimer(wxTimerEvent& event);
 
         DECLARE_EVENT_TABLE()
 };

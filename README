@@ -4,14 +4,27 @@ If you want to download OpenNI , OpenNI2 , LibFreenect , please issue
 cd 3dparty && ./get_third_party_libs.sh
 
 
-One very basic thing about setting up what you want is the acquisition/acquisition_setup.h file..
-It controls what modules get linked during the compilation in order to keep your dependencies at a minimum..  Of course you will need the appropriate 3dparty libs if you enable a module that uses them.. 
+To compile the library issue :
 
-To compile the library issue 
+make 
 
+Due to making things that require OpenNI , OpenNI2 , libFreenect , OpenGL , OpenCV and other stuff by just issuing the make script will stop in the first failure. 
+If you want specific things just type make <tab> and see the specifics that you need 
+for example one might only need the grabber , template module and the acquisition plugin so he could just run 
+
+make grabber_grabber  acquisition_acquisition template_acquisition_shared_library_templateacquisition 
+
+And this way skip everything else that is irrelevant to him.. 
+
+Another way to deal with missing dependencies is through the acquisition/acquisition_setup.h file which can deactivate compilation of certain modules..
+
+
+
+To compile the tools issue :
+cd tools 
 make
-there also exists a bash script called
-./make.sh , you could use it if you run into problems
+
+as said above if you dont have OpenCV you might not be able to build all of them
 
 
 The project is divided in libraries applications and tools
@@ -22,11 +35,14 @@ a Muxer   , which can combine 2 frame streams in to a new one and save it to dis
 a Broadcaster , which can transmit a stream through HTTP protocol
 a Viewer   , which can view a stream
 a Segmenter , which can discard or label parts of a stream
+an Editor , which is quite experimental and doesnt do anything for now ;P
 
 Tools include :
 Intrinsic / Extrinsic calibration using opencv
+Convertors from/to Euler/Quaternions
 Undistorting images ( intrinsic )
 Converting from 16bit PNG depths to PNM
+Calibrating a camera intrinsics/extrinsics using OpenCV 
 
 Libraries include :
 V4L2 acquisition
@@ -54,6 +70,7 @@ OPENGL
 V4L2 
 V4L2STEREO 
 TEMPLATE 
+NETWORK <- not working 
  
 
 ----------------------------
@@ -68,12 +85,5 @@ wget -qO- http://127.0.0.1:8080/control.html?seek=10
 ----------------------------
 
 
-Without beeing 100% certain OpenNI installed via ROS may conflict with it being downloaded as a standalone package
-If you install sudo apt-get install ros-groovy-openni-camera ros-groovy-openni-launch  
-If you want to use it you should initiate :
-
-roscore 
-roslaunch openni_launch openni.launch &
-rosrun rqt_reconfigure rqt_reconfigure 
-
-After this OpenNI should be operational
+Without beeing 100% certain OpenNI installed via ROS may conflict with it being downloaded as a standalone package , there is a script that starts it the ROS way , so if thats your case just run scripts/ROS_StartCamera.sh and then you can start using OpenNI with no problems!
+ 

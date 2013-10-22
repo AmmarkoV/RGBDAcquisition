@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/Editor" prefix_auto="1" extension_auto="1" />
+				<Option output="Editor" prefix_auto="0" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -17,7 +17,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/Editor" prefix_auto="1" extension_auto="1" />
+				<Option output="Editor" prefix_auto="0" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -41,6 +41,8 @@
 		<Unit filename="EditorApp.h" />
 		<Unit filename="EditorMain.cpp" />
 		<Unit filename="EditorMain.h" />
+		<Unit filename="FeedScreenMemory.cpp" />
+		<Unit filename="FeedScreenMemory.h" />
 		<Unit filename="wxsmith/Editorframe.wxs" />
 		<Extensions>
 			<envvars />

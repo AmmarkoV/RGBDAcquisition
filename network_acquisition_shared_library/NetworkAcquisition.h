@@ -1,10 +1,6 @@
 #ifndef NETWORKACQUISITION_H_INCLUDED
 #define NETWORKACQUISITION_H_INCLUDED
 
-//#include "../acquisition/acquisition_setup.h"
-//NetworkAcquisition does not conflict with anything so we default to building it
-#define BUILD_NETWORK 1
-
 #define USE_CALIBRATION 1
 
 #if USE_CALIBRATION
@@ -16,6 +12,7 @@ extern "C"
 {
 #endif
 
+#include "../acquisition/acquisition_setup.h"
 
 #define MAX_NETWORK_DEVICES 5
 

@@ -1,12 +1,13 @@
 #ifndef FREENECTACQUISITION_H_INCLUDED
 #define FREENECTACQUISITION_H_INCLUDED
 
-#include "../acquisition/acquisition_setup.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+#include "../acquisition/acquisition_setup.h"
 
 int startFreenectModule(unsigned int max_devs,char * settings);
 
