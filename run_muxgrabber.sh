@@ -1,4 +1,5 @@
 #!/bin/bash
+STARTDIR=`pwd`
 BIN="GrabberMux"
 DIR="grabber_mux"
 ORIGINALDIRBIN="../$DIR/$BIN"

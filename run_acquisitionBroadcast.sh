@@ -1,4 +1,5 @@
 #!/bin/bash
+STARTDIR=`pwd`
 BIN="acquisitionBroadcast"
 DIR="acquisitionBroadcast"
 ORIGINALDIRBIN="../$DIR/$BIN"

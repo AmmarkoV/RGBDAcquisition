@@ -3,6 +3,8 @@
 #include <math.h>
 
 #define PI 3.14159265359
+#define _PIDiv180 (PI/180.0)
+#define _180DivPI (180.0/PI)
 
 void euler2Quaternions(double * euler, double * quaternions)
 {
@@ -12,27 +14,26 @@ void euler2Quaternions(double * euler, double * quaternions)
 
   double top , bottom ;
 
-  double piDiv180=PI/180;
   //Calculating Quaternion 0
-  quaternions[0] = sqrt(cos(e2*piDiv180)*cos(e1*piDiv180)+cos(e2*piDiv180)*cos(e3*piDiv180)-sin(e2*piDiv180)*sin(e1*piDiv180)*sin(e3*piDiv180)+cos(e1*piDiv180)* cos(e3*piDiv180)+1)/2;
+  quaternions[0] = sqrt(cos(e2*_PIDiv180)*cos(e1*_PIDiv180)+cos(e2*_PIDiv180)*cos(e3*_PIDiv180)-sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e1*_PIDiv180)* cos(e3*_PIDiv180)+1)/2;
 
 
   //Calculating Quaternion 1
-  top = (cos(e1*piDiv180)*sin(e3*piDiv180)+cos(e2*piDiv180)*sin(e3*piDiv180)+sin(e2*piDiv180)*sin(e1*piDiv180)*cos(e3*piDiv180));
-  bottom = sqrt(cos(e2*piDiv180)* cos(e1*piDiv180)+cos(e2*piDiv180)*cos(e3*piDiv180)-sin(e2*piDiv180)*sin(e1*piDiv180)*sin(e3*piDiv180)+cos(e1*piDiv180)*cos(e3*piDiv180)+1);
+  top = (cos(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e2*_PIDiv180)*sin(e3*_PIDiv180)+sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*cos(e3*_PIDiv180));
+  bottom = sqrt(cos(e2*_PIDiv180)* cos(e1*_PIDiv180)+cos(e2*_PIDiv180)*cos(e3*_PIDiv180)-sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e1*_PIDiv180)*cos(e3*_PIDiv180)+1);
   if (bottom == 0.0 ) { fprintf(stderr,"Error , we get a division by zero for quaternion 1\nhttp://en.wikipedia.org/wiki/Gimbal_lock\n"); }
   quaternions[1] = (top/bottom)/2;
 
 
   //Calculating Quaternion 2
-  top = (sin(e2*piDiv180)*sin(e3*piDiv180)-cos(e2*piDiv180)*sin(e1*piDiv180)*cos(e3*piDiv180)-sin(e1*piDiv180));
-  bottom = sqrt(cos(e2*piDiv180)*cos(e1*piDiv180)+ cos(e2*piDiv180)*cos(e3*piDiv180)-sin(e2*piDiv180)*sin(e1*piDiv180)*sin(e3*piDiv180)+cos(e1*piDiv180)*cos(e3*piDiv180)+1);
+  top = (sin(e2*_PIDiv180)*sin(e3*_PIDiv180)-cos(e2*_PIDiv180)*sin(e1*_PIDiv180)*cos(e3*_PIDiv180)-sin(e1*_PIDiv180));
+  bottom = sqrt(cos(e2*_PIDiv180)*cos(e1*_PIDiv180)+ cos(e2*_PIDiv180)*cos(e3*_PIDiv180)-sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e1*_PIDiv180)*cos(e3*_PIDiv180)+1);
   if (bottom == 0.0 ) { fprintf(stderr,"Error , we get a division by zero for quaternion 2\nhttp://en.wikipedia.org/wiki/Gimbal_lock\n"); }
   quaternions[2] = (top/bottom)/2;
 
   //Calculating Quaternion 2
-  top = (sin(e2*piDiv180)*cos(e1*piDiv180)+sin(e2*piDiv180)*cos(e3*piDiv180)+cos(e2*piDiv180)*sin(e1*piDiv180)*sin(e3*piDiv180));
-  bottom = sqrt(cos(e2*piDiv180)* cos(e1*piDiv180)+cos(e2*piDiv180)*cos(e3*piDiv180)-sin(e2*piDiv180)*sin(e1*piDiv180)*sin(e3*piDiv180)+cos(e1*piDiv180)*cos(e3*piDiv180)+1);
+  top = (sin(e2*_PIDiv180)*cos(e1*_PIDiv180)+sin(e2*_PIDiv180)*cos(e3*_PIDiv180)+cos(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180));
+  bottom = sqrt(cos(e2*_PIDiv180)* cos(e1*_PIDiv180)+cos(e2*_PIDiv180)*cos(e3*_PIDiv180)-sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e1*_PIDiv180)*cos(e3*_PIDiv180)+1);
   quaternions[3] = (top/bottom)/2;
   if (bottom == 0.0 ) { fprintf(stderr,"Error , we get a division by zero for quaternion 2\nhttp://en.wikipedia.org/wiki/Gimbal_lock\n"); }
 

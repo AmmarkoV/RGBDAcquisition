@@ -1,4 +1,5 @@
 #!/bin/bash
+STARTDIR=`pwd`
 BIN="GrabberSegment"
 DIR="grabber_segment"
 ORIGINALDIRBIN="../$DIR/$BIN"

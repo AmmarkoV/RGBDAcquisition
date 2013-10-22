@@ -16,5 +16,9 @@ then
  cd ..
 fi
 
+#Seperate makefile for testing editor
+cd editor
+cbp2make -in Editor.cbp -unix -out makefile
+cd ..
 
 exit 0

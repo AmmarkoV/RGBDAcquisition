@@ -1,4 +1,5 @@
 #!/bin/bash
+STARTDIR=`pwd`
 BIN="Viewer"
 DIR="viewer"
 ORIGINALDIRBIN="../$DIR/$BIN"

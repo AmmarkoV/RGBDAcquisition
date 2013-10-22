@@ -36,8 +36,8 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
-			<Add directory="/home/ammar/Documents/Programming/input_acquisition/3dparty/libfreenect/include" />
-			<Add directory="/home/ammar/Documents/Programming/input_acquisition/3dparty/libfreenect/wrappers/c_sync" />
+			<Add directory="../3dparty/libfreenect/include" />
+			<Add directory="../3dparty/libfreenect/wrappers/c_sync" />
 		</Compiler>
 		<Linker>
 			<Add library="../3dparty/libfreenect/build/lib/libfreenect.so" />

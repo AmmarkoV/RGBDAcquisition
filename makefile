@@ -6,13 +6,37 @@
 WRKDIR = `pwd`
 MAKE = make
 
-all: network_acquisition_shared_library_networkacquisition viewer_viewer grabber_grabber grabber_segment_grabbersegment grabber_mux_grabbermux acquisitionbroadcast_acquisitionbroadcast acquisitionsegment_acquisitionsegment acquisition_mux_acquisitionmux acquisition_acquisition tools_timers_timers v4l2stereo_acquisition_shared_library_v4l2stereoacquisition v4l2_acquisition_shared_library_v4l2acquisition template_acquisition_shared_library_templateacquisition opengl_acquisition_shared_library_openglacquisition openni1_acquisition_shared_library_openni1acquisition openni2_acquisition_shared_library_openni2aquisition libfreenect_acquisition_shared_library_freenectacquisition tools_calibration_calibrationlibrary
+all: viewer_viewer template_acquisition_shared_library_templateacquisition network_acquisition_shared_library_networkacquisition v4l2stereo_acquisition_shared_library_v4l2stereoacquisition v4l2_acquisition_shared_library_v4l2acquisition openni1_acquisition_shared_library_openni1acquisition openni2_acquisition_shared_library_openni2aquisition libfreenect_acquisition_shared_library_freenectacquisition opengl_acquisition_shared_library_openglacquisition tools_timers_timers grabber_grabber grabber_segment_grabbersegment grabber_mux_grabbermux acquisitionbroadcast_acquisitionbroadcast acquisitionsegment_acquisitionsegment acquisition_mux_acquisitionmux acquisition_acquisition tools_calibration_calibrationlibrary
+
+viewer_viewer: 
+	$(MAKE) -C viewer all -f Viewer.cbp.mak
+
+template_acquisition_shared_library_templateacquisition: 
+	$(MAKE) -C template_acquisition_shared_library all -f TemplateAcquisition.cbp.mak
 
 network_acquisition_shared_library_networkacquisition: 
 	$(MAKE) -C network_acquisition_shared_library all -f NetworkAcquisition.cbp.mak
 
-viewer_viewer: 
-	$(MAKE) -C viewer all -f Viewer.cbp.mak
+v4l2stereo_acquisition_shared_library_v4l2stereoacquisition: 
+	$(MAKE) -C v4l2stereo_acquisition_shared_library all -f V4L2StereoAcquisition.cbp.mak
+
+v4l2_acquisition_shared_library_v4l2acquisition: 
+	$(MAKE) -C v4l2_acquisition_shared_library all -f V4L2Acquisition.cbp.mak
+
+openni1_acquisition_shared_library_openni1acquisition: 
+	$(MAKE) -C openni1_acquisition_shared_library all -f OpenNI1Acquisition.cbp.mak
+
+openni2_acquisition_shared_library_openni2aquisition: 
+	$(MAKE) -C openni2_acquisition_shared_library all -f OpenNI2Aquisition.cbp.mak
+
+libfreenect_acquisition_shared_library_freenectacquisition: 
+	$(MAKE) -C libfreenect_acquisition_shared_library all -f FreenectAcquisition.cbp.mak
+
+opengl_acquisition_shared_library_openglacquisition: 
+	$(MAKE) -C opengl_acquisition_shared_library all -f OpenGLAcquisition.cbp.mak
+
+tools_timers_timers: 
+	$(MAKE) -C tools/Timers all -f Timers.cbp.mak
 
 grabber_grabber: 
 	$(MAKE) -C grabber all -f Grabber.cbp.mak
@@ -35,40 +59,40 @@ acquisition_mux_acquisitionmux:
 acquisition_acquisition: 
 	$(MAKE) -C acquisition all -f Acquisition.cbp.mak
 
-tools_timers_timers: 
-	$(MAKE) -C tools/Timers all -f Timers.cbp.mak
-
-v4l2stereo_acquisition_shared_library_v4l2stereoacquisition: 
-	$(MAKE) -C v4l2stereo_acquisition_shared_library all -f V4L2StereoAcquisition.cbp.mak
-
-v4l2_acquisition_shared_library_v4l2acquisition: 
-	$(MAKE) -C v4l2_acquisition_shared_library all -f V4L2Acquisition.cbp.mak
-
-template_acquisition_shared_library_templateacquisition: 
-	$(MAKE) -C template_acquisition_shared_library all -f TemplateAcquisition.cbp.mak
-
-opengl_acquisition_shared_library_openglacquisition: 
-	$(MAKE) -C opengl_acquisition_shared_library all -f OpenGLAcquisition.cbp.mak
-
-openni1_acquisition_shared_library_openni1acquisition: 
-	$(MAKE) -C openni1_acquisition_shared_library all -f OpenNI1Acquisition.cbp.mak
-
-openni2_acquisition_shared_library_openni2aquisition: 
-	$(MAKE) -C openni2_acquisition_shared_library all -f OpenNI2Aquisition.cbp.mak
-
-libfreenect_acquisition_shared_library_freenectacquisition: 
-	$(MAKE) -C libfreenect_acquisition_shared_library all -f FreenectAcquisition.cbp.mak
-
 tools_calibration_calibrationlibrary: 
 	$(MAKE) -C tools/Calibration all -f CalibrationLibrary.cbp.mak
 
-clean: clean_network_acquisition_shared_library_networkacquisition clean_viewer_viewer clean_grabber_grabber clean_grabber_segment_grabbersegment clean_grabber_mux_grabbermux clean_acquisitionbroadcast_acquisitionbroadcast clean_acquisitionsegment_acquisitionsegment clean_acquisition_mux_acquisitionmux clean_acquisition_acquisition clean_tools_timers_timers clean_v4l2stereo_acquisition_shared_library_v4l2stereoacquisition clean_v4l2_acquisition_shared_library_v4l2acquisition clean_template_acquisition_shared_library_templateacquisition clean_opengl_acquisition_shared_library_openglacquisition clean_openni1_acquisition_shared_library_openni1acquisition clean_openni2_acquisition_shared_library_openni2aquisition clean_libfreenect_acquisition_shared_library_freenectacquisition clean_tools_calibration_calibrationlibrary
+clean: clean_viewer_viewer clean_template_acquisition_shared_library_templateacquisition clean_network_acquisition_shared_library_networkacquisition clean_v4l2stereo_acquisition_shared_library_v4l2stereoacquisition clean_v4l2_acquisition_shared_library_v4l2acquisition clean_openni1_acquisition_shared_library_openni1acquisition clean_openni2_acquisition_shared_library_openni2aquisition clean_libfreenect_acquisition_shared_library_freenectacquisition clean_opengl_acquisition_shared_library_openglacquisition clean_tools_timers_timers clean_grabber_grabber clean_grabber_segment_grabbersegment clean_grabber_mux_grabbermux clean_acquisitionbroadcast_acquisitionbroadcast clean_acquisitionsegment_acquisitionsegment clean_acquisition_mux_acquisitionmux clean_acquisition_acquisition clean_tools_calibration_calibrationlibrary
+
+clean_viewer_viewer: 
+	$(MAKE) -C viewer clean -f Viewer.cbp.mak
+
+clean_template_acquisition_shared_library_templateacquisition: 
+	$(MAKE) -C template_acquisition_shared_library clean -f TemplateAcquisition.cbp.mak
 
 clean_network_acquisition_shared_library_networkacquisition: 
 	$(MAKE) -C network_acquisition_shared_library clean -f NetworkAcquisition.cbp.mak
 
-clean_viewer_viewer: 
-	$(MAKE) -C viewer clean -f Viewer.cbp.mak
+clean_v4l2stereo_acquisition_shared_library_v4l2stereoacquisition: 
+	$(MAKE) -C v4l2stereo_acquisition_shared_library clean -f V4L2StereoAcquisition.cbp.mak
+
+clean_v4l2_acquisition_shared_library_v4l2acquisition: 
+	$(MAKE) -C v4l2_acquisition_shared_library clean -f V4L2Acquisition.cbp.mak
+
+clean_openni1_acquisition_shared_library_openni1acquisition: 
+	$(MAKE) -C openni1_acquisition_shared_library clean -f OpenNI1Acquisition.cbp.mak
+
+clean_openni2_acquisition_shared_library_openni2aquisition: 
+	$(MAKE) -C openni2_acquisition_shared_library clean -f OpenNI2Aquisition.cbp.mak
+
+clean_libfreenect_acquisition_shared_library_freenectacquisition: 
+	$(MAKE) -C libfreenect_acquisition_shared_library clean -f FreenectAcquisition.cbp.mak
+
+clean_opengl_acquisition_shared_library_openglacquisition: 
+	$(MAKE) -C opengl_acquisition_shared_library clean -f OpenGLAcquisition.cbp.mak
+
+clean_tools_timers_timers: 
+	$(MAKE) -C tools/Timers clean -f Timers.cbp.mak
 
 clean_grabber_grabber: 
 	$(MAKE) -C grabber clean -f Grabber.cbp.mak
@@ -91,32 +115,8 @@ clean_acquisition_mux_acquisitionmux:
 clean_acquisition_acquisition: 
 	$(MAKE) -C acquisition clean -f Acquisition.cbp.mak
 
-clean_tools_timers_timers: 
-	$(MAKE) -C tools/Timers clean -f Timers.cbp.mak
-
-clean_v4l2stereo_acquisition_shared_library_v4l2stereoacquisition: 
-	$(MAKE) -C v4l2stereo_acquisition_shared_library clean -f V4L2StereoAcquisition.cbp.mak
-
-clean_v4l2_acquisition_shared_library_v4l2acquisition: 
-	$(MAKE) -C v4l2_acquisition_shared_library clean -f V4L2Acquisition.cbp.mak
-
-clean_template_acquisition_shared_library_templateacquisition: 
-	$(MAKE) -C template_acquisition_shared_library clean -f TemplateAcquisition.cbp.mak
-
-clean_opengl_acquisition_shared_library_openglacquisition: 
-	$(MAKE) -C opengl_acquisition_shared_library clean -f OpenGLAcquisition.cbp.mak
-
-clean_openni1_acquisition_shared_library_openni1acquisition: 
-	$(MAKE) -C openni1_acquisition_shared_library clean -f OpenNI1Acquisition.cbp.mak
-
-clean_openni2_acquisition_shared_library_openni2aquisition: 
-	$(MAKE) -C openni2_acquisition_shared_library clean -f OpenNI2Aquisition.cbp.mak
-
-clean_libfreenect_acquisition_shared_library_freenectacquisition: 
-	$(MAKE) -C libfreenect_acquisition_shared_library clean -f FreenectAcquisition.cbp.mak
-
 clean_tools_calibration_calibrationlibrary: 
 	$(MAKE) -C tools/Calibration clean -f CalibrationLibrary.cbp.mak
 
-.PHONY: clean_network_acquisition_shared_library_networkacquisition clean_viewer_viewer clean_grabber_grabber clean_grabber_segment_grabbersegment clean_grabber_mux_grabbermux clean_acquisitionbroadcast_acquisitionbroadcast clean_acquisitionsegment_acquisitionsegment clean_acquisition_mux_acquisitionmux clean_acquisition_acquisition clean_tools_timers_timers clean_v4l2stereo_acquisition_shared_library_v4l2stereoacquisition clean_v4l2_acquisition_shared_library_v4l2acquisition clean_template_acquisition_shared_library_templateacquisition clean_opengl_acquisition_shared_library_openglacquisition clean_openni1_acquisition_shared_library_openni1acquisition clean_openni2_acquisition_shared_library_openni2aquisition clean_libfreenect_acquisition_shared_library_freenectacquisition clean_tools_calibration_calibrationlibrary
+.PHONY: clean_viewer_viewer clean_template_acquisition_shared_library_templateacquisition clean_network_acquisition_shared_library_networkacquisition clean_v4l2stereo_acquisition_shared_library_v4l2stereoacquisition clean_v4l2_acquisition_shared_library_v4l2acquisition clean_openni1_acquisition_shared_library_openni1acquisition clean_openni2_acquisition_shared_library_openni2aquisition clean_libfreenect_acquisition_shared_library_freenectacquisition clean_opengl_acquisition_shared_library_openglacquisition clean_tools_timers_timers clean_grabber_grabber clean_grabber_segment_grabbersegment clean_grabber_mux_grabbermux clean_acquisitionbroadcast_acquisitionbroadcast clean_acquisitionsegment_acquisitionsegment clean_acquisition_mux_acquisitionmux clean_acquisition_acquisition clean_tools_calibration_calibrationlibrary
 

@@ -36,7 +36,7 @@ struct TemplateVirtualDevice
  unsigned long lastColorTimestamp;
  char * templateColorFrame;
  unsigned long lastDepthTimestamp;
- short * templateDepthFrame;
+ unsigned short * templateDepthFrame;
 
  struct calibration calibRGB;
  struct calibration calibDepth;
@@ -177,13 +177,13 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height,unsigned
 
 
 
-short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
+unsigned short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     #if PRINT_DEBUG_EACH_CALL
      fprintf(stderr,"TemplateAcquisition : Reading file %s \n",filename);
     #endif // PRINT_DEBUG_EACH_CALL
 
-    short * pixels=0;
+    unsigned short * pixels=0;
     FILE *pf=0;
     pf = fopen(filename,"rb");
 
@@ -223,11 +223,11 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsign
 
         *width=w;
         *height=h;
-        pixels= (short*) malloc(w*h*sizeof(short)); /*Only 1 channel in depth images 3*/
+        pixels= (unsigned short*) malloc(w*h*sizeof(unsigned short)); /*Only 1 channel in depth images 3*/
 
         if ( pixels != 0 )
         {
-          size_t rd = fread(pixels,sizeof(short), w*h, pf);
+          size_t rd = fread(pixels,sizeof(unsigned short), w*h, pf);
           if (rd < w*h) { fprintf(stderr,"Note : Incomplete read while reading file %s (%u instead of %u)\n",filename,(unsigned int) rd,w*h);  }
 
           fclose(pf);
@@ -250,9 +250,9 @@ short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsign
 int flipDepth(unsigned short * depth,unsigned int width , unsigned int height )
 {
   unsigned char tmp ;
-  unsigned char * depthPtr=depth;
-  unsigned char * depthPtrNext=depth+1;
-  unsigned char * depthPtrLimit =  depth + width * height * 2 ;
+  unsigned char * depthPtr=(unsigned char *) depth;
+  unsigned char * depthPtrNext=(unsigned char *) depth+1;
+  unsigned char * depthPtrLimit =(unsigned char *) depth + width * height * 2 ;
   while ( depthPtr < depthPtrLimit )
   {
      tmp=*depthPtr;
@@ -337,14 +337,14 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
 
   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
-  short * tmpDepth = ReadPPMD(file_name_test,&widthInternal,&heightInternal, &timestampInternal);
+  unsigned short * tmpDepth = ReadPPMD(file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
   if (tmpDepth!=0) { device[devID].templateDepthFrame=tmpDepth; } else
   {
    // if templateDepthFrame is zero the next function behaves like a malloc
-   device[devID].templateDepthFrame= (short*) realloc(device[devID].templateDepthFrame,device[devID].templateWIDTH*device[devID].templateHEIGHT*1*sizeof(short));
+   device[devID].templateDepthFrame= (unsigned short*) realloc(device[devID].templateDepthFrame,device[devID].templateWIDTH*device[devID].templateHEIGHT*1*sizeof(unsigned short));
   }
 
   NullCalibration(device[devID].templateWIDTH,device[devID].templateHEIGHT,&device[devID].calibRGB);
