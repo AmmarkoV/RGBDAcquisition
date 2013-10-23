@@ -42,6 +42,7 @@
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="currentFrameTextCtrl" member="yes">
 			<value>0</value>
 			<pos>392,504</pos>
+			<style>wxTE_PROCESS_ENTER</style>
 			<handler function="OncurrentFrameTextCtrlText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT2" variable="dashForFramesRemainingLabel" member="yes">

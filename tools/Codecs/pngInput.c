@@ -202,7 +202,12 @@ png_init_io(png_ptr, fp);
 /* write header */
 if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during writing header"); return 0; }
 
-png_set_IHDR(png_ptr, info_ptr, pic->width,pic->height,8,PNG_COLOR_TYPE_RGB , PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+int i = PNG_COLOR_TYPE_RGB;
+if (pic->channels==1) { i=PNG_COLOR_TYPE_GRAY; }
+
+
+png_set_IHDR(png_ptr, info_ptr, pic->width,pic->height,pic->bitsperpixel,i , PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 png_write_info(png_ptr, info_ptr);
 
 
@@ -216,7 +221,7 @@ unsigned int y;
 for (y=0; y<pic->height; y++)
  {
    row_pointers[y] = (png_byte*) raw_pixels;
-   raw_pixels+=3*pic->width;
+   raw_pixels+=pic->channels*(pic->bitsperpixel/8)*pic->width;
  }
 
  png_write_image(png_ptr,row_pointers);

@@ -32,7 +32,20 @@ int ReadPPM(char * filename,struct Image * pic,char read_only_header)
         int r=0;
 
         t = fgets(buf, PPMREADBUFLEN, pf);
-        if ( (t == 0) || ( strncmp(buf, "P6\n", 3) != 0 ) ) { fclose(pf); return 0; }
+        if (t == 0) { fclose(pf); return 0; }
+
+        if ( strncmp(buf, "P5\n", 3)  != 0 )
+        {
+           fprintf(stderr,"Grayscale\n");
+           pic->channels=3;
+        } else
+        if ( strncmp(buf, "P6\n", 3)  != 0 )
+        {
+           fprintf(stderr,"RGB\n");
+           pic->channels=1;
+        } else
+        { fclose(pf); return 0; }
+
         do
         { /* Px formats can have # comments after first line */
            t = fgets(buf, PPMREADBUFLEN, pf);
@@ -43,26 +56,31 @@ int ReadPPM(char * filename,struct Image * pic,char read_only_header)
         // The program fails if the first byte of the image is equal to 32. because
         // the fscanf eats the space and the image is read with some bit less
         r = fscanf(pf, "%u\n", &d);
-        if ( (r < 1) || ( d != 255 ) ) { fclose(pf); return 0; }
+        if ( (r < 1) /*|| ( d != 255 )*/ ) { fclose(pf); return 0; }
 
         pic->width=w;
         pic->height=h;
-        pic->channels=3;
         pic->bitsperpixel=8;
+
+        if ( d <= 255 ) { pic->bitsperpixel=8; } else
+        if ( d <= 65535 ) { pic->bitsperpixel=16; }
+
+        fprintf(stderr,"BitsPerPixel %u , Channels %u\n", pic->bitsperpixel,pic->channels);
+
 
         if (read_only_header) { fclose(pf); return 1; }
 
       #if READ_CREATES_A_NEW_PIXEL_BUFFER
-	    pic->pixels = (unsigned char * ) malloc(pic->height * pic->width * 3 * sizeof(char));
-	    pic->image_size = pic->height * pic->width * 3 * sizeof(char);
+	    pic->image_size = pic->height * pic->width * pic->channels * (pic->bitsperpixel/8);
+	    pic->pixels = (unsigned char * ) malloc(pic->image_size);
 	  #endif
 
 
         if ( pic->pixels != 0 )
         {
-            size_t rd = fread(pic->pixels,3, w*h, pf);
+            size_t rd = fread(pic->pixels,1, pic->image_size, pf);
             fclose(pf);
-            if ( rd < w*h )
+            if ( rd < pic->image_size )
             {
                return 0;
             }
@@ -72,6 +90,9 @@ int ReadPPM(char * filename,struct Image * pic,char read_only_header)
     }
   return 0;
 }
+
+
+
 
 int WritePPMOld(char * filename,struct Image * pic)
 {

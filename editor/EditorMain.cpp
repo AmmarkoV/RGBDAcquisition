@@ -17,6 +17,7 @@ ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MO
 unsigned int devID=0;
 
 int play=0;
+int lastFrameDrawn=12312312;
 
 //(*InternalHeaders(EditorFrame)
 #include <wx/string.h>
@@ -96,7 +97,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     buttonStop = new wxButton(this, ID_BUTTON3, _("Stop"), wxPoint(150,504), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     buttonNextFrame = new wxButton(this, ID_BUTTON4, _(">"), wxPoint(236,504), wxSize(56,27), 0, wxDefaultValidator, _T("ID_BUTTON4"));
     StaticTextJumpTo = new wxStaticText(this, ID_STATICTEXT1, _("Jump To : "), wxPoint(322,508), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(392,504), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(392,504), wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(474,508), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(484,508), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     MenuBar1 = new wxMenuBar();
@@ -132,6 +133,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
     //*)
 
+//
     initFeeds();
 
 
@@ -202,20 +204,33 @@ void EditorFrame::OnPaint(wxPaintEvent& event)
   unsigned int devID=0;
   unsigned int width , height , channels , bitsperpixel;
 
+  if (lastFrameDrawn!=acquisitionGetCurrentFrameNumber(moduleID,devID))
+  {
+   //DRAW RGB FRAME -------------------------------------------------------------------------------------
+   acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+   passVideoRegisterToFeed(0,acquisitionGetColorFrame(moduleID,devID),width,height,bitsperpixel,channels);
 
-  //DRAW RGB FRAME -------------------------------------------------------------------------------------
-  acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-  passVideoRegisterToFeed(0,acquisitionGetColorFrame(moduleID,devID),width,height,bitsperpixel,channels);
-
-  //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
-  acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+   //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
+   acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
 
 
-  char * rgb = convertShortDepthTo3CharDepth(acquisitionGetDepthFrame(moduleID,devID),width,height,0,2048);
-  //char * rgb = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
-  passVideoRegisterToFeed(1,rgb,width,height,8,3);
-  free(rgb);
+   char * rgb = convertShortDepthTo3CharDepth(acquisitionGetDepthFrame(moduleID,devID),width,height,0,2048);
+   //char * rgb = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
+   passVideoRegisterToFeed(1,rgb,width,height,8,3);
+   free(rgb);
 
+   lastFrameDrawn=acquisitionGetCurrentFrameNumber(moduleID,devID);
+
+
+   wxString currentFrame;
+   currentFrame.clear();
+   currentFrame<<lastFrameDrawn;
+   currentFrameTextCtrl->SetValue(currentFrame);
+
+   currentFrame.clear();
+   currentFrame<<acquisitionGetTotalFrameNumber(moduleID,devID);
+   totalFramesLabel->SetLabel(currentFrame);
+  }
 
   dc.DrawBitmap(*live_feeds[0].bmp,feed_0_x,feed_0_y,0); //FEED 1
   dc.DrawBitmap(*live_feeds[1].bmp,feed_1_x,feed_1_y,0); //FEED 2
@@ -298,14 +313,6 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
      acquisitionSnapFrames(moduleID,devID);
     }
 
-     wxString currentFrame;
-     currentFrame.clear();
-     currentFrame<<acquisitionGetCurrentFrameNumber(moduleID,devID);
-     currentFrameTextCtrl->SetValue(currentFrame);
-
-     currentFrame.clear();
-     currentFrame<<acquisitionGetTotalFrameNumber(moduleID,devID);
-     totalFramesLabel->SetLabel(currentFrame);
 
   Refresh(); // <- This draws the window!
 }

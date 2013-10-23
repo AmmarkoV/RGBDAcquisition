@@ -29,7 +29,7 @@ extern "C"
 
 #define USE_JPG_FILES 1
 #define USE_PNG_FILES 1
-#define USE_PPM_FILES 0
+#define USE_PPM_FILES 1
 
 
 #define READ_CREATES_A_NEW_PIXEL_BUFFER 1

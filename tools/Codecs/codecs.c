@@ -100,6 +100,17 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
     #endif
 
 
+     #if USE_PNG_FILES
+      case PNG_CODEC :
+       if (!WritePNG(filename,pic)) { free(pic); pic=0; }
+        #if DEBUG_READING_IMAGES
+	     char ppmfilename[512]={0};
+	     strcpy(ppmfilename,filename);
+	     strcat(ppmfilename,".png");
+	     WritePNG(ppmfilename,pic);
+	    #endif
+      break;
+     #endif
 
       default :
         break;

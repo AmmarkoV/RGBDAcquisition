@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="8492037-00_00005.png test.pnm" />
+				<Option parameters="depthFrame_0_00010.pnm  test.png" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

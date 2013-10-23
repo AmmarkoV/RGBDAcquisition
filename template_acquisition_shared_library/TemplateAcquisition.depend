@@ -1,1 +1,20 @@
 # depslib dependency file v1.0
+1382527874 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.cpp
+	<stdio.h>
+	<stdlib.h>
+	"TemplateAcquisition.h"
+	"../acquisition/Acquisition.h"
+	<string.h>
+	<math.h>
+
+1382527750 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.h
+	"../tools/Calibration/calibration.h"
+	"../acquisition/acquisition_setup.h"
+
+1381743453 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
+
+1381399368 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
+
+1382526460 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
+	"../tools/Calibration/calibration.h"
+
