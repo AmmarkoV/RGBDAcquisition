@@ -17,19 +17,23 @@
 			<label>&lt;</label>
 			<pos>8,504</pos>
 			<size>56,27</size>
+			<handler function="OnbuttonPreviousFrameClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON2" variable="buttonPlay" member="yes">
 			<label>Play</label>
 			<pos>64,504</pos>
+			<handler function="OnbuttonPlayClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON3" variable="buttonStop" member="yes">
 			<label>Stop</label>
 			<pos>150,504</pos>
+			<handler function="OnbuttonStopClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON4" variable="buttonNextFrame" member="yes">
 			<label>&gt;</label>
 			<pos>236,504</pos>
 			<size>56,27</size>
+			<handler function="OnbuttonNextFrameClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticTextJumpTo" member="yes">
 			<label>Jump To : </label>
@@ -38,6 +42,7 @@
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="currentFrameTextCtrl" member="yes">
 			<value>0</value>
 			<pos>392,504</pos>
+			<handler function="OncurrentFrameTextCtrlText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT2" variable="dashForFramesRemainingLabel" member="yes">
 			<label>/ </label>
@@ -79,7 +84,7 @@
 			<styles>wxSB_NORMAL</styles>
 		</object>
 		<object class="wxTimer" name="ID_TIMER1" variable="Timer" member="yes">
-			<interval>1000</interval>
+			<interval>100</interval>
 			<handler function="OnTimerTrigger" entry="EVT_TIMER" />
 		</object>
 	</object>

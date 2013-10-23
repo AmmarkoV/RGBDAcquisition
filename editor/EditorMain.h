@@ -39,6 +39,11 @@ class EditorFrame: public wxFrame
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
         void OnTimerTrigger(wxTimerEvent& event);
+        void OnbuttonPlayClick(wxCommandEvent& event);
+        void OnbuttonStopClick(wxCommandEvent& event);
+        void OnbuttonPreviousFrameClick(wxCommandEvent& event);
+        void OnbuttonNextFrameClick(wxCommandEvent& event);
+        void OncurrentFrameTextCtrlText(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -79,7 +84,6 @@ class EditorFrame: public wxFrame
 
         void OnPaint(wxPaintEvent& event);
         void OnMotion(wxMouseEvent& event);
-        void OnTimer(wxTimerEvent& event);
 
         DECLARE_EVENT_TABLE()
 };

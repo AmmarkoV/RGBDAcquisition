@@ -37,6 +37,12 @@ struct acquisitionPluginInterface
    unsigned long (*getLastDepthTimestamp) (int);
 
    int (*snapFrames) (int);
+
+
+   int (*getTotalFrameNumber)  (int);
+   int (*getCurrentFrameNumber)  (int);
+
+   int (*seekRelativeFrame)  (int,signed int);
    int (*seekFrame)  (int,unsigned int);
 
    int (*getColorWidth) (int);

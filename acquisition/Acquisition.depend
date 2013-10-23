@@ -1,27 +1,5 @@
 # depslib dependency file v1.0
-1381754344 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.c
-	"Acquisition.h"
-	"acquisition_setup.h"
-	"pluginLinker.h"
-	"../tools/Timers/timer.h"
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<unistd.h>
-
-1381525415 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
-	"../tools/Calibration/calibration.h"
-
-1381743453 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
-
-1381399368 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
-
-1381529418 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.h
-	"Acquisition.h"
-
-1381529697 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Timers/timer.h
-
-1381788606 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.c
+1382527706 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.c
 	"pluginLinker.h"
 	<stdio.h>
 	<stdlib.h>
@@ -29,4 +7,12 @@
 	<unistd.h>
 	<time.h>
 	<dlfcn.h>
+
+1382525688 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.h
+	"Acquisition.h"
+
+1382526460 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
+	"../tools/Calibration/calibration.h"
+
+1381743453 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
 

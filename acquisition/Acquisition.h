@@ -72,6 +72,7 @@ int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsi
 
 char * convertShortDepthToRGBDepth(short * depth,unsigned int width , unsigned int height);
 char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth);
+char * convertShortDepthTo3CharDepth(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth);
 
 ModuleIdentifier getModuleIdFromModuleName(char * moduleName);
 int acquisitionGetModulesCount();
@@ -84,7 +85,12 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID);
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
 int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
- int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame);
+int acquisitionGetTotalFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier devID);
+int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier devID);
+
+
+int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame);
+int acquisitionSeekRelativeFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,signed int seekFrame);
 int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 

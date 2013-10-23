@@ -12,10 +12,10 @@ LD = g++
 WINDRES = windres
 
 INC = 
-CFLAGS = `wx-config --cflags` -Wall
+CFLAGS = -Wall `wx-config --cflags`
 RESINC = 
 LIBDIR = 
-LIB = 
+LIB = ../acquisition/libAcquisition.so
 LDFLAGS = `wx-config --libs`
 
 INC_DEBUG = $(INC)
@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = bin/Debug/Editor
+OUT_DEBUG = Editor
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2
@@ -38,18 +38,17 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  -s $(LDFLAGS)
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = bin/Release/Editor
+OUT_RELEASE = Editor
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/EditorApp.o $(OBJDIR_DEBUG)/EditorMain.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/EditorApp.o $(OBJDIR_DEBUG)/EditorMain.o $(OBJDIR_DEBUG)/FeedScreenMemory.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/EditorApp.o $(OBJDIR_RELEASE)/EditorMain.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/EditorApp.o $(OBJDIR_RELEASE)/EditorMain.o $(OBJDIR_RELEASE)/FeedScreenMemory.o
 
 all: debug release
 
 clean: clean_debug clean_release
 
 before_debug: 
-	test -d bin/Debug || mkdir -p bin/Debug
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 
 after_debug: 
@@ -65,13 +64,14 @@ $(OBJDIR_DEBUG)/EditorApp.o: EditorApp.cpp
 $(OBJDIR_DEBUG)/EditorMain.o: EditorMain.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c EditorMain.cpp -o $(OBJDIR_DEBUG)/EditorMain.o
 
+$(OBJDIR_DEBUG)/FeedScreenMemory.o: FeedScreenMemory.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c FeedScreenMemory.cpp -o $(OBJDIR_DEBUG)/FeedScreenMemory.o
+
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
-	rm -rf bin/Debug
 	rm -rf $(OBJDIR_DEBUG)
 
 before_release: 
-	test -d bin/Release || mkdir -p bin/Release
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 
 after_release: 
@@ -87,9 +87,11 @@ $(OBJDIR_RELEASE)/EditorApp.o: EditorApp.cpp
 $(OBJDIR_RELEASE)/EditorMain.o: EditorMain.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c EditorMain.cpp -o $(OBJDIR_RELEASE)/EditorMain.o
 
+$(OBJDIR_RELEASE)/FeedScreenMemory.o: FeedScreenMemory.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c FeedScreenMemory.cpp -o $(OBJDIR_RELEASE)/FeedScreenMemory.o
+
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
-	rm -rf bin/Release
 	rm -rf $(OBJDIR_RELEASE)
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release

@@ -28,6 +28,11 @@ extern "C"
    int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyTemplateDevice(int devID);
 
+   int getTotalTemplateFrameNumber(int devID);
+   int getCurrentTemplateFrameNumber(int devID);
+
+
+   int seekRelativeTemplateFrame(int devID,signed int seekFrame);
    int seekTemplateFrame(int devID,unsigned int seekFrame);
    int snapTemplateFrames(int devID);
 

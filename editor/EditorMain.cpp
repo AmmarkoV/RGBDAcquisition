@@ -14,7 +14,9 @@
 #include "../acquisition/Acquisition.h"
 
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
+unsigned int devID=0;
 
+int play=0;
 
 //(*InternalHeaders(EditorFrame)
 #include <wx/string.h>
@@ -118,8 +120,13 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Status->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(Status);
     Timer.SetOwner(this, ID_TIMER1);
-    Timer.Start(1000, false);
+    Timer.Start(100, false);
 
+    Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonPreviousFrameClick);
+    Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonPlayClick);
+    Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonStopClick);
+    Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonNextFrameClick);
+    Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditorFrame::OncurrentFrameTextCtrlText);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -164,7 +171,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
      // return 1;
    }
 
-   acquisitionOpenDevice(moduleID,devID,"test",640,480,25);
+   acquisitionOpenDevice(moduleID,devID,"fuse11",640,480,25);
 }
 
 EditorFrame::~EditorFrame()
@@ -190,7 +197,7 @@ void EditorFrame::OnAbout(wxCommandEvent& event)
 
 void EditorFrame::OnPaint(wxPaintEvent& event)
 {
-    wxPaintDC dc(this); // OnPaint events should always create a wxPaintDC
+  wxPaintDC dc(this); // OnPaint events should always create a wxPaintDC
 
   unsigned int devID=0;
   unsigned int width , height , channels , bitsperpixel;
@@ -199,18 +206,23 @@ void EditorFrame::OnPaint(wxPaintEvent& event)
   //DRAW RGB FRAME -------------------------------------------------------------------------------------
   acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
   passVideoRegisterToFeed(0,acquisitionGetColorFrame(moduleID,devID),width,height,bitsperpixel,channels);
-//    ++tick_count;
 
-  //DRAW RGB FRAME -------------------------------------------------------------------------------------
+  //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
   acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
- // passVideoRegisterToFeed(0,acquisitionGetDepthFrame(moduleID,devID),width,height,bitsperpixel,channels);
-//    ++tick_count;
 
-    dc.DrawBitmap(*live_feeds[0].bmp,feed_0_x,feed_0_y,0); //FEED 1
-    dc.DrawBitmap(*live_feeds[1].bmp,feed_1_x,feed_1_y,0); //FEED 2
+
+  char * rgb = convertShortDepthTo3CharDepth(acquisitionGetDepthFrame(moduleID,devID),width,height,0,2048);
+  //char * rgb = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
+  passVideoRegisterToFeed(1,rgb,width,height,8,3);
+  free(rgb);
+
+
+  dc.DrawBitmap(*live_feeds[0].bmp,feed_0_x,feed_0_y,0); //FEED 1
+  dc.DrawBitmap(*live_feeds[1].bmp,feed_1_x,feed_1_y,0); //FEED 2
     //dc.DrawBitmap(*live_feeds[2].bmp,feed_2_x,feed_2_y,0); //FEED 3
     //dc.DrawBitmap(*live_feeds[3].bmp,feed_3_x,feed_3_y,0); //FEED 4
 
+  wxSleep(0.01);
 
 }
 
@@ -233,6 +245,7 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
   wxSleep(0.01);
   int x=event.GetX();
   int y=event.GetY();
+  fprintf(stderr,"Mouse %u,%u\n",x,y);
 
 
   int fd_rx1,fd_rx2,fd_ry1,fd_ry2;
@@ -241,19 +254,20 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
   fd_rx2=fd_rx1 + default_feed->GetWidth();
   fd_ry2=fd_ry1 + default_feed->GetHeight();
 
-  if ( XYOverRect(x,y,fd_rx1,fd_ry1,fd_rx2,fd_ry2)==1 )
+  if ( XYOverRect(x,y,feed_0_x,feed_0_y,feed_0_x+default_feed->GetWidth(),feed_0_y+default_feed->GetHeight())==1 )
        {
          mouse_x=x;
          mouse_y=y;
+
+         if ( event.LeftIsDown()==1 )
+           {
+              wxString msg;
+              msg.Printf( wxT("Adding Track Point ( %u , %u )\n") ,x-feed_0_x,y-feed_0_y );
+              Status->SetLabel(msg);
+           }
        }
 
-   if ( event.LeftIsDown()==1 )
-   {
-      if ( XYOverRect(x,y,fd_rx1,fd_ry1,fd_rx2,fd_ry2)==1 )
-       {
-
-       }
-
+/*
      int fd_rx1,fd_rx2,fd_ry1,fd_ry2;
      fd_rx1=10 , fd_rx2=fd_rx1 + default_feed->GetWidth();
      fd_ry1=15 , fd_ry2=fd_ry1 + default_feed->GetHeight();
@@ -270,28 +284,66 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
             add_new_track_point=0;
       }
     }
-
-
-    }
+    }*/
 }
 
 
-void EditorFrame::OnTimer(wxTimerEvent& event)
-{
-  /*
-   if ( SnapWebCams() == 1 ) { } else
-                             { return; }
-
-*/
-}
 
 void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
 {
-  unsigned int devID=0;
-  acquisitionSnapFrames(moduleID,devID);
+  wxSleep(0.01);
 
+  if (play)
+    {
+     acquisitionSnapFrames(moduleID,devID);
+    }
+
+     wxString currentFrame;
+     currentFrame.clear();
+     currentFrame<<acquisitionGetCurrentFrameNumber(moduleID,devID);
+     currentFrameTextCtrl->SetValue(currentFrame);
+
+     currentFrame.clear();
+     currentFrame<<acquisitionGetTotalFrameNumber(moduleID,devID);
+     totalFramesLabel->SetLabel(currentFrame);
 
   Refresh(); // <- This draws the window!
-//  RedrawWindow();
+}
+
+void EditorFrame::OnbuttonPlayClick(wxCommandEvent& event)
+{
+    play=1;
+}
+
+void EditorFrame::OnbuttonStopClick(wxCommandEvent& event)
+{
+    play=0;
+}
+
+void EditorFrame::OnbuttonPreviousFrameClick(wxCommandEvent& event)
+{
+    acquisitionSeekRelativeFrame(moduleID,devID,(signed int) -2);
+    acquisitionSnapFrames(moduleID,devID);
+    Refresh(); // <- This draws the window!
+}
+
+void EditorFrame::OnbuttonNextFrameClick(wxCommandEvent& event)
+{
+    //acquisitionSeekRelativeFrame(moduleID,devID,(signed int) +1);
+    acquisitionSnapFrames(moduleID,devID);
+    Refresh(); // <- This draws the window!
+}
+
+void EditorFrame::OncurrentFrameTextCtrlText(wxCommandEvent& event)
+{
+    long jumpTo=0;
+
+    if(currentFrameTextCtrl->GetValue().ToLong(&jumpTo))
+        {
+          if (jumpTo>0) { --jumpTo; }
+          acquisitionSeekFrame(moduleID,devID,jumpTo);
+          acquisitionSnapFrames(moduleID,devID);
+          Refresh(); // <- This draws the window!
+        }
 
 }

@@ -273,6 +273,35 @@ char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned 
 }
 
 
+//Ok this is basically casting the 2 bytes of depth into 3 RGB bytes ( grayscale )
+char * convertShortDepthTo3CharDepth(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
+{
+  if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
+  short * depthPTR= depth; // This will be the traversing pointer for input
+  short * depthLimit =  depth + width*height; //<- we use sizeof(short) because we have casted to char !
+
+
+  unsigned char * outFrame = (char*) malloc(width*height*3*sizeof(unsigned char));
+  if (outFrame==0) { fprintf(stderr,"Could not perform DepthToRGB transformation\nNo memory for new frame\n"); return 0; }
+
+  float depth_range = max_depth-min_depth;
+  if (depth_range ==0 ) { depth_range = 1; }
+  float multiplier = 255 / depth_range;
+
+
+  unsigned char * outFramePTR = outFrame; // This will be the traversing pointer for output
+  while ( depthPTR<depthLimit )
+  {
+     unsigned int scaled = (unsigned int) (*depthPTR) * multiplier;
+     unsigned char scaledChar = (unsigned char) scaled;
+     * outFramePTR = scaledChar; ++outFramePTR;
+     * outFramePTR = scaledChar; ++outFramePTR;
+     * outFramePTR = scaledChar; ++outFramePTR;
+
+     ++depthPTR;
+  }
+ return outFrame;
+}
 
 
 int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
@@ -430,6 +459,27 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
 }
 
 
+int acquisitionGetTotalFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+  printCall(moduleID,devID,"acquisitionGetTotalFrameNumber", __FILE__, __LINE__);
+  if (*plugins[moduleID].getTotalFrameNumber!=0) { return (*plugins[moduleID].getTotalFrameNumber) (devID); }
+
+  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetTotalFrameNumber");
+  return 0;
+}
+
+
+int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+  printCall(moduleID,devID,"acquisitionGetCurrentFrameNumber", __FILE__, __LINE__);
+  if (*plugins[moduleID].getCurrentFrameNumber!=0) { return (*plugins[moduleID].getCurrentFrameNumber) (devID); }
+
+  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetCurrentFrameNumber");
+  return 0;
+}
+
+
+
  int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int seekFrame)
 {
     printCall(moduleID,devID,"acquisitionSeekFrame", __FILE__, __LINE__);
@@ -439,6 +489,15 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
     return 0;
 }
 
+
+ int acquisitionSeekRelativeFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,signed int seekFrame)
+{
+    printCall(moduleID,devID,"acquisitionSeekRelativeFrame", __FILE__, __LINE__);
+    if (*plugins[moduleID].seekRelativeFrame!=0) { return (*plugins[moduleID].seekRelativeFrame) (devID,seekFrame); }
+
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionSeekRelativeFrame");
+    return 0;
+}
 
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {

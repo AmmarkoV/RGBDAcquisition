@@ -204,9 +204,24 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 
+  sprintf(functionNameStr,"getTotal%sFrameNumber",moduleName);
+  plugins[moduleID].getTotalFrameNumber = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+
+  sprintf(functionNameStr,"getCurrent%sFrameNumber",moduleName);
+  plugins[moduleID].getCurrentFrameNumber = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+
+  sprintf(functionNameStr,"seekRelative%sFrame",moduleName);
+  plugins[moduleID].seekRelativeFrame = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+
   sprintf(functionNameStr,"seek%sFrame",moduleName);
   plugins[moduleID].seekFrame = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+
+
+
   sprintf(functionNameStr,"snap%sFrames",moduleName);
   plugins[moduleID].snapFrames = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }

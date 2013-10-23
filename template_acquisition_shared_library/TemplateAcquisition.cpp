@@ -368,12 +368,17 @@ int destroyTemplateDevice(int devID)
   return 1;
 }
 
-
-int seekTemplateFrame(int devID,unsigned int seekFrame)
+int getTotalTemplateFrameNumber(int devID)
 {
-  device[devID].cycle = seekFrame;
-  return 1;
+  // >>> > TODO : ADD here
+  return 0;
 }
+
+int getCurrentTemplateFrameNumber(int devID)
+{
+  return device[devID].cycle;
+}
+
 
 int snapTemplateFrames(int devID)
 {
@@ -438,6 +443,22 @@ int snapTemplateFrames(int devID)
 
   return 1;
 }
+
+
+
+int seekRelativeTemplateFrame(int devID,signed int seekFrame)
+{
+  if (device[devID].cycle - seekFrame < 0 )  { device[devID].cycle=0; } else
+                                             { device[devID].cycle += seekFrame; }
+  return 1;
+}
+
+int seekTemplateFrame(int devID,unsigned int seekFrame)
+{
+  device[devID].cycle = seekFrame;
+  return 1;
+}
+
 
 //Color Frame getters
 unsigned long getLastTemplateColorTimestamp(int devID) { return device[devID].lastColorTimestamp; }

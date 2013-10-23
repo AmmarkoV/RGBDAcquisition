@@ -31,11 +31,12 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="`wx-config --cflags`" />
 			<Add option="-Wall" />
+			<Add option="`wx-config --cflags`" />
 		</Compiler>
 		<Linker>
 			<Add option="`wx-config --libs`" />
+			<Add library="../acquisition/libAcquisition.so" />
 		</Linker>
 		<Unit filename="EditorApp.cpp" />
 		<Unit filename="EditorApp.h" />
