@@ -7,9 +7,8 @@
 	<string.h>
 	<math.h>
 
-1382527750 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.h
+1382607273 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.h
 	"../tools/Calibration/calibration.h"
-	"../acquisition/acquisition_setup.h"
 
 1381743453 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
 

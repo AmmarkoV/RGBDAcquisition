@@ -13,7 +13,6 @@
 extern "C"
 {
 #endif
-   #include "../acquisition/acquisition_setup.h"
 
    //Initialization of Template
    int startTemplateModule(unsigned int max_devs,char * settings);

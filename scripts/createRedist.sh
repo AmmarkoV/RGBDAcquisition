@@ -52,7 +52,7 @@ cd ..
 ln -s grabber/frames grabbed_frames
 
 cd opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/
-ln -s ../../libOpenGLAcquisition.so
+ln -s ../../libOGLRendererSandbox.so
 
 
 cd "$STARTDIR"
