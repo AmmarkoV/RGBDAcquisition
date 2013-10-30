@@ -1,8 +1,6 @@
 #ifndef ACQUISITION_H_INCLUDED
 #define ACQUISITION_H_INCLUDED
 
-#include "../tools/Calibration/calibration.h"
-
 
 #ifdef __cplusplus
 extern "C"
@@ -10,6 +8,8 @@ extern "C"
 #endif
 
 
+
+#include "../tools/Calibration/calibration.h"
 
 enum Acquisition_Possible_Modules
 {
@@ -55,10 +55,6 @@ struct acquisitionModuleStates
 {
   struct acquisitionDeviceStates device[NUMBER_OF_POSSIBLE_DEVICES];
 };
-
-//This holds all the info on states of modules and devices
-struct acquisitionModuleStates module[NUMBER_OF_POSSIBLE_MODULES];
-
 
 
 void acquisitionStartTimer(unsigned int timerID);

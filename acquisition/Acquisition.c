@@ -22,6 +22,12 @@ float scaleFactor = 0.0021;
 unsigned int simulateTick=0;
 unsigned long simulatedTickValue=0;
 
+
+//This holds all the info on states of modules and devices
+struct acquisitionModuleStates module[NUMBER_OF_POSSIBLE_MODULES];
+
+
+
 int acquisitionSimulateTime(unsigned long timeInMillisecs)
 {
   simulateTick=1;
