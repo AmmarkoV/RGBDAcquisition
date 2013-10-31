@@ -40,8 +40,8 @@
 			<Add directory="../3dparty/libfreenect/wrappers/c_sync" />
 		</Compiler>
 		<Linker>
-			<Add library="../3dparty/libfreenect/build/lib/libfreenect.so" />
-			<Add library="../3dparty/libfreenect/build/lib/libfreenect_sync.so" />
+			<Add library="./libfreenect.so" />
+			<Add library="./libfreenect_sync.so" />
 		</Linker>
 		<Unit filename="FreenectAcquisition.c">
 			<Option compilerVar="CC" />

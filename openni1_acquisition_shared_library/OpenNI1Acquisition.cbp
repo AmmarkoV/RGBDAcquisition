@@ -39,11 +39,11 @@
 			<Add directory="../3dparty/OpenNI/Include/" />
 		</Compiler>
 		<Linker>
-			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.so" />
-			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.jni.so" />
-			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so" />
-			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so" />
-			<Add library="../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so" />
+			<Add library="./libOpenNI.so" />
+			<Add library="./libOpenNI.jni.so" />
+			<Add library="./libnimRecorder.so" />
+			<Add library="./libnimMockNodes.so" />
+			<Add library="./libnimCodecs.so" />
 		</Linker>
 		<Unit filename="OpenNI1Acquisition.cpp" />
 		<Unit filename="OpenNI1Acquisition.h" />

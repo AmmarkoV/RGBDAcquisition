@@ -73,9 +73,13 @@ toCheck="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_mu
              fi
   done 
 
+echo
+echo "$blue Checking quirks $normal"
+echo
+
 
 #quirks!
-toCheck="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/libOGLRendererSandbox.so"
+toCheck="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/libOGLRendererSandbox.so openni2_acquisition_shared_library/libOpenNI2.so openni1_acquisition_shared_library/libOpenNI.so libfreenect_acquisition_shared_library/libfreenect.so libfreenect_acquisition_shared_library/libfreenect_sync.so"
 for f in $toCheck
 do
 if [ -e $f ]

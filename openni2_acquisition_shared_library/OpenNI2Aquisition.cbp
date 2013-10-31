@@ -39,7 +39,7 @@
 			<Add directory="../3dparty/OpenNI2/Include/" />
 		</Compiler>
 		<Linker>
-			<Add library="../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so" />
+			<Add library="./libOpenNI2.so" />
 		</Linker>
 		<Unit filename="OpenNI2Acquisition.cpp" />
 		<Unit filename="OpenNI2Acquisition.h" />
