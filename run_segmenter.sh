@@ -4,9 +4,11 @@ BIN="GrabberSegment"
 DIR="grabber_segment"
 ORIGINALDIRBIN="../$DIR/$BIN"
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "$DIR"
-cd redist 
+THISDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo "Changing to $THISDIR/redist"
+cd "$THISDIR/redist"
+ 
+
 
 if [ -e $BIN ]
 then
