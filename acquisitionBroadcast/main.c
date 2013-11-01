@@ -14,6 +14,7 @@
 #define MAX_DEPTH_FRAME_WIDTH 640
 #define MAX_DEPTH_FRAME_HEIGHT 480
 
+unsigned int devID=0;
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE; //OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
 char webserver_root[MAX_FILE_PATH]="public_html/"; // <- change this to the directory that contains your content if you dont want to use the default public_html dir..
@@ -125,6 +126,10 @@ int main(int argc, char *argv[])
                                            moduleID = getModuleIdFromModuleName(argv[i+1]);
                                            fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
                                          } else
+    if (strcmp(argv[i],"-dev")==0)      {
+                                           devID = atoi(argv[i+1]);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID);
+                                         } else
     if (
         (strcmp(argv[i],"-from")==0) ||
         (strcmp(argv[i],"-i")==0)
@@ -141,15 +146,16 @@ int main(int argc, char *argv[])
  if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 )) { AmmServer_Error("Could not start module %s ..\n",getModuleStringName(moduleID)); return 1; }
  fprintf(stderr,"OK\n");
 
-  //We want to initialize all possible devices in this example..
-  unsigned int devID=0,maxDevID=acquisitionGetModuleDevices(moduleID);
-  if (maxDevID==0) { fprintf(stderr,"No devices found for Module used \n"); return 1; }
+  //We want to check if deviceID we requested is a logical value , or we dont have that many devices!
+  unsigned int maxDevID=acquisitionGetModuleDevices(moduleID);
+  if ( (maxDevID==0) && (!acquisitionMayBeVirtualDevice(moduleID,devID,readFrom)) ) { fprintf(stderr,"No devices availiable , and we didn't request a virtual device\n");  return 1; }
+  if ( maxDevID < devID ) { fprintf(stderr,"Device Requested ( %u ) is out of range ( only %u available devices ) \n",devID,maxDevID);  return 1; }
+  //If we are past here we are good to go..!
 
-  for (devID=0; devID<maxDevID; devID++)
-     {
-        acquisitionOpenDevice(moduleID,devID,readPass,MAX_RGB_FRAME_WIDTH,MAX_RGB_FRAME_HEIGHT,25);
-        acquisitionMapDepthToRGB(moduleID,devID);
-     }
+
+   acquisitionOpenDevice(moduleID,devID,readPass,MAX_RGB_FRAME_WIDTH,MAX_RGB_FRAME_HEIGHT,25);
+   acquisitionMapDepthToRGB(moduleID,devID);
+
 
    default_server = AmmServer_Start ( "acquisitionBroadcast",DEFAULT_BINDING_IP, DEFAULT_BINDING_PORT, 0 /*don't want a configuration file*/ , webserver_root, templates_root );
    if (!default_server) { AmmServer_Error("Could not start server , shutting down everything.."); exit(1); }
@@ -158,12 +164,12 @@ int main(int argc, char *argv[])
    { //Do sampling here
      if (autoSnapFeed)
      {
-       for (devID=0; devID<maxDevID; devID++) { acquisitionSnapFrames(moduleID,devID); }
+       acquisitionSnapFrames(moduleID,devID);
      }
      usleep(25000);
    }
 
-   for (devID=0; devID<maxDevID; devID++) {  acquisitionCloseDevice(moduleID,devID); }
+   acquisitionCloseDevice(moduleID,devID);
 
    close_dynamic_content();
    acquisitionStopModule(moduleID);

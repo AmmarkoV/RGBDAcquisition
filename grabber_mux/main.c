@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
 
  //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
   unsigned int frameNum=0,maxFramesToGrab=10;
+
+  unsigned int devID_1=0 , devID_2=0;
   ModuleIdentifier moduleID_1 = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
   ModuleIdentifier moduleID_2 = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
   strcpy(outputfoldername,"frames/");
@@ -84,6 +86,14 @@ int main(int argc, char *argv[])
     if (strcmp(argv[i],"-module2")==0)   {
                                            moduleID_2 = getModuleIdFromModuleName(argv[i+1]);
                                            fprintf(stderr,"Overriding Module 2 Used , set to %s ( %u ) \n",getModuleStringName(moduleID_2),moduleID_2);
+                                         } else
+    if (strcmp(argv[i],"-dev1")==0)      {
+                                           devID_1 = atoi(argv[i+1]);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID_1);
+                                         } else
+    if (strcmp(argv[i],"-dev2")==0)      {
+                                           devID_2 = atoi(argv[i+1]);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID_2);
                                          } else
     if (
         (strcmp(argv[i],"-from1")==0) ||
@@ -141,7 +151,6 @@ int main(int argc, char *argv[])
 
 
   //We want to initialize all possible devices in this example..
-  unsigned int devID_1=0 , devID_2=0;
   if (moduleID_1==moduleID_2) { ++devID_2; }
 
    if ( calibrationSetA )

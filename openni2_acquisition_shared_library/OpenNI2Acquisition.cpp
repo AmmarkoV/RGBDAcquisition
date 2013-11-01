@@ -3,6 +3,8 @@
 
 #include "OpenNI2Acquisition.h"
 
+//#define BUILD_OPENNI2 1
+
 #if BUILD_OPENNI2
 
 #include <unistd.h>
@@ -22,6 +24,13 @@ Device device[MAX_OPENNI2_DEVICES];
 VideoStream depth[MAX_OPENNI2_DEVICES] , color[MAX_OPENNI2_DEVICES];
 VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES];
 
+
+enum howToOpenDevice
+{
+  OPENNI2_OPEN_REGULAR_ENUM = 0,
+  OPENNI2_OPEN_AS_ONI_FILE ,
+  OPENNI2_OPEN_AS_MANIFEST
+};
 
 
 /*
@@ -133,14 +142,44 @@ const char * getURIForDeviceNumber(int deviceNumber)
    return openni::ANY_DEVICE;
 }
 
-int initializeOpenNIDevice(int deviceID , Device &device , VideoStream &color , VideoStream &depth ,unsigned int width ,unsigned int height , unsigned int fps)
+int initializeOpenNIDevice(int deviceID , char * deviceName  , Device &device , VideoStream &color , VideoStream &depth ,unsigned int width ,unsigned int height , unsigned int fps)
 {
+   unsigned int openMode=OPENNI2_OPEN_REGULAR_ENUM; /* 0 = regular deviceID and enumeration*/
+   if (deviceName!=0)
+   {
+      if (strstr(deviceName,".oni")!=0) { openMode=OPENNI2_OPEN_AS_ONI_FILE; /* 1 = regular deviceID and enumeration*/ } else
+      if (strstr(deviceName,".ini")!=0) { openMode=OPENNI2_OPEN_AS_MANIFEST; /* 1 = regular deviceID and enumeration*/ }
+   }
 
-    if (device.open(getURIForDeviceNumber(deviceID)) != STATUS_OK)
-    {
+
+   switch (openMode)
+   {
+     //-------------------------------------------------------------------------------------
+     case OPENNI2_OPEN_AS_MANIFEST :
+      fprintf(stderr,"Opening manifests not supported yet! :( \n");
+      return 0;
+     break;
+
+     //-------------------------------------------------------------------------------------
+     case OPENNI2_OPEN_AS_ONI_FILE :
+      if (device.open(deviceName) != STATUS_OK)
+      {
+        fprintf(stderr,"Could not open an ONI file ( %s ) : %s \n",deviceName,OpenNI::getExtendedError());
+        return 0;
+      }
+     break;
+
+     //-------------------------------------------------------------------------------------
+     case OPENNI2_OPEN_REGULAR_ENUM :
+     default :
+      if (device.open(getURIForDeviceNumber(deviceID)) != STATUS_OK)
+      {
         fprintf(stderr,"Could not open an OpenNI device : %s \n",OpenNI::getExtendedError());
         return 0;
-    }
+      }
+     break;
+   }
+
 
   //device.setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
 
@@ -300,7 +339,7 @@ int snapOpenNI2Frames(int devID)
 
 int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
   {
-    if (! initializeOpenNIDevice(devID,device[devID],color[devID],depth[devID],width,height,framerate) )
+    if (! initializeOpenNIDevice(devID,devName,device[devID],color[devID],depth[devID],width,height,framerate) )
      {
          fprintf(stderr,"Could not initialize device with ID %u \n",devID);
          return 0;

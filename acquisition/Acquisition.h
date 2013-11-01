@@ -56,6 +56,7 @@ struct acquisitionModuleStates
   struct acquisitionDeviceStates device[NUMBER_OF_POSSIBLE_DEVICES];
 };
 
+int acquisitionFileExists(char * filename);
 
 void acquisitionStartTimer(unsigned int timerID);
 unsigned int acquisitionStopTimer(unsigned int timerID);
@@ -72,6 +73,7 @@ char * convertShortDepthTo3CharDepth(short * depth,unsigned int width , unsigned
 
 ModuleIdentifier getModuleIdFromModuleName(char * moduleName);
 int acquisitionGetModulesCount();
+int acquisitionMayBeVirtualDevice(ModuleIdentifier moduleID,DeviceIdentifier devID , char * devName);
 char * getModuleStringName(ModuleIdentifier moduleID);
 int acquisitionIsModuleLinked(ModuleIdentifier moduleID);
 

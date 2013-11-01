@@ -76,14 +76,16 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
 
 
    sprintf(pathTester,"%s/%s",possiblePath,libName);
-   if (fileExists(pathTester))   {
+   if (acquisitionFileExists(pathTester))
+                                 {
                                    fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
                                    strncpy(pathOut,pathTester,pathOutLength);
                                    return 1;
                                  }
 
    sprintf(pathTester,"./%s",libName);
-   if (fileExists(libName))      {
+   if (acquisitionFileExists(libName))
+                                {
                                    fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
                                    //strncpy(pathOut,libName,pathOutLength);
 
@@ -93,7 +95,8 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
                                    return 1;
                                  }
 
-   if (fileExists(libName))      {
+   if (acquisitionFileExists(libName))
+                                {
                                    fprintf(stderr,"Found plugin %s at standard dir \n",libName);
                                    strcat(pathOut,libName);
                                    return 1;

@@ -21,8 +21,6 @@ struct calibration calib;
 
 int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int framerate)
 {
-
-
     //GIVE TIME FOR REDRAW EVENTS ETC -------------------------------------------------------------------------
     float msWaitTime = ((float) 1000/framerate) ;
     int key = cvWaitKey(msWaitTime/3);
@@ -98,7 +96,7 @@ int main(int argc, char *argv[])
  unsigned int possibleModules = acquisitionGetModulesCount();
  fprintf(stderr,"Linked to %u modules.. \n",possibleModules);
 
-
+  unsigned int devID=0;
   ModuleIdentifier moduleID = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
   if (possibleModules==0)
@@ -133,6 +131,10 @@ int main(int argc, char *argv[])
                                            moduleID = getModuleIdFromModuleName(argv[i+1]);
                                            fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
                                          } else
+    if (strcmp(argv[i],"-dev")==0)       {
+                                           devID = atoi(argv[i+1]);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID);
+                                         } else
     if (
         (strcmp(argv[i],"-from")==0) ||
         (strcmp(argv[i],"-i")==0)
@@ -160,13 +162,11 @@ int main(int argc, char *argv[])
        return 1;
    }
 
-  //We want to initialize all possible devices in this example..
-  unsigned int devID=0,maxDevID=acquisitionGetModuleDevices(moduleID);
-  if (maxDevID==0)
-  {
-      fprintf(stderr,"No devices found for Module used \n");
-      return 1;
-  }
+  //We want to check if deviceID we requested is a logical value , or we dont have that many devices!
+  unsigned int maxDevID=acquisitionGetModuleDevices(moduleID);
+  if ( (maxDevID==0) && (!acquisitionMayBeVirtualDevice(moduleID,devID,inputname)) ) { fprintf(stderr,"No devices availiable , and we didn't request a virtual device\n");  return 1; }
+  if ( maxDevID < devID ) { fprintf(stderr,"Device Requested ( %u ) is out of range ( only %u available devices ) \n",devID,maxDevID);  return 1; }
+  //If we are past here we are good to go..!
 
 
    if ( calibrationSet )
@@ -179,8 +179,7 @@ int main(int argc, char *argv[])
   char * devName = inputname;
   if (strlen(inputname)<1) { devName=0; }
     //Initialize Every OpenNI Device
-    for (devID=0; devID<maxDevID; devID++)
-     {
+
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
         acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate);
 
@@ -190,15 +189,13 @@ int main(int argc, char *argv[])
 
         //acquisitionMapDepthToRGB(moduleID,devID);
         //acquisitionMapRGBToDepth(moduleID,devID);
-     }
+
 
     char outfilename[512]={0};
 
    if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
-     for (devID=0; devID<maxDevID; devID++)
-      {
         acquisitionStartTimer(0);
 
         acquisitionSnapFrames(moduleID,devID);
@@ -207,17 +204,13 @@ int main(int argc, char *argv[])
 
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
-
-      }
     }
 
     fprintf(stderr,"Done viewing %u frames! \n",maxFramesToGrab);
 
-    for (devID=0; devID<maxDevID; devID++)
-     {
-        /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
-        acquisitionCloseDevice(moduleID,devID);
-     }
+    /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
+    acquisitionCloseDevice(moduleID,devID);
+
 
     acquisitionStopModule(moduleID);
     return 0;

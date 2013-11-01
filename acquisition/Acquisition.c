@@ -41,7 +41,7 @@ unsigned long GetTickCount()
    return GetTickCountInternal();
 }
 
-int fileExists(char * filename)
+int acquisitionFileExists(char * filename)
 {
   FILE * fp  = fopen(filename,"r");
     if (fp!=0)
@@ -444,6 +444,17 @@ int acquisitionGetModuleDevices(ModuleIdentifier moduleID)
 }
 
 
+
+int acquisitionMayBeVirtualDevice(ModuleIdentifier moduleID,DeviceIdentifier devID , char * devName)
+{
+  if ( (moduleID==OPENNI2_ACQUISITION_MODULE) && (acquisitionFileExists(devName)) )
+      {
+        fprintf(stderr,"Hoping that %s is a valid virtual device\n",devName);
+       return 1;
+      }
+
+  return 0;
+}
 
 /*! ------------------------------------------
     FRAME SNAPPING MECHANISMS FOR MODULES..
