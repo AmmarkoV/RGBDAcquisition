@@ -9,7 +9,7 @@ extern "C"
 #endif
 
    //Initialization of OpenNI1
-   int startOpenNI1Module(unsigned int max_devs);
+   int startOpenNI1Module(unsigned int max_devs,char * settings);
 
    #if BUILD_OPENNI1
 

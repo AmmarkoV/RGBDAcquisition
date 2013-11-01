@@ -19,7 +19,7 @@ struct calibration calibRGB;
 struct calibration calibDepth;
 
 
-int startOpenGLModule(unsigned int max_devs)
+int startOpenGLModule(unsigned int max_devs,char * settings)
 {
   return 1;
 }

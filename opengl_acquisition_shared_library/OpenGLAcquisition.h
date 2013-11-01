@@ -15,7 +15,7 @@ extern "C"
 #include "../acquisition/acquisition_setup.h"
 
 
-int startOpenGLModule(unsigned int max_devs) ;
+int startOpenGLModule(unsigned int max_devs,char * settings) ;
 
 #if BUILD_OPENGL
 int getOpenGLNumberOfDevices() ;

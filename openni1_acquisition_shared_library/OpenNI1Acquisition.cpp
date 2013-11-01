@@ -29,7 +29,7 @@ Context ctx;
 
 
 
-int startOpenNI1Module(unsigned int max_devs)
+int startOpenNI1Module(unsigned int max_devs,char * settings)
 {
  EnumerationErrors errors;
  XnStatus rc;

@@ -10,7 +10,7 @@ extern "C"
    #include "../acquisition/acquisition_setup.h"
 
    //Initialization of OpenNI2
-   int startOpenNI2Module(unsigned int max_devs);
+   int startOpenNI2Module(unsigned int max_devs,char * settings);
 
    #if BUILD_OPENNI2
 

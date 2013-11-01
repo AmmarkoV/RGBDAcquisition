@@ -3,7 +3,7 @@
 
 #include "OpenNI2Acquisition.h"
 
-//#define BUILD_OPENNI2 1
+#define BUILD_OPENNI2 1
 
 #if BUILD_OPENNI2
 
@@ -147,8 +147,9 @@ int initializeOpenNIDevice(int deviceID , char * deviceName  , Device &device , 
    unsigned int openMode=OPENNI2_OPEN_REGULAR_ENUM; /* 0 = regular deviceID and enumeration*/
    if (deviceName!=0)
    {
-      if (strstr(deviceName,".oni")!=0) { openMode=OPENNI2_OPEN_AS_ONI_FILE; /* 1 = regular deviceID and enumeration*/ } else
-      if (strstr(deviceName,".ini")!=0) { openMode=OPENNI2_OPEN_AS_MANIFEST; /* 1 = regular deviceID and enumeration*/ }
+      if (strstr(deviceName,".oni")!=0) { openMode=OPENNI2_OPEN_AS_ONI_FILE; } else
+      if (strstr(deviceName,".ini")!=0) { openMode=OPENNI2_OPEN_AS_MANIFEST; } else
+      if (strstr(deviceName,".xml")!=0) { openMode=OPENNI2_OPEN_AS_MANIFEST; }
    }
 
 
@@ -156,7 +157,9 @@ int initializeOpenNIDevice(int deviceID , char * deviceName  , Device &device , 
    {
      //-------------------------------------------------------------------------------------
      case OPENNI2_OPEN_AS_MANIFEST :
-      fprintf(stderr,"Opening manifests not supported yet! :( \n");
+      fprintf(stderr,"Opening manifests ( i.e. %s ) cannot be done in OpenNI2 \n",deviceName);
+      fprintf(stderr,"OpenNI2 automatically parses OpenNI.ini and PS1080.ini so if you want to add something\n");
+      fprintf(stderr,"do it there \n");
       return 0;
      break;
 
@@ -321,7 +324,7 @@ int mapOpenNI2RGBToDepth(int devID)
 
 
 
-int startOpenNI2Module(unsigned int max_devs)
+int startOpenNI2Module(unsigned int max_devs,char * settings)
 {
     return initializeOpenNI(max_devs);
 }
