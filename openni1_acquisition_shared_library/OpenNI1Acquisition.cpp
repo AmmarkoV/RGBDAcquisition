@@ -31,10 +31,19 @@ Context ctx;
 
 int startOpenNI1Module(unsigned int max_devs,char * settings)
 {
+
  EnumerationErrors errors;
  XnStatus rc;
- //rc = ctx.InitFromXmlFile("SamplesConfig.xml");
- rc = ctx.Init();
+
+   unsigned int useXMLFile=0;
+   if (settings!=0)
+   {
+    if (strstr(settings,".ini")!=0) { useXMLFile=1; } else
+    if (strstr(settings,".xml")!=0) { useXMLFile=1; }
+   }
+
+   if (useXMLFile) { rc = ctx.InitFromXmlFile(settings); } else
+                   { rc = ctx.Init(); }
 
  if (rc == XN_STATUS_NO_NODE_PRESENT)
   {

@@ -3,7 +3,7 @@
 
 #include "OpenNI2Acquisition.h"
 
-#define BUILD_OPENNI2 1
+//#define BUILD_OPENNI2 1
 
 #if BUILD_OPENNI2
 
@@ -43,8 +43,22 @@ enum howToOpenDevice
 
 
 
-int initializeOpenNI(unsigned int MAX_DEVICES_NEEDED)
+int initializeOpenNI(unsigned int MAX_DEVICES_NEEDED,char * settings)
 {
+   unsigned int openMode=OPENNI2_OPEN_REGULAR_ENUM;
+   if (settings!=0)
+   {
+    if (strstr(settings,".ini")!=0) { openMode=OPENNI2_OPEN_AS_MANIFEST; } else
+    if (strstr(settings,".xml")!=0) { openMode=OPENNI2_OPEN_AS_MANIFEST; }
+   }
+   if (openMode!=OPENNI2_OPEN_REGULAR_ENUM)
+   {
+      fprintf(stderr,"\n\n\n\nWARNING : Opening manifests ( i.e. %s ) cannot be done in OpenNI2 \n",settings);
+      fprintf(stderr,"OpenNI2 automatically parses OpenNI.ini and PS1080.ini so if you want to add something\n");
+      fprintf(stderr,"do it there \n\n\n\n\n");
+   }
+
+
    //Startup Everything!
    if(OpenNI::initialize()!=STATUS_OK)
     {
@@ -147,22 +161,11 @@ int initializeOpenNIDevice(int deviceID , char * deviceName  , Device &device , 
    unsigned int openMode=OPENNI2_OPEN_REGULAR_ENUM; /* 0 = regular deviceID and enumeration*/
    if (deviceName!=0)
    {
-      if (strstr(deviceName,".oni")!=0) { openMode=OPENNI2_OPEN_AS_ONI_FILE; } else
-      if (strstr(deviceName,".ini")!=0) { openMode=OPENNI2_OPEN_AS_MANIFEST; } else
-      if (strstr(deviceName,".xml")!=0) { openMode=OPENNI2_OPEN_AS_MANIFEST; }
+      if (strstr(deviceName,".oni")!=0) { openMode=OPENNI2_OPEN_AS_ONI_FILE; }
    }
-
 
    switch (openMode)
    {
-     //-------------------------------------------------------------------------------------
-     case OPENNI2_OPEN_AS_MANIFEST :
-      fprintf(stderr,"Opening manifests ( i.e. %s ) cannot be done in OpenNI2 \n",deviceName);
-      fprintf(stderr,"OpenNI2 automatically parses OpenNI.ini and PS1080.ini so if you want to add something\n");
-      fprintf(stderr,"do it there \n");
-      return 0;
-     break;
-
      //-------------------------------------------------------------------------------------
      case OPENNI2_OPEN_AS_ONI_FILE :
       if (device.open(deviceName) != STATUS_OK)
@@ -326,7 +329,7 @@ int mapOpenNI2RGBToDepth(int devID)
 
 int startOpenNI2Module(unsigned int max_devs,char * settings)
 {
-    return initializeOpenNI(max_devs);
+    return initializeOpenNI(max_devs,settings);
 }
 
 int stopOpenNI2Module()
