@@ -117,9 +117,14 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
 
 int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
 {
+  if (trConf==0) { fprintf(stderr,"Could not render with null configuration\n"); return 0; }
+  if (trConf->scenePTR==0) { fprintf(stderr,"Could not render with null scene\n"); return 0; }
+  if (trConf->modelPTR==0) { fprintf(stderr,"Could not render with null model\n"); return 0; }
 
   struct VirtualStream * scene = (struct VirtualStream *)  trConf->scenePTR;
   struct Model ** models = ( struct Model ** ) trConf->modelPTR;
+
+
 
 
   fprintf(stderr,"Photoshooting Object %u -> %s \n",trConf->objID,scene->object[trConf->objID].name);
