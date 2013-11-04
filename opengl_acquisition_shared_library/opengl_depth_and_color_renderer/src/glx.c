@@ -8,6 +8,7 @@
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/gl.h>
 
+#include "scene.h"
 #include "glx.h"
 
 static int snglBuf[] = {GLX_RGBA, GLX_DEPTH_SIZE, 24, None};
@@ -134,8 +135,8 @@ int glx_checkEvents()
           }
           break;
         case ConfigureNotify:
-          glViewport(0, 0, event.xconfigure.width,
-                     event.xconfigure.height);
+          //glViewport(0, 0, event.xconfigure.width, event.xconfigure.height);
+          windowSizeUpdated(event.xconfigure.width, event.xconfigure.height);
           /* fall through... */
         case Expose:
             needRedraw=GL_TRUE;

@@ -14,14 +14,36 @@ unsigned int compareDepthPatches( unsigned short * patchADepth , unsigned int pA
                                   unsigned short * patchBDepth , unsigned int pBCenterX,  unsigned int pBCenterY , unsigned int pBImageWidth , unsigned int pBImageHeight ,
                                   unsigned int patchWidth, unsigned int patchHeight )
 {
+  if ( (patchADepth==0)||(patchBDepth==0) ) { return 0; }
+  if ( (patchWidth==0)&&(patchWidth==0) ) { return 0; }
+  if ( (pAImageWidth==0)&&(pAImageHeight==0) ) { return 0; }
+  if ( (pBImageWidth==0)&&(pBImageHeight==0) ) { return 0; }
+
+
   unsigned int halfWidth = (unsigned int) patchWidth / 2 ;
   unsigned int halfHeight = (unsigned int) patchHeight / 2 ;
 
+
   unsigned int pACX = pACenterX - halfWidth;
+  if (halfWidth>pACenterX) { pACX=0; }
   unsigned int pACY = pACenterY - halfHeight;
+  if (halfHeight>pACenterY) { pACY=0; }
 
   unsigned int pBCX = pBCenterX - halfWidth;
+  if (halfWidth>pBCenterX) { pBCX=0; }
   unsigned int pBCY = pBCenterY - halfHeight;
+  if (halfHeight>pBCenterY) { pBCY=0; }
+
+  //Check for bounds -----------------------------------------
+  if (pBCX+patchWidth>=pBImageWidth)   { patchWidth=pBImageWidth-pBCX;  }
+  if (pBCY+patchHeight>=pBImageHeight) { patchHeight=pBImageHeight-pBCY;  }
+
+  if (pACX+patchWidth>=pAImageWidth)   { patchWidth=pAImageWidth-pACX;  }
+  if (pACY+patchHeight>=pAImageHeight) { patchHeight=pAImageHeight-pACY;  }
+  //----------------------------------------------------------
+
+
+
 
 
   fprintf(stderr,"compareDepthPatches ( %u,%u -> %u,%u ) vs ( %u,%u -> %u,%u ) \n",pACX,pACY,pACX+patchWidth,pACY+patchHeight,

@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <math.h>
+
 #include "tiledRenderer.h"
 
 #include "TrajectoryParser/TrajectoryParser.h"
@@ -16,11 +18,13 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
+
 struct VirtualStream * scene = 0;
 struct Model ** models=0;
 
 float farPlane = 255; //<--be aware that this has an effect on the depth maps generated
 float nearPlane= 1; //<--this also
+float aspectRatio = 65;
 
 float depthUnit = 1;
 
@@ -75,24 +79,103 @@ unsigned int ticks = 0;
 
 
 
+
+//matrix will receive the calculated perspective matrix.
+//You would have to upload to your shader
+// or use glLoadMatrixf if you aren't using shaders.
+
+void glhFrustumf2(float *matrix, float left, float right, float bottom, float top,
+                  float znear, float zfar)
+{
+    float temp, temp2, temp3, temp4;
+    temp = 2.0 * znear;
+    temp2 = right - left;
+    temp3 = top - bottom;
+    temp4 = zfar - znear;
+    matrix[0] = temp / temp2;
+    matrix[1] = 0.0;
+    matrix[2] = 0.0;
+    matrix[3] = 0.0;
+    matrix[4] = 0.0;
+    matrix[5] = temp / temp3;
+    matrix[6] = 0.0;
+    matrix[7] = 0.0;
+    matrix[8] = (right + left) / temp2;
+    matrix[9] = (top + bottom) / temp3;
+    matrix[10] = (-zfar - znear) / temp4;
+    matrix[11] = -1.0;
+    matrix[12] = 0.0;
+    matrix[13] = 0.0;
+    matrix[14] = (-temp * zfar) / temp4;
+    matrix[15] = 0.0;
+}
+
+
+void glhPerspectivef2(float *matrix, float fovyInDegrees, float aspectRatioV,
+                      float znear, float zfar)
+{
+    float ymax, xmax , temp, temp2, temp3, temp4;
+    ymax = znear * tan(fovyInDegrees * M_PI / 360.0);
+    //ymin = -ymax;
+    //xmin = -ymax * aspectRatioV;
+    xmax = ymax * aspectRatioV;
+    glhFrustumf2(matrix, -xmax, xmax, -ymax, ymax, znear, zfar);
+}
+
+
+
+
+void gldPerspective(GLdouble fovx, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+{
+   // This code is based off the MESA source for gluPerspective
+   // *NOTE* This assumes GL_PROJECTION is the current matrix
+
+   GLdouble xmin, xmax, ymin, ymax;
+   GLdouble m[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+   xmax = zNear * tan(fovx * M_PI / 360.0);
+   xmin = -xmax;
+
+   ymin = xmin / aspect;
+   ymax = xmax / aspect;
+
+   // Set up the projection matrix
+   m[0] = (2.0 * zNear) / (xmax - xmin);
+   m[5] = (2.0 * zNear) / (ymax - ymin);
+   m[10] = -(zFar + zNear) / (zFar - zNear);
+
+   m[8] = (xmax + xmin) / (xmax - xmin);
+   m[9] = (ymax + ymin) / (ymax - ymin);
+   m[11] = -1.0;
+
+   m[14] = -(2.0 * zFar * zNear) / (zFar - zNear);
+
+   // Add to current matrix
+   glMultMatrixd(m);
+}
+
+
+
+
 int updateProjectionMatrix()
 {
-  fprintf(stderr,"updateProjectionMatrix activated \n");
+  fprintf(stderr,"updateProjectionMatrix called ( %u x %u )  \n",WIDTH,HEIGHT);
 
   if ( scene->projectionMatrixDeclared )
   { //Scene configuration overwrites local configuration
+    fprintf(stderr,"Custom projection matrix is declared\n");
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixd( scene->projectionMatrix ); // we load a matrix of Doubles
     glViewport(0,0,WIDTH,HEIGHT);
 
-   print4x4DMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix );
+    print4x4DMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix );
 
   } else
   if (useIntrinsicMatrix)
   {
    int viewport[4]={0};
 
-   fprintf(stderr,"Width %u x Height %u \n",WIDTH,HEIGHT);
+   fprintf(stderr,"Using intrinsics to build projection matrix\n");
    buildOpenGLProjectionForIntrinsics   (
                                              customProjectionMatrix  ,
                                              viewport ,
@@ -115,15 +198,23 @@ int updateProjectionMatrix()
   }
     else
   {
-  glLoadIdentity();
-  glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
-  glViewport(0, 0, WIDTH, HEIGHT);
- }
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   gldPerspective(aspectRatio, WIDTH/HEIGHT, nearPlane, farPlane);
+   //glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
+   glViewport(0, 0, WIDTH, HEIGHT);
+  }
 }
 
 
 
-
+int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
+{
+   WIDTH=newWidth;
+   HEIGHT=newHeight;
+   updateProjectionMatrix();
+   return 1;
+}
 
 
 

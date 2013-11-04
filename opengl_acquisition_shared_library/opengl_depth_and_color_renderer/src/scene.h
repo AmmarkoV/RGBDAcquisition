@@ -19,6 +19,7 @@ extern double customRodriguezRotation[3];
 
 int renderScene();
 
+int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight);
 
 int setupPhotoshoot(
                      void * context,

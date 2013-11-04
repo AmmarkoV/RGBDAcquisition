@@ -1,5 +1,6 @@
 #!/bin/bash
  
+IMAGELISTFILENAME="imageList"
 
 DIR_WITH_FRAMES="./"
 if [ $# -ne 1 ]
@@ -9,9 +10,7 @@ else
  DIR_WITH_FRAMES=$1 
 fi
 
-
-
-
+ 
 STARTDIR=`pwd`
 #Switch to this directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -42,11 +41,24 @@ do
     fi
 done
 
+echo "Temp Dir is $TEMPDIR"
+
 cd $TEMPDIR
-ls | grep jpg > imageList
+
+ls | grep jpg > $IMAGELISTFILENAME
+
+if [ -e calibration ] 
+then 
+  echo "Refreshing link to calibration executable"
+  rm calibration
+fi
+
 ln -s $DIR/calibration
-./calibration -w 6 -h 9 -s 0.02 -oe -o colorCalibration imageList
+
+./calibration -w 6 -h 9 -s 0.02 -oe -o colorCalibration $IMAGELISTFILENAME
+
 #../ExtrinsicCalibration/extrinsicCalibration -w 6 -h 9 -s 0.02 -c colorCalibration -i $DIR_WITH_FRAMES/colorFrame_0_00000.pnm
+
 mv colorCalibration $DIR_WITH_FRAMES/color.calib
 cp $DIR_WITH_FRAMES/color.calib $DIR_WITH_FRAMES/depth.calib
 

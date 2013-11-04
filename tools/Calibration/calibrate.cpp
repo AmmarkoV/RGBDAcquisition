@@ -417,6 +417,7 @@ int main( int argc, char** argv )
         capture = cvCreateFileCapture( input_filename );
         if( !capture )
         {
+            fprintf(stderr,"Warning , cvCreateFileCapture failed to open %s \n",input_filename);
             f = fopen( input_filename, "rt" );
             if( !f )
                 return fprintf( stderr, "The input file could not be opened\n" ), -1;
