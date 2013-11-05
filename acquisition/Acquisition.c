@@ -43,6 +43,7 @@ unsigned long GetTickCount()
 
 int acquisitionFileExists(char * filename)
 {
+  if (filename==0) { return 0; }
   FILE * fp  = fopen(filename,"r");
     if (fp!=0)
     {
@@ -55,6 +56,7 @@ int acquisitionFileExists(char * filename)
 
 int makepath(char * path)
 {
+  if (path==0) { return 0; }
     char command[2048];
     sprintf(command,"mkdir -p %s",path);
     fprintf(stderr,"Executing .. %s \n",command);
