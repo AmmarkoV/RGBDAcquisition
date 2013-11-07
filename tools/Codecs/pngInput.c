@@ -170,15 +170,15 @@ int WritePNG(char * filename,struct Image * pic)
 {
 
 // VARIABLES START ---------------
-png_byte color_type;
-png_byte bit_depth;
+//png_byte color_type;
+//png_byte bit_depth;
 
 png_structp png_ptr;
 png_infop info_ptr;
-int number_of_passes;
+//int number_of_passes;
 png_bytep * row_pointers;
 
-int width, height;
+//int width, height;
 // -------------------------------
 
 
@@ -215,7 +215,7 @@ png_write_info(png_ptr, info_ptr);
 if (setjmp(png_jmpbuf(png_ptr))) { abort_("[write_png_file] Error during writing bytes"); return 0; }
 row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * pic->height);
 if (row_pointers==0) { abort_("Could not allocate enough memory to hold the image \n"); return 0; }
-char * raw_pixels=pic->pixels;
+char * raw_pixels=(char*) pic->pixels;
 
 unsigned int y;
 for (y=0; y<pic->height; y++)

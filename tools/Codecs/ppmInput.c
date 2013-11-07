@@ -7,19 +7,6 @@
 
 #define PPMREADBUFLEN 256
 
-
-unsigned int simplePow(unsigned int base,unsigned int exp)
-{
-    if (exp==0) return 1;
-    unsigned int retres=base;
-    unsigned int i=0;
-    for (i=0; i<exp-1; i++)
-    {
-        retres*=base;
-    }
-    return retres;
-}
-
 int ReadPPM(char * filename,struct Image * pic,char read_only_header)
 {
     FILE *pf=0;
