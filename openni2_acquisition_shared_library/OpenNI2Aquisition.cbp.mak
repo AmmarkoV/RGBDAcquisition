@@ -15,7 +15,7 @@ INC = -I../3dparty/OpenNI2/Include/
 CFLAGS = -Wall -fexceptions -fPIC
 RESINC = 
 LIBDIR = 
-LIB = ../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so
+LIB = ./libOpenNI2.so
 LDFLAGS = 
 
 INC_DEBUG = $(INC)

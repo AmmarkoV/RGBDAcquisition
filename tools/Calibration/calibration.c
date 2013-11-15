@@ -5,6 +5,10 @@
 #include <string.h>
 #include <time.h>
 
+
+#include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h"
+#include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h"
+
 #define DEBUG_PRINT_EACH_CALIBRATION_LINE_READ 0
 
 #define DEFAULT_WIDTH 640
@@ -21,8 +25,8 @@
 
 int NullCalibration(unsigned int width,unsigned int height, struct calibration * calib)
 {
-  calib->width;
-  calib->height;
+  calib->width=width;
+  calib->height=height;
 
   calib->intrinsicParametersSet=0;
   calib->extrinsicParametersSet=0;
@@ -245,6 +249,32 @@ int WriteCalibration(char * filename,struct calibration * calib)
  return 1;
 }
 
+
+int transform3DPointUsingCalibration(struct calibration * calib , float * x , float * y , float * z)
+{
+ double * m = alloc4x4Matrix();
+ if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
+ {
+  create4x4IdentityMatrix(m);
+  if ( calib->extrinsicParametersSet ) { convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
+  else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
+
+  double raw3D[4]={0};
+  double world3D[4]={0};
+
+  raw3D[0] = (double) *x;
+  raw3D[1] = (double) *y;
+  raw3D[2] = (double) *z;
+  raw3D[3] = (double) 1.0;
+
+  transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+
+  free4x4Matrix(&m); // This is the same as free(m); m=0;
+  return 1;
+ } //End of M allocated!
+
+  return 0;
+}
 
 
 

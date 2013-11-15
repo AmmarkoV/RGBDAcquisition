@@ -15,7 +15,7 @@ INC = -I../3dparty/libfreenect/include -I../3dparty/libfreenect/wrappers/c_sync
 CFLAGS = -Wall -fPIC
 RESINC = 
 LIBDIR = 
-LIB = ../3dparty/libfreenect/build/lib/libfreenect.so ../3dparty/libfreenect/build/lib/libfreenect_sync.so
+LIB = ./libfreenect.so ./libfreenect_sync.so
 LDFLAGS = 
 
 INC_DEBUG = $(INC)

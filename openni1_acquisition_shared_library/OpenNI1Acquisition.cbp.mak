@@ -15,7 +15,7 @@ INC = -I../3dparty/OpenNI/Include/
 CFLAGS = -Wall -fexceptions -fPIC
 RESINC = 
 LIBDIR = 
-LIB = ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.jni.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so
+LIB = ./libOpenNI.so ./libOpenNI.jni.so ./libnimRecorder.so ./libnimMockNodes.so ./libnimCodecs.so
 LDFLAGS = 
 
 INC_DEBUG = $(INC)

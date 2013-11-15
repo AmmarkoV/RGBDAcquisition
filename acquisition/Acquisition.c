@@ -861,7 +861,7 @@ int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier de
     fprintf(stderr,"TODO TODO TODO: respect calibration ");
     acquisitionGetDepth3DPointAtXYNoCalibration(moduleID,devID,x2d,y2d ,x,y,z);
 
-    return 1;
+    return transform3DPointUsingCalibration(&calib , x , y , z);
 }
 
 int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID ,
