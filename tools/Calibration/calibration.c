@@ -256,7 +256,12 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
  if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
  {
   create4x4IdentityMatrix(m);
-  if ( calib->extrinsicParametersSet ) { convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
+  if ( calib->extrinsicParametersSet )
+     {
+      convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation);
+      fprintf(stderr,"Is this correct , ? shouldnt the matrix be the other way around ? \n");
+      transpose4x4MatrixD(m);
+     }
   else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
 
   double raw3D[4]={0};

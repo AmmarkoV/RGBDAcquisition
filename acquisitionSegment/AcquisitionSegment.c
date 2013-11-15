@@ -228,7 +228,12 @@ if (segConf->enableBBox)
  if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
  {
   create4x4IdentityMatrix(m);
-  if ( calib->extrinsicParametersSet ) { convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
+  if ( calib->extrinsicParametersSet )
+     {
+        convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation);
+        fprintf(stderr,"Is this correct , ? shouldnt the matrix be the other way around ? \n");
+        transpose4x4MatrixD(m);
+     }
   else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
 
   double raw3D[4]={0};
@@ -304,7 +309,12 @@ if ( segConf->enablePlaneSegmentation )
  if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
  {
   create4x4IdentityMatrix(m);
-  if ( calib->extrinsicParametersSet ) { convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
+  if ( calib->extrinsicParametersSet )
+       {
+        convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation);
+        fprintf(stderr,"Is this correct , ? shouldnt the matrix be the other way around ? \n");
+        transpose4x4MatrixD(m);
+       }
   else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
 
   double raw3D[4]={0};
@@ -352,9 +362,9 @@ if ( segConf->enablePlaneSegmentation )
       pN[0]=(float) world3D[0];
       pN[1]=(float) world3D[1];
       pN[2]=(float) world3D[2];
-      float result = signedDistanceFromPlane(segConf->p2, normal , pN);
+      float result = signedDistanceFromPlane(p2, normal , pN);
 
-      if (  result<=0.1 )  { fprintf(stderr,"%0.2f,%0.2f,%0.2f ",pN[0],pN[1],pN[2]); *selectedPtr=0; } //Denied
+      if (  result<=0.0 )  { *selectedPtr=0; } //Denied
 
      }//If it was selected and not null project it into 3d Space
 
