@@ -186,8 +186,6 @@ if (segConf->enableBBox)
 
 if ( segConf->enablePlaneSegmentation )
  {
-
-    /*
  float fx = 537.479600 , fy = 536.572920 , cx = 317.389787 ,cy = 236.118093;
  if ( calib->intrinsicParametersSet )
  {
@@ -272,7 +270,6 @@ if ( segConf->enablePlaneSegmentation )
   free4x4Matrix(&m); // This is the same as free(m); m=0;
  } //End of M allocated!
 
- */
  }
  //-----------------------------------------------------------------------------
 

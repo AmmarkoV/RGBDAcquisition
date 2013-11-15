@@ -97,6 +97,9 @@ unsigned char * combineRGBAndDepthToOutput( unsigned char * selectedRGB , unsign
   if (result == 0 ) { fprintf(stderr,"Cannot allocate a result for combining RGB and Depth\n"); return 0; }
   memset(result,0,width*height*sizeof(unsigned char));
 
+
+
+  unsigned char * ptrResult = result;
   unsigned char * ptrRGB = selectedRGB;
   unsigned char * ptrDepth = selectedDepth;
 
@@ -108,24 +111,24 @@ unsigned char * combineRGBAndDepthToOutput( unsigned char * selectedRGB , unsign
     case COMBINE_AND :
       while (ptrRGB < ptrRGBLimit )
         {
-          if ( (*ptrRGB)&&(*ptrDepth) ) {  *result=1;  }
-          ++ptrRGB; ++ptrDepth; ++result;
+          if ( (*ptrRGB!=0)&&(*ptrDepth!=0) ) {  *ptrResult=1;  }
+          ++ptrRGB; ++ptrDepth; ++ptrResult;
         }
     break;
 
     case COMBINE_OR :
       while (ptrRGB < ptrRGBLimit )
         {
-          if ( (*ptrRGB)||(*ptrDepth) ) {  *result=1;  }
-          ++ptrRGB; ++ptrDepth; ++result;
+          if ( (*ptrRGB!=0)||(*ptrDepth!=0) ) {  *ptrResult=1;  }
+          ++ptrRGB; ++ptrDepth; ++ptrResult;
         }
     break;
 
     case COMBINE_XOR :
       while (ptrRGB < ptrRGBLimit )
         {
-          if ( (*ptrRGB)^(*ptrDepth) ) {  *result=1;  }
-          ++ptrRGB; ++ptrDepth; ++result;
+          if ( (*ptrRGB!=0)^(*ptrDepth!=0) ) {  *ptrResult=1;  }
+          ++ptrRGB; ++ptrDepth; ++ptrResult;
         }
     break;
 

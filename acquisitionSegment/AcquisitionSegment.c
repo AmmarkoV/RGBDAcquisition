@@ -67,9 +67,12 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
       executeSegmentationRGB(RGB,combinedSelection,width,height,segConfRGB);
       executeSegmentationDepth(Depth,combinedSelection,width,height,segConfDepth);
 
-      fprintf(stderr,"Segmentation executed!\n");
       //And we dont forget to free our memory
-      if (combinedSelection!=0) { free(combinedSelection); combinedSelection=0; }
+      if (combinedSelection!=0)
+        {
+          free(combinedSelection);
+          combinedSelection=0;
+        }
      }
   }
 
