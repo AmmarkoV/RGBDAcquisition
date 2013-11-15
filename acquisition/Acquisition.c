@@ -832,15 +832,15 @@ unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdenti
 }
 
 
-int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  )
+int acquisitionGetDepth3DPointAtXYNoCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  )
 {
     short * depthFrame = acquisitionGetDepthFrame(moduleID,devID);
-    if (depthFrame == 0 ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXY , getting depth frame"); return 0; }
+    if (depthFrame == 0 ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration , getting depth frame"); return 0; }
 
     unsigned int width; unsigned int height; unsigned int channels; unsigned int bitsperpixel;
-    if (! acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) ) {  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXY getting depth frame dims"); return 0; }
+    if (! acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) ) {  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration getting depth frame dims"); return 0; }
 
-    if ( (x2d>=width) || (y2d>=height) ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXY incorrect 2d x,y coords"); return 0; }
+    if ( (x2d>=width) || (y2d>=height) ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration incorrect 2d x,y coords"); return 0; }
 
     float cx = width / 2;
     float cy = height/ 2;
@@ -853,6 +853,16 @@ int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier de
 }
 
 
+int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  )
+{
+    unsigned int noCalibration=1;
+    struct calibration calib;
+    if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )  { return 0; }
+    fprintf(stderr,"TODO TODO TODO: respect calibration ");
+    acquisitionGetDepth3DPointAtXYNoCalibration(moduleID,devID,x2d,y2d ,x,y,z);
+
+    return 1;
+}
 
 int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID ,
                                        unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel )

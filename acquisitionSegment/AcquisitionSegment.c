@@ -77,7 +77,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
  memcpy(sourceCopy,source,width*height*3*sizeof(char));
 
 
- char * target = (char *) malloc( width * height * 3 * sizeof(char));
+ unsigned char * target = (unsigned char *) malloc( width * height * 3 * sizeof(unsigned char));
  if ( target == 0) {  free(sourceCopy); return 0; }
  memset(target,0,width*height*3*sizeof(char));
 
@@ -288,16 +288,6 @@ if (segConf->enableBBox)
 
 if ( segConf->enablePlaneSegmentation )
  {
-    float pN[3]={  segConf->p2[0] , segConf->p2[1]+5 , segConf->p2[2] };
-    float normal[3]={0.0 , 0.0 , 0.0 };
-
-    crossProduct( segConf->p1 , segConf->p2  , segConf->p3  , normal);
-
-    fprintf(stderr,"Cross Product is %0.2f %0.2f %0.2f \n",normal[0],normal[1],normal[2]);
-    fprintf(stderr,"Dot Product of p1 p2  %0.2f \n",dotProduct(segConf->p1, segConf->p2));
-
-    //fprintf(stderr,"signedDistanceFromPlane is %0.2f \n",signedDistanceFromPlane(segConf->p2, normal , pN));
-
  float fx = 537.479600 , fy = 536.572920 , cx = 317.389787 ,cy = 236.118093;
  if ( calib->intrinsicParametersSet )
  {
@@ -319,6 +309,19 @@ if ( segConf->enablePlaneSegmentation )
 
   double raw3D[4]={0};
   double world3D[4]={0};
+
+
+    float p1[3]; p1[0]=(float) segConf->p1[0]; p1[1]=(float) segConf->p1[1]; p1[2]=(float) segConf->p1[2];
+    float p2[3]; p2[0]=(float) segConf->p2[0]; p2[1]=(float) segConf->p2[1]; p2[2]=(float) segConf->p2[2];
+    float p3[3]; p3[0]=(float) segConf->p3[0]; p3[1]=(float) segConf->p3[1]; p3[2]=(float) segConf->p3[2];
+    float pN[3]={  p2[0] , p2[1]+5 , p2[2] };
+    float normal[3]={0.0 , 0.0 , 0.0 };
+
+    crossProduct( p1 , p2  , p3  , normal);
+
+
+    //fprintf(stderr,"signedDistanceFromPlane is %0.2f \n",signedDistanceFromPlane(segConf->p2, normal , pN));
+
 
 
   sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
@@ -351,7 +354,7 @@ if ( segConf->enablePlaneSegmentation )
       pN[2]=(float) world3D[2];
       float result = signedDistanceFromPlane(segConf->p2, normal , pN);
 
-      if (  result<=0.0 )  { *selectedPtr=0; } //Denied
+      if (  result<=0.1 )  { fprintf(stderr,"%0.2f,%0.2f,%0.2f ",pN[0],pN[1],pN[2]); *selectedPtr=0; } //Denied
 
      }//If it was selected and not null project it into 3d Space
 
@@ -407,7 +410,7 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
      unsigned char *  combinedSelection = combineRGBAndDepthToOutput(selectedRGB,selectedDepth,combinationMode,width,height);
      if (combinedSelection==0)
      {
-       fprintf(stderr,"Failed to combine outputs using method %u\Cannot execute segmentation\n",combinationMode);
+       fprintf(stderr,"Failed to combine outputs using method %u\nCannot execute segmentation\n",combinationMode);
      } else
      {
       //We use the combinedSelection for both RGB and Depth

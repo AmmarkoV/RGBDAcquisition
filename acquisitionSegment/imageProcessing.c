@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "imageProcessing.h"
 
 
@@ -12,10 +13,16 @@ enum dimEnum
 
 void crossProduct(float p1[3] , float p2[3] , float p3[3]  , float * normal)
 {
+
+  fprintf(stderr,"Point 1 %0.5f %0.5f %0.5f \n",p1[0],p1[1],p1[2]);
+  fprintf(stderr,"Point 2 %0.5f %0.5f %0.5f \n",p2[0],p2[1],p2[2]);
+  fprintf(stderr,"Point 3 %0.5f %0.5f %0.5f \n",p3[0],p3[1],p3[2]);
+
   float temp_v1[3];
   float temp_v2[3];
   float tempLength;
   float CNormal[3];
+
 
 
 int i=0;
@@ -33,14 +40,20 @@ normal[DIMZ] = temp_v1[DIMX]*temp_v2[DIMY] - temp_v1[DIMY]*temp_v2[DIMX];
 // normalize normal
 tempLength =(normal[DIMX]*normal[DIMX])+ (normal[DIMY]*normal[DIMY])+ (normal[DIMZ]*normal[DIMZ]);
 
-tempLength = sqrt(tempLength);
+ if (tempLength>0)
+  {
+   tempLength = sqrt(tempLength);
 
-// prevent n/0
-if (tempLength == 0) { tempLength = 1;}
+   // prevent n/0
+   if (tempLength == 0) { tempLength = 1;}
 
-normal[DIMX] /= tempLength;
-normal[DIMY] /= tempLength;
-normal[DIMZ] /= tempLength;
+   normal[DIMX] /= tempLength;
+   normal[DIMY] /= tempLength;
+   normal[DIMZ] /= tempLength;
+  }
+
+
+ fprintf(stderr,"Cross Product is %0.2f %0.2f %0.2f \n",normal[0],normal[1],normal[2]);
 
 }
 
