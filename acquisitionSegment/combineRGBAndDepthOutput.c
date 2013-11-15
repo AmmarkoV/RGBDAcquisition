@@ -108,21 +108,24 @@ unsigned char * combineRGBAndDepthToOutput( unsigned char * selectedRGB , unsign
     case COMBINE_AND :
       while (ptrRGB < ptrRGBLimit )
         {
-          if ( (*ptrRGB)&&(*ptrDepth) ) {  *result=1;  }  ++ptrRGB; ++ptrDepth; ++result;
+          if ( (*ptrRGB)&&(*ptrDepth) ) {  *result=1;  }
+          ++ptrRGB; ++ptrDepth; ++result;
         }
     break;
 
     case COMBINE_OR :
       while (ptrRGB < ptrRGBLimit )
         {
-          if ( (*ptrRGB)||(*ptrDepth) ) {  *result=1;  }  ++ptrRGB; ++ptrDepth; ++result;
+          if ( (*ptrRGB)||(*ptrDepth) ) {  *result=1;  }
+          ++ptrRGB; ++ptrDepth; ++result;
         }
     break;
 
     case COMBINE_XOR :
       while (ptrRGB < ptrRGBLimit )
         {
-          if ( (*ptrRGB)^(*ptrDepth) ) {  *result=1;  }  ++ptrRGB; ++ptrDepth; ++result;
+          if ( (*ptrRGB)^(*ptrDepth) ) {  *result=1;  }
+          ++ptrRGB; ++ptrDepth; ++result;
         }
     break;
 

@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-from fuse03 -to fuse03Segmented -maxFrames 10 -floodEraseDepthSource 529 290 10 -floodEraseDepthSource 529 330 10 -floodEraseDepthSource 529 350 10 -floodEraseDepthSource 529 390 10 -floodEraseDepthSource 529 430 10 -eraseRGB 255 255 255 -maxDepth 500 -bbox -200 -100 100 200 150 500 -combine depth" />
+				<Option parameters="-from pancakeMix2 -to pancakeMix2Segmented -maxFrames 10 -eraseRGB 0 0 0 -maxDepth 1450 -minDepth 700 -plane -381.37680 209.26999 997.00000 244.47229 131.82959 1131.00000 253.63799 290.28799 670.00000 -floodEraseRGBTarget 134 334 35 -combine and" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

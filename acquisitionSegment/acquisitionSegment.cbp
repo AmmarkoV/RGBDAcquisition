@@ -63,10 +63,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AcquisitionSegment.h" />
+		<Unit filename="colorSelector.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="colorSelector.h" />
 		<Unit filename="combineRGBAndDepthOutput.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="combineRGBAndDepthOutput.h" />
+		<Unit filename="depthSelector.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="depthSelector.h" />
 		<Unit filename="imageProcessing.c">
 			<Option compilerVar="CC" />
 		</Unit>
