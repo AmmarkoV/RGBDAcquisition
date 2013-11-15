@@ -1,8 +1,9 @@
 #ifndef IMAGEPROCESSING_H_INCLUDED
 #define IMAGEPROCESSING_H_INCLUDED
 
-
-
+void crossProduct(float p1[3] , float p2[3] , float p3[3]  , float * normal);
+float dotProduct(float p1[3] , float p2[3] );
+float  signedDistanceFromPlane(float origin[3] , float normal[3] , float pN[3]);
 
 int getDepthBlobAverage(float * centerX , float * centerY , float * centerZ , short * frame , unsigned int width , unsigned int height);
 

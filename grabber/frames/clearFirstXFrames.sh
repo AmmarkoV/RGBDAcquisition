@@ -17,6 +17,8 @@ do
   INUM=`printf %05u $i`
   cp "colorFrame_0_$XNUM.pnm" "colorFrame_0_$INUM.pnm"
   cp "depthFrame_0_$XNUM.pnm" "depthFrame_0_$INUM.pnm"
+
+  echo cp "colorFrame_0_$XNUM.pnm" "colorFrame_0_$INUM.pnm"
 done
 
 exit 0

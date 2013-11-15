@@ -173,7 +173,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
      // return 1;
    }
 
-   acquisitionOpenDevice(moduleID,devID,"fuse11",640,480,25);
+   acquisitionOpenDevice(moduleID,devID,"pancakeMix2",640,480,25);
 }
 
 EditorFrame::~EditorFrame()
@@ -260,7 +260,7 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
   wxSleep(0.01);
   int x=event.GetX();
   int y=event.GetY();
-  fprintf(stderr,"Mouse %u,%u\n",x,y);
+  //fprintf(stderr,"Mouse %u,%u\n",x,y);
 
 
   int fd_rx1,fd_rx2,fd_ry1,fd_ry2;
@@ -279,7 +279,16 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
               wxString msg;
               msg.Printf( wxT("Adding Track Point ( %u , %u )\n") ,x-feed_0_x,y-feed_0_y );
               Status->SetLabel(msg);
+
+              float x,y,z;
+              acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z);
+              fprintf(stderr,"Depth at point is  %0.5f,%0.5f,%0.5f\n",x,y,z);
+
            }
+
+
+
+
        }
 
 /*

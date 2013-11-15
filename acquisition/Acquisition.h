@@ -65,7 +65,7 @@ float acquisitionGetTimerFPS(unsigned int timerID);
 void countdownDelay(int seconds);
 int acquisitionSimulateTime(unsigned long timeInMillisecs);
 
-int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
+int saveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
 char * convertShortDepthToRGBDepth(short * depth,unsigned int width , unsigned int height);
 char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth);

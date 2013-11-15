@@ -13,9 +13,9 @@ int RGBfindImageInImage(
   unsigned int bestScore=10000000 , bestX=0 , bestY=0;
   unsigned int score=bestScore , x , y;
 
-  for (y=404; y<haystackHeight-needleHeight-1; y++)
+  for (y=0; y<haystackHeight-needleHeight-1; y++)
   {
-    for (x=1000; x<haystackWidth-needleWidth-1; x++)
+    for (x=0; x<haystackWidth-needleWidth-1; x++)
     {
        if (
              compareRGBPatches( haystack , x ,  y , haystackWidth ,  haystackHeight,
@@ -25,11 +25,12 @@ int RGBfindImageInImage(
            )
            {
               if ( score < bestScore) { bestScore = score;  bestX=x;  bestY = y;  }
+              if (score < 100 ) { return bestScore+1; }
            }
     }
   }
 
   *resX = bestX;
   *resY = bestY;
-  return bestScore;
+  return bestScore+1;
 }

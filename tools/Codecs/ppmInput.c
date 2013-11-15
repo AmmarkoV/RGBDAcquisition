@@ -21,15 +21,15 @@ int ReadPPM(char * filename,struct Image * pic,char read_only_header)
         t = fgets(buf, PPMREADBUFLEN, pf);
         if (t == 0) { fclose(pf); return 0; }
 
-        if ( strncmp(buf, "P5\n", 3)  != 0 )
+        if ( strncmp(buf, "P5\n", 3)  == 0 )
         {
            fprintf(stderr,"Grayscale\n");
-           pic->channels=3;
+           pic->channels=1;
         } else
-        if ( strncmp(buf, "P6\n", 3)  != 0 )
+        if ( strncmp(buf, "P6\n", 3)  == 0 )
         {
            fprintf(stderr,"RGB\n");
-           pic->channels=1;
+           pic->channels=3;
         } else
         { fclose(pf); return 0; }
 
@@ -69,6 +69,7 @@ int ReadPPM(char * filename,struct Image * pic,char read_only_header)
             fclose(pf);
             if ( rd < pic->image_size )
             {
+                fprintf(stderr,"Incorrect read @ file %s , wanted to read %u bytes we got %u ",filename,pic->image_size,rd);
                return 0;
             }
             return 1;

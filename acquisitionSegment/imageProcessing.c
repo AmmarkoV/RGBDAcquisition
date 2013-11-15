@@ -2,6 +2,84 @@
 
 
 
+enum dimEnum
+{
+    DIMX = 0 ,
+    DIMY ,
+    DIMZ ,
+    NUMBER_OF_DIMENSIONS
+};
+
+void crossProduct(float p1[3] , float p2[3] , float p3[3]  , float * normal)
+{
+  float temp_v1[3];
+  float temp_v2[3];
+  float tempLength;
+  float CNormal[3];
+
+
+int i=0;
+for (i=0; i<3; i++)
+{
+   temp_v1[i]=p1[i]-p2[i];
+   temp_v2[i]=p3[i]-p2[i];
+}
+
+// calculate cross product
+normal[DIMX] = temp_v1[DIMY]*temp_v2[DIMZ] - temp_v1[DIMZ]*temp_v2[DIMY];
+normal[DIMY] = temp_v1[DIMZ]*temp_v2[DIMX] - temp_v1[DIMX]*temp_v2[DIMZ];
+normal[DIMZ] = temp_v1[DIMX]*temp_v2[DIMY] - temp_v1[DIMY]*temp_v2[DIMX];
+
+// normalize normal
+tempLength =(normal[DIMX]*normal[DIMX])+ (normal[DIMY]*normal[DIMY])+ (normal[DIMZ]*normal[DIMZ]);
+
+tempLength = sqrt(tempLength);
+
+// prevent n/0
+if (tempLength == 0) { tempLength = 1;}
+
+normal[DIMX] /= tempLength;
+normal[DIMY] /= tempLength;
+normal[DIMZ] /= tempLength;
+
+}
+
+
+
+
+float  distance3D(float p1[3] , float p2[3] , float p3[3])
+{
+   float vect_x = p1[DIMX] - p2[DIMX];
+   float vect_y = p1[DIMY] - p2[DIMY];
+   float vect_z = p1[DIMZ] - p2[DIMZ];
+
+   float len = sqrt( vect_x*vect_x + vect_y*vect_y + vect_z*vect_z);
+   if(len == 0) len = 1.0f;
+}
+
+
+
+
+float dotProduct(float p1[3] , float p2[3] )
+{
+    return p1[DIMX]*p2[DIMX] + p1[DIMY]*p2[DIMY] + p1[DIMZ]*p2[DIMZ];
+}
+
+
+float  signedDistanceFromPlane(float origin[3] , float normal[3] , float pN[3])
+{
+  float tempV[NUMBER_OF_DIMENSIONS];
+  int i=0;
+  for (i=0; i<NUMBER_OF_DIMENSIONS; i++)
+  {
+      tempV[i]=pN[i]-origin[i];
+  }
+
+
+  return dotProduct(tempV,normal);
+}
+
+
 
 int getDepthBlobAverage(float * centerX , float * centerY , float * centerZ , short * frame , unsigned int width , unsigned int height)
 {

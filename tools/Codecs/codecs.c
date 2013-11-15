@@ -85,7 +85,7 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
      #if USE_PPM_FILES
        case PPM_CODEC :
        case PNM_CODEC :
-       if (!ReadPPM(filename,img,read_only_header)) { free(img); img=0; }
+       if (!ReadPPM(filename,img,read_only_header))  { free(img); img=0;  }
        break;
      #endif
 
@@ -186,7 +186,8 @@ struct Image * createImage( unsigned int width , unsigned int height , unsigned 
 
 int destroyImage(struct Image * img)
 {
+    if (img==0) {return 0; }
     if (img->pixels!=0) { free(img->pixels); img->pixels=0; }
     if (img!=0) { free(img); img=0; }
-    return 0;
+    return 1;
 }

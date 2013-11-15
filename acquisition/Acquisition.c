@@ -178,7 +178,7 @@ int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame 
 
 
 
-int saveRawImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
+int saveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
     //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);
 

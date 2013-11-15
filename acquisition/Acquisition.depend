@@ -1,18 +1,1 @@
 # depslib dependency file v1.0
-1383298993 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.c
-	"pluginLinker.h"
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<unistd.h>
-	<time.h>
-	<dlfcn.h>
-
-1382525688 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.h
-	"Acquisition.h"
-
-1383136043 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
-	"../tools/Calibration/calibration.h"
-
-1376910583 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
-

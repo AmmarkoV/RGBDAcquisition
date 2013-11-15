@@ -279,8 +279,6 @@ if (segConf->enableBBox)
   free4x4Matrix(&m); // This is the same as free(m); m=0;
  } //End of M allocated!
 
-
-
 }
 // -------------------------------------------------------------------------------------------------
 // --------------------------------- BOUNDING BOX SEGMENTATION -------------------------------------
@@ -288,7 +286,85 @@ if (segConf->enableBBox)
 
 
 
+if ( segConf->enablePlaneSegmentation )
+ {
+    float pN[3]={  segConf->p2[0] , segConf->p2[1]+5 , segConf->p2[2] };
+    float normal[3]={0.0 , 0.0 , 0.0 };
 
+    crossProduct( segConf->p1 , segConf->p2  , segConf->p3  , normal);
+
+    fprintf(stderr,"Cross Product is %0.2f %0.2f %0.2f \n",normal[0],normal[1],normal[2]);
+    fprintf(stderr,"Dot Product of p1 p2  %0.2f \n",dotProduct(segConf->p1, segConf->p2));
+
+    //fprintf(stderr,"signedDistanceFromPlane is %0.2f \n",signedDistanceFromPlane(segConf->p2, normal , pN));
+
+ float fx = 537.479600 , fy = 536.572920 , cx = 317.389787 ,cy = 236.118093;
+ if ( calib->intrinsicParametersSet )
+ {
+   fx = calib->intrinsic[CALIB_INTR_FX];
+   fy = calib->intrinsic[CALIB_INTR_FY];
+   cx = calib->intrinsic[CALIB_INTR_CX];
+   cy = calib->intrinsic[CALIB_INTR_CY];
+
+   if (fx==0) { fx=1;}
+   if (fy==0) { fy=1;}
+ } else {fprintf(stderr,"No intrinsic parameters provided , bounding box segmentation will use default intrinsic values ( you probably dont want this )\n"); }
+
+ double * m = alloc4x4Matrix();
+ if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
+ {
+  create4x4IdentityMatrix(m);
+  if ( calib->extrinsicParametersSet ) { convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
+  else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
+
+  double raw3D[4]={0};
+  double world3D[4]={0};
+
+
+  sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
+  sourcePixelsLineEnd = sourcePixelsStart + (width);
+  sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
+  sourcePixels = sourcePixelsStart;
+
+  selectedPtr   = selectedDepth;
+  sourcePixels = sourcePixelsStart;
+  sourcePixelsLineEnd = sourcePixelsStart + (width);
+  x=0; y=0;
+  depth=0;
+  while (sourcePixels<sourcePixelsEnd)
+  {
+   while (sourcePixels<sourcePixelsLineEnd)
+    {
+     depth = sourcePixels++;
+
+     if (  (*selectedPtr!=0)  )  //  &&  (*depth != 0)
+     {
+      raw3D[0] = (double) (x - cx) * (*depth) / fx;
+      raw3D[1] = (double) (y - cy) * (*depth) / fy;
+      raw3D[2] = (double) *depth;
+      raw3D[3] = (double) 1.0;
+
+      transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+
+      pN[0]=(float) world3D[0];
+      pN[1]=(float) world3D[1];
+      pN[2]=(float) world3D[2];
+      float result = signedDistanceFromPlane(segConf->p2, normal , pN);
+
+      if (  result<=0.0 )  { *selectedPtr=0; } //Denied
+
+     }//If it was selected and not null project it into 3d Space
+
+     ++selectedPtr;
+     ++x;
+     if (x>=width) { x=0; ++y;}
+    }
+   sourcePixelsLineEnd+=sourceWidthStep;
+ }
+  free4x4Matrix(&m); // This is the same as free(m); m=0;
+ } //End of M allocated!
+ }
+ //-----------------------------------------------------------------------------
 
 
  free(sourceCopy);

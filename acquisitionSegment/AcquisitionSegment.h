@@ -57,7 +57,17 @@ struct SegmentationFeaturesDepth
    unsigned char enableBBox;
    double bboxX1,bboxY1,bboxZ1,bboxX2,bboxY2,bboxZ2;
 
+
+
+   unsigned char enablePlaneSegmentation;
+   double p1[3];
+   double p2[3];
+   double p3[3];
 };
+
+
+
+
 
 unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib);
 unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf, struct calibration * calib);

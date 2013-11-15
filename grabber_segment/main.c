@@ -167,6 +167,12 @@ int main(int argc, char *argv[])
                                             segConfDepth.bboxY2=atof(argv[i+5]);
                                             segConfDepth.bboxZ2=atof(argv[i+6]);
                                           } else
+    if (strcmp(argv[i],"-plane")==0)      {
+                                            segConfDepth.enablePlaneSegmentation=1;
+                                            segConfDepth.p1[0]=atof(argv[i+1]); segConfDepth.p1[1]=atof(argv[i+2]); segConfDepth.p1[2]=atof(argv[i+3]);
+                                            segConfDepth.p2[0]=atof(argv[i+4]); segConfDepth.p2[1]=atof(argv[i+5]); segConfDepth.p2[2]=atof(argv[i+6]);
+                                            segConfDepth.p3[0]=atof(argv[i+7]); segConfDepth.p3[1]=atof(argv[i+8]); segConfDepth.p3[2]=atof(argv[i+9]);
+                                          }
     if (strcmp(argv[i],"-minDepth")==0)   { segConfDepth.minDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
     if (strcmp(argv[i],"-maxDepth")==0)   { segConfDepth.maxDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
     if (strcmp(argv[i],"-combine")==0)    { combinationMode=pickCombinationModeFromString(argv[i+1]); }     else
