@@ -28,9 +28,16 @@ int removeFloodFillBeforeProcessing(unsigned char * source , unsigned char * tar
        //fprintf(stderr,"Flood Filling Before %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
        //fprintf(stderr,"Src Color %u,%u,%u \n",sR,sG,sB);
 
-       floodFill(source , width, height ,
-                 segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i],
-                 sR,sG,sB , 0 , 0 , 0    , 0 );
+       if (
+            !floodFill(source , width, height ,
+                       segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i],
+                       sR,sG,sB ,
+                       segConf->replaceR , segConf->replaceG , segConf->replaceB
+                       , 0 )
+          )
+          {
+             fprintf(stderr,"Failed to flood fill , bad input..\n");
+          }
      }
      //fprintf(stderr,"Flood Filled Before %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
   }
@@ -55,7 +62,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
 
  removeFloodFillBeforeProcessing(sourceCopy,target,width,height,segConf);
 
-
+ //TODO: REATTACH FLOOD FILL!
  unsigned int posX = 0;
  unsigned int posY = 0;
  unsigned int sourceWidthStep = width * 3;
@@ -89,6 +96,12 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
         G = sourcePixels++;
         B = sourcePixels++;
 
+       if (
+            (*R==segConf->replaceR) &&
+            (*G==segConf->replaceG) &&
+            (*B==segConf->replaceB)
+           ) { *selectedPtr=0; }
+             else
        if  (
              (segConf->minR <= *R) && (*R <= segConf->maxR)  &&
               (segConf->minG <= *G) && (*G <= segConf->maxG)  &&

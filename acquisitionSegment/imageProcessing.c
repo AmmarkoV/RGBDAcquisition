@@ -147,7 +147,7 @@ int floodFill(unsigned char * target , unsigned int width , unsigned int height 
  unsigned char * tB = source;
 
 
-  if ( ( *tR == R   ) &&  ( *tG == G   )  &&  ( *tB == B ) ) { return 0; }
+  if ( (depth>0) && ( *tR == R   ) &&  ( *tG == G   )  &&  ( *tB == B ) ) { return 0; }
 
 
   if (

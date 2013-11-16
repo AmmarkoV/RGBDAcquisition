@@ -141,6 +141,7 @@ int main(int argc, char *argv[])
                                                   segConfRGB.floodErase.pY[segConfRGB.floodErase.totalPoints] = atoi(argv[i+2]);
                                                   segConfRGB.floodErase.threshold[segConfRGB.floodErase.totalPoints] = atoi(argv[i+3]);
                                                   segConfRGB.floodErase.source=1;
+                                                  doNotSegmentRGB=0;
                                                   ++segConfRGB.floodErase.totalPoints;
                                                 } else
     if (strcmp(argv[i],"-floodEraseRGBTarget")==0) {
@@ -148,6 +149,7 @@ int main(int argc, char *argv[])
                                                   segConfRGB.floodErase.pY[segConfRGB.floodErase.totalPoints] = atoi(argv[i+2]);
                                                   segConfRGB.floodErase.threshold[segConfRGB.floodErase.totalPoints] = atoi(argv[i+3]);
                                                   segConfRGB.floodErase.target=1;
+                                                  doNotSegmentRGB=0;
                                                   ++segConfRGB.floodErase.totalPoints;
                                                  } else
     if (strcmp(argv[i],"-cropRGB")==0)    { segConfRGB.minX = atoi(argv[i+1]); segConfRGB.minY = atoi(argv[i+2]);
