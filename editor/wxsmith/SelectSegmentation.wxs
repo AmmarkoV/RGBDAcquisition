@@ -10,11 +10,13 @@
 		<object class="wxButton" name="ID_BUTTON1" variable="ButtonCancel" member="yes">
 			<label>Cancel</label>
 			<pos>640,464</pos>
+			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON2" variable="ButtonOk" member="yes">
 			<label>Ok</label>
 			<pos>376,464</pos>
 			<size>256,27</size>
+			<handler function="OnButtonOkClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
 			<label>RGB</label>

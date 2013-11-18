@@ -142,6 +142,9 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	ChoiceCombination->Append(_("XOR combination "));
 	ChoiceCombination->Append(_("RGB only"));
 	ChoiceCombination->Append(_("Depth only "));
+
+	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
+	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonOkClick);
 	//*)
 }
 
@@ -151,3 +154,13 @@ SelectSegmentation::~SelectSegmentation()
 	//*)
 }
 
+
+void SelectSegmentation::OnButtonOkClick(wxCommandEvent& event)
+{
+    Close();
+}
+
+void SelectSegmentation::OnButtonCancelClick(wxCommandEvent& event)
+{
+    Close();
+}

@@ -25,6 +25,7 @@ class SelectModule: public wxDialog
 
 		char deviceNameSelected[512];
 
+        int selectionMade ;
 		//(*Declarations(SelectModule)
 		wxTextCtrl* TextCtrlFPS;
 		wxTextCtrl* TextCtrlHeight;

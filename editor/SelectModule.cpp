@@ -58,6 +58,9 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectModule::OnButtonStartModuleClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectModule::OnButtonCancelClick);
 	//*)
+
+
+  selectionMade=0;
 }
 
 SelectModule::~SelectModule()
@@ -81,6 +84,7 @@ void SelectModule::OnButtonStartModuleClick(wxCommandEvent& event)
   wxString mystring = ComboBoxDevice->GetValue();
   strcpy( this->deviceNameSelected ,  mystring.mb_str() );
 
+  selectionMade=1;
   Close();
    /*
 		unsigned int deviceSelected;
@@ -93,5 +97,5 @@ void SelectModule::OnButtonStartModuleClick(wxCommandEvent& event)
 
 void SelectModule::OnButtonCancelClick(wxCommandEvent& event)
 {
-    Destroy();
+    Close();
 }

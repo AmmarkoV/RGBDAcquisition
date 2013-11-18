@@ -139,6 +139,8 @@ class SelectSegmentation: public wxDialog
 	private:
 
 		//(*Handlers(SelectSegmentation)
+		void OnButtonOkClick(wxCommandEvent& event);
+		void OnButtonCancelClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

@@ -31,6 +31,11 @@ struct SegmentationFeaturesDepth segConfDepth={0};
 struct calibration calib;
 
 
+unsigned int segmentedFramesExist=0;
+unsigned char * segmentedRGB=0;
+unsigned short * segmentedDepth=0;
+
+
 unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
 {
   unsigned char * output = (unsigned char*) malloc(width*height*3*sizeof(unsigned char));
@@ -237,23 +242,6 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
    acquisitionOpenDevice(moduleID,devID,openDevice,width,height,fps);
 
 
-   segConfRGB.floodErase.totalPoints = 0;
-
-   segConfRGB.minX=0;  segConfRGB.maxX=640;
-   segConfRGB.minY=0; segConfRGB.maxY=480;
-
-   segConfRGB.minR=0; segConfRGB.minG=0; segConfRGB.minB=0;
-   segConfRGB.maxR=256; segConfRGB.maxG=256; segConfRGB.maxB=256;
-
-   segConfRGB.enableReplacingColors=0;
-   segConfRGB.replaceR=92; segConfRGB.replaceG=45; segConfRGB.replaceB=36;
-
-   segConfDepth.minX=0;  segConfDepth.maxX=640;
-   segConfDepth.minY=0; segConfDepth.maxY=480;
-   segConfDepth.minDepth=0; segConfDepth.maxDepth=32500;
-   //-----------------------------------------------------------
-
-
 
 }
 
@@ -287,18 +275,36 @@ void EditorFrame::OnPaint(wxPaintEvent& event)
 
   if (lastFrameDrawn!=acquisitionGetCurrentFrameNumber(moduleID,devID))
   {
-   //DRAW RGB FRAME -------------------------------------------------------------------------------------
-   acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-   passVideoRegisterToFeed(0,acquisitionGetColorFrame(moduleID,devID),width,height,bitsperpixel,channels);
 
-   //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
-   acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+     if (segmentedFramesExist)
+     {
+        //DRAW RGB FRAME -------------------------------------------------------------------------------------
+       acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+       passVideoRegisterToFeed(0,segmentedRGB,width,height,bitsperpixel,channels);
+
+       //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
+       acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
 
 
-   unsigned char * rgb = convertShortDepthTo3CharDepth(acquisitionGetDepthFrame(moduleID,devID),width,height,0,2048);
-   //char * rgb = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
-   passVideoRegisterToFeed(1,rgb,width,height,8,3);
-   free(rgb);
+       unsigned char * rgb = convertShortDepthTo3CharDepth(segmentedDepth,width,height,0,2048);
+       //char * rgb = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
+       passVideoRegisterToFeed(1,rgb,width,height,8,3);
+       free(rgb);
+     } else
+     {
+       //DRAW RGB FRAME -------------------------------------------------------------------------------------
+       acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+       passVideoRegisterToFeed(0,acquisitionGetColorFrame(moduleID,devID),width,height,bitsperpixel,channels);
+
+       //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
+       acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+
+
+       unsigned char * rgb = convertShortDepthTo3CharDepth(acquisitionGetDepthFrame(moduleID,devID),width,height,0,2048);
+       //char * rgb = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
+       passVideoRegisterToFeed(1,rgb,width,height,8,3);
+       free(rgb);
+     }
 
    lastFrameDrawn=acquisitionGetCurrentFrameNumber(moduleID,devID);
 
@@ -389,6 +395,27 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 }
 
 
+int refreshSegmentedFrame()
+{
+    if (!segmentedFramesExist ) { return 0; }
+    if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
+    if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
+
+    segmentedRGB = copyRGB(acquisitionGetColorFrame(moduleID,devID) , width , height);
+    segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID,devID) , width , height);
+
+    segmentRGBAndDepthFrame (
+                              segmentedRGB ,
+                              segmentedDepth ,
+                              width , height ,
+                              &segConfRGB ,
+                              &segConfDepth ,
+                              &calib ,
+                              combinationMode
+                             );
+    return 1;
+}
+
 
 void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
 {
@@ -397,6 +424,7 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
   if (play)
     {
      acquisitionSnapFrames(moduleID,devID);
+     refreshSegmentedFrame();
     }
 
 
@@ -417,6 +445,7 @@ void EditorFrame::OnbuttonPreviousFrameClick(wxCommandEvent& event)
 {
     acquisitionSeekRelativeFrame(moduleID,devID,(signed int) -2);
     acquisitionSnapFrames(moduleID,devID);
+    refreshSegmentedFrame();
     Refresh(); // <- This draws the window!
 }
 
@@ -424,6 +453,7 @@ void EditorFrame::OnbuttonNextFrameClick(wxCommandEvent& event)
 {
     //acquisitionSeekRelativeFrame(moduleID,devID,(signed int) +1);
     acquisitionSnapFrames(moduleID,devID);
+    refreshSegmentedFrame();
     Refresh(); // <- This draws the window!
 }
 
@@ -436,6 +466,7 @@ void EditorFrame::OncurrentFrameTextCtrlText(wxCommandEvent& event)
           if (jumpTo>0) { --jumpTo; }
           acquisitionSeekFrame(moduleID,devID,jumpTo);
           acquisitionSnapFrames(moduleID,devID);
+          refreshSegmentedFrame();
           Refresh(); // <- This draws the window!
         }
 
@@ -455,35 +486,36 @@ void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
     if (jumpTo>0) { --jumpTo; }
           acquisitionSeekFrame(moduleID,devID,jumpTo);
           acquisitionSnapFrames(moduleID,devID);
+          refreshSegmentedFrame();
           Refresh(); // <- This draws the window!
 
 }
 
 void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 {
-
     SelectSegmentation  * segmentationSelector = new SelectSegmentation(this, wxID_ANY);
     segmentationSelector->ShowModal();
 
-    delete  segmentationSelector;
-
     acquisitionGetColorCalibration(moduleID,devID,&calib);
 
-    //unsigned long colorTimestamp = acquisitionGetColorTimestamp(moduleID,devID);
-    //unsigned long depthTimestamp = acquisitionGetDepthTimestamp(moduleID,devID);
+    segmentedFramesExist=1;
 
-    unsigned char * segmentedRGB = copyRGB(acquisitionGetColorFrame(moduleID,devID) , width , height);
-    unsigned short * segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID,devID) , width , height);
+   segConfRGB.floodErase.totalPoints = 0;
 
-    segmentRGBAndDepthFrame (
-                              segmentedRGB ,
-                              segmentedDepth ,
-                              width , height ,
-                              &segConfRGB ,
-                              &segConfDepth ,
-                              &calib ,
-                              combinationMode
-                             );
+   segConfRGB.minX=0;  segConfRGB.maxX=width;
+   segConfRGB.minY=0; segConfRGB.maxY=height;
 
+   segConfRGB.minR=0; segConfRGB.minG=0; segConfRGB.minB=0;
+   segConfRGB.maxR=123; segConfRGB.maxG=123; segConfRGB.maxB=123;
+
+   segConfDepth.minX=0;  segConfDepth.maxX=width;
+   segConfDepth.minY=0; segConfDepth.maxY=height;
+   segConfDepth.minDepth=0; segConfDepth.maxDepth=32500;
+   //-----------------------------------------------------------
+
+
+    delete  segmentationSelector;
+
+    refreshSegmentedFrame();
 
 }
