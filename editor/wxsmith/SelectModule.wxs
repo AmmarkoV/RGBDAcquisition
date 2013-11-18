@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="SelectModule">
+		<title>Select Used Module</title>
+		<size>297,217</size>
+		<pos_arg>1</pos_arg>
+		<size_arg>1</size_arg>
+		<object class="wxButton" name="ID_BUTTON1" variable="ButtonStartModule" member="yes">
+			<label>Start Module</label>
+			<pos>24,152</pos>
+			<size>128,27</size>
+			<handler function="OnButtonStartModuleClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+			<label>Module : </label>
+			<pos>24,22</pos>
+			<size>64,24</size>
+		</object>
+		<object class="wxComboBox" name="ID_COMBOBOX1" variable="ComboBoxModule" member="yes">
+			<content>
+				<item>NONE</item>
+				<item>V4L2</item>
+				<item>V4L2 STEREO</item>
+				<item>FREENECT</item>
+				<item>OPENNI1</item>
+				<item>OPENNI2</item>
+				<item>OPENGL</item>
+				<item>TEMPLATE</item>
+				<item>NETWORK</item>
+			</content>
+			<selection>7</selection>
+			<pos>88,16</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+			<label>Device :</label>
+			<pos>24,56</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrlDevice" member="yes">
+			<pos>88,54</pos>
+			<size>184,23</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+			<label>Size</label>
+			<pos>24,104</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrlWidth" member="yes">
+			<value>640</value>
+			<pos>80,100</pos>
+			<size>48,23</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+			<label>x</label>
+			<pos>130,104</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="TextCtrlHeight" member="yes">
+			<value>480</value>
+			<pos>144,100</pos>
+			<size>48,23</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+			<label>@</label>
+			<pos>192,104</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="TextCtrlFPS" member="yes">
+			<value>30</value>
+			<pos>216,100</pos>
+			<size>40,23</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
+			<label>fps</label>
+			<pos>264,104</pos>
+		</object>
+		<object class="wxButton" name="ID_BUTTON2" variable="ButtonCancel" member="yes">
+			<label>Cancel</label>
+			<pos>184,152</pos>
+			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
+		</object>
+	</object>
+</wxsmith>

@@ -21,4 +21,12 @@ cd editor
 cbp2make -in Editor.cbp -unix -out makefile
 cd ..
 
+
+
+cd editor
+cbp2make -in Editor.cbp -unix -out makefile
+cd ..
+
+
+
 exit 0

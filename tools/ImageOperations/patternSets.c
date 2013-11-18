@@ -4,7 +4,6 @@
 #include "../Codecs/codecs.h"
 
 
-
 int patFileExists(char * filename)
 {
   if (filename==0) { return 0; }
@@ -42,6 +41,16 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
         if (set->pattern[curSetNum].tile[totalTiles]!=0)
         {
           fprintf(stderr,"Loaded %s , we now have %u patterns for set %u\n",fName, totalTiles , curSetNum);
+
+          unsigned int totalPixels = set->pattern[curSetNum].tile[totalTiles]->width * set->pattern[curSetNum].tile[totalTiles]->height;
+          unsigned int transPixels =  countOccurancesOfRGBPixel(set->pattern[curSetNum].tile[totalTiles]->pixels,
+                                                                                                  set->pattern[curSetNum].tile[totalTiles]->width,
+                                                                                                  set->pattern[curSetNum].tile[totalTiles]->height,
+                                                                                                  123,123,0);
+
+          set->pattern[curSetNum].nonTransparentPixels[totalTiles] = totalPixels - transPixels;
+          set->pattern[curSetNum].totalPixels[totalTiles]= totalPixels ;
+
           ++totalTiles;
         }
       } else
@@ -93,11 +102,20 @@ int emptyPatternSet(struct PatternSet * pattSet)
 }
 
 
+unsigned int getPatternSetItemWidth(struct PatternSet * pattSet  , unsigned int patternNum , unsigned int tileNum)
+{
+    return pattSet->pattern[patternNum].tile[tileNum]->width ;
+}
+
+
 int compareToPatternSet(struct PatternSet * pattSet ,
                         unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
                         unsigned int sX,unsigned int sY , unsigned int width ,unsigned int height ,
                         unsigned int maximumAcceptedScore,
-                        unsigned int * pick)
+                        unsigned int * pick ,
+                        unsigned int * resultPatternNum ,
+                        unsigned int * resultTileNum
+                        )
 {
    unsigned int currentScore=maximumAcceptedScore+1;
    unsigned int bestScore=maximumAcceptedScore+1;
@@ -132,6 +150,9 @@ int compareToPatternSet(struct PatternSet * pattSet ,
                                         )
            )
       {
+          float differentTransCompensationFactor  = pattSet->pattern[patternNum].totalPixels[tileNum] / pattSet->pattern[patternNum].nonTransparentPixels[tileNum];
+          currentScore = currentScore * differentTransCompensationFactor;
+
        if (currentScore<bestScore)
        {
          //fprintf(stderr,"CMP %u,%u : NEW score %u < best score %u of a %s , compared to %u-%u \n",sX,sY,currentScore,bestScore,getPieceName(bestPick),patternNum,tileNum);
@@ -148,14 +169,41 @@ int compareToPatternSet(struct PatternSet * pattSet ,
     {
       fprintf(stderr,"INSTA-Selected %s with a score of %u \n",pattSet->pattern[patternNum].name,bestScore);
       *pick=bestPick;
+      *resultPatternNum=bestPattern;
+      *resultTileNum=bestTile;
       return 1;
     }
  }
 
    if (bestScore < maximumAcceptedScore )
     {
+
+
+
+         unsigned int x=0,y=0;
+         char comment[512]={0};
+         char nameUsed[512]={0};
+         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_score_%u",x,y,bestPattern,bestTile,bestScore);
+         sprintf(comment,"Most like  %u   with score %u", bestPick,bestScore);
+         bitBltRGBToFile(  nameUsed ,
+                           comment,
+                           screen , sX ,  sY , screenWidth, screenHeight, width, height );
+
+         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_score_%uB",x,y,bestPattern,bestTile,bestScore);
+         bitBltRGBToFile(  nameUsed , comment,
+                           pattSet->pattern[bestPattern].tile[bestTile]->pixels ,
+                           0 ,  0
+                           , pattSet->pattern[bestPattern].tile[bestTile]->width , pattSet->pattern[bestPattern].tile[bestTile]->height
+                           , pattSet->pattern[bestPattern].tile[bestTile]->width , pattSet->pattern[bestPattern].tile[bestTile]->height );
+
+
+
+
+
       fprintf(stderr,"Not so sure , but selected %u with a score of %u \n",bestPick,bestScore);
       *pick=bestPick;
+      *resultPatternNum=bestPattern;
+      *resultTileNum=bestTile;
       return 1;
     }
 
@@ -164,13 +212,13 @@ int compareToPatternSet(struct PatternSet * pattSet ,
          unsigned int x=0,y=0;
          char comment[512]={0};
          char nameUsed[512]={0};
-         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_%s_score_%u",x,y,bestPattern,bestTile,getPieceName(bestPick),bestScore);
-         sprintf(comment,"Most like %s ( %u )  with score %u",getPieceName(bestPick),bestPick,bestScore);
+         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_score_%u",x,y,bestPattern,bestTile,bestScore);
+         sprintf(comment,"Most like  %u   with score %u", bestPick,bestScore);
          bitBltRGBToFile(  nameUsed ,
                            comment,
                            screen , sX ,  sY , screenWidth, screenHeight, width, height );
 
-         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_%s_score_%uB",x,y,bestPattern,bestTile,getPieceName(bestPick),bestScore);
+         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_score_%uB",x,y,bestPattern,bestTile,bestScore);
          bitBltRGBToFile(  nameUsed , comment,
                            pattSet->pattern[bestPattern].tile[bestTile]->pixels ,
                            0 ,  0

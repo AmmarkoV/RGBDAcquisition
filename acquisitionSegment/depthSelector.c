@@ -103,7 +103,14 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
 
 if (segConf->enableBBox)
 {
- fprintf(stderr,"Selecting Bounding Box %0.2f %0.2f %0.2f -> %0.2f %0.2f %0.2f  \n",segConf->bboxX1,segConf->bboxY1,segConf->bboxZ1,segConf->bboxX2,segConf->bboxY2,segConf->bboxZ2);
+ fprintf(stderr,"Selecting Bounding Box Min %0.2f %0.2f %0.2f -> Max %0.2f %0.2f %0.2f  \n",
+                 segConf->bboxX1,
+                 segConf->bboxY1,
+                 segConf->bboxZ1,
+                 segConf->bboxX2,
+                 segConf->bboxY2,
+                 segConf->bboxZ2
+         );
 
  float fx = 537.479600 , fy = 536.572920 , cx = 317.389787 ,cy = 236.118093;
  if ( calib->intrinsicParametersSet )

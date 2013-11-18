@@ -28,6 +28,7 @@ struct TemplateVirtualDevice
 {
  char readFromDir[MAX_DIR_PATH]; // <- this sucks i know :P
  unsigned int cycle;
+ unsigned int totalFrames;
  unsigned int safeGUARD;
 
 
@@ -307,6 +308,27 @@ int stopTemplateModule()
    return 1;
 }
 
+
+int findLastFrame(int devID)
+{
+  unsigned int i=0;
+  char file_name_test[1024];
+
+  while (i<100000)
+  {
+   device[devID].totalFrames = i;
+   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,i);
+   if ( ! FileExists(file_name_test) ) { break; }
+   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devID,i);
+   if ( ! FileExists(file_name_test) ) { break; }
+   ++i;
+  }
+
+  return 1;
+}
+
+
+
 int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
   if ( ( device[devID].templateWIDTH < width ) &&  ( device[devID].templateHEIGHT < height ) )
@@ -320,6 +342,8 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
        if (strlen(devName)==0)  { strcpy(device[devID].readFromDir,""); } else
                                 { strncpy(device[devID].readFromDir,devName,MAX_DIR_PATH);  }
      }
+
+  findLastFrame(devID);
 
   unsigned int widthInternal; unsigned int heightInternal; unsigned long timestampInternal;
 
@@ -370,8 +394,7 @@ int destroyTemplateDevice(int devID)
 
 int getTotalTemplateFrameNumber(int devID)
 {
-  // >>> > TODO : ADD here
-  return 0;
+  return device[devID].totalFrames;
 }
 
 int getCurrentTemplateFrameNumber(int devID)

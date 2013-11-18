@@ -2,7 +2,13 @@
 <wxsmith>
 	<object class="wxFrame" name="EditorFrame">
 		<title>RGBDAcquisition Editor </title>
-		<size>1487,584</size>
+		<size>1487,608</size>
+		<object class="wxSlider" name="ID_SLIDER1" variable="FrameSlider" member="yes">
+			<max>10000</max>
+			<pos>8,504</pos>
+			<size>1296,22</size>
+			<handler function="OnFrameSliderCmdScroll" entry="EVT_COMMAND_SCROLL" />
+		</object>
 		<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBoxVideoFeed" member="yes">
 			<label>Video Feed</label>
 			<pos>8,0</pos>
@@ -15,43 +21,43 @@
 		</object>
 		<object class="wxButton" name="ID_BUTTON1" variable="buttonPreviousFrame" member="yes">
 			<label>&lt;</label>
-			<pos>8,504</pos>
+			<pos>8,524</pos>
 			<size>56,27</size>
 			<handler function="OnbuttonPreviousFrameClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON2" variable="buttonPlay" member="yes">
 			<label>Play</label>
-			<pos>64,504</pos>
+			<pos>64,524</pos>
 			<handler function="OnbuttonPlayClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON3" variable="buttonStop" member="yes">
 			<label>Stop</label>
-			<pos>150,504</pos>
+			<pos>150,524</pos>
 			<handler function="OnbuttonStopClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON4" variable="buttonNextFrame" member="yes">
 			<label>&gt;</label>
-			<pos>236,504</pos>
+			<pos>236,524</pos>
 			<size>56,27</size>
 			<handler function="OnbuttonNextFrameClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticTextJumpTo" member="yes">
 			<label>Jump To : </label>
-			<pos>322,508</pos>
+			<pos>322,528</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="currentFrameTextCtrl" member="yes">
 			<value>0</value>
-			<pos>392,504</pos>
+			<pos>392,524</pos>
 			<style>wxTE_PROCESS_ENTER</style>
 			<handler function="OncurrentFrameTextCtrlText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT2" variable="dashForFramesRemainingLabel" member="yes">
 			<label>/ </label>
-			<pos>474,508</pos>
+			<pos>474,528</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT3" variable="totalFramesLabel" member="yes">
 			<label>?</label>
-			<pos>484,508</pos>
+			<pos>484,528</pos>
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">

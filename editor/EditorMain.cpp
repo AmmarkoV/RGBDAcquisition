@@ -12,9 +12,13 @@
 #include <wx/msgdlg.h>
 
 #include "../acquisition/Acquisition.h"
+#include "SelectModule.h"
 
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 unsigned int devID=0;
+
+unsigned int width , height , fps ;
+char openDevice[512];
 
 int play=0;
 int lastFrameDrawn=12312312;
@@ -53,6 +57,7 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 }
 
 //(*IdInit(EditorFrame)
+const long EditorFrame::ID_SLIDER1 = wxNewId();
 const long EditorFrame::ID_STATICBOX1 = wxNewId();
 const long EditorFrame::ID_STATICBOX2 = wxNewId();
 const long EditorFrame::ID_BUTTON1 = wxNewId();
@@ -89,17 +94,18 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     wxMenu* Menu2;
 
     Create(parent, id, _("RGBDAcquisition Editor "), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
-    SetClientSize(wxSize(1487,584));
+    SetClientSize(wxSize(1487,608));
+    FrameSlider = new wxSlider(this, ID_SLIDER1, 0, 0, 10000, wxPoint(8,504), wxSize(1296,22), 0, wxDefaultValidator, _T("ID_SLIDER1"));
     StaticBoxVideoFeed = new wxStaticBox(this, ID_STATICBOX1, _("Video Feed"), wxPoint(8,0), wxSize(1304,504), 0, _T("ID_STATICBOX1"));
     StaticBox2 = new wxStaticBox(this, ID_STATICBOX2, _("Elements"), wxPoint(1312,0), wxSize(172,504), 0, _T("ID_STATICBOX2"));
-    buttonPreviousFrame = new wxButton(this, ID_BUTTON1, _("<"), wxPoint(8,504), wxSize(56,27), 0, wxDefaultValidator, _T("ID_BUTTON1"));
-    buttonPlay = new wxButton(this, ID_BUTTON2, _("Play"), wxPoint(64,504), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-    buttonStop = new wxButton(this, ID_BUTTON3, _("Stop"), wxPoint(150,504), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-    buttonNextFrame = new wxButton(this, ID_BUTTON4, _(">"), wxPoint(236,504), wxSize(56,27), 0, wxDefaultValidator, _T("ID_BUTTON4"));
-    StaticTextJumpTo = new wxStaticText(this, ID_STATICTEXT1, _("Jump To : "), wxPoint(322,508), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(392,504), wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-    dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(474,508), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-    totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(484,508), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    buttonPreviousFrame = new wxButton(this, ID_BUTTON1, _("<"), wxPoint(8,524), wxSize(56,27), 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    buttonPlay = new wxButton(this, ID_BUTTON2, _("Play"), wxPoint(64,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    buttonStop = new wxButton(this, ID_BUTTON3, _("Stop"), wxPoint(150,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    buttonNextFrame = new wxButton(this, ID_BUTTON4, _(">"), wxPoint(236,524), wxSize(56,27), 0, wxDefaultValidator, _T("ID_BUTTON4"));
+    StaticTextJumpTo = new wxStaticText(this, ID_STATICTEXT1, _("Jump To : "), wxPoint(322,528), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(392,524), wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(474,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(484,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     Menu3 = new wxMenuItem(Menu1, ID_MENUITEM1, _("Open Device"), wxEmptyString, wxITEM_NORMAL);
@@ -123,6 +129,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Timer.SetOwner(this, ID_TIMER1);
     Timer.Start(100, false);
 
+    Connect(ID_SLIDER1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorFrame::OnFrameSliderCmdScroll);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonPreviousFrameClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonPlayClick);
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonStopClick);
@@ -151,6 +158,28 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
 
 
 
+    SelectModule  * moduleSelectorFrame = new SelectModule(this, wxID_ANY);
+    moduleSelectorFrame->ShowModal();
+
+    fprintf(stderr,"Module %u Device %u  -> %u x %u : %u \n",
+                     moduleSelectorFrame->moduleSelected ,
+                     moduleSelectorFrame->deviceSelected ,
+                     moduleSelectorFrame->widthSelected,
+                     moduleSelectorFrame->heightSelected,
+                     moduleSelectorFrame->fpsSelected
+                     );
+
+   moduleID = moduleSelectorFrame->moduleSelected;
+   devID = moduleSelectorFrame->deviceSelected;
+   width = moduleSelectorFrame->widthSelected;
+   height = moduleSelectorFrame->heightSelected;
+   fps = moduleSelectorFrame->fpsSelected;
+   strcpy( openDevice , moduleSelectorFrame->deviceNameSelected );
+
+   fprintf(stderr,"Device %s \n", moduleSelectorFrame->deviceNameSelected);
+
+   delete moduleSelectorFrame;
+
 
    if (!acquisitionIsModuleLinked(moduleID))
     {
@@ -173,7 +202,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
      // return 1;
    }
 
-   acquisitionOpenDevice(moduleID,devID,"pancakeMix2",640,480,25);
+   acquisitionOpenDevice(moduleID,devID,openDevice,width,height,fps);
 }
 
 EditorFrame::~EditorFrame()
@@ -361,5 +390,23 @@ void EditorFrame::OncurrentFrameTextCtrlText(wxCommandEvent& event)
           acquisitionSnapFrames(moduleID,devID);
           Refresh(); // <- This draws the window!
         }
+
+}
+
+void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
+{
+
+    float percentageOfFrames = (float) FrameSlider->GetValue()  /  FrameSlider->GetMax() ;
+    fprintf(stderr,"Go to : %u ( %0.2f ) min %0.2f max %0.2f \n",FrameSlider->GetValue(),percentageOfFrames , FrameSlider->GetMin() , FrameSlider->GetMax());
+    fprintf(stderr,"Max Frames : %u \n",acquisitionGetTotalFrameNumber(moduleID,devID));
+
+
+    long jumpTo =  (long) (percentageOfFrames * acquisitionGetTotalFrameNumber(moduleID,devID));
+
+
+    if (jumpTo>0) { --jumpTo; }
+          acquisitionSeekFrame(moduleID,devID,jumpTo);
+          acquisitionSnapFrames(moduleID,devID);
+          Refresh(); // <- This draws the window!
 
 }

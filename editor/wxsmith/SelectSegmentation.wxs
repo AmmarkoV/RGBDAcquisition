@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="SelectSegmentation">
+		<size>748,561</size>
+		<object class="wxStaticBox" name="ID_STATICBOX2" variable="StaticBox2" member="yes">
+			<label>Depth</label>
+			<pos>392,16</pos>
+			<size>336,424</size>
+		</object>
+		<object class="wxButton" name="ID_BUTTON1" variable="Button1" member="yes">
+			<label>Label</label>
+			<pos>328,480</pos>
+		</object>
+		<object class="wxButton" name="ID_BUTTON2" variable="Button2" member="yes">
+			<label>Label</label>
+			<pos>152,472</pos>
+		</object>
+		<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
+			<label>RGB</label>
+			<pos>16,16</pos>
+			<size>352,432</size>
+		</object>
+	</object>
+</wxsmith>

@@ -13,6 +13,7 @@
 //(*Headers(EditorFrame)
 #include <wx/button.h>
 #include <wx/menu.h>
+#include <wx/slider.h>
 #include <wx/statusbr.h>
 #include <wx/statbox.h>
 #include <wx/frame.h>
@@ -44,9 +45,11 @@ class EditorFrame: public wxFrame
         void OnbuttonPreviousFrameClick(wxCommandEvent& event);
         void OnbuttonNextFrameClick(wxCommandEvent& event);
         void OncurrentFrameTextCtrlText(wxCommandEvent& event);
+        void OnFrameSliderCmdScroll(wxScrollEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
+        static const long ID_SLIDER1;
         static const long ID_STATICBOX1;
         static const long ID_STATICBOX2;
         static const long ID_BUTTON1;
@@ -75,6 +78,7 @@ class EditorFrame: public wxFrame
         wxStaticText* dashForFramesRemainingLabel;
         wxMenuItem* Menu3;
         wxButton* buttonPreviousFrame;
+        wxSlider* FrameSlider;
         wxMenu* Menu4;
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;

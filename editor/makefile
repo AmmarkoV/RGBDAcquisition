@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = Editor
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/EditorApp.o $(OBJDIR_DEBUG)/EditorMain.o $(OBJDIR_DEBUG)/FeedScreenMemory.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/EditorApp.o $(OBJDIR_DEBUG)/EditorMain.o $(OBJDIR_DEBUG)/FeedScreenMemory.o $(OBJDIR_DEBUG)/SelectModule.o $(OBJDIR_DEBUG)/SelectSegmentation.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/EditorApp.o $(OBJDIR_RELEASE)/EditorMain.o $(OBJDIR_RELEASE)/FeedScreenMemory.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/EditorApp.o $(OBJDIR_RELEASE)/EditorMain.o $(OBJDIR_RELEASE)/FeedScreenMemory.o $(OBJDIR_RELEASE)/SelectModule.o $(OBJDIR_RELEASE)/SelectSegmentation.o
 
 all: debug release
 
@@ -67,6 +67,12 @@ $(OBJDIR_DEBUG)/EditorMain.o: EditorMain.cpp
 $(OBJDIR_DEBUG)/FeedScreenMemory.o: FeedScreenMemory.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c FeedScreenMemory.cpp -o $(OBJDIR_DEBUG)/FeedScreenMemory.o
 
+$(OBJDIR_DEBUG)/SelectModule.o: SelectModule.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectModule.cpp -o $(OBJDIR_DEBUG)/SelectModule.o
+
+$(OBJDIR_DEBUG)/SelectSegmentation.o: SelectSegmentation.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectSegmentation.cpp -o $(OBJDIR_DEBUG)/SelectSegmentation.o
+
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf $(OBJDIR_DEBUG)
@@ -89,6 +95,12 @@ $(OBJDIR_RELEASE)/EditorMain.o: EditorMain.cpp
 
 $(OBJDIR_RELEASE)/FeedScreenMemory.o: FeedScreenMemory.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c FeedScreenMemory.cpp -o $(OBJDIR_RELEASE)/FeedScreenMemory.o
+
+$(OBJDIR_RELEASE)/SelectModule.o: SelectModule.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectModule.cpp -o $(OBJDIR_RELEASE)/SelectModule.o
+
+$(OBJDIR_RELEASE)/SelectSegmentation.o: SelectSegmentation.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectSegmentation.cpp -o $(OBJDIR_RELEASE)/SelectSegmentation.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)

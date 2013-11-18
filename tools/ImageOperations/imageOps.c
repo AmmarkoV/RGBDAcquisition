@@ -146,6 +146,9 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   if ( (width==0)&&(height==0) ) { return 0; }
   if ( (sourceWidth==0)&&(sourceHeight==0) ) { return 0; }
 
+  fprintf(stderr,"BitBlt an area of target image %u,%u  that starts at %u,%u \n",tX,tY,targetWidth,targetHeight);
+  fprintf(stderr,"BitBlt an area of source image %u,%u  that starts at %u,%u \n",sX,sY,sourceWidth,sourceHeight);
+  fprintf(stderr,"BitBlt size was width %u height %u \n",width,height);
   //Check for bounds -----------------------------------------
   if (tX+width>=targetWidth) { width=targetWidth-tX;  }
   if (tY+height>=targetHeight) { height=targetHeight-tY;  }
@@ -153,6 +156,7 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   if (sX+width>=sourceWidth) { width=sourceWidth-sX;  }
   if (sY+height>=sourceHeight) { height=sourceHeight-sY;  }
   //----------------------------------------------------------
+  fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
 
 
   unsigned char * sourcePTR; unsigned char * sourceLineLimitPTR; unsigned char * sourceLimitPTR; unsigned int sourceLineSkip;
@@ -164,16 +168,24 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   sourceLineSkip = (sourceWidth-width) * 3;
   sourceLineLimitPTR = sourcePTR + (width*3);
   fprintf(stderr,"SOURCE (RGB %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
+  fprintf(stderr,"sourcePTR is %p\n",sourcePTR);
+  fprintf(stderr,"sourceLimitPTR is %p\n",sourceLimitPTR);
+  fprintf(stderr,"sourceLineSkip is %p\n",sourceLineSkip);
+  fprintf(stderr,"sourceLineLimitPTR is %p\n",sourceLineLimitPTR);
+
 
   targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
   //targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
   targetLineSkip = (targetWidth-width) * 3;
+  fprintf(stderr,"targetPTR is %p\n",targetPTR);
+  fprintf(stderr,"targetLineSkip is %p\n",targetLineSkip);
   fprintf(stderr,"TARGET (RGB %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
 
   while (sourcePTR < sourceLimitPTR)
   {
      while (sourcePTR < sourceLineLimitPTR)
      {
+        //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
@@ -341,6 +353,27 @@ int bitBltDepthToFile(  char * name  ,char * comment ,
 
  return 1;
 }
+
+
+
+unsigned int countOccurancesOfRGBPixel(unsigned char * ptrRGB , unsigned int RGBwidth , unsigned int RGBheight , unsigned char transR ,unsigned char transG , unsigned char transB)
+{
+ unsigned int count = 0;
+ unsigned char * sourcePTR =  ptrRGB ;
+ unsigned char * sourceLimitPTR =  ptrRGB + (RGBwidth*RGBheight *3);
+ unsigned char R,G,B;
+
+  while (sourcePTR < sourceLimitPTR)
+  {
+    R = *sourcePTR; ++sourcePTR;
+    G = *sourcePTR; ++sourcePTR;
+    B = *sourcePTR; ++sourcePTR;
+    if ( (R==transR) && (G==transG) && (B==transB) ) { ++count ; }
+  }
+
+ return count ;
+}
+
 
 
 int getRGBPixel(unsigned char * ptrRGB , unsigned int RGBwidth , unsigned int RGBheight ,  unsigned int x , unsigned int y , unsigned char * R , unsigned char * G , unsigned char * B)
