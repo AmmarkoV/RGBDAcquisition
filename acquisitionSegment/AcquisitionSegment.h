@@ -1,6 +1,12 @@
 #ifndef ACQUISITIONSEGMENT_H_INCLUDED
 #define ACQUISITIONSEGMENT_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 
 #include "../tools/Calibration/calibration.h"
 
@@ -80,5 +86,8 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
                                );
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ACQUISITIONSEGMENT_H_INCLUDED

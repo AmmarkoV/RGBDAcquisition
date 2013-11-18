@@ -128,11 +128,6 @@ void CheckMousePosition()
 }
 
 
-int SaveRegisterToFile(char * filename , unsigned int reg_num)
-{
-//   return VisCortX_SaveVideoRegisterToFile(reg_num,filename);
-}
-
 
 
 

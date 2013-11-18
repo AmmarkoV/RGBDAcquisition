@@ -27,12 +27,12 @@ class SelectModule: public wxDialog
 
 		//(*Declarations(SelectModule)
 		wxTextCtrl* TextCtrlFPS;
-		wxTextCtrl* TextCtrlDevice;
 		wxTextCtrl* TextCtrlHeight;
 		wxStaticText* StaticText1;
 		wxButton* ButtonStartModule;
 		wxStaticText* StaticText3;
 		wxButton* ButtonCancel;
+		wxComboBox* ComboBoxDevice;
 		wxStaticText* StaticText4;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText2;
@@ -48,7 +48,6 @@ class SelectModule: public wxDialog
 		static const long ID_STATICTEXT1;
 		static const long ID_COMBOBOX1;
 		static const long ID_STATICTEXT2;
-		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT3;
 		static const long ID_TEXTCTRL2;
 		static const long ID_STATICTEXT4;
@@ -57,6 +56,7 @@ class SelectModule: public wxDialog
 		static const long ID_TEXTCTRL4;
 		static const long ID_STATICTEXT6;
 		static const long ID_BUTTON2;
+		static const long ID_COMBOBOX2;
 		//*)
 
 	private:

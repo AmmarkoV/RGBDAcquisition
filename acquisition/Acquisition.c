@@ -229,7 +229,7 @@ int saveRawImageToFile(char * filename,unsigned char * pixels , unsigned int wid
 
 //Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
 //depth is casted to char to simplify things , but that adds sizeof(short) to the pointer arethemetic!
-char * convertShortDepthToRGBDepth(short * depth,unsigned int width , unsigned int height)
+unsigned char * convertShortDepthToRGBDepth(unsigned short * depth,unsigned int width , unsigned int height)
 {
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
   char * depthPTR= (char*) depth; // This will be the traversing pointer for input
@@ -252,7 +252,7 @@ char * convertShortDepthToRGBDepth(short * depth,unsigned int width , unsigned i
 
 //Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
 //depth is casted to char to simplify things , but that adds sizeof(short) to the pointer arethemetic!
-char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
+unsigned char * convertShortDepthToCharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
 {
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
   short * depthPTR= depth; // This will be the traversing pointer for input
@@ -282,7 +282,7 @@ char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned 
 
 
 //Ok this is basically casting the 2 bytes of depth into 3 RGB bytes ( grayscale )
-char * convertShortDepthTo3CharDepth(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
+unsigned char * convertShortDepthTo3CharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
 {
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
   short * depthPTR= depth; // This will be the traversing pointer for input
@@ -725,7 +725,7 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
 }
 
 
-char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
+unsigned char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   printCall(moduleID,devID,"acquisitionGetColorFrame", __FILE__, __LINE__);
   if (*plugins[moduleID].getColorPixels!=0) { return (*plugins[moduleID].getColorPixels) (devID); }
@@ -778,7 +778,7 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
   return payloadStart;
 }
 
-short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
+unsigned short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   printCall(moduleID,devID,"acquisitionGetDepthFrame", __FILE__, __LINE__);
   if (*plugins[moduleID].getDepthPixels!=0) { return (short*) (*plugins[moduleID].getDepthPixels) (devID); }

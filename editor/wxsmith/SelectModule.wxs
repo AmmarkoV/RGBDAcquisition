@@ -35,10 +35,6 @@
 			<label>Device :</label>
 			<pos>24,56</pos>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrlDevice" member="yes">
-			<pos>88,54</pos>
-			<size>184,23</size>
-		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
 			<label>Size</label>
 			<pos>24,104</pos>
@@ -74,6 +70,9 @@
 			<label>Cancel</label>
 			<pos>184,152</pos>
 			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxComboBox" name="ID_COMBOBOX2" variable="ComboBoxDevice" member="yes">
+			<pos>88,56</pos>
 		</object>
 	</object>
 </wxsmith>

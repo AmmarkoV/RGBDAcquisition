@@ -11,8 +11,10 @@
 #include "FeedScreenMemory.h"
 #include <wx/msgdlg.h>
 
+#include "../acquisitionSegment/AcquisitionSegment.h"
 #include "../acquisition/Acquisition.h"
 #include "SelectModule.h"
+#include "SelectSegmentation.h"
 
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 unsigned int devID=0;
@@ -22,6 +24,30 @@ char openDevice[512];
 
 int play=0;
 int lastFrameDrawn=12312312;
+
+int combinationMode=DONT_COMBINE;
+struct SegmentationFeaturesRGB segConfRGB={0};
+struct SegmentationFeaturesDepth segConfDepth={0};
+struct calibration calib;
+
+
+unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
+{
+  unsigned char * output = (unsigned char*) malloc(width*height*3*sizeof(unsigned char));
+  if (output==0) { return 0; }
+  memcpy(output , source , width*height*3*sizeof(unsigned char));
+  return output;
+}
+
+unsigned short * copyDepth(unsigned short * source , unsigned int width , unsigned int height)
+{
+  unsigned short * output = (unsigned short*) malloc(width*height*sizeof(unsigned short));
+  if (output==0) { return 0; }
+  memcpy(output , source , width*height*sizeof(unsigned short));
+  return output;
+}
+
+
 
 //(*InternalHeaders(EditorFrame)
 #include <wx/string.h>
@@ -68,8 +94,10 @@ const long EditorFrame::ID_STATICTEXT1 = wxNewId();
 const long EditorFrame::ID_TEXTCTRL1 = wxNewId();
 const long EditorFrame::ID_STATICTEXT2 = wxNewId();
 const long EditorFrame::ID_STATICTEXT3 = wxNewId();
+const long EditorFrame::ID_BUTTON5 = wxNewId();
 const long EditorFrame::ID_MENUITEM1 = wxNewId();
 const long EditorFrame::idMenuQuit = wxNewId();
+const long EditorFrame::ID_MENUSEGMENTATION = wxNewId();
 const long EditorFrame::idMenuAbout = wxNewId();
 const long EditorFrame::ID_STATUSBAR1 = wxNewId();
 const long EditorFrame::ID_TIMER1 = wxNewId();
@@ -106,6 +134,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(392,524), wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(474,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(484,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(680,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     Menu3 = new wxMenuItem(Menu1, ID_MENUITEM1, _("Open Device"), wxEmptyString, wxITEM_NORMAL);
@@ -114,6 +143,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Menu1->Append(MenuItem1);
     MenuBar1->Append(Menu1, _("&File"));
     Menu4 = new wxMenu();
+    MenuItem3 = new wxMenuItem(Menu4, ID_MENUSEGMENTATION, _("Segmentation"), wxEmptyString, wxITEM_NORMAL);
+    Menu4->Append(MenuItem3);
     MenuBar1->Append(Menu4, _("Module"));
     Menu2 = new wxMenu();
     MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
@@ -135,6 +166,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonStopClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonNextFrameClick);
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditorFrame::OncurrentFrameTextCtrlText);
+    Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -203,6 +235,26 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
    }
 
    acquisitionOpenDevice(moduleID,devID,openDevice,width,height,fps);
+
+
+   segConfRGB.floodErase.totalPoints = 0;
+
+   segConfRGB.minX=0;  segConfRGB.maxX=640;
+   segConfRGB.minY=0; segConfRGB.maxY=480;
+
+   segConfRGB.minR=0; segConfRGB.minG=0; segConfRGB.minB=0;
+   segConfRGB.maxR=256; segConfRGB.maxG=256; segConfRGB.maxB=256;
+
+   segConfRGB.enableReplacingColors=0;
+   segConfRGB.replaceR=92; segConfRGB.replaceG=45; segConfRGB.replaceB=36;
+
+   segConfDepth.minX=0;  segConfDepth.maxX=640;
+   segConfDepth.minY=0; segConfDepth.maxY=480;
+   segConfDepth.minDepth=0; segConfDepth.maxDepth=32500;
+   //-----------------------------------------------------------
+
+
+
 }
 
 EditorFrame::~EditorFrame()
@@ -243,7 +295,7 @@ void EditorFrame::OnPaint(wxPaintEvent& event)
    acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
 
 
-   char * rgb = convertShortDepthTo3CharDepth(acquisitionGetDepthFrame(moduleID,devID),width,height,0,2048);
+   unsigned char * rgb = convertShortDepthTo3CharDepth(acquisitionGetDepthFrame(moduleID,devID),width,height,0,2048);
    //char * rgb = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
    passVideoRegisterToFeed(1,rgb,width,height,8,3);
    free(rgb);
@@ -305,19 +357,15 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 
          if ( event.LeftIsDown()==1 )
            {
-              wxString msg;
-              msg.Printf( wxT("Adding Track Point ( %u , %u )\n") ,x-feed_0_x,y-feed_0_y );
-              Status->SetLabel(msg);
-
               float x,y,z;
               acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z);
+
+              wxString msg;
+              msg.Printf( wxT("Depth at point is  %0.5f,%0.5f,%0.5f") ,x,y,z  );
+              Status->SetStatusText(msg);
+
               fprintf(stderr,"Depth at point is  %0.5f,%0.5f,%0.5f\n",x,y,z);
-
            }
-
-
-
-
        }
 
 /*
@@ -408,5 +456,34 @@ void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
           acquisitionSeekFrame(moduleID,devID,jumpTo);
           acquisitionSnapFrames(moduleID,devID);
           Refresh(); // <- This draws the window!
+
+}
+
+void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
+{
+
+    SelectSegmentation  * segmentationSelector = new SelectSegmentation(this, wxID_ANY);
+    segmentationSelector->ShowModal();
+
+    delete  segmentationSelector;
+
+    acquisitionGetColorCalibration(moduleID,devID,&calib);
+
+    //unsigned long colorTimestamp = acquisitionGetColorTimestamp(moduleID,devID);
+    //unsigned long depthTimestamp = acquisitionGetDepthTimestamp(moduleID,devID);
+
+    unsigned char * segmentedRGB = copyRGB(acquisitionGetColorFrame(moduleID,devID) , width , height);
+    unsigned short * segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID,devID) , width , height);
+
+    segmentRGBAndDepthFrame (
+                              segmentedRGB ,
+                              segmentedDepth ,
+                              width , height ,
+                              &segConfRGB ,
+                              &segConfDepth ,
+                              &calib ,
+                              combinationMode
+                             );
+
 
 }

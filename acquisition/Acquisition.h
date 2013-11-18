@@ -67,9 +67,9 @@ int acquisitionSimulateTime(unsigned long timeInMillisecs);
 
 int saveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
-char * convertShortDepthToRGBDepth(short * depth,unsigned int width , unsigned int height);
-char * convertShortDepthToCharDepth(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth);
-char * convertShortDepthTo3CharDepth(short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth);
+unsigned char * convertShortDepthToRGBDepth(unsigned short * depth,unsigned int width , unsigned int height);
+unsigned char * convertShortDepthToCharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth);
+unsigned char * convertShortDepthTo3CharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth);
 
 ModuleIdentifier getModuleIdFromModuleName(char * moduleName);
 int acquisitionGetModulesCount();
@@ -101,11 +101,11 @@ unsigned long acquisitionGetColorTimestamp(ModuleIdentifier moduleID,DeviceIdent
 unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 
-char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
+unsigned char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
 unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength);
 unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength);
 
-short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
+unsigned short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
 unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength);
 unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength);
 

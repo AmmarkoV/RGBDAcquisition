@@ -15,7 +15,7 @@ INC =
 CFLAGS = -Wall `wx-config --cflags`
 RESINC = 
 LIBDIR = 
-LIB = ../acquisition/libAcquisition.so
+LIB = ../tools/Calibration/libCalibrationLibrary.a ../acquisition/libAcquisition.so ../acquisitionSegment/libacquisitionSegment.a
 LDFLAGS = `wx-config --libs`
 
 INC_DEBUG = $(INC)
@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = Editor
+OUT_DEBUG = ./Editor
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE =  -s $(LDFLAGS)
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = Editor
+OUT_RELEASE = ./Editor
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/EditorApp.o $(OBJDIR_DEBUG)/EditorMain.o $(OBJDIR_DEBUG)/FeedScreenMemory.o $(OBJDIR_DEBUG)/SelectModule.o $(OBJDIR_DEBUG)/SelectSegmentation.o
 
@@ -49,6 +49,7 @@ all: debug release
 clean: clean_debug clean_release
 
 before_debug: 
+	test -d . || mkdir -p .
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 
 after_debug: 
@@ -75,9 +76,11 @@ $(OBJDIR_DEBUG)/SelectSegmentation.o: SelectSegmentation.cpp
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
+	rm -rf .
 	rm -rf $(OBJDIR_DEBUG)
 
 before_release: 
+	test -d . || mkdir -p .
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 
 after_release: 
@@ -104,6 +107,7 @@ $(OBJDIR_RELEASE)/SelectSegmentation.o: SelectSegmentation.cpp
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
+	rm -rf .
 	rm -rf $(OBJDIR_RELEASE)
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release

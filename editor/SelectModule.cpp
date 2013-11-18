@@ -10,7 +10,6 @@ const long SelectModule::ID_BUTTON1 = wxNewId();
 const long SelectModule::ID_STATICTEXT1 = wxNewId();
 const long SelectModule::ID_COMBOBOX1 = wxNewId();
 const long SelectModule::ID_STATICTEXT2 = wxNewId();
-const long SelectModule::ID_TEXTCTRL1 = wxNewId();
 const long SelectModule::ID_STATICTEXT3 = wxNewId();
 const long SelectModule::ID_TEXTCTRL2 = wxNewId();
 const long SelectModule::ID_STATICTEXT4 = wxNewId();
@@ -19,6 +18,7 @@ const long SelectModule::ID_STATICTEXT5 = wxNewId();
 const long SelectModule::ID_TEXTCTRL4 = wxNewId();
 const long SelectModule::ID_STATICTEXT6 = wxNewId();
 const long SelectModule::ID_BUTTON2 = wxNewId();
+const long SelectModule::ID_COMBOBOX2 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectModule,wxDialog)
@@ -45,7 +45,6 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	ComboBoxModule->SetSelection( ComboBoxModule->Append(_("TEMPLATE")) );
 	ComboBoxModule->Append(_("NETWORK"));
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Device :"), wxPoint(24,56), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	TextCtrlDevice = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxPoint(88,54), wxSize(184,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Size"), wxPoint(24,104), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	TextCtrlWidth = new wxTextCtrl(this, ID_TEXTCTRL2, _("640"), wxPoint(80,100), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("x"), wxPoint(130,104), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -54,6 +53,7 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	TextCtrlFPS = new wxTextCtrl(this, ID_TEXTCTRL4, _("30"), wxPoint(216,100), wxSize(40,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("fps"), wxPoint(264,104), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	ButtonCancel = new wxButton(this, ID_BUTTON2, _("Cancel"), wxPoint(184,152), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	ComboBoxDevice = new wxComboBox(this, ID_COMBOBOX2, wxEmptyString, wxPoint(88,56), wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_COMBOBOX2"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectModule::OnButtonStartModuleClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectModule::OnButtonCancelClick);
@@ -73,12 +73,12 @@ void SelectModule::OnButtonStartModuleClick(wxCommandEvent& event)
   // DEPTH MAP
   this->moduleSelected = ComboBoxModule->GetCurrentSelection();
 
-  if (TextCtrlDevice->GetValue().ToLong(&value)) {  this->deviceSelected = value; }
+  if (ComboBoxDevice->GetValue().ToLong(&value)) {  this->deviceSelected = value; }
   if (TextCtrlWidth->GetValue().ToLong(&value)) {  this->widthSelected = value; }
   if (TextCtrlHeight->GetValue().ToLong(&value)) {  this->heightSelected = value; }
   if (TextCtrlFPS->GetValue().ToLong(&value)) {  this->fpsSelected = value; }
 
-  wxString mystring = TextCtrlDevice->GetValue();
+  wxString mystring = ComboBoxDevice->GetValue();
   strcpy( this->deviceNameSelected ,  mystring.mb_str() );
 
   Close();

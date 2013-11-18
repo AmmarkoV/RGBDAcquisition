@@ -46,6 +46,7 @@ class EditorFrame: public wxFrame
         void OnbuttonNextFrameClick(wxCommandEvent& event);
         void OncurrentFrameTextCtrlText(wxCommandEvent& event);
         void OnFrameSliderCmdScroll(wxScrollEvent& event);
+        void OnButtonSegmentationClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -60,8 +61,10 @@ class EditorFrame: public wxFrame
         static const long ID_TEXTCTRL1;
         static const long ID_STATICTEXT2;
         static const long ID_STATICTEXT3;
+        static const long ID_BUTTON5;
         static const long ID_MENUITEM1;
         static const long idMenuQuit;
+        static const long ID_MENUSEGMENTATION;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         static const long ID_TIMER1;
@@ -76,6 +79,7 @@ class EditorFrame: public wxFrame
         wxTextCtrl* currentFrameTextCtrl;
         wxStaticText* StaticTextJumpTo;
         wxStaticText* dashForFramesRemainingLabel;
+        wxMenuItem* MenuItem3;
         wxMenuItem* Menu3;
         wxButton* buttonPreviousFrame;
         wxSlider* FrameSlider;
@@ -83,6 +87,7 @@ class EditorFrame: public wxFrame
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;
         wxTimer Timer;
+        wxButton* ButtonSegmentation;
         //*)
 
 
