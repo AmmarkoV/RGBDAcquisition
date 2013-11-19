@@ -15,7 +15,7 @@ INC =
 CFLAGS = -Wall `wx-config --cflags`
 RESINC = 
 LIBDIR = 
-LIB = ../tools/Calibration/libCalibrationLibrary.a ../acquisition/libAcquisition.so ../acquisitionSegment/libacquisitionSegment.a
+LIB = ../tools/Calibration/libCalibrationLibrary.a ./libAcquisition.so ../acquisitionSegment/libacquisitionSegment.a
 LDFLAGS = `wx-config --libs`
 
 INC_DEBUG = $(INC)
