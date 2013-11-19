@@ -45,7 +45,12 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
 int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib);
 int WriteCalibration(char * filename,struct calibration * calib);
 
+
+double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibration * calib);
+
 int transform3DPointUsingCalibration(struct calibration * calib , float * x , float * y , float * z);
+
+int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int x2d , unsigned int y2d  , unsigned short depthValue , float * x , float * y , float * z);
 
 #ifdef __cplusplus
 }

@@ -250,17 +250,28 @@ int WriteCalibration(char * filename,struct calibration * calib)
 }
 
 
-int transform3DPointUsingCalibration(struct calibration * calib , float * x , float * y , float * z)
+
+
+double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibration * calib)
 {
+ if (calib==0) { fprintf(stderr,"No calibration file provided \n"); return 0;  }
+ if (! calib->extrinsicParametersSet ) { fprintf(stderr,"Calibration file provided , but with no extrinsics\n"); return 0; }
+
+
  double * m = alloc4x4Matrix();
  if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
  {
   create4x4IdentityMatrix(m);
-  if ( calib->extrinsicParametersSet )
-     { convertRodriguezAndTranslationTo4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
-     else
-     {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
+  convertRodriguezAndTranslationTo4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation);
+ }
 
+
+ return m;
+}
+
+int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , float * z)
+{
+  int result = 0;
   double raw3D[4]={0};
   double world3D[4]={0};
 
@@ -269,7 +280,25 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
   raw3D[2] = (double) *z;
   raw3D[3] = (double) 1.0;
 
-  transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+  result = transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+
+  *x= (float) world3D[0];
+  *y= (float) world3D[1];
+  *z= (float) world3D[2];
+
+  return result;
+}
+
+
+int transform3DPointUsingCalibration(struct calibration * calib , float * x , float * y , float * z)
+{
+ double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
+
+ if (m==0)
+ { fprintf(stderr,"Could not allocate4x4MatrixForPointTransformationBasedOnCalibration\n");   } else
+ {
+
+  transform3DPointUsingExisting4x4Matrix(m ,x,y,z);
 
   free4x4Matrix(&m); // This is the same as free(m); m=0;
   return 1;
@@ -277,6 +306,25 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
 
   return 0;
 }
+
+int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int x2d , unsigned int y2d  , unsigned short depthValue , float * x , float * y , float * z)
+{
+    if ( (calib->intrinsic[CALIB_INTR_FX]==0) || (calib->intrinsic[CALIB_INTR_FY]==0) )
+    {
+      fprintf(stderr,"Focal Length is 0.0 , cannot transform2DProjectedPointTo3DPoint \n ");
+      return 0;
+    }
+
+    *x = (float) (x2d - calib->intrinsic[CALIB_INTR_CX]) * (depthValue / calib->intrinsic[CALIB_INTR_FX]);
+    *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
+    *z = (float) depthValue;
+
+    return 1;
+}
+
+
+
+
 
 
 

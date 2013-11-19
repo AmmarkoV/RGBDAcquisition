@@ -112,33 +112,11 @@ if (segConf->enableBBox)
                  segConf->bboxZ2
          );
 
- float fx = 537.479600 , fy = 536.572920 , cx = 317.389787 ,cy = 236.118093;
- if ( calib->intrinsicParametersSet )
- {
-   fx = calib->intrinsic[CALIB_INTR_FX];
-   fy = calib->intrinsic[CALIB_INTR_FY];
-   cx = calib->intrinsic[CALIB_INTR_CX];
-   cy = calib->intrinsic[CALIB_INTR_CY];
-
-   if (fx==0) { fx=1;}
-   if (fy==0) { fy=1;}
- } else {fprintf(stderr,"No intrinsic parameters provided , bounding box segmentation will use default intrinsic values ( you probably dont want this )\n"); }
-
- double * m = alloc4x4Matrix();
+ double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
  if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
  {
-  create4x4IdentityMatrix(m);
-  if ( calib->extrinsicParametersSet )
-     {
-        convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation);
-        fprintf(stderr,"Is this correct , ? shouldnt the matrix be the other way around ? \n");
-        transpose4x4MatrixD(m);
-     }
-  else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
-
-  double raw3D[4]={0};
-  double world3D[4]={0};
-
+  double raw3D[4];
+  double world3D[4];
 
   sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
   sourcePixelsLineEnd = sourcePixelsStart + (width);
@@ -150,6 +128,9 @@ if (segConf->enableBBox)
   sourcePixelsLineEnd = sourcePixelsStart + (width);
   x=0; y=0;
   depth=0;
+
+  float x3D , y3D , z3D;
+
   while (sourcePixels<sourcePixelsEnd)
   {
    while (sourcePixels<sourcePixelsLineEnd)
@@ -158,13 +139,14 @@ if (segConf->enableBBox)
 
      if (  (*selectedPtr!=0)  )  //  &&  (*depth != 0)
      {
+       transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
 
-      raw3D[0] = (double) (x - cx) * (*depth) / fx;
-      raw3D[1] = (double) (y - cy) * (*depth) / fy;
-      raw3D[2] = (double) *depth;
-      raw3D[3] = (double) 1.0;
+       raw3D[0] = (double) x3D;
+       raw3D[1] = (double) y3D;
+       raw3D[2] = (double) z3D;
+       raw3D[3] = (double) 1.0;
 
-      transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+       transform3DPointUsing4x4Matrix(world3D,m,raw3D);
 
        if (
            (segConf->bboxX1<world3D[0])&& (segConf->bboxX2>world3D[0]) &&
@@ -193,33 +175,11 @@ if (segConf->enableBBox)
 
 if ( segConf->enablePlaneSegmentation )
  {
- float fx = 537.479600 , fy = 536.572920 , cx = 317.389787 ,cy = 236.118093;
- if ( calib->intrinsicParametersSet )
- {
-   fx = calib->intrinsic[CALIB_INTR_FX];
-   fy = calib->intrinsic[CALIB_INTR_FY];
-   cx = calib->intrinsic[CALIB_INTR_CX];
-   cy = calib->intrinsic[CALIB_INTR_CY];
-
-   if (fx==0) { fx=1;}
-   if (fy==0) { fy=1;}
- } else {fprintf(stderr,"No intrinsic parameters provided , bounding box segmentation will use default intrinsic values ( you probably dont want this )\n"); }
-
- double * m = alloc4x4Matrix();
- if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
- {
-  create4x4IdentityMatrix(m);
-  if ( calib->extrinsicParametersSet )
-       {
-        convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation);
-        fprintf(stderr,"Is this correct , ? shouldnt the matrix be the other way around ? \n");
-        transpose4x4MatrixD(m);
-       }
-  else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
-
-  double raw3D[4]={0};
-  double world3D[4]={0};
-
+  double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
+  if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform plane segmentation\n"); } else
+  {
+    double raw3D[4]={0};
+    double world3D[4]={0};
 
     float p1[3]; p1[0]=(float) segConf->p1[0]; p1[1]=(float) segConf->p1[1]; p1[2]=(float) segConf->p1[2];
     float p2[3]; p2[0]=(float) segConf->p2[0]; p2[1]=(float) segConf->p2[1]; p2[2]=(float) segConf->p2[2];
@@ -244,6 +204,9 @@ if ( segConf->enablePlaneSegmentation )
   sourcePixelsLineEnd = sourcePixelsStart + (width);
   x=0; y=0;
   depth=0;
+
+  float x3D , y3D , z3D;
+
   while (sourcePixels<sourcePixelsEnd)
   {
    while (sourcePixels<sourcePixelsLineEnd)
@@ -252,12 +215,14 @@ if ( segConf->enablePlaneSegmentation )
 
      if (  (*selectedPtr!=0)  )  //  &&  (*depth != 0)
      {
-      raw3D[0] = (double) (x - cx) * (*depth) / fx;
-      raw3D[1] = (double) (y - cy) * (*depth) / fy;
-      raw3D[2] = (double) *depth;
-      raw3D[3] = (double) 1.0;
+       transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
 
-      transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+       raw3D[0] = (double) x3D;
+       raw3D[1] = (double) y3D;
+       raw3D[2] = (double) z3D;
+       raw3D[3] = (double) 1.0;
+
+       transform3DPointUsing4x4Matrix(world3D,m,raw3D);
 
       pN[0]=(float) world3D[0];
       pN[1]=(float) world3D[1];

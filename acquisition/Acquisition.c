@@ -855,18 +855,10 @@ int acquisitionGetDepth3DPointAtXYCameraSpace(ModuleIdentifier moduleID,DeviceId
 {
     struct calibration calib;
     unsigned short depthValue = acquisitionGetDepthValueAtXY(moduleID,devID,x2d,y2d);
-    if (depthValue==0) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration point has no depth"); return 0; }
-    if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )  { return 0; }
-    if ( (calib.intrinsic[CALIB_INTR_FX]==0) || (calib.intrinsic[CALIB_INTR_FY]==0) )
-    {
-      MeaningfullWarningMessage(moduleID,devID,"Focal Length is 0.0 , cannot project point\n ");  return 0;
-    }
+    if (depthValue==0) { fprintf(stderr,"acquisitionGetDepth3DPointAtXYNoCalibration point has no depth\n"); return 0; }
+    if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )  { fprintf(stderr,"Could not get Depth Calibration , cannot get 3D point\n");  return 0; }
 
-    *x = (float) (x2d - calib.intrinsic[CALIB_INTR_CX]) * (depthValue / calib.intrinsic[CALIB_INTR_FX]);
-    *y = (float) (y2d - calib.intrinsic[CALIB_INTR_CY]) * (depthValue / calib.intrinsic[CALIB_INTR_FY]);
-    *z = (float) depthValue;
-
-    return 1;
+    return transform2DProjectedPointTo3DPoint(&calib , x2d , y2d  , depthValue , x , y , z);
 }
 
 
@@ -874,16 +866,10 @@ int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier de
 {
     struct calibration calib;
     unsigned short depthValue = acquisitionGetDepthValueAtXY(moduleID,devID,x2d,y2d);
-    if (depthValue==0) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration point has no depth"); return 0; }
-    if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )  { return 0; }
-    if ( (calib.intrinsic[CALIB_INTR_FX]==0) || (calib.intrinsic[CALIB_INTR_FY]==0) )
-    {
-      MeaningfullWarningMessage(moduleID,devID,"Focal Length is 0.0 , cannot project point\n ");  return 0;
-    }
+    if (depthValue==0) { fprintf(stderr,"acquisitionGetDepth3DPointAtXYNoCalibration point has no depth\n"); return 0; }
+    if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )  { fprintf(stderr,"Could not get Depth Calibration , cannot get 3D point\n"); return 0; }
 
-    *x = (float) (x2d - calib.intrinsic[CALIB_INTR_CX]) * (depthValue / calib.intrinsic[CALIB_INTR_FX]);
-    *y = (float) (y2d - calib.intrinsic[CALIB_INTR_CY]) * (depthValue / calib.intrinsic[CALIB_INTR_FY]);
-    *z = (float) depthValue;
+    transform2DProjectedPointTo3DPoint(&calib , x2d , y2d  , depthValue , x , y , z);
 
     return transform3DPointUsingCalibration(&calib , x , y , z);
 }
