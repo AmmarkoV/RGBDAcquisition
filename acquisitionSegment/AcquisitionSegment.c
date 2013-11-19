@@ -83,3 +83,33 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
 
   return 1;
 }
+
+
+
+int initializeRGBSegmentationConfiguration(struct SegmentationFeaturesRGB * segConfRGB , unsigned int width , unsigned int height )
+{
+   segConfRGB->floodErase.totalPoints = 0;
+
+   segConfRGB->minX=0;  segConfRGB->maxX=width;
+   segConfRGB->minY=0; segConfRGB->maxY=height;
+
+   segConfRGB->minR=0; segConfRGB->minG=0; segConfRGB->minB=0;
+   segConfRGB->maxR=256; segConfRGB->maxG=256; segConfRGB->maxB=256;
+
+   segConfRGB->enableReplacingColors=0;
+   segConfRGB->replaceR=92; segConfRGB->replaceG=45; segConfRGB->replaceB=36;
+
+  return 1;
+}
+
+int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* segConfDepth , unsigned int width , unsigned int height )
+{
+
+   segConfDepth->minX=0;     segConfDepth->maxX=width;
+   segConfDepth->minY=0;     segConfDepth->maxY=height;
+   segConfDepth->minDepth=0; segConfDepth->maxDepth=32500;
+
+  return 1;
+}
+
+

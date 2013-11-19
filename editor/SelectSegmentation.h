@@ -1,8 +1,12 @@
 #ifndef SELECTSEGMENTATION_H
 #define SELECTSEGMENTATION_H
 
+
+#include "../acquisitionSegment/AcquisitionSegment.h"
+
 //(*Headers(SelectSegmentation)
 #include <wx/spinctrl.h>
+#include <wx/checkbox.h>
 #include <wx/dialog.h>
 #include <wx/button.h>
 #include <wx/statbox.h>
@@ -18,62 +22,69 @@ class SelectSegmentation: public wxDialog
 		SelectSegmentation(wxWindow* parent,wxWindowID id=wxID_ANY);
 		virtual ~SelectSegmentation();
 
+        int reloadSegmentationFormFromValues();
+        int saveSegmentationValuesFromForm();
+
+        int selectedCombinationMode;
+        struct SegmentationFeaturesRGB selectedRGBConf;
+        struct SegmentationFeaturesDepth selectedDepthConf;
+
 		//(*Declarations(SelectSegmentation)
 		wxSpinCtrl* minG;
-		wxTextCtrl* TextCtrl3;
-		wxTextCtrl* TextCtrl10;
 		wxSpinCtrl* maxR;
 		wxStaticText* StaticText13;
 		wxStaticText* StaticText14;
-		wxStaticText* StaticText15;
+		wxTextCtrl* planeP1Y;
+		wxTextCtrl* cropRGBY1;
+		wxTextCtrl* cropDepthY1;
+		wxTextCtrl* cropDepthY2;
 		wxStaticText* StaticText17;
-		wxTextCtrl* TextCtrl9;
-		wxTextCtrl* TextCtrl22;
+		wxTextCtrl* cropDepthX1;
+		wxCheckBox* CheckBoxBoundingBox;
+		wxTextCtrl* cropRGBX2;
+		wxTextCtrl* planeP2X;
+		wxTextCtrl* bboxMinY;
+		wxTextCtrl* planeP2Z;
+		wxTextCtrl* planeP3Z;
 		wxSpinCtrl* minB;
 		wxSpinCtrl* minR;
-		wxTextCtrl* TextCtrl20;
-		wxTextCtrl* TextCtrl21;
-		wxTextCtrl* TextCtrl18;
 		wxStaticText* StaticText18;
 		wxChoice* ChoiceCombination;
+		wxTextCtrl* bboxMinZ;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText10;
 		wxStaticText* StaticText16;
 		wxStaticBox* StaticBox2;
-		wxTextCtrl* TextCtrl5;
 		wxStaticText* StaticText3;
 		wxSpinCtrl* maxG;
 		wxButton* ButtonCancel;
-		wxTextCtrl* TextCtrl12;
+		wxTextCtrl* planeP1X;
+		wxTextCtrl* cropDepthX2;
+		wxTextCtrl* bboxMaxY;
+		wxTextCtrl* cropRGBX1;
 		wxButton* ButtonOk;
+		wxTextCtrl* planeP1Z;
 		wxStaticText* StaticText8;
-		wxStaticText* StaticText12;
-		wxTextCtrl* TextCtrl16;
-		wxTextCtrl* TextCtrl6;
 		wxStaticBox* StaticBox1;
 		wxStaticText* StaticText7;
-		wxSpinCtrl* SpinCtrl2;
-		wxTextCtrl* TextCtrl23;
-		wxTextCtrl* TextCtrl1;
+		wxSpinCtrl* maxDepth;
+		wxTextCtrl* planeP2Y;
 		wxStaticText* StaticText4;
+		wxSpinCtrl* minDepth;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText2;
-		wxTextCtrl* TextCtrl11;
+		wxTextCtrl* bboxMaxZ;
+		wxCheckBox* CheckBoxPlane;
 		wxStaticText* StaticText6;
-		wxSpinCtrl* SpinCtrl1;
 		wxSpinCtrl* maxB;
-		wxTextCtrl* TextCtrl15;
-		wxTextCtrl* TextCtrl8;
+		wxTextCtrl* bboxMaxX;
 		wxStaticText* StaticText19;
-		wxTextCtrl* TextCtrl7;
+		wxTextCtrl* cropRGBY2;
 		wxStaticText* StaticText9;
-		wxTextCtrl* TextCtrl4;
-		wxTextCtrl* TextCtrl2;
-		wxTextCtrl* TextCtrl19;
-		wxTextCtrl* TextCtrl13;
+		wxTextCtrl* bboxMinX;
+		wxTextCtrl* planeP3X;
 		wxStaticText* StaticText11;
-		wxTextCtrl* TextCtrl17;
-		wxTextCtrl* TextCtrl14;
+		wxTextCtrl* planeP3Y;
 		//*)
 
 	protected:
@@ -110,7 +121,6 @@ class SelectSegmentation: public wxDialog
 		static const long ID_STATICTEXT11;
 		static const long ID_TEXTCTRL7;
 		static const long ID_TEXTCTRL8;
-		static const long ID_STATICTEXT12;
 		static const long ID_TEXTCTRL9;
 		static const long ID_TEXTCTRL10;
 		static const long ID_TEXTCTRL11;
@@ -119,7 +129,6 @@ class SelectSegmentation: public wxDialog
 		static const long ID_TEXTCTRL14;
 		static const long ID_STATICTEXT13;
 		static const long ID_STATICTEXT14;
-		static const long ID_STATICTEXT15;
 		static const long ID_STATICTEXT16;
 		static const long ID_TEXTCTRL15;
 		static const long ID_TEXTCTRL16;
@@ -134,6 +143,8 @@ class SelectSegmentation: public wxDialog
 		static const long ID_STATICTEXT18;
 		static const long ID_STATICTEXT19;
 		static const long ID_CHOICE1;
+		static const long ID_CHECKBOX1;
+		static const long ID_CHECKBOX2;
 		//*)
 
 	private:

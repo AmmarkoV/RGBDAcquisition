@@ -235,13 +235,32 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
    unsigned int devID=0,maxDevID=acquisitionGetModuleDevices(moduleID);
    if (maxDevID==0)
    {
+       wxMessageBox(wxT("error while Openning device"),wxT("RGBDAcquisition Editor"));
       fprintf(stderr,"No devices found for Module used \n");
      // return 1;
    }
 
-   acquisitionOpenDevice(moduleID,devID,openDevice,width,height,fps);
+   if ( ! acquisitionOpenDevice(moduleID,devID,openDevice,width,height,fps) )
+   {
+       wxMessageBox(wxT("Error while Opening device"),wxT("RGBDAcquisition Editor"));
+       fprintf(stderr,"Could not open device \n");
+       return;
+   }
+
+   unsigned int totalFrames =  acquisitionGetTotalFrameNumber(moduleID,devID);
+
+   if (totalFrames==0) {
+                         totalFramesLabel->SetLabel(wxT("Live Stream"));
+                         play=1;
+                       } else // This means a live stream
+                       {
+                         wxString msg; msg.Printf(wxT("%u"),totalFrames);
+                         totalFramesLabel->SetLabel(msg);
+                       }
 
 
+   initializeRGBSegmentationConfiguration(&segConfRGB,width,height);
+   initializeDepthSegmentationConfiguration(&segConfDepth,width,height);
 
 }
 
@@ -251,9 +270,47 @@ EditorFrame::~EditorFrame()
     //*)
 }
 
+
+int removeOldSegmentedFrames()
+{
+
+    if (!segmentedFramesExist ) { return 0; }
+    if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
+    if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
+}
+
+
+int refreshSegmentedFrame()
+{
+    removeOldSegmentedFrames();
+    segmentedRGB = copyRGB(acquisitionGetColorFrame(moduleID,devID) , width , height);
+    segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID,devID) , width , height);
+
+    segmentRGBAndDepthFrame (
+                              segmentedRGB ,
+                              segmentedDepth ,
+                              width , height ,
+                              &segConfRGB ,
+                              &segConfDepth ,
+                              &calib ,
+                              combinationMode
+                             );
+    return 1;
+}
+
+
+
 void EditorFrame::OnQuit(wxCommandEvent& event)
 {
+    play=0;
+    wxSleep(0.1);
     closeFeeds();
+
+    removeOldSegmentedFrames();
+
+    acquisitionCloseDevice(moduleID,devID);
+    acquisitionStopModule(moduleID);
+
     Close();
 }
 
@@ -273,7 +330,10 @@ void EditorFrame::OnPaint(wxPaintEvent& event)
   unsigned int devID=0;
   unsigned int width , height , channels , bitsperpixel;
 
-  if (lastFrameDrawn!=acquisitionGetCurrentFrameNumber(moduleID,devID))
+  if (
+        (lastFrameDrawn!=acquisitionGetCurrentFrameNumber(moduleID,devID)) ||
+        ( (acquisitionGetTotalFrameNumber(moduleID,devID)==0) && (play) )
+     )
   {
 
      if (segmentedFramesExist)
@@ -364,71 +424,36 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
          if ( event.LeftIsDown()==1 )
            {
               float x,y,z;
-              acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z);
+              if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z) )
+              {
 
-              wxString msg;
-              msg.Printf( wxT("Depth at point is  %0.5f,%0.5f,%0.5f") ,x,y,z  );
-              Status->SetStatusText(msg);
+                wxString msg;
+                msg.Printf( wxT("Depth at point is  %0.5f,%0.5f,%0.5f") ,x,y,z  );
+                Status->SetStatusText(msg);
 
-              fprintf(stderr,"Depth at point is  %0.5f,%0.5f,%0.5f\n",x,y,z);
+                fprintf(stderr,"Depth at point is  %0.5f,%0.5f,%0.5f\n",x,y,z);
+              } else
+              {
+                //Status->SetStatusText(wxT("No depth at point"));
+              }
+
            }
        }
 
-/*
-     int fd_rx1,fd_rx2,fd_ry1,fd_ry2;
-     fd_rx1=10 , fd_rx2=fd_rx1 + default_feed->GetWidth();
-     fd_ry1=15 , fd_ry2=fd_ry1 + default_feed->GetHeight();
-     if (add_new_track_point==1)
-     {
-      if ( XYOverRect(x,y,fd_rx1,fd_ry1,fd_rx2,fd_ry2)==1 )
-       {
-
-            wxString msg;
-            msg.Printf( wxT("Adding Track Point ( %u , %u )\n") ,x-fd_rx1,y-fd_ry1 );
-            //Status->AppendText( msg );
-            Refresh();
-            //VisCortx_AddTrackPoint(0,x-fd_rx1,y-fd_ry1,1);
-            add_new_track_point=0;
-      }
-    }
-    }*/
-}
-
-
-int refreshSegmentedFrame()
-{
-    if (!segmentedFramesExist ) { return 0; }
-    if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
-    if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
-
-    segmentedRGB = copyRGB(acquisitionGetColorFrame(moduleID,devID) , width , height);
-    segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID,devID) , width , height);
-
-    segmentRGBAndDepthFrame (
-                              segmentedRGB ,
-                              segmentedDepth ,
-                              width , height ,
-                              &segConfRGB ,
-                              &segConfDepth ,
-                              &calib ,
-                              combinationMode
-                             );
-    return 1;
 }
 
 
 void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
 {
   wxSleep(0.01);
-
   if (play)
     {
      acquisitionSnapFrames(moduleID,devID);
      refreshSegmentedFrame();
+     Refresh(); // <- This draws the window!
     }
 
 
-  Refresh(); // <- This draws the window!
 }
 
 void EditorFrame::OnbuttonPlayClick(wxCommandEvent& event)
@@ -494,28 +519,26 @@ void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
 void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 {
     SelectSegmentation  * segmentationSelector = new SelectSegmentation(this, wxID_ANY);
+
+    segmentationSelector->selectedCombinationMode=combinationMode;
+    segmentationSelector->selectedRGBConf=segConfRGB;
+    segmentationSelector->selectedDepthConf=segConfDepth;
+
     segmentationSelector->ShowModal();
 
     acquisitionGetColorCalibration(moduleID,devID,&calib);
 
     segmentedFramesExist=1;
 
-   segConfRGB.floodErase.totalPoints = 0;
+    combinationMode=segmentationSelector->selectedCombinationMode;
+    segConfRGB=segmentationSelector->selectedRGBConf;
+    segConfDepth=segmentationSelector->selectedDepthConf;
 
-   segConfRGB.minX=0;  segConfRGB.maxX=width;
-   segConfRGB.minY=0; segConfRGB.maxY=height;
-
-   segConfRGB.minR=0; segConfRGB.minG=0; segConfRGB.minB=0;
-   segConfRGB.maxR=123; segConfRGB.maxG=123; segConfRGB.maxB=123;
-
-   segConfDepth.minX=0;  segConfDepth.maxX=width;
-   segConfDepth.minY=0; segConfDepth.maxY=height;
-   segConfDepth.minDepth=0; segConfDepth.maxDepth=32500;
-   //-----------------------------------------------------------
 
 
     delete  segmentationSelector;
 
     refreshSegmentedFrame();
 
+    Refresh();
 }

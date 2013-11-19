@@ -87,6 +87,8 @@ int main(int argc, char *argv[])
 
    struct SegmentationFeaturesRGB segConfRGB={0};
 
+   initializeRGBSegmentationConfiguration(&segConfRGB,640,480);
+   /*
    segConfRGB.floodErase.totalPoints = 0;
 
    segConfRGB.minX=0;  segConfRGB.maxX=640;
@@ -96,12 +98,16 @@ int main(int argc, char *argv[])
    segConfRGB.maxR=256; segConfRGB.maxG=256; segConfRGB.maxB=256;
 
    segConfRGB.enableReplacingColors=0;
-   segConfRGB.replaceR=92; segConfRGB.replaceG=45; segConfRGB.replaceB=36;
+   segConfRGB.replaceR=92; segConfRGB.replaceG=45; segConfRGB.replaceB=36;*/
 
    struct SegmentationFeaturesDepth segConfDepth={0};
+
+
+   initializeDepthSegmentationConfiguration(&segConfDepth,640,480);
+   /*
    segConfDepth.minX=0;  segConfDepth.maxX=640;
    segConfDepth.minY=0; segConfDepth.maxY=480;
-   segConfDepth.minDepth=0; segConfDepth.maxDepth=32500;
+   segConfDepth.minDepth=0; segConfDepth.maxDepth=32500;*/
    //------------------------------------------------------------------
    //------------------------------------------------------------------
 

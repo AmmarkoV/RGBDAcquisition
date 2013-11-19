@@ -81,12 +81,12 @@
 			<label>Crop:</label>
 			<pos>40,160</pos>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="cropRGBX1" member="yes">
 			<value>0</value>
 			<pos>80,156</pos>
 			<size>48,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrl2" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="cropRGBY1" member="yes">
 			<value>0</value>
 			<pos>130,156</pos>
 			<size>48,23</size>
@@ -95,12 +95,12 @@
 			<label>----&gt;</label>
 			<pos>188,158</pos>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="TextCtrl3" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="cropRGBX2" member="yes">
 			<value>Max</value>
 			<pos>232,156</pos>
 			<size>48,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="TextCtrl4" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="cropRGBY2" member="yes">
 			<value>Max</value>
 			<pos>284,156</pos>
 			<size>48,23</size>
@@ -109,7 +109,7 @@
 			<label>Minimum :</label>
 			<pos>392,66</pos>
 		</object>
-		<object class="wxSpinCtrl" name="ID_SPINCTRL7" variable="SpinCtrl1" member="yes">
+		<object class="wxSpinCtrl" name="ID_SPINCTRL7" variable="minDepth" member="yes">
 			<value>0</value>
 			<max>10000</max>
 			<pos>480,64</pos>
@@ -118,7 +118,7 @@
 			<label>Maximum :</label>
 			<pos>392,100</pos>
 		</object>
-		<object class="wxSpinCtrl" name="ID_SPINCTRL8" variable="SpinCtrl2" member="yes">
+		<object class="wxSpinCtrl" name="ID_SPINCTRL8" variable="maxDepth" member="yes">
 			<value>10000</value>
 			<max>10000</max>
 			<pos>480,96</pos>
@@ -127,12 +127,12 @@
 			<label>Crop:</label>
 			<pos>392,160</pos>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="TextCtrl5" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="cropDepthX1" member="yes">
 			<value>0</value>
 			<pos>432,156</pos>
 			<size>48,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL6" variable="TextCtrl6" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL6" variable="cropDepthY1" member="yes">
 			<value>0</value>
 			<pos>482,156</pos>
 			<size>48,23</size>
@@ -141,46 +141,42 @@
 			<label>----&gt;</label>
 			<pos>536,158</pos>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="TextCtrl7" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="cropDepthX2" member="yes">
 			<value>Max</value>
 			<pos>584,156</pos>
 			<size>48,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL8" variable="TextCtrl8" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL8" variable="cropDepthY2" member="yes">
 			<value>Max</value>
 			<pos>640,156</pos>
 			<size>48,23</size>
 		</object>
-		<object class="wxStaticText" name="ID_STATICTEXT12" variable="StaticText12" member="yes">
-			<label>Bounding Box</label>
-			<pos>392,208</pos>
-		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL9" variable="TextCtrl9" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL9" variable="bboxMinX" member="yes">
 			<value>0.0</value>
 			<pos>496,224</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL10" variable="TextCtrl10" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL10" variable="bboxMinY" member="yes">
 			<value>0.0</value>
 			<pos>560,224</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL11" variable="TextCtrl11" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL11" variable="bboxMinZ" member="yes">
 			<value>0.0</value>
 			<pos>624,224</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL12" variable="TextCtrl12" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL12" variable="bboxMaxX" member="yes">
 			<value>0.0</value>
 			<pos>496,256</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL13" variable="TextCtrl13" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL13" variable="bboxMaxY" member="yes">
 			<value>0.0</value>
 			<pos>560,256</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL14" variable="TextCtrl14" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL14" variable="bboxMaxZ" member="yes">
 			<value>0.0</value>
 			<pos>624,256</pos>
 			<size>56,23</size>
@@ -193,25 +189,21 @@
 			<label>Maximum</label>
 			<pos>424,258</pos>
 		</object>
-		<object class="wxStaticText" name="ID_STATICTEXT15" variable="StaticText15" member="yes">
-			<label>Plane</label>
-			<pos>392,288</pos>
-		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT16" variable="StaticText16" member="yes">
 			<label>Point A</label>
 			<pos>424,312</pos>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL15" variable="TextCtrl15" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL15" variable="planeP1X" member="yes">
 			<value>0.0</value>
 			<pos>496,308</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL16" variable="TextCtrl16" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL16" variable="planeP1Y" member="yes">
 			<value>0.0</value>
 			<pos>560,308</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL17" variable="TextCtrl17" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL17" variable="planeP1Z" member="yes">
 			<value>0.0</value>
 			<pos>624,308</pos>
 			<size>56,23</size>
@@ -220,32 +212,32 @@
 			<label>Point B</label>
 			<pos>424,340</pos>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL18" variable="TextCtrl18" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL18" variable="planeP2X" member="yes">
 			<value>0.0</value>
 			<pos>496,336</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL19" variable="TextCtrl19" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL19" variable="planeP2Y" member="yes">
 			<value>0.0</value>
 			<pos>560,336</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL20" variable="TextCtrl20" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL20" variable="planeP2Z" member="yes">
 			<value>0.0</value>
 			<pos>624,336</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL21" variable="TextCtrl21" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL21" variable="planeP3X" member="yes">
 			<value>0.0</value>
 			<pos>496,364</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL22" variable="TextCtrl22" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL22" variable="planeP3Y" member="yes">
 			<value>0.0</value>
 			<pos>560,364</pos>
 			<size>56,23</size>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL23" variable="TextCtrl23" member="yes">
+		<object class="wxTextCtrl" name="ID_TEXTCTRL23" variable="planeP3Z" member="yes">
 			<value>0.0</value>
 			<pos>624,364</pos>
 			<size>56,23</size>
@@ -270,6 +262,14 @@
 			<selection>0</selection>
 			<pos>192,464</pos>
 			<size>168,25</size>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxBoundingBox" member="yes">
+			<label>Bounding Box</label>
+			<pos>392,204</pos>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX2" variable="CheckBoxPlane" member="yes">
+			<label>Plane Segmentation</label>
+			<pos>392,290</pos>
 		</object>
 	</object>
 </wxsmith>

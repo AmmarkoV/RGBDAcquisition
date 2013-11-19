@@ -842,9 +842,13 @@ int acquisitionGetDepth3DPointAtXYNoCalibration(ModuleIdentifier moduleID,Device
 
     if ( (x2d>=width) || (y2d>=height) ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration incorrect 2d x,y coords"); return 0; }
 
+
     float cx = width / 2;
     float cy = height/ 2;
-    short * depthValue = depthFrame + (y2d * width + x2d );
+    unsigned short * depthValue = depthFrame + (y2d * width + x2d );
+
+    if (*depthValue==0) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration point has no depth"); return 0; }
+
     *z = * depthValue;
     *x = (x2d - cx) * (*z + minDistance) * scaleFactor * (width/height) ;
     *y = (y2d - cy) * (*z + minDistance) * scaleFactor;
@@ -859,7 +863,7 @@ int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier de
     struct calibration calib;
     if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )  { return 0; }
     fprintf(stderr,"TODO TODO TODO: respect calibration ");
-    acquisitionGetDepth3DPointAtXYNoCalibration(moduleID,devID,x2d,y2d ,x,y,z);
+    if ( ! acquisitionGetDepth3DPointAtXYNoCalibration(moduleID,devID,x2d,y2d ,x,y,z) ) { return 0; }
 
     return transform3DPointUsingCalibration(&calib , x , y , z);
 }

@@ -86,6 +86,9 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
                                );
 
 
+int initializeRGBSegmentationConfiguration(struct SegmentationFeaturesRGB * segConfRGB , unsigned int width , unsigned int height );
+int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* segConfDepth , unsigned int width , unsigned int height );
+
 #ifdef __cplusplus
 }
 #endif

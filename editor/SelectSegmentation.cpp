@@ -37,7 +37,6 @@ const long SelectSegmentation::ID_TEXTCTRL6 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT11 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL7 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL8 = wxNewId();
-const long SelectSegmentation::ID_STATICTEXT12 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL9 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL10 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL11 = wxNewId();
@@ -46,7 +45,6 @@ const long SelectSegmentation::ID_TEXTCTRL13 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL14 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT13 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT14 = wxNewId();
-const long SelectSegmentation::ID_STATICTEXT15 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT16 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL15 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL16 = wxNewId();
@@ -61,6 +59,8 @@ const long SelectSegmentation::ID_TEXTCTRL23 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT18 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT19 = wxNewId();
 const long SelectSegmentation::ID_CHOICE1 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX1 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX2 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -95,44 +95,42 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("G"), wxPoint(225,40), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("B"), wxPoint(294,40), wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("Crop:"), wxPoint(40,160), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
-	TextCtrl1 = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(80,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	TextCtrl2 = new wxTextCtrl(this, ID_TEXTCTRL2, _("0"), wxPoint(130,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+	cropRGBX1 = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(80,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	cropRGBY1 = new wxTextCtrl(this, ID_TEXTCTRL2, _("0"), wxPoint(130,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	StaticText7 = new wxStaticText(this, ID_STATICTEXT7, _("---->"), wxPoint(188,158), wxDefaultSize, 0, _T("ID_STATICTEXT7"));
-	TextCtrl3 = new wxTextCtrl(this, ID_TEXTCTRL3, _("Max"), wxPoint(232,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
-	TextCtrl4 = new wxTextCtrl(this, ID_TEXTCTRL4, _("Max"), wxPoint(284,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
+	cropRGBX2 = new wxTextCtrl(this, ID_TEXTCTRL3, _("Max"), wxPoint(232,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+	cropRGBY2 = new wxTextCtrl(this, ID_TEXTCTRL4, _("Max"), wxPoint(284,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	StaticText8 = new wxStaticText(this, ID_STATICTEXT8, _("Minimum :"), wxPoint(392,66), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
-	SpinCtrl1 = new wxSpinCtrl(this, ID_SPINCTRL7, _T("0"), wxPoint(480,64), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL7"));
-	SpinCtrl1->SetValue(_T("0"));
+	minDepth = new wxSpinCtrl(this, ID_SPINCTRL7, _T("0"), wxPoint(480,64), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL7"));
+	minDepth->SetValue(_T("0"));
 	StaticText9 = new wxStaticText(this, ID_STATICTEXT9, _("Maximum :"), wxPoint(392,100), wxDefaultSize, 0, _T("ID_STATICTEXT9"));
-	SpinCtrl2 = new wxSpinCtrl(this, ID_SPINCTRL8, _T("10000"), wxPoint(480,96), wxDefaultSize, 0, 0, 10000, 10000, _T("ID_SPINCTRL8"));
-	SpinCtrl2->SetValue(_T("10000"));
+	maxDepth = new wxSpinCtrl(this, ID_SPINCTRL8, _T("10000"), wxPoint(480,96), wxDefaultSize, 0, 0, 10000, 10000, _T("ID_SPINCTRL8"));
+	maxDepth->SetValue(_T("10000"));
 	StaticText10 = new wxStaticText(this, ID_STATICTEXT10, _("Crop:"), wxPoint(392,160), wxDefaultSize, 0, _T("ID_STATICTEXT10"));
-	TextCtrl5 = new wxTextCtrl(this, ID_TEXTCTRL5, _("0"), wxPoint(432,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
-	TextCtrl6 = new wxTextCtrl(this, ID_TEXTCTRL6, _("0"), wxPoint(482,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
+	cropDepthX1 = new wxTextCtrl(this, ID_TEXTCTRL5, _("0"), wxPoint(432,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
+	cropDepthY1 = new wxTextCtrl(this, ID_TEXTCTRL6, _("0"), wxPoint(482,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
 	StaticText11 = new wxStaticText(this, ID_STATICTEXT11, _("---->"), wxPoint(536,158), wxDefaultSize, 0, _T("ID_STATICTEXT11"));
-	TextCtrl7 = new wxTextCtrl(this, ID_TEXTCTRL7, _("Max"), wxPoint(584,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
-	TextCtrl8 = new wxTextCtrl(this, ID_TEXTCTRL8, _("Max"), wxPoint(640,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
-	StaticText12 = new wxStaticText(this, ID_STATICTEXT12, _("Bounding Box"), wxPoint(392,208), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
-	TextCtrl9 = new wxTextCtrl(this, ID_TEXTCTRL9, _("0.0"), wxPoint(496,224), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL9"));
-	TextCtrl10 = new wxTextCtrl(this, ID_TEXTCTRL10, _("0.0"), wxPoint(560,224), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL10"));
-	TextCtrl11 = new wxTextCtrl(this, ID_TEXTCTRL11, _("0.0"), wxPoint(624,224), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL11"));
-	TextCtrl12 = new wxTextCtrl(this, ID_TEXTCTRL12, _("0.0"), wxPoint(496,256), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL12"));
-	TextCtrl13 = new wxTextCtrl(this, ID_TEXTCTRL13, _("0.0"), wxPoint(560,256), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL13"));
-	TextCtrl14 = new wxTextCtrl(this, ID_TEXTCTRL14, _("0.0"), wxPoint(624,256), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL14"));
+	cropDepthX2 = new wxTextCtrl(this, ID_TEXTCTRL7, _("Max"), wxPoint(584,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
+	cropDepthY2 = new wxTextCtrl(this, ID_TEXTCTRL8, _("Max"), wxPoint(640,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
+	bboxMinX = new wxTextCtrl(this, ID_TEXTCTRL9, _("0.0"), wxPoint(496,224), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL9"));
+	bboxMinY = new wxTextCtrl(this, ID_TEXTCTRL10, _("0.0"), wxPoint(560,224), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL10"));
+	bboxMinZ = new wxTextCtrl(this, ID_TEXTCTRL11, _("0.0"), wxPoint(624,224), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL11"));
+	bboxMaxX = new wxTextCtrl(this, ID_TEXTCTRL12, _("0.0"), wxPoint(496,256), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL12"));
+	bboxMaxY = new wxTextCtrl(this, ID_TEXTCTRL13, _("0.0"), wxPoint(560,256), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL13"));
+	bboxMaxZ = new wxTextCtrl(this, ID_TEXTCTRL14, _("0.0"), wxPoint(624,256), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL14"));
 	StaticText13 = new wxStaticText(this, ID_STATICTEXT13, _("Minimum"), wxPoint(424,228), wxDefaultSize, 0, _T("ID_STATICTEXT13"));
 	StaticText14 = new wxStaticText(this, ID_STATICTEXT14, _("Maximum"), wxPoint(424,258), wxDefaultSize, 0, _T("ID_STATICTEXT14"));
-	StaticText15 = new wxStaticText(this, ID_STATICTEXT15, _("Plane"), wxPoint(392,288), wxDefaultSize, 0, _T("ID_STATICTEXT15"));
 	StaticText16 = new wxStaticText(this, ID_STATICTEXT16, _("Point A"), wxPoint(424,312), wxDefaultSize, 0, _T("ID_STATICTEXT16"));
-	TextCtrl15 = new wxTextCtrl(this, ID_TEXTCTRL15, _("0.0"), wxPoint(496,308), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL15"));
-	TextCtrl16 = new wxTextCtrl(this, ID_TEXTCTRL16, _("0.0"), wxPoint(560,308), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL16"));
-	TextCtrl17 = new wxTextCtrl(this, ID_TEXTCTRL17, _("0.0"), wxPoint(624,308), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL17"));
+	planeP1X = new wxTextCtrl(this, ID_TEXTCTRL15, _("0.0"), wxPoint(496,308), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL15"));
+	planeP1Y = new wxTextCtrl(this, ID_TEXTCTRL16, _("0.0"), wxPoint(560,308), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL16"));
+	planeP1Z = new wxTextCtrl(this, ID_TEXTCTRL17, _("0.0"), wxPoint(624,308), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL17"));
 	StaticText17 = new wxStaticText(this, ID_STATICTEXT17, _("Point B"), wxPoint(424,340), wxDefaultSize, 0, _T("ID_STATICTEXT17"));
-	TextCtrl18 = new wxTextCtrl(this, ID_TEXTCTRL18, _("0.0"), wxPoint(496,336), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL18"));
-	TextCtrl19 = new wxTextCtrl(this, ID_TEXTCTRL19, _("0.0"), wxPoint(560,336), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL19"));
-	TextCtrl20 = new wxTextCtrl(this, ID_TEXTCTRL20, _("0.0"), wxPoint(624,336), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL20"));
-	TextCtrl21 = new wxTextCtrl(this, ID_TEXTCTRL21, _("0.0"), wxPoint(496,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL21"));
-	TextCtrl22 = new wxTextCtrl(this, ID_TEXTCTRL22, _("0.0"), wxPoint(560,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL22"));
-	TextCtrl23 = new wxTextCtrl(this, ID_TEXTCTRL23, _("0.0"), wxPoint(624,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL23"));
+	planeP2X = new wxTextCtrl(this, ID_TEXTCTRL18, _("0.0"), wxPoint(496,336), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL18"));
+	planeP2Y = new wxTextCtrl(this, ID_TEXTCTRL19, _("0.0"), wxPoint(560,336), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL19"));
+	planeP2Z = new wxTextCtrl(this, ID_TEXTCTRL20, _("0.0"), wxPoint(624,336), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL20"));
+	planeP3X = new wxTextCtrl(this, ID_TEXTCTRL21, _("0.0"), wxPoint(496,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL21"));
+	planeP3Y = new wxTextCtrl(this, ID_TEXTCTRL22, _("0.0"), wxPoint(560,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL22"));
+	planeP3Z = new wxTextCtrl(this, ID_TEXTCTRL23, _("0.0"), wxPoint(624,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL23"));
 	StaticText18 = new wxStaticText(this, ID_STATICTEXT18, _("Point C"), wxPoint(424,368), wxDefaultSize, 0, _T("ID_STATICTEXT18"));
 	StaticText19 = new wxStaticText(this, ID_STATICTEXT19, _("Combination Method"), wxPoint(24,468), wxDefaultSize, 0, _T("ID_STATICTEXT19"));
 	ChoiceCombination = new wxChoice(this, ID_CHOICE1, wxPoint(192,464), wxSize(168,25), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
@@ -142,10 +140,16 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	ChoiceCombination->Append(_("XOR combination "));
 	ChoiceCombination->Append(_("RGB only"));
 	ChoiceCombination->Append(_("Depth only "));
+	CheckBoxBoundingBox = new wxCheckBox(this, ID_CHECKBOX1, _("Bounding Box"), wxPoint(392,204), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	CheckBoxBoundingBox->SetValue(false);
+	CheckBoxPlane = new wxCheckBox(this, ID_CHECKBOX2, _("Plane Segmentation"), wxPoint(392,290), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	CheckBoxPlane->SetValue(false);
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonOkClick);
 	//*)
+
+	reloadSegmentationFormFromValues();
 }
 
 SelectSegmentation::~SelectSegmentation()
@@ -155,8 +159,62 @@ SelectSegmentation::~SelectSegmentation()
 }
 
 
+int SelectSegmentation::reloadSegmentationFormFromValues()
+{
+  wxString val;
+
+  val.Clear(); val<<selectedDepthConf.bboxX1; bboxMinX->SetValue(val);
+  val.Clear(); val<<selectedDepthConf.bboxY1; bboxMinY->SetValue(val);
+  val.Clear(); val<<selectedDepthConf.bboxZ1; bboxMinZ->SetValue(val);
+
+  val.Clear(); val<<selectedDepthConf.bboxX2; bboxMaxX->SetValue(val);
+  val.Clear(); val<<selectedDepthConf.bboxY2; bboxMaxY->SetValue(val);
+  val.Clear(); val<<selectedDepthConf.bboxZ2; bboxMaxZ->SetValue(val);
+
+  return 1;
+}
+
+
+int SelectSegmentation::saveSegmentationValuesFromForm()
+{
+   long value;
+
+   if (CheckBoxBoundingBox->IsChecked())
+   {
+    if (this->bboxMinX->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxX1 = value; }
+    if (this->bboxMinY->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxY1 = value; }
+    if (this->bboxMinZ->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxZ1 = value; }
+
+    if (this->bboxMaxX->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxX2 = value; }
+    if (this->bboxMaxY->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxY2 = value; }
+    if (this->bboxMaxZ->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxZ2 = value; }
+
+    selectedDepthConf.enableBBox=1;
+   }
+
+   if (CheckBoxPlane->IsChecked())
+   {
+    if (this->planeP1X->GetValue().ToLong(&value)) {  this->selectedDepthConf.p1[0] = value; }
+    if (this->planeP1Y->GetValue().ToLong(&value)) {  this->selectedDepthConf.p1[1] = value; }
+    if (this->planeP1Z->GetValue().ToLong(&value)) {  this->selectedDepthConf.p1[2] = value; }
+
+    if (this->planeP2X->GetValue().ToLong(&value)) {  this->selectedDepthConf.p2[0] = value; }
+    if (this->planeP2Y->GetValue().ToLong(&value)) {  this->selectedDepthConf.p2[1] = value; }
+    if (this->planeP2Z->GetValue().ToLong(&value)) {  this->selectedDepthConf.p2[2] = value; }
+
+    if (this->planeP3X->GetValue().ToLong(&value)) {  this->selectedDepthConf.p3[0] = value; }
+    if (this->planeP3Y->GetValue().ToLong(&value)) {  this->selectedDepthConf.p3[1] = value; }
+    if (this->planeP3Z->GetValue().ToLong(&value)) {  this->selectedDepthConf.p3[2] = value; }
+
+    selectedDepthConf.enablePlaneSegmentation=1;
+   }
+
+  return 1;
+}
+
 void SelectSegmentation::OnButtonOkClick(wxCommandEvent& event)
 {
+    saveSegmentationValuesFromForm();
     Close();
 }
 
