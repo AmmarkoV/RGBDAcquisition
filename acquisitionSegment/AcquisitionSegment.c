@@ -109,7 +109,66 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
    segConfDepth->minY=0;     segConfDepth->maxY=height;
    segConfDepth->minDepth=0; segConfDepth->maxDepth=32500;
 
+
+   segConfDepth->enableBBox=0;
+   segConfDepth->bboxX1 = -1000;     segConfDepth->bboxY1 = -1000;    segConfDepth->bboxZ1 = -10000;
+   segConfDepth->bboxX2 = 1000;      segConfDepth->bboxY2 = 1000;     segConfDepth->bboxZ2 = 10000;
+
+   segConfDepth->enablePlaneSegmentation=0;
+   int i=0;
+   for (i=0; i<3; i++) { segConfDepth->p1[i]=0.0; segConfDepth->p2[i]=0.0; segConfDepth->p3[i]=0.0; }
+
   return 1;
 }
 
 
+int copyRGBSegmentation(struct SegmentationFeaturesRGB* target, struct SegmentationFeaturesRGB* source)
+{
+   memcpy(target,source,sizeof(struct SegmentationFeaturesRGB));
+   /*
+   target->minDepth = source->minDepth;
+   target->maxDepth = source->maxDepth;
+
+   target->minX = source->minX;  target->maxX = source->maxX;
+   target->minY = source->minY;  target->maxY = source->maxY;
+
+   target->floodErase.totalPoints=0;
+   source->floodErase.totalPoints=0;
+
+   target->enableBBox  = source->enableBBox;
+   target->bboxX1  = source->bboxX1;
+   target->bboxY1  = source->bboxY1;
+   target->bboxZ1  = source->bboxZ1;
+   target->bboxX2  = source->bboxX2;
+   target->bboxY2  = source->bboxY2;
+   target->bboxZ2  = source->bboxZ2;
+
+   target->enablePlaneSegmentation  = source-> ;
+   double p1[3];
+   double p2[3];
+   double p3[3];*/
+   return 1;
+}
+
+
+int copyDepthSegmentation(struct SegmentationFeaturesDepth* target, struct SegmentationFeaturesDepth* source)
+{
+   memcpy(target,source,sizeof(struct SegmentationFeaturesDepth));
+   return 1;
+}
+
+int printDepthSegmentationData(char * label , struct SegmentationFeaturesDepth * dat)
+{
+  fprintf(stderr,"%s \n",label);
+  fprintf(stderr,"------------------------------------------------------\n");
+  fprintf(stderr,"Printout of configuration data for depth segmentation\n");
+
+  fprintf(stderr,"Depth min %u max %u\n",dat->minDepth,dat->maxDepth);
+  fprintf(stderr,"Depth crop Values %u,%u -> %u,%u \n",dat->minX,dat->minY,dat->maxX,dat->maxY);
+
+  fprintf(stderr,"Total depth flood fill points %u \n",dat->floodErase.totalPoints);
+
+  fprintf(stderr,"Depth Bounding Box %0.2f,%0.2f,%0.2f -> %0.2f,%0.2f,%0.2f\n",dat->bboxX1,dat->bboxY1,dat->bboxZ1,dat->bboxX2,dat->bboxY2,dat->bboxZ2);
+
+  return 1;
+}

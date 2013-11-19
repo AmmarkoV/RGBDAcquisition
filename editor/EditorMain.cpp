@@ -277,6 +277,7 @@ int removeOldSegmentedFrames()
     if (!segmentedFramesExist ) { return 0; }
     if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
     if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
+    return 1;
 }
 
 
@@ -521,20 +522,26 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
     SelectSegmentation  * segmentationSelector = new SelectSegmentation(this, wxID_ANY);
 
     segmentationSelector->selectedCombinationMode=combinationMode;
-    segmentationSelector->selectedRGBConf=segConfRGB;
-    segmentationSelector->selectedDepthConf=segConfDepth;
+    copyRGBSegmentation(&segmentationSelector->selectedRGBConf, &segConfRGB);
+    copyDepthSegmentation(&segmentationSelector->selectedDepthConf, &segConfDepth);
+
+    printDepthSegmentationData("Initial Depth Configuration",&segConfDepth);
 
     segmentationSelector->ShowModal();
+
+    printDepthSegmentationData("What Depth Configuration the form filled in ",&segmentationSelector->selectedDepthConf);
 
     acquisitionGetColorCalibration(moduleID,devID,&calib);
 
     segmentedFramesExist=1;
 
     combinationMode=segmentationSelector->selectedCombinationMode;
-    segConfRGB=segmentationSelector->selectedRGBConf;
-    segConfDepth=segmentationSelector->selectedDepthConf;
+    copyRGBSegmentation(&segConfRGB , &segmentationSelector->selectedRGBConf);
+    copyDepthSegmentation(&segConfDepth , &segmentationSelector->selectedDepthConf);
 
 
+
+    printDepthSegmentationData("New Depth Configuration",&segConfDepth);
 
     delete  segmentationSelector;
 

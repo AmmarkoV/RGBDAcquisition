@@ -163,13 +163,27 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
 {
   wxString val;
 
-  val.Clear(); val<<selectedDepthConf.bboxX1; bboxMinX->SetValue(val);
-  val.Clear(); val<<selectedDepthConf.bboxY1; bboxMinY->SetValue(val);
-  val.Clear(); val<<selectedDepthConf.bboxZ1; bboxMinZ->SetValue(val);
 
-  val.Clear(); val<<selectedDepthConf.bboxX2; bboxMaxX->SetValue(val);
-  val.Clear(); val<<selectedDepthConf.bboxY2; bboxMaxY->SetValue(val);
-  val.Clear(); val<<selectedDepthConf.bboxZ2; bboxMaxZ->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxX1); bboxMinX->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxY1); bboxMinY->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxZ1); bboxMinZ->SetValue(val);
+
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxX2); bboxMaxX->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxY2); bboxMaxY->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxZ2); bboxMaxZ->SetValue(val);
+
+
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p1[0]); planeP1X->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p1[1]); planeP1Y->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p1[2]); planeP1Z->SetValue(val);
+
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p2[0]); planeP2X->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p2[1]); planeP2Y->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p2[2]); planeP2Z->SetValue(val);
+
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[0]); planeP3X->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[1]); planeP3Y->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[2]); planeP3Z->SetValue(val);
 
   return 1;
 }
@@ -208,6 +222,9 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
 
     selectedDepthConf.enablePlaneSegmentation=1;
    }
+
+  selectedDepthConf.minDepth = minDepth->GetValue();
+  selectedDepthConf.maxDepth = maxDepth->GetValue();
 
   return 1;
 }
