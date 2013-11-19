@@ -257,12 +257,9 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
  {
   create4x4IdentityMatrix(m);
   if ( calib->extrinsicParametersSet )
-     {
-      convertRodriguezAndTranslationToOpenGL4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation);
-      fprintf(stderr,"Is this correct , ? shouldnt the matrix be the other way around ? \n");
-      //transpose4x4MatrixD(m);
-     }
-  else {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
+     { convertRodriguezAndTranslationTo4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation); }
+     else
+     {fprintf(stderr,"No extrinsic parameters provided , bounding box segmentation will use default coordinate system \n"); }
 
   double raw3D[4]={0};
   double world3D[4]={0};

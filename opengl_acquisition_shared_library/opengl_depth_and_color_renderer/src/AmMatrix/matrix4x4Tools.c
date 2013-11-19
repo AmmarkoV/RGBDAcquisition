@@ -47,6 +47,15 @@ enum mat4x4RTItem
 
 
 
+
+enum mat4x4EItem
+{
+    e0 = 0 , e1  , e2  , e3 ,
+    e4     , e5  , e6  , e7 ,
+    e8     , e9  , e10 , e11 ,
+    e12    , e13 , e14 , e15
+};
+
 /* OUR MATRICES STORAGE
     0   1   2   3
     4   5   6   7
@@ -386,7 +395,8 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
   return 1;
 }
 
-int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)
+/*
+int transform3DPointUsing4x4MatrixOld(double * resultPoint3D, double * transformation4x4, double * point3D)
 {
   if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0) ) { return 0; }
 
@@ -403,5 +413,43 @@ int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformati
   resultPoint3D[3] = 1;
 
  return 1;
-}
+}*/
 
+int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)
+{
+  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0) ) { return 0; }
+
+  fprintf(stderr,"Point 3D %0.2f,%0.2f,%0.2f \n",point3D[0],point3D[1],point3D[2]);
+/*
+   What we want to do ( in matlab )
+   { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
+
+   This gives us
+
+  {
+    {e3 W + e0 X + e1 Y + e2 Z},
+    {e7 W + e4 X + e5 Y + e6 Z},
+    {e11 W + e8 X + e9 Y + e10 Z},
+    {e15 W + e12 X + e13 Y + e14 Z}
+  }
+*/
+
+
+  double * m = transformation4x4;
+  double X=point3D[0],Y=point3D[1],Z=point3D[2],W=1.0;
+
+  resultPoint3D[0] =  m[e3] * W + m[e0] * X + m[e1] * Y + m[e2] * Z;
+  resultPoint3D[1] =  m[e7] * W + m[e4] * X + m[e5] * Y + m[e6] * Z;
+  resultPoint3D[2] =  m[e11] * W + m[e8] * X + m[e9] * Y + m[e10] * Z;
+  resultPoint3D[3] =  m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
+
+  // Ok we have our results but now to normalize our vector
+  resultPoint3D[0]/=resultPoint3D[3];
+  resultPoint3D[1]/=resultPoint3D[3];
+  resultPoint3D[2]/=resultPoint3D[3];
+  resultPoint3D[3]/=resultPoint3D[3];
+
+  fprintf(stderr,"Transformed to %0.2f,%0.2f,%0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2]);
+
+ return 1;
+}
