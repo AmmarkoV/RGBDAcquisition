@@ -73,7 +73,7 @@ int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y
 }
 
 
-int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodriguez , double * translation)
+int convertRodriguezAndTranslationToInverse4x4DMatrix(double * result4x4, double * rodriguez , double * translation)
 {
   double scale = 1.0;
   double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
@@ -122,6 +122,48 @@ int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodr
   return 1;
 }
 
+int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodriguez , double * translation)
+{
+  double scale = 1.0;
+  double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
+
+  //Our translation vector is ready to be used!
+  fprintf(stderr,"translation %f %f %f\n ",translation[0],translation[1],translation[2]);
+
+  //Our rodriguez vector should be first converted to a 3x3 Rotation matrix
+  convertRodriguezTo3x3((double*) matrix3x3Rotation , rodriguez);
+
+  //Shorthand variables for readable code :P
+  double * m  = result4x4;
+  double * rm = matrix3x3Rotation;
+  double * tm = translation;
+
+
+  double Tx = tm[0]*scale;
+  double Ty = tm[1]*scale;
+  double Tz = tm[2]*scale;
+
+
+
+  /*
+      Here what we want to do is generate a 4x4 matrix that does the transformation that our
+      rodriguez and translation vector define
+
+      In order to do that we should have the following be true
+
+  */
+
+
+   m[0]=  rm[0];        m[1]= rm[1];        m[2]=  rm[2];       m[3]=  Tx ;
+   m[4]=  rm[3];        m[5]= rm[4];        m[6]=  rm[5];       m[7]=  Ty ;
+   m[8]=  rm[6];        m[9]= rm[7];        m[10]= rm[8];       m[11]= Tz ;
+   m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
+
+
+  print4x4DMatrix("ModelView", result4x4);
+  free4x4Matrix(&matrix3x3Rotation);
+  return 1;
+}
 
 
 int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double * rodriguez , double * translation  )
