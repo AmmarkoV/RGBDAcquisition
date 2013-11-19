@@ -100,6 +100,7 @@ const long EditorFrame::ID_TEXTCTRL1 = wxNewId();
 const long EditorFrame::ID_STATICTEXT2 = wxNewId();
 const long EditorFrame::ID_STATICTEXT3 = wxNewId();
 const long EditorFrame::ID_BUTTON5 = wxNewId();
+const long EditorFrame::ID_BUTTON6 = wxNewId();
 const long EditorFrame::ID_MENUITEM1 = wxNewId();
 const long EditorFrame::idMenuQuit = wxNewId();
 const long EditorFrame::ID_MENUSEGMENTATION = wxNewId();
@@ -140,6 +141,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(474,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(484,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(680,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+    ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(578,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     Menu3 = new wxMenuItem(Menu1, ID_MENUITEM1, _("Open Device"), wxEmptyString, wxITEM_NORMAL);
@@ -172,6 +174,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonNextFrameClick);
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditorFrame::OncurrentFrameTextCtrlText);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
+    Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonCalibrationClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -247,6 +250,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
        return;
    }
 
+   acquisitionGetColorCalibration(moduleID,devID,&calib);
    unsigned int totalFrames =  acquisitionGetTotalFrameNumber(moduleID,devID);
 
    if (totalFrames==0) {
@@ -535,7 +539,6 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 
     printDepthSegmentationData("What Depth Configuration the form filled in ",&segmentationSelector->selectedDepthConf);
 
-    acquisitionGetColorCalibration(moduleID,devID,&calib);
 
     segmentedFramesExist=1;
 
@@ -552,4 +555,10 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
     refreshSegmentedFrame();
 
     Refresh();
+}
+
+void EditorFrame::OnButtonCalibrationClick(wxCommandEvent& event)
+{
+
+
 }

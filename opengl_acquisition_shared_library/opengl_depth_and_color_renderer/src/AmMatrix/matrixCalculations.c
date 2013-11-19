@@ -23,8 +23,8 @@ int convertRodriguezTo3x3(double * result,double * matrix)
     }
 
    //NORMAL RESULT
-   result[0]=x*x * (1 - cosTh) + cosTh;          result[1]=x*y*(1 - cosTh) - z*sin(th);     result[2]=x*z*(1 - cosTh) + y*sin(th);
-   result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;       result[5]=y*z*(1 - cosTh) - x*sin(th);
+   result[0]=x*x * (1 - cosTh) + cosTh;          result[1]=x*y*(1 - cosTh) - z*sin(th);      result[2]=x*z*(1 - cosTh) + y*sin(th);
+   result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;          result[5]=y*z*(1 - cosTh) - x*sin(th);
    result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
 
   fprintf(stderr,"rodriguez %f %f %f\n ",matrix[0],matrix[1],matrix[2]);
@@ -72,7 +72,8 @@ int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y
  return 1;
 }
 
-int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double * rodriguez , double * translation  )
+
+int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodriguez , double * translation)
 {
   double scale = 1.0;
   double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
@@ -88,21 +89,48 @@ int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double 
   double * rm = matrix3x3Rotation;
   double * tm = translation;
 
-  //All steps at one step!
-  // rm has been transposed so that we have the inverse rotation ( based on camera coordinates )
-  // Thats why we go 0->3->6 , 1->4->7 , 2->5->8
-  // translations have a minus so that they also go inverse
-  // The result matrix is transposed so that OpenGL can read it correctly ( because OpenGL uses column major matrices )
-   m[0]=  rm[0];        m[1]= rm[3];        m[2]=  rm[6];       m[3]= 0.0;
-   m[4]=  rm[1];        m[5]= rm[4];        m[6]=  rm[7];       m[7]= 0.0;
-   m[8]=  rm[2];        m[9]= rm[5];        m[10]= rm[8];       m[11]=0.0;
-   m[12]=-tm[0]*scale;  m[13]=-tm[1]*scale; m[14]=-tm[2]*scale; m[15]=1.0;
 
-  print4x4DMatrix("ModelView Theory Inverted", result4x4);
+  double Tx = tm[0]*scale;
+  double Ty = tm[1]*scale;
+  double Tz = tm[2]*scale;
+
+
+
+  /*
+      Here what we want to do is generate a 4x4 matrix that does the inverse transformation that our
+      rodriguez and translation vector define
+
+      In order to do that we should have the following be true
+
+                                      (note the minus under)
+      (   R  |  T  )       (   R trans |  - R trans * T  )         (   I  |  0   )
+      (  --------- )    .  (  -------------------------- )     =   ( ----------- )
+      (   0  |  1  )       (   0       |        1        )         (   0  |  I   )
+
+      Using matlab to do the calculations we get the following matrix
+  */
+
+
+   m[0]=  rm[0];        m[1]= rm[3];        m[2]=  rm[6];       m[3]= -1.0 * ( rm[0]*Tx + rm[3]*Ty + rm[6]*Tz );
+   m[4]=  rm[1];        m[5]= rm[4];        m[6]=  rm[7];       m[7]= -1.0 * ( rm[1]*Tx + rm[4]*Ty + rm[7]*Tz );
+   m[8]=  rm[2];        m[9]= rm[5];        m[10]= rm[8];       m[11]=-1.0 * ( rm[2]*Tx + rm[5]*Ty + rm[8]*Tz );
+   m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
+
+
+  print4x4DMatrix("ModelView", result4x4);
   free4x4Matrix(&matrix3x3Rotation);
   return 1;
 }
 
+
+
+int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double * rodriguez , double * translation  )
+{
+  convertRodriguezAndTranslationTo4x4DMatrix(result4x4,rodriguez,translation);
+  fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
+  transpose4x4MatrixD(result4x4);
+  return 1;
+}
 
 
 int move3DPoint(double * resultPoint3D, double * transformation4x4, double * point3D  )
