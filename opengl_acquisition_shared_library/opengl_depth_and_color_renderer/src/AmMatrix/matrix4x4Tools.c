@@ -421,7 +421,7 @@ int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformati
 
   fprintf(stderr,"Point 3D %0.2f,%0.2f,%0.2f \n",point3D[0],point3D[1],point3D[2]);
 /*
-   What we want to do ( in matlab )
+   What we want to do ( in mathematica )
    { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
 
    This gives us
@@ -433,7 +433,6 @@ int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformati
     {e15 W + e12 X + e13 Y + e14 Z}
   }
 */
-
 
   double * m = transformation4x4;
   double X=point3D[0],Y=point3D[1],Z=point3D[2],W=1.0;
