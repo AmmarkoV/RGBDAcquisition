@@ -96,12 +96,12 @@
 			<pos>188,158</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="cropRGBX2" member="yes">
-			<value>Max</value>
+			<value>640</value>
 			<pos>232,156</pos>
 			<size>48,23</size>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="cropRGBY2" member="yes">
-			<value>Max</value>
+			<value>480</value>
 			<pos>284,156</pos>
 			<size>48,23</size>
 		</object>
@@ -142,12 +142,12 @@
 			<pos>536,158</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="cropDepthX2" member="yes">
-			<value>Max</value>
+			<value>640</value>
 			<pos>584,156</pos>
 			<size>48,23</size>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL8" variable="cropDepthY2" member="yes">
-			<value>Max</value>
+			<value>480</value>
 			<pos>640,156</pos>
 			<size>48,23</size>
 		</object>

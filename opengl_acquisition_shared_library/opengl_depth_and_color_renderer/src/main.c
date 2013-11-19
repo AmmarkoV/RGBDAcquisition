@@ -25,7 +25,7 @@
 
 #define FLIP_OPEN_GL_IMAGES 1
 
-
+//TODO : add Horizontal flipping  <- is the output mirrored ?
 
 int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {

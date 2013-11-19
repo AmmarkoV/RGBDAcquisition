@@ -159,6 +159,7 @@ int copyDepthSegmentation(struct SegmentationFeaturesDepth* target, struct Segme
 
 int printDepthSegmentationData(char * label , struct SegmentationFeaturesDepth * dat)
 {
+  fprintf(stderr,"\n\n\n------------------------------------------------------\n");
   fprintf(stderr,"%s \n",label);
   fprintf(stderr,"------------------------------------------------------\n");
   fprintf(stderr,"Printout of configuration data for depth segmentation\n");
@@ -168,6 +169,7 @@ int printDepthSegmentationData(char * label , struct SegmentationFeaturesDepth *
 
   fprintf(stderr,"Total depth flood fill points %u \n",dat->floodErase.totalPoints);
 
+  fprintf(stderr,"Depth Bounding Box State : %u \n",dat->enableBBox);
   fprintf(stderr,"Depth Bounding Box %0.2f,%0.2f,%0.2f -> %0.2f,%0.2f,%0.2f\n",dat->bboxX1,dat->bboxY1,dat->bboxZ1,dat->bboxX2,dat->bboxY2,dat->bboxZ2);
 
   return 1;

@@ -527,6 +527,7 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 
     printDepthSegmentationData("Initial Depth Configuration",&segConfDepth);
 
+    segmentationSelector->reloadSegmentationFormFromValues();
     segmentationSelector->ShowModal();
 
     printDepthSegmentationData("What Depth Configuration the form filled in ",&segmentationSelector->selectedDepthConf);

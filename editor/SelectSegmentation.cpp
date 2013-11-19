@@ -98,8 +98,8 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	cropRGBX1 = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(80,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	cropRGBY1 = new wxTextCtrl(this, ID_TEXTCTRL2, _("0"), wxPoint(130,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	StaticText7 = new wxStaticText(this, ID_STATICTEXT7, _("---->"), wxPoint(188,158), wxDefaultSize, 0, _T("ID_STATICTEXT7"));
-	cropRGBX2 = new wxTextCtrl(this, ID_TEXTCTRL3, _("Max"), wxPoint(232,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
-	cropRGBY2 = new wxTextCtrl(this, ID_TEXTCTRL4, _("Max"), wxPoint(284,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
+	cropRGBX2 = new wxTextCtrl(this, ID_TEXTCTRL3, _("640"), wxPoint(232,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+	cropRGBY2 = new wxTextCtrl(this, ID_TEXTCTRL4, _("480"), wxPoint(284,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	StaticText8 = new wxStaticText(this, ID_STATICTEXT8, _("Minimum :"), wxPoint(392,66), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	minDepth = new wxSpinCtrl(this, ID_SPINCTRL7, _T("0"), wxPoint(480,64), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL7"));
 	minDepth->SetValue(_T("0"));
@@ -110,8 +110,8 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	cropDepthX1 = new wxTextCtrl(this, ID_TEXTCTRL5, _("0"), wxPoint(432,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
 	cropDepthY1 = new wxTextCtrl(this, ID_TEXTCTRL6, _("0"), wxPoint(482,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
 	StaticText11 = new wxStaticText(this, ID_STATICTEXT11, _("---->"), wxPoint(536,158), wxDefaultSize, 0, _T("ID_STATICTEXT11"));
-	cropDepthX2 = new wxTextCtrl(this, ID_TEXTCTRL7, _("Max"), wxPoint(584,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
-	cropDepthY2 = new wxTextCtrl(this, ID_TEXTCTRL8, _("Max"), wxPoint(640,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
+	cropDepthX2 = new wxTextCtrl(this, ID_TEXTCTRL7, _("640"), wxPoint(584,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
+	cropDepthY2 = new wxTextCtrl(this, ID_TEXTCTRL8, _("480"), wxPoint(640,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
 	bboxMinX = new wxTextCtrl(this, ID_TEXTCTRL9, _("0.0"), wxPoint(496,224), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL9"));
 	bboxMinY = new wxTextCtrl(this, ID_TEXTCTRL10, _("0.0"), wxPoint(560,224), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL10"));
 	bboxMinZ = new wxTextCtrl(this, ID_TEXTCTRL11, _("0.0"), wxPoint(624,224), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL11"));
@@ -163,7 +163,10 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
 {
   wxString val;
 
+  val.Clear(); val<<selectedDepthConf.minDepth;  minDepth->SetValue(val);
+  val.Clear(); val<<selectedDepthConf.maxDepth;  maxDepth->SetValue(val);
 
+  CheckBoxBoundingBox->SetValue( (selectedDepthConf.enableBBox!=0) );
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxX1); bboxMinX->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxY1); bboxMinY->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxZ1); bboxMinZ->SetValue(val);
@@ -173,6 +176,7 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxZ2); bboxMaxZ->SetValue(val);
 
 
+  CheckBoxPlane->SetValue( (selectedDepthConf.enablePlaneSegmentation!=0) );
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p1[0]); planeP1X->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p1[1]); planeP1Y->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p1[2]); planeP1Z->SetValue(val);
@@ -185,40 +189,44 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[1]); planeP3Y->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[2]); planeP3Z->SetValue(val);
 
+  Refresh();
+
   return 1;
 }
 
 
 int SelectSegmentation::saveSegmentationValuesFromForm()
 {
+   float fValue;
+   double dValue;
    long value;
 
    if (CheckBoxBoundingBox->IsChecked())
    {
-    if (this->bboxMinX->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxX1 = value; }
-    if (this->bboxMinY->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxY1 = value; }
-    if (this->bboxMinZ->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxZ1 = value; }
+    if (this->bboxMinX->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.bboxX1 = dValue; }
+    if (this->bboxMinY->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.bboxY1 = dValue; }
+    if (this->bboxMinZ->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.bboxZ1 = dValue; }
 
-    if (this->bboxMaxX->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxX2 = value; }
-    if (this->bboxMaxY->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxY2 = value; }
-    if (this->bboxMaxZ->GetValue().ToLong(&value)) {  this->selectedDepthConf.bboxZ2 = value; }
+    if (this->bboxMaxX->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.bboxX2 = dValue; }
+    if (this->bboxMaxY->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.bboxY2 = dValue; }
+    if (this->bboxMaxZ->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.bboxZ2 = dValue; }
 
     selectedDepthConf.enableBBox=1;
    }
 
    if (CheckBoxPlane->IsChecked())
    {
-    if (this->planeP1X->GetValue().ToLong(&value)) {  this->selectedDepthConf.p1[0] = value; }
-    if (this->planeP1Y->GetValue().ToLong(&value)) {  this->selectedDepthConf.p1[1] = value; }
-    if (this->planeP1Z->GetValue().ToLong(&value)) {  this->selectedDepthConf.p1[2] = value; }
+    if (this->planeP1X->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p1[0] = dValue; }
+    if (this->planeP1Y->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p1[1] = dValue; }
+    if (this->planeP1Z->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p1[2] = dValue; }
 
-    if (this->planeP2X->GetValue().ToLong(&value)) {  this->selectedDepthConf.p2[0] = value; }
-    if (this->planeP2Y->GetValue().ToLong(&value)) {  this->selectedDepthConf.p2[1] = value; }
-    if (this->planeP2Z->GetValue().ToLong(&value)) {  this->selectedDepthConf.p2[2] = value; }
+    if (this->planeP2X->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p2[0] = dValue; }
+    if (this->planeP2Y->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p2[1] = dValue; }
+    if (this->planeP2Z->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p2[2] = dValue; }
 
-    if (this->planeP3X->GetValue().ToLong(&value)) {  this->selectedDepthConf.p3[0] = value; }
-    if (this->planeP3Y->GetValue().ToLong(&value)) {  this->selectedDepthConf.p3[1] = value; }
-    if (this->planeP3Z->GetValue().ToLong(&value)) {  this->selectedDepthConf.p3[2] = value; }
+    if (this->planeP3X->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[0] = dValue; }
+    if (this->planeP3Y->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[1] = dValue; }
+    if (this->planeP3Z->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[2] = dValue; }
 
     selectedDepthConf.enablePlaneSegmentation=1;
    }
