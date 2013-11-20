@@ -198,5 +198,10 @@
 			<pos>104,368</pos>
 			<size>168,25</size>
 		</object>
+		<object class="wxButton" name="ID_BUTTON1" variable="ButtonOk" member="yes">
+			<label>Not Working Yet</label>
+			<pos>160,456</pos>
+			<handler function="OnButtonOkClick" entry="EVT_BUTTON" />
+		</object>
 	</object>
 </wxsmith>

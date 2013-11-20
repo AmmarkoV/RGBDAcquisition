@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = libCalibrationLibrary.a
+OUT_DEBUG = ./libCalibrationLibrary.a
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2 -Wall -fPIC
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = libCalibrationLibrary.a
+OUT_RELEASE = ./libCalibrationLibrary.a
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_DEBUG)/calibration.o
 
@@ -49,6 +49,7 @@ all: debug release
 clean: clean_debug clean_release
 
 before_debug: 
+	test -d . || mkdir -p .
 	test -d $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix || mkdir -p $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 
@@ -76,10 +77,12 @@ $(OBJDIR_DEBUG)/calibration.o: calibration.c
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
+	rm -rf .
 	rm -rf $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix
 	rm -rf $(OBJDIR_DEBUG)
 
 before_release: 
+	test -d . || mkdir -p .
 	test -d $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix || mkdir -p $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 
@@ -107,6 +110,7 @@ $(OBJDIR_RELEASE)/calibration.o: calibration.c
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
+	rm -rf .
 	rm -rf $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix
 	rm -rf $(OBJDIR_RELEASE)
 

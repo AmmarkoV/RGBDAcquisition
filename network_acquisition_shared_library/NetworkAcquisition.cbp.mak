@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = libNetworkAcquisition.so
+OUT_DEBUG = ./libNetworkAcquisition.so
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = libNetworkAcquisition.so
+OUT_RELEASE = ./libNetworkAcquisition.so
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/__/tools/Codecs/codecs.o $(OBJDIR_DEBUG)/__/tools/Codecs/jpgInput.o $(OBJDIR_DEBUG)/daemon.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/networkFramework.o
 
@@ -49,6 +49,7 @@ all: debug release
 clean: clean_debug clean_release
 
 before_debug: 
+	test -d . || mkdir -p .
 	test -d $(OBJDIR_DEBUG)/__/tools/Codecs || mkdir -p $(OBJDIR_DEBUG)/__/tools/Codecs
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 
@@ -76,10 +77,12 @@ $(OBJDIR_DEBUG)/networkFramework.o: networkFramework.c
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
+	rm -rf .
 	rm -rf $(OBJDIR_DEBUG)/__/tools/Codecs
 	rm -rf $(OBJDIR_DEBUG)
 
 before_release: 
+	test -d . || mkdir -p .
 	test -d $(OBJDIR_RELEASE)/__/tools/Codecs || mkdir -p $(OBJDIR_RELEASE)/__/tools/Codecs
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 
@@ -107,6 +110,7 @@ $(OBJDIR_RELEASE)/networkFramework.o: networkFramework.c
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
+	rm -rf .
 	rm -rf $(OBJDIR_RELEASE)/__/tools/Codecs
 	rm -rf $(OBJDIR_RELEASE)
 
