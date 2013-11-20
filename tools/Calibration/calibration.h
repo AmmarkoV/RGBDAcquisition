@@ -27,7 +27,7 @@ struct calibration
   double extrinsicRotationRodriguez[3];
   double extrinsicTranslation[3];
 
-  /*CAMERA DIMENSIONS*/
+  /*CAMERA DIMENSIONS ( WHEN RENDERING )*/
   double nearPlane,farPlane;
   unsigned int width;
   unsigned int height;

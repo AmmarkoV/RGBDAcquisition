@@ -49,6 +49,14 @@ const long SelectCalibration::ID_STATICTEXT18 = wxNewId();
 const long SelectCalibration::ID_STATICTEXT19 = wxNewId();
 const long SelectCalibration::ID_COMBOBOX1 = wxNewId();
 const long SelectCalibration::ID_BUTTON1 = wxNewId();
+const long SelectCalibration::ID_BUTTON2 = wxNewId();
+const long SelectCalibration::ID_STATICBOX3 = wxNewId();
+const long SelectCalibration::ID_STATICTEXT20 = wxNewId();
+const long SelectCalibration::ID_TEXTCTRL21 = wxNewId();
+const long SelectCalibration::ID_TEXTCTRL22 = wxNewId();
+const long SelectCalibration::ID_STATICTEXT21 = wxNewId();
+const long SelectCalibration::ID_TEXTCTRL23 = wxNewId();
+const long SelectCalibration::ID_TEXTCTRL24 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectCalibration,wxDialog)
@@ -60,55 +68,64 @@ SelectCalibration::SelectCalibration(wxWindow* parent,wxWindowID id)
 {
 	//(*Initialize(SelectCalibration)
 	Create(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
-	SetClientSize(wxSize(501,564));
+	SetClientSize(wxSize(501,600));
 	StaticBox1 = new wxStaticBox(this, ID_STATICBOX1, _("Intrinsics"), wxPoint(24,8), wxSize(456,216), 0, _T("ID_STATICBOX1"));
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Fx : 0.0 "), wxPoint(288,56), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	TextCtrl1 = new wxTextCtrl(this, ID_TEXTCTRL1, _("0.0"), wxPoint(56,56), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	TextCtrl2 = new wxTextCtrl(this, ID_TEXTCTRL2, _("0.0"), wxPoint(128,56), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
-	TextCtrl3 = new wxTextCtrl(this, ID_TEXTCTRL3, _("0.0"), wxPoint(200,56), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
-	TextCtrl4 = new wxTextCtrl(this, ID_TEXTCTRL4, _("0.0"), wxPoint(56,88), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
-	TextCtrl5 = new wxTextCtrl(this, ID_TEXTCTRL5, _("0.0"), wxPoint(128,88), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
-	TextCtrl6 = new wxTextCtrl(this, ID_TEXTCTRL6, _("0.0"), wxPoint(200,88), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
-	TextCtrl7 = new wxTextCtrl(this, ID_TEXTCTRL7, _("0.0"), wxPoint(56,120), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
-	TextCtrl8 = new wxTextCtrl(this, ID_TEXTCTRL8, _("0.0"), wxPoint(128,120), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
-	TextCtrl9 = new wxTextCtrl(this, ID_TEXTCTRL9, _("0.0"), wxPoint(200,120), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL9"));
+	fxLabel = new wxStaticText(this, ID_STATICTEXT1, _("Fx : 0.0 "), wxPoint(384,56), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	camera0 = new wxTextCtrl(this, ID_TEXTCTRL1, _("0.0"), wxPoint(56,56), wxSize(96,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	camera1 = new wxTextCtrl(this, ID_TEXTCTRL2, _("0.0"), wxPoint(160,56), wxSize(96,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+	camera2 = new wxTextCtrl(this, ID_TEXTCTRL3, _("0.0"), wxPoint(264,56), wxSize(104,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+	camera3 = new wxTextCtrl(this, ID_TEXTCTRL4, _("0.0"), wxPoint(56,88), wxSize(96,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
+	camera4 = new wxTextCtrl(this, ID_TEXTCTRL5, _("0.0"), wxPoint(160,88), wxSize(96,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
+	camera5 = new wxTextCtrl(this, ID_TEXTCTRL6, _("0.0"), wxPoint(264,88), wxSize(104,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
+	camera6 = new wxTextCtrl(this, ID_TEXTCTRL7, _("0.0"), wxPoint(56,120), wxSize(96,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
+	camera7 = new wxTextCtrl(this, ID_TEXTCTRL8, _("0.0"), wxPoint(160,120), wxSize(96,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
+	camera8 = new wxTextCtrl(this, ID_TEXTCTRL9, _("0.0"), wxPoint(264,120), wxSize(104,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL9"));
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Distortion Coefficients"), wxPoint(40,152), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	TextCtrl10 = new wxTextCtrl(this, ID_TEXTCTRL10, _("0.0"), wxPoint(56,176), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL10"));
-	TextCtrl11 = new wxTextCtrl(this, ID_TEXTCTRL11, _("0.0"), wxPoint(140,176), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL11"));
-	TextCtrl12 = new wxTextCtrl(this, ID_TEXTCTRL12, _("0.0"), wxPoint(216,176), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL12"));
-	TextCtrl13 = new wxTextCtrl(this, ID_TEXTCTRL13, _("0.0"), wxPoint(296,176), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL13"));
-	TextCtrl14 = new wxTextCtrl(this, ID_TEXTCTRL14, _("0.0"), wxPoint(384,176), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL14"));
+	k1 = new wxTextCtrl(this, ID_TEXTCTRL10, _("0.0"), wxPoint(56,176), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL10"));
+	k2 = new wxTextCtrl(this, ID_TEXTCTRL11, _("0.0"), wxPoint(144,176), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL11"));
+	p1 = new wxTextCtrl(this, ID_TEXTCTRL12, _("0.0"), wxPoint(224,176), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL12"));
+	p2 = new wxTextCtrl(this, ID_TEXTCTRL13, _("0.0"), wxPoint(320,176), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL13"));
+	k3 = new wxTextCtrl(this, ID_TEXTCTRL14, _("0.0"), wxPoint(408,176), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL14"));
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("k1"), wxPoint(32,178), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("k2"), wxPoint(112,178), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("p1"), wxPoint(192,176), wxDefaultSize, 0, _T("ID_STATICTEXT5"));
-	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("p2"), wxPoint(272,176), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
-	StaticText7 = new wxStaticText(this, ID_STATICTEXT7, _("k3"), wxPoint(352,176), wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("k2"), wxPoint(128,178), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("p1"), wxPoint(208,178), wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("p2"), wxPoint(296,178), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticText7 = new wxStaticText(this, ID_STATICTEXT7, _("k3"), wxPoint(392,178), wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	StaticText8 = new wxStaticText(this, ID_STATICTEXT8, _("Intrinsics Matrix"), wxPoint(40,32), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	StaticBox2 = new wxStaticBox(this, ID_STATICBOX2, _("Extrinsics"), wxPoint(24,232), wxSize(456,208), 0, _T("ID_STATICBOX2"));
 	StaticText9 = new wxStaticText(this, ID_STATICTEXT9, _("Translation"), wxPoint(48,256), wxDefaultSize, 0, _T("ID_STATICTEXT9"));
-	TextCtrl15 = new wxTextCtrl(this, ID_TEXTCTRL15, _("0.0"), wxPoint(56,280), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL15"));
-	TextCtrl16 = new wxTextCtrl(this, ID_TEXTCTRL16, _("0.0"), wxPoint(128,280), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL16"));
-	TextCtrl17 = new wxTextCtrl(this, ID_TEXTCTRL17, _("0.0"), wxPoint(200,280), wxSize(72,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL17"));
+	tX = new wxTextCtrl(this, ID_TEXTCTRL15, _("0.0"), wxPoint(48,280), wxSize(72,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL15"));
+	tY = new wxTextCtrl(this, ID_TEXTCTRL16, _("0.0"), wxPoint(128,280), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL16"));
+	tZ = new wxTextCtrl(this, ID_TEXTCTRL17, _("0.0"), wxPoint(200,280), wxSize(72,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL17"));
 	StaticText10 = new wxStaticText(this, ID_STATICTEXT10, _("Rotation"), wxPoint(48,308), wxDefaultSize, 0, _T("ID_STATICTEXT10"));
-	TextCtrl18 = new wxTextCtrl(this, ID_TEXTCTRL18, _("0.0"), wxPoint(56,328), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL18"));
-	TextCtrl19 = new wxTextCtrl(this, ID_TEXTCTRL19, _("0.0"), wxPoint(128,328), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL19"));
-	TextCtrl20 = new wxTextCtrl(this, ID_TEXTCTRL20, _("0.0"), wxPoint(200,328), wxSize(72,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL20"));
-	StaticText11 = new wxStaticText(this, ID_STATICTEXT11, _("Fy : 0.0"), wxPoint(288,72), wxDefaultSize, 0, _T("ID_STATICTEXT11"));
-	StaticText12 = new wxStaticText(this, ID_STATICTEXT12, _("Cx : 0.0"), wxPoint(288,112), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
-	StaticText13 = new wxStaticText(this, ID_STATICTEXT13, _("Cy : 0.0"), wxPoint(288,128), wxDefaultSize, 0, _T("ID_STATICTEXT13"));
-	StaticText14 = new wxStaticText(this, ID_STATICTEXT14, _("0.0     0.0      0.0      0.0"), wxPoint(304,272), wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+	rX = new wxTextCtrl(this, ID_TEXTCTRL18, _("0.0"), wxPoint(48,328), wxSize(72,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL18"));
+	rY = new wxTextCtrl(this, ID_TEXTCTRL19, _("0.0"), wxPoint(128,328), wxSize(64,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL19"));
+	rZ = new wxTextCtrl(this, ID_TEXTCTRL20, _("0.0"), wxPoint(200,328), wxSize(72,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL20"));
+	fyLabel = new wxStaticText(this, ID_STATICTEXT11, _("Fy : 0.0"), wxPoint(384,72), wxDefaultSize, 0, _T("ID_STATICTEXT11"));
+	cxLabel = new wxStaticText(this, ID_STATICTEXT12, _("Cx : 0.0"), wxPoint(384,112), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
+	cyLabel = new wxStaticText(this, ID_STATICTEXT13, _("Cy : 0.0"), wxPoint(384,128), wxDefaultSize, 0, _T("ID_STATICTEXT13"));
+	StaticText14 = new wxStaticText(this, ID_STATICTEXT14, _("0.0     0.0      0.0      0.0"), wxPoint(304,280), wxDefaultSize, 0, _T("ID_STATICTEXT14"));
 	StaticText15 = new wxStaticText(this, ID_STATICTEXT15, _("Generated 4x4 Matrix"), wxPoint(280,256), wxDefaultSize, 0, _T("ID_STATICTEXT15"));
-	StaticText16 = new wxStaticText(this, ID_STATICTEXT16, _("0.0     0.0      0.0      0.0"), wxPoint(304,296), wxDefaultSize, 0, _T("ID_STATICTEXT16"));
+	StaticText16 = new wxStaticText(this, ID_STATICTEXT16, _("0.0     0.0      0.0      0.0"), wxPoint(304,304), wxDefaultSize, 0, _T("ID_STATICTEXT16"));
 	StaticText17 = new wxStaticText(this, ID_STATICTEXT17, _("0.0     0.0      0.0      0.0"), wxPoint(304,328), wxDefaultSize, 0, _T("ID_STATICTEXT17"));
-	StaticText18 = new wxStaticText(this, ID_STATICTEXT18, _("0.0     0.0      0.0      0.0"), wxPoint(304,360), wxDefaultSize, 0, _T("ID_STATICTEXT18"));
+	StaticText18 = new wxStaticText(this, ID_STATICTEXT18, _("0.0     0.0      0.0      0.0"), wxPoint(304,352), wxDefaultSize, 0, _T("ID_STATICTEXT18"));
 	StaticText19 = new wxStaticText(this, ID_STATICTEXT19, _("Scale"), wxPoint(48,372), wxDefaultSize, 0, _T("ID_STATICTEXT19"));
-	ComboBox1 = new wxComboBox(this, ID_COMBOBOX1, wxEmptyString, wxPoint(104,368), wxSize(168,25), 0, 0, 0, wxDefaultValidator, _T("ID_COMBOBOX1"));
-	ComboBox1->Append(_("millimeters"));
-	ComboBox1->Append(_("centimeters"));
-	ComboBox1->SetSelection( ComboBox1->Append(_("meters")) );
-	ButtonOk = new wxButton(this, ID_BUTTON1, _("Not Working Yet"), wxPoint(160,456), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	ComboBoxScale = new wxComboBox(this, ID_COMBOBOX1, wxEmptyString, wxPoint(104,368), wxSize(168,25), 0, 0, 0, wxDefaultValidator, _T("ID_COMBOBOX1"));
+	ComboBoxScale->Append(_("millimeters"));
+	ComboBoxScale->Append(_("centimeters"));
+	ComboBoxScale->SetSelection( ComboBoxScale->Append(_("meters")) );
+	ButtonOk = new wxButton(this, ID_BUTTON1, _("Ok"), wxPoint(152,544), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	ButtonCancel = new wxButton(this, ID_BUTTON2, _("Cancel"), wxPoint(248,544), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	StaticBox3 = new wxStaticBox(this, ID_STATICBOX3, _("Camera Rendering"), wxPoint(24,448), wxSize(456,88), 0, _T("ID_STATICBOX3"));
+	StaticText20 = new wxStaticText(this, ID_STATICTEXT20, _("Near/Far Plane for Rendering"), wxPoint(40,472), wxDefaultSize, 0, _T("ID_STATICTEXT20"));
+	nearPlane = new wxTextCtrl(this, ID_TEXTCTRL21, _("0"), wxPoint(256,466), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL21"));
+	farPlane = new wxTextCtrl(this, ID_TEXTCTRL22, _("0"), wxPoint(352,466), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL22"));
+	StaticText21 = new wxStaticText(this, ID_STATICTEXT21, _("Width / Height"), wxPoint(40,496), wxDefaultSize, 0, _T("ID_STATICTEXT21"));
+	width = new wxTextCtrl(this, ID_TEXTCTRL23, _("640"), wxPoint(256,490), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL23"));
+	height = new wxTextCtrl(this, ID_TEXTCTRL24, _("480"), wxPoint(352,490), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL24"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectCalibration::OnButtonOkClick);
+	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectCalibration::OnButtonCancelClick);
 	//*)
 }
 
@@ -119,7 +136,58 @@ SelectCalibration::~SelectCalibration()
 }
 
 
+int SelectCalibration::reloadCalibrationFormFromValues()
+{
+  wxString val;
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.intrinsic[0]); camera0->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.intrinsic[1]); camera1->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.intrinsic[2]); camera2->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.intrinsic[3]); camera3->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.intrinsic[4]); camera4->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.intrinsic[5]); camera5->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.intrinsic[6]); camera6->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.intrinsic[7]); camera7->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.intrinsic[8]); camera8->SetValue(val);
+
+
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.k1); k1->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.k2); k2->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.p1); p1->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.p2); p2->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.k3); k3->SetValue(val);
+
+
+
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.extrinsicTranslation[0]); tX->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.extrinsicTranslation[1]); tY->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.extrinsicTranslation[2]); tZ->SetValue(val);
+
+
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.extrinsicRotationRodriguez[0]); rX->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.extrinsicRotationRodriguez[1]); rY->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.extrinsicRotationRodriguez[2]); rZ->SetValue(val);
+
+
+
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.nearPlane); nearPlane->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.6f"),calib.farPlane);  farPlane->SetValue(val);
+  Refresh();
+}
+
+
+int SelectCalibration::saveCalibrationValuesFromForm()
+{
+
+}
+
+
 void SelectCalibration::OnButtonOkClick(wxCommandEvent& event)
+{
+    saveCalibrationValuesFromForm();
+    Close();
+}
+
+void SelectCalibration::OnButtonCancelClick(wxCommandEvent& event)
 {
     Close();
 }

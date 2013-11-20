@@ -1,6 +1,9 @@
 #ifndef SELECTCALIBRATION_H
 #define SELECTCALIBRATION_H
 
+
+#include "../tools/Calibration/calibration.h"
+
 //(*Headers(SelectCalibration)
 #include <wx/combobox.h>
 #include <wx/dialog.h>
@@ -14,53 +17,67 @@ class SelectCalibration: public wxDialog
 {
 	public:
 
+        struct calibration calib;
+
 		SelectCalibration(wxWindow* parent,wxWindowID id=wxID_ANY);
 		virtual ~SelectCalibration();
 
+
+        int reloadCalibrationFormFromValues();
+        int saveCalibrationValuesFromForm();
+
 		//(*Declarations(SelectCalibration)
-		wxTextCtrl* TextCtrl3;
-		wxTextCtrl* TextCtrl10;
-		wxStaticText* StaticText13;
+		wxTextCtrl* camera3;
+		wxTextCtrl* k3;
+		wxStaticText* StaticText21;
 		wxStaticText* StaticText14;
 		wxStaticText* StaticText15;
+		wxStaticText* fyLabel;
+		wxTextCtrl* height;
 		wxStaticText* StaticText17;
-		wxTextCtrl* TextCtrl9;
-		wxTextCtrl* TextCtrl20;
-		wxTextCtrl* TextCtrl18;
+		wxTextCtrl* width;
+		wxTextCtrl* farPlane;
+		wxTextCtrl* rY;
+		wxStaticText* cxLabel;
+		wxTextCtrl* p2;
+		wxTextCtrl* rX;
+		wxTextCtrl* camera7;
+		wxTextCtrl* nearPlane;
+		wxTextCtrl* rZ;
+		wxStaticText* StaticText20;
 		wxStaticText* StaticText18;
-		wxStaticText* StaticText1;
+		wxStaticText* fxLabel;
 		wxStaticText* StaticText10;
 		wxStaticText* StaticText16;
 		wxStaticBox* StaticBox2;
-		wxTextCtrl* TextCtrl5;
+		wxTextCtrl* camera1;
 		wxStaticText* StaticText3;
-		wxComboBox* ComboBox1;
+		wxButton* ButtonCancel;
 		wxButton* ButtonOk;
-		wxTextCtrl* TextCtrl12;
+		wxTextCtrl* camera5;
 		wxStaticText* StaticText8;
-		wxStaticText* StaticText12;
-		wxTextCtrl* TextCtrl16;
-		wxTextCtrl* TextCtrl6;
 		wxStaticBox* StaticBox1;
 		wxStaticText* StaticText7;
-		wxTextCtrl* TextCtrl1;
+		wxStaticBox* StaticBox3;
+		wxTextCtrl* camera4;
+		wxTextCtrl* tX;
 		wxStaticText* StaticText4;
+		wxTextCtrl* camera6;
+		wxTextCtrl* p1;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText2;
+		wxTextCtrl* tZ;
+		wxTextCtrl* k1;
+		wxTextCtrl* camera8;
+		wxComboBox* ComboBoxScale;
+		wxTextCtrl* k2;
 		wxStaticText* StaticText6;
-		wxTextCtrl* TextCtrl11;
-		wxTextCtrl* TextCtrl15;
-		wxTextCtrl* TextCtrl8;
+		wxTextCtrl* camera2;
 		wxStaticText* StaticText19;
-		wxTextCtrl* TextCtrl7;
+		wxTextCtrl* camera0;
 		wxStaticText* StaticText9;
-		wxTextCtrl* TextCtrl4;
-		wxTextCtrl* TextCtrl2;
-		wxTextCtrl* TextCtrl19;
-		wxTextCtrl* TextCtrl13;
-		wxStaticText* StaticText11;
-		wxTextCtrl* TextCtrl17;
-		wxTextCtrl* TextCtrl14;
+		wxTextCtrl* tY;
+		wxStaticText* cyLabel;
 		//*)
 
 	protected:
@@ -109,12 +126,21 @@ class SelectCalibration: public wxDialog
 		static const long ID_STATICTEXT19;
 		static const long ID_COMBOBOX1;
 		static const long ID_BUTTON1;
+		static const long ID_BUTTON2;
+		static const long ID_STATICBOX3;
+		static const long ID_STATICTEXT20;
+		static const long ID_TEXTCTRL21;
+		static const long ID_TEXTCTRL22;
+		static const long ID_STATICTEXT21;
+		static const long ID_TEXTCTRL23;
+		static const long ID_TEXTCTRL24;
 		//*)
 
 	private:
 
 		//(*Handlers(SelectCalibration)
 		void OnButtonOkClick(wxCommandEvent& event);
+		void OnButtonCancelClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

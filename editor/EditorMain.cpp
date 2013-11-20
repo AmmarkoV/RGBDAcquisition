@@ -543,8 +543,6 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
      refreshSegmentedFrame();
      Refresh(); // <- This draws the window!
     }
-
-
 }
 
 void EditorFrame::OnbuttonPlayClick(wxCommandEvent& event)
@@ -585,19 +583,15 @@ void EditorFrame::OncurrentFrameTextCtrlText(wxCommandEvent& event)
           refreshSegmentedFrame();
           Refresh(); // <- This draws the window!
         }
-
 }
 
 void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
 {
-
     float percentageOfFrames = (float) FrameSlider->GetValue()  /  FrameSlider->GetMax() ;
     fprintf(stderr,"Go to : %u ( %0.2f ) min %0.2f max %0.2f \n",FrameSlider->GetValue(),percentageOfFrames , FrameSlider->GetMin() , FrameSlider->GetMax());
     fprintf(stderr,"Max Frames : %u \n",acquisitionGetTotalFrameNumber(moduleID,devID));
 
-
     long jumpTo =  (long) (percentageOfFrames * acquisitionGetTotalFrameNumber(moduleID,devID));
-
 
     if (jumpTo>0) { --jumpTo; }
           acquisitionSeekFrame(moduleID,devID,jumpTo);
@@ -642,7 +636,17 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 
 void EditorFrame::OnButtonCalibrationClick(wxCommandEvent& event)
 {
-  SelectCalibration  * calibrationSelector = new SelectCalibration(this, wxID_ANY);
-    calibrationSelector->ShowModal();
+   SelectCalibration  * calibrationSelector = new SelectCalibration(this, wxID_ANY);
+
+   if ( !acquisitionGetColorCalibration(moduleID,devID,&calibrationSelector->calib) )
+   {
+       wxMessageBox(wxT("Error while Getting Calibration!"),wxT("RGBDAcquisition Editor"));
+   } else
+   {
+      calibrationSelector->reloadCalibrationFormFromValues();
+      calibrationSelector->ShowModal();
+      acquisitionSetColorCalibration(moduleID,devID,&calibrationSelector->calib);
+   }
+
   delete  calibrationSelector;
 }
