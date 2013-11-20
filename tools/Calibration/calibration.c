@@ -62,8 +62,7 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
 
 float intAtof(char * str)
 {
-
-   setlocale(LC_ALL, "en_US");
+   setlocale(LC_ALL, "en_US.UTF-8");
 
   //OK this is the regular thing that WORKS but doesnt work
   //for countries like france where they say 0,33 instead of 0.33
@@ -72,6 +71,10 @@ float intAtof(char * str)
   //instead of this we will use sscanf that doesnt respect locale ?
   float retVal=0.0;
   sscanf(str,"%f",&retVal);
+
+
+
+
  return retVal;
 }
 
