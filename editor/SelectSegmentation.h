@@ -9,6 +9,7 @@
 #include <wx/checkbox.h>
 #include <wx/dialog.h>
 #include <wx/button.h>
+#include <wx/filedlg.h>
 #include <wx/statbox.h>
 #include <wx/statline.h>
 #include <wx/stattext.h>
@@ -71,6 +72,7 @@ class SelectSegmentation: public wxDialog
 		wxTextCtrl* planeP1Z;
 		wxStaticText* StaticText8;
 		wxStaticText* StaticText12;
+		wxButton* ButtonExport;
 		wxStaticBox* StaticBox1;
 		wxStaticText* StaticText7;
 		wxSpinCtrl* maxDepth;
@@ -93,6 +95,7 @@ class SelectSegmentation: public wxDialog
 		wxTextCtrl* planeP3X;
 		wxStaticText* StaticText11;
 		wxTextCtrl* planeP3Y;
+		wxFileDialog* FileDialogExport;
 		//*)
 
 	protected:
@@ -160,6 +163,7 @@ class SelectSegmentation: public wxDialog
 		static const long ID_STATICTEXT15;
 		static const long ID_SPINCTRL12;
 		static const long ID_STATICLINE1;
+		static const long ID_BUTTON3;
 		//*)
 
 	private:
@@ -167,6 +171,7 @@ class SelectSegmentation: public wxDialog
 		//(*Handlers(SelectSegmentation)
 		void OnButtonOkClick(wxCommandEvent& event);
 		void OnButtonCancelClick(wxCommandEvent& event);
+		void OnButtonExportClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

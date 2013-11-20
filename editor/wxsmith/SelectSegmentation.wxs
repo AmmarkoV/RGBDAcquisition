@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="SelectSegmentation">
-		<size>748,535</size>
+		<size>748,549</size>
 		<object class="wxStaticBox" name="ID_STATICBOX2" variable="StaticBox2" member="yes">
 			<label>Depth</label>
 			<pos>376,16</pos>
@@ -10,12 +10,13 @@
 		<object class="wxButton" name="ID_BUTTON1" variable="ButtonCancel" member="yes">
 			<label>Cancel</label>
 			<pos>632,456</pos>
+			<size>85,56</size>
 			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON2" variable="ButtonOk" member="yes">
 			<label>Ok</label>
 			<pos>376,456</pos>
-			<size>240,27</size>
+			<size>248,56</size>
 			<handler function="OnButtonOkClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
@@ -305,6 +306,17 @@
 		<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
 			<pos>20,450</pos>
 			<size>700,0</size>
+		</object>
+		<object class="wxButton" name="ID_BUTTON3" variable="ButtonExport" member="yes">
+			<label>Export To File</label>
+			<pos>16,480</pos>
+			<size>120,27</size>
+			<handler function="OnButtonExportClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
+			<message>Export Segmentation To File</message>
+			<wildcard>.txt</wildcard>
+			<style>wxFD_DEFAULT_STYLE|wxFD_SAVE</style>
 		</object>
 	</object>
 </wxsmith>

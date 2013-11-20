@@ -68,6 +68,7 @@ const long SelectSegmentation::ID_SPINCTRL11 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT15 = wxNewId();
 const long SelectSegmentation::ID_SPINCTRL12 = wxNewId();
 const long SelectSegmentation::ID_STATICLINE1 = wxNewId();
+const long SelectSegmentation::ID_BUTTON3 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -79,10 +80,10 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 {
 	//(*Initialize(SelectSegmentation)
 	Create(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
-	SetClientSize(wxSize(748,535));
+	SetClientSize(wxSize(748,549));
 	StaticBox2 = new wxStaticBox(this, ID_STATICBOX2, _("Depth"), wxPoint(376,16), wxSize(352,400), 0, _T("ID_STATICBOX2"));
-	ButtonCancel = new wxButton(this, ID_BUTTON1, _("Cancel"), wxPoint(632,456), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	ButtonOk = new wxButton(this, ID_BUTTON2, _("Ok"), wxPoint(376,456), wxSize(240,27), 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	ButtonCancel = new wxButton(this, ID_BUTTON1, _("Cancel"), wxPoint(632,456), wxSize(85,56), 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	ButtonOk = new wxButton(this, ID_BUTTON2, _("Ok"), wxPoint(376,456), wxSize(248,56), 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	StaticBox1 = new wxStaticBox(this, ID_STATICBOX1, _("RGB"), wxPoint(16,16), wxSize(352,400), 0, _T("ID_STATICBOX1"));
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Minimum : "), wxPoint(40,66), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	minR = new wxSpinCtrl(this, ID_SPINCTRL1, _T("0"), wxPoint(128,64), wxSize(56,23), 0, 0, 255, 0, _T("ID_SPINCTRL1"));
@@ -162,9 +163,12 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	eraseDepth = new wxSpinCtrl(this, ID_SPINCTRL12, _T("0"), wxPoint(496,420), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL12"));
 	eraseDepth->SetValue(_T("0"));
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxPoint(20,450), wxSize(700,0), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+	ButtonExport = new wxButton(this, ID_BUTTON3, _("Export To File"), wxPoint(16,480), wxSize(120,27), 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonOkClick);
+	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonExportClick);
 	//*)
 
 	reloadSegmentationFormFromValues();
@@ -207,7 +211,17 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[1]); planeP3Y->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[2]); planeP3Z->SetValue(val);
 
+   val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.minX); cropDepthX1->SetValue(val);
+   val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.minY); cropDepthY1->SetValue(val);
+   val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.maxX); cropDepthX2->SetValue(val);
+   val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.maxY); cropDepthY2->SetValue(val);
 
+
+
+   val.Clear(); val.Printf(wxT("%u"),selectedRGBConf.minX); cropRGBX1->SetValue(val);
+   val.Clear(); val.Printf(wxT("%u"),selectedRGBConf.minY); cropRGBY1->SetValue(val);
+   val.Clear(); val.Printf(wxT("%u"),selectedRGBConf.maxX); cropRGBX2->SetValue(val);
+   val.Clear(); val.Printf(wxT("%u"),selectedRGBConf.maxY); cropRGBY2->SetValue(val);
 
    minR->SetValue( selectedRGBConf.minR );
    minG->SetValue(selectedRGBConf.minG);
@@ -262,10 +276,22 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
     selectedDepthConf.enablePlaneSegmentation=1;
    }
 
+  if (cropDepthX1->GetValue().ToLong(&value)) {  selectedDepthConf.minX = value; }
+  if (cropDepthY1->GetValue().ToLong(&value)) {  selectedDepthConf.minY = value; }
+  if (cropDepthX2->GetValue().ToLong(&value)) {  selectedDepthConf.maxX = value; }
+  if (cropDepthY2->GetValue().ToLong(&value)) {  selectedDepthConf.maxY = value; }
+
+  if (cropRGBX1->GetValue().ToLong(&value)) {  selectedRGBConf.minX = value; }
+  if (cropRGBY1->GetValue().ToLong(&value)) {  selectedRGBConf.minY = value; }
+  if (cropRGBX2->GetValue().ToLong(&value)) {  selectedRGBConf.maxX = value; }
+  if (cropRGBY2->GetValue().ToLong(&value)) {  selectedRGBConf.maxY = value; }
+
   selectedDepthConf.minDepth = minDepth->GetValue();
   selectedDepthConf.maxDepth = maxDepth->GetValue();
 
   //selectedDepthConf.
+
+
 
    selectedRGBConf.minR = minR->GetValue();
    selectedRGBConf.minG = minG->GetValue();
@@ -298,4 +324,43 @@ void SelectSegmentation::OnButtonOkClick(wxCommandEvent& event)
 void SelectSegmentation::OnButtonCancelClick(wxCommandEvent& event)
 {
     Close();
+}
+
+void SelectSegmentation::OnButtonExportClick(wxCommandEvent& event)
+{
+   FileDialogExport->ShowModal();
+
+
+    char cstring[2048];
+    strncpy(cstring, (const char*) FileDialogExport->GetPath().mb_str(wxConvUTF8), 2047);
+
+    FILE * fp;
+    fp  = fopen(cstring,"w");
+    if(fp!=0)
+    {
+      if ( selectedDepthConf.enableBBox )
+      {
+          fprintf(fp,"-bbox %f %f %f %f %f %f \n",
+                       selectedDepthConf.bboxX1,selectedDepthConf.bboxY1,selectedDepthConf.bboxZ1 ,
+                       selectedDepthConf.bboxX2,selectedDepthConf.bboxY2,selectedDepthConf.bboxZ2);
+      }
+
+      if ( selectedDepthConf.enablePlaneSegmentation )
+      {
+          fprintf(fp,"-plane %f %f %f %f %f %f %f %f %f\n",
+                       selectedDepthConf.p1[0],selectedDepthConf.p1[1],selectedDepthConf.p1[2] ,
+                       selectedDepthConf.p2[0],selectedDepthConf.p2[1],selectedDepthConf.p2[2] ,
+                       selectedDepthConf.p3[0],selectedDepthConf.p3[1],selectedDepthConf.p3[2]  );
+      }
+
+
+     fprintf(fp,"-cropDepth %u %u %u %u\n",selectedDepthConf.minDepth);
+
+
+     fprintf(fp,"-minDepth %f\n",selectedDepthConf.minDepth);
+     fprintf(fp,"-maxDepth %f\n",selectedDepthConf.maxDepth);
+
+      fclose(fp);
+    }
+
 }
