@@ -5,6 +5,8 @@
 #include <string.h>
 #include <time.h>
 
+#include <locale.h>
+
 
 #include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h"
 #include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h"
@@ -60,6 +62,9 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
 
 float intAtof(char * str)
 {
+
+   setlocale(LC_ALL, "en_US");
+
   //OK this is the regular thing that WORKS but doesnt work
   //for countries like france where they say 0,33 instead of 0.33
   // return atof(str);
