@@ -73,7 +73,7 @@ int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y
 }
 
 
-int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodriguez , double * translation)
+int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit)
 {
   double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
 
@@ -89,10 +89,10 @@ int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodr
   double * tm = translation;
 
 
-  double scale = 1000.0; //Convert Unit to milimeters
-  double Tx = tm[0]*scale;
-  double Ty = tm[1]*scale;
-  double Tz = tm[2]*scale;
+  //double scaleToDepthUnit = 1000.0; //Convert Unit to milimeters
+  double Tx = tm[0]*scaleToDepthUnit;
+  double Ty = tm[1]*scaleToDepthUnit;
+  double Tz = tm[2]*scaleToDepthUnit;
 
 
   /*
@@ -121,9 +121,9 @@ int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodr
 }
 
 
-int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double * rodriguez , double * translation  )
+int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit )
 {
-  convertRodriguezAndTranslationTo4x4DMatrix(result4x4,rodriguez,translation);
+  convertRodriguezAndTranslationTo4x4DMatrix(result4x4,rodriguez,translation , scaleToDepthUnit);
   fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
   transpose4x4MatrixD(result4x4);
   return 1;

@@ -240,10 +240,10 @@ int setOpenGLIntrinsicCalibration(double * camera)
 }
 
 
-int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation)
+int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , double scaleToDepthUnit)
 {
   useCustomModelViewMatrix=1;
-  convertRodriguezAndTranslationToOpenGL4x4DMatrix(customModelViewMatrix , rodriguez , translation );
+  convertRodriguezAndTranslationToOpenGL4x4DMatrix(customModelViewMatrix , rodriguez , translation , scaleToDepthUnit);
 
   customTranslation[0] = translation[0];
   customTranslation[1] = translation[1];

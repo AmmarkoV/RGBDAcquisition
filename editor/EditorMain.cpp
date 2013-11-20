@@ -630,6 +630,7 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
     delete  segmentationSelector;
 
     refreshSegmentedFrame();
+    lastFrameDrawn=1000000;
 
     Refresh();
 }
@@ -645,7 +646,10 @@ void EditorFrame::OnButtonCalibrationClick(wxCommandEvent& event)
    {
       calibrationSelector->reloadCalibrationFormFromValues();
       calibrationSelector->ShowModal();
-      acquisitionSetColorCalibration(moduleID,devID,&calibrationSelector->calib);
+      if ( calibrationSelector->userLikesTheNewCalibration )
+          {
+            acquisitionSetColorCalibration(moduleID,devID,&calibrationSelector->calib);
+          }
    }
 
   delete  calibrationSelector;

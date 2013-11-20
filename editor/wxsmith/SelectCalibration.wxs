@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="SelectCalibration">
-		<size>501,600</size>
+		<size>514,643</size>
 		<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
 			<label>Intrinsics</label>
 			<pos>24,8</pos>
-			<size>456,216</size>
+			<size>464,216</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT1" variable="fxLabel" member="yes">
-			<label>Fx : 0.0 </label>
-			<pos>384,56</pos>
+			<label>Fx : 0.000000</label>
+			<pos>376,56</pos>
+			<size>94,17</size>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="camera0" member="yes">
 			<value>0.0</value>
 			<pos>56,56</pos>
 			<size>96,23</size>
+			<handler function="Oncamera0Text" entry="EVT_TEXT" />
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="camera1" member="yes">
 			<value>0.0</value>
@@ -25,6 +27,7 @@
 			<value>0.0</value>
 			<pos>264,56</pos>
 			<size>104,23</size>
+			<handler function="Oncamera2Text" entry="EVT_TEXT" />
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="camera3" member="yes">
 			<value>0.0</value>
@@ -35,11 +38,13 @@
 			<value>0.0</value>
 			<pos>160,88</pos>
 			<size>96,23</size>
+			<handler function="Oncamera4Text" entry="EVT_TEXT" />
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL6" variable="camera5" member="yes">
 			<value>0.0</value>
 			<pos>264,88</pos>
 			<size>104,23</size>
+			<handler function="Oncamera5Text" entry="EVT_TEXT" />
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="camera6" member="yes">
 			<value>0.0</value>
@@ -62,48 +67,48 @@
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL10" variable="k1" member="yes">
 			<value>0.0</value>
-			<pos>56,176</pos>
-			<size>64,23</size>
+			<pos>32,184</pos>
+			<size>86,23</size>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL11" variable="k2" member="yes">
 			<value>0.0</value>
-			<pos>144,176</pos>
-			<size>64,23</size>
+			<pos>120,184</pos>
+			<size>86,23</size>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL12" variable="p1" member="yes">
 			<value>0.0</value>
-			<pos>224,176</pos>
-			<size>64,23</size>
+			<pos>208,184</pos>
+			<size>86,23</size>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL13" variable="p2" member="yes">
 			<value>0.0</value>
-			<pos>320,176</pos>
-			<size>64,23</size>
+			<pos>296,184</pos>
+			<size>86,23</size>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL14" variable="k3" member="yes">
 			<value>0.0</value>
-			<pos>408,176</pos>
-			<size>64,23</size>
+			<pos>384,184</pos>
+			<size>86,23</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
 			<label>k1</label>
-			<pos>32,178</pos>
+			<pos>72,168</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
 			<label>k2</label>
-			<pos>128,178</pos>
+			<pos>160,168</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
 			<label>p1</label>
-			<pos>208,178</pos>
+			<pos>240,168</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
 			<label>p2</label>
-			<pos>296,178</pos>
+			<pos>328,168</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
 			<label>k3</label>
-			<pos>392,178</pos>
+			<pos>416,168</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
 			<label>Intrinsics Matrix</label>
@@ -112,7 +117,7 @@
 		<object class="wxStaticBox" name="ID_STATICBOX2" variable="StaticBox2" member="yes">
 			<label>Extrinsics</label>
 			<pos>24,232</pos>
-			<size>456,208</size>
+			<size>464,208</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText9" member="yes">
 			<label>Translation</label>
@@ -122,16 +127,19 @@
 			<value>0.0</value>
 			<pos>48,280</pos>
 			<size>72,23</size>
+			<handler function="OntXText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL16" variable="tY" member="yes">
 			<value>0.0</value>
 			<pos>128,280</pos>
 			<size>64,23</size>
+			<handler function="OntYText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL17" variable="tZ" member="yes">
 			<value>0.0</value>
 			<pos>200,280</pos>
 			<size>72,23</size>
+			<handler function="OntZText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText10" member="yes">
 			<label>Rotation</label>
@@ -141,48 +149,38 @@
 			<value>0.0</value>
 			<pos>48,328</pos>
 			<size>72,23</size>
+			<handler function="OnrXText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL19" variable="rY" member="yes">
 			<value>0.0</value>
 			<pos>128,328</pos>
 			<size>64,23</size>
+			<handler function="OnrYText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL20" variable="rZ" member="yes">
 			<value>0.0</value>
 			<pos>200,328</pos>
 			<size>72,23</size>
+			<handler function="OnrZText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT11" variable="fyLabel" member="yes">
-			<label>Fy : 0.0</label>
-			<pos>384,72</pos>
+			<label>Fy : 0.000000</label>
+			<pos>376,72</pos>
+			<size>88,17</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT12" variable="cxLabel" member="yes">
-			<label>Cx : 0.0</label>
-			<pos>384,112</pos>
+			<label>Cx : 0.000000</label>
+			<pos>376,112</pos>
+			<size>88,17</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT13" variable="cyLabel" member="yes">
-			<label>Cy : 0.0</label>
-			<pos>384,128</pos>
-		</object>
-		<object class="wxStaticText" name="ID_STATICTEXT14" variable="StaticText14" member="yes">
-			<label>0.0     0.0      0.0      0.0</label>
-			<pos>304,280</pos>
+			<label>Cy : 0.000000</label>
+			<pos>376,128</pos>
+			<size>88,17</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT15" variable="StaticText15" member="yes">
 			<label>Generated 4x4 Matrix</label>
 			<pos>280,256</pos>
-		</object>
-		<object class="wxStaticText" name="ID_STATICTEXT16" variable="StaticText16" member="yes">
-			<label>0.0     0.0      0.0      0.0</label>
-			<pos>304,304</pos>
-		</object>
-		<object class="wxStaticText" name="ID_STATICTEXT17" variable="StaticText17" member="yes">
-			<label>0.0     0.0      0.0      0.0</label>
-			<pos>304,328</pos>
-		</object>
-		<object class="wxStaticText" name="ID_STATICTEXT18" variable="StaticText18" member="yes">
-			<label>0.0     0.0      0.0      0.0</label>
-			<pos>304,352</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT19" variable="StaticText19" member="yes">
 			<label>Scale</label>
@@ -190,28 +188,31 @@
 		</object>
 		<object class="wxComboBox" name="ID_COMBOBOX1" variable="ComboBoxScale" member="yes">
 			<content>
-				<item>millimeters</item>
-				<item>centimeters</item>
 				<item>meters</item>
+				<item>centimeters</item>
+				<item>millimeters</item>
+				<item>erroneous unit</item>
 			</content>
-			<selection>2</selection>
+			<selection>0</selection>
 			<pos>104,368</pos>
 			<size>168,25</size>
+			<handler function="OnComboBoxScaleSelected" entry="EVT_COMBOBOX" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON1" variable="ButtonOk" member="yes">
 			<label>Ok</label>
-			<pos>152,544</pos>
+			<pos>296,568</pos>
+			<size>101,27</size>
 			<handler function="OnButtonOkClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON2" variable="ButtonCancel" member="yes">
 			<label>Cancel</label>
-			<pos>248,544</pos>
+			<pos>400,568</pos>
 			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxStaticBox" name="ID_STATICBOX3" variable="StaticBox3" member="yes">
 			<label>Camera Rendering</label>
 			<pos>24,448</pos>
-			<size>456,88</size>
+			<size>464,88</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT20" variable="StaticText20" member="yes">
 			<label>Near/Far Plane for Rendering</label>
@@ -236,6 +237,42 @@
 		<object class="wxTextCtrl" name="ID_TEXTCTRL24" variable="height" member="yes">
 			<value>480</value>
 			<pos>352,490</pos>
+		</object>
+		<object class="wxButton" name="ID_BUTTON3" variable="ButtonSave" member="yes">
+			<label>Save To File</label>
+			<pos>16,568</pos>
+			<size>120,27</size>
+			<handler function="OnButtonSaveClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON4" variable="ButtonLoad" member="yes">
+			<label>Load From File</label>
+			<pos>144,568</pos>
+			<size>120,27</size>
+			<handler function="OnButtonLoadClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL25" variable="ModelViewMatrix" member="yes">
+			<value>0.000000  0.000000  0.000000  0.000000&#x0A;0.000000  0.000000  0.000000  0.000000&#x0A;0.000000  0.000000  0.000000  0.000000&#x0A;0.000000  0.000000  0.000000  0.000000</value>
+			<pos>288,280</pos>
+			<size>184,112</size>
+			<style>wxTE_MULTILINE|wxTE_READONLY|wxVSCROLL|wxHSCROLL</style>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxIntrinsics" member="yes">
+			<label>Intrinsics Declared</label>
+			<pos>88,536</pos>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX2" variable="CheckBoxExtrinsics" member="yes">
+			<label>Extrinsics Declared</label>
+			<pos>248,536</pos>
+		</object>
+		<object class="wxFileDialog" variable="FileDialogSave" member="yes">
+			<message>Please Select the output file</message>
+			<wildcard>*.calib</wildcard>
+			<style>wxFD_DEFAULT_STYLE|wxFD_SAVE</style>
+		</object>
+		<object class="wxFileDialog" variable="FileDialogLoad" member="yes">
+			<message>Please select a calibration file</message>
+			<wildcard>*.calib</wildcard>
+			<style>wxFD_DEFAULT_STYLE|wxFD_OPEN|wxFD_FILE_MUST_EXIST</style>
 		</object>
 	</object>
 </wxsmith>

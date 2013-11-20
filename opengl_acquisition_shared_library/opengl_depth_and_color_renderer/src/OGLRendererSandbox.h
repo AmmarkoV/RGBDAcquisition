@@ -9,8 +9,8 @@ extern "C"
 int setOpenGLDepthUnit(float unit);
 int setOpenGLNearFarPlanes(double near , double far);
 int setOpenGLIntrinsicCalibration(double * camera);
-int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation);
 
+int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , double scaleToDepthUnit);
 
 unsigned int getOpenGLWidth();
 unsigned int getOpenGLHeight();

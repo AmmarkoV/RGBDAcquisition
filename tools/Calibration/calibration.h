@@ -32,7 +32,7 @@ struct calibration
   unsigned int width;
   unsigned int height;
 
-  float depthUnit;
+  double depthUnit;
 
   /*CONFIGURATION*/
   int imagesUsed;

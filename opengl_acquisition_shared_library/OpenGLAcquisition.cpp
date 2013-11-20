@@ -131,7 +131,7 @@ int setOpenGLCalibration(int devID,struct calibration * calib)
          (translation[0]!=0.0) || (translation[1]!=0.0) || (translation[2]!=0.0)   )
       {
         fprintf(stderr,"Setting Extrinsics for OpenGL\n");
-        setOpenGLExtrinsicCalibration(rodriguez,translation);
+        setOpenGLExtrinsicCalibration(rodriguez,translation,calib->depthUnit);
       } else
       {
         fprintf(stderr,"NOT setting Extrinsics for OpenGL\n");

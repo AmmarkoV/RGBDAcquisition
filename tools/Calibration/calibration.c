@@ -27,7 +27,7 @@
 
 int forceUSLocaleToKeepOurSanity()
 {
-   fprintf(stderr,"Reinforcing EN_US locale\n");
+   fprintf(stderr,"Reinforcing EN_US locale to force commas to dots\n");
    setlocale(LC_ALL, "en_US.UTF-8");
    setlocale(LC_NUMERIC, "en_US.UTF-8");
    return 1;
@@ -63,7 +63,7 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
   /*fy*/ calib->intrinsic[CALIB_INTR_FY] = (double) (DEFAULT_FY * height)  / DEFAULT_HEIGHT;    //<- these might be wrong
   //--------------------------------------------
 
-  calib->depthUnit=1.0;
+  calib->depthUnit=1000.0; //Default is meters to millimeters
 
   return 1;
 }
@@ -79,9 +79,6 @@ float intAtof(char * str)
   //instead of this we will use sscanf that doesnt respect locale ?
   float retVal=0.0;
   sscanf(str,"%f",&retVal);
-
-
-
 
  return retVal;
 }
@@ -281,6 +278,8 @@ int WriteCalibration(char * filename,struct calibration * calib)
       }
      }
 
+ fclose(fp);
+
  return 1;
 }
 
@@ -297,7 +296,7 @@ double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibr
  if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
  {
   create4x4IdentityMatrix(m);
-  convertRodriguezAndTranslationTo4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation);
+  convertRodriguezAndTranslationTo4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation , calib->depthUnit );
  }
 
 
