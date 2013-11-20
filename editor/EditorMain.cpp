@@ -315,7 +315,11 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
        return;
    }
 
-   acquisitionGetColorCalibration(moduleID,devID,&calib);
+   if ( !acquisitionGetColorCalibration(moduleID,devID,&calib) )
+   {
+       wxMessageBox(wxT("Error while Getting Calibration!"),wxT("RGBDAcquisition Editor"));
+   }
+
    unsigned int totalFrames =  acquisitionGetTotalFrameNumber(moduleID,devID);
 
    if (totalFrames==0) {

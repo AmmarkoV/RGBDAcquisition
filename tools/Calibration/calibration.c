@@ -57,6 +57,21 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
   return 1;
 }
 
+
+float intAtof(char * str)
+{
+  //OK this is the regular thing that WORKS but doesnt work
+  //for countries like france where they say 0,33 instead of 0.33
+  // return atof(str);
+
+  //instead of this we will use sscanf that doesnt respect locale ?
+  float retVal=0.0;
+  sscanf(str,"%f",&retVal);
+ return retVal;
+}
+
+
+
 int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib)
 {
   //First free
@@ -106,15 +121,15 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->intrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->intrinsic[0] = atof(line); break;
-             case 2 :  calib->intrinsic[1] = atof(line); break;
-             case 3 :  calib->intrinsic[2] = atof(line); break;
-             case 4 :  calib->intrinsic[3] = atof(line); break;
-             case 5 :  calib->intrinsic[4] = atof(line); break;
-             case 6 :  calib->intrinsic[5] = atof(line); break;
-             case 7 :  calib->intrinsic[6] = atof(line); break;
-             case 8 :  calib->intrinsic[7] = atof(line); break;
-             case 9 :  calib->intrinsic[8] = atof(line); break;
+             case 1 :  calib->intrinsic[0] = (double)  intAtof(line); break;
+             case 2 :  calib->intrinsic[1] = (double) intAtof(line); break;
+             case 3 :  calib->intrinsic[2] = (double) intAtof(line); break;
+             case 4 :  calib->intrinsic[3] = (double) intAtof(line); break;
+             case 5 :  calib->intrinsic[4] = (double) intAtof(line); break;
+             case 6 :  calib->intrinsic[5] = (double) intAtof(line); break;
+             case 7 :  calib->intrinsic[6] = (double) intAtof(line); break;
+             case 8 :  calib->intrinsic[7] = (double) intAtof(line); break;
+             case 9 :  calib->intrinsic[8] = (double) intAtof(line); break;
            };
           } else
           if (category==2)
@@ -122,11 +137,11 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->intrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->k1 = atof(line); break;
-             case 2 :  calib->k2 = atof(line); break;
-             case 3 :  calib->p1 = atof(line); break;
-             case 4 :  calib->p2 = atof(line); break;
-             case 5 :  calib->k3 = atof(line); break;
+             case 1 :  calib->k1 = (double) intAtof(line); break;
+             case 2 :  calib->k2 = (double) intAtof(line); break;
+             case 3 :  calib->p1 = (double) intAtof(line); break;
+             case 4 :  calib->p2 = (double) intAtof(line); break;
+             case 5 :  calib->k3 = (double) intAtof(line); break;
            };
           } else
           if (category==3)
@@ -134,9 +149,9 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->extrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->extrinsicTranslation[0] = atof(line); break;
-             case 2 :  calib->extrinsicTranslation[1] = atof(line); break;
-             case 3 :  calib->extrinsicTranslation[2] = atof(line); break;
+             case 1 :  calib->extrinsicTranslation[0] = (double) intAtof(line); break;
+             case 2 :  calib->extrinsicTranslation[1] = (double) intAtof(line); break;
+             case 3 :  calib->extrinsicTranslation[2] = (double) intAtof(line); break;
            };
           } else
           if (category==4)
@@ -144,9 +159,9 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->extrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->extrinsicRotationRodriguez[0] = atof(line); break;
-             case 2 :  calib->extrinsicRotationRodriguez[1] = atof(line); break;
-             case 3 :  calib->extrinsicRotationRodriguez[2] = atof(line); break;
+             case 1 :  calib->extrinsicRotationRodriguez[0] = (double) intAtof(line); break;
+             case 2 :  calib->extrinsicRotationRodriguez[1] = (double) intAtof(line); break;
+             case 3 :  calib->extrinsicRotationRodriguez[2] = (double) intAtof(line); break;
            };
           }else
           if (category==5)
@@ -154,15 +169,15 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->extrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->nearPlane = atof(line); break;
-             case 2 :  calib->farPlane  = atof(line); break;
+             case 1 :  calib->nearPlane = (double) intAtof(line); break;
+             case 2 :  calib->farPlane  = (double) intAtof(line); break;
            };
           }else
           if (category==6)
           {
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->depthUnit = atof(line); break;
+             case 1 :  calib->depthUnit = (double) intAtof(line); break;
            };
           }
 

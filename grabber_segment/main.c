@@ -168,18 +168,18 @@ int main(int argc, char *argv[])
     if (strcmp(argv[i],"-replaceRGB")==0) { segConfRGB.replaceR = atoi(argv[i+1]); segConfRGB.replaceG = atoi(argv[i+2]); segConfRGB.replaceB = atoi(argv[i+3]); segConfRGB.enableReplacingColors=1; } else
     if (strcmp(argv[i],"-bbox")==0)       {
                                             segConfDepth.enableBBox=1;
-                                            segConfDepth.bboxX1=atof(argv[i+1]);
-                                            segConfDepth.bboxY1=atof(argv[i+2]);
-                                            segConfDepth.bboxZ1=atof(argv[i+3]);
-                                            segConfDepth.bboxX2=atof(argv[i+4]);
-                                            segConfDepth.bboxY2=atof(argv[i+5]);
-                                            segConfDepth.bboxZ2=atof(argv[i+6]);
+                                            segConfDepth.bboxX1=(double) intAtof(argv[i+1]);
+                                            segConfDepth.bboxY1=(double) intAtof(argv[i+2]);
+                                            segConfDepth.bboxZ1=(double) intAtof(argv[i+3]);
+                                            segConfDepth.bboxX2=(double) intAtof(argv[i+4]);
+                                            segConfDepth.bboxY2=(double) intAtof(argv[i+5]);
+                                            segConfDepth.bboxZ2=(double) intAtof(argv[i+6]);
                                           } else
     if (strcmp(argv[i],"-plane")==0)      {
                                             segConfDepth.enablePlaneSegmentation=1;
-                                            segConfDepth.p1[0]=atof(argv[i+1]); segConfDepth.p1[1]=atof(argv[i+2]); segConfDepth.p1[2]=atof(argv[i+3]);
-                                            segConfDepth.p2[0]=atof(argv[i+4]); segConfDepth.p2[1]=atof(argv[i+5]); segConfDepth.p2[2]=atof(argv[i+6]);
-                                            segConfDepth.p3[0]=atof(argv[i+7]); segConfDepth.p3[1]=atof(argv[i+8]); segConfDepth.p3[2]=atof(argv[i+9]);
+                                            segConfDepth.p1[0]=(double) intAtof(argv[i+1]); segConfDepth.p1[1]=(double) intAtof(argv[i+2]); segConfDepth.p1[2]=(double) intAtof(argv[i+3]);
+                                            segConfDepth.p2[0]=(double) intAtof(argv[i+4]); segConfDepth.p2[1]=(double) intAtof(argv[i+5]); segConfDepth.p2[2]=(double) intAtof(argv[i+6]);
+                                            segConfDepth.p3[0]=(double) intAtof(argv[i+7]); segConfDepth.p3[1]=(double) intAtof(argv[i+8]); segConfDepth.p3[2]=(double) intAtof(argv[i+9]);
                                           }
     if (strcmp(argv[i],"-minDepth")==0)   { segConfDepth.minDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
     if (strcmp(argv[i],"-maxDepth")==0)   { segConfDepth.maxDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
