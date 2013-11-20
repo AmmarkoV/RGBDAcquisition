@@ -13,6 +13,7 @@
 
 #include "../acquisitionSegment/AcquisitionSegment.h"
 #include "../acquisition/Acquisition.h"
+#include "SelectCalibration.h"
 #include "SelectModule.h"
 #include "SelectSegmentation.h"
 
@@ -637,6 +638,7 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 
 void EditorFrame::OnButtonCalibrationClick(wxCommandEvent& event)
 {
-
-
+  SelectCalibration  * calibrationSelector = new SelectCalibration(this, wxID_ANY);
+    calibrationSelector->ShowModal();
+  delete  calibrationSelector;
 }
