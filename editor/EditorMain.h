@@ -36,6 +36,10 @@ class EditorFrame: public wxFrame
 
     private:
 
+        void OnOpenModule(wxCommandEvent& event);
+        void OnSavePCD(wxCommandEvent& event);
+        void OnSaveDepth(wxCommandEvent& event);
+
         //(*Handlers(EditorFrame)
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
@@ -64,7 +68,9 @@ class EditorFrame: public wxFrame
         static const long ID_STATICTEXT3;
         static const long ID_BUTTON5;
         static const long ID_BUTTON6;
-        static const long ID_MENUITEM1;
+        static const long ID_MENUOPENMODULE;
+        static const long ID_MENUSAVEDEPTH;
+        static const long ID_MENUSAVEPCD;
         static const long idMenuQuit;
         static const long ID_MENUSEGMENTATION;
         static const long idMenuAbout;
@@ -82,14 +88,16 @@ class EditorFrame: public wxFrame
         wxStaticText* StaticTextJumpTo;
         wxStaticText* dashForFramesRemainingLabel;
         wxMenuItem* MenuItem3;
-        wxMenuItem* Menu3;
         wxButton* buttonPreviousFrame;
         wxSlider* FrameSlider;
         wxMenu* Menu4;
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;
+        wxMenuItem* MenuItem5;
         wxTimer Timer;
         wxButton* ButtonCalibration;
+        wxMenuItem* MenuItem4;
+        wxMenuItem* MenuItem6;
         wxButton* ButtonSegmentation;
         //*)
 

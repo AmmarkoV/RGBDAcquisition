@@ -419,7 +419,7 @@ int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformati
 {
   if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0) ) { return 0; }
 
-  fprintf(stderr,"Point 3D %0.2f,%0.2f,%0.2f \n",point3D[0],point3D[1],point3D[2]);
+  //fprintf(stderr,"Point 3D %0.2f,%0.2f,%0.2f \n",point3D[0],point3D[1],point3D[2]);
 /*
    What we want to do ( in mathematica )
    { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
@@ -448,7 +448,7 @@ int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformati
   resultPoint3D[2]/=resultPoint3D[3];
   resultPoint3D[3]/=resultPoint3D[3];
 
-  fprintf(stderr,"Transformed to %0.2f,%0.2f,%0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2]);
+  //fprintf(stderr,"Transformed to %0.2f,%0.2f,%0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2]);
 
  return 1;
 }

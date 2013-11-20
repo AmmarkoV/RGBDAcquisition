@@ -22,6 +22,7 @@ unsigned int devID=0;
 unsigned int width , height , fps ;
 char openDevice[512];
 
+int alreadyInitialized=0;
 int play=0;
 int lastFrameDrawn=12312312;
 
@@ -101,7 +102,9 @@ const long EditorFrame::ID_STATICTEXT2 = wxNewId();
 const long EditorFrame::ID_STATICTEXT3 = wxNewId();
 const long EditorFrame::ID_BUTTON5 = wxNewId();
 const long EditorFrame::ID_BUTTON6 = wxNewId();
-const long EditorFrame::ID_MENUITEM1 = wxNewId();
+const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
+const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
+const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
 const long EditorFrame::idMenuQuit = wxNewId();
 const long EditorFrame::ID_MENUSEGMENTATION = wxNewId();
 const long EditorFrame::idMenuAbout = wxNewId();
@@ -144,8 +147,13 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(578,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
-    Menu3 = new wxMenuItem(Menu1, ID_MENUITEM1, _("Open Device"), wxEmptyString, wxITEM_NORMAL);
-    Menu1->Append(Menu3);
+    MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem6);
+    MenuItem5 = new wxMenuItem(Menu1, ID_MENUSAVEDEPTH, _("Save Depth Frame"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem5);
+    MenuItem5->Enable(false);
+    MenuItem4 = new wxMenuItem(Menu1, ID_MENUSAVEPCD, _("Save Frame as PCD"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem4);
     MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
     Menu1->Append(MenuItem1);
     MenuBar1->Append(Menu1, _("&File"));
@@ -180,7 +188,12 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
     //*)
 
-//
+
+    //Connect menu stuff
+    Connect(ID_MENUSAVEPCD,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSavePCD);
+    Connect(ID_MENUSAVEDEPTH,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSaveDepth);
+    Connect(ID_MENUOPENMODULE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnOpenModule);
+
     initFeeds();
 
 
@@ -196,6 +209,57 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     feed_3_x=feed_1_x;
     feed_3_y=feed_2_y;
 
+
+    wxCommandEvent  event;
+    OnOpenModule(event);
+}
+
+EditorFrame::~EditorFrame()
+{
+    //(*Destroy(EditorFrame)
+    //*)
+}
+
+
+int removeOldSegmentedFrames()
+{
+
+    if (!segmentedFramesExist ) { return 0; }
+    if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
+    if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
+    return 1;
+}
+
+
+int refreshSegmentedFrame()
+{
+    removeOldSegmentedFrames();
+    segmentedRGB = copyRGB(acquisitionGetColorFrame(moduleID,devID) , width , height);
+    segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID,devID) , width , height);
+
+    segmentRGBAndDepthFrame (
+                              segmentedRGB ,
+                              segmentedDepth ,
+                              width , height ,
+                              &segConfRGB ,
+                              &segConfDepth ,
+                              &calib ,
+                              combinationMode
+                             );
+    return 1;
+}
+
+
+
+void EditorFrame::OnOpenModule(wxCommandEvent& event)
+{
+   if (alreadyInitialized)
+   {
+    removeOldSegmentedFrames();
+
+    acquisitionCloseDevice(moduleID,devID);
+    acquisitionStopModule(moduleID);
+   }
 
 
     SelectModule  * moduleSelectorFrame = new SelectModule(this, wxID_ANY);
@@ -266,43 +330,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
    initializeRGBSegmentationConfiguration(&segConfRGB,width,height);
    initializeDepthSegmentationConfiguration(&segConfDepth,width,height);
 
+   alreadyInitialized=1;
 }
-
-EditorFrame::~EditorFrame()
-{
-    //(*Destroy(EditorFrame)
-    //*)
-}
-
-
-int removeOldSegmentedFrames()
-{
-
-    if (!segmentedFramesExist ) { return 0; }
-    if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
-    if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
-    return 1;
-}
-
-
-int refreshSegmentedFrame()
-{
-    removeOldSegmentedFrames();
-    segmentedRGB = copyRGB(acquisitionGetColorFrame(moduleID,devID) , width , height);
-    segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID,devID) , width , height);
-
-    segmentRGBAndDepthFrame (
-                              segmentedRGB ,
-                              segmentedDepth ,
-                              width , height ,
-                              &segConfRGB ,
-                              &segConfDepth ,
-                              &calib ,
-                              combinationMode
-                             );
-    return 1;
-}
-
 
 
 void EditorFrame::OnQuit(wxCommandEvent& event)
@@ -326,7 +355,10 @@ void EditorFrame::OnAbout(wxCommandEvent& event)
 }
 
 
-
+ void EditorFrame::OnSavePCD(wxCommandEvent& event)
+ {
+    acquisitionSavePCDPointCoud(moduleID,devID,"frame.pcd");
+ }
 
 void EditorFrame::OnPaint(wxPaintEvent& event)
 {
@@ -407,6 +439,58 @@ inline int XYOverRect(int x , int y , int rectx1,int recty1,int rectx2,int recty
 }
 
 
+
+int dumpCameraDepths(char * filename)
+{
+  FILE * fp=0;
+  fp = fopen(filename,"w");
+  if (fp!=0)
+    {
+      float x3D , y3D , z3D ;
+      unsigned int x,y;
+      for (y=0; y<480; y++)
+      {
+       for (x=0; x<640; x++)
+       {
+         if ( acquisitionGetDepth3DPointAtXYCameraSpace(moduleID,devID,x,y,&x3D,&y3D,&z3D) )
+                  { fprintf(fp,"%0.4f %0.4f %0.4f ",x3D,y3D,z3D); }
+       }
+      }
+      fclose(fp);
+    }
+
+}
+
+
+
+int dumpExtDepths(char * filename)
+{
+  FILE * fp=0;
+  fp = fopen(filename,"w");
+  if (fp!=0)
+    {
+      float x3D , y3D , z3D ;
+      unsigned int x,y;
+      for (y=0; y<480; y++)
+      {
+       for (x=0; x<640; x++)
+       {
+         if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,x,y,&x3D,&y3D,&z3D) )
+                  { fprintf(fp,"%0.4f %0.4f %0.4f ",x3D,y3D,z3D); }
+       }
+      }
+      fclose(fp);
+    }
+
+}
+
+
+void EditorFrame::OnSaveDepth(wxCommandEvent& event)
+{
+  dumpExtDepths("extDepths.txt");
+}
+
+
 void EditorFrame::OnMotion(wxMouseEvent& event)
 {
   wxSleep(0.01);
@@ -428,6 +512,9 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 
          if ( event.LeftIsDown()==1 )
            {
+              //dumpCameraDepths("cameraDepths.txt");
+              //dumpExtDepths("extOldDepths.txt");
+
               float x,y,z;
               if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z) )
               {

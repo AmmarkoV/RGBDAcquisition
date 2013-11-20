@@ -110,8 +110,7 @@ unsigned int simplePow(unsigned int base,unsigned int exp)
 }
 
 
-
-int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
+int savePCD_PointCloud(char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
 {
     if(depthFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) depth frame , will not write any file output\n",filename); return 0; }
     if(colorFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) color frame , will not write any file output\n",filename); return 0; }
@@ -120,22 +119,27 @@ int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame 
     fd = fopen(filename,"wb");
     if (fd!=0)
     {
-        fprintf(fd, "# .PCD v.5 - Point Cloud Data file format\n");
+        fprintf(fd, "# .PCD v.7 - Point Cloud Data file format\n");
         fprintf(fd, "FIELDS x y z rgb\n");
         fprintf(fd, "SIZE 4 4 4 4\n");
         fprintf(fd, "TYPE F F F U\n");
+        fprintf(fd, "COUNT 1\n");
         fprintf(fd, "WIDTH %u\n",width);
         fprintf(fd, "HEIGHT %u\n",height);
-        fprintf(fd, "POINTS %u\n",height*width);
+        fprintf(fd, "POINTS %u\n",width*height);
         fprintf(fd, "DATA ascii\n");
 
-        short * depthPTR = depthFrame;
-        char  * colorPTR = colorFrame;
+        unsigned short * depthPTR = depthFrame;
+        unsigned char  * colorPTR = colorFrame;
 
         unsigned int px=0,py=0;
         float x=0.0,y=0.0,z=0.0;
         unsigned char * r , * b , * g;
         unsigned int rgb=0;
+
+        //Restart Depth
+        depthPTR = depthFrame;
+
 
         for (py=0; py<height; py++)
         {
@@ -161,6 +165,88 @@ int savePCD_PointCloud(char * filename , short * depthFrame , char * colorFrame 
            rgb = ((int)*r) << 16 | ((int)*g) << 8 | ((int)*b);
 
            fprintf(fd, "%0.4f %0.4f %0.4f %u\n",x,y,z,rgb);
+         }
+        }
+        fclose(fd);
+        return 1;
+    }
+    else
+    {
+        fprintf(stderr,"SaveRawImageToFile could not open output file %s\n",filename);
+        return 0;
+    }
+
+   return 0;
+}
+
+
+
+int savePCD_PointCloudNoEmpty(char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
+{
+    if(depthFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) depth frame , will not write any file output\n",filename); return 0; }
+    if(colorFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) color frame , will not write any file output\n",filename); return 0; }
+
+    FILE *fd=0;
+    fd = fopen(filename,"wb");
+    if (fd!=0)
+    {
+        fprintf(fd, "# .PCD v.7 - Point Cloud Data file format\n");
+        fprintf(fd, "FIELDS x y z rgb\n");
+        fprintf(fd, "SIZE 4 4 4 4\n");
+        fprintf(fd, "TYPE F F F U\n");
+        fprintf(fd, "COUNT 1\n");
+
+        unsigned short * depthPTR = depthFrame;
+        unsigned char  * colorPTR = colorFrame;
+
+        unsigned int px=0,py=0;
+        float x=0.0,y=0.0,z=0.0;
+        unsigned char * r , * b , * g;
+        unsigned int rgb=0;
+
+        unsigned int totalPoints = 0;
+        for (py=0; py<height; py++)
+        {
+         for (px=0; px<width; px++)
+         {
+           if (*depthPTR!=0) { ++totalPoints; }  ++depthPTR;
+         }
+        }
+        fprintf(fd, "WIDTH %u\n",totalPoints);
+        fprintf(fd, "HEIGHT %u\n",1);
+        fprintf(fd, "POINTS %u\n",totalPoints);
+        fprintf(fd, "DATA ascii\n");
+
+
+        //Restart Depth
+        depthPTR = depthFrame;
+
+
+        for (py=0; py<height; py++)
+        {
+         for (px=0; px<width; px++)
+         {
+           z = * depthPTR; ++depthPTR;
+           x = (px - cx) * (z + minDistance) * scaleFactor * (width/height) ;
+           y = (py - cy) * (z + minDistance) * scaleFactor;
+
+           r=colorPTR; ++colorPTR;
+           g=colorPTR; ++colorPTR;
+           b=colorPTR; ++colorPTR;
+
+
+        /* To pack it :
+            int rgb = ((int)r) << 16 | ((int)g) << 8 | ((int)b);
+
+           To unpack it :
+            int rgb = ...;
+            uint8_t r = (rgb >> 16) & 0x0000ff;
+            uint8_t g = (rgb >> 8) & 0x0000ff;
+            uint8_t b = (rgb) & 0x0000ff; */
+           rgb = ((int)*r) << 16 | ((int)*g) << 8 | ((int)*b);
+
+           if (z!=0)
+              { fprintf(fd, "%0.4f %0.4f %0.4f %u\n",x,y,z,rgb); }
          }
         }
         fclose(fd);
