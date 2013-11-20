@@ -3,6 +3,7 @@
 #include <opencv2/opencv.hpp>
 
 
+#include <locale.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -25,6 +26,17 @@ other ones will be (those, in which the chessboard pattern will be found)
 */
 
 enum { DETECTION = 0, CAPTURING = 1, CALIBRATED = 2 };
+
+
+
+int forceUSLocaleToKeepOurSanity()
+{
+   fprintf(stderr,"Reinforcing EN_US locale\n");
+   setlocale(LC_ALL, "en_US.UTF-8");
+   setlocale(LC_NUMERIC, "en_US.UTF-8");
+   return 1;
+}
+
 
 double compute_reprojection_error( const CvMat* object_points,
         const CvMat* rot_vects, const CvMat* trans_vects,
@@ -288,6 +300,8 @@ save_camera_paramsOriginal(oldFilename,image_count,img_size,board_size,square_si
 
 int main( int argc, char** argv )
 {
+    forceUSLocaleToKeepOurSanity();
+
     CvSize board_size = {0,0};
     float square_size = 1.f, aspect_ratio = 1.f;
     const char* out_filename = "out_camera_data.yml";

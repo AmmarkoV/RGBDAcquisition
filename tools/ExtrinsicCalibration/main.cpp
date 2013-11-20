@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 
 
@@ -35,6 +36,17 @@ struct calibration
   float extrinsicRotationRodriguez[3];
   float extrinsicTranslation[3];
 };
+
+
+int forceUSLocaleToKeepOurSanity()
+{
+   fprintf(stderr,"Reinforcing EN_US locale\n");
+   setlocale(LC_ALL, "en_US.UTF-8");
+   setlocale(LC_NUMERIC, "en_US.UTF-8");
+   return 1;
+}
+
+
 
 int ReadCalibration(char * filename,struct calibration * calib)
 {
@@ -241,6 +253,7 @@ int convertRodriguezTo3x3(float * rodriguez , float * result)
 
 int main( int argc, char** argv )
 {
+    forceUSLocaleToKeepOurSanity();
 
     if( argc < 2 )
     {

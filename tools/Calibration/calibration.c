@@ -25,6 +25,15 @@
 
 #define MAX_LINE_CALIBRATION 1024
 
+int forceUSLocaleToKeepOurSanity()
+{
+   fprintf(stderr,"Reinforcing EN_US locale\n");
+   setlocale(LC_ALL, "en_US.UTF-8");
+   setlocale(LC_NUMERIC, "en_US.UTF-8");
+   return 1;
+}
+
+
 int NullCalibration(unsigned int width,unsigned int height, struct calibration * calib)
 {
   calib->width=width;
@@ -62,13 +71,7 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
 
 float intAtof(char * str)
 {
-   fprintf(stderr,"Current Locale is %s \n",setlocale(LC_ALL,NULL));
-   float pi=3.141569;
-   fprintf(stderr,"Pi is represented as %f\n",pi);
-   setlocale(LC_ALL, "en_US.UTF-8");
-   setlocale(LC_NUMERIC, "en_US.UTF-8");
-   fprintf(stderr,"Pi is represented as %f\n",pi);
-
+  forceUSLocaleToKeepOurSanity();
   //OK this is the regular thing that WORKS but doesnt work
   //for countries like france where they say 0,33 instead of 0.33
   // return atof(str);
@@ -87,6 +90,8 @@ float intAtof(char * str)
 
 int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib)
 {
+  forceUSLocaleToKeepOurSanity();
+
   //First free
   NullCalibration(width,height,calib);
 
@@ -213,6 +218,8 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
 
 int WriteCalibration(char * filename,struct calibration * calib)
 {
+  forceUSLocaleToKeepOurSanity();
+
   FILE * fp = 0;
   fp = fopen(filename,"w");
   if (fp == 0 ) {  return 0; }
