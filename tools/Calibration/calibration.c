@@ -62,7 +62,12 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
 
 float intAtof(char * str)
 {
+   fprintf(stderr,"Current Locale is %s \n",setlocale(LC_ALL,NULL));
+   float pi=3.141569;
+   fprintf(stderr,"Pi is represented as %f\n",pi);
    setlocale(LC_ALL, "en_US.UTF-8");
+   setlocale(LC_NUMERIC, "en_US.UTF-8");
+   fprintf(stderr,"Pi is represented as %f\n",pi);
 
   //OK this is the regular thing that WORKS but doesnt work
   //for countries like france where they say 0,33 instead of 0.33
