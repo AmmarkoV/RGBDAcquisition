@@ -512,13 +512,9 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 
          if ( event.LeftIsDown()==1 )
            {
-              //dumpCameraDepths("cameraDepths.txt");
-              //dumpExtDepths("extOldDepths.txt");
-
               float x,y,z;
               if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z) )
               {
-
                 wxString msg;
 
                 fprintf(stderr,"Depth at point is  %0.5f   %0.5f   %0.5f\n",x,y,z);
@@ -526,12 +522,7 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
                                                   { msg.Printf( wxT("Using Camera Space : Depth at point is  %0.5f   %0.5f   %0.5f ") ,x,y,z  ); }
 
                 Status->SetStatusText(msg);
-
-              } else
-              {
-                //Status->SetStatusText(wxT("No depth at point"));
               }
-
            }
        }
 

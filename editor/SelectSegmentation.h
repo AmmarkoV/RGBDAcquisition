@@ -10,6 +10,7 @@
 #include <wx/dialog.h>
 #include <wx/button.h>
 #include <wx/statbox.h>
+#include <wx/statline.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/choice.h>
@@ -34,12 +35,15 @@ class SelectSegmentation: public wxDialog
 		wxSpinCtrl* maxR;
 		wxStaticText* StaticText13;
 		wxStaticText* StaticText14;
+		wxStaticText* StaticText15;
 		wxTextCtrl* planeP1Y;
 		wxTextCtrl* cropRGBY1;
 		wxTextCtrl* cropDepthY1;
 		wxTextCtrl* cropDepthY2;
+		wxSpinCtrl* eraseColorB;
 		wxStaticText* StaticText17;
 		wxTextCtrl* cropDepthX1;
+		wxSpinCtrl* eraseColorG;
 		wxCheckBox* CheckBoxBoundingBox;
 		wxTextCtrl* cropRGBX2;
 		wxTextCtrl* planeP2X;
@@ -61,14 +65,17 @@ class SelectSegmentation: public wxDialog
 		wxTextCtrl* planeP1X;
 		wxTextCtrl* cropDepthX2;
 		wxTextCtrl* bboxMaxY;
+		wxStaticLine* StaticLine1;
 		wxTextCtrl* cropRGBX1;
 		wxButton* ButtonOk;
 		wxTextCtrl* planeP1Z;
 		wxStaticText* StaticText8;
+		wxStaticText* StaticText12;
 		wxStaticBox* StaticBox1;
 		wxStaticText* StaticText7;
 		wxSpinCtrl* maxDepth;
 		wxTextCtrl* planeP2Y;
+		wxSpinCtrl* eraseDepth;
 		wxStaticText* StaticText4;
 		wxSpinCtrl* minDepth;
 		wxStaticText* StaticText5;
@@ -80,6 +87,7 @@ class SelectSegmentation: public wxDialog
 		wxTextCtrl* bboxMaxX;
 		wxStaticText* StaticText19;
 		wxTextCtrl* cropRGBY2;
+		wxSpinCtrl* eraseColorR;
 		wxStaticText* StaticText9;
 		wxTextCtrl* bboxMinX;
 		wxTextCtrl* planeP3X;
@@ -145,6 +153,13 @@ class SelectSegmentation: public wxDialog
 		static const long ID_CHOICE1;
 		static const long ID_CHECKBOX1;
 		static const long ID_CHECKBOX2;
+		static const long ID_STATICTEXT12;
+		static const long ID_SPINCTRL9;
+		static const long ID_SPINCTRL10;
+		static const long ID_SPINCTRL11;
+		static const long ID_STATICTEXT15;
+		static const long ID_SPINCTRL12;
+		static const long ID_STATICLINE1;
 		//*)
 
 	private:

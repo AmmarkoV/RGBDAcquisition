@@ -61,6 +61,13 @@ const long SelectSegmentation::ID_STATICTEXT19 = wxNewId();
 const long SelectSegmentation::ID_CHOICE1 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX1 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX2 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT12 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL9 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL10 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL11 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT15 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL12 = wxNewId();
+const long SelectSegmentation::ID_STATICLINE1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -72,11 +79,11 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 {
 	//(*Initialize(SelectSegmentation)
 	Create(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
-	SetClientSize(wxSize(748,561));
-	StaticBox2 = new wxStaticBox(this, ID_STATICBOX2, _("Depth"), wxPoint(376,16), wxSize(352,432), 0, _T("ID_STATICBOX2"));
-	ButtonCancel = new wxButton(this, ID_BUTTON1, _("Cancel"), wxPoint(640,464), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	ButtonOk = new wxButton(this, ID_BUTTON2, _("Ok"), wxPoint(376,464), wxSize(256,27), 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	StaticBox1 = new wxStaticBox(this, ID_STATICBOX1, _("RGB"), wxPoint(16,16), wxSize(352,432), 0, _T("ID_STATICBOX1"));
+	SetClientSize(wxSize(748,535));
+	StaticBox2 = new wxStaticBox(this, ID_STATICBOX2, _("Depth"), wxPoint(376,16), wxSize(352,400), 0, _T("ID_STATICBOX2"));
+	ButtonCancel = new wxButton(this, ID_BUTTON1, _("Cancel"), wxPoint(632,456), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	ButtonOk = new wxButton(this, ID_BUTTON2, _("Ok"), wxPoint(376,456), wxSize(240,27), 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	StaticBox1 = new wxStaticBox(this, ID_STATICBOX1, _("RGB"), wxPoint(16,16), wxSize(352,400), 0, _T("ID_STATICBOX1"));
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Minimum : "), wxPoint(40,66), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	minR = new wxSpinCtrl(this, ID_SPINCTRL1, _T("0"), wxPoint(128,64), wxSize(56,23), 0, 0, 255, 0, _T("ID_SPINCTRL1"));
 	minR->SetValue(_T("0"));
@@ -132,8 +139,8 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	planeP3Y = new wxTextCtrl(this, ID_TEXTCTRL22, _("0.0"), wxPoint(560,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL22"));
 	planeP3Z = new wxTextCtrl(this, ID_TEXTCTRL23, _("0.0"), wxPoint(624,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL23"));
 	StaticText18 = new wxStaticText(this, ID_STATICTEXT18, _("Point C"), wxPoint(424,368), wxDefaultSize, 0, _T("ID_STATICTEXT18"));
-	StaticText19 = new wxStaticText(this, ID_STATICTEXT19, _("Combination Method"), wxPoint(24,468), wxDefaultSize, 0, _T("ID_STATICTEXT19"));
-	ChoiceCombination = new wxChoice(this, ID_CHOICE1, wxPoint(192,464), wxSize(168,25), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
+	StaticText19 = new wxStaticText(this, ID_STATICTEXT19, _("Combination Method"), wxPoint(16,460), wxDefaultSize, 0, _T("ID_STATICTEXT19"));
+	ChoiceCombination = new wxChoice(this, ID_CHOICE1, wxPoint(168,456), wxSize(168,25), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
 	ChoiceCombination->SetSelection( ChoiceCombination->Append(_("No combination")) );
 	ChoiceCombination->Append(_("AND combination"));
 	ChoiceCombination->Append(_("OR combination"));
@@ -144,6 +151,17 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	CheckBoxBoundingBox->SetValue(false);
 	CheckBoxPlane = new wxCheckBox(this, ID_CHECKBOX2, _("Plane Segmentation"), wxPoint(392,290), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	CheckBoxPlane->SetValue(false);
+	StaticText12 = new wxStaticText(this, ID_STATICTEXT12, _("Erase Color is "), wxPoint(16,424), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
+	eraseColorR = new wxSpinCtrl(this, ID_SPINCTRL9, _T("255"), wxPoint(124,420), wxSize(48,23), 0, 0, 255, 255, _T("ID_SPINCTRL9"));
+	eraseColorR->SetValue(_T("255"));
+	eraseColorG = new wxSpinCtrl(this, ID_SPINCTRL10, _T("255"), wxPoint(176,420), wxSize(48,23), 0, 0, 255, 255, _T("ID_SPINCTRL10"));
+	eraseColorG->SetValue(_T("255"));
+	eraseColorB = new wxSpinCtrl(this, ID_SPINCTRL11, _T("255"), wxPoint(232,420), wxSize(48,23), 0, 0, 255, 255, _T("ID_SPINCTRL11"));
+	eraseColorB->SetValue(_T("255"));
+	StaticText15 = new wxStaticText(this, ID_STATICTEXT15, _("Erase Depth is "), wxPoint(384,424), wxDefaultSize, 0, _T("ID_STATICTEXT15"));
+	eraseDepth = new wxSpinCtrl(this, ID_SPINCTRL12, _T("0"), wxPoint(496,420), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL12"));
+	eraseDepth->SetValue(_T("0"));
+	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxPoint(20,450), wxSize(700,0), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonOkClick);
@@ -189,6 +207,19 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[1]); planeP3Y->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[2]); planeP3Z->SetValue(val);
 
+
+
+   minR->SetValue( selectedRGBConf.minR );
+   minG->SetValue(selectedRGBConf.minG);
+   minB->SetValue(selectedRGBConf.minB);
+   maxR->SetValue(selectedRGBConf.maxR);
+   maxG->SetValue(selectedRGBConf.maxG );
+   maxB->SetValue(selectedRGBConf.maxB);
+
+
+
+  ChoiceCombination->SetSelection(selectedCombinationMode);
+
   Refresh();
 
   return 1;
@@ -233,6 +264,27 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
 
   selectedDepthConf.minDepth = minDepth->GetValue();
   selectedDepthConf.maxDepth = maxDepth->GetValue();
+
+  //selectedDepthConf.
+
+   selectedRGBConf.minR = minR->GetValue();
+   selectedRGBConf.minG = minG->GetValue();
+   selectedRGBConf.minB = minB->GetValue();
+   selectedRGBConf.maxR = maxR->GetValue();
+   selectedRGBConf.maxG = maxG->GetValue();
+   selectedRGBConf.maxB = maxB->GetValue();
+
+
+   selectedRGBConf.eraseColorR = eraseColorR->GetValue();
+   selectedRGBConf.eraseColorG = eraseColorG->GetValue();
+   selectedRGBConf.eraseColorB = eraseColorB->GetValue();
+
+
+
+
+  selectedCombinationMode = ChoiceCombination->GetSelection();
+
+
 
   return 1;
 }
