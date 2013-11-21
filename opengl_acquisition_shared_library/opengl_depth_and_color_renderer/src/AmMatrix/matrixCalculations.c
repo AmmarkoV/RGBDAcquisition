@@ -271,7 +271,7 @@ void buildOpenGLProjectionForIntrinsicsStrawlab   (
     // near and far clipping planes, these only matter for the mapping from
     // world-space z-coordinate into the depth coordinate for OpenGL
     double N = nearPlane , F = farPlane;
-    double R_sub_L = R-L , T_sub_B = T-B , F_sub_N = F-N;
+    double R_sub_L = R-L , T_sub_B = T-B , F_sub_N = F-N , F_plus_N = F+N , F_mul_N = F*N;
 
     if  ( (R_sub_L==0) || (R_sub_L-1.0f==0) ||
           (T_sub_B==0) || (T_sub_B-1.0f==0) ||
@@ -304,8 +304,61 @@ void buildOpenGLProjectionForIntrinsicsStrawlab   (
    //OpenGL Projection Matrix ready for loading ( column-major ) , also axis compensated
    frustum[0] = 2* fx / R_sub_L;      frustum[1] = -2.0*skew/R_sub_L;    frustum[2] = (R_sub_L - 2.0*cx + 2.0*x0)/R_sub_L;            frustum[3] = 0.0f;
    frustum[4] = 0.0f;                 frustum[5] = 2.0*fy/T_sub_B;       frustum[6] = (-1.0 * T_sub_B - 2.0*cy + 2.0*y0)/T_sub_B ;    frustum[7] = 0.0f;
-   frustum[8] = 0.0f;                 frustum[9] = 0.0f;                 frustum[10]= -1.0 * F_sub_N  /( F_sub_N );                   frustum[11] = -2.0 * F*N/(F_sub_N);
+   frustum[8] = 0.0f;                 frustum[9] = 0.0f;                 frustum[10]= -1.0 * F_plus_N  /( F_sub_N );                  frustum[11] = -2.0 * F*N/(F_sub_N);
    frustum[12]= 0.0f;                 frustum[13]= 0.0f;                 frustum[14]= -1.0;                                           frustum[15] = 0.0f;
+   //Matrix already in OpenGL column major format
+
+   //Convert matrix to OpenGL  Column-major format
+   transpose4x4MatrixD(frustum) ;
+}
+
+
+void buildOpenGLProjectionForIntrinsicsMasteringOpenCV  (
+                                             double * frustum,
+                                             int * viewport ,
+                                             double fx,
+                                             double fy,
+                                             double skew,
+                                             double cx, double cy,
+                                             int imageWidth, int imageHeight,
+                                             double nearPlane,
+                                             double farPlane
+                                           )
+{
+
+   float x0=0.0;
+   float y0=0.0;
+
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsics Image ( %u x %u )\n",imageWidth,imageHeight);
+   fprintf(stderr,"fx %0.6f fy %0.6f , cx %0.6f , cy %0.6f , skew %0.6f \n",fx,fy,cx,cy,skew);
+   fprintf(stderr,"Near %0.6f Far %0.6f \n",nearPlane,farPlane);
+   fprintf(stderr,"x0  %0.6f y0 %0.6f \n",x0,y0);
+
+
+    // These parameters define the final viewport that is rendered into by
+    // the camera.
+    //     Left    Bottom   Right       Top
+    double L = 0.0 , B = 0.0  , R = imageWidth , T = imageHeight;
+
+    // near and far clipping planes, these only matter for the mapping from
+    // world-space z-coordinate into the depth coordinate for OpenGL
+    double N = nearPlane , F = farPlane;
+    double R_sub_L = R-L , T_sub_B = T-B , F_sub_N = F-N , F_plus_N = F+N , F_mul_N = F*N;
+
+
+    if  ( (R_sub_L==0) || (R_sub_L-1.0f==0) ||
+          (T_sub_B==0) || (T_sub_B-1.0f==0) ||
+          (F_sub_N==0) ) { fprintf(stderr,"Problem with image limigs R-L=%f , T-B=%f , F-N=%f\n",R_sub_L,T_sub_B,F_sub_N); }
+
+
+   // set the viewport parameters
+   viewport[0] = L; viewport[1] = B; viewport[2] = R_sub_L; viewport[3] = T_sub_B;
+
+   //OpenGL Projection Matrix ready for loading ( column-major ) , also axis compensated
+   frustum[0] = -2.0 * fx / R_sub_L;      frustum[1] = 0.0f;                    frustum[2] = 0.0f;                        frustum[3] = 0.0f;
+   frustum[4] = 0.0f;                     frustum[5] = 2.0*fy/T_sub_B;          frustum[6] = 0.0f;                        frustum[7] = 0.0f;
+   frustum[8] = (2.0 * cx / R_sub_L)-1.0; frustum[9] = (2.0*cy / T_sub_B)-1.0;  frustum[10]= -1.0 * (F_plus_N/F_sub_N);   frustum[11] = -1.0;
+   frustum[12]= 0.0f;                     frustum[13]= 0.0f;                    frustum[14]= -2.0 * (F_mul_N/F_sub_N);    frustum[15] = 0.0f;
    //Matrix already in OpenGL column major format
 }
 
@@ -325,7 +378,8 @@ void buildOpenGLProjectionForIntrinsics (
                                              double farPlane
                                            )
 {
-   return buildOpenGLProjectionForIntrinsicsStrawlab ( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
+   return buildOpenGLProjectionForIntrinsicsMasteringOpenCV( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
+   //return buildOpenGLProjectionForIntrinsicsStrawlab( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
    //return buildOpenGLProjectionForIntrinsicsIasonas ( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
    //return buildOpenGLProjectionForIntrinsicsAmmar ( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
 }
