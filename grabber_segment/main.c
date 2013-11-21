@@ -41,19 +41,6 @@ unsigned short * copyDepth(unsigned short * source , unsigned int width , unsign
 }
 
 
-int pickCombinationModeFromString(char * str)
-{
-  if (strcasecmp(str,"and")==0) { return COMBINE_AND; } else
-  if (strcasecmp(str,"or")==0)  { return COMBINE_OR; } else
-  if (strcasecmp(str,"xor")==0) { return COMBINE_XOR; } else
-  if (strcasecmp(str,"rgb")==0) { return COMBINE_KEEP_ONLY_RGB; } else
-  if (strcasecmp(str,"depth")==0) { return COMBINE_KEEP_ONLY_DEPTH; }
-
-  fprintf(stderr,"Could not understand combination method %s\n",str);
-  return DONT_COMBINE;
-}
-
-
 
 int main(int argc, char *argv[])
 {
@@ -78,36 +65,23 @@ int main(int argc, char *argv[])
    //------------------------------------------------------------------
    //                        CONFIGURATION
    //------------------------------------------------------------------
-   int doNotSegmentRGB=1;
-   int doNotSegmentDepth=1;
-
 
    int combinationMode=DONT_COMBINE;
 
-
    struct SegmentationFeaturesRGB segConfRGB={0};
-
-   initializeRGBSegmentationConfiguration(&segConfRGB,640,480);
-   /*
-   segConfRGB.floodErase.totalPoints = 0;
-
-   segConfRGB.minX=0;  segConfRGB.maxX=640;
-   segConfRGB.minY=0; segConfRGB.maxY=480;
-
-   segConfRGB.minR=0; segConfRGB.minG=0; segConfRGB.minB=0;
-   segConfRGB.maxR=256; segConfRGB.maxG=256; segConfRGB.maxB=256;
-
-   segConfRGB.enableReplacingColors=0;
-   segConfRGB.replaceR=92; segConfRGB.replaceG=45; segConfRGB.replaceB=36;*/
-
    struct SegmentationFeaturesDepth segConfDepth={0};
 
+   //We want to initialize our segConfRGB for "valid" guessed for our resolution
+   initializeRGBSegmentationConfiguration(&segConfRGB,640,480);
 
+   //We want to initialize our segConfDepth for "valid" guessed for our resolution
    initializeDepthSegmentationConfiguration(&segConfDepth,640,480);
-   /*
-   segConfDepth.minX=0;  segConfDepth.maxX=640;
-   segConfDepth.minY=0; segConfDepth.maxY=480;
-   segConfDepth.minDepth=0; segConfDepth.maxDepth=32500;*/
+
+
+   //After the initialization we would like to convert all arguments ( argc,argv ) to the appropriate values
+   //on segConfRGB and segConfDepth , this happens inside @ AcquisitionSegment.c
+   loadSegmentationDataFromArgs(argc,argv,&segConfRGB,&segConfDepth,&combinationMode);
+
    //------------------------------------------------------------------
    //------------------------------------------------------------------
 
@@ -133,57 +107,6 @@ int main(int argc, char *argv[])
                                            devID_1 = atoi(argv[i+1]);
                                            fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID_1);
                                          } else
-    if (strcmp(argv[i],"-floodEraseDepthSource")==0)
-                                                    {
-                                                     segConfDepth.floodErase.pX[segConfDepth.floodErase.totalPoints] = atoi(argv[i+1]);
-                                                     segConfDepth.floodErase.pY[segConfDepth.floodErase.totalPoints] = atoi(argv[i+2]);
-                                                     segConfDepth.floodErase.threshold[segConfDepth.floodErase.totalPoints] = atoi(argv[i+3]);
-                                                     segConfDepth.floodErase.source=1;
-                                                     ++segConfDepth.floodErase.totalPoints;
-                                                    } else
-    if (strcmp(argv[i],"-floodEraseRGBSource")==0)
-                                                {
-                                                  segConfRGB.floodErase.pX[segConfRGB.floodErase.totalPoints] = atoi(argv[i+1]);
-                                                  segConfRGB.floodErase.pY[segConfRGB.floodErase.totalPoints] = atoi(argv[i+2]);
-                                                  segConfRGB.floodErase.threshold[segConfRGB.floodErase.totalPoints] = atoi(argv[i+3]);
-                                                  segConfRGB.floodErase.source=1;
-                                                  doNotSegmentRGB=0;
-                                                  ++segConfRGB.floodErase.totalPoints;
-                                                } else
-    if (strcmp(argv[i],"-floodEraseRGBTarget")==0) {
-                                                  segConfRGB.floodErase.pX[segConfRGB.floodErase.totalPoints] = atoi(argv[i+1]);
-                                                  segConfRGB.floodErase.pY[segConfRGB.floodErase.totalPoints] = atoi(argv[i+2]);
-                                                  segConfRGB.floodErase.threshold[segConfRGB.floodErase.totalPoints] = atoi(argv[i+3]);
-                                                  segConfRGB.floodErase.target=1;
-                                                  doNotSegmentRGB=0;
-                                                  ++segConfRGB.floodErase.totalPoints;
-                                                 } else
-    if (strcmp(argv[i],"-cropRGB")==0)    { segConfRGB.minX = atoi(argv[i+1]); segConfRGB.minY = atoi(argv[i+2]);
-                                            segConfRGB.maxX = atoi(argv[i+3]); segConfRGB.maxY = atoi(argv[i+4]);  doNotSegmentRGB=0; } else
-    if (strcmp(argv[i],"-cropDepth")==0)  { segConfDepth.minX = atoi(argv[i+1]); segConfDepth.minY = atoi(argv[i+2]);
-                                            segConfDepth.maxX = atoi(argv[i+3]); segConfDepth.maxY = atoi(argv[i+4]);  doNotSegmentDepth=0; } else
-    if (strcmp(argv[i],"-minRGB")==0)     { segConfRGB.minR = atoi(argv[i+1]); segConfRGB.minG = atoi(argv[i+2]); segConfRGB.minB = atoi(argv[i+3]); doNotSegmentRGB=0; } else
-    if (strcmp(argv[i],"-maxRGB")==0)     { segConfRGB.maxR = atoi(argv[i+1]); segConfRGB.maxG = atoi(argv[i+2]); segConfRGB.maxB = atoi(argv[i+3]); doNotSegmentRGB=0; } else
-    if (strcmp(argv[i],"-eraseRGB")==0) { segConfRGB.eraseColorR = atoi(argv[i+1]); segConfRGB.eraseColorG = atoi(argv[i+2]); segConfRGB.eraseColorB = atoi(argv[i+3]);  } else
-    if (strcmp(argv[i],"-replaceRGB")==0) { segConfRGB.replaceR = atoi(argv[i+1]); segConfRGB.replaceG = atoi(argv[i+2]); segConfRGB.replaceB = atoi(argv[i+3]); segConfRGB.enableReplacingColors=1; } else
-    if (strcmp(argv[i],"-bbox")==0)       {
-                                            segConfDepth.enableBBox=1;
-                                            segConfDepth.bboxX1=(double) intAtof(argv[i+1]);
-                                            segConfDepth.bboxY1=(double) intAtof(argv[i+2]);
-                                            segConfDepth.bboxZ1=(double) intAtof(argv[i+3]);
-                                            segConfDepth.bboxX2=(double) intAtof(argv[i+4]);
-                                            segConfDepth.bboxY2=(double) intAtof(argv[i+5]);
-                                            segConfDepth.bboxZ2=(double) intAtof(argv[i+6]);
-                                          } else
-    if (strcmp(argv[i],"-plane")==0)      {
-                                            segConfDepth.enablePlaneSegmentation=1;
-                                            segConfDepth.p1[0]=(double) intAtof(argv[i+1]); segConfDepth.p1[1]=(double) intAtof(argv[i+2]); segConfDepth.p1[2]=(double) intAtof(argv[i+3]);
-                                            segConfDepth.p2[0]=(double) intAtof(argv[i+4]); segConfDepth.p2[1]=(double) intAtof(argv[i+5]); segConfDepth.p2[2]=(double) intAtof(argv[i+6]);
-                                            segConfDepth.p3[0]=(double) intAtof(argv[i+7]); segConfDepth.p3[1]=(double) intAtof(argv[i+8]); segConfDepth.p3[2]=(double) intAtof(argv[i+9]);
-                                          }
-    if (strcmp(argv[i],"-minDepth")==0)   { segConfDepth.minDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
-    if (strcmp(argv[i],"-maxDepth")==0)   { segConfDepth.maxDepth = atoi(argv[i+1]); doNotSegmentDepth=0; } else
-    if (strcmp(argv[i],"-combine")==0)    { combinationMode=pickCombinationModeFromString(argv[i+1]); }     else
     if (
          (strcmp(argv[i],"-to")==0) ||
          (strcmp(argv[i],"-o")==0)

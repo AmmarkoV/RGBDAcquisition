@@ -70,6 +70,8 @@ float  distance3D(float p1[3] , float p2[3] , float p3[3])
 
    float len = sqrt( vect_x*vect_x + vect_y*vect_y + vect_z*vect_z);
    if(len == 0) len = 1.0f;
+
+   return len;
 }
 
 

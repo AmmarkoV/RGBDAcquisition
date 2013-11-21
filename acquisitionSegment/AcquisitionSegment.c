@@ -221,3 +221,79 @@ int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB *
 }
 
 
+int pickCombinationModeFromString(char * str)
+{
+  if (strcasecmp(str,"and")==0) { return COMBINE_AND; } else
+  if (strcasecmp(str,"or")==0)  { return COMBINE_OR; } else
+  if (strcasecmp(str,"xor")==0) { return COMBINE_XOR; } else
+  if (strcasecmp(str,"rgb")==0) { return COMBINE_KEEP_ONLY_RGB; } else
+  if (strcasecmp(str,"depth")==0) { return COMBINE_KEEP_ONLY_DEPTH; }
+
+  fprintf(stderr,"Could not understand combination method %s\n",str);
+  return DONT_COMBINE;
+}
+
+
+
+
+int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFeaturesRGB * rgbSeg , struct SegmentationFeaturesDepth * depthSeg , unsigned int * combinationMode)
+{
+
+  int i=0;
+  for (i=0; i<argc; i++)
+  {
+
+    if (strcmp(argv[i],"-floodEraseDepthSource")==0)
+                                                    {
+                                                     depthSeg->floodErase.pX[depthSeg->floodErase.totalPoints] = atoi(argv[i+1]);
+                                                     depthSeg->floodErase.pY[depthSeg->floodErase.totalPoints] = atoi(argv[i+2]);
+                                                     depthSeg->floodErase.threshold[depthSeg->floodErase.totalPoints] = atoi(argv[i+3]);
+                                                     depthSeg->floodErase.source=1;
+                                                     ++depthSeg->floodErase.totalPoints;
+                                                    } else
+    if (strcmp(argv[i],"-floodEraseRGBSource")==0)
+                                                {
+                                                  rgbSeg->floodErase.pX[rgbSeg->floodErase.totalPoints] = atoi(argv[i+1]);
+                                                  rgbSeg->floodErase.pY[rgbSeg->floodErase.totalPoints] = atoi(argv[i+2]);
+                                                  rgbSeg->floodErase.threshold[rgbSeg->floodErase.totalPoints] = atoi(argv[i+3]);
+                                                  rgbSeg->floodErase.source=1;
+                                                  ++rgbSeg->floodErase.totalPoints;
+                                                } else
+    if (strcmp(argv[i],"-floodEraseRGBTarget")==0) {
+                                                  rgbSeg->floodErase.pX[rgbSeg->floodErase.totalPoints] = atoi(argv[i+1]);
+                                                  rgbSeg->floodErase.pY[rgbSeg->floodErase.totalPoints] = atoi(argv[i+2]);
+                                                  rgbSeg->floodErase.threshold[rgbSeg->floodErase.totalPoints] = atoi(argv[i+3]);
+                                                  rgbSeg->floodErase.target=1;
+                                                  ++rgbSeg->floodErase.totalPoints;
+                                                 } else
+    if (strcmp(argv[i],"-cropRGB")==0)    { rgbSeg->minX = atoi(argv[i+1]); rgbSeg->minY = atoi(argv[i+2]);
+                                            rgbSeg->maxX = atoi(argv[i+3]); rgbSeg->maxY = atoi(argv[i+4]);   } else
+    if (strcmp(argv[i],"-cropDepth")==0)  { depthSeg->minX = atoi(argv[i+1]); depthSeg->minY = atoi(argv[i+2]);
+                                            depthSeg->maxX = atoi(argv[i+3]); depthSeg->maxY = atoi(argv[i+4]);   } else
+    if (strcmp(argv[i],"-minRGB")==0)     { rgbSeg->minR = atoi(argv[i+1]); rgbSeg->minG = atoi(argv[i+2]); rgbSeg->minB = atoi(argv[i+3]);  } else
+    if (strcmp(argv[i],"-maxRGB")==0)     { rgbSeg->maxR = atoi(argv[i+1]); rgbSeg->maxG = atoi(argv[i+2]); rgbSeg->maxB = atoi(argv[i+3]);   } else
+    if (strcmp(argv[i],"-eraseRGB")==0) { rgbSeg->eraseColorR = atoi(argv[i+1]); rgbSeg->eraseColorG = atoi(argv[i+2]); rgbSeg->eraseColorB = atoi(argv[i+3]);  } else
+    if (strcmp(argv[i],"-replaceRGB")==0) { rgbSeg->replaceR = atoi(argv[i+1]); rgbSeg->replaceG = atoi(argv[i+2]); rgbSeg->replaceB = atoi(argv[i+3]); rgbSeg->enableReplacingColors=1; } else
+    if (strcmp(argv[i],"-bbox")==0)       {
+                                            depthSeg->enableBBox=1;
+                                            depthSeg->bboxX1=(double) intAtof(argv[i+1]);
+                                            depthSeg->bboxY1=(double) intAtof(argv[i+2]);
+                                            depthSeg->bboxZ1=(double) intAtof(argv[i+3]);
+                                            depthSeg->bboxX2=(double) intAtof(argv[i+4]);
+                                            depthSeg->bboxY2=(double) intAtof(argv[i+5]);
+                                            depthSeg->bboxZ2=(double) intAtof(argv[i+6]);
+                                          } else
+    if (strcmp(argv[i],"-plane")==0)      {
+                                            depthSeg->enablePlaneSegmentation=1;
+                                            depthSeg->p1[0]=(double) intAtof(argv[i+1]); depthSeg->p1[1]=(double) intAtof(argv[i+2]); depthSeg->p1[2]=(double) intAtof(argv[i+3]);
+                                            depthSeg->p2[0]=(double) intAtof(argv[i+4]); depthSeg->p2[1]=(double) intAtof(argv[i+5]); depthSeg->p2[2]=(double) intAtof(argv[i+6]);
+                                            depthSeg->p3[0]=(double) intAtof(argv[i+7]); depthSeg->p3[1]=(double) intAtof(argv[i+8]); depthSeg->p3[2]=(double) intAtof(argv[i+9]);
+                                          }
+    if (strcmp(argv[i],"-minDepth")==0)   { depthSeg->minDepth = atoi(argv[i+1]);  } else
+    if (strcmp(argv[i],"-maxDepth")==0)   { depthSeg->maxDepth = atoi(argv[i+1]);   } else
+    if (strcmp(argv[i],"-combine")==0)    { *combinationMode=pickCombinationModeFromString(argv[i+1]); }
+  }
+
+
+  return 1;
+}

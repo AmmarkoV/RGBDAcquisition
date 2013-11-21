@@ -101,6 +101,7 @@ int segmentGetDepthBlobAverage(unsigned short * frame , unsigned int frameWidth 
 
 int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB * rgbSeg , struct SegmentationFeaturesDepth * depthSeg );
 
+int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFeaturesRGB * rgbSeg , struct SegmentationFeaturesDepth * depthSeg , unsigned int * combinationMode);
 #ifdef __cplusplus
 }
 #endif
