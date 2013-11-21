@@ -26,7 +26,7 @@ float farPlane = 255; //<--be aware that this has an effect on the depth maps ge
 float nearPlane= 1; //<--this also
 float aspectRatio = 65;
 
-float depthUnit = 1;
+//float depthUnit = 1.0;
 
 int WIDTH=640;
 int HEIGHT=480;
@@ -200,7 +200,7 @@ int updateProjectionMatrix()
   {
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gldPerspective(aspectRatio, WIDTH/HEIGHT, nearPlane, farPlane);
+   gldPerspective((double) aspectRatio, WIDTH/HEIGHT, nearPlane, farPlane);
    //glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
    glViewport(0, 0, WIDTH, HEIGHT);
   }
@@ -404,6 +404,10 @@ int renderScene()
   if ( (scene!=0) && ( scene->modelViewMatrixDeclared ) )
   { //Scene configuration overwrites local configuration
    glLoadMatrixd( scene->modelViewMatrix ); // we load a matrix of Doubles
+      if (useCustomModelViewMatrix)
+         {
+           fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
+         }
    //print4x4DMatrix("OpenGL ModelView Matrix Given by Trajectory Parser", scene->modelViewMatrix );
   } else
   //If setOpenGLExtrinsicCalibration has set a custom MODELVIEW matrix we will use it
@@ -412,7 +416,7 @@ int renderScene()
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
     glLoadMatrixd((const GLdouble*) customModelViewMatrix);
     // We flip our coordinate system so it comes straight
-    glRotatef(90,-1.0,0,0);
+    //glRotatef(90,-1.0,0,0);
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
   {

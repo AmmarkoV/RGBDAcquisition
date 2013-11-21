@@ -6,7 +6,6 @@ extern "C"
 {
 #endif
 
-int setOpenGLDepthUnit(float unit);
 int setOpenGLNearFarPlanes(double near , double far);
 int setOpenGLIntrinsicCalibration(double * camera);
 

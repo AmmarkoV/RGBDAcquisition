@@ -6,7 +6,7 @@ extern int HEIGHT;
 
 extern float farPlane;
 extern float nearPlane;
-extern float depthUnit;
+//extern float depthUnit;
 
 extern int useIntrinsicMatrix;
 extern double cameraMatrix[9];

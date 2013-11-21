@@ -53,7 +53,7 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	TextCtrlFPS = new wxTextCtrl(this, ID_TEXTCTRL4, _("30"), wxPoint(216,100), wxSize(40,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("fps"), wxPoint(264,104), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	ButtonCancel = new wxButton(this, ID_BUTTON2, _("Cancel"), wxPoint(184,152), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	ComboBoxDevice = new wxComboBox(this, ID_COMBOBOX2, wxEmptyString, wxPoint(88,56), wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_COMBOBOX2"));
+	ComboBoxDevice = new wxComboBox(this, ID_COMBOBOX2, wxEmptyString, wxPoint(88,56), wxDefaultSize, 0, 0, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_COMBOBOX2"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectModule::OnButtonStartModuleClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectModule::OnButtonCancelClick);

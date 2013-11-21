@@ -186,12 +186,29 @@ int segmentGetDepthBlobAverage(unsigned short * frame , unsigned int frameWidth 
 
 
 
-int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB * rgbSeg , struct SegmentationFeaturesDepth * depthSeg )
+int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB * rgbSeg , struct SegmentationFeaturesDepth * depthSeg , unsigned int combinationMode)
 {
+    fprintf(stderr,"TODO:  Add all segmentation data here..\n\n");
+
+    int i=0;
     FILE * fp;
     fp  = fopen(filename,"w");
     if(fp!=0)
     {
+
+      if (depthSeg->floodErase.totalPoints>0)
+      {
+        for (i=0; i<depthSeg->floodErase.totalPoints; i++)
+        {
+          fprintf(fp,"-floodEraseDepthSource %u %u %u \n",
+                    depthSeg->floodErase.pX[i],
+                    depthSeg->floodErase.pY[i],
+                    depthSeg->floodErase.threshold[i]);
+        }
+      }
+
+
+
       if ( depthSeg->enableBBox )
       {
           fprintf(fp,"-bbox %f %f %f %f %f %f \n",
@@ -208,11 +225,23 @@ int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB *
       }
 
 
-     fprintf(fp,"-cropDepth %u %u %u %u\n",depthSeg->minDepth);
+     fprintf(fp,"-cropDepth %u %u %u %u\n",depthSeg->minX,depthSeg->minY,depthSeg->maxX,depthSeg->maxY);
 
 
      fprintf(fp,"-minDepth %f\n",depthSeg->minDepth);
      fprintf(fp,"-maxDepth %f\n",depthSeg->maxDepth);
+
+
+     fprintf(fp,"-cropRGB %u %u %u %u\n",rgbSeg->minX,rgbSeg->minY,rgbSeg->maxX,rgbSeg->maxY);
+
+
+     fprintf(fp,"-minRGB %u %u %u\n",rgbSeg->minR,rgbSeg->minG,rgbSeg->minB);
+     fprintf(fp,"-maxRGB %u %u %u\n",rgbSeg->maxR,rgbSeg->maxG,rgbSeg->maxB);
+
+
+     fprintf(fp,"-eraseRGB %u %u %u\n",rgbSeg->eraseColorR,rgbSeg->eraseColorG,rgbSeg->eraseColorB);
+
+     fprintf(fp,"-replaceRGB %u %u %u\n",rgbSeg->replaceR,rgbSeg->replaceG,rgbSeg->replaceB);
 
       fclose(fp);
       return 1;

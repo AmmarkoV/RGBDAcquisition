@@ -73,6 +73,7 @@
 		</object>
 		<object class="wxComboBox" name="ID_COMBOBOX2" variable="ComboBoxDevice" member="yes">
 			<pos>88,56</pos>
+			<style>wxTE_PROCESS_ENTER</style>
 		</object>
 	</object>
 </wxsmith>

@@ -336,7 +336,7 @@ void SelectSegmentation::OnButtonExportClick(wxCommandEvent& event)
     strncpy(cstring, (const char*) FileDialogExport->GetPath().mb_str(wxConvUTF8), 2047);
 
 
-    if (! saveSegmentationDataToFile(cstring, &selectedRGBConf , &selectedDepthConf ) )
+    if (! saveSegmentationDataToFile(cstring, &selectedRGBConf , &selectedDepthConf , selectedCombinationMode ) )
     {
         wxMessageBox(wxT("Could not write Segmentation to the file specified"),wxT("While trying to save segmentation.."));
     }

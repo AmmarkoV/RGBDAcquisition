@@ -29,7 +29,7 @@ echo
 echo "$blue Checking directory structure $normal"
 echo
 
-toCheck="tools 3dparty scripts synergiesAdapter viewer libfreenect_acquisition_shared_library opengl_acquisition_shared_library opengl_acquisition_shared_library/opengl_depth_and_color_renderer openni1_acquisition_shared_library openni2_acquisition_shared_library template_acquisition_shared_library v4l2_acquisition_shared_library v4l2stereo_acquisition_shared_library viewer"
+toCheck="tools 3dparty scripts synergiesAdapter viewer editor libfreenect_acquisition_shared_library opengl_acquisition_shared_library opengl_acquisition_shared_library/opengl_depth_and_color_renderer openni1_acquisition_shared_library openni2_acquisition_shared_library template_acquisition_shared_library v4l2_acquisition_shared_library v4l2stereo_acquisition_shared_library"
 
  for f in $toCheck
            do  
@@ -61,7 +61,7 @@ toCheck="tools/EulerToQuaternions/EulerToQuaternions tools/QuaternionsToEuler/Qu
 echo
 echo "$blue Checking binaries $normal"
 echo
-toCheck="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_mux/GrabberMux acquisitionBroadcast/acquisitionBroadcast opengl_acquisition_shared_library/opengl_depth_and_color_renderer/Renderer synergiesAdapter/Adapter"
+toCheck="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_mux/GrabberMux acquisitionBroadcast/acquisitionBroadcast opengl_acquisition_shared_library/opengl_depth_and_color_renderer/Renderer synergiesAdapter/Adapter editor/Editor"
 
  for f in $toCheck
            do  

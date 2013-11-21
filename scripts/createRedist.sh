@@ -5,15 +5,13 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
 cd ..
-
-
+ 
 mkdir redist
-
-
+ 
 cd redist
 ln -s 
 
-binaries="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_mux/GrabberMux acquisitionBroadcast/acquisitionBroadcast synergiesAdapter/Adapter"
+binaries="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_mux/GrabberMux acquisitionBroadcast/acquisitionBroadcast synergiesAdapter/Adapter editor/Editor"
 
  for f in $binaries
            do  
@@ -40,6 +38,8 @@ libraries="acquisition/libAcquisition.so libfreenect_acquisition_shared_library/
 
 
 
+ln -s ../editor/default.bmp default.bmp
+
 ln -s ../grabber/frames
 ln -s ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/Models
 ln -s ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/Scenes
@@ -48,7 +48,9 @@ ln -s ../acquisitionBroadcast/AmmarServer/public_html
 ../3dparty/link_to_libs.sh ../3dparty/
 
 cd ..
+
 #At root dir
+ 
 ln -s grabber/frames grabbed_frames
 
 cd opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/
