@@ -1,5 +1,6 @@
 #include "SelectSegmentation.h"
 
+#include <wx/msgdlg.h>
 //(*InternalHeaders(SelectSegmentation)
 #include <wx/string.h>
 #include <wx/intl.h>
@@ -334,33 +335,10 @@ void SelectSegmentation::OnButtonExportClick(wxCommandEvent& event)
     char cstring[2048];
     strncpy(cstring, (const char*) FileDialogExport->GetPath().mb_str(wxConvUTF8), 2047);
 
-    FILE * fp;
-    fp  = fopen(cstring,"w");
-    if(fp!=0)
+
+    if (! saveSegmentationDataToFile(cstring, &selectedRGBConf , &selectedDepthConf ) )
     {
-      if ( selectedDepthConf.enableBBox )
-      {
-          fprintf(fp,"-bbox %f %f %f %f %f %f \n",
-                       selectedDepthConf.bboxX1,selectedDepthConf.bboxY1,selectedDepthConf.bboxZ1 ,
-                       selectedDepthConf.bboxX2,selectedDepthConf.bboxY2,selectedDepthConf.bboxZ2);
-      }
-
-      if ( selectedDepthConf.enablePlaneSegmentation )
-      {
-          fprintf(fp,"-plane %f %f %f %f %f %f %f %f %f\n",
-                       selectedDepthConf.p1[0],selectedDepthConf.p1[1],selectedDepthConf.p1[2] ,
-                       selectedDepthConf.p2[0],selectedDepthConf.p2[1],selectedDepthConf.p2[2] ,
-                       selectedDepthConf.p3[0],selectedDepthConf.p3[1],selectedDepthConf.p3[2]  );
-      }
-
-
-     fprintf(fp,"-cropDepth %u %u %u %u\n",selectedDepthConf.minDepth);
-
-
-     fprintf(fp,"-minDepth %f\n",selectedDepthConf.minDepth);
-     fprintf(fp,"-maxDepth %f\n",selectedDepthConf.maxDepth);
-
-      fclose(fp);
+        wxMessageBox(wxT("Could not write Segmentation to the file specified"),wxT("While trying to save segmentation.."));
     }
 
 }

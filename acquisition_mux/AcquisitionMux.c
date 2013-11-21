@@ -65,15 +65,6 @@ int saveMuxImageToFile(char * filename,char * pixels , unsigned int width , unsi
 
 
 
-
-
-
-
-
-
-
-
-
 int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
 {
    char * rgb_pBase = rgbBase;
@@ -129,7 +120,12 @@ int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char 
 }
 
 
-int mux2RGBAndDepthFrames( char * rgbBase, char * rgbOverlay , char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
+int mux2RGBAndDepthFrames(
+                           char * rgbBase, char * rgbOverlay , char * rgbOut ,
+                           unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
+                           unsigned int width , unsigned int height ,
+                           unsigned int mux_type
+                         )
 {
  if (mux_type==0)
   {

@@ -5,7 +5,10 @@ void crossProduct(float p1[3] , float p2[3] , float p3[3]  , float * normal);
 float dotProduct(float p1[3] , float p2[3] );
 float  signedDistanceFromPlane(float origin[3] , float normal[3] , float pN[3]);
 
-int getDepthBlobAverage(float * centerX , float * centerY , float * centerZ , short * frame , unsigned int width , unsigned int height);
+
+int getDepthBlobAverage(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                        float * centerX , float * centerY , float * centerZ);
 
 
 int floodFill(unsigned char * target , unsigned int width , unsigned int height ,

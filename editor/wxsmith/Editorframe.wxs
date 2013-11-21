@@ -43,31 +43,36 @@
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticTextJumpTo" member="yes">
 			<label>Jump To : </label>
-			<pos>322,528</pos>
+			<pos>504,528</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="currentFrameTextCtrl" member="yes">
 			<value>0</value>
-			<pos>392,524</pos>
+			<pos>584,524</pos>
 			<style>wxTE_PROCESS_ENTER</style>
 			<handler function="OncurrentFrameTextCtrlText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT2" variable="dashForFramesRemainingLabel" member="yes">
 			<label>/ </label>
-			<pos>474,528</pos>
+			<pos>672,528</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT3" variable="totalFramesLabel" member="yes">
 			<label>?</label>
-			<pos>484,528</pos>
+			<pos>688,528</pos>
 		</object>
 		<object class="wxButton" name="ID_BUTTON5" variable="ButtonSegmentation" member="yes">
 			<label>Segmentation</label>
-			<pos>680,524</pos>
+			<pos>1192,520</pos>
 			<handler function="OnButtonSegmentationClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON6" variable="ButtonCalibration" member="yes">
 			<label>Calibration</label>
-			<pos>578,524</pos>
+			<pos>1104,520</pos>
 			<handler function="OnButtonCalibrationClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON7" variable="buttonRecord" member="yes">
+			<label>Record</label>
+			<pos>368,524</pos>
+			<handler function="OnbuttonRecordClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">

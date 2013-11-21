@@ -94,6 +94,13 @@ int copyDepthSegmentation(struct SegmentationFeaturesDepth* target, struct Segme
 
 int printDepthSegmentationData(char * label , struct SegmentationFeaturesDepth * dat);
 
+int segmentGetDepthBlobAverage(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                        float * centerX , float * centerY , float * centerZ);
+
+
+int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB * rgbSeg , struct SegmentationFeaturesDepth * depthSeg );
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <math.h>
 #include "imageProcessing.h"
 
 
+#define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
 
 enum dimEnum
 {
@@ -94,29 +96,53 @@ float  signedDistanceFromPlane(float origin[3] , float normal[3] , float pN[3])
 
 
 
-int getDepthBlobAverage(float * centerX , float * centerY , float * centerZ , short * frame , unsigned int width , unsigned int height)
+int getDepthBlobAverage(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                        float * centerX , float * centerY , float * centerZ)
 {
+
+  if (frame==0)  { return 0; }
+  if ( (width==0)||(height==0) ) { return 0; }
+  if ( (frameWidth==0)||(frameWidth==0) ) { return 0; }
+
+  if (sX>=frameWidth) { return 0; }
+  if (sY>=frameHeight) { return 0;  }
+
+  //Check for bounds -----------------------------------------
+  if (sX+width>=frameWidth) { width=frameWidth-sX;  }
+  if (sY+height>=frameHeight) { height=frameHeight-sY;  }
+  //----------------------------------------------------------
+
+
   unsigned int x=0,y=0;
-
-
   unsigned long sumX=0,sumY=0,sumZ=0,samples=0;
 
-   short * sourcePixels   = (short*) frame ;
-   short * sourcePixelsEnd   =  sourcePixels + width * height ;
+  unsigned short * sourcePTR      = frame+ MEMPLACE1(sX,sY,frameWidth);
+  unsigned short * sourceLimitPTR = frame+ MEMPLACE1((sX+width),(sY+height),frameWidth);
+  unsigned short sourceLineSkip = (frameWidth-width)  ;
+  unsigned short * sourceLineLimitPTR = sourcePTR + (width);
 
-   while (sourcePixels<sourcePixelsEnd)
-   {
-     if (*sourcePixels != 0)
+  while (sourcePTR < sourceLimitPTR)
+  {
+     while (sourcePTR < sourceLineLimitPTR)
      {
-       sumX+=x;
-       sumY+=y;
-       sumZ+=*sourcePixels;
-       ++samples;
+       if (*sourcePTR!=0)
+       {
+        sumX+=x;
+        sumY+=y;
+        sumZ+=*sourcePTR;
+        ++samples;
+       }
+
+       ++x;
+       ++sourcePTR;
      }
-     ++sourcePixels;
-     ++x;
-     if (x==width) { ++y; x=0;}
-   }
+
+    x=0; ++y;
+    sourceLineLimitPTR+=frameWidth;
+    sourcePTR+=sourceLineSkip;
+  }
+
 
    *centerX = (float) sumX / samples;
    *centerY = (float) sumY / samples;

@@ -174,3 +174,50 @@ int printDepthSegmentationData(char * label , struct SegmentationFeaturesDepth *
 
   return 1;
 }
+
+
+
+int segmentGetDepthBlobAverage(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                        float * centerX , float * centerY , float * centerZ)
+{
+  return getDepthBlobAverage(frame,frameWidth,frameHeight,sX,sY,width,height,centerX,centerY,centerZ);
+}
+
+
+
+int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB * rgbSeg , struct SegmentationFeaturesDepth * depthSeg )
+{
+    FILE * fp;
+    fp  = fopen(filename,"w");
+    if(fp!=0)
+    {
+      if ( depthSeg->enableBBox )
+      {
+          fprintf(fp,"-bbox %f %f %f %f %f %f \n",
+                       depthSeg->bboxX1,depthSeg->bboxY1,depthSeg->bboxZ1 ,
+                       depthSeg->bboxX2,depthSeg->bboxY2,depthSeg->bboxZ2);
+      }
+
+      if ( depthSeg->enablePlaneSegmentation )
+      {
+          fprintf(fp,"-plane %f %f %f %f %f %f %f %f %f\n",
+                       depthSeg->p1[0],depthSeg->p1[1],depthSeg->p1[2] ,
+                       depthSeg->p2[0],depthSeg->p2[1],depthSeg->p2[2] ,
+                       depthSeg->p3[0],depthSeg->p3[1],depthSeg->p3[2]  );
+      }
+
+
+     fprintf(fp,"-cropDepth %u %u %u %u\n",depthSeg->minDepth);
+
+
+     fprintf(fp,"-minDepth %f\n",depthSeg->minDepth);
+     fprintf(fp,"-maxDepth %f\n",depthSeg->maxDepth);
+
+      fclose(fp);
+      return 1;
+    }
+  return 0;
+}
+
+

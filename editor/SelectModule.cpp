@@ -60,6 +60,12 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	//*)
 
 
+
+  //char listOfFiles[4096];
+
+
+
+
   selectionMade=0;
 }
 

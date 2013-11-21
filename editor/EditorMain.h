@@ -52,6 +52,7 @@ class EditorFrame: public wxFrame
         void OnFrameSliderCmdScroll(wxScrollEvent& event);
         void OnButtonSegmentationClick(wxCommandEvent& event);
         void OnButtonCalibrationClick(wxCommandEvent& event);
+        void OnbuttonRecordClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -68,6 +69,7 @@ class EditorFrame: public wxFrame
         static const long ID_STATICTEXT3;
         static const long ID_BUTTON5;
         static const long ID_BUTTON6;
+        static const long ID_BUTTON7;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEDEPTH;
         static const long ID_MENUSAVEPCD;
@@ -82,6 +84,7 @@ class EditorFrame: public wxFrame
         wxButton* buttonNextFrame;
         wxStatusBar* Status;
         wxStaticText* totalFramesLabel;
+        wxButton* buttonRecord;
         wxButton* buttonStop;
         wxStaticBox* StaticBox2;
         wxTextCtrl* currentFrameTextCtrl;

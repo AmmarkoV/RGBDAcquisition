@@ -103,6 +103,7 @@ const long EditorFrame::ID_STATICTEXT2 = wxNewId();
 const long EditorFrame::ID_STATICTEXT3 = wxNewId();
 const long EditorFrame::ID_BUTTON5 = wxNewId();
 const long EditorFrame::ID_BUTTON6 = wxNewId();
+const long EditorFrame::ID_BUTTON7 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
 const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
@@ -140,12 +141,13 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     buttonPlay = new wxButton(this, ID_BUTTON2, _("Play"), wxPoint(64,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     buttonStop = new wxButton(this, ID_BUTTON3, _("Stop"), wxPoint(150,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     buttonNextFrame = new wxButton(this, ID_BUTTON4, _(">"), wxPoint(236,524), wxSize(56,27), 0, wxDefaultValidator, _T("ID_BUTTON4"));
-    StaticTextJumpTo = new wxStaticText(this, ID_STATICTEXT1, _("Jump To : "), wxPoint(322,528), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(392,524), wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-    dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(474,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-    totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(484,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-    ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(680,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
-    ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(578,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+    StaticTextJumpTo = new wxStaticText(this, ID_STATICTEXT1, _("Jump To : "), wxPoint(504,528), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(584,524), wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(672,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(688,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(1192,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+    ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(1104,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+    buttonRecord = new wxButton(this, ID_BUTTON7, _("Record"), wxPoint(368,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -184,6 +186,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditorFrame::OncurrentFrameTextCtrlText);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonCalibrationClick);
+    Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonRecordClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -194,6 +197,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_MENUSAVEPCD,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSavePCD);
     Connect(ID_MENUSAVEDEPTH,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSaveDepth);
     Connect(ID_MENUOPENMODULE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnOpenModule);
+    Connect(ID_MENUSEGMENTATION,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
 
     initFeeds();
 
@@ -355,8 +359,8 @@ void EditorFrame::OnQuit(wxCommandEvent& event)
 
 void EditorFrame::OnAbout(wxCommandEvent& event)
 {
-    wxString msg = wxbuildinfo(long_f);
-    wxMessageBox(msg, _("Welcome to..."));
+    //wxString msg = wxbuildinfo(long_f);
+    wxMessageBox(wxT("Thank you for using RGBDAcquisition , a GPL project\nWritten by AmmarkoV\nHosted at https://github.com/AmmarkoV/RGBDAcquisition"), wxT("RGBDAcquisition Editor"));
 }
 
 
@@ -462,8 +466,9 @@ int dumpCameraDepths(char * filename)
        }
       }
       fclose(fp);
+      return 1;
     }
-
+  return 0;
 }
 
 
@@ -485,8 +490,9 @@ int dumpExtDepths(char * filename)
        }
       }
       fclose(fp);
+      return 1;
     }
-
+  return 0;
 }
 
 
@@ -501,8 +507,6 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
   wxSleep(0.01);
   int x=event.GetX();
   int y=event.GetY();
-  //fprintf(stderr,"Mouse %u,%u\n",x,y);
-
 
   int fd_rx1,fd_rx2,fd_ry1,fd_ry2;
   fd_rx1=10;
@@ -510,7 +514,7 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
   fd_rx2=fd_rx1 + default_feed->GetWidth();
   fd_ry2=fd_ry1 + default_feed->GetHeight();
 
-  if ( XYOverRect(x,y,feed_0_x,feed_0_y,feed_0_x+default_feed->GetWidth(),feed_0_y+default_feed->GetHeight())==1 )
+  if ( XYOverRect(x,y,feed_0_x,feed_0_y,feed_0_x+default_feed->GetWidth(),feed_0_y+default_feed->GetHeight()) )
        {
          mouse_x=x;
          mouse_y=y;
@@ -528,6 +532,45 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 
                 Status->SetStatusText(msg);
               }
+           }
+       }
+
+  if ( XYOverRect(x,y,feed_1_x,feed_1_y,feed_1_x+default_feed->GetWidth(),feed_1_y+default_feed->GetHeight()) )
+       {
+         mouse_x=x;
+         mouse_y=y;
+
+         if ( event.LeftIsDown()==1 )
+           {
+             unsigned int checkWidth=40 , checkHeight=40;
+             unsigned int sX=x-feed_1_x,sY=y-feed_1_y;
+
+             float centerX , centerY , centerZ;
+             unsigned int width , height , channels , bitsperpixel;
+             acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+             segmentGetDepthBlobAverage(acquisitionGetDepthFrame(moduleID,devID),width,height,
+                                        sX,sY,checkWidth,checkHeight,
+                                        &centerX,&centerY,&centerZ);
+
+             fprintf(stderr,"getDepthBlobAverage starting @ %u,%u dims %u,%u\n",sX,sY,checkWidth,checkHeight);
+
+             float mouseX , mouseY , mouseZ;
+             transform2DProjectedPointTo3DPoint(&calib, sX , sY , (unsigned short) centerZ , &mouseX , &mouseY , &mouseZ);
+
+             fprintf(stderr,"transform2DProjectedPointTo3DPoint got %f,%f,%f\n", mouseX , mouseY , mouseZ);
+
+             transform3DPointUsingCalibration(&calib ,&mouseX , &mouseY , &mouseZ);
+
+             fprintf(stderr,"transform3DPointUsingCalibration got %f,%f,%f\n", mouseX , mouseY , mouseZ);
+
+             wxString msg;
+
+             if (calib.extrinsicParametersSet) { msg.Printf(wxT("3D Blob Center Using Extrinsic Calibration :  %0.5f   %0.5f   %0.5f "),mouseX,mouseY,mouseZ); } else
+                                               { msg.Printf(wxT("3D Blob Center Using Camera Space :  %0.5f   %0.5f   %0.5f "),mouseX,mouseY,mouseZ); }
+
+             Status->SetStatusText(msg);
+
+
            }
        }
 
@@ -598,7 +641,6 @@ void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
           acquisitionSnapFrames(moduleID,devID);
           refreshSegmentedFrame();
           Refresh(); // <- This draws the window!
-
 }
 
 void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
@@ -622,7 +664,6 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
     combinationMode=segmentationSelector->selectedCombinationMode;
     copyRGBSegmentation(&segConfRGB , &segmentationSelector->selectedRGBConf);
     copyDepthSegmentation(&segConfDepth , &segmentationSelector->selectedDepthConf);
-
 
 
     printDepthSegmentationData("New Depth Configuration",&segConfDepth);
@@ -653,4 +694,9 @@ void EditorFrame::OnButtonCalibrationClick(wxCommandEvent& event)
    }
 
   delete  calibrationSelector;
+}
+
+void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
+{
+  wxMessageBox(wxT("Recording has not yet been implemented in the GUI"),wxT("RGBDAcquisition Editor"));
 }

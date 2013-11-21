@@ -134,7 +134,7 @@ int acquisitionMapDepthToRGB(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 
 /*   ------------------------------------------------------------
-             Acquisition transmission to other machines
+        Acquisition transmission to other machines / and files
      ------------------------------------------------------------ */
 int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,char * target);
 int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID);
