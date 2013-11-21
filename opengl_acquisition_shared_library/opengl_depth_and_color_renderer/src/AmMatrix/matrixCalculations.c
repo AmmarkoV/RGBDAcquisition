@@ -301,12 +301,11 @@ void buildOpenGLProjectionForIntrinsicsStrawlab   (
 */
 
 
-   //OpenGL Projection Matrix ready for loading ( column-major ) , also axis compensated
-   frustum[0] = 2* fx / R_sub_L;      frustum[1] = -2.0*skew/R_sub_L;    frustum[2] = (R_sub_L - 2.0*cx + 2.0*x0)/R_sub_L;            frustum[3] = 0.0f;
-   frustum[4] = 0.0f;                 frustum[5] = 2.0*fy/T_sub_B;       frustum[6] = (-1.0 * T_sub_B - 2.0*cy + 2.0*y0)/T_sub_B ;    frustum[7] = 0.0f;
-   frustum[8] = 0.0f;                 frustum[9] = 0.0f;                 frustum[10]= -1.0 * F_plus_N  /( F_sub_N );                  frustum[11] = -2.0 * F*N/(F_sub_N);
-   frustum[12]= 0.0f;                 frustum[13]= 0.0f;                 frustum[14]= -1.0;                                           frustum[15] = 0.0f;
-   //Matrix already in OpenGL column major format
+   //OpenGL Projection Matrix
+   frustum[0] = 2* fx / R_sub_L;      frustum[1] = -2.0*skew/R_sub_L;    frustum[2] = (R_sub_L - 2.0*cx + 2.0*x0)/R_sub_L;              frustum[3] = 0.0f;
+   frustum[4] = 0.0f;                 frustum[5] = 2.0*fy/T_sub_B;       frustum[6] = ((-1.0 * T_sub_B) + 2.0*cy + 2.0*y0)/T_sub_B ;    frustum[7] = 0.0f;
+   frustum[8] = 0.0f;                 frustum[9] = 0.0f;                 frustum[10]= -1.0 * (F_plus_N/F_sub_N );                       frustum[11] = -2.0 * (F_mul_N/F_sub_N);
+   frustum[12]= 0.0f;                 frustum[13]= 0.0f;                 frustum[14]= -1.0;                                             frustum[15] = 0.0f;
 
    //Convert matrix to OpenGL  Column-major format
    transpose4x4MatrixD(frustum) ;
@@ -378,8 +377,8 @@ void buildOpenGLProjectionForIntrinsics (
                                              double farPlane
                                            )
 {
-   return buildOpenGLProjectionForIntrinsicsMasteringOpenCV( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
-   //return buildOpenGLProjectionForIntrinsicsStrawlab( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
+   //return buildOpenGLProjectionForIntrinsicsMasteringOpenCV( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
+   return buildOpenGLProjectionForIntrinsicsStrawlab( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
    //return buildOpenGLProjectionForIntrinsicsIasonas ( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
    //return buildOpenGLProjectionForIntrinsicsAmmar ( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
 }
