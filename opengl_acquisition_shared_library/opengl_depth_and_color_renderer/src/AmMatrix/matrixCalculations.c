@@ -123,7 +123,45 @@ int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodr
 
 int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit )
 {
-  convertRodriguezAndTranslationTo4x4DMatrix(result4x4,rodriguez,translation , scaleToDepthUnit);
+  double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
+
+  //Our translation vector is ready to be used!
+  fprintf(stderr,"translation %f %f %f\n ",translation[0],translation[1],translation[2]);
+
+  //Our rodriguez vector should be first converted to a 3x3 Rotation matrix
+  convertRodriguezTo3x3((double*) matrix3x3Rotation , rodriguez);
+
+  //Shorthand variables for readable code :P
+  double * m  = result4x4;
+  double * rm = matrix3x3Rotation;
+  double * tm = translation;
+
+
+  //double scaleToDepthUnit = 1000.0; //Convert Unit to milimeters
+  double Tx = tm[0];//*scaleToDepthUnit;
+  double Ty = tm[1];//*scaleToDepthUnit;
+  double Tz = tm[2];//*scaleToDepthUnit;
+
+
+  /*
+      Here what we want to do is generate a 4x4 matrix that does the normal transformation that our
+      rodriguez and translation vector define
+  */
+
+   m[0]=  rm[0];        m[1]= rm[1];        m[2]=  rm[2];       m[3]= Tx;
+   m[4]=  rm[3];        m[5]= rm[4];        m[6]=  rm[5];       m[7]= Ty;
+   m[8]=  rm[6];        m[9]= rm[7];        m[10]= rm[8];       m[11]=Tz;
+   m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
+
+
+   m[0]=  rm[0];        m[1]= rm[3];        m[2]=  rm[6];       m[3]= -1.0 * ( rm[0]*Tx + rm[3]*Ty + rm[6]*Tz );
+   m[4]=  rm[1];        m[5]= rm[4];        m[6]=  rm[7];       m[7]= -1.0 * ( rm[1]*Tx + rm[4]*Ty + rm[7]*Tz );
+   m[8]=  rm[2];        m[9]= rm[5];        m[10]= rm[8];       m[11]=-1.0 * ( rm[2]*Tx + rm[5]*Ty + rm[8]*Tz );
+   m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
+
+
+  print4x4DMatrix("ModelView", result4x4);
+  free4x4Matrix(&matrix3x3Rotation);
   fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
   transpose4x4MatrixD(result4x4);
   return 1;
@@ -149,7 +187,7 @@ void buildOpenGLProjectionForIntrinsicsAmmar   (
                                              double farPlane
                                            )
 {
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsics Image ( %u x %u )\n",imageWidth,imageHeight);
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsics according to old Ammar code Image ( %u x %u )\n",imageWidth,imageHeight);
    fprintf(stderr,"fx %0.2f fy %0.2f , cx %0.2f , cy %0.2f , skew %0.2f \n",fx,fy,cx,cy,skew);
    fprintf(stderr,"Near %0.2f Far %0.2f \n",nearPlane,farPlane);
 
@@ -162,7 +200,7 @@ void buildOpenGLProjectionForIntrinsicsAmmar   (
     // near and far clipping planes, these only matter for the mapping from
     // world-space z-coordinate into the depth coordinate for OpenGL
     double N = nearPlane , F = farPlane;
-    double R_sub_L = R-L , T_sub_B = T-B , F_sub_N = F-N;
+    double R_sub_L = R-L , T_sub_B = T-B , F_sub_N = F-N , F_plus_N = F+N , F_mul_N = F*N;
 
     if  ( (R_sub_L==0) || (R_sub_L-1.0f==0) ||
           (T_sub_B==0) || (T_sub_B-1.0f==0) ||
@@ -175,8 +213,8 @@ void buildOpenGLProjectionForIntrinsicsAmmar   (
    //OpenGL Projection Matrix ready for loading ( column-major ) , also axis compensated
    frustum[0] = -2.0f*fx/R_sub_L;     frustum[1] = 0.0f;                 frustum[2] = 0.0f;                              frustum[3] = 0.0f;
    frustum[4] = 0.0f;                 frustum[5] = 2.0f*fy/T_sub_B;      frustum[6] = 0.0f;                              frustum[7] = 0.0f;
-   frustum[8] = 2.0f*cx/R_sub_L-1.0f; frustum[9] = 2.0f*cy/T_sub_B-1.0f; frustum[10]=-(farPlane+nearPlane)/(F_sub_N);    frustum[11] = -1.0f;
-   frustum[12]= 0.0f;                 frustum[13]= 0.0f;                 frustum[14]=-2.0f*farPlane*nearPlane/(F_sub_N); frustum[15] = 0.0f;
+   frustum[8] = 2.0f*cx/R_sub_L-1.0f; frustum[9] = 2.0f*cy/T_sub_B-1.0f; frustum[10]=-1.0*(F_plus_N/F_sub_N);            frustum[11] = -1.0f;
+   frustum[12]= 0.0f;                 frustum[13]= 0.0f;                 frustum[14]=-2.0f*F_mul_N/(F_sub_N);            frustum[15] = 0.0f;
    //Matrix already in OpenGL column major format
 }
 
@@ -197,7 +235,7 @@ void buildOpenGLProjectionForIntrinsicsIasonas (
                                            )
 {
 
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsics Image ( %u x %u )\n",imageWidth,imageHeight);
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsics according to Iasonas Image ( %u x %u )\n",imageWidth,imageHeight);
    fprintf(stderr,"fx %0.2f fy %0.2f , cx %0.2f , cy %0.2f , skew %0.2f \n",fx,fy,cx,cy,skew);
    fprintf(stderr,"Near %0.2f Far %0.2f \n",nearPlane,farPlane);
 
@@ -213,9 +251,7 @@ void buildOpenGLProjectionForIntrinsicsIasonas (
     double w = (double) imageWidth;
     double h = (double) imageHeight;
 
-    double R_sub_L = R-L;
-    double T_sub_B = T-B;
-    double F_sub_N = F-N;
+    double R_sub_L = R-L , T_sub_B = T-B , F_sub_N = F-N , F_plus_N = F+N , F_mul_N = F*N;
 
     if  (R_sub_L==0) { fprintf(stderr,"R-L is negative (%0.2f-0) \n",R); }
     if  (T_sub_B==0) { fprintf(stderr,"T-B is negative (%0.2f-0) \n",T); }
@@ -230,7 +266,7 @@ void buildOpenGLProjectionForIntrinsicsIasonas (
 
    frustum[0]=2.0 * (fx / w);     frustum[1]=0.0;             frustum[2]=2.0 * ( cx / w );                     frustum[3]=0.0;
    frustum[4]=0.0;                frustum[5]=-2.0 * (fy / h); frustum[6]=1 - ( 2.0 * ( cy / h ));              frustum[7]=0.0;
-   frustum[8]=0.0;                frustum[9]=0.0;             frustum[10]=farPlane / ( farPlane - nearPlane);  frustum[11]=-farPlane * nearPlane / ( farPlane - nearPlane );
+   frustum[8]=0.0;                frustum[9]=0.0;             frustum[10]=farPlane / ( F_sub_N );  frustum[11]=-1.0 * (F_mul_N / F_sub_N);
    frustum[12]=0.0;               frustum[13]=0.0;            frustum[14]=1.0;                                 frustum[15]=0.0;
 
    //Convert matrix to OpenGL  Column-major format
@@ -257,7 +293,7 @@ void buildOpenGLProjectionForIntrinsicsStrawlab   (
    float x0=0.0;
    float y0=0.0;
 
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsics Image ( %u x %u )\n",imageWidth,imageHeight);
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsics according to http://strawlab.org/2011/11/05/augmented-reality-with-OpenGL/ Image ( %u x %u )\n",imageWidth,imageHeight);
    fprintf(stderr,"fx %0.6f fy %0.6f , cx %0.6f , cy %0.6f , skew %0.6f \n",fx,fy,cx,cy,skew);
    fprintf(stderr,"Near %0.6f Far %0.6f \n",nearPlane,farPlane);
    fprintf(stderr,"x0  %0.6f y0 %0.6f \n",x0,y0);
@@ -328,7 +364,7 @@ void buildOpenGLProjectionForIntrinsicsMasteringOpenCV  (
    float x0=0.0;
    float y0=0.0;
 
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsics Image ( %u x %u )\n",imageWidth,imageHeight);
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsics according to Mastering OpenCV Image ( %u x %u )\n",imageWidth,imageHeight);
    fprintf(stderr,"fx %0.6f fy %0.6f , cx %0.6f , cy %0.6f , skew %0.6f \n",fx,fy,cx,cy,skew);
    fprintf(stderr,"Near %0.6f Far %0.6f \n",nearPlane,farPlane);
    fprintf(stderr,"x0  %0.6f y0 %0.6f \n",x0,y0);
