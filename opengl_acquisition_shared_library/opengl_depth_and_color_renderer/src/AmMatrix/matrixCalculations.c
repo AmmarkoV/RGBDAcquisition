@@ -73,7 +73,7 @@ int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y
 }
 
 
-int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit)
+int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit)
 {
   double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
 
@@ -121,7 +121,7 @@ int convertRodriguezAndTranslationTo4x4DMatrix(double * result4x4, double * rodr
 }
 
 
-int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit )
+int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit )
 {
   double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
 
@@ -138,32 +138,25 @@ int convertRodriguezAndTranslationToOpenGL4x4DMatrix(double * result4x4, double 
 
 
   //double scaleToDepthUnit = 1000.0; //Convert Unit to milimeters
-  double Tx = tm[0];//*scaleToDepthUnit;
-  double Ty = tm[1];//*scaleToDepthUnit;
-  double Tz = tm[2];//*scaleToDepthUnit;
-
+  double Tx = tm[0]*scaleToDepthUnit;
+  double Ty = tm[1]*scaleToDepthUnit;
+  double Tz = tm[2]*scaleToDepthUnit;
 
   /*
       Here what we want to do is generate a 4x4 matrix that does the normal transformation that our
       rodriguez and translation vector define
   */
-
-   m[0]=  rm[0];        m[1]= rm[1];        m[2]=  rm[2];       m[3]= Tx;
-   m[4]=  rm[3];        m[5]= rm[4];        m[6]=  rm[5];       m[7]= Ty;
-   m[8]=  rm[6];        m[9]= rm[7];        m[10]= rm[8];       m[11]=Tz;
+   m[0]=  rm[0];        m[1]= rm[1];        m[2]=  rm[2];       m[3]= -Tx;
+   m[4]=  rm[3];        m[5]= rm[4];        m[6]=  rm[5];       m[7]= -Ty;
+   m[8]=  rm[6];        m[9]= rm[7];        m[10]= rm[8];       m[11]=-Tz;
    m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
-
-
-   m[0]=  rm[0];        m[1]= rm[3];        m[2]=  rm[6];       m[3]= -1.0 * ( rm[0]*Tx + rm[3]*Ty + rm[6]*Tz );
-   m[4]=  rm[1];        m[5]= rm[4];        m[6]=  rm[7];       m[7]= -1.0 * ( rm[1]*Tx + rm[4]*Ty + rm[7]*Tz );
-   m[8]=  rm[2];        m[9]= rm[5];        m[10]= rm[8];       m[11]=-1.0 * ( rm[2]*Tx + rm[5]*Ty + rm[8]*Tz );
-   m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
-
 
   print4x4DMatrix("ModelView", result4x4);
-  free4x4Matrix(&matrix3x3Rotation);
+
   fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
   transpose4x4MatrixD(result4x4);
+
+  free4x4Matrix(&matrix3x3Rotation);
   return 1;
 }
 

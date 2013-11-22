@@ -416,7 +416,7 @@ int renderScene()
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
     glLoadMatrixd((const GLdouble*) customModelViewMatrix);
     // We flip our coordinate system so it comes straight
-    //glRotatef(90,-1.0,0,0);
+    glRotatef(90,-1.0,0,0);
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
   {

@@ -23,7 +23,7 @@ const GLfloat defaultShininess[] = { 5.0f };
 
 int drawAxis(float x, float y , float z, float scale)
 {
- glLineWidth(5.0);
+ glLineWidth(6.0);
  glBegin(GL_LINES);
   glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+scale,y,z);
   glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+scale,z);
@@ -161,7 +161,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
   //glEnable(GL_NORMALIZE);
   if (mod->nocull) { glDisable(GL_CULL_FACE); }
-  if (mod->scale!=1.0) { glScalef(mod->scale,mod->scale,mod->scale); }
+  if (mod->scale!=1.0) { glScalef(mod->scale,mod->scale,mod->scale); /*fprintf(stderr,"Scaling model by %0.2f",mod->scale);*/ }
   glTranslatef(x,y,z);
   if ( roll!=0 ) { glRotatef(roll,0.0,0.0,1.0); }
   if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }

@@ -296,7 +296,7 @@ double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibr
  if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
  {
   create4x4IdentityMatrix(m);
-  convertRodriguezAndTranslationTo4x4DMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation , calib->depthUnit );
+  convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation , calib->depthUnit );
  }
 
 
