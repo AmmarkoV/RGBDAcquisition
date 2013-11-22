@@ -407,9 +407,9 @@ void buildOpenGLProjectionForIntrinsics (
                                            )
 {
    //return buildOpenGLProjectionForIntrinsicsMasteringOpenCV( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
-   return buildOpenGLProjectionForIntrinsicsStrawlab( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
+   //return buildOpenGLProjectionForIntrinsicsStrawlab( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
    //return buildOpenGLProjectionForIntrinsicsIasonas ( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
-   //return buildOpenGLProjectionForIntrinsicsAmmar ( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
+   return buildOpenGLProjectionForIntrinsicsAmmar ( frustum, viewport , fx, fy, skew, cx,  cy, imageWidth, imageHeight, nearPlane, farPlane);
 }
 
 
