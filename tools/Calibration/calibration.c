@@ -43,8 +43,8 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
   calib->extrinsicParametersSet=0;
 
 
-  calib->nearPlane=0.1;
-  calib->farPlane=100.0;
+  calib->nearPlane=1.0;
+  calib->farPlane=1000.0;
 
   calib->intrinsic[0]=0.0;  calib->intrinsic[1]=0.0;  calib->intrinsic[2]=0.0;
   calib->intrinsic[3]=0.0;  calib->intrinsic[4]=0.0;  calib->intrinsic[5]=0.0;
