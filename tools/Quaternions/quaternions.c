@@ -25,17 +25,17 @@ void euler2Quaternions(double * quaternions,double * euler,int quaternionConvent
 
   if ( quaternionConvention = qXqYqZqW )
   {
-   /*qX*/ quaternions[0] = sinX2 * cosY2 * cosZ2 - cosX2 * sinY2 * sinZ2;
-   /*qY*/ quaternions[1] = cosX2 * sinY2 * cosZ2 + sinX2 * cosY2 * sinZ2;
-   /*qZ*/ quaternions[2] = cosX2 * cosY2 * cosZ2 - sinX2 * sinY2 * cosZ2;
-   /*qW*/ quaternions[3] = cosX2 * cosY2 * cosZ2 + sinX2 * sinY2 * sinZ2;
+   /*qX*/ quaternions[0] = (sinX2 * cosY2 * cosZ2) - (cosX2 * sinY2 * sinZ2);
+   /*qY*/ quaternions[1] = (cosX2 * sinY2 * cosZ2) + (sinX2 * cosY2 * sinZ2);
+   /*qZ*/ quaternions[2] = (cosX2 * cosY2 * sinZ2) - (sinX2 * sinY2 * cosZ2);
+   /*qW*/ quaternions[3] = (cosX2 * cosY2 * cosZ2) + (sinX2 * sinY2 * sinZ2);
   } else
   if (quaternionConvention = qWqXqYqZ )
   {
-   /*qW*/ quaternions[0] = cosX2 * cosY2 * cosZ2 + sinX2 * sinY2 * sinZ2;
-   /*qX*/ quaternions[1] = sinX2 * cosY2 * cosZ2 - cosX2 * sinY2 * sinZ2;
-   /*qY*/ quaternions[2] = cosX2 * sinY2 * cosZ2 + sinX2 * cosY2 * sinZ2;
-   /*qZ*/ quaternions[3] = cosX2 * cosY2 * cosZ2 - sinX2 * sinY2 * cosZ2;
+   /*qW*/ quaternions[0] = (cosX2 * cosY2 * cosZ2) + (sinX2 * sinY2 * sinZ2);
+   /*qX*/ quaternions[1] = (sinX2 * cosY2 * cosZ2) - (cosX2 * sinY2 * sinZ2);
+   /*qY*/ quaternions[2] = (cosX2 * sinY2 * cosZ2) + (sinX2 * cosY2 * sinZ2);
+   /*qZ*/ quaternions[3] = (cosX2 * cosY2 * sinZ2) - (sinX2 * sinY2 * cosZ2);
   } else
   {
     fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
@@ -77,14 +77,14 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
   double q0q3 = q0*q3 , q1q2 = q1*q2;
 
 
-  double eXDenominator = ( 1.0 - 2 * (q1*q1 + q2*q2) );
+  double eXDenominator = ( 1.0 - 2.0 * (q1*q1 + q2*q2) );
   if (eXDenominator == 0.0 ) { fprintf(stderr,"Gimbal lock detected , cannot convert to euler coordinates\n"); return; }
-  double eYDenominator = ( 1.0 - 2 * ( q2*q2 + q3*q3) );
+  double eYDenominator = ( 1.0 - 2.0 * ( q2*q2 + q3*q3) );
   if (eYDenominator == 0.0 ) { fprintf(stderr,"Gimbal lock detected , cannot convert to euler coordinates\n"); return; }
 
 
-  /*eX*/ euler[0] = atan( (2 *  (q0q1 + q2q3)) / eXDenominator) ;
-  /*eY*/ euler[1] = asin( 2 * (q0q2 - q3q1));
-  /*eZ*/ euler[2] = atan( (2 * (q0q3 + q1q2)) /  eYDenominator );
+  /*eX*/ euler[0] = atan( (2.0 *  (q0q1 + q2q3)) / eXDenominator) ;
+  /*eY*/ euler[1] = asin( 2.0 * (q0q2 - q3q1));
+  /*eZ*/ euler[2] = atan( (2.0 * (q0q3 + q1q2)) /  eYDenominator );
 }
 
