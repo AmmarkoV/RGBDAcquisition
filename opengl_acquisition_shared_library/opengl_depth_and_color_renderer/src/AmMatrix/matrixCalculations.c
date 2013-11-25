@@ -420,7 +420,7 @@ void buildOpenGLProjectionForIntrinsics (
 
 void testMatrices()
 {
-  testGJSolver();
+  //testGJSolver();
   return ;
 
 

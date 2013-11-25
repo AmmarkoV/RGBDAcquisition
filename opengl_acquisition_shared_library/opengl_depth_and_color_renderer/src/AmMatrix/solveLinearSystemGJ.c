@@ -236,8 +236,20 @@ int solveLinearSystemGJ(double * result , double * coefficients , unsigned int v
 
 
 
-int calculateFundamentalMatrix(double * result3x3Matrix , unsigned int pointsNum ,  double * pointsA,  double * pointsB )
+int calculateFundamentalMatrix8Point(double * result3x3Matrix , unsigned int pointsNum ,  double * pointsA,  double * pointsB )
 {
+    if (pointsNum<8) { fprintf(stderr,"calculateFundamentalMatrix8Point requires at least 8 points\n"); return 0; }
+
+    //http://en.wikipedia.org/wiki/Eight-point_algorithm#Step_1:_Formulating_a_homogeneous_linear_equation
+    //
+    //           ( Xa )            ( Xb )                ( e11 e12 e13 )
+    //  pointsA  ( Ya )    pointsB ( Yb )              E ( e21 e22 e23 )
+    //           ( 1  )            ( 1  )                ( e31 e32 e33 )
+    //
+    //So what we do is convert this to a matrix for solving a linear system of 8 equations
+    // Xb*Xa*e11   +   Xb*Ya*e12     +    Xb*e13    +    yB*xA*e21     +    yB*yA*e22    +    yB*e23    +    xA*e31    +    yA*e32    +      1*e33    =   0
+
+
     double * pxA , * pyA , * pxB , * pyB ;
     int elements=10;
 
@@ -250,16 +262,17 @@ int calculateFundamentalMatrix(double * result3x3Matrix , unsigned int pointsNum
       //Shortcut our vars
       pxA = &pointsA[i*2 + 0]; pyA = &pointsA[i*2 + 1];
       pxB = &pointsB[i*2 + 0]; pyB = &pointsB[i*2 + 1];
+      fprintf(stderr,"Pair %u : Point A %u,%u Point B %u,%u \n",i,*pxA,*pyA,*pxB,&pyB);
       //Make the precalculations for each of the elements
-      compiledPoints[i*elements + xBxA] = (*pxB) * (*pxA);
-      compiledPoints[i*elements + xByA] = (*pxB) * (*pyA);
-      compiledPoints[i*elements + xB]   = (*pxB) ;
-      compiledPoints[i*elements + yBxA] = (*pyB) * (*pxA);
-      compiledPoints[i*elements + yByA] = (*pyB) * (*pyA);
-      compiledPoints[i*elements + yB]   = (*pyB);
-      compiledPoints[i*elements + xA]   = (*pxA);
-      compiledPoints[i*elements + yA]   = (*pyA);
-      compiledPoints[i*elements + One]  = 1;
+      compiledPoints[i*elements + xBxA] = (double)  (*pxB) * (*pxA);
+      compiledPoints[i*elements + xByA] = (double)  (*pxB) * (*pyA);
+      compiledPoints[i*elements + xB]   = (double)  (*pxB) ;
+      compiledPoints[i*elements + yBxA] = (double)  (*pyB) * (*pxA);
+      compiledPoints[i*elements + yByA] = (double)  (*pyB) * (*pyA);
+      compiledPoints[i*elements + yB]   = (double)  (*pyB);
+      compiledPoints[i*elements + xA]   = (double)  (*pxA);
+      compiledPoints[i*elements + yA]   = (double)  (*pyA);
+      compiledPoints[i*elements + One]  = 1.0;
       compiledPoints[i*elements + Result] = 0.0;
     }
 
@@ -286,8 +299,6 @@ int calculateFundamentalMatrix(double * result3x3Matrix , unsigned int pointsNum
 
 void testGJSolver()
 {
-  return ;
-
   double * F3x3 = alloc3x3Matrix();    if (F3x3 ==0) { return; }
   double * pointsA = (double *) malloc(sizeof(double) * 2 * 8);
   memset(pointsA , 0 ,sizeof(double) * 2 * 8 );
@@ -297,20 +308,21 @@ void testGJSolver()
 
 //          SOURCE FRAME POINTS                                 TARGET FRAME POINTS
 //---------------------------------------------------------------------------------------------
-  pointsA[0*2+0]=34;    pointsA[0*2+1]=379;  /* | | */  pointsB[0*2+0]=33;    pointsB[0*2+1]=358;
-  pointsA[1*2+0]=178;   pointsA[1*2+1]=379;  /* | | */  pointsB[1*2+0]=84;    pointsB[1*2+1]=374;
-  pointsA[2*2+0]=320;   pointsA[2*2+1]=379;  /* | | */  pointsB[2*2+0]=139;   pointsB[2*2+1]=392;
-  pointsA[3*2+0]=461;   pointsA[3*2+1]=379;  /* | | */  pointsB[3*2+0]=202;   pointsB[3*2+1]=410;
-  pointsA[4*2+0]=605;   pointsA[4*2+1]=379;  /* | | */  pointsB[4*2+0]=271;   pointsB[4*2+1]=432;
-  pointsA[5*2+0]=120;   pointsA[5*2+1]=312;  /* | | */  pointsB[5*2+0]=88;    pointsB[5*2+1]=318;
-  pointsA[6*2+0]=219;   pointsA[6*2+1]=312;  /* | | */  pointsB[6*2+0]=134;   pointsB[6*2+1]=329;
-  pointsA[7*2+0]=319;   pointsA[7*2+1]=312;  /* | | */  pointsB[7*2+0]=184;   pointsB[7*2+1]=342;
+  unsigned int i=0;
+  pointsA[i*2+0]=34;    pointsA[i*2+1]=379;  /* | | */  pointsB[i*2+0]=33;    pointsB[i*2+1]=358; /* | | */ ++i;
+  pointsA[i*2+0]=178;   pointsA[i*2+1]=379;  /* | | */  pointsB[i*2+0]=84;    pointsB[i*2+1]=374; /* | | */ ++i;
+  pointsA[i*2+0]=320;   pointsA[i*2+1]=379;  /* | | */  pointsB[i*2+0]=139;   pointsB[i*2+1]=392; /* | | */ ++i;
+  pointsA[i*2+0]=461;   pointsA[i*2+1]=379;  /* | | */  pointsB[i*2+0]=202;   pointsB[i*2+1]=410; /* | | */ ++i;
+  pointsA[i*2+0]=605;   pointsA[i*2+1]=379;  /* | | */  pointsB[i*2+0]=271;   pointsB[i*2+1]=432; /* | | */ ++i;
+  pointsA[i*2+0]=120;   pointsA[i*2+1]=312;  /* | | */  pointsB[i*2+0]=88;    pointsB[i*2+1]=318; /* | | */ ++i;
+  pointsA[i*2+0]=219;   pointsA[i*2+1]=312;  /* | | */  pointsB[i*2+0]=134;   pointsB[i*2+1]=329; /* | | */ ++i;
+  pointsA[i*2+0]=319;   pointsA[i*2+1]=312;  /* | | */  pointsB[i*2+0]=184;   pointsB[i*2+1]=342; /* | | */ ++i;
 //---------------------------------------------------------------------------------------------
 
 
-  calculateFundamentalMatrix(F3x3 , 8 ,  pointsA,  pointsB );
+  calculateFundamentalMatrix8Point(F3x3 , i /*Number of points*/ ,  pointsA,  pointsB );
 
-  print3x3DMatrix("Calculated matrix", F3x3);
+  print3x3DMatrix("Calculated matrix using 8 points", F3x3);
 
   print3x3DScilabMatrix("M",F3x3);
 
