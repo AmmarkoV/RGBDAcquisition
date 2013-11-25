@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = undistort
+OUT_DEBUG = ./undistort
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = /undistort
+OUT_RELEASE = ./undistort
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/__/Codecs/codecs.o $(OBJDIR_DEBUG)/__/Codecs/jpgExifexternal.o $(OBJDIR_DEBUG)/__/Codecs/jpgExiforient_embed.o $(OBJDIR_DEBUG)/__/Codecs/jpgInput.o $(OBJDIR_DEBUG)/__/Codecs/pngInput.o $(OBJDIR_DEBUG)/__/Codecs/ppmInput.o $(OBJDIR_DEBUG)/main.o
 
@@ -49,6 +49,7 @@ all: debug release
 clean: clean_debug clean_release
 
 before_debug: 
+	test -d . || mkdir -p .
 	test -d $(OBJDIR_DEBUG)/__/Codecs || mkdir -p $(OBJDIR_DEBUG)/__/Codecs
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 
@@ -82,10 +83,12 @@ $(OBJDIR_DEBUG)/main.o: main.c
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
+	rm -rf .
 	rm -rf $(OBJDIR_DEBUG)/__/Codecs
 	rm -rf $(OBJDIR_DEBUG)
 
 before_release: 
+	test -d . || mkdir -p .
 	test -d $(OBJDIR_RELEASE)/__/Codecs || mkdir -p $(OBJDIR_RELEASE)/__/Codecs
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 
@@ -119,6 +122,7 @@ $(OBJDIR_RELEASE)/main.o: main.c
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
+	rm -rf .
 	rm -rf $(OBJDIR_RELEASE)/__/Codecs
 	rm -rf $(OBJDIR_RELEASE)
 

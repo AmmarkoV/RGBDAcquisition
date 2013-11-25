@@ -1,51 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "quaternions.h"
 
-#define PI 3.14159265359
-#define _PIDiv180 (PI/180.0)
-#define _180DivPI (180.0/PI)
-
-enum quatOrder
-{
-  qWqXqYqZ=0,
-  qXqYqZqW
-};
-
-/*
-void euler2Quaternions(double * quaternions,double * euler)
-{
-  double e1 = euler[0];
-  double e2 = euler[1];
-  double e3 = euler[2];
-
-  double top , bottom ;
-
-  //Calculating Quaternion 0
-  quaternions[0] = sqrt(cos(e2*_PIDiv180)*cos(e1*_PIDiv180)+cos(e2*_PIDiv180)*cos(e3*_PIDiv180)-sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e1*_PIDiv180)* cos(e3*_PIDiv180)+1)/2;
-
-
-  //Calculating Quaternion 1
-  top = (cos(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e2*_PIDiv180)*sin(e3*_PIDiv180)+sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*cos(e3*_PIDiv180));
-  bottom = sqrt(cos(e2*_PIDiv180)* cos(e1*_PIDiv180)+cos(e2*_PIDiv180)*cos(e3*_PIDiv180)-sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e1*_PIDiv180)*cos(e3*_PIDiv180)+1);
-  if (bottom == 0.0 ) { fprintf(stderr,"Error , we get a division by zero for quaternion 1\nhttp://en.wikipedia.org/wiki/Gimbal_lock\n"); }
-  quaternions[1] = (top/bottom)/2;
-
-
-  //Calculating Quaternion 2
-  top = (sin(e2*_PIDiv180)*sin(e3*_PIDiv180)-cos(e2*_PIDiv180)*sin(e1*_PIDiv180)*cos(e3*_PIDiv180)-sin(e1*_PIDiv180));
-  bottom = sqrt(cos(e2*_PIDiv180)*cos(e1*_PIDiv180)+ cos(e2*_PIDiv180)*cos(e3*_PIDiv180)-sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e1*_PIDiv180)*cos(e3*_PIDiv180)+1);
-  if (bottom == 0.0 ) { fprintf(stderr,"Error , we get a division by zero for quaternion 2\nhttp://en.wikipedia.org/wiki/Gimbal_lock\n"); }
-  quaternions[2] = (top/bottom)/2;
-
-  //Calculating Quaternion 2
-  top = (sin(e2*_PIDiv180)*cos(e1*_PIDiv180)+sin(e2*_PIDiv180)*cos(e3*_PIDiv180)+cos(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180));
-  bottom = sqrt(cos(e2*_PIDiv180)* cos(e1*_PIDiv180)+cos(e2*_PIDiv180)*cos(e3*_PIDiv180)-sin(e2*_PIDiv180)*sin(e1*_PIDiv180)*sin(e3*_PIDiv180)+cos(e1*_PIDiv180)*cos(e3*_PIDiv180)+1);
-  quaternions[3] = (top/bottom)/2;
-  if (bottom == 0.0 ) { fprintf(stderr,"Error , we get a division by zero for quaternion 2\nhttp://en.wikipedia.org/wiki/Gimbal_lock\n"); }
-
-  return;
-}*/
 
 void euler2Quaternions(double * quaternions,double * euler,int quaternionConvention)
 {
@@ -131,22 +88,3 @@ void quaternions2Euler(double * quaternions,double * euler,int quaternionConvent
   /*eZ*/ euler[2] = atan( (2 * (q0q3 + q1q2)) /  eYDenominator );
 }
 
-
-
-int main(int argc, char *argv[])
-{
-    if (argc<3) { printf("EulerToQuaternions eulerAngleA eulerAngleY eulerAngleZ , you did not provide 3 arguments\n"); return 1; }
-
-    double euler[3];
-    euler[0] = atof(argv[1]);
-    euler[1] = atof(argv[2]);
-    euler[2] = atof(argv[3]);
-
-    double quaternions[4];
-    euler2Quaternions(quaternions,euler,qXqYqZqW);
-
-
-    printf("%f %f %f %f\n",quaternions[0],quaternions[1],quaternions[2],quaternions[3]);
-
-    return 0;
-}
