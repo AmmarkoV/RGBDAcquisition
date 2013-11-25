@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc<3) { printf("EulerToQuaternions eulerAngleA eulerAngleY eulerAngleZ , you did not provide 3 arguments\n"); return 1; }
+    if (argc<3) { printf("EulerToQuaternions eulerAngleX eulerAngleY eulerAngleZ , you did not provide 3 arguments\n"); return 1; }
 
     double euler[3];
     euler[0] = atof(argv[1]);

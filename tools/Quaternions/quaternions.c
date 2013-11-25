@@ -44,7 +44,7 @@ void euler2Quaternions(double * quaternions,double * euler,int quaternionConvent
 
 
 
-void quaternions2Euler(double * quaternions,double * euler,int quaternionConvention)
+void quaternions2Euler(double * euler,double * quaternions,int quaternionConvention)
 {
     double qX,qY,qZ,qW;
     if (quaternionConvention = qWqXqYqZ )

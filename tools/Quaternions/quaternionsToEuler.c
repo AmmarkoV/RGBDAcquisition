@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc<4) { printf("QuaternionsToEuler quatA quatB quatC quatD, you did not provide 4 arguments\n"); return 1; }
+    if (argc<4) { printf("QuaternionsToEuler quatX quatY quatZ quatW, you did not provide 4 arguments\n"); return 1; }
 
     double euler[3]={0};
 
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     quaternions[2] = atof(argv[3]);
     quaternions[3] = atof(argv[4]);
 
-    quaternions2Euler(quaternions,euler,qXqYqZqW);
+    quaternions2Euler(euler,quaternions,qXqYqZqW);
 
 
     printf("%f %f %f\n",euler[0],euler[1],euler[2]);
