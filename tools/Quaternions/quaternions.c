@@ -8,6 +8,7 @@
 void euler2Quaternions(double * quaternions,double * euler,int quaternionConvention)
 {
   //This conversion follows the rule euler X Y Z  to quaternions W X Y Z
+  //Our input is degrees so we convert it to radians for the sin/cos functions
   double eX = (double) (euler[0] * PI) / 180;
   double eY = (double) (euler[1] * PI) / 180;
   double eZ = (double) (euler[2] * PI) / 180;
@@ -94,11 +95,12 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
   /*eY*/ euler[1] = asin( 2.0 * (q0q2 - q3q1));
   /*eZ*/ euler[2] = atan( (2.0 * (q0q3 + q1q2)) /  eYDenominator );
 
+  //Our output is in radians so we convert it to degrees for the user
 
   //Go from radians back to degrees
   euler[0] = (euler[0] * 180) / PI;
-  euler[0] = (euler[0] * 180) / PI;
-  euler[0] = (euler[0] * 180) / PI;
+  euler[1] = (euler[1] * 180) / PI;
+  euler[2] = (euler[2] * 180) / PI;
 
 }
 
