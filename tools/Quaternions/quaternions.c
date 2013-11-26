@@ -3,7 +3,8 @@
 #include <math.h>
 #include "quaternions.h"
 
-#define PI 3.141592653589793
+//#define PI 3.141592653589793 precision anyone ? :P
+#define PI 3.141592653589793238462643383279502884197
 
 void euler2Quaternions(double * quaternions,double * euler,int quaternionConvention)
 {
@@ -55,23 +56,27 @@ void euler2Quaternions(double * quaternions,double * euler,int quaternionConvent
 void quaternions2Euler(double * euler,double * quaternions,int quaternionConvention)
 {
     double qX,qY,qZ,qW;
-    if (quaternionConvention == qWqXqYqZ )
-    {
-      qW = quaternions[0];
-      qX = quaternions[1];
-      qY = quaternions[2];
-      qZ = quaternions[3];
-    } else
-    if (quaternionConvention == qXqYqZqW )
-    {
-      qX = quaternions[0];
-      qY = quaternions[1];
-      qZ = quaternions[2];
-      qW = quaternions[3];
-    }else
-    {
-     fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
-    }
+
+    switch (quaternionConvention)
+     {
+       case qWqXqYqZ  :
+       qW = quaternions[0];
+       qX = quaternions[1];
+       qY = quaternions[2];
+       qZ = quaternions[3];
+       break;
+
+       case qXqYqZqW :
+       qX = quaternions[0];
+       qY = quaternions[1];
+       qZ = quaternions[2];
+       qW = quaternions[3];
+       break;
+
+       default :
+       fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
+       break;
+     }
 
   //http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
   //e1 Roll  - rX: rotation about the X-axis
@@ -80,9 +85,9 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 
   //Shorthand to go according to http://graphics.wikia.com/wiki/Conversion_between_quaternions_and_Euler_angles
   double q0=qW , q1 = qX , q2 = qY , q3 = qZ;
-  double q0q1 = q0*q1 , q2q3 = q2*q3;
-  double q0q2 = q0*q2 , q3q1 = q3*q1;
-  double q0q3 = q0*q3 , q1q2 = q1*q2;
+  double q0q1 = (double) q0*q1 , q2q3 = (double) q2*q3;
+  double q0q2 = (double) q0*q2 , q3q1 = (double) q3*q1;
+  double q0q3 = (double) q0*q3 , q1q2 = (double) q1*q2;
 
 
   double eXDenominator = ( 1.0 - 2.0 * (q1*q1 + q2*q2) );
@@ -94,6 +99,7 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
   /*eX*/ euler[0] = atan( (2.0 *  (q0q1 + q2q3)) / eXDenominator) ;
   /*eY*/ euler[1] = asin( 2.0 * (q0q2 - q3q1));
   /*eZ*/ euler[2] = atan( (2.0 * (q0q3 + q1q2)) /  eYDenominator );
+  //http://upload.wikimedia.org/math/a/2/9/a2925987257bc7469187cfc3c18da853.png
 
   //Our output is in radians so we convert it to degrees for the user
 
