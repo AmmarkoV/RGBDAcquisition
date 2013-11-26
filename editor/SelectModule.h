@@ -15,7 +15,7 @@ class SelectModule: public wxDialog
 
 		SelectModule(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
 		virtual ~SelectModule();
-
+        void ReloadDevicesForSelectedModule();
 
 		unsigned int moduleSelected;
 		unsigned int deviceSelected;
@@ -65,6 +65,8 @@ class SelectModule: public wxDialog
 		//(*Handlers(SelectModule)
 		void OnButtonStartModuleClick(wxCommandEvent& event);
 		void OnButtonCancelClick(wxCommandEvent& event);
+		void OnComboBoxDeviceSelected(wxCommandEvent& event);
+		void OnComboBoxModuleSelected(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

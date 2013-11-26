@@ -39,6 +39,7 @@
 		</Compiler>
 		<Linker>
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="../tools/Filesystem/libFilesystemListing.a" />
 		</Linker>
 		<Unit filename="TemplateAcquisition.cpp" />
 		<Unit filename="TemplateAcquisition.h" />

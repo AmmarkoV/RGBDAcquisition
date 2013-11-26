@@ -44,6 +44,7 @@
 			<Add library="../tools/Timers/libTimers.a" />
 			<Add library="dl" />
 			<Add library="rt" />
+			<Add library="../tools/Filesystem/libFilesystemListing.a" />
 		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />

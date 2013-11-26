@@ -1,5 +1,10 @@
 #include "SelectModule.h"
 
+#include <wx/msgdlg.h>
+#include "../acquisition/Acquisition.h"
+
+#define LIST_MAX_LENGTH 16000
+
 //(*InternalHeaders(SelectModule)
 #include <wx/string.h>
 #include <wx/intl.h>
@@ -54,9 +59,13 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("fps"), wxPoint(264,104), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	ButtonCancel = new wxButton(this, ID_BUTTON2, _("Cancel"), wxPoint(184,152), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	ComboBoxDevice = new wxComboBox(this, ID_COMBOBOX2, wxEmptyString, wxPoint(88,56), wxDefaultSize, 0, 0, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_COMBOBOX2"));
+	ComboBoxDevice->Append(wxEmptyString);
+	ComboBoxDevice->Append(_("Test"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectModule::OnButtonStartModuleClick);
+	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_SELECTED,(wxObjectEventFunction)&SelectModule::OnComboBoxModuleSelected);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectModule::OnButtonCancelClick);
+	Connect(ID_COMBOBOX2,wxEVT_COMMAND_COMBOBOX_SELECTED,(wxObjectEventFunction)&SelectModule::OnComboBoxDeviceSelected);
 	//*)
 
 
@@ -67,6 +76,7 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 
 
   selectionMade=0;
+  ReloadDevicesForSelectedModule();
 }
 
 SelectModule::~SelectModule()
@@ -104,4 +114,41 @@ void SelectModule::OnButtonStartModuleClick(wxCommandEvent& event)
 void SelectModule::OnButtonCancelClick(wxCommandEvent& event)
 {
     Close();
+}
+
+void SelectModule::ReloadDevicesForSelectedModule()
+{
+  unsigned int modID = ComboBoxModule->GetCurrentSelection();
+  if ( !acquisitionIsModuleLinked(modID) )
+  {
+      wxMessageBox(wxT("Could not find this plugin on your installation , see stderr for more information"),wxT("Could not detect module"));
+  } else
+  {
+   unsigned int doLoadUnload = 0;
+
+   if ( !acquisitionPluginIsLoaded(modID) ) { doLoadUnload=1; }
+   if (doLoadUnload) { acquisitionLoadPlugin(modID); }
+
+         char newListOfDevices[LIST_MAX_LENGTH];
+         acquisitionListDevices(modID,0,newListOfDevices,LIST_MAX_LENGTH);
+
+   if (doLoadUnload) { acquisitionUnloadPlugin(modID); }
+  }
+}
+
+void SelectModule::OnComboBoxDeviceSelected(wxCommandEvent& event)
+{
+
+}
+
+void SelectModule::OnComboBoxModuleSelected(wxCommandEvent& event)
+{
+    unsigned int modID = ComboBoxModule->GetCurrentSelection();
+
+    if (modID==NO_ACQUISITION_MODULE)
+    { /*No module selected*/ }
+     else
+    {
+     ReloadDevicesForSelectedModule();
+    }
 }

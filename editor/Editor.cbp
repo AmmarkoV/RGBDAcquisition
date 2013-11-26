@@ -39,6 +39,7 @@
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="./libAcquisition.so" />
 			<Add library="../acquisitionSegment/libacquisitionSegment.a" />
+			<Add library="../tools/Filesystem/libFilesystemListing.a" />
 		</Linker>
 		<Unit filename="EditorApp.cpp" />
 		<Unit filename="EditorApp.h" />

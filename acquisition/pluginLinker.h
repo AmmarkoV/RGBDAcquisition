@@ -26,7 +26,9 @@ struct acquisitionPluginInterface
    int (*mapDepthToRGB) (int);
    int (*mapRGBToDepth) (int);
 
-   int (*createDevice)  (int,char * devName,unsigned int,unsigned int,unsigned int);
+
+   int (*listDevices) (int,char *,unsigned int);
+   int (*createDevice)  (int,char *,unsigned int,unsigned int,unsigned int);
    int (*destroyDevice) (int);
 
 
@@ -83,6 +85,8 @@ char * getPluginStr(int moduleID,int strID);
 int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength);
 
 int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char * moduleLib);
+
+int isPluginLoaded(ModuleIdentifier moduleID);
 
 int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID);
 

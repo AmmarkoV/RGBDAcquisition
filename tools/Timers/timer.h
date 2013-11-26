@@ -2,6 +2,11 @@
 #define TIMER_H_INCLUDED
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 
 enum VisCortTimerList
 {
@@ -29,5 +34,12 @@ void VisCortxMillisecondsSleep(unsigned int milliseconds);
 void VisCortxMicrosecondsSleep(unsigned int microseconds);
 
 unsigned long GetTickCountInternal();
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif // VISCORTEXTIMER_H_INCLUDED

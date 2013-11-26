@@ -15,7 +15,7 @@ INC =
 CFLAGS = -Wall -fexceptions -fPIC
 RESINC = 
 LIBDIR = 
-LIB = ../tools/Calibration/libCalibrationLibrary.a
+LIB = ../tools/Calibration/libCalibrationLibrary.a ../tools/Filesystem/libFilesystemListing.a
 LDFLAGS = 
 
 INC_DEBUG = $(INC)

@@ -3,10 +3,17 @@
 
 #include "TemplateAcquisition.h"
 
+#define USE_DIRECTORY_LISTING 1
 #define BUILD_TEMPLATE 1
 
 #if BUILD_TEMPLATE
 #include "../acquisition/Acquisition.h"
+
+
+    #if USE_DIRECTORY_LISTING
+     #include "../tools/Filesystem/FilesystemListing.h"
+    #endif // USE_DIRECTORY_LISTING
+
 
 #include <string.h>
 #include <math.h>
@@ -327,6 +334,14 @@ int findLastFrame(int devID)
   return 1;
 }
 
+int listTemplateDevices(int devID,char * output, unsigned int maxOutput)
+{
+    #if USE_DIRECTORY_LISTING
+     char where2Search[]="frames/";
+     return listDirectory(where2Search, output, maxOutput);
+    #endif // USE_DIRECTORY_LISTING
+    return 0;
+}
 
 
 int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)

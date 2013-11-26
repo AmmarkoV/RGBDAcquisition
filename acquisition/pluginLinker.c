@@ -153,6 +153,14 @@ int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char 
 }
 
 
+int isPluginLoaded(ModuleIdentifier moduleID)
+{
+  if (!plugins[moduleID].handle)
+       {
+         return 0;
+       }
+   return 1;
+}
 
 int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
 {
@@ -191,6 +199,12 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"map%sRGBToDepth",moduleName);
   plugins[moduleID].mapRGBToDepth = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+
+
+
+  sprintf(functionNameStr,"list%sDevices",moduleName);
+  plugins[moduleID].listDevices = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 

@@ -30,6 +30,7 @@
 			</content>
 			<selection>7</selection>
 			<pos>88,16</pos>
+			<handler function="OnComboBoxModuleSelected" entry="EVT_COMBOBOX" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
 			<label>Device :</label>
@@ -72,8 +73,13 @@
 			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxComboBox" name="ID_COMBOBOX2" variable="ComboBoxDevice" member="yes">
+			<content>
+				<item></item>
+				<item>Test</item>
+			</content>
 			<pos>88,56</pos>
 			<style>wxTE_PROCESS_ENTER</style>
+			<handler function="OnComboBoxDeviceSelected" entry="EVT_COMBOBOX" />
 		</object>
 	</object>
 </wxsmith>

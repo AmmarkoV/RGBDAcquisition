@@ -77,9 +77,15 @@ int acquisitionMayBeVirtualDevice(ModuleIdentifier moduleID,DeviceIdentifier dev
 char * getModuleStringName(ModuleIdentifier moduleID);
 int acquisitionIsModuleLinked(ModuleIdentifier moduleID);
 
+int acquisitionPluginIsLoaded(ModuleIdentifier moduleID);
+int acquisitionLoadPlugin(ModuleIdentifier moduleID);
+int acquisitionUnloadPlugin(ModuleIdentifier moduleID);
+
 int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings);
 int acquisitionStopModule(ModuleIdentifier moduleID);
 int acquisitionGetModuleDevices(ModuleIdentifier moduleID);
+
+int acquisitionListDevices(ModuleIdentifier moduleID,DeviceIdentifier devID,char * output, unsigned int maxOutput);
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
 int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID);
 

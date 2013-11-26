@@ -6,7 +6,10 @@
 WRKDIR = `pwd`
 MAKE = make
 
-all: quaternions_quaternionstoeuler quaternions_eulertoquaternions depthimagesconverter_depthimagesconverter calibration_calibration extrinsiccalibration_extrinsiccalibration undistort_undistort calibration_calibrationlibrary timers_timers
+all: filesystem_filesystemlisting quaternions_quaternionstoeuler quaternions_eulertoquaternions depthimagesconverter_depthimagesconverter calibration_calibration undistort_undistort extrinsiccalibration_extrinsiccalibration calibration_calibrationlibrary timers_timers
+
+filesystem_filesystemlisting: 
+	$(MAKE) -C Filesystem all -f FilesystemListing.cbp.mak
 
 quaternions_quaternionstoeuler: 
 	$(MAKE) -C Quaternions all -f QuaternionsToEuler.cbp.mak
@@ -20,11 +23,11 @@ depthimagesconverter_depthimagesconverter:
 calibration_calibration: 
 	$(MAKE) -C Calibration all -f Calibration.cbp.mak
 
-extrinsiccalibration_extrinsiccalibration: 
-	$(MAKE) -C ExtrinsicCalibration all -f ExtrinsicCalibration.cbp.mak
-
 undistort_undistort: 
 	$(MAKE) -C Undistort all -f Undistort.cbp.mak
+
+extrinsiccalibration_extrinsiccalibration: 
+	$(MAKE) -C ExtrinsicCalibration all -f ExtrinsicCalibration.cbp.mak
 
 calibration_calibrationlibrary: 
 	$(MAKE) -C Calibration all -f CalibrationLibrary.cbp.mak
@@ -32,7 +35,10 @@ calibration_calibrationlibrary:
 timers_timers: 
 	$(MAKE) -C Timers all -f Timers.cbp.mak
 
-clean: clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary clean_timers_timers
+clean: clean_filesystem_filesystemlisting clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
+
+clean_filesystem_filesystemlisting: 
+	$(MAKE) -C Filesystem clean -f FilesystemListing.cbp.mak
 
 clean_quaternions_quaternionstoeuler: 
 	$(MAKE) -C Quaternions clean -f QuaternionsToEuler.cbp.mak
@@ -46,11 +52,11 @@ clean_depthimagesconverter_depthimagesconverter:
 clean_calibration_calibration: 
 	$(MAKE) -C Calibration clean -f Calibration.cbp.mak
 
-clean_extrinsiccalibration_extrinsiccalibration: 
-	$(MAKE) -C ExtrinsicCalibration clean -f ExtrinsicCalibration.cbp.mak
-
 clean_undistort_undistort: 
 	$(MAKE) -C Undistort clean -f Undistort.cbp.mak
+
+clean_extrinsiccalibration_extrinsiccalibration: 
+	$(MAKE) -C ExtrinsicCalibration clean -f ExtrinsicCalibration.cbp.mak
 
 clean_calibration_calibrationlibrary: 
 	$(MAKE) -C Calibration clean -f CalibrationLibrary.cbp.mak
@@ -58,5 +64,5 @@ clean_calibration_calibrationlibrary:
 clean_timers_timers: 
 	$(MAKE) -C Timers clean -f Timers.cbp.mak
 
-.PHONY: clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_extrinsiccalibration_extrinsiccalibration clean_undistort_undistort clean_calibration_calibrationlibrary clean_timers_timers
+.PHONY: clean_filesystem_filesystemlisting clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
 

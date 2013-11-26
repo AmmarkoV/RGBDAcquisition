@@ -24,6 +24,7 @@ extern "C"
    int stopTemplateModule();
 
    //Basic Per Device Operations
+   int listTemplateDevices(int devID,char * output, unsigned int maxOutput);
    int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyTemplateDevice(int devID);
 

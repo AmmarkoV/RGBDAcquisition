@@ -493,16 +493,31 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
 /*! ------------------------------------------
     BASIC START STOP MECHANISMS FOR MODULES..
    ------------------------------------------*/
+
+
+int acquisitionPluginIsLoaded(ModuleIdentifier moduleID)
+{
+ return isPluginLoaded(moduleID);
+}
+
+int acquisitionLoadPlugin(ModuleIdentifier moduleID)
+{
+  return   linkToPlugin(getPluginStr(moduleID,PLUGIN_NAME_STR),
+                       getPluginStr(moduleID,PLUGIN_PATH_STR),
+                       getPluginStr(moduleID,PLUGIN_LIBNAME_STR),
+                       moduleID);
+}
+
+int acquisitionUnloadPlugin(ModuleIdentifier moduleID)
+{
+  return  unlinkPlugin(moduleID);
+}
+
 int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings)
 {
   if (moduleID < NUMBER_OF_POSSIBLE_MODULES)
   {
-    if (
-         !linkToPlugin(getPluginStr(moduleID,PLUGIN_NAME_STR),
-                       getPluginStr(moduleID,PLUGIN_PATH_STR),
-                       getPluginStr(moduleID,PLUGIN_LIBNAME_STR),
-                       moduleID)
-        )
+    if (!acquisitionLoadPlugin(moduleID))
         { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
 
     if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
@@ -516,7 +531,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
 int acquisitionStopModule(ModuleIdentifier moduleID)
 {
     if (*plugins[moduleID].stopModule!=0) { return (*plugins[moduleID].stopModule) (); }
-    unlinkPlugin(moduleID);
+    acquisitionUnloadPlugin(moduleID);
 
     MeaningfullWarningMessage(moduleID,0,"acquisitionStopModule");
     return 0;
@@ -547,6 +562,17 @@ int acquisitionMayBeVirtualDevice(ModuleIdentifier moduleID,DeviceIdentifier dev
 /*! ------------------------------------------
     FRAME SNAPPING MECHANISMS FOR MODULES..
    ------------------------------------------*/
+
+
+int acquisitionListDevices(ModuleIdentifier moduleID,DeviceIdentifier devID,char * output, unsigned int maxOutput)
+{
+    printCall(moduleID,devID,"acquisitionListDevices", __FILE__, __LINE__);
+    if (plugins[moduleID].listDevices!=0) { return (*plugins[moduleID].listDevices) (devID,output,maxOutput); }
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionListDevices");
+    return 0;
+}
+
+
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     printCall(moduleID,devID,"acquisitionOpenDevice", __FILE__, __LINE__);

@@ -12,14 +12,14 @@ LD = g++
 WINDRES = windres
 
 INC = 
-CFLAGS = -Wall
+CFLAGS = -fPIC
 RESINC = 
 LIBDIR = 
-LIB = -lGL -lGLU -lX11 ../acquisition/libAcquisition.so ../acquisition_mux/libAcquisitionMux.so ../acquisitionSegment/libacquisitionSegment.a ../tools/Calibration/libCalibrationLibrary.a ../tools/Timers/libTimers.a -ldl -lrt ../tools/Filesystem/libFilesystemListing.a
+LIB = 
 LDFLAGS = 
 
 INC_DEBUG = $(INC)
-CFLAGS_DEBUG = $(CFLAGS) -g
+CFLAGS_DEBUG = $(CFLAGS) -Wall -g
 RESINC_DEBUG = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
 LIBDIR_DEBUG = $(LIBDIR)
@@ -27,10 +27,10 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = ./GrabberSegment
+OUT_DEBUG = ./libFilesystemListing.a
 
 INC_RELEASE = $(INC)
-CFLAGS_RELEASE = $(CFLAGS) -O2
+CFLAGS_RELEASE = $(CFLAGS) -Wall -O2
 RESINC_RELEASE = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
 LIBDIR_RELEASE = $(LIBDIR)
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = ./GrabberSegment
+OUT_RELEASE = ./libFilesystemListing.a
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o
 
@@ -57,7 +57,7 @@ after_debug:
 debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
-	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
+	$(AR) rcs $(OUT_DEBUG) $(OBJ_DEBUG)
 
 $(OBJDIR_DEBUG)/main.o: main.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.c -o $(OBJDIR_DEBUG)/main.o
@@ -76,7 +76,7 @@ after_release:
 release: before_release out_release after_release
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
-	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
+	$(AR) rcs $(OUT_RELEASE) $(OBJ_RELEASE)
 
 $(OBJDIR_RELEASE)/main.o: main.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.c -o $(OBJDIR_RELEASE)/main.o

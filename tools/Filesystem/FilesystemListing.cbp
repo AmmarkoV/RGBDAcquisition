@@ -2,26 +2,31 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="acquisitionBroadcast" />
+		<Option title="FilesystemListing" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="./acquisitionBroadcast" prefix_auto="0" extension_auto="1" />
+				<Option output="./libFilesystemListing" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
-				<Option type="1" />
+				<Option type="2" />
 				<Option compiler="gcc" />
+				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="./acquisitionBroadcast" prefix_auto="0" extension_auto="1" />
+				<Option output="./libFilesystemListing" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Release/" />
-				<Option type="1" />
+				<Option type="2" />
 				<Option compiler="gcc" />
-				<Option parameters="-module TEMPLATE -from test" />
+				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>
@@ -30,22 +35,9 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
-		<Linker>
-			<Add option="-pthread" />
-			<Add library="GL" />
-			<Add library="GLU" />
-			<Add library="X11" />
-			<Add library="../acquisition/libAcquisition.so" />
-			<Add library="AmmarServer/src/AmmServerlib/libAmmServerlib.a" />
-			<Add library="rt" />
-			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
-			<Add library="dl" />
-			<Add library="../tools/Timers/libTimers.a" />
-			<Add library="../tools/Filesystem/libFilesystemListing.a" />
-		</Linker>
+		<Unit filename="FilesystemListing.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
