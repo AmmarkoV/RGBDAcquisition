@@ -7,6 +7,10 @@ cd tools
 cbp2make -in Tools.workspace -unix -out makefile
 cd ..
 
+cd tests
+cbp2make -in Tests.workspace -unix -out makefile
+cd ..
+
 
 if [ -d synergiesAdapter ]
 then
@@ -21,11 +25,8 @@ cd editor
 cbp2make -in Editor.cbp -unix -out makefile
 cd ..
 
+ 
 
-
-cd editor
-cbp2make -in Editor.cbp -unix -out makefile
-cd ..
 
 
 

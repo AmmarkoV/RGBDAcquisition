@@ -6,6 +6,12 @@ extern "C"
 {
 #endif
 
+enum MuxTypeEnum
+{
+   REGULAR_MUXING = 0,
+   UNKNOWN_MUXING
+};
+
 
 struct AcquisitionMuxContext
 {

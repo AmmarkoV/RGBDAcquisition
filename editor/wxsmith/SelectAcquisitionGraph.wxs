@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="SelectAcquisitionGraph">
+		<size>933,627</size>
+		<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+			<pos>40,264</pos>
+			<size>224,144</size>
+			<object class="wxComboBox" name="ID_COMBOBOX1" variable="ComboBox1" member="yes">
+				<content>
+					<item>NONE</item>
+					<item>V4L2</item>
+					<item>V4L2 STEREO</item>
+					<item>FREENECT</item>
+					<item>OPENNI1</item>
+					<item>OPENNI2</item>
+					<item>OPENGL</item>
+					<item>TEMPLATE</item>
+					<item>NETWORK</item>
+				</content>
+				<pos>16,24</pos>
+				<size>192,25</size>
+			</object>
+		</object>
+	</object>
+</wxsmith>
