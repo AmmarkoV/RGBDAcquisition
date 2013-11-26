@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>
@@ -9,6 +11,13 @@
 int listDirectory(char * directory , char * output, unsigned int maxOutput)
 {
   DIR *dh = opendir(directory); // directory handle
+
+  if (dh==0)
+     {
+        fprintf(stderr,"Could not list directory %s\n",directory);
+        return 0;
+     }
+
   struct dirent *file; // a 'directory entity' AKA file
   struct stat info; // info about the file.
 
@@ -28,5 +37,5 @@ int listDirectory(char * directory , char * output, unsigned int maxOutput)
    }
   closedir(dh);
 
-  return 0;
+  return 1;
 }

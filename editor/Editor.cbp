@@ -37,9 +37,9 @@
 		<Linker>
 			<Add option="`wx-config --libs`" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="../tools/OperatingSystem/libOperatingSystem.a" />
 			<Add library="./libAcquisition.so" />
 			<Add library="../acquisitionSegment/libacquisitionSegment.a" />
-			<Add library="../tools/Filesystem/libFilesystemListing.a" />
 		</Linker>
 		<Unit filename="EditorApp.cpp" />
 		<Unit filename="EditorApp.h" />

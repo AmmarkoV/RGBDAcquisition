@@ -136,7 +136,8 @@ void SelectModule::ReloadDevicesForSelectedModule()
          // appropriate wxConv... parameter to the constructor
          wxString wxStrDeviceList(newListOfDevices, wxConvUTF8);
          ComboBoxDevice->Clear();
-         ComboBoxDevice->AppendString(wxStrDeviceList);
+         fprintf(stderr,"TODO : add an iterator to Append Devices line by line..!");
+          //ComboBoxDevice->AppendString(wxStrDeviceList);
 
    if (doLoadUnload) { acquisitionUnloadPlugin(modID); }
   }
