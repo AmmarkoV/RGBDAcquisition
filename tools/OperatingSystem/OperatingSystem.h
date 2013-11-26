@@ -1,5 +1,5 @@
-#ifndef FILESYSTEMLISTING_H_INCLUDED
-#define FILESYSTEMLISTING_H_INCLUDED
+#ifndef OPERATINGSYSTEM_H_INCLUDED
+#define OPERATINGSYSTEM_H_INCLUDED
 
 
 
@@ -19,4 +19,4 @@ int listDirectory(char * directory , char * output, unsigned int maxOutput);
 #endif
 
 
-#endif // FILESYSTEMLISTING_H_INCLUDED
+#endif // OPERATINGSYSTEMG_H_INCLUDED

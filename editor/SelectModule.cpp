@@ -129,8 +129,14 @@ void SelectModule::ReloadDevicesForSelectedModule()
    if ( !acquisitionPluginIsLoaded(modID) ) { doLoadUnload=1; }
    if (doLoadUnload) { acquisitionLoadPlugin(modID); }
 
-         char newListOfDevices[LIST_MAX_LENGTH];
+         char newListOfDevices[LIST_MAX_LENGTH]={0};
          acquisitionListDevices(modID,0,newListOfDevices,LIST_MAX_LENGTH);
+
+         // You can also convert from many encodings by passing the
+         // appropriate wxConv... parameter to the constructor
+         wxString wxStrDeviceList(newListOfDevices, wxConvUTF8);
+         ComboBoxDevice->Clear();
+         ComboBoxDevice->AppendString(wxStrDeviceList);
 
    if (doLoadUnload) { acquisitionUnloadPlugin(modID); }
   }

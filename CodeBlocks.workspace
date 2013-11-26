@@ -2,7 +2,7 @@
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
 		<Project filename="tools/Timers/Timers.cbp" />
-		<Project filename="tools/Filesystem/FilesystemListing.cbp" />
+		<Project filename="tools/OperatingSystem/OperatingSystem.cbp" />
 		<Project filename="tools/Calibration/CalibrationLibrary.cbp" />
 		<Project filename="acquisition/Acquisition.cbp" />
 		<Project filename="acquisition_mux/AcquisitionMux.cbp" />

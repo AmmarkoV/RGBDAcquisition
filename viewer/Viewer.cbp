@@ -43,7 +43,7 @@
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="../tools/Timers/libTimers.a" />
 			<Add library="dl" />
-			<Add library="../tools/Filesystem/libFilesystemListing.a" />
+			<Add library="../tools/OperatingSystem/libOperatingSystem.a" />
 		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />

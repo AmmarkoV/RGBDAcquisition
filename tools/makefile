@@ -6,10 +6,10 @@
 WRKDIR = `pwd`
 MAKE = make
 
-all: filesystem_filesystemlisting quaternions_quaternionstoeuler quaternions_eulertoquaternions depthimagesconverter_depthimagesconverter calibration_calibration undistort_undistort extrinsiccalibration_extrinsiccalibration calibration_calibrationlibrary timers_timers
+all: operatingsystem_operatingsystem quaternions_quaternionstoeuler quaternions_eulertoquaternions depthimagesconverter_depthimagesconverter calibration_calibration undistort_undistort extrinsiccalibration_extrinsiccalibration calibration_calibrationlibrary timers_timers
 
-filesystem_filesystemlisting: 
-	$(MAKE) -C Filesystem all -f FilesystemListing.cbp.mak
+operatingsystem_operatingsystem: 
+	$(MAKE) -C OperatingSystem all -f OperatingSystem.cbp.mak
 
 quaternions_quaternionstoeuler: 
 	$(MAKE) -C Quaternions all -f QuaternionsToEuler.cbp.mak
@@ -35,10 +35,10 @@ calibration_calibrationlibrary:
 timers_timers: 
 	$(MAKE) -C Timers all -f Timers.cbp.mak
 
-clean: clean_filesystem_filesystemlisting clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
+clean: clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
 
-clean_filesystem_filesystemlisting: 
-	$(MAKE) -C Filesystem clean -f FilesystemListing.cbp.mak
+clean_operatingsystem_operatingsystem: 
+	$(MAKE) -C OperatingSystem clean -f OperatingSystem.cbp.mak
 
 clean_quaternions_quaternionstoeuler: 
 	$(MAKE) -C Quaternions clean -f QuaternionsToEuler.cbp.mak
@@ -64,5 +64,5 @@ clean_calibration_calibrationlibrary:
 clean_timers_timers: 
 	$(MAKE) -C Timers clean -f Timers.cbp.mak
 
-.PHONY: clean_filesystem_filesystemlisting clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
+.PHONY: clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
 

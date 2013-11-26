@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = ./libFilesystemListing.a
+OUT_DEBUG = ./libOperatingSystem.a
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -Wall -O2
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = ./libFilesystemListing.a
+OUT_RELEASE = ./libOperatingSystem.a
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o
 
