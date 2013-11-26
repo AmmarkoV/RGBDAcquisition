@@ -1,12 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <math.h>
+#include <locale.h>
+
 #include "quaternions.h"
 
+int forceUSLocaleToKeepOurSanity()
+{
+   setlocale(LC_ALL, "en_US.UTF-8");
+   setlocale(LC_NUMERIC, "en_US.UTF-8");
+   return 1;
+}
 
 int main(int argc, char *argv[])
 {
+    forceUSLocaleToKeepOurSanity();
     if (argc<4) { printf("QuaternionsToEuler quatX quatY quatZ quatW, you did not provide 4 arguments\n"); return 1; }
 
     double euler[3]={0};

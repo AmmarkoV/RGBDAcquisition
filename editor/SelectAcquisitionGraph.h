@@ -5,6 +5,7 @@
 #include <wx/combobox.h>
 #include <wx/dialog.h>
 #include <wx/panel.h>
+#include <wx/stattext.h>
 //*)
 
 class SelectAcquisitionGraph: public wxDialog
@@ -16,6 +17,7 @@ class SelectAcquisitionGraph: public wxDialog
 
 		//(*Declarations(SelectAcquisitionGraph)
 		wxPanel* Panel1;
+		wxStaticText* StaticText1;
 		wxComboBox* ComboBox1;
 		//*)
 
@@ -23,6 +25,7 @@ class SelectAcquisitionGraph: public wxDialog
 
 		//(*Identifiers(SelectAcquisitionGraph)
 		static const long ID_COMBOBOX1;
+		static const long ID_STATICTEXT1;
 		static const long ID_PANEL1;
 		//*)
 

@@ -53,6 +53,7 @@ class EditorFrame: public wxFrame
         void OnButtonSegmentationClick(wxCommandEvent& event);
         void OnButtonCalibrationClick(wxCommandEvent& event);
         void OnbuttonRecordClick(wxCommandEvent& event);
+        void OnButtonAcquisitionGraphClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -70,6 +71,7 @@ class EditorFrame: public wxFrame
         static const long ID_BUTTON5;
         static const long ID_BUTTON6;
         static const long ID_BUTTON7;
+        static const long ID_BUTTON8;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEDEPTH;
         static const long ID_MENUSAVEPCD;
@@ -96,6 +98,7 @@ class EditorFrame: public wxFrame
         wxMenu* Menu4;
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;
+        wxButton* ButtonAcquisitionGraph;
         wxMenuItem* MenuItem5;
         wxTimer Timer;
         wxButton* ButtonCalibration;

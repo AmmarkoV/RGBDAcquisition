@@ -46,6 +46,8 @@
 		<Unit filename="EditorMain.h" />
 		<Unit filename="FeedScreenMemory.cpp" />
 		<Unit filename="FeedScreenMemory.h" />
+		<Unit filename="SelectAcquisitionGraph.cpp" />
+		<Unit filename="SelectAcquisitionGraph.h" />
 		<Unit filename="SelectCalibration.cpp" />
 		<Unit filename="SelectCalibration.h" />
 		<Unit filename="SelectModule.cpp" />
@@ -53,6 +55,7 @@
 		<Unit filename="SelectSegmentation.cpp" />
 		<Unit filename="SelectSegmentation.h" />
 		<Unit filename="wxsmith/Editorframe.wxs" />
+		<Unit filename="wxsmith/SelectAcquisitionGraph.wxs" />
 		<Unit filename="wxsmith/SelectCalibration.wxs" />
 		<Unit filename="wxsmith/SelectModule.wxs" />
 		<Unit filename="wxsmith/SelectSegmentation.wxs" />
@@ -66,6 +69,7 @@
 					<wxDialog wxs="wxsmith/SelectSegmentation.wxs" src="SelectSegmentation.cpp" hdr="SelectSegmentation.h" fwddecl="0" i18n="1" name="SelectSegmentation" language="CPP" />
 					<wxDialog wxs="wxsmith/SelectModule.wxs" src="SelectModule.cpp" hdr="SelectModule.h" fwddecl="0" i18n="1" name="SelectModule" language="CPP" />
 					<wxDialog wxs="wxsmith/SelectCalibration.wxs" src="SelectCalibration.cpp" hdr="SelectCalibration.h" fwddecl="0" i18n="1" name="SelectCalibration" language="CPP" />
+					<wxDialog wxs="wxsmith/SelectAcquisitionGraph.wxs" src="SelectAcquisitionGraph.cpp" hdr="SelectAcquisitionGraph.h" fwddecl="0" i18n="1" name="SelectAcquisitionGraph" language="CPP" />
 				</resources>
 			</wxsmith>
 			<debugger />

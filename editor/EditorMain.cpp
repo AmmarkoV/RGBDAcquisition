@@ -14,6 +14,7 @@
 #include "../acquisitionSegment/AcquisitionSegment.h"
 #include "../acquisition/Acquisition.h"
 #include "SelectCalibration.h"
+#include "SelectAcquisitionGraph.h"
 #include "SelectModule.h"
 #include "SelectSegmentation.h"
 
@@ -104,6 +105,7 @@ const long EditorFrame::ID_STATICTEXT3 = wxNewId();
 const long EditorFrame::ID_BUTTON5 = wxNewId();
 const long EditorFrame::ID_BUTTON6 = wxNewId();
 const long EditorFrame::ID_BUTTON7 = wxNewId();
+const long EditorFrame::ID_BUTTON8 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
 const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
@@ -146,8 +148,9 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(672,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(688,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(1192,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
-    ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(1104,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+    ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(952,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     buttonRecord = new wxButton(this, ID_BUTTON7, _("Record"), wxPoint(368,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
+    ButtonAcquisitionGraph = new wxButton(this, ID_BUTTON8, _("Stream Connections"), wxPoint(1040,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -187,6 +190,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonCalibrationClick);
     Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonRecordClick);
+    Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonAcquisitionGraphClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -699,4 +703,13 @@ void EditorFrame::OnButtonCalibrationClick(wxCommandEvent& event)
 void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
 {
   wxMessageBox(wxT("Recording has not yet been implemented in the GUI"),wxT("RGBDAcquisition Editor"));
+}
+
+void EditorFrame::OnButtonAcquisitionGraphClick(wxCommandEvent& event)
+{
+   SelectAcquisitionGraph  * inputConnector = new SelectAcquisitionGraph(this, wxID_ANY);
+
+    inputConnector->ShowModal();
+
+  delete  inputConnector;
 }

@@ -3,7 +3,7 @@
 	<object class="wxDialog" name="SelectAcquisitionGraph">
 		<size>933,627</size>
 		<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-			<pos>40,264</pos>
+			<pos>40,88</pos>
 			<size>224,144</size>
 			<object class="wxComboBox" name="ID_COMBOBOX1" variable="ComboBox1" member="yes">
 				<content>
@@ -17,8 +17,12 @@
 					<item>TEMPLATE</item>
 					<item>NETWORK</item>
 				</content>
-				<pos>16,24</pos>
+				<pos>16,48</pos>
 				<size>192,25</size>
+			</object>
+			<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+				<label>StreamLabel</label>
+				<pos>16,16</pos>
 			</object>
 		</object>
 	</object>

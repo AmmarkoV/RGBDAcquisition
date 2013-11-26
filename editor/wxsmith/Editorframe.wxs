@@ -66,13 +66,18 @@
 		</object>
 		<object class="wxButton" name="ID_BUTTON6" variable="ButtonCalibration" member="yes">
 			<label>Calibration</label>
-			<pos>1104,520</pos>
+			<pos>952,520</pos>
 			<handler function="OnButtonCalibrationClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON7" variable="buttonRecord" member="yes">
 			<label>Record</label>
 			<pos>368,524</pos>
 			<handler function="OnbuttonRecordClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON8" variable="ButtonAcquisitionGraph" member="yes">
+			<label>Stream Connections</label>
+			<pos>1040,520</pos>
+			<handler function="OnButtonAcquisitionGraphClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">
