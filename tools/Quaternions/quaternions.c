@@ -6,6 +6,10 @@
 //#define PI 3.141592653589793 precision anyone ? :P
 #define PI 3.141592653589793238462643383279502884197
 
+#define USEATAN2 1
+  /* arctan and arcsin have a result between −π/2 and π/2. With three rotations between −π/2 and π/2 you can't have all possible orientations.
+     We need to replace the arctan by atan2 to generate all the orientations. */
+
 void euler2Quaternions(double * quaternions,double * euler,int quaternionConvention)
 {
   //This conversion follows the rule euler X Y Z  to quaternions W X Y Z
@@ -96,10 +100,21 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
   if (eYDenominator == 0.0 ) { fprintf(stderr,"Gimbal lock detected , cannot convert to euler coordinates\n"); return; }
 
 
+  #if USEATAN2
+  /* arctan and arcsin have a result between −π/2 and π/2. With three rotations between −π/2 and π/2 you can't have all possible orientations.
+     We need to replace the arctan by atan2 to generate all the orientations. */
+  /*eX*/ euler[0] = atan2( (2.0 *  (q0q1 + q2q3)) , eXDenominator ) ;
+  /*eY*/ euler[1] = asin( 2.0 * (q0q2 - q3q1));
+  /*eZ*/ euler[2] = atan2( (2.0 * (q0q3 + q1q2)) ,  eYDenominator );
+  #else
+  #warning "Please note that the compiled output does not generate all possible orientations"
+  #warning "See : http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles"
+  #warning "You are strongly suggested to #define USEATAN2 1 in quaternions.c "
   /*eX*/ euler[0] = atan( (2.0 *  (q0q1 + q2q3)) / eXDenominator) ;
   /*eY*/ euler[1] = asin( 2.0 * (q0q2 - q3q1));
   /*eZ*/ euler[2] = atan( (2.0 * (q0q3 + q1q2)) /  eYDenominator );
-  //http://upload.wikimedia.org/math/a/2/9/a2925987257bc7469187cfc3c18da853.png
+  #endif // USEATAN2
+
 
   //Our output is in radians so we convert it to degrees for the user
 
