@@ -2,8 +2,10 @@
 
 #include <wx/msgdlg.h>
 #include "../acquisition/Acquisition.h"
+#include "../tools/OperatingSystem/OperatingSystem.h"
 
-#define LIST_MAX_LENGTH 16000
+#define LIST_MAX_LENGTH 32000
+#define LISTITEM_MAX_LENGTH 4096
 
 //(*InternalHeaders(SelectModule)
 #include <wx/string.h>
@@ -130,14 +132,38 @@ void SelectModule::ReloadDevicesForSelectedModule()
    if (doLoadUnload) { acquisitionLoadPlugin(modID); }
 
          char newListOfDevices[LIST_MAX_LENGTH]={0};
+         char * deviceItem = (char *) malloc(LISTITEM_MAX_LENGTH * sizeof(char));
          acquisitionListDevices(modID,0,newListOfDevices,LIST_MAX_LENGTH);
+
+           fprintf(stderr,"List Devices %s\n",newListOfDevices);
 
          // You can also convert from many encodings by passing the
          // appropriate wxConv... parameter to the constructor
-         wxString wxStrDeviceList(newListOfDevices, wxConvUTF8);
          ComboBoxDevice->Clear();
-         fprintf(stderr,"TODO : add an iterator to Append Devices line by line..!");
-          //ComboBoxDevice->AppendString(wxStrDeviceList);
+
+
+         int i=0;
+         while ( i < 100)
+          {
+           fprintf(stderr,"%u\n",i);
+           if ( copyDirectoryListItem( i , newListOfDevices , deviceItem , LISTITEM_MAX_LENGTH ) )
+           {
+               fprintf(stderr,"%u - %s \n",i,deviceItem);
+
+               wxString wxStrDeviceList(deviceItem, wxConvUTF8);
+               ComboBoxDevice->AppendString(wxStrDeviceList);
+           } else
+           {
+               fprintf(stderr,"A total of %u items\n",i);
+               break;
+           }
+
+            ++i;
+          }
+
+          free(deviceItem);
+         //fprintf(stderr,"TODO : add an iterator to Append Devices line by line..!");
+          //
 
    if (doLoadUnload) { acquisitionUnloadPlugin(modID); }
   }

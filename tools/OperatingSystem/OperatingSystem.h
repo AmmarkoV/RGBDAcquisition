@@ -8,7 +8,7 @@ extern "C"
 {
 #endif
 
-
+int copyDirectoryListItem(int itemNum , char * directoryList , char * output, unsigned int maxOutput);
 int listDirectory(char * directory , char * output, unsigned int maxOutput);
 
 
