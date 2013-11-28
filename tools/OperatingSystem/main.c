@@ -9,6 +9,8 @@
 
 #include "OperatingSystem.h"
 
+#define MAX_SYSTEM_PATH 4096
+
 
 int copyDirectoryListItem(int itemNum , char * directoryList , char * output, unsigned int maxOutput)
 {
@@ -70,9 +72,11 @@ int listDirectory(char * directory , char * output, unsigned int maxOutput)
         return 0;
      }
 
+  char * fullPathToFilename = (char*) malloc ( (MAX_SYSTEM_PATH+1) * sizeof(char) );
   struct dirent *file; // a 'directory entity' AKA file
   struct stat info; // info about the file.
 
+  //clear output string
   output[0]=0;
   int addedItems = 0;
 
@@ -85,18 +89,30 @@ int listDirectory(char * directory , char * output, unsigned int maxOutput)
     }    else
     {
      //Regular Folder
-     stat(file->d_name, &info);
-     if (S_ISDIR(info.st_mode ))
-         {
-          if (addedItems!=0) { strcat(output,","); }
-          strcat(output,file->d_name);
-          ++addedItems;
-         }
+     if (strlen(directory)+strlen(file->d_name)+3 < MAX_SYSTEM_PATH )
+     {
+      //Our Accomodation for the full string is enough
+      sprintf(fullPathToFilename,"%s/%s",directory,file->d_name);
+
+      if ( stat(fullPathToFilename, &info) == 0 ) /*SUCCESS*/
+      {
+       if ( (S_ISDIR(info.st_mode)) && (!S_ISREG(info.st_mode)) )
+          {
+           if (addedItems!=0) { strcat(output,","); }
+           strcat(output,file->d_name);
+           ++addedItems;
+          }
+      } else
+      {
+       fprintf(stderr,"Error stating %s\n",file->d_name);
+      }
+     }
     }
-    //printf("note: info.st_mode => %i\n", info.st_mode);
-    //if (S_ISREG(info.st_mode)) printf("REGULAR FILE FOUND! %s\n", file->d_name);
+
    }
+
   closedir(dh);
+  free(fullPathToFilename);
 
   return 1;
 }
