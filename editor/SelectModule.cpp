@@ -145,10 +145,10 @@ void SelectModule::ReloadDevicesForSelectedModule()
          int i=0;
          while ( i < 100)
           {
-           fprintf(stderr,"%u\n",i);
+           //fprintf(stderr,"%u\n",i);
            if ( copyDirectoryListItem( i , newListOfDevices , deviceItem , LISTITEM_MAX_LENGTH ) )
            {
-               fprintf(stderr,"%u - %s \n",i,deviceItem);
+               //fprintf(stderr,"%u - %s \n",i,deviceItem);
 
                wxString wxStrDeviceList(deviceItem, wxConvUTF8);
                ComboBoxDevice->AppendString(wxStrDeviceList);
@@ -162,8 +162,6 @@ void SelectModule::ReloadDevicesForSelectedModule()
           }
 
           free(deviceItem);
-         //fprintf(stderr,"TODO : add an iterator to Append Devices line by line..!");
-          //
 
    if (doLoadUnload) { acquisitionUnloadPlugin(modID); }
   }

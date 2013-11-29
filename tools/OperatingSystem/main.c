@@ -78,7 +78,9 @@ int listDirectory(char * directory , char * output, unsigned int maxOutput)
 
   //clear output string
   output[0]=0;
-  int addedItems = 0;
+  unsigned int addedChars = 0;
+  unsigned int addedItems = 0;
+  unsigned int charsToBeAdded=0;
 
   fprintf(stderr,"Completely unsafe , no bounds check listDirectory call done now\n");
   while (file = readdir(dh))
@@ -98,21 +100,27 @@ int listDirectory(char * directory , char * output, unsigned int maxOutput)
       {
        if ( (S_ISDIR(info.st_mode)) && (!S_ISREG(info.st_mode)) )
           {
-           if (addedItems!=0) { strcat(output,","); }
-           strcat(output,file->d_name);
-           ++addedItems;
+           charsToBeAdded = strlen(file->d_name)+1;
+
+           if (addedChars+charsToBeAdded<maxOutput)
+           {
+            if (addedItems!=0) { strcat(output,","); }
+            strcat(output,file->d_name);
+            ++addedItems;
+            addedChars+=charsToBeAdded;
+           }
+
           }
       } else
-      {
-       fprintf(stderr,"Error stating %s\n",file->d_name);
-      }
+      { fprintf(stderr,"Error stating %s\n",file->d_name); }
      }
     }
-
    }
 
   closedir(dh);
   free(fullPathToFilename);
+
+  fprintf(stderr,"listDirectory filled %u+1 chars of %u availiable\n",addedChars,maxOutput);
 
   return 1;
 }

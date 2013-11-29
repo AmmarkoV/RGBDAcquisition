@@ -243,7 +243,6 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
 
 int SelectSegmentation::saveSegmentationValuesFromForm()
 {
-   float fValue;
    double dValue;
    long value;
 
