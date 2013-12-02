@@ -26,12 +26,15 @@ int copyDirectoryListItem(int itemNum , char * directoryList , char * output, un
 
   while ( i < directoryListLength )
   {
-     if (directoryList[i]==',')
+     if ( (directoryList[i]==',') || (i+1 == directoryListLength) )
      {
        lastPathEnd=i;
+       //If we finished the string there is an extra character!
+       if (i+1 == directoryListLength) { ++lastPathEnd; }
+
        if (itemNum == pathsEncountered)
        {
-           fprintf(stderr,"strncpy( from %u to %u ) \n",lastPathStart,lastPathEnd);
+           //fprintf(stderr,"strncpy( from %u to %u ) \n",lastPathStart,lastPathEnd);
            if (lastPathEnd<=lastPathStart)
             {
              fprintf(stderr,"Cannot Copy wrong bounds \n");

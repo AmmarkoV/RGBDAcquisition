@@ -3,6 +3,8 @@
 
 #include "OpenNI1Acquisition.h"
 
+#define BUILD_OPENNI1 1
+
 #if BUILD_OPENNI1
 
 #include <XnOS.h>
@@ -247,7 +249,7 @@ if (imageGeneratorsMetaData[devID].PixelFormat() != XN_PIXEL_FORMAT_RGB24)
     return 0;
   }
 
-
+ //fprintf(stderr,"We seem to have correctly initialized OpenNI1 %u , %s \n",devID,devName);
  return 1;
 }
 

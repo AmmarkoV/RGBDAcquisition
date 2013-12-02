@@ -983,7 +983,11 @@ int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier de
 
     transform2DProjectedPointTo3DPoint(&calib , x2d , y2d  , depthValue , x , y , z);
 
-    return transform3DPointUsingCalibration(&calib , x , y , z);
+    if (calib.extrinsicParametersSet)
+    {
+      return transform3DPointUsingCalibration(&calib , x , y , z);
+    }
+    return 1;
 }
 
 int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID ,

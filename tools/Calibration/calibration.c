@@ -329,7 +329,9 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
  double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
 
  if (m==0)
- { fprintf(stderr,"Could not allocate4x4MatrixForPointTransformationBasedOnCalibration\n");   } else
+ { fprintf(stderr,"Could not allocate4x4MatrixForPointTransformationBasedOnCalibration\n");
+
+ } else
  {
 
   transform3DPointUsingExisting4x4Matrix(m ,x,y,z);

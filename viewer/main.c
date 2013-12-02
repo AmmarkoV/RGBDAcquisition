@@ -55,36 +55,53 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
     unsigned int width , height , channels , bitsperpixel;
 
+
     //DRAW RGB FRAME -------------------------------------------------------------------------------------
-    acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-    IplImage  *imageRGB = cvCreateImage( cvSize(width , height), IPL_DEPTH_8U ,channels);
-    if (imageRGB==0) { fprintf(stderr,"Could not create a new RGB OpenCV Image\n");  return 0; }
-    char * opencv_color_pointer_retainer = imageRGB->imageData; // UGLY HACK
-    imageRGB->imageData = (char *) acquisitionGetColorFrame(moduleID,devID);
-    if ( (bitsperpixel==8) && (channels==3) ) { cvCvtColor( imageRGB, imageRGB, CV_RGB2BGR); }
-    cvShowImage("RGBDAcquisition RGB ",imageRGB);
-    imageRGB->imageData = opencv_color_pointer_retainer; // UGLY HACK
-    cvReleaseImage( &imageRGB );
+    if ( acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) )
+    {
+     IplImage  *imageRGB = cvCreateImage( cvSize(width , height), IPL_DEPTH_8U ,channels);
+     IplImage  *imageViewableBGR = cvCreateImage( cvSize(width , height), IPL_DEPTH_8U ,channels);
+     if (imageRGB==0) { fprintf(stderr,"Could not create a new RGB OpenCV Image\n");  return 0; }
+     char * opencv_color_pointer_retainer = imageRGB->imageData; // UGLY HACK
+     imageRGB->imageData = (char *) acquisitionGetColorFrame(moduleID,devID);
+     if (imageRGB->imageData != 0)
+      {
+       //We convert RGB -> BGR @ imageViewableBFR so that we wont access original memory ,and OpenCV can happily display the correct colors etc
+       if ( (bitsperpixel==8) && (channels==3) ) { cvCvtColor(imageRGB , imageViewableBGR , CV_RGB2BGR); }
+       cvShowImage("RGBDAcquisition RGB ",imageViewableBGR);
+      } else
+      {
+       fprintf(stderr,"Will not view RGB Frame , it is empty \n");
+      }
+     imageRGB->imageData = opencv_color_pointer_retainer; // UGLY HACK
+     cvReleaseImage( &imageRGB );
+     cvReleaseImage( &imageViewableBGR );
+    }
 
 
     //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
-    acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-    IplImage  *imageDepth = cvCreateImage( cvSize(width , height), IPL_DEPTH_16U ,channels);
-    if (imageDepth==0) { fprintf(stderr,"Could not create a new Depth OpenCV Image\n");  return 0; }
-    char *opencv_depth_pointer_retainer = imageDepth->imageData; // UGLY HACK
-    imageDepth->imageData = (char *) acquisitionGetDepthFrame(moduleID,devID);
+    if ( acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) )
+    {
+     IplImage  *imageDepth = cvCreateImage( cvSize(width , height), IPL_DEPTH_16U ,channels);
+     if (imageDepth==0) { fprintf(stderr,"Could not create a new Depth OpenCV Image\n");  return 0; }
+     char *opencv_depth_pointer_retainer = imageDepth->imageData; // UGLY HACK
+     imageDepth->imageData = (char *) acquisitionGetDepthFrame(moduleID,devID);
 
+     if (imageDepth->imageData != 0)
+      {
+       IplImage *rdepth8  = cvCreateImage(cvSize(width , height), IPL_DEPTH_8U, 1);
+       cvConvertScaleAbs(imageDepth, rdepth8, 255.0/2048,0);
+       cvShowImage("RGBDAcquisition Depth", rdepth8);
+       cvReleaseImage( &rdepth8 );
+      } else
+      {
+       fprintf(stderr,"Will not view Depth Frame , it is empty \n");
+      }
 
-    IplImage *rdepth8  = cvCreateImage(cvSize(width , height), IPL_DEPTH_8U, 1);
-    cvConvertScaleAbs(imageDepth, rdepth8, 255.0/2048,0);
-    cvShowImage("RGBDAcquisition Depth", rdepth8);
-    cvReleaseImage( &rdepth8 );
-
-    //cvShowImage("RGBDAcquisition Depth RAW",imageDepth);
-    imageDepth->imageData = opencv_depth_pointer_retainer; // UGLY HACK
-    cvReleaseImage( &imageDepth );
-
-
+     //cvShowImage("RGBDAcquisition Depth RAW",imageDepth);
+     imageDepth->imageData = opencv_depth_pointer_retainer; // UGLY HACK
+     cvReleaseImage( &imageDepth );
+    }
 
   return 1;
 }
@@ -189,7 +206,7 @@ int main(int argc, char *argv[])
 
         //acquisitionMapDepthToRGB(moduleID,devID);
         //acquisitionMapRGBToDepth(moduleID,devID);
-
+        fprintf(stderr,"Done with Mapping Depth/RGB \n");
 
     char outfilename[512]={0};
 
