@@ -124,7 +124,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then
-     sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  
+     sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  libudev-dev
      git clone git://github.com/OpenNI/OpenNI2.git
      cd OpenNI2
      make 
