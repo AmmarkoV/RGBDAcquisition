@@ -75,7 +75,11 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
   //char listOfFiles[4096];
 
 
-
+ moduleSelected=TEMPLATE_ACQUISITION_MODULE;
+ deviceSelected=0;
+ widthSelected=640;
+ heightSelected=480;
+ fpsSelected=60;
 
   selectionMade=0;
   ReloadDevicesForSelectedModule();

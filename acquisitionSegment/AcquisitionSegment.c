@@ -34,6 +34,18 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
                                    int combinationMode
                                )
 {
+   if (RGB==0)
+   {
+       fprintf(stderr,"segmentRGBAndDepthFrame called with a  null RGB frame \n");
+       return 0;
+   }
+   if (Depth==0)
+   {
+       fprintf(stderr,"segmentRGBAndDepthFrame called with a  null Depth frame \n");
+       return 0;
+   }
+
+
   //We have some criteria for segmentation at segConfRGB , and segConfDepth
   //First of all we want to use them and the original frames (RGB,Depth) , and select ( on an abstract array )
   //the areas we want and the areas we don't want ..

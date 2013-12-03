@@ -41,6 +41,7 @@ void memcpy_1bit_2_3bit(unsigned char * dest,unsigned char * src,unsigned int le
 
 void passVideoRegisterToFeed(unsigned int feednum,void * framedata,unsigned int width , unsigned int height , unsigned int bitsperpixel , unsigned int channels)
 {
+  if (framedata == 0 ) { fprintf(stderr,"Cannot passVideoRegisterToFeed for feed %u with null framedata\n",feednum); return; }
   if ( live_feeds[feednum].bmp == 0 ) {  return;  } else
   if ( live_feeds[feednum].bmp_allocated ) { delete live_feeds[feednum].bmp; live_feeds[feednum].bmp_allocated = false; live_feeds[feednum].bmp=0;}
 

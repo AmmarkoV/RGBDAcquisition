@@ -29,6 +29,12 @@ class EditorFrame: public wxFrame
         EditorFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~EditorFrame();
 
+        void guiSnapFrames();
+        int  removeOldSegmentedFrames();
+        int  refreshSegmentedFrame();
+
+        unsigned char * rgbFrame=0;
+        unsigned short * depthFrame=0;
 
         int feed_0_x,feed_0_y,feed_1_x,feed_1_y,feed_2_x,feed_2_y,feed_3_x,feed_3_y;
         int mouse_x,mouse_y;

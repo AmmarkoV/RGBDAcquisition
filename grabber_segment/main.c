@@ -26,16 +26,28 @@ int makepath(char * path)
 
 unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
 {
+  if ( (source==0)  || (width==0) || (height==0) )
+    {
+      fprintf(stderr,"copyRGB called with zero arguments\n");
+      return 0;
+    }
+
   unsigned char * output = (unsigned char*) malloc(width*height*3*sizeof(unsigned char));
-  if (output==0) { return 0; }
+  if (output==0) { fprintf(stderr,"copyRGB could not allocate memory for output\n"); return 0; }
   memcpy(output , source , width*height*3*sizeof(unsigned char));
   return output;
 }
 
 unsigned short * copyDepth(unsigned short * source , unsigned int width , unsigned int height)
 {
+  if ( (source==0)  || (width==0) || (height==0) )
+    {
+      fprintf(stderr,"copyDepth called with zero arguments\n");
+      return 0;
+    }
+
   unsigned short * output = (unsigned short*) malloc(width*height*sizeof(unsigned short));
-  if (output==0) { return 0; }
+  if (output==0) { fprintf(stderr,"copyDepth could not allocate memory for output\n"); return 0; }
   memcpy(output , source , width*height*sizeof(unsigned short));
   return output;
 }
