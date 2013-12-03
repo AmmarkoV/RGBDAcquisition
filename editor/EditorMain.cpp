@@ -612,7 +612,7 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
          acquisitionPassFramesToTarget(moduleID,devID,recordedFrames);
          ++recordedFrames;
 
-         if (recordedFrames % 10 == 0 ) { Refresh(); /*Throttle window refreshes when recording*/}
+         if (recordedFrames % 5 == 0 ) { Refresh(); /*Throttle window refreshes when recording*/}
      } else
      {
        Refresh(); // <- This draws the window!

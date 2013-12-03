@@ -28,6 +28,7 @@
 			<pos>24,104</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrlTargetPath" member="yes">
+			<value>frames/YourDatasetName</value>
 			<pos>24,120</pos>
 			<size>288,27</size>
 		</object>

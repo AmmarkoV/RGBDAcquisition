@@ -36,7 +36,7 @@ SelectTarget::SelectTarget(wxWindow* parent,wxWindowID id)
 	ComboBoxTarget->Append(_("No Output , dry run"));
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Please select the output for your recording"), wxPoint(24,40), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	LabelForTargetPath = new wxStaticText(this, ID_STATICTEXT2, _("Target Path"), wxPoint(24,104), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	TextCtrlTargetPath = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxPoint(24,120), wxSize(288,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	TextCtrlTargetPath = new wxTextCtrl(this, ID_TEXTCTRL1, _("frames/YourDatasetName"), wxPoint(24,120), wxSize(288,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	ButtonRecord = new wxButton(this, ID_BUTTON1, _("Record"), wxPoint(24,152), wxSize(192,29), 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	ButtonCancel = new wxButton(this, ID_BUTTON2, _("Cancel"), wxPoint(228,152), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 
