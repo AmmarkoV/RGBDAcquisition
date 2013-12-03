@@ -16,6 +16,7 @@
 #include "SelectCalibration.h"
 #include "SelectAcquisitionGraph.h"
 #include "SelectModule.h"
+#include "SelectTarget.h"
 #include "SelectSegmentation.h"
 
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
@@ -702,7 +703,10 @@ void EditorFrame::OnButtonCalibrationClick(wxCommandEvent& event)
 
 void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
 {
-  wxMessageBox(wxT("Recording has not yet been implemented in the GUI"),wxT("RGBDAcquisition Editor"));
+  SelectTarget * targetSelector = new SelectTarget(this, wxID_ANY);
+  targetSelector->ShowModal();
+      //if ( targetSelector->userLikesTheNewCalibration )
+  delete  targetSelector;
 }
 
 void EditorFrame::OnButtonAcquisitionGraphClick(wxCommandEvent& event)

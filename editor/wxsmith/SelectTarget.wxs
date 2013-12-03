@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="SelectTarget">
+		<title>Target Selection for REcording</title>
+		<size>339,212</size>
+		<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
+			<label>Target Selection</label>
+			<pos>16,16</pos>
+			<size>312,184</size>
+		</object>
+		<object class="wxComboBox" name="ID_COMBOBOX1" variable="ComboBoxTarget" member="yes">
+			<content>
+				<item>Save to Files</item>
+				<item>Stream to Network</item>
+				<item>No Output , dry run</item>
+			</content>
+			<selection>0</selection>
+			<pos>24,64</pos>
+			<size>288,29</size>
+			<handler function="OnComboBoxTargetSelected" entry="EVT_COMBOBOX" />
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+			<label>Please select the output for your recording</label>
+			<pos>24,40</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT2" variable="LabelForTargetPath" member="yes">
+			<label>Target Path</label>
+			<pos>24,104</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrlTargetPath" member="yes">
+			<pos>24,120</pos>
+			<size>288,27</size>
+		</object>
+		<object class="wxButton" name="ID_BUTTON1" variable="ButtonRecord" member="yes">
+			<label>Record</label>
+			<pos>24,152</pos>
+			<size>192,29</size>
+			<handler function="OnButtonRecordClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON2" variable="ButtonCancel" member="yes">
+			<label>Cancel</label>
+			<pos>228,152</pos>
+			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
+		</object>
+	</object>
+</wxsmith>
