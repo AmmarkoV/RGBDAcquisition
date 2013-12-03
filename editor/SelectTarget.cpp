@@ -62,6 +62,13 @@ void SelectTarget::OnComboBoxTargetSelected(wxCommandEvent& event)
      case 0 :
              TextCtrlTargetPath->Enable();
              LabelForTargetPath->SetLabel(wxT("Folder name for file output"));
+
+
+             if (TextCtrlTargetPath->GetValue().IsEmpty())
+             {
+               TextCtrlTargetPath->SetValue(wxT("frames/YourDatasetName"));
+             }
+
              break;
      case 1 :
              TextCtrlTargetPath->Enable();
