@@ -1,5 +1,6 @@
 #include "SelectTarget.h"
 
+#include "../acquisition/Acquisition.h"
 
 #include <wx/msgdlg.h>
 
@@ -43,6 +44,8 @@ SelectTarget::SelectTarget(wxWindow* parent,wxWindowID id)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectTarget::OnButtonRecordClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectTarget::OnButtonCancelClick);
 	//*)
+
+	recording=0;
 }
 
 SelectTarget::~SelectTarget()
@@ -54,11 +57,51 @@ SelectTarget::~SelectTarget()
 
 void SelectTarget::OnComboBoxTargetSelected(wxCommandEvent& event)
 {
+    switch ( ComboBoxTarget->GetSelection() )
+    {
+     case 0 :
+             TextCtrlTargetPath->Enable();
+             LabelForTargetPath->SetLabel(wxT("Folder name for file output"));
+             break;
+     case 1 :
+             TextCtrlTargetPath->Enable();
+             LabelForTargetPath->SetLabel(wxT("IP:PORT for the stream ( 0.0.0.0:8080 ) "));
+
+             if (TextCtrlTargetPath->GetValue().IsEmpty())
+             {
+               TextCtrlTargetPath->SetValue(wxT("0.0.0.0:8080"));
+             }
+             break;
+     default :
+             LabelForTargetPath->SetLabel(wxT("Dry Run!"));
+             TextCtrlTargetPath->Disable();
+             TextCtrlTargetPath->Clear();
+             break;
+    };
 }
 
 void SelectTarget::OnButtonRecordClick(wxCommandEvent& event)
 {
-  wxMessageBox(wxT("Recording has not yet been implemented in the GUI"),wxT("RGBDAcquisition Editor"));
+  char targetPath[1024];
+  wxString target = TextCtrlTargetPath->GetValue();
+  strcpy( targetPath , target.mb_str() );
+
+    switch ( ComboBoxTarget->GetSelection() )
+    {
+     case 0 :
+               acquisitionInitiateTargetForFrames(moduleID,devID,targetPath);
+             break;
+     case 1 :
+               acquisitionInitiateTargetForFrames(moduleID,devID,targetPath);
+             break;
+     default :
+               acquisitionInitiateTargetForFrames(moduleID,devID,"/dev/null");
+             break;
+    };
+
+    recording=1;
+
+    Close();
 }
 
 void SelectTarget::OnButtonCancelClick(wxCommandEvent& event)

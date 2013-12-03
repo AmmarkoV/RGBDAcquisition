@@ -204,6 +204,10 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_MENUOPENMODULE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnOpenModule);
     Connect(ID_MENUSEGMENTATION,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
 
+
+    recording=0;
+    recordedFrames=0;
+
     initFeeds();
 
 
@@ -428,12 +432,25 @@ void EditorFrame::OnPaint(wxPaintEvent& event)
    currentFrame.clear();
    currentFrame<<acquisitionGetTotalFrameNumber(moduleID,devID);
    totalFramesLabel->SetLabel(currentFrame);
+
+
+
   }
+
 
   dc.DrawBitmap(*live_feeds[0].bmp,feed_0_x,feed_0_y,0); //FEED 1
   dc.DrawBitmap(*live_feeds[1].bmp,feed_1_x,feed_1_y,0); //FEED 2
     //dc.DrawBitmap(*live_feeds[2].bmp,feed_2_x,feed_2_y,0); //FEED 3
     //dc.DrawBitmap(*live_feeds[3].bmp,feed_3_x,feed_3_y,0); //FEED 4
+
+
+   if (recording)
+   {
+     wxPen red(wxColour(255,0,0),1,wxSOLID);
+     dc.SetPen(red);
+     dc.SetBrush(*wxRED_BRUSH); //*wxTRANSPARENT_BRUSH
+     dc.DrawCircle(50,50,10); //Recording Mark ON!
+   }
 
   wxSleep(0.01);
 
@@ -589,7 +606,17 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
     {
      acquisitionSnapFrames(moduleID,devID);
      refreshSegmentedFrame();
-     Refresh(); // <- This draws the window!
+
+     if (recording)
+     {
+         acquisitionPassFramesToTarget(moduleID,devID,recordedFrames);
+         ++recordedFrames;
+
+         if (recordedFrames % 10 == 0 ) { Refresh(); /*Throttle window refreshes when recording*/}
+     } else
+     {
+       Refresh(); // <- This draws the window!
+     }
     }
 }
 
@@ -703,9 +730,25 @@ void EditorFrame::OnButtonCalibrationClick(wxCommandEvent& event)
 
 void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
 {
+  if (recording)
+  {
+      recording=0;
+      acquisitionStopTargetForFrames(moduleID,devID);
+      return;
+  }
   SelectTarget * targetSelector = new SelectTarget(this, wxID_ANY);
+
+  targetSelector->moduleID = moduleID;
+  targetSelector->devID = devID;
+
   targetSelector->ShowModal();
-      //if ( targetSelector->userLikesTheNewCalibration )
+  if ( targetSelector->recording ) {
+                                     recordedFrames=0;
+                                     recording=1;
+                                     play=1;
+                                   }
+
+
   delete  targetSelector;
 }
 

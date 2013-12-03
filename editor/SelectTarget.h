@@ -17,6 +17,10 @@ class SelectTarget: public wxDialog
 		SelectTarget(wxWindow* parent,wxWindowID id=wxID_ANY);
 		virtual ~SelectTarget();
 
+		unsigned int moduleID;
+		unsigned int devID;
+		unsigned int recording;
+
 		//(*Declarations(SelectTarget)
 		wxTextCtrl* TextCtrlTargetPath;
 		wxStaticText* StaticText1;

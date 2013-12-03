@@ -1160,10 +1160,65 @@ int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier de
 }
 
 
+
 int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber)
 {
   //fprintf(stderr,"acquisitionPassFramesToTarget not fully implemented yet! Module %u , Device %u = %s \n",moduleID,devID, module[moduleID].device[devID].outputString);
 
+  if (module[moduleID].device[devID].dryRunOutput)
+  {
+    fprintf(stderr,"Grabber Running on Dry Run mode , ,grabbing frames and doing nothing\n");
+    //Lets access the frames like we want to use them but not use them..
+
+    StartTimer(FRAME_PASS_TO_TARGET_DELAY);
+    unsigned int width, height , channels , bitsperpixel;
+    acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    acquisitionGetColorFrame(moduleID,devID);
+
+    acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    acquisitionGetDepthFrame(moduleID,devID);
+    //Done doing nothing with our input..!
+    EndTimer(FRAME_PASS_TO_TARGET_DELAY);
+  } else
+  if (module[moduleID].device[devID].fileOutput)
+  {
+   StartTimer(FRAME_PASS_TO_TARGET_DELAY);
+   char outfilename[2048]={0};
+   sprintf(outfilename,"%s/colorFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
+   acquisitionSaveColorFrame(moduleID,devID,outfilename);
+
+   sprintf(outfilename,"%s/depthFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
+   acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+   EndTimer(FRAME_PASS_TO_TARGET_DELAY);
+
+  } else
+  if (module[moduleID].device[devID].networkOutput)
+  {
+    StartTimer(FRAME_PASS_TO_TARGET_DELAY);
+
+    unsigned int width, height , channels , bitsperpixel;
+    acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    pushImageToRemoteNetwork(module[moduleID].device[devID].frameServerID , 0 , (void*) acquisitionGetColorFrame(moduleID,devID) , width , height , channels , bitsperpixel);
+
+    acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+    pushImageToRemoteNetwork(module[moduleID].device[devID].frameServerID , 1 , (void*) acquisitionGetDepthFrame(moduleID,devID) , width , height , channels , bitsperpixel);
+
+    EndTimer(FRAME_PASS_TO_TARGET_DELAY);
+  } else
+  {
+    fprintf(stderr,RED "acquisitionPassFramesToTarget cannot find a method to use for module %u , device %u , has acquisitionInitiateTargetForFrames been called?\n" NORMAL , moduleID , devID );
+    return 0;
+  }
+
+  return 1;
+}
+
+
+
+
+int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber)
+{
+  //fprintf(stderr,"acquisitionPassFramesToTarget not fully implemented yet! Module %u , Device %u = %s \n",moduleID,devID, module[moduleID].device[devID].outputString);
 
   if (module[moduleID].device[devID].dryRunOutput)
   {

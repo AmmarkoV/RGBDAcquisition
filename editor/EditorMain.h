@@ -33,6 +33,8 @@ class EditorFrame: public wxFrame
         int feed_0_x,feed_0_y,feed_1_x,feed_1_y,feed_2_x,feed_2_y,feed_3_x,feed_3_y;
         int mouse_x,mouse_y;
         int add_new_track_point;
+        int recording;
+        int recordedFrames;
 
     private:
 
