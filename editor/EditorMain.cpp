@@ -208,6 +208,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     recording=0;
     recordedFrames=0;
 
+    framesDrawn=0;
+
     initFeeds();
 
 
@@ -321,6 +323,10 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
      // return 1;
    }
 
+
+    Timer.Start(1000/fps, false);
+
+
    if ( ! acquisitionOpenDevice(moduleID,devID,openDevice,width,height,fps) )
    {
        wxMessageBox(wxT("Error while Opening device"),wxT("RGBDAcquisition Editor"));
@@ -378,9 +384,22 @@ void EditorFrame::OnAbout(wxCommandEvent& event)
     acquisitionSavePCDPointCoud(moduleID,devID,"frame.pcd");
  }
 
-void EditorFrame::OnPaint(wxPaintEvent& event)
+
+void EditorFrame::OnPaint(wxPaintEvent& evt)
 {
-  wxPaintDC dc(this); // OnPaint events should always create a wxPaintDC
+    wxPaintDC dc(this);
+    render(dc);
+}
+
+void EditorFrame::paintNow()
+{
+    wxClientDC dc(this);
+    render(dc);
+}
+
+void EditorFrame::render(wxDC& dc)
+{
+  //wxPaintDC dc(this); // OnPaint events should always create a wxPaintDC
 
   unsigned int devID=0;
   unsigned int width , height , channels , bitsperpixel;
@@ -440,8 +459,6 @@ void EditorFrame::OnPaint(wxPaintEvent& event)
 
   dc.DrawBitmap(*live_feeds[0].bmp,feed_0_x,feed_0_y,0); //FEED 1
   dc.DrawBitmap(*live_feeds[1].bmp,feed_1_x,feed_1_y,0); //FEED 2
-    //dc.DrawBitmap(*live_feeds[2].bmp,feed_2_x,feed_2_y,0); //FEED 3
-    //dc.DrawBitmap(*live_feeds[3].bmp,feed_3_x,feed_3_y,0); //FEED 4
 
 
    if (recording)
@@ -452,7 +469,7 @@ void EditorFrame::OnPaint(wxPaintEvent& event)
      dc.DrawCircle(50,50,10); //Recording Mark ON!
    }
 
-  wxSleep(0.01);
+ // wxSleep(0.01);
 
 }
 
@@ -526,7 +543,6 @@ void EditorFrame::OnSaveDepth(wxCommandEvent& event)
 
 void EditorFrame::OnMotion(wxMouseEvent& event)
 {
-  wxSleep(0.01);
   int x=event.GetX();
   int y=event.GetY();
 
@@ -596,12 +612,20 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
            }
        }
 
+  wxSleep(0.01);
+  wxYield();
 }
 
 
 void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
 {
-  wxSleep(0.01);
+  int i=0;
+  for (i=0; i<30; i++)
+  {
+      wxMilliSleep(2);
+      wxYield();
+  }
+
   if (play)
     {
      acquisitionSnapFrames(moduleID,devID);
@@ -612,10 +636,10 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
          acquisitionPassFramesToTarget(moduleID,devID,recordedFrames);
          ++recordedFrames;
 
-         if (recordedFrames % 5 == 0 ) { Refresh(); /*Throttle window refreshes when recording*/}
+         if (recordedFrames % 3 == 0 ) { Refresh(); /*Throttle window refreshes when recording*/}
      } else
      {
-       Refresh(); // <- This draws the window!
+       if (framesDrawn%2 == 0 ) { Refresh();  /*Throttle window refreshes when viewing*/ }
      }
     }
 }

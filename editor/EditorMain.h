@@ -33,8 +33,11 @@ class EditorFrame: public wxFrame
         int feed_0_x,feed_0_y,feed_1_x,feed_1_y,feed_2_x,feed_2_y,feed_3_x,feed_3_y;
         int mouse_x,mouse_y;
         int add_new_track_point;
+
         int recording;
         int recordedFrames;
+
+        int framesDrawn;
 
     private:
 
@@ -109,8 +112,9 @@ class EditorFrame: public wxFrame
         wxButton* ButtonSegmentation;
         //*)
 
-
-        void OnPaint(wxPaintEvent& event);
+        void render(wxDC& dc);
+        void OnPaint(wxPaintEvent& evt);
+        void paintNow();
         void OnMotion(wxMouseEvent& event);
 
         DECLARE_EVENT_TABLE()

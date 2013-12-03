@@ -32,9 +32,11 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-pg" />
 			<Add option="`wx-config --cflags`" />
 		</Compiler>
 		<Linker>
+			<Add option="-pg" />
 			<Add option="`wx-config --libs`" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="../tools/OperatingSystem/libOperatingSystem.a" />
