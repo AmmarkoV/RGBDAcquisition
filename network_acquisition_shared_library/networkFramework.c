@@ -86,7 +86,7 @@ int receivePart(int sock,char * message,unsigned int message_size)
   return 1;
 }
 
-int sendImageSocket(int sock , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel , unsigned int compressedSize )
+int sendImageSocket(int sock ,unsigned  char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel , unsigned int compressedSize )
 {
   //fprintf(stderr,"sendImageSocket %ux%u %u channels %u bitsperpixel , %u bytes per pixel\n",width,height,channels,bitsperpixel, (bitsperpixel/8));
 
@@ -108,7 +108,7 @@ int sendImageSocket(int sock , char * pixels , unsigned int width , unsigned int
 
   transmitPart(sock,(char*) &trImage,sizeof(struct transportImage));
 
-  transmitPart(sock,pixels,messageSize);
+  transmitPart(sock,(char*) pixels,messageSize);
 
   transmitPart(sock,(char*) &trBorder,sizeof(struct transportBorder));
 
@@ -119,14 +119,14 @@ int sendImageSocket(int sock , char * pixels , unsigned int width , unsigned int
 
 
 
-char * recvImageSocket(int sock , unsigned int * width , unsigned int * height , unsigned int channels , unsigned int bitsperpixel )
+unsigned char * recvImageSocket(int sock , unsigned int * width , unsigned int * height , unsigned int channels , unsigned int bitsperpixel )
 {
   unsigned char *imgPtr=0;
   struct transportBorder trBorder={0};
   struct transportImage trImage={0};
 
 
-  receivePart(sock,&trImage,sizeof(struct transportImage));
+  receivePart(sock,(char*) &trImage,sizeof(struct transportImage));
 
   unsigned int messageSize = trImage.width * trImage.height * trImage.channels * (simplePowNet(2,trImage.bitsperpixel)/8);
 
@@ -136,9 +136,9 @@ char * recvImageSocket(int sock , unsigned int * width , unsigned int * height ,
       fprintf(stderr,RED "Could not allocate space for recvImageSocket call ( %u bytes ) " NORMAL , messageSize );
       return 0;
   }
-  receivePart(sock,imgPtr,messageSize);
+  receivePart(sock,(char*) imgPtr,messageSize);
 
-  receivePart(sock,&trBorder,sizeof(struct transportBorder));
+  receivePart(sock,(char*) &trBorder,sizeof(struct transportBorder));
    if ( (trBorder.headerN!='N') || (trBorder.headerE!='E') || (trBorder.headerX!='X') || (trBorder.headerT!='T') )
       {
         fprintf(stderr,RED "Failed reading boundary after Image @ recvImageSocket call" NORMAL);
