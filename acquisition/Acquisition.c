@@ -287,11 +287,12 @@ int saveRawImageToFile(char * filename,unsigned char * pixels , unsigned int wid
             return 1;
         }
 
-        char output[256]={0};
-      /*GetDateString(output,"TIMESTAMP",1,0,0,0,0,0,0,0);
-        fprintf(fd, "#%s\n", output );*/
+        /*
+        char timeStampStr[256]={0};
+        GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
+        fprintf(fd, "#%s\n", timeStampStr );*/
 
-        fprintf(fd, "#TIMESTAMP %u\n",GetTickCount());
+        fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
 
 
         fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
@@ -318,14 +319,14 @@ int saveRawImageToFile(char * filename,unsigned char * pixels , unsigned int wid
 unsigned char * convertShortDepthToRGBDepth(unsigned short * depth,unsigned int width , unsigned int height)
 {
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
-  char * depthPTR= (char*) depth; // This will be the traversing pointer for input
-  char * depthLimit = (char*) depth + width*height * sizeof(unsigned short); //<- we use sizeof(short) because we have casted to char !
+  unsigned char * depthPTR= (unsigned char*) depth; // This will be the traversing pointer for input
+  unsigned char * depthLimit = (unsigned char*) depth + width*height * sizeof(unsigned short); //<- we use sizeof(short) because we have casted to char !
 
 
-  char * outFrame = (char*) malloc(width*height*3*sizeof(char));
+  unsigned char * outFrame = (unsigned char*) malloc(width*height*3*sizeof(unsigned char));
   if (outFrame==0) { fprintf(stderr,"Could not perform DepthToRGB transformation\nNo memory for new frame\n"); return 0; }
 
-  char * outFramePTR = outFrame; // This will be the traversing pointer for output
+  unsigned char * outFramePTR = outFrame; // This will be the traversing pointer for output
   while ( depthPTR<depthLimit )
   {
      * outFramePTR = *depthPTR; ++outFramePTR; ++depthPTR;
@@ -345,7 +346,7 @@ unsigned char * convertShortDepthToCharDepth(unsigned short * depth,unsigned int
   unsigned short * depthLimit =  depth + width*height; //<- we use sizeof(short) because we have casted to char !
 
 
-  unsigned char * outFrame = (char*) malloc(width*height*1*sizeof(char));
+  unsigned char * outFrame = (unsigned char*) malloc(width*height*1*sizeof(char));
   if (outFrame==0) { fprintf(stderr,"Could not perform DepthToRGB transformation\nNo memory for new frame\n"); return 0; }
 
   float depth_range = max_depth-min_depth;
@@ -375,7 +376,7 @@ unsigned char * convertShortDepthTo3CharDepth(unsigned short * depth,unsigned in
   unsigned short * depthLimit =  depth + width*height; //<- we use sizeof(short) because we have casted to char !
 
 
-  unsigned char * outFrame = (char*) malloc(width*height*3*sizeof(unsigned char));
+  unsigned char * outFrame = (unsigned char*) malloc(width*height*3*sizeof(unsigned char));
   if (outFrame==0) { fprintf(stderr,"Could not perform DepthToRGB transformation\nNo memory for new frame\n"); return 0; }
 
   float depth_range = max_depth-min_depth;
@@ -634,7 +635,6 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
 {
     printCall(moduleID,devID,"acquisitionSnapFrames", __FILE__, __LINE__);
 
-    int retres=0;
     StartTimer(FRAME_SNAP_DELAY);
 
     if (*plugins[moduleID].snapFrames!=0)
@@ -845,7 +845,7 @@ unsigned char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentif
   return 0;
 }
 
-unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength)
+unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned char * mem,unsigned int memlength)
 {
   printCall(moduleID,devID,"acquisitionCopyColorFrame", __FILE__, __LINE__);
   if ( (mem==0) || (memlength==0) )
@@ -855,7 +855,7 @@ unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifie
   }
 
 
-  char * color = acquisitionGetColorFrame(moduleID,devID);
+  unsigned char * color = acquisitionGetColorFrame(moduleID,devID);
   if (color==0) { return 0; }
   unsigned int width , height , channels , bitsperpixel;
   acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
@@ -865,7 +865,7 @@ unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifie
 }
 
 
-unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,char * mem,unsigned int memlength)
+unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned char * mem,unsigned int memlength)
 {
   printCall(moduleID,devID,"acquisitionCopyColorFramePPM", __FILE__, __LINE__);
   if ( (mem==0) || (memlength==0) )
@@ -874,16 +874,17 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
     return 0;
   }
 
+  char * memC = (char*) mem;
 
-  char * color = acquisitionGetColorFrame(moduleID,devID);
+  unsigned char * color = acquisitionGetColorFrame(moduleID,devID);
   if (color==0) { return 0; }
   unsigned int width , height , channels , bitsperpixel;
   acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
 
-  sprintf(mem, "P6%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
-  unsigned int payloadStart = strlen(mem);
+  sprintf(memC, "P6%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
+  unsigned int payloadStart = strlen(memC);
 
-  char * memPayload = mem + payloadStart ;
+  unsigned char * memPayload = mem + payloadStart ;
   memcpy(memPayload,color,width*height*channels*(bitsperpixel/8));
 
   payloadStart += width*height*channels*(bitsperpixel/8);
