@@ -180,7 +180,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Status->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(Status);
     Timer.SetOwner(this, ID_TIMER1);
-    Timer.Start(30, false);
+    Timer.Start(33, false);
 
     Connect(ID_SLIDER1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorFrame::OnFrameSliderCmdScroll);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonPreviousFrameClick);
@@ -207,10 +207,11 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     rgbFrame=0;
     depthFrame=0;
 
-
+    play=0;
     recording=0;
     recordedFrames=0;
 
+    framesSnapped=0;
     framesDrawn=0;
 
     initFeeds();
@@ -230,7 +231,10 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
 
 
     wxCommandEvent  event;
+
     OnOpenModule(event);
+
+    //Connect( wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(EditorFrame::onIdle) );
 }
 
 EditorFrame::~EditorFrame()
@@ -238,8 +242,6 @@ EditorFrame::~EditorFrame()
     //(*Destroy(EditorFrame)
     //*)
 }
-
-
 
 void EditorFrame::OnOpenModule(wxCommandEvent& event)
 {
@@ -289,19 +291,17 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
     }
 
    //We want to initialize all possible devices in this example..
+   /* THIS is not always a good check
    unsigned int devID=0,maxDevID=acquisitionGetModuleDevices(moduleID);
    if (maxDevID==0)
    {
        wxMessageBox(wxT("error while Openning device"),wxT("RGBDAcquisition Editor"));
-      fprintf(stderr,"No devices found for Module used \n");
+       fprintf(stderr,"No devices found for Module used \n");
      // return 1;
-   }
+   }*/
 
 
-//
-
-    Timer.Stop();
-    if (fps!=0) { Timer.Start((unsigned int) 1000/fps, false); }
+   if (fps!=0) { Timer.Stop(); Timer.Start((unsigned int) 1000/fps, false); }
 
    if ( ! acquisitionOpenDevice(moduleID,devID,openDevice,width,height,fps) )
    {
@@ -330,11 +330,14 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    initializeRGBSegmentationConfiguration(&segConfRGB,width,height);
    initializeDepthSegmentationConfiguration(&segConfDepth,width,height);
 
+
    acquisitionSnapFrames(moduleID,devID);
    rgbFrame = acquisitionGetColorFrame(moduleID,devID);
    depthFrame = acquisitionGetDepthFrame(moduleID,devID);
 
    alreadyInitialized=1;
+   //This hangs the window -> guiSnapFrames();
+
 }
 
 
@@ -385,67 +388,7 @@ void EditorFrame::paintNow()
 
 void EditorFrame::render(wxDC& dc)
 {
-  unsigned int devID=0;
-  unsigned int width , height , channels , bitsperpixel;
-
-  if (
-        (lastFrameDrawn!=acquisitionGetCurrentFrameNumber(moduleID,devID)) ||
-        ( (acquisitionGetTotalFrameNumber(moduleID,devID)==0) && (play) )
-     )
-  {
-
-     if (segmentedFramesExist)
-     {
-        //DRAW RGB FRAME -------------------------------------------------------------------------------------
-       acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-       passVideoRegisterToFeed(0,segmentedRGB,width,height,bitsperpixel,channels);
-
-       //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
-       acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-
-
-       unsigned char * rgbDepth = convertShortDepthTo3CharDepth(segmentedDepth,width,height,0,2048);
-       //char * rgbDepth = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
-       if (rgbDepth!=0)
-       {
-         passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
-         free(rgbDepth);
-       }
-     } else
-     {
-       //DRAW RGB FRAME -------------------------------------------------------------------------------------
-       acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-       passVideoRegisterToFeed(0,rgbFrame,width,height,bitsperpixel,channels);
-
-       //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
-       acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-
-
-       unsigned char * rgbDepth = convertShortDepthTo3CharDepth(depthFrame,width,height,0,2048);
-       //char * rgbDepth = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
-       if (rgbDepth!=0)
-       {
-        passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
-        free(rgbDepth);
-       }
-     }
-
-   lastFrameDrawn=acquisitionGetCurrentFrameNumber(moduleID,devID);
-
-
-   wxString currentFrame;
-   currentFrame.clear();
-   currentFrame<<lastFrameDrawn;
-   currentFrameTextCtrl->SetValue(currentFrame);
-
-   currentFrame.clear();
-   currentFrame<<acquisitionGetTotalFrameNumber(moduleID,devID);
-   totalFramesLabel->SetLabel(currentFrame);
-
-
-
-  }
-
+  fprintf(stderr,"Render Called\n");
 
   if (rgbFrame!=0)
    { dc.DrawBitmap(*live_feeds[0].bmp,feed_0_x,feed_0_y,0); } //FEED 1
@@ -462,7 +405,8 @@ void EditorFrame::render(wxDC& dc)
      dc.DrawCircle(50,50,10); //Recording Mark ON!
    }
 
- // wxSleep(0.01);
+ wxSleep(0.01);
+ wxYieldIfNeeded();
 
 }
 
@@ -536,6 +480,7 @@ void EditorFrame::OnSaveDepth(wxCommandEvent& event)
 
 void EditorFrame::OnMotion(wxMouseEvent& event)
 {
+  fprintf(stderr,"OnMotion Called\n");
   int x=event.GetX();
   int y=event.GetY();
 
@@ -623,6 +568,7 @@ int EditorFrame::removeOldSegmentedFrames()
 
 int  EditorFrame::refreshSegmentedFrame()
 {
+  fprintf(stderr,"refreshSegmentedFrame Called\n");
     if (segmentedFramesExist)
     {
      removeOldSegmentedFrames();
@@ -648,14 +594,104 @@ int  EditorFrame::refreshSegmentedFrame()
 
 void EditorFrame::guiSnapFrames()
 {
+  wxSleep(0.01);
+
+  ++framesSnapped;
+  fprintf(stderr,"guiSnapFrames Called %u ! \n",framesSnapped);
+  wxYield();
+
+  fprintf(stderr,"Doing Snap\n");
   acquisitionSnapFrames(moduleID,devID);
+  wxYield();
+  fprintf(stderr,"Getting Color\n");
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
+  wxYield();
+  fprintf(stderr,"Getting Depth\n");
   depthFrame = acquisitionGetDepthFrame(moduleID,devID);
+  wxYield();
+  fprintf(stderr,"Refresh Segmentation\n");
   refreshSegmentedFrame();
+  wxYield();
+
+
+  unsigned int devID=0;
+  unsigned int width , height , channels , bitsperpixel;
+
+  if (
+        (lastFrameDrawn!=acquisitionGetCurrentFrameNumber(moduleID,devID)) ||
+        ( (acquisitionGetTotalFrameNumber(moduleID,devID)==0) && (play) )
+     )
+  {
+     if (segmentedFramesExist)
+     {
+        //DRAW RGB FRAME -------------------------------------------------------------------------------------
+       acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+       passVideoRegisterToFeed(0,segmentedRGB,width,height,bitsperpixel,channels);
+
+       //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
+       acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+
+
+       unsigned char * rgbDepth = convertShortDepthTo3CharDepth(segmentedDepth,width,height,0,2048);
+       //char * rgbDepth = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
+       if (rgbDepth!=0)
+       {
+         passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
+         free(rgbDepth);
+       }
+     } else
+     {
+       //DRAW RGB FRAME -------------------------------------------------------------------------------------
+       acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+       passVideoRegisterToFeed(0,rgbFrame,width,height,bitsperpixel,channels);
+
+       //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
+       acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+
+
+       unsigned char * rgbDepth = convertShortDepthTo3CharDepth(depthFrame,width,height,0,2048);
+       //char * rgbDepth = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
+       if (rgbDepth!=0)
+       {
+        passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
+        free(rgbDepth);
+       }
+     }
+
+
+   lastFrameDrawn=acquisitionGetCurrentFrameNumber(moduleID,devID);
+
+
+   wxString currentFrame;
+   currentFrame.clear();
+   currentFrame<<lastFrameDrawn;
+   currentFrameTextCtrl->SetValue(currentFrame);
+
+   currentFrame.clear();
+   currentFrame<<acquisitionGetTotalFrameNumber(moduleID,devID);
+   totalFramesLabel->SetLabel(currentFrame);
+  }
+
+  wxMilliSleep(10);
+
 }
+
+
+void EditorFrame::onIdle(wxIdleEvent& evt)
+{
+   fprintf(stderr,"OnIdle\n");
+   this->paintNow();
+   //evt.RequestMore(); // render continuously, not only once on idle
+
+   Refresh();
+   wxThread::Sleep(0.4);
+}
+
+
 
 void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
 {
+  fprintf(stderr,"OnTimerTrigger Called\n");
   if (play)
     {
      guiSnapFrames(); //Get New Frames
@@ -669,15 +705,17 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
      } else
      {
        Refresh();
-       //if (framesDrawn%1 == 0 ) { Refresh();  /*Throttle window refreshes when viewing*/ }
+       //if (framesDrawn%2 == 0 ) { Refresh();  /*Throttle window refreshes when viewing*/ }
      }
     }
 
   wxYield();
+ wxThread::Sleep(0.4);
 }
 
 void EditorFrame::OnbuttonPlayClick(wxCommandEvent& event)
 {
+    fprintf(stderr,"Play Button Clicked\n");
     play=1;
 }
 
@@ -810,8 +848,6 @@ void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
 void EditorFrame::OnButtonAcquisitionGraphClick(wxCommandEvent& event)
 {
    SelectAcquisitionGraph  * inputConnector = new SelectAcquisitionGraph(this, wxID_ANY);
-
-    inputConnector->ShowModal();
-
-  delete  inputConnector;
+   inputConnector->ShowModal();
+   delete  inputConnector;
 }

@@ -29,6 +29,7 @@ class EditorFrame: public wxFrame
         EditorFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~EditorFrame();
 
+        void onIdle(wxIdleEvent& evt);
         void guiSnapFrames();
         int  removeOldSegmentedFrames();
         int  refreshSegmentedFrame();
@@ -44,6 +45,7 @@ class EditorFrame: public wxFrame
         int recordedFrames;
 
         int framesDrawn;
+        int framesSnapped;
 
     private:
 

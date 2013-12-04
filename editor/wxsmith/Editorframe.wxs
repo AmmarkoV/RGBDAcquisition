@@ -121,7 +121,7 @@
 			<styles>wxSB_NORMAL</styles>
 		</object>
 		<object class="wxTimer" name="ID_TIMER1" variable="Timer" member="yes">
-			<interval>30</interval>
+			<interval>33</interval>
 			<handler function="OnTimerTrigger" entry="EVT_TIMER" />
 		</object>
 	</object>

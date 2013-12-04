@@ -3,7 +3,6 @@
 
 #include "OpenNI1Acquisition.h"
 
-#define BUILD_OPENNI1 1
 
 #if BUILD_OPENNI1
 
