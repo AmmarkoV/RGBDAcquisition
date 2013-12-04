@@ -10,7 +10,7 @@ BINARIES_THAT_NEED_LIBS="`./binariesThatNeedLibs.sh`"
 
 for f in $BINARIES_THAT_NEED_LIBS
            do  
-             if [ -d $f ]
+             if [ -d ../$f/ ]
               then
                cd ../$f/ 
                     
@@ -18,7 +18,7 @@ for f in $BINARIES_THAT_NEED_LIBS
 
                cd ../scripts/
              else
-              echo "Could not create links for $f"
+              echo "Could not create links for ../$f/ "
              fi
            done
 
