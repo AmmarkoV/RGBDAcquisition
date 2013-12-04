@@ -51,7 +51,7 @@ extern "C"
    int getTemplateColorDataSize(int devID);
    int getTemplateColorChannels(int devID);
    int getTemplateColorBitsPerPixel(int devID);
-   char * getTemplateColorPixels(int devID);
+   unsigned char * getTemplateColorPixels(int devID);
    double getTemplateColorFocalLength(int devID);
    double getTemplateColorPixelSize(int devID);
 

@@ -122,7 +122,11 @@ int main(int argc, char *argv[])
   if (strlen(inputname)<1) { devName=0; }
     //Initialize Every OpenNI Device
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
-        acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate);
+        if (!acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate))
+        {
+          fprintf(stderr,"Could not open device %u ( %s ) of module %s  ..\n",devID,devName,getModuleStringName(moduleID));
+          return 1;
+        }
 
         if ( strstr(inputname,"noRegistration")!=0 )         {  } else
         if ( strstr(inputname,"rgbToDepthRegistration")!=0 ) { acquisitionMapRGBToDepth(moduleID,devID); } else

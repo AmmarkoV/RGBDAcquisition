@@ -42,7 +42,7 @@ struct TemplateVirtualDevice
  unsigned int templateWIDTH;
  unsigned int templateHEIGHT;
  unsigned long lastColorTimestamp;
- char * templateColorFrame;
+ unsigned char * templateColorFrame;
  unsigned long lastDepthTimestamp;
  unsigned short * templateDepthFrame;
 
@@ -53,7 +53,19 @@ struct TemplateVirtualDevice
 
 struct TemplateVirtualDevice device[MAX_TEMPLATE_DEVICES]={0};
 
+int makeFrameNoInput(unsigned char * frame , unsigned int width , unsigned int height , unsigned int channels)
+{
+   unsigned char * framePTR = frame;
+   unsigned char * frameLimit = frame + width * height * channels * sizeof(char);
 
+   while (framePTR<frameLimit)
+   {
+       *framePTR=0; ++framePTR;
+       *framePTR=0; ++framePTR;
+       *framePTR=255; ++framePTR;
+   }
+ return 1;
+}
 
 
 int FileExists(char * filename)
@@ -111,13 +123,13 @@ int setTemplateDepthCalibration(int devID,struct calibration * calib)
 
 
 
-char * ReadPPM(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
+unsigned char * ReadPPM(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     #if PRINT_DEBUG_EACH_CALL
      fprintf(stderr,"TemplateAcquisition : Reading file %s \n",filename);
     #endif // PRINT_DEBUG_EACH_CALL
 
-    char * pixels=0;
+    unsigned char * pixels=0;
     FILE *pf=0;
     pf = fopen(filename,"rb");
 
@@ -156,7 +168,7 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height,unsigned
 
         *width=w;
         *height=h;
-        pixels= (char*) malloc(w*h*3*sizeof(char));
+        pixels= (unsigned char*) malloc(w*h*3*sizeof(unsigned char));
 
         if ( pixels != 0 )
         {
@@ -360,18 +372,21 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
   findLastFrame(devID);
 
+  unsigned int failedStream=0;
   unsigned int widthInternal; unsigned int heightInternal; unsigned long timestampInternal;
 
   char file_name_test[1024];
   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
-  char * tmpColor = ReadPPM(file_name_test,&widthInternal,&heightInternal, &timestampInternal);
+  unsigned char * tmpColor = ReadPPM(file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
   if (tmpColor!=0) { device[devID].templateColorFrame=tmpColor; } else
   {
+   ++failedStream;
    // if templateColorFrame is zero the next function behaves like a malloc
-   device[devID].templateColorFrame= (char*) realloc(device[devID].templateColorFrame,device[devID].templateWIDTH*device[devID].templateHEIGHT*3*sizeof(char));
+   device[devID].templateColorFrame= (unsigned char*) realloc(device[devID].templateColorFrame,device[devID].templateWIDTH*device[devID].templateHEIGHT*3*sizeof(char));
+   makeFrameNoInput(device[devID].templateColorFrame,device[devID].templateWIDTH,device[devID].templateHEIGHT,3);
   }
 
 
@@ -382,6 +397,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
   if (tmpDepth!=0) { device[devID].templateDepthFrame=tmpDepth; } else
   {
+   ++failedStream;
    // if templateDepthFrame is zero the next function behaves like a malloc
    device[devID].templateDepthFrame= (unsigned short*) realloc(device[devID].templateDepthFrame,device[devID].templateWIDTH*device[devID].templateHEIGHT*1*sizeof(unsigned short));
   }
@@ -397,7 +413,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
 
 
-  return ((device[devID].templateColorFrame!=0)&&(device[devID].templateDepthFrame!=0));
+  return ((device[devID].templateColorFrame!=0)&&(device[devID].templateDepthFrame!=0)&&(failedStream==0));
 }
 
 
@@ -507,7 +523,7 @@ int getTemplateColorChannels(int devID)     { return 3; }
 int getTemplateColorBitsPerPixel(int devID) { return 8; }
 
 // Frame Grabber should call this function for color frames
-char * getTemplateColorPixels(int devID)    { return device[devID].templateColorFrame; }
+unsigned char * getTemplateColorPixels(int devID)    { return device[devID].templateColorFrame; }
 
 
 
