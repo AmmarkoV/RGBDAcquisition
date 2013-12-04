@@ -29,6 +29,7 @@ char openDevice[512];
 int alreadyInitialized=0;
 int play=0;
 int lastFrameDrawn=12312312;
+int totalFramesOfDevice=12312312;
 
 int combinationMode=DONT_COMBINE;
 struct SegmentationFeaturesRGB segConfRGB={0};
@@ -321,10 +322,14 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    if (totalFrames==0) {
                          totalFramesLabel->SetLabel(wxT("Live Stream"));
                          play=1;
+                         FrameSlider->SetMax(1);
+                         FrameSlider->Disable();
                        } else // This means a live stream
                        {
                          wxString msg; msg.Printf(wxT("%u"),totalFrames);
                          totalFramesLabel->SetLabel(msg);
+                         FrameSlider->SetMax(totalFrames);
+                         FrameSlider->Enable();
                        }
 
 
@@ -415,7 +420,7 @@ void EditorFrame::render(wxDC& dc)
 
 void EditorFrame::OnSaveDepth(wxCommandEvent& event)
 {
-  dumpExtDepths("extDepths.txt");
+  dumpExtDepths(moduleID , devID , "extDepths.txt");
 }
 
 
@@ -601,7 +606,7 @@ void EditorFrame::guiSnapFrames()
 
 
    lastFrameDrawn=acquisitionGetCurrentFrameNumber(moduleID,devID);
-
+   totalFramesOfDevice=acquisitionGetTotalFrameNumber(moduleID,devID);
 
    wxString currentFrame;
    currentFrame.clear();
@@ -609,8 +614,17 @@ void EditorFrame::guiSnapFrames()
    currentFrameTextCtrl->SetValue(currentFrame);
 
    currentFrame.clear();
-   currentFrame<<acquisitionGetTotalFrameNumber(moduleID,devID);
+   currentFrame<<totalFramesOfDevice;
    totalFramesLabel->SetLabel(currentFrame);
+
+
+   FrameSlider->SetValue(lastFrameDrawn);
+
+   if (FrameSlider->GetMax()!=totalFramesOfDevice)
+     {
+       FrameSlider->SetMax(totalFramesOfDevice);
+     }
+
   }
 
   wxMilliSleep(10);
@@ -697,11 +711,14 @@ void EditorFrame::OncurrentFrameTextCtrlText(wxCommandEvent& event)
 
 void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
 {
+    /*
     float percentageOfFrames = (float) FrameSlider->GetValue()  /  FrameSlider->GetMax() ;
     fprintf(stderr,"Go to : %u ( %0.2f ) min %0.2f max %0.2f \n",FrameSlider->GetValue(),percentageOfFrames , FrameSlider->GetMin() , FrameSlider->GetMax());
     fprintf(stderr,"Max Frames : %u \n",acquisitionGetTotalFrameNumber(moduleID,devID));
 
-    long jumpTo =  (long) (percentageOfFrames * acquisitionGetTotalFrameNumber(moduleID,devID));
+    long jumpTo =  (long) (percentageOfFrames * acquisitionGetTotalFrameNumber(moduleID,devID));*/
+
+    long jumpTo = FrameSlider->GetValue();
 
     if (jumpTo>0) { --jumpTo; }
           acquisitionSeekFrame(moduleID,devID,jumpTo);

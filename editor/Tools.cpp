@@ -1,8 +1,13 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "Tools.h"
 
 
+#include "../acquisitionSegment/AcquisitionSegment.h"
+#include "../acquisition/Acquisition.h"
 
-inline int XYOverRect(int x , int y , int rectx1,int recty1,int rectx2,int recty2)
+int XYOverRect(int x , int y , int rectx1,int recty1,int rectx2,int recty2)
 {
   if ( (x>=rectx1) && (x<=rectx2) )
     {
@@ -16,7 +21,7 @@ inline int XYOverRect(int x , int y , int rectx1,int recty1,int rectx2,int recty
 
 
 
-int dumpCameraDepths(char * filename)
+int dumpCameraDepths(unsigned int moduleID , unsigned int devID , char * filename)
 {
   FILE * fp=0;
   fp = fopen(filename,"w");
@@ -40,7 +45,7 @@ int dumpCameraDepths(char * filename)
 
 
 
-int dumpExtDepths(char * filename)
+int dumpExtDepths(unsigned int moduleID , unsigned int devID , char * filename)
 {
   FILE * fp=0;
   fp = fopen(filename,"w");
