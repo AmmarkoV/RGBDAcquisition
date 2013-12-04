@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
                                          } else
     if (strcmp(argv[i],"-dev")==0)       {
                                            devID = atoi(argv[i+1]);
-                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID);
                                          } else
     if (
         (strcmp(argv[i],"-from")==0) ||
@@ -208,7 +208,6 @@ int main(int argc, char *argv[])
         //acquisitionMapRGBToDepth(moduleID,devID);
         fprintf(stderr,"Done with Mapping Depth/RGB \n");
 
-    char outfilename[512]={0};
 
    if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)

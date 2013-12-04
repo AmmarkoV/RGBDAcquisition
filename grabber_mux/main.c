@@ -89,11 +89,11 @@ int main(int argc, char *argv[])
                                          } else
     if (strcmp(argv[i],"-dev1")==0)      {
                                            devID_1 = atoi(argv[i+1]);
-                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID_1);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID_1);
                                          } else
     if (strcmp(argv[i],"-dev2")==0)      {
                                            devID_2 = atoi(argv[i+1]);
-                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID_2);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID_2);
                                          } else
     if (
         (strcmp(argv[i],"-from1")==0) ||
@@ -197,11 +197,11 @@ int main(int argc, char *argv[])
     unsigned int widthRGB , heightRGB , channelsRGB , bitsperpixelRGB;
     acquisitionGetColorFrameDimensions(moduleID_1,devID_1,&widthRGB,&heightRGB ,&channelsRGB , &bitsperpixelRGB );
     //Todo , check with module 2 bla bla
-    unsigned char * rgbOut = ( char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
+    unsigned char * rgbOut = (unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
 
     unsigned int widthDepth , heightDepth , channelsDepth , bitsperpixelDepth;
     acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&widthDepth,&heightDepth ,&channelsDepth , &bitsperpixelDepth );
-    unsigned short * depthOut = ( short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
+    unsigned short * depthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
 
     fprintf(stderr,"Base Module is %s , device %u , Overlay Module is %s , device %u\n",getModuleStringName(moduleID_1),devID_1, getModuleStringName(moduleID_2),devID_2);

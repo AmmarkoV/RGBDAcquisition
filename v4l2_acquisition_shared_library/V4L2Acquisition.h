@@ -47,7 +47,7 @@ extern "C"
    int getV4L2ColorDataSize(int devID);
    int getV4L2ColorChannels(int devID);
    int getV4L2ColorBitsPerPixel(int devID);
-   char * getV4L2ColorPixels(int devID);
+   unsigned char * getV4L2ColorPixels(int devID);
    double getV4L2ColorFocalLength(int devID);
    double getV4L2ColorPixelSize(int devID);
 

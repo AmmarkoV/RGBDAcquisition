@@ -40,7 +40,7 @@ int DecodePixels(int webcam_id)
 }
 
 
-char * ReturnDecodedLiveFrame(int webcam_id)
+unsigned char * ReturnDecodedLiveFrame(int webcam_id)
 {
    /*
           THIS FRAME DECIDES IF THE VIDEO FORMAT NEEDS DECODING OR CAN BE RETURNED RAW FROM THE DEVICE
@@ -51,7 +51,7 @@ char * ReturnDecodedLiveFrame(int webcam_id)
     {
      /*VIDEO COMES IN A FORMAT THAT NEEDS DECODING TO RGB 24*/
      if ( DecodePixels(webcam_id)==0 ) return empty_frame;
-     return (char *) camera_feeds[webcam_id].decoded_pixels;
+     return (unsigned char *) camera_feeds[webcam_id].decoded_pixels;
     } else
     {
       /* The frame is ready so we mark it as decoded*/
@@ -61,7 +61,7 @@ char * ReturnDecodedLiveFrame(int webcam_id)
            /*Handler for when the frame does not exist */
            return empty_frame;
          }
-     return (char *) camera_feeds[webcam_id].frame;
+     return (unsigned char *) camera_feeds[webcam_id].frame;
     }
    return empty_frame;
 }

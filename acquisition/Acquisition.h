@@ -135,7 +135,7 @@ double acqusitionGetDepthFocalLength(ModuleIdentifier moduleID,DeviceIdentifier 
 double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 int acquisitionMapDepthToRGB(ModuleIdentifier moduleID,DeviceIdentifier devID);
-
+int acquisitionMapRGBToDepth(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 
 

@@ -244,7 +244,7 @@ void buildOpenGLProjectionForIntrinsicsIasonas (
     double w = (double) imageWidth;
     double h = (double) imageHeight;
 
-    double R_sub_L = R-L , T_sub_B = T-B , F_sub_N = F-N , F_plus_N = F+N , F_mul_N = F*N;
+    double R_sub_L = R-L , T_sub_B = T-B , F_sub_N = F-N , /*F_plus_N = F+N,*/ F_mul_N = F*N;
 
     if  (R_sub_L==0) { fprintf(stderr,"R-L is negative (%0.2f-0) \n",R); }
     if  (T_sub_B==0) { fprintf(stderr,"T-B is negative (%0.2f-0) \n",T); }

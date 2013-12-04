@@ -62,9 +62,9 @@ int createV4L2StereoDevice(int devID,char * devName,unsigned int width,unsigned 
  if (retres<4)
  {
    fprintf(stderr,"Could not initialize both of the cameras!\n");
-   if ( retres == 3 )  { fprintf(stderr,"Destroying successfully initialized device %s "); destroyV4L2Device(devID+1); } else
+   if ( retres == 3 )  { fprintf(stderr,"Destroying successfully initialized device"); destroyV4L2Device(devID+1); } else
                        { fprintf(stderr,"V4L2 device %s failed to be initialized!\n",devName2); }
-   if ( retres == 1 )  { fprintf(stderr,"Destroying successfully initialized device %s "); destroyV4L2Device(devID+0);  } else
+   if ( retres == 1 )  { fprintf(stderr,"Destroying successfully initialized device"); destroyV4L2Device(devID+0);  } else
                        { fprintf(stderr,"V4L2 device %s failed to be initialized!\n",devName1); }
    return 0;
  }

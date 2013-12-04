@@ -25,13 +25,13 @@ struct NetworkVirtualDevice
  unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
  unsigned long lastColorTimestamp;
  unsigned long compressedColorSize;
- char * colorFrame;
+ unsigned char * colorFrame;
  volatile int okToSendColorFrame;
 
 
  unsigned int depthWidth , depthHeight , depthChannels , depthBitsperpixel;
  unsigned long lastDepthTimestamp;
- short * depthFrame;
+ unsigned short * depthFrame;
  volatile int okToSendDepthFrame;
 
  struct calibration calibRGB;
@@ -79,7 +79,7 @@ extern struct NetworkVirtualDevice networkDevice[MAX_NETWORK_DEVICES];
    int getNetworkColorDataSize(int devID);
    int getNetworkColorChannels(int devID);
    int getNetworkColorBitsPerPixel(int devID);
-   char * getNetworkColorPixels(int devID);
+   unsigned char * getNetworkColorPixels(int devID);
    double getNetworkColorFocalLength(int devID);
    double getNetworkColorPixelSize(int devID);
 
@@ -92,7 +92,7 @@ extern struct NetworkVirtualDevice networkDevice[MAX_NETWORK_DEVICES];
    int getNetworkDepthChannels(int devID);
    int getNetworkDepthBitsPerPixel(int devID);
 
-   char * getNetworkDepthPixels(int devID);
+   unsigned char * getNetworkDepthPixels(int devID);
    double getNetworkDepthFocalLength(int devID);
    double getNetworkDepthPixelSize(int devID);
    #endif

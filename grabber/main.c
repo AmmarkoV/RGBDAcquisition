@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
                                          } else
     if (strcmp(argv[i],"-dev")==0)      {
                                            devID = atoi(argv[i+1]);
-                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID);
                                          } else
     if (
          (strcmp(argv[i],"-to")==0) ||

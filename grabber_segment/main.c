@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
    //                        CONFIGURATION
    //------------------------------------------------------------------
 
-   int combinationMode=DONT_COMBINE;
+   unsigned int combinationMode=DONT_COMBINE;
 
    struct SegmentationFeaturesRGB segConfRGB={0};
    struct SegmentationFeaturesDepth segConfDepth={0};
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
                                          } else
     if (strcmp(argv[i],"-dev")==0)      {
                                            devID_1 = atoi(argv[i+1]);
-                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID_1);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID_1);
                                          } else
     if (
          (strcmp(argv[i],"-to")==0) ||
@@ -171,12 +171,13 @@ int main(int argc, char *argv[])
 
     unsigned int widthRGB , heightRGB , channelsRGB , bitsperpixelRGB;
     acquisitionGetColorFrameDimensions(moduleID_1,devID_1,&widthRGB,&heightRGB ,&channelsRGB , &bitsperpixelRGB );
-    //Todo , check with module 2 bla bla
-    char * rgbOut = ( char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
+
+    //unsigned char * rgbOut = ( unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
 
     unsigned int widthDepth , heightDepth , channelsDepth , bitsperpixelDepth;
     acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&widthDepth,&heightDepth ,&channelsDepth , &bitsperpixelDepth );
-    short * depthOut = ( short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
+
+    //unsigned short * depthOut = ( unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
 
 
@@ -190,9 +191,6 @@ int main(int argc, char *argv[])
     }
 
 
-   float centerX;
-   float centerY;
-   float centerZ;
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
@@ -226,8 +224,7 @@ int main(int argc, char *argv[])
 
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         acquisitionSimulateTime( depthTimestamp );
-        saveRawImageToFile(outfilename,(char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
-        //getDepthBlobAverage(&centerX,&centerY,&centerZ,segmentedDepth,widthDepth,heightDepth);
+        saveRawImageToFile(outfilename,(unsigned char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
 
        free (segmentedRGB);
        free (segmentedDepth);

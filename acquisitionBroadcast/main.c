@@ -34,25 +34,25 @@ int autoSnapFeed=1;
 
 void * prepare_RGB_RAW_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  rqst->contentSize = acquisitionCopyColorFrame(moduleID,0,rqst->content,rqst->MAXcontentSize);
+  rqst->contentSize = acquisitionCopyColorFrame(moduleID,0,(unsigned char*) rqst->content,rqst->MAXcontentSize);
   return 0;
 }
 
 void * prepare_RGB_PPM_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  rqst->contentSize =  acquisitionCopyColorFramePPM(moduleID,0,rqst->content,rqst->MAXcontentSize);
+  rqst->contentSize =  acquisitionCopyColorFramePPM(moduleID,0,(unsigned char*) rqst->content,rqst->MAXcontentSize);
   return 0;
 }
 
 void * prepare_Depth_RAW_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  rqst->contentSize = acquisitionCopyDepthFrame(moduleID,0,(short*) rqst->content,rqst->MAXcontentSize);
+  rqst->contentSize = acquisitionCopyDepthFrame(moduleID,0,(unsigned short*) rqst->content,rqst->MAXcontentSize);
   return 0;
 }
 
 void * prepare_Depth_PPM_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
-  rqst->contentSize =  acquisitionCopyDepthFramePPM(moduleID,0,(short*) rqst->content,rqst->MAXcontentSize);
+  rqst->contentSize =  acquisitionCopyDepthFramePPM(moduleID,0,(unsigned short*) rqst->content,rqst->MAXcontentSize);
   return 0;
 }
 
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
                                          } else
     if (strcmp(argv[i],"-dev")==0)      {
                                            devID = atoi(argv[i+1]);
-                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",devID);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID);
                                          } else
     if (
         (strcmp(argv[i],"-from")==0) ||

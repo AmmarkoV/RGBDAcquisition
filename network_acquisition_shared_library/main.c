@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "NetworkAcquisition.h"
 
@@ -8,6 +9,9 @@
 #include "../tools/Codecs/jpgInput.h"
 
 #include "../acquisition/Acquisition.h"
+
+#include "daemon.h"
+
 
 #include <string.h>
 #include <math.h>
@@ -59,7 +63,7 @@ int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void
       networkDevice[0].colorHeight=height;
       networkDevice[0].colorChannels=channels;
       networkDevice[0].colorBitsperpixel=bitsperpixel;
-      networkDevice[0].colorFrame = (char*) pixels;
+      networkDevice[0].colorFrame = (unsigned char*) pixels;
       networkDevice[0].compressedColorSize=0; // Not using compression
 
       /*
@@ -88,7 +92,7 @@ int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void
       networkDevice[0].depthHeight=height;
       networkDevice[0].depthChannels=channels;
       networkDevice[0].depthBitsperpixel=bitsperpixel;
-      networkDevice[0].depthFrame = (char*) pixels;
+      networkDevice[0].depthFrame = (unsigned short*) pixels;
 
       networkDevice[0].okToSendDepthFrame=1;
 
@@ -175,7 +179,7 @@ int getNetworkColorChannels(int devID)     { return 3; }
 int getNetworkColorBitsPerPixel(int devID) { return 8; }
 
 // Frame Grabber should call this function for color frames
-char * getNetworkColorPixels(int devID)    { return networkDevice[devID].colorFrame; }
+unsigned char * getNetworkColorPixels(int devID)    { return networkDevice[devID].colorFrame; }
 
 
 
@@ -189,7 +193,7 @@ int getNetworkDepthChannels(int devID)     { return 1; }
 int getNetworkDepthBitsPerPixel(int devID) { return 16; }
 
 // Frame Grabber should call this function for depth frames
-char * getNetworkDepthPixels(int devID) { return (char *) networkDevice[devID].depthFrame; }
+unsigned char * getNetworkDepthPixels(int devID) { return (unsigned char *) networkDevice[devID].depthFrame; }
 
 #else
 //Null build

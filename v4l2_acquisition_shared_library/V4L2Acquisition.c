@@ -68,7 +68,7 @@ int getV4L2ColorChannels(int devID) { return 3;/*camera_feeds[devID].depth;*/ }
 int getV4L2ColorBitsPerPixel(int devID) { return 8; }
 int getV4L2ColorDataSize(int devID) { return getV4L2ColorWidth(devID)*getV4L2ColorHeight(devID)*getV4L2ColorChannels(devID)*((unsigned int) getV4L2ColorBitsPerPixel(devID)/8); }
 
-char * getV4L2ColorPixels(int devID)
+unsigned char * getV4L2ColorPixels(int devID)
 {
  return ReturnDecodedLiveFrame(devID);
  //return camera_feeds[devID].frame;
