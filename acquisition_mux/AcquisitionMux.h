@@ -28,13 +28,13 @@ struct AcquisitionMuxContext
 typedef unsigned int AcquisitionMultiplexerIdentifier;
 
 int mux2RGBAndDepthFrames(
-                           char * rgbBase, char * rgbOverlay , char * rgbOut ,
+                           unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                            unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
                            unsigned int width , unsigned int height ,
                            unsigned int mux_type
                          );
 
-int saveMuxImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
+int saveMuxImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
 #ifdef __cplusplus
 }

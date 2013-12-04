@@ -15,7 +15,7 @@ static unsigned int simplePow(unsigned int base,unsigned int exp)
     return retres;
 }
 
-int saveMuxImageToFile(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
+int saveMuxImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
 
     char filenameFull[2048]={0};
@@ -65,11 +65,11 @@ int saveMuxImageToFile(char * filename,char * pixels , unsigned int width , unsi
 
 
 
-int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
+int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
 {
-   char * rgb_pBase = rgbBase;
-   char * rgb_pOverlay = rgbOverlay;
-   char * rgb_pOut = rgbOut; char * rgb_pOut_limit=rgb_pOut + width * height * 3;
+   unsigned char * rgb_pBase = rgbBase;
+   unsigned char * rgb_pOverlay = rgbOverlay;
+   unsigned char * rgb_pOut = rgbOut; char * rgb_pOut_limit=rgb_pOut + width * height * 3;
 
    unsigned short * depth_pBase = depthBase;
    unsigned short * depth_pOverlay = depthOverlay;
@@ -121,7 +121,7 @@ int mux2RGBAndDepthFramesNonZeroDepth( char * rgbBase, char * rgbOverlay , char 
 
 
 int mux2RGBAndDepthFrames(
-                           char * rgbBase, char * rgbOverlay , char * rgbOut ,
+                           unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                            unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
                            unsigned int width , unsigned int height ,
                            unsigned int mux_type
