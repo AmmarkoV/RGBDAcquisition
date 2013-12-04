@@ -52,7 +52,7 @@ struct acquisitionPluginInterface
    int (*getColorDataSize) (int);
    int (*getColorChannels) (int);
    int (*getColorBitsPerPixel) (int);
-   char * (*getColorPixels) (int);
+   unsigned char * (*getColorPixels) (int);
    double (*getColorFocalLength) (int);
    double (*getColorPixelSize)   (int);
    int (*getColorCalibration) (int,struct calibration *);
@@ -64,7 +64,7 @@ struct acquisitionPluginInterface
    int (*getDepthDataSize) (int);
    int (*getDepthChannels) (int);
    int (*getDepthBitsPerPixel) (int);
-   char * (*getDepthPixels) (int);
+   unsigned char * (*getDepthPixels) (int);
    double (*getDepthFocalLength) (int);
    double (*getDepthPixelSize)   (int);
    int (*getDepthCalibration) (int,struct calibration *);
