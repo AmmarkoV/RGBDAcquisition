@@ -78,6 +78,24 @@ echo "$blue Checking quirks $normal"
 echo
 
 
+
+#quirks!
+toCheck="viewer/libAcquisition.so grabber/libAcquisition.so grabber_segment/libAcquisition.so editor/libAcquisition.so acquisitionBroadcast/libAcquisition.so"
+for f in $toCheck
+do
+if [ -L $f ]
+              then
+              echo "$green $f link ok.. $normal" 
+             else
+              echo "$red $f failed ( running scripts/refreshLinksTo3dParty.sh might solve this )  .. $normal" 
+             fi
+done 
+
+
+
+
+
+
 #quirks!
 toCheck="opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/libOGLRendererSandbox.so openni2_acquisition_shared_library/libOpenNI2.so openni1_acquisition_shared_library/libOpenNI.so libfreenect_acquisition_shared_library/libfreenect.so libfreenect_acquisition_shared_library/libfreenect_sync.so"
 for f in $toCheck

@@ -265,7 +265,6 @@ int SelectCalibration::reloadCalibrationFormFromValues()
 int SelectCalibration::saveCalibrationValuesFromForm()
 {
     double dValue;
-    unsigned int uintValue;
 
     if (CheckBoxIntrinsics->IsChecked()) { calib.intrinsicParametersSet = 1;  } else
                                          { calib.intrinsicParametersSet = 0;  }
@@ -301,7 +300,7 @@ int SelectCalibration::saveCalibrationValuesFromForm()
     if (farPlane->GetValue().ToDouble(&dValue)) {   calib.farPlane = dValue; }
 
     calib.depthUnit=scaleSelectionToDepthUnit( ComboBoxScale->GetSelection() );
-
+    return 1;
 }
 
 

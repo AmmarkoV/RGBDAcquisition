@@ -37,7 +37,7 @@
 			<Add library="GL" />
 			<Add library="GLU" />
 			<Add library="X11" />
-			<Add library="../acquisition/libAcquisition.so" />
+			<Add library="./libAcquisition.so" />
 			<Add library="../acquisition_mux/libAcquisitionMux.so" />
 			<Add library="../acquisitionSegment/libacquisitionSegment.a" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />

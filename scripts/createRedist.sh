@@ -50,7 +50,30 @@ ln -s ../acquisitionBroadcast/AmmarServer/public_html
 cd ..
 
 #At root dir
- 
+  
+cd "$STARTDIR"
+cd scripts
+BINARIES_THAT_NEED_ACQUISITIONLIB="viewer grabber grabber_segment editor acquisitionBroadcast"
+pwd
+
+for f in $BINARIES_THAT_NEED_ACQUISITIONLIB
+           do  
+             if [ -d ../$f/ ]
+              then
+               cd ../$f/ 
+                    
+               ln -s ../acquisition/libAcquisition.so
+
+               cd ../scripts/
+             else
+              echo "Could not create links for ../$f/ "
+             fi
+           done
+cd ..
+
+
+
+#At root dir
 ln -s grabber/frames grabbed_frames
 
 cd opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/

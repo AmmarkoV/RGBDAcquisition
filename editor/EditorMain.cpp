@@ -374,10 +374,14 @@ void EditorFrame::OnAbout(wxCommandEvent& event)
 }
 
 
- void EditorFrame::OnSavePCD(wxCommandEvent& event)
+void EditorFrame::OnSavePCD(wxCommandEvent& event)
  {
-    acquisitionSavePCDPointCoud(moduleID,devID,"frame.pcd");
+    acquisitionSavePCDPointCoud(moduleID,devID,(char*) "frame.pcd");
  }
+void EditorFrame::OnSaveDepth(wxCommandEvent& event)
+{
+  dumpExtDepths(moduleID , devID ,(char*) "extDepths.txt");
+}
 
 
 void EditorFrame::OnPaint(wxPaintEvent& evt)
@@ -417,11 +421,6 @@ void EditorFrame::render(wxDC& dc)
 }
 
 
-
-void EditorFrame::OnSaveDepth(wxCommandEvent& event)
-{
-  dumpExtDepths(moduleID , devID , "extDepths.txt");
-}
 
 
 void EditorFrame::OnMotion(wxMouseEvent& event)

@@ -59,6 +59,8 @@
 		<Unit filename="SelectSegmentation.h" />
 		<Unit filename="SelectTarget.cpp" />
 		<Unit filename="SelectTarget.h" />
+		<Unit filename="Tools.cpp" />
+		<Unit filename="Tools.h" />
 		<Unit filename="wxsmith/Editorframe.wxs" />
 		<Unit filename="wxsmith/SelectAcquisitionGraph.wxs" />
 		<Unit filename="wxsmith/SelectCalibration.wxs" />
