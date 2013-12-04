@@ -15,7 +15,7 @@ INC =
 CFLAGS = -Wall -fPIC
 RESINC = 
 LIBDIR = 
-LIB = -lGL -lGLU -lX11 ../acquisition/libAcquisition.so AmmarServer/src/AmmServerlib/libAmmServerlib.a -lrt ../tools/Calibration/libCalibrationLibrary.a -ldl ../tools/Timers/libTimers.a ../tools/OperatingSystem/libOperatingSystem.a
+LIB = -lGL -lGLU -lX11 ./libAcquisition.so AmmarServer/src/AmmServerlib/libAmmServerlib.a -lrt ../tools/Calibration/libCalibrationLibrary.a -ldl ../tools/Timers/libTimers.a ../tools/OperatingSystem/libOperatingSystem.a
 LDFLAGS = -pthread
 
 INC_DEBUG = $(INC)

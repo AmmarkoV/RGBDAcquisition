@@ -346,7 +346,7 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
       {
          fprintf(stderr,"Warn : Object %u offscreen ( %0.2f , %0.2f , %0.2f ) will end up at %0.2f,%0.2f(%0.2f)\n" , objID , x3D , y3D , z3D , winX,winY , winZ);
       }
-
+  return 1;
 }
 
 

@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./Editor
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/SelectTarget.o $(OBJDIR_DEBUG)/SelectSegmentation.o $(OBJDIR_DEBUG)/EditorApp.o $(OBJDIR_DEBUG)/SelectModule.o $(OBJDIR_DEBUG)/SelectCalibration.o $(OBJDIR_DEBUG)/SelectAcquisitionGraph.o $(OBJDIR_DEBUG)/FeedScreenMemory.o $(OBJDIR_DEBUG)/EditorMain.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/SelectSegmentation.o $(OBJDIR_DEBUG)/Tools.o $(OBJDIR_DEBUG)/SelectTarget.o $(OBJDIR_DEBUG)/EditorApp.o $(OBJDIR_DEBUG)/SelectModule.o $(OBJDIR_DEBUG)/SelectCalibration.o $(OBJDIR_DEBUG)/SelectAcquisitionGraph.o $(OBJDIR_DEBUG)/FeedScreenMemory.o $(OBJDIR_DEBUG)/EditorMain.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/SelectTarget.o $(OBJDIR_RELEASE)/SelectSegmentation.o $(OBJDIR_RELEASE)/EditorApp.o $(OBJDIR_RELEASE)/SelectModule.o $(OBJDIR_RELEASE)/SelectCalibration.o $(OBJDIR_RELEASE)/SelectAcquisitionGraph.o $(OBJDIR_RELEASE)/FeedScreenMemory.o $(OBJDIR_RELEASE)/EditorMain.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/SelectSegmentation.o $(OBJDIR_RELEASE)/Tools.o $(OBJDIR_RELEASE)/SelectTarget.o $(OBJDIR_RELEASE)/EditorApp.o $(OBJDIR_RELEASE)/SelectModule.o $(OBJDIR_RELEASE)/SelectCalibration.o $(OBJDIR_RELEASE)/SelectAcquisitionGraph.o $(OBJDIR_RELEASE)/FeedScreenMemory.o $(OBJDIR_RELEASE)/EditorMain.o
 
 all: debug release
 
@@ -59,11 +59,14 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
-$(OBJDIR_DEBUG)/SelectTarget.o: SelectTarget.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectTarget.cpp -o $(OBJDIR_DEBUG)/SelectTarget.o
-
 $(OBJDIR_DEBUG)/SelectSegmentation.o: SelectSegmentation.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectSegmentation.cpp -o $(OBJDIR_DEBUG)/SelectSegmentation.o
+
+$(OBJDIR_DEBUG)/Tools.o: Tools.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Tools.cpp -o $(OBJDIR_DEBUG)/Tools.o
+
+$(OBJDIR_DEBUG)/SelectTarget.o: SelectTarget.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectTarget.cpp -o $(OBJDIR_DEBUG)/SelectTarget.o
 
 $(OBJDIR_DEBUG)/EditorApp.o: EditorApp.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c EditorApp.cpp -o $(OBJDIR_DEBUG)/EditorApp.o
@@ -99,11 +102,14 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
-$(OBJDIR_RELEASE)/SelectTarget.o: SelectTarget.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectTarget.cpp -o $(OBJDIR_RELEASE)/SelectTarget.o
-
 $(OBJDIR_RELEASE)/SelectSegmentation.o: SelectSegmentation.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectSegmentation.cpp -o $(OBJDIR_RELEASE)/SelectSegmentation.o
+
+$(OBJDIR_RELEASE)/Tools.o: Tools.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Tools.cpp -o $(OBJDIR_RELEASE)/Tools.o
+
+$(OBJDIR_RELEASE)/SelectTarget.o: SelectTarget.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectTarget.cpp -o $(OBJDIR_RELEASE)/SelectTarget.o
 
 $(OBJDIR_RELEASE)/EditorApp.o: EditorApp.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c EditorApp.cpp -o $(OBJDIR_RELEASE)/EditorApp.o

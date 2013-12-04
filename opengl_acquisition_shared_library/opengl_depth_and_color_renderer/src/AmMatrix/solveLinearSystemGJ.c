@@ -262,7 +262,7 @@ int calculateFundamentalMatrix8Point(double * result3x3Matrix , unsigned int poi
       //Shortcut our vars
       pxA = &pointsA[i*2 + 0]; pyA = &pointsA[i*2 + 1];
       pxB = &pointsB[i*2 + 0]; pyB = &pointsB[i*2 + 1];
-      fprintf(stderr,"Pair %u : Point A %u,%u Point B %u,%u \n",i,*pxA,*pyA,*pxB,&pyB);
+      fprintf(stderr,"Pair %u : Point A %f,%f Point B %f,%f \n",i,*pxA,*pyA,*pxB,*pyB);
       //Make the precalculations for each of the elements
       compiledPoints[i*elements + xBxA] = (double)  (*pxB) * (*pxA);
       compiledPoints[i*elements + xByA] = (double)  (*pxB) * (*pyA);
