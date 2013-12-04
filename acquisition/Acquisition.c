@@ -319,7 +319,7 @@ unsigned char * convertShortDepthToRGBDepth(unsigned short * depth,unsigned int 
 {
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
   char * depthPTR= (char*) depth; // This will be the traversing pointer for input
-  char * depthLimit = (char*) depth + width*height * sizeof(short); //<- we use sizeof(short) because we have casted to char !
+  char * depthLimit = (char*) depth + width*height * sizeof(unsigned short); //<- we use sizeof(short) because we have casted to char !
 
 
   char * outFrame = (char*) malloc(width*height*3*sizeof(char));
@@ -341,11 +341,11 @@ unsigned char * convertShortDepthToRGBDepth(unsigned short * depth,unsigned int 
 unsigned char * convertShortDepthToCharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
 {
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
-  short * depthPTR= depth; // This will be the traversing pointer for input
-  short * depthLimit =  depth + width*height; //<- we use sizeof(short) because we have casted to char !
+  unsigned short * depthPTR= depth; // This will be the traversing pointer for input
+  unsigned short * depthLimit =  depth + width*height; //<- we use sizeof(short) because we have casted to char !
 
 
-  char * outFrame = (char*) malloc(width*height*1*sizeof(char));
+  unsigned char * outFrame = (char*) malloc(width*height*1*sizeof(char));
   if (outFrame==0) { fprintf(stderr,"Could not perform DepthToRGB transformation\nNo memory for new frame\n"); return 0; }
 
   float depth_range = max_depth-min_depth;
@@ -353,7 +353,7 @@ unsigned char * convertShortDepthToCharDepth(unsigned short * depth,unsigned int
   float multiplier = 255 / depth_range;
 
 
-  char * outFramePTR = outFrame; // This will be the traversing pointer for output
+  unsigned char * outFramePTR = outFrame; // This will be the traversing pointer for output
   while ( depthPTR<depthLimit )
   {
      unsigned int scaled = (unsigned int) (*depthPTR) * multiplier;
@@ -729,8 +729,8 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
     unsigned int height = 0 ;
     unsigned int channels = 0 ;
     unsigned int bitsperpixel = 0 ;
-    short * inFrame = 0;
-    char * outFrame = 0 ;
+    unsigned short * inFrame = 0;
+    unsigned char * outFrame = 0 ;
 
     inFrame = acquisitionGetDepthFrame(moduleID,devID);
     if (inFrame!=0)
@@ -761,8 +761,8 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
     unsigned int height = 0 ;
     unsigned int channels = 0 ;
     unsigned int bitsperpixel = 0 ;
-    short * inFrame = 0;
-    char * outFrame = 0 ;
+    unsigned short * inFrame = 0;
+    unsigned char * outFrame = 0 ;
 
     inFrame = acquisitionGetDepthFrame(moduleID,devID);
     if (inFrame!=0)
@@ -893,13 +893,13 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
 unsigned short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   printCall(moduleID,devID,"acquisitionGetDepthFrame", __FILE__, __LINE__);
-  if (*plugins[moduleID].getDepthPixels!=0) { return (short*) (*plugins[moduleID].getDepthPixels) (devID); }
+  if (*plugins[moduleID].getDepthPixels!=0) { return (unsigned short*) (*plugins[moduleID].getDepthPixels) (devID); }
   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrame");
   return 0;
 }
 
 
-unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength)
+unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned short * mem,unsigned int memlength)
 {
   printCall(moduleID,devID,"acquisitionCopyDepthFrame", __FILE__, __LINE__);
   if ( (mem==0) || (memlength==0) )
@@ -908,7 +908,7 @@ unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifie
     return 0;
   }
 
-  short * depth = acquisitionGetDepthFrame(moduleID,devID);
+  unsigned short * depth = acquisitionGetDepthFrame(moduleID,devID);
   if (depth==0) { return 0; }
   unsigned int width , height , channels , bitsperpixel;
   acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
@@ -918,7 +918,7 @@ unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifie
 }
 
 
-unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,short * mem,unsigned int memlength)
+unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned short * mem,unsigned int memlength)
 {
   printCall(moduleID,devID,"acquisitionCopyDepthFramePPM", __FILE__, __LINE__);
   if ( (mem==0) || (memlength==0) )
@@ -927,7 +927,7 @@ unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdenti
     return 0;
   }
 
-  short * depth = acquisitionGetDepthFrame(moduleID,devID);
+  unsigned short * depth = acquisitionGetDepthFrame(moduleID,devID);
   if (depth==0) { return 0; }
 
   unsigned int width , height , channels , bitsperpixel;
@@ -936,7 +936,7 @@ unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdenti
   sprintf((char*) mem, "P5%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
   unsigned int payloadStart = strlen((char*) mem);
 
-  short * memPayload = mem + payloadStart ;
+  unsigned short * memPayload = mem + payloadStart ;
   memcpy(memPayload,depth,width*height*channels*(bitsperpixel/8));
 
   payloadStart += width*height*channels*(bitsperpixel/8);
@@ -945,7 +945,7 @@ unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdenti
 
 unsigned short acquisitionGetDepthValueAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d )
 {
-    short * depthFrame = acquisitionGetDepthFrame(moduleID,devID);
+    unsigned short * depthFrame = acquisitionGetDepthFrame(moduleID,devID);
     if (depthFrame == 0 ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration , getting depth frame"); return 0; }
 
     unsigned int width; unsigned int height; unsigned int channels; unsigned int bitsperpixel;
