@@ -256,7 +256,7 @@ if (imageGeneratorsMetaData[devID].PixelFormat() != XN_PIXEL_FORMAT_RGB24)
     #if USE_CALIBRATION
      //Populate our calibration data ( if we have them
      FocalLengthAndPixelSizeToCalibration(getOpenNI1ColorFocalLength(devID),getOpenNI1ColorFocalLength(devID),getOpenNI1ColorWidth(devID),getOpenNI1ColorHeight(devID),&calibRGB[devID]);
-     FocalLengthAndPixelSizeToCalibration(getOpenNI1DepthFocalLength(devID),getOpenNI1DepthPixelSize(devID),getOpenNI1DepthWidth(devID),getOpenNI1DepthHeight(devID),&calibRGB[devID]);
+     FocalLengthAndPixelSizeToCalibration(getOpenNI1DepthFocalLength(devID),getOpenNI1DepthPixelSize(devID),getOpenNI1DepthWidth(devID),getOpenNI1DepthHeight(devID),&calibDepth[devID]);
     #endif
 
 

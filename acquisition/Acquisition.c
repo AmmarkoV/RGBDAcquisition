@@ -969,7 +969,11 @@ int acquisitionGetDepth3DPointAtXYCameraSpace(ModuleIdentifier moduleID,DeviceId
     struct calibration calib;
     unsigned short depthValue = acquisitionGetDepthValueAtXY(moduleID,devID,x2d,y2d);
     if (depthValue==0) { fprintf(stderr,"acquisitionGetDepth3DPointAtXYNoCalibration point has no depth\n"); return 0; }
-    if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )  { fprintf(stderr,"Could not get Depth Calibration , cannot get 3D point\n");  return 0; }
+    if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )
+        {
+          if ( !acquisitionGetColorCalibration(moduleID,devID,&calib) )
+          { fprintf(stderr,"Could not get Depth Calibration , cannot get 3D point\n"); return 0; }
+        }
 
     return transform2DProjectedPointTo3DPoint(&calib , x2d , y2d  , depthValue , x , y , z);
 }
@@ -980,7 +984,11 @@ int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier de
     struct calibration calib;
     unsigned short depthValue = acquisitionGetDepthValueAtXY(moduleID,devID,x2d,y2d);
     if (depthValue==0) { fprintf(stderr,"acquisitionGetDepth3DPointAtXYNoCalibration point has no depth\n"); return 0; }
-    if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )  { fprintf(stderr,"Could not get Depth Calibration , cannot get 3D point\n"); return 0; }
+    if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )
+        {
+          if ( !acquisitionGetColorCalibration(moduleID,devID,&calib) )
+          { fprintf(stderr,"Could not get Depth Calibration , cannot get 3D point\n"); return 0; }
+        }
 
     transform2DProjectedPointTo3DPoint(&calib , x2d , y2d  , depthValue , x , y , z);
 

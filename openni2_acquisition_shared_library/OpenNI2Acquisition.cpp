@@ -381,7 +381,7 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
     #if USE_CALIBRATION
      //Populate our calibration data ( if we have them
      FocalLengthAndPixelSizeToCalibration(getOpenNI2ColorFocalLength(devID),getOpenNI2ColorFocalLength(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID),&calibRGB[devID]);
-     FocalLengthAndPixelSizeToCalibration(getOpenNI2DepthFocalLength(devID),getOpenNI2DepthPixelSize(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID),&calibRGB[devID]);
+     FocalLengthAndPixelSizeToCalibration(getOpenNI2DepthFocalLength(devID),getOpenNI2DepthPixelSize(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID),&calibDepth[devID]);
     #endif
 
     return 1;
@@ -484,7 +484,11 @@ double getOpenNI2DepthFocalLength(int devID)
 {
     int zpd=0;
     depth[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,&zpd);
-    if (zpd==0) { fprintf(stderr,"Please Note That getOpenNI2DepthFocalLength returned zero\n"); }
+    if (zpd==0) {
+                  fprintf(stderr,"Please Note That getOpenNI2DepthFocalLength returned zero , so we return getOpenNI2ColorFocalLength\n");
+                  return  getOpenNI2ColorFocalLength(devID);
+                }
+
     return (double) zpd;
 }
 
@@ -495,7 +499,11 @@ double getOpenNI2DepthPixelSize(int devID)
 
     fprintf(stderr,"Note : OpenNI2 gives us half the true pixel size ? ? \n");
     zpps*=2.0;
-    if (zpps==0) { fprintf(stderr,"Please Note That getOpenNI2DepthPixelSize returned zero\n"); }
+    if (zpps==0) {
+                  fprintf(stderr,"Please Note That getOpenNI2DepthPixelSize returned zero , so we return getOpenNI2ColorPixelSize\n");
+                  return  getOpenNI2ColorPixelSize(devID);
+                 }
+
     return (double) zpps;
 }
 

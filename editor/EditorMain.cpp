@@ -455,7 +455,8 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
               } else
               {
                 if (!calib.intrinsicParametersSet)
-                 { Status->SetStatusText(wxT("Cannot get 3D point from input source , please check your calibration data")); } else
+                 { Status->SetStatusText(wxT("Cannot get 3D point from input source , please check your calibration data")); }
+                 else
                  { Status->SetStatusText(wxT("No 3D Depth at this point..!")); }
               }
            }
@@ -474,7 +475,7 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
              float centerX , centerY , centerZ;
              unsigned int width , height , channels , bitsperpixel;
              acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-             segmentGetDepthBlobAverage(acquisitionGetDepthFrame(moduleID,devID),width,height,
+             segmentGetDepthBlobAverage(depthFrame,width,height,
                                         sX,sY,checkWidth,checkHeight,
                                         &centerX,&centerY,&centerZ);
 
@@ -555,9 +556,11 @@ void EditorFrame::guiSnapFrames()
 
   unsigned int devID=0;
   unsigned int width , height , channels , bitsperpixel;
+  unsigned int currentFrameDrawn=acquisitionGetCurrentFrameNumber(moduleID,devID);
+
 
   if (
-        ( (lastFrameDrawn!=acquisitionGetCurrentFrameNumber(moduleID,devID)) && (lastFrameDrawn!=0) )
+        ( (lastFrameDrawn!=currentFrameDrawn)  )
         // || ( (acquisitionGetTotalFrameNumber(moduleID,devID)==0) && (play) )
      )
   {
@@ -572,7 +575,7 @@ void EditorFrame::guiSnapFrames()
 
 
        unsigned char * rgbDepth = convertShortDepthTo3CharDepth(segmentedDepth,width,height,0,2048);
-       //char * rgbDepth = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
+       //char * rgbDepth = convertShortDepthToRGBDepth(depthFrame,width,height);
        if (rgbDepth!=0)
        {
          passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
@@ -589,7 +592,7 @@ void EditorFrame::guiSnapFrames()
 
 
        unsigned char * rgbDepth = convertShortDepthTo3CharDepth(depthFrame,width,height,0,2048);
-       //char * rgbDepth = convertShortDepthToRGBDepth(acquisitionGetDepthFrame(moduleID,devID),width,height);
+       //char * rgbDepth = convertShortDepthToRGBDepth(depthFrame,width,height);
        if (rgbDepth!=0)
        {
         passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
@@ -598,7 +601,7 @@ void EditorFrame::guiSnapFrames()
      }
 
 
-   lastFrameDrawn=acquisitionGetCurrentFrameNumber(moduleID,devID);
+   lastFrameDrawn=currentFrameDrawn;
    totalFramesOfDevice=acquisitionGetTotalFrameNumber(moduleID,devID);
 
 
