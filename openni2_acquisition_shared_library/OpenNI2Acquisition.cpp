@@ -3,8 +3,8 @@
 
 #include "OpenNI2Acquisition.h"
 
-#define BUILD_OPENNI2 1
-#define USE_CALIBRATION 1
+//#define BUILD_OPENNI2 1
+//#define USE_CALIBRATION 1
 
 #if BUILD_OPENNI2
 
