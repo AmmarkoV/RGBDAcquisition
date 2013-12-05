@@ -3,7 +3,7 @@
 
 #include "OpenNI2Acquisition.h"
 
-//#define BUILD_OPENNI2 1
+#define BUILD_OPENNI2 1
 
 #if BUILD_OPENNI2
 
@@ -381,6 +381,16 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
  }
 
 
+int getTotalOpenNI2FrameNumber(int devID)
+{
+  fprintf(stderr,"Todo , check here for oni file length etc..\n");
+  return 0;
+}
+
+int getCurrentOpenNI2FrameNumber(int devID)
+{
+  return colorFrame[devID].getFrameIndex();
+}
 
 //COLOR FRAMES
 int getOpenNI2ColorWidth(int devID)

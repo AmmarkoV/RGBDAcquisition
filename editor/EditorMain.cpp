@@ -147,7 +147,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     buttonStop = new wxButton(this, ID_BUTTON3, _("Stop"), wxPoint(150,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     buttonNextFrame = new wxButton(this, ID_BUTTON4, _(">"), wxPoint(236,524), wxSize(56,27), 0, wxDefaultValidator, _T("ID_BUTTON4"));
     StaticTextJumpTo = new wxStaticText(this, ID_STATICTEXT1, _("Jump To : "), wxPoint(504,528), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(584,524), wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(584,524), wxDefaultSize, wxTE_PROCESS_ENTER|wxNO_FULL_REPAINT_ON_RESIZE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(672,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(688,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(1192,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
@@ -292,16 +292,6 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
        //return 1;
     }
 
-   //We want to initialize all possible devices in this example..
-   /* THIS is not always a good check
-   unsigned int devID=0,maxDevID=acquisitionGetModuleDevices(moduleID);
-   if (maxDevID==0)
-   {
-       wxMessageBox(wxT("error while Openning device"),wxT("RGBDAcquisition Editor"));
-       fprintf(stderr,"No devices found for Module used \n");
-     // return 1;
-   }*/
-
 
    if (fps!=0) { Timer.Stop(); Timer.Start((unsigned int) 1000/fps, false); }
 
@@ -337,12 +327,13 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    initializeDepthSegmentationConfiguration(&segConfDepth,width,height);
 
 
-   acquisitionSnapFrames(moduleID,devID);
-   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
-   depthFrame = acquisitionGetDepthFrame(moduleID,devID);
+   guiSnapFrames();
 
    alreadyInitialized=1;
    //This hangs the window -> guiSnapFrames();
+   wxYield();
+   wxThread::Sleep(0.4);
+   wxYield();
 
 }
 
@@ -425,7 +416,6 @@ void EditorFrame::render(wxDC& dc)
 
 void EditorFrame::OnMotion(wxMouseEvent& event)
 {
-  fprintf(stderr,"OnMotion Called\n");
   int x=event.GetX();
   int y=event.GetY();
 
@@ -452,6 +442,9 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
                                                   { msg.Printf( wxT("Using Camera Space : Depth at point is  %0.5f   %0.5f   %0.5f ") ,x,y,z  ); }
 
                 Status->SetStatusText(msg);
+              } else
+              {
+                Status->SetStatusText(wxT("Cannot get 3D point from input source , please check your calibration data"));
               }
            }
        }
@@ -513,7 +506,6 @@ int EditorFrame::removeOldSegmentedFrames()
 
 int  EditorFrame::refreshSegmentedFrame()
 {
-  fprintf(stderr,"refreshSegmentedFrame Called\n");
     if (segmentedFramesExist)
     {
      removeOldSegmentedFrames();
@@ -539,32 +531,22 @@ int  EditorFrame::refreshSegmentedFrame()
 
 void EditorFrame::guiSnapFrames()
 {
-  wxSleep(0.01);
+  this->Freeze();                 // Freeze the window to prevent scrollbar jumping
 
   ++framesSnapped;
   fprintf(stderr,"guiSnapFrames Called %u ! \n",framesSnapped);
-  wxYield();
-
-  fprintf(stderr,"Doing Snap\n");
   acquisitionSnapFrames(moduleID,devID);
-  wxYield();
-  fprintf(stderr,"Getting Color\n");
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
-  wxYield();
-  fprintf(stderr,"Getting Depth\n");
   depthFrame = acquisitionGetDepthFrame(moduleID,devID);
-  wxYield();
-  fprintf(stderr,"Refresh Segmentation\n");
   refreshSegmentedFrame();
-  wxYield();
 
 
   unsigned int devID=0;
   unsigned int width , height , channels , bitsperpixel;
 
   if (
-        (lastFrameDrawn!=acquisitionGetCurrentFrameNumber(moduleID,devID)) ||
-        ( (acquisitionGetTotalFrameNumber(moduleID,devID)==0) && (play) )
+        ( (lastFrameDrawn!=acquisitionGetCurrentFrameNumber(moduleID,devID)) && (lastFrameDrawn!=0) )
+        // || ( (acquisitionGetTotalFrameNumber(moduleID,devID)==0) && (play) )
      )
   {
      if (segmentedFramesExist)
@@ -607,27 +589,36 @@ void EditorFrame::guiSnapFrames()
    lastFrameDrawn=acquisitionGetCurrentFrameNumber(moduleID,devID);
    totalFramesOfDevice=acquisitionGetTotalFrameNumber(moduleID,devID);
 
+
    wxString currentFrame;
-   currentFrame.clear();
-   currentFrame<<lastFrameDrawn;
-   currentFrameTextCtrl->SetValue(currentFrame);
+   if (totalFramesOfDevice!=0)
+   {
+      fprintf(stderr,"This call is problematic , it might lead to the window becoming non-responsive");
+      currentFrame.clear();
+      currentFrame<<lastFrameDrawn;
+      if (!currentFrame.IsSameAs(currentFrameTextCtrl->GetValue()))
+               { currentFrameTextCtrl->SetValue(currentFrame); }
+   }
 
    currentFrame.clear();
    currentFrame<<totalFramesOfDevice;
    totalFramesLabel->SetLabel(currentFrame);
 
 
-   FrameSlider->SetValue(lastFrameDrawn);
+   if (lastFrameDrawn!=FrameSlider->GetValue())
+        { FrameSlider->SetValue(lastFrameDrawn); }
 
    if (FrameSlider->GetMax()!=totalFramesOfDevice)
-     {
-       FrameSlider->SetMax(totalFramesOfDevice);
-     }
+        { FrameSlider->SetMax(totalFramesOfDevice); }
 
+  } else
+  {
+      fprintf(stderr,"Will not refresh bitmaps etc..\n" );
   }
 
-  wxMilliSleep(10);
 
+  this->Thaw();                 // Freeze the window to prevent scrollbar jumping
+  wxMilliSleep(10);
 }
 
 
@@ -637,15 +628,16 @@ void EditorFrame::onIdle(wxIdleEvent& evt)
    this->paintNow();
    //evt.RequestMore(); // render continuously, not only once on idle
 
-   Refresh();
-   wxThread::Sleep(0.4);
+   //Refresh();
+   //wxThread::Sleep(0.4);
 }
 
 
 
 void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
 {
-  fprintf(stderr,"OnTimerTrigger Called\n");
+  if (!alreadyInitialized) { return ; }
+  //fprintf(stderr,"OnTimerTrigger Called\n");
   if (play)
     {
      guiSnapFrames(); //Get New Frames
@@ -664,7 +656,7 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
     }
 
   wxYield();
- wxThread::Sleep(0.4);
+  //wxThread::Sleep(0.4);
 }
 
 void EditorFrame::OnbuttonPlayClick(wxCommandEvent& event)
@@ -710,19 +702,12 @@ void EditorFrame::OncurrentFrameTextCtrlText(wxCommandEvent& event)
 
 void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
 {
-    /*
-    float percentageOfFrames = (float) FrameSlider->GetValue()  /  FrameSlider->GetMax() ;
-    fprintf(stderr,"Go to : %u ( %0.2f ) min %0.2f max %0.2f \n",FrameSlider->GetValue(),percentageOfFrames , FrameSlider->GetMin() , FrameSlider->GetMax());
-    fprintf(stderr,"Max Frames : %u \n",acquisitionGetTotalFrameNumber(moduleID,devID));
-
-    long jumpTo =  (long) (percentageOfFrames * acquisitionGetTotalFrameNumber(moduleID,devID));*/
-
     long jumpTo = FrameSlider->GetValue();
 
     if (jumpTo>0) { --jumpTo; }
-          acquisitionSeekFrame(moduleID,devID,jumpTo);
-          guiSnapFrames(); //Get New Frames
-          Refresh(); // <- This draws the window!
+    acquisitionSeekFrame(moduleID,devID,jumpTo);
+    guiSnapFrames(); //Get New Frames
+    Refresh(); // <- This draws the window!
 }
 
 void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
