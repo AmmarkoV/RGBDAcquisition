@@ -9,6 +9,11 @@ extern "C"
 
    #include "../acquisition/acquisition_setup.h"
 
+   #if USE_CALIBRATION
+    #include "../tools/Calibration/calibration.h"
+   #endif
+
+
    //Initialization of OpenNI2
    int startOpenNI2Module(unsigned int max_devs,char * settings);
 
@@ -47,8 +52,18 @@ extern "C"
    int getOpenNI2DepthBitsPerPixel(int devID);
    short * getOpenNI2DepthPixels(int devID);
 
+
    double getOpenNI2DepthFocalLength(int devID);
    double getOpenNI2DepthPixelSize(int devID);
+
+   #if USE_CALIBRATION
+    int getOpenNI2ColorCalibration(int devID,struct calibration * calib);
+    int getOpenNI2DepthCalibration(int devID,struct calibration * calib);
+
+    int setOpenNI2ColorCalibration(int devID,struct calibration * calib);
+    int setOpenNI2DepthCalibration(int devID,struct calibration * calib);
+   #endif
+
 
    #endif
 

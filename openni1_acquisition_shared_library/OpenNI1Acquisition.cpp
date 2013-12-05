@@ -29,6 +29,11 @@ ScriptNode script;
 Context ctx;
 
 
+#if USE_CALIBRATION
+ struct calibration calibRGB[MAX_OPENNI_DEVICES];
+ struct calibration calibDepth[MAX_OPENNI_DEVICES];
+#endif
+
 
 int startOpenNI1Module(unsigned int max_devs,char * settings)
 {
@@ -248,6 +253,14 @@ if (imageGeneratorsMetaData[devID].PixelFormat() != XN_PIXEL_FORMAT_RGB24)
     return 0;
   }
 
+    #if USE_CALIBRATION
+     //Populate our calibration data ( if we have them
+     FocalLengthAndPixelSizeToCalibration(getOpenNI1ColorFocalLength(devID),getOpenNI1ColorFocalLength(devID),getOpenNI1ColorWidth(devID),getOpenNI1ColorHeight(devID),&calibRGB[devID]);
+     FocalLengthAndPixelSizeToCalibration(getOpenNI1DepthFocalLength(devID),getOpenNI1DepthPixelSize(devID),getOpenNI1DepthWidth(devID),getOpenNI1DepthHeight(devID),&calibRGB[devID]);
+    #endif
+
+
+
  //fprintf(stderr,"We seem to have correctly initialized OpenNI1 %u , %s \n",devID,devName);
  return 1;
 }
@@ -300,6 +313,8 @@ double getOpenNI1ColorPixelSize(int devID)
 	XnDouble pixelSize;
 	// get the pixel size in mm ("ZPPS" = pixel size at zero plane)
 	imageGenerators[devID].GetRealProperty ("ZPPS", pixelSize);
+	fprintf(stderr,"Note : OpenNI1 gives us half the true pixel size ? ? \n");
+    pixelSize*=2.0;
     return (double) pixelSize;
 }
 
@@ -332,8 +347,40 @@ double getOpenNI1DepthPixelSize(int devID)
 	XnDouble pixelSize;
 	// get the pixel size in mm ("ZPPS" = pixel size at zero plane)
 	depthGenerators[devID].GetRealProperty ("ZPPS", pixelSize);
+	fprintf(stderr,"Note : OpenNI1 gives us half the true pixel size ? ? \n");
+    pixelSize*=2.0;
     return (double) pixelSize;
 }
+
+
+
+
+#if USE_CALIBRATION
+int getOpenNI1ColorCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) calib,(void*) &calibRGB[devID],sizeof(struct calibration));
+    return 1;
+}
+
+int getOpenNI1DepthCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) calib,(void*) &calibDepth[devID],sizeof(struct calibration));
+    return 1;
+}
+
+
+int setOpenNI1ColorCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) &calibRGB[devID] , (void*) calib,sizeof(struct calibration));
+    return 1;
+}
+
+int setOpenNI1DepthCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) &calibDepth[devID] , (void*) calib,sizeof(struct calibration));
+    return 1;
+}
+#endif
 
 
 #else

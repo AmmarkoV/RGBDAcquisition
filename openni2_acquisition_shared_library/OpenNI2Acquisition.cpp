@@ -4,6 +4,7 @@
 #include "OpenNI2Acquisition.h"
 
 #define BUILD_OPENNI2 1
+#define USE_CALIBRATION 1
 
 #if BUILD_OPENNI2
 
@@ -23,6 +24,11 @@ using namespace openni;
 Device device[MAX_OPENNI2_DEVICES];
 VideoStream depth[MAX_OPENNI2_DEVICES] , color[MAX_OPENNI2_DEVICES];
 VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES];
+
+#if USE_CALIBRATION
+ struct calibration calibRGB[MAX_OPENNI2_DEVICES];
+ struct calibration calibDepth[MAX_OPENNI2_DEVICES];
+#endif
 
 
 enum howToOpenDevice
@@ -371,6 +377,13 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
      fprintf(stdout,"Depth Focal Length : %0.2f\n",getOpenNI2DepthFocalLength(devID));
      fprintf(stdout,"Depth Pixel Size : %0.2f\n",getOpenNI2DepthPixelSize(devID));
     }
+
+    #if USE_CALIBRATION
+     //Populate our calibration data ( if we have them
+     FocalLengthAndPixelSizeToCalibration(getOpenNI2ColorFocalLength(devID),getOpenNI2ColorFocalLength(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID),&calibRGB[devID]);
+     FocalLengthAndPixelSizeToCalibration(getOpenNI2DepthFocalLength(devID),getOpenNI2DepthPixelSize(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID),&calibRGB[devID]);
+    #endif
+
     return 1;
   }
 
@@ -430,6 +443,10 @@ double getOpenNI2ColorPixelSize(int devID)
 {
     double zpps=0.0;
     color[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
+
+    fprintf(stderr,"Note : OpenNI2 gives us half the true pixel size ? ? \n");
+    zpps*=2.0;
+
     return (double) zpps;
 }
 
@@ -474,8 +491,41 @@ double getOpenNI2DepthPixelSize(int devID)
 {
     double zpps=0.0;
     depth[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
+
+    fprintf(stderr,"Note : OpenNI2 gives us half the true pixel size ? ? \n");
+    zpps*=2.0;
+
     return (double) zpps;
 }
+
+
+#if USE_CALIBRATION
+int getOpenNI2ColorCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) calib,(void*) &calibRGB[devID],sizeof(struct calibration));
+    return 1;
+}
+
+int getOpenNI2DepthCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) calib,(void*) &calibDepth[devID],sizeof(struct calibration));
+    return 1;
+}
+
+
+int setOpenNI2ColorCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) &calibRGB[devID] , (void*) calib,sizeof(struct calibration));
+    return 1;
+}
+
+int setOpenNI2DepthCalibration(int devID,struct calibration * calib)
+{
+    memcpy((void*) &calibDepth[devID] , (void*) calib,sizeof(struct calibration));
+    return 1;
+}
+#endif
+
 
 
 #else

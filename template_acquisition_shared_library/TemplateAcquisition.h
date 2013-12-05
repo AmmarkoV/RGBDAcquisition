@@ -3,16 +3,17 @@
 
 
 
-#define USE_CALIBRATION 1
-
-#if USE_CALIBRATION
-#include "../tools/Calibration/calibration.h"
-#endif
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+   #include "../acquisition/acquisition_setup.h"
+
+   #if USE_CALIBRATION
+    #include "../tools/Calibration/calibration.h"
+   #endif
 
    //Initialization of Template
    int startTemplateModule(unsigned int max_devs,char * settings);
@@ -37,11 +38,13 @@ extern "C"
    int snapTemplateFrames(int devID);
 
 
-   int getTemplateColorCalibration(int devID,struct calibration * calib);
-   int getTemplateDepthCalibration(int devID,struct calibration * calib);
+   #if USE_CALIBRATION
+    int getTemplateColorCalibration(int devID,struct calibration * calib);
+    int getTemplateDepthCalibration(int devID,struct calibration * calib);
 
-   int setTemplateColorCalibration(int devID,struct calibration * calib);
-   int setTemplateDepthCalibration(int devID,struct calibration * calib);
+    int setTemplateColorCalibration(int devID,struct calibration * calib);
+    int setTemplateDepthCalibration(int devID,struct calibration * calib);
+   #endif
 
    //Color Frame getters
    unsigned long getLastTemplateColorTimestamp(int devID);

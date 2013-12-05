@@ -95,7 +95,7 @@ double getTemplateDepthFocalLength(int devID)
 double getTemplateDepthPixelSize(int devID) { return DEFAULT_PIXEL_SIZE; }
 
 
-
+#if USE_CALIBRATION
 int getTemplateColorCalibration(int devID,struct calibration * calib)
 {
     memcpy((void*) calib,(void*) &device[devID].calibRGB,sizeof(struct calibration));
@@ -120,6 +120,7 @@ int setTemplateDepthCalibration(int devID,struct calibration * calib)
     memcpy((void*) &device[devID].calibDepth , (void*) calib,sizeof(struct calibration));
     return 1;
 }
+#endif
 
 
 

@@ -1,1 +1,176 @@
 # depslib dependency file v1.0
+1386114869 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/openni1_acquisition_shared_library/OpenNI1Acquisition.cpp
+	<stdio.h>
+	<stdlib.h>
+	"OpenNI1Acquisition.h"
+	<XnOS.h>
+	<XnCppWrapper.h>
+	<XnLog.h>
+
+1386240879 /home/ammar/Documents/Programming/FORTH/input_acquisition/openni1_acquisition_shared_library/OpenNI1Acquisition.h
+	"../acquisition/acquisition_setup.h"
+	"../tools/Calibration/calibration.h"
+
+1386240724 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
+
+1384980760 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnOS.h
+	"XnPlatform.h"
+	"XnMacros.h"
+	"XnStatusCodes.h"
+	"XnOSStrings.h"
+	"XnOSMemory.h"
+	"Win32/XnOSWin32.h"
+	"Linux-x86/XnOSLinux-x86.h"
+	"ARC/XnOSARC.h"
+	<new>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnPlatform.h
+	"Win32/XnPlatformWin32.h"
+	"Android-Arm/XnPlatformAndroid-Arm.h"
+	"Linux-x86/XnPlatformLinux-x86.h"
+	"Linux-Arm/XnPlatformLinux-Arm.h"
+	"ARC/XnPlatformARC.h"
+	"MacOSX/XnPlatformMacOSX.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//Win32/XnPlatformWin32.h
+	<windows.h>
+	<stdlib.h>
+	<stdio.h>
+	<malloc.h>
+	<io.h>
+	<time.h>
+	<assert.h>
+	<float.h>
+	<crtdbg.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//Android-Arm/XnPlatformAndroid-Arm.h
+	"../Linux-x86/XnPlatformLinux-x86.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//Linux-x86/XnPlatformLinux-x86.h
+	<unistd.h>
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<assert.h>
+	<limits.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//Linux-Arm/XnPlatformLinux-Arm.h
+	"../Linux-x86/XnPlatformLinux-x86.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//ARC/XnPlatformARC.h
+	<unistd.h>
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<assert.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//MacOSX/XnPlatformMacOSX.h
+	"../Linux-x86/XnPlatformLinux-x86.h"
+	<sys/time.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnMacros.h
+	"XnStatusCodes.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnStatusCodes.h
+	"XnStatus.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnStatus.h
+	"XnPlatform.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnOSStrings.h
+	"XnPlatform.h"
+	<stdarg.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnOSMemory.h
+	"XnPlatform.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//Win32/XnOSWin32.h
+	<XnPlatform.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//Linux-x86/XnOSLinux-x86.h
+	<sys/types.h>
+	<stdarg.h>
+	<time.h>
+	<pthread.h>
+	<sys/stat.h>
+	<fcntl.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//ARC/XnOSARC.h
+	<sys/types.h>
+	<stdarg.h>
+	<time.h>
+	<stdio.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnCppWrapper.h
+	<XnOpenNI.h>
+	<XnCodecIDs.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnOpenNI.h
+	"XnTypes.h"
+	"XnContext.h"
+	"XnLicensing.h"
+	"XnUtils.h"
+	"XnPrdNodeInfo.h"
+	"XnQueries.h"
+	"XnPrdNode.h"
+	"XnEnumerationErrors.h"
+	"XnVersion.h"
+	"XnStatusCodes.h"
+	"XnStatus.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnTypes.h
+	<XnStatus.h>
+	<XnOS.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnContext.h
+	<XnTypes.h>
+	<XnQueries.h>
+	<XnPrdNodeInfoList.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnQueries.h
+	"XnTypes.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnPrdNodeInfoList.h
+	<XnTypes.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnLicensing.h
+	<XnTypes.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnUtils.h
+	<XnTypes.h>
+	<XnModuleInterface.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnModuleInterface.h
+	<XnTypes.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnPrdNodeInfo.h
+	<XnTypes.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnPrdNode.h
+	<XnTypes.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnEnumerationErrors.h
+	<XnTypes.h>
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnVersion.h
+	"XnPlatform.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnCodecIDs.h
+	"XnTypes.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnLog.h
+	"XnOS.h"
+	"XnLogTypes.h"
+	"XnDump.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnLogTypes.h
+	"XnPlatform.h"
+	"XnTypes.h"
+
+1385991788 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI/Include//XnDump.h
+	"XnPlatform.h"
+	"XnStatus.h"
+	"XnOS.h"
+

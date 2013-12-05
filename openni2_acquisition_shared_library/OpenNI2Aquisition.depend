@@ -1,1 +1,87 @@
 # depslib dependency file v1.0
+1386242808 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/openni2_acquisition_shared_library/OpenNI2Acquisition.cpp
+	<stdio.h>
+	<stdlib.h>
+	"OpenNI2Acquisition.h"
+	<unistd.h>
+	<OpenNI.h>
+	<PS1080.h>
+
+1386240861 /home/ammar/Documents/Programming/FORTH/input_acquisition/openni2_acquisition_shared_library/OpenNI2Acquisition.h
+	"../acquisition/acquisition_setup.h"
+	"../tools/Calibration/calibration.h"
+
+1386240724 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
+
+1386241976 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//OpenNI.h
+	"OniPlatform.h"
+	"OniProperties.h"
+	"OniEnums.h"
+	"OniCAPI.h"
+	"OniCProperties.h"
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//OniPlatform.h
+	"Win32/OniPlatformWin32.h"
+	"Android-Arm/OniPlatformAndroid-Arm.h"
+	"Linux-x86/OniPlatformLinux-x86.h"
+	"Linux-Arm/OniPlatformLinux-Arm.h"
+	"ARC/OniPlaformARC.h"
+	"MacOSX/OniPlatformMacOSX.h"
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//Win32/OniPlatformWin32.h
+	<windows.h>
+	<stdlib.h>
+	<stdio.h>
+	<malloc.h>
+	<io.h>
+	<time.h>
+	<assert.h>
+	<float.h>
+	<crtdbg.h>
+	<stdint.h>
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//Android-Arm/OniPlatformAndroid-Arm.h
+	"../Linux-x86/OniPlatformLinux-x86.h"
+
+1358896880 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//Linux-x86/OniPlatformLinux-x86.h
+	<unistd.h>
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<assert.h>
+	<limits.h>
+	<stdint.h>
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//Linux-Arm/OniPlatformLinux-Arm.h
+	"../Linux-x86/OniPlatformLinux-x86.h"
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//MacOSX/OniPlatformMacOSX.h
+	"../Linux-x86/OniPlatformLinux-x86.h"
+	<sys/time.h>
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//OniProperties.h
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//OniEnums.h
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//OniCAPI.h
+	"OniPlatform.h"
+	"OniCTypes.h"
+	"OniCProperties.h"
+	"OniVersion.h"
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//OniCTypes.h
+	"OniPlatform.h"
+	"OniCEnums.h"
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//OniCEnums.h
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//OniCProperties.h
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//OniVersion.h
+	"OniPlatform.h"
+
+1385999698 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/OpenNI2/Include//PS1080.h
+	<OniCTypes.h>
+

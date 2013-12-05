@@ -44,6 +44,7 @@ struct calibration
 float intAtof(char * str);
 
 int NullCalibration(unsigned int width,unsigned int height, struct calibration * calib);
+int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,unsigned int width,unsigned int height, struct calibration * calib);
 int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib);
 int WriteCalibration(char * filename,struct calibration * calib);
 

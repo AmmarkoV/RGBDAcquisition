@@ -1,12 +1,18 @@
 #ifndef OPENNI1ACQUISITION_H_INCLUDED
 #define OPENNI1ACQUISITION_H_INCLUDED
 
-#include "../acquisition/acquisition_setup.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+   #include "../acquisition/acquisition_setup.h"
+
+   #if USE_CALIBRATION
+    #include "../tools/Calibration/calibration.h"
+   #endif
+
 
    //Initialization of OpenNI1
    int startOpenNI1Module(unsigned int max_devs,char * settings);
@@ -46,6 +52,16 @@ extern "C"
 
    double getOpenNI1DepthFocalLength(int devID);
    double getOpenNI1DepthPixelSize(int devID);
+
+
+   #if USE_CALIBRATION
+    int getOpenNI1ColorCalibration(int devID,struct calibration * calib);
+    int getOpenNI1DepthCalibration(int devID,struct calibration * calib);
+
+    int setOpenNI1ColorCalibration(int devID,struct calibration * calib);
+    int setOpenNI1DepthCalibration(int devID,struct calibration * calib);
+   #endif
+
 
    #endif
 

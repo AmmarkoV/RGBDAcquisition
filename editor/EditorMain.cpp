@@ -309,23 +309,33 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
 
    unsigned int totalFrames =  acquisitionGetTotalFrameNumber(moduleID,devID);
 
+   play=0;
+   recording=0; recordedFrames=0;
+   framesSnapped=0;
+
    if (totalFrames==0) {
                          totalFramesLabel->SetLabel(wxT("Live Stream"));
                          play=1;
                          FrameSlider->SetMax(1);
                          FrameSlider->Disable();
+                         currentFrameTextCtrl->Disable();
+                         buttonPreviousFrame->Disable();
+                         buttonNextFrame->Disable();
+
                        } else // This means a live stream
                        {
                          wxString msg; msg.Printf(wxT("%u"),totalFrames);
                          totalFramesLabel->SetLabel(msg);
                          FrameSlider->SetMax(totalFrames);
                          FrameSlider->Enable();
+                         currentFrameTextCtrl->Enable();
+                         buttonPreviousFrame->Enable();
+                         buttonNextFrame->Enable();
                        }
 
 
    initializeRGBSegmentationConfiguration(&segConfRGB,width,height);
    initializeDepthSegmentationConfiguration(&segConfDepth,width,height);
-
 
    guiSnapFrames();
 
@@ -444,7 +454,9 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
                 Status->SetStatusText(msg);
               } else
               {
-                Status->SetStatusText(wxT("Cannot get 3D point from input source , please check your calibration data"));
+                if (!calib.intrinsicParametersSet)
+                 { Status->SetStatusText(wxT("Cannot get 3D point from input source , please check your calibration data")); } else
+                 { Status->SetStatusText(wxT("No 3D Depth at this point..!")); }
               }
            }
        }

@@ -20,11 +20,13 @@
 #define BUILD_FREENECT 1
 #define BUILD_OPENGL 1
 #define BUILD_NETWORK 1
-//This is on by default #define BUILD_TEMPLATE 1
+#define BUILD_TEMPLATE 1 //<- This is on by default because it has no dependencies
 #define BUILD_V4L2 1
+//todo add more acquisition modules here..
 
 #define PRINT_DEBUG_EACH_CALL 0
 
-//todo add more acquisition modules here..
+#define USE_CALIBRATION 1
+
 
 #endif // ACQUISITION_SETUP_H_INCLUDED

@@ -69,6 +69,28 @@ int NullCalibration(unsigned int width,unsigned int height, struct calibration *
 }
 
 
+
+int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,unsigned int width,unsigned int height ,  struct calibration * calib)
+{
+  NullCalibration(width,height,calib);
+
+  if (pixelSize!=0)
+  {
+  //->  ? pixelSize *= 2.f;
+   calib->intrinsic[CALIB_INTR_FX] = (double) focalLength/pixelSize;
+   calib->intrinsic[CALIB_INTR_FY] = (double) focalLength/pixelSize;
+   calib->intrinsicParametersSet=1;
+
+   return 1;
+  }
+
+  fprintf(stderr,"FocalLengthAndPixelSizeToCalibration(with focalLength %f and pixelSize %f) cannot yield a valid calibration\n",focalLength , pixelSize);
+  return 0;
+}
+
+
+
+
 float intAtof(char * str)
 {
   forceUSLocaleToKeepOurSanity();
