@@ -60,7 +60,7 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	TextCtrlFPS = new wxTextCtrl(this, ID_TEXTCTRL4, _("30"), wxPoint(216,100), wxSize(40,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("fps"), wxPoint(264,104), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	ButtonCancel = new wxButton(this, ID_BUTTON2, _("Cancel"), wxPoint(184,152), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	ComboBoxDevice = new wxComboBox(this, ID_COMBOBOX2, wxEmptyString, wxPoint(88,56), wxDefaultSize, 0, 0, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_COMBOBOX2"));
+	ComboBoxDevice = new wxComboBox(this, ID_COMBOBOX2, wxEmptyString, wxPoint(88,56), wxDefaultSize, 0, 0, wxCB_SORT|wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_COMBOBOX2"));
 	ComboBoxDevice->Append(wxEmptyString);
 	ComboBoxDevice->Append(_("Test"));
 
@@ -71,6 +71,9 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	//*)
 
 
+    Connect(ID_COMBOBOX2,wxEVT_COMMAND_ENTER,(wxObjectEventFunction)&SelectModule::OnButtonStartModuleClick);
+    Connect(ID_COMBOBOX2,wxEVT_CHAR, (wxObjectEventFunction)&SelectModule::myComboKeyPress);
+    Connect(ID_COMBOBOX2,wxEVT_KEY_DOWN,(wxObjectEventFunction)&SelectModule::myComboKeyPress);
 
   //char listOfFiles[4096];
 
@@ -175,6 +178,17 @@ void SelectModule::OnComboBoxDeviceSelected(wxCommandEvent& event)
 {
 
 }
+
+void SelectModule::myComboKeyPress( wxKeyEvent& event )
+{
+   wxCommandEvent event2;
+   if ( event.GetKeyCode() == WXK_RETURN ) { OnButtonStartModuleClick(event2); }
+
+   fprintf(stderr,"KeyCode we got was %u \n",event.GetKeyCode());
+
+   event.Skip();
+}
+
 
 void SelectModule::OnComboBoxModuleSelected(wxCommandEvent& event)
 {

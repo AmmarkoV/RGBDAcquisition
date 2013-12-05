@@ -78,7 +78,7 @@
 				<item>Test</item>
 			</content>
 			<pos>88,56</pos>
-			<style>wxTE_PROCESS_ENTER</style>
+			<style>wxCB_SORT|wxTE_PROCESS_ENTER</style>
 			<handler function="OnComboBoxDeviceSelected" entry="EVT_COMBOBOX" />
 		</object>
 	</object>

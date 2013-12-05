@@ -316,6 +316,7 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    if (totalFrames==0) {
                          totalFramesLabel->SetLabel(wxT("Live Stream"));
                          play=1;
+                         FrameSlider->SetMin(0);
                          FrameSlider->SetMax(1);
                          FrameSlider->Disable();
                          currentFrameTextCtrl->Disable();
@@ -326,6 +327,7 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
                        {
                          wxString msg; msg.Printf(wxT("%u"),totalFrames);
                          totalFramesLabel->SetLabel(msg);
+                         FrameSlider->SetMin(0);
                          FrameSlider->SetMax(totalFrames);
                          FrameSlider->Enable();
                          currentFrameTextCtrl->Enable();
@@ -399,7 +401,7 @@ void EditorFrame::paintNow()
 
 void EditorFrame::render(wxDC& dc)
 {
-  fprintf(stderr,"Render Called\n");
+  //fprintf(stderr,"Render Called\n");
 
   if (rgbFrame!=0)
    { dc.DrawBitmap(*live_feeds[0].bmp,feed_0_x,feed_0_y,0); } //FEED 1
@@ -547,7 +549,7 @@ void EditorFrame::guiSnapFrames()
   this->Freeze();                 // Freeze the window to prevent scrollbar jumping
 
   ++framesSnapped;
-  fprintf(stderr,"guiSnapFrames Called %u ! \n",framesSnapped);
+  //fprintf(stderr,"guiSnapFrames Called %u ! \n",framesSnapped);
   acquisitionSnapFrames(moduleID,devID);
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
   depthFrame = acquisitionGetDepthFrame(moduleID,devID);
@@ -624,7 +626,10 @@ void EditorFrame::guiSnapFrames()
         { FrameSlider->SetValue(lastFrameDrawn); }
 
    if (FrameSlider->GetMax()!=totalFramesOfDevice)
-        { FrameSlider->SetMax(totalFramesOfDevice); }
+        {
+          if (totalFramesOfDevice==0) { FrameSlider->SetMax(1); } else
+                                      { FrameSlider->SetMax(totalFramesOfDevice); }
+        }
 
   } else
   {

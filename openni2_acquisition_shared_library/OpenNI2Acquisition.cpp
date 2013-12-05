@@ -396,7 +396,8 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
 
 int getTotalOpenNI2FrameNumber(int devID)
 {
-  fprintf(stderr,"Todo , check here for oni file length etc..\n");
+  #warning "Todo , check here for oni file length etc..\n"
+  //fprintf(stderr,"Todo , check here for oni file length etc..\n");
   return 0;
 }
 

@@ -17,6 +17,8 @@ class SelectModule: public wxDialog
 		virtual ~SelectModule();
         void ReloadDevicesForSelectedModule();
 
+        void myComboKeyPress( wxKeyEvent& event );
+
 		unsigned int moduleSelected;
 		unsigned int deviceSelected;
 		unsigned int widthSelected;
