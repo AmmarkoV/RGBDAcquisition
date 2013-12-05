@@ -11,8 +11,22 @@
 1386161306 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.h
 	"Acquisition.h"
 
-1386161458 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
+1386163223 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
 	"../tools/Calibration/calibration.h"
 
-1384980760 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
+1386241976 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
+
+1386161730 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.c
+	"Acquisition.h"
+	"acquisition_setup.h"
+	"pluginLinker.h"
+	"../tools/Timers/timer.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<unistd.h>
+
+1386240724 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
+
+1385505427 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Timers/timer.h
 

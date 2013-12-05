@@ -447,7 +447,7 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
               {
                 wxString msg;
 
-                fprintf(stderr,"Depth at point is  %0.5f   %0.5f   %0.5f\n",x,y,z);
+                fprintf(stderr,"Depth at point %u,%u  is  %0.5f   %0.5f   %0.5f\n",mouse_x,mouse_y,x,y,z);
                 if (calib.extrinsicParametersSet) { msg.Printf( wxT("Using Extrinsic Calibration : Depth at point is  %0.5f   %0.5f   %0.5f ") ,x,y,z  ); } else
                                                   { msg.Printf( wxT("Using Camera Space : Depth at point is  %0.5f   %0.5f   %0.5f ") ,x,y,z  ); }
 

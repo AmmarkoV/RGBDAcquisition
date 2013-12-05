@@ -76,7 +76,6 @@ int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,
 
   if (pixelSize!=0)
   {
-  //->  ? pixelSize *= 2.f;
    calib->intrinsic[CALIB_INTR_FX] = (double) focalLength/pixelSize;
    calib->intrinsic[CALIB_INTR_FY] = (double) focalLength/pixelSize;
    calib->intrinsicParametersSet=1;
@@ -372,6 +371,7 @@ int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int
       fprintf(stderr,"Focal Length is 0.0 , cannot transform2DProjectedPointTo3DPoint \n ");
       return 0;
     }
+
 
     *x = (float) (x2d - calib->intrinsic[CALIB_INTR_CX]) * (depthValue / calib->intrinsic[CALIB_INTR_FX]);
     *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
