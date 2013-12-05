@@ -14,6 +14,8 @@ int startFreenectModule(unsigned int max_devs,char * settings);
 #if BUILD_FREENECT
 int stopFreenectModule();
 
+int createFreenectDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+
 int mapFreenectDepthToRGB(int devID);
 
 int getFreenectNumberOfDevices();
