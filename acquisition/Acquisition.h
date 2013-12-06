@@ -248,6 +248,7 @@ int acquisitionPluginIsLoaded(ModuleIdentifier moduleID);
 
 /**
  * @brief  Load the plugin to enable a module specified by moduleID
+ * Please note that this function gets automatically called and is only exposed for when someone wants to do more advanced things with the plugin mechanism
  * @ingroup acquisitionCore
  * @param A moduleID , One value out of enum Acquisition_Possible_Modules
  * @retval 1=Success , 0=Failure ,No means you wont be able to use this module at all!
@@ -274,13 +275,63 @@ int acquisitionUnloadPlugin(ModuleIdentifier moduleID);
 int acquisitionMayBeVirtualDevice(ModuleIdentifier moduleID,DeviceIdentifier devID , char * devName);
 
 
-
+/**
+ * @brief  Initialize a module , the module will be automatically loaded and get ready for a subsequent acquisitionOpenDevice call
+ * @ingroup acquisitionCore
+ * @param A moduleID , One value out of enum Acquisition_Possible_Modules
+ * @param Maximum Devices to be used
+ * @param A string that passes module specific settings , can also be null
+ * @retval 1=Success , 0=Failure
+ */
 int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings);
+
+/**
+ * @brief  Stop using a module , the module will be automatically unloaded , no further calls should be made to this module ( and if they are made they will fail )
+ * @ingroup acquisitionCore
+ * @param A moduleID , One value out of enum Acquisition_Possible_Modules
+ * @retval 1=Success , 0=Failure
+ */
 int acquisitionStopModule(ModuleIdentifier moduleID);
+
+/**
+ * @brief  Get the number of devices that can be accessed for this moduleID
+ * @ingroup acquisitionCore
+ * @param A moduleID , One value out of enum Acquisition_Possible_Modules
+ * @retval  The number of availiable devices or 0 for Failure or No Devices availiable
+ */
 int acquisitionGetModuleDevices(ModuleIdentifier moduleID);
 
+/**
+ * @brief  Fill the output buffer with up to maxOuput characters of comma seperated strings that describe possible devNames for this module
+ * @ingroup acquisitionCore
+ * @param A moduleID , One value out of enum Acquisition_Possible_Modules
+ * @param A deviceID that describes one of the possible devices to be used for the module specified by moduleID
+ * @param A pointer to a char * buffer that will hold the output
+ * @param The size of the output buffer
+ * @retval  1 = Success , 0=Failure
+ */
 int acquisitionListDevices(ModuleIdentifier moduleID,DeviceIdentifier devID,char * output, unsigned int maxOutput);
+
+/**
+ * @brief  Open a device with specified dimensions and framerate ,  devNames might be used to identify a specific device by its friendly name.
+ * @ingroup acquisitionCore
+ * @param A moduleID , One value out of enum Acquisition_Possible_Modules
+ * @param A deviceID that describes one of the possible devices to be used for the module specified by moduleID
+ * @param This is a string that might select a device using its friendly name , can also be null
+ * @param Width in pixels that we *WISH* to have ( this might not be what the device returns , please call acquisitionGetColorFrameDimensions / acquisitionGetDepthFrameDimensions to find out )
+ * @param Height in pixels that we *WISH* to have ( this might not be what the device returns , please call acquisitionGetColorFrameDimensions / acquisitionGetDepthFrameDimensions to find out )
+ * @param The framerate we *WISH* to have ( this might not be what the device returns )
+ * @retval  1 = Success , 0=Failure
+ */
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+
+/**
+ * @brief  Gracefully close an already opened device
+ * @ingroup acquisitionCore
+ * @param A moduleID , One value out of enum Acquisition_Possible_Modules
+ * @param A deviceID that describes one of the possible devices to be used for the module specified by moduleID
+ * @retval    1 = Success , 0=Failure
+ */
 int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 int acquisitionGetTotalFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier devID);
