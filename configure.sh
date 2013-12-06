@@ -12,4 +12,6 @@ scripts/createRedist.sh
 
 scripts/checkEverything.sh
 
+doxygen doc/doxyfile
+
 exit 0

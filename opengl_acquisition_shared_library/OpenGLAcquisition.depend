@@ -15,7 +15,7 @@
 
 1375192457 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h
 
-1385399140 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c
+1386169497 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c
 	"solveLinearSystemGJ.h"
 	<stdio.h>
 	<stdlib.h>
@@ -107,7 +107,7 @@
 
 1374778394 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/save_to_file.h
 
-1385136441 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
+1386169452 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
 	<GL/gl.h>
 	<GL/glx.h>
 	<stdio.h>
@@ -192,10 +192,19 @@
 	"../tools/Calibration/calibration.h"
 	"../acquisition/acquisition_setup.h"
 
-1384980760 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
+1386241976 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
 
-1381399368 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
+1386240724 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
 
 1386163223 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
 	"../tools/Calibration/calibration.h"
+
+1386163262 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c
+	"matrixCalculations.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"matrix3x3Tools.h"
+	"matrix4x4Tools.h"
+	"solveLinearSystemGJ.h"
 
