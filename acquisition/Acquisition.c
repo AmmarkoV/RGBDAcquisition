@@ -399,7 +399,7 @@ unsigned char * convertShortDepthTo3CharDepth(unsigned short * depth,unsigned in
 }
 
 
-int acquisitionIsModuleLinked(ModuleIdentifier moduleID)
+int acquisitionIsModuleAvailiable(ModuleIdentifier moduleID)
 {
   if (moduleID < NUMBER_OF_POSSIBLE_MODULES)
   {
@@ -419,14 +419,14 @@ int acquisitionGetModulesCount()
 {
   unsigned int modules = 0;
 
-  if ( acquisitionIsModuleLinked(V4L2_ACQUISITION_MODULE) )          { fprintf(stderr,"V4L2 module found \n");       ++modules; }
-  if ( acquisitionIsModuleLinked(V4L2STEREO_ACQUISITION_MODULE) )    { fprintf(stderr,"V4L2Stereo module found \n"); ++modules; }
-  if ( acquisitionIsModuleLinked(OPENGL_ACQUISITION_MODULE) )        { fprintf(stderr,"OpenGL module found \n");     ++modules; }
-  if ( acquisitionIsModuleLinked(TEMPLATE_ACQUISITION_MODULE) )      { fprintf(stderr,"Template module found \n");   ++modules; }
-  if ( acquisitionIsModuleLinked(FREENECT_ACQUISITION_MODULE) )      { fprintf(stderr,"Freenect module found \n");   ++modules; }
-  if ( acquisitionIsModuleLinked(OPENNI1_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI1 module found \n");    ++modules; }
-  if ( acquisitionIsModuleLinked(OPENNI2_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI2 module found \n");    ++modules; }
-  if ( acquisitionIsModuleLinked(NETWORK_ACQUISITION_MODULE) )       { fprintf(stderr,"Network module found \n");    ++modules; }
+  if ( acquisitionIsModuleAvailiable(V4L2_ACQUISITION_MODULE) )          { fprintf(stderr,"V4L2 module found \n");       ++modules; }
+  if ( acquisitionIsModuleAvailiable(V4L2STEREO_ACQUISITION_MODULE) )    { fprintf(stderr,"V4L2Stereo module found \n"); ++modules; }
+  if ( acquisitionIsModuleAvailiable(OPENGL_ACQUISITION_MODULE) )        { fprintf(stderr,"OpenGL module found \n");     ++modules; }
+  if ( acquisitionIsModuleAvailiable(TEMPLATE_ACQUISITION_MODULE) )      { fprintf(stderr,"Template module found \n");   ++modules; }
+  if ( acquisitionIsModuleAvailiable(FREENECT_ACQUISITION_MODULE) )      { fprintf(stderr,"Freenect module found \n");   ++modules; }
+  if ( acquisitionIsModuleAvailiable(OPENNI1_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI1 module found \n");    ++modules; }
+  if ( acquisitionIsModuleAvailiable(OPENNI2_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI2 module found \n");    ++modules; }
+  if ( acquisitionIsModuleAvailiable(NETWORK_ACQUISITION_MODULE) )       { fprintf(stderr,"Network module found \n");    ++modules; }
 
   return modules;
 }
@@ -448,7 +448,7 @@ ModuleIdentifier getModuleIdFromModuleName(char * moduleName)
 }
 
 
-char * getModuleStringName(ModuleIdentifier moduleID)
+char * getModuleNameFromModuleID(ModuleIdentifier moduleID)
 {
   switch (moduleID)
     {
@@ -479,13 +479,13 @@ void printCall(ModuleIdentifier moduleID,DeviceIdentifier devID,char * fromFunct
 
 void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier devFailed,char * fromFunction)
 {
-  if (!acquisitionIsModuleLinked(moduleFailed))
+  if (!acquisitionIsModuleAvailiable(moduleFailed))
    {
-       fprintf(stderr,"%s is not linked in this build of the acquisition library system..\n",getModuleStringName(moduleFailed));
+       fprintf(stderr,"%s is not linked in this build of the acquisition library system..\n",getModuleNameFromModuleID(moduleFailed));
        return ;
    }
 
-   fprintf(stderr,"%s hasn't got an implementation for function %s ..\n",getModuleStringName(moduleFailed),fromFunction);
+   fprintf(stderr,"%s hasn't got an implementation for function %s ..\n",getModuleNameFromModuleID(moduleFailed),fromFunction);
 }
 
 
@@ -519,7 +519,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
   if (moduleID < NUMBER_OF_POSSIBLE_MODULES)
   {
     if (!acquisitionLoadPlugin(moduleID))
-        { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleStringName(moduleID)); return 0; }
+        { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleNameFromModuleID(moduleID)); return 0; }
 
     if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
   }

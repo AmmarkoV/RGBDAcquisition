@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
                                          } else
     if (strcmp(argv[i],"-module")==0)    {
                                            moduleID = getModuleIdFromModuleName(argv[i+1]);
-                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
+                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID),moduleID);
                                          } else
     if (strcmp(argv[i],"-dev")==0)       {
                                            devID = atoi(argv[i+1]);
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
 
   if (framerate==0) { fprintf(stderr,"Zero is an invalid value for framerate , using 1\n"); framerate=1; }
 
-  if (!acquisitionIsModuleLinked(moduleID))
+  if (!acquisitionIsModuleAvailiable(moduleID))
    {
        fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
        return 1;
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
   {
-       fprintf(stderr,"Could not start module %s ..\n",getModuleStringName(moduleID));
+       fprintf(stderr,"Could not start module %s ..\n",getModuleNameFromModuleID(moduleID));
        return 1;
    }
 
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
         if (!acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate) )
         {
-          fprintf(stderr,"Could not open device %u ( %s ) of module %s  ..\n",devID,devName,getModuleStringName(moduleID));
+          fprintf(stderr,"Could not open device %u ( %s ) of module %s  ..\n",devID,devName,getModuleNameFromModuleID(moduleID));
           return 1;
         }
         if ( strstr(inputname,"noRegistration")!=0 )         {  } else

@@ -1,3 +1,12 @@
+/** @file main.c
+ *  @brief The simple Grabber that uses libAcquisition.so and libAcquisitionSegment.so and writes output to files
+ *
+ *  This should be used like ./GrabberSegment -module TEMPLATE -from Dataset -maxFrames 100 -to OutputDataset -eraseRGB 255 255 255 -maxDepth 1450 -minDepth 700 -plane -446.87997 180.98639 1074.00000 605.03101 79.81260 1236.00000 -335.44980 305.72638 684.00000 -floodEraseRGBSource 383 408 30 -cropRGB 164 0 481 395 -combine and
+ *  For a full list of the command line parameters see the loadSegmentationDataFromArgs of AcquisitionSegment.c that populates the segmentation structures
+ *
+ *  @author Ammar Qammaz (AmmarkoV)
+ *  @bug No known bugs
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -113,7 +122,7 @@ int main(int argc, char *argv[])
                                          } else
     if (strcmp(argv[i],"-module")==0)    {
                                            moduleID_1 = getModuleIdFromModuleName(argv[i+1]);
-                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
+                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID_1),moduleID_1);
                                          } else
     if (strcmp(argv[i],"-dev")==0)      {
                                            devID_1 = atoi(argv[i+1]);
@@ -138,7 +147,7 @@ int main(int argc, char *argv[])
   }
 
 
-  if (!acquisitionIsModuleLinked(moduleID_1))
+  if (!acquisitionIsModuleAvailiable(moduleID_1))
    {
        fprintf(stderr,"The module you are trying to use as module A is not linked in this build of the Acquisition library..\n");
        return 1;
@@ -151,7 +160,7 @@ int main(int argc, char *argv[])
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID_1,16 /*maxDevices*/ , 0 ))
   {
-       fprintf(stderr,"Could not start module A %s ..\n",getModuleStringName(moduleID_1));
+       fprintf(stderr,"Could not start module A %s ..\n",getModuleNameFromModuleID(moduleID_1));
        return 1;
    }
    //We want to initialize all possible devices in this example..

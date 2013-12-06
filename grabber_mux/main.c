@@ -81,11 +81,11 @@ int main(int argc, char *argv[])
                                          } else
     if (strcmp(argv[i],"-module1")==0)    {
                                            moduleID_1 = getModuleIdFromModuleName(argv[i+1]);
-                                           fprintf(stderr,"Overriding Module 1 Used , set to %s ( %u ) \n",getModuleStringName(moduleID_1),moduleID_1);
+                                           fprintf(stderr,"Overriding Module 1 Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID_1),moduleID_1);
                                          } else
     if (strcmp(argv[i],"-module2")==0)   {
                                            moduleID_2 = getModuleIdFromModuleName(argv[i+1]);
-                                           fprintf(stderr,"Overriding Module 2 Used , set to %s ( %u ) \n",getModuleStringName(moduleID_2),moduleID_2);
+                                           fprintf(stderr,"Overriding Module 2 Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID_2),moduleID_2);
                                          } else
     if (strcmp(argv[i],"-dev1")==0)      {
                                            devID_1 = atoi(argv[i+1]);
@@ -120,13 +120,13 @@ int main(int argc, char *argv[])
   }
 
 
-  if (!acquisitionIsModuleLinked(moduleID_1))
+  if (!acquisitionIsModuleAvailiable(moduleID_1))
    {
        fprintf(stderr,"The module you are trying to use as module A is not linked in this build of the Acquisition library..\n");
        return 1;
    }
 
-  if (!acquisitionIsModuleLinked(moduleID_2))
+  if (!acquisitionIsModuleAvailiable(moduleID_2))
    {
        fprintf(stderr,"The module you are trying to use as module B is not linked in this build of the Acquisition library..\n");
        return 1;
@@ -140,12 +140,12 @@ int main(int argc, char *argv[])
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID_1,16 /*maxDevices*/ , 0 ))
   {
-       fprintf(stderr,"Could not start module A %s ..\n",getModuleStringName(moduleID_1));
+       fprintf(stderr,"Could not start module A %s ..\n",getModuleNameFromModuleID(moduleID_1));
        return 1;
    }
   if (!acquisitionStartModule(moduleID_2,16 /*maxDevices*/ , 0 ))
   {
-       fprintf(stderr,"Could not start module B %s ..\n",getModuleStringName(moduleID_2));
+       fprintf(stderr,"Could not start module B %s ..\n",getModuleNameFromModuleID(moduleID_2));
        return 1;
    }
 
@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
     unsigned short * depthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
 
-    fprintf(stderr,"Base Module is %s , device %u , Overlay Module is %s , device %u\n",getModuleStringName(moduleID_1),devID_1, getModuleStringName(moduleID_2),devID_2);
+    fprintf(stderr,"Base Module is %s , device %u , Overlay Module is %s , device %u\n",getModuleNameFromModuleID(moduleID_1),devID_1, getModuleNameFromModuleID(moduleID_2),devID_2);
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {

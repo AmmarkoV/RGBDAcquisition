@@ -1,3 +1,11 @@
+/** @file main.c
+ *  @brief The simple Grabber that uses libAcquisition.so and writes output to files
+ *
+ *  This should be used like ./Grabber -module TEMPLATE -from Dataset -maxFrames 100 -to OutputDataset
+ *
+ *  @author Ammar Qammaz (AmmarkoV)
+ *  @bug No known bugs
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -15,7 +23,10 @@ struct calibration calib;
 
 
 
-
+/**
+ @brief this is the main function
+ @ return nothing
+ */
 int main(int argc, char *argv[])
 {
  fprintf(stderr,"Generic Grabber Application based on Acquisition lib .. \n");
@@ -59,7 +70,7 @@ int main(int argc, char *argv[])
                                          } else
     if (strcmp(argv[i],"-module")==0)    {
                                            moduleID = getModuleIdFromModuleName(argv[i+1]);
-                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
+                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID),moduleID);
                                          } else
     if (strcmp(argv[i],"-dev")==0)      {
                                            devID = atoi(argv[i+1]);
@@ -88,7 +99,7 @@ int main(int argc, char *argv[])
   }
 
 
-  if (!acquisitionIsModuleLinked(moduleID))
+  if (!acquisitionIsModuleAvailiable(moduleID))
    {
        fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
        return 1;
@@ -97,7 +108,7 @@ int main(int argc, char *argv[])
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
   {
-       fprintf(stderr,"Could not start module %s ..\n",getModuleStringName(moduleID));
+       fprintf(stderr,"Could not start module %s ..\n",getModuleNameFromModuleID(moduleID));
        return 1;
    }
 
@@ -124,7 +135,7 @@ int main(int argc, char *argv[])
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
         if (!acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate))
         {
-          fprintf(stderr,"Could not open device %u ( %s ) of module %s  ..\n",devID,devName,getModuleStringName(moduleID));
+          fprintf(stderr,"Could not open device %u ( %s ) of module %s  ..\n",devID,devName,getModuleNameFromModuleID(moduleID));
           return 1;
         }
 

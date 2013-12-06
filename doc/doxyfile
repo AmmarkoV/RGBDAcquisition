@@ -359,7 +359,7 @@ LOOKUP_CACHE_SIZE      = 0
 # Private class members and static file members will be hidden unless 
 # the EXTRACT_PRIVATE respectively EXTRACT_STATIC tags are set to YES
 
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class 
 # will be included in the documentation.
@@ -740,10 +740,12 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = 
+#EXCLUDE_PATTERNS       = 
 EXCLUDE_PATTERNS = */3dparty/* \
                    */frames/*  \
-                   */grabbed_frames/* 
+                   */grabbed_frames/*  \
+                   */AmmarServer/* \
+                   */redist/
   
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names 

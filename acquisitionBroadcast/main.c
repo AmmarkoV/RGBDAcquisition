@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
   {
     if (strcmp(argv[i],"-module")==0)    {
                                            moduleID = getModuleIdFromModuleName(argv[i+1]);
-                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleStringName(moduleID),moduleID);
+                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID),moduleID);
                                          } else
     if (strcmp(argv[i],"-dev")==0)      {
                                            devID = atoi(argv[i+1]);
@@ -140,10 +140,10 @@ int main(int argc, char *argv[])
 
 
  if (possibleModules==0) { AmmServer_Error("Acquisition Library is linked to zero modules , can't possibly do anything..\n"); return 1; }
- if (!acquisitionIsModuleLinked(moduleID)) {AmmServer_Error("The module you are trying to use is not linked in this build of the Acquisition library..\n"); return 1; }
+ if (!acquisitionIsModuleAvailiable(moduleID)) {AmmServer_Error("The module you are trying to use is not linked in this build of the Acquisition library..\n"); return 1; }
 
  fprintf(stderr,"Will Try to open module\n");
- if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 )) { AmmServer_Error("Could not start module %s ..\n",getModuleStringName(moduleID)); return 1; }
+ if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 )) { AmmServer_Error("Could not start module %s ..\n",getModuleNameFromModuleID(moduleID)); return 1; }
  fprintf(stderr,"OK\n");
 
   //We want to check if deviceID we requested is a logical value , or we dont have that many devices!
