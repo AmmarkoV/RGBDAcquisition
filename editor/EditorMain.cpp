@@ -279,7 +279,7 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    delete moduleSelectorFrame;
 
 
-   if (!acquisitionIsModuleLinked(moduleID))
+   if (!acquisitionIsModuleAvailiable(moduleID))
     {
         fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
         //return 1;
@@ -288,7 +288,7 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    //We need to initialize our module before calling any related calls to the specific module..
    if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
    {
-       fprintf(stderr,"Could not start module %s ..\n",getModuleStringName(moduleID));
+       fprintf(stderr,"Could not start module %s ..\n",getModuleNameFromModuleID(moduleID));
        //return 1;
     }
 

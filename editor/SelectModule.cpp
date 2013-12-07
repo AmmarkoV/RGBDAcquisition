@@ -128,7 +128,7 @@ void SelectModule::OnButtonCancelClick(wxCommandEvent& event)
 void SelectModule::ReloadDevicesForSelectedModule()
 {
   unsigned int modID = ComboBoxModule->GetCurrentSelection();
-  if ( !acquisitionIsModuleLinked(modID) )
+  if ( !acquisitionIsModuleAvailiable(modID) )
   {
       wxMessageBox(wxT("Could not find this plugin on your installation , see stderr for more information"),wxT("Could not detect module"));
   } else
