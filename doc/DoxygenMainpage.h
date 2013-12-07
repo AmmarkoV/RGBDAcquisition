@@ -49,12 +49,19 @@ If you want a GUI to segment your dataset using depth bounding boxes planes , et
 If you want an OpenGL 3D renderer that can fit your datasets to do AR   
 To get a simple input 
 
-@section libCompilation How to Compile
+@section libCompilation How to Compile It
 
 Compilation of the library is pretty straightforward. 
-You should enter the root directory of the project , run ./configure.sh and after this is done just run make which should in turn compile your library.
+You should enter the root directory of the project and run ./configure.sh 
 
-That should work in most cases but unfortunately due to the high number of external dependencies and configurations one can use the library with things might become more complicated than this  are not a
+The configure script should automatically prepare your working copy of RGBDAcquisition and prompt you to apt-get all the dependencies you might need , after those are installed it will prompt you to download 3dparty libraries ( like OpenNI , OpenNI2 , Freenect etc ) in order to further automate the process of configuring the lib in a new "vanilla" system.
 
+After this is done just run make which should compile all of your libraries.
+
+The make file should work in most cases but unfortunately due to the high number of external dependencies and configurations one can use the library with , things might become more complicated than this.
+
+In case you want to see what is wrong you can download codeblocks and open the CodeBlocks.workspace in the root directory which will allow you to compile and "further investigate" your potential problems ( weird gcc version errors etc ) The makefile is produced using cbp2make ( http://sourceforge.net/projects/cbp2make/ ) so the codeblocks project is the source of everything.
+
+CodeBlocks is an opensource IDE that is also used with wxSmith for making the GUI Editor Tool  
 
 */
