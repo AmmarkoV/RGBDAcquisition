@@ -49,4 +49,12 @@ If you want a GUI to segment your dataset using depth bounding boxes planes , et
 If you want an OpenGL 3D renderer that can fit your datasets to do AR   
 To get a simple input 
 
+@section libCompilation How to Compile
+
+Compilation of the library is pretty straightforward. 
+You should enter the root directory of the project , run ./configure.sh and after this is done just run make which should in turn compile your library.
+
+That should work in most cases but unfortunately due to the high number of external dependencies and configurations one can use the library with things might become more complicated than this  are not a
+
+
 */

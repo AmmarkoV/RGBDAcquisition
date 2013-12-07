@@ -29,7 +29,7 @@ int startFreenectModule(unsigned int max_devs,char * settings)
 int createFreenectDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
   uint32_t ts;
-  char * rgb, * depth;
+  char * rgb;//, * depth;
   int ret = freenect_sync_get_video((void**)&rgb, &ts, 0 , FREENECT_VIDEO_RGB);
   if (ret < 0) { fprintf(stderr,"There doesnt seem to exist a Freenect compatible device with index 0\n"); return 0; }
   return 1;
