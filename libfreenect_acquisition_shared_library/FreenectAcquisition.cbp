@@ -40,8 +40,7 @@
 			<Add directory="../3dparty/libfreenect/wrappers/c_sync" />
 		</Compiler>
 		<Linker>
-			<Add library="./libfreenect.so" />
-			<Add library="./libfreenect_sync.so" />
+			<Add option="`../scripts/get3dpartyDepencency.sh freenect`" />
 		</Linker>
 		<Unit filename="FreenectAcquisition.c">
 			<Option compilerVar="CC" />

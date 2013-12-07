@@ -109,6 +109,21 @@ if [ -e $f ]
 done 
 
 
+
+OPENNI1_LINKSTAT="`ldd openni1_acquisition_shared_library/libOpenNI1Acquisition.so | grep libOpenNI.so`"
+OPENNI2_LINKSTAT="`ldd openni2_acquisition_shared_library/libOpenNI2Acquisition.so | grep libOpenNI2.so`"
+FREENECT_LINKSTAT="`ldd libfreenect_acquisition_shared_library/libFreenectAcquisition.so | grep libfreenect_sync.so.0.1`"
+
+if [ -z "$OPENNI1_LINKSTAT" ]; then echo "$yellow OpenNI1 has a null build $normal"; else 
+                                       echo "$green OpenNI1 has a regular build $normal"; fi
+ 
+if [ -z "$OPENNI2_LINKSTAT" ]; then echo "$yellow OpenNI2 has a null build $normal"; else 
+                                       echo "$green OpenNI2 has a regular build $normal"; fi
+
+if [ -z "$FREENECT_LINKSTAT" ]; then echo "$yellow Freenect has a null build $normal"; else 
+                                       echo "$green Freenect has a regular build $normal"; fi
+
+
 cd "$STARTDIR"
 
 exit 0

@@ -39,11 +39,7 @@
 			<Add directory="../3dparty/OpenNI/Include/" />
 		</Compiler>
 		<Linker>
-			<Add library="./libOpenNI.so" />
-			<Add library="./libOpenNI.jni.so" />
-			<Add library="./libnimRecorder.so" />
-			<Add library="./libnimMockNodes.so" />
-			<Add library="./libnimCodecs.so" />
+			<Add option="`../scripts/get3dpartyDepencency.sh openni1`" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 		</Linker>
 		<Unit filename="OpenNI1Acquisition.cpp" />
