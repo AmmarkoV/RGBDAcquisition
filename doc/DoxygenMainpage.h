@@ -60,7 +60,9 @@ After this is done just run make which should compile all of your libraries.
 
 The make file should work in most cases but unfortunately due to the high number of external dependencies and configurations one can use the library with , things might become more complicated than this.
 
-In case you want to see what is wrong you can download codeblocks and open the CodeBlocks.workspace in the root directory which will allow you to compile and "further investigate" your potential problems ( weird gcc version errors etc ) The makefile is produced using cbp2make ( http://sourceforge.net/projects/cbp2make/ ) so the codeblocks project is the source of everything.
+You can open an issue @ https://github.com/AmmarkoV/RGBDAcquisition/issues if you find it not to be working
+In case you want to try and see yourself what is wrong you can download codeblocks and open the CodeBlocks.workspace in the root directory which will allow you to compile and "further investigate" your potential problems ( weird gcc version errors etc ) The makefile is produced using cbp2make ( http://sourceforge.net/projects/cbp2make/ ) .
+This codeblocks project is the source which i use during the development of all the library so it covers everything.
 
 CodeBlocks is an opensource IDE that is also used with wxSmith for making the GUI Editor Tool  
 
