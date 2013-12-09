@@ -437,6 +437,12 @@ unsigned long acquisitionGetColorTimestamp(ModuleIdentifier moduleID,DeviceIdent
  */
 unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
+
+
+/* ------------------------------------------------------------------------------------------------------------
+                                               COLOR FRAMES
+   ------------------------------------------------------------------------------------------------------------  */
+
 /**
  * @brief  TODO: Overrides current color frame so the next time acquisitionGetColor is called or someone does acquisitionPassFramesToTarget it will be the frame provided there
  * @ingroup acquisitionCore
@@ -452,11 +458,39 @@ int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier d
  * @ingroup acquisitionCore
  * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
  * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
- * @retval  Pointer to the current color frame ( you shouldnt manually free it) , 0 = Failure
+ * @retval  Pointer to the current color frame (you shouldnt manually free it) , 0 = Failure
  */
 unsigned char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
+
+/**
+ * @brief  Copy our color frame to the buffer specified to mem that has a size of memlength bytes
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param Pointer to the target of the copy
+ * @param Size of the pointer that will accomodate the copy so that we won't overflow it
+ * @retval 1=Success 0=Failure
+ */
 unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned char * mem,unsigned int memlength);
+/**
+ * @brief  Copy our color frame encapsulated in the PPM file format to the buffer specified to mem that has a size of memlength bytes
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param Pointer to the target of the copy
+ * @param Size of the pointer that will accomodate the copy so that we won't overflow it
+ * @retval 1=Success 0=Failure
+ */
 unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned char * mem,unsigned int memlength);
+
+
+
+
+
+/* ------------------------------------------------------------------------------------------------------------
+                                               DEPTH FRAMES
+   ------------------------------------------------------------------------------------------------------------  */
+
 
 /**
  * @brief  TODO: Overrides current depth frame so the next time acquisitionGetDepth is called or someone does acquisitionPassFramesToTarget it will be the frame provided there
@@ -467,21 +501,137 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
  * @retval  1=Success 0=Failure
  */
 int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth);
+/**
+ * @brief  Returns the depth frame from the last Snap we did using acquisitionSnapFrames to find out its dimensions you might want to call acquisitionGetDepthFrameDimensions
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @retval  Pointer to the current depth frame (you shouldnt manually free it) , 0 = Failure
+ */
 unsigned short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
+/**
+ * @brief  Copy our depth frame to the buffer specified to mem that has a size of memlength bytes
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param Pointer to the target of the copy
+ * @param Size of the pointer that will accomodate the copy so that we won't overflow it
+ * @retval 1=Success 0=Failure
+ */
 unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned short * mem,unsigned int memlength);
+/**
+ * @brief  Copy our depth frame encapsulated in the PPM file format to the buffer specified to mem that has a size of memlength bytes
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param Pointer to the target of the copy
+ * @param Size of the pointer that will accomodate the copy so that we won't overflow it
+ * @retval 1=Success 0=Failure
+ */
 unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned short * mem,unsigned int memlength);
 
+/**
+ * @brief  Return the depth value ( according to camera space ) of a 2d point on our frame
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param X2D Coordinates on our frame ( the projected 3d point on our 2d Frame )
+ * @param Y2D Coordinates on our frame ( the projected 3d point on our 2d Frame )
+ * @param X3D The X value of the output 3D point that corresponds to the 2D point we specified
+ * @param Y3D The Y value of the output 3D point that corresponds to the 2D point we specified
+ * @param Z3D The Z value of the output 3D point that corresponds to the 2D point we specified
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionGetDepth3DPointAtXYCameraSpace(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  );
+
+/**
+ * @brief  Return the depth value ( will try to use extrinsic calibrations if they are availiable or according to camera space if not ) of a 2d point on our frame
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param X2D Coordinates on our frame ( the projected 3d point on our 2d Frame )
+ * @param Y2D Coordinates on our frame ( the projected 3d point on our 2d Frame )
+ * @param X3D The X value of the output 3D point that corresponds to the 2D point we specified
+ * @param Y3D The Y value of the output 3D point that corresponds to the 2D point we specified
+ * @param Z3D The Z value of the output 3D point that corresponds to the 2D point we specified
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  );
+
+/**
+ * @brief  Populate the parameters with the dimensions of the Color Frame
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param width , The Width of the color frame
+ * @param height ,The Height of the color frame
+ * @param channels , The number of channels on the color frame ( should be 3 )
+ * @param bitsperpixel , The number of bits per pixel ( should be 24 for 8bits x 3 channels )
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionGetColorFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel );
+/**
+ * @brief  Populate the parameters with the dimensions of the Depth Frame
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param width , The Width of the depth frame
+ * @param height ,The Height of the depth frame
+ * @param channels , The number of channels on the depth frame ( should be 3 )
+ * @param bitsperpixel , The number of bits per pixel ( should be 24 for 8bits x 3 channels )
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int * width , unsigned int * height , unsigned int * channels , unsigned int * bitsperpixel );
 
 
+/* ------------------------------------------------------------------------------------------------------------
+                                               Save to Files
+   ------------------------------------------------------------------------------------------------------------  */
 
+/**
+ * @brief  Save the depth cloud on a PCD file ( see http://pointclouds.org/documentation/tutorials/pcd_file_format.php#pcd-file-format )
+ * @ingroup acquisitionSaveTo
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param filename , The filename of the target file
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+/**
+ * @brief  Save the color frame on a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
+ * @ingroup acquisitionSaveTo
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param filename , The filename of the target file
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+/**
+ * @brief  Save the depth frame on a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
+ * @ingroup acquisitionSaveTo
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param filename , The filename of the target file
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+/**
+ * @brief  Save the depth frame converted to 8-bit grayscale ( instead of 16bit grayscale ) to a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
+ * @ingroup acquisitionSaveTo
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param filename , The filename of the target file
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+/**
+ * @brief  Save the depth frame converted to RGB values to a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
+ * @ingroup acquisitionSaveTo
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param filename , The filename of the target file
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
 
 /* Deprecated
@@ -491,8 +641,21 @@ double acqusitionGetColorPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
 double acqusitionGetDepthFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID);
 double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID);
 */
-
+/**
+ * @brief  Map Depth Frame to RGB frame so that you have 1:1 correspondance to color/depth pixels ( depth might lose some pixels on its edges )
+ * @ingroup acquisitionSaveTo
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionMapDepthToRGB(ModuleIdentifier moduleID,DeviceIdentifier devID);
+/**
+ * @brief  Map RGB Frame to Depth frame so that you have 1:1 correspondance to color/depth pixels ( rgb might lose some pixels on its edges )
+ * @ingroup acquisitionSaveTo
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @retval 1=Success 0=Failure
+ */
 int acquisitionMapRGBToDepth(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 
