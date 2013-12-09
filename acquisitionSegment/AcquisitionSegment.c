@@ -317,18 +317,18 @@ int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFea
     if (strcmp(argv[i],"-replaceRGB")==0) { rgbSeg->replaceR = atoi(argv[i+1]); rgbSeg->replaceG = atoi(argv[i+2]); rgbSeg->replaceB = atoi(argv[i+3]); rgbSeg->enableReplacingColors=1; } else
     if (strcmp(argv[i],"-bbox")==0)       {
                                             depthSeg->enableBBox=1;
-                                            depthSeg->bboxX1=(double) intAtof(argv[i+1]);
-                                            depthSeg->bboxY1=(double) intAtof(argv[i+2]);
-                                            depthSeg->bboxZ1=(double) intAtof(argv[i+3]);
-                                            depthSeg->bboxX2=(double) intAtof(argv[i+4]);
-                                            depthSeg->bboxY2=(double) intAtof(argv[i+5]);
-                                            depthSeg->bboxZ2=(double) intAtof(argv[i+6]);
+                                            depthSeg->bboxX1=(double) internationalAtof(argv[i+1]);
+                                            depthSeg->bboxY1=(double) internationalAtof(argv[i+2]);
+                                            depthSeg->bboxZ1=(double) internationalAtof(argv[i+3]);
+                                            depthSeg->bboxX2=(double) internationalAtof(argv[i+4]);
+                                            depthSeg->bboxY2=(double) internationalAtof(argv[i+5]);
+                                            depthSeg->bboxZ2=(double) internationalAtof(argv[i+6]);
                                           } else
     if (strcmp(argv[i],"-plane")==0)      {
                                             depthSeg->enablePlaneSegmentation=1;
-                                            depthSeg->p1[0]=(double) intAtof(argv[i+1]); depthSeg->p1[1]=(double) intAtof(argv[i+2]); depthSeg->p1[2]=(double) intAtof(argv[i+3]);
-                                            depthSeg->p2[0]=(double) intAtof(argv[i+4]); depthSeg->p2[1]=(double) intAtof(argv[i+5]); depthSeg->p2[2]=(double) intAtof(argv[i+6]);
-                                            depthSeg->p3[0]=(double) intAtof(argv[i+7]); depthSeg->p3[1]=(double) intAtof(argv[i+8]); depthSeg->p3[2]=(double) intAtof(argv[i+9]);
+                                            depthSeg->p1[0]=(double) internationalAtof(argv[i+1]); depthSeg->p1[1]=(double) internationalAtof(argv[i+2]); depthSeg->p1[2]=(double) internationalAtof(argv[i+3]);
+                                            depthSeg->p2[0]=(double) internationalAtof(argv[i+4]); depthSeg->p2[1]=(double) internationalAtof(argv[i+5]); depthSeg->p2[2]=(double) internationalAtof(argv[i+6]);
+                                            depthSeg->p3[0]=(double) internationalAtof(argv[i+7]); depthSeg->p3[1]=(double) internationalAtof(argv[i+8]); depthSeg->p3[2]=(double) internationalAtof(argv[i+9]);
                                           }
     if (strcmp(argv[i],"-minDepth")==0)   { depthSeg->minDepth = atoi(argv[i+1]);  } else
     if (strcmp(argv[i],"-maxDepth")==0)   { depthSeg->maxDepth = atoi(argv[i+1]);   } else

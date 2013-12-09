@@ -25,6 +25,8 @@
 
 #define MAX_LINE_CALIBRATION 1024
 
+#define RESPECT_LOCALES 0 //<- This should in my opinion be always 0
+
 int forceUSLocaleToKeepOurSanity()
 {
    fprintf(stderr,"Reinforcing EN_US locale to force commas to dots\n");
@@ -90,18 +92,23 @@ int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,
 
 
 
-float intAtof(char * str)
+float internationalAtof(char * str)
 {
+  #if RESPECT_LOCALES
+   return atof(str);
+  #else
   forceUSLocaleToKeepOurSanity();
   //OK this is the regular thing that WORKS but doesnt work
   //for countries like france where they say 0,33 instead of 0.33
   // return atof(str);
 
   //instead of this we will use sscanf that doesnt respect locale ?
-  float retVal=0.0;
-  sscanf(str,"%f",&retVal);
+   float retVal=0.0;
+   sscanf(str,"%f",&retVal);
 
- return retVal;
+   return retVal;
+  #endif // RESPECT_LOCALES
+  return 0.0;
 }
 
 
@@ -157,15 +164,15 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->intrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->intrinsic[0] = (double)  intAtof(line); break;
-             case 2 :  calib->intrinsic[1] = (double) intAtof(line); break;
-             case 3 :  calib->intrinsic[2] = (double) intAtof(line); break;
-             case 4 :  calib->intrinsic[3] = (double) intAtof(line); break;
-             case 5 :  calib->intrinsic[4] = (double) intAtof(line); break;
-             case 6 :  calib->intrinsic[5] = (double) intAtof(line); break;
-             case 7 :  calib->intrinsic[6] = (double) intAtof(line); break;
-             case 8 :  calib->intrinsic[7] = (double) intAtof(line); break;
-             case 9 :  calib->intrinsic[8] = (double) intAtof(line); break;
+             case 1 :  calib->intrinsic[0] = (double)  internationalAtof(line); break;
+             case 2 :  calib->intrinsic[1] = (double) internationalAtof(line); break;
+             case 3 :  calib->intrinsic[2] = (double) internationalAtof(line); break;
+             case 4 :  calib->intrinsic[3] = (double) internationalAtof(line); break;
+             case 5 :  calib->intrinsic[4] = (double) internationalAtof(line); break;
+             case 6 :  calib->intrinsic[5] = (double) internationalAtof(line); break;
+             case 7 :  calib->intrinsic[6] = (double) internationalAtof(line); break;
+             case 8 :  calib->intrinsic[7] = (double) internationalAtof(line); break;
+             case 9 :  calib->intrinsic[8] = (double) internationalAtof(line); break;
            };
           } else
           if (category==2)
@@ -173,11 +180,11 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->intrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->k1 = (double) intAtof(line); break;
-             case 2 :  calib->k2 = (double) intAtof(line); break;
-             case 3 :  calib->p1 = (double) intAtof(line); break;
-             case 4 :  calib->p2 = (double) intAtof(line); break;
-             case 5 :  calib->k3 = (double) intAtof(line); break;
+             case 1 :  calib->k1 = (double) internationalAtof(line); break;
+             case 2 :  calib->k2 = (double) internationalAtof(line); break;
+             case 3 :  calib->p1 = (double) internationalAtof(line); break;
+             case 4 :  calib->p2 = (double) internationalAtof(line); break;
+             case 5 :  calib->k3 = (double) internationalAtof(line); break;
            };
           } else
           if (category==3)
@@ -185,9 +192,9 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->extrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->extrinsicTranslation[0] = (double) intAtof(line); break;
-             case 2 :  calib->extrinsicTranslation[1] = (double) intAtof(line); break;
-             case 3 :  calib->extrinsicTranslation[2] = (double) intAtof(line); break;
+             case 1 :  calib->extrinsicTranslation[0] = (double) internationalAtof(line); break;
+             case 2 :  calib->extrinsicTranslation[1] = (double) internationalAtof(line); break;
+             case 3 :  calib->extrinsicTranslation[2] = (double) internationalAtof(line); break;
            };
           } else
           if (category==4)
@@ -195,9 +202,9 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->extrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->extrinsicRotationRodriguez[0] = (double) intAtof(line); break;
-             case 2 :  calib->extrinsicRotationRodriguez[1] = (double) intAtof(line); break;
-             case 3 :  calib->extrinsicRotationRodriguez[2] = (double) intAtof(line); break;
+             case 1 :  calib->extrinsicRotationRodriguez[0] = (double) internationalAtof(line); break;
+             case 2 :  calib->extrinsicRotationRodriguez[1] = (double) internationalAtof(line); break;
+             case 3 :  calib->extrinsicRotationRodriguez[2] = (double) internationalAtof(line); break;
            };
           }else
           if (category==5)
@@ -205,15 +212,15 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            calib->extrinsicParametersSet=1;
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->nearPlane = (double) intAtof(line); break;
-             case 2 :  calib->farPlane  = (double) intAtof(line); break;
+             case 1 :  calib->nearPlane = (double) internationalAtof(line); break;
+             case 2 :  calib->farPlane  = (double) internationalAtof(line); break;
            };
           }else
           if (category==6)
           {
            switch(linesAtCurrentCategory)
            {
-             case 1 :  calib->depthUnit = (double) intAtof(line); break;
+             case 1 :  calib->depthUnit = (double) internationalAtof(line); break;
            };
           }
 
