@@ -72,7 +72,6 @@ typedef unsigned int DeviceIdentifier;
  * @brief A structure that holds the state of a specific device of a module
  *
  * A structure to hold the state of each of the devices initialized by the clients
- *
  */
 struct acquisitionDeviceStates
 {

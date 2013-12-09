@@ -190,8 +190,8 @@ int printDepthSegmentationData(char * label , struct SegmentationFeaturesDepth *
 
 
 int segmentGetDepthBlobAverage(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
-                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
-                        float * centerX , float * centerY , float * centerZ)
+                               unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                               float * centerX , float * centerY , float * centerZ)
 {
   return getDepthBlobAverage(frame,frameWidth,frameHeight,sX,sY,width,height,centerX,centerY,centerZ);
 }
