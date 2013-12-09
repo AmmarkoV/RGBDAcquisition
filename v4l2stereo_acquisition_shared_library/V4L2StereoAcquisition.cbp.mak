@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./libV4L2StereoAcquisition.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/V4L2StereoAcquisition.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/PixelFormatConversions.o $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2Acquisition.o $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.o $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2Wrapper.o $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2_c.o $(OBJDIR_DEBUG)/V4L2StereoAcquisition.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/V4L2StereoAcquisition.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/PixelFormatConversions.o $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2Acquisition.o $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.o $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2Wrapper.o $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2_c.o $(OBJDIR_RELEASE)/V4L2StereoAcquisition.o
 
 all: debug release
 
@@ -50,6 +50,7 @@ clean: clean_debug clean_release
 
 before_debug: 
 	test -d . || mkdir -p .
+	test -d $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library || mkdir -p $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 
 after_debug: 
@@ -59,16 +60,33 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
+$(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/PixelFormatConversions.o: ../v4l2_acquisition_shared_library/PixelFormatConversions.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../v4l2_acquisition_shared_library/PixelFormatConversions.c -o $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/PixelFormatConversions.o
+
+$(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2Acquisition.o: ../v4l2_acquisition_shared_library/V4L2Acquisition.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../v4l2_acquisition_shared_library/V4L2Acquisition.c -o $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2Acquisition.o
+
+$(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.o: ../v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.c -o $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.o
+
+$(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2Wrapper.o: ../v4l2_acquisition_shared_library/V4L2Wrapper.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../v4l2_acquisition_shared_library/V4L2Wrapper.c -o $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2Wrapper.o
+
+$(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2_c.o: ../v4l2_acquisition_shared_library/V4L2_c.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../v4l2_acquisition_shared_library/V4L2_c.c -o $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library/V4L2_c.o
+
 $(OBJDIR_DEBUG)/V4L2StereoAcquisition.o: V4L2StereoAcquisition.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c V4L2StereoAcquisition.c -o $(OBJDIR_DEBUG)/V4L2StereoAcquisition.o
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf .
+	rm -rf $(OBJDIR_DEBUG)/__/v4l2_acquisition_shared_library
 	rm -rf $(OBJDIR_DEBUG)
 
 before_release: 
 	test -d . || mkdir -p .
+	test -d $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library || mkdir -p $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 
 after_release: 
@@ -78,12 +96,28 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
+$(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/PixelFormatConversions.o: ../v4l2_acquisition_shared_library/PixelFormatConversions.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../v4l2_acquisition_shared_library/PixelFormatConversions.c -o $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/PixelFormatConversions.o
+
+$(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2Acquisition.o: ../v4l2_acquisition_shared_library/V4L2Acquisition.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../v4l2_acquisition_shared_library/V4L2Acquisition.c -o $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2Acquisition.o
+
+$(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.o: ../v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.c -o $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.o
+
+$(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2Wrapper.o: ../v4l2_acquisition_shared_library/V4L2Wrapper.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../v4l2_acquisition_shared_library/V4L2Wrapper.c -o $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2Wrapper.o
+
+$(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2_c.o: ../v4l2_acquisition_shared_library/V4L2_c.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../v4l2_acquisition_shared_library/V4L2_c.c -o $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library/V4L2_c.o
+
 $(OBJDIR_RELEASE)/V4L2StereoAcquisition.o: V4L2StereoAcquisition.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c V4L2StereoAcquisition.c -o $(OBJDIR_RELEASE)/V4L2StereoAcquisition.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf .
+	rm -rf $(OBJDIR_RELEASE)/__/v4l2_acquisition_shared_library
 	rm -rf $(OBJDIR_RELEASE)
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release

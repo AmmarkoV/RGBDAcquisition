@@ -15,8 +15,8 @@ INC = -I../3dparty/OpenNI/Include/
 CFLAGS = -Wall -fexceptions -fPIC
 RESINC = 
 LIBDIR = 
-LIB = ./libOpenNI.so ./libOpenNI.jni.so ./libnimRecorder.so ./libnimMockNodes.so ./libnimCodecs.so ../tools/Calibration/libCalibrationLibrary.a
-LDFLAGS = 
+LIB = ../tools/Calibration/libCalibrationLibrary.a
+LDFLAGS = `../scripts/get3dpartyDepencency.sh openni1`
 
 INC_DEBUG = $(INC)
 CFLAGS_DEBUG = $(CFLAGS) -g

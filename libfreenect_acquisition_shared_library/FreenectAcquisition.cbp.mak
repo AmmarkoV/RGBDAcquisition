@@ -15,8 +15,8 @@ INC = -I../3dparty/libfreenect/include -I../3dparty/libfreenect/wrappers/c_sync
 CFLAGS = -Wall -fPIC
 RESINC = 
 LIBDIR = 
-LIB = ./libfreenect.so ./libfreenect_sync.so
-LDFLAGS = 
+LIB = 
+LDFLAGS = `../scripts/get3dpartyDepencency.sh freenect`
 
 INC_DEBUG = $(INC)
 CFLAGS_DEBUG = $(CFLAGS) -g

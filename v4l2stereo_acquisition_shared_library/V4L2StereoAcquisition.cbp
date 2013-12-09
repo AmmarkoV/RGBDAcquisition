@@ -37,6 +37,26 @@
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
+		<Unit filename="../v4l2_acquisition_shared_library/PixelFormatConversions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../v4l2_acquisition_shared_library/PixelFormatConversions.h" />
+		<Unit filename="../v4l2_acquisition_shared_library/V4L2Acquisition.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../v4l2_acquisition_shared_library/V4L2Acquisition.h" />
+		<Unit filename="../v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../v4l2_acquisition_shared_library/V4L2IntrinsicCalibration.h" />
+		<Unit filename="../v4l2_acquisition_shared_library/V4L2Wrapper.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../v4l2_acquisition_shared_library/V4L2Wrapper.h" />
+		<Unit filename="../v4l2_acquisition_shared_library/V4L2_c.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../v4l2_acquisition_shared_library/V4L2_c.h" />
 		<Unit filename="V4L2StereoAcquisition.c">
 			<Option compilerVar="CC" />
 		</Unit>
