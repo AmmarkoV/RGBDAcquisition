@@ -98,9 +98,9 @@ int getV4L2StereoColorDataSize(int devID) { return getV4L2ColorDataSize(devID); 
 int getV4L2StereoColorChannels(int devID) {  return getV4L2ColorChannels(devID); }
 int getV4L2StereoColorBitsPerPixel(int devID) {  return getV4L2ColorBitsPerPixel(devID); }
 
-char * getV4L2StereoColorPixels(int devID) { return getV4L2ColorPixels(devID+0); }
-char * getV4L2StereoColorPixelsLeft(int devID) {  return getV4L2ColorPixels(devID+0); }
-char * getV4L2StereoColorPixelsRight(int devID) {  return getV4L2ColorPixels(devID+1); }
+unsigned char * getV4L2StereoColorPixels(int devID) { return getV4L2ColorPixels(devID+0); }
+unsigned char * getV4L2StereoColorPixelsLeft(int devID) {  return getV4L2ColorPixels(devID+0); }
+unsigned char * getV4L2StereoColorPixelsRight(int devID) {  return getV4L2ColorPixels(devID+1); }
 
 double getV4L2StereoColorFocalLength(int devID)
 {
@@ -126,7 +126,7 @@ double getV4L2StereoDepthPixelSize(int devID) { return 0; }
 int start4L2StereoModule(unsigned int max_devs,char * settings)
 {
     fprintf(stderr,"start4L2StereoModule called on a dummy build of V4L2StereoAcquisition!\n");
-    fprintf(stderr,"Please consider enabling #define BUILD_V4L2STEREO 1 on acquisition/acquisition_setup.h\n");
+    fprintf(stderr,"Please consider enabling #define BUILD_V4L2 1 on acquisition/acquisition_setup.h\n");
     return 0;
   return 1;
 }

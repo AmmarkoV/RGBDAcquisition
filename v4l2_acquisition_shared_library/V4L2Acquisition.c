@@ -1,10 +1,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "V4L2Acquisition.h"
 
 
 #if BUILD_V4L2
+#include "V4L2Acquisition.h"
 #include "V4L2Wrapper.h"
 #include "V4L2IntrinsicCalibration.h"
 #include <linux/videodev2.h>

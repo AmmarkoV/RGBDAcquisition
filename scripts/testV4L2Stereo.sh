@@ -1,9 +1,9 @@
 #!/bin/bash 
-
+clear
  
 
 BINFOLDERPATH="."
-BINPATH="run_grabber.sh -maxFrames 0 -module V4L2STEREO -i /dev/video1,/dev/video2 -o v4l2StereoTest -fps 125"
+BINPATH="run_grabber.sh -maxFrames 0 -module V4L2STEREO -i /dev/video1,/dev/video2 -o v4l2StereoTest -fps 30"
 
 
 if [ -e /usr/lib/x86_64-linux-gnu/libv4l/v4l2convert.so ]
