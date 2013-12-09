@@ -419,14 +419,54 @@ int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
  */
 int acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib);
 
+/**
+ * @brief  Returns the timestamp value of the last snapped Color Frame , time should be in milliseconds
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @retval  Milliseconds timestamp
+ */
 unsigned long acquisitionGetColorTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID);
+
+/**
+ * @brief  Returns the timestamp value of the last snapped Depth Frame , time should be in milliseconds
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @retval  Milliseconds timestamp
+ */
 unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
+/**
+ * @brief  TODO: Overrides current color frame so the next time acquisitionGetColor is called or someone does acquisitionPassFramesToTarget it will be the frame provided there
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param Pointer to the new frame that should overwrite returned , the user should probably free the frame after this call
+ * @retval  1=Success 0=Failure
+ */
+int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor);
 
+/**
+ * @brief  Returns the color frame from the last Snap we did using acquisitionSnapFrames to find out its dimensions you might want to call acquisitionGetColorFrameDimensions
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @retval  Pointer to the current color frame ( you shouldnt manually free it) , 0 = Failure
+ */
 unsigned char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
 unsigned int acquisitionCopyColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned char * mem,unsigned int memlength);
 unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned char * mem,unsigned int memlength);
 
+/**
+ * @brief  TODO: Overrides current depth frame so the next time acquisitionGetDepth is called or someone does acquisitionPassFramesToTarget it will be the frame provided there
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param Pointer to the new frame that should overwrite returned , the user should probably free the frame after this call
+ * @retval  1=Success 0=Failure
+ */
+int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth);
 unsigned short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID);
 unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned short * mem,unsigned int memlength);
 unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned short * mem,unsigned int memlength);
@@ -444,11 +484,13 @@ int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,c
 int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
 int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
 
+/* Deprecated
 double acqusitionGetColorFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID);
 double acqusitionGetColorPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 double acqusitionGetDepthFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID);
 double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID);
+*/
 
 int acquisitionMapDepthToRGB(ModuleIdentifier moduleID,DeviceIdentifier devID);
 int acquisitionMapRGBToDepth(ModuleIdentifier moduleID,DeviceIdentifier devID);

@@ -837,6 +837,13 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
 }
 
 
+int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor)
+{
+  fprintf(stderr,"TODO : acquisitionOverrideColorFrame is a stub\n");
+  return 0;
+}
+
+
 unsigned char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   printCall(moduleID,devID,"acquisitionGetColorFrame", __FILE__, __LINE__);
@@ -890,6 +897,15 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
   payloadStart += width*height*channels*(bitsperpixel/8);
   return payloadStart;
 }
+
+
+
+int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newColor)
+{
+  fprintf(stderr,"TODO : acquisitionOverrideDepthFrame is a stub\n");
+  return 0;
+}
+
 
 unsigned short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
@@ -1075,7 +1091,7 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 }
 
 
-
+/*
 double acqusitionGetColorFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
    printCall(moduleID,devID,"acqusitionGetColorFocalLength", __FILE__, __LINE__);
@@ -1109,7 +1125,7 @@ double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier de
     MeaningfullWarningMessage(moduleID,devID,"acqusitionGetPixelSize");
     return 0.0;
 }
-
+*/
 
 /*
    LAST BUT NOT LEAST acquisition can also relay its state through a TCP/IP network

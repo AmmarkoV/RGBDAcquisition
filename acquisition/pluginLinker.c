@@ -270,12 +270,12 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
   sprintf(functionNameStr,"get%sColorPixels",moduleName);
   plugins[moduleID].getColorPixels = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorFocalLength",moduleName);
-  plugins[moduleID].getColorFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sColorPixelSize",moduleName);
-  plugins[moduleID].getColorPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+  //sprintf(functionNameStr,"get%sColorFocalLength",moduleName);
+  //plugins[moduleID].getColorFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
+  //if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+  //sprintf(functionNameStr,"get%sColorPixelSize",moduleName);
+  //plugins[moduleID].getColorPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
+  //if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sColorCalibration",moduleName);
   plugins[moduleID].getColorCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
@@ -303,12 +303,12 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
   sprintf(functionNameStr,"get%sDepthPixels",moduleName);
   plugins[moduleID].getDepthPixels = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthFocalLength",moduleName);
-  plugins[moduleID].getDepthFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
-  sprintf(functionNameStr,"get%sDepthPixelSize",moduleName);
-  plugins[moduleID].getDepthPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+  //sprintf(functionNameStr,"get%sDepthFocalLength",moduleName);
+  //plugins[moduleID].getDepthFocalLength = dlsym(plugins[moduleID].handle, functionNameStr );
+  //if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+  //sprintf(functionNameStr,"get%sDepthPixelSize",moduleName);
+  //plugins[moduleID].getDepthPixelSize = dlsym(plugins[moduleID].handle, functionNameStr );
+  //if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
   sprintf(functionNameStr,"get%sDepthCalibration",moduleName);
   plugins[moduleID].getDepthCalibration = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
