@@ -661,7 +661,7 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
               (*plugins[moduleID].getColorChannels!=0) && (*plugins[moduleID].getColorBitsPerPixel!=0)
             )
          {
-            return saveRawImageToFile(
+            int retres = saveRawImageToFile(
                                       filenameFull,
                                       (*plugins[moduleID].getColorPixels)      (devID),
                                       (*plugins[moduleID].getColorWidth)       (devID),
@@ -669,6 +669,19 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
                                       (*plugins[moduleID].getColorChannels)    (devID),
                                       (*plugins[moduleID].getColorBitsPerPixel)(devID)
                                      );
+           if ( (retres) && (moduleID==V4L2STEREO_ACQUISITION_MODULE) )
+              {
+                 //V4L2Stereo images are huge so until we fix jpeg compression for all ( already there but there are some managment decisions to be made :P )
+                 //we do a simple hack here :p
+                 char convertToJPEGString[4096]={0};
+                 sprintf(convertToJPEGString , "convert %s.pnm %s.jpg && rm  %s.pnm",filename,filename,filename);
+                 int i = system(convertToJPEGString);
+                 if (i==0) { fprintf(stderr,"Success converting to jpeg\n"); } else
+                           { fprintf(stderr,"Failure converting to jpeg\n"); }
+              }
+
+
+            return retres;
          }
 
 

@@ -213,7 +213,6 @@ unsigned char * getV4L2StereoColorPixels(int devID)
 
  return devices[devID].bothImage;
 
-
 }
 
 unsigned char * getV4L2StereoColorPixelsLeft(int devID) {  return getV4L2ColorPixels(devID+0); }
