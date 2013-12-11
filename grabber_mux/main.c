@@ -22,6 +22,28 @@ int calibrationSetB = 0;
 struct calibration calibB;
 
 
+//We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
+unsigned int frameNum=0,maxFramesToGrab=10;
+
+unsigned int devID_1=0 , devID_2=0;
+ModuleIdentifier moduleID_1 = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
+ModuleIdentifier moduleID_2 = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
+
+
+
+void closeEverything()
+{
+ fprintf(stderr,"Gracefully closing everything .. ");
+    acquisitionCloseDevice(moduleID_1,devID_1);
+    acquisitionCloseDevice(moduleID_2,devID_2);
+    acquisitionStopModule(moduleID_1);
+    acquisitionStopModule(moduleID_2);
+ fprintf(stderr,"Done\n");
+ exit(0);
+}
+
+
+
 int makepath(char * path)
 {
     //FILE *fp;
@@ -40,18 +62,14 @@ int main(int argc, char *argv[])
  unsigned int possibleModules = acquisitionGetModulesCount();
  fprintf(stderr,"Linked to %u modules.. \n",possibleModules);
 
+  acquisitionRegisterTerminationSignal(&closeEverything);
+
  if (possibleModules==0)
     {
        fprintf(stderr,"Acquisition Library is linked to zero modules , can't possibly do anything..\n");
        return 1;
     }
 
- //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
-  unsigned int frameNum=0,maxFramesToGrab=10;
-
-  unsigned int devID_1=0 , devID_2=0;
-  ModuleIdentifier moduleID_1 = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
-  ModuleIdentifier moduleID_2 = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
   strcpy(outputfoldername,"frames/");
 
   /*! --------------------------------- INITIALIZATION FROM COMMAND LINE PARAMETERS --------------------------------- */
@@ -249,16 +267,9 @@ int main(int argc, char *argv[])
        if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
     }
 
-
-
-
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
-    acquisitionCloseDevice(moduleID_1,devID_1);
-    acquisitionCloseDevice(moduleID_2,devID_2);
 
-
-    acquisitionStopModule(moduleID_1);
-    acquisitionStopModule(moduleID_2);
+    closeEverything();
 
 
     return 0;

@@ -43,7 +43,14 @@ int copyDirectoryListItem(int itemNum , char * directoryList , char * output, un
 int listDirectory(char * directory , char * output, unsigned int maxOutput);
 
 
-
+/**
+ * @brief Register a function to receive CTRL+C etc kill requests so our clients will be able to exit gracefully on such events without leaving USB devices on etc
+ * @ingroup misc
+ * @param Pointer to a void  * function ( void )  that will be called on a kill event
+ * @retval 1=Success , 0=Failure
+ * @bug This only works on Linux
+ */
+int registerTerminationSignal(void * callback);
 
 #ifdef __cplusplus
 }

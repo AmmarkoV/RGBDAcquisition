@@ -745,6 +745,7 @@ EXCLUDE_PATTERNS = */3dparty/* \
                    */frames/*  \
                    */grabbed_frames/*  \
                    */AmmarServer/* \
+                   */bindings/* \
                    */redist/
   
 

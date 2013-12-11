@@ -1,3 +1,11 @@
+/** @file NetworkAcqusition.h
+ *  @brief The plugin module that provides acquisition from Network streams and broadcasts to network
+ *
+ *  @author Ammar Qammaz (AmmarkoV)
+ *  @bug This library does not yet work , it is work under progress
+ */
+
+
 #ifndef NETWORKACQUISITION_H_INCLUDED
 #define NETWORKACQUISITION_H_INCLUDED
 
@@ -51,6 +59,13 @@ extern struct NetworkVirtualDevice networkDevice[MAX_NETWORK_DEVICES];
 
 
    //Initialization of Network
+
+  /**
+   * @brief Print a countdown in console and then return
+   * @ingroup networkAcquisition
+   * @retval 1=Success , 0=Failure
+   * @bug Network Acquisition Module is work under progress ,it is currently non-operational
+   */
    int startNetworkModule(unsigned int max_devs,char * settings);
 
    #if BUILD_NETWORK

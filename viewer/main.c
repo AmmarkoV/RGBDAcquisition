@@ -12,6 +12,13 @@
 #include "../acquisition/Acquisition.h"
 #include "../tools/Calibration/calibration.h"
 
+//#include <opencv2/opencv.hpp>
+
+#include <cv.h>
+#include <cxcore.h>
+#include <highgui.h>
+
+
 char inputname[512]={0};
 unsigned int frameNum=0;
 
@@ -19,12 +26,20 @@ unsigned int frameNum=0;
 int calibrationSet = 0;
 struct calibration calib;
 
-//#include <opencv2/opencv.hpp>
+  unsigned int devID=0;
+  ModuleIdentifier moduleID = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
 
+void closeEverything()
+{
+ fprintf(stderr,"Gracefully closing everything .. ");
+ /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
+ acquisitionCloseDevice(moduleID,devID);
+ acquisitionStopModule(moduleID);
+
+ fprintf(stderr,"Done\n");
+ exit(0);
+}
 
 int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int framerate)
 {
@@ -120,8 +135,7 @@ int main(int argc, char *argv[])
  unsigned int possibleModules = acquisitionGetModulesCount();
  fprintf(stderr,"Linked to %u modules.. \n",possibleModules);
 
-  unsigned int devID=0;
-  ModuleIdentifier moduleID = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
+ acquisitionRegisterTerminationSignal(&closeEverything);
 
   if (possibleModules==0)
     {
@@ -234,10 +248,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Done viewing %u frames! \n",maxFramesToGrab);
 
-    /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
-    acquisitionCloseDevice(moduleID,devID);
+    closeEverything();
 
-
-    acquisitionStopModule(moduleID);
     return 0;
 }

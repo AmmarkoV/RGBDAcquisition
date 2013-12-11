@@ -6,10 +6,17 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "OperatingSystem.h"
 
 #define MAX_SYSTEM_PATH 4096
+
+
+//This is for calling back a client function after receiving
+//a sigkill or other signal , after using AmmServer_RegisterTerminationSignal
+void ( *TerminationCallback) ( )=0 ;
+
 
 
 int copyDirectoryListItem(int itemNum , char * directoryList , char * output, unsigned int maxOutput)
@@ -126,4 +133,19 @@ int listDirectory(char * directory , char * output, unsigned int maxOutput)
   fprintf(stderr,"listDirectory filled %u+1 chars of %u availiable\n",addedChars,maxOutput);
 
   return 1;
+}
+
+
+
+int registerTerminationSignal(void * callback)
+{
+  TerminationCallback = callback;
+
+  unsigned int failures=0;
+  if (signal(SIGINT, callback)  == SIG_ERR)  { fprintf(stderr,"Acquisition client cannot handle SIGINT!\n"); ++failures; }
+  if (signal(SIGHUP, callback)  == SIG_ERR)  { fprintf(stderr,"Acquisition client handle SIGHUP!\n");        ++failures; }
+  if (signal(SIGTERM, callback) == SIG_ERR)  { fprintf(stderr,"Acquisition client handle SIGTERM!\n");       ++failures; }
+  if (signal(SIGKILL, callback) == SIG_ERR)  { fprintf(stderr,"Acquisition client handle SIGKILL!\n");       ++failures; }
+
+  return (failures==0);
 }

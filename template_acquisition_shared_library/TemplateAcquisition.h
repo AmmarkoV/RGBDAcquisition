@@ -1,8 +1,12 @@
+/** @file TemplateAcqusition.h
+ *  @brief The plugin module that provides acquisition from Templates ( i.e. Prerecorded datasets )
+ *
+ *  @author Ammar Qammaz (AmmarkoV)
+ *  @bug This is not yet thread safe
+ */
+
 #ifndef TEMPLATEACQUISITION_H_INCLUDED
 #define TEMPLATEACQUISITION_H_INCLUDED
-
-
-
 
 #ifdef __cplusplus
 extern "C"

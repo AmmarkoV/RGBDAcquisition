@@ -3,11 +3,11 @@
 #include "pluginLinker.h"
 
 #include "../tools/Timers/timer.h"
+#include "../tools/OperatingSystem/OperatingSystem.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -26,6 +26,12 @@ unsigned long simulatedTickValue=0;
 //This holds all the info on states of modules and devices
 struct acquisitionModuleStates module[NUMBER_OF_POSSIBLE_MODULES];
 
+
+
+int acquisitionRegisterTerminationSignal(void * callback)
+{
+  return registerTerminationSignal(callback);
+}
 
 
 int acquisitionSimulateTime(unsigned long timeInMillisecs)
@@ -73,10 +79,10 @@ void countdownDelay(int seconds)
     for (secCounter=seconds; secCounter>0; secCounter--)
     {
       fprintf(stderr,"%u\n",secCounter);
-      usleep(1000*1000); // Waiting a while for the glitch frames to pass
+      VisCortxMillisecondsSleep(1000); // Waiting a while for the glitch frames to pass
 
     }
-    usleep(1000*1000); // Waiting a while for the glitch frames to pass
+    VisCortxMillisecondsSleep(1000); // Waiting a while for the glitch frames to pass
 }
 
 

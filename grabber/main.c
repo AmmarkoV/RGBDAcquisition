@@ -21,7 +21,21 @@ unsigned int delay = 0;
 int calibrationSet = 0;
 struct calibration calib;
 
+unsigned int devID=0;
+ModuleIdentifier moduleID = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
+void closeEverything()
+{
+ fprintf(stderr,"Gracefully closing everything .. ");
+ //Stop our target ( can be network or files or nothing )
+ acquisitionStopTargetForFrames(moduleID,devID);
+ /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
+ acquisitionCloseDevice(moduleID,devID);
+ acquisitionStopModule(moduleID);
+
+ fprintf(stderr,"Done\n");
+ exit(0);
+}
 
 /**
  @brief this is the main function
@@ -33,8 +47,7 @@ int main(int argc, char *argv[])
  unsigned int possibleModules = acquisitionGetModulesCount();
  fprintf(stderr,"Linked to %u modules.. \n",possibleModules);
 
-  unsigned int devID=0;
-  ModuleIdentifier moduleID = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
+ acquisitionRegisterTerminationSignal(&closeEverything);
 
   if (possibleModules==0)
     {
@@ -190,13 +203,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
 
-    //Stop our target ( can be network or files or nothing )
-    acquisitionStopTargetForFrames(moduleID,devID);
-    /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
-    acquisitionCloseDevice(moduleID,devID);
-
-
-    acquisitionStopModule(moduleID);
+    closeEverything();
 
     return 0;
 }
