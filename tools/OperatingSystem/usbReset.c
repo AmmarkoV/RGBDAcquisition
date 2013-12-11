@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     int rc;
 
     if (argc != 2) {
-        fprintf(stderr, "Usage: usbreset device-filename\n");
+        fprintf(stderr, "Usage: usbreset device-filename\ni.e. sudo ./usbreset /dev/bus/usb/003/008\n");
         return 1;
     }
     filename = argv[1];

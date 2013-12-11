@@ -297,7 +297,7 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
              return 0;
          }*/
 
-    unsigned int waittime=0,MAX_WAIT=100  , SLEEP_PER_LOOP_MILLI = 50 * /*Milliseconds*/ 1000;
+    unsigned int waittime=0,MAX_WAIT=10  , SLEEP_PER_LOOP_MILLI = 50 * /*Milliseconds*/ 1000;
     if (VIDEOINPUT_DEBUG) { printf("Giving some time ( max =  %u ms ) for the receive threads to wake up ",MAX_WAIT*SLEEP_PER_LOOP_MILLI); }
     while ( ( waittime<MAX_WAIT ) && (camera_feeds[inpt].thread_alive_flag==0) ) {
                                                                                    if (waittime%10==0) printf(".");

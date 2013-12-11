@@ -2,7 +2,7 @@
 clear
 
 BINFOLDERPATH="."
-BINPATH="run_viewer.sh -maxFrames 0 -module V4L2 -i /dev/video1 -o v4l2test"
+BINPATH="run_viewer.sh -maxFrames 0 -module V4L2 -i /dev/video1 -o v4l2test $@"
 
 
 if [ -e /usr/lib/x86_64-linux-gnu/libv4l/v4l2convert.so ]
