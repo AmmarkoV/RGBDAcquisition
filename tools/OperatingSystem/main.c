@@ -13,10 +13,6 @@
 #define MAX_SYSTEM_PATH 4096
 
 
-//This is for calling back a client function after receiving
-//a sigkill or other signal , after using AmmServer_RegisterTerminationSignal
-void ( *TerminationCallback) ( )=0 ;
-
 
 
 int copyDirectoryListItem(int itemNum , char * directoryList , char * output, unsigned int maxOutput)
@@ -139,8 +135,6 @@ int listDirectory(char * directory , char * output, unsigned int maxOutput)
 
 int registerTerminationSignal(void * callback)
 {
-  TerminationCallback = callback;
-
   unsigned int failures=0;
   if (signal(SIGINT, callback)  == SIG_ERR)  { fprintf(stderr,"Acquisition client cannot handle SIGINT!\n"); ++failures; }
   if (signal(SIGHUP, callback)  == SIG_ERR)  { fprintf(stderr,"Acquisition client handle SIGHUP!\n");        ++failures; }
