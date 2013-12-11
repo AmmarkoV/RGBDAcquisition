@@ -1,3 +1,8 @@
+/** @file matrix4x4Tools.h
+ *  @brief  A small 4x4 matrix library for simple 4x4 transformations
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
 #ifndef MATRIX4X4TOOLS_H_INCLUDED
 #define MATRIX4X4TOOLS_H_INCLUDED
 

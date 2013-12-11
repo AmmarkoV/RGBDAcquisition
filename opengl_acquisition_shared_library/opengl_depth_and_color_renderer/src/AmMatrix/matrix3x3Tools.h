@@ -1,3 +1,8 @@
+/** @file matrix3x3Tools.h
+ *  @brief  A small 3x3 matrix library for simple 3x3 transformations
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
 #ifndef MATRIX3X3TOOLS_H_INCLUDED
 #define MATRIX3X3TOOLS_H_INCLUDED
 

@@ -1,3 +1,10 @@
+/** @file main.c
+ *  @brief The simple Viewer that uses libAcquisition.so to view input from a module/device
+ *  This should be used like ./Viewer -module TEMPLATE -from Dataset
+ *
+ *  @author Ammar Qammaz (AmmarkoV)
+ *  @bug No known bugs
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

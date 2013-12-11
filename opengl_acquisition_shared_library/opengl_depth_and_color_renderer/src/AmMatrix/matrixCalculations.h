@@ -1,3 +1,8 @@
+/** @file matrixCalculations.h
+ *  @brief  Functions to prepare matrixes and transform 3D points
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
 #ifndef MATRIXCALCULATIONS_H_INCLUDED
 #define MATRIXCALCULATIONS_H_INCLUDED
 
