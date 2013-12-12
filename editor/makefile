@@ -3,136 +3,24 @@
 #------------------------------------------------------------------------------#
 
 
-WORKDIR = `pwd`
+WRKDIR = `pwd`
+MAKE = make
 
-CC = gcc
-CXX = g++
-AR = ar
-LD = g++
-WINDRES = windres
+all: ___3dparty_fast_fast editor
 
-INC = 
-CFLAGS = -Wall -pg `wx-config --cflags`
-RESINC = 
-LIBDIR = 
-LIB = ../tools/Calibration/libCalibrationLibrary.a ../tools/OperatingSystem/libOperatingSystem.a ./libAcquisition.so ../acquisitionSegment/libacquisitionSegment.a
-LDFLAGS = -pg `wx-config --libs`
+___3dparty_fast_fast: 
+	$(MAKE) -C ../3dparty/fast all -f fast.cbp.mak
 
-INC_DEBUG = $(INC)
-CFLAGS_DEBUG = $(CFLAGS) -g
-RESINC_DEBUG = $(RESINC)
-RCFLAGS_DEBUG = $(RCFLAGS)
-LIBDIR_DEBUG = $(LIBDIR)
-LIB_DEBUG = $(LIB)
-LDFLAGS_DEBUG = $(LDFLAGS)
-OBJDIR_DEBUG = obj/Debug
-DEP_DEBUG = 
-OUT_DEBUG = ./Editor
+editor: 
+	$(MAKE) all -f Editor.cbp.mak
 
-INC_RELEASE = $(INC)
-CFLAGS_RELEASE = $(CFLAGS) -O2
-RESINC_RELEASE = $(RESINC)
-RCFLAGS_RELEASE = $(RCFLAGS)
-LIBDIR_RELEASE = $(LIBDIR)
-LIB_RELEASE = $(LIB)
-LDFLAGS_RELEASE =  -s $(LDFLAGS)
-OBJDIR_RELEASE = obj/Release
-DEP_RELEASE = 
-OUT_RELEASE = ./Editor
+clean: clean____3dparty_fast_fast clean_editor
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/SelectSegmentation.o $(OBJDIR_DEBUG)/Tools.o $(OBJDIR_DEBUG)/SelectTarget.o $(OBJDIR_DEBUG)/EditorApp.o $(OBJDIR_DEBUG)/SelectModule.o $(OBJDIR_DEBUG)/SelectCalibration.o $(OBJDIR_DEBUG)/SelectAcquisitionGraph.o $(OBJDIR_DEBUG)/FeedScreenMemory.o $(OBJDIR_DEBUG)/EditorMain.o
+clean____3dparty_fast_fast: 
+	$(MAKE) -C ../3dparty/fast clean -f fast.cbp.mak
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/SelectSegmentation.o $(OBJDIR_RELEASE)/Tools.o $(OBJDIR_RELEASE)/SelectTarget.o $(OBJDIR_RELEASE)/EditorApp.o $(OBJDIR_RELEASE)/SelectModule.o $(OBJDIR_RELEASE)/SelectCalibration.o $(OBJDIR_RELEASE)/SelectAcquisitionGraph.o $(OBJDIR_RELEASE)/FeedScreenMemory.o $(OBJDIR_RELEASE)/EditorMain.o
+clean_editor: 
+	$(MAKE) clean -f Editor.cbp.mak
 
-all: debug release
-
-clean: clean_debug clean_release
-
-before_debug: 
-	test -d . || mkdir -p .
-	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
-
-after_debug: 
-
-debug: before_debug out_debug after_debug
-
-out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
-	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
-
-$(OBJDIR_DEBUG)/SelectSegmentation.o: SelectSegmentation.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectSegmentation.cpp -o $(OBJDIR_DEBUG)/SelectSegmentation.o
-
-$(OBJDIR_DEBUG)/Tools.o: Tools.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Tools.cpp -o $(OBJDIR_DEBUG)/Tools.o
-
-$(OBJDIR_DEBUG)/SelectTarget.o: SelectTarget.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectTarget.cpp -o $(OBJDIR_DEBUG)/SelectTarget.o
-
-$(OBJDIR_DEBUG)/EditorApp.o: EditorApp.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c EditorApp.cpp -o $(OBJDIR_DEBUG)/EditorApp.o
-
-$(OBJDIR_DEBUG)/SelectModule.o: SelectModule.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectModule.cpp -o $(OBJDIR_DEBUG)/SelectModule.o
-
-$(OBJDIR_DEBUG)/SelectCalibration.o: SelectCalibration.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectCalibration.cpp -o $(OBJDIR_DEBUG)/SelectCalibration.o
-
-$(OBJDIR_DEBUG)/SelectAcquisitionGraph.o: SelectAcquisitionGraph.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SelectAcquisitionGraph.cpp -o $(OBJDIR_DEBUG)/SelectAcquisitionGraph.o
-
-$(OBJDIR_DEBUG)/FeedScreenMemory.o: FeedScreenMemory.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c FeedScreenMemory.cpp -o $(OBJDIR_DEBUG)/FeedScreenMemory.o
-
-$(OBJDIR_DEBUG)/EditorMain.o: EditorMain.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c EditorMain.cpp -o $(OBJDIR_DEBUG)/EditorMain.o
-
-clean_debug: 
-	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
-	rm -rf .
-	rm -rf $(OBJDIR_DEBUG)
-
-before_release: 
-	test -d . || mkdir -p .
-	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
-
-after_release: 
-
-release: before_release out_release after_release
-
-out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
-	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
-
-$(OBJDIR_RELEASE)/SelectSegmentation.o: SelectSegmentation.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectSegmentation.cpp -o $(OBJDIR_RELEASE)/SelectSegmentation.o
-
-$(OBJDIR_RELEASE)/Tools.o: Tools.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Tools.cpp -o $(OBJDIR_RELEASE)/Tools.o
-
-$(OBJDIR_RELEASE)/SelectTarget.o: SelectTarget.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectTarget.cpp -o $(OBJDIR_RELEASE)/SelectTarget.o
-
-$(OBJDIR_RELEASE)/EditorApp.o: EditorApp.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c EditorApp.cpp -o $(OBJDIR_RELEASE)/EditorApp.o
-
-$(OBJDIR_RELEASE)/SelectModule.o: SelectModule.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectModule.cpp -o $(OBJDIR_RELEASE)/SelectModule.o
-
-$(OBJDIR_RELEASE)/SelectCalibration.o: SelectCalibration.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectCalibration.cpp -o $(OBJDIR_RELEASE)/SelectCalibration.o
-
-$(OBJDIR_RELEASE)/SelectAcquisitionGraph.o: SelectAcquisitionGraph.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SelectAcquisitionGraph.cpp -o $(OBJDIR_RELEASE)/SelectAcquisitionGraph.o
-
-$(OBJDIR_RELEASE)/FeedScreenMemory.o: FeedScreenMemory.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c FeedScreenMemory.cpp -o $(OBJDIR_RELEASE)/FeedScreenMemory.o
-
-$(OBJDIR_RELEASE)/EditorMain.o: EditorMain.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c EditorMain.cpp -o $(OBJDIR_RELEASE)/EditorMain.o
-
-clean_release: 
-	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
-	rm -rf .
-	rm -rf $(OBJDIR_RELEASE)
-
-.PHONY: before_debug after_debug clean_debug before_release after_release clean_release
+.PHONY: clean____3dparty_fast_fast clean_editor
 

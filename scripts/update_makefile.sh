@@ -22,7 +22,7 @@ fi
 
 #Seperate makefile for testing editor
 cd editor
-cbp2make -in Editor.cbp -unix -out makefile
+cbp2make -in EditorCodeBlocks.workspace -unix -out makefile
 cd ..
 
  

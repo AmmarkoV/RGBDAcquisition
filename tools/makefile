@@ -6,7 +6,7 @@
 WRKDIR = `pwd`
 MAKE = make
 
-all: operatingsystem_operatingsystem quaternions_quaternionstoeuler quaternions_eulertoquaternions depthimagesconverter_depthimagesconverter calibration_calibration undistort_undistort extrinsiccalibration_extrinsiccalibration calibration_calibrationlibrary timers_timers
+all: operatingsystem_operatingsystem quaternions_quaternionstoeuler quaternions_eulertoquaternions depthimagesconverter_depthimagesconverter calibration_calibration undistort_undistort extrinsiccalibration_extrinsiccalibration calibration_calibrationlibrary timers_timers ___3dparty_fast_fast
 
 operatingsystem_operatingsystem: 
 	$(MAKE) -C OperatingSystem all -f OperatingSystem.cbp.mak
@@ -35,7 +35,10 @@ calibration_calibrationlibrary:
 timers_timers: 
 	$(MAKE) -C Timers all -f Timers.cbp.mak
 
-clean: clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
+___3dparty_fast_fast: 
+	$(MAKE) -C ../3dparty/fast all -f fast.cbp.mak
+
+clean: clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers clean____3dparty_fast_fast
 
 clean_operatingsystem_operatingsystem: 
 	$(MAKE) -C OperatingSystem clean -f OperatingSystem.cbp.mak
@@ -64,5 +67,8 @@ clean_calibration_calibrationlibrary:
 clean_timers_timers: 
 	$(MAKE) -C Timers clean -f Timers.cbp.mak
 
-.PHONY: clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
+clean____3dparty_fast_fast: 
+	$(MAKE) -C ../3dparty/fast clean -f fast.cbp.mak
+
+.PHONY: clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers clean____3dparty_fast_fast
 
