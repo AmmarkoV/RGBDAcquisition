@@ -479,7 +479,7 @@ int acquisitionGetNumberOfColorStreams(ModuleIdentifier moduleID , DeviceIdentif
  * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
  * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
  * @param Number of the color stream to activate from there on
- * @retval  1=Success,0=Failure
+ * @retval  1=Success  0=Failure
  */
 int acquisitionSwitchToColorStream(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned int streamToActivate);
 

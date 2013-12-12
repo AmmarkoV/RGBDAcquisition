@@ -1,0 +1,28 @@
+#!/bin/bash
+echo "FAST Feature Detection / Provides libFast.a / Author : Edward Rosten http://www.edwardrosten.com/work/fast.html"  
+
+if [ -e  libFast.a ]
+then
+   echo "libFast  seems to exist ..  Skipping make operation , since this file rarely changes..! "
+ cd ..
+ exit 0
+fi
+ 
+
+gcc -Os -O3 -fexpensive-optimizations -march=native -mtune=native -c fast.c -o fast.o
+gcc -Os -O3 -fexpensive-optimizations -march=native -mtune=native -c fast_9.c -o fast_9.o 
+gcc -Os -O3 -fexpensive-optimizations -march=native -mtune=native -c nonmax.c -o nonmax.o
+
+ar  rcs libFast.a fast.o fast_9.o nonmax.o
+
+rm fast.o fast_9.o nonmax.o
+  
+if [ -e libFast.a ]
+then
+  echo "Success.."
+else
+  echo "Failure.."
+fi
+
+
+exit 0
