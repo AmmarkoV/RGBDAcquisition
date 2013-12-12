@@ -863,6 +863,40 @@ int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier d
 }
 
 
+
+
+
+
+int acquisitionGetNumberOfColorStreams(ModuleIdentifier moduleID , DeviceIdentifier devID)
+{
+  printCall(moduleID,devID,"acquisitionGetNumberOfColorStreams", __FILE__, __LINE__);
+  //If getNumberOfColorStreams is declared for the plugin return its values
+  if (*plugins[moduleID].getNumberOfColorStreams!=0) { return (*plugins[moduleID].getNumberOfColorStreams) (devID); } else
+  //If we dont find a declared getNumberOfColorStreams BUT the getColorPixels is declared it looks like a missing function on the plugin
+  //So we return 1 device ( the default
+  if (*plugins[moduleID].getColorPixels!=0) { return 1; }
+
+  //If we don't find it return 0
+  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetNumberOfColorStreams");
+  return 0;
+}
+
+
+
+int acquisitionSwitchToColorStream(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned int streamToActivate)
+{
+  printCall(moduleID,devID,"acquisitionSwitchToColorStream", __FILE__, __LINE__);
+  if (*plugins[moduleID].switchToColorStream!=0) { return (*plugins[moduleID].switchToColorStream) (devID,streamToActivate); }
+  MeaningfullWarningMessage(moduleID,devID,"acquisitionSwitchToColorStream");
+  return 0;
+}
+
+
+
+
+
+
+
 unsigned char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   printCall(moduleID,devID,"acquisitionGetColorFrame", __FILE__, __LINE__);

@@ -138,6 +138,7 @@ int mixbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
 
 
 
+
 int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
               unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
               unsigned int width , unsigned int height)
@@ -169,8 +170,8 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   sourceLineLimitPTR = sourcePTR + (width*3);
   fprintf(stderr,"SOURCE (RGB %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
   fprintf(stderr,"sourcePTR is %p\n",sourcePTR);
-  fprintf(stderr,"sourceLimitPTR is %p\n",sourceLimitPTR);
-  fprintf(stderr,"sourceLineSkip is %p\n",sourceLineSkip);
+  fprintf(stderr,"sourceLimitPTR is %p\n",(void*) sourceLimitPTR);
+  fprintf(stderr,"sourceLineSkip is %u\n",        sourceLineSkip);
   fprintf(stderr,"sourceLineLimitPTR is %p\n",sourceLineLimitPTR);
 
 
@@ -178,7 +179,7 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   //targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
   targetLineSkip = (targetWidth-width) * 3;
   fprintf(stderr,"targetPTR is %p\n",targetPTR);
-  fprintf(stderr,"targetLineSkip is %p\n",targetLineSkip);
+  fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
   fprintf(stderr,"TARGET (RGB %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
 
   while (sourcePTR < sourceLimitPTR)
@@ -197,8 +198,6 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   }
  return 1;
 }
-
-
 
 
 

@@ -461,6 +461,32 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
  */
 int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor);
 
+
+
+
+/**
+ * @brief  Some modules have more than one Color streams , this function returns the number of existing modules
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @retval  Number of color streams 0=Failure Or assume One Stream , Any other value is a number of color streams
+ */
+int acquisitionGetNumberOfColorStreams(ModuleIdentifier moduleID , DeviceIdentifier devID);
+
+/**
+ * @brief  Some modules have more than one Color streams , this function selects one of the color streams  , so all the GetColor calls will talk about the selected stream
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param Number of the color stream to activate from there on
+ * @retval  1=Success,0=Failure
+ */
+int acquisitionSwitchToColorStream(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned int streamToActivate);
+
+
+
+
+
 /**
  * @brief  Returns the color frame from the last Snap we did using acquisitionSnapFrames to find out its dimensions you might want to call acquisitionGetColorFrameDimensions
  * @ingroup acquisitionCore

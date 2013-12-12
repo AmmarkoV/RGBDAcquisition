@@ -17,6 +17,8 @@ struct v4l2StereoDevices
     unsigned char * bothImage;
     unsigned int bothWidth;
     unsigned int bothHeight;
+
+    unsigned int activeStream;
 };
 
 struct v4l2StereoDevices devices[MAX_DEVICES]={0};
@@ -51,6 +53,8 @@ int getDevIDForV4L2StereoName(char * devName)
    //Basic Per Device Operations
 int createV4L2StereoDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
+ devices[devID].activeStream=2;
+
  char devName1[512]={0};
  char devName2[512]={0};
  char * secondString = strstr(devName,",");
@@ -106,6 +110,10 @@ int snapV4L2StereoFrames(int devID)
  return 0;
 }
 
+
+int getV4L2StereoNumberOfColorStreams(int devID) { return 2; }
+int switchV4L2StereoToColorStream(int devID,unsigned int streamToActivate) { devices[devID].activeStream=streamToActivate; return 1; }
+
 //Color Frame getters
 int getV4L2StereoColorWidth(int devID) { return getV4L2ColorWidth(devID)*2; }
 int getV4L2StereoColorHeight(int devID) { return getV4L2ColorHeight(devID); }
@@ -149,8 +157,8 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   sourceLineLimitPTR = sourcePTR + (width*3);
   fprintf(stderr,"SOURCE (RGB %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
   fprintf(stderr,"sourcePTR is %p\n",sourcePTR);
-  fprintf(stderr,"sourceLimitPTR is %p\n",sourceLimitPTR);
-  fprintf(stderr,"sourceLineSkip is %p\n",sourceLineSkip);
+  fprintf(stderr,"sourceLimitPTR is %p\n",(void*) sourceLimitPTR);
+  fprintf(stderr,"sourceLineSkip is %u\n",        sourceLineSkip);
   fprintf(stderr,"sourceLineLimitPTR is %p\n",sourceLineLimitPTR);
 
 
@@ -158,7 +166,7 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   //targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
   targetLineSkip = (targetWidth-width) * 3;
   fprintf(stderr,"targetPTR is %p\n",targetPTR);
-  fprintf(stderr,"targetLineSkip is %p\n",targetLineSkip);
+  fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
   fprintf(stderr,"TARGET (RGB %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
 
   while (sourcePTR < sourceLimitPTR)
@@ -181,16 +189,17 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
 
 
 
-
-
-
-
-
 unsigned char * getV4L2StereoColorPixels(int devID)
 {
+  if (devices[devID].activeStream<2)
+  {
+      return getV4L2ColorPixels(devID+devices[devID].activeStream);
+  }
+
+
   unsigned int width =  getV4L2ColorWidth(devID);
   unsigned int height =  getV4L2ColorHeight(devID);
-  unsigned int channels =  getV4L2ColorChannels(devID);
+  //unsigned int channels =  getV4L2ColorChannels(devID);
 
   if (devices[devID].bothImage != 0 ) { free(devices[devID].bothImage); devices[devID].bothImage=0;  }
 

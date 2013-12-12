@@ -67,6 +67,9 @@ struct acquisitionPluginInterface
    int (*seekRelativeFrame)  (int,signed int);
    int (*seekFrame)  (int,unsigned int);
 
+   int (*getNumberOfColorStreams) (int);
+   int (*switchToColorStream) (int, unsigned int);
+
    int (*getColorWidth) (int);
    int (*getColorHeight) (int);
    int (*getColorDataSize) (int);

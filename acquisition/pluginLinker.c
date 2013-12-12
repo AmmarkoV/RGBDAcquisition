@@ -256,6 +256,14 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
 
+  sprintf(functionNameStr,"get%sNumberOfColorStreams",moduleName);
+  plugins[moduleID].getNumberOfColorStreams = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+  sprintf(functionNameStr,"switch%sToColorStream",moduleName);
+  plugins[moduleID].switchToColorStream = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+
+
   sprintf(functionNameStr,"get%sColorWidth",moduleName);
   plugins[moduleID].getColorWidth = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }

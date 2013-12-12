@@ -28,6 +28,9 @@ extern "C"
    int seekV4L2StereoFrame(int devID,unsigned int seekFrame);
    int snapV4L2StereoFrames(int devID);
 
+   int getV4L2StereoNumberOfColorStreams(int devID);
+   int switchV4L2StereoToColorStream(int devID,unsigned int streamToActivate);
+
    //Color Frame getters
    int getV4L2StereoColorWidth(int devID);
    int getV4L2StereoColorHeight(int devID);
