@@ -6,6 +6,7 @@
 //#define PI 3.141592653589793 precision anyone ? :P
 #define PI 3.141592653589793238462643383279502884197
 
+#define USE_FAST_NORMALIZATION 0
 #define USEATAN2 1
   /* arctan and arcsin have a result between −π/2 and π/2. With three rotations between −π/2 and π/2 you can't have all possible orientations.
      We need to replace the arctan by atan2 to generate all the orientations. */
@@ -125,3 +126,40 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 
 }
 
+
+
+int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW)
+{
+    #if USE_FAST_NORMALIZATION
+      // Works best when quat is already almost-normalized
+      double f = (double) (3.0 - (((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)))) / 2.0;
+      *qX *= f;
+      *qY *= f;
+      *qZ *= f;
+      *qW *= f;
+      #else
+      double sqrtDown = (double) sqrt(((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)));
+      double f = (double) 1 / sqrtDown;
+       *qX *= f;
+       *qY *= f;
+       *qZ *= f;
+       *qW *= f;
+     #endif // USE_FAST_NORMALIZATION
+  return 1;
+}
+
+
+double innerProductQuaternions(double qAX,double qAY,double qAZ,double qAW ,
+                               double qBX,double qBY,double qBZ,double qBW)
+{
+   return (double) ((qAX * qBX) + (qAY * qBY)+ (qAZ * qBZ) + (qAW * qBW));
+}
+
+
+double anglesBetweenQuaternions(double qAX,double qAY,double qAZ,double qAW ,
+                                double qBX,double qBY,double qBZ,double qBW)
+{
+ double rads= acos(innerProductQuaternions(qAX,qAY,qAZ,qAW,qBX,qBY,qBZ,qBW));
+
+ return (double)  /*Why is the *2 needed ? */ 2* /*Why?*/ (rads * 180) / PI;
+}
