@@ -14,7 +14,7 @@ int forceUSLocaleToKeepOurSanity()
 int main(int argc, char *argv[])
 {
     forceUSLocaleToKeepOurSanity();
-    if (argc<6) { printf("EulerToQuaternions X Y Z , X Y Z , you did not provide 6 arguments\n"); return 1; }
+    if (argc<6) { printf("%s X Y Z , X Y Z , you did not provide 6 arguments\n",argv[0]); return 1; }
 
     double xA = atof(argv[1]);
     double yA = atof(argv[2]);
