@@ -6,7 +6,7 @@
 WRKDIR = `pwd`
 MAKE = make
 
-all: ___3dparty_fast_fast operatingsystem_operatingsystem quaternions_quaternionstoeuler quaternions_eulertoquaternions quaternions_rotationbetweenquaternions depthimagesconverter_depthimagesconverter calibration_calibration undistort_undistort extrinsiccalibration_extrinsiccalibration calibration_calibrationlibrary timers_timers
+all: ___3dparty_fast_fast operatingsystem_operatingsystem quaternions_quaternionstoeuler quaternions_eulertoquaternions quaternions_rotationbetweenquaternions points_pointsdistance depthimagesconverter_depthimagesconverter calibration_calibration undistort_undistort extrinsiccalibration_extrinsiccalibration calibration_calibrationlibrary timers_timers
 
 ___3dparty_fast_fast: 
 	$(MAKE) -C ../3dparty/fast all -f fast.cbp.mak
@@ -22,6 +22,9 @@ quaternions_eulertoquaternions:
 
 quaternions_rotationbetweenquaternions: 
 	$(MAKE) -C Quaternions all -f RotationBetweenQuaternions.cbp.mak
+
+points_pointsdistance: 
+	$(MAKE) -C Points all -f PointsDistance.cbp.mak
 
 depthimagesconverter_depthimagesconverter: 
 	$(MAKE) -C DepthImagesConverter all -f DepthImagesConverter.cbp.mak
@@ -41,7 +44,7 @@ calibration_calibrationlibrary:
 timers_timers: 
 	$(MAKE) -C Timers all -f Timers.cbp.mak
 
-clean: clean____3dparty_fast_fast clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_quaternions_rotationbetweenquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
+clean: clean____3dparty_fast_fast clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_quaternions_rotationbetweenquaternions clean_points_pointsdistance clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
 
 clean____3dparty_fast_fast: 
 	$(MAKE) -C ../3dparty/fast clean -f fast.cbp.mak
@@ -57,6 +60,9 @@ clean_quaternions_eulertoquaternions:
 
 clean_quaternions_rotationbetweenquaternions: 
 	$(MAKE) -C Quaternions clean -f RotationBetweenQuaternions.cbp.mak
+
+clean_points_pointsdistance: 
+	$(MAKE) -C Points clean -f PointsDistance.cbp.mak
 
 clean_depthimagesconverter_depthimagesconverter: 
 	$(MAKE) -C DepthImagesConverter clean -f DepthImagesConverter.cbp.mak
@@ -76,5 +82,5 @@ clean_calibration_calibrationlibrary:
 clean_timers_timers: 
 	$(MAKE) -C Timers clean -f Timers.cbp.mak
 
-.PHONY: clean____3dparty_fast_fast clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_quaternions_rotationbetweenquaternions clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
+.PHONY: clean____3dparty_fast_fast clean_operatingsystem_operatingsystem clean_quaternions_quaternionstoeuler clean_quaternions_eulertoquaternions clean_quaternions_rotationbetweenquaternions clean_points_pointsdistance clean_depthimagesconverter_depthimagesconverter clean_calibration_calibration clean_undistort_undistort clean_extrinsiccalibration_extrinsiccalibration clean_calibration_calibrationlibrary clean_timers_timers
 

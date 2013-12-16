@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = ./RotationBetweenQuaternions
+OUT_DEBUG = ./PointsDistance
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2
@@ -38,11 +38,11 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = ./RotationBetweenQuaternions
+OUT_RELEASE = ./PointsDistance
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/quaternions.o $(OBJDIR_DEBUG)/rotationBetweenQuaternions.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/pointsDistance.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/quaternions.o $(OBJDIR_RELEASE)/rotationBetweenQuaternions.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/pointsDistance.o
 
 all: debug release
 
@@ -59,11 +59,8 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
-$(OBJDIR_DEBUG)/quaternions.o: quaternions.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c quaternions.c -o $(OBJDIR_DEBUG)/quaternions.o
-
-$(OBJDIR_DEBUG)/rotationBetweenQuaternions.o: rotationBetweenQuaternions.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c rotationBetweenQuaternions.c -o $(OBJDIR_DEBUG)/rotationBetweenQuaternions.o
+$(OBJDIR_DEBUG)/pointsDistance.o: pointsDistance.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c pointsDistance.c -o $(OBJDIR_DEBUG)/pointsDistance.o
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
@@ -81,11 +78,8 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
-$(OBJDIR_RELEASE)/quaternions.o: quaternions.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c quaternions.c -o $(OBJDIR_RELEASE)/quaternions.o
-
-$(OBJDIR_RELEASE)/rotationBetweenQuaternions.o: rotationBetweenQuaternions.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c rotationBetweenQuaternions.c -o $(OBJDIR_RELEASE)/rotationBetweenQuaternions.o
+$(OBJDIR_RELEASE)/pointsDistance.o: pointsDistance.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c pointsDistance.c -o $(OBJDIR_RELEASE)/pointsDistance.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)

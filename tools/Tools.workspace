@@ -6,6 +6,7 @@
 		<Project filename="Quaternions/QuaternionsToEuler.cbp" />
 		<Project filename="Quaternions/EulerToQuaternions.cbp" />
 		<Project filename="Quaternions/RotationBetweenQuaternions.cbp" />
+		<Project filename="Points/PointsDistance.cbp" />
 		<Project filename="DepthImagesConverter/DepthImagesConverter.cbp" />
 		<Project filename="Calibration/Calibration.cbp" />
 		<Project filename="Undistort/Undistort.cbp" />
