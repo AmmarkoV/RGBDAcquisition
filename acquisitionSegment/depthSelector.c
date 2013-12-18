@@ -25,7 +25,6 @@ int keepFirstDepthFrame(unsigned short * source ,  unsigned int width , unsigned
   return 0;
 }
 
-//TODO :
 int selectBasedOnMovement(unsigned char  * selection,unsigned short * baseDepth , unsigned short * currentDepth , unsigned int threshold ,  unsigned int width , unsigned int height  )
 {
   unsigned short * baseDepthPTR  = baseDepth;
@@ -40,7 +39,7 @@ int selectBasedOnMovement(unsigned char  * selection,unsigned short * baseDepth 
        if (*currentDepthPTR > *baseDepthPTR + threshold)
         {
          /*Adding the threshold we are still off so we unselect this voxel*/
-         *selectionPTR = 1;
+         *selectionPTR = 0;
         } else
         { /*We accept this voxel so , we dont change its value*/ }
     } else
@@ -49,7 +48,7 @@ int selectBasedOnMovement(unsigned char  * selection,unsigned short * baseDepth 
        if (*currentDepthPTR + threshold < *baseDepthPTR)
         {
          /*Adding the threshold we are still off so we unselect this voxel*/
-         *selectionPTR = 1;
+         *selectionPTR = 0;
         } else
         { /*We accept this voxel so , we dont change its value*/ }
     }
@@ -100,12 +99,6 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  if ( sourceCopy == 0) { return 0; }
  memcpy(sourceCopy,source,width*height*sizeof(unsigned short));
 
- if (segConf->enableDepthMotionDetection)
- {
-  //In case we want motion detection we should record the first frame we have so that we can use it to select pixels
-  keepFirstDepthFrame(sourceCopy ,  width , height , segConf);
- }
-
 
  unsigned short * target = (unsigned short *) malloc( width * height * sizeof(unsigned short));
  if ( target == 0) { free(sourceCopy); return 0; }
@@ -134,6 +127,19 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
 
  unsigned int x =0;
  unsigned int y =0;
+
+
+
+ if (segConf->enableDepthMotionDetection)
+ {
+  //In case we want motion detection we should record the first frame we have so that we can use it to select pixels
+  if (! keepFirstDepthFrame(sourceCopy ,  width , height , segConf) )
+  {
+    selectBasedOnMovement(selectedDepth, segConf->firstDepthFrame , sourceCopy , segConf->motionDistanceThreshold  ,  width , height  );
+  }
+ }
+
+
 
 
  unsigned short * depth=0;
