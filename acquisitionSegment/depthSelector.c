@@ -27,39 +27,49 @@ int keepFirstDepthFrame(unsigned short * source ,  unsigned int width , unsigned
 
 int selectBasedOnMovement(unsigned char  * selection,unsigned short * baseDepth , unsigned short * currentDepth , unsigned int threshold ,  unsigned int width , unsigned int height  )
 {
-  fprintf(stderr,"selectBasedOnMovement is executed with a threshold of %u \n",threshold);
+  fprintf(stderr,"selectBasedOnMovement is executed with a threshold of %u , ( %u x %u ) \n",threshold,width,height);
 
+  unsigned long dropped=0;
   unsigned short * baseDepthPTR  = baseDepth;
   unsigned short * currentDepthPTR  = currentDepth;
   unsigned char * selectionPTR  = selection;
-  unsigned char * selectionLimit  = selection;
+  unsigned char * selectionLimit  = selection + width*height;
+  unsigned char pixelMoving=0;
 
   while (selectionPTR<selectionLimit)
   {
+
+    pixelMoving=0;
     if (*currentDepthPTR > *baseDepthPTR)
     {
        if (*currentDepthPTR > *baseDepthPTR + threshold)
         {
-         /*Adding the threshold we are still off so we unselect this voxel*/
-         *selectionPTR = 0;
-        } else
-        { /*We accept this voxel so , we dont change its value*/ }
+         /*This voxel is the same as it was ( aka have not moved )
+           , so we select them out! */
+           pixelMoving=1;
+        }
     } else
     if (*currentDepthPTR < *baseDepthPTR)
     {
        if (*currentDepthPTR + threshold < *baseDepthPTR)
         {
-         /*Adding the threshold we are still off so we unselect this voxel*/
-         *selectionPTR = 0;
-        } else
-        { /*We accept this voxel so , we dont change its value*/ }
+         /*This voxel is the same as it was ( aka have not moved )
+           , so we select them out! */
+           pixelMoving=1;
+        }
     }
 
+    if (!pixelMoving)
+    {
+        *selectionPTR = 0;
+         ++dropped;
+    }
 
     ++currentDepthPTR;
     ++baseDepthPTR;
     ++selectionPTR;
   }
+  fprintf(stderr,"Dropped %u of %u \n",dropped,width*height);
 
   return 1;
 }
@@ -132,23 +142,6 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
 
 
 
- if (segConf->enableDepthMotionDetection)
- {
-  //In case we want motion detection we should record the first frame we have so that we can use it to select pixels
-  if (! keepFirstDepthFrame(sourceCopy ,  width , height , segConf) )
-  {
-    selectBasedOnMovement(selectedDepth, segConf->firstDepthFrame , sourceCopy , segConf->motionDistanceThreshold  ,  width , height  );
-  }
- } else
- {
-   if (segConf->firstDepthFrame!=0)
-   {
-     fprintf(stderr,"Freeing first frame for depth motion detection\n");
-     free(segConf->firstDepthFrame);
-     segConf->firstDepthFrame=0;
-   }
- }
-
 
 
 
@@ -171,6 +164,28 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
     }
    sourcePixelsLineEnd+=sourceWidthStep;
  }
+
+
+
+
+
+ if (segConf->enableDepthMotionDetection)
+ {
+  //In case we want motion detection we should record the first frame we have so that we can use it to select pixels
+  if (! keepFirstDepthFrame(sourceCopy ,  width , height , segConf) )
+  {
+    selectBasedOnMovement(selectedDepth, segConf->firstDepthFrame , sourceCopy , segConf->motionDistanceThreshold  ,  width , height  );
+  }
+ } else
+ {
+   if (segConf->firstDepthFrame!=0)
+   {
+     fprintf(stderr,"Freeing first frame for depth motion detection\n");
+     free(segConf->firstDepthFrame);
+     segConf->firstDepthFrame=0;
+   }
+ }
+
 
 
 // -------------------------------------------------------------------------------------------------
