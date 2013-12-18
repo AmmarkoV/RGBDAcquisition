@@ -542,6 +542,14 @@ int  EditorFrame::refreshSegmentedFrame()
                               &calib ,
                               combinationMode
                              );
+
+     unsigned int newColorByteSize = width * height * 3 * sizeof(unsigned char);
+     acquisitionOverrideColorFrame(moduleID,devID,segmentedRGB,newColorByteSize);
+
+     unsigned int newDepthByteSize = width * height * 1 * sizeof(unsigned short);
+     acquisitionOverrideDepthFrame(moduleID,devID,segmentedDepth,newDepthByteSize);
+
+
      return 1;
     }
  return 0;

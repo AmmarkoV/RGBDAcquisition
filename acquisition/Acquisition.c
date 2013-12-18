@@ -690,7 +690,8 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
          {
             int retres = saveRawImageToFile(
                                       filenameFull,
-                                      (*plugins[moduleID].getColorPixels)      (devID),
+                                      // (*plugins[moduleID].getColorPixels)      (devID),
+                                      acquisitionGetColorFrame(moduleID,devID)        ,
                                       (*plugins[moduleID].getColorWidth)       (devID),
                                       (*plugins[moduleID].getColorHeight)      (devID),
                                       (*plugins[moduleID].getColorChannels)    (devID),
@@ -746,7 +747,8 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
          {
             return saveRawImageToFile(
                                       filenameFull,
-                                      (*plugins[moduleID].getDepthPixels)      (devID),
+                                      // (*plugins[moduleID].getDepthPixels)      (devID),
+                                      acquisitionGetDepthFrame(moduleID,devID)        ,
                                       (*plugins[moduleID].getDepthWidth)       (devID),
                                       (*plugins[moduleID].getDepthHeight)      (devID),
                                       (*plugins[moduleID].getDepthChannels)    (devID),
@@ -959,6 +961,12 @@ int acquisitionSwitchToColorStream(ModuleIdentifier moduleID , DeviceIdentifier 
 unsigned char * acquisitionGetColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   printCall(moduleID,devID,"acquisitionGetColorFrame", __FILE__, __LINE__);
+
+  if (module[moduleID].device[devID].overrideColorFrame!=0) {
+                                                              fprintf(stderr,"Returning overriden color frame \n");
+                                                              return module[moduleID].device[devID].overrideColorFrame;
+                                                            }
+
   if (*plugins[moduleID].getColorPixels!=0) { return (*plugins[moduleID].getColorPixels) (devID); }
   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorFrame");
   return 0;
@@ -1060,6 +1068,12 @@ int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier d
 unsigned short * acquisitionGetDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   printCall(moduleID,devID,"acquisitionGetDepthFrame", __FILE__, __LINE__);
+
+  if (module[moduleID].device[devID].overrideDepthFrame!=0) {
+                                                              fprintf(stderr,"Returning overriden depth frame \n");
+                                                              return module[moduleID].device[devID].overrideDepthFrame;
+                                                            }
+
   if (*plugins[moduleID].getDepthPixels!=0) { return (unsigned short*) (*plugins[moduleID].getDepthPixels) (devID); }
   MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthFrame");
   return 0;
