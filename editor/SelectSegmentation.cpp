@@ -70,6 +70,9 @@ const long SelectSegmentation::ID_STATICTEXT15 = wxNewId();
 const long SelectSegmentation::ID_SPINCTRL12 = wxNewId();
 const long SelectSegmentation::ID_STATICLINE1 = wxNewId();
 const long SelectSegmentation::ID_BUTTON3 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX3 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT20 = wxNewId();
+const long SelectSegmentation::ID_TEXTCTRL24 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -109,11 +112,11 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	StaticText7 = new wxStaticText(this, ID_STATICTEXT7, _("---->"), wxPoint(188,158), wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	cropRGBX2 = new wxTextCtrl(this, ID_TEXTCTRL3, _("640"), wxPoint(232,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
 	cropRGBY2 = new wxTextCtrl(this, ID_TEXTCTRL4, _("480"), wxPoint(284,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
-	StaticText8 = new wxStaticText(this, ID_STATICTEXT8, _("Minimum :"), wxPoint(392,66), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
-	minDepth = new wxSpinCtrl(this, ID_SPINCTRL7, _T("0"), wxPoint(480,64), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL7"));
+	StaticText8 = new wxStaticText(this, ID_STATICTEXT8, _("Minimum :"), wxPoint(392,40), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	minDepth = new wxSpinCtrl(this, ID_SPINCTRL7, _T("0"), wxPoint(392,56), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL7"));
 	minDepth->SetValue(_T("0"));
-	StaticText9 = new wxStaticText(this, ID_STATICTEXT9, _("Maximum :"), wxPoint(392,100), wxDefaultSize, 0, _T("ID_STATICTEXT9"));
-	maxDepth = new wxSpinCtrl(this, ID_SPINCTRL8, _T("10000"), wxPoint(480,96), wxDefaultSize, 0, 0, 10000, 10000, _T("ID_SPINCTRL8"));
+	StaticText9 = new wxStaticText(this, ID_STATICTEXT9, _("Maximum :"), wxPoint(512,40), wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+	maxDepth = new wxSpinCtrl(this, ID_SPINCTRL8, _T("10000"), wxPoint(512,56), wxDefaultSize, 0, 0, 10000, 10000, _T("ID_SPINCTRL8"));
 	maxDepth->SetValue(_T("10000"));
 	StaticText10 = new wxStaticText(this, ID_STATICTEXT10, _("Crop:"), wxPoint(392,160), wxDefaultSize, 0, _T("ID_STATICTEXT10"));
 	cropDepthX1 = new wxTextCtrl(this, ID_TEXTCTRL5, _("0"), wxPoint(432,156), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
@@ -165,6 +168,10 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	eraseDepth->SetValue(_T("0"));
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxPoint(20,450), wxSize(700,0), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	ButtonExport = new wxButton(this, ID_BUTTON3, _("Export To File"), wxPoint(16,480), wxSize(120,27), 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	CheckBoxSegmentMovement = new wxCheckBox(this, ID_CHECKBOX3, _("Segment Movement"), wxPoint(392,88), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+	CheckBoxSegmentMovement->SetValue(false);
+	StaticText20 = new wxStaticText(this, ID_STATICTEXT20, _("Movement Threshold"), wxPoint(392,120), wxDefaultSize, 0, _T("ID_STATICTEXT20"));
+	TextCtrlMovementThreshold = new wxTextCtrl(this, ID_TEXTCTRL24, _("100"), wxPoint(552,114), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL24"));
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
@@ -232,6 +239,9 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
    maxB->SetValue(selectedRGBConf.maxB);
 
 
+  CheckBoxSegmentMovement->SetValue( (selectedDepthConf.enableDepthMotionDetection!=0) );
+  val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.motionDistanceThreshold); TextCtrlMovementThreshold->SetValue(val);
+
 
   ChoiceCombination->SetSelection(selectedCombinationMode);
 
@@ -291,6 +301,16 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
 
   //selectedDepthConf.
 
+
+   if (CheckBoxSegmentMovement->IsChecked())
+        {
+          selectedDepthConf.enableDepthMotionDetection=1;
+          if (TextCtrlMovementThreshold->GetValue().ToLong(&value))
+              {  selectedDepthConf.motionDistanceThreshold = value; }
+        } else
+        {
+          selectedDepthConf.enableDepthMotionDetection=0;
+        }
 
 
    selectedRGBConf.minR = minR->GetValue();

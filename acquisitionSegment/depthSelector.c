@@ -27,6 +27,8 @@ int keepFirstDepthFrame(unsigned short * source ,  unsigned int width , unsigned
 
 int selectBasedOnMovement(unsigned char  * selection,unsigned short * baseDepth , unsigned short * currentDepth , unsigned int threshold ,  unsigned int width , unsigned int height  )
 {
+  fprintf(stderr,"selectBasedOnMovement is executed with a threshold of %u \n",threshold);
+
   unsigned short * baseDepthPTR  = baseDepth;
   unsigned short * currentDepthPTR  = currentDepth;
   unsigned char * selectionPTR  = selection;
@@ -137,6 +139,14 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
   {
     selectBasedOnMovement(selectedDepth, segConf->firstDepthFrame , sourceCopy , segConf->motionDistanceThreshold  ,  width , height  );
   }
+ } else
+ {
+   if (segConf->firstDepthFrame!=0)
+   {
+     fprintf(stderr,"Freeing first frame for depth motion detection\n");
+     free(segConf->firstDepthFrame);
+     segConf->firstDepthFrame=0;
+   }
  }
 
 
