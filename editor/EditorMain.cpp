@@ -307,6 +307,12 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
        wxMessageBox(wxT("Error while Getting Calibration!"),wxT("RGBDAcquisition Editor"));
    }
 
+   if (! acquisitionMapDepthToRGB(moduleID,devID) )
+   {
+       fprintf(stderr,"Could not map depth to rgb , well no one really cares I guess.. \n");
+   }
+
+
    unsigned int totalFrames =  acquisitionGetTotalFrameNumber(moduleID,devID);
 
    play=0;

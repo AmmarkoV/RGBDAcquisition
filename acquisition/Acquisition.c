@@ -24,7 +24,7 @@ unsigned long simulatedTickValue=0;
 
 
 //This holds all the info on states of modules and devices
-struct acquisitionModuleStates module[NUMBER_OF_POSSIBLE_MODULES];
+struct acquisitionModuleStates module[NUMBER_OF_POSSIBLE_MODULES]={0};
 
 
 
@@ -33,6 +33,22 @@ int acquisitionRegisterTerminationSignal(void * callback)
   return registerTerminationSignal(callback);
 }
 
+ int acquisitionCleanOverrides(ModuleIdentifier moduleID,DeviceIdentifier devID)
+ {
+    if ( module[moduleID].device[devID].overrideColorFrame!=0 )
+        {
+          free(module[moduleID].device[devID].overrideColorFrame);
+          module[moduleID].device[devID].overrideColorFrame=0;
+        }
+
+    if ( module[moduleID].device[devID].overrideDepthFrame!=0 )
+        {
+          free(module[moduleID].device[devID].overrideDepthFrame);
+          module[moduleID].device[devID].overrideDepthFrame=0;
+        }
+
+    return 1;
+ }
 
 int acquisitionSimulateTime(unsigned long timeInMillisecs)
 {
@@ -588,8 +604,10 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char 
     return 0;
 }
 
+
  int acquisitionCloseDevice(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
+    acquisitionCleanOverrides(moduleID,devID);
     printCall(moduleID,devID,"acquisitionCloseDevice", __FILE__, __LINE__);
     if (plugins[moduleID].destroyDevice!=0) { return (*plugins[moduleID].destroyDevice) (devID); }
     MeaningfullWarningMessage(moduleID,devID,"acquisitionCloseDevice");
@@ -640,6 +658,9 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
     printCall(moduleID,devID,"acquisitionSnapFrames", __FILE__, __LINE__);
+
+    //In case the last frame had some overrides we "clear" them on our new frame so our new frame will not also appear overrided
+    acquisitionCleanOverrides(moduleID,devID);
 
     StartTimer(FRAME_SNAP_DELAY);
 
@@ -856,9 +877,47 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
 }
 
 
-int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor)
+int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor , unsigned int newColorByteSize)
 {
-  fprintf(stderr,"TODO : acquisitionOverrideColorFrame is a stub\n");
+  //Ok when someone overrides a color frame there are two chances..
+  //He either has already done it ( there is already an overriden frame ) , Or it is the first time he does it ( there is NO overriden frame existing )
+  //Since allocating/freeing chunks of memory means syscalls and since most of the time the size of each frame is the same in case there is an already
+  //Overriden frame we just use the space allocated for it in order to be economic
+  if ( module[moduleID].device[devID].overrideColorFrame!=0 )
+  {
+     fprintf(stderr,"Override Color Frame called while already overriden!\n");
+     if ( module[moduleID].device[devID].overrideColorFrameByteSize < newColorByteSize )
+     {
+      fprintf(stderr,"Old override frame is not big enough to fit our frame , will not use it!\n");
+      free(module[moduleID].device[devID].overrideColorFrame);
+      module[moduleID].device[devID].overrideColorFrame=0;
+      module[moduleID].device[devID].overrideColorFrameByteSize  = 0;
+     } else
+     {
+      fprintf(stderr,"Old override frame is big enough , we will just use it instead of doing more syscalls to achieve the same result!\n");
+     }
+  }
+
+  //In case the frame is not allocated ( or it was but it was not big enough ) , we have to malloc a new memory chunk to accomodate our frame
+  if ( module[moduleID].device[devID].overrideColorFrame==0 )
+  {
+      module[moduleID].device[devID].overrideColorFrame = ( unsigned char * ) malloc(newColorByteSize*sizeof(unsigned char));
+      if (module[moduleID].device[devID].overrideColorFrame==0)
+      {
+        module[moduleID].device[devID].overrideColorFrameByteSize  = 0;
+        fprintf(stderr,"Could not allocate a new override frame of size %u\n",newColorByteSize);
+        return 0;
+      }
+      module[moduleID].device[devID].overrideColorFrameByteSize  = newColorByteSize;
+  }
+
+  //Ok so after everything if we enter here it means we can <<at-last>> do our memcpy and get this over with
+  if ( module[moduleID].device[devID].overrideColorFrame!=0 )
+  {
+      memcpy(module[moduleID].device[devID].overrideColorFrame , newColor , newColorByteSize);
+      return 1;
+  }
+
   return 0;
 }
 
@@ -953,9 +1012,47 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
 
 
 
-int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newColor)
+int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth , unsigned int newDepthByteSize)
 {
-  fprintf(stderr,"TODO : acquisitionOverrideDepthFrame is a stub\n");
+  //Ok when someone overrides a color frame there are two chances..
+  //He either has already done it ( there is already an overriden frame ) , Or it is the first time he does it ( there is NO overriden frame existing )
+  //Since allocating/freeing chunks of memory means syscalls and since most of the time the size of each frame is the same in case there is an already
+  //Overriden frame we just use the space allocated for it in order to be economic
+  if ( module[moduleID].device[devID].overrideDepthFrame!=0 )
+  {
+     fprintf(stderr,"Override Color Frame called while already overriden!\n");
+     if ( module[moduleID].device[devID].overrideDepthFrameByteSize < newDepthByteSize )
+     {
+      fprintf(stderr,"Old override frame is not big enough to fit our frame , will not use it!\n");
+      free(module[moduleID].device[devID].overrideDepthFrame);
+      module[moduleID].device[devID].overrideDepthFrame=0;
+      module[moduleID].device[devID].overrideDepthFrameByteSize  = 0;
+     } else
+     {
+      fprintf(stderr,"Old override frame is big enough , we will just use it instead of doing more syscalls to achieve the same result!\n");
+     }
+  }
+
+  //In case the frame is not allocated ( or it was but it was not big enough ) , we have to malloc a new memory chunk to accomodate our frame
+  if ( module[moduleID].device[devID].overrideDepthFrame==0 )
+  {
+      module[moduleID].device[devID].overrideDepthFrame = ( unsigned char * ) malloc(newDepthByteSize /* *sizeof(unsigned short) */ );
+      if (module[moduleID].device[devID].overrideDepthFrame==0)
+      {
+        module[moduleID].device[devID].overrideDepthFrameByteSize  = 0;
+        fprintf(stderr,"Could not allocate a new override frame of size %u\n",newDepthByteSize);
+        return 0;
+      }
+      module[moduleID].device[devID].overrideDepthFrameByteSize  = newDepthByteSize;
+  }
+
+  //Ok so after everything if we enter here it means we can <<at-last>> do our memcpy and get this over with
+  if ( module[moduleID].device[devID].overrideDepthFrame!=0 )
+  {
+      memcpy(module[moduleID].device[devID].overrideDepthFrame , newDepth , newDepthByteSize);
+      return 1;
+  }
+
   return 0;
 }
 
@@ -1143,42 +1240,6 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
     return 0;
 }
 
-
-/*
-double acqusitionGetColorFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID)
-{
-   printCall(moduleID,devID,"acqusitionGetColorFocalLength", __FILE__, __LINE__);
-   if  (*plugins[moduleID].getColorFocalLength!=0) { return  (*plugins[moduleID].getColorFocalLength) (devID); }
-    MeaningfullWarningMessage(moduleID,devID,"acqusitionGetColorFocalLength");
-    return 0.0;
-}
-
-double acqusitionGetColorPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID)
-{
-    printCall(moduleID,devID,"acqusitionGetColorPixelSize", __FILE__, __LINE__);
-    if  (*plugins[moduleID].getColorPixelSize!=0) { return  (*plugins[moduleID].getColorPixelSize) (devID); }
-    MeaningfullWarningMessage(moduleID,devID,"acqusitionGetColorPixelSize");
-    return 0.0;
-}
-
-
-
-double acqusitionGetDepthFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID)
-{
-    printCall(moduleID,devID,"acqusitionGetFocalLength", __FILE__, __LINE__);
-    if  (*plugins[moduleID].getDepthFocalLength!=0) { return  (*plugins[moduleID].getDepthFocalLength) (devID); }
-    MeaningfullWarningMessage(moduleID,devID,"acqusitionGetFocalLength");
-    return 0.0;
-}
-
-double acqusitionGetDepthPixelSize(ModuleIdentifier moduleID,DeviceIdentifier devID)
-{
-    printCall(moduleID,devID,"acqusitionGetPixelSize", __FILE__, __LINE__);
-    if  (*plugins[moduleID].getDepthPixelSize!=0) { return  (*plugins[moduleID].getDepthPixelSize) (devID); }
-    MeaningfullWarningMessage(moduleID,devID,"acqusitionGetPixelSize");
-    return 0.0;
-}
-*/
 
 /*
    LAST BUT NOT LEAST acquisition can also relay its state through a TCP/IP network

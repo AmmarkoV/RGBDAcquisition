@@ -87,6 +87,13 @@ struct acquisitionDeviceStates
 
   //Dry Run
   unsigned char dryRunOutput;
+
+  unsigned char * overrideColorFrame;
+  unsigned int overrideColorFrameByteSize;
+
+  unsigned short * overrideDepthFrame;
+  unsigned int overrideDepthFrameByteSize;
+
 };
 
 
@@ -111,6 +118,15 @@ struct acquisitionModuleStates
 int acquisitionRegisterTerminationSignal(void * callback);
 
 
+/**
+ * @brief Clears overrides to this image that might exist ( this is used internally but someone might want to ensure the clean state of the module/device )
+ * Overrides are generated in the first place using the acquisitionOverrideColorFrame and acquisitionOverrideDepthFrame calls.
+ * @ingroup misc
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @retval 1=Success,0=Failure
+ */
+int acquisitionCleanOverrides(ModuleIdentifier moduleID,DeviceIdentifier devID);
 
 /**
  * @brief Find if file pointed by filename path exists
@@ -459,7 +475,7 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
  * @param Pointer to the new frame that should overwrite returned , the user should probably free the frame after this call
  * @retval  1=Success 0=Failure
  */
-int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor);
+int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor, unsigned int newColorByteSize);
 
 
 
@@ -534,7 +550,7 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
  * @param Pointer to the new frame that should overwrite returned , the user should probably free the frame after this call
  * @retval  1=Success 0=Failure
  */
-int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth);
+int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth , unsigned int newDepthByteSize);
 /**
  * @brief  Returns the depth frame from the last Snap we did using acquisitionSnapFrames to find out its dimensions you might want to call acquisitionGetDepthFrameDimensions
  * @ingroup acquisitionCore
