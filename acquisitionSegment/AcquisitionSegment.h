@@ -71,6 +71,12 @@ struct SegmentationFeaturesRGB
    unsigned char replaceR , replaceG , replaceB;
    char enableReplacingColors;
 
+
+   unsigned char enableRGBMotionDetection;
+   unsigned char * firstRGBFrame;
+   unsigned int firstRGBFrameByteSize;
+   unsigned int motionRThreshold,motionGThreshold,motionBThreshold;
+
    struct floodErasePoints floodErase;
 };
 

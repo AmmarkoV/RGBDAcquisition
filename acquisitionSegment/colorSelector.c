@@ -10,6 +10,67 @@
 #include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h"
 #include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h"
 
+
+int keepFirstRGBFrame(unsigned short * source ,  unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
+{
+  if (segConf->firstRGBFrame==0)
+  {
+      segConf->firstRGBFrameByteSize = width * height * 3 * sizeof (unsigned char);
+      segConf->firstRGBFrame = (unsigned char * ) malloc( segConf->firstRGBFrameByteSize );
+
+      if (segConf->firstRGBFrame !=0 )
+      {
+       memcpy(segConf->firstRGBFrame , source , segConf->firstRGBFrameByteSize);
+       return 1;
+      }
+  }
+  return 0;
+}
+
+
+int selectBasedOnRGBMovement(unsigned char  * selection,unsigned char * baseRGB , unsigned char * currentRGB ,
+                             unsigned int thresholdR , unsigned int thresholdG, unsigned int thresholdB ,  unsigned int width , unsigned int height  )
+{
+  fprintf(stderr,"selectBasedOnRGBMovement is executed with a threshold of R%u G%u B%u , ( %u x %u ) \n",thresholdR , thresholdG, thresholdB,width,height);
+
+  unsigned long dropped=0;
+  unsigned char * baseRGBPTR  = baseRGB;
+  unsigned char * currentRGBPTR  = currentRGB;
+  unsigned char * selectionPTR  = selection;
+  unsigned char * selectionLimit  = selection + width*height;
+  unsigned char channelMoving=0;
+
+  while (selectionPTR<selectionLimit)
+  {
+
+    channelMoving=0;
+    if ( (*currentRGBPTR > *baseRGBPTR) && (*currentRGBPTR > *baseRGBPTR + thresholdR) ) { ++channelMoving;  } else
+    if ( (*currentRGBPTR < *baseRGBPTR) && (*currentRGBPTR + thresholdR < *baseRGBPTR) ) { ++channelMoving;  }
+    ++currentRGBPTR; ++baseRGBPTR;
+
+    if ( (*currentRGBPTR > *baseRGBPTR) && (*currentRGBPTR > *baseRGBPTR + thresholdG) ) { ++channelMoving;  } else
+    if ( (*currentRGBPTR < *baseRGBPTR) && (*currentRGBPTR + thresholdG < *baseRGBPTR) ) { ++channelMoving;  }
+    ++currentRGBPTR; ++baseRGBPTR;
+
+    if ( (*currentRGBPTR > *baseRGBPTR) && (*currentRGBPTR > *baseRGBPTR + thresholdB) ) { ++channelMoving;  } else
+    if ( (*currentRGBPTR < *baseRGBPTR) && (*currentRGBPTR + thresholdB < *baseRGBPTR) ) { ++channelMoving;  }
+    ++currentRGBPTR; ++baseRGBPTR;
+
+
+    if (channelMoving<2)
+       {
+         *selectionPTR = 0;
+         ++dropped;
+       }
+
+    ++selectionPTR;
+  }
+  fprintf(stderr,"Dropped %u of %u \n",dropped,width*height);
+
+  return 1;
+}
+
+
 int removeFloodFillBeforeProcessing(unsigned char * source , unsigned char * target , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf  )
 {
   if (segConf->floodErase.totalPoints==0) { return 0; }
@@ -123,6 +184,27 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
    sourcePixelsLineEnd+=sourceWidthStep;
    ++y;
  }
+
+
+
+ if (segConf->enableRGBMotionDetection)
+ {
+  //In case we want motion detection we should record the first frame we have so that we can use it to select pixels
+  if (! keepFirstRGBFrame(sourceCopy ,  width , height , segConf) )
+  {
+    selectBasedOnRGBMovement(selectedRGB, segConf->firstRGBFrame , sourceCopy ,
+                             segConf->motionRThreshold , segConf->motionGThreshold , segConf->motionBThreshold ,  width , height  );
+  }
+ } else
+ {
+   if (segConf->firstRGBFrame!=0)
+   {
+     fprintf(stderr,"Freeing first frame for rgb motion detection\n");
+     free(segConf->firstRGBFrame);
+     segConf->firstRGBFrame=0;
+   }
+ }
+
 
 
  free(sourceCopy);

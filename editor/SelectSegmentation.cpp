@@ -73,6 +73,15 @@ const long SelectSegmentation::ID_BUTTON3 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX3 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT20 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL24 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX4 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT21 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL13 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT22 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL14 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT23 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT24 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL15 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT25 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -168,10 +177,23 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	eraseDepth->SetValue(_T("0"));
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxPoint(20,450), wxSize(700,0), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	ButtonExport = new wxButton(this, ID_BUTTON3, _("Export To File"), wxPoint(16,480), wxSize(120,27), 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	CheckBoxSegmentMovement = new wxCheckBox(this, ID_CHECKBOX3, _("Segment Movement"), wxPoint(392,88), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+	CheckBoxSegmentMovement = new wxCheckBox(this, ID_CHECKBOX3, _("Segment Depth Movement"), wxPoint(392,88), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
 	CheckBoxSegmentMovement->SetValue(false);
 	StaticText20 = new wxStaticText(this, ID_STATICTEXT20, _("Movement Threshold"), wxPoint(392,120), wxDefaultSize, 0, _T("ID_STATICTEXT20"));
 	TextCtrlMovementThreshold = new wxTextCtrl(this, ID_TEXTCTRL24, _("100"), wxPoint(552,114), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL24"));
+	CheckBoxSegmentRGBMovement = new wxCheckBox(this, ID_CHECKBOX4, _("Segment RGB Movement"), wxPoint(40,200), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+	CheckBoxSegmentRGBMovement->SetValue(false);
+	StaticText21 = new wxStaticText(this, ID_STATICTEXT21, _("Threshold"), wxPoint(40,256), wxDefaultSize, 0, _T("ID_STATICTEXT21"));
+	SpinCtrlMovementR = new wxSpinCtrl(this, ID_SPINCTRL13, _T("10"), wxPoint(120,240), wxSize(56,27), 0, 0, 255, 10, _T("ID_SPINCTRL13"));
+	SpinCtrlMovementR->SetValue(_T("10"));
+	StaticText22 = new wxStaticText(this, ID_STATICTEXT22, _("R"), wxPoint(136,224), wxDefaultSize, 0, _T("ID_STATICTEXT22"));
+	SpinCtrlMovementG = new wxSpinCtrl(this, ID_SPINCTRL14, _T("10"), wxPoint(184,240), wxSize(56,27), 0, 0, 255, 10, _T("ID_SPINCTRL14"));
+	SpinCtrlMovementG->SetValue(_T("10"));
+	StaticText23 = new wxStaticText(this, ID_STATICTEXT23, _("G"), wxPoint(200,224), wxDefaultSize, 0, _T("ID_STATICTEXT23"));
+	StaticText24 = new wxStaticText(this, ID_STATICTEXT24, _("B"), wxPoint(264,224), wxDefaultSize, 0, _T("ID_STATICTEXT24"));
+	SpinCtrlMovementB = new wxSpinCtrl(this, ID_SPINCTRL15, _T("10"), wxPoint(248,240), wxSize(56,27), 0, 0, 100, 10, _T("ID_SPINCTRL15"));
+	SpinCtrlMovementB->SetValue(_T("10"));
+	StaticText25 = new wxStaticText(this, ID_STATICTEXT25, _("Move"), wxPoint(55,240), wxDefaultSize, 0, _T("ID_STATICTEXT25"));
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
@@ -238,6 +260,12 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
    maxG->SetValue(selectedRGBConf.maxG );
    maxB->SetValue(selectedRGBConf.maxB);
 
+
+
+  CheckBoxSegmentRGBMovement->SetValue( (selectedRGBConf.enableRGBMotionDetection!=0) );
+  SpinCtrlMovementR->SetValue(selectedRGBConf.motionRThreshold);
+  SpinCtrlMovementG->SetValue(selectedRGBConf.motionGThreshold);
+  SpinCtrlMovementB->SetValue(selectedRGBConf.motionBThreshold);
 
   CheckBoxSegmentMovement->SetValue( (selectedDepthConf.enableDepthMotionDetection!=0) );
   val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.motionDistanceThreshold); TextCtrlMovementThreshold->SetValue(val);
@@ -312,6 +340,16 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
           selectedDepthConf.enableDepthMotionDetection=0;
         }
 
+   if (CheckBoxSegmentRGBMovement->IsChecked())
+        {
+            selectedRGBConf.enableRGBMotionDetection=1;
+            selectedRGBConf.motionRThreshold = SpinCtrlMovementR->GetValue();
+            selectedRGBConf.motionGThreshold = SpinCtrlMovementG->GetValue();
+            selectedRGBConf.motionBThreshold = SpinCtrlMovementB->GetValue();
+        } else
+        {
+            selectedRGBConf.enableRGBMotionDetection=0;
+        }
 
    selectedRGBConf.minR = minR->GetValue();
    selectedRGBConf.minG = minG->GetValue();

@@ -33,12 +33,16 @@ class SelectSegmentation: public wxDialog
 
 		//(*Declarations(SelectSegmentation)
 		wxSpinCtrl* minG;
+		wxStaticText* StaticText24;
+		wxStaticText* StaticText22;
+		wxStaticText* StaticText21;
 		wxSpinCtrl* maxR;
 		wxStaticText* StaticText13;
 		wxStaticText* StaticText14;
 		wxStaticText* StaticText15;
 		wxTextCtrl* planeP1Y;
 		wxTextCtrl* cropRGBY1;
+		wxSpinCtrl* SpinCtrlMovementG;
 		wxTextCtrl* cropDepthY1;
 		wxTextCtrl* cropDepthY2;
 		wxSpinCtrl* eraseColorB;
@@ -65,6 +69,7 @@ class SelectSegmentation: public wxDialog
 		wxSpinCtrl* maxG;
 		wxButton* ButtonCancel;
 		wxTextCtrl* planeP1X;
+		wxStaticText* StaticText23;
 		wxTextCtrl* cropDepthX2;
 		wxTextCtrl* bboxMaxY;
 		wxStaticLine* StaticLine1;
@@ -81,22 +86,26 @@ class SelectSegmentation: public wxDialog
 		wxTextCtrl* planeP2Y;
 		wxSpinCtrl* eraseDepth;
 		wxStaticText* StaticText4;
+		wxCheckBox* CheckBoxSegmentRGBMovement;
 		wxSpinCtrl* minDepth;
 		wxCheckBox* CheckBoxSegmentMovement;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText2;
 		wxTextCtrl* bboxMaxZ;
+		wxSpinCtrl* SpinCtrlMovementR;
 		wxCheckBox* CheckBoxPlane;
 		wxStaticText* StaticText6;
 		wxSpinCtrl* maxB;
 		wxTextCtrl* bboxMaxX;
 		wxStaticText* StaticText19;
 		wxTextCtrl* cropRGBY2;
+		wxSpinCtrl* SpinCtrlMovementB;
 		wxSpinCtrl* eraseColorR;
 		wxStaticText* StaticText9;
 		wxTextCtrl* bboxMinX;
 		wxTextCtrl* planeP3X;
 		wxStaticText* StaticText11;
+		wxStaticText* StaticText25;
 		wxTextCtrl* planeP3Y;
 		wxFileDialog* FileDialogExport;
 		//*)
@@ -170,6 +179,15 @@ class SelectSegmentation: public wxDialog
 		static const long ID_CHECKBOX3;
 		static const long ID_STATICTEXT20;
 		static const long ID_TEXTCTRL24;
+		static const long ID_CHECKBOX4;
+		static const long ID_STATICTEXT21;
+		static const long ID_SPINCTRL13;
+		static const long ID_STATICTEXT22;
+		static const long ID_SPINCTRL14;
+		static const long ID_STATICTEXT23;
+		static const long ID_STATICTEXT24;
+		static const long ID_SPINCTRL15;
+		static const long ID_STATICTEXT25;
 		//*)
 
 	private:

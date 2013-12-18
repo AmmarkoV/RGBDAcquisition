@@ -44,26 +44,24 @@ int selectBasedOnMovement(unsigned char  * selection,unsigned short * baseDepth 
     {
        if (*currentDepthPTR > *baseDepthPTR + threshold)
         {
-         /*This voxel is the same as it was ( aka have not moved )
-           , so we select them out! */
-           pixelMoving=1;
+         /*This voxel is the same as it was ( aka have not moved ) , so we select them out! */
+         pixelMoving=1;
         }
     } else
     if (*currentDepthPTR < *baseDepthPTR)
     {
        if (*currentDepthPTR + threshold < *baseDepthPTR)
         {
-         /*This voxel is the same as it was ( aka have not moved )
-           , so we select them out! */
-           pixelMoving=1;
+         /*This voxel is the same as it was ( aka have not moved ) , so we select them out! */
+         pixelMoving=1;
         }
     }
 
     if (!pixelMoving)
-    {
-        *selectionPTR = 0;
+       {
+         *selectionPTR = 0;
          ++dropped;
-    }
+       }
 
     ++currentDepthPTR;
     ++baseDepthPTR;

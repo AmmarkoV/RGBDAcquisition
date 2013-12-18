@@ -111,6 +111,14 @@ int initializeRGBSegmentationConfiguration(struct SegmentationFeaturesRGB * segC
    segConfRGB->enableReplacingColors=0;
    segConfRGB->replaceR=92; segConfRGB->replaceG=45; segConfRGB->replaceB=36;
 
+
+   segConfRGB->enableRGBMotionDetection=0;
+   segConfRGB->firstRGBFrame=0;
+   segConfRGB->firstRGBFrameByteSize=0;
+   segConfRGB->motionRThreshold=15;
+   segConfRGB->motionGThreshold=15;
+   segConfRGB->motionBThreshold=15;
+
   return 1;
 }
 
@@ -129,7 +137,7 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
    segConfDepth->enableDepthMotionDetection=0;
    segConfDepth->firstDepthFrame=0;
    segConfDepth->firstDepthFrameByteSize=0;
-   segConfDepth->motionDistanceThreshold=0;
+   segConfDepth->motionDistanceThreshold=25;
 
 
    segConfDepth->enablePlaneSegmentation=0;

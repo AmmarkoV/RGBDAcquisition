@@ -314,7 +314,7 @@
 			<handler function="OnButtonExportClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX3" variable="CheckBoxSegmentMovement" member="yes">
-			<label>Segment Movement</label>
+			<label>Segment Depth Movement</label>
 			<pos>392,88</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT20" variable="StaticText20" member="yes">
@@ -324,6 +324,47 @@
 		<object class="wxTextCtrl" name="ID_TEXTCTRL24" variable="TextCtrlMovementThreshold" member="yes">
 			<value>100</value>
 			<pos>552,114</pos>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX4" variable="CheckBoxSegmentRGBMovement" member="yes">
+			<label>Segment RGB Movement</label>
+			<pos>40,200</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT21" variable="StaticText21" member="yes">
+			<label>Threshold</label>
+			<pos>40,256</pos>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL13" variable="SpinCtrlMovementR" member="yes">
+			<value>10</value>
+			<max>255</max>
+			<pos>120,240</pos>
+			<size>56,27</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT22" variable="StaticText22" member="yes">
+			<label>R</label>
+			<pos>136,224</pos>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL14" variable="SpinCtrlMovementG" member="yes">
+			<value>10</value>
+			<max>255</max>
+			<pos>184,240</pos>
+			<size>56,27</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT23" variable="StaticText23" member="yes">
+			<label>G</label>
+			<pos>200,224</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT24" variable="StaticText24" member="yes">
+			<label>B</label>
+			<pos>264,224</pos>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL15" variable="SpinCtrlMovementB" member="yes">
+			<value>10</value>
+			<pos>248,240</pos>
+			<size>56,27</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT25" variable="StaticText25" member="yes">
+			<label>Move</label>
+			<pos>55,240</pos>
 		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>
