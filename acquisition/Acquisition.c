@@ -689,17 +689,19 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
             )
          {
             int retres = saveRawImageToFile(
-                                      filenameFull,
-                                      // (*plugins[moduleID].getColorPixels)      (devID),
-                                      acquisitionGetColorFrame(moduleID,devID)        ,
-                                      (*plugins[moduleID].getColorWidth)       (devID),
-                                      (*plugins[moduleID].getColorHeight)      (devID),
-                                      (*plugins[moduleID].getColorChannels)    (devID),
-                                      (*plugins[moduleID].getColorBitsPerPixel)(devID)
-                                     );
+                                            filenameFull,
+                                            // (*plugins[moduleID].getColorPixels)      (devID),
+                                            acquisitionGetColorFrame(moduleID,devID)        ,
+                                            (*plugins[moduleID].getColorWidth)       (devID),
+                                            (*plugins[moduleID].getColorHeight)      (devID),
+                                            (*plugins[moduleID].getColorChannels)    (devID),
+                                            (*plugins[moduleID].getColorBitsPerPixel)(devID)
+                                           );
+
+
+           // V4L2 Specific JPS compression ------------------------------------------------------------------------------------------------------------------------------
            if ( (retres) && (moduleID==V4L2STEREO_ACQUISITION_MODULE) )
-              {
-                 //V4L2Stereo images are huge so until we fix jpeg compression for all ( already there but there are some managment decisions to be made :P )
+              {  //V4L2Stereo images are huge so until we fix jpeg compression for all templates ( already there but there are some managment decisions to be made :P )
                  //we do a simple hack here :p
                  char convertToJPEGString[4096]={0};
                  sprintf(convertToJPEGString , "convert %s.pnm %s.jpg && rm  %s.pnm && mv %s.jpg %s.jps",filename,filename,filename,filename,filename);
@@ -707,7 +709,7 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
                  if (i==0) { fprintf(stderr,"Success converting to jpeg\n"); } else
                            { fprintf(stderr,"Failure converting to jpeg\n"); }
               }
-
+           // V4L2 Specific JPS compression ------------------------------------------------------------------------------------------------------------------------------
 
             return retres;
          }

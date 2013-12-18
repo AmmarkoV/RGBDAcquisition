@@ -359,6 +359,11 @@ int listTemplateDevices(int devID,char * output, unsigned int maxOutput)
 
 int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
+ device[devID].cycle=0;
+ device[devID].totalFrames=0;
+ device[devID].templateWIDTH=0;
+ device[devID].templateHEIGHT=0;
+
   if ( ( device[devID].templateWIDTH < width ) &&  ( device[devID].templateHEIGHT < height ) )
    {
         device[devID].templateHEIGHT=height;
@@ -374,7 +379,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   findLastFrame(devID);
 
   unsigned int failedStream=0;
-  unsigned int widthInternal; unsigned int heightInternal; unsigned long timestampInternal;
+  unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;
 
   char file_name_test[1024];
   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);

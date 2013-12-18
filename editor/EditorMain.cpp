@@ -416,8 +416,9 @@ void EditorFrame::render(wxDC& dc)
    { dc.DrawBitmap(*live_feeds[1].bmp,feed_1_x,feed_1_y,0); } //FEED 2
 
 
+
    if (recording)
-   {
+   { //DRAW RECORDING DECAL ON LEFT FEED
      wxPen red(wxColour(255,0,0),1,wxSOLID);
      dc.SetPen(red);
      dc.SetBrush(*wxRED_BRUSH); //*wxTRANSPARENT_BRUSH
@@ -568,6 +569,9 @@ void EditorFrame::guiSnapFrames()
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
   depthFrame = acquisitionGetDepthFrame(moduleID,devID);
   refreshSegmentedFrame();
+  //These should now contain the sgemented frame!
+  rgbFrame = acquisitionGetColorFrame(moduleID,devID);
+  depthFrame = acquisitionGetDepthFrame(moduleID,devID);
 
 
   unsigned int devID=0;
@@ -580,6 +584,8 @@ void EditorFrame::guiSnapFrames()
         // || ( (acquisitionGetTotalFrameNumber(moduleID,devID)==0) && (play) )
      )
   {
+
+     /*  Segmented frames are now handled through the new override mechanism of libAcquisition.h
      if (segmentedFramesExist)
      {
         //DRAW RGB FRAME -------------------------------------------------------------------------------------
@@ -597,8 +603,8 @@ void EditorFrame::guiSnapFrames()
          passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
          free(rgbDepth);
        }
-     } else
-     {
+     } else*/
+     //{
        //DRAW RGB FRAME -------------------------------------------------------------------------------------
        acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
        passVideoRegisterToFeed(0,rgbFrame,width,height,bitsperpixel,channels);
@@ -614,7 +620,7 @@ void EditorFrame::guiSnapFrames()
         passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
         free(rgbDepth);
        }
-     }
+     //}
 
 
    lastFrameDrawn=currentFrameDrawn;
