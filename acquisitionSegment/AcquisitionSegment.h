@@ -90,7 +90,10 @@ struct SegmentationFeaturesDepth
    unsigned char enableBBox;
    double bboxX1,bboxY1,bboxZ1,bboxX2,bboxY2,bboxZ2;
 
-
+   unsigned char enableDepthMotionDetection;
+   unsigned short * firstDepthFrame;
+   unsigned int firstDepthFrameByteSize;
+   unsigned int motionDistanceThreshold;
 
    unsigned char enablePlaneSegmentation;
    double p1[3];

@@ -9,6 +9,61 @@
 #include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h"
 #include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h"
 
+int keepFirstDepthFrame(unsigned short * source ,  unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf)
+{
+  if (segConf->firstDepthFrame==0)
+  {
+      segConf->firstDepthFrameByteSize = width * height * sizeof (unsigned short);
+      segConf->firstDepthFrame = (unsigned short * ) malloc( segConf->firstDepthFrameByteSize );
+
+      if (segConf->firstDepthFrame !=0 )
+      {
+       memcpy(segConf->firstDepthFrame , source , segConf->firstDepthFrameByteSize);
+       return 1;
+      }
+  }
+  return 0;
+}
+
+//TODO :
+int selectBasedOnMovement(unsigned char  * selection,unsigned short * baseDepth , unsigned short * currentDepth , unsigned int threshold ,  unsigned int width , unsigned int height  )
+{
+  unsigned short * baseDepthPTR  = baseDepth;
+  unsigned short * currentDepthPTR  = currentDepth;
+  unsigned char * selectionPTR  = selection;
+  unsigned char * selectionLimit  = selection;
+
+  while (selectionPTR<selectionLimit)
+  {
+    if (*currentDepthPTR > *baseDepthPTR)
+    {
+       if (*currentDepthPTR > *baseDepthPTR + threshold)
+        {
+         /*Adding the threshold we are still off so we unselect this voxel*/
+         *selectionPTR = 1;
+        } else
+        { /*We accept this voxel so , we dont change its value*/ }
+    } else
+    if (*currentDepthPTR < *baseDepthPTR)
+    {
+       if (*currentDepthPTR + threshold < *baseDepthPTR)
+        {
+         /*Adding the threshold we are still off so we unselect this voxel*/
+         *selectionPTR = 1;
+        } else
+        { /*We accept this voxel so , we dont change its value*/ }
+    }
+
+
+    ++currentDepthPTR;
+    ++baseDepthPTR;
+    ++selectionPTR;
+  }
+
+  return 1;
+}
+
+
 
 int removeDepthFloodFillBeforeProcessing(unsigned short * source , unsigned short * target , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf  )
 {
@@ -44,6 +99,12 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  unsigned short * sourceCopy = (unsigned short *) malloc( width * height * sizeof(unsigned short));
  if ( sourceCopy == 0) { return 0; }
  memcpy(sourceCopy,source,width*height*sizeof(unsigned short));
+
+ if (segConf->enableDepthMotionDetection)
+ {
+  //In case we want motion detection we should record the first frame we have so that we can use it to select pixels
+  keepFirstDepthFrame(sourceCopy ,  width , height , segConf);
+ }
 
 
  unsigned short * target = (unsigned short *) malloc( width * height * sizeof(unsigned short));

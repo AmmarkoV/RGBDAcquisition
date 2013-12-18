@@ -126,6 +126,12 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
    segConfDepth->bboxX1 = -1000;     segConfDepth->bboxY1 = -1000;    segConfDepth->bboxZ1 = -10000;
    segConfDepth->bboxX2 = 1000;      segConfDepth->bboxY2 = 1000;     segConfDepth->bboxZ2 = 10000;
 
+   segConfDepth->enableDepthMotionDetection=0;
+   segConfDepth->firstDepthFrame=0;
+   segConfDepth->firstDepthFrameByteSize=0;
+   segConfDepth->motionDistanceThreshold=0;
+
+
    segConfDepth->enablePlaneSegmentation=0;
    int i=0;
    for (i=0; i<3; i++) { segConfDepth->p1[i]=0.0; segConfDepth->p2[i]=0.0; segConfDepth->p3[i]=0.0; }
@@ -137,28 +143,6 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
 int copyRGBSegmentation(struct SegmentationFeaturesRGB* target, struct SegmentationFeaturesRGB* source)
 {
    memcpy(target,source,sizeof(struct SegmentationFeaturesRGB));
-   /*
-   target->minDepth = source->minDepth;
-   target->maxDepth = source->maxDepth;
-
-   target->minX = source->minX;  target->maxX = source->maxX;
-   target->minY = source->minY;  target->maxY = source->maxY;
-
-   target->floodErase.totalPoints=0;
-   source->floodErase.totalPoints=0;
-
-   target->enableBBox  = source->enableBBox;
-   target->bboxX1  = source->bboxX1;
-   target->bboxY1  = source->bboxY1;
-   target->bboxZ1  = source->bboxZ1;
-   target->bboxX2  = source->bboxX2;
-   target->bboxY2  = source->bboxY2;
-   target->bboxZ2  = source->bboxZ2;
-
-   target->enablePlaneSegmentation  = source-> ;
-   double p1[3];
-   double p2[3];
-   double p3[3];*/
    return 1;
 }
 
@@ -234,6 +218,11 @@ int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB *
                        depthSeg->p1[0],depthSeg->p1[1],depthSeg->p1[2] ,
                        depthSeg->p2[0],depthSeg->p2[1],depthSeg->p2[2] ,
                        depthSeg->p3[0],depthSeg->p3[1],depthSeg->p3[2]  );
+      }
+
+      if ( depthSeg->enableDepthMotionDetection )
+      {
+          fprintf(fp,"-depthMotion %u \n",depthSeg->motionDistanceThreshold);
       }
 
 
@@ -324,12 +313,19 @@ int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFea
                                             depthSeg->bboxY2=(double) internationalAtof(argv[i+5]);
                                             depthSeg->bboxZ2=(double) internationalAtof(argv[i+6]);
                                           } else
+    if (strcmp(argv[i],"-depthMotion")==0)
+                                          {
+                                              depthSeg->enableDepthMotionDetection=1;
+                                              depthSeg->firstDepthFrame=0;
+                                              depthSeg->firstDepthFrameByteSize=0;
+                                              depthSeg->motionDistanceThreshold=atoi(argv[i+1]);
+                                          } else
     if (strcmp(argv[i],"-plane")==0)      {
                                             depthSeg->enablePlaneSegmentation=1;
                                             depthSeg->p1[0]=(double) internationalAtof(argv[i+1]); depthSeg->p1[1]=(double) internationalAtof(argv[i+2]); depthSeg->p1[2]=(double) internationalAtof(argv[i+3]);
                                             depthSeg->p2[0]=(double) internationalAtof(argv[i+4]); depthSeg->p2[1]=(double) internationalAtof(argv[i+5]); depthSeg->p2[2]=(double) internationalAtof(argv[i+6]);
                                             depthSeg->p3[0]=(double) internationalAtof(argv[i+7]); depthSeg->p3[1]=(double) internationalAtof(argv[i+8]); depthSeg->p3[2]=(double) internationalAtof(argv[i+9]);
-                                          }
+                                          } else
     if (strcmp(argv[i],"-minDepth")==0)   { depthSeg->minDepth = atoi(argv[i+1]);  } else
     if (strcmp(argv[i],"-maxDepth")==0)   { depthSeg->maxDepth = atoi(argv[i+1]);   } else
     if (strcmp(argv[i],"-combine")==0)    { *combinationMode=pickCombinationModeFromString(argv[i+1]); }
