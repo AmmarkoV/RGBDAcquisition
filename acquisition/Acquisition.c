@@ -750,7 +750,7 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
             return saveRawImageToFile(
                                       filenameFull,
                                       // (*plugins[moduleID].getDepthPixels)      (devID),
-                                      acquisitionGetDepthFrame(moduleID,devID)        ,
+                                      (unsigned char*) acquisitionGetDepthFrame(moduleID,devID)  ,
                                       (*plugins[moduleID].getDepthWidth)       (devID),
                                       (*plugins[moduleID].getDepthHeight)      (devID),
                                       (*plugins[moduleID].getDepthChannels)    (devID),

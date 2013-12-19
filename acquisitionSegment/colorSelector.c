@@ -11,7 +11,7 @@
 #include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h"
 
 
-int keepFirstRGBFrame(unsigned short * source ,  unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
+int keepFirstRGBFrame(unsigned char * source ,  unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
 {
   if (segConf->firstRGBFrame==0)
   {
