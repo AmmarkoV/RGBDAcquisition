@@ -104,6 +104,8 @@ struct VirtualStream
     char reverseLoop;
     char debug;
 
+    unsigned int timestamp;
+
     char filename[MAX_PATH+1];
 };
 

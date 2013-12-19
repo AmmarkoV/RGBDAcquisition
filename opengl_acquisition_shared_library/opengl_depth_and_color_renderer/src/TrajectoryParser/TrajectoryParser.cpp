@@ -27,7 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
+#define PI 3.141592653589793238462643383279502884197
 
 #define LINE_MAX_LENGTH 1024
 #define OBJECT_TYPES_TO_ADD_STEP 10
@@ -485,6 +487,66 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename)
 }
 
 
+
+void quaternions2Euler(double * euler,double * quaternions,int quaternionConvention)
+{
+    double qX,qY,qZ,qW;
+
+    switch (quaternionConvention)
+     {
+       case 0  :
+       qW = quaternions[0];
+       qX = quaternions[1];
+       qY = quaternions[2];
+       qZ = quaternions[3];
+       break;
+
+       case 1 :
+       qX = quaternions[0];
+       qY = quaternions[1];
+       qZ = quaternions[2];
+       qW = quaternions[3];
+       break;
+
+       default :
+       fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
+       break;
+     }
+
+  //http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+  //e1 Roll  - rX: rotation about the X-axis
+  //e2 Pitch - rY: rotation about the Y-axis
+  //e3 Yaw   - rZ: rotation about the Z-axis
+
+  //Shorthand to go according to http://graphics.wikia.com/wiki/Conversion_between_quaternions_and_Euler_angles
+  double q0=qW , q1 = qX , q2 = qY , q3 = qZ;
+  double q0q1 = (double) q0*q1 , q2q3 = (double) q2*q3;
+  double q0q2 = (double) q0*q2 , q3q1 = (double) q3*q1;
+  double q0q3 = (double) q0*q3 , q1q2 = (double) q1*q2;
+
+
+  double eXDenominator = ( 1.0 - 2.0 * (q1*q1 + q2*q2) );
+  if (eXDenominator == 0.0 ) { fprintf(stderr,"Gimbal lock detected , cannot convert to euler coordinates\n"); return; }
+  double eYDenominator = ( 1.0 - 2.0 * ( q2*q2 + q3*q3) );
+  if (eYDenominator == 0.0 ) { fprintf(stderr,"Gimbal lock detected , cannot convert to euler coordinates\n"); return; }
+
+
+  /* arctan and arcsin have a result between −π/2 and π/2. With three rotations between −π/2 and π/2 you can't have all possible orientations.
+     We need to replace the arctan by atan2 to generate all the orientations. */
+  /*eX*/ euler[0] = atan2( (2.0 *  (q0q1 + q2q3)) , eXDenominator ) ;
+  /*eY*/ euler[1] = asin( 2.0 * (q0q2 - q3q1));
+  /*eZ*/ euler[2] = atan2( (2.0 * (q0q3 + q1q2)) ,  eYDenominator );
+
+  //Our output is in radians so we convert it to degrees for the user
+
+  //Go from radians back to degrees
+  euler[0] = (euler[0] * 180) / PI;
+  euler[1] = (euler[1] * 180) / PI;
+  euler[2] = (euler[2] * 180) / PI;
+
+}
+
+
 int readVirtualStream(struct VirtualStream * newstream)
 {
   #if USE_FILE_INPUT
@@ -544,10 +606,50 @@ int readVirtualStream(struct VirtualStream * newstream)
       unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
       if ( words_count > 0 )
          {
+
+            if (
+                  ( InputParser_GetWordChar(ipc,0,0)=='O' ) &&
+                  ( InputParser_GetWordChar(ipc,0,1)=='B' ) &&
+                  ( InputParser_GetWordChar(ipc,0,2)=='J' ) &&
+                  ( ( InputParser_GetWordChar(ipc,0,3)>='0' ) && ( InputParser_GetWordChar(ipc,0,3)<='9' )  )
+               )
+            {
+               unsigned int item = (unsigned int) InputParser_GetWordChar(ipc,0,3)-'0';
+               float pos[7]={0};
+               pos[0] = InputParser_GetWordFloat(ipc,1);
+               pos[1] = InputParser_GetWordFloat(ipc,2);
+               pos[2] = InputParser_GetWordFloat(ipc,3);
+               pos[3] = InputParser_GetWordFloat(ipc,4);
+               pos[4] = InputParser_GetWordFloat(ipc,5);
+               pos[5] = InputParser_GetWordFloat(ipc,6);
+               pos[6] = InputParser_GetWordFloat(ipc,7);
+               int coordLength=7;
+
+               double euler[3];
+               double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
+               quaternions2Euler(euler,quaternions,0);
+               pos[3] = euler[0];
+               pos[4] = euler[1];
+               pos[5] = euler[2];
+               pos[6] = 0;
+               fprintf(stderr,"Tracker OBJX( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+
+              addPositionToObject( newstream , newstream->object[item].name  , newstream->timestamp , (float*) pos , coordLength );
+            }
+
+
+
+
+
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
             {
               fprintf(stderr,"DEBUG Mode on\n");
               newstream->debug=1;
+            } else
+
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"TIMESTAMP",9)==1)
+            {
+              newstream->timestamp=InputParser_GetWordInt(ipc,1);
             } else
 
             /*! REACHED AN AUTO REFRESH DECLERATION ( AUTOREFRESH(1500) )
