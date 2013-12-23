@@ -635,6 +635,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                fprintf(stderr,"Tracker OBJX( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
 
               addPositionToObject( newstream , newstream->object[item].name  , newstream->timestamp , (float*) pos , coordLength );
+              newstream->timestamp+=1000;
             }
 
 

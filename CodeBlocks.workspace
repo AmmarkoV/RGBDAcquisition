@@ -7,7 +7,6 @@
 		<Project filename="acquisition_mux/AcquisitionMux.cbp" />
 		<Project filename="acquisitionSegment/acquisitionSegment.cbp" />
 		<Project filename="acquisition/Acquisition.cbp" />
-		<Project filename="acquisitionBroadcast/acquisitionBroadcast.cbp" />
 		<Project filename="grabber_mux/GrabberMux.cbp" />
 		<Project filename="grabber_segment/GrabberSegment.cbp" />
 		<Project filename="grabber/Grabber.cbp" />
@@ -20,5 +19,6 @@
 		<Project filename="openni2_acquisition_shared_library/OpenNI2Aquisition.cbp" />
 		<Project filename="openni1_acquisition_shared_library/OpenNI1Acquisition.cbp" />
 		<Project filename="viewer/Viewer.cbp" />
+		<Project filename="acquisitionBroadcast/acquisitionBroadcast.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
