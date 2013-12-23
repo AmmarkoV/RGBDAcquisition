@@ -161,6 +161,19 @@ int updateProjectionMatrix()
 {
   fprintf(stderr,"updateProjectionMatrix called ( %u x %u )  \n",WIDTH,HEIGHT);
 
+  if ( scene->emulateProjectionMatrixDeclared)
+  {
+     int viewport[4]={0};
+     double fx = scene->emulateProjectionMatrix[0];
+     double fy = scene->emulateProjectionMatrix[4];
+     double skew = 0.0;
+     double cx = scene->emulateProjectionMatrix[2];
+     double cy = scene->emulateProjectionMatrix[5];
+     buildOpenGLProjectionForIntrinsicsAmmar ( scene->projectionMatrix , viewport , fx, fy, skew, cx,  cy, WIDTH, HEIGHT, nearPlane, farPlane);
+     scene->projectionMatrixDeclared =1;
+     fprintf(stderr,"Updated projection matrix using 3x3 matrix");
+  }
+
   if ( scene->projectionMatrixDeclared )
   { //Scene configuration overwrites local configuration
     fprintf(stderr,"Custom projection matrix is declared\n");

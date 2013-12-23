@@ -742,6 +742,16 @@ int readVirtualStream(struct VirtualStream * newstream)
                fprintf(stderr,"Projection Matrix given to TrajectoryParser\n");
             }
              else
+            /*! REACHED AN EMULATE PROJECTION MATRIX DECLERATION ( PROJECTION_MATRIX( ... 9 values ... ) )
+              argument 0 = PROJECTION_MATRIX , argument 1-9 matrix values*/
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"EMULATE_PROJECTION_MATRIX",25)==1)
+            {
+               newstream->emulateProjectionMatrixDeclared=1;
+               int i=1;
+               for (i=1; i<=9; i++) { newstream->emulateProjectionMatrix[i-1] = (double)  InputParser_GetWordFloat(ipc,i); }
+               fprintf(stderr,"Emulating Projection Matrix given to TrajectoryParser\n");
+            }
+             else
             /*! REACHED A MODELVIEW MATRIX DECLERATION ( MODELVIEW_MATRIX( ... 16 values ... ) )
               argument 0 = MODELVIEW_MATRIX , argument 1-16 matrix values*/
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"MODELVIEW_MATRIX",16)==1)

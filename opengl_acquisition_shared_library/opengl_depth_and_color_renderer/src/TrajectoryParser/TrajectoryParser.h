@@ -79,6 +79,10 @@ struct VirtualStream
     int modelViewMatrixDeclared;
     double modelViewMatrix[16];
 
+
+    int emulateProjectionMatrixDeclared;
+    double emulateProjectionMatrix[9];
+
     int extrinsicsDeclared;
     double extrinsicTranslation[3];
     double extrinsicRodriguezRotation[3];
