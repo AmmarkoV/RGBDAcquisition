@@ -98,6 +98,8 @@ struct VirtualStream
     unsigned int numberOfObjects;
     struct VirtualObject * object;
 
+    double scaleWorld[3];
+
     unsigned int playback;
 
     unsigned int autoRefresh;

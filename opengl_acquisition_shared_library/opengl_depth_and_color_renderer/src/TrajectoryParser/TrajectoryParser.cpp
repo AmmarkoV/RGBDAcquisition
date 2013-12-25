@@ -590,6 +590,9 @@ int readVirtualStream(struct VirtualStream * newstream)
   newstream->object[0].R =0;
   newstream->object[0].G =0;
   newstream->object[0].B =0;
+  newstream->scaleWorld[0]=1.0;
+  newstream->scaleWorld[1]=1.0;
+  newstream->scaleWorld[2]=1.0;
   newstream->object[0].Transparency=0;
   ++newstream->numberOfObjects;
   // CAMERA OBJECT ADDED
@@ -616,9 +619,9 @@ int readVirtualStream(struct VirtualStream * newstream)
             {
                unsigned int item = (unsigned int) InputParser_GetWordChar(ipc,0,3)-'0';
                float pos[7]={0};
-               pos[0] = InputParser_GetWordFloat(ipc,1);
-               pos[1] = InputParser_GetWordFloat(ipc,2);
-               pos[2] = InputParser_GetWordFloat(ipc,3);
+               pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,1);
+               pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,2);
+               pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,3);
                pos[3] = InputParser_GetWordFloat(ipc,4);
                pos[4] = InputParser_GetWordFloat(ipc,5);
                pos[5] = InputParser_GetWordFloat(ipc,6);
@@ -720,9 +723,9 @@ int readVirtualStream(struct VirtualStream * newstream)
                unsigned int time = InputParser_GetWordInt(ipc,2);
 
                float pos[7]={0};
-               pos[0] = InputParser_GetWordFloat(ipc,3);
-               pos[1] = InputParser_GetWordFloat(ipc,4);
-               pos[2] = InputParser_GetWordFloat(ipc,5);
+               pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,3);
+               pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,4);
+               pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,5);
                pos[3] = InputParser_GetWordFloat(ipc,6);
                pos[4] = InputParser_GetWordFloat(ipc,7);
                pos[5] = InputParser_GetWordFloat(ipc,8);
@@ -760,6 +763,13 @@ int readVirtualStream(struct VirtualStream * newstream)
                int i=1;
                for (i=1; i<=16; i++) { newstream->modelViewMatrix[i-1] = (double) InputParser_GetWordFloat(ipc,i); }
                fprintf(stderr,"ModelView Matrix given to TrajectoryParser\n");
+            } else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"SCALE_WORLD",11)==1)
+            {
+               newstream->scaleWorld[0] = InputParser_GetWordFloat(ipc,1);
+               newstream->scaleWorld[1] = InputParser_GetWordFloat(ipc,2);
+               newstream->scaleWorld[2] = InputParser_GetWordFloat(ipc,3);
+               fprintf(stderr,"Scaling everything * %f %f %f \n",newstream->scaleWorld[0],newstream->scaleWorld[1],newstream->scaleWorld[2]);
             }
          } // End of line containing tokens
     } //End of getting a line while reading the file
