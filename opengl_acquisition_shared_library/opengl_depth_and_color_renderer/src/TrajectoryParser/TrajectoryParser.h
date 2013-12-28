@@ -98,7 +98,8 @@ struct VirtualStream
     unsigned int numberOfObjects;
     struct VirtualObject * object;
 
-    double scaleWorld[3];
+    double scaleWorld[6];
+    int rotationsXYZ[3];
 
     unsigned int playback;
 

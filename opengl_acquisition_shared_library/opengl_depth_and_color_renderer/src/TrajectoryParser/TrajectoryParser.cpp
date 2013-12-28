@@ -547,6 +547,29 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 }
 
 
+int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ)
+{
+  float tmpX = *rotX;
+  float tmpY = *rotY;
+  float tmpZ = *rotZ;
+  //-----------------------------------------
+  if (where2SendX==0) { *rotX=tmpX; } else
+  if (where2SendX==1) { *rotY=tmpX; } else
+  if (where2SendX==2) { *rotZ=tmpX; }
+
+  if (where2SendY==0) { *rotX=tmpY; } else
+  if (where2SendY==1) { *rotY=tmpY; } else
+  if (where2SendY==2) { *rotZ=tmpY; }
+
+  if (where2SendZ==0) { *rotX=tmpZ; } else
+  if (where2SendZ==1) { *rotY=tmpZ; } else
+  if (where2SendZ==2) { *rotZ=tmpZ; }
+  //-----------------------------------------
+  return 1;
+}
+
+
+
 int readVirtualStream(struct VirtualStream * newstream)
 {
   #if USE_FILE_INPUT
@@ -631,11 +654,14 @@ int readVirtualStream(struct VirtualStream * newstream)
                double euler[3];
                double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
                quaternions2Euler(euler,quaternions,0);
-               pos[3] = euler[0];
-               pos[4] = euler[1];
-               pos[5] = euler[2];
+               pos[3] = newstream->scaleWorld[3] * euler[0];
+               pos[4] = newstream->scaleWorld[4] * euler[1];
+               pos[5] = newstream->scaleWorld[5] * euler[2];
                pos[6] = 0;
                fprintf(stderr,"Tracker OBJX( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+
+
+               flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]);
 
               addPositionToObject( newstream , newstream->object[item].name  , newstream->timestamp , (float*) pos , coordLength );
               newstream->timestamp+=1000;
@@ -726,11 +752,13 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,3);
                pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,4);
                pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,5);
-               pos[3] = InputParser_GetWordFloat(ipc,6);
-               pos[4] = InputParser_GetWordFloat(ipc,7);
-               pos[5] = InputParser_GetWordFloat(ipc,8);
+               pos[3] = newstream->scaleWorld[3] * InputParser_GetWordFloat(ipc,6);
+               pos[4] = newstream->scaleWorld[4] * InputParser_GetWordFloat(ipc,7);
+               pos[5] = newstream->scaleWorld[5] * InputParser_GetWordFloat(ipc,8);
                pos[6] = InputParser_GetWordFloat(ipc,9);
                int coordLength=7;
+
+               flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]);
 
               addPositionToObject( newstream , name  , time , (float*) pos , coordLength );
             }
@@ -770,7 +798,29 @@ int readVirtualStream(struct VirtualStream * newstream)
                newstream->scaleWorld[1] = InputParser_GetWordFloat(ipc,2);
                newstream->scaleWorld[2] = InputParser_GetWordFloat(ipc,3);
                fprintf(stderr,"Scaling everything * %f %f %f \n",newstream->scaleWorld[0],newstream->scaleWorld[1],newstream->scaleWorld[2]);
+            } else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"MAP_ROTATIONS",11)==1)
+            {
+               newstream->scaleWorld[3] = InputParser_GetWordFloat(ipc,1);
+               newstream->scaleWorld[4] = InputParser_GetWordFloat(ipc,2);
+               newstream->scaleWorld[5] = InputParser_GetWordFloat(ipc,3);
+
+               if (InputParser_GetWordChar(ipc,4,0)=='x') { newstream->rotationsXYZ[0]=0; } else
+               if (InputParser_GetWordChar(ipc,4,0)=='y') { newstream->rotationsXYZ[0]=1; } else
+               if (InputParser_GetWordChar(ipc,4,0)=='z') { newstream->rotationsXYZ[0]=2; } else
+                //--------------------
+               if (InputParser_GetWordChar(ipc,4,1)=='x') { newstream->rotationsXYZ[1]=0; } else
+               if (InputParser_GetWordChar(ipc,4,1)=='y') { newstream->rotationsXYZ[1]=1; } else
+               if (InputParser_GetWordChar(ipc,4,1)=='z') { newstream->rotationsXYZ[1]=2; } else
+                //--------------------
+               if (InputParser_GetWordChar(ipc,4,2)=='x') { newstream->rotationsXYZ[2]=0; } else
+               if (InputParser_GetWordChar(ipc,4,2)=='y') { newstream->rotationsXYZ[2]=1; } else
+               if (InputParser_GetWordChar(ipc,4,2)=='z') { newstream->rotationsXYZ[2]=2; }
+
+
+               fprintf(stderr,"Scaling rotations * %f %f %f \n",newstream->scaleWorld[3],newstream->scaleWorld[4],newstream->scaleWorld[5]);
             }
+
          } // End of line containing tokens
     } //End of getting a line while reading the file
   }
