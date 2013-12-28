@@ -620,6 +620,10 @@ int readVirtualStream(struct VirtualStream * newstream)
   ++newstream->numberOfObjects;
   // CAMERA OBJECT ADDED
 
+  newstream->rotationsXYZ[0]=0;
+  newstream->rotationsXYZ[1]=1;
+  newstream->rotationsXYZ[2]=2;
+
   newstream->debug=0;
  //Everything is set , Lets read the file!
   while (!feof(fp))
@@ -799,7 +803,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                newstream->scaleWorld[2] = InputParser_GetWordFloat(ipc,3);
                fprintf(stderr,"Scaling everything * %f %f %f \n",newstream->scaleWorld[0],newstream->scaleWorld[1],newstream->scaleWorld[2]);
             } else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"MAP_ROTATIONS",11)==1)
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"MAP_ROTATIONS",13)==1)
             {
                newstream->scaleWorld[3] = InputParser_GetWordFloat(ipc,1);
                newstream->scaleWorld[4] = InputParser_GetWordFloat(ipc,2);
@@ -807,18 +811,21 @@ int readVirtualStream(struct VirtualStream * newstream)
 
                if (InputParser_GetWordChar(ipc,4,0)=='x') { newstream->rotationsXYZ[0]=0; } else
                if (InputParser_GetWordChar(ipc,4,0)=='y') { newstream->rotationsXYZ[0]=1; } else
-               if (InputParser_GetWordChar(ipc,4,0)=='z') { newstream->rotationsXYZ[0]=2; } else
+               if (InputParser_GetWordChar(ipc,4,0)=='z') { newstream->rotationsXYZ[0]=2; }
                 //--------------------
                if (InputParser_GetWordChar(ipc,4,1)=='x') { newstream->rotationsXYZ[1]=0; } else
                if (InputParser_GetWordChar(ipc,4,1)=='y') { newstream->rotationsXYZ[1]=1; } else
-               if (InputParser_GetWordChar(ipc,4,1)=='z') { newstream->rotationsXYZ[1]=2; } else
+               if (InputParser_GetWordChar(ipc,4,1)=='z') { newstream->rotationsXYZ[1]=2; }
                 //--------------------
                if (InputParser_GetWordChar(ipc,4,2)=='x') { newstream->rotationsXYZ[2]=0; } else
                if (InputParser_GetWordChar(ipc,4,2)=='y') { newstream->rotationsXYZ[2]=1; } else
                if (InputParser_GetWordChar(ipc,4,2)=='z') { newstream->rotationsXYZ[2]=2; }
 
 
-               fprintf(stderr,"Scaling rotations * %f %f %f \n",newstream->scaleWorld[3],newstream->scaleWorld[4],newstream->scaleWorld[5]);
+               fprintf(stderr,"Mapping rotations to  %f %f %f / %u %u %u \n",
+                       newstream->scaleWorld[3] , newstream->scaleWorld[4] ,newstream->scaleWorld[5] ,
+                         newstream->rotationsXYZ[0],newstream->rotationsXYZ[1],newstream->rotationsXYZ[2]);
+
             }
 
          } // End of line containing tokens
