@@ -668,7 +668,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]);
 
               addPositionToObject( newstream , newstream->object[item].name  , newstream->timestamp , (float*) pos , coordLength );
-              newstream->timestamp+=1000;
+              newstream->timestamp+=10000;
             }
 
 

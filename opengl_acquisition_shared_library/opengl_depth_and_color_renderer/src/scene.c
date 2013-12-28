@@ -279,7 +279,7 @@ int initScene(char * confFile)
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   mat_specular);
   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess); // <- this was glMateriali
 
-
+  glCullFace(GL_FRONT_AND_BACK);
 
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 

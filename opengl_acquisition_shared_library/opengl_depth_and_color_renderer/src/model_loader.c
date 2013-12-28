@@ -159,9 +159,19 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
  {
   glPushMatrix();
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-  //glEnable(GL_NORMALIZE);
+  glEnable(GL_NORMALIZE);
+  /*If scale factors other than 1 are applied to the modelview matrix
+            and lighting is enabled, lighting often appears wrong.
+            In that case, enable automatic normalization of normals by
+            calling glEnable with the argument GL_NORMALIZE.*/
+
   if (mod->nocull) { glDisable(GL_CULL_FACE); }
-  if (mod->scale!=1.0) { glScalef(mod->scale,mod->scale,mod->scale); /*fprintf(stderr,"Scaling model by %0.2f",mod->scale);*/ }
+  if (mod->scale!=1.0) {
+                         glScalef(mod->scale,mod->scale,mod->scale);
+                         int err=glGetError();
+                         if (err !=  GL_NO_ERROR/*0*/ ) { fprintf(stderr,"Could not scale ( error %u ) :(\n",err); }
+                         fprintf(stderr,"Scaling model by %0.2f\n",mod->scale);
+                       }
   glTranslatef(x,y,z);
   if ( roll!=0 ) { glRotatef(roll,0.0,0.0,1.0); }
   if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
