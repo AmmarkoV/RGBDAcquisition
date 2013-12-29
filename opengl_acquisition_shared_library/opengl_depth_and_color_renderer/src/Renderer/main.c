@@ -76,7 +76,8 @@ int main(int argc, char **argv)
   int i=0;
   for (i=0; i<argc; i++)
   {
-    if (strcmp(argv[i],"-size")==0) {
+    if ( (strcmp(argv[i],"-resolution")==0) ||
+         (strcmp(argv[i],"-size")==0) ){
                                         if (i+2<argc)
                                         {
                                          width=atof(argv[i+1]);
