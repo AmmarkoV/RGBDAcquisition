@@ -240,6 +240,8 @@ int initScene(char * confFile)
   fprintf(stderr,"createVirtualStream returned \n");
   if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
 
+
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error while initializing scene\n"); }
   glEnable(GL_DEPTH_TEST); /* enable depth buffering */
   glDepthFunc(GL_LESS);    /* pedantic, GL_LESS is the default */
   glDepthMask(GL_TRUE);
@@ -252,6 +254,7 @@ int initScene(char * confFile)
   glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
   glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error while initializing HQ settings\n"); }
 
   /* frame buffer clears should be to black */
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -260,6 +263,7 @@ int initScene(char * confFile)
   glMatrixMode(GL_PROJECTION);
 
   updateProjectionMatrix();
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after updating projection matrix\n"); }
 
   /* establish initial viewport */
   /* pedantic, full window size is default viewport */
@@ -278,8 +282,9 @@ int initScene(char * confFile)
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    mat_diffuse);
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   mat_specular);
   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess); // <- this was glMateriali
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
 
-  glCullFace(GL_FRONT_AND_BACK);
+  //This is not needed -> :P glCullFace(GL_FRONT_AND_BACK);
 
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 
@@ -366,6 +371,8 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
 int drawAllObjectsAtPositionsFromTrajectoryParser()
 {
  if (scene==0) { return 0; }
+ if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling drawAllObjectsAtPositionsFromTrajectoryParser\n"); }
+
 
   unsigned char noColor=0;
   float posStack[7]={0};
@@ -393,6 +400,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
              { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , scene->object[i].type ); }
        } else
        { fprintf(stderr,YELLOW "Could not determine position of object %s (%u) , so not drawing it\n" NORMAL,scene->object[i].name,i); }
+       if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after drawing object %u \n",i); }
     }
   return 1;
 }
@@ -405,7 +413,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
 int renderScene()
 {
-
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling renderScene\n"); }
   if (scene!=0) { glClearColor(scene->backgroundR,scene->backgroundG,scene->backgroundB,0.0); } else
                 { glClearColor(0.0,0.0,0.0,0.0); }
 
@@ -421,6 +429,8 @@ int renderScene()
          {
            fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
          }
+
+   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting modelview matrix\n"); }
    //print4x4DMatrix("OpenGL ModelView Matrix Given by Trajectory Parser", scene->modelViewMatrix );
   } else
   //If setOpenGLExtrinsicCalibration has set a custom MODELVIEW matrix we will use it
@@ -432,6 +442,7 @@ int renderScene()
     //glRotatef(90,-1.0,0,0);
     glRotatef(90,-1.0,0,0); //TODO FIX THESE
     glScalef(1.0,1.0,-1.0);
+   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting custom modelview matrix\n"); }
     //glRotatef(180,0.0,0,-1.0);
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
@@ -441,10 +452,12 @@ int renderScene()
     glRotatef(camera_angle_y,0,-1.0,0); // Peristrofi gyrw apo ton y
     glRotatef(camera_angle_z,0,0,-1.0);
     glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
+    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting specifying camera position\n"); }
   }
 
   drawAllObjectsAtPositionsFromTrajectoryParser();
 
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after drawing all objects\n"); }
 
   ++framesRendered;
 

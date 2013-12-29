@@ -153,10 +153,16 @@ void unloadModel(struct Model * mod)
     };
 }
 
+
 int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
 {
- if (mod!=0)
- {
+ if (mod==0)
+  {
+    fprintf(stderr,"Cannot draw model at position %0.2f %0.2f %0.2f , it doesnt exist \n",x,y,z);
+    return 0;
+  }
+
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt called while on an erroneous state :(\n"); }
   glPushMatrix();
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
   glEnable(GL_NORMALIZE);
@@ -166,27 +172,35 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
             calling glEnable with the argument GL_NORMALIZE.*/
 
   if (mod->nocull) { glDisable(GL_CULL_FACE); }
-  if (mod->scale!=1.0) {
-                         glScalef(mod->scale,mod->scale,mod->scale);
-                         int err=glGetError();
-                         if (err !=  GL_NO_ERROR/*0*/ ) { fprintf(stderr,"Could not scale ( error %u ) :(\n",err); }
-                         fprintf(stderr,"Scaling model by %0.2f\n",mod->scale);
-                       }
   glTranslatef(x,y,z);
   if ( roll!=0 ) { glRotatef(roll,0.0,0.0,1.0); }
   if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
   if ( pitch!=0 ) { glRotatef(pitch,1.0,0.0,0.0); }
 
+  if (mod->scale!=1.0) {
+                         glScalef( mod->scale , mod->scale , mod->scale );
+                         if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Could not scale :(\n"); }
+                         //fprintf(stderr,"Scaling model by %f %f %f\n",mod->scale,mod->scale,mod->scale);
+                       }
+
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying dimensions \n"); }
+
        // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
       if (mod->nocolor!=0)  { glDisable(GL_COLOR_MATERIAL);   } else
       {//We Have a color to set
-        glEnable(GL_COLOR);
+        //glEnable(GL_COLOR); <- not even an opengl command :P
+        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after enabling color\n"); }
         glEnable(GL_COLOR_MATERIAL);
+        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after enabling color material\n"); }
 
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,    defaultAmbient);
+        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    defaultDiffuse);
+        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   defaultSpecular);
+        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
         glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS,   defaultShininess);
+        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
 
         if (mod->transparency==0.0)
         {
@@ -199,6 +213,8 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
           glColor4f(mod->colorR,mod->colorG,mod->colorB,mod->transparency);
         }
       }
+
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying color/materials\n"); }
 
     //fprintf(stderr,"Drawing RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
@@ -228,6 +244,8 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       break;
     };
 
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing geometry\n"); }
+
   if (mod->transparency!=0.0) {glDisable(GL_BLEND);  }
   if (mod->nocolor) {glEnable(GL_COLOR); glEnable(GL_COLOR_MATERIAL); }
   if (mod->nocull)  {glEnable(GL_CULL_FACE); }
@@ -235,11 +253,6 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   glTranslatef(-x,-y,-z);
   //glDisable(GL_NORMALIZE);
   glPopMatrix();
-} else
-{
-    fprintf(stderr,"Cannot draw model at position %0.2f %0.2f %0.2f , it doesnt exist \n",x,y,z);
-    return 0;
-}
  return 1;
 }
 

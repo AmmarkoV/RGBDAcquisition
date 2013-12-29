@@ -2,7 +2,17 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <GL/gl.h>
+
 #include "tools.h"
+
+
+int checkOpenGLError(char * file , int  line)
+{
+  int err=glGetError();
+  if (err !=  GL_NO_ERROR /*0*/ ) {  fprintf(stderr,"OpenGL Error (%u) : %s %u \n ", err , file ,line ); return 1; }
+ return 0;
+}
 
 
 char * loadFileToMem(char * filename,unsigned long * file_length)

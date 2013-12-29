@@ -3,7 +3,7 @@
 
 
 
-
+int checkOpenGLError(char * file , int  line);
 char * loadFileToMem(char * filename,unsigned long * file_length);
 
 float RGB2OGL(unsigned int colr);
