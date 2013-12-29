@@ -613,13 +613,13 @@ int readVirtualStream(struct VirtualStream * newstream)
   newstream->object[0].R =0;
   newstream->object[0].G =0;
   newstream->object[0].B =0;
-  newstream->scaleWorld[0]=1.0;
-  newstream->scaleWorld[1]=1.0;
-  newstream->scaleWorld[2]=1.0;
+  newstream->scaleWorld[0]=1.0; newstream->scaleWorld[1]=1.0; newstream->scaleWorld[2]=1.0;
+  newstream->scaleWorld[3]=1.0; newstream->scaleWorld[4]=1.0; newstream->scaleWorld[5]=1.0;
   newstream->object[0].Transparency=0;
   ++newstream->numberOfObjects;
   // CAMERA OBJECT ADDED
 
+  newstream->rotationsOverride=0;
   newstream->rotationsXYZ[0]=0;
   newstream->rotationsXYZ[1]=1;
   newstream->rotationsXYZ[2]=2;
@@ -645,6 +645,8 @@ int readVirtualStream(struct VirtualStream * newstream)
                )
             {
                unsigned int item = (unsigned int) InputParser_GetWordChar(ipc,0,3)-'0';
+               item+= + 1; /*Item 0 is camera so we +1 */
+
                float pos[7]={0};
                pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,1);
                pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,2);
@@ -662,13 +664,13 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[4] = newstream->scaleWorld[4] * euler[1];
                pos[5] = newstream->scaleWorld[5] * euler[2];
                pos[6] = 0;
-               fprintf(stderr,"Tracker OBJX( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+               fprintf(stderr,"Tracker OBJ%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
 
+               if (newstream->rotationsOverride)
+                    { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
-               flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]);
-
-              addPositionToObject( newstream , newstream->object[item].name  , newstream->timestamp , (float*) pos , coordLength );
-              newstream->timestamp+=10000;
+               addPositionToObject( newstream , newstream->object[item].name  , newstream->timestamp , (float*) pos , coordLength );
+               newstream->timestamp+=100;
             }
 
 
@@ -762,7 +764,8 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[6] = InputParser_GetWordFloat(ipc,9);
                int coordLength=7;
 
-               flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]);
+               if (newstream->rotationsOverride)
+                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
               addPositionToObject( newstream , name  , time , (float*) pos , coordLength );
             }
@@ -821,6 +824,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                if (InputParser_GetWordChar(ipc,4,2)=='y') { newstream->rotationsXYZ[2]=1; } else
                if (InputParser_GetWordChar(ipc,4,2)=='z') { newstream->rotationsXYZ[2]=2; }
 
+               newstream->rotationsOverride=1;
 
                fprintf(stderr,"Mapping rotations to  %f %f %f / %u %u %u \n",
                        newstream->scaleWorld[3] , newstream->scaleWorld[4] ,newstream->scaleWorld[5] ,
@@ -1189,7 +1193,12 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
      if ( timeAbsMilliseconds > stream->object[ObjID].MAX_timeOfFrames )
      {
        //This means we have passed the last frame.. so lets find out where we really are..
-       timeAbsMilliseconds = timeAbsMilliseconds % stream->object[ObjID].MAX_timeOfFrames;
+       if (stream->object[ObjID].MAX_timeOfFrames == 0 ) {
+                                                           //If max time of frames is 0 then our time is also zero ( since it never goes over max )
+                                                           //fprintf(stderr,"timeAbsMilliseconds can not be something more than zero");
+                                                           timeAbsMilliseconds=0;
+                                                         } else
+                                                         { timeAbsMilliseconds = timeAbsMilliseconds % stream->object[ObjID].MAX_timeOfFrames; }
        //timeAbsMilliseconds should contain a valid value now somewhere from 0->MAX_timeOfFrames
      }
 

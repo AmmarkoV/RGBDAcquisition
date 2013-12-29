@@ -99,6 +99,7 @@ struct VirtualStream
     struct VirtualObject * object;
 
     double scaleWorld[6];
+    int rotationsOverride;
     int rotationsXYZ[3];
 
     unsigned int playback;
