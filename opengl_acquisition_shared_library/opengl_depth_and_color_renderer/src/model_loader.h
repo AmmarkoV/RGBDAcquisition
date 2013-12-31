@@ -1,6 +1,17 @@
+/** @file model_loader.h
+ *  @brief  A module that loads models from files so that they can be rendered
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
+
 #ifndef MODEL_LOADER_H_INCLUDED
 #define MODEL_LOADER_H_INCLUDED
 
+
+
+/**
+* @brief An enumerator structure to id special Objects that are hardcoded in this library and don't need to be loaded using the OBJ loader
+*/
 enum ModelTypes
 {
     NOTYPE = 0 ,
@@ -12,29 +23,24 @@ enum ModelTypes
 };
 
 
+/**
+* @brief The structure that defines what a Model Consists of
+*/
 struct Model
 {
+    //Pointer to the model read in memory ( what model_loader_obj reads )
     void * model;
-    int type;
-    //other stuff here
-    float x;
-    float y;
-    float z;
 
-    float heading;
-    float pitch;
-    float roll;
+    int type; //See enum ModelTypes
 
-    float scale;
+    //Position / Dimensions
+    float x , y , z , heading , pitch , roll , scale;
 
-    float colorR;
-    float colorG;
-    float colorB;
+    //Color
+    float colorR , colorG , colorB , transparency;
 
-    float transparency;
-    unsigned char nocull;
-    unsigned char nocolor;
-
+    //Flags
+    unsigned char nocull , nocolor;
 };
 
 

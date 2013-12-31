@@ -101,6 +101,7 @@ struct VirtualStream
     double scaleWorld[6];
     int rotationsOverride;
     int rotationsXYZ[3];
+    float rotationsOffset[3];
 
     unsigned int playback;
 

@@ -549,6 +549,9 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 
 int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ)
 {
+  fprintf(stderr,"Had rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
+  fprintf(stderr,"Moving 0 to %u , 1 to %u , 2 to %u \n",where2SendX,where2SendY,where2SendZ);
+
   float tmpX = *rotX;
   float tmpY = *rotY;
   float tmpZ = *rotZ;
@@ -565,6 +568,8 @@ int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX
   if (where2SendZ==1) { *rotY=tmpZ; } else
   if (where2SendZ==2) { *rotZ=tmpZ; }
   //-----------------------------------------
+
+  fprintf(stderr,"Now have rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
   return 1;
 }
 
@@ -620,9 +625,8 @@ int readVirtualStream(struct VirtualStream * newstream)
   // CAMERA OBJECT ADDED
 
   newstream->rotationsOverride=0;
-  newstream->rotationsXYZ[0]=0;
-  newstream->rotationsXYZ[1]=1;
-  newstream->rotationsXYZ[2]=2;
+  newstream->rotationsXYZ[0]=0; newstream->rotationsXYZ[1]=1; newstream->rotationsXYZ[2]=2;
+  newstream->rotationsOffset[0]=0.0; newstream->rotationsOffset[1]=0.0; newstream->rotationsOffset[2]=0.0;
 
   newstream->debug=0;
  //Everything is set , Lets read the file!
@@ -660,11 +664,12 @@ int readVirtualStream(struct VirtualStream * newstream)
                double euler[3];
                double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
                quaternions2Euler(euler,quaternions,0);
-               pos[3] = newstream->scaleWorld[3] * euler[0];
-               pos[4] = newstream->scaleWorld[4] * euler[1];
-               pos[5] = newstream->scaleWorld[5] * euler[2];
+               pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
+               pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
+               pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
                pos[6] = 0;
                fprintf(stderr,"Tracker OBJ%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+               fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
 
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
@@ -805,6 +810,12 @@ int readVirtualStream(struct VirtualStream * newstream)
                newstream->scaleWorld[1] = InputParser_GetWordFloat(ipc,2);
                newstream->scaleWorld[2] = InputParser_GetWordFloat(ipc,3);
                fprintf(stderr,"Scaling everything * %f %f %f \n",newstream->scaleWorld[0],newstream->scaleWorld[1],newstream->scaleWorld[2]);
+            } else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"OFFSET_ROTATIONS",16)==1)
+            {
+               newstream->rotationsOffset[0] = InputParser_GetWordFloat(ipc,1);
+               newstream->rotationsOffset[1] = InputParser_GetWordFloat(ipc,2);
+               newstream->rotationsOffset[2] = InputParser_GetWordFloat(ipc,3);
             } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"MAP_ROTATIONS",13)==1)
             {
@@ -986,6 +997,10 @@ int fillPosWithNull(struct VirtualStream * stream,ObjectIDHandler ObjID,float * 
 
 int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos)
 {
+   if (stream==0) { fprintf(stderr,"Cannot fill position on empty stream \n"); return 0; }
+   if (pos==0) { fprintf(stderr,"Cannot fill position on empty position \n"); return 0; }
+   if (ObjID>=stream->numberOfObjects) { fprintf(stderr,"Trying to add position for a non existing object\n"); return 0; }
+
    if (stream->object[ObjID].frame==0)
     {
       #if PRINT_WARNING_INFO

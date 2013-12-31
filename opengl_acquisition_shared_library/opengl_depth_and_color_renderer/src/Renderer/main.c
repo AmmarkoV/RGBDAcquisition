@@ -1,7 +1,10 @@
-/* A simple program to show how to set up an X window for OpenGL rendering.
- * X86 compilation: gcc -o -L/usr/X11/lib   main main.c -lGL -lX11
- * X64 compilation: gcc -o -L/usr/X11/lib64 main main.c -lGL -lX11
+/** @file main.c
+ *  @brief  A minimal binary that renders scene files using OGLRendererSandbox s
+ *          X86 compilation: gcc -o -L/usr/X11/lib   main main.c -lGL -lX11
+ *          X64 compilation: gcc -o -L/usr/X11/lib64 main main.c -lGL -lX11
+ *  @author Ammar Qammaz (AmmarkoV)
  */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -23,6 +26,7 @@ int main(int argc, char **argv)
   double * rodriguez = (double*) malloc(sizeof(double) * 3 );
   double * translation = (double*) malloc(sizeof(double) * 3 );
   double * camera = (double*) malloc(sizeof(double) * 9 );
+  double scaleToDepthUnit = 1.0;
 
 
 
@@ -31,51 +35,30 @@ int main(int argc, char **argv)
  camera[3]=0.0;          camera[4]=534.223354;  camera[5]=243.889369;
  camera[6]=0.0;          camera[7]=0.0;         camera[8]=1.0;
 
- #define USE_CAMERA_CALIBRATION 0
- #define USE_TEST 0
-
- #if   USE_TEST == 0
   translation[0]=0.0;  translation[1]=0.0; translation[2]=0.0;
   rodriguez[0]=0.0;    rodriguez[1]=0.0;    rodriguez[2]=0.0;
- #elif USE_TEST == 1
-  //box0603 Calib
-  translation[0]=0.215793; translation[1]=-0.137982; translation[2]=0.767494;
-  rodriguez[0]=0.029210; rodriguez[1]=-2.776582; rodriguez[2]=1.451629;
- #elif USE_TEST == 2
-  //boxNew Calib
-  translation[0]=-0.062989;  translation[1]=0.159865; translation[2]=0.703045;
-  rodriguez[0]=1.911447;     rodriguez[1]=0.000701;   rodriguez[2]=-0.028548;
- #elif USE_TEST == 3
-  //Test Calib
-  translation[0]=0.056651;  translation[1]=-0.000811; translation[2]=0.601942;
-  rodriguez[0]=0.829308;    rodriguez[1]=2.251753;    rodriguez[2]=-1.406462;
- #elif USE_TEST == 4
- //Test Calib
-  translation[0]=-0.041674;  translation[1]=-0.076036; translation[2]=2.355294;
-  rodriguez[0]=-0.733111;    rodriguez[1]=0.155142;    rodriguez[2]=0.172950;
- #elif USE_TEST == 5
-  // ARTest
-  translation[0]=-0.413148;  translation[1]=0.208111; translation[2]=1.987205;
-  rodriguez[0]=2.052258;    rodriguez[1]=0.642598;    rodriguez[2]=-0.246993;
- #endif // USE_TEST
 
-
- #if USE_TEST == 0
   setOpenGLNearFarPlanes(1,5000);
-  #if USE_CAMERA_CALIBRATION
-   setOpenGLIntrinsicCalibration( (double*) camera);
-  #endif
- #else
-  setOpenGLNearFarPlanes(0.1,100);
-  setOpenGLIntrinsicCalibration( (double*) camera);
-  setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation );
- #endif
-
-
 
   int i=0;
   for (i=0; i<argc; i++)
   {
+
+    if (strcmp(argv[i],"-intrinsics")==0) {
+                                           if (i+8<argc) {
+                                                          int z=0;
+                                                          for (z=0; z<9; z++) { camera[z]=atof(argv[z+i+1]); }
+                                                          setOpenGLIntrinsicCalibration( (double*) camera);
+                                                         }
+                                          } else
+    if (strcmp(argv[i],"-extrinsics")==0) {
+                                           if (i+7<argc) {
+                                                              translation[0]=atof(argv[i+1]);  translation[1]=atof(argv[i+2]); translation[2]=atof(argv[i+3]);
+                                                              rodriguez[0]=atof(argv[i+4]);    rodriguez[1]=atof(argv[i+5]);    rodriguez[2]=atof(argv[i+6]);
+                                                              scaleToDepthUnit = atof(argv[i+7]);
+                                                              setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation , scaleToDepthUnit);
+                                                         }
+                                          } else
     if ( (strcmp(argv[i],"-resolution")==0) ||
          (strcmp(argv[i],"-size")==0) ){
                                         if (i+2<argc)
