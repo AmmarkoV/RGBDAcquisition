@@ -663,7 +663,7 @@ int readVirtualStream(struct VirtualStream * newstream)
 
                double euler[3];
                double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
-               quaternions2Euler(euler,quaternions,0);
+               quaternions2Euler(euler,quaternions,1);
                pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
                pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
                pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
@@ -1104,7 +1104,7 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
     #if PRINT_DEBUGGING_INFO
     fprintf(stderr,"Interpolating frames @  %u , between %u and %u \n",time,PrevFrame,NextFrame);
     #endif
-    float interPos[7];
+    float interPos[7]={0};
 
     unsigned int MAX_stepTime= stream->object[ObjID].frame[NextFrame].time - stream->object[ObjID].frame[PrevFrame].time;
     if (MAX_stepTime == 0 ) { MAX_stepTime=1; }
