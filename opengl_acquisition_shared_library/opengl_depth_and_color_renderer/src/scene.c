@@ -440,8 +440,8 @@ int renderScene()
     glLoadMatrixd((const GLdouble*) customModelViewMatrix);
     // We flip our coordinate system so it comes straight
 
-   // glRotatef(90,-1.0,0,0); //TODO FIX THESE
-   // glScalef(1.0,1.0,-1.0); //These are now taken into account using scene files ( see SCALE_WORLD , MAP_ROTATIONS )
+    //glRotatef(90,-1.0,0,0); //TODO FIX THESE
+    //glScalef(1.0,1.0,-1.0); //These are now taken into account using scene files ( see SCALE_WORLD , MAP_ROTATIONS )
 
    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting custom modelview matrix\n"); }
     //glRotatef(180,0.0,0,-1.0);

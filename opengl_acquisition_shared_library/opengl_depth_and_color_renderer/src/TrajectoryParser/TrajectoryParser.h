@@ -146,6 +146,14 @@ int addPositionToObject(
                               unsigned int coordLength
                        );
 
+int addPositionToObjectID(
+                              struct VirtualStream * stream ,
+                              unsigned int ObjID  ,
+                              unsigned int time ,
+                              float * coord ,
+                              unsigned int coordLength
+                       );
+
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,
                                  char * type , char * model

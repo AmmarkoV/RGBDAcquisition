@@ -34,7 +34,7 @@
 #define LINE_MAX_LENGTH 1024
 #define OBJECT_TYPES_TO_ADD_STEP 10
 #define OBJECTS_TO_ADD_STEP 10
-#define FRAMES_TO_ADD_STEP 100
+#define FRAMES_TO_ADD_STEP 123
 
 #define PRINT_DEBUGGING_INFO 0
 #define PRINT_WARNING_INFO 0
@@ -290,32 +290,21 @@ unsigned long getFileSize(char * filename)
 
 
 
-
-
-int addPositionToObject(
+int addPositionToObjectID(
                               struct VirtualStream * stream ,
-                              char * name  ,
+                               unsigned int ObjID  ,
                               unsigned int time ,
                               float * coord ,
                               unsigned int coordLength
                        )
 {
-
- unsigned int ObjFound = 0;
- unsigned int ObjID = getObjectID(stream,name,&ObjFound);
-
-  if (!ObjFound) {
-                   fprintf(stderr,"Could not Find object %s \n",name);
-                   return 0;
-                 }
-
-
   if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { growVirtualStreamFrames(&stream->object[ObjID],FRAMES_TO_ADD_STEP); }
   //Now we should definately have enough space for our new frame
   if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { fprintf(stderr,"Cannot add new POS instruction to Object %u \n",ObjID); return 0; }
 
   //We have the space so lets fill our new frame spot ..!
   unsigned int pos = stream->object[ObjID].numberOfFrames;
+  ++stream->object[ObjID].numberOfFrames;
 
   // 1 is object name
   stream->object[ObjID].frame[pos].time = time;
@@ -344,9 +333,27 @@ int addPositionToObject(
    stream->object[ObjID].frame[pos].rot1 , stream->object[ObjID].frame[pos].rot2 , stream->object[ObjID].frame[pos].rot3 , stream->object[ObjID].frame[pos].rot4 );
   #endif
 
-
-  ++stream->object[ObjID].numberOfFrames;
   return 1;
+}
+
+
+int addPositionToObject(
+                              struct VirtualStream * stream ,
+                              char * name  ,
+                              unsigned int time ,
+                              float * coord ,
+                              unsigned int coordLength
+                       )
+{
+
+ unsigned int ObjFound = 0;
+ unsigned int ObjID = getObjectID(stream,name,&ObjFound);
+ if (ObjFound)
+  {
+     return addPositionToObjectID(stream,ObjID,time,coord,coordLength);
+  }
+  fprintf(stderr,"Could not Find object %s \n",name);
+  return 0;
 }
 
 
@@ -381,6 +388,13 @@ int addObjectToVirtualStream(
    stream->object[pos].scale = scale;
 
    stream->object[pos].frame=0;
+
+
+  fprintf(stderr,"TODO CHECK THIS \n");
+  stream->object[pos].lastFrame=0; // <- todo here <- check these
+  stream->object[pos].MAX_numberOfFrames=0;
+  stream->object[pos].numberOfFrames=0;
+  fprintf(stderr,"TODO CHECK THIS \n");
 
    unsigned int found=0;
    stream->object[pos].type = getObjectTypeID(stream,stream->object[pos].typeStr,&found);
@@ -487,6 +501,25 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename)
 }
 
 
+int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW)
+{
+#if USE_FAST_NORMALIZATION
+      // Works best when quat is already almost-normalized
+      double f = (double) (3.0 - (((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)))) / 2.0;
+      *qX *= f;
+      *qY *= f;
+      *qZ *= f;
+      *qW *= f;
+#else
+      double sqrtDown = (double) sqrt(((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)));
+      double f = (double) 1 / sqrtDown;
+       *qX *= f;
+       *qY *= f;
+       *qZ *= f;
+       *qW *= f;
+#endif // USE_FAST_NORMALIZATION
+  return 1;
+}
 
 void quaternions2Euler(double * euler,double * quaternions,int quaternionConvention)
 {
@@ -663,7 +696,9 @@ int readVirtualStream(struct VirtualStream * newstream)
 
                double euler[3];
                double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
-               quaternions2Euler(euler,quaternions,1);
+
+               normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
+               quaternions2Euler(euler,quaternions,1); //1
                pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
                pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
                pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
@@ -674,14 +709,12 @@ int readVirtualStream(struct VirtualStream * newstream)
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
-               addPositionToObject( newstream , newstream->object[item].name  , newstream->timestamp , (float*) pos , coordLength );
+               addPositionToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength );
                newstream->timestamp+=100;
+
+               fprintf(stderr,"Tracker OBJ%u(now has %u / %u positions )\n",newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
             }
-
-
-
-
-
+              else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
             {
               fprintf(stderr,"DEBUG Mode on\n");
@@ -772,6 +805,9 @@ int readVirtualStream(struct VirtualStream * newstream)
                if (newstream->rotationsOverride)
                      { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
+
+               //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+
               addPositionToObject( newstream , name  , time , (float*) pos , coordLength );
             }
              else
@@ -849,6 +885,8 @@ int readVirtualStream(struct VirtualStream * newstream)
 
   fclose(fp);
   InputParser_Destroy(ipc);
+
+
 
   return 1;
   #else
@@ -1067,9 +1105,9 @@ int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigne
     fprintf(stderr,"Returning frame %u \n",FrameIDToReturn);
     #endif
 
-    if (FrameIDToReturn >= stream->object[ObjID].numberOfFrames )
+    if (FrameIDToReturn >= stream->object[ObjID].MAX_numberOfFrames )
      {
-         fprintf(stderr,"fillPosWithFrame asked to return frame out of bounds\n");
+         fprintf(stderr,"fillPosWithFrame asked to return frame out of bounds ( %u / %u / %u Max ) \n",FrameIDToReturn,stream->object[ObjID].numberOfFrames,stream->object[ObjID].MAX_numberOfFrames);
          return 0;
      }
 

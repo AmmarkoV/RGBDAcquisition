@@ -25,6 +25,8 @@
 
 #define FLIP_OPEN_GL_IMAGES 1
 
+#define X_OFFSET -9
+
 //TODO : add Horizontal flipping  <- is the output mirrored ?
 
 int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
@@ -35,7 +37,7 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
 
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
-    glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
+    glReadPixels(x + X_OFFSET , y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -149,7 +151,7 @@ int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int wid
        char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
        if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
 
-       glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
+       glReadPixels(x + X_OFFSET, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
 
       //SLOW INVERSION CODE :P
        unsigned int yp = 0;
