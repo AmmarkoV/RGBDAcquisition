@@ -65,7 +65,8 @@ int saveMuxImageToFile(char * filename,unsigned char * pixels , unsigned int wid
 
 
 
-int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut , unsigned int width , unsigned int height , unsigned int mux_type)
+int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
+                                       unsigned int width , unsigned int height , unsigned int rgbTransparency , unsigned int mux_type)
 {
    unsigned char * rgb_pBase = rgbBase;
    unsigned char * rgb_pOverlay = rgbOverlay;
@@ -78,6 +79,10 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
 
    unsigned int TookBaseloops=0;
    unsigned int loops=0;
+
+   float transparencyOverlayFactor = (float) rgbTransparency / 100;
+   float transparencyBaseFactor = (float) (100-rgbTransparency) / 100;
+
    while (rgb_pOut<rgb_pOut_limit)
     {
         if (depthOverlay[loops]==0)
@@ -98,12 +103,28 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
             ++TookBaseloops;
          } else
          {
+           if (rgbTransparency!=0)
+           {
+           unsigned int rValue =  (*rgb_pOverlay * transparencyOverlayFactor) +  (*rgb_pBase * transparencyBaseFactor ); rgb_pOverlay++; rgb_pBase++;
+           unsigned int gValue =  (*rgb_pOverlay * transparencyOverlayFactor) +  (*rgb_pBase * transparencyBaseFactor ); rgb_pOverlay++; rgb_pBase++;
+           unsigned int bValue =  (*rgb_pOverlay * transparencyOverlayFactor) +  (*rgb_pBase * transparencyBaseFactor ); rgb_pOverlay++; rgb_pBase++;
+
+           unsigned char rValueCast = 0 + (unsigned char) rValue;
+           unsigned char gValueCast = 0 + (unsigned char) gValue;
+           unsigned char bValueCast = 0 + (unsigned char) bValue;
+
+           *rgb_pOut = (unsigned char) rValueCast;  ++rgb_pOut;
+           *rgb_pOut = (unsigned char) gValueCast;  ++rgb_pOut;
+           *rgb_pOut = (unsigned char) bValueCast;  ++rgb_pOut;
+           } else
+          {
             //Overlay has a non zero value so we "augment it" ignoring Base
            *rgb_pOut = *rgb_pOverlay;  ++rgb_pOut; ++rgb_pOverlay;
            *rgb_pOut = *rgb_pOverlay;  ++rgb_pOut; ++rgb_pOverlay;
            *rgb_pOut = *rgb_pOverlay;  ++rgb_pOut; ++rgb_pOverlay;
             //RGB Base is just ignored
             rgb_pBase+=3;
+          }
 
 
            *depth_pOut = *depth_pBase + *depth_pOverlay;
@@ -123,7 +144,7 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
 int mux2RGBAndDepthFrames(
                            unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                            unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
-                           unsigned int width , unsigned int height ,
+                           unsigned int width , unsigned int height , unsigned int rgbTransparency ,
                            unsigned int mux_type
                          )
 {
@@ -131,7 +152,7 @@ int mux2RGBAndDepthFrames(
   {
     return mux2RGBAndDepthFramesNonZeroDepth(rgbBase,rgbOverlay,rgbOut,
                                              depthBase,depthOverlay,depthOut ,
-                                             width,height,mux_type);
+                                             width,height,rgbTransparency,mux_type);
   }
   return 0;
 }

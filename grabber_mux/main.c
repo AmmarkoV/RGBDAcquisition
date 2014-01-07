@@ -14,7 +14,7 @@ char inputname2[512]={0};
 
 unsigned int defaultWidth=640;
 unsigned int defaultHeight=480;
-
+unsigned int transparency=0;
 
 int calibrationSetA = 0;
 struct calibration calibA;
@@ -96,6 +96,14 @@ int main(int argc, char *argv[])
     if (strcmp(argv[i],"-maxFrames")==0) {
                                            maxFramesToGrab=atoi(argv[i+1]);
                                            fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
+                                         } else
+    if  (
+          (strcmp(argv[i],"-transparency")==0) ||
+          (strcmp(argv[i],"-trans")==0)
+        )
+                                         {
+                                           transparency=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting transparency to %u \n",transparency);
                                          } else
     if (strcmp(argv[i],"-module1")==0)    {
                                            moduleID_1 = getModuleIdFromModuleName(argv[i+1]);
@@ -240,7 +248,8 @@ int main(int argc, char *argv[])
            acquisitionGetDepthFrame(moduleID_1,devID_1) ,
            acquisitionGetDepthFrame(moduleID_2,devID_2) ,
            depthOut ,
-           widthRGB , heightRGB , 0 );
+           widthRGB , heightRGB ,
+           transparency , 0 );
 
 
         sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
