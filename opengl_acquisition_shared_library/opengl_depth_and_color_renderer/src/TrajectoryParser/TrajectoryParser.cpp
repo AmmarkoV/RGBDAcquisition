@@ -241,14 +241,14 @@ char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID)
   return stream->objectTypes[typeID].model;
 }
 
-char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler id)
+char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler ObjID)
 {
-  if (stream==0) { fprintf(stderr,"Can't get object (%u) for un allocated stream\n",id); return 0; }
-  if (stream->object==0) { fprintf(stderr,"Can't get model of object id (%u) for un allocated object array\n",id); return 0;  }
-  if (stream->objectTypes==0) { fprintf(stderr,"Can't get model of object id (%u) for un allocated object type array\n",id); return 0;  }
-  if (id>=stream->numberOfObjects ) { fprintf(stderr,"Can't get object id (%u) we only got %u Objects \n",id,stream->numberOfObjects); return 0; }
+  if (stream==0) { fprintf(stderr,"Can't get object (%u) for un allocated stream\n",ObjID); return 0; }
+  if (stream->object==0) { fprintf(stderr,"Can't get model of object id (%u) for un allocated object array\n",ObjID); return 0;  }
+  if (stream->objectTypes==0) { fprintf(stderr,"Can't get model of object id (%u) for un allocated object type array\n",ObjID); return 0;  }
+  if (ObjID >= stream->numberOfObjects ) { fprintf(stderr,"Can't get object id (%u) we only got %u Objects \n", ObjID , stream->numberOfObjects); return 0; }
 
-  ObjectTypeID typeID = stream->object[id].type;
+  ObjectTypeID typeID = stream->object[ObjID].type;
   if (typeID>=stream->numberOfObjectTypes) { fprintf(stderr,"Can't get object id (%u) we only got %u Object Types \n",typeID,stream->numberOfObjectTypes); return 0; }
 
   return stream->objectTypes[typeID].model;
@@ -293,11 +293,11 @@ unsigned long getFileSize(char * filename)
 
 
 int addPositionToObjectID(
-                              struct VirtualStream * stream ,
+                               struct VirtualStream * stream ,
                                unsigned int ObjID  ,
-                              unsigned int time ,
-                              float * coord ,
-                              unsigned int coordLength
+                               unsigned int timeMilliseconds ,
+                               float * coord ,
+                               unsigned int coordLength
                        )
 {
   if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { growVirtualStreamFrames(&stream->object[ObjID],FRAMES_TO_ADD_STEP); }
@@ -309,7 +309,8 @@ int addPositionToObjectID(
   ++stream->object[ObjID].numberOfFrames;
 
   // 1 is object name
-  stream->object[ObjID].frame[pos].time = time;
+  stream->object[ObjID].frame[pos].time = timeMilliseconds;
+  stream->object[ObjID].frame[pos].isQuaternion = 0;
   if (coordLength > 0 ) {  stream->object[ObjID].frame[pos].x = coord[0]; }
   if (coordLength > 1 ) {  stream->object[ObjID].frame[pos].y = coord[1]; }
   if (coordLength > 2 ) {  stream->object[ObjID].frame[pos].z = coord[2]; }
@@ -317,7 +318,7 @@ int addPositionToObjectID(
   if (coordLength > 3 ) {stream->object[ObjID].frame[pos].rot1 = coord[3]; }
   if (coordLength > 4 ) {stream->object[ObjID].frame[pos].rot2 = coord[4]; }
   if (coordLength > 5 ) {stream->object[ObjID].frame[pos].rot3 = coord[5]; }
-  if (coordLength > 6 ) {stream->object[ObjID].frame[pos].rot4 = coord[6]; }
+  if (coordLength > 6 ) {stream->object[ObjID].frame[pos].rot4 = coord[6]; stream->object[ObjID].frame[pos].isQuaternion = 1; }
 
   if (stream->object[ObjID].MAX_timeOfFrames <= stream->object[ObjID].frame[pos].time)
     {
@@ -342,7 +343,7 @@ int addPositionToObjectID(
 int addPositionToObject(
                               struct VirtualStream * stream ,
                               char * name  ,
-                              unsigned int time ,
+                              unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength
                        )
@@ -352,7 +353,7 @@ int addPositionToObject(
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
  if (ObjFound)
   {
-     return addPositionToObjectID(stream,ObjID,time,coord,coordLength);
+     return addPositionToObjectID(stream,ObjID,timeMilliseconds,coord,coordLength);
   }
   fprintf(stderr,"Could not Find object %s \n",name);
   return 0;
@@ -423,6 +424,12 @@ int addObjectToVirtualStream(
    return found;
 }
 
+
+int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int ObjID )
+{
+ fprintf(stderr,"removeObjectFromVirtualStream is a stub , it is not implemented \n");
+ return 0;
+}
 
 
 int addObjectTypeToVirtualStream(
@@ -580,6 +587,28 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
   euler[2] = (euler[2] * 180) / PI;
 
 }
+
+
+int convert3DUnit(
+               float posXA ,float posYA,float posZA ,
+               float unitX,float unitY ,float unitZ ,
+               double * rotMat4x4
+             )
+{
+  //Iasonas 3x3 Rot Mat {x, -y, -z}
+  /*
+   rotMat4x4[0] = pos[0] ;  rotMat4x4[1] = -1 * pos[1] ;  rotMat4x4[2] = -1 * pos[2] ;  rotMat4x4[3] = 0;
+   //{y, (x * y^2+z^2)/(y^2+z^2), ((-1+x) * y * z)/(y^2+z^2)}
+   rotMat4x4[4] = pos[0] ;  rotMat4x4[5] = -1 * pos[1] ;  rotMat4x4[6] = -1 * pos[2] ;  rotMat4x4[7] = 0;
+   //{z, ((-1+x) * y * z)/(y^2+z^2), (y^2+x * z^2)/(y^2+z^2)}
+   rotMat4x4[8] = pos[0] ;  rotMat4x4[9] = -1 * pos[1] ;  rotMat4x4[10] = -1 * pos[2] ; rotMat4x4[11] = 0;
+   rotMat4x4[12] = 0 ; rotMat4x4[13] = 0; rotMat4x4[14] = 0; rotMat4x4[15] = 1.0;
+*/
+   return 1;
+}
+
+
+
 
 int convertDifferent3DPointsToAngles( float posXA ,float posYA,float posZA,
                                       float posXB ,float posYB,float posZB ,
@@ -846,6 +875,15 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[6] = 1.0; // InputParser_GetWordFloat(ipc,9);
                int coordLength=7;
 
+
+               //Iasonas 3x3 Rot Mat {x, -y, -z} {y, (x * y^2+z^2)/(y^2+z^2), ((-1+x) * y * z)/(y^2+z^2)} {z, ((-1+x) * y * z)/(y^2+z^2), (y^2+x * z^2)/(y^2+z^2)}
+               //double rotMat4x4[16]={0};
+               //convert3DUnit(pos[0],pos[1],pos[2],deltaX,deltaY,deltaZ,&rotMat4x4);
+
+
+
+
+
                double euler[3]={0};
                convertDifferent3DPointsToAngles( pos[0] ,pos[1] , pos[2] ,
                                                  pos[0]+deltaX, pos[1]+deltaY , pos[2]+deltaZ ,
@@ -859,7 +897,6 @@ int readVirtualStream(struct VirtualStream * newstream)
                fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
 
 
-               //Iasonas 3x3 Rot Mat {x, -y, -z} {y, (x * y^2+z^2)/(y^2+z^2), ((-1+x) * y * z)/(y^2+z^2)} {z, ((-1+x) * y * z)/(y^2+z^2), (y^2+x * z^2)/(y^2+z^2)}
 
 
                if (newstream->rotationsOverride)

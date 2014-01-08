@@ -3,7 +3,6 @@
  *  @author Ammar Qammaz (AmmarkoV)
  */
 
-
 #ifndef TRAJECTORYPARSER_H_INCLUDED
 #define TRAJECTORYPARSER_H_INCLUDED
 
@@ -11,12 +10,20 @@
 extern "C" {
 #endif
 
-
+/**  @brief The maximum path for Object Files/Object Names/Object Types  etc */
 #define MAX_PATH 250
 
+
+/**
+* @brief Some type definitions to better seperate ObjectID , TypeID concepts when used as function parameters
+*/
 typedef unsigned int ObjectIDHandler;
 typedef unsigned int ObjectTypeID;
 
+
+/**
+* @brief Whats the state of our playback of the stream
+*/
 enum PlaybackState
 {
     STOPPED = 0 ,
@@ -24,14 +31,23 @@ enum PlaybackState
     PLAYING_BACKWARDS
 };
 
+
+/**
+* @brief This holds the state for each known frame/position of each object!
+*/
 struct KeyFrame
 {
    float x; float y; float z;
    float rot1; float rot2; float rot3; float rot4;
+   unsigned char isQuaternion;
    unsigned int time;
 };
 
 
+/**
+* @brief ObjectTypes provide a lookup table to associate user-given abstract types to existing 3D models
+*        models can be paths to 3d compatible object files ( .obj ) or hardcoded objects like planes , grids etc (, see model_loader.c)
+*/
 struct ObjectType
 {
    char name[MAX_PATH+1];
@@ -39,6 +55,9 @@ struct ObjectType
 };
 
 
+/**
+* @brief VirtualObject structure holds all the data that defines an object
+*/
 struct VirtualObject
 {
    char name[MAX_PATH+1];
@@ -46,10 +65,7 @@ struct VirtualObject
    char value[MAX_PATH+1];
    ObjectTypeID type;
 
-   float R;
-   float G;
-   float B;
-   float Transparency;
+   float R , G , B , Transparency;
    unsigned char nocolor;
 
    unsigned int MAX_timeOfFrames;
@@ -77,6 +93,11 @@ struct VirtualObject
 
 };
 
+
+
+/**
+* @brief A VirtualObject structure holds many objects each of which have their own characteristics
+*/
 struct VirtualStream
 {
     int projectionMatrixDeclared;
@@ -124,16 +145,104 @@ struct VirtualStream
     char filename[MAX_PATH+1];
 };
 
+/**
+* @brief Get the ObjectID by using the name of an Object
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Name of the object
+* @param Output unsigned int that is set to 1 if we found the object , or 0 if we didn't find the object
+* @retval ObjID if found is 1 can also be 0 ( ObjID 0 is the camera */
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);
-char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID);
-int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency, unsigned char * noColor);
-char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler id);
 
+/**
+* @brief Get a String with the model of a typeID
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param  ObjectTypeID
+* @retval String with the model associated with this typeID */
+char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID);
+
+/**
+* @brief Get the Color/Transparency State for a specific Object
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param ObjID that defines the object to use
+* @param Output R channel color
+* @param Output G channel color
+* @param Output B channel color
+* @param Output Alpha(Transparency) channel color
+* @param Output NoColor flag ( 1=Set 0=Not Set )
+* @retval 1=Success,0=Failure */
+int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,float * R,float * G,float * B,float * Transparency, unsigned char * noColor);
+
+
+
+
+/**
+* @brief Get a String with the model from an ObjID
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param  ObjID
+* @retval String with the model associated with this ObjID */
+char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler ObjID);
+
+
+
+
+/**
+* @brief Write a VirtualStream to a file  , so state can be loaded on another run/machine etc
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Name of the output file that will hold the text file describing this particular virtual stream
+* @bug The writeVirtualStream function hasn't been updated for a long time and probably no longer reflects the full state of a virtual stream
+* @retval 1=Success , 0=Failure */
 int writeVirtualStream(struct VirtualStream * newstream,char * filename);
+
+/**
+* @brief Read a VirtualStream from a file
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Name of the input file that will populate the new virtual stream
+* @bug  Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser
+   This should probably be split down to some primitives and also support things like including a file from another file dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate
+   parser declerations like arrowsX or objX
+* @retval 1=Success , 0=Failure */
 int readVirtualStream(struct VirtualStream * newstream , char * filename);
+
+
+/**
+* @brief Create and allocate the structures to accomodate a virtual stream , and read it from a file ( see readVirtualStream )
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Name of the input file that will populate the new virtual stream
+* @retval 0=Failure , anything else is a pointer to a valid struct VirtualStream * stream */
 struct VirtualStream * createVirtualStream(char * filename);
+
+/**
+* @brief Destroy and deallocate a virtual stream
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @retval 1=Success , 0=Failure */
 int destroyVirtualStream(struct VirtualStream * stream);
 
+
+
+
+
+/**
+* @brief Add a new Object to the Virtual stream
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Name of the new object
+* @param Type of the new object ( see ObjectTypes )
+* @param R channel color
+* @param G channel color
+* @param B channel color
+* @param Alpha(Transparency) channel color
+* @param NoColor flag ( 1=Set 0=Not Set )
+* @param Pointer to an array of floats that defines initial position ( should be 3 or 4 floats long )
+* @param The length of the coords array ( typically 3 or 4 )
+* @retval 1=Success , 0=Failure */
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
                               char * name , char * type ,
@@ -144,31 +253,101 @@ int addObjectToVirtualStream(
                               float scale
                             );
 
-int addPositionToObject(
-                              struct VirtualStream * stream ,
-                              char * name  ,
-                              unsigned int time ,
-                              float * coord ,
-                              unsigned int coordLength
-                       );
 
+/**
+* @brief Remove an existing Object from a Virtual stream
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object ID we want to remove
+* @bug This is a stub function , removeObjectFromVirtualStream needs to be properly implemented
+* @retval 1=Success , 0=Failure */
+int removeObjectFromVirtualStream(struct VirtualStream * stream ,  unsigned int ObjID );
+
+
+
+
+/**
+* @brief Add a new Position at a specified time for an object using its ObjectID
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object ID we want to add the position to
+* @param The time ine Milliseconds
+* @retval 1=Success , 0=Failure */
 int addPositionToObjectID(
                               struct VirtualStream * stream ,
                               unsigned int ObjID  ,
-                              unsigned int time ,
+                              unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength
                        );
 
+
+
+
+/**
+* @brief Add a new Position at a specified time for an object using its name
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param String with the name of the object we want to add the position to
+* @param The time ine Milliseconds
+* @retval 1=Success , 0=Failure */
+int addPositionToObject(
+                              struct VirtualStream * stream ,
+                              char * name  ,
+                              unsigned int timeMilliseconds ,
+                              float * coord ,
+                              unsigned int coordLength
+                       );
+
+/**
+* @brief Create a new Object Type definition
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object Type we want to Create
+* @param The model it will use
+* @retval 1=Success , 0=Failure */
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,
                                  char * type , char * model
                                 );
 
-
+/**
+* @brief Calculate the position for an object at an absolute time interval
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object Id we want to get info about
+* @param Time in milliseconds ( absolute time value in milliseconds )
+* @param Output Array of floats , should be at least 4 floats long
+* @retval 1=Success , 0=Failure */
 int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeMilliseconds,float * pos);
+
+/**
+* @brief Calculate the position for an object after a delta time interval
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object Id we want to get info about
+* @param Time in milliseconds ( a delta that has to be combined with last value , milliseconds )
+* @param Output Array of floats , should be at least 4 floats long
+* @retval 1=Success , 0=Failure */
 int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos);
+
+
+/**
+* @brief Get an array of Floats , describing the last position of the objects
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object Id we want to get info about
+* @param Output Array of floats , should be at least 4 floats long
+* @retval 1=Success , 0=Failure */
 int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos);
+
+/**
+* @brief Get an array of Doubles , describing the last position of the objects
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object Id we want to get info about
+* @param Output Array of doubles , should be at least 4 doubles long
+* @retval 1=Success , 0=Failure */
 int getVirtualStreamLastPosD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos);
 
 

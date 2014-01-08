@@ -211,39 +211,38 @@ double det4x4Matrix(double * mat)
 {
  double * a = mat;
 
- double detA = 0.0;
- detA  = a[I11] * a[I22] * a[I33]  * a[I44];
- detA += a[I11] * a[I23] * a[I34]  * a[I42];
- detA += a[I11] * a[I24] * a[I32]  * a[I43];
+ double  detA  = a[I11] * a[I22] * a[I33]  * a[I44];
+         detA += a[I11] * a[I23] * a[I34]  * a[I42];
+         detA += a[I11] * a[I24] * a[I32]  * a[I43];
 
- detA += a[I12] * a[I21] * a[I34]  * a[I43];
- detA += a[I12] * a[I23] * a[I31]  * a[I44];
- detA += a[I12] * a[I24] * a[I33]  * a[I41];
+         detA += a[I12] * a[I21] * a[I34]  * a[I43];
+         detA += a[I12] * a[I23] * a[I31]  * a[I44];
+         detA += a[I12] * a[I24] * a[I33]  * a[I41];
 
- detA += a[I13] * a[I21] * a[I32]  * a[I44];
- detA += a[I13] * a[I22] * a[I34]  * a[I41];
- detA += a[I13] * a[I24] * a[I31]  * a[I42];
+         detA += a[I13] * a[I21] * a[I32]  * a[I44];
+         detA += a[I13] * a[I22] * a[I34]  * a[I41];
+         detA += a[I13] * a[I24] * a[I31]  * a[I42];
 
- detA += a[I14] * a[I21] * a[I33]  * a[I42];
- detA += a[I14] * a[I22] * a[I31]  * a[I43];
- detA += a[I14] * a[I23] * a[I32]  * a[I41];
+         detA += a[I14] * a[I21] * a[I33]  * a[I42];
+         detA += a[I14] * a[I22] * a[I31]  * a[I43];
+         detA += a[I14] * a[I23] * a[I32]  * a[I41];
 
-//FIRST PART DONE
- detA -= a[I11] * a[I22] * a[I34]  * a[I43];
- detA -= a[I11] * a[I23] * a[I32]  * a[I44];
- detA -= a[I11] * a[I24] * a[I33]  * a[I42];
+  //FIRST PART DONE
+         detA -= a[I11] * a[I22] * a[I34]  * a[I43];
+         detA -= a[I11] * a[I23] * a[I32]  * a[I44];
+         detA -= a[I11] * a[I24] * a[I33]  * a[I42];
 
- detA -= a[I12] * a[I21] * a[I33]  * a[I44];
- detA -= a[I12] * a[I23] * a[I34]  * a[I41];
- detA -= a[I12] * a[I24] * a[I31]  * a[I43];
+         detA -= a[I12] * a[I21] * a[I33]  * a[I44];
+         detA -= a[I12] * a[I23] * a[I34]  * a[I41];
+         detA -= a[I12] * a[I24] * a[I31]  * a[I43];
 
- detA -= a[I13] * a[I21] * a[I34]  * a[I42];
- detA -= a[I13] * a[I22] * a[I31]  * a[I44];
- detA -= a[I13] * a[I24] * a[I32]  * a[I41];
+         detA -= a[I13] * a[I21] * a[I34]  * a[I42];
+         detA -= a[I13] * a[I22] * a[I31]  * a[I44];
+         detA -= a[I13] * a[I24] * a[I32]  * a[I41];
 
- detA -= a[I14] * a[I21] * a[I32]  * a[I43];
- detA -= a[I14] * a[I22] * a[I33]  * a[I41];
- detA -= a[I14] * a[I23] * a[I31]  * a[I42];
+         detA -= a[I14] * a[I21] * a[I32]  * a[I43];
+         detA -= a[I14] * a[I22] * a[I33]  * a[I41];
+         detA -= a[I14] * a[I23] * a[I31]  * a[I42];
 
  return detA;
 }

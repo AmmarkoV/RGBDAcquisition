@@ -103,15 +103,14 @@ double det3x3Matrix(double * mat)
 {
  double * a = mat;
 
- double detA = 0.0;
- detA  = a[I11] * a[I22] * a[I33];
- detA += a[I21] * a[I32] * a[I13];
- detA += a[I31] * a[I12] * a[I23];
+ double detA  = a[I11] * a[I22] * a[I33];
+        detA += a[I21] * a[I32] * a[I13];
+        detA += a[I31] * a[I12] * a[I23];
 
-//FIRST PART DONE
- detA -= a[I11] * a[I32] * a[I23];
- detA -= a[I31] * a[I22] * a[I13];
- detA -= a[I21] * a[I12] * a[I33];
+ //FIRST PART DONE
+        detA -= a[I11] * a[I32] * a[I23];
+        detA -= a[I31] * a[I22] * a[I13];
+        detA -= a[I21] * a[I12] * a[I33];
 
  return detA;
 }
