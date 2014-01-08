@@ -393,6 +393,9 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          mod->scale = scene->object[i].scale;
          //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
+
+         fprintf(stderr,"Draw OBJ%u(%f %f %f , %f %f %f , trans %f )\n",i,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],trans);
+
          if (scene->debug)
                 { print3DPoint2DWindowPosition(i , pos[0],pos[1],pos[2] ); }
 

@@ -51,6 +51,8 @@
   #include "InputParser_C.h"
 #endif
 
+//This is retarded , i have to remake parsing to fix this
+#define INCREMENT_TIMER_FOR_EACH_OBJ 0
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -383,7 +385,7 @@ int addObjectToVirtualStream(
    stream->object[pos].R = (float) R/255;
    stream->object[pos].G = (float) G/255;
    stream->object[pos].B = (float) B/255;
-   stream->object[pos].Transparency = Alpha;
+   stream->object[pos].Transparency = (float) Alpha/100;
    stream->object[pos].nocolor = noColor;
    stream->object[pos].scale = scale;
 
@@ -579,6 +581,28 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 
 }
 
+int convertDifferent3DPointsToAngles( float posXA ,float posYA,float posZA,
+                                      float posXB ,float posYB,float posZB ,
+                                      double * euler)
+{
+  float diffX = posXB-posXA;
+  float diffY = posYB-posYA;
+  float diffZ = posZB-posZA;
+
+  if (diffZ==0) { euler[0]=0.0; } else { /*eX*/ euler[0] = atan2(diffZ,diffY) ; }
+  if (diffX==0) { euler[1]=0.0; } else { /*eY*/ euler[1] = atan2(diffX,diffZ) ; }
+  if (diffX==0) { euler[2]=0.0; } else { /*eZ*/ euler[2] = atan2(diffX,diffY) ; }
+
+  //Go from radians back to degrees
+  euler[0] = (euler[0] * 180) / PI;
+  euler[1] = (euler[1] * 180) / PI;
+  euler[2] = (euler[2] * 180) / PI;
+
+  fprintf(stderr,"%f,%f,%f To f,%f,%f  corresponds to angles %f %f %f\n",posXA,posYA,posZA,posXB,posYB,posZB,euler[0],euler[1],euler[2]);
+
+ return 1;
+}
+
 
 int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ)
 {
@@ -607,9 +631,15 @@ int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX
 }
 
 
-
 int readVirtualStream(struct VirtualStream * newstream)
 {
+  #warning "Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser"
+  #warning "This should probably be split down to some primitives and also support things like including a file from another file"
+  #warning "dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate"
+  #warning "parser declerations like arrowsX or objX"
+
+
+
   #if USE_FILE_INPUT
 
   #if PRINT_DEBUGGING_INFO
@@ -710,7 +740,8 @@ int readVirtualStream(struct VirtualStream * newstream)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
                addPositionToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength );
-               newstream->timestamp+=100;
+
+               if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
 
                fprintf(stderr,"Tracker OBJ%u(now has %u / %u positions )\n",newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
             }
@@ -784,6 +815,58 @@ int readVirtualStream(struct VirtualStream * newstream)
                addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,nocolor,0,0,scale);
 
             } else
+            /*! REACHED A POSITION DECLERATION ( ARROWX(103.0440706,217.1741961,-22.9230451,0.780506107461,0.625148155413,-0,0.00285155239622) )
+              argument 0 = ARROW , argument 1-3 = X/Y/Z ,  argument 4-7 =  ux/uy/uz  , argument 8 Scale */
+            if (
+                  ( InputParser_GetWordChar(ipc,0,0)=='A' ) &&
+                  ( InputParser_GetWordChar(ipc,0,1)=='R' ) &&
+                  ( InputParser_GetWordChar(ipc,0,2)=='R' ) &&
+                  ( InputParser_GetWordChar(ipc,0,3)=='O' ) &&
+                  ( InputParser_GetWordChar(ipc,0,4)=='W' ) &&
+                  ( ( InputParser_GetWordChar(ipc,0,5)>='0' ) && ( InputParser_GetWordChar(ipc,0,5)<='9' )  )
+               )
+            {
+               unsigned int item = (unsigned int) InputParser_GetWordChar(ipc,0,5)-'0';
+               item+= + 1; /*Item 0 is camera so we +1 */
+
+               char name[MAX_PATH];
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               unsigned int time = InputParser_GetWordInt(ipc,2);
+
+               float pos[7]={0};
+               pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,1);
+               pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,2);
+               pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,3);
+               float deltaX = InputParser_GetWordFloat(ipc,4);
+               float deltaY = InputParser_GetWordFloat(ipc,5);
+               float deltaZ = InputParser_GetWordFloat(ipc,6);
+               pos[3] = 0.0; // newstream->scaleWorld[3] * InputParser_GetWordFloat(ipc,6);
+               pos[4] = 0.0; // newstream->scaleWorld[4] * InputParser_GetWordFloat(ipc,7);
+               pos[5] = 0.0; // newstream->scaleWorld[5] * InputParser_GetWordFloat(ipc,8);
+               pos[6] = 1.0; // InputParser_GetWordFloat(ipc,9);
+               int coordLength=7;
+
+               double euler[3]={0};
+               convertDifferent3DPointsToAngles( pos[0] ,pos[1] , pos[2] ,
+                                                 pos[0]+deltaX, pos[1]+deltaY , pos[2]+deltaZ ,
+                                                 euler);
+
+               pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
+               pos[4] = 90 + newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
+               pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
+               pos[6] = 0;
+               fprintf(stderr,"Tracker ARROW%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+               fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+
+               if (newstream->rotationsOverride)
+                    { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
+
+               addPositionToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength );
+
+               if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
+
+               fprintf(stderr,"Tracker ARROW%u(now has %u / %u positions )\n",newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
+            }  else
             /*! REACHED A POSITION DECLERATION ( POS(hand,0,   0.0,0.0,0.0 , 0.0,0.0,0.0,0.0 ) )
               argument 0 = POS , argument 1 = name ,  argument 2 = time in MS , argument 3-5 = X,Y,Z , argument 6-9 = Rotations*/
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"POS",3)==1)
