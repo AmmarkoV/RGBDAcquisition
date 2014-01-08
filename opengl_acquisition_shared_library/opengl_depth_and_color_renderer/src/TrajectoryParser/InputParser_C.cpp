@@ -192,13 +192,13 @@ struct InputParserC * InputParser_Create(unsigned int max_string_count,unsigned 
     if ( ipc  == 0 ) { fprintf(stderr,"InputParserC unable to commit memory for a new instance\n"); return 0; }
 
     ipc->tokenlist = (struct tokens *) malloc( sizeof(struct tokens) * (max_string_count+1) );
-    if ( ipc->tokenlist  == 0 ) { fprintf(stderr,"InputParserC unable to commit memory for a new Token List\n"); return 0; }
+    if ( ipc->tokenlist  == 0 ) { fprintf(stderr,"InputParserC unable to commit memory for a new Token List\n"); free(ipc); return 0; }
     ipc->tokens_count=0;
     ipc->tokens_max = max_string_count;
 
 
     ipc->delimeters = (char *) malloc( sizeof(char) * (max_delimiter_count+1) );
-    if ( ipc->delimeters  == 0 ) { fprintf(stderr,"InputParserC unable to commit memory for a new Delimeter List\n"); return 0; }
+    if ( ipc->delimeters  == 0 ) { fprintf(stderr,"InputParserC unable to commit memory for a new Delimeter List\n"); free(ipc); free(ipc->tokenlist); return 0; }
     ipc->max_delimeter_count=max_delimiter_count;
     ipc->cur_delimeter_count=max_delimiter_count;
 

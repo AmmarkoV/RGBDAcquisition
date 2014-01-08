@@ -1,3 +1,9 @@
+/** @file TrajectoryParser.h
+ *  @brief Parsing trajectories of 3d Objects to create 3d visualizations
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
+
 #ifndef TRAJECTORYPARSER_H_INCLUDED
 #define TRAJECTORYPARSER_H_INCLUDED
 

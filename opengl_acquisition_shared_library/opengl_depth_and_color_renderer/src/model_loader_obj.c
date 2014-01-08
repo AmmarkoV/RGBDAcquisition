@@ -393,7 +393,7 @@ int readOBJ(struct OBJ_Model * obj)
   }
   if(numgroups==0) { numgroups=1; }
   obj->groups = (Group*) malloc(sizeof(Group)* numgroups);
-  if (obj->groups == 0) { fprintf(stderr,"Could not make enough space for %u groups \n",numgroups); return 0; }
+  if (obj->groups == 0) { fprintf(stderr,"Could not make enough space for %u groups \n",numgroups); fclose(file); return 0; }
   obj->numGroups = 0;
   obj->numFaces =0;
 
@@ -1243,11 +1243,11 @@ struct OBJ_Model * loadObj(char * directory,char * filename)
 
 
     unsigned int directory_length = strlen(directory);
-    if (directory_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge directory filename provided , will not loadObject ( %u char limit ) \n",MAX_MODEL_PATHS); return 0; }
+    if (directory_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge directory filename provided , will not loadObject ( %u char limit ) \n",MAX_MODEL_PATHS); free(obj); return 0; }
 	strncpy(obj->directory, directory, MAX_MODEL_PATHS );
 
     unsigned int file_name_length = strlen(filename);
-    if (file_name_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge filename provided , will not loadObject ( %u char limit ) \n",MAX_MODEL_PATHS); return 0; }
+    if (file_name_length > MAX_MODEL_PATHS ) { fprintf(stderr,"Huge filename provided , will not loadObject ( %u char limit ) \n",MAX_MODEL_PATHS); free(obj); return 0; }
 	strncpy(obj->filename, filename, MAX_MODEL_PATHS );
 
     if (!readOBJ(obj) ) { fprintf(stderr," Could not read object %s \n",filename); unloadObj(obj); return 0;}

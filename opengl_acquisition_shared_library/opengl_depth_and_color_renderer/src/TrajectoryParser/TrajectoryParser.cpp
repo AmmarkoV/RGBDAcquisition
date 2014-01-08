@@ -852,11 +852,15 @@ int readVirtualStream(struct VirtualStream * newstream)
                                                  euler);
 
                pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
-               pos[4] = 90 + newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
-               pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
+               pos[4] = 270 + newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
+               pos[5] = 90 + newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
                pos[6] = 0;
                fprintf(stderr,"Tracker ARROW%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
                fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+
+
+               //Iasonas 3x3 Rot Mat {x, -y, -z} {y, (x * y^2+z^2)/(y^2+z^2), ((-1+x) * y * z)/(y^2+z^2)} {z, ((-1+x) * y * z)/(y^2+z^2), (y^2+x * z^2)/(y^2+z^2)}
+
 
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
@@ -1300,6 +1304,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    /*!OK , Two major cases here..! The one is a simple Next frame getter , the second is a more complicated interpolated frame getter..! */
    if ( (stream->object[ObjID].MAX_numberOfFrames == 0 ) )
    {
+       fprintf(stderr,"Returning Null position for ObjID %u\n",ObjID);
        fillPosWithNull(stream,ObjID,pos);
        return 1;
    } else
@@ -1312,12 +1317,14 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
     ++stream->object[ObjID].lastFrame;
 
     fillPosWithFrame(stream,ObjID,FrameIDToReturn,pos);
+    fprintf(stderr,"fillPosWithFrame %u => ( %0.2f %0.2f %0.2f , %0.2f %0.2f %0.2f)\n",FrameIDToReturn,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
 
     FrameIDLast = FrameIDToReturn;
     FrameIDNext = FrameIDToReturn+1;
+
     if ( FrameIDNext >= stream->object[ObjID].numberOfFrames )
-     {
-       FrameIDNext  = 0;
+     { //We 've reached the end of the stream so the last frame should truncate 0
+       stream->object[ObjID].lastFrame=0;
      }
 
      return 1;
@@ -1325,6 +1332,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    } /*!END OF SIMPLE FRAME GETTER*/
    else
    { /*!START OF INTERPOLATED FRAME GETTER*/
+      fprintf(stderr,"interpolated position for ObjID %u\n",ObjID);
      //This is the case when we respect time , we will pick two frames and interpolate between them
      if ( timeAbsMilliseconds > stream->object[ObjID].MAX_timeOfFrames )
      {
