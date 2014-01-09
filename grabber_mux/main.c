@@ -15,6 +15,8 @@ char inputname2[512]={0};
 unsigned int defaultWidth=640;
 unsigned int defaultHeight=480;
 unsigned int transparency=0;
+signed int shiftX=0;
+signed int shiftY=0;
 
 int calibrationSetA = 0;
 struct calibration calibA;
@@ -121,6 +123,14 @@ int main(int argc, char *argv[])
                                            devID_2 = atoi(argv[i+1]);
                                            fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID_2);
                                          } else
+    if (strcmp(argv[i],"-shiftX")==0)      {
+                                            shiftX = atoi(argv[i+1]);
+                                            fprintf(stderr,"Adding a horizontal shift ( %u ) \n",argv[i+1],shiftX);
+                                          } else
+    if (strcmp(argv[i],"-shiftY")==0)      {
+                                            shiftY = atoi(argv[i+1]);
+                                            fprintf(stderr,"Adding a horizontal shift ( %u ) \n",argv[i+1],shiftY);
+                                          } else
     if (
         (strcmp(argv[i],"-from1")==0) ||
         (strcmp(argv[i],"-i1")==0)
@@ -248,6 +258,7 @@ int main(int argc, char *argv[])
            acquisitionGetDepthFrame(moduleID_1,devID_1) ,
            acquisitionGetDepthFrame(moduleID_2,devID_2) ,
            depthOut ,
+           shiftX,shiftY,
            widthRGB , heightRGB ,
            transparency , 0 );
 

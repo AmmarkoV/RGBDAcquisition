@@ -66,15 +66,21 @@ int saveMuxImageToFile(char * filename,unsigned char * pixels , unsigned int wid
 
 
 int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
+                                       signed int shiftX,signed int shiftY,
                                        unsigned int width , unsigned int height , unsigned int rgbTransparency , unsigned int mux_type)
 {
+   if ( (shiftX!=0) || (shiftY!=0) )
+   {
+    fprintf(stderr,"Warning : Please note that the shift you provided is not beeing used ( %u , %u ) , since shifts are not yet implemented \n",shiftX,shiftY);
+   }
+
    unsigned char * rgb_pBase = rgbBase;
    unsigned char * rgb_pOverlay = rgbOverlay;
-   unsigned char * rgb_pOut = rgbOut; char * rgb_pOut_limit=rgb_pOut + width * height * 3;
+   unsigned char * rgb_pOut = rgbOut; unsigned char * rgb_pOut_limit=rgb_pOut + width * height * 3;
 
    unsigned short * depth_pBase = depthBase;
    unsigned short * depth_pOverlay = depthOverlay;
-   unsigned short * depth_pOut = depthOut; short * depth_pOut_limit=rgb_pOut + width * height * 2;
+   unsigned short * depth_pOut = depthOut; unsigned short * depth_pOut_limit=rgb_pOut + width * height * 2;
 
 
    unsigned int TookBaseloops=0;
@@ -135,7 +141,7 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
        ++loops;
     }
 
-    fprintf(stderr,"Total of %u pixels ( base are %u , %0.2f %% ) \n",loops,TookBaseloops,TookBaseloops*100/loops);
+    fprintf(stderr,"Total of %u pixels ( base are %u , %0.2f %% ) \n",loops,TookBaseloops,(double) TookBaseloops*100/loops);
 
     return 1;
 }
@@ -144,6 +150,7 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
 int mux2RGBAndDepthFrames(
                            unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                            unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
+                           signed int shiftX,signed int shiftY,
                            unsigned int width , unsigned int height , unsigned int rgbTransparency ,
                            unsigned int mux_type
                          )
@@ -152,6 +159,7 @@ int mux2RGBAndDepthFrames(
   {
     return mux2RGBAndDepthFramesNonZeroDepth(rgbBase,rgbOverlay,rgbOut,
                                              depthBase,depthOverlay,depthOut ,
+                                             shiftX,shiftY,
                                              width,height,rgbTransparency,mux_type);
   }
   return 0;
