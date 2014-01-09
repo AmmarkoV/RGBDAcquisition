@@ -1,13 +1,17 @@
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
+#include <GL/glu.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <math.h>
 
 #include "tiledRenderer.h"
+#include "tools.h"
 
+#include "AmMatrix/matrixCalculations.h"
 #include "TrajectoryParser/TrajectoryParser.h"
 #include "model_loader.h"
 #include "scene.h"
@@ -114,7 +118,7 @@ void glhFrustumf2(float *matrix, float left, float right, float bottom, float to
 void glhPerspectivef2(float *matrix, float fovyInDegrees, float aspectRatioV,
                       float znear, float zfar)
 {
-    float ymax, xmax , temp, temp2, temp3, temp4;
+    float ymax, xmax;
     ymax = znear * tan(fovyInDegrees * M_PI / 360.0);
     //ymin = -ymax;
     //xmin = -ymax * aspectRatioV;
@@ -169,7 +173,7 @@ int updateProjectionMatrix()
      double skew = 0.0;
      double cx = scene->emulateProjectionMatrix[2];
      double cy = scene->emulateProjectionMatrix[5];
-     buildOpenGLProjectionForIntrinsicsAmmar ( scene->projectionMatrix , viewport , fx, fy, skew, cx,  cy, WIDTH, HEIGHT, nearPlane, farPlane);
+     buildOpenGLProjectionForIntrinsics( scene->projectionMatrix , viewport , fx, fy, skew, cx,  cy, WIDTH, HEIGHT, nearPlane, farPlane);
      scene->projectionMatrixDeclared =1;
      fprintf(stderr,"Updated projection matrix using 3x3 matrix");
   }
@@ -217,6 +221,8 @@ int updateProjectionMatrix()
    //glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
    glViewport(0, 0, WIDTH, HEIGHT);
   }
+
+  return 1;
 }
 
 
@@ -323,12 +329,10 @@ int tickScene()
 {
    //ALL positions should be calculated here!
    //i dont like the way this is working now
-   float x,y,z,heading,pitch,roll;
    float posStack[7];
    float * pos = (float*) &posStack;
    float scale = 1.0;
 
-   unsigned int i=0;
   //Object 0 is camera  lets calculate its position
    calculateVirtualStreamPos(scene,0,ticks*100,pos,&scale);
    camera_pos_x = pos[0];  camera_pos_y = pos[1]; camera_pos_z = pos[2];
@@ -356,6 +360,7 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
       glGetDoublev( GL_PROJECTION_MATRIX, projection );
       glGetIntegerv( GL_VIEWPORT, viewport );
 
+      #warning "All the functions that use gluProject / unproject should be moved in a seperate compartment"
       gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
 
       if  (

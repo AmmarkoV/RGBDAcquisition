@@ -106,7 +106,7 @@ int glx_endRedraw()
 
 int glx_checkEvents()
 {
-  GLboolean            needRedraw = GL_FALSE, recalcModelView = GL_TRUE;
+  //GLboolean            needRedraw = GL_FALSE, recalcModelView = GL_TRUE;
   XEvent  event;
      while(XPending(dpy))
      {
@@ -139,7 +139,8 @@ int glx_checkEvents()
           windowSizeUpdated(event.xconfigure.width, event.xconfigure.height);
           /* fall through... */
         case Expose:
-            needRedraw=GL_TRUE;
+             #warning "redraws are not handled ?"
+             //needRedraw=GL_TRUE;
           break;
       }
     }; /* loop to compress events */

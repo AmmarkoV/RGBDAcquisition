@@ -39,7 +39,7 @@ int writePPM(char * filename,char * pixels , unsigned int width , unsigned int h
             return 1;
         }
 
-        fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
+        fprintf(fd, "%d %d\n%u\n", (signed int) width, (signed int) height , simplePow(2 ,bitsperpixel)-1);
 
         float tmp_n = (float) bitsperpixel/ 8;
         tmp_n = tmp_n *  width * height * channels ;
@@ -64,7 +64,6 @@ int writePPM(char * filename,char * pixels , unsigned int width , unsigned int h
 char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
 {
     fprintf(stderr,"Reading template file %s \n",filename);
-    char * pixels=0;
     FILE *pf=0;
     pf = fopen(filename,"rb");
 
@@ -91,7 +90,7 @@ char * ReadPPM(char * filename,unsigned int *width,unsigned int *height)
 
         *width=w;
         *height=h;
-        pixels= (char*) malloc(w*h*3*sizeof(char));
+        char * pixels= (char*) malloc(w*h*3*sizeof(char));
 
         if ( pixels != 0 )
         {

@@ -175,7 +175,7 @@ void buildOpenGLProjectionForIntrinsicsAmmar   (
                                              double fy,
                                              double skew,
                                              double cx, double cy,
-                                             int imageWidth, int imageHeight,
+                                             unsigned int imageWidth, unsigned int imageHeight,
                                              double nearPlane,
                                              double farPlane
                                            )
@@ -222,7 +222,7 @@ void buildOpenGLProjectionForIntrinsicsIasonas (
                                              double fy,
                                              double skew,
                                              double cx, double cy,
-                                             int imageWidth, int imageHeight,
+                                             unsigned int imageWidth, unsigned int imageHeight,
                                              double nearPlane,
                                              double farPlane
                                            )
@@ -277,7 +277,7 @@ void buildOpenGLProjectionForIntrinsicsStrawlab   (
                                              double fy,
                                              double skew,
                                              double cx, double cy,
-                                             int imageWidth, int imageHeight,
+                                             unsigned int imageWidth,unsigned  int imageHeight,
                                              double nearPlane,
                                              double farPlane
                                            )
@@ -348,7 +348,7 @@ void buildOpenGLProjectionForIntrinsicsMasteringOpenCV  (
                                              double fy,
                                              double skew,
                                              double cx, double cy,
-                                             int imageWidth, int imageHeight,
+                                             unsigned int imageWidth, unsigned int imageHeight,
                                              double nearPlane,
                                              double farPlane
                                            )
@@ -401,7 +401,7 @@ void buildOpenGLProjectionForIntrinsics (
                                              double fy,
                                              double skew,
                                              double cx, double cy,
-                                             int imageWidth, int imageHeight,
+                                             unsigned int imageWidth, unsigned int imageHeight,
                                              double nearPlane,
                                              double farPlane
                                            )

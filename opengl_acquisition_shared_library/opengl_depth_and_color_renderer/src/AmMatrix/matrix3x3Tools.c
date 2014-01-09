@@ -47,7 +47,7 @@ void print3x3DMatrix(char * str , double * matrix4x4)
 
 void print3x3DScilabMatrix(char * str , double * matrix4x4)
 {
-  fprintf( stderr, "str = [ %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ; ",matrix4x4[2]);
+  fprintf( stderr, "%s = [ %f ",str,matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ; ",matrix4x4[2]);
   fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f ; ",matrix4x4[5]);
   fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f ]\n\n",matrix4x4[8]);
 

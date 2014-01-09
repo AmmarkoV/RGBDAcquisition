@@ -172,7 +172,7 @@ static int dummy_strcasecmp_internal(char * input1, char * input2)
 
    char A; //<- character buffer for input1
    char B; //<- character buffer for input2
-   int i=0;
+   unsigned int i=0;
    while (i<len1) //len1 and len2 are equal
     {
        A = toupper(input1[i]);
@@ -443,7 +443,7 @@ int addObjectToVirtualStream(
 
 int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int ObjID )
 {
- fprintf(stderr,"removeObjectFromVirtualStream is a stub , it is not implemented \n");
+ fprintf(stderr,"removeObjectFromVirtualStream is a stub , it is not implemented , ObjID %u stayed in stream (%p) \n",ObjID,stream);
  return 0;
 }
 
@@ -472,7 +472,7 @@ int addObjectTypeToVirtualStream(
 
 int writeVirtualStream(struct VirtualStream * newstream,char * filename)
 {
-  if (newstream==0) { fprintf(stderr,"Cannot writeVirtualStream(%s) , virtual stream does not exist\n"); return 0; }
+  if (newstream==0) { fprintf(stderr,"Cannot writeVirtualStream(%s) , virtual stream does not exist\n",filename); return 0; }
   FILE * fp = fopen(filename,"w");
   if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream output file %s \n",filename); return 0; }
 
@@ -484,12 +484,12 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename)
                              { fprintf(fp,"INTERPOLATE_TIME(1)\n"); }
   fprintf(fp,"\n\n#List of object-types\n");
 
-  int i=0;
+  unsigned int i=0;
   for (i=1; i<newstream->numberOfObjectTypes; i++) { fprintf(fp,"OBJECTTYPE(%s,\"%s\")\n",newstream->objectTypes[i].name,newstream->objectTypes[i].model); }
 
 
   fprintf(fp,"\n\n#List of objects and their positions");
-  int pos=0;
+  unsigned int pos=0;
   for (i=1; i<newstream->numberOfObjects; i++)
     {
       fprintf(fp,"\nOBJECT(%s,%s,%u,%u,%u,%u,%u,%0.2f,%s)\n",
@@ -602,50 +602,6 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
   euler[1] = (euler[1] * 180) / PI;
   euler[2] = (euler[2] * 180) / PI;
 
-}
-
-
-int convert3DUnit(
-               float posXA ,float posYA,float posZA ,
-               float unitX,float unitY ,float unitZ ,
-               double * rotMat4x4
-             )
-{
-  //Iasonas 3x3 Rot Mat {x, -y, -z}
-  /*
-   rotMat4x4[0] = pos[0] ;  rotMat4x4[1] = -1 * pos[1] ;  rotMat4x4[2] = -1 * pos[2] ;  rotMat4x4[3] = 0;
-   //{y, (x * y^2+z^2)/(y^2+z^2), ((-1+x) * y * z)/(y^2+z^2)}
-   rotMat4x4[4] = pos[0] ;  rotMat4x4[5] = -1 * pos[1] ;  rotMat4x4[6] = -1 * pos[2] ;  rotMat4x4[7] = 0;
-   //{z, ((-1+x) * y * z)/(y^2+z^2), (y^2+x * z^2)/(y^2+z^2)}
-   rotMat4x4[8] = pos[0] ;  rotMat4x4[9] = -1 * pos[1] ;  rotMat4x4[10] = -1 * pos[2] ; rotMat4x4[11] = 0;
-   rotMat4x4[12] = 0 ; rotMat4x4[13] = 0; rotMat4x4[14] = 0; rotMat4x4[15] = 1.0;
-*/
-   return 1;
-}
-
-
-
-
-int convertDifferent3DPointsToAngles( float posXA ,float posYA,float posZA,
-                                      float posXB ,float posYB,float posZB ,
-                                      double * euler)
-{
-  float diffX = posXB-posXA;
-  float diffY = posYB-posYA;
-  float diffZ = posZB-posZA;
-
-  if (diffZ==0) { euler[0]=0.0; } else { /*eX*/ euler[0] = atan2(diffZ,diffY) ; }
-  if (diffX==0) { euler[1]=0.0; } else { /*eY*/ euler[1] = atan2(diffX,diffZ) ; }
-  if (diffX==0) { euler[2]=0.0; } else { /*eZ*/ euler[2] = atan2(diffX,diffY) ; }
-
-  //Go from radians back to degrees
-  euler[0] = (euler[0] * 180) / PI;
-  euler[1] = (euler[1] * 180) / PI;
-  euler[2] = (euler[2] * 180) / PI;
-
-  fprintf(stderr,"%f,%f,%f To f,%f,%f  corresponds to angles %f %f %f\n",posXA,posYA,posZA,posXB,posYB,posZB,euler[0],euler[1],euler[2]);
-
- return 1;
 }
 
 
@@ -793,7 +749,7 @@ int readVirtualStream(struct VirtualStream * newstream)
 
                if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
 
-               fprintf(stderr,"Tracker OBJ%u(now has %u / %u positions )\n",newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
+               fprintf(stderr,"Tracker OBJ%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
             }
               else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
@@ -881,16 +837,15 @@ int readVirtualStream(struct VirtualStream * newstream)
 
                char name[MAX_PATH];
                InputParser_GetWord(ipc,1,name,MAX_PATH);
-               unsigned int time = InputParser_GetWordInt(ipc,2);
 
                float pos[7]={0};
                pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,1);
                pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,2);
                pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,3);
-               float deltaX = InputParser_GetWordFloat(ipc,4);
-               float deltaY = InputParser_GetWordFloat(ipc,5);
-               float deltaZ = InputParser_GetWordFloat(ipc,6);
-               float scale = InputParser_GetWordFloat(ipc,7);
+               //float deltaX = InputParser_GetWordFloat(ipc,4);
+               //float deltaY = InputParser_GetWordFloat(ipc,5);
+               //float deltaZ = InputParser_GetWordFloat(ipc,6);
+               float scale = InputParser_GetWordFloat(ipc,8);
                pos[3] = 0.0; // newstream->scaleWorld[3] * InputParser_GetWordFloat(ipc,6);
                pos[4] = 0.0; // newstream->scaleWorld[4] * InputParser_GetWordFloat(ipc,7);
                pos[5] = 0.0; // newstream->scaleWorld[5] * InputParser_GetWordFloat(ipc,8);
@@ -902,27 +857,26 @@ int readVirtualStream(struct VirtualStream * newstream)
                //double rotMat4x4[16]={0};
                //convert3DUnit(pos[0],pos[1],pos[2],deltaX,deltaY,deltaZ,&rotMat4x4);
 
+               pos[3] = InputParser_GetWordFloat(ipc,4);
+               pos[4] = InputParser_GetWordFloat(ipc,5);
+               pos[5] = InputParser_GetWordFloat(ipc,6);
+               pos[6] = InputParser_GetWordFloat(ipc,7);
 
+               double euler[3];
+               double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
 
-
-
-               double euler[3]={0};
-               convertDifferent3DPointsToAngles( pos[0] ,pos[1] , pos[2] ,
-                                                 pos[0]+deltaX, pos[1]+deltaY , pos[2]+deltaZ ,
-                                                 euler);
-
+               normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
+               quaternions2Euler(euler,quaternions,1); //1
                pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
-               pos[4] = 270 + newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
-               pos[5] = 90 + newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
+               pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
+               pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
                pos[6] = 0;
                fprintf(stderr,"Tracker ARROW%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
                fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
 
-
-
-
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
+
 
                addStateToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength , newstream->object[item].scale * scale ,
                                    newstream->object[item].R ,
@@ -933,7 +887,7 @@ int readVirtualStream(struct VirtualStream * newstream)
 
                if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
 
-               fprintf(stderr,"Tracker ARROW%u(now has %u / %u positions )\n",newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
+               fprintf(stderr,"Tracker ARROW%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
             }  else
             /*! REACHED A POSITION DECLERATION ( POS(hand,0,   0.0,0.0,0.0 , 0.0,0.0,0.0,0.0 ) )
               argument 0 = POS , argument 1 = name ,  argument 2 = time in MS , argument 3-5 = X,Y,Z , argument 6-9 = Rotations*/
@@ -1124,7 +1078,7 @@ int refreshVirtualStream(struct VirtualStream * newstream)
 
 void myStrCpy(char * destination,char * source,unsigned int maxDestinationSize)
 {
-  int i=0;
+  unsigned int i=0;
   while ( (i<maxDestinationSize) && (source[i]!=0) ) { destination[i]=source[i]; ++i; }
 }
 
@@ -1177,7 +1131,7 @@ struct VirtualStream * createVirtualStream(char * filename)
 
 
 
-int fillPosWithNull(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scale )
+int fillPosWithNull(float * pos,float * scale )
 {
     #if PRINT_DEBUGGING_INFO
     fprintf(stderr,"Returning null frame for obj %u \n",ObjID);
@@ -1389,7 +1343,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    if ( (stream->object[ObjID].MAX_numberOfFrames == 0 ) )
    {
        fprintf(stderr,"Returning Null position for ObjID %u\n",ObjID);
-       fillPosWithNull(stream,ObjID,pos,scale);
+       fillPosWithNull(/*stream,ObjID,*/pos,scale);
        return 1;
    } else
    if  ( (stream->ignoreTime) || (stream->object[ObjID].MAX_numberOfFrames == 1 ) )

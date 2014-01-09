@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include "matrix3x3Tools.h"
 #include "matrix4x4Tools.h"
@@ -18,7 +19,7 @@ enum packedPointPrecalcs
  ,yA
  ,One
  ,Result
- ,elements
+ ,ElementsNumber
 };
 
 void printSystemMatlab(double * mat,unsigned int totalLines)
@@ -27,16 +28,16 @@ void printSystemMatlab(double * mat,unsigned int totalLines)
     unsigned int  i=0;
     for (i=0; i< totalLines; i++)
     {
-     fprintf(stderr,"{ %0.2f , ",mat[i*elements + xBxA] );
-     fprintf(stderr,"%0.2f , ",mat[i*elements + xByA] );
-     fprintf(stderr,"%0.2f ,",mat[i*elements + xB] );
-     fprintf(stderr,"%0.2f ,",mat[i*elements + yBxA] );
-     fprintf(stderr,"%0.2f ,",mat[i*elements + yByA] );
-     fprintf(stderr,"%0.2f ,",mat[i*elements + yB] );
-     fprintf(stderr,"%0.2f ,",mat[i*elements + xA] );
-     fprintf(stderr,"%0.2f ,",mat[i*elements + yA] );
-     fprintf(stderr,"%0.2f ,",mat[i*elements + One] );
-     fprintf(stderr,"%f } , ",mat[i*elements + Result] );
+     fprintf(stderr,"{ %0.2f , ",mat[i*ElementsNumber + xBxA] );
+     fprintf(stderr,"%0.2f , ",mat[i*ElementsNumber + xByA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + xB] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yBxA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yByA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yB] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + xA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + One] );
+     fprintf(stderr,"%f } , ",mat[i*ElementsNumber + Result] );
     }
   fprintf(stderr,"} \n ");
 }
@@ -49,16 +50,16 @@ void printSystemScilab(double * mat,unsigned int totalLines)
     unsigned int i=0;
     for (i=0; i< totalLines; i++)
     {
-     fprintf(stderr,"%0.2f ",mat[i*elements + xBxA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + xByA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + xB] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + yBxA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + yByA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + yB] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + xA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + yA] );
-     fprintf(stderr,"%0.2f ;",mat[i*elements + One] );
-     //fprintf(stderr,"%f } , ",mat[i*elements + Result] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + xBxA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + xByA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + xB] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + yBxA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + yByA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + yB] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + xA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + yA] );
+     fprintf(stderr,"%0.2f ;",mat[i*ElementsNumber + One] );
+     //fprintf(stderr,"%f } , ",mat[i*ElementsNumber + Result] );
     }
   fprintf(stderr,"]\n");
 }
@@ -72,16 +73,16 @@ void printSystemPlain(double * mat,char * label , unsigned int totalLines)
     unsigned int i=0;
     for (i=0; i<totalLines; i++)
     {
-     fprintf(stderr,"%0.2f ",mat[i*elements + xBxA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + xByA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + xB] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + yBxA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + yByA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + yB] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + xA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + yA] );
-     fprintf(stderr,"%0.2f ",mat[i*elements + One] );
-     fprintf(stderr,"%f "   ,mat[i*elements + Result] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + xBxA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + xByA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + xB] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + yBxA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + yByA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + yB] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + xA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + yA] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + One] );
+     fprintf(stderr,"%f "   ,mat[i*ElementsNumber + Result] );
      fprintf(stderr,"\n");
     }
   fprintf(stderr,"---------------------------------------------\n");
@@ -92,26 +93,27 @@ int swapMatrixLines(double * mat , unsigned int line1, unsigned int line2)
   fprintf(stderr,"Swapping line %u with line %u \n",line1,line2);
   double tmp;
   unsigned int i=0;
-  for (i=0; i<elements; i++)
+  for (i=0; i<ElementsNumber; i++)
     {
-      tmp = mat[line1*elements + i];
-      mat[line1*elements + i] = mat[line2*elements + i];
-      mat[line2*elements + i] = tmp;
+      tmp = mat[line1*ElementsNumber + i];
+      mat[line1*ElementsNumber + i] = mat[line2*ElementsNumber + i];
+      mat[line2*ElementsNumber + i] = tmp;
     }
   return 1;
 }
 
 int makeSureNonZero(double * mat   , unsigned int activeLine , unsigned int totalLines )
 {
-  if ( ( mat[activeLine*elements + activeLine] >=  0.0000001 ) ||
-       ( mat[activeLine*elements + activeLine] <=  -0.0000001 ) )   { return 1; }
+  if ( ( mat[activeLine*ElementsNumber + activeLine] >=  0.0000001 ) ||
+       ( mat[activeLine*ElementsNumber + activeLine] <=  -0.0000001 ) )   { return 1; }
 
   //If we are here it means our line has a zero leading element
   unsigned int line=0;
-  for (line=activeLine+1; line<elements; line++)
+  fprintf(stderr,"makeSureNonZero : totalLines %u disregarded \n",totalLines);
+  for (line=activeLine+1; line<ElementsNumber; line++)
     {
-      if ( ( mat[line*elements + activeLine] >=  0.0000001 )||
-           ( mat[line*elements + activeLine] <=  -0.0000001 ) )
+      if ( ( mat[line*ElementsNumber + activeLine] >=  0.0000001 )||
+           ( mat[line*ElementsNumber + activeLine] <=  -0.0000001 ) )
               { return swapMatrixLines(mat,activeLine,line);  }
     }
 
@@ -120,13 +122,13 @@ int makeSureNonZero(double * mat   , unsigned int activeLine , unsigned int tota
 
 int createBaseOne(double * mat   , unsigned int activeLine)
 {
-  double divisor = mat[activeLine*elements + activeLine];
+  double divisor = mat[activeLine*ElementsNumber + activeLine];
   if (divisor == 0.0) { return 0; }
 
   unsigned int i=0;
-  for (i=0; i<elements; i++)
+  for (i=0; i<ElementsNumber; i++)
     {
-      mat[activeLine*elements + i] /= divisor;
+      mat[activeLine*ElementsNumber + i] /= divisor;
     }
 
   return 1;
@@ -142,11 +144,11 @@ int subtractBase(double * mat   , unsigned int activeLine , unsigned int totalLi
   {
    if (line!=activeLine)
    {
-    multiplier = mat[line*elements + activeLine];
-     for (i=0; i<elements; i++)
+    multiplier = mat[line*ElementsNumber + activeLine];
+     for (i=0; i<ElementsNumber; i++)
       {
-        newval = (double) ( mat[activeLine*elements + i] * multiplier ) ;
-        mat[line*elements + i] -= newval;
+        newval = (double) ( mat[activeLine*ElementsNumber + i] * multiplier ) ;
+        mat[line*ElementsNumber + i] -= newval;
       }
    }
   }
@@ -179,19 +181,19 @@ int gatherResult(double * result , double * mat  , unsigned int totalLines )
     {
        for (i=line+1; i<totalLines; i++)
        {
-          calculatedItem -= mat[line*elements + i];
+          calculatedItem -= mat[line*ElementsNumber + i];
        }
     } else
     {
-     calculatedItem = mat[line*elements + line];
+     calculatedItem = mat[line*ElementsNumber + line];
     }
 
     //We have calculated the result for this raw so we save it
-    mat[line*elements + Result] = calculatedItem;
+    mat[line*ElementsNumber + Result] = calculatedItem;
     //And we propagate it to previous lines
     for (i=0; i<totalLines; i++)
         {
-         mat[i*elements + line] *= calculatedItem;
+         mat[i*ElementsNumber + line] *= calculatedItem;
         }
 
     if (line==0) { break; } else
@@ -202,7 +204,7 @@ int gatherResult(double * result , double * mat  , unsigned int totalLines )
   //Store results in resulting matrix
   for (i=0; i<totalLines; i++)
         {
-          result[i] = mat[i*elements + Result];
+          result[i] = mat[i*ElementsNumber + Result];
         }
   return 1;
 }
@@ -213,6 +215,8 @@ int gatherResult(double * result , double * mat  , unsigned int totalLines )
 
 int solveLinearSystemGJ(double * result , double * coefficients , unsigned int variables , unsigned int totalLines )
 {
+    fprintf(stderr,"solveLinearSystemGJ : Variables %u argument is not taken into account (?)",variables);
+
     //Make the system upper diagonal
     unsigned int i=0;
     for (i=0; i<totalLines; i++)

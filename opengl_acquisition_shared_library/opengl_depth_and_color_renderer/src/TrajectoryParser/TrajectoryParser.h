@@ -89,13 +89,14 @@ struct VirtualObject
    double scale;
 
 
+   /*
    // 0-6  low bounds          X Y Z    A B C D
    // 7-13 high bounds         X Y Z    A B C D
    // 14-20 resample variances X Y Z    A B C D
    double limits[ 7 * 3];
 
-   int generations;
-   int particles;
+   unsigned int generations;
+   unsigned int particles;*/
 
 };
 

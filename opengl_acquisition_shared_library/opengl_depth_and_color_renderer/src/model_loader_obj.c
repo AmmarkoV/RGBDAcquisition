@@ -189,10 +189,10 @@ int loadMTL(struct OBJ_Model * obj,char * directory,char *filename)
   FILE *file;
   char buf[128];
   char buf1[128];
-  GLuint tex_id;
+  //Not Used : ? GLuint tex_id;
   GLuint mat_num;
   float   r,g,b;
- int i;
+ unsigned int i;
 
 
   char fname[2*MAX_MODEL_PATHS+2];
@@ -393,7 +393,7 @@ int readOBJ(struct OBJ_Model * obj)
   }
   if(numgroups==0) { numgroups=1; }
   obj->groups = (Group*) malloc(sizeof(Group)* numgroups);
-  if (obj->groups == 0) { fprintf(stderr,"Could not make enough space for %u groups \n",numgroups); fclose(file); return 0; }
+  if (obj->groups == 0) { fprintf(stderr,"Could not make enough space for %lu groups \n",numgroups); fclose(file); return 0; }
   obj->numGroups = 0;
   obj->numFaces =0;
 
@@ -988,7 +988,7 @@ int findIntersection(struct OBJ_Model * obj,Vertex v1, Vertex v2, Vector* new_no
 // through v2 and the mesh. If the intersection between the line and the mesh is located before v1, then the
 // intersection point is discarded. See the overloaded member below for argument details.
 {
-	int i, j;
+	unsigned int i, j;
 	for(i=0;i<obj->numGroups;i++)
 	{
 		for(j=0;j< obj->groups[i].numFaces;j++)
@@ -1201,6 +1201,7 @@ int compileOBJList(struct OBJ_Model * obj)
 		}//FOR I
 	glEndList();
 glPopAttrib();
+return 1;
 }
 
 

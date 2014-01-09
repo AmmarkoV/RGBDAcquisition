@@ -8,6 +8,7 @@
 
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/gl.h>
+#include <GL/glu.h>
 
 #include <X11/X.h>    /* X11 constant (e.g. TrueColor) */
 #include <X11/keysym.h>
@@ -16,6 +17,7 @@
 #include "model_loader_obj.h"
 #include "scene.h"
 
+#include "save_to_file.h"
 #include "shader_loader.h"
 #include "AmMatrix/matrixCalculations.h"
 
@@ -48,7 +50,7 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
 
     #if FLIP_OPEN_GL_IMAGES
      unsigned int   yp = 0;
-     int i=0;
+     unsigned int i=0;
      unsigned int stride = (width-x)*1;
 
      for (yp=0; yp<height; yp++)
@@ -86,6 +88,7 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
 
 
 
+
 int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
     double depth_bias=0.0; double depth_scale=1.0;
@@ -99,8 +102,8 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     /*
        Not sure I am calculating the correct depth here..
     */
-    float max_distance = farPlane-nearPlane;
-    float multiplier = (float) 65535 / max_distance;
+    //float max_distance = farPlane-nearPlane;
+    //float multiplier = (float) 65535 / max_distance;
 
     memset(depth,0 , (width-x)*(height-y)*2 );
 
@@ -176,7 +179,7 @@ void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned in
 {
 
     char * rgb = (char *) malloc((width-x)*(height-y)*sizeof(char)*3);
-    if (rgb==0) { fprintf(stderr,"Could not allocate a buffer to write color to file %s \n",colorfile); return 0; }
+    if (rgb==0) { fprintf(stderr,"Could not allocate a buffer to write color to file %s \n",colorfile); return ; }
 
     getOpenGLColor(rgb, x, y, width,  height);
     saveRawImageToFile(colorfile,rgb,(width-x),(height-y),3,8);
@@ -190,7 +193,7 @@ void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned in
 void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
     short * zshortbuffer = (short *) malloc((width-x)*(height-y)*sizeof(short));
-    if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth to file %s \n",depthfile); return 0; }
+    if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth to file %s \n",depthfile); return; }
 
     getOpenGLDepth(zshortbuffer,x,y,width,height);
 
@@ -338,6 +341,7 @@ void * createOGLRendererPhotoshootSandbox(
 
 int destroyOGLRendererPhotoshootSandbox( void * photoConf )
 {
+    fprintf(stderr,"destroyOGLRendererPhotoshootSandbox is a stub : %p \n",photoConf);
    return 0;
 }
 
