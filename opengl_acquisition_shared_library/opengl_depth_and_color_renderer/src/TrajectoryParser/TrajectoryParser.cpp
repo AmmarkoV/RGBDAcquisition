@@ -292,12 +292,14 @@ unsigned long getFileSize(char * filename)
 
 
 
-int addPositionToObjectID(
+int addStateToObjectID(
                                struct VirtualStream * stream ,
                                unsigned int ObjID  ,
                                unsigned int timeMilliseconds ,
                                float * coord ,
-                               unsigned int coordLength
+                               unsigned int coordLength ,
+                               float scale ,
+                               float R , float G , float B , float Alpha
                        )
 {
   if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { growVirtualStreamFrames(&stream->object[ObjID],FRAMES_TO_ADD_STEP); }
@@ -311,6 +313,13 @@ int addPositionToObjectID(
   // 1 is object name
   stream->object[ObjID].frame[pos].time = timeMilliseconds;
   stream->object[ObjID].frame[pos].isQuaternion = 0;
+
+  stream->object[ObjID].frame[pos].scale = scale;
+  stream->object[ObjID].frame[pos].R = R;
+  stream->object[ObjID].frame[pos].G = G;
+  stream->object[ObjID].frame[pos].B = B;
+  stream->object[ObjID].frame[pos].Alpha = Alpha;
+
   if (coordLength > 0 ) {  stream->object[ObjID].frame[pos].x = coord[0]; }
   if (coordLength > 1 ) {  stream->object[ObjID].frame[pos].y = coord[1]; }
   if (coordLength > 2 ) {  stream->object[ObjID].frame[pos].z = coord[2]; }
@@ -340,12 +349,14 @@ int addPositionToObjectID(
 }
 
 
-int addPositionToObject(
+int addStateToObject(
                               struct VirtualStream * stream ,
                               char * name  ,
                               unsigned int timeMilliseconds ,
                               float * coord ,
-                              unsigned int coordLength
+                              unsigned int coordLength ,
+                              float scale ,
+                              float R , float G , float B , float Alpha
                        )
 {
 
@@ -353,7 +364,7 @@ int addPositionToObject(
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
  if (ObjFound)
   {
-     return addPositionToObjectID(stream,ObjID,timeMilliseconds,coord,coordLength);
+     return addStateToObjectID(stream,ObjID,timeMilliseconds,coord,coordLength,scale,R,G,B,Alpha);
   }
   fprintf(stderr,"Could not Find object %s \n",name);
   return 0;
@@ -412,7 +423,12 @@ int addObjectToVirtualStream(
 
    if (coords!=0)
    {
-    if (! addPositionToObject(stream,name,0,coords,coordLength) )
+    if (! addStateToObject(stream,name,0,coords,coordLength,
+                           stream->object[pos].scale,
+                           stream->object[pos].R,
+                           stream->object[pos].G,
+                           stream->object[pos].B,
+                           stream->object[pos].Transparency) )
     {
        fprintf(stderr,"Cannot add initial position to new object\n");
     }
@@ -768,7 +784,12 @@ int readVirtualStream(struct VirtualStream * newstream)
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
-               addPositionToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength );
+               addStateToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength ,
+                                   newstream->object[item].scale,
+                                   newstream->object[item].R,
+                                   newstream->object[item].G,
+                                   newstream->object[item].B,
+                                   newstream->object[item].Transparency);
 
                if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
 
@@ -869,6 +890,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                float deltaX = InputParser_GetWordFloat(ipc,4);
                float deltaY = InputParser_GetWordFloat(ipc,5);
                float deltaZ = InputParser_GetWordFloat(ipc,6);
+               float scale = InputParser_GetWordFloat(ipc,7);
                pos[3] = 0.0; // newstream->scaleWorld[3] * InputParser_GetWordFloat(ipc,6);
                pos[4] = 0.0; // newstream->scaleWorld[4] * InputParser_GetWordFloat(ipc,7);
                pos[5] = 0.0; // newstream->scaleWorld[5] * InputParser_GetWordFloat(ipc,8);
@@ -902,7 +924,12 @@ int readVirtualStream(struct VirtualStream * newstream)
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
-               addPositionToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength );
+               addStateToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength , scale ,
+                                   newstream->object[item].R ,
+                                   newstream->object[item].G ,
+                                   newstream->object[item].B ,
+                                   newstream->object[item].Transparency
+                                   );
 
                if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
 
@@ -929,10 +956,21 @@ int readVirtualStream(struct VirtualStream * newstream)
                if (newstream->rotationsOverride)
                      { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
-
-               //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
-
-              addPositionToObject( newstream , name  , time , (float*) pos , coordLength );
+               unsigned int found = 0;
+               unsigned int item = getObjectID(newstream, name, &found );
+               if (found)
+               {
+                //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+                addStateToObjectID( newstream , item  , time , (float*) pos , coordLength,
+                                    newstream->object[item].scale,
+                                    newstream->object[item].R,
+                                    newstream->object[item].G,
+                                    newstream->object[item].B,
+                                    newstream->object[item].Transparency );
+               } else
+               {
+                 fprintf(stderr,"Could not add state/position to non-existing object `%s` \n",name);
+               }
             }
              else
             /*! REACHED A PROJECTION MATRIX DECLERATION ( PROJECTION_MATRIX( ... 16 values ... ) )

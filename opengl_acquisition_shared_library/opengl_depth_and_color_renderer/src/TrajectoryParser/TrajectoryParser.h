@@ -37,9 +37,15 @@ enum PlaybackState
 */
 struct KeyFrame
 {
-   float x; float y; float z;
-   float rot1; float rot2; float rot3; float rot4;
+   float x , y , z , scale;
+   float rot1 , rot2 , rot3 , rot4;
    unsigned char isQuaternion;
+
+   float R , G , B , Alpha ;
+   unsigned char hasColor;
+   unsigned char hasTrans;
+
+   //TimeStamp in milliseconds
    unsigned int time;
 };
 
@@ -273,12 +279,14 @@ int removeObjectFromVirtualStream(struct VirtualStream * stream ,  unsigned int 
 * @param Object ID we want to add the position to
 * @param The time ine Milliseconds
 * @retval 1=Success , 0=Failure */
-int addPositionToObjectID(
-                              struct VirtualStream * stream ,
-                              unsigned int ObjID  ,
-                              unsigned int timeMilliseconds ,
-                              float * coord ,
-                              unsigned int coordLength
+int addStateToObjectID(
+                               struct VirtualStream * stream ,
+                               unsigned int ObjID  ,
+                               unsigned int timeMilliseconds ,
+                               float * coord ,
+                               unsigned int coordLength ,
+                               float scale ,
+                               float R , float G , float B , float Alpha
                        );
 
 
@@ -291,12 +299,14 @@ int addPositionToObjectID(
 * @param String with the name of the object we want to add the position to
 * @param The time ine Milliseconds
 * @retval 1=Success , 0=Failure */
-int addPositionToObject(
+int addStateToObject(
                               struct VirtualStream * stream ,
                               char * name  ,
                               unsigned int timeMilliseconds ,
                               float * coord ,
-                              unsigned int coordLength
+                              unsigned int coordLength,
+                              float scale ,
+                              float R , float G , float B , float Alpha
                        );
 
 /**
