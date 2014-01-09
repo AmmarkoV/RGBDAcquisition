@@ -329,7 +329,7 @@ int addObjectTypeToVirtualStream(
 * @param Time in milliseconds ( absolute time value in milliseconds )
 * @param Output Array of floats , should be at least 4 floats long
 * @retval 1=Success , 0=Failure */
-int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeMilliseconds,float * pos);
+int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeMilliseconds,float * pos,float * scale);
 
 /**
 * @brief Calculate the position for an object after a delta time interval
@@ -339,7 +339,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
 * @param Time in milliseconds ( a delta that has to be combined with last value , milliseconds )
 * @param Output Array of floats , should be at least 4 floats long
 * @retval 1=Success , 0=Failure */
-int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos);
+int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos,float * scale);
 
 
 /**
@@ -349,16 +349,7 @@ int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHan
 * @param Object Id we want to get info about
 * @param Output Array of floats , should be at least 4 floats long
 * @retval 1=Success , 0=Failure */
-int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos);
-
-/**
-* @brief Get an array of Doubles , describing the last position of the objects
-* @ingroup trajectoryParser
-* @param Pointer to a valid stream
-* @param Object Id we want to get info about
-* @param Output Array of doubles , should be at least 4 doubles long
-* @retval 1=Success , 0=Failure */
-int getVirtualStreamLastPosD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos);
+int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scale);
 
 
 #ifdef __cplusplus

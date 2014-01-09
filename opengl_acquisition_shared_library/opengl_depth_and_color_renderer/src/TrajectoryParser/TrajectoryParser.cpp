@@ -924,7 +924,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
-               addStateToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength , scale ,
+               addStateToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength , newstream->object[item].scale * scale ,
                                    newstream->object[item].R ,
                                    newstream->object[item].G ,
                                    newstream->object[item].B ,
@@ -1177,7 +1177,7 @@ struct VirtualStream * createVirtualStream(char * filename)
 
 
 
-int fillPosWithNull(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos)
+int fillPosWithNull(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scale )
 {
     #if PRINT_DEBUGGING_INFO
     fprintf(stderr,"Returning null frame for obj %u \n",ObjID);
@@ -1190,12 +1190,13 @@ int fillPosWithNull(struct VirtualStream * stream,ObjectIDHandler ObjID,float * 
     pos[4]=0.0;
     pos[5]=0.0;
     pos[6]=0.0;
+    *scale = 1.0;
 
     return 1;
 }
 
 
-int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos)
+int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scale )
 {
    if (stream==0) { fprintf(stderr,"Cannot fill position on empty stream \n"); return 0; }
    if (pos==0) { fprintf(stderr,"Cannot fill position on empty position \n"); return 0; }
@@ -1222,11 +1223,12 @@ int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,flo
     pos[4]=stream->object[ObjID].frame[FrameIDToReturn].rot2;
     pos[5]=stream->object[ObjID].frame[FrameIDToReturn].rot3;
     pos[6]=stream->object[ObjID].frame[FrameIDToReturn].rot4;
+    *scale=stream->object[ObjID].frame[FrameIDToReturn].scale;
     return 1;
 }
 
 
-int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos)
+int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos,double * scale )
 {
    if (stream->object[ObjID].frame==0)
     {
@@ -1249,11 +1251,12 @@ int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,do
     pos[4]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot2;
     pos[5]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot3;
     pos[6]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot4;
+    *scale=stream->object[ObjID].frame[FrameIDToReturn].scale;
     return 1;
 }
 
 
-int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int FrameIDToReturn,float * pos)
+int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int FrameIDToReturn,float * pos,float * scale)
 {
    if (stream->object[ObjID].frame==0)
     {
@@ -1280,11 +1283,12 @@ int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigne
     pos[4]=stream->object[ObjID].frame[FrameIDToReturn].rot2;
     pos[5]=stream->object[ObjID].frame[FrameIDToReturn].rot3;
     pos[6]=stream->object[ObjID].frame[FrameIDToReturn].rot4;
+    *scale=stream->object[ObjID].frame[FrameIDToReturn].scale;
     return 1;
 }
 
 
-int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,
+int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scale,
                                  unsigned int PrevFrame,unsigned int NextFrame , unsigned int time )
 {
    if (stream->object[ObjID].frame==0)
@@ -1297,7 +1301,7 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
 
    if (PrevFrame==NextFrame)
     {
-       return fillPosWithFrame(stream,ObjID,PrevFrame,pos);
+       return fillPosWithFrame(stream,ObjID,PrevFrame,pos,scale);
     }
 
 
@@ -1305,6 +1309,7 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
     fprintf(stderr,"Interpolating frames @  %u , between %u and %u \n",time,PrevFrame,NextFrame);
     #endif
     float interPos[7]={0};
+    float interScale;
 
     unsigned int MAX_stepTime= stream->object[ObjID].frame[NextFrame].time - stream->object[ObjID].frame[PrevFrame].time;
     if (MAX_stepTime == 0 ) { MAX_stepTime=1; }
@@ -1332,6 +1337,10 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
     interPos[6]=(float) ( stream->object[ObjID].frame[NextFrame].rot4-stream->object[ObjID].frame[PrevFrame].rot4 ) * our_stepTime / MAX_stepTime;
     interPos[6]+=stream->object[ObjID].frame[PrevFrame].rot4;
 
+    interScale = (float) ( stream->object[ObjID].frame[NextFrame].scale-stream->object[ObjID].frame[PrevFrame].scale ) * our_stepTime / MAX_stepTime;
+    interScale += stream->object[ObjID].frame[PrevFrame].scale;
+    *scale=interScale;
+
     pos[0]=interPos[0]; pos[1]=interPos[1]; pos[2]=interPos[2];
     pos[3]=interPos[3]; pos[4]=interPos[4]; pos[5]=interPos[5];
     pos[6]=interPos[6];
@@ -1348,7 +1357,7 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
 
 
 
-int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAbsMilliseconds,float * pos)
+int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAbsMilliseconds,float * pos,float * scale)
 {
    if (stream==0) { fprintf(stderr,"calculateVirtualStreamPos called with null stream\n"); return 0; }
    if (stream->object==0) { fprintf(stderr,"calculateVirtualStreamPos called with null object array\n"); return 0; }
@@ -1380,7 +1389,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    if ( (stream->object[ObjID].MAX_numberOfFrames == 0 ) )
    {
        fprintf(stderr,"Returning Null position for ObjID %u\n",ObjID);
-       fillPosWithNull(stream,ObjID,pos);
+       fillPosWithNull(stream,ObjID,pos,scale);
        return 1;
    } else
    if  ( (stream->ignoreTime) || (stream->object[ObjID].MAX_numberOfFrames == 1 ) )
@@ -1391,7 +1400,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
     FrameIDToReturn = stream->object[ObjID].lastFrame;
     ++stream->object[ObjID].lastFrame;
 
-    fillPosWithFrame(stream,ObjID,FrameIDToReturn,pos);
+    fillPosWithFrame(stream,ObjID,FrameIDToReturn,pos,scale);
     fprintf(stderr,"fillPosWithFrame %u => ( %0.2f %0.2f %0.2f , %0.2f %0.2f %0.2f)\n",FrameIDToReturn,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
 
     FrameIDLast = FrameIDToReturn;
@@ -1443,7 +1452,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
 
     //We now have our Last and Next frame , all that remains is extracting the
     //interpolated time between them..!
-    return fillPosWithInterpolatedFrame(stream,ObjID,pos,FrameIDLast,FrameIDNext,timeAbsMilliseconds);
+    return fillPosWithInterpolatedFrame(stream,ObjID,pos,scale,FrameIDLast,FrameIDNext,timeAbsMilliseconds);
 
    } /*!END OF INTERPOLATED FRAME GETTER*/
 
@@ -1452,21 +1461,16 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
 
 
 
-int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos)
+int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos,float * scale)
 {
    stream->object[ObjID].lastCalculationTime+=timeAfterMilliseconds;
-   return calculateVirtualStreamPos(stream,ObjID,stream->object[ObjID].lastCalculationTime,pos);
+   return calculateVirtualStreamPos(stream,ObjID,stream->object[ObjID].lastCalculationTime,pos,scale);
 }
 
 
-int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos)
+int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scale)
 {
-    return fillPosWithLastFrame(stream,ObjID,pos);
-}
-
-int getVirtualStreamLastPosD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos)
-{
-    return fillPosWithLastFrameD(stream,ObjID,pos);
+    return fillPosWithLastFrame(stream,ObjID,pos,scale);
 }
 
 

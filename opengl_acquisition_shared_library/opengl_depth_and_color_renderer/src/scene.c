@@ -326,10 +326,11 @@ int tickScene()
    float x,y,z,heading,pitch,roll;
    float posStack[7];
    float * pos = (float*) &posStack;
+   float scale = 1.0;
 
    unsigned int i=0;
   //Object 0 is camera  lets calculate its position
-   calculateVirtualStreamPos(scene,0,ticks*100,pos);
+   calculateVirtualStreamPos(scene,0,ticks*100,pos,&scale);
    camera_pos_x = pos[0];  camera_pos_y = pos[1]; camera_pos_z = pos[2];
    camera_angle_x = pos[3]; camera_angle_y = pos[4]; camera_angle_z = pos[5];
 
@@ -376,6 +377,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
   unsigned char noColor=0;
   float posStack[7]={0};
+  float scale=1.0;
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
   unsigned int i;
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
@@ -383,14 +385,14 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
     {
        struct Model * mod = models[scene->object[i].type];
        float * pos = (float*) &posStack;
-       if ( calculateVirtualStreamPos(scene,i,ticks*100,pos) )
+       if ( calculateVirtualStreamPos(scene,i,ticks*100,pos,&scale) )
        {
          //This is a stupid way of passing stuff to be drawn
          R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
          getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
          //fprintf(stderr,"Object %s should be RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name,R,G,B,trans,noColor);
          setModelColor(mod,&R,&G,&B,&trans,&noColor);
-         mod->scale = scene->object[i].scale;
+         mod->scale = scale;//scene->object[i].scale;
          //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
 
