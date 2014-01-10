@@ -168,7 +168,7 @@ int mux2RGBAndDepthFramesNonTrans( unsigned char * rgbBase, unsigned char * rgbO
    if ( (shiftX!=0) || (shiftY!=0) )
    {
      shiftImageRGB(rgbOverlay,rgbOverlay,transR,transG,transB,shiftX,shiftY,width,height);
-    // shiftImageDepth(depthOverlay,depthOverlay,0,shiftX,shiftY,width,height);
+     shiftImageDepth(depthOverlay,depthOverlay,0,shiftX,shiftY,width,height);
    }
 
 
