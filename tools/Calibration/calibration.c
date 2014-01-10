@@ -232,6 +232,8 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
      line[0]=0;
    }
 
+  fclose(fp);
+
   return 1;
 }
 

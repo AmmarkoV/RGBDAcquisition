@@ -28,6 +28,19 @@ int saveTileDepthToFile(  unsigned int solutionColumn , unsigned int solutionRow
                           unsigned short * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
                           unsigned int width , unsigned int height);
 
+
+int shiftImageRGB(unsigned char * target, unsigned char * source ,  unsigned char transR, unsigned char transG, unsigned char transB , signed int tX,  signed int tY  ,  unsigned int width , unsigned int height);
+int shiftImageDepth(unsigned short * target, unsigned short * source , unsigned short depthVal  , signed int tX,  signed int tY  ,  unsigned int width , unsigned int height);
+
+
+int bitbltColorRGB(unsigned char * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
+                   unsigned char R , unsigned char G , unsigned char B ,
+                   unsigned int width , unsigned int height);
+
+int bitbltDepthValue(unsigned short * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
+                     unsigned short DepthVal ,
+                     unsigned int width , unsigned int height);
+
 int bitBltRGBToFile(  char * name  ,char * comment ,
                       unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
                       unsigned int width , unsigned int height);

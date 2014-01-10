@@ -49,6 +49,11 @@ typedef unsigned int AcquisitionMultiplexerIdentifier;
  * @param Pointer to the Base Depth Frame input
  * @param Pointer to the Overlay Depth Frame input
  * @param Pointer to the Depth Frame output
+ * @param R Channel Value specifying the transparent color ( the overlay background )
+ * @param G Channel Value specifying the transparent color ( the overlay background )
+ * @param B Channel Value specifying the transparent color ( the overlay background )
+ * @param Integer specifying a shift for the overlay in pixels along the X axis
+ * @param Integer specifying a shift for the overlay in pixels along the Y axis
  * @param Width  , The Width of the image files ( assumed to be the same for all inputs )
  * @param Height , The Height of the image files ( assumed to be the same for all inputs )
  * @param MuxType , The way to multiplex the base with the overlay , see enum MuxTypeEnum
@@ -57,6 +62,7 @@ typedef unsigned int AcquisitionMultiplexerIdentifier;
 int mux2RGBAndDepthFrames(
                            unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                            unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
+                           unsigned char transR, unsigned char transG, unsigned char transB ,
                            signed int shiftX,signed int shiftY,
                            unsigned int width , unsigned int height , unsigned int rgbTransparency ,
                            unsigned int mux_type

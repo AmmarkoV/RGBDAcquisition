@@ -80,7 +80,7 @@ int saveRawImageToFile(char * filename,char *comments ,unsigned char * pixels , 
 
 
 
-int shiftImageRGB(unsigned char * target, unsigned char * source , signed int tX,  signed int tY  ,  unsigned int width , unsigned int height)
+int shiftImageRGB(unsigned char * target, unsigned char * source ,  unsigned char transR, unsigned char transG, unsigned char transB , signed int tX,  signed int tY  ,  unsigned int width , unsigned int height)
 {
   if ( (target==0)||(source==0) ) { return 0; }
   if ( (width==0)&&(height==0) ) { return 0; }
@@ -95,21 +95,109 @@ int shiftImageRGB(unsigned char * target, unsigned char * source , signed int tX
   if (tY < 0 ) { sourceY=abs(tY); targetY=0;  } else
                { sourceY=0;       targetY=abs(tY); }
 
-  width=width - abs(tX) -1;
-  height=height - abs(tY) - 1;
+  width=width - abs(tX);
+  height=height - abs(tY);
 
   if (width>sourceWidth) { width=sourceWidth; fprintf(stderr,"Error setting width (?) why did this happen ? :P \n"); }
   if (height>sourceHeight) { height=sourceHeight; fprintf(stderr,"Error setting height (?) why did this happen ? :P \n"); }
 
   fprintf(stderr,"Doing shift (%d,%d) by bit blitting %u,%u to %u,%u ( size %u,%u) \n",tX,tY,sourceX,sourceY,targetX,targetY,width,height);
 
-  return bitbltRGB( target ,targetX,targetY, targetWidth,targetHeight,
-                    source ,sourceX,sourceY, sourceWidth,sourceHeight,
-                    width,height);
 
-  #warning "TODO : add cleaning for unblitted areas here"
+  //----------------------------------------------------------------
+  unsigned char * maybeCopiedSource = source;
+  //In case tx or ty is positive it is impossible to bit blt using the same buffer since lines will be overriden so we use a seperate buffer
+
+  if ( (tX>0) || (tY>0) )
+  {
+    unsigned int copySize = (width+1)*(height+1)*3*sizeof(unsigned char);
+    maybeCopiedSource = (unsigned char * ) malloc(copySize);
+    if (maybeCopiedSource==0) { maybeCopiedSource = source; } else
+                              { memcpy(maybeCopiedSource,source,copySize); }
+  }
+  //----------------------------------------------------------------
+
+  bitbltRGB( target ,targetX,targetY, targetWidth,targetHeight,
+             maybeCopiedSource ,sourceX,sourceY, sourceWidth,sourceHeight,
+             width,height);
+
+  //----------------------------------------------------------------
+     if (maybeCopiedSource!=source) { free(maybeCopiedSource); maybeCopiedSource=0; }
+  //----------------------------------------------------------------
+
+
+
+   if (tX==0) { } else
+   if (tX<0) { bitbltColorRGB(target,targetWidth+tX,0,targetWidth,targetHeight,transR,transG,transB,abs(tX),targetHeight); } else
+             { bitbltColorRGB(target,0,0,targetWidth,targetHeight,transR,transG,transB,abs(tX),targetHeight); }
+
+   if (tY==0) { } else
+   if (tY<0) { bitbltColorRGB(target,0,targetHeight+tY,targetWidth,targetHeight,transR,transG,transB,targetWidth,abs(tY)); } else
+             { bitbltColorRGB(target,0,0,targetWidth,targetHeight,transR,transG,transB,targetWidth,abs(tY)); }
+
+return 1;
+
 }
 
+
+
+
+
+int shiftImageDepth(unsigned short * target, unsigned short * source , unsigned short depthVal , signed int tX,  signed int tY  ,  unsigned int width , unsigned int height)
+{
+  if ( (target==0)||(source==0) ) { return 0; }
+  if ( (width==0)&&(height==0) ) { return 0; }
+
+
+  unsigned int sourceWidth=width,sourceHeight=height,targetWidth=width,targetHeight=height;
+  unsigned int sourceX,sourceY , targetX,targetY;
+
+  if (tX < 0 ) {   sourceX=abs(tX);    targetX=0;   } else
+               {   sourceX=0;          targetX=abs(tX); }
+
+  if (tY < 0 ) { sourceY=abs(tY); targetY=0;  } else
+               { sourceY=0;       targetY=abs(tY); }
+
+  width=width - abs(tX);
+  height=height - abs(tY);
+
+  if (width>sourceWidth) { width=sourceWidth; fprintf(stderr,"Error setting width (?) why did this happen ? :P \n"); }
+  if (height>sourceHeight) { height=sourceHeight; fprintf(stderr,"Error setting height (?) why did this happen ? :P \n"); }
+
+  fprintf(stderr,"Doing shift (%d,%d) by bit blitting %u,%u to %u,%u ( size %u,%u) \n",tX,tY,sourceX,sourceY,targetX,targetY,width,height);
+
+  //----------------------------------------------------------------
+  unsigned short * maybeCopiedSource = source;
+  //In case tx or ty is positive it is impossible to bit blt using the same buffer since lines will be overriden so we use a seperate buffer
+  if ( (tX>0) || (tY>0) )
+  {
+    unsigned int copySize = width*height*1*sizeof(unsigned short);
+    maybeCopiedSource = (unsigned short * ) malloc(copySize);
+    memcpy(maybeCopiedSource,source,copySize);
+  }
+  //----------------------------------------------------------------
+
+        bitbltDepth( target ,targetX,targetY, targetWidth,targetHeight,
+                     maybeCopiedSource ,sourceX,sourceY, sourceWidth,sourceHeight,
+                     width,height);
+
+
+  //----------------------------------------------------------------
+  if (maybeCopiedSource!=source) { free(maybeCopiedSource); }
+  //----------------------------------------------------------------
+
+
+   if (tX==0) { } else
+   if (tX<0) { bitbltDepthValue(target,targetWidth+tX,0,targetWidth,targetHeight,depthVal,abs(tX),targetHeight); } else
+             { bitbltDepthValue(target,0,0,targetWidth,targetHeight,depthVal,abs(tX),targetHeight); }
+
+   if (tY==0) { } else
+   if (tY<0) { bitbltDepthValue(target,0,targetHeight+tY,targetWidth,targetHeight,depthVal,targetWidth,abs(tY)); } else
+             { bitbltDepthValue(target,0,0,targetWidth,targetHeight,depthVal,targetWidth,abs(tY)); }
+
+
+  return 1;
+}
 
 
 
@@ -123,11 +211,11 @@ int mixbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   if ( (sourceWidth==0)&&(sourceHeight==0) ) { return 0; }
 
   //Check for bounds -----------------------------------------
-  if (tX+width>=targetWidth) { width=targetWidth-tX;  }
-  if (tY+height>=targetHeight) { height=targetHeight-tY;  }
+  if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
+  if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
 
-  if (sX+width>=sourceWidth) { width=sourceWidth-sX;  }
-  if (sY+height>=sourceHeight) { height=sourceHeight-sY;  }
+  if (sX+width>=sourceWidth) { width=sourceWidth-sX-1;  }
+  if (sY+height>=sourceHeight) { height=sourceHeight-sY-1;  }
   //----------------------------------------------------------
 
   unsigned char * sourcePTR; unsigned char * sourceLineLimitPTR; unsigned char * sourceLimitPTR; unsigned int sourceLineSkip;
@@ -189,58 +277,49 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   fprintf(stderr,"BitBlt an area of source image %u,%u  sized %u,%u \n",sX,sY,sourceWidth,sourceHeight);
   fprintf(stderr,"BitBlt size was width %u height %u \n",width,height);
   //Check for bounds -----------------------------------------
-  if (tX+width>=targetWidth) { width=targetWidth-tX;  }
-  if (tY+height>=targetHeight) { height=targetHeight-tY;  }
+  if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
+  if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
 
-  if (sX+width>=sourceWidth) { width=sourceWidth-sX;  }
-  if (sY+height>=sourceHeight) { height=sourceHeight-sY;  }
+  if (sX+width>=sourceWidth) { width=sourceWidth-sX-1;  }
+  if (sY+height>=sourceHeight) { height=sourceHeight-sY-1;  }
   //----------------------------------------------------------
   fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
 
-
-  unsigned char * sourcePTR; unsigned char * sourceLineLimitPTR; unsigned char * sourceLimitPTR;   unsigned int sourceLineSkip;
-  unsigned char * targetPTR; unsigned char * targetLineLimitPTR; unsigned char * targetLimitPTR;   unsigned int targetLineSkip;
-
-
-  sourcePTR      = source+ MEMPLACE3(sX,sY,sourceWidth);
-  sourceLimitPTR = source+ MEMPLACE3((sX+width),(sY+height),sourceWidth);
-  sourceLineSkip = (sourceWidth-width) * 3;
-  sourceLineLimitPTR = sourcePTR + (width*3);
+  unsigned char *  sourcePTR      = source+ MEMPLACE3(sX,sY,sourceWidth);
+  unsigned char *  sourceLimitPTR = source+ MEMPLACE3((sX+width),(sY+height),sourceWidth);
+  unsigned int     sourceLineSkip = (sourceWidth-width) * 3;
+  unsigned char *  sourceLineLimitPTR = sourcePTR + (width*3) -3; /*-3 is required here*/
   fprintf(stderr,"SOURCE (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
   fprintf(stderr,"sourcePTR is %p , limit is %p \n",sourcePTR,sourceLimitPTR);
   fprintf(stderr,"sourceLineSkip is %u\n",        sourceLineSkip);
   fprintf(stderr,"sourceLineLimitPTR is %p\n",sourceLineLimitPTR);
 
 
-  targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
-  targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
-  targetLineSkip = (targetWidth-width) * 3;
-  targetLineLimitPTR = targetPTR + (width*3);
+  unsigned char * targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
+  unsigned char * targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
+  unsigned int targetLineSkip = (targetWidth-width) * 3;
+  unsigned char * targetLineLimitPTR = targetPTR + (width*3) -3; /*-3 is required here*/
   fprintf(stderr,"TARGET (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
   fprintf(stderr,"targetPTR is %p , limit is %p \n",targetPTR,targetLimitPTR);
   fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
   fprintf(stderr,"targetLineLimitPTR is %p\n",targetLineLimitPTR);
 
-
-  unsigned int x=0,y=0;
   while ( (sourcePTR < sourceLimitPTR) && ( targetPTR < targetLimitPTR ) )
   {
-     while ( (sourcePTR < sourceLineLimitPTR) && ((targetPTR < targetLineLimitPTR)) )
+     while ( (sourcePTR < sourceLineLimitPTR) && ((targetPTR+3 < targetLineLimitPTR)) )
      {
         //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
-        ++x;
      }
 
     sourceLineLimitPTR += sourceWidth*3;
     targetLineLimitPTR += targetWidth*3;
-    targetPTR+=targetLineSkip;
     sourcePTR+=sourceLineSkip;
-    ++y;
-    x=0;
+    targetPTR+=targetLineSkip;
   }
+
  return 1;
 }
 
@@ -248,9 +327,64 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
 
 
 
+int bitbltColorRGB(unsigned char * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
+                   unsigned char R , unsigned char G , unsigned char B ,
+                   unsigned int width , unsigned int height)
+{
+  //Check for bounds -----------------------------------------
+  if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
+  if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
+  //----------------------------------------------------------
+
+  unsigned char * targetPTR; unsigned char * targetLineLimitPTR; unsigned char * targetLimitPTR;   unsigned int targetLineSkip;
+  targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
+  targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
+  targetLineSkip = (targetWidth-width) * 3;
+  targetLineLimitPTR = targetPTR + (width*3) -3; /*-3 is required here*/
+
+  fprintf(stderr,"BitBlt Color an area (%u,%u) of target image  starting at %u,%u  sized %u,%u with color RGB(%u,%u,%u)\n",width,height,tX,tY,targetWidth,targetHeight,R,G,B);
+  fprintf(stderr,"last Pixels @ %u,%u\n",tX+width,tY+height);
+  while ( targetPTR < targetLimitPTR )
+  {
+     while (targetPTR < targetLineLimitPTR)
+     {
+        //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
+        *targetPTR = R; ++targetPTR;
+        *targetPTR = G; ++targetPTR;
+        *targetPTR = B; ++targetPTR;
+     }
+    targetLineLimitPTR += targetWidth*3;
+    targetPTR+=targetLineSkip;
+  }
+ return 1;
+}
 
 
 
+int bitbltDepthValue(unsigned short * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
+                     unsigned short DepthVal ,
+                     unsigned int width , unsigned int height)
+{
+
+  unsigned short * targetPTR; unsigned short * targetLineLimitPTR; unsigned short * targetLimitPTR;   unsigned int targetLineSkip;
+  targetPTR      = target + MEMPLACE1(tX,tY,targetWidth);
+  targetLimitPTR = target + MEMPLACE1((tX+width),(tY+height),targetWidth);
+  targetLineSkip = (targetWidth-width);
+  targetLineLimitPTR = targetPTR + (width);
+
+  fprintf(stderr,"BitBlt Depth an area (%u,%u) of target image  starting at %u,%u  sized %u,%u with Depth(%u)\n",width,height,tX,tY,targetWidth,targetHeight,DepthVal);
+  while ( targetPTR < targetLimitPTR )
+  {
+     while (targetPTR < targetLineLimitPTR)
+     {
+        //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
+        *targetPTR = DepthVal; ++targetPTR;
+     }
+    targetLineLimitPTR += targetWidth;
+    targetPTR+=targetLineSkip;
+  }
+ return 1;
+}
 
 
 
@@ -263,11 +397,11 @@ int bitbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY  , u
   if ( (sourceWidth==0)&&(sourceHeight==0) ) { return 0; }
 
   //Check for bounds -----------------------------------------
-  if (tX+width>=targetWidth) { width=targetWidth-tX;  }
-  if (tY+height>=targetHeight) { height=targetHeight-tY;  }
+  if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
+  if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
 
-  if (sX+width>=sourceWidth) { width=sourceWidth-sX;  }
-  if (sY+height>=sourceHeight) { height=sourceHeight-sY;  }
+  if (sX+width>=sourceWidth) { width=sourceWidth-sX-1;  }
+  if (sY+height>=sourceHeight) { height=sourceHeight-sY-1;  }
   //----------------------------------------------------------
 
   unsigned short * sourcePTR;  unsigned short* sourceLineLimitPTR; unsigned short * sourceLimitPTR; unsigned int sourceLineSkip;

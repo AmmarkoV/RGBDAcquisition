@@ -15,6 +15,7 @@ char inputname2[512]={0};
 unsigned int defaultWidth=640;
 unsigned int defaultHeight=480;
 unsigned int transparency=0;
+unsigned char transR=0,transG=0,transB=0;
 signed int shiftX=0;
 signed int shiftY=0;
 
@@ -123,6 +124,13 @@ int main(int argc, char *argv[])
                                            devID_2 = atoi(argv[i+1]);
                                            fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID_2);
                                          } else
+    if ((strcmp(argv[i],"-overlayBackground")==0) ||
+        (strcmp(argv[i],"-background")==0) )  {
+                                                  transR = atoi(argv[i+1]);
+                                                  transG = atoi(argv[i+2]);
+                                                  transB = atoi(argv[i+3]);
+                                                  fprintf(stderr,"Setting OverlayBackground RGB(%u,%u,%u)\n",transR,transG,transB);
+                                              } else
     if (strcmp(argv[i],"-shiftX")==0)      {
                                             shiftX = atoi(argv[i+1]);
                                             fprintf(stderr,"Adding a horizontal shift ( %u ) \n",argv[i+1],shiftX);
@@ -244,6 +252,7 @@ int main(int argc, char *argv[])
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
+        fprintf(stderr,"Muxing , grabbed frame %u \n",frameNum);
         acquisitionStartTimer(0);
 
         acquisitionSnapFrames(moduleID_1,devID_1);
@@ -258,6 +267,7 @@ int main(int argc, char *argv[])
            acquisitionGetDepthFrame(moduleID_1,devID_1) ,
            acquisitionGetDepthFrame(moduleID_2,devID_2) ,
            depthOut ,
+           transR,transG,transB,
            shiftX,shiftY,
            widthRGB , heightRGB ,
            transparency , 0 );
