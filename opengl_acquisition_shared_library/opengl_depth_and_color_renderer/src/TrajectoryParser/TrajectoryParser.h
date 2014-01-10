@@ -88,6 +88,8 @@ struct VirtualObject
 
    double scale;
 
+   unsigned char hasAssociatedEvents;
+
 
    /*
    // 0-6  low bounds          X Y Z    A B C D

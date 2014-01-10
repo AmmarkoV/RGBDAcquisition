@@ -1,4 +1,6 @@
 #include "AcquisitionMux.h"
+#include "../tools/ImageOperations/imageOps.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -69,11 +71,6 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
                                        signed int shiftX,signed int shiftY,
                                        unsigned int width , unsigned int height , unsigned int rgbTransparency , unsigned int mux_type)
 {
-   if ( (shiftX!=0) || (shiftY!=0) )
-   {
-    fprintf(stderr,"Warning : Please note that the shift you provided is not beeing used ( %u , %u ) , since shifts are not yet implemented \n",shiftX,shiftY);
-   }
-
    unsigned char * rgb_pBase = rgbBase;
    unsigned char * rgb_pOverlay = rgbOverlay;
    unsigned char * rgb_pOut = rgbOut; unsigned char * rgb_pOut_limit=rgb_pOut + width * height * 3;
@@ -81,7 +78,6 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
    unsigned short * depth_pBase = depthBase;
    unsigned short * depth_pOverlay = depthOverlay;
    unsigned short * depth_pOut = depthOut; unsigned short * depth_pOut_limit=rgb_pOut + width * height * 2;
-
 
    unsigned int TookBaseloops=0;
    unsigned int loops=0;
@@ -141,7 +137,17 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
        ++loops;
     }
 
+
     fprintf(stderr,"Total of %u pixels ( base are %u , %0.2f %% ) \n",loops,TookBaseloops,(double) TookBaseloops*100/loops);
+
+
+
+   if ( (shiftX!=0) || (shiftY!=0) )
+   {
+     shiftImageRGB(rgb_pOverlay,rgb_pOverlay,shiftX,shiftY,width,height);
+   }
+
+
 
     return 1;
 }

@@ -44,6 +44,7 @@
 			<Add library="rt" />
 			<Add library="../tools/OperatingSystem/libOperatingSystem.a" />
 		</Linker>
+		<Unit filename="../tools/ImageOperations/imageOps.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

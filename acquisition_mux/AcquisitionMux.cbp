@@ -37,6 +37,10 @@
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
+		<Unit filename="../tools/ImageOperations/imageOps.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/ImageOperations/imageOps.h" />
 		<Unit filename="AcquisitionMux.c">
 			<Option compilerVar="CC" />
 		</Unit>

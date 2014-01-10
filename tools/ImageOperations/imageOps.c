@@ -76,6 +76,58 @@ int saveRawImageToFile(char * filename,char *comments ,unsigned char * pixels , 
 }
 
 
+
+
+
+
+int shiftImageRGB(unsigned char * target, unsigned char * source , signed int tX,  signed int tY  ,  unsigned int width , unsigned int height)
+{
+  if ( (target==0)||(source==0) ) { return 0; }
+  if ( (width==0)&&(height==0) ) { return 0; }
+
+
+  unsigned int sourceWidth=width,sourceHeight=height,targetWidth=width,targetHeight=height;
+  unsigned int sourceX,sourceY , targetX,targetY;
+  if (tX < 0 )
+  {
+      sourceX=abs(tX);
+      targetX=0;
+  } else
+  {
+      sourceX=0;
+      targetX=abs(tX);
+  }
+
+
+  if (tY < 0 )
+  {
+      sourceY=abs(tY);
+      targetY=0;
+  } else
+  {
+      sourceY=0;
+      targetY=abs(tY);
+  }
+
+  width-=abs(tX);
+  height-=abs(tY);
+
+  if (width>sourceWidth) { width=sourceWidth; fprintf(stderr,"Error setting width (?) why did this happen ? :P \n"); }
+  if (height>sourceHeight) { height=sourceHeight; fprintf(stderr,"Error setting height (?) why did this happen ? :P \n"); }
+
+  fprintf(stderr,"Doing shift (%d,%d) by bit blitting %u,%u to %u,%u ( size %u,%u) \n",tX,tY,sourceX,sourceY,targetX,targetY,width,height);
+
+  return bitbltRGB( target ,targetX,targetY, targetWidth,targetHeight,
+                    source ,sourceX,sourceY, sourceWidth,sourceHeight,
+                    width,height);
+
+  #warning "TODO : add cleaning for unblitted areas here"
+}
+
+
+
+
+
 int mixbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
               unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
               unsigned int width , unsigned int height)
@@ -147,8 +199,8 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   if ( (width==0)&&(height==0) ) { return 0; }
   if ( (sourceWidth==0)&&(sourceHeight==0) ) { return 0; }
 
-  fprintf(stderr,"BitBlt an area of target image %u,%u  that starts at %u,%u \n",tX,tY,targetWidth,targetHeight);
-  fprintf(stderr,"BitBlt an area of source image %u,%u  that starts at %u,%u \n",sX,sY,sourceWidth,sourceHeight);
+  fprintf(stderr,"BitBlt an area of target image %u,%u  sized %u,%u \n",tX,tY,targetWidth,targetHeight);
+  fprintf(stderr,"BitBlt an area of source image %u,%u  sized %u,%u \n",sX,sY,sourceWidth,sourceHeight);
   fprintf(stderr,"BitBlt size was width %u height %u \n",width,height);
   //Check for bounds -----------------------------------------
   if (tX+width>=targetWidth) { width=targetWidth-tX;  }

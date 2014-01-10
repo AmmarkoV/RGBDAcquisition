@@ -27,7 +27,7 @@
 
 #define FLIP_OPEN_GL_IMAGES 1
 
-#define X_OFFSET -9
+#define X_OFFSET 0 //This should always be 0 and probably removed also  :P
 
 //TODO : add Horizontal flipping  <- is the output mirrored ?
 

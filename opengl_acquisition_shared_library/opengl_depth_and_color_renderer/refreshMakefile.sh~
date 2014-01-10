@@ -1,4 +1,0 @@
-#!/bin/bash
-cbp2make -in Renderer.cbp -unix -out makefile
-
-exit 0
