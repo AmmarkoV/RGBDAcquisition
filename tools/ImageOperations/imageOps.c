@@ -88,29 +88,15 @@ int shiftImageRGB(unsigned char * target, unsigned char * source , signed int tX
 
   unsigned int sourceWidth=width,sourceHeight=height,targetWidth=width,targetHeight=height;
   unsigned int sourceX,sourceY , targetX,targetY;
-  if (tX < 0 )
-  {
-      sourceX=abs(tX);
-      targetX=0;
-  } else
-  {
-      sourceX=0;
-      targetX=abs(tX);
-  }
 
+  if (tX < 0 ) {   sourceX=abs(tX);    targetX=0;   } else
+               {   sourceX=0;          targetX=abs(tX); }
 
-  if (tY < 0 )
-  {
-      sourceY=abs(tY);
-      targetY=0;
-  } else
-  {
-      sourceY=0;
-      targetY=abs(tY);
-  }
+  if (tY < 0 ) { sourceY=abs(tY); targetY=0;  } else
+               { sourceY=0;       targetY=abs(tY); }
 
-  width-=abs(tX);
-  height-=abs(tY);
+  width=width - abs(tX) -1;
+  height=height - abs(tY) - 1;
 
   if (width>sourceWidth) { width=sourceWidth; fprintf(stderr,"Error setting width (?) why did this happen ? :P \n"); }
   if (height>sourceHeight) { height=sourceHeight; fprintf(stderr,"Error setting height (?) why did this happen ? :P \n"); }
@@ -212,41 +198,48 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
 
 
-  unsigned char * sourcePTR; unsigned char * sourceLineLimitPTR; unsigned char * sourceLimitPTR; unsigned int sourceLineSkip;
-  unsigned char * targetPTR; /*unsigned char * targetLimitPTR;*/  unsigned int targetLineSkip;
+  unsigned char * sourcePTR; unsigned char * sourceLineLimitPTR; unsigned char * sourceLimitPTR;   unsigned int sourceLineSkip;
+  unsigned char * targetPTR; unsigned char * targetLineLimitPTR; unsigned char * targetLimitPTR;   unsigned int targetLineSkip;
 
 
   sourcePTR      = source+ MEMPLACE3(sX,sY,sourceWidth);
   sourceLimitPTR = source+ MEMPLACE3((sX+width),(sY+height),sourceWidth);
   sourceLineSkip = (sourceWidth-width) * 3;
   sourceLineLimitPTR = sourcePTR + (width*3);
-  fprintf(stderr,"SOURCE (RGB %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
-  fprintf(stderr,"sourcePTR is %p\n",sourcePTR);
-  fprintf(stderr,"sourceLimitPTR is %p\n",(void*) sourceLimitPTR);
+  fprintf(stderr,"SOURCE (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
+  fprintf(stderr,"sourcePTR is %p , limit is %p \n",sourcePTR,sourceLimitPTR);
   fprintf(stderr,"sourceLineSkip is %u\n",        sourceLineSkip);
   fprintf(stderr,"sourceLineLimitPTR is %p\n",sourceLineLimitPTR);
 
 
   targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
-  //targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
+  targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
   targetLineSkip = (targetWidth-width) * 3;
-  fprintf(stderr,"targetPTR is %p\n",targetPTR);
+  targetLineLimitPTR = targetPTR + (width*3);
+  fprintf(stderr,"TARGET (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
+  fprintf(stderr,"targetPTR is %p , limit is %p \n",targetPTR,targetLimitPTR);
   fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
-  fprintf(stderr,"TARGET (RGB %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
+  fprintf(stderr,"targetLineLimitPTR is %p\n",targetLineLimitPTR);
 
-  while (sourcePTR < sourceLimitPTR)
+
+  unsigned int x=0,y=0;
+  while ( (sourcePTR < sourceLimitPTR) && ( targetPTR < targetLimitPTR ) )
   {
-     while (sourcePTR < sourceLineLimitPTR)
+     while ( (sourcePTR < sourceLineLimitPTR) && ((targetPTR < targetLineLimitPTR)) )
      {
         //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
+        ++x;
      }
 
-    sourceLineLimitPTR+= sourceWidth*3;//*3;
+    sourceLineLimitPTR += sourceWidth*3;
+    targetLineLimitPTR += targetWidth*3;
     targetPTR+=targetLineSkip;
     sourcePTR+=sourceLineSkip;
+    ++y;
+    x=0;
   }
  return 1;
 }

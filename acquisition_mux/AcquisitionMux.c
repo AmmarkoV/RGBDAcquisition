@@ -71,6 +71,13 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
                                        signed int shiftX,signed int shiftY,
                                        unsigned int width , unsigned int height , unsigned int rgbTransparency , unsigned int mux_type)
 {
+
+   if ( (shiftX!=0) || (shiftY!=0) )
+   {
+     shiftImageRGB(rgbOverlay,rgbOverlay,shiftX,shiftY,width,height);
+   }
+
+
    unsigned char * rgb_pBase = rgbBase;
    unsigned char * rgb_pOverlay = rgbOverlay;
    unsigned char * rgb_pOut = rgbOut; unsigned char * rgb_pOut_limit=rgb_pOut + width * height * 3;
@@ -139,15 +146,6 @@ int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * 
 
 
     fprintf(stderr,"Total of %u pixels ( base are %u , %0.2f %% ) \n",loops,TookBaseloops,(double) TookBaseloops*100/loops);
-
-
-
-   if ( (shiftX!=0) || (shiftY!=0) )
-   {
-     shiftImageRGB(rgb_pOverlay,rgb_pOverlay,shiftX,shiftY,width,height);
-   }
-
-
 
     return 1;
 }
