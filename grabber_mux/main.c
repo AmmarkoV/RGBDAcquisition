@@ -18,6 +18,7 @@ unsigned int transparency=0;
 unsigned char transR=0,transG=0,transB=0;
 signed int shiftX=0;
 signed int shiftY=0;
+signed int shiftTime=0;
 
 int calibrationSetA = 0;
 struct calibration calibA;
@@ -135,10 +136,14 @@ int main(int argc, char *argv[])
                                             shiftX = atoi(argv[i+1]);
                                             fprintf(stderr,"Adding a horizontal shift ( %u ) \n",argv[i+1],shiftX);
                                           } else
-    if (strcmp(argv[i],"-shiftY")==0)      {
+    if (strcmp(argv[i],"-shiftY")==0)     {
                                             shiftY = atoi(argv[i+1]);
                                             fprintf(stderr,"Adding a horizontal shift ( %u ) \n",argv[i+1],shiftY);
                                           } else
+    if (strcmp(argv[i],"-shiftTime")==0)    {
+                                              shiftTime = atoi(argv[i+1]);
+                                              fprintf(stderr,"Adding a time shift ( %u ) \n",argv[i+1],shiftTime);
+                                            } else
     if (
         (strcmp(argv[i],"-from1")==0) ||
         (strcmp(argv[i],"-i1")==0)
@@ -249,6 +254,9 @@ int main(int argc, char *argv[])
 
 
     fprintf(stderr,"Base Module is %s , device %u , Overlay Module is %s , device %u\n",getModuleNameFromModuleID(moduleID_1),devID_1, getModuleNameFromModuleID(moduleID_2),devID_2);
+    if (shiftTime==0) { /* No time shift */ } else
+    if (shiftTime>0) { for (frameNum=0; frameNum<abs(shiftTime); frameNum++) { acquisitionSnapFrames(moduleID_2,devID_2); } } else
+    if (shiftTime<0) { for (frameNum=0; frameNum<abs(shiftTime); frameNum++) { acquisitionSnapFrames(moduleID_1,devID_1); } }
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
