@@ -172,7 +172,7 @@ float RGB2OGL(unsigned int colr)
   return (float) colr/255;
 }
 
-float CalculateDistance(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z)
+float calculateDistance(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z)
 {
    float vect_x = from_x - to_x;
    float vect_y = from_y - to_y;
@@ -183,7 +183,7 @@ float CalculateDistance(float from_x,float from_y,float from_z,float to_x,float 
 }
 
 
-void VectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ_y,float targ_z,float *vect_x,float *vect_y,float *vect_z)
+void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ_y,float targ_z,float *vect_x,float *vect_y,float *vect_z)
 {
     *vect_x = src_x - targ_x;
     *vect_y = src_y - targ_y;
@@ -199,7 +199,7 @@ void VectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ
 
 
 
-void FindNormal(float *v1x, float *v1y, float *v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z )
+void findNormal(float *v1x, float *v1y, float *v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z )
 { char x = 1;
   char y = 2;
   char z = 3;

@@ -164,7 +164,7 @@ void gldPerspective(GLdouble fovx, GLdouble aspect, GLdouble zNear, GLdouble zFa
 int updateProjectionMatrix()
 {
   fprintf(stderr,"updateProjectionMatrix called ( %u x %u )  \n",WIDTH,HEIGHT);
-
+  if (scene==0) { fprintf(stderr,"No Scene declared yet , don't know how to update proj matrix\n"); return 0; }
   if ( scene->emulateProjectionMatrixDeclared)
   {
      int viewport[4]={0};
@@ -374,17 +374,50 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
 }
 
 
+
 int drawAllObjectsAtPositionsFromTrajectoryParser()
 {
  if (scene==0) { return 0; }
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling drawAllObjectsAtPositionsFromTrajectoryParser\n"); }
 
 
+  unsigned int i;
+  for (i=0; i<scene->numberOfEvents; i++)
+  {
+     unsigned int objID_A = scene->event[i].objID_A , objID_B = scene->event[i].objID_B;
+
+     switch (scene->event[i].eventType)
+      {
+        case EVENT_INTERSECTION :
+
+          fprintf(stderr,"Testing Rule %u , intersection between %u and %u \n",i,objID_A,objID_B);
+          if ( objectsCollide(scene,ticks*100,objID_A ,objID_B) )
+          {
+             if (!scene->event[i].activated)
+             {
+                scene->event[i].activated=1;
+                fprintf(stderr,"Executed %s collision between %u and %u , rule %u/%u \n",scene->event[i].data, objID_A ,objID_B,i,scene->numberOfEvents);
+
+                int retres=system(scene->event[i].data);
+                if (retres==0) { fprintf(stderr,"Successfully executed\n"); }
+             }
+          } else
+          {
+             if (scene->event[i].activated) { scene->event[i].activated=0;  } //Intersection Event has stopped
+          }
+
+        break;
+      };
+  }
+
+
+
+
   unsigned char noColor=0;
   float posStack[7]={0};
   float scale=1.0;
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
-  unsigned int i;
+
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<scene->numberOfObjects; i++)
     {

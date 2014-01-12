@@ -61,6 +61,40 @@ struct ObjectType
 };
 
 
+
+/**
+* @brief Handled Events list
+*/
+enum EventType
+{
+  EVENT_EMPTY = 0 ,
+  EVENT_INTERSECTION,
+  //--------------------
+  NUMBER_OF_EVENTS
+};
+
+
+
+/**
+* @brief VirtualEvent structure holds all the data that defines events
+*/
+struct VirtualEvent
+{
+    unsigned int eventType;
+    unsigned int objID_A;
+    unsigned int objID_B;
+
+    char * data;
+    unsigned int dataSize;
+
+    unsigned char activated;
+};
+
+
+
+
+
+
 /**
 * @brief VirtualObject structure holds all the data that defines an object
 */
@@ -134,6 +168,11 @@ struct VirtualStream
     unsigned int numberOfObjects;
     struct VirtualObject * object;
 
+
+    unsigned int MAX_numberOfEvents;
+    unsigned int numberOfEvents;
+    struct VirtualEvent * event;
+
     double scaleWorld[6];
     int rotationsOverride;
     int rotationsXYZ[3];
@@ -196,6 +235,9 @@ int getObjectColorsTrans(struct VirtualStream * stream,ObjectIDHandler ObjID,flo
 char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler ObjID);
 
 
+
+
+int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB);
 
 
 /**

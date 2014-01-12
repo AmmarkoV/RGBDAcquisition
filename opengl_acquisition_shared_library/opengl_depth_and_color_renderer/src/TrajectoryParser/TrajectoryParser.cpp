@@ -34,6 +34,7 @@
 #define LINE_MAX_LENGTH 1024
 #define OBJECT_TYPES_TO_ADD_STEP 10
 #define OBJECTS_TO_ADD_STEP 10
+#define EVENTS_TO_ADD_STEP 10
 #define FRAMES_TO_ADD_STEP 123
 
 #define PRINT_DEBUGGING_INFO 0
@@ -135,6 +136,31 @@ int growVirtualStreamObjects(struct VirtualStream * stream,unsigned int objectsT
 
    stream->MAX_numberOfObjects+=objectsToAdd;
    stream->object = new_object ;
+  return 1;
+}
+
+
+
+int growVirtualStreamEvents(struct VirtualStream * stream,unsigned int eventsToAdd)
+{
+  if (eventsToAdd == 0) { return 0 ; }
+  if (stream == 0) { fprintf(stderr,"Given an empty stream to grow objects on \n"); return 0 ; }
+  struct VirtualEvent * new_event;
+  new_event = (struct VirtualEvent *) realloc( stream->event , sizeof(struct VirtualEvent) * ( stream->MAX_numberOfEvents+eventsToAdd ));
+
+   if (new_event == 0 )
+    {
+       fprintf(stderr,"Cannot add %u objects to our currently %u sized event buffer\n",eventsToAdd,stream->MAX_numberOfEvents);
+       return 0;
+    } else
+    {
+      //Clean up all new objects allocated
+      void * clear_from_here  =  new_event+stream->MAX_numberOfEvents;
+      memset(clear_from_here,0,eventsToAdd * sizeof(struct VirtualEvent));
+    }
+
+   stream->MAX_numberOfEvents+=eventsToAdd;
+   stream->event = new_event ;
   return 1;
 }
 
@@ -469,6 +495,68 @@ int addObjectTypeToVirtualStream(
     return 1; // <- we a
 }
 
+
+int addEventToVirtualStream(
+                             struct VirtualStream * stream ,
+                             unsigned int objIDA ,
+                             unsigned int objIDB ,
+                             unsigned int eventType ,
+                             char * data ,
+                             unsigned int dataSize
+                           )
+{
+    if (stream->MAX_numberOfEvents<=stream->numberOfEvents+1) { growVirtualStreamEvents(stream,EVENTS_TO_ADD_STEP); }
+    //Now we should definately have enough space for our new frame
+    if (stream->MAX_numberOfEvents<=stream->numberOfEvents+1) { fprintf(stderr,"Cannot add new Event instruction\n"); }
+
+    //We have the space so lets fill our new object spot ..!
+    unsigned int pos = stream->numberOfEvents;
+    stream->event[pos].objID_A=objIDA;
+    stream->event[pos].objID_B=objIDB;
+    stream->event[pos].eventType = eventType;
+
+    stream->event[pos].dataSize = dataSize;
+    stream->event[pos].data = (char *) malloc((dataSize+1) * sizeof(char));
+    memcpy(stream->event[pos].data,data,dataSize);
+    stream->event[pos].data[dataSize]=0;
+/*
+    int i=0;
+    i=system(data);
+    if (i==0) { fprintf(stderr,"lel\n"); }*/
+
+    ++stream->numberOfEvents;
+
+    return 1; // <- we a
+}
+
+
+
+float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z)
+{
+   float vect_x = from_x - to_x;
+   float vect_y = from_y - to_y;
+   float vect_z = from_z - to_z;
+
+   return  (sqrt(pow(vect_x, 2) + pow(vect_y, 2) + pow(vect_z, 2)));
+
+}
+
+
+
+int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB)
+{
+  float posA[7]={0}; float scaleA;
+  float posB[7]={0}; float scaleB;
+
+  calculateVirtualStreamPos(newstream,objIDA,atTime,posA,&scaleA);
+  calculateVirtualStreamPos(newstream,objIDB,atTime,posB,&scaleB);
+
+  float distance =  calculateDistanceTra(posA[0],posA[1],posA[2],posB[0],posB[1],posB[2]);
+  fprintf(stderr,"Distance %u from %u = %f\n",objIDA,objIDB,distance);
+  if ( distance > 0.3 ) { return 0;}
+
+  return 1;
+}
 
 int writeVirtualStream(struct VirtualStream * newstream,char * filename)
 {
@@ -925,6 +1013,40 @@ int readVirtualStream(struct VirtualStream * newstream)
                {
                  fprintf(stderr,"Could not add state/position to non-existing object `%s` \n",name);
                }
+            }
+
+             else
+            /*! REACHED A PROJECTION MATRIX DECLERATION ( PROJECTION_MATRIX( ... 16 values ... ) )
+              argument 0 = PROJECTION_MATRIX , argument 1-16 matrix values*/
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"EVENT",5)==1)
+            {
+
+              unsigned int eventType=0;
+               if (InputParser_WordCompareNoCase(ipc,1,(char*)"INTERSECTS",10)==1)
+                     {
+                       eventType = EVENT_INTERSECTION;
+                     }
+
+              unsigned int foundA = 0 , foundB = 0;
+              char name[MAX_PATH];
+              InputParser_GetWord(ipc,2,name,MAX_PATH);
+              unsigned int objIDA = getObjectID(newstream,name,&foundA);
+
+              InputParser_GetWord(ipc,3,name,MAX_PATH);
+              unsigned int objIDB = getObjectID(newstream,name,&foundB);
+
+              if ( (foundA) && (foundB) )
+              {
+               char buf[256];
+               InputParser_GetWord(ipc,4,buf,256);
+               if (addEventToVirtualStream(newstream,objIDA,objIDB,eventType,buf,InputParser_GetWordLength(ipc,4)) )
+               {
+                 fprintf(stderr,"addedEvent\n");
+               } else
+               {
+                 fprintf(stderr,"Could NOT add event\n");
+               }
+              }
             }
              else
             /*! REACHED A PROJECTION MATRIX DECLERATION ( PROJECTION_MATRIX( ... 16 values ... ) )
