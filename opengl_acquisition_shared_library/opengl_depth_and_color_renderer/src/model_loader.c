@@ -177,8 +177,11 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
   if ( pitch!=0 ) { glRotatef(pitch,1.0,0.0,0.0); }
 
-  if (mod->scale!=1.0) {
-                         glScalef( mod->scale , mod->scale , mod->scale );
+  if ( (mod->scaleX!=1.0) ||
+       (mod->scaleY!=1.0) ||
+       (mod->scaleZ!=1.0) )
+                       {
+                         glScalef( mod->scaleX , mod->scaleY , mod->scaleZ );
                          if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Could not scale :(\n"); }
                          //fprintf(stderr,"Scaling model by %f %f %f\n",mod->scale,mod->scale,mod->scale);
                        }

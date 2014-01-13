@@ -37,7 +37,7 @@ enum PlaybackState
 */
 struct KeyFrame
 {
-   float x , y , z , scale;
+   float x , y , z , scaleX ,scaleY, scaleZ;
    float rot1 , rot2 , rot3 , rot4;
    unsigned char isQuaternion;
 
@@ -120,7 +120,7 @@ struct VirtualObject
    unsigned int lastFrameTime;
    unsigned int nextFrameTime;
 
-   double scale;
+   double scaleX,scaleY,scaleZ;
 
    unsigned char hasAssociatedEvents;
 
@@ -301,7 +301,9 @@ int addObjectToVirtualStream(
                               unsigned char noColor ,
                               float * coords ,
                               unsigned int coordLength ,
-                              float scale
+                              float scaleX,
+                              float scaleY,
+                              float scaleZ
                             );
 
 
@@ -330,7 +332,7 @@ int addStateToObjectID(
                                unsigned int timeMilliseconds ,
                                float * coord ,
                                unsigned int coordLength ,
-                               float scale ,
+                               float scaleX , float scaleY ,float scaleZ ,
                                float R , float G , float B , float Alpha
                        );
 
@@ -350,7 +352,7 @@ int addStateToObject(
                               unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength,
-                              float scale ,
+                               float scaleX , float scaleY ,float scaleZ ,
                               float R , float G , float B , float Alpha
                        );
 
@@ -374,7 +376,7 @@ int addObjectTypeToVirtualStream(
 * @param Time in milliseconds ( absolute time value in milliseconds )
 * @param Output Array of floats , should be at least 4 floats long
 * @retval 1=Success , 0=Failure */
-int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeMilliseconds,float * pos,float * scale);
+int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeMilliseconds,float * pos, float * scaleX , float * scaleY ,float * scaleZ);
 
 /**
 * @brief Calculate the position for an object after a delta time interval
@@ -384,7 +386,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
 * @param Time in milliseconds ( a delta that has to be combined with last value , milliseconds )
 * @param Output Array of floats , should be at least 4 floats long
 * @retval 1=Success , 0=Failure */
-int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos,float * scale);
+int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos, float * scaleX , float * scaleY ,float * scaleZ);
 
 
 /**
@@ -394,7 +396,7 @@ int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHan
 * @param Object Id we want to get info about
 * @param Output Array of floats , should be at least 4 floats long
 * @retval 1=Success , 0=Failure */
-int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scale);
+int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos, float * scaleX , float * scaleY ,float * scaleZ);
 
 
 #ifdef __cplusplus

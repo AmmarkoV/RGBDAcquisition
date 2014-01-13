@@ -150,7 +150,9 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
          getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
 
          setModelColor(mod,&R,&G,&B,&trans,&noColor);
-         mod->scale = scene->object[i].scale;
+         mod->scaleX = scene->object[i].scaleX;
+         mod->scaleY = scene->object[i].scaleY;
+         mod->scaleZ = scene->object[i].scaleZ;
 
         int x,y,z;
 

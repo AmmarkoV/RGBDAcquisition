@@ -34,7 +34,7 @@ struct Model
     int type; //See enum ModelTypes
 
     //Position / Dimensions
-    float x , y , z , heading , pitch , roll , scale;
+    float x , y , z , heading , pitch , roll , scaleX , scaleY ,scaleZ;
 
     //Color
     float colorR , colorG , colorB , transparency;
