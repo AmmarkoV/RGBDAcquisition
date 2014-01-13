@@ -58,6 +58,7 @@ typedef unsigned int AcquisitionMultiplexerIdentifier;
  * @param Height , The Height of the image files ( assumed to be the same for all inputs )
  * @param MuxType , The way to multiplex the base with the overlay , see enum MuxTypeEnum
  * @retval 1 if file Exists , 0 if file does not exist
+ * @bug Shifting X/Y does not work for depth stream due ( it is implemented but turned off due to a segfault bug )
  */
 int mux2RGBAndDepthFrames(
                            unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,

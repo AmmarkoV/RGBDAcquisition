@@ -122,7 +122,10 @@ int shiftImageRGB(unsigned char * target, unsigned char * source ,  unsigned cha
              width,height);
 
   //----------------------------------------------------------------
+    if ( (tX>0) || (tY>0) )
+   {
      if (maybeCopiedSource!=source) { free(maybeCopiedSource); maybeCopiedSource=0; }
+   }
   //----------------------------------------------------------------
 
 
@@ -173,7 +176,8 @@ int shiftImageDepth(unsigned short * target, unsigned short * source , unsigned 
   {
     unsigned int copySize = width*height*1*sizeof(unsigned short);
     maybeCopiedSource = (unsigned short * ) malloc(copySize);
-    memcpy(maybeCopiedSource,source,copySize);
+    if (maybeCopiedSource==0) { maybeCopiedSource = source; } else
+                              { memcpy(maybeCopiedSource,source,copySize); }
   }
   //----------------------------------------------------------------
 
@@ -183,7 +187,10 @@ int shiftImageDepth(unsigned short * target, unsigned short * source , unsigned 
 
 
   //----------------------------------------------------------------
-  if (maybeCopiedSource!=source) { free(maybeCopiedSource); }
+   if ( (tX>0) || (tY>0) )
+   {
+     if (maybeCopiedSource!=source) { free(maybeCopiedSource); maybeCopiedSource=0; }
+   }
   //----------------------------------------------------------------
 
 
