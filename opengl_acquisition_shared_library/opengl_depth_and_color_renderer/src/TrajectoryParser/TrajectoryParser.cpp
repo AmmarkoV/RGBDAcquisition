@@ -810,7 +810,14 @@ int readVirtualStream(struct VirtualStream * newstream)
                   ( ( InputParser_GetWordChar(ipc,0,3)>='0' ) && ( InputParser_GetWordChar(ipc,0,3)<='9' )  )
                )
             {
-               unsigned int item = (unsigned int) InputParser_GetWordChar(ipc,0,3)-'0';
+
+               char name[MAX_PATH];
+               InputParser_GetWord(ipc,0,name,MAX_PATH);
+               char * itemNumStr = &name[3];
+
+               unsigned int item = atoi(itemNumStr);  // (unsigned int) InputParser_GetWordChar(ipc,0,3)-'0';
+
+               //unsigned int item = (unsigned int) InputParser_GetWordChar(ipc,0,3)-'0';
                item+= + 1; /*Item 0 is camera so we +1 */
 
                float pos[7]={0};
@@ -934,10 +941,14 @@ int readVirtualStream(struct VirtualStream * newstream)
                   ( ( InputParser_GetWordChar(ipc,0,5)>='0' ) && ( InputParser_GetWordChar(ipc,0,5)<='9' )  )
                )
             {
-               unsigned int item = (unsigned int) InputParser_GetWordChar(ipc,0,5)-'0';
-               item+= + 1; /*Item 0 is camera so we +1 */
 
                char name[MAX_PATH];
+               InputParser_GetWord(ipc,0,name,MAX_PATH);
+               char * itemNumStr = &name[5];
+
+               unsigned int item = atoi(itemNumStr);  // (unsigned int) InputParser_GetWordChar(ipc,0,5)-'0';
+               item+= + 1; /*Item 0 is camera so we +1 */
+
                InputParser_GetWord(ipc,1,name,MAX_PATH);
 
                float pos[7]={0};
