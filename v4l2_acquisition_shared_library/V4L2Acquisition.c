@@ -40,7 +40,9 @@ int createV4L2Device(int devID,char * devName,unsigned int width,unsigned int he
 {
  struct VideoFeedSettings videosettings={0};
  char BITRATE=32;
- videosettings.PixelFormat=V4L2_PIX_FMT_YUYV; BITRATE=16;// <- Common setting for UVC
+ videosettings.PixelFormat=V4L2_PIX_FMT_YUYV;
+ BITRATE=16;// <- Common setting for UVC
+ videosettings.FieldType = V4L2_FIELD_NONE;
  return VideoInput_OpenFeed(devID,devName,width,height,BITRATE,framerate,0,videosettings);
 }
 

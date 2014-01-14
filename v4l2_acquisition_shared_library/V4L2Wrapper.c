@@ -17,7 +17,7 @@ unsigned int largest_feed_y=480;
 struct Video * camera_feeds=0;
 
 
-io_method io=IO_METHOD_MMAP; /*IO_METHOD_MMAP;  IO_METHOD_READ; IO_METHOD_USERPTR;*/
+io_method io=IO_METHOD_MMAP;//  /*IO_METHOD_MMAP;  IO_METHOD_READ; IO_METHOD_USERPTR;*/
 
 
 
@@ -205,23 +205,23 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
 
 
    /* IF videosettings is null set default capture mode ( VIDEO CAPTURE , YUYV mode , INTERLACED )  */
-      if ( videosettings.EncodingType==0 ) { camera_feeds[inpt].fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE; } else
-                                           { camera_feeds[inpt].fmt.type =  videosettings.EncodingType; }
+   if ( videosettings.EncodingType==0 ) { camera_feeds[inpt].fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE; } else
+                                        { camera_feeds[inpt].fmt.type =  videosettings.EncodingType; }
 
-      if ( videosettings.PixelFormat==0 ) { camera_feeds[inpt].fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV; } else
-                                          { camera_feeds[inpt].fmt.fmt.pix.pixelformat = videosettings.PixelFormat; }
+   if ( videosettings.PixelFormat==0 ) { camera_feeds[inpt].fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV; } else
+                                       { camera_feeds[inpt].fmt.fmt.pix.pixelformat = videosettings.PixelFormat; }
 
-      if ( videosettings.FieldType==0 ) { camera_feeds[inpt].fmt.fmt.pix.field = V4L2_FIELD_INTERLACED; } else
-                                        { camera_feeds[inpt].fmt.fmt.pix.field =  videosettings.FieldType; }
+   if ( videosettings.FieldType==0 ) { camera_feeds[inpt].fmt.fmt.pix.field = V4L2_FIELD_NONE; /*V4L2_FIELD_INTERLACED;*/ } else
+                                     { camera_feeds[inpt].fmt.fmt.pix.field =  videosettings.FieldType; }
 
-      camera_feeds[inpt].input_pixel_format=camera_feeds[inpt].fmt.fmt.pix.pixelformat;
-      camera_feeds[inpt].input_pixel_format_bitdepth=bitdepth;
+   camera_feeds[inpt].input_pixel_format=camera_feeds[inpt].fmt.fmt.pix.pixelformat;
+   camera_feeds[inpt].input_pixel_format_bitdepth=bitdepth;
 
-      PrintOutCaptureMode(camera_feeds[inpt].fmt.type);
-      PrintOutPixelFormat(camera_feeds[inpt].fmt.fmt.pix.pixelformat);
-      PrintOutFieldType(camera_feeds[inpt].fmt.fmt.pix.field);
+   PrintOutCaptureMode(camera_feeds[inpt].fmt.type);
+   PrintOutPixelFormat(camera_feeds[inpt].fmt.fmt.pix.pixelformat);
+   PrintOutFieldType(camera_feeds[inpt].fmt.fmt.pix.field);
 
-       camera_feeds[inpt].decoded_pixels=0;
+   camera_feeds[inpt].decoded_pixels=0;
 
        if (!VideoFormatImplemented(camera_feeds[inpt].input_pixel_format,camera_feeds[inpt].input_pixel_format_bitdepth))
        {
@@ -254,29 +254,6 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
                     camera_feeds[inpt].frame = empty_frame;
                  }
 
-      /*
-      camera_feeds[inpt].v4l2_intf = new V4L2(camera_feeds[inpt].videoinp, io);
-       if ( camera_feeds[inpt].v4l2_intf->set(camera_feeds[inpt].fmt) == 0 ) { fprintf(stderr,"Device does not support settings:\n"); return 0; }
-         else
-       {
-           if (VIDEOINPUT_DEBUG) { fprintf(stderr,"No errors , starting camera %u / locking memory..!",inpt); }
-           camera_feeds[inpt].v4l2_intf->initBuffers();
-           camera_feeds[inpt].v4l2_intf->startCapture();
-
-           camera_feeds[inpt].frame = empty_frame;
-       }*/
-/*
-   if (VIDEOINPUT_DEBUG) { printf("Enabling Snapshots!\n"); }
-   camera_feeds[inpt].rec_video.pixels = 0; // Xreiazontai etsi wste an den theloume snapshots na min crasharei to sympan
-   camera_feeds[inpt].rec_video.size_x=width;
-   camera_feeds[inpt].rec_video.size_y=height;
-   camera_feeds[inpt].rec_video.depth=3;
-   camera_feeds[inpt].rec_video.image_size=camera_feeds[inpt].rec_video.size_x * camera_feeds[inpt].rec_video.size_y * camera_feeds[inpt].rec_video.depth;
-   if ( snapshots_on == 1 )
-    {
-        camera_feeds[inpt].rec_video.pixels = (char * ) malloc(camera_feeds[inpt].rec_video.image_size + 1);
-     8   if (camera_feeds[inpt].rec_video.pixels == 0) { fprintf(stderr,"Error allocating memory for snapshot frame"); return 0; }
-    }*/
     /* INIT MEMORY FOR SNAPSHOTS !*/
 
 
@@ -288,14 +265,7 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
    // ChooseDifferentSoftFramerate(inpt,framespersecond); // Go for a good old solid PAL 25 fps , ( the PS3 cameras may be snapping at 120fps , but VisualCortex without
                                            // hardware acceleration can`t go more than 6-8 fps )
 
-  /*  struct ThreadPassParam param={0};
-    param.feednum=inpt;
-    if ( pthread_create( &camera_feeds[inpt].loop_thread, NULL,  SnapLoop ,(void*) &param) != 0 )
-         {
-             fprintf(stderr,"Could not create the camera receiving thread.. \n");
-             VideoInput_CloseFeed(inpt);
-             return 0;
-         }*/
+
 
     unsigned int waittime=0,MAX_WAIT=10  , SLEEP_PER_LOOP_MILLI = 50 * /*Milliseconds*/ 1000;
     if (VIDEOINPUT_DEBUG) { printf("Giving some time ( max =  %u ms ) for the receive threads to wake up ",MAX_WAIT*SLEEP_PER_LOOP_MILLI); }

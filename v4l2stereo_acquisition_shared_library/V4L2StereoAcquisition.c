@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "V4L2StereoAcquisition.h"
 
-
+#define BUILD_V4L2 1
 #if BUILD_V4L2
 
 #define MAX_DEVICES 10
@@ -19,6 +19,11 @@ struct v4l2StereoDevices
     unsigned int bothHeight;
 
     unsigned int activeStream;
+
+    unsigned char * leftFrame;
+    unsigned char * rightFrame;
+    unsigned int sizeOfFeedX,sizeOfFeedY;
+    unsigned int sizePerFrame;
 };
 
 struct v4l2StereoDevices devices[MAX_DEVICES]={0};
@@ -73,6 +78,22 @@ int createV4L2StereoDevice(int devID,char * devName,unsigned int width,unsigned 
  retres+=createV4L2Device(devID+0,devName1,width,height,framerate);
  retres+=3*createV4L2Device(devID+1,devName2,width,height,framerate);
 
+
+ snapV4L2Frames(devID+0);
+ snapV4L2Frames(devID+1);
+
+ unsigned int actWidth =  getV4L2ColorWidth(devID+0);
+ unsigned int actHeight =  getV4L2ColorHeight(devID);
+ if (actWidth < getV4L2ColorWidth(devID+1) ) { actWidth=getV4L2ColorWidth(devID+1); }
+ if (actHeight < getV4L2ColorHeight(devID+1) ) { actHeight=getV4L2ColorHeight(devID+1); }
+
+ devices[devID].leftFrame = (char*) malloc (actWidth *actHeight * 3 * sizeof(char));
+ devices[devID].rightFrame= (char*) malloc (actWidth *actHeight * 3 * sizeof(char));
+ devices[devID].bothImage=  (char*) malloc (actWidth *actHeight * 3 * 2 * sizeof(char));
+ devices[devID].sizeOfFeedX=actWidth;
+ devices[devID].sizeOfFeedY=actHeight;
+ devices[devID].sizePerFrame = actWidth * actHeight * 3 ;
+
  if (retres==0)
  {
    fprintf(stderr,"Could not initialize any of the cameras!\n");
@@ -95,6 +116,12 @@ int destroyV4L2StereoDevice(int devID)
 {
  destroyV4L2Device(devID+0);
  destroyV4L2Device(devID+1);
+
+
+ if ( devices[devID].bothImage != 0 )  { free(devices[devID].bothImage); devices[devID].bothImage=0; }
+ if ( devices[devID].leftFrame != 0 )  { free(devices[devID].leftFrame);  devices[devID].leftFrame=0; }
+ if ( devices[devID].rightFrame != 0 ) { free(devices[devID].rightFrame); devices[devID].rightFrame=0; }
+
  return 0;
 }
 
@@ -102,25 +129,6 @@ int seekV4L2StereoFrame(int devID,unsigned int seekFrame)
 {
  return 0;
 }
-
-int snapV4L2StereoFrames(int devID)
-{
- snapV4L2Frames(devID+0);
- snapV4L2Frames(devID+1);
- return 0;
-}
-
-
-int getV4L2StereoNumberOfColorStreams(int devID) { return 2; }
-int switchV4L2StereoToColorStream(int devID,unsigned int streamToActivate) { devices[devID].activeStream=streamToActivate; return 1; }
-
-//Color Frame getters
-int getV4L2StereoColorWidth(int devID) { return getV4L2ColorWidth(devID)*2; }
-int getV4L2StereoColorHeight(int devID) { return getV4L2ColorHeight(devID); }
-int getV4L2StereoColorDataSize(int devID) { return getV4L2ColorDataSize(devID); }
-int getV4L2StereoColorChannels(int devID) {  return getV4L2ColorChannels(devID); }
-int getV4L2StereoColorBitsPerPixel(int devID) {  return getV4L2ColorBitsPerPixel(devID); }
-
 
 
 
@@ -138,11 +146,11 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   fprintf(stderr,"BitBlt an area of source image %u,%u  that starts at %u,%u \n",sX,sY,sourceWidth,sourceHeight);
   fprintf(stderr,"BitBlt size was width %u height %u \n",width,height);
   //Check for bounds -----------------------------------------
-  if (tX+width>=targetWidth) { width=targetWidth-tX;  }
-  if (tY+height>=targetHeight) { height=targetHeight-tY;  }
+  if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
+  if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
 
-  if (sX+width>=sourceWidth) { width=sourceWidth-sX;  }
-  if (sY+height>=sourceHeight) { height=sourceHeight-sY;  }
+  if (sX+width>=sourceWidth) { width=sourceWidth-sX-1;  }
+  if (sY+height>=sourceHeight) { height=sourceHeight-sY-1;  }
   //----------------------------------------------------------
   fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
 
@@ -188,6 +196,28 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
 
 
 
+int snapV4L2StereoFrames(int devID)
+{
+ snapV4L2Frames(devID+0);
+ memcpy( devices[devID].leftFrame , getV4L2ColorPixels(devID+0) , devices[devID].sizePerFrame );
+ snapV4L2Frames(devID+1);
+ memcpy( devices[devID].rightFrame , getV4L2ColorPixels(devID+1) , devices[devID].sizePerFrame );
+
+ return 0;
+}
+
+
+int getV4L2StereoNumberOfColorStreams(int devID) { return 2; }
+int switchV4L2StereoToColorStream(int devID,unsigned int streamToActivate) { devices[devID].activeStream=streamToActivate; return 1; }
+
+//Color Frame getters
+int getV4L2StereoColorWidth(int devID) { return getV4L2ColorWidth(devID)*2; }
+int getV4L2StereoColorHeight(int devID) { return getV4L2ColorHeight(devID); }
+int getV4L2StereoColorDataSize(int devID) { return getV4L2ColorDataSize(devID); }
+int getV4L2StereoColorChannels(int devID) {  return getV4L2ColorChannels(devID); }
+int getV4L2StereoColorBitsPerPixel(int devID) {  return getV4L2ColorBitsPerPixel(devID); }
+
+
 
 unsigned char * getV4L2StereoColorPixels(int devID)
 {
@@ -201,11 +231,11 @@ unsigned char * getV4L2StereoColorPixels(int devID)
   unsigned int height =  getV4L2ColorHeight(devID);
   //unsigned int channels =  getV4L2ColorChannels(devID);
 
-  if (devices[devID].bothImage != 0 ) { free(devices[devID].bothImage); devices[devID].bothImage=0;  }
+  // This is not needed if (devices[devID].bothImage != 0 ) { free(devices[devID].bothImage); devices[devID].bothImage=0;  }
 
   if (devices[devID].bothImage == 0 )
   {
-     devices[devID].bothImage = ( unsigned char * ) malloc (sizeof(unsigned char) * 2 * getV4L2ColorWidth(devID)*2 * getV4L2ColorHeight(devID) * getV4L2ColorChannels(devID) );
+     devices[devID].bothImage = ( unsigned char * ) malloc (sizeof(unsigned char) * 2 * getV4L2ColorWidth(devID) * getV4L2ColorHeight(devID) * getV4L2ColorChannels(devID) );
   }
 
   bitbltRGB(devices[devID].bothImage,0,0,width*2,height,

@@ -18,7 +18,7 @@
 
 #define CLEAR(x) memset (&(x), 0, sizeof (x))
 
-#define MAX_DEVICE_FILENAME 256
+#define MAX_DEVICE_FILENAME 512
 
 #define TIMEOUT_SEC 10
 #define TIMEOUT_USEC 0

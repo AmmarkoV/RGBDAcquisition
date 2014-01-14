@@ -25,7 +25,7 @@ for i in $1/*; do
   outname="$2/`printf colorFrame_0_%05d.jpg $count`"
   echo "Processing image $i output is $outname " ; 
 
-  cp $i $outname;
+  mv $i $outname;
   count=$((count + 1))
 done 
 

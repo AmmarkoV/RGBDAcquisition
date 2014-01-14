@@ -15,7 +15,7 @@ underlinedChars=$(printf "\033[4m")
 blinkingChars=$(printf "\033[5m") 
 
 
-TIME_TO_RECORD="10000"
+TIME_TO_RECORD="100000"
 OUTPUT_FILE="stereoFromCar"
 
 
@@ -31,7 +31,12 @@ fi
 
 sudo modprobe usbcore usbfs_memory_mb=1000
  
-#sudo nice -n -20 ionice -c 1 -n 0  -fps 20
-./run_grabber.sh -module V4L2STEREO -from /dev/video2,/dev/video1 -resolution 752 416 -maxFrames $TIME_TO_RECORD -o $OUTPUT_FILE
+#Viewer
+#./run_viewer.sh -module V4L2STEREO -from /dev/video2,/dev/video1 -resolution 752 416 -fps 30
+
+
+#Grabber
+#sudo nice -n -20 ionice -c 1 -n 0 
+./run_grabber.sh -module V4L2STEREO -from /dev/video2,/dev/video1 -resolution 752 416 -fps 30 -maxFrames $TIME_TO_RECORD -o $OUTPUT_FILE
 
 exit 0

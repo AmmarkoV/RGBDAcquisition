@@ -8,9 +8,10 @@ cd "$DIR"
 DATASET=""
 EXTENSION="pnm"
 
-if (( $#<1 ))
+if (( $#<2 ))
 then 
- echo "Will run as if you supplied 7 as an argument"
+ echo "Please provide arguments first argument is dataset ,  second is file format ( i.e. boxNew jpg ) "
+ exit 1
 else
  DATASET=$1
  EXTENSION=$2
