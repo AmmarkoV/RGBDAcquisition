@@ -161,8 +161,8 @@ int shiftImageDepth(unsigned short * target, unsigned short * source , unsigned 
   if (tY < 0 ) { sourceY=abs(tY); targetY=0;  } else
                { sourceY=0;       targetY=abs(tY); }
 
-  width=width - abs(tX);
-  height=height - abs(tY);
+  width=width - abs(tX)-1;
+  height=height - abs(tY)-1;
 
   if (width>sourceWidth) { width=sourceWidth; fprintf(stderr,"Error setting width (?) why did this happen ? :P \n"); }
   if (height>sourceHeight) { height=sourceHeight; fprintf(stderr,"Error setting height (?) why did this happen ? :P \n"); }
@@ -195,12 +195,12 @@ int shiftImageDepth(unsigned short * target, unsigned short * source , unsigned 
 
 
    if (tX==0) { } else
-   if (tX<0) { bitbltDepthValue(target,targetWidth+tX,0,targetWidth,targetHeight,depthVal,abs(tX),targetHeight); } else
-             { bitbltDepthValue(target,0,0,targetWidth,targetHeight,depthVal,abs(tX),targetHeight); }
+   if (tX<0)  { bitbltDepthValue(target,targetWidth+tX,0,targetWidth,targetHeight,depthVal,abs(tX),targetHeight); } else
+              { bitbltDepthValue(target,0,0,targetWidth,targetHeight,depthVal,abs(tX),targetHeight); }
 
    if (tY==0) { } else
-   if (tY<0) { bitbltDepthValue(target,0,targetHeight+tY,targetWidth,targetHeight,depthVal,targetWidth,abs(tY)); } else
-             { bitbltDepthValue(target,0,0,targetWidth,targetHeight,depthVal,targetWidth,abs(tY)); }
+   if (tY<0)  { bitbltDepthValue(target,0,targetHeight+tY,targetWidth,targetHeight,depthVal,targetWidth,abs(tY)); } else
+              { bitbltDepthValue(target,0,0,targetWidth,targetHeight,depthVal,targetWidth,abs(tY)); }
 
 
   return 1;
@@ -311,7 +311,7 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
   fprintf(stderr,"targetLineLimitPTR is %p\n",targetLineLimitPTR);
 
-  while ( (sourcePTR < sourceLimitPTR) && ( targetPTR < targetLimitPTR ) )
+  while ( (sourcePTR < sourceLimitPTR) && ( targetPTR+3 < targetLimitPTR ) )
   {
      while ( (sourcePTR < sourceLineLimitPTR) && ((targetPTR+3 < targetLineLimitPTR)) )
      {
@@ -377,7 +377,7 @@ int bitbltDepthValue(unsigned short * target,  unsigned int tX,  unsigned int tY
   targetPTR      = target + MEMPLACE1(tX,tY,targetWidth);
   targetLimitPTR = target + MEMPLACE1((tX+width),(tY+height),targetWidth);
   targetLineSkip = (targetWidth-width);
-  targetLineLimitPTR = targetPTR + (width);
+  targetLineLimitPTR = targetPTR + (width) -1 ;
 
   fprintf(stderr,"BitBlt Depth an area (%u,%u) of target image  starting at %u,%u  sized %u,%u with Depth(%u)\n",width,height,tX,tY,targetWidth,targetHeight,DepthVal);
   while ( targetPTR < targetLimitPTR )
@@ -418,7 +418,7 @@ int bitbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY  , u
   sourcePTR      = source+ MEMPLACE1(sX,sY,sourceWidth);
   sourceLimitPTR = source+ MEMPLACE1((sX+width),(sY+height),sourceWidth);
   sourceLineSkip = (sourceWidth-width)  ;
-  sourceLineLimitPTR = sourcePTR + (width);
+  sourceLineLimitPTR = sourcePTR + (width) -1;
   fprintf(stderr,"SOURCE (Depth %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
 
   targetPTR      = target + MEMPLACE1(tX,tY,targetWidth);
@@ -543,7 +543,7 @@ int bitBltDepthToFile(  char * name  ,char * comment ,
 
 unsigned int countOccurancesOfRGBPixel(unsigned char * ptrRGB , unsigned int RGBwidth , unsigned int RGBheight , unsigned char transR ,unsigned char transG , unsigned char transB)
 {
- unsigned int count = 0;
+ unsigned int cCount = 0;
  unsigned char * sourcePTR =  ptrRGB ;
  unsigned char * sourceLimitPTR =  ptrRGB + (RGBwidth*RGBheight *3);
  unsigned char R,G,B;
@@ -553,10 +553,10 @@ unsigned int countOccurancesOfRGBPixel(unsigned char * ptrRGB , unsigned int RGB
     R = *sourcePTR; ++sourcePTR;
     G = *sourcePTR; ++sourcePTR;
     B = *sourcePTR; ++sourcePTR;
-    if ( (R==transR) && (G==transG) && (B==transB) ) { ++count ; }
+    if ( (R==transR) && (G==transG) && (B==transB) ) { ++cCount; }
   }
 
- return count ;
+ return cCount;
 }
 
 
@@ -576,14 +576,7 @@ int getRGBPixel(unsigned char * ptrRGB , unsigned int RGBwidth , unsigned int RG
 
 int closeToRGB(unsigned char R , unsigned char G , unsigned char B  ,  unsigned char targetR , unsigned char targetG , unsigned char targetB , unsigned int threshold)
 {
- if (
-      ( ABSDIFF(R,targetR) < threshold ) &&
-      ( ABSDIFF(G,targetG) < threshold ) &&
-      ( ABSDIFF(B,targetB) < threshold )
-    )
-    {
-        return 1;
-    }
+ if ( ( ABSDIFF(R,targetR) < threshold ) && ( ABSDIFF(G,targetG) < threshold ) && ( ABSDIFF(B,targetB) < threshold ) )   { return 1; }
  return 0;
 }
 

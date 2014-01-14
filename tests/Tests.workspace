@@ -2,5 +2,6 @@
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
 		<Project filename="TestGJSolver/TestGJSolver.cbp" />
+		<Project filename="TestImageOps/TestImageOps.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

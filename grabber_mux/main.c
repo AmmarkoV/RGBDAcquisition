@@ -107,6 +107,8 @@ int main(int argc, char *argv[])
         )
                                          {
                                            transparency=atoi(argv[i+1]);
+                                           if (transparency>100) { transparency=100; }
+                                           //Transparency 0 = no transparency , transparency 100 = full transparency
                                            fprintf(stderr,"Setting transparency to %u \n",transparency);
                                          } else
     if (strcmp(argv[i],"-module1")==0)    {
@@ -260,7 +262,7 @@ int main(int argc, char *argv[])
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
-        fprintf(stderr,"Muxing , grabbed frame %u \n",frameNum);
+        fprintf(stderr,"Muxing %0.2f , grabbed frame %u/%u \n", frameNum*100/maxFramesToGrab , frameNum,maxFramesToGrab);
         acquisitionStartTimer(0);
 
         acquisitionSnapFrames(moduleID_1,devID_1);
