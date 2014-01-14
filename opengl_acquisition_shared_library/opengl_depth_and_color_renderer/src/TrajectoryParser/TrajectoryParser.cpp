@@ -39,6 +39,7 @@
 
 #define PRINT_DEBUGGING_INFO 0
 #define PRINT_WARNING_INFO 0
+#define PRINT_LOAD_INFO 0
 
 #define CASE_SENSITIVE_OBJECT_NAMES 0
 
@@ -648,6 +649,8 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 {
     double qX,qY,qZ,qW;
 
+    euler[0]=0.0; euler[1]=0.0; euler[2]=0.0;
+
     switch (quaternionConvention)
      {
        case 0  :
@@ -705,8 +708,10 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 
 int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ)
 {
-  fprintf(stderr,"Had rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
-  fprintf(stderr,"Moving 0 to %u , 1 to %u , 2 to %u \n",where2SendX,where2SendY,where2SendZ);
+  #if PRINT_LOAD_INFO
+   fprintf(stderr,"Had rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
+   fprintf(stderr,"Moving 0 to %u , 1 to %u , 2 to %u \n",where2SendX,where2SendY,where2SendZ);
+  #endif
 
   float tmpX = *rotX;
   float tmpY = *rotY;
@@ -725,7 +730,10 @@ int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX
   if (where2SendZ==2) { *rotZ=tmpZ; }
   //-----------------------------------------
 
-  fprintf(stderr,"Now have rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
+  #if PRINT_LOAD_INFO
+   fprintf(stderr,"Now have rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
+  #endif
+
   return 1;
 }
 
@@ -816,8 +824,6 @@ int readVirtualStream(struct VirtualStream * newstream)
                char * itemNumStr = &name[3];
 
                unsigned int item = atoi(itemNumStr);  // (unsigned int) InputParser_GetWordChar(ipc,0,3)-'0';
-
-               //unsigned int item = (unsigned int) InputParser_GetWordChar(ipc,0,3)-'0';
                item+= + 1; /*Item 0 is camera so we +1 */
 
                float pos[7]={0};
@@ -839,8 +845,11 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
                pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
                pos[6] = 0;
-               fprintf(stderr,"Tracker OBJ%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
-               fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+
+               #if PRINT_LOAD_INFO
+                fprintf(stderr,"Tracker OBJ%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+                fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+               #endif
 
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
@@ -856,7 +865,10 @@ int readVirtualStream(struct VirtualStream * newstream)
 
                if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
 
-               fprintf(stderr,"Tracker OBJ%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
+
+               #if PRINT_LOAD_INFO
+                fprintf(stderr,"Tracker OBJ%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
+               #endif
             }
               else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
@@ -965,11 +977,6 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[6] = 1.0; // InputParser_GetWordFloat(ipc,9);
                int coordLength=7;
 
-
-               //Iasonas 3x3 Rot Mat {x, -y, -z} {y, (x * y^2+z^2)/(y^2+z^2), ((-1+x) * y * z)/(y^2+z^2)} {z, ((-1+x) * y * z)/(y^2+z^2), (y^2+x * z^2)/(y^2+z^2)}
-               //double rotMat4x4[16]={0};
-               //convert3DUnit(pos[0],pos[1],pos[2],deltaX,deltaY,deltaZ,&rotMat4x4);
-
                pos[3] = InputParser_GetWordFloat(ipc,4);
                pos[4] = InputParser_GetWordFloat(ipc,5);
                pos[5] = InputParser_GetWordFloat(ipc,6);
@@ -984,8 +991,12 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
                pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
                pos[6] = 0;
-               fprintf(stderr,"Tracker ARROW%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
-               fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+
+
+               #if PRINT_LOAD_INFO
+                fprintf(stderr,"Tracker ARROW%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+                fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+               #endif
 
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
@@ -1003,7 +1014,9 @@ int readVirtualStream(struct VirtualStream * newstream)
 
                if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
 
-               fprintf(stderr,"Tracker ARROW%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
+               #if PRINT_LOAD_INFO
+                fprintf(stderr,"Tracker ARROW%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
+               #endif
             }  else
             /*! REACHED A POSITION DECLERATION ( POS(hand,0,   0.0,0.0,0.0 , 0.0,0.0,0.0,0.0 ) )
               argument 0 = POS , argument 1 = name ,  argument 2 = time in MS , argument 3-5 = X,Y,Z , argument 6-9 = Rotations*/
