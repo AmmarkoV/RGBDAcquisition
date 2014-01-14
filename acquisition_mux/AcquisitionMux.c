@@ -169,7 +169,7 @@ int mux2RGBAndDepthFramesNonTrans( unsigned char * rgbBase, unsigned char * rgbO
    {
      shiftImageRGB(rgbOverlay,rgbOverlay,transR,transG,transB,shiftX,shiftY,width,height);
      #warning "Shifting Depth Images is disabled since it seems to segfault ( probably a bad implementation on bitBltDepth ?"
-     //shiftImageDepth(depthOverlay,depthOverlay,0,shiftX,shiftY,width,height);
+     shiftImageDepth(depthOverlay,depthOverlay,0,shiftX,shiftY,width,height);
    }
 
 

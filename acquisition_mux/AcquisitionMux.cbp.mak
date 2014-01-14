@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./libAcquisitionMux.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/AcquisitionMux.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/__/tools/ImageOperations/imageOps.o $(OBJDIR_DEBUG)/AcquisitionMux.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/AcquisitionMux.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/__/tools/ImageOperations/imageOps.o $(OBJDIR_RELEASE)/AcquisitionMux.o
 
 all: debug release
 
@@ -50,6 +50,7 @@ clean: clean_debug clean_release
 
 before_debug: 
 	test -d . || mkdir -p .
+	test -d $(OBJDIR_DEBUG)/__/tools/ImageOperations || mkdir -p $(OBJDIR_DEBUG)/__/tools/ImageOperations
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 
 after_debug: 
@@ -59,16 +60,21 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
+$(OBJDIR_DEBUG)/__/tools/ImageOperations/imageOps.o: ../tools/ImageOperations/imageOps.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../tools/ImageOperations/imageOps.c -o $(OBJDIR_DEBUG)/__/tools/ImageOperations/imageOps.o
+
 $(OBJDIR_DEBUG)/AcquisitionMux.o: AcquisitionMux.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c AcquisitionMux.c -o $(OBJDIR_DEBUG)/AcquisitionMux.o
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf .
+	rm -rf $(OBJDIR_DEBUG)/__/tools/ImageOperations
 	rm -rf $(OBJDIR_DEBUG)
 
 before_release: 
 	test -d . || mkdir -p .
+	test -d $(OBJDIR_RELEASE)/__/tools/ImageOperations || mkdir -p $(OBJDIR_RELEASE)/__/tools/ImageOperations
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 
 after_release: 
@@ -78,12 +84,16 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
+$(OBJDIR_RELEASE)/__/tools/ImageOperations/imageOps.o: ../tools/ImageOperations/imageOps.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../tools/ImageOperations/imageOps.c -o $(OBJDIR_RELEASE)/__/tools/ImageOperations/imageOps.o
+
 $(OBJDIR_RELEASE)/AcquisitionMux.o: AcquisitionMux.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c AcquisitionMux.c -o $(OBJDIR_RELEASE)/AcquisitionMux.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf .
+	rm -rf $(OBJDIR_RELEASE)/__/tools/ImageOperations
 	rm -rf $(OBJDIR_RELEASE)
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release

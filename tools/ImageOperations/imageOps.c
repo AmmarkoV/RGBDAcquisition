@@ -193,7 +193,6 @@ int shiftImageDepth(unsigned short * target, unsigned short * source , unsigned 
    }
   //----------------------------------------------------------------
 
-
    if (tX==0) { } else
    if (tX<0)  { bitbltDepthValue(target,targetWidth+tX,0,targetWidth,targetHeight,depthVal,abs(tX),targetHeight); } else
               { bitbltDepthValue(target,0,0,targetWidth,targetHeight,depthVal,abs(tX),targetHeight); }
@@ -201,7 +200,6 @@ int shiftImageDepth(unsigned short * target, unsigned short * source , unsigned 
    if (tY==0) { } else
    if (tY<0)  { bitbltDepthValue(target,0,targetHeight+tY,targetWidth,targetHeight,depthVal,targetWidth,abs(tY)); } else
               { bitbltDepthValue(target,0,0,targetWidth,targetHeight,depthVal,targetWidth,abs(tY)); }
-
 
   return 1;
 }
@@ -296,20 +294,20 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   unsigned char *  sourceLimitPTR = source+ MEMPLACE3((sX+width),(sY+height),sourceWidth);
   unsigned int     sourceLineSkip = (sourceWidth-width) * 3;
   unsigned char *  sourceLineLimitPTR = sourcePTR + (width*3) -3; /*-3 is required here*/
-  fprintf(stderr,"SOURCE (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
-  fprintf(stderr,"sourcePTR is %p , limit is %p \n",sourcePTR,sourceLimitPTR);
-  fprintf(stderr,"sourceLineSkip is %u\n",        sourceLineSkip);
-  fprintf(stderr,"sourceLineLimitPTR is %p\n",sourceLineLimitPTR);
+  //fprintf(stderr,"SOURCE (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
+  //fprintf(stderr,"sourcePTR is %p , limit is %p \n",sourcePTR,sourceLimitPTR);
+  //fprintf(stderr,"sourceLineSkip is %u\n",        sourceLineSkip);
+  //fprintf(stderr,"sourceLineLimitPTR is %p\n",sourceLineLimitPTR);
 
 
   unsigned char * targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
   unsigned char * targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
   unsigned int targetLineSkip = (targetWidth-width) * 3;
   unsigned char * targetLineLimitPTR = targetPTR + (width*3) -3; /*-3 is required here*/
-  fprintf(stderr,"TARGET (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
-  fprintf(stderr,"targetPTR is %p , limit is %p \n",targetPTR,targetLimitPTR);
-  fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
-  fprintf(stderr,"targetLineLimitPTR is %p\n",targetLineLimitPTR);
+  //fprintf(stderr,"TARGET (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
+  //fprintf(stderr,"targetPTR is %p , limit is %p \n",targetPTR,targetLimitPTR);
+  //fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
+  //fprintf(stderr,"targetLineLimitPTR is %p\n",targetLineLimitPTR);
 
   while ( (sourcePTR < sourceLimitPTR) && ( targetPTR+3 < targetLimitPTR ) )
   {
@@ -372,6 +370,10 @@ int bitbltDepthValue(unsigned short * target,  unsigned int tX,  unsigned int tY
                      unsigned short DepthVal ,
                      unsigned int width , unsigned int height)
 {
+  //Check for bounds -----------------------------------------
+  if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
+  if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
+  //----------------------------------------------------------
 
   unsigned short * targetPTR; unsigned short * targetLineLimitPTR; unsigned short * targetLimitPTR;   unsigned int targetLineSkip;
   targetPTR      = target + MEMPLACE1(tX,tY,targetWidth);
@@ -419,12 +421,12 @@ int bitbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY  , u
   sourceLimitPTR = source+ MEMPLACE1((sX+width),(sY+height),sourceWidth);
   sourceLineSkip = (sourceWidth-width)  ;
   sourceLineLimitPTR = sourcePTR + (width) -1;
-  fprintf(stderr,"SOURCE (Depth %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
+  //fprintf(stderr,"SOURCE (Depth %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
 
   targetPTR      = target + MEMPLACE1(tX,tY,targetWidth);
   //targetLimitPTR = target + MEMPLACE1((tX+width),(tY+height),targetWidth);
   targetLineSkip = (targetWidth-width)  ;
-  fprintf(stderr,"TARGET (Depth %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
+  //fprintf(stderr,"TARGET (Depth %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
 
   while (sourcePTR < sourceLimitPTR)
   {

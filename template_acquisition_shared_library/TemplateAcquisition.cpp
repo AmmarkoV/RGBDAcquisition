@@ -27,6 +27,12 @@
 #define DEFAULT_FOCAL_LENGTH 120.0
 #define DEFAULT_PIXEL_SIZE 0.1052
 
+#define REALLOCATE_ON_EVERY_SNAP 0
+ #if REALLOCATE_ON_EVERY_SNAP
+         #warning "Reallocating arrays on every frame , performance --"
+        #else
+         #warning "Not Reallocating arrays on every frame this means better performance but if stream dynamically changes resolution from frame to frame this could be a problem"
+ #endif
 
 #define PRINT_COMMENTS 1
 #define PRINT_DEBUG_EACH_CALL 0
@@ -124,13 +130,13 @@ int setTemplateDepthCalibration(int devID,struct calibration * calib)
 
 
 
-unsigned char * ReadPPM(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
+unsigned char * ReadPPM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     #if PRINT_DEBUG_EACH_CALL
      fprintf(stderr,"TemplateAcquisition : Reading file %s \n",filename);
     #endif // PRINT_DEBUG_EACH_CALL
 
-    unsigned char * pixels=0;
+    unsigned char * pixels=buffer;
     FILE *pf=0;
     pf = fopen(filename,"rb");
 
@@ -169,7 +175,7 @@ unsigned char * ReadPPM(char * filename,unsigned int *width,unsigned int *height
 
         *width=w;
         *height=h;
-        pixels= (unsigned char*) malloc(w*h*3*sizeof(unsigned char));
+        if (pixels==0) {  pixels= (unsigned char*) malloc(w*h*3*sizeof(unsigned char)); }
 
         if ( pixels != 0 )
         {
@@ -198,13 +204,13 @@ unsigned char * ReadPPM(char * filename,unsigned int *width,unsigned int *height
 
 
 
-unsigned short * ReadPPMD(char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
+unsigned short * ReadPPMD(unsigned short * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     #if PRINT_DEBUG_EACH_CALL
      fprintf(stderr,"TemplateAcquisition : Reading file %s \n",filename);
     #endif // PRINT_DEBUG_EACH_CALL
 
-    unsigned short * pixels=0;
+    unsigned short * pixels=buffer;
     FILE *pf=0;
     pf = fopen(filename,"rb");
 
@@ -244,7 +250,7 @@ unsigned short * ReadPPMD(char * filename,unsigned int *width,unsigned int *heig
 
         *width=w;
         *height=h;
-        pixels= (unsigned short*) malloc(w*h*sizeof(unsigned short)); /*Only 1 channel in depth images 3*/
+        if ( pixels == 0 ) { pixels= (unsigned short*) malloc(w*h*sizeof(unsigned short)); } /*Only 1 channel in depth images 3*/
 
         if ( pixels != 0 )
         {
@@ -383,7 +389,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
   char file_name_test[1024];
   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
-  unsigned char * tmpColor = ReadPPM(file_name_test,&widthInternal,&heightInternal, &timestampInternal);
+  unsigned char * tmpColor = ReadPPM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
@@ -397,7 +403,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
 
   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
-  unsigned short * tmpDepth = ReadPPMD(file_name_test,&widthInternal,&heightInternal, &timestampInternal);
+  unsigned short * tmpDepth = ReadPPMD(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
@@ -477,8 +483,10 @@ int snapTemplateFrames(int devID)
     //fprintf(stderr,"Snap color %s\n",file_name_test);
     if (FileExists(file_name_test))
      {
-       if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); }
-       device[devID].templateColorFrame = ReadPPM(file_name_test,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
+       #if REALLOCATE_ON_EVERY_SNAP
+         if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); device[devID].templateColorFrame=0; }
+       #endif
+       device[devID].templateColorFrame = ReadPPM(device[devID].templateColorFrame,file_name_test,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
        ++found_frames;
      }
 
@@ -486,8 +494,10 @@ int snapTemplateFrames(int devID)
     //fprintf(stderr,"Snap depth %s",file_name_test);
     if (FileExists(file_name_test))
      {
-      if (device[devID].templateDepthFrame!=0) { free(device[devID].templateDepthFrame); }
-      device[devID].templateDepthFrame = ReadPPMD(file_name_test,&widthInternal,&heightInternal,&device[devID].lastDepthTimestamp);
+      #if REALLOCATE_ON_EVERY_SNAP
+        if (device[devID].templateDepthFrame!=0) { free(device[devID].templateDepthFrame); device[devID].templateDepthFrame=0; }
+      #endif
+      device[devID].templateDepthFrame = ReadPPMD(device[devID].templateDepthFrame,file_name_test,&widthInternal,&heightInternal,&device[devID].lastDepthTimestamp);
       ++found_frames;
      }
 

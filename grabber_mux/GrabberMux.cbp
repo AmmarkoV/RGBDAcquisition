@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=" -transparency 40 -module1 TEMPLATE -from1 grasp01-01 -module2 TEMPLATE -from2 hoaOGL2  -o hoaOGLMux2 -shiftX 9 -maxFrames 5 -background 255 255 255 -maxFrames 1642" />
+				<Option parameters=" -transparency 40 -module1 TEMPLATE -from1 grasp01-01 -module2 TEMPLATE -from2 synergies  -o hoaOGLMux2 -shiftX 9 -maxFrames 5 -background 255 255 255 -maxFrames 1642" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
