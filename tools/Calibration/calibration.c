@@ -27,9 +27,16 @@
 
 #define RESPECT_LOCALES 0 //<- This should in my opinion be always 0
 
+unsigned char warnUSLocale = 0;
+
 int forceUSLocaleToKeepOurSanity()
 {
-   fprintf(stderr,"Reinforcing EN_US locale to force commas to dots\n");
+   if (!warnUSLocale)
+      {
+        fprintf(stderr,"Reinforcing EN_US locale to force commas to dots (This warning appears only one time)\n");
+        warnUSLocale=1;
+      }
+
    setlocale(LC_ALL, "en_US.UTF-8");
    setlocale(LC_NUMERIC, "en_US.UTF-8");
    return 1;
@@ -113,12 +120,9 @@ float internationalAtof(char * str)
 
 
 
-int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib)
+int RefreshCalibration(char * filename,struct calibration * calib)
 {
   forceUSLocaleToKeepOurSanity();
-
-  //First free
-  NullCalibration(width,height,calib);
 
   FILE * fp = 0;
   fp = fopen(filename,"r");
@@ -135,7 +139,7 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
 
   while ( fgets(line,MAX_LINE_CALIBRATION,fp)!=0 )
    {
-     unsigned int lineLength = strlen ( line );
+     lineLength = strlen ( line );
      if ( lineLength > 0 ) {
                                  if (line[lineLength-1]==10) { line[lineLength-1]=0; /*fprintf(stderr,"-1 newline \n");*/ }
                                  if (line[lineLength-1]==13) { line[lineLength-1]=0; /*fprintf(stderr,"-1 newline \n");*/ }
@@ -154,6 +158,8 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
      if ( (line[0]=='%') && (line[1]=='N') && (line[2]=='F') && (line[3]==0) ) { category=5;    } else
      if ( (line[0]=='%') && (line[1]=='U') && (line[2]=='N') && (line[3]=='I')
                          && (line[4]=='T') && (line[5]==0) )                   { category=6;    } else
+     if ( (line[0]=='%') && (line[1]=='R') && (line[2]=='T') && (line[3]=='4')
+                         && (line[4]=='*') && (line[5]=='4') && (line[6]==0) ) { category=7;    } else
         {
           #if DEBUG_PRINT_EACH_CALIBRATION_LINE_READ
            fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
@@ -222,7 +228,31 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
            {
              case 1 :  calib->depthUnit = (double) internationalAtof(line); break;
            };
+          } else
+          if (category==7)
+          {
+           calib->extrinsicParametersSet=1;
+           switch(linesAtCurrentCategory)
+           {
+             case 1 :  calib->extrinsic[0]  = (double) internationalAtof(line); break;
+             case 2 :  calib->extrinsic[1]  = (double) internationalAtof(line); break;
+             case 3 :  calib->extrinsic[2]  = (double) internationalAtof(line); break;
+             case 4 :  calib->extrinsic[3]  = (double) internationalAtof(line); break;
+             case 5 :  calib->extrinsic[4]  = (double) internationalAtof(line); break;
+             case 6 :  calib->extrinsic[5]  = (double) internationalAtof(line); break;
+             case 7 :  calib->extrinsic[6]  = (double) internationalAtof(line); break;
+             case 8 :  calib->extrinsic[7]  = (double) internationalAtof(line); break;
+             case 9 :  calib->extrinsic[8]  = (double) internationalAtof(line); break;
+             case 10:  calib->extrinsic[9]  = (double) internationalAtof(line); break;
+             case 11:  calib->extrinsic[10] = (double) internationalAtof(line); break;
+             case 12:  calib->extrinsic[11] = (double) internationalAtof(line); break;
+             case 13:  calib->extrinsic[12] = (double) internationalAtof(line); break;
+             case 14:  calib->extrinsic[13] = (double) internationalAtof(line); break;
+             case 15:  calib->extrinsic[14] = (double) internationalAtof(line); break;
+             case 16:  calib->extrinsic[15] = (double) internationalAtof(line); break;
+           };
           }
+
 
 
         }
@@ -238,8 +268,12 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
 }
 
 
-
-
+int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib)
+{
+  //First free
+  NullCalibration(width,height,calib);
+  return RefreshCalibration(filename,calib);
+}
 
 
 
@@ -265,7 +299,7 @@ int WriteCalibration(char * filename,struct calibration * calib)
 
     fprintf( fp, "%%ImageWidth=%u\n",calib->width);
     fprintf( fp, "%%ImageHeight=%u\n",calib->height);
-    fprintf( fp, "%%Description=After %u images , board is %ux%u , square size is %u , aspect ratio %0.2f\n",
+    fprintf( fp, "%%Description=After %u images , board is %ux%u , square size is %f , aspect ratio %0.2f\n",
                                                     calib->imagesUsed,
                                                     calib->boardWidth,
                                                     calib->boardHeight,

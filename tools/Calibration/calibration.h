@@ -52,6 +52,7 @@ struct calibration
   char extrinsicParametersSet;
   double extrinsicRotationRodriguez[3];
   double extrinsicTranslation[3];
+  double extrinsic[16];
 
   /*CAMERA DIMENSIONS ( WHEN RENDERING )*/
   double nearPlane,farPlane;
@@ -107,7 +108,17 @@ int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,
 
 
 /**
- * @brief  Parse a file and get the calibration specified into struct calibration * calib
+ * @brief  Refresh a calibration structure with incremental data from calib file
+ * @ingroup calibration
+ * @param  filename , Path to file to read
+ * @param  Pointer , Pointer to the calibration to be filled with the values of the file
+ * @retval 1=Success , 0=Failure
+ */
+int RefreshCalibration(char * filename,struct calibration * calib);
+
+
+/**
+ * @brief  Parse a new file and get the calibration specified into struct calibration * calib
  * @ingroup calibration
  * @param  filename , Path to file to read
  * @param  width , With of frames

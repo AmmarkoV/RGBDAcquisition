@@ -479,6 +479,14 @@ int snapTemplateFrames(int devID)
     //-----------------------------------------------------------------
 
 
+    sprintf(file_name_test,"frames/%s/cameraPose_%u_%05u.calib",device[devID].readFromDir,devIDRead,device[devID].cycle);
+    if ( RefreshCalibration(file_name_test,&device[devID].calibRGB) )
+     {
+       fprintf(stderr,"Refreshed calibration data %u \n",device[devID].cycle);
+     }
+
+
+
     sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devIDRead,device[devID].cycle);
     //fprintf(stderr,"Snap color %s\n",file_name_test);
     if (FileExists(file_name_test))

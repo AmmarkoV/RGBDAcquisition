@@ -67,9 +67,8 @@ int queryctrl_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_quer
 int setctrl_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_control  control);
 int getctrl_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_control *control);
 
-int setsparam_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_fract *tpf);
+int setsparam_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_streamparm *param);
 int setFramerate_v4l2intf(struct V4L2_c_interface * v4l2_interface,unsigned int fps);
-int getFramerateIntervals_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_frmivalenum *argp);
 
 
 int initread_v4l2intf(struct V4L2_c_interface * v4l2_interface,unsigned int buffer_size);

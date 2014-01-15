@@ -28,6 +28,8 @@
 
 unsigned char warnNoDepth=0;
 
+unsigned int windowX=0,windowY=0;
+
 char inputname[512]={0};
 unsigned int frameNum=0;
 
@@ -99,7 +101,20 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
       {
        //We convert RGB -> BGR @ imageViewableBFR so that we wont access original memory ,and OpenCV can happily display the correct colors etc
        if ( (bitsperpixel==8) && (channels==3) ) { cvCvtColor(imageRGB , imageViewableBGR , CV_RGB2BGR); }
-       cvShowImage("RGBDAcquisition RGB ",imageViewableBGR);
+
+       if ( (windowX!=0) && (windowY!=0) )
+          {
+            //Enforce a different window size for the rgb window ( so we also need to rescale )
+            CvSize rescaleSize = cvSize(windowX,windowY);
+            IplImage* rescaledWindow=cvCreateImage(rescaleSize,IPL_DEPTH_8U ,channels);
+            cvResize(imageViewableBGR,rescaledWindow,CV_INTER_LINEAR);
+            cvShowImage("RGBDAcquisition RGB ",rescaledWindow);
+            cvReleaseImage( &rescaledWindow );
+          } else
+          {
+            cvShowImage("RGBDAcquisition RGB ",imageViewableBGR);
+          }
+
       } else
       {
        fprintf(stderr,RED "Will not view RGB Frame , it is empty \n" NORMAL);
@@ -122,7 +137,17 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
       {
        IplImage *rdepth8  = cvCreateImage(cvSize(width , height), IPL_DEPTH_8U, 1);
        cvConvertScaleAbs(imageDepth, rdepth8, 255.0/2048,0);
-       cvShowImage("RGBDAcquisition Depth", rdepth8);
+       if ( (windowX!=0) && (windowY!=0) )
+            { //Enforce a different window size for the depth window ( so we also need to rescale )
+              CvSize rescaleSize = cvSize(windowX,windowY);
+              IplImage* rescaledWindow=cvCreateImage(rescaleSize,IPL_DEPTH_8U , 1);
+              cvResize(rdepth8,rescaledWindow,CV_INTER_LINEAR);
+              cvShowImage("RGBDAcquisition Depth ",rescaledWindow);
+              cvReleaseImage( &rescaledWindow );
+            } else
+            {
+              cvShowImage("RGBDAcquisition Depth", rdepth8);
+            }
        cvReleaseImage( &rdepth8 );
       } else
       {
@@ -163,6 +188,11 @@ int main(int argc, char *argv[])
                                              width=atoi(argv[i+1]);
                                              height=atoi(argv[i+2]);
                                              fprintf(stderr,"Resolution set to %u x %u \n",width,height);
+                                           } else
+    if (strcmp(argv[i],"-window")==0) {
+                                             windowX=atoi(argv[i+1]);
+                                             windowY=atoi(argv[i+2]);
+                                             fprintf(stderr,"Window Sizes set to %u x %u \n",windowX,windowY);
                                            } else
     if (strcmp(argv[i],"-calibration")==0) {
                                              calibrationSet=1;

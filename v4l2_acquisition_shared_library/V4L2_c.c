@@ -1,6 +1,5 @@
 #include "V4L2_c.h"
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,11 +24,6 @@ static int xioctl(int fd,int request,void * arg)
    while (-1 == r && EINTR == errno);
    return r;
 };
-
-int test_ioctl(int fd, int cmd, void *arg)
-{
-	return ioctl(fd, cmd, arg);
-}
 
 int populateAndStart_v4l2intf(struct V4L2_c_interface * v4l2_interface,char * device,int method_used)
 {
@@ -110,24 +104,21 @@ int getctrl_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_contro
 }
 
 
-int setsparam_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_fract *tpf)
+int setsparam_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_streamparm *param)
 {
-  if (-1 == xioctl (v4l2_interface->fd, VIDIOC_S_PARM, tpf)) { return 0; } else { return 1; }
+  if (-1 == xioctl (v4l2_interface->fd, VIDIOC_S_PARM, param)) { return 0; } else { return 1; }
 }
 
 
 int setFramerate_v4l2intf(struct V4L2_c_interface * v4l2_interface,unsigned int fps)
 {
-  struct v4l2_fract tpf={0};
-  tpf.numerator = 1;
-  tpf.denominator = (unsigned int) fps;
-  return setsparam_v4l2intf(v4l2_interface,&tpf);
-}
+  #warning "setFramerate is not working "
+  struct v4l2_streamparm parm={0};
+  parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  parm.parm.capture.timeperframe.numerator = 1;
+  parm.parm.capture.timeperframe.denominator = (unsigned int) fps;
 
-
-int getFramerateIntervals_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_frmivalenum *argp)
-{
-  if (-1 == xioctl (v4l2_interface->fd, VIDIOC_ENUM_FRAMEINTERVALS, argp)) { return 0; } else { return 1; }
+  return setsparam_v4l2intf(v4l2_interface,&parm);
 }
 
 
@@ -427,9 +418,9 @@ void * getFrame_v4l2intf(struct V4L2_c_interface * v4l2_interface)
 
 
 
-static char * num2s(unsigned num)
+static char * num2s(unsigned num,char * buf)
 {
-	char buf[10];
+	//char buf[10];
 	sprintf(buf, "%08x", num);
 	return buf;
 }
@@ -464,11 +455,9 @@ char * buftype2s(int type)
 	}
 }
 
-char * fcc2s(unsigned int val)
+char * fcc2s(unsigned int val,char * s)
 {
-
-	char s[10];
-
+    //char s[10];
 	s[0]= val & 0xff;
 	s[1]= (val >> 8) & 0xff;
 	s[2]= (val >> 16) & 0xff;
@@ -528,37 +517,104 @@ char * colorspace2s(int val)
 	}
 }
 
+
+
+char * frmtype2s(unsigned type)
+{
+	static const char *types[] = { "Unknown", "Discrete", "Continuous", "Stepwise" };
+	if (type > 3) type = 0;
+	return types[type];
+}
+
+char * fract2sec(const struct v4l2_fract *f,char * buf)
+{
+	//char buf[100];
+	sprintf(buf, "%.3f", (1.0 * f->numerator) / f->denominator);
+	return buf;
+}
+
+char * fract2fps(const struct v4l2_fract *f,char * buf)
+{
+	//char buf[100];
+	sprintf(buf, "%.3f", (1.0 * f->denominator) / f->numerator);
+	return buf;
+}
+
+
+void print_frmsize(const struct v4l2_frmsizeenum * frmsize, const char *prefix)
+{
+	printf("%s\tSize: %s ", prefix, frmtype2s(frmsize->type));
+	if (frmsize->type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+		printf("%dx%d", frmsize->discrete.width, frmsize->discrete.height);
+	} else
+	if (frmsize->type == V4L2_FRMSIZE_TYPE_STEPWISE)
+	  {
+		printf("%dx%d - %dx%d with step %d/%d",
+				frmsize->stepwise.min_width,
+				frmsize->stepwise.min_height,
+				frmsize->stepwise.max_width,
+				frmsize->stepwise.max_height,
+				frmsize->stepwise.step_width,
+				frmsize->stepwise.step_height);
+	  }
+	printf("\n");
+}
+
+
+void print_frmival(const struct v4l2_frmivalenum * frmival, const char *prefix)
+{
+    char buf1[100];
+    char buf2[100];
+	//printf("%s\tInterval: %s ", prefix, frmtype2s(frmival->type).c_str());
+	if (frmival->type == V4L2_FRMIVAL_TYPE_DISCRETE)
+    {
+       //printf("%ss (%s fps)\n", fract2sec(frmival,buf1), fract2fps(frmival,buf2) );
+	} else
+	if (frmival->type == V4L2_FRMIVAL_TYPE_STEPWISE)
+    {/*
+		printf("%ss - %ss with step %ss (%s-%s fps)\n",
+				fract2sec(frmival->stepwise.min,buf),
+				fract2sec(frmival->stepwise.max,buf),
+				fract2sec(frmival->stepwise.step,buf),
+				fract2fps(frmival->stepwise.max,buf),
+				fract2fps(frmival->stepwise.min,buf)   );*/
+	}
+}
+
+
 void print_video_formats_ext(int fd, enum v4l2_buf_type type)
 {
 	struct v4l2_fmtdesc fmt;
 	struct v4l2_frmsizeenum frmsize;
 	struct v4l2_frmivalenum frmival;
 
+
+    char ps[100];
 	fmt.index = 0;
 	fmt.type = type;
 	fprintf(stderr,"Printing Video Formats \n");
-	while (test_ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0)
+	while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0)
     {
 		printf("\tIndex       : %d\n", fmt.index);
 		printf("\tType        : %s\n", buftype2s(type));
-		printf("\tPixel Format: '%s'", fcc2s(fmt.pixelformat));
+		printf("\tPixel Format: '%s'", fcc2s(fmt.pixelformat,ps));
 		if (fmt.flags) { printf(" (%s)", fmtdesc2s(fmt.flags)); }
 		printf("\n");
 		printf("\tName        : %s\n", fmt.description);
 		frmsize.pixel_format = fmt.pixelformat;
 		frmsize.index = 0;
-		while (test_ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0)
+		while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0)
 		{
-			print_frmsize(frmsize, "\t");
+			print_frmsize(&frmsize, "\t");
 			if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE)
 			 {
 				frmival.index = 0;
 				frmival.pixel_format = fmt.pixelformat;
 				frmival.width = frmsize.discrete.width;
 				frmival.height = frmsize.discrete.height;
-				while (test_ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0)
+				while (ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0)
 				{
-					print_frmival(frmival, "\t\t");
+					print_frmival(&frmival, "\t\t");
 					frmival.index++;
 				}
 		     }

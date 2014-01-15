@@ -264,26 +264,26 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
 		      }*/
 
            if ( ! cap.device_caps & V4L2_CAP_TIMEPERFRAME )
-              { fprintf(stderr,"This Device has no framerate changin caps ?\n"); framespersecond = 0; } else
+              { fprintf(stderr,"This Device has no framerate changing capabilities ?\n"); framespersecond = 0; } else
               {
                 struct v4l2_frmivalenum argp;
                 getFramerateIntervals_v4l2intf(&camera_feeds[inpt].v4l2_interface,&argp);
+                fprintf(stderr,"Todo check if our resolution is supported here\n");
               }
        }
-
-    /* //This doesnt work as expected
-      if (framespersecond!=0)
-       {
-        if (!setFramerate_v4l2intf(&camera_feeds[inpt].v4l2_interface , (float) framespersecond ) )
-               { fprintf(stderr,"Could not set Framerate to %d  ..\n" ,framespersecond); return 0; }
-       }
-    */
 
       if ( setfmt_v4l2intf(&camera_feeds[inpt].v4l2_interface,camera_feeds[inpt].fmt) == 0 )
                 { fprintf(stderr,"Device does not support settings:\n"); return 0; } else
                  {
                     if (VIDEOINPUT_DEBUG) { fprintf(stderr,"No errors , starting camera %u / locking memory..!",inpt); }
 
+                    //This doesnt work as expected
+                    if (framespersecond!=0)
+                      {
+                          if (!setFramerate_v4l2intf(&camera_feeds[inpt].v4l2_interface , (unsigned int) framespersecond ) )
+                                              { fprintf(stderr,"Could not set Framerate to %d  ..\n" ,framespersecond);  } else
+                                              { fprintf(stderr,"Set Framerate to %d  ..\n" ,framespersecond);   }
+                      }
 
                     if ( !initBuffers_v4l2intf(&camera_feeds[inpt].v4l2_interface) ) { fprintf(stderr,"Could not initialize buffers..\n"); return 0; }
                     if ( !startCapture_v4l2intf(&camera_feeds[inpt].v4l2_interface) ) { fprintf(stderr,"Could not start capture..\n"); return 0; }
