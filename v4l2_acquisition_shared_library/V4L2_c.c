@@ -12,6 +12,11 @@
 #include <unistd.h>
 
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
 
 static int xioctl(int fd,int request,void * arg)
 {
@@ -21,8 +26,12 @@ static int xioctl(int fd,int request,void * arg)
    return r;
 };
 
+int test_ioctl(int fd, int cmd, void *arg)
+{
+	return ioctl(fd, cmd, arg);
+}
 
-int populate_v4l2intf(struct V4L2_c_interface * v4l2_interface,char * device,int method_used)
+int populateAndStart_v4l2intf(struct V4L2_c_interface * v4l2_interface,char * device,int method_used)
 {
   if (v4l2_interface==0) { fprintf(stderr,"Populate populate_v4l2intf called with an unallocated v4l2intf \n"); return 0; }
   memset(v4l2_interface,0,sizeof(struct V4L2_c_interface));
@@ -34,21 +43,21 @@ int populate_v4l2intf(struct V4L2_c_interface * v4l2_interface,char * device,int
   v4l2_interface->fd=-1;
 
   strncpy(v4l2_interface->device,device,MAX_DEVICE_FILENAME);
-  fprintf(stderr,"opening device: %s\n",device);
+  fprintf(stderr,"Opening device: %s\n",device);
 
   struct stat st={0};
   if (-1 == stat (device, &st)) { fprintf (stderr, "Cannot identify '%s': %d, %s\n",device, errno, strerror (errno)); return 0;  }
   if (!S_ISCHR (st.st_mode))    { fprintf (stderr, "%s is no device\n", device); return 0; }
 
   //We just open the /dev/videoX file descriptor and start reading..!
-  v4l2_interface->fd = open (v4l2_interface->device, O_RDWR /* required */ | O_NONBLOCK, 0);
+  v4l2_interface->fd = open (v4l2_interface->device, O_RDWR /* required */ /*| O_NONBLOCK non block*/, 0);
   if (-1 == v4l2_interface->fd)
    {
-        fprintf (stderr, "Cannot open '%s': %d, %s\n",device, errno, strerror (errno));
+        fprintf (stderr, RED "Cannot open '%s': %d, %s\n" NORMAL ,device, errno, strerror (errno));
         return 0;
    }
 
-   fprintf(stderr,"device opening ok \n");
+   fprintf(stderr,GREEN "Device opening ok \n" NORMAL);
    return 1;
 }
 
@@ -99,6 +108,28 @@ int getctrl_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_contro
 {
   if (-1 == xioctl (v4l2_interface->fd, VIDIOC_G_CTRL, &control)) { return 0; } else { return 1; }
 }
+
+
+int setsparam_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_fract *tpf)
+{
+  if (-1 == xioctl (v4l2_interface->fd, VIDIOC_S_PARM, tpf)) { return 0; } else { return 1; }
+}
+
+
+int setFramerate_v4l2intf(struct V4L2_c_interface * v4l2_interface,unsigned int fps)
+{
+  struct v4l2_fract tpf={0};
+  tpf.numerator = 1;
+  tpf.denominator = (unsigned int) fps;
+  return setsparam_v4l2intf(v4l2_interface,&tpf);
+}
+
+
+int getFramerateIntervals_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_frmivalenum *argp)
+{
+  if (-1 == xioctl (v4l2_interface->fd, VIDIOC_ENUM_FRAMEINTERVALS, argp)) { return 0; } else { return 1; }
+}
+
 
 /*
       THESE ARE THE GETTERS AND SETTERS , WE NOW MOVE TO BASIC FUNCTIONALITY
@@ -236,10 +267,10 @@ int startCapture_v4l2intf(struct V4L2_c_interface * v4l2_interface)
                                                   buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
                                                   buf.memory = V4L2_MEMORY_MMAP;
                                                   buf.index = i;
-                                                  if (-1 == xioctl (v4l2_interface->fd, VIDIOC_QBUF, &buf)) { fprintf(stderr,"Error VIDIOC_QBUF\n"); return 0; }
+                                                  if (-1 == xioctl (v4l2_interface->fd, VIDIOC_QBUF, &buf)) { fprintf(stderr,RED "Error VIDIOC_QBUF\n" NORMAL); return 0; }
                                                }
                                           type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-                                          if (-1 == xioctl (v4l2_interface->fd, VIDIOC_STREAMON, &type)) { fprintf(stderr,"Error VIDIOC_STREAMON\n");  return 0; }
+                                          if (-1 == xioctl (v4l2_interface->fd, VIDIOC_STREAMON, &type)) { fprintf(stderr,RED "Error VIDIOC_STREAMON\n" NORMAL);  return 0; }
                      break;
 
                      case IO_METHOD_USERPTR:
@@ -252,10 +283,10 @@ int startCapture_v4l2intf(struct V4L2_c_interface * v4l2_interface)
                                                       buf.index       = i;
                                                       buf.m.userptr   = (unsigned long) v4l2_interface->buffers[i].start;
                                                       buf.length      = v4l2_interface->buffers[i].length;
-                                                      if (-1 == xioctl (v4l2_interface->fd, VIDIOC_QBUF, &buf)) { fprintf(stderr,"Error VIDIOC_QBUF\n"); return 0; }
+                                                      if (-1 == xioctl (v4l2_interface->fd, VIDIOC_QBUF, &buf)) { fprintf(stderr,RED "Error VIDIOC_QBUF\n" NORMAL); return 0; }
                                                      }
                                                type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-                                              if (-1 == xioctl (v4l2_interface->fd, VIDIOC_STREAMON, &type))  { fprintf(stderr,"Error VIDIOC_STREAMON\n"); return 0; }
+                                              if (-1 == xioctl (v4l2_interface->fd, VIDIOC_STREAMON, &type))  { fprintf(stderr,RED "Error VIDIOC_STREAMON\n" NORMAL); return 0; }
                     break;
   }
 
@@ -272,7 +303,7 @@ int stopCapture_v4l2intf(struct V4L2_c_interface * v4l2_interface)
   case IO_METHOD_MMAP:
   case IO_METHOD_USERPTR:   /*Common for MMAP and userptr*/
                              type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-                             if (-1 == xioctl (v4l2_interface->fd, VIDIOC_STREAMOFF, &type)) { fprintf(stderr,"Error VIDIOC_STREAMOFF"); return 0; }
+                             if (-1 == xioctl (v4l2_interface->fd, VIDIOC_STREAMOFF, &type)) { fprintf(stderr,RED "Error VIDIOC_STREAMOFF" NORMAL); return 0; }
                              break;
   }
   return 1;
@@ -295,7 +326,7 @@ void * readFrame_v4l2intf(struct V4L2_c_interface * v4l2_interface)
                                      switch (errno) {
                                                        case EAGAIN: return 0;
                                                        case EIO: /* Could ignore EIO, see spec. */ /* fall through */
-                                                       default: fprintf(stderr,"Failed reading video stream\n");
+                                                       default: fprintf(stderr,RED "Failed reading video stream\n"NORMAL );
                                                        return 0;
                                                      }
                                   }
@@ -312,14 +343,14 @@ void * readFrame_v4l2intf(struct V4L2_c_interface * v4l2_interface)
                                      switch (errno) {
                                                         case EAGAIN: return 0;
                                                         case EIO: /* Could ignore EIO, see spec. */ /* fall through */
-                                                        default: fprintf(stderr,"Failed VIDIOC_DQBUF(1)\n");
+                                                        default: fprintf(stderr,RED "Failed VIDIOC_DQBUF(1)\n"NORMAL);
                                                         return 0;
                                                       }
                                     }
 
                             //assert (buf.index < v4l2_interface->n_buffers);
-                            if ( !(buf.index<v4l2_interface->n_buffers) ) { fprintf(stderr,"assert (buf.index < v4l2_interface->n_buffers); failed.."); return 0; }
-                            if (-1 == xioctl (v4l2_interface->fd, VIDIOC_QBUF, &buf)) { fprintf(stderr,"Failed VIDIOC_QBUF\n"); return 0; }
+                            if ( !(buf.index<v4l2_interface->n_buffers) ) { fprintf(stderr,RED "assert (buf.index < v4l2_interface->n_buffers); failed.." NORMAL); return 0; }
+                            if (-1 == xioctl (v4l2_interface->fd, VIDIOC_QBUF, &buf)) { fprintf(stderr,RED "Failed VIDIOC_QBUF\n" NORMAL); return 0; }
      //Successful IO_METHOD_MMAP..
      return v4l2_interface->buffers[buf.index].start;
     break;
@@ -332,14 +363,14 @@ void * readFrame_v4l2intf(struct V4L2_c_interface * v4l2_interface)
                                                                                         switch (errno) {
                                                                                                           case EAGAIN: return 0;
                                                                                                           case EIO: /* Could ignore EIO, see spec. */ /* fall through */
-                                                                                                          default: fprintf(stderr,"Failed VIDIOC_DQBUF(2)\n");
+                                                                                                          default: fprintf(stderr,RED "Failed VIDIOC_DQBUF(2)\n" NORMAL);
                                                                                                           return 0;
                                                                                                         }
                                                                                       }
                            for (i = 0; i < v4l2_interface->n_buffers; ++i)
                                              if (buf.m.userptr == (unsigned long) v4l2_interface->buffers[i].start && buf.length == v4l2_interface->buffers[i].length) break;
                            assert (i < v4l2_interface->n_buffers);
-                           if (-1 == xioctl (v4l2_interface->fd, VIDIOC_QBUF, &buf)) { fprintf(stderr,"Failed VIDIOC_QBUF\n"); return 0; }
+                           if (-1 == xioctl (v4l2_interface->fd, VIDIOC_QBUF, &buf)) { fprintf(stderr,RED "Failed VIDIOC_QBUF\n" NORMAL); return 0; }
     //Successful IO_METHOD_USERPTR..
     return (void *)(buf.m.userptr);
     break;
@@ -348,8 +379,6 @@ void * readFrame_v4l2intf(struct V4L2_c_interface * v4l2_interface)
 
   return 0;
 }
-
-
 
 
 
@@ -376,7 +405,7 @@ void * getFrame_v4l2intf(struct V4L2_c_interface * v4l2_interface)
     if (-1 == r) { if (EINTR == errno) continue; fprintf(stderr,"Error selecting stream\n");  return 0; }
 
 
-    if (0 == r) { fprintf (stderr, "Select call timed out\n"); return 0; }
+    if (0 == r) { fprintf (stderr, YELLOW "Select call timed out\n" NORMAL); return 0; }
 
 
     void *p=readFrame_v4l2intf(v4l2_interface);
@@ -385,5 +414,159 @@ void * getFrame_v4l2intf(struct V4L2_c_interface * v4l2_interface)
   }
 }
 
+
+/*
+    ----------------------------------------------------------
+    ----------------------------------------------------------
+
+                       Printing Data from V4L2
+
+    ----------------------------------------------------------
+    ----------------------------------------------------------
+*/
+
+
+
+static char * num2s(unsigned num)
+{
+	char buf[10];
+	sprintf(buf, "%08x", num);
+	return buf;
+}
+
+char * buftype2s(int type)
+{
+	switch (type) {
+	case 0:
+		return "Invalid";
+	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
+		return "Video Capture";
+	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
+		return "Video Capture Multiplanar";
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
+		return "Video Output";
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
+		return "Video Output Multiplanar";
+	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
+		return "Video Overlay";
+	case V4L2_BUF_TYPE_VBI_CAPTURE:
+		return "VBI Capture";
+	case V4L2_BUF_TYPE_VBI_OUTPUT:
+		return "VBI Output";
+	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
+		return "Sliced VBI Capture";
+	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
+		return "Sliced VBI Output";
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
+		return "Video Output Overlay";
+	default:
+		return "Unknown ( Error ) ";// + num2s(type) + ")";
+	}
+}
+
+char * fcc2s(unsigned int val)
+{
+
+	char s[10];
+
+	s[0]= val & 0xff;
+	s[1]= (val >> 8) & 0xff;
+	s[2]= (val >> 16) & 0xff;
+	s[3]= (val >> 24) & 0xff;
+	return s;
+}
+
+char * field2s(int val)
+{
+	switch (val) {
+	case V4L2_FIELD_ANY:
+		return "Any";
+	case V4L2_FIELD_NONE:
+		return "None";
+	case V4L2_FIELD_TOP:
+		return "Top";
+	case V4L2_FIELD_BOTTOM:
+		return "Bottom";
+	case V4L2_FIELD_INTERLACED:
+		return "Interlaced";
+	case V4L2_FIELD_SEQ_TB:
+		return "Sequential Top-Bottom";
+	case V4L2_FIELD_SEQ_BT:
+		return "Sequential Bottom-Top";
+	case V4L2_FIELD_ALTERNATE:
+		return "Alternating";
+	case V4L2_FIELD_INTERLACED_TB:
+		return "Interlaced Top-Bottom";
+	case V4L2_FIELD_INTERLACED_BT:
+		return "Interlaced Bottom-Top";
+	default:
+		return "Unknown ( Error ) ";// + num2s(val) + ")";
+	}
+}
+
+char * colorspace2s(int val)
+{
+	switch (val) {
+	case V4L2_COLORSPACE_SMPTE170M:
+		return "Broadcast NTSC/PAL (SMPTE170M/ITU601)";
+	case V4L2_COLORSPACE_SMPTE240M:
+		return "1125-Line (US) HDTV (SMPTE240M)";
+	case V4L2_COLORSPACE_REC709:
+		return "HDTV and modern devices (ITU709)";
+	case V4L2_COLORSPACE_BT878:
+		return "Broken Bt878";
+	case V4L2_COLORSPACE_470_SYSTEM_M:
+		return "NTSC/M (ITU470/ITU601)";
+	case V4L2_COLORSPACE_470_SYSTEM_BG:
+		return "PAL/SECAM BG (ITU470/ITU601)";
+	case V4L2_COLORSPACE_JPEG:
+		return "JPEG (JFIF/ITU601)";
+	case V4L2_COLORSPACE_SRGB:
+		return "SRGB";
+	default:
+		return "Unknown ( Error ) ";// + num2s(val) + ")";
+	}
+}
+
+void print_video_formats_ext(int fd, enum v4l2_buf_type type)
+{
+	struct v4l2_fmtdesc fmt;
+	struct v4l2_frmsizeenum frmsize;
+	struct v4l2_frmivalenum frmival;
+
+	fmt.index = 0;
+	fmt.type = type;
+	fprintf(stderr,"Printing Video Formats \n");
+	while (test_ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0)
+    {
+		printf("\tIndex       : %d\n", fmt.index);
+		printf("\tType        : %s\n", buftype2s(type));
+		printf("\tPixel Format: '%s'", fcc2s(fmt.pixelformat));
+		if (fmt.flags) { printf(" (%s)", fmtdesc2s(fmt.flags)); }
+		printf("\n");
+		printf("\tName        : %s\n", fmt.description);
+		frmsize.pixel_format = fmt.pixelformat;
+		frmsize.index = 0;
+		while (test_ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0)
+		{
+			print_frmsize(frmsize, "\t");
+			if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE)
+			 {
+				frmival.index = 0;
+				frmival.pixel_format = fmt.pixelformat;
+				frmival.width = frmsize.discrete.width;
+				frmival.height = frmsize.discrete.height;
+				while (test_ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0)
+				{
+					print_frmival(frmival, "\t\t");
+					frmival.index++;
+				}
+		     }
+			frmsize.index++;
+	     }
+		printf("\n");
+		fmt.index++;
+	}
+}
 
 

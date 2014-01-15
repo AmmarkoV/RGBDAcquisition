@@ -15,6 +15,8 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
+char warnDryRun=0;
+
 //This should probably pass on to each of the sub modules
 float minDistance = -10;
 float scaleFactor = 0.0021;
@@ -1322,7 +1324,9 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
 
   if (module[moduleID].device[devID].dryRunOutput)
   {
-    fprintf(stderr,"Grabber Running on Dry Run mode , ,grabbing frames and doing nothing\n");
+    if (!warnDryRun)
+     { fprintf(stderr,GREEN "Grabber Running on Dry Run mode , grabbing frames and doing nothing [ This message appears only one time ]\n" NORMAL); warnDryRun=1; }
+
     //Lets access the frames like we want to use them but not use them..
 
     StartTimer(FRAME_PASS_TO_TARGET_DELAY);

@@ -12,12 +12,21 @@
 #include "../acquisition/Acquisition.h"
 #include "../tools/Calibration/calibration.h"
 
+
+
+#define NORMAL "\033[0m"
+#define BLACK "\033[30m" /* Black */
+#define RED "\033[31m" /* Red */
+#define GREEN "\033[32m" /* Green */
+#define YELLOW "\033[33m" /* Yellow */
+
 //#include <opencv2/opencv.hpp>
 
 #include <cv.h>
 #include <cxcore.h>
 #include <highgui.h>
 
+unsigned char warnNoDepth=0;
 
 char inputname[512]={0};
 unsigned int frameNum=0;
@@ -93,7 +102,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
        cvShowImage("RGBDAcquisition RGB ",imageViewableBGR);
       } else
       {
-       fprintf(stderr,"Will not view RGB Frame , it is empty \n");
+       fprintf(stderr,RED "Will not view RGB Frame , it is empty \n" NORMAL);
       }
      imageRGB->imageData = opencv_color_pointer_retainer; // UGLY HACK
      cvReleaseImage( &imageRGB );
@@ -117,7 +126,9 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
        cvReleaseImage( &rdepth8 );
       } else
       {
-       fprintf(stderr,"Will not view Depth Frame , it is empty \n");
+       if (!warnNoDepth)
+         { fprintf(stderr,RED "\n\n\n\nWill not view Depth Frame , it is empty [ This warning will only appear once ]\n\n\n\n" NORMAL); }
+       warnNoDepth=1;
       }
 
      //cvShowImage("RGBDAcquisition Depth RAW",imageDepth);

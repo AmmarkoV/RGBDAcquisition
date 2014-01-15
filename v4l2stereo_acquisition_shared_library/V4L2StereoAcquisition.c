@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "V4L2StereoAcquisition.h"
 
-#define BUILD_V4L2 1
+
 #if BUILD_V4L2
 
 #define MAX_DEVICES 10

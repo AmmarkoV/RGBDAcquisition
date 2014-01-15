@@ -54,7 +54,7 @@ struct V4L2_c_interface
   unsigned int n_buffers;
 };
 
-int populate_v4l2intf(struct V4L2_c_interface * v4l2_interface,char * device,int method_used);
+int populateAndStart_v4l2intf(struct V4L2_c_interface * v4l2_interface,char * device,int method_used);
 int destroy_v4l2intf(struct V4L2_c_interface * v4l2_interface);
 int getFileDescriptor_v4l2intf(struct V4L2_c_interface * v4l2_interface);
 
@@ -67,6 +67,11 @@ int queryctrl_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_quer
 int setctrl_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_control  control);
 int getctrl_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_control *control);
 
+int setsparam_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_fract *tpf);
+int setFramerate_v4l2intf(struct V4L2_c_interface * v4l2_interface,unsigned int fps);
+int getFramerateIntervals_v4l2intf(struct V4L2_c_interface * v4l2_interface,struct v4l2_frmivalenum *argp);
+
+
 int initread_v4l2intf(struct V4L2_c_interface * v4l2_interface,unsigned int buffer_size);
 int inituserp_v4l2intf(struct V4L2_c_interface * v4l2_interface,unsigned int buffer_size);
 int initmmap_v4l2intf(struct V4L2_c_interface * v4l2_interface);
@@ -76,6 +81,8 @@ int freeBuffers_v4l2intf(struct V4L2_c_interface * v4l2_interface);
 
 int startCapture_v4l2intf(struct V4L2_c_interface * v4l2_interface);
 int stopCapture_v4l2intf(struct V4L2_c_interface * v4l2_interface);
+
+void print_video_formats_ext(int fd, enum v4l2_buf_type type);
 
 void * getFrame_v4l2intf(struct V4L2_c_interface * v4l2_interface);
 

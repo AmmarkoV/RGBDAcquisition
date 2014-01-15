@@ -223,6 +223,7 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
 
    camera_feeds[inpt].decoded_pixels=0;
 
+
        if (!VideoFormatImplemented(camera_feeds[inpt].input_pixel_format,camera_feeds[inpt].input_pixel_format_bitdepth))
        {
           fprintf(stderr,(char *)"Video format not implemented!!! :S \n");
@@ -240,19 +241,56 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
 
       fprintf(stderr,(char *)"Starting camera , if it segfaults consider running \nLD_PRELOAD=/usr/lib/libv4l/v4l2convert.so  executable_name\n");
 
-      if (!populate_v4l2intf(&camera_feeds[inpt].v4l2_interface,camera_feeds[inpt].videoinp,io) ) { fprintf(stderr,"Could not populate v4l2 interface..\n"); return 0; }
 
+      if (!populateAndStart_v4l2intf(&camera_feeds[inpt].v4l2_interface,camera_feeds[inpt].videoinp,io) ) { fprintf(stderr,"Could not populate and start v4l2 interface..\n"); return 0; }
+
+       struct v4l2_capability cap;
+       if (getcap_v4l2intf(&camera_feeds[inpt].v4l2_interface,&cap))
+       {
+           fprintf(stderr,"Device Bus ....... %s \n" ,cap.bus_info);
+           fprintf(stderr,"Card       ....... %s \n" ,cap.card);
+           fprintf(stderr,"Driver     ....... %s \n" ,cap.driver);
+           fprintf(stderr,"Driver Version ... %d.%d.%d\n",cap.version >> 16,(cap.version >> 8) & 0xff,cap.version & 0xff);
+		   fprintf(stderr,"Capabilities ..... 0x%08X\n", cap.capabilities);
+		   fprintf(stderr,"DevCapabilities .. 0x%08X\n", cap.device_caps);
+
+		   print_video_formats_ext(&camera_feeds[inpt].v4l2_interface,V4L2_BUF_TYPE_VIDEO_CAPTURE);
+		   /*
+		   fprintf(stderr,"%s", cap2s(cap.capabilities).c_str());
+		   if (vcap.capabilities & V4L2_CAP_DEVICE_CAPS)
+              {
+			   printf("\tDevice Caps   : 0x%08X\n", vcap.device_caps);
+			   printf("%s", cap2s(vcap.device_caps).c_str());
+		      }*/
+
+           if ( ! cap.device_caps & V4L2_CAP_TIMEPERFRAME )
+              { fprintf(stderr,"This Device has no framerate changin caps ?\n"); framespersecond = 0; } else
+              {
+                struct v4l2_frmivalenum argp;
+                getFramerateIntervals_v4l2intf(&camera_feeds[inpt].v4l2_interface,&argp);
+              }
+       }
+
+    /* //This doesnt work as expected
+      if (framespersecond!=0)
+       {
+        if (!setFramerate_v4l2intf(&camera_feeds[inpt].v4l2_interface , (float) framespersecond ) )
+               { fprintf(stderr,"Could not set Framerate to %d  ..\n" ,framespersecond); return 0; }
+       }
+    */
 
       if ( setfmt_v4l2intf(&camera_feeds[inpt].v4l2_interface,camera_feeds[inpt].fmt) == 0 )
                 { fprintf(stderr,"Device does not support settings:\n"); return 0; } else
                  {
                     if (VIDEOINPUT_DEBUG) { fprintf(stderr,"No errors , starting camera %u / locking memory..!",inpt); }
 
+
                     if ( !initBuffers_v4l2intf(&camera_feeds[inpt].v4l2_interface) ) { fprintf(stderr,"Could not initialize buffers..\n"); return 0; }
                     if ( !startCapture_v4l2intf(&camera_feeds[inpt].v4l2_interface) ) { fprintf(stderr,"Could not start capture..\n"); return 0; }
 
                     camera_feeds[inpt].frame = empty_frame;
                  }
+
 
     /* INIT MEMORY FOR SNAPSHOTS !*/
 
