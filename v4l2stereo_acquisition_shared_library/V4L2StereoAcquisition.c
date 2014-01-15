@@ -81,6 +81,7 @@ int createV4L2StereoDevice(int devID,char * devName,unsigned int width,unsigned 
 
  snapV4L2Frames(devID+0);
  snapV4L2Frames(devID+1);
+ snapV4L2Frames(devID+0); //Snap another frame to achieve sync
 
  unsigned int actWidth =  getV4L2ColorWidth(devID+0);
  unsigned int actHeight =  getV4L2ColorHeight(devID);
@@ -199,8 +200,8 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
 int snapV4L2StereoFrames(int devID)
 {
  snapV4L2Frames(devID+0);
- memcpy( devices[devID].leftFrame , getV4L2ColorPixels(devID+0) , devices[devID].sizePerFrame );
  snapV4L2Frames(devID+1);
+ memcpy( devices[devID].leftFrame , getV4L2ColorPixels(devID+0) , devices[devID].sizePerFrame );
  memcpy( devices[devID].rightFrame , getV4L2ColorPixels(devID+1) , devices[devID].sizePerFrame );
 
  return 0;

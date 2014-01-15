@@ -27,16 +27,25 @@ then
 else
  OUTPUT_FILE=$1
 fi
+
+
+
  
+WIDTH="752"
+HEIGHT="416"
+
+#WIDTH="1280"
+#HEIGHT="720"
+FPS="30"
 
 sudo modprobe usbcore usbfs_memory_mb=1000
  
 #Viewer
-#./run_viewer.sh -module V4L2STEREO -from /dev/video2,/dev/video1 -resolution 752 416 -fps 30
+./run_viewer.sh -module V4L2STEREO -from /dev/video2,/dev/video1 -resolution $WIDTH $HEIGHT -fps $FPS 
 
 
 #Grabber
 #sudo nice -n -20 ionice -c 1 -n 0 
-./run_grabber.sh -module V4L2STEREO -from /dev/video2,/dev/video1 -resolution 752 416 -fps 30 -maxFrames $TIME_TO_RECORD -o $OUTPUT_FILE
+#./run_grabber.sh -module V4L2STEREO -from /dev/video2,/dev/video1 -resolution $WIDTH $HEIGHT -fps $FPS -maxFrames $TIME_TO_RECORD -o $OUTPUT_FILE
 
 exit 0
