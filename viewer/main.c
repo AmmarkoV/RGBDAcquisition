@@ -106,7 +106,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
      imageRGB->imageData = (char *) acquisitionGetColorFrame(moduleID,devID);
      if (imageRGB->imageData != 0)
       {
-        sprintf(windowName,"RGBDAcquisition RGB Module %u Device %u",moduleID,devID);
+        sprintf(windowName,"RGBDAcquisition RGB - Module %u Device %u",moduleID,devID);
 
        //We convert RGB -> BGR @ imageViewableBFR so that we wont access original memory ,and OpenCV can happily display the correct colors etc
        if ( (bitsperpixel==8) && (channels==3) ) { cvCvtColor(imageRGB , imageViewableBGR , CV_RGB2BGR); }
@@ -144,7 +144,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
      if (imageDepth->imageData != 0)
       {
-       sprintf(windowName,"RGBDAcquisition Depth Module %u Device %u\n",moduleID,devID);
+       sprintf(windowName,"RGBDAcquisition Depth - Module %u Device %u",moduleID,devID);
 
        IplImage *rdepth8  = cvCreateImage(cvSize(width , height), IPL_DEPTH_8U, 1);
        cvConvertScaleAbs(imageDepth, rdepth8, 255.0/2048,0);
