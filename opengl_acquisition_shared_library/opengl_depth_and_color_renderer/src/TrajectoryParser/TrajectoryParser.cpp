@@ -410,7 +410,8 @@ int addObjectToVirtualStream(
                               unsigned int coordLength ,
                               float scaleX,
                               float scaleY,
-                              float scaleZ
+                              float scaleZ,
+                              unsigned int particleNumber
                             )
 {
    if (stream->MAX_numberOfObjects<=stream->numberOfObjects+1) { growVirtualStreamObjects(stream,OBJECTS_TO_ADD_STEP); }
@@ -433,6 +434,7 @@ int addObjectToVirtualStream(
    stream->object[pos].scaleX = scaleX;
    stream->object[pos].scaleY = scaleY;
    stream->object[pos].scaleZ = scaleZ;
+   stream->object[pos].particleNumber = particleNumber;
 
    stream->object[pos].frame=0;
 
@@ -939,7 +941,30 @@ int readVirtualStream(struct VirtualStream * newstream)
                float scaleZ = (float) InputParser_GetWordFloat(ipc,10);
 
                //Value , not used : InputParser_GetWord(ipc,8,newstream->object[pos].value,15);
-               addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,nocolor,0,0,scaleX,scaleY,scaleZ);
+               addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,nocolor,0,0,scaleX,scaleY,scaleZ,0);
+
+            } else
+            /*! REACHED AN COMPOSITEOBJECT DECLERATION ( COMPOSITEOBJECT(something,spatoula_type,0,255,0,0,0,1.0,spatoula_something) )
+              argument 0 = COMPOSITEOBJECT , argument 1 = name ,  argument 2 = type ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = No Color ,
+              argument 8 = ScaleX , argument 9 = ScaleY , argument 10 = ScaleZ , argument 11 = Number of arguments , argument 12 = String Freely formed Data */
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"COMPOSITEOBJECT",15)==1)
+            {
+               char name[MAX_PATH]={0} , typeStr[MAX_PATH]={0};
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
+
+               unsigned char R = (unsigned char) InputParser_GetWordInt(ipc,3);
+               unsigned char G = (unsigned char)  InputParser_GetWordInt(ipc,4);
+               unsigned char B = (unsigned char)  InputParser_GetWordInt(ipc,5);
+               unsigned char Alpha = (unsigned char)  InputParser_GetWordInt(ipc,6) ;
+               unsigned char nocolor = (unsigned char) InputParser_GetWordInt(ipc,7);
+               float scaleX = (float) InputParser_GetWordFloat(ipc,8);
+               float scaleY = (float) InputParser_GetWordFloat(ipc,9);
+               float scaleZ = (float) InputParser_GetWordFloat(ipc,10);
+               unsigned int numberOfParticles = (unsigned char)  InputParser_GetWordInt(ipc,11);
+
+               //Value , not used : InputParser_GetWord(ipc,8,newstream->object[pos].value,15);
+               addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,nocolor,0,0,scaleX,scaleY,scaleZ,numberOfParticles);
 
             } else
             /*! REACHED A POSITION DECLERATION ( ARROWX(103.0440706,217.1741961,-22.9230451,0.780506107461,0.625148155413,-0,0.00285155239622) )

@@ -39,7 +39,7 @@ struct calibration calib;
 
   unsigned int devID=0;
   unsigned int devID2=66666;
-  ModuleIdentifier moduleID = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
+  ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
 
 void closeEverything()

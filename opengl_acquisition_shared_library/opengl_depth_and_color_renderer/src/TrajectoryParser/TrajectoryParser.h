@@ -121,6 +121,7 @@ struct VirtualObject
    unsigned int nextFrameTime;
 
    double scaleX,scaleY,scaleZ;
+   unsigned int particleNumber;
 
    unsigned char hasAssociatedEvents;
 
