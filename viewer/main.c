@@ -38,6 +38,7 @@ int calibrationSet = 0;
 struct calibration calib;
 
   unsigned int devID=0;
+  unsigned int devID2=66666;
   ModuleIdentifier moduleID = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
 
@@ -85,7 +86,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
 
 
-
+    char windowName[250]={0};
     unsigned int width , height , channels , bitsperpixel;
 
 
@@ -99,6 +100,8 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
      imageRGB->imageData = (char *) acquisitionGetColorFrame(moduleID,devID);
      if (imageRGB->imageData != 0)
       {
+        sprintf(windowName,"RGBDAcquisition RGB %u %u\n",moduleID,devID);
+
        //We convert RGB -> BGR @ imageViewableBFR so that we wont access original memory ,and OpenCV can happily display the correct colors etc
        if ( (bitsperpixel==8) && (channels==3) ) { cvCvtColor(imageRGB , imageViewableBGR , CV_RGB2BGR); }
 
@@ -108,11 +111,11 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
             CvSize rescaleSize = cvSize(windowX,windowY);
             IplImage* rescaledWindow=cvCreateImage(rescaleSize,IPL_DEPTH_8U ,channels);
             cvResize(imageViewableBGR,rescaledWindow,CV_INTER_LINEAR);
-            cvShowImage("RGBDAcquisition RGB ",rescaledWindow);
+            cvShowImage(windowName,rescaledWindow);
             cvReleaseImage( &rescaledWindow );
           } else
           {
-            cvShowImage("RGBDAcquisition RGB ",imageViewableBGR);
+            cvShowImage(windowName,imageViewableBGR);
           }
 
       } else
@@ -135,6 +138,8 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
      if (imageDepth->imageData != 0)
       {
+       sprintf(windowName,"RGBDAcquisition Depth %u %u\n",moduleID,devID);
+
        IplImage *rdepth8  = cvCreateImage(cvSize(width , height), IPL_DEPTH_8U, 1);
        cvConvertScaleAbs(imageDepth, rdepth8, 255.0/2048,0);
        if ( (windowX!=0) && (windowY!=0) )
@@ -142,11 +147,11 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
               CvSize rescaleSize = cvSize(windowX,windowY);
               IplImage* rescaledWindow=cvCreateImage(rescaleSize,IPL_DEPTH_8U , 1);
               cvResize(rdepth8,rescaledWindow,CV_INTER_LINEAR);
-              cvShowImage("RGBDAcquisition Depth ",rescaledWindow);
+              cvShowImage(windowName,rescaledWindow);
               cvReleaseImage( &rescaledWindow );
             } else
             {
-              cvShowImage("RGBDAcquisition Depth", rdepth8);
+              cvShowImage(windowName, rdepth8);
             }
        cvReleaseImage( &rdepth8 );
       } else
@@ -210,9 +215,15 @@ int main(int argc, char *argv[])
                                            moduleID = getModuleIdFromModuleName(argv[i+1]);
                                            fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID),moduleID);
                                          } else
-    if (strcmp(argv[i],"-dev")==0)       {
+    if ( (strcmp(argv[i],"-dev")==0) ||
+         (strcmp(argv[i],"-dev1")==0) )
+                                         {
                                            devID = atoi(argv[i+1]);
                                            fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID);
+                                         } else
+    if   (strcmp(argv[i],"-dev2")==0)    {
+                                           devID2 = atoi(argv[i+1]);
+                                           fprintf(stderr,"Overriding device #2 Used , set to %s ( %u ) \n",argv[i+1],devID2);
                                          } else
     if (
         (strcmp(argv[i],"-from")==0) ||
@@ -273,6 +284,11 @@ int main(int argc, char *argv[])
         //acquisitionMapRGBToDepth(moduleID,devID);
         fprintf(stderr,"Done with Mapping Depth/RGB \n");
 
+        if (devID2!=66666)
+        {
+          acquisitionOpenDevice(moduleID,devID2,devName,width,height,framerate);
+        }
+
 
    if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
@@ -282,6 +298,12 @@ int main(int argc, char *argv[])
         acquisitionSnapFrames(moduleID,devID);
 
         acquisitionDisplayFrames(moduleID,devID,framerate);
+
+       if (devID2!=66666)
+        {
+          acquisitionSnapFrames(moduleID,devID2);
+          acquisitionDisplayFrames(moduleID,devID2,framerate);
+        }
 
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));

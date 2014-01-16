@@ -581,8 +581,8 @@ void print_frmival(const struct v4l2_frmivalenum * frmival, const char *prefix)
 	}
 }
 
-
-void print_video_formats_ext(int fd, enum v4l2_buf_type type)
+// enum v4l2_buf_type
+void print_video_formats_ext(int fd,int type)
 {
 	struct v4l2_fmtdesc fmt;
 	struct v4l2_frmsizeenum frmsize;

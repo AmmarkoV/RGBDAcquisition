@@ -17,7 +17,7 @@
 
 #include <asm/types.h>          /* for videodev2.h */
 
-#define MAX_DEVICE_FILENAME 256
+#define MAX_DEVICE_FILENAME 512
 
 #define TIMEOUT_SEC 10
 #define TIMEOUT_USEC 0
