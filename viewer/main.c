@@ -47,6 +47,12 @@ void closeEverything()
  fprintf(stderr,"Gracefully closing everything .. ");
  /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
  acquisitionCloseDevice(moduleID,devID);
+
+ if (devID2!=66666)
+        {
+          acquisitionCloseDevice(moduleID,devID2);
+        }
+
  acquisitionStopModule(moduleID);
 
  fprintf(stderr,"Done\n");
