@@ -366,7 +366,7 @@ int snapOpenNI2Frames(int devID)
     #endif
 
     #if MOD_FACEDETECTION
-      if (frameSnapped%5==0) DetectFaces((unsigned char*) getOpenNI2ColorPixels(devID));
+      if (frameSnapped%5==0) DetectFaces((unsigned char*) getOpenNI2ColorPixels(devID),45,150);
     #endif
 
   return i;
