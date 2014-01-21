@@ -11,21 +11,25 @@ CvHaarClassifierCascade *cascade=0;
 CvMemStorage            *storage=0;
 
 
-void InitFaceDetection(char * haarCascadePath , unsigned int width ,unsigned int height)
+int InitFaceDetection(char * haarCascadePath , unsigned int width ,unsigned int height)
 {
     /* load the classifier
        note that I put the file in the same directory with
        this code */
     cascade = ( CvHaarClassifierCascade* ) cvLoad(haarCascadePath, 0, 0, 0 );
-
+    if (cascade==0) { fprintf(stderr,"Could not load cascade file %s\n",haarCascadePath); return 0; }
     /* setup memory buffer; needed by the face detector */
     storage = cvCreateMemStorage( 0 );
+    if (storage==0) { fprintf(stderr,"Could not allocate storage \n"); return 0; }
 
     image = cvCreateImage( cvSize(width,height), IPL_DEPTH_8U, 3 );
+    if (image==0) { fprintf(stderr,"Could not allocate image \n"); return 0; }
+
     opencv_pointer_retainer = image->imageData; // UGLY HACK
+    return 1;
 }
 
-void CloseFaceDetection()
+int CloseFaceDetection()
 {
     cvReleaseHaarClassifierCascade( &cascade );
     cvReleaseMemStorage( &storage );
@@ -38,6 +42,9 @@ void CloseFaceDetection()
 unsigned int DetectFaces(unsigned char * colorPixels , unsigned int maxHeadSize,unsigned int minHeadSize)
 {
     if  (colorPixels == 0 )  { return 0; }
+    if (cascade==0)  { return 0; }
+    if (storage==0)  { return 0; }
+    if (image==0)    { return 0; }
 
     /* detect faces */
     image->imageData=(char*) colorPixels; // UGLY HACK
@@ -83,6 +90,6 @@ unsigned int DetectFaces(unsigned char * colorPixels , unsigned int maxHeadSize,
 
     }
 
-	return 0;
+	return 1;
 }
 
