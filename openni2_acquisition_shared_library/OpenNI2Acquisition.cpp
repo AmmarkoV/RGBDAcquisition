@@ -356,7 +356,7 @@ int snapOpenNI2Frames(int devID)
   int i=readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
 
     #if MOD_NITE2
-       loopNite();
+       loopNite2();
     #endif
 
   return i;
