@@ -6,12 +6,19 @@
 //#define BUILD_OPENNI2 1
 //#define USE_CALIBRATION 1
 
+
+#define MOD_NITE2 0
+
 #if BUILD_OPENNI2
 
 #include <unistd.h>
 
 #include <OpenNI.h>
 #include <PS1080.h>
+
+    #if MOD_NITE2
+       #include "Nite2.h"
+    #endif
 
 #define MAX_OPENNI2_DEVICES 16
 #define ANY_OPENNI2_DEVICE MAX_OPENNI2_DEVICES*2
@@ -346,7 +353,13 @@ int stopOpenNI2Module()
 
 int snapOpenNI2Frames(int devID)
 {
-  return readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
+  int i=readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
+
+    #if MOD_NITE2
+       loopNite();
+    #endif
+
+  return i;
 }
 
 int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
@@ -356,6 +369,10 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
          fprintf(stderr,"Could not initialize device with ID %u \n",devID);
          return 0;
      }
+
+    #if MOD_NITE2
+       startNite2();
+    #endif
 
 
      //Snapping an initial frame to populate Image Sizes , etc..
@@ -390,6 +407,10 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
 
  int destroyOpenNI2Device(int devID)
  {
+     #if MOD_NITE2
+       stopNite2();
+     #endif
+
      return closeOpenNIDevice(device[devID] , color[devID] , depth[devID]);
  }
 
