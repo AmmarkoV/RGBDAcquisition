@@ -6,7 +6,7 @@
 //#define BUILD_OPENNI2 1
 //#define USE_CALIBRATION 1
 
-
+#define MOD_FACEDETECTION 0
 #define MOD_NITE2 0
 
 #if BUILD_OPENNI2
@@ -20,6 +20,10 @@
        #include "Nite2.h"
     #endif
 
+    #if MOD_FACEDETECTION
+       #include "FaceDetection.h"
+    #endif
+
 #define MAX_OPENNI2_DEVICES 16
 #define ANY_OPENNI2_DEVICE MAX_OPENNI2_DEVICES*2
 #define MAX_TRIES_FOR_EACH_FRAME 10
@@ -31,6 +35,7 @@ using namespace openni;
 Device device[MAX_OPENNI2_DEVICES];
 VideoStream depth[MAX_OPENNI2_DEVICES] , color[MAX_OPENNI2_DEVICES];
 VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES];
+unsigned int frameSnapped=0;
 
 #if USE_CALIBRATION
  struct calibration calibRGB[MAX_OPENNI2_DEVICES];
@@ -353,10 +358,15 @@ int stopOpenNI2Module()
 
 int snapOpenNI2Frames(int devID)
 {
+  ++frameSnapped;
   int i=readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
 
     #if MOD_NITE2
-       loopNite2();
+       if (frameSnapped%2==1) loopNite2();
+    #endif
+
+    #if MOD_FACEDETECTION
+      if (frameSnapped%5==0) DetectFaces((unsigned char*) getOpenNI2ColorPixels(devID));
     #endif
 
   return i;
@@ -374,6 +384,9 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
        startNite2();
     #endif
 
+    #if MOD_FACEDETECTION
+       InitFaceDetection((char*) "haarcascade_frontalface_alt.xml",width,height);
+    #endif
 
      //Snapping an initial frame to populate Image Sizes , etc..
     if ( ! snapOpenNI2Frames(devID) )
@@ -410,7 +423,9 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
      #if MOD_NITE2
        stopNite2();
      #endif
-
+    #if MOD_FACEDETECTION
+       CloseFaceDetection();
+    #endif
      return closeOpenNIDevice(device[devID] , color[devID] , depth[devID]);
  }
 

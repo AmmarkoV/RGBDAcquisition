@@ -36,12 +36,21 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add option="-fPIC" />
+			<Add option="`pkg-config --cflags opencv`" />
 			<Add directory="../3dparty/OpenNI2/Include/" />
+			<Add directory="../3dparty/NiTE-Linux-x64-2.2/Include" />
+			<Add directory="../3dparty/NiTE-Linux-x64-2.2/Samples/SimpleUserTracker" />
 		</Compiler>
 		<Linker>
 			<Add option="`../scripts/get3dpartyDepencency.sh openni2`" />
+			<Add option="`pkg-config --libs opencv`" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="../3dparty/NiTE-Linux-x64-2.2/Redist/libNiTE2.so" />
 		</Linker>
+		<Unit filename="FaceDetection.cpp" />
+		<Unit filename="FaceDetection.h" />
+		<Unit filename="Nite2.cpp" />
+		<Unit filename="Nite2.h" />
 		<Unit filename="OpenNI2Acquisition.cpp" />
 		<Unit filename="OpenNI2Acquisition.h" />
 		<Extensions>
