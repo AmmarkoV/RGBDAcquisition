@@ -368,9 +368,12 @@ int snapOpenNI2Frames(int devID)
     #if MOD_FACEDETECTION
       if (frameSnapped%5==0)
       {
+         struct calibration calib;
+         getOpenNI2ColorCalibration(devID,&calib);
          DetectFaces(frameSnapped,
                       (unsigned char*) getOpenNI2ColorPixels(devID) ,
                       (unsigned short*) getOpenNI2DepthPixels(devID) ,
+                      &calib ,
                       45,150 //Min / Max
                      );
       }

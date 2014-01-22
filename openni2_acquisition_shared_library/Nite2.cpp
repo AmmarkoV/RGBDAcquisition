@@ -21,6 +21,49 @@ nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
 	nite::UserTrackerFrameRef userTrackerFrame;
 
 
+
+void * skelCallbackAddr = 0;
+
+
+enum humanSkeletonJoints
+{
+   HUMAN_SKELETON_HEAD = 0,
+   HUMAN_SKELETON__LEFT_SHOULDER,
+   HUMAN_SKELETON_RIGHT_SHOULDER,
+   HUMAN_SKELETON_LEFT_ELBOW,
+   HUMAN_SKELETON_RIGHT_ELBOW,
+   HUMAN_SKELETON_LEFT_HAND,
+   HUMAN_SKELETON_RIGHT_HAND,
+   HUMAN_SKELETON_TORSO,
+   HUMAN_SKELETON_LEFT_HIP,
+   HUMAN_SKELETON_RIGHT_HIP,
+   HUMAN_SKELETON_LEFT_KNEE,
+   HUMAN_SKELETON_RIGHT_KNEE,
+   HUMAN_SKELETON_LEFT_FOOT,
+   HUMAN_SKELETON_RIGHT_FOOT,
+   //---------------------
+   HUMAN_SKELETON_PARTS
+};
+
+struct point3D
+{
+    float x,y,z;
+};
+
+struct skeletonHuman
+{
+  unsigned int userID;
+
+  unsigned char isNew,isVisible,isOutOfScene,isLost;
+  unsigned char statusCalibrating,statusTracking,statusFailed;
+
+  struct point3D bbox[4];
+  struct point3D centerOfMass;
+  struct point3D joint[HUMAN_SKELETON_PARTS];
+  float jointAccuracy[HUMAN_SKELETON_PARTS];
+};
+
+
 void printSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user)
 {
 
@@ -62,6 +105,36 @@ void printSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTrac
 
      fprintf(stderr,"Head %f %f %f \n",jointHead.getPosition().x ,jointHead.getPosition().y, jointHead.getPosition().z);
 
+    unsigned int ts = frameNumber;
+	if (user.isNew()) USER_MESSAGE("New") else
+    if (user.isVisible() && !g_visibleUsers[user.getId()]) USER_MESSAGE("Visible") else
+    if (!user.isVisible() && g_visibleUsers[user.getId()]) USER_MESSAGE("Out of Scene") else
+    if (user.isLost()) USER_MESSAGE("Lost")
+
+	g_visibleUsers[user.getId()] = user.isVisible();
+
+	if(g_skeletonStates[user.getId()] != user.getSkeleton().getState())
+	{
+		switch(g_skeletonStates[user.getId()] = user.getSkeleton().getState())
+		{
+		case nite::SKELETON_NONE:
+			USER_MESSAGE("Stopped tracking.")
+			break;
+		case nite::SKELETON_CALIBRATING:
+			USER_MESSAGE("Calibrating...")
+			break;
+		case nite::SKELETON_TRACKED:
+			USER_MESSAGE("Tracking!")
+			break;
+		case nite::SKELETON_CALIBRATION_ERROR_NOT_IN_POSE:
+		case nite::SKELETON_CALIBRATION_ERROR_HANDS:
+		case nite::SKELETON_CALIBRATION_ERROR_LEGS:
+		case nite::SKELETON_CALIBRATION_ERROR_HEAD:
+		case nite::SKELETON_CALIBRATION_ERROR_TORSO:
+			USER_MESSAGE("Calibration Failed... :-|")
+			break;
+		}
+	}
 
      //This only works for 2 poses and needs initialization fprintf(stderr,"Pose %u ( held %u , enter %u , exit %u)\n",user.getPose().getType() , user.getPose().isHeld() , user.getPose().isEntered() , user.getPose().isExited() );
 }
@@ -69,7 +142,7 @@ void printSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTrac
 
 
 
-
+/*
 
 void updateUserState(unsigned int frameNumber , nite::UserTracker & pUserTracker ,const nite::UserData& user, unsigned long long ts)
 {
@@ -107,7 +180,7 @@ void updateUserState(unsigned int frameNumber , nite::UserTracker & pUserTracker
 			break;
 		}
 	}
-}
+}*/
 
 int startNite2()
 {
@@ -147,7 +220,7 @@ int loopNite2(unsigned int frameNumber)
 		for (int i = 0; i < users.getSize(); ++i)
 		{
 			const nite::UserData& user = users[i];
-			updateUserState(frameNumber,userTracker,user,userTrackerFrame.getTimestamp());
+			//updateUserState(frameNumber,userTracker,user,userTrackerFrame.getTimestamp());
 			if (user.isNew())
 			{
 				userTracker.startSkeletonTracking(user.getId());
@@ -164,3 +237,11 @@ int loopNite2(unsigned int frameNumber)
 		}
   return 1;
 }
+
+int registerSkeletonDetectedEvent(void * callback)
+{
+  skelCallbackAddr  = callback;
+  return 1;
+}
+
+

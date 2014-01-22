@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <cv.h>
 #include <cxcore.h>
-#include "../tools/Calibration/calibration.h"
 #include "../tools/ImageOperations/imageOps.h"
 
 
@@ -17,6 +16,9 @@ CvMemStorage            *storage=0;
 
 unsigned int fdFrameWidth = 640;
 unsigned int fdFrameHeight = 480;
+
+void * callbackAddr = 0;
+
 
 unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width , unsigned int height ,unsigned int x2d, unsigned int y2d )
 {
@@ -125,8 +127,39 @@ int CloseFaceDetection()
 }
 
 
+int registerFaceDetectedEvent(void * callback)
+{
+  callbackAddr = callback;
+  return 1;
+}
 
-unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels , unsigned short * depthPixels, unsigned int maxHeadSize,unsigned int minHeadSize)
+
+
+void newFaceDetected(unsigned int frameNumber ,
+                    unsigned int sX , unsigned int sY , unsigned int tileWidth , unsigned int tileHeight ,
+                    unsigned int distance ,
+                    float headX,float headY,float headZ
+                   )
+{
+ fprintf(stderr,"-----------------------------\n");
+ fprintf(stderr,"Head Reading @ frame %u \n", frameNumber);
+ fprintf(stderr,"HeadProjection  @ %u %u , %u , %u   \n", sX , sY , tileWidth , tileHeight );
+ fprintf(stderr,"Head @ 3D %0.2f %0.2f %0.2f  \n",headX , headY , headZ);
+ fprintf(stderr,"Head Distance @  %u\n",distance);
+ fprintf(stderr,"-----------------------------\n");
+
+
+ if (callbackAddr!=0)
+ {
+   void ( *DoCallback) (  unsigned int  , unsigned int  , unsigned int , unsigned int , unsigned int , unsigned int , float  ,float  ,float  )=0 ;
+   DoCallback = (void(*) (  unsigned int  , unsigned int  , unsigned int , unsigned int , unsigned int , unsigned int , float  ,float  ,float  ) ) callbackAddr;
+   DoCallback(frameNumber , sX , sY , tileWidth , tileHeight , distance , headX, headY, headZ);
+ }
+
+ return;
+}
+
+unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels , unsigned short * depthPixels, struct calibration * calib ,unsigned int maxHeadSize,unsigned int minHeadSize)
 {
     if  (colorPixels == 0 )  { return 0; }
     if (cascade==0)  { return 0; }
@@ -158,40 +191,22 @@ unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels 
     {
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
 
-
-        /*
-        if ( settings[REMEMBER_FACES] )
-         {
-           char timestamped_filename[512]={0};
-           timestamped_filename[0]=0; timestamped_filename[1]=0;
-           GetANewSnapShotFileName(timestamped_filename,"memfs/faces/face_snap",".ppm");
-           SaveRegisterPartToFile(timestamped_filename,vid_reg, r->x , r->y , r->width , r->height );
-         }
-        */
-
-        fprintf(stderr,"Frame %u : Face%u @ %u , %u ( size %u,%u ) \n",frameNumber,i,r->x , r->y ,  r->width , r->height );
-       /* AddToFeatureList(  video_register[vid_reg].faces  ,
-                           r->x , r->y , 0 ,
-                           r->width , r->height , 0
-                         );*/
-
-         //saveFDImageToFile("testD.pnm",(unsigned char*) depthPixels,fdFrameWidth,fdFrameHeight,1,16);
+         unsigned int tileWidthHalf = (unsigned int) r->width/2 , tileHeightHalf = (unsigned int) r->height/2;
          unsigned int tileWidth = (unsigned int) r->width , tileHeight = (unsigned int) r->height;
          unsigned int sX = r->x;
          unsigned int sY = r->y;
-         unsigned int avgDepth = countDepthAverage(depthPixels,fdFrameWidth,fdFrameHeight,sX,sY,tileWidth,tileHeight);
-         fprintf(stderr,"AvgDepth %u , Spot Depth %u \n",avgDepth ,(unsigned int)  getDepthValueAtXY(depthPixels,fdFrameWidth,fdFrameHeight,sX,sY));
+         unsigned int avgFaceDepth = countDepthAverage(depthPixels,fdFrameWidth,fdFrameHeight,sX,sY,tileWidth,tileHeight);
 
+         /*
          float centerX , centerY , centerZ;
          getDepthBlobAverage(depthPixels,fdFrameWidth,fdFrameHeight,
                              sX,sY,tileWidth,tileHeight,
-                             &centerX , &centerY , &centerZ);
-         fprintf(stderr,"Depth Blob @ %f %f %f  \n",centerX , centerY , centerZ);
-         float mouseX , mouseY , mouseZ;
-         struct calibration calib;
-         NullCalibration(fdFrameWidth,fdFrameHeight,&calib);
-         transform2DProjectedPointTo3DPoint(&calib, sX , sY , (unsigned short) centerZ , &mouseX , &mouseY , &mouseZ);
-         fprintf(stderr,"Depth Blob Transformed @ %f %f %f  \n", mouseX , mouseY , mouseZ);
+                             &centerX , &centerY , &centerZ);*/
+
+         float headX=0.0 , headY=0.0 , headZ=0.0;
+         transform2DProjectedPointTo3DPoint(calib, sX+tileWidthHalf , sY+tileHeightHalf , (unsigned short) avgFaceDepth , &headX , &headY , &headZ);
+
+         newFaceDetected(frameNumber,sX,sY,tileWidth,tileHeight,avgFaceDepth ,headX,headY,headZ);
 
     }
 
