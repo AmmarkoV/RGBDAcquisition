@@ -28,7 +28,7 @@ void * skelCallbackAddr = 0;
 enum humanSkeletonJoints
 {
    HUMAN_SKELETON_HEAD = 0,
-   HUMAN_SKELETON__LEFT_SHOULDER,
+   HUMAN_SKELETON_LEFT_SHOULDER,
    HUMAN_SKELETON_RIGHT_SHOULDER,
    HUMAN_SKELETON_LEFT_ELBOW,
    HUMAN_SKELETON_RIGHT_ELBOW,
@@ -55,7 +55,7 @@ struct skeletonHuman
   unsigned int userID;
 
   unsigned char isNew,isVisible,isOutOfScene,isLost;
-  unsigned char statusCalibrating,statusTracking,statusFailed;
+  unsigned char statusCalibrating,statusStoppedTracking, statusTracking,statusFailed;
 
   struct point3D bbox[4];
   struct point3D centerOfMass;
@@ -66,121 +66,137 @@ struct skeletonHuman
 
 void printSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user)
 {
+    struct skeletonHuman humanSkeleton={0};
 
-	float bbox[] =
-	{
-		user.getBoundingBox().max.x, user.getBoundingBox().max.y, 0,
-		user.getBoundingBox().max.x, user.getBoundingBox().min.y, 0,
-		user.getBoundingBox().min.x, user.getBoundingBox().min.y, 0,
-		user.getBoundingBox().min.x, user.getBoundingBox().max.y, 0,
-	};
+    humanSkeleton.bbox[0].x = user.getBoundingBox().max.x;       humanSkeleton.bbox[0].y = user.getBoundingBox().max.y;   humanSkeleton.bbox[0].z = 0;
+    humanSkeleton.bbox[1].x = user.getBoundingBox().max.x;       humanSkeleton.bbox[1].y = user.getBoundingBox().min.y;   humanSkeleton.bbox[1].z = 0;
+    humanSkeleton.bbox[2].x = user.getBoundingBox().min.x;       humanSkeleton.bbox[2].y = user.getBoundingBox().min.y;   humanSkeleton.bbox[2].z = 0;
+    humanSkeleton.bbox[3].x = user.getBoundingBox().min.x;       humanSkeleton.bbox[3].y = user.getBoundingBox().max.y;   humanSkeleton.bbox[3].z = 0;
 
-    fprintf(stderr,"User ID %u \n",user.getId());
-	fprintf(stderr,"Bounding Box %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f\n",bbox[0],bbox[1],bbox[2],bbox[3],bbox[4],bbox[5],bbox[6],bbox[7]);
-    fprintf(stderr,"Center mass %0.2f %0.2f %0.2f \n",user.getCenterOfMass().x , user.getCenterOfMass().y, user.getCenterOfMass().z);
+    humanSkeleton.userID = user.getId();
+
+    humanSkeleton.centerOfMass.x = user.getCenterOfMass().x;
+    humanSkeleton.centerOfMass.y = user.getCenterOfMass().y;
+    humanSkeleton.centerOfMass.z = user.getCenterOfMass().z;
 
      nite::SkeletonJoint jointHead           =   user.getSkeleton().getJoint(nite::JOINT_HEAD);
-
      nite::SkeletonJoint jointLeftShoulder   =   user.getSkeleton().getJoint(nite::JOINT_LEFT_SHOULDER);
      nite::SkeletonJoint jointRightShoulder  =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_SHOULDER);
-
      nite::SkeletonJoint jointLeftElbow      =   user.getSkeleton().getJoint(nite::JOINT_LEFT_ELBOW);
      nite::SkeletonJoint jointRightElbow     =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_ELBOW);
-
-
      nite::SkeletonJoint jointLeftHand      =   user.getSkeleton().getJoint(nite::JOINT_LEFT_HAND);
      nite::SkeletonJoint jointRightHand      =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_HAND);
-
      nite::SkeletonJoint jointTorso     =   user.getSkeleton().getJoint(nite::JOINT_TORSO);
-
      nite::SkeletonJoint jointLeftHip     =   user.getSkeleton().getJoint(nite::JOINT_LEFT_HIP);
      nite::SkeletonJoint jointRightHip     =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_HIP);
-
      nite::SkeletonJoint jointLeftKnee     =   user.getSkeleton().getJoint(nite::JOINT_LEFT_KNEE);
      nite::SkeletonJoint jointRightKnee     =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_KNEE);
-
      nite::SkeletonJoint jointLeftFoot     =   user.getSkeleton().getJoint(nite::JOINT_LEFT_FOOT);
      nite::SkeletonJoint jointRightFoot     =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_FOOT);
 
+     humanSkeleton.joint[HUMAN_SKELETON_HEAD].x = jointHead.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_HEAD].y = jointHead.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_HEAD].z = jointHead.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_HEAD] = jointHead.getPositionConfidence();
 
-     fprintf(stderr,"Head %f %f %f \n",jointHead.getPosition().x ,jointHead.getPosition().y, jointHead.getPosition().z);
 
-    unsigned int ts = frameNumber;
-	if (user.isNew()) USER_MESSAGE("New") else
-    if (user.isVisible() && !g_visibleUsers[user.getId()]) USER_MESSAGE("Visible") else
-    if (!user.isVisible() && g_visibleUsers[user.getId()]) USER_MESSAGE("Out of Scene") else
-    if (user.isLost()) USER_MESSAGE("Lost")
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].x = jointLeftShoulder.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].y = jointLeftShoulder.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].z = jointLeftShoulder.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_SHOULDER] = jointLeftShoulder.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_SHOULDER].x = jointRightShoulder.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_SHOULDER].y = jointRightShoulder.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_SHOULDER].z = jointRightShoulder.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_SHOULDER] = jointRightShoulder.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_ELBOW].x = jointLeftElbow.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_ELBOW].y = jointLeftElbow.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_ELBOW].z = jointLeftElbow.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_ELBOW] = jointLeftElbow.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_ELBOW].x = jointRightElbow.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_ELBOW].y = jointRightElbow.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_ELBOW].z = jointRightElbow.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_ELBOW] = jointRightElbow.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_HAND].x = jointLeftHand.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_HAND].y = jointLeftHand.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_HAND].z = jointLeftHand.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_HAND] = jointLeftHand.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HAND].x = jointRightHand.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HAND].y = jointRightHand.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HAND].z = jointRightHand.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_HAND] = jointRightHand.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_TORSO].x = jointTorso.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_TORSO].y = jointTorso.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_TORSO].z = jointTorso.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_TORSO] = jointTorso.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_HIP].x = jointLeftHip.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_HIP].y = jointLeftHip.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_HIP].z = jointLeftHip.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_HIP] = jointLeftHip.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HIP].x = jointRightHip.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HIP].y = jointRightHip.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HIP].z = jointRightHip.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_HIP] = jointRightHip.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_KNEE].x = jointLeftKnee.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_KNEE].y = jointLeftKnee.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_KNEE].z = jointLeftKnee.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_KNEE] = jointLeftKnee.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_KNEE].x = jointRightKnee.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_KNEE].y = jointRightKnee.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_KNEE].z = jointRightKnee.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_KNEE] = jointRightKnee.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_FOOT].x = jointLeftFoot.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_FOOT].y = jointLeftFoot.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_LEFT_FOOT].z = jointLeftFoot.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_FOOT] = jointLeftFoot.getPositionConfidence();
+
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].x = jointRightFoot.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].y = jointRightFoot.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].z = jointRightFoot.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_FOOT] = jointRightFoot.getPositionConfidence();
+
+
+
+  unsigned char statusCalibrating,statusTracking,statusFailed;
+
+    long long unsigned int ts = frameNumber;
+	if (user.isNew())  { humanSkeleton.isNew=1; } else
+    if ((user.isVisible()) && (!g_visibleUsers[user.getId()])) { humanSkeleton.isVisible=1; }  else
+    if ((!user.isVisible()) && (g_visibleUsers[user.getId()])) { humanSkeleton.isOutOfScene=1; } else
+    if (user.isLost())  { humanSkeleton.isLost=1; }
 
 	g_visibleUsers[user.getId()] = user.isVisible();
-
 	if(g_skeletonStates[user.getId()] != user.getSkeleton().getState())
 	{
 		switch(g_skeletonStates[user.getId()] = user.getSkeleton().getState())
 		{
-		case nite::SKELETON_NONE:
-			USER_MESSAGE("Stopped tracking.")
-			break;
-		case nite::SKELETON_CALIBRATING:
-			USER_MESSAGE("Calibrating...")
-			break;
-		case nite::SKELETON_TRACKED:
-			USER_MESSAGE("Tracking!")
-			break;
-		case nite::SKELETON_CALIBRATION_ERROR_NOT_IN_POSE:
-		case nite::SKELETON_CALIBRATION_ERROR_HANDS:
-		case nite::SKELETON_CALIBRATION_ERROR_LEGS:
-		case nite::SKELETON_CALIBRATION_ERROR_HEAD:
-		case nite::SKELETON_CALIBRATION_ERROR_TORSO:
-			USER_MESSAGE("Calibration Failed... :-|")
-			break;
+		 case nite::SKELETON_NONE:         humanSkeleton.statusStoppedTracking = 1; break; // USER_MESSAGE("Stopped tracking.")
+		 case nite::SKELETON_CALIBRATING:  humanSkeleton.statusCalibrating=1;       break; // USER_MESSAGE("Calibrating...")
+	 	 case nite::SKELETON_TRACKED:      humanSkeleton.statusTracking=1;          break; // USER_MESSAGE("Tracking!")
+		 case nite::SKELETON_CALIBRATION_ERROR_NOT_IN_POSE:
+		 case nite::SKELETON_CALIBRATION_ERROR_HANDS:
+		 case nite::SKELETON_CALIBRATION_ERROR_LEGS:
+		 case nite::SKELETON_CALIBRATION_ERROR_HEAD:
+		 case nite::SKELETON_CALIBRATION_ERROR_TORSO:
+			humanSkeleton.statusFailed=1; //USER_MESSAGE("Calibration Failed... :-|")
+		 break;
 		}
 	}
 
-     //This only works for 2 poses and needs initialization fprintf(stderr,"Pose %u ( held %u , enter %u , exit %u)\n",user.getPose().getType() , user.getPose().isHeld() , user.getPose().isEntered() , user.getPose().isExited() );
-}
+ }
 
 
 
-
-/*
-
-void updateUserState(unsigned int frameNumber , nite::UserTracker & pUserTracker ,const nite::UserData& user, unsigned long long ts)
-{
-	if (user.isNew())
-		USER_MESSAGE("New")
-	else if (user.isVisible() && !g_visibleUsers[user.getId()])
-		USER_MESSAGE("Visible")
-	else if (!user.isVisible() && g_visibleUsers[user.getId()])
-		USER_MESSAGE("Out of Scene")
-	else if (user.isLost())
-		USER_MESSAGE("Lost")
-
-	g_visibleUsers[user.getId()] = user.isVisible();
-
-
-	if(g_skeletonStates[user.getId()] != user.getSkeleton().getState())
-	{
-		switch(g_skeletonStates[user.getId()] = user.getSkeleton().getState())
-		{
-		case nite::SKELETON_NONE:
-			USER_MESSAGE("Stopped tracking.")
-			break;
-		case nite::SKELETON_CALIBRATING:
-			USER_MESSAGE("Calibrating...")
-			break;
-		case nite::SKELETON_TRACKED:
-			USER_MESSAGE("Tracking!")
-			break;
-		case nite::SKELETON_CALIBRATION_ERROR_NOT_IN_POSE:
-		case nite::SKELETON_CALIBRATION_ERROR_HANDS:
-		case nite::SKELETON_CALIBRATION_ERROR_LEGS:
-		case nite::SKELETON_CALIBRATION_ERROR_HEAD:
-		case nite::SKELETON_CALIBRATION_ERROR_TORSO:
-			USER_MESSAGE("Calibration Failed... :-|")
-			break;
-		}
-	}
-}*/
 
 int startNite2()
 {
