@@ -50,7 +50,7 @@ extern "C"
    int getOpenNI2DepthDataSize(int devID);
    int getOpenNI2DepthChannels(int devID);
    int getOpenNI2DepthBitsPerPixel(int devID);
-   short * getOpenNI2DepthPixels(int devID);
+   unsigned short * getOpenNI2DepthPixels(int devID);
 
 
    double getOpenNI2DepthFocalLength(int devID);

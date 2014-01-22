@@ -12,7 +12,7 @@
 #include "../acquisition/Acquisition.h"
 #include "../tools/Calibration/calibration.h"
 
-
+#define INTERCEPT_MOUSE_IN_WINDOWS 1
 
 #define NORMAL "\033[0m"
 #define BLACK "\033[30m" /* Black */
@@ -26,6 +26,32 @@
 #include <cxcore.h>
 #include <highgui.h>
 
+#if INTERCEPT_MOUSE_IN_WINDOWS
+enum
+{
+    EVENT_MOUSEMOVE      =0,
+    EVENT_LBUTTONDOWN    =1,
+    EVENT_RBUTTONDOWN    =2,
+    EVENT_MBUTTONDOWN    =3,
+    EVENT_LBUTTONUP      =4,
+    EVENT_RBUTTONUP      =5,
+    EVENT_MBUTTONUP      =6,
+    EVENT_LBUTTONDBLCLK  =7,
+    EVENT_RBUTTONDBLCLK  =8,
+    EVENT_MBUTTONDBLCLK  =9
+};
+
+enum
+{
+    EVENT_FLAG_LBUTTON   =1,
+    EVENT_FLAG_RBUTTON   =2,
+    EVENT_FLAG_MBUTTON   =4,
+    EVENT_FLAG_CTRLKEY   =8,
+    EVENT_FLAG_SHIFTKEY  =16,
+    EVENT_FLAG_ALTKEY    =32
+};
+#endif
+
 unsigned char warnNoDepth=0;
 
 unsigned int windowX=0,windowY=0;
@@ -34,12 +60,36 @@ char inputname[512]={0};
 unsigned int frameNum=0;
 
 
+char RGBwindowName[250]={0};
+char DepthwindowName[250]={0};
+
 int calibrationSet = 0;
 struct calibration calib;
 
   unsigned int devID=0;
   unsigned int devID2=66666;
   ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
+
+
+
+#if INTERCEPT_MOUSE_IN_WINDOWS
+void CallBackFunc(int event, int x, int y, int flags, void* userdata)
+{
+if  ( event == EVENT_LBUTTONDOWN )
+    {
+     fprintf(stderr,"Left button of the mouse is clicked - position (%u,%u)\n",x,y);
+     float x3D,y3D,z3D;
+     acquisitionGetDepth3DPointAtXYCameraSpace(moduleID,devID,x,y,&x3D,&y3D,&z3D);
+     fprintf(stderr,"acquisitionGetDepthValueAtXY(%u,%u) = %u \n",acquisitionGetDepthValueAtXY(moduleID,devID,x,y));
+     fprintf(stderr,"acquisitionGetDepth3DPointAtXYCameraSpace(%u,%u) = %0.2f , %0.2f , %0.2f\n",x,y,x3D,y3D,z3D);
+
+    } else
+if  ( event == EVENT_RBUTTONDOWN ) { fprintf(stderr,"Right button of the mouse is clicked - position (%u,%u)\n",x,y); } else
+if  ( event == EVENT_MBUTTONDOWN ) { fprintf(stderr,"Middle button of the mouse is clicked - position (%u,%u)\n",x,y); }
+// Commented out because it spams a lot -> else if  ( event == EVENT_MOUSEMOVE )   { fprintf(stderr,"Mouse move over the window - position (%u,%u)\n",x,y); }
+}
+#endif
+
 
 
 void closeEverything()
@@ -58,6 +108,8 @@ void closeEverything()
  fprintf(stderr,"Done\n");
  exit(0);
 }
+
+
 
 int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int framerate)
 {
@@ -92,7 +144,6 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
 
 
-    char windowName[250]={0};
     unsigned int width , height , channels , bitsperpixel;
 
 
@@ -106,7 +157,6 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
      imageRGB->imageData = (char *) acquisitionGetColorFrame(moduleID,devID);
      if (imageRGB->imageData != 0)
       {
-        sprintf(windowName,"RGBDAcquisition RGB - Module %u Device %u",moduleID,devID);
 
        //We convert RGB -> BGR @ imageViewableBFR so that we wont access original memory ,and OpenCV can happily display the correct colors etc
        if ( (bitsperpixel==8) && (channels==3) ) { cvCvtColor(imageRGB , imageViewableBGR , CV_RGB2BGR); }
@@ -117,11 +167,11 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
             CvSize rescaleSize = cvSize(windowX,windowY);
             IplImage* rescaledWindow=cvCreateImage(rescaleSize,IPL_DEPTH_8U ,channels);
             cvResize(imageViewableBGR,rescaledWindow,CV_INTER_LINEAR);
-            cvShowImage(windowName,rescaledWindow);
+            cvShowImage(RGBwindowName,rescaledWindow);
             cvReleaseImage( &rescaledWindow );
           } else
           {
-            cvShowImage(windowName,imageViewableBGR);
+            cvShowImage(RGBwindowName,imageViewableBGR);
           }
 
       } else
@@ -144,8 +194,6 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
      if (imageDepth->imageData != 0)
       {
-       sprintf(windowName,"RGBDAcquisition Depth - Module %u Device %u",moduleID,devID);
-
        IplImage *rdepth8  = cvCreateImage(cvSize(width , height), IPL_DEPTH_8U, 1);
        cvConvertScaleAbs(imageDepth, rdepth8, 255.0/2048,0);
        if ( (windowX!=0) && (windowY!=0) )
@@ -153,11 +201,11 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
               CvSize rescaleSize = cvSize(windowX,windowY);
               IplImage* rescaledWindow=cvCreateImage(rescaleSize,IPL_DEPTH_8U , 1);
               cvResize(rdepth8,rescaledWindow,CV_INTER_LINEAR);
-              cvShowImage(windowName,rescaledWindow);
+              cvShowImage(DepthwindowName,rescaledWindow);
               cvReleaseImage( &rescaledWindow );
             } else
             {
-              cvShowImage(windowName, rdepth8);
+              cvShowImage(DepthwindowName, rdepth8);
             }
        cvReleaseImage( &rdepth8 );
       } else
@@ -295,6 +343,16 @@ int main(int argc, char *argv[])
           acquisitionOpenDevice(moduleID,devID2,devName,width,height,framerate);
         }
 
+
+     sprintf(RGBwindowName,"RGBDAcquisition RGB - Module %u Device %u",moduleID,devID);
+     sprintf(DepthwindowName,"RGBDAcquisition Depth - Module %u Device %u",moduleID,devID);
+
+     #if INTERCEPT_MOUSE_IN_WINDOWS
+      //Create a window
+       cvNamedWindow(RGBwindowName, 1);
+      //set the callback function for any mouse event
+       cvSetMouseCallback(RGBwindowName, CallBackFunc, NULL);
+     #endif
 
    if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)

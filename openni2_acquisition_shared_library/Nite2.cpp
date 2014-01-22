@@ -21,7 +21,7 @@ nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
 	nite::UserTrackerFrameRef userTrackerFrame;
 
 
-void printSkeletonState(nite::UserTracker & pUserTracker , const nite::UserData & user)
+void printSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user)
 {
 
 	float bbox[] =
@@ -32,6 +32,7 @@ void printSkeletonState(nite::UserTracker & pUserTracker , const nite::UserData 
 		user.getBoundingBox().min.x, user.getBoundingBox().max.y, 0,
 	};
 
+    fprintf(stderr,"User ID %u \n",user.getId());
 	fprintf(stderr,"Bounding Box %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f\n",bbox[0],bbox[1],bbox[2],bbox[3],bbox[4],bbox[5],bbox[6],bbox[7]);
     fprintf(stderr,"Center mass %0.2f %0.2f %0.2f \n",user.getCenterOfMass().x , user.getCenterOfMass().y, user.getCenterOfMass().z);
 
@@ -70,7 +71,7 @@ void printSkeletonState(nite::UserTracker & pUserTracker , const nite::UserData 
 
 
 
-void updateUserState(nite::UserTracker & pUserTracker ,const nite::UserData& user, unsigned long long ts)
+void updateUserState(unsigned int frameNumber , nite::UserTracker & pUserTracker ,const nite::UserData& user, unsigned long long ts)
 {
 	if (user.isNew())
 		USER_MESSAGE("New")
@@ -133,7 +134,7 @@ int stopNite2()
 
 
 
-int loopNite2()
+int loopNite2(unsigned int frameNumber)
 {
 		niteRc = userTracker.readFrame(&userTrackerFrame);
 		if (niteRc != nite::STATUS_OK)
@@ -146,7 +147,7 @@ int loopNite2()
 		for (int i = 0; i < users.getSize(); ++i)
 		{
 			const nite::UserData& user = users[i];
-			updateUserState(userTracker,user,userTrackerFrame.getTimestamp());
+			updateUserState(frameNumber,userTracker,user,userTrackerFrame.getTimestamp());
 			if (user.isNew())
 			{
 				userTracker.startSkeletonTracking(user.getId());
@@ -156,8 +157,8 @@ int loopNite2()
 				const nite::SkeletonJoint& head = user.getSkeleton().getJoint(nite::JOINT_HEAD);
 				if (head.getPositionConfidence() > .5)
 				 {
-				     printf("%d. (%5.2f, %5.2f, %5.2f)\n", user.getId(), head.getPosition().x, head.getPosition().y, head.getPosition().z);
-                     printSkeletonState(userTracker,user);
+				     //printf("%d. (%5.2f, %5.2f, %5.2f)\n", user.getId(), head.getPosition().x, head.getPosition().y, head.getPosition().z);
+                     printSkeletonState(frameNumber,userTracker,user);
 				 }
 			}
 		}

@@ -583,3 +583,47 @@ int closeToRGB(unsigned char R , unsigned char G , unsigned char B  ,  unsigned 
 }
 
 
+
+
+unsigned int countDepthAverage(unsigned short * source, unsigned int sourceWidth , unsigned int sourceHeight ,
+                                unsigned int sX,  unsigned int sY  , unsigned int tileWidth , unsigned int tileHeight)
+{
+  //Check for bounds -----------------------------------------
+  if (sX+tileWidth>=sourceWidth) { tileWidth=sourceWidth-sX-1;  }
+  if (sY+tileHeight>=sourceHeight) { tileHeight=sourceHeight-sY-1;  }
+  //----------------------------------------------------------
+
+  unsigned short * sourcePTR; unsigned short * sourceLineLimitPTR; unsigned short * sourceLimitPTR;   unsigned int sourceLineSkip;
+  sourcePTR      = source + MEMPLACE1(sX,sY,sourceWidth);
+  sourceLimitPTR = source + MEMPLACE1((sX+tileWidth),(sY+tileHeight),sourceWidth);
+  sourceLineSkip = (sourceWidth-tileWidth);
+  sourceLineLimitPTR = sourcePTR + (tileWidth) -1 ;
+
+  fprintf(stderr,"Getting Average Depth at area (%u,%u) of source image  starting at %u,%u  sized %u,%u \n",tileWidth,tileHeight,sX,sY,sourceWidth,sourceHeight);
+  unsigned int curDepth = 0;
+  unsigned int totalDepth = 0;
+  unsigned int totalMeasurements = 0;
+
+  while ( sourcePTR < sourceLimitPTR )
+  {
+     while (sourcePTR < sourceLineLimitPTR)
+     {
+        //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
+        if (*sourcePTR!=0)
+             {
+               curDepth = (unsigned int) *sourcePTR;
+               totalDepth += curDepth;
+               ++totalMeasurements;
+             }
+        ++sourcePTR;
+     }
+    sourceLineLimitPTR += sourceWidth;
+    sourcePTR+=sourceLineSkip;
+  }
+ fprintf(stderr,"Initial total is %u after %u measurments \n",totalDepth,totalMeasurements);
+
+ if (totalMeasurements==0) { return 0; }
+ return (unsigned int) (totalDepth / totalMeasurements);
+}
+
+

@@ -1,6 +1,13 @@
 #ifndef IMAGEOPS_H_INCLUDED
 #define IMAGEOPS_H_INCLUDED
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 int mixbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
               unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
               unsigned int width , unsigned int height);
@@ -54,5 +61,14 @@ unsigned int countOccurancesOfRGBPixel(unsigned char * ptrRGB , unsigned int RGB
 int getRGBPixel(unsigned char * ptrRGB  , unsigned int RGBwidth , unsigned int RGBheight ,  unsigned int x , unsigned int y , unsigned char * R , unsigned char * G , unsigned char * B);
 
 int closeToRGB(unsigned char R , unsigned char G , unsigned char B  ,  unsigned char targetR , unsigned char targetG , unsigned char targetB , unsigned int threshold);
+
+
+unsigned int countDepthAverage(unsigned short * source, unsigned int sourceWidth , unsigned int sourceHeight ,
+                                unsigned int sX,  unsigned int sY  , unsigned int tileWidth , unsigned int tileHeight);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // PPM_H_INCLUDED

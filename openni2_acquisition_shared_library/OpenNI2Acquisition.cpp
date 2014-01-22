@@ -362,11 +362,18 @@ int snapOpenNI2Frames(int devID)
   int i=readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
 
     #if MOD_NITE2
-       if (frameSnapped%2==1) loopNite2();
+       if (frameSnapped%2==1) loopNite2(frameSnapped);
     #endif
 
     #if MOD_FACEDETECTION
-      if (frameSnapped%5==0) DetectFaces((unsigned char*) getOpenNI2ColorPixels(devID),45,150);
+      if (frameSnapped%5==0)
+      {
+         DetectFaces(frameSnapped,
+                      (unsigned char*) getOpenNI2ColorPixels(devID) ,
+                      (unsigned short*) getOpenNI2DepthPixels(devID) ,
+                      45,150 //Min / Max
+                     );
+      }
     #endif
 
   return i;
@@ -380,12 +387,15 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
          return 0;
      }
 
+    unsigned int forceMapDepthToRGB=0;
     #if MOD_NITE2
        startNite2();
+       forceMapDepthToRGB=1;
     #endif
 
     #if MOD_FACEDETECTION
        InitFaceDetection((char*) "haarcascade_frontalface_alt.xml",width,height);
+       forceMapDepthToRGB=1;
     #endif
 
      //Snapping an initial frame to populate Image Sizes , etc..
@@ -413,6 +423,10 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
      FocalLengthAndPixelSizeToCalibration(getOpenNI2ColorFocalLength(devID),getOpenNI2ColorFocalLength(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID),&calibRGB[devID]);
      FocalLengthAndPixelSizeToCalibration(getOpenNI2DepthFocalLength(devID),getOpenNI2DepthPixelSize(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID),&calibDepth[devID]);
     #endif
+
+    if (forceMapDepthToRGB)
+       { mapOpenNI2DepthToRGB(devID); }
+
 
     return 1;
   }
@@ -511,9 +525,9 @@ int getOpenNI2DepthBitsPerPixel(int devID)
 {
     return 16;
 }
-short * getOpenNI2DepthPixels(int devID)
+unsigned short * getOpenNI2DepthPixels(int devID)
 {
-   return (short *) depthFrame[devID].getData();
+   return (unsigned short *) depthFrame[devID].getData();
 }
 
 
