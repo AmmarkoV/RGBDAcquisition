@@ -8,8 +8,21 @@
 #include "NiTE.h"
 
 #include <NiteSampleUtilities.h>
+#include "Nite2.h"
 
 #define MAX_USERS 10
+
+#define NORMAL "\033[0m"
+#define BLACK "\033[30m" /* Black */
+#define RED "\033[31m" /* Red */
+#define GREEN "\033[32m" /* Green */
+#define YELLOW "\033[33m" /* Yellow */
+#define BLUE "\033[34m" /* Blue */
+#define MAGENTA "\033[35m" /* Magenta */
+#define CYAN "\033[36m" /* Cyan */
+#define WHITE "\033[37m" /* White */
+
+
 bool g_visibleUsers[MAX_USERS] = {false};
 nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
 
@@ -25,48 +38,20 @@ nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
 void * skelCallbackAddr = 0;
 
 
-enum humanSkeletonJoints
+
+
+int registerSkeletonDetectedEvent(void * callback)
 {
-   HUMAN_SKELETON_HEAD = 0,
-   HUMAN_SKELETON_TORSO,
-   HUMAN_SKELETON_LEFT_SHOULDER,
-   HUMAN_SKELETON_RIGHT_SHOULDER,
-   HUMAN_SKELETON_LEFT_ELBOW,
-   HUMAN_SKELETON_RIGHT_ELBOW,
-   HUMAN_SKELETON_LEFT_HAND,
-   HUMAN_SKELETON_RIGHT_HAND,
-   HUMAN_SKELETON_LEFT_HIP,
-   HUMAN_SKELETON_RIGHT_HIP,
-   HUMAN_SKELETON_LEFT_KNEE,
-   HUMAN_SKELETON_RIGHT_KNEE,
-   HUMAN_SKELETON_LEFT_FOOT,
-   HUMAN_SKELETON_RIGHT_FOOT,
-   //---------------------
-   HUMAN_SKELETON_PARTS
-};
+  skelCallbackAddr = callback;
+  return 1;
+}
 
-struct point3D
-{
-    float x,y,z;
-};
-
-struct skeletonHuman
-{
-  unsigned int userID;
-
-  unsigned char isNew,isVisible,isOutOfScene,isLost;
-  unsigned char statusCalibrating,statusStoppedTracking, statusTracking,statusFailed;
-
-  struct point3D bbox[4];
-  struct point3D centerOfMass;
-  struct point3D joint[HUMAN_SKELETON_PARTS];
-  float jointAccuracy[HUMAN_SKELETON_PARTS];
-};
 
 
 
 void newSkeletonDetected(unsigned int frameNumber ,struct skeletonHuman * skeletonFound)
 {
+    fprintf(stderr, GREEN " " );
     fprintf(stderr,"Skeleton #%u found at frame %u \n",skeletonFound->userID, frameNumber);
     unsigned int i=0;
 
@@ -79,11 +64,24 @@ void newSkeletonDetected(unsigned int frameNumber ,struct skeletonHuman * skelet
 
     fprintf(stderr,"Center of Mass %0.2f %0.2f %0.2f \n",skeletonFound->centerOfMass.x,skeletonFound->centerOfMass.y,skeletonFound->centerOfMass.z);
 
+
+    fprintf(stderr,"Head %0.2f %0.2f %0.2f \n",skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
+
+    fprintf(stderr,  " \n" NORMAL );
+
+
+  if (skelCallbackAddr!=0)
+  {
+    void ( *DoCallback) (unsigned int ,struct skeletonHuman *)=0 ;
+    DoCallback = (void(*) (unsigned int ,struct skeletonHuman *) ) skelCallbackAddr;
+    DoCallback(frameNumber ,skeletonFound);
+  }
+
 }
 
 
 
-void printSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user)
+void prepareSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user)
 {
     struct skeletonHuman humanSkeleton={0};
 
@@ -218,14 +216,25 @@ void printSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTrac
  }
 
 
+int startNite2Void()
+{
+	nite::NiTE::initialize();
+	niteRc = userTracker.create();
+	if (niteRc != nite::STATUS_OK)
+	{
+		printf("Couldn't create user tracker\n");
+		return 3;
+	}
+	printf("\nStart moving around to get detected...\n(PSI pose may be required for skeleton calibration, depending on the configuration)\n");
+ return 1;
+}
 
-
-int startNite2()
+int startNite2(openni::Device * device)
 {
     printf("Starting Nite2\n");
 	nite::NiTE::initialize();
 
-	niteRc = userTracker.create();
+	niteRc = userTracker.create(device);
 	if (niteRc != nite::STATUS_OK)
 	{
 		printf("Couldn't create user tracker\n");
@@ -263,22 +272,18 @@ int loopNite2(unsigned int frameNumber)
 			{
 				userTracker.startSkeletonTracking(user.getId());
 			}
-			else if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
+			else
+            if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
 			{
+		      prepareSkeletonState(frameNumber,userTracker,user);
+			     /*
 				const nite::SkeletonJoint& head = user.getSkeleton().getJoint(nite::JOINT_HEAD);
 				if (head.getPositionConfidence() > .5)
 				 {
-				     //printf("%d. (%5.2f, %5.2f, %5.2f)\n", user.getId(), head.getPosition().x, head.getPosition().y, head.getPosition().z);
-                     printSkeletonState(frameNumber,userTracker,user);
-				 }
+
+				 }*/
 			}
 		}
-  return 1;
-}
-
-int registerSkeletonDetectedEvent(void * callback)
-{
-  skelCallbackAddr  = callback;
   return 1;
 }
 

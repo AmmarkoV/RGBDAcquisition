@@ -5,6 +5,7 @@
 
 //#define BUILD_OPENNI2 1
 //#define USE_CALIBRATION 1
+//#define BUILD_OPENNI2 1
 
 #define MOD_FACEDETECTION 0
 #define MOD_NITE2 0
@@ -392,7 +393,7 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
 
     unsigned int forceMapDepthToRGB=0;
     #if MOD_NITE2
-       startNite2();
+       startNite2(&device[devID]);
        forceMapDepthToRGB=1;
     #endif
 
