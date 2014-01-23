@@ -47,6 +47,14 @@
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="../3dparty/NiTE-Linux-x64-2.2/Redist/libNiTE2.so" />
 		</Linker>
+		<Unit filename="../tools/Calibration/calibration.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/Calibration/calibration.h" />
+		<Unit filename="../tools/ImageOperations/imageOps.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/ImageOperations/imageOps.h" />
 		<Unit filename="FaceDetection.cpp" />
 		<Unit filename="FaceDetection.h" />
 		<Unit filename="Nite2.cpp" />

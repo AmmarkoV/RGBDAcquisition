@@ -28,13 +28,13 @@ void * skelCallbackAddr = 0;
 enum humanSkeletonJoints
 {
    HUMAN_SKELETON_HEAD = 0,
+   HUMAN_SKELETON_TORSO,
    HUMAN_SKELETON_LEFT_SHOULDER,
    HUMAN_SKELETON_RIGHT_SHOULDER,
    HUMAN_SKELETON_LEFT_ELBOW,
    HUMAN_SKELETON_RIGHT_ELBOW,
    HUMAN_SKELETON_LEFT_HAND,
    HUMAN_SKELETON_RIGHT_HAND,
-   HUMAN_SKELETON_TORSO,
    HUMAN_SKELETON_LEFT_HIP,
    HUMAN_SKELETON_RIGHT_HIP,
    HUMAN_SKELETON_LEFT_KNEE,
@@ -62,6 +62,25 @@ struct skeletonHuman
   struct point3D joint[HUMAN_SKELETON_PARTS];
   float jointAccuracy[HUMAN_SKELETON_PARTS];
 };
+
+
+
+void newSkeletonDetected(unsigned int frameNumber ,struct skeletonHuman * skeletonFound)
+{
+    fprintf(stderr,"Skeleton #%u found at frame %u \n",skeletonFound->userID, frameNumber);
+    unsigned int i=0;
+
+    fprintf(stderr,"BBox : ( ");
+    for (int i=0; i<4; i++)
+    {
+      fprintf(stderr,"%0.1f %0.1f , " ,skeletonFound->bbox[i].x , skeletonFound->bbox[i].y  );
+    }
+    fprintf(stderr,"\n");
+
+    fprintf(stderr,"Center of Mass %0.2f %0.2f %0.2f \n",skeletonFound->centerOfMass.x,skeletonFound->centerOfMass.y,skeletonFound->centerOfMass.z);
+
+}
+
 
 
 void printSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user)
@@ -192,6 +211,9 @@ void printSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTrac
 		 break;
 		}
 	}
+
+
+   newSkeletonDetected(frameNumber,&humanSkeleton);
 
  }
 
