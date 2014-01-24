@@ -7,7 +7,6 @@
 
 #include "NiTE.h"
 
-#include <NiteSampleUtilities.h>
 #include "Nite2.h"
 
 #define MAX_USERS 10
@@ -210,7 +209,8 @@ void prepareSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTr
 		}
 	}
 
-
+   //This is an event that gets fed with our newly encapsulated data
+   //it should also fire up any additional events registered by clients
    newSkeletonDetected(frameNumber,&humanSkeleton);
 
  }
@@ -266,22 +266,19 @@ int loopNite2(unsigned int frameNumber)
 		const nite::Array<nite::UserData>& users = userTrackerFrame.getUsers();
 		for (int i = 0; i < users.getSize(); ++i)
 		{
+		    //We will use user from now on as the current user
 			const nite::UserData& user = users[i];
-			//updateUserState(frameNumber,userTracker,user,userTrackerFrame.getTimestamp());
+
+            //If our user is new we should start to track his skeleton
 			if (user.isNew())
 			{
 				userTracker.startSkeletonTracking(user.getId());
 			}
 			else
+            //If we have a skeleton tracked , populate our internal structures and call callbacks
             if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
 			{
 		      prepareSkeletonState(frameNumber,userTracker,user);
-			     /*
-				const nite::SkeletonJoint& head = user.getSkeleton().getJoint(nite::JOINT_HEAD);
-				if (head.getPositionConfidence() > .5)
-				 {
-
-				 }*/
 			}
 		}
   return 1;

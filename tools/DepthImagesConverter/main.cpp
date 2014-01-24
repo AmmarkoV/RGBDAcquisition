@@ -132,7 +132,7 @@ int main( int argc, char** argv )
     fprintf(stderr,"%u arguments\n",argc);
     if( argc < 2)
     {
-     cout <<" Usage: display_image ImageToLoadAndDisplay ImageToStore" << endl;
+     cout <<" Usage: DepthImagesConverter inputImage outputImage" << endl;
      return -1;
     }
 

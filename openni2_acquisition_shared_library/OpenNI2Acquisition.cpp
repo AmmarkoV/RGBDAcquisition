@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> //<- just for a strncpy :P
 
 #include "OpenNI2Acquisition.h"
 
@@ -9,6 +10,8 @@
 
 #define MOD_FACEDETECTION 0
 #define MOD_NITE2 0
+#define BUILD_OPENNI2 1
+
 
 #if BUILD_OPENNI2
 
@@ -121,7 +124,7 @@ int getOpenNI2NumberOfDevices()
 }
 
 
-const char * getURIForDeviceNumber(int deviceNumber)
+const char * getURIForDeviceNumber(int deviceNumber,char * outURI,unsigned int maxOutURILength)
 {
     //This call returns a URI for a device number
     Array<DeviceInfo> deviceInfoList;
@@ -168,7 +171,17 @@ const char * getURIForDeviceNumber(int deviceNumber)
         fprintf(stderr,"Vendor : %s \n",deviceInfoList[i].getVendor());
         fprintf(stderr,"USB vendor:productid = %04x:%04x (lsusb style) \n",deviceInfoList[i].getUsbVendorId(),deviceInfoList[i].getUsbProductId());
         fprintf(stderr,"- - - - - - - - - -\n");
-        return deviceInfoList[i].getUri();
+
+        //Returning deviceInfoList[i].getUri() may point to garbage after the function exits and objects get destructed
+        //Thats why we use the buffer space provided by outURI and return our sure to work buffer instead
+        if ( (outURI==0) || (maxOutURILength<strlen(deviceInfoList[i].getUri())) )
+             {
+                fprintf(stderr,"getURIForDeviceNumber does not have enough accomodating space for the URI so it will return any availiable device \n");
+                return openni::ANY_DEVICE;
+             }
+        strncpy(outURI,deviceInfoList[i].getUri(),maxOutURILength);
+
+        return outURI;
       }
     }
 
@@ -180,12 +193,14 @@ int initializeOpenNIDevice(int deviceID , char * deviceName  , Device &device , 
    unsigned int openMode=OPENNI2_OPEN_REGULAR_ENUM; /* 0 = regular deviceID and enumeration*/
    if (deviceName!=0)
    {
+      //If our deviceName contains a .oni we assume that we have an oni file to open
       if (strstr(deviceName,".oni")!=0) { openMode=OPENNI2_OPEN_AS_ONI_FILE; }
    }
 
    switch (openMode)
    {
      //-------------------------------------------------------------------------------------
+     //If we have an ONI file to open just pass it as an argument to device.open(deviceName)
      case OPENNI2_OPEN_AS_ONI_FILE :
       if (device.open(deviceName) != STATUS_OK)
       {
@@ -193,20 +208,20 @@ int initializeOpenNIDevice(int deviceID , char * deviceName  , Device &device , 
         return 0;
       }
      break;
-
      //-------------------------------------------------------------------------------------
+     //If we don't have a deviceName we assume deviceID points to the device we want to open so we will try to use
+     //the openNI enumerator to get the specific device URI for device with number deviceID and use this to device.open( devURI )
      case OPENNI2_OPEN_REGULAR_ENUM :
      default :
-      if (device.open(getURIForDeviceNumber(deviceID)) != STATUS_OK)
+      //We have to supply our own buffer to hold the uri device string , so we make one here
+      char devURIBuffer[512]={0};
+      if (device.open(getURIForDeviceNumber(deviceID,devURIBuffer,512)) != STATUS_OK)
       {
         fprintf(stderr,"Could not open an OpenNI device : %s \n",OpenNI::getExtendedError());
         return 0;
       }
      break;
    }
-
-
-  //device.setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
 
 if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
     {
@@ -339,7 +354,9 @@ int mapOpenNI2DepthToRGB(int devID)
 int mapOpenNI2RGBToDepth(int devID)
 {
   return 0;
-  //device[devID].setImageRegistrationMode(IMAGE_REGISTRATION_COLOR_TO_DEPTH);
+  //Un commenting the next line leads to an error :
+  //IMAGE_REGISTRATION_COLOR_TO_DEPTH was not declared in this scope , is this not implemented by OPENNI2 ?
+  // device[devID].setImageRegistrationMode(IMAGE_REGISTRATION_COLOR_TO_DEPTH);
   return 1;
 }
 

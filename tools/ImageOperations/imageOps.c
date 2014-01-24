@@ -1,6 +1,7 @@
 #include "imageOps.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
 
