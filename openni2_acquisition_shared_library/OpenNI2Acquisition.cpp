@@ -10,7 +10,6 @@
 
 #define MOD_FACEDETECTION 0
 #define MOD_NITE2 0
-#define BUILD_OPENNI2 1
 
 
 #if BUILD_OPENNI2

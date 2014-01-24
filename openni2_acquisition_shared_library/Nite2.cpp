@@ -80,9 +80,12 @@ void newSkeletonDetected(unsigned int frameNumber ,struct skeletonHuman * skelet
 
 
 
-void prepareSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user)
+void prepareSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user  , unsigned int observation , unsigned int totalObservations)
 {
     struct skeletonHuman humanSkeleton={0};
+
+    humanSkeleton.observationNumber = observation;
+    humanSkeleton.observationTotal = totalObservations;
 
     humanSkeleton.bbox[0].x = user.getBoundingBox().max.x;       humanSkeleton.bbox[0].y = user.getBoundingBox().max.y;   humanSkeleton.bbox[0].z = 0;
     humanSkeleton.bbox[1].x = user.getBoundingBox().max.x;       humanSkeleton.bbox[1].y = user.getBoundingBox().min.y;   humanSkeleton.bbox[1].z = 0;
@@ -278,7 +281,7 @@ int loopNite2(unsigned int frameNumber)
             //If we have a skeleton tracked , populate our internal structures and call callbacks
             if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
 			{
-		      prepareSkeletonState(frameNumber,userTracker,user);
+		      prepareSkeletonState(frameNumber,userTracker,user  , i , users.getSize() );
 			}
 		}
   return 1;

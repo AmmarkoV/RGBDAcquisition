@@ -45,66 +45,6 @@ unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width
 
 
 
-
-
-
-int getDepthBlobAverage(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
-                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
-                        float * centerX , float * centerY , float * centerZ)
-{
-
-  if (frame==0)  { return 0; }
-  if ( (width==0)||(height==0) ) { return 0; }
-  if ( (frameWidth==0)||(frameWidth==0) ) { return 0; }
-
-  if (sX>=frameWidth) { return 0; }
-  if (sY>=frameHeight) { return 0;  }
-
-  //Check for bounds -----------------------------------------
-  if (sX+width>=frameWidth) { width=frameWidth-sX;  }
-  if (sY+height>=frameHeight) { height=frameHeight-sY;  }
-  //----------------------------------------------------------
-
-
-  unsigned int x=0,y=0;
-  unsigned long sumX=0,sumY=0,sumZ=0,samples=0;
-
-  unsigned short * sourcePTR      = frame+ MEMPLACE1(sX,sY,frameWidth);
-  unsigned short * sourceLimitPTR = frame+ MEMPLACE1((sX+width),(sY+height),frameWidth);
-  unsigned short sourceLineSkip = (frameWidth-width)  ;
-  unsigned short * sourceLineLimitPTR = sourcePTR + (width);
-
-  while (sourcePTR < sourceLimitPTR)
-  {
-     while (sourcePTR < sourceLineLimitPTR)
-     {
-       if (*sourcePTR!=0)
-       {
-        sumX+=x;
-        sumY+=y;
-        sumZ+=*sourcePTR;
-        ++samples;
-       }
-
-       ++x;
-       ++sourcePTR;
-     }
-
-    x=0; ++y;
-    sourceLineLimitPTR+=frameWidth;
-    sourcePTR+=sourceLineSkip;
-  }
-
-
-   *centerX = (float) sumX / samples;
-   *centerY = (float) sumY / samples;
-   *centerZ = (float) sumZ / samples;
-   return 1;
-}
-
-
-
-
 int InitFaceDetection(char * haarCascadePath , unsigned int width ,unsigned int height)
 {
     /* load the classifier
@@ -146,27 +86,23 @@ int registerFaceDetectedEvent(void * callback)
 
 
 
-void newFaceDetected(unsigned int frameNumber ,
-                    unsigned int sX , unsigned int sY , unsigned int tileWidth , unsigned int tileHeight ,
-                    unsigned int distance ,
-                    float headX,float headY,float headZ
-                   )
+void newFaceDetected(unsigned int frameNumber , struct detectedFace * faceDetected )
 {
  fprintf(stderr, BLUE " " );
  fprintf(stderr,"-----------------------------\n");
  fprintf(stderr,"Head Reading @ frame %u \n", frameNumber);
- fprintf(stderr,"HeadProjection  @ %u %u , %u , %u   \n", sX , sY , tileWidth , tileHeight );
- fprintf(stderr,"Head @ 3D %0.2f %0.2f %0.2f  \n",headX , headY , headZ);
- fprintf(stderr,"Head Distance @  %u\n",distance);
+ fprintf(stderr,"HeadProjection  @ %u %u , %u , %u   \n", faceDetected->sX , faceDetected->sY , faceDetected->tileWidth , faceDetected->tileHeight );
+ fprintf(stderr,"Head @ 3D %0.2f %0.2f %0.2f  \n",faceDetected->headX , faceDetected->headY , faceDetected->headZ);
+ fprintf(stderr,"Head Distance @  %u\n",faceDetected->distance);
  fprintf(stderr,"-----------------------------\n");
  fprintf(stderr,  " \n" NORMAL );
 
 
  if (callbackAddr!=0)
  {
-   void ( *DoCallback) (  unsigned int  , unsigned int  , unsigned int , unsigned int , unsigned int , unsigned int , float  ,float  ,float  )=0 ;
-   DoCallback = (void(*) (  unsigned int  , unsigned int  , unsigned int , unsigned int , unsigned int , unsigned int , float  ,float  ,float  ) ) callbackAddr;
-   DoCallback(frameNumber , sX , sY , tileWidth , tileHeight , distance , headX, headY, headZ);
+   void ( *DoCallback) (  unsigned int  , struct detectedFace * )=0 ;
+   DoCallback = (void(*) (  unsigned int  , struct detectedFace * ) ) callbackAddr;
+   DoCallback(frameNumber , faceDetected);
  }
 
  return;
@@ -184,7 +120,6 @@ unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels 
 
     unsigned int maxX=(unsigned int) (minHeadSize)       , maxY=minHeadSize;
     unsigned int minX=(unsigned int) (0.77*maxHeadSize)  , minY=maxHeadSize;
-    //fprintf(stderr,"Detect Faces Min %u,%u Max %u,%u \n",minX,minY,maxX,maxY);
 
     CvSeq *faces = cvHaarDetectObjects
            (
@@ -210,17 +145,26 @@ unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels 
          unsigned int sY = r->y;
          unsigned int avgFaceDepth = countDepthAverage(depthPixels,fdFrameWidth,fdFrameHeight,sX,sY,tileWidth,tileHeight);
 
-         /*
-         float centerX , centerY , centerZ;
-         getDepthBlobAverage(depthPixels,fdFrameWidth,fdFrameHeight,
-                             sX,sY,tileWidth,tileHeight,
-                             &centerX , &centerY , &centerZ);*/
 
          float headX=0.0 , headY=0.0 , headZ=0.0;
          transform2DProjectedPointTo3DPoint(calib, sX+tileWidthHalf , sY+tileHeightHalf , (unsigned short) avgFaceDepth , &headX , &headY , &headZ);
 
-         newFaceDetected(frameNumber,sX,sY,tileWidth,tileHeight,avgFaceDepth ,headX,headY,headZ);
 
+         struct detectedFace faceDetected;
+         faceDetected.observationNumber = i;
+         faceDetected.observationTotal = faces->total;
+
+         faceDetected.sX = sX;
+         faceDetected.sY = sY;
+         faceDetected.tileWidth = tileWidth;
+         faceDetected.tileHeight = tileHeight;
+         faceDetected.distance = avgFaceDepth;
+         faceDetected.headX = headX;
+         faceDetected.headY = headY;
+         faceDetected.headZ = headZ;
+
+
+         newFaceDetected(frameNumber,&faceDetected);
     }
 
 	return 1;

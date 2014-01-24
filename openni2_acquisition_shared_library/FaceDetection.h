@@ -3,6 +3,19 @@
 
 
 #include "../tools/Calibration/calibration.h"
+
+
+struct detectedFace
+{
+  unsigned int observationNumber , observationTotal;
+
+  unsigned int sX , sY , tileWidth , tileHeight , distance;
+  float headX, headY, headZ;
+};
+
+
+
+
 int InitFaceDetection(char * haarCascadePath , unsigned int width ,unsigned int height);
 int CloseFaceDetection() ;
 int registerFaceDetectedEvent(void * callback);

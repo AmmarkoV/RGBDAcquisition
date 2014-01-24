@@ -37,6 +37,7 @@ struct point3D
 
 struct skeletonHuman
 {
+  unsigned int observationNumber , observationTotal;
   unsigned int userID;
 
   unsigned char isNew,isVisible,isOutOfScene,isLost;
