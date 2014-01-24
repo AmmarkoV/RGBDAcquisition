@@ -498,9 +498,9 @@ int getOpenNI2ColorBitsPerPixel(int devID)
 {
     return 8;
 }
-char * getOpenNI2ColorPixels(int devID)
+unsigned char * getOpenNI2ColorPixels(int devID)
 {
-   return (char *)colorFrame[devID].getData();
+   return (unsigned char *)colorFrame[devID].getData();
 }
 
 

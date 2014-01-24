@@ -39,7 +39,7 @@ extern "C"
    int getOpenNI2ColorDataSize(int devID);
    int getOpenNI2ColorChannels(int devID);
    int getOpenNI2ColorBitsPerPixel(int devID);
-   char * getOpenNI2ColorPixels(int devID);
+   unsigned char * getOpenNI2ColorPixels(int devID);
 
    double getOpenNI2ColorFocalLength(int devID);
    double getOpenNI2ColorPixelSize(int devID);
