@@ -1,3 +1,9 @@
+/** @file main.cpp
+*   @brief  A small tool that converts Depth files from .PNM with swapped endianness to .PNG
+*   @author Ammar Qammaz (AmmarkoV)
+*   @bug This handles only a few file types
+*/
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>

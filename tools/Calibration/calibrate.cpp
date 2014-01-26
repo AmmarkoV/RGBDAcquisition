@@ -251,7 +251,7 @@ save_camera_paramsOriginal(oldFilename,image_count,img_size,board_size,square_si
 
     fprintf( fp, "%%ImageWidth=%u\n",img_size.width);
     fprintf( fp, "%%ImageHeight=%u\n",img_size.height);
-    fprintf( fp, "%%Description=After %u images , board is %ux%u , square size is %u , aspect ratio %0.2f\n",image_count,board_size.width,board_size.height,square_size,aspect_ratio);
+    fprintf( fp, "%%Description=After %u images , board is %ux%u , square size is %f , aspect ratio %0.2f\n",image_count,board_size.width,board_size.height,square_size,aspect_ratio);
 
 
     fprintf( fp, "%%Intrinsics I[1,1], I[1,2], I[1,3], I[2,1], I[2,2], I[2,3], I[3,1], I[3,2] I[3,3] %ux%u\n",camera_matrix->rows,camera_matrix->cols);

@@ -1,3 +1,9 @@
+/** @file main.c
+*   @brief  Some Operating System specific functions to abstract the OS layer
+*   @author Ammar Qammaz (AmmarkoV)
+*   @bug This does not have implementations for non-Linux systems
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,3 +1,7 @@
+/** @file quaternions.c
+*   @brief  A Library that provides quaternion functionality
+*   @author Ammar Qammaz (AmmarkoV)
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -10,6 +14,7 @@
 #define USEATAN2 1
   /* arctan and arcsin have a result between −π/2 and π/2. With three rotations between −π/2 and π/2 you can't have all possible orientations.
      We need to replace the arctan by atan2 to generate all the orientations. */
+
 
 void euler2Quaternions(double * quaternions,double * euler,int quaternionConvention)
 {

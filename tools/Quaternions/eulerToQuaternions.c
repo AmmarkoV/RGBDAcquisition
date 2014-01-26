@@ -1,3 +1,7 @@
+/** @file eulerToQuaternions.c
+*   @brief  A Tool to convert euler angles to quaternions
+*   @author Ammar Qammaz (AmmarkoV)
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

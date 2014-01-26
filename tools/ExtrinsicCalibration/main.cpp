@@ -1,4 +1,3 @@
-
 //#include <cv.h>
 //#include <highgui.h>
 #include <opencv2/opencv.hpp>
@@ -14,7 +13,7 @@
 #include <locale.h>
 
 
-
+#define MAX_FILENAME_STRING 1024
 #define MAX_LINE_CALIBRATION 1024
 
 #define DEFAULT_FOCAL_LENGTH 120.0
@@ -55,7 +54,6 @@ int ReadCalibration(char * filename,struct calibration * calib)
   if (fp == 0 ) {  return 0; }
 
   char line[MAX_LINE_CALIBRATION]={0};
-  unsigned int lineLength=0;
 
   unsigned int i=0;
 
@@ -146,7 +144,7 @@ int ReadCalibration(char * filename,struct calibration * calib)
 
 void append_camera_params( const char* out_filename, struct calibration * calib )
 {
-  char oldFilename[512]={0};
+  char oldFilename[MAX_FILENAME_STRING]={0};
   sprintf(oldFilename,"old%s",out_filename);
 
     FILE * fp=0;
@@ -176,7 +174,7 @@ int calibrateExtrinsicOnly( CvPoint2D32f* image_points_buf, CvSize img_size, CvS
                      CvMat* camera_matrix, CvMat* dist_coeffs, CvMat** extr_params,
                      CvMat * rot_vects, CvMat * trans_vects )
 {
-    int code;
+    int code=0;
     int image_count = 1;
     int point_count = board_size.width*board_size.height;
     fprintf(stderr,"Calibrate , image points total %u , images total %u \n",point_count,image_count);
@@ -184,13 +182,13 @@ int calibrateExtrinsicOnly( CvPoint2D32f* image_points_buf, CvSize img_size, CvS
     CvMat* object_points = cvCreateMat( 1, image_count*point_count, CV_32FC3 );
     CvMat* point_counts = cvCreateMat( 1, image_count, CV_32SC1 );
     ;
-    int i, j, k;
-    CvSeqReader reader;
+    int initialPoint=0, j=0, k=0;
+    //CvSeqReader reader;
 
     // initialize arrays of points
     CvPoint2D32f* src_img_pt = (CvPoint2D32f*) image_points_buf;
-    CvPoint2D32f* dst_img_pt = ((CvPoint2D32f*)image_points->data.fl) + i*point_count;
-    CvPoint3D32f* obj_pt = ((CvPoint3D32f*)object_points->data.fl) + i*point_count;
+    CvPoint2D32f* dst_img_pt = ((CvPoint2D32f*)image_points->data.fl) + initialPoint*point_count;
+    CvPoint3D32f* obj_pt = ((CvPoint3D32f*)object_points->data.fl) + initialPoint*point_count;
 
     for( j = 0; j < board_size.height; j++ )
      for( k = 0; k < board_size.width; k++ )
@@ -276,8 +274,8 @@ int main( int argc, char** argv )
     int viewResult = 0;
     int writeResult = 1;
 
-    char calibFile[512]={0};
-    char imageFile[512]={0};
+    char calibFile[MAX_FILENAME_STRING]={0};
+    char imageFile[MAX_FILENAME_STRING]={0};
 
   int i=0;
   for (i=0; i<argc; i++)
@@ -286,8 +284,8 @@ int main( int argc, char** argv )
     if (strcmp(argv[i],"-h")==0) { board_size.height=atoi(argv[i+1]); } else
     //Size of unit
     if (strcmp(argv[i],"-s")==0) { square_size=atof(argv[i+1]);      } else
-    if (strcmp(argv[i],"-c")==0) { strcpy(calibFile,argv[i+1]);      } else
-    if (strcmp(argv[i],"-i")==0) { strcpy(imageFile,argv[i+1]);      } else
+    if (strcmp(argv[i],"-c")==0) { strncpy(calibFile,argv[i+1],MAX_FILENAME_STRING);      } else
+    if (strcmp(argv[i],"-i")==0) { strncpy(imageFile,argv[i+1],MAX_FILENAME_STRING);      } else
     if (strcmp(argv[i],"-v")==0) { viewResult=1;   } else
     if (strcmp(argv[i],"-n")==0) { writeResult=0;   }
   }
@@ -299,11 +297,24 @@ int main( int argc, char** argv )
     int count = 0, found;
 
     view = cvLoadImage( imageFile, 1 );
+    if (view==0)
+     {
+       fprintf(stderr,"Could not read image file %s \n",imageFile);
+       return 1;
+     }
 
     int elem_size = board_size.width*board_size.height*sizeof(CvPoint2D32f);
 
     CvMemStorage* storage = cvCreateMemStorage( MAX( elem_size*4, 1 << 16 ));
     CvPoint2D32f* image_points_buf = (CvPoint2D32f*)cvAlloc( elem_size );
+
+    if ( (storage==0) || (image_points_buf==0) )
+    {
+       fprintf(stderr,"Could not allocate OpenCV Buffers for chessboard\n");
+       return 2;
+    }
+
+
 
     img_size = cvGetSize(view);
     found = cvFindChessboardCorners( view, board_size, image_points_buf, &count, CV_CALIB_CB_ADAPTIVE_THRESH );
@@ -323,10 +334,12 @@ int main( int argc, char** argv )
     double _dist_coeffs[4]={0}; _dist_coeffs[0]=calib.k1; _dist_coeffs[1]=calib.k2; _dist_coeffs[2]=calib.p1; _dist_coeffs[3]=calib.p2;
     CvMat camera = cvMat( 3, 3, CV_64F, calib.intrinsic );
     CvMat dist_coeffs = cvMat( 1, 4, CV_64F, _dist_coeffs );
-    CvMat *extr_params = 0, *reproj_errs = 0;
-    double avg_reproj_err = 0;
+    CvMat *extr_params = 0;
+    //CvMat *reproj_errs = 0;
+    //double avg_reproj_err = 0;
 
     int code = calibrateExtrinsicOnly( image_points_buf, img_size, board_size, square_size, aspect_ratio, &camera, &dist_coeffs, &extr_params, &rot_vects, &trans_vects );
+    fprintf(stderr,".. code %u .. \n",code);
 
 
     fprintf( stderr, " Rot : %f ",rot_vects.data.fl[0]); fprintf( stderr, "%f ",rot_vects.data.fl[1]); fprintf( stderr, "%f\n",rot_vects.data.fl[2]);
@@ -342,7 +355,6 @@ int main( int argc, char** argv )
 
 
     if (writeResult) { append_camera_params(calibFile,&calib); }
-    // waitKey(0);
 
     float result[9]={0};
     convertRodriguezTo3x3(calib.extrinsicRotationRodriguez,(float*) &result);

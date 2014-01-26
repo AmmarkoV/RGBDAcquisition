@@ -1,3 +1,8 @@
+/** @file pointsDistance.c
+*   @brief  A small tool that calculates the distance between 2 points
+*   @author Ammar Qammaz (AmmarkoV)
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
