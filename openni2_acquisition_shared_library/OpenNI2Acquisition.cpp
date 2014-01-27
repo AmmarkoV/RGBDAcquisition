@@ -10,7 +10,7 @@
 
 #define MOD_FACEDETECTION 0
 #define MOD_NITE2 0
-
+#define BUILD_OPENNI2 1
 
 #if BUILD_OPENNI2
 
@@ -35,6 +35,8 @@
 using namespace std;
 using namespace openni;
 
+
+unsigned int currentAllocatedDevices = 0;
 Device device[MAX_OPENNI2_DEVICES];
 VideoStream depth[MAX_OPENNI2_DEVICES] , color[MAX_OPENNI2_DEVICES];
 VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES];
@@ -359,11 +361,16 @@ int mapOpenNI2RGBToDepth(int devID)
   return 1;
 }
 
-
+int badDeviceID(int devID)
+{
+  if ((unsigned int) devID<currentAllocatedDevices) { fprintf(stderr,"Bad Device ID detected (%i) , ignoring request\n",devID); return 0; }
+  return 1;
+}
 
 
 int startOpenNI2Module(unsigned int max_devs,char * settings)
 {
+    currentAllocatedDevices  = max_devs;
     return initializeOpenNI(max_devs,settings);
 }
 
@@ -375,6 +382,7 @@ int stopOpenNI2Module()
 
 int snapOpenNI2Frames(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
   ++frameSnapped;
   int i=readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
 
@@ -400,7 +408,8 @@ int snapOpenNI2Frames(int devID)
 }
 
 int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
-  {
+{
+  if (badDeviceID(devID)) { return 0; }
     if (! initializeOpenNIDevice(devID,devName,device[devID],color[devID],depth[devID],width,height,framerate) )
      {
          fprintf(stderr,"Could not initialize device with ID %u \n",devID);
@@ -454,6 +463,7 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
 
  int destroyOpenNI2Device(int devID)
  {
+  if (badDeviceID(devID)) { return 0; }
      #if MOD_NITE2
        stopNite2();
      #endif
@@ -466,6 +476,7 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
 
 int getTotalOpenNI2FrameNumber(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
   #warning "Todo , check here for oni file length etc..\n"
   //fprintf(stderr,"Todo , check here for oni file length etc..\n");
   return 0;
@@ -473,38 +484,46 @@ int getTotalOpenNI2FrameNumber(int devID)
 
 int getCurrentOpenNI2FrameNumber(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
   return colorFrame[devID].getFrameIndex();
 }
 
 //COLOR FRAMES
 int getOpenNI2ColorWidth(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
    return colorFrame[devID].getWidth();
 }
 int getOpenNI2ColorHeight(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
    return colorFrame[devID].getHeight();
 }
 int getOpenNI2ColorDataSize(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     return colorFrame[devID].getDataSize();
 }
 int getOpenNI2ColorChannels(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     return 3;
 }
 int getOpenNI2ColorBitsPerPixel(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     return 8;
 }
 unsigned char * getOpenNI2ColorPixels(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
    return (unsigned char *)colorFrame[devID].getData();
 }
 
 
 double getOpenNI2ColorFocalLength(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     int zpd=0;
     color[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,&zpd);
     return (double) zpd;
@@ -512,6 +531,7 @@ double getOpenNI2ColorFocalLength(int devID)
 
 double getOpenNI2ColorPixelSize(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     double zpps=0.0;
     color[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
 
@@ -527,32 +547,39 @@ double getOpenNI2ColorPixelSize(int devID)
 //DEPTH FRAMES
 int getOpenNI2DepthWidth(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
    return depthFrame[devID].getWidth();
 }
 int getOpenNI2DepthHeight(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
    return depthFrame[devID].getHeight();
 }
 int getOpenNI2DepthDataSize(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     return depthFrame[devID].getDataSize();
 }
 int getOpenNI2DepthChannels(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     return 1;
 }
 int getOpenNI2DepthBitsPerPixel(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     return 16;
 }
 unsigned short * getOpenNI2DepthPixels(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
    return (unsigned short *) depthFrame[devID].getData();
 }
 
 
 double getOpenNI2DepthFocalLength(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     int zpd=0;
     depth[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,&zpd);
     if (zpd==0) {
@@ -565,6 +592,7 @@ double getOpenNI2DepthFocalLength(int devID)
 
 double getOpenNI2DepthPixelSize(int devID)
 {
+  if (badDeviceID(devID)) { return 0; }
     double zpps=0.0;
     depth[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
 
@@ -582,12 +610,14 @@ double getOpenNI2DepthPixelSize(int devID)
 #if USE_CALIBRATION
 int getOpenNI2ColorCalibration(int devID,struct calibration * calib)
 {
+  if (badDeviceID(devID)) { return 0; }
     memcpy((void*) calib,(void*) &calibRGB[devID],sizeof(struct calibration));
     return 1;
 }
 
 int getOpenNI2DepthCalibration(int devID,struct calibration * calib)
 {
+  if (badDeviceID(devID)) { return 0; }
     memcpy((void*) calib,(void*) &calibDepth[devID],sizeof(struct calibration));
     return 1;
 }
@@ -595,12 +625,14 @@ int getOpenNI2DepthCalibration(int devID,struct calibration * calib)
 
 int setOpenNI2ColorCalibration(int devID,struct calibration * calib)
 {
+  if (badDeviceID(devID)) { return 0; }
     memcpy((void*) &calibRGB[devID] , (void*) calib,sizeof(struct calibration));
     return 1;
 }
 
 int setOpenNI2DepthCalibration(int devID,struct calibration * calib)
 {
+  if (badDeviceID(devID)) { return 0; }
     memcpy((void*) &calibDepth[devID] , (void*) calib,sizeof(struct calibration));
     return 1;
 }
