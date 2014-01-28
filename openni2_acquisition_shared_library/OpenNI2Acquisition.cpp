@@ -48,6 +48,13 @@ unsigned int frameSnapped=0;
 #endif
 
 
+
+unsigned int pauseFaceDetection = 0;
+unsigned int faceDetectionFramesBetweenScans = 2;
+unsigned int pauseSkeletonDetection = 0;
+unsigned int skeletonDetectionFramesBetweenScans = 5;
+
+
 enum howToOpenDevice
 {
   OPENNI2_OPEN_REGULAR_ENUM = 0,
@@ -386,13 +393,18 @@ int snapOpenNI2Frames(int devID)
   ++frameSnapped;
   int i=readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
 
-    #if MOD_NITE2
-       if (frameSnapped%2==1) loopNite2(frameSnapped);
+  #if MOD_NITE2
+       if ( (skeletonDetectionFramesBetweenScans!=0) && (!pauseSkeletonDetection) )
+       {
+          if (frameSnapped%skeletonDetectionFramesBetweenScans ==1) loopNite2(frameSnapped);
+       }
     #endif
 
     #if MOD_FACEDETECTION
-      if (frameSnapped%5==0)
-      {
+       if ( (faceDetectionFramesBetweenScans!=0) && (!pauseFaceDetection)  )
+       {
+        if (frameSnapped%faceDetectionFramesBetweenScans==0)
+        {
          struct calibration calib;
          getOpenNI2ColorCalibration(devID,&calib);
          DetectFaces(frameSnapped,
@@ -401,7 +413,8 @@ int snapOpenNI2Frames(int devID)
                       &calib ,
                       45,150 //Min / Max
                      );
-      }
+        }
+       }
     #endif
 
   return i;

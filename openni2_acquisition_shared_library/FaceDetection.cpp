@@ -19,6 +19,9 @@
 
 #define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
 
+
+int saveResults = 0;
+
 IplImage  *image=0;
 char * opencv_pointer_retainer=0; // This is a kind of an ugly hack ( see lines noted with UGLY HACK ) to minimize memcpying between my VisCortex and OpenCV , without disturbing OpenCV
 
@@ -27,6 +30,7 @@ CvMemStorage            *storage=0;
 
 unsigned int fdFrameWidth = 640;
 unsigned int fdFrameHeight = 480;
+unsigned int faceReadingNumber=0;
 
 void * callbackAddr = 0;
 
@@ -163,6 +167,13 @@ unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels 
          faceDetected.headY = headY;
          faceDetected.headZ = headZ;
 
+         if (saveResults)
+          {
+            char filename[512]={0};
+            sprintf(filename,"colorFrame_0_%05u.pnm",faceReadingNumber);
+            bitBltRGBToFile(filename, 0 , colorPixels , sX, sY  ,640,480 , tileWidth , tileHeight );
+            ++faceReadingNumber;
+          }
 
          newFaceDetected(frameNumber,&faceDetected);
     }

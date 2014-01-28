@@ -30,6 +30,27 @@ enum humanSkeletonJoints
    HUMAN_SKELETON_PARTS
 };
 
+const char * jointNames[] =
+{"head",
+ "torso",
+ "left_shoulder",
+ "right_shoulder",
+ "left_elbow",
+ "right_elbow",
+ "left_hand",
+ "right_hand",
+ "left_hip",
+ "right_hip",
+ "left_knee",
+ "right_knee",
+ "left_foot",
+ "right_foot"
+};
+
+
+
+
+
 struct point3D
 {
     float x,y,z;
