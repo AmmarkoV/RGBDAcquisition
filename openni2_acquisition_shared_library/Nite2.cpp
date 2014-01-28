@@ -21,6 +21,22 @@
 #define CYAN "\033[36m" /* Cyan */
 #define WHITE "\033[37m" /* White */
 
+const char * jointNames[] =
+{"head",
+ "torso",
+ "left_shoulder",
+ "right_shoulder",
+ "left_elbow",
+ "right_elbow",
+ "left_hand",
+ "right_hand",
+ "left_hip",
+ "right_hip",
+ "left_knee",
+ "right_knee",
+ "left_foot",
+ "right_foot"
+};
 
 bool g_visibleUsers[MAX_USERS] = {false};
 nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
