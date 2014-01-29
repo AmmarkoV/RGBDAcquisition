@@ -8,6 +8,7 @@
 #include "NiTE.h"
 
 #include "Nite2.h"
+#include <math.h>
 
 #define MAX_USERS 10
 
@@ -75,9 +76,6 @@ void newSkeletonPointingDetected(unsigned int frameNumber ,struct skeletonPointi
 
   fprintf(stderr,"Skeleton Pointing Detected\n");
 
-
-
-
   if (skelCallbackPointingAddr!=0)
   {
     void ( *DoCallback) (unsigned int ,struct skeletonPointing *)=0 ;
@@ -86,11 +84,6 @@ void newSkeletonPointingDetected(unsigned int frameNumber ,struct skeletonPointi
   }
 
 }
-
-
-
-
-
 
 
 void newSkeletonDetected(unsigned int frameNumber ,struct skeletonHuman * skeletonFound)
@@ -123,10 +116,75 @@ void newSkeletonDetected(unsigned int frameNumber ,struct skeletonHuman * skelet
 
 }
 
+
+
+float simpPow(float base,unsigned int exp)
+{
+    if (exp==0) return 1;
+    float retres=base;
+    unsigned int i=0;
+    for (i=0; i<exp-1; i++)
+    {
+        retres*=base;
+    }
+    return retres;
+}
+
+
+
 int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * skeletonFound)
 {
-  struct skeletonPointing skeletonPointingFound={0};
-  newSkeletonPointingDetected(frameNumber,&skeletonPointingFound);
+  struct skeletonPointing skelPF={0};
+
+  float distanceLeft = sqrt(
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].x - skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].x ,2)  +
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].y - skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].y ,2)  +
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].z - skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].z ,2)
+                           );
+  float distanceRight = sqrt(
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].x - skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].x ,2)  +
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].y - skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].y ,2)  +
+                             simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].z - skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].z ,2)
+                             );
+
+
+  int doHand=1; //1 = left , 2 =right
+  if (distanceLeft<distanceRight) { doHand=2; }
+
+  if (doHand==1)
+  {
+   skelPF.pointStart.x = skeletonFound->joint[HUMAN_SKELETON_LEFT_ELBOW].x;
+   skelPF.pointStart.y = skeletonFound->joint[HUMAN_SKELETON_LEFT_ELBOW].y;
+   skelPF.pointStart.z = skeletonFound->joint[HUMAN_SKELETON_LEFT_ELBOW].z;
+   skelPF.pointEnd.x = skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].x;
+   skelPF.pointEnd.y = skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].y;
+   skelPF.pointEnd.z = skeletonFound->joint[HUMAN_SKELETON_LEFT_HAND].z;
+   skelPF.pointingVector.x = skelPF.pointEnd.x - skelPF.pointStart.x;
+   skelPF.pointingVector.y = skelPF.pointEnd.y - skelPF.pointStart.y;
+   skelPF.pointingVector.z = skelPF.pointEnd.z - skelPF.pointStart.z;
+   skelPF.isLeftHand=1;
+   skelPF.isRightHand=0;
+   newSkeletonPointingDetected(frameNumber,&skelPF);
+   return 1;
+  } else
+  if (doHand==2)
+  {
+   skelPF.pointStart.x = skeletonFound->joint[HUMAN_SKELETON_RIGHT_ELBOW].x;
+   skelPF.pointStart.y = skeletonFound->joint[HUMAN_SKELETON_RIGHT_ELBOW].y;
+   skelPF.pointStart.z = skeletonFound->joint[HUMAN_SKELETON_RIGHT_ELBOW].z;
+   skelPF.pointEnd.x = skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].x;
+   skelPF.pointEnd.y = skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].y;
+   skelPF.pointEnd.z = skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].z;
+   skelPF.pointingVector.x = skelPF.pointEnd.x - skelPF.pointStart.x;
+   skelPF.pointingVector.y = skelPF.pointEnd.y - skelPF.pointStart.y;
+   skelPF.pointingVector.z = skelPF.pointEnd.z - skelPF.pointStart.z;
+   skelPF.isLeftHand=0;
+   skelPF.isRightHand=1;
+   newSkeletonPointingDetected(frameNumber,&skelPF);
+   return 1;
+  }
+
+ return 0;
 }
 
 
