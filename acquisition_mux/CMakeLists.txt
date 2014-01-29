@@ -1,6 +1,5 @@
 project( AcquisitionMux ) 
-cmake_minimum_required( VERSION 2.8.7 )  
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODULE_PATH})
+cmake_minimum_required( VERSION 2.8.7 )   
  
 add_library(AcquisitionMux SHARED AcquisitionMux.c AcquisitionMux.h ../tools/ImageOperations/imageOps.c ../tools/ImageOperations/imageOps.h ) 
 #target_link_libraries(AcquisitionMux rt dl m Timers CalibrationLibrary OperatingSystem ) 

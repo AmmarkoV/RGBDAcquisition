@@ -1,8 +1,5 @@
 project( Viewer ) 
 cmake_minimum_required( VERSION 2.8.7 )
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODULE_PATH})
-   
-
 
 find_package(OpenCV REQUIRED)
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})

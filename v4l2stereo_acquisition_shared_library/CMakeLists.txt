@@ -1,6 +1,5 @@
 project( V4L2StereoAcquisition ) 
 cmake_minimum_required( VERSION 2.8.7 )  
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODULE_PATH})
   
 add_library(V4L2StereoAcquisition SHARED 
             ../v4l2_acquisition_shared_library/PixelFormatConversions.c
