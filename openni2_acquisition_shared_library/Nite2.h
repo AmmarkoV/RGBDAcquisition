@@ -76,6 +76,5 @@ int stopNite2();
 int loopNite2(unsigned int frameNumber);
 
 
-int registerSkeletonDetectedEvent(void * callback);
 
 #endif // NITE2_H_INCLUDED

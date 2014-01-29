@@ -74,7 +74,15 @@ int registerSkeletonDetectedEvent(void * callback)
 void newSkeletonPointingDetected(unsigned int frameNumber ,struct skeletonPointing * skeletonPointingFound)
 {
 
-  fprintf(stderr,"Skeleton Pointing Detected\n");
+  fprintf(stderr,YELLOW "Skeleton Pointing Detected : ");
+  if (skeletonPointingFound->isLeftHand) {  fprintf(stderr,"LEFT "); } else
+  if (skeletonPointingFound->isRightHand) {  fprintf(stderr,"RIGHT "); }
+  fprintf(stderr," From %0.2f,%0.2f,%0.2f\n",skeletonPointingFound->pointStart.x,skeletonPointingFound->pointStart.y,skeletonPointingFound->pointStart.z);
+  fprintf(stderr," To   %0.2f,%0.2f,%0.2f\n",skeletonPointingFound->pointEnd.x,skeletonPointingFound->pointEnd.y,skeletonPointingFound->pointEnd.z);
+  fprintf(stderr," Vector %0.2f,%0.2f,%0.2f\n",skeletonPointingFound->pointingVector.x,skeletonPointingFound->pointingVector.y,skeletonPointingFound->pointingVector.z);
+  fprintf(stderr,"\n " NORMAL);
+
+
 
   if (skelCallbackPointingAddr!=0)
   {
@@ -146,6 +154,9 @@ int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * ske
                              simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].y - skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].y ,2)  +
                              simpPow(skeletonFound->joint[HUMAN_SKELETON_TORSO].z - skeletonFound->joint[HUMAN_SKELETON_RIGHT_HAND].z ,2)
                              );
+
+
+  if ( (distanceLeft<300) && (distanceRight<300) ) { fprintf(stderr,"Cutting off pointing "); return 0; }
 
 
   int doHand=1; //1 = left , 2 =right

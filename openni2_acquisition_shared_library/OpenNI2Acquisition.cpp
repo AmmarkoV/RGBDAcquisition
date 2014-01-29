@@ -280,6 +280,7 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
         }
     }
 
+    //Mirroring is disabled
     depth.setMirroringEnabled (false);
     color.setMirroringEnabled (false);
 
