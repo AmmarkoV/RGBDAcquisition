@@ -3,9 +3,9 @@ cmake_minimum_required( VERSION 2.8.7 )
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODULE_PATH})
    
 add_executable(Grabber main.c ) 
-target_link_libraries(Grabber rt dl m Acquistion OperatingSystem Timers CalibrationLibrary )
+target_link_libraries(Grabber rt dl m Acquisition OperatingSystem Timers CalibrationLibrary )
 set_target_properties(Grabber PROPERTIES DEBUG_POSTFIX "D")
-add_dependencies(Grabber Acquistion OperatingSystem Timers CalibrationLibrary)  
+add_dependencies(Grabber Acquisition OperatingSystem Timers CalibrationLibrary)  
        
  
 set_target_properties(CalibrationLibrary PROPERTIES 

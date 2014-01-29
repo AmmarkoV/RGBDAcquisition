@@ -3,9 +3,9 @@ cmake_minimum_required( VERSION 2.8.7 )
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODULE_PATH})
    
 add_executable(GrabberMux main.c ) 
-target_link_libraries(GrabberMux rt dl m Acquistion AcquistionMux OperatingSystem Timers CalibrationLibrary )
+target_link_libraries(GrabberMux rt dl m Acquisition AcquisitionMux OperatingSystem Timers CalibrationLibrary )
 set_target_properties(GrabberMux PROPERTIES DEBUG_POSTFIX "D")
-add_dependencies(GrabberMux Acquistion AcquistionMux OperatingSystem Timers CalibrationLibrary)  
+add_dependencies(GrabberMux Acquisition AcquisitionMux OperatingSystem Timers CalibrationLibrary)  
        
  
 set_target_properties(CalibrationLibrary PROPERTIES 

@@ -1,8 +1,8 @@
-project( AcquistionSegment ) 
+project( AcquisitionSegment ) 
 cmake_minimum_required( VERSION 2.8.7 )  
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODULE_PATH})
  
-add_library(AcquistionSegment SHARED 
+add_library(AcquisitionSegment SHARED 
             AcquisitionSegment.c
             AcquisitionSegment.h
             colorSelector.c
@@ -22,11 +22,11 @@ add_library(AcquistionSegment SHARED
             ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c
             ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.h
             ) 
-target_link_libraries(AcquistionSegment m CalibrationLibrary ) 
+target_link_libraries(AcquisitionSegment m CalibrationLibrary ) 
  
  
 
-set_target_properties(AcquistionSegment PROPERTIES 
+set_target_properties(AcquisitionSegment PROPERTIES 
                        DEBUG_POSTFIX "D"
                        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
