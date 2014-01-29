@@ -4,6 +4,14 @@ cmake_minimum_required( VERSION 2.8.7 )
 set(CMAKE_CXX_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
 set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
      
+
+
+OPTION (ENABLE_FREENECT ON)
+OPTION (ENABLE_OPENNI1 ON)
+OPTION (ENABLE_OPENNI2 ON)
+OPTION (ENABLE_OPENGL ON)
+OPTION (ENABLE_NETWORK ON)
+
 add_subdirectory (3dparty/fast)
 
 #First to make our handy tools
@@ -20,9 +28,38 @@ add_subdirectory (grabber_segment/)
   
 
 #Acquisition Plugins 
+add_subdirectory (template_acquisition_shared_library/)
 add_subdirectory (v4l2_acquisition_shared_library/)
 add_subdirectory (v4l2stereo_acquisition_shared_library/)
-#THIS DOESNT WORK YET > add_subdirectory (libfreenect_acquisition_shared_library/)
+
+
+
+IF( ENABLE_NETWORK )
+  add_subdirectory (network_acquisition_shared_library/)
+ENDIF( ENABLE_NETWORK )
+ 
+IF( ENABLE_FREENECT )
+  add_subdirectory (libfreenect_acquisition_shared_library/)
+ENDIF( ENABLE_FREENECT )
+
+IF( ENABLE_OPENNI1 )
+  add_subdirectory (openni1_acquisition_shared_library/)
+ENDIF( ENABLE_OPENNI1 )
+
+IF( ENABLE_OPENNI2 )
+  add_subdirectory (openni2_acquisition_shared_library/)
+ENDIF( ENABLE_OPENNI2 )
+
+IF( ENABLE_OPENGL )
+  add_subdirectory (opengl_acquisition_shared_library/)
+ENDIF( ENABLE_OPENGL )
+ 
+
+
+
+
+
+
 
 
 
