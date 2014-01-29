@@ -9,13 +9,17 @@ add_subdirectory (tools/)
 
 #This is the core library
 add_subdirectory (acquisition/)
+add_subdirectory (acquisitionSegment/)
+add_subdirectory (acquisition_mux/)
 #This is the core application  
 add_subdirectory (grabber/)
+add_subdirectory (grabber_mux/)
+add_subdirectory (grabber_segment/)
   
 
 # TODO FIX INSTALLATION DIRECTORIES 
 
-#    install(TARGETS AmmarServer
+#    install(TARGETS RGBDAcquisitionProject
 #                    LIBRARY DESTINATION lib
 #                    ARCHIVE DESTINATION lib
 #                    RUNTIME DESTINATION bin)

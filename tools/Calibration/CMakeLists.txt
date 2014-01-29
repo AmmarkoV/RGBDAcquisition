@@ -14,7 +14,7 @@ add_library(CalibrationLibrary STATIC
             ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c
             ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.h
            ) 
-#target_link_libraries(Calibration rt ) 
+target_link_libraries(CalibrationLibrary m ) 
  
 
 set_target_properties(CalibrationLibrary PROPERTIES 
