@@ -10,6 +10,7 @@
 #include "Nite2.h"
 #include <math.h>
 
+#define MAXIMUM_DISTANCE_FOR_POINTING 400
 #define MAX_USERS 10
 
 #define NORMAL "\033[0m"
@@ -21,6 +22,8 @@
 #define MAGENTA "\033[35m" /* Magenta */
 #define CYAN "\033[36m" /* Cyan */
 #define WHITE "\033[37m" /* White */
+
+
 
 const char * jointNames[] =
 {"head",
@@ -156,7 +159,7 @@ int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * ske
                              );
 
 
-  if ( (distanceLeft<300) && (distanceRight<300) ) { fprintf(stderr,"Cutting off pointing "); return 0; }
+  if ( (distanceLeft<MAXIMUM_DISTANCE_FOR_POINTING) && (distanceRight<MAXIMUM_DISTANCE_FOR_POINTING) ) { fprintf(stderr,"Cutting off pointing "); return 0; }
 
 
   int doHand=1; //1 = left , 2 =right
