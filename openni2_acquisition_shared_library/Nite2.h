@@ -56,6 +56,17 @@ struct skeletonHuman
 };
 
 
+struct skeletonPointing
+{
+  struct point3D pointStart;
+  struct point3D pointEnd;
+  struct point3D pointingVector;
+  unsigned char isLeftHand;
+  unsigned char isRightHand;
+};
+
+
+int registerSkeletonPointingDetectedEvent(void * callback);
 int registerSkeletonDetectedEvent(void * callback);
 
 int startNite2Void();

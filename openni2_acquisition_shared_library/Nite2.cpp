@@ -51,15 +51,44 @@ nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
 
 
 void * skelCallbackAddr = 0;
+void * skelCallbackPointingAddr = 0;
 
 
 
+int registerSkeletonPointingDetectedEvent(void * callback)
+{
+  skelCallbackPointingAddr=callback;
+  return 1;
+}
 
 int registerSkeletonDetectedEvent(void * callback)
 {
   skelCallbackAddr = callback;
   return 1;
 }
+
+
+
+
+void newSkeletonPointingDetected(unsigned int frameNumber ,struct skeletonPointing * skeletonPointingFound)
+{
+
+  fprintf(stderr,"Skeleton Pointing Detected\n");
+
+
+
+
+  if (skelCallbackPointingAddr!=0)
+  {
+    void ( *DoCallback) (unsigned int ,struct skeletonPointing *)=0 ;
+    DoCallback = (void(*) (unsigned int ,struct skeletonPointing *) ) skelCallbackPointingAddr;
+    DoCallback(frameNumber ,skeletonPointingFound);
+  }
+
+}
+
+
+
 
 
 
@@ -92,6 +121,12 @@ void newSkeletonDetected(unsigned int frameNumber ,struct skeletonHuman * skelet
     DoCallback(frameNumber ,skeletonFound);
   }
 
+}
+
+int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * skeletonFound)
+{
+  struct skeletonPointing skeletonPointingFound={0};
+  newSkeletonPointingDetected(frameNumber,&skeletonPointingFound);
 }
 
 
@@ -231,6 +266,12 @@ void prepareSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTr
    //This is an event that gets fed with our newly encapsulated data
    //it should also fire up any additional events registered by clients
    newSkeletonDetected(frameNumber,&humanSkeleton);
+
+
+   if (considerSkeletonPointing(frameNumber,&humanSkeleton))
+   {
+      fprintf(stderr,"New pointing gesture found\n");
+   }
 
  }
 
