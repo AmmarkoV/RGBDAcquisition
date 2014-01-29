@@ -7,8 +7,10 @@ set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizatio
 #First to make our handy tools
 add_subdirectory (tools/)
 
+#This is the core library
 add_subdirectory (acquisition/)
 #This is the core application  
+add_subdirectory (grabber/)
   
 
 # TODO FIX INSTALLATION DIRECTORIES 

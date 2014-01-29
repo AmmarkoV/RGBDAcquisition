@@ -12,7 +12,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODUL
               )
   
     add_library(Acquistion SHARED ${ACQUISITION_INGREDIENTS} ) 
-    target_link_libraries(Acquistion rt dl Timers CalibrationLibrary OperatingSystem ) 
+    target_link_libraries(Acquistion rt dl m Timers CalibrationLibrary OperatingSystem ) 
  
  
 
