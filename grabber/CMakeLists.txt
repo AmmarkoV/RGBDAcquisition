@@ -8,7 +8,7 @@ set_target_properties(Grabber PROPERTIES DEBUG_POSTFIX "D")
 add_dependencies(Grabber Acquisition OperatingSystem Timers CalibrationLibrary)  
        
  
-set_target_properties(CalibrationLibrary PROPERTIES 
+set_target_properties(Grabber PROPERTIES 
                        DEBUG_POSTFIX "D"
                        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
