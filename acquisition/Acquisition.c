@@ -288,12 +288,12 @@ int savePCD_PointCloudNoEmpty(char * filename ,unsigned short * depthFrame ,unsi
 
 
 
-int saveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
+int acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-    //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);
+    //fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called\n",filename);
 
-    if ( (width==0) || (height==0) || (channels==0) || (bitsperpixel==0) ) { fprintf(stderr,"saveRawImageToFile(%s) called with zero dimensions\n",filename); return 0;}
-    if(pixels==0) { fprintf(stderr,"saveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
+    if ( (width==0) || (height==0) || (channels==0) || (bitsperpixel==0) ) { fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called with zero dimensions\n",filename); return 0;}
+    if(pixels==0) { fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
     if (bitsperpixel>16) { fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n"); return 0; }
 
     FILE *fd=0;
@@ -690,7 +690,7 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
               (*plugins[moduleID].getColorChannels!=0) && (*plugins[moduleID].getColorBitsPerPixel!=0)
             )
          {
-            int retres = saveRawImageToFile(
+            int retres = acquisitionSaveRawImageToFile(
                                             filenameFull,
                                             // (*plugins[moduleID].getColorPixels)      (devID),
                                             acquisitionGetColorFrame(moduleID,devID)        ,
@@ -749,7 +749,7 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
               (*plugins[moduleID].getDepthChannels!=0) && (*plugins[moduleID].getDepthBitsPerPixel!=0)
              )
          {
-            return saveRawImageToFile(
+            return acquisitionSaveRawImageToFile(
                                       filenameFull,
                                       // (*plugins[moduleID].getDepthPixels)      (devID),
                                       (unsigned char*) acquisitionGetDepthFrame(moduleID,devID)  ,
@@ -785,7 +785,7 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
        outFrame = convertShortDepthToRGBDepth(inFrame,width,height);
        if (outFrame!=0)
         {
-         saveRawImageToFile(filenameFull,outFrame,width,height,3,8);
+         acquisitionSaveRawImageToFile(filenameFull,outFrame,width,height,3,8);
          free(outFrame);
          return 1;
         }
@@ -817,7 +817,7 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
        outFrame = convertShortDepthToCharDepth(inFrame,width,height,0,7000);
        if (outFrame!=0)
         {
-         saveRawImageToFile(filenameFull,outFrame,width,height,1,8);
+         acquisitionSaveRawImageToFile(filenameFull,outFrame,width,height,1,8);
          free(outFrame);
          return 1;
         }

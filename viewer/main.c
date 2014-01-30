@@ -80,7 +80,7 @@ if  ( event == EVENT_LBUTTONDOWN )
      fprintf(stderr,"Left button of the mouse is clicked - position (%u,%u)\n",x,y);
      float x3D,y3D,z3D;
      acquisitionGetDepth3DPointAtXYCameraSpace(moduleID,devID,x,y,&x3D,&y3D,&z3D);
-     fprintf(stderr,"acquisitionGetDepthValueAtXY(%u,%u) = %u \n",acquisitionGetDepthValueAtXY(moduleID,devID,x,y));
+     fprintf(stderr,"acquisitionGetDepthValueAtXY(%u,%u) = %u \n",x,y,acquisitionGetDepthValueAtXY(moduleID,devID,x,y));
      fprintf(stderr,"acquisitionGetDepth3DPointAtXYCameraSpace(%u,%u) = %0.2f , %0.2f , %0.2f\n",x,y,x3D,y3D,z3D);
 
     } else

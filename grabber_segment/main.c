@@ -246,12 +246,12 @@ int main(int argc, char *argv[])
 
         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         acquisitionSimulateTime( colorTimestamp );
-        saveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+        acquisitionSaveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
 
 
         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
         acquisitionSimulateTime( depthTimestamp );
-        saveRawImageToFile(outfilename,(unsigned char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
+        acquisitionSaveRawImageToFile(outfilename,(unsigned char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
 
        free (segmentedRGB);
        free (segmentedDepth);

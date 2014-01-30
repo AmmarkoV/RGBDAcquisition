@@ -190,7 +190,7 @@ int acquisitionSimulateTime(unsigned long timeInMillisecs);
  * @param The number of bits per pixel 24 for RGB ( 8 bytes for 3 channels ) , 16 for Depth ( 16 bytes for 1 channel )
  * @retval 1 = Success saving the file  , 0 = Failure
  */
-int saveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
+int acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
 /**
  * @brief  Convert a Depth Frame Buffer to 3channel 24bit format
