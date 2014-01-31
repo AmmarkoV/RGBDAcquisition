@@ -58,7 +58,7 @@ unsigned int skeletonDetectionFramesBetweenScans = 5;
 enum howToOpenDevice
 {
   OPENNI2_OPEN_REGULAR_ENUM = 0,
-  OPENNI2_OPEN_AS_ONI_FILE ,
+  OPENNI2_OPEN_USING_STRING ,
   OPENNI2_OPEN_AS_MANIFEST
 };
 
@@ -202,17 +202,27 @@ int initializeOpenNIDevice(int deviceID , char * deviceName  , Device &device , 
    if (deviceName!=0)
    {
       //If our deviceName contains a .oni we assume that we have an oni file to open
-      if (strstr(deviceName,".oni")!=0) { openMode=OPENNI2_OPEN_AS_ONI_FILE; }
+      if (strstr(deviceName,".oni")!=0)
+         {
+           fprintf(stderr,"Found an .ONI filename , trying to open it..\n");
+           openMode=OPENNI2_OPEN_USING_STRING;
+         } else
+      if (strlen(deviceName)>7)
+        {
+           fprintf(stderr,"deviceName is too long (%u chars) , assuming it is a Device URI ..\n",strlen(deviceName));
+           openMode=OPENNI2_OPEN_USING_STRING;
+        }
+
    }
 
    switch (openMode)
    {
      //-------------------------------------------------------------------------------------
      //If we have an ONI file to open just pass it as an argument to device.open(deviceName)
-     case OPENNI2_OPEN_AS_ONI_FILE :
+     case OPENNI2_OPEN_USING_STRING :
       if (device.open(deviceName) != STATUS_OK)
       {
-        fprintf(stderr,"Could not open an ONI file ( %s ) : %s \n",deviceName,OpenNI::getExtendedError());
+        fprintf(stderr,"Could not open using given string ( %s ) : %s \n",deviceName,OpenNI::getExtendedError());
         return 0;
       }
      break;
