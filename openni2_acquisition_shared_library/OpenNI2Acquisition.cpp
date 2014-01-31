@@ -11,6 +11,7 @@
 #define MOD_FACEDETECTION 1
 #define MOD_NITE2 1
 #define BUILD_OPENNI2 1
+#define USE_WAITFORANYSTREAM_TO_GRAB 0
 
 #if BUILD_OPENNI2
 
@@ -338,13 +339,55 @@ int readFrameBlocking(VideoStream &stream,VideoFrameRef &frame , unsigned int ma
 
 int readOpenNiColorAndDepth(VideoStream &color , VideoStream &depth,VideoFrameRef &colorFrame,VideoFrameRef &depthFrame)
 {
+  #if USE_WAITFORANYSTREAM_TO_GRAB
+   #warning "Please turn #define USE_WAITFORANYSTREAM_TO_GRAB 0"
+   #warning "This is a bad idea taken from OpenNI2/Samples/SimpleViewer , we dont just want to update 'any' frame we really want to snap BOTH and do that sequentially"
+   #warning "It is better to sequencially grab them instead of waiting for any stream a couple of times "
+   openni::VideoStream** m_streams = new openni::VideoStream*[2];
+   m_streams[0] = &depth;
+   m_streams[1] = &color;
+
+  unsigned int i=0;
+  int changedIndex;
+  while (i<2)
+  {
+	openni::Status rc = openni::OpenNI::waitForAnyStream(m_streams, 2, &changedIndex);
+	if (rc != openni::STATUS_OK)
+	{
+		fprintf(stderr,"Wait failed\n");
+		return 0 ;
+	}
+
+  unsigned int i=0;
+
+	switch (changedIndex)
+	{
+	case 0:
+		depth.readFrame(&depthFrame);
+		++i;
+    break;
+	case 1:
+		color.readFrame(&colorFrame);
+		++i;
+    break;
+	default:
+		printf("Error in wait\n");
+	}
+  }
+
+	delete m_streams;
+	return 1;
+  #else
+    //Using serial frame grabbing
     readFrameBlocking(depth,depthFrame,MAX_TRIES_FOR_EACH_FRAME); // depth.readFrame(&depthFrame);
     readFrameBlocking(color,colorFrame,MAX_TRIES_FOR_EACH_FRAME); // color.readFrame(&colorFrame);
 
     if(depthFrame.isValid() && colorFrame.isValid()) { return 1; }
 
     fprintf(stderr,"Depth And Color frames are wrong!\n");
+  #endif
     return 0;
+
 }
 /*
    --------------------------------------------------------------------------------
