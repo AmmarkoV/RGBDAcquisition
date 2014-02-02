@@ -12,6 +12,7 @@
 
 #define MAXIMUM_DISTANCE_FOR_POINTING 400
 #define MAX_USERS 10
+#define CALCULATE_BOUNDING_BOX 1
 
 #define NORMAL "\033[0m"
 #define BLACK "\033[30m" /* Black */
@@ -193,11 +194,6 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
     humanSkeleton.observationNumber = observation;
     humanSkeleton.observationTotal = totalObservations;
 
-    humanSkeleton.bbox[0].x = user.getBoundingBox().max.x;       humanSkeleton.bbox[0].y = user.getBoundingBox().max.y;   humanSkeleton.bbox[0].z = 0;
-    humanSkeleton.bbox[1].x = user.getBoundingBox().max.x;       humanSkeleton.bbox[1].y = user.getBoundingBox().min.y;   humanSkeleton.bbox[1].z = 0;
-    humanSkeleton.bbox[2].x = user.getBoundingBox().min.x;       humanSkeleton.bbox[2].y = user.getBoundingBox().min.y;   humanSkeleton.bbox[2].z = 0;
-    humanSkeleton.bbox[3].x = user.getBoundingBox().min.x;       humanSkeleton.bbox[3].y = user.getBoundingBox().max.y;   humanSkeleton.bbox[3].z = 0;
-
     humanSkeleton.userID = user.getId();
 
     humanSkeleton.centerOfMass.x = user.getCenterOfMass().x;
@@ -290,6 +286,39 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].z = jointRightFoot.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_FOOT] = jointRightFoot.getPositionConfidence();
 
+
+
+     float maxX=user.getBoundingBox().max.x , maxY=user.getBoundingBox().max.y , maxZ=user.getBoundingBox().max.z;
+     float minX=user.getBoundingBox().min.x , minY=user.getBoundingBox().min.y , minZ=user.getBoundingBox().min.z;
+
+     #if CALCULATE_BOUNDING_BOX
+     //Use joints to extract bbox
+     minX = humanSkeleton.joint[HUMAN_SKELETON_HEAD].x;      maxX = humanSkeleton.joint[HUMAN_SKELETON_HEAD].x;
+     minY = humanSkeleton.joint[HUMAN_SKELETON_HEAD].y;      maxY = humanSkeleton.joint[HUMAN_SKELETON_HEAD].y;
+     minZ = humanSkeleton.joint[HUMAN_SKELETON_HEAD].z;      maxZ = humanSkeleton.joint[HUMAN_SKELETON_HEAD].z;
+
+     unsigned int i=0;
+     for (i=0; i<HUMAN_SKELETON_MIRRORED_PARTS; i++)
+      {
+        if (humanSkeleton.joint[i].x>maxX) { maxX = humanSkeleton.joint[i].x; } else
+        if (humanSkeleton.joint[i].x<minX) { minX = humanSkeleton.joint[i].x; }
+
+        if (humanSkeleton.joint[i].y>maxY) { maxY = humanSkeleton.joint[i].y; } else
+        if (humanSkeleton.joint[i].y<minY) { minY = humanSkeleton.joint[i].y; }
+
+        if (humanSkeleton.joint[i].z>maxZ) { maxZ = humanSkeleton.joint[i].z; } else
+        if (humanSkeleton.joint[i].z<minZ) { minZ = humanSkeleton.joint[i].z; }
+      }
+     #endif
+
+     humanSkeleton.bbox[0].x = maxX;       humanSkeleton.bbox[0].y = maxY;   humanSkeleton.bbox[0].z =  minZ;
+     humanSkeleton.bbox[1].x = maxX;       humanSkeleton.bbox[1].y = minY;   humanSkeleton.bbox[1].z =  minZ;
+     humanSkeleton.bbox[2].x = minX;       humanSkeleton.bbox[2].y = minY;   humanSkeleton.bbox[2].z =  minZ;
+     humanSkeleton.bbox[3].x = minX;       humanSkeleton.bbox[3].y = maxY;   humanSkeleton.bbox[3].z =  minZ;
+     humanSkeleton.bbox[4].x = maxX;       humanSkeleton.bbox[4].y = maxY;   humanSkeleton.bbox[4].z =  maxZ;
+     humanSkeleton.bbox[5].x = maxX;       humanSkeleton.bbox[5].y = minY;   humanSkeleton.bbox[5].z =  maxZ;
+     humanSkeleton.bbox[6].x = minX;       humanSkeleton.bbox[6].y = minY;   humanSkeleton.bbox[6].z =  maxZ;
+     humanSkeleton.bbox[7].x = minX;       humanSkeleton.bbox[7].y = maxY;   humanSkeleton.bbox[7].z =  maxZ;
 
 
   unsigned char statusCalibrating,statusTracking,statusFailed;

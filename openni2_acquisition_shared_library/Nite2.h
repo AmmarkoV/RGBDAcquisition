@@ -64,7 +64,7 @@ struct skeletonHuman
   unsigned char isNew,isVisible,isOutOfScene,isLost;
   unsigned char statusCalibrating,statusStoppedTracking, statusTracking,statusFailed;
 
-  struct point3D bbox[4];
+  struct point3D bbox[8];
   struct point3D centerOfMass;
   struct point3D joint[HUMAN_SKELETON_PARTS];
   float jointAccuracy[HUMAN_SKELETON_PARTS];
