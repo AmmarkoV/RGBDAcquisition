@@ -18,7 +18,6 @@ extern "C"
    int startOpenNI2Module(unsigned int max_devs,char * settings);
 
    #if BUILD_OPENNI2
-
    int getOpenNI2NumberOfDevices(); // This has to be called AFTER startOpenNI2
    int stopOpenNI2Module();
 

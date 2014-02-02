@@ -96,6 +96,7 @@ int startNite2(Device * device);
 int stopNite2();
 int loopNite2(unsigned int frameNumber);
 
+unsigned short  * getNite2DepthFrame();
 
 
 #endif // NITE2_H_INCLUDED

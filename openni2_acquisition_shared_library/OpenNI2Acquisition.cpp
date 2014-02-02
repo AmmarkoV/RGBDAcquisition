@@ -49,7 +49,7 @@ unsigned int frameSnapped=0;
 #endif
 
 
-
+unsigned int lastDepthComesFromNite[MAX_OPENNI2_DEVICES]={0};
 unsigned int pauseFaceDetection = 0;
 unsigned int faceDetectionFramesBetweenScans = 2;
 unsigned int pauseSkeletonDetection = 0;
@@ -210,7 +210,7 @@ int initializeOpenNIDevice(int deviceID , char * deviceName  , Device &device , 
          } else
       if (strlen(deviceName)>7)
         {
-           fprintf(stderr,"deviceName is too long (%u chars) , assuming it is a Device URI ..\n",strlen(deviceName));
+           fprintf(stderr,"deviceName is too long (%lu chars) , assuming it is a Device URI ..\n",strlen(deviceName));
            openMode=OPENNI2_OPEN_USING_STRING;
         }
 
@@ -391,6 +391,19 @@ int readOpenNiColorAndDepth(VideoStream &color , VideoStream &depth,VideoFrameRe
     return 0;
 
 }
+
+
+
+int readOpenNiColor(VideoStream &color , VideoFrameRef &colorFrame)
+{
+    readFrameBlocking(color,colorFrame,MAX_TRIES_FOR_EACH_FRAME); // color.readFrame(&colorFrame);
+
+    if (colorFrame.isValid()) { return 1; }
+    fprintf(stderr,"Color frame  is wrong!\n");
+    return 0;
+}
+
+
 /*
    --------------------------------------------------------------------------------
    --------------------------------------------------------------------------------
@@ -424,7 +437,7 @@ int mapOpenNI2RGBToDepth(int devID)
   return 1;
 }
 
-int badDeviceID(int devID,char * callFile,unsigned int callLine)
+int badDeviceID(int devID,const char * callFile,unsigned int callLine)
 {
   if (devID<=currentAllocatedDevices) { return 0; }
   fprintf(stderr,"Bad Device ID detected (%i/%i) , File %s : Line %u , ignoring request\n",devID,currentAllocatedDevices,callFile,callLine);
@@ -447,15 +460,35 @@ int stopOpenNI2Module()
 int snapOpenNI2Frames(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
-  ++frameSnapped;
-  int i=readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
-
+  int retres=0; // Initially failed snap :P
   #if MOD_NITE2
+   //If we use nite  , things get ugly , because nite wants to snap the depth frame for itself
+   //So we have to workaround not snapping a depth frame and returning the depth frame that nite snapped
+       lastDepthComesFromNite[devID]=0;
        if ( (skeletonDetectionFramesBetweenScans!=0) && (!pauseSkeletonDetection) )
        {
-          if (frameSnapped%skeletonDetectionFramesBetweenScans ==1) loopNite2(frameSnapped);
+          if (frameSnapped%skeletonDetectionFramesBetweenScans ==1)
+          {
+            loopNite2(frameSnapped);
+            readOpenNiColor(color[devID],colorFrame[devID]);
+            #warning "Check for success of color and depth operation here"
+            retres=1;
+            lastDepthComesFromNite[devID]=1;
+          }
        }
-    #endif
+       //If we don't have a skeleton snap do a regular snap here
+       if (!lastDepthComesFromNite[devID])
+       {
+         retres=readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
+       }
+  #else
+    //Regular Snapping of OpenNI2 both color and depth
+    retres=readOpenNiColorAndDepth(color[devID],depth[devID],colorFrame[devID],depthFrame[devID]);
+
+
+
+
+ #endif
 
     #if MOD_FACEDETECTION
        if ( (faceDetectionFramesBetweenScans!=0) && (!pauseFaceDetection)  )
@@ -474,7 +507,9 @@ int snapOpenNI2Frames(int devID)
        }
     #endif
 
-  return i;
+
+  ++frameSnapped;
+  return retres;
 }
 
 int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
@@ -643,6 +678,11 @@ int getOpenNI2DepthBitsPerPixel(int devID)
 unsigned short * getOpenNI2DepthPixels(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+
+  #if MOD_NITE2
+   if (lastDepthComesFromNite[devID]) {  }
+  #endif
+
  return (unsigned short *) depthFrame[devID].getData();
 }
 
@@ -711,8 +751,7 @@ int setOpenNI2DepthCalibration(int devID,struct calibration * calib)
 
 
 #else
-
-//Null build
+//Null build of this library just outputs a warning when linked
 int startOpenNI2Module(unsigned int max_devs,char * settings)
 {
     fprintf(stderr,"startOpenNI2Module called on a dummy build of OpenNI2Acquisition!\n");

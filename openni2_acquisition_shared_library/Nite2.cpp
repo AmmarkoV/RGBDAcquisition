@@ -42,17 +42,30 @@ const char * jointNames[] =
  "right_foot"
 };
 
-bool g_visibleUsers[MAX_USERS] = {false};
-nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
+  #define USER_MESSAGE(msg) \
+	  {printf("[%08llu] User #%d:\t%s\n",ts, user.getId(),msg);}
 
-#define USER_MESSAGE(msg) \
-	{printf("[%08llu] User #%d:\t%s\n",ts, user.getId(),msg);}
+struct NiteVirtualDevice
+{
+  bool g_visibleUsers[MAX_USERS] = {false};
+  nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
 
 	nite::UserTracker userTracker;
 	nite::Status niteRc;
 	nite::UserTrackerFrameRef userTrackerFrame;
 
+void * skelCallbackAddr = 0;
+void * skelCallbackPointingAddr = 0;
+};
 
+struct NiteVirtualDevice skeltonTracker[10];
+
+bool g_visibleUsers[MAX_USERS] = {false};
+nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
+
+	nite::UserTracker userTracker;
+	nite::Status niteRc;
+	nite::UserTrackerFrameRef userTrackerFrame;
 
 void * skelCallbackAddr = 0;
 void * skelCallbackPointingAddr = 0;
@@ -416,4 +429,10 @@ int loopNite2(unsigned int frameNumber)
   return 1;
 }
 
+
+
+unsigned short  * getNite2DepthFrame()
+{
+  return (unsigned short *) userTrackerFrame.getDepthFrame().getData();
+}
 

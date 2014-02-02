@@ -14,6 +14,7 @@ OPTION (ENABLE_OPENNI1 ON)
 OPTION (ENABLE_OPENNI2 ON)
 OPTION (ENABLE_OPENGL ON)
 OPTION (ENABLE_NETWORK ON)
+OPTION (ENABLE_EDITOR ON)
 
 add_subdirectory (3dparty/fast)
 
@@ -62,7 +63,10 @@ ENDIF( ENABLE_OPENGL )
  
  
 #Composite ( bloated ;p ) parts 
+IF( ENABLE_EDITOR )
 add_subdirectory (editor/)
+ENDIF( ENABLE_EDITOR )
+
 add_subdirectory (viewer/)
 
 # TODO FIX INSTALLATION DIRECTORIES 
