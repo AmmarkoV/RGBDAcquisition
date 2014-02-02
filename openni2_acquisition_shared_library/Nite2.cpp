@@ -146,10 +146,10 @@ int considerSkeletonPointing(int devID ,unsigned int frameNumber,struct skeleton
   if ( (distanceLeft<MAXIMUM_DISTANCE_FOR_POINTING) && (distanceRight<MAXIMUM_DISTANCE_FOR_POINTING) ) { fprintf(stderr,"Cutting off pointing "); return 0; }
 
 
-  int doHand=1; //1 = left , 2 =right
+  int doHand=1; //1 = right , 2 =left
   if (distanceLeft<distanceRight) { doHand=2; }
 
-  if (doHand==1)
+  if (doHand==2)
   {
    skelPF.pointStart.x = skeletonFound->joint[HUMAN_SKELETON_LEFT_ELBOW].x;
    skelPF.pointStart.y = skeletonFound->joint[HUMAN_SKELETON_LEFT_ELBOW].y;
@@ -165,7 +165,7 @@ int considerSkeletonPointing(int devID ,unsigned int frameNumber,struct skeleton
    newSkeletonPointingDetected(devID,frameNumber,&skelPF);
    return 1;
   } else
-  if (doHand==2)
+  if (doHand==1)
   {
    skelPF.pointStart.x = skeletonFound->joint[HUMAN_SKELETON_RIGHT_ELBOW].x;
    skelPF.pointStart.y = skeletonFound->joint[HUMAN_SKELETON_RIGHT_ELBOW].y;

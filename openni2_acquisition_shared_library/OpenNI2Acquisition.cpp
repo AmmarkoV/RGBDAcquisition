@@ -477,7 +477,7 @@ int snapOpenNI2Frames(int devID)
        lastDepthComesFromNite[devID]=0;
        if ( (skeletonDetectionFramesBetweenScans!=0) && (!pauseSkeletonDetection) )
        {
-          if (frameSnapped%skeletonDetectionFramesBetweenScans ==1)
+          if ( (skeletonDetectionFramesBetweenScans==1) || (frameSnapped%skeletonDetectionFramesBetweenScans ==1) )
           {
             if ( loopNite2(devID,frameSnapped) )
             {
@@ -506,7 +506,7 @@ int snapOpenNI2Frames(int devID)
     #if MOD_FACEDETECTION
        if ( (faceDetectionFramesBetweenScans!=0) && (!pauseFaceDetection)  )
        {
-        if (frameSnapped%faceDetectionFramesBetweenScans==0)
+        if ( (faceDetectionFramesBetweenScans==1) || (frameSnapped%faceDetectionFramesBetweenScans==0) )
         {
          struct calibration calib;
          getOpenNI2ColorCalibration(devID,&calib);
