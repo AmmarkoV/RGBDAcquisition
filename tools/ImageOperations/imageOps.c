@@ -600,7 +600,7 @@ unsigned int countDepthAverage(unsigned short * source, unsigned int sourceWidth
   sourceLineSkip = (sourceWidth-tileWidth);
   sourceLineLimitPTR = sourcePTR + (tileWidth) -1 ;
 
-  fprintf(stderr,"Getting Average Depth at area (%u,%u) of source image  starting at %u,%u  sized %u,%u \n",tileWidth,tileHeight,sX,sY,sourceWidth,sourceHeight);
+  //fprintf(stderr,"Getting Average Depth at area (%u,%u) of source image  starting at %u,%u  sized %u,%u \n",tileWidth,tileHeight,sX,sY,sourceWidth,sourceHeight);
   unsigned int curDepth = 0;
   unsigned int totalDepth = 0;
   unsigned int totalMeasurements = 0;
@@ -621,7 +621,7 @@ unsigned int countDepthAverage(unsigned short * source, unsigned int sourceWidth
     sourceLineLimitPTR += sourceWidth;
     sourcePTR+=sourceLineSkip;
   }
- fprintf(stderr,"Initial total is %u after %u measurments \n",totalDepth,totalMeasurements);
+ //fprintf(stderr,"Initial total is %u after %u measurments \n",totalDepth,totalMeasurements);
 
  if (totalMeasurements==0) { return 0; }
  return (unsigned int) (totalDepth / totalMeasurements);

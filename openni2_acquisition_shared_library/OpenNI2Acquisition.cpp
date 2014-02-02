@@ -511,8 +511,8 @@ int snapOpenNI2Frames(int devID)
          struct calibration calib;
          getOpenNI2ColorCalibration(devID,&calib);
          DetectFaces(frameSnapped,
-                      (unsigned char*) getOpenNI2ColorPixels(devID) ,
-                      (unsigned short*) getOpenNI2DepthPixels(devID) ,
+                      (unsigned char*) getOpenNI2ColorPixels(devID) , getOpenNI2ColorWidth(devID) , getOpenNI2ColorHeight(devID) ,
+                      (unsigned short*) getOpenNI2DepthPixels(devID) , getOpenNI2DepthWidth(devID) , getOpenNI2DepthHeight(devID) ,
                       &calib ,
                       45,150 //Min / Max
                      );
@@ -541,7 +541,8 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
     #endif
 
     #if MOD_FACEDETECTION
-       InitFaceDetection((char*) "haarcascade_frontalface_alt.xml",width,height);
+       #warning "maybe provide a different path for the HAAR cascade for face detection although this should be ok"
+       InitFaceDetection((char*) "haarcascade_frontalface_alt.xml");
        forceMapDepthToRGB=1;
     #endif
 

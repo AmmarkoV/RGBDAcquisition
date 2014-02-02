@@ -23,7 +23,8 @@
 #define CYAN "\033[36m" /* Cyan */
 #define WHITE "\033[37m" /* White */
 
-
+  #define USER_MESSAGE(msg) \
+	  {printf("[%08llu] User #%d:\t%s\n",ts, user.getId(),msg);}
 
 const char * jointNames[] =
 {"head",
@@ -42,14 +43,12 @@ const char * jointNames[] =
  "right_foot"
 };
 
-  #define USER_MESSAGE(msg) \
-	  {printf("[%08llu] User #%d:\t%s\n",ts, user.getId(),msg);}
 
 struct NiteVirtualDevice
 {
   int failed;
-  nite::UserTracker userTracker;
-  nite::UserTrackerFrameRef userTrackerFrame;
+  nite::UserTracker * userTracker;
+  nite::UserTrackerFrameRef * userTrackerFrame;
 
   bool g_visibleUsers[MAX_USERS];
   nite::SkeletonState g_skeletonStates[MAX_USERS];
@@ -60,19 +59,6 @@ struct NiteVirtualDevice
 
 //Skeleton Tracker Context shorthand
 struct NiteVirtualDevice * stc=0;
-
-int registerSkeletonPointingDetectedEvent(int devID, void * callback)
-{
-  stc[devID].skelCallbackPointingAddr=callback;
-  return 1;
-}
-
-int registerSkeletonDetectedEvent(int devID, void * callback)
-{
-  stc[devID].skelCallbackAddr = callback;
-  return 1;
-}
-
 
 
 
@@ -102,22 +88,18 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
 {
     fprintf(stderr, GREEN " " );
     fprintf(stderr,"Skeleton #%u found at frame %u \n",skeletonFound->userID, frameNumber);
-    unsigned int i=0;
 
     fprintf(stderr,"BBox : ( ");
-    for (int i=0; i<4; i++)
+    unsigned int i=0;
+    for (i=0; i<4; i++)
     {
-      fprintf(stderr,"%0.1f %0.1f , " ,skeletonFound->bbox[i].x , skeletonFound->bbox[i].y  );
+      fprintf(stderr,"%0.1f %0.1f " ,skeletonFound->bbox[i].x , skeletonFound->bbox[i].y  );
+      if (i<3) { fprintf(stderr,","); } else { fprintf(stderr,")"); }
     }
     fprintf(stderr,"\n");
-
     fprintf(stderr,"Center of Mass %0.2f %0.2f %0.2f \n",skeletonFound->centerOfMass.x,skeletonFound->centerOfMass.y,skeletonFound->centerOfMass.z);
-
-
     fprintf(stderr,"Head %0.2f %0.2f %0.2f \n",skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
-
     fprintf(stderr,  " \n" NORMAL );
-
 
   if (stc[devID].skelCallbackAddr!=0)
   {
@@ -348,6 +330,50 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
 
  }
 
+
+
+
+/*
+
+  ------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------
+  CODE over here has to do with packing the state of the NITE2 Tracker ( or any other tracker ) to our internal
+  format
+  ------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------
+
+
+  ------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------
+     Code under here has to do with maintaining the lifecycle of skeleton trackers bound to devices
+  ------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------
+*/
+
+
+
+
+
+
+
+
+int registerSkeletonPointingDetectedEvent(int devID, void * callback)
+{
+  stc[devID].skelCallbackPointingAddr=callback;
+  return 1;
+}
+
+int registerSkeletonDetectedEvent(int devID, void * callback)
+{
+  stc[devID].skelCallbackAddr = callback;
+  return 1;
+}
+
+
+
+
+
+
 int startNite2(int maxVirtualSkeletonTrackers)
 {
     printf("Starting Nite2\n");
@@ -374,8 +400,12 @@ int startNite2(int maxVirtualSkeletonTrackers)
 int createNite2Device(int devID,openni::Device * device)
 {
     nite::Status niteRc;
-    if (device==0) {  niteRc = stc[devID].userTracker.create();       } else
-	               {  niteRc = stc[devID].userTracker.create(device); }
+
+    stc[devID].userTracker = new nite::UserTracker;
+    stc[devID].userTrackerFrame = new nite::UserTrackerFrameRef;
+
+    if (device==0) {  niteRc = stc[devID].userTracker->create();       } else
+	               {  niteRc = stc[devID].userTracker->create(device); }
 	if ( niteRc != nite::STATUS_OK)
 	{
 		fprintf(stderr,RED "Couldn't create user tracker\n" NORMAL);
@@ -392,8 +422,11 @@ int createNite2Device(int devID,openni::Device * device)
 
 int destroyNite2Device(int devID)
 {
-   stc[devID].userTracker.destroy();
-   stc[devID].userTrackerFrame.release();
+   stc[devID].userTracker->destroy();
+   stc[devID].userTrackerFrame->release();
+
+   delete stc[devID].userTracker;
+   delete stc[devID].userTrackerFrame;
 
    return 1 ;
 }
@@ -419,14 +452,14 @@ int loopNite2(int devID ,unsigned int frameNumber)
        return 0;
      }
 
-    nite::Status niteRc  = stc[devID].userTracker.readFrame(&stc[devID].userTrackerFrame);
+    nite::Status niteRc  = stc[devID].userTracker->readFrame(stc[devID].userTrackerFrame);
 	 if (niteRc != nite::STATUS_OK)
 		{
 			printf("Get next frame failed\n");
 			return 0;
 		}
 
-		const nite::Array<nite::UserData>& users = stc[devID].userTrackerFrame.getUsers();
+		const nite::Array<nite::UserData>& users = stc[devID].userTrackerFrame->getUsers();
 		for (int i = 0; i < users.getSize(); ++i)
 		{
 		    //We will use user from now on as the current user
@@ -435,13 +468,13 @@ int loopNite2(int devID ,unsigned int frameNumber)
             //If our user is new we should start to track his skeleton
 			if (user.isNew())
 			{
-				stc[devID].userTracker.startSkeletonTracking(user.getId());
+				stc[devID].userTracker->startSkeletonTracking(user.getId());
 			}
 			else
             //If we have a skeleton tracked , populate our internal structures and call callbacks
             if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
 			{
-		      prepareSkeletonState(devID,frameNumber,stc[devID].userTracker,user  , i , users.getSize() );
+		      prepareSkeletonState(devID,frameNumber,*stc[devID].userTracker,user  , i , users.getSize() );
 			}
 		}
   return 1;
@@ -451,6 +484,6 @@ int loopNite2(int devID ,unsigned int frameNumber)
 
 unsigned short  * getNite2DepthFrame(int devID)
 {
-  return (unsigned short *) stc[devID].userTrackerFrame.getDepthFrame().getData();
+  return (unsigned short *) stc[devID].userTrackerFrame->getDepthFrame().getData();
 }
 

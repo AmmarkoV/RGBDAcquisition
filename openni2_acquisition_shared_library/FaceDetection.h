@@ -16,9 +16,14 @@ struct detectedFace
 
 
 
-int InitFaceDetection(char * haarCascadePath , unsigned int width ,unsigned int height);
+int InitFaceDetection(char * haarCascadePath);
 int CloseFaceDetection() ;
 int registerFaceDetectedEvent(void * callback);
-unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels , unsigned short * depthPixels, struct calibration * calib ,unsigned int maxHeadSize,unsigned int minHeadSize);
 
+
+unsigned int DetectFaces(unsigned int frameNumber ,
+                         unsigned char * colorPixels ,  unsigned int colorWidth ,unsigned int colorHeight ,
+                         unsigned short * depthPixels ,   unsigned int depthWidth ,unsigned int depthHeight ,
+                         struct calibration * calib ,
+                         unsigned int maxHeadSize,unsigned int minHeadSize);
 #endif // NITE2_H_INCLUDED

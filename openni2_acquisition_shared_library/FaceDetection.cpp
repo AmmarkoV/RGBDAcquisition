@@ -19,14 +19,9 @@
 
 int saveResults = 0;
 
-IplImage  *image=0;
-char * opencv_pointer_retainer=0; // This is a kind of an ugly hack ( see lines noted with UGLY HACK ) to minimize memcpying between my VisCortex and OpenCV , without disturbing OpenCV
-
 CvHaarClassifierCascade *cascade=0;
 CvMemStorage            *storage=0;
 
-unsigned int fdFrameWidth = 640;
-unsigned int fdFrameHeight = 480;
 unsigned int faceReadingNumber=0;
 
 void * callbackAddr = 0;
@@ -46,7 +41,7 @@ unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width
 
 
 
-int InitFaceDetection(char * haarCascadePath , unsigned int width ,unsigned int height)
+int InitFaceDetection(char * haarCascadePath)
 {
     /* load the classifier
        note that I put the file in the same directory with
@@ -56,15 +51,6 @@ int InitFaceDetection(char * haarCascadePath , unsigned int width ,unsigned int 
     /* setup memory buffer; needed by the face detector */
     storage = cvCreateMemStorage( 0 );
     if (storage==0) { fprintf(stderr,"Could not allocate storage \n"); return 0; }
-
-    image = cvCreateImage( cvSize(width,height), IPL_DEPTH_8U, 3 );
-    if (image==0) { fprintf(stderr,"Could not allocate image \n"); return 0; }
-
-    fdFrameWidth = width;
-    fdFrameHeight = height;
-
-
-    opencv_pointer_retainer = image->imageData; // UGLY HACK
     return 1;
 }
 
@@ -73,8 +59,6 @@ int CloseFaceDetection()
     cvReleaseHaarClassifierCascade( &cascade );
     cvReleaseMemStorage( &storage );
 
-    image->imageData = opencv_pointer_retainer; // UGLY HACK
-    cvReleaseImage( &image );
     return 1;
 }
 
@@ -109,14 +93,20 @@ void newFaceDetected(unsigned int frameNumber , struct detectedFace * faceDetect
  return;
 }
 
-unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels , unsigned short * depthPixels, struct calibration * calib ,unsigned int maxHeadSize,unsigned int minHeadSize)
+unsigned int DetectFaces(unsigned int frameNumber ,
+                         unsigned char * colorPixels ,  unsigned int colorWidth ,unsigned int colorHeight ,
+                         unsigned short * depthPixels ,   unsigned int depthWidth ,unsigned int depthHeight ,
+                         struct calibration * calib ,
+                         unsigned int maxHeadSize,unsigned int minHeadSize)
 {
     if  (colorPixels == 0 )  { return 0; }
     if (cascade==0)  { return 0; }
     if (storage==0)  { return 0; }
-    if (image==0)    { return 0; }
 
     /* detect faces */
+    IplImage  *image=0;
+    image = cvCreateImageHeader( cvSize(colorWidth,colorHeight), IPL_DEPTH_8U, 3 );
+    if (image==0) { fprintf(stderr,"Could not allocate image \n"); return 0; }
     image->imageData=(char*) colorPixels; // UGLY HACK
 
     unsigned int maxX=(unsigned int) (minHeadSize)       , maxY=minHeadSize;
@@ -144,7 +134,7 @@ unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels 
          unsigned int tileWidth = (unsigned int) r->width , tileHeight = (unsigned int) r->height;
          unsigned int sX = r->x;
          unsigned int sY = r->y;
-         unsigned int avgFaceDepth = countDepthAverage(depthPixels,fdFrameWidth,fdFrameHeight,sX,sY,tileWidth,tileHeight);
+         unsigned int avgFaceDepth = countDepthAverage(depthPixels,depthWidth,depthHeight,sX,sY,tileWidth,tileHeight);
 
 
          float headX=0.0 , headY=0.0 , headZ=0.0;
@@ -174,6 +164,9 @@ unsigned int DetectFaces(unsigned int frameNumber , unsigned char * colorPixels 
 
          newFaceDetected(frameNumber,&faceDetected);
     }
+
+
+    cvReleaseImageHeader( &image );
 
 	return 1;
 }
