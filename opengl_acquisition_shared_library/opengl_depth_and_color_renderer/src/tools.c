@@ -155,7 +155,7 @@ float distanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,float*y2,fl
   return (float) sqrt_fast_approximation( (dx * dx) + (dy * dy) + (dz * dz) );
 }
 
-float SquareddistanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2)
+float squaredDistanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2)
 {
   float dx,dy,dz;
 

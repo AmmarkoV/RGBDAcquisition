@@ -1,3 +1,9 @@
+/** @file tiledRenderer.h
+ *  @brief  Rendering multiple
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
+
 #ifndef TILEDRENDERER_H_INCLUDED
 #define TILEDRENDERER_H_INCLUDED
 
@@ -7,6 +13,9 @@
 #include "scene.h"
 
 
+/**
+* @brief An enumerator to represent position coordinates
+*/
 enum POS_COORDS
 {
     POS_X=0,
@@ -19,6 +28,10 @@ enum POS_COORDS
 };
 
 
+/**
+* @brief Depending on these values we get more or less tiles with more or less pixels per tile
+*        So this has a direct impact on the information provided
+*/
 struct tiledRendererDetail
 {
  float OGLUnitWidth , OGLUnitHeight ;
@@ -36,6 +49,9 @@ struct tiledRendererDetail
 };
 
 
+/**
+* @brief Tiled rendering configuration
+*/
 struct tiledRendererConfiguration
 {
   void * scenePTR;
@@ -55,10 +71,32 @@ struct tiledRendererConfiguration
 
 
 
+/**
+* @brief Get The 2D center for the rendering on specific Column and Row
+* @ingroup TiledRenderer
+* @param Tiled Renderer Context
+* @param Column to get info about
+* @param Row to get info about
+* @param X in the 2D Rendered output
+* @param Y in the 2D Rendered output
+* @param Z ( depth value ) of the center pixel
+* @retval 1=Success , 0=Failure
+*/
 int tiledRenderer_get2DCenter(void * trConf ,
                               unsigned int column, unsigned int row ,
                               float * x2D , float *y2D , float * z2D);
 
+
+
+
+
+
+/**
+* @brief Render one shot
+* @ingroup TiledRenderer
+* @param Tiled Renderer Context
+* @retval 1=Success , 0=Failure
+*/
 int tiledRenderer_Render( struct tiledRendererConfiguration * trConf);
 
 

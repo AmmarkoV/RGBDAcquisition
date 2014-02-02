@@ -347,9 +347,10 @@ int readOpenNiColorAndDepth(VideoStream &color , VideoStream &depth,VideoFrameRe
    m_streams[0] = &depth;
    m_streams[1] = &color;
 
-  unsigned int i=0;
+
+  unsigned char haveDepth=0,haveColor=0;
   int changedIndex;
-  while (i<2)
+  while ( (!haveDepth) || (!haveColor) )
   {
 	openni::Status rc = openni::OpenNI::waitForAnyStream(m_streams, 2, &changedIndex);
 	if (rc != openni::STATUS_OK)
@@ -364,14 +365,15 @@ int readOpenNiColorAndDepth(VideoStream &color , VideoStream &depth,VideoFrameRe
 	{
 	case 0:
 		depth.readFrame(&depthFrame);
-		++i;
+		haveDepth=1;
     break;
 	case 1:
 		color.readFrame(&colorFrame);
-		++i;
+		haveColor=1;
     break;
 	default:
 		printf("Error in wait\n");
+		return 0;
 	}
   }
 
