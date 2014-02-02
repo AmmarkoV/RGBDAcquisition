@@ -52,6 +52,9 @@ enum
 };
 #endif
 
+
+
+volatile int stop=0;
 unsigned char warnNoDepth=0;
 
 unsigned int windowX=0,windowY=0;
@@ -91,10 +94,21 @@ if  ( event == EVENT_MBUTTONDOWN ) { fprintf(stderr,"Middle button of the mouse 
 #endif
 
 
+int acquisitionStopDisplayingFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+  	 cvDestroyWindow(RGBwindowName);
+   	 cvDestroyWindow(DepthwindowName);
+   	 return 1;
+}
+
+
+
 
 void closeEverything()
 {
  fprintf(stderr,"Gracefully closing everything .. ");
+
+ acquisitionStopDisplayingFrames(moduleID,devID);
  /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
  acquisitionCloseDevice(moduleID,devID);
 
@@ -136,7 +150,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
                   case 'Q' :
 				  case 'q' :
 				      fprintf(stderr,"Q Key pressed , quitting\n");
-                      exit (0);
+                      stop=1; // exit (0);
                   break;
 				}
 			}
@@ -333,9 +347,6 @@ int main(int argc, char *argv[])
         if ( strstr(inputname,"noRegistration")!=0 )         {  } else
         if ( strstr(inputname,"rgbToDepthRegistration")!=0 ) { acquisitionMapRGBToDepth(moduleID,devID); } else
                                                              { acquisitionMapDepthToRGB(moduleID,devID);  }
-
-        //acquisitionMapDepthToRGB(moduleID,devID);
-        //acquisitionMapRGBToDepth(moduleID,devID);
         fprintf(stderr,"Done with Mapping Depth/RGB \n");
 
         if (devID2!=66666)
@@ -354,8 +365,7 @@ int main(int argc, char *argv[])
        cvSetMouseCallback(RGBwindowName, CallBackFunc, NULL);
      #endif
 
-   if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
-   for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
+   while ( (!stop) && ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) ) )
     {
         acquisitionStartTimer(0);
 
@@ -371,9 +381,10 @@ int main(int argc, char *argv[])
 
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
+        ++frameNum;
     }
 
-    fprintf(stderr,"Done viewing %u frames! \n",maxFramesToGrab);
+    fprintf(stderr,"Done viewing %u frames! \n",frameNum);
 
     closeEverything();
 

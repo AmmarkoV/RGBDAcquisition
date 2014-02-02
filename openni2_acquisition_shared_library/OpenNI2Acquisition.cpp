@@ -448,12 +448,22 @@ int badDeviceID(int devID,const char * callFile,unsigned int callLine)
 int startOpenNI2Module(unsigned int max_devs,char * settings)
 {
     currentAllocatedDevices  = max_devs;
-    return initializeOpenNI(max_devs,settings);
+    int retres = initializeOpenNI(max_devs,settings);
+
+    #if MOD_NITE2
+       startNite2(max_devs);
+   #endif
+
+   return retres;
 }
 
 int stopOpenNI2Module()
 {
-    return closeOpenNI();
+   #if MOD_NITE2
+       stopNite2();
+   #endif
+
+  return closeOpenNI();
 }
 
 
@@ -469,11 +479,14 @@ int snapOpenNI2Frames(int devID)
        {
           if (frameSnapped%skeletonDetectionFramesBetweenScans ==1)
           {
-            loopNite2(frameSnapped);
-            readOpenNiColor(color[devID],colorFrame[devID]);
-            #warning "Check for success of color and depth operation here"
-            retres=1;
-            lastDepthComesFromNite[devID]=1;
+            if ( loopNite2(devID,frameSnapped) )
+            {
+             //If we managed to grab a frame using NITE2 then only grab color outside
+             readOpenNiColor(color[devID],colorFrame[devID]);
+             #warning "Check for success of color and depth operation here"
+             retres=1;
+             lastDepthComesFromNite[devID]=1;
+            }
           }
        }
        //If we don't have a skeleton snap do a regular snap here
@@ -523,7 +536,7 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
 
     unsigned int forceMapDepthToRGB=0;
     #if MOD_NITE2
-       startNite2(&device[devID]);
+       createNite2Device(devID,&device[devID]);
        forceMapDepthToRGB=1;
     #endif
 
@@ -570,7 +583,7 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
  {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
      #if MOD_NITE2
-       stopNite2();
+       destroyNite2Device(devID);
      #endif
     #if MOD_FACEDETECTION
        CloseFaceDetection();
@@ -611,12 +624,10 @@ int getOpenNI2ColorDataSize(int devID)
 }
 int getOpenNI2ColorChannels(int devID)
 {
-  //if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
   return 3;
 }
 int getOpenNI2ColorBitsPerPixel(int devID)
 {
-  //if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
   return 8;
 }
 unsigned char * getOpenNI2ColorPixels(int devID)
@@ -667,12 +678,10 @@ int getOpenNI2DepthDataSize(int devID)
 }
 int getOpenNI2DepthChannels(int devID)
 {
-  //if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
   return 1;
 }
 int getOpenNI2DepthBitsPerPixel(int devID)
 {
-  //if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
   return 16;
 }
 unsigned short * getOpenNI2DepthPixels(int devID)
@@ -680,7 +689,7 @@ unsigned short * getOpenNI2DepthPixels(int devID)
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
 
   #if MOD_NITE2
-   if (lastDepthComesFromNite[devID]) {  }
+   if (lastDepthComesFromNite[devID]) { return getNite2DepthFrame(devID); }
   #endif
 
  return (unsigned short *) depthFrame[devID].getData();

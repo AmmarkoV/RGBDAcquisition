@@ -47,49 +47,37 @@ const char * jointNames[] =
 
 struct NiteVirtualDevice
 {
-  bool g_visibleUsers[MAX_USERS] = {false};
-  nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
+  int failed;
+  nite::UserTracker userTracker;
+  nite::UserTrackerFrameRef userTrackerFrame;
 
-	nite::UserTracker userTracker;
-	nite::Status niteRc;
-	nite::UserTrackerFrameRef userTrackerFrame;
+  bool g_visibleUsers[MAX_USERS];
+  nite::SkeletonState g_skeletonStates[MAX_USERS];
 
-void * skelCallbackAddr = 0;
-void * skelCallbackPointingAddr = 0;
+  void * skelCallbackAddr;
+  void * skelCallbackPointingAddr;
 };
 
-struct NiteVirtualDevice skeltonTracker[10];
+//Skeleton Tracker Context shorthand
+struct NiteVirtualDevice * stc=0;
 
-bool g_visibleUsers[MAX_USERS] = {false};
-nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
-
-	nite::UserTracker userTracker;
-	nite::Status niteRc;
-	nite::UserTrackerFrameRef userTrackerFrame;
-
-void * skelCallbackAddr = 0;
-void * skelCallbackPointingAddr = 0;
-
-
-
-int registerSkeletonPointingDetectedEvent(void * callback)
+int registerSkeletonPointingDetectedEvent(int devID, void * callback)
 {
-  skelCallbackPointingAddr=callback;
+  stc[devID].skelCallbackPointingAddr=callback;
   return 1;
 }
 
-int registerSkeletonDetectedEvent(void * callback)
+int registerSkeletonDetectedEvent(int devID, void * callback)
 {
-  skelCallbackAddr = callback;
+  stc[devID].skelCallbackAddr = callback;
   return 1;
 }
 
 
 
 
-void newSkeletonPointingDetected(unsigned int frameNumber ,struct skeletonPointing * skeletonPointingFound)
+void newSkeletonPointingDetected(int devID, unsigned int frameNumber ,struct skeletonPointing * skeletonPointingFound)
 {
-
   fprintf(stderr,YELLOW "Skeleton Pointing Detected : ");
   if (skeletonPointingFound->isLeftHand) {  fprintf(stderr,"LEFT "); } else
   if (skeletonPointingFound->isRightHand) {  fprintf(stderr,"RIGHT "); }
@@ -100,17 +88,17 @@ void newSkeletonPointingDetected(unsigned int frameNumber ,struct skeletonPointi
 
 
 
-  if (skelCallbackPointingAddr!=0)
+  if (stc[devID].skelCallbackPointingAddr!=0)
   {
     void ( *DoCallback) (unsigned int ,struct skeletonPointing *)=0 ;
-    DoCallback = (void(*) (unsigned int ,struct skeletonPointing *) ) skelCallbackPointingAddr;
+    DoCallback = (void(*) (unsigned int ,struct skeletonPointing *) ) stc[devID].skelCallbackPointingAddr;
     DoCallback(frameNumber ,skeletonPointingFound);
   }
 
 }
 
 
-void newSkeletonDetected(unsigned int frameNumber ,struct skeletonHuman * skeletonFound)
+void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuman * skeletonFound)
 {
     fprintf(stderr, GREEN " " );
     fprintf(stderr,"Skeleton #%u found at frame %u \n",skeletonFound->userID, frameNumber);
@@ -131,10 +119,10 @@ void newSkeletonDetected(unsigned int frameNumber ,struct skeletonHuman * skelet
     fprintf(stderr,  " \n" NORMAL );
 
 
-  if (skelCallbackAddr!=0)
+  if (stc[devID].skelCallbackAddr!=0)
   {
     void ( *DoCallback) (unsigned int ,struct skeletonHuman *)=0 ;
-    DoCallback = (void(*) (unsigned int ,struct skeletonHuman *) ) skelCallbackAddr;
+    DoCallback = (void(*) (unsigned int ,struct skeletonHuman *) ) stc[devID].skelCallbackAddr;
     DoCallback(frameNumber ,skeletonFound);
   }
 
@@ -156,7 +144,7 @@ float simpPow(float base,unsigned int exp)
 
 
 
-int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * skeletonFound)
+int considerSkeletonPointing(int devID ,unsigned int frameNumber,struct skeletonHuman * skeletonFound)
 {
   struct skeletonPointing skelPF={0};
 
@@ -191,7 +179,7 @@ int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * ske
    skelPF.pointingVector.z = skelPF.pointEnd.z - skelPF.pointStart.z;
    skelPF.isLeftHand=1;
    skelPF.isRightHand=0;
-   newSkeletonPointingDetected(frameNumber,&skelPF);
+   newSkeletonPointingDetected(devID,frameNumber,&skelPF);
    return 1;
   } else
   if (doHand==2)
@@ -207,7 +195,7 @@ int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * ske
    skelPF.pointingVector.z = skelPF.pointEnd.z - skelPF.pointStart.z;
    skelPF.isLeftHand=0;
    skelPF.isRightHand=1;
-   newSkeletonPointingDetected(frameNumber,&skelPF);
+   newSkeletonPointingDetected(devID,frameNumber,&skelPF);
    return 1;
   }
 
@@ -216,7 +204,7 @@ int considerSkeletonPointing(unsigned int frameNumber,struct skeletonHuman * ske
 
 
 
-void prepareSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user  , unsigned int observation , unsigned int totalObservations)
+void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker & pUserTracker , const nite::UserData & user  , unsigned int observation , unsigned int totalObservations)
 {
     struct skeletonHuman humanSkeleton={0};
 
@@ -326,14 +314,14 @@ void prepareSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTr
 
     long long unsigned int ts = frameNumber;
 	if (user.isNew())  { humanSkeleton.isNew=1; } else
-    if ((user.isVisible()) && (!g_visibleUsers[user.getId()])) { humanSkeleton.isVisible=1; }  else
-    if ((!user.isVisible()) && (g_visibleUsers[user.getId()])) { humanSkeleton.isOutOfScene=1; } else
+    if ((user.isVisible()) && (!stc[devID].g_visibleUsers[user.getId()])) { humanSkeleton.isVisible=1; }  else
+    if ((!user.isVisible()) && (stc[devID].g_visibleUsers[user.getId()])) { humanSkeleton.isOutOfScene=1; } else
     if (user.isLost())  { humanSkeleton.isLost=1; }
 
-	g_visibleUsers[user.getId()] = user.isVisible();
-	if(g_skeletonStates[user.getId()] != user.getSkeleton().getState())
+	stc[devID].g_visibleUsers[user.getId()] = user.isVisible();
+	if(stc[devID].g_skeletonStates[user.getId()] != user.getSkeleton().getState())
 	{
-		switch(g_skeletonStates[user.getId()] = user.getSkeleton().getState())
+		switch(stc[devID].g_skeletonStates[user.getId()] = user.getSkeleton().getState())
 		{
 		 case nite::SKELETON_NONE:         humanSkeleton.statusStoppedTracking = 1; break; // USER_MESSAGE("Stopped tracking.")
 		 case nite::SKELETON_CALIBRATING:  humanSkeleton.statusCalibrating=1;       break; // USER_MESSAGE("Calibrating...")
@@ -350,65 +338,95 @@ void prepareSkeletonState(unsigned int frameNumber , nite::UserTracker & pUserTr
 
    //This is an event that gets fed with our newly encapsulated data
    //it should also fire up any additional events registered by clients
-   newSkeletonDetected(frameNumber,&humanSkeleton);
+   newSkeletonDetected(devID,frameNumber,&humanSkeleton);
 
 
-   if (considerSkeletonPointing(frameNumber,&humanSkeleton))
+   if (considerSkeletonPointing(devID,frameNumber,&humanSkeleton))
    {
       fprintf(stderr,"New pointing gesture found\n");
    }
 
  }
 
-
-int startNite2Void()
-{
-	nite::NiTE::initialize();
-	niteRc = userTracker.create();
-	if (niteRc != nite::STATUS_OK)
-	{
-		printf("Couldn't create user tracker\n");
-		return 3;
-	}
-	printf("\nStart moving around to get detected...\n(PSI pose may be required for skeleton calibration, depending on the configuration)\n");
- return 1;
-}
-
-int startNite2(openni::Device * device)
+int startNite2(int maxVirtualSkeletonTrackers)
 {
     printf("Starting Nite2\n");
 	nite::NiTE::initialize();
+	stc=(struct NiteVirtualDevice * ) malloc(sizeof(struct NiteVirtualDevice) * maxVirtualSkeletonTrackers);
+	//memset(stc,0,sizeof(struct NiteVirtualDevice) * maxVirtualSkeletonTrackers);
 
-	niteRc = userTracker.create(device);
-	if (niteRc != nite::STATUS_OK)
-	{
-		printf("Couldn't create user tracker\n");
-		return 3;
-	}
-	printf("\nStart moving around to get detected...\n(PSI pose may be required for skeleton calibration, depending on the configuration)\n");
-
+	int i=0,uid=0;
+	for (i=0; i<maxVirtualSkeletonTrackers; i++)
+    {
+      stc[i].failed=0;
+      stc[i].skelCallbackAddr = 0;
+      stc[i].skelCallbackPointingAddr = 0;
+      for (uid=0; uid<MAX_USERS; uid++)
+         {
+          stc[i].g_visibleUsers[i] = false;
+          stc[i].g_skeletonStates[i] = nite::SKELETON_NONE;
+         }
+    }
  return 1;
 }
+
+
+int createNite2Device(int devID,openni::Device * device)
+{
+    nite::Status niteRc;
+    if (device==0) {  niteRc = stc[devID].userTracker.create();       } else
+	               {  niteRc = stc[devID].userTracker.create(device); }
+	if ( niteRc != nite::STATUS_OK)
+	{
+		fprintf(stderr,RED "Couldn't create user tracker\n" NORMAL);
+		if ( niteRc == nite::STATUS_ERROR )       { fprintf(stderr,"Status Error returned\n"); } else
+        if ( niteRc == nite::STATUS_BAD_USER_ID ) { fprintf(stderr,"Status Bad User Id returned\n"); } else
+        if ( niteRc == nite::STATUS_OUT_OF_FLOW ) { fprintf(stderr,"Status Out of flow returned\n"); }
+		stc[devID].failed=1;
+		return 0;
+	}
+	printf("\nStart moving around to get detected...\n(PSI pose may be required for skeleton calibration, depending on the configuration)\n");
+	return 1;
+}
+
+
+int destroyNite2Device(int devID)
+{
+   stc[devID].userTracker.destroy();
+   stc[devID].userTrackerFrame.release();
+
+   return 1 ;
+}
+
 
 
 int stopNite2()
 {
 	nite::NiTE::shutdown();
+	#warning "TODO : check if each and every one of stc contexes has been destroyed"
+	free ( stc );
+	stc=0;
   return 1;
 }
 
 
 
-int loopNite2(unsigned int frameNumber)
+int loopNite2(int devID ,unsigned int frameNumber)
 {
-		niteRc = userTracker.readFrame(&userTrackerFrame);
-		if (niteRc != nite::STATUS_OK)
+   if (stc[devID].failed)
+     {
+       fprintf(stderr,RED "Skeleton Tracking has failed at initialization can't track anything :(\n" NORMAL);
+       return 0;
+     }
+
+    nite::Status niteRc  = stc[devID].userTracker.readFrame(&stc[devID].userTrackerFrame);
+	 if (niteRc != nite::STATUS_OK)
 		{
 			printf("Get next frame failed\n");
 			return 0;
 		}
 
-		const nite::Array<nite::UserData>& users = userTrackerFrame.getUsers();
+		const nite::Array<nite::UserData>& users = stc[devID].userTrackerFrame.getUsers();
 		for (int i = 0; i < users.getSize(); ++i)
 		{
 		    //We will use user from now on as the current user
@@ -417,13 +435,13 @@ int loopNite2(unsigned int frameNumber)
             //If our user is new we should start to track his skeleton
 			if (user.isNew())
 			{
-				userTracker.startSkeletonTracking(user.getId());
+				stc[devID].userTracker.startSkeletonTracking(user.getId());
 			}
 			else
             //If we have a skeleton tracked , populate our internal structures and call callbacks
             if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
 			{
-		      prepareSkeletonState(frameNumber,userTracker,user  , i , users.getSize() );
+		      prepareSkeletonState(devID,frameNumber,stc[devID].userTracker,user  , i , users.getSize() );
 			}
 		}
   return 1;
@@ -431,8 +449,8 @@ int loopNite2(unsigned int frameNumber)
 
 
 
-unsigned short  * getNite2DepthFrame()
+unsigned short  * getNite2DepthFrame(int devID)
 {
-  return (unsigned short *) userTrackerFrame.getDepthFrame().getData();
+  return (unsigned short *) stc[devID].userTrackerFrame.getDepthFrame().getData();
 }
 

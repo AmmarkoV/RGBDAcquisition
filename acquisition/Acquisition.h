@@ -608,6 +608,27 @@ int acquisitionGetDepth3DPointAtXYCameraSpace(ModuleIdentifier moduleID,DeviceId
  */
 int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  );
 
+
+
+
+
+
+/**
+ * @brief  Return the depth value of a 2d point on our frame
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param X2D Coordinates on our frame ( the projected 3d point on our 2d Frame )
+ * @param Y2D Coordinates on our frame ( the projected 3d point on our 2d Frame )
+ * @retval 1=Success 0=Failure
+ */
+unsigned short acquisitionGetDepthValueAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d );
+
+
+
+
+
+
 /**
  * @brief  Populate the parameters with the dimensions of the Color Frame
  * @ingroup acquisitionCore

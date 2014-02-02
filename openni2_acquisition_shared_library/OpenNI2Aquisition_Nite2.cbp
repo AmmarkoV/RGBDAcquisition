@@ -11,6 +11,9 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
+				<Option parameters="-module OPENNI2 -from ../redist/ACapturedCalibration.oni " />
+				<Option host_application="../viewer/Viewer" />
+				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>

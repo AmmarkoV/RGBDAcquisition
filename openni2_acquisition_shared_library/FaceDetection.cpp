@@ -5,8 +5,6 @@
 #include <cxcore.h>
 #include "../tools/ImageOperations/imageOps.h"
 
-
-
 #define NORMAL "\033[0m"
 #define BLACK "\033[30m" /* Black */
 #define RED "\033[31m" /* Red */
@@ -18,7 +16,6 @@
 #define WHITE "\033[37m" /* White */
 
 #define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
-
 
 int saveResults = 0;
 
