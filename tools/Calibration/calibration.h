@@ -137,6 +137,14 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
  */
 int WriteCalibration(char * filename,struct calibration * calib);
 
+/**
+ * @brief  Write a basic calibration parameters to screen
+ * @ingroup calibration
+ * @param  Pointer , Pointer to the calibration to be printed on screen
+ * @retval 1=Success , 0=Failure
+ */
+int PrintCalibration(struct calibration * calib);
+
 
 /**
  * @brief  This call allocates a 4x4 Transformation matrix based on the extrinsics of the calibration file passed as a parameter

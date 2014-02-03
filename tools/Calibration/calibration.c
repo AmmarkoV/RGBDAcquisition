@@ -122,6 +122,7 @@ float internationalAtof(char * str)
 
 int RefreshCalibration(char * filename,struct calibration * calib)
 {
+  if ((filename==0)||(calib==0)) { return 0; }
   forceUSLocaleToKeepOurSanity();
 
   FILE * fp = 0;
@@ -270,15 +271,30 @@ int RefreshCalibration(char * filename,struct calibration * calib)
 
 int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib)
 {
+  if ((filename==0)||(calib==0)) { return 0; }
   //First free
   NullCalibration(width,height,calib);
   return RefreshCalibration(filename,calib);
 }
 
+int PrintCalibration(struct calibration * calib)
+{
+  if (calib==0) { return 0; }
+  fprintf(stderr, "Dimensions ( %u x %u ) \n",calib->width,calib->height);
+  fprintf(stderr, "fx %0.2f fy %0.2f cx %0.2f cy %0.2f\n",calib->intrinsic[CALIB_INTR_FX],calib->intrinsic[CALIB_INTR_FY],
+                                                          calib->intrinsic[CALIB_INTR_CX],calib->intrinsic[CALIB_INTR_CY]);
+  fprintf(stderr, "k1 %0.2f k2 %0.2f p1 %0.2f p2 %0.2f k3 %0.2f\n",calib->k1,calib->k2,calib->p1,calib->p2,calib->k3);
+
+  fprintf(stderr, "Tx %0.2f %0.2f %0.2f \n",calib->extrinsicTranslation[0],calib->extrinsicTranslation[1],calib->extrinsicTranslation[2]);
+  fprintf(stderr, "Rodriguez %0.2f %0.2f %0.2f \n",calib->extrinsicRotationRodriguez[0],calib->extrinsicRotationRodriguez[1],calib->extrinsicRotationRodriguez[2]);
+
+  return 0;
+}
 
 
 int WriteCalibration(char * filename,struct calibration * calib)
 {
+  if ((filename==0)||(calib==0)) { return 0; }
   forceUSLocaleToKeepOurSanity();
 
   FILE * fp = 0;
