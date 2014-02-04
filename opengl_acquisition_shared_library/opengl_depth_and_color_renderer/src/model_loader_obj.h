@@ -1,3 +1,9 @@
+/** @file model_loader_obj.h
+ *  @brief  A module that loads models from OBJ files
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
+
 #ifndef MODEL_LOADER_OBJ_H_INCLUDED
 #define MODEL_LOADER_OBJ_H_INCLUDED
 
@@ -28,15 +34,21 @@
 #define GL_BGR_EXT 0x80E0
 
 
-/* Vector Structure*/  typedef struct { GLfloat n1, n2, n3;  } Vector;
+/**  @brief The structure that defines Vectors*/
+typedef struct { GLfloat n1, n2, n3;  } Vector;
 
-/* Vertex Structure*/  typedef struct { GLfloat x,y,z; }       Vertex;
+/**  @brief The structure that defines Vertexes*/
+typedef struct { GLfloat x,y,z; }       Vertex;
 
-/* Vertex-Face Normal Structure*/ typedef struct { GLfloat n1,n2,n3; } Normal;
+/**  @brief The structure that defines Vertex-Face Normal  */
+typedef struct { GLfloat n1,n2,n3; } Normal;
 
-/*Texture Coordinates Structure*/ typedef struct { GLfloat u, v; }  TexCoords;
 
-/* Face Structure*/
+/**  @brief The structure that defines texture coordinates */
+typedef struct { GLfloat u, v; }  TexCoords;
+
+
+/**  @brief The structure that defines a Face ( its vertices normal , area etc ) */
 typedef struct
 {
 		long unsigned int v[3];
@@ -46,10 +58,11 @@ typedef struct
 		GLfloat area;
 }Face;
 
-/* Model Bounding Box Structure*/
+
+/**  @brief The structure that defines a Bounding Box */
 typedef struct { Vertex min; Vertex max; } bbox;
 
-/* Material Structure*/
+/**  @brief The structure that defines a Material */
 typedef struct
 {
         GLfloat shine;
@@ -62,7 +75,7 @@ typedef struct
 		GLboolean hasTex; //has texture file
 } Material;
 
-/* Group Structure*/
+/**  @brief The structure that defines a Group */
 typedef struct
 {
 	    long unsigned int *faceList;
@@ -77,6 +90,8 @@ typedef struct
 
 typedef float MATRIX[16];
 
+
+/**  @brief The structure that defines a .OBJ Object */
 struct OBJ_Model
 {
         bbox boundBox;
@@ -120,12 +135,56 @@ struct OBJ_Model
 		//the display list id
 		GLuint dispList;
 };
+
+
+
+
+/**
+* @brief Render a compiled OpenGL list using glCallList()
+* @ingroup OBJModelLoader
+* @param The loaded object
+* @retval A pointer to a compiled opengl renderer
+*/
 GLuint getObjOGLList(struct OBJ_Model * obj);
 
+
+/**
+* @brief Load an Object (.OBJ) file
+* @ingroup OBJModelLoader
+* @param String with the directory of the model
+* @param String with the filename of the model ( after the directory )
+* @retval 0=Failure , A pointer to an object model
+*/
 struct OBJ_Model * loadObj(char * directory,char * filename);
+
+
+/**
+* @brief Unload a loaded Object
+* @ingroup OBJModelLoader
+* @param The loaded object
+* @retval 0=Failure , 1=Success
+*/
 int unloadObj(struct OBJ_Model * obj);
 
+
+/**
+* @brief Draw a loaded Object
+* @ingroup OBJModelLoader
+* @param The loaded object
+*/
 void  drawOBJMesh(struct OBJ_Model * obj);
+
+
+/**
+* @brief Find intersection of vertexes with object model ( and return it )
+* @ingroup OBJModelLoader
+* @param The loaded object
+* @param Vertex 1
+* @param Vertex 2
+* @param Output Normal
+* @param Output Intersection point
+* @retval A pointer to a compiled opengl renderer
+*/
 int findIntersection(struct OBJ_Model * obj,Vertex v1, Vertex v2, Vector* new_normal, Vector* intersection_point);
 
 #endif // MODEL_LOADER_OBJ_H_INCLUDED
