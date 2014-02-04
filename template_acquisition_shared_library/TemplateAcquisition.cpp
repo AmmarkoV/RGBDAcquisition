@@ -130,24 +130,28 @@ int setTemplateDepthCalibration(int devID,struct calibration * calib)
 
 
 
-unsigned char * ReadPPM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
+unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
-    #if PRINT_DEBUG_EACH_CALL
-     fprintf(stderr,"TemplateAcquisition : Reading file %s \n",filename);
-    #endif // PRINT_DEBUG_EACH_CALL
-
+    //See http://en.wikipedia.org/wiki/Portable_anymap#File_format_description for this simple and useful format
     unsigned char * pixels=buffer;
     FILE *pf=0;
     pf = fopen(filename,"rb");
 
     if (pf!=0 )
     {
+        *width=0; *height=0; *timestamp=0;
+        unsigned int bytesPerPixel=0;
+        unsigned int channels=0;
         char buf[PPMREADBUFLEN], *t;
         unsigned int w=0, h=0, d=0;
         int r=0;
 
         t = fgets(buf, PPMREADBUFLEN, pf);
-        if ( (t == 0) || ( strncmp(buf, "P6\n", 3) != 0 ) ) { fprintf(stderr,"ReadPPM only undertsands P6 format\n"); fclose(pf); return 0; }
+        if (t == 0) { return 0; }
+
+        if ( strncmp(buf,"P6\n", 3) == 0 ) { channels=3; } else
+        if ( strncmp(buf,"P5\n", 3) == 0 ) { channels=1; } else
+                                           { fprintf(stderr,"Could not understand file format\n"); fclose(pf); return 0; }
         do
         { /* Px formats can have # comments after first line */
            #if PRINT_COMMENTS
@@ -161,32 +165,36 @@ unsigned char * ReadPPM(unsigned char * buffer , char * filename,unsigned int *w
               }
 
            if ( t == 0 ) { fclose(pf); return 0; }
-           #if PRINT_COMMENTS
-             if (buf[0]=='#') { printf("COLOR %s\n",buf+1); } //<- Printout Comment!
-           #endif
         } while ( strncmp(buf, "#", 1) == 0 );
         r = sscanf(buf, "%u %u", &w, &h);
         if ( r < 2 ) { fclose(pf); fprintf(stderr,"Incoherent dimensions received %ux%u \n",w,h); return 0; }
         // The program fails if the first byte of the image is equal to 32. because
         // the fscanf eats the space and the image is read with some bit less
         r = fscanf(pf, "%u\n", &d);
-        if ( (r < 1) || ( d != 255 ) ) { fprintf(stderr,"Incoherent payload received %u bits per pixel \n",d); fclose(pf); return 0; }
+        if (r < 1) { fprintf(stderr,"Could not understand how many bytesPerPixel there are on this image\n"); fclose(pf); return 0; }
+        if (d==255) { bytesPerPixel=1; }  else
+        if (d==65535) { bytesPerPixel=2; } else
+                        { fprintf(stderr,"Incoherent payload received %u bits per pixel \n",d); fclose(pf); return 0; }
 
-
-        *width=w;
-        *height=h;
-        if (pixels==0) {  pixels= (unsigned char*) malloc(w*h*3*sizeof(unsigned char)); }
+        *width=w; *height=h;
+        if (pixels==0) {  pixels= (unsigned char*) malloc(w*h*bytesPerPixel*channels*sizeof(char)); }
 
         if ( pixels != 0 )
         {
-          size_t rd = fread(pixels,3, w*h, pf);
+          size_t rd = fread(pixels,bytesPerPixel*channels, w*h, pf);
           if (rd < w*h )
              {
                fprintf(stderr,"Note : Incomplete read while reading file %s (%u instead of %u)\n",filename,(unsigned int) rd, w*h);
+               fprintf(stderr,"Dimensions ( %u x %u ) , Depth %u bytes , Channels %u \n",w,h,bytesPerPixel,channels);
              }
 
           fclose(pf);
-          //if ( rd < w*h ) { return 0; }
+
+           #if PRINT_COMMENTS
+             if ( (channels==1) && (bytesPerPixel==2) && (timestamp!=0) ) { printf("DEPTH %lu\n",*timestamp); } else
+             if ( (channels==3) && (bytesPerPixel==1) && (timestamp!=0) ) { printf("COLOR %lu\n",*timestamp); }
+           #endif
+
           return pixels;
         } else
         {
@@ -200,78 +208,6 @@ unsigned char * ReadPPM(unsigned char * buffer , char * filename,unsigned int *w
 
   return 0;
 }
-
-
-
-
-unsigned short * ReadPPMD(unsigned short * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
-{
-    #if PRINT_DEBUG_EACH_CALL
-     fprintf(stderr,"TemplateAcquisition : Reading file %s \n",filename);
-    #endif // PRINT_DEBUG_EACH_CALL
-
-    unsigned short * pixels=buffer;
-    FILE *pf=0;
-    pf = fopen(filename,"rb");
-
-    if (pf!=0 )
-    {
-        char buf[PPMREADBUFLEN], *t;
-        unsigned int w=0, h=0, d=0;
-        int r=0;
-
-        t = fgets(buf, PPMREADBUFLEN, pf);
-        if ( (t == 0) || ( strncmp(buf, "P5\n", 3) != 0 ) ) { fclose(pf); return 0; }
-        do
-        { /* Px formats can have # comments after first line */
-           #if PRINT_COMMENTS
-             memset(buf,0,PPMREADBUFLEN);
-           #endif
-           t = fgets(buf, PPMREADBUFLEN, pf);
-
-           if (strstr(buf,"TIMESTAMP")!=0)
-              {
-                char * timestampPayloadStr = buf + 10;
-                *timestamp = atoi(timestampPayloadStr);
-              }
-
-           if ( t == 0 ) { fclose(pf); return 0; }
-           #if PRINT_COMMENTS
-             if (buf[0]=='#') { printf("DEPTH %s\n",buf+1); } //<- Printout Comment!
-           #endif
-        } while ( strncmp(buf, "#", 1) == 0 );
-        r = sscanf(buf, "%u %u", &w, &h);
-        if ( r < 2 ) { fclose(pf); return 0; }
-        // The program fails if the first byte of the image is equal to 32. because
-        // the fscanf eats the space and the image is read with some bit less
-        r = fscanf(pf, "%u\n", &d);
-        if ( (r < 1) /*|| ( d != 255 )*/ ) { fclose(pf); return 0; }
-
-
-        *width=w;
-        *height=h;
-        if ( pixels == 0 ) { pixels= (unsigned short*) malloc(w*h*sizeof(unsigned short)); } /*Only 1 channel in depth images 3*/
-
-        if ( pixels != 0 )
-        {
-          size_t rd = fread(pixels,sizeof(unsigned short), w*h, pf);
-          if (rd < w*h) { fprintf(stderr,"Note : Incomplete read while reading file %s (%u instead of %u)\n",filename,(unsigned int) rd,w*h);  }
-
-          fclose(pf);
-          return pixels;
-        } else
-        {
-            fprintf(stderr,"Could not Allocate enough memory for file %s \n",filename);
-        }
-        fclose(pf);
-    } else
-    {
-      fprintf(stderr,"File %s does not exist \n",filename);
-    }
-
-  return 0;
-}
-
 
 
 int flipDepth(unsigned short * depth,unsigned int width , unsigned int height )
@@ -389,7 +325,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
   char file_name_test[1024];
   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
-  unsigned char * tmpColor = ReadPPM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
+  unsigned char * tmpColor = ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
@@ -403,7 +339,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
 
   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
-  unsigned short * tmpDepth = ReadPPMD(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
+  unsigned short * tmpDepth = (unsigned short *) ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
 
@@ -494,7 +430,7 @@ int snapTemplateFrames(int devID)
        #if REALLOCATE_ON_EVERY_SNAP
          if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); device[devID].templateColorFrame=0; }
        #endif
-       device[devID].templateColorFrame = ReadPPM(device[devID].templateColorFrame,file_name_test,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
+       device[devID].templateColorFrame = ReadPNM(device[devID].templateColorFrame,file_name_test,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
        ++found_frames;
      }
 
@@ -505,7 +441,7 @@ int snapTemplateFrames(int devID)
       #if REALLOCATE_ON_EVERY_SNAP
         if (device[devID].templateDepthFrame!=0) { free(device[devID].templateDepthFrame); device[devID].templateDepthFrame=0; }
       #endif
-      device[devID].templateDepthFrame = ReadPPMD(device[devID].templateDepthFrame,file_name_test,&widthInternal,&heightInternal,&device[devID].lastDepthTimestamp);
+      device[devID].templateDepthFrame = (unsigned short *) ReadPNM((unsigned char *) device[devID].templateDepthFrame,file_name_test,&widthInternal,&heightInternal,&device[devID].lastDepthTimestamp);
       ++found_frames;
      }
 
