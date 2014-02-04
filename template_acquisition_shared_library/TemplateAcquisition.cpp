@@ -147,11 +147,11 @@ unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *w
         int r=0;
 
         t = fgets(buf, PPMREADBUFLEN, pf);
-        if (t == 0) { return 0; }
+        if (t == 0) { return buffer; }
 
         if ( strncmp(buf,"P6\n", 3) == 0 ) { channels=3; } else
         if ( strncmp(buf,"P5\n", 3) == 0 ) { channels=1; } else
-                                           { fprintf(stderr,"Could not understand file format\n"); fclose(pf); return 0; }
+                                           { fprintf(stderr,"Could not understand/Not supported file format\n"); fclose(pf); return buffer; }
         do
         { /* Px formats can have # comments after first line */
            #if PRINT_COMMENTS
@@ -164,17 +164,17 @@ unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *w
                 *timestamp = atoi(timestampPayloadStr);
               }
 
-           if ( t == 0 ) { fclose(pf); return 0; }
+           if ( t == 0 ) { fclose(pf); return buffer; }
         } while ( strncmp(buf, "#", 1) == 0 );
         r = sscanf(buf, "%u %u", &w, &h);
-        if ( r < 2 ) { fclose(pf); fprintf(stderr,"Incoherent dimensions received %ux%u \n",w,h); return 0; }
+        if ( r < 2 ) { fclose(pf); fprintf(stderr,"Incoherent dimensions received %ux%u \n",w,h); return buffer; }
         // The program fails if the first byte of the image is equal to 32. because
         // the fscanf eats the space and the image is read with some bit less
         r = fscanf(pf, "%u\n", &d);
-        if (r < 1) { fprintf(stderr,"Could not understand how many bytesPerPixel there are on this image\n"); fclose(pf); return 0; }
+        if (r < 1) { fprintf(stderr,"Could not understand how many bytesPerPixel there are on this image\n"); fclose(pf); return buffer; }
         if (d==255) { bytesPerPixel=1; }  else
         if (d==65535) { bytesPerPixel=2; } else
-                        { fprintf(stderr,"Incoherent payload received %u bits per pixel \n",d); fclose(pf); return 0; }
+                        { fprintf(stderr,"Incoherent payload received %u bits per pixel \n",d); fclose(pf); return buffer; }
 
         *width=w; *height=h;
         if (pixels==0) {  pixels= (unsigned char*) malloc(w*h*bytesPerPixel*channels*sizeof(char)); }
@@ -205,8 +205,7 @@ unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *w
     {
       fprintf(stderr,"File %s does not exist \n",filename);
     }
-
-  return 0;
+  return buffer;
 }
 
 
