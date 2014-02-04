@@ -4,7 +4,7 @@
  *  That beeing said anything that has a different implementation for windows/linux and has to do with framework/API calls etc should go here
  *
  *  @author Ammar Qammaz (AmmarkoV)
- *  @bug This does not yet support all operating systems
+ *  @bug OperatingSystem.h is supposed to provide cross platform basic functionality but for now it only supports Linux
  */
 
 

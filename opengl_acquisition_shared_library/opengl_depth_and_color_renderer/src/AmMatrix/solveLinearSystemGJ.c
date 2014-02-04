@@ -217,6 +217,7 @@ int solveLinearSystemGJ(double * result , double * coefficients , unsigned int v
 {
     fprintf(stderr,"solveLinearSystemGJ : Variables %u argument is not taken into account (?)",variables);
 
+    char name[128]={0};
     //Make the system upper diagonal
     unsigned int i=0;
     for (i=0; i<totalLines; i++)
@@ -224,6 +225,9 @@ int solveLinearSystemGJ(double * result , double * coefficients , unsigned int v
       if (! makeSureNonZero(coefficients,i,totalLines) ) { fprintf(stderr,"Error making sure that we have a non zero element first ( %u ) \n", i ); break; }
       if (! createBaseOne(coefficients,i) )              { fprintf(stderr,"Error creating base one  ( %u ) \n", i ); break; }
       if (! subtractBase(coefficients,i,totalLines) )    { fprintf(stderr,"Error subtracting base  ( %u ) \n" , i ); break; }
+
+      sprintf(name,"Echeloned Step %u",i);
+      printSystemPlain(coefficients,name,totalLines);
     }
 
     fprintf(stderr,"\n\n");
