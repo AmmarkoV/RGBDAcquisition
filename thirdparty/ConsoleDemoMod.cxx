@@ -316,7 +316,8 @@ void configureColorNode()
 
 
     config.frameFormat = FRAME_FORMAT_QQVGA;
-    config.compression = COMPRESSION_TYPE_MJPEG;
+    //config.compression = COMPRESSION_TYPE_MJPEG;
+    config.compression = COMPRESSION_TYPE_YUY2;
 
     //config.powerLineFrequency = POWER_LINE_FREQUENCY_50HZ;
     //config.framerate = 25;
