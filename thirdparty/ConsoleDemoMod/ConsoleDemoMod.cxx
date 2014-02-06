@@ -1,6 +1,8 @@
-// ConsoleDemo modification due to Damian Lyons
+// ConsoleDemo initial modification due to Damian Lyons
 // Code originally retrieved from SoftKinetic forum
 // http://www.softkinetic.com/Support/Forum/tabid/110/forumid/32/threadid/1450/scope/posts/language/en-US/Default.aspx
+
+// DepthSense 325 parameters and conversion fix - Tu-Hoa Pham (thp@pham.in)
 
 ////////////////////////////////////////////////////////////////////////////////
 // SoftKinetic DepthSense SDK
@@ -22,7 +24,6 @@
 // info@softkinetic.com Copyright (c) 2002-2012 Softkinetic Sensors NV
 ////////////////////////////////////////////////////////////////////////////////
 
-
 // Some OpenCV mods added below for viewing and saving - Damian Lyons, dlyons@fordham.edu
 
 #ifdef _MSC_VER
@@ -43,15 +44,65 @@
 using namespace DepthSense;
 using namespace std;
 
+bool exportJPG = true;
 
+// Resolution type: 0: QQVGA; 1: QVGA; 2:VGA; 3:WXGA_H; 4:NHD
+int resDepthType = 1;
+int resVideoType = 2;
+//int resDepthX,resDepthY,resVideoX,resVideoY;
+int frameRateDepth = 30;
+int frameRateVideo = 30;
+
+FrameFormat formatName(int resType) {
+    switch (resType) {
+        case 0: return FRAME_FORMAT_QQVGA;
+        case 1: return FRAME_FORMAT_QVGA;
+        case 2: return FRAME_FORMAT_VGA;
+        case 3: return FRAME_FORMAT_WXGA_H;
+        case 4: return FRAME_FORMAT_NHD;
+        default: printf("Unsupported resolution parameter\n"); return FRAME_FORMAT_WXGA_H;
+    }
+}
+int formatResX(int resType) {
+    switch (resType) {
+        case 0: return 160;
+        case 1: return 320;
+        case 2: return 640;
+        case 3: return 1280;
+        case 4: return 640;
+        default: printf("Unsupported resolution parameter\n"); return 0;
+    }
+}
+int formatResY(int resType) {
+    switch (resType) {
+        case 0: return 120;
+        case 1: return 240;
+        case 2: return 480;
+        case 3: return 720;
+        case 4: return 360;
+        default: printf("Unsupported resolution parameter\n"); return 0;
+    }
+}
+
+int resDepthX = formatResX(resDepthType), resDepthY= formatResY(resDepthType);
+int resVideoX = formatResX(resVideoType), resVideoY= formatResY(resVideoType);
+
+//printf("%i,%i\n",resDepthX,resDepthY);
+
+
+//int pixelsDepth[10];
+
+//vector<int> pixelsDepth(resDepthX*resDepthY);
+//vector<int> pixelsVideo(resVideoX*resVideoY);
 
 // Open CV vars
 IplImage
   *g_depthImage=NULL,
   *g_videoImage=NULL; // initialized in main, used in CBs
 CvSize
-  g_szDepth=cvSize(160,120), // QQVGA
-  g_szVideo=cvSize(640,480); //VGA
+  //g_szDepth=cvSize(160,120), // QQVGA
+  g_szDepth=cvSize(resDepthX,resDepthY), // QVGA
+  g_szVideo=cvSize(resVideoX,resVideoY); //VGA
 
 bool g_saveImageFlag=false, g_saveDepthFlag=false;
 
@@ -75,6 +126,7 @@ StereoCameraParameters g_scp;
 // From SoftKinetic
 // convert a YUY2 image to RGB
 
+
 void yuy2rgb(unsigned char *dst, const unsigned char *src, const int width, const int height) {
   int x, y;
   const int width2 = width * 2;
@@ -93,7 +145,6 @@ void yuy2rgb(unsigned char *dst, const unsigned char *src, const int width, cons
       int uvg = (-1873 * u - 4681 * v) / 10000;
       int uvb = (18556 * u          ) / 10000;
 
-      int x4=x*3;
       int r1 = y1 + uvr;
       int r2 = y2 + uvr;
       int g1 = y1 + uvg;
@@ -101,6 +152,7 @@ void yuy2rgb(unsigned char *dst, const unsigned char *src, const int width, cons
       int b1 = y1 + uvb;
       int b2 = y2 + uvb;
 
+      int x4=x*3;
       dst1[x4+0] = (b1 > 255) ? 255 : ((b1 < 0) ? 0 : b1);
       dst1[x4+1] = (g1 > 255) ? 255 : ((g1 < 0) ? 0 : g1);
       dst1[x4+2] = (r1 > 255) ? 255 : ((r1 < 0) ? 0 : r1);
@@ -141,10 +193,93 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
     int32_t w, h;
     FrameFormat_toResolution(data.captureConfiguration.frameFormat,&w,&h);
 
-    yuy2rgb((unsigned char *)g_videoImage->imageData,data.colorMap,w,h);
+    int pixelsVideo[3*w*h];
+    float b = 0.0;
+    float g = 0.0;
+    float r = 0.0;
+
+    //yuy2rgb((unsigned char *)g_videoImage->imageData,data.colorMap,w,h);
+    int count=0; // DS data index
+    if (data.colorMap!=0)// just in case !
+    for (int i=0; i<h; i++)
+        for (int j=0; j<w; j++) {
+          b = data.colorMap[3*count];
+          g = data.colorMap[3*count+1];
+          r = data.colorMap[3*count+2];
+          cvSet2D(g_videoImage,i,j,cvScalar(b,g,r));
+          pixelsVideo[3*count] = b;
+          pixelsVideo[3*count+1] = r;
+          pixelsVideo[3*count+2] = g;
+          count++;
+        }
 
     g_cFrames++;
 
+
+
+    if (g_saveImageFlag || g_saveDepthFlag) { // save a timestamped image pair; synched by depth image time
+      char filenameVideo[100];
+      g_fTime = clock();
+    if (exportJPG)
+    {
+        sprintf(filenameVideo,"df%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+        cvSaveImage(filenameVideo,g_videoImage);
+    }
+    else
+    {
+      sprintf(filenameVideo,"df%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+
+
+        FILE *fd=0;
+        fd = fopen(filenameVideo,"wb");
+
+        int channels = 3;
+
+        if (fd!=0)
+        {
+            unsigned int n;
+            if (channels==3) fprintf(fd, "P6\n");
+            else if (channels==1) fprintf(fd, "P5\n");
+            else
+            {
+                fprintf(stderr,"Invalid channels arg (%u) for SaveRawImageToFile\n",channels);
+                fclose(fd);
+            }
+
+            /*
+            char timeStampStr[256]={0};
+            GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
+            fprintf(fd, "#%s\n", timeStampStr );*/
+
+            //fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
+            fprintf(fd, "#TIMESTAMP %lu\n",42);
+
+
+            /*int bitsperpixel = 8;
+            fprintf(fd, "%d %d\n%u\n", w, h, simplePow(2 ,bitsperpixel)-1);
+            float tmp_n = (float) bitsperpixel/ 8; */
+
+            fprintf(fd, "%d %d\n%i\n", w, h, 255);
+            float tmp_n = 1.0;
+
+            tmp_n = tmp_n *  w * h * channels ;
+            n = (unsigned int) tmp_n;
+
+            //int tmp_pixelsVideo[3*w*h];
+            //for (int i; i<(3*w*h); i++) tmp_pixelsVideo[i] = pixelsVideo[i];
+            //fwrite(tmp_pixelsVideo, 1 , n , fd);
+            fflush(fd);
+            fclose(fd);
+        }
+    }
+
+
+
+
+
+
+
+    }
 }
 
 /*----------------------------------------------------------------------------*/
@@ -167,16 +302,24 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     int32_t w, h;
     FrameFormat_toResolution(data.captureConfiguration.frameFormat,&w,&h);
-
+    float val = 0.0;
+    int pixelsDepth[w*h];
     int count=0; // DS data index
     if (data.depthMapFloatingPoint!=0)// just in case !
       for (int i=0; i<h; i++)
     for (int j=0; j<w; j++) {
           // some arbitrary scaling to make this visible
-      float val = data.depthMapFloatingPoint[count++];
-      if (!g_saveImageFlag && !g_saveDepthFlag) val*=150;
-      if (val<0) val=255; // catch the saturated points
+      val = data.depthMapFloatingPoint[count++];
+      //if (!g_saveImageFlag && !g_saveDepthFlag) val*= 100; //150;
+      //if (val<0) val=255; // catch the saturated points
+      val *= 1000.0; // convert meters to millimeters
+      //if (val > 255) val = 255;
       cvSet2D(g_depthImage,i,j,cvScalar(val));
+      //printf("%f\n",val);
+      //printf("%i\n",count);
+      pixelsDepth[count-1] = (int) (val);
+      //printf("%i\n",pixels[count-1]);
+      if (i == h-1 && j == 0) printf("%f\n",val);
     }
 
     g_dFrames++;
@@ -195,13 +338,67 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     cvShowImage("Depth",g_depthImage);
 
     if (g_saveImageFlag || g_saveDepthFlag) { // save a timestamped image pair; synched by depth image time
-      char filename[100];
+      char filenameDepth[100];
+      char filenameVideo[100];
       g_fTime = clock();
-      sprintf(filename,"df%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-      cvSaveImage(filename,g_depthImage);
-      sprintf(filename,"vf%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-      if (g_saveImageFlag)
-    cvSaveImage(filename,g_videoImage);
+      sprintf(filenameDepth,"df%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+      if (exportJPG)
+        {
+            sprintf(filenameDepth,"df%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+            cvSaveImage(filenameDepth,g_depthImage);
+        }
+        else
+        {
+          sprintf(filenameDepth,"df%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+
+        FILE *fd=0;
+        fd = fopen(filenameDepth,"wb");
+
+        int channels = 1;
+
+        if (fd!=0)
+        {
+            unsigned int n;
+            if (channels==3) fprintf(fd, "P6\n");
+            else if (channels==1) fprintf(fd, "P5\n");
+            else
+            {
+                fprintf(stderr,"Invalid channels arg (%u) for SaveRawImageToFile\n",channels);
+                fclose(fd);
+            }
+
+            /*
+            char timeStampStr[256]={0};
+            GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
+            fprintf(fd, "#%s\n", timeStampStr );*/
+
+            //fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
+            fprintf(fd, "#TIMESTAMP %lu\n",42);
+
+
+            /*int bitsperpixel = 8;
+            fprintf(fd, "%d %d\n%u\n", w, h, simplePow(2 ,bitsperpixel)-1);
+            float tmp_n = (float) bitsperpixel/ 8; */
+
+            fprintf(fd, "%d %d\n%i\n", w, h, 255);
+            float tmp_n = 1.0;
+
+            tmp_n = tmp_n *  w * h * channels ;
+            n = (unsigned int) tmp_n;
+
+            //int tmp_pixelsDepth[w*h];
+            //for (int i; i<w*h; i++) tmp_pixelsDepth[i] = pixelsDepth[i];
+            fwrite(pixelsDepth, 1 , n , fd);
+            fflush(fd);
+            fclose(fd);
+        }
+    }
+
+
+
+
+
+
     }
 
     // Allow OpenCV to shut down the program
@@ -258,9 +455,18 @@ void configureDepthNode()
 {
     g_dnode.newSampleReceivedEvent().connect(&onNewDepthSample);
 
+    /*
     DepthNode::Configuration config = g_dnode.getConfiguration();
     config.frameFormat = FRAME_FORMAT_QQVGA;
     config.framerate = 60;
+    config.mode = DepthNode::CAMERA_MODE_CLOSE_MODE;
+    config.saturation = true;
+    */
+
+    DepthNode::Configuration config = g_dnode.getConfiguration();
+    //config.frameFormat = FRAME_FORMAT_QVGA;
+    config.frameFormat = formatName(resDepthType);
+    config.framerate = frameRateDepth;
     config.mode = DepthNode::CAMERA_MODE_CLOSE_MODE;
     config.saturation = true;
 
@@ -313,14 +519,11 @@ void configureColorNode()
     g_cnode.newSampleReceivedEvent().connect(&onNewColorSample);
 
     ColorNode::Configuration config = g_cnode.getConfiguration();
-
-
-    config.frameFormat = FRAME_FORMAT_QQVGA;
-    //config.compression = COMPRESSION_TYPE_MJPEG;
-    config.compression = COMPRESSION_TYPE_YUY2;
-
-    //config.powerLineFrequency = POWER_LINE_FREQUENCY_50HZ;
-    //config.framerate = 25;
+    //config.frameFormat = FRAME_FORMAT_VGA;
+    config.frameFormat = formatName(resVideoType);
+    config.compression = COMPRESSION_TYPE_MJPEG;
+    config.powerLineFrequency = POWER_LINE_FREQUENCY_50HZ;
+    config.framerate = frameRateVideo;
 
     g_cnode.setEnableColorMap(true);
 
