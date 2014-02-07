@@ -59,6 +59,7 @@ int frameRateColor = 30;
 int resDepthX = formatResX(resDepthType), resDepthY= formatResY(resDepthType);
 int resColorX = formatResX(resColorType), resColorY= formatResY(resColorType);
 
+int timeStamp;
 
 
 unsigned int depthFrameCount, colorFrameCount;
@@ -91,13 +92,13 @@ uint32_t g_aFrames = 0;
 uint32_t g_cFrames = 0;
 uint32_t g_dFrames = 0;
 
-clock_t g_fTime;
-
 bool g_bDeviceFound = false;
 
 ProjectionHelper* g_pProjHelper = NULL;
 StereoCameraParameters g_scp;
 
+char fileNameColor[50];
+char fileNameDepth[50];
 
 
 
@@ -125,12 +126,13 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
 {
     //printf("C#%u: %d\n",g_cFrames,data.colorMap.size());
 
+    timeStamp = (int) (((float)(1000*clock()))/CLOCKS_PER_SEC);
+
     int32_t width, height;
     FrameFormat_toResolution(data.captureConfiguration.frameFormat,&width,&height);
 
     uint8_t pixelsRGB[3*width*height];
 
-    //yuy2rgb((unsigned char *)g_colorImage->imageData,data.colorMap,width,h);
     int count=0; // DS data index
     if (data.colorMap!=0)// just in case !
         for (int i=0; i<height; i++)
@@ -141,17 +143,13 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
                 pixelsRGB[3*count+2] = data.colorMap[3*count];
                 cvSet2D(g_colorImage,i,j,cvScalar(data.colorMap[3*count],data.colorMap[3*count+1],data.colorMap[3*count+2])); //BGR format
                 count++;
-                //printf("%i,%i,%i\n",pixelsColor[3*count],pixelsColor[3*count+1],pixelsColor[3*count+2]);
             }
 
     g_cFrames++;
 
-
-
-    if (g_saveImageFlag)   // save a timestamped image pair; synched by depth image time
+    if (g_saveImageFlag)
     {
-        char fileNameColor[100];
-        g_fTime = clock();
+        //g_fTime = clock();
         if (exportJPG)
         {
             //sprintf(fileNameColor,"colorFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
@@ -162,7 +160,7 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
         {
             //sprintf(fileNameColor,"colorFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
             sprintf(fileNameColor,"colorFrame_%05u.pnm",colorFrameCount);
-            saveRawColorFrame(fileNameColor, pixelsRGB, width, height, 0);
+            saveRawColorFrame(fileNameColor, pixelsRGB, width, height, timeStamp);
         }
         colorFrameCount++;
     }
@@ -184,6 +182,7 @@ each pixel, expressed in meters. Saturated pixels are given the special value -2
 
 void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
+    timeStamp = (int) (((float)(1000*clock()))/CLOCKS_PER_SEC);
     int32_t width, height;
     FrameFormat_toResolution(data.captureConfiguration.frameFormat,&width,&height);
     int val = 0;
@@ -208,8 +207,6 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     if (g_saveImageFlag || g_saveDepthFlag)   // save a timestamped image pair; synched by depth image time
     {
-        char fileNameDepth[100];
-        g_fTime = clock();
         if (exportJPG)
         {
             //(fileNameDepth,"depthFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
@@ -220,7 +217,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         {
             //sprintf(fileNameDepth,"depthFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
             sprintf(fileNameDepth,"depthFrame_%05u.pnm",depthFrameCount);
-            saveRawDepthFrame(fileNameDepth, pixelsDepth, width, height, 0);
+            saveRawDepthFrame(fileNameDepth, pixelsDepth, width, height, timeStamp);
         }
         depthFrameCount++;
     }
