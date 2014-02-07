@@ -123,6 +123,39 @@ ProjectionHelper* g_pProjHelper = NULL;
 StereoCameraParameters g_scp;
 
 
+
+
+unsigned char * convertShortDepthToCharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
+{
+  if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
+  unsigned short * depthPTR= depth; // This will be the traversing pointer for input
+  unsigned short * depthLimit =  depth + width*height; //<- we use sizeof(short) because we have casted to char !
+
+
+  unsigned char * outFrame = (unsigned char*) malloc(width*height*1*sizeof(char));
+  if (outFrame==0) { fprintf(stderr,"Could not perform DepthToRGB transformation\nNo memory for new frame\n"); return 0; }
+
+  float depth_range = max_depth-min_depth;
+  if (depth_range ==0 ) { depth_range = 1; }
+  float multiplier = 255 / depth_range;
+
+
+  unsigned char * outFramePTR = outFrame; // This will be the traversing pointer for output
+  while ( depthPTR<depthLimit )
+  {
+     unsigned int scaled = (unsigned int) (*depthPTR) * multiplier;
+     unsigned char scaledChar = (unsigned char) scaled;
+     * outFramePTR = scaledChar;
+
+     ++outFramePTR;
+     ++depthPTR;
+  }
+ return outFrame;
+}
+
+
+
+
 // From SoftKinetic
 // convert a YUY2 image to RGB
 
@@ -222,12 +255,12 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
       g_fTime = clock();
     if (exportJPG)
     {
-        sprintf(filenameVideo,"df%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+        sprintf(filenameVideo,"colorFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
         cvSaveImage(filenameVideo,g_videoImage);
     }
     else
     {
-      sprintf(filenameVideo,"df%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+      sprintf(filenameVideo,"colorFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
 
 
         FILE *fd=0;
@@ -303,7 +336,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     int32_t w, h;
     FrameFormat_toResolution(data.captureConfiguration.frameFormat,&w,&h);
     float val = 0.0;
-    int pixelsDepth[w*h];
+    unsigned short pixelsDepth[w*h];
     int count=0; // DS data index
     if (data.depthMapFloatingPoint!=0)// just in case !
       for (int i=0; i<h; i++)
@@ -317,9 +350,9 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
       cvSet2D(g_depthImage,i,j,cvScalar(val));
       //printf("%f\n",val);
       //printf("%i\n",count);
-      pixelsDepth[count-1] = (int) (val);
+      pixelsDepth[count-1] = (unsigned short) (val);
       //printf("%i\n",pixels[count-1]);
-      if (i == h-1 && j == 0) printf("%f\n",val);
+      //if (i == h-1 && j == 0) printf("%f\n",val);
     }
 
     g_dFrames++;
@@ -339,17 +372,15 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     if (g_saveImageFlag || g_saveDepthFlag) { // save a timestamped image pair; synched by depth image time
       char filenameDepth[100];
-      char filenameVideo[100];
       g_fTime = clock();
-      sprintf(filenameDepth,"df%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
       if (exportJPG)
         {
-            sprintf(filenameDepth,"df%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+            sprintf(filenameDepth,"depthFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
             cvSaveImage(filenameDepth,g_depthImage);
         }
         else
         {
-          sprintf(filenameDepth,"df%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+          sprintf(filenameDepth,"depthFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
 
         FILE *fd=0;
         fd = fopen(filenameDepth,"wb");
@@ -376,19 +407,23 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
             fprintf(fd, "#TIMESTAMP %lu\n",42);
 
 
-            /*int bitsperpixel = 8;
+            /*int bitsperpixel = 16;
             fprintf(fd, "%d %d\n%u\n", w, h, simplePow(2 ,bitsperpixel)-1);
             float tmp_n = (float) bitsperpixel/ 8; */
 
-            fprintf(fd, "%d %d\n%i\n", w, h, 255);
-            float tmp_n = 1.0;
+            fprintf(fd, "%d %d\n%i\n", w, h, 65535);
+            float tmp_n = 2.0;
 
             tmp_n = tmp_n *  w * h * channels ;
             n = (unsigned int) tmp_n;
 
             //int tmp_pixelsDepth[w*h];
             //for (int i; i<w*h; i++) tmp_pixelsDepth[i] = pixelsDepth[i];
-            fwrite(pixelsDepth, 1 , n , fd);
+
+
+            unsigned char * pixelsDepthChar = convertShortDepthToCharDepth(pixelsDepth,w,h,0,7000);
+
+            fwrite(pixelsDepthChar, 1 , n , fd);
             fflush(fd);
             fclose(fd);
         }
@@ -449,6 +484,9 @@ void configureAudioNode()
         printf("TimeoutException\n");
     }
 }
+
+
+
 
 /*----------------------------------------------------------------------------*/
 void configureDepthNode()
