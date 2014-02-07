@@ -21,4 +21,4 @@ int formatResX(int resType);
 int formatResY(int resType);
 
 void saveRawColorFrame(char* fileName, uint8_t* pixels, int width, int height, int timeStamp);
-void saveRawDepthFrame(char* fileName, unsigned short* pixels, int width, int height, int timeStamp);
+void saveRawDepthFrame(char* fileName, uint16_t* pixels, int width, int height, int timeStamp);

@@ -61,6 +61,7 @@ int resColorX = formatResX(resColorType), resColorY= formatResY(resColorType);
 
 int timeStamp;
 
+int divideDepthBrightnessCV = 50;
 
 unsigned int depthFrameCount, colorFrameCount;
 
@@ -185,16 +186,16 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     timeStamp = (int) (((float)(1000*clock()))/CLOCKS_PER_SEC);
     int32_t width, height;
     FrameFormat_toResolution(data.captureConfiguration.frameFormat,&width,&height);
-    int val = 0;
-    unsigned short pixelsDepth[width*height];
+    uint16_t val = 0;
+    uint16_t pixelsDepth[width*height];
     int count=0; // DS data index
     if (data.depthMap!=0)// just in case !
         for (int i=0; i<height; i++)
             for (int j=0; j<width; j++)
             {
                 val = data.depthMap[count];
-                cvSet2D(g_depthImage,i,j,cvScalar(val));
-                pixelsDepth[count] = (unsigned short) (val);
+                cvSet2D(g_depthImage,i,j,cvScalar(val/divideDepthBrightnessCV));
+                pixelsDepth[count] = val;
                 count++;
             }
 
