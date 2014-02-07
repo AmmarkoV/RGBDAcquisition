@@ -49,79 +49,51 @@ int formatResY(int resType) {
     }
 }
 
-
-
-unsigned char * convertShortDepthToCharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
+void saveRawColorFrame(char* fileName, uint8_t* pixels, int width, int height, int timeStamp)
 {
-  if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform DepthToRGB transformation \n"); return 0; }
-  unsigned short * depthPTR= depth; // This will be the traversing pointer for input
-  unsigned short * depthLimit =  depth + width*height; //<- we use sizeof(short) because we have casted to char !
+    FILE *pFile=0;
+    pFile = fopen(fileName,"wb");
 
+    if (pFile!=0)
+    {
+        fprintf(pFile, "P6\n");
+        /*
+        char timeStampStr[256]={0};
+        GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
+        fprintf(fd, "#%s\n", timeStampStr );*/
 
-  unsigned char * outFrame = (unsigned char*) malloc(width*height*1*sizeof(char));
-  if (outFrame==0) { fprintf(stderr,"Could not perform DepthToRGB transformation\nNo memory for new frame\n"); return 0; }
-
-  float depth_range = max_depth-min_depth;
-  if (depth_range ==0 ) { depth_range = 1; }
-  float multiplier = 255 / depth_range;
-
-
-  unsigned char * outFramePTR = outFrame; // This will be the traversing pointer for output
-  while ( depthPTR<depthLimit )
-  {
-     unsigned int scaled = (unsigned int) (*depthPTR) * multiplier;
-     unsigned char scaledChar = (unsigned char) scaled;
-     * outFramePTR = scaledChar;
-
-     ++outFramePTR;
-     ++depthPTR;
-  }
- return outFrame;
-}
-
-
-
-
-// From SoftKinetic
-// convert a YUY2 image to RGB
-
-
-void yuy2rgb(unsigned char *dst, const unsigned char *src, const int width, const int height) {
-  int x, y;
-  const int width2 = width * 2;
-  const int width4 = width * 3;
-  const unsigned char *src1 = src;
-  unsigned char *dst1 = dst;
-
-  for (y=0; y<height; y++) {
-    for (x=0; x<width; x+=2) {
-      int x2=x*2;
-      int y1  = src1[x2  ];
-      int y2  = src1[x2+2];
-      int u   = src1[x2+1] - 128;
-      int v   = src1[x2+3] - 128;
-      int uvr = (          15748 * v) / 10000;
-      int uvg = (-1873 * u - 4681 * v) / 10000;
-      int uvb = (18556 * u          ) / 10000;
-
-      int r1 = y1 + uvr;
-      int r2 = y2 + uvr;
-      int g1 = y1 + uvg;
-      int g2 = y2 + uvg;
-      int b1 = y1 + uvb;
-      int b2 = y2 + uvb;
-
-      int x4=x*3;
-      dst1[x4+0] = (b1 > 255) ? 255 : ((b1 < 0) ? 0 : b1);
-      dst1[x4+1] = (g1 > 255) ? 255 : ((g1 < 0) ? 0 : g1);
-      dst1[x4+2] = (r1 > 255) ? 255 : ((r1 < 0) ? 0 : r1);
-      //dst1[x4+3] = 255;
-
-      dst1[x4+3] = (b2 > 255) ? 255 : ((b2 < 0) ? 0 : b2);
-      dst1[x4+4] = (g2 > 255) ? 255 : ((g2 < 0) ? 0 : g2);
-      dst1[x4+5] = (r2 > 255) ? 255 : ((r2 < 0) ? 0 : r2);
+        //fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
+        fprintf(pFile, "#TIMESTAMP %i\n",timeStamp);
+        fprintf(pFile, "%d %d\n%i\n", width, height, 255);
+        fwrite(pixels,1,3*width*height,pFile);
+        fflush(pFile);
+        fclose(pFile);
     }
-    src1 += width2;
-    dst1 += width4;
-  }
 }
+
+
+
+void saveRawDepthFrame(char* fileName, unsigned short* pixels, int width, int height, int timeStamp)
+{
+    FILE *pFile=0;
+    pFile = fopen(fileName,"wb");
+
+    if (pFile!=0)
+    {
+        fprintf(pFile, "P5\n");
+        /*
+        char timeStampStr[256]={0};
+        GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
+        fprintf(fd, "#%s\n", timeStampStr );*/
+
+        //fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
+        fprintf(pFile, "#TIMESTAMP %i\n",timeStamp);
+
+        fprintf(pFile, "%d %d\n%i\n", width, height, 65535);
+        fwrite(pixels,2,width*height,pFile);
+        fflush(pFile);
+        fclose(pFile);
+    }
+}
+
+

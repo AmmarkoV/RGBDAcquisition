@@ -16,13 +16,9 @@
 using namespace DepthSense;
 using namespace std;
 
-
 FrameFormat formatName(int resType);
 int formatResX(int resType);
 int formatResY(int resType);
 
-unsigned char * convertShortDepthToCharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth);
-
-// From SoftKinetic
-// convert a YUY2 image to RGB
-void yuy2rgb(unsigned char *dst, const unsigned char *src, const int width, const int height);
+void saveRawColorFrame(char* fileName, uint8_t* pixels, int width, int height, int timeStamp);
+void saveRawDepthFrame(char* fileName, unsigned short* pixels, int width, int height, int timeStamp);

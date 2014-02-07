@@ -47,17 +47,21 @@
 using namespace DepthSense;
 using namespace std;
 
-bool exportJPG = true;
+bool exportJPG = false;
 
 // Resolution type: 0: QQVGA; 1: QVGA; 2:VGA; 3:WXGA_H; 4:NHD
 int resDepthType = 1;
-int resVideoType = 2;
-//int resDepthX,resDepthY,resVideoX,resVideoY;
+int resColorType = 2;
+//int resDepthX,resDepthY,resColorX,resColorY;
 int frameRateDepth = 30;
-int frameRateVideo = 30;
+int frameRateColor = 30;
 
 int resDepthX = formatResX(resDepthType), resDepthY= formatResY(resDepthType);
-int resVideoX = formatResX(resVideoType), resVideoY= formatResY(resVideoType);
+int resColorX = formatResX(resColorType), resColorY= formatResY(resColorType);
+
+
+
+unsigned int depthFrameCount, colorFrameCount;
 
 //printf("%i,%i\n",resDepthX,resDepthY);
 
@@ -65,16 +69,16 @@ int resVideoX = formatResX(resVideoType), resVideoY= formatResY(resVideoType);
 //int pixelsDepth[10];
 
 //vector<int> pixelsDepth(resDepthX*resDepthY);
-//vector<int> pixelsVideo(resVideoX*resVideoY);
+//vector<int> pixelsColor(resColorX*resColorY);
 
 // Open CV vars
 IplImage
-  *g_depthImage=NULL,
-  *g_videoImage=NULL; // initialized in main, used in CBs
+*g_depthImage=NULL,
+ *g_colorImage=NULL; // initialized in main, used in CBs
 CvSize
-  //g_szDepth=cvSize(160,120), // QQVGA
-  g_szDepth=cvSize(resDepthX,resDepthY), // QVGA
-  g_szVideo=cvSize(resVideoX,resVideoY); //VGA
+//g_szDepth=cvSize(160,120), // QQVGA
+g_szDepth=cvSize(resDepthX,resDepthY), // QVGA
+g_szColor=cvSize(resColorX,resColorY); //VGA
 
 bool g_saveImageFlag=false, g_saveDepthFlag=false;
 
@@ -102,7 +106,7 @@ StereoCameraParameters g_scp;
 // New audio sample event handler
 void onNewAudioSample(AudioNode node, AudioNode::NewSampleReceivedData data)
 {
-  //    printf("A#%u: %d\n",g_aFrames,data.audioData.size());
+    //    printf("A#%u: %d\n",g_aFrames,data.audioData.size());
     g_aFrames++;
 }
 
@@ -119,97 +123,48 @@ the output format is YUY2.
  */
 void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
 {
-  //printf("C#%u: %d\n",g_cFrames,data.colorMap.size());
+    //printf("C#%u: %d\n",g_cFrames,data.colorMap.size());
 
-    int32_t w, h;
-    FrameFormat_toResolution(data.captureConfiguration.frameFormat,&w,&h);
+    int32_t width, height;
+    FrameFormat_toResolution(data.captureConfiguration.frameFormat,&width,&height);
 
-    int pixelsVideo[3*w*h];
-    float b = 0.0;
-    float g = 0.0;
-    float r = 0.0;
+    uint8_t pixelsRGB[3*width*height];
 
-    //yuy2rgb((unsigned char *)g_videoImage->imageData,data.colorMap,w,h);
+    //yuy2rgb((unsigned char *)g_colorImage->imageData,data.colorMap,width,h);
     int count=0; // DS data index
     if (data.colorMap!=0)// just in case !
-    for (int i=0; i<h; i++)
-        for (int j=0; j<w; j++) {
-          b = data.colorMap[3*count];
-          g = data.colorMap[3*count+1];
-          r = data.colorMap[3*count+2];
-          cvSet2D(g_videoImage,i,j,cvScalar(b,g,r));
-          pixelsVideo[3*count] = b;
-          pixelsVideo[3*count+1] = r;
-          pixelsVideo[3*count+2] = g;
-          count++;
-        }
+        for (int i=0; i<height; i++)
+            for (int j=0; j<width; j++)
+            {
+                pixelsRGB[3*count] = data.colorMap[3*count+2];
+                pixelsRGB[3*count+1] = data.colorMap[3*count+1];
+                pixelsRGB[3*count+2] = data.colorMap[3*count];
+                cvSet2D(g_colorImage,i,j,cvScalar(data.colorMap[3*count],data.colorMap[3*count+1],data.colorMap[3*count+2])); //BGR format
+                count++;
+                //printf("%i,%i,%i\n",pixelsColor[3*count],pixelsColor[3*count+1],pixelsColor[3*count+2]);
+            }
 
     g_cFrames++;
 
 
 
-    if (g_saveImageFlag || g_saveDepthFlag) { // save a timestamped image pair; synched by depth image time
-      char filenameVideo[100];
-      g_fTime = clock();
-    if (exportJPG)
+    if (g_saveImageFlag)   // save a timestamped image pair; synched by depth image time
     {
-        sprintf(filenameVideo,"colorFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-        cvSaveImage(filenameVideo,g_videoImage);
-    }
-    else
-    {
-      sprintf(filenameVideo,"colorFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-
-
-        FILE *fd=0;
-        fd = fopen(filenameVideo,"wb");
-
-        int channels = 3;
-
-        if (fd!=0)
+        char fileNameColor[100];
+        g_fTime = clock();
+        if (exportJPG)
         {
-            unsigned int n;
-            if (channels==3) fprintf(fd, "P6\n");
-            else if (channels==1) fprintf(fd, "P5\n");
-            else
-            {
-                fprintf(stderr,"Invalid channels arg (%u) for SaveRawImageToFile\n",channels);
-                fclose(fd);
-            }
-
-            /*
-            char timeStampStr[256]={0};
-            GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
-            fprintf(fd, "#%s\n", timeStampStr );*/
-
-            //fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
-            fprintf(fd, "#TIMESTAMP %lu\n",42);
-
-
-            /*int bitsperpixel = 8;
-            fprintf(fd, "%d %d\n%u\n", w, h, simplePow(2 ,bitsperpixel)-1);
-            float tmp_n = (float) bitsperpixel/ 8; */
-
-            fprintf(fd, "%d %d\n%i\n", w, h, 255);
-            float tmp_n = 1.0;
-
-            tmp_n = tmp_n *  w * h * channels ;
-            n = (unsigned int) tmp_n;
-
-            //int tmp_pixelsVideo[3*w*h];
-            //for (int i; i<(3*w*h); i++) tmp_pixelsVideo[i] = pixelsVideo[i];
-            //fwrite(tmp_pixelsVideo, 1 , n , fd);
-            fflush(fd);
-            fclose(fd);
+            //sprintf(fileNameColor,"colorFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+            sprintf(fileNameColor,"colorFrame_%05u.jpg",colorFrameCount);
+            cvSaveImage(fileNameColor,g_colorImage);
         }
-    }
-
-
-
-
-
-
-
+        else
+        {
+            //sprintf(fileNameColor,"colorFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+            sprintf(fileNameColor,"colorFrame_%05u.pnm",colorFrameCount);
+            saveRawColorFrame(fileNameColor, pixelsRGB, width, height, 0);
+        }
+        colorFrameCount++;
     }
 }
 
@@ -229,120 +184,57 @@ each pixel, expressed in meters. Saturated pixels are given the special value -2
 
 void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
-  //printf("Z#%u: %d\n",g_dFrames,data.vertices.size());
-
-    int32_t w, h;
-    FrameFormat_toResolution(data.captureConfiguration.frameFormat,&w,&h);
-    float val = 0.0;
-    unsigned short pixelsDepth[w*h];
+    int32_t width, height;
+    FrameFormat_toResolution(data.captureConfiguration.frameFormat,&width,&height);
+    int val = 0;
+    unsigned short pixelsDepth[width*height];
     int count=0; // DS data index
-    if (data.depthMapFloatingPoint!=0)// just in case !
-      for (int i=0; i<h; i++)
-    for (int j=0; j<w; j++) {
-          // some arbitrary scaling to make this visible
-      val = data.depthMapFloatingPoint[count++];
-      //if (!g_saveImageFlag && !g_saveDepthFlag) val*= 100; //150;
-      //if (val<0) val=255; // catch the saturated points
-      val *= 1000.0; // convert meters to millimeters
-      //if (val > 255) val = 255;
-      cvSet2D(g_depthImage,i,j,cvScalar(val));
-      //printf("%f\n",val);
-      //printf("%i\n",count);
-      pixelsDepth[count-1] = (unsigned short) (val);
-      //printf("%i\n",pixels[count-1]);
-      //if (i == h-1 && j == 0) printf("%f\n",val);
-    }
+    if (data.depthMap!=0)// just in case !
+        for (int i=0; i<height; i++)
+            for (int j=0; j<width; j++)
+            {
+                val = data.depthMap[count];
+                cvSet2D(g_depthImage,i,j,cvScalar(val));
+                pixelsDepth[count] = (unsigned short) (val);
+                count++;
+            }
 
     g_dFrames++;
 
-    /*
-    // Quit the main loop after 200 depth frames received
-    if (g_dFrames == 20) {
-      printf("Quitting main loop after MAX frames\n");
-        g_context.quit();
-    }
-    */
-
     /* OpenCV display - this will slow stuff down, should be in thread*/
 
-    cvShowImage("Video",g_videoImage);
+    cvShowImage("Color",g_colorImage);
     cvShowImage("Depth",g_depthImage);
 
-    if (g_saveImageFlag || g_saveDepthFlag) { // save a timestamped image pair; synched by depth image time
-      char filenameDepth[100];
-      g_fTime = clock();
-      if (exportJPG)
+    if (g_saveImageFlag || g_saveDepthFlag)   // save a timestamped image pair; synched by depth image time
+    {
+        char fileNameDepth[100];
+        g_fTime = clock();
+        if (exportJPG)
         {
-            sprintf(filenameDepth,"depthFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-            cvSaveImage(filenameDepth,g_depthImage);
+            //(fileNameDepth,"depthFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+            sprintf(fileNameDepth,"depthFrame_%05u.jpg",depthFrameCount);
+            cvSaveImage(fileNameDepth,g_depthImage);
         }
         else
         {
-          sprintf(filenameDepth,"depthFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-
-        FILE *fd=0;
-        fd = fopen(filenameDepth,"wb");
-
-        int channels = 1;
-
-        if (fd!=0)
-        {
-            unsigned int n;
-            if (channels==3) fprintf(fd, "P6\n");
-            else if (channels==1) fprintf(fd, "P5\n");
-            else
-            {
-                fprintf(stderr,"Invalid channels arg (%u) for SaveRawImageToFile\n",channels);
-                fclose(fd);
-            }
-
-            /*
-            char timeStampStr[256]={0};
-            GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
-            fprintf(fd, "#%s\n", timeStampStr );*/
-
-            //fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
-            fprintf(fd, "#TIMESTAMP %lu\n",42);
-
-
-            /*int bitsperpixel = 16;
-            fprintf(fd, "%d %d\n%u\n", w, h, simplePow(2 ,bitsperpixel)-1);
-            float tmp_n = (float) bitsperpixel/ 8; */
-
-            fprintf(fd, "%d %d\n%i\n", w, h, 65535);
-            float tmp_n = 2.0;
-
-            tmp_n = tmp_n *  w * h * channels ;
-            n = (unsigned int) tmp_n;
-
-            //int tmp_pixelsDepth[w*h];
-            //for (int i; i<w*h; i++) tmp_pixelsDepth[i] = pixelsDepth[i];
-
-
-            unsigned char * pixelsDepthChar = convertShortDepthToCharDepth(pixelsDepth,w,h,0,7000);
-
-            fwrite(pixelsDepthChar, 1 , n , fd);
-            fflush(fd);
-            fclose(fd);
+            //sprintf(fileNameDepth,"depthFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
+            sprintf(fileNameDepth,"depthFrame_%05u.pnm",depthFrameCount);
+            saveRawDepthFrame(fileNameDepth, pixelsDepth, width, height, 0);
         }
-    }
-
-
-
-
-
-
+        depthFrameCount++;
     }
 
     // Allow OpenCV to shut down the program
     char key = cvWaitKey(10);
 
-    if (key==27) {
-      printf("Quitting main loop from OpenCV\n");
+    if (key==27)
+    {
+        printf("Quitting main loop from OpenCV\n");
         g_context.quit();
-    } else
-      if (key=='W') g_saveImageFlag = !g_saveImageFlag;
-      else if (key=='w') g_saveDepthFlag = !g_saveDepthFlag;
+    }
+    else if (key=='W') g_saveImageFlag = !g_saveImageFlag;
+    else if (key=='w') g_saveDepthFlag = !g_saveDepthFlag;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -390,26 +282,13 @@ void configureAudioNode()
 void configureDepthNode()
 {
     g_dnode.newSampleReceivedEvent().connect(&onNewDepthSample);
-
-    /*
     DepthNode::Configuration config = g_dnode.getConfiguration();
-    config.frameFormat = FRAME_FORMAT_QQVGA;
-    config.framerate = 60;
-    config.mode = DepthNode::CAMERA_MODE_CLOSE_MODE;
-    config.saturation = true;
-    */
-
-    DepthNode::Configuration config = g_dnode.getConfiguration();
-    //config.frameFormat = FRAME_FORMAT_QVGA;
     config.frameFormat = formatName(resDepthType);
     config.framerate = frameRateDepth;
     config.mode = DepthNode::CAMERA_MODE_CLOSE_MODE;
     config.saturation = true;
 
-    //    g_dnode.setEnableVertices(true);
-    g_dnode.setEnableDepthMapFloatingPoint(true);
-
-
+    g_dnode.setEnableDepthMap(true);
 
     try
     {
@@ -455,12 +334,10 @@ void configureColorNode()
     g_cnode.newSampleReceivedEvent().connect(&onNewColorSample);
 
     ColorNode::Configuration config = g_cnode.getConfiguration();
-    //config.frameFormat = FRAME_FORMAT_VGA;
-    config.frameFormat = formatName(resVideoType);
-    config.compression = COMPRESSION_TYPE_MJPEG;
-    //config.compression = COMPRESSION_TYPE_YUY2;
+    config.frameFormat = formatName(resColorType);
+    config.compression = COMPRESSION_TYPE_MJPEG; // can also be COMPRESSION_TYPE_YUY2
     config.powerLineFrequency = POWER_LINE_FREQUENCY_50HZ;
-    config.framerate = frameRateVideo;
+    config.framerate = frameRateColor;
 
     g_cnode.setEnableColorMap(true);
 
@@ -585,7 +462,7 @@ int main(int argc, char* argv[])
 
         printf("Found %lu nodes\n",na.size());
 
-        for (int n = 0; n < (int)na.size();n++)
+        for (int n = 0; n < (int)na.size(); n++)
             configureNode(na[n]);
     }
 
@@ -594,14 +471,20 @@ int main(int argc, char* argv[])
 
 
     // VGA format color image
-    g_videoImage=cvCreateImage(g_szVideo,IPL_DEPTH_8U,3);
-    if (g_videoImage==NULL)
-      { printf("Unable to create video image buffer\n"); exit(0); }
+    g_colorImage=cvCreateImage(g_szColor,IPL_DEPTH_8U,3);
+    if (g_colorImage==NULL)
+    {
+        printf("Unable to create color image buffer\n");
+        exit(0);
+    }
 
     // QVGA format depth image
     g_depthImage=cvCreateImage(g_szDepth,IPL_DEPTH_8U,1);
     if (g_depthImage==NULL)
-      { printf("Unable to create depth image buffer\n"); exit(0);}
+    {
+        printf("Unable to create depth image buffer\n");
+        exit(0);
+    }
 
     printf("dml@Fordham version of DS ConsoleDemo. June 2013.\n");
     printf("Click onto in image for commands. ESC to exit.\n");
