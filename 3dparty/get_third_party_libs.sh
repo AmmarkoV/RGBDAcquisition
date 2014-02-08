@@ -1,5 +1,9 @@
 #!/bin/bash
 
+STARTDIR=`pwd`
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$DIR"
+
 #BINARIES_THAT_NEED_LIBS="grabber viewer grabber_mux grabber_segment acquisitionBroadcast editor redist openni1_acquisition_shared_library openni2_acquisition_shared_library libfreenect_acquisition_shared_library "
 
 BINARIES_THAT_NEED_LIBS="`../scripts/binariesThatNeedLibs.sh`"
@@ -19,7 +23,7 @@ else
      cd libfreenect
      mkdir build
      cd build
-     cmake ..
+     cmake .. -DBUILD_OPENNI2_DRIVER=ON
      make
      cd ../../ 
 
@@ -130,6 +134,12 @@ else
      git clone git://github.com/OpenNI/OpenNI2.git
      cd OpenNI2
      make 
+
+     cd Bin/x64-Release/OpenNI2/Drivers/
+     #ln -s ../../../../../libfreenect/build/lib/OpenNI2-FreenectDriver/libFreenectDriver.so   
+     ln -s $DIR/libfreenect/build/lib/OpenNI2-FreenectDriver/libFreenectDriver.so
+     cd ../../../../
+
      cd ..
      
      #should be at 3dparty dir
@@ -139,7 +149,7 @@ else
            do  
              if [ -d $f ]
               then
-               cd $f 
+               cd $f  
                ln -s ../3dparty/OpenNI2/Bin/x64-Release/OpenNI2/  
                ln -s ../3dparty/OpenNI2/Config/OpenNI.ini   
                ln -s ../3dparty/OpenNI2/Config/PS1080.ini 
@@ -155,5 +165,8 @@ else
 
   fi
 fi
+
+
+cd "$STARTDIR"
 
 exit 0

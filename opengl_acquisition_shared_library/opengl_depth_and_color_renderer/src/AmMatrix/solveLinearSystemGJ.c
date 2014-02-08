@@ -22,13 +22,13 @@ enum packedPointPrecalcs
  ,ElementsNumber
 };
 
-void printSystemMatlab(double * mat,unsigned int totalLines)
+void printSystemMathematica(double * mat,unsigned int totalLines)
 {
   fprintf(stderr,"\n\n { ");
     unsigned int  i=0;
     for (i=0; i< totalLines; i++)
     {
-     fprintf(stderr,"{ %0.2f , ",mat[i*ElementsNumber + xBxA] );
+     fprintf(stderr,"m = { %0.2f , ",mat[i*ElementsNumber + xBxA] );
      fprintf(stderr,"%0.2f , ",mat[i*ElementsNumber + xByA] );
      fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + xB] );
      fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yBxA] );
@@ -37,9 +37,14 @@ void printSystemMatlab(double * mat,unsigned int totalLines)
      fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + xA] );
      fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yA] );
      fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + One] );
-     fprintf(stderr,"%f } , ",mat[i*ElementsNumber + Result] );
+     fprintf(stderr," } " );
+     if (i<totalLines-1) { fprintf(stderr," , "); }
     }
   fprintf(stderr,"} \n ");
+
+  fprintf(stderr,"Equal @@ # & /@ Transpose[{m.{e11, e12, e13, e21, e22, e23, e31, e32, e33}, {0, 0, 0, 0, 0, 0, 0, 0}}]\n");
+  fprintf(stderr,"Solve[%]\n");
+
 }
 
 
@@ -121,7 +126,7 @@ int makeSureNonZero(double * mat   , unsigned int activeLine , unsigned int tota
 }
 
 int createBaseOne(double * mat   , unsigned int activeLine)
-{
+{ //Divide all elements of active line with the initial element to create a base zero
   double divisor = mat[activeLine*ElementsNumber + activeLine];
   if (divisor == 0.0) { return 0; }
 
@@ -136,7 +141,7 @@ int createBaseOne(double * mat   , unsigned int activeLine)
 
 int subtractBase(double * mat   , unsigned int activeLine , unsigned int totalLines )
 {
-  double newval;
+  double newval =0.0;
   double multiplier = 0.0;
   unsigned int i=0,line=0;
 
@@ -144,7 +149,7 @@ int subtractBase(double * mat   , unsigned int activeLine , unsigned int totalLi
   {
    if (line!=activeLine)
    {
-    multiplier = mat[line*ElementsNumber + activeLine];
+     multiplier = mat[line*ElementsNumber + activeLine];
      for (i=0; i<ElementsNumber; i++)
       {
         newval = (double) ( mat[activeLine*ElementsNumber + i] * multiplier ) ;
@@ -157,7 +162,8 @@ int subtractBase(double * mat   , unsigned int activeLine , unsigned int totalLi
 
 
 
-/*
+/* #0  #1  #2  #3  #4  #5  #6   #7     #8
+  ________________________________   ______
 #0  1  xA  xB  xC  xD  xE  xF   xG   RESULT
 #1      1  xH  xI  xJ  xK  xL   xM   RESULT
 #2          1  xN  xO  xP  xQ   xR   RESULT
@@ -288,7 +294,7 @@ int calculateFundamentalMatrix8Point(double * result3x3Matrix , unsigned int poi
     printSystemPlain(compiledPoints,"Original",pointsNum);
 
     //fprintf(stderr,"\n\n");
-    printSystemMatlab(compiledPoints, pointsNum);
+    printSystemMathematica(compiledPoints, pointsNum);
     //printSystemScilab(compiledPoints, pointsNum);
 
     solveLinearSystemGJ(result3x3Matrix,compiledPoints,elements,pointsNum);
