@@ -11,6 +11,7 @@
 #define MOD_FACEDETECTION 0
 #define MOD_NITE2 0
 #define BUILD_OPENNI2 1
+#define RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE 1
 #define USE_WAITFORANYSTREAM_TO_GRAB 0
 
 #if BUILD_OPENNI2
@@ -692,7 +693,7 @@ unsigned short * getOpenNI2DepthPixels(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
 
-  #if MOD_NITE2
+  #if MOD_NITE2 && RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE
    if (lastDepthComesFromNite[devID]) { return getNite2DepthFrame(devID); }
   #endif
 
