@@ -665,16 +665,19 @@ double getOpenNI2ColorPixelSize(int devID)
 int getOpenNI2DepthWidth(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+  //return 640;
    return depthFrame[devID].getWidth();
 }
 int getOpenNI2DepthHeight(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+  //return 480;
    return depthFrame[devID].getHeight();
 }
 int getOpenNI2DepthDataSize(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+    //return  getOpenNI2DepthWidth(devID)*getOpenNI2DepthHeight(devID)*getOpenNI2DepthChannels(devID)*(getOpenNI2DepthBitsPerPixel(devID)/8);
     return depthFrame[devID].getDataSize();
 }
 int getOpenNI2DepthChannels(int devID)
