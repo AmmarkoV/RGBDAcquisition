@@ -21,8 +21,12 @@ fi
 
 if [ "$1" == "freenect" ]
 then 
-  if [ -e "libfreenect.so.0.1" ]; then LIBSTOLINK="$LIBSTOLINK ./libfreenect.so.0.1"; fi
-  if [ -e "libfreenect_sync.so.0.1" ]; then LIBSTOLINK="$LIBSTOLINK ./libfreenect_sync.so.0.1"; fi
+  if [ -e "libfreenect.so" ]; then LIBSTOLINK="$LIBSTOLINK ./libfreenect.so"; fi
+  if [ -e "libfreenect_sync.so" ]; then LIBSTOLINK="$LIBSTOLINK ./libfreenect_sync.so"; fi
+  if [ -e "/usr/local/lib64/libfreenect.so" ]; then LIBSTOLINK="$LIBSTOLINK /usr/local/lib64/libfreenect.so"; fi
+  if [ -e "/usr/local/lib64/libfreenect_sync.so" ]; then LIBSTOLINK="$LIBSTOLINK /usr/local/lib64/libfreenect_sync.so"; fi
+  #if [ -e "libfreenect.so.0.1" ]; then LIBSTOLINK="$LIBSTOLINK ./libfreenect.so.0.1"; fi
+  #if [ -e "libfreenect_sync.so.0.1" ]; then LIBSTOLINK="$LIBSTOLINK ./libfreenect_sync.so.0.1"; fi
 
   if [ -z "$LIBSTOLINK" ]; then echo "No libraries found"; else
                                 echo "$FLAGTOENABLE $LIBSTOLINK"
