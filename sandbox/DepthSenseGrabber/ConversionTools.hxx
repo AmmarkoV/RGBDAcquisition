@@ -16,6 +16,7 @@
 using namespace DepthSense;
 using namespace std;
 
+void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol);
 FrameFormat formatName(int resType);
 int formatResX(int resType);
 int formatResY(int resType);
