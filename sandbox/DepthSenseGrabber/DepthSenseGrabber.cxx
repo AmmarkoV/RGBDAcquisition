@@ -47,7 +47,17 @@
 using namespace DepthSense;
 using namespace std;
 
-bool exportJPG = false;
+bool exportJPG = 0;
+
+bool dispColorRawFlag = 0;
+bool dispDepthRawFlag = 0;
+bool dispColorSyncFlag = 0;
+bool dispDepthSyncFlag = 0;
+
+bool saveColorRawFlag = 1;
+bool saveDepthRawFlag = 1;
+bool saveColorSyncFlag = 1;
+bool saveDepthSyncFlag = 1;
 
 // Resolution type: 0: QQVGA; 1: QVGA; 2:VGA; 3:WXGA_H; 4:NHD
 int resDepthType = 1;
@@ -61,22 +71,28 @@ int widthDepth = formatResX(resDepthType), heightDepth = formatResY(resDepthType
 int widthColor = formatResX(resColorType), heightColor = formatResY(resColorType);
 */
 
-const int widthDepth = 320, heightDepth = 240;
-const int widthColor = 640, heightColor= 480;
+FrameFormat frameFormatDepth = FRAME_FORMAT_QVGA; const int widthDepth = 320, heightDepth = 240; // Depth QVGA
+
+FrameFormat frameFormatColor = FRAME_FORMAT_VGA; const int widthColor = 640, heightColor= 480; // Color VGA
+//FrameFormat frameFormatColor = FRAME_FORMAT_WXGA_H; const int widthColor = 1280, heightColor= 720; // Color WXGA_H
+//FrameFormat frameFormatColor = FRAME_FORMAT_NHD; const int widthColor = 640, heightColor= 360; // Color NHD
+
+
+
 const int nPixelsColor = 3*widthColor*heightColor;
 const int nPixelsDepth = widthDepth*heightDepth;
-uint8_t pixelsColor[nPixelsColor];
+uint8_t pixelsColorRaw[nPixelsColor];
 
-const int16_t noDepthValue = 65535;
+const uint16_t noDepthDefault = 0; //65535;
+const uint16_t noDepthThreshold = 2000; //65535;
 
-unsigned int8_t x = 255;
 
-unsigned int8_t noDepthBGR[3];// = {255,255,255};
+uint8_t noDepthBGR[3];// = {255,255,255};
 
-uint16_t pixelsDepth[nPixelsDepth];
+uint16_t pixelsDepthRaw[nPixelsDepth];
 uint16_t pixelsUv[nPixelsDepth];
-uint8_t pixelsDepthColor[nPixelsColor];
-uint16_t pixelsColorDepth[nPixelsColor];
+unsigned char pixelsColorSync[nPixelsColor];
+uint16_t pixelsDepthSync[nPixelsColor];
 
 int colorPixelInd, colorPixelRow, colorPixelCol;
 UV uv;
@@ -86,30 +102,32 @@ int countColor, countDepth; // DS data index
 
 int timeStamp;
 
-int divideDepthBrightnessCV = 50;
+int divideDepthBrightnessCV = 1;
 
-unsigned int depthFrameCount, colorFrameCount;
+unsigned int frameCount;
 
 //printf("%i,%i\n",widthDepth,heightDepth);
 
 
-//int pixelsDepth[10];
+//int pixelsDepthRaw[10];
 
 //vector<int> pixelsDepth(widthDepth*heightDepth);
 //vector<int> pixelsColor(widthColor*heightColor);
 
 // Open CV vars
 IplImage
-*g_depthImage=NULL,
- *g_colorImage=NULL, // initialized in main, used in CBs
- *g_depthColorImage=NULL, // initialized in main, used in CBs
- *g_colorDepthImage=NULL; // initialized in main, used in CBs
+*g_depthRawImage=NULL,
+ *g_colorRawImage=NULL, // initialized in main, used in CBs
+ *g_depthSyncImage=NULL, // initialized in main, used in CBs
+ *g_colorSyncImage=NULL, // initialized in main, used in CBs
+ *g_emptyImage=NULL; // initialized in main, used in CBs
 CvSize
 //g_szDepth=cvSize(160,120), // QQVGA
-g_szDepth=cvSize(widthDepth,heightDepth), // QVGA
-g_szColor=cvSize(widthColor,heightColor); //VGA
+g_szDepthRaw=cvSize(widthDepth,heightDepth), // QVGA
+g_szColorRaw=cvSize(widthColor,heightColor); //VGA
 
-bool g_saveImageFlag=false, g_saveDepthFlag=false;
+CvSize g_szDepthSync = g_szColorRaw, g_szColorSync = g_szDepthRaw;
+bool g_saveFrameFlag=false;
 
 Context g_context;
 DepthNode g_dnode;
@@ -125,11 +143,10 @@ bool g_bDeviceFound = false;
 ProjectionHelper* g_pProjHelper = NULL;
 StereoCameraParameters g_scp;
 
-char fileNameColor[50];
-char fileNameDepth[50];
-
-
-
+char fileNameColorRaw[50];
+char fileNameDepthRaw[50];
+char fileNameColorSync[50];
+char fileNameDepthSync[50];
 
 /*----------------------------------------------------------------------------*/
 // New audio sample event handler
@@ -152,48 +169,25 @@ the output format is YUY2.
  */
 void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
 {
-    //printf("C#%u: %d\n",g_cFrames,data.colorMap.size());
 
     timeStamp = (int) (((float)(1000*clock()))/CLOCKS_PER_SEC);
 
-    /*
-    int32_t width, height;
-    FrameFormat_toResolution(data.captureConfiguration.frameFormat,&width,&height);
-    int count=0; // DS data index
-    */
     countColor = 0;
 
     if (data.colorMap!=0)// just in case !
         for (int i=0; i<heightColor; i++)
             for (int j=0; j<widthColor; j++)
             {
-                pixelsColorDepth[countColor] = noDepthValue;
-                pixelsColor[3*countColor] = data.colorMap[3*countColor+2];
-                pixelsColor[3*countColor+1] = data.colorMap[3*countColor+1];
-                pixelsColor[3*countColor+2] = data.colorMap[3*countColor];
-                cvSet2D(g_colorImage,i,j,cvScalar(pixelsColor[3*countColor+2],pixelsColor[3*countColor+1],pixelsColor[3*countColor])); //BGR format
+                pixelsDepthSync[countColor] = noDepthDefault;
+                pixelsColorRaw[3*countColor] = data.colorMap[3*countColor+2];
+                pixelsColorRaw[3*countColor+1] = data.colorMap[3*countColor+1];
+                pixelsColorRaw[3*countColor+2] = data.colorMap[3*countColor];
+                if (dispColorRawFlag || (saveColorRawFlag && exportJPG)) cvSet2D(g_colorRawImage,i,j,cvScalar(pixelsColorRaw[3*countColor+2],pixelsColorRaw[3*countColor+1],pixelsColorRaw[3*countColor])); //BGR format
+                if (dispDepthSyncFlag || (saveDepthSyncFlag && exportJPG)) cvSet2D(g_depthSyncImage,i,j,cvScalar(pixelsDepthSync[countColor]));
                 countColor++;
             }
-
     g_cFrames++;
 
-    if (g_saveImageFlag)
-    {
-        //g_fTime = clock();
-        if (exportJPG)
-        {
-            //sprintf(fileNameColor,"colorFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-            sprintf(fileNameColor,"colorFrame_%05u.jpg",colorFrameCount);
-            cvSaveImage(fileNameColor,g_colorImage);
-        }
-        else
-        {
-            //sprintf(fileNameColor,"colorFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-            sprintf(fileNameColor,"colorFrame_%05u.pnm",colorFrameCount);
-            saveRawColorFrame(fileNameColor, pixelsColor, widthColor, heightColor, timeStamp);
-        }
-        colorFrameCount++;
-    }
 }
 
 /*----------------------------------------------------------------------------*/
@@ -213,99 +207,91 @@ each pixel, expressed in meters. Saturated pixels are given the special value -2
 void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
     timeStamp = (int) (((float)(1000*clock()))/CLOCKS_PER_SEC);
-    //int32_t width, height;
-    //FrameFormat_toResolution(data.captureConfiguration.frameFormat,&widthDepth,&heightDepth);
-    /*
-    uint16_t val = 0;
-    UV uv;
-    float u,v;
-    uint16_t pixelsDepth[width*height];
-    uint16_t pixelsUv[width*height];
-    int count=0; // DS data index
-    */
     countDepth = 0;
-    /*
-    if (data.depthMap!=0)// just in case !
-        for (int i=0; i<height; i++)
-            for (int j=0; j<width; j++)
-            {
-                val = data.depthMap[count];
-                cvSet2D(g_depthImage,i,j,cvScalar(val/divideDepthBrightnessCV));
-                pixelsDepth[count] = val;
-                count++;
-            }
-    */
+
     if (data.depthMap!=0)// just in case !
         for (int i=0; i<heightDepth; i++)
             for (int j=0; j<widthDepth; j++)
             {
                 uv = data.uvMap[countDepth];
-                pixelsDepth[countDepth] = data.depthMap[countDepth];
+                if (pixelsDepthRaw[countDepth] < noDepthThreshold)
+                    pixelsDepthRaw[countDepth] = data.depthMap[countDepth];
+                else
+                    pixelsDepthRaw[countDepth] = noDepthDefault;
                 uvToColorPixelInd(uv, widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
-                //colorPixelInd = uvToColorPixelInd(u, v, widthColor, heightColor);
-                //printf("Testing pixelInd %d\n",colorPixelInd);
-                //printf("i=%d, j=%d, countDepth=%d\n",i,j,countDepth);
                 if (colorPixelInd == -1) {
-                    pixelsColorDepth[colorPixelInd] = noDepthValue;
-                    pixelsDepthColor[3*countDepth] = noDepthBGR[2];
-                    pixelsDepthColor[3*countDepth+1] = noDepthBGR[1];
-                    pixelsDepthColor[3*countDepth+2] = noDepthBGR[0];
+                    pixelsDepthSync[colorPixelInd] = noDepthDefault;
+                    pixelsColorSync[3*countDepth] = noDepthBGR[2];
+                    pixelsColorSync[3*countDepth+1] = noDepthBGR[1];
+                    pixelsColorSync[3*countDepth+2] = noDepthBGR[0];
                 }
                 else {
-                    pixelsColorDepth[colorPixelInd] = data.depthMap[countDepth];
-                    pixelsDepthColor[3*countDepth] = pixelsColor[3*colorPixelInd];
-                    pixelsDepthColor[3*countDepth+1] = pixelsColor[3*colorPixelInd+1];
-                    pixelsDepthColor[3*countDepth+2] = pixelsColor[3*colorPixelInd+2];
+                    pixelsDepthSync[colorPixelInd] = data.depthMap[countDepth];
+                    pixelsColorSync[3*countDepth] = pixelsColorRaw[3*colorPixelInd];
+                    pixelsColorSync[3*countDepth+1] = pixelsColorRaw[3*colorPixelInd+1];
+                    pixelsColorSync[3*countDepth+2] = pixelsColorRaw[3*colorPixelInd+2];
                 }
 
-                cvSet2D(g_depthImage,i,j,cvScalar(pixelsDepth[countDepth]/divideDepthBrightnessCV));
-                cvSet2D(g_colorDepthImage,i,j,cvScalar(pixelsColorDepth[colorPixelInd]/divideDepthBrightnessCV));
-
-                cvSet2D(g_depthColorImage,i,j,cvScalar(pixelsDepthColor[3*countDepth+2],pixelsDepthColor[3*countDepth+1],pixelsDepthColor[3*countDepth])); //BGR format
-                //cvSet2D(g_colorDepthImage,i,j,cvScalar(data.depthMap[countDepth]/divideDepthBrightnessCV));
-                //cvSet2D(g_depthColorImage,i,j,cvScalar(100,100,100)); //BGR format
-
-
-                //cvSet2D(g_depthImage,i,j,cvScalar(data.colorMap[3*countDepth],data.colorMap[3*countDepth+1],data.colorMap[3*countDepth+2]));
+                if (dispDepthRawFlag || (saveDepthRawFlag && exportJPG)) cvSet2D(g_depthRawImage,i,j,cvScalar(pixelsDepthRaw[countDepth]/divideDepthBrightnessCV));
+                if (dispDepthSyncFlag || (saveDepthSyncFlag && exportJPG)) cvSet2D(g_depthSyncImage,colorPixelRow,colorPixelCol,cvScalar(pixelsDepthSync[colorPixelInd]/divideDepthBrightnessCV));
+                if (dispColorSyncFlag || (saveColorSyncFlag && exportJPG)) cvSet2D(g_colorSyncImage,i,j,cvScalar(pixelsColorSync[3*countDepth+2],pixelsColorSync[3*countDepth+1],pixelsColorSync[3*countDepth])); //BGR format
                 countDepth++;
             }
-    /*
-    if (data.uvMap!=0)// just in case !
-        for (int i=0; i<height; i++)
-            for (int j=0; j<width; j++)
-            {
-                printf("%f\n",u);
-                cvSet2D(g_depthImage,i,j,cvScalar(u));
-                pixelsDepth[countDepth] = u;
-                countDepth++;
-            }
-    */
 
     g_dFrames++;
 
     /* OpenCV display - this will slow stuff down, should be in thread*/
 
-    cvShowImage("Color",g_colorImage);
-    cvShowImage("Depth",g_depthImage);
-    cvShowImage("Depth Color",g_depthColorImage);
-    cvShowImage("Color Depth",g_colorDepthImage);
+    if (dispColorRawFlag) cvShowImage("Raw Color",g_colorRawImage);
+    if (dispDepthRawFlag) cvShowImage("Raw Depth",g_depthRawImage);
+    if (dispDepthSyncFlag) cvShowImage("Synchronized Depth",g_depthSyncImage);
+    if (dispColorSyncFlag) cvShowImage("Synchronized Color",g_colorSyncImage);
+    if (dispColorRawFlag+dispColorSyncFlag+dispDepthRawFlag+dispDepthSyncFlag == 0)  cvShowImage("Empty",g_emptyImage);
 
-    if (g_saveImageFlag || g_saveDepthFlag)   // save a timestamped image pair; synched by depth image time
+    if (g_saveFrameFlag)
     {
         if (exportJPG)
         {
-            //(fileNameDepth,"depthFrame_%d.%d.jpg",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-            sprintf(fileNameDepth,"depthFrame_%05u.jpg",depthFrameCount);
-            cvSaveImage(fileNameDepth,g_depthImage);
+            if (saveDepthRawFlag) {
+                sprintf(fileNameDepthRaw,"depthRawFrame_%05u.jpg",frameCount);
+                cvSaveImage(fileNameDepthRaw,g_depthRawImage);
+            }
+            if (saveColorRawFlag) {
+                sprintf(fileNameColorRaw,"colorRawFrame_%05u.jpg",frameCount);
+                cvSaveImage(fileNameColorRaw,g_colorRawImage);
+            }
+            if (saveDepthSyncFlag) {
+                sprintf(fileNameDepthSync,"depthSyncFrame_%05u.jpg",frameCount);
+                cvSaveImage(fileNameDepthSync,g_depthSyncImage);
+            }
+            if (saveColorSyncFlag) {
+                sprintf(fileNameColorSync,"colorSyncFrame_%05u.jpg",frameCount);
+                cvSaveImage(fileNameColorSync,g_colorSyncImage);
+            }
         }
         else
         {
-            //sprintf(fileNameDepth,"depthFrame_%d.%d.pnm",(int)(g_fTime/CLOCKS_PER_SEC), (int)(g_fTime%CLOCKS_PER_SEC));
-            sprintf(fileNameDepth,"depthFrame_%05u.pnm",depthFrameCount);
-            saveRawDepthFrame(fileNameDepth, pixelsDepth, widthDepth, heightDepth, timeStamp);
+            if (saveDepthRawFlag) {
+                sprintf(fileNameDepthRaw,"depthRawFrame_%05u.pnm",frameCount);
+                saveRawDepthFrame(fileNameDepthRaw, pixelsDepthRaw, widthDepth, heightDepth, timeStamp);
+            }
+            if (saveColorRawFlag) {
+                sprintf(fileNameColorRaw,"colorRawFrame_%05u.pnm",frameCount);
+                saveRawColorFrame(fileNameColorRaw, pixelsColorRaw, widthColor, heightColor, timeStamp);
+            }
+            if (saveDepthSyncFlag) {
+                sprintf(fileNameDepthSync,"depthSyncFrame_%05u.pnm",frameCount);
+                saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
+            }
+            if (saveColorSyncFlag) {
+                sprintf(fileNameColorSync,"colorSyncFrame_%05u.pnm",frameCount);
+                saveRawColorFrame(fileNameColorSync, pixelsColorSync, widthDepth, heightDepth, timeStamp);
+            }
         }
-        depthFrameCount++;
+        frameCount++;
     }
+
+
 
     // Allow OpenCV to shut down the program
     char key = cvWaitKey(10);
@@ -315,8 +301,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         printf("Quitting main loop from OpenCV\n");
         g_context.quit();
     }
-    else if (key=='W') g_saveImageFlag = !g_saveImageFlag;
-    else if (key=='w') g_saveDepthFlag = !g_saveDepthFlag;
+    else if (key=='W' || key=='w') g_saveFrameFlag = !g_saveFrameFlag;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -361,18 +346,18 @@ void configureAudioNode()
 
 
 /*----------------------------------------------------------------------------*/
+
 void configureDepthNode()
 {
     g_dnode.newSampleReceivedEvent().connect(&onNewDepthSample);
     DepthNode::Configuration config = g_dnode.getConfiguration();
-    config.frameFormat = formatName(resDepthType);
+    config.frameFormat = frameFormatDepth;
     config.framerate = frameRateDepth;
     config.mode = DepthNode::CAMERA_MODE_CLOSE_MODE;
     config.saturation = true;
 
     g_dnode.setEnableDepthMap(true);
     g_dnode.setEnableUvMap(true);
-    g_dnode.setEnableVerticesFloatingPoint(true);
 
     try
     {
@@ -418,7 +403,7 @@ void configureColorNode()
     g_cnode.newSampleReceivedEvent().connect(&onNewColorSample);
 
     ColorNode::Configuration config = g_cnode.getConfiguration();
-    config.frameFormat = formatName(resColorType);
+    config.frameFormat = frameFormatColor;
     config.compression = COMPRESSION_TYPE_MJPEG; // can also be COMPRESSION_TYPE_YUY2
     config.powerLineFrequency = POWER_LINE_FREQUENCY_50HZ;
     config.framerate = frameRateColor;
@@ -526,7 +511,6 @@ void onDeviceDisconnected(Context context, Context::DeviceRemovedData data)
 /*----------------------------------------------------------------------------*/
 int main(int argc, char* argv[])
 {
-printf("TEST %i\n",(int) x);
     g_context = Context::create("localhost");
 
     g_context.deviceAddedEvent().connect(&onDeviceConnected);
@@ -556,42 +540,49 @@ printf("TEST %i\n",(int) x);
 
 
     // VGA format color image
-    g_colorImage=cvCreateImage(g_szColor,IPL_DEPTH_8U,3);
-    if (g_colorImage==NULL)
+    g_colorRawImage=cvCreateImage(g_szColorRaw,IPL_DEPTH_8U,3);
+    if (g_colorRawImage==NULL)
     {
         printf("Unable to create color image buffer\n");
         exit(0);
     }
 
     // QVGA format depth image
-    g_depthImage=cvCreateImage(g_szDepth,IPL_DEPTH_8U,1);
-    if (g_depthImage==NULL)
+    g_depthRawImage=cvCreateImage(g_szDepthRaw,IPL_DEPTH_8U,1);
+    if (g_depthRawImage==NULL)
     {
         printf("Unable to create depth image buffer\n");
         exit(0);
     }
 
     // QVGA format depth color image
-    g_depthColorImage=cvCreateImage(g_szDepth,IPL_DEPTH_8U,3);
-    if (g_depthColorImage==NULL)
+    g_depthSyncImage=cvCreateImage(g_szDepthSync,IPL_DEPTH_8U,1);
+    if (g_depthSyncImage==NULL)
     {
         printf("Unable to create depth color image buffer\n");
         exit(0);
     }
 
-
     // QVGA format depth color image
-    g_colorDepthImage=cvCreateImage(g_szColor,IPL_DEPTH_8U,1);
-    if (g_colorDepthImage==NULL)
+    g_colorSyncImage=cvCreateImage(g_szColorSync,IPL_DEPTH_8U,3);
+    if (g_colorSyncImage==NULL)
     {
         printf("Unable to create color depth image buffer\n");
         exit(0);
     }
 
+    // Empty image
+    g_emptyImage=cvCreateImage(g_szColorSync,IPL_DEPTH_8U,1);
+    if (g_emptyImage==NULL)
+    {
+        printf("Unable to create empty image buffer\n");
+        exit(0);
+    }
+
     printf("dml@Fordham version of DS ConsoleDemo. June 2013.\n");
+    printf("Updated Feb. 2014 (THP).\n");
     printf("Click onto in image for commands. ESC to exit.\n");
-    printf("Use \'W\' to toggle dumping of depth and visual images.\n");
-    printf("Use \'w\' to toggle dumping of depth images only.\n\n");
+    printf("Use \'W\' or \'w\' to toggle frame dumping.\n");
     g_context.startNodes();
 
     g_context.run();
