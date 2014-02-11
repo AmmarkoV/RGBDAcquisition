@@ -148,6 +148,11 @@ char fileNameDepthRaw[50];
 char fileNameColorSync[50];
 char fileNameDepthSync[50];
 
+char baseNameColorRaw[20] = "colorFrame_0_";
+char baseNameDepthRaw[20] = "depthRawFrame_0_";
+char baseNameColorSync[20] = "colorSyncFrame_0_";
+char baseNameDepthSync[20] = "depthFrame_0_";
+
 /*----------------------------------------------------------------------------*/
 // New audio sample event handler
 void onNewAudioSample(AudioNode node, AudioNode::NewSampleReceivedData data)
@@ -253,38 +258,38 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         if (exportJPG)
         {
             if (saveDepthRawFlag) {
-                sprintf(fileNameDepthRaw,"depthRawFrame_%05u.jpg",frameCount);
+                sprintf(fileNameDepthRaw,"%s%05u.jpg",baseNameDepthRaw,frameCount);
                 cvSaveImage(fileNameDepthRaw,g_depthRawImage);
             }
             if (saveColorRawFlag) {
-                sprintf(fileNameColorRaw,"colorRawFrame_%05u.jpg",frameCount);
+                sprintf(fileNameColorRaw,"%s%05u.jpg",baseNameColorRaw,frameCount);
                 cvSaveImage(fileNameColorRaw,g_colorRawImage);
             }
             if (saveDepthSyncFlag) {
-                sprintf(fileNameDepthSync,"depthSyncFrame_%05u.jpg",frameCount);
+                sprintf(fileNameDepthSync,"%s%05u.jpg",baseNameDepthSync,frameCount);
                 cvSaveImage(fileNameDepthSync,g_depthSyncImage);
             }
             if (saveColorSyncFlag) {
-                sprintf(fileNameColorSync,"colorSyncFrame_%05u.jpg",frameCount);
+                sprintf(fileNameColorSync,"%s%05u.jpg",baseNameColorSync,frameCount);
                 cvSaveImage(fileNameColorSync,g_colorSyncImage);
             }
         }
         else
         {
             if (saveDepthRawFlag) {
-                sprintf(fileNameDepthRaw,"depthRawFrame_%05u.pnm",frameCount);
+                sprintf(fileNameDepthRaw,"%s%05u.pnm",baseNameDepthRaw,frameCount);
                 saveRawDepthFrame(fileNameDepthRaw, pixelsDepthRaw, widthDepth, heightDepth, timeStamp);
             }
             if (saveColorRawFlag) {
-                sprintf(fileNameColorRaw,"colorRawFrame_%05u.pnm",frameCount);
+                sprintf(fileNameColorRaw,"%s%05u.pnm",baseNameColorRaw,frameCount);
                 saveRawColorFrame(fileNameColorRaw, pixelsColorRaw, widthColor, heightColor, timeStamp);
             }
             if (saveDepthSyncFlag) {
-                sprintf(fileNameDepthSync,"depthSyncFrame_%05u.pnm",frameCount);
+                sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
                 saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
             }
             if (saveColorSyncFlag) {
-                sprintf(fileNameColorSync,"colorSyncFrame_%05u.pnm",frameCount);
+                sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
                 saveRawColorFrame(fileNameColorSync, pixelsColorSync, widthDepth, heightDepth, timeStamp);
             }
         }

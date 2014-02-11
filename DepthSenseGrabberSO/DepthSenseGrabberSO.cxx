@@ -53,8 +53,8 @@ bool dispColorSyncFlag = 0;
 bool dispDepthSyncFlag = 0;
 
 bool saveColorRawFlag = 1;
-bool saveDepthRawFlag = 1;
-bool saveColorSyncFlag = 1;
+bool saveDepthRawFlag = 0;
+bool saveColorSyncFlag = 0;
 bool saveDepthSyncFlag = 1;
 
 // Resolution type: 0: QQVGA; 1: QVGA; 2:VGA; 3:WXGA_H; 4:NHD
@@ -124,6 +124,12 @@ char fileNameColorRaw[50];
 char fileNameDepthRaw[50];
 char fileNameColorSync[50];
 char fileNameDepthSync[50];
+
+char baseNameColorRaw[20] = "colorFrame_0_";
+char baseNameDepthRaw[20] = "depthRawFrame_0_";
+char baseNameColorSync[20] = "colorSyncFrame_0_";
+char baseNameDepthSync[20] = "depthFrame_0_";
+
 
 /*----------------------------------------------------------------------------*/
 // New audio sample event handler
@@ -214,19 +220,19 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     if (g_saveFrameFlag)
     {
         if (saveDepthRawFlag) {
-            sprintf(fileNameDepthRaw,"depthRawFrame_%05u.pnm",frameCount);
+            sprintf(fileNameDepthRaw,"%s%05u.pnm",baseNameDepthRaw,frameCount);
             saveRawDepthFrame(fileNameDepthRaw, pixelsDepthRaw, widthDepth, heightDepth, timeStamp);
         }
         if (saveColorRawFlag) {
-            sprintf(fileNameColorRaw,"colorRawFrame_%05u.pnm",frameCount);
+            sprintf(fileNameColorRaw,"%s%05u.pnm",baseNameColorRaw,frameCount);
             saveRawColorFrame(fileNameColorRaw, pixelsColorRaw, widthColor, heightColor, timeStamp);
         }
         if (saveDepthSyncFlag) {
-            sprintf(fileNameDepthSync,"depthSyncFrame_%05u.pnm",frameCount);
+            sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
             saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
         }
         if (saveColorSyncFlag) {
-            sprintf(fileNameColorSync,"colorSyncFrame_%05u.pnm",frameCount);
+            sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
             saveRawColorFrame(fileNameColorSync, pixelsColorSync, widthDepth, heightDepth, timeStamp);
         }
         frameCount++;
