@@ -352,6 +352,14 @@ void configureColorNode()
         g_context.requestControl(g_cnode,0);
 
         g_cnode.setConfiguration(config);
+        g_cnode.setBrightness(0);
+        g_cnode.setContrast(5);
+        g_cnode.setSaturation(5);
+        g_cnode.setHue(0);
+        g_cnode.setGamma(3);
+        g_cnode.setWhiteBalance(4650);
+        g_cnode.setSharpness(5);
+        g_cnode.setWhiteBalanceAuto(true);
     }
     catch (ArgumentException& e)
     {
@@ -404,7 +412,7 @@ void configureNode(Node node)
     {
         g_anode = node.as<AudioNode>();
         configureAudioNode();
-        g_context.registerNode(node);
+        //g_context.registerNode(node); // switch this off to save bandwidth
     }
 }
 
