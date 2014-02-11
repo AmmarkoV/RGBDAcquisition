@@ -8,9 +8,6 @@
 #include <vector>
 #include <exception>
 
-#include "cv.h"
-#include "highgui.h"
-
 #include <DepthSense.hxx>
 
 using namespace DepthSense;

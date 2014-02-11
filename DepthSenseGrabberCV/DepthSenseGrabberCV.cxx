@@ -41,8 +41,8 @@
 
 #include <DepthSense.hxx>
 
-#include "DepthSenseGrabber.hxx"
-#include "ConversionTools.hxx"
+#include "DepthSenseGrabberCV.hxx"
+#include "../shared/ConversionTools.hxx"
 
 using namespace DepthSense;
 using namespace std;
