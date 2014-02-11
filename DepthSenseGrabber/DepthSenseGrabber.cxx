@@ -83,11 +83,11 @@ const int nPixelsColor = 3*widthColor*heightColor;
 const int nPixelsDepth = widthDepth*heightDepth;
 uint8_t pixelsColorRaw[nPixelsColor];
 
-const uint16_t noDepthDefault = 0; //65535;
-const uint16_t noDepthThreshold = 2000; //65535;
+const uint16_t noDepthDefault = 0;
+const uint16_t noDepthThreshold = 2000;
 
 
-uint8_t noDepthBGR[3];// = {255,255,255};
+uint8_t noDepthBGR[3] = {255,255,255};
 
 uint16_t pixelsDepthRaw[nPixelsDepth];
 uint16_t pixelsUv[nPixelsDepth];

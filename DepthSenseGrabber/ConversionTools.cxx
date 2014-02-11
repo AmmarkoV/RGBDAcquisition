@@ -19,14 +19,9 @@ using namespace std;
 
 void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol) {
     if(uv.u >= 0.0 && uv.u <= 1.0 && uv.v >= 0.0 && uv.v <= 1.0) {
-        //int row, col;
-        //int colorPixelInd;
         *colorPixelRow = (int) (uv.v * ((float) heightColor));
         *colorPixelCol = (int) (uv.u * ((float) widthColor));
         *colorPixelInd = (*colorPixelRow)*widthColor + (*colorPixelCol);
-        //printf("colorPixelInd %d\n",colorPixelInd);
-        //int[3] colorPixelCoord = {colorPixelInd,row,col};
-        //return colorPixelCoord;
     }
     else
         *colorPixelInd = -1;
