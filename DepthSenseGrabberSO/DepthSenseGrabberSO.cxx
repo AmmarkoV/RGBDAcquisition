@@ -47,14 +47,16 @@ using namespace std;
 
 bool exportJPG = 0;
 
+int waitSecondsBeforeGrab = 3;
+
 bool dispColorRawFlag = 0;
 bool dispDepthRawFlag = 0;
 bool dispColorSyncFlag = 0;
 bool dispDepthSyncFlag = 0;
 
 bool saveColorRawFlag = 1;
-bool saveDepthRawFlag = 0;
-bool saveColorSyncFlag = 0;
+bool saveDepthRawFlag = 1;
+bool saveColorSyncFlag = 1;
 bool saveDepthSyncFlag = 1;
 
 // Resolution type: 0: QQVGA; 1: QVGA; 2:VGA; 3:WXGA_H; 4:NHD
@@ -77,9 +79,14 @@ FrameFormat frameFormatColor = FRAME_FORMAT_VGA; const int widthColor = 640, hei
 
 
 
-const int nPixelsColor = 3*widthColor*heightColor;
-const int nPixelsDepth = widthDepth*heightDepth;
-uint8_t pixelsColorRaw[nPixelsColor];
+const int nPixelsColorRaw = 3*widthColor*heightColor;
+const int nPixelsDepthRaw = widthDepth*heightDepth;
+const int nPixelsColorSync = 3*widthDepth*heightDepth;
+const int nPixelsDepthSync = widthColor*heightColor;
+uint8_t pixelsColorRaw[nPixelsColorRaw];
+uint16_t pixelsDepthRaw[nPixelsDepthRaw];
+uint8_t pixelsColorSync[nPixelsColorSync];
+uint16_t pixelsDepthSync[nPixelsDepthSync];
 
 const uint16_t noDepthDefault = 0;
 const uint16_t noDepthThreshold = 2000;
@@ -87,10 +94,6 @@ const uint16_t noDepthThreshold = 2000;
 
 uint8_t noDepthBGR[3] = {255,255,255};
 
-uint16_t pixelsDepthRaw[nPixelsDepth];
-uint16_t pixelsUv[nPixelsDepth];
-unsigned char pixelsColorSync[nPixelsColor];
-uint16_t pixelsDepthSync[nPixelsColor];
 
 int colorPixelInd, colorPixelRow, colorPixelCol;
 UV uv;
@@ -99,6 +102,7 @@ int countColor, countDepth; // DS data index
 
 
 int timeStamp;
+clock_t clockStartGrab;
 
 int divideDepthBrightnessCV = 1;
 
@@ -484,7 +488,14 @@ int main(int argc, char* argv[])
     printf("Updated Feb. 2014 (THP).\n");
     printf("Click onto in image for commands. ESC to exit.\n");
     printf("Use \'W\' or \'w\' to toggle frame dumping.\n");
+
+    clockStartGrab = clock()+CLOCKS_PER_SEC*waitSecondsBeforeGrab;
+
     g_context.startNodes();
+
+    printf("Waiting %i seconds before grabbing...\n",waitSecondsBeforeGrab);
+    while (clock() < clockStartGrab);
+    printf("Now grabbing!\n");
 
     g_context.run();
 

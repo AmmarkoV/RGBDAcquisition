@@ -79,20 +79,19 @@ FrameFormat frameFormatColor = FRAME_FORMAT_VGA; const int widthColor = 640, hei
 
 
 
-const int nPixelsColor = 3*widthColor*heightColor;
-const int nPixelsDepth = widthDepth*heightDepth;
-uint8_t pixelsColorRaw[nPixelsColor];
+const int nPixelsColorRaw = 3*widthColor*heightColor;
+const int nPixelsDepthRaw = widthDepth*heightDepth;
+const int nPixelsColorSync = 3*widthDepth*heightDepth;
+const int nPixelsDepthSync = widthColor*heightColor;
+uint8_t pixelsColorRaw[nPixelsColorRaw];
+uint16_t pixelsDepthRaw[nPixelsDepthRaw];
+uint8_t pixelsColorSync[nPixelsColorSync];
+uint16_t pixelsDepthSync[nPixelsDepthSync];
 
 const uint16_t noDepthDefault = 0;
 const uint16_t noDepthThreshold = 2000;
 
-
 uint8_t noDepthBGR[3] = {255,255,255};
-
-uint16_t pixelsDepthRaw[nPixelsDepth];
-uint16_t pixelsUv[nPixelsDepth];
-unsigned char pixelsColorSync[nPixelsColor];
-uint16_t pixelsDepthSync[nPixelsColor];
 
 int colorPixelInd, colorPixelRow, colorPixelCol;
 UV uv;
