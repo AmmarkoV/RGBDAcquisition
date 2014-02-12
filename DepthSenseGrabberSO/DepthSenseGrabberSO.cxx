@@ -47,29 +47,25 @@ using namespace std;
 
 bool exportJPG = 0;
 
-int waitSecondsBeforeGrab = 3;
+int waitSecondsBeforeGrab = 0;
+
+bool interpolateDepthFlag = 1;
 
 bool dispColorRawFlag = 0;
 bool dispDepthRawFlag = 0;
 bool dispColorSyncFlag = 0;
 bool dispDepthSyncFlag = 0;
+bool dispDepthSyncSmallFlag = 0;
 
 bool saveColorRawFlag = 1;
 bool saveDepthRawFlag = 1;
 bool saveColorSyncFlag = 1;
 bool saveDepthSyncFlag = 1;
+bool saveDepthSyncSmallFlag = 1;
 
-// Resolution type: 0: QQVGA; 1: QVGA; 2:VGA; 3:WXGA_H; 4:NHD
-int resDepthType = 1;
-int resColorType = 2;
 //int widthDepth,heightDepth,widthColor,heightColor;
 int frameRateDepth = 30;
 int frameRateColor = 30;
-
-/*
-int widthDepth = formatResX(resDepthType), heightDepth = formatResY(resDepthType);
-int widthColor = formatResX(resColorType), heightColor = formatResY(resColorType);
-*/
 
 FrameFormat frameFormatDepth = FRAME_FORMAT_QVGA; const int widthDepth = 320, heightDepth = 240; // Depth QVGA
 
@@ -79,14 +75,18 @@ FrameFormat frameFormatColor = FRAME_FORMAT_VGA; const int widthColor = 640, hei
 
 
 
-const int nPixelsColorRaw = 3*widthColor*heightColor;
-const int nPixelsDepthRaw = widthDepth*heightDepth;
-const int nPixelsColorSync = 3*widthDepth*heightDepth;
-const int nPixelsDepthSync = widthColor*heightColor;
-uint8_t pixelsColorRaw[nPixelsColorRaw];
-uint16_t pixelsDepthRaw[nPixelsDepthRaw];
-uint8_t pixelsColorSync[nPixelsColorSync];
-uint16_t pixelsDepthSync[nPixelsDepthSync];
+const int nPixelsColorLarge = 3*widthColor*heightColor;
+const int nPixelsDepthSmall = widthDepth*heightDepth;
+const int nPixelsColorSmall = 3*widthDepth*heightDepth;
+const int nPixelsDepthLarge = widthColor*heightColor;
+uint8_t pixelsColorRaw[nPixelsColorLarge];
+uint16_t pixelsDepthRaw[nPixelsDepthSmall];
+uint8_t pixelsColorSync[nPixelsColorSmall];
+uint16_t pixelsDepthSync[nPixelsDepthLarge];
+
+
+uint8_t pixelsColorSyncInterp[nPixelsColorLarge];
+uint16_t pixelsDepthRawInterp[nPixelsDepthLarge];
 
 const uint16_t noDepthDefault = 0;
 const uint16_t noDepthThreshold = 2000;
@@ -98,8 +98,15 @@ uint8_t noDepthBGR[3] = {255,255,255};
 int colorPixelInd, colorPixelRow, colorPixelCol;
 UV uv;
 float u,v;
-int countColor, countDepth; // DS data index
+int currentPixelInd; // DS data index
 
+UV uvMapRaw[nPixelsDepthSmall];
+UV uvMapInterp[nPixelsDepthSmall];
+
+float uvMapURaw[nPixelsDepthSmall];
+float uvMapVRaw[nPixelsDepthSmall];
+float uvMapUInterp[nPixelsDepthLarge];
+float uvMapVInterp[nPixelsDepthLarge];
 
 int timeStamp;
 clock_t clockStartGrab;
@@ -107,8 +114,6 @@ clock_t clockStartGrab;
 int divideDepthBrightnessCV = 1;
 
 unsigned int frameCount;
-
-bool g_saveFrameFlag=true;
 
 Context g_context;
 DepthNode g_dnode;
@@ -129,10 +134,10 @@ char fileNameDepthRaw[50];
 char fileNameColorSync[50];
 char fileNameDepthSync[50];
 
-char baseNameColorRaw[20] = "colorFrame_0_";
+char baseNameColorRaw[20] = "colorRawFrame_0_";
 char baseNameDepthRaw[20] = "depthRawFrame_0_";
 char baseNameColorSync[20] = "colorSyncFrame_0_";
-char baseNameDepthSync[20] = "depthFrame_0_";
+char baseNameDepthSync[20] = "depthSyncFrame_0_";
 
 
 /*----------------------------------------------------------------------------*/
@@ -159,17 +164,17 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
 
     timeStamp = (int) (((float)(1000*clock()))/CLOCKS_PER_SEC);
 
-    countColor = 0;
+    currentPixelInd = 0;
 
     if (data.colorMap!=0)// just in case !
         for (int i=0; i<heightColor; i++)
             for (int j=0; j<widthColor; j++)
             {
-                pixelsDepthSync[countColor] = noDepthDefault;
-                pixelsColorRaw[3*countColor] = data.colorMap[3*countColor+2];
-                pixelsColorRaw[3*countColor+1] = data.colorMap[3*countColor+1];
-                pixelsColorRaw[3*countColor+2] = data.colorMap[3*countColor];
-                countColor++;
+                pixelsDepthSync[currentPixelInd] = noDepthDefault;
+                pixelsColorRaw[3*currentPixelInd] = data.colorMap[3*currentPixelInd+2];
+                pixelsColorRaw[3*currentPixelInd+1] = data.colorMap[3*currentPixelInd+1];
+                pixelsColorRaw[3*currentPixelInd+2] = data.colorMap[3*currentPixelInd];
+                currentPixelInd++;
             }
     g_cFrames++;
 
@@ -192,55 +197,119 @@ each pixel, expressed in meters. Saturated pixels are given the special value -2
 void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
     timeStamp = (int) (((float)(1000*clock()))/CLOCKS_PER_SEC);
-    countDepth = 0;
 
+    /*
     if (data.depthMap!=0)// just in case !
+    {
+        currentPixelInd = 0;
         for (int i=0; i<heightDepth; i++)
             for (int j=0; j<widthDepth; j++)
             {
-                uv = data.uvMap[countDepth];
-                if (pixelsDepthRaw[countDepth] < noDepthThreshold)
-                    pixelsDepthRaw[countDepth] = data.depthMap[countDepth];
+                uv = data.uvMap[currentPixelInd];
+                if (pixelsDepthRaw[currentPixelInd] < noDepthThreshold)
+                    pixelsDepthRaw[currentPixelInd] = data.depthMap[currentPixelInd];
                 else
-                    pixelsDepthRaw[countDepth] = noDepthDefault;
+                    pixelsDepthRaw[currentPixelInd] = noDepthDefault;
                 uvToColorPixelInd(uv, widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
                 if (colorPixelInd == -1) {
                     pixelsDepthSync[colorPixelInd] = noDepthDefault;
-                    pixelsColorSync[3*countDepth] = noDepthBGR[2];
-                    pixelsColorSync[3*countDepth+1] = noDepthBGR[1];
-                    pixelsColorSync[3*countDepth+2] = noDepthBGR[0];
+                    pixelsColorSync[3*currentPixelInd] = noDepthBGR[2];
+                    pixelsColorSync[3*currentPixelInd+1] = noDepthBGR[1];
+                    pixelsColorSync[3*currentPixelInd+2] = noDepthBGR[0];
                 }
                 else {
-                    pixelsDepthSync[colorPixelInd] = data.depthMap[countDepth];
-                    pixelsColorSync[3*countDepth] = pixelsColorRaw[3*colorPixelInd];
-                    pixelsColorSync[3*countDepth+1] = pixelsColorRaw[3*colorPixelInd+1];
-                    pixelsColorSync[3*countDepth+2] = pixelsColorRaw[3*colorPixelInd+2];
+                    pixelsDepthSync[colorPixelInd] = pixelsDepthRaw[currentPixelInd];
+                    pixelsColorSync[3*currentPixelInd] = pixelsColorRaw[3*colorPixelInd];
+                    pixelsColorSync[3*currentPixelInd+1] = pixelsColorRaw[3*colorPixelInd+1];
+                    pixelsColorSync[3*currentPixelInd+2] = pixelsColorRaw[3*colorPixelInd+2];
                 }
-                countDepth++;
+                if (interpolateDepthFlag) doubleSizeDepth(pixelsDepthRaw, pixelsDepthRawInterp, widthDepth, heightDepth);
+                currentPixelInd++;
             }
+    }
+    */
+
+    // Initialize raw depth and UV maps
+    currentPixelInd = 0;
+    for (int i=0; i<heightDepth; i++)
+        for (int j=0; j<widthDepth; j++)
+        {
+            uvMapRaw[currentPixelInd] = data.uvMap[currentPixelInd];
+            if (pixelsDepthRaw[currentPixelInd] < noDepthThreshold)
+                pixelsDepthRaw[currentPixelInd] = data.depthMap[currentPixelInd];
+            else
+                pixelsDepthRaw[currentPixelInd] = noDepthDefault;
+            if (interpolateDepthFlag == 0)
+            {
+                pixelsColorSync[3*currentPixelInd] = noDepthBGR[2];
+                pixelsColorSync[3*currentPixelInd+1] = noDepthBGR[1];
+                pixelsColorSync[3*currentPixelInd+2] = noDepthBGR[0];
+            }
+            currentPixelInd++;
+        }
+
+    if (interpolateDepthFlag)
+    {
+        currentPixelInd = 0;
+        doubleSizeDepth(pixelsDepthRaw, pixelsDepthRawInterp, widthDepth, heightDepth);
+        doubleSizeUV(uvMapRaw, uvMapInterp, widthDepth, heightDepth);
+        for (int i=0; i<heightColor; i++)
+            for (int j=0; j<widthColor; j++)
+            {
+                uvToColorPixelInd(uvMapInterp[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
+                if (colorPixelInd == -1) {
+                    pixelsColorSyncInterp[3*currentPixelInd] = noDepthBGR[2];
+                    pixelsColorSyncInterp[3*currentPixelInd+1] = noDepthBGR[1];
+                    pixelsColorSyncInterp[3*currentPixelInd+2] = noDepthBGR[0];
+                }
+                else
+                {
+                    pixelsDepthSync[colorPixelInd] = pixelsDepthRawInterp[currentPixelInd];
+                    pixelsColorSyncInterp[3*currentPixelInd] = pixelsColorRaw[3*colorPixelInd];
+                    pixelsColorSyncInterp[3*currentPixelInd+1] = pixelsColorRaw[3*colorPixelInd+1];
+                    pixelsColorSyncInterp[3*currentPixelInd+2] = pixelsColorRaw[3*colorPixelInd+2];
+                }
+                currentPixelInd++;
+            }
+    }
+    else
+    {
+        currentPixelInd = 0;
+        for (int i=0; i<heightColor; i++)
+            for (int j=0; j<widthColor; j++)
+            {
+                uvToColorPixelInd(uvMapRaw[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
+                if (colorPixelInd != -1) {
+                    pixelsDepthSync[colorPixelInd] = pixelsDepthRawInterp[currentPixelInd];
+                    pixelsColorSync[3*currentPixelInd] = pixelsColorRaw[3*colorPixelInd];
+                    pixelsColorSync[3*currentPixelInd+1] = pixelsColorRaw[3*colorPixelInd+1];
+                    pixelsColorSync[3*currentPixelInd+2] = pixelsColorRaw[3*colorPixelInd+2];
+                }
+                currentPixelInd++;
+            }
+    }
 
     g_dFrames++;
 
-    if (g_saveFrameFlag)
-    {
-        if (saveDepthRawFlag) {
-            sprintf(fileNameDepthRaw,"%s%05u.pnm",baseNameDepthRaw,frameCount);
-            saveRawDepthFrame(fileNameDepthRaw, pixelsDepthRaw, widthDepth, heightDepth, timeStamp);
-        }
-        if (saveColorRawFlag) {
-            sprintf(fileNameColorRaw,"%s%05u.pnm",baseNameColorRaw,frameCount);
-            saveRawColorFrame(fileNameColorRaw, pixelsColorRaw, widthColor, heightColor, timeStamp);
-        }
-        if (saveDepthSyncFlag) {
-            sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
-            saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
-        }
-        if (saveColorSyncFlag) {
-            sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-            saveRawColorFrame(fileNameColorSync, pixelsColorSync, widthDepth, heightDepth, timeStamp);
-        }
-        frameCount++;
+    if (saveDepthRawFlag) {
+        sprintf(fileNameDepthRaw,"%s%05u.pnm",baseNameDepthRaw,frameCount);
+        if (interpolateDepthFlag) saveRawDepthFrame(fileNameDepthRaw, pixelsDepthRawInterp, widthColor, heightColor, timeStamp);
+        else saveRawDepthFrame(fileNameDepthRaw, pixelsDepthRaw, widthDepth, heightDepth, timeStamp);
     }
+    if (saveColorRawFlag) {
+        sprintf(fileNameColorRaw,"%s%05u.pnm",baseNameColorRaw,frameCount);
+        saveRawColorFrame(fileNameColorRaw, pixelsColorRaw, widthColor, heightColor, timeStamp);
+    }
+    if (saveDepthSyncFlag) {
+        sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
+        saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
+    }
+    if (saveColorSyncFlag) {
+        sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
+        if (interpolateDepthFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncInterp, widthColor, heightColor, timeStamp);
+        else saveRawColorFrame(fileNameColorSync, pixelsColorSync, widthDepth, heightDepth, timeStamp);
+    }
+    frameCount++;
 
 }
 

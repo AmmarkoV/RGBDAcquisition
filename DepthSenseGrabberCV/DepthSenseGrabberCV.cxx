@@ -51,7 +51,7 @@ bool exportJPG = 0;
 
 bool dispColorRawFlag = 0;
 bool dispDepthRawFlag = 0;
-bool dispColorSyncFlag = 0;
+bool dispColorSyncFlag = 1;
 bool dispDepthSyncFlag = 0;
 
 bool saveColorRawFlag = 1;
@@ -218,7 +218,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
             for (int j=0; j<widthDepth; j++)
             {
                 uv = data.uvMap[countDepth];
-                if (pixelsDepthRaw[countDepth] < noDepthThreshold)
+                if (data.depthMap[countDepth] < noDepthThreshold)
                     pixelsDepthRaw[countDepth] = data.depthMap[countDepth];
                 else
                     pixelsDepthRaw[countDepth] = noDepthDefault;

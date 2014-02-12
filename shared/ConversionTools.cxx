@@ -15,9 +15,9 @@ using namespace std;
 
 
 void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol) {
-    if(uv.u >= 0.0 && uv.u <= 1.0 && uv.v >= 0.0 && uv.v <= 1.0) {
-        *colorPixelRow = (int) (uv.v * ((float) heightColor));
-        *colorPixelCol = (int) (uv.u * ((float) widthColor));
+    if(uv.u > 0.0001 && uv.u < 0.9999 && uv.v > 0.0001 && uv.v < 0.9999) {
+        *colorPixelRow = (int) (uv.v * ((float) heightColor) + 0.5);
+        *colorPixelCol = (int) (uv.u * ((float) widthColor) + 0.5);
         *colorPixelInd = (*colorPixelRow)*widthColor + (*colorPixelCol);
     }
     else
@@ -103,4 +103,34 @@ void saveRawDepthFrame(char* fileName, uint16_t* pixels, int width, int height, 
     }
 }
 
+void doubleSizeDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight) {
+    for (int i = 0; i < srcHeight; i++)
+        for (int j = 0; j < srcWidth; j++) {
+            dst[(2*i)*2*srcWidth+2*j] = src[i*srcWidth+j];
+        }
+    for (int i = 0; i < srcHeight-1; i++)
+        for (int j = 0; j < srcWidth-1; j++) {
+            dst[(2*i+1)*2*srcWidth+2*j] = (src[i*srcWidth+j]+src[(i+1)*srcWidth+j])/2;
+            dst[(2*i)*2*srcWidth+2*j+1] = (src[i*srcWidth+j]+src[(i)*srcWidth+j+1])/2;
+        }
+    for (int i = 0; i < srcHeight-1; i++)
+        for (int j = 0; j < srcWidth-1; j++) {
+            dst[(2*i+1)*2*srcWidth+2*j+1] = (src[i*srcWidth+j]+src[(i+1)*srcWidth+j]+src[(i)*srcWidth+j+1]+src[(i+1)*srcWidth+j+1])/4;
+        }
+}
 
+void doubleSizeUV(UV* src, UV* dst, int srcWidth, int srcHeight) {
+    for (int i = 0; i < srcHeight; i++)
+        for (int j = 0; j < srcWidth; j++) {
+            dst[(2*i)*2*srcWidth+2*j] = UV(src[i*srcWidth+j].u,src[i*srcWidth+j].v);
+        }
+    for (int i = 0; i < srcHeight-1; i++)
+        for (int j = 0; j < srcWidth-1; j++) {
+            dst[(2*i+1)*2*srcWidth+2*j] = UV((src[i*srcWidth+j].u+src[(i+1)*srcWidth+j].u)/2.0,(src[i*srcWidth+j].v+src[(i+1)*srcWidth+j].v)/2.0);
+            dst[(2*i)*2*srcWidth+2*j+1] = UV((src[i*srcWidth+j].u+src[(i)*srcWidth+j+1].u)/2.0,(src[i*srcWidth+j].v+src[(i)*srcWidth+j+1].v)/2.0);
+        }
+    for (int i = 0; i < srcHeight-1; i++)
+        for (int j = 0; j < srcWidth-1; j++) {
+            dst[(2*i+1)*2*srcWidth+2*j+1] = UV((src[i*srcWidth+j].u+src[(i+1)*srcWidth+j].u+src[(i)*srcWidth+j+1].u+src[(i+1)*srcWidth+j+1].u)/4.0,(src[i*srcWidth+j].v+src[(i+1)*srcWidth+j].v+src[(i)*srcWidth+j+1].v+src[(i+1)*srcWidth+j+1].v)/4.0);
+        }
+}
