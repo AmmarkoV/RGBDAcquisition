@@ -13,12 +13,30 @@
 using namespace DepthSense;
 using namespace std;
 
+void fitValueAround(uint16_t* pixels, int width, int height, int targetPixel, uint16_t newValue, uint16_t replaceableValue) {
+    if (pixels[targetPixel] == replaceableValue) pixels[targetPixel] = newValue;
+    else if (targetPixel+width < width*height && pixels[targetPixel+width] == replaceableValue) pixels[targetPixel+width] = newValue; // try below
+    else if (targetPixel >= width && pixels[targetPixel-width] == replaceableValue) pixels[targetPixel-width] = newValue; // try above
+    else if (targetPixel+1 < width*height && pixels[targetPixel+1] == replaceableValue) pixels[targetPixel+1] = newValue; // try right
+    else if (targetPixel >= 1 && pixels[targetPixel-1] == replaceableValue) pixels[targetPixel-1] = newValue; // try left
+    else if (targetPixel+width+1 < width*height && pixels[targetPixel+width+1] == replaceableValue) pixels[targetPixel+width+1] = newValue; // try below-right
+    else if (targetPixel+width-1 < width*height && pixels[targetPixel+width-1] == replaceableValue) pixels[targetPixel+width-1] = newValue; // try below-left
+    else if (targetPixel >= width+1 && pixels[targetPixel-width-1] == replaceableValue) pixels[targetPixel-width-1] = newValue; // try above-left
+    else if (targetPixel >= width-1 && pixels[targetPixel-width+1] == replaceableValue) pixels[targetPixel-width+1] = newValue; // try above-right
+    //else printf("FAIL! %i\n", targetPixel);
+}
 
 void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol) {
-    if(uv.u > 0.0001 && uv.u < 0.9999 && uv.v > 0.0001 && uv.v < 0.9999) {
+    if(uv.u > 0.00001 && uv.u < 0.99999 && uv.v > 0.00001 && uv.v < 0.99999) {
         *colorPixelRow = (int) (uv.v * ((float) heightColor) + 0.5);
         *colorPixelCol = (int) (uv.u * ((float) widthColor) + 0.5);
-        *colorPixelInd = (*colorPixelRow)*widthColor + (*colorPixelCol);
+        /*float row = uv.v * ((float) heightColor);
+        float col = uv.u * ((float) widthColor);
+        float ind = (row * ((float) widthColor)) + col;
+        *colorPixelInd = (int) ind;*/
+        *colorPixelInd = (*colorPixelRow)*widthColor + *colorPixelCol;
+        //printf("TEST\n %f \n %i \n %i\n",ind,(int) ind, *colorPixelInd);
+        //*colorPixelInd = (int) (((uv.v * ((float) heightColor))*((float) widthColor)) + (uv.u * ((float) widthColor)));
     }
     else
         *colorPixelInd = -1;
@@ -126,11 +144,11 @@ void doubleSizeUV(UV* src, UV* dst, int srcWidth, int srcHeight) {
         }
     for (int i = 0; i < srcHeight-1; i++)
         for (int j = 0; j < srcWidth-1; j++) {
-            dst[(2*i+1)*2*srcWidth+2*j] = UV((src[i*srcWidth+j].u+src[(i+1)*srcWidth+j].u)/2.0,(src[i*srcWidth+j].v+src[(i+1)*srcWidth+j].v)/2.0);
-            dst[(2*i)*2*srcWidth+2*j+1] = UV((src[i*srcWidth+j].u+src[(i)*srcWidth+j+1].u)/2.0,(src[i*srcWidth+j].v+src[(i)*srcWidth+j+1].v)/2.0);
+            dst[(2*i+1)*2*srcWidth+2*j] = UV(0.5*(src[i*srcWidth+j].u+src[(i+1)*srcWidth+j].u),0.5*(src[i*srcWidth+j].v+src[(i+1)*srcWidth+j].v));
+            dst[(2*i)*2*srcWidth+2*j+1] = UV(0.5*(src[i*srcWidth+j].u+src[(i)*srcWidth+j+1].u),0.5*(src[i*srcWidth+j].v+src[(i)*srcWidth+j+1].v));
         }
     for (int i = 0; i < srcHeight-1; i++)
         for (int j = 0; j < srcWidth-1; j++) {
-            dst[(2*i+1)*2*srcWidth+2*j+1] = UV((src[i*srcWidth+j].u+src[(i+1)*srcWidth+j].u+src[(i)*srcWidth+j+1].u+src[(i+1)*srcWidth+j+1].u)/4.0,(src[i*srcWidth+j].v+src[(i+1)*srcWidth+j].v+src[(i)*srcWidth+j+1].v+src[(i+1)*srcWidth+j+1].v)/4.0);
+            dst[(2*i+1)*2*srcWidth+2*j+1] = UV(0.25*(src[i*srcWidth+j].u+src[(i+1)*srcWidth+j].u+src[(i)*srcWidth+j+1].u+src[(i+1)*srcWidth+j+1].u),0.25*(src[i*srcWidth+j].v+src[(i+1)*srcWidth+j].v+src[(i)*srcWidth+j+1].v+src[(i+1)*srcWidth+j+1].v));
         }
 }

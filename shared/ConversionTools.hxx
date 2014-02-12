@@ -13,6 +13,7 @@
 using namespace DepthSense;
 using namespace std;
 
+void fitValueAround(uint16_t* pixels, int width, int height, int targetPixel, uint16_t newValue, uint16_t replaceableValue);
 void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol);
 FrameFormat formatName(int resType);
 int formatResX(int resType);
