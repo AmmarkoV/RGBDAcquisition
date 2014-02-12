@@ -198,37 +198,6 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
     timeStamp = (int) (((float)(1000*clock()))/CLOCKS_PER_SEC);
 
-    /*
-    if (data.depthMap!=0)// just in case !
-    {
-        currentPixelInd = 0;
-        for (int i=0; i<heightDepth; i++)
-            for (int j=0; j<widthDepth; j++)
-            {
-                uv = data.uvMap[currentPixelInd];
-                if (pixelsDepthRaw[currentPixelInd] < noDepthThreshold)
-                    pixelsDepthRaw[currentPixelInd] = data.depthMap[currentPixelInd];
-                else
-                    pixelsDepthRaw[currentPixelInd] = noDepthDefault;
-                uvToColorPixelInd(uv, widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
-                if (colorPixelInd == -1) {
-                    pixelsDepthSync[colorPixelInd] = noDepthDefault;
-                    pixelsColorSync[3*currentPixelInd] = noDepthBGR[2];
-                    pixelsColorSync[3*currentPixelInd+1] = noDepthBGR[1];
-                    pixelsColorSync[3*currentPixelInd+2] = noDepthBGR[0];
-                }
-                else {
-                    pixelsDepthSync[colorPixelInd] = pixelsDepthRaw[currentPixelInd];
-                    pixelsColorSync[3*currentPixelInd] = pixelsColorRaw[3*colorPixelInd];
-                    pixelsColorSync[3*currentPixelInd+1] = pixelsColorRaw[3*colorPixelInd+1];
-                    pixelsColorSync[3*currentPixelInd+2] = pixelsColorRaw[3*colorPixelInd+2];
-                }
-                if (interpolateDepthFlag) doubleSizeDepth(pixelsDepthRaw, pixelsDepthRawInterp, widthDepth, heightDepth);
-                currentPixelInd++;
-            }
-    }
-    */
-
     // Initialize raw depth and UV maps
     currentPixelInd = 0;
     for (int i=0; i<heightDepth; i++)
