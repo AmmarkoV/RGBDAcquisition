@@ -47,7 +47,7 @@ using namespace std;
 
 bool exportJPG = 0;
 
-int waitSecondsBeforeGrab = 1;
+int waitSecondsBeforeGrab = 0;
 
 bool interpolateDepthFlag = 1;
 
@@ -81,7 +81,6 @@ uint8_t pixelsColorRaw[nPixelsColorLarge];
 uint16_t pixelsDepthRaw[nPixelsDepthSmall];
 uint8_t pixelsColorSync[nPixelsColorSmall];
 uint16_t pixelsDepthSync[nPixelsDepthLarge];
-uint16_t pixelsDepthSyncSmall[nPixelsDepthSmall];
 
 
 uint8_t pixelsColorSyncInterp[nPixelsColorLarge];
@@ -203,9 +202,8 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     for (int i=0; i<heightDepth; i++)
         for (int j=0; j<widthDepth; j++)
         {
-            pixelsDepthSyncSmall[currentPixelInd] = noDepthDefault;
             uvMapRaw[currentPixelInd] = data.uvMap[currentPixelInd];
-            if (pixelsDepthRaw[currentPixelInd] < noDepthThreshold)
+            if (data.depthMap[currentPixelInd] < noDepthThreshold)
                 pixelsDepthRaw[currentPixelInd] = data.depthMap[currentPixelInd];
             else
                 pixelsDepthRaw[currentPixelInd] = noDepthDefault;
@@ -234,8 +232,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
                 }
                 else
                 {
-                    fitValueAround(pixelsDepthSync, widthColor, heightColor, colorPixelInd, pixelsDepthRawInterp[currentPixelInd], noDepthDefault);
-                    //pixelsDepthSync[colorPixelInd] = pixelsDepthRawInterp[currentPixelInd];
+                    pixelsDepthSync[colorPixelInd] = pixelsDepthRawInterp[currentPixelInd];
                     pixelsColorSyncInterp[3*currentPixelInd] = pixelsColorRaw[3*colorPixelInd];
                     pixelsColorSyncInterp[3*currentPixelInd+1] = pixelsColorRaw[3*colorPixelInd+1];
                     pixelsColorSyncInterp[3*currentPixelInd+2] = pixelsColorRaw[3*colorPixelInd+2];
@@ -253,8 +250,6 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
                 uvToColorPixelInd(uvMapRaw[currentPixelInd], widthDepth, heightDepth, &debugInt, &colorPixelRow, &colorPixelCol);
                 if (colorPixelInd != -1) {
                     pixelsDepthSync[colorPixelInd] = pixelsDepthRaw[currentPixelInd];
-                    fitValueAround(pixelsDepthSyncSmall, widthDepth, heightDepth, debugInt, pixelsDepthRaw[currentPixelInd], noDepthDefault);
-                    //pixelsDepthSyncSmall[debugInt] = pixelsDepthRaw[currentPixelInd];
                     pixelsColorSync[3*currentPixelInd] = pixelsColorRaw[3*colorPixelInd];
                     pixelsColorSync[3*currentPixelInd+1] = pixelsColorRaw[3*colorPixelInd+1];
                     pixelsColorSync[3*currentPixelInd+2] = pixelsColorRaw[3*colorPixelInd+2];
@@ -277,8 +272,6 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     if (saveDepthSyncFlag) {
         sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
         saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
-        sprintf(fileNameDepthSync,"aaaa%s%05u.pnm",baseNameDepthSync,frameCount);
-        saveRawDepthFrame(fileNameDepthSync, pixelsDepthSyncSmall, widthDepth, heightDepth, timeStamp);
     }
     if (saveColorSyncFlag) {
         sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);

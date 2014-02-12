@@ -13,18 +13,6 @@
 using namespace DepthSense;
 using namespace std;
 
-void fitValueAround(uint16_t* pixels, int width, int height, int targetPixel, uint16_t newValue, uint16_t replaceableValue) {
-    if (pixels[targetPixel] == replaceableValue) pixels[targetPixel] = newValue;
-    else if (targetPixel+width < width*height && pixels[targetPixel+width] == replaceableValue) pixels[targetPixel+width] = newValue; // try below
-    else if (targetPixel >= width && pixels[targetPixel-width] == replaceableValue) pixels[targetPixel-width] = newValue; // try above
-    else if (targetPixel+1 < width*height && pixels[targetPixel+1] == replaceableValue) pixels[targetPixel+1] = newValue; // try right
-    else if (targetPixel >= 1 && pixels[targetPixel-1] == replaceableValue) pixels[targetPixel-1] = newValue; // try left
-    else if (targetPixel+width+1 < width*height && pixels[targetPixel+width+1] == replaceableValue) pixels[targetPixel+width+1] = newValue; // try below-right
-    else if (targetPixel+width-1 < width*height && pixels[targetPixel+width-1] == replaceableValue) pixels[targetPixel+width-1] = newValue; // try below-left
-    else if (targetPixel >= width+1 && pixels[targetPixel-width-1] == replaceableValue) pixels[targetPixel-width-1] = newValue; // try above-left
-    else if (targetPixel >= width-1 && pixels[targetPixel-width+1] == replaceableValue) pixels[targetPixel-width+1] = newValue; // try above-right
-    //else printf("FAIL! %i\n", targetPixel);
-}
 
 void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol) {
     if(uv.u > 0.00001 && uv.u < 0.99999 && uv.v > 0.00001 && uv.v < 0.99999) {
