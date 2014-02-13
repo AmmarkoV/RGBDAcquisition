@@ -45,19 +45,17 @@
 using namespace DepthSense;
 using namespace std;
 
-bool exportJPG = 0;
-
 int waitSecondsBeforeGrab = 0;
 
-bool interpolateDepthFlag = 0;
+bool interpolateDepthFlag = 1;
 
-bool dispColorRawFlag = 0;
-bool dispDepthRawFlag = 0;
+bool dispColorAcqFlag = 0;
+bool dispDepthAcqFlag = 0;
 bool dispColorSyncFlag = 0;
 bool dispDepthSyncFlag = 0;
 
-bool saveColorRawFlag = 1;
-bool saveDepthRawFlag = 1;
+bool saveColorAcqFlag = 1;
+bool saveDepthAcqFlag = 1;
 bool saveColorSyncFlag = 1;
 bool saveDepthSyncFlag = 1;
 
@@ -68,39 +66,61 @@ int frameRateColor = 30;
 const int widthQVGA = 320, heightQVGA = 240;
 const int widthVGA = 640, heightVGA = 480;
 const int widthWXGA = 1280, heightWXGA = 720;
-
-
+const int widthNHD = 640, heightNHD = 360;
 
 const int nPixelsQVGA = widthQVGA*heightQVGA;
 const int nPixelsVGA = widthVGA*heightVGA;
 const int nPixelsWXGA = widthWXGA*heightWXGA;
+const int nPixelsNHD = widthNHD*heightNHD;
 //const int nPixelsColorLarge = 3*widthColor*heightColor;
 //const int nPixelsColorSmall = 3*widthQVGA*heightQVGA;
 
 // Acquired data
-uint8_t pixelsColorRawVGA[3*nPixelsVGA];
-uint8_t pixelsColorRawWXGA[3*nPixelsWXGA];
-uint16_t pixelsDepthRawQVGA[nPixelsQVGA];
+uint16_t pixelsDepthAcqQVGA[nPixelsQVGA];
+uint8_t pixelsColorAcqVGA[3*nPixelsVGA];
+uint8_t pixelsColorAcqWXGA[3*nPixelsWXGA];
+uint8_t pixelsColorAcqNHD[3*nPixelsNHD];
 
 // UVmap-processed frames
 uint8_t pixelsColorSyncQVGA[3*nPixelsQVGA];
-uint16_t pixelsDepthSyncWXGA[nPixelsWXGA];
 uint16_t pixelsDepthSyncVGA[nPixelsVGA];
+uint16_t pixelsDepthSyncWXGA[nPixelsWXGA];
+uint16_t pixelsDepthSyncNHD[nPixelsNHD];
 
 // Interpolated frames
 uint8_t pixelsColorSyncVGA[3*nPixelsVGA];
-uint16_t pixelsDepthRawVGA[nPixelsVGA];
-
+uint16_t pixelsDepthAcqVGA[nPixelsVGA];
 
 
 FrameFormat frameFormatDepth = FRAME_FORMAT_QVGA; // Depth QVGA
+const int nPixelsDepthAcq = nPixelsQVGA;
+uint16_t* pixelsDepthAcq = pixelsDepthAcqQVGA;
+
+
+
+
 
 // Color VGA
 FrameFormat frameFormatColor = FRAME_FORMAT_VGA;
-const int widthColor = widthVGA, heightColor = heightVGA;
-const int nPixelsColorRaw = nPixelsVGA;
-uint8_t* pixelsColorRaw = pixelsColorRawVGA;
-uint16_t* pixelsDepthSyncRaw = pixelsDepthSyncVGA;
+const int widthColor = widthVGA, heightColor = heightVGA, nPixelsColorAcq = nPixelsVGA;
+uint8_t* pixelsColorAcq = pixelsColorAcqVGA;
+uint16_t* pixelsDepthSync = pixelsDepthSyncVGA;
+
+/*
+// Color WXGA
+FrameFormat frameFormatColor = FRAME_FORMAT_WXGA_H;
+const int widthColor = widthWXGA, heightColor = heightWXGA, nPixelsColorAcq = nPixelsWXGA;
+uint8_t* pixelsColorAcq = pixelsColorAcqWXGA;
+uint16_t* pixelsDepthSync = pixelsDepthSyncWXGA;
+*/
+
+/*
+// Color NHD
+FrameFormat frameFormatColor = FRAME_FORMAT_NHD;
+const int widthColor = widthNHD, heightColor = heightNHD, nPixelsColorAcq = nPixelsNHD;
+uint8_t* pixelsColorAcq = pixelsColorAcqNHD;
+uint16_t* pixelsDepthSync = pixelsDepthSyncNHD;
+*/
 
 
 
@@ -124,15 +144,10 @@ UV uv;
 float u,v;
 //int currentPixelInd; // DS data index
 
-UV uvMapQVGA[nPixelsQVGA];
+UV uvMapAcq[nPixelsQVGA];
 UV uvMapVGA[nPixelsVGA];
 
-/*
-float uvMapURaw[nPixelsDepthSmall];
-float uvMapVRaw[nPixelsDepthSmall];
-float uvMapUInterp[nPixelsDepthLarge];
-float uvMapVInterp[nPixelsDepthLarge];
-*/
+
 
 int timeStamp;
 clock_t clockStartGrab;
@@ -155,13 +170,13 @@ bool g_bDeviceFound = false;
 ProjectionHelper* g_pProjHelper = NULL;
 StereoCameraParameters g_scp;
 
-char fileNameColorRaw[50];
-char fileNameDepthRaw[50];
+char fileNameColorAcq[50];
+char fileNameDepthAcq[50];
 char fileNameColorSync[50];
 char fileNameDepthSync[50];
 
-char baseNameColorRaw[20] = "colorRawFrame_0_";
-char baseNameDepthRaw[20] = "depthRawFrame_0_";
+char baseNameColorAcq[20] = "colorAcqFrame_0_";
+char baseNameDepthAcq[20] = "depthAcqFrame_0_";
 char baseNameColorSync[20] = "colorSyncFrame_0_";
 char baseNameDepthSync[20] = "depthSyncFrame_0_";
 
@@ -187,13 +202,13 @@ the output format is YUY2.
  */
 void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
 {
-    for (int currentPixelInd = 0; currentPixelInd < nPixelsColorRaw; currentPixelInd++)
+    for (int currentPixelInd = 0; currentPixelInd < nPixelsColorAcq; currentPixelInd++)
     {
-        pixelsDepthSyncRaw[currentPixelInd] = noDepthDefault;
-        pixelsColorRaw[3*currentPixelInd] = data.colorMap[3*currentPixelInd+2];
-        pixelsColorRaw[3*currentPixelInd+1] = data.colorMap[3*currentPixelInd+1];
-        pixelsColorRaw[3*currentPixelInd+2] = data.colorMap[3*currentPixelInd];
-        currentPixelInd++;
+        // Reinitialize synchronized depth
+        pixelsDepthSync[currentPixelInd] = noDepthDefault;
+        pixelsColorAcq[3*currentPixelInd] = data.colorMap[3*currentPixelInd+2];
+        pixelsColorAcq[3*currentPixelInd+1] = data.colorMap[3*currentPixelInd+1];
+        pixelsColorAcq[3*currentPixelInd+2] = data.colorMap[3*currentPixelInd];
     }
     g_cFrames++;
 
@@ -217,20 +232,21 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
     timeStamp = (int) (((float)(1000*(clock()-clockStartGrab)))/CLOCKS_PER_SEC);
 
-    // Reinitialize synchronized depth
+    /*
     for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthVGA; currentPixelInd++)
     {
         pixelsDepthSyncWXGA[currentPixelInd] = noDepthDefault;
     }
+    */
 
     // Initialize raw depth and UV maps
-    for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthQVGA; currentPixelInd++)
+    for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthAcq; currentPixelInd++)
     {
-        uvMapQVGA[currentPixelInd] = data.uvMap[currentPixelInd];
+        uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
         if (data.depthMap[currentPixelInd] < noDepthThreshold)
-            pixelsDepthRawQVGA[currentPixelInd] = data.depthMap[currentPixelInd];
+            pixelsDepthAcq[currentPixelInd] = data.depthMap[currentPixelInd];
         else
-            pixelsDepthRawQVGA[currentPixelInd] = noDepthDefault;
+            pixelsDepthAcq[currentPixelInd] = noDepthDefault;
         if (interpolateDepthFlag == 0)
         {
             pixelsColorSyncQVGA[3*currentPixelInd] = noDepthBGR[2];
@@ -242,9 +258,9 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     if (interpolateDepthFlag)
     {
         //currentPixelInd = 0;
-        doubleSizeDepth(pixelsDepthRawQVGA, pixelsDepthRawVGA, widthQVGA, heightQVGA);
-        doubleSizeUV(uvMapQVGA, uvMapVGA, widthQVGA, heightQVGA);
-        for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthVGA; currentPixelInd++)
+        doubleSizeDepth(pixelsDepthAcq, pixelsDepthAcqVGA, widthQVGA, heightQVGA);
+        doubleSizeUV(uvMapAcq, uvMapVGA, widthQVGA, heightQVGA);
+        for (int currentPixelInd = 0; currentPixelInd < nPixelsVGA; currentPixelInd++)
         {
             uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);;
             if (colorPixelInd == -1) {
@@ -254,41 +270,37 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
             }
             else
             {
-                pixelsDepthSyncWXGA[colorPixelInd] = pixelsDepthRawVGA[currentPixelInd];
-                pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorRaw[3*colorPixelInd];
-                pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorRaw[3*colorPixelInd+1];
-                pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorRaw[3*colorPixelInd+2];
+                pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd];
+                pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
+                pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
+                pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
             }
         }
     }
     else
     {
-        currentPixelInd = 0;
-        for (int i=0; i<heightQVGA; i++)
-            for (int j=0; j<widthQVGA; j++)
-            {
-                uvToColorPixelInd(uvMapQVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
-                uvToColorPixelInd(uvMapQVGA[currentPixelInd], widthQVGA, heightQVGA, &debugInt, &colorPixelRow, &colorPixelCol);
-                if (colorPixelInd != -1) {
-                    pixelsDepthSync[colorPixelInd] = pixelsDepthRaw[currentPixelInd];
-                    pixelsColorSync[3*currentPixelInd] = pixelsColorRaw[3*colorPixelInd];
-                    pixelsColorSync[3*currentPixelInd+1] = pixelsColorRaw[3*colorPixelInd+1];
-                    pixelsColorSync[3*currentPixelInd+2] = pixelsColorRaw[3*colorPixelInd+2];
-                }
-                currentPixelInd++;
+        for (int currentPixelInd = 0; currentPixelInd < nPixelsQVGA; currentPixelInd++)
+        {
+            uvToColorPixelInd(uvMapAcq[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
+            if (colorPixelInd != -1) {
+                pixelsDepthSync[colorPixelInd] = pixelsDepthAcq[currentPixelInd];
+                pixelsColorSyncQVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
+                pixelsColorSyncQVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
+                pixelsColorSyncQVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
             }
+        }
     }
 
     g_dFrames++;
 
-    if (saveDepthRawFlag) {
-        sprintf(fileNameDepthRaw,"%s%05u.pnm",baseNameDepthRaw,frameCount);
-        if (interpolateDepthFlag) saveRawDepthFrame(fileNameDepthRaw, pixelsDepthRawInterp, widthColor, heightColor, timeStamp);
-        else saveRawDepthFrame(fileNameDepthRaw, pixelsDepthRaw, widthQVGA, heightQVGA, timeStamp);
+    if (saveDepthAcqFlag) {
+        sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
+        if (interpolateDepthFlag) saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcqVGA, widthVGA, heightVGA, timeStamp);
+        else saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcq, widthQVGA, heightQVGA, timeStamp);
     }
-    if (saveColorRawFlag) {
-        sprintf(fileNameColorRaw,"%s%05u.pnm",baseNameColorRaw,frameCount);
-        saveRawColorFrame(fileNameColorRaw, pixelsColorRaw, widthColor, heightColor, timeStamp);
+    if (saveColorAcqFlag) {
+        sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
+        saveRawColorFrame(fileNameColorAcq, pixelsColorAcq, widthColor, heightColor, timeStamp);
     }
     if (saveDepthSyncFlag) {
         sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
@@ -296,8 +308,8 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     }
     if (saveColorSyncFlag) {
         sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-        if (interpolateDepthFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncInterp, widthColor, heightColor, timeStamp);
-        else saveRawColorFrame(fileNameColorSync, pixelsColorSync, widthQVGA, heightQVGA, timeStamp);
+        if (interpolateDepthFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
+        else saveRawColorFrame(fileNameColorSync, pixelsColorSyncQVGA, widthQVGA, heightQVGA, timeStamp);
     }
     frameCount++;
 
