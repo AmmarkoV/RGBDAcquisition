@@ -72,8 +72,6 @@ const int nPixelsQVGA = widthQVGA*heightQVGA;
 const int nPixelsVGA = widthVGA*heightVGA;
 const int nPixelsWXGA = widthWXGA*heightWXGA;
 const int nPixelsNHD = widthNHD*heightNHD;
-//const int nPixelsColorLarge = 3*widthColor*heightColor;
-//const int nPixelsColorSmall = 3*widthQVGA*heightQVGA;
 
 // Acquired data
 uint16_t pixelsDepthAcqQVGA[nPixelsQVGA];
@@ -105,7 +103,6 @@ uint16_t* pixelsDepthAcq = pixelsDepthAcqQVGA;
 FrameFormat frameFormatColor = FRAME_FORMAT_VGA;
 const int widthColor = widthVGA, heightColor = heightVGA, nPixelsColorAcq = nPixelsVGA;
 uint8_t* pixelsColorAcq = pixelsColorAcqVGA;
-//uint16_t* pixelsDepthSync = pixelsDepthSyncVGA;
 uint16_t* pixelsDepthSync = pixelsDepthSyncVGA;
 
 /*
@@ -124,37 +121,20 @@ uint8_t* pixelsColorAcq = pixelsColorAcqNHD;
 uint16_t* pixelsDepthSync = pixelsDepthSyncNHD;
 */
 
-
-
-
-//FrameFormat frameFormatColor = FRAME_FORMAT_WXGA_H; const int widthColor = widthWXGA, heightColor = heightWXGA; // Color WXGA_H
-//FrameFormat frameFormatColor = FRAME_FORMAT_NHD; const int widthNHD = 640, heightNHD= 360; // Color NHD
-
-
-
-
 const uint16_t noDepthDefault = 65535;
 const uint16_t noDepthThreshold = 2000;
 
-
-uint8_t noDepthBGR[3] = {0,0,0};
+uint8_t noDepthBGR[3] = {255,255,255};
 
 
 int colorPixelInd, colorPixelRow, colorPixelCol;
 int debugInt;
-UV uv;
-float u,v;
-//int currentPixelInd; // DS data index
 
 UV uvMapAcq[nPixelsQVGA];
 UV uvMapVGA[nPixelsVGA];
 
-
-
 int timeStamp;
 clock_t clockStartGrab;
-
-int divideDepthBrightnessCV = 1;
 
 unsigned int frameCount;
 
@@ -187,7 +167,6 @@ char baseNameDepthSync[20] = "depthSyncFrame_0_";
 // New audio sample event handler
 void onNewAudioSample(AudioNode node, AudioNode::NewSampleReceivedData data)
 {
-    //    printf("A#%u: %d\n",g_aFrames,data.audioData.size());
     g_aFrames++;
 }
 
