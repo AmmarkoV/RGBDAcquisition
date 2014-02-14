@@ -3,6 +3,7 @@
 #endif
 
 #include <stdio.h>
+#include <math.h>
 #include <time.h>
 
 #include <vector>
@@ -109,7 +110,7 @@ void saveRawDepthFrame(char* fileName, uint16_t* pixels, int width, int height, 
     }
 }
 
-void doubleSizeDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight) {
+void floatSizeDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight) {
     for (int i = 0; i < srcHeight; i++)
         for (int j = 0; j < srcWidth; j++) {
             dst[(2*i)*2*srcWidth+2*j] = src[i*srcWidth+j];
@@ -125,7 +126,7 @@ void doubleSizeDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight) 
         }
 }
 
-void doubleSizeUV(UV* src, UV* dst, int srcWidth, int srcHeight) {
+void floatSizeUV(UV* src, UV* dst, int srcWidth, int srcHeight) {
     for (int i = 0; i < srcHeight; i++)
         for (int j = 0; j < srcWidth; j++) {
             dst[(2*i)*2*srcWidth+2*j] = UV(src[i*srcWidth+j].u,src[i*srcWidth+j].v);
@@ -139,4 +140,82 @@ void doubleSizeUV(UV* src, UV* dst, int srcWidth, int srcHeight) {
         for (int j = 0; j < srcWidth-1; j++) {
             dst[(2*i+1)*2*srcWidth+2*j+1] = UV(0.25*(src[i*srcWidth+j].u+src[(i+1)*srcWidth+j].u+src[(i)*srcWidth+j+1].u+src[(i+1)*srcWidth+j+1].u),0.25*(src[i*srcWidth+j].v+src[(i+1)*srcWidth+j].v+src[(i)*srcWidth+j+1].v+src[(i+1)*srcWidth+j+1].v));
         }
+}
+
+
+void rescaleDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+
+    float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
+    float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
+
+    for (int x=0;x<dstWidth;x++)
+    {
+        float fx=x*stepWidth;
+        float dx=fx-(int)fx;
+        int ffx = floor(fx);
+        int cfx = ceil(fx);
+        for (int y=0;y<dstHeight;y++)
+        {
+            float fy=y*stepHeight;
+            float dy=fy-(int)fy;
+            int ffy = floor(fy);
+            int cfy = ceil(fy);
+
+            uint16_t val1, val2, val3, val4;
+            val1 = src[ffx + ffy*srcWidth];
+            val2 = src[cfx + ffy*srcWidth];
+            val3 = src[ffx + cfy*srcWidth];
+            val4 = src[cfx + cfy*srcWidth];
+
+            float valT1 = dx*val2 + (1-dx)*val1;
+            float valT2 = dx*val4 + (1-dx)*val3;
+
+            uint16_t val = dy*valT2 + (1-dy)*valT1;
+
+            dst[x + y*dstWidth] = val;
+        }
+    }
+}
+
+
+
+void rescaleUV(UV* src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+
+    float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
+    float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
+
+    for (int x=0;x<dstWidth;x++)
+    {
+        float fx=x*stepWidth;
+        float dx=fx-(int)fx;
+        int ffx = floor(fx);
+        int cfx = ceil(fx);
+        for (int y=0;y<dstHeight;y++)
+        {
+            float fy=y*stepHeight;
+            float dy=fy-(int)fy;
+            int ffy = floor(fy);
+            int cfy = ceil(fy);
+
+            float u1, u2, u3, u4, v1, v2, v3, v4;
+            u1 = src[ffx + ffy*srcWidth].u;
+            u2 = src[cfx + ffy*srcWidth].u;
+            u3 = src[ffx + cfy*srcWidth].u;
+            u4 = src[cfx + cfy*srcWidth].u;
+            v1 = src[ffx + ffy*srcWidth].v;
+            v2 = src[cfx + ffy*srcWidth].v;
+            v3 = src[ffx + cfy*srcWidth].v;
+            v4 = src[cfx + cfy*srcWidth].v;
+
+            float uT1 = dx*u2 + (1-dx)*u1;
+            float uT2 = dx*u4 + (1-dx)*u3;
+            float vT1 = dx*v2 + (1-dx)*v1;
+            float vT2 = dx*v4 + (1-dx)*v3;
+
+            float u = dy*uT2 + (1-dy)*uT1;
+            float v = dy*vT2 + (1-dy)*vT1;
+
+            dst[x + y*dstWidth] = UV(u,v);
+        }
+    }
 }

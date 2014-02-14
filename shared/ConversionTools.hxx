@@ -23,3 +23,6 @@ void saveRawDepthFrame(char* fileName, uint16_t* pixels, int width, int height, 
 
 void doubleSizeDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight);
 void doubleSizeUV(UV* src, UV* dst, int srcWidth, int srcHeight);
+
+void rescaleDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
+void rescaleUV(UV* src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
