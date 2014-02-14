@@ -54,10 +54,10 @@ bool dispDepthAcqFlag = 0;
 bool dispColorSyncFlag = 0;
 bool dispDepthSyncFlag = 0;
 
-bool saveColorAcqFlag = 1;
+bool saveColorAcqFlag = 0;
 bool saveDepthAcqFlag = 1;
 bool saveColorSyncFlag = 1;
-bool saveDepthSyncFlag = 1;
+bool saveDepthSyncFlag = 0;
 
 //int widthQVGA,heightQVGA,widthColor,heightColor;
 int frameRateDepth = 30;
@@ -158,8 +158,8 @@ char fileNameColorSync[50];
 char fileNameDepthSync[50];
 
 char baseNameColorAcq[20] = "colorAcqFrame_0_";
-char baseNameDepthAcq[20] = "depthAcqFrame_0_";
-char baseNameColorSync[20] = "colorSyncFrame_0_";
+char baseNameDepthAcq[20] = "depthFrame_0_";
+char baseNameColorSync[20] = "colorFrame_0_";
 char baseNameDepthSync[20] = "depthSyncFrame_0_";
 
 
