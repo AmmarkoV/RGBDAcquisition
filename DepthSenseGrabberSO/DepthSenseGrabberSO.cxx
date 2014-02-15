@@ -46,18 +46,15 @@ using namespace DepthSense;
 using namespace std;
 
 int waitSecondsBeforeGrab = 0;
+int divideConfidencePixels = 10;
 
 bool interpolateDepthFlag = 1;
-
-bool dispColorAcqFlag = 0;
-bool dispDepthAcqFlag = 0;
-bool dispColorSyncFlag = 0;
-bool dispDepthSyncFlag = 0;
 
 bool saveColorAcqFlag = 0;
 bool saveDepthAcqFlag = 1;
 bool saveColorSyncFlag = 1;
 bool saveDepthSyncFlag = 0;
+bool saveConfidenceFlag = 1;
 
 //int widthQVGA,heightQVGA,widthColor,heightColor;
 int frameRateDepth = 30;
@@ -74,6 +71,7 @@ const int nPixelsWXGA = widthWXGA*heightWXGA;
 const int nPixelsNHD = widthNHD*heightNHD;
 
 // Acquired data
+uint16_t pixelsConfidenceQVGA[nPixelsQVGA];
 uint16_t pixelsDepthAcqQVGA[nPixelsQVGA];
 uint8_t pixelsColorAcqVGA[3*nPixelsVGA];
 uint8_t pixelsColorAcqWXGA[3*nPixelsWXGA];
@@ -156,11 +154,13 @@ char fileNameColorAcq[50];
 char fileNameDepthAcq[50];
 char fileNameColorSync[50];
 char fileNameDepthSync[50];
+char fileNameConfidence[50];
 
 char baseNameColorAcq[20] = "colorAcqFrame_0_";
 char baseNameDepthAcq[20] = "depthFrame_0_";
 char baseNameColorSync[20] = "colorFrame_0_";
 char baseNameDepthSync[20] = "depthSyncFrame_0_";
+char baseNameConfidence[20] = "confidenceFrame_0_";
 
 
 /*----------------------------------------------------------------------------*/
@@ -223,6 +223,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     // Initialize raw depth and UV maps
     for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthAcq; currentPixelInd++)
     {
+        pixelsConfidenceQVGA[currentPixelInd] = data.confidenceMap[currentPixelInd]/divideConfidencePixels;
         pixelsDepthSyncQVGA[currentPixelInd] = noDepthDefault;
         uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
         if (data.depthMap[currentPixelInd] < noDepthThreshold)
@@ -292,6 +293,10 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         if (interpolateDepthFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
         else saveRawColorFrame(fileNameColorSync, pixelsColorSyncQVGA, widthQVGA, heightQVGA, timeStamp);
     }
+    if (saveConfidenceFlag) {
+        sprintf(fileNameConfidence,"%s%05u.pnm",baseNameConfidence,frameCount);
+        saveRawDepthFrame(fileNameConfidence, pixelsConfidenceQVGA, widthQVGA, heightQVGA, timeStamp);
+    }
     frameCount++;
 
 }
@@ -350,6 +355,7 @@ void configureDepthNode()
 
     g_dnode.setEnableDepthMap(true);
     g_dnode.setEnableUvMap(true);
+    if (saveConfidenceFlag) g_dnode.setEnableConfidenceMap(true);
 
     try
     {

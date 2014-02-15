@@ -26,4 +26,4 @@ else
   fi
 fi
 
-avconv -i $DATASET"Frame_"%05d.pnm -y -r 30 -threads 8 -b 30000k -s $FORMAT  video$DATASET".mp4" 
+avconv -i $DATASET"Frame_0_"%05d.pnm -y -r 30 -threads 8 -b 30000k -s $FORMAT  video$DATASET".mp4" 
