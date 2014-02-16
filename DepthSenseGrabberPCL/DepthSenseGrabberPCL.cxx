@@ -295,26 +295,12 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         cloud.is_dense = false;
         cloud.points.resize (cloud.width * cloud.height);
 
-        //for (size_t currentPixelInd = 0; currentPixelInd < cloud.points.size (); currentPixelInd++)
-        //{
-        //    cloud.points[currentPixelInd].z = (float) pixelsDepthAcqVGA[currentPixelInd];
-        //    cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXVGA[currentPixelInd];
-        //    cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYVGA[currentPixelInd];
-        //    cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncVGA[3*currentPixelInd]);
-        //}
-        size_t currentPixelInd = 0;
-        for (int i = 0; i < heightVGA; i++) {
-            for (int j = 0; j < widthVGA; j++) {
-                cloud.points[currentPixelInd].z = (float) pixelsDepthAcqVGA[currentPixelInd];
-                //cloud.points[currentPixelInd].x = 100*depthToPosMatXVGA[currentPixelInd];
-                //cloud.points[currentPixelInd].y = 100*depthToPosMatYVGA[currentPixelInd];
-                cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXVGA[currentPixelInd];
-                cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYVGA[currentPixelInd];
-                //cloud.points[currentPixelInd].x = (float) j;
-                //cloud.points[currentPixelInd].y = (float) i;
-                cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncVGA[3*currentPixelInd]);
-                currentPixelInd++;
-            }
+        for (int currentPixelInd = 0; currentPixelInd < cloud.points.size (); currentPixelInd++)
+        {
+            cloud.points[currentPixelInd].z = (float) pixelsDepthAcqVGA[currentPixelInd];
+            cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXVGA[currentPixelInd];
+            cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYVGA[currentPixelInd];
+            cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncVGA[3*currentPixelInd]);
         }
     }
     else {
@@ -324,39 +310,26 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         cloud.is_dense = false;
         cloud.points.resize (cloud.width * cloud.height);
 
-        for (size_t i = 0; i < cloud.points.size (); ++i)
+        for (int currentPixelInd = 0; currentPixelInd < cloud.points.size (); currentPixelInd++)
         {
-            cloud.points[i].z = ((float) pixelsDepthAcqQVGA[i]);
-            cloud.points[i].x = cloud.points[i].z*depthToPosMatXQVGA[i];
-            cloud.points[i].y = cloud.points[i].z*depthToPosMatYQVGA[i];
-            cloud.points[i].rgb = packRGB(&pixelsColorSyncQVGA[3*i]);
+            cloud.points[currentPixelInd].z = (float) pixelsDepthAcqQVGA[currentPixelInd];
+            cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXQVGA[currentPixelInd];
+            cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYQVGA[currentPixelInd];
+            cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncQVGA[3*currentPixelInd]);
         }
+        //for (size_t i = 0; i < cloud.points.size (); ++i)
+        //{
+        //    cloud.points[i].z = ((float) pixelsDepthAcqQVGA[i]);
+        //    cloud.points[i].x = cloud.points[i].z*depthToPosMatXQVGA[i];
+        //    cloud.points[i].y = cloud.points[i].z*depthToPosMatYQVGA[i];
+        //    cloud.points[i].rgb = packRGB(&pixelsColorSyncQVGA[3*i]);
+        //}
 
 
     }
     sprintf(fileNamePCL,"%s%05u.pcd",baseNamePCL,frameCount);
-    pcl::io::savePCDFileASCII (fileNamePCL, cloud);
+    pcl::io::savePCDFileBinary(fileNamePCL, cloud);
 
-
-
-//    if (saveDepthAcqFlag) {
-//        sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
-//        if (interpolateDepthFlag) saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcqVGA, widthVGA, heightVGA, timeStamp);
-//        else saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcq, widthQVGA, heightQVGA, timeStamp);
-//    }
-//    if (saveColorAcqFlag) {
-//        sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
-//        saveRawColorFrame(fileNameColorAcq, pixelsColorAcq, widthColor, heightColor, timeStamp);
-//    }
-//    if (saveDepthSyncFlag) {
-//        sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
-//        saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
-//    }
-//    if (saveColorSyncFlag) {
-//        sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-//        if (interpolateDepthFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
-//        else saveRawColorFrame(fileNameColorSync, pixelsColorSyncQVGA, widthQVGA, heightQVGA, timeStamp);
-//    }
     frameCount++;
 
 }
