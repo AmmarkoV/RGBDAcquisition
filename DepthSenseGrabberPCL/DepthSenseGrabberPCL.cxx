@@ -286,21 +286,40 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
 
 
-    pcl::PointCloud<pcl::PointXYZ> cloud;
+    pcl::PointCloud<pcl::PointXYZRGB> cloud;
 
-    // Fill in the cloud data
-    cloud.width    = widthQVGA;
-    cloud.height   = heightQVGA;
-    cloud.is_dense = false;
-    cloud.points.resize (cloud.width * cloud.height);
+    if (interpolateDepthFlag) {
+        // Fill in the cloud data
+        cloud.width    = widthVGA;
+        cloud.height   = heightVGA;
+        cloud.is_dense = false;
+        cloud.points.resize (cloud.width * cloud.height);
 
-    for (size_t i = 0; i < cloud.points.size (); ++i)
-    {
-    cloud.points[i].z = ((float) pixelsDepthAcqQVGA[i]);
-    cloud.points[i].x = cloud.points[i].z*depthToPosMatXQVGA[i];
-    cloud.points[i].y = cloud.points[i].z*depthToPosMatYQVGA[i];
+        for (size_t i = 0; i < cloud.points.size (); ++i)
+        {
+            cloud.points[i].z = ((float) pixelsDepthAcqVGA[i]);
+            cloud.points[i].x = cloud.points[i].z*depthToPosMatXVGA[i];
+            cloud.points[i].y = cloud.points[i].z*depthToPosMatYVGA[i];
+            cloud.points[i].rgb = packRGB(&pixelsColorSyncVGA[3*i]);
+        }
     }
+    else {
+        // Fill in the cloud data
+        cloud.width    = widthQVGA;
+        cloud.height   = heightQVGA;
+        cloud.is_dense = false;
+        cloud.points.resize (cloud.width * cloud.height);
 
+        for (size_t i = 0; i < cloud.points.size (); ++i)
+        {
+            cloud.points[i].z = ((float) pixelsDepthAcqQVGA[i]);
+            cloud.points[i].x = cloud.points[i].z*depthToPosMatXQVGA[i];
+            cloud.points[i].y = cloud.points[i].z*depthToPosMatYQVGA[i];
+            cloud.points[i].rgb = packRGB(&pixelsColorSyncQVGA[3*i]);
+        }
+
+
+    }
     sprintf(fileNamePCL,"%s%05u.pcd",baseNamePCL,frameCount);
     pcl::io::savePCDFileASCII (fileNamePCL, cloud);
 
@@ -544,6 +563,7 @@ void onDeviceDisconnected(Context context, Context::DeviceRemovedData data)
 int main(int argc, char* argv[])
 {
     calcDepthToPosMat(depthToPosMatXQVGA,depthToPosMatYQVGA,fovDepthHorizontalDeg,fovDepthVerticalDeg,widthQVGA,heightQVGA);
+    calcDepthToPosMat(depthToPosMatXVGA,depthToPosMatYVGA,fovDepthHorizontalDeg,fovDepthVerticalDeg,widthVGA,heightVGA);
 
     g_context = Context::create("localhost");
 
