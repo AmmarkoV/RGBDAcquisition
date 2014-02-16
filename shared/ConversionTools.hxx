@@ -13,6 +13,9 @@
 using namespace DepthSense;
 using namespace std;
 
+void calcDepthToPosMat(float* depthToPosMatX, float* depthToPosMatY, int fovHorizontalDeg, int fovVerticalDeg, int width, int height);
+float packRGB(uint8_t* rgb);
+
 void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol);
 FrameFormat formatName(int resType);
 int formatResX(int resType);

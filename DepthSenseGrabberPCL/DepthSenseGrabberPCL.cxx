@@ -38,6 +38,8 @@
 #include <exception>
 
 #include <DepthSense.hxx>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
 
 #include "DepthSenseGrabberPCL.hxx"
 #include "../shared/ConversionTools.hxx"
@@ -62,6 +64,9 @@ bool saveDepthSyncFlag = 0;
 //int widthQVGA,heightQVGA,widthColor,heightColor;
 int frameRateDepth = 30;
 int frameRateColor = 30;
+
+int fovDepthHorizontalDeg = 74;
+int fovDepthVerticalDeg = 58;
 
 const int widthQVGA = 320, heightQVGA = 240;
 const int widthVGA = 640, heightVGA = 480;
@@ -96,7 +101,10 @@ const int nPixelsDepthAcq = nPixelsQVGA;
 uint16_t* pixelsDepthAcq = pixelsDepthAcqQVGA;
 
 
-
+float depthToPosMatXQVGA[nPixelsQVGA];
+float depthToPosMatYQVGA[nPixelsQVGA];
+float depthToPosMatXVGA[nPixelsVGA];
+float depthToPosMatYVGA[nPixelsVGA];
 
 
 // Color VGA
@@ -152,11 +160,13 @@ bool g_bDeviceFound = false;
 ProjectionHelper* g_pProjHelper = NULL;
 StereoCameraParameters g_scp;
 
+char fileNamePCL[50];
 char fileNameColorAcq[50];
 char fileNameDepthAcq[50];
 char fileNameColorSync[50];
 char fileNameDepthSync[50];
 
+char baseNamePCL[20] = "pclFrame_0_";
 char baseNameColorAcq[20] = "colorAcqFrame_0_";
 char baseNameDepthAcq[20] = "depthFrame_0_";
 char baseNameColorSync[20] = "colorFrame_0_";
@@ -274,24 +284,46 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     g_dFrames++;
 
-    if (saveDepthAcqFlag) {
-        sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
-        if (interpolateDepthFlag) saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcqVGA, widthVGA, heightVGA, timeStamp);
-        else saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcq, widthQVGA, heightQVGA, timeStamp);
+
+
+    pcl::PointCloud<pcl::PointXYZ> cloud;
+
+    // Fill in the cloud data
+    cloud.width    = widthQVGA;
+    cloud.height   = heightQVGA;
+    cloud.is_dense = false;
+    cloud.points.resize (cloud.width * cloud.height);
+
+    for (size_t i = 0; i < cloud.points.size (); ++i)
+    {
+    cloud.points[i].z = ((float) pixelsDepthAcqQVGA[i]);
+    cloud.points[i].x = cloud.points[i].z*depthToPosMatXQVGA[i];
+    cloud.points[i].y = cloud.points[i].z*depthToPosMatYQVGA[i];
     }
-    if (saveColorAcqFlag) {
-        sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
-        saveRawColorFrame(fileNameColorAcq, pixelsColorAcq, widthColor, heightColor, timeStamp);
-    }
-    if (saveDepthSyncFlag) {
-        sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
-        saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
-    }
-    if (saveColorSyncFlag) {
-        sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-        if (interpolateDepthFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
-        else saveRawColorFrame(fileNameColorSync, pixelsColorSyncQVGA, widthQVGA, heightQVGA, timeStamp);
-    }
+
+    sprintf(fileNamePCL,"%s%05u.pcd",baseNamePCL,frameCount);
+    pcl::io::savePCDFileASCII (fileNamePCL, cloud);
+
+
+
+//    if (saveDepthAcqFlag) {
+//        sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
+//        if (interpolateDepthFlag) saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcqVGA, widthVGA, heightVGA, timeStamp);
+//        else saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcq, widthQVGA, heightQVGA, timeStamp);
+//    }
+//    if (saveColorAcqFlag) {
+//        sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
+//        saveRawColorFrame(fileNameColorAcq, pixelsColorAcq, widthColor, heightColor, timeStamp);
+//    }
+//    if (saveDepthSyncFlag) {
+//        sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
+//        saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
+//    }
+//    if (saveColorSyncFlag) {
+//        sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
+//        if (interpolateDepthFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
+//        else saveRawColorFrame(fileNameColorSync, pixelsColorSyncQVGA, widthQVGA, heightQVGA, timeStamp);
+//    }
     frameCount++;
 
 }
@@ -511,6 +543,8 @@ void onDeviceDisconnected(Context context, Context::DeviceRemovedData data)
 /*----------------------------------------------------------------------------*/
 int main(int argc, char* argv[])
 {
+    calcDepthToPosMat(depthToPosMatXQVGA,depthToPosMatYQVGA,fovDepthHorizontalDeg,fovDepthVerticalDeg,widthQVGA,heightQVGA);
+
     g_context = Context::create("localhost");
 
     g_context.deviceAddedEvent().connect(&onDeviceConnected);

@@ -3,6 +3,7 @@
 #endif
 
 #include <stdio.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <time.h>
 
@@ -14,6 +15,27 @@
 using namespace DepthSense;
 using namespace std;
 
+void calcDepthToPosMat(float* depthToPosMatX, float* depthToPosMatY, int fovHorizontalDeg, int fovVerticalDeg, int width, int height) {
+    double halfFovHorizontalRad = fovHorizontalDeg*M_PI/360.0;
+    double halfFovVerticalRad = fovVerticalDeg*M_PI/360.0;
+    double stepHorizontal = tan(halfFovHorizontalRad*2.0/((double) width));
+    double stepVertical = tan(halfFovVerticalRad*2.0/((double) height));
+    double startHorizontal = -tan(halfFovVerticalRad);
+    double startVertical = tan(halfFovVerticalRad);
+    int currentPixelInd = 0;
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            depthToPosMatX[currentPixelInd] = (float) (startHorizontal + ((float) i)*stepHorizontal);
+            depthToPosMatY[currentPixelInd] = (float) (startVertical - ((float) j)*stepVertical);
+            currentPixelInd++;
+        }
+    }
+}
+
+float packRGB(uint8_t* rgb) {
+    uint32_t rgbInt = ((uint32_t)rgb[0] << 16 | (uint32_t)rgb[1] << 8 | (uint32_t)rgb[2]);
+    return *reinterpret_cast<float*>(&rgbInt);
+}
 
 void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol) {
     if(uv.u > 0.00001 && uv.u < 0.99999 && uv.v > 0.00001 && uv.v < 0.99999) {
