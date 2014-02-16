@@ -47,29 +47,21 @@
 using namespace DepthSense;
 using namespace std;
 
-bool exportJPG = 0;
+bool usingUSB30Flag = true;
+bool exportJPGFlag = 0;
 
-bool dispColorRawFlag = 0;
-bool dispDepthRawFlag = 0;
+bool dispColorRawFlag = 1;
+bool dispDepthRawFlag = 1;
 bool dispColorSyncFlag = 1;
-bool dispDepthSyncFlag = 0;
+bool dispDepthSyncFlag = 1;
 
 bool saveColorRawFlag = 1;
 bool saveDepthRawFlag = 1;
 bool saveColorSyncFlag = 1;
 bool saveDepthSyncFlag = 1;
 
-// Resolution type: 0: QQVGA; 1: QVGA; 2:VGA; 3:WXGA_H; 4:NHD
-int resDepthType = 1;
-int resColorType = 2;
-//int widthDepth,heightDepth,widthColor,heightColor;
 int frameRateDepth = 30;
 int frameRateColor = 30;
-
-/*
-int widthDepth = formatResX(resDepthType), heightDepth = formatResY(resDepthType);
-int widthColor = formatResX(resColorType), heightColor = formatResY(resColorType);
-*/
 
 FrameFormat frameFormatDepth = FRAME_FORMAT_QVGA; const int widthDepth = 320, heightDepth = 240; // Depth QVGA
 
@@ -104,14 +96,6 @@ int timeStamp;
 int divideDepthBrightnessCV = 1;
 
 unsigned int frameCount;
-
-//printf("%i,%i\n",widthDepth,heightDepth);
-
-
-//int pixelsDepthRaw[10];
-
-//vector<int> pixelsDepth(widthDepth*heightDepth);
-//vector<int> pixelsColor(widthColor*heightColor);
 
 // Open CV vars
 IplImage
@@ -186,8 +170,8 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
                 pixelsColorRaw[3*countColor] = data.colorMap[3*countColor+2];
                 pixelsColorRaw[3*countColor+1] = data.colorMap[3*countColor+1];
                 pixelsColorRaw[3*countColor+2] = data.colorMap[3*countColor];
-                if (dispColorRawFlag || (saveColorRawFlag && exportJPG)) cvSet2D(g_colorRawImage,i,j,cvScalar(pixelsColorRaw[3*countColor+2],pixelsColorRaw[3*countColor+1],pixelsColorRaw[3*countColor])); //BGR format
-                if (dispDepthSyncFlag || (saveDepthSyncFlag && exportJPG)) cvSet2D(g_depthSyncImage,i,j,cvScalar(pixelsDepthSync[countColor]));
+                if (dispColorRawFlag || (saveColorRawFlag && exportJPGFlag)) cvSet2D(g_colorRawImage,i,j,cvScalar(pixelsColorRaw[3*countColor+2],pixelsColorRaw[3*countColor+1],pixelsColorRaw[3*countColor])); //BGR format
+                if (dispDepthSyncFlag || (saveDepthSyncFlag && exportJPGFlag)) cvSet2D(g_depthSyncImage,i,j,cvScalar(pixelsDepthSync[countColor]));
                 countColor++;
             }
     g_cFrames++;
@@ -236,9 +220,9 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
                     pixelsColorSync[3*countDepth+2] = pixelsColorRaw[3*colorPixelInd+2];
                 }
 
-                if (dispDepthRawFlag || (saveDepthRawFlag && exportJPG)) cvSet2D(g_depthRawImage,i,j,cvScalar(pixelsDepthRaw[countDepth]/divideDepthBrightnessCV));
-                if (dispDepthSyncFlag || (saveDepthSyncFlag && exportJPG)) cvSet2D(g_depthSyncImage,colorPixelRow,colorPixelCol,cvScalar(pixelsDepthSync[colorPixelInd]/divideDepthBrightnessCV));
-                if (dispColorSyncFlag || (saveColorSyncFlag && exportJPG)) cvSet2D(g_colorSyncImage,i,j,cvScalar(pixelsColorSync[3*countDepth+2],pixelsColorSync[3*countDepth+1],pixelsColorSync[3*countDepth])); //BGR format
+                if (dispDepthRawFlag || (saveDepthRawFlag && exportJPGFlag)) cvSet2D(g_depthRawImage,i,j,cvScalar(pixelsDepthRaw[countDepth]/divideDepthBrightnessCV));
+                if (dispDepthSyncFlag || (saveDepthSyncFlag && exportJPGFlag)) cvSet2D(g_depthSyncImage,colorPixelRow,colorPixelCol,cvScalar(pixelsDepthSync[colorPixelInd]/divideDepthBrightnessCV));
+                if (dispColorSyncFlag || (saveColorSyncFlag && exportJPGFlag)) cvSet2D(g_colorSyncImage,i,j,cvScalar(pixelsColorSync[3*countDepth+2],pixelsColorSync[3*countDepth+1],pixelsColorSync[3*countDepth])); //BGR format
                 countDepth++;
             }
 
@@ -254,7 +238,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     if (g_saveFrameFlag)
     {
-        if (exportJPG)
+        if (exportJPGFlag)
         {
             if (saveDepthRawFlag) {
                 sprintf(fileNameDepthRaw,"%s%05u.jpg",baseNameDepthRaw,frameCount);
@@ -480,7 +464,7 @@ void configureNode(Node node)
     {
         g_anode = node.as<AudioNode>();
         configureAudioNode();
-        //g_context.registerNode(node); // switch this off to save bandwidth
+        if (usingUSB30Flag) g_context.registerNode(node); // switch this off to save bandwidth
     }
 }
 

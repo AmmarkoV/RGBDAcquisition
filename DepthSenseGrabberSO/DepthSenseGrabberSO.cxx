@@ -45,18 +45,19 @@
 using namespace DepthSense;
 using namespace std;
 
+bool usingUSB30Flag = true; // if the camera is plugged on a USB 3.0 port
+
 int waitSecondsBeforeGrab = 0;
 int divideConfidencePixels = 10;
 
 bool interpolateDepthFlag = 1;
 
-bool saveColorAcqFlag = 0;
+bool saveColorAcqFlag = 1;
 bool saveDepthAcqFlag = 1;
 bool saveColorSyncFlag = 1;
-bool saveDepthSyncFlag = 0;
+bool saveDepthSyncFlag = 1;
 bool saveConfidenceFlag = 1;
 
-//int widthQVGA,heightQVGA,widthColor,heightColor;
 int frameRateDepth = 30;
 int frameRateColor = 30;
 
@@ -95,7 +96,7 @@ uint16_t* pixelsDepthAcq = pixelsDepthAcqQVGA;
 
 
 
-
+// Color map configuration, comment out undesired parameters
 
 // Color VGA
 FrameFormat frameFormatColor = FRAME_FORMAT_VGA;
@@ -213,17 +214,10 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
     timeStamp = (int) (((float)(1000*(clock()-clockStartGrab)))/CLOCKS_PER_SEC);
 
-    /*
-    for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthVGA; currentPixelInd++)
-    {
-        pixelsDepthSyncWXGA[currentPixelInd] = noDepthDefault;
-    }
-    */
-
     // Initialize raw depth and UV maps
     for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthAcq; currentPixelInd++)
     {
-        pixelsConfidenceQVGA[currentPixelInd] = data.confidenceMap[currentPixelInd]/divideConfidencePixels;
+        if (saveConfidenceFlag) pixelsConfidenceQVGA[currentPixelInd] = data.confidenceMap[currentPixelInd]/divideConfidencePixels;
         pixelsDepthSyncQVGA[currentPixelInd] = noDepthDefault;
         uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
         if (data.depthMap[currentPixelInd] < noDepthThreshold)
@@ -474,7 +468,7 @@ void configureNode(Node node)
     {
         g_anode = node.as<AudioNode>();
         configureAudioNode();
-        //g_context.registerNode(node); // switch this off to save bandwidth
+        //if (usingUSB30Flag != 0) g_context.registerNode(node); // switch this off to save bandwidth
     }
 }
 
