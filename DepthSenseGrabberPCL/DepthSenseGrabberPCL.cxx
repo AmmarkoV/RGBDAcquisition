@@ -295,12 +295,26 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         cloud.is_dense = false;
         cloud.points.resize (cloud.width * cloud.height);
 
-        for (size_t i = 0; i < cloud.points.size (); ++i)
-        {
-            cloud.points[i].z = ((float) pixelsDepthAcqVGA[i]);
-            cloud.points[i].x = cloud.points[i].z*depthToPosMatXVGA[i];
-            cloud.points[i].y = cloud.points[i].z*depthToPosMatYVGA[i];
-            cloud.points[i].rgb = packRGB(&pixelsColorSyncVGA[3*i]);
+        //for (size_t currentPixelInd = 0; currentPixelInd < cloud.points.size (); currentPixelInd++)
+        //{
+        //    cloud.points[currentPixelInd].z = (float) pixelsDepthAcqVGA[currentPixelInd];
+        //    cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXVGA[currentPixelInd];
+        //    cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYVGA[currentPixelInd];
+        //    cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncVGA[3*currentPixelInd]);
+        //}
+        size_t currentPixelInd = 0;
+        for (int i = 0; i < heightVGA; i++) {
+            for (int j = 0; j < widthVGA; j++) {
+                cloud.points[currentPixelInd].z = (float) pixelsDepthAcqVGA[currentPixelInd];
+                //cloud.points[currentPixelInd].x = 100*depthToPosMatXVGA[currentPixelInd];
+                //cloud.points[currentPixelInd].y = 100*depthToPosMatYVGA[currentPixelInd];
+                cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXVGA[currentPixelInd];
+                cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYVGA[currentPixelInd];
+                //cloud.points[currentPixelInd].x = (float) j;
+                //cloud.points[currentPixelInd].y = (float) i;
+                cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncVGA[3*currentPixelInd]);
+                currentPixelInd++;
+            }
         }
     }
     else {
