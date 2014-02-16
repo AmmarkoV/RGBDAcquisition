@@ -38,16 +38,10 @@ float packRGB(uint8_t* rgb) {
 }
 
 void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol) {
-    if(uv.u > 0.00001 && uv.u < 0.99999 && uv.v > 0.00001 && uv.v < 0.99999) {
-        *colorPixelRow = (int) (uv.v * ((float) heightColor) + 0.5);
-        *colorPixelCol = (int) (uv.u * ((float) widthColor) + 0.5);
-        /*float row = uv.v * ((float) heightColor);
-        float col = uv.u * ((float) widthColor);
-        float ind = (row * ((float) widthColor)) + col;
-        *colorPixelInd = (int) ind;*/
+    if(uv.u > 0.001 && uv.u < 0.999 && uv.v > 0.001 && uv.v < 0.999) {
+        *colorPixelRow = (int) (uv.v * ((float) heightColor));
+        *colorPixelCol = (int) (uv.u * ((float) widthColor));
         *colorPixelInd = (*colorPixelRow)*widthColor + *colorPixelCol;
-        //printf("TEST\n %f \n %i \n %i\n",ind,(int) ind, *colorPixelInd);
-        //*colorPixelInd = (int) (((uv.v * ((float) heightColor))*((float) widthColor)) + (uv.u * ((float) widthColor)));
     }
     else
         *colorPixelInd = -1;
@@ -93,12 +87,6 @@ void saveRawColorFrame(char* fileName, uint8_t* pixels, int width, int height, i
     if (pFile!=0)
     {
         fprintf(pFile, "P6\n");
-        /*
-        char timeStampStr[256]={0};
-        GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
-        fprintf(fd, "#%s\n", timeStampStr );*/
-
-        //fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
         fprintf(pFile, "#TIMESTAMP %i\n",timeStamp);
         fprintf(pFile, "%d %d\n%i\n", width, height, 255);
         fwrite(pixels,1,3*width*height,pFile);
@@ -117,14 +105,7 @@ void saveRawDepthFrame(char* fileName, uint16_t* pixels, int width, int height, 
     if (pFile!=0)
     {
         fprintf(pFile, "P5\n");
-        /*
-        char timeStampStr[256]={0};
-        GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
-        fprintf(fd, "#%s\n", timeStampStr );*/
-
-        //fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
         fprintf(pFile, "#TIMESTAMP %i\n",timeStamp);
-
         fprintf(pFile, "%d %d\n%i\n", width, height, 65535);
         fwrite(pixels,2,width*height,pFile);
         fflush(pFile);

@@ -1,30 +1,5 @@
-// ConsoleDemo initial modification due to Damian Lyons
-// Code originally retrieved from SoftKinetic forum
-// http://www.softkinetic.com/Support/Forum/tabid/110/forumid/32/threadid/1450/scope/posts/language/en-US/Default.aspx
-
-// DepthSense 325 parameters and conversion fix - Tu-Hoa Pham (thp@pham.in)
-
-////////////////////////////////////////////////////////////////////////////////
-// SoftKinetic DepthSense SDK
-//
-// COPYRIGHT AND CONFIDENTIALITY NOTICE - SOFTKINETIC CONFIDENTIAL
-// INFORMATION
-//
-// All rights reserved to SOFTKINETIC SENSORS NV (a
-// company incorporated and existing under the laws of Belgium, with
-// its principal place of business at Boulevard de la Plainelaan 15,
-// 1050 Brussels (Belgium), registered with the Crossroads bank for
-// enterprises under company number 0811 341 454 - "Softkinetic
-// Sensors").
-//
-// The source code of the SoftKinetic DepthSense Camera Drivers is
-// proprietary and confidential information of Softkinetic Sensors NV.
-//
-// For any question about terms and conditions, please contact:
-// info@softkinetic.com Copyright (c) 2002-2012 Softkinetic Sensors NV
-////////////////////////////////////////////////////////////////////////////////
-
-// Some OpenCV mods added below for viewing and saving - Damian Lyons, dlyons@fordham.edu
+// DepthSenseGrabber
+// http://github.com/ph4m
 
 #ifdef _MSC_VER
 #include <windows.h>
@@ -468,7 +443,7 @@ void configureNode(Node node)
     {
         g_anode = node.as<AudioNode>();
         configureAudioNode();
-        //if (usingUSB30Flag != 0) g_context.registerNode(node); // switch this off to save bandwidth
+        if (usingUSB30Flag != 1) g_context.registerNode(node); // switch this off to save bandwidth
     }
 }
 
@@ -536,10 +511,7 @@ int main(int argc, char* argv[])
     }
 
 
-    printf("dml@Fordham version of DS ConsoleDemo. June 2013.\n");
-    printf("Updated Feb. 2014 (THP).\n");
-    printf("Click onto in image for commands. ESC to exit.\n");
-    printf("Use \'W\' or \'w\' to toggle frame dumping.\n");
+    printf("DepthSenseGrabber, Feb. 2014. (thp@pham.in)\n");
 
     clockStartGrab = clock()+CLOCKS_PER_SEC*waitSecondsBeforeGrab;
 

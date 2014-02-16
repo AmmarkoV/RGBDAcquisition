@@ -47,8 +47,8 @@
 using namespace DepthSense;
 using namespace std;
 
-bool usingUSB30Flag = true;
-bool exportJPGFlag = 0;
+bool usingUSB30Flag = 1;
+bool exportJPGFlag = 1;
 
 bool dispColorRawFlag = 1;
 bool dispDepthRawFlag = 1;
@@ -227,7 +227,6 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
             }
 
     g_dFrames++;
-
     /* OpenCV display - this will slow stuff down, should be in thread*/
 
     if (dispColorRawFlag) cvShowImage("Raw Color",g_colorRawImage);
@@ -278,8 +277,6 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         }
         frameCount++;
     }
-
-
 
     // Allow OpenCV to shut down the program
     char key = cvWaitKey(10);
@@ -464,7 +461,7 @@ void configureNode(Node node)
     {
         g_anode = node.as<AudioNode>();
         configureAudioNode();
-        if (usingUSB30Flag) g_context.registerNode(node); // switch this off to save bandwidth
+        if (usingUSB30Flag != 1) g_context.registerNode(node); // switch this off to save bandwidth
     }
 }
 
@@ -574,9 +571,8 @@ int main(int argc, char* argv[])
         printf("Unable to create empty image buffer\n");
         exit(0);
     }
-
     printf("dml@Fordham version of DS ConsoleDemo. June 2013.\n");
-    printf("Updated Feb. 2014 (THP).\n");
+    printf("Updated Feb. 2014 (thp@pham.in).\n");
     printf("Click onto in image for commands. ESC to exit.\n");
     printf("Use \'W\' or \'w\' to toggle frame dumping.\n");
     g_context.startNodes();
