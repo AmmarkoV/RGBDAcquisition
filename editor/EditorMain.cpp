@@ -19,6 +19,7 @@
 #include "SelectModule.h"
 #include "SelectTarget.h"
 #include "SelectSegmentation.h"
+#include "GetExtrinsics.h"
 
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 unsigned int devID=0;
@@ -114,6 +115,7 @@ const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
 const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
 const long EditorFrame::idMenuQuit = wxNewId();
 const long EditorFrame::ID_MENUSEGMENTATION = wxNewId();
+const long EditorFrame::ID_MENUGETEXTRINSICS = wxNewId();
 const long EditorFrame::idMenuAbout = wxNewId();
 const long EditorFrame::ID_STATUSBAR1 = wxNewId();
 const long EditorFrame::ID_TIMER1 = wxNewId();
@@ -169,6 +171,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Menu4 = new wxMenu();
     MenuItem3 = new wxMenuItem(Menu4, ID_MENUSEGMENTATION, _("Segmentation"), wxEmptyString, wxITEM_NORMAL);
     Menu4->Append(MenuItem3);
+    MenuItem7 = new wxMenuItem(Menu4, ID_MENUGETEXTRINSICS, _("Get Extrinsics"), wxEmptyString, wxITEM_NORMAL);
+    Menu4->Append(MenuItem7);
     MenuBar1->Append(Menu4, _("Module"));
     Menu2 = new wxMenu();
     MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
@@ -205,6 +209,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_MENUSAVEDEPTH,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSaveDepth);
     Connect(ID_MENUOPENMODULE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnOpenModule);
     Connect(ID_MENUSEGMENTATION,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
+    Connect(ID_MENUGETEXTRINSICS,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonGetExtrinsics);
 
     rgbFrame=0;
     depthFrame=0;
@@ -832,4 +837,19 @@ void EditorFrame::OnButtonAcquisitionGraphClick(wxCommandEvent& event)
    SelectAcquisitionGraph  * inputConnector = new SelectAcquisitionGraph(this, wxID_ANY);
    inputConnector->ShowModal();
    delete  inputConnector;
+}
+
+
+
+void EditorFrame::OnButtonGetExtrinsics(wxCommandEvent& event)
+{
+   GetExtrinsics * extrinsicsSelector = new GetExtrinsics(this, wxID_ANY);
+
+
+  extrinsicsSelector->moduleID = moduleID;
+  extrinsicsSelector->devID = devID;
+
+  extrinsicsSelector->ShowModal();
+
+   delete  extrinsicsSelector;
 }

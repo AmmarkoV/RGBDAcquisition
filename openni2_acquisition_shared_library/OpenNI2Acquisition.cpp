@@ -8,8 +8,8 @@
 //#define USE_CALIBRATION 1
 //#define BUILD_OPENNI2 1
 
-#define MOD_FACEDETECTION 0
-#define MOD_NITE2 0
+#define MOD_FACEDETECTION 1
+#define MOD_NITE2 1
 #define BUILD_OPENNI2 1
 #define RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE 1
 #define USE_WAITFORANYSTREAM_TO_GRAB 0
@@ -54,7 +54,7 @@ unsigned int lastDepthComesFromNite[MAX_OPENNI2_DEVICES]={0};
 unsigned int pauseFaceDetection = 0;
 unsigned int faceDetectionFramesBetweenScans = 2;
 unsigned int pauseSkeletonDetection = 0;
-unsigned int skeletonDetectionFramesBetweenScans = 5;
+unsigned int skeletonDetectionFramesBetweenScans = 10;
 
 
 enum howToOpenDevice
@@ -515,7 +515,8 @@ int snapOpenNI2Frames(int devID)
                       (unsigned char*) getOpenNI2ColorPixels(devID) , getOpenNI2ColorWidth(devID) , getOpenNI2ColorHeight(devID) ,
                       (unsigned short*) getOpenNI2DepthPixels(devID) , getOpenNI2DepthWidth(devID) , getOpenNI2DepthHeight(devID) ,
                       &calib ,
-                      45,150 //Min / Max
+                      60 , //45, //Min
+                      150 // Max
                      );
         }
        }

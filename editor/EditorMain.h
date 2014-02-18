@@ -53,6 +53,8 @@ class EditorFrame: public wxFrame
         void OnSavePCD(wxCommandEvent& event);
         void OnSaveDepth(wxCommandEvent& event);
 
+        void OnButtonGetExtrinsics(wxCommandEvent& event);
+
         //(*Handlers(EditorFrame)
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
@@ -90,6 +92,7 @@ class EditorFrame: public wxFrame
         static const long ID_MENUSAVEPCD;
         static const long idMenuQuit;
         static const long ID_MENUSEGMENTATION;
+        static const long ID_MENUGETEXTRINSICS;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         static const long ID_TIMER1;
@@ -115,6 +118,7 @@ class EditorFrame: public wxFrame
         wxMenuItem* MenuItem5;
         wxTimer Timer;
         wxButton* ButtonCalibration;
+        wxMenuItem* MenuItem7;
         wxMenuItem* MenuItem4;
         wxMenuItem* MenuItem6;
         wxButton* ButtonSegmentation;

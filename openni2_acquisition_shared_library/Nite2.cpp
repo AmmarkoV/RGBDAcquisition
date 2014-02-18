@@ -501,6 +501,10 @@ int loopNite2(int devID ,unsigned int frameNumber)
 			}
 			else
             //If we have a skeleton tracked , populate our internal structures and call callbacks
+            if (user.getSkeleton().getState() == nite::SKELETON_CALIBRATING )
+            {
+              fprintf(stderr,"Skeleton is beeing calibrated\n");
+            }
             if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
 			{
 		      prepareSkeletonState(devID,frameNumber,*stc[devID].userTracker,user  , i , users.getSize() );

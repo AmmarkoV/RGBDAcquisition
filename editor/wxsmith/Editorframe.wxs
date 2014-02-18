@@ -104,6 +104,9 @@
 				<object class="wxMenuItem" name="ID_MENUSEGMENTATION" variable="MenuItem3" member="yes">
 					<label>Segmentation</label>
 				</object>
+				<object class="wxMenuItem" name="ID_MENUGETEXTRINSICS" variable="MenuItem7" member="yes">
+					<label>Get Extrinsics</label>
+				</object>
 			</object>
 			<object class="wxMenu" variable="Menu2" member="no">
 				<label>Help</label>
