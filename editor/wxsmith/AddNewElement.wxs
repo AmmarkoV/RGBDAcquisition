@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="AddNewElement">
-		<title>New Element</title>
+		<title>Add new element from points</title>
+		<size>400,471</size>
 		<pos_arg>1</pos_arg>
 		<size_arg>1</size_arg>
 		<object class="wxButton" name="ID_BUTTON1" variable="ButtonAdd" member="yes">
@@ -16,6 +17,23 @@
 		<object class="wxButton" name="ID_BUTTON2" variable="ButtonCancel" member="yes">
 			<label>Cancel</label>
 			<pos>296,384</pos>
+			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
+			<value>Text</value>
+			<pos>72,16</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+			<label>How To Add</label>
+			<pos>24,56</pos>
+		</object>
+		<object class="wxChoice" name="ID_CHOICE1" variable="Choice1" member="yes">
+			<content>
+				<item>Flood Fill Point Segmentation</item>
+				<item>Plane Segmentation</item>
+			</content>
+			<pos>24,80</pos>
+			<size>360,29</size>
 		</object>
 	</object>
 </wxsmith>
