@@ -1,7 +1,7 @@
 DepthSenseGrabber
 ===============
 
-Various tools for SoftKinetic's DepthSense 325 camera using Linux SDK
+Various tools for SoftKinetic DepthSense 325 camera using Linux SDK
 
 So far, DepthSenseGrabber allows you to:
  - visualize camera streams (both color and depth)
