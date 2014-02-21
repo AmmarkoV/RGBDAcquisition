@@ -11,6 +11,7 @@
 #define EDITORMAIN_H
 
 //(*Headers(EditorFrame)
+#include <wx/listctrl.h>
 #include <wx/button.h>
 #include <wx/menu.h>
 #include <wx/slider.h>
@@ -69,6 +70,8 @@ class EditorFrame: public wxFrame
         void OnButtonCalibrationClick(wxCommandEvent& event);
         void OnbuttonRecordClick(wxCommandEvent& event);
         void OnButtonAcquisitionGraphClick(wxCommandEvent& event);
+        void OnButtonAddClick(wxCommandEvent& event);
+        void OnButtonRemoveClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -87,6 +90,9 @@ class EditorFrame: public wxFrame
         static const long ID_BUTTON6;
         static const long ID_BUTTON7;
         static const long ID_BUTTON8;
+        static const long ID_LISTCTRL1;
+        static const long ID_BUTTON9;
+        static const long ID_BUTTON10;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEDEPTH;
         static const long ID_MENUSAVEPCD;
@@ -103,6 +109,7 @@ class EditorFrame: public wxFrame
         wxStatusBar* Status;
         wxStaticText* totalFramesLabel;
         wxButton* buttonRecord;
+        wxButton* ButtonAdd;
         wxButton* buttonStop;
         wxStaticBox* StaticBox2;
         wxTextCtrl* currentFrameTextCtrl;
@@ -117,7 +124,9 @@ class EditorFrame: public wxFrame
         wxButton* ButtonAcquisitionGraph;
         wxMenuItem* MenuItem5;
         wxTimer Timer;
+        wxListCtrl* ListCtrlPoints;
         wxButton* ButtonCalibration;
+        wxButton* ButtonRemove;
         wxMenuItem* MenuItem7;
         wxMenuItem* MenuItem4;
         wxMenuItem* MenuItem6;

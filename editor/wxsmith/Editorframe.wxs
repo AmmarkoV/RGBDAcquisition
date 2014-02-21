@@ -79,6 +79,23 @@
 			<pos>1040,520</pos>
 			<handler function="OnButtonAcquisitionGraphClick" entry="EVT_BUTTON" />
 		</object>
+		<object class="wxListCtrl" name="ID_LISTCTRL1" variable="ListCtrlPoints" member="yes">
+			<pos>1320,56</pos>
+			<size>152,408</size>
+			<style>wxLC_REPORT|wxLC_SINGLE_SEL|wxRAISED_BORDER|wxVSCROLL</style>
+		</object>
+		<object class="wxButton" name="ID_BUTTON9" variable="ButtonAdd" member="yes">
+			<label>+</label>
+			<pos>1320,464</pos>
+			<size>40,29</size>
+			<handler function="OnButtonAddClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON10" variable="ButtonRemove" member="yes">
+			<label>-</label>
+			<pos>1368,464</pos>
+			<size>40,29</size>
+			<handler function="OnButtonRemoveClick" entry="EVT_BUTTON" />
+		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">
 				<label>&amp;File</label>

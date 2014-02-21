@@ -166,11 +166,11 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	CheckBoxPlane = new wxCheckBox(this, ID_CHECKBOX2, _("Plane Segmentation"), wxPoint(392,290), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	CheckBoxPlane->SetValue(false);
 	StaticText12 = new wxStaticText(this, ID_STATICTEXT12, _("Erase Color is "), wxPoint(16,424), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
-	eraseColorR = new wxSpinCtrl(this, ID_SPINCTRL9, _T("255"), wxPoint(124,420), wxSize(48,23), 0, 0, 255, 255, _T("ID_SPINCTRL9"));
+	eraseColorR = new wxSpinCtrl(this, ID_SPINCTRL9, _T("255"), wxPoint(124,420), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL9"));
 	eraseColorR->SetValue(_T("255"));
-	eraseColorG = new wxSpinCtrl(this, ID_SPINCTRL10, _T("255"), wxPoint(176,420), wxSize(48,23), 0, 0, 255, 255, _T("ID_SPINCTRL10"));
+	eraseColorG = new wxSpinCtrl(this, ID_SPINCTRL10, _T("255"), wxPoint(176,420), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL10"));
 	eraseColorG->SetValue(_T("255"));
-	eraseColorB = new wxSpinCtrl(this, ID_SPINCTRL11, _T("255"), wxPoint(232,420), wxSize(48,23), 0, 0, 255, 255, _T("ID_SPINCTRL11"));
+	eraseColorB = new wxSpinCtrl(this, ID_SPINCTRL11, _T("255"), wxPoint(228,420), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL11"));
 	eraseColorB->SetValue(_T("255"));
 	StaticText15 = new wxStaticText(this, ID_STATICTEXT15, _("Erase Depth is "), wxPoint(384,424), wxDefaultSize, 0, _T("ID_STATICTEXT15"));
 	eraseDepth = new wxSpinCtrl(this, ID_SPINCTRL12, _T("0"), wxPoint(496,420), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL12"));

@@ -49,6 +49,8 @@
 		<Unit filename="EditorMain.h" />
 		<Unit filename="FeedScreenMemory.cpp" />
 		<Unit filename="FeedScreenMemory.h" />
+		<Unit filename="GetExtrinsics.cpp" />
+		<Unit filename="GetExtrinsics.h" />
 		<Unit filename="SelectAcquisitionGraph.cpp" />
 		<Unit filename="SelectAcquisitionGraph.h" />
 		<Unit filename="SelectCalibration.cpp" />
@@ -62,6 +64,7 @@
 		<Unit filename="Tools.cpp" />
 		<Unit filename="Tools.h" />
 		<Unit filename="wxsmith/Editorframe.wxs" />
+		<Unit filename="wxsmith/GetExtrinsics.wxs" />
 		<Unit filename="wxsmith/SelectAcquisitionGraph.wxs" />
 		<Unit filename="wxsmith/SelectCalibration.wxs" />
 		<Unit filename="wxsmith/SelectModule.wxs" />
@@ -79,6 +82,7 @@
 					<wxDialog wxs="wxsmith/SelectCalibration.wxs" src="SelectCalibration.cpp" hdr="SelectCalibration.h" fwddecl="0" i18n="1" name="SelectCalibration" language="CPP" />
 					<wxDialog wxs="wxsmith/SelectAcquisitionGraph.wxs" src="SelectAcquisitionGraph.cpp" hdr="SelectAcquisitionGraph.h" fwddecl="0" i18n="1" name="SelectAcquisitionGraph" language="CPP" />
 					<wxDialog wxs="wxsmith/SelectTarget.wxs" src="SelectTarget.cpp" hdr="SelectTarget.h" fwddecl="0" i18n="1" name="SelectTarget" language="CPP" />
+					<wxDialog wxs="wxsmith/GetExtrinsics.wxs" src="GetExtrinsics.cpp" hdr="GetExtrinsics.h" fwddecl="0" i18n="1" name="GetExtrinsics" language="CPP" />
 				</resources>
 			</wxsmith>
 			<debugger />

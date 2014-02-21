@@ -280,19 +280,19 @@
 			<value>255</value>
 			<max>255</max>
 			<pos>124,420</pos>
-			<size>48,23</size>
+			<size>52,23</size>
 		</object>
 		<object class="wxSpinCtrl" name="ID_SPINCTRL10" variable="eraseColorG" member="yes">
 			<value>255</value>
 			<max>255</max>
 			<pos>176,420</pos>
-			<size>48,23</size>
+			<size>52,23</size>
 		</object>
 		<object class="wxSpinCtrl" name="ID_SPINCTRL11" variable="eraseColorB" member="yes">
 			<value>255</value>
 			<max>255</max>
-			<pos>232,420</pos>
-			<size>48,23</size>
+			<pos>228,420</pos>
+			<size>52,23</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT15" variable="StaticText15" member="yes">
 			<label>Erase Depth is </label>

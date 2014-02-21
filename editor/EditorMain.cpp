@@ -27,6 +27,7 @@ unsigned int devID=0;
 unsigned int width , height , fps ;
 char openDevice[512];
 
+int addingPoint=0;
 int alreadyInitialized=0;
 int play=0;
 int lastFrameDrawn=12312312;
@@ -110,6 +111,9 @@ const long EditorFrame::ID_BUTTON5 = wxNewId();
 const long EditorFrame::ID_BUTTON6 = wxNewId();
 const long EditorFrame::ID_BUTTON7 = wxNewId();
 const long EditorFrame::ID_BUTTON8 = wxNewId();
+const long EditorFrame::ID_LISTCTRL1 = wxNewId();
+const long EditorFrame::ID_BUTTON9 = wxNewId();
+const long EditorFrame::ID_BUTTON10 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
 const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
@@ -156,6 +160,9 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(952,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     buttonRecord = new wxButton(this, ID_BUTTON7, _("Record"), wxPoint(368,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
     ButtonAcquisitionGraph = new wxButton(this, ID_BUTTON8, _("Stream Connections"), wxPoint(1040,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
+    ListCtrlPoints = new wxListCtrl(this, ID_LISTCTRL1, wxPoint(1320,56), wxSize(152,408), wxLC_REPORT|wxLC_SINGLE_SEL|wxRAISED_BORDER|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL1"));
+    ButtonAdd = new wxButton(this, ID_BUTTON9, _("+"), wxPoint(1320,464), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON9"));
+    ButtonRemove = new wxButton(this, ID_BUTTON10, _("-"), wxPoint(1368,464), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON10"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -198,6 +205,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonCalibrationClick);
     Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonRecordClick);
     Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonAcquisitionGraphClick);
+    Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonAddClick);
+    Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonRemoveClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -240,6 +249,21 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     wxCommandEvent  event;
 
     OnOpenModule(event);
+
+
+    wxListItem col0;
+     col0.SetId(0);
+     col0.SetText( wxT(" X ") );
+     col0.SetWidth(70);
+     ListCtrlPoints->InsertColumn(0, col0);
+
+    wxListItem col1;
+     col1.SetId(0);
+     col1.SetText( wxT(" Y ") );
+     col1.SetWidth(70);
+     ListCtrlPoints->InsertColumn(1, col1);
+
+
 
     //Connect( wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(EditorFrame::onIdle) );
 }
@@ -451,11 +475,29 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 
   if ( XYOverRect(x,y,feed_0_x,feed_0_y,feed_0_x+default_feed->GetWidth(),feed_0_y+default_feed->GetHeight()) )
        {
+
          mouse_x=x;
          mouse_y=y;
 
          if ( event.LeftIsDown()==1 )
            {
+              if (addingPoint)
+              {
+               ListCtrlPoints->Hide();
+               wxString txt; txt<<wxT("2d");
+               long tmp = ListCtrlPoints->InsertItem(0,txt);
+               fprintf(stderr,"Inserting item %lu \n",tmp);
+                //ListCtrlPoints->SetItemData(tmp, i);
+                //ListCtrlPoints->SetItemData(tmp, i);
+               txt.clear(); txt<<x;
+                ListCtrlPoints->SetItem(tmp, 0, txt);
+               txt.clear(); txt<<y;
+                ListCtrlPoints->SetItem(tmp, 1, txt);
+
+               ListCtrlPoints->Show();
+               addingPoint=0;
+              }
+
               float x,y,z;
               if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z) )
               {
@@ -852,4 +894,41 @@ void EditorFrame::OnButtonGetExtrinsics(wxCommandEvent& event)
   extrinsicsSelector->ShowModal();
 
    delete  extrinsicsSelector;
+}
+
+void EditorFrame::OnButtonAddClick(wxCommandEvent& event)
+{
+  addingPoint=1;
+
+}
+
+
+
+
+long getItemIndex(wxListCtrl * lstctrl)
+{
+  unsigned int itemsNumber =0;
+  long itemIndex = -1;
+
+  for (;;)
+   {
+      itemIndex = lstctrl->GetNextItem(itemIndex, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+      if (itemIndex == -1) break;
+      // Got the selected item index
+
+      wxLogDebug(lstctrl->GetItemText(itemIndex));
+      ++itemsNumber;
+
+      if (itemsNumber>512) { return 0; }
+  }
+
+  return itemIndex;
+}
+
+
+void EditorFrame::OnButtonRemoveClick(wxCommandEvent& event)
+{
+  long i = getItemIndex(ListCtrlPoints); // ListCtrlPoints->GetSelectedItemCount();
+
+  fprintf(stderr,"List Active %lu \n",i);
 }
