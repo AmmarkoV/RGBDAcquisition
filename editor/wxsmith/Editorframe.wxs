@@ -80,21 +80,36 @@
 			<handler function="OnButtonAcquisitionGraphClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxListCtrl" name="ID_LISTCTRL1" variable="ListCtrlPoints" member="yes">
-			<pos>1320,56</pos>
-			<size>152,408</size>
+			<pos>1320,24</pos>
+			<size>152,168</size>
 			<style>wxLC_REPORT|wxLC_SINGLE_SEL|wxRAISED_BORDER|wxVSCROLL</style>
 		</object>
 		<object class="wxButton" name="ID_BUTTON9" variable="ButtonAdd" member="yes">
 			<label>+</label>
-			<pos>1320,464</pos>
+			<pos>1320,192</pos>
 			<size>40,29</size>
 			<handler function="OnButtonAddClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON10" variable="ButtonRemove" member="yes">
 			<label>-</label>
-			<pos>1368,464</pos>
+			<pos>1360,192</pos>
 			<size>40,29</size>
 			<handler function="OnButtonRemoveClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON11" variable="ButtonExecute" member="yes">
+			<label>=</label>
+			<pos>1408,192</pos>
+			<size>64,29</size>
+			<handler function="OnButtonExecuteClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxListCtrl" name="ID_LISTCTRL2" variable="ListCtrl1" member="yes">
+			<pos>1320,240</pos>
+			<size>152,232</size>
+			<style>wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL</style>
+		</object>
+		<object class="wxButton" name="ID_BUTTON12" variable="Button1" member="yes">
+			<label>Remove</label>
+			<pos>1320,472</pos>
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">

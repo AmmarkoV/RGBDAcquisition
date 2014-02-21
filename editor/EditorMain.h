@@ -72,6 +72,7 @@ class EditorFrame: public wxFrame
         void OnButtonAcquisitionGraphClick(wxCommandEvent& event);
         void OnButtonAddClick(wxCommandEvent& event);
         void OnButtonRemoveClick(wxCommandEvent& event);
+        void OnButtonExecuteClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -93,6 +94,9 @@ class EditorFrame: public wxFrame
         static const long ID_LISTCTRL1;
         static const long ID_BUTTON9;
         static const long ID_BUTTON10;
+        static const long ID_BUTTON11;
+        static const long ID_LISTCTRL2;
+        static const long ID_BUTTON12;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEDEPTH;
         static const long ID_MENUSAVEPCD;
@@ -105,10 +109,12 @@ class EditorFrame: public wxFrame
         //*)
 
         //(*Declarations(EditorFrame)
+        wxButton* ButtonExecute;
         wxButton* buttonNextFrame;
         wxStatusBar* Status;
         wxStaticText* totalFramesLabel;
         wxButton* buttonRecord;
+        wxButton* Button1;
         wxButton* ButtonAdd;
         wxButton* buttonStop;
         wxStaticBox* StaticBox2;
@@ -119,6 +125,7 @@ class EditorFrame: public wxFrame
         wxButton* buttonPreviousFrame;
         wxSlider* FrameSlider;
         wxMenu* Menu4;
+        wxListCtrl* ListCtrl1;
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;
         wxButton* ButtonAcquisitionGraph;

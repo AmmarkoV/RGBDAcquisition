@@ -20,6 +20,7 @@
 #include "SelectTarget.h"
 #include "SelectSegmentation.h"
 #include "GetExtrinsics.h"
+#include "AddNewElement.h"
 
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 unsigned int devID=0;
@@ -114,6 +115,9 @@ const long EditorFrame::ID_BUTTON8 = wxNewId();
 const long EditorFrame::ID_LISTCTRL1 = wxNewId();
 const long EditorFrame::ID_BUTTON9 = wxNewId();
 const long EditorFrame::ID_BUTTON10 = wxNewId();
+const long EditorFrame::ID_BUTTON11 = wxNewId();
+const long EditorFrame::ID_LISTCTRL2 = wxNewId();
+const long EditorFrame::ID_BUTTON12 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
 const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
@@ -160,9 +164,12 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(952,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     buttonRecord = new wxButton(this, ID_BUTTON7, _("Record"), wxPoint(368,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
     ButtonAcquisitionGraph = new wxButton(this, ID_BUTTON8, _("Stream Connections"), wxPoint(1040,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
-    ListCtrlPoints = new wxListCtrl(this, ID_LISTCTRL1, wxPoint(1320,56), wxSize(152,408), wxLC_REPORT|wxLC_SINGLE_SEL|wxRAISED_BORDER|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL1"));
-    ButtonAdd = new wxButton(this, ID_BUTTON9, _("+"), wxPoint(1320,464), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON9"));
-    ButtonRemove = new wxButton(this, ID_BUTTON10, _("-"), wxPoint(1368,464), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON10"));
+    ListCtrlPoints = new wxListCtrl(this, ID_LISTCTRL1, wxPoint(1320,24), wxSize(152,168), wxLC_REPORT|wxLC_SINGLE_SEL|wxRAISED_BORDER|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL1"));
+    ButtonAdd = new wxButton(this, ID_BUTTON9, _("+"), wxPoint(1320,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON9"));
+    ButtonRemove = new wxButton(this, ID_BUTTON10, _("-"), wxPoint(1360,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON10"));
+    ButtonExecute = new wxButton(this, ID_BUTTON11, _("="), wxPoint(1408,192), wxSize(64,29), 0, wxDefaultValidator, _T("ID_BUTTON11"));
+    ListCtrl1 = new wxListCtrl(this, ID_LISTCTRL2, wxPoint(1320,240), wxSize(152,232), wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL2"));
+    Button1 = new wxButton(this, ID_BUTTON12, _("Remove"), wxPoint(1320,472), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -207,6 +214,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonAcquisitionGraphClick);
     Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonAddClick);
     Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonRemoveClick);
+    Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonExecuteClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -931,4 +939,11 @@ void EditorFrame::OnButtonRemoveClick(wxCommandEvent& event)
   long i = getItemIndex(ListCtrlPoints); // ListCtrlPoints->GetSelectedItemCount();
 
   fprintf(stderr,"List Active %lu \n",i);
+}
+
+void EditorFrame::OnButtonExecuteClick(wxCommandEvent& event)
+{
+    AddNewElement * ane  = new AddNewElement(this, wxID_ANY);
+      ane->ShowModal();
+    delete  ane;
 }

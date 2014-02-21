@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="AddNewElement">
+		<title>New Element</title>
+		<pos_arg>1</pos_arg>
+		<size_arg>1</size_arg>
+		<object class="wxButton" name="ID_BUTTON1" variable="ButtonAdd" member="yes">
+			<label>Add</label>
+			<pos>16,384</pos>
+			<size>248,29</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+			<label>Label</label>
+			<pos>24,24</pos>
+		</object>
+		<object class="wxButton" name="ID_BUTTON2" variable="ButtonCancel" member="yes">
+			<label>Cancel</label>
+			<pos>296,384</pos>
+		</object>
+	</object>
+</wxsmith>
