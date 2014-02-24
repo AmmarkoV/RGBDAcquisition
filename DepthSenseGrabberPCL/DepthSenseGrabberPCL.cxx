@@ -104,11 +104,12 @@ const int widthColor = widthNHD, heightColor = heightNHD, nPixelsColorAcq = nPix
 uint8_t* pixelsColorAcq = pixelsColorAcqNHD;
 float* pixelsDepthSync = pixelsDepthSyncNHD;
 */
-
-const float noDepthDefault = 10.0;
-const float noDepthThreshold = 10.0;
+const float noDepthDefault = std::numeric_limits<float>::quiet_NaN();
+const float noDepthMin = 0.001;
+const float noDepthMax = 2.000;
 
 uint8_t noDepthBGR[3] = {255,255,255};
+uint8_t defaultBGR[3] = {255,255,255};
 
 
 int colorPixelInd, colorPixelRow, colorPixelCol;
@@ -211,15 +212,15 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     {
         pixelsDepthSyncQVGA[currentPixelInd] = noDepthDefault;
         uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
-        if (data.depthMapFloatingPoint[currentPixelInd] < noDepthThreshold)
+        if (data.depthMapFloatingPoint[currentPixelInd] < noDepthMax && data.depthMapFloatingPoint[currentPixelInd] > noDepthMin)
             pixelsDepthAcq[currentPixelInd] = data.depthMapFloatingPoint[currentPixelInd];
         else
             pixelsDepthAcq[currentPixelInd] = noDepthDefault;
         if (interpolateDepthFlag == 0)
         {
-            pixelsColorSyncQVGA[3*currentPixelInd] = noDepthBGR[2];
-            pixelsColorSyncQVGA[3*currentPixelInd+1] = noDepthBGR[1];
-            pixelsColorSyncQVGA[3*currentPixelInd+2] = noDepthBGR[0];
+            pixelsColorSyncQVGA[3*currentPixelInd] = defaultBGR[2];
+            pixelsColorSyncQVGA[3*currentPixelInd+1] = defaultBGR[1];
+            pixelsColorSyncQVGA[3*currentPixelInd+2] = defaultBGR[0];
         }
     }
 
@@ -231,9 +232,9 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         {
             uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
             if (colorPixelInd == -1) {
-                pixelsColorSyncVGA[3*currentPixelInd] = noDepthBGR[2];
-                pixelsColorSyncVGA[3*currentPixelInd+1] = noDepthBGR[1];
-                pixelsColorSyncVGA[3*currentPixelInd+2] = noDepthBGR[0];
+                pixelsColorSyncVGA[3*currentPixelInd] = defaultBGR[2];
+                pixelsColorSyncVGA[3*currentPixelInd+1] = defaultBGR[1];
+                pixelsColorSyncVGA[3*currentPixelInd+2] = defaultBGR[0];
             }
             else
             {
