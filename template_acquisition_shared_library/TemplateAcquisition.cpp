@@ -142,9 +142,10 @@ unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *w
         *width=0; *height=0; *timestamp=0;
         unsigned int bytesPerPixel=0;
         unsigned int channels=0;
-        char buf[PPMREADBUFLEN], *t;
+        char buf[PPMREADBUFLEN]={0};
+        char *t;
         unsigned int w=0, h=0, d=0;
-        int r=0;
+        int r=0 , z=0;
 
         t = fgets(buf, PPMREADBUFLEN, pf);
         if (t == 0) { return buffer; }
@@ -166,15 +167,34 @@ unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *w
 
            if ( t == 0 ) { fclose(pf); return buffer; }
         } while ( strncmp(buf, "#", 1) == 0 );
-        r = sscanf(buf, "%u %u", &w, &h);
-        if ( r < 2 ) { fclose(pf); fprintf(stderr,"Incoherent dimensions received %ux%u \n",w,h); return buffer; }
+        z = sscanf(buf, "%u %u", &w, &h);
+        if ( z < 2 ) { fclose(pf); fprintf(stderr,"Incoherent dimensions received %ux%u \n",w,h); return buffer; }
         // The program fails if the first byte of the image is equal to 32. because
         // the fscanf eats the space and the image is read with some bit less
         r = fscanf(pf, "%u\n", &d);
         if (r < 1) { fprintf(stderr,"Could not understand how many bytesPerPixel there are on this image\n"); fclose(pf); return buffer; }
         if (d==255) { bytesPerPixel=1; }  else
         if (d==65535) { bytesPerPixel=2; } else
-                        { fprintf(stderr,"Incoherent payload received %u bits per pixel \n",d); fclose(pf); return buffer; }
+                       { fprintf(stderr,"Incoherent payload received %u bits per pixel \n",d); fclose(pf); return buffer; }
+
+
+        //This is a super ninja hackish patch that fixes the case where fscanf eats one character more on the stream
+        //It could be done better  ( no need to fseek ) but this will have to do for now
+        //Scan for border case
+           unsigned long startOfBinaryPart = ftell(pf);
+           if ( fseek (pf , 0 , SEEK_END)!=0 ) { fprintf(stderr,"Could not find file size to cache client..!\nUnable to serve client\n"); fclose(pf); return 0; }
+           unsigned long totalFileSize = ftell (pf); //lSize now holds the size of the file..
+
+           fprintf(stderr,"totalFileSize-startOfBinaryPart = %u \n",totalFileSize-startOfBinaryPart);
+           fprintf(stderr,"bytesPerPixel*channels*w*h = %u \n",bytesPerPixel*channels*w*h);
+           if (totalFileSize-startOfBinaryPart < bytesPerPixel*channels*w*h )
+           {
+              fprintf(stderr," Detected Border Case\n\n\n");
+              startOfBinaryPart-=1;
+           }
+           if ( fseek (pf , startOfBinaryPart , SEEK_SET)!=0 ) { fprintf(stderr,"Could not find file size to cache client..!\nUnable to serve client\n"); fclose(pf); return 0; }
+         //-----------------------
+         //----------------------
 
         *width=w; *height=h;
         if (pixels==0) {  pixels= (unsigned char*) malloc(w*h*bytesPerPixel*channels*sizeof(char)); }

@@ -9,6 +9,7 @@
 			<label>Add</label>
 			<pos>16,384</pos>
 			<size>248,29</size>
+			<handler function="OnButtonAddClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 			<label>Label</label>

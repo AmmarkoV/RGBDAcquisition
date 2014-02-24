@@ -43,6 +43,8 @@
 			<Add library="./libAcquisition.so" />
 			<Add library="../acquisitionSegment/libacquisitionSegment.a" />
 		</Linker>
+		<Unit filename="AddNewElement.cpp" />
+		<Unit filename="AddNewElement.h" />
 		<Unit filename="EditorApp.cpp" />
 		<Unit filename="EditorApp.h" />
 		<Unit filename="EditorMain.cpp" />
@@ -63,6 +65,7 @@
 		<Unit filename="SelectTarget.h" />
 		<Unit filename="Tools.cpp" />
 		<Unit filename="Tools.h" />
+		<Unit filename="wxsmith/AddNewElement.wxs" />
 		<Unit filename="wxsmith/Editorframe.wxs" />
 		<Unit filename="wxsmith/GetExtrinsics.wxs" />
 		<Unit filename="wxsmith/SelectAcquisitionGraph.wxs" />
@@ -83,6 +86,7 @@
 					<wxDialog wxs="wxsmith/SelectAcquisitionGraph.wxs" src="SelectAcquisitionGraph.cpp" hdr="SelectAcquisitionGraph.h" fwddecl="0" i18n="1" name="SelectAcquisitionGraph" language="CPP" />
 					<wxDialog wxs="wxsmith/SelectTarget.wxs" src="SelectTarget.cpp" hdr="SelectTarget.h" fwddecl="0" i18n="1" name="SelectTarget" language="CPP" />
 					<wxDialog wxs="wxsmith/GetExtrinsics.wxs" src="GetExtrinsics.cpp" hdr="GetExtrinsics.h" fwddecl="0" i18n="1" name="GetExtrinsics" language="CPP" />
+					<wxDialog wxs="wxsmith/AddNewElement.wxs" src="AddNewElement.cpp" hdr="AddNewElement.h" fwddecl="0" i18n="1" name="AddNewElement" language="CPP" />
 				</resources>
 			</wxsmith>
 			<debugger />

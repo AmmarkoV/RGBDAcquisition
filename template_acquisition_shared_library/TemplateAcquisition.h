@@ -2,7 +2,7 @@
  *  @brief The plugin module that provides acquisition from Templates ( i.e. Prerecorded datasets )
  *
  *  @author Ammar Qammaz (AmmarkoV)
- *  @bug This is not yet thread safe
+ *  @bug There is a weird bug with color frames when fscanf eats one more character than what it should , this is resolved using consequent fseek calls but it could be handled better
  */
 
 #ifndef TEMPLATEACQUISITION_H_INCLUDED
