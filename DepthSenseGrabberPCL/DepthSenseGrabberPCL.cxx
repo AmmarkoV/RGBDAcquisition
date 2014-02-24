@@ -55,26 +55,26 @@ const int nPixelsWXGA = widthWXGA*heightWXGA;
 const int nPixelsNHD = widthNHD*heightNHD;
 
 // Acquired data
-uint16_t pixelsDepthAcqQVGA[nPixelsQVGA];
+float pixelsDepthAcqQVGA[nPixelsQVGA];
 uint8_t pixelsColorAcqVGA[3*nPixelsVGA];
 uint8_t pixelsColorAcqWXGA[3*nPixelsWXGA];
 uint8_t pixelsColorAcqNHD[3*nPixelsNHD];
 
 // UVmap-processed frames
 uint8_t pixelsColorSyncQVGA[3*nPixelsQVGA];
-uint16_t pixelsDepthSyncQVGA[nPixelsQVGA];
-uint16_t pixelsDepthSyncVGA[nPixelsVGA];
-uint16_t pixelsDepthSyncWXGA[nPixelsWXGA];
-uint16_t pixelsDepthSyncNHD[nPixelsNHD];
+float pixelsDepthSyncQVGA[nPixelsQVGA];
+float pixelsDepthSyncVGA[nPixelsVGA];
+float pixelsDepthSyncWXGA[nPixelsWXGA];
+float pixelsDepthSyncNHD[nPixelsNHD];
 
 // Interpolated frames
 uint8_t pixelsColorSyncVGA[3*nPixelsVGA];
-uint16_t pixelsDepthAcqVGA[nPixelsVGA];
+float pixelsDepthAcqVGA[nPixelsVGA];
 
 
 FrameFormat frameFormatDepth = FRAME_FORMAT_QVGA; // Depth QVGA
 const int nPixelsDepthAcq = nPixelsQVGA;
-uint16_t* pixelsDepthAcq = pixelsDepthAcqQVGA;
+float* pixelsDepthAcq = pixelsDepthAcqQVGA;
 
 
 float depthToPosMatXQVGA[nPixelsQVGA];
@@ -87,14 +87,14 @@ float depthToPosMatYVGA[nPixelsVGA];
 FrameFormat frameFormatColor = FRAME_FORMAT_VGA;
 const int widthColor = widthVGA, heightColor = heightVGA, nPixelsColorAcq = nPixelsVGA;
 uint8_t* pixelsColorAcq = pixelsColorAcqVGA;
-uint16_t* pixelsDepthSync = pixelsDepthSyncVGA;
+float* pixelsDepthSync = pixelsDepthSyncVGA;
 
 /*
 // Color WXGA
 FrameFormat frameFormatColor = FRAME_FORMAT_WXGA_H;
 const int widthColor = widthWXGA, heightColor = heightWXGA, nPixelsColorAcq = nPixelsWXGA;
 uint8_t* pixelsColorAcq = pixelsColorAcqWXGA;
-uint16_t* pixelsDepthSync = pixelsDepthSyncWXGA;
+float* pixelsDepthSync = pixelsDepthSyncWXGA;
 */
 
 /*
@@ -102,11 +102,11 @@ uint16_t* pixelsDepthSync = pixelsDepthSyncWXGA;
 FrameFormat frameFormatColor = FRAME_FORMAT_NHD;
 const int widthColor = widthNHD, heightColor = heightNHD, nPixelsColorAcq = nPixelsNHD;
 uint8_t* pixelsColorAcq = pixelsColorAcqNHD;
-uint16_t* pixelsDepthSync = pixelsDepthSyncNHD;
+float* pixelsDepthSync = pixelsDepthSyncNHD;
 */
 
-const uint16_t noDepthDefault = 65535;
-const uint16_t noDepthThreshold = 2000;
+const float noDepthDefault = 10.0;
+const float noDepthThreshold = 10.0;
 
 uint8_t noDepthBGR[3] = {255,255,255};
 
@@ -211,8 +211,8 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     {
         pixelsDepthSyncQVGA[currentPixelInd] = noDepthDefault;
         uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
-        if (data.depthMap[currentPixelInd] < noDepthThreshold)
-            pixelsDepthAcq[currentPixelInd] = data.depthMap[currentPixelInd];
+        if (data.depthMapFloatingPoint[currentPixelInd] < noDepthThreshold)
+            pixelsDepthAcq[currentPixelInd] = data.depthMapFloatingPoint[currentPixelInd];
         else
             pixelsDepthAcq[currentPixelInd] = noDepthDefault;
         if (interpolateDepthFlag == 0)
@@ -225,8 +225,8 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     if (interpolateDepthFlag)
     {
-        rescaleDepth(pixelsDepthAcq, pixelsDepthAcqVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
-        rescaleUV(uvMapAcq, uvMapVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
+        rescaleMap(pixelsDepthAcq, pixelsDepthAcqVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
+        rescaleMap(uvMapAcq, uvMapVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
         for (int currentPixelInd = 0; currentPixelInd < nPixelsVGA; currentPixelInd++)
         {
             uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
@@ -273,7 +273,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
         for (int currentPixelInd = 0; currentPixelInd < cloud.points.size (); currentPixelInd++)
         {
-            cloud.points[currentPixelInd].z = (float) pixelsDepthAcqVGA[currentPixelInd];
+            cloud.points[currentPixelInd].z = pixelsDepthAcqVGA[currentPixelInd];
             cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXVGA[currentPixelInd];
             cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYVGA[currentPixelInd];
             cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncVGA[3*currentPixelInd]);
@@ -288,7 +288,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
         for (int currentPixelInd = 0; currentPixelInd < cloud.points.size (); currentPixelInd++)
         {
-            cloud.points[currentPixelInd].z = (float) pixelsDepthAcqQVGA[currentPixelInd];
+            cloud.points[currentPixelInd].z = pixelsDepthAcqQVGA[currentPixelInd];
             cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXQVGA[currentPixelInd];
             cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYQVGA[currentPixelInd];
             cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncQVGA[3*currentPixelInd]);
@@ -362,7 +362,7 @@ void configureDepthNode()
     config.mode = DepthNode::CAMERA_MODE_CLOSE_MODE;
     config.saturation = true;
 
-    g_dnode.setEnableDepthMap(true);
+    g_dnode.setEnableDepthMapFloatingPoint(true);
     g_dnode.setEnableUvMap(true);
 
     try

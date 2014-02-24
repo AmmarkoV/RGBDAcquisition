@@ -145,8 +145,44 @@ void floatSizeUV(UV* src, UV* dst, int srcWidth, int srcHeight) {
         }
 }
 
+void rescaleMap(float* src, float* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
 
-void rescaleDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+    float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
+    float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
+
+    for (int x=0;x<dstWidth;x++)
+    {
+        float fx=x*stepWidth;
+        float dx=fx-(int)fx;
+        int ffx = floor(fx);
+        int cfx = ceil(fx);
+        for (int y=0;y<dstHeight;y++)
+        {
+            float fy=y*stepHeight;
+            float dy=fy-(int)fy;
+            int ffy = floor(fy);
+            int cfy = ceil(fy);
+
+            float val1, val2, val3, val4;
+            val1 = src[ffx + ffy*srcWidth];
+            val2 = src[cfx + ffy*srcWidth];
+            val3 = src[ffx + cfy*srcWidth];
+            val4 = src[cfx + cfy*srcWidth];
+
+            float valT1 = dx*val2 + (1-dx)*val1;
+            float valT2 = dx*val4 + (1-dx)*val3;
+
+            float val = dy*valT2 + (1-dy)*valT1;
+
+            dst[x + y*dstWidth] = val;
+        }
+    }
+}
+
+
+
+
+void rescaleMap(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
 
     float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
     float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
@@ -182,7 +218,7 @@ void rescaleDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight, int
 
 
 
-void rescaleUV(UV* src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+void rescaleMap(UV* src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
 
     float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
     float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
