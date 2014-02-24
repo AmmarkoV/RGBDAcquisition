@@ -25,7 +25,7 @@ using namespace std;
 int waitSecondsBeforeGrab = 0;
 
 bool usingUSB30Flag = true;
-bool interpolateDepthFlag = 1;
+bool interpolateDepthFlag = 0;
 
 bool dispColorAcqFlag = 0;
 bool dispDepthAcqFlag = 0;
@@ -55,6 +55,7 @@ const int nPixelsWXGA = widthWXGA*heightWXGA;
 const int nPixelsNHD = widthNHD*heightNHD;
 
 // Acquired data
+FPVertex* verticesAcqQVGA[nPixelsQVGA];
 float pixelsDepthAcqQVGA[nPixelsQVGA];
 uint8_t pixelsColorAcqVGA[3*nPixelsVGA];
 uint8_t pixelsColorAcqWXGA[3*nPixelsWXGA];
@@ -70,6 +71,7 @@ float pixelsDepthSyncNHD[nPixelsNHD];
 // Interpolated frames
 uint8_t pixelsColorSyncVGA[3*nPixelsVGA];
 float pixelsDepthAcqVGA[nPixelsVGA];
+FPVertex* verticesAcqVGA[nPixelsVGA];
 
 
 FrameFormat frameFormatDepth = FRAME_FORMAT_QVGA; // Depth QVGA
@@ -212,6 +214,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     {
         pixelsDepthSyncQVGA[currentPixelInd] = noDepthDefault;
         uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
+        verticesAcqQVGA[currentPixelInd] = data.verticesFloatingPoint[currentPixelInd];
         if (data.depthMapFloatingPoint[currentPixelInd] < noDepthMax && data.depthMapFloatingPoint[currentPixelInd] > noDepthMin)
             pixelsDepthAcq[currentPixelInd] = data.depthMapFloatingPoint[currentPixelInd];
         else
@@ -228,6 +231,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     {
         rescaleMap(pixelsDepthAcq, pixelsDepthAcqVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
         rescaleMap(uvMapAcq, uvMapVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
+        rescaleMap(verticesAcqQVGA, verticesAcqVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
         for (int currentPixelInd = 0; currentPixelInd < nPixelsVGA; currentPixelInd++)
         {
             uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
@@ -289,9 +293,12 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
         for (int currentPixelInd = 0; currentPixelInd < cloud.points.size (); currentPixelInd++)
         {
-            cloud.points[currentPixelInd].z = pixelsDepthAcqQVGA[currentPixelInd];
-            cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXQVGA[currentPixelInd];
-            cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYQVGA[currentPixelInd];
+            cloud.points[currentPixelInd].x = data.verticesFloatingPoint[currentPixelInd].x;
+            cloud.points[currentPixelInd].y = data.verticesFloatingPoint[currentPixelInd].y;
+            cloud.points[currentPixelInd].z = data.verticesFloatingPoint[currentPixelInd].z;
+            //cloud.points[currentPixelInd].z = pixelsDepthAcqQVGA[currentPixelInd];
+            //cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXQVGA[currentPixelInd];
+            //cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYQVGA[currentPixelInd];
             cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncQVGA[3*currentPixelInd]);
         }
         //for (size_t i = 0; i < cloud.points.size (); ++i)
@@ -365,6 +372,7 @@ void configureDepthNode()
 
     g_dnode.setEnableDepthMapFloatingPoint(true);
     g_dnode.setEnableUvMap(true);
+    g_dnode.setEnableVerticesFloatingPoint(true);
 
     try
     {
