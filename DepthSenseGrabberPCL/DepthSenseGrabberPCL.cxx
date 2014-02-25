@@ -175,7 +175,6 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
     for (int currentPixelInd = 0; currentPixelInd < nPixelsColorAcq; currentPixelInd++)
     {
         // Reinitialize synchronized depth
-        pixelsDepthSync[currentPixelInd] = noDepthDefault;
         pixelsColorAcq[3*currentPixelInd] = data.colorMap[3*currentPixelInd+2];
         pixelsColorAcq[3*currentPixelInd+1] = data.colorMap[3*currentPixelInd+1];
         pixelsColorAcq[3*currentPixelInd+2] = data.colorMap[3*currentPixelInd];
@@ -198,7 +197,6 @@ The depth map in floating point format. This map represents the cartesian depth 
 each pixel, expressed in meters. Saturated pixels are given the special value -2.0.
 */
 
-float testFloat;
 
 void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
@@ -208,13 +206,15 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     // Initialize raw depth and UV maps
     for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthAcq; currentPixelInd++)
     {
-        pixelsDepthSyncQVGA[currentPixelInd] = noDepthDefault;
         uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
-        verticesAcqQVGA[currentPixelInd] = data.verticesFloatingPoint[currentPixelInd];
-        if (data.depthMapFloatingPoint[currentPixelInd] < noDepthMax && data.depthMapFloatingPoint[currentPixelInd] > noDepthMin)
-            pixelsDepthAcq[currentPixelInd] = data.depthMapFloatingPoint[currentPixelInd];
-        else
-            pixelsDepthAcq[currentPixelInd] = noDepthDefault;
+        if (data.verticesFloatingPoint[currentPixelInd].z < noDepthMax && data.verticesFloatingPoint[currentPixelInd].z > noDepthMin) {
+            //pixelsDepthAcq[currentPixelInd] = data.depthMapFloatingPoint[currentPixelInd];
+            verticesAcqQVGA[currentPixelInd] = data.verticesFloatingPoint[currentPixelInd];
+        }
+        else {
+            //pixelsDepthAcq[currentPixelInd] = noDepthDefault;
+            verticesAcqQVGA[currentPixelInd] = FPVertex(noDepthDefault,noDepthDefault,noDepthDefault);
+        }
         if (interpolateDepthFlag == 0)
         {
             pixelsColorSyncQVGA[3*currentPixelInd] = defaultBGR[2];
@@ -225,7 +225,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     if (interpolateDepthFlag)
     {
-        rescaleMap(pixelsDepthAcq, pixelsDepthAcqVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
+        //rescaleMap(pixelsDepthAcq, pixelsDepthAcqVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
         rescaleMap(uvMapAcq, uvMapVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
         rescaleMap(verticesAcqQVGA, verticesAcqVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
         for (int currentPixelInd = 0; currentPixelInd < nPixelsVGA; currentPixelInd++)
@@ -366,7 +366,7 @@ void configureDepthNode()
     config.mode = DepthNode::CAMERA_MODE_CLOSE_MODE;
     config.saturation = true;
 
-    g_dnode.setEnableDepthMapFloatingPoint(true);
+    //g_dnode.setEnableDepthMapFloatingPoint(true);
     g_dnode.setEnableUvMap(true);
     g_dnode.setEnableVerticesFloatingPoint(true);
 
