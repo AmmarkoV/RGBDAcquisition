@@ -24,6 +24,7 @@ bool usingUSB30Flag = true; // if the camera is plugged on a USB 3.0 port
 
 int waitSecondsBeforeGrab = 0;
 int divideConfidencePixels = 10;
+const int16_t confidenceThreshold = 60;
 
 bool interpolateDepthFlag = 1;
 
@@ -195,7 +196,8 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         if (saveConfidenceFlag) pixelsConfidenceQVGA[currentPixelInd] = data.confidenceMap[currentPixelInd]/divideConfidencePixels;
         pixelsDepthSyncQVGA[currentPixelInd] = noDepthDefault;
         uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
-        if (data.depthMap[currentPixelInd] < noDepthThreshold)
+        //if (data.depthMap[currentPixelInd] < noDepthThreshold)
+        if (data.confidenceMap[currentPixelInd] > confidenceThreshold)
             pixelsDepthAcq[currentPixelInd] = data.depthMap[currentPixelInd];
         else
             pixelsDepthAcq[currentPixelInd] = noDepthDefault;
@@ -324,7 +326,7 @@ void configureDepthNode()
 
     g_dnode.setEnableDepthMap(true);
     g_dnode.setEnableUvMap(true);
-    if (saveConfidenceFlag) g_dnode.setEnableConfidenceMap(true);
+    g_dnode.setEnableConfidenceMap(true);
 
     try
     {

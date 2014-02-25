@@ -654,7 +654,6 @@ public:
   run ()
   {
     //pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
-	//pcl::Grabber* interface = new pcl::PCDGrabber<pcl::PointXYZRGBA> ("/home/thp/Documents/Programmation/sandbox/Vision/DepthSenseGrabber/DepthSenseGrabberPCL/build/frames.tar",30,1);
 
     std::vector<std::string> pcd_files;
 	char path[20] = "frames";
@@ -690,7 +689,7 @@ public:
 
 
 
-	pcl::Grabber* interface = new pcl::PCDGrabber<pcl::PointXYZRGBA> (pcd_files,5,true);
+	pcl::Grabber* interface = new pcl::PCDGrabber<pcl::PointXYZRGBA> (pcd_files,10,true);
     boost::function<void (const CloudConstPtr&)> f =
       boost::bind (&OpenNISegmentTracking::cloud_cb, this, _1);
     interface->registerCallback (f);

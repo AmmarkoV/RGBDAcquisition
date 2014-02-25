@@ -25,7 +25,7 @@ using namespace std;
 int waitSecondsBeforeGrab = 0;
 
 bool usingUSB30Flag = true;
-bool interpolateDepthFlag = 0;
+bool interpolateDepthFlag = 1;
 
 bool dispColorAcqFlag = 0;
 bool dispDepthAcqFlag = 0;
@@ -109,6 +109,7 @@ float* pixelsDepthSync = pixelsDepthSyncNHD;
 const float noDepthDefault = std::numeric_limits<float>::quiet_NaN();
 const float noDepthMin = 0.001;
 const float noDepthMax = 2.000;
+const int16_t confidenceThreshold = 60;
 
 uint8_t noDepthBGR[3] = {255,255,255};
 uint8_t defaultBGR[3] = {255,255,255};
@@ -207,7 +208,8 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthAcq; currentPixelInd++)
     {
         uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
-        if (data.verticesFloatingPoint[currentPixelInd].z < noDepthMax && data.verticesFloatingPoint[currentPixelInd].z > noDepthMin) {
+        //if (data.confidenceMap[currentPixelInd] > confidenceThreshold && data.verticesFloatingPoint[currentPixelInd].z < noDepthMax && data.verticesFloatingPoint[currentPixelInd].z > noDepthMin) {
+        if (data.confidenceMap[currentPixelInd] > confidenceThreshold) {
             //pixelsDepthAcq[currentPixelInd] = data.depthMapFloatingPoint[currentPixelInd];
             verticesAcqQVGA[currentPixelInd] = data.verticesFloatingPoint[currentPixelInd];
         }
@@ -369,6 +371,7 @@ void configureDepthNode()
     //g_dnode.setEnableDepthMapFloatingPoint(true);
     g_dnode.setEnableUvMap(true);
     g_dnode.setEnableVerticesFloatingPoint(true);
+    g_dnode.setEnableConfidenceMap(true);
 
     try
     {
