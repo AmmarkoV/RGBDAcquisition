@@ -25,7 +25,7 @@ using namespace std;
 int waitSecondsBeforeGrab = 0;
 
 bool usingUSB30Flag = true;
-bool interpolateDepthFlag = 0;
+bool interpolateDepthFlag = 1;
 
 bool dispColorAcqFlag = 0;
 bool dispDepthAcqFlag = 0;
@@ -55,7 +55,7 @@ const int nPixelsWXGA = widthWXGA*heightWXGA;
 const int nPixelsNHD = widthNHD*heightNHD;
 
 // Acquired data
-FPVertex* verticesAcqQVGA[nPixelsQVGA];
+FPVertex verticesAcqQVGA[nPixelsQVGA];
 float pixelsDepthAcqQVGA[nPixelsQVGA];
 uint8_t pixelsColorAcqVGA[3*nPixelsVGA];
 uint8_t pixelsColorAcqWXGA[3*nPixelsWXGA];
@@ -71,7 +71,7 @@ float pixelsDepthSyncNHD[nPixelsNHD];
 // Interpolated frames
 uint8_t pixelsColorSyncVGA[3*nPixelsVGA];
 float pixelsDepthAcqVGA[nPixelsVGA];
-FPVertex* verticesAcqVGA[nPixelsVGA];
+FPVertex verticesAcqVGA[nPixelsVGA];
 
 
 FrameFormat frameFormatDepth = FRAME_FORMAT_QVGA; // Depth QVGA
@@ -198,16 +198,12 @@ The depth map in floating point format. This map represents the cartesian depth 
 each pixel, expressed in meters. Saturated pixels are given the special value -2.0.
 */
 
+float testFloat;
+
 void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
     timeStamp = (int) (((float)(1000*(clock()-clockStartGrab)))/CLOCKS_PER_SEC);
 
-    /*
-    for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthVGA; currentPixelInd++)
-    {
-        pixelsDepthSyncWXGA[currentPixelInd] = noDepthDefault;
-    }
-    */
 
     // Initialize raw depth and UV maps
     for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthAcq; currentPixelInd++)
@@ -242,7 +238,6 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
             }
             else
             {
-                pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd];
                 pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
                 pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
                 pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
@@ -255,7 +250,6 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         {
             uvToColorPixelInd(uvMapAcq[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
             if (colorPixelInd != -1) {
-                pixelsDepthSync[colorPixelInd] = pixelsDepthAcq[currentPixelInd];
                 pixelsColorSyncQVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
                 pixelsColorSyncQVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
                 pixelsColorSyncQVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
@@ -278,9 +272,15 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
         for (int currentPixelInd = 0; currentPixelInd < cloud.points.size (); currentPixelInd++)
         {
+            cloud.points[currentPixelInd].x = verticesAcqVGA[currentPixelInd].x;
+            cloud.points[currentPixelInd].y = verticesAcqVGA[currentPixelInd].y;
+            cloud.points[currentPixelInd].z = verticesAcqVGA[currentPixelInd].z;
+            /*
+            // For future reference: cloud points can also be computed using the camera's FoV
             cloud.points[currentPixelInd].z = pixelsDepthAcqVGA[currentPixelInd];
             cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXVGA[currentPixelInd];
             cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYVGA[currentPixelInd];
+            */
             cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncVGA[3*currentPixelInd]);
         }
     }
@@ -293,21 +293,17 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
         for (int currentPixelInd = 0; currentPixelInd < cloud.points.size (); currentPixelInd++)
         {
-            cloud.points[currentPixelInd].x = data.verticesFloatingPoint[currentPixelInd].x;
-            cloud.points[currentPixelInd].y = data.verticesFloatingPoint[currentPixelInd].y;
-            cloud.points[currentPixelInd].z = data.verticesFloatingPoint[currentPixelInd].z;
-            //cloud.points[currentPixelInd].z = pixelsDepthAcqQVGA[currentPixelInd];
-            //cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXQVGA[currentPixelInd];
-            //cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYQVGA[currentPixelInd];
+            cloud.points[currentPixelInd].x = verticesAcqQVGA[currentPixelInd].x;
+            cloud.points[currentPixelInd].y = verticesAcqQVGA[currentPixelInd].y;
+            cloud.points[currentPixelInd].z = verticesAcqQVGA[currentPixelInd].z;
+            /*
+            // For future reference: cloud points can also be computed using the camera's FoV
+            cloud.points[currentPixelInd].z = pixelsDepthAcqQVGA[currentPixelInd];
+            cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXQVGA[currentPixelInd];
+            cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYQVGA[currentPixelInd];
+            */
             cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncQVGA[3*currentPixelInd]);
         }
-        //for (size_t i = 0; i < cloud.points.size (); ++i)
-        //{
-        //    cloud.points[i].z = ((float) pixelsDepthAcqQVGA[i]);
-        //    cloud.points[i].x = cloud.points[i].z*depthToPosMatXQVGA[i];
-        //    cloud.points[i].y = cloud.points[i].z*depthToPosMatYQVGA[i];
-        //    cloud.points[i].rgb = packRGB(&pixelsColorSyncQVGA[3*i]);
-        //}
 
 
     }

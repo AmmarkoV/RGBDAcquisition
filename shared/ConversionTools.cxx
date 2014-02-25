@@ -180,6 +180,58 @@ void rescaleMap(float* src, float* dst, int srcWidth, int srcHeight, int dstWidt
 }
 
 
+void rescaleMap(FPVertex* src, FPVertex* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+
+    float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
+    float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
+
+    for (int x=0;x<dstWidth;x++)
+    {
+        float fx=x*stepWidth;
+        float dx=fx-(int)fx;
+        int ffx = floor(fx);
+        int cfx = ceil(fx);
+        for (int y=0;y<dstHeight;y++)
+        {
+            float fy=y*stepHeight;
+            float dy=fy-(int)fy;
+            int ffy = floor(fy);
+            int cfy = ceil(fy);
+
+            float val1x, val2x, val3x, val4x;
+            val1x = src[ffx + ffy*srcWidth].x;
+            val2x = src[cfx + ffy*srcWidth].x;
+            val3x = src[ffx + cfy*srcWidth].x;
+            val4x = src[cfx + cfy*srcWidth].x;
+            float valT1x = dx*val2x + (1-dx)*val1x;
+            float valT2x = dx*val4x + (1-dx)*val3x;
+            float valx = dy*valT2x + (1-dy)*valT1x;
+
+            float val1y, val2y, val3y, val4y;
+            val1y = src[ffx + ffy*srcWidth].y;
+            val2y = src[cfx + ffy*srcWidth].y;
+            val3y = src[ffx + cfy*srcWidth].y;
+            val4y = src[cfx + cfy*srcWidth].y;
+            float valT1y = dx*val2y + (1-dx)*val1y;
+            float valT2y = dx*val4y + (1-dx)*val3y;
+            float valy = dy*valT2y + (1-dy)*valT1y;
+
+            float val1z, val2z, val3z, val4z;
+            val1z = src[ffx + ffy*srcWidth].z;
+            val2z = src[cfx + ffy*srcWidth].z;
+            val3z = src[ffx + cfy*srcWidth].z;
+            val4z = src[cfx + cfy*srcWidth].z;
+            float valT1z = dx*val2z + (1-dx)*val1z;
+            float valT2z = dx*val4z + (1-dx)*val3z;
+            float valz = dy*valT2z + (1-dy)*valT1z;
+
+            dst[x + y*dstWidth] = FPVertex(valx,valy,valz);
+        }
+    }
+}
+
+
+
 
 
 void rescaleMap(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
