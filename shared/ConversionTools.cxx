@@ -37,6 +37,11 @@ float packRGB(uint8_t* rgb) {
     return *reinterpret_cast<float*>(&rgbInt);
 }
 
+int packRGBA(uint8_t* rgb) {
+    int rgbInt = ((uint32_t)rgb[0] << 16 | (uint32_t)rgb[1] << 8 | (uint32_t)rgb[2]);
+    return rgbInt;
+}
+
 void uvToColorPixelInd(UV uv, int widthColor, int heightColor, int* colorPixelInd, int* colorPixelRow, int* colorPixelCol) {
     if(uv.u > 0.001 && uv.u < 0.999 && uv.v > 0.001 && uv.v < 0.999) {
         *colorPixelRow = (int) (uv.v * ((float) heightColor));

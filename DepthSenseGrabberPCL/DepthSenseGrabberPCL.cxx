@@ -25,7 +25,7 @@ using namespace std;
 int waitSecondsBeforeGrab = 0;
 
 bool usingUSB30Flag = true;
-bool interpolateDepthFlag = 1;
+bool interpolateDepthFlag = 0;
 
 bool dispColorAcqFlag = 0;
 bool dispDepthAcqFlag = 0;
@@ -261,7 +261,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
 
 
-    pcl::PointCloud<pcl::PointXYZRGB> cloud;
+    pcl::PointCloud<pcl::PointXYZRGBA> cloud;
 
     if (interpolateDepthFlag) {
         // Fill in the cloud data
@@ -281,7 +281,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
             cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXVGA[currentPixelInd];
             cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYVGA[currentPixelInd];
             */
-            cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncVGA[3*currentPixelInd]);
+            cloud.points[currentPixelInd].rgba = packRGBA(&pixelsColorSyncVGA[3*currentPixelInd]);
         }
     }
     else {
@@ -302,7 +302,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
             cloud.points[currentPixelInd].x = cloud.points[currentPixelInd].z*depthToPosMatXQVGA[currentPixelInd];
             cloud.points[currentPixelInd].y = cloud.points[currentPixelInd].z*depthToPosMatYQVGA[currentPixelInd];
             */
-            cloud.points[currentPixelInd].rgb = packRGB(&pixelsColorSyncQVGA[3*currentPixelInd]);
+            cloud.points[currentPixelInd].rgba = packRGBA(&pixelsColorSyncQVGA[3*currentPixelInd]);
         }
 
 
