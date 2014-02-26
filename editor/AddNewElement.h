@@ -33,6 +33,8 @@ class AddNewElement: public wxDialog
         struct SegmentationFeaturesDepth * segDepth;
         struct SegmentationFeaturesRGB * segRGB;
         wxListCtrl* ListCtrlPoints;
+        unsigned int moduleID;
+        unsigned int devID;
 
 	protected:
 

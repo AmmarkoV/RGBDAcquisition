@@ -31,7 +31,7 @@ class EditorFrame: public wxFrame
         virtual ~EditorFrame();
 
         void onIdle(wxIdleEvent& evt);
-        void guiSnapFrames();
+        void guiSnapFrames(int doSnap);
         int  removeOldSegmentedFrames();
         int  refreshSegmentedFrame();
 

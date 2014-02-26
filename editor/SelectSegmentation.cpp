@@ -295,6 +295,9 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
     if (this->bboxMaxZ->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.bboxZ2 = dValue; }
 
     selectedDepthConf.enableBBox=1;
+   } else
+   {
+    selectedDepthConf.enableBBox=0;
    }
 
    if (CheckBoxPlane->IsChecked())
@@ -312,7 +315,11 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
     if (this->planeP3Z->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[2] = dValue; }
 
     selectedDepthConf.enablePlaneSegmentation=1;
+   } else
+   {
+    selectedDepthConf.enablePlaneSegmentation=0;
    }
+
 
   if (cropDepthX1->GetValue().ToLong(&value)) {  selectedDepthConf.minX = value; }
   if (cropDepthY1->GetValue().ToLong(&value)) {  selectedDepthConf.minY = value; }

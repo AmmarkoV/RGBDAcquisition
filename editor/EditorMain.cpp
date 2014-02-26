@@ -382,7 +382,7 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    initializeRGBSegmentationConfiguration(&segConfRGB,width,height);
    initializeDepthSegmentationConfiguration(&segConfDepth,width,height);
 
-   guiSnapFrames();
+   guiSnapFrames(1);
 
    alreadyInitialized=1;
    //This hangs the window -> guiSnapFrames();
@@ -614,13 +614,14 @@ int  EditorFrame::refreshSegmentedFrame()
 
 
 
-void EditorFrame::guiSnapFrames()
+void EditorFrame::guiSnapFrames(int doSnap)
 {
   this->Freeze();                 // Freeze the window to prevent scrollbar jumping
 
   ++framesSnapped;
   //fprintf(stderr,"guiSnapFrames Called %u ! \n",framesSnapped);
-  acquisitionSnapFrames(moduleID,devID);
+  if (doSnap)
+     { acquisitionSnapFrames(moduleID,devID); }
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
   depthFrame = acquisitionGetDepthFrame(moduleID,devID);
   refreshSegmentedFrame();
@@ -735,7 +736,7 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
   //fprintf(stderr,"OnTimerTrigger Called\n");
   if (play)
     {
-     guiSnapFrames(); //Get New Frames
+     guiSnapFrames(1); //Get New Frames
 
      if (recording)
      {
@@ -768,7 +769,7 @@ void EditorFrame::OnbuttonStopClick(wxCommandEvent& event)
 void EditorFrame::OnbuttonPreviousFrameClick(wxCommandEvent& event)
 {
     acquisitionSeekRelativeFrame(moduleID,devID,(signed int) -2);
-    guiSnapFrames(); //Get New Frames
+    guiSnapFrames(1); //Get New Frames
 
     Refresh(); // <- This draws the window!
 }
@@ -776,7 +777,7 @@ void EditorFrame::OnbuttonPreviousFrameClick(wxCommandEvent& event)
 void EditorFrame::OnbuttonNextFrameClick(wxCommandEvent& event)
 {
     //acquisitionSeekRelativeFrame(moduleID,devID,(signed int) +1);
-    guiSnapFrames(); //Get New Frames
+    guiSnapFrames(1); //Get New Frames
 
     Refresh(); // <- This draws the window!
 }
@@ -789,7 +790,7 @@ void EditorFrame::OncurrentFrameTextCtrlText(wxCommandEvent& event)
         {
           if (jumpTo>0) { --jumpTo; }
           acquisitionSeekFrame(moduleID,devID,jumpTo);
-          guiSnapFrames(); //Get New Frames
+          guiSnapFrames(1); //Get New Frames
 
           Refresh(); // <- This draws the window!
         }
@@ -801,7 +802,7 @@ void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
 
     if (jumpTo>0) { --jumpTo; }
     acquisitionSeekFrame(moduleID,devID,jumpTo);
-    guiSnapFrames(); //Get New Frames
+    guiSnapFrames(1); //Get New Frames
     Refresh(); // <- This draws the window!
 }
 
@@ -833,8 +834,7 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
     delete  segmentationSelector;
 
     refreshSegmentedFrame();
-    lastFrameDrawn=1000000;
-
+    lastFrameDrawn+=1000;
     Refresh();
 }
 
@@ -949,6 +949,16 @@ void EditorFrame::OnButtonExecuteClick(wxCommandEvent& event)
     ane->segDepth = &segConfDepth;
     ane->segRGB   = &segConfRGB;
     ane->ListCtrlPoints = ListCtrlPoints;
+    ane->moduleID = moduleID;
+    ane->devID = devID;
+
     ane->ShowModal();
+
+    refreshSegmentedFrame();
+    lastFrameDrawn+=1000;
+    guiSnapFrames(0); //Get New Frames
+    Refresh();
+
+
     delete  ane;
 }

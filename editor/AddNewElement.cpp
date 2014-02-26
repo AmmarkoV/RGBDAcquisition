@@ -1,4 +1,5 @@
 #include "AddNewElement.h"
+#include "../acquisition/Acquisition.h"
 #include <wx/msgdlg.h>
 
 //(*InternalHeaders(AddNewElement)
@@ -52,6 +53,55 @@ void AddNewElement::OnButtonCancelClick(wxCommandEvent& event)
     Close();
 }
 
+double getwxListDouble(wxListCtrl * theList , unsigned int col , unsigned int row )
+{
+  wxListItem     row_info;
+  wxString       cell_contents_string;
+
+  // Set what row it is (m_itemId is a member of the regular wxListCtrl class)
+   row_info.m_itemId = row;
+  // Set what column of that row we want to query for information.
+   row_info.m_col = col;
+  // Set text mask
+   row_info.m_mask = wxLIST_MASK_TEXT;
+
+   // Get the info and store it in row_info variable.
+   theList->GetItem( row_info );
+
+   // Extract the text out that cell
+   cell_contents_string = row_info.m_text;
+
+   double dValue;
+    if (cell_contents_string.ToDouble(&dValue)) {  return dValue; }
+
+   return 0.0;
+}
+
+unsigned int  getwxListInteger(wxListCtrl * theList , unsigned int col , unsigned int row )
+{
+  wxListItem     row_info;
+  wxString       cell_contents_string;
+
+  // Set what row it is (m_itemId is a member of the regular wxListCtrl class)
+   row_info.m_itemId = row;
+  // Set what column of that row we want to query for information.
+   row_info.m_col = col;
+  // Set text mask
+   row_info.m_mask = wxLIST_MASK_TEXT;
+
+   // Get the info and store it in row_info variable.
+   theList->GetItem( row_info );
+
+   // Extract the text out that cell
+   cell_contents_string = row_info.m_text;
+
+   unsigned long uValue;
+    if (cell_contents_string.ToULong(&uValue)) {  return (unsigned int) uValue; }
+
+   return 0;
+}
+
+
 void AddNewElement::OnButtonAddClick(wxCommandEvent& event)
 {
   if ( (segDepth==0) || (segRGB==0) ) { wxMessageBox(wxT("Cannot add this element since accomodation for the settings is not allocated"),wxT("Error Adding Element")); return ;  }
@@ -63,10 +113,31 @@ void AddNewElement::OnButtonAddClick(wxCommandEvent& event)
    break;
    case 1 :  //Chosen to interpret selected points as a plane
              segDepth->enablePlaneSegmentation=1;
-             /*
-             segDepth->p1[3];
-             segDepth->p2[3];
-             segDepth->p3[3];*/
+
+             unsigned int x2D,y2D; float x,y,z;
+
+             x2D=getwxListInteger(ListCtrlPoints,0,0); y2D=getwxListInteger(ListCtrlPoints,1,0);
+             if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,x2D,y2D,&x,&y,&z) )
+                                    { segDepth->p1[0]=(double) x; segDepth->p1[1]=(double) y; segDepth->p1[2]=(double) z; } else
+                                    { wxMessageBox(wxT("Could not project point 1 , it is left as it was"),wxT("Please select")); }
+
+
+             x2D=getwxListInteger(ListCtrlPoints,0,1); y2D=getwxListInteger(ListCtrlPoints,1,1);
+             if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,x2D,y2D,&x,&y,&z) )
+                                    { segDepth->p2[0]=(double) x; segDepth->p2[1]=(double) y; segDepth->p2[2]=(double) z; } else
+                                    { wxMessageBox(wxT("Could not project point 2 , it is left as it was"),wxT("Please select")); }
+
+
+             x2D=getwxListInteger(ListCtrlPoints,0,2); y2D=getwxListInteger(ListCtrlPoints,1,2);
+             if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,x2D,y2D,&x,&y,&z) )
+                                    { segDepth->p3[0]=(double) x; segDepth->p3[1]=(double) y; segDepth->p3[2]=(double) z; } else
+                                    { wxMessageBox(wxT("Could not project point 3 , it is left as it was"),wxT("Please select")); }
+
+
+
+             ListCtrlPoints->DeleteItem(2);
+             ListCtrlPoints->DeleteItem(1);
+             ListCtrlPoints->DeleteItem(0);
    break;
    default :
      wxMessageBox(wxT("No Selection of how to add points"),wxT("Please select"));
