@@ -22,10 +22,10 @@
 using namespace DepthSense;
 using namespace std;
 
-int waitSecondsBeforeGrab = 0;
+int waitSecondsBeforeGrab = 1;
 
 bool usingUSB30Flag = true;
-bool interpolateDepthFlag = 1;
+bool interpolateDepthFlag = 0;
 
 bool dispColorAcqFlag = 0;
 bool dispDepthAcqFlag = 0;
