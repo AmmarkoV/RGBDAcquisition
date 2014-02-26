@@ -876,6 +876,8 @@ void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
                                      recordedFrames=0;
                                      recording=1;
                                      play=1;
+                                     fprintf(stderr,"Recording started\n");
+                                     Refresh();
                                    }
 
 
@@ -944,6 +946,9 @@ void EditorFrame::OnButtonRemoveClick(wxCommandEvent& event)
 void EditorFrame::OnButtonExecuteClick(wxCommandEvent& event)
 {
     AddNewElement * ane  = new AddNewElement(this, wxID_ANY);
-      ane->ShowModal();
+    ane->segDepth = &segConfDepth;
+    ane->segRGB   = &segConfRGB;
+    ane->ListCtrlPoints = ListCtrlPoints;
+    ane->ShowModal();
     delete  ane;
 }

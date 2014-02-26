@@ -12,7 +12,7 @@ cd "$DIR"
 cd $FROM
 
 
-../../../tools/ExtrinsicCalibration/extrinsicCalibration -v -w 6 -h 9 -s 0.02 -c color.calib -i colorFrame_0_00063.pnm
+../../../tools/ExtrinsicCalibration/extrinsicCalibration -v -w 6 -h 9 -s 0.02 -c color.calib -i colorFrame_0_00000.pnm
 
 cp color.calib depth.calib
 

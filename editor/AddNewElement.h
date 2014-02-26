@@ -1,6 +1,10 @@
 #ifndef ADDNEWELEMENT_H
 #define ADDNEWELEMENT_H
 
+
+#include "../acquisitionSegment/AcquisitionSegment.h"
+#include <wx/listctrl.h>
+
 //(*Headers(AddNewElement)
 #include <wx/dialog.h>
 #include <wx/button.h>
@@ -17,13 +21,18 @@ class AddNewElement: public wxDialog
 		virtual ~AddNewElement();
 
 		//(*Declarations(AddNewElement)
+		wxChoice* ChoiceHowToAdd;
 		wxStaticText* StaticText1;
 		wxButton* ButtonAdd;
 		wxButton* ButtonCancel;
-		wxChoice* Choice1;
 		wxTextCtrl* TextCtrl1;
 		wxStaticText* StaticText2;
 		//*)
+
+
+        struct SegmentationFeaturesDepth * segDepth;
+        struct SegmentationFeaturesRGB * segRGB;
+        wxListCtrl* ListCtrlPoints;
 
 	protected:
 

@@ -28,7 +28,7 @@
 			<label>How To Add</label>
 			<pos>24,56</pos>
 		</object>
-		<object class="wxChoice" name="ID_CHOICE1" variable="Choice1" member="yes">
+		<object class="wxChoice" name="ID_CHOICE1" variable="ChoiceHowToAdd" member="yes">
 			<content>
 				<item>Flood Fill Point Segmentation</item>
 				<item>Plane Segmentation</item>

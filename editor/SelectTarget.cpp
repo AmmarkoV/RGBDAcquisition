@@ -103,11 +103,12 @@ void SelectTarget::OnButtonRecordClick(wxCommandEvent& event)
              break;
      default :
                acquisitionInitiateTargetForFrames(moduleID,devID,"/dev/null");
+               fprintf(stderr,"Initiating null target \n");
              break;
     };
 
     recording=1;
-
+    fprintf(stderr,"Record Dialog is done\n");
     Close();
 }
 
