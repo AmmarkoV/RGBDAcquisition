@@ -34,6 +34,7 @@ class SelectSegmentation: public wxDialog
 		//(*Declarations(SelectSegmentation)
 		wxSpinCtrl* minG;
 		wxStaticText* StaticText24;
+		wxTextCtrl* planeNormalOffset;
 		wxStaticText* StaticText22;
 		wxStaticText* StaticText21;
 		wxSpinCtrl* maxR;
@@ -94,6 +95,7 @@ class SelectSegmentation: public wxDialog
 		wxTextCtrl* bboxMaxZ;
 		wxSpinCtrl* SpinCtrlMovementR;
 		wxCheckBox* CheckBoxPlane;
+		wxStaticText* StaticText26;
 		wxStaticText* StaticText6;
 		wxSpinCtrl* maxB;
 		wxTextCtrl* bboxMaxX;
@@ -188,6 +190,8 @@ class SelectSegmentation: public wxDialog
 		static const long ID_STATICTEXT24;
 		static const long ID_SPINCTRL15;
 		static const long ID_STATICTEXT25;
+		static const long ID_STATICTEXT26;
+		static const long ID_TEXTCTRL25;
 		//*)
 
 	private:

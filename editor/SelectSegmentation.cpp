@@ -82,6 +82,8 @@ const long SelectSegmentation::ID_STATICTEXT23 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT24 = wxNewId();
 const long SelectSegmentation::ID_SPINCTRL15 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT25 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT26 = wxNewId();
+const long SelectSegmentation::ID_TEXTCTRL25 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -194,6 +196,8 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	SpinCtrlMovementB = new wxSpinCtrl(this, ID_SPINCTRL15, _T("10"), wxPoint(248,240), wxSize(56,27), 0, 0, 100, 10, _T("ID_SPINCTRL15"));
 	SpinCtrlMovementB->SetValue(_T("10"));
 	StaticText25 = new wxStaticText(this, ID_STATICTEXT25, _("Move"), wxPoint(55,240), wxDefaultSize, 0, _T("ID_STATICTEXT25"));
+	StaticText26 = new wxStaticText(this, ID_STATICTEXT26, _("Offset Normal : "), wxPoint(424,392), wxDefaultSize, 0, _T("ID_STATICTEXT26"));
+	planeNormalOffset = new wxTextCtrl(this, ID_TEXTCTRL25, _("0.0"), wxPoint(560,388), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL25"));
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
@@ -240,6 +244,8 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[0]); planeP3X->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[1]); planeP3Y->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[2]); planeP3Z->SetValue(val);
+
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.planeNormalOffset); planeNormalOffset->SetValue(val);
 
    val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.minX); cropDepthX1->SetValue(val);
    val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.minY); cropDepthY1->SetValue(val);
@@ -313,6 +319,8 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
     if (this->planeP3X->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[0] = dValue; }
     if (this->planeP3Y->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[1] = dValue; }
     if (this->planeP3Z->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[2] = dValue; }
+
+    if (this->planeNormalOffset->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.planeNormalOffset = dValue; }
 
     selectedDepthConf.enablePlaneSegmentation=1;
    } else

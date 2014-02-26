@@ -7,6 +7,7 @@
 
 //(*Headers(AddNewElement)
 #include <wx/dialog.h>
+#include <wx/listctrl.h>
 #include <wx/button.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -27,6 +28,7 @@ class AddNewElement: public wxDialog
 		wxButton* ButtonCancel;
 		wxTextCtrl* TextCtrl1;
 		wxStaticText* StaticText2;
+		wxListCtrl* ListCtrlCopiedPointList;
 		//*)
 
 
@@ -45,6 +47,7 @@ class AddNewElement: public wxDialog
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT2;
 		static const long ID_CHOICE1;
+		static const long ID_LISTCTRL1;
 		//*)
 
 	private:

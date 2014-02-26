@@ -7,25 +7,25 @@
 		<size_arg>1</size_arg>
 		<object class="wxButton" name="ID_BUTTON1" variable="ButtonAdd" member="yes">
 			<label>Add</label>
-			<pos>16,384</pos>
-			<size>248,29</size>
+			<pos>16,360</pos>
+			<size>248,53</size>
 			<handler function="OnButtonAddClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-			<label>Label</label>
+			<label>Element Name : </label>
 			<pos>24,24</pos>
 		</object>
 		<object class="wxButton" name="ID_BUTTON2" variable="ButtonCancel" member="yes">
 			<label>Cancel</label>
-			<pos>296,384</pos>
+			<pos>296,368</pos>
 			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
-			<value>Text</value>
-			<pos>72,16</pos>
+			<pos>144,20</pos>
+			<size>232,27</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-			<label>How To Add</label>
+			<label>How To Interpret Point list : </label>
 			<pos>24,56</pos>
 		</object>
 		<object class="wxChoice" name="ID_CHOICE1" variable="ChoiceHowToAdd" member="yes">
@@ -35,6 +35,10 @@
 			</content>
 			<pos>24,80</pos>
 			<size>360,29</size>
+		</object>
+		<object class="wxListCtrl" name="ID_LISTCTRL1" variable="ListCtrlCopiedPointList" member="yes">
+			<pos>24,112</pos>
+			<size>360,248</size>
 		</object>
 	</object>
 </wxsmith>

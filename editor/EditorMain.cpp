@@ -835,6 +835,7 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 
     refreshSegmentedFrame();
     lastFrameDrawn+=1000;
+    guiSnapFrames(0); //Get New Frames
     Refresh();
 }
 
@@ -954,6 +955,7 @@ void EditorFrame::OnButtonExecuteClick(wxCommandEvent& event)
 
     ane->ShowModal();
 
+    segmentedFramesExist=1;
     refreshSegmentedFrame();
     lastFrameDrawn+=1000;
     guiSnapFrames(0); //Get New Frames

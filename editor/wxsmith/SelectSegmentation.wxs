@@ -366,6 +366,15 @@
 			<label>Move</label>
 			<pos>55,240</pos>
 		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT26" variable="StaticText26" member="yes">
+			<label>Offset Normal : </label>
+			<pos>424,392</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL25" variable="planeNormalOffset" member="yes">
+			<value>0.0</value>
+			<pos>560,388</pos>
+			<size>56,23</size>
+		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>
 			<wildcard>.txt</wildcard>
