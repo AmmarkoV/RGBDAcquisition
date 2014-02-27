@@ -149,6 +149,7 @@ int PrintCalibration(struct calibration * calib);
 /**
  * @brief  This call allocates a 4x4 Transformation matrix based on the extrinsics of the calibration file passed as a parameter
  *         Using this one can perform a massive amount of transformations without paying the overhead of constructing the matrix etc for every call
+ *         In case of no extrinsics declared we return an identity transformation matrix
  * @ingroup calibration
  * @param  Pointer , Pointer to the calibration
  * @retval Pointer to a an array of 16 doubles (4x4) , 0=Failure
