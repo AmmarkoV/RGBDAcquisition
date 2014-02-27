@@ -368,17 +368,15 @@ int WriteCalibration(char * filename,struct calibration * calib)
 
 double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibration * calib)
 {
- if (calib==0) { fprintf(stderr,"No calibration file provided \n"); return 0;  }
- if (! calib->extrinsicParametersSet ) { fprintf(stderr,"Calibration file provided , but with no extrinsics\n"); return 0; }
-
+ if (calib==0) { fprintf(stderr,"No calibration file provided , returning null 4x4 transformation matrix \n"); return 0;  }
 
  double * m = alloc4x4Matrix();
- if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
- {
-  create4x4IdentityMatrix(m);
-  convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation , calib->depthUnit );
- }
+ create4x4IdentityMatrix(m);
+ if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n");  return 0; }
 
+ if (! calib->extrinsicParametersSet )
+     { fprintf(stderr,"Calibration file provided , but with no extrinsics\n"); return m; } else
+     { convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(m, calib->extrinsicRotationRodriguez , calib->extrinsicTranslation , calib->depthUnit ); }
 
  return m;
 }
