@@ -254,7 +254,7 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
 		   fprintf(stderr,"Capabilities ..... 0x%08X\n", cap.capabilities);
 		   fprintf(stderr,"DevCapabilities .. 0x%08X\n", cap.device_caps);
 
-		   print_video_formats_ext(&camera_feeds[inpt].v4l2_interface,V4L2_BUF_TYPE_VIDEO_CAPTURE);
+		   //print_video_formats_ext(&camera_feeds[inpt].v4l2_interface,V4L2_BUF_TYPE_VIDEO_CAPTURE);
 		   /*
 		   fprintf(stderr,"%s", cap2s(cap.capabilities).c_str());
 		   if (vcap.capabilities & V4L2_CAP_DEVICE_CAPS)
