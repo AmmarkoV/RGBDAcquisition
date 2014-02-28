@@ -29,6 +29,9 @@ void doubleSizeDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight);
 void doubleSizeUV(UV* src, UV* dst, int srcWidth, int srcHeight);
 
 void rescaleMap(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
+void rescaleMap(const short int* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
 void rescaleMap(float* src, float* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
 void rescaleMap(UV* src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
+void rescaleMap(DepthSense::Pointer<DepthSense::UV> src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
 void rescaleMap(FPVertex* src, FPVertex* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
+void rescaleMap(const short int* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight, uint16_t* confidenceMap, uint16_t confidenceMin, uint16_t noDepthValue);

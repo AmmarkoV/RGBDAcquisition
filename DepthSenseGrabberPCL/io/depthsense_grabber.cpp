@@ -2,7 +2,8 @@
  * Software License Agreement (BSD License)
  *
  *  Point Cloud Library (PCL) - www.pointclouds.org
- *  Copyright (c) 2010-2012, Willow Garage, Inc.
+ *  Copyright (c) 2010-2011, Willow Garage, Inc.
+ *  Copyright (c) 2012-, Open Perception, Inc.
  *
  *  All rights reserved.
  *
@@ -16,7 +17,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Willow Garage, Inc. nor the names of its
+ *   * Neither the name of the copyright holder(s) nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -36,443 +37,329 @@
  */
 
 #include <pcl/pcl_config.h>
+//#ifdef HAVE_FZAPI
+
 #include "depthsense_grabber.h"
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/io/tar.h>
+#include <pcl/common/time.h>
+#include <pcl/common/io.h>
+#include <pcl/console/print.h>
+#include <pcl/io/boost.h>
+#include <pcl/exceptions.h>
 
-#ifdef _WIN32
-# include <io.h>
-# include <windows.h>
-# define pcl_open                    _open
-# define pcl_close(fd)               _close(fd)
-# define pcl_lseek(fd,offset,origin) _lseek(fd,offset,origin)
-#else
-# include <sys/mman.h>
-# define pcl_open                    open
-# define pcl_close(fd)               close(fd)
-# define pcl_lseek(fd,offset,origin) lseek(fd,offset,origin)
-#endif
+#include <boost/thread.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////// GrabberImplementation //////////////////////
-struct pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl
+#include <iostream>
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+pcl::DepthSenseGrabber::DepthSenseGrabber (const int& device_info, const int& depth_mode, const int& image_mode)
+  : running_ (false)
 {
-  DepthSenseGrabberImpl (pcl::DepthSenseGrabberBase& grabber, const std::string& pcd_path, float frames_per_second, bool repeat);
-  DepthSenseGrabberImpl (pcl::DepthSenseGrabberBase& grabber, const std::vector<std::string>& pcd_files, float frames_per_second, bool repeat);
-  void trigger ();
-  void readAhead ();
+  // initialize device
+  //onInit (device_info, depth_mode, image_mode);
 
-  // TAR reading I/O
-  int openTARFile (const std::string &file_name);
-  void closeTARFile ();
-  bool readTARHeader ();
-
-  //! Initialize (find the locations of all clouds, if we haven't yet)
-  void
-  scrapeForClouds (bool force=false);
-
-  //! Get cloud at a particular location
-  bool
-  getCloudAt (size_t idx,
-              pcl::PCLPointCloud2 &blob,
-              Eigen::Vector4f &origin,
-              Eigen::Quaternionf &orientation);
-
-  //! Returns the size
-  size_t
-  numFrames ();
-
-  pcl::DepthSenseGrabberBase& grabber_;
-  float frames_per_second_;
-  bool repeat_;
-  bool running_;
-  std::vector<std::string> pcd_files_;
-  std::vector<std::string>::iterator pcd_iterator_;
-  TimeTrigger time_trigger_;
-
-  pcl::PCLPointCloud2 next_cloud_;
-  Eigen::Vector4f origin_;
-  Eigen::Quaternionf orientation_;
-  bool valid_;
-
-  // TAR reading I/O
-  int tar_fd_;
-  int tar_offset_;
-  std::string tar_file_;
-  pcl::io::TARHeader tar_header_;
-
-  // True if we have already found the location of all clouds (for tar only)
-  bool scraped_;
-  std::vector<int> tar_offsets_;
-  std::vector<size_t> cloud_idx_to_file_idx_;
-
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::DepthSenseGrabberImpl (pcl::DepthSenseGrabberBase& grabber, const std::string& pcd_path, float frames_per_second, bool repeat)
-  : grabber_ (grabber)
-  , frames_per_second_ (frames_per_second)
-  , repeat_ (repeat)
-  , running_ (false)
-  , pcd_files_ ()
-  , pcd_iterator_ ()
-  , time_trigger_ (1.0 / static_cast<double> (std::max (frames_per_second, 0.001f)), boost::bind (&DepthSenseGrabberImpl::trigger, this))
-  , next_cloud_ ()
-  , origin_ ()
-  , orientation_ ()
-  , valid_ (false)
-  , tar_fd_ (-1)
-  , tar_offset_ (0)
-  , tar_file_ ()
-  , tar_header_ ()
-  , scraped_ (false)
-{
-  pcd_files_.push_back (pcd_path);
-  pcd_iterator_ = pcd_files_.begin ();
-  readAhead ();
+  point_cloud_signal_      = createSignal<sig_cb_fotonic_point_cloud> ();
+  point_cloud_rgb_signal_  = createSignal<sig_cb_fotonic_point_cloud_rgb> ();
+  point_cloud_rgba_signal_ = createSignal<sig_cb_fotonic_point_cloud_rgba> ();
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::DepthSenseGrabberImpl (pcl::DepthSenseGrabberBase& grabber, const std::vector<std::string>& pcd_files, float frames_per_second, bool repeat)
-  : grabber_ (grabber)
-  , frames_per_second_ (frames_per_second)
-  , repeat_ (repeat)
-  , running_ (false)
-  , pcd_files_ ()
-  , pcd_iterator_ ()
-  , time_trigger_ (1.0 / static_cast<double> (std::max (frames_per_second, 0.001f)), boost::bind (&DepthSenseGrabberImpl::trigger, this))
-  , next_cloud_ ()
-  , origin_ ()
-  , orientation_ ()
-  , valid_ (false)
-  , tar_fd_ (-1)
-  , tar_offset_ (0)
-  , tar_file_ ()
-  , tar_header_ ()
-  , scraped_ (false)
+/*
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+pcl::DepthSenseGrabber::DepthSenseGrabber (const FZ_DEVICE_INFO& device_info, const Mode& depth_mode, const Mode& image_mode)
+  : running_ (false)
 {
-  pcd_files_ = pcd_files;
-  pcd_iterator_ = pcd_files_.begin ();
-  readAhead ();
+  // initialize device
+  onInit (device_info, depth_mode, image_mode);
+
+  point_cloud_signal_      = createSignal<sig_cb_fotonic_point_cloud> ();
+  point_cloud_rgb_signal_  = createSignal<sig_cb_fotonic_point_cloud_rgb> ();
+  point_cloud_rgba_signal_ = createSignal<sig_cb_fotonic_point_cloud_rgba> ();
 }
+*/
 
-///////////////////////////////////////////////////////////////////////////////////////////
-void
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::readAhead ()
-{
-  PCDReader reader;
-  int pcd_version;
-
-  // Check if we're still reading files from a TAR file
-  if (tar_fd_ != -1)
-  {
-    if (!readTARHeader ())
-      return;
-    valid_ = (reader.read (tar_file_, next_cloud_, origin_, orientation_, pcd_version, tar_offset_) == 0);
-    if (!valid_)
-      closeTARFile ();
-    else
-    {
-      tar_offset_ += (tar_header_.getFileSize ()) + (512 - tar_header_.getFileSize () % 512);
-      int result = static_cast<int> (pcl_lseek (tar_fd_, tar_offset_, SEEK_SET));
-      if (result < 0)
-        closeTARFile ();
-    }
-  }
-  // We're not still reading from a TAR file, so check if there are other PCD/TAR files in the list
-  else
-  {
-    if (pcd_iterator_ != pcd_files_.end ())
-    {
-      // Try to read in the file as a PCD first
-      valid_ = (reader.read (*pcd_iterator_, next_cloud_, origin_, orientation_, pcd_version) == 0);
-
-      // Has an error occured? Check if we can interpret the file as a TAR file first before going onto the next
-      if (!valid_ && openTARFile (*pcd_iterator_) >= 0 && readTARHeader ())
-      {
-        tar_file_ = *pcd_iterator_;
-        valid_ = (reader.read (tar_file_, next_cloud_, origin_, orientation_, pcd_version, tar_offset_) == 0);
-        if (!valid_)
-          closeTARFile ();
-        else
-        {
-          tar_offset_ += (tar_header_.getFileSize ()) + (512 - tar_header_.getFileSize () % 512);
-          int result = static_cast<int> (pcl_lseek (tar_fd_, tar_offset_, SEEK_SET));
-          if (result < 0)
-            closeTARFile ();
-        }
-      }
-
-      if (++pcd_iterator_ == pcd_files_.end () && repeat_)
-        pcd_iterator_ = pcd_files_.begin ();
-    }
-    else
-      valid_ = false;
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-bool
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::readTARHeader ()
-{
-  // Read in the header
-#if WIN32
-  int result = static_cast<int> (_read (tar_fd_, reinterpret_cast<char*> (&tar_header_), 512));
-#else
-  int result = static_cast<int> (::read (tar_fd_, reinterpret_cast<char*> (&tar_header_), 512));
-#endif
-  if (result == -1)
-  {
-    closeTARFile ();
-    return (false);
-  }
-
-  // We only support regular files for now.
-  // Addional file types in TAR include: hard links, symbolic links, device/special files, block devices,
-  // directories, and named pipes.
-  if (tar_header_.file_type[0] != '0' && tar_header_.file_type[0] != '\0')
-  {
-    closeTARFile ();
-    return (false);
-  }
-
-  // We only support USTAR version 0 files for now
-  if (std::string (tar_header_.ustar).substr (0, 5) != "ustar")
-  {
-    closeTARFile ();
-    return (false);
-  }
-
-  if (tar_header_.getFileSize () == 0)
-  {
-    closeTARFile ();
-    return (false);
-  }
-
-  tar_offset_ += 512;
-
-  return (true);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-void
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::closeTARFile ()
-{
-  pcl_close (tar_fd_);
-  tar_fd_ = -1;
-  tar_offset_ = 0;
-  memset (&tar_header_.file_name[0], 0, 512);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-int
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::openTARFile (const std::string &file_name)
-{
-  tar_fd_ = pcl_open (file_name.c_str (), O_RDONLY);
-  if (tar_fd_ == -1)
-    return (-1);
-
-  return (0);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-void
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::trigger ()
-{
-  if (valid_)
-    grabber_.publish (next_cloud_,origin_,orientation_);
-
-  // use remaining time, if there is time left!
-  readAhead ();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-void
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::scrapeForClouds (bool force)
-{
-  // Do nothing if we've already scraped (unless force is set)
-  if (scraped_ && !force)
-    return;
-  // Store temporary information
-  int tmp_fd = tar_fd_;
-  int tmp_offset = tar_offset_;
-  pcl::io::TARHeader tmp_header = tar_header_;
-  tar_fd_ = -1;
-  tar_offset_ = 0;
-
-  // Go through and index the clouds
-  PCDReader reader;
-  pcl::PCLPointCloud2 blob;
-  for (size_t i = 0; i < pcd_files_.size (); ++i)
-  {
-    std::string pcd_file = pcd_files_[i];
-    // Try to read the file header (TODO this is a huge waste just to make sure it's PCD...is extension enough?)
-    if (reader.readHeader (pcd_file, blob) == 0)
-    {
-      tar_offsets_.push_back (0);
-      cloud_idx_to_file_idx_.push_back (i);
-    }
-    else if (openTARFile (pcd_file) >= 0)
-    {
-      while (readTARHeader () && (reader.readHeader (pcd_file, blob, tar_offset_) == 0))
-      {
-        tar_offsets_.push_back (tar_offset_);
-        cloud_idx_to_file_idx_.push_back (i);
-        // Update offset
-        tar_offset_ += (tar_header_.getFileSize ()) + (512 - tar_header_.getFileSize () % 512);
-        int result = static_cast<int> (pcl_lseek (tar_fd_, tar_offset_, SEEK_SET));
-        if (result < 0)
-          break;
-        if (tar_fd_ == -1)
-          break;
-      }
-      closeTARFile ();
-    }
-  }
-
-  // Re-save temporary information
-  tar_fd_ = tmp_fd;
-  tar_offset_ = tmp_offset;
-  tar_header_ = tmp_header;
-  // Flag scraped
-  scraped_ = true;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-bool
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::getCloudAt (size_t idx,
-                                                 pcl::PCLPointCloud2 &blob,
-                                                 Eigen::Vector4f &origin,
-                                                 Eigen::Quaternionf &orientation)
-{
-  scrapeForClouds (); // Make sure we've scraped
-  if (idx >= numFrames ())
-    return false;
-
-  PCDReader reader;
-  int pcd_version;
-  std::string filename = pcd_files_[cloud_idx_to_file_idx_[idx]];
-  return (reader.read (filename, blob, origin, orientation, pcd_version, tar_offsets_[idx]));
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-size_t
-pcl::DepthSenseGrabberBase::DepthSenseGrabberImpl::numFrames ()
-{
-  scrapeForClouds (); // Make sure we've scraped
-  return (cloud_idx_to_file_idx_.size ());
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////// GrabberBase //////////////////////
-pcl::DepthSenseGrabberBase::DepthSenseGrabberBase (const std::string& pcd_path, float frames_per_second, bool repeat)
-: impl_ (new DepthSenseGrabberImpl (*this, pcd_path, frames_per_second, repeat))
-{
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-pcl::DepthSenseGrabberBase::DepthSenseGrabberBase (const std::vector<std::string>& pcd_files, float frames_per_second, bool repeat)
-: impl_ (new DepthSenseGrabberImpl (*this, pcd_files, frames_per_second, repeat))
-{
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-pcl::DepthSenseGrabberBase::~DepthSenseGrabberBase () throw ()
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+pcl::DepthSenseGrabber::~DepthSenseGrabber () throw ()
 {
   stop ();
-  delete impl_;
+
+  disconnect_all_slots<sig_cb_fotonic_point_cloud> ();
+  disconnect_all_slots<sig_cb_fotonic_point_cloud_rgb> ();
+  disconnect_all_slots<sig_cb_fotonic_point_cloud_rgba> ();
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-pcl::DepthSenseGrabberBase::start ()
+pcl::DepthSenseGrabber::initAPI ()
 {
-  if (impl_->frames_per_second_ > 0)
-  {
-    impl_->running_ = true;
-    impl_->time_trigger_.start ();
-  }
-  else // manual trigger
-  {
-    boost::thread non_blocking_call (boost::bind (&DepthSenseGrabberBase::DepthSenseGrabberImpl::trigger, impl_));
-  }
+  FZ_Init ();
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-pcl::DepthSenseGrabberBase::stop ()
+pcl::DepthSenseGrabber::exitAPI ()
 {
-  if (impl_->frames_per_second_ > 0)
+  FZ_Exit ();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+std::vector<FZ_DEVICE_INFO>
+pcl::DepthSenseGrabber::enumDevices ()
+{
+  // enumerate devices
+  int num_of_devices = 32;
+  FZ_DEVICE_INFO * device_infos = new FZ_DEVICE_INFO[num_of_devices];
+  FZ_Result result = FZ_EnumDevices2 (device_infos, &num_of_devices);
+
+  // put found devices into vector
+  std::vector<FZ_DEVICE_INFO> devices;
+  for (int index = 0; index < num_of_devices; ++index)
   {
-    impl_->time_trigger_.stop ();
-    impl_->running_ = false;
+    FZ_DEVICE_INFO device_info;
+    device_info.iDeviceType = device_infos[index].iDeviceType;
+    memcpy (device_info.iReserved, device_infos[index].iReserved, sizeof (device_infos[index].iReserved[0])*64);
+    memcpy (device_info.szPath, device_infos[index].szPath, sizeof (device_infos[index].szPath[0])*512);
+    memcpy (device_info.szSerial, device_infos[index].szSerial, sizeof (device_infos[index].szSerial[0])*16);
+    memcpy (device_info.szShortName, device_infos[index].szShortName, sizeof (device_infos[index].szShortName[0])*32);
+
+    devices.push_back (device_info);
   }
+
+  return (devices);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-pcl::DepthSenseGrabberBase::trigger ()
+pcl::DepthSenseGrabber::start ()
 {
-  if (impl_->frames_per_second_ > 0)
-    return;
-  boost::thread non_blocking_call (boost::bind (&DepthSenseGrabberBase::DepthSenseGrabberImpl::trigger, impl_));
+  FZ_CmdRespCode_t resp;
+  FZ_Result res = FZ_IOCtl (*fotonic_device_handle_, CMD_DE_SENSOR_START, NULL, 0, &resp, NULL, NULL);
 
-//  impl_->trigger ();
+  running_ = true;
+
+  grabber_thread_ = boost::thread(&pcl::DepthSenseGrabber::processGrabbing, this);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void
+pcl::DepthSenseGrabber::stop ()
+{
+  running_ = false;
+  grabber_thread_.join ();
+
+  FZ_Close (*fotonic_device_handle_);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool
-pcl::DepthSenseGrabberBase::isRunning () const
+pcl::DepthSenseGrabber::isRunning () const
 {
-  return (impl_->running_ && (impl_->pcd_iterator_ != impl_->pcd_files_.end()));
+  return (running_);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::string
-pcl::DepthSenseGrabberBase::getName () const
+pcl::DepthSenseGrabber::getName () const
 {
-  return ("DepthSenseGrabber");
+  return std::string ("DepthSenseGrabber");
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-void
-pcl::DepthSenseGrabberBase::rewind ()
-{
-  impl_->pcd_iterator_ = impl_->pcd_files_.begin ();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float
-pcl::DepthSenseGrabberBase::getFramesPerSecond () const
+pcl::DepthSenseGrabber::getFramesPerSecond () const
 {
-  return (impl_->frames_per_second_);
+  //return (static_cast<float> (device_->getDepthOutputMode ().nFPS));
+  return 0.0f;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-bool
-pcl::DepthSenseGrabberBase::isRepeatOn () const
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void
+pcl::DepthSenseGrabber::onInit (const FZ_DEVICE_INFO& device_info, const Mode& depth_mode, const Mode& image_mode)
 {
-  return (impl_->repeat_);
+  setupDevice (device_info, depth_mode, image_mode);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-bool
-pcl::DepthSenseGrabberBase::getCloudAt (size_t idx,
-                                 pcl::PCLPointCloud2 &blob,
-                                 Eigen::Vector4f &origin,
-                                 Eigen::Quaternionf &orientation) const
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void
+pcl::DepthSenseGrabber::setupDevice (const FZ_DEVICE_INFO& device_info, const Mode& depth_mode, const Mode& image_mode)
 {
-  return (impl_->getCloudAt (idx, blob, origin, orientation));
+  // Initialize device
+  fotonic_device_handle_ = new FZ_Device_Handle_t ();
+
+  unsigned int flags = 0;
+
+  FZ_Result res;
+
+  res = FZ_Open (device_info.szPath, flags, fotonic_device_handle_);
+
+  // set mode (resolution, fps..)
+	FZ_CmdRespCode_t resp;
+  unsigned short mode = DE_MODE_640X480_30;
+  res = FZ_IOCtl (*fotonic_device_handle_, CMD_DE_SET_MODE, &mode, sizeof(mode), &resp, NULL, NULL);
+
+  res = FZ_SetFrameDataFmt (*fotonic_device_handle_, -1, -1, -1, -1, FZ_FMT_PIXEL_PER_PLANE+FZ_FMT_COMPONENT_Z+FZ_FMT_COMPONENT_XY+FZ_FMT_COMPONENT_B);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-size_t
-pcl::DepthSenseGrabberBase::numFrames () const
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void
+pcl::DepthSenseGrabber::processGrabbing ()
 {
-  return (impl_->numFrames ());
+  char * frame_buffer = new char [640*480*8];
+
+  bool continue_grabbing = running_;
+  while (continue_grabbing)
+  {
+    FZ_Result result = FZ_FrameAvailable (*fotonic_device_handle_);
+    //std::cerr << "FZ_FrameAvailable: " << result << std::endl;
+
+    if (result == FZ_Success)
+    {
+      size_t length_in_byte = 640*480*10;
+      FZ_FRAME_HEADER frame_header;
+
+      result = FZ_GetFrame (*fotonic_device_handle_, &frame_header, frame_buffer, &length_in_byte);
+
+      if (result == FZ_Success)
+      {
+        //std::cerr << "frame: " << frame_header.framecounter << std::endl;
+        //std::cerr << "  timestamp: " << frame_header.timestamp << std::endl;
+        //std::cerr << "  format: " << frame_header.format << std::endl;
+        //std::cerr << "  cols: " << frame_header.ncols << std::endl;
+        //std::cerr << "  rows: " << frame_header.nrows << std::endl;
+        //std::cerr << "  reportedframerate: " << frame_header.reportedframerate << std::endl;
+        //std::cerr << "  bytesperpixel: " << frame_header.bytesperpixel << std::endl;
+
+        const int width = frame_header.ncols;
+        const int height = frame_header.nrows;
+
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGBA> ());
+        cloud->resize (width*height);
+        cloud->width = width;
+        cloud->height = height;
+        cloud->is_dense = false;
+
+        short * ptr = (short*) frame_buffer;
+
+        for (int row_index = 0; row_index < height; ++row_index)
+        {
+          //if(pixelformat == FZ_PIXELFORMAT_YUV422)
+          {
+            // YUV422
+            FZ_YUV422_DOUBLE_PIXEL *p = (FZ_YUV422_DOUBLE_PIXEL*)ptr;
+            int col = 0;
+            for (int col_index = 0; col_index < width/2; ++col_index)
+            {
+              pcl::PointXYZRGBA & point0 = (*cloud) (col, row_index);
+              ++col;
+              pcl::PointXYZRGBA & point1 = (*cloud) (col, row_index);
+              ++col;
+
+              float r,g,b,u,v,u1,v1,uv1;
+
+              u = p[col_index].u - 128.0f;
+              v = p[col_index].v - 128.0f;
+              v1 = 1.13983f*v;
+              uv1 = -0.39465f*u - 0.58060f*v;
+              u1 = 0.03211f*u;
+
+              r = p[col_index].y1 + v1;
+              g = p[col_index].y1 + uv1;
+              b = p[col_index].y1 + u1;
+
+              r = std::min (255.0f, std::max (0.0f, r));
+              g = std::min (255.0f, std::max (0.0f, g));
+              b = std::min (255.0f, std::max (0.0f, b));
+
+              point0.r = unsigned(r);
+              point0.g = unsigned(g);
+              point0.b = unsigned(b);
+
+              r = p[col_index].y2 + v1;
+              g = p[col_index].y2 + uv1;
+              b = p[col_index].y2 + u1;
+
+              r = std::min (255.0f, std::max (0.0f, r));
+              g = std::min (255.0f, std::max (0.0f, g));
+              b = std::min (255.0f, std::max (0.0f, b));
+
+              point1.r = unsigned(r);
+              point1.g = unsigned(g);
+              point1.b = unsigned(b);
+            }
+
+            ptr += width;
+          }
+
+          for (int col_index = 0; col_index < width; ++col_index)
+          {
+            pcl::PointXYZRGBA & point = (*cloud) (col_index, row_index);
+
+            short z = *ptr;
+
+            point.z = static_cast<float> (z) / 1000.0f;
+
+            ++ptr;
+          }
+
+          for (int col_index = 0; col_index < width; ++col_index)
+          {
+            pcl::PointXYZRGBA & point = (*cloud) (col_index, row_index);
+
+            short x = *ptr;
+            ++ptr;
+
+            point.x = -static_cast<float> (x) / 1000.0f;
+          }
+
+          for (int col_index = 0; col_index < width; ++col_index)
+          {
+            pcl::PointXYZRGBA & point = (*cloud) (col_index, row_index);
+
+            short y = *ptr;
+            ++ptr;
+
+            point.y = static_cast<float> (y) / 1000.0f;
+          }
+        }
+
+        // publish cloud
+        if (num_slots<sig_cb_fotonic_point_cloud_rgba> () > 0)
+        {
+          point_cloud_rgba_signal_->operator() (cloud);
+        }
+        if (num_slots<sig_cb_fotonic_point_cloud_rgb> () > 0)
+        {
+          pcl::PointCloud<pcl::PointXYZRGB>::Ptr tmp_cloud (new pcl::PointCloud<pcl::PointXYZRGB> ());
+          cloud->resize (width*height);
+          cloud->width = width;
+          cloud->height = height;
+          cloud->is_dense = false;
+
+          pcl::copyPointCloud<pcl::PointXYZRGBA, pcl::PointXYZRGB> (*cloud, *tmp_cloud);
+
+          point_cloud_rgb_signal_->operator() (tmp_cloud);
+        }
+        if (num_slots<sig_cb_fotonic_point_cloud> () > 0)
+        {
+          pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_tmp (new pcl::PointCloud<pcl::PointXYZ> ());
+          cloud->resize (width*height);
+          cloud->width = width;
+          cloud->height = height;
+          cloud->is_dense = false;
+
+          pcl::copyPointCloud<pcl::PointXYZRGBA, pcl::PointXYZ> (*cloud, *cloud_tmp);
+
+          point_cloud_signal_->operator() (cloud_tmp);
+        }
+
+      }
+    }
+    else
+      boost::this_thread::sleep (boost::posix_time::milliseconds(1));
+
+    continue_grabbing = running_;
+  }
 }
 
 
+//#endif

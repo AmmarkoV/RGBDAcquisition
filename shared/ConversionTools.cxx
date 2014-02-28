@@ -275,7 +275,125 @@ void rescaleMap(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight, int d
 
 
 
+void rescaleMap(const short int* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+
+    float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
+    float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
+
+    for (int x=0;x<dstWidth;x++)
+    {
+        float fx=x*stepWidth;
+        float dx=fx-(int)fx;
+        int ffx = floor(fx);
+        int cfx = ceil(fx);
+        for (int y=0;y<dstHeight;y++)
+        {
+            float fy=y*stepHeight;
+            float dy=fy-(int)fy;
+            int ffy = floor(fy);
+            int cfy = ceil(fy);
+
+            uint16_t val1, val2, val3, val4;
+            val1 = src[ffx + ffy*srcWidth];
+            val2 = src[cfx + ffy*srcWidth];
+            val3 = src[ffx + cfy*srcWidth];
+            val4 = src[cfx + cfy*srcWidth];
+
+            float valT1 = dx*val2 + (1-dx)*val1;
+            float valT2 = dx*val4 + (1-dx)*val3;
+
+            uint16_t val = dy*valT2 + (1-dy)*valT1;
+
+            dst[x + y*dstWidth] = val;
+        }
+    }
+}
+
+
+void rescaleMap(const short int* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight, uint16_t* confidenceMap, uint16_t confidenceMin, uint16_t noDepthValue) {
+
+    float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
+    float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
+
+    for (int x=0;x<dstWidth;x++)
+    {
+        float fx=x*stepWidth;
+        float dx=fx-(int)fx;
+        int ffx = floor(fx);
+        int cfx = ceil(fx);
+        for (int y=0;y<dstHeight;y++)
+        {
+			if (confidenceMap[x + y*dstWidth] > confidenceMin) {
+				float fy=y*stepHeight;
+		        float dy=fy-(int)fy;
+		        int ffy = floor(fy);
+		        int cfy = ceil(fy);
+
+		        uint16_t val1, val2, val3, val4;
+		        val1 = src[ffx + ffy*srcWidth];
+		        val2 = src[cfx + ffy*srcWidth];
+		        val3 = src[ffx + cfy*srcWidth];
+		        val4 = src[cfx + cfy*srcWidth];
+
+		        float valT1 = dx*val2 + (1-dx)*val1;
+		        float valT2 = dx*val4 + (1-dx)*val3;
+
+		        uint16_t val = dy*valT2 + (1-dy)*valT1;
+
+		        dst[x + y*dstWidth] = val;
+			}
+			else {
+				dst[x + y*dstWidth] = noDepthValue;
+			}
+        }
+    }
+}
+
+
+
 void rescaleMap(UV* src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+
+    float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
+    float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
+
+    for (int x=0;x<dstWidth;x++)
+    {
+        float fx=x*stepWidth;
+        float dx=fx-(int)fx;
+        int ffx = floor(fx);
+        int cfx = ceil(fx);
+        for (int y=0;y<dstHeight;y++)
+        {
+            float fy=y*stepHeight;
+            float dy=fy-(int)fy;
+            int ffy = floor(fy);
+            int cfy = ceil(fy);
+
+            float u1, u2, u3, u4, v1, v2, v3, v4;
+            u1 = src[ffx + ffy*srcWidth].u;
+            u2 = src[cfx + ffy*srcWidth].u;
+            u3 = src[ffx + cfy*srcWidth].u;
+            u4 = src[cfx + cfy*srcWidth].u;
+            v1 = src[ffx + ffy*srcWidth].v;
+            v2 = src[cfx + ffy*srcWidth].v;
+            v3 = src[ffx + cfy*srcWidth].v;
+            v4 = src[cfx + cfy*srcWidth].v;
+
+            float uT1 = dx*u2 + (1-dx)*u1;
+            float uT2 = dx*u4 + (1-dx)*u3;
+            float vT1 = dx*v2 + (1-dx)*v1;
+            float vT2 = dx*v4 + (1-dx)*v3;
+
+            float u = dy*uT2 + (1-dy)*uT1;
+            float v = dy*vT2 + (1-dy)*vT1;
+
+            dst[x + y*dstWidth] = UV(u,v);
+        }
+    }
+}
+
+
+void rescaleMap(DepthSense::Pointer<DepthSense::UV> src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
 
     float stepWidth=(float)(srcWidth-1)/(float)(dstWidth-1);
     float stepHeight=(float)(srcHeight-1)/(float)(dstHeight-1);
