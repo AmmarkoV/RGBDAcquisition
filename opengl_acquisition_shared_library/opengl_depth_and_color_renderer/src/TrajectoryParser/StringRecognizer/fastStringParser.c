@@ -370,12 +370,12 @@ struct fastStringParser * fastSTringParser_createRulesFromFile(char* filename,un
       lineLength = strlen(line);
       if ( lineLength > 0 )
         {
-         if (line[lineLength-1]==10) { line[lineLength-1]=0; --lineLength; }
+         if (line[lineLength-1]==10) { line[lineLength-1]=0; --lineLength; } else
          if (line[lineLength-1]==13) { line[lineLength-1]=0; --lineLength; }
         }
       if ( lineLength > 1 )
         {
-         if (line[lineLength-2]==10) { line[lineLength-2]=0; --lineLength; }
+         if (line[lineLength-2]==10) { line[lineLength-2]=0; --lineLength; } else
          if (line[lineLength-2]==13) { line[lineLength-2]=0; --lineLength; }
         }
 

@@ -1,7 +1,10 @@
 #!/bin/bash
 
+#gcc main.c fastStringParser.c -o StringRecognizer
 
-for item in TrajectoryPrimitives ; do
+#for item in TrajectoryPrimitives test ; do
+
+item="TrajectoryPrimitives"
     echo "Generating $item header"
     ./StringRecognizer $item
     #gcc "$item.c" -o "$item-Scanner"
@@ -10,7 +13,7 @@ for item in TrajectoryPrimitives ; do
     cp "$item.h" ../
 
     rm "$item.c" "$item.h"
-done
+#done
 
  
 exit 0
