@@ -944,7 +944,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,nocolor,0,0,scaleX,scaleY,scaleZ,0);
 
             } else
-            /*! REACHED AN COMPOSITEOBJECT DECLERATION ( COMPOSITEOBJECT(something,spatoula_type,0,255,0,0,0,1.0,spatoula_something) )
+            /*! REACHED AN COMPOSITEOBJECT DECLERATION ( COMPOSITEOBJECT(something,spatoula_type,0,255,0,0,0,1.0,1.0,1.0,27,spatoula_something) )
               argument 0 = COMPOSITEOBJECT , argument 1 = name ,  argument 2 = type ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = No Color ,
               argument 8 = ScaleX , argument 9 = ScaleY , argument 10 = ScaleZ , argument 11 = Number of arguments , argument 12 = String Freely formed Data */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"COMPOSITEOBJECT",15)==1)
