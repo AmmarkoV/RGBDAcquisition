@@ -442,6 +442,31 @@ void EditorFrame::paintNow()
     render(dc);
 }
 
+
+
+int EditorFrame::DrawFeaturesAtFeed(wxDC & dc , unsigned int x , unsigned int y, wxListCtrl* whereFrom)
+{
+if (whereFrom==0) { return 0;}
+if  ( whereFrom->GetItemCount() > 0 )
+      { fprintf(stderr,"Drawing %i features \n",whereFrom->GetItemCount());
+        wxPen red_marker(wxColour(255,0,0),1,wxSOLID);
+         dc.SetPen(red_marker);
+
+        int i;
+        for ( i=0; i<whereFrom->GetItemCount(); i++ )
+         {
+            unsigned int ptX,ptY;
+            ptX = getwxListInteger(whereFrom,0,i);
+            ptY = getwxListInteger(whereFrom,1,i);
+
+            dc.DrawRectangle(x+ptX,y+ptY,3,3);
+         }
+     }
+  return 1;
+}
+
+
+
 void EditorFrame::render(wxDC& dc)
 {
   //fprintf(stderr,"Render Called\n");
@@ -461,6 +486,9 @@ void EditorFrame::render(wxDC& dc)
      dc.SetBrush(*wxRED_BRUSH); //*wxTRANSPARENT_BRUSH
      dc.DrawCircle(50,50,10); //Recording Mark ON!
    }
+
+
+   DrawFeaturesAtFeed(dc,feed_0_x,feed_0_y,ListCtrlPoints);
 
  wxSleep(0.01);
  wxYieldIfNeeded();
@@ -911,6 +939,8 @@ void EditorFrame::OnButtonAddClick(wxCommandEvent& event)
 {
   addingPoint=1;
 
+    guiSnapFrames(0); //Get New Frames
+    Refresh();
 }
 
 
@@ -941,7 +971,12 @@ void EditorFrame::OnButtonRemoveClick(wxCommandEvent& event)
 {
   long i = getItemIndex(ListCtrlPoints); // ListCtrlPoints->GetSelectedItemCount();
 
-  fprintf(stderr,"List Active %lu \n",i);
+
+
+  fprintf(stderr,"List Active %lu , active %i \n",i,ListCtrlPoints->GetItemCount());
+
+  guiSnapFrames(0); //Get New Frames
+  Refresh();
 }
 
 void EditorFrame::OnButtonExecuteClick(wxCommandEvent& event)

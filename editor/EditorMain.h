@@ -23,12 +23,15 @@
 #include <wx/timer.h>
 //*)
 
+#include <wx/dc.h>
 class EditorFrame: public wxFrame
 {
     public:
 
         EditorFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~EditorFrame();
+
+       int DrawFeaturesAtFeed(wxDC & dc , unsigned int x , unsigned int y, wxListCtrl* whereFrom);
 
         void onIdle(wxIdleEvent& evt);
         void guiSnapFrames(int doSnap);
