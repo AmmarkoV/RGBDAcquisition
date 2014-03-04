@@ -185,8 +185,8 @@ unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *w
            if ( fseek (pf , 0 , SEEK_END)!=0 ) { fprintf(stderr,"Could not find file size to cache client..!\nUnable to serve client\n"); fclose(pf); return 0; }
            unsigned long totalFileSize = ftell (pf); //lSize now holds the size of the file..
 
-           fprintf(stderr,"totalFileSize-startOfBinaryPart = %u \n",totalFileSize-startOfBinaryPart);
-           fprintf(stderr,"bytesPerPixel*channels*w*h = %u \n",bytesPerPixel*channels*w*h);
+           //fprintf(stderr,"totalFileSize-startOfBinaryPart = %u \n",totalFileSize-startOfBinaryPart);
+           //fprintf(stderr,"bytesPerPixel*channels*w*h = %u \n",bytesPerPixel*channels*w*h);
            if (totalFileSize-startOfBinaryPart < bytesPerPixel*channels*w*h )
            {
               fprintf(stderr," Detected Border Case\n\n\n");

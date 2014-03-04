@@ -472,12 +472,10 @@ if  ( whereFrom->GetItemCount() > 0 )
 
 void EditorFrame::render(wxDC& dc)
 {
-  //fprintf(stderr,"Render Called\n");
-
-  if (rgbFrame!=0)
+  if ( (rgbFrame!=0) && (live_feeds[0].bmp!=0) )
    { dc.DrawBitmap(*live_feeds[0].bmp,feed_0_x,feed_0_y,0); } //FEED 1
 
-  if (depthFrame!=0)
+  if ( (depthFrame!=0) && (live_feeds[1].bmp!=0) )
    { dc.DrawBitmap(*live_feeds[1].bmp,feed_1_x,feed_1_y,0); } //FEED 2
 
 
@@ -495,7 +493,6 @@ void EditorFrame::render(wxDC& dc)
 
  wxSleep(0.01);
  wxYieldIfNeeded();
-
 }
 
 
@@ -636,7 +633,6 @@ int  EditorFrame::refreshSegmentedFrame()
      unsigned int newDepthByteSize = width * height * 1 * sizeof(unsigned short);
      acquisitionOverrideDepthFrame(moduleID,devID,segmentedDepth,newDepthByteSize);
 
-
      return 1;
     }
  return 0;
@@ -652,7 +648,8 @@ void EditorFrame::guiSnapFrames(int doSnap)
   ++framesSnapped;
   //fprintf(stderr,"guiSnapFrames Called %u ! \n",framesSnapped);
   if (doSnap)
-     { acquisitionSnapFrames(moduleID,devID); }
+          { acquisitionSnapFrames(moduleID,devID); }
+
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
   depthFrame = acquisitionGetDepthFrame(moduleID,devID);
   refreshSegmentedFrame();
@@ -671,27 +668,6 @@ void EditorFrame::guiSnapFrames(int doSnap)
         // || ( (acquisitionGetTotalFrameNumber(moduleID,devID)==0) && (play) )
      )
   {
-
-     /*  Segmented frames are now handled through the new override mechanism of libAcquisition.h
-     if (segmentedFramesExist)
-     {
-        //DRAW RGB FRAME -------------------------------------------------------------------------------------
-       acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-       passVideoRegisterToFeed(0,segmentedRGB,width,height,bitsperpixel,channels);
-
-       //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
-       acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
-
-
-       unsigned char * rgbDepth = convertShortDepthTo3CharDepth(segmentedDepth,width,height,0,2048);
-       //char * rgbDepth = convertShortDepthToRGBDepth(depthFrame,width,height);
-       if (rgbDepth!=0)
-       {
-         passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
-         free(rgbDepth);
-       }
-     } else*/
-     //{
        //DRAW RGB FRAME -------------------------------------------------------------------------------------
        acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
        passVideoRegisterToFeed(0,rgbFrame,width,height,bitsperpixel,channels);
@@ -707,7 +683,6 @@ void EditorFrame::guiSnapFrames(int doSnap)
         passVideoRegisterToFeed(1,rgbDepth,width,height,8,3);
         free(rgbDepth);
        }
-     //}
 
 
    lastFrameDrawn=currentFrameDrawn;
