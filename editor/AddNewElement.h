@@ -14,6 +14,10 @@
 #include <wx/choice.h>
 //*)
 
+
+double getwxListDouble(wxListCtrl * theList , unsigned int col , unsigned int row );
+unsigned int  getwxListInteger(wxListCtrl * theList , unsigned int col , unsigned int row );
+
 class AddNewElement: public wxDialog
 {
 	public:

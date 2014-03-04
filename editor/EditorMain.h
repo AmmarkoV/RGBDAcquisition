@@ -23,12 +23,15 @@
 #include <wx/timer.h>
 //*)
 
+#include <wx/dc.h>
 class EditorFrame: public wxFrame
 {
     public:
 
         EditorFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~EditorFrame();
+
+       int DrawFeaturesAtFeed(wxDC & dc , unsigned int x , unsigned int y, wxListCtrl* whereFrom);
 
         void onIdle(wxIdleEvent& evt);
         void guiSnapFrames(int doSnap);
@@ -103,6 +106,7 @@ class EditorFrame: public wxFrame
         static const long idMenuQuit;
         static const long ID_MENUSEGMENTATION;
         static const long ID_MENUGETEXTRINSICS;
+        static const long ID_MENUDETECTFEATURES;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         static const long ID_TIMER1;
@@ -138,6 +142,7 @@ class EditorFrame: public wxFrame
         wxMenuItem* MenuItem4;
         wxMenuItem* MenuItem6;
         wxButton* ButtonSegmentation;
+        wxMenuItem* MenuItem8;
         //*)
 
         void render(wxDC& dc);
