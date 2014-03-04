@@ -124,6 +124,9 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
  removeFloodFillBeforeProcessing(sourceCopy,target,width,height,segConf);
 
  //TODO: REATTACH FLOOD FILL!
+ free(target);
+
+
  unsigned int posX = 0;
  unsigned int posY = 0;
  unsigned int sourceWidthStep = width * 3;

@@ -387,6 +387,8 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
 int destroyTemplateDevice(int devID)
 {
+  if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); device[devID].templateColorFrame=0; }
+  if (device[devID].templateDepthFrame!=0) { free(device[devID].templateDepthFrame); device[devID].templateDepthFrame=0; }
   return 1;
 }
 

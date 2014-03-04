@@ -65,6 +65,13 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
      //The same goes for Depth
      executeSegmentationDepth(Depth,selectedDepth,width,height,segConfDepth);
   } else
+  if (combinationMode == COMBINE_SWAP )
+  {
+     //If we want to swap RGB and Depth  we just swap it
+     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB);
+     //The same goes for Depth
+     executeSegmentationDepth(Depth,selectedRGB,width,height,segConfDepth);
+  } else
   {
      //If we do want to combine the selections "Together" , and there are many ways to do that using
      //the combinationMode switch ( see enum combinationModesEnumerator ) , we first make a new selection
@@ -80,18 +87,13 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
       executeSegmentationDepth(Depth,combinedSelection,width,height,segConfDepth);
 
       //And we dont forget to free our memory
-      if (combinedSelection!=0)
-        {
-          free(combinedSelection);
-          combinedSelection=0;
-        }
+      if (combinedSelection!=0) { free(combinedSelection); combinedSelection=0; }
      }
   }
 
-
   //Free memory from selections..
-  if (selectedRGB!=0) { free(selectedRGB); selectedRGB=0; }
-  if (selectedDepth!=0) { free(selectedDepth); selectedDepth=0; }
+  if (selectedRGB!=0)   { free(selectedRGB);   selectedRGB=0;     }
+  if (selectedDepth!=0) { free(selectedDepth); selectedDepth=0;   }
 
   return 1;
 }
