@@ -259,6 +259,7 @@
 				<item>XOR combination </item>
 				<item>RGB only</item>
 				<item>Depth only </item>
+				<item>Swap RGB/Depth</item>
 			</content>
 			<selection>0</selection>
 			<pos>168,456</pos>

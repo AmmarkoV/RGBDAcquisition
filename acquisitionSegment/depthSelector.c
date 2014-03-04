@@ -117,6 +117,7 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
 
  removeDepthFloodFillBeforeProcessing(sourceCopy,target,width,height,segConf);
 
+ if ( target != 0)  { free(target); target=0; }
 
  unsigned int sourceWidthStep = width;
  unsigned int targetWidthStep = width;

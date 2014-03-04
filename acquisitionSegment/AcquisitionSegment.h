@@ -36,6 +36,7 @@ enum combinationModesEnumerator
   COMBINE_XOR   ,
   COMBINE_KEEP_ONLY_RGB  ,
   COMBINE_KEEP_ONLY_DEPTH ,
+  COMBINE_SWAP ,
   //-----------------------------
   NUMBER_OF_COMBINATION_MODES
 };

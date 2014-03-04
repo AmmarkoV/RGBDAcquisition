@@ -633,6 +633,9 @@ int  EditorFrame::refreshSegmentedFrame()
      unsigned int newDepthByteSize = width * height * 1 * sizeof(unsigned short);
      acquisitionOverrideDepthFrame(moduleID,devID,segmentedDepth,newDepthByteSize);
 
+     if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
+     if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
+
      return 1;
     }
  return 0;

@@ -163,6 +163,7 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	ChoiceCombination->Append(_("XOR combination "));
 	ChoiceCombination->Append(_("RGB only"));
 	ChoiceCombination->Append(_("Depth only "));
+	ChoiceCombination->Append(_("Swap RGB/Depth"));
 	CheckBoxBoundingBox = new wxCheckBox(this, ID_CHECKBOX1, _("Bounding Box"), wxPoint(392,204), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	CheckBoxBoundingBox->SetValue(false);
 	CheckBoxPlane = new wxCheckBox(this, ID_CHECKBOX2, _("Plane Segmentation"), wxPoint(392,290), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
