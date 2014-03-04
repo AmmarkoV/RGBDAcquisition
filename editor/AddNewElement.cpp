@@ -114,6 +114,10 @@ void AddNewElement::OnButtonAddClick(wxCommandEvent& event)
 
    break;
    case 1 :  //Chosen to interpret selected points as a plane
+
+             if  ( ListCtrlPoints->GetItemCount() < 3 )
+                      {  wxMessageBox(wxT("A plane needs at least 3 points"),wxT("Error Adding Element")); return ;  }
+
              segDepth->enablePlaneSegmentation=1;
 
              unsigned int x2D,y2D; float x,y,z;

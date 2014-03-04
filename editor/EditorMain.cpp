@@ -124,6 +124,7 @@ const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
 const long EditorFrame::idMenuQuit = wxNewId();
 const long EditorFrame::ID_MENUSEGMENTATION = wxNewId();
 const long EditorFrame::ID_MENUGETEXTRINSICS = wxNewId();
+const long EditorFrame::ID_MENUDETECTFEATURES = wxNewId();
 const long EditorFrame::idMenuAbout = wxNewId();
 const long EditorFrame::ID_STATUSBAR1 = wxNewId();
 const long EditorFrame::ID_TIMER1 = wxNewId();
@@ -187,6 +188,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Menu4->Append(MenuItem3);
     MenuItem7 = new wxMenuItem(Menu4, ID_MENUGETEXTRINSICS, _("Get Extrinsics"), wxEmptyString, wxITEM_NORMAL);
     Menu4->Append(MenuItem7);
+    MenuItem8 = new wxMenuItem(Menu4, ID_MENUDETECTFEATURES, _("Detect Features"), wxEmptyString, wxITEM_NORMAL);
+    Menu4->Append(MenuItem8);
     MenuBar1->Append(Menu4, _("Module"));
     Menu2 = new wxMenu();
     MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);

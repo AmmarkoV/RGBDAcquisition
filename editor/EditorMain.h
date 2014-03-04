@@ -106,6 +106,7 @@ class EditorFrame: public wxFrame
         static const long idMenuQuit;
         static const long ID_MENUSEGMENTATION;
         static const long ID_MENUGETEXTRINSICS;
+        static const long ID_MENUDETECTFEATURES;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         static const long ID_TIMER1;
@@ -141,6 +142,7 @@ class EditorFrame: public wxFrame
         wxMenuItem* MenuItem4;
         wxMenuItem* MenuItem6;
         wxButton* ButtonSegmentation;
+        wxMenuItem* MenuItem8;
         //*)
 
         void render(wxDC& dc);
