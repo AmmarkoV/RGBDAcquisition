@@ -885,6 +885,7 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
 
 int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor , unsigned int newColorByteSize)
 {
+  if (newColor==0) { fprintf(stderr,"acquisitionOverrideColorFrame called with null new buffer");  return 0; }
   //Ok when someone overrides a color frame there are two chances..
   //He either has already done it ( there is already an overriden frame ) , Or it is the first time he does it ( there is NO overriden frame existing )
   //Since allocating/freeing chunks of memory means syscalls and since most of the time the size of each frame is the same in case there is an already
@@ -1026,6 +1027,7 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
 
 int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth , unsigned int newDepthByteSize)
 {
+  if (newDepth==0) { fprintf(stderr,"acquisitionOverrideDepthFrame called with null new buffer");  return 0; }
   //Ok when someone overrides a color frame there are two chances..
   //He either has already done it ( there is already an overriden frame ) , Or it is the first time he does it ( there is NO overriden frame existing )
   //Since allocating/freeing chunks of memory means syscalls and since most of the time the size of each frame is the same in case there is an already
