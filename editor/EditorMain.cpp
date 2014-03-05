@@ -695,7 +695,8 @@ void EditorFrame::guiSnapFrames(int doSnap)
    wxString currentFrame;
    if (totalFramesOfDevice!=0)
    {
-      fprintf(stderr,"This call is problematic , it might lead to the window becoming non-responsive");
+      #warning "This call is problematic , it might lead to the window becoming non-responsive"
+      //fprintf(stderr,"This call is problematic , it might lead to the window becoming non-responsive");
       currentFrame.clear();
       currentFrame<<lastFrameDrawn;
       if (!currentFrame.IsSameAs(currentFrameTextCtrl->GetValue()))
