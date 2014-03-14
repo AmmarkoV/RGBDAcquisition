@@ -20,6 +20,9 @@ int transpose3x3MatrixD(double * mat);
 
 int upscale3x3to4x4(double * mat4x4,double * mat3x3);
 
+
+int random3x3Matrix(double * mat,double minimumValues, double maximumValues);
+
 double det3x3Matrix(double * mat);
 int invert3x3MatrixD(double * mat,double * result);
 

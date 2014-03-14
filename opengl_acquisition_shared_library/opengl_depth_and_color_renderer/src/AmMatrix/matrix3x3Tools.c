@@ -108,6 +108,19 @@ int transpose3x3MatrixD(double * mat)
   return 1;
 }
 
+int random3x3Matrix(double * mat,double minimumValues, double maximumValues)
+{
+ int i=0;
+ unsigned int randRange=(unsigned int) maximumValues - minimumValues;
+
+ for (i=0; i<9; i++)
+ {
+     mat[i]=minimumValues + rand()%randRange;
+ }
+
+ return 1;
+}
+
 
 double det3x3Matrix(double * mat)
 {

@@ -75,9 +75,11 @@ double solvePNPHomography(double * result3x3Matrix , unsigned int pointsNum ,  d
 {
    double * hypothesis = alloc3x3Matrix();    if (hypothesis ==0) { return 0 ; }
    unsigned int numberOfIterations=0;
-   double bestError=10000 , currentError = 10000;
-   while ( ( bestError > 0.5 ) && ( numberOfIterations < 1000 ) )
+   double bestError=10000 , currentError = 100;
+   while ( ( bestError > 0.5 ) && ( numberOfIterations < 100 ) )
    {
+     random3x3Matrix(hypothesis,0.0,200.0);
+
      currentError =  testHomogaphyError( hypothesis , pointsNum , pointsA, pointsB);
      if (currentError<bestError)
      {

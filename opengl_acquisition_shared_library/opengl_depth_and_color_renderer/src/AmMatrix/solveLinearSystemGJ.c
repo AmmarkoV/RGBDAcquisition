@@ -43,7 +43,7 @@ void printSystemMathematicaJazz(double * mat,unsigned int totalLines)
   fprintf(stderr,"} \n ");
 
   fprintf(stderr,"Equal @@ # & /@ Transpose[{m.{e11, e12, e13, e21, e22, e23, e31, e32, e33}, {0, 0, 0, 0, 0, 0, 0, 0}}]\n");
-  fprintf(stderr,"Solve[%]\n");
+  fprintf(stderr,"Solve[%%]\n");
 
 }
 
