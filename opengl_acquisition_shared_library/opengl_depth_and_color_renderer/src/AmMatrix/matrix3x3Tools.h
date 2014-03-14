@@ -25,4 +25,7 @@ int invert3x3MatrixD(double * mat,double * result);
 
 int multiplyTwo3x3Matrices(double * result , double * matrixA , double * matrixB);
 
+int transform2DPointUsing3x3Matrix(double * resultPoint2D, double * transformation3x3, double * point2D);
+
+
 #endif // MATRIX3X3TOOLS_H_INCLUDED

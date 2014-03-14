@@ -31,6 +31,14 @@
 
 //TODO : add Horizontal flipping  <- is the output mirrored ?
 
+
+int doTest()
+{
+    testMatrices();
+    return ;
+}
+
+
 int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
     double depth_bias=0.0; double depth_scale=1.0;

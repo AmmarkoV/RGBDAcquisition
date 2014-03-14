@@ -1,3 +1,5 @@
+
+
 #include "matrixCalculations.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,6 +7,7 @@
 #include "matrix3x3Tools.h"
 #include "matrix4x4Tools.h"
 #include "solveLinearSystemGJ.h"
+#include "solvePnPIterative.h"
 
 int convertRodriguezTo3x3(double * result,double * matrix)
 {
@@ -220,6 +223,7 @@ void buildOpenGLProjectionForIntrinsics   (
 
 void testMatrices()
 {
+   testPNPSolver();
   //testGJSolver();
   return ;
 

@@ -10,6 +10,16 @@ enum mat3x3Item
     I31     , I32 , I33
 };
 
+
+enum mat3x3EItem
+{
+    e0 = 0 , e1  , e2  ,
+    e3     , e4  , e5  ,
+    e6     , e7 ,  e8
+};
+
+
+
 double * alloc3x3Matrix()
 {
   return malloc ( sizeof(double) * 16 );
@@ -194,4 +204,49 @@ int multiplyTwo3x3Matrices(double * result , double * matrixA , double * matrixB
   print3x3DMatrix("AxB", result);
 
   return 1;
+}
+
+
+int transform2DPointUsing3x3Matrix(double * resultPoint2D, double * transformation3x3, double * point2D)
+{
+  if ( (resultPoint2D==0) || (transformation3x3==0) || (point2D==0) ) { return 0; }
+
+  fprintf(stderr,"Point 2D %0.2f,%0.2f \n",point2D[0],point2D[1]);
+
+  fprintf(stderr,"Getting multiplied with \n");
+
+  print3x3DMatrix("transformation3x3", transformation3x3);
+
+/*
+   What we want to do ( in mathematica )
+   { {e0,e1,e2} , {e3,e4,e5} , {e6,e7,e8} } * { { X } , { Y } , { W } }
+
+   This gives us
+
+  {
+    {e2 W + e0 X + e1 Y},
+    {e5 W + e3 X + e4 Y},
+    {e8 W + e6 X + e7 Y}
+  }
+*/
+
+  double * m = transformation3x3;
+  double X=point2D[0],Y=point2D[1],W=1.0;
+
+
+  resultPoint2D[0] =  m[e2] * W + m[e0] * X + m[e1] * Y;
+  resultPoint2D[1] =  m[e5] * W + m[e3] * X + m[e4] * Y;
+  resultPoint2D[2] =  m[e8] * W + m[e6] * X + m[e7] * Y;
+
+  // Ok we have our results but now to normalize our vector
+  if(resultPoint2D[2]!=0.0)
+  {
+   resultPoint2D[0]/=resultPoint2D[2];
+   resultPoint2D[1]/=resultPoint2D[2];
+   resultPoint2D[2]/=resultPoint2D[2];
+  } else
+  {
+     fprintf(stderr,"Error with W coordinate after multiplication of 2D Point with 3x3 Matrix\n");
+  }
+ return 1;
 }

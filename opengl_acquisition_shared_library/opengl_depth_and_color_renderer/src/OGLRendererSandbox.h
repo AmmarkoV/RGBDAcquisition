@@ -11,6 +11,9 @@ extern "C"
 {
 #endif
 
+int doTest();
+
+
 /**
 * @brief Set OpenGL Near And Far Planes
 * @ingroup OGLRendererSandbox

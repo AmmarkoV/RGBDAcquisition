@@ -442,10 +442,16 @@ int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformati
   resultPoint3D[3] =  m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
 
   // Ok we have our results but now to normalize our vector
-  resultPoint3D[0]/=resultPoint3D[3];
-  resultPoint3D[1]/=resultPoint3D[3];
-  resultPoint3D[2]/=resultPoint3D[3];
-  resultPoint3D[3]/=resultPoint3D[3];
+  if (resultPoint3D[3]!=0.0)
+  {
+   resultPoint3D[0]/=resultPoint3D[3];
+   resultPoint3D[1]/=resultPoint3D[3];
+   resultPoint3D[2]/=resultPoint3D[3];
+   resultPoint3D[3]/=resultPoint3D[3];
+  } else
+  {
+     fprintf(stderr,"Error with W coordinate after multiplication of 3D Point with 4x4 Matrix\n");
+  }
 
   //fprintf(stderr,"Transformed to %0.2f,%0.2f,%0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2]);
 

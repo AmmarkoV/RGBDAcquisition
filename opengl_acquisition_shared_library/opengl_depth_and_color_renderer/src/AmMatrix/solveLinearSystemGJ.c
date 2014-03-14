@@ -22,7 +22,7 @@ enum packedPointPrecalcs
  ,ElementsNumber
 };
 
-void printSystemMathematica(double * mat,unsigned int totalLines)
+void printSystemMathematicaJazz(double * mat,unsigned int totalLines)
 {
   fprintf(stderr,"\n\n { ");
     unsigned int  i=0;
@@ -47,6 +47,30 @@ void printSystemMathematica(double * mat,unsigned int totalLines)
 
 }
 
+
+
+void printSystemMathematica(double * mat,unsigned int totalLines)
+{
+  fprintf(stderr,"\n\n m = { ");
+    unsigned int  i=0;
+    for (i=0; i< totalLines; i++)
+    {
+     fprintf(stderr," { %0.2f , ",mat[i*ElementsNumber + xBxA] );
+     fprintf(stderr,"%0.2f , ",mat[i*ElementsNumber + xByA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + xB] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yBxA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yByA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yB] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + xA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yA] );
+     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + One] );
+     fprintf(stderr," } " );
+     if (i<totalLines-1) { fprintf(stderr," , "); }
+    }
+  fprintf(stderr,"} \n ");
+
+
+}
 
 void printSystemScilab(double * mat,unsigned int totalLines)
 {
