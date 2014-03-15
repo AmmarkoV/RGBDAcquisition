@@ -66,6 +66,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AmMatrix/solveLinearSystemGJ.h" />
+		<Unit filename="AmMatrix/solvePnPIterative.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/solvePnPIterative.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="TextureLoader/bmp.c">
 			<Option compilerVar="CC" />

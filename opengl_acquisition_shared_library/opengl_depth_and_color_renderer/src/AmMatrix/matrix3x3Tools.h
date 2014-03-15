@@ -9,9 +9,9 @@
 double * alloc3x3Matrix();
 void free3x3Matrix(double ** mat);
 
-void print3x3FMatrix(char * str , float * matrix4x4);
-void print3x3DMatrix(char * str , double * matrix4x4);
-void print3x3DScilabMatrix(char * str , double * matrix4x4);
+void print3x3FMatrix(char * str , float * matrix3x3);
+void print3x3DMatrix(char * str , double * matrix3x3);
+void print3x3DScilabMatrix(char * str , double * matrix3x3);
 
 void copy3x3Matrix(double * out,double * in);
 void create3x3IdentityMatrix(double * m);

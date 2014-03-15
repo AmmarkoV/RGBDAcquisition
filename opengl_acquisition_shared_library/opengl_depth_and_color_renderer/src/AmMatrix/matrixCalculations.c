@@ -9,6 +9,497 @@
 #include "solveLinearSystemGJ.h"
 #include "solvePnPIterative.h"
 
+
+
+#define Sgn(x)              ( (x)<0 ? -1:1 )    /* Sgn(0) = 1 ! */
+#define REAL_ZERO(x)        ( (x<0.0001) && (x>0.0001) ? 0:1 )    /* REAL_ZERO(0.000001) = 1 ! */
+#define MAX(a,b)            ( (a)<(b) ? b:a )
+
+int
+icvSingularValueDecomposition( int M,
+                               int N,
+                               double *A,
+                               double *W, int get_U, double *U, int get_V, double *V )
+{
+    int i = 0, j, k, l = 0, i1, k1, l1 = 0;
+    int iterations, error = 0, jN, iN, kN, lN = 0;
+    double *rv1;
+    double c, f, g, h, s, x, y, z, scale, anorm;
+    double af, ag, ah, t;
+    int MN = M * N;
+    int NN = N * N;
+
+    /*  max_iterations - maximum number QR-iterations
+       cc - reduces requirements to number stitch (cc>1)
+     */
+
+    int max_iterations = 100;
+    double cc = 100;
+
+    if( M < N )
+        return N;
+
+    rv1 = (double *) malloc( N * sizeof( double ));
+
+    if( rv1 == 0 )
+        return N;
+
+    for( iN = 0; iN < MN; iN += N )
+    {
+        for( j = 0; j < N; j++ )
+            U[iN + j] = A[iN + j];
+    }                           /* for */
+
+    /*  Adduction to bidiagonal type (transformations of reflection).
+       Bidiagonal matrix is located in W (diagonal elements)
+       and in rv1 (upperdiagonal elements)
+     */
+
+    g = 0;
+    scale = 0;
+    anorm = 0;
+
+    for( i = 0, iN = 0; i < N; i++, iN += N )
+    {
+
+        l = i + 1;
+        lN = iN + N;
+        rv1[i] = scale * g;
+
+        /*  Multiplyings on the left  */
+
+        g = 0;
+        s = 0;
+        scale = 0;
+
+        for( kN = iN; kN < MN; kN += N )
+            scale += fabs( U[kN + i] );
+
+        if( !REAL_ZERO( scale ))
+        {
+
+            for( kN = iN; kN < MN; kN += N )
+            {
+
+                U[kN + i] /= scale;
+                s += U[kN + i] * U[kN + i];
+            }                   /* for */
+
+            f = U[iN + i];
+            g = -sqrt( s ) * Sgn( f );
+            h = f * g - s;
+            U[iN + i] = f - g;
+
+            for( j = l; j < N; j++ )
+            {
+
+                s = 0;
+
+                for( kN = iN; kN < MN; kN += N )
+                {
+
+                    s += U[kN + i] * U[kN + j];
+                }               /* for */
+
+                f = s / h;
+
+                for( kN = iN; kN < MN; kN += N )
+                {
+
+                    U[kN + j] += f * U[kN + i];
+                }               /* for */
+            }                   /* for */
+
+            for( kN = iN; kN < MN; kN += N )
+                U[kN + i] *= scale;
+        }                       /* if */
+
+        W[i] = scale * g;
+
+        /*  Multiplyings on the right  */
+
+        g = 0;
+        s = 0;
+        scale = 0;
+
+        for( k = l; k < N; k++ )
+            scale += fabs( U[iN + k] );
+
+        if( !REAL_ZERO( scale ))
+        {
+
+            for( k = l; k < N; k++ )
+            {
+
+                U[iN + k] /= scale;
+                s += (U[iN + k]) * (U[iN + k]);
+            }                   /* for */
+
+            f = U[iN + l];
+            g = -sqrt( s ) * Sgn( f );
+            h = f * g - s;
+            U[i * N + l] = f - g;
+
+            for( k = l; k < N; k++ )
+                rv1[k] = U[iN + k] / h;
+
+            for( jN = lN; jN < MN; jN += N )
+            {
+
+                s = 0;
+
+                for( k = l; k < N; k++ )
+                    s += U[jN + k] * U[iN + k];
+
+                for( k = l; k < N; k++ )
+                    U[jN + k] += s * rv1[k];
+
+            }                   /* for */
+
+            for( k = l; k < N; k++ )
+                U[iN + k] *= scale;
+        }                       /* if */
+
+        t = fabs( W[i] );
+        t += fabs( rv1[i] );
+        anorm = MAX( anorm, t );
+    }                           /* for */
+
+    anorm *= cc;
+
+    /*  accumulation of right transformations, if needed  */
+
+    if( get_V )
+    {
+
+        for( i = N - 1, iN = NN - N; i >= 0; i--, iN -= N )
+        {
+
+            if( i < N - 1 )
+            {
+
+                /*  pass-by small g  */
+                if( !REAL_ZERO( g ))
+                {
+
+                    for( j = l, jN = lN; j < N; j++, jN += N )
+                        V[jN + i] = U[iN + j] / U[iN + l] / g;
+
+                    for( j = l; j < N; j++ )
+                    {
+
+                        s = 0;
+
+                        for( k = l, kN = lN; k < N; k++, kN += N )
+                            s += U[iN + k] * V[kN + j];
+
+                        for( kN = lN; kN < NN; kN += N )
+                            V[kN + j] += s * V[kN + i];
+                    }           /* for */
+                }               /* if */
+
+                for( j = l, jN = lN; j < N; j++, jN += N )
+                {
+                    V[iN + j] = 0;
+                    V[jN + i] = 0;
+                }               /* for */
+            }                   /* if */
+
+            V[iN + i] = 1;
+            g = rv1[i];
+            l = i;
+            lN = iN;
+        }                       /* for */
+    }                           /* if */
+
+    /*  accumulation of left transformations, if needed  */
+
+    if( get_U )
+    {
+
+        for( i = N - 1, iN = NN - N; i >= 0; i--, iN -= N )
+        {
+
+            l = i + 1;
+            lN = iN + N;
+            g = W[i];
+
+            for( j = l; j < N; j++ )
+                U[iN + j] = 0;
+
+            /*  pass-by small g  */
+            if( !REAL_ZERO( g ))
+            {
+
+                for( j = l; j < N; j++ )
+                {
+
+                    s = 0;
+
+                    for( kN = lN; kN < MN; kN += N )
+                        s += U[kN + i] * U[kN + j];
+
+                    f = s / U[iN + i] / g;
+
+                    for( kN = iN; kN < MN; kN += N )
+                        U[kN + j] += f * U[kN + i];
+                }               /* for */
+
+                for( jN = iN; jN < MN; jN += N )
+                    U[jN + i] /= g;
+            }
+            else
+            {
+
+                for( jN = iN; jN < MN; jN += N )
+                    U[jN + i] = 0;
+            }                   /* if */
+
+            U[iN + i] += 1;
+        }                       /* for */
+    }                           /* if */
+
+    /*  Iterations QR-algorithm for bidiagonal matrixes
+       W[i] - is the main diagonal
+       rv1[i] - is the top diagonal, rv1[0]=0.
+     */
+
+    for( k = N - 1; k >= 0; k-- )
+    {
+
+        k1 = k - 1;
+        iterations = 0;
+
+        for( ;; )
+        {
+
+            /*  Cycle: checking a possibility of fission matrix  */
+            for( l = k; l >= 0; l-- )
+            {
+
+                l1 = l - 1;
+
+                if( REAL_ZERO( rv1[l] ) || REAL_ZERO( W[l1] ))
+                    break;
+            }                   /* for */
+
+            if( !REAL_ZERO( rv1[l] ))
+            {
+
+                /*  W[l1] = 0,  matrix possible to fission
+                   by clearing out rv1[l]  */
+
+                c = 0;
+                s = 1;
+
+                for( i = l; i <= k; i++ )
+                {
+
+                    f = s * rv1[i];
+                    rv1[i] = c * rv1[i];
+
+                    /*  Rotations are done before the end of the block,
+                       or when element in the line is finagle.
+                     */
+
+                    if( REAL_ZERO( f ))
+                        break;
+
+                    g = W[i];
+
+                    /*  Scaling prevents finagling H ( F!=0!) */
+
+                    af = fabs( f );
+                    ag = fabs( g );
+
+                    if( af < ag )
+                        h = ag * sqrt( 1 + (f / g) * (f / g) );
+                    else
+                        h = af * sqrt( 1 + (f / g) * (f / g) );
+
+                    W[i] = h;
+                    c = g / h;
+                    s = -f / h;
+
+                    if( get_U )
+                    {
+
+                        for( jN = 0; jN < MN; jN += N )
+                        {
+
+                            y = U[jN + l1];
+                            z = U[jN + i];
+                            U[jN + l1] = y * c + z * s;
+                            U[jN + i] = -y * s + z * c;
+                        }       /* for */
+                    }           /* if */
+                }               /* for */
+            }                   /* if */
+
+
+            /*  Output in this place of program means,
+               that rv1[L] = 0, matrix fissioned
+               Iterations of the process of the persecution
+               will be executed always for
+               the bottom block ( from l before k ),
+               with increase l possible.
+             */
+
+            z = W[k];
+
+            if( l == k )
+                break;
+
+            /*  Completion iterations: lower block
+               became trivial ( rv1[K]=0)  */
+
+            if( iterations++ == max_iterations )
+                return k;
+
+            /*  Shift is computed on the lowest order 2 minor.  */
+
+            x = W[l];
+            y = W[k1];
+            g = rv1[k1];
+            h = rv1[k];
+
+            /*  consequent fission prevents forming a machine zero  */
+            f = ((y - z) * (y + z) + (g - h) * (g + h)) / (2 * h) / y;
+
+            /*  prevented overflow  */
+            if( fabs( f ) > 1 )
+            {
+                g = fabs( f );
+                g *= sqrt( 1 + (1 / f) * (1 / f) );
+            }
+            else
+                g = sqrt( f * f + 1 );
+
+            f = ((x - z) * (x + z) + h * (y / (f + fabs( g ) * Sgn( f )) - h)) / x;
+            c = 1;
+            s = 1;
+
+            for( i1 = l; i1 <= k1; i1++ )
+            {
+
+                i = i1 + 1;
+                g = rv1[i];
+                y = W[i];
+                h = s * g;
+                g *= c;
+
+                /*  Scaling at calculation Z prevents its clearing,
+                   however if F and H both are zero - pass-by of fission on Z.
+                 */
+
+                af = fabs( f );
+                ah = fabs( h );
+
+                if( af < ah )
+                    z = ah * sqrt( 1 + (f / h) * (f / h) );
+
+                else
+                {
+
+                    z = 0;
+                    if( !REAL_ZERO( af ))
+                        z = af * sqrt( 1 + (h / f) * (h / f) );
+                }               /* if */
+
+                rv1[i1] = z;
+
+                /*  if Z=0, the rotation is free.  */
+                if( !REAL_ZERO( z ))
+                {
+
+                    c = f / z;
+                    s = h / z;
+                }               /* if */
+
+                f = x * c + g * s;
+                g = -x * s + g * c;
+                h = y * s;
+                y *= c;
+
+                if( get_V )
+                {
+
+                    for( jN = 0; jN < NN; jN += N )
+                    {
+
+                        x = V[jN + i1];
+                        z = V[jN + i];
+                        V[jN + i1] = x * c + z * s;
+                        V[jN + i] = -x * s + z * c;
+                    }           /* for */
+                }               /* if */
+
+                af = fabs( f );
+                ah = fabs( h );
+
+                if( af < ah )
+                    z = ah * sqrt( 1 + (f / h) * (f / h) );
+                else
+                {
+
+                    z = 0;
+                    if( !REAL_ZERO( af ))
+                        z = af * sqrt( 1 + (h / f) * (h / f) );
+                }               /* if */
+
+                W[i1] = z;
+
+                if( !REAL_ZERO( z ))
+                {
+
+                    c = f / z;
+                    s = h / z;
+                }               /* if */
+
+                f = c * g + s * y;
+                x = -s * g + c * y;
+
+                if( get_U )
+                {
+
+                    for( jN = 0; jN < MN; jN += N )
+                    {
+
+                        y = U[jN + i1];
+                        z = U[jN + i];
+                        U[jN + i1] = y * c + z * s;
+                        U[jN + i] = -y * s + z * c;
+                    }           /* for */
+                }               /* if */
+            }                   /* for */
+
+            rv1[l] = 0;
+            rv1[k] = f;
+            W[k] = x;
+        }                       /* for */
+
+        if( z < 0 )
+        {
+
+            W[k] = -z;
+
+            if( get_V )
+            {
+
+                for( jN = 0; jN < NN; jN += N )
+                    V[jN + k] *= -1;
+            }                   /* if */
+        }                       /* if */
+    }                           /* for */
+
+    free( rv1 );
+
+    return error;
+
+}                               /* vm_SingularValueDecomposition */
+
+
+
 int convertRodriguezTo3x3(double * result,double * matrix)
 {
   if ( (matrix==0) ||  (result==0) ) { return 0; }

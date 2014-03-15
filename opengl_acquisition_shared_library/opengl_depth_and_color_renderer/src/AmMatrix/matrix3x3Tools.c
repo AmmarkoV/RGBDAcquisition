@@ -34,32 +34,32 @@ void free3x3Matrix(double ** mat)
 }
 
 
-void print3x3FMatrix(char * str , float * matrix4x4)
+void print3x3FMatrix(char * str , float * matrix3x3)
 {
   fprintf( stderr, "  3x3 float %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "%f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f\n",matrix4x4[2]);
-  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f\n",matrix4x4[5]);
-  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f\n",matrix4x4[8]);
+  fprintf( stderr, "%f ",matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f\n",matrix3x3[2]);
+  fprintf( stderr, "%f ",matrix3x3[3]);  fprintf( stderr, "%f ",matrix3x3[4]);  fprintf( stderr, "%f\n",matrix3x3[5]);
+  fprintf( stderr, "%f ",matrix3x3[6]);  fprintf( stderr, "%f ",matrix3x3[7]);  fprintf( stderr, "%f\n",matrix3x3[8]);
   fprintf( stderr, "--------------------------------------\n");
 }
 
-void print3x3DMatrix(char * str , double * matrix4x4)
+void print3x3DMatrix(char * str , double * matrix3x3)
 {
   fprintf( stderr, "  3x3 double %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "%f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f\n",matrix4x4[2]);
-  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f\n",matrix4x4[5]);
-  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f\n",matrix4x4[8]);
+  fprintf( stderr, "%f ",matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f\n",matrix3x3[2]);
+  fprintf( stderr, "%f ",matrix3x3[3]);  fprintf( stderr, "%f ",matrix3x3[4]);  fprintf( stderr, "%f\n",matrix3x3[5]);
+  fprintf( stderr, "%f ",matrix3x3[6]);  fprintf( stderr, "%f ",matrix3x3[7]);  fprintf( stderr, "%f\n",matrix3x3[8]);
   fprintf( stderr, "--------------------------------------\n");
 }
 
 
-void print3x3DScilabMatrix(char * str , double * matrix4x4)
+void print3x3DScilabMatrix(char * str , double * matrix3x3)
 {
-  fprintf( stderr, "%s = [ %f ",str,matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ; ",matrix4x4[2]);
-  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f ; ",matrix4x4[5]);
-  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f ]\n\n",matrix4x4[8]);
+  fprintf( stderr, "%s = [ %f ",str,matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f ; ",matrix3x3[2]);
+  fprintf( stderr, "%f ",matrix3x3[3]);  fprintf( stderr, "%f ",matrix3x3[4]);  fprintf( stderr, "%f ; ",matrix3x3[5]);
+  fprintf( stderr, "%f ",matrix3x3[6]);  fprintf( stderr, "%f ",matrix3x3[7]);  fprintf( stderr, "%f ]\n\n",matrix3x3[8]);
 
 }
 
@@ -224,11 +224,11 @@ int transform2DPointUsing3x3Matrix(double * resultPoint2D, double * transformati
 {
   if ( (resultPoint2D==0) || (transformation3x3==0) || (point2D==0) ) { return 0; }
 
+/*
   fprintf(stderr,"Point 2D %0.2f,%0.2f \n",point2D[0],point2D[1]);
-
   fprintf(stderr,"Getting multiplied with \n");
-
   print3x3DMatrix("transformation3x3", transformation3x3);
+*/
 
 /*
    What we want to do ( in mathematica )
