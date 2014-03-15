@@ -1,5 +1,3 @@
-
-
 #include "matrixCalculations.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,8 +10,83 @@
 
 
 #define Sgn(x)              ( (x)<0 ? -1:1 )    /* Sgn(0) = 1 ! */
-#define REAL_ZERO(x)        ( (x<0.0001) && (x>0.0001) ? 0:1 )    /* REAL_ZERO(0.000001) = 1 ! */
+#define REAL_ZERO(x)   ( (x) < 1e-8 && (x) > -1e-8)
 #define MAX(a,b)            ( (a)<(b) ? b:a )
+
+
+int icvSort( double *array, int length )
+{
+ int i, j, index;
+ double swapd;
+
+ if( !array || length < 1 ) return 0;
+
+ for( i = 0; i < length - 1; i++ )
+         {
+           index = i;
+           for( j = i + 1; j < length; j++ )
+              {
+               if( array[j] < array[index] )  index = j;
+              }                       /* for */
+
+            if( index - i )
+             {
+               swapd = array[i];
+               array[i] = array[index];
+               array[index] = swapd;
+             }                       /* if */
+          }                           /* for */
+
+  return 1;
+}
+
+
+double
+icvMedian( int *ml, int *mr, int num, double *F )
+{
+    double l1, l2, l3, d1, d2, value;
+    double *deviation;
+    int i, i3;
+
+    if( !ml || !mr || !F )
+        return -1;
+
+    deviation = (double *) malloc( (num) * sizeof( double ));
+
+    if( !deviation )
+        return -1;
+
+    for( i = 0, i3 = 0; i < num; i++, i3 += 3 )
+    {
+
+        l1 = F[0] * mr[i3] + F[1] * mr[i3 + 1] + F[2];
+        l2 = F[3] * mr[i3] + F[4] * mr[i3 + 1] + F[5];
+        l3 = F[6] * mr[i3] + F[7] * mr[i3 + 1] + F[8];
+
+        d1 = (l1 * ml[i3] + l2 * ml[i3 + 1] + l3) / sqrt( l1 * l1 + l2 * l2 );
+
+        l1 = F[0] * ml[i3] + F[3] * ml[i3 + 1] + F[6];
+        l2 = F[1] * ml[i3] + F[4] * ml[i3 + 1] + F[7];
+        l3 = F[2] * ml[i3] + F[5] * ml[i3 + 1] + F[8];
+
+        d2 = (l1 * mr[i3] + l2 * mr[i3 + 1] + l3) / sqrt( l1 * l1 + l2 * l2 );
+
+        deviation[i] = (double) (d1 * d1 + d2 * d2);
+    }                           /* for */
+
+    if( !icvSort( deviation, num ) )
+    {
+
+        free( deviation );
+        return -1;
+    }                           /* if */
+
+    value = deviation[num / 2];
+    free(deviation );
+    return value;
+
+}
+
 
 int
 icvSingularValueDecomposition( int M,
@@ -145,7 +218,6 @@ icvSingularValueDecomposition( int M,
 
             for( jN = lN; jN < MN; jN += N )
             {
-
                 s = 0;
 
                 for( k = l; k < N; k++ )
