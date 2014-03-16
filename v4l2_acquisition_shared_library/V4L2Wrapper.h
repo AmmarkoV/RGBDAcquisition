@@ -53,6 +53,7 @@ struct Video
 {
   /* DEVICE NAME */
   char * videoinp;
+  unsigned int frameNumber;
   unsigned int height;
   unsigned int width;
   unsigned int frame_rate;
@@ -112,6 +113,8 @@ extern unsigned int largest_feed_y;
 extern struct Video * camera_feeds;
 
 unsigned char * ReturnDecodedLiveFrame(int webcam_id);
+
+char FileExistsVideoInput(char * filename);
 
 int VideoInput_InitializeLibrary(int numofinputs);
 int VideoInput_DeinitializeLibrary();

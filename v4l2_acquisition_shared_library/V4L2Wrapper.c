@@ -299,6 +299,7 @@ int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth
     camera_feeds[inpt].thread_alive_flag=0; /* <- This will be set to 1 when child process will start :)*/
     camera_feeds[inpt].stop_snap_loop=0;
     camera_feeds[inpt].loop_thread=0;
+    camera_feeds[inpt].frameNumber=0;
 
    // ChooseDifferentSoftFramerate(inpt,framespersecond); // Go for a good old solid PAL 25 fps , ( the PS3 cameras may be snapping at 120fps , but VisualCortex without
                                            // hardware acceleration can`t go more than 6-8 fps )

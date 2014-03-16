@@ -1,13 +1,56 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "V4L2Acquisition.h"
+
+#define BUILD_V4L2 1
 
 #if BUILD_V4L2
 #include "V4L2Wrapper.h"
 #include "V4L2IntrinsicCalibration.h"
 #include <linux/videodev2.h>
+
+
+int listV4L2Devices(int devID,char * output, unsigned int maxOutput)
+{
+   if ( (output==0)||(maxOutput==0)) { return 0; }
+
+   output[0]=0; //Flush string
+   char nextDev[128]={0};
+   unsigned int nextDevLength = 0;
+   unsigned int curOutput=0;
+   unsigned int curDev =0;
+   while (curOutput<maxOutput)
+   {
+      sprintf(nextDev,"/dev/video%u",curDev);
+      if (FileExistsVideoInput(nextDev))
+      {
+        nextDevLength = strlen(nextDev);
+        if ( nextDevLength + curOutput <  maxOutput-1 )
+        {
+           if ( (curDev>0) && (nextDevLength + curOutput + 1 <  maxOutput-1)  ) { strcat(output,","); }
+           strcat(output,nextDev);
+           curOutput+=nextDevLength+curOutput;
+        }
+      } else
+      {
+       //We Finished querying devices
+       return 1;
+      }
+      ++curDev;
+   }
+
+    return 1;
+}
+
+
+int getCurrentV4L2FrameNumber(int devID)
+{
+  return camera_feeds[devID].frameNumber;
+}
+
 
 int startV4L2Module(unsigned int max_devs,char * settings)
 {
@@ -59,6 +102,7 @@ int seekV4L2Frame(int devID,unsigned int seekFrame)
 int snapV4L2Frames(int devID)
 {
  camera_feeds[devID].frame_decoded=0;
+ ++camera_feeds[devID].frameNumber;
  camera_feeds[devID].frame=getFrame_v4l2intf(&camera_feeds[devID].v4l2_interface);
  return 0;
 }

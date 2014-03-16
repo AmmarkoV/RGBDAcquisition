@@ -4,6 +4,6 @@
 
 double solvePNPHomography(double * result3x3Matrix , unsigned int pointsNum ,  double * pointsA,  double * pointsB);
 
-void testPNPSolver();
+void testHomographySolver();
 
 #endif // SOLVEPNPITERATIVE_H_INCLUDED

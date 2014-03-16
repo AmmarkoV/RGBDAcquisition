@@ -62,14 +62,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AmMatrix/matrixCalculations.h" />
+		<Unit filename="AmMatrix/ocvStaging.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/ocvStaging.h" />
+		<Unit filename="AmMatrix/solveHomography.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/solveHomography.h" />
 		<Unit filename="AmMatrix/solveLinearSystemGJ.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AmMatrix/solveLinearSystemGJ.h" />
-		<Unit filename="AmMatrix/solvePnPIterative.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="AmMatrix/solvePnPIterative.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="TextureLoader/bmp.c">
 			<Option compilerVar="CC" />

@@ -719,7 +719,7 @@ void EditorFrame::guiSnapFrames(int doSnap)
 
   } else
   {
-      fprintf(stderr,"Will not refresh bitmaps etc..\n" );
+      fprintf(stderr,"Will not refresh bitmaps (acquisitionGetCurrentFrameNumber does not indicate a new frame availiable)..\n" );
   }
 
 

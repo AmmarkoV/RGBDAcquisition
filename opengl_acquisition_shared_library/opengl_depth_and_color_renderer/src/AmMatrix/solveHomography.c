@@ -1,4 +1,4 @@
-#include "solvePnPIterative.h"
+#include "solveHomography.h"
 
 
 #include <stdio.h>
@@ -114,7 +114,7 @@ double solvePNPHomography(double * result3x3Matrix , unsigned int pointsNum ,  d
 
 
 
-void testPNPSolver()
+void testHomographySolver()
 {
   double * F3x3 = alloc3x3Matrix();    if (F3x3 ==0) { return; }
   double * pointsA = (double *) malloc(sizeof(double) * 2 * 8);
