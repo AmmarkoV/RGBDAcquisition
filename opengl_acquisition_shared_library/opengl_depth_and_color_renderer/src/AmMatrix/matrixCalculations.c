@@ -224,8 +224,8 @@ void buildOpenGLProjectionForIntrinsics   (
 
 void testMatrices()
 {
-   testHomographySolver();
-  //testGJSolver();
+   //testHomographySolver();
+   testGJSolver();
   return ;
 
 

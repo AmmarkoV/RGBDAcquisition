@@ -38,7 +38,7 @@ int main(int argc, char **argv)
   translation[0]=0.0;  translation[1]=0.0; translation[2]=0.0;
   rodriguez[0]=0.0;    rodriguez[1]=0.0;    rodriguez[2]=0.0;
 
-  setOpenGLNearFarPlanes(1,5000);
+  setOpenGLNearFarPlanes(1,1500);
 
   int i=0;
   for (i=0; i<argc; i++)

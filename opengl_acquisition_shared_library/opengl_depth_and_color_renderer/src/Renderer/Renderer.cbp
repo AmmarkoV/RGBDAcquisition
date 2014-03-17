@@ -12,7 +12,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-from Scenes/piano.conf -intrinsics 519.460494 0.0 324.420168 0.0 519.118667 229.823479 0.0 0.0 1.0 -extrinsics 0.342452 0.293313 0.820453 1.585210 -1.579291 0.944875 10.0  " />
+				<Option parameters="-test" />
 				<Option host_application="/home/ammar/Documents/Programming/FORTH/opengl_depth_and_color_renderer/Renderer" />
 				<Option run_host_application_in_terminal="1" />
 				<Compiler>

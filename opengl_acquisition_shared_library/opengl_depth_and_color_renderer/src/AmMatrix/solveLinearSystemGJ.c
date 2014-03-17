@@ -6,6 +6,8 @@
 #include <math.h>
 #include "matrix3x3Tools.h"
 #include "matrix4x4Tools.h"
+#include "solveHomography.h"
+
 
 enum packedPointPrecalcs
 {
@@ -21,6 +23,38 @@ enum packedPointPrecalcs
  ,Result
  ,ElementsNumber
 };
+
+
+
+enum packedPointPrecalcsFirstLine
+{
+  m_line1_minus_xA=0
+ ,m_line1_minus_yA
+ ,m_line1_minus_One_1
+ ,m_line1_zero_1
+ ,m_line1_zero_2
+ ,m_line1_zero_3
+ ,m_line1_xBxA
+ ,m_line1_xByA
+ ,m_line1_xB
+ ,m_line1_Result
+};
+
+enum packedPointPrecalcsSecondLine
+{
+  m_line2_zero_1=0
+ ,m_line2_zero_2
+ ,m_line2_zero_3
+ ,m_line2_minus_xA
+ ,m_line2_minus_yA
+ ,m_line2_minus_One_1
+ ,m_line2_yBxA
+ ,m_line2_yByA
+ ,m_line2_yB
+ ,m_line2_Result
+};
+
+
 
 void printSystemMathematicaJazz(double * mat,unsigned int totalLines)
 {
@@ -63,7 +97,7 @@ void printSystemMathematica(double * mat,unsigned int totalLines)
      fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yB] );
      fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + xA] );
      fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + yA] );
-     fprintf(stderr,"%0.2f ,",mat[i*ElementsNumber + One] );
+     fprintf(stderr,"%0.2f ",mat[i*ElementsNumber + One] );
      fprintf(stderr," } " );
      if (i<totalLines-1) { fprintf(stderr," , "); }
     }
@@ -274,7 +308,7 @@ int solveLinearSystemGJ(double * result , double * coefficients , unsigned int v
 
 
 
-int calculateFundamentalMatrix8Point(double * result3x3Matrix , unsigned int pointsNum ,  double * pointsA,  double * pointsB )
+int calculateFundamentalMatrix8PointMultipleView(double * result3x3Matrix , unsigned int pointsNum ,  double * pointsA,  double * pointsB )
 {
     if (pointsNum<8) { fprintf(stderr,"calculateFundamentalMatrix8Point requires at least 8 points\n"); return 0; }
 
@@ -332,6 +366,79 @@ int calculateFundamentalMatrix8Point(double * result3x3Matrix , unsigned int poi
 
 
 
+int calculateFundamentalMatrix8Point(double * result3x3Matrix , unsigned int pointsNum ,  double * pointsA,  double * pointsB )
+{
+    if (pointsNum<8) { fprintf(stderr,"calculateFundamentalMatrix8Point requires at least 8 points\n"); return 0; }
+
+    //http://en.wikipedia.org/wiki/Eight-point_algorithm#Step_1:_Formulating_a_homogeneous_linear_equation
+    //
+    //           ( Xa )            ( Xb )                ( e11 e12 e13 )
+    //  pointsA  ( Ya )    pointsB ( Yb )              E ( e21 e22 e23 )
+    //           ( 1  )            ( 1  )                ( e31 e32 e33 )
+    //
+    //So what we do is convert this to a matrix for solving a linear system of 8 equations
+    // Xb*Xa*e11   +   Xb*Ya*e12     +    Xb*e13    +    yB*xA*e21     +    yB*yA*e22    +    yB*e23    +    xA*e31    +    yA*e32    +      1*e33    =   0
+
+
+    double * pxA , * pyA , * pxB , * pyB ;
+    int elements=10;
+
+    double * compiledPoints = (double * ) malloc(pointsNum * elements * sizeof(double));
+    if (compiledPoints==0) { return 0; }
+
+    unsigned int i=0;
+    for (i=0; i< pointsNum; i+=2)
+    {
+      //Shortcut our vars
+      pxA = &pointsA[i*2 + 0]; pyA = &pointsA[i*2 + 1];
+      pxB = &pointsB[i*2 + 0]; pyB = &pointsB[i*2 + 1];
+      fprintf(stderr,"Pair %u : Point A %f,%f Point B %f,%f \n",i,*pxA,*pyA,*pxB,*pyB);
+
+
+      //Make the precalculations for each of the elements
+      compiledPoints[i*elements + m_line1_minus_xA] = (double)  (-1.0) * (*pxA);
+      compiledPoints[i*elements + m_line1_minus_yA] = (double)  (-1.0) * (*pyA);
+      compiledPoints[i*elements + m_line1_minus_One_1]   = (double)  (-1.0) ;
+      compiledPoints[i*elements + m_line1_zero_1] = (double)  0.0;
+      compiledPoints[i*elements + m_line1_zero_2] = (double)  0.0;
+      compiledPoints[i*elements + m_line1_zero_3] = (double)  0.0;
+      compiledPoints[i*elements + m_line1_xBxA]   = (double)  (*pxB)*(*pxA);
+      compiledPoints[i*elements + m_line1_xByA]   = (double)  (*pxB)*(*pyA);
+      compiledPoints[i*elements + m_line1_xB]  = (*pxB);
+      compiledPoints[i*elements + m_line1_Result] = 0.0;
+
+      //Make the precalculations for each of the elements
+      compiledPoints[(i+1)*elements + m_line2_zero_1] = (double)  0.0;
+      compiledPoints[(i+1)*elements + m_line2_zero_2] = (double)  0.0;
+      compiledPoints[(i+1)*elements + m_line2_zero_3] = (double)  0.0;
+      compiledPoints[(i+1)*elements + m_line2_minus_xA] = (double)  (-1.0) * (*pxA);
+      compiledPoints[(i+1)*elements + m_line2_minus_yA] = (double)  (-1.0) * (*pyA);
+      compiledPoints[(i+1)*elements + m_line2_minus_One_1] = (double)  (-1.0) ;
+      compiledPoints[(i+1)*elements + m_line2_yBxA]   = (double)  (*pyB)*(*pxA);
+      compiledPoints[(i+1)*elements + m_line2_yByA]   = (double)  (*pyB)*(*pyA);
+      compiledPoints[(i+1)*elements + m_line2_yB]  = (*pyB);
+      compiledPoints[(i+1)*elements + m_line2_Result] = 0.0;
+
+
+    }
+
+    fprintf(stderr,"\n\n");
+    printSystemPlain(compiledPoints,"Original",pointsNum);
+
+    //fprintf(stderr,"\n\n");
+    printSystemMathematica(compiledPoints, pointsNum);
+    //printSystemScilab(compiledPoints, pointsNum);
+
+    solveLinearSystemGJ(result3x3Matrix,compiledPoints,elements,pointsNum);
+
+
+
+   free(compiledPoints);
+
+   return 1;
+}
+
+
 
 
 
@@ -363,6 +470,23 @@ void testGJSolver()
   print3x3DMatrix("Calculated matrix using 8 points", F3x3);
 
   print3x3DScilabMatrix("M",F3x3);
+
+
+  double err = testHomographyError(F3x3 , i ,  pointsA , pointsB);
+  printf("result homography brings error %0.2f \n",err);
+
+
+
+
+  F3x3[0] = 3.369783338522472;     F3x3[1] = -1.637685275601417;   F3x3[2] = 851.0036476001653;
+  F3x3[3] = -0.2783636300638685;   F3x3[4] =  15.54534472903452;   F3x3[5] = -2133.959529863233;
+  F3x3[6] = -0.003793213664419078; F3x3[7] =  0.02530490689886264; F3x3[8] = 1;
+
+  print3x3DMatrix("3x3 known good homography", F3x3);
+        err = testHomographyError(F3x3 , i , pointsA , pointsB);
+  printf("known good homography brings error %0.2f \n",err);
+
+
 
   free3x3Matrix(&F3x3);
   free(pointsA);

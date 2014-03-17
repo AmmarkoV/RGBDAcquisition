@@ -41,6 +41,9 @@ M///////////////////////////////////////////////////////////////////////////////
 00037 // or tort (including negligence or otherwise) arising in any way out of
 00038 // the use of this software, even if advised of the possibility of such damage.
 */
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 #include "ocvStaging.h"
 

@@ -275,7 +275,6 @@ double getOpenGLPixelSize()
 int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,char * sceneFile)
 {
   fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
-  testMatrices();
 
   char test[12]={0};
   char * testP = test;

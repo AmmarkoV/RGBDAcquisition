@@ -65,7 +65,7 @@ typedef struct { Vertex min; Vertex max; } bbox;
 /**  @brief The structure that defines a Material */
 typedef struct
 {
-        GLfloat shine;
+        GLfloat shine[1];
 		GLfloat ambient[4];
 		GLfloat diffuse[4];
 		GLfloat specular[4];

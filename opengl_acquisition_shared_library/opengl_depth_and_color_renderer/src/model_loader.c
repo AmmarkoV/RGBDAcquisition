@@ -10,6 +10,11 @@
 #include "model_loader_obj.h"
 #include "tools.h"
 
+#define DISABLE_GL_CALL_LIST 1
+#if DISABLE_GL_CALL_LIST
+ #warning "Please note that glCallList is disabled and that has a really bad effect on graphics card performance"
+#endif // DISABLE_GL_CALL_LIST
+
 
 #define PIE 3.14159265358979323846
 #define degreeToRadOLD(deg) (deg)*(PIE/180)
@@ -233,12 +238,17 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
          {
            //A model has been created , and it can be served
            GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->model);
-           if (objlist!=0)
+           if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after getObjOGLList\n"); }
+
+
+           if ( (objlist!=0) && (!DISABLE_GL_CALL_LIST) )
              { //We have compiled a list of the triangles for better performance
                glCallList(objlist);
+               if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing glCallList(%u)\n",objlist); }
              }  else
              { //Just feed the triangles to open gl one by one ( slow )
                drawOBJMesh( ( struct OBJ_Model * ) mod->model);
+               if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing all the triangles\n"); }
              }
          } else
          { fprintf(stderr,"Could not draw unspecified model\n"); }

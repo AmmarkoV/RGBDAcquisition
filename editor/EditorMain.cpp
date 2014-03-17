@@ -359,7 +359,13 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    recording=0; recordedFrames=0;
    framesSnapped=0;
 
-   if (totalFrames==0) {
+   if  (
+         (totalFrames==0) ||
+         (moduleID==V4L2_ACQUISITION_MODULE) ||
+         (moduleID==V4L2STEREO_ACQUISITION_MODULE)
+       )
+
+                       {
                          totalFramesLabel->SetLabel(wxT("Live Stream"));
                          play=1;
                          FrameSlider->SetMin(0);

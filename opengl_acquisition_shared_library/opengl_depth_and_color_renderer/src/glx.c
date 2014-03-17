@@ -140,7 +140,7 @@ int glx_checkEvents()
           /* fall through... */
         case Expose:
              #warning "redraws are not handled ?"
-             //needRedraw=GL_TRUE;
+             // needRedraw=GL_TRUE;
           break;
       }
     }; /* loop to compress events */
