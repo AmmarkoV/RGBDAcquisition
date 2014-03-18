@@ -288,15 +288,13 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
   #endif
 
 
-  char * defaultSceneFile = "scene.conf";
+  char defaultSceneFile[] = "scene.conf";
   //( char *)   malloc(sizeof(32)*sizeof(char));
   //strncpy(defaultSceneFile,"scene.conf",32);
 
-  if (sceneFile == 0 ) { initScene(defaultSceneFile);  } else
-                       { initScene(sceneFile);    }
+  if (sceneFile == 0 ) { return initScene(defaultSceneFile);  } else
+                       { return initScene(sceneFile);    }
 
-  //free(defaultSceneFile);
-  fprintf(stderr,"startOGLRendererSandbox returning\n");
   return 1;
 }
 

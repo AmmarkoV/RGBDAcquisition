@@ -167,6 +167,10 @@ int updateProjectionMatrix()
   if (scene==0) { fprintf(stderr,"No Scene declared yet , don't know how to update proj matrix\n"); return 0; }
   if ( scene->emulateProjectionMatrixDeclared)
   {
+     if (useIntrinsicMatrix)
+     {
+       fprintf(stderr,YELLOW "Please note that intrinsics have been passed as an argument but we also have a projection matrix from trajectory parser , we will use the latter\n" NORMAL);
+     }
      fprintf(stderr,"Emulating Projection Matrix from Trajectory Parser");
      int viewport[4]={0};
      double fx = scene->emulateProjectionMatrix[0];
@@ -489,7 +493,7 @@ int renderScene()
 
    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting modelview matrix\n"); }
    //print4x4DMatrix("OpenGL ModelView Matrix Given by Trajectory Parser", scene->modelViewMatrix );
-  } else //<- this else
+  } //else //<- this else
   //If setOpenGLExtrinsicCalibration has set a custom MODELVIEW matrix we will use it
   #warning "Is this else required?"
   if (useCustomModelViewMatrix)
@@ -500,9 +504,10 @@ int renderScene()
 
     //glRotatef(90,-1.0,0,0); //TODO FIX THESE
     //glScalef(1.0,1.0,-1.0); //These are now taken into account using scene files ( see SCALE_WORLD , MAP_ROTATIONS )
+    //glRotatef(180,0.0,0,-1.0);
 
    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting custom modelview matrix\n"); }
-    //glRotatef(180,0.0,0,-1.0);
+
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
   {

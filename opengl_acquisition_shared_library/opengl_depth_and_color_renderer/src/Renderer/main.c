@@ -38,7 +38,7 @@ int main(int argc, char **argv)
   translation[0]=0.0;  translation[1]=0.0; translation[2]=0.0;
   rodriguez[0]=0.0;    rodriguez[1]=0.0;    rodriguez[2]=0.0;
 
-  setOpenGLNearFarPlanes(1,1500);
+  setOpenGLNearFarPlanes(1,15000);
 
   int i=0;
   for (i=0; i<argc; i++)
@@ -87,9 +87,16 @@ int main(int argc, char **argv)
                                     }
   }
 
- if (readFromArg!=0) {   startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,argv[readFromArg]); } else
-                     {   startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/ }
 
+ int started = 0;
+ if (readFromArg!=0) {   started=startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,argv[readFromArg]); } else
+                     {   started=startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/ }
+
+ if (!started)
+ {
+    fprintf(stderr,"Could not start OpenGL Renderer Sandbox , please see log to find the exact reason of failure \n");
+    return 0;
+ }
 
   if (photoShootOBJ)
    {
