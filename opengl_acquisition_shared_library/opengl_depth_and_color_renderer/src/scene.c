@@ -511,11 +511,18 @@ int renderScene()
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
   {
-    fprintf(stderr,"Using on the fly rotate/translate\n");
+    fprintf(stderr,"Using on the fly rotate/translate rot x,y,z ( %0.2f,%0.2f,%0.2f ) trans x,y,z, (  %0.2f,%0.2f,%0.2f ) \n"
+            ,camera_angle_x,camera_angle_y,camera_angle_z,camera_pos_x,camera_pos_y,camera_pos_z
+            );
     glLoadIdentity();
-    glRotatef(camera_angle_x,-1.0,0,0); // Peristrofi gyrw apo ton x
-    glRotatef(camera_angle_y,0,-1.0,0); // Peristrofi gyrw apo ton y
-    glRotatef(camera_angle_z,0,0,-1.0);
+
+    if (camera_angle_x!=0.0)
+      glRotatef(camera_angle_x,-1.0,0,0); // Rotate around x
+    if (camera_angle_y!=0.0)
+      glRotatef(camera_angle_y,0,-1.0,0); // Rotate around y
+    if (camera_angle_z!=0.0)
+      glRotatef(camera_angle_z,0,0,-1.0); // Rotate around z
+
     glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting specifying camera position\n"); }
   }
