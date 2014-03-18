@@ -113,6 +113,46 @@ int drawCube()
 }
 
 
+int drawPyramid()
+{
+  // draw a pyramid (in smooth coloring mode)
+  glBegin(GL_POLYGON);				// start drawing a pyramid
+
+  // front face of pyramid
+  glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Red
+  glVertex3f(0.0f, 1.0f, 0.0f);		        // Top of triangle (front)
+  glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
+  glVertex3f(-1.0f,-1.0f, 1.0f);		// left of triangle (front)
+  glColor3f(0.0f,0.0f,1.0f);			// Set The Color To Blue
+  glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)
+
+  // right face of pyramid
+  glColor3f(1.0f,0.0f,0.0f);			// Red
+  glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Right)
+  glColor3f(0.0f,0.0f,1.0f);			// Blue
+  glVertex3f( 1.0f,-1.0f, 1.0f);		// Left Of Triangle (Right)
+  glColor3f(0.0f,1.0f,0.0f);			// Green
+  glVertex3f( 1.0f,-1.0f, -1.0f);		// Right Of Triangle (Right)
+
+  // back face of pyramid
+  glColor3f(1.0f,0.0f,0.0f);			// Red
+  glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Back)
+  glColor3f(0.0f,1.0f,0.0f);			// Green
+  glVertex3f( 1.0f,-1.0f, -1.0f);		// Left Of Triangle (Back)
+  glColor3f(0.0f,0.0f,1.0f);			// Blue
+  glVertex3f(-1.0f,-1.0f, -1.0f);		// Right Of Triangle (Back)
+
+  // left face of pyramid.
+  glColor3f(1.0f,0.0f,0.0f);			// Red
+  glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Left)
+  glColor3f(0.0f,0.0f,1.0f);			// Blue
+  glVertex3f(-1.0f,-1.0f,-1.0f);		// Left Of Triangle (Left)
+  glColor3f(0.0f,1.0f,0.0f);			// Green
+  glVertex3f(-1.0f,-1.0f, 1.0f);		// Right Of Triangle (Left)
+
+  glEnd();					// Done Drawing The Pyramid
+}
+
 
 struct Model * loadModel(char * directory,char * modelname)
 {
@@ -126,10 +166,11 @@ struct Model * loadModel(char * directory,char * modelname)
   if ( mod == 0 )  { fprintf(stderr,"Could not allocate enough space for model %s \n",modelname);  return 0; }
   memset(mod , 0 , sizeof(struct Model));
 
-  if ( strcmp(modelname,"plane") == 0 ) {  mod->type = OBJ_PLANE; mod->model = 0; }  else
-  if ( strcmp(modelname,"grid") == 0 ) {  mod->type = OBJ_GRIDPLANE; mod->model = 0; }  else
-  if ( strcmp(modelname,"cube") == 0 ) {  mod->type = OBJ_CUBE; mod->model = 0; }  else
-  if ( strcmp(modelname,"axis") == 0 ) {  mod->type = OBJ_AXIS; mod->model = 0; }  else
+  if ( strcmp(modelname,"plane") == 0 )   {  mod->type = OBJ_PLANE;     mod->model = 0; }  else
+  if ( strcmp(modelname,"grid") == 0 )    {  mod->type = OBJ_GRIDPLANE; mod->model = 0; }  else
+  if ( strcmp(modelname,"cube") == 0 )    {  mod->type = OBJ_CUBE;      mod->model = 0; }  else
+  if ( strcmp(modelname,"pyramid") == 0 ) {  mod->type = OBJ_PYRAMID;   mod->model = 0; }  else
+  if ( strcmp(modelname,"axis") == 0 )    {  mod->type = OBJ_AXIS;      mod->model = 0; }  else
   if ( strstr(modelname,".obj") != 0 )
     {
       mod->type = OBJMODEL;
@@ -170,11 +211,11 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt called while on an erroneous state :(\n"); }
   glPushMatrix();
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-  glEnable(GL_NORMALIZE);
+  //glEnable(GL_NORMALIZE);
   /*If scale factors other than 1 are applied to the modelview matrix
-            and lighting is enabled, lighting often appears wrong.
-            In that case, enable automatic normalization of normals by
-            calling glEnable with the argument GL_NORMALIZE.*/
+    and lighting is enabled, lighting often appears wrong.
+    In that case, enable automatic normalization of normals by
+    calling glEnable with the argument GL_NORMALIZE.*/
 
   if (mod->nocull) { glDisable(GL_CULL_FACE); }
   glTranslatef(x,y,z);
@@ -188,7 +229,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
                        {
                          glScalef( mod->scaleX , mod->scaleY , mod->scaleZ );
                          if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Could not scale :(\n"); }
-                         //fprintf(stderr,"Scaling model by %f %f %f\n",mod->scale,mod->scale,mod->scale);
+                         fprintf(stderr,"Scaling model by %f %f %f\n",mod->scaleX,mod->scaleY,mod->scaleZ);
                        }
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying dimensions \n"); }
@@ -232,6 +273,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       case OBJ_GRIDPLANE : drawGridPlane( 0.0 , 0.0 , 0.0, 1.0); break;
       case OBJ_AXIS :      drawAxis(0,0,0,1.0);                  break;
       case OBJ_CUBE :      drawCube();                           break;
+      case OBJ_PYRAMID :   drawPyramid();                        break;
       case OBJMODEL :
       {
          if (mod->model!=0)

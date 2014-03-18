@@ -63,7 +63,7 @@ double customTranslation[3]={0};
 double customRodriguezRotation[3]={0};
 
 
-#define USE_LIGHTS 1
+#define USE_LIGHTS 0
 const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
 const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };

@@ -11,6 +11,17 @@
 
 #include "../OGLRendererSandbox.h"
 
+
+#include <GL/glx.h>    /* this includes the necessary X headers */
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#include <X11/X.h>    /* X11 constant (e.g. TrueColor) */
+#include <X11/keysym.h>
+
+#include "../glx.h"
+
+
 int readFromArg=0;
 int photoShootOBJ=0;
 float angleX=0.0,angleY=0.0,angleZ=0.0;

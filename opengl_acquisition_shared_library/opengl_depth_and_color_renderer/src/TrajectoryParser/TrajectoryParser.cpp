@@ -434,6 +434,12 @@ int addObjectToVirtualStream(
    stream->object[pos].scaleX = scaleX;
    stream->object[pos].scaleY = scaleY;
    stream->object[pos].scaleZ = scaleZ;
+
+   if ( (scaleX==0.0) || (scaleY==0.0) || (scaleZ==0.0) )
+   {
+       fprintf(stderr,RED "Please note that scaling parameters (%f,%f,%f) will effectively make object %s invisible \n" NORMAL,scaleX,scaleY,scaleZ,name);
+   }
+
    stream->object[pos].particleNumber = particleNumber;
 
    stream->object[pos].frame=0;
@@ -1079,7 +1085,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                                     newstream->object[item].Transparency );
                } else
                {
-                 fprintf(stderr,"Could not add state/position to non-existing object `%s` \n",name);
+                 fprintf(stderr,RED "Could not add state/position to non-existing object `%s` \n" NORMAL,name);
                }
             }
 

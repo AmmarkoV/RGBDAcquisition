@@ -19,6 +19,7 @@ enum ModelTypes
     OBJ_PLANE,
     OBJ_GRIDPLANE,
     OBJ_CUBE,
+    OBJ_PYRAMID,
     OBJMODEL
 };
 
