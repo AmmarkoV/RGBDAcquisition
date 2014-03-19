@@ -95,8 +95,8 @@ void DrawGLScene()
   glLoadIdentity();				// Reset The View
 glTranslatef(-1.5f,0.0f,-6.0f);		// Move Left 1.5 Units And Into The Screen 6.0
 
-  drawPyramid();
-/*
+ // drawPyramid();
+
   glTranslatef(-1.5f,0.0f,-6.0f);		// Move Left 1.5 Units And Into The Screen 6.0
 
   glRotatef(rtri,0.0f,1.0f,0.0f);		// Rotate The Pyramid On The Y axis
@@ -195,7 +195,6 @@ glTranslatef(-1.5f,0.0f,-6.0f);		// Move Left 1.5 Units And Into The Screen 6.0
   // swap the buffers to display, since double buffering is used.
 //  glutSwapBuffers();
 
-*/
   glx_endRedraw();
 }
 

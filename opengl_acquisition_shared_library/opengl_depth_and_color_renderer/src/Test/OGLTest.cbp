@@ -31,6 +31,15 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add library="GL" />
+			<Add library="GLU" />
+			<Add library="X11" />
+		</Linker>
+		<Unit filename="../glx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../glx.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

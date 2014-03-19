@@ -20,7 +20,11 @@ enum ModelTypes
     OBJ_GRIDPLANE,
     OBJ_CUBE,
     OBJ_PYRAMID,
-    OBJMODEL
+    OBJ_SPHERE,
+    //-----------
+    OBJMODEL,
+    //-----------
+    TOTAL_POSSIBLE_MODEL_TYPES
 };
 
 
