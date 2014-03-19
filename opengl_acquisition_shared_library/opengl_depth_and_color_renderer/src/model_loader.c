@@ -266,7 +266,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
                        {
                          glScalef( mod->scaleX , mod->scaleY , mod->scaleZ );
                          if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Could not scale :(\n"); }
-                         fprintf(stderr,"Scaling model by %f %f %f\n",mod->scaleX,mod->scaleY,mod->scaleZ);
+                         //fprintf(stderr,"Scaling model by %f %f %f\n",mod->scaleX,mod->scaleY,mod->scaleZ);
                        }
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying dimensions \n"); }

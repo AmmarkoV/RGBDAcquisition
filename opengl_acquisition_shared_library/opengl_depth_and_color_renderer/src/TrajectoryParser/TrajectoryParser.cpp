@@ -1049,6 +1049,38 @@ int readVirtualStream(struct VirtualStream * newstream)
                 fprintf(stderr,"Tracker ARROW%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
                #endif
             }  else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"HAND_POINTS0",12)==1)
+            {
+               char curItem[128];
+               unsigned int item=0;
+               float pos[7]={0};
+               int coordLength=6;
+
+               fprintf(stderr,"Trying to parse Hand Points\n");
+               unsigned int found = 0;
+
+               int i=0;
+               for (i=0; i<23; i++)
+               {
+                sprintf(curItem,"hand%u_sph%u",0,i);
+                item = getObjectID(newstream, curItem, &found );
+                if (found)
+                 {
+                  pos[0]=newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,1+i*3);
+                  pos[1]=newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,2+i*3);
+                  pos[2]=newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,3+i*3);
+                  addStateToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength ,
+                                      newstream->object[item].scaleX,
+                                      newstream->object[item].scaleY,
+                                      newstream->object[item].scaleZ,
+                                      newstream->object[item].R,
+                                      newstream->object[item].G,
+                                      newstream->object[item].B,
+                                      newstream->object[item].Transparency);
+                 }
+               }
+            }
+
             /*! REACHED A POSITION DECLERATION ( POS(hand,0,   0.0,0.0,0.0 , 0.0,0.0,0.0,0.0 ) )
               argument 0 = POS , argument 1 = name ,  argument 2 = time in MS , argument 3-5 = X,Y,Z , argument 6-9 = Rotations*/
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"POS",3)==1)

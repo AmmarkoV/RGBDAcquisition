@@ -345,7 +345,7 @@ int tickScene()
 {
    //ALL positions should be calculated here!
    //i dont like the way this is working now
-   float posStack[7];
+   float posStack[7]={0};
    float * pos = (float*) &posStack;
    float scaleX = 1.0 , scaleY = 1.0 , scaleZ = 1.0;
 
