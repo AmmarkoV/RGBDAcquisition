@@ -28,20 +28,20 @@ OBJECT(hand0_sph1,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)
 OBJECT(hand0_sph2,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
 OBJECT(hand0_sph3,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
 OBJECT(hand0_sph4,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
-OBJECT(hand0_sph5,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
-OBJECT(hand0_sph6,obj_type,255,255,0,0 ,0, 0.14,0.14,0.14)    
+OBJECT(hand0_sph5,obj_type,255,255,0,0 ,0, 0.14,0.14,0.14)    
+OBJECT(hand0_sph6,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
 OBJECT(hand0_sph7,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
 OBJECT(hand0_sph8,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
-OBJECT(hand0_sph9,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14) 
-      
+OBJECT(hand0_sph9,obj_type,155,50,50,0 ,0, 0.14,0.14,0.14)  
+         
 OBJECT(hand0_sph10,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
 OBJECT(hand0_sph11,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
-OBJECT(hand0_sph12,obj_type,255,0,255,0 ,0, 0.14,0.14,0.14)    
-OBJECT(hand0_sph13,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
+OBJECT(hand0_sph12,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)    
+OBJECT(hand0_sph13,obj_type,255,0,0,0 ,0, 0.14,0.14,0.14)    
 OBJECT(hand0_sph14,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)       
 OBJECT(hand0_sph15,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)       
-OBJECT(hand0_sph16,obj_type,0,0,00,0 ,0, 0.14,0.14,0.14)       
-OBJECT(hand0_sph17,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)       
+OBJECT(hand0_sph16,obj_type,0,255,0 ,0 ,0, 0.14,0.14,0.14)       
+OBJECT(hand0_sph17,obj_type,0,100,100,100 ,0, 0.14,0.14,0.14)       
 OBJECT(hand0_sph18,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)       
 OBJECT(hand0_sph19,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)     
     
@@ -49,13 +49,13 @@ OBJECT(hand0_sph20,obj_type,0,0,100,0 ,0, 0.14,0.14,0.14)
 OBJECT(hand0_sph21,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)       
 OBJECT(hand0_sph22,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)            
  
-
+ 
 #------------------------------------------------------------------
 
 
+ 
 
-
-
+ 
 
 
 
