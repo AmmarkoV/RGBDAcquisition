@@ -88,7 +88,8 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
 
     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
-      printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
+      printf("%0.2f %0.2f ", skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
+      //printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
     }
    printf("\n\n");
 
