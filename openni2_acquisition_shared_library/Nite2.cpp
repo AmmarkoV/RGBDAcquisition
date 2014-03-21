@@ -90,7 +90,7 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
     {
       printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
     }
-
+   printf("\n\n");
 
   if (stc[devID].skelCallbackAddr!=0)
   {

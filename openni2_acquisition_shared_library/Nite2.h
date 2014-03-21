@@ -8,7 +8,7 @@
 using namespace openni;
 
 
-const char * jointNames[] =
+static const char * jointNames[] =
 {"head",
  "torso",
  "left_shoulder",
