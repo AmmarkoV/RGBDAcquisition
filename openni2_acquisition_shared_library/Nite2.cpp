@@ -27,23 +27,6 @@
   #define USER_MESSAGE(msg) \
 	  {printf("[%08llu] User #%d:\t%s\n",ts, user.getId(),msg);}
 
-const char * jointNames[] =
-{"head",
- "torso",
- "left_shoulder",
- "right_shoulder",
- "left_elbow",
- "right_elbow",
- "left_hand",
- "right_hand",
- "left_hip",
- "right_hip",
- "left_knee",
- "right_knee",
- "left_foot",
- "right_foot"
-};
-
 
 struct NiteVirtualDevice
 {
@@ -101,6 +84,13 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
     fprintf(stderr,"Center of Mass %0.2f %0.2f %0.2f \n",skeletonFound->centerOfMass.x,skeletonFound->centerOfMass.y,skeletonFound->centerOfMass.z);
     fprintf(stderr,"Head %0.2f %0.2f %0.2f \n",skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
     fprintf(stderr,  " \n" NORMAL );
+
+
+    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+    {
+      printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
+    }
+
 
   if (stc[devID].skelCallbackAddr!=0)
   {
@@ -219,75 +209,158 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
      humanSkeleton.joint[HUMAN_SKELETON_HEAD].y = jointHead.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_HEAD].z = jointHead.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_HEAD] = jointHead.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_HEAD].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_HEAD].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_HEAD].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_HEAD].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_HEAD].y );
+     //------------------------------------------------------------------------------------------
 
 
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].x = jointLeftShoulder.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].y = jointLeftShoulder.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].z = jointLeftShoulder.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_SHOULDER] = jointLeftShoulder.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_SHOULDER].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_SHOULDER].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_SHOULDER].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_SHOULDER].x = jointRightShoulder.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_SHOULDER].y = jointRightShoulder.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_SHOULDER].z = jointRightShoulder.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_SHOULDER] = jointRightShoulder.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_RIGHT_SHOULDER].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_SHOULDER].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_SHOULDER].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_SHOULDER].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_SHOULDER].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_ELBOW].x = jointLeftElbow.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_ELBOW].y = jointLeftElbow.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_ELBOW].z = jointLeftElbow.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_ELBOW] = jointLeftElbow.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_LEFT_ELBOW].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_ELBOW].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_ELBOW].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_ELBOW].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_ELBOW].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_ELBOW].x = jointRightElbow.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_ELBOW].y = jointRightElbow.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_ELBOW].z = jointRightElbow.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_ELBOW] = jointRightElbow.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_RIGHT_ELBOW].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_ELBOW].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_ELBOW].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_ELBOW].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_ELBOW].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_HAND].x = jointLeftHand.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_HAND].y = jointLeftHand.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_HAND].z = jointLeftHand.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_HAND] = jointLeftHand.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_LEFT_HAND].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_HAND].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_HAND].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_HAND].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_HAND].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HAND].x = jointRightHand.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HAND].y = jointRightHand.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HAND].z = jointRightHand.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_HAND] = jointRightHand.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HAND].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HAND].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HAND].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_HAND].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_HAND].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_TORSO].x = jointTorso.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_TORSO].y = jointTorso.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_TORSO].z = jointTorso.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_TORSO] = jointTorso.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_TORSO].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_TORSO].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_TORSO].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_TORSO].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_TORSO].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_HIP].x = jointLeftHip.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_HIP].y = jointLeftHip.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_HIP].z = jointLeftHip.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_HIP] = jointLeftHip.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_LEFT_HIP].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_HIP].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_HIP].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_HIP].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_HIP].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HIP].x = jointRightHip.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HIP].y = jointRightHip.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HIP].z = jointRightHip.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_HIP] = jointRightHip.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HIP].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HIP].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_HIP].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_HIP].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_HIP].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_KNEE].x = jointLeftKnee.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_KNEE].y = jointLeftKnee.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_KNEE].z = jointLeftKnee.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_KNEE] = jointLeftKnee.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_LEFT_KNEE].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_KNEE].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_KNEE].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_KNEE].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_KNEE].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_KNEE].x = jointRightKnee.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_KNEE].y = jointRightKnee.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_KNEE].z = jointRightKnee.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_KNEE] = jointRightKnee.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_RIGHT_KNEE].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_KNEE].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_KNEE].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_KNEE].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_KNEE].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_FOOT].x = jointLeftFoot.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_FOOT].y = jointLeftFoot.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_LEFT_FOOT].z = jointLeftFoot.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_LEFT_FOOT] = jointLeftFoot.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_LEFT_FOOT].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_FOOT].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_LEFT_FOOT].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_FOOT].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_LEFT_FOOT].y );
+     //------------------------------------------------------------------------------------------
 
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].x = jointRightFoot.getPosition().x;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].y = jointRightFoot.getPosition().y;
      humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].z = jointRightFoot.getPosition().z;
      humanSkeleton.jointAccuracy[HUMAN_SKELETON_RIGHT_FOOT] = jointRightFoot.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_RIGHT_FOOT].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_FOOT].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_RIGHT_FOOT].y );
+     //------------------------------------------------------------------------------------------
 
-
-
+     //At first take the bounding box given by NiTE ( but this is 2D only and we want a 3D one )
      float maxX=user.getBoundingBox().max.x , maxY=user.getBoundingBox().max.y , maxZ=user.getBoundingBox().max.z;
      float minX=user.getBoundingBox().min.x , minY=user.getBoundingBox().min.y , minZ=user.getBoundingBox().min.z;
 
