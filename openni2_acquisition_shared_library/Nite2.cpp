@@ -192,6 +192,7 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
     humanSkeleton.centerOfMass.z = user.getCenterOfMass().z;
 
      nite::SkeletonJoint jointHead           =   user.getSkeleton().getJoint(nite::JOINT_HEAD);
+     nite::SkeletonJoint jointNeck           =   user.getSkeleton().getJoint(nite::JOINT_NECK);
      nite::SkeletonJoint jointLeftShoulder   =   user.getSkeleton().getJoint(nite::JOINT_LEFT_SHOULDER);
      nite::SkeletonJoint jointRightShoulder  =   user.getSkeleton().getJoint(nite::JOINT_RIGHT_SHOULDER);
      nite::SkeletonJoint jointLeftElbow      =   user.getSkeleton().getJoint(nite::JOINT_LEFT_ELBOW);
@@ -215,6 +216,19 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
                                                  humanSkeleton.joint[HUMAN_SKELETON_HEAD].z ,
                                                  &humanSkeleton.joint2D[HUMAN_SKELETON_HEAD].x ,
                                                  &humanSkeleton.joint2D[HUMAN_SKELETON_HEAD].y );
+     //------------------------------------------------------------------------------------------
+
+
+
+     humanSkeleton.joint[HUMAN_SKELETON_NECK].x = jointNeck.getPosition().x;
+     humanSkeleton.joint[HUMAN_SKELETON_NECK].y = jointNeck.getPosition().y;
+     humanSkeleton.joint[HUMAN_SKELETON_NECK].z = jointNeck.getPosition().z;
+     humanSkeleton.jointAccuracy[HUMAN_SKELETON_NECK] = jointNeck.getPositionConfidence();
+     pUserTracker.convertJointCoordinatesToDepth(humanSkeleton.joint[HUMAN_SKELETON_NECK].x ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_NECK].y ,
+                                                 humanSkeleton.joint[HUMAN_SKELETON_NECK].z ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_NECK].x ,
+                                                 &humanSkeleton.joint2D[HUMAN_SKELETON_NECK].y );
      //------------------------------------------------------------------------------------------
 
 

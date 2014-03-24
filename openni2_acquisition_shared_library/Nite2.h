@@ -10,6 +10,7 @@ using namespace openni;
 
 static const char * jointNames[] =
 {"head",
+ "neck", 
  "torso",
  "left_shoulder",
  "right_shoulder",
@@ -29,6 +30,7 @@ static const char * jointNames[] =
 static const char * const humanSkeletonJointNames[] =
     {
        "HUMAN_SKELETON_HEAD",
+       "HUMAN_SKELETON_NECK",
        "HUMAN_SKELETON_TORSO",
        "HUMAN_SKELETON_RIGHT_SHOULDER",
        "HUMAN_SKELETON_LEFT_SHOULDER",
@@ -47,6 +49,7 @@ static const char * const humanSkeletonJointNames[] =
 enum humanSkeletonJoints
 {
    HUMAN_SKELETON_HEAD = 0,
+   HUMAN_SKELETON_NECK,
    HUMAN_SKELETON_TORSO,
    HUMAN_SKELETON_RIGHT_SHOULDER,
    HUMAN_SKELETON_LEFT_SHOULDER,
@@ -67,6 +70,7 @@ enum humanSkeletonJoints
 static const char * const humanSkeletonMirroredJointNames[] =
     {
       "HUMAN_SKELETON_MIRRORED_HEAD",
+      "HUMAN_SKELETON_MIRRORED_NECK",
       "HUMAN_SKELETON_MIRRORED_TORSO",
       "HUMAN_SKELETON_MIRRORED_LEFT_SHOULDER",
       "HUMAN_SKELETON_MIRRORED_RIGHT_SHOULDER",
@@ -85,6 +89,7 @@ static const char * const humanSkeletonMirroredJointNames[] =
 enum humanMirroredSkeletonJoints
 {
    HUMAN_SKELETON_MIRRORED_HEAD = 0,
+   HUMAN_SKELETON_MIRRORED_NECK,
    HUMAN_SKELETON_MIRRORED_TORSO,
    HUMAN_SKELETON_MIRRORED_LEFT_SHOULDER,
    HUMAN_SKELETON_MIRRORED_RIGHT_SHOULDER,
