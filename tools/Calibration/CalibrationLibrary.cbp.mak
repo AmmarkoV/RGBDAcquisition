@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./libCalibrationLibrary.a
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_DEBUG)/calibration.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_DEBUG)/calibration.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_RELEASE)/calibration.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_RELEASE)/calibration.o
 
 all: debug release
 
@@ -68,6 +68,12 @@ $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_r
 
 $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o: ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c -o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o
+
+$(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.o: ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.c -o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.o
+
+$(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.o: ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.c -o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.o
 
 $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o: ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c -o $(OBJDIR_DEBUG)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o
@@ -101,6 +107,12 @@ $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color
 
 $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o: ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c -o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o
+
+$(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.o: ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.c -o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.o
+
+$(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.o: ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.c -o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.o
 
 $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o: ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c -o $(OBJDIR_RELEASE)/__/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o

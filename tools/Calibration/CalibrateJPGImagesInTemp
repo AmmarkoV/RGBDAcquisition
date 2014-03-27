@@ -1,0 +1,10 @@
+#!/bin/bash
+ 
+cd temp
+ ls | grep jpg > imageList
+
+./calibration -w 5 -h 7 -s 0.02 -oe -o colorCalibration imageList
+
+cd ..
+
+exit 0

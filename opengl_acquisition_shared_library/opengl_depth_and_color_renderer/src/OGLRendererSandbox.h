@@ -171,16 +171,67 @@ int stopOGLRendererSandbox();
 /* ---------------------------------------------------------
    ----------------- Photo shoot mode ----------------------
    --------------------------------------------------------- */
+/**
+* @brief Create a photoshoot context to later render it
+* @ingroup OGLPhotoshoot
+* @bug createOGLRendererPhotoshootSandbox call is providing the same arguments that snapOGLRendererPhotoshootSandbox uses , is there any point in it ?
+* @param ObjectId to be drawn ( assumes that a scene has already been loaded )
+* @param ObjectId to be drawn ( assumes that a scene has already been loaded )
+* @param Number Of columns for the photoshoot
+* @param Number Of rows for the photoshoot
+* @param Central Rotation Angle on the X axis of the Object
+* @param Central Rotation Angle on the Y axis of the Object
+* @param Central Rotation Angle on the Z axis of the Object
+* @param Maximum Variance from the Central Rotation Angle on the X axis of the Object
+* @param Maximum Variance from the Central Rotation Angle on the Y axis of the Object
+* @param Maximum Variance from the Central Rotation Angle on the Z axis of the Object
+* @retval 0=Failure, or a pointer to a photoshoot context
+*/
 void * createOGLRendererPhotoshootSandbox(
                                            int objID, unsigned int columns , unsigned int rows , float distance,
                                            float angleX,float angleY,float angleZ,
                                            float angXVariance ,float angYVariance , float angZVariance
                                          );
+
+
+/**
+* @brief Destroy and deallocate a photoshoot context created using createOGLRendererPhotoshootSandbox
+* @ingroup OGLPhotoshoot
+* @param Pointer to an OGL Photoshoot context created using createOGLRendererPhotoshootSandbox
+* @retval 0=Failure,1=Success
+*/
 int destroyOGLRendererPhotoshootSandbox( void * photoConf );
 
 
+/**
+* @brief Get the center of a tile ( in order to extract its 2D rendering )
+* @ingroup OGLPhotoshoot
+* @param Pointer to an OGL Photoshoot context created using createOGLRendererPhotoshootSandbox
+* @param Column of the rendering we want to get coordinates for
+* @param Row of the rendering we want to get coordinates for
+* @param Output X Coordinates
+* @param Output Y Coordinates
+* @retval 0=Failure,1=Success
+*/
 int getOGLPhotoshootTileXY(void * photoConf , unsigned int column , unsigned int row ,
                                               float * X , float * Y);
+/**
+* @brief Do a photoshoot on an object covering it from all viewpoints ( for object tracking )
+* @bug The Photoshoot rendering mode is not ready yet , there need to be set rules to be able to reverse track the position of an object given
+* @ingroup OGLPhotoshoot
+* @param Pointer to an OGL Photoshoot context created using createOGLRendererPhotoshootSandbox
+* @param The object id of the item to be photoshoot
+* @param Number Of columns for the photoshoot
+* @param Number Of rows for the photoshoot
+* @param Distance at which the object should be remdered
+* @param Central Rotation Angle on the X axis of the Object
+* @param Central Rotation Angle on the Y axis of the Object
+* @param Central Rotation Angle on the Z axis of the Object
+* @param Maximum Variance from the Central Rotation Angle on the X axis of the Object
+* @param Maximum Variance from the Central Rotation Angle on the Y axis of the Object
+* @param Maximum Variance from the Central Rotation Angle on the Z axis of the Object
+* @retval 0=Failure,1=Success
+*/
 int snapOGLRendererPhotoshootSandbox(
                                      void * photoConf ,
                                      int objID, unsigned int columns , unsigned int rows , float distance,

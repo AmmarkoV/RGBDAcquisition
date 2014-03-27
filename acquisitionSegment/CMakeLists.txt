@@ -12,6 +12,8 @@ add_library(AcquisitionSegment SHARED
             depthSelector.h
             imageProcessing.c
             imageProcessing.h
+            automaticPlaneSegmentation.c
+            automaticPlaneSegmentation.h
             ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.c
             ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h
             ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.c
