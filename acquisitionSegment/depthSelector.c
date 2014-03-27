@@ -279,7 +279,7 @@ if ( segConf->enablePlaneSegmentation )
     float pN[3]={  p2[0] , p2[1]+5 , p2[2] };
     float normal[3]={0.0 , 0.0 , 0.0 };
 
-    crossProduct( p1 , p2  , p3  , normal);
+    crossProductFrom3Points( p1 , p2  , p3  , normal);
 
 
     //fprintf(stderr,"signedDistanceFromPlane is %0.2f \n",signedDistanceFromPlane(segConf->p2, normal , pN));

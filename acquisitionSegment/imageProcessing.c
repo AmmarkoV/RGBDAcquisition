@@ -13,7 +13,7 @@ enum dimEnum
     NUMBER_OF_DIMENSIONS
 };
 
-void crossProduct(float p1[3] , float p2[3] , float p3[3]  , float * normal)
+void crossProductFrom3Points(float p1[3] , float p2[3] , float p3[3]  , float * normal)
 {
 
   fprintf(stderr,"Point 1 %0.5f %0.5f %0.5f \n",p1[0],p1[1],p1[2]);
@@ -23,9 +23,6 @@ void crossProduct(float p1[3] , float p2[3] , float p3[3]  , float * normal)
   float temp_v1[3];
   float temp_v2[3];
   float tempLength;
-  float CNormal[3];
-
-
 
 int i=0;
 for (i=0; i<3; i++)
@@ -59,8 +56,30 @@ tempLength =(normal[DIMX]*normal[DIMX])+ (normal[DIMY]*normal[DIMY])+ (normal[DI
 
 }
 
+float magnitudeOfNormal(float p1[3])
+{
+  float tmp = ((float) p1[0]*p1[0]) + ((float)p1[1]*p1[1]) + ((float)p1[2]*p1[2]);
 
+  if (tmp>=0.0)
+  {
+    return sqrt(tmp);
+  }
 
+  fprintf(stderr,"Error Calculating Magnitude of Normal\n");
+  return 0.0;
+}
+
+float  angleOfNormals(float p1[3] , float p2[3])
+{
+   float numerator = innerProduct(p1,p2);
+
+   float denominator = magnitudeOfNormal(p1) * magnitudeOfNormal(p2);
+
+   if (denominator==0.0) { fprintf(stderr,"Error calculating angleOfNormals\n"); return 0.0; }
+
+   float len = (float) numerator / denominator;
+   return len;
+}
 
 float  distance3D(float p1[3] , float p2[3] , float p3[3])
 {
@@ -73,8 +92,6 @@ float  distance3D(float p1[3] , float p2[3] , float p3[3])
 
    return len;
 }
-
-
 
 
 float dotProduct(float p1[3] , float p2[3] )

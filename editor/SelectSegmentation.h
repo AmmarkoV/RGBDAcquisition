@@ -65,6 +65,7 @@ class SelectSegmentation: public wxDialog
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText10;
 		wxStaticText* StaticText16;
+		wxCheckBox* CheckBoxAutoPlaneSegmentation;
 		wxStaticBox* StaticBox2;
 		wxStaticText* StaticText3;
 		wxSpinCtrl* maxG;
@@ -192,6 +193,7 @@ class SelectSegmentation: public wxDialog
 		static const long ID_STATICTEXT25;
 		static const long ID_STATICTEXT26;
 		static const long ID_TEXTCTRL25;
+		static const long ID_CHECKBOX5;
 		//*)
 
 	private:

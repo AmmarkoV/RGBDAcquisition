@@ -63,6 +63,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AcquisitionSegment.h" />
+		<Unit filename="automaticPlaneSegmentation.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="automaticPlaneSegmentation.h" />
 		<Unit filename="colorSelector.c">
 			<Option compilerVar="CC" />
 		</Unit>

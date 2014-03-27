@@ -45,6 +45,11 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
        return 0;
    }
 
+  if (segConfDepth->autoPlaneSegmentation)
+   {
+     automaticPlaneSegmentation(Depth,width,height,segConfDepth,calib);
+   }
+
 
   //We have some criteria for segmentation at segConfRGB , and segConfDepth
   //First of all we want to use them and the original frames (RGB,Depth) , and select ( on an abstract array )

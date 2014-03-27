@@ -84,6 +84,7 @@ const long SelectSegmentation::ID_SPINCTRL15 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT25 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT26 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL25 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX5 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -199,6 +200,8 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	StaticText25 = new wxStaticText(this, ID_STATICTEXT25, _("Move"), wxPoint(55,240), wxDefaultSize, 0, _T("ID_STATICTEXT25"));
 	StaticText26 = new wxStaticText(this, ID_STATICTEXT26, _("Offset Normal : "), wxPoint(424,392), wxDefaultSize, 0, _T("ID_STATICTEXT26"));
 	planeNormalOffset = new wxTextCtrl(this, ID_TEXTCTRL25, _("0.0"), wxPoint(560,388), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL25"));
+	CheckBoxAutoPlaneSegmentation = new wxCheckBox(this, ID_CHECKBOX5, _("Auto"), wxPoint(568,290), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
+	CheckBoxAutoPlaneSegmentation->SetValue(false);
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
@@ -233,6 +236,8 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.bboxZ2); bboxMaxZ->SetValue(val);
 
 
+
+  CheckBoxAutoPlaneSegmentation->SetValue( (selectedDepthConf.autoPlaneSegmentation!=0) );
   CheckBoxPlane->SetValue( (selectedDepthConf.enablePlaneSegmentation!=0) );
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p1[0]); planeP1X->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p1[1]); planeP1Y->SetValue(val);
@@ -306,6 +311,10 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
    {
     selectedDepthConf.enableBBox=0;
    }
+
+
+   if (CheckBoxAutoPlaneSegmentation->IsChecked())  { selectedDepthConf.autoPlaneSegmentation=1;  } else
+                                                    { selectedDepthConf.autoPlaneSegmentation=0;  }
 
    if (CheckBoxPlane->IsChecked())
    {

@@ -376,6 +376,10 @@
 			<pos>560,388</pos>
 			<size>56,23</size>
 		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX5" variable="CheckBoxAutoPlaneSegmentation" member="yes">
+			<label>Auto</label>
+			<pos>568,290</pos>
+		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>
 			<wildcard>.txt</wildcard>

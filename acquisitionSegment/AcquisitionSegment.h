@@ -102,6 +102,8 @@ struct SegmentationFeaturesDepth
    unsigned int firstDepthFrameByteSize;
    unsigned int motionDistanceThreshold;
 
+
+   unsigned char autoPlaneSegmentation;
    unsigned char enablePlaneSegmentation;
    double p1[3];
    double p2[3];
