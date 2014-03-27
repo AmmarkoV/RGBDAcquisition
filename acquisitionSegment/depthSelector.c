@@ -270,7 +270,7 @@ if ( segConf->enablePlaneSegmentation )
   double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
   if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform plane segmentation\n"); } else
   {
-    double raw3D[4]={0};
+    double raw3D[4]={0};  raw3D[3] = (double) 1.0;
     double world3D[4]={0};
 
     float p1[3]; p1[0]=(float) segConf->p1[0]; p1[1]=(float) segConf->p1[1]; p1[2]=(float) segConf->p1[2];
@@ -307,14 +307,10 @@ if ( segConf->enablePlaneSegmentation )
 
      if (  (*selectedPtr!=0)  )  //  &&  (*depth != 0)
      {
-       transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
+      transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
+      raw3D[0] = (double) x3D; raw3D[1] = (double) y3D; raw3D[2] = (double) z3D; raw3D[3] = (double) 1.0;
 
-       raw3D[0] = (double) x3D;
-       raw3D[1] = (double) y3D;
-       raw3D[2] = (double) z3D;
-       raw3D[3] = (double) 1.0;
-
-       transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+      transform3DPointUsing4x4Matrix(world3D,m,raw3D);
 
       pN[0]=(float) world3D[0];
       pN[1]=(float) world3D[1];

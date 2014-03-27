@@ -20,6 +20,6 @@
  * @param Structure holding the segmentation results for Depth Frame ( will just update the plane variables )
  * @retval 1=Success,0=Failure
  */
-int automaticPlaneSegmentation(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf );
+int automaticPlaneSegmentation(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf , struct calibration * calib );
 
 #endif // AUTOMATICPLANESEGMENTATION_H_INCLUDED

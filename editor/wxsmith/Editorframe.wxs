@@ -117,6 +117,9 @@
 				<object class="wxMenuItem" name="ID_MENUOPENMODULE" variable="MenuItem6" member="yes">
 					<label>Open Module</label>
 				</object>
+				<object class="wxMenuItem" name="ID_MENUSAVEPAIR" variable="MenuItem9" member="yes">
+					<label>Save Pair</label>
+				</object>
 				<object class="wxMenuItem" name="ID_MENUSAVEDEPTH" variable="MenuItem5" member="yes">
 					<label>Save Depth Frame</label>
 					<enabled>0</enabled>
