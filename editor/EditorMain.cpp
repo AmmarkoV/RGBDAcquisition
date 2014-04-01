@@ -574,9 +574,17 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
               } else
               {
                 if (!calib.intrinsicParametersSet)
-                 { Status->SetStatusText(wxT("Cannot get 3D point from input source , please check your calibration data")); }
+                {
+                   wxString msg;
+                   msg.Printf( wxT("Cannot get 3D point from input source , please check your calibration data - RGB(%u,%u,%u) ")  , r,g,b  );
+                   Status->SetStatusText(msg);
+                }
                  else
-                 { Status->SetStatusText(wxT("No 3D Depth at this point..!")); }
+                {
+                   wxString msg;
+                   msg.Printf( wxT("No 3D Depth at this point..! - RGB(%u,%u,%u) ")  , r,g,b  );
+                   Status->SetStatusText(msg);
+                }
               }
            }
        }
