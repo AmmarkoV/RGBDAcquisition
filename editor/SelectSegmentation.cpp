@@ -85,6 +85,10 @@ const long SelectSegmentation::ID_STATICTEXT25 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT26 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL25 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX5 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL16 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL17 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL18 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX6 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -202,6 +206,14 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	planeNormalOffset = new wxTextCtrl(this, ID_TEXTCTRL25, _("0.0"), wxPoint(560,388), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL25"));
 	CheckBoxAutoPlaneSegmentation = new wxCheckBox(this, ID_CHECKBOX5, _("Auto"), wxPoint(568,288), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
 	CheckBoxAutoPlaneSegmentation->SetValue(false);
+	replaceR = new wxSpinCtrl(this, ID_SPINCTRL16, _T("0"), wxPoint(156,307), wxSize(56,27), 0, 0, 255, 0, _T("ID_SPINCTRL16"));
+	replaceR->SetValue(_T("0"));
+	replaceG = new wxSpinCtrl(this, ID_SPINCTRL17, _T("0"), wxPoint(212,307), wxSize(56,27), 0, 0, 255, 0, _T("ID_SPINCTRL17"));
+	replaceG->SetValue(_T("0"));
+	replaceB = new wxSpinCtrl(this, ID_SPINCTRL18, _T("0"), wxPoint(268,307), wxSize(56,27), 0, 0, 255, 0, _T("ID_SPINCTRL18"));
+	replaceB->SetValue(_T("0"));
+	CheckBoxReplaceColor = new wxCheckBox(this, ID_CHECKBOX6, _("Replace Color"), wxPoint(24,308), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
+	CheckBoxReplaceColor->SetValue(false);
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
@@ -272,6 +284,11 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
    maxG->SetValue(selectedRGBConf.maxG );
    maxB->SetValue(selectedRGBConf.maxB);
 
+
+   CheckBoxSegmentRGBMovement->SetValue( (selectedRGBConf.enableReplacingColors!=0) );
+   replaceR->SetValue(selectedRGBConf.replaceR);
+   replaceG->SetValue(selectedRGBConf.replaceG );
+   replaceB->SetValue(selectedRGBConf.replaceB);
 
 
   CheckBoxSegmentRGBMovement->SetValue( (selectedRGBConf.enableRGBMotionDetection!=0) );
@@ -383,6 +400,13 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
    selectedRGBConf.maxG = maxG->GetValue();
    selectedRGBConf.maxB = maxB->GetValue();
 
+
+   if (CheckBoxSegmentRGBMovement->IsChecked()) { selectedRGBConf.enableReplacingColors=1; } else
+                                                { selectedRGBConf.enableReplacingColors=0; }
+
+   selectedRGBConf.replaceR = replaceR->GetValue();
+   selectedRGBConf.replaceG = replaceG->GetValue();
+   selectedRGBConf.replaceB = replaceB->GetValue();
 
    selectedRGBConf.eraseColorR = eraseColorR->GetValue();
    selectedRGBConf.eraseColorG = eraseColorG->GetValue();
