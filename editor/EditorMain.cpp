@@ -559,12 +559,13 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
               }
 
               unsigned char r=0,g=0,b=0;
+              acquisitionGetColorRGBAtXY(moduleID,devID,mouse_x,mouse_y,&r,&g,&b);
+
               float x,y,z;
               if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z) )
               {
                 wxString msg;
 
-                acquisitionGetColorRGBAtXY(moduleID,devID,mouse_x,mouse_y,&r,&g,&b);
 
                 fprintf(stderr,"Depth at point %u,%u  is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u)  \n",mouse_x,mouse_y,x,y,z,r,g,b);
                 if (calib.extrinsicParametersSet) { msg.Printf( wxT("Using Extrinsic Calibration : Depth at point is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u) ") ,x,y,z , r,g,b  ); } else
