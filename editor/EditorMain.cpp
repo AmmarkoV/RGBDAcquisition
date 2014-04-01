@@ -438,16 +438,18 @@ void EditorFrame::OnAbout(wxCommandEvent& event)
 void EditorFrame::OnSavePair(wxCommandEvent& event)
  {
     char filename[512];
-    sprintf(filename,"color%05u.pnm",lastFrameDrawn);
+    sprintf(filename,"color%05u",lastFrameDrawn);
     acquisitionSaveColorFrame(moduleID,devID,filename);
-    sprintf(filename,"depth%05u.pnm",lastFrameDrawn);
+    sprintf(filename,"depth%05u",lastFrameDrawn);
     acquisitionSaveDepthFrame(moduleID,devID,filename);
  }
 
 
 void EditorFrame::OnSavePCD(wxCommandEvent& event)
  {
-    acquisitionSavePCDPointCoud(moduleID,devID,(char*) "frame.pcd");
+    char filename[512];
+    sprintf(filename,"pointCloud%05u.pcd",lastFrameDrawn);
+    acquisitionSavePCDPointCoud(moduleID,devID,filename);
  }
 void EditorFrame::OnSaveDepth(wxCommandEvent& event)
 {
@@ -556,14 +558,17 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
                addingPoint=0;
               }
 
+              unsigned char r=0,g=0,b=0;
               float x,y,z;
               if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z) )
               {
                 wxString msg;
 
-                fprintf(stderr,"Depth at point %u,%u  is  %0.5f   %0.5f   %0.5f\n",mouse_x,mouse_y,x,y,z);
-                if (calib.extrinsicParametersSet) { msg.Printf( wxT("Using Extrinsic Calibration : Depth at point is  %0.5f   %0.5f   %0.5f ") ,x,y,z  ); } else
-                                                  { msg.Printf( wxT("Using Camera Space : Depth at point is  %0.5f   %0.5f   %0.5f ") ,x,y,z  ); }
+                acquisitionGetColorRGBAtXY(moduleID,devID,mouse_x,mouse_y,&r,&g,&b);
+
+                fprintf(stderr,"Depth at point %u,%u  is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u)  \n",mouse_x,mouse_y,x,y,z,r,g,b);
+                if (calib.extrinsicParametersSet) { msg.Printf( wxT("Using Extrinsic Calibration : Depth at point is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u) ") ,x,y,z , r,g,b  ); } else
+                                                  { msg.Printf( wxT("Using Camera Space : Depth at point is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u) ") ,x,y,z , r,g,b ); }
 
                 Status->SetStatusText(msg);
               } else

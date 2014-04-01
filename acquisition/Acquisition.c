@@ -1130,6 +1130,31 @@ unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdenti
   return payloadStart;
 }
 
+
+
+int acquisitionGetColorRGBAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , unsigned char * R ,unsigned char * G , unsigned char * B )
+{
+    unsigned char * colorFrame = acquisitionGetColorFrame(moduleID,devID);
+    if (colorFrame == 0 ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorRGBAtXY , getting color frame"); return 0; }
+
+    unsigned int width; unsigned int height; unsigned int channels; unsigned int bitsperpixel;
+    if (! acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) )
+        {  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorRGBAtXY getting depth frame dims"); return 0; }
+
+    if ( (x2d>=width) || (y2d>=height) )
+        { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorRGBAtXY incorrect 2d x,y coords"); return 0; }
+
+
+    unsigned char * colorValue = colorFrame + ( (y2d * width *  channels)  + (x2d * channels ) );
+    *R = *colorValue; ++colorValue;
+    *G = *colorValue; ++colorValue;
+    *B = *colorValue;
+
+    return 1;
+}
+
+
+
 unsigned short acquisitionGetDepthValueAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d )
 {
     unsigned short * depthFrame = acquisitionGetDepthFrame(moduleID,devID);
