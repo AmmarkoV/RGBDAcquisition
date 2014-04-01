@@ -29,6 +29,10 @@ add_library(OGLRendererSandbox SHARED
             AmMatrix/matrixCalculations.h
             AmMatrix/solveLinearSystemGJ.c
             AmMatrix/solveLinearSystemGJ.h
+            AmMatrix/solveHomography.c
+            AmMatrix/solveHomography.h
+            AmMatrix/ocvStaging.c
+            AmMatrix/ocvStaging.h
             TextureLoader/bmp.c
             TextureLoader/bmp.h
             TextureLoader/ppm.c

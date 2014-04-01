@@ -31,6 +31,14 @@
 
 //TODO : add Horizontal flipping  <- is the output mirrored ?
 
+
+int doTest()
+{
+    testMatrices();
+    return ;
+}
+
+
 int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
     double depth_bias=0.0; double depth_scale=1.0;
@@ -267,7 +275,6 @@ double getOpenGLPixelSize()
 int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,char * sceneFile)
 {
   fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
-  testMatrices();
 
   char test[12]={0};
   char * testP = test;
@@ -281,15 +288,13 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
   #endif
 
 
-  char * defaultSceneFile = "scene.conf";
+  char defaultSceneFile[] = "scene.conf";
   //( char *)   malloc(sizeof(32)*sizeof(char));
   //strncpy(defaultSceneFile,"scene.conf",32);
 
-  if (sceneFile == 0 ) { initScene(defaultSceneFile);  } else
-                       { initScene(sceneFile);    }
+  if (sceneFile == 0 ) { return initScene(defaultSceneFile);  } else
+                       { return initScene(sceneFile);    }
 
-  //free(defaultSceneFile);
-  fprintf(stderr,"startOGLRendererSandbox returning\n");
   return 1;
 }
 

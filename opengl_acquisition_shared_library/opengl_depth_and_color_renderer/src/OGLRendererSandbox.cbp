@@ -62,6 +62,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="AmMatrix/matrixCalculations.h" />
+		<Unit filename="AmMatrix/ocvStaging.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/ocvStaging.h" />
+		<Unit filename="AmMatrix/solveHomography.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/solveHomography.h" />
 		<Unit filename="AmMatrix/solveLinearSystemGJ.c">
 			<Option compilerVar="CC" />
 		</Unit>

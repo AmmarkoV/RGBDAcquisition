@@ -28,7 +28,7 @@ struct Model ** models=0;
 
 float farPlane = 255; //<--be aware that this has an effect on the depth maps generated
 float nearPlane= 1; //<--this also
-float aspectRatio = 65;
+float fieldOfView = 65;
 
 //float depthUnit = 1.0;
 
@@ -63,7 +63,7 @@ double customTranslation[3]={0};
 double customRodriguezRotation[3]={0};
 
 
-
+#define USE_LIGHTS 0
 const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
 const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -72,7 +72,7 @@ const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
 const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
 const GLfloat mat_specular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
-      GLfloat mat_shininess = 5.0f;
+const GLfloat mat_shininess[]  = { 5.0f };
 
 
 float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;
@@ -167,6 +167,11 @@ int updateProjectionMatrix()
   if (scene==0) { fprintf(stderr,"No Scene declared yet , don't know how to update proj matrix\n"); return 0; }
   if ( scene->emulateProjectionMatrixDeclared)
   {
+     if (useIntrinsicMatrix)
+     {
+       fprintf(stderr,YELLOW "Please note that intrinsics have been passed as an argument but we also have a projection matrix from trajectory parser , we will use the latter\n" NORMAL);
+     }
+     fprintf(stderr,"Emulating Projection Matrix from Trajectory Parser");
      int viewport[4]={0};
      double fx = scene->emulateProjectionMatrix[0];
      double fy = scene->emulateProjectionMatrix[4];
@@ -215,9 +220,10 @@ int updateProjectionMatrix()
   }
     else
   {
+   fprintf(stderr,"Regular Clean/Default Projection matrix \n");
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gldPerspective((double) aspectRatio, WIDTH/HEIGHT, nearPlane, farPlane);
+   gldPerspective((double) fieldOfView, (double) WIDTH/HEIGHT, (double) nearPlane, (double) farPlane);
    //glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
    glViewport(0, 0, WIDTH, HEIGHT);
   }
@@ -274,23 +280,33 @@ int initScene(char * confFile)
   /* establish initial viewport */
   /* pedantic, full window size is default viewport */
 
-  glEnable(GL_COLOR);
+
+  #warning "GL_COLOR does not even exist"
+  //glEnable(GL_COLOR);
+  //if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color \n"); }
   glEnable(GL_COLOR_MATERIAL);
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color material\n"); }
 
-  glEnable(GL_LIGHT0);
-  glEnable(GL_LIGHTING);
-  glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-  glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-  glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+  #if USE_LIGHTS
+   glEnable(GL_LIGHT0);
+   glEnable(GL_LIGHTING);
+   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling lighting\n"); }
+   glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+   glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
 
-  glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,    mat_ambient);
-  glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    mat_diffuse);
-  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   mat_specular);
-  glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess); // <- this was glMateriali
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
+   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,    mat_ambient);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    mat_diffuse);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   mat_specular);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess); // <- this was glMateriali
+   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up Front/Back lights\n"); }
+  #else
+   fprintf(stderr,"Please note that lighting is disabled via the USE_LIGHTS precompiler define\n");
+  #endif // USE_LIGHTS
 
-  //This is not needed -> :P glCullFace(GL_FRONT_AND_BACK);
+  //This is not needed -> :P  glCullFace(GL_FRONT_AND_BACK);
 
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 
@@ -329,7 +345,7 @@ int tickScene()
 {
    //ALL positions should be calculated here!
    //i dont like the way this is working now
-   float posStack[7];
+   float posStack[7]={0};
    float * pos = (float*) &posStack;
    float scaleX = 1.0 , scaleY = 1.0 , scaleZ = 1.0;
 
@@ -477,8 +493,9 @@ int renderScene()
 
    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting modelview matrix\n"); }
    //print4x4DMatrix("OpenGL ModelView Matrix Given by Trajectory Parser", scene->modelViewMatrix );
-  } else
+  } //else //<- this else
   //If setOpenGLExtrinsicCalibration has set a custom MODELVIEW matrix we will use it
+  #warning "Is this else required?"
   if (useCustomModelViewMatrix)
   {
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
@@ -487,16 +504,25 @@ int renderScene()
 
     //glRotatef(90,-1.0,0,0); //TODO FIX THESE
     //glScalef(1.0,1.0,-1.0); //These are now taken into account using scene files ( see SCALE_WORLD , MAP_ROTATIONS )
+    //glRotatef(180,0.0,0,-1.0);
 
    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting custom modelview matrix\n"); }
-    //glRotatef(180,0.0,0,-1.0);
+
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
   {
+    fprintf(stderr,"Using on the fly rotate/translate rot x,y,z ( %0.2f,%0.2f,%0.2f ) trans x,y,z, (  %0.2f,%0.2f,%0.2f ) \n"
+            ,camera_angle_x,camera_angle_y,camera_angle_z,camera_pos_x,camera_pos_y,camera_pos_z
+            );
     glLoadIdentity();
-    glRotatef(camera_angle_x,-1.0,0,0); // Peristrofi gyrw apo ton x
-    glRotatef(camera_angle_y,0,-1.0,0); // Peristrofi gyrw apo ton y
-    glRotatef(camera_angle_z,0,0,-1.0);
+
+    if (camera_angle_x!=0.0)
+      glRotatef(camera_angle_x,-1.0,0,0); // Rotate around x
+    if (camera_angle_y!=0.0)
+      glRotatef(camera_angle_y,0,-1.0,0); // Rotate around y
+    if (camera_angle_z!=0.0)
+      glRotatef(camera_angle_z,0,0,-1.0); // Rotate around z
+
     glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting specifying camera position\n"); }
   }

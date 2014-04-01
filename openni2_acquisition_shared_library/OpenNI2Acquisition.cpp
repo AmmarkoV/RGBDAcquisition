@@ -10,6 +10,7 @@
 
 #define MOD_FACEDETECTION 0
 #define MOD_NITE2 0
+#define MOD_IR 0
 #define BUILD_OPENNI2 1
 #define RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE 1
 #define USE_WAITFORANYSTREAM_TO_GRAB 0
@@ -40,8 +41,8 @@ using namespace openni;
 
 int currentAllocatedDevices = 0;
 Device device[MAX_OPENNI2_DEVICES];
-VideoStream depth[MAX_OPENNI2_DEVICES] , color[MAX_OPENNI2_DEVICES];
-VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES];
+VideoStream depth[MAX_OPENNI2_DEVICES] , color[MAX_OPENNI2_DEVICES] , ir[MAX_OPENNI2_DEVICES];
+VideoFrameRef depthFrame[MAX_OPENNI2_DEVICES],colorFrame[MAX_OPENNI2_DEVICES] , irFrame[MAX_OPENNI2_DEVICES];
 unsigned int frameSnapped=0;
 
 #if USE_CALIBRATION
@@ -292,6 +293,24 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
         }
     }
 
+
+  #if MOD_IR
+    if(device.getSensorInfo(SENSOR_IR) != NULL)
+    {
+        Status rc = ir.create(device, SENSOR_IR);    // Create the VideoStream for IR
+        if (rc == STATUS_OK)
+        {
+          rc = ir.start();                      // Start the IR VideoStream
+        }
+         else
+        {
+            fprintf(stderr,"Couldn't create IR stream: %s \n",OpenNI::getExtendedError());
+            OpenNI::getExtendedError();
+            return 0;
+        }
+    }
+  #endif // MOD_IR
+
     //Mirroring is disabled
     depth.setMirroringEnabled (false);
     color.setMirroringEnabled (false);
@@ -304,11 +323,17 @@ if (device.getSensorInfo(SENSOR_DEPTH)  != NULL)
 
 
 
-int closeOpenNIDevice(Device &device , VideoStream &color , VideoStream &depth)
+int closeOpenNIDevice(Device &device , VideoStream &color , VideoStream &depth , VideoStream &ir)
 {
     fprintf(stderr,"Stopping depth and color streams\n");
     depth.stop();
     color.stop();
+
+    #if MOD_IR
+       ir.stop();
+       ir.destroy();
+    #endif // MOD_IR
+
     depth.destroy();
     color.destroy();
     device.close();
@@ -591,7 +616,7 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
     #if MOD_FACEDETECTION
        CloseFaceDetection();
     #endif
-     return closeOpenNIDevice(device[devID] , color[devID] , depth[devID]);
+     return closeOpenNIDevice(device[devID] , color[devID] , depth[devID] , ir[devID]);
  }
 
 

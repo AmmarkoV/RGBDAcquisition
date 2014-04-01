@@ -15,7 +15,7 @@ INC =
 CFLAGS = -Wall
 RESINC = 
 LIBDIR = 
-LIB = 
+LIB = -lgsl -lgslcblas
 LDFLAGS = 
 
 INC_DEBUG = $(INC)

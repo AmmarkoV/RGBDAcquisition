@@ -119,6 +119,7 @@ const long EditorFrame::ID_BUTTON11 = wxNewId();
 const long EditorFrame::ID_LISTCTRL2 = wxNewId();
 const long EditorFrame::ID_BUTTON12 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
+const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
 const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
 const long EditorFrame::idMenuQuit = wxNewId();
@@ -175,6 +176,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(MenuItem6);
+    MenuItem9 = new wxMenuItem(Menu1, ID_MENUSAVEPAIR, _("Save Pair"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem9);
     MenuItem5 = new wxMenuItem(Menu1, ID_MENUSAVEDEPTH, _("Save Depth Frame"), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(MenuItem5);
     MenuItem5->Enable(false);
@@ -225,6 +228,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
 
 
     //Connect menu stuff
+    Connect(ID_MENUSAVEPAIR,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSavePair);
     Connect(ID_MENUSAVEPCD,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSavePCD);
     Connect(ID_MENUSAVEDEPTH,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSaveDepth);
     Connect(ID_MENUOPENMODULE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnOpenModule);
@@ -359,7 +363,13 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    recording=0; recordedFrames=0;
    framesSnapped=0;
 
-   if (totalFrames==0) {
+   if  (
+         (totalFrames==0) ||
+         (moduleID==V4L2_ACQUISITION_MODULE) ||
+         (moduleID==V4L2STEREO_ACQUISITION_MODULE)
+       )
+
+                       {
                          totalFramesLabel->SetLabel(wxT("Live Stream"));
                          play=1;
                          FrameSlider->SetMin(0);
@@ -399,6 +409,8 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
 void EditorFrame::OnQuit(wxCommandEvent& event)
 {
     play=0;
+    wxSleep(0.1);
+    Refresh();
     if (recording)
     {
         fprintf(stderr,"TODO : handle stopping recording properly \n");
@@ -421,6 +433,16 @@ void EditorFrame::OnAbout(wxCommandEvent& event)
     //wxString msg = wxbuildinfo(long_f);
     wxMessageBox(wxT("Thank you for using RGBDAcquisition , a GPL project\nWritten by AmmarkoV\nHosted at https://github.com/AmmarkoV/RGBDAcquisition"), wxT("RGBDAcquisition Editor"));
 }
+
+
+void EditorFrame::OnSavePair(wxCommandEvent& event)
+ {
+    char filename[512];
+    sprintf(filename,"color%05u.pnm",lastFrameDrawn);
+    acquisitionSaveColorFrame(moduleID,devID,filename);
+    sprintf(filename,"depth%05u.pnm",lastFrameDrawn);
+    acquisitionSaveDepthFrame(moduleID,devID,filename);
+ }
 
 
 void EditorFrame::OnSavePCD(wxCommandEvent& event)
@@ -719,7 +741,7 @@ void EditorFrame::guiSnapFrames(int doSnap)
 
   } else
   {
-      fprintf(stderr,"Will not refresh bitmaps etc..\n" );
+      fprintf(stderr,"Will not refresh bitmaps (acquisitionGetCurrentFrameNumber does not indicate a new frame availiable)..\n" );
   }
 
 

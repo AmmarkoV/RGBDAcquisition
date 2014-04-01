@@ -11,6 +11,17 @@
 
 #include "../OGLRendererSandbox.h"
 
+
+#include <GL/glx.h>    /* this includes the necessary X headers */
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#include <X11/X.h>    /* X11 constant (e.g. TrueColor) */
+#include <X11/keysym.h>
+
+#include "../glx.h"
+
+
 int readFromArg=0;
 int photoShootOBJ=0;
 float angleX=0.0,angleY=0.0,angleZ=0.0;
@@ -38,12 +49,13 @@ int main(int argc, char **argv)
   translation[0]=0.0;  translation[1]=0.0; translation[2]=0.0;
   rodriguez[0]=0.0;    rodriguez[1]=0.0;    rodriguez[2]=0.0;
 
-  setOpenGLNearFarPlanes(1,5000);
+  setOpenGLNearFarPlanes(1,15000);
 
   int i=0;
   for (i=0; i<argc; i++)
   {
 
+    if (strcmp(argv[i],"-test")==0) { doTest(); exit(0); } else
     if (strcmp(argv[i],"-intrinsics")==0) {
                                            if (i+8<argc) {
                                                           int z=0;
@@ -86,9 +98,18 @@ int main(int argc, char **argv)
                                     }
   }
 
- if (readFromArg!=0) {   startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,argv[readFromArg]); } else
-                     {   startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/ }
 
+ int started = 0;
+ if (readFromArg!=0) {   started=startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,argv[readFromArg]); } else
+                     {   started=startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/ }
+
+ usleep(100);
+
+ if (!started)
+ {
+    fprintf(stderr,"Could not start OpenGL Renderer Sandbox , please see log to find the exact reason of failure \n");
+    return 0;
+ }
 
   if (photoShootOBJ)
    {

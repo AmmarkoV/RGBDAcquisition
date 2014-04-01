@@ -54,6 +54,7 @@ class EditorFrame: public wxFrame
     private:
 
         void OnOpenModule(wxCommandEvent& event);
+        void OnSavePair(wxCommandEvent& event);
         void OnSavePCD(wxCommandEvent& event);
         void OnSaveDepth(wxCommandEvent& event);
 
@@ -101,6 +102,7 @@ class EditorFrame: public wxFrame
         static const long ID_LISTCTRL2;
         static const long ID_BUTTON12;
         static const long ID_MENUOPENMODULE;
+        static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
         static const long ID_MENUSAVEPCD;
         static const long idMenuQuit;
@@ -128,6 +130,7 @@ class EditorFrame: public wxFrame
         wxMenuItem* MenuItem3;
         wxButton* buttonPreviousFrame;
         wxSlider* FrameSlider;
+        wxMenuItem* MenuItem9;
         wxMenu* Menu4;
         wxListCtrl* ListCtrl1;
         wxStaticBox* StaticBoxVideoFeed;

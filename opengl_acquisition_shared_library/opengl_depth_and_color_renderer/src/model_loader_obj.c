@@ -8,7 +8,10 @@
 
 #define reallocationStep 500
 
-
+#define DISABLE_SHININESS 1
+#if DISABLE_SHININESS
+ #warning "Shininess is problematic ( apparently )"
+#endif // DISABLE_SHININESS
 
 void calcFaceNormal(Normal *nrm,Vertex v1,Vertex v2,Vertex v3,int normalized)
 {
@@ -226,7 +229,7 @@ int loadMTL(struct OBJ_Model * obj,char * directory,char *filename)
 
   for(i = 0; i<mat_num; i++)
   {
-	obj->matList[i].shine = 0;
+	obj->matList[i].shine[0] = 0.0;
 	obj->matList[i].diffuse[0] = 0.8;
 	obj->matList[i].diffuse[1] = 0.8;
 	obj->matList[i].diffuse[2] = 0.8;
@@ -286,7 +289,7 @@ int loadMTL(struct OBJ_Model * obj,char * directory,char *filename)
 		if (!strcmp(buf,"Ns"))
 		{
 			fscanf(file,"%f",&r);
-			obj->matList[mat_num].shine =  r;
+			obj->matList[mat_num].shine[0] =  r;
 		} else
 		if(!strcmp(buf, "map_Kd"))
 		{
@@ -749,6 +752,8 @@ void  drawOBJMesh(struct OBJ_Model * obj)
         long unsigned int i,j;
 
         glDisable(GL_CULL_FACE);
+
+        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Initial Error while @ drawOBJMesh\n"); }
 		//for every group
 		for(i=0; i<obj->numGroups; i++)
 		{
@@ -768,10 +773,19 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 			 {	/*glDisable(GL_TEXTURE_2D);*/ }
 
 
+            if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Error before setting up material @ drawOBJMesh\n"); }
+
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  obj->matList[ obj->groups[i].material].ambient);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  obj->matList[ obj->groups[i].material].diffuse);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, obj->matList[ obj->groups[i].material].specular);
-			glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, obj->matList[ obj->groups[i].material].shine);
+            if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Error after setting up material for specularity @ drawOBJMesh\n"); }
+
+            #if DISABLE_SHININESS
+			 glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+			#else
+			 glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, obj->matList[ obj->groups[i].material].shine);
+            #endif
+            if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Error after setting up material for shininess @ drawOBJMesh\n"); }
 
 
 
@@ -781,6 +795,9 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 			                                 glDisable(GL_TEXTURE_GEN_S);
                                              glDisable(GL_TEXTURE_GEN_T);
 			                               }
+
+            if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Error after setting up material @ drawOBJMesh\n"); }
+
 		}   else
         {
               //No Matterials , No Textures
@@ -788,6 +805,8 @@ void  drawOBJMesh(struct OBJ_Model * obj)
                glDisable(GL_TEXTURE_GEN_T);
                glDisable(GL_TEXTURE_2D);
         }
+
+        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Error before starting drawing triangles @ drawOBJMesh\n"); }
 
 			glBegin(GL_TRIANGLES);
 			for(j=0; j<obj->groups[i].numFaces; j++)
@@ -890,6 +909,10 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 
 			}//FOR J
 			glEnd();
+
+
+
+        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Initial Error after drawing triangles @ drawOBJMesh\n"); }
     }//FOR I
 glPopAttrib();
 
@@ -1077,7 +1100,12 @@ int compileOBJList(struct OBJ_Model * obj)
             glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  obj->matList[ obj->groups[i].material].ambient);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  obj->matList[ obj->groups[i].material].diffuse);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, obj->matList[ obj->groups[i].material].specular);
-			glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, obj->matList[ obj->groups[i].material].shine);
+
+            #if DISABLE_SHININESS
+			 glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+			#else
+			 glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, obj->matList[ obj->groups[i].material].shine);
+            #endif
 
 			if(  ( obj->groups[i].hasTex) ==0 )
 			{

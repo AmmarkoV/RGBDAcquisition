@@ -31,6 +31,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add library="gsl" />
+			<Add library="gslcblas" />
+		</Linker>
 		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>

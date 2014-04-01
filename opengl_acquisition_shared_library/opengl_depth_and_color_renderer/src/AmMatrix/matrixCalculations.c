@@ -5,6 +5,10 @@
 #include "matrix3x3Tools.h"
 #include "matrix4x4Tools.h"
 #include "solveLinearSystemGJ.h"
+#include "solveHomography.h"
+
+
+
 
 int convertRodriguezTo3x3(double * result,double * matrix)
 {
@@ -220,7 +224,8 @@ void buildOpenGLProjectionForIntrinsics   (
 
 void testMatrices()
 {
-  //testGJSolver();
+   //testHomographySolver();
+   testGJSolver();
   return ;
 
 

@@ -12,6 +12,10 @@ add_library(CalibrationLibrary STATIC
             ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h
             ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c
             ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.h
+            ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.c
+            ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.h
+            ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.c
+            ../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.h
            ) 
 target_link_libraries(CalibrationLibrary m ) 
  

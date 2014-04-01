@@ -10,6 +10,16 @@ enum mat3x3Item
     I31     , I32 , I33
 };
 
+
+enum mat3x3EItem
+{
+    e0 = 0 , e1  , e2  ,
+    e3     , e4  , e5  ,
+    e6     , e7 ,  e8
+};
+
+
+
 double * alloc3x3Matrix()
 {
   return malloc ( sizeof(double) * 16 );
@@ -24,32 +34,32 @@ void free3x3Matrix(double ** mat)
 }
 
 
-void print3x3FMatrix(char * str , float * matrix4x4)
+void print3x3FMatrix(char * str , float * matrix3x3)
 {
   fprintf( stderr, "  3x3 float %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "%f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f\n",matrix4x4[2]);
-  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f\n",matrix4x4[5]);
-  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f\n",matrix4x4[8]);
+  fprintf( stderr, "%f ",matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f\n",matrix3x3[2]);
+  fprintf( stderr, "%f ",matrix3x3[3]);  fprintf( stderr, "%f ",matrix3x3[4]);  fprintf( stderr, "%f\n",matrix3x3[5]);
+  fprintf( stderr, "%f ",matrix3x3[6]);  fprintf( stderr, "%f ",matrix3x3[7]);  fprintf( stderr, "%f\n",matrix3x3[8]);
   fprintf( stderr, "--------------------------------------\n");
 }
 
-void print3x3DMatrix(char * str , double * matrix4x4)
+void print3x3DMatrix(char * str , double * matrix3x3)
 {
   fprintf( stderr, "  3x3 double %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "%f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f\n",matrix4x4[2]);
-  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f\n",matrix4x4[5]);
-  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f\n",matrix4x4[8]);
+  fprintf( stderr, "%f ",matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f\n",matrix3x3[2]);
+  fprintf( stderr, "%f ",matrix3x3[3]);  fprintf( stderr, "%f ",matrix3x3[4]);  fprintf( stderr, "%f\n",matrix3x3[5]);
+  fprintf( stderr, "%f ",matrix3x3[6]);  fprintf( stderr, "%f ",matrix3x3[7]);  fprintf( stderr, "%f\n",matrix3x3[8]);
   fprintf( stderr, "--------------------------------------\n");
 }
 
 
-void print3x3DScilabMatrix(char * str , double * matrix4x4)
+void print3x3DScilabMatrix(char * str , double * matrix3x3)
 {
-  fprintf( stderr, "%s = [ %f ",str,matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ; ",matrix4x4[2]);
-  fprintf( stderr, "%f ",matrix4x4[3]);  fprintf( stderr, "%f ",matrix4x4[4]);  fprintf( stderr, "%f ; ",matrix4x4[5]);
-  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f ",matrix4x4[7]);  fprintf( stderr, "%f ]\n\n",matrix4x4[8]);
+  fprintf( stderr, "%s = [ %f ",str,matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f ; ",matrix3x3[2]);
+  fprintf( stderr, "%f ",matrix3x3[3]);  fprintf( stderr, "%f ",matrix3x3[4]);  fprintf( stderr, "%f ; ",matrix3x3[5]);
+  fprintf( stderr, "%f ",matrix3x3[6]);  fprintf( stderr, "%f ",matrix3x3[7]);  fprintf( stderr, "%f ]\n\n",matrix3x3[8]);
 
 }
 
@@ -96,6 +106,19 @@ int transpose3x3MatrixD(double * mat)
   tmp = mat[2]; mat[2]=mat[6];  mat[6]=tmp;
   tmp = mat[5]; mat[5]=mat[7];  mat[7]=tmp;
   return 1;
+}
+
+int random3x3Matrix(double * mat,double minimumValues, double maximumValues)
+{
+ int i=0;
+ unsigned int randRange=(unsigned int) maximumValues - minimumValues;
+
+ for (i=0; i<9; i++)
+ {
+     mat[i]=minimumValues + rand()%randRange;
+ }
+
+ return 1;
 }
 
 
@@ -194,4 +217,49 @@ int multiplyTwo3x3Matrices(double * result , double * matrixA , double * matrixB
   print3x3DMatrix("AxB", result);
 
   return 1;
+}
+
+
+int transform2DPointUsing3x3Matrix(double * resultPoint2D, double * transformation3x3, double * point2D)
+{
+  if ( (resultPoint2D==0) || (transformation3x3==0) || (point2D==0) ) { return 0; }
+
+/*
+  fprintf(stderr,"Point 2D %0.2f,%0.2f \n",point2D[0],point2D[1]);
+  fprintf(stderr,"Getting multiplied with \n");
+  print3x3DMatrix("transformation3x3", transformation3x3);
+*/
+
+/*
+   What we want to do ( in mathematica )
+   { {e0,e1,e2} , {e3,e4,e5} , {e6,e7,e8} } * { { X } , { Y } , { W } }
+
+   This gives us
+
+  {
+    {e2 W + e0 X + e1 Y},
+    {e5 W + e3 X + e4 Y},
+    {e8 W + e6 X + e7 Y}
+  }
+*/
+
+  double * m = transformation3x3;
+  double X=point2D[0],Y=point2D[1],W=1.0;
+
+
+  resultPoint2D[0] =  m[e2] * W + m[e0] * X + m[e1] * Y;
+  resultPoint2D[1] =  m[e5] * W + m[e3] * X + m[e4] * Y;
+  resultPoint2D[2] =  m[e8] * W + m[e6] * X + m[e7] * Y;
+
+  // Ok we have our results but now to normalize our vector
+  if(resultPoint2D[2]!=0.0)
+  {
+   resultPoint2D[0]/=resultPoint2D[2];
+   resultPoint2D[1]/=resultPoint2D[2];
+   resultPoint2D[2]/=resultPoint2D[2];
+  } else
+  {
+     fprintf(stderr,"Error with W coordinate after multiplication of 2D Point with 3x3 Matrix\n");
+  }
+ return 1;
 }
