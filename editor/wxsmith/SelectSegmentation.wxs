@@ -271,7 +271,7 @@
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX2" variable="CheckBoxPlane" member="yes">
 			<label>Plane Segmentation</label>
-			<pos>392,290</pos>
+			<pos>392,288</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT12" variable="StaticText12" member="yes">
 			<label>Erase Color is </label>
@@ -378,7 +378,7 @@
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX5" variable="CheckBoxAutoPlaneSegmentation" member="yes">
 			<label>Auto</label>
-			<pos>568,290</pos>
+			<pos>568,288</pos>
 		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>

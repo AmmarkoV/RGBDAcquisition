@@ -167,7 +167,7 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	ChoiceCombination->Append(_("Swap RGB/Depth"));
 	CheckBoxBoundingBox = new wxCheckBox(this, ID_CHECKBOX1, _("Bounding Box"), wxPoint(392,204), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	CheckBoxBoundingBox->SetValue(false);
-	CheckBoxPlane = new wxCheckBox(this, ID_CHECKBOX2, _("Plane Segmentation"), wxPoint(392,290), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	CheckBoxPlane = new wxCheckBox(this, ID_CHECKBOX2, _("Plane Segmentation"), wxPoint(392,288), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	CheckBoxPlane->SetValue(false);
 	StaticText12 = new wxStaticText(this, ID_STATICTEXT12, _("Erase Color is "), wxPoint(16,424), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
 	eraseColorR = new wxSpinCtrl(this, ID_SPINCTRL9, _T("255"), wxPoint(124,420), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL9"));
@@ -200,7 +200,7 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	StaticText25 = new wxStaticText(this, ID_STATICTEXT25, _("Move"), wxPoint(55,240), wxDefaultSize, 0, _T("ID_STATICTEXT25"));
 	StaticText26 = new wxStaticText(this, ID_STATICTEXT26, _("Offset Normal : "), wxPoint(424,392), wxDefaultSize, 0, _T("ID_STATICTEXT26"));
 	planeNormalOffset = new wxTextCtrl(this, ID_TEXTCTRL25, _("0.0"), wxPoint(560,388), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL25"));
-	CheckBoxAutoPlaneSegmentation = new wxCheckBox(this, ID_CHECKBOX5, _("Auto"), wxPoint(568,290), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
+	CheckBoxAutoPlaneSegmentation = new wxCheckBox(this, ID_CHECKBOX5, _("Auto"), wxPoint(568,288), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
 	CheckBoxAutoPlaneSegmentation->SetValue(false);
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 

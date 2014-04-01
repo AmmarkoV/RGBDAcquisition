@@ -12,8 +12,8 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
 				<Option compiler="gcc" />
-				<Option parameters="-from fuse03 -to fuse03Segmented -maxFrames 10 -floodEraseDepthSource 529 290 10 -floodEraseDepthSource 529 330 10 -floodEraseDepthSource 529 350 10 -floodEraseDepthSource 529 390 10 -floodEraseDepthSource 529 430 10 -eraseRGB 255 255 255 -maxDepth 500 -bbox -200 -100 100 200 150 500 -combine depth" />
-				<Option host_application="redist/GrabberSegment" />
+				<Option parameters="-from floor -to floorSegmented -maxFrames 10 -autoplane -calibration color.calib" />
+				<Option host_application="../redist/GrabberSegment" />
 				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
 				<Compiler>

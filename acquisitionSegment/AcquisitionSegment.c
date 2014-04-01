@@ -146,7 +146,7 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
    segConfDepth->firstDepthFrameByteSize=0;
    segConfDepth->motionDistanceThreshold=25;
 
-
+   segConfDepth->autoPlaneSegmentation = 0;
    segConfDepth->enablePlaneSegmentation=0;
    int i=0;
    for (i=0; i<3; i++) { segConfDepth->p1[i]=0.0; segConfDepth->p2[i]=0.0; segConfDepth->p3[i]=0.0; }
@@ -226,6 +226,12 @@ int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB *
                        depthSeg->bboxX1,depthSeg->bboxY1,depthSeg->bboxZ1 ,
                        depthSeg->bboxX2,depthSeg->bboxY2,depthSeg->bboxZ2);
       }
+
+      if ( depthSeg->autoPlaneSegmentation )
+      {
+        fprintf(fp,"-autoplane\n");
+      }
+
 
       if ( depthSeg->enablePlaneSegmentation )
       {
@@ -334,6 +340,9 @@ int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFea
                                               depthSeg->firstDepthFrame=0;
                                               depthSeg->firstDepthFrameByteSize=0;
                                               depthSeg->motionDistanceThreshold=atoi(argv[i+1]);
+                                          } else
+    if (strcmp(argv[i],"-autoplane")==0)  {
+                                            depthSeg->autoPlaneSegmentation=1;
                                           } else
     if (strcmp(argv[i],"-plane")==0)      {
                                             depthSeg->enablePlaneSegmentation=1;
