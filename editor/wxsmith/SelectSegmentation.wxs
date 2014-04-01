@@ -380,6 +380,28 @@
 			<label>Auto</label>
 			<pos>568,288</pos>
 		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL16" variable="replaceR" member="yes">
+			<value>0</value>
+			<max>255</max>
+			<pos>156,307</pos>
+			<size>56,27</size>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL17" variable="replaceG" member="yes">
+			<value>0</value>
+			<max>255</max>
+			<pos>212,307</pos>
+			<size>56,27</size>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL18" variable="replaceB" member="yes">
+			<value>0</value>
+			<max>255</max>
+			<pos>268,307</pos>
+			<size>56,27</size>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX6" variable="CheckBoxReplaceColor" member="yes">
+			<label>Replace Color</label>
+			<pos>24,308</pos>
+		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>
 			<wildcard>.txt</wildcard>
