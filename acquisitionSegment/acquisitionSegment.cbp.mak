@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = ./libacquisitionSegment.a
+OUT_DEBUG = ./libAcquisitionSegment.a
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2 -fPIC
@@ -38,11 +38,11 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = ./libacquisitionSegment.a
+OUT_RELEASE = ./libAcquisitionSegment.a
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/imageProcessing.o $(OBJDIR_DEBUG)/depthSelector.o $(OBJDIR_DEBUG)/combineRGBAndDepthOutput.o $(OBJDIR_DEBUG)/colorSelector.o $(OBJDIR_DEBUG)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_DEBUG)/AcquisitionSegment.o $(OBJDIR_DEBUG)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_DEBUG)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_DEBUG)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/automaticPlaneSegmentation.o $(OBJDIR_DEBUG)/imageProcessing.o $(OBJDIR_DEBUG)/depthSelector.o $(OBJDIR_DEBUG)/combineRGBAndDepthOutput.o $(OBJDIR_DEBUG)/colorSelector.o $(OBJDIR_DEBUG)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_DEBUG)/AcquisitionSegment.o $(OBJDIR_DEBUG)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_DEBUG)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_DEBUG)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/imageProcessing.o $(OBJDIR_RELEASE)/depthSelector.o $(OBJDIR_RELEASE)/combineRGBAndDepthOutput.o $(OBJDIR_RELEASE)/colorSelector.o $(OBJDIR_RELEASE)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_RELEASE)/AcquisitionSegment.o $(OBJDIR_RELEASE)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_RELEASE)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_RELEASE)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/automaticPlaneSegmentation.o $(OBJDIR_RELEASE)/imageProcessing.o $(OBJDIR_RELEASE)/depthSelector.o $(OBJDIR_RELEASE)/combineRGBAndDepthOutput.o $(OBJDIR_RELEASE)/colorSelector.o $(OBJDIR_RELEASE)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.o $(OBJDIR_RELEASE)/AcquisitionSegment.o $(OBJDIR_RELEASE)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.o $(OBJDIR_RELEASE)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.o $(OBJDIR_RELEASE)/__/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.o
 
 all: debug release
 
@@ -59,6 +59,9 @@ debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(AR) rcs $(OUT_DEBUG) $(OBJ_DEBUG)
+
+$(OBJDIR_DEBUG)/automaticPlaneSegmentation.o: automaticPlaneSegmentation.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c automaticPlaneSegmentation.c -o $(OBJDIR_DEBUG)/automaticPlaneSegmentation.o
 
 $(OBJDIR_DEBUG)/imageProcessing.o: imageProcessing.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c imageProcessing.c -o $(OBJDIR_DEBUG)/imageProcessing.o
@@ -104,6 +107,9 @@ release: before_release out_release after_release
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(AR) rcs $(OUT_RELEASE) $(OBJ_RELEASE)
+
+$(OBJDIR_RELEASE)/automaticPlaneSegmentation.o: automaticPlaneSegmentation.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c automaticPlaneSegmentation.c -o $(OBJDIR_RELEASE)/automaticPlaneSegmentation.o
 
 $(OBJDIR_RELEASE)/imageProcessing.o: imageProcessing.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c imageProcessing.c -o $(OBJDIR_RELEASE)/imageProcessing.o

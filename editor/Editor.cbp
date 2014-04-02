@@ -41,7 +41,8 @@
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="../tools/OperatingSystem/libOperatingSystem.a" />
 			<Add library="./libAcquisition.so" />
-			<Add library="../acquisitionSegment/libacquisitionSegment.a" />
+			<Add library="../acquisitionSegment/libAcquisitionSegment.a" />
+			<Add library="../acquisition_mux/libAcquisitionMux.a" />
 		</Linker>
 		<Unit filename="AddNewElement.cpp" />
 		<Unit filename="AddNewElement.h" />

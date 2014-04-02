@@ -13,6 +13,7 @@
 #include <wx/msgdlg.h>
 
 #include "../acquisitionSegment/AcquisitionSegment.h"
+#include "../acquisition_mux/AcquisitionMux.h"
 #include "../acquisition/Acquisition.h"
 #include "SelectCalibration.h"
 #include "SelectAcquisitionGraph.h"
@@ -279,7 +280,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
      ListCtrlPoints->InsertColumn(1, col1);
 
 
-
+     //Todo -> acquisitionOpenDevice(OPENGL_ACQUISITION_MODULE,9,"Scenes/dragon.conf",width,height,30);
     //Connect( wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(EditorFrame::onIdle) );
 }
 

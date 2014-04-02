@@ -38,7 +38,7 @@
 			<Add library="GLU" />
 			<Add library="X11" />
 			<Add library="../acquisition/libAcquisition.so" />
-			<Add library="../acquisition_mux/libAcquisitionMux.so" />
+			<Add library="../acquisition_mux/libAcquisitionMux.a" />
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="../tools/Timers/libTimers.a" />
 			<Add library="dl" />
