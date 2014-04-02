@@ -68,12 +68,12 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
      //now have the segmented output frame
      executeSegmentationRGB(RGB,selectedRGB,width,height,segConfRGB);
      //The same goes for Depth
-     executeSegmentationDepth(Depth,selectedDepth,width,height,segConfDepth);
+     executeSegmentationDepth(Depth,selectedDepth,width,height);
   } else
   if (combinationMode == COMBINE_RGBFULL_DEPTH_USE_RGB )
   {
     //RGB frame is unaffected , Depth Frame uses RGB Segmentation
-    executeSegmentationDepth(Depth,selectedRGB,width,height,segConfDepth);
+    executeSegmentationDepth(Depth,selectedRGB,width,height);
   } else
   if (combinationMode == COMBINE_DEPTHFULL_RGB_USE_DEPTH )
   {
@@ -85,7 +85,7 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
      //If we want to swap RGB and Depth  we just swap it
      executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB);
      //The same goes for Depth
-     executeSegmentationDepth(Depth,selectedRGB,width,height,segConfDepth);
+     executeSegmentationDepth(Depth,selectedRGB,width,height);
   } else
   {
      //If we do want to combine the selections "Together" , and there are many ways to do that using
@@ -99,7 +99,7 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
      {
       //We use the combinedSelection for both RGB and Depth
       executeSegmentationRGB(RGB,combinedSelection,width,height,segConfRGB);
-      executeSegmentationDepth(Depth,combinedSelection,width,height,segConfDepth);
+      executeSegmentationDepth(Depth,combinedSelection,width,height);
 
       //And we dont forget to free our memory
       if (combinedSelection!=0) { free(combinedSelection); combinedSelection=0; }
@@ -289,6 +289,9 @@ int pickCombinationModeFromString(char * str)
   if (strcasecmp(str,"xor")==0) { return COMBINE_XOR; } else
   if (strcasecmp(str,"rgb")==0) { return COMBINE_KEEP_ONLY_RGB; } else
   if (strcasecmp(str,"depth")==0) { return COMBINE_KEEP_ONLY_DEPTH; }
+  if (strcasecmp(str,"swap")==0) { return COMBINE_SWAP; } else
+  if (strcasecmp(str,"depth_use_rgb")==0) { return COMBINE_RGBFULL_DEPTH_USE_RGB; } else
+  if (strcasecmp(str,"rgb_use_depth")==0) { return COMBINE_DEPTHFULL_RGB_USE_DEPTH; }
 
   fprintf(stderr,"Could not understand combination method %s\n",str);
   return DONT_COMBINE;
