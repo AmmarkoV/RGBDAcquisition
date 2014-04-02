@@ -62,7 +62,7 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
 
 
 
-int executeSegmentationDepth(unsigned short * Depth , unsigned char * selectedDepth , unsigned int width , unsigned int height ,  struct SegmentationFeaturesDepth * segConf )
+int executeSegmentationDepth(unsigned short * Depth , unsigned char * selectedDepth , unsigned int width , unsigned int height )
 {
   if (Depth==0) { fprintf(stderr,"Wrong Depth Array while @ executeSegmentationDepth\n"); return 0; }
   if (selectedDepth==0) { fprintf(stderr,"Wrong selectedDepth Array while @ executeSegmentationDepth\n"); return 0; }
