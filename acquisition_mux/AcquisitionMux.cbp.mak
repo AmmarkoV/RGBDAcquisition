@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = ./libAcquisitionMux.so
+OUT_DEBUG = ./libAcquisitionMux.a
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2 -fPIC
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = ./libAcquisitionMux.so
+OUT_RELEASE = ./libAcquisitionMux.a
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/__/tools/ImageOperations/imageOps.o $(OBJDIR_DEBUG)/AcquisitionMux.o
 
@@ -58,7 +58,7 @@ after_debug:
 debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
-	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
+	$(AR) rcs $(OUT_DEBUG) $(OBJ_DEBUG)
 
 $(OBJDIR_DEBUG)/__/tools/ImageOperations/imageOps.o: ../tools/ImageOperations/imageOps.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../tools/ImageOperations/imageOps.c -o $(OBJDIR_DEBUG)/__/tools/ImageOperations/imageOps.o
@@ -82,7 +82,7 @@ after_release:
 release: before_release out_release after_release
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
-	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
+	$(AR) rcs $(OUT_RELEASE) $(OBJ_RELEASE)
 
 $(OBJDIR_RELEASE)/__/tools/ImageOperations/imageOps.o: ../tools/ImageOperations/imageOps.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../tools/ImageOperations/imageOps.c -o $(OBJDIR_RELEASE)/__/tools/ImageOperations/imageOps.o
