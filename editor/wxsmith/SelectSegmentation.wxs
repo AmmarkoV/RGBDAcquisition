@@ -260,6 +260,8 @@
 				<item>RGB only</item>
 				<item>Depth only </item>
 				<item>Swap RGB/Depth</item>
+				<item>RGB no segmentation , Depth use RGB</item>
+				<item>Depth no segmentation ,  RGB use Depth</item>
 			</content>
 			<selection>0</selection>
 			<pos>168,456</pos>

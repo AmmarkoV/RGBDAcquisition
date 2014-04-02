@@ -70,6 +70,16 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
      //The same goes for Depth
      executeSegmentationDepth(Depth,selectedDepth,width,height,segConfDepth);
   } else
+  if (combinationMode == COMBINE_RGBFULL_DEPTH_USE_RGB )
+  {
+    //RGB frame is unaffected , Depth Frame uses RGB Segmentation
+    executeSegmentationDepth(Depth,selectedRGB,width,height,segConfDepth);
+  } else
+  if (combinationMode == COMBINE_DEPTHFULL_RGB_USE_DEPTH )
+  {
+    //Depth frame is unaffected ,  RGB Frame uses DepthSegmentation
+     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB);
+  } else
   if (combinationMode == COMBINE_SWAP )
   {
      //If we want to swap RGB and Depth  we just swap it
