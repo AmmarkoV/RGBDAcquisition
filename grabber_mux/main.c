@@ -25,7 +25,7 @@ struct calibration calibA;
 int calibrationSetB = 0;
 struct calibration calibB;
 
-
+unsigned int saveColor=1 , saveDepth=1;
 //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
 unsigned int frameNum=0,maxFramesToGrab=10;
 
@@ -81,6 +81,13 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+     if (strcmp(argv[i],"-noColor")==0)    {
+                                               saveColor = 0;
+                                           } else
+     if (strcmp(argv[i],"-noDepth")==0)    {
+                                               saveDepth = 0;
+                                           } else
+
     if (strcmp(argv[i],"-calibration1")==0) {
                                              calibrationSetA=1;
                                              if (!ReadCalibration(argv[i+1],defaultWidth,defaultHeight,&calibA) )
@@ -112,11 +119,11 @@ int main(int argc, char *argv[])
                                            fprintf(stderr,"Setting transparency to %u \n",transparency);
                                          } else
     if (strcmp(argv[i],"-module1")==0)    {
-                                           moduleID_1 = getModuleIdFromModuleName(argv[i+1]);
+                                           moduleID_1 = getModuleIdFromModuleName(argv[i+1]); // //Module 1 is Base
                                            fprintf(stderr,"Overriding Module 1 Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID_1),moduleID_1);
                                          } else
     if (strcmp(argv[i],"-module2")==0)   {
-                                           moduleID_2 = getModuleIdFromModuleName(argv[i+1]);
+                                           moduleID_2 = getModuleIdFromModuleName(argv[i+1]); //Module 2 is Overlay
                                            fprintf(stderr,"Overriding Module 2 Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID_2),moduleID_2);
                                          } else
     if (strcmp(argv[i],"-dev1")==0)      {
@@ -148,13 +155,15 @@ int main(int argc, char *argv[])
                                             } else
     if (
         (strcmp(argv[i],"-from1")==0) ||
-        (strcmp(argv[i],"-i1")==0)
+        (strcmp(argv[i],"-i1")==0)||
+        (strcmp(argv[i],"-fromBase")==0)
        )
        { strcat(inputname1,argv[i+1]); fprintf(stderr,"Input , set to %s  \n",inputname1); }
       else
     if (
          (strcmp(argv[i],"-from2")==0)||
-         (strcmp(argv[i],"-i2")==0)
+         (strcmp(argv[i],"-i2")==0)||
+        (strcmp(argv[i],"-fromOverlay")==0)
        )
        { strcat(inputname2,argv[i+1]); fprintf(stderr,"Input , set to %s  \n",inputname2); }
       else
@@ -262,7 +271,11 @@ int main(int argc, char *argv[])
 
    for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
     {
-        fprintf(stderr,"Muxing %0.2f , grabbed frame %u/%u \n", frameNum*100/maxFramesToGrab , frameNum,maxFramesToGrab);
+
+        if (maxFramesToGrab!=0)
+          { fprintf(stderr,"Muxing %0.2f %% , grabbed frame %u/%u \n", (float) frameNum*100/maxFramesToGrab , frameNum,maxFramesToGrab); } else
+          { fprintf(stderr,"Muxing an unknown total number of frames , currently at %u \n",frameNum); }
+
         acquisitionStartTimer(0);
 
         acquisitionSnapFrames(moduleID_1,devID_1);
@@ -282,12 +295,17 @@ int main(int argc, char *argv[])
            widthRGB , heightRGB ,
            transparency , 0 );
 
+        if (saveColor)
+         {
+          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+         }
 
-        sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
-        saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
-
-        sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
-        saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+        if (saveDepth)
+        {
+          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+        }
 
         #if SAVE_ALL_STREAMS
         sprintf(outfilename,"%s/BASEcolorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
