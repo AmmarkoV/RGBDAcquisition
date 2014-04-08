@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-from pancakeMix2 -to pancakeMix2Segmented -maxFrames 10 -eraseRGB 0 0 0 -maxDepth 1450 -minDepth 700 -plane -381.37680 209.26999 997.00000 244.47229 131.82959 1131.00000 253.63799 290.28799 670.00000 -floodEraseRGBTarget 134 334 35 -combine and" />
+				<Option parameters="-module TEMPLATE -from floor -to floorSegmented -maxFrames 1 -autoplane -calibration color.calib " />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

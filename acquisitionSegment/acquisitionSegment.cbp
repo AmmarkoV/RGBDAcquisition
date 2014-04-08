@@ -12,7 +12,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
 				<Option compiler="gcc" />
-				<Option parameters="-from floor -to floorSegmented -maxFrames 10 -autoplane -calibration color.calib" />
+				<Option parameters="-module TEMPLATE -from floor -to floorSegmented -maxFrames 1 -autoplane -calibration color.calib " />
 				<Option host_application="../redist/GrabberSegment" />
 				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
