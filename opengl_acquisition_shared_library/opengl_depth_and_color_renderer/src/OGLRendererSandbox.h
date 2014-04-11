@@ -60,6 +60,15 @@ unsigned int getOpenGLWidth();
 */
 unsigned int getOpenGLHeight();
 
+/**
+* @brief Enable Shaders ( this has to be called before initializing a scene , otherwise it does something )
+* @ingroup OGLRendererSandbox
+* @param Vertex Shader Filename
+* @param Fragment Shader Filename
+* @retval 0=Failure,1=Success
+*/
+int enableShaders(char * vertShaderFilename , char * fragShaderFilename );
+
 
 /**
 * @brief Get Virtual Focal Length

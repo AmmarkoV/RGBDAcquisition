@@ -271,6 +271,16 @@ double getOpenGLPixelSize()
  return 2/WIDTH;
 }
 
+int enableShaders(char * vertShaderFilename , char * fragShaderFilename)
+{
+  strncpy(fragmentShaderFile , fragShaderFilename,MAX_FILENAMES);
+  selectedFragmentShader = fragmentShaderFile;
+
+  strncpy(vertexShaderFile , vertShaderFilename,MAX_FILENAMES);
+  selectedVertexShader = vertexShaderFile;
+
+  return 1;
+}
 
 int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,char * sceneFile)
 {
