@@ -218,6 +218,30 @@ void buildOpenGLProjectionForIntrinsics   (
 
 
 
+/*
+    We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
+    We also have an absolute position of a 3D point , and we want to calculate the relative position
+    of the 3D point in relation to the object ( unrotated relative position )
+*/
+int pointInRelationToObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated )
+{
+  double objectTransposedRotation3x3[3*3]={0};
+  copy3x3Matrix(objectTransposedRotation3x3,objectRotation3x3);
+  transpose3x3MatrixD(objectTransposedRotation3x3);
+
+  double objectTransposedRotation4x4[4*4]={0};
+  upscale3x3to4x4(objectTransposedRotation4x4,objectTransposedRotation3x3);
+
+  double relativeInPoint3DRotated[4]={0};
+
+  relativeInPoint3DRotated[0]=objectPosition[0]-absoluteInPoint3DRotated[0];
+  relativeInPoint3DRotated[1]=objectPosition[1]-absoluteInPoint3DRotated[1];
+  relativeInPoint3DRotated[2]=objectPosition[2]-absoluteInPoint3DRotated[2];
+  relativeInPoint3DRotated[3]=objectPosition[3]-absoluteInPoint3DRotated[3];
+
+  transform3DPointUsing4x4Matrix(relativeOutPoint3DUnrotated,objectTransposedRotation4x4,relativeInPoint3DRotated);
+  return 1;
+}
 
 
 

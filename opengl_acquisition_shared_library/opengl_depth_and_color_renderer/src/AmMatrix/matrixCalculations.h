@@ -15,6 +15,17 @@ int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y
 
 void print4x4DMatrix(char * str , double * matrix4x4);
 
+
+
+/**
+* @brief build OpenGL Projection Matrix simulating a "real" camera
+* @ingroup AmMatrix
+* @param  Output Array 4x1 of resulting relative position ( X,Y,Z,W )
+* @param  Input Array 4x1 of object Position ( X,Y,Z,W )
+* @param  Input Array 3x3 of object Rotation
+* @param  Input Array 4x1 of absolute 3D position of the point ( X,Y,Z,W )
+* @retval 0=Failure,1=Success
+*/
 void buildOpenGLProjectionForIntrinsics   (
                                              double * frustum,
                                              int * viewport ,
@@ -27,6 +38,22 @@ void buildOpenGLProjectionForIntrinsics   (
                                              double farPlane
                                            );
 
+/**
+* @brief Convert 3D Point in Relation to a 3D Object
+* @ingroup AmMatrix
+* @param  Output Array 4x1 of resulting relative position ( X,Y,Z,W )
+* @param  Input Array 4x1 of object Position ( X,Y,Z,W )
+* @param  Input Array 3x3 of object Rotation
+* @param  Input Array 4x1 of absolute 3D position of the point ( X,Y,Z,W )
+* @retval 0=Failure,1=Success
+*/
+int pointInRelationToObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated );
+
+
+/**
+* @brief Internally Test Matrix subsystem
+* @ingroup AmMatrix
+*/
 void testMatrices();
 
 #endif // MATRIXCALCULATIONS_H_INCLUDED
