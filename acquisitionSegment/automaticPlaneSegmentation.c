@@ -22,6 +22,10 @@ struct normalArray
 int ensureClockwise(unsigned int id , struct normalArray * result)
 {
   return 0;
+
+  int swapPos[3]={0,1,2 };
+
+
   if ( (result[id].p1X <=  result[id].p2X)  && (result[id].p2X <=  result[id].p3X)   )
   {
     //ok
@@ -31,8 +35,9 @@ int ensureClockwise(unsigned int id , struct normalArray * result)
     //ok
   }
 
-  if (result[id].p1X <  result[id].p2X)
+  if ( (result[id].p1Y <  result[id].p2Y) && (result[id].p2Y <  result[id].p3Y) )
   {
+    //ok
 
   }
 
