@@ -16,6 +16,21 @@
      We need to replace the arctan by atan2 to generate all the orientations. */
 
 
+enum matrix3x3Enum
+{
+  m0=0,
+  m1,m2,m3,m4,m5,m6,m7,m8
+};
+
+
+enum matrix3x3EnumTranspose
+{
+  mT0=0,mT3,mT6,
+  mT1,mT4,mT7,
+  mT2,mT5,mT8
+};
+
+
 void euler2Quaternions(double * quaternions,double * euler,int quaternionConvention)
 {
   //This conversion follows the rule euler X Y Z  to quaternions W X Y Z
@@ -70,17 +85,10 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
     switch (quaternionConvention)
      {
        case qWqXqYqZ  :
-       qW = quaternions[0];
-       qX = quaternions[1];
-       qY = quaternions[2];
-       qZ = quaternions[3];
+        qW = quaternions[0]; qX = quaternions[1]; qY = quaternions[2]; qZ = quaternions[3];
        break;
-
        case qXqYqZqW :
-       qX = quaternions[0];
-       qY = quaternions[1];
-       qZ = quaternions[2];
-       qW = quaternions[3];
+        qX = quaternions[0]; qY = quaternions[1]; qZ = quaternions[2]; qW = quaternions[3];
        break;
 
        default :
@@ -168,3 +176,41 @@ double anglesBetweenQuaternions(double qAX,double qAY,double qAZ,double qAW ,
 
  return (double)  /*Why is the *2 needed ? */ 2* /*Why?*/ (rads * 180) / PI;
 }
+
+
+
+void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention)
+{
+    //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
+    double qX,qY,qZ,qW;
+
+    switch (quaternionConvention)
+     {
+       case qWqXqYqZ  :
+        qW = quaternions[0]; qX = quaternions[1]; qY = quaternions[2]; qZ = quaternions[3];
+       break;
+       case qXqYqZqW :
+        qX = quaternions[0]; qY = quaternions[1]; qZ = quaternions[2]; qW = quaternions[3];
+       break;
+
+       default :
+       fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
+       break;
+     }
+
+
+     double * m = matrix3x3;
+
+     m[m0]=1 -(2*qY*qY) - (2*qZ*qZ); /*|*/  m[m1]=(2*qX*qY) - (2*qZ*qW);     /*|*/ m[m2]=(2*qX*qZ) + (2*qY*qW);
+     m[m3]=(2*qX*qY) + (2*qZ*qW);    /*|*/  m[m4]=1 - (2*qX*qX) - (2*qZ*qZ); /*|*/ m[m5]=(2*qY*qZ) - (2*qX*qW);
+     m[m6]=(2*qX*qZ) - (2*qY*qW);    /*|*/  m[m7]=(2*qY*qZ) + (2*qX*qW);     /*|*/ m[m8]=1 - (2*qX*qX) - (2*qY*qY);
+
+ return ;
+}
+
+
+
+
+
+
+

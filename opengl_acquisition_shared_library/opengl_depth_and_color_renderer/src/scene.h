@@ -6,6 +6,14 @@
 #ifndef SCENE_H_INCLUDED
 #define SCENE_H_INCLUDED
 
+#define MAX_FILENAMES 512
+
+extern char fragmentShaderFile[MAX_FILENAMES];
+extern char * selectedFragmentShader;
+extern char vertexShaderFile[MAX_FILENAMES];
+extern char * selectedVertexShader;
+
+
 extern int WIDTH;
 extern int HEIGHT;
 

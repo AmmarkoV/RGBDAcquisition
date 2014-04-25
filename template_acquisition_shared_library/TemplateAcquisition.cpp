@@ -37,6 +37,18 @@
 #define PRINT_COMMENTS 1
 #define PRINT_DEBUG_EACH_CALL 0
 
+
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
 struct TemplateVirtualDevice
 {
  char readFromDir[MAX_DIR_PATH]; // <- this sucks i know :P
@@ -379,8 +391,9 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   sprintf(file_name_test,"frames/%s/depth.calib",device[devID].readFromDir);
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
 
-
-  return ((device[devID].templateColorFrame!=0)&&(device[devID].templateDepthFrame!=0)&&(failedStream==0));
+  if (device[devID].templateColorFrame==0) { fprintf(stderr,RED " Could not open , color frame Template acquisition will not process this data\n"); }
+  if (device[devID].templateDepthFrame==0) { fprintf(stderr,RED " Could not open , depth frame Template acquisition will not process this data\n"); }
+  return ((device[devID].templateColorFrame!=0)&& (device[devID].templateDepthFrame!=0)&& (failedStream==0));
 }
 
 
@@ -473,8 +486,8 @@ int snapTemplateFrames(int devID)
   if ( device[devID].safeGUARD != SAFEGUARD_VALUE ) { fprintf(stderr,"\n\n\n\nERROR , memory corruption \n\n\n\n"); }
 
   if (device[devID].cycle>65534) { device[devID].cycle=0; }
-  if (found_frames==0) { fprintf(stderr,"Could not find any frames , we finished stream \n");  device[devID].cycle = 0; } else
-  if (found_frames!=2) { fprintf(stderr,"\n Warning: Did not find both frames\n");   }
+  if (found_frames==0) { fprintf(stderr,YELLOW "Could not find any frames , we finished stream \n" NORMAL);  device[devID].cycle = 0; } else
+  if (found_frames!=2) { fprintf(stderr,YELLOW "\n Warning: Did not find both frames\n" NORMAL);   }
 
   return 1;
 }

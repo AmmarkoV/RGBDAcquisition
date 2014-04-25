@@ -23,6 +23,14 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 
+//Shader specific stuff ----------------
+char fragmentShaderFile[MAX_FILENAMES]={0};
+char * selectedFragmentShader = 0;
+char vertexShaderFile[MAX_FILENAMES]={0};
+char * selectedVertexShader = 0;
+struct shaderObject * loadedShader=0;
+//--------------------------------------
+
 struct VirtualStream * scene = 0;
 struct Model ** models=0;
 
@@ -63,7 +71,7 @@ double customTranslation[3]={0};
 double customRodriguezRotation[3]={0};
 
 
-#define USE_LIGHTS 0
+#define USE_LIGHTS 1
 const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
 const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -306,6 +314,12 @@ int initScene(char * confFile)
    fprintf(stderr,"Please note that lighting is disabled via the USE_LIGHTS precompiler define\n");
   #endif // USE_LIGHTS
 
+
+  if ( ( selectedFragmentShader != 0) || ( selectedVertexShader != 0 ) )
+  {
+      loadedShader = loadShader(selectedVertexShader,selectedFragmentShader);
+  }
+
   //This is not needed -> :P  glCullFace(GL_FRONT_AND_BACK);
 
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
@@ -326,6 +340,12 @@ int initScene(char * confFile)
 
 int closeScene()
 {
+
+  if ( ( selectedFragmentShader != 0) || ( selectedVertexShader != 0 ) )
+  {
+      unloadShader(loadedShader);
+  }
+
   unsigned int i=0;
   //Object 0 is camera
   for (i=1; i<scene->numberOfObjectTypes; i++)

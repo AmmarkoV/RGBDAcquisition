@@ -8,6 +8,7 @@
 #include "AcquisitionSegment.h"
 
 #include "combineRGBAndDepthOutput.h"
+#include "automaticPlaneSegmentation.h"
 
 #include "imageProcessing.h"
 #include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h"
@@ -260,8 +261,8 @@ int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB *
      fprintf(fp,"-cropDepth %u %u %u %u\n",depthSeg->minX,depthSeg->minY,depthSeg->maxX,depthSeg->maxY);
 
 
-     fprintf(fp,"-minDepth %f\n",depthSeg->minDepth);
-     fprintf(fp,"-maxDepth %f\n",depthSeg->maxDepth);
+     fprintf(fp,"-minDepth %u\n",depthSeg->minDepth);
+     fprintf(fp,"-maxDepth %u\n",depthSeg->maxDepth);
 
 
      fprintf(fp,"-cropRGB %u %u %u %u\n",rgbSeg->minX,rgbSeg->minY,rgbSeg->maxX,rgbSeg->maxY);

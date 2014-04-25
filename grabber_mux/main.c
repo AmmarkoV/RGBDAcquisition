@@ -81,10 +81,13 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
-     if (strcmp(argv[i],"-noColor")==0)    {
+
+     if ( (strcmp(argv[i],"-onlyDepth")==0)||
+          (strcmp(argv[i],"-noColor")==0)) {
                                                saveColor = 0;
                                            } else
-     if (strcmp(argv[i],"-noDepth")==0)    {
+     if ( (strcmp(argv[i],"-onlyColor")==0)||
+          (strcmp(argv[i],"-noDepth")==0)) {
                                                saveDepth = 0;
                                            } else
 

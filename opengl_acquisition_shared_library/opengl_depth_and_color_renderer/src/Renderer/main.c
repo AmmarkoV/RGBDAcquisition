@@ -83,7 +83,7 @@ int main(int argc, char **argv)
          (strcmp(argv[i],"-photo")==0) ||
          (strcmp(argv[i],"-photoshoot")==0)
         )
-                                     {
+                                      {
                                         if (i+4<argc)
                                         {
                                          photoShootOBJ=atoi(argv[i+1]);
@@ -91,11 +91,14 @@ int main(int argc, char **argv)
                                          angleY=atof(argv[i+3]);
                                          angleZ=atof(argv[i+4]);
                                         }
-                                     } else
-    if (strcmp(argv[i],"-from")==0) {
+                                      } else
+    if (strcmp(argv[i],"-from")==0)   {
                                         if (i+1<argc)
                                           { readFromArg = i+1 ; }
-                                    }
+                                      }  else
+    if (strcmp(argv[i],"-shader")==0) {
+                                       enableShaders(argv[i+1],argv[i+2]);
+                                      }
   }
 
 
