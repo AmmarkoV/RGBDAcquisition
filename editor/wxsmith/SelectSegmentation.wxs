@@ -375,7 +375,7 @@
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL25" variable="planeNormalOffset" member="yes">
 			<value>0.0</value>
-			<pos>560,388</pos>
+			<pos>536,388</pos>
 			<size>56,23</size>
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX5" variable="CheckBoxAutoPlaneSegmentation" member="yes">
@@ -403,6 +403,15 @@
 		<object class="wxCheckBox" name="ID_CHECKBOX6" variable="CheckBoxReplaceColor" member="yes">
 			<label>Replace Color</label>
 			<pos>24,308</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT27" variable="StaticText27" member="yes">
+			<label>Size</label>
+			<pos>608,392</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL26" variable="planeNormalSize" member="yes">
+			<value>0.0</value>
+			<pos>640,388</pos>
+			<size>40,27</size>
 		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>

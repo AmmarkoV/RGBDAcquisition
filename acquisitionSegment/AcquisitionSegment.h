@@ -111,6 +111,7 @@ struct SegmentationFeaturesDepth
    double p2[3];
    double p3[3];
    double planeNormalOffset;
+   double planeNormalSize;
 };
 
 

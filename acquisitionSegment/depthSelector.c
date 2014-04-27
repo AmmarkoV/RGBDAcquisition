@@ -317,6 +317,11 @@ if ( segConf->enablePlaneSegmentation )
       pN[2]=(float) world3D[2];
       float result = signedDistanceFromPlane(p2, normal , pN);
 
+      if (segConf->planeNormalSize!=0)
+      {
+         //We also have a ceiling defined
+         if (  result >= 0.0 + segConf->planeNormalOffset + segConf->planeNormalSize )  { *selectedPtr=0; } //Denied
+      }
       if (  result <= 0.0 + segConf->planeNormalOffset )  { *selectedPtr=0; } //Denied
 
      }//If it was selected and not null project it into 3d Space
