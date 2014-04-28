@@ -48,7 +48,7 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
 
   if (segConfDepth->autoPlaneSegmentation)
    {
-     automaticPlaneSegmentation(Depth,width,height,segConfDepth,calib);
+     automaticPlaneSegmentation(Depth,width,height,10.0,segConfDepth,calib);
    }
 
 
