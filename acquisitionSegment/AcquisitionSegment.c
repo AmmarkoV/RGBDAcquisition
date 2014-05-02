@@ -48,7 +48,7 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
 
   if (segConfDepth->autoPlaneSegmentation)
    {
-     automaticPlaneSegmentation(Depth,width,height,segConfDepth,calib);
+     automaticPlaneSegmentation(Depth,width,height,10.0,segConfDepth,calib);
    }
 
 
@@ -159,6 +159,8 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
 
    segConfDepth->autoPlaneSegmentation = 0;
    segConfDepth->enablePlaneSegmentation=0;
+   segConfDepth->planeNormalOffset=0;
+   segConfDepth->planeNormalSize=0;
    int i=0;
    for (i=0; i<3; i++) { segConfDepth->p1[i]=0.0; segConfDepth->p2[i]=0.0; segConfDepth->p3[i]=0.0; }
 

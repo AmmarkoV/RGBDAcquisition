@@ -89,6 +89,8 @@ const long SelectSegmentation::ID_SPINCTRL16 = wxNewId();
 const long SelectSegmentation::ID_SPINCTRL17 = wxNewId();
 const long SelectSegmentation::ID_SPINCTRL18 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX6 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT27 = wxNewId();
+const long SelectSegmentation::ID_TEXTCTRL26 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -205,7 +207,7 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	SpinCtrlMovementB->SetValue(_T("10"));
 	StaticText25 = new wxStaticText(this, ID_STATICTEXT25, _("Move"), wxPoint(55,240), wxDefaultSize, 0, _T("ID_STATICTEXT25"));
 	StaticText26 = new wxStaticText(this, ID_STATICTEXT26, _("Offset Normal : "), wxPoint(424,392), wxDefaultSize, 0, _T("ID_STATICTEXT26"));
-	planeNormalOffset = new wxTextCtrl(this, ID_TEXTCTRL25, _("0.0"), wxPoint(560,388), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL25"));
+	planeNormalOffset = new wxTextCtrl(this, ID_TEXTCTRL25, _("0.0"), wxPoint(536,388), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL25"));
 	CheckBoxAutoPlaneSegmentation = new wxCheckBox(this, ID_CHECKBOX5, _("Auto"), wxPoint(568,288), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
 	CheckBoxAutoPlaneSegmentation->SetValue(false);
 	replaceR = new wxSpinCtrl(this, ID_SPINCTRL16, _T("0"), wxPoint(156,307), wxSize(56,27), 0, 0, 255, 0, _T("ID_SPINCTRL16"));
@@ -216,6 +218,8 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	replaceB->SetValue(_T("0"));
 	CheckBoxReplaceColor = new wxCheckBox(this, ID_CHECKBOX6, _("Replace Color"), wxPoint(24,308), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
 	CheckBoxReplaceColor->SetValue(false);
+	StaticText27 = new wxStaticText(this, ID_STATICTEXT27, _("Size"), wxPoint(608,392), wxDefaultSize, 0, _T("ID_STATICTEXT27"));
+	planeNormalSize = new wxTextCtrl(this, ID_TEXTCTRL26, _("0.0"), wxPoint(640,388), wxSize(40,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL26"));
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
@@ -266,6 +270,7 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[2]); planeP3Z->SetValue(val);
 
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.planeNormalOffset); planeNormalOffset->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.planeNormalSize);   planeNormalSize->SetValue(val);
 
    val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.minX); cropDepthX1->SetValue(val);
    val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.minY); cropDepthY1->SetValue(val);
@@ -350,6 +355,7 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
     if (this->planeP3Z->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[2] = dValue; }
 
     if (this->planeNormalOffset->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.planeNormalOffset = dValue; }
+    if (this->planeNormalSize->GetValue().ToDouble(&dValue))   {  this->selectedDepthConf.planeNormalSize = dValue; }
 
     selectedDepthConf.enablePlaneSegmentation=1;
    } else
