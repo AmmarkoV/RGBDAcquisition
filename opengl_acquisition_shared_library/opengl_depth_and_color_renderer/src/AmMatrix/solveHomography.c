@@ -75,7 +75,7 @@ double testHomographyError(double * homography , unsigned int pointsNum ,  doubl
     actualTarget[2] = 1.0;
 
 
-    transform2DPointUsing3x3Matrix(thisTarget,homography,source);
+    transform2DPointVectorUsing3x3Matrix(thisTarget,homography,source);
 
     currentError += distanceBetween2DPoints(&actualTarget[0],&actualTarget[1],&thisTarget[0],&thisTarget[1]);
   }

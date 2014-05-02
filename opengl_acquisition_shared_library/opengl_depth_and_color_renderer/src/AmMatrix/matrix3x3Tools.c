@@ -55,6 +55,15 @@ void print3x3DMatrix(char * str , double * matrix3x3)
 }
 
 
+
+void print3x3DMathematicaMatrix(char * str , double * matrix3x3)
+{
+  fprintf( stderr, "%s = { { %f ,",str,matrix3x3[0]);  fprintf( stderr, "%f ,",matrix3x3[1]);  fprintf( stderr, "%f } , ",matrix3x3[2]);
+  fprintf( stderr, "{ %f ,",matrix3x3[3]);  fprintf( stderr, "%f ,",matrix3x3[4]);  fprintf( stderr, "%f } , ",matrix3x3[5]);
+  fprintf( stderr, "{ %f ,",matrix3x3[6]);  fprintf( stderr, "%f ,",matrix3x3[7]);  fprintf( stderr, "%f } }\n\n",matrix3x3[8]);
+
+}
+
 void print3x3DScilabMatrix(char * str , double * matrix3x3)
 {
   fprintf( stderr, "%s = [ %f ",str,matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f ; ",matrix3x3[2]);
@@ -220,7 +229,7 @@ int multiplyTwo3x3Matrices(double * result , double * matrixA , double * matrixB
 }
 
 
-int transform2DPointUsing3x3Matrix(double * resultPoint2D, double * transformation3x3, double * point2D)
+int transform2DPointVectorUsing3x3Matrix(double * resultPoint2D, double * transformation3x3, double * point2D)
 {
   if ( (resultPoint2D==0) || (transformation3x3==0) || (point2D==0) ) { return 0; }
 
@@ -244,7 +253,7 @@ int transform2DPointUsing3x3Matrix(double * resultPoint2D, double * transformati
 */
 
   double * m = transformation3x3;
-  double X=point2D[0],Y=point2D[1],W=1.0;
+  double X=point2D[0],Y=point2D[1],W=point2D[2];
 
 
   resultPoint2D[0] =  m[e2] * W + m[e0] * X + m[e1] * Y;
@@ -262,4 +271,21 @@ int transform2DPointUsing3x3Matrix(double * resultPoint2D, double * transformati
      fprintf(stderr,"Error with W coordinate after multiplication of 2D Point with 3x3 Matrix\n");
   }
  return 1;
+}
+
+
+int normalize2DPointVector(double * vec)
+{
+  if ( vec[2]==0.0 )
+  {
+    fprintf(stderr,"normalize2DPointVector cannot be normalized since element 2 is zero\n");
+    return 0;
+  }
+  if ( vec[2]==1.0 ) { return 1; }
+
+  vec[0]=vec[0]/vec[2];
+  vec[1]=vec[1]/vec[2];
+  vec[2]=vec[2]/vec[2];
+
+  return 1;
 }

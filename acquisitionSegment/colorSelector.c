@@ -119,7 +119,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
 
  unsigned char * target = (unsigned char *) malloc( width * height * 3 * sizeof(unsigned char));
  if ( target == 0) {  free(sourceCopy); return 0; }
- memset(target,0,width*height*3*sizeof(char));
+ memset(target,0,width*height*3*sizeof(unsigned char));
 
  removeFloodFillBeforeProcessing(sourceCopy,target,width,height,segConf);
 
@@ -131,10 +131,10 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
  unsigned int posY = 0;
  unsigned int sourceWidthStep = width * 3;
 
- char * sourcePixelsStart   = (char*) sourceCopy + ( (posX*3) + posY * sourceWidthStep );
- char * sourcePixelsLineEnd = sourcePixelsStart + (width*3);
- char * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
- char * sourcePixels = sourcePixelsStart;
+ unsigned char * sourcePixelsStart   = (unsigned char*) sourceCopy + ( (posX*3) + posY * sourceWidthStep );
+ unsigned char * sourcePixelsLineEnd = sourcePixelsStart + (width*3);
+ unsigned char * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
+ unsigned char * sourcePixels = sourcePixelsStart;
 
  unsigned char * selectedRGB   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
  if (selectedRGB==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }

@@ -100,6 +100,15 @@ void print4x4DMatrix(char * str , double * matrix4x4)
 }
 
 
+void print4x4DMathematicaMatrix(char * str , double * matrix3x3)
+{
+  fprintf( stderr, "%s = { { %f , %f , %f ,%f } , { %f , %f , %f , %f } , { %f , %f , %f , %f } , { %f , %f , %f , %f } }\n",str,
+           matrix3x3[0],matrix3x3[1],matrix3x3[2],matrix3x3[3],
+           matrix3x3[4],matrix3x3[5],matrix3x3[6],matrix3x3[7],
+           matrix3x3[8],matrix3x3[9],matrix3x3[10],matrix3x3[11],
+           matrix3x3[12],matrix3x3[13],matrix3x3[14],matrix3x3[15]);
+}
+
 void copy4x4Matrix(double * out,double * in)
 {
   out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
@@ -414,7 +423,7 @@ int transform3DPointUsing4x4MatrixOld(double * resultPoint3D, double * transform
  return 1;
 }*/
 
-int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)
+int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)
 {
   if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0) ) { return 0; }
 
@@ -434,7 +443,7 @@ int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformati
 */
 
   double * m = transformation4x4;
-  double X=point3D[0],Y=point3D[1],Z=point3D[2],W=1.0;
+  double X=point3D[0],Y=point3D[1],Z=point3D[2],W=point3D[3];
 
   resultPoint3D[0] =  m[e3] * W + m[e0] * X + m[e1] * Y + m[e2] * Z;
   resultPoint3D[1] =  m[e7] * W + m[e4] * X + m[e5] * Y + m[e6] * Z;
@@ -456,4 +465,24 @@ int transform3DPointUsing4x4Matrix(double * resultPoint3D, double * transformati
   //fprintf(stderr,"Transformed to %0.2f,%0.2f,%0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2]);
 
  return 1;
+}
+
+
+
+int normalize3DPointVector(double * vec)
+{
+  if ( vec[3]==0.0 )
+  {
+    fprintf(stderr,"normalize3DPointVector cannot be normalized since element 3 is zero\n");
+    return 0;
+  }
+  if ( vec[3]==1.0 ) { return 1; }
+
+
+  vec[0]=vec[0]/vec[3];
+  vec[1]=vec[1]/vec[3];
+  vec[2]=vec[2]/vec[3];
+  vec[3]=vec[3]/vec[3];
+
+  return 1;
 }

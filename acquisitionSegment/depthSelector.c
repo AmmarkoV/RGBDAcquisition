@@ -120,7 +120,7 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  if ( target != 0)  { free(target); target=0; }
 
  unsigned int sourceWidthStep = width;
- unsigned int targetWidthStep = width;
+// unsigned int targetWidthStep = width;
  unsigned int posX = segConf->minX;
  unsigned int posY = segConf->minY;
  width = segConf->maxX-segConf->minX;
@@ -280,18 +280,7 @@ if ( segConf->enablePlaneSegmentation )
     float normal[3]={0.0 , 0.0 , 0.0 };
 
     crossProductFrom3Points( p1 , p2  , p3  , normal);
-    fprintf(stderr,"crossProductFrom3Points is \n");
-    fprintf(stderr,"%f,%f,%f  - %f,%f,%f  - %f,%f,%f \n",p1[0],p1[1],p1[2],p2[0],p2[1],p2[2],p3[0],p3[1],p3[2]);
-    fprintf(stderr,"the normal %f,%f,%f \n",normal[0],normal[1],normal[2]);
-
     //fprintf(stderr,"signedDistanceFromPlane is %0.2f \n",signedDistanceFromPlane(segConf->p2, normal , pN));
-
-     if ( (normal[0]<0.0) && (normal[1]>0.0) && (normal[2]>0.0) )
-     {
-         fprintf(stderr,"Performing known up/down flip\n");
-         normal[1]=-1*normal[1];
-         normal[2]=-1*normal[2];
-     }
 
   sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
   sourcePixelsLineEnd = sourcePixelsStart + (width);
