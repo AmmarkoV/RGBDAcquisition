@@ -391,7 +391,7 @@ int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , 
   raw3D[2] = (double) *z;
   raw3D[3] = (double) 1.0;
 
-  result = transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+  result = transform3DPointVectorUsing4x4Matrix(world3D,m,raw3D);
 
   *x= (float) world3D[0];
   *y= (float) world3D[1];

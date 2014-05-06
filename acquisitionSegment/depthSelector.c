@@ -238,7 +238,7 @@ if (segConf->enableBBox)
        raw3D[2] = (double) z3D;
        raw3D[3] = (double) 1.0;
 
-       transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+       transform3DPointVectorUsing4x4Matrix(world3D,m,raw3D);
 
        if (
            (segConf->bboxX1<world3D[0])&& (segConf->bboxX2>world3D[0]) &&
@@ -306,7 +306,7 @@ if ( segConf->enablePlaneSegmentation )
       transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
       raw3D[0] = (double) x3D; raw3D[1] = (double) y3D; raw3D[2] = (double) z3D; raw3D[3] = (double) 1.0;
 
-      transform3DPointUsing4x4Matrix(world3D,m,raw3D);
+      transform3DPointVectorUsing4x4Matrix(world3D,m,raw3D);
 
       pN[0]=(float) world3D[0];
       pN[1]=(float) world3D[1];
