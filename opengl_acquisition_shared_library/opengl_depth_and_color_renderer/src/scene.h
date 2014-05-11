@@ -46,7 +46,7 @@ int renderScene();
 */
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight);
 
-
+int handleUserInput(char key,int state,unsigned int x, unsigned int y);
 
 void * createPhotoshoot(
                         int objID,

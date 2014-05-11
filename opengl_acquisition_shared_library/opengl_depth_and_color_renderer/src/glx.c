@@ -124,14 +124,19 @@ int glx_checkEvents()
           if (   (XLookupString((XKeyEvent *)&event,buffer,1,&keysym,NULL) == 1)
               && (keysym == (KeySym)XK_Escape) )
             exit(0);
+
+
+          handleUserInput(keysym,1,0,0);
+
+
           break;
         }
         case ButtonPress:
           switch (event.xbutton.button)
           {
-            case 1: break;
-            case 2: break;
-            case 3: break;
+            case 1: handleUserInput(1,1,0,0); break;
+            case 2: handleUserInput(2,1,0,0); break;
+            case 3: handleUserInput(3,1,0,0); break;
           }
           break;
         case ConfigureNotify:
