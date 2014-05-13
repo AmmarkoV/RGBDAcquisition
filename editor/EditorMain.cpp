@@ -29,21 +29,31 @@ unsigned int devID=0;
 unsigned int width , height , fps ;
 char openDevice[512];
 
-int addingPoint=0;
-int alreadyInitialized=0;
-int play=0;
-int lastFrameDrawn=12312312;
-int totalFramesOfDevice=12312312;
+unsigned int addingPoint=0;
+unsigned int alreadyInitialized=0;
+unsigned int play=0;
+unsigned int lastFrameDrawn=12312312;
+unsigned int totalFramesOfDevice=12312312;
 
-int combinationMode=DONT_COMBINE;
+unsigned int combinationMode=DONT_COMBINE;
 struct SegmentationFeaturesRGB segConfRGB={0};
 struct SegmentationFeaturesDepth segConfDepth={0};
 struct calibration calib;
 
 
+unsigned int overlayModule=OPENGL_ACQUISITION_MODULE;
+unsigned int overlayDevice=6;
+unsigned int overlayFramesExist=0;
+unsigned char * overlayRGB=0;
+unsigned short * overlayDepth=0;
+
+
+
 unsigned int segmentedFramesExist=0;
 unsigned char * segmentedRGB=0;
 unsigned short * segmentedDepth=0;
+unsigned char trR=255,trG=255,trB=255;
+unsigned int shiftX=0,shiftY=0;
 
 
 unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
@@ -290,6 +300,32 @@ EditorFrame::~EditorFrame()
     //*)
 }
 
+
+int EditorFrame::initializeOverlay()
+{
+   if ( acquisitionStartModule(overlayModule,16 /*maxDevices*/ , 0 ) )
+   {
+     if ( acquisitionOpenDevice(overlayModule,overlayDevice,"Scenes/bothhand.conf",width,height,fps) )
+     {
+        overlayFramesExist=1;
+        return 1;
+     }
+   }
+   return 0;
+}
+
+int EditorFrame::stopOverlay()
+{
+  if (overlayFramesExist)
+  {
+      acquisitionCloseDevice(overlayModule,overlayDevice);
+      acquisitionStopModule(overlayModule);
+      return 1;
+  }
+  return 0;
+}
+
+
 void EditorFrame::OnOpenModule(wxCommandEvent& event)
 {
    if (alreadyInitialized)
@@ -393,6 +429,8 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
                        }
 
 
+   initializeOverlay();
+
    initializeRGBSegmentationConfiguration(&segConfRGB,width,height);
    initializeDepthSegmentationConfiguration(&segConfDepth,width,height);
 
@@ -420,6 +458,7 @@ void EditorFrame::OnQuit(wxCommandEvent& event)
     Close();
 
     closeFeeds();
+    stopOverlay();
 
     removeOldSegmentedFrames();
 
@@ -637,7 +676,6 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 
 int EditorFrame::removeOldSegmentedFrames()
 {
-
     if (!segmentedFramesExist ) { return 0; }
     if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
     if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
@@ -645,14 +683,15 @@ int EditorFrame::removeOldSegmentedFrames()
 }
 
 
-
-int  EditorFrame::refreshSegmentedFrame()
+int  EditorFrame::refreshAllOverlays()
 {
+    unsigned int retres=0;
     if (segmentedFramesExist)
     {
      removeOldSegmentedFrames();
      segmentedRGB = copyRGB(rgbFrame, width , height);
      segmentedDepth = copyDepth(depthFrame , width , height);
+
 
      segmentRGBAndDepthFrame (
                               segmentedRGB ,
@@ -673,12 +712,46 @@ int  EditorFrame::refreshSegmentedFrame()
      if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
      if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
 
-     return 1;
+     retres=1;
     }
- return 0;
+
+
+   if (overlayFramesExist)
+    {
+        unsigned char * rgbOut = (unsigned char * ) malloc(width * height * 3 * sizeof(unsigned char) );
+        unsigned short * depthOut = (unsigned short * )  malloc(width * height * 1 * sizeof(unsigned short) );
+
+        if ( (rgbOut!=0) && (depthOut!=0) )
+        {
+         overlayRGB = acquisitionGetColorFrame(overlayModule,overlayDevice);
+         overlayDepth = acquisitionGetDepthFrame(overlayModule,overlayDevice);
+
+
+         mux2RGBAndDepthFrames(
+                                rgbFrame    , overlayRGB , rgbOut ,
+                                depthFrame  , overlayDepth , depthOut ,
+                                trR,trG,trB,
+                                shiftX,shiftY,
+                                width , height , 0 ,
+                                REGULAR_MUXING
+                              );
+
+         unsigned int newColorByteSize = width * height * 3 * sizeof(unsigned char);
+         acquisitionOverrideColorFrame(moduleID,devID,rgbOut,newColorByteSize);
+
+         unsigned int newDepthByteSize = width * height * 1 * sizeof(unsigned short);
+         acquisitionOverrideDepthFrame(moduleID,devID,depthOut,newDepthByteSize);
+        }
+
+
+       if ( rgbOut!=0 ) { free(rgbOut); rgbOut=0; }
+       if ( depthOut!=0 ) { free(depthOut); depthOut=0; }
+
+    }
+
+
+ return retres;
 }
-
-
 
 
 void EditorFrame::guiSnapFrames(int doSnap)
@@ -692,8 +765,10 @@ void EditorFrame::guiSnapFrames(int doSnap)
 
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
   depthFrame = acquisitionGetDepthFrame(moduleID,devID);
-  refreshSegmentedFrame();
-  //These should now contain the sgemented frame!
+
+  refreshAllOverlays();
+
+  //These should now contain the segmented frame!
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
   depthFrame = acquisitionGetDepthFrame(moduleID,devID);
 
@@ -880,7 +955,9 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 
     delete  segmentationSelector;
 
-    refreshSegmentedFrame();
+    //refreshSegmentedFrame();
+    //refreshOverlay(segmentedFramesExist,segmentedRGB,segmentedDepth);
+    refreshAllOverlays();
     lastFrameDrawn+=1000;
     guiSnapFrames(0); //Get New Frames
     Refresh();
@@ -1010,7 +1087,8 @@ void EditorFrame::OnButtonExecuteClick(wxCommandEvent& event)
     ane->ShowModal();
 
     segmentedFramesExist=1;
-    refreshSegmentedFrame();
+    //refreshSegmentedFrame();
+    refreshAllOverlays();
     lastFrameDrawn+=1000;
     guiSnapFrames(0); //Get New Frames
     Refresh();

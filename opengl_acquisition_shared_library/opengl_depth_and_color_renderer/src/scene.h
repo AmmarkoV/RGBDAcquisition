@@ -21,6 +21,9 @@ extern float farPlane;
 extern float nearPlane;
 //extern float depthUnit;
 
+
+extern unsigned int userKeyFOVEnabled;
+
 extern int useIntrinsicMatrix;
 extern double cameraMatrix[9];
 

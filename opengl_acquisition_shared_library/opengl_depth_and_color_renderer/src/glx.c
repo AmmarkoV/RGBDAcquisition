@@ -131,12 +131,13 @@ int glx_checkEvents()
 
           break;
         }
+        case ButtonRelease:
         case ButtonPress:
           switch (event.xbutton.button)
           {
-            case 1: handleUserInput(1,1,0,0); break;
-            case 2: handleUserInput(2,1,0,0); break;
-            case 3: handleUserInput(3,1,0,0); break;
+            case 1: handleUserInput(1,(event.type==ButtonPress),event.xmotion.x_root,event.xmotion.y_root); break;
+            case 2: handleUserInput(2,(event.type==ButtonPress),event.xmotion.x_root,event.xmotion.y_root); break;
+            case 3: handleUserInput(3,(event.type==ButtonPress),event.xmotion.x_root,event.xmotion.y_root); break;
           }
           break;
         case ConfigureNotify:

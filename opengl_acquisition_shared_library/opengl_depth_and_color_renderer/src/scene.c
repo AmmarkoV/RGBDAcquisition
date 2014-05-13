@@ -40,6 +40,8 @@ float fieldOfView = 65;
 
 //float depthUnit = 1.0;
 
+unsigned int userKeyFOVEnabled=0;
+
 int WIDTH=640;
 int HEIGHT=480;
 
@@ -256,6 +258,7 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 
 int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
+    if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input is disabled\n"); return 0; }
     fprintf(stderr,"handleUserInput called for key %c ( %u ) \n",key,key);
     switch (key)
     {
@@ -300,6 +303,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 
     }
+  return 1;
 }
 
 
