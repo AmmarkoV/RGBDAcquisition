@@ -23,6 +23,9 @@
 #include "GetExtrinsics.h"
 #include "AddNewElement.h"
 
+
+#define OVERLAY_EDITOR_SCENE_FILE "Scenes/editor.conf"
+
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 unsigned int devID=0;
 
@@ -308,7 +311,7 @@ int EditorFrame::initializeOverlay()
 {
    if ( acquisitionStartModule(overlayModule,16 /*maxDevices*/ , 0 ) )
    {
-     if ( acquisitionOpenDevice(overlayModule,overlayDevice,"Scenes/editor.conf",width,height,fps) )
+     if ( acquisitionOpenDevice(overlayModule,overlayDevice,OVERLAY_EDITOR_SCENE_FILE,width,height,fps) )
      {
         overlayFramesExist=1;
         return 1;
@@ -766,10 +769,11 @@ void EditorFrame::guiSnapFrames(int doSnap)
   if (doSnap)
           {
             acquisitionSnapFrames(moduleID,devID);
-            if (overlayFramesExist)
-            {
-               acquisitionSnapFrames(overlayModule,overlayDevice);
-            }
+
+            if ( (overlayFramesExist) && ( CheckBoxOverlay->GetValue() ) )
+              {
+                acquisitionSnapFrames(overlayModule,overlayDevice);
+              }
           }
 
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
