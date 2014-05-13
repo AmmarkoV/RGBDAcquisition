@@ -129,6 +129,7 @@ const long EditorFrame::ID_BUTTON10 = wxNewId();
 const long EditorFrame::ID_BUTTON11 = wxNewId();
 const long EditorFrame::ID_LISTCTRL2 = wxNewId();
 const long EditorFrame::ID_BUTTON12 = wxNewId();
+const long EditorFrame::ID_CHECKBOX1 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
@@ -183,6 +184,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     ButtonExecute = new wxButton(this, ID_BUTTON11, _("="), wxPoint(1408,192), wxSize(64,29), 0, wxDefaultValidator, _T("ID_BUTTON11"));
     ListCtrl1 = new wxListCtrl(this, ID_LISTCTRL2, wxPoint(1320,240), wxSize(152,232), wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL2"));
     Button1 = new wxButton(this, ID_BUTTON12, _("Remove"), wxPoint(1320,472), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
+    CheckBoxOverlay = new wxCheckBox(this, ID_CHECKBOX1, _("Overlay Active"), wxPoint(1320,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+    CheckBoxOverlay->SetValue(false);
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -305,7 +308,7 @@ int EditorFrame::initializeOverlay()
 {
    if ( acquisitionStartModule(overlayModule,16 /*maxDevices*/ , 0 ) )
    {
-     if ( acquisitionOpenDevice(overlayModule,overlayDevice,"Scenes/bothhand.conf",width,height,fps) )
+     if ( acquisitionOpenDevice(overlayModule,overlayDevice,"Scenes/editor.conf",width,height,fps) )
      {
         overlayFramesExist=1;
         return 1;
@@ -716,7 +719,7 @@ int  EditorFrame::refreshAllOverlays()
     }
 
 
-   if (overlayFramesExist)
+   if ( (overlayFramesExist) && ( CheckBoxOverlay->GetValue() ) )
     {
         unsigned char * rgbOut = (unsigned char * ) malloc(width * height * 3 * sizeof(unsigned char) );
         unsigned short * depthOut = (unsigned short * )  malloc(width * height * 1 * sizeof(unsigned short) );
@@ -761,7 +764,13 @@ void EditorFrame::guiSnapFrames(int doSnap)
   ++framesSnapped;
   //fprintf(stderr,"guiSnapFrames Called %u ! \n",framesSnapped);
   if (doSnap)
-          { acquisitionSnapFrames(moduleID,devID); }
+          {
+            acquisitionSnapFrames(moduleID,devID);
+            if (overlayFramesExist)
+            {
+               acquisitionSnapFrames(overlayModule,overlayDevice);
+            }
+          }
 
   rgbFrame = acquisitionGetColorFrame(moduleID,devID);
   depthFrame = acquisitionGetDepthFrame(moduleID,devID);

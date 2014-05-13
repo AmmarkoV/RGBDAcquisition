@@ -11,6 +11,7 @@
 #define EDITORMAIN_H
 
 //(*Headers(EditorFrame)
+#include <wx/checkbox.h>
 #include <wx/listctrl.h>
 #include <wx/button.h>
 #include <wx/menu.h>
@@ -103,6 +104,7 @@ class EditorFrame: public wxFrame
         static const long ID_BUTTON11;
         static const long ID_LISTCTRL2;
         static const long ID_BUTTON12;
+        static const long ID_CHECKBOX1;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
@@ -146,6 +148,7 @@ class EditorFrame: public wxFrame
         wxMenuItem* MenuItem7;
         wxMenuItem* MenuItem4;
         wxMenuItem* MenuItem6;
+        wxCheckBox* CheckBoxOverlay;
         wxButton* ButtonSegmentation;
         wxMenuItem* MenuItem8;
         //*)
