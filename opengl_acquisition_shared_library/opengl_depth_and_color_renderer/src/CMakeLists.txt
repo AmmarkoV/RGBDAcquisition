@@ -21,6 +21,8 @@ add_library(OGLRendererSandbox SHARED
             tiledRenderer.h
             tools.c
             tools.h
+            AmMatrix/collisions.c
+            AmMatrix/collisions.h
             AmMatrix/matrix3x3Tools.c
             AmMatrix/matrix3x3Tools.h
             AmMatrix/matrix4x4Tools.c

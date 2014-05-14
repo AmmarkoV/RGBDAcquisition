@@ -141,6 +141,7 @@ const long EditorFrame::idMenuQuit = wxNewId();
 const long EditorFrame::ID_MENUSEGMENTATION = wxNewId();
 const long EditorFrame::ID_MENUGETEXTRINSICS = wxNewId();
 const long EditorFrame::ID_MENUDETECTFEATURES = wxNewId();
+const long EditorFrame::ID_MENUOVERLAYEDITOR = wxNewId();
 const long EditorFrame::idMenuAbout = wxNewId();
 const long EditorFrame::ID_STATUSBAR1 = wxNewId();
 const long EditorFrame::ID_TIMER1 = wxNewId();
@@ -210,6 +211,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Menu4->Append(MenuItem7);
     MenuItem8 = new wxMenuItem(Menu4, ID_MENUDETECTFEATURES, _("Detect Features"), wxEmptyString, wxITEM_NORMAL);
     Menu4->Append(MenuItem8);
+    MenuItem10 = new wxMenuItem(Menu4, ID_MENUOVERLAYEDITOR, _("Overlay Editor"), wxEmptyString, wxITEM_NORMAL);
+    Menu4->Append(MenuItem10);
     MenuBar1->Append(Menu4, _("Module"));
     Menu2 = new wxMenu();
     MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
@@ -251,6 +254,9 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_MENUOPENMODULE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnOpenModule);
     Connect(ID_MENUSEGMENTATION,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
     Connect(ID_MENUGETEXTRINSICS,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonGetExtrinsics);
+
+    Connect(ID_MENUOVERLAYEDITOR,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OpenOverlayEditor);
+
 
     rgbFrame=0;
     depthFrame=0;
@@ -304,6 +310,20 @@ EditorFrame::~EditorFrame()
 {
     //(*Destroy(EditorFrame)
     //*)
+}
+
+
+inline wxString _U(const char String[] = "")
+{
+  return wxString(String, wxConvUTF8);
+}
+
+
+void EditorFrame::OpenOverlayEditor(wxCommandEvent& event)
+{
+  char outStr[512];
+  sprintf(outStr,"gedit %s",OVERLAY_EDITOR_SCENE_FILE);
+  wxExecute(_U(outStr));
 }
 
 
@@ -749,10 +769,8 @@ int  EditorFrame::refreshAllOverlays()
          acquisitionOverrideDepthFrame(moduleID,devID,depthOut,newDepthByteSize);
         }
 
-
        if ( rgbOut!=0 ) { free(rgbOut); rgbOut=0; }
        if ( depthOut!=0 ) { free(depthOut); depthOut=0; }
-
     }
 
 
