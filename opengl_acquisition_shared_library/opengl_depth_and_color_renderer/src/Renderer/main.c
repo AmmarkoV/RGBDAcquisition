@@ -106,7 +106,6 @@ int main(int argc, char **argv)
  if (readFromArg!=0) {   started=startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,argv[readFromArg]); } else
                      {   started=startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/ }
 
- usleep(100);
 
  if (!started)
  {

@@ -40,6 +40,8 @@ float fieldOfView = 65;
 
 //float depthUnit = 1.0;
 
+unsigned int userKeyFOVEnabled=0;
+
 int WIDTH=640;
 int HEIGHT=480;
 
@@ -85,6 +87,10 @@ const GLfloat mat_shininess[]  = { 5.0f };
 
 float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;
 float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z = 0.0f;
+
+
+float userDeltacamera_pos_x = 0.0f; float userDeltacamera_pos_y = 0.0f; float userDeltacamera_pos_z = 0.0f;
+float userDeltacamera_angle_x = 0.0f; float userDeltacamera_angle_y = 0.0f; float userDeltacamera_angle_z = 0.0f;
 
 unsigned int ticks = 0;
 
@@ -250,6 +256,56 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 }
 
 
+int handleUserInput(char key,int state,unsigned int x, unsigned int y)
+{
+    if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input is disabled\n"); return 0; }
+    fprintf(stderr,"handleUserInput called for key %c ( %u ) \n",key,key);
+    switch (key)
+    {
+       case 1 : userDeltacamera_angle_x+=1.0; break;
+       case 2 : userDeltacamera_angle_y+=1.0; break;
+       case 3 : userDeltacamera_angle_z+=1.0; break;
+
+       case 'W' :
+       case 'w' :
+              userDeltacamera_pos_y+=1.0;
+       break;
+
+       case 'S' :
+       case 's' :
+              userDeltacamera_pos_y-=1.0;
+       break;
+
+       case 'A' :
+       case 'a' :
+              userDeltacamera_pos_x-=1.0;
+       break;
+
+       case 'D' :
+       case 'd' :
+              userDeltacamera_pos_x+=1.0;
+       break;
+
+       case 'Q' :
+       case 'q' :
+              userDeltacamera_pos_z-=1.0;
+       break;
+
+       case 'Z' :
+       case 'z' :
+              userDeltacamera_pos_z+=1.0;
+       break;
+
+
+      //float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;
+      //float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z = 0.0f;
+
+
+
+    }
+  return 1;
+}
+
 
 
 
@@ -371,8 +427,8 @@ int tickScene()
 
   //Object 0 is camera  lets calculate its position
    calculateVirtualStreamPos(scene,0,ticks*100,pos,&scaleX,&scaleY,&scaleZ);
-   camera_pos_x = pos[0];  camera_pos_y = pos[1]; camera_pos_z = pos[2];
-   camera_angle_x = pos[3]; camera_angle_y = pos[4]; camera_angle_z = pos[5];
+   camera_pos_x = userDeltacamera_pos_x + pos[0];  camera_pos_y = userDeltacamera_pos_y + pos[1]; camera_pos_z = userDeltacamera_pos_z + pos[2];
+   camera_angle_x = userDeltacamera_angle_x + pos[3]; camera_angle_y = userDeltacamera_angle_y + pos[4]; camera_angle_z = userDeltacamera_angle_z + pos[5];
 
    usleep(100);
    ++ticks;

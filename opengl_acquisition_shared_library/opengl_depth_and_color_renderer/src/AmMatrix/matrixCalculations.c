@@ -167,7 +167,7 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
 
 int move3DPoint(double * resultPoint3D, double * transformation4x4, double * point3D  )
 {
-  return transform3DPointUsing4x4Matrix(resultPoint3D,transformation4x4,point3D);
+  return transform3DPointVectorUsing4x4Matrix(resultPoint3D,transformation4x4,point3D);
 }
 
 
@@ -227,23 +227,45 @@ int pointInRelationToObject(double * relativeOutPoint3DUnrotated, double * objec
 {
   double objectTransposedRotation3x3[3*3]={0};
   copy3x3Matrix(objectTransposedRotation3x3,objectRotation3x3);
+  //We transpose our 3x3 rotation matrix because we want the inverse transformation
   transpose3x3MatrixD(objectTransposedRotation3x3);
 
   double objectTransposedRotation4x4[4*4]={0};
+  //We make the 3x3 matrix onto a 4x4 by adding zeros and 1 as the diagonal element
   upscale3x3to4x4(objectTransposedRotation4x4,objectTransposedRotation3x3);
 
   double relativeInPoint3DRotated[4]={0};
 
-  relativeInPoint3DRotated[0]=objectPosition[0]-absoluteInPoint3DRotated[0];
-  relativeInPoint3DRotated[1]=objectPosition[1]-absoluteInPoint3DRotated[1];
-  relativeInPoint3DRotated[2]=objectPosition[2]-absoluteInPoint3DRotated[2];
-  relativeInPoint3DRotated[3]=objectPosition[3]-absoluteInPoint3DRotated[3];
+  relativeInPoint3DRotated[0]=absoluteInPoint3DRotated[0]-objectPosition[0];
+  relativeInPoint3DRotated[1]=absoluteInPoint3DRotated[1]-objectPosition[1];
+  relativeInPoint3DRotated[2]=absoluteInPoint3DRotated[2]-objectPosition[2];
+  relativeInPoint3DRotated[3]=1.0;  //We know we are talking about 2 3d points
 
-  transform3DPointUsing4x4Matrix(relativeOutPoint3DUnrotated,objectTransposedRotation4x4,relativeInPoint3DRotated);
+  transform3DPointVectorUsing4x4Matrix(relativeOutPoint3DUnrotated,objectTransposedRotation4x4,relativeInPoint3DRotated);
   return 1;
 }
 
 
+
+
+/*
+    We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
+    We also have an absolute position of a 3D point , and we want to calculate the relative position
+    of the 3D point in relation to the object ( unrotated relative position )
+*//*
+int pointInRelationToObjectQuaternion(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated )
+{
+    double objectRotation3x3[9];
+    normalizeQuaternions(&objectQuaternion[0],&objectQuaternion[1],&objectQuaternion[2],&objectQuaternion[3]);
+
+    quaternion2Matrix3x3(objectRotation3x3,objectQuaternion,qXqYqZqW);
+    pointInRelationToObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
+
+    //We have to try to normalize the output point , although it should already be normalized..
+    normalize3DPointVector(relativeOutPoint3DUnrotated);
+
+    return 1;
+}*/
 
 
 void testMatrices()

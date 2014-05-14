@@ -129,7 +129,7 @@ int multiplyTwo3x3Matrices(double * result , double * matrixA , double * matrixB
 * @param  Input Vector 3x1 V
 * @retval 0=failure,1=success
 */
-int transform2DPointUsing3x3Matrix(double * resultPoint2D, double * transformation3x3, double * point2D);
+int transform2DPointVectorUsing3x3Matrix(double * resultPoint2D, double * transformation3x3, double * point2D);
 
-
+int normalize2DPointVector(double * vec);
 #endif // MATRIX3X3TOOLS_H_INCLUDED

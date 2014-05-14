@@ -11,6 +11,7 @@
 #define EDITORMAIN_H
 
 //(*Headers(EditorFrame)
+#include <wx/checkbox.h>
 #include <wx/listctrl.h>
 #include <wx/button.h>
 #include <wx/menu.h>
@@ -31,12 +32,14 @@ class EditorFrame: public wxFrame
         EditorFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~EditorFrame();
 
-       int DrawFeaturesAtFeed(wxDC & dc , unsigned int x , unsigned int y, wxListCtrl* whereFrom);
+        int initializeOverlay();
+        int stopOverlay();
+        int DrawFeaturesAtFeed(wxDC & dc , unsigned int x , unsigned int y, wxListCtrl* whereFrom);
 
         void onIdle(wxIdleEvent& evt);
         void guiSnapFrames(int doSnap);
         int  removeOldSegmentedFrames();
-        int  refreshSegmentedFrame();
+        int  refreshAllOverlays();
 
         unsigned char * rgbFrame;
         unsigned short * depthFrame;
@@ -57,6 +60,7 @@ class EditorFrame: public wxFrame
         void OnSavePair(wxCommandEvent& event);
         void OnSavePCD(wxCommandEvent& event);
         void OnSaveDepth(wxCommandEvent& event);
+        void OpenOverlayEditor(wxCommandEvent& event);
 
         void OnButtonGetExtrinsics(wxCommandEvent& event);
 
@@ -101,6 +105,7 @@ class EditorFrame: public wxFrame
         static const long ID_BUTTON11;
         static const long ID_LISTCTRL2;
         static const long ID_BUTTON12;
+        static const long ID_CHECKBOX1;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
@@ -109,6 +114,7 @@ class EditorFrame: public wxFrame
         static const long ID_MENUSEGMENTATION;
         static const long ID_MENUGETEXTRINSICS;
         static const long ID_MENUDETECTFEATURES;
+        static const long ID_MENUOVERLAYEDITOR;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         static const long ID_TIMER1;
@@ -139,11 +145,13 @@ class EditorFrame: public wxFrame
         wxMenuItem* MenuItem5;
         wxTimer Timer;
         wxListCtrl* ListCtrlPoints;
+        wxMenuItem* MenuItem10;
         wxButton* ButtonCalibration;
         wxButton* ButtonRemove;
         wxMenuItem* MenuItem7;
         wxMenuItem* MenuItem4;
         wxMenuItem* MenuItem6;
+        wxCheckBox* CheckBoxOverlay;
         wxButton* ButtonSegmentation;
         wxMenuItem* MenuItem8;
         //*)

@@ -111,6 +111,10 @@
 			<label>Remove</label>
 			<pos>1320,472</pos>
 		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxOverlay" member="yes">
+			<label>Overlay Active</label>
+			<pos>1320,520</pos>
+		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">
 				<label>&amp;File</label>
@@ -144,6 +148,9 @@
 				</object>
 				<object class="wxMenuItem" name="ID_MENUDETECTFEATURES" variable="MenuItem8" member="yes">
 					<label>Detect Features</label>
+				</object>
+				<object class="wxMenuItem" name="ID_MENUOVERLAYEDITOR" variable="MenuItem10" member="yes">
+					<label>Overlay Editor</label>
 				</object>
 			</object>
 			<object class="wxMenu" variable="Menu2" member="no">
