@@ -17,6 +17,7 @@ struct cubeVolume
 
 struct approximateCubeList
 {
+  unsigned int MAXnumberOfCubes;
   unsigned int numberOfCubes;
   struct cubeVolume * cube;
 };
@@ -24,7 +25,8 @@ struct approximateCubeList
 
 
 int pointCollidesWithCubeList(float * point3D, struct approximateCubeList * cubeList);
-
+int destroyCubeListSingle(struct approximateCubeList *cubeList);
+int destroyCubeList(struct approximateCubeList ** cubeList);
 
 
 

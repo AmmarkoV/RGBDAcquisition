@@ -50,6 +50,10 @@
 			<Add library="GLU" />
 			<Add library="X11" />
 		</Linker>
+		<Unit filename="AmMatrix/collisions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="AmMatrix/collisions.h" />
 		<Unit filename="AmMatrix/matrix3x3Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
