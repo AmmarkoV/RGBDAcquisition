@@ -456,16 +456,24 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
                          buttonNextFrame->Enable();
                        }
 
-
-   sprintf(openDeviceOGLOverlay,"%s/dataset.scene",openDevice);
-   if (!acquisitionFileExists(openDeviceOGLOverlay))
-    {
-      fprintf(stderr,"\n\nCouldn't find a dataset specific dataset.scene file , falling back on editor default\n\n");
+   if (moduleID==TEMPLATE_ACQUISITION_MODULE)
+   {
+    sprintf(openDeviceOGLOverlay,"frames/%s/dataset.scene",openDevice);
+    if (!acquisitionFileExists(openDeviceOGLOverlay))
+     {
+      fprintf(stderr,"\n\nCouldn't find a dataset specific dataset.scene file (%s) , falling back on editor default\n\n",openDeviceOGLOverlay);
       strcpy(openDeviceOGLOverlay,OVERLAY_EDITOR_SCENE_FILE);
-    } else
-    {
-      fprintf(stderr,"\n\nUsing Editor default scene file\n\n");
-    }
+     } else
+     {
+      fprintf(stderr,"\n\nDataset contains OGL overlay file %s which will  be used \n\n",openDeviceOGLOverlay);
+     }
+   } else
+   {
+     //Non template input gets a forced editor overlay
+     strcpy(openDeviceOGLOverlay,OVERLAY_EDITOR_SCENE_FILE);
+   }
+
+
    initializeOverlay(openDeviceOGLOverlay);
 
    initializeRGBSegmentationConfiguration(&segConfRGB,width,height);
