@@ -746,6 +746,8 @@ EXCLUDE_PATTERNS = */3dparty/* \
                    */grabbed_frames/*  \
                    */AmmarServer/* \
                    */bindings/* \
+                   */hobbitSignTrackerTest/* \
+                   */synergiesAdapter/* \
                    */redist/
   
 

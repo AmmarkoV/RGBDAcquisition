@@ -31,6 +31,7 @@ unsigned int devID=0;
 
 unsigned int width , height , fps ;
 char openDevice[512];
+char openDeviceOGLOverlay[1024];
 
 unsigned int addingPoint=0;
 unsigned int alreadyInitialized=0;
@@ -322,16 +323,16 @@ inline wxString _U(const char String[] = "")
 void EditorFrame::OpenOverlayEditor(wxCommandEvent& event)
 {
   char outStr[512];
-  sprintf(outStr,"gedit %s",OVERLAY_EDITOR_SCENE_FILE);
+  sprintf(outStr,"gedit %s",openDeviceOGLOverlay);
   wxExecute(_U(outStr));
 }
 
 
-int EditorFrame::initializeOverlay()
+int EditorFrame::initializeOverlay(char * pathForSceneFile)
 {
    if ( acquisitionStartModule(overlayModule,16 /*maxDevices*/ , 0 ) )
    {
-     if ( acquisitionOpenDevice(overlayModule,overlayDevice,OVERLAY_EDITOR_SCENE_FILE,width,height,fps) )
+     if ( acquisitionOpenDevice(overlayModule,overlayDevice,pathForSceneFile,width,height,fps) )
      {
         overlayFramesExist=1;
         return 1;
@@ -357,6 +358,7 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
    if (alreadyInitialized)
    {
     removeOldSegmentedFrames();
+    stopOverlay();
 
     acquisitionCloseDevice(moduleID,devID);
     acquisitionStopModule(moduleID);
@@ -454,8 +456,25 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
                          buttonNextFrame->Enable();
                        }
 
+   if (moduleID==TEMPLATE_ACQUISITION_MODULE)
+   {
+    sprintf(openDeviceOGLOverlay,"frames/%s/dataset.scene",openDevice);
+    if (!acquisitionFileExists(openDeviceOGLOverlay))
+     {
+      fprintf(stderr,"\n\nCouldn't find a dataset specific dataset.scene file (%s) , falling back on editor default\n\n",openDeviceOGLOverlay);
+      strcpy(openDeviceOGLOverlay,OVERLAY_EDITOR_SCENE_FILE);
+     } else
+     {
+      fprintf(stderr,"\n\nDataset contains OGL overlay file %s which will  be used \n\n",openDeviceOGLOverlay);
+     }
+   } else
+   {
+     //Non template input gets a forced editor overlay
+     strcpy(openDeviceOGLOverlay,OVERLAY_EDITOR_SCENE_FILE);
+   }
 
-   initializeOverlay();
+
+   initializeOverlay(openDeviceOGLOverlay);
 
    initializeRGBSegmentationConfiguration(&segConfRGB,width,height);
    initializeDepthSegmentationConfiguration(&segConfDepth,width,height);

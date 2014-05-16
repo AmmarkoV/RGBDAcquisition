@@ -116,28 +116,28 @@ int drawCube()
    // glNewList(1, GL_COMPILE_AND_EXECUTE);
     /* front face */
     glBegin(GL_QUADS);
-      glColor3f(0.0, 0.7, 0.1);  /* green */
+      //glColor3f(0.0, 0.7, 0.1);  /* green */
       glVertex3f(-1.0, 1.0, 1.0);
       glVertex3f(1.0, 1.0, 1.0);
       glVertex3f(1.0, -1.0, 1.0);
       glVertex3f(-1.0, -1.0, 1.0);
 
       /* back face */
-      glColor3f(0.9, 1.0, 0.0);  /* yellow */
+      //glColor3f(0.9, 1.0, 0.0);  /* yellow */
       glVertex3f(-1.0, 1.0, -1.0);
       glVertex3f(1.0, 1.0, -1.0);
       glVertex3f(1.0, -1.0, -1.0);
       glVertex3f(-1.0, -1.0, -1.0);
 
       /* top side face */
-      glColor3f(0.2, 0.2, 1.0);  /* blue */
+      //glColor3f(0.2, 0.2, 1.0);  /* blue */
       glVertex3f(-1.0, 1.0, 1.0);
       glVertex3f(1.0, 1.0, 1.0);
       glVertex3f(1.0, 1.0, -1.0);
       glVertex3f(-1.0, 1.0, -1.0);
 
       /* bottom side face */
-      glColor3f(0.7, 0.0, 0.1);  /* red */
+      //glColor3f(0.7, 0.0, 0.1);  /* red */
       glVertex3f(-1.0, -1.0, 1.0);
       glVertex3f(1.0, -1.0, 1.0);
       glVertex3f(1.0, -1.0, -1.0);
@@ -154,35 +154,35 @@ int drawPyramid()
   glBegin(GL_POLYGON);				// start drawing a pyramid
 
   // front face of pyramid
-  glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Red
+  //glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Red
   glVertex3f(0.0f, 1.0f, 0.0f);		        // Top of triangle (front)
-  glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
+  //glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
   glVertex3f(-1.0f,-1.0f, 1.0f);		// left of triangle (front)
-  glColor3f(0.0f,0.0f,1.0f);			// Set The Color To Blue
+  //glColor3f(0.0f,0.0f,1.0f);			// Set The Color To Blue
   glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)
 
   // right face of pyramid
-  glColor3f(1.0f,0.0f,0.0f);			// Red
+  //glColor3f(1.0f,0.0f,0.0f);			// Red
   glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Right)
-  glColor3f(0.0f,0.0f,1.0f);			// Blue
+  //glColor3f(0.0f,0.0f,1.0f);			// Blue
   glVertex3f( 1.0f,-1.0f, 1.0f);		// Left Of Triangle (Right)
-  glColor3f(0.0f,1.0f,0.0f);			// Green
+  //glColor3f(0.0f,1.0f,0.0f);			// Green
   glVertex3f( 1.0f,-1.0f, -1.0f);		// Right Of Triangle (Right)
 
   // back face of pyramid
-  glColor3f(1.0f,0.0f,0.0f);			// Red
+  //glColor3f(1.0f,0.0f,0.0f);			// Red
   glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Back)
-  glColor3f(0.0f,1.0f,0.0f);			// Green
+  //glColor3f(0.0f,1.0f,0.0f);			// Green
   glVertex3f( 1.0f,-1.0f, -1.0f);		// Left Of Triangle (Back)
-  glColor3f(0.0f,0.0f,1.0f);			// Blue
+  //glColor3f(0.0f,0.0f,1.0f);			// Blue
   glVertex3f(-1.0f,-1.0f, -1.0f);		// Right Of Triangle (Back)
 
   // left face of pyramid.
-  glColor3f(1.0f,0.0f,0.0f);			// Red
+  //glColor3f(1.0f,0.0f,0.0f);			// Red
   glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Left)
-  glColor3f(0.0f,0.0f,1.0f);			// Blue
+  //glColor3f(0.0f,0.0f,1.0f);			// Blue
   glVertex3f(-1.0f,-1.0f,-1.0f);		// Left Of Triangle (Left)
-  glColor3f(0.0f,1.0f,0.0f);			// Green
+  //glColor3f(0.0f,1.0f,0.0f);			// Green
   glVertex3f(-1.0f,-1.0f, 1.0f);		// Right Of Triangle (Left)
 
   glEnd();					// Done Drawing The Pyramid

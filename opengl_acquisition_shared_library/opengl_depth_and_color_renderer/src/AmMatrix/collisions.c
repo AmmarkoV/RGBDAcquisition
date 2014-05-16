@@ -1,5 +1,6 @@
 #include "collisions.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 
 
 float dotProduct(float p1[3] , float p2[3] )
@@ -61,8 +62,7 @@ struct approximateCubeList * createCubeList(unsigned int maxCubes)
   return 0;
 }
 
-
-//Hoa's box is 60 , ? , ?
+//Hoa's box is 171 , 111 , 60
 struct approximateCubeList * createSingleCubeObj(float sizeX,float sizeY,float sizeZ)
 {
   struct approximateCubeList * retCubeList = createCubeList(1);
@@ -103,7 +103,7 @@ int destroyCubeListSingle(struct approximateCubeList *cubeList)
   {
     if ( cubeList->cube !=0 ) { free(cubeList->cube); }
     free(cubeList);
-    *cubeList=0;
+    cubeList=0;
   }
 
 }
