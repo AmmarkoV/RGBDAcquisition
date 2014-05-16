@@ -32,7 +32,7 @@ class EditorFrame: public wxFrame
         EditorFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~EditorFrame();
 
-        int initializeOverlay();
+        int initializeOverlay(char * pathForSceneFile);
         int stopOverlay();
         int DrawFeaturesAtFeed(wxDC & dc , unsigned int x , unsigned int y, wxListCtrl* whereFrom);
 
