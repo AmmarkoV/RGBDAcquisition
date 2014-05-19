@@ -22,20 +22,21 @@ using namespace std;
 
 bool usingUSB30Flag = true; // if the camera is plugged on a USB 3.0 port
 
-int waitSecondsBeforeGrab = 0;
+int waitSecondsBeforeGrab = 1;
 int divideConfidencePixels = 10;
 const int16_t confidenceThreshold = 60;
 
-bool interpolateDepthFlag = 1;
+bool interpolateDepthFlag = 0;
+bool interpolateColorFlag = 0;
 
-bool saveColorAcqFlag = 1;
+bool saveColorAcqFlag = 0;
 bool saveDepthAcqFlag = 1;
 bool saveColorSyncFlag = 1;
-bool saveDepthSyncFlag = 1;
-bool saveConfidenceFlag = 1;
+bool saveDepthSyncFlag = 0;
+bool saveConfidenceFlag = 0;
 
-int frameRateDepth = 30;
-int frameRateColor = 30;
+int32_t  frameRateDepth = 60;
+int32_t  frameRateColor = 30;
 
 const int widthQVGA = 320, heightQVGA = 240;
 const int widthVGA = 640, heightVGA = 480;
@@ -99,7 +100,7 @@ uint16_t* pixelsDepthSync = pixelsDepthSyncNHD;
 const uint16_t noDepthDefault = 65535;
 const uint16_t noDepthThreshold = 2000;
 
-uint8_t noDepthBGR[3] = {255,255,255};
+uint8_t noDepthBGR[3] = {0,0,0};
 
 
 int colorPixelInd, colorPixelRow, colorPixelCol;
@@ -137,7 +138,7 @@ char baseNameColorAcq[20] = "colorAcqFrame_0_";
 char baseNameDepthAcq[20] = "depthFrame_0_";
 char baseNameColorSync[20] = "colorFrame_0_";
 char baseNameDepthSync[20] = "depthSyncFrame_0_";
-char baseNameConfidence[20] = "confidenceFrame_0_";
+char baseNameConfidence[30] = "depthConfidenceFrame_0_";
 
 
 /*----------------------------------------------------------------------------*/
@@ -196,7 +197,6 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         if (saveConfidenceFlag) pixelsConfidenceQVGA[currentPixelInd] = data.confidenceMap[currentPixelInd]/divideConfidencePixels;
         pixelsDepthSyncQVGA[currentPixelInd] = noDepthDefault;
         uvMapAcq[currentPixelInd] = data.uvMap[currentPixelInd];
-        //if (data.depthMap[currentPixelInd] < noDepthThreshold)
         if (data.confidenceMap[currentPixelInd] > confidenceThreshold)
             pixelsDepthAcq[currentPixelInd] = data.depthMap[currentPixelInd];
         else
@@ -212,21 +212,23 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     if (interpolateDepthFlag)
     {
         rescaleMap(pixelsDepthAcq, pixelsDepthAcqVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
-        rescaleMap(uvMapAcq, uvMapVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
-        for (int currentPixelInd = 0; currentPixelInd < nPixelsVGA; currentPixelInd++)
-        {
-            uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
-            if (colorPixelInd == -1) {
-                pixelsColorSyncVGA[3*currentPixelInd] = noDepthBGR[2];
-                pixelsColorSyncVGA[3*currentPixelInd+1] = noDepthBGR[1];
-                pixelsColorSyncVGA[3*currentPixelInd+2] = noDepthBGR[0];
-            }
-            else
+        if (interpolateColorFlag) {
+            rescaleMap(uvMapAcq, uvMapVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
+            for (int currentPixelInd = 0; currentPixelInd < nPixelsVGA; currentPixelInd++)
             {
-                pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd];
-                pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
-                pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
-                pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
+                uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
+                if (colorPixelInd == -1) {
+                    pixelsColorSyncVGA[3*currentPixelInd] = noDepthBGR[2];
+                    pixelsColorSyncVGA[3*currentPixelInd+1] = noDepthBGR[1];
+                    pixelsColorSyncVGA[3*currentPixelInd+2] = noDepthBGR[0];
+                }
+                else
+                {
+                    pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd];
+                    pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
+                    pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
+                    pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
+                }
             }
         }
     }
@@ -261,7 +263,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     }
     if (saveColorSyncFlag) {
         sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-        if (interpolateDepthFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
+        if (interpolateColorFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
         else saveRawColorFrame(fileNameColorSync, pixelsColorSyncQVGA, widthQVGA, heightQVGA, timeStamp);
     }
     if (saveConfidenceFlag) {
@@ -318,6 +320,7 @@ void configureAudioNode()
 void configureDepthNode()
 {
     g_dnode.newSampleReceivedEvent().connect(&onNewDepthSample);
+    DepthNode::Configuration configRef(frameFormatDepth, frameRateDepth, DepthNode::CAMERA_MODE_CLOSE_MODE, true);
     DepthNode::Configuration config = g_dnode.getConfiguration();
     config.frameFormat = frameFormatDepth;
     config.framerate = frameRateDepth;
@@ -331,7 +334,6 @@ void configureDepthNode()
     try
     {
         g_context.requestControl(g_dnode,0);
-
         g_dnode.setConfiguration(config);
     }
     catch (ArgumentException& e)
@@ -376,7 +378,6 @@ void configureColorNode()
     config.compression = COMPRESSION_TYPE_MJPEG; // can also be COMPRESSION_TYPE_YUY2
     config.powerLineFrequency = POWER_LINE_FREQUENCY_50HZ;
     config.framerate = frameRateColor;
-
     g_cnode.setEnableColorMap(true);
 
 
