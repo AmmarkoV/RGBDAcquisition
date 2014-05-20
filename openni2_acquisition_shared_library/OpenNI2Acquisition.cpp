@@ -57,7 +57,6 @@ unsigned int faceDetectionFramesBetweenScans = 2;
 unsigned int pauseSkeletonDetection = 0;
 unsigned int skeletonDetectionFramesBetweenScans = 10;
 
-int cucu;
 
 enum howToOpenDevice
 {
@@ -589,16 +588,10 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
      fprintf(stdout,"Color Focal Length : %0.2f\n",getOpenNI2ColorFocalLength(devID));
      fprintf(stdout,"Color Pixel Size : %0.2f\n",getOpenNI2ColorPixelSize(devID));
 
-     if (!lastDepthComesFromNite[devID])
-     {
-      fprintf(stdout,"Depth Frames : %u x %u , channels %u , bitsperpixel %u \n",getOpenNI2DepthWidth(devID), getOpenNI2DepthHeight(devID), getOpenNI2DepthChannels(devID) , getOpenNI2DepthBitsPerPixel(devID));
-      fprintf(stdout,"Depth Focal Length : %0.2f\n",getOpenNI2DepthFocalLength(devID));
-      fprintf(stdout,"Depth Pixel Size : %0.2f\n",getOpenNI2DepthPixelSize(devID));
-     } else
-     {
-       //Thanks Maria
-       fprintf(stdout,"Don't know what depth format Nite internally uses , avoiding width/height calls to avoid segfault\n");
-     }
+     fprintf(stdout,"Depth Frames : %u x %u , channels %u , bitsperpixel %u \n",getOpenNI2DepthWidth(devID), getOpenNI2DepthHeight(devID), getOpenNI2DepthChannels(devID) , getOpenNI2DepthBitsPerPixel(devID));
+     fprintf(stdout,"Depth Focal Length : %0.2f\n",getOpenNI2DepthFocalLength(devID));
+     fprintf(stdout,"Depth Pixel Size : %0.2f\n",getOpenNI2DepthPixelSize(devID));
+     
     }
 
     #if USE_CALIBRATION
@@ -700,13 +693,21 @@ double getOpenNI2ColorPixelSize(int devID)
 int getOpenNI2DepthWidth(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+  	
+  #if MOD_NITE2 && RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE
+		if (lastDepthComesFromNite[devID]) { return getNite2DepthWidth(devID); }
+  #endif
   //return 640;
    return depthFrame[devID].getWidth();
 }
 int getOpenNI2DepthHeight(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
-  //return 480;
+
+  #if MOD_NITE2 && RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE
+		if (lastDepthComesFromNite[devID]) { return getNite2DepthHeight(devID); }
+  #endif
+   //return 480;
    return depthFrame[devID].getHeight();
 }
 int getOpenNI2DepthDataSize(int devID)
