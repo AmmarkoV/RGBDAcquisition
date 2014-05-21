@@ -539,8 +539,15 @@ int createNite2Device(int devID,openni::Device * device)
 
 int destroyNite2Device(int devID)
 {
-   stc[devID].userTracker->destroy();
    stc[devID].userTrackerFrame->release();
+   
+    for (int i=0; i < MAX_USERS; i++) 
+   {
+		stc[devID].userTracker->stopSkeletonTracking(i+1);
+   }
+   
+   stc[devID].userTracker->destroy();
+
 
    delete stc[devID].userTracker;
    delete stc[devID].userTrackerFrame;

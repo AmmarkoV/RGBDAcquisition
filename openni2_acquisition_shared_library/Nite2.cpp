@@ -506,8 +506,8 @@ int startNite2(int maxVirtualSkeletonTrackers)
       stc[i].skelCallbackPointingAddr = 0;
       for (uid=0; uid<MAX_USERS; uid++)
          {
-          stc[i].g_visibleUsers[i] = false;
-          stc[i].g_skeletonStates[i] = nite::SKELETON_NONE;
+          stc[uid].g_visibleUsers[uid] = false;
+          stc[uid].g_skeletonStates[uid] = nite::SKELETON_NONE;
          }
     }
  return 1;
