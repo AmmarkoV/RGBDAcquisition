@@ -608,3 +608,14 @@ unsigned short  * getNite2DepthFrame(int devID)
   return (unsigned short *) stc[devID].userTrackerFrame->getDepthFrame().getData();
 }
 
+
+int getNite2DepthHeight(int devID)
+{
+	return (int) stc[devID].userTrackerFrame->getDepthFrame().getHeight();
+}
+
+
+int getNite2DepthWidth(int devID)
+{
+	return (int) stc[devID].userTrackerFrame->getDepthFrame().getWidth();
+}
