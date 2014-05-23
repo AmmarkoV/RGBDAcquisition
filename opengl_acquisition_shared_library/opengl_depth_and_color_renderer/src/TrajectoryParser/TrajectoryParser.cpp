@@ -884,6 +884,11 @@ int readVirtualStream(struct VirtualStream * newstream)
               fprintf(stderr,"DEBUG Mode on\n");
               newstream->debug=1;
             } else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"MOVE_VIEW",9)==1)
+            {
+              newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1);
+            } else
+
 
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"TIMESTAMP",9)==1)
             {

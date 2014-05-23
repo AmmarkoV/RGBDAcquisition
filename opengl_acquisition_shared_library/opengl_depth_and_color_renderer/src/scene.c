@@ -316,6 +316,8 @@ int initScene(char * confFile)
   fprintf(stderr,"createVirtualStream returned \n");
   if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
 
+  //This only enables keyfov if enabled in scene
+  if (scene->userCanMoveCameraOnHisOwn) { userKeyFOVEnabled=1; }
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error while initializing scene\n"); }
   glEnable(GL_DEPTH_TEST); /* enable depth buffering */

@@ -179,6 +179,7 @@ struct VirtualStream
     int rotationsXYZ[3];
     float rotationsOffset[3];
 
+    unsigned int userCanMoveCameraOnHisOwn;
     unsigned int playback;
 
     unsigned int autoRefresh;
