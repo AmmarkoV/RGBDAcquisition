@@ -81,6 +81,7 @@ class EditorFrame: public wxFrame
         void OnButtonAddClick(wxCommandEvent& event);
         void OnButtonRemoveClick(wxCommandEvent& event);
         void OnButtonExecuteClick(wxCommandEvent& event);
+        void OnButtonSendDirectCommandClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -106,6 +107,8 @@ class EditorFrame: public wxFrame
         static const long ID_LISTCTRL2;
         static const long ID_BUTTON12;
         static const long ID_CHECKBOX1;
+        static const long ID_TEXTCTRL2;
+        static const long ID_BUTTON13;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
@@ -127,9 +130,11 @@ class EditorFrame: public wxFrame
         wxStaticText* totalFramesLabel;
         wxButton* buttonRecord;
         wxButton* Button1;
+        wxButton* ButtonSendDirectCommand;
         wxButton* ButtonAdd;
         wxButton* buttonStop;
         wxStaticBox* StaticBox2;
+        wxTextCtrl* TextCtrlDirectCommand;
         wxTextCtrl* currentFrameTextCtrl;
         wxStaticText* StaticTextJumpTo;
         wxStaticText* dashForFramesRemainingLabel;

@@ -135,6 +135,8 @@ const long EditorFrame::ID_BUTTON11 = wxNewId();
 const long EditorFrame::ID_LISTCTRL2 = wxNewId();
 const long EditorFrame::ID_BUTTON12 = wxNewId();
 const long EditorFrame::ID_CHECKBOX1 = wxNewId();
+const long EditorFrame::ID_TEXTCTRL2 = wxNewId();
+const long EditorFrame::ID_BUTTON13 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
@@ -188,10 +190,12 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     ButtonAdd = new wxButton(this, ID_BUTTON9, _("+"), wxPoint(1320,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON9"));
     ButtonRemove = new wxButton(this, ID_BUTTON10, _("-"), wxPoint(1360,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON10"));
     ButtonExecute = new wxButton(this, ID_BUTTON11, _("="), wxPoint(1408,192), wxSize(64,29), 0, wxDefaultValidator, _T("ID_BUTTON11"));
-    ListCtrl1 = new wxListCtrl(this, ID_LISTCTRL2, wxPoint(1320,240), wxSize(152,232), wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL2"));
+    ListCtrl1 = new wxListCtrl(this, ID_LISTCTRL2, wxPoint(1320,264), wxSize(152,208), wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL2"));
     Button1 = new wxButton(this, ID_BUTTON12, _("Remove"), wxPoint(1320,472), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     CheckBoxOverlay = new wxCheckBox(this, ID_CHECKBOX1, _("Overlay Active"), wxPoint(1320,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     CheckBoxOverlay->SetValue(false);
+    TextCtrlDirectCommand = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxPoint(1320,228), wxSize(120,27), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    ButtonSendDirectCommand = new wxButton(this, ID_BUTTON13, _(">"), wxPoint(1440,228), wxSize(29,29), 0, wxDefaultValidator, _T("ID_BUTTON13"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -243,6 +247,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonAddClick);
     Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonRemoveClick);
     Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonExecuteClick);
+    Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonSendDirectCommandClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -259,6 +264,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
 
     Connect(ID_MENUOVERLAYEDITOR,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OpenOverlayEditor);
 
+    Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&EditorFrame::OnButtonSendDirectCommandClick);
 
     rgbFrame=0;
     depthFrame=0;
@@ -1146,4 +1152,10 @@ void EditorFrame::OnButtonExecuteClick(wxCommandEvent& event)
 
 
     delete  ane;
+}
+
+void EditorFrame::OnButtonSendDirectCommandClick(wxCommandEvent& event)
+{
+  wxMessageBox(wxT("Test"),wxT("Test"));
+
 }

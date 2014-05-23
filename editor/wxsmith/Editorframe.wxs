@@ -103,8 +103,8 @@
 			<handler function="OnButtonExecuteClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxListCtrl" name="ID_LISTCTRL2" variable="ListCtrl1" member="yes">
-			<pos>1320,240</pos>
-			<size>152,232</size>
+			<pos>1320,264</pos>
+			<size>152,208</size>
 			<style>wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL</style>
 		</object>
 		<object class="wxButton" name="ID_BUTTON12" variable="Button1" member="yes">
@@ -114,6 +114,17 @@
 		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxOverlay" member="yes">
 			<label>Overlay Active</label>
 			<pos>1320,520</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrlDirectCommand" member="yes">
+			<pos>1320,228</pos>
+			<size>120,27</size>
+			<style>wxTE_PROCESS_ENTER</style>
+		</object>
+		<object class="wxButton" name="ID_BUTTON13" variable="ButtonSendDirectCommand" member="yes">
+			<label>&gt;</label>
+			<pos>1440,228</pos>
+			<size>29,29</size>
+			<handler function="OnButtonSendDirectCommandClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">
