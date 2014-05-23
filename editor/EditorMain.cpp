@@ -1156,6 +1156,6 @@ void EditorFrame::OnButtonExecuteClick(wxCommandEvent& event)
 
 void EditorFrame::OnButtonSendDirectCommandClick(wxCommandEvent& event)
 {
-  wxMessageBox(wxT("Test"),wxT("Test"));
+  //wxMessageBox(wxT("Test"),wxT("Test"));
 
 }

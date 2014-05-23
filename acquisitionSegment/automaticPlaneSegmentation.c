@@ -4,8 +4,8 @@
 #include "imageProcessing.h"
 
 #define MEMPLACE1(x,y,width) ( y * ( width ) + x )
-
 #define GET_RANDOM_DIM(width,bounds) (bounds+rand()%(width-1-bounds))
+
 unsigned int minimumAcceptedDepths = 830;
 unsigned int maximumAcceptedDepths = 3000;
 
@@ -65,6 +65,16 @@ int ensureClockwise(unsigned int id , struct normalArray * result)
 
   return 1;
 }
+
+
+
+unsigned int supplyUniform2DPoints(unsigned int width ,unsigned int height , unsigned int pointsNumber)
+{
+    #warning "TODO : supply Uniform 2D points"
+    return 0;
+}
+
+
 
 
 
