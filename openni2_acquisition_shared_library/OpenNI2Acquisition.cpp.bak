@@ -707,7 +707,7 @@ int getOpenNI2DepthHeight(int devID)
   #if MOD_NITE2 && RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE
 		if (lastDepthComesFromNite[devID]) { return getNite2DepthHeight(devID); }
   #endif
-   //return 480;
+    //return 480;
    return depthFrame[devID].getHeight();
 }
 int getOpenNI2DepthDataSize(int devID)
