@@ -4,7 +4,13 @@
 #include "imageProcessing.h"
 
 #define MEMPLACE1(x,y,width) ( y * ( width ) + x )
-#define ResultNormals 256
+
+#define GET_RANDOM_DIM(width,bounds) (bounds+rand()%(width-1-bounds))
+unsigned int minimumAcceptedDepths = 1000;
+unsigned int maximumAcceptedDepths = 5000;
+
+
+#define ResultNormals 128
 #define MaxTriesPerPoint 1000
 
 
@@ -80,18 +86,45 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
     struct TriplePoint legend;
     legend.coord[X]=0.016560; legend.coord[Y]=-0.826509; legend.coord[Z]=-0.562679;
 
-    unsigned int tries=0;
     int i=0;
     for (i=0; i<ResultNormals; i++)
     {
+
+        unsigned int pointNum=0;
+
+        for (pointNum=0; pointNum<3; pointNum++)
+        {
+         unsigned int tries=0;
+         fprintf(stderr,"TryNumber %u \n",i);
+         result[i].point[pointNum].coord[Z]=0;
+         tries=0; depth=0;
+         while ( ( (depth==0) || (tries==0) || (result[i].point[pointNum].coord[Z]==0) ) && (tries<MaxTriesPerPoint) )
+         {
+          ++tries;
+          x=GET_RANDOM_DIM(width,boundDistance);  y=GET_RANDOM_DIM(height,boundDistance); depth=source[MEMPLACE1(x,y,width)];
+          if ( (depth>minimumAcceptedDepths) && (depth<maximumAcceptedDepths) )
+                         {
+                           transform2DProjectedPointTo3DPoint(
+                                                              calib , x, y , depth ,
+                                                              &result[i].point[pointNum].coord[X] ,
+                                                              &result[i].point[pointNum].coord[Y] ,
+                                                              &result[i].point[pointNum].coord[Z]
+                                                             );
+                         }
+         }
+
+         fprintf(stderr,"Point%u(%u,%u) picked with depth %u , after %u tries \n",pointNum,x,y,depth,tries);
+        }
+/*
         fprintf(stderr,"TryNumber %u \n",i);
          result[i].point[0].coord[Z]=0;
          tries=0; depth=0;
          while ( ( (depth==0) || (tries==0) || (result[i].point[0].coord[Z]==0) ) && (tries<MaxTriesPerPoint) )
          {
           ++tries;
-          x=boundDistance+rand()%(width-1-boundDistance);  y=boundDistance+rand()%(height-1-boundDistance); depth=source[MEMPLACE1(x,y,width)];
-          if (depth!=0)  {
+          x=GET_RANDOM_DIM(width,boundDistance);  y=GET_RANDOM_DIM(height,boundDistance); depth=source[MEMPLACE1(x,y,width)];
+          if ( (depth>minimumAcceptedDepths) && (depth<maximumAcceptedDepths) )
+                         {
                            transform2DProjectedPointTo3DPoint(calib , x, y , depth , &result[i].point[0].coord[X] , &result[i].point[0].coord[Y] ,  &result[i].point[0].coord[Z]);
                          }
          }
@@ -103,8 +136,9 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
          while ( ( (depth==0) || (tries==0) || (result[i].point[1].coord[Z]==0) ) && (tries<MaxTriesPerPoint) )
          {
           ++tries;
-          x=boundDistance+rand()%(width-1-boundDistance);  y=boundDistance+rand()%(height-1-boundDistance); depth=source[MEMPLACE1(x,y,width)];
-          if (depth!=0) {
+          x=GET_RANDOM_DIM(width,boundDistance);  y=GET_RANDOM_DIM(height,boundDistance); depth=source[MEMPLACE1(x,y,width)];
+          if (  (depth>minimumAcceptedDepths) && (depth<maximumAcceptedDepths)  )
+                        {
                           transform2DProjectedPointTo3DPoint(calib , x, y , depth , &result[i].point[1].coord[X] , &result[i].point[1].coord[Y] ,  &result[i].point[1].coord[Z]);
                         }
          }
@@ -116,13 +150,14 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
          while ( ( (depth==0) || (tries==0) || (result[i].point[2].coord[Z]==0) ) && (tries<MaxTriesPerPoint) )
          {
           ++tries;
-          x=boundDistance+rand()%(width-1-boundDistance);  y=boundDistance+rand()%(height-1-boundDistance); depth=source[MEMPLACE1(x,y,width)];
-          if (depth!=0) {
+          x=GET_RANDOM_DIM(width,boundDistance);  y=GET_RANDOM_DIM(height,boundDistance); depth=source[MEMPLACE1(x,y,width)];
+          if ( (depth>minimumAcceptedDepths) && (depth<maximumAcceptedDepths)  )
+                        {
                           transform2DProjectedPointTo3DPoint(calib , x, y , depth , &result[i].point[2].coord[X] , &result[i].point[2].coord[Y] ,  &result[i].point[2].coord[Z]);
                         }
          }
 
-         fprintf(stderr,"Point3(%u,%u) picked with depth %u , after %u tries \n",x,y,depth,tries);
+         fprintf(stderr,"Point3(%u,%u) picked with depth %u , after %u tries \n",x,y,depth,tries);  */
 
          fprintf(stderr,"3 Points are %0.2f %0.2f %0.2f \n %0.2f %0.2f %0.2f \n %0.2f %0.2f %0.2f \n " ,
                          result[i].point[0].coord[X] ,  result[i].point[0].coord[Y] ,  result[i].point[0].coord[Z] ,

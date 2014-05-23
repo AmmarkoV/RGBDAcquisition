@@ -24,6 +24,7 @@
 #include "AddNewElement.h"
 
 
+
 #define OVERLAY_EDITOR_SCENE_FILE "Scenes/editor.conf"
 
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
