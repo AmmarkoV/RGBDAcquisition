@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "automaticPlaneSegmentation.h"
 #include "imageProcessing.h"
+#include "../tools/Quasirandomness/quasirandomness.h"
 
 #define MEMPLACE1(x,y,width) ( y * ( width ) + x )
 #define GET_RANDOM_DIM(width,bounds) (bounds+rand()%(width-1-bounds))
@@ -10,7 +11,7 @@ unsigned int minimumAcceptedDepths = 830;
 unsigned int maximumAcceptedDepths = 3000;
 
 
-#define ResultNormals 128
+#define ResultNormals 256
 #define MaxTriesPerPoint 1000
 
 
@@ -96,6 +97,10 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
     struct TriplePoint legend;
     legend.coord[X]=0.016560; legend.coord[Y]=-0.826509; legend.coord[Z]=-0.562679;
 
+    struct quasiRandomizerContext qrc;
+    initializeQuasirandomnessContext(&qrc,width,height,0);
+    float rX,rY,rZ;
+
     unsigned int tries=0;
     int i=0;
     for (i=0; i<ResultNormals; i++)
@@ -110,7 +115,11 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
          while ( ( (depth==0) || (tries==0) || (result[i].point[pointNum].coord[Z]==0) ) && (tries<MaxTriesPerPoint) )
          {
           ++tries;
-          x=GET_RANDOM_DIM(width,boundDistance);  y=GET_RANDOM_DIM(height,boundDistance); depth=source[MEMPLACE1(x,y,width)];
+          getNextRandomPoint(&qrc,&rX,&rY,&rZ);
+          //x=GET_RANDOM_DIM(width,boundDistance);  y=GET_RANDOM_DIM(height,boundDistance);
+          x=(unsigned int) rX;
+          y=(unsigned int) rY;
+          depth=source[MEMPLACE1(x,y,width)];
           if ( (minimumAcceptedDepths<depth) && (depth<maximumAcceptedDepths) )
                          {
                            transform2DProjectedPointTo3DPoint(
