@@ -1,13 +1,18 @@
 #include "quasirandomness.h"
 #include <stdlib.h>
 
-int initializeQuasirandomnessContext(struct quasiRandomizerContext * qrc)
+
+int initializeQuasirandomnessContext(struct quasiRandomizerContext * qrc,unsigned int width , unsigned int height , unsigned int depth)
 {
   memset(qrc,sizeof(struct quasiRandomizerContext),0);
-  return 0;
+  qrc->width=width;
+  qrc->height=height;
+  qrc->depth=depth;
+
+  return 1;
 }
 
-
+//Halton Quasirandom algorithm
 int getNextRandomPoint(struct quasiRandomizerContext * qrc , float * x, float * y , float * z)
 {
         float fOneOver3 = 1.0f/3.0f;
@@ -84,6 +89,10 @@ int getNextRandomPoint(struct quasiRandomizerContext * qrc , float * x, float * 
                 break;
             }
         };
+
+        *x=qrc->m_CurrentPos_x*qrc->width;
+        *y=qrc->m_CurrentPos_y*qrc->height;
+        *z=qrc->m_CurrentPos_z*qrc->depth;
 
         return qrc->m_Base2;
     }
