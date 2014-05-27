@@ -16,9 +16,9 @@ enum dimEnum
 void crossProductFrom3Points(float p1[3] , float p2[3] , float p3[3]  , float * normal)
 {
 
-  fprintf(stderr,"Point 1 %0.5f %0.5f %0.5f \n",p1[0],p1[1],p1[2]);
-  fprintf(stderr,"Point 2 %0.5f %0.5f %0.5f \n",p2[0],p2[1],p2[2]);
-  fprintf(stderr,"Point 3 %0.5f %0.5f %0.5f \n",p3[0],p3[1],p3[2]);
+ // fprintf(stderr,"Point 1 %0.5f %0.5f %0.5f \n",p1[0],p1[1],p1[2]);
+ // fprintf(stderr,"Point 2 %0.5f %0.5f %0.5f \n",p2[0],p2[1],p2[2]);
+ // fprintf(stderr,"Point 3 %0.5f %0.5f %0.5f \n",p3[0],p3[1],p3[2]);
 
   float temp_v1[3];
   float temp_v2[3];
@@ -52,7 +52,7 @@ tempLength =(normal[DIMX]*normal[DIMX])+ (normal[DIMY]*normal[DIMY])+ (normal[DI
   }
 
 
- fprintf(stderr,"Cross Product is %0.2f %0.2f %0.2f \n",normal[0],normal[1],normal[2]);
+ // fprintf(stderr,"Cross Product is %0.2f %0.2f %0.2f \n",normal[0],normal[1],normal[2]);
 
 }
 
@@ -71,8 +71,6 @@ float magnitudeOfNormal(float p1[3])
 
 float  angleOfNormals(float p1[3] , float p2[3])
 {
-   float numerator = innerProduct(p1,p2);
-
    float mag1 =  magnitudeOfNormal(p1);
    float mag2 =  magnitudeOfNormal(p2);
 
@@ -82,6 +80,8 @@ float  angleOfNormals(float p1[3] , float p2[3])
                            fprintf(stderr,"Error calculating angleOfNormals between (%f %f %f ) and (%f %f %f ) \n",p1[0],p1[1],p1[2],p2[0],p2[1],p2[2]);
                            fprintf(stderr,"  ( magnitudes %f %f produce a zero denominator  )\n",mag1,mag2);
                            return 0.0; }
+
+   float numerator = innerProduct(p1,p2);
 
    float len = (float) numerator / denominator;
    return len;
