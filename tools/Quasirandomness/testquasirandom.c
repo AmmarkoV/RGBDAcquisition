@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     fclose(fp);
   } 
 
-int i=system("gnuplot -e 'set terminal png; set output \"quasi.png\"; set title \"3D random points\"; splot \"quasi.dat\" using 1:2:3 with points palette'");
+int i=system("gnuplot -e 'set terminal png; set output \"quasi.png\"; set title \"3D random points\"; splot \"quasi.dat\" using 1:2:3:3 with points palette'");
 
 
 
