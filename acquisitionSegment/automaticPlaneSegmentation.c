@@ -12,10 +12,9 @@ unsigned int minimumAcceptedDepths = 830;
 unsigned int maximumAcceptedDepths = 3000;
 
 #define NeighborhoodNormalCombos 6
-#define ResultNormals 64
+#define ResultNormals 32
 #define MaxTriesPerPoint 100
 
-#define SINGLE_TEST 0
 
 unsigned int neighborhoodHalfWidth = 5;
 unsigned int neighborhoodHalfHeight = 5;
@@ -229,10 +228,12 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
      fprintf(stderr," Total normal %f %f %f %u samples \n",normal[0],normal[1],normal[2],samples);
    if (samples>0)
    {
-      float sampleF = (float) samples;
-      normal[0]=(float) normal[0] / (float) (sampleF);
-      normal[1]=(float) normal[1] / (float) (sampleF);
-      normal[2]=(float) normal[2] / (float) (sampleF);
+      float sampleF = (float) samples+0.0f;
+      normal[0]=(float) normal[0] / sampleF;
+      normal[1]=(float) normal[1] / sampleF;
+      normal[2]=(float) normal[2] / sampleF;
+
+      normal[1]=normal[1]+5.0f;
 
      if ( ! pointORNormalAreZero(point,normal) )
         {
