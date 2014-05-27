@@ -176,9 +176,8 @@ unsigned int decideNormalAround3DPoint(unsigned short * source , struct calibrat
 
 int automaticPlaneSegmentation(unsigned short * source , unsigned int width , unsigned int height , float offset, struct SegmentationFeaturesDepth * segConf , struct calibration * calib)
 {
-    fprintf(stderr,"doing automaticPlaneSegmentation( using RANSAC with %u points ) VER\n",ResultNormals);
-    //double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
-    //if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform plane segmentation\n"); return 0; }
+    fprintf(stderr,"doing automaticPlaneSegmentation( using RANSAC with %u points )\n",ResultNormals);
+
     unsigned int boundDistance=10;
     unsigned int x,y,depth;
     unsigned int bestNormal = 0;
@@ -208,14 +207,20 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
           //x=GET_RANDOM_DIM(width,boundDistance);  y=GET_RANDOM_DIM(height,boundDistance);
           x=(unsigned int) rX;
           y=(unsigned int) rY;
-          depth=source[MEMPLACE1(x,y,width)];
-          if ( (minimumAcceptedDepths<depth) && (depth<maximumAcceptedDepths) )
+          if ( (x<width) && (y<height) )
+          {
+           depth=source[MEMPLACE1(x,y,width)];
+           if ( (minimumAcceptedDepths<depth) && (depth<maximumAcceptedDepths) )
                          {
                            decideNormalAround3DPoint(source , calib , x , y  , width , height , result[i].normal );
                          } else
                          {
                            depth=0; //We will not use this point , please find another one
                          }
+          } else
+          {
+            depth=0;
+          }
          }
          fprintf(stderr,"Normal %u(%u,%u) picked with depth %u , after %u tries \n",i,x,y,depth,tries);
     }
@@ -235,7 +240,9 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
       resultScore[i]+=angleOfNormals(result[i].normal,legend.coord);
     }
 
-    float bestScore = 121230.0;
+
+    float MAX_SCORE = 121230.0;
+    float bestScore = MAX_SCORE;
     for (i=0; i<ResultNormals; i++)
     {
       if (resultScore[i]<bestScore)
@@ -244,6 +251,12 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
         bestScore = resultScore[i];
       }
     }
+
+   if (bestScore == MAX_SCORE)
+   {
+     fprintf(stderr,"Failed to get an automatic plane :( \n");
+     return 0;
+   }
 
    segConf->enablePlaneSegmentation=1;
    segConf->planeNormalOffset=offset; //<- this is to ensure a good auto segmentation
