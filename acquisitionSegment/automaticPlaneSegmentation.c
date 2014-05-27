@@ -194,14 +194,15 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
     initializeQuasirandomnessContext(&qrc,width,height,0);
     float rX,rY,rZ;
 
+    unsigned int gotResult=0;
     unsigned int tries=0;
     unsigned int i=0;
     for (i=0; i<ResultNormals; i++)
     {
-        tries=0; depth=0;
+        tries=0; depth=0; gotResult=0;
          while (
                   (
-                   (depth==0) ||
+                   (!gotResult) ||
                    (tries==0) ||
                    (result[i].point.coord[Z]==0) ||
                    ( (result[i].normal[0]==0) && (result[i].normal[1]==0) && (result[i].normal[2]==0) )
@@ -212,40 +213,45 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
           ++tries;
           getNextRandomPoint(&qrc,&rX,&rY,&rZ);
 
-          x=(unsigned int) rX;
-          y=(unsigned int) rY;
-          if ( (x<width) && (y<height) )
+          if ( (0<=rX) && (rX<width) && (0<=rY) && (rY<height) )
           {
-           depth=source[MEMPLACE1(x,y,width)];
-           if ( (minimumAcceptedDepths<depth) && (depth<maximumAcceptedDepths) )
+           x=(unsigned int) rX;
+           y=(unsigned int) rY;
+           if ( (0<=x) && (x<width) && (0<=y) && (y<height) )
+           {
+            depth=source[MEMPLACE1(x,y,width)];
+            if ( (minimumAcceptedDepths<depth) && (depth<maximumAcceptedDepths) && (depth!=0) )
                          {
-                           if ( ! decideNormalAround3DPoint(source , calib , x , y  , width , height , result[i].normal ) ) { depth=0; }
-                         } else
-                         { depth=0; } //We will not use this point , please find another one
-
-          } else
-          { depth=0; }
+                           if (decideNormalAround3DPoint(source , calib , x , y  , width , height , result[i].normal ) ) { gotResult=1; }
+                         }
+           }
+          }
          }
-         fprintf(stderr,"Normal %u(%u,%u) picked with depth %u , after %u tries \n",i,x,y,depth,tries);
+
+         if ((result[i].normal[0]!=0) ||
+             (result[i].normal[1]!=0) ||
+             (result[i].normal[2]!=0)) { fprintf(stderr,"Normal %u(%f,%f,%f) picked after %u tries \n",i,result[i].normal[0],result[i].normal[1],result[i].normal[2],tries); } else
+                                       {
+                                        fprintf(stderr,"Produced a zero normal after %u tries , wtf \n",tries);
+                                       }
     } //We now have Populated result[i].normal and result[i].point
 
     unsigned int z=0;
     float angle=0.0;
     for (i=0; i<ResultNormals; i++)
     {
-      fprintf(stderr,"Normal %u is (%f,%f,%f)\n",i, result[i].normal[0], result[i].normal[1], result[i].normal[2] );
       for (z=0; z<ResultNormals; z++)
       {
           if (z!=i)
           {
              angle=angleOfNormals(result[i].normal,result[z].normal);
-             fprintf(stderr,"Normal %u is (%f,%f,%f) has angle of %f\n",z, result[z].normal[0], result[z].normal[1], result[z].normal[2] , angle );
              resultScore[i]+=angle;
           }
       }
 
       //Adding angle penalty according to legend ( to try and match it
       resultScore[i]+=angleOfNormals(result[i].normal,legend.coord);
+      fprintf(stderr,"Normal %u is (%f,%f,%f) score is %f \n",i, result[i].normal[0], result[i].normal[1], result[i].normal[2] , resultScore[i] );
     }
 
 
