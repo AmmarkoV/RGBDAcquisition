@@ -242,7 +242,7 @@ int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB *
 
       if ( depthSeg->autoPlaneSegmentation )
       {
-        fprintf(fp,"-autoplane\n");
+        fprintf(fp,"-autoplane 0\n");
       }
 
 
@@ -359,6 +359,7 @@ int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFea
                                           } else
     if (strcmp(argv[i],"-autoplane")==0)  {
                                             depthSeg->autoPlaneSegmentation=1;
+                                            depthSeg->planeNormalOffset=(double) internationalAtof(argv[i+1]);
                                           } else
     if (strcmp(argv[i],"-plane")==0)      {
                                             depthSeg->enablePlaneSegmentation=1;

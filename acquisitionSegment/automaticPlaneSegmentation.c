@@ -55,7 +55,7 @@ inline float getDepthValue(unsigned short * source , unsigned int x, unsigned in
   return (float) source[MEMPLACE1(x,y,width)];
 }
 
-int decideNormalAround3DPoint(unsigned short * source , struct calibration * calib , unsigned int x , unsigned int y  , unsigned int width , unsigned int height , float * normal )
+int decideNormalAround3DPoint(unsigned short * source , struct calibration * calib , unsigned int x , unsigned int y  , unsigned int width , unsigned int height , float * point , float * normal )
 {
   //We get a position x,y and we want to decide the normal of this position
   //In order to do so , we have to find some neighboring points calculate the resulting normals
@@ -87,6 +87,10 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
    neighbors[NH_CENTER].coord[X]=x;
    neighbors[NH_CENTER].coord[Y]=y;
    neighbors[NH_CENTER].coord[Z]=getDepthValue(source,neighbors[NH_CENTER].coord[X],neighbors[NH_CENTER].coord[Y],width);
+
+   point[0]=neighbors[NH_CENTER].coord[X];
+   point[1]=neighbors[NH_CENTER].coord[Y];
+   point[2]=neighbors[NH_CENTER].coord[Z];
 
    if ( (x>neighborhoodHalfWidth) && (y>neighborhoodHalfHeight) )
        { neighbors[NH_TOPLEFT].coord[X]=x-neighborhoodHalfWidth; neighbors[NH_TOPLEFT].coord[Y]=y-neighborhoodHalfHeight;
@@ -199,7 +203,7 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
     if (ResultNormals==0) { fprintf(stderr,"No Normals allowed cannot do automatic plane segmentation \n"); return 0; }
 
     struct normalArray result[ResultNormals]={0};
-    unsigned int resultScore[ResultNormals]={0};
+    float resultScore[ResultNormals]={0};
 
 
     struct TriplePoint legend;
@@ -229,18 +233,27 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
             depth=source[MEMPLACE1(x,y,width)];
             if ( (minimumAcceptedDepths<depth) && (depth<maximumAcceptedDepths) && (depth!=0) )
                          {
-                           if (decideNormalAround3DPoint(source , calib , x , y  , width , height , result[i].normal ) ) { gotResult=1; }
+                           if (decideNormalAround3DPoint(source , calib , x , y  , width , height , result[i].point.coord , result[i].normal ) ) { gotResult=1; }
                          }
            }
           }
          }
 
-         if ((result[i].normal[0]!=0) ||
-             (result[i].normal[1]!=0) ||
-             (result[i].normal[2]!=0)) { fprintf(stderr,"Normal %u(%f,%f,%f) picked after %u tries \n",i,result[i].normal[0],result[i].normal[1],result[i].normal[2],tries); } else
-                                       {
-                                        fprintf(stderr,"Produced a zero normal after %u tries , wtf \n",tries);
-                                       }
+         if (
+             (
+             (! FLOATISZERO(result[i].normal[0]) ) ||
+             (! FLOATISZERO(result[i].normal[1]) ) ||
+             (! FLOATISZERO(result[i].normal[2]) )
+             ) &&
+             (
+             (! FLOATISZERO(result[i].point.coord[0]) ) ||
+             (! FLOATISZERO(result[i].point.coord[1]) ) ||
+             (! FLOATISZERO(result[i].point.coord[2]) )
+             )
+            ) { fprintf(stderr,"Normal %u(%f,%f,%f) point (%f,%f,%f)  after %u tries \n",i,result[i].normal[0],result[i].normal[1],result[i].normal[2],
+                                                                                             result[i].point.coord[0],result[i].point.coord[1],result[i].point.coord[2],
+                                                                                              tries); } else
+              { fprintf(stderr,"Produced a zero normal after %u tries , wtf \n",tries); }
     } //We now have Populated result[i].normal and result[i].point
 
     unsigned int z=0;
@@ -269,9 +282,9 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
       if (
            ( resultScore[i]<bestScore ) &&
            (
-             (result[i].normal[0]!=0) ||
-             (result[i].normal[1]!=0) ||
-             (result[i].normal[2]!=0)
+             (!FLOATISZERO(result[i].normal[0]) ) ||
+             (!FLOATISZERO(result[i].normal[1]) ) ||
+             (!FLOATISZERO(result[i].normal[2]) )
            )
           )
       {
