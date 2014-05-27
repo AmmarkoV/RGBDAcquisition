@@ -276,10 +276,22 @@ if ( segConf->enablePlaneSegmentation )
     float p1[3]; p1[0]=(float) segConf->p1[0]; p1[1]=(float) segConf->p1[1]; p1[2]=(float) segConf->p1[2];
     float p2[3]; p2[0]=(float) segConf->p2[0]; p2[1]=(float) segConf->p2[1]; p2[2]=(float) segConf->p2[2];
     float p3[3]; p3[0]=(float) segConf->p3[0]; p3[1]=(float) segConf->p3[1]; p3[2]=(float) segConf->p3[2];
+
     float pN[3]={  p2[0] , p2[1]+5 , p2[2] };
     float normal[3]={0.0 , 0.0 , 0.0 };
 
-    crossProductFrom3Points( p1 , p2  , p3  , normal);
+    if (segConf->doNotGenerateNormalFrom3Points)
+    { //We have our normals ready
+      pN[0]=segConf->center[0]; pN[1]=segConf->center[1];  pN[2]=segConf->center[2];
+      normal[0]=segConf->normal[0]; normal[1]=segConf->normal[1]; normal[2]=segConf->normal[2];
+    } else
+    {
+      crossProductFrom3Points( p1 , p2  , p3  , normal);
+    }
+
+
+
+
     //fprintf(stderr,"signedDistanceFromPlane is %0.2f \n",signedDistanceFromPlane(segConf->p2, normal , pN));
 
   sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );

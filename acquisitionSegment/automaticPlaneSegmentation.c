@@ -11,7 +11,7 @@ unsigned int minimumAcceptedDepths = 830;
 unsigned int maximumAcceptedDepths = 3000;
 
 #define NeighborhoodNormalCombos 6
-#define ResultNormals 256
+#define ResultNormals 64
 #define MaxTriesPerPoint 1000
 
 
@@ -48,52 +48,12 @@ struct normalArray
 };
 
 
-int swapResultPoints(unsigned int id ,struct normalArray * result, unsigned int swapIDA,unsigned int swapIDB)
-{
-  if (swapIDA==swapIDB) { return 1; }
-
-  float tmp=0.0;
-  unsigned int i=0;
-  for (i=0; i<3; i++)
-     {
-        tmp = result[id].point[swapIDA].coord[i];
-        result[id].point[swapIDA].coord[i] = result[id].point[swapIDB].coord[i];
-        result[id].point[swapIDB].coord[i] = tmp;
-     }
-  return 1;
-}
-
-
-int ensureClockwise(unsigned int id , struct normalArray * result)
-{
-  unsigned int swapA=0,swapB=1;
-
-  struct TriplePoint legend;
-  legend.coord[X]=0.016560; legend.coord[Y]=-0.826509; legend.coord[Z]=-0.562679;
-
-
-  float retres = dotProduct(result->normal , legend.coord );
-
-  if (retres<0.0) { swapResultPoints(id,result,swapA,swapB); }
-
-  return 1;
-}
-
-
-
-unsigned int supplyUniform2DPoints(unsigned int width ,unsigned int height , unsigned int pointsNumber)
-{
-    #warning "TODO : supply Uniform 2D points"
-    return 0;
-}
-
-
 inline float getDepthValue(unsigned short * source , unsigned int x, unsigned int y , unsigned int width)
 {
   return source[MEMPLACE1(x,y,width)];
 }
 
-unsigned int decideNormalAround3DPoint(unsigned short * source , unsigned int x , unsigned int y  , unsigned int width , unsigned int height , float normal[3] )
+unsigned int decideNormalAround3DPoint(unsigned short * source , struct calibration * calib , unsigned int x , unsigned int y  , unsigned int width , unsigned int height , float normal[3] )
 {
 
    //---------------------------------------------------
@@ -240,11 +200,8 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
     int i=0;
     for (i=0; i<ResultNormals; i++)
     {
-
-
-
-         result[i].point[pointNum].coord[Z]=0; tries=0; depth=0;
-         while ( ( (depth==0) || (tries==0) || (result[i].point[pointNum].coord[Z]==0) ) && (tries<MaxTriesPerPoint) )
+        tries=0; depth=0;
+         while ( ( (depth==0) || (tries==0) || (result[i].point.coord[Z]==0) ) && (tries<MaxTriesPerPoint) )
          {
           ++tries;
           getNextRandomPoint(&qrc,&rX,&rY,&rZ);
@@ -254,27 +211,14 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
           depth=source[MEMPLACE1(x,y,width)];
           if ( (minimumAcceptedDepths<depth) && (depth<maximumAcceptedDepths) )
                          {
-                           decideNormalAround3DPoint(source , x , y  , width , height , result[i].normal );
+                           decideNormalAround3DPoint(source , calib , x , y  , width , height , result[i].normal );
                          } else
                          {
-                           depth=0; //We will not use this point
+                           depth=0; //We will not use this point , please find another one
                          }
          }
-
-
-         fprintf(stderr,"Point%u(%u,%u) picked with depth %u , after %u tries \n",pointNum,x,y,depth,tries);
-
-
-         fprintf(stderr,"3 Points are %0.2f %0.2f %0.2f \n %0.2f %0.2f %0.2f \n %0.2f %0.2f %0.2f \n " ,
-                         result[i].point[0].coord[X] ,  result[i].point[0].coord[Y] ,  result[i].point[0].coord[Z] ,
-                         result[i].point[1].coord[X] ,  result[i].point[1].coord[Y] ,  result[i].point[1].coord[Z] ,
-                         result[i].point[2].coord[X] ,  result[i].point[2].coord[Y] ,  result[i].point[2].coord[Z]
-                );
-
-         crossProductFrom3Points( result[i].point[0].coord , result[i].point[1].coord  , result[i].point[2].coord  , result[i].normal);
-
-
-
+         fprintf(stderr,"Normal %u(%u,%u) picked with depth %u , after %u tries \n",i,x,y,depth,tries);
+    }
 
     int z=0;
     for (i=0; i<ResultNormals; i++)
@@ -291,12 +235,6 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
       resultScore[i]+=angleOfNormals(result[i].normal,legend.coord);
     }
 
-    for (i=0; i<ResultNormals; i++)
-    {
-        ensureClockwise(i , result);
-    }
-
-
     float bestScore = 121230.0;
     for (i=0; i<ResultNormals; i++)
     {
@@ -307,27 +245,27 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
       }
     }
 
+   segConf->enablePlaneSegmentation=1;
+   segConf->planeNormalOffset=offset; //<- this is to ensure a good auto segmentation
+   segConf->doNotGenerateNormalFrom3Points=1; // <- we have a normal and a point , we dont have 3 points
 
-    fprintf(stderr,"Picked result %u with score %0.2f \n",bestNormal , bestScore);
+   segConf->center[0] = result[bestNormal].point.coord[0];
+   segConf->center[1] = result[bestNormal].point.coord[1];
+   segConf->center[2] = result[bestNormal].point.coord[2];
 
-    segConf->enablePlaneSegmentation=1;
-    segConf->planeNormalOffset=offset; //<- this is to ensure a good auto segmentation
-    for (i=0; i<3; i++)
-      {
-       segConf->p1[i]=result[bestNormal].point[0].coord[i];
-       segConf->p2[i]=result[bestNormal].point[1].coord[i];
-       segConf->p3[i]=result[bestNormal].point[2].coord[i];
-      }
+   segConf->normal[0] = result[bestNormal].normal[0];
+   segConf->normal[1] = result[bestNormal].normal[1];
+   segConf->normal[2] = result[bestNormal].normal[2];
+   fprintf(stderr,"Picked result %u with score %0.2f \n",bestNormal , bestScore);
 
-   fprintf(stderr,"Best Points are \n %0.2f %0.2f %0.2f \n %0.2f %0.2f %0.2f \n %0.2f %0.2f %0.2f \n " ,
-                         result[bestNormal].point[0].coord[0] ,  result[bestNormal].point[0].coord[1] ,  result[bestNormal].point[0].coord[2] ,
-                         result[bestNormal].point[1].coord[0] ,  result[bestNormal].point[1].coord[1] ,  result[bestNormal].point[1].coord[2] ,
-                         result[bestNormal].point[2].coord[0] ,  result[bestNormal].point[2].coord[1] ,  result[bestNormal].point[2].coord[2]
+
+
+   fprintf(stderr,"Best Points are \n point %0.2f %0.2f %0.2f \n normal %0.2f %0.2f %0.2f \n" ,
+                         result[bestNormal].point.coord[0] ,  result[bestNormal].point.coord[1] ,  result[bestNormal].point.coord[2] ,
+                         result[bestNormal].normal[0] ,  result[bestNormal].normal[1] ,  result[bestNormal].normal[2]
          );
 
-   fprintf(stderr,"AUTOMATIC SHUTDOWN OF SEGMENTATION SO THAT DOES NOT DESTORY OUTPUT\n");
+   fprintf(stderr,"Automatic shutdown of automatic plane segmentation so it does not feed on itself on the next frame\n");
    segConf->autoPlaneSegmentation=0;
-
-   // free4x4Matrix(&m);
   return 1;
 }
