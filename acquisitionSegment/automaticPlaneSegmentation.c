@@ -16,8 +16,8 @@ unsigned int maximumAcceptedDepths = 3000;
 #define MaxTriesPerPoint 100
 
 
-unsigned int neighborhoodHalfWidth = 5;
-unsigned int neighborhoodHalfHeight = 5;
+unsigned int neighborhoodHalfWidth = 6;
+unsigned int neighborhoodHalfHeight = 6;
 enum NEIGHBORHOOD_OF_POINTS
 {
    NH_TOPLEFT = 0 ,
