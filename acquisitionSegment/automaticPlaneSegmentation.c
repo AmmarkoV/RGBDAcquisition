@@ -12,8 +12,8 @@ unsigned int minimumAcceptedDepths = 830;
 unsigned int maximumAcceptedDepths = 3000;
 
 #define NeighborhoodNormalCombos 6
-#define ResultNormals 64
-#define MaxTriesPerPoint 2000
+#define ResultNormals 128
+#define MaxTriesPerPoint 100
 
 
 unsigned int neighborhoodHalfWidth = 5;
@@ -45,6 +45,7 @@ struct TriplePoint
 
 struct normalArray
 {
+    unsigned int originX,originY;
     struct TriplePoint point;
     float normal[3];
 };
@@ -181,7 +182,21 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
      normal[1]/=samples;
      normal[2]/=samples;
 
-     return 1;
+         if (
+             (
+             (! FLOATISZERO(normal[0]) ) ||
+             (! FLOATISZERO(normal[1]) ) ||
+             (! FLOATISZERO(normal[2]) )
+             ) &&
+             (
+             (! FLOATISZERO(point[0]) ) ||
+             (! FLOATISZERO(point[1]) ) ||
+             (! FLOATISZERO(point[2]) )
+             )
+            )
+             {
+                  return 1;
+             }
    }
 
    fprintf(stderr,"decideNormalAround3DPoint( %u , %u ) failed \n",x,y);
@@ -233,7 +248,12 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
             depth=source[MEMPLACE1(x,y,width)];
             if ( (minimumAcceptedDepths<depth) && (depth<maximumAcceptedDepths) && (depth!=0) )
                          {
-                           if (decideNormalAround3DPoint(source , calib , x , y  , width , height , result[i].point.coord , result[i].normal ) ) { gotResult=1; }
+                           if (decideNormalAround3DPoint(source , calib , x , y  , width , height , result[i].point.coord , result[i].normal ) )
+                            {
+                                result[i].originX=x;
+                                result[i].originY=y;
+                                gotResult=1;
+                             }
                          }
            }
           }
@@ -250,9 +270,7 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
              (! FLOATISZERO(result[i].point.coord[1]) ) ||
              (! FLOATISZERO(result[i].point.coord[2]) )
              )
-            ) { fprintf(stderr,"Normal %u(%f,%f,%f) point (%f,%f,%f)  after %u tries \n",i,result[i].normal[0],result[i].normal[1],result[i].normal[2],
-                                                                                             result[i].point.coord[0],result[i].point.coord[1],result[i].point.coord[2],
-                                                                                              tries); } else
+            ) { /*Got a good normal */ } else
               { fprintf(stderr,"Produced a zero normal after %u tries , wtf \n",tries); }
     } //We now have Populated result[i].normal and result[i].point
 
@@ -265,15 +283,22 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
           if (z!=i)
           {
              angle=angleOfNormals(result[i].normal,result[z].normal);
+             if (angle<0.0) { angle=-1 * angle; }
              resultScore[i]+=angle;
           }
       }
 
       //Adding angle penalty according to legend ( to try and match it
-      resultScore[i]+=angleOfNormals(result[i].normal,legend.coord);
-      fprintf(stderr,"Normal %u is (%f,%f,%f) score is %f \n",i, result[i].normal[0], result[i].normal[1], result[i].normal[2] , resultScore[i] );
+      angle=angleOfNormals(result[i].normal,legend.coord);
+      if (angle<0.0) { angle=-1 * angle; }
+      resultScore[i]+=angle;
+      fprintf(stderr,"Point 2D %u (%u,%u) - 3D (%f,%f,%f) - Normal (%f,%f,%f) - score %f\n",i,
+                                                                                      result[i].originX,result[i].originY,
+                                                                                      result[i].point.coord[0],result[i].point.coord[1],result[i].point.coord[2],
+                                                                                      result[i].normal[0], result[i].normal[1], result[i].normal[2] , resultScore[i] );
     }
 
+//Normal segmentation using point 24.677238,256.603088,1019.000000 and normal 0.022093,-0.833547,-0.552007
 
     float MAX_SCORE = 121230.0;
     float bestScore = MAX_SCORE;
@@ -314,9 +339,11 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
 
 
 
-   fprintf(stderr,"Best Points are \n point %0.2f %0.2f %0.2f \n normal %0.2f %0.2f %0.2f \n" ,
+   fprintf(stderr,"Best Points are \n point %u,%u , %0.2f %0.2f %0.2f \n normal %0.2f %0.2f %0.2f , offset %f \n" ,
+                         result[bestNormal].originX,result[bestNormal].originY,
                          result[bestNormal].point.coord[0] ,  result[bestNormal].point.coord[1] ,  result[bestNormal].point.coord[2] ,
                          result[bestNormal].normal[0] ,  result[bestNormal].normal[1] ,  result[bestNormal].normal[2]
+                         ,offset
          );
 
    fprintf(stderr,"Automatic shutdown of automatic plane segmentation so it does not feed on itself on the next frame\n");

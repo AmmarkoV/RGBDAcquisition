@@ -61,8 +61,6 @@ int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsign
 
 int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
 {
-
-
    char* ldPreloadPath;
    ldPreloadPath= getenv("LD_PRELOAD");
    if (ldPreloadPath!=0) { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPreloadPath); }
@@ -70,15 +68,15 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
 
    char pathTester[2048]={0};
 
-
+  /*
    if (getcwd(pathTester, sizeof(pathTester)) != 0)
          fprintf(stdout, "Current working dir: %s\n", pathTester);
-
+  */
 
    sprintf(pathTester,"%s/%s",possiblePath,libName);
    if (acquisitionFileExists(pathTester))
                                  {
-                                   fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
+                                   //fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
                                    strncpy(pathOut,pathTester,pathOutLength);
                                    return 1;
                                  }
@@ -86,7 +84,7 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
    sprintf(pathTester,"./%s",libName);
    if (acquisitionFileExists(libName))
                                 {
-                                   fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
+                                   //fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
                                    //strncpy(pathOut,libName,pathOutLength);
 
                                    strcpy(pathOut,"./"); //<-TODO CHECK BOUNDS HERE ETC..
@@ -97,7 +95,7 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
 
    if (acquisitionFileExists(libName))
                                 {
-                                   fprintf(stderr,"Found plugin %s at standard dir \n",libName);
+                                   //fprintf(stderr,"Found plugin %s at standard dir \n",libName);
                                    strcat(pathOut,libName);
                                    return 1;
                                  }

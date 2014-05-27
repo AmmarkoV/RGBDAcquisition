@@ -289,7 +289,7 @@ if ( segConf->enablePlaneSegmentation )
       crossProductFrom3Points( p1 , p2  , p3  , normal);
     }
 
-
+    fprintf(stderr,"Normal segmentation using point %f,%f,%f and normal %f,%f,%f\n",pN[0],pN[1],pN[2],normal[0],normal[1],normal[2]);
 
 
     //fprintf(stderr,"signedDistanceFromPlane is %0.2f \n",signedDistanceFromPlane(segConf->p2, normal , pN));
