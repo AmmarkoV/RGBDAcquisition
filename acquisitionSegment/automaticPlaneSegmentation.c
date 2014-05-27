@@ -6,6 +6,7 @@
 
 #define MEMPLACE1(x,y,width) ( y * ( width ) + x )
 #define GET_RANDOM_DIM(width,bounds) (bounds+rand()%(width-1-bounds))
+#define FLOATISZERO(f) ( (f<0.00001) && (f>-0.00001) )
 
 unsigned int minimumAcceptedDepths = 830;
 unsigned int maximumAcceptedDepths = 3000;
@@ -25,7 +26,9 @@ enum NEIGHBORHOOD_OF_POINTS
    NH_CENTER,
    NH_MIDRIGHT,
    NH_BOTLEFT,
-   NH_BOTRIGHT
+   NH_BOTRIGHT,
+   //---------------
+   NH_TOTAL_NEIGHBORS
 };
 
 enum pShorthand
@@ -49,11 +52,14 @@ struct normalArray
 
 inline float getDepthValue(unsigned short * source , unsigned int x, unsigned int y , unsigned int width)
 {
-  return source[MEMPLACE1(x,y,width)];
+  return (float) source[MEMPLACE1(x,y,width)];
 }
 
-unsigned int decideNormalAround3DPoint(unsigned short * source , struct calibration * calib , unsigned int x , unsigned int y  , unsigned int width , unsigned int height , float normal[3] )
+int decideNormalAround3DPoint(unsigned short * source , struct calibration * calib , unsigned int x , unsigned int y  , unsigned int width , unsigned int height , float * normal )
 {
+  //We get a position x,y and we want to decide the normal of this position
+  //In order to do so , we have to find some neighboring points calculate the resulting normals
+  //and take a mean approximation of the point , then we return
 
    //---------------------------------------------------
    //        *0                                   *1
@@ -72,12 +78,12 @@ unsigned int decideNormalAround3DPoint(unsigned short * source , struct calibrat
    //---------------------------------------------------
    unsigned int normalSeries[NeighborhoodNormalCombos][3] = { { 0, 2, 3 }, { 0, 3, 1 }, { 1, 3, 4 } , { 2, 5, 3 } , { 3, 6, 4 } , { 3, 5, 6 } };
 
-   struct TriplePoint neighbors[7]={0};
+   struct TriplePoint neighbors[NH_TOTAL_NEIGHBORS]={0};
    struct normalArray neighborNormals[NeighborhoodNormalCombos]={0};
    unsigned int normalOK[NeighborhoodNormalCombos]={0};
 
 
-   //We populate the neighborhood with values Z coordinate will signal existing/inexisting points
+   //The central point is of course the one we have !
    neighbors[NH_CENTER].coord[X]=x;
    neighbors[NH_CENTER].coord[Y]=y;
    neighbors[NH_CENTER].coord[Z]=getDepthValue(source,neighbors[NH_CENTER].coord[X],neighbors[NH_CENTER].coord[Y],width);
@@ -106,22 +112,26 @@ unsigned int decideNormalAround3DPoint(unsigned short * source , struct calibrat
       { neighbors[NH_BOTRIGHT].coord[X]=x+neighborhoodHalfWidth; neighbors[NH_BOTRIGHT].coord[Y]=y+neighborhoodHalfHeight;
         neighbors[NH_BOTRIGHT].coord[Z]=getDepthValue(source,neighbors[NH_BOTRIGHT].coord[X],neighbors[NH_BOTRIGHT].coord[Y],width); }
 
-   unsigned int i=0;
 
 
    //Project Points to get real 3D coordinates
+   unsigned int i=0;
    unsigned int x2D,y2D,d3D;
-   for (i=0; i<7; i++)
+   for (i=0; i<NH_TOTAL_NEIGHBORS; i++)
    {
         x2D = (unsigned int) neighbors[i].coord[X];
         y2D = (unsigned int) neighbors[i].coord[Y];
         d3D = (unsigned int) neighbors[i].coord[Z];
 
-       transform2DProjectedPointTo3DPoint( calib , x2D , y2D  , d3D ,
-                                           &neighbors[i].coord[X] ,
-                                           &neighbors[i].coord[Y] ,
-                                           &neighbors[i].coord[Z]
-                                          );
+        if (! transform2DProjectedPointTo3DPoint( calib , x2D , y2D  , d3D ,
+                                                  &neighbors[i].coord[X] ,
+                                                  &neighbors[i].coord[Y] ,
+                                                  &neighbors[i].coord[Z]
+                                                 )
+           )
+           {
+               fprintf(stderr,"Could not calculate point %u for center %u,%u\n",i,x,y);
+           }
    }
 
 
@@ -129,11 +139,15 @@ unsigned int decideNormalAround3DPoint(unsigned short * source , struct calibrat
    //We have an array of normals ready , lets populate the normals now
    for (i=0; i<NeighborhoodNormalCombos; i++)
    {
-      if ( //If all three points have a depth
-           (neighbors[normalSeries[i][0]].coord[Z]!=0) &&
-           (neighbors[normalSeries[i][1]].coord[Z]!=0) &&
-           (neighbors[normalSeries[i][2]].coord[Z]!=0)
+      if ( //If all three points have a Depth ( thus only Z is checked )
+           ( FLOATISZERO(neighbors[normalSeries[i][0]].coord[Z]) ) &&
+           ( FLOATISZERO(neighbors[normalSeries[i][1]].coord[Z]) ) &&
+           ( FLOATISZERO(neighbors[normalSeries[i][2]].coord[Z]) )
          )
+          {
+            //This is a zero normal , we dont consider it
+            normalOK[i]=0;
+          } else
           { //Find the normal
             crossProductFrom3Points( neighbors[normalSeries[i][0]].coord ,
                                      neighbors[normalSeries[i][1]].coord ,
@@ -166,6 +180,7 @@ unsigned int decideNormalAround3DPoint(unsigned short * source , struct calibrat
      return 1;
    }
 
+   fprintf(stderr,"decideNormalAround3DPoint( %u , %u ) failed \n",x,y);
    return 0;
 }
 
@@ -199,24 +214,16 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
     unsigned int i=0;
     for (i=0; i<ResultNormals; i++)
     {
-        tries=0; depth=0; gotResult=0;
-         while (
-                  (
-                   (!gotResult) ||
-                   (tries==0) ||
-                   (result[i].point.coord[Z]==0) ||
-                   ( (result[i].normal[0]==0) && (result[i].normal[1]==0) && (result[i].normal[2]==0) )
-                  ) &&
-                  (tries<MaxTriesPerPoint)
-                )
+        tries=0; gotResult=0;
+         while ( (!gotResult)  && (tries<MaxTriesPerPoint)  )
          {
           ++tries;
           getNextRandomPoint(&qrc,&rX,&rY,&rZ);
 
           if ( (0<=rX) && (rX<width) && (0<=rY) && (rY<height) )
           {
-           x=(unsigned int) rX;
-           y=(unsigned int) rY;
+           x=(unsigned int) rX%width;
+           y=(unsigned int) rY%height;
            if ( (0<=x) && (x<width) && (0<=y) && (y<height) )
            {
             depth=source[MEMPLACE1(x,y,width)];
