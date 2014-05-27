@@ -91,6 +91,14 @@ const long SelectSegmentation::ID_SPINCTRL18 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX6 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT27 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL26 = wxNewId();
+const long SelectSegmentation::ID_TEXTCTRL27 = wxNewId();
+const long SelectSegmentation::ID_TEXTCTRL28 = wxNewId();
+const long SelectSegmentation::ID_TEXTCTRL29 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT28 = wxNewId();
+const long SelectSegmentation::ID_TEXTCTRL30 = wxNewId();
+const long SelectSegmentation::ID_TEXTCTRL31 = wxNewId();
+const long SelectSegmentation::ID_TEXTCTRL32 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT29 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -102,10 +110,10 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 {
 	//(*Initialize(SelectSegmentation)
 	Create(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
-	SetClientSize(wxSize(748,549));
-	StaticBox2 = new wxStaticBox(this, ID_STATICBOX2, _("Depth"), wxPoint(376,16), wxSize(352,400), 0, _T("ID_STATICBOX2"));
-	ButtonCancel = new wxButton(this, ID_BUTTON1, _("Cancel"), wxPoint(632,456), wxSize(85,56), 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	ButtonOk = new wxButton(this, ID_BUTTON2, _("Ok"), wxPoint(376,456), wxSize(248,56), 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	SetClientSize(wxSize(748,599));
+	StaticBox2 = new wxStaticBox(this, ID_STATICBOX2, _("Depth"), wxPoint(376,16), wxSize(352,496), 0, _T("ID_STATICBOX2"));
+	ButtonCancel = new wxButton(this, ID_BUTTON1, _("Cancel"), wxPoint(624,520), wxSize(85,56), 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	ButtonOk = new wxButton(this, ID_BUTTON2, _("Ok"), wxPoint(368,520), wxSize(248,56), 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	StaticBox1 = new wxStaticBox(this, ID_STATICBOX1, _("RGB"), wxPoint(16,16), wxSize(352,400), 0, _T("ID_STATICBOX1"));
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Minimum : "), wxPoint(40,66), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	minR = new wxSpinCtrl(this, ID_SPINCTRL1, _T("0"), wxPoint(128,64), wxSize(56,23), 0, 0, 255, 0, _T("ID_SPINCTRL1"));
@@ -162,8 +170,8 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	planeP3Y = new wxTextCtrl(this, ID_TEXTCTRL22, _("0.0"), wxPoint(560,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL22"));
 	planeP3Z = new wxTextCtrl(this, ID_TEXTCTRL23, _("0.0"), wxPoint(624,364), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL23"));
 	StaticText18 = new wxStaticText(this, ID_STATICTEXT18, _("Point C"), wxPoint(424,368), wxDefaultSize, 0, _T("ID_STATICTEXT18"));
-	StaticText19 = new wxStaticText(this, ID_STATICTEXT19, _("Combination Method"), wxPoint(16,460), wxDefaultSize, 0, _T("ID_STATICTEXT19"));
-	ChoiceCombination = new wxChoice(this, ID_CHOICE1, wxPoint(168,456), wxSize(168,25), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
+	StaticText19 = new wxStaticText(this, ID_STATICTEXT19, _("Combination Method"), wxPoint(16,520), wxDefaultSize, 0, _T("ID_STATICTEXT19"));
+	ChoiceCombination = new wxChoice(this, ID_CHOICE1, wxPoint(168,512), wxSize(168,25), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
 	ChoiceCombination->SetSelection( ChoiceCombination->Append(_("No combination")) );
 	ChoiceCombination->Append(_("AND combination"));
 	ChoiceCombination->Append(_("OR combination"));
@@ -177,18 +185,18 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	CheckBoxBoundingBox->SetValue(false);
 	CheckBoxPlane = new wxCheckBox(this, ID_CHECKBOX2, _("Plane Segmentation"), wxPoint(392,288), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	CheckBoxPlane->SetValue(false);
-	StaticText12 = new wxStaticText(this, ID_STATICTEXT12, _("Erase Color is "), wxPoint(16,424), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
-	eraseColorR = new wxSpinCtrl(this, ID_SPINCTRL9, _T("255"), wxPoint(124,420), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL9"));
+	StaticText12 = new wxStaticText(this, ID_STATICTEXT12, _("Erase Color is "), wxPoint(32,356), wxDefaultSize, 0, _T("ID_STATICTEXT12"));
+	eraseColorR = new wxSpinCtrl(this, ID_SPINCTRL9, _T("255"), wxPoint(136,352), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL9"));
 	eraseColorR->SetValue(_T("255"));
-	eraseColorG = new wxSpinCtrl(this, ID_SPINCTRL10, _T("255"), wxPoint(176,420), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL10"));
+	eraseColorG = new wxSpinCtrl(this, ID_SPINCTRL10, _T("255"), wxPoint(192,352), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL10"));
 	eraseColorG->SetValue(_T("255"));
-	eraseColorB = new wxSpinCtrl(this, ID_SPINCTRL11, _T("255"), wxPoint(228,420), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL11"));
+	eraseColorB = new wxSpinCtrl(this, ID_SPINCTRL11, _T("255"), wxPoint(248,352), wxSize(52,23), 0, 0, 255, 255, _T("ID_SPINCTRL11"));
 	eraseColorB->SetValue(_T("255"));
-	StaticText15 = new wxStaticText(this, ID_STATICTEXT15, _("Erase Depth is "), wxPoint(384,424), wxDefaultSize, 0, _T("ID_STATICTEXT15"));
-	eraseDepth = new wxSpinCtrl(this, ID_SPINCTRL12, _T("0"), wxPoint(496,420), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL12"));
+	StaticText15 = new wxStaticText(this, ID_STATICTEXT15, _("Erase Depth is "), wxPoint(376,488), wxDefaultSize, 0, _T("ID_STATICTEXT15"));
+	eraseDepth = new wxSpinCtrl(this, ID_SPINCTRL12, _T("0"), wxPoint(480,482), wxDefaultSize, 0, 0, 10000, 0, _T("ID_SPINCTRL12"));
 	eraseDepth->SetValue(_T("0"));
-	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxPoint(20,450), wxSize(700,0), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-	ButtonExport = new wxButton(this, ID_BUTTON3, _("Export To File"), wxPoint(16,480), wxSize(120,27), 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxPoint(20,510), wxSize(700,0), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+	ButtonExport = new wxButton(this, ID_BUTTON3, _("Export To File"), wxPoint(16,544), wxSize(120,27), 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	CheckBoxSegmentMovement = new wxCheckBox(this, ID_CHECKBOX3, _("Segment Depth Movement"), wxPoint(392,88), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
 	CheckBoxSegmentMovement->SetValue(false);
 	StaticText20 = new wxStaticText(this, ID_STATICTEXT20, _("Movement Threshold"), wxPoint(392,120), wxDefaultSize, 0, _T("ID_STATICTEXT20"));
@@ -206,8 +214,8 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	SpinCtrlMovementB = new wxSpinCtrl(this, ID_SPINCTRL15, _T("10"), wxPoint(248,240), wxSize(56,27), 0, 0, 100, 10, _T("ID_SPINCTRL15"));
 	SpinCtrlMovementB->SetValue(_T("10"));
 	StaticText25 = new wxStaticText(this, ID_STATICTEXT25, _("Move"), wxPoint(55,240), wxDefaultSize, 0, _T("ID_STATICTEXT25"));
-	StaticText26 = new wxStaticText(this, ID_STATICTEXT26, _("Offset Normal : "), wxPoint(424,392), wxDefaultSize, 0, _T("ID_STATICTEXT26"));
-	planeNormalOffset = new wxTextCtrl(this, ID_TEXTCTRL25, _("0.0"), wxPoint(536,388), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL25"));
+	StaticText26 = new wxStaticText(this, ID_STATICTEXT26, _("Offset Normal : "), wxPoint(424,456), wxDefaultSize, 0, _T("ID_STATICTEXT26"));
+	planeNormalOffset = new wxTextCtrl(this, ID_TEXTCTRL25, _("0.0"), wxPoint(536,452), wxSize(56,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL25"));
 	CheckBoxAutoPlaneSegmentation = new wxCheckBox(this, ID_CHECKBOX5, _("Auto"), wxPoint(568,288), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
 	CheckBoxAutoPlaneSegmentation->SetValue(false);
 	replaceR = new wxSpinCtrl(this, ID_SPINCTRL16, _T("0"), wxPoint(156,307), wxSize(56,27), 0, 0, 255, 0, _T("ID_SPINCTRL16"));
@@ -218,8 +226,16 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	replaceB->SetValue(_T("0"));
 	CheckBoxReplaceColor = new wxCheckBox(this, ID_CHECKBOX6, _("Replace Color"), wxPoint(24,308), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
 	CheckBoxReplaceColor->SetValue(false);
-	StaticText27 = new wxStaticText(this, ID_STATICTEXT27, _("Size"), wxPoint(608,392), wxDefaultSize, 0, _T("ID_STATICTEXT27"));
-	planeNormalSize = new wxTextCtrl(this, ID_TEXTCTRL26, _("0.0"), wxPoint(640,388), wxSize(40,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL26"));
+	StaticText27 = new wxStaticText(this, ID_STATICTEXT27, _("Size"), wxPoint(608,456), wxDefaultSize, 0, _T("ID_STATICTEXT27"));
+	planeNormalSize = new wxTextCtrl(this, ID_TEXTCTRL26, _("0.0"), wxPoint(640,450), wxSize(40,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL26"));
+	PlanePointX = new wxTextCtrl(this, ID_TEXTCTRL27, _("0.0"), wxPoint(496,392), wxSize(56,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL27"));
+	PlanePointY = new wxTextCtrl(this, ID_TEXTCTRL28, _("0.0"), wxPoint(560,392), wxSize(56,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL28"));
+	PlanePointZ = new wxTextCtrl(this, ID_TEXTCTRL29, _("0.0"), wxPoint(624,392), wxSize(56,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL29"));
+	StaticText28 = new wxStaticText(this, ID_STATICTEXT28, _("Point "), wxPoint(424,400), wxDefaultSize, 0, _T("ID_STATICTEXT28"));
+	NormalX = new wxTextCtrl(this, ID_TEXTCTRL30, _("0.0"), wxPoint(496,424), wxSize(56,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL30"));
+	NormalY = new wxTextCtrl(this, ID_TEXTCTRL31, _("0.0"), wxPoint(560,424), wxSize(56,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL31"));
+	NormalZ = new wxTextCtrl(this, ID_TEXTCTRL32, _("0.0"), wxPoint(624,424), wxSize(56,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL32"));
+	StaticText29 = new wxStaticText(this, ID_STATICTEXT29, _("Normal"), wxPoint(424,430), wxDefaultSize, 0, _T("ID_STATICTEXT29"));
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
@@ -268,6 +284,14 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[0]); planeP3X->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[1]); planeP3Y->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.p3[2]); planeP3Z->SetValue(val);
+
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.center[0]); PlanePointX->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.center[1]); PlanePointY->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.center[2]); PlanePointZ->SetValue(val);
+
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.normal[0]); NormalX->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.normal[1]); NormalY->SetValue(val);
+  val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.normal[2]); NormalZ->SetValue(val);
 
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.planeNormalOffset); planeNormalOffset->SetValue(val);
   val.Clear(); val.Printf(wxT("%0.2f"),selectedDepthConf.planeNormalSize);   planeNormalSize->SetValue(val);
@@ -353,6 +377,14 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
     if (this->planeP3X->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[0] = dValue; }
     if (this->planeP3Y->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[1] = dValue; }
     if (this->planeP3Z->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.p3[2] = dValue; }
+
+    if (this->PlanePointX->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.center[0] = dValue; }
+    if (this->PlanePointY->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.center[1] = dValue; }
+    if (this->PlanePointZ->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.center[2] = dValue; }
+
+    if (this->NormalX->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.normal[0] = dValue; }
+    if (this->NormalY->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.normal[1] = dValue; }
+    if (this->NormalZ->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.normal[2] = dValue; }
 
     if (this->planeNormalOffset->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.planeNormalOffset = dValue; }
     if (this->planeNormalSize->GetValue().ToDouble(&dValue))   {  this->selectedDepthConf.planeNormalSize = dValue; }

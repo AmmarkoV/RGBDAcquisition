@@ -287,6 +287,8 @@ if ( segConf->enablePlaneSegmentation )
     } else
     {
       crossProductFrom3Points( p1 , p2  , p3  , normal);
+      segConf->center[0]=pN[0]; segConf->center[1]=pN[1]; segConf->center[2]=pN[2];
+      segConf->normal[0]=normal[0]; segConf->normal[1]=normal[1]; segConf->normal[2]=normal[2];
     }
 
     fprintf(stderr,"Normal segmentation using point %f,%f,%f and normal %f,%f,%f\n",pN[0],pN[1],pN[2],normal[0],normal[1],normal[2]);

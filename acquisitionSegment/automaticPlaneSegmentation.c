@@ -11,10 +11,11 @@
 unsigned int minimumAcceptedDepths = 830;
 unsigned int maximumAcceptedDepths = 3000;
 
-#define NeighborhoodNormalCombos 6
+#define NeighborhoodNormalCombos 4
 #define ResultNormals 64
 #define MaxTriesPerPoint 100
 
+#define SINGLE_TEST 0
 
 unsigned int neighborhoodHalfWidth = 6;
 unsigned int neighborhoodHalfHeight = 6;
@@ -22,9 +23,7 @@ enum NEIGHBORHOOD_OF_POINTS
 {
    NH_TOPLEFT = 0 ,
    NH_TOPRIGHT ,
-   NH_MIDLEFT,
    NH_CENTER,
-   NH_MIDRIGHT,
    NH_BOTLEFT,
    NH_BOTRIGHT,
    //---------------
@@ -86,19 +85,17 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
    //---------------------------------------------------
    //        *0                                   *1
    //
-   //        *2        *3 Central Point *         *4
+   //                  *2 Central Point *
    //
-   //        *5                                   *6
+   //        *3                                   *4
    //---------------------------------------------------
    //        Calculated normals ( triangles will be )
-   //        0 , 2 , 3 -> Normal 0
-   //        0 , 3 , 1 -> Normal 1
-   //        1 , 3 , 4 -> Normal 2
-   //        2 , 5 , 3 -> Normal 3
-   //        3 , 6 , 4 -> Normal 4
-   //        3 , 5 , 6 -> Normal 5
+   //        0 , 2 , 1 -> Normal 0
+   //        0 , 3 , 2 -> Normal 1
+   //        2 , 3 , 4 -> Normal 2
+   //        1 , 2 , 4 -> Normal 3
    //---------------------------------------------------
-   unsigned int normalSeries[NeighborhoodNormalCombos][3] = { { 0, 2, 3 }, { 0, 3, 1 }, { 1, 3, 4 } , { 2, 5, 3 } , { 3, 6, 4 } , { 3, 5, 6 } };
+   unsigned int normalSeries[NeighborhoodNormalCombos][3] = { { 0, 2, 1 }, { 0, 3, 2 }, { 2, 3, 4 } , { 1, 2, 4 }  };
 
    struct TriplePoint neighbors[NH_TOTAL_NEIGHBORS]={0};
    struct normalArray neighborNormals[NeighborhoodNormalCombos]={0};
@@ -110,9 +107,6 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
    neighbors[NH_CENTER].coord[Y]=y;
    neighbors[NH_CENTER].coord[Z]=getDepthValue(source,neighbors[NH_CENTER].coord[X],neighbors[NH_CENTER].coord[Y],width);
 
-   point[0]=neighbors[NH_CENTER].coord[X];
-   point[1]=neighbors[NH_CENTER].coord[Y];
-   point[2]=neighbors[NH_CENTER].coord[Z];
 
    if ( (x>neighborhoodHalfWidth) && (y>neighborhoodHalfHeight) )
        { neighbors[NH_TOPLEFT].coord[X]=x-neighborhoodHalfWidth; neighbors[NH_TOPLEFT].coord[Y]=y-neighborhoodHalfHeight;
@@ -121,14 +115,6 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
    if ( (x+neighborhoodHalfWidth>width) && (y>neighborhoodHalfHeight) )
       { neighbors[NH_TOPRIGHT].coord[X]=x+neighborhoodHalfWidth; neighbors[NH_TOPRIGHT].coord[Y]=y-neighborhoodHalfHeight;
         neighbors[NH_TOPRIGHT].coord[Z]=getDepthValue(source,neighbors[NH_TOPRIGHT].coord[X],neighbors[NH_TOPRIGHT].coord[Y],width); }
-
-   if ( (x>neighborhoodHalfWidth) && (y>neighborhoodHalfHeight) )
-      { neighbors[NH_MIDLEFT].coord[X]=x-neighborhoodHalfWidth; neighbors[NH_MIDLEFT].coord[Y]=y;
-        neighbors[NH_MIDLEFT].coord[Z]=getDepthValue(source,neighbors[NH_MIDLEFT].coord[X],neighbors[NH_MIDLEFT].coord[Y],width); }
-
-   if ( (x+neighborhoodHalfWidth>width) && (y>neighborhoodHalfHeight) )
-      { neighbors[NH_MIDRIGHT].coord[X]=x+neighborhoodHalfWidth; neighbors[NH_MIDRIGHT].coord[Y]=y;
-        neighbors[NH_MIDRIGHT].coord[Z]=getDepthValue(source,neighbors[NH_MIDRIGHT].coord[X],neighbors[NH_MIDRIGHT].coord[Y],width); }
 
    if ( (x>neighborhoodHalfWidth) && (y+neighborhoodHalfHeight>height) )
        { neighbors[NH_BOTLEFT].coord[X]=x-neighborhoodHalfWidth; neighbors[NH_BOTLEFT].coord[Y]=y+neighborhoodHalfHeight;
@@ -145,6 +131,12 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
    unsigned int x2D,y2D,d3D;
    for (i=0; i<NH_TOTAL_NEIGHBORS; i++)
    {
+      if (
+           (neighbors[i].coord[X]!=0) ||
+           (neighbors[i].coord[Y]!=0) ||
+           (neighbors[i].coord[Z]!=0)
+         )
+        {
         x2D = (unsigned int) neighbors[i].coord[X];
         y2D = (unsigned int) neighbors[i].coord[Y];
         d3D = (unsigned int) neighbors[i].coord[Z];
@@ -158,9 +150,13 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
            {
                fprintf(stderr,"Could not calculate point %u for center %u,%u\n",i,x,y);
            }
+        }
    }
 
 
+   point[0]=neighbors[NH_CENTER].coord[X];
+   point[1]=neighbors[NH_CENTER].coord[Y];
+   point[2]=neighbors[NH_CENTER].coord[Z];
 
    //We have an array of normals ready , lets populate the normals now
    for (i=0; i<NeighborhoodNormalCombos; i++)
@@ -175,12 +171,14 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
             normalOK[i]=0;
           } else
           { //Find the normal
-            crossProductFrom3Points( neighbors[normalSeries[i][0]].coord ,
-                                     neighbors[normalSeries[i][1]].coord ,
-                                     neighbors[normalSeries[i][2]].coord ,
-                                     neighborNormals[i].normal);
-            //Mark the normal as found
-            normalOK[i]=1;
+                 crossProductFrom3Points( neighbors[normalSeries[i][0]].coord ,
+                                          neighbors[normalSeries[i][1]].coord ,
+                                          neighbors[normalSeries[i][2]].coord ,
+                                          neighborNormals[i].normal);
+
+               //Mark the normal as found
+               if ( ! pointAndNormalAreZero(point,neighborNormals[i].normal) ) {  normalOK[i]=1; }
+
           }
    }
 
@@ -191,22 +189,40 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
      if (normalOK[i])
      {
        ++samples;
+       #if SINGLE_TEST
+        normal[0]=neighborNormals[i].normal[0];
+        normal[1]=neighborNormals[i].normal[1];
+        normal[2]=neighborNormals[i].normal[2];
+        #else
        normal[0]+=neighborNormals[i].normal[0];
        normal[1]+=neighborNormals[i].normal[1];
        normal[2]+=neighborNormals[i].normal[2];
+       #endif // SINGLE_TEST
      }
    }
 
    if (samples>0)
    {
-     normal[0]/=samples;
-     normal[1]/=samples;
-     normal[2]/=samples;
 
-     if ( ! pointAndNormalAreZero(point,normal) )  { return 1; }
+     #if SINGLE_TEST
+
+     #else
+      normal[0]/=samples;
+      normal[1]/=samples;
+      normal[2]/=samples;
+     #endif // SINGLE_TEST
+
+     //
+
+     if ( ! pointAndNormalAreZero(point,normal) )
+        {
+          fprintf(stderr,"Should returned 0.02 -0.83 -0.56 , returned %f %f %f\n",normal[0],normal[1],normal[2]);
+
+          return 1;
+        }
    }
 
-   fprintf(stderr,"decideNormalAround3DPoint( %u , %u ) failed \n",x,y);
+   fprintf(stderr,"decideNormalAround3DPoint( %u , %u ) failed with normal %f %f %f \n",x,y,normal[0],normal[1],normal[2]);
    return 0;
 }
 
