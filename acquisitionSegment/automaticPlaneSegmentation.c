@@ -309,15 +309,13 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
             getNextRandomPoint(&qrc,&rX,&rY,&rZ);
            #else
             rX = (float) GET_RANDOM_DIM(width,neighborhoodHalfWidth);
-            rY = (float) GET_RANDOM_DIM(height,neighborhoodHalfHeight);
+            unsigned int halfHeight = (unsigned int ) height/2;
+            rY = (float) halfHeight + GET_RANDOM_DIM(halfHeight,neighborhoodHalfHeight);
           #endif // USE_QUASIRANDOM
 
-
-
-          if ( (0<=rX) && (rX<width) && (0<=rY) && (rY<height) )
-          {
            x=(unsigned int) rX%width;
            y=(unsigned int) rY%height;
+
            if ( (0<=x) && (x<width) && (0<=y) && (y<height) )
            {
             depth=source[MEMPLACE1(x,y,width)];
@@ -331,7 +329,6 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
                              }
                          }
            }
-          }
          }
 
         if ( pointORNormalAreZero(result[i].point.coord,result[i].normal) )
