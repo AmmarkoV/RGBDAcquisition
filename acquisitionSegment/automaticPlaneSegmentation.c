@@ -13,7 +13,7 @@ unsigned int maximumAcceptedDepths = 3000;
 
 #define NeighborhoodNormalCombos 6
 #define ResultNormals 100
-#define MaxTriesPerPoint 100
+#define MaxTriesPerPoint 10
 
 #define USE_QUASIRANDOM 1
 
@@ -129,7 +129,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
          neighbors2D[NH_TOPLEFT].coord[Y]=y-neighborhoodHalfHeight;
          neighbors2D[NH_TOPLEFT].coord[Z]=getDepthValue(source,neighbors2D[NH_TOPLEFT].coord[X],neighbors2D[NH_TOPLEFT].coord[Y],width);
        } else
-      {  fprintf(stderr,"Point TOPLEFT out of bounds %u,%u ( %u,%u ) ",x-neighborhoodHalfWidth,y-neighborhoodHalfHeight,width,height); }
+      {  /*fprintf(stderr,"Point TOPLEFT out of bounds %u,%u ( %u,%u ) ",x-neighborhoodHalfWidth,y-neighborhoodHalfHeight,width,height);*/ }
 
    if ( (x+neighborhoodHalfWidth<width) && (y>neighborhoodHalfHeight) )
       {
@@ -137,7 +137,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
         neighbors2D[NH_TOPRIGHT].coord[Y]=y-neighborhoodHalfHeight;
         neighbors2D[NH_TOPRIGHT].coord[Z]=getDepthValue(source,neighbors2D[NH_TOPRIGHT].coord[X],neighbors2D[NH_TOPRIGHT].coord[Y],width);
       } else
-      {  fprintf(stderr,"Point TOPRIGHT out of bounds %u,%u ( %u,%u ) ",x+neighborhoodHalfWidth,y-neighborhoodHalfHeight,width,height); }
+      {  /*fprintf(stderr,"Point TOPRIGHT out of bounds %u,%u ( %u,%u ) ",x+neighborhoodHalfWidth,y-neighborhoodHalfHeight,width,height);*/ }
 
    if ( (x>neighborhoodHalfWidth) && (y+neighborhoodHalfHeight<height) )
        {
@@ -145,7 +145,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
          neighbors2D[NH_BOTLEFT].coord[Y]=y+neighborhoodHalfHeight;
          neighbors2D[NH_BOTLEFT].coord[Z]=getDepthValue(source,neighbors2D[NH_BOTLEFT].coord[X],neighbors2D[NH_BOTLEFT].coord[Y],width);
        } else
-      {  fprintf(stderr,"Point BOTLEFT out of bounds %u,%u ( %u,%u ) ",x-neighborhoodHalfWidth,y+neighborhoodHalfHeight,width,height); }
+      {  /*fprintf(stderr,"Point BOTLEFT out of bounds %u,%u ( %u,%u ) ",x-neighborhoodHalfWidth,y+neighborhoodHalfHeight,width,height);*/ }
 
    if ( (x+neighborhoodHalfWidth<width) && (y+neighborhoodHalfHeight<height) )
       {
@@ -153,7 +153,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
         neighbors2D[NH_BOTRIGHT].coord[Y]=y+neighborhoodHalfHeight;
         neighbors2D[NH_BOTRIGHT].coord[Z]=getDepthValue(source,neighbors2D[NH_BOTRIGHT].coord[X],neighbors2D[NH_BOTRIGHT].coord[Y],width);
       } else
-      {  fprintf(stderr,"Point BOTRIGHT out of bounds %u,%u ( %u,%u ) ",x+neighborhoodHalfWidth,y+neighborhoodHalfHeight,width,height); }
+      {  /*fprintf(stderr,"Point BOTRIGHT out of bounds %u,%u ( %u,%u ) ",x+neighborhoodHalfWidth,y+neighborhoodHalfHeight,width,height);*/ }
 
 
 
@@ -298,6 +298,7 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
     unsigned int gotResult=0;
     unsigned int tries=0;
     unsigned int i=0;
+    unsigned int failedNormals=0;
     for (i=0; i<ResultNormals; i++)
     {
         tries=0; gotResult=0;
@@ -331,8 +332,18 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
          }
 
         if ( pointORNormalAreZero(result[i].point.coord,result[i].normal) )
-                         { fprintf(stderr,"Produced a zero normal after %u tries , wtf \n",tries); }
+                         {
+                          //fprintf(stderr,"Produced a zero normal after %u tries \n",tries);
+                          ++failedNormals;
+                         }
     } //We now have Populated result[i].normal and result[i].point
+
+    if (failedNormals>ResultNormals/2)
+    {
+      fprintf(stderr,"Too many depth holes , cannot get a good estimation of scene\n");
+      return 0;
+    }
+
 
     unsigned int z=0;
     float angle=0.0;
@@ -393,15 +404,36 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
    segConf->normal[2] = -1 * result[bestNormal].normal[2];
    fprintf(stderr,"Picked result %u with score %0.2f \n",bestNormal , bestScore);
 
+
+   //Second pass to ensure that it is the lowest point normal of its kind
+   float distance ;
+    bestScore = -100000;
+    for (i=0; i<ResultNormals; i++)
+    {
+      if ( !pointORNormalAreZero(result[i].point.coord,result[i].normal) )
+      {
+       distance = signedDistanceFromPlane(segConf->center ,segConf->normal ,  result[i].point.coord);
+       if   ( distance>bestScore )  //&& todo check orientation
+      {
+        fprintf(stderr,"Distance %f is better\n",distance);
+        bestNormal = i;
+        bestScore = resultScore[i];
+      }
+     }
+    }
+
+
+   segConf->center[0] = result[bestNormal].point.coord[0];
+   segConf->center[1] = result[bestNormal].point.coord[1];
+   segConf->center[2] = result[bestNormal].point.coord[2];
+   fprintf(stderr,"Picked result %u with score %0.2f , second round\n",bestNormal , bestScore);
+
+
+
 /* This is the "standard plane for an Xtion at around 1.2m tilted
-   segConf->center[0] = -669.38;
-   segConf->center[1] = 105.65;
-   segConf->center[2] = 1214.00;
-
-
-   segConf->normal[0] = -0.01;
-   segConf->normal[1] = -0.81;
-   segConf->normal[2] = -0.57;*/
+   segConf->center[0] = -669.38; segConf->center[1] = 105.65; segConf->center[2] = 1214.00;
+   segConf->normal[0] = -0.01; segConf->normal[1] = -0.81; segConf->normal[2] = -0.57;
+   */
 
    fprintf(stderr,"Best Points are \n 2D Point %u,%u 3D Point %0.2f %0.2f %0.2f \n normal %0.2f %0.2f %0.2f , offset %f \n" ,
                          result[bestNormal].originX,result[bestNormal].originY,

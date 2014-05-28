@@ -76,23 +76,6 @@ float magnitudeOfNormal(float p1[3])
   return 0.0;
 }
 
-float  angleOfNormalsOLD(float p1[3] , float p2[3])
-{
-   float mag1 =  magnitudeOfNormal(p1);
-   float mag2 =  magnitudeOfNormal(p2);
-
-   float denominator = mag1 * mag2;
-
-   if (denominator==0.0) {
-                           fprintf(stderr,"Error calculating angleOfNormals between (%f %f %f ) and (%f %f %f ) \n",p1[0],p1[1],p1[2],p2[0],p2[1],p2[2]);
-                           fprintf(stderr,"  ( magnitudes %f %f produce a zero denominator  )\n",mag1,mag2);
-                           return 0.0; }
-
-   float numerator = innerProduct(p1,p2);
-
-   float len = (float) numerator / denominator;
-   return len;
-}
 
 float  angleOfNormals(float p1[3] , float p2[3])
 {
@@ -102,9 +85,9 @@ float  angleOfNormals(float p1[3] , float p2[3])
    float denominator = mag1 * mag2;
 
    if (denominator==0.0) {
-                           fprintf(stderr,"Error calculating angleOfNormals between (%f %f %f ) and (%f %f %f ) \n",p1[0],p1[1],p1[2],p2[0],p2[1],p2[2]);
-                           fprintf(stderr,"  ( magnitudes %f %f produce a zero denominator  )\n",mag1,mag2);
-                           return 0.0; }
+                           //fprintf(stderr,"Error calculating angleOfNormals between (%f %f %f ) and (%f %f %f ) \n",p1[0],p1[1],p1[2],p2[0],p2[1],p2[2]);
+                           //fprintf(stderr,"  ( magnitudes %f %f produce a zero denominator  )\n",mag1,mag2);
+                           return NAN; }
 
    float numerator = innerProduct(p1,p2);
 
