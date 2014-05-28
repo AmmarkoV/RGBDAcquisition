@@ -251,11 +251,11 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
       normal[1]=(float) normal[1] / sampleF;
       normal[2]=(float) normal[2] / sampleF;
 
-      normal[1]=normal[1]+5.0f;
-
      if ( ! pointORNormalAreZero(point,normal) )
         {
           fprintf(stderr,"Averaged point %f %f %f  normal %f %f %f\n",point[0],point[1],point[2],normal[0],normal[1],normal[2]);
+           //point[1]=point[1]+5.0f;
+
           return 1;
         } else
         {

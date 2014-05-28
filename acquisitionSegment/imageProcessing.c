@@ -15,24 +15,23 @@ enum dimEnum
 
 
 
-float normalizeNormal(float * normal)
+int normalizeNormal(float * normal)
 {
- float tempLength;
- // normalize normal
- tempLength =(normal[DIMX]*normal[DIMX])+ (normal[DIMY]*normal[DIMY])+ (normal[DIMZ]*normal[DIMZ]);
+ float tempLength =(normal[DIMX]*normal[DIMX]) + (normal[DIMY]*normal[DIMY]) + (normal[DIMZ]*normal[DIMZ]);
 
  if (tempLength>0)
   {
    tempLength = sqrt(tempLength);
 
-   // prevent n/0
-   if (tempLength == 0) { tempLength = 1;}
-
    normal[DIMX] /= tempLength;
    normal[DIMY] /= tempLength;
    normal[DIMZ] /= tempLength;
+   return 1;
+  } else
+  {
+    fprintf(stderr,"Error normalizing normal ( %f , %f , %f ) \n",normal[0],normal[1],normal[2]);
   }
-
+ return 0;
 }
 
 
@@ -58,8 +57,9 @@ void crossProductFrom3Points(float p1[3] , float p2[3] , float p3[3]  , float * 
  normal[DIMZ] = temp_v1[DIMX]*temp_v2[DIMY] - temp_v1[DIMY]*temp_v2[DIMX];
 
 
- normalizeNormal(normal);
  // fprintf(stderr,"Cross Product is %0.2f %0.2f %0.2f \n",normal[0],normal[1],normal[2]);
+ normalizeNormal(normal);
+ // fprintf(stderr,"Cross Product Normalized is %0.2f %0.2f %0.2f \n",normal[0],normal[1],normal[2]);
 
 }
 
@@ -108,11 +108,7 @@ float  angleOfNormals(float p1[3] , float p2[3])
 
    float numerator = innerProduct(p1,p2);
 
-   float len = (float) numerator / denominator;
-
-
-
-   float result = acos(len) * 180.0 / PI;
+   float result = acos((float) numerator / denominator ) * 180.0 / PI;
    return result;
 }
 
