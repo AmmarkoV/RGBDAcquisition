@@ -277,17 +277,17 @@ if ( segConf->enablePlaneSegmentation )
     float p2[3]; p2[0]=(float) segConf->p2[0]; p2[1]=(float) segConf->p2[1]; p2[2]=(float) segConf->p2[2];
     float p3[3]; p3[0]=(float) segConf->p3[0]; p3[1]=(float) segConf->p3[1]; p3[2]=(float) segConf->p3[2];
 
-    float pN[3]={  p2[0] , p2[1]+5 , p2[2] };
+    float pN[3]={ 0 }; //This is the buffer for each point tested
     float normal[3]={0.0 , 0.0 , 0.0 };
 
     if (segConf->doNotGenerateNormalFrom3Points)
     { //We have our normals ready
-      pN[0]=segConf->center[0]; pN[1]=segConf->center[1];  pN[2]=segConf->center[2];
+      p2[0]=segConf->center[0]; p2[1]=segConf->center[1];  p2[2]=segConf->center[2];
       normal[0]=segConf->normal[0]; normal[1]=segConf->normal[1]; normal[2]=segConf->normal[2];
     } else
     {
       crossProductFrom3Points( p1 , p2  , p3  , normal);
-      segConf->center[0]=pN[0]; segConf->center[1]=pN[1]; segConf->center[2]=pN[2];
+      segConf->center[0]=p2[0]; segConf->center[1]=p2[1]; segConf->center[2]=p2[2];
       segConf->normal[0]=normal[0]; segConf->normal[1]=normal[1]; segConf->normal[2]=normal[2];
     }
 

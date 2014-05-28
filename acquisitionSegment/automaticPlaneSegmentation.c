@@ -17,8 +17,8 @@ unsigned int maximumAcceptedDepths = 3000;
 
 #define USE_QUASIRANDOM 0
 
-unsigned int neighborhoodHalfWidth = 5;
-unsigned int neighborhoodHalfHeight = 5;
+unsigned int neighborhoodHalfWidth = 8;
+unsigned int neighborhoodHalfHeight = 8;
 enum NEIGHBORHOOD_OF_POINTS
 {
    NH_TOPLEFT = 0 ,
@@ -212,7 +212,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
                fprintf(stderr,"Component ( %f , %f , %f ) \n",neighbors[normalSeries[i][0]].coord[X],neighbors[normalSeries[i][0]].coord[Y],neighbors[normalSeries[i][0]].coord[Z]);
                fprintf(stderr,"Component ( %f , %f , %f ) \n",neighbors[normalSeries[i][1]].coord[X],neighbors[normalSeries[i][1]].coord[Y],neighbors[normalSeries[i][1]].coord[Z]);
                fprintf(stderr,"Component ( %f , %f , %f ) \n",neighbors[normalSeries[i][2]].coord[X],neighbors[normalSeries[i][2]].coord[Y],neighbors[normalSeries[i][2]].coord[Z]);
-            normalOK[i]=0;
+               normalOK[i]=0;
           } else
           { //Find the normal
                  crossProductFrom3Points( neighbors[normalSeries[i][0]].coord ,
@@ -309,8 +309,9 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
             getNextRandomPoint(&qrc,&rX,&rY,&rZ);
            #else
             rX = (float) GET_RANDOM_DIM(width,neighborhoodHalfWidth);
-            unsigned int halfHeight = (unsigned int ) height/2;
-            rY = (float) halfHeight + GET_RANDOM_DIM(halfHeight,neighborhoodHalfHeight);
+            rY = (float) GET_RANDOM_DIM(height,neighborhoodHalfHeight);
+            //unsigned int halfHeight = (unsigned int ) height/2;
+            //rY = (float) halfHeight + GET_RANDOM_DIM(halfHeight,neighborhoodHalfHeight);
           #endif // USE_QUASIRANDOM
 
            x=(unsigned int) rX%width;
@@ -388,14 +389,21 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
    segConf->center[1] = result[bestNormal].point.coord[1];
    segConf->center[2] = result[bestNormal].point.coord[2];
 
-   segConf->normal[0] = result[bestNormal].normal[0];
-   segConf->normal[1] = result[bestNormal].normal[1];
-   segConf->normal[2] = result[bestNormal].normal[2];
+   segConf->normal[0] = -1 * result[bestNormal].normal[0];
+   segConf->normal[1] = -1 * result[bestNormal].normal[1];
+   segConf->normal[2] = -1 * result[bestNormal].normal[2];
    fprintf(stderr,"Picked result %u with score %0.2f \n",bestNormal , bestScore);
 
+   segConf->center[0] = -669.38;
+   segConf->center[1] = 105.65;
+   segConf->center[2] = 1214.00;
 
 
-   fprintf(stderr,"Best Points are \n point %u,%u , %0.2f %0.2f %0.2f \n normal %0.2f %0.2f %0.2f , offset %f \n" ,
+   segConf->normal[0] = -0.01;
+   segConf->normal[1] = -0.81;
+   segConf->normal[2] = -0.57;
+
+   fprintf(stderr,"Best Points are \n 2D Point %u,%u 3D Point %0.2f %0.2f %0.2f \n normal %0.2f %0.2f %0.2f , offset %f \n" ,
                          result[bestNormal].originX,result[bestNormal].originY,
                          result[bestNormal].point.coord[0] ,  result[bestNormal].point.coord[1] ,  result[bestNormal].point.coord[2] ,
                          result[bestNormal].normal[0] ,  result[bestNormal].normal[1] ,  result[bestNormal].normal[2]

@@ -5,7 +5,7 @@
 		<object class="wxStaticBox" name="ID_STATICBOX2" variable="StaticBox2" member="yes">
 			<label>Depth</label>
 			<pos>376,16</pos>
-			<size>352,496</size>
+			<size>328,496</size>
 		</object>
 		<object class="wxButton" name="ID_BUTTON1" variable="ButtonCancel" member="yes">
 			<label>Cancel</label>
@@ -380,7 +380,7 @@
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX5" variable="CheckBoxAutoPlaneSegmentation" member="yes">
 			<label>Auto</label>
-			<pos>568,288</pos>
+			<pos>560,288</pos>
 		</object>
 		<object class="wxSpinCtrl" name="ID_SPINCTRL16" variable="replaceR" member="yes">
 			<value>0</value>
@@ -450,6 +450,10 @@
 		<object class="wxStaticText" name="ID_STATICTEXT29" variable="StaticText29" member="yes">
 			<label>Normal</label>
 			<pos>424,430</pos>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX7" variable="CheckBoxAutoPlane3Point" member="yes">
+			<label>3 Point</label>
+			<pos>624,288</pos>
 		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>
