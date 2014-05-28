@@ -12,9 +12,10 @@ unsigned int minimumAcceptedDepths = 830;
 unsigned int maximumAcceptedDepths = 3000;
 
 #define NeighborhoodNormalCombos 6
-#define ResultNormals 32
+#define ResultNormals 128
 #define MaxTriesPerPoint 100
 
+#define USE_QUASIRANDOM 0
 
 unsigned int neighborhoodHalfWidth = 5;
 unsigned int neighborhoodHalfHeight = 5;
@@ -39,6 +40,12 @@ enum pShorthand
 struct TriplePoint
 {
  float coord[3];
+};
+
+
+struct Triple2DPoint
+{
+ unsigned int coord[3];
 };
 
 struct normalArray
@@ -103,75 +110,86 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
 
    unsigned int i=0;
    struct TriplePoint neighbors[NH_TOTAL_NEIGHBORS]={0};
+   struct Triple2DPoint neighbors2D[NH_TOTAL_NEIGHBORS]={0};
    struct normalArray neighborNormals[NeighborhoodNormalCombos]={0};
    unsigned int normalOK[NeighborhoodNormalCombos]={0};
 
 
    //The central point is of course the one we have !
-   neighbors[NH_CENTER].coord[X]=x;
-   neighbors[NH_CENTER].coord[Y]=y;
-   neighbors[NH_CENTER].coord[Z]=getDepthValue(source,neighbors[NH_CENTER].coord[X],neighbors[NH_CENTER].coord[Y],width);
+   neighbors2D[NH_CENTER].coord[X]=x;
+   neighbors2D[NH_CENTER].coord[Y]=y;
+   neighbors2D[NH_CENTER].coord[Z]=getDepthValue(source,neighbors2D[NH_CENTER].coord[X],neighbors2D[NH_CENTER].coord[Y],width);
 
-   fprintf(stderr,"Center point is %f , %f , %f \n",neighbors[NH_CENTER].coord[X],neighbors[NH_CENTER].coord[Y],neighbors[NH_CENTER].coord[Z]);
+   fprintf(stderr,"Center point is %u , %u , %u \n",neighbors2D[NH_CENTER].coord[X],neighbors2D[NH_CENTER].coord[Y],neighbors2D[NH_CENTER].coord[Z]);
 
 
    if ( (x>neighborhoodHalfWidth) && (y>neighborhoodHalfHeight) )
        {
-         neighbors[NH_TOPLEFT].coord[X]=x-neighborhoodHalfWidth;
-         neighbors[NH_TOPLEFT].coord[Y]=y-neighborhoodHalfHeight;
-         neighbors[NH_TOPLEFT].coord[Z]=getDepthValue(source,neighbors[NH_TOPLEFT].coord[X],neighbors[NH_TOPLEFT].coord[Y],width);
+         neighbors2D[NH_TOPLEFT].coord[X]=x-neighborhoodHalfWidth;
+         neighbors2D[NH_TOPLEFT].coord[Y]=y-neighborhoodHalfHeight;
+         neighbors2D[NH_TOPLEFT].coord[Z]=getDepthValue(source,neighbors2D[NH_TOPLEFT].coord[X],neighbors2D[NH_TOPLEFT].coord[Y],width);
        } else
       {  fprintf(stderr,"Point TOPLEFT out of bounds %u,%u ( %u,%u ) ",x-neighborhoodHalfWidth,y-neighborhoodHalfHeight,width,height); }
 
    if ( (x+neighborhoodHalfWidth<width) && (y>neighborhoodHalfHeight) )
       {
-        neighbors[NH_TOPRIGHT].coord[X]=x+neighborhoodHalfWidth;
-        neighbors[NH_TOPRIGHT].coord[Y]=y-neighborhoodHalfHeight;
-        neighbors[NH_TOPRIGHT].coord[Z]=getDepthValue(source,neighbors[NH_TOPRIGHT].coord[X],neighbors[NH_TOPRIGHT].coord[Y],width);
+        neighbors2D[NH_TOPRIGHT].coord[X]=x+neighborhoodHalfWidth;
+        neighbors2D[NH_TOPRIGHT].coord[Y]=y-neighborhoodHalfHeight;
+        neighbors2D[NH_TOPRIGHT].coord[Z]=getDepthValue(source,neighbors2D[NH_TOPRIGHT].coord[X],neighbors2D[NH_TOPRIGHT].coord[Y],width);
       } else
       {  fprintf(stderr,"Point TOPRIGHT out of bounds %u,%u ( %u,%u ) ",x+neighborhoodHalfWidth,y-neighborhoodHalfHeight,width,height); }
 
    if ( (x>neighborhoodHalfWidth) && (y+neighborhoodHalfHeight<height) )
        {
-         neighbors[NH_BOTLEFT].coord[X]=x-neighborhoodHalfWidth;
-         neighbors[NH_BOTLEFT].coord[Y]=y+neighborhoodHalfHeight;
-         neighbors[NH_BOTLEFT].coord[Z]=getDepthValue(source,neighbors[NH_BOTLEFT].coord[X],neighbors[NH_BOTLEFT].coord[Y],width);
+         neighbors2D[NH_BOTLEFT].coord[X]=x-neighborhoodHalfWidth;
+         neighbors2D[NH_BOTLEFT].coord[Y]=y+neighborhoodHalfHeight;
+         neighbors2D[NH_BOTLEFT].coord[Z]=getDepthValue(source,neighbors2D[NH_BOTLEFT].coord[X],neighbors2D[NH_BOTLEFT].coord[Y],width);
        } else
       {  fprintf(stderr,"Point BOTLEFT out of bounds %u,%u ( %u,%u ) ",x-neighborhoodHalfWidth,y+neighborhoodHalfHeight,width,height); }
 
    if ( (x+neighborhoodHalfWidth<width) && (y+neighborhoodHalfHeight<height) )
       {
-        neighbors[NH_BOTRIGHT].coord[X]=x+neighborhoodHalfWidth;
-        neighbors[NH_BOTRIGHT].coord[Y]=y+neighborhoodHalfHeight;
-        neighbors[NH_BOTRIGHT].coord[Z]=getDepthValue(source,neighbors[NH_BOTRIGHT].coord[X],neighbors[NH_BOTRIGHT].coord[Y],width);
+        neighbors2D[NH_BOTRIGHT].coord[X]=x+neighborhoodHalfWidth;
+        neighbors2D[NH_BOTRIGHT].coord[Y]=y+neighborhoodHalfHeight;
+        neighbors2D[NH_BOTRIGHT].coord[Z]=getDepthValue(source,neighbors2D[NH_BOTRIGHT].coord[X],neighbors2D[NH_BOTRIGHT].coord[Y],width);
       } else
       {  fprintf(stderr,"Point BOTRIGHT out of bounds %u,%u ( %u,%u ) ",x+neighborhoodHalfWidth,y+neighborhoodHalfHeight,width,height); }
 
 
 
    //Project Points to get real 3D coordinates
-   unsigned int x2D,y2D,d3D;
    for (i=0; i<NH_TOTAL_NEIGHBORS; i++)
    {
       if (
-           (neighbors[i].coord[X]!=0) ||
-           (neighbors[i].coord[Y]!=0) ||
-           (neighbors[i].coord[Z]!=0)
+           (neighbors2D[i].coord[X]!=0) ||
+           (neighbors2D[i].coord[Y]!=0) ||
+           (neighbors2D[i].coord[Z]!=0)
          )
         {
-        x2D = (unsigned int) neighbors[i].coord[X];
-        y2D = (unsigned int) neighbors[i].coord[Y];
-        d3D = (unsigned int) neighbors[i].coord[Z];
-
-        if (! transform2DProjectedPointTo3DPoint( calib , x2D , y2D  , d3D ,
+        if ( transform2DProjectedPointTo3DPoint( calib ,
+                                                  //Input Unsigned int 2D and Depth
+                                                  neighbors2D[i].coord[X] ,
+                                                  neighbors2D[i].coord[Y] ,
+                                                  neighbors2D[i].coord[Z] ,
+                                                  //Output 3D Float
                                                   &neighbors[i].coord[X] ,
                                                   &neighbors[i].coord[Y] ,
                                                   &neighbors[i].coord[Z]
                                                  )
            )
            {
-               fprintf(stderr,"Could not calculate point %u for center %u,%u\n",i,x,y);
+            if (calib->extrinsicParametersSet)
+              {
+                 transform3DPointUsingCalibration(&calib ,
+                                                  &neighbors[i].coord[X] ,
+                                                  &neighbors[i].coord[Y] ,
+                                                  &neighbors[i].coord[Z]);
+              }
+           } else
+           {
+             fprintf(stderr,"Calibration error , could not transform 2D point and depth to 3D point\n");
            }
+
         }
    }
 
@@ -225,7 +243,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
      }
    }
 
-     fprintf(stderr," Total normal %f %f %f %u samples \n",normal[0],normal[1],normal[2],samples);
+   fprintf(stderr," Total normal %f %f %f %u samples \n",normal[0],normal[1],normal[2],samples);
    if (samples>0)
    {
       float sampleF = (float) samples+0.0f;
@@ -237,12 +255,11 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
 
      if ( ! pointORNormalAreZero(point,normal) )
         {
-          fprintf(stderr,"Averaged %f %f %f\n",normal[0],normal[1],normal[2]);
+          fprintf(stderr,"Averaged point %f %f %f  normal %f %f %f\n",point[0],point[1],point[2],normal[0],normal[1],normal[2]);
           return 1;
         } else
         {
          fprintf(stderr," point %f %f %f  OR normal %f %f %f Are Zero! \n",point[0],point[1],point[2],normal[0],normal[1],normal[2]);
-
         }
    } else
    {
@@ -287,7 +304,15 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
          while ( (!gotResult)  && (tries<MaxTriesPerPoint)  )
          {
           ++tries;
-          getNextRandomPoint(&qrc,&rX,&rY,&rZ);
+
+          #if USE_QUASIRANDOM
+            getNextRandomPoint(&qrc,&rX,&rY,&rZ);
+           #else
+            rX = (float) GET_RANDOM_DIM(width,neighborhoodHalfWidth);
+            rY = (float) GET_RANDOM_DIM(height,neighborhoodHalfHeight);
+          #endif // USE_QUASIRANDOM
+
+
 
           if ( (0<=rX) && (rX<width) && (0<=rY) && (rY<height) )
           {
