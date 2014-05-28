@@ -8,16 +8,19 @@ unsigned long  ulrandom()
    return ((unsigned long)rand() << 32) | (unsigned long)rand();
 }
 
-int initializeQuasirandomnessContext(struct quasiRandomizerContext * qrc,unsigned int width , unsigned int height , unsigned int depth)
+int initializeQuasirandomnessContext(struct quasiRandomizerContext * qrc,unsigned int width , unsigned int height , unsigned int depth,int randomSeed)
 {
   srand(time());
   memset(qrc,sizeof(struct quasiRandomizerContext),0);
   qrc->width=width;
   qrc->height=height;
   qrc->depth=depth;
-  qrc->m_Base2=ulrandom();
-  qrc->m_Base3=ulrandom();
-  qrc->m_Base5=ulrandom();
+  if (randomSeed)
+  {
+   qrc->m_Base2=ulrandom();
+   qrc->m_Base3=ulrandom();
+   qrc->m_Base5=ulrandom();
+  }
 
   return 1;
 }

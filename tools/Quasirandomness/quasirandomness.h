@@ -12,7 +12,7 @@ struct quasiRandomizerContext
 
 };
 
-int initializeQuasirandomnessContext(struct quasiRandomizerContext * qrc,unsigned int width , unsigned int height , unsigned int depth);
+int initializeQuasirandomnessContext(struct quasiRandomizerContext * qrc,unsigned int width , unsigned int height , unsigned int depth,int randomSeed);
 int getNextRandomPoint(struct quasiRandomizerContext * qrc , float * x, float * y , float * z);
 
 #endif // QUASIRANDOMNESS_H_INCLUDED

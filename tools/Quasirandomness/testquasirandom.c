@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
   struct quasiRandomizerContext qrc;
-  initializeQuasirandomnessContext(&qrc,640,640,640);
+  initializeQuasirandomnessContext(&qrc,640,640,640,1);
   
   FILE *fp = 0;
   fp = fopen("quasi.dat","w");

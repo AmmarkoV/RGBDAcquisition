@@ -12,10 +12,10 @@ unsigned int minimumAcceptedDepths = 830;
 unsigned int maximumAcceptedDepths = 3000;
 
 #define NeighborhoodNormalCombos 6
-#define ResultNormals 128
+#define ResultNormals 100
 #define MaxTriesPerPoint 100
 
-#define USE_QUASIRANDOM 0
+#define USE_QUASIRANDOM 1
 
 unsigned int neighborhoodHalfWidth = 8;
 unsigned int neighborhoodHalfHeight = 8;
@@ -120,7 +120,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
    neighbors2D[NH_CENTER].coord[Y]=y;
    neighbors2D[NH_CENTER].coord[Z]=getDepthValue(source,neighbors2D[NH_CENTER].coord[X],neighbors2D[NH_CENTER].coord[Y],width);
 
-   fprintf(stderr,"Center point is %u , %u , %u \n",neighbors2D[NH_CENTER].coord[X],neighbors2D[NH_CENTER].coord[Y],neighbors2D[NH_CENTER].coord[Z]);
+   //fprintf(stderr,"Center point is %u , %u , %u \n",neighbors2D[NH_CENTER].coord[X],neighbors2D[NH_CENTER].coord[Y],neighbors2D[NH_CENTER].coord[Z]);
 
 
    if ( (x>neighborhoodHalfWidth) && (y>neighborhoodHalfHeight) )
@@ -208,10 +208,12 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
          )
           {
             //There is a zero depth  , we dont consider this neighborhood
+            /*
                fprintf(stderr,"Neighborhood %u  Has a Zero ( %u , %u , %u ) \n",i,normalSeries[i][0],normalSeries[i][1],normalSeries[i][2]);
                fprintf(stderr,"Component ( %f , %f , %f ) \n",neighbors[normalSeries[i][0]].coord[X],neighbors[normalSeries[i][0]].coord[Y],neighbors[normalSeries[i][0]].coord[Z]);
                fprintf(stderr,"Component ( %f , %f , %f ) \n",neighbors[normalSeries[i][1]].coord[X],neighbors[normalSeries[i][1]].coord[Y],neighbors[normalSeries[i][1]].coord[Z]);
                fprintf(stderr,"Component ( %f , %f , %f ) \n",neighbors[normalSeries[i][2]].coord[X],neighbors[normalSeries[i][2]].coord[Y],neighbors[normalSeries[i][2]].coord[Z]);
+            */
                normalOK[i]=0;
           } else
           { //Find the normal
@@ -220,8 +222,8 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
                                           neighbors[normalSeries[i][2]].coord ,
                                           neighborNormals[i].normal);
 
-               fprintf(stderr,"Neighborhood %u ( %u , %u , %u ) ",i,normalSeries[i][0],normalSeries[i][1],normalSeries[i][2]);
-               fprintf(stderr,"Produced ( %f , %f , %f )\n",neighborNormals[i].normal[0],neighborNormals[i].normal[1],neighborNormals[i].normal[2]);
+               //fprintf(stderr,"Neighborhood %u ( %u , %u , %u ) ",i,normalSeries[i][0],normalSeries[i][1],normalSeries[i][2]);
+               //fprintf(stderr,"Produced ( %f , %f , %f )\n",neighborNormals[i].normal[0],neighborNormals[i].normal[1],neighborNormals[i].normal[2]);
                //Mark the normal as found
                if ( ! pointORNormalAreZero(point,neighborNormals[i].normal) ) {  normalOK[i]=1; }
 
@@ -243,7 +245,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
      }
    }
 
-   fprintf(stderr," Total normal %f %f %f %u samples \n",normal[0],normal[1],normal[2],samples);
+   //fprintf(stderr," Total normal %f %f %f %u samples \n",normal[0],normal[1],normal[2],samples);
    if (samples>0)
    {
       float sampleF = (float) samples+0.0f;
@@ -253,9 +255,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
 
      if ( ! pointORNormalAreZero(point,normal) )
         {
-          fprintf(stderr,"Averaged point %f %f %f  normal %f %f %f\n",point[0],point[1],point[2],normal[0],normal[1],normal[2]);
-           //point[1]=point[1]+5.0f;
-
+          //fprintf(stderr,"Averaged point %f %f %f  normal %f %f %f\n",point[0],point[1],point[2],normal[0],normal[1],normal[2]);
           return 1;
         } else
         {
@@ -292,7 +292,7 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
     legend.coord[X]=0.016560; legend.coord[Y]=-0.826509; legend.coord[Z]=-0.562679;
 
     struct quasiRandomizerContext qrc;
-    initializeQuasirandomnessContext(&qrc,width,height,0);
+    initializeQuasirandomnessContext(&qrc,width,height,0,0);
     float rX,rY,rZ;
 
     unsigned int gotResult=0;
@@ -310,8 +310,6 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
            #else
             rX = (float) GET_RANDOM_DIM(width,neighborhoodHalfWidth);
             rY = (float) GET_RANDOM_DIM(height,neighborhoodHalfHeight);
-            //unsigned int halfHeight = (unsigned int ) height/2;
-            //rY = (float) halfHeight + GET_RANDOM_DIM(halfHeight,neighborhoodHalfHeight);
           #endif // USE_QUASIRANDOM
 
            x=(unsigned int) rX%width;
@@ -354,13 +352,14 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
       angle=angleOfNormals(result[i].normal,legend.coord);
       if (angle<0.0) { angle=-1 * angle; }
       resultScore[i]+=angle;
+      /*
       fprintf(stderr,"Point 2D %u (%u,%u) - 3D (%f,%f,%f) - Normal (%f,%f,%f) - score %f\n",i,
                                                                                       result[i].originX,result[i].originY,
                                                                                       result[i].point.coord[0],result[i].point.coord[1],result[i].point.coord[2],
                                                                                       result[i].normal[0], result[i].normal[1], result[i].normal[2] , resultScore[i] );
+       */
     }
 
-//Normal segmentation using point 24.677238,256.603088,1019.000000 and normal 0.022093,-0.833547,-0.552007
 
     float MAX_SCORE = 121230.0;
     float bestScore = MAX_SCORE;
@@ -394,6 +393,7 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
    segConf->normal[2] = -1 * result[bestNormal].normal[2];
    fprintf(stderr,"Picked result %u with score %0.2f \n",bestNormal , bestScore);
 
+/* This is the "standard plane for an Xtion at around 1.2m tilted
    segConf->center[0] = -669.38;
    segConf->center[1] = 105.65;
    segConf->center[2] = 1214.00;
@@ -401,7 +401,7 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
 
    segConf->normal[0] = -0.01;
    segConf->normal[1] = -0.81;
-   segConf->normal[2] = -0.57;
+   segConf->normal[2] = -0.57;*/
 
    fprintf(stderr,"Best Points are \n 2D Point %u,%u 3D Point %0.2f %0.2f %0.2f \n normal %0.2f %0.2f %0.2f , offset %f \n" ,
                          result[bestNormal].originX,result[bestNormal].originY,
@@ -410,7 +410,7 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
                          ,offset
          );
 
-   fprintf(stderr,"Automatic shutdown of automatic plane segmentation so it does not feed on itself on the next frame\n");
-   segConf->autoPlaneSegmentation=0;
+   //fprintf(stderr,"Automatic shutdown of automatic plane segmentation so it does not feed on itself on the next frame\n");
+   //segConf->autoPlaneSegmentation=0;
   return 1;
 }
