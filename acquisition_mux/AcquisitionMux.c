@@ -62,102 +62,6 @@ int saveMuxImageToFile(char * filename,unsigned char * pixels , unsigned int wid
 }
 
 
-
-
-
-/*
-
-int mux2RGBAndDepthFramesNonZeroDepth( unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut , unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
-                                       signed int shiftX,signed int shiftY,
-                                       unsigned int width , unsigned int height , unsigned int rgbTransparency , unsigned int mux_type)
-{
-
-   if ( (shiftX!=0) || (shiftY!=0) )
-   {
-     shiftImageRGB(rgbOverlay,rgbOverlay,shiftX,shiftY,width,height);
-     shiftImageDepth(depthOverlay,depthOverlay,shiftX,shiftY,width,height);
-   }
-
-
-   unsigned char * rgb_pBase = rgbBase;
-   unsigned char * rgb_pOverlay = rgbOverlay;
-   unsigned char * rgb_pOut = rgbOut; unsigned char * rgb_pOut_limit=rgb_pOut + width * height * 3;
-
-   unsigned short * depth_pBase = depthBase;
-   unsigned short * depth_pOverlay = depthOverlay;
-   unsigned short * depth_pOut = depthOut; unsigned short * depth_pOut_limit=rgb_pOut + width * height * 2;
-
-   unsigned int TookBaseloops=0;
-   unsigned int loops=0;
-
-   float transparencyOverlayFactor = (float) rgbTransparency / 100;
-   float transparencyBaseFactor = (float) (100-rgbTransparency) / 100;
-
-   while (rgb_pOut<rgb_pOut_limit)
-    {
-        if (depthOverlay[loops]==0)
-         {
-           //Overlay has a zero depth on this pixel! that means we will completely discard it and go along with our base
-           *rgb_pOut = *rgb_pBase;  ++rgb_pOut; ++rgb_pBase;
-           *rgb_pOut = *rgb_pBase;  ++rgb_pOut; ++rgb_pBase;
-           *rgb_pOut = *rgb_pBase;  ++rgb_pOut; ++rgb_pBase;
-            //RGB Overlay bytes are just ignored
-            rgb_pOverlay+=3;
-
-
-           *depth_pOut = *depth_pBase;
-            ++depth_pOut; ++depth_pBase;
-            //DEPTH overlay bytes are also just ignored
-            ++depth_pOverlay;
-
-            ++TookBaseloops;
-         } else
-         {
-           if (rgbTransparency!=0)
-           {
-           unsigned int rValue =  (*rgb_pOverlay * transparencyOverlayFactor) +  (*rgb_pBase * transparencyBaseFactor ); rgb_pOverlay++; rgb_pBase++;
-           unsigned int gValue =  (*rgb_pOverlay * transparencyOverlayFactor) +  (*rgb_pBase * transparencyBaseFactor ); rgb_pOverlay++; rgb_pBase++;
-           unsigned int bValue =  (*rgb_pOverlay * transparencyOverlayFactor) +  (*rgb_pBase * transparencyBaseFactor ); rgb_pOverlay++; rgb_pBase++;
-
-           unsigned char rValueCast = 0 + (unsigned char) rValue;
-           unsigned char gValueCast = 0 + (unsigned char) gValue;
-           unsigned char bValueCast = 0 + (unsigned char) bValue;
-
-           *rgb_pOut = (unsigned char) rValueCast;  ++rgb_pOut;
-           *rgb_pOut = (unsigned char) gValueCast;  ++rgb_pOut;
-           *rgb_pOut = (unsigned char) bValueCast;  ++rgb_pOut;
-           } else
-          {
-            //Overlay has a non zero value so we "augment it" ignoring Base
-           *rgb_pOut = *rgb_pOverlay;  ++rgb_pOut; ++rgb_pOverlay;
-           *rgb_pOut = *rgb_pOverlay;  ++rgb_pOut; ++rgb_pOverlay;
-           *rgb_pOut = *rgb_pOverlay;  ++rgb_pOut; ++rgb_pOverlay;
-            //RGB Base is just ignored
-            rgb_pBase+=3;
-          }
-
-
-           *depth_pOut = *depth_pBase + *depth_pOverlay;
-            ++depth_pOut;  ++depth_pOverlay;
-            //DEPTH base bytes are also just ignored
-            ++depth_pBase;
-         }
-       ++loops;
-    }
-
-
-    fprintf(stderr,"Total of %u pixels ( base are %u , %0.2f %% ) \n",loops,TookBaseloops,(double) TookBaseloops*100/loops);
-
-    return 1;
-}
-
-*/
-
-
-
-
-
-
 int mux2RGBAndDepthFramesColorNonTrans( unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                                    unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
                                    unsigned char transR, unsigned char transG, unsigned char transB ,
@@ -312,12 +216,6 @@ int mux2RGBAndDepthFramesBasedOnDepth( unsigned char * rgbBase, unsigned char * 
 
     return 1;
 }
-
-
-
-
-
-
 
 
 int mux2RGBAndDepthFrames(

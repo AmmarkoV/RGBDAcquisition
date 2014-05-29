@@ -61,12 +61,12 @@
 		</object>
 		<object class="wxButton" name="ID_BUTTON5" variable="ButtonSegmentation" member="yes">
 			<label>Segmentation</label>
-			<pos>1192,520</pos>
+			<pos>1000,520</pos>
 			<handler function="OnButtonSegmentationClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON6" variable="ButtonCalibration" member="yes">
 			<label>Calibration</label>
-			<pos>952,520</pos>
+			<pos>760,520</pos>
 			<handler function="OnButtonCalibrationClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON7" variable="buttonRecord" member="yes">
@@ -76,7 +76,7 @@
 		</object>
 		<object class="wxButton" name="ID_BUTTON8" variable="ButtonAcquisitionGraph" member="yes">
 			<label>Stream Connections</label>
-			<pos>1040,520</pos>
+			<pos>848,520</pos>
 			<handler function="OnButtonAcquisitionGraphClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxListCtrl" name="ID_LISTCTRL1" variable="ListCtrlPoints" member="yes">
@@ -113,7 +113,7 @@
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxOverlay" member="yes">
 			<label>Overlay Active</label>
-			<pos>1320,520</pos>
+			<pos>1152,520</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrlDirectCommand" member="yes">
 			<pos>1320,228</pos>
@@ -125,6 +125,10 @@
 			<pos>1440,228</pos>
 			<size>29,29</size>
 			<handler function="OnButtonSendDirectCommandClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX2" variable="CheckBoxOverlayDepth" member="yes">
+			<label>Overlay Respect Depth</label>
+			<pos>1288,520</pos>
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">

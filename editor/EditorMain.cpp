@@ -783,7 +783,7 @@ int  EditorFrame::refreshAllOverlays()
 
          overlayRGB = acquisitionGetColorFrame(overlayModule,overlayDevice);
          if (muxMode==DEPTH_MUXING) { overlayDepth = acquisitionGetDepthFrame(overlayModule,overlayDevice); } else
-                                    { overlayDepth = 0; } //COLOR MUXING IGNORES OVERLAY , so we can get away passing a null there
+                                    { overlayDepth = 0; } //COLOR MUXING IGNORES DEPTH OVERLAY , so we can get away passing a null there
 
          mux2RGBAndDepthFrames(
                                 rgbFrame    , overlayRGB , rgbOut ,
