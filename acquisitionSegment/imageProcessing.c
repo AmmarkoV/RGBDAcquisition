@@ -35,7 +35,7 @@ int normalizeNormal(float * normal)
 }
 
 
-void crossProductFrom3Points(float p1[3] , float p2[3] , float p3[3]  , float * normal)
+void crossProductFrom3Points(float * p1 , float * p2 , float * p3  , float * normal)
 {
  // fprintf(stderr,"Point 1 %0.5f %0.5f %0.5f \n",p1[0],p1[1],p1[2]);
  // fprintf(stderr,"Point 2 %0.5f %0.5f %0.5f \n",p2[0],p2[1],p2[2]);
@@ -63,7 +63,7 @@ void crossProductFrom3Points(float p1[3] , float p2[3] , float p3[3]  , float * 
 
 }
 
-float magnitudeOfNormal(float p1[3])
+float magnitudeOfNormal(float * p1)
 {
   float tmp = ((float) p1[0]*p1[0]) + ((float)p1[1]*p1[1]) + ((float)p1[2]*p1[2]);
 
@@ -77,7 +77,7 @@ float magnitudeOfNormal(float p1[3])
 }
 
 
-float  angleOfNormals(float p1[3] , float p2[3])
+float  angleOfNormals(float * p1 , float * p2)
 {
    float mag1 =  magnitudeOfNormal(p1);
    float mag2 =  magnitudeOfNormal(p2);
@@ -96,7 +96,7 @@ float  angleOfNormals(float p1[3] , float p2[3])
 }
 
 
-float  distance3D(float p1[3] , float p2[3] , float p3[3])
+float  distance3D(float * p1 , float * p2 , float * p3)
 {
    float vect_x = p1[DIMX] - p2[DIMX];
    float vect_y = p1[DIMY] - p2[DIMY];
@@ -109,13 +109,13 @@ float  distance3D(float p1[3] , float p2[3] , float p3[3])
 }
 
 
-float dotProduct(float p1[3] , float p2[3] )
+float dotProduct(float * p1 , float * p2 )
 {
-    return p1[DIMX]*p2[DIMX] + p1[DIMY]*p2[DIMY] + p1[DIMZ]*p2[DIMZ];
+    return (float) ( p1[DIMX]*p2[DIMX] + p1[DIMY]*p2[DIMY] + p1[DIMZ]*p2[DIMZ] );
 }
 
 
-float  signedDistanceFromPlane(float origin[3] , float normal[3] , float pN[3])
+float  signedDistanceFromPlane(float * origin , float * normal , float * pN)
 {
   float tempV[NUMBER_OF_DIMENSIONS];
   int i=0;
@@ -123,7 +123,6 @@ float  signedDistanceFromPlane(float origin[3] , float normal[3] , float pN[3])
   {
       tempV[i]=pN[i]-origin[i];
   }
-
 
   return dotProduct(tempV,normal);
 }

@@ -28,11 +28,11 @@
         (a)[2] = (b)[2] - (c)[2];
 
 
-float  angleOfNormals(float p1[3] , float p2[3]);
+float  angleOfNormals(float * p1, float * p2);
 
-void crossProductFrom3Points(float p1[3] , float p2[3] , float p3[3]  , float * normal);
-float dotProduct(float p1[3] , float p2[3] );
-float  signedDistanceFromPlane(float origin[3] , float normal[3] , float pN[3]);
+void crossProductFrom3Points(float * p1 , float * p2  , float * p3  , float * normal);
+float dotProduct(float * p1 , float * p2 );
+float  signedDistanceFromPlane(float * origin , float * normal , float * pN );
 
 
 int getDepthBlobAverage(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,

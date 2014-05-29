@@ -405,20 +405,31 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
    fprintf(stderr,"Picked result %u with score %0.2f \n",bestNormal , bestScore);
 
 
+   float centerF[3];
+   float normalF[3];
+   for (i=0; i<3; i++)
+   {
+     centerF[i]=(float) segConf->center[i];
+     normalF[i]=(float) segConf->normal[i];
+   }
+
+
    //Second pass to ensure that it is the lowest point normal of its kind
-   float distance ;
-    bestScore = -100000;
+    float distance=0.0;
+    bestScore = 100000;
     for (i=0; i<ResultNormals; i++)
     {
       if ( !pointORNormalAreZero(result[i].point.coord,result[i].normal) )
       {
-       distance = signedDistanceFromPlane(segConf->center ,segConf->normal ,  result[i].point.coord);
-       if   ( distance>bestScore )  //&& todo check orientation
-      {
-        fprintf(stderr,"Distance %f is better\n",distance);
-        bestNormal = i;
-        bestScore = resultScore[i];
-      }
+        distance = signedDistanceFromPlane( centerF ,normalF ,  result[i].point.coord);
+        fprintf(stderr,"Distance %u / %f \n",i,distance);
+
+        if ( distance<bestScore )  //&& todo check orientation
+         {
+          fprintf(stderr,"Distance %f is better than %f \n",distance,bestScore);
+          bestNormal = i;
+          bestScore = distance;
+         }
      }
     }
 
