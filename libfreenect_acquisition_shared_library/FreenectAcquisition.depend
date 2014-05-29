@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1386274020 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/libfreenect_acquisition_shared_library/FreenectAcquisition.c
+1386414538 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/libfreenect_acquisition_shared_library/FreenectAcquisition.c
 	<stdio.h>
 	<stdlib.h>
 	"FreenectAcquisition.h"
@@ -11,12 +11,12 @@
 
 1386338530 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
 
-1356393881 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/libfreenect/include/libfreenect.h
+1391840373 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/libfreenect/include/libfreenect.h
 	<stdint.h>
 	<winsock.h>
 	<sys/time.h>
 
-1358356963 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/libfreenect/wrappers/c_sync/libfreenect_sync.h
-	"../../include/libfreenect.h"
+1400937410 /home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/libfreenect/wrappers/c_sync/libfreenect_sync.h
+	"libfreenect.h"
 	<stdint.h>
 

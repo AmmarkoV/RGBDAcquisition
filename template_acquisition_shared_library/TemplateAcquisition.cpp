@@ -98,6 +98,12 @@ int FileExists(char * filename)
 }
 
 
+int mapTemplateDepthToRGB(int devID) { return 0; }
+int mapTemplateRGBToDepth(int devID) { return 0; }
+int switchTemplateToColorStream(int devID) { return 1; }
+
+
+int getTemplateNumberOfColorStreams(int devID) { return 1; /*TODO support multiple streams*/ }
 
 double getTemplateColorPixelSize(int devID)   { return DEFAULT_PIXEL_SIZE; }
 double getTemplateColorFocalLength(int devID)

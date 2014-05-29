@@ -1158,14 +1158,14 @@ int acquisitionGetColorRGBAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,
 unsigned short acquisitionGetDepthValueAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d )
 {
     unsigned short * depthFrame = acquisitionGetDepthFrame(moduleID,devID);
-    if (depthFrame == 0 ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration , getting depth frame"); return 0; }
+    if (depthFrame == 0 ) { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthValueAtXY , getting depth frame"); return 0; }
 
     unsigned int width; unsigned int height; unsigned int channels; unsigned int bitsperpixel;
     if (! acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) )
-        {  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration getting depth frame dims"); return 0; }
+        {  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthValueAtXY getting depth frame dims"); return 0; }
 
     if ( (x2d>=width) || (y2d>=height) )
-        { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepth3DPointAtXYNoCalibration incorrect 2d x,y coords"); return 0; }
+        { MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthValueAtXY incorrect 2d x,y coords"); return 0; }
 
 
     unsigned short * depthValue = depthFrame + (y2d * width + x2d );
@@ -1179,7 +1179,7 @@ int acquisitionGetDepth3DPointAtXYCameraSpace(ModuleIdentifier moduleID,DeviceId
 {
     struct calibration calib;
     unsigned short depthValue = acquisitionGetDepthValueAtXY(moduleID,devID,x2d,y2d);
-    if (depthValue==0) { fprintf(stderr,"acquisitionGetDepth3DPointAtXYNoCalibration point has no depth\n"); return 0; }
+    if (depthValue==0) { fprintf(stderr,"acquisitionGetDepth3DPointAtXYCameraSpace point %u,%u has no depth\n",x2d,y2d); return 0; }
     if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )
         {
           if ( !acquisitionGetColorCalibration(moduleID,devID,&calib) )
@@ -1194,7 +1194,7 @@ int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier de
 {
     struct calibration calib;
     unsigned short depthValue = acquisitionGetDepthValueAtXY(moduleID,devID,x2d,y2d);
-    if (depthValue==0) { fprintf(stderr,"acquisitionGetDepth3DPointAtXYNoCalibration point has no depth\n"); return 0; }
+    if (depthValue==0) { fprintf(stderr,"acquisitionGetDepth3DPointAtXY point %u,%u has no depth\n",x2d,y2d); return 0; }
     if ( !acquisitionGetDepthCalibration(moduleID,devID,&calib) )
         {
           if ( !acquisitionGetColorCalibration(moduleID,devID,&calib) )

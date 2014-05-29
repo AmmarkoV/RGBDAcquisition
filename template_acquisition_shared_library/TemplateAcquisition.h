@@ -28,6 +28,11 @@ extern "C"
    int getTemplateNumberOfDevices(); // This has to be called AFTER startTemplate
    int stopTemplateModule();
 
+   int switchTemplateToColorStream(int devID);
+   int mapTemplateDepthToRGB(int devID);
+   int mapTemplateRGBToDepth(int devID);
+   int getTemplateNumberOfColorStreams(int devID);
+
    //Basic Per Device Operations
    int listTemplateDevices(int devID,char * output, unsigned int maxOutput);
    int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);

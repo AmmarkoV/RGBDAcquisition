@@ -13,5 +13,6 @@
 		<Project filename="ExtrinsicCalibration/ExtrinsicCalibration.cbp" />
 		<Project filename="Timers/Timers.cbp" />
 		<Project filename="Calibration/Calibration.cbp" />
+		<Project filename="Quasirandomness/Quasirandomness.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

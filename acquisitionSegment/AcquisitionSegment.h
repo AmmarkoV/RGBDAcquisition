@@ -107,9 +107,13 @@ struct SegmentationFeaturesDepth
 
    unsigned char autoPlaneSegmentation;
    unsigned char enablePlaneSegmentation;
+   unsigned char doNotGenerateNormalFrom3Points;
    double p1[3];
    double p2[3];
    double p3[3];
+
+   double center[3];
+   double normal[3];
    double planeNormalOffset;
    double planeNormalSize;
 };

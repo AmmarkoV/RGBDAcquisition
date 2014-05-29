@@ -1,7 +1,7 @@
 project( AcquisitionSegment ) 
 cmake_minimum_required( VERSION 2.8.7 )   
  
-add_library(AcquisitionSegment SHARED 
+add_library(AcquisitionSegment STATIC 
             AcquisitionSegment.c
             AcquisitionSegment.h
             colorSelector.c
