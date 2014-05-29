@@ -93,55 +93,40 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
    //---------------------------------------------------
    unsigned int normalSeries[NeighborhoodNormalCombos][3] = { { 0, 2, 1 }, { 0, 3, 2 }, { 2, 3, 4 } , { 1, 2, 4 } , { 0, 3, 4} , { 4 , 1 , 0 } };
 
-
    unsigned int i=0;
    struct TriplePoint neighbors[NH_TOTAL_NEIGHBORS]={0};
    struct Triple2DPoint neighbors2D[NH_TOTAL_NEIGHBORS]={0};
    struct normalArray neighborNormals[NeighborhoodNormalCombos]={0};
    unsigned int normalOK[NeighborhoodNormalCombos]={0};
 
-
    //The central point is of course the one we have !
    neighbors2D[NH_CENTER].coord[X]=x;
    neighbors2D[NH_CENTER].coord[Y]=y;
    neighbors2D[NH_CENTER].coord[Z]=getDepthValue(source,neighbors2D[NH_CENTER].coord[X],neighbors2D[NH_CENTER].coord[Y],width);
 
-   //fprintf(stderr,"Center point is %u , %u , %u \n",neighbors2D[NH_CENTER].coord[X],neighbors2D[NH_CENTER].coord[Y],neighbors2D[NH_CENTER].coord[Z]);
-
-
    if ( (x>neighborhoodHalfWidth) && (y>neighborhoodHalfHeight) )
        {
-         neighbors2D[NH_TOPLEFT].coord[X]=x-neighborhoodHalfWidth;
-         neighbors2D[NH_TOPLEFT].coord[Y]=y-neighborhoodHalfHeight;
+         neighbors2D[NH_TOPLEFT].coord[X]=x-neighborhoodHalfWidth; neighbors2D[NH_TOPLEFT].coord[Y]=y-neighborhoodHalfHeight;
          neighbors2D[NH_TOPLEFT].coord[Z]=getDepthValue(source,neighbors2D[NH_TOPLEFT].coord[X],neighbors2D[NH_TOPLEFT].coord[Y],width);
-       } else
-      {  /*fprintf(stderr,"Point TOPLEFT out of bounds %u,%u ( %u,%u ) ",x-neighborhoodHalfWidth,y-neighborhoodHalfHeight,width,height);*/ }
+       }
 
    if ( (x+neighborhoodHalfWidth<width) && (y>neighborhoodHalfHeight) )
       {
-        neighbors2D[NH_TOPRIGHT].coord[X]=x+neighborhoodHalfWidth;
-        neighbors2D[NH_TOPRIGHT].coord[Y]=y-neighborhoodHalfHeight;
+        neighbors2D[NH_TOPRIGHT].coord[X]=x+neighborhoodHalfWidth; neighbors2D[NH_TOPRIGHT].coord[Y]=y-neighborhoodHalfHeight;
         neighbors2D[NH_TOPRIGHT].coord[Z]=getDepthValue(source,neighbors2D[NH_TOPRIGHT].coord[X],neighbors2D[NH_TOPRIGHT].coord[Y],width);
-      } else
-      {  /*fprintf(stderr,"Point TOPRIGHT out of bounds %u,%u ( %u,%u ) ",x+neighborhoodHalfWidth,y-neighborhoodHalfHeight,width,height);*/ }
+      }
 
    if ( (x>neighborhoodHalfWidth) && (y+neighborhoodHalfHeight<height) )
        {
-         neighbors2D[NH_BOTLEFT].coord[X]=x-neighborhoodHalfWidth;
-         neighbors2D[NH_BOTLEFT].coord[Y]=y+neighborhoodHalfHeight;
+         neighbors2D[NH_BOTLEFT].coord[X]=x-neighborhoodHalfWidth; neighbors2D[NH_BOTLEFT].coord[Y]=y+neighborhoodHalfHeight;
          neighbors2D[NH_BOTLEFT].coord[Z]=getDepthValue(source,neighbors2D[NH_BOTLEFT].coord[X],neighbors2D[NH_BOTLEFT].coord[Y],width);
-       } else
-      {  /*fprintf(stderr,"Point BOTLEFT out of bounds %u,%u ( %u,%u ) ",x-neighborhoodHalfWidth,y+neighborhoodHalfHeight,width,height);*/ }
+       }
 
    if ( (x+neighborhoodHalfWidth<width) && (y+neighborhoodHalfHeight<height) )
       {
-        neighbors2D[NH_BOTRIGHT].coord[X]=x+neighborhoodHalfWidth;
-        neighbors2D[NH_BOTRIGHT].coord[Y]=y+neighborhoodHalfHeight;
+        neighbors2D[NH_BOTRIGHT].coord[X]=x+neighborhoodHalfWidth; neighbors2D[NH_BOTRIGHT].coord[Y]=y+neighborhoodHalfHeight;
         neighbors2D[NH_BOTRIGHT].coord[Z]=getDepthValue(source,neighbors2D[NH_BOTRIGHT].coord[X],neighbors2D[NH_BOTRIGHT].coord[Y],width);
-      } else
-      {  /*fprintf(stderr,"Point BOTRIGHT out of bounds %u,%u ( %u,%u ) ",x+neighborhoodHalfWidth,y+neighborhoodHalfHeight,width,height);*/ }
-
-
+      }
 
    //Project Points to get real 3D coordinates
    for (i=0; i<NH_TOTAL_NEIGHBORS; i++)
@@ -186,13 +171,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
          )
           {
             //There is a zero depth  , we dont consider this neighborhood
-            /*
-               fprintf(stderr,"Neighborhood %u  Has a Zero ( %u , %u , %u ) \n",i,normalSeries[i][0],normalSeries[i][1],normalSeries[i][2]);
-               fprintf(stderr,"Component ( %f , %f , %f ) \n",neighbors[normalSeries[i][0]].coord[X],neighbors[normalSeries[i][0]].coord[Y],neighbors[normalSeries[i][0]].coord[Z]);
-               fprintf(stderr,"Component ( %f , %f , %f ) \n",neighbors[normalSeries[i][1]].coord[X],neighbors[normalSeries[i][1]].coord[Y],neighbors[normalSeries[i][1]].coord[Z]);
-               fprintf(stderr,"Component ( %f , %f , %f ) \n",neighbors[normalSeries[i][2]].coord[X],neighbors[normalSeries[i][2]].coord[Y],neighbors[normalSeries[i][2]].coord[Z]);
-            */
-               normalOK[i]=0;
+            normalOK[i]=0;
           } else
           { //Find the normal
                  crossProductFrom3Points( neighbors[normalSeries[i][0]].coord ,
@@ -231,14 +210,7 @@ int decideNormalAround3DPoint(unsigned short * source , struct calibration * cal
       normal[1]=(float) normal[1] / sampleF;
       normal[2]=(float) normal[2] / sampleF;
 
-     if ( ! pointORNormalAreZero(point,normal) )
-        {
-          //fprintf(stderr,"Averaged point %f %f %f  normal %f %f %f\n",point[0],point[1],point[2],normal[0],normal[1],normal[2]);
-          return 1;
-        } else
-        {
-         fprintf(stderr," point %f %f %f  OR normal %f %f %f Are Zero! \n",point[0],point[1],point[2],normal[0],normal[1],normal[2]);
-        }
+      if ( ! pointORNormalAreZero(point,normal) )  { return 1; }
    } else
    {
      fprintf(stderr,"Zero good samples\n");
@@ -346,17 +318,10 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
              resultScore[i]+=angle;
           }
       }
-
       //Adding angle penalty according to legend ( to try and match it
       angle=angleOfNormals(result[i].normal,legend.coord);
       if (angle<0.0) { angle=-1 * angle; }
       resultScore[i]+=angle;
-      /*
-      fprintf(stderr,"Point 2D %u (%u,%u) - 3D (%f,%f,%f) - Normal (%f,%f,%f) - score %f\n",i,
-                                                                                      result[i].originX,result[i].originY,
-                                                                                      result[i].point.coord[0],result[i].point.coord[1],result[i].point.coord[2],
-                                                                                      result[i].normal[0], result[i].normal[1], result[i].normal[2] , resultScore[i] );
-       */
     }
 
 
@@ -395,8 +360,7 @@ int automaticPlaneSegmentation(unsigned short * source , unsigned int width , un
    segConf->normal[2] = -1 * result[bestNormal].normal[2];
    fprintf(stderr,"Picked result %u with score %0.2f \n",bestNormal , bestScore);
 
-   float centerF[3];
-   float normalF[3];
+   float centerF[3]; float normalF[3];
    for (i=0; i<3; i++)
    {
      centerF[i]=(float) segConf->center[i];
