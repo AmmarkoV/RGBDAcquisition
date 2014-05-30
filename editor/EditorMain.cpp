@@ -137,6 +137,7 @@ const long EditorFrame::ID_BUTTON12 = wxNewId();
 const long EditorFrame::ID_CHECKBOX1 = wxNewId();
 const long EditorFrame::ID_TEXTCTRL2 = wxNewId();
 const long EditorFrame::ID_BUTTON13 = wxNewId();
+const long EditorFrame::ID_CHECKBOX2 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
@@ -182,20 +183,22 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(584,524), wxDefaultSize, wxTE_PROCESS_ENTER|wxNO_FULL_REPAINT_ON_RESIZE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(672,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(688,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-    ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(1192,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
-    ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(952,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+    ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(1000,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+    ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(760,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     buttonRecord = new wxButton(this, ID_BUTTON7, _("Record"), wxPoint(368,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
-    ButtonAcquisitionGraph = new wxButton(this, ID_BUTTON8, _("Stream Connections"), wxPoint(1040,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
+    ButtonAcquisitionGraph = new wxButton(this, ID_BUTTON8, _("Stream Connections"), wxPoint(848,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     ListCtrlPoints = new wxListCtrl(this, ID_LISTCTRL1, wxPoint(1320,24), wxSize(152,168), wxLC_REPORT|wxLC_SINGLE_SEL|wxRAISED_BORDER|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL1"));
     ButtonAdd = new wxButton(this, ID_BUTTON9, _("+"), wxPoint(1320,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON9"));
     ButtonRemove = new wxButton(this, ID_BUTTON10, _("-"), wxPoint(1360,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON10"));
     ButtonExecute = new wxButton(this, ID_BUTTON11, _("="), wxPoint(1408,192), wxSize(64,29), 0, wxDefaultValidator, _T("ID_BUTTON11"));
     ListCtrl1 = new wxListCtrl(this, ID_LISTCTRL2, wxPoint(1320,264), wxSize(152,208), wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL2"));
     Button1 = new wxButton(this, ID_BUTTON12, _("Remove"), wxPoint(1320,472), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
-    CheckBoxOverlay = new wxCheckBox(this, ID_CHECKBOX1, _("Overlay Active"), wxPoint(1320,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+    CheckBoxOverlay = new wxCheckBox(this, ID_CHECKBOX1, _("Overlay Active"), wxPoint(1152,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     CheckBoxOverlay->SetValue(false);
     TextCtrlDirectCommand = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxPoint(1320,228), wxSize(120,27), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL2"));
     ButtonSendDirectCommand = new wxButton(this, ID_BUTTON13, _(">"), wxPoint(1440,228), wxSize(29,29), 0, wxDefaultValidator, _T("ID_BUTTON13"));
+    CheckBoxOverlayDepth = new wxCheckBox(this, ID_CHECKBOX2, _("Overlay Respect Depth"), wxPoint(1288,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+    CheckBoxOverlayDepth->SetValue(false);
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -775,9 +778,12 @@ int  EditorFrame::refreshAllOverlays()
 
         if ( (rgbOut!=0) && (depthOut!=0) )
         {
-         overlayRGB = acquisitionGetColorFrame(overlayModule,overlayDevice);
-         overlayDepth = acquisitionGetDepthFrame(overlayModule,overlayDevice);
+         int muxMode = COLOR_MUXING;
+         if (CheckBoxOverlayDepth->IsChecked())   { muxMode=DEPTH_MUXING; }
 
+         overlayRGB = acquisitionGetColorFrame(overlayModule,overlayDevice);
+         if (muxMode==DEPTH_MUXING) { overlayDepth = acquisitionGetDepthFrame(overlayModule,overlayDevice); } else
+                                    { overlayDepth = 0; } //COLOR MUXING IGNORES DEPTH OVERLAY , so we can get away passing a null there
 
          mux2RGBAndDepthFrames(
                                 rgbFrame    , overlayRGB , rgbOut ,
@@ -785,7 +791,7 @@ int  EditorFrame::refreshAllOverlays()
                                 trR,trG,trB,
                                 shiftX,shiftY,
                                 width , height , 0 ,
-                                REGULAR_MUXING
+                                muxMode
                               );
 
          unsigned int newColorByteSize = width * height * 3 * sizeof(unsigned char);

@@ -111,12 +111,14 @@ float  distance3D(float * p1 , float * p2 , float * p3)
 
 float dotProduct(float * p1 , float * p2 )
 {
+    #warning "dotProduct is a very heavily used function , it needs to be optimized using AVX"
     return (float) ( p1[DIMX]*p2[DIMX] + p1[DIMY]*p2[DIMY] + p1[DIMZ]*p2[DIMZ] );
 }
 
 
 float  signedDistanceFromPlane(float * origin , float * normal , float * pN)
 {
+  #warning "signedDistanceFromPlane is a very heavily used function , it needs to be optimized using AVX"
   float tempV[NUMBER_OF_DIMENSIONS];
   int i=0;
   for (i=0; i<NUMBER_OF_DIMENSIONS; i++)

@@ -12,7 +12,7 @@ cd redist
 if [ -e $BIN ]
 then
  ldd $BIN | grep not
- LD_LIBRARY_PATH=.:../3dparty/libfreenect/build/lib ./$BIN -module TEMPLATE -from floor -maxFrames 10 -to floorSegmented -autoplane 10 -calibration frames/floor/color.calib -combine AND $@  &> ../error.txt
+ LD_LIBRARY_PATH=.:../3dparty/libfreenect/build/lib ./$BIN -module TEMPLATE -from floor -maxFrames 10 -to floorSegmented -autoplane 50 0 800 4000 -calibration frames/floor/color.calib -combine AND $@  &> ../error.txt
  gpicview frames/floorSegmented/colorFrame_0_00000.pnm
 else
  if [ -e $ORIGINALDIRBIN ]

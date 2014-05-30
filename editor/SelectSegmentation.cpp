@@ -396,6 +396,10 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
     if (this->planeNormalOffset->GetValue().ToDouble(&dValue)) {  this->selectedDepthConf.planeNormalOffset = dValue; }
     if (this->planeNormalSize->GetValue().ToDouble(&dValue))   {  this->selectedDepthConf.planeNormalSize = dValue; }
 
+    this->selectedDepthConf.autoPlaneSegmentationMinimumDistancePoint = 830;
+    this->selectedDepthConf.autoPlaneSegmentationMaximumDistancePoint = 3000;
+
+
     selectedDepthConf.enablePlaneSegmentation=1;
    } else
    {

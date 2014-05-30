@@ -114,6 +114,8 @@ struct SegmentationFeaturesDepth
 
    double center[3];
    double normal[3];
+   unsigned int autoPlaneSegmentationMinimumDistancePoint;
+   unsigned int autoPlaneSegmentationMaximumDistancePoint;
    double planeNormalOffset;
    double planeNormalSize;
 };

@@ -48,7 +48,13 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
 
   if (segConfDepth->autoPlaneSegmentation)
    {
-     automaticPlaneSegmentation(Depth,width,height,10.0,segConfDepth,calib);
+     automaticPlaneSegmentation(Depth,width,height,
+                                segConfDepth->autoPlaneSegmentationMinimumDistancePoint ,
+                                segConfDepth->autoPlaneSegmentationMaximumDistancePoint ,
+                                segConfDepth->planeNormalOffset,
+                                segConfDepth->planeNormalSize,
+                                segConfDepth,
+                                calib);
    }
 
 
@@ -161,8 +167,20 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
    segConfDepth->enablePlaneSegmentation=0;
    segConfDepth->planeNormalOffset=0;
    segConfDepth->planeNormalSize=0;
+
+
+   segConfDepth->autoPlaneSegmentationMinimumDistancePoint=0;
+   segConfDepth->autoPlaneSegmentationMaximumDistancePoint=0;
+
    int i=0;
-   for (i=0; i<3; i++) { segConfDepth->p1[i]=0.0; segConfDepth->p2[i]=0.0; segConfDepth->p3[i]=0.0; }
+   for (i=0; i<3; i++)
+     {
+        segConfDepth->p1[i]=0.0;
+        segConfDepth->p2[i]=0.0;
+        segConfDepth->p3[i]=0.0;
+        segConfDepth->center[i]=0.0;
+        segConfDepth->normal[i]=0.0;
+     }
 
   return 1;
 }
@@ -242,7 +260,7 @@ int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB *
 
       if ( depthSeg->autoPlaneSegmentation )
       {
-        fprintf(fp,"-autoplane 0\n");
+        fprintf(fp,"-autoplane 0 0 800 4000\n");
       }
 
 
@@ -360,6 +378,9 @@ int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFea
     if (strcmp(argv[i],"-autoplane")==0)  {
                                             depthSeg->autoPlaneSegmentation=1;
                                             depthSeg->planeNormalOffset=(double) internationalAtof(argv[i+1]);
+                                            depthSeg->planeNormalSize=(double) internationalAtof(argv[i+2]);
+                                            depthSeg->autoPlaneSegmentationMinimumDistancePoint=atoi(argv[i+3]);
+                                            depthSeg->autoPlaneSegmentationMaximumDistancePoint=atoi(argv[i+4]);
                                           } else
     if (strcmp(argv[i],"-plane")==0)      {
                                             depthSeg->enablePlaneSegmentation=1;

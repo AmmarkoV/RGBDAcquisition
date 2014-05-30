@@ -17,9 +17,20 @@
  * @param Pointer to Depth Input
  * @param Width of RGB Input
  * @param Height of RGB Input
+ * @param Minimum Accepted Depth For the random points selected
+ * @param Maximum Accepted Depth For the random points selected
+ * @param Offset of plane
+ * @param Size ( ceiling of plane )
  * @param Structure holding the segmentation results for Depth Frame ( will just update the plane variables )
  * @retval 1=Success,0=Failure
  */
-int automaticPlaneSegmentation(unsigned short * source , unsigned int width , unsigned int height , float offset, struct SegmentationFeaturesDepth * segConf , struct calibration * calib );
+int automaticPlaneSegmentation(unsigned short * source , unsigned int width , unsigned int height ,
+                               unsigned int minimumAcceptedDepths ,
+                               unsigned int maximumAcceptedDepths ,
+                               float offset,
+                               float planeCeiling,
+                               struct SegmentationFeaturesDepth * segConf ,
+                               struct calibration * calib);
+
 
 #endif // AUTOMATICPLANESEGMENTATION_H_INCLUDED

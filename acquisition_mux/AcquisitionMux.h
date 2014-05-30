@@ -18,7 +18,9 @@ extern "C"
  */
 enum MuxTypeEnum
 {
-   REGULAR_MUXING = 0,
+   COLOR_MUXING = 0,
+   DEPTH_MUXING ,
+   //----------------------
    UNKNOWN_MUXING
 };
 
