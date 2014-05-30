@@ -19,6 +19,8 @@ extern int HEIGHT;
 
 extern float farPlane;
 extern float nearPlane;
+extern float scaleDepthTo;
+
 //extern float depthUnit;
 
 

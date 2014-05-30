@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "OpenGLAcquisition.h"
+#define USE_SIMPLE_FAST_DEPTH 0
 
 #if BUILD_OPENGL
 
@@ -164,11 +165,15 @@ int getOpenGLDepthBitsPerPixel(int devID) { return 16; }
 
 char * getOpenGLDepthPixels(int devID)
 {
-  getOpenGLZBuffer(openGLDepthFrame,0,0,getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID));
+  #if USE_SIMPLE_FAST_DEPTH
+    getOpenGLZBuffer(openGLDepthFrame,0,0,getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID));
+  #else
+   //Real depth gets returned using the next function , problem is that
+   //most times we dont want real depth..
+   getOpenGLDepth(openGLDepthFrame,0,0,getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID));
+  #endif // USE_SIMPLE_FAST_DEPTH
 
-  //Real depth gets returned using the next function , problem is that
-  //most times we dont want real depth..
-  //getOpenGLDepth(openGLDepthFrame,0,0,getOpenGLDepthWidth(devID),getOpenGLDepthHeight(devID));
+
   return (char*) openGLDepthFrame;
 }
 
