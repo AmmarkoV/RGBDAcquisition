@@ -14,6 +14,7 @@
 #define MAX_USERS 10
 #define CALCULATE_BOUNDING_BOX 1
 #define BROADCAST_EVEN_BAD_SKELETONS 1
+#define DO_2D_JOIN_FILTERING  1
 
 #define NORMAL "\033[0m"
 #define BLACK "\033[30m" /* Black */
@@ -89,6 +90,28 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
 
     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
+      #if DO_2D_JOIN_FILTERING
+       int badJoint = 0;
+       if (
+            (
+             (skeletonFound->joint2D[i].x!=skeletonFound->joint2D[i].x) || //IEEE way to detect a NaN value
+             (skeletonFound->joint2D[i].x<0) ||
+             (skeletonFound->joint2D[i].x>1000)
+            ) ||
+            (
+             (skeletonFound->joint2D[i].y!=skeletonFound->joint2D[i].y) || //IEEE way to detect a NaN value
+             (skeletonFound->joint2D[i].y<0) ||
+             (skeletonFound->joint2D[i].y>1000)
+            )
+           )  { badJoint=1; }
+
+       if (badJoint)
+         {
+           skeletonFound->joint2D[i].x=0;
+           skeletonFound->joint2D[i].y=0;
+         }
+      #endif // DO_2D_JOIN_FILTERING
+
       printf("%0.2f %0.2f ", skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
       //printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
     }
@@ -410,7 +433,7 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
      //------------------------------------------------------------------------------------------
 
      #if CALCULATE_BOUNDING_BOX
-      //We calculate by hand the Bounding box 
+      //We calculate by hand the Bounding box
         updateSkeletonBoundingBox(&humanSkeleton);
      #else
       //We take the bounding box given by NiTE ( but this is 2D only and we want a 3D one )
@@ -456,17 +479,17 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
 
    //This is an event that gets fed with our newly encapsulated data
    //it should also fire up any additional events registered by clients
- if ( 
+ if (
         (BROADCAST_EVEN_BAD_SKELETONS) ||
         ( (humanSkeleton.isVisible) && ( (humanSkeleton.statusCalibrating) || (humanSkeleton.statusTracking) ) )
       )
    {
     newSkeletonDetected(devID,frameNumber,&humanSkeleton);
     if (considerSkeletonPointing(devID,frameNumber,&humanSkeleton))
-                                { fprintf(stderr,"New pointing gesture found\n"); } 
+                                { fprintf(stderr,"New pointing gesture found\n"); }
    } else
    {
-     fprintf(stderr,"Got a skeleton , but it got rejected ( flags New : %u , Calib : %u , Tracking %u , Stopped %u , Visible %u , OutOfScene %u , Lost %u )\n", 
+     fprintf(stderr,"Got a skeleton , but it got rejected ( flags New : %u , Calib : %u , Tracking %u , Stopped %u , Visible %u , OutOfScene %u , Lost %u )\n",
              humanSkeleton.isNew,
              humanSkeleton.statusCalibrating,
              humanSkeleton.statusTracking,
@@ -573,12 +596,12 @@ int createNite2Device(int devID,openni::Device * device)
 int destroyNite2Device(int devID)
 {
    stc[devID].userTrackerFrame->release();
-   
-    for (int i=0; i < MAX_USERS; i++) 
+
+    for (int i=0; i < MAX_USERS; i++)
    {
 		stc[devID].userTracker->stopSkeletonTracking(i+1);
    }
-   
+
    stc[devID].userTracker->destroy();
 
 
