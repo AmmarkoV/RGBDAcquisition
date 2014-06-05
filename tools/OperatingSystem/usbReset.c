@@ -1,5 +1,7 @@
-/* usbreset -- send a USB port reset to a USB device */
-
+/*  
+   gcc usbReset.c -s -O3 -o usbreset 
+   usbreset -- send a USB port reset to a USB device 
+*/
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -15,21 +17,24 @@ int main(int argc, char **argv)
     int fd;
     int rc;
 
-    if (argc != 2) {
+    if (argc != 2) 
+    {
         fprintf(stderr, "Usage: usbreset device-filename\ni.e. sudo ./usbreset /dev/bus/usb/003/008\n");
         return 1;
     }
     filename = argv[1];
 
     fd = open(filename, O_WRONLY);
-    if (fd < 0) {
+    if (fd < 0) 
+    {
         perror("Error opening output file");
         return 1;
     }
 
     printf("Resetting USB device %s\n", filename);
     rc = ioctl(fd, USBDEVFS_RESET, 0);
-    if (rc < 0) {
+    if (rc < 0) 
+    {
         perror("Error in ioctl");
         return 1;
     }

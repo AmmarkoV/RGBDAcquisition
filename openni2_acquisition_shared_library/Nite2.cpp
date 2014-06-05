@@ -13,6 +13,7 @@
 #define MAXIMUM_DISTANCE_FOR_POINTING 400
 #define MAX_USERS 10
 #define CALCULATE_BOUNDING_BOX 1
+#define BROADCAST_EVEN_BAD_SKELETONS 1
 
 #define NORMAL "\033[0m"
 #define BLACK "\033[30m" /* Black */
@@ -455,13 +456,27 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
 
    //This is an event that gets fed with our newly encapsulated data
    //it should also fire up any additional events registered by clients
-   newSkeletonDetected(devID,frameNumber,&humanSkeleton);
-
-
-   if (considerSkeletonPointing(devID,frameNumber,&humanSkeleton))
+ if ( 
+        (BROADCAST_EVEN_BAD_SKELETONS) ||
+        ( (humanSkeleton.isVisible) && ( (humanSkeleton.statusCalibrating) || (humanSkeleton.statusTracking) ) )
+      )
    {
-      fprintf(stderr,"New pointing gesture found\n");
+    newSkeletonDetected(devID,frameNumber,&humanSkeleton);
+    if (considerSkeletonPointing(devID,frameNumber,&humanSkeleton))
+                                { fprintf(stderr,"New pointing gesture found\n"); } 
+   } else
+   {
+     fprintf(stderr,"Got a skeleton , but it got rejected ( flags New : %u , Calib : %u , Tracking %u , Stopped %u , Visible %u , OutOfScene %u , Lost %u )\n", 
+             humanSkeleton.isNew,
+             humanSkeleton.statusCalibrating,
+             humanSkeleton.statusTracking,
+             humanSkeleton.statusStoppedTracking,
+             humanSkeleton.isVisible,
+             humanSkeleton.isOutOfScene,
+             humanSkeleton.isLost
+            );
    }
+
 
  }
 
