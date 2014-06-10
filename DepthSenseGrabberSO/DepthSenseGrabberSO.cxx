@@ -22,20 +22,20 @@ using namespace std;
 
 bool usingUSB30Flag = true; // if the camera is plugged on a USB 3.0 port
 
-int waitSecondsBeforeGrab = 1;
-int divideConfidencePixels = 10;
+int waitSecondsBeforeGrab = 3;
+int divideConfidencePixels = 5;
 const int16_t confidenceThreshold = 60;
 
 bool interpolateDepthFlag = 0;
 bool interpolateColorFlag = 0;
 
-bool saveColorAcqFlag = 0;
+bool saveColorAcqFlag = 1;
 bool saveDepthAcqFlag = 1;
 bool saveColorSyncFlag = 1;
 bool saveDepthSyncFlag = 0;
 bool saveConfidenceFlag = 0;
 
-int32_t  frameRateDepth = 60;
+int32_t  frameRateDepth = 30;
 int32_t  frameRateColor = 30;
 
 const int widthQVGA = 320, heightQVGA = 240;
