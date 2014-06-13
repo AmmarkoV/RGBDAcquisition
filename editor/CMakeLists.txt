@@ -28,7 +28,7 @@ add_executable(Editor
  FIND_PACKAGE(wxWidgets)
  IF(wxWidgets_FOUND)
    INCLUDE("${wxWidgets_USE_FILE}") 
-   target_link_libraries(Editor Acquisition AcquisitionMux AcquisitionSegment CalibrationLibrary OperatingSystem Timers rt dl m ${wxWidgets_LIBRARIES} )
+   target_link_libraries(Editor Acquisition AcquisitionMux AcquisitionSegment CalibrationLibrary ViewpointChange OperatingSystem Timers rt dl m ${wxWidgets_LIBRARIES} )
    # and for each of your dependant executable/library targets: 
  ELSE(wxWidgets_FOUND)
    # For convenience. When we cannot continue, inform the user

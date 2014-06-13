@@ -43,40 +43,40 @@
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticTextJumpTo" member="yes">
 			<label>Jump To : </label>
-			<pos>504,528</pos>
+			<pos>408,528</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="currentFrameTextCtrl" member="yes">
 			<value>0</value>
-			<pos>584,524</pos>
+			<pos>472,524</pos>
 			<style>wxTE_PROCESS_ENTER|wxNO_FULL_REPAINT_ON_RESIZE</style>
 			<handler function="OncurrentFrameTextCtrlText" entry="EVT_TEXT" />
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT2" variable="dashForFramesRemainingLabel" member="yes">
 			<label>/ </label>
-			<pos>672,528</pos>
+			<pos>560,528</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT3" variable="totalFramesLabel" member="yes">
 			<label>?</label>
-			<pos>688,528</pos>
+			<pos>576,528</pos>
 		</object>
 		<object class="wxButton" name="ID_BUTTON5" variable="ButtonSegmentation" member="yes">
 			<label>Segmentation</label>
-			<pos>1000,520</pos>
+			<pos>856,524</pos>
 			<handler function="OnButtonSegmentationClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON6" variable="ButtonCalibration" member="yes">
 			<label>Calibration</label>
-			<pos>760,520</pos>
+			<pos>608,524</pos>
 			<handler function="OnButtonCalibrationClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON7" variable="buttonRecord" member="yes">
 			<label>Record</label>
-			<pos>368,524</pos>
+			<pos>304,524</pos>
 			<handler function="OnbuttonRecordClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON8" variable="ButtonAcquisitionGraph" member="yes">
 			<label>Stream Connections</label>
-			<pos>848,520</pos>
+			<pos>696,524</pos>
 			<handler function="OnButtonAcquisitionGraphClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxListCtrl" name="ID_LISTCTRL1" variable="ListCtrlPoints" member="yes">
@@ -113,7 +113,7 @@
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxOverlay" member="yes">
 			<label>Overlay Active</label>
-			<pos>1152,520</pos>
+			<pos>976,528</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrlDirectCommand" member="yes">
 			<pos>1320,228</pos>
@@ -128,7 +128,11 @@
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX2" variable="CheckBoxOverlayDepth" member="yes">
 			<label>Overlay Respect Depth</label>
-			<pos>1288,520</pos>
+			<pos>1104,528</pos>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX3" variable="CheckBoxPluginProc" member="yes">
+			<label>PlugIn Proc</label>
+			<pos>1304,528</pos>
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">

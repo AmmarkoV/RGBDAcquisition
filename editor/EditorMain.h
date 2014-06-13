@@ -110,6 +110,7 @@ class EditorFrame: public wxFrame
         static const long ID_TEXTCTRL2;
         static const long ID_BUTTON13;
         static const long ID_CHECKBOX2;
+        static const long ID_CHECKBOX3;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
@@ -149,6 +150,7 @@ class EditorFrame: public wxFrame
         wxButton* buttonPlay;
         wxButton* ButtonAcquisitionGraph;
         wxMenuItem* MenuItem5;
+        wxCheckBox* CheckBoxPluginProc;
         wxTimer Timer;
         wxListCtrl* ListCtrlPoints;
         wxMenuItem* MenuItem10;

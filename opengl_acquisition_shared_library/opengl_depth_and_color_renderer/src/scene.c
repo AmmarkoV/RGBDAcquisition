@@ -37,6 +37,7 @@ struct Model ** models=0;
 float farPlane = 255; //<--be aware that this has an effect on the depth maps generated
 float nearPlane= 1; //<--this also
 float fieldOfView = 65;
+float scaleDepthTo =1000.0;
 
 //float depthUnit = 1.0;
 

@@ -26,6 +26,7 @@
 #include "OGLRendererSandbox.h"
 
 #define FLIP_OPEN_GL_IMAGES 1
+#define REAL_DEPTH 1
 
 #define X_OFFSET 0 //This should always be 0 and probably removed also  :P
 
@@ -51,13 +52,10 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
     /*
        Not sure I am calculating the correct depth here..
     */
-    float max_distance = farPlane-nearPlane;
-    float multiplier = (float) 65535 / max_distance;
-
     memset(depth,0 , (width-x)*(height-y)*2 );
 
     #if FLIP_OPEN_GL_IMAGES
-     unsigned int   yp = 0;
+     unsigned int yp = 0;
      unsigned int i=0;
      unsigned int stride = (width-x)*1;
 
@@ -65,28 +63,19 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
        {
          for ( i =0 ; i < (width-x); i ++ )
             {
-
-               if (zbuffer[(height-1-yp)*stride+i]>=max_distance)  { depth[yp*stride+i]=  (short) 0;  } else
-                                                                         {
-                                                                           float tmpF=zbuffer[(height-1-yp)*stride+i];
-
-                                                                           tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) /* * depthUnit This scales depth but is bad*/ * multiplier;
-                                                                           unsigned short tmp = (unsigned short) tmpF;
-                                                                           depth[yp*stride+i]= tmp ;
-                                                                         }
-
+              float tmpF=zbuffer[(height-1-yp)*stride+i];
+              tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) * 65534.0;
+              unsigned short tmp = (unsigned short) tmpF;
+              depth[yp*stride+i]= tmp ;
             }
        }
     #else
     int i=0;
     for ( i =0 ; i < (width-x)*(height-y); i ++ )
       {
-        if (zbuffer[i]>=max_distance)  { depth[i]=  (short) 0; } else
-                                       {
-                                         float tmpF  = (1.0f - zbuffer[i]) * multiplier;
-                                         unsigned short tmp = tmpF;
-                                         depth[i]= tmp;
-                                       }
+           float tmpF  = (1.0f - zbuffer[i]) * 65534.0;
+           unsigned short tmp = (unsigned short) tmpF;
+           depth[i]= tmp;
       }
     #endif
 
@@ -110,8 +99,6 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     /*
        Not sure I am calculating the correct depth here..
     */
-    //float max_distance = farPlane-nearPlane;
-    //float multiplier = (float) 65535 / max_distance;
 
     memset(depth,0 , (width-x)*(height-y)*2 );
 
@@ -132,10 +119,17 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
          for ( xp=0 ; xp<width; xp++)
             {
                 float tmpF=zbuffer[yp*width+xp];
-                if (tmpF!=1.0)
+                if (tmpF<depth_scale)
                 {
                  gluUnProject((double) xp , (double) yp, (double) tmpF , modelview, projection, viewport, &posX, &posY, &posZ);
-                 depth[(height-yp-1)*width+xp]=(unsigned short) posZ;
+
+                 #if REAL_DEPTH
+                  tmpF = sqrt( (posX*posX) + (posY*posY) + (posZ*posZ) ) * scaleDepthTo;
+                  depth[(height-yp-1)*width+xp]=(unsigned short) tmpF;
+                 #else
+                  depth[(height-yp-1)*width+xp]=(unsigned short) posZ * scaleDepthTo;
+                 #endif // REAL_DEPTH
+
                 }
             }
        }
@@ -249,6 +243,8 @@ int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , doub
 {
   useCustomModelViewMatrix=1;
   convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(customModelViewMatrix , rodriguez , translation , scaleToDepthUnit);
+
+  scaleDepthTo = (float) scaleToDepthUnit;
 
   customTranslation[0] = translation[0];
   customTranslation[1] = translation[1];

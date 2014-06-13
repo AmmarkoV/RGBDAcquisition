@@ -23,6 +23,9 @@
 #include "GetExtrinsics.h"
 #include "AddNewElement.h"
 
+#include "../tools/ViewpointChange/ViewpointChange.h"
+
+#define USE_BIRDVIEW_LOGIC 1
 
 
 #define OVERLAY_EDITOR_SCENE_FILE "Scenes/editor.conf"
@@ -138,6 +141,7 @@ const long EditorFrame::ID_CHECKBOX1 = wxNewId();
 const long EditorFrame::ID_TEXTCTRL2 = wxNewId();
 const long EditorFrame::ID_BUTTON13 = wxNewId();
 const long EditorFrame::ID_CHECKBOX2 = wxNewId();
+const long EditorFrame::ID_CHECKBOX3 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
@@ -179,26 +183,28 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     buttonPlay = new wxButton(this, ID_BUTTON2, _("Play"), wxPoint(64,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     buttonStop = new wxButton(this, ID_BUTTON3, _("Stop"), wxPoint(150,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     buttonNextFrame = new wxButton(this, ID_BUTTON4, _(">"), wxPoint(236,524), wxSize(56,27), 0, wxDefaultValidator, _T("ID_BUTTON4"));
-    StaticTextJumpTo = new wxStaticText(this, ID_STATICTEXT1, _("Jump To : "), wxPoint(504,528), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(584,524), wxDefaultSize, wxTE_PROCESS_ENTER|wxNO_FULL_REPAINT_ON_RESIZE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-    dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(672,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-    totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(688,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-    ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(1000,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
-    ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(760,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
-    buttonRecord = new wxButton(this, ID_BUTTON7, _("Record"), wxPoint(368,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
-    ButtonAcquisitionGraph = new wxButton(this, ID_BUTTON8, _("Stream Connections"), wxPoint(848,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
+    StaticTextJumpTo = new wxStaticText(this, ID_STATICTEXT1, _("Jump To : "), wxPoint(408,528), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    currentFrameTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxPoint(472,524), wxDefaultSize, wxTE_PROCESS_ENTER|wxNO_FULL_REPAINT_ON_RESIZE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    dashForFramesRemainingLabel = new wxStaticText(this, ID_STATICTEXT2, _("/ "), wxPoint(560,528), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    totalFramesLabel = new wxStaticText(this, ID_STATICTEXT3, _("\?"), wxPoint(576,528), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    ButtonSegmentation = new wxButton(this, ID_BUTTON5, _("Segmentation"), wxPoint(856,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+    ButtonCalibration = new wxButton(this, ID_BUTTON6, _("Calibration"), wxPoint(608,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+    buttonRecord = new wxButton(this, ID_BUTTON7, _("Record"), wxPoint(304,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
+    ButtonAcquisitionGraph = new wxButton(this, ID_BUTTON8, _("Stream Connections"), wxPoint(696,524), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     ListCtrlPoints = new wxListCtrl(this, ID_LISTCTRL1, wxPoint(1320,24), wxSize(152,168), wxLC_REPORT|wxLC_SINGLE_SEL|wxRAISED_BORDER|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL1"));
     ButtonAdd = new wxButton(this, ID_BUTTON9, _("+"), wxPoint(1320,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON9"));
     ButtonRemove = new wxButton(this, ID_BUTTON10, _("-"), wxPoint(1360,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON10"));
     ButtonExecute = new wxButton(this, ID_BUTTON11, _("="), wxPoint(1408,192), wxSize(64,29), 0, wxDefaultValidator, _T("ID_BUTTON11"));
     ListCtrl1 = new wxListCtrl(this, ID_LISTCTRL2, wxPoint(1320,264), wxSize(152,208), wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL2"));
     Button1 = new wxButton(this, ID_BUTTON12, _("Remove"), wxPoint(1320,472), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
-    CheckBoxOverlay = new wxCheckBox(this, ID_CHECKBOX1, _("Overlay Active"), wxPoint(1152,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+    CheckBoxOverlay = new wxCheckBox(this, ID_CHECKBOX1, _("Overlay Active"), wxPoint(976,528), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     CheckBoxOverlay->SetValue(false);
     TextCtrlDirectCommand = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxPoint(1320,228), wxSize(120,27), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL2"));
     ButtonSendDirectCommand = new wxButton(this, ID_BUTTON13, _(">"), wxPoint(1440,228), wxSize(29,29), 0, wxDefaultValidator, _T("ID_BUTTON13"));
-    CheckBoxOverlayDepth = new wxCheckBox(this, ID_CHECKBOX2, _("Overlay Respect Depth"), wxPoint(1288,520), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+    CheckBoxOverlayDepth = new wxCheckBox(this, ID_CHECKBOX2, _("Overlay Respect Depth"), wxPoint(1104,528), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
     CheckBoxOverlayDepth->SetValue(false);
+    CheckBoxPluginProc = new wxCheckBox(this, ID_CHECKBOX3, _("PlugIn Proc"), wxPoint(1304,528), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+    CheckBoxPluginProc->SetValue(false);
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -662,7 +668,7 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
                 wxString msg;
 
 
-                fprintf(stderr,"Depth at point %u,%u  is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u)  \n",mouse_x,mouse_y,x,y,z,r,g,b);
+                fprintf(stderr,"Depth at point %u,%u  is %u , or 3D  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u)  \n",mouse_x,mouse_y,acquisitionGetDepthValueAtXY(moduleID,devID,mouse_x,mouse_y),x,y,z,r,g,b);
                 if (calib.extrinsicParametersSet) { msg.Printf( wxT("Using Extrinsic Calibration : Depth at point is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u) ") ,x,y,z , r,g,b  ); } else
                                                   { msg.Printf( wxT("Using Camera Space : Depth at point is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u) ") ,x,y,z , r,g,b ); }
 
@@ -805,7 +811,25 @@ int  EditorFrame::refreshAllOverlays()
        if ( depthOut!=0 ) { free(depthOut); depthOut=0; }
     }
 
+    #if USE_BIRDVIEW_LOGIC
+      if(CheckBoxPluginProc->GetValue())
+      {
+       unsigned char * bev = viewPointChange_mallocTransformToBirdEyeView
+                                 (
+                                  acquisitionGetColorFrame(moduleID,devID) ,
+                                  acquisitionGetDepthFrame(moduleID,devID) ,
+                                  width , height , 10000
+                                 );
+       if (bev!=0) {
+                       //acquisitionSaveRawImageToFile( "bev.pnm",bev   , width , height , 3, 8 );
 
+                       unsigned int newColorByteSize = width * height * 3 * sizeof(unsigned char);
+                       acquisitionOverrideColorFrame(moduleID,devID,bev,newColorByteSize);
+
+                     free(bev);
+                   }
+      }
+    #endif // USE_BIRDVIEW_LOGIC
  return retres;
 }
 
