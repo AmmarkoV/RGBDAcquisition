@@ -20,11 +20,21 @@
 #define GREEN "\033[32m" /* Green */
 #define YELLOW "\033[33m" /* Yellow */
 
-//#include <opencv2/opencv.hpp>
 
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#define USE_NEW_OPENCV_HEADERS 1
+
+#if USE_NEW_OPENCV_HEADERS
+ //#include <opencv2/opencv.hpp>
+ #include <opencv2/imgproc/imgproc_c.h>
+ #include <opencv2/legacy/legacy.hpp>
+ #include "opencv2/highgui/highgui.hpp"
+#else
+ #include <cv.h>
+ #include <cxcore.h>
+ #include <highgui.h>
+#endif
+
+
 
 #if INTERCEPT_MOUSE_IN_WINDOWS
 enum
