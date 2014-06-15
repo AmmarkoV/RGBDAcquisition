@@ -10,7 +10,7 @@ using namespace openni;
 
 static const char * jointNames[] =
 {"head",
- "neck", 
+ "neck",
  "torso",
  "left_shoulder",
  "right_shoulder",
@@ -129,6 +129,7 @@ struct skeletonHuman
   unsigned char statusCalibrating,statusStoppedTracking, statusTracking,statusFailed;
 
   struct point3D bbox[8];
+  struct point3D bboxDimensions;
   struct point3D centerOfMass;
   struct point3D joint[HUMAN_SKELETON_PARTS];
   struct point2D joint2D[HUMAN_SKELETON_PARTS];

@@ -9,7 +9,7 @@
 //#define BUILD_OPENNI2 1
 
 #define MOD_FACEDETECTION 0
-#define MOD_NITE2 0
+#define MOD_NITE2 1
 #define MOD_IR 0
 #define BUILD_OPENNI2 1
 #define RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE 1
@@ -591,7 +591,7 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
      fprintf(stdout,"Depth Frames : %u x %u , channels %u , bitsperpixel %u \n",getOpenNI2DepthWidth(devID), getOpenNI2DepthHeight(devID), getOpenNI2DepthChannels(devID) , getOpenNI2DepthBitsPerPixel(devID));
      fprintf(stdout,"Depth Focal Length : %0.2f\n",getOpenNI2DepthFocalLength(devID));
      fprintf(stdout,"Depth Pixel Size : %0.2f\n",getOpenNI2DepthPixelSize(devID));
-     
+
     }
 
     #if USE_CALIBRATION
@@ -693,7 +693,7 @@ double getOpenNI2ColorPixelSize(int devID)
 int getOpenNI2DepthWidth(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
-  	
+
   #if MOD_NITE2 && RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE
 		if (lastDepthComesFromNite[devID]) { return getNite2DepthWidth(devID); }
   #endif
