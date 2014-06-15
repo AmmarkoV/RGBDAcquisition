@@ -12,6 +12,7 @@ IF( ENABLE_NITE2 )
  set(OpenNI2_Parts OpenNI2Acquisition.cpp OpenNI2Acquisition.h Nite2.cpp Nite2.h )
  set(OpenNI2_Includes ${CMAKE_SOURCE_DIR}/3dparty/OpenNI2/Include/ ${CMAKE_SOURCE_DIR}/3dparty/NiTE-Linux-x64-2.2/Include )
  set(OpenNI2_Libraries ${CMAKE_SOURCE_DIR}/3dparty/NiTE-Linux-x64-2.2/Redist/libNiTE2.so)
+ add_definitions(-DMOD_NITE2)
 ENDIF( ENABLE_NITE2 )
 
 
