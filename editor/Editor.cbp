@@ -43,6 +43,7 @@
 			<Add library="./libAcquisition.so" />
 			<Add library="../acquisitionSegment/libAcquisitionSegment.a" />
 			<Add library="../acquisition_mux/libAcquisitionMux.a" />
+			<Add library="../tools/ViewpointChange/libViewpointChange.a" />
 		</Linker>
 		<Unit filename="AddNewElement.cpp" />
 		<Unit filename="AddNewElement.h" />
