@@ -61,7 +61,7 @@ void GetExtrinsics::OnButtonGetExtrinsicsClick(wxCommandEvent& event)
  acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
 
 
- acquisitionSaveRawImageToFile("getExtrinsics.pnm",acquisitionGetColorFrame(moduleID,devID), width , height , channels , bitsperpixel);
+ acquisitionSaveRawImageToFile((char *) "getExtrinsics.pnm",acquisitionGetColorFrame(moduleID,devID), width , height , channels , bitsperpixel);
  sprintf(what2run,"../tools/ExtrinsicCalibration/extrinsicCalibration  -v -w %u -h %u -s %0.5f -i getExtrinsics.pnm -c colorAR.calib",w,h,s);
 
  fprintf(stderr,"What will run %s \n",what2run);
