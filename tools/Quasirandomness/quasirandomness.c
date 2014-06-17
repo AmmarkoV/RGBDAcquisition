@@ -11,7 +11,7 @@ unsigned long  ulrandom()
 int initializeQuasirandomnessContext(struct quasiRandomizerContext * qrc,unsigned int width , unsigned int height , unsigned int depth,int randomSeed)
 {
   srand(time());
-  memset(qrc,sizeof(struct quasiRandomizerContext),0);
+  memset(qrc,0,sizeof(struct quasiRandomizerContext));
   qrc->width=width;
   qrc->height=height;
   qrc->depth=depth;
