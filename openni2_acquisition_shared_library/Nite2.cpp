@@ -108,7 +108,7 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
     skeletonFound->bboxDimensions.x = (float) skeletonFound->bbox[4].x-skeletonFound->bbox[2].x;
     skeletonFound->bboxDimensions.y = (float) skeletonFound->bbox[4].y-skeletonFound->bbox[2].y;
     skeletonFound->bboxDimensions.z = (float) skeletonFound->bbox[4].z-skeletonFound->bbox[2].z;
-    fprintf(stderr,"BBoxSize(%0.2f,%0.2f,%0.2f)\n", skeletonFound->bboxDimensions.x  , skeletonFound->bboxDimensions.y , skeletonFound->bboxDimensions.z );
+    fprintf(stderr,"BBoxSize %0.2f %0.2f %0.2f\n", skeletonFound->bboxDimensions.x  , skeletonFound->bboxDimensions.y , skeletonFound->bboxDimensions.z );
 
 
 
