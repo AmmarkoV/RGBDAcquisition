@@ -6,7 +6,7 @@ cd "$DIR"
 cd ..
 cd ..
  
-./run_grabber.sh -module OPENNI2 -to /dev/null -maxFrames 2000  2> out.txt
+./run_grabber.sh -module OPENNI2 -to /dev/null -maxFrames 5000  2> out.txt
 
 cat out.txt | grep BBoxSize | cut -d ' ' -f 2 > openni2_acquisition_shared_library/scripts/bboxx.txt
 cat out.txt | grep BBoxSize | cut -d ' ' -f 3 > openni2_acquisition_shared_library/scripts/bboxy.txt

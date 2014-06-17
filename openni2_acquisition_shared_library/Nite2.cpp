@@ -94,15 +94,16 @@ void filter2DJoints(struct skeletonHuman * skeletonFound)
            skeletonFound->joint2D[i].x=0;
            skeletonFound->joint2D[i].y=0;
          }
-      printf("%0.2f %0.2f ", skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );      //printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
+      //printf("%0.2f %0.2f ", skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );      //printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
     }
-   printf("\n\n");
+   //printf("\n\n");
 }
 
 
 void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuman * skeletonFound)
 {
     fprintf(stderr, GREEN " " );
+    fprintf(stdout,"Skeleton #%u found at frame %u \n",skeletonFound->userID, frameNumber);
     fprintf(stderr,"Skeleton #%u found at frame %u \n",skeletonFound->userID, frameNumber);
 
     skeletonFound->bboxDimensions.x = (float) skeletonFound->bbox[4].x-skeletonFound->bbox[2].x;
