@@ -322,7 +322,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
 
     #if USE_BIRDVIEW_LOGIC
      unsigned int width , height , channels, bitsperpixel;
-     fallenBody = viewPointChange_ReadPPM("emergency.pnm",&width,&height,&channels,&bitsperpixel,0);
+     fallenBody = viewPointChange_ReadPPM((char*) "emergency.pnm",&width,&height,&channels,&bitsperpixel,0);
     #endif // USE_BIRDVIEW_LOGIC
 
      //Todo -> acquisitionOpenDevice(OPENGL_ACQUISITION_MODULE,9,"Scenes/dragon.conf",width,height,30);
@@ -835,9 +835,11 @@ int  EditorFrame::refreshAllOverlays()
            ( depthAvg < 2000)
          )
                        {
-                        fprintf(stderr,"\n\n OBSTACLE \n\n",depthAvg);
+                        fprintf(stderr,"\n\n OBSTACLE \n\n");
                         ++bleeps;
-                        if (bleeps%10==0) { system("paplay bleep.wav&"); }
+                        if (bleeps%10==0) { int i=system("paplay bleep.wav&");
+                                            if (i!=0) { fprintf(stderr,"Could not emit beep\n"); }
+                                          }
                        }
 
 /*
@@ -1059,12 +1061,12 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
     copyRGBSegmentation(&segmentationSelector->selectedRGBConf, &segConfRGB);
     copyDepthSegmentation(&segmentationSelector->selectedDepthConf, &segConfDepth);
 
-    printDepthSegmentationData("Initial Depth Configuration",&segConfDepth);
+    printDepthSegmentationData((char*) "Initial Depth Configuration",&segConfDepth);
 
     segmentationSelector->reloadSegmentationFormFromValues();
     segmentationSelector->ShowModal();
 
-    printDepthSegmentationData("What Depth Configuration the form filled in ",&segmentationSelector->selectedDepthConf);
+    printDepthSegmentationData((char*) "What Depth Configuration the form filled in ",&segmentationSelector->selectedDepthConf);
 
 
     segmentedFramesExist=1;
@@ -1074,7 +1076,7 @@ void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
     copyDepthSegmentation(&segConfDepth , &segmentationSelector->selectedDepthConf);
 
 
-    printDepthSegmentationData("New Depth Configuration",&segConfDepth);
+    printDepthSegmentationData((char*) "New Depth Configuration",&segConfDepth);
 
     delete  segmentationSelector;
 
