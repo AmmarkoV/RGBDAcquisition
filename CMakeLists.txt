@@ -21,6 +21,9 @@ add_subdirectory (3dparty/fast)
 
 #First to make our handy tools
 add_subdirectory (tools/)
+ 
+#First to make our handy processor plugins
+add_subdirectory (processors/)
 
 #This is the core library
 add_subdirectory (acquisition/)

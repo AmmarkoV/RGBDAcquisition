@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "ViewpointChange.h"
 #include "viewpoint_change.h"
 
@@ -56,7 +57,7 @@ unsigned char * viewPointChange_ReadPPM(char * filename,unsigned int * width , u
         fprintf(stderr,"BitsPerPixel %u , Channels %u\n", *bitsperpixel,*channels);
 
 
-        if (read_only_header) { fclose(pf); return 1; }
+        if (read_only_header) { fclose(pf); return 0; }
 
 	    unsigned int pic_image_size = (*height) * (*width) * (*channels) * ((unsigned int) (*bitsperpixel)/8);
 	    unsigned char * pic_pixels = (unsigned char * ) malloc(pic_image_size);

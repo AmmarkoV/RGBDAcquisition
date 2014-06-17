@@ -23,7 +23,7 @@
 #include "GetExtrinsics.h"
 #include "AddNewElement.h"
 
-#include "../tools/ViewpointChange/ViewpointChange.h"
+#include "../processors/ViewpointChange/ViewpointChange.h"
 
 #define USE_BIRDVIEW_LOGIC 1
 

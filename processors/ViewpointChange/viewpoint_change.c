@@ -23,7 +23,7 @@ unsigned char * birdsEyeView(unsigned char * rgb,unsigned short * depth,unsigned
   if (rgb==0)  { fprintf(stderr,"RGB is not allocated , cannot perform birdsEyeView transformation \n"); return 0; }
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform birdsEyeView transformation \n"); return 0; }
   unsigned char * rgbPTR= rgb; unsigned char * rgbLimit = rgb + width*height*3;
-  unsigned short * depthPTR= depth; unsigned short * depthLimit = depth + width*height;
+  unsigned short * depthPTR= depth; //unsigned short * depthLimit = depth + width*height;
 
 
   unsigned char * birdEyeFrame = (unsigned char*) malloc(width*height*3*sizeof(unsigned char));
