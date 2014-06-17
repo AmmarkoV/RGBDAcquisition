@@ -12,6 +12,7 @@ OPTION (ENABLE_TEMPLATE ON)
 OPTION (ENABLE_V4L2 ON)
 OPTION (ENABLE_OPENNI1 ON)
 OPTION (ENABLE_OPENNI2 ON)
+OPTION (ENABLE_NITE2 OFF)
 OPTION (ENABLE_OPENGL ON)
 OPTION (ENABLE_NETWORK ON)
 OPTION (ENABLE_EDITOR ON)
@@ -20,6 +21,9 @@ add_subdirectory (3dparty/fast)
 
 #First to make our handy tools
 add_subdirectory (tools/)
+ 
+#First to make our handy processor plugins
+add_subdirectory (processors/)
 
 #This is the core library
 add_subdirectory (acquisition/)

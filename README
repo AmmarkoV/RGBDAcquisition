@@ -6,6 +6,9 @@ cd 3dparty && ./get_third_party_libs.sh
 
 To compile the library issue :
 
+mkdir build 
+cd build 
+cmake .. 
 make 
 
 Due to making things that require OpenNI , OpenNI2 , libFreenect , OpenGL , OpenCV and other stuff by just issuing the make script will stop in the first failure. 
@@ -20,11 +23,7 @@ Another way to deal with missing dependencies is through the acquisition/acquisi
 
 
 
-To compile the tools issue :
-cd tools 
-make
-
-as said above if you dont have OpenCV you might not be able to build all of them
+To compile the tools ,  if you dont have OpenCV you might not be able to build all of them
 
 
 The project is divided in libraries applications and tools

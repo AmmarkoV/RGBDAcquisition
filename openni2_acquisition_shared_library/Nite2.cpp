@@ -70,27 +70,11 @@ void newSkeletonPointingDetected(int devID, unsigned int frameNumber ,struct ske
 }
 
 
-void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuman * skeletonFound)
+void filter2DJoints(struct skeletonHuman * skeletonFound)
 {
-    fprintf(stderr, GREEN " " );
-    fprintf(stderr,"Skeleton #%u found at frame %u \n",skeletonFound->userID, frameNumber);
-
-    fprintf(stderr,"BBox : ( ");
-    unsigned int i=0;
-    for (i=0; i<4; i++)
-    {
-      fprintf(stderr,"%0.1f %0.1f " ,skeletonFound->bbox[i].x , skeletonFound->bbox[i].y  );
-      if (i<3) { fprintf(stderr,","); } else { fprintf(stderr,")"); }
-    }
-    fprintf(stderr,"\n");
-    fprintf(stderr,"Center of Mass %0.2f %0.2f %0.2f \n",skeletonFound->centerOfMass.x,skeletonFound->centerOfMass.y,skeletonFound->centerOfMass.z);
-    fprintf(stderr,"Head %0.2f %0.2f %0.2f \n",skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
-    fprintf(stderr,  " \n" NORMAL );
-
-
+ unsigned int i=0;
     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
-      #if DO_2D_JOIN_FILTERING
        int badJoint = 0;
        if (
             (
@@ -110,12 +94,39 @@ void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuma
            skeletonFound->joint2D[i].x=0;
            skeletonFound->joint2D[i].y=0;
          }
-      #endif // DO_2D_JOIN_FILTERING
-
-      printf("%0.2f %0.2f ", skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
-      //printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
+      printf("%0.2f %0.2f ", skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );      //printf("JOINT2D(%s,%0.2f,%0.2f)\n" , humanSkeletonJointNames[i] , skeletonFound->joint2D[i].x , skeletonFound->joint2D[i].y );
     }
    printf("\n\n");
+}
+
+
+void newSkeletonDetected(int devID,unsigned int frameNumber ,struct skeletonHuman * skeletonFound)
+{
+    fprintf(stderr, GREEN " " );
+    fprintf(stderr,"Skeleton #%u found at frame %u \n",skeletonFound->userID, frameNumber);
+
+    skeletonFound->bboxDimensions.x = (float) skeletonFound->bbox[4].x-skeletonFound->bbox[2].x;
+    skeletonFound->bboxDimensions.y = (float) skeletonFound->bbox[4].y-skeletonFound->bbox[2].y;
+    skeletonFound->bboxDimensions.z = (float) skeletonFound->bbox[4].z-skeletonFound->bbox[2].z;
+    fprintf(stderr,"BBoxSize(%0.2f,%0.2f,%0.2f)\n", skeletonFound->bboxDimensions.x  , skeletonFound->bboxDimensions.y , skeletonFound->bboxDimensions.z );
+
+
+
+    fprintf(stderr,"BBox(");
+    unsigned int i=0;
+    for (i=0; i<8; i++)
+    {
+      fprintf(stderr,"%0.1f %0.1f " ,skeletonFound->bbox[i].x , skeletonFound->bbox[i].y  );
+      if (i<7) { fprintf(stderr,","); } else { fprintf(stderr,")"); }
+    }
+    fprintf(stderr,"\n");
+    fprintf(stderr,"Center of Mass %0.2f %0.2f %0.2f \n",skeletonFound->centerOfMass.x,skeletonFound->centerOfMass.y,skeletonFound->centerOfMass.z);
+    fprintf(stderr,"Head %0.2f %0.2f %0.2f \n",skeletonFound->joint[HUMAN_SKELETON_HEAD].x,skeletonFound->joint[HUMAN_SKELETON_HEAD].y,skeletonFound->joint[HUMAN_SKELETON_HEAD].z);
+    fprintf(stderr,  " \n" NORMAL );
+
+    #if DO_2D_JOIN_FILTERING
+      filter2DJoints(skeletonFound);
+    #endif
 
   if (stc[devID].skelCallbackAddr!=0)
   {

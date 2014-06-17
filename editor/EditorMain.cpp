@@ -23,7 +23,7 @@
 #include "GetExtrinsics.h"
 #include "AddNewElement.h"
 
-#include "../tools/ViewpointChange/ViewpointChange.h"
+#include "../processors/ViewpointChange/ViewpointChange.h"
 
 #define USE_BIRDVIEW_LOGIC 1
 
@@ -48,6 +48,8 @@ struct SegmentationFeaturesRGB segConfRGB={0};
 struct SegmentationFeaturesDepth segConfDepth={0};
 struct calibration calib;
 
+unsigned char * fallenBody =0;
+unsigned int bleeps=0;
 
 unsigned int overlayModule=OPENGL_ACQUISITION_MODULE;
 unsigned int overlayDevice=6;
@@ -318,6 +320,10 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
      col1.SetWidth(70);
      ListCtrlPoints->InsertColumn(1, col1);
 
+    #if USE_BIRDVIEW_LOGIC
+     unsigned int width , height , channels, bitsperpixel;
+     fallenBody = viewPointChange_ReadPPM("emergency.pnm",&width,&height,&channels,&bitsperpixel,0);
+    #endif // USE_BIRDVIEW_LOGIC
 
      //Todo -> acquisitionOpenDevice(OPENGL_ACQUISITION_MODULE,9,"Scenes/dragon.conf",width,height,30);
     //Connect( wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(EditorFrame::onIdle) );
@@ -522,6 +528,11 @@ void EditorFrame::OnQuit(wxCommandEvent& event)
     stopOverlay();
 
     removeOldSegmentedFrames();
+
+    #if USE_BIRDVIEW_LOGIC
+     if (fallenBody!=0) { free(fallenBody); fallenBody=0; }
+    #endif // USE_BIRDVIEW_LOGIC
+
 
     acquisitionCloseDevice(moduleID,devID);
     acquisitionStopModule(moduleID);
@@ -814,6 +825,22 @@ int  EditorFrame::refreshAllOverlays()
     #if USE_BIRDVIEW_LOGIC
       if(CheckBoxPluginProc->GetValue())
       {
+
+      unsigned int depthAvg = viewPointChange_countDepths(acquisitionGetDepthFrame(moduleID,devID) , width , height,
+                                147 , 169 , 300 , 200 ,
+                                1000 );
+      fprintf(stderr,"RECT Score is %u \n",depthAvg);
+      if (
+           ( depthAvg > 1000) &&
+           ( depthAvg < 2000)
+         )
+                       {
+                        fprintf(stderr,"\n\n OBSTACLE \n\n",depthAvg);
+                        ++bleeps;
+                        if (bleeps%10==0) { system("paplay bleep.wav&"); }
+                       }
+
+/*
        unsigned char * bev = viewPointChange_mallocTransformToBirdEyeView
                                  (
                                   acquisitionGetColorFrame(moduleID,devID) ,
@@ -822,12 +849,21 @@ int  EditorFrame::refreshAllOverlays()
                                  );
        if (bev!=0) {
                        //acquisitionSaveRawImageToFile( "bev.pnm",bev   , width , height , 3, 8 );
-
                        unsigned int newColorByteSize = width * height * 3 * sizeof(unsigned char);
                        acquisitionOverrideColorFrame(moduleID,devID,bev,newColorByteSize);
 
-                     free(bev);
-                   }
+                       unsigned int fitScore = viewPointChange_fitImageInMask(bev,fallenBody, width , height );
+
+                       fprintf(stderr,"Score is %u \n",fitScore);
+                       if (fitScore < 4000)
+                       {
+                        fprintf(stderr,"\n\n OBSTACLE \n\n",fitScore);
+                        ++bleeps;
+                        if (bleeps%10==0) { system("paplay bleep.wav&"); }
+                       }
+
+                       free(bev);
+                   }*/
       }
     #endif // USE_BIRDVIEW_LOGIC
  return retres;
