@@ -40,6 +40,7 @@
 		<Linker>
 			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="../tools/OperatingSystem/libOperatingSystem.a" />
+			<Add library="../tools/Codecs/libCodecs.a" />
 		</Linker>
 		<Unit filename="TemplateAcquisition.c">
 			<Option compilerVar="CC" />

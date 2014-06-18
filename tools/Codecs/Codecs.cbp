@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/Codecs" prefix_auto="1" extension_auto="1" />
+				<Option output="./libCodecs" prefix_auto="0" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
@@ -19,7 +19,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/Codecs" prefix_auto="1" extension_auto="1" />
+				<Option output="./libCodecs" prefix_auto="0" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="obj/Release/" />
 				<Option type="2" />
@@ -34,9 +34,33 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Unit filename="main.c">
+		<Compiler>
+			<Add option="-fPIC" />
+		</Compiler>
+		<Unit filename="codecs.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="codecs.h" />
+		<Unit filename="jpgExifexternal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpgExifexternal.h" />
+		<Unit filename="jpgExiforient_embed.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpgExiforient_embed.h" />
+		<Unit filename="jpgInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpgInput.h" />
+		<Unit filename="pngInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pngInput.h" />
+		<Unit filename="ppmInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ppmInput.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

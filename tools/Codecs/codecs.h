@@ -56,14 +56,18 @@ struct Image
 unsigned int simplePow(unsigned int base,unsigned int exp);
 
 struct Image * readImage( char *filename,unsigned int type,char read_only_header);
+unsigned char * readImageRaw( char *filename,unsigned int type,unsigned int *width,unsigned int *height,unsigned int *bitsperpixel , unsigned int *channels);
 
 int writeImageFile(struct Image * pic,unsigned int type,char *filename);
 int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned long * mem_size);
+
 
 struct Image * createImageUsingExistingBuffer( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel , unsigned char * pixels);
 struct Image * createImage( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel);
 int destroyImage(struct Image * img);
 
+int swapImageEndianness(struct Image * img);
+int swapImageEndiannessRaw(unsigned char * pixels, unsigned int width,unsigned int height,unsigned int bitsperpixel , unsigned int channels);
 #ifdef __cplusplus
 }
 #endif

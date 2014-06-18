@@ -7,7 +7,7 @@ add_library(TemplateAcquisition SHARED
             templateAcquisitionHelper.c
             templateAcquisitionHelper.h 
            ) 
-target_link_libraries(TemplateAcquisition rt m CalibrationLibrary OperatingSystem) 
+target_link_libraries(TemplateAcquisition rt m CalibrationLibrary OperatingSystem Codecs) 
  
  
 

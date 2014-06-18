@@ -23,9 +23,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "jpgInput.h"
-#include "pngInput.h"
-#include "ppmInput.h"
+#if USE_JPG_FILES
+      #include "jpgInput.h"
+#endif // USE_JPG_FILES
+
+
+#if USE_PNG_FILES
+      #include "pngInput.h"
+#endif // USE_PNG_FILES
+
+
+#if USE_PPM_FILES
+      #include "ppmInput.h"
+#endif // USE_PPM_FILES
 
 #define DEBUG_READING_IMAGES 0
 
@@ -93,6 +103,72 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 
    return img;
 }
+
+
+unsigned char * readImageRaw( char *filename,unsigned int type,unsigned int *width,unsigned int *height,unsigned int *bitsperpixel , unsigned int *channels)
+{
+    struct Image * img = readImage(filename,type,0);
+    if (img!=0)
+    {
+        unsigned char * pixels = img->pixels;
+        *width=img->width;
+        *height=img->height;
+        *bitsperpixel=img->bitsperpixel;
+        *channels=img->channels;
+
+
+        free(img);
+        return pixels;
+    }
+   return 0;
+}
+
+
+
+
+int swapImageEndianness(struct Image * img)
+{
+  unsigned char * traverser=(unsigned char * ) img->pixels;
+  unsigned char * traverserSwap1=(unsigned char * ) img->pixels;
+  unsigned char * traverserSwap2=(unsigned char * ) img->pixels;
+
+  unsigned int bytesperpixel = (img->bitsperpixel/8);
+  unsigned char * endOfMem = traverser + img->width * img->height * img->channels * bytesperpixel;
+
+  unsigned char tmp ;
+  while ( ( traverser < endOfMem)  )
+  {
+    traverserSwap1 = traverser;
+    traverserSwap2 = traverser+1;
+
+    tmp = *traverserSwap1;
+    *traverserSwap1 = *traverserSwap2;
+    *traverserSwap2 = tmp;
+
+    traverser += bytesperpixel;
+  }
+
+ return 1;
+}
+
+int swapImageEndiannessRaw(unsigned char * pixels, unsigned int width,unsigned int height,unsigned int bitsperpixel , unsigned int channels)
+{
+  struct Image imgS={0};
+
+  imgS.bitsperpixel=bitsperpixel;
+  imgS.channels=channels;
+  imgS.width=width;
+  imgS.height=height;
+  imgS.pixels=pixels;
+
+  return swapImageEndianness(&imgS);
+}
+
+
+
+
+
+
 
 
 int writeImageFile(struct Image * pic,unsigned int type,char *filename)
@@ -187,3 +263,5 @@ int destroyImage(struct Image * img)
     if (img!=0) { free(img); img=0; }
     return 1;
 }
+
+

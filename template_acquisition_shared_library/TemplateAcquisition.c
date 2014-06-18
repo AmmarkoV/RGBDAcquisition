@@ -290,7 +290,7 @@ int snapTemplateFrames(int devID)
       #if REALLOCATE_ON_EVERY_SNAP
         if (device[devID].templateDepthFrame!=0) { free(device[devID].templateDepthFrame); device[devID].templateDepthFrame=0; }
       #endif
-      device[devID].templateDepthFrame = (unsigned short *) ReadImageFile(device[devID].templateColorFrame,file_name_test,device[devID].extension,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
+      device[devID].templateDepthFrame = (unsigned short *) ReadImageFile(device[devID].templateDepthFrame,file_name_test,device[devID].extension,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
       ++found_frames;
      }
 

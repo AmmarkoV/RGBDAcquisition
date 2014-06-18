@@ -3,8 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define USE_CODEC_LIBRARY 0
+#define USE_CODEC_LIBRARY 1
+
+ #if USE_CODEC_LIBRARY
+  #include "../tools/Codecs/codecs.h"
+ #endif // USE_CODEC_LIBRARY
+
+
 #define PPMREADBUFLEN 256
+
+
 
 int makeFrameNoInput(unsigned char * frame , unsigned int width , unsigned int height , unsigned int channels)
 {
@@ -34,7 +42,7 @@ int FileExists(char * filename)
 
 
 
-unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
+unsigned char * ReadPNMInternal(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     //See http://en.wikipedia.org/wiki/Portable_anymap#File_format_description for this simple and useful format
     unsigned char * pixels=buffer;
@@ -194,9 +202,16 @@ unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int
 void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,  unsigned int * widthInternal, unsigned int * heightInternal, unsigned long *  timestampInternal)
 {
  #if USE_CODEC_LIBRARY
-   return ReadPNM(existingBuffer,filename,widthInternal,heightInternal,timestampInternal);
+   unsigned int type=0;
+   if (strcmp(extension,"pnm")==0) { type=PNM_CODEC; } else
+   if (strcmp(extension,"png")==0) { type=PNG_CODEC; } else
+   if (strcmp(extension,"jpg")==0) { type=JPG_CODEC; }
+   unsigned int bitsperpixel,channels;
+   char * pixels = readImageRaw(filename,type,widthInternal,heightInternal,&bitsperpixel,&channels);
+   if ( (channels==1) && (bitsperpixel==16) && (type==PNG_CODEC) ) { swapImageEndiannessRaw( pixels, *widthInternal , *heightInternal ,bitsperpixel , channels);  }
+   return pixels ;
  #else
-   return ReadPNM(existingBuffer,filename,widthInternal,heightInternal,timestampInternal);
+   return ReadPNMInternal(existingBuffer,filename,widthInternal,heightInternal,timestampInternal);
  #endif // USE_CODEC_LIBRARY
 }
 
