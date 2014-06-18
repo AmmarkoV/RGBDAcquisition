@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1403082254 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.cpp
+1403083526 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.cpp
 	<stdio.h>
 	<stdlib.h>
 	"TemplateAcquisition.h"
@@ -22,5 +22,21 @@
 
 1386338530 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
 
-1403082217 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.h
+1403083438 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.h
+
+1403083430 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.c
+	"templateAcquisitionHelper.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1403083526 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.c
+	<stdio.h>
+	<stdlib.h>
+	"TemplateAcquisition.h"
+	"../acquisition/Acquisition.h"
+	"../tools/OperatingSystem/OperatingSystem.h"
+	<string.h>
+	<math.h>
+	"templateAcquisitionHelper.h"
 

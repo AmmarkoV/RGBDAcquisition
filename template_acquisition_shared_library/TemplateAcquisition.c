@@ -158,24 +158,6 @@ int stopTemplateModule()
 }
 
 
-int findLastFrame(int devID)
-{
-  unsigned int i=0;
-  char file_name_test[1024];
-
-  while (i<100000)
-  {
-   device[devID].totalFrames = i;
-   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",device[devID].readFromDir,devID,i,device[devID].extension);
-   if ( ! FileExists(file_name_test) ) { break; }
-   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.%s",device[devID].readFromDir,devID,i,device[devID].extension);
-   if ( ! FileExists(file_name_test) ) { break; }
-   ++i;
-  }
-
-  return 1;
-}
-
 int listTemplateDevices(int devID,char * output, unsigned int maxOutput)
 {
     #if USE_DIRECTORY_LISTING
@@ -205,7 +187,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                                 { strncpy(device[devID].readFromDir,devName,MAX_DIR_PATH);  }
      }
 
-  findLastFrame(devID);
+  device[devID].totalFrames=findLastFrame(devID,device[devID].readFromDir,device[devID].extension);
 
   unsigned int failedStream=0;
   unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;

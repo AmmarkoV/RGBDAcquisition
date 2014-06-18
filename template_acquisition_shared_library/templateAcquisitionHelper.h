@@ -17,5 +17,8 @@ int FileExists(char * filename);
 unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp);
 int flipDepth(unsigned short * depth,unsigned int width , unsigned int height );
 
+unsigned int retreiveDatasetDeviceID(unsigned int devID , unsigned int cycle , char * readFromDir , char * extension);
+
+unsigned int findLastFrame(int devID, char * readFromDir , char * extension);
 
 #endif // TEMPLATEACQUISITIONHELPER_H_INCLUDED
