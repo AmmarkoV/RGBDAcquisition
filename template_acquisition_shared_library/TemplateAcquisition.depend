@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1391473658 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.cpp
+1403082254 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.cpp
 	<stdio.h>
 	<stdlib.h>
 	"TemplateAcquisition.h"
@@ -7,17 +7,20 @@
 	"../tools/OperatingSystem/OperatingSystem.h"
 	<string.h>
 	<math.h>
+	"templateAcquisitionHelper.h"
 
-1386765166 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.h
+1401218135 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.h
 	"../acquisition/acquisition_setup.h"
 	"../tools/Calibration/calibration.h"
 
-1391438407 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
+1393507135 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
 
-1391351464 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
+1396361333 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
 	"../tools/Calibration/calibration.h"
 
-1386766795 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/OperatingSystem/OperatingSystem.h
+1391515895 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/OperatingSystem/OperatingSystem.h
 
 1386338530 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
+
+1403082217 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.h
 

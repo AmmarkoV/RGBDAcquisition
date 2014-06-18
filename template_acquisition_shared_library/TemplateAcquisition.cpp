@@ -18,10 +18,12 @@
 #include <string.h>
 #include <math.h>
 
+#include "templateAcquisitionHelper.h"
+
 #define SAFEGUARD_VALUE 123123
 #define MAX_TEMPLATE_DEVICES 5
 #define MAX_DIR_PATH 1024
-#define PPMREADBUFLEN 256
+#define MAX_EXTENSION_PATH 16
 #define MAX_LINE_CALIBRATION 1024
 
 #define DEFAULT_FOCAL_LENGTH 120.0
@@ -29,7 +31,7 @@
 
 #define REALLOCATE_ON_EVERY_SNAP 0
  #if REALLOCATE_ON_EVERY_SNAP
-         #warning "Reallocating arrays on every frame , performance --"
+         #warning "Reallocating arrays on every frame ,  performance will be impacted by this "
         #else
          #warning "Not Reallocating arrays on every frame this means better performance but if stream dynamically changes resolution from frame to frame this could be a problem"
  #endif
@@ -39,19 +41,10 @@
 
 
 
-#define NORMAL   "\033[0m"
-#define BLACK   "\033[30m"      /* Black */
-#define RED     "\033[31m"      /* Red */
-#define GREEN   "\033[32m"      /* Green */
-#define YELLOW  "\033[33m"      /* Yellow */
-#define BLUE    "\033[34m"      /* Blue */
-#define MAGENTA "\033[35m"      /* Magenta */
-#define CYAN    "\033[36m"      /* Cyan */
-#define WHITE   "\033[37m"      /* White */
-
 struct TemplateVirtualDevice
 {
  char readFromDir[MAX_DIR_PATH]; // <- this sucks i know :P
+ char extension[MAX_EXTENSION_PATH];
  unsigned int cycle;
  unsigned int totalFrames;
  unsigned int safeGUARD;
@@ -71,37 +64,11 @@ struct TemplateVirtualDevice
 
 struct TemplateVirtualDevice device[MAX_TEMPLATE_DEVICES]={0};
 
-int makeFrameNoInput(unsigned char * frame , unsigned int width , unsigned int height , unsigned int channels)
-{
-   unsigned char * framePTR = frame;
-   unsigned char * frameLimit = frame + width * height * channels * sizeof(char);
-
-   while (framePTR<frameLimit)
-   {
-       *framePTR=0; ++framePTR;
-       *framePTR=0; ++framePTR;
-       *framePTR=255; ++framePTR;
-   }
- return 1;
-}
-
-
-int FileExists(char * filename)
-{
- FILE *fp = fopen(filename,"r");
- if( fp ) { /* exists */
-            fclose(fp);
-            return 1;
-          }
- /* doesnt exist */
- return 0;
-}
 
 
 int mapTemplateDepthToRGB(int devID) { return 0; }
 int mapTemplateRGBToDepth(int devID) { return 0; }
 int switchTemplateToColorStream(int devID) { return 1; }
-
 
 int getTemplateNumberOfColorStreams(int devID) { return 1; /*TODO support multiple streams*/ }
 
@@ -148,124 +115,6 @@ int setTemplateDepthCalibration(int devID,struct calibration * calib)
 
 
 
-unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
-{
-    //See http://en.wikipedia.org/wiki/Portable_anymap#File_format_description for this simple and useful format
-    unsigned char * pixels=buffer;
-    FILE *pf=0;
-    pf = fopen(filename,"rb");
-
-    if (pf!=0 )
-    {
-        *width=0; *height=0; *timestamp=0;
-        unsigned int bytesPerPixel=0;
-        unsigned int channels=0;
-        char buf[PPMREADBUFLEN]={0};
-        char *t;
-        unsigned int w=0, h=0, d=0;
-        int r=0 , z=0;
-
-        t = fgets(buf, PPMREADBUFLEN, pf);
-        if (t == 0) { return buffer; }
-
-        if ( strncmp(buf,"P6\n", 3) == 0 ) { channels=3; } else
-        if ( strncmp(buf,"P5\n", 3) == 0 ) { channels=1; } else
-                                           { fprintf(stderr,"Could not understand/Not supported file format\n"); fclose(pf); return buffer; }
-        do
-        { /* Px formats can have # comments after first line */
-           #if PRINT_COMMENTS
-             memset(buf,0,PPMREADBUFLEN);
-           #endif
-           t = fgets(buf, PPMREADBUFLEN, pf);
-           if (strstr(buf,"TIMESTAMP")!=0)
-              {
-                char * timestampPayloadStr = buf + 10;
-                *timestamp = atoi(timestampPayloadStr);
-              }
-
-           if ( t == 0 ) { fclose(pf); return buffer; }
-        } while ( strncmp(buf, "#", 1) == 0 );
-        z = sscanf(buf, "%u %u", &w, &h);
-        if ( z < 2 ) { fclose(pf); fprintf(stderr,"Incoherent dimensions received %ux%u \n",w,h); return buffer; }
-        // The program fails if the first byte of the image is equal to 32. because
-        // the fscanf eats the space and the image is read with some bit less
-        r = fscanf(pf, "%u\n", &d);
-        if (r < 1) { fprintf(stderr,"Could not understand how many bytesPerPixel there are on this image\n"); fclose(pf); return buffer; }
-        if (d==255) { bytesPerPixel=1; }  else
-        if (d==65535) { bytesPerPixel=2; } else
-                       { fprintf(stderr,"Incoherent payload received %u bits per pixel \n",d); fclose(pf); return buffer; }
-
-
-        //This is a super ninja hackish patch that fixes the case where fscanf eats one character more on the stream
-        //It could be done better  ( no need to fseek ) but this will have to do for now
-        //Scan for border case
-           unsigned long startOfBinaryPart = ftell(pf);
-           if ( fseek (pf , 0 , SEEK_END)!=0 ) { fprintf(stderr,"Could not find file size to cache client..!\nUnable to serve client\n"); fclose(pf); return 0; }
-           unsigned long totalFileSize = ftell (pf); //lSize now holds the size of the file..
-
-           //fprintf(stderr,"totalFileSize-startOfBinaryPart = %u \n",totalFileSize-startOfBinaryPart);
-           //fprintf(stderr,"bytesPerPixel*channels*w*h = %u \n",bytesPerPixel*channels*w*h);
-           if (totalFileSize-startOfBinaryPart < bytesPerPixel*channels*w*h )
-           {
-              fprintf(stderr," Detected Border Case\n\n\n");
-              startOfBinaryPart-=1;
-           }
-           if ( fseek (pf , startOfBinaryPart , SEEK_SET)!=0 ) { fprintf(stderr,"Could not find file size to cache client..!\nUnable to serve client\n"); fclose(pf); return 0; }
-         //-----------------------
-         //----------------------
-
-        *width=w; *height=h;
-        if (pixels==0) {  pixels= (unsigned char*) malloc(w*h*bytesPerPixel*channels*sizeof(char)); }
-
-        if ( pixels != 0 )
-        {
-          size_t rd = fread(pixels,bytesPerPixel*channels, w*h, pf);
-          if (rd < w*h )
-             {
-               fprintf(stderr,"Note : Incomplete read while reading file %s (%u instead of %u)\n",filename,(unsigned int) rd, w*h);
-               fprintf(stderr,"Dimensions ( %u x %u ) , Depth %u bytes , Channels %u \n",w,h,bytesPerPixel,channels);
-             }
-
-          fclose(pf);
-
-           #if PRINT_COMMENTS
-             if ( (channels==1) && (bytesPerPixel==2) && (timestamp!=0) ) { printf("DEPTH %lu\n",*timestamp); } else
-             if ( (channels==3) && (bytesPerPixel==1) && (timestamp!=0) ) { printf("COLOR %lu\n",*timestamp); }
-           #endif
-
-          return pixels;
-        } else
-        {
-            fprintf(stderr,"Could not Allocate enough memory for file %s \n",filename);
-        }
-        fclose(pf);
-    } else
-    {
-      fprintf(stderr,"File %s does not exist \n",filename);
-    }
-  return buffer;
-}
-
-
-int flipDepth(unsigned short * depth,unsigned int width , unsigned int height )
-{
-  unsigned char tmp ;
-  unsigned char * depthPtr=(unsigned char *) depth;
-  unsigned char * depthPtrNext=(unsigned char *) depth+1;
-  unsigned char * depthPtrLimit =(unsigned char *) depth + width * height * 2 ;
-  while ( depthPtr < depthPtrLimit )
-  {
-     tmp=*depthPtr;
-     *depthPtr=*depthPtrNext;
-     *depthPtrNext=tmp;
-
-     ++depthPtr;
-     ++depthPtrNext;
-  }
-
- return 0;
-}
-
 
 
 int startTemplateModule(unsigned int max_devs,char * settings)
@@ -278,6 +127,7 @@ int startTemplateModule(unsigned int max_devs,char * settings)
         device[devID].templateHEIGHT = 480;
 
         device[devID].readFromDir[0]=0; // <- this sucks i know :P
+        strncpy(device[devID].extension,"pnm",MAX_EXTENSION_PATH);
         device[devID].cycle=0;
 
         device[devID].safeGUARD = SAFEGUARD_VALUE;
@@ -316,9 +166,9 @@ int findLastFrame(int devID)
   while (i<100000)
   {
    device[devID].totalFrames = i;
-   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,i);
+   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",device[devID].readFromDir,devID,i,device[devID].extension);
    if ( ! FileExists(file_name_test) ) { break; }
-   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devID,i);
+   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.%s",device[devID].readFromDir,devID,i,device[devID].extension);
    if ( ! FileExists(file_name_test) ) { break; }
    ++i;
   }
@@ -361,10 +211,10 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;
 
   char file_name_test[1024];
-  sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
+  sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",device[devID].readFromDir,devID,0,device[devID].extension);
   unsigned char * tmpColor = ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
-   { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
+   { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
 
   if (tmpColor!=0) { device[devID].templateColorFrame=tmpColor; } else
   {
@@ -378,7 +228,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
   unsigned short * tmpDepth = (unsigned short *) ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
-   { fprintf(stderr,"Please note that the templateColor.pnm file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",widthInternal,heightInternal,width,height); }
+   { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
 
   if (tmpDepth!=0) { device[devID].templateDepthFrame=tmpDepth; } else
   {
@@ -444,9 +294,9 @@ int snapTemplateFrames(int devID)
     int devIDInc=devID;
     while ( (devIDInc >=0 ) && (!decided) )
     {
-      sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devIDInc,device[devID].cycle);
+      sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",device[devID].readFromDir,devIDInc,device[devID].cycle,device[devID].extension);
       if (FileExists(file_name_test)) { devIDRead=devIDInc; decided=1; }
-      sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devIDInc,device[devID].cycle);
+      sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.%s",device[devID].readFromDir,devIDInc,device[devID].cycle,device[devID].extension);
       if (FileExists(file_name_test)) { devIDRead=devIDInc; decided=1; }
 
       if (devIDInc==0) { break; decided=1; } else
@@ -463,7 +313,7 @@ int snapTemplateFrames(int devID)
 
 
 
-    sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.pnm",device[devID].readFromDir,devIDRead,device[devID].cycle);
+    sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",device[devID].readFromDir,devIDRead,device[devID].cycle,device[devID].extension);
     //fprintf(stderr,"Snap color %s\n",file_name_test);
     if (FileExists(file_name_test))
      {
@@ -474,7 +324,7 @@ int snapTemplateFrames(int devID)
        ++found_frames;
      }
 
-    sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devIDRead,device[devID].cycle);
+    sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.%s",device[devID].readFromDir,devIDRead,device[devID].cycle,device[devID].extension);
     //fprintf(stderr,"Snap depth %s",file_name_test);
     if (FileExists(file_name_test))
      {

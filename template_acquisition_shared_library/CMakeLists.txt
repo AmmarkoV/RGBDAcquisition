@@ -4,6 +4,8 @@ cmake_minimum_required( VERSION 2.8.7 )
 add_library(TemplateAcquisition SHARED 
             TemplateAcquisition.cpp
             TemplateAcquisition.h
+            templateAcquisitionHelper.cpp
+            templateAcquisitionHelper.h
            ) 
 target_link_libraries(TemplateAcquisition rt m CalibrationLibrary OperatingSystem) 
  
