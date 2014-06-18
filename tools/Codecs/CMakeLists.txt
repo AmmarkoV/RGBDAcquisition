@@ -1,11 +1,34 @@
-project( Codecs ) 
-cmake_minimum_required( VERSION 2.8.7 )   
- 
-add_library(Codecs STATIC ppmInput.c ppmInput.h pngInput.c pngInput.h jpgInput.c jpgInput.h jpgExifexternal.c jpgExifexternal.h jpgExiforient_embed.c jpgExiforient_embed.h codecs.c codecs.h ) 
-target_link_libraries(Codecs m rt ) 
- 
+project( Codecs )
+cmake_minimum_required( VERSION 2.8.7 )
 
-set_target_properties(Codecs PROPERTIES 
+
+IF( ENABLE_JPG )
+ set(JPG_Parts jpgInput.c jpgInput.h jpgExifexternal.c jpgExifexternal.h jpgExiforient_embed.c jpgExiforient_embed.h )
+ set(JPG_Includes ${CMAKE_SOURCE_DIR}/3dparty/OpenNI2/Include/ )
+ add_definitions(-DUSE_JPG_FILES)
+ENDIF( ENABLE_JPG )
+
+
+IF( ENABLE_PNG )
+set(PNG_Parts pngInput.c pngInput.h)
+set(PNG_Includes ${CMAKE_SOURCE_DIR}/3dparty/OpenNI2/Include/ )
+ add_definitions(-DUSE_PNG_FILES)
+ENDIF( ENABLE_PNG )
+
+
+add_library(
+            Codecs STATIC
+            ppmInput.c
+            ppmInput.
+            ${PNG_Parts}
+            ${JPG_Parts}
+            codecs.c
+            codecs.h
+           )
+target_link_libraries(Codecs m rt )
+
+
+set_target_properties(Codecs PROPERTIES
                        DEBUG_POSTFIX "D"
                        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
