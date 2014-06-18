@@ -22,7 +22,6 @@
 
 #define SAFEGUARD_VALUE 123123
 #define MAX_TEMPLATE_DEVICES 5
-#define MAX_EXTENSION_PATH 16
 #define MAX_LINE_CALIBRATION 1024
 
 #define DEFAULT_FOCAL_LENGTH 120.0
@@ -126,6 +125,7 @@ int startTemplateModule(unsigned int max_devs,char * settings)
 
         device[devID].readFromDir[0]=0; // <- this sucks i know :P
         strncpy(device[devID].extension,"pnm",MAX_EXTENSION_PATH);
+
         device[devID].cycle=0;
 
         device[devID].safeGUARD = SAFEGUARD_VALUE;
@@ -185,6 +185,8 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                                 { strncpy(device[devID].readFromDir,devName,MAX_DIR_PATH);  }
      }
 
+  findExtensionOfDataset(devID,device[devID].readFromDir,device[devID].extension);
+  fprintf(stderr,"Extension of dataset %s is %s \n",device[devID].readFromDir,device[devID].extension);
   device[devID].totalFrames=findLastFrame(devID,device[devID].readFromDir,device[devID].extension);
 
   unsigned int failedStream=0;
@@ -192,7 +194,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
   char file_name_test[MAX_DIR_PATH];
   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 ,device[devID].readFromDir,device[devID].extension);
-  unsigned char * tmpColor = ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
+  unsigned char * tmpColor = ReadImageFile(0,file_name_test,device[devID].extension,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
        { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
 
@@ -206,7 +208,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
 
   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID ,0,device[devID].readFromDir,device[devID].extension);
-  unsigned short * tmpDepth = (unsigned short *) ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
+  unsigned short * tmpDepth = (unsigned short *) ReadImageFile(0,file_name_test,device[devID].extension,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
 
@@ -278,7 +280,7 @@ int snapTemplateFrames(int devID)
        #if REALLOCATE_ON_EVERY_SNAP
          if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); device[devID].templateColorFrame=0; }
        #endif
-       device[devID].templateColorFrame = ReadPNM(device[devID].templateColorFrame,file_name_test,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
+       device[devID].templateColorFrame = ReadImageFile(device[devID].templateColorFrame,file_name_test,device[devID].extension,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
        ++found_frames;
      }
 
@@ -288,7 +290,7 @@ int snapTemplateFrames(int devID)
       #if REALLOCATE_ON_EVERY_SNAP
         if (device[devID].templateDepthFrame!=0) { free(device[devID].templateDepthFrame); device[devID].templateDepthFrame=0; }
       #endif
-      device[devID].templateDepthFrame = (unsigned short *) ReadPNM((unsigned char *) device[devID].templateDepthFrame,file_name_test,&widthInternal,&heightInternal,&device[devID].lastDepthTimestamp);
+      device[devID].templateDepthFrame = (unsigned short *) ReadImageFile(device[devID].templateColorFrame,file_name_test,device[devID].extension,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
       ++found_frames;
      }
 

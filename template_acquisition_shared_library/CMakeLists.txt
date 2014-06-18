@@ -5,7 +5,7 @@ add_library(TemplateAcquisition SHARED
             TemplateAcquisition.c
             TemplateAcquisition.h
             templateAcquisitionHelper.c
-            templateAcquisitionHelper.h
+            templateAcquisitionHelper.h 
            ) 
 target_link_libraries(TemplateAcquisition rt m CalibrationLibrary OperatingSystem) 
  

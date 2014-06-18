@@ -27,11 +27,7 @@
 #include "pngInput.h"
 #include "ppmInput.h"
 
-
-
 #define DEBUG_READING_IMAGES 0
-
-
 
 
 unsigned int simplePow(unsigned int base,unsigned int exp)

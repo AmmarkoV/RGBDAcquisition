@@ -16,6 +16,7 @@ OPTION (ENABLE_NITE2 OFF)
 OPTION (ENABLE_OPENGL ON)
 OPTION (ENABLE_NETWORK ON)
 OPTION (ENABLE_EDITOR ON)
+OPTION (ENABLE_OPENCV OFF)
 
 add_subdirectory (3dparty/fast)
 
@@ -71,7 +72,10 @@ IF( ENABLE_EDITOR )
 add_subdirectory (editor/)
 ENDIF( ENABLE_EDITOR )
 
-add_subdirectory (viewer/)
+
+IF( ENABLE_OPENCV )
+ add_subdirectory (viewer/)
+ENDIF( ENABLE_OPENCV )
 
 # TODO FIX INSTALLATION DIRECTORIES 
 

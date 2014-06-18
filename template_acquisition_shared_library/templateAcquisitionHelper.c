@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+#define USE_CODEC_LIBRARY 0
 #define PPMREADBUFLEN 256
 
 int makeFrameNoInput(unsigned char * frame , unsigned int width , unsigned int height , unsigned int channels)
@@ -188,6 +188,44 @@ unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int
 
   free(file_name_test);
   return devIDInc;
+}
+
+
+void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,  unsigned int * widthInternal, unsigned int * heightInternal, unsigned long *  timestampInternal)
+{
+ #if USE_CODEC_LIBRARY
+   return ReadPNM(existingBuffer,filename,widthInternal,heightInternal,timestampInternal);
+ #else
+   return ReadPNM(existingBuffer,filename,widthInternal,heightInternal,timestampInternal);
+ #endif // USE_CODEC_LIBRARY
+}
+
+
+
+
+unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * extension)
+{
+  unsigned int i=0;
+
+  char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
+  if (file_name_test==0) { fprintf(stderr,"Could not findLastFrame , no space for string\n"); return 0; }
+
+  while (i<2)
+  {
+   if (i==0) { strncpy(extension,"pnm",MAX_EXTENSION_PATH); } else
+   if (i==1) { strncpy(extension,"png",MAX_EXTENSION_PATH); }
+
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 , readFromDir , extension );
+   if ( FileExists(file_name_test) ) { return 1; }
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , 0 , readFromDir , extension );
+   if ( FileExists(file_name_test) ) { return 1; }
+
+   ++i;
+  }
+
+  free(file_name_test);
+
+  return 0;
 }
 
 
