@@ -36,7 +36,6 @@
  #endif
 
 #define PRINT_COMMENTS 1
-#define PRINT_DEBUG_EACH_CALL 0
 
 
 
@@ -192,7 +191,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;
 
   char file_name_test[MAX_DIR_PATH];
-  getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 1 /*Color*/ , devID , 0 ,device[devID].readFromDir,device[devID].extension);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 ,device[devID].readFromDir,device[devID].extension);
   unsigned char * tmpColor = ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
        { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
@@ -206,7 +205,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   }
 
 
-  getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 0 /*Depth*/ , devID ,0,device[devID].readFromDir,device[devID].extension);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID ,0,device[devID].readFromDir,device[devID].extension);
   unsigned short * tmpDepth = (unsigned short *) ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
@@ -219,13 +218,11 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   }
 
   NullCalibration(device[devID].templateWIDTH,device[devID].templateHEIGHT,&device[devID].calibRGB);
-
-  sprintf(file_name_test,"frames/%s/color.calib",device[devID].readFromDir);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibRGB) ) { fprintf(stderr,"Could not read color calibration\n"); }
 
   NullCalibration(device[devID].templateWIDTH,device[devID].templateHEIGHT,&device[devID].calibDepth);
-
-  sprintf(file_name_test,"frames/%s/depth.calib",device[devID].readFromDir);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
 
   if (device[devID].templateColorFrame==0) { fprintf(stderr,RED " Could not open , color frame Template acquisition will not process this data\n"); }
@@ -255,10 +252,6 @@ int getCurrentTemplateFrameNumber(int devID)
 
 int snapTemplateFrames(int devID)
 {
-    #if PRINT_DEBUG_EACH_CALL
-     fprintf(stderr,"snapTemplateFrames (%u) \n",devID);
-    #endif // PRINT_DEBUG_EACH_CALL
-
     //TODO HERE MAYBE LOAD NEW BUFFERS
     int found_frames = 0;
 
@@ -273,13 +266,13 @@ int snapTemplateFrames(int devID)
     char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
     if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
 
-    sprintf(file_name_test,"frames/%s/cameraPose_%u_%05u.calib",device[devID].readFromDir,devIDRead,device[devID].cycle);
+    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_LIVE_CALIBRATION_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
     if ( RefreshCalibration(file_name_test,&device[devID].calibRGB) )
      {
        fprintf(stderr,"Refreshed calibration data %u \n",device[devID].cycle);
      }
 
-    getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 1 /*Color*/ , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
+    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
     if (FileExists(file_name_test))
      {
        #if REALLOCATE_ON_EVERY_SNAP
@@ -289,7 +282,7 @@ int snapTemplateFrames(int devID)
        ++found_frames;
      }
 
-    getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 0 /*Depth*/ , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
+    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
     if (FileExists(file_name_test))
      {
       #if REALLOCATE_ON_EVERY_SNAP

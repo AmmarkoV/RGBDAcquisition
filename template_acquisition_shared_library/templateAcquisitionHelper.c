@@ -154,15 +154,16 @@ int flipDepth(unsigned short * depth,unsigned int width , unsigned int height )
 
 
 //Single place to change filename conventions :)
-void getFilenameForCurrentImage(char * filename , unsigned int maxSize , unsigned int isColor , unsigned int devID , unsigned int cycle, char * readFromDir , char * extension )
+void getFilenameForNextResource(char * filename , unsigned int maxSize , unsigned int resType , unsigned int devID , unsigned int cycle, char * readFromDir , char * extension )
 {
-  if (isColor)
+  switch (resType)
   {
-    sprintf(filename,"frames/%s/colorFrame_%u_%05u.%s",readFromDir,devID,cycle,extension);
-  } else
-  {
-    sprintf(filename,"frames/%s/depthFrame_%u_%05u.%s",readFromDir,devID,cycle,extension);
-  }
+    case RESOURCE_COLOR_FILE : sprintf(filename,"frames/%s/colorFrame_%u_%05u.%s",readFromDir,devID,cycle,extension); break;
+    case RESOURCE_DEPTH_FILE : sprintf(filename,"frames/%s/depthFrame_%u_%05u.%s",readFromDir,devID,cycle,extension); break;
+    case RESOURCE_COLOR_CALIBRATION_FILE :  sprintf(filename,"frames/%s/color.calib",readFromDir); break;
+    case RESOURCE_DEPTH_CALIBRATION_FILE :  sprintf(filename,"frames/%s/depth.calib",readFromDir); break;
+    case RESOURCE_LIVE_CALIBRATION_FILE : sprintf(filename,"frames/%s/cameraPose_%u_%05u.calib",readFromDir,devID,cycle);
+  };
 }
 
 
@@ -176,9 +177,9 @@ unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int
  unsigned int devIDInc=devID;
  while ( (devIDInc >=0 ) && (!decided) )
     {
-      getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 1 /*COLOR*/ , devIDInc , cycle, readFromDir , extension );
+      getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devIDInc , cycle, readFromDir , extension );
       if (FileExists(file_name_test)) {  decided=1; }
-      getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 0 /*DEPTH*/ , devIDInc , cycle, readFromDir , extension );
+      getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devIDInc , cycle, readFromDir , extension );
       if (FileExists(file_name_test)) {  decided=1; }
 
       if (devIDInc==0) { break; decided=1; } else
@@ -202,9 +203,9 @@ unsigned int findLastFrame(int devID, char * readFromDir , char * extension)
   while (i<100000)
   {
    totalFrames = i;
-   getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 1 /*COLOR*/ , devID , i, readFromDir , extension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , i, readFromDir , extension );
    if ( ! FileExists(file_name_test) ) { break; }
-   getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 0 /*DEPTH*/ , devID , i, readFromDir , extension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , i, readFromDir , extension );
    if ( ! FileExists(file_name_test) ) { break; }
    ++i;
   }

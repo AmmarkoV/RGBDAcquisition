@@ -15,6 +15,15 @@
 
 #define MAX_DIR_PATH 1024
 
+enum resourceFilename
+{
+   RESOURCE_COLOR_FILE=0,
+   RESOURCE_DEPTH_FILE,
+   RESOURCE_COLOR_CALIBRATION_FILE,
+   RESOURCE_DEPTH_CALIBRATION_FILE,
+   RESOURCE_LIVE_CALIBRATION_FILE,
+};
+
 int makeFrameNoInput(unsigned char * frame , unsigned int width , unsigned int height , unsigned int channels);
 int FileExists(char * filename);
 unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp);
@@ -24,6 +33,6 @@ unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int
 
 unsigned int findLastFrame(int devID, char * readFromDir , char * extension);
 
-void getFilenameForCurrentImage(char * filename , unsigned int maxSize , unsigned int isColor , unsigned int devID , unsigned int cycle, char * readFromDir , char * extension );
+void getFilenameForNextResource(char * filename , unsigned int maxSize , unsigned int resType , unsigned int devID , unsigned int cycle, char * readFromDir , char * extension );
 
 #endif // TEMPLATEACQUISITIONHELPER_H_INCLUDED
