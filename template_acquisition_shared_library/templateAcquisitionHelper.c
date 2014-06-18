@@ -153,25 +153,37 @@ int flipDepth(unsigned short * depth,unsigned int width , unsigned int height )
 }
 
 
-unsigned int retreiveDatasetDeviceID(unsigned int devID , unsigned int cycle , char * readFromDir , char * extension)
+//Single place to change filename conventions :)
+void getFilenameForCurrentImage(char * filename , unsigned int maxSize , unsigned int isColor , unsigned int devID , unsigned int cycle, char * readFromDir , char * extension )
 {
- char * file_name_test = (char* ) malloc(2048 * sizeof(char));
- if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
+  if (isColor)
+  {
+    sprintf(filename,"frames/%s/colorFrame_%u_%05u.%s",readFromDir,devID,cycle,extension);
+  } else
+  {
+    sprintf(filename,"frames/%s/depthFrame_%u_%05u.%s",readFromDir,devID,cycle,extension);
+  }
+}
+
+
+
+unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int cycle , char * readFromDir , char * extension)
+{
+ char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
+ if (file_name_test==0) { fprintf(stderr,"Could not retreiveDatasetDeviceID , no space for string\n"); return 0; }
 
  unsigned int decided=0;
- unsigned int devIDRead=devID;
  unsigned int devIDInc=devID;
  while ( (devIDInc >=0 ) && (!decided) )
     {
-      sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",readFromDir,devIDInc,cycle,extension);
-      if (FileExists(file_name_test)) { devIDRead=devIDInc; decided=1; }
-      sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.%s",readFromDir,devIDInc,cycle,extension);
-      if (FileExists(file_name_test)) { devIDRead=devIDInc; decided=1; }
+      getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 1 /*COLOR*/ , devIDInc , cycle, readFromDir , extension );
+      if (FileExists(file_name_test)) {  decided=1; }
+      getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 0 /*DEPTH*/ , devIDInc , cycle, readFromDir , extension );
+      if (FileExists(file_name_test)) {  decided=1; }
 
       if (devIDInc==0) { break; decided=1; } else
                        { --devIDInc; }
     }
-
 
   free(file_name_test);
   return devIDInc;
@@ -184,15 +196,15 @@ unsigned int findLastFrame(int devID, char * readFromDir , char * extension)
   unsigned int totalFrames=0;
   unsigned int i=0;
 
-  char * file_name_test = (char* ) malloc(2048 * sizeof(char));
-  if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
+  char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
+  if (file_name_test==0) { fprintf(stderr,"Could not findLastFrame , no space for string\n"); return 0; }
 
   while (i<100000)
   {
    totalFrames = i;
-   sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",readFromDir,devID,i,extension);
+   getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 1 /*COLOR*/ , devID , i, readFromDir , extension );
    if ( ! FileExists(file_name_test) ) { break; }
-   sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.%s",readFromDir,devID,i,extension);
+   getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 0 /*DEPTH*/ , devID , i, readFromDir , extension );
    if ( ! FileExists(file_name_test) ) { break; }
    ++i;
   }

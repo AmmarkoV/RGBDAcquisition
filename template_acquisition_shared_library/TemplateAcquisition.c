@@ -22,7 +22,6 @@
 
 #define SAFEGUARD_VALUE 123123
 #define MAX_TEMPLATE_DEVICES 5
-#define MAX_DIR_PATH 1024
 #define MAX_EXTENSION_PATH 16
 #define MAX_LINE_CALIBRATION 1024
 
@@ -192,11 +191,11 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   unsigned int failedStream=0;
   unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;
 
-  char file_name_test[1024];
-  sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",device[devID].readFromDir,devID,0,device[devID].extension);
+  char file_name_test[MAX_DIR_PATH];
+  getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 1 /*Color*/ , devID , 0 ,device[devID].readFromDir,device[devID].extension);
   unsigned char * tmpColor = ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
-   { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
+       { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
 
   if (tmpColor!=0) { device[devID].templateColorFrame=tmpColor; } else
   {
@@ -207,7 +206,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   }
 
 
-  sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.pnm",device[devID].readFromDir,devID,0);
+  getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 0 /*Depth*/ , devID ,0,device[devID].readFromDir,device[devID].extension);
   unsigned short * tmpDepth = (unsigned short *) ReadPNM(0,file_name_test,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
    { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
@@ -263,29 +262,16 @@ int snapTemplateFrames(int devID)
     //TODO HERE MAYBE LOAD NEW BUFFERS
     int found_frames = 0;
 
-    unsigned int widthInternal=0; unsigned int heightInternal=0;
-    char * file_name_test = (char* ) malloc(2048 * sizeof(char));
-    if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
-
-
     //-----------------------------------------------------------------
     //Extra check , stupid case with mixed signals
     //-----------------------------------------------------------------
-    int decided=0;
-    int devIDRead=devID;
-    int devIDInc=devID;
-    while ( (devIDInc >=0 ) && (!decided) )
-    {
-      sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",device[devID].readFromDir,devIDInc,device[devID].cycle,device[devID].extension);
-      if (FileExists(file_name_test)) { devIDRead=devIDInc; decided=1; }
-      sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.%s",device[devID].readFromDir,devIDInc,device[devID].cycle,device[devID].extension);
-      if (FileExists(file_name_test)) { devIDRead=devIDInc; decided=1; }
-
-      if (devIDInc==0) { break; decided=1; } else
-                       { --devIDInc; }
-    }
+    unsigned int devIDRead = retreiveDatasetDeviceIDToReadFrom( devID , device[devID].cycle , device[devID].readFromDir , device[devID].extension);
     //-----------------------------------------------------------------
 
+
+    unsigned int widthInternal=0; unsigned int heightInternal=0;
+    char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
+    if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
 
     sprintf(file_name_test,"frames/%s/cameraPose_%u_%05u.calib",device[devID].readFromDir,devIDRead,device[devID].cycle);
     if ( RefreshCalibration(file_name_test,&device[devID].calibRGB) )
@@ -293,10 +279,7 @@ int snapTemplateFrames(int devID)
        fprintf(stderr,"Refreshed calibration data %u \n",device[devID].cycle);
      }
 
-
-
-    sprintf(file_name_test,"frames/%s/colorFrame_%u_%05u.%s",device[devID].readFromDir,devIDRead,device[devID].cycle,device[devID].extension);
-    //fprintf(stderr,"Snap color %s\n",file_name_test);
+    getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 1 /*Color*/ , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
     if (FileExists(file_name_test))
      {
        #if REALLOCATE_ON_EVERY_SNAP
@@ -306,8 +289,7 @@ int snapTemplateFrames(int devID)
        ++found_frames;
      }
 
-    sprintf(file_name_test,"frames/%s/depthFrame_%u_%05u.%s",device[devID].readFromDir,devIDRead,device[devID].cycle,device[devID].extension);
-    //fprintf(stderr,"Snap depth %s",file_name_test);
+    getFilenameForCurrentImage(file_name_test , MAX_DIR_PATH , 0 /*Depth*/ , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
     if (FileExists(file_name_test))
      {
       #if REALLOCATE_ON_EVERY_SNAP
