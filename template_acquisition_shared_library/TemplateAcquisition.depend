@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1391473658 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.cpp
+1403083526 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.cpp
 	<stdio.h>
 	<stdlib.h>
 	"TemplateAcquisition.h"
@@ -7,17 +7,96 @@
 	"../tools/OperatingSystem/OperatingSystem.h"
 	<string.h>
 	<math.h>
+	"templateAcquisitionHelper.h"
 
-1386765166 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.h
+1401218135 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.h
 	"../acquisition/acquisition_setup.h"
 	"../tools/Calibration/calibration.h"
 
-1391438407 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
+1393507135 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
 
-1391351464 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
+1396361333 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
 	"../tools/Calibration/calibration.h"
 
-1386766795 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/OperatingSystem/OperatingSystem.h
+1391515895 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/OperatingSystem/OperatingSystem.h
 
 1386338530 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
+
+1403094565 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.h
+
+1403095407 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.c
+	"templateAcquisitionHelper.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1403095555 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.c
+	<stdio.h>
+	<stdlib.h>
+	"TemplateAcquisition.h"
+	"../acquisition/Acquisition.h"
+	"../tools/OperatingSystem/OperatingSystem.h"
+	<string.h>
+	<math.h>
+	"templateAcquisitionHelper.h"
+
+1384272992 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/codecs.c
+	"codecs.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"jpgInput.h"
+	"pngInput.h"
+	"ppmInput.h"
+
+1383831167 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/codecs.h
+
+1372525293 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/jpgInput.h
+	"codecs.h"
+
+1372525298 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/pngInput.h
+	"codecs.h"
+
+1362071985 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/ppmInput.h
+	"codecs.h"
+
+1362261862 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/jpgExifexternal.c
+	"jpgExifexternal.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1362261546 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/jpgExifexternal.h
+
+1372540221 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/jpgExiforient_embed.c
+	"jpgExiforient_embed.h"
+	<stdio.h>
+	<stdlib.h>
+
+1362260142 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/jpgExiforient_embed.h
+
+1372536415 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/jpgInput.c
+	"jpgInput.h"
+	<stdio.h>
+	<string.h>
+	<jpeglib.h>
+	<stdlib.h>
+	"codecs.h"
+
+1383831398 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/pngInput.c
+	"pngInput.h"
+	<unistd.h>
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<stdarg.h>
+	<png.h>
+
+1384723852 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/ppmInput.c
+	"codecs.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"codecs.h"
+	"ppmInput.h"
 

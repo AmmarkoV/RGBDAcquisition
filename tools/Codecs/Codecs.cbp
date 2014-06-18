@@ -2,29 +2,31 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="TemplateAcquisition" />
+		<Option title="Codecs" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="./libTemplateAcquisition" prefix_auto="0" extension_auto="1" />
+				<Option output="./libCodecs" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
-				<Option type="3" />
+				<Option type="2" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="./libTemplateAcquisition" prefix_auto="0" extension_auto="1" />
+				<Option output="./libCodecs" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Release/" />
-				<Option type="3" />
+				<Option type="2" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>
@@ -33,28 +35,37 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Wall" />
-			<Add option="-fexceptions" />
 			<Add option="-fPIC" />
 		</Compiler>
-		<Linker>
-			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
-			<Add library="../tools/OperatingSystem/libOperatingSystem.a" />
-			<Add library="../tools/Codecs/libCodecs.a" />
-		</Linker>
-		<Unit filename="TemplateAcquisition.c">
+		<Unit filename="codecs.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="TemplateAcquisition.h" />
-		<Unit filename="templateAcquisitionHelper.c">
+		<Unit filename="codecs.h" />
+		<Unit filename="jpgExifexternal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="templateAcquisitionHelper.h" />
+		<Unit filename="jpgExifexternal.h" />
+		<Unit filename="jpgExiforient_embed.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpgExiforient_embed.h" />
+		<Unit filename="jpgInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpgInput.h" />
+		<Unit filename="pngInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pngInput.h" />
+		<Unit filename="ppmInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ppmInput.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
-			<debugger />
 			<lib_finder disable_auto="1" />
+			<debugger />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

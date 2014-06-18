@@ -2,10 +2,12 @@ project( TemplateAcquisition )
 cmake_minimum_required( VERSION 2.8.7 )  
   
 add_library(TemplateAcquisition SHARED 
-            TemplateAcquisition.cpp
+            TemplateAcquisition.c
             TemplateAcquisition.h
+            templateAcquisitionHelper.c
+            templateAcquisitionHelper.h 
            ) 
-target_link_libraries(TemplateAcquisition rt m CalibrationLibrary OperatingSystem) 
+target_link_libraries(TemplateAcquisition rt m CalibrationLibrary OperatingSystem Codecs) 
  
  
 

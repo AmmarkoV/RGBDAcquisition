@@ -4,4 +4,10 @@ add_subdirectory (Timers/)
 add_subdirectory (Calibration/)
 add_subdirectory (OperatingSystem/)
 add_subdirectory (Quasirandomness/) 
+add_subdirectory (Codecs/) 
+
+
+IF( ENABLE_OPENCV )
+  #add_subdirectory (DepthImagesConverter/) 
+ENDIF( ENABLE_OPENCV )
 
