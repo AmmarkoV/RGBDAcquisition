@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define USE_CODEC_LIBRARY 1
+#define PRINT_COMMENTS 1
+#define USE_CODEC_LIBRARY 1 //Not Using the codec library really simplifies build things but we lose png/jpg formats
 
  #if USE_CODEC_LIBRARY
   #include "../tools/Codecs/codecs.h"
@@ -14,34 +15,7 @@
 
 
 
-int makeFrameNoInput(unsigned char * frame , unsigned int width , unsigned int height , unsigned int channels)
-{
-   unsigned char * framePTR = frame;
-   unsigned char * frameLimit = frame + width * height * channels * sizeof(char);
-
-   while (framePTR<frameLimit)
-   {
-       *framePTR=0; ++framePTR;
-       *framePTR=0; ++framePTR;
-       *framePTR=255; ++framePTR;
-   }
- return 1;
-}
-
-
-int FileExists(char * filename)
-{
- FILE *fp = fopen(filename,"r");
- if( fp ) { /* exists */
-            fclose(fp);
-            return 1;
-          }
- /* doesnt exist */
- return 0;
-}
-
-
-
+#ifndef USE_CODEC_LIBRARY
 unsigned char * ReadPNMInternal(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     //See http://en.wikipedia.org/wiki/Portable_anymap#File_format_description for this simple and useful format
@@ -138,6 +112,36 @@ unsigned char * ReadPNMInternal(unsigned char * buffer , char * filename,unsigne
       fprintf(stderr,"File %s does not exist \n",filename);
     }
   return buffer;
+}
+#endif
+
+
+
+
+int makeFrameNoInput(unsigned char * frame , unsigned int width , unsigned int height , unsigned int channels)
+{
+   unsigned char * framePTR = frame;
+   unsigned char * frameLimit = frame + width * height * channels * sizeof(char);
+
+   while (framePTR<frameLimit)
+   {
+       *framePTR=0; ++framePTR;
+       *framePTR=0; ++framePTR;
+       *framePTR=255; ++framePTR;
+   }
+ return 1;
+}
+
+
+int FileExists(char * filename)
+{
+ FILE *fp = fopen(filename,"r");
+ if( fp ) { /* exists */
+            fclose(fp);
+            return 1;
+          }
+ /* doesnt exist */
+ return 0;
 }
 
 

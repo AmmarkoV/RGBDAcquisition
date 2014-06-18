@@ -3,6 +3,7 @@ cmake_minimum_required( VERSION 2.8.7 )
 
 
 IF( ENABLE_JPG )
+ MESSAGE("JPGs will be included in this codec build")
  set(JPG_Parts jpgInput.c jpgInput.h jpgExifexternal.c jpgExifexternal.h jpgExiforient_embed.c jpgExiforient_embed.h )
  set(JPG_Includes ${CMAKE_SOURCE_DIR}/3dparty/OpenNI2/Include/ )
  add_definitions(-DUSE_JPG_FILES)
@@ -10,8 +11,9 @@ ENDIF( ENABLE_JPG )
 
 
 IF( ENABLE_PNG )
-set(PNG_Parts pngInput.c pngInput.h)
-set(PNG_Includes ${CMAKE_SOURCE_DIR}/3dparty/OpenNI2/Include/ )
+ MESSAGE("PNGs will be included in this codec build")
+ set(PNG_Parts pngInput.c pngInput.h)
+ set(PNG_Includes ${CMAKE_SOURCE_DIR}/3dparty/OpenNI2/Include/ )
  add_definitions(-DUSE_PNG_FILES)
 ENDIF( ENABLE_PNG )
 
@@ -19,7 +21,7 @@ ENDIF( ENABLE_PNG )
 add_library(
             Codecs STATIC
             ppmInput.c
-            ppmInput.
+            ppmInput.h
             ${PNG_Parts}
             ${JPG_Parts}
             codecs.c

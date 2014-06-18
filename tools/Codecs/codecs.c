@@ -25,16 +25,22 @@
 
 #if USE_JPG_FILES
       #include "jpgInput.h"
+#else
+  #warning "JPG Support is disabled in this build of Image Codecs"
 #endif // USE_JPG_FILES
 
 
 #if USE_PNG_FILES
       #include "pngInput.h"
+#else
+  #warning "PNG Support is disabled in this build of Image Codecs"
 #endif // USE_PNG_FILES
 
 
 #if USE_PPM_FILES
       #include "ppmInput.h"
+#else
+  #error "PNM/PPM Support is disabled in this build of Image Codecs and this doesnt make any sense since we have it hardcoded"
 #endif // USE_PPM_FILES
 
 #define DEBUG_READING_IMAGES 0

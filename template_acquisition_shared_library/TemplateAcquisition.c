@@ -34,7 +34,6 @@
          #warning "Not Reallocating arrays on every frame this means better performance but if stream dynamically changes resolution from frame to frame this could be a problem"
  #endif
 
-#define PRINT_COMMENTS 1
 
 
 

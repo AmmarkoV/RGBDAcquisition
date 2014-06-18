@@ -17,7 +17,13 @@ OPTION (ENABLE_OPENGL ON)
 OPTION (ENABLE_NETWORK ON)
 OPTION (ENABLE_EDITOR ON)
 #----
-OPTION (ENABLE_OPENCV OFF)
+find_package(OpenCV)
+if (OpenCV_FOUND)
+ OPTION (ENABLE_OPENCV ON)
+ELSE (OpenCV_FOUND)
+ OPTION (ENABLE_OPENCV OFF)
+ MESSAGE("OpenCV Not found , some parts like viewer etc will not be compiled")
+ENDIF(OpenCV_FOUND)
 #----
 OPTION (ENABLE_JPG OFF)
 OPTION (ENABLE_PNG OFF)
@@ -42,7 +48,6 @@ add_subdirectory (grabber_segment/)
 
 #Acquisition Plugins 
 IF( ENABLE_TEMPLATE )
-MESSAGE("Templates are enabled!")
 add_subdirectory (template_acquisition_shared_library/)
 ENDIF( ENABLE_TEMPLATE )
 
