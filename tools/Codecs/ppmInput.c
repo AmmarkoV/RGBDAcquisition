@@ -5,6 +5,7 @@
 #include "codecs.h"
 #include "ppmInput.h"
 
+#define PRINT_COMMENTS 1
 #define PPMREADBUFLEN 256
 
 

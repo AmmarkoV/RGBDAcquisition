@@ -19,7 +19,7 @@ OPTION (ENABLE_EDITOR ON)
 #----
 find_package(OpenCV)
 if (OpenCV_FOUND)
- OPTION (ENABLE_OPENCV ON)
+ OPTION (ENABLE_OPENCV ON) 
 ELSE (OpenCV_FOUND)
  OPTION (ENABLE_OPENCV OFF)
  MESSAGE("OpenCV Not found , some parts like viewer etc will not be compiled")
