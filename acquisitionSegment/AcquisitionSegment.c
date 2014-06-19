@@ -48,11 +48,17 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
 
   if (calib==0)
   {
-       fprintf(stderr,"segmentRGBAndDepthFrame called with a  null Calibration , generating one an ephimeral one now \n");
+       fprintf(stderr,"segmentRGBAndDepthFrame called with a  null Calibration , generating an ephimeral one now \n");
        struct calibration lastMomentEmptyCalibration={0};
        NullCalibration(  width, height, &lastMomentEmptyCalibration );
        calib=&lastMomentEmptyCalibration;
   }
+
+  if (segConfRGB==0) { fprintf(stderr,"segmentRGBAndDepthFrame called with a  null RGB Segmentation configuration \n"); } else
+  if (!segConfRGB->isInitialized) { fprintf(stderr,"segmentRGBAndDepthFrame called with a  non initialized RGB Segmentation configuration\n"); }
+
+  if (segConfDepth==0) { fprintf(stderr,"segmentRGBAndDepthFrame called with a  null Depth Segmentation configuration \n"); } else
+  if (!segConfDepth->isInitialized) { fprintf(stderr,"segmentRGBAndDepthFrame called with a  non initialized Depth Segmentation configuration\n"); }
 
 
   if (segConfDepth->autoPlaneSegmentation)
@@ -152,6 +158,7 @@ int initializeRGBSegmentationConfiguration(struct SegmentationFeaturesRGB * segC
    segConfRGB->motionGThreshold=15;
    segConfRGB->motionBThreshold=15;
 
+   segConfRGB->isInitialized=1;
   return 1;
 }
 
@@ -191,6 +198,7 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
         segConfDepth->normal[i]=0.0;
      }
 
+   segConfDepth->isInitialized=1;
   return 1;
 }
 

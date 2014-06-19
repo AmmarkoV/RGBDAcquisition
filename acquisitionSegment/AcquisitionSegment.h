@@ -81,6 +81,9 @@ struct SegmentationFeaturesRGB
    unsigned int motionRThreshold,motionGThreshold,motionBThreshold;
 
    struct floodErasePoints floodErase;
+
+   //----------------
+   int isInitialized;
 };
 
 
@@ -118,6 +121,10 @@ struct SegmentationFeaturesDepth
    unsigned int autoPlaneSegmentationMaximumDistancePoint;
    double planeNormalOffset;
    double planeNormalSize;
+
+
+   //----------------
+   int isInitialized;
 };
 
 
