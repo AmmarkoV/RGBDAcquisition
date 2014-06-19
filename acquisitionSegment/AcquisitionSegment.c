@@ -46,6 +46,15 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
        return 0;
    }
 
+  if (calib==0)
+  {
+       fprintf(stderr,"segmentRGBAndDepthFrame called with a  null Calibration , generating one an ephimeral one now \n");
+       struct calibration lastMomentEmptyCalibration={0};
+       NullCalibration(  width, height, &lastMomentEmptyCalibration );
+       calib=&lastMomentEmptyCalibration;
+  }
+
+
   if (segConfDepth->autoPlaneSegmentation)
    {
      automaticPlaneSegmentation(Depth,width,height,
