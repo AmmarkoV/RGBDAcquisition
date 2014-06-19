@@ -50,34 +50,34 @@
 			<Add library="GLU" />
 			<Add library="X11" />
 		</Linker>
-		<Unit filename="AmMatrix/collisions.c">
+		<Unit filename="../../../tools/AmMatrix/collisions.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="AmMatrix/collisions.h" />
-		<Unit filename="AmMatrix/matrix3x3Tools.c">
+		<Unit filename="../../../tools/AmMatrix/collisions.h" />
+		<Unit filename="../../../tools/AmMatrix/matrix3x3Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="AmMatrix/matrix3x3Tools.h" />
-		<Unit filename="AmMatrix/matrix4x4Tools.c">
+		<Unit filename="../../../tools/AmMatrix/matrix3x3Tools.h" />
+		<Unit filename="../../../tools/AmMatrix/matrix4x4Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="AmMatrix/matrix4x4Tools.h" />
-		<Unit filename="AmMatrix/matrixCalculations.c">
+		<Unit filename="../../../tools/AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../../../tools/AmMatrix/matrixCalculations.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="AmMatrix/matrixCalculations.h" />
-		<Unit filename="AmMatrix/ocvStaging.c">
+		<Unit filename="../../../tools/AmMatrix/matrixCalculations.h" />
+		<Unit filename="../../../tools/AmMatrix/ocvStaging.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="AmMatrix/ocvStaging.h" />
-		<Unit filename="AmMatrix/solveHomography.c">
+		<Unit filename="../../../tools/AmMatrix/ocvStaging.h" />
+		<Unit filename="../../../tools/AmMatrix/solveHomography.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="AmMatrix/solveHomography.h" />
-		<Unit filename="AmMatrix/solveLinearSystemGJ.c">
+		<Unit filename="../../../tools/AmMatrix/solveHomography.h" />
+		<Unit filename="../../../tools/AmMatrix/solveLinearSystemGJ.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="AmMatrix/solveLinearSystemGJ.h" />
+		<Unit filename="../../../tools/AmMatrix/solveLinearSystemGJ.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="TextureLoader/bmp.c">
 			<Option compilerVar="CC" />

@@ -1,6 +1,6 @@
 project( GrabberSegment ) 
 cmake_minimum_required( VERSION 2.8.7 ) 
-   
+    
 add_executable(GrabberSegment main.c ) 
 target_link_libraries(GrabberSegment rt dl m Acquisition AcquisitionSegment OperatingSystem Timers CalibrationLibrary )
 set_target_properties(GrabberSegment PROPERTIES DEBUG_POSTFIX "D")

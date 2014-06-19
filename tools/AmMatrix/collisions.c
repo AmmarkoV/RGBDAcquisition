@@ -105,7 +105,7 @@ int destroyCubeListSingle(struct approximateCubeList *cubeList)
     free(cubeList);
     cubeList=0;
   }
-
+ return 1;
 }
 
 

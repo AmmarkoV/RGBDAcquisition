@@ -25,6 +25,10 @@ struct calibration calibA;
 int calibrationSetB = 0;
 struct calibration calibB;
 
+unsigned int longExposure = 0;
+unsigned long * rgbCollector =0;
+unsigned long * depthCollector =0;
+
 unsigned int saveColor=1 , saveDepth=1;
 //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
 unsigned int frameNum=0,maxFramesToGrab=10;
@@ -81,7 +85,11 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
-
+     if (strcmp(argv[i],"-longExposure")==0)
+     {
+         longExposure=1;
+         fprintf(stderr,"Long Exposure mode initialized\n");
+     } else
      if ( (strcmp(argv[i],"-onlyDepth")==0)||
           (strcmp(argv[i],"-noColor")==0)) {
                                                saveColor = 0;
@@ -266,6 +274,13 @@ int main(int argc, char *argv[])
     acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&widthDepth,&heightDepth ,&channelsDepth , &bitsperpixelDepth );
     unsigned short * depthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
+    if (longExposure)
+    {
+      rgbCollector = (unsigned long * ) malloc(sizeof(unsigned long) * widthRGB * heightRGB*3 );
+      memset(rgbCollector,0,sizeof(unsigned long) * widthRGB * heightRGB*3 );
+      depthCollector = (unsigned long * ) malloc(sizeof(unsigned long) * widthRGB * heightRGB );
+      memset(depthCollector,0,sizeof(unsigned long) * widthRGB * heightRGB);
+    }
 
     fprintf(stderr,"Base Module is %s , device %u , Overlay Module is %s , device %u\n",getModuleNameFromModuleID(moduleID_1),devID_1, getModuleNameFromModuleID(moduleID_2),devID_2);
     if (shiftTime==0) { /* No time shift */ } else
@@ -284,7 +299,13 @@ int main(int argc, char *argv[])
         acquisitionSnapFrames(moduleID_1,devID_1);
         acquisitionSnapFrames(moduleID_2,devID_2);
 
-
+        if (longExposure)
+        {
+          LongExposureFramesCollect( acquisitionGetColorFrame(moduleID_1,devID_1) , rgbCollector ,
+                                     acquisitionGetDepthFrame(moduleID_1,devID_1),  depthCollector ,
+                                     widthRGB , heightRGB, &frameNum );
+        } else
+        {
         mux2RGBAndDepthFrames
           (
            acquisitionGetColorFrame(moduleID_1,devID_1) , //Module 1 is Base
@@ -298,35 +319,49 @@ int main(int argc, char *argv[])
            widthRGB , heightRGB ,
            transparency , 0 );
 
-        if (saveColor)
-         {
+
+         if (saveColor)
+          {
           sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
           saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
-         }
+          }
 
-        if (saveDepth)
-        {
+         if (saveDepth)
+         {
           sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
           saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+         }
         }
 
-        #if SAVE_ALL_STREAMS
-        sprintf(outfilename,"%s/BASEcolorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
-        acquisitionSaveColorFrame(moduleID_1,devID_1,outfilename);
-        sprintf(outfilename,"%s/BASEdepthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
-        acquisitionSaveDepthFrame(moduleID_1,devID_1,outfilename);
-
-        sprintf(outfilename,"%s/OVERLAYcolorFrame_%u_%05u",outputfoldername,devID_2,frameNum);
-        acquisitionSaveColorFrame(moduleID_2,devID_2,outfilename);
-        sprintf(outfilename,"%s/OVERLAYdepthFrame_%u_%05u",outputfoldername,devID_2,frameNum);
-        acquisitionSaveDepthFrame(moduleID_2,devID_2,outfilename);
-        #endif
 
 
 
        acquisitionStopTimer(0);
        if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
     }
+
+
+    if (longExposure)
+    {
+      LongExposureFramesFinalize(rgbCollector ,  rgbOut ,
+                                 depthCollector ,  depthOut,
+                                 widthRGB , heightRGB , &frameNum);
+
+      free(rgbCollector);
+      free(depthCollector);
+         if (saveColor)
+          {
+          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+          }
+
+         if (saveDepth)
+         {
+          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+         }
+    }
+
 
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
 

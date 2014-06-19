@@ -7,8 +7,8 @@
 #include "combineRGBAndDepthOutput.h"
 
 #include "imageProcessing.h"
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h"
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h"
+#include "../tools/AmMatrix/matrix4x4Tools.h"
+#include "../tools/AmMatrix/matrixCalculations.h"
 
 int keepFirstDepthFrame(unsigned short * source ,  unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf)
 {

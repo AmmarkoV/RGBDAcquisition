@@ -20,21 +20,15 @@ add_library(OGLRendererSandbox SHARED
             tiledRenderer.c
             tiledRenderer.h
             tools.c
-            tools.h
-            AmMatrix/collisions.c
-            AmMatrix/collisions.h
-            AmMatrix/matrix3x3Tools.c
-            AmMatrix/matrix3x3Tools.h
-            AmMatrix/matrix4x4Tools.c
-            AmMatrix/matrix4x4Tools.h
-            AmMatrix/matrixCalculations.c
-            AmMatrix/matrixCalculations.h
-            AmMatrix/solveLinearSystemGJ.c
-            AmMatrix/solveLinearSystemGJ.h
-            AmMatrix/solveHomography.c
-            AmMatrix/solveHomography.h
-            AmMatrix/ocvStaging.c
-            AmMatrix/ocvStaging.h
+            tools.h 
+            ../../tools/AmMatrix/matrix3x3Tools.c
+            ../../tools/AmMatrix/matrix3x3Tools.h
+            ../../tools/AmMatrix/matrix4x4Tools.c
+            ../../tools/AmMatrix/matrix4x4Tools.h
+            ../../tools/AmMatrix/matrixCalculations.c
+            ../../tools/AmMatrix/matrixCalculations.h
+            ../../tools/AmMatrix/solveLinearSystemGJ.c
+            ../../tools/AmMatrix/solveLinearSystemGJ.h
             TextureLoader/bmp.c
             TextureLoader/bmp.h
             TextureLoader/ppm.c

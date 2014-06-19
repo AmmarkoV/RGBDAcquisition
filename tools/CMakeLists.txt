@@ -5,6 +5,7 @@ add_subdirectory (Calibration/)
 add_subdirectory (OperatingSystem/)
 add_subdirectory (Quasirandomness/) 
 add_subdirectory (Codecs/) 
+add_subdirectory (AmMatrix/) 
 
 
 IF( ENABLE_OPENCV )

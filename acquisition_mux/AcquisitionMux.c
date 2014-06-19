@@ -254,3 +254,59 @@ int mux2RGBAndDepthFrames(
 
 
 
+int LongExposureFramesCollect( unsigned char * rgb , unsigned long * rgbCollector ,
+                               unsigned short * depth, unsigned long * depthCollector ,
+                               unsigned int width , unsigned int height , unsigned int * framesCollected)
+{
+    unsigned long * rgbCollectorPTR = rgbCollector , rgbOutLimit = rgbCollector + width * height *3 ;
+    unsigned long * depthCollectorPTR = depthCollector , depthOutLimit = depthCollector + width * height ;
+
+    unsigned char * rgbPTR = rgb;
+    unsigned short * depthPTR = depth;
+
+
+    while ( rgbCollectorPTR < rgbOutLimit )     { *rgbCollectorPTR += *rgbPTR; ++rgbCollectorPTR; ++rgbPTR; }
+    while ( depthCollectorPTR < depthOutLimit ) { *depthCollectorPTR += *depthPTR; ++depthCollectorPTR; ++depthPTR; }
+
+    *framesCollected+=1;
+
+    if (*framesCollected%4==0)
+    {
+        rgbCollectorPTR = rgbCollector;
+        depthCollectorPTR = depthCollector;
+        while ( rgbCollectorPTR < rgbOutLimit )
+        {
+            *rgbCollectorPTR=*rgbCollectorPTR/4;
+            ++rgbCollectorPTR;
+        }
+
+        while ( depthCollectorPTR < depthOutLimit )
+        {
+            *depthCollectorPTR=*depthCollectorPTR/4;
+            ++depthCollectorPTR;
+        }
+    }
+
+
+    return 1;
+}
+
+int LongExposureFramesFinalize(unsigned long * rgbCollector ,  unsigned char * rgbOut ,
+                               unsigned long * depthCollector ,  unsigned short * depthOut,
+                               unsigned int width , unsigned int height , unsigned int * framesCollected)
+{
+
+    unsigned long * rgbCollectorPTR = rgbCollector , rgbOutLimit = rgbCollector + width * height *3 ;
+    unsigned long * depthCollectorPTR = depthCollector , depthOutLimit = depthCollector + width * height ;
+
+
+
+    unsigned char * rgbPTR = rgbOut;
+    unsigned short * depthPTR = depthOut;
+
+    unsigned int what2DivideWith = *framesCollected%4;
+    while ( rgbCollectorPTR < rgbOutLimit )     { *rgbPTR=*rgbCollectorPTR/what2DivideWith; ++rgbCollectorPTR; ++rgbPTR; }
+    while ( depthCollectorPTR < depthOutLimit ) { *depthPTR=*depthCollectorPTR/what2DivideWith; ++depthCollectorPTR; ++depthPTR; }
+
+}
+

@@ -11,7 +11,7 @@
 #include "tiledRenderer.h"
 #include "tools.h"
 
-#include "AmMatrix/matrixCalculations.h"
+#include "../../../tools/AmMatrix/matrixCalculations.h"
 #include "TrajectoryParser/TrajectoryParser.h"
 #include "model_loader.h"
 #include "scene.h"
