@@ -8,8 +8,8 @@
 #include <locale.h>
 
 
-#include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h"
-#include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h"
+#include "../AmMatrix/matrix4x4Tools.h"
+#include "../AmMatrix/matrixCalculations.h"
 
 #define DEBUG_PRINT_EACH_CALIBRATION_LINE_READ 0
 

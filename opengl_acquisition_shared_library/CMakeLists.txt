@@ -20,14 +20,14 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/shader_loader.h
             opengl_depth_and_color_renderer/src/tools.c
             opengl_depth_and_color_renderer/src/tools.h
-            opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.c
-            opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.h
-            opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.c
-            opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h
-            opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c
-            opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h
-            opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c
-            opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.h
+            ../tools/AmMatrix/matrix3x3Tools.c
+            ../tools/AmMatrix/matrix3x3Tools.h
+            ../tools/AmMatrix/matrix4x4Tools.c
+            ../tools/AmMatrix/matrix4x4Tools.h
+            ../tools/AmMatrix/matrixCalculations.c
+            ../tools/AmMatrix/matrixCalculations.h
+            ../tools/AmMatrix/solveLinearSystemGJ.c
+            ../tools/AmMatrix/solveLinearSystemGJ.h
             opengl_depth_and_color_renderer/src/TextureLoader/bmp.c
             opengl_depth_and_color_renderer/src/TextureLoader/bmp.h
             opengl_depth_and_color_renderer/src/TextureLoader/ppm.c

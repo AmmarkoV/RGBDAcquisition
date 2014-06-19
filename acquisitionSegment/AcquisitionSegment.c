@@ -11,8 +11,8 @@
 #include "automaticPlaneSegmentation.h"
 
 #include "imageProcessing.h"
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h"
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h"
+#include "../tools/AmMatrix/matrix4x4Tools.h"
+#include "../tools/AmMatrix/matrixCalculations.h"
 
 
 unsigned char * segmentRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib)

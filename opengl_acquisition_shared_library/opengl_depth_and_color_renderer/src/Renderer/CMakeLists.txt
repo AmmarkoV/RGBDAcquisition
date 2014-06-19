@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 2.8.7 )
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODULE_PATH})
    
 add_executable(Renderer main.c ) 
-target_link_libraries(Renderer rt m GL GLU X11 OGLRendererSandbox ) 
+target_link_libraries(Renderer rt m GL GLU X11 OGLRendererSandbox  ) 
 add_dependencies(Renderer OGLRendererSandbox)  
        
  

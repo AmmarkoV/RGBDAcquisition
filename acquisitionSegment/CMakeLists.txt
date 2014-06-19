@@ -16,14 +16,14 @@ add_library(AcquisitionSegment STATIC
             automaticPlaneSegmentation.h
             ../tools/Quasirandomness/quasirandomness.c
             ../tools/Quasirandomness/quasirandomness.h
-            ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.c
-            ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h
-            ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.c
-            ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.h 
-            ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c
-            ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h
-            ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c
-            ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.h
+            ../tools/AmMatrix/matrix4x4Tools.c
+            ../tools/AmMatrix/matrix4x4Tools.h
+            ../tools/AmMatrix/matrix3x3Tools.c
+            ../tools/AmMatrix/matrix3x3Tools.h 
+            ../tools/AmMatrix/matrixCalculations.c
+            ../tools/AmMatrix/matrixCalculations.h
+            ../tools/AmMatrix/solveLinearSystemGJ.c
+            ../tools/AmMatrix/solveLinearSystemGJ.h
             ) 
 target_link_libraries(AcquisitionSegment m CalibrationLibrary ) 
  

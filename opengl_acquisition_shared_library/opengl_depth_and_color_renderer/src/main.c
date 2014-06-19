@@ -19,7 +19,7 @@
 
 #include "save_to_file.h"
 #include "shader_loader.h"
-#include "AmMatrix/matrixCalculations.h"
+#include "../../../tools/AmMatrix/matrixCalculations.h"
 
 #include "tiledRenderer.h"
 

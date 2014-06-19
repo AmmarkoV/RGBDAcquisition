@@ -38,30 +38,34 @@
 		<Compiler>
 			<Add option="-fPIC" />
 		</Compiler>
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.c">
+		<Unit filename="../AmMatrix/collisions.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix3x3Tools.h" />
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.c">
+		<Unit filename="../AmMatrix/collisions.h" />
+		<Unit filename="../AmMatrix/matrix3x3Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrix4x4Tools.h" />
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.c">
+		<Unit filename="../AmMatrix/matrix3x3Tools.h" />
+		<Unit filename="../AmMatrix/matrix4x4Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/matrixCalculations.h" />
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.c">
+		<Unit filename="../AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../AmMatrix/matrixCalculations.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/ocvStaging.h" />
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.c">
+		<Unit filename="../AmMatrix/matrixCalculations.h" />
+		<Unit filename="../AmMatrix/ocvStaging.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveHomography.h" />
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.c">
+		<Unit filename="../AmMatrix/ocvStaging.h" />
+		<Unit filename="../AmMatrix/solveHomography.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/solveLinearSystemGJ.h" />
+		<Unit filename="../AmMatrix/solveHomography.h" />
+		<Unit filename="../AmMatrix/solveLinearSystemGJ.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../AmMatrix/solveLinearSystemGJ.h" />
 		<Unit filename="calibration.c">
 			<Option compilerVar="CC" />
 		</Unit>
