@@ -18,6 +18,7 @@
 #define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
 
 int useDepthHeadMinMaxSizeHeuristic=1;
+int useHistogramHeuristic=0;
 int saveResults = 1;
 
 CvHaarClassifierCascade *cascade=0;
@@ -46,6 +47,7 @@ int storeCalibrationValue(unsigned int tileSize,unsigned int minSize , unsigned 
   headDimensions[tileSize].minSize = minSize;
   headDimensions[tileSize].maxSize = maxSize;
   headDimensions[tileSize].samples = samples;
+  return 1;
 }
 
 int checkHeadSize(unsigned int tileSize,unsigned int headDepth)
@@ -214,8 +216,28 @@ void newFaceDetected(unsigned int frameNumber , struct detectedFace * faceDetect
  return;
 }
 
+int fitsFaceHistogram(unsigned char * colorPixels ,   unsigned int colorWidth ,unsigned int colorHeight ,
+                      unsigned int sX ,unsigned int sY , unsigned int tileWidth ,unsigned int tileHeight )
+{
+  if (!useHistogramHeuristic) { return 1; }
 
+  unsigned char RHistogram[256]={0};
+  unsigned char GHistogram[256]={0};
+  unsigned char BHistogram[256]={0};
+  calculateHistogram(colorPixels ,  sX,  sY  ,  tileWidth , tileHeight ,
+                      RHistogram ,  GHistogram , BHistogram ,
+                      colorWidth,colorHeight);
 
+  unsigned int histogramsCompletelyDifferent=0;
+
+  if (histogramsCompletelyDifferent)
+  {
+      fprintf(stderr,RED "Discarding head due to terrible histogram mismatch\n" NORMAL);
+      return 0;
+  }
+
+  return 1;
+}
 
 
 int fitsFaceDepth(unsigned short * depthPixels ,   unsigned int depthWidth ,unsigned int depthHeight ,
@@ -370,7 +392,10 @@ unsigned int DetectFaces(unsigned int frameNumber ,
 
 
 
-         if (fitsFaceDepth(depthPixels ,  depthWidth ,depthHeight , sX , sY , tileWidth , tileHeight , avgFaceDepth ))
+         if (
+              (fitsFaceDepth(depthPixels ,  depthWidth ,depthHeight , sX , sY , tileWidth , tileHeight , avgFaceDepth )) &&
+              (fitsFaceHistogram(colorPixels,colorWidth,colorHeight,sX,sY,tileWidth,tileHeight))
+            )
          {
 
           if (saveResults)

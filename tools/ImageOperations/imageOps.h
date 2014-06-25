@@ -23,6 +23,12 @@ int mixbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY , un
                 unsigned int width , unsigned int height);
 
 
+
+int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
+                       unsigned char * RHistogram , unsigned char * GHistogram , unsigned char * BHistogram ,
+                       unsigned int width , unsigned int height);
+
+
 int saveRawImageToFile(char * filename,char * comment ,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
 

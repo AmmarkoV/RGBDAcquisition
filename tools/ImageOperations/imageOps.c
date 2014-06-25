@@ -447,6 +447,47 @@ int bitbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY  , u
 
 
 
+int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
+                       unsigned char * RHistogram , unsigned char * GHistogram , unsigned char * BHistogram ,
+                       unsigned int width , unsigned int height)
+{
+  if ( (RHistogram==0)||(GHistogram==0)||(BHistogram==0) )
+  {
+      fprintf(stderr,"Cannot Calculate Histogram without a target histogram output");
+      return 0;
+  }
+
+  memset(RHistogram,0,255);
+  memset(GHistogram,0,255);
+  memset(BHistogram,0,255);
+
+  //Check for bounds -----------------------------------------
+  if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
+  if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
+  //----------------------------------------------------------
+
+  unsigned char * targetPTR; unsigned char * targetLineLimitPTR; unsigned char * targetLimitPTR;   unsigned int targetLineSkip;
+  targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
+  targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
+  targetLineSkip = (targetWidth-width) * 3;
+  targetLineLimitPTR = targetPTR + (width*3) -3; /*-3 is required here*/
+
+  fprintf(stderr,"Calculating a Histogram at an area (%u,%u) of target image  starting at %u,%u  sized %u,%u  \n",width,height,tX,tY,targetWidth,targetHeight);
+
+  while ( targetPTR < targetLimitPTR )
+  {
+     while (targetPTR < targetLineLimitPTR)
+     {
+        //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
+        ++RHistogram[*targetPTR]; ++targetPTR;
+        ++GHistogram[*targetPTR]; ++targetPTR;
+        ++BHistogram[*targetPTR]; ++targetPTR;
+     }
+    targetLineLimitPTR += targetWidth*3;
+    targetPTR+=targetLineSkip;
+  }
+ return 1;
+}
 
 
 int saveTileRGBToFile(  unsigned int solutionColumn , unsigned int solutionRow ,
