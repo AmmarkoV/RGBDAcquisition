@@ -447,8 +447,36 @@ int bitbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY  , u
 
 
 
+
+int compareHistogram(unsigned char * RHistogram_1 , unsigned char * GHistogram_1 , unsigned char * BHistogram_1 , unsigned int Samples_1 ,
+                     unsigned char * RHistogram_2 , unsigned char * GHistogram_2 , unsigned char * BHistogram_2 , unsigned int Samples_2 )
+{
+  unsigned int totalRDiff = 0;
+  unsigned int totalGDiff = 0;
+  unsigned int totalBDiff = 0;
+  unsigned int i=0;
+
+  for (i=0; i<256; i++)
+  {
+    if (RHistogram_1[i]<RHistogram_2[i]) { totalRDiff+=RHistogram_2[i]-RHistogram_1[i];} else
+                                         { totalRDiff+=RHistogram_1[i]-RHistogram_2[i];}
+
+    if (GHistogram_1[i]<GHistogram_2[i]) { totalGDiff+=GHistogram_2[i]-GHistogram_1[i];} else
+                                         { totalGDiff+=GHistogram_1[i]-GHistogram_2[i];}
+
+    if (BHistogram_1[i]<BHistogram_2[i]) { totalBDiff+=BHistogram_2[i]-BHistogram_1[i];} else
+                                         { totalBDiff+=BHistogram_1[i]-BHistogram_2[i];}
+
+  }
+
+ return totalRDiff+totalBDiff+totalGDiff;
+}
+
+
+
+
 int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
-                       unsigned char * RHistogram , unsigned char * GHistogram , unsigned char * BHistogram ,
+                       unsigned char * RHistogram , unsigned char * GHistogram , unsigned char * BHistogram , unsigned int * samples ,
                        unsigned int width , unsigned int height)
 {
   if ( (RHistogram==0)||(GHistogram==0)||(BHistogram==0) )
@@ -457,6 +485,7 @@ int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int t
       return 0;
   }
 
+  *samples=0;
   memset(RHistogram,0,255);
   memset(GHistogram,0,255);
   memset(BHistogram,0,255);
@@ -486,6 +515,10 @@ int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int t
     targetLineLimitPTR += targetWidth*3;
     targetPTR+=targetLineSkip;
   }
+
+  *samples=targetWidth*targetHeight;
+
+
  return 1;
 }
 

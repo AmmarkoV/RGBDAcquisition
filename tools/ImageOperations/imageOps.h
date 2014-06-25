@@ -23,9 +23,12 @@ int mixbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY , un
                 unsigned int width , unsigned int height);
 
 
+int compareHistogram(unsigned char * RHistogram_1 , unsigned char * GHistogram_1 , unsigned char * BHistogram_1 , unsigned int Samples_1 ,
+                     unsigned char * RHistogram_2 , unsigned char * GHistogram_2 , unsigned char * BHistogram_2 , unsigned int Samples_2 );
+
 
 int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
-                       unsigned char * RHistogram , unsigned char * GHistogram , unsigned char * BHistogram ,
+                       unsigned char * RHistogram , unsigned char * GHistogram , unsigned char * BHistogram , unsigned int * samples ,
                        unsigned int width , unsigned int height);
 
 

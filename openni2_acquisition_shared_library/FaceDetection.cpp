@@ -224,8 +224,9 @@ int fitsFaceHistogram(unsigned char * colorPixels ,   unsigned int colorWidth ,u
   unsigned char RHistogram[256]={0};
   unsigned char GHistogram[256]={0};
   unsigned char BHistogram[256]={0};
+  unsigned int histogramSamples=0;
   calculateHistogram(colorPixels ,  sX,  sY  ,  tileWidth , tileHeight ,
-                      RHistogram ,  GHistogram , BHistogram ,
+                      RHistogram ,  GHistogram , BHistogram , &histogramSamples ,
                       colorWidth,colorHeight);
 
   unsigned int histogramsCompletelyDifferent=0;
