@@ -268,7 +268,7 @@ int fitsFaceDepth(unsigned short * depthPixels ,   unsigned int depthWidth ,unsi
 
  #define MAX_AREAS_FOR_DEPTH_CHECK 10
  struct point2DFace hotAreas[MAX_AREAS_FOR_DEPTH_CHECK]={0};
- int i=0;
+ unsigned int i=0;
  //84x84
  //Nose Center
  hotAreas[i].x=42; hotAreas[i].y=42; ++i;
@@ -290,7 +290,7 @@ int fitsFaceDepth(unsigned short * depthPixels ,   unsigned int depthWidth ,unsi
  //Forehead
  hotAreas[i].x=42; hotAreas[i].y=20; ++i;
 
- unsigned int answerX=105,answerY=105;
+ //unsigned int answerX=105,answerY=105;
  signed int answers[MAX_AREAS_FOR_DEPTH_CHECK]={854,851,845,843,843,854,843};
 
  signed int results[MAX_AREAS_FOR_DEPTH_CHECK]={0};
@@ -410,7 +410,7 @@ unsigned int DetectFaces(unsigned int frameNumber ,
 
           if (faceReadingNumber%100==0)
           {
-             fprintf(stderr,"//-----------AUTOMATICALLY GENERATED after %u faces --------------\n",faceReadingNumber);
+             fprintf(stderr,"//-------------- AUTOMATICALLY GENERATED after %u faces --------------\n",faceReadingNumber);
              fprintf(stderr,"void initHeadDimensions()\n");
              fprintf(stderr,"{\n");
              unsigned int i=0;
@@ -419,10 +419,8 @@ unsigned int DetectFaces(unsigned int frameNumber ,
                  fprintf(stderr,"  storeCalibrationValue(%u,%u,%u,%u);\n",i,headCountedDimensions[i].minSize,headCountedDimensions[i].maxSize,headCountedDimensions[i].samples);
              }
              fprintf(stderr,"}\n");
-             fprintf(stderr,"//----------- --------------\n");
+             fprintf(stderr,"//-------------- --------------\n");
           }
-
-
           newFaceDetected(frameNumber,&faceDetected);
          } else
          {
@@ -438,9 +436,7 @@ unsigned int DetectFaces(unsigned int frameNumber ,
          }
     }
 
-
     cvReleaseImageHeader( &image );
-
 	return 1;
 }
 
