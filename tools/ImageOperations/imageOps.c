@@ -577,6 +577,24 @@ int getRGBPixel(unsigned char * ptrRGB , unsigned int RGBwidth , unsigned int RG
 
 
 
+
+unsigned short getDepthPixel(unsigned short * ptrDepth , unsigned int Depthwidth , unsigned int Depthheight ,  unsigned int x , unsigned int y)
+{
+ unsigned short * ptr =  ptrDepth  + MEMPLACE1(x,y,Depthwidth);
+ return *ptr;
+}
+
+
+
+int setDepthPixel(unsigned short * ptrDepth , unsigned int Depthwidth , unsigned int Depthheight ,  unsigned int x , unsigned int y , unsigned short depthValue)
+{
+ unsigned short * ptr =  ptrDepth  + MEMPLACE1(x,y,Depthwidth);
+ *ptr = depthValue;
+ return 1;
+}
+
+
+
 int closeToRGB(unsigned char R , unsigned char G , unsigned char B  ,  unsigned char targetR , unsigned char targetG , unsigned char targetB , unsigned int threshold)
 {
  if ( ( ABSDIFF(R,targetR) < threshold ) && ( ABSDIFF(G,targetG) < threshold ) && ( ABSDIFF(B,targetB) < threshold ) )   { return 1; }

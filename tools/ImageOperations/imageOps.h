@@ -59,6 +59,8 @@ int bitBltDepthToFile(  char * name  ,char * comment ,
 unsigned int countOccurancesOfRGBPixel(unsigned char * ptrRGB , unsigned int RGBwidth , unsigned int RGBheight , unsigned char transR ,unsigned char transG , unsigned char transB);
 
 int getRGBPixel(unsigned char * ptrRGB  , unsigned int RGBwidth , unsigned int RGBheight ,  unsigned int x , unsigned int y , unsigned char * R , unsigned char * G , unsigned char * B);
+unsigned short getDepthPixel(unsigned short * ptrDepth , unsigned int Depthwidth , unsigned int Depthheight ,  unsigned int x , unsigned int y);
+int setDepthPixel(unsigned short * ptrDepth , unsigned int Depthwidth , unsigned int Depthheight ,  unsigned int x , unsigned int y , unsigned short depthValue);
 
 int closeToRGB(unsigned char R , unsigned char G , unsigned char B  ,  unsigned char targetR , unsigned char targetG , unsigned char targetB , unsigned int threshold);
 

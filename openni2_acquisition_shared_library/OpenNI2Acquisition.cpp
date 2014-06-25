@@ -8,8 +8,9 @@
 //#define USE_CALIBRATION 1
 //#define BUILD_OPENNI2 1
 
-//#define MOD_FACEDETECTION 0
-//#define MOD_NITE2 1
+#define MOD_FACEDETECTION 1
+#define MOD_NITE2 1
+
 #if MOD_NITE2
  #warning "NITE2 Support is enabled in this binary , ( you probably dont want/care about this ) "
 #endif // MOD_NITE2
