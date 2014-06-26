@@ -18,7 +18,7 @@
 #define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
 
 int useDepthHeadMinMaxSizeHeuristic=1;
-int useHistogramHeuristic=0;
+int useHistogramHeuristic=1;
 int saveResults = 1;
 
 CvHaarClassifierCascade *cascade=0;
@@ -41,6 +41,10 @@ struct headSizeMinMax
 
 struct headSizeMinMax headCountedDimensions[640]={0};
 struct headSizeMinMax headDimensions[640]={0};
+
+
+unsigned int minRHistogram[256]={10000}, minGHistogram[256]={10000} , minBHistogram[256]={10000};
+unsigned int maxRHistogram[256]={0}, maxGHistogram[256]={0} , maxBHistogram[256]={0};
 
 int storeCalibrationValue(unsigned int tileSize,unsigned int minSize , unsigned int maxSize , unsigned int samples)
 {
@@ -198,7 +202,7 @@ void newFaceDetected(unsigned int frameNumber , struct detectedFace * faceDetect
 {
  fprintf(stderr, BLUE " " );
  fprintf(stderr,"-----------------------------\n");
- fprintf(stderr,"Head Reading @ frame %u \n", frameNumber);
+ fprintf(stderr,"Head Reading # %u @ frame %u \n", faceReadingNumber , frameNumber);
  fprintf(stderr,"HeadProjection  @ %u %u , %u , %u   \n", faceDetected->sX , faceDetected->sY , faceDetected->tileWidth , faceDetected->tileHeight );
  fprintf(stderr,"Head @ 3D %0.2f %0.2f %0.2f  \n",faceDetected->headX , faceDetected->headY , faceDetected->headZ);
  fprintf(stderr,"Head Distance @  %u\n",faceDetected->distance);
@@ -221,13 +225,27 @@ int fitsFaceHistogram(unsigned char * colorPixels ,   unsigned int colorWidth ,u
 {
   if (!useHistogramHeuristic) { return 1; }
 
-  unsigned char RHistogram[256]={0};
-  unsigned char GHistogram[256]={0};
-  unsigned char BHistogram[256]={0};
+  unsigned int RHistogram[256]={0};
+  unsigned int GHistogram[256]={0};
+  unsigned int BHistogram[256]={0};
   unsigned int histogramSamples=0;
-  calculateHistogram(colorPixels ,  sX,  sY  ,  tileWidth , tileHeight ,
-                      RHistogram ,  GHistogram , BHistogram , &histogramSamples ,
-                      colorWidth,colorHeight);
+  calculateHistogram(colorPixels ,  sX,  sY  , colorWidth,colorHeight,
+                     RHistogram ,  GHistogram , BHistogram , &histogramSamples ,
+                     tileWidth , tileHeight );
+
+
+  updateHistogramFilter( RHistogram , GHistogram , BHistogram , &histogramSamples ,
+                         minRHistogram , minGHistogram , minBHistogram   ,
+                         maxRHistogram , maxGHistogram , maxBHistogram
+                       );
+/*
+  if (saveResults)
+  {
+   char filename[128]={0};
+   sprintf(filename,"histogram_%u",faceReadingNumber);
+   printOutHistogram(filename,RHistogram,GHistogram,BHistogram,histogramSamples);
+  }*/
+
 
   unsigned int histogramsCompletelyDifferent=0;
 
@@ -421,6 +439,11 @@ unsigned int DetectFaces(unsigned int frameNumber ,
              }
              fprintf(stderr,"}\n");
              fprintf(stderr,"//-------------- --------------\n");
+
+             //-----------------------------------------
+             printOutHistogram("histogramMinLimit",minRHistogram,minGHistogram,minBHistogram,0);
+             printOutHistogram("histogramMaxLimit",maxRHistogram,maxGHistogram,maxBHistogram,0);
+
           }
           newFaceDetected(frameNumber,&faceDetected);
          } else

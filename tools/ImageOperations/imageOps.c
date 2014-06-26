@@ -9,7 +9,106 @@
 #define MEMPLACE3(x,y,width) ( y * ( width * 3 ) + x*3 )
 
 
+//RGB 2 HSV / HSV 2 RGB from http://www.cs.rit.edu/~ncs/color/t_convert.html
+// r,g,b values are from 0 to 1
+// h = [0,360], s = [0,1], v = [0,1]
+//		if s == 0, then h = -1 (undefined)
 
+void RGBFtoHSV( float r, float g, float b, float *h, float *s, float *v )
+{
+	float min, max, delta;
+
+	min = MIN( r, g, b );
+	max = MAX( r, g, b );
+	*v = max;				// v
+
+	delta = max - min;
+
+	if( max != 0 )
+		*s = delta / max;		// s
+	else {
+		// r = g = b = 0		// s = 0, v is undefined
+		*s = 0;
+		*h = -1;
+		return;
+	}
+
+	if( r == max )
+		*h = ( g - b ) / delta;		// between yellow & magenta
+	else if( g == max )
+		*h = 2 + ( b - r ) / delta;	// between cyan & yellow
+	else
+		*h = 4 + ( r - g ) / delta;	// between magenta & cyan
+
+	*h *= 60;				// degrees
+	if( *h < 0 )
+		*h += 360;
+
+}
+
+
+void RGBtoHSV( unsigned char r, unsigned char g, unsigned char b,
+               float *h, float *s, float *v )
+{
+  float rInt = (float) r/255;
+  float gInt = (float) g/255;
+  float bInt = (float) b/255;
+  RGBFtoHSV(rInt,gInt,bInt,h,s,v);
+}
+
+
+void HSVtoRGB( float *r, float *g, float *b, float h, float s, float v )
+{
+	int i;
+	float f, p, q, t;
+
+	if( s == 0 ) {
+		// achromatic (grey)
+		*r = *g = *b = v;
+		return;
+	}
+
+	h /= 60;			// sector 0 to 5
+	i = floor( h );
+	f = h - i;			// factorial part of h
+	p = v * ( 1 - s );
+	q = v * ( 1 - s * f );
+	t = v * ( 1 - s * ( 1 - f ) );
+
+	switch( i ) {
+		case 0:
+			*r = v;
+			*g = t;
+			*b = p;
+			break;
+		case 1:
+			*r = q;
+			*g = v;
+			*b = p;
+			break;
+		case 2:
+			*r = p;
+			*g = v;
+			*b = t;
+			break;
+		case 3:
+			*r = p;
+			*g = q;
+			*b = v;
+			break;
+		case 4:
+			*r = t;
+			*g = p;
+			*b = v;
+			break;
+		default:		// case 5:
+			*r = v;
+			*g = p;
+			*b = q;
+			break;
+	}
+
+}
 unsigned int simplePowInline(unsigned int base,unsigned int exp)
 {
     if (exp==0) return 1;
@@ -448,8 +547,53 @@ int bitbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY  , u
 
 
 
-int compareHistogram(unsigned char * RHistogram_1 , unsigned char * GHistogram_1 , unsigned char * BHistogram_1 , unsigned int Samples_1 ,
-                     unsigned char * RHistogram_2 , unsigned char * GHistogram_2 , unsigned char * BHistogram_2 , unsigned int Samples_2 )
+int printOutHistogram(char * filename, unsigned int * RHistogram_1 , unsigned int * GHistogram_1 , unsigned int * BHistogram_1 , unsigned int Samples_1  )
+{
+  unsigned int i=0;
+
+  FILE *fpr = 0;
+
+  char filenameInt[255];
+  sprintf(filenameInt,"RED%s",filename);
+  fpr=fopen(filenameInt,"w");
+  if (fpr!=0)
+  {
+   for (i=0; i<256; i++) { fprintf(fpr,"%u\n",RHistogram_1[i]); }
+   fclose(fpr);
+  }
+
+
+  sprintf(filenameInt,"GREEN%s",filename);
+  fpr=fopen(filenameInt,"w");
+  if (fpr!=0)
+  {
+   for (i=0; i<256; i++) { fprintf(fpr,"%u\n",GHistogram_1[i]); }
+   fclose(fpr);
+  }
+
+
+  sprintf(filenameInt,"BLUE%s",filename);
+  fpr=fopen(filenameInt,"w");
+  if (fpr!=0)
+  {
+   for (i=0; i<256; i++) { fprintf(fpr,"%u\n",BHistogram_1[i]); }
+   fclose(fpr);
+  }
+
+  char command[1024]={0};
+  sprintf(command,"gnuplot -e 'set terminal png; set output \"RED%s.png\"; set title \"3D random points\"; plot \"RED%s\" with lines'",filename,filename);
+  i=system(command);
+
+  sprintf(command,"gnuplot -e 'set terminal png; set output \"GREEN%s.png\"; set title \"3D random points\"; plot \"GREEN%s\" with lines'",filename,filename);
+  i=system(command);
+
+  sprintf(command,"gnuplot -e 'set terminal png; set output \"BLUE%s.png\"; set title \"3D random points\"; plot \"BLUE%s\" with lines'",filename,filename);
+  i=system(command);
+ return 1;
+}
+
+int compareHistogram(unsigned int * RHistogram_1 , unsigned int * GHistogram_1 , unsigned int * BHistogram_1 , unsigned int Samples_1 ,
+                     unsigned int * RHistogram_2 , unsigned int * GHistogram_2 , unsigned int * BHistogram_2 , unsigned int Samples_2 )
 {
   unsigned int totalRDiff = 0;
   unsigned int totalGDiff = 0;
@@ -474,9 +618,31 @@ int compareHistogram(unsigned char * RHistogram_1 , unsigned char * GHistogram_1
 
 
 
+int updateHistogramFilter(
+                           unsigned int * RHistogram , unsigned int * GHistogram , unsigned int * BHistogram , unsigned int * samples ,
+                           unsigned int * minRHistogram , unsigned int * minGHistogram , unsigned int * minBHistogram   ,
+                           unsigned int * maxRHistogram , unsigned int * maxGHistogram , unsigned int * maxBHistogram
+                         )
+{
+  unsigned int i=0;
+  for (i=0; i<256; i++)
+  {
+    if (minRHistogram[i]>RHistogram[i])  { minRHistogram[i]=RHistogram[i]; }
+    if (minGHistogram[i]>GHistogram[i])  { minGHistogram[i]=GHistogram[i]; }
+    if (minBHistogram[i]>BHistogram[i])  { minBHistogram[i]=BHistogram[i]; }
+
+    if (maxRHistogram[i]<RHistogram[i])  { maxRHistogram[i]=RHistogram[i]; }
+    if (maxGHistogram[i]<GHistogram[i])  { maxGHistogram[i]=GHistogram[i]; }
+    if (maxBHistogram[i]<BHistogram[i])  { maxBHistogram[i]=BHistogram[i]; }
+  }
+ return 1;
+}
+
+
+
 
 int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
-                       unsigned char * RHistogram , unsigned char * GHistogram , unsigned char * BHistogram , unsigned int * samples ,
+                       unsigned int * RHistogram , unsigned int * GHistogram , unsigned int * BHistogram , unsigned int * samples ,
                        unsigned int width , unsigned int height)
 {
   if ( (RHistogram==0)||(GHistogram==0)||(BHistogram==0) )
@@ -490,6 +656,7 @@ int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int t
   memset(GHistogram,0,255);
   memset(BHistogram,0,255);
 
+  fprintf(stderr,"Initially a Histogram at an area (%u,%u) of target image  starting at %u,%u  sized %u,%u  \n",width,height,tX,tY,targetWidth,targetHeight);
   //Check for bounds -----------------------------------------
   if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
   if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
@@ -508,13 +675,15 @@ int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int t
      while (targetPTR < targetLineLimitPTR)
      {
         //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
-        ++RHistogram[*targetPTR]; ++targetPTR;
-        ++GHistogram[*targetPTR]; ++targetPTR;
-        ++BHistogram[*targetPTR]; ++targetPTR;
+        RHistogram[*targetPTR]+=1; ++targetPTR;
+        GHistogram[*targetPTR]+=1; ++targetPTR;
+        BHistogram[*targetPTR]+=1; ++targetPTR;
      }
     targetLineLimitPTR += targetWidth*3;
     targetPTR+=targetLineSkip;
   }
+
+  fprintf(stderr,"Done\n");
 
   *samples=targetWidth*targetHeight;
 
