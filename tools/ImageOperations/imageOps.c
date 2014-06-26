@@ -592,8 +592,9 @@ int printOutHistogram(char * filename, unsigned int * RHistogram_1 , unsigned in
  return 1;
 }
 
-int compareHistogram(unsigned int * RHistogram_1 , unsigned int * GHistogram_1 , unsigned int * BHistogram_1 , unsigned int Samples_1 ,
-                     unsigned int * RHistogram_2 , unsigned int * GHistogram_2 , unsigned int * BHistogram_2 , unsigned int Samples_2 )
+unsigned int compareHistogram(unsigned int * RHistogram , unsigned int * GHistogram , unsigned int * BHistogram , unsigned int * samples ,
+                     unsigned int * minRHistogram , unsigned int * minGHistogram , unsigned int * minBHistogram ,
+                     unsigned int * maxRHistogram , unsigned int * maxGHistogram , unsigned int * maxBHistogram  )
 {
   unsigned int totalRDiff = 0;
   unsigned int totalGDiff = 0;
@@ -602,15 +603,14 @@ int compareHistogram(unsigned int * RHistogram_1 , unsigned int * GHistogram_1 ,
 
   for (i=0; i<256; i++)
   {
-    if (RHistogram_1[i]<RHistogram_2[i]) { totalRDiff+=RHistogram_2[i]-RHistogram_1[i];} else
-                                         { totalRDiff+=RHistogram_1[i]-RHistogram_2[i];}
+    if (minRHistogram[i]>RHistogram[i])  { totalRDiff+= minRHistogram[i]-RHistogram[i]; } else
+    if (maxRHistogram[i]<RHistogram[i])  { totalRDiff+= RHistogram[i]-maxRHistogram[i]; }
 
-    if (GHistogram_1[i]<GHistogram_2[i]) { totalGDiff+=GHistogram_2[i]-GHistogram_1[i];} else
-                                         { totalGDiff+=GHistogram_1[i]-GHistogram_2[i];}
+    if (minGHistogram[i]>GHistogram[i])  { totalGDiff+= minGHistogram[i]-GHistogram[i]; } else
+    if (maxGHistogram[i]<GHistogram[i])  { totalGDiff+= GHistogram[i]-maxGHistogram[i]; }
 
-    if (BHistogram_1[i]<BHistogram_2[i]) { totalBDiff+=BHistogram_2[i]-BHistogram_1[i];} else
-                                         { totalBDiff+=BHistogram_1[i]-BHistogram_2[i];}
-
+    if (minBHistogram[i]>BHistogram[i])  { totalBDiff+= minBHistogram[i]-BHistogram[i]; } else
+    if (maxBHistogram[i]<BHistogram[i])  { totalBDiff+= BHistogram[i]-maxBHistogram[i]; }
   }
 
  return totalRDiff+totalBDiff+totalGDiff;
@@ -638,6 +638,63 @@ int updateHistogramFilter(
  return 1;
 }
 
+
+
+int saveHistogramFilter(
+                           char * filename ,
+                           unsigned int * minRHistogram , unsigned int * minGHistogram , unsigned int * minBHistogram   ,
+                           unsigned int * maxRHistogram , unsigned int * maxGHistogram , unsigned int * maxBHistogram
+                         )
+{
+  FILE *fpr = 0;
+
+  fpr=fopen(filename,"w");
+  if (fpr!=0)
+  {
+   unsigned int i=0;
+
+
+   fprintf(fpr,"unsigned int minRHistogram[256]={");
+   for (i=0; i<255; i++) { fprintf(fpr,"%u,",minRHistogram[i]); }
+   fprintf(fpr,"%u};\n ",minBHistogram[255]);
+
+   fprintf(fpr,"unsigned int minGHistogram[256]={");
+   for (i=0; i<255; i++) { fprintf(fpr,"%u,",minGHistogram[i]); }
+   fprintf(fpr,"%u};\n ",minBHistogram[255]);
+
+   fprintf(fpr,"unsigned int minBHistogram[256]={");
+   for (i=0; i<255; i++) { fprintf(fpr,"%u,",minBHistogram[i]); }
+   fprintf(fpr,"%u};\n\n ",minBHistogram[255]);
+
+
+   fprintf(fpr,"unsigned int maxRHistogram[256]={");
+   for (i=0; i<255; i++) { fprintf(fpr,"%u,",maxRHistogram[i]); }
+   fprintf(fpr,"%u};\n ",maxBHistogram[255]);
+
+   fprintf(fpr,"unsigned int maxGHistogram[256]={");
+   for (i=0; i<255; i++) { fprintf(fpr,"%u,",maxGHistogram[i]); }
+   fprintf(fpr,"%u};\n ",maxBHistogram[255]);
+
+   fprintf(fpr,"unsigned int maxBHistogram[256]={");
+   for (i=0; i<255; i++) { fprintf(fpr,"%u,",maxBHistogram[i]); }
+   fprintf(fpr,"%u};\n\n ",maxBHistogram[255]);
+
+   fprintf(fpr,"void initHistogramLimits()\n");
+   fprintf(fpr,"{ return; //AUTOMATICALLY DISABLED \n");
+   fprintf(fpr," unsigned int i=0;\n");
+   fprintf(fpr," for (i=0; i<256; i++)\n");
+   fprintf(fpr," {\n");
+   fprintf(fpr,"   minRHistogram[i]=10000;");
+   fprintf(fpr,"   minGHistogram[i]=10000;");
+   fprintf(fpr,"   minBHistogram[i]=10000;");
+   fprintf(fpr," }\n");
+   fprintf(fpr,"}\n");
+
+   fclose(fpr);
+  }
+
+ return 1;
+}
 
 
 

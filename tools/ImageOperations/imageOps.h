@@ -38,8 +38,16 @@ int updateHistogramFilter(
                            unsigned int * maxRHistogram , unsigned int * maxGHistogram , unsigned int * maxBHistogram
                          );
 
-int compareHistogram(unsigned int * RHistogram_1 , unsigned int * GHistogram_1 , unsigned int * BHistogram_1 , unsigned int Samples_1 ,
-                     unsigned int * RHistogram_2 , unsigned int * GHistogram_2 , unsigned int * BHistogram_2 , unsigned int Samples_2 );
+
+int saveHistogramFilter(
+                           char * filename ,
+                           unsigned int * minRHistogram , unsigned int * minGHistogram , unsigned int * minBHistogram   ,
+                           unsigned int * maxRHistogram , unsigned int * maxGHistogram , unsigned int * maxBHistogram
+                         );
+
+unsigned int compareHistogram(unsigned int * RHistogram , unsigned int * GHistogram , unsigned int * BHistogram , unsigned int * samples ,
+                     unsigned int * minRHistogram , unsigned int * minGHistogram , unsigned int * minBHistogram ,
+                     unsigned int * maxRHistogram , unsigned int * maxGHistogram , unsigned int * maxBHistogram  );
 
 
 int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,

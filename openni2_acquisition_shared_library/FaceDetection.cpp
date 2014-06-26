@@ -18,7 +18,10 @@
 #define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
 
 int useDepthHeadMinMaxSizeHeuristic=1;
+
+unsigned int learnFaceHistogramHeuristic=0;
 int useHistogramHeuristic=1;
+
 int saveResults = 1;
 
 CvHaarClassifierCascade *cascade=0;
@@ -43,8 +46,23 @@ struct headSizeMinMax headCountedDimensions[640]={0};
 struct headSizeMinMax headDimensions[640]={0};
 
 
-unsigned int minRHistogram[256]={10000}, minGHistogram[256]={10000} , minBHistogram[256]={10000};
-unsigned int maxRHistogram[256]={0}, maxGHistogram[256]={0} , maxBHistogram[256]={0};
+ unsigned int minRHistogram[256]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,2,1,4,6,4,7,2,5,2,1,8,4,5,7,2,3,2,6,5,6,2,6,3,7,8,5,6,10,8,10,16,19,22,22,14,14,11,30,19,15,22,27,27,28,33,34,26,27,31,37,40,47,46,35,42,43,42,45,46,34,44,42,39,44,44,52,44,47,37,42,38,39,49,45,33,58,42,36,45,45,52,58,66,48,51,56,41,48,36,32,36,36,33,21,28,29,23,22,23,24,18,14,17,9,8,8,15,8,10,10,6,9,9,1,3,1,4,3,0,3,0,1,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+ unsigned int minGHistogram[256]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,2,2,4,4,5,5,9,9,5,13,10,8,13,14,9,10,13,10,12,17,15,12,15,17,19,27,24,34,29,36,37,37,35,39,37,46,57,47,52,48,47,56,39,54,45,49,71,79,86,85,68,49,55,38,51,43,30,38,31,27,27,27,24,21,28,19,26,18,23,22,19,19,18,21,12,17,15,10,12,10,9,9,11,12,9,3,1,4,3,2,0,0,0,1,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+ unsigned int minBHistogram[256]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,2,0,1,1,0,1,2,1,3,4,4,5,4,6,5,4,4,15,10,15,9,5,8,15,12,16,18,21,21,22,23,19,27,31,33,32,34,36,46,74,50,52,55,45,63,71,30,32,50,41,32,39,48,52,32,29,31,37,26,35,20,23,24,15,13,19,19,16,14,18,12,16,17,10,10,9,8,9,8,9,4,6,6,3,7,4,4,4,4,1,5,1,1,2,1,2,2,0,2,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+ unsigned int maxRHistogram[256]={1087,311,163,54,243,136,48,207,131,112,43,127,175,51,119,133,98,63,141,116,121,21,159,152,47,104,117,99,121,143,171,98,149,135,82,122,147,114,121,113,116,115,90,112,113,84,129,127,126,83,148,98,126,108,77,122,141,113,114,120,123,158,164,80,104,172,156,149,136,170,270,237,187,362,292,213,277,215,236,246,329,267,351,398,237,504,233,348,451,297,363,334,474,375,318,282,394,358,417,252,214,239,279,321,381,264,292,198,196,157,162,193,157,168,252,149,187,208,194,221,267,332,389,306,273,302,299,299,288,284,303,239,207,247,243,206,239,206,216,273,251,202,259,186,190,217,219,206,197,159,216,237,178,179,177,173,149,239,201,214,158,158,163,191,134,185,190,153,134,133,147,107,150,116,136,134,151,193,108,106,98,124,171,135,155,133,118,124,136,144,107,137,109,69,84,77,80,84,73,75,59,60,63,82,77,78,85,83,76,44,66,63,42,48,39,44,46,40,30,41,32,44,31,27,20,25,15,17,21,17,17,12,15,16,13,12,18,14,17,14,13,12,11,13,10,14,18,17,21,22,12,13,30,39,31,471};
+ unsigned int maxGHistogram[256]={2896,262,204,210,195,237,267,132,220,252,213,156,251,252,212,205,219,162,186,121,218,186,126,187,128,143,144,184,191,173,242,280,292,213,296,345,297,332,225,359,318,246,296,288,358,303,330,370,373,489,287,478,312,359,311,406,361,372,224,253,282,306,263,251,253,240,209,265,230,232,273,327,374,344,323,323,347,274,299,306,286,324,281,302,264,312,273,265,290,239,297,231,302,255,232,243,210,242,221,211,216,197,203,164,200,189,246,211,154,199,209,179,189,220,154,156,137,171,171,121,160,154,146,140,147,156,156,212,186,214,228,132,194,115,152,122,112,132,134,148,109,119,91,106,99,110,145,109,111,81,90,93,89,68,70,83,58,79,73,67,61,59,68,48,72,75,56,62,49,57,78,70,81,47,36,46,38,41,41,37,43,60,53,55,43,37,48,48,62,65,52,62,35,46,27,28,39,25,18,18,19,16,15,26,16,27,14,14,13,15,14,16,13,13,10,12,13,13,8,9,18,12,15,10,18,15,15,20,16,18,16,26,47,29,29,7,17,9,21,24,34,52,46,32,10,9,5,5,8,8,5,4,7,3,3,471};
+ unsigned int maxBHistogram[256]={1312,223,118,479,329,365,239,268,215,176,264,222,330,329,232,229,237,291,271,323,280,232,225,250,236,230,351,394,345,412,332,356,395,337,328,414,456,392,490,237,393,497,456,304,278,421,340,350,336,266,288,290,280,240,209,200,259,275,215,227,216,212,264,279,178,161,264,266,232,269,290,366,284,239,244,260,245,313,229,316,253,329,249,325,272,298,250,319,222,282,254,233,259,272,197,259,214,218,214,242,172,215,179,138,174,168,141,185,161,139,107,98,129,120,130,106,95,92,78,89,113,106,146,100,123,139,148,160,143,230,131,169,152,138,142,101,133,110,128,96,134,85,76,85,73,85,88,79,78,79,77,67,73,68,79,58,68,43,70,55,67,50,41,51,40,36,44,48,39,36,44,45,41,36,34,35,41,30,34,30,35,40,33,47,36,43,39,35,56,43,45,30,52,27,29,19,26,23,22,19,23,27,15,28,15,35,23,16,19,20,15,19,18,13,15,12,15,14,19,30,22,20,12,21,13,17,16,20,25,35,31,16,27,23,20,11,13,9,10,7,7,6,5,9,9,7,9,8,10,4,7,8,8,7,9,471};
+
+void initHistogramLimits()
+{
+ return;
+ unsigned int i=0;
+ for (i=0; i<256; i++)
+ {
+   minRHistogram[i]=10000;   minGHistogram[i]=10000;   minBHistogram[i]=10000; }
+}
+
 
 int storeCalibrationValue(unsigned int tileSize,unsigned int minSize , unsigned int maxSize , unsigned int samples)
 {
@@ -60,6 +78,7 @@ int checkHeadSize(unsigned int tileSize,unsigned int headDepth)
    if (headDimensions[tileSize].samples<=1) { fprintf(stderr,YELLOW "checkHeadSize(%u,%u) has one/no reference , accepting it..!\n" NORMAL,tileSize,headDepth); return 1; }
    return ( (headDimensions[tileSize].minSize<=headDepth) && (headDepth<=headDimensions[tileSize].maxSize) );
 }
+
 
 void initHeadDimensions()
 {
@@ -152,6 +171,28 @@ void initHeadDimensions()
 }
 
 
+void saveClassifierData()
+{
+ fprintf(stderr,"//-------------- AUTOMATICALLY GENERATED after %u faces --------------\n",faceReadingNumber);
+ fprintf(stderr,"void initHeadDimensions()\n");
+ fprintf(stderr,"{\n");
+ unsigned int i=0;
+ for (i=60; i<200; i++)
+                { fprintf(stderr,"  storeCalibrationValue(%u,%u,%u,%u);\n",i,headCountedDimensions[i].minSize,headCountedDimensions[i].maxSize,headCountedDimensions[i].samples); }
+ fprintf(stderr,"}\n");
+ fprintf(stderr,"//-------------- --------------\n");
+
+ //-----------------------------------------
+ if (learnFaceHistogramHeuristic)
+             {
+              printOutHistogram((char*) "histogramMinLimit",minRHistogram,minGHistogram,minBHistogram,0);
+              printOutHistogram((char*) "histogramMaxLimit",maxRHistogram,maxGHistogram,maxBHistogram,0);
+              saveHistogramFilter((char*) "histogramFilter",minRHistogram , minGHistogram , minBHistogram ,
+                                                            maxRHistogram , maxGHistogram , maxBHistogram );
+             }
+}
+
+
 unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width , unsigned int height ,unsigned int x2d, unsigned int y2d )
 {
     if (depthFrame == 0 ) {  return 0; }
@@ -168,6 +209,7 @@ unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width
 
 int InitFaceDetection(char * haarCascadePath)
 {
+     initHistogramLimits();
      initHeadDimensions();
 
     /* load the classifier
@@ -233,27 +275,38 @@ int fitsFaceHistogram(unsigned char * colorPixels ,   unsigned int colorWidth ,u
                      RHistogram ,  GHistogram , BHistogram , &histogramSamples ,
                      tileWidth , tileHeight );
 
+  unsigned int differenceScore=0;
+  unsigned int histogramsCompletelyDifferent=0;
 
+ if (learnFaceHistogramHeuristic)
+ {
   updateHistogramFilter( RHistogram , GHistogram , BHistogram , &histogramSamples ,
                          minRHistogram , minGHistogram , minBHistogram   ,
                          maxRHistogram , maxGHistogram , maxBHistogram
                        );
-/*
-  if (saveResults)
-  {
-   char filename[128]={0};
-   sprintf(filename,"histogram_%u",faceReadingNumber);
-   printOutHistogram(filename,RHistogram,GHistogram,BHistogram,histogramSamples);
-  }*/
 
+ } else
+ {
+     differenceScore = compareHistogram( RHistogram ,  GHistogram , BHistogram , &histogramSamples ,
+                                         minRHistogram ,  minGHistogram ,  minBHistogram ,
+                                         maxRHistogram ,  maxGHistogram ,  maxBHistogram  );
 
-  unsigned int histogramsCompletelyDifferent=0;
+    if (differenceScore>4000) { histogramsCompletelyDifferent=1; }
+ }
 
   if (histogramsCompletelyDifferent)
   {
-      fprintf(stderr,RED "Discarding head due to terrible histogram mismatch\n" NORMAL);
-      return 0;
+    fprintf(stderr,RED "Discarding head due to terrible histogram mismatch ( %u ) \n" NORMAL,differenceScore);
+    if (saveResults)
+      {
+       char filename[128]={0};
+       sprintf(filename,"badHistogram_%u", discardedFaceByHeuristics);
+       printOutHistogram(filename,RHistogram,GHistogram,BHistogram,histogramSamples);
+      }
+     return 0;
   }
+
+
 
   return 1;
 }
@@ -338,16 +391,6 @@ int fitsFaceDepth(unsigned short * depthPixels ,   unsigned int depthWidth ,unsi
 }
 
 
-
-
-
-
-
-
-
-
-
-
 unsigned int DetectFaces(unsigned int frameNumber ,
                          unsigned char * colorPixels ,  unsigned int colorWidth ,unsigned int colorHeight ,
                          unsigned short * depthPixels ,   unsigned int depthWidth ,unsigned int depthHeight ,
@@ -416,7 +459,8 @@ unsigned int DetectFaces(unsigned int frameNumber ,
               (fitsFaceHistogram(colorPixels,colorWidth,colorHeight,sX,sY,tileWidth,tileHeight))
             )
          {
-
+          //GOOD Result - - - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+          //-------------------------------------------------------------------------------------------
           if (saveResults)
           {
             char filename[512]={0};
@@ -427,27 +471,15 @@ unsigned int DetectFaces(unsigned int frameNumber ,
           }
          ++faceReadingNumber;
 
-          if (faceReadingNumber%100==0)
-          {
-             fprintf(stderr,"//-------------- AUTOMATICALLY GENERATED after %u faces --------------\n",faceReadingNumber);
-             fprintf(stderr,"void initHeadDimensions()\n");
-             fprintf(stderr,"{\n");
-             unsigned int i=0;
-             for (i=60; i<200; i++)
-             {
-                 fprintf(stderr,"  storeCalibrationValue(%u,%u,%u,%u);\n",i,headCountedDimensions[i].minSize,headCountedDimensions[i].maxSize,headCountedDimensions[i].samples);
-             }
-             fprintf(stderr,"}\n");
-             fprintf(stderr,"//-------------- --------------\n");
+          if (faceReadingNumber%100==0) {  saveClassifierData(); }
 
-             //-----------------------------------------
-             printOutHistogram("histogramMinLimit",minRHistogram,minGHistogram,minBHistogram,0);
-             printOutHistogram("histogramMaxLimit",maxRHistogram,maxGHistogram,maxBHistogram,0);
-
-          }
+          //Trigger new face detected event
           newFaceDetected(frameNumber,&faceDetected);
+          //-------------------------------------------------------------------------------------------
          } else
          {
+           //BAD Result - - - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+          //-------------------------------------------------------------------------------------------
           if (saveResults)
           {
             char filename[512]={0};
@@ -457,6 +489,7 @@ unsigned int DetectFaces(unsigned int frameNumber ,
             bitBltDepthToFile(filename, 0 , depthPixels , sX, sY  ,640,480 , tileWidth , tileHeight );
           }
             ++discardedFaceByHeuristics;
+          //-------------------------------------------------------------------------------------------
          }
     }
 
