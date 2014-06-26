@@ -7,6 +7,8 @@ extern "C"
 {
 #endif
 
+void RGBtoHSV( unsigned char r, unsigned char g, unsigned char b,
+               float *h, float *s, float *v );
 
 int mixbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
               unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
@@ -18,9 +20,39 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
               unsigned int width , unsigned int height);
 
 
+
+int bitbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
+                unsigned short * source , unsigned int sX,  unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
+                unsigned int width , unsigned int height);
+
 int mixbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
                 unsigned short * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
                 unsigned int width , unsigned int height);
+
+
+int printOutHistogram(char * filename, unsigned int * RHistogram_1 , unsigned int * GHistogram_1 , unsigned int * BHistogram_1 , unsigned int Samples_1  );
+
+int updateHistogramFilter(
+                           unsigned int * RHistogram , unsigned int * GHistogram , unsigned int * BHistogram , unsigned int * samples ,
+                           unsigned int * minRHistogram , unsigned int * minGHistogram , unsigned int * minBHistogram   ,
+                           unsigned int * maxRHistogram , unsigned int * maxGHistogram , unsigned int * maxBHistogram
+                         );
+
+
+int saveHistogramFilter(
+                           char * filename ,
+                           unsigned int * minRHistogram , unsigned int * minGHistogram , unsigned int * minBHistogram   ,
+                           unsigned int * maxRHistogram , unsigned int * maxGHistogram , unsigned int * maxBHistogram
+                         );
+
+unsigned int compareHistogram(unsigned int * RHistogram , unsigned int * GHistogram , unsigned int * BHistogram , unsigned int * samples ,
+                     unsigned int * minRHistogram , unsigned int * minGHistogram , unsigned int * minBHistogram ,
+                     unsigned int * maxRHistogram , unsigned int * maxGHistogram , unsigned int * maxBHistogram  );
+
+
+int calculateHistogram(unsigned char * target,  unsigned int tX,  unsigned int tY  , unsigned int targetWidth , unsigned int targetHeight ,
+                       unsigned int * RHistogram , unsigned int * GHistogram , unsigned int * BHistogram , unsigned int * samples ,
+                       unsigned int width , unsigned int height);
 
 
 int saveRawImageToFile(char * filename,char * comment ,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
