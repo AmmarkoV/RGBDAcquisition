@@ -296,7 +296,7 @@ int fitsFaceHistogram(unsigned char * colorPixels ,   unsigned int colorWidth ,u
 
   if (histogramsCompletelyDifferent)
   {
-    fprintf(stderr,RED "Discarding head due to terrible histogram mismatch ( %u ) \n" NORMAL,differenceScore);
+    fprintf(stderr,RED "Discarding head due to histogram mismatch ( %u ) \n" NORMAL,differenceScore);
     if (saveResults)
       {
        char filename[128]={0};
