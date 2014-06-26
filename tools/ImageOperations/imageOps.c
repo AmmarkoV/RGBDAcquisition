@@ -2,12 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
 
 #define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
 #define MEMPLACE3(x,y,width) ( y * ( width * 3 ) + x*3 )
 
+#define MIN2(A,B)       ((A)<(B)?(A):(B))
+#define MIN3(A,B,C)     (MIN2(MIN2((A),(B)),(C)))
+
+#define MAX2(A,B)       ((A)>(B)?(A):(B))
+#define MAX3(A,B,C)     (MAX2(MAX2((A),(B)),(C)))
 
 //RGB 2 HSV / HSV 2 RGB from http://www.cs.rit.edu/~ncs/color/t_convert.html
 // r,g,b values are from 0 to 1
@@ -18,8 +24,8 @@ void RGBFtoHSV( float r, float g, float b, float *h, float *s, float *v )
 {
 	float min, max, delta;
 
-	min = MIN( r, g, b );
-	max = MAX( r, g, b );
+	min = MIN3( r, g, b );
+	max = MAX3( r, g, b );
 	*v = max;				// v
 
 	delta = max - min;
