@@ -30,8 +30,8 @@ unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width
 
 void setDepthValueAtXY(unsigned short * depthFrame ,unsigned int width , unsigned int height ,unsigned int x2d, unsigned int y2d , unsigned int value )
 {
-    if (depthFrame == 0 ) {  return 0; }
-    if ( (x2d>=width) || (y2d>=height) )    {   return 0; }
+    if (depthFrame == 0 ) {  return; }
+    if ( (x2d>=width) || (y2d>=height) )  {   return; }
 
     unsigned short * depthValue = depthFrame + (y2d * width + x2d );
     *depthValue  = value;
