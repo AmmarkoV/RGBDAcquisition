@@ -497,7 +497,8 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
    //it should also fire up any additional events registered by clients
  if (
         (BROADCAST_EVEN_BAD_SKELETONS) ||
-        ( (notAll_Z_AreZero) && (humanSkeleton.isVisible) && ( (humanSkeleton.statusCalibrating) || (humanSkeleton.statusTracking) ) )
+        (notAll_Z_AreZero) ||
+        ( (humanSkeleton.isVisible) && ( (humanSkeleton.statusCalibrating) || (humanSkeleton.statusTracking) ) )
       )
    {
     newSkeletonDetected(devID,frameNumber,&humanSkeleton);
