@@ -59,7 +59,7 @@ struct headSizeMinMax headDimensions[640]={0};
  unsigned int maxBHistogram[256]={1312,223,118,479,329,365,239,268,215,176,264,222,330,329,232,229,237,291,271,323,280,232,225,250,236,230,351,394,345,412,332,356,395,337,328,414,456,392,490,237,393,497,456,304,278,421,340,350,336,266,288,290,280,240,209,200,259,275,215,227,216,212,264,279,178,161,264,266,232,269,290,366,284,239,244,260,245,313,229,316,253,329,249,325,272,298,250,319,222,282,254,233,259,272,197,259,214,218,214,242,172,215,179,138,174,168,141,185,161,139,107,98,129,120,130,106,95,92,78,89,113,106,146,100,123,139,148,160,143,230,131,169,152,138,142,101,133,110,128,96,134,85,76,85,73,85,88,79,78,79,77,67,73,68,79,58,68,43,70,55,67,50,41,51,40,36,44,48,39,36,44,45,41,36,34,35,41,30,34,30,35,40,33,47,36,43,39,35,56,43,45,30,52,27,29,19,26,23,22,19,23,27,15,28,15,35,23,16,19,20,15,19,18,13,15,12,15,14,19,30,22,20,12,21,13,17,16,20,25,35,31,16,27,23,20,11,13,9,10,7,7,6,5,9,9,7,9,8,10,4,7,8,8,7,9,471};
 
 
- struct depthClassifier dc={0};;
+ struct depthClassifier dc={0};
 
 void initHistogramLimits()
 {
@@ -120,28 +120,28 @@ void saveClassifierData()
 
 void initHeadDimensions()
 {
-  storeCalibrationValue(63,2500,3196,4);  storeCalibrationValue(64,1731,3644,13); storeCalibrationValue(65,1575,3240,18); storeCalibrationValue(66,1582,3263,9);
+  storeCalibrationValue(63,1600,3196,4);  storeCalibrationValue(64,1731,3644,13); storeCalibrationValue(65,1575,3240,18); storeCalibrationValue(66,1582,3263,9);
   storeCalibrationValue(67,1483,3179,15); storeCalibrationValue(68,1472,3468,12); storeCalibrationValue(69,1437,2709,6); storeCalibrationValue(70,1372,2568,12);
   storeCalibrationValue(71,1374,2532,12); storeCalibrationValue(72,1354,2038,10); storeCalibrationValue(73,1357,1939,10); storeCalibrationValue(74,1274,2031,7);
   storeCalibrationValue(75,1103,2424,9);  storeCalibrationValue(76,1171,1746,5); storeCalibrationValue(77,1245,1498,9); storeCalibrationValue(78,1241,1770,8);
-  storeCalibrationValue(79,1231,1438,6); storeCalibrationValue(80,1102,1397,8); storeCalibrationValue(81,1105,4664,5); storeCalibrationValue(82,1173,1456,4);
-  storeCalibrationValue(83,1170,1295,5); storeCalibrationValue(84,1157,4748,10); storeCalibrationValue(85,1105,1336,3); storeCalibrationValue(86,1109,5516,6);
-  storeCalibrationValue(87,1218,5984,3); storeCalibrationValue(88,1045,5754,4); storeCalibrationValue(89,1102,1122,4); storeCalibrationValue(90,1062,6019,5);
-  storeCalibrationValue(91,1069,5737,7); storeCalibrationValue(92,996,1223,3); storeCalibrationValue(93,1017,1236,3); storeCalibrationValue(94,973,1178,4);
-  storeCalibrationValue(95,985,1102,4); storeCalibrationValue(96,978,1110,3); storeCalibrationValue(97,971,1119,4); storeCalibrationValue(98,937,1072,4);
-  storeCalibrationValue(99,929,1015,4); storeCalibrationValue(100,900,1044,3); storeCalibrationValue(101,921,1023,4); storeCalibrationValue(102,903,1060,6);
-  storeCalibrationValue(103,879,1069,3); storeCalibrationValue(104,867,960,3); storeCalibrationValue(105,905,955,2); storeCalibrationValue(106,855,995,2);
-  storeCalibrationValue(107,806,940,5); storeCalibrationValue(108,826,887,3); storeCalibrationValue(109,826,916,2); storeCalibrationValue(110,852,916,3);
-  storeCalibrationValue(111,798,908,5); storeCalibrationValue(112,797,885,3); storeCalibrationValue(113,881,970,2); storeCalibrationValue(114,764,888,5);
-  storeCalibrationValue(115,801,887,4); storeCalibrationValue(116,783,912,4); storeCalibrationValue(117,810,910,5); storeCalibrationValue(118,807,812,2);
-  storeCalibrationValue(119,777,819,3); storeCalibrationValue(120,729,799,4); storeCalibrationValue(121,747,844,5); storeCalibrationValue(122,771,856,4);
-  storeCalibrationValue(123,760,814,2); storeCalibrationValue(124,717,863,5); storeCalibrationValue(125,687,803,4); storeCalibrationValue(126,669,842,8);
-  storeCalibrationValue(127,661,876,6); storeCalibrationValue(128,685,863,3); storeCalibrationValue(129,637,764,7); storeCalibrationValue(130,664,756,6);
-  storeCalibrationValue(131,658,722,2); storeCalibrationValue(132,630,739,3); storeCalibrationValue(133,633,728,4); storeCalibrationValue(134,606,689,5);
-  storeCalibrationValue(135,608,752,4); storeCalibrationValue(136,632,720,4); storeCalibrationValue(137,558,651,5); storeCalibrationValue(138,558,695,6);
-  storeCalibrationValue(139,525,744,2);  storeCalibrationValue(140,537,678,5); storeCalibrationValue(141,510,684,3); storeCalibrationValue(142,522,662,7);
-  storeCalibrationValue(143,552,588,2); storeCalibrationValue(144,550,612,3); storeCalibrationValue(145,512,585,2); storeCalibrationValue(146,502,527,2);
-  storeCalibrationValue(147,502,527,2); storeCalibrationValue(148,502,519,2);
+  storeCalibrationValue(79,1231,1438,6);  storeCalibrationValue(80,1102,1397,8); storeCalibrationValue(81,1105,4664,5); storeCalibrationValue(82,1173,1456,4);
+  storeCalibrationValue(83,1170,1295,5);  storeCalibrationValue(84,1157,4748,10); storeCalibrationValue(85,1105,1336,3); storeCalibrationValue(86,1109,5516,6);
+  storeCalibrationValue(87,1218,5984,3);  storeCalibrationValue(88,1045,5754,4); storeCalibrationValue(89,1102,1122,4); storeCalibrationValue(90,1062,6019,5);
+  storeCalibrationValue(91,1069,5737,7);  storeCalibrationValue(92,996,1223,3); storeCalibrationValue(93,1017,1236,3); storeCalibrationValue(94,973,1178,4);
+  storeCalibrationValue(95,985,1102,4);   storeCalibrationValue(96,978,1110,3); storeCalibrationValue(97,971,1119,4); storeCalibrationValue(98,937,1072,4);
+  storeCalibrationValue(99,929,1015,4);   storeCalibrationValue(100,900,1044,3); storeCalibrationValue(101,921,1023,4); storeCalibrationValue(102,903,1060,6);
+  storeCalibrationValue(103,879,1069,3);  storeCalibrationValue(104,867,960,3); storeCalibrationValue(105,905,955,2); storeCalibrationValue(106,855,995,2);
+  storeCalibrationValue(107,806,940,5);   storeCalibrationValue(108,826,887,3); storeCalibrationValue(109,826,916,2); storeCalibrationValue(110,852,916,3);
+  storeCalibrationValue(111,798,908,5);   storeCalibrationValue(112,797,885,3); storeCalibrationValue(113,881,970,2); storeCalibrationValue(114,764,888,5);
+  storeCalibrationValue(115,801,887,4);   storeCalibrationValue(116,783,912,4); storeCalibrationValue(117,810,910,5); storeCalibrationValue(118,807,812,2);
+  storeCalibrationValue(119,777,819,3);   storeCalibrationValue(120,729,799,4); storeCalibrationValue(121,747,844,5); storeCalibrationValue(122,771,856,4);
+  storeCalibrationValue(123,760,814,2);   storeCalibrationValue(124,717,863,5); storeCalibrationValue(125,687,803,4); storeCalibrationValue(126,669,842,8);
+  storeCalibrationValue(127,661,876,6);   storeCalibrationValue(128,685,863,3); storeCalibrationValue(129,637,764,7); storeCalibrationValue(130,664,756,6);
+  storeCalibrationValue(131,658,722,2);   storeCalibrationValue(132,630,739,3); storeCalibrationValue(133,633,728,4); storeCalibrationValue(134,606,689,5);
+  storeCalibrationValue(135,608,752,4);   storeCalibrationValue(136,632,720,4); storeCalibrationValue(137,558,651,5); storeCalibrationValue(138,558,695,6);
+  storeCalibrationValue(139,525,744,2);   storeCalibrationValue(140,537,678,5); storeCalibrationValue(141,510,684,3); storeCalibrationValue(142,522,662,7);
+  storeCalibrationValue(143,552,588,2);   storeCalibrationValue(144,550,612,3); storeCalibrationValue(145,512,585,2); storeCalibrationValue(146,502,527,2);
+  storeCalibrationValue(147,502,527,2);   storeCalibrationValue(148,502,519,2);
 }
 
 
@@ -178,7 +178,7 @@ dc->pointList[3].maxAccepted=53;
 dc->pointList[3].samples=101;
 
 dc->pointList[4].x=42;
-dc->pointList[4].y=78;
+dc->pointList[4].y=68;
 dc->pointList[4].minAccepted=4;
 dc->pointList[4].maxAccepted=198;
 dc->pointList[4].samples=201;
@@ -333,10 +333,6 @@ int fitsFaceDepthClassifier(
   }
  return 1;
 }
-
-
-
-
 
 
 
