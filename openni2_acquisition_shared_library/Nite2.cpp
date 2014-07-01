@@ -489,11 +489,15 @@ void prepareSkeletonState(int devID,unsigned int frameNumber , nite::UserTracker
 		}
 	}
 
+
+    unsigned int notAll_Z_AreZero=0 , i =0 ;
+    for (i=0; i<HUMAN_SKELETON_PARTS; i++)  {  if (humanSkeleton.joint[i].z!=0) { notAll_Z_AreZero=1; } }
+
    //This is an event that gets fed with our newly encapsulated data
    //it should also fire up any additional events registered by clients
  if (
         (BROADCAST_EVEN_BAD_SKELETONS) ||
-        ( (humanSkeleton.isVisible) && ( (humanSkeleton.statusCalibrating) || (humanSkeleton.statusTracking) ) )
+        ( (notAll_Z_AreZero) && (humanSkeleton.isVisible) && ( (humanSkeleton.statusCalibrating) || (humanSkeleton.statusTracking) ) )
       )
    {
     newSkeletonDetected(devID,frameNumber,&humanSkeleton);
