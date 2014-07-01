@@ -15,6 +15,12 @@
  #warning "NITE2 Support is enabled in this binary , ( you probably dont want/care about this ) "
 #endif // MOD_NITE2
 
+
+#if MOD_FACEDETECTION
+ #warning "Face Detection Support is enabled in this binary , ( you probably dont want/care about this ) "
+#endif //
+
+
 #define MOD_IR 0
 #define BUILD_OPENNI2 1
 #define RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE 1
