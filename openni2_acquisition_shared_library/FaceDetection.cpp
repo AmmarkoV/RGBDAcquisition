@@ -20,12 +20,13 @@
 int useDepthHeadMinMaxSizeHeuristic=1;
 
 unsigned int learnFaceHistogramHeuristic=0;
-int useHistogramHeuristic=1;
+int useHistogramHeuristic=0;
 
 unsigned int learnDepthClassifier=0;
 int useDepthClassifier=1;
 
 int saveResults = 1;
+
 
 CvHaarClassifierCascade *cascade=0;
 CvMemStorage            *storage=0;
@@ -64,9 +65,7 @@ void initHistogramLimits()
 {
  return;
  unsigned int i=0;
- for (i=0; i<256; i++)
- {
-   minRHistogram[i]=10000;   minGHistogram[i]=10000;   minBHistogram[i]=10000; }
+ for (i=0; i<256; i++) {  minRHistogram[i]=10000;   minGHistogram[i]=10000;   minBHistogram[i]=10000; }
 }
 
 
@@ -85,32 +84,6 @@ int checkHeadSize(unsigned int tileSize,unsigned int headDepth)
    return ( (headDimensions[tileSize].minSize<=headDepth) && (headDepth<=headDimensions[tileSize].maxSize) );
 }
 
-
-void initHeadDimensions()
-{
-  storeCalibrationValue(63,2500,3196,4);  storeCalibrationValue(64,1731,3644,13); storeCalibrationValue(65,1575,3240,18); storeCalibrationValue(66,1582,3263,9);
-  storeCalibrationValue(67,1483,3179,15); storeCalibrationValue(68,1472,3468,12); storeCalibrationValue(69,1437,2709,6); storeCalibrationValue(70,1372,2568,12);
-  storeCalibrationValue(71,1374,2532,12); storeCalibrationValue(72,1354,2038,10); storeCalibrationValue(73,1357,1939,10); storeCalibrationValue(74,1274,2031,7);
-  storeCalibrationValue(75,1103,2424,9);  storeCalibrationValue(76,1171,1746,5); storeCalibrationValue(77,1245,1498,9); storeCalibrationValue(78,1241,1770,8);
-  storeCalibrationValue(79,1231,1438,6); storeCalibrationValue(80,1102,1397,8); storeCalibrationValue(81,1105,4664,5); storeCalibrationValue(82,1173,1456,4);
-  storeCalibrationValue(83,1170,1295,5); storeCalibrationValue(84,1157,4748,10); storeCalibrationValue(85,1105,1336,3); storeCalibrationValue(86,1109,5516,6);
-  storeCalibrationValue(87,1218,5984,3); storeCalibrationValue(88,1045,5754,4); storeCalibrationValue(89,1102,1122,4); storeCalibrationValue(90,1062,6019,5);
-  storeCalibrationValue(91,1069,5737,7); storeCalibrationValue(92,996,1223,3); storeCalibrationValue(93,1017,1236,3); storeCalibrationValue(94,973,1178,4);
-  storeCalibrationValue(95,985,1102,4); storeCalibrationValue(96,978,1110,3); storeCalibrationValue(97,971,1119,4); storeCalibrationValue(98,937,1072,4);
-  storeCalibrationValue(99,929,1015,4); storeCalibrationValue(100,900,1044,3); storeCalibrationValue(101,921,1023,4); storeCalibrationValue(102,903,1060,6);
-  storeCalibrationValue(103,879,1069,3); storeCalibrationValue(104,867,960,3); storeCalibrationValue(105,905,955,2); storeCalibrationValue(106,855,995,2);
-  storeCalibrationValue(107,806,940,5); storeCalibrationValue(108,826,887,3); storeCalibrationValue(109,826,916,2); storeCalibrationValue(110,852,916,3);
-  storeCalibrationValue(111,798,908,5); storeCalibrationValue(112,797,885,3); storeCalibrationValue(113,881,970,2); storeCalibrationValue(114,764,888,5);
-  storeCalibrationValue(115,801,887,4); storeCalibrationValue(116,783,912,4); storeCalibrationValue(117,810,910,5); storeCalibrationValue(118,807,812,2);
-  storeCalibrationValue(119,777,819,3); storeCalibrationValue(120,729,799,4); storeCalibrationValue(121,747,844,5); storeCalibrationValue(122,771,856,4);
-  storeCalibrationValue(123,760,814,2); storeCalibrationValue(124,717,863,5); storeCalibrationValue(125,687,803,4); storeCalibrationValue(126,669,842,8);
-  storeCalibrationValue(127,661,876,6); storeCalibrationValue(128,685,863,3); storeCalibrationValue(129,637,764,7); storeCalibrationValue(130,664,756,6);
-  storeCalibrationValue(131,658,722,2); storeCalibrationValue(132,630,739,3); storeCalibrationValue(133,633,728,4); storeCalibrationValue(134,606,689,5);
-  storeCalibrationValue(135,608,752,4); storeCalibrationValue(136,632,720,4); storeCalibrationValue(137,558,651,5); storeCalibrationValue(138,558,695,6);
-  storeCalibrationValue(139,525,744,2);  storeCalibrationValue(140,537,678,5); storeCalibrationValue(141,510,684,3); storeCalibrationValue(142,522,662,7);
-  storeCalibrationValue(143,552,588,2); storeCalibrationValue(144,550,612,3); storeCalibrationValue(145,512,585,2); storeCalibrationValue(146,502,527,2);
-  storeCalibrationValue(147,502,527,2); storeCalibrationValue(148,502,519,2);
-}
 
 
 void saveClassifierData()
@@ -143,11 +116,40 @@ void saveClassifierData()
 
 }
 
+
+
+void initHeadDimensions()
+{
+  storeCalibrationValue(63,2500,3196,4);  storeCalibrationValue(64,1731,3644,13); storeCalibrationValue(65,1575,3240,18); storeCalibrationValue(66,1582,3263,9);
+  storeCalibrationValue(67,1483,3179,15); storeCalibrationValue(68,1472,3468,12); storeCalibrationValue(69,1437,2709,6); storeCalibrationValue(70,1372,2568,12);
+  storeCalibrationValue(71,1374,2532,12); storeCalibrationValue(72,1354,2038,10); storeCalibrationValue(73,1357,1939,10); storeCalibrationValue(74,1274,2031,7);
+  storeCalibrationValue(75,1103,2424,9);  storeCalibrationValue(76,1171,1746,5); storeCalibrationValue(77,1245,1498,9); storeCalibrationValue(78,1241,1770,8);
+  storeCalibrationValue(79,1231,1438,6); storeCalibrationValue(80,1102,1397,8); storeCalibrationValue(81,1105,4664,5); storeCalibrationValue(82,1173,1456,4);
+  storeCalibrationValue(83,1170,1295,5); storeCalibrationValue(84,1157,4748,10); storeCalibrationValue(85,1105,1336,3); storeCalibrationValue(86,1109,5516,6);
+  storeCalibrationValue(87,1218,5984,3); storeCalibrationValue(88,1045,5754,4); storeCalibrationValue(89,1102,1122,4); storeCalibrationValue(90,1062,6019,5);
+  storeCalibrationValue(91,1069,5737,7); storeCalibrationValue(92,996,1223,3); storeCalibrationValue(93,1017,1236,3); storeCalibrationValue(94,973,1178,4);
+  storeCalibrationValue(95,985,1102,4); storeCalibrationValue(96,978,1110,3); storeCalibrationValue(97,971,1119,4); storeCalibrationValue(98,937,1072,4);
+  storeCalibrationValue(99,929,1015,4); storeCalibrationValue(100,900,1044,3); storeCalibrationValue(101,921,1023,4); storeCalibrationValue(102,903,1060,6);
+  storeCalibrationValue(103,879,1069,3); storeCalibrationValue(104,867,960,3); storeCalibrationValue(105,905,955,2); storeCalibrationValue(106,855,995,2);
+  storeCalibrationValue(107,806,940,5); storeCalibrationValue(108,826,887,3); storeCalibrationValue(109,826,916,2); storeCalibrationValue(110,852,916,3);
+  storeCalibrationValue(111,798,908,5); storeCalibrationValue(112,797,885,3); storeCalibrationValue(113,881,970,2); storeCalibrationValue(114,764,888,5);
+  storeCalibrationValue(115,801,887,4); storeCalibrationValue(116,783,912,4); storeCalibrationValue(117,810,910,5); storeCalibrationValue(118,807,812,2);
+  storeCalibrationValue(119,777,819,3); storeCalibrationValue(120,729,799,4); storeCalibrationValue(121,747,844,5); storeCalibrationValue(122,771,856,4);
+  storeCalibrationValue(123,760,814,2); storeCalibrationValue(124,717,863,5); storeCalibrationValue(125,687,803,4); storeCalibrationValue(126,669,842,8);
+  storeCalibrationValue(127,661,876,6); storeCalibrationValue(128,685,863,3); storeCalibrationValue(129,637,764,7); storeCalibrationValue(130,664,756,6);
+  storeCalibrationValue(131,658,722,2); storeCalibrationValue(132,630,739,3); storeCalibrationValue(133,633,728,4); storeCalibrationValue(134,606,689,5);
+  storeCalibrationValue(135,608,752,4); storeCalibrationValue(136,632,720,4); storeCalibrationValue(137,558,651,5); storeCalibrationValue(138,558,695,6);
+  storeCalibrationValue(139,525,744,2);  storeCalibrationValue(140,537,678,5); storeCalibrationValue(141,510,684,3); storeCalibrationValue(142,522,662,7);
+  storeCalibrationValue(143,552,588,2); storeCalibrationValue(144,550,612,3); storeCalibrationValue(145,512,585,2); storeCalibrationValue(146,502,527,2);
+  storeCalibrationValue(147,502,527,2); storeCalibrationValue(148,502,519,2);
+}
+
+
 void initDepthClassifier(struct depthClassifier * dc)
 {
 dc->currentPointList=8;
-dc->depthBase=2767;
-dc->totalSamples=4;
+dc->depthBase=614;
+dc->totalSamples=8;
 dc->patchWidth=84;
 dc->patchHeight=84;
 
@@ -155,49 +157,50 @@ dc->pointList[0].x=42;
 dc->pointList[0].y=42;
 dc->pointList[0].minAccepted=0;
 dc->pointList[0].maxAccepted=0;
-dc->pointList[0].samples=0;
+dc->pointList[0].samples=101;
 
 dc->pointList[1].x=42;
 dc->pointList[1].y=47;
 dc->pointList[1].minAccepted=0;
 dc->pointList[1].maxAccepted=0;
-dc->pointList[1].samples=100;
+dc->pointList[1].samples=201;
 
 dc->pointList[2].x=24;
 dc->pointList[2].y=32;
-dc->pointList[2].minAccepted=0;
-dc->pointList[2].maxAccepted=0;
-dc->pointList[2].samples=0;
+dc->pointList[2].minAccepted=27;
+dc->pointList[2].maxAccepted=52;
+dc->pointList[2].samples=101;
 
 dc->pointList[3].x=60;
 dc->pointList[3].y=32;
 dc->pointList[3].minAccepted=0;
-dc->pointList[3].maxAccepted=0;
-dc->pointList[3].samples=0;
+dc->pointList[3].maxAccepted=53;
+dc->pointList[3].samples=101;
 
 dc->pointList[4].x=42;
 dc->pointList[4].y=78;
-dc->pointList[4].minAccepted=121;
+dc->pointList[4].minAccepted=4;
 dc->pointList[4].maxAccepted=198;
-dc->pointList[4].samples=100;
+dc->pointList[4].samples=201;
 
 dc->pointList[5].x=20;
 dc->pointList[5].y=54;
-dc->pointList[5].minAccepted=23;
+dc->pointList[5].minAccepted=17;
 dc->pointList[5].maxAccepted=127;
-dc->pointList[5].samples=100;
+dc->pointList[5].samples=200;
 
 dc->pointList[6].x=64;
 dc->pointList[6].y=54;
 dc->pointList[6].minAccepted=0;
 dc->pointList[6].maxAccepted=45;
-dc->pointList[6].samples=100;
+dc->pointList[6].samples=201;
 
 dc->pointList[7].x=42;
 dc->pointList[7].y=20;
-dc->pointList[7].minAccepted=0;
-dc->pointList[7].maxAccepted=0;
-dc->pointList[7].samples=0;
+dc->pointList[7].minAccepted=12;
+dc->pointList[7].maxAccepted=34;
+dc->pointList[7].samples=101;
+
 
 }
 
@@ -292,7 +295,7 @@ int fitsFaceHistogram(unsigned char * colorPixels ,   unsigned int colorWidth ,u
 
   if (histogramsCompletelyDifferent)
   {
-    fprintf(stderr,RED "Discarding head due to histogram mismatch ( %u ) \n" NORMAL,differenceScore);
+    fprintf(stderr,RED "Discarding bad head #%u due to histogram mismatch ( %u ) \n" NORMAL,discardedFaceByHeuristics,differenceScore);
     if (saveResults)
       {
        fprintf(stderr,YELLOW "Saving Bad Histogram Tile , reminder that you don't want this in production\n" NORMAL );
@@ -302,8 +305,6 @@ int fitsFaceHistogram(unsigned char * colorPixels ,   unsigned int colorWidth ,u
       }
      return 0;
   }
-
-
 
   return 1;
 }
@@ -320,12 +321,13 @@ int fitsFaceDepthClassifier(
   {
     trainDepthClassifier(&dc,depthPixels,sX,sY,depthWidth,depthHeight,tileWidth,tileHeight);
   } else
+  if (useDepthClassifier)
   {
     unsigned int differenceScore = compareDepthClassifier(&dc,depthPixels,sX,sY,depthWidth,depthHeight,tileWidth,tileHeight);
 
     if  ( differenceScore > 100 )
     {
-       fprintf(stderr,RED "Discarding head due to bad depth match on depthClassifier ( %u ) \n" NORMAL,differenceScore);
+       fprintf(stderr,RED "Discarding bad head #%u due to bad depth match on depthClassifier ( %u ) \n" NORMAL,discardedFaceByHeuristics,differenceScore);
       return 0;
     }
   }
@@ -361,7 +363,7 @@ int fitsFaceDepth(unsigned short * depthPixels ,   unsigned int depthWidth ,unsi
 
    if (!checkHeadSize(tileWidth,averageDepth))
    {
-     fprintf(stderr,RED "Discarding head due to bad tile size heuristic ( tile %u - depth %u ) \n" NORMAL,tileWidth,averageDepth);
+     fprintf(stderr,RED "Discarding bad head #%u due to bad tile size heuristic ( tile %u - depth %u ) \n" NORMAL,discardedFaceByHeuristics,tileWidth,averageDepth);
      return 0;
    }
 

@@ -16,11 +16,6 @@
 #define MAX3(A,B,C)     (MAX2(MAX2((A),(B)),(C)))
 
 
-
-
-
-
-
 unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width , unsigned int height ,unsigned int x2d, unsigned int y2d )
 {
     if (depthFrame == 0 ) {  return 0; }
@@ -33,7 +28,14 @@ unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width
     return result;
 }
 
+void setDepthValueAtXY(unsigned short * depthFrame ,unsigned int width , unsigned int height ,unsigned int x2d, unsigned int y2d , unsigned int value )
+{
+    if (depthFrame == 0 ) {  return 0; }
+    if ( (x2d>=width) || (y2d>=height) )    {   return 0; }
 
+    unsigned short * depthValue = depthFrame + (y2d * width + x2d );
+    *depthValue  = value;
+}
 
 
 
@@ -123,6 +125,9 @@ unsigned int compareDepthClassifier(struct depthClassifier * dc ,
 
 
      dc->pointList[i].depth = getDepthValueAtXY(target,targetWidth,targetHeight ,  tX + useX , tY + useY );
+
+     setDepthValueAtXY(target,targetWidth,targetHeight,tX + useX,tY + useY,65536);
+
      if (dc->totalSamples==0) { dc->depthBase = dc->pointList[i].depth; ++dc->totalSamples; } else
                               {
                                 if (dc->depthBase >  dc->pointList[i].depth) { dc->depthBase= dc->pointList[i].depth; }
@@ -176,15 +181,6 @@ int printDepthClassifier(char * filename , struct depthClassifier * dc )
   }
  return 1;
 }
-
-
-
-
-
-
-
-
-
 
 
 

@@ -17,6 +17,9 @@ struct detectedFace
 //Leverage Depth Information using fast min/max head sizes heuristic ( this is great , should be always on for RGBD input)
 extern int useDepthHeadMinMaxSizeHeuristic;
 
+//Leverage Depth Shape Classifier , experimental
+extern int useDepthClassifier;
+
 //Leverage Skin Color heuristic , this doesnt work very good for people of different skin color
 extern int useHistogramHeuristic;
 
