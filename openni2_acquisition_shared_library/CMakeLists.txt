@@ -16,12 +16,21 @@ IF( ENABLE_NITE2 )
 ENDIF( ENABLE_NITE2 )
 
 
+IF( ENABLE_FACEDETECTION_DEV )
+ add_definitions(-DMOD_FACEDETECTION)
+ find_package(OpenCV REQUIRED)
+ INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS}) 
+ set(FaceDetection_Parts FaceDetection.cpp FaceDetection.h ../tools/Calibration/calibration.c  ../tools/Calibration/calibration.h ../tools/ImageOperations/imageOps.c  ../tools/ImageOperations/imageOps.h )
+ set(FaceDetection_Libraries ${OpenCV_LIBRARIES} )
+ENDIF( ENABLE_FACEDETECTION_DEV )
+
+
 INCLUDE_DIRECTORIES(${OPENNI2_INCLUDE_DIR} ${OpenNI2_Includes} )
 LINK_DIRECTORIES(${OPENNI2_LIBRARY_DIRS} )
 
 
-add_library(OpenNI2Acquisition SHARED ${OpenNI2_Parts} ) 
-target_link_libraries(OpenNI2Acquisition rt CalibrationLibrary ${OPENNI2_LIBRARIES} ${OpenNI2_Libraries} ) 
+add_library(OpenNI2Acquisition SHARED ${OpenNI2_Parts} ${FaceDetection_Parts} ) 
+target_link_libraries(OpenNI2Acquisition rt CalibrationLibrary ${OPENNI2_LIBRARIES} ${OpenNI2_Libraries} ${FaceDetection_Libraries} ) 
 
 
 set_target_properties(OpenNI2Acquisition PROPERTIES 

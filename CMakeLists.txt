@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizat
 set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
       
 OPTION (ENABLE_AMMARSERVER_BROADCAST ON)
+OPTION (ENABLE_FACEDETECTION_DEV OFF)
 OPTION (ENABLE_FREENECT ON)
 OPTION (ENABLE_TEMPLATE ON)
 OPTION (ENABLE_V4L2 ON)
