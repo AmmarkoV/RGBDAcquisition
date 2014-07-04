@@ -596,12 +596,12 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
 
      //Frame Width/Height /Focal length , etc should be ok..
      fprintf(stdout,"Color Frames : %u x %u , channels %u , bitsperpixel %u \n",getOpenNI2ColorWidth(devID), getOpenNI2ColorHeight(devID) , getOpenNI2ColorChannels(devID) , getOpenNI2ColorBitsPerPixel(devID));
-     fprintf(stdout,"Color Focal Length : %0.2f\n",getOpenNI2ColorFocalLength(devID));
-     fprintf(stdout,"Color Pixel Size : %0.2f\n",getOpenNI2ColorPixelSize(devID));
+     fprintf(stdout,"Color Focal Length : %0.4f\n",getOpenNI2ColorFocalLength(devID));
+     fprintf(stdout,"Color Pixel Size : %0.4f\n",getOpenNI2ColorPixelSize(devID));
 
      fprintf(stdout,"Depth Frames : %u x %u , channels %u , bitsperpixel %u \n",getOpenNI2DepthWidth(devID), getOpenNI2DepthHeight(devID), getOpenNI2DepthChannels(devID) , getOpenNI2DepthBitsPerPixel(devID));
-     fprintf(stdout,"Depth Focal Length : %0.2f\n",getOpenNI2DepthFocalLength(devID));
-     fprintf(stdout,"Depth Pixel Size : %0.2f\n",getOpenNI2DepthPixelSize(devID));
+     fprintf(stdout,"Depth Focal Length : %0.4f\n",getOpenNI2DepthFocalLength(devID));
+     fprintf(stdout,"Depth Pixel Size : %0.4f\n\n",getOpenNI2DepthPixelSize(devID));
 
     }
 
@@ -677,24 +677,56 @@ unsigned char * getOpenNI2ColorPixels(int devID)
 }
 
 
-double getOpenNI2ColorFocalLength(int devID)
-{
-  if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
-    int zpd=0;
-    color[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,&zpd);
-    return (double) zpd;
-}
-
 double getOpenNI2ColorPixelSize(int devID)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
     double zpps=0.0;
     color[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
 
-    fprintf(stderr,"Note : OpenNI2 gives us half the true pixel size ? ? \n");
-    zpps*=2.0;
+    unsigned int width=getOpenNI2ColorWidth(devID);
+    unsigned int height=getOpenNI2ColorHeight(devID);
+
+    if (zpps==0.0)
+    {
+        fprintf(stderr,"OpenNI2 does not return a PixelSize for the color sensor , so we will use known good values, instead of returning zero \n");
+        if ( (width==320)&&(height==240) ) { fprintf(stderr,"I am not sure if getOpenNI2ColorPixelSize QVGA value is correct\n");  return 0.1045; } else
+        if ( (width==640)&&(height==480) ) { fprintf(stderr,"I am not sure if getOpenNI2ColorPixelSize VGA value is correct\n");  return 0.208;  }
+    }
+
+    if ( (width==640)&&(height==480) )
+        {
+          zpps*=2.0;
+          fprintf(stderr,"VGA means double pixel size\n");
+        }
 
     return (double) zpps;
+}
+
+double getOpenNI2ColorFocalLength(int devID)
+{
+  if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+    int zpd=0;
+    color[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_DISTANCE,&zpd);
+
+    if (zpd==0.0)
+    {
+       fprintf(stderr,"OpenNI2 does not return a Focal length for the color sensor , so we will use known good values, instead of returning zero \n");
+
+       unsigned int width=getOpenNI2ColorWidth(devID);
+       unsigned int height=getOpenNI2ColorHeight(devID);
+       double zpps=getOpenNI2ColorPixelSize(devID);
+
+
+       if ( (width==640)&&(height==480) ) { return (double) 531.15 * zpps; } else
+       if ( (width==320)&&(height==240) ) { return (double) 285.63 * zpps; } else
+                                          {
+                                             fprintf(stderr,"Unknown set of dimensions for the OpenNI2 sensor , do not know a good focal length value to use\n");
+                                          }
+
+    }
+
+
+    return (double) zpd;
 }
 
 
@@ -766,12 +798,24 @@ double getOpenNI2DepthPixelSize(int devID)
     double zpps=0.0;
     depth[devID].getProperty(XN_STREAM_PROPERTY_ZERO_PLANE_PIXEL_SIZE,&zpps);
 
+
+
+    unsigned int width=getOpenNI2ColorWidth(devID);
+    unsigned int height=getOpenNI2ColorHeight(devID);
+
     fprintf(stderr,"Note : OpenNI2 gives us half the true pixel size ? ? \n");
-    zpps*=2.0;
+
     if (zpps==0) {
                   fprintf(stderr,"Please Note That getOpenNI2DepthPixelSize returned zero , so we return getOpenNI2ColorPixelSize\n");
                   return  getOpenNI2ColorPixelSize(devID);
                  }
+
+    if ( (width==640)&&(height==480) )
+        {
+          zpps*=2.0;
+          fprintf(stderr,"VGA Depth means double pixel size\n");
+        }
+
 
     return (double) zpps;
 }
