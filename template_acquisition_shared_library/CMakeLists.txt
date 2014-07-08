@@ -3,12 +3,14 @@ cmake_minimum_required( VERSION 2.8.7 )
    
 
 IF( ENABLE_JPG ) 
- set(JPG_Libs jpg ) 
+ set(JPG_Libs jpeg ) 
+ add_definitions(-DENABLE_JPG)
 ENDIF( ENABLE_JPG )
 
 
 IF( ENABLE_PNG ) 
  set(PNG_Libs png ) 
+ add_definitions(-DENABLE_PNG)
 ENDIF( ENABLE_PNG )
 
 
