@@ -35,6 +35,9 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
                                    int combinationMode
                                )
 {
+   struct calibration lastMomentEmptyCalibration={0};
+
+
    if (RGB==0)
    {
        fprintf(stderr,"segmentRGBAndDepthFrame called with a  null RGB frame \n");
@@ -49,7 +52,6 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
   if (calib==0)
   {
        fprintf(stderr,"segmentRGBAndDepthFrame called with a  null Calibration , generating an ephimeral one now \n");
-       struct calibration lastMomentEmptyCalibration={0};
        NullCalibration(  width, height, &lastMomentEmptyCalibration );
        calib=&lastMomentEmptyCalibration;
   }
