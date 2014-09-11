@@ -83,12 +83,14 @@ int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,
 {
   NullCalibration(width,height,calib);
 
+  fprintf(stderr,"FocalLengthAndPixelSizeToCalibration(focalLength=%0.2f,pixelSize=%0.2f,width=%u,height=%u) = ",focalLength,pixelSize,width,height);
+
   if (pixelSize!=0)
   {
    calib->intrinsic[CALIB_INTR_FX] = (double) focalLength/pixelSize;
    calib->intrinsic[CALIB_INTR_FY] = (double) focalLength/pixelSize;
    calib->intrinsicParametersSet=1;
-
+   fprintf(stderr,"fx : %0.2f fy : %0.2f \n",calib->intrinsic[CALIB_INTR_FX],calib->intrinsic[CALIB_INTR_FY]);
    return 1;
   }
 
