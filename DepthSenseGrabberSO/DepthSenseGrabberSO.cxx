@@ -22,17 +22,17 @@ using namespace std;
 
 bool usingUSB30Flag = true; // if the camera is plugged on a USB 3.0 port
 
-int waitSecondsBeforeGrab = 3;
+int waitSecondsBeforeGrab = 1;
 int divideConfidencePixels = 5;
 const int16_t confidenceThreshold = 60;
 
-bool interpolateDepthFlag = 0;
-bool interpolateColorFlag = 0;
+bool interpolateDepthFlag = 1;
+bool interpolateColorFlag = 1;
 
 bool saveColorAcqFlag = 1;
 bool saveDepthAcqFlag = 1;
 bool saveColorSyncFlag = 1;
-bool saveDepthSyncFlag = 0;
+bool saveDepthSyncFlag = 1;
 bool saveConfidenceFlag = 0;
 
 int32_t  frameRateDepth = 30;
@@ -72,6 +72,8 @@ const int nPixelsDepthAcq = nPixelsQVGA;
 uint16_t* pixelsDepthAcq = pixelsDepthAcqQVGA;
 
 
+int deltaPixelsIndAround[8] = {-641,-640,-639,-1,1,639,640,641};
+bool hasData[nPixelsVGA];
 
 // Color map configuration, comment out undesired parameters
 
@@ -164,6 +166,7 @@ void onNewColorSample(ColorNode node, ColorNode::NewSampleReceivedData data)
     for (int currentPixelInd = 0; currentPixelInd < nPixelsColorAcq; currentPixelInd++)
     {
         // Reinitialize synchronized depth
+        hasData[currentPixelInd] = 0;
         pixelsDepthSync[currentPixelInd] = noDepthDefault;
         pixelsColorAcq[3*currentPixelInd] = data.colorMap[3*currentPixelInd+2];
         pixelsColorAcq[3*currentPixelInd+1] = data.colorMap[3*currentPixelInd+1];
@@ -224,11 +227,30 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
                 }
                 else
                 {
+                    hasData[colorPixelInd] = 1;
                     pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd];
                     pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
                     pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
                     pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
                 }
+            }
+            for (int currentRow = 1; currentRow < heightVGA-1; currentRow++) {
+              for (int currentCol = 1; currentCol < widthVGA-1; currentCol++) {
+                int currentPixelInd = currentRow*widthVGA+currentCol;
+                int countValidAround = 0;
+                uint16_t depthValidAround = 0;
+                if (hasData[currentPixelInd] == 0) {
+                  for (int indDeltaPixel = 0; indDeltaPixel < 8; indDeltaPixel++) {
+                    if (hasData[currentPixelInd+deltaPixelsIndAround[indDeltaPixel]]) {
+                      countValidAround++;
+                      depthValidAround = depthValidAround + pixelsDepthSync[currentPixelInd+deltaPixelsIndAround[indDeltaPixel]];
+                    }
+                  }
+                  if (countValidAround > 1) {
+                    pixelsDepthSync[currentPixelInd] = depthValidAround / countValidAround;
+                  }
+                }
+              }
             }
         }
     }
