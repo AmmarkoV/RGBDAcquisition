@@ -102,6 +102,7 @@ uint16_t* pixelsDepthSync = pixelsDepthSyncNHD;
 
 const uint16_t noDepthDefault = 65535;
 const uint16_t noDepthThreshold = 2000;
+const uint16_t deltaDepthSync = 150;
 
 uint8_t noDepthBGR[3] = {0,0,0};
 
@@ -231,8 +232,8 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
                   else
                   {
                       hasData[colorPixelInd] = 1;
-                      if (saveDepthAcqFlag || interpolateDepthAcqFlag) pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd];
-                      else pixelsDepthSync[colorPixelInd] = pixelsDepthAcq[currentPixelRow/2*widthQVGA+currentPixelCol/2];
+                      if (saveDepthAcqFlag || interpolateDepthAcqFlag) pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd] + deltaDepthSync;
+                      else pixelsDepthSync[colorPixelInd] = pixelsDepthAcq[currentPixelRow/2*widthQVGA+currentPixelCol/2] + deltaDepthSync;
                       pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
                       pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
                       pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
