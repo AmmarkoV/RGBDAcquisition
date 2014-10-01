@@ -302,8 +302,8 @@ int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width 
     g = *rgbPtr++;
     b = *rgbPtr++;
     if (
-         ( (r<20) && (g<20)  && (b<20) ) ||
-         ( (r>230) && (g>230)  && (b>230) )
+         ( (r<45) && (g<45)  && (b<45) ) ||
+         ( (r>200) && (g>200)  && (b>200) )
        )
     {
      ++highContrastPixels;
