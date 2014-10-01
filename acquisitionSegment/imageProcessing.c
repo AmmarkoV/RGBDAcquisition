@@ -285,8 +285,59 @@ int floodFillUShort(unsigned short * target , unsigned int width , unsigned int 
 
 
 
+int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width , unsigned int height , float percentageHigh)
+{
+  unsigned char * rgbPtr = rgbFrame;
+  unsigned char * rgbLimit = rgbFrame + width * height * 3;
+
+  float tmp = percentageHigh / 100;
+        tmp = tmp * width * height;
+  unsigned int targetHighContrastPixels = (unsigned int) tmp;
+  unsigned int highContrastPixels = 0;
+
+  unsigned char r, g , b;
+  while (rgbPtr<rgbLimit)
+  {
+    r = *rgbPtr++;
+    g = *rgbPtr++;
+    b = *rgbPtr++;
+    if (
+         ( (r<20) && (g<20)  && (b<20) ) ||
+         ( (r>230) && (g>230)  && (b>230) )
+       )
+    {
+     ++highContrastPixels;
+     if ( highContrastPixels>targetHighContrastPixels) { return 1; }
+    }
+  }
+ return 0;
+}
 
 
+
+int detectNoDepth(unsigned short * depthFrame , unsigned int width , unsigned int height , float percentageHigh)
+{
+  unsigned char * depthPtr = depthFrame;
+  unsigned char * depthLimit = depthFrame + width * height ;
+
+  float tmp = percentageHigh / 100;
+        tmp = tmp * width * height ;
+  unsigned int targetHighContrastPixels = (unsigned int) tmp;
+  unsigned int highContrastPixels = 0;
+
+  unsigned char r,g,b;
+  while (depthPtr<depthLimit)
+  {
+    if (*depthPtr==0)
+    {
+     ++highContrastPixels;
+     if ( highContrastPixels>targetHighContrastPixels) { return 1; }
+    }
+
+    ++depthPtr;
+  }
+ return 0;
+}
 
 
 
