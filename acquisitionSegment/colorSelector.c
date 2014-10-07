@@ -10,6 +10,7 @@
 #include "../tools/AmMatrix/matrix4x4Tools.h"
 #include "../tools/AmMatrix/matrixCalculations.h"
 
+#define PACKED_RGB_SEGMENTER 1
 
 int keepFirstRGBFrame(unsigned char * source ,  unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
 {
@@ -65,7 +66,7 @@ int selectBasedOnRGBMovement(unsigned char  * selection,unsigned char * baseRGB 
 
     ++selectionPTR;
   }
-  fprintf(stderr,"Dropped %u of %u \n",dropped,width*height);
+  fprintf(stderr,"Dropped %lu of %u \n",dropped,width*height);
 
   return 1;
 }
@@ -143,7 +144,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
  unsigned char * selectedPtr   = selectedRGB;
 
  unsigned int x=0 , y=0;
- unsigned char * R , * G , * B;
+ register unsigned char * R , * G , * B;
  while (sourcePixels<sourcePixelsEnd)
  {
 
@@ -160,7 +161,20 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
         G = sourcePixels++;
         B = sourcePixels++;
 
-       if (
+
+        #if PACKED_RGB_SEGMENTER
+        *selectedPtr=(
+                             ( (*R!=segConf->replaceR) || (*G!=segConf->replaceG) || (*B!=segConf->replaceB) ) &&
+                             (
+                              (segConf->minR <= *R) && (*R <= segConf->maxR) &&
+                              (segConf->minG <= *G) && (*G <= segConf->maxG) &&
+                              (segConf->minB <= *B) && (*B <= segConf->maxB) &&
+                              //----------------------------------------
+                              (segConf->minX <= x) && ( x<= segConf->maxX)
+                             )
+                     );
+        #else
+        if (
             (*R==segConf->replaceR) &&
             (*G==segConf->replaceG) &&
             (*B==segConf->replaceB)
@@ -179,6 +193,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
        {
           *selectedPtr=0;
        }
+        #endif
 
         ++selectedPtr;
         ++x;

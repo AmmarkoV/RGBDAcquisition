@@ -121,7 +121,7 @@ unsigned char * readImageRaw( char *filename,unsigned int type,unsigned int *wid
         *height=img->height;
         *bitsperpixel=img->bitsperpixel;
         *channels=img->channels;
-        fprintf(stderr,"Read %s of %ux%u %u bpp %u channels\n",filename,img->width,img->height,img->bitsperpixel,img->channels);
+        //fprintf(stderr,"Read %s of %ux%u %u bpp %u channels\n",filename,img->width,img->height,img->bitsperpixel,img->channels);
 
         free(img);
         return pixels;

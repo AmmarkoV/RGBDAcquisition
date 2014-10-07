@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-module TEMPLATE -from floor -to floorSegmented -maxFrames 1 -autoplane -calibration color.calib " />
+				<Option parameters="-module TEMPLATE -from floor -to /dev/null -maxFrames 0 -autoplane " />
 				<Compiler>
 					<Add option="-pg" />
 					<Add option="-g" />

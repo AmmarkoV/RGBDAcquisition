@@ -140,11 +140,6 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  unsigned int x =0;
  unsigned int y =0;
 
-
-
-
-
-
  unsigned short * depth=0;
  while (sourcePixels<sourcePixelsEnd)
  {
@@ -164,9 +159,6 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
     }
    sourcePixelsLineEnd+=sourceWidthStep;
  }
-
-
-
 
 
  if (segConf->enableDepthMotionDetection)

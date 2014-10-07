@@ -395,17 +395,23 @@ int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFea
                                               depthSeg->motionDistanceThreshold=atoi(argv[i+1]);
                                           } else
     if (strcmp(argv[i],"-autoplane")==0)  {
-                                            depthSeg->autoPlaneSegmentation=1;
-                                            depthSeg->planeNormalOffset=(double) internationalAtof(argv[i+1]);
-                                            depthSeg->planeNormalSize=(double) internationalAtof(argv[i+2]);
-                                            depthSeg->autoPlaneSegmentationMinimumDistancePoint=atoi(argv[i+3]);
-                                            depthSeg->autoPlaneSegmentationMaximumDistancePoint=atoi(argv[i+4]);
+                                            if (argc>i+4)
+                                            {
+                                             depthSeg->autoPlaneSegmentation=1;
+                                             depthSeg->planeNormalOffset=(double) internationalAtof(argv[i+1]);
+                                             depthSeg->planeNormalSize=(double) internationalAtof(argv[i+2]);
+                                             depthSeg->autoPlaneSegmentationMinimumDistancePoint=atoi(argv[i+3]);
+                                             depthSeg->autoPlaneSegmentationMaximumDistancePoint=atoi(argv[i+4]);
+                                            } else { fprintf(stderr,"Not enough parameters\n"); }
                                           } else
     if (strcmp(argv[i],"-plane")==0)      {
-                                            depthSeg->enablePlaneSegmentation=1;
-                                            depthSeg->p1[0]=(double) internationalAtof(argv[i+1]); depthSeg->p1[1]=(double) internationalAtof(argv[i+2]); depthSeg->p1[2]=(double) internationalAtof(argv[i+3]);
-                                            depthSeg->p2[0]=(double) internationalAtof(argv[i+4]); depthSeg->p2[1]=(double) internationalAtof(argv[i+5]); depthSeg->p2[2]=(double) internationalAtof(argv[i+6]);
-                                            depthSeg->p3[0]=(double) internationalAtof(argv[i+7]); depthSeg->p3[1]=(double) internationalAtof(argv[i+8]); depthSeg->p3[2]=(double) internationalAtof(argv[i+9]);
+                                            if (argc>i+9)
+                                            {
+                                             depthSeg->enablePlaneSegmentation=1;
+                                             depthSeg->p1[0]=(double) internationalAtof(argv[i+1]); depthSeg->p1[1]=(double) internationalAtof(argv[i+2]); depthSeg->p1[2]=(double) internationalAtof(argv[i+3]);
+                                             depthSeg->p2[0]=(double) internationalAtof(argv[i+4]); depthSeg->p2[1]=(double) internationalAtof(argv[i+5]); depthSeg->p2[2]=(double) internationalAtof(argv[i+6]);
+                                             depthSeg->p3[0]=(double) internationalAtof(argv[i+7]); depthSeg->p3[1]=(double) internationalAtof(argv[i+8]); depthSeg->p3[2]=(double) internationalAtof(argv[i+9]);
+                                            } else { fprintf(stderr,"Not enough parameters\n"); }
                                           } else
     if (strcmp(argv[i],"-minDepth")==0)   { depthSeg->minDepth = atoi(argv[i+1]);  } else
     if (strcmp(argv[i],"-maxDepth")==0)   { depthSeg->maxDepth = atoi(argv[i+1]);   } else
