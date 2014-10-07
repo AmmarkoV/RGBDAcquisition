@@ -151,10 +151,16 @@ int main(int argc, char *argv[])
          (strcmp(argv[i],"-o")==0)
         )
         {
-          strcpy(outputfoldername,"frames/");
-          strcat(outputfoldername,argv[i+1]);
-          makepath(outputfoldername);
-          fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
+          if (strcmp(argv[i+1],"/dev/null")==0)
+          {
+           strcpy(outputfoldername,"frames/");
+           strcat(outputfoldername,argv[i+1]);
+           makepath(outputfoldername);
+           fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
+          } else
+          {
+           strcpy(outputfoldername,"/dev/null");
+          }
          }
        else
     if (
@@ -244,14 +250,17 @@ int main(int argc, char *argv[])
 
 
 
-        sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
-        acquisitionSimulateTime( colorTimestamp );
-        acquisitionSaveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+        if (strcmp(outfilename,"/dev/null")!=0)
+        {
+         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+         acquisitionSimulateTime( colorTimestamp );
+         acquisitionSaveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
 
 
-        sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
-        acquisitionSimulateTime( depthTimestamp );
-        acquisitionSaveRawImageToFile(outfilename,(unsigned char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
+         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+         acquisitionSimulateTime( depthTimestamp );
+         acquisitionSaveRawImageToFile(outfilename,(unsigned char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
+        }
 
        free (segmentedRGB);
        free (segmentedDepth);
