@@ -166,9 +166,6 @@ int main(int argc, char *argv[])
    countdownDelay(delay);
    fprintf(stderr,"Starting Grabbing!\n");
 
-
-   if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
-
    while  ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) )
     {
         acquisitionStartTimer(0);
