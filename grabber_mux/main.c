@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
     if (shiftTime>0) { for (frameNum=0; frameNum<abs(shiftTime); frameNum++) { acquisitionSnapFrames(moduleID_2,devID_2); } } else
     if (shiftTime<0) { for (frameNum=0; frameNum<abs(shiftTime); frameNum++) { acquisitionSnapFrames(moduleID_1,devID_1); } }
 
-   for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
+   while  ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) )
     {
 
         if (maxFramesToGrab!=0)
@@ -338,6 +338,7 @@ int main(int argc, char *argv[])
 
        acquisitionStopTimer(0);
        if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
+       ++frameNum;
     }
 
 

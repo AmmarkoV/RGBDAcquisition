@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
 
 
 
-   for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
+   while  ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) )
     {
         acquisitionStartTimer(0);
 
@@ -259,6 +259,7 @@ int main(int argc, char *argv[])
 
        acquisitionStopTimer(0);
        if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
+       ++frameNum;
     }
 
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);

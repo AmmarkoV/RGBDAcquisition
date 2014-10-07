@@ -168,7 +168,8 @@ int main(int argc, char *argv[])
 
 
    if ( maxFramesToGrab==0 ) { maxFramesToGrab= 1294967295; } //set maxFramesToGrab to "infinite" :P
-   for (frameNum=0; frameNum<maxFramesToGrab; frameNum++)
+
+   while  ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) )
     {
         acquisitionStartTimer(0);
 
@@ -178,6 +179,8 @@ int main(int argc, char *argv[])
 
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
+
+        ++frameNum;
 
         /*
          If someone would like to manually save things instead of using acquisitionPassFramesToTarget he could call the following calls ,left here for future reference
