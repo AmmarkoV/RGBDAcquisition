@@ -10,6 +10,7 @@
 #include "../tools/AmMatrix/matrix4x4Tools.h"
 #include "../tools/AmMatrix/matrixCalculations.h"
 
+#define GOTO_RGB_SEGMENTER 1
 #define PACKED_RGB_SEGMENTER 1
 
 int keepFirstRGBFrame(unsigned char * source ,  unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
@@ -143,6 +144,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
 
  unsigned char * selectedPtr   = selectedRGB;
 
+ register unsigned char response=0;
  unsigned int x=0 , y=0;
  register unsigned char * R , * G , * B;
  while (sourcePixels<sourcePixelsEnd)
@@ -157,13 +159,28 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
      x=0;
       while (sourcePixels<sourcePixelsLineEnd)
       {
-        R = sourcePixels++;
-        G = sourcePixels++;
-        B = sourcePixels++;
-
 
         #if PACKED_RGB_SEGMENTER
-        *selectedPtr=(
+           #if GOTO_RGB_SEGMENTER
+             response=0;
+             R = sourcePixels++;
+             if ((segConf->minR > *R) || (*R > segConf->maxR)) { sourcePixels+=2; goto doneWithPixel; }
+             G = sourcePixels++;
+             if ((segConf->minG > *G) || (*G > segConf->maxG)) { ++sourcePixels;  goto doneWithPixel; }
+             B = sourcePixels++;
+             if ((segConf->minB > *B) || (*B > segConf->maxB)) { goto doneWithPixel; }
+
+             if ( (*R==segConf->replaceR) && (*G==segConf->replaceG) && (*B==segConf->replaceB) ) { goto doneWithPixel; }
+
+             response=1;
+             doneWithPixel:
+                *selectedPtr=response;
+           #else
+             R = sourcePixels++;
+             G = sourcePixels++;
+             B = sourcePixels++;
+
+             *selectedPtr=(
                              ( (*R!=segConf->replaceR) || (*G!=segConf->replaceG) || (*B!=segConf->replaceB) ) &&
                              (
                               (segConf->minR <= *R) && (*R <= segConf->maxR) &&
@@ -172,21 +189,26 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
                               //----------------------------------------
                               (segConf->minX <= x) && ( x<= segConf->maxX)
                              )
-                     );
+                          );
+           #endif // GOTO_RGB_SEGMENTER
         #else
+        R = sourcePixels++;
+        G = sourcePixels++;
+        B = sourcePixels++;
+
         if (
             (*R==segConf->replaceR) &&
             (*G==segConf->replaceG) &&
             (*B==segConf->replaceB)
            ) { *selectedPtr=0; }
              else
-       if  (
+        if  (
              (segConf->minR <= *R) && (*R <= segConf->maxR)  &&
               (segConf->minG <= *G) && (*G <= segConf->maxG)  &&
                (segConf->minB <= *B) && (*B <= segConf->maxB) &&
 
                (segConf->minX <= x) && ( x<= segConf->maxX)
-           )
+            )
        {
           *selectedPtr=1;
        } else
