@@ -210,6 +210,9 @@ unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int
 void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,  unsigned int * widthInternal, unsigned int * heightInternal, unsigned long *  timestampInternal)
 {
  #if USE_CODEC_LIBRARY
+   //Codec Library ignores existing buffers
+   if (existingBuffer!=0) { free(existingBuffer); existingBuffer=0; }
+
    unsigned int type=0;
    if (strcmp(extension,"pnm")==0) { type=PNM_CODEC; } else
    if (strcmp(extension,"png")==0) { type=PNG_CODEC; } else
