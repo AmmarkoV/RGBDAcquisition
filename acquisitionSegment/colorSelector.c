@@ -10,7 +10,7 @@
 #include "../tools/AmMatrix/matrix4x4Tools.h"
 #include "../tools/AmMatrix/matrixCalculations.h"
 
-#define GOTO_RGB_SEGMENTER 1
+#define GOTO_RGB_SEGMENTER 0
 #define PACKED_RGB_SEGMENTER 1
 
 int keepFirstRGBFrame(unsigned char * source ,  unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)

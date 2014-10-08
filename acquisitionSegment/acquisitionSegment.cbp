@@ -12,7 +12,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
 				<Option compiler="gcc" />
-				<Option parameters="-module TEMPLATE -from floor -to /dev/null -maxFrames 0 -autoplane -calibration color.calib " />
+				<Option parameters="-module TEMPLATE -from floor -to /dev/null -maxFrames 500 -autoplane -calibration color.calib " />
 				<Option host_application="../redist/GrabberSegment" />
 				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
@@ -32,7 +32,8 @@
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Compiler>
-					<Add option="-O2" />
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-O3" />
 					<Add option="-fPIC" />
 				</Compiler>
 				<Linker>
