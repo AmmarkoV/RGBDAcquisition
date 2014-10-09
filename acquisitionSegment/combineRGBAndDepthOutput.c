@@ -75,9 +75,12 @@ int executeSegmentationDepth(unsigned short * Depth , unsigned char * selectedDe
 
   while (ptrDepth < ptrDepthLimit )
     {
-      if (*selectedPtr==0) { *ptrDepth = (unsigned short) 0 ; }
-                           // else  { *ptrDepth = (unsigned short) 40000 ; }
-      ++selectedPtr; ++ptrDepth;
+      //Erase non-selected depth pixels
+      if (*selectedPtr==0)
+         { *ptrDepth = (unsigned short) 0 ; }
+
+      ++selectedPtr;
+      ++ptrDepth;
     }
   return 1;
 }

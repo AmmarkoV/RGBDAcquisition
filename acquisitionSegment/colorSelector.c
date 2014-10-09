@@ -10,8 +10,6 @@
 #include "../tools/AmMatrix/matrix4x4Tools.h"
 #include "../tools/AmMatrix/matrixCalculations.h"
 
-#define GOTO_RGB_SEGMENTER 0
-#define PACKED_RGB_SEGMENTER 1
 
 int keepFirstRGBFrame(unsigned char * source ,  unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf)
 {
@@ -73,9 +71,14 @@ int selectBasedOnRGBMovement(unsigned char  * selection,unsigned char * baseRGB 
 }
 
 
-int removeFloodFillBeforeProcessing(unsigned char * source , unsigned char * target , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf  )
+int removeFloodFillBeforeProcessing(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf  )
 {
   if (segConf->floodErase.totalPoints==0) { return 0; }
+
+  unsigned char * target = (unsigned char *) malloc( width * height * 3 * sizeof(unsigned char));
+  if ( target == 0) {  return 0; }
+  memset(target,0,width*height*3*sizeof(unsigned char));
+
   unsigned char sR , sG, sB ;
 
   int i=0;
@@ -105,127 +108,76 @@ int removeFloodFillBeforeProcessing(unsigned char * source , unsigned char * tar
      //fprintf(stderr,"Flood Filled Before %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
   }
 
+ free(target);
+
   return 1;
 }
 
 
 
-
-
 unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib)
 {
+ //This will be our response segmentation
+ unsigned char * selectedRGB   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
+ if (selectedRGB==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
+
+ //We initially disqualify ( unselect ) the whole image , so we only PICK things that are ok
+ memset(selectedRGB,0,width*height*sizeof(unsigned char));
+
+ //In case our bounds are impossible we get an unselected image..!
+ if ( segConf->maxX > width )  { segConf->maxX = width; }
+ if ( segConf->maxY > height ) { segConf->maxY = height; }
+ if ( segConf->minX > segConf->maxX ) { return selectedRGB; }
+ if ( segConf->minY > segConf->maxY ) { return selectedRGB; }
+
+
  unsigned char * sourceCopy = (unsigned char *) malloc( width * height * 3 * sizeof( unsigned char));
- if ( sourceCopy == 0) { return 0; }
+ if ( sourceCopy == 0) { fprintf(stderr,"Could not allocate a buffer to copy the source..\n"); return 0; }
  memcpy(sourceCopy,source,width*height*3*sizeof(char));
 
-
- unsigned char * target = (unsigned char *) malloc( width * height * 3 * sizeof(unsigned char));
- if ( target == 0) {  free(sourceCopy); return 0; }
- memset(target,0,width*height*3*sizeof(unsigned char));
-
- removeFloodFillBeforeProcessing(sourceCopy,target,width,height,segConf);
-
- //TODO: REATTACH FLOOD FILL!
- free(target);
+ removeFloodFillBeforeProcessing(sourceCopy,width,height,segConf);
 
 
- unsigned int posX = 0;
- unsigned int posY = 0;
+ unsigned int posX = segConf->minX , posY = segConf->minY;
+ unsigned int limX = segConf->maxX , limY = segConf->maxY;
+ unsigned int patchWidth = limX-posX-1 , patchHeight = limY-posY-1;
  unsigned int sourceWidthStep = width * 3;
 
  unsigned char * sourcePixelsStart   = (unsigned char*) sourceCopy + ( (posX*3) + posY * sourceWidthStep );
- unsigned char * sourcePixelsLineEnd = sourcePixelsStart + (width*3);
- unsigned char * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
+ unsigned char * sourcePixelsLineEnd = sourcePixelsStart + ((patchWidth)*3);
+ unsigned char * sourcePixelsEnd     = sourcePixelsLineEnd + ((patchHeight-1) * sourceWidthStep );
  unsigned char * sourcePixels = sourcePixelsStart;
 
- unsigned char * selectedRGB   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
- if (selectedRGB==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
- memset(selectedRGB,0,width*height*sizeof(unsigned char));
+ unsigned char * selectedPtrStart = selectedRGB + ( posX + (posY * width) ) ;
+ unsigned char * selectedPtr = selectedPtrStart;
 
- unsigned char * selectedPtr   = selectedRGB;
 
- register unsigned char response=0;
- unsigned int x=0 , y=0;
  register unsigned char * R , * G , * B;
  while (sourcePixels<sourcePixelsEnd)
  {
-
-   if ( (y<segConf->minY) || (y>segConf->maxY) )
-   {
-     sourcePixels+=sourceWidthStep;
-     selectedPtr+=width;
-   } else
-   {
-     x=0;
-      while (sourcePixels<sourcePixelsLineEnd)
+   while (sourcePixels<sourcePixelsLineEnd)
       {
-
-        #if PACKED_RGB_SEGMENTER
-           #if GOTO_RGB_SEGMENTER
-             response=0;
-             R = sourcePixels++;
-             if ((segConf->minR > *R) || (*R > segConf->maxR)) { sourcePixels+=2; goto doneWithPixel; }
-             G = sourcePixels++;
-             if ((segConf->minG > *G) || (*G > segConf->maxG)) { ++sourcePixels;  goto doneWithPixel; }
-             B = sourcePixels++;
-             if ((segConf->minB > *B) || (*B > segConf->maxB)) { goto doneWithPixel; }
-
-             if ( (*R==segConf->replaceR) && (*G==segConf->replaceG) && (*B==segConf->replaceB) ) { goto doneWithPixel; }
-
-             response=1;
-             doneWithPixel:
-                *selectedPtr=response;
-           #else
-             R = sourcePixels++;
-             G = sourcePixels++;
-             B = sourcePixels++;
-
-             *selectedPtr=(
-                             ( (*R!=segConf->replaceR) || (*G!=segConf->replaceG) || (*B!=segConf->replaceB) ) &&
-                             (
-                              (segConf->minR <= *R) && (*R <= segConf->maxR) &&
-                              (segConf->minG <= *G) && (*G <= segConf->maxG) &&
-                              (segConf->minB <= *B) && (*B <= segConf->maxB) &&
-                              //----------------------------------------
-                              (segConf->minX <= x) && ( x<= segConf->maxX)
-                             )
-                          );
-           #endif // GOTO_RGB_SEGMENTER
-        #else
         R = sourcePixels++;
         G = sourcePixels++;
         B = sourcePixels++;
 
-        if (
-            (*R==segConf->replaceR) &&
-            (*G==segConf->replaceG) &&
-            (*B==segConf->replaceB)
-           ) { *selectedPtr=0; }
-             else
-        if  (
-             (segConf->minR <= *R) && (*R <= segConf->maxR)  &&
-              (segConf->minG <= *G) && (*G <= segConf->maxG)  &&
-               (segConf->minB <= *B) && (*B <= segConf->maxB) &&
-
-               (segConf->minX <= x) && ( x<= segConf->maxX)
-            )
-       {
-          *selectedPtr=1;
-       } else
-       {
-          *selectedPtr=0;
-       }
-        #endif
+        *selectedPtr=(
+                       ( (*R!=segConf->replaceR) || (*G!=segConf->replaceG) || (*B!=segConf->replaceB) ) &&
+                         (
+                              (segConf->minR <= *R) && (*R <= segConf->maxR) &&
+                              (segConf->minG <= *G) && (*G <= segConf->maxG) &&
+                              (segConf->minB <= *B) && (*B <= segConf->maxB)
+                         )
+                     );
 
         ++selectedPtr;
-        ++x;
       }
-   }
+   sourcePixelsStart+=sourceWidthStep;
+   sourcePixels=sourcePixelsStart;
    sourcePixelsLineEnd+=sourceWidthStep;
-   ++y;
+   selectedPtrStart+=width;
+   selectedPtr=selectedPtrStart;
  }
-
-
 
  if (segConf->enableRGBMotionDetection)
  {
