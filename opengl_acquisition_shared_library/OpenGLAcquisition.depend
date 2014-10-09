@@ -41,7 +41,7 @@
 
 1388407773 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.h
 
-1403178575 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/main.c
+1412880196 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -249,7 +249,7 @@
 
 1400069927 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/collisions.h
 
-1399042813 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix3x3Tools.c
+1412880350 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix3x3Tools.c
 	"matrix3x3Tools.h"
 	<stdio.h>
 	<stdlib.h>
@@ -257,11 +257,12 @@
 
 1399040148 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix3x3Tools.h
 
-1399043515 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixCalculations.c
+1412881665 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixCalculations.c
 	"matrixCalculations.h"
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
+	"matrixTools.h"
 	"matrix3x3Tools.h"
 	"matrix4x4Tools.h"
 	"solveLinearSystemGJ.h"
@@ -281,12 +282,13 @@
 
 1394933120 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/ocvStaging.h
 
-1399039971 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/solveHomography.c
+1412881623 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/solveHomography.c
 	"solveHomography.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<math.h>
+	"matrixTools.h"
 	"matrix3x3Tools.h"
 	"matrix4x4Tools.h"
 
@@ -299,4 +301,13 @@
 	"matrix3x3Tools.h"
 	"matrix4x4Tools.h"
 	"solveHomography.h"
+
+1412881248 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix4x4Tools.c
+	"matrix4x4Tools.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"matrixTools.h"
+
+1412880920 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixTools.h
 

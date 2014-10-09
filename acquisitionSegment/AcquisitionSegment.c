@@ -87,6 +87,15 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
   unsigned int selectedDepthCount=0;
   unsigned char * selectedDepth = selectSegmentationForDepthFrame(Depth , width , height , segConfDepth , calib , &selectedDepthCount);
 
+
+  if (
+       (selectedDepthCount==width*height) &&
+       (selectedRGBCount==width*height)
+     )
+  {
+    fprintf(stderr,"Both RGB and Depth are fully selected , fastpath doing nothing\n");
+  } else
+  {
   //We may chose to combine , or make a different selection for the RGB and Depth Frame
   if ( combinationMode == DONT_COMBINE )
   {
@@ -131,6 +140,7 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
       if (combinedSelection!=0) { free(combinedSelection); combinedSelection=0; }
      }
   }
+  } // We do COMBINE LOGIC
 
   //Free memory from selections..
   if (selectedRGB!=0)   { free(selectedRGB);   selectedRGB=0;     }

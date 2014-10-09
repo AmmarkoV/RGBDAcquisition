@@ -111,11 +111,38 @@ int removeDepthFloodFillBeforeProcessing(unsigned short * source  , unsigned int
 
 
 
+int justSelectAllDepthPixels(struct SegmentationFeaturesDepth * segConf , unsigned int width , unsigned int height)
+{
+  if (
+       (segConf->enableBBox==0) &&
+       (segConf->enablePlaneSegmentation==0) &&
+       (segConf->enableDepthMotionDetection==0) &&
+       (segConf->floodErase.totalPoints==0) &&
+       (segConf->minDepth == 0) && ( 32000 <= segConf->maxDepth) &&
+       (segConf->minX==0) && (segConf->maxX >= width) &&
+       (segConf->minY==0) && (segConf->maxY >= height)
+     )
+  {
+      return 1;
+  }
+
+  return 0;
+}
+
 
 unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf , struct calibration * calib,unsigned int * selectedPixels)
 {
  unsigned char * selectedDepth   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
  if (selectedDepth==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
+
+ //if we don't need to segment , conserve our CPU
+ if (justSelectAllDepthPixels(segConf,width,height))
+    {
+      fprintf(stderr,"Just Selecting All Depth Frame \n");
+      *selectedPixels=width*height;
+      memset(selectedDepth,1,width*height*sizeof(unsigned char));
+      return selectedDepth;
+    }
 
  //We initially disqualify ( unselect ) the whole image , so we only PICK things that are ok
  *selectedPixels=0; memset(selectedDepth,0,width*height*sizeof(unsigned char));

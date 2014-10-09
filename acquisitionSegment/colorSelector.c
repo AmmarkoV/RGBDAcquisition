@@ -113,13 +113,40 @@ int removeFloodFillBeforeProcessing(unsigned char * source , unsigned int width 
   return 1;
 }
 
+int justSelectAllRGBPixels(struct SegmentationFeaturesRGB * segConf , unsigned int width , unsigned int height)
+{
+  if (
+       (segConf->floodErase.totalPoints==0) &&
+       (segConf->enableRGBMotionDetection==0) &&
+       (segConf->minR == 0) && ( 255 <= segConf->maxR) &&
+       (segConf->minG == 0) && ( 255 <= segConf->maxG) &&
+       (segConf->minB == 0) && ( 255 <= segConf->maxB) &&
+       (segConf->enableReplacingColors == 0 ) &&
+       (segConf->minX==0) && (segConf->maxX >= width) &&
+       (segConf->minY==0) && (segConf->maxY >= height)
+     )
+  {
 
+      return 1;
+  }
+
+  return 0;
+}
 
 unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib,unsigned int * selectedPixels)
 {
  //This will be our response segmentation
  unsigned char * selectedRGB   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
  if (selectedRGB==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
+
+ //if we don't need to segment , conserve our CPU
+ if (justSelectAllRGBPixels(segConf,width,height))
+    {
+      fprintf(stderr,"Just Selecting All RGB Frame \n");
+      *selectedPixels=width*height;
+      memset(selectedRGB,1,width*height*sizeof(unsigned char));
+      return selectedRGB;
+    }
 
  //We initially disqualify ( unselect ) the whole image , so we only PICK things that are ok
  *selectedPixels=0;   memset(selectedRGB,0,width*height*sizeof(unsigned char));
