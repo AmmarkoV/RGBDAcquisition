@@ -15,14 +15,14 @@
 #include "../tools/AmMatrix/matrixCalculations.h"
 
 
-unsigned char * segmentRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib)
+unsigned char * segmentRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib,unsigned int * selectedPixels)
 {
-  return selectSegmentationForRGBFrame(source,width,height,segConf,calib);
+  return selectSegmentationForRGBFrame(source,width,height,segConf,calib,selectedPixels);
 }
 
-unsigned char * segmentDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf, struct calibration * calib)
+unsigned char * segmentDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf, struct calibration * calib,unsigned int * selectedPixels)
 {
- return selectSegmentationForDepthFrame(source,width,height,segConf,calib);
+ return selectSegmentationForDepthFrame(source,width,height,segConf,calib,selectedPixels);
 }
 
 
@@ -80,36 +80,38 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
   //the areas we want and the areas we don't want ..
 
   //We select the area for segmentation from RGB frame
-  unsigned char * selectedRGB = selectSegmentationForRGBFrame(RGB , width , height , segConfRGB , calib);
+  unsigned int selectedRGBCount=0;
+  unsigned char * selectedRGB = selectSegmentationForRGBFrame(RGB , width , height , segConfRGB , calib , &selectedRGBCount);
 
   //We select the area for segmentation from Depth frame
-  unsigned char * selectedDepth = selectSegmentationForDepthFrame(Depth , width , height , segConfDepth , calib);
+  unsigned int selectedDepthCount=0;
+  unsigned char * selectedDepth = selectSegmentationForDepthFrame(Depth , width , height , segConfDepth , calib , &selectedDepthCount);
 
   //We may chose to combine , or make a different selection for the RGB and Depth Frame
   if ( combinationMode == DONT_COMBINE )
   {
      //If we dont want to combine them we just execute the selection and RGB will
      //now have the segmented output frame
-     executeSegmentationRGB(RGB,selectedRGB,width,height,segConfRGB);
+     executeSegmentationRGB(RGB,selectedRGB,width,height,segConfRGB,selectedRGBCount);
      //The same goes for Depth
-     executeSegmentationDepth(Depth,selectedDepth,width,height);
+     executeSegmentationDepth(Depth,selectedDepth,width,height,selectedDepthCount);
   } else
   if (combinationMode == COMBINE_RGBFULL_DEPTH_USE_RGB )
   {
     //RGB frame is unaffected , Depth Frame uses RGB Segmentation
-    executeSegmentationDepth(Depth,selectedRGB,width,height);
+    executeSegmentationDepth(Depth,selectedRGB,width,height,selectedDepthCount);
   } else
   if (combinationMode == COMBINE_DEPTHFULL_RGB_USE_DEPTH )
   {
     //Depth frame is unaffected ,  RGB Frame uses DepthSegmentation
-     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB);
+     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB,selectedRGBCount);
   } else
   if (combinationMode == COMBINE_SWAP )
   {
      //If we want to swap RGB and Depth  we just swap it
-     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB);
+     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB,selectedRGBCount);
      //The same goes for Depth
-     executeSegmentationDepth(Depth,selectedRGB,width,height);
+     executeSegmentationDepth(Depth,selectedRGB,width,height,selectedDepthCount);
   } else
   {
      //If we do want to combine the selections "Together" , and there are many ways to do that using
@@ -122,8 +124,8 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
      } else
      {
       //We use the combinedSelection for both RGB and Depth
-      executeSegmentationRGB(RGB,combinedSelection,width,height,segConfRGB);
-      executeSegmentationDepth(Depth,combinedSelection,width,height);
+      executeSegmentationRGB(RGB,combinedSelection,width,height,segConfRGB,selectedRGBCount);
+      executeSegmentationDepth(Depth,combinedSelection,width,height,selectedDepthCount);
 
       //And we dont forget to free our memory
       if (combinedSelection!=0) { free(combinedSelection); combinedSelection=0; }
@@ -402,7 +404,7 @@ int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFea
                                              depthSeg->planeNormalSize=(double) internationalAtof(argv[i+2]);
                                              depthSeg->autoPlaneSegmentationMinimumDistancePoint=atoi(argv[i+3]);
                                              depthSeg->autoPlaneSegmentationMaximumDistancePoint=atoi(argv[i+4]);
-                                            } else { fprintf(stderr,"Not enough parameters\n"); }
+                                            } else { fprintf(stderr,"Not enough parameters ( -autoplane offset ceiling minimumDistance maximumDistance \n"); }
                                           } else
     if (strcmp(argv[i],"-plane")==0)      {
                                             if (argc>i+9)

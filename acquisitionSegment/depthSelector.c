@@ -68,16 +68,21 @@ int selectBasedOnMovement(unsigned char  * selection,unsigned short * baseDepth 
     ++baseDepthPTR;
     ++selectionPTR;
   }
-  fprintf(stderr,"Dropped %u of %u \n",dropped,width*height);
+  fprintf(stderr,"Dropped %lu of %u \n",dropped,width*height);
 
   return 1;
 }
 
 
 
-int removeDepthFloodFillBeforeProcessing(unsigned short * source , unsigned short * target , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf  )
+int removeDepthFloodFillBeforeProcessing(unsigned short * source  , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf  )
 {
   if (segConf->floodErase.totalPoints==0) { return 0; }
+
+  unsigned short * target = (unsigned short *) malloc( width * height * sizeof(unsigned short));
+  if ( target == 0) {  return 0; }
+  memset(target,0,width*height*sizeof(unsigned short));
+
   unsigned short sDepth ;
 
   int i=0;
@@ -98,66 +103,66 @@ int removeDepthFloodFillBeforeProcessing(unsigned short * source , unsigned shor
      //fprintf(stderr,"Flood Filled Before %u  - %u,%u thresh(%u) \n",i,segConf->floodErase.pX[i],segConf->floodErase.pY[i],segConf->floodErase.threshold[i]);
   }
 
+
+ if ( target != 0)  { free(target); target=0; }
+
   return 1;
 }
 
 
 
 
-unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf , struct calibration * calib)
+unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf , struct calibration * calib,unsigned int * selectedPixels)
 {
+ unsigned char * selectedDepth   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
+ if (selectedDepth==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
+
+ //We initially disqualify ( unselect ) the whole image , so we only PICK things that are ok
+ *selectedPixels=0; memset(selectedDepth,0,width*height*sizeof(unsigned char));
+
+
  unsigned short * sourceCopy = (unsigned short *) malloc( width * height * sizeof(unsigned short));
- if ( sourceCopy == 0) { return 0; }
+ if ( sourceCopy == 0) { fprintf(stderr,"Couldn ot allocate a buffer to copy depth frame for segmentation\n"); return 0; }
  memcpy(sourceCopy,source,width*height*sizeof(unsigned short));
 
+ removeDepthFloodFillBeforeProcessing(sourceCopy,width,height,segConf);
 
- unsigned short * target = (unsigned short *) malloc( width * height * sizeof(unsigned short));
- if ( target == 0) { free(sourceCopy); return 0; }
- memset(target,0,width*height*sizeof(short));
-
- removeDepthFloodFillBeforeProcessing(sourceCopy,target,width,height,segConf);
-
- if ( target != 0)  { free(target); target=0; }
 
  unsigned int sourceWidthStep = width;
-// unsigned int targetWidthStep = width;
- unsigned int posX = segConf->minX;
- unsigned int posY = segConf->minY;
+ unsigned int posX = segConf->minX , posY = segConf->minY;
+ unsigned int limX = segConf->maxX , limY = segConf->maxY;
+ unsigned int patchWidth = limX-posX , patchHeight = limY-posY;
  width = segConf->maxX-segConf->minX;
  height = segConf->maxY-segConf->minY;
 
  unsigned short * sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
- unsigned short * sourcePixelsLineEnd = sourcePixelsStart + (width);
- unsigned short * sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
+ unsigned short * sourcePixelsLineEnd = sourcePixelsStart + (patchWidth);
+ unsigned short * sourcePixelsEnd     = sourcePixelsLineEnd + ((patchHeight-1) * sourceWidthStep );
  unsigned short * sourcePixels = sourcePixelsStart;
 
- unsigned char * selectedDepth   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
- if (selectedDepth==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
- memset(selectedDepth,0,width*height*sizeof(unsigned char));
+ unsigned char * selectedPtrStart   = selectedDepth + ( (posX) + posY * sourceWidthStep );
+ unsigned char * selectedPtr   = selectedPtrStart;
 
- unsigned char * selectedPtr   = selectedDepth;
+ unsigned int x =0 , y =0;
 
- unsigned int x =0;
- unsigned int y =0;
-
- unsigned short * depth=0;
+ register unsigned char selected;
+ register unsigned short * depth=0;
  while (sourcePixels<sourcePixelsEnd)
  {
    while (sourcePixels<sourcePixelsLineEnd)
     {
      depth = sourcePixels++;
-
-     if (*depth != 0)
-     { //If there is a depth given for point
-       if  ( (segConf->minDepth <= *depth) && (*depth <= segConf->maxDepth) ) { *selectedPtr=1; } else
-                                                                              { *selectedPtr=0; }
-     }
+     selected = ((*depth != 0)&&((segConf->minDepth <= *depth) && (*depth <= segConf->maxDepth)));
+     *selectedPtr=selected;
+     selectedPixels+=selected;
 
      ++selectedPtr;
-     ++x;
-     if (x>=width) { x=0; ++y;}
     }
+   sourcePixelsStart+=sourceWidthStep;
+   sourcePixels=sourcePixelsStart;
    sourcePixelsLineEnd+=sourceWidthStep;
+   selectedPtrStart+=sourceWidthStep;
+   selectedPtr=selectedPtrStart;
  }
 
 
@@ -187,41 +192,35 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
 
 if (segConf->enableBBox)
 {
- fprintf(stderr,"Selecting Bounding Box Min %0.2f %0.2f %0.2f -> Max %0.2f %0.2f %0.2f  \n",
-                 segConf->bboxX1,
-                 segConf->bboxY1,
-                 segConf->bboxZ1,
-                 segConf->bboxX2,
-                 segConf->bboxY2,
-                 segConf->bboxZ2
-         );
+  fprintf(stderr,"Selecting Bounding Box Min %0.2f %0.2f %0.2f -> Max %0.2f %0.2f %0.2f  \n",
+                   segConf->bboxX1, segConf->bboxY1, segConf->bboxZ1,
+                   segConf->bboxX2, segConf->bboxY2, segConf->bboxZ2 );
 
  double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
- if (m==0) {fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n"); } else
+ if (m==0)
  {
-  double raw3D[4];
-  double world3D[4];
-
+   fprintf(stderr,"Could not allocate a 4x4 matrix , cannot perform bounding box selection\n");
+ }
+  else
+ {
   sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
-  sourcePixelsLineEnd = sourcePixelsStart + (width);
-  sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
+  sourcePixelsLineEnd = sourcePixelsStart + (patchWidth);
+  sourcePixelsEnd     = sourcePixelsLineEnd + ((patchHeight-1) * sourceWidthStep );
   sourcePixels = sourcePixelsStart;
 
-  selectedPtr   = selectedDepth;
-  sourcePixels = sourcePixelsStart;
-  sourcePixelsLineEnd = sourcePixelsStart + (width);
-  x=0; y=0;
-  depth=0;
+  selectedPtrStart   = selectedDepth + ( (posX) + posY * sourceWidthStep );
+  selectedPtr   = selectedPtrStart;
 
+  double raw3D[4] ,  world3D[4];
   float x3D , y3D , z3D;
-
+  x=posX; y=posY; depth=0;
   while (sourcePixels<sourcePixelsEnd)
   {
    while (sourcePixels<sourcePixelsLineEnd)
     {
      depth = sourcePixels++;
 
-     if (  (*selectedPtr!=0)  )  //  &&  (*depth != 0)
+     if (*selectedPtr!=0)
      {
        transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
 
@@ -232,25 +231,28 @@ if (segConf->enableBBox)
 
        transform3DPointVectorUsing4x4Matrix(world3D,m,raw3D);
 
-       if (
-           (segConf->bboxX1<world3D[0])&& (segConf->bboxX2>world3D[0]) &&
-           (segConf->bboxY1<world3D[1])&& (segConf->bboxY2>world3D[1]) &&
-           (segConf->bboxZ1<world3D[2])&& (segConf->bboxZ2>world3D[2])
-          )
-     {   } else // If it was selected keep it selected
-     { *selectedPtr=0; } //Denied
+       selected=(
+                   (segConf->bboxX1<world3D[0])&& (segConf->bboxX2>world3D[0]) &&
+                   (segConf->bboxY1<world3D[1])&& (segConf->bboxY2>world3D[1]) &&
+                   (segConf->bboxZ1<world3D[2])&& (segConf->bboxZ2>world3D[2])
+                );
+
+       if (!selected) { *selectedPtr=0; --selectedPixels; } //New Pixel , just got denied
      }//If it was selected and not null project it into 3d Space
 
      ++selectedPtr;
      ++x;
-     if (x>=width) { x=0; ++y;}
-    }
+    } // End Of Scanline Loop
+   ++y; x=posX;
+   sourcePixelsStart+=sourceWidthStep;
+   sourcePixels=sourcePixelsStart;
    sourcePixelsLineEnd+=sourceWidthStep;
- }
+   selectedPtrStart+=sourceWidthStep;
+   selectedPtr=selectedPtrStart;
+ } //End of Master While loop
   free4x4Matrix(&m); // This is the same as free(m); m=0;
  } //End of M allocated!
-
-}
+} // End of Bounding Box Segmentation
 // -------------------------------------------------------------------------------------------------
 // --------------------------------- BOUNDING BOX SEGMENTATION -------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -287,27 +289,23 @@ if ( segConf->enablePlaneSegmentation )
 
 
     //fprintf(stderr,"signedDistanceFromPlane is %0.2f \n",signedDistanceFromPlane(segConf->p2, normal , pN));
+   sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
+   sourcePixelsLineEnd = sourcePixelsStart + (patchWidth);
+   sourcePixelsEnd     = sourcePixelsLineEnd + ((patchHeight-1) * sourceWidthStep );
+   sourcePixels = sourcePixelsStart;
 
-  sourcePixelsStart   = (unsigned short*) sourceCopy + ( (posX) + posY * sourceWidthStep );
-  sourcePixelsLineEnd = sourcePixelsStart + (width);
-  sourcePixelsEnd     = sourcePixelsLineEnd + ((height-1) * sourceWidthStep );
-  sourcePixels = sourcePixelsStart;
+   selectedPtrStart   = selectedDepth + ( (posX) + posY * sourceWidthStep );
+   selectedPtr   = selectedPtrStart;
 
-  selectedPtr   = selectedDepth;
-  sourcePixels = sourcePixelsStart;
-  sourcePixelsLineEnd = sourcePixelsStart + (width);
-  x=0; y=0;
-  depth=0;
-
-  float x3D , y3D , z3D;
-
+  float x3D , y3D , z3D , distanceFromPlane;
+  x=posX; y=posY; depth=0;
   while (sourcePixels<sourcePixelsEnd)
   {
    while (sourcePixels<sourcePixelsLineEnd)
     {
      depth = sourcePixels++;
 
-     if (  (*selectedPtr!=0)  )  //  &&  (*depth != 0)
+     if (*selectedPtr!=0)
      {
       transform2DProjectedPointTo3DPoint(calib , x, y , *depth , &x3D , &y3D ,  &z3D);
       raw3D[0] = (double) x3D; raw3D[1] = (double) y3D; raw3D[2] = (double) z3D; raw3D[3] = (double) 1.0;
@@ -317,23 +315,28 @@ if ( segConf->enablePlaneSegmentation )
       pN[0]=(float) world3D[0];
       pN[1]=(float) world3D[1];
       pN[2]=(float) world3D[2];
-      float result = signedDistanceFromPlane(p2, normal , pN);
+
+      distanceFromPlane = signedDistanceFromPlane(p2, normal , pN);
 
       if (segConf->planeNormalSize!=0)
       {
          //We also have a ceiling defined
-         if (  result >= 0.0 + segConf->planeNormalOffset + segConf->planeNormalSize )  { *selectedPtr=0; } //Denied
+         if (  distanceFromPlane >= 0.0 + segConf->planeNormalOffset + segConf->planeNormalSize )  { *selectedPtr=0; } //Denied
       }
-      if (  result <= 0.0 + segConf->planeNormalOffset )  { *selectedPtr=0; } //Denied
+      if (  distanceFromPlane <= 0.0 + segConf->planeNormalOffset )  { *selectedPtr=0; } //Denied
 
      }//If it was selected and not null project it into 3d Space
 
      ++selectedPtr;
      ++x;
-     if (x>=width) { x=0; ++y;}
-    }
+    } // End Of Scanline Loop
+   ++y; x=posX;
+   sourcePixelsStart+=sourceWidthStep;
+   sourcePixels=sourcePixelsStart;
    sourcePixelsLineEnd+=sourceWidthStep;
- }
+   selectedPtrStart+=sourceWidthStep;
+   selectedPtr=selectedPtrStart;
+ } //End of Master While loop
   free4x4Matrix(&m); // This is the same as free(m); m=0;
  } //End of M allocated!
 

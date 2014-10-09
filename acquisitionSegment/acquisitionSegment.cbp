@@ -17,6 +17,7 @@
 				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-O3" />
 					<Add option="-pg" />
 					<Add option="-g" />
 				</Compiler>

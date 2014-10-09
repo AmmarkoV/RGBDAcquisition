@@ -139,7 +139,7 @@ struct SegmentationFeaturesDepth
  * @param Calibration of the camera that produced the RGB Input
  * @retval Pointer to a width*height array with which pixels to keep and which to discard , should be freed when user is done with it , 0 = Failure
  */
-unsigned char * segmentRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib);
+unsigned char * segmentRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib,unsigned int * selectedPixels);
 
 
 
@@ -153,7 +153,7 @@ unsigned char * segmentRGBFrame(unsigned char * source , unsigned int width , un
  * @param Calibration of the camera that produced the Depth Input
  * @retval Pointer to a width*height array with which pixels to keep and which to discard , should be freed when user is done with it , 0 = Failure
  */
-unsigned char * segmentDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf, struct calibration * calib);
+unsigned char * segmentDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf, struct calibration * calib,unsigned int * selectedPixels);
 
 
 

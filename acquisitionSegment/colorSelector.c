@@ -115,14 +115,14 @@ int removeFloodFillBeforeProcessing(unsigned char * source , unsigned int width 
 
 
 
-unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib)
+unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib,unsigned int * selectedPixels)
 {
  //This will be our response segmentation
  unsigned char * selectedRGB   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
  if (selectedRGB==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
 
  //We initially disqualify ( unselect ) the whole image , so we only PICK things that are ok
- memset(selectedRGB,0,width*height*sizeof(unsigned char));
+ *selectedPixels=0;   memset(selectedRGB,0,width*height*sizeof(unsigned char));
 
  //In case our bounds are impossible we get an unselected image..!
  if ( segConf->maxX > width )  { segConf->maxX = width; }
@@ -152,6 +152,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
  unsigned char * selectedPtr = selectedPtrStart;
 
 
+ register unsigned char selected;
  register unsigned char * R , * G , * B;
  while (sourcePixels<sourcePixelsEnd)
  {
@@ -161,15 +162,17 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
         G = sourcePixels++;
         B = sourcePixels++;
 
-        *selectedPtr=(
+        selected=(
                        ( (*R!=segConf->replaceR) || (*G!=segConf->replaceG) || (*B!=segConf->replaceB) ) &&
                          (
                               (segConf->minR <= *R) && (*R <= segConf->maxR) &&
                               (segConf->minG <= *G) && (*G <= segConf->maxG) &&
                               (segConf->minB <= *B) && (*B <= segConf->maxB)
                          )
-                     );
+                  );
 
+        *selectedPixels+=selected;
+        *selectedPtr=selected;
         ++selectedPtr;
       }
    sourcePixelsStart+=sourceWidthStep;
