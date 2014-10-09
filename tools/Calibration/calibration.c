@@ -438,19 +438,21 @@ int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int
     {
       fprintf(stderr,"Focal Length is 0.0 , cannot transform2DProjectedPointTo3DPoint \n ");
       return 0;
+    } else
+    {
+
+     /*
+     fprintf(stderr,"Cx,Cy (%0.2f,%0.2f) , Fx,Fy (%0.2f,%0.2f) \n ",calib->intrinsic[CALIB_INTR_CX],
+                                                                    calib->intrinsic[CALIB_INTR_CY],
+                                                                    calib->intrinsic[CALIB_INTR_FX],
+                                                                    calib->intrinsic[CALIB_INTR_FY]);*/
+
+      *x = (float) (x2d - calib->intrinsic[CALIB_INTR_CX]) * (depthValue / calib->intrinsic[CALIB_INTR_FX]);
+      *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
+      *z = (float) depthValue;
+     return 1;
     }
 
-   /*
-    fprintf(stderr,"Cx,Cy (%0.2f,%0.2f) , Fx,Fy (%0.2f,%0.2f) \n ",calib->intrinsic[CALIB_INTR_CX],
-                                                                   calib->intrinsic[CALIB_INTR_CY],
-                                                                   calib->intrinsic[CALIB_INTR_FX],
-                                                                   calib->intrinsic[CALIB_INTR_FY]);*/
-
-    *x = (float) (x2d - calib->intrinsic[CALIB_INTR_CX]) * (depthValue / calib->intrinsic[CALIB_INTR_FX]);
-    *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
-    *z = (float) depthValue;
-
-    return 1;
 }
 
 

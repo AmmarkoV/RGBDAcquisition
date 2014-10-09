@@ -221,6 +221,9 @@ int main(int argc, char *argv[])
                                                fprintf(stderr,"Could not read calibration file `%s`\n",calibrationFile);
                                                return 1;
                                              }
+    } else
+    {
+      acquisitionGetColorCalibration(moduleID_1,devID_1,&calib);
     }
 
 
