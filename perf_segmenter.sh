@@ -11,7 +11,7 @@ cd redist
 if [ -e $BIN ]
 then
  ldd $BIN | grep not
- LD_LIBRARY_PATH=.:../3dparty/libfreenect/build/lib  valgrind --tool=callgrind --callgrind-out-file=perf.txt --dump-instr=yes --cacheuse=yes --collect-jumps=yes   ./$BIN $@
+ LD_LIBRARY_PATH=.:../3dparty/libfreenect/build/lib  valgrind --tool=callgrind --callgrind-out-file=perf.txt --dump-instr=yes -v --cacheuse=yes --collect-jumps=yes   ./$BIN $@
  kcachegrind perf.txt
 else
  if [ -e $ORIGINALDIRBIN ]

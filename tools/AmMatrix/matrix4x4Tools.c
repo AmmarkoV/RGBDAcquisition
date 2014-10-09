@@ -5,25 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-// Pre-calculated value of PI / 180.
-#define kPI180   0.017453
-
-// Pre-calculated value of 180 / PI.
-#define k180PI  57.295780
-
-// Converts degrees to radians.
-#define degreesToRadians(x) (x * kPI180)
-
-// Converts radians to degrees.
-#define radiansToDegrees(x) (x * k180PI)
-
-const float DEG2RAD = 3.141592653589793f / 180;
-
-/*
-inline double degreesToRadians(double degrees)
-{
-  return tan(0.25 * 3.141592653589793 );
-}*/
+#include "matrixTools.h"
 
 
 enum mat4x4Item
@@ -79,6 +61,7 @@ void free4x4Matrix(double ** mat)
 
 void print4x4FMatrix(char * str , float * matrix4x4)
 {
+  #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, " 4x4 float %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
   fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
@@ -86,10 +69,12 @@ void print4x4FMatrix(char * str , float * matrix4x4)
   fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
   fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
   fprintf( stderr, "--------------------------------------\n");
+  #endif // PRINT_MATRIX_DEBUGGING
 }
 
 void print4x4DMatrix(char * str , double * matrix4x4)
 {
+  #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, " 4x4 double %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
   fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
@@ -97,16 +82,19 @@ void print4x4DMatrix(char * str , double * matrix4x4)
   fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
   fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
   fprintf( stderr, "--------------------------------------\n");
+  #endif // PRINT_MATRIX_DEBUGGING
 }
 
 
 void print4x4DMathematicaMatrix(char * str , double * matrix3x3)
 {
+  #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "%s = { { %f , %f , %f ,%f } , { %f , %f , %f , %f } , { %f , %f , %f , %f } , { %f , %f , %f , %f } }\n",str,
            matrix3x3[0],matrix3x3[1],matrix3x3[2],matrix3x3[3],
            matrix3x3[4],matrix3x3[5],matrix3x3[6],matrix3x3[7],
            matrix3x3[8],matrix3x3[9],matrix3x3[10],matrix3x3[11],
            matrix3x3[12],matrix3x3[13],matrix3x3[14],matrix3x3[15]);
+  #endif // PRINT_MATRIX_DEBUGGING
 }
 
 void copy4x4Matrix(double * out,double * in)
@@ -403,31 +391,11 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
   return 1;
 }
 
-/*
-int transform3DPointUsing4x4MatrixOld(double * resultPoint3D, double * transformation4x4, double * point3D)
-{
-  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0) ) { return 0; }
-
-  //fprintf(stderr,"%0.2f %0.2f %0.2f %0.2f  \n * \n",point3D[0],point3D[1],point3D[2],point3D[3]);
-  //print4x4DMatrix("M", transformation4x4);
-
-
-  double * m = transformation4x4;
-  double X=point3D[0],Y=point3D[1],Z=point3D[2];
-
-  resultPoint3D[0] = m[t0] + m[r0] * X + m[r1] *  Y + m[r2] * Z;
-  resultPoint3D[1] = m[t1] + m[r3] * X + m[r4] *  Y + m[r5] * Z;
-  resultPoint3D[2] = m[t2] + m[r6] * X + m[r7] *  Y + m[r8] * Z;
-  resultPoint3D[3] = 1;
-
- return 1;
-}*/
 
 int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)
 {
-  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0) ) { return 0; }
+  if ( unlikely((resultPoint3D==0) || (transformation4x4==0) || (point3D==0)) ) { return 0; }
 
-  //fprintf(stderr,"Point 3D %0.2f,%0.2f,%0.2f \n",point3D[0],point3D[1],point3D[2]);
 /*
    What we want to do ( in mathematica )
    { {e0,e1,e2,e3} , {e4,e5,e6,e7} , {e8,e9,e10,e11} , {e12,e13,e14,e15} } * { { X } , { Y }  , { Z } , { W } }
@@ -441,9 +409,8 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
     {e15 W + e12 X + e13 Y + e14 Z}
   }
 */
-
   double * m = transformation4x4;
-  double X=point3D[0],Y=point3D[1],Z=point3D[2],W=point3D[3];
+  register double X=point3D[0],Y=point3D[1],Z=point3D[2],W=point3D[3];
 
   resultPoint3D[0] =  m[e3] * W + m[e0] * X + m[e1] * Y + m[e2] * Z;
   resultPoint3D[1] =  m[e7] * W + m[e4] * X + m[e5] * Y + m[e6] * Z;
@@ -451,18 +418,17 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
   resultPoint3D[3] =  m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
 
   // Ok we have our results but now to normalize our vector
-  if (resultPoint3D[3]!=0.0)
+  if (likely(resultPoint3D[3]!=0.0))
   {
    resultPoint3D[0]/=resultPoint3D[3];
    resultPoint3D[1]/=resultPoint3D[3];
    resultPoint3D[2]/=resultPoint3D[3];
    resultPoint3D[3]/=resultPoint3D[3];
+   return 1;
   } else
   {
      fprintf(stderr,"Error with W coordinate after multiplication of 3D Point with 4x4 Matrix\n");
   }
-
-  //fprintf(stderr,"Transformed to %0.2f,%0.2f,%0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2]);
 
  return 1;
 }
@@ -471,12 +437,12 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
 
 int normalize3DPointVector(double * vec)
 {
+  if ( vec[3]==1.0 ) { return 1; } else
   if ( vec[3]==0.0 )
   {
     fprintf(stderr,"normalize3DPointVector cannot be normalized since element 3 is zero\n");
     return 0;
   }
-  if ( vec[3]==1.0 ) { return 1; }
 
 
   vec[0]=vec[0]/vec[3];

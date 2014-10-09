@@ -65,6 +65,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../tools/AmMatrix/matrixCalculations.h" />
+		<Unit filename="../tools/AmMatrix/matrixTools.h" />
 		<Unit filename="../tools/AmMatrix/ocvStaging.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -109,7 +109,7 @@ float  distance3D(float * p1 , float * p2 , float * p3)
 }
 
 
-float dotProduct(float * p1 , float * p2 )
+inline float dotProduct(float * p1 , float * p2 )
 {
     #warning "dotProduct is a very heavily used function , it needs to be optimized using AVX"
     return (float) ( p1[DIMX]*p2[DIMX] + p1[DIMY]*p2[DIMY] + p1[DIMZ]*p2[DIMZ] );
@@ -317,15 +317,14 @@ int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width 
 
 int detectNoDepth(unsigned short * depthFrame , unsigned int width , unsigned int height , float percentageHigh)
 {
-  unsigned char * depthPtr = depthFrame;
-  unsigned char * depthLimit = depthFrame + width * height ;
+  unsigned short * depthPtr = depthFrame;
+  unsigned short * depthLimit = depthFrame + width * height ;
 
   float tmp = percentageHigh / 100;
         tmp = tmp * width * height ;
   unsigned int targetHighContrastPixels = (unsigned int) tmp;
   unsigned int highContrastPixels = 0;
 
-  unsigned char r,g,b;
   while (depthPtr<depthLimit)
   {
     if (*depthPtr==0)

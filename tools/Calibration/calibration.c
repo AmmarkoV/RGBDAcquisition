@@ -11,6 +11,15 @@
 #include "../AmMatrix/matrix4x4Tools.h"
 #include "../AmMatrix/matrixCalculations.h"
 
+
+#if __GNUC__
+#define likely(x)    __builtin_expect (!!(x), 1)
+#define unlikely(x)  __builtin_expect (!!(x), 0)
+#else
+ #define likely(x)   x
+ #define unlikely(x)   x
+#endif
+
 #define DEBUG_PRINT_EACH_CALIBRATION_LINE_READ 0
 
 #define DEFAULT_WIDTH 640
@@ -408,15 +417,9 @@ int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , 
 int transform3DPointUsingCalibration(struct calibration * calib , float * x , float * y , float * z)
 {
  double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
-
- if (m==0)
- { fprintf(stderr,"Could not allocate4x4MatrixForPointTransformationBasedOnCalibration\n");
-
- } else
+ if (likely(m!=0))
  {
-
   transform3DPointUsingExisting4x4Matrix(m ,x,y,z);
-
   free4x4Matrix(&m); // This is the same as free(m); m=0;
   return 1;
  } //End of M allocated!
@@ -426,12 +429,12 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
 
 int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int x2d , unsigned int y2d  , unsigned short depthValue , float * x , float * y , float * z)
 {
-    if (calib==0)
+    if (unlikely(calib==0) )
     {
       fprintf(stderr,"Cannot transform2DProjectedPointTo3DPoint without a calibration \n ");
       return 0;
-    }
-    if ( (calib->intrinsic[CALIB_INTR_FX]==0) || (calib->intrinsic[CALIB_INTR_FY]==0) )
+    } else
+    if (unlikely( (calib->intrinsic[CALIB_INTR_FX]==0) || (calib->intrinsic[CALIB_INTR_FY]==0) ) )
     {
       fprintf(stderr,"Focal Length is 0.0 , cannot transform2DProjectedPointTo3DPoint \n ");
       return 0;
