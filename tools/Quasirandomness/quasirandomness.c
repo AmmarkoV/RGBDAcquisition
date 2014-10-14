@@ -1,6 +1,7 @@
 #include "quasirandomness.h"
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 
 unsigned long  ulrandom()
@@ -10,7 +11,7 @@ unsigned long  ulrandom()
 
 int initializeQuasirandomnessContext(struct quasiRandomizerContext * qrc,unsigned int width , unsigned int height , unsigned int depth,int randomSeed)
 {
-  srand(time());
+  srand(time(0));
   memset(qrc,0,sizeof(struct quasiRandomizerContext));
   qrc->width=width;
   qrc->height=height;

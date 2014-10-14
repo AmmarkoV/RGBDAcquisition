@@ -6,6 +6,22 @@ cd "$DIR"
 
 #BINARIES_THAT_NEED_LIBS="grabber viewer grabber_mux grabber_segment acquisitionBroadcast editor redist openni1_acquisition_shared_library openni2_acquisition_shared_library libfreenect_acquisition_shared_library "
 
+
+ONIFOLDER64="x64-Release"
+ONIFOLDER="x86-Release"
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+echo "Will pick 64bit binaries"
+ONIFOLDER=$ONIFOLDER64
+else
+echo "Will pick 32bit binaries"
+#CUDA_VER SHOULD ALREADY BE SET TO $CUDA_VER32
+fi
+
+
+
+
+
 BINARIES_THAT_NEED_LIBS="`../scripts/binariesThatNeedLibs.sh`"
 
 if [ -d libfreenect ]
@@ -92,11 +108,11 @@ else
              if [ -d $f ]
               then
                cd $f 
-               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.so
-               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libOpenNI.jni.so  
-               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimCodecs.so 
-               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimMockNodes.so 
-               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/x64-Release/libnimRecorder.so 
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/$ONIFOLDER/libOpenNI.so
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/$ONIFOLDER/libOpenNI.jni.so  
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/$ONIFOLDER/libnimCodecs.so 
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/$ONIFOLDER/libnimMockNodes.so 
+               ln -s ../3dparty/OpenNI/Platform/Linux/Bin/$ONIFOLDER/libnimRecorder.so 
                cd ..
              else
               echo "Could not create links for $f"
@@ -135,7 +151,7 @@ else
      cd OpenNI2
      make 
 
-     cd Bin/x64-Release/OpenNI2/Drivers/
+     cd Bin/$ONIFOLDER/OpenNI2/Drivers/
      #ln -s ../../../../../libfreenect/build/lib/OpenNI2-FreenectDriver/libFreenectDriver.so   
      ln -s $DIR/libfreenect/build/lib/OpenNI2-FreenectDriver/libFreenectDriver.so
      cd ../../../../
@@ -150,10 +166,10 @@ else
              if [ -d $f ]
               then
                cd $f  
-               ln -s ../3dparty/OpenNI2/Bin/x64-Release/OpenNI2/  
+               ln -s ../3dparty/OpenNI2/Bin/$ONIFOLDER/OpenNI2/  
                ln -s ../3dparty/OpenNI2/Config/OpenNI.ini   
                ln -s ../3dparty/OpenNI2/Config/PS1080.ini 
-               ln -s ../3dparty/OpenNI2/Bin/x64-Release/libOpenNI2.so 
+               ln -s ../3dparty/OpenNI2/Bin/$ONIFOLDER/libOpenNI2.so 
                cd ..
              else
               echo "Could not create links for $f"

@@ -15,9 +15,10 @@ extern "C" {
 #define CONTAINERS_MAX 1
 #define MAX_COMPLICITY 4
 
-#define MAX_MEMORY 512
-#define MAX_STRING 4096
+#define MAX_MEMORY 256
+#define MAX_STRING 2048
 
+#define USE_SCANF 0
 
 
 

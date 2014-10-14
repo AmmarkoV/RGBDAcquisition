@@ -6,6 +6,9 @@
 #ifndef MATRIXCALCULATIONS_H_INCLUDED
 #define MATRIXCALCULATIONS_H_INCLUDED
 
+
+
+
 int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit);
 int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit);
 

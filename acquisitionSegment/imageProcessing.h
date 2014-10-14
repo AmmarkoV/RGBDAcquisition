@@ -51,4 +51,9 @@ int floodFillUShort(unsigned short * target , unsigned int width , unsigned int 
                     unsigned short sourceDepth ,
                     unsigned short replaceDepth , int depth);
 
+
+int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width , unsigned int height , float percentageHigh);
+
+int detectNoDepth(unsigned short * depthFrame , unsigned int width , unsigned int height , float percentageHigh);
+
 #endif // IMAGEPROCESSING_H_INCLUDED

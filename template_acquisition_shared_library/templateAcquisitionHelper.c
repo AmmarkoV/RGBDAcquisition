@@ -4,7 +4,11 @@
 #include <string.h>
 
 #define PRINT_COMMENTS 1
-#define USE_CODEC_LIBRARY 1 //Not Using the codec library really simplifies build things but we lose png/jpg formats
+
+#if ENABLE_PNG
+  #define USE_CODEC_LIBRARY 1 //Not Using the codec library really simplifies build things but we lose png/jpg formats
+#endif // ENABLE_PNG
+
 
  #if USE_CODEC_LIBRARY
   #include "../tools/Codecs/codecs.h"
@@ -38,7 +42,7 @@ unsigned char * ReadPNMInternal(unsigned char * buffer , char * filename,unsigne
 
         if ( strncmp(buf,"P6\n", 3) == 0 ) { channels=3; } else
         if ( strncmp(buf,"P5\n", 3) == 0 ) { channels=1; } else
-                                           { fprintf(stderr,"Could not understand/Not supported file format\n"); fclose(pf); return buffer; }
+                                           { fprintf(stderr,"ReadPNMInternal : Could not understand/Not supported file format\n"); fclose(pf); return buffer; }
         do
         { /* Px formats can have # comments after first line */
            #if PRINT_COMMENTS
@@ -206,11 +210,15 @@ unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int
 void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,  unsigned int * widthInternal, unsigned int * heightInternal, unsigned long *  timestampInternal)
 {
  #if USE_CODEC_LIBRARY
+   //Codec Library ignores existing buffers
+   if (existingBuffer!=0) { free(existingBuffer); existingBuffer=0; }
+
    unsigned int type=0;
    if (strcmp(extension,"pnm")==0) { type=PNM_CODEC; } else
    if (strcmp(extension,"png")==0) { type=PNG_CODEC; } else
    if (strcmp(extension,"jpg")==0) { type=JPG_CODEC; }
    unsigned int bitsperpixel,channels;
+   //fprintf(stderr,"Reading %s , using Codec Library \n",filename);
    char * pixels = readImageRaw(filename,type,widthInternal,heightInternal,&bitsperpixel,&channels);
    if ( (channels==1) && (bitsperpixel==16) && (type==PNG_CODEC) ) { swapImageEndiannessRaw( pixels, *widthInternal , *heightInternal ,bitsperpixel , channels);  }
    return pixels ;

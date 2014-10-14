@@ -1004,7 +1004,7 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
 
 void EditorFrame::OnbuttonPlayClick(wxCommandEvent& event)
 {
-    fprintf(stderr,"Play Button Clicked\n");
+    fprintf(stderr,"Play Button Clicked ( current frame = %u ) \n", acquisitionGetCurrentFrameNumber(moduleID,devID));
     play=1;
 }
 

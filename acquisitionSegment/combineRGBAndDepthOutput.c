@@ -6,14 +6,22 @@
 
 
 
+#if __GNUC__
+#define likely(x)    __builtin_expect (!!(x), 1)
+#define unlikely(x)  __builtin_expect (!!(x), 0)
+#else
+ #define likely(x)   x
+ #define unlikely(x)   x
+#endif
 
 
 
-
-
-int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , unsigned int width , unsigned int height ,  struct SegmentationFeaturesRGB * segConf )
+int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , unsigned int width , unsigned int height ,  struct SegmentationFeaturesRGB * segConf ,unsigned int selectedRGBCount )
 {
-  unsigned char * tmpRGB;
+  if (RGB==0) { fprintf(stderr,"Wrong RGB Array while @ executeSegmentationRGB\n"); return 0; }
+  if (selectedRGB==0) { fprintf(stderr,"Wrong selectedRGB Array while @ executeSegmentationRGB\n"); return 0; }
+  if (selectedRGBCount==width*height) { /*Immediate , selected all response , RGB buffer remains intact */ return 1; }
+
   unsigned char * ptrRGB = RGB;
   unsigned char * ptrRGBLimit = RGB + ( width * height * 3 );
   unsigned char * selectedPtr = selectedRGB;
@@ -22,37 +30,53 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
   { //We replace colors with something
     while (ptrRGB < ptrRGBLimit )
     {
-      tmpRGB=ptrRGB;
       if ( *selectedPtr!=0 )
          {
-            *tmpRGB=segConf->replaceR; ++tmpRGB;
-            *tmpRGB=segConf->replaceG; ++tmpRGB;
-            *tmpRGB=segConf->replaceB;
+            *ptrRGB=segConf->replaceR; ++ptrRGB;
+            *ptrRGB=segConf->replaceG; ++ptrRGB;
+            *ptrRGB=segConf->replaceB; ++ptrRGB;
          } else
          {
-            *tmpRGB=segConf->eraseColorR; ++tmpRGB;
-            *tmpRGB=segConf->eraseColorG; ++tmpRGB;
-            *tmpRGB=segConf->eraseColorB;
+            *ptrRGB=segConf->eraseColorR; ++ptrRGB;
+            *ptrRGB=segConf->eraseColorG; ++ptrRGB;
+            *ptrRGB=segConf->eraseColorB; ++ptrRGB;
          }
 
       ++selectedPtr;
-      ptrRGB+=3;
     }
   }  else
   {
-    while (ptrRGB < ptrRGBLimit )
-    {
-      if ( *selectedPtr==0 )
+    if (selectedRGBCount>width*height*2)
+    { //TODO COPY RGBA BYTE HERE
+      while (ptrRGB < ptrRGBLimit )
+      {
+        if (unlikely( *selectedPtr==0 ) )
          {
-            tmpRGB=ptrRGB;
-            *tmpRGB=segConf->eraseColorR; ++tmpRGB;
-            *tmpRGB=segConf->eraseColorG; ++tmpRGB;
-            *tmpRGB=segConf->eraseColorB;
+            *ptrRGB=segConf->eraseColorR; ++ptrRGB;
+            *ptrRGB=segConf->eraseColorG; ++ptrRGB;
+            *ptrRGB=segConf->eraseColorB; ++ptrRGB;
+            ptrRGB-=3;
+         }
+       ++selectedPtr;
+       ptrRGB+=3;
+     }
+    } else
+    {
+      while (ptrRGB < ptrRGBLimit )
+      {
+        if ( likely( *selectedPtr==0 ) )
+         {
+            *ptrRGB=segConf->eraseColorR; ++ptrRGB;
+            *ptrRGB=segConf->eraseColorG; ++ptrRGB;
+            *ptrRGB=segConf->eraseColorB; ++ptrRGB;
+            ptrRGB-=3;
          }
 
-      ++selectedPtr;
-      ptrRGB+=3;
+       ++selectedPtr;
+       ptrRGB+=3;
+     }
     }
+
   }
   return 1;
 }
@@ -63,22 +87,41 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
 
 
 
-int executeSegmentationDepth(unsigned short * Depth , unsigned char * selectedDepth , unsigned int width , unsigned int height )
+int executeSegmentationDepth(unsigned short * Depth , unsigned char * selectedDepth , unsigned int width , unsigned int height ,unsigned int selectedDepthCount)
 {
   if (Depth==0) { fprintf(stderr,"Wrong Depth Array while @ executeSegmentationDepth\n"); return 0; }
   if (selectedDepth==0) { fprintf(stderr,"Wrong selectedDepth Array while @ executeSegmentationDepth\n"); return 0; }
+  if (selectedDepthCount==width*height) { /*Immediate , selected all response , Depth buffer remains intact */ return 1; }
 
   unsigned short * ptrDepth = Depth;
   unsigned short * ptrDepthLimit = Depth + ( width * height );
   unsigned char * selectedPtr = selectedDepth;
 
 
-  while (ptrDepth < ptrDepthLimit )
-    {
-      if (*selectedPtr==0) { *ptrDepth = (unsigned short) 0 ; }
-                           // else  { *ptrDepth = (unsigned short) 40000 ; }
-      ++selectedPtr; ++ptrDepth;
-    }
+  if (selectedDepthCount>width*height*2)
+  { //We have more than half of the pixels selected so we assume selection is the default
+    while (ptrDepth < ptrDepthLimit )
+      {
+      //Erase non-selected depth pixels
+        if (unlikely(*selectedPtr==0))
+                 { *ptrDepth = (unsigned short) 0 ; }
+
+       ++selectedPtr;
+       ++ptrDepth;
+      }
+  } else
+  {
+    while (ptrDepth < ptrDepthLimit )
+      {
+      //Erase non-selected depth pixels
+        if (likely(*selectedPtr==0))
+                 { *ptrDepth = (unsigned short) 0 ; }
+
+       ++selectedPtr;
+       ++ptrDepth;
+      }
+  }
+
   return 1;
 }
 

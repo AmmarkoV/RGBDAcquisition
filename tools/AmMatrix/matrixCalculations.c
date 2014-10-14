@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "matrixTools.h"
 #include "matrix3x3Tools.h"
 #include "matrix4x4Tools.h"
 #include "solveLinearSystemGJ.h"
@@ -31,8 +32,10 @@ int convertRodriguezTo3x3(double * result,double * matrix)
    result[3]=x*y*(1 - cosTh) + z*sin(th);        result[4]=y*y*(1 - cosTh) + cosTh;          result[5]=y*z*(1 - cosTh) - x*sin(th);
    result[6]=x*z*(1 - cosTh) - y*sin(th);        result[7]=y*z*(1 - cosTh) + x*sin(th);      result[8]=z*z*(1 - cosTh) + cosTh;
 
-  fprintf(stderr,"rodriguez %f %f %f\n ",matrix[0],matrix[1],matrix[2]);
-  print3x3DMatrix("Rodriguez Initial", result);
+  #if PRINT_MATRIX_DEBUGGING
+   fprintf(stderr,"rodriguez %f %f %f\n ",matrix[0],matrix[1],matrix[2]);
+   print3x3DMatrix("Rodriguez Initial", result);
+  #endif // PRINT_MATRIX_DEBUGGING
 
   return 1;
 }
@@ -40,7 +43,10 @@ int convertRodriguezTo3x3(double * result,double * matrix)
 
 void changeYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
 {
-  fprintf(stderr,"Invert Y and Z axis\n");
+  #if PRINT_MATRIX_DEBUGGING
+   fprintf(stderr,"Invert Y and Z axis\n");
+  #endif // PRINT_MATRIX_DEBUGGING
+
   double * invertOp = (double * ) malloc ( sizeof(double) * 16 );
   if (invertOp==0) { return; }
 
@@ -82,7 +88,9 @@ int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, d
   double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
 
   //Our translation vector is ready to be used!
+  #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"translation %f %f %f\n ",translation[0],translation[1],translation[2]);
+  #endif // PRINT_MATRIX_DEBUGGING
 
   //Our rodriguez vector should be first converted to a 3x3 Rotation matrix
   convertRodriguezTo3x3((double*) matrix3x3Rotation , rodriguez);
@@ -130,7 +138,10 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
   double * matrix3x3Rotation = alloc4x4Matrix();    if (matrix3x3Rotation==0) { return 0; }
 
   //Our translation vector is ready to be used!
+  #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"translation %f %f %f\n ",translation[0],translation[1],translation[2]);
+  #endif // PRINT_MATRIX_DEBUGGING
+
 
   //Our rodriguez vector should be first converted to a 3x3 Rotation matrix
   convertRodriguezTo3x3((double*) matrix3x3Rotation , rodriguez);
@@ -155,9 +166,12 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
    m[8]=  rm[6];        m[9]= rm[7];        m[10]= rm[8];       m[11]=-Tz;
    m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
 
-  print4x4DMatrix("ModelView", result4x4);
 
-  fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
+  #if PRINT_MATRIX_DEBUGGING
+   print4x4DMatrix("ModelView", result4x4);
+   fprintf(stderr,"Matrix will be transposed to become OpenGL format ( i.e. column major )\n");
+  #endif // PRINT_MATRIX_DEBUGGING
+
   transpose4x4MatrixD(result4x4);
 
   free4x4Matrix(&matrix3x3Rotation);

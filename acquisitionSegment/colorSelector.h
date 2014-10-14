@@ -21,6 +21,7 @@
  * @param height , Height dimension of RGB frame
  * @param segConf , Criteria to use for segmentation of the RGB frame
  * @param calib , Calibration information for the specific image
+ * @param Output Value describing the number of pixels selected from this filter
  * @retval  Pointer to the a bitmap  that describes selected pixels (you shouldnt manually free it) , 0 = Failure
  * @bug   Pixel flood pre needs to be reconnected
  */
@@ -28,7 +29,8 @@ unsigned char * selectSegmentationForRGBFrame( unsigned char * source ,
                                                unsigned int width ,
                                                unsigned int height ,
                                                struct SegmentationFeaturesRGB * segConf,
-                                               struct calibration * calib
+                                               struct calibration * calib,
+                                               unsigned int * selectedPixels
                                              );
 
 #endif // COLORSELECTOR_H_INCLUDED

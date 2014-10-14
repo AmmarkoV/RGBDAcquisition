@@ -11,7 +11,7 @@
 #include "AcquisitionSegment.h"
 #include "../tools/Calibration/calibration.h"
 
-int removeDepthFloodFillBeforeProcessing(unsigned short * source , unsigned short * target , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf );
+int removeDepthFloodFillBeforeProcessing(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf );
 
 
 
@@ -31,7 +31,8 @@ unsigned char * selectSegmentationForDepthFrame(
                                                  unsigned int width ,
                                                  unsigned int height ,
                                                  struct SegmentationFeaturesDepth * segConf ,
-                                                 struct calibration * calib
+                                                 struct calibration * calib,
+                                                 unsigned int * selectedPixels
                                                 );
 
 #endif // DEPTHSELECTOR_H_INCLUDED

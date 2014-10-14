@@ -11,6 +11,15 @@
 #include "../AmMatrix/matrix4x4Tools.h"
 #include "../AmMatrix/matrixCalculations.h"
 
+
+#if __GNUC__
+#define likely(x)    __builtin_expect (!!(x), 1)
+#define unlikely(x)  __builtin_expect (!!(x), 0)
+#else
+ #define likely(x)   x
+ #define unlikely(x)   x
+#endif
+
 #define DEBUG_PRINT_EACH_CALIBRATION_LINE_READ 0
 
 #define DEFAULT_WIDTH 640
@@ -45,6 +54,8 @@ int forceUSLocaleToKeepOurSanity()
 
 int NullCalibration(unsigned int width,unsigned int height, struct calibration * calib)
 {
+  if (calib==0) { fprintf(stderr,"NullCalibration cannot empty a non allocated calibration structure \n"); return 0;  }
+
   calib->width=width;
   calib->height=height;
 
@@ -83,12 +94,14 @@ int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,
 {
   NullCalibration(width,height,calib);
 
+  fprintf(stderr,"FocalLengthAndPixelSizeToCalibration(focalLength=%0.2f,pixelSize=%0.2f,width=%u,height=%u) = ",focalLength,pixelSize,width,height);
+
   if (pixelSize!=0)
   {
    calib->intrinsic[CALIB_INTR_FX] = (double) focalLength/pixelSize;
    calib->intrinsic[CALIB_INTR_FY] = (double) focalLength/pixelSize;
    calib->intrinsicParametersSet=1;
-
+   fprintf(stderr,"fx : %0.2f fy : %0.2f \n",calib->intrinsic[CALIB_INTR_FX],calib->intrinsic[CALIB_INTR_FY]);
    return 1;
   }
 
@@ -404,15 +417,9 @@ int transform3DPointUsingExisting4x4Matrix(double * m , float * x , float * y , 
 int transform3DPointUsingCalibration(struct calibration * calib , float * x , float * y , float * z)
 {
  double * m = allocate4x4MatrixForPointTransformationBasedOnCalibration(calib);
-
- if (m==0)
- { fprintf(stderr,"Could not allocate4x4MatrixForPointTransformationBasedOnCalibration\n");
-
- } else
+ if (likely(m!=0))
  {
-
   transform3DPointUsingExisting4x4Matrix(m ,x,y,z);
-
   free4x4Matrix(&m); // This is the same as free(m); m=0;
   return 1;
  } //End of M allocated!
@@ -422,23 +429,30 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
 
 int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int x2d , unsigned int y2d  , unsigned short depthValue , float * x , float * y , float * z)
 {
-    if ( (calib->intrinsic[CALIB_INTR_FX]==0) || (calib->intrinsic[CALIB_INTR_FY]==0) )
+    if (unlikely(calib==0) )
+    {
+      fprintf(stderr,"Cannot transform2DProjectedPointTo3DPoint without a calibration \n ");
+      return 0;
+    } else
+    if (unlikely( (calib->intrinsic[CALIB_INTR_FX]==0) || (calib->intrinsic[CALIB_INTR_FY]==0) ) )
     {
       fprintf(stderr,"Focal Length is 0.0 , cannot transform2DProjectedPointTo3DPoint \n ");
       return 0;
+    } else
+    {
+
+     /*
+     fprintf(stderr,"Cx,Cy (%0.2f,%0.2f) , Fx,Fy (%0.2f,%0.2f) \n ",calib->intrinsic[CALIB_INTR_CX],
+                                                                    calib->intrinsic[CALIB_INTR_CY],
+                                                                    calib->intrinsic[CALIB_INTR_FX],
+                                                                    calib->intrinsic[CALIB_INTR_FY]);*/
+
+      *x = (float) (x2d - calib->intrinsic[CALIB_INTR_CX]) * (depthValue / calib->intrinsic[CALIB_INTR_FX]);
+      *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
+      *z = (float) depthValue;
+     return 1;
     }
 
-   /*
-    fprintf(stderr,"Cx,Cy (%0.2f,%0.2f) , Fx,Fy (%0.2f,%0.2f) \n ",calib->intrinsic[CALIB_INTR_CX],
-                                                                   calib->intrinsic[CALIB_INTR_CY],
-                                                                   calib->intrinsic[CALIB_INTR_FX],
-                                                                   calib->intrinsic[CALIB_INTR_FY]);*/
-
-    *x = (float) (x2d - calib->intrinsic[CALIB_INTR_CX]) * (depthValue / calib->intrinsic[CALIB_INTR_FX]);
-    *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
-    *z = (float) depthValue;
-
-    return 1;
 }
 
 

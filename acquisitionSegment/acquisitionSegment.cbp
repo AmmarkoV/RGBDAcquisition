@@ -12,11 +12,12 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
 				<Option compiler="gcc" />
-				<Option parameters="-module TEMPLATE -from floor -to floorSegmented -maxFrames 1 -autoplane -calibration color.calib " />
+				<Option parameters="-module TEMPLATE -from floor -to /dev/null -maxFrames 500 -autoplane -calibration color.calib " />
 				<Option host_application="../redist/GrabberSegment" />
 				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-O3" />
 					<Add option="-pg" />
 					<Add option="-g" />
 				</Compiler>
@@ -32,7 +33,8 @@
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Compiler>
-					<Add option="-O2" />
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-O3" />
 					<Add option="-fPIC" />
 				</Compiler>
 				<Linker>
@@ -63,6 +65,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../tools/AmMatrix/matrixCalculations.h" />
+		<Unit filename="../tools/AmMatrix/matrixTools.h" />
 		<Unit filename="../tools/AmMatrix/ocvStaging.c">
 			<Option compilerVar="CC" />
 		</Unit>

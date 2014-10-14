@@ -5,6 +5,15 @@
 #include <stdlib.h>
 
 
+#if __GNUC__
+#define likely(x)    __builtin_expect (!!(x), 1)
+#define unlikely(x)  __builtin_expect (!!(x), 0)
+#else
+ #define likely(x)   x
+ #define unlikely(x)   x
+#endif
+
+
 static unsigned int simplePow(unsigned int base,unsigned int exp)
 {
     if (exp==0) return 1;
@@ -95,7 +104,7 @@ int mux2RGBAndDepthFramesColorNonTrans( unsigned char * rgbBase, unsigned char *
    unsigned char *gOverlay;
    unsigned char *bOverlay;
 
-
+   #warning "MUXer needs work on performance.."
    while (rgb_pOut<rgb_pOut_limit)
     {
         rOverlay = rgb_pOverlay++;

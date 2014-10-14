@@ -36,40 +36,46 @@ void free3x3Matrix(double ** mat)
 
 void print3x3FMatrix(char * str , float * matrix3x3)
 {
+  #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "  3x3 float %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
   fprintf( stderr, "%f ",matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f\n",matrix3x3[2]);
   fprintf( stderr, "%f ",matrix3x3[3]);  fprintf( stderr, "%f ",matrix3x3[4]);  fprintf( stderr, "%f\n",matrix3x3[5]);
   fprintf( stderr, "%f ",matrix3x3[6]);  fprintf( stderr, "%f ",matrix3x3[7]);  fprintf( stderr, "%f\n",matrix3x3[8]);
   fprintf( stderr, "--------------------------------------\n");
+  #endif // PRINT_MATRIX_DEBUGGING
 }
 
 void print3x3DMatrix(char * str , double * matrix3x3)
 {
+  #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "  3x3 double %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
   fprintf( stderr, "%f ",matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f\n",matrix3x3[2]);
   fprintf( stderr, "%f ",matrix3x3[3]);  fprintf( stderr, "%f ",matrix3x3[4]);  fprintf( stderr, "%f\n",matrix3x3[5]);
   fprintf( stderr, "%f ",matrix3x3[6]);  fprintf( stderr, "%f ",matrix3x3[7]);  fprintf( stderr, "%f\n",matrix3x3[8]);
   fprintf( stderr, "--------------------------------------\n");
+  #endif // PRINT_MATRIX_DEBUGGING
 }
 
 
 
 void print3x3DMathematicaMatrix(char * str , double * matrix3x3)
 {
+  #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "%s = { { %f ,",str,matrix3x3[0]);  fprintf( stderr, "%f ,",matrix3x3[1]);  fprintf( stderr, "%f } , ",matrix3x3[2]);
   fprintf( stderr, "{ %f ,",matrix3x3[3]);  fprintf( stderr, "%f ,",matrix3x3[4]);  fprintf( stderr, "%f } , ",matrix3x3[5]);
   fprintf( stderr, "{ %f ,",matrix3x3[6]);  fprintf( stderr, "%f ,",matrix3x3[7]);  fprintf( stderr, "%f } }\n\n",matrix3x3[8]);
-
+  #endif // PRINT_MATRIX_DEBUGGING
 }
 
 void print3x3DScilabMatrix(char * str , double * matrix3x3)
 {
+  #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "%s = [ %f ",str,matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f ; ",matrix3x3[2]);
   fprintf( stderr, "%f ",matrix3x3[3]);  fprintf( stderr, "%f ",matrix3x3[4]);  fprintf( stderr, "%f ; ",matrix3x3[5]);
   fprintf( stderr, "%f ",matrix3x3[6]);  fprintf( stderr, "%f ",matrix3x3[7]);  fprintf( stderr, "%f ]\n\n",matrix3x3[8]);
-
+  #endif // PRINT_MATRIX_DEBUGGING
 }
 
 

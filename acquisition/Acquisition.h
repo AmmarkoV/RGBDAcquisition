@@ -34,8 +34,11 @@ extern "C"
 {
 #endif
 
-
-#include "../tools/Calibration/calibration.h"
+#if ALL_HEADERS_IN_SAME_DIR
+  #include "calibration.h"
+#else
+  #include "../tools/Calibration/calibration.h"
+#endif // ALL_FILES_IN_SAME_DIR
 
 
 

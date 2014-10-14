@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "matrixTools.h"
 #include "matrix3x3Tools.h"
 #include "matrix4x4Tools.h"
 
@@ -33,7 +34,9 @@ double distanceBetween2DPoints(double *x1,double *y1, double *x2, double *y2 )
 
   double output = (double) sqrt_fast_approximationAgain( (dx * dx) + (dy * dy)  );
 
-  fprintf(stderr,"Comparing Point ( %0.2f , %0.2f ) with ( %0.2f , %0.2f ) = error %0.2f \n",*x1,*y1,*x2,*y2,output);
+  #if PRINT_MATRIX_DEBUGGING
+   fprintf(stderr,"Comparing Point ( %0.2f , %0.2f ) with ( %0.2f , %0.2f ) = error %0.2f \n",*x1,*y1,*x2,*y2,output);
+  #endif // PRINT_MATRIX_DEBUGGING
 
 
   return output;

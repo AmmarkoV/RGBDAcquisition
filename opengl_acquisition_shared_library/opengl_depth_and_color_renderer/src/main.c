@@ -36,7 +36,7 @@
 int doTest()
 {
     testMatrices();
-    return ;
+    return 1;
 }
 
 

@@ -300,7 +300,7 @@ int snapTemplateFrames(int devID)
   if ( device[devID].safeGUARD != SAFEGUARD_VALUE ) { fprintf(stderr,"\n\n\n\nERROR , memory corruption \n\n\n\n"); }
 
   if (device[devID].cycle>65534) { device[devID].cycle=0; }
-  if (found_frames==0) { fprintf(stderr,YELLOW "Could not find any frames , we finished stream \n" NORMAL);  device[devID].cycle = 0; } else
+  if (found_frames==0) { /*fprintf(stderr,YELLOW "Finished stream \n" NORMAL);*/  device[devID].cycle = 0; } else
   if (found_frames!=2) { fprintf(stderr,YELLOW "\n Warning: Did not find both frames\n" NORMAL);   }
 
   return 1;
