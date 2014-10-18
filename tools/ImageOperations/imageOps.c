@@ -16,6 +16,25 @@
 #define MAX3(A,B,C)     (MAX2(MAX2((A),(B)),(C)))
 
 
+//TODO : http://www.compuphase.com/graphic/scale.htm#KIENTZLE2
+/*
+
+unsigned long InterleavedValue(RGB colour)
+{
+  static unsigned long InterleaveTable[256] =
+    { 0x00000000, 0x00000001, 0x00000008, 0x00000009,
+      0x00000040, 0x00000041, 0x00000048, 0x00000049,
+      0x00000200, 0x00000201, 0x00000208, 0x00000209,
+      0x00000240, 0x00000241, 0x00000248, 0x00000249,
+      // etc. etc.
+    };
+
+  return (InterleaveTable[colour.g] << 2) |
+         (InterleaveTable[colour.r] << 1) |
+          InterleaveTable[colour.b];
+}
+*/
+
 unsigned short getDepthValueAtXY(unsigned short * depthFrame ,unsigned int width , unsigned int height ,unsigned int x2d, unsigned int y2d )
 {
     if (depthFrame == 0 ) {  return 0; }
