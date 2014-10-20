@@ -24,6 +24,39 @@ fi
 
 BINARIES_THAT_NEED_LIBS="`../scripts/binariesThatNeedLibs.sh`"
 
+if [ -d libfreenect2 ]
+then
+echo "Freenect appears to already exist .."
+else
+  echo "Do you want to download freenect 2 ( kinect 2 support ) ? " 
+  echo
+  echo -n " (Y/N)?"
+  read answer
+  if test "$answer" != "N" -a "$answer" != "n";
+  then
+     git clone git://github.com/OpenKinect/libfreenect2.git
+     cd libfreenect2
+     sudo depends/install_ubuntu.sh
+     cd examples/protonect
+     cmake .
+     make
+     cd ../../../
+
+     #should be at 3dparty dir
+     cd 3dparty   
+  fi
+fi
+
+
+
+
+
+
+
+
+
+
+
 if [ -d libfreenect ]
 then
 echo "Freenect appears to already exist .."
@@ -65,6 +98,15 @@ else
   
   fi
 fi
+
+
+
+
+
+
+
+
+
 
 
 #wget http://www.openni.org/wp-content/uploads/2012/12/OpenNI-Bin-Dev-Linux-Arm-v1.5.4.0.tar.zip

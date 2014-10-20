@@ -79,8 +79,9 @@ char DepthwindowName[250]={0};
 int calibrationSet = 0;
 struct calibration calib;
 
+#define UNINITIALIZED_DEVICE 66666
   unsigned int devID=0;
-  unsigned int devID2=66666;
+  unsigned int devID2=UNINITIALIZED_DEVICE;
   ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
 
@@ -122,7 +123,7 @@ void closeEverything()
  /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
  acquisitionCloseDevice(moduleID,devID);
 
- if (devID2!=66666)
+ if (devID2!=UNINITIALIZED_DEVICE)
         {
           acquisitionCloseDevice(moduleID,devID2);
         }
@@ -359,7 +360,7 @@ int main(int argc, char *argv[])
                                                              { acquisitionMapDepthToRGB(moduleID,devID);  }
         fprintf(stderr,"Done with Mapping Depth/RGB \n");
 
-        if (devID2!=66666)
+        if (devID2!=UNINITIALIZED_DEVICE)
         {
           acquisitionOpenDevice(moduleID,devID2,devName,width,height,framerate);
         }
@@ -383,7 +384,7 @@ int main(int argc, char *argv[])
 
         acquisitionDisplayFrames(moduleID,devID,framerate);
 
-       if (devID2!=66666)
+       if (devID2!=UNINITIALIZED_DEVICE)
         {
           acquisitionSnapFrames(moduleID,devID2);
           acquisitionDisplayFrames(moduleID,devID2,framerate);
