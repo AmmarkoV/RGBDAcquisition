@@ -457,8 +457,29 @@ int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int
 
 
 
+unsigned char *  registerColorToDepthFrame(
+                                           unsigned char * rgb , unsigned int rgbWidth , unsigned int rgbHeight , struct calibration * rgbCalibration ,
+                                           unsigned short * depth , unsigned int depthWidth , unsigned int depthHeight , struct calibration * depthCalibration ,
+                                           double * trasformation4x4Matrix ,
+                                           unsigned int * outputWidth , unsigned int * outputHeight
+                                          )
+{
+  fprintf(stderr,"registerColorToDepthFrame is not implemented\n");
+  return 0;
+}
 
 
 
+
+unsigned short *  registerDepthToColorFrame(
+                                           unsigned char * rgb , unsigned int rgbWidth , unsigned int rgbHeight , struct calibration * rgbCalibration ,
+                                           unsigned short * depth , unsigned int depthWidth , unsigned int depthHeight , struct calibration * depthCalibration ,
+                                           double * trasformation4x4Matrix ,
+                                           unsigned int * outputWidth , unsigned int * outputHeight
+                                          )
+{
+  fprintf(stderr,"registerDepthToColorFrame is not implemented\n");
+  return 0;
+}
 
 
