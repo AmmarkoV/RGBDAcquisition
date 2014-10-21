@@ -9,6 +9,7 @@ set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizatio
 OPTION (ENABLE_AMMARSERVER_BROADCAST ON)
 OPTION (ENABLE_FACEDETECTION_DEV OFF)
 OPTION (ENABLE_FREENECT ON)
+OPTION (ENABLE_FREENECT2 ON)
 OPTION (ENABLE_TEMPLATE ON)
 OPTION (ENABLE_V4L2 ON)
 OPTION (ENABLE_OPENNI1 OFF)
@@ -64,6 +65,10 @@ ENDIF( ENABLE_NETWORK )
 IF( ENABLE_FREENECT )
   add_subdirectory (libfreenect_acquisition_shared_library/)
 ENDIF( ENABLE_FREENECT )
+
+IF( ENABLE_FREENECT2 )
+  add_subdirectory (libfreenect2_acquisition_shared_library/)
+ENDIF( ENABLE_FREENECT2 )
 
 IF( ENABLE_OPENNI1 )
   add_subdirectory (openni1_acquisition_shared_library/)
