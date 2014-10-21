@@ -13,6 +13,77 @@
 int rgb_mode[MAX_DEVS]={FREENECT_VIDEO_RGB};
 int depth_mode[MAX_DEVS]={FREENECT_DEPTH_11BIT};
 
+
+
+int convertAndSave(unsigned int framesRecorded , libfreenect2::Frame *  rgb ,  libfreenect2::Frame *  ir , libfreenect2::Frame * depth)
+{
+    //--------------------------------------------------------------------------
+    cv::Mat rgbMat(rgb->height, rgb->width, CV_8UC3, rgb->data);
+
+    cv::Mat depthMat(depth->height, depth->width, CV_32FC1, depth->data) ;
+    cv::Mat depthMatR = depthMat / 4500.0f;
+    //--------------------------------------------------------------------------
+
+
+    #if USE_REAL_COLOR
+     unsigned int dW = depth->width-1;
+     unsigned int dH = (rgb->height / 3 ) -1;
+
+     cv::Mat rgbMatAligned(rgb->height / 3 , rgb->width / 3 , CV_8UC3);
+     cv::resize(rgbMat, rgbMatAligned, rgbMatAligned.size(), 0.5, 0.5, cv::INTER_LINEAR );
+
+    cv::Mat rgbMatAlignedOk(dH, dW , CV_8UC3);
+    //---------
+    //where image starts
+
+    cv::Rect roi( (rgb->width/3 - depth->width)/2 , 0 ,    dW , dH  );
+    cv::Mat image_roi = rgbMatAligned(roi);
+    image_roi.copyTo(rgbMatAlignedOk);
+
+
+    //cv::imshow("rgbAligned",rgbMatAligned);
+    //cv::imshow("rgbAlignedOk",rgbMatAlignedOk);
+    #else
+    cv::Mat irMat(ir->height, ir->width, CV_32FC1, ir->data);
+    cv::Mat irMatR = irMat / 20000.0f;
+
+    cv::Mat irMatUC(ir->height, ir->width, CV_8UC1);
+    irMatR.convertTo(irMatUC, CV_8UC1, 255, 0);
+    cv::Mat irRGBMat(ir->height, ir->width, CV_8UC3);
+
+    cvtColor(irMatUC, irRGBMat, CV_GRAY2RGB);
+    #endif // USE_REAL_COLOR
+
+
+    cv::Mat depthMatUS(depth->height, depth->width,  CV_32FC1) ;
+    depthMatR.convertTo(depthMatUS, CV_16UC1, 4500, 0);
+    cv::imshow("depth", depthMatR);
+
+    char filename[FILENAME_MAX]={0};
+    // Write File down ---------------------------------------------------
+
+
+    #if USE_REAL_COLOR
+    snprintf(filename,FILENAME_MAX,"frames/kinect2/colorFrameBig_0_%05u.png",framesRecorded);
+    cv::imwrite(filename,rgbMatAligned);
+
+    snprintf(filename,FILENAME_MAX,"frames/kinect2/colorFrame_0_%05u.png",framesRecorded);
+    cv::imwrite(filename,rgbMatAlignedOk);
+    #else
+     snprintf(filename,FILENAME_MAX,"frames/kinect2/colorFrame_0_%05u.png",framesRecorded);
+     cv::imwrite(filename,irRGBMat);
+    #endif
+
+
+
+    snprintf(filename,FILENAME_MAX,"frames/kinect2/depthFrame_0_%05u.png",framesRecorded);
+    cv::imwrite(filename,depthMatUS);
+    // -------------------------------------------------------------------
+
+  return 1;
+}
+
+
 int startFreenect2Module(unsigned int max_devs,char * settings)
 {
   uint32_t ts;
