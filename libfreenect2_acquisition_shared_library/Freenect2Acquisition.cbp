@@ -38,8 +38,9 @@
 			<Add option="-fPIC" />
 		</Compiler>
 		<Linker>
-			<Add library="../tools/Calibration/libCalibrationLibrary.a" />
-			<Add library="../tools/OperatingSystem/libOperatingSystem.a" />
+			<Add option="`../scripts/get3dpartyDepencency.sh freenect`" />
+			<Add library="../3dparty/libfreenect2/examples/protonect/lib/libglfw.so" />
+			<Add library="../3dparty/libfreenect2/examples/protonect/lib/libfreenect2.a" />
 		</Linker>
 		<Unit filename="Freenect2Acquisition.cpp" />
 		<Unit filename="Freenect2Acquisition.h" />
