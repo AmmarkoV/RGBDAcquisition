@@ -71,6 +71,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="calibration.h" />
+		<Unit filename="transform.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="transform.h" />
+		<Unit filename="undistort.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="undistort.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

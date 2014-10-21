@@ -4,7 +4,7 @@
 
 int testUndistort()
 {
-
+ return 0;
 }
 
 
