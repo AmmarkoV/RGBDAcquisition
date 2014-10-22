@@ -645,11 +645,17 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
   fd_rx2=fd_rx1 + default_feed->GetWidth();
   fd_ry2=fd_ry1 + default_feed->GetHeight();
 
+  unsigned int unscaledImageWidth , unscaledImageHeight , unscaledImageChannels , unscaledImageBitsPerPixel;
+  acquisitionGetColorFrameDimensions(moduleID,devID,&unscaledImageWidth ,&unscaledImageHeight ,&unscaledImageChannels ,&unscaledImageBitsPerPixel);
+
+  float upscaleRatioWidth  = (float) unscaledImageWidth / default_feed->GetWidth();
+  float upscaleRatioHeight = (float) unscaledImageHeight / default_feed->GetHeight();
+
   if ( XYOverRect(x,y,feed_0_x,feed_0_y,feed_0_x+default_feed->GetWidth(),feed_0_y+default_feed->GetHeight()) )
        {
 
-         mouse_x=x;
-         mouse_y=y;
+         mouse_x=(unsigned int) ((x-feed_0_x) * upscaleRatioWidth );
+         mouse_y=(unsigned int) ((y-feed_0_y) * upscaleRatioHeight );
 
          if ( event.LeftIsDown()==1 )
            {
@@ -704,13 +710,13 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 
   if ( XYOverRect(x,y,feed_1_x,feed_1_y,feed_1_x+default_feed->GetWidth(),feed_1_y+default_feed->GetHeight()) )
        {
-         mouse_x=x;
-         mouse_y=y;
+         mouse_x=(unsigned int) ((x-feed_1_x) * upscaleRatioWidth );
+         mouse_y=(unsigned int) ((y-feed_1_y) * upscaleRatioHeight );
 
          if ( event.LeftIsDown()==1 )
            {
              unsigned int checkWidth=40 , checkHeight=40;
-             unsigned int sX=x-feed_1_x,sY=y-feed_1_y;
+             unsigned int sX=mouse_x,sY=mouse_y;
 
              float centerX , centerY , centerZ;
              unsigned int width , height , channels , bitsperpixel;
