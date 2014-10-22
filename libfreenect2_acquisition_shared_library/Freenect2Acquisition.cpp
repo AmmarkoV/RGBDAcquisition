@@ -14,14 +14,13 @@ int rgb_mode[MAX_DEVS]={FREENECT_VIDEO_RGB};
 int depth_mode[MAX_DEVS]={FREENECT_DEPTH_11BIT};
 
 
-
 int convertAndSave(unsigned int framesRecorded , libfreenect2::Frame *  rgb ,  libfreenect2::Frame *  ir , libfreenect2::Frame * depth)
 {
     //--------------------------------------------------------------------------
     cv::Mat rgbMat(rgb->height, rgb->width, CV_8UC3, rgb->data);
 
     cv::Mat depthMat(depth->height, depth->width, CV_32FC1, depth->data) ;
-    cv::Mat depthMatR = depthMat / 4500.0f;
+    //cv::Mat depthMatR = depthMat / 4500.0f;
     //--------------------------------------------------------------------------
 
 
@@ -48,16 +47,18 @@ int convertAndSave(unsigned int framesRecorded , libfreenect2::Frame *  rgb ,  l
     cv::Mat irMatR = irMat / 20000.0f;
 
     cv::Mat irMatUC(ir->height, ir->width, CV_8UC1);
-    irMatR.convertTo(irMatUC, CV_8UC1, 255, 0);
+    irMatR.convertTo(irMatUC, CV_8UC1, 254, 0);
     cv::Mat irRGBMat(ir->height, ir->width, CV_8UC3);
 
     cvtColor(irMatUC, irRGBMat, CV_GRAY2RGB);
+    cv::imshow("ir", irRGBMat);
     #endif // USE_REAL_COLOR
 
 
     cv::Mat depthMatUS(depth->height, depth->width,  CV_32FC1) ;
-    depthMatR.convertTo(depthMatUS, CV_16UC1, 4500, 0);
-    cv::imshow("depth", depthMatR);
+    //depthMatR.convertTo(depthMatUS, CV_16UC1, 4500, 0);
+    depthMat.convertTo(depthMatUS, CV_16UC1);
+    //cv::imshow("depth", depthMatR);
 
     char filename[FILENAME_MAX]={0};
     // Write File down ---------------------------------------------------

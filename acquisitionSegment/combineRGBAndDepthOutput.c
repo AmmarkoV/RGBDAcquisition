@@ -16,12 +16,20 @@
 
 
 
-int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , unsigned int width , unsigned int height ,  struct SegmentationFeaturesRGB * segConf ,unsigned int selectedRGBCount )
+int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , unsigned int width , unsigned int height ,  struct SegmentationFeaturesRGB * segConf ,unsigned int selectedRGBCount , unsigned int combinationMode)
 {
   if (RGB==0) { fprintf(stderr,"Wrong RGB Array while @ executeSegmentationRGB\n"); return 0; }
   if (selectedRGB==0) { fprintf(stderr,"Wrong selectedRGB Array while @ executeSegmentationRGB\n"); return 0; }
-  if (selectedRGBCount==width*height) { /*Immediate , selected all response , RGB buffer remains intact */ return 1; }
 
+
+  if (
+       (combinationMode==DONT_COMBINE) ||
+       (combinationMode==COMBINE_KEEP_ONLY_RGB)
+     )
+  {
+  if (selectedRGBCount==width*height)
+        { /*Immediate , selected all response , RGB buffer remains intact */ return 1; }
+  }
   unsigned char * ptrRGB = RGB;
   unsigned char * ptrRGBLimit = RGB + ( width * height * 3 );
   unsigned char * selectedPtr = selectedRGB;
@@ -87,11 +95,20 @@ int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , u
 
 
 
-int executeSegmentationDepth(unsigned short * Depth , unsigned char * selectedDepth , unsigned int width , unsigned int height ,unsigned int selectedDepthCount)
+int executeSegmentationDepth(unsigned short * Depth , unsigned char * selectedDepth , unsigned int width , unsigned int height ,unsigned int selectedDepthCount  , unsigned int combinationMode)
 {
   if (Depth==0) { fprintf(stderr,"Wrong Depth Array while @ executeSegmentationDepth\n"); return 0; }
   if (selectedDepth==0) { fprintf(stderr,"Wrong selectedDepth Array while @ executeSegmentationDepth\n"); return 0; }
-  if (selectedDepthCount==width*height) { /*Immediate , selected all response , Depth buffer remains intact */ return 1; }
+
+
+
+  if (
+       (combinationMode==DONT_COMBINE) ||
+       (combinationMode==COMBINE_KEEP_ONLY_DEPTH)
+     )
+  {
+   if (selectedDepthCount==width*height) { /*Immediate , selected all response , Depth buffer remains intact */ return 1; }
+  }
 
   unsigned short * ptrDepth = Depth;
   unsigned short * ptrDepthLimit = Depth + ( width * height );
@@ -155,7 +172,8 @@ unsigned char * combineRGBAndDepthToOutput( unsigned char * selectedRGB , unsign
     case COMBINE_AND :
       while (ptrRGB < ptrRGBLimit )
         {
-          if ( (*ptrRGB!=0)&&(*ptrDepth!=0) ) {  *ptrResult=1;  }
+          *ptrResult=((*ptrRGB!=0)&&(*ptrDepth!=0));
+          //OLD requires jmp: if ( (*ptrRGB!=0)&&(*ptrDepth!=0) ) {  *ptrResult=1;  }
           ++ptrRGB; ++ptrDepth; ++ptrResult;
         }
     break;
@@ -163,7 +181,8 @@ unsigned char * combineRGBAndDepthToOutput( unsigned char * selectedRGB , unsign
     case COMBINE_OR :
       while (ptrRGB < ptrRGBLimit )
         {
-          if ( (*ptrRGB!=0)||(*ptrDepth!=0) ) {  *ptrResult=1;  }
+          *ptrResult=((*ptrRGB!=0)||(*ptrDepth!=0));
+          //OLD requires jmp: if ( (*ptrRGB!=0)||(*ptrDepth!=0) ) {  *ptrResult=1;  }
           ++ptrRGB; ++ptrDepth; ++ptrResult;
         }
     break;
@@ -171,7 +190,8 @@ unsigned char * combineRGBAndDepthToOutput( unsigned char * selectedRGB , unsign
     case COMBINE_XOR :
       while (ptrRGB < ptrRGBLimit )
         {
-          if ( (*ptrRGB!=0)^(*ptrDepth!=0) ) {  *ptrResult=1;  }
+          *ptrResult=((*ptrRGB!=0)^(*ptrDepth!=0));
+          //OLD requires jmp: if ( (*ptrRGB!=0)^(*ptrDepth!=0) ) {  *ptrResult=1;  }
           ++ptrRGB; ++ptrDepth; ++ptrResult;
         }
     break;

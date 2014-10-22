@@ -101,26 +101,26 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
   {
      //If we dont want to combine them we just execute the selection and RGB will
      //now have the segmented output frame
-     executeSegmentationRGB(RGB,selectedRGB,width,height,segConfRGB,selectedRGBCount);
+     executeSegmentationRGB(RGB,selectedRGB,width,height,segConfRGB,selectedRGBCount,combinationMode);
      //The same goes for Depth
-     executeSegmentationDepth(Depth,selectedDepth,width,height,selectedDepthCount);
+     executeSegmentationDepth(Depth,selectedDepth,width,height,selectedDepthCount,combinationMode);
   } else
   if (combinationMode == COMBINE_RGBFULL_DEPTH_USE_RGB )
   {
     //RGB frame is unaffected , Depth Frame uses RGB Segmentation
-    executeSegmentationDepth(Depth,selectedRGB,width,height,selectedDepthCount);
+    executeSegmentationDepth(Depth,selectedRGB,width,height,selectedDepthCount,combinationMode);
   } else
   if (combinationMode == COMBINE_DEPTHFULL_RGB_USE_DEPTH )
   {
     //Depth frame is unaffected ,  RGB Frame uses DepthSegmentation
-     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB,selectedRGBCount);
+     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB,selectedRGBCount,combinationMode);
   } else
   if (combinationMode == COMBINE_SWAP )
   {
      //If we want to swap RGB and Depth  we just swap it
-     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB,selectedRGBCount);
+     executeSegmentationRGB(RGB,selectedDepth,width,height,segConfRGB,selectedRGBCount,combinationMode);
      //The same goes for Depth
-     executeSegmentationDepth(Depth,selectedRGB,width,height,selectedDepthCount);
+     executeSegmentationDepth(Depth,selectedRGB,width,height,selectedDepthCount,combinationMode);
   } else
   {
      //If we do want to combine the selections "Together" , and there are many ways to do that using
@@ -133,8 +133,8 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
      } else
      {
       //We use the combinedSelection for both RGB and Depth
-      executeSegmentationRGB(RGB,combinedSelection,width,height,segConfRGB,selectedRGBCount);
-      executeSegmentationDepth(Depth,combinedSelection,width,height,selectedDepthCount);
+      executeSegmentationRGB(RGB,combinedSelection,width,height,segConfRGB,selectedRGBCount,combinationMode);
+      executeSegmentationDepth(Depth,combinedSelection,width,height,selectedDepthCount,combinationMode);
 
       //And we dont forget to free our memory
       if (combinedSelection!=0) { free(combinedSelection); combinedSelection=0; }
