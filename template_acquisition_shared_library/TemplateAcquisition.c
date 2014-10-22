@@ -46,8 +46,12 @@ struct TemplateVirtualDevice
  unsigned int safeGUARD;
 
 
- unsigned int templateWIDTH;
- unsigned int templateHEIGHT;
+ unsigned int templateColorWidth;
+ unsigned int templateColorHeight;
+
+ unsigned int templateDepthWidth;
+ unsigned int templateDepthHeight;
+
  unsigned long lastColorTimestamp;
  unsigned char * templateColorFrame;
  unsigned long lastDepthTimestamp;
@@ -119,8 +123,11 @@ int startTemplateModule(unsigned int max_devs,char * settings)
     for (devID=0; devID<MAX_TEMPLATE_DEVICES; devID++)
     {
         //fprintf(stderr,"Zeroing device %u\n",devID);
-        device[devID].templateWIDTH = 640;
-        device[devID].templateHEIGHT = 480;
+        device[devID].templateColorWidth = 640;
+        device[devID].templateColorHeight = 480;
+
+        device[devID].templateDepthWidth = 640;
+        device[devID].templateDepthHeight = 480;
 
         device[devID].readFromDir[0]=0; // <- this sucks i know :P
         strncpy(device[devID].extension,"pnm",MAX_EXTENSION_PATH);
@@ -169,14 +176,11 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 {
  device[devID].cycle=0;
  device[devID].totalFrames=0;
- device[devID].templateWIDTH=0;
- device[devID].templateHEIGHT=0;
+ device[devID].templateColorWidth=width;
+ device[devID].templateColorHeight=height;
+ device[devID].templateDepthWidth=width;
+ device[devID].templateDepthHeight=height;
 
-  if ( ( device[devID].templateWIDTH < width ) &&  ( device[devID].templateHEIGHT < height ) )
-   {
-        device[devID].templateHEIGHT=height;
-        device[devID].templateWIDTH=width;
-   }
 
    if (devName==0) { strcpy(device[devID].readFromDir,""); } else
      {
@@ -195,34 +199,45 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 ,device[devID].readFromDir,device[devID].extension);
   unsigned char * tmpColor = ReadImageFile(0,file_name_test,device[devID].extension,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
-       { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
+    {
+      fprintf(stderr,YELLOW "Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n" NORMAL,file_name_test,widthInternal,heightInternal,width,height);
+      device[devID].templateColorWidth=widthInternal;
+      device[devID].templateColorHeight=heightInternal;
+    }
+
 
   if (tmpColor!=0) { device[devID].templateColorFrame=tmpColor; } else
   {
    ++failedStream;
    // if templateColorFrame is zero the next function behaves like a malloc
-   device[devID].templateColorFrame= (unsigned char*) realloc(device[devID].templateColorFrame,device[devID].templateWIDTH*device[devID].templateHEIGHT*3*sizeof(char));
-   makeFrameNoInput(device[devID].templateColorFrame,device[devID].templateWIDTH,device[devID].templateHEIGHT,3);
+   device[devID].templateColorFrame= (unsigned char*) realloc(device[devID].templateColorFrame,device[devID].templateColorWidth*device[devID].templateColorHeight*3*sizeof(char));
+   makeFrameNoInput(device[devID].templateColorFrame,device[devID].templateColorWidth,device[devID].templateColorHeight,3);
   }
 
 
   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID ,0,device[devID].readFromDir,device[devID].extension);
   unsigned short * tmpDepth = (unsigned short *) ReadImageFile(0,file_name_test,device[devID].extension,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )
-   { fprintf(stderr,"Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n",file_name_test,widthInternal,heightInternal,width,height); }
+   {
+    fprintf(stderr,YELLOW "Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n" NORMAL,file_name_test,widthInternal,heightInternal,width,height);
+      device[devID].templateDepthWidth=widthInternal;
+      device[devID].templateDepthHeight=heightInternal;
+   }
+
+
 
   if (tmpDepth!=0) { device[devID].templateDepthFrame=tmpDepth; } else
   {
    ++failedStream;
    // if templateDepthFrame is zero the next function behaves like a malloc
-   device[devID].templateDepthFrame= (unsigned short*) realloc(device[devID].templateDepthFrame,device[devID].templateWIDTH*device[devID].templateHEIGHT*1*sizeof(unsigned short));
+   device[devID].templateDepthFrame= (unsigned short*) realloc(device[devID].templateDepthFrame,device[devID].templateDepthWidth*device[devID].templateDepthHeight*1*sizeof(unsigned short));
   }
 
-  NullCalibration(device[devID].templateWIDTH,device[devID].templateHEIGHT,&device[devID].calibRGB);
+  NullCalibration(device[devID].templateColorWidth,device[devID].templateColorHeight,&device[devID].calibRGB);
   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibRGB) ) { fprintf(stderr,"Could not read color calibration\n"); }
 
-  NullCalibration(device[devID].templateWIDTH,device[devID].templateHEIGHT,&device[devID].calibDepth);
+  NullCalibration(device[devID].templateDepthWidth,device[devID].templateDepthHeight,&device[devID].calibDepth);
   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
 
@@ -324,9 +339,9 @@ int seekTemplateFrame(int devID,unsigned int seekFrame)
 
 //Color Frame getters
 unsigned long getLastTemplateColorTimestamp(int devID) { return device[devID].lastColorTimestamp; }
-int getTemplateColorWidth(int devID)        { return device[devID].templateWIDTH; }
-int getTemplateColorHeight(int devID)       { return device[devID].templateHEIGHT; }
-int getTemplateColorDataSize(int devID)     { return device[devID].templateHEIGHT*device[devID].templateWIDTH * 3; }
+int getTemplateColorWidth(int devID)        { return device[devID].templateColorWidth; }
+int getTemplateColorHeight(int devID)       { return device[devID].templateColorHeight; }
+int getTemplateColorDataSize(int devID)     { return device[devID].templateColorHeight*device[devID].templateColorWidth * 3; }
 int getTemplateColorChannels(int devID)     { return 3; }
 int getTemplateColorBitsPerPixel(int devID) { return 8; }
 
@@ -338,9 +353,9 @@ unsigned char * getTemplateColorPixels(int devID)    { return device[devID].temp
 
    //Depth Frame getters
 unsigned long getLastTemplateDepthTimestamp(int devID) { return device[devID].lastDepthTimestamp; }
-int getTemplateDepthWidth(int devID)    { return device[devID].templateWIDTH; }
-int getTemplateDepthHeight(int devID)   { return device[devID].templateHEIGHT; }
-int getTemplateDepthDataSize(int devID) { return device[devID].templateWIDTH*device[devID].templateHEIGHT; }
+int getTemplateDepthWidth(int devID)    { return device[devID].templateDepthWidth; }
+int getTemplateDepthHeight(int devID)   { return device[devID].templateDepthHeight; }
+int getTemplateDepthDataSize(int devID) { return device[devID].templateDepthWidth*device[devID].templateDepthHeight; }
 int getTemplateDepthChannels(int devID)     { return 1; }
 int getTemplateDepthBitsPerPixel(int devID) { return 16; }
 
@@ -348,7 +363,7 @@ int getTemplateDepthBitsPerPixel(int devID) { return 16; }
 char * getTemplateDepthPixels(int devID) { return (char *) device[devID].templateDepthFrame; }
 
 char * getTemplateDepthPixelsFlipped(int devID) {
-                                                  flipDepth(device[devID].templateDepthFrame,device[devID].templateWIDTH, device[devID].templateHEIGHT);
+                                                  flipDepth(device[devID].templateDepthFrame,device[devID].templateDepthWidth, device[devID].templateDepthHeight);
                                                   return (char *) device[devID].templateDepthFrame;
                                                 }
 

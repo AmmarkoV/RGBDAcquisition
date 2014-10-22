@@ -17,6 +17,7 @@
 		<Project filename="template_acquisition_shared_library/TemplateAcquisition.cbp" />
 		<Project filename="v4l2_acquisition_shared_library/V4L2Acquisition.cbp" />
 		<Project filename="v4l2stereo_acquisition_shared_library/V4L2StereoAcquisition.cbp" />
+		<Project filename="libfreenect2_acquisition_shared_library/Freenect2Acquisition.cbp" />
 		<Project filename="libfreenect_acquisition_shared_library/FreenectAcquisition.cbp" />
 		<Project filename="openni2_acquisition_shared_library/OpenNI2Aquisition.cbp" />
 		<Project filename="openni1_acquisition_shared_library/OpenNI1Acquisition.cbp" />

@@ -7,7 +7,8 @@
 
 #include <locale.h>
 
-
+#include "transform.h"
+#include "undistort.h"
 #include "../AmMatrix/matrix4x4Tools.h"
 #include "../AmMatrix/matrixCalculations.h"
 
@@ -457,8 +458,37 @@ int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int
 
 
 
+unsigned char *  registerColorToDepthFrame(
+                                           unsigned char * rgb , unsigned int rgbWidth , unsigned int rgbHeight , struct calibration * rgbCalibration ,
+                                           unsigned short * depth , unsigned int depthWidth , unsigned int depthHeight , struct calibration * depthCalibration ,
+                                           double * rotation3x3 , double * translation3x1 ,
+                                           unsigned int * outputWidth , unsigned int * outputHeight
+                                          )
+{
+  fprintf(stderr,"registerColorToDepthFrame is not implemented\n");
+   //TODO : undistort
+
+  return registerUndistortedColorToUndistortedDepthFrame
+                                          (
+                                           rgb , rgbWidth , rgbHeight , rgbCalibration ,
+                                           depth , depthWidth , depthHeight , depthCalibration ,
+                                           rotation3x3 , translation3x1 ,
+                                           outputWidth , outputHeight
+                                          );
+}
 
 
 
+
+unsigned short *  registerDepthToColorFrame(
+                                           unsigned char * rgb , unsigned int rgbWidth , unsigned int rgbHeight , struct calibration * rgbCalibration ,
+                                           unsigned short * depth , unsigned int depthWidth , unsigned int depthHeight , struct calibration * depthCalibration ,
+                                           double * rotation3x3 , double * translation3x1 ,
+                                           unsigned int * outputWidth , unsigned int * outputHeight
+                                          )
+{
+  fprintf(stderr,"registerDepthToColorFrame is not implemented\n");
+  return 0;
+}
 
 

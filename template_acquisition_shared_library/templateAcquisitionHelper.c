@@ -218,8 +218,9 @@ void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,
    if (strcmp(extension,"png")==0) { type=PNG_CODEC; } else
    if (strcmp(extension,"jpg")==0) { type=JPG_CODEC; }
    unsigned int bitsperpixel,channels;
-   //fprintf(stderr,"Reading %s , using Codec Library \n",filename);
+   //fprintf(stderr,"Reading %s , using Codec Library .. ",filename);
    char * pixels = readImageRaw(filename,type,widthInternal,heightInternal,&bitsperpixel,&channels);
+   //fprintf(stderr,"got back a %ux%u image \n",*widthInternal,*heightInternal);
    if ( (channels==1) && (bitsperpixel==16) && (type==PNG_CODEC) ) { swapImageEndiannessRaw( pixels, *widthInternal , *heightInternal ,bitsperpixel , channels);  }
    return pixels ;
  #else

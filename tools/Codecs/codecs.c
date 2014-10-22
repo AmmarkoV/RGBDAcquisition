@@ -46,6 +46,18 @@
 #define DEBUG_READING_IMAGES 0
 
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
+
 unsigned int simplePow(unsigned int base,unsigned int exp)
 {
     if (exp==0) return 1;
@@ -72,7 +84,12 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
    {
      #if USE_JPG_FILES
       case JPG_CODEC :
-       if (!ReadJPEG(filename,img,read_only_header)) { free(img); img=0; }
+       if (!ReadJPEG(filename,img,read_only_header))
+         {
+           fprintf(stderr,RED "Could error reading file %s using jpg reader" NORMAL , filename);
+           free(img);
+           img=0;
+         }
         #if DEBUG_READING_IMAGES
 	     char ppmfilename[512]={0};
 	     strcpy(ppmfilename,filename);
@@ -84,7 +101,12 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 
      #if USE_PNG_FILES
       case PNG_CODEC :
-       if (!ReadPNG(filename,img,read_only_header)) { free(img); img=0; }
+       if (!ReadPNG(filename,img,read_only_header))
+         {
+           fprintf(stderr,RED "Could error reading file %s using png reader" NORMAL , filename);
+           free(img);
+           img=0;
+         }
         #if DEBUG_READING_IMAGES
 	     char ppmfilename[512]={0};
 	     strcpy(ppmfilename,filename);
@@ -97,7 +119,12 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
      #if USE_PPM_FILES
        case PPM_CODEC :
        case PNM_CODEC :
-       if (!ReadPPM(filename,img,read_only_header))  { free(img); img=0;  }
+       if (!ReadPPM(filename,img,read_only_header))
+         {
+           fprintf(stderr,RED "Could error reading file %s using pnm reader" NORMAL , filename);
+           free(img);
+           img=0;
+         }
        break;
      #endif
 

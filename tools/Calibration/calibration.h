@@ -184,6 +184,69 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
  */
 int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int x2d , unsigned int y2d  , unsigned short depthValue , float * x , float * y , float * z);
 
+
+
+
+
+
+
+/**
+ * @brief  This call will register a distorted color frame to a distorted depth map given the distortion models and the transformation between them ,
+ * @ingroup calibration
+ * @param  Pointer to distorted color image
+ * @param  Width of color image
+ * @param  Height of color image
+ * @param  Calibration information of color image
+ * @param  Pointer to distorted depth image
+ * @param  Width of depth image
+ * @param  Height of depth image
+ * @param  Calibration information of depth image
+
+ * @param  4x4 Matrix that transforms color to depth
+
+ * @param  Output image width
+ * @param  Output image height
+
+ * @retval 0=Failure, Or a pointer to a registered color image
+ */
+unsigned char *  registerColorToDepthFrame(
+                                           unsigned char * rgb , unsigned int rgbWidth , unsigned int rgbHeight , struct calibration * rgbCalibration ,
+                                           unsigned short * depth , unsigned int depthWidth , unsigned int depthHeight , struct calibration * depthCalibration ,
+                                           double * rotation3x3 , double * translation3x1 ,
+                                           unsigned int * outputWidth , unsigned int * outputHeight
+                                          );
+
+
+
+
+
+
+/**
+ * @brief  This call will register a distorted color frame to a distorted depth map given the distortion models and the transformation between them ,
+ * @ingroup calibration
+ * @param  Pointer to distorted color image
+ * @param  Width of color image
+ * @param  Height of color image
+ * @param  Calibration information of color image
+ * @param  Pointer to distorted depth image
+ * @param  Width of depth image
+ * @param  Height of depth image
+ * @param  Calibration information of depth image
+
+ * @param  4x4 Matrix that transforms color to depth
+
+ * @param  Output image width
+ * @param  Output image height
+
+ * @retval 0=Failure, Or a pointer to a registered depth image
+ */
+unsigned short *  registerDepthToColorFrame(
+                                           unsigned char * rgb , unsigned int rgbWidth , unsigned int rgbHeight , struct calibration * rgbCalibration ,
+                                           unsigned short * depth , unsigned int depthWidth , unsigned int depthHeight , struct calibration * depthCalibration ,
+                                           double * rotation3x3 , double * translation3x1 ,
+                                           unsigned int * outputWidth , unsigned int * outputHeight
+                                          );
+
 #ifdef __cplusplus
 }
 #endif
