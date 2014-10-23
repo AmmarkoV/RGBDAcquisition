@@ -429,6 +429,8 @@ int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFea
                                           } else
     if (strcmp(argv[i],"-minDepth")==0)   { depthSeg->minDepth = atoi(argv[i+1]);  } else
     if (strcmp(argv[i],"-maxDepth")==0)   { depthSeg->maxDepth = atoi(argv[i+1]);   } else
+    if (strcmp(argv[i],"-invertRGB")==0)   { rgbSeg->invert = 1;  } else
+    if (strcmp(argv[i],"-invertDepth")==0)   { depthSeg->invert = 1;   } else
     if (strcmp(argv[i],"-combine")==0)    { *combinationMode=pickCombinationModeFromString(argv[i+1]); }
   }
 
