@@ -121,9 +121,9 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Minimum : "), wxPoint(40,66), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	minR = new wxSpinCtrl(this, ID_SPINCTRL1, _T("0"), wxPoint(128,64), wxSize(56,23), 0, 0, 255, 0, _T("ID_SPINCTRL1"));
 	minR->SetValue(_T("0"));
-	minG = new wxSpinCtrl(this, ID_SPINCTRL2, _T("0"), wxPoint(200,64), wxSize(56,23), 0, 0, 100, 0, _T("ID_SPINCTRL2"));
+	minG = new wxSpinCtrl(this, ID_SPINCTRL2, _T("0"), wxPoint(200,64), wxSize(56,23), 0, 0, 255, 0, _T("ID_SPINCTRL2"));
 	minG->SetValue(_T("0"));
-	minB = new wxSpinCtrl(this, ID_SPINCTRL3, _T("0"), wxPoint(272,64), wxSize(56,23), 0, 0, 100, 0, _T("ID_SPINCTRL3"));
+	minB = new wxSpinCtrl(this, ID_SPINCTRL3, _T("0"), wxPoint(272,64), wxSize(56,23), 0, 0, 255, 0, _T("ID_SPINCTRL3"));
 	minB->SetValue(_T("0"));
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Maximum :"), wxPoint(40,100), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	maxR = new wxSpinCtrl(this, ID_SPINCTRL4, _T("255"), wxPoint(128,96), wxSize(56,23), 0, 0, 255, 255, _T("ID_SPINCTRL4"));
