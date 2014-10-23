@@ -14,7 +14,20 @@
  #define unlikely(x)   x
 #endif
 
+int invertSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int * selectedCount)
+{
+  *selectedCount =  width*height - *selectedCount;
+  unsigned char * selectedPTR = selected;
+  unsigned char * selectedLimit = selected + width * height;
 
+  while (selectedPTR<selectedLimit)
+   {
+     *selectedPTR=(*selectedPTR==0);
+     ++selectedPTR;
+   }
+
+ return 1;
+}
 
 int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , unsigned int width , unsigned int height ,  struct SegmentationFeaturesRGB * segConf ,unsigned int selectedRGBCount , unsigned int combinationMode)
 {

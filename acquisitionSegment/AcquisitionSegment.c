@@ -173,6 +173,7 @@ int initializeRGBSegmentationConfiguration(struct SegmentationFeaturesRGB * segC
    segConfRGB->motionBThreshold=15;
 
    segConfRGB->isInitialized=1;
+   segConfRGB->invert=0;
   return 1;
 }
 
@@ -213,6 +214,7 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
      }
 
    segConfDepth->isInitialized=1;
+   segConfDepth->invert=0;
   return 1;
 }
 

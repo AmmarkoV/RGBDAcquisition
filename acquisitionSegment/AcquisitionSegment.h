@@ -84,6 +84,7 @@ struct SegmentationFeaturesRGB
 
    //----------------
    int isInitialized;
+   int invert;
 };
 
 
@@ -125,6 +126,7 @@ struct SegmentationFeaturesDepth
 
    //----------------
    int isInitialized;
+   int invert;
 };
 
 

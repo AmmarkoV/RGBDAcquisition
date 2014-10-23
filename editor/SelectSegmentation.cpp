@@ -100,6 +100,8 @@ const long SelectSegmentation::ID_TEXTCTRL31 = wxNewId();
 const long SelectSegmentation::ID_TEXTCTRL32 = wxNewId();
 const long SelectSegmentation::ID_STATICTEXT29 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX7 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX8 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX9 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -239,6 +241,10 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	StaticText29 = new wxStaticText(this, ID_STATICTEXT29, _("Normal"), wxPoint(424,430), wxDefaultSize, 0, _T("ID_STATICTEXT29"));
 	CheckBoxAutoPlane3Point = new wxCheckBox(this, ID_CHECKBOX7, _("3 Point"), wxPoint(624,288), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
 	CheckBoxAutoPlane3Point->SetValue(false);
+	CheckBoxInvertRGB = new wxCheckBox(this, ID_CHECKBOX8, _("Invert RGB"), wxPoint(44,480), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX8"));
+	CheckBoxInvertRGB->SetValue(false);
+	CheckBoxInvertDepth = new wxCheckBox(this, ID_CHECKBOX9, _("Invert Depth"), wxPoint(182,480), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX9"));
+	CheckBoxInvertDepth->SetValue(false);
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
@@ -335,6 +341,10 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
   val.Clear(); val.Printf(wxT("%u"),selectedDepthConf.motionDistanceThreshold); TextCtrlMovementThreshold->SetValue(val);
 
 
+
+  CheckBoxInvertDepth->SetValue( (selectedDepthConf.invert!=0) );
+  CheckBoxInvertRGB->SetValue( (selectedRGBConf.invert!=0) );
+
   ChoiceCombination->SetSelection(selectedCombinationMode);
 
   Refresh();
@@ -399,6 +409,9 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
     this->selectedDepthConf.autoPlaneSegmentationMinimumDistancePoint = 830;
     this->selectedDepthConf.autoPlaneSegmentationMaximumDistancePoint = 3000;
 
+
+    if ( CheckBoxInvertDepth->IsChecked() ) { this->selectedDepthConf.invert=1;  } else
+                                             { this->selectedDepthConf.invert=0;  }
 
     selectedDepthConf.enablePlaneSegmentation=1;
    } else
@@ -468,6 +481,9 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
 
   selectedCombinationMode = ChoiceCombination->GetSelection();
 
+
+    if ( CheckBoxInvertRGB->IsChecked() ) { this->selectedRGBConf.invert=1;  } else
+                                             { this->selectedRGBConf.invert=0;  }
 
 
   return 1;

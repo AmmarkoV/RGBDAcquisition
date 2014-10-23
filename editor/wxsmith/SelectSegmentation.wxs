@@ -455,6 +455,14 @@
 			<label>3 Point</label>
 			<pos>624,288</pos>
 		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX8" variable="CheckBoxInvertRGB" member="yes">
+			<label>Invert RGB</label>
+			<pos>44,480</pos>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX9" variable="CheckBoxInvertDepth" member="yes">
+			<label>Invert Depth</label>
+			<pos>182,480</pos>
+		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>
 			<wildcard>.txt</wildcard>

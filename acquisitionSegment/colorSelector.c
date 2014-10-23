@@ -229,6 +229,11 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
 
 
 
+  if (segConf->invert)
+     { invertSelection(selectedRGB , width ,   height ,selectedPixels); }
+
+
+
  free(sourceCopy);
  return selectedRGB;
 }
