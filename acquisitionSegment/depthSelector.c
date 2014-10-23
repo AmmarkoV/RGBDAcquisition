@@ -370,6 +370,9 @@ if ( segConf->enablePlaneSegmentation )
  }
  //-----------------------------------------------------------------------------
 
+  if (segConf->invert)
+     { invertSelection(selectedDepth , width ,   height ,selectedPixels); }
+
 
  free(sourceCopy);
  return selectedDepth;
