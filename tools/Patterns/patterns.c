@@ -1,8 +1,42 @@
 #include "patterns.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
+
+int viewPattern(struct pattern* pat , const char * label )
+{
+  unsigned int i=0;
+
+  fprintf(stderr,"Pattern %s is : ",label);
+  for (i=0; i<pat->currentStates; i++)
+  {
+   fprintf(stderr," %u(%u) ",pat->state[i],pat->duration[i]);
+  }
+  fprintf(stderr,"\n");
+
+ return 1;
+}
+
+int convertStringToPattern(struct pattern * out , const char *  in)
+{
+  if (out->state!=0)    { free(out->state); }
+  if (out->duration!=0) { free(out->duration); }
+
+  out->currentStates = strlen(in);
+  out->maxStates = out->currentStates;
+  out->state = (unsigned int * ) malloc( out->currentStates * sizeof (unsigned int ));
+  out->duration = (unsigned int * ) malloc( out->currentStates * sizeof (unsigned int ));
+
+  int i=0;
+  for (i=0; i<out->currentStates; i++)
+  {
+    out->state[i]=in[i];
+    out->duration[i]=1;
+  }
+ return 1;
+}
 
 
 int compactPattern(struct pattern * observation)
@@ -42,7 +76,7 @@ int cleanPattern(struct pattern * observation , double noiseFactor)
       }
   }
 
-
+  //STEP 3 : RE COMPACT
   if (offset!=0)
   { //We made some changes so let's compact again..!
     compactPattern(observation);
@@ -66,26 +100,26 @@ int patternsMatch(struct pattern * remembered, struct pattern * observed)
      {
        timingMismatch+=ABSDIFF(remembered->duration[rP],observed->duration[oP]);
        ++rP; ++oP;
+     } else
+     {
+        fprintf(stderr,"Mismatch at character %u/%u ( %u )  vs %u/%u  ( %u )\n",
+                rP,remembered->currentStates,remembered->state[rP] ,
+                oP,observed->currentStates,observed->state[oP]);
+       return 0;
      }
 
 
 
 
-     if (oP==observed->currentStates) { done=1; }
+
+     if (
+         (oP==observed->currentStates) ||
+         (rP==remembered->currentStates)
+        )
+         { done=1; }
   }
 
 
-  for (oP=0; oP<observed->currentStates; oP++)
-  {
-
-
-
-    //Let's Check
-
-
-
-
-  }
 
 
 
