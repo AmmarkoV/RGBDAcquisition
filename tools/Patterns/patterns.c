@@ -42,15 +42,24 @@ int convertStringToPattern(struct pattern * out , const char *  in)
 int compactPattern(struct pattern * observation)
 {
   unsigned int i=0,offset=0;
-  for (i=1; i+offset<observation->currentStates; i++)
+
+  unsigned int initialStates=observation->currentStates;
+
+ for (i=1; i+offset<initialStates; i++)
   {
     if ( observation->state[i-1] == observation->state[i+offset] )
       {
          observation->duration[i-1]+=observation->duration[i+offset];
          ++offset;
-      }
+         if (i>0) { --i; }
+      } else
+    if (offset!=0)
+     { observation->state[i-1] == observation->state[i+offset]; }
+
+
+    ++i;
   }
-  observation->currentStates -= offset;
+  observation->currentStates -= (offset-1);
   return 1;
 }
 

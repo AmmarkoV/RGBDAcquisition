@@ -9,16 +9,27 @@ int main(int argc, char *argv[])
 {
     printf("Checking for patterns from first two inputs\n");
 
+    //----------------------------------------------------------
+    fprintf(stderr,"\n\n");
+    //----------------------------------------------------------
 
     convertStringToPattern(&patA, argv[1]);
-    convertStringToPattern(&patB, argv[2]);
+    viewPattern(&patA , "Initial Pattern A");
 
-    cleanPattern(&patA,0.2);
+    convertStringToPattern(&patB, argv[2]);
+    viewPattern(&patB , "Initial Pattern B");
+
+    //----------------------------------------------------------
+    fprintf(stderr,"\n\n");
+    //----------------------------------------------------------
+
+    cleanPattern(&patA,0.0);
     viewPattern(&patA , "Pattern A");
 
-    cleanPattern(&patB,0.2);
+    cleanPattern(&patB,0.0);
     viewPattern(&patB , "Pattern B");
 
+    //----------------------------------------------------------
 
     if (!patternsMatch(&patA,&patB)) { fprintf(stderr,"Mismatch\n"); return 1; }
 
