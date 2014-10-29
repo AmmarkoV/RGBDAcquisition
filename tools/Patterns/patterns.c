@@ -41,25 +41,23 @@ int convertStringToPattern(struct pattern * out , const char *  in)
 
 int compactPattern(struct pattern * observation)
 {
-  unsigned int i=0,offset=0;
+  unsigned int i=0,offset=0,initialStates=observation->currentStates;
 
-  unsigned int initialStates=observation->currentStates;
-
- for (i=1; i+offset<initialStates; i++)
+ for (i=0; i+offset+1<initialStates; i++)
   {
-    if ( observation->state[i-1] == observation->state[i+offset] )
+    if (offset!=0)
+     {
+      observation->state[i+1] = observation->state[i+1+offset];
+     }
+
+    if ( observation->state[i] == observation->state[i+1] )
       {
-         observation->duration[i-1]+=observation->duration[i+offset];
+         observation->duration[i]+=observation->duration[i+1];
          ++offset;
          if (i>0) { --i; }
-      } else
-    if (offset!=0)
-     { observation->state[i-1] == observation->state[i+offset]; }
-
-
-    ++i;
+      }
   }
-  observation->currentStates -= (offset-1);
+  observation->currentStates=i+1;
   return 1;
 }
 
@@ -116,23 +114,13 @@ int patternsMatch(struct pattern * remembered, struct pattern * observed)
                 oP,observed->currentStates,observed->state[oP]);
        return 0;
      }
-
-
-
-
-
+    //---------------------------------------------------------
      if (
          (oP==observed->currentStates) ||
          (rP==remembered->currentStates)
         )
          { done=1; }
   }
-
-
-
-
-
-
 
   return 1;
 }

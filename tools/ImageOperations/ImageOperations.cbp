@@ -60,6 +60,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="patternSets.h" />
+		<Unit filename="resize.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="resize.h" />
 		<Unit filename="splitMPO.c">
 			<Option compilerVar="CC" />
 		</Unit>
