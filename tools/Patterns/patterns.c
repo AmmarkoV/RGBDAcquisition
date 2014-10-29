@@ -12,7 +12,7 @@ int viewPattern(struct pattern* pat , const char * label )
   fprintf(stderr,"Pattern %s is : ",label);
   for (i=0; i<pat->currentStates; i++)
   {
-   fprintf(stderr," %u(%u) ",pat->state[i],pat->duration[i]);
+   fprintf(stderr,"%u(%u) ",pat->state[i],pat->duration[i]);
   }
   fprintf(stderr,"\n");
 
