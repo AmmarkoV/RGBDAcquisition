@@ -109,6 +109,7 @@ void sleepMicroseconds(unsigned int microseconds);
  * @brief Get elapsed time since the start of RGBDAcquisition ( to set timestamps )
  * @ingroup timers
  * @retval Microseconds since start of RGBDAcquisition
+ * @bug GetTickCountMicroseconds segfaults..(?)
  */
 unsigned long GetTickCountMicroseconds();
 

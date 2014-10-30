@@ -126,8 +126,23 @@ void sleepMicroseconds(unsigned int microseconds)
     usleep(microseconds);
 }
 
+unsigned long GetTickCountMicroseconds()
+{
+   struct timespec ts;
+   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
 
-unsigned long GetTickCountInternal()
+   if (tickBase==0)
+   {
+     tickBase = ts.tv_sec*1000000 + ts.tv_nsec/1000;
+     return 0;
+   }
+
+   return ( ts.tv_sec*1000000 + ts.tv_nsec/1000 ) - tickBase;
+}
+
+
+
+unsigned long GetTickCountMilliseconds()
 {
    //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
    struct timespec ts;
@@ -142,26 +157,5 @@ unsigned long GetTickCountInternal()
    return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBase;
 }
 
-
-unsigned long GetTickCountMicroseconds()
-{
-   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
-   struct timespec ts;
-   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
-
-   if (tickBase==0)
-   {
-     tickBase = ts.tv_sec*1000000 + ts.tv_nsec/1000;
-     return 0;
-   }
-
-   return ( ts.tv_sec*1000000 + ts.tv_nsec/1000 ) - tickBase;
-}
-
-
-unsigned long GetTickCountMilliseconds()
-{
-  return (unsigned long) GetTickCountMilliseconds()/1000;
-}
 
 
