@@ -116,16 +116,15 @@ float GetFPSTimer( unsigned int timer_num )
  return (float)  1000*1000 / timers_array[timer_num].lastTimeMicroseconds ;
 }
 
-void VisCortxMillisecondsSleep(unsigned int milliseconds)
+void sleepMilliseconds(unsigned int milliseconds)
 {
     usleep(milliseconds*1000);
 }
 
-void VisCortxMicrosecondsSleep(unsigned int microseconds)
+void sleepMicroseconds(unsigned int microseconds)
 {
     usleep(microseconds);
 }
-
 
 
 unsigned long GetTickCountInternal()
@@ -142,4 +141,27 @@ unsigned long GetTickCountInternal()
 
    return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBase;
 }
+
+
+unsigned long GetTickCountMicroseconds()
+{
+   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
+   struct timespec ts;
+   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
+
+   if (tickBase==0)
+   {
+     tickBase = ts.tv_sec*1000000 + ts.tv_nsec/1000;
+     return 0;
+   }
+
+   return ( ts.tv_sec*1000000 + ts.tv_nsec/1000 ) - tickBase;
+}
+
+
+unsigned long GetTickCountMilliseconds()
+{
+  return (unsigned long) GetTickCountMilliseconds()/1000;
+}
+
 

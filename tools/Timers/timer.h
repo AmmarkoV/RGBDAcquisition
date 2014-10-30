@@ -48,7 +48,7 @@ void StartTimer( unsigned int timer_num );
  * @brief Stops a timer and returns the number of elapsed milliseconds
  * @ingroup timers
  * @param timerNumber , the number that specifies what timer we want to start
- * @retval Number of Milliseconds
+ * @retval Number of Microseconds
  */
 unsigned int EndTimer( unsigned int timer_num );
 
@@ -57,7 +57,7 @@ unsigned int EndTimer( unsigned int timer_num );
  * @brief Get the number of elapsed milliseconds from last run of timer
  * @ingroup timers
  * @param timerNumber , the number that specifies what timer we want to start
- * @retval Number of Milliseconds
+ * @retval Number of Microseconds
  */
 unsigned int GetLastTimer( unsigned int timer_num );
 
@@ -66,7 +66,7 @@ unsigned int GetLastTimer( unsigned int timer_num );
  * @brief Get the average number of elapsed milliseconds from all of the runs of the specific timer
  * @ingroup timers
  * @param timerNumber , the number that specifies what timer we want to start
- * @retval Number of average Milliseconds
+ * @retval Number of average Microseconds
  */
 unsigned int GetAverageTimer( unsigned int timer_num );
 
@@ -93,7 +93,7 @@ float GetFPSTimer( unsigned int timer_num );
  * @param milliseconds , to sleep for
  * @retval No Return Value
  */
-void VisCortxMillisecondsSleep(unsigned int milliseconds);
+void sleepMilliseconds(unsigned int milliseconds);
 
 
 /**
@@ -102,7 +102,15 @@ void VisCortxMillisecondsSleep(unsigned int milliseconds);
  * @param microseconds , to sleep for
  * @retval No Return Value
  */
-void VisCortxMicrosecondsSleep(unsigned int microseconds);
+void sleepMicroseconds(unsigned int microseconds);
+
+
+/**
+ * @brief Get elapsed time since the start of RGBDAcquisition ( to set timestamps )
+ * @ingroup timers
+ * @retval Microseconds since start of RGBDAcquisition
+ */
+unsigned long GetTickCountMicroseconds();
 
 
 /**
@@ -110,7 +118,7 @@ void VisCortxMicrosecondsSleep(unsigned int microseconds);
  * @ingroup timers
  * @retval Milliseconds since start of RGBDAcquisition
  */
-unsigned long GetTickCountInternal();
+unsigned long GetTickCountMilliseconds();
 
 
 #ifdef __cplusplus
