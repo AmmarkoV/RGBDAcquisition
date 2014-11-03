@@ -53,6 +53,53 @@ void buildOpenGLProjectionForIntrinsics   (
 int pointInRelationToObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated );
 
 
+
+int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW);
+
+void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention);
+
+
+int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation);
+
+int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit);
+
+
+int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit );
+
+
+int move3DPoint(double * resultPoint3D, double * transformation4x4, double * point3D  );
+
+
+void buildOpenGLProjectionForIntrinsics   (
+                                             double * frustum,
+                                             int * viewport ,
+                                             double fx,
+                                             double fy,
+                                             double skew,
+                                             double cx, double cy,
+                                             unsigned int imageWidth, unsigned int imageHeight,
+                                             double nearPlane,
+                                             double farPlane
+                                           );
+
+
+
+
+
+int pointInRelationToObject2(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated );
+
+
+int pointInRelationToObjectQuaternion(unsigned int method, double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated );
+
+
+
+
+
+
+
+
+
+
 /**
 * @brief Internally Test Matrix subsystem
 * @ingroup AmMatrix

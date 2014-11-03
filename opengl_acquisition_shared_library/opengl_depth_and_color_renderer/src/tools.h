@@ -54,7 +54,9 @@ float calculateDistance(float from_x,float from_y,float from_z,float to_x,float 
 int rayIntersectsTriangle(float *p, float *d,float *v0, float *v1, float *v2);
 int rayIntersectsRectangle(float *p, float *d,float *v0, float *v1, float *v2, float *v3);
 
-float distanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2);
+
+double distanceBetween3DPoints(double * p1, double * p2);
+float distanceBetween3DPointsFast(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2);
 float squaredDistanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2);
 
 void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ_y,float targ_z,float *vect_x,float *vect_y,float *vect_z);

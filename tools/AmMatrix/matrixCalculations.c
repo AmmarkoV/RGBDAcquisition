@@ -8,7 +8,28 @@
 #include "solveLinearSystemGJ.h"
 #include "solveHomography.h"
 
+enum mat3x3MItem
+{
+    m0 = 0 , m1  , m2  ,
+    m3     , m4  , m5  ,
+    m6     , m7 ,  m8
+};
 
+
+enum mat4x4EItem
+{
+    e0 = 0 , e1  , e2  , e3 ,
+    e4     , e5  , e6  , e7 ,
+    e8     , e9  , e10 , e11 ,
+    e12    , e13 , e14 , e15
+};
+
+
+enum quatOrder
+{
+  qWqXqYqZ=0,
+  qXqYqZqW
+};
 
 
 int convertRodriguezTo3x3(double * result,double * matrix)
@@ -54,6 +75,57 @@ void changeYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
   invertOp[5]=-1;   invertOp[10]=-1;
   multiplyTwo4x4Matrices(result, matrix, invertOp);
   free(invertOp);
+}
+
+
+int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW)
+{
+#if USE_FAST_NORMALIZATION
+      // Works best when quat is already almost-normalized
+      double f = (double) (3.0 - (((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)))) / 2.0;
+      *qX *= f;
+      *qY *= f;
+      *qZ *= f;
+      *qW *= f;
+#else
+      double sqrtDown = (double) sqrt(((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)));
+      double f = (double) 1 / sqrtDown;
+       *qX *= f;
+       *qY *= f;
+       *qZ *= f;
+       *qW *= f;
+#endif // USE_FAST_NORMALIZATION
+  return 1;
+}
+
+
+void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention)
+{
+    //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
+    double qX,qY,qZ,qW;
+
+    switch (quaternionConvention)
+     {
+       case qWqXqYqZ  :
+        qW = quaternions[0]; qX = quaternions[1]; qY = quaternions[2]; qZ = quaternions[3];
+       break;
+       case qXqYqZqW :
+        qX = quaternions[0]; qY = quaternions[1]; qZ = quaternions[2]; qW = quaternions[3];
+       break;
+
+       default :
+       fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
+       break;
+     }
+
+
+     double * m = matrix3x3;
+
+     m[m0]=1 -(2*qY*qY) - (2*qZ*qZ); /*|*/  m[m1]=(2*qX*qY) - (2*qZ*qW);     /*|*/ m[m2]=(2*qX*qZ) + (2*qY*qW);
+     m[m3]=(2*qX*qY) + (2*qZ*qW);    /*|*/  m[m4]=1 - (2*qX*qX) - (2*qZ*qZ); /*|*/ m[m5]=(2*qY*qZ) - (2*qX*qW);
+     m[m6]=(2*qX*qZ) - (2*qY*qW);    /*|*/  m[m7]=(2*qY*qZ) + (2*qX*qW);     /*|*/ m[m8]=1 - (2*qX*qX) - (2*qY*qY);
+
+ return ;
 }
 
 int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation)
@@ -232,6 +304,7 @@ void buildOpenGLProjectionForIntrinsics   (
 
 
 
+
 /*
     We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
     We also have an absolute position of a 3D point , and we want to calculate the relative position
@@ -239,6 +312,7 @@ void buildOpenGLProjectionForIntrinsics   (
 */
 int pointInRelationToObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated )
 {
+  printf("\n\nUsing Simple Code\n");
   double objectTransposedRotation3x3[3*3]={0};
   copy3x3Matrix(objectTransposedRotation3x3,objectRotation3x3);
   //We transpose our 3x3 rotation matrix because we want the inverse transformation
@@ -260,26 +334,68 @@ int pointInRelationToObject(double * relativeOutPoint3DUnrotated, double * objec
 }
 
 
+/*
+    We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
+    We also have an absolute position of a 3D point , and we want to calculate the relative position
+    of the 3D point in relation to the object ( unrotated relative position )
+*/
+int pointInRelationToObject2(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated )
+{
+  printf("\n\nUsing Inversion Code\n");
+  double objectRotation4x4[4*4]={0};
+  //We make the 3x3 matrix onto a 4x4 by adding zeros and 1 as the diagonal element
+  upscale3x3to4x4(objectRotation4x4,objectRotation3x3);
+
+  objectRotation4x4[e3]=objectPosition[0];
+  objectRotation4x4[e7]=objectPosition[1];
+  objectRotation4x4[e11]=objectPosition[2];
+  objectRotation4x4[e15]=1.0;
+
+
+  double objectInvRotation4x4[4*4]={0};
+  invert4x4MatrixD(objectInvRotation4x4,objectRotation4x4);
+
+  transform3DPointVectorUsing4x4Matrix(relativeOutPoint3DUnrotated,objectInvRotation4x4,absoluteInPoint3DRotated);
+  return 1;
+}
+
 
 
 /*
     We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
     We also have an absolute position of a 3D point , and we want to calculate the relative position
     of the 3D point in relation to the object ( unrotated relative position )
-*//*
-int pointInRelationToObjectQuaternion(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated )
+*/
+int pointInRelationToObjectQuaternion(unsigned int method, double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated )
 {
     double objectRotation3x3[9];
+
+    printf("Object Position is %f,%f,%f  \n",
+            objectPosition[0],
+            objectPosition[1],
+            objectPosition[2]
+           );
+
+    printf("Quaternion %f,%f,%f,%f \n",objectQuaternion[0],objectQuaternion[1],objectQuaternion[2],objectQuaternion[3]);
     normalizeQuaternions(&objectQuaternion[0],&objectQuaternion[1],&objectQuaternion[2],&objectQuaternion[3]);
+    printf("Normalized Quaternion %f,%f,%f,%f \n",objectQuaternion[0],objectQuaternion[1],objectQuaternion[2],objectQuaternion[3]);
 
     quaternion2Matrix3x3(objectRotation3x3,objectQuaternion,qXqYqZqW);
-    pointInRelationToObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
+
+    print3x3DMatrix("Quaternion to 3x3",objectRotation3x3);
+    print3x3DMathematicaMatrix("Quat3x3",objectRotation3x3);
+
+    if (method==0) { pointInRelationToObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated); } else
+                   { pointInRelationToObject2(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated); }
 
     //We have to try to normalize the output point , although it should already be normalized..
     normalize3DPointVector(relativeOutPoint3DUnrotated);
 
     return 1;
-}*/
+}
+
+
+
 
 
 void testMatrices()

@@ -143,7 +143,27 @@ inline float sqrt_fast_approximation(const float x)
   return u.x;
 }
 
-float distanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2)
+
+
+
+double distanceBetween3DPoints(double * p1, double * p2)
+{
+  double x1 = p1[0] , y1 = p1[1] , z1 = p1[2];
+  double x2 = p2[0] , y2 = p2[1] , z2 = p2[2];
+
+  double dx=0.0,dy=0.0,dz=0.0;
+
+  //I Could actually skip this
+  if (x1>=x2) { dx=x1-x2; } else { dx=x2-x1; }
+  if (y1>=y2) { dy=y1-y2; } else { dy=y2-y1; }
+  if (z1>=z2) { dz=z1-z2; } else { dz=z2-z1; }
+  //==========================
+
+  return (double) sqrt( (dx * dx) + (dy * dy) + (dz * dz) );
+}
+
+
+float distanceBetween3DPointsFast(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2)
 {
     //sqrt_fast_approximation
   float dx,dy,dz;
