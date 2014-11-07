@@ -8,6 +8,12 @@
 
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 
 int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit);
 int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit);
@@ -105,5 +111,12 @@ int pointInRelationToObjectQuaternion(unsigned int method, double * relativeOutP
 * @ingroup AmMatrix
 */
 void testMatrices();
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // MATRIXCALCULATIONS_H_INCLUDED
