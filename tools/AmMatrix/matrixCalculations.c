@@ -305,6 +305,26 @@ void buildOpenGLProjectionForIntrinsics   (
 
 
 
+int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, double * objectPosition , double * objectRotation3x3 ,  double * relativeInPoint3DUnrotated)
+{
+
+  double objectRotation4x4[4*4]={0};
+  //We make the 3x3 matrix onto a 4x4 by adding zeros and 1 as the diagonal element
+  upscale3x3to4x4(objectRotation4x4,objectRotation3x3);
+
+  double relativePoint3DRotated[4]={0};
+  transform3DPointVectorUsing4x4Matrix(relativePoint3DRotated,objectRotation4x4,relativeInPoint3DUnrotated);
+
+  absoluteOutPoint3DRotated[0]=relativePoint3DRotated[0]+objectPosition[0];
+  absoluteOutPoint3DRotated[1]=relativePoint3DRotated[1]+objectPosition[1];
+  absoluteOutPoint3DRotated[2]=relativePoint3DRotated[2]+objectPosition[2];
+  absoluteOutPoint3DRotated[3]=1.0;  //We know we are talking about 2 3d points
+
+  return 1;
+}
+
+
+
 /*
     We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
     We also have an absolute position of a 3D point , and we want to calculate the relative position
@@ -395,6 +415,37 @@ int pointInRelationToObjectQuaternion(unsigned int method, double * relativeOutP
 }
 
 
+
+
+/*
+    We have an object with a relative Position X,Y,Z to an Object (objectPosition[])
+*/
+int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,  double * absoluteInPoint3DRotated , double * objectPosition , double * objectQuaternion ,double * relativeOutPoint3DUnrotated)
+{
+    double objectRotation3x3[9];
+
+    printf("Object Position is %f,%f,%f  \n",
+            objectPosition[0],
+            objectPosition[1],
+            objectPosition[2]
+           );
+
+    printf("Quaternion %f,%f,%f,%f \n",objectQuaternion[0],objectQuaternion[1],objectQuaternion[2],objectQuaternion[3]);
+    normalizeQuaternions(&objectQuaternion[0],&objectQuaternion[1],&objectQuaternion[2],&objectQuaternion[3]);
+    printf("Normalized Quaternion %f,%f,%f,%f \n",objectQuaternion[0],objectQuaternion[1],objectQuaternion[2],objectQuaternion[3]);
+
+    quaternion2Matrix3x3(objectRotation3x3,objectQuaternion,qXqYqZqW);
+
+    print3x3DMatrix("Quaternion to 3x3",objectRotation3x3);
+    print3x3DMathematicaMatrix("Quat3x3",objectRotation3x3);
+
+    pointFromRelationWithObjectToAbsolute(absoluteInPoint3DRotated,objectPosition,objectRotation3x3,relativeOutPoint3DUnrotated);
+
+    //We have to try to normalize the output point , although it should already be normalized..
+    normalize3DPointVector(relativeOutPoint3DUnrotated);
+
+    return 1;
+}
 
 
 
