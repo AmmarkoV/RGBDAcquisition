@@ -123,6 +123,22 @@ int transpose3x3MatrixD(double * mat)
   return 1;
 }
 
+
+int transpose3x3MatrixDFromSource(double * dest,double * source)
+{
+  if ( (dest==0) || (source==0) ) { return 0; }
+  /*       -------  TRANSPOSE ------->
+      0   1   2             0  3  6
+      3   4   5             1  4  7
+      6   7   8             2  5  8   */
+  dest[0]=source[0]; dest[1]=source[3]; dest[2]=source[6];
+  dest[3]=source[1]; dest[4]=source[4]; dest[5]=source[7];
+  dest[6]=source[2]; dest[7]=source[5]; dest[8]=source[8];
+
+  return 1;
+}
+
+
 int random3x3Matrix(double * mat,double minimumValues, double maximumValues)
 {
  int i=0;
