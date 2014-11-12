@@ -323,10 +323,11 @@ void buildOpenGLProjectionForIntrinsics   (
 
 
 
-
-
 int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, double * objectPosition , double * objectRotation3x3 ,  double * relativeInPoint3DUnrotated)
 {
+  //  What we want to do ( in mathematica )
+  // (  { {r0,r1,r2,0} , {r3,r4,r5,0} , {r6,r7,r8,0} , {0,0,0,1} } * { { X }  , { Y }  , { Z } , { 1.0 } } ) + { {ObjX} , {ObjY} , {ObjZ} , { 0 }  }
+
   //We have a coordinate space in Relation to our object so we want to first rotate our point and then translate it
   //back to absolute coordinate space
 
@@ -348,7 +349,6 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
   return 1;
 }
 
-
 /*
     We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
     We also have an absolute position of a 3D point , and we want to calculate the relative position
@@ -356,6 +356,9 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
 */
 int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated )
 {
+  //  What we want to do ( in mathematica )
+  // { {r0,r3,r6,0} , {r1,r4,r7,0} , {r2,r5,r8,0} , {0,0,0,1} } * { { X-ObjX } , { Y-ObjY }  , { Z-ObjZ } , { 1.0 } }
+
   //printf("pointFromAbsoluteToInRelationWithObject Using Simple Code\n");
   double relativeInPoint3DRotated[4]={0};
 
@@ -372,9 +375,11 @@ int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated
   //We make the 3x3 matrix onto a 4x4 by adding zeros and 1 as the diagonal element
   upscale3x3to4x4(objectTransposedRotation4x4,objectTransposedRotation3x3);
 
+
   transform3DPointVectorUsing4x4Matrix(relativeOutPoint3DUnrotated,objectTransposedRotation4x4,relativeInPoint3DRotated);
   return 1;
 }
+
 
 
 /*
