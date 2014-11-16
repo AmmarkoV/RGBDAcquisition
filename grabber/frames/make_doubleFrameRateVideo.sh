@@ -20,7 +20,7 @@ fi
 THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"` 
 
 cd $DATASET
-avconv -i colorFrame_0_%05d.$EXTENSION -y -6 80 -threads 8 -b 30000k -s 640x480  ../outHD_$THEDATETAG.mp4 
+avconv  -r 90 -i colorFrame_0_%05d.$EXTENSION  -threads 8 -b 30000k -s 640x480  ../outHD_$THEDATETAG.mp4 
 cd ..
 
 cd $STARTDIR 

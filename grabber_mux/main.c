@@ -31,11 +31,11 @@ unsigned int longExposure = 0;
 unsigned long * rgbCollector =0;
 unsigned long * depthCollector =0;
 
-unsigned int saveColor=1 , saveDepth=1;
+unsigned int saveColor=1 , saveDepth=1 , makeVideo =0 , videoFps=25 ;
 //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
 unsigned int frameNum=0,outFrameNum=0,maxFramesToGrab=10;
 
-unsigned int devID_1=0 , devID_2=0;
+unsigned int devID_1=0 , devID_2=0 ;
 ModuleIdentifier moduleID_1 = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 ModuleIdentifier moduleID_2 = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
@@ -59,11 +59,22 @@ int makepath(char * path)
     //FILE *fp;
     /* Open the command for reading. */
     char command[1024];
-    sprintf(command,"mkdir -p %s",outputfoldername);
+    snprintf(command,1024,"mkdir -p %s",outputfoldername);
     fprintf(stderr,"Executing .. %s \n",command);
 
     return system(command);
 }
+
+int executeMakeVideo(char * datasetName, unsigned int framerate, unsigned int width , unsigned int height)
+{
+    char command[1024];
+    snprintf(command,1024,"avconv  -r %u -i %s/colorFrame_0_%%05d.pnm  -threads 8 -b 30000k -s %ux%u  %s.mp4",framerate,datasetName,width,height,datasetName);
+    fprintf(stderr,"Executing .. %s \n",command);
+
+    return system(command);
+
+}
+
 
 
 int main(int argc, char *argv[])
@@ -167,11 +178,20 @@ int main(int argc, char *argv[])
                                               fprintf(stderr,"Adding a time shift ( %u ) \n",argv[i+1],shiftTime);
                                             } else
     if (
+        (strcmp(argv[i],"-makeVideo")==0)
+       )
+       { makeVideo=1; fprintf(stderr,"Will make video on end\n"); }
+       else
+    if (
+        (strcmp(argv[i],"-videoFps")==0)
+       )
+       { videoFps=atoi(argv[i+1]); fprintf(stderr,"Video Framerate set to %u\n",videoFps); }
+      else
+    if (
         (strcmp(argv[i],"-frameDoubler")==0)
        )
        { frameDoublerEnabled=1; fprintf(stderr,"Frame Doubler Will be engaged \n"); }
       else
-
     if (
         (strcmp(argv[i],"-from1")==0) ||
         (strcmp(argv[i],"-i1")==0)||
@@ -299,7 +319,6 @@ int main(int argc, char *argv[])
       doubleDepthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
       if (doubleDepthOut==0) { fprintf(stderr,"Could not allocate an RGB Output buffer for double buffering"); return 1; }
 
-      fprintf(stderr,"doubleRGB %p doubleRGBOut %p doubleDepth %p doubleDepthOut %p \n",doubleRGB, doubleRGBOut , doubleDepth , doubleDepthOut);
     }
 
 
@@ -349,23 +368,8 @@ int main(int argc, char *argv[])
            transparency , 0 );
 
 
-         if (saveColor)
-          {
-           sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
-           saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
-          }
-
-         if (saveDepth)
-          {
-           sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
-           saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
-          }
-
-          ++outFrameNum;
-        }
-
        if (frameDoublerEnabled)
-       {
+       { // ==========================================================================
         if (outFrameNum%2==1)
         {
           generateInterpolatedFrames(
@@ -396,8 +400,24 @@ int main(int argc, char *argv[])
 
          ++outFrameNum;
         }
+       } // ==========================================================================
 
-       }
+
+         if (saveColor)
+          {
+           sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
+           saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+          }
+
+         if (saveDepth)
+          {
+           sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
+           saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+          }
+
+          ++outFrameNum;
+        }
+
 
 
 
@@ -432,6 +452,12 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
 
+    if (makeVideo)
+    {
+      if (frameDoublerEnabled) { videoFps=videoFps*2; }
+      if (executeMakeVideo(outputfoldername, videoFps , widthRGB , heightRGB )) { fprintf(stderr,"Could not make a video\n"); } else
+                                                                                { fprintf(stderr,"Made a video\n"); }
+    }
 
     //-----------------------------------------------
     if (depthOut != 0) { free(depthOut); }
