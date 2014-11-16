@@ -180,6 +180,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
  device[devID].templateColorHeight=height;
  device[devID].templateDepthWidth=width;
  device[devID].templateDepthHeight=height;
+ device[devID].extension[0]=0;
 
 
    if (devName==0) { strcpy(device[devID].readFromDir,""); } else
@@ -195,7 +196,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   unsigned int failedStream=0;
   unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;
 
-  char file_name_test[MAX_DIR_PATH];
+  char file_name_test[MAX_DIR_PATH]={0};
   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 ,device[devID].readFromDir,device[devID].extension);
   unsigned char * tmpColor = ReadImageFile(0,file_name_test,device[devID].extension,&widthInternal,&heightInternal, &timestampInternal);
   if ( (widthInternal!=width) || (heightInternal!=height) )

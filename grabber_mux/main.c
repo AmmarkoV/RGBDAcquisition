@@ -20,6 +20,8 @@ signed int shiftX=0;
 signed int shiftY=0;
 signed int shiftTime=0;
 
+unsigned int frameDoublerEnabled=0;
+
 int calibrationSetA = 0;
 struct calibration calibA;
 int calibrationSetB = 0;
@@ -165,6 +167,12 @@ int main(int argc, char *argv[])
                                               fprintf(stderr,"Adding a time shift ( %u ) \n",argv[i+1],shiftTime);
                                             } else
     if (
+        (strcmp(argv[i],"-frameDoubler")==0)
+       )
+       { frameDoublerEnabled=1; fprintf(stderr,"Frame Doubler Will be engaged \n"); }
+      else
+
+    if (
         (strcmp(argv[i],"-from1")==0) ||
         (strcmp(argv[i],"-i1")==0)||
         (strcmp(argv[i],"-fromBase")==0)
@@ -274,6 +282,18 @@ int main(int argc, char *argv[])
     acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&widthDepth,&heightDepth ,&channelsDepth , &bitsperpixelDepth );
     unsigned short * depthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
+
+    unsigned char * doubleRGB = 0 , doubleRGBOut = 0;
+    unsigned short * doubleDepth = 0 , doubleDepthOut = 0;
+    if (frameDoublerEnabled)
+    {
+      doubleRGB = (unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
+      doubleRGBOut = (unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
+      doubleDepth = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
+      doubleDepthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
+    }
+
+
     if (longExposure)
     {
       rgbCollector = (unsigned long * ) malloc(sizeof(unsigned long) * widthRGB * heightRGB*3 );
@@ -333,6 +353,35 @@ int main(int argc, char *argv[])
          }
         }
 
+       if (frameDoublerEnabled)
+       {
+        if (frameNum!=0)
+        {
+            /*
+          generateInterpolatedFrames(
+                                      doubleRGB, rgbOut , doubleRGBOut ,
+                                      doubleDepth, depthOut , doubleDepthOut ,
+                                      widthRGB , heightRGB
+                                     );*/
+          ++frameNum;
+
+         if (saveColor)
+          {
+          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          saveMuxImageToFile(outfilename,doubleRGBOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+          }
+
+         if (saveDepth)
+         {
+          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          saveMuxImageToFile(outfilename,(unsigned char*) doubleDepthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+         }
+        }
+
+         memcpy( doubleRGB , rgbOut , sizeof(unsigned char) * widthRGB * heightRGB*3 );
+         memcpy( doubleDepth , depthOut , sizeof(unsigned long) * widthRGB * heightRGB );
+       }
+
 
 
 
@@ -365,6 +414,19 @@ int main(int argc, char *argv[])
 
 
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
+
+
+    //-----------------------------------------------
+    if (depthOut != 0) { free(depthOut); }
+    if (rgbOut != 0) { free(rgbOut); }
+    //-----------------------------------------------
+    if (doubleRGB != 0) { free(doubleRGB); }
+    if (doubleRGBOut != 0) { free(doubleRGBOut); }
+    //-----------------------------------------------
+    if (doubleDepth != 0) { free(doubleDepth); }
+    if (doubleDepthOut != 0) { free(doubleDepthOut); }
+    //-----------------------------------------------
+
 
     closeEverything();
 

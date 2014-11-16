@@ -76,6 +76,28 @@ int mux2RGBAndDepthFrames(
 
 
 
+
+/**
+ * @brief Frame Doubler , Combine A set of frames to produce an intermediate output frame
+ * @ingroup mux
+ * @param Pointer to the First RGB Frame input
+ * @param Pointer to the Second RGB Frame input
+ * @param Pointer to the Intermediate RGB Frame output
+ * @param Pointer to the First Depth Frame input
+ * @param Pointer to the Second Depth Frame input
+ * @param Pointer to the Intermediate Depth Frame output
+ * @param Width  , The Width of the image files ( assumed to be the same for all inputs )
+ * @param Height , The Height of the image files ( assumed to be the same for all inputs )
+ * @retval 1 if operation succeeds , 0 if it fails
+ */
+int generateInterpolatedFrames(
+                               unsigned char * firstRGB, unsigned char *  secondRGB , unsigned char * intermediateRGBOut ,
+                               unsigned short * firstDepth, unsigned short *  secondDepth  , unsigned short *  intermediateDepthOut  ,
+                               unsigned int width ,
+                               unsigned int height
+                               );
+
+
 /**
  * @brief  Save a MuxedFrame Buffer to a file
  * @ingroup mux
