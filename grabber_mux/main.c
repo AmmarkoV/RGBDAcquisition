@@ -273,12 +273,12 @@ int main(int argc, char *argv[])
     char outfilename[512]={0};
 
 
-    unsigned int widthRGB , heightRGB , channelsRGB , bitsperpixelRGB;
+    unsigned int widthRGB=0 , heightRGB=0 , channelsRGB=0 , bitsperpixelRGB=0;
     acquisitionGetColorFrameDimensions(moduleID_1,devID_1,&widthRGB,&heightRGB ,&channelsRGB , &bitsperpixelRGB );
     //Todo , check with module 2 bla bla
     unsigned char * rgbOut = (unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
 
-    unsigned int widthDepth , heightDepth , channelsDepth , bitsperpixelDepth;
+    unsigned int widthDepth=0 , heightDepth=0 , channelsDepth=0 , bitsperpixelDepth=0;
     acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&widthDepth,&heightDepth ,&channelsDepth , &bitsperpixelDepth );
     unsigned short * depthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
@@ -369,17 +369,19 @@ int main(int argc, char *argv[])
           {
           sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
           saveMuxImageToFile(outfilename,doubleRGBOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+          if ( (doubleRGB!=0)&&(rgbOut!=0) )
+              { memcpy( doubleRGB , rgbOut , sizeof(unsigned char) * widthRGB * heightRGB*3 );  }
           }
 
          if (saveDepth)
          {
           sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
           saveMuxImageToFile(outfilename,(unsigned char*) doubleDepthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+          if ( (doubleDepth!=0)&&(depthOut!=0) )
+              { memcpy( doubleDepth , depthOut , sizeof(unsigned long) * widthRGB * heightRGB ); }
          }
         }
 
-         memcpy( doubleRGB , rgbOut , sizeof(unsigned char) * widthRGB * heightRGB*3 );
-         memcpy( doubleDepth , depthOut , sizeof(unsigned long) * widthRGB * heightRGB );
        }
 
 
