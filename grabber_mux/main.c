@@ -33,7 +33,7 @@ unsigned long * depthCollector =0;
 
 unsigned int saveColor=1 , saveDepth=1;
 //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
-unsigned int frameNum=0,maxFramesToGrab=10;
+unsigned int frameNum=0,outFrameNum=0,maxFramesToGrab=10;
 
 unsigned int devID_1=0 , devID_2=0;
 ModuleIdentifier moduleID_1 = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
@@ -283,14 +283,23 @@ int main(int argc, char *argv[])
     unsigned short * depthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
 
-    unsigned char * doubleRGB = 0 , doubleRGBOut = 0;
-    unsigned short * doubleDepth = 0 , doubleDepthOut = 0;
+    unsigned char * doubleRGB = 0 , * doubleRGBOut = 0;
+    unsigned short * doubleDepth = 0 , * doubleDepthOut = 0;
     if (frameDoublerEnabled)
     {
       doubleRGB = (unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
+      if (doubleRGB==0) { fprintf(stderr,"Could not allocate an RGB Input buffer for double buffering"); return 1; }
+
       doubleRGBOut = (unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
+      if (doubleRGBOut==0) { fprintf(stderr,"Could not allocate an RGB Output buffer for double buffering"); return 1; }
+
       doubleDepth = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
+      if (doubleDepth==0) { fprintf(stderr,"Could not allocate an Depth Input buffer for double buffering"); return 1; }
+
       doubleDepthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
+      if (doubleDepthOut==0) { fprintf(stderr,"Could not allocate an RGB Output buffer for double buffering"); return 1; }
+
+      fprintf(stderr,"doubleRGB %p doubleRGBOut %p doubleDepth %p doubleDepthOut %p \n",doubleRGB, doubleRGBOut , doubleDepth , doubleDepthOut);
     }
 
 
@@ -342,44 +351,50 @@ int main(int argc, char *argv[])
 
          if (saveColor)
           {
-          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
-          saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+           sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
+           saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
           }
 
          if (saveDepth)
-         {
-          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
-          saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
-         }
+          {
+           sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
+           saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+          }
+
+          ++outFrameNum;
         }
 
        if (frameDoublerEnabled)
        {
-        if (frameNum!=0)
+        if (outFrameNum%2==1)
         {
-            /*
           generateInterpolatedFrames(
                                       doubleRGB, rgbOut , doubleRGBOut ,
                                       doubleDepth, depthOut , doubleDepthOut ,
                                       widthRGB , heightRGB
-                                     );*/
-          ++frameNum;
+                                     );
 
          if (saveColor)
           {
-          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
           saveMuxImageToFile(outfilename,doubleRGBOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
           if ( (doubleRGB!=0)&&(rgbOut!=0) )
-              { memcpy( doubleRGB , rgbOut , sizeof(unsigned char) * widthRGB * heightRGB*3 );  }
+              {
+                memcpy( doubleRGB , rgbOut , sizeof(unsigned char) * widthRGB * heightRGB * 3 );
+              }
           }
 
          if (saveDepth)
          {
-          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
           saveMuxImageToFile(outfilename,(unsigned char*) doubleDepthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
           if ( (doubleDepth!=0)&&(depthOut!=0) )
-              { memcpy( doubleDepth , depthOut , sizeof(unsigned long) * widthRGB * heightRGB ); }
+              {
+                memcpy( doubleDepth , depthOut , sizeof(unsigned short) * widthDepth * heightDepth );
+              }
          }
+
+         ++outFrameNum;
         }
 
        }

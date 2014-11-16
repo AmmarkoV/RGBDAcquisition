@@ -285,6 +285,7 @@ int generateInterpolatedFrames(
      ++ptrA; ++ptrB; ++ptrOut;
    }
 
+
    if ( (firstDepth==0)||(secondDepth==0) ) { fprintf(stderr,"generateInterpolatedFrames( input frames are empty )\n"); return 0; }
    if ( intermediateDepthOut==0)   { fprintf(stderr,"generateInterpolatedFrames( output frames is not allocated)\n"); return 0; }
 
