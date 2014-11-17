@@ -244,7 +244,6 @@ int drawConnector(
 {
  glPushMatrix();
     glLineWidth(*scale);
-    //fprintf(stderr,"Scale %0.2f \n",*scale);
     glColor3f(R,G,B);
      glBegin(GL_LINES);
        glVertex3f(posA[0],posA[1],posA[2]);
