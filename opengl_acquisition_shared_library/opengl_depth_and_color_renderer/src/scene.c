@@ -476,6 +476,8 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling drawAllObjectsAtPositionsFromTrajectoryParser\n"); }
 
 
+ unsigned int timestampToUse = ticks*100;
+
   unsigned int i;
   for (i=0; i<scene->numberOfEvents; i++)
   {
@@ -486,7 +488,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
         case EVENT_INTERSECTION :
 
           fprintf(stderr,"Testing Rule %u , intersection between %u and %u \n",i,objID_A,objID_B);
-          if ( objectsCollide(scene,ticks*100,objID_A ,objID_B) )
+          if ( objectsCollide(scene,timestampToUse,objID_A ,objID_B) )
           {
              if (!scene->event[i].activated)
              {
@@ -518,7 +520,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
     {
        struct Model * mod = models[scene->object[i].type];
        float * pos = (float*) &posStack;
-       if ( calculateVirtualStreamPos(scene,i,ticks*100,pos,&scaleX,&scaleY,&scaleZ) )
+       if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
        {
          //This is a stupid way of passing stuff to be drawn
          R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
@@ -542,6 +544,39 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
        { fprintf(stderr,YELLOW "Could not determine position of object %s (%u) , so not drawing it\n" NORMAL,scene->object[i].name,i); }
        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after drawing object %u \n",i); }
     }
+
+
+
+
+
+  float posStackB[7]={0};
+  for (i=0; i<scene->numberOfConnectors; i++)
+  {
+    if (
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,posStack,&scaleX,&scaleY,&scaleZ) ) &&
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,posStackB,&scaleX,&scaleY,&scaleZ) )
+        )
+       {
+
+        drawConnector(posStack[0],posStack[1],posStack[2],
+                      posStackB[0],posStackB[1],posStackB[2],
+                      scene->connector[i].scale ,
+                      scene->connector[i].R ,
+                      scene->connector[i].G ,
+                      scene->connector[i].B ,
+                      scene->connector[i].Transparency );
+       } else
+       {
+         fprintf(stderr,YELLOW "Could not determine position of object %s (%u) , so not drawing it\n" NORMAL,scene->object[i].name,i);
+       }
+  }
+
+
+
+
+
+
+
   return 1;
 }
 

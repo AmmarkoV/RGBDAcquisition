@@ -236,6 +236,18 @@ void unloadModel(struct Model * mod)
     };
 }
 
+int drawConnector(float xA,float yA,float zA,float xB,float yB,float zB,float scale ,
+                  unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha )
+{
+  glLineWidth(scale);
+  glColor3f(R,G,B);
+  glBegin(GL_LINES);
+   glVertex3f(xA,yA,zA);
+   glVertex3f(xB,yB,zB);
+  glEnd();
+ return 1;
+}
+
 
 int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
 {
@@ -291,7 +303,8 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
         if (mod->transparency==0.0)
         {
           //fprintf(stderr,"SET RGB(%0.2f,%0.2f,%0.2f)\n",mod->colorR, mod->colorG, mod->colorB);
-          glColor3f(mod->colorR,mod->colorG,mod->colorB); }
+          glColor3f(mod->colorR,mod->colorG,mod->colorB);
+        }
         else
         { glEnable(GL_BLEND);			// Turn Blending On
           glBlendFunc(GL_SRC_ALPHA, GL_ONE);
