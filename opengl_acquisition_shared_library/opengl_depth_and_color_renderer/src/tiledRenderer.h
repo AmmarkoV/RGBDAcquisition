@@ -44,8 +44,6 @@ struct tiledRendererDetail
 
  float angXStep , angYStep , angZStep ;
 
-
-
 };
 
 

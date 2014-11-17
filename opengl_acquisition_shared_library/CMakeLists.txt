@@ -2,7 +2,7 @@ project( OpenGLAcquisition )
 cmake_minimum_required( VERSION 2.8.7 )  
   
 add_library(OpenGLAcquisition SHARED 
-            OpenGLAcquisition.cpp
+            OpenGLAcquisition.c
             OpenGLAcquisition.h
             opengl_depth_and_color_renderer/src/glx.c
             opengl_depth_and_color_renderer/src/glx.h
