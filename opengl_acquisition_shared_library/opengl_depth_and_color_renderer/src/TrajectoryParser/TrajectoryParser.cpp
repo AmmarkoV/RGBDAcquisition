@@ -458,6 +458,9 @@ int addConnectorToVirtualStream(
    stream->connector[pos].B = (float) B/255;
    stream->connector[pos].Transparency = (float) Alpha/100;
    stream->connector[pos].scale = scale;
+
+   ++stream->numberOfConnectors;
+   return 1;
 }
 
 int addObjectToVirtualStream(
@@ -901,7 +904,10 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[5] = InputParser_GetWordFloat(ipc,6);
                pos[6] = InputParser_GetWordFloat(ipc,7);
                if ( (pos[3]==0) && (pos[4]==0)  && (pos[5]==0)  && (pos[6]==0)  )
-                  { fprintf(stderr,"OBJ %u , frame %u declared with completely zero quaternion normalizing it to 0,0,0,1\n",item,newstream->timestamp); pos[6]=1.0; }
+                  {
+                    /*fprintf(stderr,"OBJ %u , frame %u declared with completely zero quaternion normalizing it to 0,0,0,1\n",item,newstream->timestamp);*/
+                    pos[6]=1.0;
+                  }
 
                int coordLength=7;
 

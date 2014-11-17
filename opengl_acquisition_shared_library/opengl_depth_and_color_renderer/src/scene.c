@@ -511,7 +511,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
 
   unsigned char noColor=0;
-  float posStack[7]={0};
+  float posStackA[7]={0};
   float scaleX=1.0,scaleY=1.0,scaleZ=1.0;
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 
@@ -519,7 +519,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   for (i=1; i<scene->numberOfObjects; i++)
     {
        struct Model * mod = models[scene->object[i].type];
-       float * pos = (float*) &posStack;
+       float * pos = (float*) &posStackA;
        if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
        {
          //This is a stupid way of passing stuff to be drawn
@@ -553,12 +553,15 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   for (i=0; i<scene->numberOfConnectors; i++)
   {
     if (
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,posStack,&scaleX,&scaleY,&scaleZ) ) &&
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,posStackA,&scaleX,&scaleY,&scaleZ) ) &&
         ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,posStackB,&scaleX,&scaleY,&scaleZ) )
         )
        {
+        fprintf(stderr,"Draw drawConnector %u( Object %u ( %f %f %f ) to Object %u ( %f %f %f )  )\n",i,
+                       scene->connector[i].objID_A , posStackA[0],posStackA[1],posStackA[2],
+                       scene->connector[i].objID_B , posStackB[0],posStackB[1],posStackB[2]);
 
-        drawConnector(posStack[0],posStack[1],posStack[2],
+        drawConnector(posStackA[0],posStackA[1],posStackA[2],
                       posStackB[0],posStackB[1],posStackB[2],
                       scene->connector[i].scale ,
                       scene->connector[i].R ,
@@ -567,7 +570,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
                       scene->connector[i].Transparency );
        } else
        {
-         fprintf(stderr,YELLOW "Could not determine position of object %s (%u) , so not drawing it\n" NORMAL,scene->object[i].name,i);
+         fprintf(stderr,YELLOW "Could not determine position of objects for connector %u\n" NORMAL,i);
        }
   }
 

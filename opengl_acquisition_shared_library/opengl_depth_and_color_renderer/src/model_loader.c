@@ -236,15 +236,25 @@ void unloadModel(struct Model * mod)
     };
 }
 
-int drawConnector(float xA,float yA,float zA,float xB,float yB,float zB,float scale ,
+int drawConnector(
+                  float xA,float yA,float zA,
+                  float xB,float yB,float zB,
+                  float scale ,
                   unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha )
 {
-  glLineWidth(scale);
-  glColor3f(R,G,B);
-  glBegin(GL_LINES);
-   glVertex3f(xA,yA,zA);
-   glVertex3f(xB,yB,zB);
-  glEnd();
+ glPushMatrix();
+  glTranslatef(xA,yA,zA);
+    glLineWidth(scale);
+    glColor3f(R,G,B);
+    drawCube();
+    //glBegin(GL_LINES);
+     //glVertex3f(xA,yA,zA);
+     //glVertex3f(xB,yB,zB);
+     //glVertex3f(10.0,10.0,10.0);
+     //glVertex3f(0.0,0.0,0.0);
+    //glEnd();
+   glTranslatef(-xA,-yA,-zA);
+ glPopMatrix();
  return 1;
 }
 
