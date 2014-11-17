@@ -842,6 +842,9 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[4] = InputParser_GetWordFloat(ipc,5);
                pos[5] = InputParser_GetWordFloat(ipc,6);
                pos[6] = InputParser_GetWordFloat(ipc,7);
+               if ( (pos[3]==0) && (pos[4]==0)  && (pos[5]==0)  && (pos[6]==0)  )
+                  { fprintf(stderr,"OBJ declared with completely zero quaternion normalizing it to 0,0,0,1"); pos[6]=1.0; }
+
                int coordLength=7;
 
                double euler[3];
@@ -879,6 +882,11 @@ int readVirtualStream(struct VirtualStream * newstream)
                #endif
             }
               else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME",5)==1)
+            {
+               //Increment Frame
+               //newstream->timestamp+=100;
+            } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
             {
               fprintf(stderr,"DEBUG Mode on\n");

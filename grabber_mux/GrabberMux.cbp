@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=" -transparency 40 -module1 TEMPLATE -from1 grasp01-01 -module2 TEMPLATE -from2 synergies  -o hoaOGLMux2 -shiftX 9 -maxFrames 5 -background 255 255 255 -maxFrames 1642" />
+				<Option parameters="-module1 TEMPLATE -from1 cvpr40 -module2 TEMPLATE -from2 cvprRun2 -to cvprMux -background 255 255 255 -trans 50 -maxFrames 10 -shiftTime -3 -frameDoubler" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
