@@ -92,6 +92,28 @@ struct VirtualEvent
 
 
 
+/**
+* @brief VirtualConnector structure holds all the data that defines a connector between two objects
+*/
+struct VirtualConnector
+{
+   char firstObject[MAX_PATH+1];
+   char secondObject[MAX_PATH+1];
+   char typeStr[MAX_PATH+1];
+
+   unsigned int connectorType;
+   unsigned int objID_A;
+   unsigned int objID_B;
+
+   float R , G , B , Transparency;
+
+   double scale;
+
+};
+
+
+
+
 
 
 
@@ -134,7 +156,6 @@ struct VirtualObject
 
    unsigned int generations;
    unsigned int particles;*/
-
 };
 
 
@@ -169,6 +190,10 @@ struct VirtualStream
     unsigned int numberOfObjects;
     struct VirtualObject * object;
 
+
+    unsigned int MAX_numberOfConnectors;
+    unsigned int numberOfConnectors;
+    struct VirtualConnector *connector;
 
     unsigned int MAX_numberOfEvents;
     unsigned int numberOfEvents;

@@ -68,7 +68,7 @@ int makepath(char * path)
 int executeMakeVideo(char * datasetName, unsigned int framerate, unsigned int width , unsigned int height)
 {
     char command[1024];
-    snprintf(command,1024,"avconv  -r %u -i %s/colorFrame_0_%%05d.pnm  -threads 8 -b 30000k -s %ux%u  %s.mp4",framerate,datasetName,width,height,datasetName);
+    snprintf(command,1024,"avconv  -r %u -i %s/colorFrame_0_%%05d.pnm  -y -threads 8 -b 30000k -s %ux%u  %s.mp4",framerate,datasetName,width,height,datasetName);
     fprintf(stderr,"Executing .. %s \n",command);
 
     return system(command);

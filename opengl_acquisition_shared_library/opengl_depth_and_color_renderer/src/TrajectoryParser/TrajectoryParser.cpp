@@ -402,6 +402,17 @@ int addStateToObject(
 
 
 
+int addConnectorToVirtualStream(
+                                 struct VirtualStream * stream ,
+                                 char * firstObject , char * secondObject ,
+                                 unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
+                                 float scale,
+                                 char * type
+                               )
+{
+ fprintf(stderr,"TODO: addConnectorToVirtualStream is a stub\n");
+}
+
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
                               char * name , char * type ,
@@ -843,7 +854,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[5] = InputParser_GetWordFloat(ipc,6);
                pos[6] = InputParser_GetWordFloat(ipc,7);
                if ( (pos[3]==0) && (pos[4]==0)  && (pos[5]==0)  && (pos[6]==0)  )
-                  { fprintf(stderr,"OBJ declared with completely zero quaternion normalizing it to 0,0,0,1"); pos[6]=1.0; }
+                  { fprintf(stderr,"OBJ %u , frame %u declared with completely zero quaternion normalizing it to 0,0,0,1\n",item,newstream->timestamp); pos[6]=1.0; }
 
                int coordLength=7;
 
@@ -885,7 +896,7 @@ int readVirtualStream(struct VirtualStream * newstream)
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME",5)==1)
             {
                //Increment Frame
-               //newstream->timestamp+=100;
+               newstream->timestamp+=100;
             } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
             {
@@ -939,6 +950,31 @@ int readVirtualStream(struct VirtualStream * newstream)
                InputParser_GetWord(ipc,2,model,MAX_PATH);
 
                addObjectTypeToVirtualStream( newstream , name, model );
+
+            } else
+            /*! REACHED A CONNECTOR DECLERATION ( CONNECTOR(something,somethingElse,0,255,0,0,1.0,type) )
+              argument 0 = CONNECTOR , argument 1 = nameOfFirstObject ,  argument 2 = nameOfSecondObject ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = Scale , argument 8 = Type */
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"CONNECTOR",9)==1)
+            {
+               char firstObject[MAX_PATH]={0} , secondObject[MAX_PATH]={0} , type[MAX_PATH]={0};
+               InputParser_GetWord(ipc,1,firstObject,MAX_PATH);
+               InputParser_GetWord(ipc,2,secondObject,MAX_PATH);
+
+               unsigned char R = (unsigned char) InputParser_GetWordInt(ipc,3);
+               unsigned char G = (unsigned char)  InputParser_GetWordInt(ipc,4);
+               unsigned char B = (unsigned char)  InputParser_GetWordInt(ipc,5);
+               unsigned char Alpha = (unsigned char)  InputParser_GetWordInt(ipc,6);
+               float scale = (float) InputParser_GetWordFloat(ipc,8);
+               float scaleY = (float) InputParser_GetWordFloat(ipc,9);
+               float scaleZ = (float) InputParser_GetWordFloat(ipc,10);
+
+               addConnectorToVirtualStream(
+                                            newstream ,
+                                            firstObject , secondObject,
+                                            R, G , B , Alpha ,
+                                            scale,
+                                            type
+                                          );
 
             } else
             /*! REACHED AN OBJECT DECLERATION ( OBJECT(something,spatoula_type,0,255,0,0,0,1.0,spatoula_something) )
