@@ -166,6 +166,33 @@ int growVirtualStreamEvents(struct VirtualStream * stream,unsigned int eventsToA
   return 1;
 }
 
+
+
+
+int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int connectorsToAdd)
+{
+  if (connectorsToAdd == 0) { return 0 ; }
+  if (stream == 0) { fprintf(stderr,"Given an empty stream to grow objects on \n"); return 0 ; }
+  struct VirtualConnector * new_connector;
+  new_connector = (struct VirtualConnector *) realloc( stream->connector , sizeof(struct VirtualConnector) * ( stream->MAX_numberOfConnectors+connectorsToAdd ));
+
+   if (new_connector == 0 )
+    {
+       fprintf(stderr,"Cannot add %u objects to our currently %u sized connector buffer\n",connectorsToAdd,stream->MAX_numberOfConnectors);
+       return 0;
+    } else
+    {
+      //Clean up all new objects allocated
+      void * clear_from_here  =  new_connector+stream->MAX_numberOfConnectors;
+      memset(clear_from_here,0,connectorsToAdd * sizeof(struct VirtualConnector));
+    }
+
+   stream->MAX_numberOfConnectors+=connectorsToAdd;
+   stream->connector = new_connector ;
+  return 1;
+}
+
+
 /*!
     ------------------------------------------------------------------------------------------
                        /\   /\   /\   /\   /\   /\   /\   /\   /\   /\   /\
@@ -407,10 +434,30 @@ int addConnectorToVirtualStream(
                                  char * firstObject , char * secondObject ,
                                  unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
                                  float scale,
-                                 char * type
+                                 char * typeStr
                                )
 {
- fprintf(stderr,"TODO: addConnectorToVirtualStream is a stub\n");
+   if (stream->MAX_numberOfConnectors<=stream->numberOfConnectors+1) { growVirtualStreamConnectors(stream,OBJECTS_TO_ADD_STEP); }
+   //Now we should definately have enough space for our new frame
+   if (stream->MAX_numberOfConnectors<=stream->numberOfConnectors+1) { fprintf(stderr,"Cannot add new OBJECT instruction\n"); return 0; }
+
+   unsigned int found=0;
+   unsigned int pos = stream->numberOfConnectors;
+
+   strcpy(stream->connector[pos].firstObject,firstObject);
+   stream->connector[pos].objID_A = getObjectID(stream,firstObject,&found);
+   if (!found) { fprintf(stderr,"Couldn't find object id for object %s \n",firstObject); }
+
+   strcpy(stream->connector[pos].secondObject,secondObject);
+   stream->connector[pos].objID_B = getObjectID(stream,secondObject,&found);
+   if (!found) { fprintf(stderr,"Couldn't find object id for object %s \n",secondObject); }
+
+   strcpy(stream->connector[pos].typeStr,typeStr);
+   stream->connector[pos].R = (float) R/255;
+   stream->connector[pos].G = (float) G/255;
+   stream->connector[pos].B = (float) B/255;
+   stream->connector[pos].Transparency = (float) Alpha/100;
+   stream->connector[pos].scale = scale;
 }
 
 int addObjectToVirtualStream(
@@ -456,12 +503,12 @@ int addObjectToVirtualStream(
 
    stream->object[pos].frame=0;
 
-
-  fprintf(stderr,"TODO CHECK THIS \n");
+  #warning "Check this part of the code "
+  //<-------- check from here ------------->
   stream->object[pos].lastFrame=0; // <- todo here <- check these
   stream->object[pos].MAX_numberOfFrames=0;
   stream->object[pos].numberOfFrames=0;
-  fprintf(stderr,"TODO CHECK THIS \n");
+  //<-------- check up until here ------------->
 
    unsigned int found=0;
    stream->object[pos].type = getObjectTypeID(stream,stream->object[pos].typeStr,&found);
