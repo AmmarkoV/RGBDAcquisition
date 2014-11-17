@@ -74,7 +74,7 @@ void unloadModel(struct Model * mod);
 int drawConnector(
                   float * posA,
                   float * posB,
-                  float scale ,
+                  float * scale ,
                   unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha );
 
 /**

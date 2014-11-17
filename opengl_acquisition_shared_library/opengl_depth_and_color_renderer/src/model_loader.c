@@ -239,11 +239,12 @@ void unloadModel(struct Model * mod)
 int drawConnector(
                   float * posA,
                   float * posB,
-                  float scale ,
+                  float * scale ,
                   unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha )
 {
  glPushMatrix();
-    glLineWidth(scale);
+    glLineWidth(*scale);
+    //fprintf(stderr,"Scale %0.2f \n",*scale);
     glColor3f(R,G,B);
      glBegin(GL_LINES);
        glVertex3f(posA[0],posA[1],posA[2]);

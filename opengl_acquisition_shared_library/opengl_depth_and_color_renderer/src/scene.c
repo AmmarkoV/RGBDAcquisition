@@ -563,10 +563,11 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
         fprintf(stderr,"Draw drawConnector %u( Object %u ( %f %f %f ) to Object %u ( %f %f %f )  )\n",i,
                        scene->connector[i].objID_A , pos1[0],pos1[1],pos1[2],
                        scene->connector[i].objID_B , pos2[0],pos2[1],pos2[2]);*/
+        float scale = (float) scene->connector[i].scale;
 
         drawConnector(pos1,
                       pos2,
-                      scene->connector[i].scale ,
+                      &scale ,
                       scene->connector[i].R ,
                       scene->connector[i].G ,
                       scene->connector[i].B ,

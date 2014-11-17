@@ -1017,9 +1017,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                unsigned char G = (unsigned char)  InputParser_GetWordInt(ipc,4);
                unsigned char B = (unsigned char)  InputParser_GetWordInt(ipc,5);
                unsigned char Alpha = (unsigned char)  InputParser_GetWordInt(ipc,6);
-               float scale = (float) InputParser_GetWordFloat(ipc,8);
-               float scaleY = (float) InputParser_GetWordFloat(ipc,9);
-               float scaleZ = (float) InputParser_GetWordFloat(ipc,10);
+               float scale = (float) InputParser_GetWordFloat(ipc,7);
 
                addConnectorToVirtualStream(
                                             newstream ,
