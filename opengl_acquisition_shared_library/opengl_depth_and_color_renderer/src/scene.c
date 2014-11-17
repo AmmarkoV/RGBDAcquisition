@@ -512,6 +512,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
   unsigned char noColor=0;
   float posStackA[7]={0};
+  float posStackB[7]={0};
   float scaleX=1.0,scaleY=1.0,scaleZ=1.0;
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 
@@ -548,21 +549,23 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
 
 
+  float * pos1 = (float*) &posStackA;
+  float * pos2 = (float*) &posStackB;
 
-  float posStackB[7]={0};
   for (i=0; i<scene->numberOfConnectors; i++)
   {
     if (
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,posStackA,&scaleX,&scaleY,&scaleZ) ) &&
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,posStackB,&scaleX,&scaleY,&scaleZ) )
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,&scaleX,&scaleY,&scaleZ) ) &&
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,&scaleX,&scaleY,&scaleZ) )
         )
        {
+        /*
         fprintf(stderr,"Draw drawConnector %u( Object %u ( %f %f %f ) to Object %u ( %f %f %f )  )\n",i,
-                       scene->connector[i].objID_A , posStackA[0],posStackA[1],posStackA[2],
-                       scene->connector[i].objID_B , posStackB[0],posStackB[1],posStackB[2]);
+                       scene->connector[i].objID_A , pos1[0],pos1[1],pos1[2],
+                       scene->connector[i].objID_B , pos2[0],pos2[1],pos2[2]);*/
 
-        drawConnector(posStackA[0],posStackA[1],posStackA[2],
-                      posStackB[0],posStackB[1],posStackB[2],
+        drawConnector(pos1,
+                      pos2,
                       scene->connector[i].scale ,
                       scene->connector[i].R ,
                       scene->connector[i].G ,

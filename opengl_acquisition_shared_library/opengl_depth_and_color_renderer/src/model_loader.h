@@ -71,6 +71,12 @@ struct Model * loadModel(char * directory,char * modelname);
 void unloadModel(struct Model * mod);
 
 
+int drawConnector(
+                  float * posA,
+                  float * posB,
+                  float scale ,
+                  unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha );
+
 /**
 * @brief Draw a Model at a specified pose in our world
 * @ingroup ModelLoader
