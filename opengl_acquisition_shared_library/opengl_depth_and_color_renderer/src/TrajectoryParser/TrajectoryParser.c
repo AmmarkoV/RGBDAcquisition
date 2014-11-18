@@ -993,6 +993,11 @@ int readVirtualStream(struct VirtualStream * newstream)
                #endif
             }
               else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME_RESET",11)==1)
+            {
+               //Reset Frame
+               newstream->timestamp=0;
+            } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME",5)==1)
             {
                //Increment Frame
@@ -1007,8 +1012,6 @@ int readVirtualStream(struct VirtualStream * newstream)
             {
               newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1);
             } else
-
-
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"TIMESTAMP",9)==1)
             {
               newstream->timestamp=InputParser_GetWordInt(ipc,1);
@@ -1764,7 +1767,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    } /*!END OF SIMPLE FRAME GETTER*/
    else
    { /*!START OF INTERPOLATED FRAME GETTER*/
-      fprintf(stderr,"interpolated position for ObjID %u\n",ObjID);
+     //fprintf(stderr,"interpolated position for ObjID %u\n",ObjID);
      //This is the case when we respect time , we will pick two frames and interpolate between them
      if ( timeAbsMilliseconds > stream->object[ObjID].MAX_timeOfFrames )
      {
