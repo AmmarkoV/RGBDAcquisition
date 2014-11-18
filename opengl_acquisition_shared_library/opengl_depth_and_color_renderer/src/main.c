@@ -164,6 +164,10 @@ unsigned int getOpenGLHeight()
 
 int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
+  GLint ext_format, ext_type;
+  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &ext_format);
+  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &ext_type);
+
     #if FLIP_OPEN_GL_IMAGES
        char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
        if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
@@ -328,12 +332,6 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
 
 int snapOGLRendererSandbox()
 {
-  GLint ext_format, ext_type;
-  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &ext_format);
-  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &ext_type);
-  //TODO : do something with these. .
-
-
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before starting to snapOGLRendererSandbox \n"); }
     if (glx_checkEvents())
     {
