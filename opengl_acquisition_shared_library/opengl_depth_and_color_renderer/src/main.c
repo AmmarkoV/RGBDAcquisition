@@ -32,8 +32,24 @@
 
 #define X_OFFSET 0 //This should always be 0 and probably removed also  :P
 
-//TODO : add Horizontal flipping  <- is the output mirrored ?
 
+#define NORMAL   "\033[0m"
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+
+
+void checkFrameGettersForError(char * from)
+{
+  int err=glGetError();
+  if (err !=  GL_NO_ERROR /*0*/ )
+    {
+      fprintf(stderr,YELLOW "Note: OpenGL stack is complaining about the way %s works\n" NORMAL , from);
+    }
+}
+
+#warning "TODO : add Horizontal flipping  <- is the output mirrored ?"
 
 int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
@@ -44,8 +60,7 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x + X_OFFSET , y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
-   if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"getOpenGLZBuffer() : OpenGL error after glReadPixels() , this OpenGL graphics stack , does not support our frame format/type ? \n"); }
+    checkFrameGettersForError("Z-Buffer Getter");
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -100,9 +115,8 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     memset(zbuffer,0,(width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
+    checkFrameGettersForError("Depth Getter");
 
-   if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"getOpenGLDepth() : OpenGL error after glReadPixels() , this OpenGL graphics stack , does not support our frame format/type ? \n"); }
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -161,7 +175,6 @@ unsigned int getOpenGLHeight()
     return HEIGHT;
 }
 
-
 int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
   GLint ext_format, ext_type;
@@ -172,11 +185,8 @@ int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int wid
        char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
        if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
 
-   if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"getOpenGLColor() : OpenGL error before glReadPixels() \n"); }
        glReadPixels(x + X_OFFSET, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
-   if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"getOpenGLColor() : OpenGL error after glReadPixels() , this OpenGL graphics stack , does not support our frame format/type ? \n"); }
+       checkFrameGettersForError("Flipped Color Getter");
 
       //SLOW INVERSION CODE :P
        unsigned int yp = 0;
@@ -191,6 +201,7 @@ int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int wid
       free(inverter);
     #else
        glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,color);
+       checkFrameGettersForError("Normal Color Getter");
     #endif
 
 
