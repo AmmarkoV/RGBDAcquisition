@@ -6,11 +6,52 @@
 
 #include "tools.h"
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+
+void printOpenGLError(int errorCode)
+{
+  switch (errorCode)
+  {
+    case  GL_NO_ERROR       :
+         fprintf(stderr,"No error has been recorded.");
+        break;
+    case  GL_INVALID_ENUM   :
+         fprintf(stderr,"An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag.\n");
+        break;
+    case  GL_INVALID_VALUE  :
+         fprintf(stderr,"A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag.");
+        break;
+    case  GL_INVALID_OPERATION :
+         fprintf(stderr,"The specified operation is not allowed in the current state. The offending command is ignored and has no other side effect than to set the error flag.");
+        break;
+    case  GL_INVALID_FRAMEBUFFER_OPERATION :
+         fprintf(stderr,"The framebuffer object is not complete. The offending command is ignored and has no other side effect than to set the error flag.");
+        break;
+    case  GL_OUT_OF_MEMORY :
+         fprintf(stderr,"There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded.");
+        break;
+    case  GL_STACK_UNDERFLOW :
+         fprintf(stderr,"An attempt has been made to perform an operation that would cause an internal stack to underflow.");
+        break;
+    case  GL_STACK_OVERFLOW :
+         fprintf(stderr,"An attempt has been made to perform an operation that would cause an internal stack to overflow.");
+     break;
+  };
+}
+
 
 int checkOpenGLError(char * file , int  line)
 {
   int err=glGetError();
-  if (err !=  GL_NO_ERROR /*0*/ ) {  fprintf(stderr,"OpenGL Error (%u) : %s %u \n ", err , file ,line ); return 1; }
+  if (err !=  GL_NO_ERROR /*0*/ )
+    {
+      fprintf(stderr,RED "OpenGL Error (%u) : %s %u \n ", err , file ,line );
+      printOpenGLError(err);
+      fprintf(stderr,"\n" NORMAL);
+      return 1;
+    }
  return 0;
 }
 
