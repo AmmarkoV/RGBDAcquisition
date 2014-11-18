@@ -17,6 +17,7 @@
 #include "glx.h"
 #include "model_loader_obj.h"
 #include "scene.h"
+#include "tools.h"
 
 #include "save_to_file.h"
 #include "shader_loader.h"
@@ -43,6 +44,8 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x + X_OFFSET , y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"getOpenGLZBuffer() : OpenGL error after glReadPixels() \n"); }
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -74,6 +77,10 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
     #endif
 
     if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
+
+
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"OpenGL error after getOpenGLZBuffer() \n"); }
     return 1;
 }
 
@@ -86,10 +93,16 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
     glGetDoublev(GL_DEPTH_SCALE, &depth_scale); // Returns 1.0
 
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"getOpenGLDepth() : Error getting depth bias/scale \n"); }
+
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     memset(zbuffer,0,(width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
+
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"getOpenGLDepth() : OpenGL error after glReadPixels() \n"); }
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -129,6 +142,11 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
        }
 
     if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
+
+
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"OpenGL error after getOpenGLDepth() \n"); }
+
     return 1;
 }
 
@@ -150,7 +168,11 @@ int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int wid
        char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
        if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
 
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"getOpenGLColor() : OpenGL error before glReadPixels() \n"); }
        glReadPixels(x + X_OFFSET, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"getOpenGLColor() : OpenGL error after glReadPixels() \n"); }
 
       //SLOW INVERSION CODE :P
        unsigned int yp = 0;
@@ -166,6 +188,10 @@ int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int wid
     #else
        glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,color);
     #endif
+
+
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"OpenGL error after getOpenGLColor() \n"); }
 
    return 1;
 }
@@ -205,6 +231,7 @@ void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned in
 
 void redraw(void)
 {
+ if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error just after receiving a redraw command\n"); }
     renderScene();
     glx_endRedraw();
 }
@@ -301,10 +328,20 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
 
 int snapOGLRendererSandbox()
 {
+  GLint ext_format, ext_type;
+  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &ext_format);
+  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &ext_type);
+  //TODO : do something with these. .
+
+
+ if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before starting to snapOGLRendererSandbox \n"); }
     if (glx_checkEvents())
     {
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after checking glx_checkEvents()\n"); }
       tickScene();
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after ticking scene\n"); }
       redraw();
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after redrawing scene\n"); }
       return 1;
     }
    return 0;

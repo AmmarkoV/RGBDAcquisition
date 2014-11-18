@@ -579,11 +579,6 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   }
 
 
-
-
-
-
-
   return 1;
 }
 
