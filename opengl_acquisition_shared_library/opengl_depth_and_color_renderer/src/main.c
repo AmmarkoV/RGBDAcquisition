@@ -45,7 +45,7 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x + X_OFFSET , y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
    if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"getOpenGLZBuffer() : OpenGL error after glReadPixels() \n"); }
+      { fprintf(stderr,"getOpenGLZBuffer() : OpenGL error after glReadPixels() , this OpenGL graphics stack , does not support our frame format/type ? \n"); }
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -102,7 +102,7 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
 
    if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"getOpenGLDepth() : OpenGL error after glReadPixels() \n"); }
+      { fprintf(stderr,"getOpenGLDepth() : OpenGL error after glReadPixels() , this OpenGL graphics stack , does not support our frame format/type ? \n"); }
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -176,7 +176,7 @@ int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int wid
       { fprintf(stderr,"getOpenGLColor() : OpenGL error before glReadPixels() \n"); }
        glReadPixels(x + X_OFFSET, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
    if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"getOpenGLColor() : OpenGL error after glReadPixels() \n"); }
+      { fprintf(stderr,"getOpenGLColor() : OpenGL error after glReadPixels() , this OpenGL graphics stack , does not support our frame format/type ? \n"); }
 
       //SLOW INVERSION CODE :P
        unsigned int yp = 0;
