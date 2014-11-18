@@ -72,7 +72,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../tools/AmMatrix/solveLinearSystemGJ.h" />
-		<Unit filename="OpenGLAcquisition.cpp" />
+		<Unit filename="OpenGLAcquisition.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="OpenGLAcquisition.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/OGLRendererSandbox.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/bmp.c">

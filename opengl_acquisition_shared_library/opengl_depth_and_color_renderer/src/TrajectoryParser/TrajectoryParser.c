@@ -609,6 +609,53 @@ int addEventToVirtualStream(
 }
 
 
+int smoothTrajectoriesOfObject(struct VirtualStream * stream,unsigned int ObjID)
+{
+  float avg=0.0;
+  unsigned int pos=0;
+  for (pos=1; pos<stream->object[ObjID].numberOfFrames; pos++)
+  {
+    //------------------------------------------------------------------------------------
+    avg = stream->object[ObjID].frame[pos-1].x + stream->object[ObjID].frame[pos].x;
+    stream->object[ObjID].frame[pos-1].x = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].y + stream->object[ObjID].frame[pos].y;
+    stream->object[ObjID].frame[pos-1].y = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].z + stream->object[ObjID].frame[pos].z;
+    stream->object[ObjID].frame[pos-1].z = avg / 2;
+    //------------------------------------------------------------------------------------
+
+
+    //------------------------------------------------------------------------------------
+    avg = stream->object[ObjID].frame[pos-1].rot1 + stream->object[ObjID].frame[pos].rot1;
+    stream->object[ObjID].frame[pos-1].rot1 = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].rot2 + stream->object[ObjID].frame[pos].rot2;
+    stream->object[ObjID].frame[pos-1].rot2 = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].rot3 + stream->object[ObjID].frame[pos].rot3;
+    stream->object[ObjID].frame[pos-1].rot3 = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].rot4 + stream->object[ObjID].frame[pos].rot4;
+    stream->object[ObjID].frame[pos-1].rot4 = avg / 2;
+    //------------------------------------------------------------------------------------
+  }
+ return 1;
+}
+
+int smoothTrajectories(struct VirtualStream * stream)
+{
+  fprintf(stderr,"Smoothing %u objects \n",stream->numberOfObjects);
+  unsigned int objID=0;
+  for (objID=0; objID<stream->numberOfObjects; objID++)
+  {
+     smoothTrajectoriesOfObject(stream,objID);
+  }
+ return 1;
+}
+
+
 
 float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z)
 {
@@ -966,7 +1013,11 @@ int readVirtualStream(struct VirtualStream * newstream)
             {
               newstream->timestamp=InputParser_GetWordInt(ipc,1);
             } else
-
+            /*! REACHED A SMOOTH DECLERATION ( SMOOTH() )  */
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"SMOOTH",6)==1)
+            {
+              smoothTrajectories(newstream);
+            } else
             /*! REACHED AN AUTO REFRESH DECLERATION ( AUTOREFRESH(1500) )
               argument 0 = AUTOREFRESH , argument 1 = value in milliseconds (0 = off ) */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"AUTOREFRESH",11)==1)
