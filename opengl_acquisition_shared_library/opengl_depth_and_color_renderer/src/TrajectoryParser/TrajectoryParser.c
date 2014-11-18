@@ -854,67 +854,37 @@ int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX
 }
 
 
-int readVirtualStream(struct VirtualStream * newstream)
+int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filename)
 {
   #warning "Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser"
   #warning "This should probably be split down to some primitives and also support things like including a file from another file"
   #warning "dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate"
   #warning "parser declerations like arrowsX or objX"
 
-
-
   #if USE_FILE_INPUT
-
-  #if PRINT_DEBUGGING_INFO
-  fprintf(stderr,"readVirtualStream(%s) called \n",newstream->filename);
-  #endif
-
   //Our stack variables ..
+  unsigned int fileSize=0;
   unsigned int readOpResult = 0;
   char line [LINE_MAX_LENGTH]={0};
 
   //Try and open filename
-  FILE * fp = fopen(newstream->filename,"r");
-  if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",newstream->filename); return 0; }
+  FILE * fp = fopen(filename,"r");
+  if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
 
-  //Find out the size of the file..!
+  //Find out the size of the file , This is no longer needed..!
+  /*
   fseek (fp , 0 , SEEK_END);
   unsigned long lSize = ftell (fp);
   rewind (fp);
-  fprintf(stderr,"Opening a %lu byte file %s \n",lSize,newstream->filename);
+  fprintf(stderr,"Opening a %lu byte file %s \n",lSize,filename);
+  fileSize = lSize;
+  */
 
   //Allocate a token parser
   struct InputParserC * ipc=0;
   ipc = InputParser_Create(LINE_MAX_LENGTH,5);
   if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
 
-  newstream->fileSize = lSize;
-
-  //Add a dummy CAMERA Object here!
-  growVirtualStreamObjectsTypes(newstream,OBJECT_TYPES_TO_ADD_STEP);
-  strcpy( newstream->objectTypes[0].name , "camera" );
-  strcpy( newstream->objectTypes[0].model , "camera" );
-  ++newstream->numberOfObjectTypes;
-
-  growVirtualStreamObjects(newstream,OBJECTS_TO_ADD_STEP);
-  strcpy( newstream->object[0].name, "camera");
-  strcpy( newstream->object[0].typeStr, "camera");
-  strcpy( newstream->object[0].value, "camera");
-  newstream->object[0].type = 0; //Camera
-  newstream->object[0].R =0;
-  newstream->object[0].G =0;
-  newstream->object[0].B =0;
-  newstream->scaleWorld[0]=1.0; newstream->scaleWorld[1]=1.0; newstream->scaleWorld[2]=1.0;
-  newstream->scaleWorld[3]=1.0; newstream->scaleWorld[4]=1.0; newstream->scaleWorld[5]=1.0;
-  newstream->object[0].Transparency=0;
-  ++newstream->numberOfObjects;
-  // CAMERA OBJECT ADDED
-
-  newstream->rotationsOverride=0;
-  newstream->rotationsXYZ[0]=0; newstream->rotationsXYZ[1]=1; newstream->rotationsXYZ[2]=2;
-  newstream->rotationsOffset[0]=0.0; newstream->rotationsOffset[1]=0.0; newstream->rotationsOffset[2]=0.0;
-
-  newstream->debug=0;
  //Everything is set , Lets read the file!
   while (!feof(fp))
   {
@@ -995,13 +965,24 @@ int readVirtualStream(struct VirtualStream * newstream)
               else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME_RESET",11)==1)
             {
-               //Reset Frame
-               newstream->timestamp=0;
+               newstream->timestamp=0;  //Reset Frame
             } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME",5)==1)
             {
-               //Increment Frame
-               newstream->timestamp+=100;
+               newstream->timestamp+=100; //Increment Frame
+            } else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"INCLUDE",7)==1)
+            {
+               char includeFile[MAX_PATH]={0};
+               InputParser_GetWord(ipc,1,includeFile,MAX_PATH);
+              if (appendVirtualStreamFromFile(newstream,includeFile))
+              {
+                fprintf(stderr,GREEN "Successfully included file %s..!" NORMAL,includeFile);
+              } else
+              {
+                fprintf(stderr,RED "Could not include include file..!" NORMAL);
+              }
+
             } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
             {
@@ -1397,6 +1378,49 @@ int readVirtualStream(struct VirtualStream * newstream)
  return 0;
 }
 
+
+
+int readVirtualStream(struct VirtualStream * newstream)
+{
+  //Try and open filename to get the size ( this is needed for auto refresh functionality to work correctly..!
+   FILE * fp = fopen(newstream->filename,"r");
+   if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",newstream->filename); return 0; } else
+    {
+      fseek (fp , 0 , SEEK_END);
+      unsigned long lSize = ftell (fp);
+      rewind (fp);
+      fprintf(stderr,"Opening a %lu byte file %s \n",lSize,newstream->filename);
+      newstream->fileSize = lSize;
+    }
+
+  //Do initial state here , make sure we will start reading using a clean state
+  growVirtualStreamObjectsTypes(newstream,OBJECT_TYPES_TO_ADD_STEP);
+  strcpy( newstream->objectTypes[0].name , "camera" );
+  strcpy( newstream->objectTypes[0].model , "camera" );
+  ++newstream->numberOfObjectTypes;
+
+  growVirtualStreamObjects(newstream,OBJECTS_TO_ADD_STEP);
+  strcpy( newstream->object[0].name, "camera");
+  strcpy( newstream->object[0].typeStr, "camera");
+  strcpy( newstream->object[0].value, "camera");
+  newstream->object[0].type = 0; //Camera
+  newstream->object[0].R =0;
+  newstream->object[0].G =0;
+  newstream->object[0].B =0;
+  newstream->scaleWorld[0]=1.0; newstream->scaleWorld[1]=1.0; newstream->scaleWorld[2]=1.0;
+  newstream->scaleWorld[3]=1.0; newstream->scaleWorld[4]=1.0; newstream->scaleWorld[5]=1.0;
+  newstream->object[0].Transparency=0;
+  ++newstream->numberOfObjects;
+  // CAMERA OBJECT ADDED
+
+  newstream->rotationsOverride=0;
+  newstream->rotationsXYZ[0]=0; newstream->rotationsXYZ[1]=1; newstream->rotationsXYZ[2]=2;
+  newstream->rotationsOffset[0]=0.0; newstream->rotationsOffset[1]=0.0; newstream->rotationsOffset[2]=0.0;
+
+  newstream->debug=0;
+
+  return appendVirtualStreamFromFile(newstream,newstream->filename);
+}
 
 
 
