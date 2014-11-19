@@ -3,8 +3,9 @@ cmake_minimum_required( VERSION 2.8.7 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/3dparty ${CMAKE_MODULE_PATH})
 
-set(CMAKE_CXX_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
-set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
+#-march=native -mtune=native
+set(CMAKE_CXX_FLAGS "-fPIC  -O3 -fexpensive-optimizations -s") 
+set(CMAKE_C_FLAGS "-fPIC  -O3 -fexpensive-optimizations -s") 
       
 OPTION (ENABLE_AMMARSERVER_BROADCAST ON)
 OPTION (ENABLE_FACEDETECTION_DEV OFF)
