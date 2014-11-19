@@ -172,6 +172,7 @@ int flipDepth(unsigned short * depth,unsigned int width , unsigned int height )
 //Single place to change filename conventions :)
 void getFilenameForNextResource(char * filename , unsigned int maxSize , unsigned int resType , unsigned int devID , unsigned int cycle, char * readFromDir , char * extension )
 {
+  devID=0; //<- test
   switch (resType)
   {
     case RESOURCE_COLOR_FILE : sprintf(filename,"frames/%s/colorFrame_%u_%05u.%s",readFromDir,devID,cycle,extension); break;

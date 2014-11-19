@@ -2,7 +2,7 @@ project( OpenGLAcquisition )
 cmake_minimum_required( VERSION 2.8.7 )  
   
 add_library(OpenGLAcquisition SHARED 
-            OpenGLAcquisition.cpp
+            OpenGLAcquisition.c
             OpenGLAcquisition.h
             opengl_depth_and_color_renderer/src/glx.c
             opengl_depth_and_color_renderer/src/glx.h
@@ -34,9 +34,9 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/TextureLoader/ppm.h
             opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
             opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h
-            opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.cpp
+            opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c
             opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
-            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.cpp
+            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h 
            ) 
 target_link_libraries(OpenGLAcquisition rt m CalibrationLibrary GL GLU X11 ) 

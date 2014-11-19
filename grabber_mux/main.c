@@ -20,6 +20,8 @@ signed int shiftX=0;
 signed int shiftY=0;
 signed int shiftTime=0;
 
+unsigned int frameDoublerEnabled=0;
+
 int calibrationSetA = 0;
 struct calibration calibA;
 int calibrationSetB = 0;
@@ -29,11 +31,11 @@ unsigned int longExposure = 0;
 unsigned long * rgbCollector =0;
 unsigned long * depthCollector =0;
 
-unsigned int saveColor=1 , saveDepth=1;
+unsigned int saveColor=1 , saveDepth=1 , makeVideo =0 , videoFps=25 ;
 //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
-unsigned int frameNum=0,maxFramesToGrab=10;
+unsigned int frameNum=0,outFrameNum=0,maxFramesToGrab=10;
 
-unsigned int devID_1=0 , devID_2=0;
+unsigned int devID_1=0 , devID_2=0 ;
 ModuleIdentifier moduleID_1 = OPENGL_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 ModuleIdentifier moduleID_2 = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
@@ -57,11 +59,22 @@ int makepath(char * path)
     //FILE *fp;
     /* Open the command for reading. */
     char command[1024];
-    sprintf(command,"mkdir -p %s",outputfoldername);
+    snprintf(command,1024,"mkdir -p %s",outputfoldername);
     fprintf(stderr,"Executing .. %s \n",command);
 
     return system(command);
 }
+
+int executeMakeVideo(char * datasetName, unsigned int framerate, unsigned int width , unsigned int height)
+{
+    char command[1024];
+    snprintf(command,1024,"avconv  -r %u -i %s/colorFrame_0_%%05d.pnm  -y -threads 8 -b 30000k -s %ux%u  %s.mp4",framerate,datasetName,width,height,datasetName);
+    fprintf(stderr,"Executing .. %s \n",command);
+
+    return system(command);
+
+}
+
 
 
 int main(int argc, char *argv[])
@@ -165,6 +178,21 @@ int main(int argc, char *argv[])
                                               fprintf(stderr,"Adding a time shift ( %u ) \n",argv[i+1],shiftTime);
                                             } else
     if (
+        (strcmp(argv[i],"-makeVideo")==0)
+       )
+       { makeVideo=1; fprintf(stderr,"Will make video on end\n"); }
+       else
+    if (
+        (strcmp(argv[i],"-videoFps")==0)
+       )
+       { videoFps=atoi(argv[i+1]); fprintf(stderr,"Video Framerate set to %u\n",videoFps); }
+      else
+    if (
+        (strcmp(argv[i],"-frameDoubler")==0)
+       )
+       { frameDoublerEnabled=1; fprintf(stderr,"Frame Doubler Will be engaged \n"); }
+      else
+    if (
         (strcmp(argv[i],"-from1")==0) ||
         (strcmp(argv[i],"-i1")==0)||
         (strcmp(argv[i],"-fromBase")==0)
@@ -265,14 +293,34 @@ int main(int argc, char *argv[])
     char outfilename[512]={0};
 
 
-    unsigned int widthRGB , heightRGB , channelsRGB , bitsperpixelRGB;
+    unsigned int widthRGB=0 , heightRGB=0 , channelsRGB=0 , bitsperpixelRGB=0;
     acquisitionGetColorFrameDimensions(moduleID_1,devID_1,&widthRGB,&heightRGB ,&channelsRGB , &bitsperpixelRGB );
     //Todo , check with module 2 bla bla
     unsigned char * rgbOut = (unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
 
-    unsigned int widthDepth , heightDepth , channelsDepth , bitsperpixelDepth;
+    unsigned int widthDepth=0 , heightDepth=0 , channelsDepth=0 , bitsperpixelDepth=0;
     acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&widthDepth,&heightDepth ,&channelsDepth , &bitsperpixelDepth );
     unsigned short * depthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
+
+
+    unsigned char * doubleRGB = 0 , * doubleRGBOut = 0;
+    unsigned short * doubleDepth = 0 , * doubleDepthOut = 0;
+    if (frameDoublerEnabled)
+    {
+      doubleRGB = (unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
+      if (doubleRGB==0) { fprintf(stderr,"Could not allocate an RGB Input buffer for double buffering"); return 1; }
+
+      doubleRGBOut = (unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
+      if (doubleRGBOut==0) { fprintf(stderr,"Could not allocate an RGB Output buffer for double buffering"); return 1; }
+
+      doubleDepth = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
+      if (doubleDepth==0) { fprintf(stderr,"Could not allocate an Depth Input buffer for double buffering"); return 1; }
+
+      doubleDepthOut = (unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
+      if (doubleDepthOut==0) { fprintf(stderr,"Could not allocate an RGB Output buffer for double buffering"); return 1; }
+
+    }
+
 
     if (longExposure)
     {
@@ -320,18 +368,56 @@ int main(int argc, char *argv[])
            transparency , 0 );
 
 
+       if (frameDoublerEnabled)
+       { // ==========================================================================
+        if (outFrameNum%2==1)
+        {
+          generateInterpolatedFrames(
+                                      doubleRGB, rgbOut , doubleRGBOut ,
+                                      doubleDepth, depthOut , doubleDepthOut ,
+                                      widthRGB , heightRGB
+                                     );
+
          if (saveColor)
           {
-          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
-          saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
+          saveMuxImageToFile(outfilename,doubleRGBOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+          if ( (doubleRGB!=0)&&(rgbOut!=0) )
+              {
+                memcpy( doubleRGB , rgbOut , sizeof(unsigned char) * widthRGB * heightRGB * 3 );
+              }
           }
 
          if (saveDepth)
          {
-          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
-          saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
+          saveMuxImageToFile(outfilename,(unsigned char*) doubleDepthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+          if ( (doubleDepth!=0)&&(depthOut!=0) )
+              {
+                memcpy( doubleDepth , depthOut , sizeof(unsigned short) * widthDepth * heightDepth );
+              }
          }
+
+         ++outFrameNum;
         }
+       } // ==========================================================================
+
+
+         if (saveColor)
+          {
+           sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
+           saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
+          }
+
+         if (saveDepth)
+          {
+           sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,outFrameNum);
+           saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
+          }
+
+          ++outFrameNum;
+        }
+
 
 
 
@@ -365,6 +451,25 @@ int main(int argc, char *argv[])
 
 
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
+
+    if (makeVideo)
+    {
+      if (frameDoublerEnabled) { videoFps=videoFps*2; }
+      if (executeMakeVideo(outputfoldername, videoFps , widthRGB , heightRGB )) { fprintf(stderr,"Could not make a video\n"); } else
+                                                                                { fprintf(stderr,"Made a video\n"); }
+    }
+
+    //-----------------------------------------------
+    if (depthOut != 0) { free(depthOut); }
+    if (rgbOut != 0) { free(rgbOut); }
+    //-----------------------------------------------
+    if (doubleRGB != 0) { free(doubleRGB); }
+    if (doubleRGBOut != 0) { free(doubleRGBOut); }
+    //-----------------------------------------------
+    if (doubleDepth != 0) { free(doubleDepth); }
+    if (doubleDepthOut != 0) { free(doubleDepthOut); }
+    //-----------------------------------------------
+
 
     closeEverything();
 

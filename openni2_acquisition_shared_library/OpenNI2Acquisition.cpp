@@ -26,6 +26,14 @@
 #define RETURN_DEPTH_FRAME_IN_SYNC_WITH_NITE 1
 #define USE_WAITFORANYSTREAM_TO_GRAB 0
 
+
+
+#if USE_WAITFORANYSTREAM_TO_GRAB
+ #warning "Wait for any stream to grab synced frames works badly..  Would not suggest using it..!"
+#endif // USE_WAITFORANYSTREAM_TO_GRAB
+
+
+
 #if BUILD_OPENNI2
 
 #include <unistd.h>

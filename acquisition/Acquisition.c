@@ -62,7 +62,7 @@ int acquisitionSimulateTime(unsigned long timeInMillisecs)
 unsigned long GetTickCount()
 {
    if (simulateTick) { return simulatedTickValue; }
-   return GetTickCountInternal();
+   return GetTickCountMilliseconds();
 }
 
 int acquisitionFileExists(char * filename)
@@ -97,10 +97,10 @@ void countdownDelay(int seconds)
     for (secCounter=seconds; secCounter>0; secCounter--)
     {
       fprintf(stderr,"%u\n",secCounter);
-      VisCortxMillisecondsSleep(1000); // Waiting a while for the glitch frames to pass
+      sleepMilliseconds(1000); // Waiting a while for the glitch frames to pass
 
     }
-    VisCortxMillisecondsSleep(1000); // Waiting a while for the glitch frames to pass
+    sleepMilliseconds(1000); // Waiting a while for the glitch frames to pass
 }
 
 

@@ -476,6 +476,8 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling drawAllObjectsAtPositionsFromTrajectoryParser\n"); }
 
 
+ unsigned int timestampToUse = ticks*100;
+
   unsigned int i;
   for (i=0; i<scene->numberOfEvents; i++)
   {
@@ -486,7 +488,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
         case EVENT_INTERSECTION :
 
           fprintf(stderr,"Testing Rule %u , intersection between %u and %u \n",i,objID_A,objID_B);
-          if ( objectsCollide(scene,ticks*100,objID_A ,objID_B) )
+          if ( objectsCollide(scene,timestampToUse,objID_A ,objID_B) )
           {
              if (!scene->event[i].activated)
              {
@@ -509,7 +511,8 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
 
   unsigned char noColor=0;
-  float posStack[7]={0};
+  float posStackA[7]={0};
+  float posStackB[7]={0};
   float scaleX=1.0,scaleY=1.0,scaleZ=1.0;
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 
@@ -517,8 +520,8 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   for (i=1; i<scene->numberOfObjects; i++)
     {
        struct Model * mod = models[scene->object[i].type];
-       float * pos = (float*) &posStack;
-       if ( calculateVirtualStreamPos(scene,i,ticks*100,pos,&scaleX,&scaleY,&scaleZ) )
+       float * pos = (float*) &posStackA;
+       if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
        {
          //This is a stupid way of passing stuff to be drawn
          R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
@@ -531,7 +534,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
 
-         fprintf(stderr,"Draw OBJ%u(%f %f %f , %f %f %f , trans %f )\n",i,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],trans);
+         //fprintf(stderr,"Draw OBJ%u(%f %f %f , %f %f %f , trans %f )\n",i,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],trans);
 
          if (scene->debug)
                 { print3DPoint2DWindowPosition(i , pos[0],pos[1],pos[2] ); }
@@ -542,6 +545,40 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
        { fprintf(stderr,YELLOW "Could not determine position of object %s (%u) , so not drawing it\n" NORMAL,scene->object[i].name,i); }
        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after drawing object %u \n",i); }
     }
+
+
+
+
+  float * pos1 = (float*) &posStackA;
+  float * pos2 = (float*) &posStackB;
+
+  for (i=0; i<scene->numberOfConnectors; i++)
+  {
+    if (
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,&scaleX,&scaleY,&scaleZ) ) &&
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,&scaleX,&scaleY,&scaleZ) )
+        )
+       {
+        /*
+        fprintf(stderr,"Draw drawConnector %u( Object %u ( %f %f %f ) to Object %u ( %f %f %f )  )\n",i,
+                       scene->connector[i].objID_A , pos1[0],pos1[1],pos1[2],
+                       scene->connector[i].objID_B , pos2[0],pos2[1],pos2[2]);*/
+        float scale = (float) scene->connector[i].scale;
+
+        drawConnector(pos1,
+                      pos2,
+                      &scale ,
+                      scene->connector[i].R ,
+                      scene->connector[i].G ,
+                      scene->connector[i].B ,
+                      scene->connector[i].Transparency );
+       } else
+       {
+         fprintf(stderr,YELLOW "Could not determine position of objects for connector %u\n" NORMAL,i);
+       }
+  }
+
+
   return 1;
 }
 

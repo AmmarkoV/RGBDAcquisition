@@ -6,11 +6,52 @@
 
 #include "tools.h"
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+
+void printOpenGLError(int errorCode)
+{
+  switch (errorCode)
+  {
+    case  GL_NO_ERROR       :
+         fprintf(stderr,"No error has been recorded.");
+        break;
+    case  GL_INVALID_ENUM   :
+         fprintf(stderr,"An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag.\n");
+        break;
+    case  GL_INVALID_VALUE  :
+         fprintf(stderr,"A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag.");
+        break;
+    case  GL_INVALID_OPERATION :
+         fprintf(stderr,"The specified operation is not allowed in the current state. The offending command is ignored and has no other side effect than to set the error flag.");
+        break;
+    case  GL_INVALID_FRAMEBUFFER_OPERATION :
+         fprintf(stderr,"The framebuffer object is not complete. The offending command is ignored and has no other side effect than to set the error flag.");
+        break;
+    case  GL_OUT_OF_MEMORY :
+         fprintf(stderr,"There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded.");
+        break;
+    case  GL_STACK_UNDERFLOW :
+         fprintf(stderr,"An attempt has been made to perform an operation that would cause an internal stack to underflow.");
+        break;
+    case  GL_STACK_OVERFLOW :
+         fprintf(stderr,"An attempt has been made to perform an operation that would cause an internal stack to overflow.");
+     break;
+  };
+}
+
 
 int checkOpenGLError(char * file , int  line)
 {
   int err=glGetError();
-  if (err !=  GL_NO_ERROR /*0*/ ) {  fprintf(stderr,"OpenGL Error (%u) : %s %u \n ", err , file ,line ); return 1; }
+  if (err !=  GL_NO_ERROR /*0*/ )
+    {
+      fprintf(stderr,RED "OpenGL Error (%u) : %s %u \n ", err , file ,line );
+      printOpenGLError(err);
+      fprintf(stderr,"\n" NORMAL);
+      return 1;
+    }
  return 0;
 }
 
@@ -143,7 +184,27 @@ inline float sqrt_fast_approximation(const float x)
   return u.x;
 }
 
-float distanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2)
+
+
+
+double distanceBetween3DPoints(double * p1, double * p2)
+{
+  double x1 = p1[0] , y1 = p1[1] , z1 = p1[2];
+  double x2 = p2[0] , y2 = p2[1] , z2 = p2[2];
+
+  double dx=0.0,dy=0.0,dz=0.0;
+
+  //I Could actually skip this
+  if (x1>=x2) { dx=x1-x2; } else { dx=x2-x1; }
+  if (y1>=y2) { dy=y1-y2; } else { dy=y2-y1; }
+  if (z1>=z2) { dz=z1-z2; } else { dz=z2-z1; }
+  //==========================
+
+  return (double) sqrt( (dx * dx) + (dy * dy) + (dz * dz) );
+}
+
+
+float distanceBetween3DPointsFast(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2)
 {
     //sqrt_fast_approximation
   float dx,dy,dz;

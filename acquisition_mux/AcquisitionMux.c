@@ -28,11 +28,10 @@ static unsigned int simplePow(unsigned int base,unsigned int exp)
 
 int saveMuxImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-
     char filenameFull[2048]={0};
     sprintf(filenameFull,"%s.pnm",filename);
 
-    if(pixels==0) { fprintf(stderr,"saveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
+    if(pixels==0) { fprintf(stderr,"saveMuxImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
     if (bitsperpixel>16) { fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n"); return 0; }
 
     FILE *fd=0;
@@ -261,7 +260,38 @@ int mux2RGBAndDepthFrames(
 
 
 
+int generateInterpolatedFrames(
+                               unsigned char * firstRGB, unsigned char *  secondRGB , unsigned char * intermediateRGBOut ,
+                               unsigned short * firstDepth, unsigned short *  secondDepth  , unsigned short *  intermediateDepthOut  ,
+                               unsigned int width ,
+                               unsigned int height
+                               )
+{
+   if ( (firstRGB==0)||(secondRGB==0) ) { fprintf(stderr,"generateInterpolatedFrames( input frames are empty )\n"); return 0; }
+   if ( intermediateRGBOut==0)   { fprintf(stderr,"generateInterpolatedFrames( output frames is not allocated)\n"); return 0; }
 
+   unsigned char * ptrA = firstRGB;
+   unsigned char * ptrB = secondRGB;
+   unsigned char * ptrOut = intermediateRGBOut;
+   unsigned char * ptrOutLimit = intermediateRGBOut + width*height*3;
+
+   unsigned int avg;
+
+   while (ptrOut<ptrOutLimit)
+   {
+     avg=(unsigned int) ( *ptrA + *ptrB ) / 2 ;
+     *ptrOut = (unsigned char) avg;
+     //----------
+     ++ptrA; ++ptrB; ++ptrOut;
+   }
+
+
+   if ( (firstDepth==0)||(secondDepth==0) ) { fprintf(stderr,"generateInterpolatedFrames( input frames are empty )\n"); return 0; }
+   if ( intermediateDepthOut==0)   { fprintf(stderr,"generateInterpolatedFrames( output frames is not allocated)\n"); return 0; }
+
+
+ return 1;
+}
 
 int LongExposureFramesCollect( unsigned char * rgb , unsigned long * rgbCollector ,
                                unsigned short * depth, unsigned long * depthCollector ,

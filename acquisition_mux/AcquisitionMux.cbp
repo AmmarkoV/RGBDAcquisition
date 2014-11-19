@@ -12,6 +12,9 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
 				<Option compiler="gcc" />
+				<Option parameters="-module1 TEMPLATE -from1 cvpr40 -module2 TEMPLATE -from2 cvprRun2 -to cvprMux -background 255 255 255 -trans 50 -maxFrames 10 -shiftTime -3 -frameDoubler" />
+				<Option host_application="/home/ammar/Documents/Programming/FORTH/input_acquisition/grabber_mux/GrabberMux" />
+				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
 				<Compiler>
 					<Add option="-g" />

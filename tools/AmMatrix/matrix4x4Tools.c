@@ -423,7 +423,7 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
    resultPoint3D[0]/=resultPoint3D[3];
    resultPoint3D[1]/=resultPoint3D[3];
    resultPoint3D[2]/=resultPoint3D[3];
-   resultPoint3D[3]/=resultPoint3D[3];
+   resultPoint3D[3]=1.0; // resultPoint3D[3]/=resultPoint3D[3];
    return 1;
   } else
   {
@@ -448,7 +448,7 @@ int normalize3DPointVector(double * vec)
   vec[0]=vec[0]/vec[3];
   vec[1]=vec[1]/vec[3];
   vec[2]=vec[2]/vec[3];
-  vec[3]=vec[3]/vec[3];
+  vec[3]=1.0; // vec[3]=vec[3]/vec[3];
 
   return 1;
 }

@@ -23,6 +23,7 @@
 
 
 #include "TrajectoryParser.h"
+//Using normalizeQuaternionsTJP #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -164,6 +165,33 @@ int growVirtualStreamEvents(struct VirtualStream * stream,unsigned int eventsToA
    stream->event = new_event ;
   return 1;
 }
+
+
+
+
+int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int connectorsToAdd)
+{
+  if (connectorsToAdd == 0) { return 0 ; }
+  if (stream == 0) { fprintf(stderr,"Given an empty stream to grow objects on \n"); return 0 ; }
+  struct VirtualConnector * new_connector;
+  new_connector = (struct VirtualConnector *) realloc( stream->connector , sizeof(struct VirtualConnector) * ( stream->MAX_numberOfConnectors+connectorsToAdd ));
+
+   if (new_connector == 0 )
+    {
+       fprintf(stderr,"Cannot add %u objects to our currently %u sized connector buffer\n",connectorsToAdd,stream->MAX_numberOfConnectors);
+       return 0;
+    } else
+    {
+      //Clean up all new objects allocated
+      void * clear_from_here  =  new_connector+stream->MAX_numberOfConnectors;
+      memset(clear_from_here,0,connectorsToAdd * sizeof(struct VirtualConnector));
+    }
+
+   stream->MAX_numberOfConnectors+=connectorsToAdd;
+   stream->connector = new_connector ;
+  return 1;
+}
+
 
 /*!
     ------------------------------------------------------------------------------------------
@@ -401,6 +429,40 @@ int addStateToObject(
 
 
 
+int addConnectorToVirtualStream(
+                                 struct VirtualStream * stream ,
+                                 char * firstObject , char * secondObject ,
+                                 unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
+                                 float scale,
+                                 char * typeStr
+                               )
+{
+   if (stream->MAX_numberOfConnectors<=stream->numberOfConnectors+1) { growVirtualStreamConnectors(stream,OBJECTS_TO_ADD_STEP); }
+   //Now we should definately have enough space for our new frame
+   if (stream->MAX_numberOfConnectors<=stream->numberOfConnectors+1) { fprintf(stderr,"Cannot add new OBJECT instruction\n"); return 0; }
+
+   unsigned int found=0;
+   unsigned int pos = stream->numberOfConnectors;
+
+   strcpy(stream->connector[pos].firstObject,firstObject);
+   stream->connector[pos].objID_A = getObjectID(stream,firstObject,&found);
+   if (!found) { fprintf(stderr,"Couldn't find object id for object %s \n",firstObject); }
+
+   strcpy(stream->connector[pos].secondObject,secondObject);
+   stream->connector[pos].objID_B = getObjectID(stream,secondObject,&found);
+   if (!found) { fprintf(stderr,"Couldn't find object id for object %s \n",secondObject); }
+
+   strcpy(stream->connector[pos].typeStr,typeStr);
+   stream->connector[pos].R = (float) R/255;
+   stream->connector[pos].G = (float) G/255;
+   stream->connector[pos].B = (float) B/255;
+   stream->connector[pos].Transparency = (float) Alpha/100;
+   stream->connector[pos].scale = scale;
+
+   ++stream->numberOfConnectors;
+   return 1;
+}
+
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
                               char * name , char * type ,
@@ -444,12 +506,12 @@ int addObjectToVirtualStream(
 
    stream->object[pos].frame=0;
 
-
-  fprintf(stderr,"TODO CHECK THIS \n");
+  #warning "Check this part of the code "
+  //<-------- check from here ------------->
   stream->object[pos].lastFrame=0; // <- todo here <- check these
   stream->object[pos].MAX_numberOfFrames=0;
   stream->object[pos].numberOfFrames=0;
-  fprintf(stderr,"TODO CHECK THIS \n");
+  //<-------- check up until here ------------->
 
    unsigned int found=0;
    stream->object[pos].type = getObjectTypeID(stream,stream->object[pos].typeStr,&found);
@@ -547,6 +609,53 @@ int addEventToVirtualStream(
 }
 
 
+int smoothTrajectoriesOfObject(struct VirtualStream * stream,unsigned int ObjID)
+{
+  float avg=0.0;
+  unsigned int pos=0;
+  for (pos=1; pos<stream->object[ObjID].numberOfFrames; pos++)
+  {
+    //------------------------------------------------------------------------------------
+    avg = stream->object[ObjID].frame[pos-1].x + stream->object[ObjID].frame[pos].x;
+    stream->object[ObjID].frame[pos-1].x = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].y + stream->object[ObjID].frame[pos].y;
+    stream->object[ObjID].frame[pos-1].y = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].z + stream->object[ObjID].frame[pos].z;
+    stream->object[ObjID].frame[pos-1].z = avg / 2;
+    //------------------------------------------------------------------------------------
+
+
+    //------------------------------------------------------------------------------------
+    avg = stream->object[ObjID].frame[pos-1].rot1 + stream->object[ObjID].frame[pos].rot1;
+    stream->object[ObjID].frame[pos-1].rot1 = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].rot2 + stream->object[ObjID].frame[pos].rot2;
+    stream->object[ObjID].frame[pos-1].rot2 = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].rot3 + stream->object[ObjID].frame[pos].rot3;
+    stream->object[ObjID].frame[pos-1].rot3 = avg / 2;
+
+    avg = stream->object[ObjID].frame[pos-1].rot4 + stream->object[ObjID].frame[pos].rot4;
+    stream->object[ObjID].frame[pos-1].rot4 = avg / 2;
+    //------------------------------------------------------------------------------------
+  }
+ return 1;
+}
+
+int smoothTrajectories(struct VirtualStream * stream)
+{
+  fprintf(stderr,"Smoothing %u objects \n",stream->numberOfObjects);
+  unsigned int objID=0;
+  for (objID=0; objID<stream->numberOfObjects; objID++)
+  {
+     smoothTrajectoriesOfObject(stream,objID);
+  }
+ return 1;
+}
+
+
 
 float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z)
 {
@@ -632,8 +741,7 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename)
   return 1;
 }
 
-
-int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW)
+int normalizeQuaternionsTJP(double *qX,double *qY,double *qZ,double *qW)
 {
 #if USE_FAST_NORMALIZATION
       // Works best when quat is already almost-normalized
@@ -746,67 +854,37 @@ int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX
 }
 
 
-int readVirtualStream(struct VirtualStream * newstream)
+int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filename)
 {
   #warning "Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser"
   #warning "This should probably be split down to some primitives and also support things like including a file from another file"
   #warning "dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate"
   #warning "parser declerations like arrowsX or objX"
 
-
-
   #if USE_FILE_INPUT
-
-  #if PRINT_DEBUGGING_INFO
-  fprintf(stderr,"readVirtualStream(%s) called \n",newstream->filename);
-  #endif
-
   //Our stack variables ..
+  unsigned int fileSize=0;
   unsigned int readOpResult = 0;
   char line [LINE_MAX_LENGTH]={0};
 
   //Try and open filename
-  FILE * fp = fopen(newstream->filename,"r");
-  if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",newstream->filename); return 0; }
+  FILE * fp = fopen(filename,"r");
+  if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
 
-  //Find out the size of the file..!
+  //Find out the size of the file , This is no longer needed..!
+  /*
   fseek (fp , 0 , SEEK_END);
   unsigned long lSize = ftell (fp);
   rewind (fp);
-  fprintf(stderr,"Opening a %lu byte file %s \n",lSize,newstream->filename);
+  fprintf(stderr,"Opening a %lu byte file %s \n",lSize,filename);
+  fileSize = lSize;
+  */
 
   //Allocate a token parser
   struct InputParserC * ipc=0;
   ipc = InputParser_Create(LINE_MAX_LENGTH,5);
   if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
 
-  newstream->fileSize = lSize;
-
-  //Add a dummy CAMERA Object here!
-  growVirtualStreamObjectsTypes(newstream,OBJECT_TYPES_TO_ADD_STEP);
-  strcpy( newstream->objectTypes[0].name , "camera" );
-  strcpy( newstream->objectTypes[0].model , "camera" );
-  ++newstream->numberOfObjectTypes;
-
-  growVirtualStreamObjects(newstream,OBJECTS_TO_ADD_STEP);
-  strcpy( newstream->object[0].name, "camera");
-  strcpy( newstream->object[0].typeStr, "camera");
-  strcpy( newstream->object[0].value, "camera");
-  newstream->object[0].type = 0; //Camera
-  newstream->object[0].R =0;
-  newstream->object[0].G =0;
-  newstream->object[0].B =0;
-  newstream->scaleWorld[0]=1.0; newstream->scaleWorld[1]=1.0; newstream->scaleWorld[2]=1.0;
-  newstream->scaleWorld[3]=1.0; newstream->scaleWorld[4]=1.0; newstream->scaleWorld[5]=1.0;
-  newstream->object[0].Transparency=0;
-  ++newstream->numberOfObjects;
-  // CAMERA OBJECT ADDED
-
-  newstream->rotationsOverride=0;
-  newstream->rotationsXYZ[0]=0; newstream->rotationsXYZ[1]=1; newstream->rotationsXYZ[2]=2;
-  newstream->rotationsOffset[0]=0.0; newstream->rotationsOffset[1]=0.0; newstream->rotationsOffset[2]=0.0;
-
-  newstream->debug=0;
  //Everything is set , Lets read the file!
   while (!feof(fp))
   {
@@ -842,12 +920,18 @@ int readVirtualStream(struct VirtualStream * newstream)
                pos[4] = InputParser_GetWordFloat(ipc,5);
                pos[5] = InputParser_GetWordFloat(ipc,6);
                pos[6] = InputParser_GetWordFloat(ipc,7);
+               if ( (pos[3]==0) && (pos[4]==0)  && (pos[5]==0)  && (pos[6]==0)  )
+                  {
+                    /*fprintf(stderr,"OBJ %u , frame %u declared with completely zero quaternion normalizing it to 0,0,0,1\n",item,newstream->timestamp);*/
+                    pos[6]=1.0;
+                  }
+
                int coordLength=7;
 
                double euler[3];
                double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
 
-               normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
+               normalizeQuaternionsTJP(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
                quaternions2Euler(euler,quaternions,1); //1
                pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
                pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
@@ -879,6 +963,27 @@ int readVirtualStream(struct VirtualStream * newstream)
                #endif
             }
               else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME_RESET",11)==1)
+            {
+               newstream->timestamp=0;  //Reset Frame
+            } else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME",5)==1)
+            {
+               newstream->timestamp+=100; //Increment Frame
+            } else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"INCLUDE",7)==1)
+            {
+               char includeFile[MAX_PATH]={0};
+               InputParser_GetWord(ipc,1,includeFile,MAX_PATH);
+              if (appendVirtualStreamFromFile(newstream,includeFile))
+              {
+                fprintf(stderr,GREEN "Successfully included file %s..!" NORMAL,includeFile);
+              } else
+              {
+                fprintf(stderr,RED "Could not include include file..!" NORMAL);
+              }
+
+            } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
             {
               fprintf(stderr,"DEBUG Mode on\n");
@@ -888,13 +993,15 @@ int readVirtualStream(struct VirtualStream * newstream)
             {
               newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1);
             } else
-
-
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"TIMESTAMP",9)==1)
             {
               newstream->timestamp=InputParser_GetWordInt(ipc,1);
             } else
-
+            /*! REACHED A SMOOTH DECLERATION ( SMOOTH() )  */
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"SMOOTH",6)==1)
+            {
+              smoothTrajectories(newstream);
+            } else
             /*! REACHED AN AUTO REFRESH DECLERATION ( AUTOREFRESH(1500) )
               argument 0 = AUTOREFRESH , argument 1 = value in milliseconds (0 = off ) */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"AUTOREFRESH",11)==1)
@@ -931,6 +1038,29 @@ int readVirtualStream(struct VirtualStream * newstream)
                InputParser_GetWord(ipc,2,model,MAX_PATH);
 
                addObjectTypeToVirtualStream( newstream , name, model );
+
+            } else
+            /*! REACHED A CONNECTOR DECLERATION ( CONNECTOR(something,somethingElse,0,255,0,0,1.0,type) )
+              argument 0 = CONNECTOR , argument 1 = nameOfFirstObject ,  argument 2 = nameOfSecondObject ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = Scale , argument 8 = Type */
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"CONNECTOR",9)==1)
+            {
+               char firstObject[MAX_PATH]={0} , secondObject[MAX_PATH]={0} , type[MAX_PATH]={0};
+               InputParser_GetWord(ipc,1,firstObject,MAX_PATH);
+               InputParser_GetWord(ipc,2,secondObject,MAX_PATH);
+
+               unsigned char R = (unsigned char) InputParser_GetWordInt(ipc,3);
+               unsigned char G = (unsigned char)  InputParser_GetWordInt(ipc,4);
+               unsigned char B = (unsigned char)  InputParser_GetWordInt(ipc,5);
+               unsigned char Alpha = (unsigned char)  InputParser_GetWordInt(ipc,6);
+               float scale = (float) InputParser_GetWordFloat(ipc,7);
+
+               addConnectorToVirtualStream(
+                                            newstream ,
+                                            firstObject , secondObject,
+                                            R, G , B , Alpha ,
+                                            scale,
+                                            type
+                                          );
 
             } else
             /*! REACHED AN OBJECT DECLERATION ( OBJECT(something,spatoula_type,0,255,0,0,0,1.0,spatoula_something) )
@@ -1021,7 +1151,7 @@ int readVirtualStream(struct VirtualStream * newstream)
                double euler[3];
                double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
 
-               normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
+               normalizeQuaternionsTJP(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
                quaternions2Euler(euler,quaternions,1); //1
                pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
                pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
@@ -1248,6 +1378,49 @@ int readVirtualStream(struct VirtualStream * newstream)
  return 0;
 }
 
+
+
+int readVirtualStream(struct VirtualStream * newstream)
+{
+  //Try and open filename to get the size ( this is needed for auto refresh functionality to work correctly..!
+   FILE * fp = fopen(newstream->filename,"r");
+   if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",newstream->filename); return 0; } else
+    {
+      fseek (fp , 0 , SEEK_END);
+      unsigned long lSize = ftell (fp);
+      rewind (fp);
+      fprintf(stderr,"Opening a %lu byte file %s \n",lSize,newstream->filename);
+      newstream->fileSize = lSize;
+    }
+
+  //Do initial state here , make sure we will start reading using a clean state
+  growVirtualStreamObjectsTypes(newstream,OBJECT_TYPES_TO_ADD_STEP);
+  strcpy( newstream->objectTypes[0].name , "camera" );
+  strcpy( newstream->objectTypes[0].model , "camera" );
+  ++newstream->numberOfObjectTypes;
+
+  growVirtualStreamObjects(newstream,OBJECTS_TO_ADD_STEP);
+  strcpy( newstream->object[0].name, "camera");
+  strcpy( newstream->object[0].typeStr, "camera");
+  strcpy( newstream->object[0].value, "camera");
+  newstream->object[0].type = 0; //Camera
+  newstream->object[0].R =0;
+  newstream->object[0].G =0;
+  newstream->object[0].B =0;
+  newstream->scaleWorld[0]=1.0; newstream->scaleWorld[1]=1.0; newstream->scaleWorld[2]=1.0;
+  newstream->scaleWorld[3]=1.0; newstream->scaleWorld[4]=1.0; newstream->scaleWorld[5]=1.0;
+  newstream->object[0].Transparency=0;
+  ++newstream->numberOfObjects;
+  // CAMERA OBJECT ADDED
+
+  newstream->rotationsOverride=0;
+  newstream->rotationsXYZ[0]=0; newstream->rotationsXYZ[1]=1; newstream->rotationsXYZ[2]=2;
+  newstream->rotationsOffset[0]=0.0; newstream->rotationsOffset[1]=0.0; newstream->rotationsOffset[2]=0.0;
+
+  newstream->debug=0;
+
+  return appendVirtualStreamFromFile(newstream,newstream->filename);
+}
 
 
 
@@ -1618,7 +1791,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    } /*!END OF SIMPLE FRAME GETTER*/
    else
    { /*!START OF INTERPOLATED FRAME GETTER*/
-      fprintf(stderr,"interpolated position for ObjID %u\n",ObjID);
+     //fprintf(stderr,"interpolated position for ObjID %u\n",ObjID);
      //This is the case when we respect time , we will pick two frames and interpolate between them
      if ( timeAbsMilliseconds > stream->object[ObjID].MAX_timeOfFrames )
      {

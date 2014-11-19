@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/gl.h>
@@ -16,6 +17,7 @@
 #include "glx.h"
 #include "model_loader_obj.h"
 #include "scene.h"
+#include "tools.h"
 
 #include "save_to_file.h"
 #include "shader_loader.h"
@@ -30,15 +32,24 @@
 
 #define X_OFFSET 0 //This should always be 0 and probably removed also  :P
 
-//TODO : add Horizontal flipping  <- is the output mirrored ?
+
+#define NORMAL   "\033[0m"
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
 
 
-int doTest()
+
+void checkFrameGettersForError(char * from)
 {
-    testMatrices();
-    return 1;
+  int err=glGetError();
+  if (err !=  GL_NO_ERROR /*0*/ )
+    {
+      fprintf(stderr,YELLOW "Note: OpenGL stack is complaining about the way %s works\n" NORMAL , from);
+    }
 }
 
+#warning "TODO : add Horizontal flipping  <- is the output mirrored ?"
 
 int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
@@ -49,6 +60,7 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x + X_OFFSET , y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
+    checkFrameGettersForError("Z-Buffer Getter");
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -80,6 +92,10 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
     #endif
 
     if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
+
+
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"OpenGL error after getOpenGLZBuffer() \n"); }
     return 1;
 }
 
@@ -92,10 +108,15 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
     glGetDoublev(GL_DEPTH_SCALE, &depth_scale); // Returns 1.0
 
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"getOpenGLDepth() : Error getting depth bias/scale \n"); }
+
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     memset(zbuffer,0,(width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
+    checkFrameGettersForError("Depth Getter");
+
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -135,6 +156,11 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
        }
 
     if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
+
+
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"OpenGL error after getOpenGLDepth() \n"); }
+
     return 1;
 }
 
@@ -149,14 +175,18 @@ unsigned int getOpenGLHeight()
     return HEIGHT;
 }
 
-
 int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
+  GLint ext_format, ext_type;
+  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &ext_format);
+  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &ext_type);
+
     #if FLIP_OPEN_GL_IMAGES
        char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
        if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
 
        glReadPixels(x + X_OFFSET, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
+       checkFrameGettersForError("Flipped Color Getter");
 
       //SLOW INVERSION CODE :P
        unsigned int yp = 0;
@@ -171,7 +201,12 @@ int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int wid
       free(inverter);
     #else
        glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,color);
+       checkFrameGettersForError("Normal Color Getter");
     #endif
+
+
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"OpenGL error after getOpenGLColor() \n"); }
 
    return 1;
 }
@@ -211,6 +246,7 @@ void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned in
 
 void redraw(void)
 {
+ if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error just after receiving a redraw command\n"); }
     renderScene();
     glx_endRedraw();
 }
@@ -307,10 +343,14 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
 
 int snapOGLRendererSandbox()
 {
+ if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before starting to snapOGLRendererSandbox \n"); }
     if (glx_checkEvents())
     {
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after checking glx_checkEvents()\n"); }
       tickScene();
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after ticking scene\n"); }
       redraw();
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after redrawing scene\n"); }
       return 1;
     }
    return 0;

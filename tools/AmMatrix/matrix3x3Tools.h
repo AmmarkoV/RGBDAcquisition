@@ -71,6 +71,16 @@ void create3x3IdentityMatrix(double * m);
 int transpose3x3MatrixD(double * mat);
 
 
+
+/**
+* @brief Transpose an allocated 3x3 matrix to Identity ( diagonal 1 , all else 0 )
+* @ingroup AmMatrix
+* @param  Output Matrix
+* @param  Input Matrix
+* @retval 0=Failure,1=Success
+*/
+int transpose3x3MatrixDFromSource(double * dest,double * source);
+
 /**
 * @brief Convert an allocated 3x3 matrix to an allocated 4x4 Matrix
 * @ingroup AmMatrix

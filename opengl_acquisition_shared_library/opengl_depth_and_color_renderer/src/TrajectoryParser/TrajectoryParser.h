@@ -92,6 +92,28 @@ struct VirtualEvent
 
 
 
+/**
+* @brief VirtualConnector structure holds all the data that defines a connector between two objects
+*/
+struct VirtualConnector
+{
+   char firstObject[MAX_PATH+1];
+   char secondObject[MAX_PATH+1];
+   char typeStr[MAX_PATH+1];
+
+   unsigned int connectorType;
+   unsigned int objID_A;
+   unsigned int objID_B;
+
+   float R , G , B , Transparency;
+
+   double scale;
+
+};
+
+
+
+
 
 
 
@@ -134,7 +156,6 @@ struct VirtualObject
 
    unsigned int generations;
    unsigned int particles;*/
-
 };
 
 
@@ -169,6 +190,10 @@ struct VirtualStream
     unsigned int numberOfObjects;
     struct VirtualObject * object;
 
+
+    unsigned int MAX_numberOfConnectors;
+    unsigned int numberOfConnectors;
+    struct VirtualConnector *connector;
 
     unsigned int MAX_numberOfEvents;
     unsigned int numberOfEvents;
@@ -260,7 +285,7 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename);
    This should probably be split down to some primitives and also support things like including a file from another file dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate
    parser declerations like arrowsX or objX
 * @retval 1=Success , 0=Failure */
-int readVirtualStream(struct VirtualStream * newstream , char * filename);
+int readVirtualStream(struct VirtualStream * newstream/* , char * filename*/);
 
 
 /**
@@ -295,6 +320,7 @@ int destroyVirtualStream(struct VirtualStream * stream);
 * @param NoColor flag ( 1=Set 0=Not Set )
 * @param Pointer to an array of floats that defines initial position ( should be 3 or 4 floats long )
 * @param The length of the coords array ( typically 3 or 4 )
+* @param Particle number
 * @retval 1=Success , 0=Failure */
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
@@ -305,9 +331,9 @@ int addObjectToVirtualStream(
                               unsigned int coordLength ,
                               float scaleX,
                               float scaleY,
-                              float scaleZ
+                              float scaleZ,
+                              unsigned int particleNumber
                             );
-
 
 /**
 * @brief Remove an existing Object from a Virtual stream

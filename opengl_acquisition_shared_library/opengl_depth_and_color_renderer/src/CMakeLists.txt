@@ -35,9 +35,9 @@ add_library(OGLRendererSandbox SHARED
             TextureLoader/ppm.h
             TextureLoader/texture_loader.c
             TextureLoader/texture_loader.h
-            TrajectoryParser/InputParser_C.cpp
+            TrajectoryParser/InputParser_C.c
             TrajectoryParser/InputParser_C.h
-            TrajectoryParser/TrajectoryParser.cpp
+            TrajectoryParser/TrajectoryParser.c
             TrajectoryParser/TrajectoryParser.h 
            ) 
 target_link_libraries(OGLRendererSandbox m GL GLU X11 ) 
