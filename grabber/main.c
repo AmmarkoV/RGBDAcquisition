@@ -17,6 +17,7 @@ char inputname[512]={0};
 char outputfoldername[512]={0};
 
 unsigned int delay = 0;
+unsigned int skippedFrames=0;
 
 int calibrationSet = 0;
 struct calibration calib;
@@ -60,6 +61,10 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcmp(argv[i],"-skip")==0) {
+                                       skippedFrames=atoi(argv[i+1]);
+                                       fprintf(stderr,"Skipped Frames set to %u\n",skippedFrames);
+                                      } else
     if (strcmp(argv[i],"-delay")==0) {
                                        delay=atoi(argv[i+1]);
                                        fprintf(stderr,"Delay set to %u seconds \n",delay);
@@ -141,7 +146,6 @@ int main(int argc, char *argv[])
    }
 
 
-
   char * devName = inputname;
   if (strlen(inputname)<1) { devName=0; }
     //Initialize Every OpenNI Device
@@ -165,6 +169,20 @@ int main(int argc, char *argv[])
 
    countdownDelay(delay);
    fprintf(stderr,"Starting Grabbing!\n");
+
+
+  if (skippedFrames>0)
+  {
+   fprintf(stderr,"Skipping first %u frame(s) ..  ",skippedFrames);
+   unsigned int i=0;
+   for (i=0; i<skippedFrames; i++)
+   {
+        acquisitionSnapFrames(moduleID,devID);
+   }
+   fprintf(stderr,"done .. \n");
+  }
+
+
 
    while  ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) )
     {
