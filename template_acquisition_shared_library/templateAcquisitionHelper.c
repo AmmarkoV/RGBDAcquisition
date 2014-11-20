@@ -79,8 +79,10 @@ unsigned char * ReadPNMInternal(unsigned char * buffer , char * filename,unsigne
            //fprintf(stderr,"bytesPerPixel*channels*w*h = %u \n",bytesPerPixel*channels*w*h);
            if (totalFileSize-startOfBinaryPart < bytesPerPixel*channels*w*h )
            {
-              fprintf(stderr," Detected Border Case\n\n\n");
-              startOfBinaryPart-=1;
+              unsigned int differenceInBytes =  bytesPerPixel*channels*w*h;
+              differenceInBytes = differenceInBytes -totalFileSize + startOfBinaryPart;
+              fprintf(stderr," Detected Border Case (%u) \n\n\n",differenceInBytes);
+              startOfBinaryPart-=differenceInBytes;
            }
            if ( fseek (pf , startOfBinaryPart , SEEK_SET)!=0 ) { fprintf(stderr,"Could not find file size to cache client..!\nUnable to serve client\n"); fclose(pf); return 0; }
          //-----------------------
