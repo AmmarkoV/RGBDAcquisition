@@ -736,7 +736,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
     planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
     planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
-    euler2QuaternionsInternal(planetQuatAbsolute , planetRotAbsolute,0);
+    euler2QuaternionsInternal(planetQuatAbsolute , planetRotAbsolute,1);
 
 
     double satPosRelative[4]={0};
@@ -778,12 +778,10 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
        planetRotAbsolute[1] =  planetRotAbsolute[1] / stream->scaleWorld[4];
        planetRotAbsolute[2] =  planetRotAbsolute[2] / stream->scaleWorld[5];
 
-       /*
-       float tmp = planetRotAbsolute[0];
-       planetRotAbsolute[0]=planetRotAbsolute[2];
-       planetRotAbsolute[2]=planetRotAbsolute[1];
-       planetRotAbsolute[1]=planetRotAbsolute[0];
-       euler2QuaternionsInternal(planetQuatAbsolute , planetRotAbsolute,0);*/
+       euler2QuaternionsInternal(planetQuatAbsolute , planetRotAbsolute,1);
+
+       planetQuatAbsolute[0]=(-1) * planetQuatAbsolute[0];
+       //planetQuatAbsolute[3]=(-1) * planetQuatAbsolute[3];
 
        if ( pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(satPosAbsolute,planetPosAbsolute,planetQuatAbsolute,satPosRelative) )
        {
