@@ -667,7 +667,17 @@ float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,flo
 
 }
 
+int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * newstream,unsigned int sattelite,unsigned int planet , unsigned int frame , unsigned int duration)
+{
+/*
 
+#Affix object 1 to object 71 from frame 30 and for next 10 frames
+AFFIX_OBJ_TO_OBJ_FOR_NEXT_FRAMES(1,71,30,10)
+
+*/
+
+
+}
 
 int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB)
 {
@@ -970,6 +980,17 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME",5)==1)
             {
                newstream->timestamp+=100; //Increment Frame
+            } else
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"AFFIX_OBJ_TO_OBJ_FOR_NEXT_FRAMES",32)==1)
+            {
+               unsigned int sattelite = InputParser_GetWordInt(ipc,1);
+               unsigned int planet    = InputParser_GetWordInt(ipc,2);
+               unsigned int frame     = InputParser_GetWordInt(ipc,3);
+               unsigned int duration  = InputParser_GetWordInt(ipc,4);
+               if (! affixSatteliteToPlanetFromFrameForLength(newstream,sattelite,planet,frame,duration) )
+               {
+                fprintf(stderr,RED "Could not affix Object %u to Object %u for %u frames ( starting @ %u )\n" NORMAL , sattelite,planet,duration,frame);
+               }
             } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"INCLUDE",7)==1)
             {
