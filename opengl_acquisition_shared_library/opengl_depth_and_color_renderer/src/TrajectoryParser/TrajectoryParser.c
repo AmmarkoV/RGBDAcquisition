@@ -667,16 +667,58 @@ float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,flo
 
 }
 
-int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * newstream,unsigned int sattelite,unsigned int planet , unsigned int frame , unsigned int duration)
+int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
-/*
+    //==================================================================================
+    double satPosAbsolute[4]={0};
+    satPosAbsolute[0] = (double) stream->object[satteliteObj].frame[frameNumber].x;
+    satPosAbsolute[1] = (double) stream->object[satteliteObj].frame[frameNumber].y;
+    satPosAbsolute[2] = (double) stream->object[satteliteObj].frame[frameNumber].z;
+    satPosAbsolute[3] = 1.0;
 
-#Affix object 1 to object 71 from frame 30 and for next 10 frames
-AFFIX_OBJ_TO_OBJ_FOR_NEXT_FRAMES(1,71,30,10)
+    double satQuatAbsolute[4]={0};
+    satQuatAbsolute[0] = (double) stream->object[satteliteObj].frame[frameNumber].rot1;
+    satQuatAbsolute[1] = (double) stream->object[satteliteObj].frame[frameNumber].rot2;
+    satQuatAbsolute[2] = (double) stream->object[satteliteObj].frame[frameNumber].rot3;
+    satQuatAbsolute[3] = (double) stream->object[satteliteObj].frame[frameNumber].rot4;
+    //==================================================================================
+    double planetPosAbsolute[4]={0};
+    planetPosAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].x;
+    planetPosAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].y;
+    planetPosAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].z;
+    planetPosAbsolute[3] = 1.0;
 
-*/
+    double planetQuatAbsolute[4]={0};
+    planetQuatAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
+    planetQuatAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
+    planetQuatAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
+    planetQuatAbsolute[3] = (double) stream->object[planetObj].frame[frameNumber].rot4;
 
 
+    double satPosRelative[4]={0};
+    pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(0,satPosRelative,planetPosAbsolute,planetQuatAbsolute,satPosAbsolute);
+
+    unsigned int pos=0;
+    for (pos=frameNumber+1; pos<frameNumber+duration; pos++)
+    {
+       planetPosAbsolute[0] = (double) stream->object[planetObj].frame[pos].x;
+       planetPosAbsolute[1] = (double) stream->object[planetObj].frame[pos].y;
+       planetPosAbsolute[2] = (double) stream->object[planetObj].frame[pos].z;
+       planetPosAbsolute[3] = 1.0;
+
+       planetQuatAbsolute[0] = (double) stream->object[planetObj].frame[pos].rot1;
+       planetQuatAbsolute[1] = (double) stream->object[planetObj].frame[pos].rot2;
+       planetQuatAbsolute[2] = (double) stream->object[planetObj].frame[pos].rot3;
+       planetQuatAbsolute[3] = (double) stream->object[planetObj].frame[pos].rot4;
+
+       if ( pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(satPosAbsolute,planetPosAbsolute,planetQuatAbsolute,satPosRelative) )
+       {
+           stream->object[satteliteObj].frame[pos].x = (float) satPosAbsolute[0];
+           stream->object[satteliteObj].frame[pos].y = (float) satPosAbsolute[1];
+           stream->object[satteliteObj].frame[pos].z = (float) satPosAbsolute[2];
+       }
+    }
+ return 1;
 }
 
 int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB)
@@ -983,13 +1025,13 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
             } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"AFFIX_OBJ_TO_OBJ_FOR_NEXT_FRAMES",32)==1)
             {
-               unsigned int sattelite = InputParser_GetWordInt(ipc,1);
-               unsigned int planet    = InputParser_GetWordInt(ipc,2);
+               unsigned int satteliteObj = 1 + newstream->objDeclarationsOffset + InputParser_GetWordInt(ipc,1);    /*Item 0 is camera so we +1 */
+               unsigned int planetObj    = 1 + newstream->objDeclarationsOffset + InputParser_GetWordInt(ipc,2);    /*Item 0 is camera so we +1 */
                unsigned int frame     = InputParser_GetWordInt(ipc,3);
                unsigned int duration  = InputParser_GetWordInt(ipc,4);
-               if (! affixSatteliteToPlanetFromFrameForLength(newstream,sattelite,planet,frame,duration) )
+               if (! affixSatteliteToPlanetFromFrameForLength(newstream,satteliteObj,planetObj,frame,duration) )
                {
-                fprintf(stderr,RED "Could not affix Object %u to Object %u for %u frames ( starting @ %u )\n" NORMAL , sattelite,planet,duration,frame);
+                fprintf(stderr,RED "Could not affix Object %u to Object %u for %u frames ( starting @ %u )\n" NORMAL , satteliteObj,planetObj,duration,frame);
                }
             } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"INCLUDE",7)==1)
