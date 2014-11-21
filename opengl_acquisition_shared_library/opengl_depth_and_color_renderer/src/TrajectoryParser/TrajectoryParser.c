@@ -23,6 +23,7 @@
 
 
 #include "TrajectoryParser.h"
+#include "../../../../tools/AmMatrix/matrixCalculations.h"
 //Using normalizeQuaternionsTJP #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,6 +45,7 @@
 
 #define CASE_SENSITIVE_OBJECT_NAMES 0
 
+#define USE_QUATERNIONS_FOR_ORBITING 0
 
 //If you want Trajectory parser to be able to READ
 //and parse files you should set  USE_FILE_INPUT  to 1
@@ -712,6 +714,7 @@ void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternio
 
 }
 
+#if USE_QUATERNIONS_FOR_ORBITING
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
     //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized
@@ -792,6 +795,58 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     }
  return 1;
 }
+#else
+int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
+{
+    //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized
+    //==================================================================================
+    double satPosAbsolute[4]={0};
+    satPosAbsolute[0] = (double) stream->object[satteliteObj].frame[frameNumber].x;
+    satPosAbsolute[1] = (double) stream->object[satteliteObj].frame[frameNumber].y;
+    satPosAbsolute[2] = (double) stream->object[satteliteObj].frame[frameNumber].z;
+    satPosAbsolute[3] = 1.0;
+
+    //==================================================================================
+    double planetPosAbsolute[4]={0};
+    planetPosAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].x;
+    planetPosAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].y;
+    planetPosAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].z;
+    planetPosAbsolute[3] = 1.0;
+
+
+    double planetRotAbsolute[4]={0};
+    planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
+    planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
+    planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
+
+
+    double satPosRelative[4]={0};
+    pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(1,satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
+
+    unsigned int pos=0;
+    for (pos=frameNumber+1; pos<frameNumber+duration; pos++)
+    {
+       planetPosAbsolute[0] = (double) stream->object[planetObj].frame[pos].x;
+       planetPosAbsolute[1] = (double) stream->object[planetObj].frame[pos].y;
+       planetPosAbsolute[2] = (double) stream->object[planetObj].frame[pos].z;
+       planetPosAbsolute[3] = 1.0;
+
+       planetRotAbsolute[0] = stream->object[planetObj].frame[pos].rot1;
+       planetRotAbsolute[1] = stream->object[planetObj].frame[pos].rot2;
+       planetRotAbsolute[2] = stream->object[planetObj].frame[pos].rot3;
+
+       if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
+       {
+           stream->object[satteliteObj].frame[pos].x = (float) satPosAbsolute[0];
+           stream->object[satteliteObj].frame[pos].y = (float) satPosAbsolute[1];
+           stream->object[satteliteObj].frame[pos].z = (float) satPosAbsolute[2];
+       }
+    }
+ return 1;
+}
+
+#endif // USE_QUATERNIONS_FOR_ORBITING
+
 
 int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB)
 {

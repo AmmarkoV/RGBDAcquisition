@@ -440,7 +440,7 @@ int pointFromAbsoluteToInRelationWithObject_UsingInversion(double * relativeOutP
     We also have an absolute position of a 3D point , and we want to calculate the relative position
     of the 3D point in relation to the object ( unrotated relative position )
 */
-int pointFromAbsoluteToRelationWithObject_PosXYZRotXYZ(unsigned int method, double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated )
+int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(unsigned int method, double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated )
 {
     double objectRotation3x3[9];
 
