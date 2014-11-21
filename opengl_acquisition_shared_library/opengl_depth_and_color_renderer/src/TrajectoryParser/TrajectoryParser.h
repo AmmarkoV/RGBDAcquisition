@@ -215,6 +215,8 @@ struct VirtualStream
     char reverseLoop;
     char debug;
 
+
+    unsigned int objDeclarationsOffset;
     unsigned int timestamp;
 
     char filename[MAX_PATH+1];

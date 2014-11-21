@@ -910,7 +910,7 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
                char * itemNumStr = &name[3];
 
                unsigned int item = atoi(itemNumStr);  // (unsigned int) InputParser_GetWordChar(ipc,0,3)-'0';
-               item+= + 1; /*Item 0 is camera so we +1 */
+               item+= + 1 + newstream->objDeclarationsOffset; /*Item 0 is camera so we +1 */
 
                float pos[7]={0};
                pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,1);
@@ -1001,6 +1001,12 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"SMOOTH",6)==1)
             {
               smoothTrajectories(newstream);
+            } else
+
+            /*! REACHED A SMOOTH DECLERATION ( SMOOTH() )  */
+            if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJ_OFFSET",10)==1)
+            {
+              newstream->objDeclarationsOffset = InputParser_GetWordInt(ipc,1);
             } else
             /*! REACHED AN AUTO REFRESH DECLERATION ( AUTOREFRESH(1500) )
               argument 0 = AUTOREFRESH , argument 1 = value in milliseconds (0 = off ) */
@@ -1125,7 +1131,7 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
                char * itemNumStr = &name[5];
 
                unsigned int item = atoi(itemNumStr);  // (unsigned int) InputParser_GetWordChar(ipc,0,5)-'0';
-               item+= + 1; /*Item 0 is camera so we +1 */
+               item+= + 1 + newstream->objDeclarationsOffset; /*Item 0 is camera so we +1 */
 
                InputParser_GetWord(ipc,1,name,MAX_PATH);
 
@@ -1413,6 +1419,7 @@ int readVirtualStream(struct VirtualStream * newstream)
   ++newstream->numberOfObjects;
   // CAMERA OBJECT ADDED
 
+  newstream->objDeclarationsOffset=0;
   newstream->rotationsOverride=0;
   newstream->rotationsXYZ[0]=0; newstream->rotationsXYZ[1]=1; newstream->rotationsXYZ[2]=2;
   newstream->rotationsOffset[0]=0.0; newstream->rotationsOffset[1]=0.0; newstream->rotationsOffset[2]=0.0;
