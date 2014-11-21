@@ -65,7 +65,7 @@ enum
 
 
 volatile int stop=0;
-unsigned char warnNoDepth=0;
+unsigned char warnNoDepth=0,verbose=0;
 
 unsigned int windowX=0,windowY=0;
 
@@ -278,6 +278,9 @@ int main(int argc, char *argv[])
                                              windowY=atoi(argv[i+2]);
                                              fprintf(stderr,"Window Sizes set to %u x %u \n",windowX,windowY);
                                            } else
+    if (strcmp(argv[i],"-v")==0)           {
+                                             verbose=1;
+                                           } else
     if (strcmp(argv[i],"-calibration")==0) {
                                              calibrationSet=1;
                                              if (!ReadCalibration(argv[i+1],width,height,&calib) )
@@ -378,6 +381,10 @@ int main(int argc, char *argv[])
 
    while ( (!stop) && ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) ) )
     {
+        if (verbose)
+        {
+           fprintf(stderr,"Frame Number is : %u\n",frameNum);
+        }
         acquisitionStartTimer(0);
 
         acquisitionSnapFrames(moduleID,devID);

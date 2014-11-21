@@ -667,8 +667,54 @@ float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,flo
 
 }
 
+void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternionConvention)
+{
+  //This conversion follows the rule euler X Y Z  to quaternions W X Y Z
+  //Our input is degrees so we convert it to radians for the sin/cos functions
+  double eX = (double) (euler[0] * PI) / 180;
+  double eY = (double) (euler[1] * PI) / 180;
+  double eZ = (double) (euler[2] * PI) / 180;
+
+  //fprintf(stderr,"eX %f eY %f eZ %f\n",eX,eY,eZ);
+
+  //http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+  //eX Roll  φ - rotation about the X-axis
+  //eY Pitch θ - rotation about the Y-axis
+  //eZ Yaw   ψ - rotation about the Z-axis
+
+  double cosX2 = cos((double) eX/2); //cos(φ/2);
+  double sinX2 = sin((double) eX/2); //sin(φ/2);
+  double cosY2 = cos((double) eY/2); //cos(θ/2);
+  double sinY2 = sin((double) eY/2); //sin(θ/2);
+  double cosZ2 = cos((double) eZ/2); //cos(ψ/2);
+  double sinZ2 = sin((double) eZ/2); //sin(ψ/2);
+
+  switch (quaternionConvention )
+  {
+   case 1 :
+   /*qX*/ quaternions[0] = (sinX2 * cosY2 * cosZ2) - (cosX2 * sinY2 * sinZ2);
+   /*qY*/ quaternions[1] = (cosX2 * sinY2 * cosZ2) + (sinX2 * cosY2 * sinZ2);
+   /*qZ*/ quaternions[2] = (cosX2 * cosY2 * sinZ2) - (sinX2 * sinY2 * cosZ2);
+   /*qW*/ quaternions[3] = (cosX2 * cosY2 * cosZ2) + (sinX2 * sinY2 * sinZ2);
+   break;
+
+   case 0 :
+   /*qW*/ quaternions[0] = (cosX2 * cosY2 * cosZ2) + (sinX2 * sinY2 * sinZ2);
+   /*qX*/ quaternions[1] = (sinX2 * cosY2 * cosZ2) - (cosX2 * sinY2 * sinZ2);
+   /*qY*/ quaternions[2] = (cosX2 * sinY2 * cosZ2) + (sinX2 * cosY2 * sinZ2);
+   /*qZ*/ quaternions[3] = (cosX2 * cosY2 * sinZ2) - (sinX2 * sinY2 * cosZ2);
+   break;
+
+   default :
+    fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
+   break;
+  };
+
+}
+
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
+    //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized
     //==================================================================================
     double satPosAbsolute[4]={0};
     satPosAbsolute[0] = (double) stream->object[satteliteObj].frame[frameNumber].x;
@@ -676,11 +722,6 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     satPosAbsolute[2] = (double) stream->object[satteliteObj].frame[frameNumber].z;
     satPosAbsolute[3] = 1.0;
 
-    double satQuatAbsolute[4]={0};
-    satQuatAbsolute[0] = (double) stream->object[satteliteObj].frame[frameNumber].rot1;
-    satQuatAbsolute[1] = (double) stream->object[satteliteObj].frame[frameNumber].rot2;
-    satQuatAbsolute[2] = (double) stream->object[satteliteObj].frame[frameNumber].rot3;
-    satQuatAbsolute[3] = (double) stream->object[satteliteObj].frame[frameNumber].rot4;
     //==================================================================================
     double planetPosAbsolute[4]={0};
     planetPosAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].x;
@@ -688,11 +729,14 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     planetPosAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].z;
     planetPosAbsolute[3] = 1.0;
 
+
     double planetQuatAbsolute[4]={0};
-    planetQuatAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
-    planetQuatAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
-    planetQuatAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
-    planetQuatAbsolute[3] = (double) stream->object[planetObj].frame[frameNumber].rot4;
+    double planetRotAbsolute[4]={0};
+    double planetRotAbsoluteF[4]={0};
+    planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
+    planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
+    planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
+    euler2QuaternionsInternal(planetQuatAbsolute , planetRotAbsolute,0);
 
 
     double satPosRelative[4]={0};
@@ -706,10 +750,40 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
        planetPosAbsolute[2] = (double) stream->object[planetObj].frame[pos].z;
        planetPosAbsolute[3] = 1.0;
 
-       planetQuatAbsolute[0] = (double) stream->object[planetObj].frame[pos].rot1;
-       planetQuatAbsolute[1] = (double) stream->object[planetObj].frame[pos].rot2;
-       planetQuatAbsolute[2] = (double) stream->object[planetObj].frame[pos].rot3;
-       planetQuatAbsolute[3] = (double) stream->object[planetObj].frame[pos].rot4;
+       planetRotAbsoluteF[0] = stream->object[planetObj].frame[pos].rot1;
+       planetRotAbsoluteF[1] = stream->object[planetObj].frame[pos].rot2;
+       planetRotAbsoluteF[2] = stream->object[planetObj].frame[pos].rot3;
+
+       //Undo all the evil that has been done to our coordinate system
+       if (stream->rotationsOverride)
+         {
+            unflipRotationAxis(
+                              &planetRotAbsoluteF[0],
+                              &planetRotAbsoluteF[1],
+                              &planetRotAbsoluteF[2],
+                              stream->rotationsXYZ[0] ,
+                              stream->rotationsXYZ[1] ,
+                              stream->rotationsXYZ[2]
+                              );
+         }
+
+       planetRotAbsolute[0] = (double) planetRotAbsoluteF[0];
+       planetRotAbsolute[1] = (double) planetRotAbsoluteF[1];
+       planetRotAbsolute[2] = (double) planetRotAbsoluteF[2];
+
+       planetRotAbsolute[0] -= stream->rotationsOffset[0];
+       planetRotAbsolute[1] -= stream->rotationsOffset[1];
+       planetRotAbsolute[2] -= stream->rotationsOffset[2];
+       planetRotAbsolute[0] =  planetRotAbsolute[0] / stream->scaleWorld[3];
+       planetRotAbsolute[1] =  planetRotAbsolute[1] / stream->scaleWorld[4];
+       planetRotAbsolute[2] =  planetRotAbsolute[2] / stream->scaleWorld[5];
+
+       /*
+       float tmp = planetRotAbsolute[0];
+       planetRotAbsolute[0]=planetRotAbsolute[2];
+       planetRotAbsolute[2]=planetRotAbsolute[1];
+       planetRotAbsolute[1]=planetRotAbsolute[0];
+       euler2QuaternionsInternal(planetQuatAbsolute , planetRotAbsolute,0);*/
 
        if ( pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(satPosAbsolute,planetPosAbsolute,planetQuatAbsolute,satPosRelative) )
        {
@@ -735,6 +809,8 @@ int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned
 
   return 1;
 }
+
+
 
 int writeVirtualStream(struct VirtualStream * newstream,char * filename)
 {
@@ -904,6 +980,45 @@ int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX
 
   return 1;
 }
+
+
+
+int unflipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ)
+{
+  #warning "Is   unflipRotationAxis correct ? "
+  #if PRINT_LOAD_INFO
+   fprintf(stderr,"Had rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
+   fprintf(stderr,"Moving 0 to %u , 1 to %u , 2 to %u \n",where2SendX,where2SendY,where2SendZ);
+  #endif
+
+  float tmpX = 0;
+  float tmpY = 0;
+  float tmpZ = 0;
+  //-----------------------------------------
+  if (where2SendX==0) { tmpX=*rotX; } else
+  if (where2SendX==1) { tmpX=*rotY; } else
+  if (where2SendX==2) { tmpX=*rotZ; }
+
+  if (where2SendY==0) { tmpY=*rotX; } else
+  if (where2SendY==1) { tmpY=*rotY; } else
+  if (where2SendY==2) { tmpY=*rotZ; }
+
+  if (where2SendZ==0) { tmpZ=*rotX; } else
+  if (where2SendZ==1) { tmpZ=*rotY; } else
+  if (where2SendZ==2) { tmpZ=*rotZ; }
+  //-----------------------------------------
+
+  *rotX=tmpX;
+  *rotY=tmpY;
+  *rotZ=tmpZ;
+
+  #if PRINT_LOAD_INFO
+   fprintf(stderr,"Now have rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
+  #endif
+
+  return 1;
+}
+
 
 
 int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filename)
