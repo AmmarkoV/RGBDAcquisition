@@ -78,9 +78,9 @@ glEnd();
  return 1;
 }
 
-int drawSphere()
+void drawSphere()
 {
-    double r=1.0;
+//    double r=1.0;
     int lats=100;
     int longs=100;
   //---------------
@@ -148,7 +148,7 @@ int drawCube()
 }
 
 
-int drawPyramid()
+void drawPyramid()
 {
   // draw a pyramid (in smooth coloring mode)
   glBegin(GL_POLYGON);				// start drawing a pyramid
@@ -273,9 +273,9 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
 
   if (mod->nocull) { glDisable(GL_CULL_FACE); }
   glTranslatef(x,y,z);
-  if ( roll!=0 ) { glRotatef(roll,0.0,0.0,1.0); }
+  if ( roll!=0 )    { glRotatef(roll,0.0,0.0,1.0); }
   if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
-  if ( pitch!=0 ) { glRotatef(pitch,1.0,0.0,0.0); }
+  if ( pitch!=0 )   { glRotatef(pitch,1.0,0.0,0.0); }
 
   if ( (mod->scaleX!=1.0) ||
        (mod->scaleY!=1.0) ||

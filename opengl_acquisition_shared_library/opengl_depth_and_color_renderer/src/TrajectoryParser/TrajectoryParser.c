@@ -805,7 +805,6 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     satPosAbsolute[1] = (double) stream->object[satteliteObj].frame[frameNumber].y;
     satPosAbsolute[2] = (double) stream->object[satteliteObj].frame[frameNumber].z;
     satPosAbsolute[3] = 1.0;
-
     //==================================================================================
     double planetPosAbsolute[4]={0};
     planetPosAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].x;
@@ -813,11 +812,11 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     planetPosAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].z;
     planetPosAbsolute[3] = 1.0;
 
-
     double planetRotAbsolute[4]={0};
     planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
     planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
     planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
+    //==================================================================================
 
 
     double satPosRelative[4]={0};
@@ -831,9 +830,9 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
        planetPosAbsolute[2] = (double) stream->object[planetObj].frame[pos].z;
        planetPosAbsolute[3] = 1.0;
 
-       planetRotAbsolute[0] = stream->object[planetObj].frame[pos].rot1;
-       planetRotAbsolute[1] = stream->object[planetObj].frame[pos].rot2;
-       planetRotAbsolute[2] = stream->object[planetObj].frame[pos].rot3;
+       planetRotAbsolute[0] = (double) stream->object[planetObj].frame[pos].rot1;
+       planetRotAbsolute[1] = (double) stream->object[planetObj].frame[pos].rot2;
+       planetRotAbsolute[2] = (double) stream->object[planetObj].frame[pos].rot3;
 
        if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
        {

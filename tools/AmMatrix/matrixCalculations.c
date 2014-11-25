@@ -131,21 +131,21 @@ void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternion
 
 void  rotationXYZ_2_Matrix3x3(double * matrix3x3,double * rotationsXYZ)
 {
- double heading =rotationsXYZ[0];
- double attitude=rotationsXYZ[1];
- double bank    =rotationsXYZ[2];
+ double heading = degreesToRadians(rotationsXYZ[0]);
+ double attitude= degreesToRadians(rotationsXYZ[1]);
+ double bank    = degreesToRadians(rotationsXYZ[2]);
 
  double ch=cos(heading);
  double ca=cos(attitude);
  double cb=cos(bank);
- double sh= sin(heading);
+ double sh=sin(heading);
  double sa=sin(attitude);
  double sb=sin(bank);
 
 
-  matrix3x3[0]=ch*ca;    /*|*/    matrix3x3[1]=-ch*sa*cb + sh*sb;       /*|*/    matrix3x3[2]=ch*sa*sb + sh*cb;
-  matrix3x3[3]=sa;       /*|*/    matrix3x3[4]=ca*cb;                   /*|*/    matrix3x3[5]=-ca*sb;
-  matrix3x3[6]=-sh*ca;   /*|*/    matrix3x3[7]=sh*sa*cb + ch*sb;        /*|*/    matrix3x3[8]=-sh*sa*sb + ch*cb;
+  matrix3x3[0]=ch*ca;      /*|*/    matrix3x3[1]=((-1)*ch*sa*cb) + (sh*sb);       /*|*/    matrix3x3[2]=(ch*sa*sb) + (sh*cb);
+  matrix3x3[3]=sa;         /*|*/    matrix3x3[4]=ca*cb;                           /*|*/    matrix3x3[5]=(-1)*ca*sb;
+  matrix3x3[6]=(-1)*sh*ca; /*|*/    matrix3x3[7]=(sh*sa*cb) + (ch*sb);            /*|*/    matrix3x3[8]=((-1)*sh*sa*sb) + (ch*cb);
 }
 
 
