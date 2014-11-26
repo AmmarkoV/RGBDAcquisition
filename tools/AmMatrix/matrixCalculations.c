@@ -142,7 +142,6 @@ void  rotationXYZ_2_Matrix3x3(double * matrix3x3,double * rotationsXYZ)
  double sa=sin(attitude);
  double sb=sin(bank);
 
-
   matrix3x3[0]=ch*ca;      /*|*/    matrix3x3[1]=((-1)*ch*sa*cb) + (sh*sb);       /*|*/    matrix3x3[2]=(ch*sa*sb) + (sh*cb);
   matrix3x3[3]=sa;         /*|*/    matrix3x3[4]=ca*cb;                           /*|*/    matrix3x3[5]=(-1)*ca*sb;
   matrix3x3[6]=(-1)*sh*ca; /*|*/    matrix3x3[7]=(sh*sa*cb) + (ch*sb);            /*|*/    matrix3x3[8]=((-1)*sh*sa*sb) + (ch*cb);
