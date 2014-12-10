@@ -29,9 +29,6 @@ extern "C" {
 
 #define USE_QUATERNIONS_FOR_ORBITING 0
 
-//If you want Trajectory parser to be able to READ
-//and parse files you should set  USE_FILE_INPUT  to 1
-#define USE_FILE_INPUT 1
 //-------------------------------------------------------
 
 //This is retarded , i have to remake parsing to fix this

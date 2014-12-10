@@ -34,6 +34,9 @@
 #include <math.h>
 
 
+//If you want Trajectory parser to be able to READ
+//and parse files you should set  USE_FILE_INPUT  to 1
+#define USE_FILE_INPUT 1
 
 
 #if USE_FILE_INPUT
@@ -794,19 +797,4 @@ struct VirtualStream * createVirtualStream(char * filename)
 
   return newstream;
 }
-
-/*!
-    ------------------------------------------------------------------------------------------
-                       /\   /\   /\   /\   /\   /\   /\   /\   /\   /\   /\
-                                 READING FILES , CREATING CONTEXT
-    ------------------------------------------------------------------------------------------
-
-    ------------------------------------------------------------------------------------------
-                                     GETTING AN OBJECT POSITION
-                       \/   \/   \/   \/   \/   \/   \/   \/   \/   \/   \/
-    ------------------------------------------------------------------------------------------
-
-*/
-
-
 
