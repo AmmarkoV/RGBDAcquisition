@@ -14,6 +14,33 @@ extern "C" {
 #define MAX_PATH 250
 
 
+
+#define LINE_MAX_LENGTH 1024
+#define OBJECT_TYPES_TO_ADD_STEP 10
+#define OBJECTS_TO_ADD_STEP 10
+#define EVENTS_TO_ADD_STEP 10
+#define FRAMES_TO_ADD_STEP 123
+
+#define PRINT_DEBUGGING_INFO 0
+#define PRINT_WARNING_INFO 0
+#define PRINT_LOAD_INFO 0
+
+#define CASE_SENSITIVE_OBJECT_NAMES 0
+
+#define USE_QUATERNIONS_FOR_ORBITING 0
+
+//If you want Trajectory parser to be able to READ
+//and parse files you should set  USE_FILE_INPUT  to 1
+#define USE_FILE_INPUT 1
+//-------------------------------------------------------
+
+//This is retarded , i have to remake parsing to fix this
+#define INCREMENT_TIMER_FOR_EACH_OBJ 0
+
+
+
+
+
 /**
 * @brief Some type definitions to better seperate ObjectID , TypeID concepts when used as function parameters
 */
@@ -308,6 +335,7 @@ int destroyVirtualStream(struct VirtualStream * stream);
 
 
 
+int refreshVirtualStream(struct VirtualStream * newstream);
 
 /**
 * @brief Add a new Object to the Virtual stream
