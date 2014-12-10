@@ -8,6 +8,14 @@
 
 #define PI 3.141592653589793238462643383279502884197
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
 
 int smoothTrajectoriesOfObject(struct VirtualStream * stream,unsigned int ObjID)
@@ -113,9 +121,40 @@ void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternio
 
 }
 
-#if USE_QUATERNIONS_FOR_ORBITING
+
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
+  if ( satteliteObj >= stream->numberOfObjects ) { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,satteliteObj); return 0; }
+  if ( planetObj >= stream->numberOfObjects )    { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,planetObj);    return 0; }
+
+  unsigned int satteliteObjFrameNumber = stream->object[satteliteObj].numberOfFrames;
+  unsigned int planetObjFrameNumber    = stream->object[planetObj].numberOfFrames;
+
+  if ( satteliteObjFrameNumber <= frameNumber )
+     {
+       fprintf(stderr,RED " referencing non existent frames ( %u ) \n" NORMAL,frameNumber);
+       return 0;
+     }
+  if ( satteliteObjFrameNumber < frameNumber+duration )
+     {
+       fprintf(stderr,RED " referencing non existent frames ( want %u + %u frames , but max frame is %u ) \n" NORMAL,frameNumber,duration,satteliteObjFrameNumber);
+       duration = satteliteObjFrameNumber-frameNumber;
+       fprintf(stderr,RED " correcting duration to %u\n" NORMAL,duration);
+     }
+
+  if ( planetObjFrameNumber <= frameNumber )
+     {
+       fprintf(stderr,RED " referencing non existent frames ( %u ) \n" NORMAL,frameNumber);
+       return 0;
+     }
+  if ( planetObjFrameNumber < frameNumber+duration )
+     {
+       fprintf(stderr,RED " referencing non existent frames ( want %u + %u frames , but max frame is %u ) \n" NORMAL,frameNumber,duration,planetObjFrameNumber);
+       duration = planetObjFrameNumber-frameNumber;
+       fprintf(stderr,RED " correcting duration to %u\n" NORMAL,duration);
+     }
+
+#if USE_QUATERNIONS_FOR_ORBITING
     //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized
     //==================================================================================
     double satPosAbsolute[4]={0};
@@ -195,8 +234,6 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
  return 1;
 }
 #else
-int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
-{
     //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized
     //==================================================================================
     double satPosAbsolute[4]={0};
@@ -241,9 +278,11 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
        }
     }
  return 1;
-}
 
 #endif // USE_QUATERNIONS_FOR_ORBITING
+
+}
+
 
 
 int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB)

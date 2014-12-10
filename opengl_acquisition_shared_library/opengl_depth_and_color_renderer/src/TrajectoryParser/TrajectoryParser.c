@@ -121,7 +121,6 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                   ( ( InputParser_GetWordChar(ipc,0,3)>='0' ) && ( InputParser_GetWordChar(ipc,0,3)<='9' )  )
                )
             {
-
                char name[MAX_PATH];
                InputParser_GetWord(ipc,0,name,MAX_PATH);
                char * itemNumStr = &name[3];
