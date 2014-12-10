@@ -532,3 +532,10 @@ int addEventToVirtualStream(
 }
 
 
+
+
+void myStrCpy(char * destination,char * source,unsigned int maxDestinationSize)
+{
+  unsigned int i=0;
+  while ( (i<maxDestinationSize) && (source[i]!=0) ) { destination[i]=source[i]; ++i; }
+}

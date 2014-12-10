@@ -112,51 +112,8 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename)
 }
 
 
-
-
-int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filename)
+int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc , char * line , unsigned int words_count )
 {
-  #warning "Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser"
-  #warning "This should probably be split down to some primitives and also support things like including a file from another file"
-  #warning "dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate"
-  #warning "parser declerations like arrowsX or objX"
-
-  #if USE_FILE_INPUT
-  //Our stack variables ..
-  unsigned int fileSize=0;
-  unsigned int readOpResult = 0;
-  char line [LINE_MAX_LENGTH]={0};
-
-  //Try and open filename
-  FILE * fp = fopen(filename,"r");
-  if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
-
-  //Find out the size of the file , This is no longer needed..!
-  /*
-  fseek (fp , 0 , SEEK_END);
-  unsigned long lSize = ftell (fp);
-  rewind (fp);
-  fprintf(stderr,"Opening a %lu byte file %s \n",lSize,filename);
-  fileSize = lSize;
-  */
-
-  //Allocate a token parser
-  struct InputParserC * ipc=0;
-  ipc = InputParser_Create(LINE_MAX_LENGTH,5);
-  if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
-
- //Everything is set , Lets read the file!
-  while (!feof(fp))
-  {
-   //We get a new line out of the file
-   readOpResult = (fgets(line,LINE_MAX_LENGTH,fp)!=0);
-   if ( readOpResult != 0 )
-    {
-      //We tokenize it
-      unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
-      if ( words_count > 0 )
-         {
-
             if (
                   ( InputParser_GetWordChar(ipc,0,0)=='O' ) &&
                   ( InputParser_GetWordChar(ipc,0,1)=='B' ) &&
@@ -251,7 +208,7 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
                 fprintf(stderr,GREEN "Successfully included file %s..!" NORMAL,includeFile);
               } else
               {
-                fprintf(stderr,RED "Could not include include file..!" NORMAL);
+                fprintf(stderr,RED "Could not include file..!" NORMAL);
               }
 
             } else
@@ -634,7 +591,46 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
                          newstream->rotationsXYZ[0],newstream->rotationsXYZ[1],newstream->rotationsXYZ[2]);
 
             }
+ return 1;
+}
 
+
+
+
+int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filename)
+{
+  #warning "Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser"
+  #warning "This should probably be split down to some primitives and also support things like including a file from another file"
+  #warning "dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate"
+  #warning "parser declerations like arrowsX or objX"
+
+  #if USE_FILE_INPUT
+  //Our stack variables ..
+  unsigned int fileSize=0;
+  unsigned int readOpResult = 0;
+  char line [LINE_MAX_LENGTH]={0};
+
+  //Try and open filename
+  FILE * fp = fopen(filename,"r");
+  if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
+
+  //Allocate a token parser
+  struct InputParserC * ipc=0;
+  ipc = InputParser_Create(LINE_MAX_LENGTH,5);
+  if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
+
+ //Everything is set , Lets read the file!
+  while (!feof(fp))
+  {
+   //We get a new line out of the file
+   readOpResult = (fgets(line,LINE_MAX_LENGTH,fp)!=0);
+   if ( readOpResult != 0 )
+    {
+      //We tokenize it
+      unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
+      if ( words_count > 0 )
+         {
+             processCommand(newstream,ipc,line,words_count);
          } // End of line containing tokens
     } //End of getting a line while reading the file
   }
@@ -758,13 +754,6 @@ int refreshVirtualStream(struct VirtualStream * newstream)
 }
 
 
-
-
-void myStrCpy(char * destination,char * source,unsigned int maxDestinationSize)
-{
-  unsigned int i=0;
-  while ( (i<maxDestinationSize) && (source[i]!=0) ) { destination[i]=source[i]; ++i; }
-}
 
 struct VirtualStream * createVirtualStream(char * filename)
 {

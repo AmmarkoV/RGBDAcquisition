@@ -92,5 +92,6 @@ int addEventToVirtualStream(
                            );
 
 
+void myStrCpy(char * destination,char * source,unsigned int maxDestinationSize);
 
 #endif // TRAJECTORYPARSERDATASTRUCTURES_H_INCLUDED
