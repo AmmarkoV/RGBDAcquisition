@@ -93,10 +93,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/glx.c">
 			<Option compilerVar="CC" />
 		</Unit>

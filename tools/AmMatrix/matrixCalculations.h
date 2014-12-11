@@ -106,9 +106,55 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
 
 
 
+/*
+  TAKEN FROM http://www.lighthouse3d.com/opengl/maths/index.php?raytriint
+
+*/
+
+
+#define innerProduct(v,q) \
+       ((v)[0] * (q)[0] + \
+		(v)[1] * (q)[1] + \
+		(v)[2] * (q)[2])
+
+
+#define crossProduct(a,b,c) \
+        (a)[0] = (b)[1] * (c)[2] - (c)[1] * (b)[2]; \
+        (a)[1] = (b)[2] * (c)[0] - (c)[2] * (b)[0]; \
+        (a)[2] = (b)[0] * (c)[1] - (c)[0] * (b)[1];
 
 
 
+/* a = b - c */
+#define vector(a,b,c) \
+        (a)[0] = (b)[0] - (c)[0];	\
+        (a)[1] = (b)[1] - (c)[1];	\
+        (a)[2] = (b)[2] - (c)[2];
+
+
+int rayIntersectsTriangle(float *p, float *d,float *v0, float *v1, float *v2);
+
+int rayIntersectsRectangle(float *p, float *d,float *v0, float *v1, float *v2, float *v3);
+//http://ilab.usc.edu/wiki/index.php/Fast_Square_Root
+inline float sqrt_fast_approximation(const float x);
+double distanceBetween3DPoints(double * p1, double * p2);
+float distanceBetween3DPointsFast(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2);
+float squaredDistanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2);
+
+/**
+* @brief Calculate the distance between two 3d points
+* @ingroup OGLTools
+* @param Point 1 - X
+* @param Point 1 - Y
+* @param Point 1 - Z
+* @param Point 2 - X
+* @param Point 2 - Y
+* @param Point 2 - Z
+* @retval A float describing the distance
+*/
+float calculateDistance(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z);
+void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ_y,float targ_z,float *vect_x,float *vect_y,float *vect_z);
+void findNormal(float *v1x, float *v1y, float *v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z );
 
 
 /**

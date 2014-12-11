@@ -12,7 +12,7 @@ float dotProduct(float p1[3] , float p2[3] )
 float  signedDistanceFromPlane(struct planeSurface * ps , float pN[3])
 {
   float tempV[3];
-  int i=0;
+  unsigned int i=0;
   for (i=0; i<3; i++)
   {
       tempV[i] = pN[i] - ps->pos[i];
