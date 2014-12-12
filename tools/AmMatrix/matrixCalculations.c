@@ -40,7 +40,6 @@ enum quatOrder
 
 int rayIntersectsTriangle(float *p, float *d,float *v0, float *v1, float *v2)
 {
-
 	float e1[3],e2[3],h[3],s[3],q[3];
 	float a,f,u,v;
 
