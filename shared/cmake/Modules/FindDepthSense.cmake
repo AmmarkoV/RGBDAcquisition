@@ -6,10 +6,14 @@
 # DEPTHSENSE_INCLUDE_DIR - Directories containing the DEPTHSENSE include files.
 # DEPTHSENSE_LIBRARIES - Libraries needed to use DEPTHSENSE.
 
-if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(PROGRAM_FILES_PATHS "$ENV{PROGRAMW6432}/SoftKinetic/DepthSenseSDK")
-else ()
-    set(PROGRAM_FILES_PATHS "$ENV{PROGRAMFILES}/SoftKinetic/DepthSenseSDK")
+if (UNIX)
+    set(PROGRAM_FILES_PATHS "/opt/softkinetic/DepthSenseSDK")
+elseif( WIN32)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(PROGRAM_FILES_PATHS "$ENV{PROGRAMW6432}/SoftKinetic/DepthSenseSDK")
+    else ()
+        set(PROGRAM_FILES_PATHS "$ENV{PROGRAMFILES}/SoftKinetic/DepthSenseSDK")
+    endif()
 endif()
 
 find_path(DEPTHSENSE_INCLUDE_DIR DepthSense.hxx

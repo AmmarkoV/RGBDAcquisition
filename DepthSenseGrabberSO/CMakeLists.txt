@@ -13,5 +13,6 @@ add_executable (DepthSenseGrabberSO
 	../shared/ConversionTools.cxx
 	../shared/ConversionTools.hxx
 )
+message(${DEPTHSENSE_INCLUDE_DIR})
 
 target_link_libraries (DepthSenseGrabberSO ${DEPTHSENSE_LIBRARIES})

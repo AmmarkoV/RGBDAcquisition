@@ -7,8 +7,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../shared/cmake/
 find_package(DepthSense REQUIRED)
 include_directories(${DEPTHSENSE_INCLUDE_DIR})
 
-find_package(OpenCV REQUIRED)
-#FIND_PACKAGE(OpenCV 2 REQUIRED)
+find_package(OpenCV 2.4.10 REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable (DepthSenseGrabberCV
 	DepthSenseGrabberCV.cxx
@@ -18,6 +18,6 @@ add_executable (DepthSenseGrabberCV
 )
 message("test")
 message(${OpenCV_LIBS})
-target_link_libraries (DepthSenseGrabberCV ${DEPTHSENSESDK_LIBRARIES} ${OpenCV_LIBS})
-
-#target_link_libraries (DepthSenseGrabberCV ${DEPTHSENSESDK_LIBRARIES})
+message(${DEPTHSENSE_LIBRARIES})
+message(${DEPTHSENSE_INCLUDE_DIR})
+target_link_libraries (DepthSenseGrabberCV ${DEPTHSENSE_LIBRARIES} ${OpenCV_LIBS})
