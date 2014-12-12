@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <sys/time.h>
+#include <unistd.h>
 
 #include <vector>
 #include <exception>
@@ -19,6 +21,9 @@
 
 using namespace DepthSense;
 using namespace std;
+
+struct timeval timeStart, timeCurrent;
+long mtime, seconds, useconds;
 
 bool usingUSB30Flag = true; // if the camera is plugged on a USB 3.0 port
 
@@ -102,7 +107,7 @@ uint16_t* pixelsDepthSync = pixelsDepthSyncNHD;
 
 const uint16_t noDepthDefault = 65535;
 const uint16_t noDepthThreshold = 2000;
-const uint16_t deltaDepthSync = 150;
+const uint16_t deltaDepthSync = 132; // DS325
 
 uint8_t noDepthBGR[3] = {0,0,0};
 
@@ -113,6 +118,7 @@ int debugInt;
 UV uvMapAcq[nPixelsQVGA];
 UV uvMapVGA[nPixelsVGA];
 
+double timeStampSeconds;
 int timeStamp;
 clock_t clockStartGrab;
 
@@ -143,6 +149,12 @@ char baseNameDepthAcq[20] = "depthAcqFrame_0_";
 char baseNameColorSync[20] = "colorSyncFrame_0_";
 char baseNameDepthSync[20] = "depthFrame_0_";
 char baseNameConfidence[30] = "depthConfidenceFrame_0_";
+
+//char baseNameColorAcq[20] = "colorAcqFrame_0_";
+//char baseNameDepthAcq[20] = "depthFrame_0_";
+//char baseNameColorSync[20] = "colorFrame_0_";
+//char baseNameDepthSync[20] = "depthAcqFrame_0_";
+//char baseNameConfidence[30] = "depthConfidenceFrame_0_";
 
 
 /*----------------------------------------------------------------------------*/
@@ -194,7 +206,7 @@ each pixel, expressed in meters. Saturated pixels are given the special value -2
 
 void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 {
-    timeStamp = (int) (((float)(1000*(clock()-clockStartGrab)))/CLOCKS_PER_SEC);
+    //timeStamp = (int) (((float)(1000*(clock()-clockStartGrab)))/CLOCKS_PER_SEC);
 
     // Initialize raw depth and UV maps
     for (int currentPixelInd = 0; currentPixelInd < nPixelsDepthAcq; currentPixelInd++)
@@ -277,6 +289,15 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     g_dFrames++;
 
+    //timeStamp = (int) (((float)(1000*(clock()-clockStartGrab)))/CLOCKS_PER_SEC);
+
+    gettimeofday(&timeCurrent, NULL);
+    //timeStampSeconds = difftime(timeCurrent,timeStart);
+    seconds  = timeCurrent.tv_sec  - timeStart.tv_sec;
+    useconds = timeCurrent.tv_usec - timeStart.tv_usec;
+    mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+
+    timeStamp = (int) (mtime);
     if (saveDepthAcqFlag) {
         sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
         if (interpolateDepthFlag) saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcqVGA, widthVGA, heightVGA, timeStamp);
@@ -518,6 +539,7 @@ void onDeviceDisconnected(Context context, Context::DeviceRemovedData data)
 /*----------------------------------------------------------------------------*/
 int main(int argc, char* argv[])
 {
+
     g_context = Context::create("localhost");
 
     g_context.deviceAddedEvent().connect(&onDeviceConnected);
@@ -552,6 +574,8 @@ int main(int argc, char* argv[])
     printf("Waiting %i seconds before grabbing...\n",waitSecondsBeforeGrab);
     while (clock() < clockStartGrab);
     printf("Now grabbing!\n");
+
+    gettimeofday(&timeStart, NULL);
 
     g_context.run();
 
