@@ -14,8 +14,7 @@ int affixSatteliteToPlanetFromFrameForLength(
     //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized
     //==================================================================================
 
-    pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(1,satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
-/*
+ /*
     unsigned int pos=0;
     for (pos=frameNumber+1; pos<frameNumber+duration; pos++)
     {
@@ -50,5 +49,31 @@ int main()
     double planetPosAbsolute[4]={0};
     double planetRotAbsolute[4]={0};
     double satPosRelative[4]={0};
+
+
+    planetPosAbsolute[0]=0.0;
+    planetPosAbsolute[1]=0.0;
+    planetPosAbsolute[2]=0.0;
+    planetPosAbsolute[3]=1.0;
+
+
+    planetRotAbsolute[0]=0.0;
+    planetRotAbsolute[1]=0.0;
+    planetRotAbsolute[2]=0.0;
+
+
+    satPosAbsolute[0]=10.0;
+    satPosAbsolute[1]=10.0;
+    satPosAbsolute[2]=10.0;
+    satPosAbsolute[3]=1.0;
+
+    fprintf(stderr,"Sattelite Pos Absolute %0.2f %0.2f %0.2f \n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
+
+    pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(1,satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
+
+    fprintf(stderr,"Sattelite Pos Relative %0.2f %0.2f %0.2f \n",satPosRelative[0],satPosRelative[1],satPosRelative[2]);
+
+
+
     return 0;
 }
