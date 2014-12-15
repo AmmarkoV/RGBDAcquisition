@@ -246,8 +246,9 @@ void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternion
 }
 
 
-void  rotationXYZ_2_Matrix3x3(double * matrix3x3,double * rotationsXYZ)
+void  rotationXYZ_2_Matrix3x3Old(double * matrix3x3,double * rotationsXYZ)
 {
+ //result = cos ( param * PI / 180.0 );
  double heading = degreesToRadians(rotationsXYZ[0]);
  double attitude= degreesToRadians(rotationsXYZ[1]);
  double bank    = degreesToRadians(rotationsXYZ[2]);
@@ -264,6 +265,25 @@ void  rotationXYZ_2_Matrix3x3(double * matrix3x3,double * rotationsXYZ)
   matrix3x3[6]=(-1)*sh*ca; /*|*/    matrix3x3[7]=(sh*sa*cb) + (ch*sb);            /*|*/    matrix3x3[8]=((-1)*sh*sa*sb) + (ch*cb);
 }
 
+
+void  rotationXYZ_2_Matrix3x3(double * matrix3x3,double * rotationsXYZ)
+{
+ //result = cos ( param * PI / 180.0 );
+ double a = degreesToRadians(rotationsXYZ[0]);
+ double b = degreesToRadians(rotationsXYZ[1]);
+ double c = degreesToRadians(rotationsXYZ[2]);
+
+ double ca=cos(a);
+ double cb=cos(b);
+ double cc=cos(c);
+ double sa=sin(a);
+ double sb=sin(b);
+ double sc=sin(c);
+
+  matrix3x3[0]=cb*cc;   /*|*/    matrix3x3[1]=(sa*sb*cc) - (ca*sc); /*|*/    matrix3x3[2]=(ca*sb*cc) + (sa*sc);
+  matrix3x3[3]=cb*sc;   /*|*/    matrix3x3[4]=(sa*sb*sc) + (ca*cc); /*|*/    matrix3x3[5]=(ca*sb*sc) - (sa*cc);
+  matrix3x3[6]=(-1)*sb; /*|*/    matrix3x3[7]=(sa*cb);              /*|*/    matrix3x3[8]=(ca*cb);
+}
 
 
 int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation)
@@ -677,7 +697,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(unsigned int meth
 */
 int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectRotation ,double * relativeInPoint3DUnrotated)
 {
-    double objectRotation3x3[9];
+    double objectRotation3x3[9]={0};
 
     rotationXYZ_2_Matrix3x3(objectRotation3x3,objectRotation);
 

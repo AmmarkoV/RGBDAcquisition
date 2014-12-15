@@ -45,15 +45,18 @@ int main()
 {
     fprintf(stderr,"\n\n\nLets Test Orbiting..!\n");
 
+    float xOffset=0.0,yOffset=0.0,zOffset=00.0;
+
+
     double satPosAbsolute[4]={0};
     double planetPosAbsolute[4]={0};
     double planetRotAbsolute[4]={0};
     double satPosRelative[4]={0};
 
 
-    planetPosAbsolute[0]=1.0;
-    planetPosAbsolute[1]=2.0;
-    planetPosAbsolute[2]=3.0;
+    planetPosAbsolute[0]=0.0;
+    planetPosAbsolute[1]=0.0;
+    planetPosAbsolute[2]=0.0;
     planetPosAbsolute[3]=1.0;
 
 
@@ -62,9 +65,9 @@ int main()
     planetRotAbsolute[2]=0.0;
 
 
-    satPosAbsolute[0]=15.0;
-    satPosAbsolute[1]=20.0;
-    satPosAbsolute[2]=25.0;
+    satPosAbsolute[0]=1.0;
+    satPosAbsolute[1]=1.0;
+    satPosAbsolute[2]=1.0;
     satPosAbsolute[3]=1.0;
 
     fprintf(stderr,"Sattelite Pos Absolute %0.2f %0.2f %0.2f \n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
@@ -85,7 +88,7 @@ int main()
 
     for (i=0; i<180; i++)
     {
-     planetRotAbsolute[0]=i*2.0; planetRotAbsolute[1]=0.0; planetRotAbsolute[2]=0.0;
+     planetRotAbsolute[0]=xOffset+i*2.0; planetRotAbsolute[1]=yOffset+0.0; planetRotAbsolute[2]=zOffset+0.0;
      if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
        {
          fprintf(pFile,"%0.2f %0.2f %0.2f\n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
@@ -94,7 +97,7 @@ int main()
 
    for (i=0; i<180; i++)
     {
-     planetRotAbsolute[0]=0; planetRotAbsolute[1]=i*2.0; planetRotAbsolute[2]=0.0;
+     planetRotAbsolute[0]=xOffset+0; planetRotAbsolute[1]=yOffset+i*2.0; planetRotAbsolute[2]=zOffset+0.0;
      if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
        {
          fprintf(pFile,"%0.2f %0.2f %0.2f\n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
@@ -105,7 +108,7 @@ int main()
 
    for (i=0; i<180; i++)
     {
-     planetRotAbsolute[0]=0; planetRotAbsolute[1]=0.0; planetRotAbsolute[2]=i*2.0;
+     planetRotAbsolute[0]=xOffset+0; planetRotAbsolute[1]=yOffset+0.0; planetRotAbsolute[2]=zOffset+i*2.0;
      if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
        {
          fprintf(pFile,"%0.2f %0.2f %0.2f\n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
@@ -114,6 +117,7 @@ int main()
 
     fclose (pFile);
     i=system("gnuplot -e 'set terminal png; set output \"quasi.png\"; set title \"3D random points\"; splot \"output.dat\" using 1:2:3:3 with points palette'");
+    i=system("gpicview \"quasi.png\" ");
   }
 
 
