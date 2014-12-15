@@ -43,7 +43,7 @@ int affixSatteliteToPlanetFromFrameForLength(
 
 int main()
 {
-    printf("Lets Test Orbiting..!\n");
+    fprintf(stderr,"\n\n\nLets Test Orbiting..!\n");
 
     double satPosAbsolute[4]={0};
     double planetPosAbsolute[4]={0};
@@ -51,9 +51,9 @@ int main()
     double satPosRelative[4]={0};
 
 
-    planetPosAbsolute[0]=0.0;
-    planetPosAbsolute[1]=0.0;
-    planetPosAbsolute[2]=0.0;
+    planetPosAbsolute[0]=1.0;
+    planetPosAbsolute[1]=2.0;
+    planetPosAbsolute[2]=3.0;
     planetPosAbsolute[3]=1.0;
 
 
@@ -62,17 +62,59 @@ int main()
     planetRotAbsolute[2]=0.0;
 
 
-    satPosAbsolute[0]=10.0;
-    satPosAbsolute[1]=10.0;
-    satPosAbsolute[2]=10.0;
+    satPosAbsolute[0]=15.0;
+    satPosAbsolute[1]=20.0;
+    satPosAbsolute[2]=25.0;
     satPosAbsolute[3]=1.0;
 
     fprintf(stderr,"Sattelite Pos Absolute %0.2f %0.2f %0.2f \n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
 
     pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(1,satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
 
-    fprintf(stderr,"Sattelite Pos Relative %0.2f %0.2f %0.2f \n",satPosRelative[0],satPosRelative[1],satPosRelative[2]);
+    fprintf(stderr,"   Planet Pos : %0.2f %0.2f %0.2f \n",planetPosAbsolute[0],planetPosAbsolute[1],planetPosAbsolute[2]);
+    fprintf(stderr,"   Planet Rot : %0.2f %0.2f %0.2f \n",planetRotAbsolute[0],planetRotAbsolute[1],planetRotAbsolute[2]);
 
+    fprintf(stderr,"   Sattelite Pos Relative %0.2f %0.2f %0.2f \n",satPosRelative[0],satPosRelative[1],satPosRelative[2]);
+
+
+  FILE * pFile  = fopen ("output.dat","w");
+  if (pFile!=NULL)
+  {
+    fprintf(pFile,"%0.2f %0.2f %0.2f\n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
+    unsigned int i=0;
+
+    for (i=0; i<180; i++)
+    {
+     planetRotAbsolute[0]=i*2.0; planetRotAbsolute[1]=0.0; planetRotAbsolute[2]=0.0;
+     if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
+       {
+         fprintf(pFile,"%0.2f %0.2f %0.2f\n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
+       }
+    }
+
+   for (i=0; i<180; i++)
+    {
+     planetRotAbsolute[0]=0; planetRotAbsolute[1]=i*2.0; planetRotAbsolute[2]=0.0;
+     if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
+       {
+         fprintf(pFile,"%0.2f %0.2f %0.2f\n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
+       }
+    }
+
+
+
+   for (i=0; i<180; i++)
+    {
+     planetRotAbsolute[0]=0; planetRotAbsolute[1]=0.0; planetRotAbsolute[2]=i*2.0;
+     if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
+       {
+         fprintf(pFile,"%0.2f %0.2f %0.2f\n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
+       }
+    }
+
+    fclose (pFile);
+    i=system("gnuplot -e 'set terminal png; set output \"quasi.png\"; set title \"3D random points\"; splot \"output.dat\" using 1:2:3:3 with points palette'");
+  }
 
 
     return 0;

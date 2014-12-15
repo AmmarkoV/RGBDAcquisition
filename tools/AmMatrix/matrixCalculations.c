@@ -248,9 +248,9 @@ void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternion
 
 void  rotationXYZ_2_Matrix3x3(double * matrix3x3,double * rotationsXYZ)
 {
- double heading = rotationsXYZ[0]; // degreesToRadians(rotationsXYZ[0]);
- double attitude= rotationsXYZ[1]; // degreesToRadians(rotationsXYZ[1]);
- double bank    = rotationsXYZ[2]; // degreesToRadians(rotationsXYZ[2]);
+ double heading = degreesToRadians(rotationsXYZ[0]);
+ double attitude= degreesToRadians(rotationsXYZ[1]);
+ double bank    = degreesToRadians(rotationsXYZ[2]);
 
  double ch=cos(heading);
  double ca=cos(attitude);
