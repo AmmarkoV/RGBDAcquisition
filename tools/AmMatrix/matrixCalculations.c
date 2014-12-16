@@ -339,13 +339,13 @@ if ( pitch!=0 ) { glRotatef(pitch,1.0,0.0,0.0); }*/
  double axisXYZ[3]={0};
 
  axisXYZ[0]=0.0; axisXYZ[1]=0.0; axisXYZ[2]=1.0;
- rotationXYZAxis_2_Matrix3x3(firstRot,axisXYZ,degreesToRadians(rotationsXYZ[0]));
+ rotationXYZAxis_2_Matrix3x3(firstRot,axisXYZ,rotationsXYZ[0]);
 
  axisXYZ[0]=0.0; axisXYZ[1]=1.0; axisXYZ[2]=0.0;
- rotationXYZAxis_2_Matrix3x3(secondRot,axisXYZ,degreesToRadians(rotationsXYZ[1]));
+ rotationXYZAxis_2_Matrix3x3(secondRot,axisXYZ,rotationsXYZ[1]);
 
  axisXYZ[0]=1.0; axisXYZ[1]=0.0; axisXYZ[2]=0.0;
- rotationXYZAxis_2_Matrix3x3(thirdRot,axisXYZ,degreesToRadians(rotationsXYZ[2]));
+ rotationXYZAxis_2_Matrix3x3(thirdRot,axisXYZ,rotationsXYZ[2]);
 
  multiplyTwo3x3Matrices(tmp,firstRot,secondRot);
  multiplyTwo3x3Matrices(matrix3x3,tmp,thirdRot);
