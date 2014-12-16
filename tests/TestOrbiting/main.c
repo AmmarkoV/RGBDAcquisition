@@ -45,12 +45,13 @@ int main()
 {
     fprintf(stderr,"\n\n\nLets Test Orbiting..!\n");
 
-    float xOffset=0.0,yOffset=0.0,zOffset=00.0;
+    double xOffset=0.0,yOffset=0.0,zOffset=00.0;
 
 
     double satPosAbsolute[4]={0};
     double planetPosAbsolute[4]={0};
     double planetRotAbsolute[4]={0};
+    //
     double satPosRelative[4]={0};
 
 
@@ -65,9 +66,9 @@ int main()
     planetRotAbsolute[2]=0.0;
 
 
-    satPosAbsolute[0]=1.0;
-    satPosAbsolute[1]=1.0;
-    satPosAbsolute[2]=1.0;
+    satPosAbsolute[0]=1000.0;
+    satPosAbsolute[1]=1000.0;
+    satPosAbsolute[2]=1000.0;
     satPosAbsolute[3]=1.0;
 
     fprintf(stderr,"Sattelite Pos Absolute %0.2f %0.2f %0.2f \n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);

@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+
+#define PRINT_MATRIX_DEBUGGING 1
+
 enum mat3x3Item
 {
     I11 = 0 , I12 , I13 ,
