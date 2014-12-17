@@ -5,6 +5,8 @@ add_library(CalibrationLibrary STATIC
             calibration.c calibration.h 
             undistort.c   undistort.h  
             transform.c   transform.h 
+            ../AmMatrix/quaternions.c
+            ../AmMatrix/quaternions.h
             ../AmMatrix/matrix4x4Tools.c
             ../AmMatrix/matrix4x4Tools.h
             ../AmMatrix/matrix3x3Tools.c

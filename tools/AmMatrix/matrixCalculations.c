@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "quaternions.h"
 #include "matrixTools.h"
 #include "matrix3x3Tools.h"
 #include "matrix4x4Tools.h"
@@ -25,12 +26,6 @@ enum mat4x4EItem
     e12    , e13 , e14 , e15
 };
 
-
-enum quatOrder
-{
-  qWqXqYqZ=0,
-  qXqYqZqW
-};
 
 
 

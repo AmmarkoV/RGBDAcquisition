@@ -16,6 +16,8 @@ add_library(AcquisitionSegment STATIC
             automaticPlaneSegmentation.h
             ../tools/Quasirandomness/quasirandomness.c
             ../tools/Quasirandomness/quasirandomness.h
+            ../tools/AmMatrix/quaternions.c
+            ../tools/AmMatrix/quaternions.h
             ../tools/AmMatrix/matrix4x4Tools.c
             ../tools/AmMatrix/matrix4x4Tools.h
             ../tools/AmMatrix/matrix3x3Tools.c
