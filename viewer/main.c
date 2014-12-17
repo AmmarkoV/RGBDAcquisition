@@ -68,6 +68,8 @@ volatile int stop=0;
 unsigned char warnNoDepth=0,verbose=0;
 
 unsigned int windowX=0,windowY=0;
+unsigned int drawColor=1;
+unsigned int drawDepth=1;
 
 char inputname[512]={0};
 unsigned int frameNum=0;
@@ -172,6 +174,8 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
     unsigned int width , height , channels , bitsperpixel;
 
 
+if (drawColor)
+{
     //DRAW RGB FRAME -------------------------------------------------------------------------------------
     if ( acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) )
     {
@@ -207,8 +211,11 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
      cvReleaseImage( &imageRGB );
      cvReleaseImage( &imageViewableBGR );
     }
+}
 
 
+if (drawDepth)
+{
     //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
     if ( acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) )
     {
@@ -244,6 +251,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
      imageDepth->imageData = opencv_depth_pointer_retainer; // UGLY HACK
      cvReleaseImage( &imageDepth );
     }
+}
 
   return 1;
 }
@@ -280,6 +288,14 @@ int main(int argc, char *argv[])
                                            } else
     if (strcmp(argv[i],"-v")==0)           {
                                              verbose=1;
+                                           } else
+     if ( (strcmp(argv[i],"-onlyDepth")==0)||
+          (strcmp(argv[i],"-noColor")==0)) {
+                                               drawColor = 0;
+                                           } else
+     if ( (strcmp(argv[i],"-onlyColor")==0)||
+          (strcmp(argv[i],"-noDepth")==0)) {
+                                               drawDepth = 0;
                                            } else
     if (strcmp(argv[i],"-calibration")==0) {
                                              calibrationSet=1;

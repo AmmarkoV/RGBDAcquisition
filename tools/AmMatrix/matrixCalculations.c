@@ -326,11 +326,13 @@ void  rotationXYZAxis_2_Matrix3x3(double * matrix3x3,double * axisXYZ,double ang
 
 void  rotationXYZ_2_Matrix3x3(double * matrix3x3,double * rotationsXYZ)
 {
-/*
-glTranslatef(x,y,z);
-if ( roll!=0 ) { glRotatef(roll,0.0,0.0,1.0); }
-if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
-if ( pitch!=0 ) { glRotatef(pitch,1.0,0.0,0.0); }*/
+ /*
+  OpenGL rotates using roll/heading/pitch , our XYZ rotation
+  glTranslatef(x,y,z);
+  if ( roll!=0 ) { glRotatef(roll,0.0,0.0,1.0); }
+  if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
+  if ( pitch!=0 ) { glRotatef(pitch,1.0,0.0,0.0); }
+ */
 
  double firstRot[9]={0};
  double secondRot[9]={0};
