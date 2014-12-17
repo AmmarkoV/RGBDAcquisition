@@ -39,6 +39,22 @@ int affixSatteliteToPlanetFromFrameForLength(
 }
 
 
+int generatePlot(unsigned int viewX,unsigned int viewY)
+{
+  char command[1024]={0};
+  //-----------------------
+  snprintf(command,1024,"gnuplot -e 'set terminal png; set output \"plot_%u_%u.png\"; set title \"3D random points\"; set view %u,%u; splot \"output.dat\"  using 1:2:3:3 with points palette'",viewX,viewY,viewX,viewY);
+  int  i=system(command);
+  if (i!=0) { fprintf(stderr,"Error generating graph ( is gnuplot installed ? )"); }
+
+  //-----------------------
+  snprintf(command,1024,"gpicview  \"plot_%u_%u.png\"& ",viewX,viewY);
+  i=system(command);
+  if (i!=0) { fprintf(stderr,"Error generating graph ( is gpicview installed ? )"); }
+
+ return 1;
+}
+
 
 
 int main()
@@ -117,8 +133,19 @@ int main()
     }
 
     fclose (pFile);
-    i=system("gnuplot -e 'set terminal png; set output \"quasi.png\"; set title \"3D random points\"; splot \"output.dat\" using 1:2:3:3 with points palette'");
-    i=system("gpicview \"quasi.png\" ");
+
+
+
+
+
+    generatePlot(0,40);
+    generatePlot(15,40);
+    generatePlot(55,40);
+    generatePlot(85,40);
+
+
+
+
   }
 
 
