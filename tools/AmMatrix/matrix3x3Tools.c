@@ -4,8 +4,6 @@
 #include <math.h>
 
 
-#define PRINT_MATRIX_DEBUGGING 1
-
 enum mat3x3Item
 {
     I11 = 0 , I12 , I13 ,
@@ -229,9 +227,12 @@ int multiplyTwo3x3Matrices(double * result , double * matrixA , double * matrixB
 {
   if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }
 
-  fprintf(stderr,"Multiplying 3x3 A and B \n");
-  print3x3DMatrix("A", matrixA);
-  print3x3DMatrix("B", matrixB);
+
+  #if PRINT_MATRIX_DEBUGGING
+   fprintf(stderr,"Multiplying 3x3 A and B \n");
+   print3x3DMatrix("A", matrixA);
+   print3x3DMatrix("B", matrixB);
+  #endif
 
   //MULTIPLICATION_RESULT FIRST ROW
   // 0 1 2

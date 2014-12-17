@@ -38,6 +38,10 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h 
+            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.c
+            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.h 
+            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.c
+            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.h 
            ) 
 target_link_libraries(OpenGLAcquisition rt m CalibrationLibrary GL GLU X11 ) 
  

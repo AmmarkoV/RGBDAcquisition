@@ -125,6 +125,7 @@ void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternio
 
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
+  fprintf(stderr,"affixSatteliteToPlanetFromFrameForLength(sat=%u,planet=%u)\n",satteliteObj,planetObj);
   if ( satteliteObj >= stream->numberOfObjects ) { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,satteliteObj); return 0; }
   if ( planetObj >= stream->numberOfObjects )    { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,planetObj);    return 0; }
 
@@ -155,86 +156,6 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
        fprintf(stderr,RED " correcting duration to %u\n" NORMAL,duration);
      }
 
-#if USE_QUATERNIONS_FOR_ORBITING
-    //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized
-    //==================================================================================
-    double satPosAbsolute[4]={0};
-    satPosAbsolute[0] = (double) stream->object[satteliteObj].frame[frameNumber].x;
-    satPosAbsolute[1] = (double) stream->object[satteliteObj].frame[frameNumber].y;
-    satPosAbsolute[2] = (double) stream->object[satteliteObj].frame[frameNumber].z;
-    satPosAbsolute[3] = 1.0;
-
-    //==================================================================================
-    double planetPosAbsolute[4]={0};
-    planetPosAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].x;
-    planetPosAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].y;
-    planetPosAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].z;
-    planetPosAbsolute[3] = 1.0;
-
-
-    double planetQuatAbsolute[4]={0};
-    double planetRotAbsolute[4]={0};
-    double planetRotAbsoluteF[4]={0};
-    planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
-    planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
-    planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
-    euler2QuaternionsInternal(planetQuatAbsolute , planetRotAbsolute,1);
-
-
-    double satPosRelative[4]={0};
-    pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(0,satPosRelative,planetPosAbsolute,planetQuatAbsolute,satPosAbsolute);
-
-    unsigned int pos=0;
-    for (pos=frameNumber+1; pos<frameNumber+duration; pos++)
-    {
-       planetPosAbsolute[0] = (double) stream->object[planetObj].frame[pos].x;
-       planetPosAbsolute[1] = (double) stream->object[planetObj].frame[pos].y;
-       planetPosAbsolute[2] = (double) stream->object[planetObj].frame[pos].z;
-       planetPosAbsolute[3] = 1.0;
-
-       planetRotAbsoluteF[0] = stream->object[planetObj].frame[pos].rot1;
-       planetRotAbsoluteF[1] = stream->object[planetObj].frame[pos].rot2;
-       planetRotAbsoluteF[2] = stream->object[planetObj].frame[pos].rot3;
-
-       //Undo all the evil that has been done to our coordinate system
-       if (stream->rotationsOverride)
-         {
-            unflipRotationAxis(
-                              &planetRotAbsoluteF[0],
-                              &planetRotAbsoluteF[1],
-                              &planetRotAbsoluteF[2],
-                              stream->rotationsXYZ[0] ,
-                              stream->rotationsXYZ[1] ,
-                              stream->rotationsXYZ[2]
-                              );
-         }
-
-       planetRotAbsolute[0] = (double) planetRotAbsoluteF[0];
-       planetRotAbsolute[1] = (double) planetRotAbsoluteF[1];
-       planetRotAbsolute[2] = (double) planetRotAbsoluteF[2];
-
-       planetRotAbsolute[0] -= stream->rotationsOffset[0];
-       planetRotAbsolute[1] -= stream->rotationsOffset[1];
-       planetRotAbsolute[2] -= stream->rotationsOffset[2];
-       planetRotAbsolute[0] =  planetRotAbsolute[0] / stream->scaleWorld[3];
-       planetRotAbsolute[1] =  planetRotAbsolute[1] / stream->scaleWorld[4];
-       planetRotAbsolute[2] =  planetRotAbsolute[2] / stream->scaleWorld[5];
-
-       euler2QuaternionsInternal(planetQuatAbsolute , planetRotAbsolute,1);
-
-       planetQuatAbsolute[0]=(-1) * planetQuatAbsolute[0];
-       //planetQuatAbsolute[3]=(-1) * planetQuatAbsolute[3];
-
-       if ( pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(satPosAbsolute,planetPosAbsolute,planetQuatAbsolute,satPosRelative) )
-       {
-           stream->object[satteliteObj].frame[pos].x = (float) satPosAbsolute[0];
-           stream->object[satteliteObj].frame[pos].y = (float) satPosAbsolute[1];
-           stream->object[satteliteObj].frame[pos].z = (float) satPosAbsolute[2];
-       }
-    }
- return 1;
-}
-#else
     //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized
     //==================================================================================
     double satPosAbsolute[4]={0};
@@ -280,8 +201,6 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
        }
     }
  return 1;
-
-#endif // USE_QUATERNIONS_FOR_ORBITING
 
 }
 

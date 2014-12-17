@@ -8,6 +8,7 @@
 #include "matrixTools.h"
 
 
+
 enum mat4x4Item
 {
     I11 = 0 , I12 , I13 , I14 ,
@@ -428,6 +429,10 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
   } else
   {
      fprintf(stderr,"Error with W coordinate after multiplication of 3D Point with 4x4 Matrix\n");
+     print4x4DMatrix("Matrix was",transformation4x4);
+     fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D[0],point3D[1],point3D[2],point3D[3]);
+     fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2],resultPoint3D[3]);
+
   }
 
  return 1;

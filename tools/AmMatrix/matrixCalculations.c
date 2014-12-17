@@ -350,11 +350,6 @@ if ( pitch!=0 ) { glRotatef(pitch,1.0,0.0,0.0); }*/
  multiplyTwo3x3Matrices(tmp,firstRot,secondRot);
  multiplyTwo3x3Matrices(matrix3x3,tmp,thirdRot);
 
-   fprintf(stderr,"Constructing 3x3 matrix for rotations %0.2f %0.2f %0.2f\n",rotationsXYZ[0],rotationsXYZ[1],rotationsXYZ[2]);
-
-   print3x3DMatrix("Result is ",  matrix3x3);
-
-
 }
 
 
@@ -608,12 +603,6 @@ CNormal[z] /= temp_lenght;
 
 
 
-
-
-
-
-
-
 int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, double * objectPosition , double * objectRotation3x3 ,  double * relativeInPoint3DUnrotated)
 {
   //  What we want to do ( in mathematica )
@@ -631,11 +620,10 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
   objectRotation4x4[e11]=objectPosition[2];
   objectRotation4x4[e15]=1.0;
 
-  double relativePoint3DRotated[4]={0};
-  transform3DPointVectorUsing4x4Matrix(relativePoint3DRotated,objectRotation4x4,relativeInPoint3DUnrotated);
+  transform3DPointVectorUsing4x4Matrix(absoluteOutPoint3DRotated,objectRotation4x4,relativeInPoint3DUnrotated);
 
   //Normalization is done automatically
-  //normalize3DPointVector(relativePoint3DRotated);
+  normalize3DPointVector(absoluteOutPoint3DRotated);
 
   return 1;
 }
@@ -646,7 +634,7 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
     We also have an absolute position of a 3D point , and we want to calculate the relative position
     of the 3D point in relation to the object ( unrotated relative position )
 */
-int pointFromAbsoluteToInRelationWithObject_UsingInversion(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated )
+int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated )
 {
   //printf("pointFromAbsoluteToInRelationWithObject Using Inversion Code\n");
   double objectRotation4x4[4*4]={0};
@@ -680,13 +668,9 @@ int pointFromAbsoluteToInRelationWithObject_UsingInversion(double * relativeOutP
 int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated )
 {
     double objectRotation3x3[9];
-
     rotationXYZ_2_Matrix3x3(objectRotation3x3,objectRotation);
 
-    //print3x3DMatrix("Quaternion to 3x3",objectRotation3x3);
-    //print3x3DMathematicaMatrix("Quat3x3",objectRotation3x3);
-
-     pointFromAbsoluteToInRelationWithObject_UsingInversion(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
+     pointFromAbsoluteToInRelationWithObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
     normalize3DPointVector(relativeOutPoint3DUnrotated);
@@ -716,7 +700,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relative
     //print3x3DMatrix("Quaternion to 3x3",objectRotation3x3);
     //print3x3DMathematicaMatrix("Quat3x3",objectRotation3x3);
 
-    pointFromAbsoluteToInRelationWithObject_UsingInversion(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
+    pointFromAbsoluteToInRelationWithObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
     normalize3DPointVector(relativeOutPoint3DUnrotated);
@@ -731,12 +715,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relative
 int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectRotation ,double * relativeInPoint3DUnrotated)
 {
     double objectRotation3x3[9]={0};
-
     rotationXYZ_2_Matrix3x3(objectRotation3x3,objectRotation);
-
-    //print3x3DMatrix("Quaternion to 3x3",objectRotation3x3);
-    //print3x3DMathematicaMatrix("Quat3x3",objectRotation3x3);
-
     pointFromRelationWithObjectToAbsolute(absoluteOutPoint3DRotated,objectPosition,objectRotation3x3,relativeInPoint3DUnrotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
