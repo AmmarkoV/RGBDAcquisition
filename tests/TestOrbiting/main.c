@@ -48,7 +48,7 @@ int generatePlot(unsigned int viewX,unsigned int viewY)
   if (i!=0) { fprintf(stderr,"Error generating graph ( is gnuplot installed ? )"); }
 
   //-----------------------
-  snprintf(command,1024,"timeout 5 gpicview  \"plot_%u_%u.png\"& ",viewX,viewY);
+  snprintf(command,1024,"timeout 10 gpicview  \"plot_%u_%u.png\"& ",viewX,viewY);
   i=system(command);
   if (i!=0) { fprintf(stderr,"Error generating graph ( is gpicview installed ? )"); }
 
@@ -140,10 +140,11 @@ int main()
 
 
 
-    generatePlot(0,40);
-    generatePlot(45,40);
-    generatePlot(90,40);
+    generatePlot(0,0);
+    generatePlot(45,0);
+    generatePlot(90,0);
 
+    generatePlot(45,45);
 
 
 
