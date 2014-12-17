@@ -41,16 +41,58 @@ void euler2Quaternions(double * quaternions,double * euler,int quaternionConvent
  * @param Euler angles , The output euler angles X,Y,Z
  * @param Quaternions , The input quaternions in the order declared by enum quatOrder
  * @param The convention used for quaternions ( see enum quatOrder )
- * @retval Nothing , no return value
  */
 void quaternions2Euler(double * euler,double * quaternions,int quaternionConvention);
 
 
+/**
+ * @brief Normalize Quaternion
+ * @ingroup quaternions
+ * @param
+ * @param Input/Output , qX
+ * @param Input/Output , qY
+ * @param Input/Output , qZ
+ * @param Input/Output , qW
+ * @retval 1=Success/0=Failure
+ */
 int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW);
 
+
+/**
+ * @brief Calculate the Inner Product of Two Quaternions
+ * @ingroup quaternions
+ --------------------------
+ * @param Quaternion A qX
+ * @param Quaternion A qY
+ * @param Quaternion A qZ
+ * @param Quaternion A qW
+ --------------------------
+ * @param Quaternion B qX
+ * @param Quaternion B qY
+ * @param Quaternion B qZ
+ * @param Quaternion B qW
+ * @retval Inner Product
+ */
 double innerProductQuaternions(double qAX,double qAY,double qAZ,double qAW ,
                                double qBX,double qBY,double qBZ,double qBW);
 
+
+
+/**
+ * @brief Calculate the Angle Between Two Quaternions
+ * @ingroup quaternions
+ --------------------------
+ * @param Quaternion A qX
+ * @param Quaternion A qY
+ * @param Quaternion A qZ
+ * @param Quaternion A qW
+ --------------------------
+ * @param Quaternion B qX
+ * @param Quaternion B qY
+ * @param Quaternion B qZ
+ * @param Quaternion B qW
+ * @retval Angle Between the Two
+ */
 double anglesBetweenQuaternions(double qAX,double qAY,double qAZ,double qAW ,
                                 double qBX,double qBY,double qBZ,double qBW);
 

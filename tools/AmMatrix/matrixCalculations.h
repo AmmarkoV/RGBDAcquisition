@@ -287,6 +287,22 @@ float squaredDistanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,floa
 * @retval A float describing the distance
 */
 float calculateDistance(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z);
+
+
+
+/**
+* @brief Convert 2 Points to a Vector Direction ( a = b - c )
+* @ingroup AmMatrix
+* @param  Input Point Array A X
+* @param  Input Point Array A Y
+* @param  Input Point Array A Z
+* @param  Input Point Array B X
+* @param  Input Point Array B Y
+* @param  Input Point Array B Z
+* @param  Output Array X
+* @param  Output Array Y
+* @param  Output Array Z
+*/
 void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ_y,float targ_z,float *vect_x,float *vect_y,float *vect_z);
 
 
