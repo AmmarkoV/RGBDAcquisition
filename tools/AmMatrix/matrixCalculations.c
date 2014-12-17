@@ -196,56 +196,6 @@ void changeYandZAxisOpenGL4x4Matrix(double * result,double * matrix)
 }
 
 
-int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW)
-{
-#if USE_FAST_NORMALIZATION
-      // Works best when quat is already almost-normalized
-      double f = (double) (3.0 - (((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)))) / 2.0;
-      *qX *= f;
-      *qY *= f;
-      *qZ *= f;
-      *qW *= f;
-#else
-      double sqrtDown = (double) sqrt(((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)));
-      double f = (double) 1 / sqrtDown;
-       *qX *= f;
-       *qY *= f;
-       *qZ *= f;
-       *qW *= f;
-#endif // USE_FAST_NORMALIZATION
-  return 1;
-}
-
-
-void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention)
-{
-    //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
-    double qX,qY,qZ,qW;
-
-    switch (quaternionConvention)
-     {
-       case qWqXqYqZ  :
-        qW = quaternions[0]; qX = quaternions[1]; qY = quaternions[2]; qZ = quaternions[3];
-       break;
-       case qXqYqZqW :
-        qX = quaternions[0]; qY = quaternions[1]; qZ = quaternions[2]; qW = quaternions[3];
-       break;
-
-       default :
-       fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
-       break;
-     }
-
-
-     double * m = matrix3x3;
-
-     m[m0]=1 -(2*qY*qY) - (2*qZ*qZ); /*|*/  m[m1]=(2*qX*qY) - (2*qZ*qW);     /*|*/ m[m2]=(2*qX*qZ) + (2*qY*qW);
-     m[m3]=(2*qX*qY) + (2*qZ*qW);    /*|*/  m[m4]=1 - (2*qX*qX) - (2*qZ*qZ); /*|*/ m[m5]=(2*qY*qZ) - (2*qX*qW);
-     m[m6]=(2*qX*qZ) - (2*qY*qW);    /*|*/  m[m7]=(2*qY*qZ) + (2*qX*qW);     /*|*/ m[m8]=1 - (2*qX*qX) - (2*qY*qY);
-
- return ;
-}
-
 
 int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation)
 {

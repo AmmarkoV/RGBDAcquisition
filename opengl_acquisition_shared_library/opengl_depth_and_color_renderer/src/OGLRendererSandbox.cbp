@@ -70,6 +70,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../tools/AmMatrix/ocvStaging.h" />
+		<Unit filename="../../../tools/AmMatrix/quaternions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../tools/AmMatrix/quaternions.h" />
 		<Unit filename="../../../tools/AmMatrix/solveHomography.c">
 			<Option compilerVar="CC" />
 		</Unit>

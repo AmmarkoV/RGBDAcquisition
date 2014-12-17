@@ -9,6 +9,11 @@
 #define QUATERNIONS_H_INCLUDED
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /**
  * @brief This enumerator defines the order of quaternions qWqXqYqZ means W X Y Z , and qXqYqZqW means X Y Z W
  */
@@ -48,4 +53,12 @@ double innerProductQuaternions(double qAX,double qAY,double qAZ,double qAW ,
 
 double anglesBetweenQuaternions(double qAX,double qAY,double qAZ,double qAW ,
                                 double qBX,double qBY,double qBZ,double qBW);
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif // QUATERNIONS_H_INCLUDED

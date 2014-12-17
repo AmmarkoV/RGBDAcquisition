@@ -61,9 +61,6 @@ int pointInRelationToObject(double * relativeOutPoint3DUnrotated, double * objec
 
 int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,  double * absoluteInPoint3DRotated , double * objectPosition , double * objectQuaternion ,double * relativeOutPoint3DUnrotated);
 
-int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW);
-
-void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention);
 
 
 int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation);

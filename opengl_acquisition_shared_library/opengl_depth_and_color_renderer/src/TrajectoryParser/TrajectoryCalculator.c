@@ -17,6 +17,7 @@
 
 
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../tools/AmMatrix/quaternions.h"
 
 int smoothTrajectoriesOfObject(struct VirtualStream * stream,unsigned int ObjID)
 {
@@ -78,6 +79,7 @@ float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,flo
 
 void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternionConvention)
 {
+  #warning "TODO : make this use euler2Quaternions declared at AmMatrix/quaternions.h"
   //This conversion follows the rule euler X Y Z  to quaternions W X Y Z
   //Our input is degrees so we convert it to radians for the sin/cos functions
   double eX = (double) (euler[0] * PI) / 180;
@@ -221,88 +223,6 @@ int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned
   if ( distance > 0.3 ) { return 0;}
 
   return 1;
-}
-
-
-
-int normalizeQuaternionsTJP(double *qX,double *qY,double *qZ,double *qW)
-{
-#if USE_FAST_NORMALIZATION
-      // Works best when quat is already almost-normalized
-      double f = (double) (3.0 - (((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)))) / 2.0;
-      *qX *= f;
-      *qY *= f;
-      *qZ *= f;
-      *qW *= f;
-#else
-      double sqrtDown = (double) sqrt(((*qX) * (*qX)) + ( (*qY) * (*qY) ) + ( (*qZ) * (*qZ)) + ((*qW) * (*qW)));
-      double f = (double) 1 / sqrtDown;
-       *qX *= f;
-       *qY *= f;
-       *qZ *= f;
-       *qW *= f;
-#endif // USE_FAST_NORMALIZATION
-  return 1;
-}
-
-void quaternions2Euler(double * euler,double * quaternions,int quaternionConvention)
-{
-    double qX,qY,qZ,qW;
-
-    euler[0]=0.0; euler[1]=0.0; euler[2]=0.0;
-
-    switch (quaternionConvention)
-     {
-       case 0  :
-       qW = quaternions[0];
-       qX = quaternions[1];
-       qY = quaternions[2];
-       qZ = quaternions[3];
-       break;
-
-       case 1 :
-       qX = quaternions[0];
-       qY = quaternions[1];
-       qZ = quaternions[2];
-       qW = quaternions[3];
-       break;
-
-       default :
-       fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
-       break;
-     }
-
-  //http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-  //e1 Roll  - rX: rotation about the X-axis
-  //e2 Pitch - rY: rotation about the Y-axis
-  //e3 Yaw   - rZ: rotation about the Z-axis
-
-  //Shorthand to go according to http://graphics.wikia.com/wiki/Conversion_between_quaternions_and_Euler_angles
-  double q0=qW , q1 = qX , q2 = qY , q3 = qZ;
-  double q0q1 = (double) q0*q1 , q2q3 = (double) q2*q3;
-  double q0q2 = (double) q0*q2 , q3q1 = (double) q3*q1;
-  double q0q3 = (double) q0*q3 , q1q2 = (double) q1*q2;
-
-
-  double eXDenominator = ( 1.0 - 2.0 * (q1*q1 + q2*q2) );
-  if (eXDenominator == 0.0 ) { fprintf(stderr,"Gimbal lock detected , cannot convert to euler coordinates\n"); return; }
-  double eYDenominator = ( 1.0 - 2.0 * ( q2*q2 + q3*q3) );
-  if (eYDenominator == 0.0 ) { fprintf(stderr,"Gimbal lock detected , cannot convert to euler coordinates\n"); return; }
-
-
-  /* arctan and arcsin have a result between −π/2 and π/2. With three rotations between −π/2 and π/2 you can't have all possible orientations.
-     We need to replace the arctan by atan2 to generate all the orientations. */
-  /*eX*/ euler[0] = atan2( (2.0 *  (q0q1 + q2q3)) , eXDenominator ) ;
-  /*eY*/ euler[1] = asin( 2.0 * (q0q2 - q3q1));
-  /*eZ*/ euler[2] = atan2( (2.0 * (q0q3 + q1q2)) ,  eYDenominator );
-
-  //Our output is in radians so we convert it to degrees for the user
-
-  //Go from radians back to degrees
-  euler[0] = (euler[0] * 180) / PI;
-  euler[1] = (euler[1] * 180) / PI;
-  euler[2] = (euler[2] * 180) / PI;
-
 }
 
 

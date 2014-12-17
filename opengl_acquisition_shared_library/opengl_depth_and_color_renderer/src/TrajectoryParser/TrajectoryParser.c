@@ -147,7 +147,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                double euler[3];
                double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
 
-               normalizeQuaternionsTJP(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
+               normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
                quaternions2Euler(euler,quaternions,1); //1
                pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
                pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
@@ -384,7 +384,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                double euler[3];
                double quaternions[4]; quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
 
-               normalizeQuaternionsTJP(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
+               normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
                quaternions2Euler(euler,quaternions,1); //1
                pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
                pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
