@@ -614,12 +614,6 @@ CNormal[z] /= temp_lenght;
 
 
 
-
-
-
-
-
-
 int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, double * objectPosition , double * objectRotation3x3 ,  double * relativeInPoint3DUnrotated)
 {
   //  What we want to do ( in mathematica )
@@ -632,51 +626,19 @@ int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, do
   //We make the 3x3 matrix onto a 4x4 by adding zeros and 1 as the diagonal element
   upscale3x3to4x4(objectRotation4x4,objectRotation3x3);
 
+  objectRotation4x4[e3]=objectPosition[0];
+  objectRotation4x4[e7]=objectPosition[1];
+  objectRotation4x4[e11]=objectPosition[2];
+  objectRotation4x4[e15]=1.0;
+
   double relativePoint3DRotated[4]={0};
   transform3DPointVectorUsing4x4Matrix(relativePoint3DRotated,objectRotation4x4,relativeInPoint3DUnrotated);
 
   //Normalization is done automatically
   //normalize3DPointVector(relativePoint3DRotated);
 
-  absoluteOutPoint3DRotated[0]=relativePoint3DRotated[0]+objectPosition[0];
-  absoluteOutPoint3DRotated[1]=relativePoint3DRotated[1]+objectPosition[1];
-  absoluteOutPoint3DRotated[2]=relativePoint3DRotated[2]+objectPosition[2];
-  absoluteOutPoint3DRotated[3]=1.0;  //We know we are talking about 2 normalized 3d points
-
   return 1;
 }
-
-/*
-    We have an object with an absolute Position X,Y,Z (objectPosition[]) and Rotation (objectRotation3x3[])
-    We also have an absolute position of a 3D point , and we want to calculate the relative position
-    of the 3D point in relation to the object ( unrotated relative position )
-*/
-int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated )
-{
-  //  What we want to do ( in mathematica )
-  // { {r0,r3,r6,0} , {r1,r4,r7,0} , {r2,r5,r8,0} , {0,0,0,1} } * { { X-ObjX } , { Y-ObjY }  , { Z-ObjZ } , { 1.0 } }
-
-  //printf("pointFromAbsoluteToInRelationWithObject Using Simple Code\n");
-  double relativeInPoint3DRotated[4]={0};
-
-  relativeInPoint3DRotated[0]=absoluteInPoint3DRotated[0]-objectPosition[0];
-  relativeInPoint3DRotated[1]=absoluteInPoint3DRotated[1]-objectPosition[1];
-  relativeInPoint3DRotated[2]=absoluteInPoint3DRotated[2]-objectPosition[2];
-  relativeInPoint3DRotated[3]=1.0;  //We know we are talking about 2 3d points
-
-  double objectTransposedRotation3x3[3*3]={0};
-  //We transpose our 3x3 rotation matrix because we want the inverse transformation
-  transpose3x3MatrixDFromSource(objectTransposedRotation3x3,objectRotation3x3);
-
-  double objectTransposedRotation4x4[4*4]={0};
-  //We make the 3x3 matrix onto a 4x4 by adding zeros and 1 as the diagonal element
-  upscale3x3to4x4(objectTransposedRotation4x4,objectTransposedRotation3x3);
-
-
-  transform3DPointVectorUsing4x4Matrix(relativeOutPoint3DUnrotated,objectTransposedRotation4x4,relativeInPoint3DRotated);
-  return 1;
-}
-
 
 
 /*
@@ -715,7 +677,7 @@ int pointFromAbsoluteToInRelationWithObject_UsingInversion(double * relativeOutP
     We also have an absolute position of a 3D point , and we want to calculate the relative position
     of the 3D point in relation to the object ( unrotated relative position )
 */
-int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(unsigned int method, double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated )
+int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated )
 {
     double objectRotation3x3[9];
 
@@ -724,8 +686,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(unsigned int method,
     //print3x3DMatrix("Quaternion to 3x3",objectRotation3x3);
     //print3x3DMathematicaMatrix("Quat3x3",objectRotation3x3);
 
-    if (method==0) { pointFromAbsoluteToInRelationWithObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated); } else
-                   { pointFromAbsoluteToInRelationWithObject_UsingInversion(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated); }
+     pointFromAbsoluteToInRelationWithObject_UsingInversion(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
     normalize3DPointVector(relativeOutPoint3DUnrotated);
@@ -741,7 +702,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(unsigned int method,
     We also have an absolute position of a 3D point , and we want to calculate the relative position
     of the 3D point in relation to the object ( unrotated relative position )
 */
-int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(unsigned int method, double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated )
+int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated )
 {
     double objectRotation3x3[9];
 
@@ -755,8 +716,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(unsigned int meth
     //print3x3DMatrix("Quaternion to 3x3",objectRotation3x3);
     //print3x3DMathematicaMatrix("Quat3x3",objectRotation3x3);
 
-    if (method==0) { pointFromAbsoluteToInRelationWithObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated); } else
-                   { pointFromAbsoluteToInRelationWithObject_UsingInversion(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated); }
+    pointFromAbsoluteToInRelationWithObject_UsingInversion(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
 
     //We have to try to normalize the output point , although it should already be normalized..
     normalize3DPointVector(relativeOutPoint3DUnrotated);

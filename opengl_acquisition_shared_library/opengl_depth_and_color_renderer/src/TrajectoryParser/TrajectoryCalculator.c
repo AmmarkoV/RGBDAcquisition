@@ -258,7 +258,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
 
 
     double satPosRelative[4]={0};
-    pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(1,satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
+    pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
 
     unsigned int pos=0;
     for (pos=frameNumber+1; pos<frameNumber+duration; pos++)

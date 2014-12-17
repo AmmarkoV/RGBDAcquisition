@@ -48,7 +48,7 @@ int generatePlot(unsigned int viewX,unsigned int viewY)
   if (i!=0) { fprintf(stderr,"Error generating graph ( is gnuplot installed ? )"); }
 
   //-----------------------
-  snprintf(command,1024,"gpicview  \"plot_%u_%u.png\"& ",viewX,viewY);
+  snprintf(command,1024,"timeout 5 gpicview  \"plot_%u_%u.png\"& ",viewX,viewY);
   i=system(command);
   if (i!=0) { fprintf(stderr,"Error generating graph ( is gpicview installed ? )"); }
 
@@ -89,7 +89,7 @@ int main()
 
     fprintf(stderr,"Sattelite Pos Absolute %0.2f %0.2f %0.2f \n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
 
-    pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(1,satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
+    pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
 
     fprintf(stderr,"   Planet Pos : %0.2f %0.2f %0.2f \n",planetPosAbsolute[0],planetPosAbsolute[1],planetPosAbsolute[2]);
     fprintf(stderr,"   Planet Rot : %0.2f %0.2f %0.2f \n",planetRotAbsolute[0],planetRotAbsolute[1],planetRotAbsolute[2]);
