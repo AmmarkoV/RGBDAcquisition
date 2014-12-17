@@ -102,47 +102,109 @@ int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,  d
 int move3DPoint(double * resultPoint3D, double * transformation4x4, double * point3D  );
 
 
-
-
-
+/**
+* @brief Convert 3D Point From in Relation to a 3D Object , to an Absolute Coordinate System using a 3x3 Matrix
+* @ingroup AmMatrix
+* @param  Output Array 4x1 of resulting absolute position ( X,Y,Z,W )
+* @param  Input Array 4x1 of object Position ( X,Y,Z,W )
+* @param  Input Array 3x3 of a Rotation Matrix
+* @param  Input Array 4x1 of relative 3D position of the point we want to convert ( X,Y,Z,W )
+* @retval 0=Failure,1=Success */
 int pointFromRelationWithObjectToAbsolute(double * absoluteOutPoint3DRotated, double * objectPosition , double * objectRotation3x3 ,  double * relativeInPoint3DUnrotated);
+
+/**
+* @brief Convert 3D Point From an Absolute Coordinate System , to in Relation with a 3D Object using a 3x3 Matrix
+* @ingroup AmMatrix
+* @param  Output Array 4x1 of resulting relative position ( X,Y,Z,W )
+* @param  Input Array 4x1 of object Position ( X,Y,Z,W )
+* @param  Input Array 3x3 of a Rotation Matrix
+* @param  Input Array 4x1 of absolute 3D position of the point we want to convert ( X,Y,Z,W )
+* @retval 0=Failure,1=Success */
 int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation3x3 , double * absoluteInPoint3DRotated );
 
+
+
+/**
+* @brief Convert 3D Point From an Absolute Coordinate System , to in Relation with a 3D Object using an Euler Rotation
+* @ingroup AmMatrix
+* @param  Output Array 4x1 of resulting relative position ( X,Y,Z,W )
+* @param  Input Array 4x1 of object Position ( X,Y,Z,W )
+* @param  Input Array of Euler Angles
+* @param  Input Array 4x1 of absolute 3D position of the point we want to convert ( X,Y,Z,W )
+* @retval 0=Failure,1=Success */
 int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated );
+
+/**
+* @brief Convert 3D Point From an Absolute Coordinate System , to in Relation with a 3D Object using a Quaternion Rotation
+* @ingroup AmMatrix
+* @param  Output Array 4x1 of resulting relative position ( X,Y,Z,W )
+* @param  Input Array 4x1 of object Position ( X,Y,Z,W )
+* @param  Input Array Quaternion qX qY qZ qW order
+* @param  Input Array 4x1 of absolute 3D position of the point we want to convert ( X,Y,Z,W )
+* @retval 0=Failure,1=Success */
 int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectQuaternion , double * absoluteInPoint3DRotated );
 
+
+/**
+* @brief Convert 3D Point From in Relation to a 3D Object , to an Absolute Coordinate System using an Euler Rotation
+* @ingroup AmMatrix
+* @param  Output Array 4x1 of resulting absolute position ( X,Y,Z,W )
+* @param  Input Array 4x1 of object Position ( X,Y,Z,W )
+* @param  Input Array of Euler Angles
+* @param  Input Array 4x1 of relative 3D position of the point we want to convert ( X,Y,Z,W )
+* @retval 0=Failure,1=Success */
 int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectRotation ,double * relativeInPoint3DUnrotated);
+
+
+
+/**
+* @brief Convert 3D Point From in Relation to a 3D Object , to an Absolute Coordinate System using a Quaternion Rotation
+* @ingroup AmMatrix
+* @param  Output Array 4x1 of resulting absolute position ( X,Y,Z,W )
+* @param  Input Array 4x1 of object Position ( X,Y,Z,W )
+* @param  Input Array Quaternion qX qY qZ qW order
+* @param  Input Array 4x1 of relative 3D position of the point we want to convert ( X,Y,Z,W )
+* @retval 0=Failure,1=Success */
 int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectQuaternion ,double * relativeInPoint3DUnrotated);
 
 
 
 
-
-/*
-  TAKEN FROM http://www.lighthouse3d.com/opengl/maths/index.php?raytriint
-  http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
+/**
+* @brief Return the Inner Product of 2 3D points
+* @ingroup AmMatrix
+* @param  Input Array A (XYZ)
+* @param  Input Array B (XYZ)
+* @retval Result number of the inner product
 */
-
-
 #define innerProduct(v,q) \
        ((v)[0] * (q)[0] + \
 		(v)[1] * (q)[1] + \
 		(v)[2] * (q)[2])
 
-
+/**
+* @brief Return the Cross Product of 2 3D points
+* @ingroup AmMatrix
+* @param  Output Array  (XYZ)
+* @param  Input Point Array A (XYZ)
+* @param  Input Point Array B (XYZ)
+*/
 #define crossProduct(a,b,c) \
         (a)[0] = (b)[1] * (c)[2] - (c)[1] * (b)[2]; \
         (a)[1] = (b)[2] * (c)[0] - (c)[2] * (b)[0]; \
         (a)[2] = (b)[0] * (c)[1] - (c)[0] * (b)[1];
 
-
-
-/* a = b - c */
+/**
+* @brief Convert 2 Points to a Vector ( a = b - c )
+* @ingroup AmMatrix
+* @param  Output Array  (XYZ)
+* @param  Input Point Array A (XYZ)
+* @param  Input Point Array B (XYZ)
+*/
 #define vector(a,b,c) \
         (a)[0] = (b)[0] - (c)[0];	\
         (a)[1] = (b)[1] - (c)[1];	\
         (a)[2] = (b)[2] - (c)[2];
-
 
 /**
 * @brief Check if a Ray Intersects a Triangle
@@ -153,6 +215,7 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
 * @param  3D Position of Triangle point V1
 * @param  3D Position of Triangle point V2
 * @retval 0=NoIntersection,1=Intersects
+  TAKEN FROM   http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 */
 int rayIntersectsTriangle(float *p, float *d,float *v0, float *v1, float *v2);
 
@@ -225,6 +288,23 @@ float squaredDistanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,floa
 */
 float calculateDistance(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z);
 void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ_y,float targ_z,float *vect_x,float *vect_y,float *vect_z);
+
+
+
+/**
+* @brief Calculate the normal between three 3d points
+* @ingroup OGLTools
+* @param Input Point 1/Output X
+* @param Input Point 1/Output Y
+* @param Input Point 1/Output Z
+* @param Point 2 - X
+* @param Point 2 - Y
+* @param Point 2 - Z
+* @param Point 3 - X
+* @param Point 3 - Y
+* @param Point 3 - Z
+* @retval A float describing the distance
+*/
 void findNormal(float *v1x, float *v1y, float *v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z );
 
 
