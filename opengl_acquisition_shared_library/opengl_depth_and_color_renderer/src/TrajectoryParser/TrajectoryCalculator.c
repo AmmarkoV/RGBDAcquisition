@@ -253,6 +253,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
     planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
     planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
+    if (stream->object[planetObj].frame[frameNumber].rot4!=0.0) { fprintf(stderr,"ERROR , while affixing obj , it is using quaternions"); }
     //==================================================================================
 
 

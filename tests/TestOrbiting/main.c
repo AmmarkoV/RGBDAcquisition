@@ -98,6 +98,8 @@ int main()
 
 
   FILE * pFile  = fopen ("output.dat","w");
+  fprintf(pFile,"0.0 0.0 0.0\n");
+
   if (pFile!=NULL)
   {
     fprintf(pFile,"%0.2f %0.2f %0.2f\n",satPosAbsolute[0],satPosAbsolute[1],satPosAbsolute[2]);
@@ -139,9 +141,8 @@ int main()
 
 
     generatePlot(0,40);
-    generatePlot(15,40);
-    generatePlot(55,40);
-    generatePlot(85,40);
+    generatePlot(45,40);
+    generatePlot(90,40);
 
 
 
