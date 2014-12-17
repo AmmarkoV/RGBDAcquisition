@@ -22,7 +22,6 @@ int convertTranslationTo4x4(double * translation, double * result);
 
 int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation);
 
-void print4x4DMatrix(char * str , double * matrix4x4);
 
 
 
@@ -63,28 +62,9 @@ int pointFromRelationToObjectXYZQuaternionXYZWToAbsolute(unsigned int method,  d
 
 
 
-int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation);
-
-int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit);
-
-
-int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x4, double * rodriguez , double * translation , double scaleToDepthUnit );
-
-
 int move3DPoint(double * resultPoint3D, double * transformation4x4, double * point3D  );
 
 
-void buildOpenGLProjectionForIntrinsics   (
-                                             double * frustum,
-                                             int * viewport ,
-                                             double fx,
-                                             double fy,
-                                             double skew,
-                                             double cx, double cy,
-                                             unsigned int imageWidth, unsigned int imageHeight,
-                                             double nearPlane,
-                                             double farPlane
-                                           );
 
 
 
@@ -105,7 +85,7 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
 
 /*
   TAKEN FROM http://www.lighthouse3d.com/opengl/maths/index.php?raytriint
-
+  http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 */
 
 
@@ -129,11 +109,44 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
         (a)[2] = (b)[2] - (c)[2];
 
 
+/**
+* @brief Check if a Ray Intersects a Triangle
+* @ingroup AmMatrix
+* @param  Beginning Point for Ray
+* @param  Direction of Ray ?
+* @param  3D Position of Triangle point V0
+* @param  3D Position of Triangle point V1
+* @param  3D Position of Triangle point V2
+* @retval 0=NoIntersection,1=Intersects
+*/
 int rayIntersectsTriangle(float *p, float *d,float *v0, float *v1, float *v2);
 
+/**
+* @brief Check if a Ray Intersects a Rectangle
+* @ingroup AmMatrix
+* @param  Beginning Point for Ray
+* @param  Direction of Ray ?
+* @param  3D Position of Triangle point V0
+* @param  3D Position of Triangle point V1
+* @param  3D Position of Triangle point V2
+* @param  3D Position of Triangle point V3
+* @retval 0=NoIntersection,1=Intersects
+*/
 int rayIntersectsRectangle(float *p, float *d,float *v0, float *v1, float *v2, float *v3);
-//http://ilab.usc.edu/wiki/index.php/Fast_Square_Root
+
+
+
+/**
+* @brief Check if a Ray Intersects a Rectangle
+* @ingroup AmMatrix
+* @param  Number which we are searching for its square root
+* @retval Square Root Using a fast approximation
+* @bug Using an approximation of the sqrt is fast , but it should only be used for approximations and not accurate results
+Found at : http://ilab.usc.edu/wiki/index.php/Fast_Square_Root
+*/
 inline float sqrt_fast_approximation(const float x);
+
+
 double distanceBetween3DPoints(double * p1, double * p2);
 float distanceBetween3DPointsFast(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2);
 float squaredDistanceBetween3DPoints(float *x1,float*y1,float *z1,float *x2,float*y2,float *z2);
