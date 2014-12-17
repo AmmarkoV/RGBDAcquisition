@@ -71,9 +71,9 @@ int main()
     double satPosRelative[4]={0};
 
 
-    planetPosAbsolute[0]=0.0;
-    planetPosAbsolute[1]=0.0;
-    planetPosAbsolute[2]=0.0;
+    planetPosAbsolute[0]=400.0;
+    planetPosAbsolute[1]=400.0;
+    planetPosAbsolute[2]=400.0;
     planetPosAbsolute[3]=1.0;
 
 
@@ -98,7 +98,8 @@ int main()
 
 
   FILE * pFile  = fopen ("output.dat","w");
-  fprintf(pFile,"0.0 0.0 0.0\n");
+  fprintf(pFile,"%0.2f %0.2f %0.2f\n",planetPosAbsolute[0],planetPosAbsolute[1],planetPosAbsolute[2]);
+
 
   if (pFile!=NULL)
   {

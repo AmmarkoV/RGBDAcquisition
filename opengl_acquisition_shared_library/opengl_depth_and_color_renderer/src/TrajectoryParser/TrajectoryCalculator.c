@@ -125,7 +125,7 @@ void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternio
 
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
-  fprintf(stderr,"affixSatteliteToPlanetFromFrameForLength(sat=%u,planet=%u)\n",satteliteObj,planetObj);
+  fprintf(stderr,"affixSatteliteToPlanetFromFrameForLength(sat=%u,planet=%u) from frame %u to frame %u \n",satteliteObj,planetObj,frameNumber,frameNumber+duration);
   if ( satteliteObj >= stream->numberOfObjects ) { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,satteliteObj); return 0; }
   if ( planetObj >= stream->numberOfObjects )    { fprintf(stderr,RED "affixSatteliteToPlanetFromFrameForLength referencing non existent Object %u\n" NORMAL,planetObj);    return 0; }
 
