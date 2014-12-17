@@ -31,10 +31,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="quaternions.c">
+		<Unit filename="../AmMatrix/quaternions.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="quaternions.h" />
+		<Unit filename="../AmMatrix/quaternions.h" />
 		<Unit filename="quaternionsToEuler.c">
 			<Option compilerVar="CC" />
 		</Unit>

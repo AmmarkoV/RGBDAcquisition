@@ -1,4 +1,5 @@
 #include "matrix3x3Tools.h"
+#include "matrixTools.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -95,6 +96,58 @@ void create3x3IdentityMatrix(double * m)
     m[3] = 0.0;  m[4] = 1.0;  m[5] = 0.0;
     m[6] = 0.0;  m[7] = 0.0;  m[8] = 1.0;
 }
+
+
+
+
+void  create3x3EulerVectorRotationMatrix(double * matrix3x3,double * axisXYZ,double angle)
+{
+ double x = axisXYZ[0];
+ double y = axisXYZ[1];
+ double z = axisXYZ[2];
+
+ double radFactor = 2.0 * PI / 360.0;
+ double cosA = cos(radFactor * angle);
+ double sinA = sin(radFactor * angle);
+
+  matrix3x3[0]=cosA+x*x*(1-cosA);     /*|*/    matrix3x3[1]=x*y*(1-cosA)-z*sinA;    /*|*/    matrix3x3[2]=x*z*(1-cosA)+y*sinA;
+  matrix3x3[3]=y*x*(1-cosA)+z*sinA;   /*|*/    matrix3x3[4]=cosA+y*y*(1-cosA);      /*|*/    matrix3x3[5]=y*z*(1-cosA)-x*sinA;
+  matrix3x3[6]=z*x*(1-cosA)-y*sinA;   /*|*/    matrix3x3[7]=z*y*(1-cosA)+x*sinA;    /*|*/    matrix3x3[8]=cosA+z*z*(1-cosA);
+}
+
+
+
+void  create3x3EulerRotationXYZOrthonormalMatrix(double * matrix3x3,double * rotationsXYZ)
+{
+ /*
+  OpenGL rotates using roll/heading/pitch , our XYZ rotation
+  glTranslatef(x,y,z);
+  if ( roll!=0 ) { glRotatef(roll,0.0,0.0,1.0); }
+  if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
+  if ( pitch!=0 ) { glRotatef(pitch,1.0,0.0,0.0); }
+ */
+
+ double firstRot[9]={0};
+ double secondRot[9]={0};
+ double thirdRot[9]={0};
+ double tmp[9]={0};
+ double axisXYZ[3]={0};
+
+ axisXYZ[0]=0.0; axisXYZ[1]=0.0; axisXYZ[2]=1.0;
+ create3x3EulerVectorRotationMatrix(firstRot,axisXYZ,rotationsXYZ[2]);
+
+ axisXYZ[0]=0.0; axisXYZ[1]=1.0; axisXYZ[2]=0.0;
+ create3x3EulerVectorRotationMatrix(secondRot,axisXYZ,rotationsXYZ[0]);
+
+ axisXYZ[0]=1.0; axisXYZ[1]=0.0; axisXYZ[2]=0.0;
+ create3x3EulerVectorRotationMatrix(thirdRot,axisXYZ,rotationsXYZ[1]);
+
+ multiplyTwo3x3Matrices(tmp,firstRot,secondRot);
+ multiplyTwo3x3Matrices(matrix3x3,tmp,thirdRot);
+
+}
+
+
 
 
 int upscale3x3to4x4(double * mat4x4,double * mat3x3)

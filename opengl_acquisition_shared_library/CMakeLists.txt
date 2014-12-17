@@ -20,6 +20,8 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/shader_loader.h
             opengl_depth_and_color_renderer/src/tools.c
             opengl_depth_and_color_renderer/src/tools.h
+            ../tools/AmMatrix/quaternions.c
+            ../tools/AmMatrix/quaternions.h
             ../tools/AmMatrix/matrix3x3Tools.c
             ../tools/AmMatrix/matrix3x3Tools.h
             ../tools/AmMatrix/matrix4x4Tools.c

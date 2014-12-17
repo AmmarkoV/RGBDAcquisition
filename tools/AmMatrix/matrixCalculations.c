@@ -247,115 +247,6 @@ void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternion
 }
 
 
-void  rotationXYZ_2_Matrix3x3Old(double * matrix3x3,double * rotationsXYZ)
-{
- //result = cos ( param * PI / 180.0 );
- double heading = degreesToRadians(rotationsXYZ[0]);
- double attitude= degreesToRadians(rotationsXYZ[1]);
- double bank    = degreesToRadians(rotationsXYZ[2]);
-
- double ch=cos(heading);
- double ca=cos(attitude);
- double cb=cos(bank);
- double sh=sin(heading);
- double sa=sin(attitude);
- double sb=sin(bank);
-
-  matrix3x3[0]=ch*ca;      /*|*/    matrix3x3[1]=((-1)*ch*sa*cb) + (sh*sb);       /*|*/    matrix3x3[2]=(ch*sa*sb) + (sh*cb);
-  matrix3x3[3]=sa;         /*|*/    matrix3x3[4]=ca*cb;                           /*|*/    matrix3x3[5]=(-1)*ca*sb;
-  matrix3x3[6]=(-1)*sh*ca; /*|*/    matrix3x3[7]=(sh*sa*cb) + (ch*sb);            /*|*/    matrix3x3[8]=((-1)*sh*sa*sb) + (ch*cb);
-}
-
-
-void  rotationXYZ_2_Matrix3x3Old2(double * matrix3x3,double * rotationsXYZ)
-{
- //result = cos ( param * PI / 180.0 );
- double a = degreesToRadians(rotationsXYZ[0]);
- double b = degreesToRadians(rotationsXYZ[1]);
- double c = degreesToRadians(rotationsXYZ[2]);
-
- double ca=cos(a);
- double cb=cos(b);
- double cc=cos(c);
- double sa=sin(a);
- double sb=sin(b);
- double sc=sin(c);
-
-  matrix3x3[0]=cb*cc;   /*|*/    matrix3x3[1]=(sa*sb*cc) - (ca*sc); /*|*/    matrix3x3[2]=(ca*sb*cc) + (sa*sc);
-  matrix3x3[3]=cb*sc;   /*|*/    matrix3x3[4]=(sa*sb*sc) + (ca*cc); /*|*/    matrix3x3[5]=(ca*sb*sc) - (sa*cc);
-  matrix3x3[6]=(-1)*sb; /*|*/    matrix3x3[7]=(sa*cb);              /*|*/    matrix3x3[8]=(ca*cb);
-}
-
-
-void  rotationXYZ_2_Matrix3x3MBV(double * matrix3x3,double * rotationsXYZ)
-{
- //result = cos ( param * PI / 180.0 );
- double a = degreesToRadians(rotationsXYZ[0]);
- double b = degreesToRadians(rotationsXYZ[1]);
- double c = degreesToRadians(rotationsXYZ[2]);
-
- double ca=cos(a);
- double cb=cos(b);
- double cc=cos(c);
- double sa=sin(a);
- double sb=sin(b);
- double sc=sin(c);
-
-  matrix3x3[0]=ca*cb;   /*|*/    matrix3x3[1]=(ca*sb*sc) - (sa*cc); /*|*/    matrix3x3[2]=(ca*sb*cc) + (sa*sc);
-  matrix3x3[3]=sa*cb;   /*|*/    matrix3x3[4]=(sa*sb*sc) + (ca*cc); /*|*/    matrix3x3[5]=(sa*sb*cc) - (ca*sc);
-  matrix3x3[6]=(-1)*sb; /*|*/    matrix3x3[7]=(cb*sc);              /*|*/    matrix3x3[8]=(cb*cc);
-}
-
-
-
-void  rotationXYZAxis_2_Matrix3x3(double * matrix3x3,double * axisXYZ,double angle)
-{
- double x = axisXYZ[0];
- double y = axisXYZ[1];
- double z = axisXYZ[2];
-
- double radFactor = 2.0 * PI / 360.0;
- double cosA = cos(radFactor * angle);
- double sinA = sin(radFactor * angle);
-
-  matrix3x3[0]=cosA+x*x*(1-cosA);     /*|*/    matrix3x3[1]=x*y*(1-cosA)-z*sinA;    /*|*/    matrix3x3[2]=x*z*(1-cosA)+y*sinA;
-  matrix3x3[3]=y*x*(1-cosA)+z*sinA;   /*|*/    matrix3x3[4]=cosA+y*y*(1-cosA);      /*|*/    matrix3x3[5]=y*z*(1-cosA)-x*sinA;
-  matrix3x3[6]=z*x*(1-cosA)-y*sinA;   /*|*/    matrix3x3[7]=z*y*(1-cosA)+x*sinA;    /*|*/    matrix3x3[8]=cosA+z*z*(1-cosA);
-}
-
-
-void  rotationXYZ_2_Matrix3x3(double * matrix3x3,double * rotationsXYZ)
-{
- /*
-  OpenGL rotates using roll/heading/pitch , our XYZ rotation
-  glTranslatef(x,y,z);
-  if ( roll!=0 ) { glRotatef(roll,0.0,0.0,1.0); }
-  if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
-  if ( pitch!=0 ) { glRotatef(pitch,1.0,0.0,0.0); }
- */
-
- double firstRot[9]={0};
- double secondRot[9]={0};
- double thirdRot[9]={0};
- double tmp[9]={0};
- double axisXYZ[3]={0};
-
- axisXYZ[0]=0.0; axisXYZ[1]=0.0; axisXYZ[2]=1.0;
- rotationXYZAxis_2_Matrix3x3(firstRot,axisXYZ,rotationsXYZ[2]);
-
- axisXYZ[0]=0.0; axisXYZ[1]=1.0; axisXYZ[2]=0.0;
- rotationXYZAxis_2_Matrix3x3(secondRot,axisXYZ,rotationsXYZ[0]);
-
- axisXYZ[0]=1.0; axisXYZ[1]=0.0; axisXYZ[2]=0.0;
- rotationXYZAxis_2_Matrix3x3(thirdRot,axisXYZ,rotationsXYZ[1]);
-
- multiplyTwo3x3Matrices(tmp,firstRot,secondRot);
- multiplyTwo3x3Matrices(matrix3x3,tmp,thirdRot);
-
-}
-
-
-
 int projectPointsFrom3Dto2D(double * x2D, double * y2D , double * x3D, double *y3D , double * z3D , double * intrinsics , double * rotation3x3 , double * translation)
 {
   double fx = intrinsics[0];
@@ -670,7 +561,7 @@ int pointFromAbsoluteToInRelationWithObject(double * relativeOutPoint3DUnrotated
 int pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(double * relativeOutPoint3DUnrotated, double * objectPosition , double * objectRotation , double * absoluteInPoint3DRotated )
 {
     double objectRotation3x3[9];
-    rotationXYZ_2_Matrix3x3(objectRotation3x3,objectRotation);
+    create3x3EulerRotationXYZOrthonormalMatrix(objectRotation3x3,objectRotation);
 
      pointFromAbsoluteToInRelationWithObject(relativeOutPoint3DUnrotated,objectPosition,objectRotation3x3,absoluteInPoint3DRotated);
 
@@ -717,7 +608,7 @@ int pointFromAbsoluteToRelationWithObject_PosXYZQuaternionXYZW(double * relative
 int pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(double * absoluteOutPoint3DRotated , double * objectPosition , double * objectRotation ,double * relativeInPoint3DUnrotated)
 {
     double objectRotation3x3[9]={0};
-    rotationXYZ_2_Matrix3x3(objectRotation3x3,objectRotation);
+    create3x3EulerRotationXYZOrthonormalMatrix(objectRotation3x3,objectRotation);
     pointFromRelationWithObjectToAbsolute(absoluteOutPoint3DRotated,objectPosition,objectRotation3x3,relativeInPoint3DUnrotated);
 
     //We have to try to normalize the output point , although it should already be normalized..

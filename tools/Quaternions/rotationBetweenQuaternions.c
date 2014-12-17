@@ -3,7 +3,7 @@
 #include <math.h>
 #include <locale.h>
 
-#include "quaternions.h"
+#include "../AmMatrix/quaternions.h"
 
 int forceUSLocaleToKeepOurSanity()
 {
