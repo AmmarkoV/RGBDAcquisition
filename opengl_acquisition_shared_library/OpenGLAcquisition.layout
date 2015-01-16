@@ -1,104 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="../tools/AmMatrix/quaternions.c" open="0" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5113" topLine="175" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/OGLRendererSandbox.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="119" topLine="3" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3068" topLine="141" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/glx.c" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/tools.c" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1902" topLine="54" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/model_loader.h" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2216" topLine="79" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.h" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3553" topLine="56" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/scene.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="826" topLine="13" />
-		</Cursor>
-	</File>
 	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="6264" topLine="129" />
 		</Cursor>
 	</File>
-	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.c" open="1" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../tools/AmMatrix/matrix3x3Tools.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="10187" topLine="188" />
+			<Cursor1 position="4033" topLine="108" />
 		</Cursor>
 	</File>
-	<File name="../tools/AmMatrix/matrixCalculations.h" open="0" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../tools/AmMatrix/matrixCalculations.c" open="0" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2627" topLine="35" />
+			<Cursor1 position="5593" topLine="190" />
 		</Cursor>
 	</File>
 	<File name="opengl_depth_and_color_renderer/src/save_to_file.c" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="0" topLine="13" />
-		</Cursor>
-	</File>
-	<File name="OpenGLAcquisition.c" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/shader_loader.c" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="OpenGLAcquisition.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1660" topLine="23" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/model_loader_obj.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="10265" topLine="64" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.c" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="20608" topLine="501" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/TextureLoader/bmp.h" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="694" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="../tools/AmMatrix/matrixCalculations.c" open="0" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4423" topLine="172" />
-		</Cursor>
-	</File>
-	<File name="opengl_depth_and_color_renderer/src/model_loader.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="10268" topLine="274" />
 		</Cursor>
 	</File>
 	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.h" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -111,9 +31,59 @@
 			<Cursor1 position="1304" topLine="19" />
 		</Cursor>
 	</File>
+	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3068" topLine="141" />
+		</Cursor>
+	</File>
+	<File name="../tools/AmMatrix/matrixCalculations.h" open="0" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2627" topLine="35" />
+		</Cursor>
+	</File>
 	<File name="opengl_depth_and_color_renderer/src/main.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="770" topLine="68" />
+		</Cursor>
+	</File>
+	<File name="OpenGLAcquisition.h" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1660" topLine="23" />
+		</Cursor>
+	</File>
+	<File name="../tools/AmMatrix/matrix4x4Tools.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10644" topLine="418" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/OGLRendererSandbox.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="119" topLine="3" />
+		</Cursor>
+	</File>
+	<File name="../tools/AmMatrix/quaternions.c" open="0" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5113" topLine="175" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.c" open="1" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10187" topLine="188" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/shader_loader.c" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/model_loader.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10268" topLine="274" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/glx.c" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="../tools/AmMatrix/matrix3x3Tools.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -121,9 +91,9 @@
 			<Cursor1 position="2116" topLine="45" />
 		</Cursor>
 	</File>
-	<File name="../tools/AmMatrix/matrix3x3Tools.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.h" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4033" topLine="108" />
+			<Cursor1 position="3553" topLine="56" />
 		</Cursor>
 	</File>
 	<File name="opengl_depth_and_color_renderer/src/scene.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -131,9 +101,39 @@
 			<Cursor1 position="21031" topLine="615" />
 		</Cursor>
 	</File>
-	<File name="../tools/AmMatrix/matrix4x4Tools.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="opengl_depth_and_color_renderer/src/scene.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="15300" topLine="317" />
+			<Cursor1 position="826" topLine="13" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/tools.c" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1902" topLine="54" />
+		</Cursor>
+	</File>
+	<File name="OpenGLAcquisition.c" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/TextureLoader/bmp.h" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="694" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.c" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="20608" topLine="501" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/model_loader.h" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2216" topLine="79" />
+		</Cursor>
+	</File>
+	<File name="opengl_depth_and_color_renderer/src/model_loader_obj.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10265" topLine="64" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

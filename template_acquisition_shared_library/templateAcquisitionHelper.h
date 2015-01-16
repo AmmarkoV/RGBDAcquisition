@@ -33,7 +33,7 @@ int flipDepth(unsigned short * depth,unsigned int width , unsigned int height );
 unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int cycle , char * readFromDir , char * extension);
 void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,  unsigned int * widthInternal, unsigned int * heightInternal, unsigned long *  timestampInternal);
 
-unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * extension);
+unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * colorExtension , char * depthExtension);
 unsigned int findLastFrame(int devID, char * readFromDir , char * extension);
 
 void getFilenameForNextResource(char * filename , unsigned int maxSize , unsigned int resType , unsigned int devID , unsigned int cycle, char * readFromDir , char * extension );
