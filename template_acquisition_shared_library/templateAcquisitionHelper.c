@@ -268,7 +268,7 @@ unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * color
 
   free(file_name_test);
 
-  return ( (colorSet)&& (depthSet) );
+  return ( (colorSet)&&(depthSet) );
 }
 
 

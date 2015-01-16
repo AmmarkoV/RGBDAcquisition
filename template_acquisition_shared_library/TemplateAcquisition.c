@@ -257,6 +257,17 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
   if (device[devID].templateColorFrame==0) { fprintf(stderr,RED " Could not open , color frame Template acquisition will not process this data\n"); }
   if (device[devID].templateDepthFrame==0) { fprintf(stderr,RED " Could not open , depth frame Template acquisition will not process this data\n"); }
+
+  if (failedStream)
+  {
+   #ifdef USE_CODEC_LIBRARY
+    fprintf(stderr,YELLOW "We were using Codec Library\n" NORMAL);
+   #else
+    fprintf(stderr,YELLOW "Please note that this build of TemplateAcquisition does not use the codec library and thus cannot read images other than in pnm format\n" NORMAL);
+    fprintf(stderr,YELLOW "Formats used by this dataset where %s for color and %s for depth\n" NORMAL,device[devID].colorExtension,device[devID].depthExtension);
+   #endif // USE_CODEC_LIBRARY
+  }
+
   return ((device[devID].templateColorFrame!=0)&& (device[devID].templateDepthFrame!=0)&& (failedStream==0));
 }
 
