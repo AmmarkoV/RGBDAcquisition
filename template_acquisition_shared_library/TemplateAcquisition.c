@@ -197,12 +197,8 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   fprintf(stderr,"Extension of dataset %s for Depth Frames is %s \n",device[devID].readFromDir,device[devID].depthExtension);
 
 
-  unsigned int lastColorFrame=findLastFrame(devID,device[devID].readFromDir,device[devID].colorExtension);
-  unsigned int lastDepthFrame=findLastFrame(devID,device[devID].readFromDir,device[devID].depthExtension);
-
-  if (lastColorFrame>lastDepthFrame) {  device[devID].totalFrames=lastDepthFrame; } else
-                                     {  device[devID].totalFrames=lastColorFrame; }
-  fprintf(stderr,"Dataset %s consists of %u pairs ( %u color and %u depth )\n",device[devID].readFromDir,device[devID].totalFrames,lastColorFrame,lastDepthFrame);
+  device[devID].totalFrames=findLastFrame(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension);
+  fprintf(stderr,"Dataset %s consists of %u frame pairs \n",device[devID].readFromDir,device[devID].totalFrames);
 
   unsigned int failedStream=0;
   unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;

@@ -273,7 +273,7 @@ unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * color
 
 
 
-unsigned int findLastFrame(int devID, char * readFromDir , char * extension)
+unsigned int findLastFrame(int devID, char * readFromDir , char * colorExtension, char * depthExtension)
 {
   unsigned int totalFrames=0;
   unsigned int i=0;
@@ -281,12 +281,13 @@ unsigned int findLastFrame(int devID, char * readFromDir , char * extension)
   char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
   if (file_name_test==0) { fprintf(stderr,"Could not findLastFrame , no space for string\n"); return 0; }
 
+  //TODO : This can be done in a much smarter way , this is the most stupid way possible to do this kind of check :P
   while (i<100000)
   {
    totalFrames = i;
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , i, readFromDir , extension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , i, readFromDir , colorExtension );
    if ( ! FileExists(file_name_test) ) { break; }
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , i, readFromDir , extension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , i, readFromDir , depthExtension );
    if ( ! FileExists(file_name_test) ) { break; }
    ++i;
   }
