@@ -40,7 +40,8 @@
 struct TemplateVirtualDevice
 {
  char readFromDir[MAX_DIR_PATH]; // <- this sucks i know :P
- char extension[MAX_EXTENSION_PATH];
+ char colorExtension[MAX_EXTENSION_PATH];
+ char depthExtension[MAX_EXTENSION_PATH];
  unsigned int cycle;
  unsigned int totalFrames;
  unsigned int safeGUARD;
@@ -130,7 +131,8 @@ int startTemplateModule(unsigned int max_devs,char * settings)
         device[devID].templateDepthHeight = 480;
 
         device[devID].readFromDir[0]=0; // <- this sucks i know :P
-        strncpy(device[devID].extension,"pnm",MAX_EXTENSION_PATH);
+        strncpy(device[devID].colorExtension,"pnm",MAX_EXTENSION_PATH);
+        strncpy(device[devID].depthExtension,"pnm",MAX_EXTENSION_PATH);
 
         device[devID].cycle=0;
 
@@ -180,7 +182,8 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
  device[devID].templateColorHeight=height;
  device[devID].templateDepthWidth=width;
  device[devID].templateDepthHeight=height;
- device[devID].extension[0]=0;
+ device[devID].colorExtension[0]=0;
+ device[devID].depthExtension[0]=0;
 
 
    if (devName==0) { strcpy(device[devID].readFromDir,""); } else
@@ -189,16 +192,21 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                                 { strncpy(device[devID].readFromDir,devName,MAX_DIR_PATH);  }
      }
 
-  findExtensionOfDataset(devID,device[devID].readFromDir,device[devID].extension);
-  fprintf(stderr,"Extension of dataset %s is %s \n",device[devID].readFromDir,device[devID].extension);
-  device[devID].totalFrames=findLastFrame(devID,device[devID].readFromDir,device[devID].extension);
+  findExtensionOfDataset(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension);
+  fprintf(stderr,"Extension of dataset %s for Color Frames is %s \n",device[devID].readFromDir,device[devID].colorExtension);
+  fprintf(stderr,"Extension of dataset %s for Depth Frames is %s \n",device[devID].readFromDir,device[devID].depthExtension);
+
+
+  device[devID].totalFrames=findLastFrame(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension);
+  fprintf(stderr,"Dataset %s consists of %u frame pairs \n",device[devID].readFromDir,device[devID].totalFrames);
 
   unsigned int failedStream=0;
   unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;
 
   char file_name_test[MAX_DIR_PATH]={0};
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 ,device[devID].readFromDir,device[devID].extension);
-  unsigned char * tmpColor = ReadImageFile(0,file_name_test,device[devID].extension,&widthInternal,&heightInternal, &timestampInternal);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 ,device[devID].readFromDir,device[devID].colorExtension);
+  unsigned char * tmpColor = ReadImageFile(0,file_name_test,device[devID].colorExtension,&widthInternal,&heightInternal, &timestampInternal);
+  if (tmpColor==0) { fprintf(stderr,YELLOW "Could not open initial color file %s \n",file_name_test);  }
   if ( (widthInternal!=width) || (heightInternal!=height) )
     {
       fprintf(stderr,YELLOW "Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n" NORMAL,file_name_test,widthInternal,heightInternal,width,height);
@@ -216,8 +224,9 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   }
 
 
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID ,0,device[devID].readFromDir,device[devID].extension);
-  unsigned short * tmpDepth = (unsigned short *) ReadImageFile(0,file_name_test,device[devID].extension,&widthInternal,&heightInternal, &timestampInternal);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID ,0,device[devID].readFromDir,device[devID].depthExtension);
+  unsigned short * tmpDepth = (unsigned short *) ReadImageFile(0,file_name_test,device[devID].depthExtension,&widthInternal,&heightInternal, &timestampInternal);
+  if (tmpDepth==0) { fprintf(stderr,YELLOW "Could not open initial depth file %s \n",file_name_test);  }
   if ( (widthInternal!=width) || (heightInternal!=height) )
    {
     fprintf(stderr,YELLOW "Please note that the %s file has %ux%u resolution and the createTemplateDevice asked for %ux%u \n" NORMAL,file_name_test,widthInternal,heightInternal,width,height);
@@ -235,15 +244,26 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   }
 
   NullCalibration(device[devID].templateColorWidth,device[devID].templateColorHeight,&device[devID].calibRGB);
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].colorExtension);
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibRGB) ) { fprintf(stderr,"Could not read color calibration\n"); }
 
   NullCalibration(device[devID].templateDepthWidth,device[devID].templateDepthHeight,&device[devID].calibDepth);
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].depthExtension);
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
 
   if (device[devID].templateColorFrame==0) { fprintf(stderr,RED " Could not open , color frame Template acquisition will not process this data\n"); }
   if (device[devID].templateDepthFrame==0) { fprintf(stderr,RED " Could not open , depth frame Template acquisition will not process this data\n"); }
+
+  if (failedStream)
+  {
+   #ifdef USE_CODEC_LIBRARY
+    fprintf(stderr,YELLOW "We were using Codec Library\n" NORMAL);
+   #else
+    fprintf(stderr,YELLOW "Please note that this build of TemplateAcquisition does not use the codec library and thus cannot read images other than in pnm format\n" NORMAL);
+    fprintf(stderr,YELLOW "Formats used by this dataset where %s for color and %s for depth\n" NORMAL,device[devID].colorExtension,device[devID].depthExtension);
+   #endif // USE_CODEC_LIBRARY
+  }
+
   return ((device[devID].templateColorFrame!=0)&& (device[devID].templateDepthFrame!=0)&& (failedStream==0));
 }
 
@@ -275,7 +295,7 @@ int snapTemplateFrames(int devID)
     //-----------------------------------------------------------------
     //Extra check , stupid case with mixed signals
     //-----------------------------------------------------------------
-    unsigned int devIDRead = retreiveDatasetDeviceIDToReadFrom( devID , device[devID].cycle , device[devID].readFromDir , device[devID].extension);
+    unsigned int devIDRead = retreiveDatasetDeviceIDToReadFrom( devID , device[devID].cycle , device[devID].readFromDir , device[devID].colorExtension);
     //-----------------------------------------------------------------
 
 
@@ -283,29 +303,31 @@ int snapTemplateFrames(int devID)
     char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
     if (file_name_test==0) { fprintf(stderr,"Could not snap frame , no space for string\n"); return 0; }
 
-    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_LIVE_CALIBRATION_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
+
+    //TODO : Check the next line , does it make sense ?
+    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_LIVE_CALIBRATION_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,0/*calib files are special*/);
     if ( RefreshCalibration(file_name_test,&device[devID].calibRGB) )
      {
        fprintf(stderr,"Refreshed calibration data %u \n",device[devID].cycle);
      }
 
-    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
+    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].colorExtension);
     if (FileExists(file_name_test))
      {
        #if REALLOCATE_ON_EVERY_SNAP
          if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); device[devID].templateColorFrame=0; }
        #endif
-       device[devID].templateColorFrame = ReadImageFile(device[devID].templateColorFrame,file_name_test,device[devID].extension,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
+       device[devID].templateColorFrame = ReadImageFile(device[devID].templateColorFrame,file_name_test,device[devID].colorExtension,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
        ++found_frames;
      }
 
-    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].extension);
+    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].depthExtension);
     if (FileExists(file_name_test))
      {
       #if REALLOCATE_ON_EVERY_SNAP
         if (device[devID].templateDepthFrame!=0) { free(device[devID].templateDepthFrame); device[devID].templateDepthFrame=0; }
       #endif
-      device[devID].templateDepthFrame = (unsigned short *) ReadImageFile(device[devID].templateDepthFrame,file_name_test,device[devID].extension,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
+      device[devID].templateDepthFrame = (unsigned short *) ReadImageFile(device[devID].templateDepthFrame,file_name_test,device[devID].depthExtension,&widthInternal,&heightInternal,&device[devID].lastColorTimestamp);
       ++found_frames;
      }
 

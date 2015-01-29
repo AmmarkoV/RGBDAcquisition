@@ -4,6 +4,7 @@ cmake_minimum_required( VERSION 2.8.7 )
 add_library(
             AmMatrix STATIC
             collisions.c
+            quaternions.c
             matrix3x3Tools.c
             matrix4x4Tools.c
             matrixCalculations.c

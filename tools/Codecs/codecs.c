@@ -97,6 +97,8 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 	     WritePPM(ppmfilename,img);
 	    #endif
       break;
+     #else
+       fprintf(stderr,RED "JPG File requested (%s) , but this build of Codec Library does not have JPG Support :(" NORMAL , filename);
      #endif
 
      #if USE_PNG_FILES
@@ -114,6 +116,8 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 	     WritePPM(ppmfilename,img);
 	    #endif
       break;
+     #else
+       fprintf(stderr,RED "PNG File requested (%s) , but this build of Codec Library does not have PNG Support :(" NORMAL , filename);
      #endif
 
      #if USE_PPM_FILES
@@ -126,6 +130,8 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
            img=0;
          }
        break;
+     #else
+       fprintf(stderr,RED "PNM/PPM File requested (%s) , but this build of Codec Library does not have PNM/PPM Support :(" NORMAL , filename);
      #endif
 
       default :

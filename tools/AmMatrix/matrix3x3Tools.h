@@ -62,6 +62,26 @@ void copy3x3Matrix(double * out,double * in);
 */
 void create3x3IdentityMatrix(double * m);
 
+
+
+/**
+* @brief Set an allocated 3x3 matrix to contain a rotation (  )
+* @ingroup AmMatrix
+* @param   Output 3x3 Matrix
+* @param   Input Axis Unit for the rotation
+* @param   Input angle of the Rotation Matrix in Degrees
+*/
+void  create3x3EulerVectorRotationMatrix(double * matrix3x3,double * axisXYZ,double angle);
+
+
+/**
+* @brief Set an allocated 3x3 matrix to contain a rotation (  )
+* @ingroup AmMatrix
+* @param   Output 3x3 Matrix
+* @param   Input Rotations array in degrees , should be  roll , heading , pitch
+*/
+void  create3x3EulerRotationXYZOrthonormalMatrix(double * matrix3x3,double * rotationsXYZ);
+
 /**
 * @brief Transpose an allocated 3x3 matrix to Identity ( diagonal 1 , all else 0 )
 * @ingroup AmMatrix
@@ -141,5 +161,14 @@ int multiplyTwo3x3Matrices(double * result , double * matrixA , double * matrixB
 */
 int transform2DPointVectorUsing3x3Matrix(double * resultPoint2D, double * transformation3x3, double * point2D);
 
+
+/**
+* @brief Normalize a 3x1 matrix with a Vector (2D Point)
+* @ingroup AmMatrix
+* @param  Input/Output Vector
+* @retval 0=failure,1=success
+*/
 int normalize2DPointVector(double * vec);
+
+
 #endif // MATRIX3X3TOOLS_H_INCLUDED

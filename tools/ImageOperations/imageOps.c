@@ -7,7 +7,7 @@
 #define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
 
 #define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
-#define MEMPLACE3(x,y,width) ( y * ( width * 3 ) + x*3 )
+#define MEMPLACE3(x,y,width) ( ( y * ( width * 3 ) ) + (x*3) )
 
 #define MIN2(A,B)       ((A)<(B)?(A):(B))
 #define MIN3(A,B,C)     (MIN2(MIN2((A),(B)),(C)))
@@ -412,16 +412,19 @@ int shiftImageRGB(unsigned char * target, unsigned char * source ,  unsigned cha
 
   if ( (tX>0) || (tY>0) )
   {
-    unsigned int copySize = (width+1)*(height+1)*3*sizeof(unsigned char);
-    maybeCopiedSource = (unsigned char * ) malloc(copySize);
+    unsigned int copySize = (sourceWidth)*(sourceHeight)*3*sizeof(unsigned char); //21/11/14 - Fixed Hoa , invisible bottom bug
+    maybeCopiedSource = (unsigned char * ) malloc(copySize+sourceHeight);
     if (maybeCopiedSource==0) { maybeCopiedSource = source; } else
                               { memcpy(maybeCopiedSource,source,copySize); }
   }
   //----------------------------------------------------------------
 
-  bitbltRGB( target ,targetX,targetY, targetWidth,targetHeight,
-             maybeCopiedSource ,sourceX,sourceY, sourceWidth,sourceHeight,
-             width,height);
+
+  bitbltRGB(
+             target             ,targetX,targetY, targetWidth,targetHeight,
+             maybeCopiedSource  ,sourceX,sourceY, sourceWidth,sourceHeight,
+             width,height
+           );
 
   //----------------------------------------------------------------
     if ( (tX>0) || (tY>0) )
@@ -429,7 +432,6 @@ int shiftImageRGB(unsigned char * target, unsigned char * source ,  unsigned cha
      if (maybeCopiedSource!=source) { free(maybeCopiedSource); maybeCopiedSource=0; }
    }
   //----------------------------------------------------------------
-
 
 
    if (tX==0) { } else
@@ -570,11 +572,9 @@ int mixbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
 
 
 
-
-
-int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
-              unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
-              unsigned int width , unsigned int height)
+int bitbltRGBBothDirections(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
+                            unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
+                            unsigned int width , unsigned int height)
 {
   if ( (target==0)||(source==0) ) { return 0; }
   if ( (width==0)&&(height==0) ) { return 0; }
@@ -627,6 +627,61 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
     targetPTR+=targetLineSkip;
   }
 
+ return 1;
+}
+
+
+
+
+
+//TODO : Remove this at some point
+int bitbltRGBDebugMode(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
+                   unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
+                   unsigned int width , unsigned int height)
+{
+  if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
+
+  if (sX+width>=sourceWidth) { width=sourceWidth-sX-1;  }
+
+  unsigned int x=0,y=0;
+
+  for (y=0; y<height; y++)
+  {
+    for (x=0; x<width; x++)
+    {
+      target[ ((tX+x*3) + (tY+y*targetWidth*3)) + 0  ]  =source[ ((sX+x*3) + (sY+y*sourceWidth*3)) + 0];
+      target[ ((tX+x*3) + (tY+y*targetWidth*3)) + 1  ]  =source[ ((sX+x*3) + (sY+y*sourceWidth*3)) + 1];
+      target[ ((tX+x*3) + (tY+y*targetWidth*3)) + 2  ]  =source[ ((sX+x*3) + (sY+y*sourceWidth*3)) + 2];
+    }
+  }
+ return 1;
+}
+//----------------------------------
+
+
+
+
+
+
+int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
+              unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
+              unsigned int width , unsigned int height)
+{
+    return bitbltRGBBothDirections(
+                                   target,tX,tY,targetWidth,targetHeight,
+                                   source,sX,sY,sourceWidth,sourceHeight ,
+                                   width,height
+                                   );
+
+   /*
+    //Todo remove this at some point
+    return bitbltRGBDebugMode(
+                                   target,tX,tY,targetWidth,targetHeight,
+                                   source,sX,sY,sourceWidth,sourceHeight ,
+                                   width,height
+                                   );
+
+   */
  return 1;
 }
 

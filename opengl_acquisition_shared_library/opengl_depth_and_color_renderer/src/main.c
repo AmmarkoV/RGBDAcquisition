@@ -38,14 +38,22 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
-
+unsigned int openGLGetComplaintsLeft=10;
 
 void checkFrameGettersForError(char * from)
 {
+
   int err=glGetError();
   if (err !=  GL_NO_ERROR /*0*/ )
     {
-      fprintf(stderr,YELLOW "Note: OpenGL stack is complaining about the way %s works\n" NORMAL , from);
+      if (openGLGetComplaintsLeft>0)
+      {
+        --openGLGetComplaintsLeft;
+        fprintf(stderr,YELLOW "Note: OpenGL stack is complaining about the way %s works , this will appear %u more times \n" NORMAL , from , openGLGetComplaintsLeft);
+      } else
+      {
+        openGLGetComplaintsLeft=0;
+      }
     }
 }
 

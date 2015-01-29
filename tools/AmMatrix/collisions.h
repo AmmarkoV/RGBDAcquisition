@@ -2,12 +2,18 @@
 #define COLLISIONS_H_INCLUDED
 
 
+/**
+ * @brief  Definition for a plane Surface
+ */
 struct planeSurface
 {
   float pos[3];
   float normal[3];
 };
 
+/**
+ * @brief  Definition for a cube
+ */
 struct cubeVolume
 {
   struct planeSurface planeX; float maxAbsoluteDistanceX;

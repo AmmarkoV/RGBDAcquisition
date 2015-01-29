@@ -380,6 +380,7 @@ int readOBJ(struct OBJ_Model * obj)
   strcat(fname,"/");
   strncat(fname,obj->filename,MAX_MODEL_PATHS);
 
+  fprintf(stderr,"Opening %s ..\n",fname);
   file=fopen(fname,"r");
   if(file==0) { fprintf(stderr,"Could not open file %s for reading Object\n",fname); return 0;  }
  // strcpy(name,filename);

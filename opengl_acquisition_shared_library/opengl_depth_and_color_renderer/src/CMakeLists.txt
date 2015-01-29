@@ -21,6 +21,8 @@ add_library(OGLRendererSandbox SHARED
             tiledRenderer.h
             tools.c
             tools.h 
+            ../../tools/AmMatrix/quaternions.c
+            ../../tools/AmMatrix/quaternions.h
             ../../tools/AmMatrix/matrix3x3Tools.c
             ../../tools/AmMatrix/matrix3x3Tools.h
             ../../tools/AmMatrix/matrix4x4Tools.c
@@ -39,6 +41,10 @@ add_library(OGLRendererSandbox SHARED
             TrajectoryParser/InputParser_C.h
             TrajectoryParser/TrajectoryParser.c
             TrajectoryParser/TrajectoryParser.h 
+            TrajectoryParser/TrajectoryParserDataStructures.c
+            TrajectoryParser/TrajectoryParserDataStructures.h 
+            TrajectoryParser/TrajectoryCalculator.c
+            TrajectoryParser/TrajectoryCalculator.h 
            ) 
 target_link_libraries(OGLRendererSandbox m GL GLU X11 ) 
  

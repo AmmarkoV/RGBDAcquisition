@@ -6,6 +6,8 @@ add_subdirectory (OperatingSystem/)
 add_subdirectory (Quasirandomness/) 
 add_subdirectory (Codecs/) 
 add_subdirectory (AmMatrix/) 
+add_subdirectory (Quaternions/)
+add_subdirectory (ImageOperations/)
 
 
 IF( ENABLE_OPENCV )

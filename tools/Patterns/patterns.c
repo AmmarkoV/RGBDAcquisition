@@ -119,7 +119,15 @@ int patternsMatch(struct pattern * remembered, struct pattern * observed)
          (oP==observed->currentStates) ||
          (rP==remembered->currentStates)
         )
-         { done=1; }
+        {
+          if (remembered->currentStates>observed->currentStates)
+          {
+            fprintf(stderr,"Mismatch size , our sequence is good up to a point but not complete\n");
+            return 0;
+          }
+
+          done=1;
+        }
   }
 
   return 1;

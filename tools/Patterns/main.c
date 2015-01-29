@@ -14,20 +14,20 @@ int main(int argc, char *argv[])
     //----------------------------------------------------------
 
     convertStringToPattern(&patA, argv[1]);
-    viewPattern(&patA , "Initial Pattern A");
+    viewPattern(&patA , "Prototype Initial (A)");
 
     convertStringToPattern(&patB, argv[2]);
-    viewPattern(&patB , "Initial Pattern B");
+    viewPattern(&patB , "Observed Initial (B)");
 
     //----------------------------------------------------------
     fprintf(stderr,"\n\n");
     //----------------------------------------------------------
 
     cleanPattern(&patA,0.0);
-    viewPattern(&patA , "Pattern A");
+    viewPattern(&patA , "Prototype (A)");
 
     cleanPattern(&patB,0.0);
-    viewPattern(&patB , "Pattern B");
+    viewPattern(&patB , "Observed (B)");
 
     //----------------------------------------------------------
 

@@ -79,8 +79,10 @@ unsigned char * ReadPNMInternal(unsigned char * buffer , char * filename,unsigne
            //fprintf(stderr,"bytesPerPixel*channels*w*h = %u \n",bytesPerPixel*channels*w*h);
            if (totalFileSize-startOfBinaryPart < bytesPerPixel*channels*w*h )
            {
-              fprintf(stderr," Detected Border Case\n\n\n");
-              startOfBinaryPart-=1;
+              unsigned int differenceInBytes =  bytesPerPixel*channels*w*h;
+              differenceInBytes = differenceInBytes -totalFileSize + startOfBinaryPart;
+              fprintf(stderr," Detected Border Case (%u) \n\n\n",differenceInBytes);
+              startOfBinaryPart-=differenceInBytes;
            }
            if ( fseek (pf , startOfBinaryPart , SEEK_SET)!=0 ) { fprintf(stderr,"Could not find file size to cache client..!\nUnable to serve client\n"); fclose(pf); return 0; }
          //-----------------------
@@ -232,34 +234,46 @@ void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,
 
 
 
-unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * extension)
+unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * colorExtension , char * depthExtension)
 {
-  unsigned int i=0;
-
+  unsigned int colorSet=0,depthSet=0;
   char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
   if (file_name_test==0) { fprintf(stderr,"Could not findLastFrame , no space for string\n"); return 0; }
 
-  while (i<2)
+  unsigned int i=0;
+  while (i<3)
   {
-   if (i==0) { strncpy(extension,"pnm",MAX_EXTENSION_PATH); } else
-   if (i==1) { strncpy(extension,"png",MAX_EXTENSION_PATH); }
+   if (i==0) { strncpy(colorExtension,"pnm",MAX_EXTENSION_PATH); } else
+   if (i==1) { strncpy(colorExtension,"png",MAX_EXTENSION_PATH); } else
+   if (i==2) { strncpy(colorExtension,"jpg",MAX_EXTENSION_PATH); }
 
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 , readFromDir , extension );
-   if ( FileExists(file_name_test) ) { return 1; }
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , 0 , readFromDir , extension );
-   if ( FileExists(file_name_test) ) { return 1; }
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 , readFromDir , colorExtension );
+   if ( FileExists(file_name_test) ) { colorSet=1; break; }
+
+   ++i;
+  }
+
+  i=0;
+  while (i<3)
+  {
+   if (i==0) { strncpy(depthExtension,"pnm",MAX_EXTENSION_PATH); } else
+   if (i==1) { strncpy(depthExtension,"png",MAX_EXTENSION_PATH); } else
+   if (i==2) { strncpy(depthExtension,"jpg",MAX_EXTENSION_PATH); }
+
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , 0 , readFromDir , depthExtension );
+   if ( FileExists(file_name_test) ) { depthSet=1; break; }
 
    ++i;
   }
 
   free(file_name_test);
 
-  return 0;
+  return ( (colorSet)&&(depthSet) );
 }
 
 
 
-unsigned int findLastFrame(int devID, char * readFromDir , char * extension)
+unsigned int findLastFrame(int devID, char * readFromDir , char * colorExtension, char * depthExtension)
 {
   unsigned int totalFrames=0;
   unsigned int i=0;
@@ -267,12 +281,13 @@ unsigned int findLastFrame(int devID, char * readFromDir , char * extension)
   char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
   if (file_name_test==0) { fprintf(stderr,"Could not findLastFrame , no space for string\n"); return 0; }
 
+  //TODO : This can be done in a much smarter way , this is the most stupid way possible to do this kind of check :P
   while (i<100000)
   {
    totalFrames = i;
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , i, readFromDir , extension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , i, readFromDir , colorExtension );
    if ( ! FileExists(file_name_test) ) { break; }
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , i, readFromDir , extension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , i, readFromDir , depthExtension );
    if ( ! FileExists(file_name_test) ) { break; }
    ++i;
   }

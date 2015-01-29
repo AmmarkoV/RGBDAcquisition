@@ -163,5 +163,12 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
 int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D);
 
 
+/**
+* @brief Normalize a 4x1 matrix with a Vector (3D Point)
+* @ingroup AmMatrix
+* @param  Input/Output Vector
+* @retval 0=failure,1=success
+*/
 int normalize3DPointVector(double * vec);
+
 #endif // MATRIX4X4TOOLS_H_INCLUDED

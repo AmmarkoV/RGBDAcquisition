@@ -18,6 +18,8 @@
  #define unlikely(x)   x
 #endif
 
+#define PI 3.14159265358979323846264338
+
 #define DEG2RAD 3.141592653589793f/180
 
 // Pre-calculated value of PI / 180.

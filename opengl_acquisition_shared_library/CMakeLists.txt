@@ -20,6 +20,8 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/shader_loader.h
             opengl_depth_and_color_renderer/src/tools.c
             opengl_depth_and_color_renderer/src/tools.h
+            ../tools/AmMatrix/quaternions.c
+            ../tools/AmMatrix/quaternions.h
             ../tools/AmMatrix/matrix3x3Tools.c
             ../tools/AmMatrix/matrix3x3Tools.h
             ../tools/AmMatrix/matrix4x4Tools.c
@@ -38,6 +40,10 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h 
+            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.c
+            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.h 
+            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.c
+            opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.h 
            ) 
 target_link_libraries(OpenGLAcquisition rt m CalibrationLibrary GL GLU X11 ) 
  
