@@ -689,10 +689,9 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
               {
                 wxString msg;
 
-
-                fprintf(stderr,"Depth at point %u,%u  is %u , or 3D  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u)  \n",mouse_x,mouse_y,acquisitionGetDepthValueAtXY(moduleID,devID,mouse_x,mouse_y),x,y,z,r,g,b);
-                if (calib.extrinsicParametersSet) { msg.Printf( wxT("Using Extrinsic Calibration : Depth at point is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u) ") ,x,y,z , r,g,b  ); } else
-                                                  { msg.Printf( wxT("Using Camera Space : Depth at point is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u) ") ,x,y,z , r,g,b ); }
+                fprintf(stderr,"Depth(%u,%u)=%u - 3D(%0.5f,%0.5f,%0.5f) - RGB(%u,%u,%u)  \n",mouse_x,mouse_y,acquisitionGetDepthValueAtXY(moduleID,devID,mouse_x,mouse_y),x,y,z,r,g,b);
+                if (calib.extrinsicParametersSet) { msg.Printf( wxT("Using Extrinsic Calibration : Depth(%0.5f,%0.5f,%0.5f) - RGB(%u,%u,%u) ") ,x,y,z , r,g,b  ); } else
+                                                  { msg.Printf( wxT("Using Camera Space : Depth(%0.5f,%0.5f,%0.5f) - RGB(%u,%u,%u) ") ,x,y,z , r,g,b ); }
 
                 Status->SetStatusText(msg);
               } else

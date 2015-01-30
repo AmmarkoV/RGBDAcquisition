@@ -1,6 +1,10 @@
 #ifndef DEPTHCLASSIFIER_H_INCLUDED
 #define DEPTHCLASSIFIER_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 struct depthClassifierPoint
 {
@@ -33,6 +37,10 @@ unsigned int compareDepthClassifier(struct depthClassifier * dc ,
 
 int printDepthClassifier(char * filename , struct depthClassifier * dc );
 
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif // DEPTHCLASSIFIER_H_INCLUDED
