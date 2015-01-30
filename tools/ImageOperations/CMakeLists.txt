@@ -4,6 +4,7 @@ cmake_minimum_required( VERSION 2.8.7 )
 add_library(
             ImageOperations STATIC 
             depthClassifier.c
+            convolutionFilter.c
             imageFilters.c
             findSubImage.c
             imageOps.c 

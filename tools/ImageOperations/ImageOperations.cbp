@@ -34,6 +34,10 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="convolutionFilter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="convolutionFilter.h" />
 		<Unit filename="depthClassifier.c">
 			<Option compilerVar="CC" />
 		</Unit>
