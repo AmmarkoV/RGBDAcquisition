@@ -633,6 +633,11 @@ void EditorFrame::render(wxDC& dc)
 
 
 
+void activateBlobSelector(unsigned int x,unsigned int y)
+{
+
+}
+
 
 void EditorFrame::OnMotion(wxMouseEvent& event)
 {

@@ -260,6 +260,20 @@ int segmentGetDepthBlobAverage(unsigned short * frame , unsigned int frameWidth 
 }
 
 
+unsigned char * mallocSelectVolume(unsigned short * depthFrame , unsigned int frameWidth , unsigned int frameHeight ,
+                                   unsigned int sX,unsigned int sY , float sensitivity )
+{
+  unsigned char * selection = (unsigned char*) malloc( frameWidth * frameHeight * sizeof(unsigned char));
+
+  if ( selectVolume( selection , depthFrame , frameWidth , frameHeight , sX, sY , sensitivity ) )
+  {
+    return selection;
+  }
+
+  if (selection!=0) { free(selection); selection=0; }
+  return selection;
+}
+
 
 int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB * rgbSeg , struct SegmentationFeaturesDepth * depthSeg , unsigned int combinationMode)
 {

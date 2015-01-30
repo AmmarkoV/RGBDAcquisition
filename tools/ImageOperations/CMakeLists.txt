@@ -3,6 +3,7 @@ cmake_minimum_required( VERSION 2.8.7 )
  
 add_library(
             ImageOperations STATIC 
+            depthClassifier.c
             findSubImage.c
             imageOps.c 
             joinMPO.c

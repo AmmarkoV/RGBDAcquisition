@@ -341,6 +341,14 @@ int detectNoDepth(unsigned short * depthFrame , unsigned int width , unsigned in
 
 
 
+int selectVolume(unsigned char * selection ,
+                 unsigned short * depthFrame , unsigned int frameWidth , unsigned int frameHeight ,
+                 unsigned int sX,unsigned int sY , float sensitivity )
+{
+  //TODO : implement this
+ return 0;
+}
+
 
 
 
