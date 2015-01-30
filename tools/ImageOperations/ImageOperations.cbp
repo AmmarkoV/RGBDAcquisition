@@ -42,6 +42,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="findSubImage.h" />
+		<Unit filename="imageFilters.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="imageFilters.h" />
 		<Unit filename="imageOps.c">
 			<Option compilerVar="CC" />
 		</Unit>
