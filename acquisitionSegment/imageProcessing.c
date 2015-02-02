@@ -346,9 +346,50 @@ int selectVolume(unsigned char * selection ,
                  unsigned int sX,unsigned int sY , float sensitivity )
 {
   //TODO : implement this
+   fprintf(stderr,"Select Volume has not been implemented..! , sorry about that! This message is coming from https://github.com/AmmarkoV/RGBDAcquisition/blob/master/acquisitionSegment/imageProcessing.c#L%u \n",__LINE__);
  return 0;
 }
 
+
+
+
+unsigned int countDepths(unsigned short *  depth, unsigned int imageWidth , unsigned int imageHeight  ,
+                         unsigned int x , unsigned int y , unsigned int width , unsigned int height ,
+                         unsigned int * numberOfHolesIgnored)
+{
+  unsigned int depthSamples = 0;
+  unsigned int totalDepth = 0;
+  unsigned int holesIgnored = 0;
+  *numberOfHolesIgnored=0;
+
+  unsigned short * depthPTR=depth; //This needs to be set to something even if we will overwrite , so that first while will work
+  unsigned short * depthStart=depth+ (y * imageWidth) +x;
+  unsigned short * depthLimit = depthStart + width;
+  unsigned short * depthTotalLimit = depthLimit + imageWidth*height;
+
+  while (depthPTR<depthTotalLimit)
+  {
+   depthPTR = depthStart;
+   while ( depthPTR < depthLimit )
+   {
+     if   (*depthPTR==0)  { ++holesIgnored; } else
+                          {
+                           totalDepth+=*depthPTR;
+                           ++depthSamples;
+                          }
+    ++depthPTR;
+   }
+   depthStart+=imageWidth;
+   depthLimit+=imageWidth;
+  }
+
+ // fprintf(stderr,"viewPointChange_countDepths(%u,%u to %u,%u) => gathered %u samples and %u holes\n",x,y,x+width,y+height,depthSamples,holesIgnored);
+
+  *numberOfHolesIgnored = holesIgnored;
+
+  if (depthSamples==0) { depthSamples=1; }
+  return (unsigned int) totalDepth/depthSamples;
+}
 
 
 

@@ -639,6 +639,28 @@ void activateBlobSelector(unsigned int x,unsigned int y)
 }
 
 
+int convertCenterCoordinatesToUpperLeft(unsigned int * sX , unsigned int *sY , unsigned int centerX,unsigned int centerY , unsigned int *width , unsigned int *height , unsigned int maxWidth , unsigned int maxHeight)
+{
+   fprintf(stderr,"Converting Center Coord( %u , %u ) with a patch size ( %u , %u ) ",centerX,centerY,*width,*height);
+   unsigned int halfWidth  = (unsigned int) *width / 2;
+   unsigned int halfHeight = (unsigned int) *height / 2;
+   fprintf(stderr,"Half Size is ( %u , %u ) ",halfWidth,halfHeight);
+
+   fprintf(stderr,"if ( halfWidth[%u] > centerX[%u] ) \n",halfWidth,centerX);
+   if ( halfWidth < centerX )   { *sX = centerX-halfWidth; }  else { *sX=0; }
+   fprintf(stderr,"*sX = %u\n",*sX);
+
+   fprintf(stderr,"if ( halfHeight[%u] > centerY[%u] ) \n",halfHeight,centerY);
+   if ( halfHeight < centerY )  { *sY = centerY-halfHeight; } else { *sY=0; }
+   fprintf(stderr,"*sY = %u\n",*sY);
+
+   if (*sX+halfWidth>=maxWidth) { *width=maxWidth-*sX-1; }
+   if (*sY+halfHeight>=maxHeight) { *height=maxHeight-*sY-1; }
+   fprintf(stderr,"to Coord( %u , %u ) with a patch size ( %u , %u ) ",*sX,*sY,*width,*height);
+
+  return 1;
+}
+
 void EditorFrame::OnMotion(wxMouseEvent& event)
 {
   int x=event.GetX();
@@ -723,11 +745,18 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
              unsigned int sX=mouse_x,sY=mouse_y;
 
              float centerX , centerY , centerZ;
+             float dimX , dimY , dimZ;
              unsigned int width , height , channels , bitsperpixel;
              acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
              segmentGetDepthBlobAverage(depthFrame,width,height,
                                         sX,sY,checkWidth,checkHeight,
                                         &centerX,&centerY,&centerZ);
+
+             //This was just used for a test : mallocSelectVolume(depthFrame,width,height,sX,sY,1.0);
+             unsigned int nonCenterX,nonCenterY,wantedWidth=300,wantedHeight=200;
+             convertCenterCoordinatesToUpperLeft(&nonCenterX,&nonCenterY,sX,sY,&wantedWidth,&wantedHeight,width,height);
+             segmentGetDepthBlobDimensions(depthFrame,width,height,nonCenterX,nonCenterY,wantedWidth,wantedHeight,&dimX,&dimY,&dimZ);
+
 
              fprintf(stderr,"getDepthBlobAverage starting @ %u,%u dims %u,%u\n",sX,sY,checkWidth,checkHeight);
 

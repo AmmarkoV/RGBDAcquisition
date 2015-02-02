@@ -260,6 +260,22 @@ int segmentGetDepthBlobAverage(unsigned short * frame , unsigned int frameWidth 
 }
 
 
+
+int segmentGetDepthBlobDimensions(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                                  unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                                  float * centerX , float * centerY , float * centerZ)
+{
+ fprintf(stderr,"segmentGetDepthBlobDimensions [ start(%u,%u) size(%u %u) ] \n " , sX,sY , width , height );
+
+ unsigned int numberOfHolesIgnored=0;
+ unsigned int depthAverage =  countDepths(frame,frameWidth,frameHeight,sX,sY,width,height,&numberOfHolesIgnored);
+ fprintf(stderr," number of holes = %u , depth average = %u mm"  , numberOfHolesIgnored , depthAverage );
+
+ return 1;
+}
+
+
+
 unsigned char * mallocSelectVolume(unsigned short * depthFrame , unsigned int frameWidth , unsigned int frameHeight ,
                                    unsigned int sX,unsigned int sY , float sensitivity )
 {
