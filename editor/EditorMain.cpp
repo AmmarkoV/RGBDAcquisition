@@ -599,7 +599,7 @@ void EditorFrame::paintNow()
 
 int EditorFrame::DrawAFPoints(wxDC & dc , unsigned int x , unsigned int y )
 {
- fprintf(stderr,"DrawAFPoints for %u points",afPointsActive);
+ //fprintf(stderr,"DrawAFPoints for %u points",afPointsActive);
  int i;
  dc.SetBrush(*wxTRANSPARENT_BRUSH);
         for ( i=0; i<afPointsActive; i++ )
