@@ -644,18 +644,12 @@ int convertCenterCoordinatesToUpperLeft(unsigned int * sX , unsigned int *sY , u
    fprintf(stderr,"Converting Center Coord( %u , %u ) with a patch size ( %u , %u ) ",centerX,centerY,*width,*height);
    unsigned int halfWidth  = (unsigned int) *width / 2;
    unsigned int halfHeight = (unsigned int) *height / 2;
-   fprintf(stderr,"Half Size is ( %u , %u ) ",halfWidth,halfHeight);
 
-   fprintf(stderr,"if ( halfWidth[%u] > centerX[%u] ) \n",halfWidth,centerX);
    if ( halfWidth < centerX )   { *sX = centerX-halfWidth; }  else { *sX=0; }
-   fprintf(stderr,"*sX = %u\n",*sX);
-
-   fprintf(stderr,"if ( halfHeight[%u] > centerY[%u] ) \n",halfHeight,centerY);
    if ( halfHeight < centerY )  { *sY = centerY-halfHeight; } else { *sY=0; }
-   fprintf(stderr,"*sY = %u\n",*sY);
 
-   if (*sX+halfWidth>=maxWidth) { *width=maxWidth-*sX-1; }
-   if (*sY+halfHeight>=maxHeight) { *height=maxHeight-*sY-1; }
+   if (*sX + *width >=maxWidth) { *width=maxWidth-*sX-1; }
+   if (*sY + *height >=maxHeight) { *height=maxHeight-*sY-1; }
    fprintf(stderr,"to Coord( %u , %u ) with a patch size ( %u , %u ) ",*sX,*sY,*width,*height);
 
   return 1;
