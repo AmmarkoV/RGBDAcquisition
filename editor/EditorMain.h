@@ -35,6 +35,7 @@ class EditorFrame: public wxFrame
         int initializeOverlay(char * pathForSceneFile);
         int stopOverlay();
         int DrawFeaturesAtFeed(wxDC & dc , unsigned int x , unsigned int y, wxListCtrl* whereFrom);
+        int DrawAFPoints(wxDC & dc , unsigned int x , unsigned int y );
 
         void onIdle(wxIdleEvent& evt);
         void guiSnapFrames(int doSnap);
@@ -82,6 +83,7 @@ class EditorFrame: public wxFrame
         void OnButtonRemoveClick(wxCommandEvent& event);
         void OnButtonExecuteClick(wxCommandEvent& event);
         void OnButtonSendDirectCommandClick(wxCommandEvent& event);
+        void OnButtonAFClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -111,6 +113,7 @@ class EditorFrame: public wxFrame
         static const long ID_BUTTON13;
         static const long ID_CHECKBOX2;
         static const long ID_CHECKBOX3;
+        static const long ID_BUTTON14;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
@@ -149,6 +152,7 @@ class EditorFrame: public wxFrame
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;
         wxButton* ButtonAcquisitionGraph;
+        wxButton* ButtonAF;
         wxMenuItem* MenuItem5;
         wxCheckBox* CheckBoxPluginProc;
         wxTimer Timer;

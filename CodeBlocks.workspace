@@ -6,8 +6,8 @@
 		<Project filename="tools/OperatingSystem/OperatingSystem.cbp" />
 		<Project filename="tools/Calibration/CalibrationLibrary.cbp" />
 		<Project filename="tools/Codecs/Codecs.cbp" />
-		<Project filename="acquisition_mux/AcquisitionMux.cbp" />
 		<Project filename="acquisitionSegment/acquisitionSegment.cbp" />
+		<Project filename="acquisition_mux/AcquisitionMux.cbp" />
 		<Project filename="acquisition/Acquisition.cbp" />
 		<Project filename="grabber_mux/GrabberMux.cbp" />
 		<Project filename="grabber_segment/GrabberSegment.cbp" />
