@@ -225,6 +225,43 @@ else
 fi
 
 
+
+if [ -d caffe ]
+then
+echo "Caffe appears to already exist .."
+else
+  echo "Do you want to download Caffe ? " 
+  echo
+  echo -n " (Y/N)?"
+  read answer
+  if test "$answer" != "N" -a "$answer" != "n";
+  then 
+      sudo apt-get install libprotobuf-dev libleveldb-dev libsnappy-dev libopencv-dev libboost-all-dev libhdf5-serial-dev libgflags-dev libgoogle-glog-dev liblmdb-dev protobuf-compiler 
+      git clone https://github.com/BVLC/caffe.git
+      cd caffe
+
+      #CMakeFile of caffe is bad :P 
+      #mkdir build
+      #cd build
+      #cmake ..
+      
+      cp  Makefile.config.example Makefile.config
+      make  
+  fi
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+
 cd "$STARTDIR"
 
 exit 0
