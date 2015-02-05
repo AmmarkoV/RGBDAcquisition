@@ -34,7 +34,9 @@ extern "C"
 {
 #endif
 
-#if ALL_HEADERS_IN_SAME_DIR
+#if ALL_HEADERS_IN_SAME_EXTERNAL_INCLUDED_DIR
+ #include <tools/Calibration/calibration.h>
+#elif ALL_HEADERS_IN_SAME_DIR
   #include "calibration.h"
 #else
   #include "../tools/Calibration/calibration.h"
