@@ -66,6 +66,18 @@ unsigned char trR=255,trG=255,trB=255;
 unsigned int shiftX=0,shiftY=0;
 
 
+struct AF_Rectangle
+{
+  unsigned int x1,y1,width,height,R,G,B;
+
+};
+
+
+unsigned int afPointsActive=0;
+struct AF_Rectangle afPoints[10]={0};
+
+
+
 unsigned char * copyRGB(unsigned char * source , unsigned int width , unsigned int height)
 {
   unsigned char * output = (unsigned char*) malloc(width*height*3*sizeof(unsigned char));
@@ -144,6 +156,7 @@ const long EditorFrame::ID_TEXTCTRL2 = wxNewId();
 const long EditorFrame::ID_BUTTON13 = wxNewId();
 const long EditorFrame::ID_CHECKBOX2 = wxNewId();
 const long EditorFrame::ID_CHECKBOX3 = wxNewId();
+const long EditorFrame::ID_BUTTON14 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
@@ -207,6 +220,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     CheckBoxOverlayDepth->SetValue(false);
     CheckBoxPluginProc = new wxCheckBox(this, ID_CHECKBOX3, _("PlugIn Proc"), wxPoint(1304,528), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
     CheckBoxPluginProc->SetValue(false);
+    ButtonAF = new wxButton(this, ID_BUTTON14, _("AF"), wxPoint(1416,524), wxSize(37,29), 0, wxDefaultValidator, _T("ID_BUTTON14"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -259,6 +273,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonRemoveClick);
     Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonExecuteClick);
     Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonSendDirectCommandClick);
+    Connect(ID_BUTTON14,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonAFClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -582,6 +597,22 @@ void EditorFrame::paintNow()
 }
 
 
+int EditorFrame::DrawAFPoints(wxDC & dc , unsigned int x , unsigned int y )
+{
+ //fprintf(stderr,"DrawAFPoints for %u points",afPointsActive);
+ int i;
+ dc.SetBrush(*wxTRANSPARENT_BRUSH);
+        for ( i=0; i<afPointsActive; i++ )
+         {
+            wxPen tmp_marker(wxColour(afPoints[i].R,afPoints[i].G,afPoints[i].B),1,wxSOLID);
+            dc.SetPen(tmp_marker);
+            dc.DrawRectangle(x+afPoints[i].x1,y+afPoints[i].y1,afPoints[i].width,afPoints[i].height);
+         }
+  return 1;
+}
+
+
+
 
 int EditorFrame::DrawFeaturesAtFeed(wxDC & dc , unsigned int x , unsigned int y, wxListCtrl* whereFrom)
 {
@@ -624,7 +655,7 @@ void EditorFrame::render(wxDC& dc)
      dc.DrawCircle(50,50,10); //Recording Mark ON!
    }
 
-
+   DrawAFPoints(dc ,feed_0_x,feed_0_y);
    DrawFeaturesAtFeed(dc,feed_0_x,feed_0_y,ListCtrlPoints);
 
  wxSleep(0.01);
@@ -633,6 +664,27 @@ void EditorFrame::render(wxDC& dc)
 
 
 
+void activateBlobSelector(unsigned int x,unsigned int y)
+{
+
+}
+
+
+int convertCenterCoordinatesToUpperLeft(unsigned int * sX , unsigned int *sY , unsigned int centerX,unsigned int centerY , unsigned int *width , unsigned int *height , unsigned int maxWidth , unsigned int maxHeight)
+{
+   fprintf(stderr,"Converting Center Coord( %u , %u ) with a patch size ( %u , %u ) ",centerX,centerY,*width,*height);
+   unsigned int halfWidth  = (unsigned int) *width / 2;
+   unsigned int halfHeight = (unsigned int) *height / 2;
+
+   if ( halfWidth < centerX )   { *sX = centerX-halfWidth; }  else { *sX=0; }
+   if ( halfHeight < centerY )  { *sY = centerY-halfHeight; } else { *sY=0; }
+
+   if (*sX + *width >=maxWidth) { *width=maxWidth-*sX-1; }
+   if (*sY + *height >=maxHeight) { *height=maxHeight-*sY-1; }
+   fprintf(stderr,"to Coord( %u , %u ) with a patch size ( %u , %u ) ",*sX,*sY,*width,*height);
+
+  return 1;
+}
 
 void EditorFrame::OnMotion(wxMouseEvent& event)
 {
@@ -684,10 +736,9 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
               {
                 wxString msg;
 
-
-                fprintf(stderr,"Depth at point %u,%u  is %u , or 3D  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u)  \n",mouse_x,mouse_y,acquisitionGetDepthValueAtXY(moduleID,devID,mouse_x,mouse_y),x,y,z,r,g,b);
-                if (calib.extrinsicParametersSet) { msg.Printf( wxT("Using Extrinsic Calibration : Depth at point is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u) ") ,x,y,z , r,g,b  ); } else
-                                                  { msg.Printf( wxT("Using Camera Space : Depth at point is  %0.5f   %0.5f   %0.5f - RGB(%u,%u,%u) ") ,x,y,z , r,g,b ); }
+                fprintf(stderr,"Depth(%u,%u)=%u - 3D(%0.5f,%0.5f,%0.5f) - RGB(%u,%u,%u)  \n",mouse_x,mouse_y,acquisitionGetDepthValueAtXY(moduleID,devID,mouse_x,mouse_y),x,y,z,r,g,b);
+                if (calib.extrinsicParametersSet) { msg.Printf( wxT("Using Extrinsic Calibration : Depth(%0.5f,%0.5f,%0.5f) - RGB(%u,%u,%u) ") ,x,y,z , r,g,b  ); } else
+                                                  { msg.Printf( wxT("Using Camera Space : Depth(%0.5f,%0.5f,%0.5f) - RGB(%u,%u,%u) ") ,x,y,z , r,g,b ); }
 
                 Status->SetStatusText(msg);
               } else
@@ -719,11 +770,22 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
              unsigned int sX=mouse_x,sY=mouse_y;
 
              float centerX , centerY , centerZ;
+             float dimX , dimY , dimZ;
              unsigned int width , height , channels , bitsperpixel;
              acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
              segmentGetDepthBlobAverage(depthFrame,width,height,
                                         sX,sY,checkWidth,checkHeight,
                                         &centerX,&centerY,&centerZ);
+
+             //This was just used for a test : mallocSelectVolume(depthFrame,width,height,sX,sY,1.0);
+             unsigned int nonCenterX,nonCenterY,wantedWidth=300,wantedHeight=200;
+             convertCenterCoordinatesToUpperLeft(&nonCenterX,&nonCenterY,sX,sY,&wantedWidth,&wantedHeight,width,height);
+             segmentGetDepthBlobDimensions(depthFrame,width,height,nonCenterX,nonCenterY,wantedWidth,wantedHeight,&dimX,&dimY,&dimZ);
+             afPointsActive=1;
+             afPoints[0].R=255; afPoints[0].G=0; afPoints[0].B=0;
+             afPoints[0].x1=nonCenterX; afPoints[0].y1=nonCenterY; afPoints[0].width=wantedWidth; afPoints[0].height=wantedHeight;
+
+
 
              fprintf(stderr,"getDepthBlobAverage starting @ %u,%u dims %u,%u\n",sX,sY,checkWidth,checkHeight);
 
@@ -1232,4 +1294,33 @@ void EditorFrame::OnButtonSendDirectCommandClick(wxCommandEvent& event)
 {
   //wxMessageBox(wxT("Test"),wxT("Test"));
 
+}
+
+void EditorFrame::OnButtonAFClick(wxCommandEvent& event)
+{
+  unsigned int width , height , channels , bitsperpixel;
+  acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+
+
+ int i=0;
+ for (i=0; i<10; i++) { afPoints[i].R = 123;   afPoints[i].G = 123;   afPoints[i].B = 123; afPoints[i].width = 80; afPoints[i].height= 80; }
+ i=0;
+ afPoints[i].x1 = 50;   afPoints[i].y1 = width/2; ++i;
+ afPoints[i].x1 = 100;   afPoints[i].y1 = width/2; ++i;
+ afPoints[i].x1 = 150;   afPoints[i].y1 = width/2; ++i;
+ afPoints[i].x1 = 200;   afPoints[i].y1 = width/2; ++i;
+ afPoints[i].x1 = 250;   afPoints[i].y1 = width/2; ++i;
+ afPoints[i].x1 = 300;   afPoints[i].y1 = width/2; ++i;
+ afPoints[i].x1 = 350;   afPoints[i].y1 = width/2; ++i;
+ afPoints[i].x1 = 400;   afPoints[i].y1 = width/2; ++i;
+
+  float dimX,dimY,dimZ;
+
+
+  afPointsActive=0;
+  for (i=0; i<10; i++)
+  {
+   segmentGetDepthBlobDimensions(depthFrame,width,height,afPoints[0].x1,afPoints[0].y1,afPoints[0].width,afPoints[0].height,&dimX,&dimY,&dimZ);
+   ++afPointsActive=1;
+  }
 }

@@ -257,6 +257,36 @@ int segmentGetDepthBlobAverage(unsigned short * frame , unsigned int frameWidth 
                                float * centerX , float * centerY , float * centerZ);
 
 
+
+
+/**
+ * @brief  get dimensions of a depth blob
+ * @ingroup acquisitionSegment
+ * @param Depth Frame
+ * @param Width of Depth Frame
+ * @param Height of Depth Frame
+ * @param Block for DepthBlob Extraction Start X
+ * @param Block for DepthBlob Extraction Start Y
+ * @param Block for DepthBlob Extraction Width
+ * @param Block for DepthBlob Extraction Height
+ * @param Output Depth Blob 3d Size X
+ * @param Output Depth Blob 3d Size Y
+ * @param Output Depth Blob 3d Size Z
+ * @retval 1 = Success , 0 = Failure
+ */
+int segmentGetDepthBlobDimensions(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                                  unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                                  float * centerX , float * centerY , float * centerZ);
+
+
+/**
+ * @brief  stub , planned functionality for the future
+ * @ingroup acquisitionSegment
+ */
+unsigned char * mallocSelectVolume(unsigned short * depthFrame , unsigned int frameWidth , unsigned int frameHeight ,
+                                   unsigned int sX,unsigned int sY , float sensitivity );
+
+
 /**
  * @brief  Save RGB/Depth Segmentation and the combination mode to be used as arguments that can be supplied to a program
  * @ingroup acquisitionSegment

@@ -5,6 +5,14 @@
 #define PI (3.141592653589793)
 #define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+
 enum dimEnum
 {
     DIMX = 0 ,
@@ -341,6 +349,59 @@ int detectNoDepth(unsigned short * depthFrame , unsigned int width , unsigned in
 
 
 
+int selectVolume(unsigned char * selection ,
+                 unsigned short * depthFrame , unsigned int frameWidth , unsigned int frameHeight ,
+                 unsigned int sX,unsigned int sY , float sensitivity )
+{
+  //TODO : implement this
+   fprintf(stderr,"Select Volume has not been implemented..! , sorry about that! This message is coming from https://github.com/AmmarkoV/RGBDAcquisition/blob/master/acquisitionSegment/imageProcessing.c#L%u \n",__LINE__);
+ return 0;
+}
+
+
+
+
+unsigned int countDepths(unsigned short *  depth, unsigned int imageWidth , unsigned int imageHeight  ,
+                         unsigned int x , unsigned int y , unsigned int width , unsigned int height ,
+                         unsigned int * numberOfHolesIgnored)
+{
+  if (depth==0) { fprintf(stderr,RED "Cannot count Depth on empty depth frame \n" NORMAL); return 0; }
+  if ( x+width >= imageWidth )  { fprintf(stderr,RED "Cannot count Depth , incorrect input dimensions X ..\n" NORMAL); return 0; }
+  if ( y+height>= imageHeight)  { fprintf(stderr,RED "Cannot count Depth , incorrect input dimensions Y..\n" NORMAL); return 0; }
+
+  unsigned int depthSamples = 0;
+  unsigned int totalDepth = 0;
+  unsigned int holesIgnored = 0;
+  *numberOfHolesIgnored=0;
+
+  unsigned short * depthPTR=depth; //This needs to be set to something even if we will overwrite , so that first while will work
+  unsigned short * depthStart=depth+ (y * imageWidth) +x;
+  unsigned short * depthLimit = depthStart + width;
+  unsigned short * depthTotalLimit = depthLimit + imageWidth*height;
+
+  while (depthPTR<depthTotalLimit)
+  {
+   depthPTR = depthStart;
+   while ( depthPTR < depthLimit )
+   {
+     if   (*depthPTR==0)  { ++holesIgnored; } else
+                          {
+                           totalDepth+=*depthPTR;
+                           ++depthSamples;
+                          }
+    ++depthPTR;
+   }
+   depthStart+=imageWidth;
+   depthLimit+=imageWidth;
+  }
+
+ // fprintf(stderr,"viewPointChange_countDepths(%u,%u to %u,%u) => gathered %u samples and %u holes\n",x,y,x+width,y+height,depthSamples,holesIgnored);
+
+  *numberOfHolesIgnored = holesIgnored;
+
+  if (depthSamples==0) { depthSamples=1; }
+  return (unsigned int) totalDepth/depthSamples;
+}
 
 
 

@@ -56,4 +56,13 @@ int detectHighContrastUnusableRGB(unsigned char * rgbFrame , unsigned int width 
 
 int detectNoDepth(unsigned short * depthFrame , unsigned int width , unsigned int height , float percentageHigh);
 
+
+unsigned int countDepths(unsigned short *  depth, unsigned int imageWidth , unsigned int imageHeight  ,
+                         unsigned int x , unsigned int y , unsigned int width , unsigned int height ,
+                         unsigned int * numberOfHolesIgnored);
+
+int selectVolume(unsigned char * selection ,
+                 unsigned short * depthFrame , unsigned int frameWidth , unsigned int frameHeight ,
+                 unsigned int sX,unsigned int sY , float sensitivity );
+
 #endif // IMAGEPROCESSING_H_INCLUDED
