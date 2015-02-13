@@ -286,11 +286,42 @@ int savePCD_PointCloudNoEmpty(char * filename ,unsigned short * depthFrame ,unsi
 }
 
 
+int swapEndiannessPNM(void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
+{
+  unsigned char * traverser=(unsigned char * ) pixels;
+  unsigned char * traverserSwap1=(unsigned char * ) pixels;
+  unsigned char * traverserSwap2=(unsigned char * ) pixels;
+
+  unsigned int bytesperpixel = (bitsperpixel/8);
+  unsigned char * endOfMem = traverser + width * height * channels * bytesperpixel;
+
+  unsigned char tmp ;
+  while ( ( traverser < endOfMem)  )
+  {
+    traverserSwap1 = traverser;
+    traverserSwap2 = traverser+1;
+
+    tmp = *traverserSwap1;
+    *traverserSwap1 = *traverserSwap2;
+    *traverserSwap2 = tmp;
+
+    traverser += bytesperpixel;
+  }
+
+ return 1;
+}
 
 
 int acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
     //fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called\n",filename);
+
+    #if USE_REGULAR_BYTEORDER_FOR_PNM
+     //Want Conformance to the NETPBM spec http://en.wikipedia.org/wiki/Netpbm_format#16-bit_extensions
+     if (bitsperpixel==16) { swapEndiannessPNM(pixels , width , height , channels , bitsperpixel); }
+    #else
+      #warning "We are using Our Local Byte Order for saving files , this makes things fast but is incompatible with other PNM loaders"
+    #endif // USE_REGULAR_BYTEORDER_FOR_PNM
 
     if ( (width==0) || (height==0) || (channels==0) || (bitsperpixel==0) ) { fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called with zero dimensions\n",filename); return 0;}
     if(pixels==0) { fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }

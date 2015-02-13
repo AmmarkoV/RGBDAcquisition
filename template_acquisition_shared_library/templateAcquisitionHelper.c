@@ -20,6 +20,35 @@
 
 
 #ifndef USE_CODEC_LIBRARY
+
+
+int swapEndiannessInternalPNM(void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
+{
+  unsigned char * traverser=(unsigned char * ) pixels;
+  unsigned char * traverserSwap1=(unsigned char * ) pixels;
+  unsigned char * traverserSwap2=(unsigned char * ) pixels;
+
+  unsigned int bytesperpixel = (bitsperpixel/8);
+  unsigned char * endOfMem = traverser + width * height * channels * bytesperpixel;
+
+  unsigned char tmp ;
+  while ( ( traverser < endOfMem)  )
+  {
+    traverserSwap1 = traverser;
+    traverserSwap2 = traverser+1;
+
+    tmp = *traverserSwap1;
+    *traverserSwap1 = *traverserSwap2;
+    *traverserSwap2 = tmp;
+
+    traverser += bytesperpixel;
+  }
+
+ return 1;
+}
+
+
+
 unsigned char * ReadPNMInternal(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     //See http://en.wikipedia.org/wiki/Portable_anymap#File_format_description for this simple and useful format
@@ -117,6 +146,11 @@ unsigned char * ReadPNMInternal(unsigned char * buffer , char * filename,unsigne
     {
       fprintf(stderr,"File %s does not exist \n",filename);
     }
+
+
+  //Compatibility with normal PNM files..!
+  //swapEndianness(buffer,*width,*height,channels,bytesPerPixel*8);
+
   return buffer;
 }
 #endif

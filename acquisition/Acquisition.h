@@ -69,6 +69,15 @@ enum Acquisition_Possible_Modules
 #define NUMBER_OF_POSSIBLE_DEVICES 20
 
 
+
+/**
+ * @brief This switch controls whether we use the regular ( network ) byte order for the stored PNM files
+ *        or we use our local pnm byte order , I prefer to use the local byte order because this way I don't have to swap bytes
+ *        for each frame read/written to disk , although most sane people should set this to 1 ;P
+ */
+#define USE_REGULAR_BYTEORDER_FOR_PNM 0
+
+
 typedef unsigned int ModuleIdentifier;
 typedef unsigned int DeviceIdentifier;
 
