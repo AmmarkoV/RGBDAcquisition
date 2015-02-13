@@ -136,6 +136,7 @@ int startTemplateModule(unsigned int max_devs,char * settings)
         strncpy(device[devID].depthExtension,"pnm",MAX_EXTENSION_PATH);
 
         device[devID].cycle=0;
+        device[devID].intialized=0;
 
         device[devID].safeGUARD = SAFEGUARD_VALUE;
 
@@ -151,6 +152,8 @@ int deviceIsSafeToUse(int devID)
 {
   if ( devID<MAX_TEMPLATE_DEVICES )
   {
+    return 1;
+    #warning "For now only do a bounds check"
     if (device[devID].intialized)
       {
         return 1;
