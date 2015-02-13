@@ -73,7 +73,8 @@ unsigned int drawDepth=1;
 
 char inputname[512]={0};
 unsigned int frameNum=0;
-
+unsigned int seekFrame=0;
+unsigned int loopFrame=0;
 
 char RGBwindowName[250]={0};
 char DepthwindowName[250]={0};
@@ -305,6 +306,15 @@ int main(int argc, char *argv[])
                                                return 1;
                                              }
                                            } else
+    if (strcmp(argv[i],"-seek")==0)      {
+                                           seekFrame=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting seek to %u \n",seekFrame);
+                                         } else
+
+    if (strcmp(argv[i],"-loop")==0)      {
+                                           loopFrame=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting loop to %u \n",loopFrame);
+                                         } else
     if (strcmp(argv[i],"-maxFrames")==0) {
                                            maxFramesToGrab=atoi(argv[i+1]);
                                            fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
@@ -388,6 +398,11 @@ int main(int argc, char *argv[])
      sprintf(RGBwindowName,"RGBDAcquisition RGB - Module %u Device %u",moduleID,devID);
      sprintf(DepthwindowName,"RGBDAcquisition Depth - Module %u Device %u",moduleID,devID);
 
+      if (seekFrame!=0)
+      {
+          acquisitionSeekFrame(moduleID,devID,seekFrame);
+      }
+
      #if INTERCEPT_MOUSE_IN_WINDOWS
       //Create a window
        cvNamedWindow(RGBwindowName, 1);
@@ -416,6 +431,19 @@ int main(int argc, char *argv[])
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
         ++frameNum;
+
+
+
+        if (loopFrame!=0)
+        {
+          //fprintf(stderr,"%u%%(%u+%u)==%u\n",frameNum,loopFrame,seekFrame,frameNum%(loopFrame+seekFrame));
+          if ( frameNum%(loopFrame)==0)
+          {
+            fprintf(stderr,"Looping Dataset , we reached frame %u ( %u ) , going back to %u\n",frameNum,loopFrame,seekFrame);
+            acquisitionSeekFrame(moduleID,devID,seekFrame);
+          }
+        }
+
     }
 
     fprintf(stderr,"Done viewing %u frames! \n",frameNum);

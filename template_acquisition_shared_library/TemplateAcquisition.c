@@ -39,6 +39,7 @@
 
 struct TemplateVirtualDevice
 {
+ char intialized;
  char readFromDir[MAX_DIR_PATH]; // <- this sucks i know :P
  char colorExtension[MAX_EXTENSION_PATH];
  char depthExtension[MAX_EXTENSION_PATH];
@@ -146,7 +147,17 @@ int startTemplateModule(unsigned int max_devs,char * settings)
     return 1;
 }
 
-
+int deviceIsSafeToUse(int devID)
+{
+  if ( devID<MAX_TEMPLATE_DEVICES )
+  {
+    if (device[devID].intialized)
+      {
+        return 1;
+      }
+  }
+ return 0;
+}
 
 
 int getTemplateNumberOfDevices() { return 1; }
@@ -264,7 +275,10 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
    #endif // USE_CODEC_LIBRARY
   }
 
-  return ((device[devID].templateColorFrame!=0)&& (device[devID].templateDepthFrame!=0)&& (failedStream==0));
+  device[devID].intialized = ((device[devID].templateColorFrame!=0)&& (device[devID].templateDepthFrame!=0)&& (failedStream==0));
+
+
+  return device[devID].intialized;
 }
 
 
@@ -348,6 +362,8 @@ int snapTemplateFrames(int devID)
 
 int seekRelativeTemplateFrame(int devID,signed int seekFrame)
 {
+  if (!deviceIsSafeToUse(devID)) { fprintf(stderr,YELLOW "Device %u is not safe to use At %s , Line %u" NORMAL , __FILE__ , __LINE__ ); return 0; }
+
   if (device[devID].cycle - seekFrame < 0 )  { device[devID].cycle=0; } else
                                              { device[devID].cycle += seekFrame; }
   return 1;
@@ -355,6 +371,8 @@ int seekRelativeTemplateFrame(int devID,signed int seekFrame)
 
 int seekTemplateFrame(int devID,unsigned int seekFrame)
 {
+  if (!deviceIsSafeToUse(devID)) { fprintf(stderr,YELLOW "Device %u is not safe to use At %s , Line %u" NORMAL , __FILE__ , __LINE__ ); return 0; }
+
   device[devID].cycle = seekFrame;
   return 1;
 }
