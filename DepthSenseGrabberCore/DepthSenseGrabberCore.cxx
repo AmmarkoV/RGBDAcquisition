@@ -31,7 +31,7 @@ bool usingUSB30Flag = true; // if the camera is plugged on a USB 3.0 port
 
 int waitSecondsBeforeGrab = 1;
 int divideConfidencePixels = 5;
-const int16_t confidenceThreshold = 60;
+const int16_t confidenceThreshold = 150;
 
 bool interpolateDepthFlag = 1;
 bool interpolateDepthAcqFlag = 0;
@@ -236,9 +236,10 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
           for (int currentPixelRow = 0; currentPixelRow < heightVGA; currentPixelRow++) {
             for (int currentPixelCol = 0; currentPixelCol < widthVGA; currentPixelCol++) {
               int currentPixelInd = currentPixelRow*widthVGA+currentPixelCol;
+              int currentPixelIndQVGA = currentPixelRow/2*widthQVGA+currentPixelCol/2;
               {
                   uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
-                  if (colorPixelInd == -1) {
+                  if (colorPixelInd == -1 || data.confidenceMap[currentPixelIndQVGA] < confidenceThreshold) {
                       pixelsColorSyncVGA[3*currentPixelInd] = noDepthBGR[2];
                       pixelsColorSyncVGA[3*currentPixelInd+1] = noDepthBGR[1];
                       pixelsColorSyncVGA[3*currentPixelInd+2] = noDepthBGR[0];
@@ -247,7 +248,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
                   {
                       hasData[colorPixelInd] = 1;
                       if (saveDepthAcqFlag || interpolateDepthAcqFlag) pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd] + deltaDepthSync;
-                      else pixelsDepthSync[colorPixelInd] = pixelsDepthAcq[currentPixelRow/2*widthQVGA+currentPixelCol/2] + deltaDepthSync;
+                      else pixelsDepthSync[colorPixelInd] = pixelsDepthAcq[currentPixelIndQVGA] + deltaDepthSync;
                       pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
                       pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
                       pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
