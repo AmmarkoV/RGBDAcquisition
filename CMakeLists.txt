@@ -3,8 +3,15 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(DepthSenseGrabber)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/shared/cmake/Modules/")
+find_package(DepthSense REQUIRED)
+include_directories(${DEPTHSENSE_INCLUDE_DIR})
+find_package(Boost 1.46.0 REQUIRED)
 
-include(${CMAKE_SOURCE_DIR}/DepthSenseGrabberCore/CMakeLists.txt)
+#include(${CMAKE_SOURCE_DIR}/DepthSenseGrabberCore/CMakeLists.txt)
+add_subdirectory(${CMAKE_SOURCE_DIR}/DepthSenseGrabberCore/)
+add_subdirectory(${CMAKE_SOURCE_DIR}/DepthSenseGrabberPNM/)
+#include_directories(${CMAKE_SOURCE_DIR}/DepthSenseGrabberCore/)
+#include_directories(${CMAKE_SOURCE_DIR}/DepthSenseGrabberPNM/)
 
 #find_package(DepthSense REQUIRED)
 #include_directories(${DEPTHSENSE_INCLUDE_DIR})

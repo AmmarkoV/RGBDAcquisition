@@ -8,9 +8,9 @@
 #include <vector>
 #include <exception>
 
-#include <DepthSense.hxx>
+//#include <DepthSense.hxx>
 
-using namespace DepthSense;
+//using namespace DepthSense;
 using namespace std;
 
 /*----------------------------------------------------------------------------*/

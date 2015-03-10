@@ -16,7 +16,7 @@
 #include <vector>
 #include <exception>
 
-#include <DepthSense.hxx>
+//#include <DepthSense.hxx>
 
 #include "DepthSenseGrabberPNM.hxx"
 #include "../DepthSenseGrabberCore/DepthSenseGrabberCore.hxx"
