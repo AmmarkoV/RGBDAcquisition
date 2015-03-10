@@ -38,7 +38,6 @@ const int16_t confidenceThreshold = 150;
 
 bool interpolateDepthFlag = 1;
 bool interpolateDepthAcqFlag = 0;
-bool interpolateColorFlag = 1;
 
 bool saveColorAcqFlag = 1;
 bool saveDepthAcqFlag = 1;
@@ -234,50 +233,50 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     if (interpolateDepthFlag)
     {
-        if (saveDepthAcqFlag || interpolateDepthAcqFlag) rescaleMap(pixelsDepthAcq, pixelsDepthAcqVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT);
-        if (interpolateColorFlag) {
-          rescaleMap(uvMapAcq, uvMapVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT);
-          for (int currentPixelRow = 0; currentPixelRow < FORMAT_VGA_HEIGHT; currentPixelRow++) {
+        if (saveDepthAcqFlag || interpolateDepthAcqFlag) {
+            rescaleMap(pixelsDepthAcq, pixelsDepthAcqVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT);
+        }
+        rescaleMap(uvMapAcq, uvMapVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT);
+        for (int currentPixelRow = 0; currentPixelRow < FORMAT_VGA_HEIGHT; currentPixelRow++) {
             for (int currentPixelCol = 0; currentPixelCol < FORMAT_VGA_WIDTH; currentPixelCol++) {
-              int currentPixelInd = currentPixelRow*FORMAT_VGA_WIDTH+currentPixelCol;
-              int currentPixelIndQVGA = currentPixelRow/2*FORMAT_QVGA_WIDTH+currentPixelCol/2;
-              {
-                  uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
-                  if (colorPixelInd == -1 || data.confidenceMap[currentPixelIndQVGA] < confidenceThreshold) {
-                      pixelsColorSyncVGA[3*currentPixelInd] = noDepthBGR[2];
-                      pixelsColorSyncVGA[3*currentPixelInd+1] = noDepthBGR[1];
-                      pixelsColorSyncVGA[3*currentPixelInd+2] = noDepthBGR[0];
-                  }
-                  else
-                  {
-                      hasData[colorPixelInd] = 1;
-                      if (saveDepthAcqFlag || interpolateDepthAcqFlag) pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd] + deltaDepthSync;
-                      else pixelsDepthSync[colorPixelInd] = pixelsDepthAcq[currentPixelIndQVGA] + deltaDepthSync;
-                      pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
-                      pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
-                      pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
-                  }
-              }
+                int currentPixelInd = currentPixelRow*FORMAT_VGA_WIDTH+currentPixelCol;
+                int currentPixelIndQVGA = currentPixelRow/2*FORMAT_QVGA_WIDTH+currentPixelCol/2;
+                uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
+                if (colorPixelInd == -1 || data.confidenceMap[currentPixelIndQVGA] < confidenceThreshold) {
+                    pixelsColorSyncVGA[3*currentPixelInd] = noDepthBGR[2];
+                    pixelsColorSyncVGA[3*currentPixelInd+1] = noDepthBGR[1];
+                    pixelsColorSyncVGA[3*currentPixelInd+2] = noDepthBGR[0];
+                }
+                else
+                {
+                    hasData[colorPixelInd] = 1;
+                    if (saveDepthAcqFlag || interpolateDepthAcqFlag)
+                        pixelsDepthSync[colorPixelInd] = pixelsDepthAcqVGA[currentPixelInd] + deltaDepthSync;
+                    else
+                        pixelsDepthSync[colorPixelInd] = pixelsDepthAcq[currentPixelIndQVGA] + deltaDepthSync;
+                    pixelsColorSyncVGA[3*currentPixelInd] = pixelsColorAcq[3*colorPixelInd];
+                    pixelsColorSyncVGA[3*currentPixelInd+1] = pixelsColorAcq[3*colorPixelInd+1];
+                    pixelsColorSyncVGA[3*currentPixelInd+2] = pixelsColorAcq[3*colorPixelInd+2];
+                }
             }
-          }
-          for (int currentRow = 1; currentRow < FORMAT_VGA_HEIGHT-1; currentRow++) {
+        }
+        for (int currentRow = 1; currentRow < FORMAT_VGA_HEIGHT-1; currentRow++) {
             for (int currentCol = 1; currentCol < FORMAT_VGA_WIDTH-1; currentCol++) {
-              int currentPixelInd = currentRow*FORMAT_VGA_WIDTH+currentCol;
-              int countValidAround = 0;
-              uint16_t depthValidAround = 0;
-              if (hasData[currentPixelInd] == 0) {
-                for (int indDeltaPixel = 0; indDeltaPixel < 8; indDeltaPixel++) {
-                  if (hasData[currentPixelInd+deltaPixelsIndAround[indDeltaPixel]]) {
-                    countValidAround++;
-                    depthValidAround = depthValidAround + pixelsDepthSync[currentPixelInd+deltaPixelsIndAround[indDeltaPixel]];
-                  }
+                int currentPixelInd = currentRow*FORMAT_VGA_WIDTH+currentCol;
+                int countValidAround = 0;
+                uint16_t depthValidAround = 0;
+                if (hasData[currentPixelInd] == 0) {
+                    for (int indDeltaPixel = 0; indDeltaPixel < 8; indDeltaPixel++) {
+                        if (hasData[currentPixelInd+deltaPixelsIndAround[indDeltaPixel]]) {
+                            countValidAround++;
+                            depthValidAround = depthValidAround + pixelsDepthSync[currentPixelInd+deltaPixelsIndAround[indDeltaPixel]];
+                        }
+                    }
+                    if (countValidAround > 1) {
+                        pixelsDepthSync[currentPixelInd] = depthValidAround / countValidAround;
+                    }
                 }
-                if (countValidAround > 1) {
-                  pixelsDepthSync[currentPixelInd] = depthValidAround / countValidAround;
-                }
-              }
             }
-          }
         }
     }
     else
@@ -599,16 +598,6 @@ void capture()
     printf("DepthSenseGrabber, Feb. 2014. (thp@pham.in)\n");
 
     clockStartGrab = clock()+CLOCKS_PER_SEC*waitSecondsBeforeGrab;
-
-    /*
-    pixelsDepthAcqVGASnapshot = (uint16_t*) malloc(FORMAT_VGA_PIXELS*sizeof(uint16_t));
-    pixelsColorSyncVGASnapshot = (uint8_t*) malloc(3*FORMAT_VGA_PIXELS*sizeof(uint8_t));
-    pixelsDepthAcqQVGASnapshot = (uint16_t*) malloc(FORMAT_QVGA_PIXELS*sizeof(uint16_t));
-    pixelsColorSyncQVGASnapshot = (uint8_t*) malloc(3*FORMAT_QVGA_PIXELS*sizeof(uint8_t));
-    pixelsColorAcqSnapshot = (uint8_t*) malloc(3*nPixelsColorAcq*sizeof(uint8_t));
-    pixelsDepthSyncSnapshot = (uint16_t*) malloc(nPixelsColorAcq*sizeof(uint16_t));
-    pixelsConfidenceQVGASnapshot = (uint16_t*) malloc(FORMAT_QVGA_PIXELS*sizeof(uint16_t));
-    */
 
     g_context.startNodes();
 

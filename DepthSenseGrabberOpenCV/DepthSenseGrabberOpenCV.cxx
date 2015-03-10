@@ -37,13 +37,13 @@ int main(int argc, char* argv[])
 
     bool dispColorAcqFlag = 1;
     bool dispDepthAcqFlag = 0;
-    bool dispColorSyncFlag = 0;
+    bool dispColorSyncFlag = 1;
     bool dispDepthSyncFlag = 1;
     bool dispConfidenceFlag = 0;
 
     bool saveColorAcqFlag = 1;
-    bool saveDepthAcqFlag = 0;
-    bool saveColorSyncFlag = 0;
+    bool saveDepthAcqFlag = 1;
+    bool saveColorSyncFlag = 1;
     bool saveDepthSyncFlag = 1;
     bool saveConfidenceFlag = 0;
 
@@ -247,8 +247,6 @@ int main(int argc, char* argv[])
                 sprintf(fileNameConfidence,"%s%05u.pnm",baseNameConfidence,frameCount);
                 saveDepthFramePNM(fileNameConfidence, pixelsConfidenceQVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, timeStamp);
             }
-            /*
-            */
 
             char key = cvWaitKey(10);
             if (key==27)
@@ -256,7 +254,6 @@ int main(int argc, char* argv[])
                 printf("Quitting main loop from OpenCV\n");
                 stop_capture();
             }
-
 
         }
     }
