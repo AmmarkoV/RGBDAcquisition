@@ -59,6 +59,16 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
     }
 
+    int widthDepthAcq, heightDepthAcq;
+    if (interpolateDepthFlag) {
+        widthDepthAcq = FORMAT_VGA_WIDTH;
+        heightDepthAcq = FORMAT_VGA_HEIGHT;
+    } else {
+        widthDepthAcq = FORMAT_QVGA_WIDTH;
+        heightDepthAcq = FORMAT_QVGA_HEIGHT;
+    }
+
+
     char fileNameColorAcq[50];
     char fileNameDepthAcq[50];
     char fileNameColorSync[50];
@@ -73,25 +83,18 @@ int main(int argc, char* argv[])
 
     start_capture();
 
-    uint16_t* pixelsDepthAcqQVGA = getPixelsDepthAcqQVGA();
-    uint16_t* pixelsDepthAcqVGA = getPixelsDepthAcqVGA();
-    uint8_t* pixelsColorAcq = getPixelsColorsAcq();
-    uint16_t* pixelsDepthSync = getPixelsDepthSync();
-    uint8_t* pixelsColorSyncQVGA = getPixelsColorSyncQVGA();
-    uint8_t* pixelsColorSyncVGA = getPixelsColorSyncVGA();
-    uint16_t* pixelsConfidenceQVGA = getPixelsConfidenceQVGA();
-
     uint16_t* pixelsDepthAcq;
     uint8_t* pixelsColorSync;
+    uint8_t* pixelsColorAcq = getPixelsColorsAcq();
+    uint16_t* pixelsDepthSync = getPixelsDepthSync();
+    uint16_t* pixelsConfidenceQVGA = getPixelsConfidenceQVGA();
     if (interpolateDepthFlag) {
-        pixelsDepthAcq = pixelsDepthAcqVGA;
-        pixelsColorSync = pixelsColorSyncVGA;
+        pixelsDepthAcq = getPixelsDepthAcqVGA();
+        pixelsColorSync = getPixelsColorSyncVGA();
     } else {
-        pixelsDepthAcq = pixelsDepthAcqQVGA;
-        pixelsColorSync = pixelsColorSyncQVGA;
+        pixelsDepthAcq = getPixelsDepthAcqQVGA();
+        pixelsColorSync = getPixelsColorSyncQVGA();
     }
-
-
 
     int frameCountPrevious = -1;
     while (true) {
@@ -103,8 +106,7 @@ int main(int argc, char* argv[])
 
             if (saveDepthAcqFlag) {
                 sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
-                if (interpolateDepthFlag) saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcqVGA, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT, timeStamp);
-                else saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcqQVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, timeStamp);
+                saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcq, widthDepthAcq, heightDepthAcq, timeStamp);
             }
             if (saveColorAcqFlag) {
                 sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
@@ -116,14 +118,12 @@ int main(int argc, char* argv[])
             }
             if (saveColorSyncFlag) {
                 sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-                if (interpolateColorFlag) saveColorFramePNM(fileNameColorSync, pixelsColorSyncVGA, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT, timeStamp);
-                else saveColorFramePNM(fileNameColorSync, pixelsColorSyncQVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, timeStamp);
+                saveColorFramePNM(fileNameColorSync, pixelsColorSync, widthDepthAcq, heightDepthAcq, timeStamp);
             }
             if (saveConfidenceFlag) {
                 sprintf(fileNameConfidence,"%s%05u.pnm",baseNameConfidence,frameCount);
                 saveDepthFramePNM(fileNameConfidence, pixelsConfidenceQVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, timeStamp);
             }
-
         }
     }
 

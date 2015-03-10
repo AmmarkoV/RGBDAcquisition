@@ -29,15 +29,17 @@ int main(int argc, char* argv[])
     int flagExportType = FILETYPE_JPG; // FILETYPE_NONE, FILETYPE_JPG or FILETYPE_PNM
 
     int divideDepthBrightnessCV = 6;
+    int divideConfidenceBrightnessCV = 1;
 
     bool interpolateDepthFlag = 1;
     bool interpolateDepthAcqFlag = 0;
     bool interpolateColorFlag = 1;
 
     bool dispColorAcqFlag = 1;
-    bool dispDepthAcqFlag = 1;
-    bool dispColorSyncFlag = 1;
+    bool dispDepthAcqFlag = 0;
+    bool dispColorSyncFlag = 0;
     bool dispDepthSyncFlag = 1;
+    bool dispConfidenceFlag = 0;
 
     bool saveColorAcqFlag = 1;
     bool saveDepthAcqFlag = 0;
@@ -93,29 +95,18 @@ int main(int argc, char* argv[])
 
     start_capture();
 
-    uint16_t* pixelsDepthAcqQVGA = getPixelsDepthAcqQVGA();
-    uint16_t* pixelsDepthAcqVGA = getPixelsDepthAcqVGA();
-    uint8_t* pixelsColorAcq = getPixelsColorsAcq();
-    uint16_t* pixelsDepthSync = getPixelsDepthSync();
-    uint8_t* pixelsColorSyncQVGA = getPixelsColorSyncQVGA();
-    uint8_t* pixelsColorSyncVGA = getPixelsColorSyncVGA();
-    uint16_t* pixelsConfidenceQVGA = getPixelsConfidenceQVGA();
-
     uint16_t* pixelsDepthAcq;
     uint8_t* pixelsColorSync;
+    uint8_t* pixelsColorAcq = getPixelsColorsAcq();
+    uint16_t* pixelsDepthSync = getPixelsDepthSync();
+    uint16_t* pixelsConfidenceQVGA = getPixelsConfidenceQVGA();
     if (interpolateDepthFlag) {
-        pixelsDepthAcq = pixelsDepthAcqVGA;
-        pixelsColorSync = pixelsColorSyncVGA;
+        pixelsDepthAcq = getPixelsDepthAcqVGA();
+        pixelsColorSync = getPixelsColorSyncVGA();
     } else {
-        pixelsDepthAcq = pixelsDepthAcqQVGA;
-        pixelsColorSync = pixelsColorSyncQVGA;
+        pixelsDepthAcq = getPixelsDepthAcqQVGA();
+        pixelsColorSync = getPixelsColorSyncQVGA();
     }
-
-
-
-
-    ProjectionHelper* g_pProjHelper = NULL;
-    StereoCameraParameters g_scp;
 
 
 
@@ -123,9 +114,11 @@ int main(int argc, char* argv[])
              *cv_colorAcqImage=NULL, // initialized in main, used in CBs
              *cv_depthSyncImage=NULL, // initialized in main, used in CBs
              *cv_colorSyncImage=NULL, // initialized in main, used in CBs
+             *cv_confidenceImage=NULL, // initialized in main, used in CBs
              *cv_emptyImage=NULL; // initialized in main, used in CBs
     CvSize cv_szDepthAcq=cvSize(widthDepthAcq,heightDepthAcq),
-           cv_szColorAcq=cvSize(widthColor,heightColor);
+           cv_szColorAcq=cvSize(widthColor,heightColor),
+           cv_szConfidence=cvSize(FORMAT_QVGA_WIDTH,FORMAT_QVGA_HEIGHT);
     CvSize cv_szDepthSync = cv_szColorAcq, cv_szColorSync = cv_szDepthAcq;
 
     // VGA format color image
@@ -160,6 +153,14 @@ int main(int argc, char* argv[])
         exit(0);
     }
 
+    // QVGA format confidence image
+    cv_confidenceImage=cvCreateImage(cv_szConfidence,IPL_DEPTH_8U,1);
+    if (cv_confidenceImage==NULL)
+    {
+        printf("Unable to create confidence image buffer\n");
+        exit(0);
+    }
+
     // Empty image
     cv_emptyImage=cvCreateImage(cv_szColorSync,IPL_DEPTH_8U,1);
     if (cv_emptyImage==NULL)
@@ -184,25 +185,51 @@ int main(int argc, char* argv[])
             int countDepth = 0;
             for (int i=0; i<heightDepthAcq; i++) {
                 for (int j=0; j<widthDepthAcq; j++) {
-                   if (dispDepthAcqFlag || (saveDepthAcqFlag && (flagExportType == FILETYPE_JPG))) {
-                       cvSet2D(cv_depthAcqImage,i,j,cvScalar(pixelsDepthAcq[countDepth]/divideDepthBrightnessCV));
-                   }
-                   //if (dispColorSyncFlag || (saveColorSyncFlag && (flagExportType == FILETYPE_JPG)))
-                   //    cvSet2D(cv_colorSyncImage,i,j,cvScalar(pixelsColorSync[3*countDepth+2],pixelsColorSync[3*countDepth+1],pixelsColorSync[3*countDepth])); //BGR format
-                   countDepth++;
+                    if (dispDepthAcqFlag || (saveDepthAcqFlag && (flagExportType == FILETYPE_JPG))) {
+                        cvSet2D(cv_depthAcqImage,i,j,cvScalar(pixelsDepthAcq[countDepth]/divideDepthBrightnessCV));
+                        //cvSet2D(cv_depthSyncImage,i,j,cvScalar(pixelsDepthSync[countDepth]/divideDepthBrightnessCV));
+                    }
+                    if (dispColorSyncFlag || (saveColorSyncFlag && (flagExportType == FILETYPE_JPG))) {
+                        cvSet2D(cv_colorSyncImage,i,j,cvScalar(pixelsColorSync[3*countDepth+2],pixelsColorSync[3*countDepth+1],pixelsColorSync[3*countDepth])); //BGR format
+                    }
+                    countDepth++;
+                }
+            }
+            int countColor = 0;
+            for (int i=0; i<heightColor; i++) {
+                for (int j=0; j<widthColor; j++) {
+                    if (dispColorAcqFlag || (saveColorAcqFlag && flagExportType)) {
+                        cvSet2D(cv_colorAcqImage,i,j,cvScalar(pixelsColorAcq[3*countColor+2],pixelsColorAcq[3*countColor+1],pixelsColorAcq[3*countColor])); //BGR format
+                    }
+                    if (dispDepthSyncFlag || (saveDepthSyncFlag && flagExportType)) {
+                        cvSet2D(cv_depthSyncImage,i,j,cvScalar(pixelsDepthSync[countColor]/divideDepthBrightnessCV));
+                    }
+                   countColor++;
+                }
+            }
+            int countConfidence = 0;
+            for (int i=0; i<FORMAT_QVGA_HEIGHT; i++) {
+                for (int j=0; j<FORMAT_QVGA_WIDTH; j++) {
+                    if (dispConfidenceFlag || (saveConfidenceFlag && flagExportType)) {
+                        cvSet2D(cv_confidenceImage,i,j,cvScalar(pixelsConfidenceQVGA[countConfidence]/divideConfidenceBrightnessCV));
+                    }
+                   countConfidence++;
                 }
             }
 
-            //if (dispColorAcqFlag) cvShowImage("Acq Color",cv_colorAcqImage);
+
+
+            if (dispColorAcqFlag) cvShowImage("Acq Color",cv_colorAcqImage);
             if (dispDepthAcqFlag) cvShowImage("Acq Depth",cv_depthAcqImage);
-            //if (dispDepthSyncFlag) cvShowImage("Synchronized Depth",cv_depthSyncImage);
-            //if (dispColorSyncFlag) cvShowImage("Synchronized Color",cv_colorSyncImage);
-            //if (dispColorAcqFlag+dispColorSyncFlag+dispDepthAcqFlag+dispDepthSyncFlag == 0)  cvShowImage("Empty",cv_emptyImage);
+            if (dispDepthSyncFlag) cvShowImage("Synchronized Depth",cv_depthSyncImage);
+            if (dispColorSyncFlag) cvShowImage("Synchronized Color",cv_colorSyncImage);
+            if (dispConfidenceFlag) cvShowImage("Confidence",cv_confidenceImage);
+            if (dispColorAcqFlag+dispColorSyncFlag+dispDepthAcqFlag+dispDepthSyncFlag+dispConfidenceFlag == 0)
+                cvShowImage("Empty",cv_emptyImage);
 
             if (saveDepthAcqFlag) {
                 sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
-                if (interpolateDepthFlag) saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcqVGA, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT, timeStamp);
-                else saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcq, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, timeStamp);
+                saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcq, widthDepthAcq, heightDepthAcq, timeStamp);
             }
             if (saveColorAcqFlag) {
                 sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
@@ -214,8 +241,7 @@ int main(int argc, char* argv[])
             }
             if (saveColorSyncFlag) {
                 sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-                if (interpolateColorFlag) saveColorFramePNM(fileNameColorSync, pixelsColorSyncVGA, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT, timeStamp);
-                else saveColorFramePNM(fileNameColorSync, pixelsColorSyncQVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, timeStamp);
+                saveColorFramePNM(fileNameColorSync, pixelsColorSync, widthDepthAcq, heightDepthAcq, timeStamp);
             }
             if (saveConfidenceFlag) {
                 sprintf(fileNameConfidence,"%s%05u.pnm",baseNameConfidence,frameCount);

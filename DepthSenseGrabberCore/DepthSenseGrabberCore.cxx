@@ -28,6 +28,8 @@ using namespace std;
 struct timeval timeStart, timeCurrent;
 long mtime, seconds, useconds;
 
+//bool flagTakingSnapshot = 0;
+
 bool usingUSB30Flag = true; // if the camera is plugged on a USB 3.0 port
 
 int waitSecondsBeforeGrab = 1;
@@ -39,10 +41,10 @@ bool interpolateDepthAcqFlag = 0;
 bool interpolateColorFlag = 1;
 
 bool saveColorAcqFlag = 1;
-bool saveDepthAcqFlag = 0;
-bool saveColorSyncFlag = 0;
+bool saveDepthAcqFlag = 1;
+bool saveColorSyncFlag = 1;
 bool saveDepthSyncFlag = 1;
-bool saveConfidenceFlag = 0;
+bool saveConfidenceFlag = 1;
 
 int32_t  frameRateDepth = 30;
 int32_t  frameRateColor = 30;
@@ -107,6 +109,26 @@ const int widthColor = FORMAT_NHD_WIDTH, heightColor = FORMAT_NHD_HEIGHT, nPixel
 uint8_t* pixelsColorAcq = pixelsColorAcqNHD;
 uint16_t* pixelsDepthSync = pixelsDepthSyncNHD;
 */
+
+// Snapshot data
+/*
+uint16_t* pixelsDepthAcqVGASnapshot;
+uint16_t* pixelsDepthAcqQVGASnapshot;
+uint8_t* pixelsColorSyncVGASnapshot;
+uint8_t* pixelsColorSyncQVGASnapshot;
+uint8_t* pixelsColorAcqSnapshot;
+uint16_t* pixelsDepthSyncSnapshot;
+uint16_t* pixelsConfidenceQVGASnapshot;
+*/
+
+uint16_t* pixelsDepthAcqVGASnapshot = (uint16_t*) malloc(FORMAT_VGA_PIXELS*sizeof(uint16_t));
+uint8_t* pixelsColorSyncVGASnapshot = (uint8_t*) malloc(3*FORMAT_VGA_PIXELS*sizeof(uint8_t));
+uint16_t* pixelsDepthAcqQVGASnapshot = (uint16_t*) malloc(FORMAT_QVGA_PIXELS*sizeof(uint16_t));
+uint8_t* pixelsColorSyncQVGASnapshot = (uint8_t*) malloc(3*FORMAT_QVGA_PIXELS*sizeof(uint8_t));
+uint8_t* pixelsColorAcqSnapshot = (uint8_t*) malloc(3*nPixelsColorAcq*sizeof(uint8_t));
+uint16_t* pixelsDepthSyncSnapshot = (uint16_t*) malloc(nPixelsColorAcq*sizeof(uint16_t));
+uint16_t* pixelsConfidenceQVGASnapshot = (uint16_t*) malloc(FORMAT_QVGA_PIXELS*sizeof(uint16_t));
+
 
 const uint16_t noDepthDefault = 65535;
 const uint16_t noDepthThreshold = 2000;
@@ -272,6 +294,18 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         }
     }
 
+
+    // Saving snapshot...
+    //memcpy(pixelsDepthAcqQVGASnapshot, pixelsDepthAcqQVGA, FORMAT_QVGA_PIXELS*sizeof(uint16_t));
+    //memcpy(pixelsDepthAcqVGASnapshot, pixelsDepthAcqVGA, FORMAT_VGA_PIXELS*sizeof(uint16_t));
+    //memcpy(pixelsColorSyncVGASnapshot, pixelsColorSyncVGA, 3*FORMAT_VGA_PIXELS*sizeof(uint8_t));
+    //memcpy(pixelsColorSyncQVGASnapshot, pixelsColorSyncQVGA, 3*FORMAT_QVGA_PIXELS*sizeof(uint8_t));
+    //memcpy(pixelsColorAcqSnapshot, pixelsColorAcq, 3*nPixelsColorAcq*sizeof(uint8_t));
+    memcpy(pixelsDepthSyncSnapshot, pixelsDepthSync, nPixelsColorAcq*sizeof(uint16_t));
+    //memcpy(pixelsConfidenceQVGASnapshot, pixelsConfidenceQVGA, FORMAT_QVGA_PIXELS*sizeof(uint16_t));
+    /*
+    */
+
     g_dFrames++;
 
     gettimeofday(&timeCurrent, NULL);
@@ -286,15 +320,18 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
 uint16_t* getPixelsDepthAcqQVGA() {
     return pixelsDepthAcqQVGA;
+    //return pixelsDepthAcqQVGASnapshot;
 }
 uint16_t* getPixelsDepthAcqVGA() {
     return pixelsDepthAcqVGA;
+    //return pixelsDepthAcqVGASnapshot;
 }
 uint8_t* getPixelsColorsAcq() {
     return pixelsColorAcq;
 }
 uint16_t* getPixelsDepthSync() {
-    return pixelsDepthSync;
+    //return pixelsDepthSync;
+    return pixelsDepthSyncSnapshot;
 }
 uint8_t* getPixelsColorSyncVGA() {
     return pixelsColorSyncVGA;
@@ -304,10 +341,6 @@ uint8_t* getPixelsColorSyncQVGA() {
 }
 uint16_t* getPixelsConfidenceQVGA() {
     return pixelsConfidenceQVGA;
-}
-
-void requestSnapshot() {
-
 }
 
 int getTimeStamp() {
@@ -567,6 +600,16 @@ void capture()
 
     clockStartGrab = clock()+CLOCKS_PER_SEC*waitSecondsBeforeGrab;
 
+    /*
+    pixelsDepthAcqVGASnapshot = (uint16_t*) malloc(FORMAT_VGA_PIXELS*sizeof(uint16_t));
+    pixelsColorSyncVGASnapshot = (uint8_t*) malloc(3*FORMAT_VGA_PIXELS*sizeof(uint8_t));
+    pixelsDepthAcqQVGASnapshot = (uint16_t*) malloc(FORMAT_QVGA_PIXELS*sizeof(uint16_t));
+    pixelsColorSyncQVGASnapshot = (uint8_t*) malloc(3*FORMAT_QVGA_PIXELS*sizeof(uint8_t));
+    pixelsColorAcqSnapshot = (uint8_t*) malloc(3*nPixelsColorAcq*sizeof(uint8_t));
+    pixelsDepthSyncSnapshot = (uint16_t*) malloc(nPixelsColorAcq*sizeof(uint16_t));
+    pixelsConfidenceQVGASnapshot = (uint16_t*) malloc(FORMAT_QVGA_PIXELS*sizeof(uint16_t));
+    */
+
     g_context.startNodes();
 
     printf("Waiting %i seconds before grabbing...\n",waitSecondsBeforeGrab);
@@ -588,6 +631,14 @@ void start_capture()
 
 void stop_capture()
 {
+    free(pixelsDepthAcqVGASnapshot);
+    free(pixelsDepthAcqQVGASnapshot);
+    free(pixelsColorSyncVGASnapshot);
+    free(pixelsColorSyncQVGASnapshot);
+    free(pixelsColorAcqSnapshot);
+    free(pixelsDepthSyncSnapshot);
+    free(pixelsConfidenceQVGASnapshot);
+
     g_context.stopNodes();
 
     if (g_cnode.isSet()) g_context.unregisterNode(g_cnode);
