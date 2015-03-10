@@ -84,7 +84,7 @@ int formatResY(int resType) {
     }
 }
 
-void saveRawColorFrame(char* fileName, uint8_t* pixels, int width, int height, int timeStamp)
+void saveColorFramePNM(char* fileName, uint8_t* pixels, int width, int height, int timeStamp)
 {
     FILE *pFile=0;
     pFile = fopen(fileName,"wb");
@@ -102,7 +102,7 @@ void saveRawColorFrame(char* fileName, uint8_t* pixels, int width, int height, i
 
 
 
-void saveRawDepthFrame(char* fileName, uint16_t* pixels, int width, int height, int timeStamp)
+void saveDepthFramePNM(char* fileName, uint16_t* pixels, int width, int height, int timeStamp)
 {
     FILE *pFile=0;
     pFile = fopen(fileName,"wb");

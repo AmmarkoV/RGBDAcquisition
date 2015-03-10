@@ -301,25 +301,25 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     timeStamp = (int) (mtime);
     if (saveDepthAcqFlag) {
         sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
-        if (interpolateDepthFlag) saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcqVGA, widthVGA, heightVGA, timeStamp);
-        else saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcq, widthQVGA, heightQVGA, timeStamp);
+        if (interpolateDepthFlag) saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcqVGA, widthVGA, heightVGA, timeStamp);
+        else saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcq, widthQVGA, heightQVGA, timeStamp);
     }
     if (saveColorAcqFlag) {
         sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
-        saveRawColorFrame(fileNameColorAcq, pixelsColorAcq, widthColor, heightColor, timeStamp);
+        saveColorFramePNM(fileNameColorAcq, pixelsColorAcq, widthColor, heightColor, timeStamp);
     }
     if (saveDepthSyncFlag) {
         sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
-        saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
+        saveDepthFramePNM(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
     }
     if (saveColorSyncFlag) {
         sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-        if (interpolateColorFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
-        else saveRawColorFrame(fileNameColorSync, pixelsColorSyncQVGA, widthQVGA, heightQVGA, timeStamp);
+        if (interpolateColorFlag) saveColorFramePNM(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
+        else saveColorFramePNM(fileNameColorSync, pixelsColorSyncQVGA, widthQVGA, heightQVGA, timeStamp);
     }
     if (saveConfidenceFlag) {
         sprintf(fileNameConfidence,"%s%05u.pnm",baseNameConfidence,frameCount);
-        saveRawDepthFrame(fileNameConfidence, pixelsConfidenceQVGA, widthQVGA, heightQVGA, timeStamp);
+        saveDepthFramePNM(fileNameConfidence, pixelsConfidenceQVGA, widthQVGA, heightQVGA, timeStamp);
     }
     frameCount++;
 

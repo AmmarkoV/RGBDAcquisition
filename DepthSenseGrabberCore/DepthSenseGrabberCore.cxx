@@ -284,8 +284,8 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
 }
 
-uint16_t* getPixelsDepthAcq() {
-    return pixelsDepthAcq;
+uint16_t* getPixelsDepthAcqQVGA() {
+    return pixelsDepthAcqQVGA;
 }
 uint16_t* getPixelsDepthAcqVGA() {
     return pixelsDepthAcqVGA;
@@ -304,6 +304,10 @@ uint8_t* getPixelsColorSyncQVGA() {
 }
 uint16_t* getPixelsConfidenceQVGA() {
     return pixelsConfidenceQVGA;
+}
+
+void requestSnapshot() {
+
 }
 
 int getTimeStamp() {

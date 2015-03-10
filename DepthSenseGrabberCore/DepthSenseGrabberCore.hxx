@@ -85,7 +85,7 @@ void start_capture();
 void stop_capture();
 
 
-uint16_t* getPixelsDepthAcq();
+uint16_t* getPixelsDepthAcqQVGA();
 uint16_t* getPixelsDepthAcqVGA();
 uint8_t* getPixelsColorsAcq();
 uint16_t* getPixelsDepthSync();

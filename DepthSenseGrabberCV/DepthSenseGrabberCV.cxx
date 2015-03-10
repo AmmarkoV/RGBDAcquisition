@@ -260,19 +260,19 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
         {
             if (saveDepthRawFlag) {
                 sprintf(fileNameDepthRaw,"%s%05u.pnm",baseNameDepthRaw,frameCount);
-                saveRawDepthFrame(fileNameDepthRaw, pixelsDepthRaw, widthDepth, heightDepth, timeStamp);
+                saveDepthFramePNM(fileNameDepthRaw, pixelsDepthRaw, widthDepth, heightDepth, timeStamp);
             }
             if (saveColorRawFlag) {
                 sprintf(fileNameColorRaw,"%s%05u.pnm",baseNameColorRaw,frameCount);
-                saveRawColorFrame(fileNameColorRaw, pixelsColorRaw, widthColor, heightColor, timeStamp);
+                saveColorFramePNM(fileNameColorRaw, pixelsColorRaw, widthColor, heightColor, timeStamp);
             }
             if (saveDepthSyncFlag) {
                 sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
-                saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
+                saveDepthFramePNM(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
             }
             if (saveColorSyncFlag) {
                 sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-                saveRawColorFrame(fileNameColorSync, pixelsColorSync, widthDepth, heightDepth, timeStamp);
+                saveColorFramePNM(fileNameColorSync, pixelsColorSync, widthDepth, heightDepth, timeStamp);
             }
         }
         frameCount++;

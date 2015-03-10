@@ -22,8 +22,8 @@ FrameFormat formatName(int resType);
 int formatResX(int resType);
 int formatResY(int resType);
 
-void saveRawColorFrame(char* fileName, uint8_t* pixels, int width, int height, int timeStamp);
-void saveRawDepthFrame(char* fileName, uint16_t* pixels, int width, int height, int timeStamp);
+void saveColorFramePNM(char* fileName, uint8_t* pixels, int width, int height, int timeStamp);
+void saveDepthFramePNM(char* fileName, uint16_t* pixels, int width, int height, int timeStamp);
 
 void doubleSizeDepth(uint16_t* src, uint16_t* dst, int srcWidth, int srcHeight);
 void doubleSizeUV(UV* src, UV* dst, int srcWidth, int srcHeight);
