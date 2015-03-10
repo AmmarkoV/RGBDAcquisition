@@ -20,6 +20,7 @@
 
 #include "DepthSenseGrabberCore.hxx"
 #include "../shared/ConversionTools.hxx"
+#include "../shared/AcquisitionParameters.hxx"
 
 using namespace DepthSense;
 using namespace std;
@@ -46,55 +47,55 @@ bool saveConfidenceFlag = 0;
 int32_t  frameRateDepth = 30;
 int32_t  frameRateColor = 30;
 
-const int widthQVGA = 320, heightQVGA = 240;
-const int widthVGA = 640, heightVGA = 480;
-const int widthWXGA = 1280, heightWXGA = 720;
-const int widthNHD = 640, heightNHD = 360;
-
-const int nPixelsQVGA = widthQVGA*heightQVGA;
-const int nPixelsVGA = widthVGA*heightVGA;
-const int nPixelsWXGA = widthWXGA*heightWXGA;
-const int nPixelsNHD = widthNHD*heightNHD;
+//const int FORMAT_QVGA_WIDTH = 320, FORMAT_QVGA_HEIGHT = 240;
+//const int FORMAT_VGA_WIDTH = 640, FORMAT_VGA_HEIGHT = 480;
+//const int FORMAT_WXGA_WIDTH = 1280, FORMAT_WXGA_HEIGHT = 720;
+//const int FORMAT_NHD_WIDTH = 640, FORMAT_NHD_HEIGHT = 360;
+//
+//const int FORMAT_QVGA_PIXELS = FORMAT_QVGA_WIDTH*FORMAT_QVGA_HEIGHT;
+//const int FORMAT_VGA_PIXELS = FORMAT_VGA_WIDTH*FORMAT_VGA_HEIGHT;
+//const int FORMAT_WXGA_PIXELS = FORMAT_WXGA_WIDTH*FORMAT_WXGA_HEIGHT;
+//const int FORMAT_NHD_PIXELS = FORMAT_NHD_WIDTH*FORMAT_NHD_HEIGHT;
 
 // Acquired data
-uint16_t pixelsConfidenceQVGA[nPixelsQVGA];
-uint16_t pixelsDepthAcqQVGA[nPixelsQVGA];
-uint8_t pixelsColorAcqVGA[3*nPixelsVGA];
-uint8_t pixelsColorAcqWXGA[3*nPixelsWXGA];
-uint8_t pixelsColorAcqNHD[3*nPixelsNHD];
+uint16_t pixelsConfidenceQVGA[FORMAT_QVGA_PIXELS];
+uint16_t pixelsDepthAcqQVGA[FORMAT_QVGA_PIXELS];
+uint8_t pixelsColorAcqVGA[3*FORMAT_VGA_PIXELS];
+uint8_t pixelsColorAcqWXGA[3*FORMAT_WXGA_PIXELS];
+uint8_t pixelsColorAcqNHD[3*FORMAT_NHD_PIXELS];
 
 // UVmap-processed frames
-uint8_t pixelsColorSyncQVGA[3*nPixelsQVGA];
-uint16_t pixelsDepthSyncQVGA[nPixelsQVGA];
-uint16_t pixelsDepthSyncVGA[nPixelsVGA];
-uint16_t pixelsDepthSyncWXGA[nPixelsWXGA];
-uint16_t pixelsDepthSyncNHD[nPixelsNHD];
+uint8_t pixelsColorSyncQVGA[3*FORMAT_QVGA_PIXELS];
+uint16_t pixelsDepthSyncQVGA[FORMAT_QVGA_PIXELS];
+uint16_t pixelsDepthSyncVGA[FORMAT_VGA_PIXELS];
+uint16_t pixelsDepthSyncWXGA[FORMAT_WXGA_PIXELS];
+uint16_t pixelsDepthSyncNHD[FORMAT_NHD_PIXELS];
 
 // Interpolated frames
-uint8_t pixelsColorSyncVGA[3*nPixelsVGA];
-uint16_t pixelsDepthAcqVGA[nPixelsVGA];
+uint8_t pixelsColorSyncVGA[3*FORMAT_VGA_PIXELS];
+uint16_t pixelsDepthAcqVGA[FORMAT_VGA_PIXELS];
 
 
 FrameFormat frameFormatDepth = FRAME_FORMAT_QVGA; // Depth QVGA
-const int nPixelsDepthAcq = nPixelsQVGA;
+const int nPixelsDepthAcq = FORMAT_QVGA_PIXELS;
 uint16_t* pixelsDepthAcq = pixelsDepthAcqQVGA;
 
 
 int deltaPixelsIndAround[8] = {-641,-640,-639,-1,1,639,640,641};
-bool hasData[nPixelsVGA];
+bool hasData[FORMAT_VGA_PIXELS];
 
 // Color map configuration, comment out undesired parameters
 
 // Color VGA
 FrameFormat frameFormatColor = FRAME_FORMAT_VGA;
-const int widthColor = widthVGA, heightColor = heightVGA, nPixelsColorAcq = nPixelsVGA;
+const int widthColor = FORMAT_VGA_WIDTH, heightColor = FORMAT_VGA_HEIGHT, nPixelsColorAcq = FORMAT_VGA_PIXELS;
 uint8_t* pixelsColorAcq = pixelsColorAcqVGA;
 uint16_t* pixelsDepthSync = pixelsDepthSyncVGA;
 
 /*
 // Color WXGA
 FrameFormat frameFormatColor = FRAME_FORMAT_WXGA_H;
-const int widthColor = widthWXGA, heightColor = heightWXGA, nPixelsColorAcq = nPixelsWXGA;
+const int widthColor = FORMAT_WXGA_WIDTH, heightColor = FORMAT_WXGA_HEIGHT, nPixelsColorAcq = FORMAT_WXGA_PIXELS;
 uint8_t* pixelsColorAcq = pixelsColorAcqWXGA;
 uint16_t* pixelsDepthSync = pixelsDepthSyncWXGA;
 */
@@ -102,7 +103,7 @@ uint16_t* pixelsDepthSync = pixelsDepthSyncWXGA;
 /*
 // Color NHD
 FrameFormat frameFormatColor = FRAME_FORMAT_NHD;
-const int widthColor = widthNHD, heightColor = heightNHD, nPixelsColorAcq = nPixelsNHD;
+const int widthColor = FORMAT_NHD_WIDTH, heightColor = FORMAT_NHD_HEIGHT, nPixelsColorAcq = FORMAT_NHD_PIXELS;
 uint8_t* pixelsColorAcq = pixelsColorAcqNHD;
 uint16_t* pixelsDepthSync = pixelsDepthSyncNHD;
 */
@@ -117,14 +118,14 @@ uint8_t noDepthBGR[3] = {0,0,0};
 int colorPixelInd, colorPixelRow, colorPixelCol;
 int debugInt;
 
-UV uvMapAcq[nPixelsQVGA];
-UV uvMapVGA[nPixelsVGA];
+UV uvMapAcq[FORMAT_QVGA_PIXELS];
+UV uvMapVGA[FORMAT_VGA_PIXELS];
 
 double timeStampSeconds;
 int timeStamp;
 clock_t clockStartGrab;
 
-unsigned int frameCount;
+int frameCount = -1;
 
 Context g_context;
 DepthNode g_dnode;
@@ -139,25 +140,6 @@ bool g_bDeviceFound = false;
 
 ProjectionHelper* g_pProjHelper = NULL;
 StereoCameraParameters g_scp;
-
-char fileNameColorAcq[50];
-char fileNameDepthAcq[50];
-char fileNameColorSync[50];
-char fileNameDepthSync[50];
-char fileNameConfidence[50];
-
-char baseNameColorAcq[20] = "colorFrame_0_";
-char baseNameDepthAcq[20] = "depthAcqFrame_0_";
-char baseNameColorSync[20] = "colorSyncFrame_0_";
-char baseNameDepthSync[20] = "depthFrame_0_";
-char baseNameConfidence[30] = "depthConfidenceFrame_0_";
-
-//char baseNameColorAcq[20] = "colorAcqFrame_0_";
-//char baseNameDepthAcq[20] = "depthFrame_0_";
-//char baseNameColorSync[20] = "colorFrame_0_";
-//char baseNameDepthSync[20] = "depthAcqFrame_0_";
-//char baseNameConfidence[30] = "depthConfidenceFrame_0_";
-
 
 /*----------------------------------------------------------------------------*/
 // New audio sample event handler
@@ -230,13 +212,13 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     if (interpolateDepthFlag)
     {
-        if (saveDepthAcqFlag || interpolateDepthAcqFlag) rescaleMap(pixelsDepthAcq, pixelsDepthAcqVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
+        if (saveDepthAcqFlag || interpolateDepthAcqFlag) rescaleMap(pixelsDepthAcq, pixelsDepthAcqVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT);
         if (interpolateColorFlag) {
-          rescaleMap(uvMapAcq, uvMapVGA, widthQVGA, heightQVGA, widthVGA, heightVGA);
-          for (int currentPixelRow = 0; currentPixelRow < heightVGA; currentPixelRow++) {
-            for (int currentPixelCol = 0; currentPixelCol < widthVGA; currentPixelCol++) {
-              int currentPixelInd = currentPixelRow*widthVGA+currentPixelCol;
-              int currentPixelIndQVGA = currentPixelRow/2*widthQVGA+currentPixelCol/2;
+          rescaleMap(uvMapAcq, uvMapVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, FORMAT_VGA_WIDTH, FORMAT_VGA_HEIGHT);
+          for (int currentPixelRow = 0; currentPixelRow < FORMAT_VGA_HEIGHT; currentPixelRow++) {
+            for (int currentPixelCol = 0; currentPixelCol < FORMAT_VGA_WIDTH; currentPixelCol++) {
+              int currentPixelInd = currentPixelRow*FORMAT_VGA_WIDTH+currentPixelCol;
+              int currentPixelIndQVGA = currentPixelRow/2*FORMAT_QVGA_WIDTH+currentPixelCol/2;
               {
                   uvToColorPixelInd(uvMapVGA[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
                   if (colorPixelInd == -1 || data.confidenceMap[currentPixelIndQVGA] < confidenceThreshold) {
@@ -256,9 +238,9 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
               }
             }
           }
-          for (int currentRow = 1; currentRow < heightVGA-1; currentRow++) {
-            for (int currentCol = 1; currentCol < widthVGA-1; currentCol++) {
-              int currentPixelInd = currentRow*widthVGA+currentCol;
+          for (int currentRow = 1; currentRow < FORMAT_VGA_HEIGHT-1; currentRow++) {
+            for (int currentCol = 1; currentCol < FORMAT_VGA_WIDTH-1; currentCol++) {
+              int currentPixelInd = currentRow*FORMAT_VGA_WIDTH+currentCol;
               int countValidAround = 0;
               uint16_t depthValidAround = 0;
               if (hasData[currentPixelInd] == 0) {
@@ -278,7 +260,7 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
     }
     else
     {
-        for (int currentPixelInd = 0; currentPixelInd < nPixelsQVGA; currentPixelInd++)
+        for (int currentPixelInd = 0; currentPixelInd < FORMAT_QVGA_PIXELS; currentPixelInd++)
         {
             uvToColorPixelInd(uvMapAcq[currentPixelInd], widthColor, heightColor, &colorPixelInd, &colorPixelRow, &colorPixelCol);
             if (colorPixelInd != -1) {
@@ -292,39 +274,44 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     g_dFrames++;
 
-    //timeStamp = (int) (((float)(1000*(clock()-clockStartGrab)))/CLOCKS_PER_SEC);
-
     gettimeofday(&timeCurrent, NULL);
-    //timeStampSeconds = difftime(timeCurrent,timeStart);
     seconds  = timeCurrent.tv_sec  - timeStart.tv_sec;
     useconds = timeCurrent.tv_usec - timeStart.tv_usec;
     mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
 
     timeStamp = (int) (mtime);
-    if (saveDepthAcqFlag) {
-        sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
-        if (interpolateDepthFlag) saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcqVGA, widthVGA, heightVGA, timeStamp);
-        else saveRawDepthFrame(fileNameDepthAcq, pixelsDepthAcq, widthQVGA, heightQVGA, timeStamp);
-    }
-    if (saveColorAcqFlag) {
-        sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
-        saveRawColorFrame(fileNameColorAcq, pixelsColorAcq, widthColor, heightColor, timeStamp);
-    }
-    if (saveDepthSyncFlag) {
-        sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
-        saveRawDepthFrame(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
-    }
-    if (saveColorSyncFlag) {
-        sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-        if (interpolateColorFlag) saveRawColorFrame(fileNameColorSync, pixelsColorSyncVGA, widthVGA, heightVGA, timeStamp);
-        else saveRawColorFrame(fileNameColorSync, pixelsColorSyncQVGA, widthQVGA, heightQVGA, timeStamp);
-    }
-    if (saveConfidenceFlag) {
-        sprintf(fileNameConfidence,"%s%05u.pnm",baseNameConfidence,frameCount);
-        saveRawDepthFrame(fileNameConfidence, pixelsConfidenceQVGA, widthQVGA, heightQVGA, timeStamp);
-    }
     frameCount++;
 
+}
+
+uint16_t* getPixelsDepthAcq() {
+    return pixelsDepthAcq;
+}
+uint16_t* getPixelsDepthAcqVGA() {
+    return pixelsDepthAcqVGA;
+}
+uint8_t* getPixelsColorsAcq() {
+    return pixelsColorAcq;
+}
+uint16_t* getPixelsDepthSync() {
+    return pixelsDepthSync;
+}
+uint8_t* getPixelsColorSyncVGA() {
+    return pixelsColorSyncVGA;
+}
+uint8_t* getPixelsColorSyncQVGA() {
+    return pixelsColorSyncQVGA;
+}
+uint16_t* getPixelsConfidenceQVGA() {
+    return pixelsConfidenceQVGA;
+}
+
+int getTimeStamp() {
+    return timeStamp;
+}
+
+int getFrameCount() {
+    return frameCount;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -586,26 +573,16 @@ void capture()
 
     g_context.run();
 
-    //g_context.stopNodes();
-
-    //if (g_cnode.isSet()) g_context.unregisterNode(g_cnode);
-    //if (g_dnode.isSet()) g_context.unregisterNode(g_dnode);
-    //if (g_anode.isSet()) g_context.unregisterNode(g_anode);
-
-    //if (g_pProjHelper)
-    //    delete g_pProjHelper;
-
-    //return 0;
 }
 
 
-void start()
+void start_capture()
 {
     boost::thread capture_thread(capture);
     printf("Starting capture thread\n");
 }
 
-void stop()
+void stop_capture()
 {
     g_context.stopNodes();
 

@@ -80,6 +80,18 @@ void onDeviceDisconnected(Context context, Context::DeviceRemovedData data);
 
 void capture();
 
-void start();
+void start_capture();
 
-void stop();
+void stop_capture();
+
+
+uint16_t* getPixelsDepthAcq();
+uint16_t* getPixelsDepthAcqVGA();
+uint8_t* getPixelsColorsAcq();
+uint16_t* getPixelsDepthSync();
+uint8_t* getPixelsColorSyncVGA();
+uint8_t* getPixelsColorSyncQVGA();
+uint16_t* getPixelsConfidenceQVGA();
+int getTimeStamp();
+int getFrameCount();
+

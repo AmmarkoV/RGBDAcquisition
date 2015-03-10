@@ -13,6 +13,7 @@ add_library (DepthSenseGrabberCore SHARED
 	DepthSenseGrabberCore.hxx
 	../shared/ConversionTools.cxx
 	../shared/ConversionTools.hxx
+	../shared/AcquisitionParameters.hxx
 )
 message(${DEPTHSENSE_INCLUDE_DIR})
 
