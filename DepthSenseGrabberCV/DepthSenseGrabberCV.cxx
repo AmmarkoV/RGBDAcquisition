@@ -65,8 +65,8 @@ int frameRateColor = 30;
 
 FrameFormat frameFormatDepth = FRAME_FORMAT_QVGA; const int widthDepth = 320, heightDepth = 240; // Depth QVGA
 
-FrameFormat frameFormatColor = FRAME_FORMAT_VGA; const int widthColor = 640, heightColor= 480; // Color VGA
-//FrameFormat frameFormatColor = FRAME_FORMAT_WXGA_H; const int widthColor = 1280, heightColor= 720; // Color WXGA_H
+//FrameFormat frameFormatColor = FRAME_FORMAT_VGA; const int widthColor = 640, heightColor= 480; // Color VGA
+FrameFormat frameFormatColor = FRAME_FORMAT_WXGA_H; const int widthColor = 1280, heightColor= 720; // Color WXGA_H
 //FrameFormat frameFormatColor = FRAME_FORMAT_NHD; const int widthColor = 640, heightColor= 360; // Color NHD
 
 

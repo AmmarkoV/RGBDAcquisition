@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -29,41 +28,39 @@ int main(int argc, char* argv[])
     int flagExportType = FILETYPE_JPG; // FILETYPE_NONE, FILETYPE_JPG or FILETYPE_PNM
 
     int divideDepthBrightnessCV = 6;
-    int divideConfidenceBrightnessCV = 1;
+    int divideConfidenceBrightnessCV = 2;
 
     bool interpolateDepthFlag = 1;
-    bool interpolateDepthAcqFlag = 0;
-    bool interpolateColorFlag = 1;
 
-    bool dispColorAcqFlag = 1;
-    bool dispDepthAcqFlag = 0;
-    bool dispColorSyncFlag = 1;
-    bool dispDepthSyncFlag = 1;
-    bool dispConfidenceFlag = 0;
+    bool dispColorAcqFlag   = 1;
+    bool dispDepthAcqFlag   = 1;
+    bool dispColorSyncFlag  = 1;
+    bool dispDepthSyncFlag  = 1;
+    bool dispConfidenceFlag = 1;
 
-    bool saveColorAcqFlag = 1;
-    bool saveDepthAcqFlag = 1;
-    bool saveColorSyncFlag = 1;
-    bool saveDepthSyncFlag = 1;
+    bool saveColorAcqFlag   = 0;
+    bool saveDepthAcqFlag   = 0;
+    bool saveColorSyncFlag  = 0;
+    bool saveDepthSyncFlag  = 0;
     bool saveConfidenceFlag = 0;
 
-    int flagColorFormat = FORMAT_VGA_ID; //QVGA, VGA, WXGA or NHD
+    bool buildColorSyncFlag = dispColorSyncFlag || saveColorSyncFlag;
+    bool buildDepthSyncFlag = dispDepthSyncFlag || saveDepthSyncFlag;
+    bool buildConfidenceFlag = dispConfidenceFlag || saveConfidenceFlag;
+
+    int flagColorFormat = FORMAT_VGA_ID; // VGA, WXGA or NHD
 
     int widthColor, heightColor;
     switch (flagColorFormat) {
-        case FORMAT_QVGA_ID:
-            widthColor = FORMAT_QVGA_WIDTH;
-            heightColor = FORMAT_QVGA_HEIGHT;
-            break;
         case FORMAT_VGA_ID:
             widthColor = FORMAT_VGA_WIDTH;
             heightColor = FORMAT_VGA_HEIGHT;
             break;
-        case FORMAT_WXGA_HEIGHT:
+        case FORMAT_WXGA_ID:
             widthColor = FORMAT_WXGA_WIDTH;
             heightColor = FORMAT_WXGA_HEIGHT;
             break;
-        case FORMAT_NHD_HEIGHT:
+        case FORMAT_NHD_ID:
             widthColor = FORMAT_NHD_WIDTH;
             heightColor = FORMAT_NHD_HEIGHT;
             break;
@@ -93,7 +90,9 @@ int main(int argc, char* argv[])
     char baseNameDepthSync[20] = "depthFrame_0_";
     char baseNameConfidence[30] = "depthConfidenceFrame_0_";
 
-    start_capture();
+    start_capture(flagColorFormat,
+                  interpolateDepthFlag,
+                  buildColorSyncFlag, buildDepthSyncFlag, buildConfidenceFlag);
 
     uint16_t* pixelsDepthAcq;
     uint8_t* pixelsColorSync;
@@ -128,7 +127,6 @@ int main(int argc, char* argv[])
         printf("Unable to create color image buffer\n");
         exit(0);
     }
-
     // QVGA format depth image
     cv_depthAcqImage=cvCreateImage(cv_szDepthAcq,IPL_DEPTH_8U,1);
     if (cv_depthAcqImage==NULL)
@@ -136,7 +134,6 @@ int main(int argc, char* argv[])
         printf("Unable to create depth image buffer\n");
         exit(0);
     }
-
     // QVGA format depth color image
     cv_depthSyncImage=cvCreateImage(cv_szDepthSync,IPL_DEPTH_8U,1);
     if (cv_depthSyncImage==NULL)
@@ -144,7 +141,6 @@ int main(int argc, char* argv[])
         printf("Unable to create depth color image buffer\n");
         exit(0);
     }
-
     // QVGA format depth color image
     cv_colorSyncImage=cvCreateImage(cv_szColorSync,IPL_DEPTH_8U,3);
     if (cv_colorSyncImage==NULL)
@@ -152,7 +148,6 @@ int main(int argc, char* argv[])
         printf("Unable to create color depth image buffer\n");
         exit(0);
     }
-
     // QVGA format confidence image
     cv_confidenceImage=cvCreateImage(cv_szConfidence,IPL_DEPTH_8U,1);
     if (cv_confidenceImage==NULL)
@@ -160,7 +155,6 @@ int main(int argc, char* argv[])
         printf("Unable to create confidence image buffer\n");
         exit(0);
     }
-
     // Empty image
     cv_emptyImage=cvCreateImage(cv_szColorSync,IPL_DEPTH_8U,1);
     if (cv_emptyImage==NULL)
@@ -168,9 +162,6 @@ int main(int argc, char* argv[])
         printf("Unable to create empty image buffer\n");
         exit(0);
     }
-
-
-
 
 
     int frameCountPrevious = -1;
@@ -181,13 +172,11 @@ int main(int argc, char* argv[])
             frameCountPrevious = frameCount;
             printf("%d\n", frameCount);
 
-
             int countDepth = 0;
             for (int i=0; i<heightDepthAcq; i++) {
                 for (int j=0; j<widthDepthAcq; j++) {
                     if (dispDepthAcqFlag || (saveDepthAcqFlag && (flagExportType == FILETYPE_JPG))) {
                         cvSet2D(cv_depthAcqImage,i,j,cvScalar(pixelsDepthAcq[countDepth]/divideDepthBrightnessCV));
-                        //cvSet2D(cv_depthSyncImage,i,j,cvScalar(pixelsDepthSync[countDepth]/divideDepthBrightnessCV));
                     }
                     if (dispColorSyncFlag || (saveColorSyncFlag && (flagExportType == FILETYPE_JPG))) {
                         cvSet2D(cv_colorSyncImage,i,j,cvScalar(pixelsColorSync[3*countDepth+2],pixelsColorSync[3*countDepth+1],pixelsColorSync[3*countDepth])); //BGR format
@@ -227,25 +216,49 @@ int main(int argc, char* argv[])
             if (dispColorAcqFlag+dispColorSyncFlag+dispDepthAcqFlag+dispDepthSyncFlag+dispConfidenceFlag == 0)
                 cvShowImage("Empty",cv_emptyImage);
 
-            if (saveDepthAcqFlag) {
-                sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
-                saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcq, widthDepthAcq, heightDepthAcq, timeStamp);
-            }
-            if (saveColorAcqFlag) {
-                sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
-                saveColorFramePNM(fileNameColorAcq, pixelsColorAcq, widthColor, heightColor, timeStamp);
-            }
-            if (saveDepthSyncFlag) {
-                sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
-                saveDepthFramePNM(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
-            }
-            if (saveColorSyncFlag) {
-                sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
-                saveColorFramePNM(fileNameColorSync, pixelsColorSync, widthDepthAcq, heightDepthAcq, timeStamp);
-            }
-            if (saveConfidenceFlag) {
-                sprintf(fileNameConfidence,"%s%05u.pnm",baseNameConfidence,frameCount);
-                saveDepthFramePNM(fileNameConfidence, pixelsConfidenceQVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, timeStamp);
+            if (flagExportType == FILETYPE_JPG)
+            {
+                if (saveDepthAcqFlag) {
+                    sprintf(fileNameDepthAcq,"%s%05u.jpg",baseNameDepthAcq,frameCount);
+                    cvSaveImage(fileNameDepthAcq,cv_depthAcqImage);
+                }
+                if (saveColorAcqFlag) {
+                    sprintf(fileNameColorAcq,"%s%05u.jpg",baseNameColorAcq,frameCount);
+                    cvSaveImage(fileNameColorAcq,cv_colorAcqImage);
+                }
+                if (saveDepthSyncFlag) {
+                    sprintf(fileNameDepthSync,"%s%05u.jpg",baseNameDepthSync,frameCount);
+                    cvSaveImage(fileNameDepthSync,cv_depthSyncImage);
+                }
+                if (saveColorSyncFlag) {
+                    sprintf(fileNameColorSync,"%s%05u.jpg",baseNameColorSync,frameCount);
+                    cvSaveImage(fileNameColorSync,cv_colorSyncImage);
+                }
+                if (saveConfidenceFlag) {
+                    sprintf(fileNameConfidence,"%s%05u.jpg",baseNameConfidence,frameCount);
+                    cvSaveImage(fileNameConfidence,cv_confidenceImage);
+                }
+            } else if (flagExportType == FILETYPE_PNM) {
+                if (saveDepthAcqFlag) {
+                    sprintf(fileNameDepthAcq,"%s%05u.pnm",baseNameDepthAcq,frameCount);
+                    saveDepthFramePNM(fileNameDepthAcq, pixelsDepthAcq, widthDepthAcq, heightDepthAcq, timeStamp);
+                }
+                if (saveColorAcqFlag) {
+                    sprintf(fileNameColorAcq,"%s%05u.pnm",baseNameColorAcq,frameCount);
+                    saveColorFramePNM(fileNameColorAcq, pixelsColorAcq, widthColor, heightColor, timeStamp);
+                }
+                if (saveDepthSyncFlag) {
+                    sprintf(fileNameDepthSync,"%s%05u.pnm",baseNameDepthSync,frameCount);
+                    saveDepthFramePNM(fileNameDepthSync, pixelsDepthSync, widthColor, heightColor, timeStamp);
+                }
+                if (saveColorSyncFlag) {
+                    sprintf(fileNameColorSync,"%s%05u.pnm",baseNameColorSync,frameCount);
+                    saveColorFramePNM(fileNameColorSync, pixelsColorSync, widthDepthAcq, heightDepthAcq, timeStamp);
+                }
+                if (saveConfidenceFlag) {
+                    sprintf(fileNameConfidence,"%s%05u.pnm",baseNameConfidence,frameCount);
+                    saveDepthFramePNM(fileNameConfidence, pixelsConfidenceQVGA, FORMAT_QVGA_WIDTH, FORMAT_QVGA_HEIGHT, timeStamp);
+                }
             }
 
             char key = cvWaitKey(10);

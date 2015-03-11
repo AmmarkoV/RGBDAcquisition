@@ -25,32 +25,30 @@ int main(int argc, char* argv[])
 {
 
     bool interpolateDepthFlag = 1;
-    bool interpolateDepthAcqFlag = 0;
-    bool interpolateColorFlag = 1;
 
-    bool saveColorAcqFlag = 1;
-    bool saveDepthAcqFlag = 0;
-    bool saveColorSyncFlag = 0;
-    bool saveDepthSyncFlag = 1;
-    bool saveConfidenceFlag = 0;
+    bool saveColorAcqFlag   = 1;
+    bool saveDepthAcqFlag   = 1;
+    bool saveColorSyncFlag  = 1;
+    bool saveDepthSyncFlag  = 1;
+    bool saveConfidenceFlag = 1;
 
-    int flagColorFormat = FORMAT_VGA_ID; // QVGA, VGA, WXGA or NHD
+    bool buildColorSyncFlag = saveColorSyncFlag;
+    bool buildDepthSyncFlag = saveDepthSyncFlag;
+    bool buildConfidenceFlag = saveConfidenceFlag;
+
+    int flagColorFormat = FORMAT_VGA_ID; // VGA, WXGA or NHD
 
     int widthColor, heightColor;
     switch (flagColorFormat) {
-        case FORMAT_QVGA_ID:
-            widthColor = FORMAT_QVGA_WIDTH;
-            heightColor = FORMAT_QVGA_HEIGHT;
-            break;
         case FORMAT_VGA_ID:
             widthColor = FORMAT_VGA_WIDTH;
             heightColor = FORMAT_VGA_HEIGHT;
             break;
-        case FORMAT_WXGA_HEIGHT:
+        case FORMAT_WXGA_ID:
             widthColor = FORMAT_WXGA_WIDTH;
             heightColor = FORMAT_WXGA_HEIGHT;
             break;
-        case FORMAT_NHD_HEIGHT:
+        case FORMAT_NHD_ID:
             widthColor = FORMAT_NHD_WIDTH;
             heightColor = FORMAT_NHD_HEIGHT;
             break;
@@ -81,7 +79,9 @@ int main(int argc, char* argv[])
     char baseNameDepthSync[20] = "depthFrame_0_";
     char baseNameConfidence[30] = "depthConfidenceFrame_0_";
 
-    start_capture();
+    start_capture(flagColorFormat,
+                  interpolateDepthFlag,
+                  buildColorSyncFlag, buildDepthSyncFlag, buildConfidenceFlag);
 
     uint16_t* pixelsDepthAcq;
     uint8_t* pixelsColorSync;

@@ -1,3 +1,6 @@
+#ifndef SHARED_CONVERSIONTOOLS_H_
+#define SHARED_CONVERSIONTOOLS_H_
+
 #ifdef _MSC_VER
 #include <windows.h>
 #endif
@@ -35,3 +38,5 @@ void rescaleMap(UV* src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int
 void rescaleMap(DepthSense::Pointer<DepthSense::UV> src, UV* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
 void rescaleMap(FPVertex* src, FPVertex* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight);
 void rescaleMap(const short int* src, uint16_t* dst, int srcWidth, int srcHeight, int dstWidth, int dstHeight, uint16_t* confidenceMap, uint16_t confidenceMin, uint16_t noDepthValue);
+
+#endif // SHARED_CONVERSIONTOOLS_H_

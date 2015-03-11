@@ -10,4 +10,4 @@ add_executable (DepthSenseGrabberOpenCV
 	../shared/ConversionTools.hxx
 )
 
-target_link_libraries (DepthSenseGrabberOpenCV DepthSenseGrabberCore ${OpenCV_LIBS})
+target_link_libraries (DepthSenseGrabberOpenCV DepthSenseGrabberCore ${OpenCV_LIBS} boost_system)

@@ -1,3 +1,6 @@
+#ifndef DEPTHSENSEGRABBERCORE_DEPTHSENSEGRABBERCORE_H_
+#define DEPTHSENSEGRABBERCORE_DEPTHSENSEGRABBERCORE_H_
+
 #ifdef _MSC_VER
 #include <windows.h>
 #endif
@@ -9,6 +12,8 @@
 #include <exception>
 
 #include <DepthSense.hxx>
+#include "../shared/AcquisitionParameters.hxx"
+
 
 using namespace DepthSense;
 using namespace std;
@@ -80,7 +85,10 @@ void onDeviceDisconnected(Context context, Context::DeviceRemovedData data);
 
 void capture();
 
-void start_capture();
+void start_capture(int flagColorFormat = FRAME_FORMAT_VGA,
+                   bool interpolateDepthFlag_in = true,
+                   bool buildColorSyncFlag_in = true, bool buildDepthSyncFlag_in = true,
+                   bool buildConfidenceFlag_in = true);
 
 void stop_capture();
 
@@ -94,4 +102,6 @@ uint8_t* getPixelsColorSyncQVGA();
 uint16_t* getPixelsConfidenceQVGA();
 int getTimeStamp();
 int getFrameCount();
+
+#endif // DEPTHSENSEGRABBERCORE_DEPTHSENSEGRABBERCORE_H_
 
