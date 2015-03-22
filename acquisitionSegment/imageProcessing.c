@@ -404,5 +404,38 @@ unsigned int countDepths(unsigned short *  depth, unsigned int imageWidth , unsi
 }
 
 
+int cutFurtherThanDepth(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                        unsigned maxDepth )
+{
+
+  if (frame==0)  { return 0; }
+  if ( (width==0)||(height==0) ) { return 0; }
+  if ( (frameWidth==0)||(frameWidth==0) ) { return 0; }
+
+  if (sX>=frameWidth) { return 0; }
+  if (sY>=frameHeight) { return 0;  }
+
+  //Check for bounds -----------------------------------------
+  if (sX+width>=frameWidth) { width=frameWidth-sX;  }
+  if (sY+height>=frameHeight) { height=frameHeight-sY;  }
+  //----------------------------------------------------------
+
+
+  unsigned short * sourcePTR      = frame+ MEMPLACE1(sX,sY,frameWidth);
+  unsigned short * sourceLimitPTR = frame+ MEMPLACE1((sX+width),(sY+height),frameWidth);
+  unsigned short sourceLineSkip = (frameWidth-width)  ;
+
+  while (sourcePTR < sourceLimitPTR)
+  {
+    if (*sourcePTR>=maxDepth)
+         { *sourcePTR=0; }
+
+    ++sourcePTR;
+  }
+
+   return 1;
+}
+
 
 

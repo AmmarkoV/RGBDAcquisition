@@ -28,6 +28,13 @@
         (a)[2] = (b)[2] - (c)[2];
 
 
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 float  angleOfNormals(float * p1, float * p2);
 
 void crossProductFrom3Points(float * p1 , float * p2  , float * p3  , float * normal);
@@ -64,5 +71,15 @@ unsigned int countDepths(unsigned short *  depth, unsigned int imageWidth , unsi
 int selectVolume(unsigned char * selection ,
                  unsigned short * depthFrame , unsigned int frameWidth , unsigned int frameHeight ,
                  unsigned int sX,unsigned int sY , float sensitivity );
+
+
+int cutFurtherThanDepth(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
+                        unsigned maxDepth );
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // IMAGEPROCESSING_H_INCLUDED
