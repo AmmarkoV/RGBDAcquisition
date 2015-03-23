@@ -95,10 +95,26 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TextureLoader/texture_loader.h" />
-		<Unit filename="TrajectoryParser/InputParser_C.cpp" />
+		<Unit filename="TrajectoryParser/InputParser_C.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TrajectoryParser/InputParser_C.h" />
-		<Unit filename="TrajectoryParser/TrajectoryParser.cpp" />
+		<Unit filename="TrajectoryParser/TrajectoryCalculator.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TrajectoryParser/TrajectoryCalculator.h" />
+		<Unit filename="TrajectoryParser/TrajectoryParser.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="TrajectoryParser/TrajectoryParser.h" />
+		<Unit filename="TrajectoryParser/TrajectoryParserDataStructures.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TrajectoryParser/TrajectoryParserDataStructures.h" />
+		<Unit filename="TrajectoryParser/TrajectoryPrimitives.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TrajectoryParser/TrajectoryPrimitives.h" />
 		<Unit filename="glx.c">
 			<Option compilerVar="CC" />
 		</Unit>

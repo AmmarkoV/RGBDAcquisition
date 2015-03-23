@@ -55,7 +55,7 @@ int main(int argc, char **argv)
   for (i=0; i<argc; i++)
   {
 
-    if (strcmp(argv[i],"-test")==0) { doTest(); exit(0); } else
+    if (strcmp(argv[i],"-test")==0) { /*doTest(); exit(0);*/ } else
     if (strcmp(argv[i],"-intrinsics")==0) {
                                            if (i+8<argc) {
                                                           int z=0;

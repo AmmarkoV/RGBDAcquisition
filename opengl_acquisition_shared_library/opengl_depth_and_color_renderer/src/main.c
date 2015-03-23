@@ -27,6 +27,7 @@
 
 #include "OGLRendererSandbox.h"
 
+#define OPTIMIZE_DEPTH_EXTRACTION 1
 #define FLIP_OPEN_GL_IMAGES 1
 #define REAL_DEPTH 1
 
@@ -148,6 +149,13 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
          for ( xp=0 ; xp<width; xp++)
             {
                 float tmpF=zbuffer[yp*width+xp];
+
+                #if OPTIMIZE_DEPTH_EXTRACTION
+                if (tmpF==0)
+                {
+                  //Do nothing , fast path
+                } else
+                #endif // OPTIMIZE_DEPTH_EXTRACTION
                 if (tmpF<depth_scale)
                 {
                  gluUnProject((double) xp , (double) yp, (double) tmpF , modelview, projection, viewport, &posX, &posY, &posZ);
