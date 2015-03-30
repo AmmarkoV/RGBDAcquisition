@@ -16,3 +16,4 @@ add_executable (DepthSenseGrabberSO
 message(${DEPTHSENSE_INCLUDE_DIR})
 
 target_link_libraries (DepthSenseGrabberSO ${DEPTHSENSE_LIBRARIES})
+#target_link_libraries (DepthSenseGrabberSO ${DEPTHSENSE_LIBRARIES} boost_system boost_thread)
