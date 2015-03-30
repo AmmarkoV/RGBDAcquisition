@@ -9,8 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/shared/cmake/Mod
 find_package(DepthSense REQUIRED)
 include_directories(${DEPTHSENSE_INCLUDE_DIR})
 
-#find_package(Boost 1.46.0 REQUIRED)
-find_package(Boost 1.46.0 REQUIRED COMPONENTS system thread)
+find_package(Boost 1.46.0 COMPONENTS system thread REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 

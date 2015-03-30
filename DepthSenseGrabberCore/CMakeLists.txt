@@ -18,7 +18,5 @@ GENERATE_EXPORT_HEADER( DepthSenseGrabberCore
              STATIC_DEFINE DepthSenseGrabberCore_BUILT_AS_STATIC
 )
 
-#target_link_libraries (DepthSenseGrabberCore ${DEPTHSENSE_LIBRARIES} boost_system boost_thread)
-#target_link_libraries (DepthSenseGrabberCore ${DEPTHSENSE_LIBRARIES})
 target_link_libraries (DepthSenseGrabberCore ${DEPTHSENSE_LIBRARIES} ${Boost_LIBRARIES})
 
