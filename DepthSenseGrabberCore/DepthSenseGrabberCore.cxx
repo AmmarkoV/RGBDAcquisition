@@ -4,25 +4,12 @@
 #ifdef _MSC_VER
 #include <windows.h>
 #endif
-/*
-#ifdef _WIN32
-#ifdef DEPTHSENSEGRABBERCORE_EXPORTS
-#    define DEPTHSENSEGRABBERCORE_API __declspec(dllexport)
-#else
-#    define DEPTHSENSEGRABBERCORE_API __declspec(dllimport)
-#endif
-#else
-#	define DEPTHSENSEGRABBERCORE_API
-#endif // WIN32
-*/
 
 #include <stdio.h>
 #include <time.h>
 
 #include <boost/thread.hpp>
 
-//#include <sys/time.h>
-//#include <unistd.h>
 #include <chrono>
 
 #include <vector>
@@ -37,9 +24,8 @@
 using namespace DepthSense;
 using namespace std;
 
-struct timeval timeStart, timeCurrent;
 long seconds, useconds;
-std::chrono::high_resolution_clock::time_point timeStart_hr, timeCurrent_hr;
+std::chrono::high_resolution_clock::time_point timeStart, timeCurrent;
 
 //bool flagTakingSnapshot = 0;
 
@@ -274,12 +260,8 @@ void onNewDepthSample(DepthNode node, DepthNode::NewSampleReceivedData data)
 
     g_dFrames++;
 
-    //gettimeofday(&timeCurrent, NULL);
-	//seconds = timeCurrent.tv_sec - timeStart.tv_sec;
-	//useconds = timeCurrent.tv_usec - timeStart.tv_usec;
-	//timeStamp = (int)(seconds * 1000 + useconds / 1000.0 + 0.5);
-	timeCurrent_hr = std::chrono::high_resolution_clock::now();
-	timeStamp = (int) std::chrono::duration_cast<std::chrono::milliseconds>(timeCurrent_hr - timeStart_hr).count();
+	timeCurrent = std::chrono::high_resolution_clock::now();
+	timeStamp = (int) std::chrono::duration_cast<std::chrono::milliseconds>(timeCurrent - timeStart).count();
 
     frameCount++;
 
@@ -575,8 +557,7 @@ void capture()
     while (clock() < clockStartGrab);
     printf("Now grabbing!\n");
 
-	//gettimeofday(&timeStart, NULL);
-	timeStart_hr = std::chrono::high_resolution_clock::now();
+	timeStart = std::chrono::high_resolution_clock::now();
 
     g_context.run();
 
