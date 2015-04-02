@@ -1,8 +1,8 @@
 project( PointsDistance ) 
 cmake_minimum_required( VERSION 2.8.7 )  
 
-add_library(PointsDistance STATIC pointsDistance.c  ) 
-#target_link_libraries(OperatingSystem rt ) 
+add_executable(PointsDistance pointsDistance.c  ) 
+target_link_libraries(PointsDistance rt  m ) 
  
 
 set_target_properties(PointsDistance PROPERTIES 
