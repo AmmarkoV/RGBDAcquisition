@@ -13,7 +13,7 @@ function getStatistics
 
 if [ "$#" -ne 3 ]; then
     echo "Illegal groundTruth fileA fileB"
-    echo "groundTruth , fileA and fileB should look like itemID X Y Z<newline>"
+    echo "groundTruth , fileA and fileB should look like itemID timestamp X Y Z<newline>"
     exit 2
 fi
 

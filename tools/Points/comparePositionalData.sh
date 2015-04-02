@@ -7,7 +7,7 @@ function getStatistics
  
 if [ "$#" -ne 3 ]; then
     echo "Illegal number of parameters , should be 3 fileA fileB itemID"
-    echo "fileA and fileB should look like itemID X Y Z<newline>"
+    echo "fileA and fileB should look like itemID timestamp X Y Z<newline>"
     exit 2
 fi
  
@@ -21,8 +21,8 @@ mkdir Tmp  &> /dev/null
 OUTPUT_IMAGE="Results/$3$2.png" 
 MOVEMENT_FILE="Results/distance$3$2.dat" 
 
-cat $1 | grep $3 | cut -d ' ' -f2,3,4 > Tmp/fileAPos.dat
-cat $2 | grep $3 | cut -d ' ' -f2,3,4 > Tmp/fileBPos.dat
+cat $1 | grep $3 | cut -d ' ' -f3,4,5 > Tmp/fileAPos.dat
+cat $2 | grep $3 | cut -d ' ' -f3,4,5 > Tmp/fileBPos.dat
 rm $MOVEMENT_FILE  &> /dev/null
 
 echo "Comparing ID $3 of $1 to $2" 
