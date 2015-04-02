@@ -3,6 +3,13 @@
 
 OBJNUM="16"
 
+function getStatistics 
+{ #use R to generate statistics
+  R -q -e "x <- read.csv('$1', header = F); summary(x); sd(x[ , 1])" > $2
+  cat $1 | wc -l >> $2 
+}  
+ 
+
 
 if [ "$#" -ne 3 ]; then
     echo "Illegal groundTruth fileA fileB"
@@ -15,14 +22,24 @@ fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+rm Tmp/sumA.dat
+rm Tmp/sumB.dat
 
 count=0
 while [ $count -le $OBJNUM ]
 do
-    ./comparePositionalData.sh $1 $2 "O$count"P0 
-    ./comparePositionalData.sh $1 $3 "O$count"P0 
+    IDNAME="O$count"P0
+
+    ./comparePositionalData.sh $1 $2 $IDNAME 
+    cat Results/distance$IDNAME$2.dat >>Tmp/sumA.dat 
+    ./comparePositionalData.sh $1 $3 $IDNAME 
+    cat Results/distance$IDNAME$3.dat >>Tmp/sumB.dat 
     (( count++ ))
 done
+
+
+getStatistics Tmp/sumA.dat Results/global$2-stats.txt
+getStatistics Tmp/sumB.dat Results/global$3-stats.txt
 
 
 
