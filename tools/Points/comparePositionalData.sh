@@ -15,15 +15,15 @@ fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
-mkdir Results
-mkdir Tmp
+mkdir Results &> /dev/null
+mkdir Tmp  &> /dev/null
 
 OUTPUT_IMAGE="Results/$3$2.png" 
 MOVEMENT_FILE="Results/distance$3$2.dat" 
 
 cat $1 | grep $3 | cut -d ' ' -f2,3,4 > Tmp/fileAPos.dat
 cat $2 | grep $3 | cut -d ' ' -f2,3,4 > Tmp/fileBPos.dat
-rm Results/$MOVEMENT_FILE 
+rm $MOVEMENT_FILE  &> /dev/null
 
 echo "Comparing ID $3 of $1 to $2" 
 
