@@ -39,8 +39,13 @@ done
 
 
 getStatistics Tmp/sumA.dat Results/global$2-stats.txt
-getStatistics Tmp/sumB.dat Results/global$3-stats.txt
+GNUPLOT_CMD="set terminal png; set output \"global$2.png\"; set ylabel \"Distance(mm)\"; plot \"Tmp/sumA.dat\"  with lines  title \"Movement Analysis, $2\""
+gnuplot -e "$GNUPLOT_CMD"
 
+
+getStatistics Tmp/sumB.dat Results/global$3-stats.txt
+GNUPLOT_CMD="set terminal png; set output \"global$3.png\"; set ylabel \"Distance(mm)\"; plot \"Tmp/sumB.dat\"  with lines  title \"Movement Analysis, $3\""
+gnuplot -e "$GNUPLOT_CMD"
 
 
 exit 0
