@@ -46,6 +46,16 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 
 
 /**
+ * @brief Perform Slerp function ( mix , smooth ) 2 quaternions
+ * @ingroup quaternions
+ * @param Output Quaternion
+ * @param Input Quaternion A
+ * @param Input Quaternion B
+ * @param Factor , typically should be 0.5 for half and half
+ */
+void quaternionSlerp(double * qOut, double * q0,double * q1,double t);
+
+/**
  * @brief Normalize Quaternion
  * @ingroup quaternions
  * @param
@@ -56,6 +66,9 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
  * @retval 1=Success/0=Failure
  */
 int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW);
+
+
+
 
 
 /**

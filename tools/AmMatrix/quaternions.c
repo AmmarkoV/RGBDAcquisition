@@ -140,6 +140,32 @@ void quaternions2Euler(double * euler,double * quaternions,int quaternionConvent
 }
 
 
+void quaternionSlerp(double * qOut, double * q0,double * q1,double t)
+{
+ double product = (q0[0]*q1[0]) + (q0[1]*q1[1]) + (q0[2]*q1[2]) + (q0[3]*q1[3]); // -1,1)
+ if (product<-1.0) { product=-1.0;} else
+ if (product> 1.0) { product= 1.0;}
+
+ double omega = acos(product);
+ double absOmega = omega;
+ if (absOmega<0.0) { absOmega=-1*absOmega; }
+ if (absOmega < 1e-10)
+    { if (omega<0.0) { omega = -1 * 1e-10; } else
+                     { omega = 1e-10; }
+    }
+
+
+  double som = sin(omega);
+  double st0 = sin((1-t) * omega) / som;
+  double st1 = sin(t * omega) / som;
+
+  qOut[0] = q0[0]*st0 + q1[0]*st1;
+  qOut[1] = q0[1]*st0 + q1[1]*st1;
+  qOut[2] = q0[2]*st0 + q1[2]*st1;
+  qOut[3] = q0[3]*st0 + q1[3]*st1;
+
+ return;
+}
 
 int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW)
 {
