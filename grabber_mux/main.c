@@ -142,19 +142,32 @@ int main(int argc, char *argv[])
                                            //Transparency 0 = no transparency , transparency 100 = full transparency
                                            fprintf(stderr,"Setting transparency to %u \n",transparency);
                                          } else
-    if (strcmp(argv[i],"-module1")==0)    {
+    if (
+        (strcmp(argv[i],"-module1")==0) ||
+        (strcmp(argv[i],"-moduleBase")==0)
+       )
+                                         {
                                            moduleID_1 = getModuleIdFromModuleName(argv[i+1]); // //Module 1 is Base
                                            fprintf(stderr,"Overriding Module 1 Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID_1),moduleID_1);
                                          } else
-    if (strcmp(argv[i],"-module2")==0)   {
+    if (
+        (strcmp(argv[i],"-module2")==0) ||
+        (strcmp(argv[i],"-moduleOverlay")==0)
+       )                                 {
                                            moduleID_2 = getModuleIdFromModuleName(argv[i+1]); //Module 2 is Overlay
                                            fprintf(stderr,"Overriding Module 2 Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID_2),moduleID_2);
                                          } else
-    if (strcmp(argv[i],"-dev1")==0)      {
+    if (
+        (strcmp(argv[i],"-dev1")==0) ||
+        (strcmp(argv[i],"-devBase")==0)
+       )                                 {
                                            devID_1 = atoi(argv[i+1]);
                                            fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID_1);
                                          } else
-    if (strcmp(argv[i],"-dev2")==0)      {
+    if (
+        (strcmp(argv[i],"-dev2")==0) ||
+        (strcmp(argv[i],"-devOverlay")==0)
+       )                                 {
                                            devID_2 = atoi(argv[i+1]);
                                            fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID_2);
                                          } else
