@@ -67,6 +67,7 @@ enum
 volatile int stop=0;
 unsigned char warnNoDepth=0,verbose=0;
 
+unsigned int moveWindowX=0,moveWindowY=0,doMoveWindow=0;
 unsigned int windowX=0,windowY=0;
 unsigned int drawColor=1;
 unsigned int drawDepth=1;
@@ -171,7 +172,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 
 
 
-
+    unsigned int colorWidth = 640;
     unsigned int width , height , channels , bitsperpixel;
 
 
@@ -180,6 +181,7 @@ if (drawColor)
     //DRAW RGB FRAME -------------------------------------------------------------------------------------
     if ( acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) )
     {
+     colorWidth = width;
      IplImage  *imageRGB = cvCreateImage( cvSize(width , height), IPL_DEPTH_8U ,channels);
      IplImage  *imageViewableBGR = cvCreateImage( cvSize(width , height), IPL_DEPTH_8U ,channels);
      if (imageRGB==0) { fprintf(stderr,"Could not create a new RGB OpenCV Image\n");  return 0; }
@@ -203,6 +205,9 @@ if (drawColor)
           {
             cvShowImage(RGBwindowName,imageViewableBGR);
           }
+
+        if (doMoveWindow)
+          {  cvMoveWindow(RGBwindowName,moveWindowX,moveWindowY); }
 
       } else
       {
@@ -240,6 +245,14 @@ if (drawDepth)
             {
               cvShowImage(DepthwindowName, rdepth8);
             }
+
+
+        if (doMoveWindow)
+          {
+             unsigned int depthWindowX=windowX;
+             if (depthWindowX==0) { depthWindowX=colorWidth; }
+              cvMoveWindow(DepthwindowName,moveWindowX+depthWindowX,moveWindowY); }
+
        cvReleaseImage( &rdepth8 );
       } else
       {
@@ -282,7 +295,13 @@ int main(int argc, char *argv[])
                                              height=atoi(argv[i+2]);
                                              fprintf(stderr,"Resolution set to %u x %u \n",width,height);
                                            } else
-    if (strcmp(argv[i],"-window")==0) {
+    if (strcmp(argv[i],"-moveWindow")==0) {
+                                           moveWindowX=atoi(argv[i+1]);
+                                           moveWindowY=atoi(argv[i+2]);
+                                           doMoveWindow=1;
+                                           fprintf(stderr,"Setting window position to %u %u\n",moveWindowX,moveWindowY);
+                                         } else
+    if (strcmp(argv[i],"-resizeWindow")==0) {
                                              windowX=atoi(argv[i+1]);
                                              windowY=atoi(argv[i+2]);
                                              fprintf(stderr,"Window Sizes set to %u x %u \n",windowX,windowY);
