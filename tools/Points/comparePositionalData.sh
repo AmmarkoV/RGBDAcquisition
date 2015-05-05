@@ -36,6 +36,6 @@ gnuplot -e "$GNUPLOT_CMD"
 
 getStatistics $MOVEMENT_FILE Results/$3$2-stats.txt
 
-echo "done."
+#echo "done."
 
 exit 0
