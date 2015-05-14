@@ -253,7 +253,8 @@ void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,
    unsigned int type=0;
    if (strcmp(extension,"pnm")==0) { type=PNM_CODEC; } else
    if (strcmp(extension,"png")==0) { type=PNG_CODEC; } else
-   if (strcmp(extension,"jpg")==0) { type=JPG_CODEC; }
+   if (strcmp(extension,"jpg")==0) { type=JPG_CODEC; } else
+   if (strcmp(extension,"jpeg")==0) { type=JPG_CODEC; }
    unsigned int bitsperpixel,channels;
    //fprintf(stderr,"Reading %s , using Codec Library .. ",filename);
    char * pixels = readImageRaw(filename,type,widthInternal,heightInternal,&bitsperpixel,&channels);

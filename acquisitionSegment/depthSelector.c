@@ -26,6 +26,10 @@ int keepFirstDepthFrame(unsigned short * source ,  unsigned int width , unsigned
   return 0;
 }
 
+
+
+
+
 int selectBasedOnMovement(unsigned char  * selection,unsigned short * baseDepth , unsigned short * currentDepth , unsigned int threshold ,  unsigned int width , unsigned int height  )
 {
   fprintf(stderr,"selectBasedOnMovement is executed with a threshold of %u , ( %u x %u ) \n",threshold,width,height);

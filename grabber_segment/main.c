@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
          (strcmp(argv[i],"-o")==0)
         )
         {
-          if (strcmp(argv[i+1],"/dev/null")==0)
+          if (strcmp(argv[i+1],"/dev/null")!=0)
           {
            strcpy(outputfoldername,"frames/");
            strcat(outputfoldername,argv[i+1]);

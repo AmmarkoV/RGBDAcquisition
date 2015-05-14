@@ -48,6 +48,7 @@ struct acquisitionPluginInterface
 
 
    int (*listDevices) (int,char *,unsigned int);
+   int (*changeResolution) (unsigned int,unsigned int);
    int (*createDevice)  (int,char *,unsigned int,unsigned int,unsigned int);
    int (*destroyDevice) (int);
 
@@ -92,6 +93,11 @@ struct acquisitionPluginInterface
    //double (*getDepthPixelSize)   (int);
    int (*getDepthCalibration) (int,struct calibration *);
    int (*setDepthCalibration) (int,struct calibration *);
+
+
+   unsigned int forcedWidth;
+   unsigned int forcedHeight;
+   unsigned int forceResolution;
 };
 
 /**

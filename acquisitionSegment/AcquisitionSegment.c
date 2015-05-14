@@ -335,6 +335,11 @@ int saveSegmentationDataToFile(char* filename , struct SegmentationFeaturesRGB *
                        depthSeg->p3[0],depthSeg->p3[1],depthSeg->p3[2]  );
       }
 
+      if (rgbSeg->enableRGBMotionDetection)
+      {
+          fprintf(fp,"-rgbMotion %u %u %u \n",rgbSeg->motionRThreshold , rgbSeg->motionGThreshold , rgbSeg->motionBThreshold);
+      }
+
       if ( depthSeg->enableDepthMotionDetection )
       {
           fprintf(fp,"-depthMotion %u \n",depthSeg->motionDistanceThreshold);
@@ -437,6 +442,15 @@ int loadSegmentationDataFromArgs(int argc, char *argv[] , struct SegmentationFea
                                               depthSeg->firstDepthFrame=0;
                                               depthSeg->firstDepthFrameByteSize=0;
                                               depthSeg->motionDistanceThreshold=atoi(argv[i+1]);
+                                          } else
+    if (strcmp(argv[i],"-rgbMotion")==0)
+                                          {
+                                              rgbSeg->enableRGBMotionDetection=1;
+                                              rgbSeg->firstRGBFrame=0;
+                                              rgbSeg->firstRGBFrameByteSize=0;
+                                              rgbSeg->motionRThreshold=atoi(argv[i+1]);
+                                              rgbSeg->motionGThreshold=atoi(argv[i+2]);
+                                              rgbSeg->motionBThreshold=atoi(argv[i+3]);
                                           } else
     if (strcmp(argv[i],"-autoplane")==0)  {
                                             if (argc>i+4)
