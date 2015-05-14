@@ -111,7 +111,6 @@ int main(int argc, char *argv[])
           (strcmp(argv[i],"-noDepth")==0)) {
                                                saveDepth = 0;
                                            } else
-
     if (strcmp(argv[i],"-calibration1")==0) {
                                              calibrationSetA=1;
                                              if (!ReadCalibration(argv[i+1],defaultWidth,defaultHeight,&calibA) )
@@ -143,6 +142,7 @@ int main(int argc, char *argv[])
                                            fprintf(stderr,"Setting transparency to %u \n",transparency);
                                          } else
     if (
+        (strcmp(argv[i],"-module")==0) ||
         (strcmp(argv[i],"-module1")==0) ||
         (strcmp(argv[i],"-moduleBase")==0)
        )
@@ -158,6 +158,7 @@ int main(int argc, char *argv[])
                                            fprintf(stderr,"Overriding Module 2 Used , set to %s ( %u ) \n",getModuleNameFromModuleID(moduleID_2),moduleID_2);
                                          } else
     if (
+        (strcmp(argv[i],"-dev")==0) ||
         (strcmp(argv[i],"-dev1")==0) ||
         (strcmp(argv[i],"-devBase")==0)
        )                                 {
@@ -180,15 +181,15 @@ int main(int argc, char *argv[])
                                               } else
     if (strcmp(argv[i],"-shiftX")==0)      {
                                             shiftX = atoi(argv[i+1]);
-                                            fprintf(stderr,"Adding a horizontal shift ( %u ) \n",argv[i+1],shiftX);
+                                            fprintf(stderr,"Adding a horizontal shift ( %s , %u ) \n",argv[i+1],shiftX);
                                           } else
     if (strcmp(argv[i],"-shiftY")==0)     {
                                             shiftY = atoi(argv[i+1]);
-                                            fprintf(stderr,"Adding a horizontal shift ( %u ) \n",argv[i+1],shiftY);
+                                            fprintf(stderr,"Adding a horizontal shift ( %s ,  %u ) \n",argv[i+1],shiftY);
                                           } else
     if (strcmp(argv[i],"-shiftTime")==0)    {
                                               shiftTime = atoi(argv[i+1]);
-                                              fprintf(stderr,"Adding a time shift ( %u ) \n",argv[i+1],shiftTime);
+                                              fprintf(stderr,"Adding a time shift (  %s , %u ) \n",argv[i+1],shiftTime);
                                             } else
     if (
         (strcmp(argv[i],"-makeVideo")==0)
@@ -206,6 +207,8 @@ int main(int argc, char *argv[])
        { frameDoublerEnabled=1; fprintf(stderr,"Frame Doubler Will be engaged \n"); }
       else
     if (
+        (strcmp(argv[i],"-from")==0) ||
+        (strcmp(argv[i],"-i")==0)||
         (strcmp(argv[i],"-from1")==0) ||
         (strcmp(argv[i],"-i1")==0)||
         (strcmp(argv[i],"-fromBase")==0)
@@ -343,7 +346,8 @@ int main(int argc, char *argv[])
       memset(depthCollector,0,sizeof(unsigned long) * widthRGB * heightRGB);
     }
 
-    fprintf(stderr,"Base Module is %s , device %u , Overlay Module is %s , device %u\n",getModuleNameFromModuleID(moduleID_1),devID_1, getModuleNameFromModuleID(moduleID_2),devID_2);
+    fprintf(stderr,"Base Module is %s , device %u , Overlay Module is %s , device %u\n",getModuleNameFromModuleID(moduleID_1),devID_1,
+                                                                                        getModuleNameFromModuleID(moduleID_2),devID_2);
     if (shiftTime==0) { /* No time shift */ } else
     if (shiftTime>0) { for (frameNum=0; frameNum<abs(shiftTime); frameNum++) { acquisitionSnapFrames(moduleID_2,devID_2); } } else
     if (shiftTime<0) { for (frameNum=0; frameNum<abs(shiftTime); frameNum++) { acquisitionSnapFrames(moduleID_1,devID_1); } }
@@ -358,7 +362,6 @@ int main(int argc, char *argv[])
         acquisitionStartTimer(0);
 
         acquisitionSnapFrames(moduleID_1,devID_1);
-        acquisitionSnapFrames(moduleID_2,devID_2);
 
         if (longExposure)
         {
@@ -367,6 +370,7 @@ int main(int argc, char *argv[])
                                      widthRGB , heightRGB, &frameNum );
         } else
         {
+        acquisitionSnapFrames(moduleID_2,devID_2);
         mux2RGBAndDepthFrames
           (
            acquisitionGetColorFrame(moduleID_1,devID_1) , //Module 1 is Base
@@ -451,13 +455,13 @@ int main(int argc, char *argv[])
       free(depthCollector);
          if (saveColor)
           {
-          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          sprintf(outfilename,"%s/colorFrame_%u_%05u",outputfoldername,devID_1,0/*,frameNum*/);
           saveMuxImageToFile(outfilename,rgbOut,widthRGB , heightRGB, channelsRGB , bitsperpixelRGB);
           }
 
          if (saveDepth)
          {
-          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,frameNum);
+          sprintf(outfilename,"%s/depthFrame_%u_%05u",outputfoldername,devID_1,0/*,frameNum*/);
           saveMuxImageToFile(outfilename,(unsigned char*) depthOut,widthDepth , heightDepth, channelsDepth , bitsperpixelDepth);
          }
     }

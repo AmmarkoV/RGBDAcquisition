@@ -13,6 +13,8 @@
  #define unlikely(x)   x
 #endif
 
+#define CUT_NUMBERS 10000
+
 
 static unsigned int simplePow(unsigned int base,unsigned int exp)
 {
@@ -307,24 +309,26 @@ int LongExposureFramesCollect( unsigned char * rgb , unsigned long * rgbCollecto
     while ( rgbCollectorPTR < rgbOutLimit )     { *rgbCollectorPTR += *rgbPTR; ++rgbCollectorPTR; ++rgbPTR; }
     while ( depthCollectorPTR < depthOutLimit ) { *depthCollectorPTR += *depthPTR; ++depthCollectorPTR; ++depthPTR; }
 
-    *framesCollected+=1;
-
-    if (*framesCollected%4==0)
+    //*framesCollected+=1;
+  if (CUT_NUMBERS!=0)
+  {
+    if (*framesCollected%CUT_NUMBERS==0)
     {
         rgbCollectorPTR = rgbCollector;
         depthCollectorPTR = depthCollector;
         while ( rgbCollectorPTR < rgbOutLimit )
         {
-            *rgbCollectorPTR=*rgbCollectorPTR/4;
+            *rgbCollectorPTR=*rgbCollectorPTR/CUT_NUMBERS;
             ++rgbCollectorPTR;
         }
 
         while ( depthCollectorPTR < depthOutLimit )
         {
-            *depthCollectorPTR=*depthCollectorPTR/4;
+            *depthCollectorPTR=*depthCollectorPTR/CUT_NUMBERS;
             ++depthCollectorPTR;
         }
     }
+  }
 
 
     return 1;
@@ -343,9 +347,21 @@ int LongExposureFramesFinalize(unsigned long * rgbCollector ,  unsigned char * r
     unsigned char * rgbPTR = rgbOut;
     unsigned short * depthPTR = depthOut;
 
-    unsigned int what2DivideWith = *framesCollected%4;
-    while ( rgbCollectorPTR < rgbOutLimit )     { *rgbPTR=*rgbCollectorPTR/what2DivideWith; ++rgbCollectorPTR; ++rgbPTR; }
-    while ( depthCollectorPTR < depthOutLimit ) { *depthPTR=*depthCollectorPTR/what2DivideWith; ++depthCollectorPTR; ++depthPTR; }
+    unsigned int what2DivideWith = *framesCollected%CUT_NUMBERS;
+    if (what2DivideWith==0) {  what2DivideWith=1; }
 
+
+     if (rgbCollector!=0)
+     {
+      while ( rgbCollectorPTR < rgbOutLimit )     { *rgbPTR=*rgbCollectorPTR/what2DivideWith;     ++rgbCollectorPTR;   ++rgbPTR; }
+     }
+
+     if (depthCollector!=0)
+     {
+      while ( depthCollectorPTR < depthOutLimit ) { *depthPTR=*depthCollectorPTR/what2DivideWith; ++depthCollectorPTR; ++depthPTR; }
+     }
+
+
+   return 1;
 }
 

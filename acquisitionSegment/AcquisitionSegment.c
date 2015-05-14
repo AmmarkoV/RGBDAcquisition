@@ -153,6 +153,7 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
 
 int initializeRGBSegmentationConfiguration(struct SegmentationFeaturesRGB * segConfRGB , unsigned int width , unsigned int height )
 {
+   segConfRGB->saveRGB=1;
    segConfRGB->floodErase.totalPoints = 0;
 
    segConfRGB->minX=0;  segConfRGB->maxX=width;
@@ -179,7 +180,7 @@ int initializeRGBSegmentationConfiguration(struct SegmentationFeaturesRGB * segC
 
 int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* segConfDepth , unsigned int width , unsigned int height )
 {
-
+   segConfDepth->saveDepth=1;
    segConfDepth->minX=0;     segConfDepth->maxX=width;
    segConfDepth->minY=0;     segConfDepth->maxY=height;
    segConfDepth->minDepth=0; segConfDepth->maxDepth=32500;
