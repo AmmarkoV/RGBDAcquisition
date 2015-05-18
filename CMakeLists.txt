@@ -33,6 +33,16 @@ OPTION (ENABLE_PNG OFF)
 
 add_subdirectory (3dparty/fast)
 
+
+
+if (ENABLE_FREENECT2)
+  add_subdirectory (3dparty/libfreenect2/examples/protonect)
+ELSE (ENABLE_FREENECT2)
+ OPTION (ENABLE_OPENCV OFF)
+ MESSAGE("OpenCV Not found , some parts like viewer etc will not be compiled")
+ENDIF(ENABLE_FREENECT2)
+
+
 #First to make our handy tools
 add_subdirectory (tools/)
  

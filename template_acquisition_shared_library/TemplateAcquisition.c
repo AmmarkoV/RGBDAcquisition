@@ -208,8 +208,8 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
      }
 
   findExtensionOfDataset(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension,device[devID].cycle);
-  fprintf(stderr,"Extension of dataset `%s` dev %u for Color Frames is %s , starting @ %u \n",device[devID].readFromDir,devID,device[devID].colorExtension,device[devID].cycle);
-  fprintf(stderr,"Extension of dataset `%s` dev %u for Depth Frames is %s , starting @ %u \n",device[devID].readFromDir,devID,device[devID].depthExtension,device[devID].cycle);
+  fprintf(stderr,"Extension of dataset `%s` dev %u for Color Frames is %s , starting @ %u\n",device[devID].readFromDir,devID,device[devID].colorExtension,device[devID].cycle);
+  fprintf(stderr,"Extension of dataset `%s` dev %u for Depth Frames is %s , starting @ %u\n",device[devID].readFromDir,devID,device[devID].depthExtension,device[devID].cycle);
 
 
   device[devID].totalFrames=findLastFrame(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension);
