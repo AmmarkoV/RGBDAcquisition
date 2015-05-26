@@ -314,7 +314,7 @@ int swapEndiannessPNM(void * pixels , unsigned int width , unsigned int height ,
 
 int acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-    //fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called\n",filename);
+   // fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called\n",filename);
 
     #if USE_REGULAR_BYTEORDER_FOR_PNM
      //Want Conformance to the NETPBM spec http://en.wikipedia.org/wiki/Netpbm_format#16-bit_extensions
