@@ -31,4 +31,8 @@ done
 done
 
 
+#/home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/caffe/build/examples/rgbd_acquisition_converter/rgbd_dataset_converter /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/dobble/dataset/
+
+
+
 exit 0
