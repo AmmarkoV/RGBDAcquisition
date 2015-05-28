@@ -30,6 +30,8 @@
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/db.hpp"
 
+#define CAFFEDIR "/home/ammar/Documents/Programming/FORTH/input_acquisition/3dparty/caffe"
+
 
 using caffe::Datum;
 using boost::scoped_ptr;
@@ -170,6 +172,18 @@ if (classDir !=0)
  train_db->Close();
 }
 
+
+int generate_mean(char * caffedir, char * outputdir)
+{
+ fprintf(stderr,"Using %s as caffedir\n",caffedir);
+ char commandline[2048]={0};
+ snprintf(commandline,2048,"%s/build/tools/compute_image_mean %s/../leveldb %s/../leveldb/mean.binaryproto",caffedir,outputdir,outputdir);
+
+ int i=system(commandline);
+ return (i==0);
+}
+
+
 int main(int argc, char** argv)
 {
     if (argc < 2)
@@ -182,6 +196,7 @@ int main(int argc, char** argv)
 
         char dbType[120]="lmdb";
         convert_dataset(argv[1],dbType);
+        generate_mean(CAFFEDIR,argv[1]);
     }
     return 0;
 }
