@@ -1,11 +1,18 @@
 #!/bin/bash
-  
+
+
+for inputDataset in $@
+do
+
+echo "Doing $inputDataset" 
+
+
 MAXRUNJOBS=11
 
-INITIALSIZE=`du -hs $1 | cut -f1`
+INITIALSIZE=`du -hs $inputDataset | cut -f1`
 
 CONVNAME="tmp_under_conversion-$BASHPID"
-cd $1
+cd $inputDataset
 
 
 
@@ -14,15 +21,15 @@ DEPTHFILENUM=`ls -al | grep depth | grep .pnm |  wc -l`
 
 
 if [ $COLORFILENUM -eq 0 ]; then
- echo "No color pnm files found , $1 is not a valid PNM dataset for compression..!"
+ echo "No color pnm files found , $inputDataset is not a valid PNM dataset for compression..!"
  exit 0
 fi
 if [ $DEPTHFILENUM -eq 0 ]; then
- echo "No depth pnm files found , $1 is not a valid PNM dataset for compression..!"
+ echo "No depth pnm files found , $inputDataset is not a valid PNM dataset for compression..!"
  exit 0
 fi
 
-echo "Looks $1 is an uncompressed dataset ($COLORFILENUM pnm color files , $DEPTHFILENUM pnm depth files ) will try to compress it now "
+echo "Looks $inputDataset is an uncompressed dataset ($COLORFILENUM pnm color files , $DEPTHFILENUM pnm depth files ) will try to compress it now "
 
 
 mkdir ../$CONVNAME
@@ -40,7 +47,7 @@ do
  RUNNINGJOBS=`ps -A | grep convert | wc -l`
  while [ $RUNNINGJOBS -gt $MAXRUNJOBS ]
   do
-   sleep 0.02
+   sleep 0.03
    echo -n "@" 
    RUNNINGJOBS=`ps -A | grep convert | wc -l`
   done 
@@ -60,7 +67,7 @@ do
  RUNNINGJOBS=`ps -A | grep DepthImagesCon | wc -l`
  while [ $RUNNINGJOBS -gt $MAXRUNJOBS ]
   do
-   sleep 0.02
+   sleep 0.03
    echo -n "@" 
    RUNNINGJOBS=`ps -A | grep DepthImagesCon | wc -l`
   done 
@@ -90,16 +97,16 @@ echo "Overwrite old dataset ?"
   read answer
   if test "$answer" != "Y" -a "$answer" != "y";
   then 
-   echo "Naming the compressed dataset $1-Compressed.." 
-   mv $CONVNAME "$1-Compressed" 
+   echo "Naming the compressed dataset $inputDataset-Compressed.." 
+   mv $CONVNAME "$inputDataset-Compressed" 
 else
    echo "Overwriting.." 
-   rm -rf $1
-   mv $CONVNAME $1 
+   rm -rf $inputDataset
+   mv $CONVNAME $inputDataset 
 fi
 
  
-
+done
 
 
 
