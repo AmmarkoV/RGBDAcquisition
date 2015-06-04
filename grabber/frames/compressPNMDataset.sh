@@ -1,11 +1,14 @@
 #!/bin/bash
 
+
+CURDIR=`pwd`
+
 echo "$@"
 for inputDataset in $@
 do
 
 echo "Doing $inputDataset" 
-
+cd $CURDIR
 
 MAXRUNJOBS=11
 
@@ -41,6 +44,8 @@ mkdir ../$CONVNAME
 
 cp color.calib ../$CONVNAME/color.calib
 cp depth.calib ../$CONVNAME/depth.calib
+cp ./*.sh ../$CONVNAME/
+cp ./*.mp4 ../$CONVNAME/
 
 echo "Converting Color Files"
 
@@ -90,7 +95,7 @@ clear
 FINALSIZE=`du -hs $CONVNAME| cut -f1`
   echo
   echo   
-echo "Compressed from $INITIALSIZE to $FINALSIZE"
+echo "Compressed $inputDataset from $INITIALSIZE to $FINALSIZE"
 
 
 echo "Overwrite old dataset ?"
