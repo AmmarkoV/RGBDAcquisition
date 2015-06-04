@@ -18,7 +18,7 @@ FILES_TO_CONVERT=`ls | grep color`
 for f in $FILES_TO_CONVERT
 do 
  TARGETNAME=`basename $f .pnm`
- convert $f ../$CONVNAME/$TARGETNAME.png
+ convert $f ../$CONVNAME/$TARGETNAME.jpg
 done
 
 
