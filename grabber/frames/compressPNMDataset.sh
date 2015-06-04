@@ -1,6 +1,6 @@
 #!/bin/bash
   
-MAXRUNJOBS=10
+MAXRUNJOBS=11
 
 INITIALSIZE=`du -hs $1 | cut -f1`
 
@@ -57,12 +57,12 @@ FILES_TO_CONVERT=`ls | grep depth | grep .pnm`
 for f in $FILES_TO_CONVERT
 do 
 
- RUNNINGJOBS=`ps -A | grep DepthImagesConverter | wc -l`
+ RUNNINGJOBS=`ps -A | grep DepthImagesCon | wc -l`
  while [ $RUNNINGJOBS -gt $MAXRUNJOBS ]
   do
    sleep 0.02
    echo -n "@" 
-   RUNNINGJOBS=`ps -A | grep DepthImagesConverter | wc -l`
+   RUNNINGJOBS=`ps -A | grep DepthImagesCon | wc -l`
   done 
 
 
@@ -72,7 +72,7 @@ done
 
 cd ..
 
-
+sleep 1
 clear
 
 FINALSIZE=`du -hs $CONVNAME| cut -f1`
