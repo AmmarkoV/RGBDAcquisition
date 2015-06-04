@@ -27,7 +27,6 @@ int keepFirstRGBFrame(unsigned char * source ,  unsigned int width , unsigned in
   return 0;
 }
 
-
 int selectBasedOnRGBMovement(unsigned char  * selection,unsigned char * baseRGB , unsigned char * currentRGB ,
                              unsigned int thresholdR , unsigned int thresholdG, unsigned int thresholdB ,  unsigned int width , unsigned int height  )
 {

@@ -314,7 +314,7 @@ int swapEndiannessPNM(void * pixels , unsigned int width , unsigned int height ,
 
 int acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-    //fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called\n",filename);
+   // fprintf(stderr,"acquisitionSaveRawImageToFile(%s) called\n",filename);
 
     #if USE_REGULAR_BYTEORDER_FOR_PNM
      //Want Conformance to the NETPBM spec http://en.wikipedia.org/wiki/Netpbm_format#16-bit_extensions
@@ -629,6 +629,18 @@ int acquisitionListDevices(ModuleIdentifier moduleID,DeviceIdentifier devID,char
 }
 
 
+int acquisitionChangeResolution(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int width,unsigned int height)
+{
+  printCall(moduleID,devID,"acquisitionChangeResolution", __FILE__, __LINE__);
+  if (plugins[moduleID].changeResolution!=0) { return (*plugins[moduleID].changeResolution) (width,height); }
+
+  plugins[moduleID].forcedWidth=width;
+  plugins[moduleID].forcedHeight=height;
+  plugins[moduleID].forceResolution=1;
+  return 1;
+}
+
+
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     printCall(moduleID,devID,"acquisitionOpenDevice", __FILE__, __LINE__);
@@ -657,6 +669,17 @@ int acquisitionGetTotalFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier de
   return 0;
 }
 
+
+int acquisitionPrepareDifferentResolutionFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+    if ( plugins[moduleID].forceResolution )
+    {
+      fprintf(stderr,"TODO :");
+      return 1;
+    }
+
+  return 0;
+}
 
 int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {

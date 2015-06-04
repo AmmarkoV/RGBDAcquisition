@@ -396,7 +396,10 @@ int main(int argc, char *argv[])
   char * devName = inputname;
   if (strlen(inputname)<1) { devName=0; }
     //Initialize Every OpenNI Device
-
+      if (seekFrame!=0)
+      {
+          acquisitionSeekFrame(moduleID,devID,seekFrame);
+      }
         /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
         if (!acquisitionOpenDevice(moduleID,devID,devName,width,height,framerate) )
         {

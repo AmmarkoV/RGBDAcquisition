@@ -363,6 +363,18 @@ int acquisitionListDevices(ModuleIdentifier moduleID,DeviceIdentifier devID,char
  */
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
 
+
+/**
+ * @brief  Change resolution of running device,
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param Width in pixels that we *WISH* to have ( this might not be what the device returns , please call acquisitionGetColorFrameDimensions / acquisitionGetDepthFrameDimensions to find out )
+ * @param Height in pixels that we *WISH* to have ( this might not be what the device returns , please call acquisitionGetColorFrameDimensions / acquisitionGetDepthFrameDimensions to find out )
+ * @retval  1 = Success , 0=Failure
+ */
+int acquisitionChangeResolution(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int width,unsigned int height);
+
 /**
  * @brief  Gracefully close an already opened device
  * @ingroup acquisitionCore

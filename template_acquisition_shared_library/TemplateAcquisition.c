@@ -190,7 +190,8 @@ int listTemplateDevices(int devID,char * output, unsigned int maxOutput)
 
 int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
- device[devID].cycle=0;
+ // We may want to start from a non zero frame : device[devID].cycle=0;
+ fprintf(stderr,"Creating a template device starting from frame %u \n",device[devID].cycle);
  device[devID].totalFrames=0;
  device[devID].templateColorWidth=width;
  device[devID].templateColorHeight=height;
@@ -206,9 +207,9 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                                 { strncpy(device[devID].readFromDir,devName,MAX_DIR_PATH);  }
      }
 
-  findExtensionOfDataset(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension);
-  fprintf(stderr,"Extension of dataset `%s` dev %u for Color Frames is %s \n",device[devID].readFromDir,devID,device[devID].colorExtension);
-  fprintf(stderr,"Extension of dataset `%s` dev %u for Depth Frames is %s \n",device[devID].readFromDir,devID,device[devID].depthExtension);
+  findExtensionOfDataset(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension,device[devID].cycle);
+  fprintf(stderr,"Extension of dataset `%s` dev %u for Color Frames is %s , starting @ %u\n",device[devID].readFromDir,devID,device[devID].colorExtension,device[devID].cycle);
+  fprintf(stderr,"Extension of dataset `%s` dev %u for Depth Frames is %s , starting @ %u\n",device[devID].readFromDir,devID,device[devID].depthExtension,device[devID].cycle);
 
 
   device[devID].totalFrames=findLastFrame(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension);
@@ -218,7 +219,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;
 
   char file_name_test[MAX_DIR_PATH]={0};
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 ,device[devID].readFromDir,device[devID].colorExtension);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , device[devID].cycle ,device[devID].readFromDir,device[devID].colorExtension);
   unsigned char * tmpColor = ReadImageFile(0,file_name_test,device[devID].colorExtension,&widthInternal,&heightInternal, &timestampInternal);
   if (tmpColor==0) { fprintf(stderr,YELLOW "Could not open initial color file %s \n",file_name_test);  }
   if ( (widthInternal!=width) || (heightInternal!=height) )
@@ -238,7 +239,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   }
 
 
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID ,0,device[devID].readFromDir,device[devID].depthExtension);
+  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].depthExtension);
   unsigned short * tmpDepth = (unsigned short *) ReadImageFile(0,file_name_test,device[devID].depthExtension,&widthInternal,&heightInternal, &timestampInternal);
   if (tmpDepth==0) { fprintf(stderr,YELLOW "Could not open initial depth file %s \n",file_name_test);  }
   if ( (widthInternal!=width) || (heightInternal!=height) )

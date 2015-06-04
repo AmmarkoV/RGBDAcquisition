@@ -2,18 +2,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BUILD_FREENECT2 1
+
 #include "Freenect2Acquisition.h"
 
 #if BUILD_FREENECT2
-#include "../3dparty/libfreenect/include/libfreenect.h"
-#include "../3dparty/libfreenect/wrappers/c_sync/libfreenect_sync.h"
+
+
+#include <libfreenect2/libfreenect2.hpp>
+#include <libfreenect2/frame_listener_impl.h>
+#include <libfreenect2/threading.h>
+#include <libfreenect2/registration.h>
+
 
 #define MAX_DEVS 16
 
-int rgb_mode[MAX_DEVS]={FREENECT_VIDEO_RGB};
-int depth_mode[MAX_DEVS]={FREENECT_DEPTH_11BIT};
+//int rgb_mode[MAX_DEVS]={FREENECT_VIDEO_RGB};
+//int depth_mode[MAX_DEVS]={FREENECT_DEPTH_11BIT};
 
-
+/*
 int convertAndSave(unsigned int framesRecorded , libfreenect2::Frame *  rgb ,  libfreenect2::Frame *  ir , libfreenect2::Frame * depth)
 {
     //--------------------------------------------------------------------------
@@ -83,28 +90,31 @@ int convertAndSave(unsigned int framesRecorded , libfreenect2::Frame *  rgb ,  l
 
   return 1;
 }
-
+*/
 
 int startFreenect2Module(unsigned int max_devs,char * settings)
 {
+    /*
   uint32_t ts;
   char * rgb, * depth;
   fprintf(stderr,"Please hang on while starting Freenect2 module.. \n");
   int ret = freenect_sync_get_video((void**)&rgb, &ts, 0 , FREENECT_VIDEO_RGB);
   if (ret < 0) { fprintf(stderr,"There doesnt seem to exist a Freenect2 compatible device with index 0\n"); return 0; }
-
-  freenect_sync_get_video((void**)&rgb, &ts, 0 , FREENECT_VIDEO_RGB);
-  freenect_sync_get_depth((void**)&depth, &ts, 0 ,FREENECT_DEPTH_11BIT);
+*/
+ // freenect_sync_get_video((void**)&rgb, &ts, 0 , FREENECT_VIDEO_RGB);
+ // freenect_sync_get_depth((void**)&depth, &ts, 0 ,FREENECT_DEPTH_11BIT);
   return 1;
 }
 
 int createFreenect2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
+    /*
   uint32_t ts;
   char * rgb;//, * depth;
   int ret = freenect_sync_get_video((void**)&rgb, &ts, 0 , FREENECT_VIDEO_RGB);
   if (ret < 0) { fprintf(stderr,"There doesnt seem to exist a Freenect2 compatible device with index 0\n"); return 0; }
   return 1;
+  */
 }
 
 int stopFreenect2Module() { return 1; }
@@ -114,7 +124,7 @@ int getFreenect2NumberOfDevices()  { fprintf(stderr,"New getFreenect2NumberOfDev
 
 int mapFreenect2DepthToRGB(int devID)
 {
-   depth_mode[devID]=FREENECT_DEPTH_REGISTERED;
+ //  depth_mode[devID]=FREENECT_DEPTH_REGISTERED;
    return 1;
 }
 
@@ -137,11 +147,13 @@ int getFreenect2ColorBitsPerPixel(int devID) { return 8; }
 
 char * getFreenect2ColorPixels(int devID)
 {
+    /*
   uint32_t ts;
   char * rgb;
   int ret = freenect_sync_get_video((void**)&rgb, &ts, devID , rgb_mode[devID]);
   if (ret < 0) { fprintf(stderr,"There doesnt seem to exist a Freenect2 compatible device with index %u\n",devID); return 0; }
   return rgb;
+  */
 }
 
 
@@ -154,11 +166,13 @@ int getFreenect2DepthBitsPerPixel(int devID) { return 16; }
 
 char * getFreenect2DepthPixels(int devID)
 {
+    /*
   uint32_t ts;
   char * depth;
   int ret = freenect_sync_get_depth((void**)&depth, &ts, devID , depth_mode[devID]);
   if (ret < 0) { fprintf(stderr,"There doesnt seem to exist a Freenect2 compatible device with index %u\n",devID);  return 0; }
   return depth;
+  */
 }
 
 

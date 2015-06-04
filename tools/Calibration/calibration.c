@@ -346,12 +346,7 @@ int WriteCalibration(char * filename,struct calibration * calib)
 
 
     fprintf( fp, "%%Distortion D[1], D[2], D[3], D[4] D[5] \n");
-    fprintf( fp, "%%D\n");
-    fprintf( fp, "%f\n",calib->k1);
-    fprintf( fp, "%f\n",calib->k2);
-    fprintf( fp, "%f\n",calib->p1);
-    fprintf( fp, "%f\n",calib->p2);
-    fprintf( fp, "%f\n",calib->k3);
+    fprintf( fp, "%%D\n%f\n%f\n%f\n%f\n%f\n",calib->k1,calib->k2,calib->p1,calib->p2,calib->k3);
 
     if( calib->extrinsicParametersSet )
     {
@@ -360,15 +355,11 @@ int WriteCalibration(char * filename,struct calibration * calib)
       {
        fprintf( fp, "%%Translation T.X, T.Y, T.Z\n");
        fprintf( fp, "%%T\n");
-       fprintf( fp, "%f\n",calib->extrinsicTranslation[0]);
-       fprintf( fp, "%f\n",calib->extrinsicTranslation[1]);
-       fprintf( fp, "%f\n",calib->extrinsicTranslation[2]);
+       fprintf( fp, "%f\n%f\n%f\n",calib->extrinsicTranslation[0],calib->extrinsicTranslation[1],calib->extrinsicTranslation[2]);
 
        fprintf( fp, "%%Rotation Vector (Rodrigues) R.X, R.Y, R.Z \n");
        fprintf( fp, "%%R\n");
-       fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[0]);
-       fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[1]);
-       fprintf( fp, "%f\n",calib->extrinsicRotationRodriguez[2]);
+       fprintf( fp, "%f\n%f\n%f\n",calib->extrinsicRotationRodriguez[0],calib->extrinsicRotationRodriguez[1],calib->extrinsicRotationRodriguez[2]);
       }
      }
 

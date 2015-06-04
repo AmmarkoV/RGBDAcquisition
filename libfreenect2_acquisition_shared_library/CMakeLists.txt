@@ -1,15 +1,28 @@
 project( Freenect2Acquisition ) 
 cmake_minimum_required( VERSION 2.8.7 )  
+ 
 
-set(Freenect2_DIR "${CMAKE_SOURCE_DIR}/3dparty" )
+IF(ENABLE_CXX11)
+  INCLUDE(CheckCXXCompilerFlag)
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+  IF(COMPILER_SUPPORTS_CXX11)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  ELSEIF(COMPILER_SUPPORTS_CXX0X)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+  ELSE()
+    MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+  ENDIF()
+ENDIF(ENABLE_CXX11)
 
-FIND_PACKAGE(Freenect2 REQUIRED)
-INCLUDE_DIRECTORIES(${FREENECT2_INCLUDE_DIR})
-LINK_DIRECTORIES(${FREENECT2_LIBRARY_DIRS})
 
+SET(FREENECT_2_CENTRAL_DIR ${libfreenect2_SOURCE_DIR})
+INCLUDE_DIRECTORIES("${FREENECT_2_CENTRAL_DIR}/include")
 
-add_library(Freenect2Acquisition SHARED Freenect2Acquisition.c Freenect2Acquisition.h ${FREENECT2_INCLUDES} ) 
-target_link_libraries(FreenectAcquisition rt dl m Timers CalibrationLibrary OperatingSystem ${FREENECT2_LIBRARIES} )  
+INCLUDE_DIRECTORIES(${LIBFREENECT2_THREADING_INCLUDE_DIR})
+
+add_library(Freenect2Acquisition SHARED Freenect2Acquisition.cpp Freenect2Acquisition.h  ) 
+target_link_libraries(Freenect2Acquisition rt dl m Timers CalibrationLibrary OperatingSystem  freenect2 )  
  
 
 set_target_properties(Freenect2Acquisition PROPERTIES 

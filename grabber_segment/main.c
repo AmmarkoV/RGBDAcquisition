@@ -130,6 +130,15 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+
+     if ( (strcmp(argv[i],"-onlyDepth")==0)||
+          (strcmp(argv[i],"-noColor")==0)) {
+                                               segConfRGB.saveRGB = 0;
+                                           } else
+     if ( (strcmp(argv[i],"-onlyColor")==0)||
+          (strcmp(argv[i],"-noDepth")==0)) {
+                                               segConfDepth.saveDepth = 0;
+                                           } else
     if (strcmp(argv[i],"-calibration")==0) {
                                              calibrationSet=1;
                                              strncpy(calibrationFile,argv[i+1],2048);
@@ -151,7 +160,7 @@ int main(int argc, char *argv[])
          (strcmp(argv[i],"-o")==0)
         )
         {
-          if (strcmp(argv[i+1],"/dev/null")==0)
+          if (strcmp(argv[i+1],"/dev/null")!=0)
           {
            strcpy(outputfoldername,"frames/");
            strcat(outputfoldername,argv[i+1]);
@@ -204,11 +213,15 @@ int main(int argc, char *argv[])
 
     unsigned int widthRGB , heightRGB , channelsRGB , bitsperpixelRGB;
     acquisitionGetColorFrameDimensions(moduleID_1,devID_1,&widthRGB,&heightRGB ,&channelsRGB , &bitsperpixelRGB );
+    if (widthRGB!=segConfRGB.maxX)  { segConfRGB.maxX=widthRGB;  fprintf(stderr,"Updating Segmentation data to match initialized input size Width\n"); }
+    if (heightRGB!=segConfRGB.maxY) { segConfRGB.maxY=heightRGB; fprintf(stderr,"Updating Segmentation data to match initialized input size Height\n"); }
 
     //unsigned char * rgbOut = ( unsigned char* )  malloc(widthRGB*heightRGB*channelsRGB * (bitsperpixelRGB/8 ) );
 
     unsigned int widthDepth , heightDepth , channelsDepth , bitsperpixelDepth;
     acquisitionGetDepthFrameDimensions(moduleID_1,devID_1,&widthDepth,&heightDepth ,&channelsDepth , &bitsperpixelDepth );
+    if (widthRGB!=segConfDepth.maxX)  { segConfDepth.maxX=widthRGB;  fprintf(stderr,"Updating Segmentation data to match initialized input size Width\n"); }
+    if (heightRGB!=segConfDepth.maxY) { segConfDepth.maxY=heightRGB; fprintf(stderr,"Updating Segmentation data to match initialized input size Height\n"); }
 
     //unsigned short * depthOut = ( unsigned short* )  malloc(widthDepth*heightDepth*channelsDepth * (bitsperpixelDepth/8 ) );
 
@@ -255,14 +268,19 @@ int main(int argc, char *argv[])
 
         if (strcmp(outfilename,"/dev/null")!=0)
         {
-         sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
-         acquisitionSimulateTime( colorTimestamp );
-         acquisitionSaveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+         if (segConfRGB.saveRGB)
+         {
+          sprintf(outfilename,"%s/colorFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+          acquisitionSimulateTime( colorTimestamp );
+          acquisitionSaveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+         }
 
-
-         sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
-         acquisitionSimulateTime( depthTimestamp );
-         acquisitionSaveRawImageToFile(outfilename,(unsigned char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
+         if (segConfDepth.saveDepth)
+         {
+          sprintf(outfilename,"%s/depthFrame_%u_%05u.pnm",outputfoldername,devID_1,frameNum);
+          acquisitionSimulateTime( depthTimestamp );
+          acquisitionSaveRawImageToFile(outfilename,(unsigned char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
+         }
         }
 
        free (segmentedRGB);

@@ -253,7 +253,8 @@ void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,
    unsigned int type=0;
    if (strcmp(extension,"pnm")==0) { type=PNM_CODEC; } else
    if (strcmp(extension,"png")==0) { type=PNG_CODEC; } else
-   if (strcmp(extension,"jpg")==0) { type=JPG_CODEC; }
+   if (strcmp(extension,"jpg")==0) { type=JPG_CODEC; } else
+   if (strcmp(extension,"jpeg")==0) { type=JPG_CODEC; }
    unsigned int bitsperpixel,channels;
    //fprintf(stderr,"Reading %s , using Codec Library .. ",filename);
    char * pixels = readImageRaw(filename,type,widthInternal,heightInternal,&bitsperpixel,&channels);
@@ -268,7 +269,7 @@ void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,
 
 
 
-unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * colorExtension , char * depthExtension)
+unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * colorExtension , char * depthExtension,unsigned int startingFrame)
 {
   unsigned int colorSet=0,depthSet=0;
   char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
@@ -281,7 +282,7 @@ unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * color
    if (i==1) { strncpy(colorExtension,"png",MAX_EXTENSION_PATH); } else
    if (i==2) { strncpy(colorExtension,"jpg",MAX_EXTENSION_PATH); }
 
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , 0 , readFromDir , colorExtension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , startingFrame , readFromDir , colorExtension );
    if ( FileExists(file_name_test) ) { colorSet=1; break; }
 
    ++i;
@@ -294,7 +295,7 @@ unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * color
    if (i==1) { strncpy(depthExtension,"png",MAX_EXTENSION_PATH); } else
    if (i==2) { strncpy(depthExtension,"jpg",MAX_EXTENSION_PATH); }
 
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , 0 , readFromDir , depthExtension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , startingFrame , readFromDir , depthExtension );
    if ( FileExists(file_name_test) ) { depthSet=1; break; }
 
    ++i;

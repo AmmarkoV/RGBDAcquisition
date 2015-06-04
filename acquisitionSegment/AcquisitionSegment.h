@@ -63,6 +63,7 @@ struct floodErasePoints
  */
 struct SegmentationFeaturesRGB
 {
+   unsigned int saveRGB;
    unsigned char eraseColorR , eraseColorG , eraseColorB;
 
    unsigned int minR ,  minG ,  minB;
@@ -93,6 +94,7 @@ struct SegmentationFeaturesRGB
  */
 struct SegmentationFeaturesDepth
 {
+   unsigned int saveDepth;
    unsigned int minDepth, maxDepth;
 
    unsigned int minX , maxX;
