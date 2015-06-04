@@ -1,10 +1,10 @@
 #!/bin/bash
   
- 
+MAXRUNJOBS=10
 
 INITIALSIZE=`du -hs $1 | cut -f1`
 
-CONVNAME="tmp_under_conversion"
+CONVNAME="tmp_under_conversion-$BASHPID"
 cd $1
 
 
@@ -24,7 +24,7 @@ fi
 
 echo "Looks $1 is an uncompressed dataset ($COLORFILENUM pnm color files , $DEPTHFILENUM pnm depth files ) will try to compress it now "
 
-exit 0
+
 mkdir ../$CONVNAME
 
 cp color.calib ../$CONVNAME/color.calib
@@ -32,24 +32,48 @@ cp depth.calib ../$CONVNAME/depth.calib
 
 echo "Converting Color Files"
 
-FILES_TO_CONVERT=`ls | grep color`
+FILES_TO_CONVERT=`ls | grep color | grep .pnm`
+
+
 for f in $FILES_TO_CONVERT
 do 
+ RUNNINGJOBS=`ps -A | grep convert | wc -l`
+ while [ $RUNNINGJOBS -gt $MAXRUNJOBS ]
+  do
+   sleep 0.02
+   echo -n "@" 
+   RUNNINGJOBS=`ps -A | grep convert | wc -l`
+  done 
+
  TARGETNAME=`basename $f .pnm`
- convert $f ../$CONVNAME/$TARGETNAME.jpg
+ convert $f ../$CONVNAME/$TARGETNAME.jpg&
+ echo -n "."
 done
 
 
 echo "Converting Depth Files"
 
-FILES_TO_CONVERT=`ls | grep depth`
+FILES_TO_CONVERT=`ls | grep depth | grep .pnm`
 for f in $FILES_TO_CONVERT
 do 
+
+ RUNNINGJOBS=`ps -A | grep DepthImagesConverter | wc -l`
+ while [ $RUNNINGJOBS -gt $MAXRUNJOBS ]
+  do
+   sleep 0.02
+   echo -n "@" 
+   RUNNINGJOBS=`ps -A | grep DepthImagesConverter | wc -l`
+  done 
+
+
  TARGETNAME=`basename $f .pnm`
- ../../../tools/DepthImagesConverter/DepthImagesConverter "$f" "../$CONVNAME/$TARGETNAME.png"
+ ../../../tools/DepthImagesConverter/DepthImagesConverter "$f" "../$CONVNAME/$TARGETNAME.png"&
 done
 
 cd ..
+
+
+clear
 
 FINALSIZE=`du -hs $CONVNAME| cut -f1`
   echo
