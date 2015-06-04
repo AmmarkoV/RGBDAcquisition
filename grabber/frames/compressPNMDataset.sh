@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+echo "$@"
 for inputDataset in $@
 do
 
@@ -18,16 +18,21 @@ cd $inputDataset
 
 COLORFILENUM=`ls -al | grep color | grep .pnm |  wc -l`
 DEPTHFILENUM=`ls -al | grep depth | grep .pnm |  wc -l`
+DOCONV=1
 
-
-if [ $COLORFILENUM -eq 0 ]; then
+if [ $COLORFILENUM -eq 0 ]; 
+then
  echo "No color pnm files found , $inputDataset is not a valid PNM dataset for compression..!"
- exit 0
-fi
-if [ $DEPTHFILENUM -eq 0 ]; then
+ DOCONV=0  
+elif [ $DEPTHFILENUM -eq 0 ]; 
+then
  echo "No depth pnm files found , $inputDataset is not a valid PNM dataset for compression..!"
- exit 0
+ DOCONV=0
 fi
+
+
+if [ $DOCONV -eq 1 ]; 
+then
 
 echo "Looks $inputDataset is an uncompressed dataset ($COLORFILENUM pnm color files , $DEPTHFILENUM pnm depth files ) will try to compress it now "
 
@@ -105,6 +110,7 @@ else
    mv $CONVNAME $inputDataset 
 fi
 
+fi
  
 done
 
