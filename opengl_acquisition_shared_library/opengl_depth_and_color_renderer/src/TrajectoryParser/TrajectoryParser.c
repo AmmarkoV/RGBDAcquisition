@@ -25,6 +25,7 @@
 #include "TrajectoryParser.h"
 #include "TrajectoryParserDataStructures.h"
 #include "TrajectoryCalculator.h"
+#include "TrajectoryPrimitives.h"
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
 //Using normalizeQuaternionsTJP #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include <stdio.h>
@@ -112,8 +113,124 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename)
 }
 
 
-int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc , char * line , unsigned int words_count )
+int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc , unsigned int label , char * line , unsigned int words_count )
 {
+
+  char name[MAX_PATH]={0};
+  char model[MAX_PATH]={0};
+  char includeFile[MAX_PATH]={0};
+  unsigned int i,satteliteObj,planetObj,frame,duration;
+
+
+  if (line[0]=='#')
+     { label = TRAJECTORYPRIMITIVES_COMMENT; }
+
+  if (newstream->debug)
+     { fprintf(stderr,"Label %u =>  Line  %s \n",label,line); }
+
+
+  switch (label)
+  {
+             case TRAJECTORYPRIMITIVES_COMMENT : /*Comment , don't spam console etc*/ break;
+             case TRAJECTORYPRIMITIVES_OBJ : break;
+             case TRAJECTORYPRIMITIVES_ARROW  : break;
+             case TRAJECTORYPRIMITIVES_POS  : break;
+             case TRAJECTORYPRIMITIVES_DEBUG                             :  newstream->debug=1;           break;
+             case TRAJECTORYPRIMITIVES_TIMESTAMP                         :  newstream->timestamp=InputParser_GetWordInt(ipc,1); break;
+             case TRAJECTORYPRIMITIVES_AUTOREFRESH                       :  newstream->autoRefresh = InputParser_GetWordInt(ipc,1); break;
+             case TRAJECTORYPRIMITIVES_INTERPOLATE_TIME                  :  newstream->ignoreTime = ( InputParser_GetWordInt(ipc,1) == 0 ); break;
+             case TRAJECTORYPRIMITIVES_OBJECT                            : break;
+             case TRAJECTORYPRIMITIVES_COMPOSITEOBJECT                   : break;
+             case TRAJECTORYPRIMITIVES_EVENT                             : break;
+             case TRAJECTORYPRIMITIVES_MAP_ROTATIONS                     : break;
+             case TRAJECTORYPRIMITIVES_FRAME_RESET                       :   newstream->timestamp=0;     break;
+             case TRAJECTORYPRIMITIVES_FRAME                             :   newstream->timestamp+=100;  break;
+             case TRAJECTORYPRIMITIVES_MOVE_VIEW                         :   newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1); break;
+             case TRAJECTORYPRIMITIVES_SMOOTH                            :   smoothTrajectories(newstream); break;
+             case TRAJECTORYPRIMITIVES_OBJ_OFFSET                        :   newstream->objDeclarationsOffset = InputParser_GetWordInt(ipc,1);   break;
+             case TRAJECTORYPRIMITIVES_CONNECTOR                         : break;
+             case TRAJECTORYPRIMITIVES_HAND_POINTS                       : break;
+
+             case TRAJECTORYPRIMITIVES_BACKGROUND  :
+                newstream->backgroundR = (float) InputParser_GetWordInt(ipc,1) / 255;
+                newstream->backgroundG = (float) InputParser_GetWordInt(ipc,2) / 255;
+                newstream->backgroundB = (float) InputParser_GetWordInt(ipc,3) / 255;
+             break;
+
+
+             case TRAJECTORYPRIMITIVES_AFFIX_OBJ_TO_OBJ_FOR_NEXT_FRAMES  :
+               satteliteObj = 1 + newstream->objDeclarationsOffset + InputParser_GetWordInt(ipc,1);    /*Item 0 is camera so we +1 */
+               planetObj    = 1 + newstream->objDeclarationsOffset + InputParser_GetWordInt(ipc,2);    /*Item 0 is camera so we +1 */
+               frame     = InputParser_GetWordInt(ipc,3);
+               duration  = InputParser_GetWordInt(ipc,4);
+               if (! affixSatteliteToPlanetFromFrameForLength(newstream,satteliteObj,planetObj,frame,duration) )
+               {
+                fprintf(stderr,RED "Could not affix Object %u to Object %u for %u frames ( starting @ %u )\n" NORMAL , satteliteObj,planetObj,duration,frame);
+               }
+             break;
+
+
+
+             case TRAJECTORYPRIMITIVES_INCLUDE :
+              InputParser_GetWord(ipc,1,includeFile,MAX_PATH);
+              if (appendVirtualStreamFromFile(newstream,includeFile))
+              {
+                fprintf(stderr,GREEN "Successfully included file %s..!" NORMAL,includeFile);
+              } else
+              {
+                fprintf(stderr,RED "Could not include file..!" NORMAL);
+              }
+             break;
+
+            case TRAJECTORYPRIMITIVES_OBJECTTYPE :
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,model,MAX_PATH);
+               addObjectTypeToVirtualStream( newstream , name, model );
+             break;
+
+
+           case TRAJECTORYPRIMITIVES_PROJECTION_MATRIX :
+                 newstream->projectionMatrixDeclared=1;
+                 for (i=1; i<=16; i++) { newstream->projectionMatrix[i-1] = (double)  InputParser_GetWordFloat(ipc,i); }
+                 fprintf(stderr,"Projection Matrix given to TrajectoryParser\n");
+           break;
+
+
+           case TRAJECTORYPRIMITIVES_EMULATE_PROJECTION_MATRIX :
+                 newstream->emulateProjectionMatrixDeclared=1;
+                 for (i=1; i<=9; i++) { newstream->emulateProjectionMatrix[i-1] = (double)  InputParser_GetWordFloat(ipc,i); }
+                 fprintf(stderr,"Emulating Projection Matrix given to TrajectoryParser\n");
+           break;
+
+
+           case TRAJECTORYPRIMITIVES_MODELVIEW_MATRIX :
+                 newstream->modelViewMatrixDeclared=1;
+                 for (i=1; i<=16; i++) { newstream->modelViewMatrix[i-1] = (double) InputParser_GetWordFloat(ipc,i); }
+                 fprintf(stderr,"ModelView Matrix given to TrajectoryParser\n");
+           break;
+
+
+           case TRAJECTORYPRIMITIVES_SCALE_WORLD :
+               newstream->scaleWorld[0] = InputParser_GetWordFloat(ipc,1);
+               newstream->scaleWorld[1] = InputParser_GetWordFloat(ipc,2);
+               newstream->scaleWorld[2] = InputParser_GetWordFloat(ipc,3);
+               fprintf(stderr,"Scaling everything * %f %f %f \n",newstream->scaleWorld[0],newstream->scaleWorld[1],newstream->scaleWorld[2]);
+           break;
+
+
+           case TRAJECTORYPRIMITIVES_OFFSET_ROTATIONS :
+               newstream->rotationsOffset[0] = InputParser_GetWordFloat(ipc,1);
+               newstream->rotationsOffset[1] = InputParser_GetWordFloat(ipc,2);
+               newstream->rotationsOffset[2] = InputParser_GetWordFloat(ipc,3);
+               fprintf(stderr,"Offsetting rotations + %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+           break;
+
+    default :
+             fprintf(stderr,RED "Can't recognize `%s` \n" NORMAL , line);
+    break;
+  };
+
+
             if (
                   ( InputParser_GetWordChar(ipc,0,0)=='O' ) &&
                   ( InputParser_GetWordChar(ipc,0,1)=='B' ) &&
@@ -179,100 +296,6 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                #endif
             }
               else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME_RESET",11)==1)
-            {
-               newstream->timestamp=0;  //Reset Frame
-            } else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"FRAME",5)==1)
-            {
-               newstream->timestamp+=100; //Increment Frame
-            } else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"AFFIX_OBJ_TO_OBJ_FOR_NEXT_FRAMES",32)==1)
-            {
-               unsigned int satteliteObj = 1 + newstream->objDeclarationsOffset + InputParser_GetWordInt(ipc,1);    /*Item 0 is camera so we +1 */
-               unsigned int planetObj    = 1 + newstream->objDeclarationsOffset + InputParser_GetWordInt(ipc,2);    /*Item 0 is camera so we +1 */
-               unsigned int frame     = InputParser_GetWordInt(ipc,3);
-               unsigned int duration  = InputParser_GetWordInt(ipc,4);
-               if (! affixSatteliteToPlanetFromFrameForLength(newstream,satteliteObj,planetObj,frame,duration) )
-               {
-                fprintf(stderr,RED "Could not affix Object %u to Object %u for %u frames ( starting @ %u )\n" NORMAL , satteliteObj,planetObj,duration,frame);
-               }
-            } else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"INCLUDE",7)==1)
-            {
-               char includeFile[MAX_PATH]={0};
-               InputParser_GetWord(ipc,1,includeFile,MAX_PATH);
-              if (appendVirtualStreamFromFile(newstream,includeFile))
-              {
-                fprintf(stderr,GREEN "Successfully included file %s..!" NORMAL,includeFile);
-              } else
-              {
-                fprintf(stderr,RED "Could not include file..!" NORMAL);
-              }
-
-            } else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"DEBUG",5)==1)
-            {
-              fprintf(stderr,"DEBUG Mode on\n");
-              newstream->debug=1;
-            } else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"MOVE_VIEW",9)==1)
-            {
-              newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1);
-            } else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"TIMESTAMP",9)==1)
-            {
-              newstream->timestamp=InputParser_GetWordInt(ipc,1);
-            } else
-            /*! REACHED A SMOOTH DECLERATION ( SMOOTH() )  */
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"SMOOTH",6)==1)
-            {
-              smoothTrajectories(newstream);
-            } else
-
-            /*! REACHED A SMOOTH DECLERATION ( SMOOTH() )  */
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJ_OFFSET",10)==1)
-            {
-              newstream->objDeclarationsOffset = InputParser_GetWordInt(ipc,1);
-            } else
-            /*! REACHED AN AUTO REFRESH DECLERATION ( AUTOREFRESH(1500) )
-              argument 0 = AUTOREFRESH , argument 1 = value in milliseconds (0 = off ) */
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"AUTOREFRESH",11)==1)
-            {
-                newstream->autoRefresh = InputParser_GetWordInt(ipc,1);
-            } else
-            /*! REACHED AN INTERPOLATE TIME SWITCH DECLERATION ( INTERPOLATE_TIME(1) )
-              argument 0 = INTERPOLATE_TIME , argument 1 = (0 = off ) ( 1 = on )*/
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"INTERPOLATE_TIME",16)==1)
-            {
-                //The configuration INTERPOLATE_TIME is the "opposite" of this flag ignore time
-                newstream->ignoreTime = InputParser_GetWordInt(ipc,1);
-                // so we flip it here.. , the default is not ignoring time..
-                if (newstream->ignoreTime == 0 ) { newstream->ignoreTime=1; } else
-                                                 { newstream->ignoreTime=0; }
-            } else
-              /*! REACHED AN BACKGROUND DECLERATION ( BACKGROUND(0,0,0) )
-              argument 0 = BACKGROUND , argument 1 = R , argument 2 = G , argument 3 = B , */
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"BACKGROUND",10)==1)
-            {
-                //The configuration INTERPOLATE_TIME is the "opposite" of this flag ignore time
-                newstream->backgroundR = (float) InputParser_GetWordInt(ipc,1) / 255;
-                newstream->backgroundG = (float) InputParser_GetWordInt(ipc,2) / 255;
-                newstream->backgroundB = (float) InputParser_GetWordInt(ipc,3) / 255;
-                // so we flip it here.. , the default is not ignoring time..
-            } else
-            /*! REACHED AN OBJECT TYPE DECLERATION ( OBJECTTYPE(spatoula_type,"spatoula.obj") )
-              argument 0 = OBJECTTYPE , argument 1 = name ,  argument 2 = value */
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECTTYPE",10)==1)
-            {
-               char name[MAX_PATH]={0};
-               char model[MAX_PATH]={0};
-               InputParser_GetWord(ipc,1,name,MAX_PATH);
-               InputParser_GetWord(ipc,2,model,MAX_PATH);
-
-               addObjectTypeToVirtualStream( newstream , name, model );
-
-            } else
             /*! REACHED A CONNECTOR DECLERATION ( CONNECTOR(something,somethingElse,0,255,0,0,1.0,type) )
               argument 0 = CONNECTOR , argument 1 = nameOfFirstObject ,  argument 2 = nameOfSecondObject ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = Scale , argument 8 = Type */
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"CONNECTOR",9)==1)
@@ -523,48 +546,6 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
               }
             }
              else
-            /*! REACHED A PROJECTION MATRIX DECLERATION ( PROJECTION_MATRIX( ... 16 values ... ) )
-              argument 0 = PROJECTION_MATRIX , argument 1-16 matrix values*/
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"PROJECTION_MATRIX",17)==1)
-            {
-               newstream->projectionMatrixDeclared=1;
-               int i=1;
-               for (i=1; i<=16; i++) { newstream->projectionMatrix[i-1] = (double)  InputParser_GetWordFloat(ipc,i); }
-               fprintf(stderr,"Projection Matrix given to TrajectoryParser\n");
-            }
-             else
-            /*! REACHED AN EMULATE PROJECTION MATRIX DECLERATION ( PROJECTION_MATRIX( ... 9 values ... ) )
-              argument 0 = PROJECTION_MATRIX , argument 1-9 matrix values*/
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"EMULATE_PROJECTION_MATRIX",25)==1)
-            {
-               newstream->emulateProjectionMatrixDeclared=1;
-               int i=1;
-               for (i=1; i<=9; i++) { newstream->emulateProjectionMatrix[i-1] = (double)  InputParser_GetWordFloat(ipc,i); }
-               fprintf(stderr,"Emulating Projection Matrix given to TrajectoryParser\n");
-            }
-             else
-            /*! REACHED A MODELVIEW MATRIX DECLERATION ( MODELVIEW_MATRIX( ... 16 values ... ) )
-              argument 0 = MODELVIEW_MATRIX , argument 1-16 matrix values*/
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"MODELVIEW_MATRIX",16)==1)
-            {
-               newstream->modelViewMatrixDeclared=1;
-               int i=1;
-               for (i=1; i<=16; i++) { newstream->modelViewMatrix[i-1] = (double) InputParser_GetWordFloat(ipc,i); }
-               fprintf(stderr,"ModelView Matrix given to TrajectoryParser\n");
-            } else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"SCALE_WORLD",11)==1)
-            {
-               newstream->scaleWorld[0] = InputParser_GetWordFloat(ipc,1);
-               newstream->scaleWorld[1] = InputParser_GetWordFloat(ipc,2);
-               newstream->scaleWorld[2] = InputParser_GetWordFloat(ipc,3);
-               fprintf(stderr,"Scaling everything * %f %f %f \n",newstream->scaleWorld[0],newstream->scaleWorld[1],newstream->scaleWorld[2]);
-            } else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"OFFSET_ROTATIONS",16)==1)
-            {
-               newstream->rotationsOffset[0] = InputParser_GetWordFloat(ipc,1);
-               newstream->rotationsOffset[1] = InputParser_GetWordFloat(ipc,2);
-               newstream->rotationsOffset[2] = InputParser_GetWordFloat(ipc,3);
-            } else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"MAP_ROTATIONS",13)==1)
             {
                newstream->scaleWorld[3] = InputParser_GetWordFloat(ipc,1);
@@ -629,7 +610,8 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
       unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
       if ( words_count > 0 )
          {
-             processCommand(newstream,ipc,line,words_count);
+             unsigned int label=scanFor_TrajectoryPrimitives(line,strlen(line));
+             processCommand(newstream,ipc,label,line,words_count);
          } // End of line containing tokens
     } //End of getting a line while reading the file
   }
