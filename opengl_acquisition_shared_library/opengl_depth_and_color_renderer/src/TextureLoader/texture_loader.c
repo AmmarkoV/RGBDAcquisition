@@ -4,7 +4,7 @@
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
 
-#include "../model_loader.h"
+#include "../ModelLoader/model_loader.h"
 #include "texture_loader.h"
 #include "bmp.h"
 #include "ppm.h"

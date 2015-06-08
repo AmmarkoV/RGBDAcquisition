@@ -7,10 +7,10 @@ add_library(OGLRendererSandbox SHARED
             glx.h
             main.c
             OGLRendererSandbox.h
-            model_loader.c
-            model_loader.h
-            model_loader_obj.c
-            model_loader_obj.h
+            ModelLoader/model_loader.c
+            ModelLoader/model_loader.h
+            ModelLoader/model_loader_obj.c
+            ModelLoader/model_loader_obj.h
             save_to_file.c
             save_to_file.h
             scene.c

@@ -82,6 +82,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../tools/AmMatrix/solveLinearSystemGJ.h" />
+		<Unit filename="ModelLoader/model_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ModelLoader/model_loader.h" />
+		<Unit filename="ModelLoader/model_loader_obj.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ModelLoader/model_loader_obj.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="TextureLoader/bmp.c">
 			<Option compilerVar="CC" />

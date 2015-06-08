@@ -9,7 +9,7 @@
 
 
 #include "TrajectoryParser/TrajectoryParser.h"
-#include "model_loader.h"
+#include "ModelLoader/model_loader.h"
 #include "scene.h"
 
 

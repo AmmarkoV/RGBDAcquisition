@@ -15,7 +15,7 @@
 #include <X11/keysym.h>
 
 #include "glx.h"
-#include "model_loader_obj.h"
+#include "ModelLoader/model_loader_obj.h"
 #include "scene.h"
 #include "tools.h"
 

@@ -11,7 +11,7 @@
 
 #include "model_loader.h"
 #include "model_loader_obj.h"
-#include "tools.h"
+#include "../tools.h"
 
 #define DISABLE_GL_CALL_LIST 1
 #if DISABLE_GL_CALL_LIST

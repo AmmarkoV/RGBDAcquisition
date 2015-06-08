@@ -53,7 +53,7 @@
 
 1388407773 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.h
 
-1433758161 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/main.c
+1433771545 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -64,7 +64,7 @@
 	<X11/X.h>
 	<X11/keysym.h>
 	"glx.h"
-	"model_loader_obj.h"
+	"ModelLoader/model_loader_obj.h"
 	"scene.h"
 	"tools.h"
 	"save_to_file.h"
@@ -85,9 +85,9 @@
 	<GL/gl.h>
 	<GL/glext.h>
 
-1416263005 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/tiledRenderer.h
+1433771551 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/tiledRenderer.h
 	"TrajectoryParser/TrajectoryParser.h"
-	"model_loader.h"
+	"ModelLoader/model_loader.h"
 	"scene.h"
 
 1418211682 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h
@@ -378,4 +378,30 @@
 	<stdlib.h>
 	<math.h>
 	"quaternions.h"
+
+1395095541 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.h
+	<GL/gl.h>
+	<GL/glx.h>
+	"model_loader.h"
+
+1416266692 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader.h
+
+1433771568 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	"model_loader.h"
+	"model_loader_obj.h"
+	"../tools.h"
+
+1433771579 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.c
+	"model_loader_obj.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"../TextureLoader/texture_loader.h"
 

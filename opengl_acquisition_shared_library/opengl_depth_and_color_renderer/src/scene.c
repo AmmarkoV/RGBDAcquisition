@@ -13,7 +13,7 @@
 
 #include "../../../tools/AmMatrix/matrixCalculations.h"
 #include "TrajectoryParser/TrajectoryParser.h"
-#include "model_loader.h"
+#include "ModelLoader/model_loader.h"
 #include "scene.h"
 
 #define NORMAL   "\033[0m"
@@ -296,6 +296,37 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
        case 'z' :
               userDeltacamera_pos_z+=1.0;
        break;
+
+
+
+
+       case 'T' :
+       case 't' :
+              userDeltacamera_angle_x+=1.0;
+       break;
+       case 'G' :
+       case 'g' :
+              userDeltacamera_angle_x-=1.0;
+       break;
+       case 'F' :
+       case 'f' :
+              userDeltacamera_angle_y+=1.0;
+       break;
+       case 'H' :
+       case 'h' :
+              userDeltacamera_angle_y-=1.0;
+       break;
+       case 'R' :
+       case 'r' :
+              userDeltacamera_angle_z+=1.0;
+       break;
+       case 'Y' :
+       case 'y' :
+              userDeltacamera_angle_z-=1.0;
+       break;
+
+
+
 
 
       //float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;

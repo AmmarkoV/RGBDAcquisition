@@ -122,7 +122,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
   char typeStr[MAX_PATH]={0};
   char includeFile[MAX_PATH]={0};
   float pos[7]={0};
-  unsigned int i,satteliteObj,planetObj,frame,duration,time,coordLength;
+  unsigned int i,satteliteObj,planetObj,frame,duration,time,coordLength,eventType=0,foundA=0,foundB=0,objIDA=0,objIDB=0;
 
 
   if (line[0]=='#')
@@ -142,7 +142,6 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
              case TRAJECTORYPRIMITIVES_AUTOREFRESH                       :  newstream->autoRefresh = InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_INTERPOLATE_TIME                  :  newstream->ignoreTime = ( InputParser_GetWordInt(ipc,1) == 0 ); break;
 
-             case TRAJECTORYPRIMITIVES_EVENT                             : break;
              case TRAJECTORYPRIMITIVES_FRAME_RESET                       :   newstream->timestamp=0;     break;
              case TRAJECTORYPRIMITIVES_FRAME                             :   newstream->timestamp+=100;  break;
              case TRAJECTORYPRIMITIVES_MOVE_VIEW                         :   newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1); break;
@@ -326,6 +325,23 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
           break;
 
 
+          case TRAJECTORYPRIMITIVES_EVENT :
+              if (InputParser_WordCompareNoCase(ipc,1,(char*)"INTERSECTS",10)==1)
+                     { eventType = EVENT_INTERSECTION; }
+
+              InputParser_GetWord(ipc,2,name,MAX_PATH);
+              objIDA = getObjectID(newstream,name,&foundA);
+
+              InputParser_GetWord(ipc,3,name,MAX_PATH);
+              objIDB = getObjectID(newstream,name,&foundB);
+
+              if ( (foundA) && (foundB) )
+              {
+               InputParser_GetWord(ipc,4,model,MAX_PATH);
+               addEventToVirtualStream(newstream,objIDA,objIDB,eventType,model,InputParser_GetWordLength(ipc,4));
+              }
+          break;
+
 
     default :
              fprintf(stderr,RED "Can't recognize `%s` \n" NORMAL , line);
@@ -503,37 +519,6 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                                       newstream->object[item].Transparency);
                  }
                }
-            }
-            else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"EVENT",5)==1)
-            {
-
-              unsigned int eventType=0;
-               if (InputParser_WordCompareNoCase(ipc,1,(char*)"INTERSECTS",10)==1)
-                     {
-                       eventType = EVENT_INTERSECTION;
-                     }
-
-              unsigned int foundA = 0 , foundB = 0;
-              char name[MAX_PATH];
-              InputParser_GetWord(ipc,2,name,MAX_PATH);
-              unsigned int objIDA = getObjectID(newstream,name,&foundA);
-
-              InputParser_GetWord(ipc,3,name,MAX_PATH);
-              unsigned int objIDB = getObjectID(newstream,name,&foundB);
-
-              if ( (foundA) && (foundB) )
-              {
-               char buf[256];
-               InputParser_GetWord(ipc,4,buf,256);
-               if (addEventToVirtualStream(newstream,objIDA,objIDB,eventType,buf,InputParser_GetWordLength(ipc,4)) )
-               {
-                 fprintf(stderr,"addedEvent\n");
-               } else
-               {
-                 fprintf(stderr,"Could NOT add event\n");
-               }
-              }
             }
 
  return 1;
