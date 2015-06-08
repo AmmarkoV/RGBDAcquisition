@@ -39,7 +39,10 @@ GLuint loadTexture(int type,char * directory ,char *fname)
       height = info->bmiHeader.biHeight;
     }
      else
-  if ( strstr(fname,".ppm") != 0 )
+  if (
+      ( strstr(fname,".ppm") != 0 ) ||
+      ( strstr(fname,".pnm") != 0 )
+     )
     {
       //PPM LOADER
       bits = ( GLubyte * ) ReadPPM((char *) fullPath,&width,&height);

@@ -130,14 +130,6 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="model_loader.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="model_loader.h" />
-		<Unit filename="model_loader_obj.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="model_loader_obj.h" />
 		<Unit filename="save_to_file.c">
 			<Option compilerVar="CC" />
 		</Unit>
