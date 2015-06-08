@@ -117,9 +117,12 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
 {
 
   char name[MAX_PATH]={0};
+  char nameB[MAX_PATH]={0};
   char model[MAX_PATH]={0};
+  char typeStr[MAX_PATH]={0};
   char includeFile[MAX_PATH]={0};
-  unsigned int i,satteliteObj,planetObj,frame,duration;
+  float pos[7]={0};
+  unsigned int i,satteliteObj,planetObj,frame,duration,time,coordLength;
 
 
   if (line[0]=='#')
@@ -134,21 +137,18 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
              case TRAJECTORYPRIMITIVES_COMMENT : /*Comment , don't spam console etc*/ break;
              case TRAJECTORYPRIMITIVES_OBJ : break;
              case TRAJECTORYPRIMITIVES_ARROW  : break;
-             case TRAJECTORYPRIMITIVES_POS  : break;
              case TRAJECTORYPRIMITIVES_DEBUG                             :  newstream->debug=1;           break;
              case TRAJECTORYPRIMITIVES_TIMESTAMP                         :  newstream->timestamp=InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_AUTOREFRESH                       :  newstream->autoRefresh = InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_INTERPOLATE_TIME                  :  newstream->ignoreTime = ( InputParser_GetWordInt(ipc,1) == 0 ); break;
-             case TRAJECTORYPRIMITIVES_OBJECT                            : break;
+
              case TRAJECTORYPRIMITIVES_COMPOSITEOBJECT                   : break;
              case TRAJECTORYPRIMITIVES_EVENT                             : break;
-             case TRAJECTORYPRIMITIVES_MAP_ROTATIONS                     : break;
              case TRAJECTORYPRIMITIVES_FRAME_RESET                       :   newstream->timestamp=0;     break;
              case TRAJECTORYPRIMITIVES_FRAME                             :   newstream->timestamp+=100;  break;
              case TRAJECTORYPRIMITIVES_MOVE_VIEW                         :   newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_SMOOTH                            :   smoothTrajectories(newstream); break;
              case TRAJECTORYPRIMITIVES_OBJ_OFFSET                        :   newstream->objDeclarationsOffset = InputParser_GetWordInt(ipc,1);   break;
-             case TRAJECTORYPRIMITIVES_CONNECTOR                         : break;
              case TRAJECTORYPRIMITIVES_HAND_POINTS                       : break;
 
              case TRAJECTORYPRIMITIVES_BACKGROUND  :
@@ -225,6 +225,90 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                fprintf(stderr,"Offsetting rotations + %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
            break;
 
+
+
+           case TRAJECTORYPRIMITIVES_MAP_ROTATIONS :
+               newstream->scaleWorld[3] = InputParser_GetWordFloat(ipc,1);
+               newstream->scaleWorld[4] = InputParser_GetWordFloat(ipc,2);
+               newstream->scaleWorld[5] = InputParser_GetWordFloat(ipc,3);
+
+               if (InputParser_GetWordChar(ipc,4,0)=='x') { newstream->rotationsXYZ[0]=0; } else
+               if (InputParser_GetWordChar(ipc,4,0)=='y') { newstream->rotationsXYZ[0]=1; } else
+               if (InputParser_GetWordChar(ipc,4,0)=='z') { newstream->rotationsXYZ[0]=2; }
+                //--------------------
+               if (InputParser_GetWordChar(ipc,4,1)=='x') { newstream->rotationsXYZ[1]=0; } else
+               if (InputParser_GetWordChar(ipc,4,1)=='y') { newstream->rotationsXYZ[1]=1; } else
+               if (InputParser_GetWordChar(ipc,4,1)=='z') { newstream->rotationsXYZ[1]=2; }
+                //--------------------
+               if (InputParser_GetWordChar(ipc,4,2)=='x') { newstream->rotationsXYZ[2]=0; } else
+               if (InputParser_GetWordChar(ipc,4,2)=='y') { newstream->rotationsXYZ[2]=1; } else
+               if (InputParser_GetWordChar(ipc,4,2)=='z') { newstream->rotationsXYZ[2]=2; }
+
+               newstream->rotationsOverride=1;
+
+               fprintf(stderr,"Mapping rotations to  %f %f %f / %u %u %u \n",
+                       newstream->scaleWorld[3] , newstream->scaleWorld[4] ,newstream->scaleWorld[5] ,
+                         newstream->rotationsXYZ[0],newstream->rotationsXYZ[1],newstream->rotationsXYZ[2]);
+           break;
+
+
+           case TRAJECTORYPRIMITIVES_OBJECT :
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
+               addObjectToVirtualStream(newstream , name,typeStr,
+                                        (unsigned char) InputParser_GetWordInt(ipc,3),
+                                        (unsigned char) InputParser_GetWordInt(ipc,4),
+                                        (unsigned char) InputParser_GetWordInt(ipc,5),
+                                        (unsigned char) InputParser_GetWordInt(ipc,6),
+                                        (unsigned char) InputParser_GetWordInt(ipc,7),
+                                        0,0,
+                                        InputParser_GetWordFloat(ipc,8),
+                                        InputParser_GetWordFloat(ipc,9),
+                                        InputParser_GetWordFloat(ipc,10)
+                                        ,0);
+
+          break;
+
+
+          case TRAJECTORYPRIMITIVES_CONNECTOR :
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,nameB,MAX_PATH);
+
+               addConnectorToVirtualStream(
+                                            newstream ,
+                                            name , nameB,
+                                            (unsigned char) InputParser_GetWordInt(ipc,3),
+                                            (unsigned char) InputParser_GetWordInt(ipc,4),
+                                            (unsigned char) InputParser_GetWordInt(ipc,5),
+                                            (unsigned char) InputParser_GetWordInt(ipc,6),
+                                            (float) InputParser_GetWordFloat(ipc,7),
+                                            typeStr
+                                          );
+          break;
+
+
+          case TRAJECTORYPRIMITIVES_POS :
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               time = InputParser_GetWordInt(ipc,2);
+
+               pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,3);
+               pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,4);
+               pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,5);
+               pos[3] = newstream->scaleWorld[3] * InputParser_GetWordFloat(ipc,6);
+               pos[4] = newstream->scaleWorld[4] * InputParser_GetWordFloat(ipc,7);
+               pos[5] = newstream->scaleWorld[5] * InputParser_GetWordFloat(ipc,8);
+               pos[6] = InputParser_GetWordFloat(ipc,9);
+               coordLength=7;
+
+               if (newstream->rotationsOverride)
+                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
+
+                //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+                addStateToObjectMini( newstream , name  , time , (float*) pos , coordLength );
+          break;
+
+
+
     default :
              fprintf(stderr,RED "Can't recognize `%s` \n" NORMAL , line);
     break;
@@ -294,52 +378,6 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                #if PRINT_LOAD_INFO
                 fprintf(stderr,"Tracker OBJ%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
                #endif
-            }
-              else
-            /*! REACHED A CONNECTOR DECLERATION ( CONNECTOR(something,somethingElse,0,255,0,0,1.0,type) )
-              argument 0 = CONNECTOR , argument 1 = nameOfFirstObject ,  argument 2 = nameOfSecondObject ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = Scale , argument 8 = Type */
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"CONNECTOR",9)==1)
-            {
-               char firstObject[MAX_PATH]={0} , secondObject[MAX_PATH]={0} , type[MAX_PATH]={0};
-               InputParser_GetWord(ipc,1,firstObject,MAX_PATH);
-               InputParser_GetWord(ipc,2,secondObject,MAX_PATH);
-
-               unsigned char R = (unsigned char) InputParser_GetWordInt(ipc,3);
-               unsigned char G = (unsigned char)  InputParser_GetWordInt(ipc,4);
-               unsigned char B = (unsigned char)  InputParser_GetWordInt(ipc,5);
-               unsigned char Alpha = (unsigned char)  InputParser_GetWordInt(ipc,6);
-               float scale = (float) InputParser_GetWordFloat(ipc,7);
-
-               addConnectorToVirtualStream(
-                                            newstream ,
-                                            firstObject , secondObject,
-                                            R, G , B , Alpha ,
-                                            scale,
-                                            type
-                                          );
-
-            } else
-            /*! REACHED AN OBJECT DECLERATION ( OBJECT(something,spatoula_type,0,255,0,0,0,1.0,spatoula_something) )
-              argument 0 = OBJECT , argument 1 = name ,  argument 2 = type ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = No Color ,
-              argument 8 = ScaleX , argument 9 = ScaleY , argument 10 = ScaleZ , argument 11 = String Freely formed Data */
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"OBJECT",6)==1)
-            {
-               char name[MAX_PATH]={0} , typeStr[MAX_PATH]={0};
-               InputParser_GetWord(ipc,1,name,MAX_PATH);
-               InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
-
-               unsigned char R = (unsigned char) InputParser_GetWordInt(ipc,3);
-               unsigned char G = (unsigned char)  InputParser_GetWordInt(ipc,4);
-               unsigned char B = (unsigned char)  InputParser_GetWordInt(ipc,5);
-               unsigned char Alpha = (unsigned char)  InputParser_GetWordInt(ipc,6) ;
-               unsigned char nocolor = (unsigned char) InputParser_GetWordInt(ipc,7);
-               float scaleX = (float) InputParser_GetWordFloat(ipc,8);
-               float scaleY = (float) InputParser_GetWordFloat(ipc,9);
-               float scaleZ = (float) InputParser_GetWordFloat(ipc,10);
-
-               //Value , not used : InputParser_GetWord(ipc,8,newstream->object[pos].value,15);
-               addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,nocolor,0,0,scaleX,scaleY,scaleZ,0);
-
             } else
             /*! REACHED AN COMPOSITEOBJECT DECLERATION ( COMPOSITEOBJECT(something,spatoula_type,0,255,0,0,0,1.0,1.0,1.0,27,spatoula_something) )
               argument 0 = COMPOSITEOBJECT , argument 1 = name ,  argument 2 = type ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = No Color ,
@@ -471,50 +509,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                  }
                }
             }
-
-            /*! REACHED A POSITION DECLERATION ( POS(hand,0,   0.0,0.0,0.0 , 0.0,0.0,0.0,0.0 ) )
-              argument 0 = POS , argument 1 = name ,  argument 2 = time in MS , argument 3-5 = X,Y,Z , argument 6-9 = Rotations*/
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"POS",3)==1)
-            {
-               char name[MAX_PATH];
-               InputParser_GetWord(ipc,1,name,MAX_PATH);
-               unsigned int time = InputParser_GetWordInt(ipc,2);
-
-               float pos[7]={0};
-               pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,3);
-               pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,4);
-               pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,5);
-               pos[3] = newstream->scaleWorld[3] * InputParser_GetWordFloat(ipc,6);
-               pos[4] = newstream->scaleWorld[4] * InputParser_GetWordFloat(ipc,7);
-               pos[5] = newstream->scaleWorld[5] * InputParser_GetWordFloat(ipc,8);
-               pos[6] = InputParser_GetWordFloat(ipc,9);
-               int coordLength=7;
-
-               if (newstream->rotationsOverride)
-                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
-
-               unsigned int found = 0;
-               unsigned int item = getObjectID(newstream, name, &found );
-               if (found)
-               {
-                //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
-                addStateToObjectID( newstream , item  , time , (float*) pos , coordLength,
-                                    newstream->object[item].scaleX,
-                                    newstream->object[item].scaleY,
-                                    newstream->object[item].scaleZ,
-                                    newstream->object[item].R,
-                                    newstream->object[item].G,
-                                    newstream->object[item].B,
-                                    newstream->object[item].Transparency );
-               } else
-               {
-                 fprintf(stderr,RED "Could not add state/position to non-existing object `%s` \n" NORMAL,name);
-               }
-            }
-
-             else
-            /*! REACHED A PROJECTION MATRIX DECLERATION ( PROJECTION_MATRIX( ... 16 values ... ) )
-              argument 0 = PROJECTION_MATRIX , argument 1-16 matrix values*/
+            else
             if (InputParser_WordCompareNoCase(ipc,0,(char*)"EVENT",5)==1)
             {
 
@@ -545,32 +540,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                }
               }
             }
-             else
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"MAP_ROTATIONS",13)==1)
-            {
-               newstream->scaleWorld[3] = InputParser_GetWordFloat(ipc,1);
-               newstream->scaleWorld[4] = InputParser_GetWordFloat(ipc,2);
-               newstream->scaleWorld[5] = InputParser_GetWordFloat(ipc,3);
 
-               if (InputParser_GetWordChar(ipc,4,0)=='x') { newstream->rotationsXYZ[0]=0; } else
-               if (InputParser_GetWordChar(ipc,4,0)=='y') { newstream->rotationsXYZ[0]=1; } else
-               if (InputParser_GetWordChar(ipc,4,0)=='z') { newstream->rotationsXYZ[0]=2; }
-                //--------------------
-               if (InputParser_GetWordChar(ipc,4,1)=='x') { newstream->rotationsXYZ[1]=0; } else
-               if (InputParser_GetWordChar(ipc,4,1)=='y') { newstream->rotationsXYZ[1]=1; } else
-               if (InputParser_GetWordChar(ipc,4,1)=='z') { newstream->rotationsXYZ[1]=2; }
-                //--------------------
-               if (InputParser_GetWordChar(ipc,4,2)=='x') { newstream->rotationsXYZ[2]=0; } else
-               if (InputParser_GetWordChar(ipc,4,2)=='y') { newstream->rotationsXYZ[2]=1; } else
-               if (InputParser_GetWordChar(ipc,4,2)=='z') { newstream->rotationsXYZ[2]=2; }
-
-               newstream->rotationsOverride=1;
-
-               fprintf(stderr,"Mapping rotations to  %f %f %f / %u %u %u \n",
-                       newstream->scaleWorld[3] , newstream->scaleWorld[4] ,newstream->scaleWorld[5] ,
-                         newstream->rotationsXYZ[0],newstream->rotationsXYZ[1],newstream->rotationsXYZ[2]);
-
-            }
  return 1;
 }
 

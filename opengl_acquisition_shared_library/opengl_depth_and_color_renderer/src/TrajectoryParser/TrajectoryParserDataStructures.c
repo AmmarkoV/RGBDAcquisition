@@ -352,6 +352,34 @@ int addStateToObject(
 }
 
 
+int addStateToObjectMini(
+                              struct VirtualStream * stream ,
+                              char * name  ,
+                              unsigned int timeMilliseconds ,
+                              float * coord ,
+                              unsigned int coordLength
+                       )
+{
+
+ unsigned int ObjFound = 0;
+ unsigned int ObjID = getObjectID(stream,name,&ObjFound);
+ if (ObjFound)
+  {
+     return addStateToObjectID(stream,ObjID,timeMilliseconds,coord,coordLength,
+                                    stream->object[ObjID].scaleX,
+                                    stream->object[ObjID].scaleY,
+                                    stream->object[ObjID].scaleZ,
+                                    stream->object[ObjID].R,
+                                    stream->object[ObjID].G,
+                                    stream->object[ObjID].B,
+                                    stream->object[ObjID].Transparency );
+  }
+  fprintf(stderr,"Could not Find object %s \n",name);
+  return 0;
+}
+
+
+
 
 int addConnectorToVirtualStream(
                                  struct VirtualStream * stream ,

@@ -54,6 +54,13 @@ int addStateToObject(
                               float R , float G , float B , float Alpha
                        );
 
+int addStateToObjectMini(
+                              struct VirtualStream * stream ,
+                              char * name  ,
+                              unsigned int timeMilliseconds ,
+                              float * coord ,
+                              unsigned int coordLength
+                       );
 
 int addConnectorToVirtualStream(
                                  struct VirtualStream * stream ,
