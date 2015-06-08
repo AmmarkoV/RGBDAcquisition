@@ -325,15 +325,6 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
               userDeltacamera_angle_z-=1.0;
        break;
 
-
-
-
-
-      //float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;
-      //float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z = 0.0f;
-
-
-
     }
   return 1;
 }
