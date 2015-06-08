@@ -27,6 +27,7 @@ int photoShootOBJ=0;
 float angleX=0.0,angleY=0.0,angleZ=0.0;
 unsigned int width=640;
 unsigned int height=480;
+unsigned int forceKeyboardControl=0;
 
 unsigned int columns=22,rows=21;
 float distance = 30;
@@ -98,7 +99,10 @@ int main(int argc, char **argv)
                                       }  else
     if (strcmp(argv[i],"-shader")==0) {
                                        enableShaders(argv[i+1],argv[i+2]);
-                                      }
+                                      }  else
+    if (strcmp(argv[i],"-keyboard")==0) {
+                                           forceKeyboardControl=1;
+                                        }
   }
 
 
@@ -132,6 +136,12 @@ int main(int argc, char **argv)
   snapOGLRendererSandbox(); // Snap a frame
   writeOpenGLColor("color.pnm",0,0,width,height);
   writeOpenGLDepth("depth.pnm",0,0,width,height);
+
+  if ( forceKeyboardControl )
+  {
+    setKeyboardControl(1);
+  }
+
 
    while (1)
     {

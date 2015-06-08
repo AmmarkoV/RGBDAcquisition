@@ -259,7 +259,7 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 
 int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
-    if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input is disabled\n"); return 0; }
+    if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input is disabled [ add MOVE_VIEW(1) to scene ]\n"); return 0; }
     fprintf(stderr,"handleUserInput called for key %c ( %u ) \n",key,key);
     switch (key)
     {
@@ -742,6 +742,13 @@ int renderPhotoshoot( void * context  )
 
 
 
-
+int sceneSwitchKeyboardControl(int newVal)
+{
+  if (scene!=0)
+  {
+   scene->userCanMoveCameraOnHisOwn=newVal;
+  }
+ return 1;
+}
 
 

@@ -93,7 +93,7 @@
 
 1397211771 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
 
-1400152890 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader.c
+1416930483 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -106,7 +106,7 @@
 
 1418310443 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/tools.h
 
-1395096758 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader_obj.c
+1416396635 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/model_loader_obj.c
 	"model_loader_obj.h"
 	<stdio.h>
 	<stdlib.h>
@@ -186,7 +186,7 @@
 	"model_loader.h"
 	"scene.h"
 
-1415002965 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/tools.c
+1418310319 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/tools.c
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
@@ -249,42 +249,44 @@
 
 1400069927 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/AmMatrix/collisions.h
 
-1403178855 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/collisions.c
+1418295944 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/collisions.c
 	"collisions.h"
 	<stdio.h>
 	<stdlib.h>
 
-1400069927 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/collisions.h
+1418835072 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/collisions.h
 
-1412880350 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix3x3Tools.c
+1418825866 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix3x3Tools.c
 	"matrix3x3Tools.h"
+	"matrixTools.h"
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
 
-1418825819 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix3x3Tools.h
+1418828292 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix3x3Tools.h
 
-1412881248 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix4x4Tools.c
+1418819667 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix4x4Tools.c
 	"matrix4x4Tools.h"
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
 	"matrixTools.h"
 
-1399040185 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix4x4Tools.h
+1418828288 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix4x4Tools.h
 
-1415003242 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixCalculations.c
+1425033884 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixCalculations.c
 	"matrixCalculations.h"
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
+	"quaternions.h"
 	"matrixTools.h"
 	"matrix3x3Tools.h"
 	"matrix4x4Tools.h"
 	"solveLinearSystemGJ.h"
 	"solveHomography.h"
 
-1415004537 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixCalculations.h
+1418834408 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixCalculations.h
 
 1386710528 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/solveLinearSystemGJ.h
 
@@ -319,4 +321,54 @@
 	"solveHomography.h"
 
 1418730370 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixTools.h
+
+1430827896 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/quaternions.h
+
+1409858305 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c
+	"InputParser_C.h"
+	<math.h>
+	<stdio.h>
+
+1418827350 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.c
+	"TrajectoryCalculator.h"
+	"TrajectoryParserDataStructures.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"../../../../tools/AmMatrix/matrixCalculations.h"
+	"../../../../tools/AmMatrix/quaternions.h"
+
+1418827341 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.h
+	"TrajectoryParser.h"
+
+1418216214 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.h
+	"TrajectoryParser.h"
+
+1418827330 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c
+	"TrajectoryParser.h"
+	"TrajectoryParserDataStructures.h"
+	"TrajectoryCalculator.h"
+	"../../../../tools/AmMatrix/matrixCalculations.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<math.h>
+	"InputParser_C.h"
+
+1418310415 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.c
+	"TrajectoryParserDataStructures.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+
+1393608962 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.c
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+	"TrajectoryPrimitives.h"
+
+1393608962 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.h
 

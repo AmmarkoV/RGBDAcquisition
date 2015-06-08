@@ -61,7 +61,16 @@ unsigned int getOpenGLWidth();
 unsigned int getOpenGLHeight();
 
 /**
-* @brief Enable Shaders ( this has to be called before initializing a scene , otherwise it does something )
+* @brief Enable Keyboard control ( this has to be called after initializing a scene , otherwise it does nothing )
+* @ingroup OGLRendererSandbox
+* @param New Value of Keyboard setting
+* @retval 0=Failure,1=Success
+*/
+int setKeyboardControl(int val);
+
+
+/**
+* @brief Enable Shaders ( this has to be called before initializing a scene , otherwise it does nothing )
 * @ingroup OGLRendererSandbox
 * @param Vertex Shader Filename
 * @param Fragment Shader Filename

@@ -319,6 +319,14 @@ double getOpenGLPixelSize()
  return 2/WIDTH;
 }
 
+
+
+int setKeyboardControl(int val)
+{
+  sceneSwitchKeyboardControl(val);
+  return 1;
+}
+
 int enableShaders(char * vertShaderFilename , char * fragShaderFilename)
 {
   strncpy(fragmentShaderFile , fragShaderFilename,MAX_FILENAMES);

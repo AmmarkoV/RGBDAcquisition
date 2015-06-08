@@ -105,4 +105,14 @@ int tickScene();
 * @retval 1=Success , 0=Failure
 */
 int closeScene();
+
+
+
+/**
+* @brief Set Keyboard Control
+* @ingroup Scene
+* @param New State
+* @retval 1=Success , 0=Failure
+*/
+int sceneSwitchKeyboardControl(int newVal);
 #endif // VISUALS_H_INCLUDED

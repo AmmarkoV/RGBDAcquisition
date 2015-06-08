@@ -1,7 +1,13 @@
+/** @file TrajectoryPrimitives.h
+* @brief A tool that scans for a string in a very fast and robust way
+* @author Ammar Qammaz (AmmarkoV)
+*/
+
 #ifndef TRAJECTORYPRIMITIVES_H_INCLUDED
 #define TRAJECTORYPRIMITIVES_H_INCLUDED
 
 
+/** @brief Enumerator for the IDs of TrajectoryPrimitives so we can know what the result was*/
 enum { 
  TRAJECTORYPRIMITIVES_EMPTY=0,
  TRAJECTORYPRIMITIVES_OBJ,
@@ -28,6 +34,11 @@ enum {
 
 
 
-int scanFor_TrajectoryPrimitives(char * str,unsigned int strLength); 
+/** @brief Scan a string for one of the words of the TrajectoryPrimitives word set
+* @ingroup stringParsing
+* @param Input String , to be scanned
+* @param Length of Input String
+* @retval See above enumerator*/
+ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength); 
 
 #endif
