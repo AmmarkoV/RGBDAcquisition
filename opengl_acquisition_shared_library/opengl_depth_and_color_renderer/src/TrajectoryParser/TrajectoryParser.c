@@ -142,7 +142,6 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
              case TRAJECTORYPRIMITIVES_AUTOREFRESH                       :  newstream->autoRefresh = InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_INTERPOLATE_TIME                  :  newstream->ignoreTime = ( InputParser_GetWordInt(ipc,1) == 0 ); break;
 
-             case TRAJECTORYPRIMITIVES_COMPOSITEOBJECT                   : break;
              case TRAJECTORYPRIMITIVES_EVENT                             : break;
              case TRAJECTORYPRIMITIVES_FRAME_RESET                       :   newstream->timestamp=0;     break;
              case TRAJECTORYPRIMITIVES_FRAME                             :   newstream->timestamp+=100;  break;
@@ -270,6 +269,25 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
           break;
 
 
+
+           case TRAJECTORYPRIMITIVES_COMPOSITEOBJECT :
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
+               addObjectToVirtualStream(newstream , name,typeStr,
+                                        (unsigned char) InputParser_GetWordInt(ipc,3),
+                                        (unsigned char) InputParser_GetWordInt(ipc,4),
+                                        (unsigned char) InputParser_GetWordInt(ipc,5),
+                                        (unsigned char) InputParser_GetWordInt(ipc,6),
+                                        (unsigned char) InputParser_GetWordInt(ipc,7),
+                                        0,0,
+                                        InputParser_GetWordFloat(ipc,8),
+                                        InputParser_GetWordFloat(ipc,9),
+                                        InputParser_GetWordFloat(ipc,10),
+                                        InputParser_GetWordInt(ipc,11) );
+          break;
+
+
+
           case TRAJECTORYPRIMITIVES_CONNECTOR :
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                InputParser_GetWord(ipc,2,nameB,MAX_PATH);
@@ -378,29 +396,6 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                #if PRINT_LOAD_INFO
                 fprintf(stderr,"Tracker OBJ%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
                #endif
-            } else
-            /*! REACHED AN COMPOSITEOBJECT DECLERATION ( COMPOSITEOBJECT(something,spatoula_type,0,255,0,0,0,1.0,1.0,1.0,27,spatoula_something) )
-              argument 0 = COMPOSITEOBJECT , argument 1 = name ,  argument 2 = type ,  argument 3-5 = RGB color  , argument 6 Transparency , argument 7 = No Color ,
-              argument 8 = ScaleX , argument 9 = ScaleY , argument 10 = ScaleZ , argument 11 = Number of arguments , argument 12 = String Freely formed Data */
-            if (InputParser_WordCompareNoCase(ipc,0,(char*)"COMPOSITEOBJECT",15)==1)
-            {
-               char name[MAX_PATH]={0} , typeStr[MAX_PATH]={0};
-               InputParser_GetWord(ipc,1,name,MAX_PATH);
-               InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
-
-               unsigned char R = (unsigned char) InputParser_GetWordInt(ipc,3);
-               unsigned char G = (unsigned char)  InputParser_GetWordInt(ipc,4);
-               unsigned char B = (unsigned char)  InputParser_GetWordInt(ipc,5);
-               unsigned char Alpha = (unsigned char)  InputParser_GetWordInt(ipc,6) ;
-               unsigned char nocolor = (unsigned char) InputParser_GetWordInt(ipc,7);
-               float scaleX = (float) InputParser_GetWordFloat(ipc,8);
-               float scaleY = (float) InputParser_GetWordFloat(ipc,9);
-               float scaleZ = (float) InputParser_GetWordFloat(ipc,10);
-               unsigned int numberOfParticles = (unsigned char)  InputParser_GetWordInt(ipc,11);
-
-               //Value , not used : InputParser_GetWord(ipc,8,newstream->object[pos].value,15);
-               addObjectToVirtualStream(newstream ,name,typeStr,R,G,B,Alpha,nocolor,0,0,scaleX,scaleY,scaleZ,numberOfParticles);
-
             } else
             /*! REACHED A POSITION DECLERATION ( ARROWX(103.0440706,217.1741961,-22.9230451,0.780506107461,0.625148155413,-0,0.00285155239622) )
               argument 0 = ARROW , argument 1-3 = X/Y/Z ,  argument 4-7 =  ux/uy/uz  , argument 8 Scale */
