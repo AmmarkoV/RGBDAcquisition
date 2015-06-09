@@ -368,7 +368,7 @@ int seekRelativeTemplateFrame(int devID,signed int seekFrame)
 {
   if (!deviceIsSafeToUse(devID)) { fprintf(stderr,YELLOW "Device %u is not safe to use At %s , Line %u" NORMAL , __FILE__ , __LINE__ ); return 0; }
 
-  if (device[devID].cycle - seekFrame < 0 )  { device[devID].cycle=0; } else
+  if (device[devID].cycle + seekFrame < 0 )  { device[devID].cycle=0; } else
                                              { device[devID].cycle += seekFrame; }
   return 1;
 }
