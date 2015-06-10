@@ -160,7 +160,16 @@ int isPluginLoaded(ModuleIdentifier moduleID)
    return 1;
 }
 
+void * linkFunction(ModuleIdentifier moduleID,char * functionName,char * moduleName)
+{
+  char *error;
+  char functionNameStr[1024]={0};
+  sprintf(functionNameStr,functionName,moduleName);
+  void * linkPtr = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
 
+  return linkPtr;
+}
 
 
 
@@ -187,9 +196,14 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
 
 
   //Start Stop ================================================================================================================
+
+  plugins[moduleID].startModule = linkFunction(moduleID,"start%sModule",moduleName);
+
+  /*
   sprintf(functionNameStr,"start%sModule",moduleName);
   plugins[moduleID].startModule = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+*/
 
   sprintf(functionNameStr,"stop%sModule",moduleName);
   plugins[moduleID].stopModule = dlsym(plugins[moduleID].handle, functionNameStr );
@@ -244,6 +258,11 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
   sprintf(functionNameStr,"seek%sFrame",moduleName);
   plugins[moduleID].seekFrame = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+
+  sprintf(functionNameStr,"control%sFlow",moduleName);
+  plugins[moduleID].controlFlow = dlsym(plugins[moduleID].handle, functionNameStr );
+  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW  "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+
 
 
 

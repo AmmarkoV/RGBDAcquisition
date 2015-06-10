@@ -80,6 +80,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="OpenGLAcquisition.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="opengl_depth_and_color_renderer/src/ModelLoader/model_loader.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/OGLRendererSandbox.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/bmp.c">
 			<Option compilerVar="CC" />

@@ -422,6 +422,10 @@ int acquisitionSeekFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,unsign
  */
 int acquisitionSeekRelativeFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,signed int seekFrame);
 
+
+//NOT READY YET
+int acquisitionControlFlow(ModuleIdentifier moduleID,DeviceIdentifier devID,float newFlowState);
+
 /**
  * @brief  Snap a new frame from device , this will populate  acquisitionGetColorFrame acquisitionGetDepthFrame with new frames
  * @ingroup acquisitionCore

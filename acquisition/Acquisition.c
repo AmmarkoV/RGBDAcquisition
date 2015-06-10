@@ -711,6 +711,18 @@ int acquisitionGetCurrentFrameNumber(ModuleIdentifier moduleID,DeviceIdentifier 
     return 0;
 }
 
+
+int acquisitionControlFlow(ModuleIdentifier moduleID,DeviceIdentifier devID,float newFlowState)
+{
+    printCall(moduleID,devID,"acquisitionControlFlow", __FILE__, __LINE__);
+    if (*plugins[moduleID].controlFlow!=0) { return (*plugins[moduleID].controlFlow) (devID,newFlowState); }
+
+    MeaningfullWarningMessage(moduleID,devID,"acquisitionControlFlow");
+
+  return 0;
+}
+
+
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
     printCall(moduleID,devID,"acquisitionSnapFrames", __FILE__, __LINE__);
