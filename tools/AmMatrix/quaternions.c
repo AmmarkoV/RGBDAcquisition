@@ -366,14 +366,16 @@ void axisAngle2Quaternion(double * quaternionOutput,double xx,double yy,double z
 
 void quaternionRotate(double * quaternion , double rotX , double rotY, double rotZ , double angleDegrees , int quaternionConvention)
 {
-    double rotationQuaternion[4]= {0};
+    double rotationQuaternion[4]={0};
     axisAngle2Quaternion(rotationQuaternion,rotX,rotY,rotZ,angleDegrees,quaternionConvention);
 
-    double result[4]= {0};
+    double result[4]={0};
     multiplyQuaternions(&result[pQX],&result[pQY],&result[pQZ],&result[pQW],
                         quaternion[pQX],quaternion[pQY],quaternion[pQZ],quaternion[pQW],
                         rotationQuaternion[pQX],rotationQuaternion[pQY],rotationQuaternion[pQZ],rotationQuaternion[pQW] );
 
+
+   quaternion[0]=result[0]; quaternion[1]=result[1]; quaternion[2]=result[2]; quaternion[3]=result[3];
 }
 
 
