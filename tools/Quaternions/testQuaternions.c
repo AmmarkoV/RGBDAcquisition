@@ -16,6 +16,29 @@ int forceUSLocaleToKeepOurSanity()
    return 1;
 }
 
+int testRotation(double * quaternions , double * euler , double rX,double rY,double rZ)
+{
+    unsigned int i=0;
+    signed int inc=10;
+    for (i=0; i<5; i++)
+    {
+      quaternionRotate(quaternions,rX,rY,rZ, inc,qXqYqZqW);
+      quaternions2Euler(euler,quaternions,qXqYqZqW);
+      printf("Step %u %d  |  %f %f %f \n",i,inc,euler[0],euler[1],euler[2]);
+    }
+
+    inc=-10;
+    for (i=0; i<5; i++)
+    {
+      quaternionRotate(quaternions,rX,rY,rZ, inc,qXqYqZqW);
+      quaternions2Euler(euler,quaternions,qXqYqZqW);
+      printf("Step %u %d | %f %f %f \n",i,inc,euler[0],euler[1],euler[2]);
+    }
+
+ return 1;
+}
+
+
 int main(int argc, char *argv[])
 {
     forceUSLocaleToKeepOurSanity();
@@ -30,24 +53,9 @@ int main(int argc, char *argv[])
     euler2Quaternions(quaternions,euler,qXqYqZqW);
     printf("Strarting from %f %f %f \n",euler[0],euler[1],euler[2]);
 
-    unsigned int i=0;
-    signed int inc=10;
-    for (i=0; i<10; i++)
-    {
-      quaternionRotate(quaternions,1.0,0.0,0.0, inc,qXqYqZqW);
-      quaternions2Euler(euler,quaternions,qXqYqZqW);
-      printf("Step %u %d  |  %f %f %f \n",i,inc,euler[0],euler[1],euler[2]);
-    }
-
-    inc=-10;
-    for (i=0; i<10; i++)
-    {
-      quaternionRotate(quaternions,1.0,0.0,0.0, inc,qXqYqZqW);
-      quaternions2Euler(euler,quaternions,qXqYqZqW);
-      printf("Step %u %d | %f %f %f \n",i,inc,euler[0],euler[1],euler[2]);
-    }
-
-
+    testRotation(quaternions,euler,1.0,0.0,0.0);
+    testRotation(quaternions,euler,0.0,1.0,0.0);
+    testRotation(quaternions,euler,0.0,0.0,1.0);
 
     return 0;
 }
