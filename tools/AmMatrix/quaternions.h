@@ -24,6 +24,16 @@ enum quatOrder
 };
 
 
+enum quatOrderXYZW
+{
+  pQX=0,
+  pQY,
+  pQZ,
+  pQW
+};
+
+
+
 /**
  * @brief This function converts euler angles to quaternions
  * @ingroup quaternions
