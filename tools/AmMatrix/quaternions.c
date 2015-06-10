@@ -134,15 +134,14 @@ void multiplyQuaternions(double * qXOut,double * qYOut,double * qZOut,double * q
                          double qAX,double qAY,double qAZ,double qAW ,
                          double qBX,double qBY,double qBZ,double qBW)
 {
-    *qXOut = (qBX*qAX)-(qBY*qAY)-(qBZ*qAZ)-(qBW*qAW);
-    *qYOut = (qBX*qAY)+(qBY*qAX)-(qBZ*qAW)+(qBW*qAZ);
-    *qZOut = (qBX*qAZ)+(qBY*qAW)+(qBZ*qAX)-(qBW*qAY);
-    *qWOut = (qBX*qAW)-(qBY*qAZ)+(qBZ*qAY)+(qBW*qAX);
+    *qXOut = (qBX*qAW)+(qBW*qAX)+(qBZ*qAY)-(qBY*qAZ);
+    *qYOut = (qBY*qAW)-(qBZ*qAX)+(qBW*qAY)+(qBX*qAZ);
+    *qZOut = (qBZ*qAW)+(qBY*qAX)-(qBX*qAY)+(qBW*qAZ);
+    *qWOut = (qBW*qAW)-(qBX*qAX)-(qBY*qAY)-(qBZ*qAZ);
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 
 void euler2Quaternions(double * quaternions,double * euler,int quaternionConvention)
 {
@@ -349,15 +348,15 @@ void axisAngle2Quaternion(double * quaternionOutput,double xx,double yy,double z
 {
     // Here we calculate the sin( theta / 2) once for optimization
     double aDeg= a*PI_DIV_180;
-    double result = sin( aDeg / 2.0 );
+    double sin_aDegDiv2 = sin( aDeg / 2.0 );
 
     // Calculate the x, y and z of the quaternion
-    double x = xx * result;
-    double y = yy * result;
-    double z = zz * result;
+    double x = xx * sin_aDegDiv2;
+    double y = yy * sin_aDegDiv2;
+    double z = zz * sin_aDegDiv2;
+    double w = cos( aDeg / 2.0 );
 
     // Calcualte the w value by cos( theta / 2 )
-    double w = cos( aDeg / 2.0 );
     normalizeQuaternions(&x,&y,&z,&w);
 
     handleQuaternionPackConvention(x,y,z,w,quaternionOutput,quaternionConvention);
@@ -379,7 +378,4 @@ void quaternionRotate(double * quaternion , double rotX , double rotY, double ro
 
    quaternion[0]=result[0]; quaternion[1]=result[1]; quaternion[2]=result[2]; quaternion[3]=result[3];
 }
-
-
-
 
