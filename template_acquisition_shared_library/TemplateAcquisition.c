@@ -44,6 +44,7 @@ struct TemplateVirtualDevice
  char colorExtension[MAX_EXTENSION_PATH];
  char depthExtension[MAX_EXTENSION_PATH];
  unsigned int cycle;
+ float cycleFlow;
  unsigned int totalFrames;
  unsigned int safeGUARD;
 
@@ -352,16 +353,30 @@ int snapTemplateFrames(int devID)
   free(file_name_test);
   file_name_test=0;
 
-  ++device[devID].cycle;
+
+  if (device[devID].cycleFlow<0.0)
+  {
+   if (device[devID].cycle>0) { --device[devID].cycle; }
+  } else
+  {
+   ++device[devID].cycle;
+   if (device[devID].cycle>65534) { device[devID].cycle=0; }
+  }
+
+
   if ( device[devID].safeGUARD != SAFEGUARD_VALUE ) { fprintf(stderr,"\n\n\n\nERROR , memory corruption \n\n\n\n"); }
 
-  if (device[devID].cycle>65534) { device[devID].cycle=0; }
   if (found_frames==0) { /*fprintf(stderr,YELLOW "Finished stream \n" NORMAL);*/  device[devID].cycle = 0; } else
   if (found_frames!=2) { fprintf(stderr,YELLOW "\n Warning: Did not find both frames\n" NORMAL);   }
 
   return 1;
 }
 
+
+int controlTemplateFlow(int devID,float newFlowState)
+{
+  device[devID].cycleFlow = newFlowState;
+}
 
 
 int seekRelativeTemplateFrame(int devID,signed int seekFrame)

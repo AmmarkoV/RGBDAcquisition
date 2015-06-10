@@ -41,6 +41,7 @@ extern "C"
    int getTotalTemplateFrameNumber(int devID);
    int getCurrentTemplateFrameNumber(int devID);
 
+   int controlTemplateFlow(int devID,float newFlowState);
 
    int seekRelativeTemplateFrame(int devID,signed int seekFrame);
    int seekTemplateFrame(int devID,unsigned int seekFrame);
