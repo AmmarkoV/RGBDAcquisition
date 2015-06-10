@@ -369,10 +369,12 @@ void quaternionRotate(double * quaternion , double rotX , double rotY, double ro
     double rotationQuaternion[4]={0};
     axisAngle2Quaternion(rotationQuaternion,rotX,rotY,rotZ,angleDegrees,quaternionConvention);
 
+
+    normalizeQuaternions(&quaternion[pQX],&quaternion[pQY],&quaternion[pQZ],&quaternion[pQW]);
     double result[4]={0};
     multiplyQuaternions(&result[pQX],&result[pQY],&result[pQZ],&result[pQW],
-                        quaternion[pQX],quaternion[pQY],quaternion[pQZ],quaternion[pQW],
-                        rotationQuaternion[pQX],rotationQuaternion[pQY],rotationQuaternion[pQZ],rotationQuaternion[pQW] );
+                        rotationQuaternion[pQX],rotationQuaternion[pQY],rotationQuaternion[pQZ],rotationQuaternion[pQW],
+                        quaternion[pQX],quaternion[pQY],quaternion[pQZ],quaternion[pQW] );
 
 
    quaternion[0]=result[0]; quaternion[1]=result[1]; quaternion[2]=result[2]; quaternion[3]=result[3];

@@ -4,6 +4,7 @@
 		<Project filename="../3dparty/fast/fast.cbp" />
 		<Project filename="Calibration/CalibrationLibrary.cbp" />
 		<Project filename="OperatingSystem/OperatingSystem.cbp" />
+		<Project filename="Quaternions/TestQuaternions.cbp" />
 		<Project filename="Quaternions/QuaternionsToEuler.cbp" />
 		<Project filename="Quaternions/EulerToQuaternions.cbp" />
 		<Project filename="Quaternions/RotationBetweenQuaternions.cbp" />

@@ -15,6 +15,11 @@ target_link_libraries(RotationBetweenQuaternions rt dl m  )
 set_target_properties(RotationBetweenQuaternions PROPERTIES DEBUG_POSTFIX "D")   
        
  
+add_executable(TestQuaternions testQuaternions.c ../AmMatrix/quaternions.c ) 
+target_link_libraries(TestQuaternions rt dl m  )
+set_target_properties(TestQuaternions PROPERTIES DEBUG_POSTFIX "D")   
+       
+ 
 
 
 
@@ -40,4 +45,12 @@ set_target_properties(RotationBetweenQuaternions PROPERTIES
                        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                      ) 
+
+set_target_properties(TestQuaternions PROPERTIES 
+                       DEBUG_POSTFIX "D"
+                       ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                       LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                       )
+
