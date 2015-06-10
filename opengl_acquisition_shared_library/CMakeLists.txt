@@ -8,10 +8,10 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/glx.h
             opengl_depth_and_color_renderer/src/main.c
             opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
-            opengl_depth_and_color_renderer/src/model_loader.c
-            opengl_depth_and_color_renderer/src/model_loader.h
-            opengl_depth_and_color_renderer/src/model_loader_obj.c
-            opengl_depth_and_color_renderer/src/model_loader_obj.h
+            opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c
+            opengl_depth_and_color_renderer/src/ModelLoader/model_loader.h
+            opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.c
+            opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.h
             opengl_depth_and_color_renderer/src/save_to_file.c
             opengl_depth_and_color_renderer/src/save_to_file.h
             opengl_depth_and_color_renderer/src/scene.c
