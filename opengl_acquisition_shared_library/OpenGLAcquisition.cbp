@@ -117,6 +117,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.h" />
+		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/glx.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -124,14 +128,6 @@
 		<Unit filename="opengl_depth_and_color_renderer/src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/model_loader.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/model_loader.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/model_loader_obj.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/model_loader_obj.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/save_to_file.c">
 			<Option compilerVar="CC" />
 		</Unit>
