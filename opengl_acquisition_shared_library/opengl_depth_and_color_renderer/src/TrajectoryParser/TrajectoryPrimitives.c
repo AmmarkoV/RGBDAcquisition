@@ -1,5 +1,5 @@
 /*                  
-This file was automatically generated @ 08-06-2015 14:31:07 using StringRecognizer                  
+This file was automatically generated @ 11-06-2015 14:05:56 using StringRecognizer                  
 https://github.com/AmmarkoV/AmmarServer/tree/master/src/StringRecognizer                 
 Please note that changes you make here may be automatically overwritten                  
 if the String Recognizer generator runs again..!              
@@ -42,7 +42,7 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
          switch (toupper(str[2])) { 
          case 'M' : 
              if ( (strLength >= 7 )&& ( strncasecmp(str,"COMMENT",7) == 0 ) ) { return TRAJECTORYPRIMITIVES_COMMENT; } 
-             else  if ( (strLength >= 15 )&& ( strncasecmp(str,"COMPOSITEOBJECT",15) == 0 ) ) { return TRAJECTORYPRIMITIVES_COMPOSITEOBJECT; } 
+             else  if ( (strLength >= 16 )&& ( strncasecmp(str,"COMPOSITE_OBJECT",16) == 0 ) ) { return TRAJECTORYPRIMITIVES_COMPOSITE_OBJECT; } 
          break; 
          case 'N' : 
              if ( (strLength >= 9 )&& ( strncasecmp(str,"CONNECTOR",9) == 0 ) ) { return TRAJECTORYPRIMITIVES_CONNECTOR; } 
@@ -144,6 +144,10 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
          if ( strncasecmp(str,"PROJECTION_MATRIX",17) == 0 ) { return TRAJECTORYPRIMITIVES_PROJECTION_MATRIX; } 
      break; 
     }; 
+ break; 
+ case 'R' : 
+     if (strLength<12) { return 0; } 
+     if ( strncasecmp(str,"RIGID_OBJECT",12) == 0 ) { return TRAJECTORYPRIMITIVES_RIGID_OBJECT; } 
  break; 
  case 'S' : 
      switch (toupper(str[1])) { 

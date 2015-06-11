@@ -250,6 +250,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
            break;
 
 
+           case TRAJECTORYPRIMITIVES_RIGID_OBJECT :
            case TRAJECTORYPRIMITIVES_OBJECT :
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
@@ -269,7 +270,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
 
 
 
-           case TRAJECTORYPRIMITIVES_COMPOSITEOBJECT :
+           case TRAJECTORYPRIMITIVES_COMPOSITE_OBJECT :
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
                addObjectToVirtualStream(newstream , name,typeStr,
