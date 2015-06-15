@@ -230,6 +230,7 @@ struct VirtualStream
 
     unsigned int userCanMoveCameraOnHisOwn;
     unsigned int playback;
+    float rate;
 
     unsigned int autoRefresh;
     unsigned int lastRefresh;

@@ -121,8 +121,10 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
   char model[MAX_PATH]={0};
   char typeStr[MAX_PATH]={0};
   char includeFile[MAX_PATH]={0};
+  double euler[3];
+  double quaternions[4];
   float pos[7]={0};
-  unsigned int i,satteliteObj,planetObj,frame,duration,time,coordLength,eventType=0,foundA=0,foundB=0,objIDA=0,objIDB=0;
+  unsigned int i,satteliteObj,planetObj,item,frame,duration,time,coordLength,eventType=0,foundA=0,foundB=0,objIDA=0,objIDB=0;
 
 
   if (line[0]=='#')
@@ -144,6 +146,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
 
              case TRAJECTORYPRIMITIVES_FRAME_RESET                       :   newstream->timestamp=0;     break;
              case TRAJECTORYPRIMITIVES_FRAME                             :   newstream->timestamp+=100;  break;
+             case TRAJECTORYPRIMITIVES_RATE                              :   newstream->rate=InputParser_GetWordFloat(ipc,1);  break;
              case TRAJECTORYPRIMITIVES_MOVE_VIEW                         :   newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_SMOOTH                            :   smoothTrajectories(newstream); break;
              case TRAJECTORYPRIMITIVES_OBJ_OFFSET                        :   newstream->objDeclarationsOffset = InputParser_GetWordInt(ipc,1);   break;
@@ -342,6 +345,72 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                addEventToVirtualStream(newstream,objIDA,objIDB,eventType,model,InputParser_GetWordLength(ipc,4));
               }
           break;
+
+
+
+
+          case TRAJECTORYPRIMITIVES_PQ :
+               //PQ(ID,X,Y,Z,QX,QY,QZ,QW)
+               item = InputParser_GetWordInt(ipc,1);
+               //item+= + 1 + newstream->objDeclarationsOffset; /*Item 0 is camera so we +1 */
+
+               frame = InputParser_GetWordInt(ipc,2);
+
+               pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,3);
+               pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,4);
+               pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,5);
+               pos[3] = InputParser_GetWordFloat(ipc,6);
+               pos[4] = InputParser_GetWordFloat(ipc,7);
+               pos[5] = InputParser_GetWordFloat(ipc,8);
+               pos[6] = InputParser_GetWordFloat(ipc,9);
+               if ( (pos[3]==0) && (pos[4]==0)  && (pos[5]==0)  && (pos[6]==0)  )
+                  {
+                    /*fprintf(stderr,"OBJ %u , frame %u declared with completely zero quaternion normalizing it to 0,0,0,1\n",item,newstream->timestamp);*/
+                    pos[6]=1.0;
+                  }
+
+               coordLength=7;
+               quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
+
+               normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
+               quaternions2Euler(euler,quaternions,1); //1
+               pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
+               pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
+               pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
+               pos[6] = 0;
+
+               #if PRINT_LOAD_INFO
+                fprintf(stderr,"Tracker OBJ%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+                fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+               #endif
+
+               if (newstream->rotationsOverride)
+                    { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
+
+               addStateToObjectID( newstream , item , frame*newstream->rate  , (float*) pos , coordLength ,
+                                   newstream->object[item].scaleX,
+                                   newstream->object[item].scaleY,
+                                   newstream->object[item].scaleZ,
+                                   newstream->object[item].R,
+                                   newstream->object[item].G,
+                                   newstream->object[item].B,
+                                   newstream->object[item].Transparency);
+
+               if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
+
+
+               #if PRINT_LOAD_INFO
+                fprintf(stderr,"Tracker OBJ%u(now has %u / %u positions )\n",item,newstream->object[item].numberOfFrames,newstream->object[item].MAX_numberOfFrames);
+               #endif
+          break;
+
+
+
+
+
+
+
+
 
 
     default :

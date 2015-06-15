@@ -21,16 +21,16 @@ add_library(OGLRendererSandbox SHARED
             tiledRenderer.h
             tools.c
             tools.h 
-            ../../tools/AmMatrix/quaternions.c
-            ../../tools/AmMatrix/quaternions.h
-            ../../tools/AmMatrix/matrix3x3Tools.c
-            ../../tools/AmMatrix/matrix3x3Tools.h
-            ../../tools/AmMatrix/matrix4x4Tools.c
-            ../../tools/AmMatrix/matrix4x4Tools.h
-            ../../tools/AmMatrix/matrixCalculations.c
-            ../../tools/AmMatrix/matrixCalculations.h
-            ../../tools/AmMatrix/solveLinearSystemGJ.c
-            ../../tools/AmMatrix/solveLinearSystemGJ.h
+            ../../../tools/AmMatrix/quaternions.c
+            ../../../tools/AmMatrix/quaternions.h
+            ../../../tools/AmMatrix/matrix3x3Tools.c
+            ../../../tools/AmMatrix/matrix3x3Tools.h
+            ../../../tools/AmMatrix/matrix4x4Tools.c
+            ../../../tools/AmMatrix/matrix4x4Tools.h
+            ../../../tools/AmMatrix/matrixCalculations.c
+            ../../../tools/AmMatrix/matrixCalculations.h
+            ../../../tools/AmMatrix/solveLinearSystemGJ.c
+            ../../../tools/AmMatrix/solveLinearSystemGJ.h
             TextureLoader/bmp.c
             TextureLoader/bmp.h
             TextureLoader/ppm.c

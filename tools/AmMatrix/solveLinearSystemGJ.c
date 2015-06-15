@@ -472,6 +472,7 @@ void testGJSolver()
   print3x3DScilabMatrix("M",F3x3);
 
 
+/*
   double err = testHomographyError(F3x3 , i ,  pointsA , pointsB);
   printf("result homography brings error %0.2f \n",err);
 
@@ -486,7 +487,7 @@ void testGJSolver()
         err = testHomographyError(F3x3 , i , pointsA , pointsB);
   printf("known good homography brings error %0.2f \n",err);
 
-
+*/
 
   free3x3Matrix(&F3x3);
   free(pointsA);
