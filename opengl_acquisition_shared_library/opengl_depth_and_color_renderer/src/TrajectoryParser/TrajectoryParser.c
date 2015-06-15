@@ -183,6 +183,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
               }
              break;
 
+            case TRAJECTORYPRIMITIVES_OBJECT_TYPE :
             case TRAJECTORYPRIMITIVES_OBJECTTYPE :
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                InputParser_GetWord(ipc,2,model,MAX_PATH);
