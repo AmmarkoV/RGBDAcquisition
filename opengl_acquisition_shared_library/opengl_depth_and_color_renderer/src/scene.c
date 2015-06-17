@@ -538,6 +538,11 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   float scaleX=1.0,scaleY=1.0,scaleZ=1.0;
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 
+
+  if (ticks%10==0)
+  {
+    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks ) \r",(float) timestampToUse/1000,ticks);
+  }
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<scene->numberOfObjects; i++)
     {

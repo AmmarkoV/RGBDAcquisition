@@ -502,10 +502,14 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    if (stream==0) { fprintf(stderr,"calculateVirtualStreamPos called with null stream\n"); return 0; }
    if (stream->object==0) { fprintf(stderr,"calculateVirtualStreamPos called with null object array\n"); return 0; }
    if (stream->numberOfObjects<=ObjID) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u is out of bounds (%u)\n",ObjID,stream->numberOfObjects); return 0; }
+
+   if ( (ObjID==0) && (stream->object[ObjID].frame == 0 )  ) { /*Special case with non declared cameras , it is ok , dont spam for every frame..! */ return 0; }
+     else
    if (stream->object[ObjID].frame == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u does not have a frame array allocated\n",ObjID); return 0; }
 
 
    if ( (ObjID==0) && (stream->object[ObjID].numberOfFrames == 0 )  ) { /*Special case with non declared cameras , it is ok , dont spam for every frame..! */ return 0; }
+    else
    if (stream->object[ObjID].numberOfFrames == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u has 0 frames\n",ObjID); return 0; }
 
 

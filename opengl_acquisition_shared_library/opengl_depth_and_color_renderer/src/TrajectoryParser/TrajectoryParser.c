@@ -388,6 +388,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
+
                addStateToObjectID( newstream , item , frame*newstream->rate  , (float*) pos , coordLength ,
                                    newstream->object[item].scaleX,
                                    newstream->object[item].scaleY,
@@ -397,7 +398,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                                    newstream->object[item].B,
                                    newstream->object[item].Transparency);
 
-               if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
+              // if ( (item==newstream->numberOfObjects) || (INCREMENT_TIMER_FOR_EACH_OBJ) ) { newstream->timestamp+=100; }
 
 
                #if PRINT_LOAD_INFO
@@ -766,6 +767,7 @@ struct VirtualStream * createVirtualStream(char * filename)
 
   //Clear the whole damn thing..
   memset(newstream,0,sizeof(struct VirtualStream));
+  newstream->rate=1.0;
 
   if (filename!=0)
   {
