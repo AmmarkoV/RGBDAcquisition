@@ -513,16 +513,26 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    if (stream->object[ObjID].numberOfFrames == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u has 0 frames\n",ObjID); return 0; }
 
 
-   if (stream->autoRefresh != 0 )
+   if (
+        (stream->autoRefresh != 0 ) ||
+        (stream->autoRefreshForce)
+      )
     {
          //Check for refreshed version ?
-       if (stream->autoRefresh < timeAbsMilliseconds-stream->lastRefresh )
+       if  (
+            (stream->autoRefreshForce) ||
+            (stream->autoRefresh < timeAbsMilliseconds-stream->lastRefresh )
+           )
           {
             unsigned long current_size = getFileSize(stream->filename);
-            if (current_size != stream->fileSize)
+            if (
+                (current_size != stream->fileSize) ||
+                (stream->autoRefreshForce)
+               )
              {
               refreshVirtualStream(stream);
               stream->lastRefresh = timeAbsMilliseconds;
+              stream->autoRefreshForce=0;
              }
           }
     }

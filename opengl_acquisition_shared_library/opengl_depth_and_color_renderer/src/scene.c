@@ -34,6 +34,7 @@ struct shaderObject * loadedShader=0;
 struct VirtualStream * scene = 0;
 struct Model ** models=0;
 
+unsigned int pauseTicking=0;
 float farPlane = 255; //<--be aware that this has an effect on the depth maps generated
 float nearPlane= 1; //<--this also
 float fieldOfView = 65;
@@ -267,6 +268,23 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
        case 2 : userDeltacamera_angle_y+=1.0; break;
        case 3 : userDeltacamera_angle_z+=1.0; break;
 
+
+        case ' ' :
+            if (pauseTicking) { pauseTicking=0; } else { pauseTicking=1; }
+        break;
+
+
+       case 9 : //TAB
+            if (scene!=0)
+             { scene->autoRefreshForce=1; }
+       break;
+
+       case 'P' :
+       case 'p' :
+            //Unpause/Pause..
+       break;
+
+
        case 'W' :
        case 'w' :
               userDeltacamera_pos_y+=1.0;
@@ -444,6 +462,12 @@ int closeScene()
 
 int tickScene()
 {
+   if (pauseTicking)
+   {
+       //No Tick
+       return 0;
+   }
+
    //ALL positions should be calculated here!
    //i dont like the way this is working now
    float posStack[7]={0};

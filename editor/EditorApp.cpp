@@ -31,3 +31,5 @@ bool EditorApp::OnInit()
     return wxsOK;
 
 }
+
+

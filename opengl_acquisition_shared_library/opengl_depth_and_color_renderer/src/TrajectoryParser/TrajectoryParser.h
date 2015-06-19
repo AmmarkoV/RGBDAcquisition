@@ -233,6 +233,7 @@ struct VirtualStream
     float rate;
 
     unsigned int autoRefresh;
+    unsigned int autoRefreshForce;
     unsigned int lastRefresh;
     unsigned int fileSize;
 
