@@ -207,6 +207,10 @@ struct Model * loadModel(char * directory,char * modelname)
   if ( strcmp(modelname,"pyramid") == 0 ) {  mod->type = OBJ_PYRAMID;   mod->model = 0; }  else
   if ( strcmp(modelname,"axis") == 0 )    {  mod->type = OBJ_AXIS;      mod->model = 0; }  else
   if ( strcmp(modelname,"sphere") == 0 )  {  mod->type = OBJ_SPHERE;    mod->model = 0; }  else
+  if ( strcmp(modelname,"none") == 0 )       {  mod->type = OBJ_INVISIBLE;    mod->model = 0; }  else
+  if ( strcmp(modelname,"invisible") == 0 )  {  mod->type = OBJ_INVISIBLE;    mod->model = 0; }  else
+
+
 
   if ( strstr(modelname,".obj") != 0 )
     {
@@ -330,6 +334,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       case OBJ_CUBE :      drawCube();                           break;
       case OBJ_PYRAMID :   drawPyramid();                        break;
       case OBJ_SPHERE  :   drawSphere();                         break;
+      case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
       case OBJMODEL :
       {
          if (mod->model!=0)

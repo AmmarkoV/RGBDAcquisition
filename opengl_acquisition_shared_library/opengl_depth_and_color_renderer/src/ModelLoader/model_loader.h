@@ -21,6 +21,7 @@ enum ModelTypes
     OBJ_CUBE,
     OBJ_PYRAMID,
     OBJ_SPHERE,
+    OBJ_INVISIBLE,
     //-----------
     OBJMODEL,
     //-----------
