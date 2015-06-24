@@ -353,7 +353,7 @@ void buildOpenGLProjectionForIntrinsics   (
 
     if  ( (R_sub_L==0) || (R_sub_L-1.0f==0) ||
           (T_sub_B==0) || (T_sub_B-1.0f==0) ||
-          (F_sub_N==0) ) { fprintf(stderr,"Problem with image limigs R-L=%f , T-B=%f , F-N=%f\n",R_sub_L,T_sub_B,F_sub_N); }
+          (F_sub_N==0) ) { fprintf(stderr,"Problem with image limits R-L=%f , T-B=%f , F-N=%f\n",R_sub_L,T_sub_B,F_sub_N); }
 
 
    // set the viewport parameters
@@ -365,99 +365,18 @@ void buildOpenGLProjectionForIntrinsics   (
    frustum[8] = 2.0f*cx/R_sub_L-1.0f; frustum[9] = 2.0f*cy/T_sub_B-1.0f; frustum[10]=-1.0*(F_plus_N/F_sub_N);            frustum[11] = -1.0f;
    frustum[12]= 0.0f;                 frustum[13]= 0.0f;                 frustum[14]=-2.0f*F_mul_N/(F_sub_N);            frustum[15] = 0.0f;
    //Matrix already in OpenGL column major format
-}
-
-
-void buildOpenGLProjectionForIntrinsicsAS  (
-                                             double * frustum,
-                                             int * viewport ,
-                                             double fx,
-                                             double fy,
-                                             double skew,
-                                             double cx, double cy,
-                                             unsigned int imageWidth, unsigned int imageHeight,
-                                             double nearPlane,
-                                             double farPlane
-                                           )
-{
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsics according to new MBV Ammar code Image ( %u x %u )\n",imageWidth,imageHeight);
-   fprintf(stderr,"fx %0.2f fy %0.2f , cx %0.2f , cy %0.2f , skew %0.2f \n",fx,fy,cx,cy,skew);
-   fprintf(stderr,"Near %0.2f Far %0.2f \n",nearPlane,farPlane);
-
-
-    // These parameters define the final viewport that is rendered into by
-    // the camera.
-    //     Left    Bottom   Right       Top
-    double L = 0.0 , B = 0.0  , R = imageWidth , T = imageHeight;
-
-
-    // near and far clipping planes, these only matter for the mapping from
-    // world-space z-coordinate into the depth coordinate for OpenGL
-    double N = nearPlane , F = farPlane;
-    double R_sub_L = R-L , T_sub_B = T-B , F_sub_N = F-N , F_plus_N = F+N , F_mul_N = F*N;
-
-    if  ( (R_sub_L==0) || (R_sub_L-1.0f==0) ||
-          (T_sub_B==0) || (T_sub_B-1.0f==0) ||
-          (F_sub_N==0) ) { fprintf(stderr,"Problem with image limigs R-L=%f , T-B=%f , F-N=%f\n",R_sub_L,T_sub_B,F_sub_N); }
 
 
 
- double z_n = N;
- double z_f = F;
- double near = -1;
- double far = 1;
- double up = 1;
- double down = -1;
- double left = L;
- double right = R;
- double W = imageWidth;
- double H = imageHeight;
- double c_x = cx;
- double c_y = cy;
-
-
-
-/*
-    v00_result = (1.0L/2.0L)*W;
-    v03_result = (1.0L/2.0L)*W;
-    v11_result = -1.0L/2.0L*H;
-    v13_result = (1.0L/2.0L)*H;
-    v22_result = 1;
-    v33_result = 1;
-    */
-
-
-   // set the viewport parameters
-   viewport[0] = L; viewport[1] = B; viewport[2] = R_sub_L; viewport[3] = T_sub_B;
-
-   //OpenGL Projection Matrix ready for loading ( column-major ) , also axis compensated
-
-   frustum[0] = -z_n*(left - right)*(z_f - z_n)/(W*(far*z_f - near*z_n));
-   frustum[1] = 0.0f;
-   frustum[2] = (1.0L/2.0L)*(z_f - z_n)*(W*left + W*right + 4*c_x)/(W*(far*z_f - near*z_n));
-   frustum[3] = 0.0f;
-
-   frustum[4] = 0.0f;
-   frustum[5] = -z_n*(down - up)*(z_f - z_n)/(H*(far*z_f - near*z_n));
-   frustum[6] = (1.0L/2.0L)*(z_f - z_n)*(2*H*down - H*(down - up) + 4*c_y)/(H*(far*z_f - near*z_n));
-   frustum[7] = 0.0f;
-
-   frustum[8] = 0.0f;
-   frustum[9] = 0.0f;
-   frustum[10]= 1.0f;
-   frustum[11] = -z_f*z_n*(far - near)/(far*z_f - near*z_n);
-
-   frustum[12]= 0.0f;
-   frustum[13]= 0.0f;
-   frustum[14]= (z_f - z_n)/(far*z_f - near*z_n);
-   frustum[15] = 0.0f;
-   //Matrix already in OpenGL column major format
+   //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15
+   double identMat[16];
+   double finalFrutstrum[16];
+   create4x4IdentityMatrix(identMat);
+   identMat[10]=-1;
+   multiplyTwo4x4Matrices(finalFrutstrum,identMat,frustum);
+   copy4x4Matrix(frustum,finalFrutstrum);
 
 }
-
-
-
-
 
 
 float calculateDistance(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z)
