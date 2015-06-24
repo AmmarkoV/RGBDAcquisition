@@ -8,6 +8,7 @@ add_subdirectory (src/)
 
 #First to make our handy tools
 add_subdirectory (src/Renderer/)
+add_subdirectory (src/Comparer/)
  
 
 # TODO FIX INSTALLATION DIRECTORIES 
