@@ -1,10 +1,12 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+
+#include "../OGLRendererSandbox.h"
+
 
 int main(int argc, char **argv)
 {
-    printf("Hello world!\n");
-
 
   int i=0;
   for (i=0; i<argc; i++)
@@ -14,6 +16,7 @@ int main(int argc, char **argv)
 
   }
 
+   compareTrajectoryFiles("comparison.txt",argv[1],argv[2]);
 
     return 0;
 }

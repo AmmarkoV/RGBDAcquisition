@@ -455,3 +455,22 @@ int snapOGLRendererPhotoshootSandbox(
    return 0;
 }
 
+
+/*
+   --------------------------------------------------------------------------------------
+                                    TRAJECTORY GROUND TRUTH COMPARISON SPECIFIC
+   --------------------------------------------------------------------------------------
+*/
+
+int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB)
+{
+  struct VirtualStream * streamA = createVirtualStream(filenameA);
+  struct VirtualStream * streamB = createVirtualStream(filenameB);
+
+
+  if (streamA!=0) { destroyVirtualStream(streamA); }
+  if (streamB!=0) { destroyVirtualStream(streamB); }
+
+ return 0;
+}
+
