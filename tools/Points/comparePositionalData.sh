@@ -1,6 +1,6 @@
 #!/bin/bash 
 function getStatistics 
-{ #use R to generate statistics
+{ #use R to generate statistics ( sudo apt-get install r-base )
   R -q -e "x <- read.csv('$1', header = F); summary(x); sd(x[ , 1])" > $2
   cat $1 | wc -l >> $2 
 }  
