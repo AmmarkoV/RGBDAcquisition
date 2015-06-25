@@ -261,7 +261,7 @@ int snapOGLRendererPhotoshootSandbox(
 
 
 
-int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB);
+int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB,unsigned int posesToCompare);
 
 #ifdef __cplusplus
 }

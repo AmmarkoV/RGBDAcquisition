@@ -7,16 +7,14 @@
 
 int main(int argc, char **argv)
 {
+   if (argc<4)
+   {
+     fprintf(stderr,"usage : Comparer path/To/FileA.scene path/To/FileB.scene numberOfFrames \n");
+     return 0;
+   }
+   compareTrajectoryFiles("comparison.txt",argv[1],argv[2],atoi(argv[3]));
 
-  int i=0;
-  for (i=0; i<argc; i++)
-  {
-     if (strcmp(argv[i],"-from1")==0) { } else
-     if (strcmp(argv[i],"-from2")==0) {  }
 
-  }
-
-   compareTrajectoryFiles("comparison.txt",argv[1],argv[2]);
 
     return 0;
 }

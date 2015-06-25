@@ -462,12 +462,16 @@ int snapOGLRendererPhotoshootSandbox(
    --------------------------------------------------------------------------------------
 */
 
-int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB)
+int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB,unsigned int posesToCompare)
 {
   struct VirtualStream * sceneA = createVirtualStream(filenameA);
   struct VirtualStream * sceneB = createVirtualStream(filenameB);
 
 
+  if ( (sceneA==0) || (sceneB==0) )
+  {
+    fprintf(stderr,"Could not read scenes ..!\n");
+  } else
   if (sceneA->numberOfObjects != sceneB->numberOfObjects)
   {
     fprintf(stderr,"Inconsistent scenes , with different number of objects..!\n");
@@ -481,21 +485,33 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 
 
+
   unsigned int timestampToUse=0;
+
+
 
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<sceneA->numberOfObjects; i++)
     {
+     for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
+     {
+
        //struct Model * mod = models[sceneA->object[i].type];
-       float * pos = (float*) &posStackA;
-       if ( calculateVirtualStreamPos(sceneA,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
+       float * posA = (float*) &posStackA;
+       float * posB = (float*) &posStackB;
+       if (
+             ( calculateVirtualStreamPos(sceneA,i,timestampToUse,posA,&scaleX,&scaleY,&scaleZ) ) &&
+             ( calculateVirtualStreamPos(sceneA,i,timestampToUse,posB,&scaleX,&scaleY,&scaleZ) )
+          )
        {
+         float distance = calculateDistance(posA[0],posA[1],posA[2],
+                                            posB[0],posB[1],posB[2]);
 
+          fprintf(stderr,"Obj %u - Frame %u - Distance %0.5f\n",i,timestampToUse,distance);
        }
+
+     }
     }
-
-
-
   }
 
 
