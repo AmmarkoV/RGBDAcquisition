@@ -7,7 +7,7 @@
 
 #include "matrixTools.h"
 
-#define PRINT_MATRIX_DEBUGGING 1
+#define PRINT_MATRIX_DEBUGGING 0
 
 enum mat4x4Item
 {

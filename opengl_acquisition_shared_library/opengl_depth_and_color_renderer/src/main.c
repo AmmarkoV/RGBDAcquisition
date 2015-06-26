@@ -462,7 +462,7 @@ int snapOGLRendererPhotoshootSandbox(
    --------------------------------------------------------------------------------------
 */
 
-int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB,unsigned int posesToCompare)
+int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB,unsigned int posesToCompare , unsigned totalDistancePerFrame)
 {
   struct VirtualStream * sceneA = createVirtualStream(filenameA);
   struct VirtualStream * sceneB = createVirtualStream(filenameB);
@@ -491,10 +491,13 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
 
 
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
-  for (i=1; i<sceneA->numberOfObjects; i++)
-    {
-     for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
-     {
+
+for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
+   {
+     float totalDistance=0;
+     for (i=1; i<sceneA->numberOfObjects; i++)
+      {
+
 
        //struct Model * mod = models[sceneA->object[i].type];
        float * posA = (float*) &posStackA;
@@ -506,11 +509,12 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
        {
          float distance = calculateDistance(posA[0]*100,posA[1]*100,posA[2]*100,
                                             posB[0]*100,posB[1]*100,posB[2]*100);
-
-          fprintf(stdout,"%u %u %0.5f\n",i,timestampToUse,distance);
+         totalDistance+=distance;
+         if (!totalDistancePerFrame) { fprintf(stdout,"%u %u %0.5f\n",i,timestampToUse,distance); }
        }
 
      }
+     if (totalDistancePerFrame) { fprintf(stdout,"%u %u %0.5f\n",i,timestampToUse,totalDistance); }
     }
   }
 
