@@ -504,8 +504,8 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
              ( calculateVirtualStreamPos(sceneB,i,timestampToUse,posB,&scaleX,&scaleY,&scaleZ) )
           )
        {
-         float distance = calculateDistance(posA[0]*1000,posA[1]*1000,posA[2]*1000,
-                                            posB[0]*1000,posB[1]*1000,posB[2]*1000);
+         float distance = calculateDistance(posA[0]*100,posA[1]*100,posA[2]*100,
+                                            posB[0]*100,posB[1]*100,posB[2]*100);
 
           fprintf(stdout,"%u %u %0.5f\n",i,timestampToUse,distance);
        }
