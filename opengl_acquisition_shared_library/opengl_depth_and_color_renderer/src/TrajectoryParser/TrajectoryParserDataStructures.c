@@ -419,6 +419,53 @@ int addConnectorToVirtualStream(
    return 1;
 }
 
+
+
+int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
+{
+  char name[512]={0};
+
+  unsigned int found=0;
+  unsigned int frame=0;
+  unsigned int duration=10000;
+
+  addObjectTypeToVirtualStream(stream,"hardcodedSphere","sphere");
+
+
+  float coords[7]={100,100,100,0,0,0,0};
+  unsigned int i=0;
+  unsigned int originalNumberOfObjects = stream->numberOfObjects;
+  for (i=0; i<originalNumberOfObjects; i++)
+  {
+
+        snprintf(name,512,"objAngleForObj%u",i);
+        addObjectToVirtualStream(
+                                 stream ,
+                                 name , "hardcodedSphere" ,
+                                 255,0,255,0, /**/0,
+                                 coords,7,
+                                 10.0,
+                                 10.0,
+                                 10.0,
+                                 0
+                                );
+
+       unsigned int planetObj = i;
+       unsigned int satteliteObj = getObjectID(stream,name,&found);
+
+
+      /*
+       if (! affixSatteliteToPlanetFromFrameForLength(stream,satteliteObj,planetObj,frame,duration) )
+               {
+                fprintf(stderr,RED "Could not affix Object %u to Object %u for %u frames ( starting @ %u )\n" NORMAL , satteliteObj,planetObj,duration,frame);
+               }
+
+*/
+  }
+ return 1;
+}
+
+
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
                               char * name , char * type ,

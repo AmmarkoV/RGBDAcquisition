@@ -140,6 +140,10 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
              case TRAJECTORYPRIMITIVES_OBJ : break;
              case TRAJECTORYPRIMITIVES_ARROW  : break;
              case TRAJECTORYPRIMITIVES_DEBUG                             :  newstream->debug=1;           break;
+
+             case TRAJECTORYPRIMITIVES_GENERATE_ANGLE_OBJECTS            :  generateAngleObjectsForVirtualStream(newstream);       break;
+
+
              case TRAJECTORYPRIMITIVES_TIMESTAMP                         :  newstream->timestamp=InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_AUTOREFRESH                       :  newstream->autoRefresh = InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_INTERPOLATE_TIME                  :  newstream->ignoreTime = ( InputParser_GetWordInt(ipc,1) == 0 ); break;

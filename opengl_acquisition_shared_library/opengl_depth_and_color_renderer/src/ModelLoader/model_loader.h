@@ -53,6 +53,17 @@ struct Model
 #define MAX_MODEL_PATHS 120
 
 
+
+
+/**
+* @brief Check if model name is a hardcoded model
+* @ingroup ModelLoader
+* @param String of filename of the file to load
+* @param Output that returns true if we have a hardcoded model name
+* @retval 0=Enumerator of Hardcoded model
+*/
+unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel);
+
 /**
 * @brief Load a model from a file
 * @ingroup ModelLoader

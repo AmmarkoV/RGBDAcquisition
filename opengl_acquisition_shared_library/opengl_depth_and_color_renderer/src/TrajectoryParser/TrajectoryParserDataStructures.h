@@ -70,6 +70,8 @@ int addConnectorToVirtualStream(
                                  char * typeStr
                                );
 
+int generateAngleObjectsForVirtualStream(struct VirtualStream * stream);
+
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
                               char * name , char * type ,

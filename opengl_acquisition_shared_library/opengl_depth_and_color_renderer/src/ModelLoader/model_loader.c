@@ -189,6 +189,24 @@ void drawPyramid()
 }
 
 
+
+unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel)
+{
+  *itIsAHardcodedModel=1;
+  unsigned int modType=0;
+   if ( strcmp(modelname,"plane") == 0 )      {  modType = OBJ_PLANE;     }  else
+   if ( strcmp(modelname,"grid") == 0 )       {  modType = OBJ_GRIDPLANE; }  else
+   if ( strcmp(modelname,"cube") == 0 )       {  modType = OBJ_CUBE;      }  else
+   if ( strcmp(modelname,"pyramid") == 0 )    {  modType = OBJ_PYRAMID;   }  else
+   if ( strcmp(modelname,"axis") == 0 )       {  modType = OBJ_AXIS;      }  else
+   if ( strcmp(modelname,"sphere") == 0 )     {  modType = OBJ_SPHERE;    }  else
+   if ( strcmp(modelname,"none") == 0 )       {  modType = OBJ_INVISIBLE; }  else
+   if ( strcmp(modelname,"invisible") == 0 )  {  modType = OBJ_INVISIBLE; }  else
+                                              {  *itIsAHardcodedModel=0;   }
+  return modType;
+}
+
+
 struct Model * loadModel(char * directory,char * modelname)
 {
   if ( (directory==0) || (modelname==0) )
@@ -201,17 +219,14 @@ struct Model * loadModel(char * directory,char * modelname)
   if ( mod == 0 )  { fprintf(stderr,"Could not allocate enough space for model %s \n",modelname);  return 0; }
   memset(mod , 0 , sizeof(struct Model));
 
-  if ( strcmp(modelname,"plane") == 0 )   {  mod->type = OBJ_PLANE;     mod->model = 0; }  else
-  if ( strcmp(modelname,"grid") == 0 )    {  mod->type = OBJ_GRIDPLANE; mod->model = 0; }  else
-  if ( strcmp(modelname,"cube") == 0 )    {  mod->type = OBJ_CUBE;      mod->model = 0; }  else
-  if ( strcmp(modelname,"pyramid") == 0 ) {  mod->type = OBJ_PYRAMID;   mod->model = 0; }  else
-  if ( strcmp(modelname,"axis") == 0 )    {  mod->type = OBJ_AXIS;      mod->model = 0; }  else
-  if ( strcmp(modelname,"sphere") == 0 )  {  mod->type = OBJ_SPHERE;    mod->model = 0; }  else
-  if ( strcmp(modelname,"none") == 0 )       {  mod->type = OBJ_INVISIBLE;    mod->model = 0; }  else
-  if ( strcmp(modelname,"invisible") == 0 )  {  mod->type = OBJ_INVISIBLE;    mod->model = 0; }  else
 
-
-
+  unsigned int checkForHardcodedReturn=0;
+  unsigned int modType = isModelnameAHardcodedModel(modelname,&checkForHardcodedReturn);
+  if (checkForHardcodedReturn)
+  {
+      mod->type = modType;
+      mod->model = 0;
+  } else
   if ( strstr(modelname,".obj") != 0 )
     {
       mod->type = OBJMODEL;
