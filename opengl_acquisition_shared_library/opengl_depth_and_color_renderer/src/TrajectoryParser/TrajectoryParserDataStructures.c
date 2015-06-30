@@ -420,6 +420,24 @@ int addConnectorToVirtualStream(
 }
 
 
+int getObjectVirtualStreamPositionAtIndex(struct VirtualStream * stream,ObjectIDHandler objID,unsigned int frameIndex,float * coords)
+{
+  if (stream==0) { return 0; }
+  if (stream->object==0) { return 0; }
+  if (stream->object[objID].frame==0) { return 0; }
+
+  coords[0] = stream->object[objID].frame[frameIndex].x;
+  coords[1] = stream->object[objID].frame[frameIndex].y;
+  coords[2] = stream->object[objID].frame[frameIndex].z;
+  //-----------
+  coords[3] = stream->object[objID].frame[frameIndex].rot1;
+  coords[4] = stream->object[objID].frame[frameIndex].rot2;
+  coords[5] = stream->object[objID].frame[frameIndex].rot3;
+  coords[6] = stream->object[objID].frame[frameIndex].rot4;
+
+ return 1;
+}
+
 
 int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
 {
@@ -437,33 +455,39 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
   unsigned int originalNumberOfObjects = stream->numberOfObjects;
   for (i=0; i<originalNumberOfObjects; i++)
   {
+       unsigned int planetObj = i;
 
         snprintf(name,512,"objAngleForObj%u",i);
+
+        getObjectVirtualStreamPositionAtIndex(stream,planetObj,0,coords);
+        coords[1]-=20;
+
         addObjectToVirtualStream(
                                  stream ,
                                  name , "hardcodedSphere" ,
                                  255,0,255,0, /**/0,
                                  coords,7,
-                                 10.0,
-                                 10.0,
-                                 10.0,
-                                 0
+                                 0.10,
+                                 0.10,
+                                 0.10,
+                                 planetObj
                                 );
 
-       unsigned int planetObj = i;
        unsigned int satteliteObj = getObjectID(stream,name,&found);
 
 
-      /*
        if (! affixSatteliteToPlanetFromFrameForLength(stream,satteliteObj,planetObj,frame,duration) )
                {
                 fprintf(stderr,RED "Could not affix Object %u to Object %u for %u frames ( starting @ %u )\n" NORMAL , satteliteObj,planetObj,duration,frame);
                }
 
-*/
+
   }
  return 1;
 }
+
+
+
 
 
 int addObjectToVirtualStream(
