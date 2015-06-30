@@ -200,7 +200,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
 
     unsigned int pos=0;
-    fprintf(stderr,YELLOW " Will align sattelite to planet from frame %u to  %u " NORMAL ,frameNumber+1 , frameNumber+duration );
+    fprintf(stderr,YELLOW " Will align sattelite to planet from frame %u to %u\n" NORMAL ,frameNumber+1 , frameNumber+duration );
     for (pos=frameNumber+1; pos<frameNumber+duration; pos++)
     {
        planetPosAbsolute[0] = (double) stream->object[planetObj].frame[pos].x;
@@ -212,19 +212,30 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
        planetRotAbsolute[1] = (double) stream->object[planetObj].frame[pos].rot2;
        planetRotAbsolute[2] = (double) stream->object[planetObj].frame[pos].rot3;
 
+
        if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
        {
-           stream->object[satteliteObj].frame[pos].x = (float) satPosAbsolute[0];
-           stream->object[satteliteObj].frame[pos].y = (float) satPosAbsolute[1];
-           stream->object[satteliteObj].frame[pos].z = (float) satPosAbsolute[2];
+         stream->object[satteliteObj].frame[pos].x = (float) satPosAbsolute[0];
+         stream->object[satteliteObj].frame[pos].y = (float) satPosAbsolute[1];
+         stream->object[satteliteObj].frame[pos].z = (float) satPosAbsolute[2];
+         stream->object[satteliteObj].frame[pos].time = stream->object[planetObj].frame[pos].time;
        }
     }
+
+    //Everything is set now to mark the sattelite new end
+    stream->object[satteliteObj].numberOfFrames = stream->object[planetObj].numberOfFrames;// frameNumber+duration; //stream->object[planetObj].numberOfFrames;
+    stream->object[satteliteObj].lastFrame = stream->object[planetObj].lastFrame;
+    stream->object[satteliteObj].MAX_timeOfFrames = stream->object[planetObj].MAX_timeOfFrames;
+    stream->object[satteliteObj].MAX_numberOfFrames = stream->object[planetObj].MAX_numberOfFrames;
+    stream->object[satteliteObj].numberOfFrames = stream->object[planetObj].numberOfFrames;
+
+    //fprintf(stderr,YELLOW " Will align sattelite to planet from frame %u to  %u " NORMAL ,frameNumber+1 , frameNumber+duration );
  return 1;
 
 }
 
 
-
+   unsigned int time;
 
 
 int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB)
