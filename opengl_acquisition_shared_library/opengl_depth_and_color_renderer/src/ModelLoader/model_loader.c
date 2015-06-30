@@ -78,14 +78,21 @@ glEnd();
  return 1;
 }
 
-void drawSphere()
+void drawSphere(unsigned int quality)
 {
+  #if DISABLE_GL_CALL_LIST
+    //GL_CALL_LIST is disabled so this is actually ok now
+  #else
+    #warning "drawSphere should create a call list , otherwise it is a very slow call.."
+  #endif
+
 //    double r=1.0;
-    int lats=100;
-    int longs=100;
+    int lats=quality;
+    int longs=quality;
   //---------------
     int i, j;
-    for(i = 0; i <= lats; i++) {
+    for(i = 0; i <= lats; i++)
+    {
        double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
        double z0  = sin(lat0);
        double zr0 =  cos(lat0);
@@ -95,7 +102,8 @@ void drawSphere()
        double zr1 = cos(lat1);
 
        glBegin(GL_QUAD_STRIP);
-       for(j = 0; j <= longs; j++) {
+       for(j = 0; j <= longs; j++)
+        {
            double lng = 2 * M_PI * (double) (j - 1) / longs;
            double x = cos(lng);
            double y = sin(lng);
@@ -104,7 +112,7 @@ void drawSphere()
            glVertex3f(x * zr0, y * zr0, z0);
            glNormal3f(x * zr1, y * zr1, z1);
            glVertex3f(x * zr1, y * zr1, z1);
-       }
+        }
        glEnd();
    }
 }
@@ -263,7 +271,7 @@ int drawConnector(
 {
  glPushMatrix();
     glLineWidth(*scale);
-    glColor3f(R,G,B);
+    glColor3f(R,G,B); //Alpha not used ?
      glBegin(GL_LINES);
        glVertex3f(posA[0],posA[1],posA[2]);
        glVertex3f(posB[0],posB[1],posB[2]);
@@ -348,7 +356,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       case OBJ_AXIS :      drawAxis(0,0,0,1.0);                  break;
       case OBJ_CUBE :      drawCube();                           break;
       case OBJ_PYRAMID :   drawPyramid();                        break;
-      case OBJ_SPHERE  :   drawSphere();                         break;
+      case OBJ_SPHERE  :   drawSphere(50 /*100 is normal quality*/);                         break;
       case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
       case OBJMODEL :
       {

@@ -374,9 +374,13 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                     pos[6]=1.0;
                   }
 
-               coordLength=7;
-               quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
 
+               coordLength=6;
+               quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
+               convertQuaternionsToEulerAngles(newstream,euler,quaternions);
+               pos[3]=euler[0]; pos[4]=euler[1];  pos[5]=euler[2]; pos[6]=0.0;
+
+               /*
                normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
                quaternions2Euler(euler,quaternions,1); //1
                pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
@@ -391,7 +395,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
 
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
-
+*/
 
                addStateToObjectID( newstream , item , frame*newstream->rate  , (float*) pos , coordLength ,
                                    newstream->object[item].scaleX,
@@ -472,6 +476,38 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
 
                if (newstream->rotationsOverride)
                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
+
+
+
+
+
+               coordLength=6;
+               quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
+               convertQuaternionsToEulerAngles(newstream,euler,quaternions);
+               pos[3]=euler[0]; pos[4]=euler[1];  pos[5]=euler[2]; pos[6]=0.0;
+
+               /*
+               normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
+               quaternions2Euler(euler,quaternions,1); //1
+               pos[3] = newstream->rotationsOffset[0] + (newstream->scaleWorld[3] * euler[0]);
+               pos[4] = newstream->rotationsOffset[1] + (newstream->scaleWorld[4] * euler[1]);
+               pos[5] = newstream->rotationsOffset[2] + (newstream->scaleWorld[5] * euler[2]);
+               pos[6] = 0;
+
+               #if PRINT_LOAD_INFO
+                fprintf(stderr,"Tracker OBJ%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+                fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+               #endif
+
+               if (newstream->rotationsOverride)
+                    { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
+*/
+
+
+
+
+
+
 
                addStateToObjectID( newstream , item , newstream->timestamp , (float*) pos , coordLength ,
                                    newstream->object[item].scaleX,

@@ -498,6 +498,7 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
 for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
    {
      float totalDistance=0;
+     //i=0 is the camera we dont compare it..!
      for (i=1; i<sceneA->numberOfObjects; i++)
       {
 

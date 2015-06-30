@@ -131,7 +131,42 @@ int convertQuaternionsToEulerAngles(struct VirtualStream * stream,double * euler
  euler[0] = stream->rotationsOffset[0] + (stream->scaleWorld[3] * eulerTMP[0]);
  euler[1] = stream->rotationsOffset[1] + (stream->scaleWorld[4] * eulerTMP[1]);
  euler[2] = stream->rotationsOffset[2] + (stream->scaleWorld[5] * eulerTMP[2]);
+
+ #if PRINT_LOAD_INFO
+                fprintf(stderr,"Tracker OBJ%u( %f %f %f ,  %f %f %f )\n",item,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+                fprintf(stderr,"Angle Offset %f %f %f \n",newstream->rotationsOffset[0],newstream->rotationsOffset[1],newstream->rotationsOffset[2]);
+ #endif
+
+
+  if (stream->rotationsOverride)
+    { flipRotationAxisD(&euler[0],&euler[1],&euler[2], stream->rotationsXYZ[0] , stream->rotationsXYZ[1] , stream->rotationsXYZ[2]); }
+
+ return 1;
 }
+
+int parseAbsoluteRotation(struct VirtualStream * stream,double * planetRotAbsolute,unsigned int planetObj,unsigned int frameNumber)
+{
+   if (stream->object[planetObj].frame[frameNumber].isQuaternion)
+      {
+        double euler[3];
+        double quaternions[4];
+        quaternions[0]=stream->object[planetObj].frame[frameNumber].rot1;
+        quaternions[1]=stream->object[planetObj].frame[frameNumber].rot2;
+        quaternions[2]=stream->object[planetObj].frame[frameNumber].rot3;
+        quaternions[3]=stream->object[planetObj].frame[frameNumber].rot4;
+        convertQuaternionsToEulerAngles(stream,euler,quaternions);
+        planetRotAbsolute[0] = euler[0];
+        planetRotAbsolute[1] = euler[1];
+        planetRotAbsolute[2] = euler[2];
+      } else
+      {
+       planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
+       planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
+       planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
+      }
+  return 1;
+}
+
 
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
@@ -201,25 +236,8 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
     planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
 
-    if (stream->object[planetObj].frame[frameNumber].isQuaternion)
-      {
-        fprintf(stderr,RED "YELLOW , affixing using quaternion obj \n" NORMAL);
-        double euler[3];
-        double quaternions[4];
-        quaternions[0]=stream->object[planetObj].frame[frameNumber].rot1;
-        quaternions[1]=stream->object[planetObj].frame[frameNumber].rot2;
-        quaternions[2]=stream->object[planetObj].frame[frameNumber].rot3;
-        quaternions[3]=stream->object[planetObj].frame[frameNumber].rot4;
-        convertQuaternionsToEulerAngles(stream,euler,quaternions);
-        planetRotAbsolute[0] = euler[0];
-        planetRotAbsolute[1] = euler[1];
-        planetRotAbsolute[2] = euler[2];
-      } else
-      {
-       planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
-       planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
-       planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
-      }
+
+    parseAbsoluteRotation(stream,planetRotAbsolute,planetObj,frameNumber);
     //==================================================================================
 
 
@@ -235,10 +253,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
        planetPosAbsolute[2] = (double) stream->object[planetObj].frame[pos].z;
        planetPosAbsolute[3] = 1.0;
 
-       planetRotAbsolute[0] = (double) stream->object[planetObj].frame[pos].rot1;
-       planetRotAbsolute[1] = (double) stream->object[planetObj].frame[pos].rot2;
-       planetRotAbsolute[2] = (double) stream->object[planetObj].frame[pos].rot3;
-
+       parseAbsoluteRotation(stream,planetRotAbsolute,planetObj,frameNumber);
 
        if ( pointFromRelationWithObjectToAbsolute_PosXYZRotationXYZ(satPosAbsolute,planetPosAbsolute,planetRotAbsolute,satPosRelative) )
        {
@@ -246,8 +261,12 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
          stream->object[satteliteObj].frame[pos].y = (float) satPosAbsolute[1];
          stream->object[satteliteObj].frame[pos].z = (float) satPosAbsolute[2];
          stream->object[satteliteObj].frame[pos].time = stream->object[planetObj].frame[pos].time;
-         stream->object[satteliteObj].frame[pos].isQuaternion = 0;
+         //stream->object[satteliteObj].frame[pos].isQuaternion = 0;
        }
+
+       //  stream->object[satteliteObj].frame[pos].x = stream->object[planetObj].frame[pos].x;
+      //   stream->object[satteliteObj].frame[pos].y = stream->object[planetObj].frame[pos].y;
+      //   stream->object[satteliteObj].frame[pos].z = stream->object[planetObj].frame[pos].z-0.5;
     }
 
     //Everything is set now to mark the sattelite new end
@@ -275,6 +294,36 @@ int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned
   return 1;
 }
 
+int flipRotationAxisD(double * rotX, double * rotY , double * rotZ , int where2SendX , int where2SendY , int where2SendZ)
+{
+  #if PRINT_LOAD_INFO
+   fprintf(stderr,"Had rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
+   fprintf(stderr,"Moving 0 to %u , 1 to %u , 2 to %u \n",where2SendX,where2SendY,where2SendZ);
+  #endif
+
+  double tmpX = *rotX;
+  double tmpY = *rotY;
+  double tmpZ = *rotZ;
+  //-----------------------------------------
+  if (where2SendX==0) { *rotX=tmpX; } else
+  if (where2SendX==1) { *rotY=tmpX; } else
+  if (where2SendX==2) { *rotZ=tmpX; }
+
+  if (where2SendY==0) { *rotX=tmpY; } else
+  if (where2SendY==1) { *rotY=tmpY; } else
+  if (where2SendY==2) { *rotZ=tmpY; }
+
+  if (where2SendZ==0) { *rotX=tmpZ; } else
+  if (where2SendZ==1) { *rotY=tmpZ; } else
+  if (where2SendZ==2) { *rotZ=tmpZ; }
+  //-----------------------------------------
+
+  #if PRINT_LOAD_INFO
+   fprintf(stderr,"Now have rotX %f rotY %f rotZ %f \n",*rotX,*rotY,*rotZ);
+  #endif
+
+  return 1;
+}
 
 int flipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2SendX , int where2SendY , int where2SendZ)
 {

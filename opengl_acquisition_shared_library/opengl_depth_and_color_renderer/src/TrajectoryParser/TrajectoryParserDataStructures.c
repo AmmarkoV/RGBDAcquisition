@@ -447,33 +447,46 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
   unsigned int frame=0;
   unsigned int duration=10000;
 
-  addObjectTypeToVirtualStream(stream,"hardcodedSphere","sphere");
+  float scale=0.03; // 0.025
+  addObjectTypeToVirtualStream(stream,"autoGenAngleObject","sphere");
 
 
   float coords[7]={100,100,100,0,0,0,0};
   unsigned int i=0;
   unsigned int originalNumberOfObjects = stream->numberOfObjects;
-  for (i=0; i<originalNumberOfObjects; i++)
+  //i=0 is the camera ! we dont include it
+  for (i=1; i<originalNumberOfObjects; i++)
   {
        unsigned int planetObj = i;
 
         snprintf(name,512,"objAngleForObj%u",i);
 
         getObjectVirtualStreamPositionAtIndex(stream,planetObj,0,coords);
-        coords[2]-=0.50;
+        coords[2]-=2.00;
         //No Rotation for Sattelites ( they are spheres anyway )
         coords[3]=0.0; coords[4]=0.0; coords[5]=0.0; coords[6]=0.0;
 
         addObjectToVirtualStream(
                                  stream ,
-                                 name , "hardcodedSphere" ,
+                                 name , "autoGenAngleObject" ,
                                  255,0,255,0, /**/0,
                                  coords,7,
-                                 0.025,
-                                 0.025,
-                                 0.025,
+                                 scale,
+                                 scale,
+                                 scale,
                                  planetObj
                                 );
+
+
+       unsigned int z;
+       for (z=0; z<stream->object[planetObj].numberOfFrames; z++)
+       {
+        getObjectVirtualStreamPositionAtIndex(stream,planetObj,z,coords);
+        coords[2]-=2.00;
+        //No Rotation for Sattelites ( they are spheres anyway )
+        coords[3]=0.0; coords[4]=0.0; coords[5]=0.0; coords[6]=0.0;
+        addStateToObject(stream,name,stream->object[planetObj].frame[z].time ,coords,7,scale,scale,scale,255,0,255,0 );
+       }
 
        unsigned int satteliteObj = getObjectID(stream,name,&found);
 
