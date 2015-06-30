@@ -134,14 +134,17 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
   unsigned int satteliteObjFrameNumber = stream->object[satteliteObj].numberOfFrames;
   unsigned int planetObjFrameNumber    = stream->object[planetObj].numberOfFrames;
 
+  unsigned int satteliteObjMaxFrameNumber = stream->object[satteliteObj].MAX_numberOfFrames;
+  unsigned int planetObjMaxFrameNumber    = stream->object[planetObj].MAX_numberOfFrames;
 
-  if ( satteliteObjFrameNumber <  planetObjFrameNumber )
+  if ( satteliteObjMaxFrameNumber <  planetObjFrameNumber )
      {
-       unsigned int growthSize = planetObjFrameNumber-satteliteObjFrameNumber+frameNumber+1;
+       unsigned int growthSize = planetObjFrameNumber-satteliteObjMaxFrameNumber+frameNumber+1;
        fprintf(stderr,GREEN" sattelite : growing sattelite stream to accomodate %u poses , as many as the planet stream\n" NORMAL,growthSize);
        //GROW STREAM HERE
        growVirtualStreamFrames(&stream->object[satteliteObj],growthSize);
        satteliteObjFrameNumber = stream->object[satteliteObj].numberOfFrames;
+       satteliteObjMaxFrameNumber = stream->object[satteliteObj].MAX_numberOfFrames;
      }
 
 
@@ -151,10 +154,10 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
        fprintf(stderr,RED " sattelite : referencing non existent frames ( %u ) \n" NORMAL,frameNumber);
        return 0;
      }
-  if ( satteliteObjFrameNumber < frameNumber+duration )
+  if ( satteliteObjMaxFrameNumber < frameNumber+duration )
      {
-       fprintf(stderr,RED " sattelite : referencing non existent frames ( want %u + %u frames , but max frame is %u ) \n" NORMAL,frameNumber,duration,satteliteObjFrameNumber);
-       duration = satteliteObjFrameNumber-frameNumber;
+       fprintf(stderr,RED " sattelite : referencing non existent frames ( want %u + %u frames , but max frame is %u ) \n" NORMAL,frameNumber,duration,satteliteObjMaxFrameNumber);
+       duration = satteliteObjMaxFrameNumber-frameNumber;
        fprintf(stderr,RED " sattelite : correcting duration to %u\n" NORMAL,duration);
      }
 
@@ -197,6 +200,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
 
     unsigned int pos=0;
+    fprintf(stderr,YELLOW " Will align sattelite to planet from frame %u to  %u " NORMAL ,frameNumber+1 , frameNumber+duration );
     for (pos=frameNumber+1; pos<frameNumber+duration; pos++)
     {
        planetPosAbsolute[0] = (double) stream->object[planetObj].frame[pos].x;

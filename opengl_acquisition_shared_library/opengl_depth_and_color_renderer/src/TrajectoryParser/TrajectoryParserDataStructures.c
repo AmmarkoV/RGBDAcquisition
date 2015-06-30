@@ -461,6 +461,8 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
 
         getObjectVirtualStreamPositionAtIndex(stream,planetObj,0,coords);
         coords[2]-=0.50;
+        //No Rotation for Sattelites ( they are spheres anyway )
+        coords[3]=0.0; coords[4]=0.0; coords[5]=0.0; coords[6]=0.0;
 
         addObjectToVirtualStream(
                                  stream ,
