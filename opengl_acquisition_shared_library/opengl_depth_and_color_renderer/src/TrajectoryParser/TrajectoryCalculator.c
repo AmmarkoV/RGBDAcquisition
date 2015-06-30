@@ -123,7 +123,15 @@ void euler2QuaternionsInternal(double * quaternions,double * euler,int quaternio
 
 }
 
-
+int convertQuaternionsToEulerAngles(struct VirtualStream * stream,double * euler,double *quaternion)
+{
+ normalizeQuaternions(&quaternion[0],&quaternion[1],&quaternion[2],&quaternion[3]);
+ double eulerTMP[3];
+ quaternions2Euler(eulerTMP,quaternion,1); //1
+ euler[0] = stream->rotationsOffset[0] + (stream->scaleWorld[3] * eulerTMP[0]);
+ euler[1] = stream->rotationsOffset[1] + (stream->scaleWorld[4] * eulerTMP[1]);
+ euler[2] = stream->rotationsOffset[2] + (stream->scaleWorld[5] * eulerTMP[2]);
+}
 
 int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsigned int satteliteObj,unsigned int planetObj , unsigned int frameNumber , unsigned int duration)
 {
@@ -192,7 +200,26 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
     planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
     planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
-    if (stream->object[planetObj].frame[frameNumber].rot4!=0.0) { fprintf(stderr,"ERROR , while affixing obj , it is using quaternions"); }
+
+    if (stream->object[planetObj].frame[frameNumber].isQuaternion)
+      {
+        fprintf(stderr,RED "YELLOW , affixing using quaternion obj \n" NORMAL);
+        double euler[3];
+        double quaternions[4];
+        quaternions[0]=stream->object[planetObj].frame[frameNumber].rot1;
+        quaternions[1]=stream->object[planetObj].frame[frameNumber].rot2;
+        quaternions[2]=stream->object[planetObj].frame[frameNumber].rot3;
+        quaternions[3]=stream->object[planetObj].frame[frameNumber].rot4;
+        convertQuaternionsToEulerAngles(stream,euler,quaternions);
+        planetRotAbsolute[0] = euler[0];
+        planetRotAbsolute[1] = euler[1];
+        planetRotAbsolute[2] = euler[2];
+      } else
+      {
+       planetRotAbsolute[0] = (double) stream->object[planetObj].frame[frameNumber].rot1;
+       planetRotAbsolute[1] = (double) stream->object[planetObj].frame[frameNumber].rot2;
+       planetRotAbsolute[2] = (double) stream->object[planetObj].frame[frameNumber].rot3;
+      }
     //==================================================================================
 
 
@@ -219,6 +246,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
          stream->object[satteliteObj].frame[pos].y = (float) satPosAbsolute[1];
          stream->object[satteliteObj].frame[pos].z = (float) satPosAbsolute[2];
          stream->object[satteliteObj].frame[pos].time = stream->object[planetObj].frame[pos].time;
+         stream->object[satteliteObj].frame[pos].isQuaternion = 0;
        }
     }
 
@@ -226,10 +254,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     stream->object[satteliteObj].numberOfFrames = stream->object[planetObj].numberOfFrames;// frameNumber+duration; //stream->object[planetObj].numberOfFrames;
     stream->object[satteliteObj].lastFrame = stream->object[planetObj].lastFrame;
     stream->object[satteliteObj].MAX_timeOfFrames = stream->object[planetObj].MAX_timeOfFrames;
-    stream->object[satteliteObj].MAX_numberOfFrames = stream->object[planetObj].MAX_numberOfFrames;
     stream->object[satteliteObj].numberOfFrames = stream->object[planetObj].numberOfFrames;
-
-    //fprintf(stderr,YELLOW " Will align sattelite to planet from frame %u to  %u " NORMAL ,frameNumber+1 , frameNumber+duration );
  return 1;
 
 }

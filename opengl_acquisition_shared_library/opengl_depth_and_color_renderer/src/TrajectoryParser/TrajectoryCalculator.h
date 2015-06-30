@@ -16,6 +16,7 @@ int unflipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2Sen
 
 
 
+int convertQuaternionsToEulerAngles(struct VirtualStream * stream,double * euler,double *quaternion);
 
 
 

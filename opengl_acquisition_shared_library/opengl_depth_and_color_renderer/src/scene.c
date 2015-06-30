@@ -274,9 +274,15 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
              { scene->autoRefreshForce=1; }
             return 1;
        break;
+
+
+       case -66 : //F1
+           //Todo list objects here
+            return 1;
+       break;
     };
 
-    if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input is disabled [ add MOVE_VIEW(1) to scene ]\n"); return 0; }
+    if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input (%d) is disabled [ add MOVE_VIEW(1) to scene ]\n",(signed int) key); return 0; }
     fprintf(stderr,"handleUserInput called for key %c ( %u ) \n",key,key);
     switch (key)
     {
@@ -592,7 +598,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
 
-         //fprintf(stderr,"Draw OBJ%u(%f %f %f , %f %f %f , trans %f )\n",i,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],trans);
+         //fprintf(stderr,"Draw OBJ%u(%f %f %f , %f %f %f %f , trans %f )\n",i,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],pos[6],trans);
 
          if (scene->debug)
                 { print3DPoint2DWindowPosition(i , pos[0],pos[1],pos[2] ); }
