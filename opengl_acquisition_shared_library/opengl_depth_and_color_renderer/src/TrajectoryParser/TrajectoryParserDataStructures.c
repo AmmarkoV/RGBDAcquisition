@@ -443,6 +443,7 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
 {
   char name[512]={0};
 
+  float offset = 0.5;
   unsigned int found=0;
   unsigned int frame=0;
   unsigned int duration=10000;
@@ -462,7 +463,7 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
         snprintf(name,512,"objAngleForObj%u",i);
 
         getObjectVirtualStreamPositionAtIndex(stream,planetObj,0,coords);
-        coords[2]-=2.00;
+        coords[1]+=offset;
         //No Rotation for Sattelites ( they are spheres anyway )
         coords[3]=0.0; coords[4]=0.0; coords[5]=0.0; coords[6]=0.0;
 
@@ -482,7 +483,7 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
        for (z=0; z<stream->object[planetObj].numberOfFrames; z++)
        {
         getObjectVirtualStreamPositionAtIndex(stream,planetObj,z,coords);
-        coords[2]-=2.00;
+        coords[1]+=offset;
         //No Rotation for Sattelites ( they are spheres anyway )
         coords[3]=0.0; coords[4]=0.0; coords[5]=0.0; coords[6]=0.0;
         addStateToObject(stream,name,stream->object[planetObj].frame[z].time ,coords,7,scale,scale,scale,255,0,255,0 );
