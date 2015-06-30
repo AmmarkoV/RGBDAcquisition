@@ -439,7 +439,7 @@ int getObjectVirtualStreamPositionAtIndex(struct VirtualStream * stream,ObjectID
 }
 
 
-int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
+int generateAngleObjectsForVirtualStream(struct VirtualStream * stream,char * excludeObjectType)
 {
   char name[512]={0};
 
@@ -458,6 +458,11 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
   //i=0 is the camera ! we dont include it
   for (i=1; i<originalNumberOfObjects; i++)
   {
+
+    fprintf(stderr,"Obj %u objtype %s - excluding %s \n",i,stream->object[i].typeStr,excludeObjectType);
+
+    if ( strcmp(excludeObjectType,stream->object[i].typeStr)!=0 )
+    {
        unsigned int planetObj = i;
 
         snprintf(name,512,"objAngleForObj%u",i);
@@ -496,8 +501,7 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
                {
                 fprintf(stderr,RED "Could not affix Object %u to Object %u for %u frames ( starting @ %u )\n" NORMAL , satteliteObj,planetObj,duration,frame);
                }
-
-
+    }
   }
  return 1;
 }

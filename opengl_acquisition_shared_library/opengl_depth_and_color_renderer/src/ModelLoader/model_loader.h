@@ -23,7 +23,7 @@ enum ModelTypes
     OBJ_SPHERE,
     OBJ_INVISIBLE,
     //-----------
-    OBJMODEL,
+    OBJ_MODEL,
     //-----------
     TOTAL_POSSIBLE_MODEL_TYPES
 };

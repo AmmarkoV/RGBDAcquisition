@@ -237,7 +237,7 @@ struct Model * loadModel(char * directory,char * modelname)
   } else
   if ( strstr(modelname,".obj") != 0 )
     {
-      mod->type = OBJMODEL;
+      mod->type = OBJ_MODEL;
       mod->model = (struct  OBJ_Model * ) loadObj(directory,modelname);
       if (mod->model ==0 ) { free(mod); return 0 ;}
     } else
@@ -257,7 +257,7 @@ void unloadModel(struct Model * mod)
 
     switch ( mod->type )
     {
-      case OBJMODEL :
+      case OBJ_MODEL :
           unloadObj( (struct  OBJ_Model * ) mod->model);
       break;
     };
@@ -358,7 +358,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       case OBJ_PYRAMID :   drawPyramid();                        break;
       case OBJ_SPHERE  :   drawSphere(50 /*100 is normal quality*/);                         break;
       case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
-      case OBJMODEL :
+      case OBJ_MODEL :
       {
          if (mod->model!=0)
          {

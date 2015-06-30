@@ -26,6 +26,8 @@
 #include "TrajectoryParserDataStructures.h"
 #include "TrajectoryCalculator.h"
 #include "TrajectoryPrimitives.h"
+
+#include "../ModelLoader/model_loader.h"
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
 //Using normalizeQuaternionsTJP #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include <stdio.h>
@@ -141,7 +143,11 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
              case TRAJECTORYPRIMITIVES_ARROW  : break;
              case TRAJECTORYPRIMITIVES_DEBUG                             :  newstream->debug=1;           break;
 
-             case TRAJECTORYPRIMITIVES_GENERATE_ANGLE_OBJECTS            :  generateAngleObjectsForVirtualStream(newstream);       break;
+             case TRAJECTORYPRIMITIVES_GENERATE_ANGLE_OBJECTS            :
+
+                 InputParser_GetWord(ipc,1,model,MAX_PATH);
+                 generateAngleObjectsForVirtualStream(newstream,model);
+               break;
 
 
              case TRAJECTORYPRIMITIVES_TIMESTAMP                         :  newstream->timestamp=InputParser_GetWordInt(ipc,1); break;
