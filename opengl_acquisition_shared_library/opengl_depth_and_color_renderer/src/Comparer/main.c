@@ -7,12 +7,10 @@
 
 int main(int argc, char **argv)
 {
-   if (argc<5)
+   if (argc<6)
    {
-     fprintf(stderr,"usage : Comparer path/To/FileA.scene path/To/FileB.scene numberOfFrames \n");
+     fprintf(stderr,"usage : Comparer path/To/FileA.scene path/To/FileB.scene numberOfFrames sumErrorForAllObjects generateAngleObjects \n");
      return 0;
    }
-   compareTrajectoryFiles("comparison.txt",argv[1],argv[2],atoi(argv[3]),atoi(argv[4]));
-
-  return 0;
+    return compareTrajectoryFiles("comparison.txt",argv[1],argv[2],atoi(argv[3]),atoi(argv[4]),atoi(argv[5]));
 }

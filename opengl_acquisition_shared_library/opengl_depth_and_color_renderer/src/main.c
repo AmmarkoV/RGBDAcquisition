@@ -465,7 +465,7 @@ int snapOGLRendererPhotoshootSandbox(
    --------------------------------------------------------------------------------------
 */
 
-int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB,unsigned int posesToCompare , unsigned totalDistancePerFrame)
+int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB,unsigned int posesToCompare , unsigned totalDistancePerFrame,unsigned int useAngleObjects)
 {
   struct VirtualStream * sceneA = createVirtualStream(filenameA);
   struct VirtualStream * sceneB = createVirtualStream(filenameB);
@@ -480,6 +480,15 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
     fprintf(stderr,"Inconsistent scenes , with different number of objects..!\n");
   } else
   {
+
+
+  if (useAngleObjects)
+  {
+   generateAngleObjectsForVirtualStream(sceneA,"objSphere");
+   generateAngleObjectsForVirtualStream(sceneB,"objSphere");
+  }
+
+
   unsigned int i=0;
   unsigned int ticks;
   float posStackA[7]={0};
@@ -495,14 +504,13 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
 
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
 
+ fprintf(stderr,"Comparing %u objects across %u poses ..!\n",sceneA->numberOfObjects , posesToCompare);
 for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
    {
      float totalDistance=0;
      //i=0 is the camera we dont compare it..!
      for (i=1; i<sceneA->numberOfObjects; i++)
       {
-
-
        //struct Model * mod = models[sceneA->object[i].type];
        float * posA = (float*) &posStackA;
        float * posB = (float*) &posStackB;
@@ -515,10 +523,13 @@ for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
                                             posB[0]*100,posB[1]*100,posB[2]*100);
          totalDistance+=distance;
          if (!totalDistancePerFrame) { fprintf(stdout,"%u %u %0.5f\n",i,timestampToUse,distance); }
+       } else
+       {
+         fprintf(stderr,"Cannot calculate distance for obj %u\n",i);
        }
 
      }
-     if (totalDistancePerFrame) { fprintf(stdout,"%u %u %0.5f\n",i,timestampToUse,totalDistance); }
+     if (totalDistancePerFrame) { fprintf(stdout,"SUM %u %0.5f\n",timestampToUse,totalDistance); }
     }
   }
 

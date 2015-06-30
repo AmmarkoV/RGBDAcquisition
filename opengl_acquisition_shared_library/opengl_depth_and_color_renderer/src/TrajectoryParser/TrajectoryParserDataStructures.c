@@ -459,9 +459,11 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream,char * ex
   for (i=1; i<originalNumberOfObjects; i++)
   {
 
-    fprintf(stderr,"Obj %u objtype %s - excluding %s \n",i,stream->object[i].typeStr,excludeObjectType);
 
-    if ( strcmp(excludeObjectType,stream->object[i].typeStr)!=0 )
+    if ( strcmp(excludeObjectType,stream->object[i].typeStr)==0 )
+    {
+      fprintf(stderr,"excluding objid %u ( objtype %s [ %s ] ) from generateAngleObjectsForVirtualStream \n",i,stream->object[i].typeStr,excludeObjectType);
+    } else
     {
        unsigned int planetObj = i;
 

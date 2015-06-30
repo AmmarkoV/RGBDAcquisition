@@ -245,7 +245,7 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
     pointFromAbsoluteToRelationWithObject_PosXYZRotationXYZ(satPosRelative,planetPosAbsolute,planetRotAbsolute,satPosAbsolute);
 
     unsigned int pos=0;
-    fprintf(stderr,YELLOW " Will align sattelite to planet from frame %u to %u\n" NORMAL ,frameNumber+1 , frameNumber+duration );
+    fprintf(stderr,YELLOW " Will align satelite to planet from frame %u to %u\n" NORMAL ,frameNumber+1 , frameNumber+duration );
     for (pos=frameNumber+1; pos<frameNumber+duration; pos++)
     {
        planetPosAbsolute[0] = (double) stream->object[planetObj].frame[pos].x;
