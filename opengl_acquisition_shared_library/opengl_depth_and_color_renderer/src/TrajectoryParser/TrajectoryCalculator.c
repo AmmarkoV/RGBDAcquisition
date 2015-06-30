@@ -235,9 +235,6 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
 }
 
 
-   unsigned int time;
-
-
 int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB)
 {
   float posA[7]={0}; float scaleA_X,scaleA_Y,scaleA_Z;
