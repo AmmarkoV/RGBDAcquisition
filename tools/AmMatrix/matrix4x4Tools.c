@@ -328,8 +328,10 @@ int invert4x4MatrixD(double * result,double * mat)
  b[I44] *= one_div_detA;
 
 
- print4x4DMatrix("Inverted Matrix From Source",a);
- print4x4DMatrix("Inverted Matrix To Target",b);
+ #if PRINT_MATRIX_DEBUGGING
+  print4x4DMatrix("Inverted Matrix From Source",a);
+  print4x4DMatrix("Inverted Matrix To Target",b);
+ #endif // PRINT_MATRIX_DEBUGGING
 
  return 1;
 }
@@ -360,9 +362,12 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
 {
   if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }
 
+  #if PRINT_MATRIX_DEBUGGING
   fprintf(stderr,"Multiplying 4x4 A and B \n");
   print4x4DMatrix("A", matrixA);
   print4x4DMatrix("B", matrixB);
+  #endif // PRINT_MATRIX_DEBUGGING
+
 
   //MULTIPLICATION_RESULT FIRST ROW
   result[0]=matrixA[0] * matrixB[0] + matrixA[1] * matrixB[4]  + matrixA[2] * matrixB[8]  + matrixA[3] * matrixB[12];
@@ -387,7 +392,9 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
   result[14]=matrixA[12] * matrixB[2] + matrixA[13] * matrixB[6]  + matrixA[14] * matrixB[10]   + matrixA[15] * matrixB[14];
   result[15]=matrixA[12] * matrixB[3] + matrixA[13] * matrixB[7]  + matrixA[14] * matrixB[11]   + matrixA[15] * matrixB[15];
 
-  print4x4DMatrix("AxB", result);
+  #if PRINT_MATRIX_DEBUGGING
+   print4x4DMatrix("AxB", result);
+  #endif // PRINT_MATRIX_DEBUGGING
 
   return 1;
 }

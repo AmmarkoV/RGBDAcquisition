@@ -134,28 +134,41 @@ int affixSatteliteToPlanetFromFrameForLength(struct VirtualStream * stream,unsig
   unsigned int satteliteObjFrameNumber = stream->object[satteliteObj].numberOfFrames;
   unsigned int planetObjFrameNumber    = stream->object[planetObj].numberOfFrames;
 
+
+  if ( satteliteObjFrameNumber <  planetObjFrameNumber )
+     {
+       unsigned int growthSize = planetObjFrameNumber-satteliteObjFrameNumber+frameNumber+1;
+       fprintf(stderr,GREEN" sattelite : growing sattelite stream to accomodate %u poses , as many as the planet stream\n" NORMAL,growthSize);
+       //GROW STREAM HERE
+       growVirtualStreamFrames(&stream->object[satteliteObj],growthSize);
+       satteliteObjFrameNumber = stream->object[satteliteObj].numberOfFrames;
+     }
+
+
+
   if ( satteliteObjFrameNumber <= frameNumber )
      {
-       fprintf(stderr,RED " referencing non existent frames ( %u ) \n" NORMAL,frameNumber);
+       fprintf(stderr,RED " sattelite : referencing non existent frames ( %u ) \n" NORMAL,frameNumber);
        return 0;
      }
   if ( satteliteObjFrameNumber < frameNumber+duration )
      {
-       fprintf(stderr,RED " referencing non existent frames ( want %u + %u frames , but max frame is %u ) \n" NORMAL,frameNumber,duration,satteliteObjFrameNumber);
+       fprintf(stderr,RED " sattelite : referencing non existent frames ( want %u + %u frames , but max frame is %u ) \n" NORMAL,frameNumber,duration,satteliteObjFrameNumber);
        duration = satteliteObjFrameNumber-frameNumber;
-       fprintf(stderr,RED " correcting duration to %u\n" NORMAL,duration);
+       fprintf(stderr,RED " sattelite : correcting duration to %u\n" NORMAL,duration);
      }
 
+  // PLANET CODE --------------------------------------------------------------
   if ( planetObjFrameNumber <= frameNumber )
      {
-       fprintf(stderr,RED " referencing non existent frames ( %u ) \n" NORMAL,frameNumber);
+       fprintf(stderr,RED " planet : referencing non existent frames ( %u ) \n" NORMAL,frameNumber);
        return 0;
      }
   if ( planetObjFrameNumber < frameNumber+duration )
      {
-       fprintf(stderr,RED " referencing non existent frames ( want %u + %u frames , but max frame is %u ) \n" NORMAL,frameNumber,duration,planetObjFrameNumber);
+       fprintf(stderr,RED " planet : referencing non existent frames ( want %u + %u frames , but max frame is %u ) \n" NORMAL,frameNumber,duration,planetObjFrameNumber);
        duration = planetObjFrameNumber-frameNumber;
-       fprintf(stderr,RED " correcting duration to %u\n" NORMAL,duration);
+       fprintf(stderr,RED " planet : correcting duration to %u\n" NORMAL,duration);
      }
 
     //There is literally no good reason to go from rotation -> quaternion -> 3x3 -> quaternion -> rotation this could be optimized

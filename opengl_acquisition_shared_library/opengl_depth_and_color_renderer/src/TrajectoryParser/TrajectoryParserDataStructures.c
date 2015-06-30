@@ -460,16 +460,16 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream)
         snprintf(name,512,"objAngleForObj%u",i);
 
         getObjectVirtualStreamPositionAtIndex(stream,planetObj,0,coords);
-        coords[1]-=20;
+        coords[2]-=0.50;
 
         addObjectToVirtualStream(
                                  stream ,
                                  name , "hardcodedSphere" ,
                                  255,0,255,0, /**/0,
                                  coords,7,
-                                 0.10,
-                                 0.10,
-                                 0.10,
+                                 0.025,
+                                 0.025,
+                                 0.025,
                                  planetObj
                                 );
 
