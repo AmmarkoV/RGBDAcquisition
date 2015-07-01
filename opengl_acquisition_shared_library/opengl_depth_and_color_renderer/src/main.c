@@ -356,6 +356,7 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
     fprintf(stderr,"This version of OGLRendererSandbox is compiled to flip OpenGL frames to their correct orientation\n");
   #endif
 
+  initializeHardcodedCallLists();
 
   char defaultSceneFile[] = "scene.conf";
   //( char *)   malloc(sizeof(32)*sizeof(char));

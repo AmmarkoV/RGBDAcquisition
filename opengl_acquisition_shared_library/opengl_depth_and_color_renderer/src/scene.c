@@ -34,6 +34,7 @@ struct shaderObject * loadedShader=0;
 struct VirtualStream * scene = 0;
 struct Model ** models=0;
 
+unsigned int tickUSleepTime=100;
 unsigned int pauseTicking=0;
 float farPlane = 255; //<--be aware that this has an effect on the depth maps generated
 float nearPlane= 1; //<--this also
@@ -277,7 +278,14 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 
        case -66 : //F1
-           //Todo list objects here
+            if (tickUSleepTime<=10) { tickUSleepTime=0; } else
+                                    { tickUSleepTime-=10; }
+             fprintf(stderr,"tickUSleepTime is now %u \n",tickUSleepTime);
+            return 1;
+       break;
+       case -65 : //F2
+            tickUSleepTime+=10;
+            fprintf(stderr,"tickUSleepTime is now %u \n",tickUSleepTime);
             return 1;
        break;
     };
@@ -488,11 +496,11 @@ int tickScene()
    float scaleX = 1.0 , scaleY = 1.0 , scaleZ = 1.0;
 
   //Object 0 is camera  lets calculate its position
-   calculateVirtualStreamPos(scene,0,ticks*100,pos,&scaleX,&scaleY,&scaleZ);
+   calculateVirtualStreamPos(scene,0,ticks*tickUSleepTime,pos,&scaleX,&scaleY,&scaleZ);
    camera_pos_x = userDeltacamera_pos_x + pos[0];  camera_pos_y = userDeltacamera_pos_y + pos[1]; camera_pos_z = userDeltacamera_pos_z + pos[2];
    camera_angle_x = userDeltacamera_angle_x + pos[3]; camera_angle_y = userDeltacamera_angle_y + pos[4]; camera_angle_z = userDeltacamera_angle_z + pos[5];
 
-   usleep(100);
+   if (tickUSleepTime!=0) { usleep(tickUSleepTime); }
    ++ticks;
    return 1;
 }

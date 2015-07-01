@@ -13,7 +13,7 @@
 #include "model_loader_obj.h"
 #include "../tools.h"
 
-#define DISABLE_GL_CALL_LIST 1
+#define DISABLE_GL_CALL_LIST 0
 #if DISABLE_GL_CALL_LIST
  #warning "Please note that glCallList is disabled and that has a really bad effect on graphics card performance"
 #endif // DISABLE_GL_CALL_LIST
@@ -27,6 +27,8 @@ const GLfloat defaultDiffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
 const GLfloat defaultSpecular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
 const GLfloat defaultShininess[] = { 5.0f };
 
+
+GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 
 
 int drawAxis(float x, float y , float z, float scale)
@@ -196,8 +198,6 @@ void drawPyramid()
   glEnd();					// Done Drawing The Pyramid
 }
 
-
-
 unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel)
 {
   *itIsAHardcodedModel=1;
@@ -212,6 +212,62 @@ unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * it
    if ( strcmp(modelname,"invisible") == 0 )  {  modType = OBJ_INVISIBLE; }  else
                                               {  *itIsAHardcodedModel=0;   }
   return modType;
+}
+
+
+unsigned int drawHardcodedModelRaw(unsigned int modelType)
+{
+    switch (modelType)
+    {
+      case OBJ_PLANE :     drawObjPlane(0,0,0, 0.5);             break;
+      case OBJ_GRIDPLANE : drawGridPlane( 0.0 , 0.0 , 0.0, 1.0); break;
+      case OBJ_AXIS :      drawAxis(0,0,0,1.0);                  break;
+      case OBJ_CUBE :      drawCube();                           break;
+      case OBJ_PYRAMID :   drawPyramid();                        break;
+      case OBJ_SPHERE  :   drawSphere(30 /*100 is normal quality*/);                         break;
+      case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
+      default :
+       return 0;
+      break;
+    }
+  return 1;
+}
+
+
+unsigned int drawHardcodedModel(unsigned int modelType)
+{
+    #if DISABLE_GL_CALL_LIST
+      drawHardcodedModelRaw(modelType);
+    #else
+      if ( modelType >= TOTAL_POSSIBLE_MODEL_TYPES )
+      {
+       fprintf(stderr,"Cannot draw object list for object out of reference");
+       return 0;
+      }
+
+      if (hardcodedObjlist[modelType]!=0)
+        { glCallList(hardcodedObjlist[modelType]); }
+    #endif // DISABLE_GL_CALL_LIST
+  return 1;
+}
+
+
+
+int initializeHardcodedCallLists()
+{
+  unsigned int i=0;
+  for (i=0; i<TOTAL_POSSIBLE_MODEL_TYPES; i++)
+  {
+    if (i!=OBJ_MODEL)
+    {
+     glPushAttrib(GL_ALL_ATTRIB_BITS);
+	 hardcodedObjlist[i]=glGenLists(1);
+     glNewList(hardcodedObjlist[i],GL_COMPILE);
+      drawHardcodedModelRaw(i);
+     glEndList();
+     glPopAttrib();
+    }
+  }
 }
 
 
@@ -349,23 +405,13 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
 
     //fprintf(stderr,"Drawing RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
-    switch ( mod->type )
-    {
-      case OBJ_PLANE :     drawObjPlane(0,0,0, 0.5);             break;
-      case OBJ_GRIDPLANE : drawGridPlane( 0.0 , 0.0 , 0.0, 1.0); break;
-      case OBJ_AXIS :      drawAxis(0,0,0,1.0);                  break;
-      case OBJ_CUBE :      drawCube();                           break;
-      case OBJ_PYRAMID :   drawPyramid();                        break;
-      case OBJ_SPHERE  :   drawSphere(50 /*100 is normal quality*/);                         break;
-      case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
-      case OBJ_MODEL :
+      if (mod->type==OBJ_MODEL)
       {
-         if (mod->model!=0)
+        if (mod->model!=0)
          {
            //A model has been created , and it can be served
            GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->model);
            if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after getObjOGLList\n"); }
-
 
            if ( (objlist!=0) && (!DISABLE_GL_CALL_LIST) )
              { //We have compiled a list of the triangles for better performance
@@ -379,9 +425,16 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
          } else
          { fprintf(stderr,"Could not draw unspecified model\n"); }
          glDisable(GL_TEXTURE_2D); //TODO : <-- change drawOBJMesh , Calllist so that they dont leave textures on! :P
+
+      } else
+      if (drawHardcodedModel(mod->type))
+      {
+        //Success drawing hardcoded model
+      } else
+      {
+         fprintf(stderr, "Cannot draw model , unknown type %u\n",mod->type );
       }
-      break;
-    };
+
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing geometry\n"); }
 
@@ -487,5 +540,4 @@ int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * s
 
  return 1;
 }
-
 

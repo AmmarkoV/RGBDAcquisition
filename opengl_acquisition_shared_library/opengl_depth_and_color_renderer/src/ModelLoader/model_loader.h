@@ -53,7 +53,7 @@ struct Model
 #define MAX_MODEL_PATHS 120
 
 
-
+int initializeHardcodedCallLists();
 
 /**
 * @brief Check if model name is a hardcoded model
