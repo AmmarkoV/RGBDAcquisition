@@ -500,7 +500,9 @@ int tickScene()
    camera_pos_x = userDeltacamera_pos_x + pos[0];  camera_pos_y = userDeltacamera_pos_y + pos[1]; camera_pos_z = userDeltacamera_pos_z + pos[2];
    camera_angle_x = userDeltacamera_angle_x + pos[3]; camera_angle_y = userDeltacamera_angle_y + pos[4]; camera_angle_z = userDeltacamera_angle_z + pos[5];
 
-   if (tickUSleepTime!=0) { usleep(tickUSleepTime); }
+   if (tickUSleepTime>0)
+    { usleep(tickUSleepTime); }
+
    ++ticks;
    return 1;
 }
@@ -586,7 +588,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
   if (ticks%10==0)
   {
-    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks ) \r",(float) timestampToUse/1000,ticks);
+    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,ticks,tickUSleepTime);
   }
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<scene->numberOfObjects; i++)
