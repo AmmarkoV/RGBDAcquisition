@@ -31,6 +31,11 @@
 #define FLIP_OPEN_GL_IMAGES 1
 #define REAL_DEPTH 1
 
+#if REAL_DEPTH
+#else
+ #warning "getOpenGLDepth call will not return the real Depth but just the depth buffer , please #define REAL_DEPTH 1"
+#endif // REAL_DEPTH
+
 #define X_OFFSET 0 //This should always be 0 and probably removed also  :P
 
 
@@ -40,6 +45,9 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 unsigned int openGLGetComplaintsLeft=10;
+
+#define SCALE_REAL_DEPTH_OUTPUT 1
+float depthScale=0.1;
 
 void checkFrameGettersForError(char * from)
 {
@@ -163,6 +171,10 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
                  #if REAL_DEPTH
                   tmpF = sqrt( (posX*posX) + (posY*posY) + (posZ*posZ) ) * scaleDepthTo;
                   depth[(height-yp-1)*width+xp]=(unsigned short) tmpF;
+
+                  #if SCALE_REAL_DEPTH_OUTPUT
+                    depth[(height-yp-1)*width+xp]*=depthScale;
+                  #endif // SCALE_REAL_DEPTH_OUTPUT
                  #else
                   depth[(height-yp-1)*width+xp]=(unsigned short) posZ * scaleDepthTo;
                  #endif // REAL_DEPTH

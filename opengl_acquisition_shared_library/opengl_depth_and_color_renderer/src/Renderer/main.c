@@ -24,6 +24,7 @@
 
 int readFromArg=0,writeToArg=0,doFileOutput=0;
 int photoShootOBJ=0;
+unsigned int maxFrames=0;
 float angleX=0.0,angleY=0.0,angleZ=0.0;
 unsigned int width=640;
 unsigned int height=480;
@@ -156,6 +157,10 @@ int main(int argc, char **argv)
         {
             forceKeyboardControl=1;
         }
+        else if (strcmp(argv[i],"-maxFrames")==0)
+        {
+            maxFrames=atoi(argv[i+1]);
+        }
     }
 
 
@@ -213,14 +218,24 @@ int main(int argc, char **argv)
 
         if (doFileOutput)
         {
-            snprintf(filename,FILENAME_MAX,"frames/%s/color_0_%05u.pnm",argv[writeToArg],snappedFrames);
+            snprintf(filename,FILENAME_MAX,"frames/%s/colorFrame_0_%05u.pnm",argv[writeToArg],snappedFrames);
             writeOpenGLColor(filename,0,0,width,height);
 
 
-            snprintf(filename,FILENAME_MAX,"frames/%s/depth_0_%05u.pnm",argv[writeToArg],snappedFrames);
+            snprintf(filename,FILENAME_MAX,"frames/%s/depthFrame_0_%05u.pnm",argv[writeToArg],snappedFrames);
             writeOpenGLDepth(filename,0,0,width,height);
 
             ++snappedFrames;
+        }
+
+
+        if (maxFrames!=0)
+        {
+          if (maxFrames==snappedFrames)
+          {
+            fprintf(stderr,"Reached target of %u frames , stopping\n",maxFrames);
+            break;
+          }
         }
     }
 
