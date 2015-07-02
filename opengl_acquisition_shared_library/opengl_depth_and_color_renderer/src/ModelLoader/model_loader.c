@@ -18,6 +18,7 @@
  #warning "Please note that glCallList is disabled and that has a really bad effect on graphics card performance"
 #endif // DISABLE_GL_CALL_LIST
 
+#define SPHERE_QUALITY 10 /*100 is good quality*/
 
 #define PIE 3.14159265358979323846
 #define degreeToRadOLD(deg) (deg)*(PIE/180)
@@ -224,7 +225,7 @@ unsigned int drawHardcodedModelRaw(unsigned int modelType)
       case OBJ_AXIS :      drawAxis(0,0,0,1.0);                  break;
       case OBJ_CUBE :      drawCube();                           break;
       case OBJ_PYRAMID :   drawPyramid();                        break;
-      case OBJ_SPHERE  :   drawSphere(30 /*100 is normal quality*/);                         break;
+      case OBJ_SPHERE  :   drawSphere( SPHERE_QUALITY );         break;
       case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
       default :
        return 0;

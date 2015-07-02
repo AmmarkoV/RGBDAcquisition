@@ -265,6 +265,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
     switch (key)
     {
+        case 1 : //SPACE??
         case ' ' :
             if (pauseTicking) { pauseTicking=0; } else { pauseTicking=1; }
             return 1;
@@ -286,6 +287,10 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
        case -65 : //F2
             tickUSleepTime+=10;
             fprintf(stderr,"tickUSleepTime is now %u \n",tickUSleepTime);
+            return 1;
+       break;
+       case -64 : //F3
+            if (scene->ignoreTime) { scene->ignoreTime=0; } else { scene->ignoreTime=1; }
             return 1;
        break;
     };
