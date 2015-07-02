@@ -348,7 +348,10 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt called while on an erroneous state :(\n"); }
   glPushMatrix();
-  glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+  //glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+
+   if (mod->wireframe)  { glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); } else
+                        { glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); }
   //glEnable(GL_NORMALIZE);
   /*If scale factors other than 1 are applied to the modelview matrix
     and lighting is enabled, lighting often appears wrong.

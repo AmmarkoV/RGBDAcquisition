@@ -242,6 +242,8 @@ struct VirtualStream
     char debug;
 
 
+    char renderWireframe;
+
     unsigned int objDeclarationsOffset;
     unsigned int timestamp;
 

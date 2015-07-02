@@ -293,6 +293,11 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
             if (scene->ignoreTime) { scene->ignoreTime=0; } else { scene->ignoreTime=1; }
             return 1;
        break;
+       case -63 : //F3
+            if (scene->renderWireframe) { scene->renderWireframe=0; } else { scene->renderWireframe=1; }
+            return 1;
+       break;
+
     };
 
     if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input (%d) is disabled [ add MOVE_VIEW(1) to scene ]\n",(signed int) key); return 0; }
@@ -610,6 +615,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          mod->scaleX = scaleX;//scene->object[i].scale;
          mod->scaleY = scaleY;//scene->object[i].scale;
          mod->scaleZ = scaleZ;//scene->object[i].scale;
+         mod->wireframe = scene->renderWireframe;
          //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
 
@@ -680,6 +686,9 @@ int renderScene()
 
   if ( (scene!=0) && ( scene->modelViewMatrixDeclared ) )
   { //Scene configuration overwrites local configuration
+
+
+
    glLoadMatrixd( scene->modelViewMatrix ); // we load a matrix of Doubles
       if (useCustomModelViewMatrix)
          {
