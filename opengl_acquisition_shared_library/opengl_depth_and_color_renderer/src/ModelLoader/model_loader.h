@@ -8,6 +8,7 @@
 #define MODEL_LOADER_H_INCLUDED
 
 
+#define MAX_MODEL_PATHS 120
 
 /**
 * @brief An enumerator structure to id special Objects that are hardcoded in this library and don't need to be loaded using the OBJ loader
@@ -22,6 +23,7 @@ enum ModelTypes
     OBJ_PYRAMID,
     OBJ_SPHERE,
     OBJ_INVISIBLE,
+    OBJ_QUESTION,
     //-----------
     OBJ_MODEL,
     //-----------
@@ -47,10 +49,12 @@ struct Model
 
     //Flags
     unsigned char nocull , nocolor , wireframe;
+
+    //-----------------
+    char pathOfModel[MAX_MODEL_PATHS];
 };
 
 
-#define MAX_MODEL_PATHS 120
 
 
 int initializeHardcodedCallLists();
@@ -63,6 +67,21 @@ int initializeHardcodedCallLists();
 * @retval 0=Enumerator of Hardcoded model
 */
 unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel);
+
+
+
+/**
+* @brief Find an already loaded model
+* @ingroup ModelLoader
+* @param Pointer of model array
+* @param number of models in model array
+* @param String of filename of the file to load
+* @param The "friendly" name of the model loaded
+* @retval 0=Could not find model , A pointer to an already loaded model structure
+*/
+struct Model * findModel(struct Model ** models,  unsigned int numberOfModels,char * directory,char * modelname);
+
+
 
 /**
 * @brief Load a model from a file

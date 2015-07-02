@@ -23,6 +23,17 @@
 #define PIE 3.14159265358979323846
 #define degreeToRadOLD(deg) (deg)*(PIE/180)
 
+
+
+#define USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS 1
+
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
 const GLfloat defaultAmbient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLfloat defaultDiffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
 const GLfloat defaultSpecular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -121,6 +132,22 @@ void drawSphere(unsigned int quality)
 }
 
 
+int drawQuestion()
+{
+  //Todo draw a question mark here , this is an axis actually :P
+  float x=0,y=0,z=0,scale=1.0;
+  glLineWidth(6.0);
+  glBegin(GL_LINES);
+   glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+scale,y,z);
+   glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+scale,z);
+   glColor3f(0.0,0.0,1.0); glVertex3f(x,y,z); glVertex3f(x,y,z+scale);
+  glEnd();
+  glLineWidth(1.0);
+
+  //drawSphere(30);
+ return 1;
+}
+
 
 int drawCube()
 {
@@ -211,6 +238,7 @@ unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * it
    if ( strcmp(modelname,"sphere") == 0 )     {  modType = OBJ_SPHERE;    }  else
    if ( strcmp(modelname,"none") == 0 )       {  modType = OBJ_INVISIBLE; }  else
    if ( strcmp(modelname,"invisible") == 0 )  {  modType = OBJ_INVISIBLE; }  else
+   if ( strcmp(modelname,"question") == 0 )   {  modType = OBJ_QUESTION;  }  else
                                               {  *itIsAHardcodedModel=0;   }
   return modType;
 }
@@ -227,6 +255,7 @@ unsigned int drawHardcodedModelRaw(unsigned int modelType)
       case OBJ_PYRAMID :   drawPyramid();                        break;
       case OBJ_SPHERE  :   drawSphere( SPHERE_QUALITY );         break;
       case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
+      case OBJ_QUESTION  : drawQuestion();                       break;
       default :
        return 0;
       break;
@@ -272,6 +301,32 @@ int initializeHardcodedCallLists()
 }
 
 
+struct Model * findModel(struct Model ** models,  unsigned int numberOfModels,char * directory,char * modelname)
+{
+  char tmpPathOfModel[MAX_MODEL_PATHS]={0};
+  snprintf(tmpPathOfModel,MAX_MODEL_PATHS,"%s/%s",directory,modelname);
+
+  //fprintf(stderr,"Trying to find %s  .. ",tmpPathOfModel);
+  unsigned int i=0;
+  for (i=0; i<numberOfModels; i++)
+  {
+   if (models[i]!=0)
+   {
+    //fprintf(stderr,"comparing %p %p \n",models[i],models[i]->pathOfModel);
+    if ( strcmp(tmpPathOfModel,models[i]->pathOfModel)==0)
+    {
+      fprintf(stderr,GREEN "model ( %s ) is already loaded , no need to reload it \n" NORMAL,tmpPathOfModel);
+      return models[i];
+    }
+   }
+  }
+
+//fprintf(stderr,"not found \n");
+return 0;
+}
+
+
+
 struct Model * loadModel(char * directory,char * modelname)
 {
   if ( (directory==0) || (modelname==0) )
@@ -285,6 +340,8 @@ struct Model * loadModel(char * directory,char * modelname)
   memset(mod , 0 , sizeof(struct Model));
 
 
+  snprintf(mod->pathOfModel,MAX_MODEL_PATHS,"%s/%s",directory,modelname);
+
   unsigned int checkForHardcodedReturn=0;
   unsigned int modType = isModelnameAHardcodedModel(modelname,&checkForHardcodedReturn);
   if (checkForHardcodedReturn)
@@ -296,13 +353,33 @@ struct Model * loadModel(char * directory,char * modelname)
     {
       mod->type = OBJ_MODEL;
       mod->model = (struct  OBJ_Model * ) loadObj(directory,modelname);
-      if (mod->model ==0 ) { free(mod); return 0 ;}
+      if (mod->model ==0 )
+         {
+          #if USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
+              mod->type = OBJ_QUESTION;
+              mod->model = 0;
+              fprintf(stderr,RED "Failed to load object %s \n" NORMAL,modelname);
+          #else
+            free(mod);
+            return 0 ;
+          #endif // USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
+         }
     } else
     {
       fprintf(stderr,"Could not understand how to load object %s \n",modelname);
       fprintf(stderr,"Searched in directory %s \n",directory);
       fprintf(stderr,"Object %s was also not one of the hardcoded shapes\n",modelname);
-      if (mod->model ==0 ) { free(mod); return 0 ;}
+      if (mod->model==0 )
+         {
+          #if USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
+              mod->type = OBJ_QUESTION;
+              mod->model = 0;
+              fprintf(stderr,RED "Failed to load object %s \n" NORMAL,modelname);
+          #else
+            free(mod);
+            return 0 ;
+          #endif // USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
+         }
     }
 
   return mod;

@@ -453,15 +453,22 @@ int initScene(char * confFile)
   //This is not needed -> :P  glCullFace(GL_FRONT_AND_BACK);
 
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
+  memset(models,0,scene->numberOfObjectTypes * sizeof(struct Model **));
 
   unsigned int i=0;  //Object 0 is camera so we don't need to load a model or something for it
   for (i=1; i<scene->numberOfObjectTypes; i++)
     {
          fprintf(stderr,"Loading Model %s ( %u )\n",scene->object[i].name,i);
-         models[i] = loadModel("Models/",getObjectTypeModel(scene,i));
-         if (models[i]!=0) {  fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,getObjectTypeModel(scene,i) ,i ); } else
-                           {  fprintf(stderr,RED "Failed loading model %s ( %u ) \n" NORMAL,getObjectTypeModel(scene,i),i);          }
 
+         models[i] = findModel(models,scene->numberOfObjectTypes,"Models/",getObjectTypeModel(scene,i));
+         if (models[i]==0)
+         { //If we can't find an already loaded version of the mesh we are looking for
+           models[i] = loadModel("Models/",getObjectTypeModel(scene,i));
+
+           if (models[i]!=0)
+             { fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,getObjectTypeModel(scene,i) ,i ); } else
+             { fprintf(stderr,RED "Failed loading model %s ( %u ) \n" NORMAL,getObjectTypeModel(scene,i),i);            }
+         }
     }
 
   return 1;
