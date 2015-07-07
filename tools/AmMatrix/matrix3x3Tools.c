@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define PRINT_MATRIX_DEBUGGING 1
 
 enum mat3x3Item
 {

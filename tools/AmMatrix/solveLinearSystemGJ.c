@@ -203,7 +203,8 @@ int subtractBase(double * mat   , unsigned int activeLine , unsigned int totalLi
   double multiplier = 0.0;
   unsigned int i=0,line=0;
 
-  for (line=activeLine; line<totalLines; line++)
+
+  for (line=0;/*activeLine;*/ line<totalLines; line++)
   {
    if (line!=activeLine)
    {
@@ -357,7 +358,7 @@ int calculateFundamentalMatrix8PointMultipleView(double * result3x3Matrix , unsi
 
     solveLinearSystemGJ(result3x3Matrix,compiledPoints,elements,pointsNum);
 
-
+    print3x3DMatrix("Result 3x3 Matrix",result3x3Matrix);
 
    free(compiledPoints);
 
