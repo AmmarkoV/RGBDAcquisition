@@ -49,9 +49,14 @@ unsigned int openGLGetComplaintsLeft=10;
 #define SCALE_REAL_DEPTH_OUTPUT 1
 float depthScale=0.1;
 
+void internalTest()
+{
+  testMatrices();
+}
+
+
 void checkFrameGettersForError(char * from)
 {
-
   int err=glGetError();
   if (err !=  GL_NO_ERROR /*0*/ )
     {

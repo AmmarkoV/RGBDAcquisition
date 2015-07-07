@@ -11,8 +11,13 @@ extern "C"
 {
 #endif
 
-int doTest();
 
+
+/**
+* @brief Do an internal check of the library , only used for development
+* @ingroup OGLRendererSandbox
+*/
+void internalTest();
 
 /**
 * @brief Set OpenGL Near And Far Planes

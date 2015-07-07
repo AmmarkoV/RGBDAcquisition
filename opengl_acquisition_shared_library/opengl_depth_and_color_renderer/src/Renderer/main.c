@@ -84,7 +84,8 @@ int main(int argc, char **argv)
 
         if (strcmp(argv[i],"-test")==0)
         {
-            /*doTest(); exit(0);*/
+            internalTest();
+            exit(0);
         }
         else if (strcmp(argv[i],"-intrinsics")==0)
         {
