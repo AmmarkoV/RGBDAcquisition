@@ -115,7 +115,7 @@ struct OBJ_Model
 		//the center of our model
 		GLfloat center[3];
 
-        float minX,minY,minZ,maxX,maxY,maxZ;
+        GLfloat minX,minY,minZ,maxX,maxY,maxZ;
 
 		//the number of vertices
 		long unsigned int numVertices;

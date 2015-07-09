@@ -362,6 +362,24 @@ int prepareObject(struct OBJ_Model * obj)
 }
 
 
+int calculateOBJBBox(struct OBJ_Model * obj)
+{
+  unsigned int vertNum = 0;
+
+  for (vertNum=0; vertNum<obj->numVertices; vertNum++)
+  {
+    if  (obj->vertexList[vertNum].x < obj->minX) { obj->minX = obj->vertexList[vertNum].x; }
+	if  (obj->vertexList[vertNum].x > obj->maxX) { obj->maxX = obj->vertexList[vertNum].x; }
+	if  (obj->vertexList[vertNum].y < obj->minY) { obj->minY = obj->vertexList[vertNum].y; }
+	if  (obj->vertexList[vertNum].y > obj->maxY) { obj->maxY = obj->vertexList[vertNum].y; }
+	if  (obj->vertexList[vertNum].z < obj->minZ) { obj->minZ = obj->vertexList[vertNum].z; }
+	if  (obj->vertexList[vertNum].z > obj->maxZ) { obj->maxZ = obj->vertexList[vertNum].z; }
+  }
+
+ return 1;
+}
+
+
 int readOBJ(struct OBJ_Model * obj)
 {
   if (obj->filename == 0 ) { fprintf(stderr,"readOBJ called with a null filename , cannot continue \n"); return 0; }
@@ -580,24 +598,6 @@ int readOBJ(struct OBJ_Model * obj)
 	                              &obj->vertexList[obj->numVertices].z);
 	                              obj->numVertices++;
 
-                                  #if CALCULATE_3D_BOUNDING_BOX
-                                  // X
-	                              if  (obj->vertexList[obj->numVertices].x < obj->minX)
-                                         { obj->minX = obj->vertexList[obj->numVertices].x; }
-	                              if  (obj->vertexList[obj->numVertices].x > obj->maxX)
-                                         { obj->maxX = obj->vertexList[obj->numVertices].x; }
-                                  // Y
-	                              if  (obj->vertexList[obj->numVertices].y < obj->minY)
-                                         { obj->minY = obj->vertexList[obj->numVertices].y; }
-	                              if  (obj->vertexList[obj->numVertices].y > obj->maxY)
-                                         { obj->maxY = obj->vertexList[obj->numVertices].y; }
-	                              // Z
-	                              if  (obj->vertexList[obj->numVertices].z < obj->minZ)
-                                         { obj->minZ = obj->vertexList[obj->numVertices].z; }
-	                              if  (obj->vertexList[obj->numVertices].z > obj->maxZ)
-                                         { obj->maxZ = obj->vertexList[obj->numVertices].z; }
-                                  #endif // CALCULATE_3D_BOUNDING_BOX
-
 	                   break;
                        case 'n': // normal
 	                             fscanf(file, "%f %f %f",
@@ -746,6 +746,10 @@ int readOBJ(struct OBJ_Model * obj)
 	 // fprintf(stderr,"Group %s has %ld faces and material %s, \t \n",obj->groups[i].name,obj->groups[i].numFaces,obj->matList[obj->groups[i].material].name);
   }
 
+
+#if CALCULATE_3D_BOUNDING_BOX
+  calculateOBJBBox(obj);
+#endif // CALCULATE_3D_BOUNDING_BOX
 
  return 1;
 }
