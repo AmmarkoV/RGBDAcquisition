@@ -273,8 +273,8 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
         break;
 
        case 9 : //TAB
-            if (scene!=0)
-             { scene->autoRefreshForce=1; }
+             ++scene->selectedObject;
+             scene->selectedObject = scene->selectedObject % scene->numberOfObjects;
             return 1;
        break;
 
@@ -296,6 +296,11 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
        break;
        case -63 : //F4
             if (scene->renderWireframe) { scene->renderWireframe=0; } else { scene->renderWireframe=1; }
+            return 1;
+       break;
+       case -62 : //F5 refresh
+            if (scene!=0)
+             { scene->autoRefreshForce=1; }
             return 1;
        break;
 
@@ -624,6 +629,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          mod->scaleY = scaleY;//scene->object[i].scale;
          mod->scaleZ = scaleZ;//scene->object[i].scale;
          mod->wireframe = scene->renderWireframe;
+         mod->highlight = ( scene->selectedObject == i );
          //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
 

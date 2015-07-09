@@ -153,6 +153,7 @@ int drawBoundingBox(float x,float y,float z ,float minX,float minY,float minZ,fl
  //fprintf(stderr,"drawBoundingBox( pos %0.2f %0.2f %0.2f min %0.2f %0.2f %0.2f  max %0.2f %0.2f %0.2f \n",x,y,z ,minX,minY,minZ,maxX,maxY,maxZ);
 
 glLineWidth(6.0);
+
  glBegin(GL_LINES);
  glNormal3f(0.0,1.0,0.0);
  glVertex3f(x+minX,y+minY,z+minZ);
@@ -176,20 +177,42 @@ glLineWidth(6.0);
  glBegin(GL_LINES);
  glNormal3f(0.0,1.0,0.0);
  glVertex3f(x+minX,y+minY,z+maxZ);
- glVertex3f(x+minX,y+maxY,z+maxZ);
+ glVertex3f(x+maxX,y+minY,z+maxZ);
  glEnd();
 
  glBegin(GL_LINES);
  glNormal3f(0.0,1.0,0.0);
- glVertex3f(x+maxX,y+minY,z+maxZ);
+ glVertex3f(x+minX,y+maxY,z+maxZ);
  glVertex3f(x+maxX,y+maxY,z+maxZ);
  glEnd();
 
  glBegin(GL_LINES);
  glNormal3f(0.0,1.0,0.0);
+ glVertex3f(x+minX,y+minY,z+minZ);
  glVertex3f(x+maxX,y+minY,z+minZ);
+ glEnd();
+
+ glBegin(GL_LINES);
+ glNormal3f(0.0,1.0,0.0);
+ glVertex3f(x+minX,y+maxY,z+minZ);
  glVertex3f(x+maxX,y+maxY,z+minZ);
  glEnd();
+
+
+
+ glBegin(GL_LINES);
+ glNormal3f(0.0,1.0,0.0);
+ glVertex3f(x+minX,y+minY,z+minZ);
+ glVertex3f(x+minX,y+minY,z+maxZ);
+ glVertex3f(x+maxX,y+maxY,z+minZ);
+ glVertex3f(x+maxX,y+maxY,z+maxZ);
+ glVertex3f(x+minX,y+minY,z+minZ);
+ glVertex3f(x+minX,y+minY,z+maxZ);
+ glVertex3f(x+maxX,y+maxY,z+minZ);
+ glVertex3f(x+maxX,y+maxY,z+maxZ);
+ glEnd();
+
+
 glLineWidth(1.0);
 
 return 1;
@@ -550,8 +573,12 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       {
         if (mod->model!=0)
          {
-           struct  OBJ_Model *  drawOBJ = (struct  OBJ_Model * ) mod->model;
-           drawBoundingBox(0,0,0,drawOBJ->minX,drawOBJ->minY,drawOBJ->minZ,drawOBJ->maxX,drawOBJ->maxY,drawOBJ->maxZ);
+           if (mod->highlight)
+           {
+            struct  OBJ_Model *  drawOBJ = (struct  OBJ_Model * ) mod->model;
+            drawBoundingBox(0,0,0,drawOBJ->minX,drawOBJ->minY,drawOBJ->minZ,drawOBJ->maxX,drawOBJ->maxY,drawOBJ->maxZ);
+           }
+
            //A model has been created , and it can be served
            GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->model);
            if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after getObjOGLList\n"); }

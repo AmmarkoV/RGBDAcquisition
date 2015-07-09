@@ -42,7 +42,7 @@ struct Model
 
     int type; //See enum ModelTypes
 
-    //Position / Dimensions
+    //Position / DimensionsglColor3f(1.0,0.0,0.0);
     float x , y , z , heading , pitch , roll , scaleX , scaleY ,scaleZ;
     float minX,minY,minZ,maxX,maxY,maxZ;
 
@@ -50,7 +50,7 @@ struct Model
     float colorR , colorG , colorB , transparency;
 
     //Flags
-    unsigned char nocull , nocolor , wireframe;
+    unsigned char nocull , nocolor , wireframe , highlight;
 
     //-----------------
     char pathOfModel[MAX_MODEL_PATHS];

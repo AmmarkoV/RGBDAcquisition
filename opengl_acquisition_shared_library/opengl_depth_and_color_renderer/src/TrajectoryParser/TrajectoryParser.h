@@ -212,6 +212,7 @@ struct VirtualStream
 
     unsigned int MAX_numberOfObjects;
     unsigned int numberOfObjects;
+    unsigned int selectedObject;
     struct VirtualObject * object;
 
 
