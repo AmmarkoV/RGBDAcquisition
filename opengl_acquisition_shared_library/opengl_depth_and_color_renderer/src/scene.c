@@ -349,13 +349,12 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
        case 2 : userDeltacamera_angle_y+=1.0; break;
        case 3 : userDeltacamera_angle_z+=1.0; break;
 
-
-
        case 'P' :
        case 'p' :
             //Unpause/Pause..
        break;
 
+///// -----------------------------------------------------------------------
 
        case 'W' :
        case 'w' :
@@ -388,7 +387,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
        break;
 
 
-
+///// -----------------------------------------------------------------------
 
        case 'T' :
        case 't' :
