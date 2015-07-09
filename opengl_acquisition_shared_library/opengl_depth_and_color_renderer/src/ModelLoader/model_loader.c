@@ -150,7 +150,9 @@ int drawQuestion()
 
 int drawBoundingBox(float x,float y,float z ,float minX,float minY,float minZ,float maxX,float maxY,float maxZ)
 {
-  glLineWidth(6.0);
+ //fprintf(stderr,"drawBoundingBox( pos %0.2f %0.2f %0.2f min %0.2f %0.2f %0.2f  max %0.2f %0.2f %0.2f \n",x,y,z ,minX,minY,minZ,maxX,maxY,maxZ);
+
+glLineWidth(6.0);
  glBegin(GL_LINES);
  glNormal3f(0.0,1.0,0.0);
  glVertex3f(x+minX,y+minY,z+minZ);
@@ -160,7 +162,6 @@ int drawBoundingBox(float x,float y,float z ,float minX,float minY,float minZ,fl
  glVertex3f(x+minX,y+maxY,z+maxZ);
  glVertex3f(x+minX,y+maxY,z+minZ);
  glEnd();
-
 
  glBegin(GL_LINES);
  glNormal3f(0.0,1.0,0.0);
@@ -189,7 +190,8 @@ int drawBoundingBox(float x,float y,float z ,float minX,float minY,float minZ,fl
  glVertex3f(x+maxX,y+minY,z+minZ);
  glVertex3f(x+maxX,y+maxY,z+minZ);
  glEnd();
-  glLineWidth(1.0);
+glLineWidth(1.0);
+
 return 1;
 }
 
@@ -329,6 +331,22 @@ unsigned int drawHardcodedModel(unsigned int modelType)
 }
 
 
+int drawConnector(
+                  float * posA,
+                  float * posB,
+                  float * scale ,
+                  unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha )
+{
+ glPushMatrix();
+    glLineWidth(*scale);
+    glColor3f(R,G,B); //Alpha not used ?
+     glBegin(GL_LINES);
+       glVertex3f(posA[0],posA[1],posA[2]);
+       glVertex3f(posB[0],posB[1],posB[2]);
+     glEnd();
+ glPopMatrix();
+ return 1;
+}
 
 int initializeHardcodedCallLists()
 {
@@ -416,6 +434,7 @@ struct Model * loadModel(char * directory,char * modelname)
              //Populate 3D bounding box data
              mod->minX = newObj->minX; mod->minY = newObj->minY;  mod->minZ = newObj->minZ;
              mod->minX = newObj->maxX; mod->maxY = newObj->maxY;  mod->maxZ = newObj->maxZ;
+             fprintf(stderr,"new obj : min %0.2f %0.2f %0.2f  max %0.2f %0.2f %0.2f \n",newObj->minX,newObj->minY,newObj->minZ,newObj->maxX,newObj->maxY,newObj->maxZ);
          }
 
     } else
@@ -451,22 +470,6 @@ void unloadModel(struct Model * mod)
     };
 }
 
-int drawConnector(
-                  float * posA,
-                  float * posB,
-                  float * scale ,
-                  unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha )
-{
- glPushMatrix();
-    glLineWidth(*scale);
-    glColor3f(R,G,B); //Alpha not used ?
-     glBegin(GL_LINES);
-       glVertex3f(posA[0],posA[1],posA[2]);
-       glVertex3f(posB[0],posB[1],posB[2]);
-     glEnd();
- glPopMatrix();
- return 1;
-}
 
 
 int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
@@ -542,12 +545,13 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
 
     //fprintf(stderr,"Drawing RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
-  drawBoundingBox(0,0,0,mod->minX,mod->minY,mod->minZ,mod->maxX,mod->maxY,mod->maxZ);
 
       if (mod->type==OBJ_MODEL)
       {
         if (mod->model!=0)
          {
+           struct  OBJ_Model *  drawOBJ = (struct  OBJ_Model * ) mod->model;
+           drawBoundingBox(0,0,0,drawOBJ->minX,drawOBJ->minY,drawOBJ->minZ,drawOBJ->maxX,drawOBJ->maxY,drawOBJ->maxZ);
            //A model has been created , and it can be served
            GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->model);
            if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after getObjOGLList\n"); }
