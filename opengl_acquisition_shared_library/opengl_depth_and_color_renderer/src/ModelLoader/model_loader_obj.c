@@ -8,6 +8,11 @@
 
 #define reallocationStep 500
 
+#define CALCULATE_3D_BOUNDING_BOX 1
+#ifndef CALCULATE_3D_BOUNDING_BOX
+  #warning "3D bounding boxes not getting calculated"
+#endif // CALCULATE_3D_BOUNDING_BOX
+
 #define DISABLE_SHININESS 1
 #if DISABLE_SHININESS
  #warning "Shininess is problematic ( apparently )"
@@ -574,6 +579,25 @@ int readOBJ(struct OBJ_Model * obj)
 	                              &obj->vertexList[obj->numVertices].y,
 	                              &obj->vertexList[obj->numVertices].z);
 	                              obj->numVertices++;
+
+                                  #if CALCULATE_3D_BOUNDING_BOX
+                                  // X
+	                              if  (obj->vertexList[obj->numVertices].x < obj->minX)
+                                         { obj->minX = obj->vertexList[obj->numVertices].x; }
+	                              if  (obj->vertexList[obj->numVertices].x > obj->maxX)
+                                         { obj->maxX = obj->vertexList[obj->numVertices].x; }
+                                  // Y
+	                              if  (obj->vertexList[obj->numVertices].y < obj->minY)
+                                         { obj->minY = obj->vertexList[obj->numVertices].y; }
+	                              if  (obj->vertexList[obj->numVertices].y > obj->maxY)
+                                         { obj->maxY = obj->vertexList[obj->numVertices].y; }
+	                              // Z
+	                              if  (obj->vertexList[obj->numVertices].z < obj->minZ)
+                                         { obj->minZ = obj->vertexList[obj->numVertices].z; }
+	                              if  (obj->vertexList[obj->numVertices].z > obj->maxZ)
+                                         { obj->maxZ = obj->vertexList[obj->numVertices].z; }
+                                  #endif // CALCULATE_3D_BOUNDING_BOX
+
 	                   break;
                        case 'n': // normal
 	                             fscanf(file, "%f %f %f",

@@ -148,6 +148,51 @@ int drawQuestion()
  return 1;
 }
 
+int drawBoundingBox(float x,float y,float z ,float minX,float minY,float minZ,float maxX,float maxY,float maxZ)
+{
+  glLineWidth(6.0);
+ glBegin(GL_LINES);
+ glNormal3f(0.0,1.0,0.0);
+ glVertex3f(x+minX,y+minY,z+minZ);
+ glVertex3f(x+minX,y+maxY,z+minZ);
+ glVertex3f(x+maxX,y+maxY,z+minZ);
+ glVertex3f(x+maxX,y+maxY,z+maxZ);
+ glVertex3f(x+minX,y+maxY,z+maxZ);
+ glVertex3f(x+minX,y+maxY,z+minZ);
+ glEnd();
+
+
+ glBegin(GL_LINES);
+ glNormal3f(0.0,1.0,0.0);
+ glVertex3f(x+minX,y+minY,z+maxZ);
+ glVertex3f(x+minX,y+minY,z+minZ);
+ glVertex3f(x+maxX,y+minY,z+minZ);
+ glVertex3f(x+maxX,y+minY,z+maxZ);
+ glVertex3f(x+minX,y+minY,z+maxZ);
+ glEnd();
+
+
+ glBegin(GL_LINES);
+ glNormal3f(0.0,1.0,0.0);
+ glVertex3f(x+minX,y+minY,z+maxZ);
+ glVertex3f(x+minX,y+maxY,z+maxZ);
+ glEnd();
+
+ glBegin(GL_LINES);
+ glNormal3f(0.0,1.0,0.0);
+ glVertex3f(x+maxX,y+minY,z+maxZ);
+ glVertex3f(x+maxX,y+maxY,z+maxZ);
+ glEnd();
+
+ glBegin(GL_LINES);
+ glNormal3f(0.0,1.0,0.0);
+ glVertex3f(x+maxX,y+minY,z+minZ);
+ glVertex3f(x+maxX,y+maxY,z+minZ);
+ glEnd();
+  glLineWidth(1.0);
+return 1;
+}
+
 
 int drawCube()
 {
@@ -239,6 +284,7 @@ unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * it
    if ( strcmp(modelname,"none") == 0 )       {  modType = OBJ_INVISIBLE; }  else
    if ( strcmp(modelname,"invisible") == 0 )  {  modType = OBJ_INVISIBLE; }  else
    if ( strcmp(modelname,"question") == 0 )   {  modType = OBJ_QUESTION;  }  else
+   if ( strcmp(modelname,"bbox") == 0 )       {  modType = OBJ_BBOX;      }  else
                                               {  *itIsAHardcodedModel=0;   }
   return modType;
 }
@@ -256,6 +302,7 @@ unsigned int drawHardcodedModelRaw(unsigned int modelType)
       case OBJ_SPHERE  :   drawSphere( SPHERE_QUALITY );         break;
       case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
       case OBJ_QUESTION  : drawQuestion();                       break;
+      case OBJ_BBOX :  drawBoundingBox(0,0,0,-1.0,-1.0,-1.0,1.0,1.0,1.0); break;
       default :
        return 0;
       break;
@@ -352,7 +399,8 @@ struct Model * loadModel(char * directory,char * modelname)
   if ( strstr(modelname,".obj") != 0 )
     {
       mod->type = OBJ_MODEL;
-      mod->model = (struct  OBJ_Model * ) loadObj(directory,modelname);
+      struct  OBJ_Model *  newObj = (struct  OBJ_Model * ) loadObj(directory,modelname);
+      mod->model = newObj;//(struct  OBJ_Model * ) loadObj(directory,modelname);
       if (mod->model ==0 )
          {
           #if USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
@@ -363,7 +411,13 @@ struct Model * loadModel(char * directory,char * modelname)
             free(mod);
             return 0 ;
           #endif // USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
+         } else
+         {
+             //Populate 3D bounding box data
+             mod->minX = newObj->minX; mod->minY = newObj->minY;  mod->minZ = newObj->minZ;
+             mod->minX = newObj->maxX; mod->maxY = newObj->maxY;  mod->maxZ = newObj->maxZ;
          }
+
     } else
     {
       fprintf(stderr,"Could not understand how to load object %s \n",modelname);
@@ -450,6 +504,8 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
                          //fprintf(stderr,"Scaling model by %f %f %f\n",mod->scaleX,mod->scaleY,mod->scaleZ);
                        }
 
+
+
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying dimensions \n"); }
 
        // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
@@ -485,6 +541,8 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying color/materials\n"); }
 
     //fprintf(stderr,"Drawing RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
+
+  drawBoundingBox(0,0,0,mod->minX,mod->minY,mod->minZ,mod->maxX,mod->maxY,mod->maxZ);
 
       if (mod->type==OBJ_MODEL)
       {

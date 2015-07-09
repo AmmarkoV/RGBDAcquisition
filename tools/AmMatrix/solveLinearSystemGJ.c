@@ -232,7 +232,7 @@ int subtractBase(double * mat   , unsigned int activeLine , unsigned int totalLi
 #6                          1   x3   RESULT = -x3 * x4
 #7                              x4   RESULT =  x4  */
 
-int gatherResult(double * result , double * mat  , unsigned int totalLines )
+int gatherResultOLD(double * result , double * mat  , unsigned int totalLines )
 {
   double calculatedItem = 0.0;
   unsigned int line=0;
@@ -271,6 +271,52 @@ int gatherResult(double * result , double * mat  , unsigned int totalLines )
         {
           result[i] = mat[i*ElementsNumber + Result];
         }
+  return 1;
+}
+
+/* #0  #1  #2  #3  #4  #5  #6   #7     #8
+  ________________________________   ______
+#0  1   0   0   0   0   0   0    0   RESULT
+#1      1   0   0   0   0   0    0   RESULT
+#2          1   0   0   0   0    0   RESULT
+#3              1   0   0   0    0   RESULT
+#4                  1   0   0    0   RESULT
+#5                     1    0    0   RESULT = -x1 * 1 - x2 * ( -x3 * x4 )
+#6                          1    0   RESULT = -x3 * x4
+#7                               1   RESULT =  x4  */
+
+int gatherResult(double * result , double * mat  , unsigned int totalLines )
+{
+  unsigned int line=0,i=0,ok=0;
+
+  line=totalLines-1;
+  while (line>=0)
+  {
+    ok=0;
+    for (i=0; i<ElementsNumber; i++)
+        {
+          if (i==line)
+          {
+            if ( mat[line*ElementsNumber+i]==1 ) { ++ok; }
+          } else
+          {
+	        if ( (mat[line*ElementsNumber+i] > -0.00001) && (mat[line*ElementsNumber+i] < 0.00001) ) { ++ok; }
+          }
+        }
+
+
+    if (ok>=ElementsNumber-1)
+    {
+        fprintf(stderr,"Line %u is ok , solution #%u is %0.2f\n",line,line,mat[line*ElementsNumber+Result-1]);
+        result[line]=mat[line*ElementsNumber+Result-1];
+    } else
+    {
+        fprintf(stderr,"Line %u is not ok ,  %u/%u oks \n",line,ok,ElementsNumber);
+    }
+
+    if (line==0) { break; } else { --line; }
+  }
+
   return 1;
 }
 

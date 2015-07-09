@@ -97,6 +97,7 @@ float userDeltacamera_angle_x = 0.0f; float userDeltacamera_angle_y = 0.0f; floa
 
 unsigned int ticks = 0;
 
+unsigned int selectedOBJ=1;
 
 
 
@@ -293,7 +294,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
             if (scene->ignoreTime) { scene->ignoreTime=0; } else { scene->ignoreTime=1; }
             return 1;
        break;
-       case -63 : //F3
+       case -63 : //F4
             if (scene->renderWireframe) { scene->renderWireframe=0; } else { scene->renderWireframe=1; }
             return 1;
        break;

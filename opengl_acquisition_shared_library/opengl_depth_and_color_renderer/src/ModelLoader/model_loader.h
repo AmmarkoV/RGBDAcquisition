@@ -24,6 +24,7 @@ enum ModelTypes
     OBJ_SPHERE,
     OBJ_INVISIBLE,
     OBJ_QUESTION,
+    OBJ_BBOX,
     //-----------
     OBJ_MODEL,
     //-----------
@@ -43,6 +44,7 @@ struct Model
 
     //Position / Dimensions
     float x , y , z , heading , pitch , roll , scaleX , scaleY ,scaleZ;
+    float minX,minY,minZ,maxX,maxY,maxZ;
 
     //Color
     float colorR , colorG , colorB , transparency;
