@@ -259,11 +259,41 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
    return 1;
 }
 
+int moveObject(unsigned objToMove , float X , float Y , float Z)
+{
+  if (objToMove==0)
+  {
+    userDeltacamera_pos_x+=X;
+    userDeltacamera_pos_y+=Y;
+    userDeltacamera_pos_z+=Z;
+    fprintf(stderr,"Moving camera %0.2f %0.2f %0.2f..!\n",X,Y,Z);
+  } else
+  {
+    fprintf(stderr,"Moving an arbitrary object is not yet implemented..!\n");
+  }
+}
+
+int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleDegrees)
+{
+  if (objToMove==0)
+  {
+    if ( (X==1.0) && (Y==0.0) && (Z==0.0) ) { userDeltacamera_angle_x+=angleDegrees; } else
+    if ( (X==0.0) && (Y==1.0) && (Z==0.0) ) { userDeltacamera_angle_y+=angleDegrees; } else
+    if ( (X==0.0) && (Y==0.0) && (Z==1.0) ) { userDeltacamera_angle_z+=angleDegrees; } else
+        {
+           fprintf(stderr,"Unhandled camera rotation %0.2f %0.2f %0.2f %0.2f..!\n",X,Y,Z,angleDegrees);
+        }
+  } else
+  {
+    fprintf(stderr,"Rotating an arbitrary object is not yet implemented..!\n");
+  }
+}
+
+
+
 
 int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
-
-
     switch (key)
     {
         case 1 : //SPACE??
@@ -303,6 +333,11 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
              { scene->autoRefreshForce=1; }
             return 1;
        break;
+       case -61 : //F6 refresh
+            if (userKeyFOVEnabled==0) { userKeyFOVEnabled=1; } else
+                                      { userKeyFOVEnabled=0; }
+            return 1;
+       break;
 
     };
 
@@ -324,32 +359,32 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
        case 'W' :
        case 'w' :
-              userDeltacamera_pos_y+=1.0;
+              moveObject(scene->selectedObject,0.0,1.0,0.0);
        break;
 
        case 'S' :
        case 's' :
-              userDeltacamera_pos_y-=1.0;
+              moveObject(scene->selectedObject,0.0,-1.0,0.0);
        break;
 
        case 'A' :
        case 'a' :
-              userDeltacamera_pos_x-=1.0;
+              moveObject(scene->selectedObject,1.0,0.0,0.0);
        break;
 
        case 'D' :
        case 'd' :
-              userDeltacamera_pos_x+=1.0;
+              moveObject(scene->selectedObject,-1.0,0.0,0.0);
        break;
 
        case 'Q' :
        case 'q' :
-              userDeltacamera_pos_z-=1.0;
+              moveObject(scene->selectedObject,0.0,0.0,1.0);
        break;
 
        case 'Z' :
        case 'z' :
-              userDeltacamera_pos_z+=1.0;
+              moveObject(scene->selectedObject,0.0,0.0,-1.0);
        break;
 
 
@@ -357,27 +392,27 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
        case 'T' :
        case 't' :
-              userDeltacamera_angle_x+=1.0;
+              rotateObject(scene->selectedObject,1.0,0.0,0.0,1.0);
        break;
        case 'G' :
        case 'g' :
-              userDeltacamera_angle_x-=1.0;
+              rotateObject(scene->selectedObject,1.0,0.0,0.0,-1.0);
        break;
        case 'F' :
        case 'f' :
-              userDeltacamera_angle_y+=1.0;
+              rotateObject(scene->selectedObject,0.0,1.0,0.0,1.0);
        break;
        case 'H' :
        case 'h' :
-              userDeltacamera_angle_y-=1.0;
+              rotateObject(scene->selectedObject,0.0,1.0,0.0,-1.0);
        break;
        case 'R' :
        case 'r' :
-              userDeltacamera_angle_z+=1.0;
+              rotateObject(scene->selectedObject,0.0,0.0,1.0,1.0);
        break;
        case 'Y' :
        case 'y' :
-              userDeltacamera_angle_z-=1.0;
+              rotateObject(scene->selectedObject,0.0,0.0,1.0,-1.0);
        break;
 
     }
