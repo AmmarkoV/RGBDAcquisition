@@ -269,6 +269,8 @@ int moveObject(unsigned objToMove , float X , float Y , float Z)
     fprintf(stderr,"Moving camera %0.2f %0.2f %0.2f..!\n",X,Y,Z);
   } else
   {
+    fprintf(stderr,"Moving obj %u %0.2f %0.2f %0.2f..!\n",objToMove,X,Y,Z);
+    movePositionOfObjectTrajectorySt(scene,objToMove,scene->ticks,X,Y,Z);
     movePositionOfObjectTrajectory(scene,objToMove,scene->ticks,&X,&Y,&Z);
   }
 }

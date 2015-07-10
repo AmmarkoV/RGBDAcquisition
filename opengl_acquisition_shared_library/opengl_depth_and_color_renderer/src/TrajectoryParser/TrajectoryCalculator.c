@@ -38,6 +38,19 @@ int accessOfObjectPositionIsOk(struct VirtualStream * stream,unsigned int ObjID,
 }
 
 
+int movePositionOfObjectTrajectorySt(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float relX,float relY,float relZ)
+{
+    FrameIDToReturn=FrameIDToReturn%stream->object[ObjID].numberOfFrames;
+    if (!accessOfObjectPositionIsOk(stream,ObjID,FrameIDToReturn)) { return 0; }
+
+    stream->object[ObjID].frame[FrameIDToReturn].x+=relX;
+    stream->object[ObjID].frame[FrameIDToReturn].y+=relY;
+    stream->object[ObjID].frame[FrameIDToReturn].z+=relZ;
+    fprintf(stderr,"This doesnt work for some weird reason.. Moving Object %u at %u/%u by %0.2f %0.2f %0.2f ( %0.2f %0.2f %0.2f  )\n",ObjID,FrameIDToReturn,stream->object[ObjID].numberOfFrames,relX,relY,relZ,
+            stream->object[ObjID].frame[FrameIDToReturn].x,stream->object[ObjID].frame[FrameIDToReturn].y,stream->object[ObjID].frame[FrameIDToReturn].z);
+ return 1;
+}
+
 int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float * relX,float * relY,float * relZ)
 {
     FrameIDToReturn=FrameIDToReturn%stream->object[ObjID].numberOfFrames;

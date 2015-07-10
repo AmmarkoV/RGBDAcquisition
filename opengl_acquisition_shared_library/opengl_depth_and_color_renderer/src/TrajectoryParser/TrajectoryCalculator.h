@@ -4,6 +4,7 @@
 #include "TrajectoryParser.h"
 
 
+int movePositionOfObjectTrajectorySt(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float relX,float relY,float relZ);
 int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float * relX,float * relY,float * relZ);
 int rotatePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float *x,float *y,float *z,float *angleDegrees);
 
