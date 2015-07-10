@@ -20,12 +20,13 @@
 #include "../../../../tools/AmMatrix/quaternions.h"
 
 
-int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float * relX,float * relY,float * relZ)
+int accessOfObjectPositionIsOk(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn)
 {
    if (stream==0)                      {  fprintf(stderr,"movePositionOfObjectTrajectory : Cannot access stream\n"); return 0; }
    if (stream->object==0)              {  fprintf(stderr,"movePositionOfObjectTrajectory : Cannot access objects\n"); return 0; }
-   if (stream->object[ObjID].frame==0) {  fprintf(stderr,"movePositionOfObjectTrajectory : Cannot Access frames for object %u \n",ObjID); return 0; }
+   if (stream->numberOfObjects<=ObjID) {  fprintf(stderr,"movePositionOfObjectTrajectory : Cannot access objects index %u\n",ObjID); return 0; }
 
+   if (stream->object[ObjID].frame==0) {  fprintf(stderr,"movePositionOfObjectTrajectory : Cannot Access frames for object %u \n",ObjID); return 0; }
    if (stream->object[ObjID].numberOfFrames==0 )
    {
      fprintf(stderr,"Position %u of Object %u cannot be altered since we only have %u positions \n",FrameIDToReturn,ObjID,stream->object[ObjID].numberOfFrames);
@@ -33,6 +34,14 @@ int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int Ob
    }
 
    if (FrameIDToReturn>=stream->object[ObjID].numberOfFrames) { fprintf(stderr,"Position %u of Object %u is out of bounds\n"); return 0; }
+ return 1;
+}
+
+
+int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float * relX,float * relY,float * relZ)
+{
+    FrameIDToReturn=FrameIDToReturn%stream->object[ObjID].numberOfFrames;
+    if (!accessOfObjectPositionIsOk(stream,ObjID,FrameIDToReturn)) { return 0; }
 
     stream->object[ObjID].frame[FrameIDToReturn].x+=*relX;
     stream->object[ObjID].frame[FrameIDToReturn].y+=*relY;
@@ -45,18 +54,8 @@ int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int Ob
 
 int rotatePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float *x,float *y,float *z,float *angleDegrees)
 {
-   if (stream==0)                      {  fprintf(stderr,"rotatePositionOfObjectTrajectory : Cannot access stream\n"); return 0; }
-   if (stream->object==0)              {  fprintf(stderr,"rotatePositionOfObjectTrajectory : Cannot access objects\n"); return 0; }
-   if (stream->object[ObjID].frame==0) {  fprintf(stderr,"rotatePositionOfObjectTrajectory : Cannot Access frames for object %u \n",ObjID); return 0; }
-
-   if (stream->object[ObjID].numberOfFrames==0 )
-   {
-       fprintf(stderr,"Position %u of Object %u cannot be altered since we only have %u positions \n",FrameIDToReturn,ObjID,stream->object[ObjID].numberOfFrames);
-     return 0;
-   }
-
-   if (FrameIDToReturn>=stream->object[ObjID].numberOfFrames) { fprintf(stderr,"Position %u of Object %u is out of bounds\n"); return 0; }
-
+   FrameIDToReturn=FrameIDToReturn%stream->object[ObjID].numberOfFrames;
+   if (!accessOfObjectPositionIsOk(stream,ObjID,FrameIDToReturn)) { return 0; }
 
    if ( stream->object[ObjID].frame[FrameIDToReturn].isQuaternion )
    {
