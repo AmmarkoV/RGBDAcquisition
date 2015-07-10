@@ -28,9 +28,12 @@ int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int Ob
 
    if (stream->object[ObjID].numberOfFrames==0 )
    {
-       fprintf(stderr,"Position %u of Object %u cannot be altered since we only have %u positions \n",FrameIDToReturn,ObjID,stream->object[ObjID].numberOfFrames);
+     fprintf(stderr,"Position %u of Object %u cannot be altered since we only have %u positions \n",FrameIDToReturn,ObjID,stream->object[ObjID].numberOfFrames);
      return 0;
    }
+
+   if (FrameIDToReturn>=stream->object[ObjID].numberOfFrames) { fprintf(stderr,"Position %u of Object %u is out of bounds\n"); return 0; }
+
     stream->object[ObjID].frame[FrameIDToReturn].x+=*relX;
     stream->object[ObjID].frame[FrameIDToReturn].y+=*relY;
     stream->object[ObjID].frame[FrameIDToReturn].z+=*relZ;
@@ -51,6 +54,9 @@ int rotatePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int 
        fprintf(stderr,"Position %u of Object %u cannot be altered since we only have %u positions \n",FrameIDToReturn,ObjID,stream->object[ObjID].numberOfFrames);
      return 0;
    }
+
+   if (FrameIDToReturn>=stream->object[ObjID].numberOfFrames) { fprintf(stderr,"Position %u of Object %u is out of bounds\n"); return 0; }
+
 
    if ( stream->object[ObjID].frame[FrameIDToReturn].isQuaternion )
    {
