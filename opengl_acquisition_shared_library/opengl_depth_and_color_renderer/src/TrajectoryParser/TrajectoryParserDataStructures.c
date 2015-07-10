@@ -647,10 +647,6 @@ int addEventToVirtualStream(
     stream->event[pos].data = (char *) malloc((dataSize+1) * sizeof(char));
     memcpy(stream->event[pos].data,data,dataSize);
     stream->event[pos].data[dataSize]=0;
-/*
-    int i=0;
-    i=system(data);
-    if (i==0) { fprintf(stderr,"lel\n"); }*/
 
     ++stream->numberOfEvents;
 
