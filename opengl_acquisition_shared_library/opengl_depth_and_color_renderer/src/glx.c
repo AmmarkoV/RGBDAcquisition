@@ -25,6 +25,11 @@ void fatalError(char *message)
   exit(1);
 }
 
+static Bool WaitForNotify( Display *dpy, XEvent *event, XPointer arg )
+{
+    return (event->type == MapNotify) && (event->xmap.window == (Window) arg);
+}
+
 
 int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 {
@@ -91,7 +96,14 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   fprintf(stderr,"(7) request the X window to be displayed on the screen\n");
   /*** (7) request the X window to be displayed on the screen ***/
 
-  if (viewWindow) { XMapWindow(dpy, win); }
+  if (viewWindow)
+    {
+      //Request the window to get Displayed
+      XMapWindow(dpy, win);
+      //Wait for window to be visible
+      XEvent event;
+      XIfEvent( dpy, &event, WaitForNotify, (XPointer) win );
+    }
 
 
   /*** (9) dispatch X events ***/
