@@ -359,25 +359,12 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
 {
   fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
 
-/*
-  char * testP=(char *) malloc(sizeof(char) * MAX_FILENAMES );
-  if (testP==0)
-  {
-    fprintf(stderr,"Cannot allocate argument list , failed starting OGL Sandbox\n");
-    return 0;
-  }
-  snprintf(testP,MAX_FILENAMES,"dummy");
-*/
- char * testP=0;
-
+  char * testP=0;
   fprintf(stderr,"starting glx code ..\n");
   start_glx_stuff(width,height,viewWindow,0,testP);
   fprintf(stderr," ok\n");
   WIDTH=width;
   HEIGHT=height;
-
-
-  if (testP!=0) { free(testP); }
 
   #if FLIP_OPEN_GL_IMAGES
     fprintf(stderr,"This version of OGLRendererSandbox is compiled to flip OpenGL frames to their correct orientation\n");
@@ -385,7 +372,7 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
 
   initializeHardcodedCallLists();
 
-  char defaultSceneFile[] = "scene.conf";
+  char defaultSceneFile[] = "Scenes/simple.conf";
   //( char *)   malloc(sizeof(32)*sizeof(char));
   //strncpy(defaultSceneFile,"scene.conf",32);
 
