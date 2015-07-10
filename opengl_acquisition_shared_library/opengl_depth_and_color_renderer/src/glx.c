@@ -28,7 +28,6 @@ void fatalError(char *message)
 
 int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 {
-
   XVisualInfo         *vi;
   Colormap             cmap;
   XSetWindowAttributes swa;
@@ -39,7 +38,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   /*** (1) open a connection to the X server ***/
 
   dpy = XOpenDisplay(NULL);
-  if (dpy == NULL) { fatalError("could not open display"); }
+  if (dpy == NULL) { fatalError("Could not open display"); }
 
   fprintf(stderr,"(2) make sure OpenGL's GLX extension supported\n");
   /*** (2) make sure OpenGL's GLX extension supported ***/
@@ -68,7 +67,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   cx = glXCreateContext(dpy, vi, /* no shared dlists */ None,
                         /* direct rendering if possible */ GL_TRUE);
   if (cx == NULL)
-    fatalError("could not create rendering context");
+    { fatalError("could not create rendering context"); }
 
   fprintf(stderr,"(5) create an X window with the selected visual\n");
   /*** (5) create an X window with the selected visual ***/
