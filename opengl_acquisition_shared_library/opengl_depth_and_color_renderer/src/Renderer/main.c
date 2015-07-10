@@ -34,10 +34,15 @@ unsigned int columns=22,rows=21;
 float distance = 30;
 
 
-int mkdir(const char * prefix,const char * dirname)
+static int myMkdir(const char * prefix,const char * dirname)
 {
     char filename[FILENAME_MAX]= {0};
-    snprintf(filename,FILENAME_MAX,"mkdir -p %s/%s",prefix,dirname);
+    // - - - - - - - - - - - - - - - -
+    if ( (prefix==0)||(dirname==0) ) { return 0; }
+    if ( (prefix==0)&&(dirname!=0) ) { snprintf(filename,FILENAME_MAX,"mkdir -p %s",dirname); }
+    if ( (prefix!=0)&&(dirname==0) ) { snprintf(filename,FILENAME_MAX,"mkdir -p %s",prefix); } else
+                                     { snprintf(filename,FILENAME_MAX,"mkdir -p %s/%s",prefix,dirname); }
+
     int i=system(filename);
     if (i!=0)
     {
@@ -148,6 +153,7 @@ int main(int argc, char **argv)
             {
                 writeToArg = i+1 ;
                 doFileOutput=1;
+                fprintf(stderr,"Will write data to %s\n",argv[writeToArg]);
             }
         }
         else if (strcmp(argv[i],"-shader")==0)
@@ -205,7 +211,7 @@ int main(int argc, char **argv)
     char filename[FILENAME_MAX]= {0};
     if (doFileOutput)
     {
-        mkdir("frames",argv[writeToArg]);
+        myMkdir("frames",argv[writeToArg]);
     }
 
 
