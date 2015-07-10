@@ -82,6 +82,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../tools/AmMatrix/solveLinearSystemGJ.h" />
+		<Unit filename="Interfaces/webInterface.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Interfaces/webInterface.h" />
 		<Unit filename="ModelLoader/model_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

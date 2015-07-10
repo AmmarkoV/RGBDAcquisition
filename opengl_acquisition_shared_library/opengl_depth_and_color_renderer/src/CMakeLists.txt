@@ -47,6 +47,8 @@ add_library(OGLRendererSandbox SHARED
             TrajectoryParser/TrajectoryCalculator.h 
             TrajectoryParser/TrajectoryPrimitives.c 
             TrajectoryParser/TrajectoryPrimitives.h
+            Interfaces/webInterface.c 
+            Interfaces/webInterface.h
            ) 
 target_link_libraries(OGLRendererSandbox m GL GLU X11 ) 
  
