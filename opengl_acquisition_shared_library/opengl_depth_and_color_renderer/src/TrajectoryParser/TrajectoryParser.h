@@ -247,6 +247,7 @@ struct VirtualStream
 
     unsigned int objDeclarationsOffset;
     unsigned int timestamp;
+    unsigned int ticks;
 
     char filename[MAX_PATH+1];
 };

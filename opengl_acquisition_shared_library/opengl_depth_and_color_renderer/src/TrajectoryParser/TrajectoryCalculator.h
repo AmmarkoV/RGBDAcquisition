@@ -3,6 +3,10 @@
 
 #include "TrajectoryParser.h"
 
+
+int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float * relX,float * relY,float * relZ);
+int rotatePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float *x,float *y,float *z,float *angleDegrees);
+
 int smoothTrajectoriesOfObject(struct VirtualStream * stream,unsigned int ObjID);
 int smoothTrajectories(struct VirtualStream * stream);
 float calculateDistanceTra(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z);

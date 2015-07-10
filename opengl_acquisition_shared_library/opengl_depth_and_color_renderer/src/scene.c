@@ -95,7 +95,7 @@ float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z =
 float userDeltacamera_pos_x = 0.0f; float userDeltacamera_pos_y = 0.0f; float userDeltacamera_pos_z = 0.0f;
 float userDeltacamera_angle_x = 0.0f; float userDeltacamera_angle_y = 0.0f; float userDeltacamera_angle_z = 0.0f;
 
-unsigned int ticks = 0;
+//unsigned int ticks = 0;
 
 unsigned int selectedOBJ=1;
 
@@ -269,7 +269,7 @@ int moveObject(unsigned objToMove , float X , float Y , float Z)
     fprintf(stderr,"Moving camera %0.2f %0.2f %0.2f..!\n",X,Y,Z);
   } else
   {
-    fprintf(stderr,"Moving an arbitrary object is not yet implemented..!\n");
+    movePositionOfObjectTrajectory(scene,objToMove,scene->ticks,&X,&Y,&Z);
   }
 }
 
@@ -285,7 +285,7 @@ int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleD
         }
   } else
   {
-    fprintf(stderr,"Rotating an arbitrary object is not yet implemented..!\n");
+    rotatePositionOfObjectTrajectory(scene,objToMove,scene->ticks,&X,&Y,&Z,&angleDegrees);
   }
 }
 
@@ -553,14 +553,14 @@ int tickScene()
    float scaleX = 1.0 , scaleY = 1.0 , scaleZ = 1.0;
 
   //Object 0 is camera  lets calculate its position
-   calculateVirtualStreamPos(scene,0,ticks*tickUSleepTime,pos,&scaleX,&scaleY,&scaleZ);
+   calculateVirtualStreamPos(scene,0,scene->ticks*tickUSleepTime,pos,&scaleX,&scaleY,&scaleZ);
    camera_pos_x = userDeltacamera_pos_x + pos[0];  camera_pos_y = userDeltacamera_pos_y + pos[1]; camera_pos_z = userDeltacamera_pos_z + pos[2];
    camera_angle_x = userDeltacamera_angle_x + pos[3]; camera_angle_y = userDeltacamera_angle_y + pos[4]; camera_angle_z = userDeltacamera_angle_z + pos[5];
 
    if (tickUSleepTime>0)
     { usleep(tickUSleepTime); }
 
-   ++ticks;
+   ++scene->ticks;
    return 1;
 }
 
@@ -602,7 +602,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling drawAllObjectsAtPositionsFromTrajectoryParser\n"); }
 
 
- unsigned int timestampToUse = ticks*100;
+ unsigned int timestampToUse = scene->ticks*100;
 
   unsigned int i;
   for (i=0; i<scene->numberOfEvents; i++)
@@ -643,9 +643,9 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 
 
-  if (ticks%10==0)
+  if (scene->ticks%10==0)
   {
-    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,ticks,tickUSleepTime);
+    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime);
   }
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<scene->numberOfObjects; i++)

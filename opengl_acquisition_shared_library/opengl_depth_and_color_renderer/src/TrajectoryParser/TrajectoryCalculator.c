@@ -19,6 +19,67 @@
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include "../../../../tools/AmMatrix/quaternions.h"
 
+
+int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float * relX,float * relY,float * relZ)
+{
+   if (stream==0)                      {  fprintf(stderr,"movePositionOfObjectTrajectory : Cannot access stream\n"); return 0; }
+   if (stream->object==0)              {  fprintf(stderr,"movePositionOfObjectTrajectory : Cannot access objects\n"); return 0; }
+   if (stream->object[ObjID].frame==0) {  fprintf(stderr,"movePositionOfObjectTrajectory : Cannot Access frames for object %u \n",ObjID); return 0; }
+
+   if (stream->object[ObjID].numberOfFrames==0 )
+   {
+       fprintf(stderr,"Position %u of Object %u cannot be altered since we only have %u positions \n",FrameIDToReturn,ObjID,stream->object[ObjID].numberOfFrames);
+     return 0;
+   }
+    stream->object[ObjID].frame[FrameIDToReturn].x+=*relX;
+    stream->object[ObjID].frame[FrameIDToReturn].y+=*relY;
+    stream->object[ObjID].frame[FrameIDToReturn].z+=*relZ;
+    fprintf(stderr,"Moving Object %u at %u/%u by %0.2f %0.2f %0.2f ( %0.2f %0.2f %0.2f  )\n",ObjID,FrameIDToReturn,stream->object[ObjID].numberOfFrames,*relX,*relY,*relZ,
+            stream->object[ObjID].frame[FrameIDToReturn].x,stream->object[ObjID].frame[FrameIDToReturn].y,stream->object[ObjID].frame[FrameIDToReturn].z);
+ return 1;
+}
+
+
+int rotatePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float *x,float *y,float *z,float *angleDegrees)
+{
+   if (stream==0)                      {  fprintf(stderr,"rotatePositionOfObjectTrajectory : Cannot access stream\n"); return 0; }
+   if (stream->object==0)              {  fprintf(stderr,"rotatePositionOfObjectTrajectory : Cannot access objects\n"); return 0; }
+   if (stream->object[ObjID].frame==0) {  fprintf(stderr,"rotatePositionOfObjectTrajectory : Cannot Access frames for object %u \n",ObjID); return 0; }
+
+   if (stream->object[ObjID].numberOfFrames==0 )
+   {
+       fprintf(stderr,"Position %u of Object %u cannot be altered since we only have %u positions \n",FrameIDToReturn,ObjID,stream->object[ObjID].numberOfFrames);
+     return 0;
+   }
+
+   if ( stream->object[ObjID].frame[FrameIDToReturn].isQuaternion )
+   {
+       fprintf(stderr,"rotatePositionOfObjectTrajectory doing a quaternion rotation %0.2f %0.2f %0.2f , angle %0.2f..\n",*x,*y,*z,*angleDegrees);
+       double quaternion[4]={0};
+       quaternion[0]=stream->object[ObjID].frame[FrameIDToReturn].rot1;
+       quaternion[1]=stream->object[ObjID].frame[FrameIDToReturn].rot2;
+       quaternion[2]=stream->object[ObjID].frame[FrameIDToReturn].rot3;
+       quaternion[3]=stream->object[ObjID].frame[FrameIDToReturn].rot4;
+       //-----------
+        quaternionRotate(quaternion,*x,*y,*z,*angleDegrees,0);
+       //-----------
+       stream->object[ObjID].frame[FrameIDToReturn].rot1=quaternion[0];
+       stream->object[ObjID].frame[FrameIDToReturn].rot2=quaternion[1];
+       stream->object[ObjID].frame[FrameIDToReturn].rot3=quaternion[2];
+       stream->object[ObjID].frame[FrameIDToReturn].rot4=quaternion[3];
+   } else
+   {
+     fprintf(stderr,"rotatePositionOfObjectTrajectory doing an euler rotation %0.2f %0.2f %0.2f , angle %0.2f..\n",*x,*y,*z,*angleDegrees);
+     if ( (*x==1.0) && (*y==0.0) && (*z==0.0) ) { stream->object[ObjID].frame[FrameIDToReturn].rot1+=*angleDegrees; } else
+     if ( (*x==0.0) && (*y==1.0) && (*z==0.0) ) { stream->object[ObjID].frame[FrameIDToReturn].rot2+=*angleDegrees; } else
+     if ( (*x==0.0) && (*y==0.0) && (*z==1.0) ) { stream->object[ObjID].frame[FrameIDToReturn].rot3+=*angleDegrees; }
+   }
+
+
+ return 0;
+}
+
+
 int smoothTrajectoriesOfObject(struct VirtualStream * stream,unsigned int ObjID)
 {
   float avg=0.0;
