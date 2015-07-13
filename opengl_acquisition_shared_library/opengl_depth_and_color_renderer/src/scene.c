@@ -341,6 +341,12 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
             return 1;
        break;
 
+
+       case -57: //F10 Dump to file
+               writeVirtualStream(scene,"dump.scene");
+             return 1;
+       break;
+
     };
 
     if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input (%d) is disabled [ add MOVE_VIEW(1) to scene ]\n",(signed int) key); return 0; }
