@@ -729,11 +729,14 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    } else
    if  ( (stream->ignoreTime) || (stream->object[ObjID].MAX_numberOfFrames == 1 ) )
    {
+
     //We might want to ignore time and just return frame after frame on each call!
     //Also if we only got one frame for the object there is no point in trying to interpolate time etc.. so just handle things here..
     if ( stream->object[ObjID].lastFrame +1 >= stream->object[ObjID].MAX_numberOfFrames ) { stream->object[ObjID].lastFrame  = 0; }
     FrameIDToReturn = stream->object[ObjID].lastFrame;
     ++stream->object[ObjID].lastFrame;
+
+    //fprintf(stderr,"Simple Getter ObjID %u Frame %u\n",ObjID,FrameIDToReturn);
 
     fillPosWithFrame(stream,ObjID,FrameIDToReturn,pos,scaleX,scaleY,scaleZ);
     //fprintf(stderr,"fillPosWithFrame %u => ( %0.2f %0.2f %0.2f , %0.2f %0.2f %0.2f)\n",FrameIDToReturn,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
@@ -751,6 +754,8 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
    } /*!END OF SIMPLE FRAME GETTER*/
    else
    { /*!START OF INTERPOLATED FRAME GETTER*/
+
+    //fprintf(stderr,"Interpolated Getter ObjID %u Frame %u\n",ObjID,FrameIDToReturn);
      //fprintf(stderr,"interpolated position for ObjID %u\n",ObjID);
      //This is the case when we respect time , we will pick two frames and interpolate between them
      if ( timeAbsMilliseconds > stream->object[ObjID].MAX_timeOfFrames )

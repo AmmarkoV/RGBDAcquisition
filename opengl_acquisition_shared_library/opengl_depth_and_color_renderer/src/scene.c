@@ -269,9 +269,11 @@ int moveObject(unsigned objToMove , float X , float Y , float Z)
     fprintf(stderr,"Moving camera %0.2f %0.2f %0.2f..!\n",X,Y,Z);
   } else
   {
+    unsigned int frameNumber = scene->ticks;
+    //if (frameNumber>0) { frameNumber-=1; }
     fprintf(stderr,"Moving obj %u %0.2f %0.2f %0.2f..!\n",objToMove,X,Y,Z);
     //movePositionOfObjectTrajectorySt(scene,objToMove,scene->ticks,X,Y,Z);
-    movePositionOfObjectTrajectory(scene,objToMove,scene->ticks,&X,&Y,&Z);
+    movePositionOfObjectTrajectory(scene,objToMove,frameNumber,&X,&Y,&Z);
   }
 }
 
@@ -287,7 +289,9 @@ int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleD
         }
   } else
   {
-    rotatePositionOfObjectTrajectory(scene,objToMove,scene->ticks,&X,&Y,&Z,&angleDegrees);
+    unsigned int frameNumber = scene->ticks;
+    //if (frameNumber>0) { frameNumber-=1; }
+    rotatePositionOfObjectTrajectory(scene,objToMove,frameNumber,&X,&Y,&Z,&angleDegrees);
   }
 }
 
@@ -610,9 +614,14 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling drawAllObjectsAtPositionsFromTrajectoryParser\n"); }
 
 
+ unsigned int i;
  unsigned int timestampToUse = scene->ticks*100;
 
-  unsigned int i;
+  for (i=1; i<scene->numberOfObjects; i++)
+    {
+     scene->object[i].lastFrame = scene->ticks % scene->object[i].numberOfFrames;
+    }
+
   for (i=0; i<scene->numberOfEvents; i++)
   {
      unsigned int objID_A = scene->event[i].objID_A , objID_B = scene->event[i].objID_B;
