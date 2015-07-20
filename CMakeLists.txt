@@ -38,8 +38,8 @@ add_subdirectory (3dparty/fast)
 if (ENABLE_FREENECT2)
   add_subdirectory (3dparty/libfreenect2/examples/protonect)
 ELSE (ENABLE_FREENECT2)
- OPTION (ENABLE_OPENCV OFF)
- MESSAGE("OpenCV Not found , some parts like viewer etc will not be compiled")
+ #OPTION (ENABLE_OPENCV OFF)
+ MESSAGE("Freenect2 not found , some parts will not be compiled")
 ENDIF(ENABLE_FREENECT2)
 
 
@@ -100,8 +100,10 @@ add_subdirectory (editor/)
 ENDIF( ENABLE_EDITOR )
 
 
-IF( ENABLE_OPENCV )
+IF( ENABLE_OPENCV ) 
  add_subdirectory (viewer/)
+ELSE (ENABLE_OPENCV)
+ MESSAGE("Viewer will not be compiled , OpenCV stuff missing? ( check ENABLE_OPENCV flag )..")
 ENDIF( ENABLE_OPENCV )
 
 # TODO FIX INSTALLATION DIRECTORIES 
