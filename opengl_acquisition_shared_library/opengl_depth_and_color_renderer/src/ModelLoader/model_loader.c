@@ -10,6 +10,7 @@
 #include <GL/glx.h>    /* this includes the necessary X headers */
 
 #include "model_loader.h"
+#include "model_loader_hardcoded.h"
 #include "model_loader_obj.h"
 #include "../tools.h"
 
@@ -40,352 +41,44 @@ const GLfloat defaultSpecular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
 const GLfloat defaultShininess[] = { 5.0f };
 
 
-GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 
 
-int drawAxis(float x, float y , float z, float scale)
+unsigned int updateModelPosition(struct Model * model,float * position)
 {
- glLineWidth(6.0);
- glBegin(GL_LINES);
-  glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+scale,y,z);
-  glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+scale,z);
-  glColor3f(0.0,0.0,1.0); glVertex3f(x,y,z); glVertex3f(x,y,z+scale);
- glEnd();
- glLineWidth(1.0);
- return 1;
-}
+      if (model==0) { return 0; }
+      if (position==0) { return 0; }
 
-int drawObjPlane(float x,float y,float z,float dimension)
-{
-   // glNewList(1, GL_COMPILE_AND_EXECUTE);
-    /* front face */
-    glBegin(GL_QUADS);
-      glNormal3f(0.0,1.0,0.0);
-      glVertex3f(x-dimension, 0.0, z-dimension);
-      glVertex3f(x+dimension, 0.0, z-dimension);
-      glVertex3f(x+dimension, 0.0, z+dimension);
-      glVertex3f(x-dimension, 0.0, z+dimension);
-    glEnd();
-    //glEndList();
-    return 1;
-}
+      GLint viewport[4];
+      GLdouble modelview[16];
+      GLdouble projection[16];
 
+      GLdouble winX, winY, winZ=0.0;
 
+      #warning "It is terribly inneficient to query all the tables for each position update..!"
+      glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+      glGetDoublev( GL_PROJECTION_MATRIX, projection );
+      glGetIntegerv( GL_VIEWPORT, viewport );
 
-int drawGridPlane(float x,float y,float z , float scale)
-{
- glBegin(GL_LINES);
- glNormal3f(0.0,1.0,0.0);
+      GLdouble posX=0.0,posY=0.0,posZ=0.0;
 
-  signed int i;
-
- float floorWidth = 500;
- for(i=-floorWidth; i<=floorWidth; i++)
- {
-    glVertex3f(x+-floorWidth*scale,y,z+i*scale);
-    glVertex3f(x+floorWidth*scale,y,z+i*scale);
-
-    glVertex3f(x+i*scale,y,z-floorWidth*scale);
-    glVertex3f(x+i*scale,y,z+floorWidth*scale);
- };
-glEnd();
- return 1;
-}
-
-void drawSphere(unsigned int quality)
-{
-  #if DISABLE_GL_CALL_LIST
-    //GL_CALL_LIST is disabled so this is actually ok now
-  #else
-    #warning "drawSphere should create a call list , otherwise it is a very slow call.."
-  #endif
-
-//    double r=1.0;
-    int lats=quality;
-    int longs=quality;
-  //---------------
-    int i, j;
-    for(i = 0; i <= lats; i++)
-    {
-       double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
-       double z0  = sin(lat0);
-       double zr0 =  cos(lat0);
-
-       double lat1 = M_PI * (-0.5 + (double) i / lats);
-       double z1 = sin(lat1);
-       double zr1 = cos(lat1);
-
-       glBegin(GL_QUAD_STRIP);
-       for(j = 0; j <= longs; j++)
-        {
-           double lng = 2 * M_PI * (double) (j - 1) / longs;
-           double x = cos(lng);
-           double y = sin(lng);
-
-           glNormal3f(x * zr0, y * zr0, z0);
-           glVertex3f(x * zr0, y * zr0, z0);
-           glNormal3f(x * zr1, y * zr1, z1);
-           glVertex3f(x * zr1, y * zr1, z1);
-        }
-       glEnd();
-   }
-}
-
-
-int drawQuestion()
-{
-  //Todo draw a question mark here , this is an axis actually :P
-  float x=0,y=0,z=0,scale=1.0;
-  glLineWidth(6.0);
-  glBegin(GL_LINES);
-   glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+scale,y,z);
-   glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+scale,z);
-   glColor3f(0.0,0.0,1.0); glVertex3f(x,y,z); glVertex3f(x,y,z+scale);
-  glEnd();
-  glLineWidth(1.0);
-
-  //drawSphere(30);
- return 1;
-}
-
-int drawBoundingBox(float x,float y,float z ,float minX,float minY,float minZ,float maxX,float maxY,float maxZ)
-{
- //fprintf(stderr,"drawBoundingBox( pos %0.2f %0.2f %0.2f min %0.2f %0.2f %0.2f  max %0.2f %0.2f %0.2f \n",x,y,z ,minX,minY,minZ,maxX,maxY,maxZ);
-
-glLineWidth(6.0);
-
- glBegin(GL_LINES);
- glNormal3f(0.0,1.0,0.0);
- glVertex3f(x+minX,y+minY,z+minZ);
- glVertex3f(x+minX,y+maxY,z+minZ);
- glVertex3f(x+maxX,y+maxY,z+minZ);
- glVertex3f(x+maxX,y+maxY,z+maxZ);
- glVertex3f(x+minX,y+maxY,z+maxZ);
- glVertex3f(x+minX,y+maxY,z+minZ);
- glEnd();
-
- glBegin(GL_LINES);
- glNormal3f(0.0,1.0,0.0);
- glVertex3f(x+minX,y+minY,z+maxZ);
- glVertex3f(x+minX,y+minY,z+minZ);
- glVertex3f(x+maxX,y+minY,z+minZ);
- glVertex3f(x+maxX,y+minY,z+maxZ);
- glVertex3f(x+minX,y+minY,z+maxZ);
- glEnd();
-
-
- glBegin(GL_LINES);
- glNormal3f(0.0,1.0,0.0);
- glVertex3f(x+minX,y+minY,z+maxZ);
- glVertex3f(x+maxX,y+minY,z+maxZ);
- glEnd();
-
- glBegin(GL_LINES);
- glNormal3f(0.0,1.0,0.0);
- glVertex3f(x+minX,y+maxY,z+maxZ);
- glVertex3f(x+maxX,y+maxY,z+maxZ);
- glEnd();
-
- glBegin(GL_LINES);
- glNormal3f(0.0,1.0,0.0);
- glVertex3f(x+minX,y+minY,z+minZ);
- glVertex3f(x+maxX,y+minY,z+minZ);
- glEnd();
-
- glBegin(GL_LINES);
- glNormal3f(0.0,1.0,0.0);
- glVertex3f(x+minX,y+maxY,z+minZ);
- glVertex3f(x+maxX,y+maxY,z+minZ);
- glEnd();
-
-
-
- glBegin(GL_LINES);
- glNormal3f(0.0,1.0,0.0);
- glVertex3f(x+minX,y+minY,z+minZ);
- glVertex3f(x+minX,y+minY,z+maxZ);
- glVertex3f(x+maxX,y+maxY,z+minZ);
- glVertex3f(x+maxX,y+maxY,z+maxZ);
- glVertex3f(x+minX,y+minY,z+minZ);
- glVertex3f(x+minX,y+minY,z+maxZ);
- glVertex3f(x+maxX,y+maxY,z+minZ);
- glVertex3f(x+maxX,y+maxY,z+maxZ);
- glEnd();
-
-
-glLineWidth(1.0);
-
-return 1;
-}
-
-
-int drawCube()
-{
-   // glNewList(1, GL_COMPILE_AND_EXECUTE);
-    /* front face */
-    glBegin(GL_QUADS);
-      //glColor3f(0.0, 0.7, 0.1);  /* green */
-      glVertex3f(-1.0, 1.0, 1.0);
-      glVertex3f(1.0, 1.0, 1.0);
-      glVertex3f(1.0, -1.0, 1.0);
-      glVertex3f(-1.0, -1.0, 1.0);
-
-      /* back face */
-      //glColor3f(0.9, 1.0, 0.0);  /* yellow */
-      glVertex3f(-1.0, 1.0, -1.0);
-      glVertex3f(1.0, 1.0, -1.0);
-      glVertex3f(1.0, -1.0, -1.0);
-      glVertex3f(-1.0, -1.0, -1.0);
-
-      /* top side face */
-      //glColor3f(0.2, 0.2, 1.0);  /* blue */
-      glVertex3f(-1.0, 1.0, 1.0);
-      glVertex3f(1.0, 1.0, 1.0);
-      glVertex3f(1.0, 1.0, -1.0);
-      glVertex3f(-1.0, 1.0, -1.0);
-
-      /* bottom side face */
-      //glColor3f(0.7, 0.0, 0.1);  /* red */
-      glVertex3f(-1.0, -1.0, 1.0);
-      glVertex3f(1.0, -1.0, 1.0);
-      glVertex3f(1.0, -1.0, -1.0);
-      glVertex3f(-1.0, -1.0, -1.0);
-    glEnd();
-   // glEndList();
-    return 1;
-}
-
-
-void drawPyramid()
-{
-  // draw a pyramid (in smooth coloring mode)
-  glBegin(GL_POLYGON);				// start drawing a pyramid
-
-  // front face of pyramid
-  //glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Red
-  glVertex3f(0.0f, 1.0f, 0.0f);		        // Top of triangle (front)
-  //glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
-  glVertex3f(-1.0f,-1.0f, 1.0f);		// left of triangle (front)
-  //glColor3f(0.0f,0.0f,1.0f);			// Set The Color To Blue
-  glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)
-
-  // right face of pyramid
-  //glColor3f(1.0f,0.0f,0.0f);			// Red
-  glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Right)
-  //glColor3f(0.0f,0.0f,1.0f);			// Blue
-  glVertex3f( 1.0f,-1.0f, 1.0f);		// Left Of Triangle (Right)
-  //glColor3f(0.0f,1.0f,0.0f);			// Green
-  glVertex3f( 1.0f,-1.0f, -1.0f);		// Right Of Triangle (Right)
-
-  // back face of pyramid
-  //glColor3f(1.0f,0.0f,0.0f);			// Red
-  glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Back)
-  //glColor3f(0.0f,1.0f,0.0f);			// Green
-  glVertex3f( 1.0f,-1.0f, -1.0f);		// Left Of Triangle (Back)
-  //glColor3f(0.0f,0.0f,1.0f);			// Blue
-  glVertex3f(-1.0f,-1.0f, -1.0f);		// Right Of Triangle (Back)
-
-  // left face of pyramid.
-  //glColor3f(1.0f,0.0f,0.0f);			// Red
-  glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Left)
-  //glColor3f(0.0f,0.0f,1.0f);			// Blue
-  glVertex3f(-1.0f,-1.0f,-1.0f);		// Left Of Triangle (Left)
-  //glColor3f(0.0f,1.0f,0.0f);			// Green
-  glVertex3f(-1.0f,-1.0f, 1.0f);		// Right Of Triangle (Left)
-
-  glEnd();					// Done Drawing The Pyramid
-}
-
-unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel)
-{
-  *itIsAHardcodedModel=1;
-  unsigned int modType=0;
-   if ( strcmp(modelname,"plane") == 0 )      {  modType = OBJ_PLANE;     }  else
-   if ( strcmp(modelname,"grid") == 0 )       {  modType = OBJ_GRIDPLANE; }  else
-   if ( strcmp(modelname,"cube") == 0 )       {  modType = OBJ_CUBE;      }  else
-   if ( strcmp(modelname,"pyramid") == 0 )    {  modType = OBJ_PYRAMID;   }  else
-   if ( strcmp(modelname,"axis") == 0 )       {  modType = OBJ_AXIS;      }  else
-   if ( strcmp(modelname,"sphere") == 0 )     {  modType = OBJ_SPHERE;    }  else
-   if ( strcmp(modelname,"none") == 0 )       {  modType = OBJ_INVISIBLE; }  else
-   if ( strcmp(modelname,"invisible") == 0 )  {  modType = OBJ_INVISIBLE; }  else
-   if ( strcmp(modelname,"question") == 0 )   {  modType = OBJ_QUESTION;  }  else
-   if ( strcmp(modelname,"bbox") == 0 )       {  modType = OBJ_BBOX;      }  else
-                                              {  *itIsAHardcodedModel=0;   }
-  return modType;
-}
-
-
-unsigned int drawHardcodedModelRaw(unsigned int modelType)
-{
-    switch (modelType)
-    {
-      case OBJ_PLANE :     drawObjPlane(0,0,0, 0.5);             break;
-      case OBJ_GRIDPLANE : drawGridPlane( 0.0 , 0.0 , 0.0, 1.0); break;
-      case OBJ_AXIS :      drawAxis(0,0,0,1.0);                  break;
-      case OBJ_CUBE :      drawCube();                           break;
-      case OBJ_PYRAMID :   drawPyramid();                        break;
-      case OBJ_SPHERE  :   drawSphere( SPHERE_QUALITY );         break;
-      case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
-      case OBJ_QUESTION  : drawQuestion();                       break;
-      case OBJ_BBOX :  drawBoundingBox(0,0,0,-1.0,-1.0,-1.0,1.0,1.0,1.0); break;
-      default :
-       return 0;
-      break;
-    }
-  return 1;
-}
-
-
-unsigned int drawHardcodedModel(unsigned int modelType)
-{
-    #if DISABLE_GL_CALL_LIST
-      drawHardcodedModelRaw(modelType);
-    #else
-      if ( modelType >= TOTAL_POSSIBLE_MODEL_TYPES )
+      if (model->type==OBJ_MODEL)
       {
-       fprintf(stderr,"Cannot draw object list for object out of reference");
-       return 0;
+      GLdouble posX=position[0],posY=position[1],posZ=position[2];
+      struct OBJ_Model * modelOBJ = (struct OBJ_Model *) model->model;
+
+      posX=position[0] - modelOBJ->boundBox.min.x;
+      posY=position[1] - modelOBJ->boundBox.min.y;
+      posZ=position[2] - modelOBJ->boundBox.min.z;
+      gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
+
+      posX=position[0] + modelOBJ->boundBox.max.x;
+      posY=position[1] + modelOBJ->boundBox.max.y;
+      posZ=position[2] + modelOBJ->boundBox.max.z;
+      gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
+       return 1;
       }
 
-      if (hardcodedObjlist[modelType]!=0)
-        { glCallList(hardcodedObjlist[modelType]); }
-    #endif // DISABLE_GL_CALL_LIST
-  return 1;
-}
-
-
-int drawConnector(
-                  float * posA,
-                  float * posB,
-                  float * scale ,
-                  unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha )
-{
- glPushMatrix();
-    glLineWidth(*scale);
-    glColor3f(R,G,B); //Alpha not used ?
-     glBegin(GL_LINES);
-       glVertex3f(posA[0],posA[1],posA[2]);
-       glVertex3f(posB[0],posB[1],posB[2]);
-     glEnd();
- glPopMatrix();
- return 1;
-}
-
-int initializeHardcodedCallLists()
-{
-  unsigned int i=0;
-  for (i=0; i<TOTAL_POSSIBLE_MODEL_TYPES; i++)
-  {
-    if (i!=OBJ_MODEL)
-    {
-     glPushAttrib(GL_ALL_ATTRIB_BITS);
-	 hardcodedObjlist[i]=glGenLists(1);
-     glNewList(hardcodedObjlist[i],GL_COMPILE);
-      drawHardcodedModelRaw(i);
-     glEndList();
-     glPopAttrib();
-    }
-  }
+ return 0;
 }
 
 

@@ -576,7 +576,12 @@ int tickScene()
    return 1;
 }
 
+int getModelAtScreenCoordinates(unsigned int x , unsigned int y)
+{
 
+
+ return 0;
+}
 
 
 
@@ -671,6 +676,8 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
        float * pos = (float*) &posStackA;
        if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
        {
+         updateModelPosition(mod,pos);
+
          //This is a stupid way of passing stuff to be drawn
          R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
          getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);

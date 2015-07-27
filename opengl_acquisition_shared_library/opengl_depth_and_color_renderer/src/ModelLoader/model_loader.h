@@ -11,28 +11,6 @@
 #define MAX_MODEL_PATHS 120
 
 /**
-* @brief An enumerator structure to id special Objects that are hardcoded in this library and don't need to be loaded using the OBJ loader
-*/
-enum ModelTypes
-{
-    NOTYPE = 0 ,
-    OBJ_AXIS,
-    OBJ_PLANE,
-    OBJ_GRIDPLANE,
-    OBJ_CUBE,
-    OBJ_PYRAMID,
-    OBJ_SPHERE,
-    OBJ_INVISIBLE,
-    OBJ_QUESTION,
-    OBJ_BBOX,
-    //-----------
-    OBJ_MODEL,
-    //-----------
-    TOTAL_POSSIBLE_MODEL_TYPES
-};
-
-
-/**
 * @brief The structure that defines what a Model Consists of
 */
 struct Model
@@ -59,17 +37,15 @@ struct Model
 
 
 
-int initializeHardcodedCallLists();
 
 /**
-* @brief Check if model name is a hardcoded model
+* @brief Update Model Position triggers , ( 3D / 2D )
 * @ingroup ModelLoader
-* @param String of filename of the file to load
-* @param Output that returns true if we have a hardcoded model name
-* @retval 0=Enumerator of Hardcoded model
+* @param Pointer to a model object
+* @param Pointer to a position array ( X,Y,Z and Quat or Euler )
+* @retval 1=Success,0=Failure
 */
-unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel);
-
+unsigned int updateModelPosition(struct Model * model,float * position);
 
 
 /**
