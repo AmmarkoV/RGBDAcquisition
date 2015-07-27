@@ -45,6 +45,9 @@ const GLfloat defaultShininess[] = { 5.0f };
 
 unsigned int updateModelPosition(struct Model * model,float * position)
 {
+      //This function is a stub..!
+      return 0;
+
       if (model==0) { return 0; }
       if (position==0) { return 0; }
 
@@ -61,8 +64,8 @@ unsigned int updateModelPosition(struct Model * model,float * position)
 
       GLdouble posX=0.0,posY=0.0,posZ=0.0;
 
-      if (model->type==OBJ_MODEL)
-      {
+    if (model->type==OBJ_MODEL)
+     {
       GLdouble posX=position[0],posY=position[1],posZ=position[2];
       struct OBJ_Model * modelOBJ = (struct OBJ_Model *) model->model;
 
@@ -70,13 +73,18 @@ unsigned int updateModelPosition(struct Model * model,float * position)
       posY=position[1] - modelOBJ->boundBox.min.y;
       posZ=position[2] - modelOBJ->boundBox.min.z;
       gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
+      model->bbox2D[0]=winX;
+      model->bbox2D[1]=winY;
 
       posX=position[0] + modelOBJ->boundBox.max.x;
       posY=position[1] + modelOBJ->boundBox.max.y;
       posZ=position[2] + modelOBJ->boundBox.max.z;
       gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
-       return 1;
-      }
+      model->bbox2D[2]=winX;
+      model->bbox2D[3]=winY;
+
+      return 1;
+     }
 
  return 0;
 }

@@ -21,6 +21,9 @@ struct Model
     int type; //See enum ModelTypes
 
     //Position / DimensionsglColor3f(1.0,0.0,0.0);
+
+    float bbox2D[4];
+
     float x , y , z , heading , pitch , roll , scaleX , scaleY ,scaleZ;
     float minX,minY,minZ,maxX,maxY,maxZ;
 
