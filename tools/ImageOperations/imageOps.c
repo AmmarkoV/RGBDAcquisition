@@ -446,6 +446,7 @@ int bitbltRGBBothDirections(unsigned char * target,  unsigned int tX,  unsigned 
   if (sY+height>=sourceHeight) { height=sourceHeight-sY-1;  }
   //----------------------------------------------------------
   fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
+  if ( (width==0) || (height==0) ) { fprintf(stderr,"Unacceptable size..\n"); return 0;}
 
   unsigned char *  sourcePTR      = source+ MEMPLACE3(sX,sY,sourceWidth);
   unsigned char *  sourceLimitPTR = source+ MEMPLACE3((sX+width),(sY+height),sourceWidth);
@@ -586,6 +587,8 @@ int bitbltDepthValue(unsigned short * target,  unsigned int tX,  unsigned int tY
   if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
   if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
   //----------------------------------------------------------
+  if ( (width==0) || (height==0) ) { fprintf(stderr,"Unacceptable size..\n"); return 0;}
+
 
   unsigned short * targetPTR; unsigned short * targetLineLimitPTR; unsigned short * targetLimitPTR;   unsigned int targetLineSkip;
   targetPTR      = target + MEMPLACE1(tX,tY,targetWidth);
@@ -614,7 +617,7 @@ int bitbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY  , u
                 unsigned int width , unsigned int height)
 {
   if ( (target==0)||(source==0) ) { return 0; }
-  if ( (width==0)&&(height==0) ) { return 0; }
+  if ( (width==0)||(height==0) ) { return 0; }
   if ( (sourceWidth==0)&&(sourceHeight==0) ) { return 0; }
 
   //Check for bounds -----------------------------------------
@@ -624,6 +627,7 @@ int bitbltDepth(unsigned short * target,  unsigned int tX,  unsigned int tY  , u
   if (sX+width>=sourceWidth) { width=sourceWidth-sX-1;  }
   if (sY+height>=sourceHeight) { height=sourceHeight-sY-1;  }
   //----------------------------------------------------------
+  if ( (width==0)||(height==0) ) { return 0; }
 
   unsigned short * sourcePTR;  unsigned short* sourceLineLimitPTR; unsigned short * sourceLimitPTR; unsigned int sourceLineSkip;
   unsigned short * targetPTR;  /*unsigned short * targetLimitPTR;*/    unsigned int targetLineSkip;

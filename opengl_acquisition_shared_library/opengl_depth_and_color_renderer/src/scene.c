@@ -16,6 +16,8 @@
 #include "ModelLoader/model_loader.h"
 #include "scene.h"
 
+#include "OGLRendererSandbox.h"
+
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -275,6 +277,7 @@ int moveObject(unsigned objToMove , float X , float Y , float Z)
     //movePositionOfObjectTrajectorySt(scene,objToMove,scene->ticks,X,Y,Z);
     movePositionOfObjectTrajectory(scene,objToMove,frameNumber,&X,&Y,&Z);
   }
+ return 1;
 }
 
 int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleDegrees)
@@ -286,6 +289,7 @@ int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleD
     if ( (X==0.0) && (Y==0.0) && (Z==1.0) ) { userDeltacamera_angle_z+=angleDegrees; } else
         {
            fprintf(stderr,"Unhandled camera rotation %0.2f %0.2f %0.2f %0.2f..!\n",X,Y,Z,angleDegrees);
+           return 0;
         }
   } else
   {
@@ -293,6 +297,7 @@ int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleD
     //if (frameNumber>0) { frameNumber-=1; }
     rotatePositionOfObjectTrajectory(scene,objToMove,frameNumber,&X,&Y,&Z,&angleDegrees);
   }
+ return 1;
 }
 
 
@@ -348,6 +353,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
        case -57: //F10 Dump to file
                writeVirtualStream(scene,"dump.scene");
+               saveSnapshotOfObjects();
              return 1;
        break;
 

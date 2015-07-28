@@ -191,6 +191,14 @@ int snapOGLRendererSandbox();
 */
 int stopOGLRendererSandbox();
 
+
+/**
+* @brief Save snapshots of OGL Renderer Sandbox items
+* @ingroup OGLRendererSandbox
+* @retval 0=Failure , 1=Success
+*/
+int saveSnapshotOfObjects();
+
 /* ---------------------------------------------------------
    ----------------- Photo shoot mode ----------------------
    --------------------------------------------------------- */
