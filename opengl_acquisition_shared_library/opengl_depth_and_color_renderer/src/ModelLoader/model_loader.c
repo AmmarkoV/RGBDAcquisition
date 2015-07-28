@@ -57,7 +57,7 @@ unsigned int updateModelPosition(struct Model * model,float * position)
       GLdouble winX, winY, winZ=0.0;
 
       #warning "It is terribly inneficient to query all the tables for each position update..!"
-      fprintf(stderr,"This should not work it should only be called when the draw operation is ready , otherwise the matrices received here are irrelevant\n");
+      //fprintf(stderr,"This should not work it should only be called when the draw operation is ready , otherwise the matrices received here are irrelevant\n");
       glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
       glGetDoublev( GL_PROJECTION_MATRIX, projection );
       glGetIntegerv( GL_VIEWPORT, viewport );

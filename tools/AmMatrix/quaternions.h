@@ -77,9 +77,15 @@ void quaternionSlerp(double * qOut, double * q0,double * q1,double t);
  */
 int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW);
 
-
-
-
+/**
+ * @brief Convert Quaternion to a 3x3 Matrix
+ * @ingroup quaternions
+ * @param
+ * @param Output 3x3 double matrix
+ * @param Input quaternion
+ * @param Input quaternion convention used
+ */
+void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention);
 
 /**
  * @brief Calculate the Inner Product of Two Quaternions

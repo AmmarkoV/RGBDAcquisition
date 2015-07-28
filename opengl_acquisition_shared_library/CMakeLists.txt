@@ -38,12 +38,9 @@ add_library(OpenGLAcquisition SHARED
             ../tools/ImageOperations/convolutionFilter.c
             ../tools/ImageOperations/imageFilters.c
             ../tools/ImageOperations/findSubImage.c
-            ../tools/ImageOperations/imageOps.c  
-            ../tools/ImageOperations/ocr.c
-            ../tools/ImageOperations/ocr.h 
+            ../tools/ImageOperations/imageOps.c   
             ../tools/ImageOperations/patchComparison.c
-            ../tools/ImageOperations/patchComparison.h
-            ../tools/ImageOperations/patternSets.c
+            ../tools/ImageOperations/patchComparison.h 
             ../tools/ImageOperations/resize.c 
             #Rest of the stuff 
             opengl_depth_and_color_renderer/src/TextureLoader/bmp.c

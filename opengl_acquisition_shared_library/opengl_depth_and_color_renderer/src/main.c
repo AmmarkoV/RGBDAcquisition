@@ -431,6 +431,7 @@ int saveSnapshotOfObjects()
 
       for (i=0; i<maxObjs; i++)
       {
+        fprintf(stderr,"Dumping snapshot of object %u/%u \n",i,maxObjs);
         minX = bbox2D[0+i*4];
         minY = bbox2D[1+i*4];
         maxX = bbox2D[2+i*4];
@@ -438,8 +439,8 @@ int saveSnapshotOfObjects()
         pWidth = abs(maxX-minX);
         pHeight = abs(maxY-minY);
 
-        saveTileRGBToFile(0,i,rgb, minX,minY,pWidth,pHeight,WIDTH,HEIGHT);
-        saveTileDepthToFile(0,i,zshortbuffer,  minX,minY,pWidth,pHeight,WIDTH,HEIGHT);
+        saveTileRGBToFile(0,i,rgb, minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
+        saveTileDepthToFile(0,i,zshortbuffer,  minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
       }
 
       free(bbox2D);

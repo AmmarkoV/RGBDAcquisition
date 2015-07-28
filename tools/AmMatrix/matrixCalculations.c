@@ -27,11 +27,23 @@ enum mat4x4EItem
 };
 
 
+int pointInsideBoundingBox3D(
+                             float bboxX1,float bboxY1,float bboxZ1,
+                             float bboxX2,float bboxY2,float bboxZ2,
+                             float X , float Y , float Z
+                             )
+{
+   return (
+                   (bboxX1<X)&& (bboxX2>X) &&
+                   (bboxY1<Y)&& (bboxY2>Y) &&
+                   (bboxZ1<Z)&& (bboxZ2>Z)
+          );
+}
+
 
 
 /*
   TAKEN FROM http://www.lighthouse3d.com/opengl/maths/index.php?raytriint
-
 */
 
 int rayIntersectsTriangle(float *p, float *d,float *v0, float *v1, float *v2)
@@ -67,6 +79,17 @@ int rayIntersectsTriangle(float *p, float *d,float *v0, float *v1, float *v2)
 		 // but not a ray intersection
 		 return (0);
 }
+
+
+
+int pointInsidePyramid(float *pyramidTop,float * pyramidBase,float X,float Y, float Z)
+{
+ fprintf(stderr,"Point inside pyramid is a stub..!\n");
+ return 0;
+
+}
+
+
 
 
 int rayIntersectsRectangle(float *p, float *d,float *v0, float *v1, float *v2, float *v3)

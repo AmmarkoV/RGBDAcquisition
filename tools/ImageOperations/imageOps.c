@@ -447,6 +447,8 @@ int bitbltRGBBothDirections(unsigned char * target,  unsigned int tX,  unsigned 
   //----------------------------------------------------------
   fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
   if ( (width==0) || (height==0) ) { fprintf(stderr,"Unacceptable size..\n"); return 0;}
+  if ( (width>sourceWidth) || (width>targetWidth) ) { fprintf(stderr,"Unacceptable size , too big..\n"); return 0;}
+  if ( (height>sourceHeight) || (height>targetHeight) ) { fprintf(stderr,"Unacceptable size , too big..\n"); return 0;}
 
   unsigned char *  sourcePTR      = source+ MEMPLACE3(sX,sY,sourceWidth);
   unsigned char *  sourceLimitPTR = source+ MEMPLACE3((sX+width),(sY+height),sourceWidth);
