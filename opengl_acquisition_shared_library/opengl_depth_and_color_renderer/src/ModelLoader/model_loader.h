@@ -40,13 +40,13 @@ struct Model
 
 
 
-
 /**
 * @brief Update Model Position triggers , ( 3D / 2D )
 * @ingroup ModelLoader
 * @param Pointer to a model object
 * @param Pointer to a position array ( X,Y,Z and Quat or Euler )
 * @retval 1=Success,0=Failure
+* @bug If updateModelPosition is called without the correct modelview/projection matrices loaded it will fail miserably , it should probably not even be exposed outside the modelloader.c file..
 */
 unsigned int updateModelPosition(struct Model * model,float * position);
 

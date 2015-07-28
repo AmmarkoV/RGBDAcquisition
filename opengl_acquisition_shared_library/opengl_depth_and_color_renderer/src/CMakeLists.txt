@@ -39,6 +39,8 @@ add_library(OGLRendererSandbox SHARED
             TextureLoader/ppm.h
             TextureLoader/texture_loader.c
             TextureLoader/texture_loader.h
+            TextureLoader/image_proc.c
+            TextureLoader/image_proc.h
             TrajectoryParser/InputParser_C.c
             TrajectoryParser/InputParser_C.h
             TrajectoryParser/TrajectoryParser.c

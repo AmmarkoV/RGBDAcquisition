@@ -38,6 +38,8 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/TextureLoader/ppm.h
             opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
             opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h
+            opengl_depth_and_color_renderer/src/TextureLoader/image_proc.c
+            opengl_depth_and_color_renderer/src/TextureLoader/image_proc.h
             opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c
             opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c

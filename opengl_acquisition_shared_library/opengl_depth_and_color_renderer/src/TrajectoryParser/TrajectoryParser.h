@@ -169,6 +169,9 @@ struct VirtualObject
    double scaleX,scaleY,scaleZ;
    unsigned int particleNumber;
 
+   unsigned int bbox2D[4];
+
+
    unsigned char hasAssociatedEvents;
 
 

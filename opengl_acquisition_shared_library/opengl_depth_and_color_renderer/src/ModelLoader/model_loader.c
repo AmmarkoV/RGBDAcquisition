@@ -45,8 +45,7 @@ const GLfloat defaultShininess[] = { 5.0f };
 
 unsigned int updateModelPosition(struct Model * model,float * position)
 {
-      //This function is a stub..!
-      return 0;
+ //     return 0;
 
       if (model==0) { return 0; }
       if (position==0) { return 0; }
@@ -58,6 +57,7 @@ unsigned int updateModelPosition(struct Model * model,float * position)
       GLdouble winX, winY, winZ=0.0;
 
       #warning "It is terribly inneficient to query all the tables for each position update..!"
+      fprintf(stderr,"This should not work it should only be called when the draw operation is ready , otherwise the matrices received here are irrelevant\n");
       glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
       glGetDoublev( GL_PROJECTION_MATRIX, projection );
       glGetIntegerv( GL_VIEWPORT, viewport );
@@ -269,6 +269,9 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
 
     //fprintf(stderr,"Drawing RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
+  //We have all the files
+  float position[7]={0};
+  updateModelPosition(mod,position);
 
       if (mod->type==OBJ_MODEL)
       {

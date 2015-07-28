@@ -612,6 +612,29 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
 }
 
 
+unsigned int *  getObject2DBoundingBoxList(unsigned int * bboxItemsSize)
+{
+ if (scene==0) { return 0; }
+ unsigned int i=0,resIdx=0;
+
+ unsigned int * result = (unsigned int *) malloc(sizeof(unsigned int) * 4 * scene->numberOfObjects );
+ *bboxItemsSize=scene->numberOfObjects*4;
+ if (result!=0)
+ {
+  for (i=1; i<scene->numberOfObjects; i++)
+    {
+     //scene->object[i].model = scene->ticks % scene->object[i].numberOfFrames;
+        result[resIdx] =  scene->object[i].bbox2D[0]; ++resIdx;
+        result[resIdx] =  scene->object[i].bbox2D[1]; ++resIdx;
+        result[resIdx] =  scene->object[i].bbox2D[2]; ++resIdx;
+        result[resIdx] =  scene->object[i].bbox2D[3]; ++resIdx;
+    }
+ }
+
+ return result;
+}
+
+
 
 int drawAllObjectsAtPositionsFromTrajectoryParser()
 {
@@ -676,8 +699,6 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
        float * pos = (float*) &posStackA;
        if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
        {
-         updateModelPosition(mod,pos);
-
          //This is a stupid way of passing stuff to be drawn
          R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
          getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
@@ -698,6 +719,12 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
          if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
              { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , scene->object[i].type ); }
+
+
+        scene->object[i].bbox2D[0] = mod->bbox2D[0];         scene->object[i].bbox2D[1] = mod->bbox2D[1];
+        scene->object[i].bbox2D[2] = mod->bbox2D[2];         scene->object[i].bbox2D[3] = mod->bbox2D[3];
+
+
        } else
        { fprintf(stderr,YELLOW "Could not determine position of object %s (%u) , so not drawing it\n" NORMAL,scene->object[i].name,i); }
        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after drawing object %u \n",i); }

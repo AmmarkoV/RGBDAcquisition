@@ -408,6 +408,27 @@ int stopOGLRendererSandbox()
 
 
 
+int saveSnapshotOfObjects()
+{
+  unsigned int bboxItemsSize=0;
+  unsigned int * bbox2D =  getObject2DBoundingBoxList(&bboxItemsSize);
+
+  if (bbox2D!=0)
+  {
+      free(bbox2D);
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
 /*
    --------------------------------------------------------------------------------------
                                     PHOTOSHOOT SPECIFIC
