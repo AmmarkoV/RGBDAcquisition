@@ -23,6 +23,8 @@
 #include "shader_loader.h"
 #include "../../../tools/AmMatrix/matrixCalculations.h"
 
+#include "../../../tools/ImageOperations/imageOps.h"
+
 #include "tiledRenderer.h"
 
 #include "OGLRendererSandbox.h"
@@ -252,7 +254,7 @@ void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned in
     if (rgb==0) { fprintf(stderr,"Could not allocate a buffer to write color to file %s \n",colorfile); return ; }
 
     getOpenGLColor(rgb, x, y, width,  height);
-    saveRawImageToFile(colorfile,rgb,(width-x),(height-y),3,8);
+    saveRawImageToFileOGLR(colorfile,rgb,(width-x),(height-y),3,8);
 
     if (rgb!=0) { free(rgb); rgb=0; }
     return ;
@@ -267,7 +269,7 @@ void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned in
 
     getOpenGLDepth(zshortbuffer,x,y,width,height);
 
-    saveRawImageToFile(depthfile,zshortbuffer,(width-x),(height-y),1,16);
+    saveRawImageToFileOGLR(depthfile,zshortbuffer,(width-x),(height-y),1,16);
 
     if (zshortbuffer!=0) { free(zshortbuffer); zshortbuffer=0; }
 
@@ -410,13 +412,41 @@ int stopOGLRendererSandbox()
 
 int saveSnapshotOfObjects()
 {
+  char * rgb = (char *) malloc((WIDTH)*(HEIGHT)*sizeof(char)*3);
+  if (rgb==0) { fprintf(stderr,"Could not allocate a buffer to write color \n"); return 0; }
+  short * zshortbuffer = (short *) malloc((WIDTH)*(HEIGHT)*sizeof(short));
+  if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth \n"); return; }
+
+  getOpenGLColor(rgb, 0, 0, WIDTH,HEIGHT);
+  getOpenGLDepth(zshortbuffer,0,0,WIDTH,HEIGHT);
+
   unsigned int bboxItemsSize=0;
   unsigned int * bbox2D =  getObject2DBoundingBoxList(&bboxItemsSize);
 
+  unsigned int minX,minY,maxX,maxY,pWidth,pHeight;
   if (bbox2D!=0)
   {
+      unsigned int i=0;
+      unsigned int maxObjs=bboxItemsSize/4;
+
+      for (i=0; i<maxObjs; i++)
+      {
+        minX = bbox2D[0+i*4];
+        minY = bbox2D[1+i*4];
+        maxX = bbox2D[2+i*4];
+        maxY = bbox2D[3+i*4];
+        pWidth = abs(maxX-minX);
+        pHeight = abs(maxY-minY);
+
+        saveTileRGBToFile(0,i,rgb, minX,minY,pWidth,pHeight,WIDTH,HEIGHT);
+        saveTileDepthToFile(0,i,zshortbuffer,  minX,minY,pWidth,pHeight,WIDTH,HEIGHT);
+      }
+
       free(bbox2D);
   }
+
+ if (rgb!=0) { free(rgb); rgb=0; }
+ if (zshortbuffer!=0) { free(zshortbuffer); zshortbuffer=0; }
 
 }
 

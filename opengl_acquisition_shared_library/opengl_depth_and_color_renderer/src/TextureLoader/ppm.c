@@ -21,7 +21,7 @@ static unsigned int simplePow(unsigned int base,unsigned int exp)
 
 int writePPM(char * filename,char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-    if(pixels==0) { fprintf(stderr,"saveRawImageToFile(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
+    if(pixels==0) { fprintf(stderr,"writePPM(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
     if (bitsperpixel>16) { fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n"); return 0; }
 
     FILE *fd=0;

@@ -17,6 +17,6 @@
 * @param channels , Bits per pixel ( RGB = 24 ( 3channels * 8 Bits ) , Depth Grayscale = 16 ( 1 channel * 16 bits )  )
 * @retval 1=Success , 0=Failure
 */
-int saveRawImageToFile(char * filename,void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
+int saveRawImageToFileOGLR(char * filename,void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
 #endif // SAVE_TO_FILE_H_INCLUDED

@@ -22,6 +22,7 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/shader_loader.h
             opengl_depth_and_color_renderer/src/tools.c
             opengl_depth_and_color_renderer/src/tools.h
+            #AmMatrix dependencies 
             ../tools/AmMatrix/quaternions.c
             ../tools/AmMatrix/quaternions.h
             ../tools/AmMatrix/matrix3x3Tools.c
@@ -31,7 +32,20 @@ add_library(OpenGLAcquisition SHARED
             ../tools/AmMatrix/matrixCalculations.c
             ../tools/AmMatrix/matrixCalculations.h
             ../tools/AmMatrix/solveLinearSystemGJ.c
-            ../tools/AmMatrix/solveLinearSystemGJ.h
+            ../tools/AmMatrix/solveLinearSystemGJ.h 
+            #ImageOperations dependencies
+            ../tools/ImageOperations/depthClassifier.c
+            ../tools/ImageOperations/convolutionFilter.c
+            ../tools/ImageOperations/imageFilters.c
+            ../tools/ImageOperations/findSubImage.c
+            ../tools/ImageOperations/imageOps.c  
+            ../tools/ImageOperations/ocr.c
+            ../tools/ImageOperations/ocr.h 
+            ../tools/ImageOperations/patchComparison.c
+            ../tools/ImageOperations/patchComparison.h
+            ../tools/ImageOperations/patternSets.c
+            ../tools/ImageOperations/resize.c 
+            #Rest of the stuff 
             opengl_depth_and_color_renderer/src/TextureLoader/bmp.c
             opengl_depth_and_color_renderer/src/TextureLoader/bmp.h
             opengl_depth_and_color_renderer/src/TextureLoader/ppm.c

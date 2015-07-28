@@ -128,7 +128,7 @@
 
 1418310443 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/tools.h
 
-1388410325 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/save_to_file.h
+1438082007 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/save_to_file.h
 
 1391296101 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/shader_loader.h
 	<GL/glx.h>
@@ -154,7 +154,7 @@
 
 1360239459 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h
 
-1374778441 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/save_to_file.c
+1438082019 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/save_to_file.c
 	"save_to_file.h"
 	<stdio.h>
 	<stdlib.h>
@@ -179,7 +179,7 @@
 	<windows.h>
 	<wingdi.h>
 
-1389279978 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/ppm.c
+1438082074 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/ppm.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -296,7 +296,7 @@
 	"model_loader_obj.h"
 	"../tools.h"
 
-1438080447 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
+1438080861 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
 	<GL/gl.h>
 	<GL/glx.h>
 	<GL/glu.h>
@@ -310,4 +310,76 @@
 	"TrajectoryParser/TrajectoryParser.h"
 	"ModelLoader/model_loader.h"
 	"scene.h"
+
+1422638576 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/convolutionFilter.c
+	"convolutionFilter.h"
+
+1422638373 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/convolutionFilter.h
+
+1422619663 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/depthClassifier.c
+	"depthClassifier.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1422619910 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/depthClassifier.h
+
+1383842258 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/findSubImage.c
+	"findSubImage.h"
+	"patchComparison.h"
+
+1383831038 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/findSubImage.h
+
+1384339684 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/patchComparison.h
+
+1422633291 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/imageFilters.c
+	"imageFilters.h"
+	<stdio.h>
+	<stdlib.h>
+
+1422633135 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/imageFilters.h
+
+1422619603 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/imageOps.c
+	"imageOps.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
+1422619611 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/imageOps.h
+
+1418836057 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/main.c
+
+1384721299 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/ocr.c
+	"ocr.h"
+	<stdio.h>
+
+1384647010 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/ocr.h
+	"patternSets.h"
+
+1384702185 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/patternSets.h
+
+1384468078 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/patchComparison.c
+	"patchComparison.h"
+	<stdio.h>
+
+1384702168 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/patternSets.c
+	<stdio.h>
+	<stdlib.h>
+	"patternSets.h"
+	"../Codecs/codecs.h"
+
+1403101764 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/codecs.h
+
+1414500243 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/resize.c
+	"resize.h"
+	<stdio.h>
+	<stdlib.h>
+
+1414495830 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/resize.h
+
+1386682076 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/splitMPO.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
 
