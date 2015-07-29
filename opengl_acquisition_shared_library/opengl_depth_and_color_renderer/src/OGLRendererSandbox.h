@@ -196,6 +196,7 @@ int stopOGLRendererSandbox();
 * @brief Save snapshots of OGL Renderer Sandbox items
 * @ingroup OGLRendererSandbox
 * @retval 0=Failure , 1=Success
+* @bug saveSnapshotOfObjects relies on correctly extracted 2D bounding boxes and a crapload of Image code bit blt which is not in a particularly good shape..
 */
 int saveSnapshotOfObjects();
 

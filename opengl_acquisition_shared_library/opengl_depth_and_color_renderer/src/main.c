@@ -440,8 +440,18 @@ int saveSnapshotOfObjects()
         pWidth = abs(maxX-minX);
         pHeight = abs(maxY-minY);
 
-        saveTileRGBToFile(0,i,rgb, minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
-        saveTileDepthToFile(0,i,zshortbuffer,  minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
+
+        if (
+             (pWidth<WIDTH) &&
+             (pHeight<HEIGHT)
+           )
+        {
+         saveTileRGBToFile(0,i,rgb, minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
+         saveTileDepthToFile(0,i,zshortbuffer,  minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
+        } else
+        {
+         fprintf(stderr,"");
+        }
       }
 
       free(bbox2D);

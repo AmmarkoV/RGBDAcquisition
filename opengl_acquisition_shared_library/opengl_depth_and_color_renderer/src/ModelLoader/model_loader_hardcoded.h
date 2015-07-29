@@ -82,6 +82,21 @@ int drawConnector(float * posA,float * posB,float * scale ,
 
 
 
+/**
+* @brief Draw a bounding box providing the center and dimensions
+* @ingroup ModelLoaderHardcoded
+* @param Center Position X
+* @param Center Position Y
+* @param Center Position Z
+* @param Minimum X
+* @param Minimum Y
+* @param Minimum Z
+* @param Maximum X
+* @param Maximum Y
+* @param Maximum Z
+* @retval 1=Success/0=Failure
+*/
+int drawBoundingBox(float x,float y,float z ,float minX,float minY,float minZ,float maxX,float maxY,float maxZ);
 
 
 

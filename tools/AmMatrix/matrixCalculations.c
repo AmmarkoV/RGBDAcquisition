@@ -430,9 +430,9 @@ void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ
 
 
 void findNormal(float *v1x, float *v1y, float *v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z )
-{ char x = 1;
-  char y = 2;
-  char z = 3;
+{ int x = 1;
+  int y = 2;
+  int z = 3;
   float temp_v1[4];
   float temp_v2[4];
   float temp_lenght;
