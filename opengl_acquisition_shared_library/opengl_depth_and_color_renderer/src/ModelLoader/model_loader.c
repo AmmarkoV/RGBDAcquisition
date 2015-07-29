@@ -45,7 +45,7 @@ const GLfloat defaultShininess[] = { 5.0f };
 
 unsigned int updateModelPosition(struct Model * model,float * position)
 {
- //     return 0;
+      return 0;
 
       if (model==0) { return 0; }
       if (position==0) { return 0; }
@@ -56,7 +56,7 @@ unsigned int updateModelPosition(struct Model * model,float * position)
 
       GLdouble winX, winY, winZ=0.0;
 
-      #warning "It is terribly inneficient to query all the tables for each position update..!"
+      #warning "It is inneficient to query all the tables for each position update..!"
       //fprintf(stderr,"This should not work it should only be called when the draw operation is ready , otherwise the matrices received here are irrelevant\n");
       glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
       glGetDoublev( GL_PROJECTION_MATRIX, projection );
@@ -72,14 +72,14 @@ unsigned int updateModelPosition(struct Model * model,float * position)
       posX=position[0] - modelOBJ->boundBox.min.x;
       posY=position[1] - modelOBJ->boundBox.min.y;
       posZ=position[2] - modelOBJ->boundBox.min.z;
-      gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
+      gluProject( posX * model->scaleX , posY* model->scaleY , posZ * model->scaleZ , modelview, projection, viewport, &winX, &winY, &winZ);
       model->bbox2D[0]=winX;
       model->bbox2D[1]=winY;
 
       posX=position[0] + modelOBJ->boundBox.max.x;
       posY=position[1] + modelOBJ->boundBox.max.y;
       posZ=position[2] + modelOBJ->boundBox.max.z;
-      gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
+      gluProject( posX* model->scaleX , posY* model->scaleY , posZ * model->scaleZ , modelview, projection, viewport, &winX, &winY, &winZ);
       model->bbox2D[2]=winX;
       model->bbox2D[3]=winY;
 

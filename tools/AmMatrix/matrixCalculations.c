@@ -433,10 +433,10 @@ void findNormal(float *v1x, float *v1y, float *v1z, float v2x, float v2y, float 
 { char x = 1;
   char y = 2;
   char z = 3;
-  float temp_v1[3];
-  float temp_v2[3];
+  float temp_v1[4];
+  float temp_v2[4];
   float temp_lenght;
-  float CNormal[3];
+  float CNormal[4];
 
 temp_v1[x] = *v1x - v2x;
 temp_v1[y] = *v1y - v2y;

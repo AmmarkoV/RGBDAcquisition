@@ -346,7 +346,7 @@ int transform2DPointVectorUsing3x3Matrix(double * resultPoint2D, double * transf
   {
    resultPoint2D[0]/=resultPoint2D[2];
    resultPoint2D[1]/=resultPoint2D[2];
-   resultPoint2D[2]/=resultPoint2D[2];
+   resultPoint2D[2]=1.0; //resultPoint2D[2]/=resultPoint2D[2];
   } else
   {
      fprintf(stderr,"Error with W coordinate after multiplication of 2D Point with 3x3 Matrix\n");
