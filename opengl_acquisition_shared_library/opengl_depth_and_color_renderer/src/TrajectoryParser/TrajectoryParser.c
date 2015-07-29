@@ -627,7 +627,7 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
   //Allocate a token parser
   struct InputParserC * ipc=0;
   ipc = InputParser_Create(LINE_MAX_LENGTH,5);
-  if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n"); return 0; }
+  if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n"); fclose(fp); return 0; }
 
  //Everything is set , Lets read the file!
   while (!feof(fp))
@@ -704,6 +704,8 @@ int readVirtualStream(struct VirtualStream * newstream)
 
   newstream->debug=0;
 
+
+  fclose(fp);
   return appendVirtualStreamFromFile(newstream,newstream->filename);
 }
 

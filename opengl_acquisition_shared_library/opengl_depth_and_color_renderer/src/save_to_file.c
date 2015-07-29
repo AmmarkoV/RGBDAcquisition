@@ -30,6 +30,7 @@ int saveRawImageToFileOGLR(char * filename,void * pixels , unsigned int width , 
         else
         {
             fprintf(stderr,"Invalid channels arg (%u) for SaveRawImageToFile\n",channels);
+            fclose(fd);
             return 1;
         }
 

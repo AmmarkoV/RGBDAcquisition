@@ -76,11 +76,11 @@ char * loadFileToMem(char * filename,unsigned long * file_length)
 
   // allocate memory to contain the whole file:
   buffer = (char*) malloc ( (sizeof(char)*lSize)+1 );
-  if (buffer == 0) {fprintf(stderr,"Could not allocate %u bytes of memory for shader file %s \n",(unsigned int ) lSize,filename); return 0; }
+  if (buffer == 0) {fprintf(stderr,"Could not allocate %u bytes of memory for shader file %s \n",(unsigned int ) lSize,filename);   fclose (pFile); return 0; }
 
   // copy the file into the buffer:
   result = fread (buffer,1,lSize,pFile);
-  if (result != lSize) {fputs ("Reading error",stderr); free(buffer); return 0; }
+  if (result != lSize) {fputs ("Reading error",stderr); free(buffer);  fclose (pFile); return 0; }
 
   /* the whole file is now loaded in the memory buffer. */
 

@@ -591,7 +591,7 @@ int addObjectToVirtualStream(
 
 
    return 1; // <- we always return
-   return found;
+  // return found;
 }
 
 

@@ -94,12 +94,13 @@ int getOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int 
      unsigned int yp = 0;
      unsigned int i=0;
      unsigned int stride = (width-x)*1;
+     float tmpF;
 
      for (yp=0; yp<height; yp++)
        {
          for ( i =0 ; i < (width-x); i ++ )
             {
-              float tmpF=zbuffer[(height-1-yp)*stride+i];
+              //float tmpF=zbuffer[(height-1-yp)*stride+i];
               tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) * 65534.0;
               unsigned short tmp = (unsigned short) tmpF;
               depth[yp*stride+i]= tmp ;
@@ -136,8 +137,8 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
       { fprintf(stderr,"getOpenGLDepth() : Error getting depth bias/scale \n"); }
 
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
-    memset(zbuffer,0,(width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
+    memset(zbuffer,0,(width-x)*(height-y)*sizeof(float));
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
     checkFrameGettersForError("Depth Getter");
 
@@ -415,7 +416,7 @@ int saveSnapshotOfObjects()
   char * rgb = (char *) malloc((WIDTH)*(HEIGHT)*sizeof(char)*3);
   if (rgb==0) { fprintf(stderr,"Could not allocate a buffer to write color \n"); return 0; }
   short * zshortbuffer = (short *) malloc((WIDTH)*(HEIGHT)*sizeof(short));
-  if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth \n"); return; }
+  if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth \n"); free(rgb); return; }
 
   getOpenGLColor(rgb, 0, 0, WIDTH,HEIGHT);
   getOpenGLDepth(zshortbuffer,0,0,WIDTH,HEIGHT);
