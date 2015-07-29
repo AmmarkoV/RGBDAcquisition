@@ -105,11 +105,12 @@ int InputParser_ClearNonCharacters(char * inpt , unsigned int length)
 
 int InputParser_TrimCharactersStart(char * inpt , unsigned int length,char what2trim)
 {
+   if ( ( inpt==0 ) || (length==0) ) { return 0; }
    unsigned int skip_chars=0;
    unsigned int i=0;
 
 
-   while ((inpt[skip_chars]==what2trim)&&(skip_chars<length)) { ++skip_chars; }
+   while ((skip_chars<length)&&(inpt[skip_chars]==what2trim)) { ++skip_chars; }
 
    while  (i<length)
     {
@@ -248,10 +249,10 @@ struct InputParserC * InputParser_Create(unsigned int max_string_count,unsigned 
     struct InputParserC * ipc=0;
 
     ipc = ( struct InputParserC * ) malloc ( sizeof ( struct InputParserC ) );
-    if ( ipc  == 0 ) { fprintf(stderr,"InputParserC unable to commit memory for a new instance\n"); return 0; }
+    if ( ipc  == 0 ) { fprintf(stderr,"InputParserC unable to commit memory for a new instance\n");  return 0; }
 
     ipc->tokenlist = (struct tokens *) malloc( sizeof(struct tokens) * (max_string_count+1) );
-    if ( ipc->tokenlist  == 0 ) { fprintf(stderr,"InputParserC unable to commit memory for a new Token List\n");   free(ipc); return 0; }
+    if ( ipc->tokenlist  == 0 ) { fprintf(stderr,"InputParserC unable to commit memory for a new Token List\n"); free(ipc); return 0; }
     ipc->tokens_count=0;
     ipc->tokens_max = max_string_count;
 
@@ -433,7 +434,7 @@ unsigned char InputParser_WordCompareNoCase(struct InputParserC * ipc,unsigned i
     if ( wordsize != InputParser_GetWordLength(ipc,num) ) { return 0; }
     /*if (  ipc->str_length <= ipc->tokenlist[num].token_start+wordsize ) { fprintf(stderr,"Erroneous input on InputParser_WordCompareNoCase leads out of array \n"); return 0; }*/
 
-    int i=0;
+    unsigned int i=0;
     for ( i=0; i<wordsize; i++ )
     {
       if (toupper(ipc->str[ipc->tokenlist[num].token_start+i])!=toupper(word[i])) { /*fprintf(stderr," returning fail ");*/  return 0; }
