@@ -35,6 +35,7 @@ extern double customModelViewMatrix[16];
 extern double customTranslation[3];
 extern double customRodriguezRotation[3];
 
+int sceneSeekTime(unsigned int seekTime);
 int sceneIgnoreTime(unsigned int newSettingMode);
 
 /**

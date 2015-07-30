@@ -180,6 +180,7 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
 * @param Relative position to the current frame
 * @ingroup OGLRendererSandbox
 * @retval 0=Failure , 1=Success
+* @bug Not implemented
 */
 int seekRelativeOGLRendererSandbox(int devID,signed int seekFrame);
 

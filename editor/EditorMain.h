@@ -38,6 +38,7 @@ class EditorFrame: public wxFrame
         int DrawAFPoints(wxDC & dc , unsigned int x , unsigned int y );
 
         void onIdle(wxIdleEvent& evt);
+        int doGlobalSeek(long jumpTo);
         void guiSnapFrames(int doSnap);
         int  removeOldSegmentedFrames();
         int  refreshAllOverlays();

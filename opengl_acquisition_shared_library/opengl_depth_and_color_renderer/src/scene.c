@@ -102,6 +102,14 @@ float userDeltacamera_angle_x = 0.0f; float userDeltacamera_angle_y = 0.0f; floa
 unsigned int selectedOBJ=1;
 
 
+int sceneSeekTime(unsigned int seekTime)
+{
+  if (scene==0) { return 0; }
+  scene->ticks=seekTime;
+
+  return 1;
+}
+
 
 int sceneIgnoreTime(unsigned int newSettingMode)
 {

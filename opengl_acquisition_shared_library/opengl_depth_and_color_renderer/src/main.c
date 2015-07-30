@@ -394,13 +394,14 @@ int changeOGLRendererGrabMode(unsigned int sequentialModeOn)
 
 int seekRelativeOGLRendererSandbox(int devID,signed int seekFrame)
 {
-
+  fprintf(stderr,"seekRelativeOGLRendererSandbox(%u,%d) is a stub\n",devID,seekFrame);
+  return 0;
 }
 
 
 int seekOGLRendererSandbox(int devID,unsigned int seekFrame)
 {
-
+  return sceneSeekTime(seekFrame);
 }
 
 

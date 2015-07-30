@@ -1097,6 +1097,20 @@ void EditorFrame::OnbuttonNextFrameClick(wxCommandEvent& event)
     Refresh(); // <- This draws the window!
 }
 
+
+int EditorFrame::doGlobalSeek(long jumpTo)
+{
+  acquisitionSeekFrame(moduleID,devID,jumpTo);
+
+  if (overlayFramesExist)
+  {
+    acquisitionSeekFrame(overlayModule,overlayDevice,jumpTo);
+  }
+  guiSnapFrames(1); //Get New Frames
+  return 1;
+}
+
+
 void EditorFrame::OncurrentFrameTextCtrlText(wxCommandEvent& event)
 {
     long jumpTo=0;
@@ -1104,9 +1118,7 @@ void EditorFrame::OncurrentFrameTextCtrlText(wxCommandEvent& event)
     if(currentFrameTextCtrl->GetValue().ToLong(&jumpTo))
         {
           if (jumpTo>0) { --jumpTo; }
-          acquisitionSeekFrame(moduleID,devID,jumpTo);
-          guiSnapFrames(1); //Get New Frames
-
+          doGlobalSeek(jumpTo);
           Refresh(); // <- This draws the window!
         }
 }
@@ -1116,8 +1128,7 @@ void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
     long jumpTo = FrameSlider->GetValue();
 
     if (jumpTo>0) { --jumpTo; }
-    acquisitionSeekFrame(moduleID,devID,jumpTo);
-    guiSnapFrames(1); //Get New Frames
+    doGlobalSeek(jumpTo);
     Refresh(); // <- This draws the window!
 }
 
