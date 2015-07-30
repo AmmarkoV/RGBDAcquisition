@@ -385,6 +385,10 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
   return 1;
 }
 
+int changeOGLRendererGrabMode(unsigned int sequentialModeOn)
+{
+  sceneIgnoreTime(sequentialModeOn);
+}
 
 int snapOGLRendererSandbox()
 {

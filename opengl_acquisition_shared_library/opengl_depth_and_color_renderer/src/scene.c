@@ -103,6 +103,15 @@ unsigned int selectedOBJ=1;
 
 
 
+int sceneIgnoreTime(unsigned int newSettingMode)
+{
+  if (scene==0) { return 0; }
+  if (newSettingMode)   { scene->ignoreTime = 1; tickUSleepTime=0;   } else
+                        { scene->ignoreTime = 0; tickUSleepTime=100; }
+
+  return 1;
+}
+
 
 //matrix will receive the calculated perspective matrix.
 //You would have to upload to your shader

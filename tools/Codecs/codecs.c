@@ -84,6 +84,7 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
    {
      #if USE_JPG_FILES
       case JPG_CODEC :
+       //fprintf(stderr,GREEN "JPG Loader active" NORMAL , filename);
        if (!ReadJPEG(filename,img,read_only_header))
          {
            fprintf(stderr,RED "Could error reading file %s using jpg reader" NORMAL , filename);
@@ -103,6 +104,7 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 
      #if USE_PNG_FILES
       case PNG_CODEC :
+       //fprintf(stderr,GREEN "PNG Loader active" NORMAL , filename);
        if (!ReadPNG(filename,img,read_only_header))
          {
            fprintf(stderr,RED "Could error reading file %s using png reader" NORMAL , filename);

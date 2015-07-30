@@ -35,6 +35,8 @@ extern double customModelViewMatrix[16];
 extern double customTranslation[3];
 extern double customRodriguezRotation[3];
 
+int sceneIgnoreTime(unsigned int newSettingMode);
+
 /**
 * @brief Render A Scene
 * @ingroup Scene

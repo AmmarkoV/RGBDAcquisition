@@ -76,6 +76,30 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../tools/AmMatrix/solveLinearSystemGJ.h" />
+		<Unit filename="../tools/ImageOperations/convolutionFilter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/ImageOperations/convolutionFilter.h" />
+		<Unit filename="../tools/ImageOperations/depthClassifier.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/ImageOperations/depthClassifier.h" />
+		<Unit filename="../tools/ImageOperations/imageFilters.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/ImageOperations/imageFilters.h" />
+		<Unit filename="../tools/ImageOperations/imageOps.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/ImageOperations/imageOps.h" />
+		<Unit filename="../tools/ImageOperations/patchComparison.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/ImageOperations/patchComparison.h" />
+		<Unit filename="../tools/ImageOperations/resize.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/ImageOperations/resize.h" />
 		<Unit filename="OpenGLAcquisition.c">
 			<Option compilerVar="CC" />
 		</Unit>

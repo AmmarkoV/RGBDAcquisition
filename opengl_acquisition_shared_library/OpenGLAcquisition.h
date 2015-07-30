@@ -22,6 +22,9 @@ int getOpenGLNumberOfDevices() ;
 int stopOpenGLModule() ;
 int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate) ;
 int destroyOpenGLDevice(int devID) ;
+
+
+int changeOGLRendererGrabMode(unsigned int sequentialModeOn);
 int snapOpenGLFrames(int devID) ;
 
 //Color Frame getters
