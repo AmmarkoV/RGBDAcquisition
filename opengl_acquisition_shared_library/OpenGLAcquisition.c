@@ -68,6 +68,21 @@ int destroyOpenGLDevice(int devID)
 }
 
 
+int seekRelativeOpenGLFrame(int devID,signed int seekFrame)
+{
+
+ return 0;
+}
+
+
+
+int seekOpenGLFrame(int devID,unsigned int seekFrame)
+{
+
+ return 0;
+}
+
+
 int snapOpenGLFrames(int devID) { return snapOGLRendererSandbox(); }
 
 //Color Frame getters

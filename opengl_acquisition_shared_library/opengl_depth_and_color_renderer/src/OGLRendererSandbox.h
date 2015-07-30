@@ -176,6 +176,23 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
 
 
 /**
+* @brief Seek a relative place compared to current frame on OGL Renderer stream
+* @param Relative position to the current frame
+* @ingroup OGLRendererSandbox
+* @retval 0=Failure , 1=Success
+*/
+int seekRelativeOGLRendererSandbox(int devID,signed int seekFrame);
+
+
+/**
+* @brief Seek a place on OGL Renderer stream
+* @param Absolute frame to seek
+* @ingroup OGLRendererSandbox
+* @retval 0=Failure , 1=Success
+*/
+int seekOGLRendererSandbox(int devID,unsigned int seekFrame);
+
+/**
 * @brief Snap OGL Renderer Frame
 * @ingroup OGLRendererSandbox
 * @retval 0=Failure , 1=Success

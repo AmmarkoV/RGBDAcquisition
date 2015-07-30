@@ -25,6 +25,11 @@ int destroyOpenGLDevice(int devID) ;
 
 
 int changeOGLRendererGrabMode(unsigned int sequentialModeOn);
+
+
+
+int seekRelativeOpenGLFrame(int devID,signed int seekFrame);
+int seekOpenGLFrame(int devID,unsigned int seekFrame);
 int snapOpenGLFrames(int devID) ;
 
 //Color Frame getters

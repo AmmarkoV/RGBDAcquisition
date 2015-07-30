@@ -390,6 +390,20 @@ int changeOGLRendererGrabMode(unsigned int sequentialModeOn)
   sceneIgnoreTime(sequentialModeOn);
 }
 
+
+
+int seekRelativeOGLRendererSandbox(int devID,signed int seekFrame)
+{
+
+}
+
+
+int seekOGLRendererSandbox(int devID,unsigned int seekFrame)
+{
+
+}
+
+
 int snapOGLRendererSandbox()
 {
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before starting to snapOGLRendererSandbox \n"); }
