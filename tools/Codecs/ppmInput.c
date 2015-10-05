@@ -110,8 +110,7 @@ unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *w
 
 int ReadPPM(char * filename,struct Image * pic,char read_only_header)
 {
-  unsigned long timestamp;
-  pic->pixels = ReadPNM(pic->pixels , filename, &pic->width, &pic->height, &timestamp );
+  pic->pixels = ReadPNM(pic->pixels , filename, &pic->width, &pic->height, &pic->timestamp );
   return (pic->pixels!=0);
 }
 

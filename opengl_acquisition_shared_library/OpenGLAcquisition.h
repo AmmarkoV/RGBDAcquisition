@@ -1,3 +1,9 @@
+/** @file OpenGLAcquisition.h
+ *  @brief  A module that emulates RGBDAcquisition from an OpenGL context
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
+
 #ifndef OPENGL_ACQUISITION_H_INCLUDED
 #define OPENGL_ACQUISITION_H_INCLUDED
 
