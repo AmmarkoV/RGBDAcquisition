@@ -37,6 +37,10 @@
 		<Compiler>
 			<Add option="-fPIC" />
 		</Compiler>
+		<Unit filename="asciiInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="asciiInput.h" />
 		<Unit filename="codecs.c">
 			<Option compilerVar="CC" />
 		</Unit>
