@@ -43,6 +43,16 @@
   #error "PNM/PPM Support is disabled in this build of Image Codecs and this doesnt make any sense since we have it hardcoded"
 #endif // USE_PPM_FILES
 
+
+
+
+#if USE_ASCII_FILES
+      #include "asciiInput.h"
+#else
+  #error "ASCII Support is disabled in this build of Image Codecs and this doesnt make any sense since we have it hardcoded"
+#endif // USE_ASCII_FILES
+
+
 #define DEBUG_READING_IMAGES 0
 
 
@@ -82,8 +92,8 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 
    switch (type)
    {
+     case JPG_CODEC :
      #if USE_JPG_FILES
-      case JPG_CODEC :
        //fprintf(stderr,GREEN "JPG Loader active" NORMAL , filename);
        if (!ReadJPEG(filename,img,read_only_header))
          {
@@ -97,13 +107,13 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 	     strcat(ppmfilename,".ppm");
 	     WritePPM(ppmfilename,img);
 	    #endif
-      break;
      #else
        fprintf(stderr,RED "JPG File requested (%s) , but this build of Codec Library does not have JPG Support :(" NORMAL , filename);
      #endif
+     break;
 
+     case PNG_CODEC :
      #if USE_PNG_FILES
-      case PNG_CODEC :
        //fprintf(stderr,GREEN "PNG Loader active" NORMAL , filename);
        if (!ReadPNG(filename,img,read_only_header))
          {
@@ -117,24 +127,41 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 	     strcat(ppmfilename,".ppm");
 	     WritePPM(ppmfilename,img);
 	    #endif
-      break;
      #else
        fprintf(stderr,RED "PNG File requested (%s) , but this build of Codec Library does not have PNG Support :(" NORMAL , filename);
      #endif
+     break;
 
+
+     case PPM_CODEC :
+     case PNM_CODEC :
      #if USE_PPM_FILES
-       case PPM_CODEC :
-       case PNM_CODEC :
        if (!ReadPPM(filename,img,read_only_header))
          {
            fprintf(stderr,RED "Could error reading file %s using pnm reader" NORMAL , filename);
            free(img);
            img=0;
          }
-       break;
      #else
        fprintf(stderr,RED "PNM/PPM File requested (%s) , but this build of Codec Library does not have PNM/PPM Support :(" NORMAL , filename);
      #endif
+     break;
+
+
+
+     #if USE_ASCII_FILES
+        if (!ReadASCII(filename,img,read_only_header))
+         {
+           fprintf(stderr,RED "Could error reading file %s using pnm reader" NORMAL , filename);
+           free(img);
+           img=0;
+         }
+     #else
+       fprintf(stderr,RED "PNM/PPM File requested (%s) , but this build of Codec Library does not have PNM/PPM Support :(" NORMAL , filename);
+     #endif // USE_ASCII_FILES
+     break;
+
+
 
       default :
        free(img);
