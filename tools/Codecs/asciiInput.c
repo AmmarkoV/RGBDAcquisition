@@ -84,7 +84,7 @@ int WriteASCII(char * filename,struct Image * pic,int packed)
     if (fd!=0)
     {
 
-      fprintf(fd, "%u %u\n",pic->width,pic->height);
+      fprintf(fd, "%u %u\n",pic->height,pic->width);
 
       char * ptr = pic->pixels ;
       unsigned int x , y;
