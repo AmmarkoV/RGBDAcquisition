@@ -138,7 +138,7 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
      #if USE_PPM_FILES
        if (!ReadPPM(filename,img,read_only_header))
          {
-           fprintf(stderr,RED "Could error reading file %s using pnm reader" NORMAL , filename);
+           fprintf(stderr,RED "Error reading file %s using pnm reader" NORMAL , filename);
            free(img);
            img=0;
          }
@@ -152,7 +152,7 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
      #if USE_ASCII_FILES
         if (!ReadASCII(filename,img,read_only_header))
          {
-           fprintf(stderr,RED "Could error reading file %s using pnm reader" NORMAL , filename);
+           fprintf(stderr,RED "Error reading file %s using pnm reader" NORMAL , filename);
            free(img);
            img=0;
          }
@@ -350,6 +350,8 @@ unsigned int guessFilenameTypeStupid(char * filename)
   if (strcasestr(filename,".PNM")!=0)   { return PNM_CODEC; } else
   if (strcasestr(filename,".PPM")!=0)   { return PPM_CODEC; } else
   if (strcasestr(filename,".ASCII")!=0) { return ASCII_CODEC; } else
+  if (strcasestr(filename,".TEXT")!=0) { return ASCII_CODEC; } else
+  if (strcasestr(filename,".TXT")!=0) { return ASCII_CODEC; }
 
  return  NO_CODEC;
 }

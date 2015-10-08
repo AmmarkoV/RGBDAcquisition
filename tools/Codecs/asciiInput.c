@@ -20,15 +20,16 @@ unsigned char * ReadASCIIRaw(unsigned char * buffer , char * filename,unsigned i
     {
         *width=0; *height=0; *timestamp=0;
 
-        fscanf(fp, "%u %u\n", width, height );
+        fscanf(fp, "%u %u\n",  height , width);
+          if (pixels==0)
+            {  pixels= (unsigned char*) malloc((*width)*(*height)*8*3*sizeof(char)); }
 
         unsigned int i=0,x=0,y=0,value=0;
         if (packed)
         {
+
         }  else
         {
-          if (pixels==0)
-            {  pixels= (unsigned char*) malloc((*width)*(*height)*8*3*sizeof(char)); }
 
           char * pixelsPtr = pixels;
 
@@ -52,13 +53,15 @@ unsigned char * ReadASCIIRaw(unsigned char * buffer , char * filename,unsigned i
     {
       fprintf(stderr,"File %s does not exist \n",filename);
     }
-  return buffer;
+  return pixels;
 }
 
 
 int ReadASCII(char * filename,struct Image * pic,char read_only_header)
 {
   pic->pixels = ReadASCIIRaw(pic->pixels , filename, &pic->width, &pic->height, &pic->timestamp , 0 );
+  pic->channels=3;
+  pic->bitsperpixel=8;
   return (pic->pixels!=0);
 }
 
