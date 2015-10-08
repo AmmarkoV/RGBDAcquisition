@@ -148,7 +148,7 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
      break;
 
 
-
+     case ASCII_CODEC :
      #if USE_ASCII_FILES
         if (!ReadASCII(filename,img,read_only_header))
          {
@@ -269,6 +269,15 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
       break;
      #endif
 
+
+
+     #if USE_ASCII_FILES
+     case ASCII_CODEC :
+         WriteASCII(filename,pic,0);
+      break;
+     #endif // USE_ASCII_FILES
+
+
       default :
         break;
    };
@@ -332,4 +341,32 @@ int destroyImage(struct Image * img)
     return 1;
 }
 
+unsigned int guessFilenameTypeStupid(char * filename)
+{
+  fprintf(stderr,"Guessing filename type for `%s` \n" , filename);
+  if (strcasestr(filename,".JPG")!=0)   { return JPG_CODEC; } else
+  if (strcasestr(filename,".JPEG")!=0)  { return JPG_CODEC; } else
+  if (strcasestr(filename,".PNG")!=0)   { return PNG_CODEC; } else
+  if (strcasestr(filename,".PNM")!=0)   { return PNM_CODEC; } else
+  if (strcasestr(filename,".PPM")!=0)   { return PPM_CODEC; } else
+  if (strcasestr(filename,".ASCII")!=0) { return ASCII_CODEC; } else
 
+ return  NO_CODEC;
+}
+
+
+
+int convertCodecImages(char * filenameInput , char * filenameOutput)
+{
+ unsigned int inputType = guessFilenameTypeStupid(filenameInput);
+ struct Image * inputImage = readImage(filenameInput,inputType,0);
+ if (inputImage!=0)
+ {
+    unsigned int outputType = guessFilenameTypeStupid(filenameOutput);
+    writeImageFile(inputImage,outputType ,filenameOutput);
+
+    destroyImage(inputImage);
+    return 1;
+ }
+ return 0;
+}

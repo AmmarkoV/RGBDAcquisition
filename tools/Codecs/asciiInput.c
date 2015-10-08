@@ -9,22 +9,45 @@
 #define PPMREADBUFLEN 256
 
 
-unsigned char * ReadASCIIRaw(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
+unsigned char * ReadASCIIRaw(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp,int packed)
 {
     //See http://en.wikipedia.org/wiki/Portable_anymap#File_format_description for this simple and useful format
     unsigned char * pixels=buffer;
-    FILE *pf=0;
-    pf = fopen(filename,"r");
+    FILE *fp=0;
+    fp = fopen(filename,"r");
 
-    if (pf!=0 )
+    if (fp!=0 )
     {
         *width=0; *height=0; *timestamp=0;
 
-        //Todo read once
-         //if (pixels==0) {  pixels= (unsigned char*) malloc(w*h*bytesPerPixel*channels*sizeof(char)); }
+        fscanf(fp, "%u %u\n", width, height );
 
+        unsigned int i=0,x=0,y=0,value=0;
+        if (packed)
+        {
+        }  else
+        {
+          if (pixels==0)
+            {  pixels= (unsigned char*) malloc((*width)*(*height)*8*3*sizeof(char)); }
 
-        fclose(pf);
+          char * pixelsPtr = pixels;
+
+          for (i=0; i<3; i++)
+          {
+           pixelsPtr = pixels+i;
+           for (y=0; y<*height; y++)
+           {
+            for (x=0; x<*width; x++)
+             {
+               fscanf(fp, "%u ", &value );
+               *pixelsPtr=value;
+               pixelsPtr+=3;
+             }
+           }
+          }
+        }
+
+        fclose(fp);
     } else
     {
       fprintf(stderr,"File %s does not exist \n",filename);
@@ -35,7 +58,7 @@ unsigned char * ReadASCIIRaw(unsigned char * buffer , char * filename,unsigned i
 
 int ReadASCII(char * filename,struct Image * pic,char read_only_header)
 {
-  pic->pixels = ReadASCIIRaw(pic->pixels , filename, &pic->width, &pic->height, &pic->timestamp );
+  pic->pixels = ReadASCIIRaw(pic->pixels , filename, &pic->width, &pic->height, &pic->timestamp , 0 );
   return (pic->pixels!=0);
 }
 
@@ -57,6 +80,8 @@ int WriteASCII(char * filename,struct Image * pic,int packed)
 
     if (fd!=0)
     {
+
+      fprintf(fd, "%u %u\n",pic->width,pic->height);
 
       char * ptr = pic->pixels ;
       unsigned int x , y;

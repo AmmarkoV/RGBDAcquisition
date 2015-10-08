@@ -41,7 +41,8 @@ enum codecTypeList
    JPG_CODEC ,
    PPM_CODEC ,
    PNM_CODEC ,
-   PNG_CODEC
+   PNG_CODEC ,
+   ASCII_CODEC
 };
 
 struct Image
@@ -70,6 +71,9 @@ int destroyImage(struct Image * img);
 
 int swapImageEndianness(struct Image * img);
 int swapImageEndiannessRaw(unsigned char * pixels, unsigned int width,unsigned int height,unsigned int bitsperpixel , unsigned int channels);
+
+
+int convertCodecImages(char * filenameInput , char * filenameOutput);
 #ifdef __cplusplus
 }
 #endif
