@@ -36,7 +36,7 @@
 			<Add option="-lpng" />
 			<Add library="./libCodecs.a" />
 		</Linker>
-		<Unit filename="main.c">
+		<Unit filename="utilConverterMain.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

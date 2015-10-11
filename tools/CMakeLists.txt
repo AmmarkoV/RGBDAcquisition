@@ -11,6 +11,11 @@ add_subdirectory (Quaternions/)
 add_subdirectory (ImageOperations/)
 
 
+
+if (ENABLE_LOCATION_SERVICE)
+ add_subdirectory (LocationServices/)
+ENDIF(ENABLE_LOCATION_SERVICE)
+
 IF( ENABLE_OPENCV )
   #add_subdirectory (DepthImagesConverter/) 
 ENDIF( ENABLE_OPENCV )
