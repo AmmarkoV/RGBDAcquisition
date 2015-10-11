@@ -5,6 +5,11 @@
 #include "../tools/Timers/timer.h"
 #include "../tools/OperatingSystem/OperatingSystem.h"
 
+
+   #if ENABLE_LOCATION_SERVICE
+    #include "../tools/LocationServices/locationService.h"
+   #endif // ENABLE_LOCATION_SERVICE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -369,6 +374,29 @@ int acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels , unsig
     return 0;
 }
 
+
+
+int acquisitionSaveLocationStamp(char * filename)
+{
+   #if ENABLE_LOCATION_SERVICE
+    FILE *fd=0;
+    fd = fopen(filename,"w");
+
+    if (fd!=0)
+    {
+     fprintf(fd,"Alt(%0.5f)\n",getAlt());
+     fprintf(fd,"Lat(%0.5f)\n",getLat());
+     fprintf(fd,"Lon(%0.5f)\n",getLon());
+
+     fflush(fd);
+     fclose(fd);
+    }
+    return 1;
+   #else
+    return 0;
+   #endif
+}
+
 //Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
 //depth is casted to char to simplify things , but that adds sizeof(short) to the pointer arethemetic!
 unsigned char * convertShortDepthToRGBDepth(unsigned short * depth,unsigned int width , unsigned int height)
@@ -571,6 +599,11 @@ int acquisitionUnloadPlugin(ModuleIdentifier moduleID)
 
 int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings)
 {
+   #if ENABLE_LOCATION_SERVICE
+    startLocationServices();
+   #endif // ENABLE_LOCATION_SERVICE
+
+
   if (moduleID < NUMBER_OF_POSSIBLE_MODULES)
   {
     if (!acquisitionLoadPlugin(moduleID))
@@ -586,6 +619,10 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
 
 int acquisitionStopModule(ModuleIdentifier moduleID)
 {
+   #if ENABLE_LOCATION_SERVICE
+    stopLocationServices();
+   #endif // ENABLE_LOCATION_SERVICE
+
     if (*plugins[moduleID].stopModule!=0) { return (*plugins[moduleID].stopModule) (); }
     acquisitionUnloadPlugin(moduleID);
 
@@ -732,6 +769,10 @@ int acquisitionControlFlow(ModuleIdentifier moduleID,DeviceIdentifier devID,floa
 
     StartTimer(FRAME_SNAP_DELAY);
 
+   #if ENABLE_LOCATION_SERVICE
+    pollLocationServices();
+   #endif // ENABLE_LOCATION_SERVICE
+
     if (*plugins[moduleID].snapFrames!=0)
     {
       EndTimer(FRAME_SNAP_DELAY);
@@ -747,7 +788,7 @@ int acquisitionControlFlow(ModuleIdentifier moduleID,DeviceIdentifier devID,floa
 {
     printCall(moduleID,devID,"acquisitionSaveColorFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
-    sprintf(filenameFull,"%s.pnm",filename);
+    snprintf(filenameFull,2048,"%s.pnm",filename);
 
 
 
@@ -772,12 +813,22 @@ int acquisitionControlFlow(ModuleIdentifier moduleID,DeviceIdentifier devID,floa
               {  //V4L2Stereo images are huge so until we fix jpeg compression for all templates ( already there but there are some managment decisions to be made :P )
                  //we do a simple hack here :p
                  char convertToJPEGString[4096]={0};
-                 sprintf(convertToJPEGString , "convert %s.pnm %s.jpg && rm  %s.pnm && mv %s.jpg %s.jps",filename,filename,filename,filename,filename);
+                 snprintf(convertToJPEGString , 4096, "convert %s.pnm %s.jpg && rm  %s.pnm && mv %s.jpg %s.jps",filename,filename,filename,filename,filename);
                  int i = system(convertToJPEGString);
                  if (i==0) { fprintf(stderr,"Success converting to jpeg\n"); } else
                            { fprintf(stderr,"Failure converting to jpeg\n"); }
               }
            // V4L2 Specific JPS compression ------------------------------------------------------------------------------------------------------------------------------
+
+
+              #if ENABLE_LOCATION_SERVICE
+              char timestampFilename[4096]={0};
+              snprintf(timestampFilename, 4096, "%s_loc.txt",filename);
+              if (!acquisitionSaveLocationStamp(timestampFilename))
+              {
+                fprintf(stderr,"Could not save location stamp [ %s ] \n",filename);
+              }
+              #endif // ENABLE_LOCATION_SERVICE
 
             return retres;
          }

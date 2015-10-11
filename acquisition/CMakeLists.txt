@@ -1,6 +1,11 @@
 project( Acquisition ) 
 cmake_minimum_required( VERSION 2.8.7 )   
  
+IF( ENABLE_LOCATION_SERVICE )
+ MESSAGE("Location Service Will Be included in Acquisition")
+ set(LocationService_Libs LocationServices gps ) 
+ add_definitions(-DENABLE_LOCATION_SERVICE)
+ENDIF( ENABLE_LOCATION_SERVICE )
    
     set(ACQUISITION_INGREDIENTS
                  Acquisition.c
