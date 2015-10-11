@@ -11,7 +11,7 @@ cmake_minimum_required( VERSION 2.8.7 )
               )
   
     add_library(Acquisition SHARED ${ACQUISITION_INGREDIENTS} ) 
-    target_link_libraries(Acquisition rt dl m Timers CalibrationLibrary OperatingSystem ) 
+    target_link_libraries(Acquisition rt dl m Timers CalibrationLibrary OperatingSystem ${LocationService_Libs} ) 
  
     set_target_properties(Acquisition PROPERTIES 
                           DEBUG_POSTFIX "D"
