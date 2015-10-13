@@ -254,6 +254,7 @@ void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,
    if (strcmp(extension,"pnm")==0) { type=PNM_CODEC; } else
    if (strcmp(extension,"png")==0) { type=PNG_CODEC; } else
    if (strcmp(extension,"jpg")==0) { type=JPG_CODEC; } else
+   if (strcmp(extension,"jps")==0) { type=JPG_CODEC; } else
    if (strcmp(extension,"jpeg")==0) { type=JPG_CODEC; }
    unsigned int bitsperpixel,channels;
    //fprintf(stderr,"Reading %s , using Codec Library .. ",filename);
@@ -276,11 +277,12 @@ unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * color
   if (file_name_test==0) { fprintf(stderr,"Could not findLastFrame , no space for string\n"); return 0; }
 
   unsigned int i=0;
-  while (i<3)
+  while (i<4)
   {
    if (i==0) { strncpy(colorExtension,"pnm",MAX_EXTENSION_PATH); } else
    if (i==1) { strncpy(colorExtension,"png",MAX_EXTENSION_PATH); } else
-   if (i==2) { strncpy(colorExtension,"jpg",MAX_EXTENSION_PATH); }
+   if (i==2) { strncpy(colorExtension,"jpg",MAX_EXTENSION_PATH); } else
+   if (i==3) { strncpy(colorExtension,"jps",MAX_EXTENSION_PATH); }
 
    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , startingFrame , readFromDir , colorExtension );
    if ( FileExists(file_name_test) ) { colorSet=1; break; }
@@ -289,11 +291,12 @@ unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * color
   }
 
   i=0;
-  while (i<3)
+  while (i<4)
   {
    if (i==0) { strncpy(depthExtension,"pnm",MAX_EXTENSION_PATH); } else
    if (i==1) { strncpy(depthExtension,"png",MAX_EXTENSION_PATH); } else
-   if (i==2) { strncpy(depthExtension,"jpg",MAX_EXTENSION_PATH); }
+   if (i==2) { strncpy(depthExtension,"jpg",MAX_EXTENSION_PATH); } else
+   if (i==2) { strncpy(depthExtension,"jps",MAX_EXTENSION_PATH); }
 
    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , startingFrame , readFromDir , depthExtension );
    if ( FileExists(file_name_test) ) { depthSet=1; break; }

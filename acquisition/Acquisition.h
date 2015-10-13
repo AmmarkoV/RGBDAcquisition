@@ -313,6 +313,30 @@ int acquisitionUnloadPlugin(ModuleIdentifier moduleID);
 int acquisitionMayBeVirtualDevice(ModuleIdentifier moduleID,DeviceIdentifier devID , char * devName);
 
 
+
+
+/**
+ * @brief  Enable a stream of the acquisition pipeline..
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param streamID , An integer value typically 0=RGB / 1=Depth
+ * @retval 1=Yes , 0=No
+ */
+int acquisitionEnableStream(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int streamID);
+
+
+/**
+ * @brief  Disable a stream of the acquisition pipeline , you might want to do this prior to starting streams with not depth for example..
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param streamID , An integer value typically 0=RGB / 1=Depth
+ * @retval 1=Yes , 0=No
+ */
+int acquisitionDisableStream(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int streamID);
+
+
 /**
  * @brief  Initialize a module , the module will be automatically loaded and get ready for a subsequent acquisitionOpenDevice call
  * @ingroup acquisitionCore

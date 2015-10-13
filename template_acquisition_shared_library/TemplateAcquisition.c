@@ -61,7 +61,9 @@ struct TemplateVirtualDevice
  unsigned short * templateDepthFrame;
 
  struct calibration calibRGB;
+ unsigned int disableRGBStream;
  struct calibration calibDepth;
+ unsigned int disableDepthStream;
 
 };
 
@@ -117,6 +119,21 @@ int setTemplateDepthCalibration(int devID,struct calibration * calib)
 #endif
 
 
+
+
+int enableTemplateStream(int devID,unsigned int streamID)
+{
+    if (streamID==0) { device[devID].disableRGBStream=0; } else
+    if (streamID==1) { device[devID].disableDepthStream=0; }
+    return 1;
+}
+
+int disableTemplateStream(int devID,unsigned int streamID)
+{
+    if (streamID==0) { device[devID].disableRGBStream=1; } else
+    if (streamID==1) { device[devID].disableDepthStream=1; }
+    return 1;
+}
 
 
 
@@ -280,7 +297,15 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
    #endif // USE_CODEC_LIBRARY
   }
 
-  device[devID].intialized = ((device[devID].templateColorFrame!=0)&& (device[devID].templateDepthFrame!=0)&& (failedStream==0));
+
+  if ( (device[devID].disableRGBStream) )  { fprintf(stderr,GREEN "RGB Stream is disabled so we will take that into account \n" NORMAL); }
+  if ( (device[devID].disableDepthStream) )  { fprintf(stderr,GREEN "Depth Stream is disabled so we will take that into account \n" NORMAL); }
+
+  device[devID].intialized = (
+                               ( (device[devID].templateColorFrame!=0) || (device[devID].disableRGBStream) )&&
+                               ( (device[devID].templateDepthFrame!=0) || (device[devID].disableDepthStream) ) &&
+                               (failedStream==0)
+                             );
 
 
   return device[devID].intialized;

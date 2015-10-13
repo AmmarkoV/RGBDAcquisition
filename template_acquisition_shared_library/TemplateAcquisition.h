@@ -25,6 +25,10 @@ extern "C"
    #define BUILD_TEMPLATE 1
 
    #if BUILD_TEMPLATE
+
+   int enableTemplateStream(int devID,unsigned int streamID);
+   int disableTemplateStream(int devID,unsigned int streamID);
+
    int getTemplateNumberOfDevices(); // This has to be called AFTER startTemplate
    int stopTemplateModule();
 

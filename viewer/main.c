@@ -366,6 +366,12 @@ int main(int argc, char *argv[])
 
   if (framerate==0) { fprintf(stderr,"Zero is an invalid value for framerate , using 1\n"); framerate=1; }
 
+
+
+  if (drawColor==0) { acquisitionDisableStream(moduleID,devID,0); }
+  if (drawDepth==0) { acquisitionDisableStream(moduleID,devID,1); }
+
+
   if (!acquisitionIsModuleAvailiable(moduleID))
    {
        fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");

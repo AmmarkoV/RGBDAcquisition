@@ -652,6 +652,28 @@ int acquisitionMayBeVirtualDevice(ModuleIdentifier moduleID,DeviceIdentifier dev
   return 0;
 }
 
+
+
+
+int acquisitionEnableStream(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int streamID)
+{
+    printCall(moduleID,0,"acquisitionEnableStream", __FILE__, __LINE__);
+    if (plugins[moduleID].enableStream!=0) { return (*plugins[moduleID].enableStream) (devID,streamID); }
+    MeaningfullWarningMessage(moduleID,0,"acquisitionEnableStream");
+    return 0;
+}
+
+int acquisitionDisableStream(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int streamID)
+{
+    printCall(moduleID,0,"acquisitionDisableStream", __FILE__, __LINE__);
+    fprintf(stderr,"acquisitionDisableStream called\n");
+    if (plugins[moduleID].disableStream!=0) { return (*plugins[moduleID].disableStream) (devID,streamID); }
+    MeaningfullWarningMessage(moduleID,0,"acquisitionDisableStream");
+    return 0;
+}
+
+
+
 /*! ------------------------------------------
     FRAME SNAPPING MECHANISMS FOR MODULES..
    ------------------------------------------*/
