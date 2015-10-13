@@ -120,7 +120,6 @@ int setTemplateDepthCalibration(int devID,struct calibration * calib)
 
 
 
-
 int enableTemplateStream(int devID,unsigned int streamID)
 {
     if (streamID==0) { device[devID].disableRGBStream=0; } else
@@ -297,14 +296,13 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
    #endif // USE_CODEC_LIBRARY
   }
 
-
   if ( (device[devID].disableRGBStream) )  { fprintf(stderr,GREEN "RGB Stream is disabled so we will take that into account \n" NORMAL); }
   if ( (device[devID].disableDepthStream) )  { fprintf(stderr,GREEN "Depth Stream is disabled so we will take that into account \n" NORMAL); }
 
   device[devID].intialized = (
                                ( (device[devID].templateColorFrame!=0) || (device[devID].disableRGBStream) )&&
                                ( (device[devID].templateDepthFrame!=0) || (device[devID].disableDepthStream) ) &&
-                               (failedStream==0)
+                               ( (failedStream==0) || (device[devID].disableRGBStream) || (device[devID].disableDepthStream) )
                              );
 
 

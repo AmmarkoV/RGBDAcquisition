@@ -166,7 +166,9 @@ void * linkFunction(ModuleIdentifier moduleID,char * functionName,char * moduleN
   char functionNameStr[1024]={0};
   sprintf(functionNameStr,functionName,moduleName);
   void * linkPtr = dlsym(plugins[moduleID].handle, functionNameStr );
-  if ((error = dlerror()) != NULL)  { fprintf (stderr, YELLOW "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+  if ((error = dlerror()) != NULL)
+     { fprintf (stderr, YELLOW "Could not find a definition of %s : %s\n" NORMAL ,functionNameStr ,  error); }
+     //else { fprintf (stderr, GREEN "Found %s \n" NORMAL ,functionNameStr ); }
 
   return linkPtr;
 }
@@ -207,8 +209,7 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
   plugins[moduleID].createDevice = linkFunction(moduleID,"create%sDevice",moduleName);
   plugins[moduleID].destroyDevice  = linkFunction(moduleID,"destroy%sDevice",moduleName);
 
-
-  plugins[moduleID].enableStream = linkFunction(moduleID,"enable%sStream",moduleName);
+  plugins[moduleID].enableStream  = linkFunction(moduleID,"enable%sStream",moduleName);
   plugins[moduleID].disableStream = linkFunction(moduleID,"disable%sStream",moduleName);
 
   plugins[moduleID].getNumberOfDevices = linkFunction(moduleID,"get%sNumberOfDevices",moduleName);

@@ -62,7 +62,7 @@ struct acquisitionPluginInterface
    int (*snapFrames) (int);
 
 
-   int (*enableStream) (int,unsigned int);
+   int (*enableStream)  (int,unsigned int);
    int (*disableStream) (int,unsigned int);
 
    int (*getTotalFrameNumber)  (int);

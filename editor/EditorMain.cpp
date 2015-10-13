@@ -57,6 +57,8 @@ unsigned int overlayFramesExist=0;
 unsigned char * overlayRGB=0;
 unsigned short * overlayDepth=0;
 
+unsigned int ignoreColor=0;
+unsigned int ignoreDepth=0;
 
 
 unsigned int segmentedFramesExist=0;
@@ -369,6 +371,10 @@ int EditorFrame::initializeOverlay(char * pathForSceneFile)
 {
    if ( acquisitionStartModule(overlayModule,16 /*maxDevices*/ , 0 ) )
    {
+
+     if ( ignoreColor ) { acquisitionDisableStream(overlayModule,overlayDevice,0); }
+     if ( ignoreDepth ) { acquisitionDisableStream(overlayModule,overlayDevice,1); }
+
      if ( acquisitionOpenDevice(overlayModule,overlayDevice,pathForSceneFile,width,height,fps) )
      {
         overlayFramesExist=1;
@@ -431,6 +437,7 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
         //return 1;
     }
 
+
    //We need to initialize our module before calling any related calls to the specific module..
    if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
    {
@@ -438,6 +445,8 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
        //return 1;
     }
 
+  if ( ignoreColor ) { acquisitionDisableStream(moduleID,devID,0); }
+  if ( ignoreDepth ) { acquisitionDisableStream(moduleID,devID,1); }
 
    if (fps!=0) { Timer.Stop(); Timer.Start((unsigned int) 1000/fps, false); }
 

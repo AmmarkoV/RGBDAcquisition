@@ -666,7 +666,6 @@ int acquisitionEnableStream(ModuleIdentifier moduleID,DeviceIdentifier devID,uns
 int acquisitionDisableStream(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int streamID)
 {
     printCall(moduleID,0,"acquisitionDisableStream", __FILE__, __LINE__);
-    fprintf(stderr,"acquisitionDisableStream called\n");
     if (plugins[moduleID].disableStream!=0) { return (*plugins[moduleID].disableStream) (devID,streamID); }
     MeaningfullWarningMessage(moduleID,0,"acquisitionDisableStream");
     return 0;

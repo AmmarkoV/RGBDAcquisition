@@ -71,6 +71,7 @@ unsigned int moveWindowX=0,moveWindowY=0,doMoveWindow=0;
 unsigned int windowX=0,windowY=0;
 unsigned int drawColor=1;
 unsigned int drawDepth=1;
+unsigned int noinput=0;
 
 char inputname[512]={0};
 unsigned int frameNum=0;
@@ -143,6 +144,9 @@ void closeEverything()
 int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int framerate)
 {
     //GIVE TIME FOR REDRAW EVENTS ETC -------------------------------------------------------------------------
+
+    if (!noinput)
+    {
     float msWaitTime = ((float) 1000/framerate) ;
     int key = cvWaitKey(msWaitTime/3);
     if (key != -1)
@@ -170,6 +174,10 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 				}
 			}
 
+    } else
+    {
+     cvWaitKey(1);
+    }
 
 
     unsigned int colorWidth = 640;
@@ -290,6 +298,12 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+
+
+    if (strcmp(argv[i],"-noinput")==0) {
+                                         fprintf(stderr,"Disabling user input\n");
+                                         noinput=1;
+                                        } else
     if (strcmp(argv[i],"-resolution")==0) {
                                              width=atoi(argv[i+1]);
                                              height=atoi(argv[i+2]);
@@ -368,8 +382,6 @@ int main(int argc, char *argv[])
 
 
 
-  if (drawColor==0) { acquisitionDisableStream(moduleID,devID,0); }
-  if (drawDepth==0) { acquisitionDisableStream(moduleID,devID,1); }
 
 
   if (!acquisitionIsModuleAvailiable(moduleID))
@@ -384,6 +396,10 @@ int main(int argc, char *argv[])
        fprintf(stderr,"Could not start module %s ..\n",getModuleNameFromModuleID(moduleID));
        return 1;
    }
+
+  if (drawColor==0) { acquisitionDisableStream(moduleID,devID,0); }
+  if (drawDepth==0) { acquisitionDisableStream(moduleID,devID,1); }
+
 
   //We want to check if deviceID we requested is a logical value , or we dont have that many devices!
   unsigned int maxDevID=acquisitionGetModuleDevices(moduleID);
@@ -435,7 +451,10 @@ int main(int argc, char *argv[])
       //Create a window
        cvNamedWindow(RGBwindowName, 1);
       //set the callback function for any mouse event
-       cvSetMouseCallback(RGBwindowName, CallBackFunc, NULL);
+       if (!noinput)
+        {
+         cvSetMouseCallback(RGBwindowName, CallBackFunc, NULL);
+        }
      #endif
 
    while ( (!stop) && ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) ) )
