@@ -384,9 +384,13 @@ int acquisitionSaveLocationStamp(char * filename)
 
     if (fd!=0)
     {
+     fprintf(fd,"Sats(%u)\n",sattelitesUsed());
      fprintf(fd,"Alt(%0.5f)\n",getAlt());
      fprintf(fd,"Lat(%0.5f)\n",getLat());
      fprintf(fd,"Lon(%0.5f)\n",getLon());
+     fprintf(fd,"Speed(%0.5f)\n",getSpeed());
+     fprintf(fd,"Climb(%0.5f)\n",getClimb());
+     fprintf(fd,"Bearing(%0.5f)\n",getBearing());
 
      fflush(fd);
      fclose(fd);

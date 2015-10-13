@@ -226,6 +226,27 @@ double getLon()
  return gpsdata.fix.longitude;
 }
 
+
+
+double getSpeed()
+{
+ if (!working) { return 0.0; }
+ return gpsdata.fix.speed;
+}
+
+
+double getClimb()
+{
+ if (!working) { return 0.0; }
+ return gpsdata.fix.climb;
+}
+
+double getBearing()
+{
+ if (!working) { return 0.0; }
+ return gpsdata.fix.track;
+}
+
 int fixTypeIs3D()
 {
  if (!working) { return 0; }
