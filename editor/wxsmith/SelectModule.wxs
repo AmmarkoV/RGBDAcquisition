@@ -2,12 +2,12 @@
 <wxsmith>
 	<object class="wxDialog" name="SelectModule">
 		<title>Select Used Module</title>
-		<size>297,217</size>
+		<size>297,226</size>
 		<pos_arg>1</pos_arg>
 		<size_arg>1</size_arg>
 		<object class="wxButton" name="ID_BUTTON1" variable="ButtonStartModule" member="yes">
 			<label>Start Module</label>
-			<pos>24,152</pos>
+			<pos>24,160</pos>
 			<size>128,27</size>
 			<handler function="OnButtonStartModuleClick" entry="EVT_BUTTON" />
 		</object>
@@ -69,7 +69,7 @@
 		</object>
 		<object class="wxButton" name="ID_BUTTON2" variable="ButtonCancel" member="yes">
 			<label>Cancel</label>
-			<pos>184,152</pos>
+			<pos>184,160</pos>
 			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxComboBox" name="ID_COMBOBOX2" variable="ComboBoxDevice" member="yes">
@@ -80,6 +80,16 @@
 			<pos>88,56</pos>
 			<style>wxCB_SORT|wxTE_PROCESS_ENTER</style>
 			<handler function="OnComboBoxDeviceSelected" entry="EVT_COMBOBOX" />
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxColorStream" member="yes">
+			<label>Color Stream</label>
+			<checked>1</checked>
+			<pos>24,128</pos>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX2" variable="CheckBoxDepthStream" member="yes">
+			<label>Depth Stream</label>
+			<checked>1</checked>
+			<pos>160,128</pos>
 		</object>
 	</object>
 </wxsmith>

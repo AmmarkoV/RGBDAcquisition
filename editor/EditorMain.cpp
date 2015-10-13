@@ -419,6 +419,9 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
                      moduleSelectorFrame->fpsSelected
                      );
 
+   ignoreColor = moduleSelectorFrame->ignoreColor;
+   ignoreDepth = moduleSelectorFrame->ignoreDepth;
+
    moduleID = moduleSelectorFrame->moduleSelected;
    devID = moduleSelectorFrame->deviceSelected;
    width = moduleSelectorFrame->widthSelected;

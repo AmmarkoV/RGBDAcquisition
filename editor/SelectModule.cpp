@@ -26,6 +26,8 @@ const long SelectModule::ID_TEXTCTRL4 = wxNewId();
 const long SelectModule::ID_STATICTEXT6 = wxNewId();
 const long SelectModule::ID_BUTTON2 = wxNewId();
 const long SelectModule::ID_COMBOBOX2 = wxNewId();
+const long SelectModule::ID_CHECKBOX1 = wxNewId();
+const long SelectModule::ID_CHECKBOX2 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectModule,wxDialog)
@@ -37,9 +39,9 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 {
 	//(*Initialize(SelectModule)
 	Create(parent, id, _("Select Used Module"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
-	SetClientSize(wxSize(297,217));
+	SetClientSize(wxSize(297,226));
 	Move(wxDefaultPosition);
-	ButtonStartModule = new wxButton(this, ID_BUTTON1, _("Start Module"), wxPoint(24,152), wxSize(128,27), 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	ButtonStartModule = new wxButton(this, ID_BUTTON1, _("Start Module"), wxPoint(24,160), wxSize(128,27), 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Module : "), wxPoint(24,22), wxSize(64,24), 0, _T("ID_STATICTEXT1"));
 	ComboBoxModule = new wxComboBox(this, ID_COMBOBOX1, wxEmptyString, wxPoint(88,16), wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_COMBOBOX1"));
 	ComboBoxModule->Append(_("NONE"));
@@ -59,10 +61,14 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("@"), wxPoint(192,104), wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	TextCtrlFPS = new wxTextCtrl(this, ID_TEXTCTRL4, _("30"), wxPoint(216,100), wxSize(40,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("fps"), wxPoint(264,104), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
-	ButtonCancel = new wxButton(this, ID_BUTTON2, _("Cancel"), wxPoint(184,152), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	ButtonCancel = new wxButton(this, ID_BUTTON2, _("Cancel"), wxPoint(184,160), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	ComboBoxDevice = new wxComboBox(this, ID_COMBOBOX2, wxEmptyString, wxPoint(88,56), wxDefaultSize, 0, 0, wxCB_SORT|wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_COMBOBOX2"));
 	ComboBoxDevice->Append(wxEmptyString);
 	ComboBoxDevice->Append(_("Plugin Not Availiable"));
+	CheckBoxColorStream = new wxCheckBox(this, ID_CHECKBOX1, _("Color Stream"), wxPoint(24,128), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	CheckBoxColorStream->SetValue(true);
+	CheckBoxDepthStream = new wxCheckBox(this, ID_CHECKBOX2, _("Depth Stream"), wxPoint(160,128), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	CheckBoxDepthStream->SetValue(true);
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectModule::OnButtonStartModuleClick);
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_SELECTED,(wxObjectEventFunction)&SelectModule::OnComboBoxModuleSelected);
@@ -83,6 +89,9 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
  widthSelected=640;
  heightSelected=480;
  fpsSelected=60;
+
+ ignoreColor=0;
+ ignoreDepth=0;
 
   selectionMade=0;
   ReloadDevicesForSelectedModule();
@@ -105,6 +114,11 @@ void SelectModule::OnButtonStartModuleClick(wxCommandEvent& event)
   if (TextCtrlWidth->GetValue().ToLong(&value)) {  this->widthSelected = value; }
   if (TextCtrlHeight->GetValue().ToLong(&value)) {  this->heightSelected = value; }
   if (TextCtrlFPS->GetValue().ToLong(&value)) {  this->fpsSelected = value; }
+
+
+  if ( CheckBoxColorStream->IsChecked() ) { ignoreColor=0; } else { ignoreColor=1; }
+  if ( CheckBoxDepthStream->IsChecked() ) { ignoreDepth=0; } else { ignoreDepth=1; }
+
 
   wxString mystring = ComboBoxDevice->GetValue();
   strcpy( this->deviceNameSelected ,  mystring.mb_str() );

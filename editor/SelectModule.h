@@ -3,6 +3,7 @@
 
 //(*Headers(SelectModule)
 #include <wx/combobox.h>
+#include <wx/checkbox.h>
 #include <wx/dialog.h>
 #include <wx/button.h>
 #include <wx/stattext.h>
@@ -25,12 +26,17 @@ class SelectModule: public wxDialog
 		unsigned int heightSelected;
 		unsigned int fpsSelected;
 
+        unsigned int ignoreColor;
+        unsigned int ignoreDepth;
+
 		char deviceNameSelected[512];
 
         int selectionMade ;
 		//(*Declarations(SelectModule)
 		wxTextCtrl* TextCtrlFPS;
 		wxTextCtrl* TextCtrlHeight;
+		wxCheckBox* CheckBoxColorStream;
+		wxCheckBox* CheckBoxDepthStream;
 		wxStaticText* StaticText1;
 		wxButton* ButtonStartModule;
 		wxStaticText* StaticText3;
@@ -60,6 +66,8 @@ class SelectModule: public wxDialog
 		static const long ID_STATICTEXT6;
 		static const long ID_BUTTON2;
 		static const long ID_COMBOBOX2;
+		static const long ID_CHECKBOX1;
+		static const long ID_CHECKBOX2;
 		//*)
 
 	private:

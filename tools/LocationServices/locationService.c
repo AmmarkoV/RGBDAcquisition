@@ -166,7 +166,7 @@ int startLocationServices()
     unsigned int flags = WATCH_ENABLE;
 
     if (gps_open("127.0.0.1" , "2947", &gpsdata) != 0)
-        { fprintf(stderr,"no gpsd running or network error: %d, %s\n", errno, gps_errstr(errno)); return 0; }
+        { fprintf(stderr,"LoacationService : no gpsd running or network error: %d, %s\n", errno, gps_errstr(errno)); return 0; }
 
     if (source.device != NULL)
 	flags |= WATCH_DEVICE;
