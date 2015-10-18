@@ -113,7 +113,7 @@ int doStereoSplit(
   {
   fprintf(stderr,"Stereo Split 3 \n");
    sprintf(outfilename,"%s/colorFrame_0_%05u.pnm",outputfoldername,frameNum);
-   acquisitionSaveRawImageToFile(outfilename,ss,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+   acquisitionSaveRawImageToFile(outfilename,ss,newWidth,newHeight,channelsRGB,bitsperpixelRGB);
    free(ss);
   }
 
@@ -130,7 +130,7 @@ int doStereoSplit(
   if (ss!=0)
   {
    sprintf(outfilename,"%s/colorFrame_1_%05u.pnm",outputfoldername,frameNum);
-   acquisitionSaveRawImageToFile(outfilename,ss,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+   acquisitionSaveRawImageToFile(outfilename,ss,newWidth,newHeight,channelsRGB,bitsperpixelRGB);
    free(ss);
   }
 

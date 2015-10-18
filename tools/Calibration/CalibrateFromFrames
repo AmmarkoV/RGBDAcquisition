@@ -29,6 +29,7 @@ rm *.jpg
 
 
 FILES=$DIR_WITH_FRAMES/*
+echo "Detected Files $FILES"
 COUNTER=0
 for f in $FILES
 do
