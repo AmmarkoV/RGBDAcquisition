@@ -379,6 +379,8 @@ int acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels , unsig
 int acquisitionSaveLocationStamp(char * filename)
 {
    #if ENABLE_LOCATION_SERVICE
+   if (locationServicesOK())
+   {
     FILE *fd=0;
     fd = fopen(filename,"w");
 
@@ -396,6 +398,10 @@ int acquisitionSaveLocationStamp(char * filename)
      fclose(fd);
     }
     return 1;
+   } else
+   {
+    return 0;
+   }
    #else
     return 0;
    #endif

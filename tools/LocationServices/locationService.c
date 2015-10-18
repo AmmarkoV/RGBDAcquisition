@@ -18,6 +18,18 @@
 
 #include <gps.h>
 
+
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
 #define SOCKET_EXPORT_ENABLE 1
 
 struct fixsource_t
@@ -108,25 +120,6 @@ static int socket_mainloop(void)
  **************************************************************************/
 
 
-int getAFirstPoll()
-{
- if (!working) { return 0; }
-
-  if (!gps_waiting(&gpsdata, 5000000))
-     {
-	    fprintf(stderr, "LoacationService : error while waiting\n");
-         return 0;
-     } else
-	 {
-	     fprintf(stderr,"!");
-	    (void)gps_read(&gpsdata);
-	    // This is not needed => //conditionally_log_fix(&gpsdata);
-        return 1;
-	 }
-
- return 0;
-}
-
 
 int pollLocationServices()
 {
@@ -172,15 +165,35 @@ int startLocationServices()
 	flags |= WATCH_DEVICE;
     gps_stream(&gpsdata, flags, source.device);
 
+
+    fprintf(stderr,MAGENTA "Polling location services to determine if they will be used in this run : \n" NORMAL);
+    unsigned int tries=3;
     unsigned int success=0;
     unsigned int i=0;
-    for (i=0; i<3; i++)
+    working=1; //lets assume that we are working so that  pollLocationServices will work
+    for (i=0; i<tries; i++)
     {
-        success+=getAFirstPoll();
+        success+=pollLocationServices();
+        usleep(1000*1000);
     }
 
- working=1;
- return 1;
+    if (success==0)
+    {
+     fprintf(stderr,RED "Location services failed to provide gps coordinates beeing switched off\n" NORMAL);
+     working=0;
+    } else
+    if (success<tries)
+    {
+     fprintf(stderr,YELLOW "Location services failed to provide gps coordinates beeing switched off\n" NORMAL);
+     working=1;
+    } else
+    if (success==tries)
+    {
+     fprintf(stderr,GREEN "Location services working fine.. :) \n" NORMAL);
+     working=1;
+    }
+
+ return working;
 }
 
 
@@ -193,18 +206,15 @@ int stopLocationServices()
 return 1;
 }
 
+int locationServicesOK()
+{
+  return working;
+}
 
 unsigned int sattelitesUsed()
 {
  if (!working) { return 0; }
  return gpsdata.satellites_used;
-}
-
-double getSpeed()
-{
-  /* may not be worth logging if we've moved only a very short distance */
- //  return earth_distance( gpsdata.fix.latitude, gpsdata.fix.longitude, old_lat, old_lon);
- return 0;
 }
 
 

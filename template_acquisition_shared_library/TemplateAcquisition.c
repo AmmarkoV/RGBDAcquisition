@@ -305,6 +305,10 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                                ( (failedStream==0) || (device[devID].disableRGBStream) || (device[devID].disableDepthStream) )
                              );
 
+   if (!device[devID].intialized)
+   {
+     fprintf(stderr,"Consider running with -noColor or -noDepth if a missing stream is the problem \n");
+   }
 
   return device[devID].intialized;
 }

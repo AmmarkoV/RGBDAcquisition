@@ -14,7 +14,7 @@
 #include "../acquisition/Acquisition.h"
 #include "../acquisitionSegment/AcquisitionSegment.h"
 
-
+int stereoSplit=0;
 int calibrationSet = 0;
 char calibrationFile[2048]={0};
 struct calibration calib;
@@ -82,6 +82,25 @@ unsigned short * copyDepth(unsigned short * source , unsigned int width , unsign
 
 
 
+
+int doStereoSplit(
+                  unsigned int frameNum,
+                  unsigned char * rgb,
+                  unsigned int widthRGB,
+                  unsigned int heightRGB,
+                  unsigned int channelsRGB,
+                  unsigned int bitsperpixelRGB,
+                  unsigned long colorTimestamp
+                  )
+{
+  acquisitionSimulateTime( colorTimestamp );
+  acquisitionSaveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+
+}
+
+
+
+
 int main(int argc, char *argv[])
 {
  fprintf(stderr,"Generic Multiplexed Grabber Application based on Acquisition lib .. \n");
@@ -138,6 +157,9 @@ int main(int argc, char *argv[])
      if ( (strcmp(argv[i],"-onlyColor")==0)||
           (strcmp(argv[i],"-noDepth")==0)) {
                                                segConfDepth.saveDepth = 0;
+                                           } else
+    if (strcmp(argv[i],"-stereoSplit")==0) {
+                                             stereoSplit=1;
                                            } else
     if (strcmp(argv[i],"-calibration")==0) {
                                              calibrationSet=1;
@@ -254,6 +276,19 @@ int main(int argc, char *argv[])
         unsigned long depthTimestamp = acquisitionGetDepthTimestamp(moduleID_1,devID_1);
         unsigned short * segmentedDepth = copyDepth(acquisitionGetDepthFrame(moduleID_1,devID_1) ,widthDepth , heightDepth);
 
+        if (stereoSplit)
+        {
+          doStereoSplit(
+                         frameNum,
+                         segmentedRGB  ,
+                         widthRGB,
+                         heightRGB,
+                         channelsRGB ,
+                         bitsperpixelRGB,
+                         colorTimestamp
+                        );
+        } else
+        {
         segmentRGBAndDepthFrame (
                                    segmentedRGB ,
                                    segmentedDepth ,
@@ -282,6 +317,7 @@ int main(int argc, char *argv[])
           acquisitionSaveRawImageToFile(outfilename,(unsigned char*) segmentedDepth,widthDepth,heightDepth,channelsDepth,bitsperpixelDepth);
          }
         }
+       }
 
        free (segmentedRGB);
        free (segmentedDepth);

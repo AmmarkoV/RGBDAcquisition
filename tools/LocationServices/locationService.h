@@ -10,6 +10,7 @@ int startLocationServices();
 int stopLocationServices();
 int pollLocationServices();
 
+int locationServicesOK();
 
 unsigned int sattelitesUsed();
 

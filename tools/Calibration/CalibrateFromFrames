@@ -1,14 +1,19 @@
 #!/bin/bash
  
+clear
+
 IMAGELISTFILENAME="imageList"
 
 DIR_WITH_FRAMES="./"
-if [ $# -ne 1 ]
+if [ $# -ne 4 ]
 then 
   echo "Please provide a path argument to the path that contains the directory with your frames"
+  exit 0
 else
  DIR_WITH_FRAMES=$1 
 fi
+
+echo "Frame Directory $DIR_WITH_FRAMES"
 
  
 STARTDIR=`pwd`
@@ -33,6 +38,8 @@ do
      echo "Processing $f file..."
      convert $f "$TEMPDIR/$COUNTER.jpg"
      COUNTER=$[$COUNTER +1]
+     else
+     echo "Unknown $f file..."  
     fi
 
     if [ $COUNTER -gt 80 ] 
@@ -55,7 +62,7 @@ fi
 
 ln -s $DIR/calibration
 
-./calibration -w 6 -h 9 -s 0.02 -oe -o colorCalibration $IMAGELISTFILENAME
+./calibration -w $2 -h $3 -s $4 -oe -o colorCalibration $IMAGELISTFILENAME
 
 #../ExtrinsicCalibration/extrinsicCalibration -w 6 -h 9 -s 0.02 -c colorCalibration -i $DIR_WITH_FRAMES/colorFrame_0_00000.pnm
 

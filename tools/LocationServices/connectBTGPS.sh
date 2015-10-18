@@ -6,7 +6,7 @@ sudo service gpsd stop
 sudo killall gpsd
 
 #sudo rfcomm connect 0 00:19:EF:11:16:ED
-sudo rfcomm connect 0 44:6D:6C:17:3A:13 #connect to mobile
+#sudo rfcomm connect 0 44:6D:6C:17:3A:13 #connect to mobile
 
 sudo bypassBTBS.sh /dev/rfcomm0&
 #sudo usermod -a -G dialout ammar
