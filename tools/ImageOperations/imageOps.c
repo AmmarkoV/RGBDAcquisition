@@ -507,9 +507,9 @@ int bitbltRGBDebugMode(unsigned char * target,  unsigned int tX,  unsigned int t
   {
     for (x=0; x<width; x++)
     {
-      target[ ((tX+x*3) + (tY+y*targetWidth*3)) + 0  ]  =source[ ((sX+x*3) + (sY+y*sourceWidth*3)) + 0];
-      target[ ((tX+x*3) + (tY+y*targetWidth*3)) + 1  ]  =source[ ((sX+x*3) + (sY+y*sourceWidth*3)) + 1];
-      target[ ((tX+x*3) + (tY+y*targetWidth*3)) + 2  ]  =source[ ((sX+x*3) + (sY+y*sourceWidth*3)) + 2];
+      target[ ((tX+x*3) + (tY+y*targetWidth*3)) + 0  ] = source[ ((sX+x*3) + (sY+y*sourceWidth*3)) + 0];
+      target[ ((tX+x*3) + (tY+y*targetWidth*3)) + 1  ] = source[ ((sX+x*3) + (sY+y*sourceWidth*3)) + 1];
+      target[ ((tX+x*3) + (tY+y*targetWidth*3)) + 2  ] = source[ ((sX+x*3) + (sY+y*sourceWidth*3)) + 2];
     }
   }
  return 1;

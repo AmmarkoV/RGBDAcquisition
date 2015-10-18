@@ -15,6 +15,10 @@ int mixbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
               unsigned int width , unsigned int height);
 
 
+int bitbltRGBDebugMode(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
+                       unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
+                       unsigned int width , unsigned int height);
+
 int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
               unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
               unsigned int width , unsigned int height);

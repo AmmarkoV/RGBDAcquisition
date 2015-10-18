@@ -14,6 +14,7 @@
 #include "../acquisition/Acquisition.h"
 #include "../acquisitionSegment/AcquisitionSegment.h"
 
+unsigned int seekFrame=0;
 int stereoSplit=0;
 int calibrationSet = 0;
 char calibrationFile[2048]={0};
@@ -94,29 +95,38 @@ int doStereoSplit(
                   char * outputfoldername
                   )
 {
+ fprintf(stderr,"Stereo Split \n");
+  if (rgb==0) { return 0; }
   acquisitionSimulateTime( colorTimestamp );
 
   char outfilename[512]={0};
+ fprintf(stderr,"Stereo Split 2 \n");
+
   unsigned int newWidth=widthRGB;
   unsigned int newHeight=heightRGB;
   unsigned char* ss = splitStereo(rgb,
+                                  0,
                                   &newWidth,
-                                  &newHeight,
-                                  0);
+                                  &newHeight
+                                 );
   if (ss!=0)
   {
+  fprintf(stderr,"Stereo Split 3 \n");
    sprintf(outfilename,"%s/colorFrame_0_%05u.pnm",outputfoldername,frameNum);
    acquisitionSaveRawImageToFile(outfilename,ss,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
    free(ss);
   }
 
 
+  fprintf(stderr,"Stereo Split 4 \n");
+
   newWidth=widthRGB;
   newHeight=heightRGB;
   ss = splitStereo(rgb,
+                   0,
                    &newWidth,
-                   &newHeight,
-                   0);
+                   &newHeight
+                   );
   if (ss!=0)
   {
    sprintf(outfilename,"%s/colorFrame_1_%05u.pnm",outputfoldername,frameNum);
@@ -224,6 +234,11 @@ int main(int argc, char *argv[])
           }
          }
        else
+    if (strcmp(argv[i],"-seek")==0)      {
+                                           seekFrame=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting seek to %u \n",seekFrame);
+                                         }
+       else
     if (
         (strcmp(argv[i],"-from")==0) ||
         (strcmp(argv[i],"-i")==0)
@@ -257,6 +272,11 @@ int main(int argc, char *argv[])
 
    char * devName = inputname;
    if (strlen(inputname)<1) { devName=0; }
+
+      if (seekFrame!=0)
+      {
+          acquisitionSeekFrame(moduleID_1,devID_1,seekFrame);
+      }
 
     //Initialize Every OpenNI Device
     acquisitionOpenDevice(moduleID_1,devID_1,devName,640,480,25);
@@ -354,8 +374,8 @@ int main(int argc, char *argv[])
         }
        }
 
-       free (segmentedRGB);
-       free (segmentedDepth);
+       if (segmentedRGB!=0) { free (segmentedRGB); }
+       if(segmentedDepth!=0) { free (segmentedDepth); }
 
 
        acquisitionStopTimer(0);

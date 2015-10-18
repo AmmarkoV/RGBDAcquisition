@@ -23,24 +23,29 @@ unsigned char * splitStereo(unsigned char * source ,
                             unsigned int * height
                            )
 {
- unsigned int newWidth = *width/2;
- unsigned int newHeight = *height/2;
+ unsigned int originalWidth = *width;
+ unsigned int originalHeight = *height;
+ unsigned int newWidth = originalWidth /2;
+ unsigned int newHeight = originalHeight;
  unsigned char * newSplitBuffer = (unsigned char* ) malloc(sizeof(unsigned char) * newWidth * newHeight * 3);
 
-
+ fprintf(stderr,"splitStereo (%u,%u -> %u,%u)  .. ",originalWidth , originalHeight, newWidth,newHeight);
  if (newSplitBuffer!=0)
  {
   if (feed==0)
   {
-   bitbltRGB(newSplitBuffer,0,0,newWidth,newHeight,
-             source,0,0,*width,*height,
+   //bitbltRGBDebugMode
+   //bitbltRGB
+   bitbltRGBDebugMode(newSplitBuffer,0,0,newWidth,newHeight,
+             source,0,0,originalWidth,originalHeight,
              newWidth,newHeight);
   } else
   {
-   bitbltRGB(newSplitBuffer,0,0,newWidth,newHeight,
-             source,newWidth,0,*width,*height,
+   bitbltRGBDebugMode(newSplitBuffer,0,0,newWidth,newHeight,
+             source,newWidth,0,originalWidth,originalHeight,
              newWidth,newHeight);
   }
+ fprintf(stderr,"survived bitblt\n");
 
   *width=newWidth;
   *height=newHeight;
