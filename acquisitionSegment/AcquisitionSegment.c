@@ -14,6 +14,41 @@
 #include "../tools/AmMatrix/matrix4x4Tools.h"
 #include "../tools/AmMatrix/matrixCalculations.h"
 
+#include "../tools/ImageOperations/imageOps.h"
+
+
+unsigned char * splitStereo(unsigned char * source ,
+                            unsigned int feed,
+                            unsigned int * width ,
+                            unsigned int * height
+                           )
+{
+ unsigned int newWidth = *width/2;
+ unsigned int newHeight = *height/2;
+ unsigned char * newSplitBuffer = (unsigned char* ) malloc(sizeof(unsigned char) * newWidth * newHeight * 3);
+
+
+ if (newSplitBuffer!=0)
+ {
+  if (feed==0)
+  {
+   bitbltRGB(newSplitBuffer,0,0,newWidth,newHeight,
+             source,0,0,*width,*height,
+             newWidth,newHeight);
+  } else
+  {
+   bitbltRGB(newSplitBuffer,0,0,newWidth,newHeight,
+             source,newWidth,0,*width,*height,
+             newWidth,newHeight);
+  }
+
+  *width=newWidth;
+  *height=newHeight;
+ }
+
+ return newSplitBuffer;
+}
+
 
 unsigned char * segmentRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib,unsigned int * selectedPixels)
 {

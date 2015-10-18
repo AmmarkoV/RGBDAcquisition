@@ -14,6 +14,8 @@ add_library(AcquisitionSegment STATIC
             imageProcessing.h
             automaticPlaneSegmentation.c
             automaticPlaneSegmentation.h
+            ../tools/ImageOperations/imageOps.c
+            ../tools/ImageOperations/imageOps.h
             ../tools/Quasirandomness/quasirandomness.c
             ../tools/Quasirandomness/quasirandomness.h
             ../tools/AmMatrix/quaternions.c

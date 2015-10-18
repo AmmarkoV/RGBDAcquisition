@@ -90,12 +90,41 @@ int doStereoSplit(
                   unsigned int heightRGB,
                   unsigned int channelsRGB,
                   unsigned int bitsperpixelRGB,
-                  unsigned long colorTimestamp
+                  unsigned long colorTimestamp,
+                  char * outputfoldername
                   )
 {
   acquisitionSimulateTime( colorTimestamp );
-  acquisitionSaveRawImageToFile(outfilename,segmentedRGB,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
 
+  char outfilename[512]={0};
+  unsigned int newWidth=widthRGB;
+  unsigned int newHeight=heightRGB;
+  unsigned char* ss = splitStereo(rgb,
+                                  &newWidth,
+                                  &newHeight,
+                                  0);
+  if (ss!=0)
+  {
+   sprintf(outfilename,"%s/colorFrame_0_%05u.pnm",outputfoldername,frameNum);
+   acquisitionSaveRawImageToFile(outfilename,ss,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+   free(ss);
+  }
+
+
+  newWidth=widthRGB;
+  newHeight=heightRGB;
+  ss = splitStereo(rgb,
+                   &newWidth,
+                   &newHeight,
+                   0);
+  if (ss!=0)
+  {
+   sprintf(outfilename,"%s/colorFrame_1_%05u.pnm",outputfoldername,frameNum);
+   acquisitionSaveRawImageToFile(outfilename,ss,widthRGB,heightRGB,channelsRGB,bitsperpixelRGB);
+   free(ss);
+  }
+
+ return 1;
 }
 
 
@@ -159,6 +188,7 @@ int main(int argc, char *argv[])
                                                segConfDepth.saveDepth = 0;
                                            } else
     if (strcmp(argv[i],"-stereoSplit")==0) {
+                                             segConfDepth.saveDepth = 0;
                                              stereoSplit=1;
                                            } else
     if (strcmp(argv[i],"-calibration")==0) {
@@ -220,6 +250,10 @@ int main(int argc, char *argv[])
    }
    //We want to initialize all possible devices in this example..
 
+
+
+  if (segConfRGB.saveRGB==0) { acquisitionDisableStream(moduleID_1,devID_1,0); }
+  if (segConfDepth.saveDepth==0) { acquisitionDisableStream(moduleID_1,devID_1,1); }
 
    char * devName = inputname;
    if (strlen(inputname)<1) { devName=0; }
@@ -285,7 +319,8 @@ int main(int argc, char *argv[])
                          heightRGB,
                          channelsRGB ,
                          bitsperpixelRGB,
-                         colorTimestamp
+                         colorTimestamp,
+                         outputfoldername
                         );
         } else
         {

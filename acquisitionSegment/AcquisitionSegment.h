@@ -133,6 +133,13 @@ struct SegmentationFeaturesDepth
 
 
 
+unsigned char * splitStereo(unsigned char * source ,
+                            unsigned int feed,
+                            unsigned int * width ,
+                            unsigned int * height
+                           );
+
+
 /**
  * @brief  Allocate an array with width*height size that describes which pixels we our configuration keeps( set as ones ) and it discards ( set as zeros )
  * @ingroup acquisitionSegment
