@@ -128,10 +128,10 @@ int pollLocationServices()
   if (!gps_waiting(&gpsdata, 5000000))
      {
 	    fprintf(stderr, "LoacationService : error while waiting\n");
-         return 0;
+        return 0;
      } else
 	 {
-	     fprintf(stderr,"!");
+	    fprintf(stderr,"!");
 	    (void)gps_read(&gpsdata);
 	    // This is not needed => //conditionally_log_fix(&gpsdata);
         return 1;
@@ -167,6 +167,7 @@ int startLocationServices()
 
 
     fprintf(stderr,MAGENTA "Polling location services to determine if they will be used in this run : \n" NORMAL);
+    fprintf(stderr,MAGENTA "If you don't want to wait use `sudo service gpsd stop`\n" NORMAL);
     unsigned int tries=3;
     unsigned int success=0;
     unsigned int i=0;

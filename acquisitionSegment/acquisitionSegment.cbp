@@ -82,6 +82,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../tools/AmMatrix/solveLinearSystemGJ.h" />
+		<Unit filename="../tools/ImageOperations/imageOps.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/ImageOperations/imageOps.h" />
 		<Unit filename="../tools/Quasirandomness/quasirandomness.c">
 			<Option compilerVar="CC" />
 		</Unit>

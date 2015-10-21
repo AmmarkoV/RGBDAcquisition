@@ -95,12 +95,10 @@ int doStereoSplit(
                   char * outputfoldername
                   )
 {
- fprintf(stderr,"Stereo Split \n");
   if (rgb==0) { return 0; }
   acquisitionSimulateTime( colorTimestamp );
 
   char outfilename[512]={0};
- fprintf(stderr,"Stereo Split 2 \n");
 
   unsigned int newWidth=widthRGB;
   unsigned int newHeight=heightRGB;
@@ -111,14 +109,12 @@ int doStereoSplit(
                                  );
   if (ss!=0)
   {
-  fprintf(stderr,"Stereo Split 3 \n");
    sprintf(outfilename,"%s/colorFrame_0_%05u.pnm",outputfoldername,frameNum);
+   acquisitionSaveRawImageToFile(outfilename,ss,newWidth,newHeight,channelsRGB,bitsperpixelRGB);
+   sprintf(outfilename,"%s/left%02u.ppm",outputfoldername,frameNum);
    acquisitionSaveRawImageToFile(outfilename,ss,newWidth,newHeight,channelsRGB,bitsperpixelRGB);
    free(ss);
   }
-
-
-  fprintf(stderr,"Stereo Split 4 \n");
 
   newWidth=widthRGB;
   newHeight=heightRGB;
@@ -130,6 +126,8 @@ int doStereoSplit(
   if (ss!=0)
   {
    sprintf(outfilename,"%s/colorFrame_1_%05u.pnm",outputfoldername,frameNum);
+   acquisitionSaveRawImageToFile(outfilename,ss,newWidth,newHeight,channelsRGB,bitsperpixelRGB);
+   sprintf(outfilename,"%s/right%02u.ppm",outputfoldername,frameNum);
    acquisitionSaveRawImageToFile(outfilename,ss,newWidth,newHeight,channelsRGB,bitsperpixelRGB);
    free(ss);
   }
