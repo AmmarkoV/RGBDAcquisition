@@ -7,16 +7,17 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/DisparityMapping" prefix_auto="1" extension_auto="1" />
+				<Option output="./DisparityMapping" prefix_auto="0" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="`pkg-config --cflags opencv`" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/DisparityMapping" prefix_auto="1" extension_auto="1" />
+				<Option output="./DisparityMapping" prefix_auto="0" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -32,7 +33,14 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Linker>
+			<Add option="`pkg-config --libs opencv`" />
+		</Linker>
 		<Unit filename="main.cpp" />
+		<Unit filename="sgbm.cpp" />
+		<Unit filename="sgbm.h" />
+		<Unit filename="stereo_calibrate.cpp" />
+		<Unit filename="stereo_calibrate.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

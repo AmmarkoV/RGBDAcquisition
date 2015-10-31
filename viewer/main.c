@@ -72,6 +72,7 @@ unsigned int windowX=0,windowY=0;
 unsigned int drawColor=1;
 unsigned int drawDepth=1;
 unsigned int noinput=0;
+unsigned int waitKeyToStart=0;
 
 char inputname[512]={0};
 unsigned int frameNum=0;
@@ -108,6 +109,12 @@ if  ( event == EVENT_MBUTTONDOWN ) { fprintf(stderr,"Middle button of the mouse 
 // Commented out because it spams a lot -> else if  ( event == EVENT_MOUSEMOVE )   { fprintf(stderr,"Mouse move over the window - position (%u,%u)\n",x,y); }
 }
 #endif
+
+int blockWaitingForKey()
+{
+    cvWaitKey(0); //block for ever until key pressed
+ return 1;
+}
 
 
 int acquisitionStopDisplayingFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
@@ -299,7 +306,10 @@ int main(int argc, char *argv[])
   for (i=0; i<argc; i++)
   {
 
-
+    if (strcmp(argv[i],"-waitKey")==0) {
+                                         fprintf(stderr,"Waiting for key to be pressed to start\n");
+                                         waitKeyToStart=1;
+                                        } else
     if (strcmp(argv[i],"-noinput")==0) {
                                          fprintf(stderr,"Disabling user input\n");
                                          noinput=1;
@@ -479,7 +489,11 @@ int main(int argc, char *argv[])
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
         ++frameNum;
 
-
+       if ( waitKeyToStart>0 )
+       {
+         --waitKeyToStart;
+         blockWaitingForKey();
+       }
 
         if (loopFrame!=0)
         {
