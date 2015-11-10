@@ -12,9 +12,6 @@ unsigned char * getDataOutput(unsigned int stream , unsigned int * width, unsign
 
 int addDataInput(unsigned int stream , unsigned char * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
-
-
-
  return 0;
 }
 
@@ -23,7 +20,7 @@ int addDataInput(unsigned int stream , unsigned char * data, unsigned int width,
 
 int processData()
 {
-
+return 0;
 }
 
 
