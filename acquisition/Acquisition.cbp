@@ -53,6 +53,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="pluginLinker.h" />
+		<Unit filename="processorLinker.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="processorLinker.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

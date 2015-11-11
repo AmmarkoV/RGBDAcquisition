@@ -78,8 +78,24 @@ enum Acquisition_Possible_Modules
 #define USE_REGULAR_BYTEORDER_FOR_PNM 0
 
 
+/**
+ * @brief This switch controls the maximum number of loaded processors
+ */
+#define MAX_NUMBER_OF_PROCESSORS 10
+
+
 typedef unsigned int ModuleIdentifier;
 typedef unsigned int DeviceIdentifier;
+
+
+/**
+ * @brief A structure that holds the state of processors
+ */
+struct processorData
+{
+   char processorName[1024];
+   unsigned int handle;
+};
 
 
 /**
@@ -98,6 +114,10 @@ struct acquisitionDeviceStates
   unsigned char networkOutput;
   int frameServerID ;
   int port;
+
+  //Processor links
+  unsigned int processorsLoaded;
+  struct processorData processors[10];
 
   //Dry Run
   unsigned char dryRunOutput;
@@ -828,6 +848,17 @@ int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier de
  */
 int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber);
 
+
+
+/**
+ * @brief Add Processor
+ * @ingroup target
+ * @param moduleID ( see enum Acquisition_Possible_Modules )
+ * @param devID the number of the device we want to use
+ * @param Name of processor module
+ * @retval 1=Success , 0=Failure
+ */
+int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName);
 
 
 
