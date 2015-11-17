@@ -1553,4 +1553,5 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
 int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName)
 {
 //  linkToProcessor(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
+ return 0;
 }
