@@ -1,6 +1,7 @@
 #include "Acquisition.h"
 #include "acquisition_setup.h"
 #include "pluginLinker.h"
+#include "processorLinker.h"
 
 #include "../tools/Timers/timer.h"
 #include "../tools/OperatingSystem/OperatingSystem.h"
@@ -804,15 +805,25 @@ int acquisitionControlFlow(ModuleIdentifier moduleID,DeviceIdentifier devID,floa
     pollLocationServices();
    #endif // ENABLE_LOCATION_SERVICE
 
+   EndTimer(FRAME_SNAP_DELAY);
+
+   int snapResult = 0 , processorID = 0;
     if (*plugins[moduleID].snapFrames!=0)
     {
-      EndTimer(FRAME_SNAP_DELAY);
-      return (*plugins[moduleID].snapFrames) (devID);
-    }
+      snapResult = (*plugins[moduleID].snapFrames) (devID);
 
-    EndTimer(FRAME_SNAP_DELAY);
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionSnapFrames");
-    return 0;
+      for (processorID=0; processorID<module[moduleID].device[devID].processorsLoaded; processorID++)
+       {
+          if (processors[processorID].processData!=0)
+          {
+           (*processors[processorID].processData) ();
+          }
+       }
+
+    } else
+    { MeaningfullWarningMessage(moduleID,devID,"acquisitionSnapFrames"); }
+
+    return snapResult;
 }
 
  int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
@@ -1550,8 +1561,19 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
 
 
 
-int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName)
+int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName,char * processorLibPath)
 {
-//  linkToProcessor(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
- return 0;
+  unsigned int weSucceeded=0;
+  unsigned int where2LoadProcessor = module[moduleID].device[devID].processorsLoaded;
+  if (bringProcessorOnline(processorName,processorLibPath, &where2LoadProcessor))
+  {
+   ++module[moduleID].device[devID].processorsLoaded;
+   module[moduleID].device[devID].processorsIDs[where2LoadProcessor] = where2LoadProcessor;
+   weSucceeded=1;
+  } else
+  {
+   fprintf(stderr,RED "acquisitionAddProcessor could not load %s \n" NORMAL , processorName );
+  }
+
+ return weSucceeded;
 }

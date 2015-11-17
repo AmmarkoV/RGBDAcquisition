@@ -37,8 +37,8 @@
 		<Linker>
 			<Add option="`pkg-config --libs opencv`" />
 		</Linker>
+		<Unit filename="DisparityMapping.cpp" />
 		<Unit filename="DisparityMapping.h" />
-		<Unit filename="main.cpp" />
 		<Unit filename="sgbm.cpp" />
 		<Unit filename="sgbm.h" />
 		<Unit filename="stereo_calibrate.cpp" />

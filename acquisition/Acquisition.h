@@ -117,7 +117,7 @@ struct acquisitionDeviceStates
 
   //Processor links
   unsigned int processorsLoaded;
-  struct processorData processors[10];
+  unsigned int processorsIDs[10];
 
   //Dry Run
   unsigned char dryRunOutput;
@@ -858,7 +858,7 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
  * @param Name of processor module
  * @retval 1=Success , 0=Failure
  */
-int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName);
+int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName,char * processorLibPath);
 
 
 

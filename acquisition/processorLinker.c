@@ -15,8 +15,8 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
-
-struct acquisitionProcessorInterface processors[MAX_NUMBER_OF_PROCESSORS];
+unsigned int processorsLoaded=0;
+struct acquisitionProcessorInterface processors[MAX_NUMBER_OF_PROCESSORS]={0};
 
 
 void * linkProcessorFunction(int moduleID,char * functionName,char * moduleName)
@@ -34,33 +34,25 @@ void * linkProcessorFunction(int moduleID,char * functionName,char * moduleName)
 
 
 
-int linkToProcessor(char * processorName,char * processorPossiblePath ,char * processorLib ,  int processorID)
+int linkToProcessor(char * processorName,char * processorLibPath ,  int processorID)
 {
-    /*
    char *error;
-   char functionNameStr[1024]={0};
 
-   if (!getPluginPath(processorPossiblePath,processorLib,functionNameStr,1024))
-       {
-          fprintf(stderr,RED "Could not find %s (try adding it to current directory)\n" NORMAL , processorLib);
-          return 0;
-       }
-
-   processors[processorID].handle = dlopen (functionNameStr, RTLD_LAZY);
+   processors[processorID].handle = dlopen (processorName, RTLD_LAZY);
    if (!processors[processorID].handle)
        {
-        fprintf (stderr,RED "Failed while loading code for %s plugin from %s\n Error : %s\n" NORMAL, processorName , functionNameStr , dlerror());
+        fprintf (stderr,RED "Failed while loading code for %s plugin from %s\n Error : %s\n" NORMAL, processorName , processorLibPath , dlerror());
         return 0;
        }
-*/
     dlerror();    /* Clear any existing error */
 
 
-  processors[processorID].setConfigStr_DisparityMapping = linkProcessorFunction(processorID,"get%sDepthWidth",processorName);
-  processors[processorID].setConfigInt_DisparityMapping = linkProcessorFunction(processorID,"get%sDepthHeight",processorName);
-  processors[processorID].getDataOutput_DisparityMapping = linkProcessorFunction(processorID,"get%sDepthDataSize",processorName);
-  processors[processorID].addDataInput_DisparityMapping = linkProcessorFunction(processorID,"get%sDepthChannels",processorName);
-  processors[processorID].processData_DisparityMapping = linkProcessorFunction(processorID,"get%sDepthChannels",processorName);
+
+  processors[processorID].setConfigStr = linkProcessorFunction(processorID,"setConfigStr_%s",processorLibPath);
+  processors[processorID].setConfigInt = linkProcessorFunction(processorID,"setConfigInt_%s",processorLibPath);
+  processors[processorID].getDataOutput= linkProcessorFunction(processorID,"getDataOutput_%s",processorLibPath);
+  processors[processorID].addDataInput = linkProcessorFunction(processorID,"addDataInput_%s",processorLibPath);
+  processors[processorID].processData  = linkProcessorFunction(processorID,"processData_%s",processorLibPath);
 
 
 
@@ -75,4 +67,24 @@ int unlinkProcessor(int processorID)
   dlclose(processors[processorID].handle);
   processors[processorID].handle=0;
   return 1;
+}
+
+int closeAllProcessors()
+{
+ fprintf(stderr,"closeAllProcessors not implemented\n");
+  return 0;
+}
+
+int bringProcessorOnline(char * processorName,char * processorLibPath,unsigned int *loadedID)
+{
+ fprintf(stderr,"bringProcessorOnline not implemented\n");
+ unsigned int where2TryToLoad = processorsLoaded;
+ if (  linkToProcessor(processorName,processorLibPath , where2TryToLoad  ) )
+    {
+     ++processorsLoaded;
+     return 1;
+    }
+
+
+ return 0;
 }

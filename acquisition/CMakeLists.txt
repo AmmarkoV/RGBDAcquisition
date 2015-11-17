@@ -12,6 +12,8 @@ ENDIF( ENABLE_LOCATION_SERVICE )
                  Acquisition.h
                  pluginLinker.c
                  pluginLinker.h
+                 processorLinker.c
+                 processorLinker.h 
                  acquisition_setup.h
               )
   

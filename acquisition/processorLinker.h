@@ -16,19 +16,20 @@ struct acquisitionProcessorInterface
 {
    void *handle;
 
-   int (*setConfigStr_DisparityMapping) (char * ,char * );
-   int (*setConfigInt_DisparityMapping) (char * ,int );
+   int (*setConfigStr) (char * ,char * );
+   int (*setConfigInt) (char * ,int );
 
-   int (*getDataOutput_DisparityMapping) (unsigned int , unsigned int *  , unsigned int * ,unsigned int * ,unsigned int * );
-   int (*addDataInput_DisparityMapping)  (unsigned int , unsigned char * , unsigned int   , unsigned int  ,unsigned int ,unsigned int );
+   int (*getDataOutput) (unsigned int , unsigned int *  , unsigned int * ,unsigned int * ,unsigned int * );
+   int (*addDataInput)  (unsigned int , unsigned char * , unsigned int   , unsigned int  ,unsigned int ,unsigned int );
 
-   int (*processData_DisparityMapping) ();
+   int (*processData) ();
 
 };
 
 
 
 
+extern unsigned int processorsLoaded;
 /**
  * @brief The array that holds the functions and the state of each plugin
  *        The elements of the array get populated using int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID);
@@ -40,11 +41,7 @@ extern struct acquisitionProcessorInterface processors[MAX_NUMBER_OF_PROCESSORS]
 
 
 
-
-
-
-int linkToProcessor(char * processorName,char * processorPossiblePath ,char * processorLib ,  int processorID);
-
-
+int bringProcessorOnline(char * processorName,char * processorLibPath,unsigned int *loadedID);
+int closeAllProcessors();
 
 #endif // PROCESSORLINKER_H_INCLUDED

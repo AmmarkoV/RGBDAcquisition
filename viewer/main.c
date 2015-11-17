@@ -306,6 +306,10 @@ int main(int argc, char *argv[])
   for (i=0; i<argc; i++)
   {
 
+    if (strcmp(argv[i],"-processor")==0) {
+                                          fprintf(stderr,"Adding Processor to Pipeline %s , postfix %s\n",argv[i+1],argv[i+2]);
+                                          acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2]);
+                                         } else
     if (strcmp(argv[i],"-waitKey")==0) {
                                          fprintf(stderr,"Waiting for key to be pressed to start\n");
                                          waitKeyToStart=1;
