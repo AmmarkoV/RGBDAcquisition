@@ -792,6 +792,42 @@ int acquisitionControlFlow(ModuleIdentifier moduleID,DeviceIdentifier devID,floa
 }
 
 
+
+int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+   unsigned int processorsCalled=0;
+   unsigned int colorWidth, colorHeight, colorChannels, colorBitsperpixel;
+   unsigned int depthWidth, depthHeight, depthChannels, depthBitsperpixel;
+
+   unsigned int processorID = 0;
+      for (processorID=0; processorID<module[moduleID].device[devID].processorsLoaded; processorID++)
+       {
+          if (processors[processorID].processData!=0)
+          {
+           (*processors[processorID].processData) ();
+           ++processorsCalled;
+          }
+       }
+
+
+ if (processorsCalled)
+ {
+
+//unsigned short * processData_GetDepth( &depthWidth, &depthHeight, &depthChannels, &depthBitsperpixel)
+//unsigned char * processData_GetColor( &colorWidth, &colorHeight, &colorChannels, &colorBitsperpixel );
+  //acquisitionOverrideColorFrame(moduleID , devID , unsigned char * newColor , unsigned int newColorByteSize)
+
+  //acquisitionOverrideDepthFrame(moduleID , devID , unsigned short * newDepth , unsigned int newDepthByteSize);
+
+
+ }
+
+  return 1;
+}
+
+
+
+
  int acquisitionSnapFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
     printCall(moduleID,devID,"acquisitionSnapFrames", __FILE__, __LINE__);
@@ -807,19 +843,11 @@ int acquisitionControlFlow(ModuleIdentifier moduleID,DeviceIdentifier devID,floa
 
    EndTimer(FRAME_SNAP_DELAY);
 
-   int snapResult = 0 , processorID = 0;
+   int snapResult = 0;
     if (*plugins[moduleID].snapFrames!=0)
     {
       snapResult = (*plugins[moduleID].snapFrames) (devID);
-
-      for (processorID=0; processorID<module[moduleID].device[devID].processorsLoaded; processorID++)
-       {
-          if (processors[processorID].processData!=0)
-          {
-           (*processors[processorID].processData) ();
-          }
-       }
-
+      acquisitionDoProcessorSubsystem(moduleID,devID);
     } else
     { MeaningfullWarningMessage(moduleID,devID,"acquisitionSnapFrames"); }
 

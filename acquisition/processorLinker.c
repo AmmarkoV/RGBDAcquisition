@@ -46,16 +46,14 @@ int linkToProcessor(char * processorName,char * processorLibPath ,  int processo
        }
     dlerror();    /* Clear any existing error */
 
-
-
   processors[processorID].setConfigStr = linkProcessorFunction(processorID,"setConfigStr_%s",processorLibPath);
   processors[processorID].setConfigInt = linkProcessorFunction(processorID,"setConfigInt_%s",processorLibPath);
   processors[processorID].getDataOutput= linkProcessorFunction(processorID,"getDataOutput_%s",processorLibPath);
   processors[processorID].addDataInput = linkProcessorFunction(processorID,"addDataInput_%s",processorLibPath);
+  processors[processorID].getDepth  = linkProcessorFunction(processorID,"getDepth_%s",processorLibPath);
+  processors[processorID].getColor  = linkProcessorFunction(processorID,"getColor_%s",processorLibPath);
+
   processors[processorID].processData  = linkProcessorFunction(processorID,"processData_%s",processorLibPath);
-
-
-
 
   return 1;
 }
