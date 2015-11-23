@@ -549,7 +549,7 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
  * @param Pointer to the new frame that should overwrite returned , the user should probably free the frame after this call
  * @retval  1=Success 0=Failure
  */
-int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor, unsigned int newColorByteSize);
+int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor, unsigned int newColorByteSize , unsigned int width ,unsigned int height , unsigned int channels, unsigned int bitsperpixel);
 
 
 
@@ -624,7 +624,7 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
  * @param Pointer to the new frame that should overwrite returned , the user should probably free the frame after this call
  * @retval  1=Success 0=Failure
  */
-int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth , unsigned int newDepthByteSize);
+int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth , unsigned int newDepthByteSize , unsigned int width ,unsigned int height , unsigned int channels, unsigned int bitsperpixel);
 /**
  * @brief  Returns the depth frame from the last Snap we did using acquisitionSnapFrames to find out its dimensions you might want to call acquisitionGetDepthFrameDimensions
  * @ingroup acquisitionCore

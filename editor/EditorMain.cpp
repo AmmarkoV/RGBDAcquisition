@@ -856,10 +856,10 @@ int  EditorFrame::refreshAllOverlays()
                              );
 
      unsigned int newColorByteSize = width * height * 3 * sizeof(unsigned char);
-     acquisitionOverrideColorFrame(moduleID,devID,segmentedRGB,newColorByteSize);
+     acquisitionOverrideColorFrame(moduleID,devID,segmentedRGB,newColorByteSize,width,height,3,24);
 
      unsigned int newDepthByteSize = width * height * 1 * sizeof(unsigned short);
-     acquisitionOverrideDepthFrame(moduleID,devID,segmentedDepth,newDepthByteSize);
+     acquisitionOverrideDepthFrame(moduleID,devID,segmentedDepth,newDepthByteSize,width,height,1,16);
 
      if ( segmentedRGB!=0 ) { free(segmentedRGB); segmentedRGB=0; }
      if ( segmentedDepth!=0 ) { free(segmentedDepth); segmentedDepth=0; }
@@ -892,10 +892,10 @@ int  EditorFrame::refreshAllOverlays()
                               );
 
          unsigned int newColorByteSize = width * height * 3 * sizeof(unsigned char);
-         acquisitionOverrideColorFrame(moduleID,devID,rgbOut,newColorByteSize);
+         acquisitionOverrideColorFrame(moduleID,devID,rgbOut,newColorByteSize,width,height,3,24);
 
          unsigned int newDepthByteSize = width * height * 1 * sizeof(unsigned short);
-         acquisitionOverrideDepthFrame(moduleID,devID,depthOut,newDepthByteSize);
+         acquisitionOverrideDepthFrame(moduleID,devID,depthOut,newDepthByteSize,width,height,1,16);
         }
 
        if ( rgbOut!=0 ) { free(rgbOut); rgbOut=0; }

@@ -802,25 +802,28 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
    unsigned int processorID = 0;
       for (processorID=0; processorID<module[moduleID].device[devID].processorsLoaded; processorID++)
        {
-          if (processors[processorID].processData!=0)
+          if (
+               (processors[processorID].processData!=0) &&
+               (processors[processorID].cleanup!=0) &&
+               (processors[processorID].getDepth!=0) &&
+               (processors[processorID].getColor!=0)
+             )
           {
            (*processors[processorID].processData) ();
            ++processorsCalled;
+
+
+            unsigned short * depthFrame = (*processors[processorID].getDepth( &depthWidth, &depthHeight, &depthChannels, &depthBitsperpixel) );
+            unsigned char *  colorFrame = (*processors[processorID].getColor( &colorWidth, &colorHeight, &colorChannels, &colorBitsperpixel) );
+
+            acquisitionOverrideColorFrame(moduleID , devID , colorFrame , colorWidth*colorHeight*colorChannels ,colorWidth,colorHeight,colorChannels,colorBitsperpixel);
+            acquisitionOverrideDepthFrame(moduleID , devID , depthFrame , depthWidth*depthHeight*depthChannels ,depthWidth,depthHeight,depthChannels,depthBitsperpixel);
+
+            (*processors[processorID].cleanup) ();
           }
        }
 
 
- if (processorsCalled)
- {
-
-//unsigned short * processData_GetDepth( &depthWidth, &depthHeight, &depthChannels, &depthBitsperpixel)
-//unsigned char * processData_GetColor( &colorWidth, &colorHeight, &colorChannels, &colorBitsperpixel );
-  //acquisitionOverrideColorFrame(moduleID , devID , unsigned char * newColor , unsigned int newColorByteSize)
-
-  //acquisitionOverrideDepthFrame(moduleID , devID , unsigned short * newDepth , unsigned int newDepthByteSize);
-
-
- }
 
   return 1;
 }
@@ -1070,7 +1073,7 @@ unsigned long acquisitionGetDepthTimestamp(ModuleIdentifier moduleID,DeviceIdent
 }
 
 
-int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor , unsigned int newColorByteSize)
+int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned char * newColor , unsigned int newColorByteSize , unsigned int width ,unsigned int height , unsigned int channels, unsigned int bitsperpixel)
 {
   if (newColor==0) { fprintf(stderr,"acquisitionOverrideColorFrame called with null new buffer");  return 0; }
   //Ok when someone overrides a color frame there are two chances..
@@ -1212,7 +1215,7 @@ unsigned int acquisitionCopyColorFramePPM(ModuleIdentifier moduleID,DeviceIdenti
 
 
 
-int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth , unsigned int newDepthByteSize)
+int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier devID , unsigned short * newDepth , unsigned int newDepthByteSize , unsigned int width ,unsigned int height , unsigned int channels, unsigned int bitsperpixel)
 {
   if (newDepth==0) { fprintf(stderr,"acquisitionOverrideDepthFrame called with null new buffer");  return 0; }
   //Ok when someone overrides a color frame there are two chances..

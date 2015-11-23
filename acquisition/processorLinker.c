@@ -54,6 +54,7 @@ int linkToProcessor(char * processorName,char * processorLibPath ,  int processo
   processors[processorID].getColor  = linkProcessorFunction(processorID,"getColor_%s",processorLibPath);
 
   processors[processorID].processData  = linkProcessorFunction(processorID,"processData_%s",processorLibPath);
+  processors[processorID].cleanup  = linkProcessorFunction(processorID,"cleanup_%s",processorLibPath);
 
   return 1;
 }
