@@ -65,6 +65,7 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
      cv::cvtColor(bgrrightImage,rightImage, cv::COLOR_RGB2BGR);
 
 
+
     //std::cerr<<"Doing drawing..\n";
     //cv::imshow("testLeft",leftImage);
     //cv::imshow("testRight",rightImage);
@@ -101,7 +102,7 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
 
     enum { STEREO_BM=0, STEREO_SGBM=1, STEREO_HH=2, STEREO_VAR=3 };
     int alg = STEREO_SGBM;
-    int SADWindowSize = 40, numberOfDisparities = 0;
+    int SADWindowSize = 45, numberOfDisparities = 0;
     bool no_display = false;
     float scale = 1.f;
 

@@ -91,6 +91,7 @@ int ReadJPEG( char *filename,struct Image * pic,char read_only_header)
 
 	pic->width=cinfo.image_width;
 	pic->height=cinfo.image_height;
+	pic->bitsperpixel=8;
 
 	if ( (read_only_header) || ( (pic->width==0)&&(pic->height==0)  ) )
 	  {

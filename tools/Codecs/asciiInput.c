@@ -71,6 +71,8 @@ int WriteASCII(char * filename,struct Image * pic,int packed)
 {
     //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);
     if (pic==0) { return 0; }
+
+
     if ( (pic->width==0) || (pic->height==0) || (pic->channels==0) || (pic->bitsperpixel==0) )
         {
           fprintf(stderr,"WriteASCII(%s) called with zero dimensions ( %ux%u %u channels %u bpp\n",filename,pic->width , pic->height,pic->channels,pic->bitsperpixel);
@@ -95,10 +97,11 @@ int WriteASCII(char * filename,struct Image * pic,int packed)
            {
             for (x=0; x<pic->width; x++)
              {
-               fprintf(fd, "%u ",*ptr);
+               unsigned char value = *ptr;
+               fprintf(fd, "%u ",value);
                ++ptr;
              }
-             fprintf(fd, "%\n ");
+             fprintf(fd, "\n ");
            }
         } else
         {
@@ -110,10 +113,11 @@ int WriteASCII(char * filename,struct Image * pic,int packed)
            {
             for (x=0; x<pic->width; x++)
              {
-               fprintf(fd, "%u ",*ptr);
+               unsigned char value = *ptr;
+               fprintf(fd, "%u ",value);
                ptr+=3;
              }
-             fprintf(fd, "%\n ");
+             fprintf(fd, "\n ");
            }
          }
         }

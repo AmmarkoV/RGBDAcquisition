@@ -27,8 +27,8 @@ extern "C"
 #endif
 
 
-//#define USE_JPG_FILES 1
-//#define USE_PNG_FILES 1
+#define USE_JPG_FILES 1
+#define USE_PNG_FILES 1
 #define USE_PPM_FILES 1
 #define USE_ASCII_FILES 1
 
