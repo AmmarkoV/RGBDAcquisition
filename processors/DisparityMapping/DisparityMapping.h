@@ -14,7 +14,7 @@ int setConfigInt_DisparityMapping(char * label,int value);
 
 
 unsigned char * getDataOutput_DisparityMapping(unsigned int stream , unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel);
-int addDataInput_DisparityMapping(unsigned int stream , unsigned char * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel);
+int addDataInput_DisparityMapping(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel);
 
 
 unsigned short * getDepth_DisparityMapping(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel);

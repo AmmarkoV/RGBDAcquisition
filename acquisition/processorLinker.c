@@ -36,8 +36,6 @@ void * linkProcessorFunction(int moduleID,char * functionName,char * moduleName)
 
 int linkToProcessor(char * processorName,char * processorLibPath ,  int processorID)
 {
-   char *error;
-
    processors[processorID].handle = dlopen (processorName, RTLD_LAZY);
    if (!processors[processorID].handle)
        {
@@ -50,8 +48,8 @@ int linkToProcessor(char * processorName,char * processorLibPath ,  int processo
   processors[processorID].setConfigInt = linkProcessorFunction(processorID,"setConfigInt_%s",processorLibPath);
   processors[processorID].getDataOutput= linkProcessorFunction(processorID,"getDataOutput_%s",processorLibPath);
   processors[processorID].addDataInput = linkProcessorFunction(processorID,"addDataInput_%s",processorLibPath);
-  processors[processorID].getDepth  = linkProcessorFunction(processorID,"getDepth_%s",processorLibPath);
-  processors[processorID].getColor  = linkProcessorFunction(processorID,"getColor_%s",processorLibPath);
+  processors[processorID].getDepth     = linkProcessorFunction(processorID,"getDepth_%s",processorLibPath);
+  processors[processorID].getColor     = linkProcessorFunction(processorID,"getColor_%s",processorLibPath);
 
   processors[processorID].processData  = linkProcessorFunction(processorID,"processData_%s",processorLibPath);
   processors[processorID].cleanup  = linkProcessorFunction(processorID,"cleanup_%s",processorLibPath);

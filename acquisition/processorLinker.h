@@ -20,7 +20,7 @@ struct acquisitionProcessorInterface
    int (*setConfigInt) (char * ,int );
 
    int (*getDataOutput) (unsigned int , unsigned int *  , unsigned int * ,unsigned int * ,unsigned int * );
-   int (*addDataInput)  (unsigned int , unsigned char * , unsigned int   , unsigned int  ,unsigned int ,unsigned int );
+   int (*addDataInput)  (unsigned int , void * , unsigned int   , unsigned int  ,unsigned int ,unsigned int );
 
 
    unsigned short * (*getDepth) (unsigned int * , unsigned int * ,unsigned int * ,unsigned int * );

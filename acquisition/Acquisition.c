@@ -805,22 +805,40 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
           if (
                (processors[processorID].processData!=0) &&
                (processors[processorID].cleanup!=0) &&
+               (processors[processorID].addDataInput!=0) &&
                (processors[processorID].getDepth!=0) &&
                (processors[processorID].getColor!=0)
              )
           {
+
+           acquisitionGetColorFrameDimensions(moduleID,devID,&colorWidth,&colorHeight,&colorChannels,&colorBitsperpixel);
+           acquisitionGetDepthFrameDimensions(moduleID,devID,&depthWidth,&depthHeight,&depthChannels,&depthBitsperpixel);
+
+           (*processors[processorID].addDataInput) (0, acquisitionGetColorFrame(moduleID,devID) , colorWidth, colorHeight, colorChannels, colorBitsperpixel);
+           (*processors[processorID].addDataInput) (1, acquisitionGetDepthFrame(moduleID,devID) , depthWidth, depthHeight, depthChannels, depthBitsperpixel);
+
            (*processors[processorID].processData) ();
-           ++processorsCalled;
+
+            fprintf(stderr,"going to do further calls \n");
+
+            unsigned short * depthFrame = (*processors[processorID].getDepth) ( &depthWidth, &depthHeight, &depthChannels, &depthBitsperpixel) ;
+            unsigned char *  colorFrame = (*processors[processorID].getColor) ( &colorWidth, &colorHeight, &colorChannels, &colorBitsperpixel) ;
 
 
-            unsigned short * depthFrame = (*processors[processorID].getDepth( &depthWidth, &depthHeight, &depthChannels, &depthBitsperpixel) );
-            unsigned char *  colorFrame = (*processors[processorID].getColor( &colorWidth, &colorHeight, &colorChannels, &colorBitsperpixel) );
+            fprintf(stderr,"colorFrame=%p , depthFrame=%p \n",colorFrame,depthFrame);
 
-            acquisitionOverrideColorFrame(moduleID , devID , colorFrame , colorWidth*colorHeight*colorChannels ,colorWidth,colorHeight,colorChannels,colorBitsperpixel);
-            acquisitionOverrideDepthFrame(moduleID , devID , depthFrame , depthWidth*depthHeight*depthChannels ,depthWidth,depthHeight,depthChannels,depthBitsperpixel);
+            if (colorFrame!=0)
+                 { acquisitionOverrideColorFrame(moduleID , devID , colorFrame , colorWidth*colorHeight*colorChannels ,colorWidth,colorHeight,colorChannels,colorBitsperpixel); }
+
+            if (depthFrame!=0)
+                 { acquisitionOverrideDepthFrame(moduleID , devID , depthFrame , depthWidth*depthHeight*depthChannels ,depthWidth,depthHeight,depthChannels,depthBitsperpixel); }
 
             (*processors[processorID].cleanup) ();
+          } else
+          {
+            fprintf(stderr,"Cannot run processor %u , it hasn't got all relevant calls implemented \n",processorID);
           }
+
        }
 
 
