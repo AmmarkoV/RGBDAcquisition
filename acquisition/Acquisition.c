@@ -1610,11 +1610,11 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
 
 
 
-int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName,char * processorLibPath)
+int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName,char * processorLibPath,int argc, char *argv[])
 {
   unsigned int weSucceeded=0;
   unsigned int where2LoadProcessor = module[moduleID].device[devID].processorsLoaded;
-  if (bringProcessorOnline(processorName,processorLibPath, &where2LoadProcessor))
+  if (bringProcessorOnline(processorName,processorLibPath, &where2LoadProcessor,argc,argv))
   {
    ++module[moduleID].device[devID].processorsLoaded;
    module[moduleID].device[devID].processorsIDs[where2LoadProcessor] = where2LoadProcessor;

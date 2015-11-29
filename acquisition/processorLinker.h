@@ -16,6 +16,8 @@ struct acquisitionProcessorInterface
 {
    void *handle;
 
+   int (*initArgs) (int , char * );
+
    int (*setConfigStr) (char * ,char * );
    int (*setConfigInt) (char * ,int );
 
@@ -47,7 +49,7 @@ extern struct acquisitionProcessorInterface processors[MAX_NUMBER_OF_PROCESSORS]
 
 
 
-int bringProcessorOnline(char * processorName,char * processorLibPath,unsigned int *loadedID);
+int bringProcessorOnline(char * processorName,char * processorLibPath,unsigned int *loadedID,int argc, char *argv[]);
 int closeAllProcessors();
 
 #endif // PROCESSORLINKER_H_INCLUDED

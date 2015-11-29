@@ -44,6 +44,7 @@ int linkToProcessor(char * processorName,char * processorLibPath ,  int processo
        }
     dlerror();    /* Clear any existing error */
 
+  processors[processorID].initArgs     = linkProcessorFunction(processorID,"initArgs_%s",processorLibPath);
   processors[processorID].setConfigStr = linkProcessorFunction(processorID,"setConfigStr_%s",processorLibPath);
   processors[processorID].setConfigInt = linkProcessorFunction(processorID,"setConfigInt_%s",processorLibPath);
   processors[processorID].getDataOutput= linkProcessorFunction(processorID,"getDataOutput_%s",processorLibPath);
@@ -72,12 +73,17 @@ int closeAllProcessors()
   return 0;
 }
 
-int bringProcessorOnline(char * processorName,char * processorLibPath,unsigned int *loadedID)
+int bringProcessorOnline(char * processorName,char * processorLibPath,unsigned int *loadedID,int argc, char *argv[])
 {
  fprintf(stderr,"bringProcessorOnline not implemented\n");
  unsigned int where2TryToLoad = processorsLoaded;
  if (  linkToProcessor(processorName,processorLibPath , where2TryToLoad  ) )
     {
+     if ( (argc!=0) && (argv!=0) )
+     { if (processors[where2TryToLoad].initArgs!=0)
+             { (*processors[where2TryToLoad].initArgs) (argc,argv); }
+     }
+
      ++processorsLoaded;
      return 1;
     }

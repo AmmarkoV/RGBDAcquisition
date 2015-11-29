@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
   {
     if (strcmp(argv[i],"-processor")==0) {
                                           fprintf(stderr,"Adding Processor to Pipeline %s , postfix %s\n",argv[i+1],argv[i+2]);
-                                          acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2]);
+                                          acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2],argc,argv);
                                          } else
     if (strcmp(argv[i],"-skip")==0) {
                                        skippedFrames=atoi(argv[i+1]);

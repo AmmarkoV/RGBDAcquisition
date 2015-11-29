@@ -9,6 +9,8 @@ extern "C"
 #endif
 
 
+int initArgs_DisparityMapping(int argc, char *argv[]);
+
 int setConfigStr_DisparityMapping(char * label,char * value);
 int setConfigInt_DisparityMapping(char * label,int value);
 

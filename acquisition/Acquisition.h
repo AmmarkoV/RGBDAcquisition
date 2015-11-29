@@ -856,10 +856,11 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
  * @param moduleID ( see enum Acquisition_Possible_Modules )
  * @param devID the number of the device we want to use
  * @param Name of processor module
+ * @param argc number of intialization arguments
+ * @param argv value of intialization arguments
  * @retval 1=Success , 0=Failure
  */
-int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName,char * processorLibPath);
-
+int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName,char * processorLibPath,int argc, char *argv[]);
 
 
 #ifdef __cplusplus
