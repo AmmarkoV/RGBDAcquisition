@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
 
   unsigned int width=640,height=480,framerate=30;
   unsigned int frameNum=0,maxFramesToGrab=0;
-  int i=0;
+  unsigned int i=0;
   for (i=0; i<argc; i++)
   {
 

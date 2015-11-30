@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
   /*! --------------------------------- INITIALIZATION FROM COMMAND LINE PARAMETERS --------------------------------- */
 
-  int i=0;
+  unsigned int i=0;
   for (i=0; i<argc; i++)
   {
      if (strcmp(argv[i],"-longExposure")==0)

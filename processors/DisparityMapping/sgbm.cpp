@@ -14,13 +14,108 @@
 
 #include "stereo_calibrate.h"
 
-int flipLeftRight=1;
 unsigned int shiftYLeft=0;
-unsigned int shiftYRight=17;
+unsigned int shiftYRight=0;//17;
 
 using namespace cv;
 
-int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int colorHeight )
+
+struct sgbmCalibrationStuff
+{
+  CvMat* _M1,*_M2,*_D1,*_D2,*_R1,*_R2,*_P1,*_P2,*_R,*_T,*_Q;
+  cv::Mat M1,M2,D1,D2,R1,R2,P1,P2,R,T,Q;
+};
+
+struct sgbmCalibrationStuff sgbmCalib;
+
+
+int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
+{
+  if (disparityCalibrationPath==0) { return 0; }
+
+
+// OpenCV 3.0  might require something like this sgbmCalib.M1 = cv::Mat(sgbmCalib._M1->rows, sgbmCalib._M1->cols, sgbmCalib._M1->type, sgbmCalib._M1->data.*);
+  char filenameOfFile[1024]={0};
+  snprintf(filenameOfFile,1024,"%s/M1.xml",disparityCalibrationPath);
+  sgbmCalib._M1 = (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.M1 = cv::Mat(sgbmCalib._M1);
+
+  snprintf(filenameOfFile,1024,"%s/M2.xml",disparityCalibrationPath);
+  sgbmCalib._M2 = (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.M2 = cv::Mat(sgbmCalib._M2);
+
+  snprintf(filenameOfFile,1024,"%s/D1.xml",disparityCalibrationPath);
+  sgbmCalib._D1 = (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.D1 = cv::Mat(sgbmCalib._D1);
+
+  snprintf(filenameOfFile,1024,"%s/D2.xml",disparityCalibrationPath);
+  sgbmCalib._D2 = (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.D2 = cv::Mat(sgbmCalib._D2);
+
+  snprintf(filenameOfFile,1024,"%s/R1.xml",disparityCalibrationPath);
+  sgbmCalib._R1 = (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.R1 = cv::Mat(sgbmCalib._R1);
+
+  snprintf(filenameOfFile,1024,"%s/R2.xml",disparityCalibrationPath);
+  sgbmCalib._R2 = (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.R2 = cv::Mat(sgbmCalib._R2);
+
+  snprintf(filenameOfFile,1024,"%s/P1.xml",disparityCalibrationPath);
+  sgbmCalib._P1 = (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.P1 = cv::Mat(sgbmCalib._P1);
+
+  snprintf(filenameOfFile,1024,"%s/P2.xml",disparityCalibrationPath);
+  sgbmCalib._P2 = (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.P2 = cv::Mat(sgbmCalib._P2);
+
+  snprintf(filenameOfFile,1024,"%s/R.xml",disparityCalibrationPath);
+  sgbmCalib._R =  (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.R = cv::Mat(sgbmCalib._R);
+
+  snprintf(filenameOfFile,1024,"%s/T.xml",disparityCalibrationPath);
+  sgbmCalib._T =  (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.T = cv::Mat(sgbmCalib._T);
+
+  snprintf(filenameOfFile,1024,"%s/Q.xml",disparityCalibrationPath);
+  sgbmCalib._Q =  (CvMat*) cvLoad(filenameOfFile);
+  sgbmCalib.Q = cv::Mat(sgbmCalib._Q);
+
+ return 1;
+}
+
+
+
+
+/*
+ Other way to read/write calibrations
+        // reading intrinsic parameters
+        FileStorage fs(intrinsic_filename, CV_STORAGE_READ);
+        if(!fs.isOpened())
+        {
+            printf("Failed to open file %s\n", intrinsic_filename);
+            return -1;
+        }
+
+        Mat M1, D1, M2, D2;
+        fs["M1"] >> M1;
+        fs["D1"] >> D1;
+        fs["M2"] >> M2;
+        fs["D2"] >> D2;
+
+        fs.open(extrinsic_filename, CV_STORAGE_READ);
+        if(!fs.isOpened())
+        {
+            printf("Failed to open file %s\n", extrinsic_filename);
+            return -1;
+        }
+
+        Mat R, T, R1, P1, R2, P2;
+        fs["R"] >> R;
+        fs["T"] >> T;*/
+
+
+
+int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int colorHeight , unsigned int swapColorFeeds , unsigned int SADWindowSize , char * disparityCalibrationPath)
 {
     cv::Mat rgbImg(colorHeight,colorWidth,CV_8UC3,colorFrame);
     //cv::Mat depthImg(depthHeight,depthWidth,CV_16UC1,depthFrame);
@@ -36,7 +131,7 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
     leftROI = cv::Rect(0,0,(rgbImg.cols/2)-1,rgbImg.rows-1);
     rightROI = cv::Rect(rgbImg.cols/2,0,(rgbImg.cols/2)-1,rgbImg.rows-1);
 
-    if (flipLeftRight)
+    if (swapColorFeeds)
     {
      tmpleftImage= cv::Mat(rgbImg,rightROI);
      tmprightImage= cv::Mat(rgbImg,leftROI);
@@ -66,9 +161,6 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
 
 
 
-    //std::cerr<<"Doing drawing..\n";
-    //cv::imshow("testLeft",leftImage);
-    //cv::imshow("testRight",rightImage);
 
     double alpha = 0.5;
     double beta = ( 1.0 - alpha );
@@ -84,25 +176,18 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
     int argc=0;
     char * argv=0;
 
-    //return 1;
-
-    const char* algorithm_opt = "--algorithm=";
-    const char* maxdisp_opt = "--max-disparity=";
-    const char* blocksize_opt = "--blocksize=";
-    const char* nodisplay_opt = "--no-display=";
-    const char* scale_opt = "--scale=";
 
 
     const char* img1_filename = 0;
     const char* img2_filename = 0;
-    const char* intrinsic_filename = 0;
-    const char* extrinsic_filename = 0;
+    const char* intrinsic_filename = disparityCalibrationPath;
+    const char* extrinsic_filename = disparityCalibrationPath;
     const char* disparity_filename = 0;
     const char* point_cloud_filename = 0;
 
     enum { STEREO_BM=0, STEREO_SGBM=1, STEREO_HH=2, STEREO_VAR=3 };
     int alg = STEREO_SGBM;
-    int SADWindowSize = 45, numberOfDisparities = 0;
+    int numberOfDisparities = 0;
     bool no_display = false;
     float scale = 1.f;
 
@@ -125,8 +210,8 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
 
     int color_mode = alg == STEREO_BM ? 0 : -1;
     Mat img1 ,img2 ;
-    img1 = leftImage; //imread(img1_filename, color_mode);
-    img2 = rightImage; //imread(img2_filename, color_mode);
+    img1 = leftImage;
+    img2 = rightImage;
 
     if( scale != 1.f )
     {
@@ -141,40 +226,14 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
     Size img_size = img1.size();
 
     Rect roi1, roi2;
-    Mat Q;
 
     if( intrinsic_filename )
     {
-        // reading intrinsic parameters
-        FileStorage fs(intrinsic_filename, CV_STORAGE_READ);
-        if(!fs.isOpened())
-        {
-            printf("Failed to open file %s\n", intrinsic_filename);
-            return -1;
-        }
-
-        Mat M1, D1, M2, D2;
-        fs["M1"] >> M1;
-        fs["D1"] >> D1;
-        fs["M2"] >> M2;
-        fs["D2"] >> D2;
-
-        fs.open(extrinsic_filename, CV_STORAGE_READ);
-        if(!fs.isOpened())
-        {
-            printf("Failed to open file %s\n", extrinsic_filename);
-            return -1;
-        }
-
-        Mat R, T, R1, P1, R2, P2;
-        fs["R"] >> R;
-        fs["T"] >> T;
-
-        stereoRectify( M1, D1, M2, D2, img_size, R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY, -1, img_size, &roi1, &roi2 );
+        stereoRectify( sgbmCalib.M1, sgbmCalib.D1, sgbmCalib.M2, sgbmCalib.D2, img_size, sgbmCalib.R, sgbmCalib.T, sgbmCalib.R1, sgbmCalib.R2, sgbmCalib.P1, sgbmCalib.P2, sgbmCalib.Q, CALIB_ZERO_DISPARITY, -1, img_size, &roi1, &roi2 );
 
         Mat map11, map12, map21, map22;
-        initUndistortRectifyMap(M1, D1, R1, P1, img_size, CV_16SC2, map11, map12);
-        initUndistortRectifyMap(M2, D2, R2, P2, img_size, CV_16SC2, map21, map22);
+        initUndistortRectifyMap(sgbmCalib.M1, sgbmCalib.D1, sgbmCalib.R1, sgbmCalib.P1, img_size, CV_16SC2, map11, map12);
+        initUndistortRectifyMap(sgbmCalib.M2, sgbmCalib.D2, sgbmCalib.R2, sgbmCalib.P2, img_size, CV_16SC2, map21, map22);
 
         Mat img1r, img2r;
         remap(img1, img1r, map11, map12, INTER_LINEAR);
@@ -232,21 +291,19 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
     //copyMakeBorder(img2, img2p, 0, 0, numberOfDisparities, 0, IPL_BORDER_REPLICATE);
 
     int64 t = getTickCount();
-    if( alg == STEREO_BM )
-        bm(img1, img2, disp);
-    else if( alg == STEREO_VAR ) {
-        var(img1, img2, disp);
-	}
-    else if( alg == STEREO_SGBM || alg == STEREO_HH )
-        sgbm(img1, img2, disp);
+    if( alg == STEREO_BM )  { bm(img1, img2, disp);  } else
+    if( alg == STEREO_VAR ) { var(img1, img2, disp); } else
+    if( alg == STEREO_SGBM || alg == STEREO_HH )
+                            { sgbm(img1, img2, disp); }
+
     t = getTickCount() - t;
     printf("OpenCV Time elapsed: %fms\n", t*1000/getTickFrequency());
 
     //disp = dispp.colRange(numberOfDisparities, img1p.cols);
-    if( alg != STEREO_VAR )
-        disp.convertTo(disp8, CV_8U, 255/(numberOfDisparities*16.));
-    else
-        disp.convertTo(disp8, CV_8U);
+    if( alg != STEREO_VAR ) { disp.convertTo(disp8, CV_8U, 255/(numberOfDisparities*16.)); } else
+                            { disp.convertTo(disp8, CV_8U); }
+
+
     if( !no_display )
     {
         //namedWindow("left", 1);
@@ -264,17 +321,17 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
     }
 
     if(disparity_filename)
-        imwrite(disparity_filename, disp8);
+        { imwrite(disparity_filename, disp8); }
 
     if(point_cloud_filename)
     {
         printf("storing the point cloud...");
         fflush(stdout);
         Mat xyz;
-        reprojectImageTo3D(disp, xyz, Q, true);
+        reprojectImageTo3D(disp, xyz, sgbmCalib.Q, true);
         printf("\n");
     }
 
 
-
+ return 1;
 }

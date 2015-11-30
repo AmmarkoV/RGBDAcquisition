@@ -143,7 +143,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _s
                                      count, result );
             cvShowImage( "corners", cimg );
             cvReleaseImage( &cimg );
-            if( cvWaitKey(0) == 27 ) //Allow ESC to quit
+            if( cvWaitKey(3) == 27 ) //Allow ESC to quit
                 exit(-1);
         }
         else
@@ -263,6 +263,8 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _s
             cvSave("D2.xml",&_D2);
             cvSave("R2.xml",&_R2);
             cvSave("P2.xml",&_P2);
+            cvSave("R.xml",&_R);
+            cvSave("T.xml",&_T);
             cvSave("Q.xml",&_Q);
             cvSave("mx1.xml",mx1);
             cvSave("my1.xml",my1);
@@ -355,7 +357,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _s
                         cvLine( pair, cvPoint(j,0), cvPoint(j,imageSize.height*2), CV_RGB(0,255,0));
                 }
                 cvShowImage( "rectified", pair );
-                if( cvWaitKey() == 27 )
+                if( cvWaitKey(3) == 27 )
                     break;
             }
             cvReleaseImage( &img1 );
@@ -397,6 +399,7 @@ int calibmain(int argc, char *argv[])
 
     if(fail != 0) return 1;
 
-    StereoCalib(argv[1], nx, ny, 0, squareSize);
+    unsigned int useUncalibrated=0;
+    StereoCalib(argv[1], nx, ny, useUncalibrated, squareSize);
     return 0;
 }
