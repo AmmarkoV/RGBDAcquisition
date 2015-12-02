@@ -178,6 +178,15 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
 				      fprintf(stderr,"Q Key pressed , quitting\n");
                       stop=1; // exit (0);
                   break;
+
+                  case 32 :
+                      if (waitKeyToStart==1) { waitKeyToStart=0; } else { waitKeyToStart=1; }
+                  break;
+
+                  default :
+                      fprintf(stderr,"Unhandled key press %u \n",key);
+
+                  break;
 				}
 			}
 

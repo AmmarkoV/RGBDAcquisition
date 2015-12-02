@@ -24,6 +24,7 @@ struct sgbmCalibrationStuff
 {
   CvMat* _M1,*_M2,*_D1,*_D2,*_R1,*_R2,*_P1,*_P2,*_R,*_T,*_Q;
   cv::Mat M1,M2,D1,D2,R1,R2,P1,P2,R,T,Q;
+  int calibrationIsSet;
 };
 
 struct sgbmCalibrationStuff sgbmCalib;
@@ -79,6 +80,8 @@ int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
   snprintf(filenameOfFile,1024,"%s/Q.xml",disparityCalibrationPath);
   sgbmCalib._Q =  (CvMat*) cvLoad(filenameOfFile);
   sgbmCalib.Q = cv::Mat(sgbmCalib._Q);
+
+  sgbmCalib.calibrationIsSet=1;
 
  return 1;
 }
@@ -180,8 +183,9 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
 
     const char* img1_filename = 0;
     const char* img2_filename = 0;
-    const char* intrinsic_filename = disparityCalibrationPath;
-    const char* extrinsic_filename = disparityCalibrationPath;
+    char* intrinsic_filename = disparityCalibrationPath;
+    char* extrinsic_filename = disparityCalibrationPath;
+    if (!sgbmCalib.calibrationIsSet) { intrinsic_filename = 0;  extrinsic_filename = 0; }
     const char* disparity_filename = 0;
     const char* point_cloud_filename = 0;
 
