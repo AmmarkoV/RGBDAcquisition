@@ -81,6 +81,41 @@ cv::Mat rgbImg(colorHeight,colorWidth,CV_8UC3,colorFrame);
       cv::cvtColor(bgrrightImage, greyRight, CV_BGR2GRAY);
     }
 
+
+
+
+
+
+
+ double alpha = 0.5;
+    double beta = ( 1.0 - alpha );
+    cv::Mat blend ;
+    cv::addWeighted( leftImage, alpha, rightImage , beta, 0.0, blend);
+
+
+    cv::Point pt1=cv::Point(0,0);
+    cv::Point pt2=cv::Point(colorWidth,0);
+    cv::Scalar color=cv::Scalar(0,255,0);
+    unsigned int i=0;
+    unsigned int blockY=(unsigned int) colorHeight/15;
+    for (i=0; i<colorHeight/15; i++)
+    {
+       pt1.y=i*blockY; pt2.y=i*blockY;
+       cv::line(blend,pt1,pt2,   color, 1, 8, 0);
+    }
+
+    cv::imshow("blending",blend);
+
+
+    //cv::waitKey(5);
+
+    std::cerr<<"Done with preliminary stuff..\n";
+
+
+
+
+
+
     ++framesProcessed;
     return 1;
 };
