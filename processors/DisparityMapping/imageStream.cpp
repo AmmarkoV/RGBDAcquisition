@@ -87,7 +87,7 @@ cv::Mat rgbImg(colorHeight,colorWidth,CV_8UC3,colorFrame);
 
 
 
- double alpha = 0.5;
+    double alpha = 0.5;
     double beta = ( 1.0 - alpha );
     cv::Mat blend ;
     cv::addWeighted( leftImage, alpha, rightImage , beta, 0.0, blend);
@@ -104,13 +104,15 @@ cv::Mat rgbImg(colorHeight,colorWidth,CV_8UC3,colorFrame);
        cv::line(blend,pt1,pt2,   color, 1, 8, 0);
     }
 
+    cv::Point textPos=cv::Point(50,50);
+    char outBuf[1024]={0};
+    snprintf(outBuf,1024,"frame %u", framesProcessed );
+    cv::putText( blend,outBuf, textPos , CV_FONT_HERSHEY_COMPLEX, 1 ,  cv::Scalar(0,255,0)  , 5, 2 );
+
+
     cv::imshow("blending",blend);
-
-
-    //cv::waitKey(5);
-
     std::cerr<<"Done with preliminary stuff..\n";
-
+    //cv::waitKey(5);
 
 
 

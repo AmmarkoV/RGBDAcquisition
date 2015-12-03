@@ -1,7 +1,7 @@
 #!/bin/bash
  
 #  firstGPSCar firstGPSCar2 allimiagpscalibra
-./run_viewer.sh -module TEMPLATE -from firstGPSCar2 -seek 60  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500 -maxFrames 200 -disparityCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/allimiagpscalibra/DisparityMappingCalibration  -disparitySADWindowSize 70 -disparitySwapColorFeeds $@
+./run_viewer.sh -module TEMPLATE -from firstGPSCar2 -seek 160  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500 -maxFrames 500 -disparityCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/allimiagpscalibra/DisparityMappingCalibration  -disparitySADWindowSize 70 -disparitySwapColorFeeds $@
 
 
 
