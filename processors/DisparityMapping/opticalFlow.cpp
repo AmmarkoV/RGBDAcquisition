@@ -12,15 +12,17 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+using namespace cv;
 
-int test()
+int doLKOpticalFlow(cv::Mat leftRGB,cv::Mat lastLeftRGB)
 {
     // winsize has to be 11 or 13, otherwise nothing is found
     int winsize = 11;
     int maxlvl = 5;
 
-    calcOpticalFlowPyrLK(imgAgray, imgBgray, cornersA, cornersB, status, error,
-            Size(winsize, winsize), maxlvl);
+/*
+
+    calcOpticalFlowPyrLK(imgAgray,imgBgray,cornersA,cornersB,status,error,Size(winsize, winsize), maxlvl);
 
     for (unsigned int i = 0; i < cornersB.size(); i++) {
         if (status[i] == 0 || error[i] > 0) {
@@ -34,5 +36,5 @@ int test()
     namedWindow("window", 1);
     moveWindow("window", 50, 50);
 
-
+*/
 }

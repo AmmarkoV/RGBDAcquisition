@@ -14,8 +14,6 @@
 
 #include "stereo_calibrate.h"
 
-unsigned int shiftYLeft=0;
-unsigned int shiftYRight=0;//17;
 
 using namespace cv;
 
@@ -118,7 +116,9 @@ int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
 
 
 
-int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int colorHeight , unsigned int swapColorFeeds , unsigned int SADWindowSize , char * disparityCalibrationPath)
+int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int colorHeight , unsigned int swapColorFeeds ,
+           unsigned int SADWindowSize , unsigned int shiftYLeft , unsigned int shiftYRight ,
+           unsigned int speckleRange, char * disparityCalibrationPath)
 {
     cv::Mat rgbImg(colorHeight,colorWidth,CV_8UC3,colorFrame);
     //cv::Mat depthImg(depthHeight,depthWidth,CV_16UC1,depthFrame);
@@ -169,6 +169,19 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
     double beta = ( 1.0 - alpha );
     cv::Mat blend ;
     cv::addWeighted( leftImage, alpha, rightImage , beta, 0.0, blend);
+
+
+    cv::Point pt1=cv::Point(0,0);
+    cv::Point pt2=cv::Point(colorWidth,0);
+    cv::Scalar color=cv::Scalar(0,255,0);
+    unsigned int i=0;
+    unsigned int blockY=(unsigned int) colorHeight/15;
+    for (i=0; i<colorHeight/15; i++)
+    {
+       pt1.y=i*blockY; pt2.y=i*blockY;
+       cv::line(blend,pt1,pt2,   color, 1, 8, 0);
+    }
+
     cv::imshow("blending",blend);
 
 
@@ -258,7 +271,7 @@ int doSGBM(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int co
     bm.state->textureThreshold = 10;
     bm.state->uniquenessRatio = 15;
     bm.state->speckleWindowSize = 100;
-    bm.state->speckleRange = 32;
+    bm.state->speckleRange = speckleRange;
     bm.state->disp12MaxDiff = 1;
 
     sgbm.preFilterCap = 63;
