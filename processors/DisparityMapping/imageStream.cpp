@@ -60,25 +60,38 @@ cv::Mat rgbImg(colorHeight,colorWidth,CV_8UC3,colorFrame);
     {
       leftRGB=bgrleftImage;
       rightRGB=bgrrightImage;
-      lastLeftRGB=leftRGB;
-      lastRightRGB=rightRGB;
+      leftRGB.copyTo(lastLeftRGB);
+      //lastLeftRGB=leftRGB;
+      rightRGB.copyTo(lastRightRGB);
+      //lastRightRGB=rightRGB;
 
       cv::cvtColor(bgrleftImage, greyLeft, CV_BGR2GRAY);
       cv::cvtColor(bgrrightImage, greyRight, CV_BGR2GRAY);
-      greyLastLeft = greyLeft;
-      greyLastRight = greyRight;
+      greyLeft.copyTo(greyLastLeft);
+      //greyLastLeft = greyLeft;
+      greyRight.copyTo(greyLastRight);
+      //greyLastRight = greyRight;
 
     } else
     {
-      lastLeftRGB=leftRGB;
-      lastRightRGB=rightRGB;
+
+      leftRGB.copyTo(lastLeftRGB);
+      //lastLeftRGB=leftRGB;
+      rightRGB.copyTo(lastRightRGB);
+      //lastRightRGB=rightRGB;
       leftRGB=bgrleftImage;
       rightRGB=bgrrightImage;
 
-      greyLastLeft = greyLeft;
-      greyLastRight = greyRight;
+
+
+
+      greyLeft.copyTo(greyLastLeft);
+      //greyLastLeft = greyLeft;
+      greyRight.copyTo(greyLastRight);
+      //greyLastRight = greyRight;
       cv::cvtColor(bgrleftImage, greyLeft, CV_BGR2GRAY);
       cv::cvtColor(bgrrightImage, greyRight, CV_BGR2GRAY);
+
     }
 
 

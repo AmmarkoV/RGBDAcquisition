@@ -22,13 +22,20 @@ void drawPixel(cv::Mat * img , unsigned int x, unsigned int y , cv::Scalar color
 }
 
 
-int doLKOpticalFlow(cv::Mat leftBGR,cv::Mat leftGray,cv::Mat lastLeftGray)
+float euclideanDist(cv::Point2f& p, cv::Point2f& q)
+{
+    cv::Point diff = p - q;
+    return cv::sqrt(diff.x*diff.x + diff.y*diff.y);
+}
+
+int doLKOpticalFlow(cv::Mat leftBGR,cv::Mat Gray,cv::Mat lastGray)
 {
     cv::Mat flowVis=leftBGR;
 
     // winsize has to be 11 or 13, otherwise nothing is found
     int winsize = 11;
     int maxlvl = 5;
+    unsigned int maxFeaturesToUse=120;
 
     unsigned int sizeOfPixel=10;
     cv::Scalar red=cv::Scalar(255,0,0);
@@ -40,13 +47,13 @@ int doLKOpticalFlow(cv::Mat leftBGR,cv::Mat leftGray,cv::Mat lastLeftGray)
     TermCriteria termcrit(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 20, 0.03);
     Size subPixWinSize(10,10);
 
-    goodFeaturesToTrack(leftGray, cornersA, 100, 0.01, 30);
-    cornerSubPix(leftGray, cornersA , subPixWinSize, Size(-1,-1), termcrit);
+    goodFeaturesToTrack(Gray, cornersA, maxFeaturesToUse, 0.01, 30);
+    cornerSubPix(Gray, cornersA , subPixWinSize, Size(-1,-1), termcrit);
     for (unsigned int i = 0; i < cornersA.size(); i++) { drawPixel(&flowVis , cornersA[i].x , cornersA[i].y , blue , sizeOfPixel); }
 
-    goodFeaturesToTrack(lastLeftGray, cornersB, 100, 0.01, 30);
-    cornerSubPix(lastLeftGray, cornersB , subPixWinSize, Size(-1,-1), termcrit);
-    for (unsigned int i = 0; i < cornersB.size(); i++) { drawPixel(&flowVis , cornersB[i].x , cornersB[i].y , red , sizeOfPixel+5); }
+    //goodFeaturesToTrack(lastGray, cornersB, 100, 0.01, 30);
+    //cornerSubPix(lastGray, cornersB , subPixWinSize, Size(-1,-1), termcrit);
+    //for (unsigned int i = 0; i < cornersB.size(); i++) { drawPixel(&flowVis , cornersB[i].x , cornersB[i].y , red , sizeOfPixel+5); }
 
 
 
@@ -54,16 +61,21 @@ int doLKOpticalFlow(cv::Mat leftBGR,cv::Mat leftGray,cv::Mat lastLeftGray)
     vector<float> error;
 
 
-    calcOpticalFlowPyrLK(lastLeftGray,leftGray,cornersB,cornersA,status,error,Size(winsize, winsize), maxlvl);
+    calcOpticalFlowPyrLK(lastGray,Gray,cornersA,cornersB,status,error,Size(winsize, winsize), maxlvl);
     for (unsigned int i = 0; i < cornersB.size(); i++)
         {
-         if (status[i] == 0 || error[i] > 0)
+          if (euclideanDist(cornersA[i],cornersB[i])>60)
               {
                 drawPixel(&flowVis , cornersB[i].x , cornersB[i].y , red , sizeOfPixel);
-                 continue;
+              } else
+          if (status[i] == 0 ) //|| error[i] > 0
+              {
+                drawPixel(&flowVis , cornersB[i].x , cornersB[i].y , red , sizeOfPixel);
+              } else
+              {
+               drawPixel(&flowVis , cornersB[i].x , cornersB[i].y , green , sizeOfPixel);
+               cv::line(flowVis, cornersA[i], cornersB[i],  green, 1, 8, 0);
               }
-         drawPixel(&flowVis , cornersB[i].x , cornersB[i].y , green , sizeOfPixel);
-         line(flowVis, cornersA[i], cornersB[i], Scalar(255, 0, 0));
         }
 
     //imshow("window",flowVis);

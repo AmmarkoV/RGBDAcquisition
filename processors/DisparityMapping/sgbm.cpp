@@ -122,8 +122,6 @@ int doSGBM( cv::Mat leftBGR,cv::Mat rightBGR , unsigned int SADWindowSize ,  uns
     int argc=0;
     char * argv=0;
 
-
-
     const char* img1_filename = 0;
     const char* img2_filename = 0;
     char* intrinsic_filename = disparityCalibrationPath;

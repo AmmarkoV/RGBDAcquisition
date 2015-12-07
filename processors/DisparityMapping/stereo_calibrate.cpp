@@ -45,6 +45,54 @@
 
 using namespace std;
 
+
+
+    int haveInitialization=0;
+
+    int displayCorners = 1;
+    int showUndistorted = 1;
+    bool isVerticalStereo = false;//OpenCV can handle left-right
+    //or up-down camera arrangements
+    const int maxScale = 1;
+    float squareSize = 0; //Chessboard square size in cm
+    vector<string> imageNames[2];
+    vector<CvPoint3D32f> objectPoints;
+    vector<CvPoint2D32f> points[2];
+    vector<int> npoints;
+    vector<uchar> active[2];
+    CvSize imageSize = {0,0};
+    // ARRAY AND VECTOR STORAGE:
+    double M1[3][3], M2[3][3], D1[5], D2[5];
+    double R[3][3], T[3], E[3][3], F[3][3];
+    double Q[4][4];
+    CvMat _M1,_M2,_D1,_D2,_R,_T,_E,_F,_Q;
+
+
+
+int initializeCalibration()
+{
+     _M1 = cvMat(3, 3, CV_64F, M1 );
+     _M2 = cvMat(3, 3, CV_64F, M2 );
+     _D1 = cvMat(1, 5, CV_64F, D1 );
+     _D2 = cvMat(1, 5, CV_64F, D2 );
+     _R = cvMat(3, 3, CV_64F, R );
+     _T = cvMat(3, 1, CV_64F, T );
+     _E = cvMat(3, 3, CV_64F, E );
+     _F = cvMat(3, 3, CV_64F, F );
+     _Q = cvMat(4,4, CV_64F, Q);
+
+    haveInitialization=1;
+    return 1;
+}
+
+
+
+int stopCalibration()
+{
+    haveInitialization=0;
+    return 1;
+}
+
 //
 // Given a list of chessboard images, the number of corners (nx, ny)
 // on the chessboards, and a flag: useCalibrated for calibrated (0) or
@@ -52,58 +100,28 @@ using namespace std;
 // matrix separately) stereo. Calibrate the cameras and display the
 // rectified results along with the computed disparity images.
 //
-static void
-StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _squareSize)
+static void StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _squareSize)
 {
-    int displayCorners = 1;
-    int showUndistorted = 1;
-    bool isVerticalStereo = false;//OpenCV can handle left-right
-    //or up-down camera arrangements
-    const int maxScale = 1;
-    const float squareSize = _squareSize; //Chessboard square size in cm
-    FILE* f = fopen(imageList, "rt");
     int i, j, lr, nframes, n = nx*ny, N = 0;
-    vector<string> imageNames[2];
-    vector<CvPoint3D32f> objectPoints;
-    vector<CvPoint2D32f> points[2];
-    vector<int> npoints;
-    vector<uchar> active[2];
     vector<CvPoint2D32f> temp(n);
-    CvSize imageSize = {0,0};
-    // ARRAY AND VECTOR STORAGE:
-    double M1[3][3], M2[3][3], D1[5], D2[5];
-    double R[3][3], T[3], E[3][3], F[3][3];
-    double Q[4][4];
-    CvMat _M1 = cvMat(3, 3, CV_64F, M1 );
-    CvMat _M2 = cvMat(3, 3, CV_64F, M2 );
-    CvMat _D1 = cvMat(1, 5, CV_64F, D1 );
-    CvMat _D2 = cvMat(1, 5, CV_64F, D2 );
-    CvMat _R = cvMat(3, 3, CV_64F, R );
-    CvMat _T = cvMat(3, 1, CV_64F, T );
-    CvMat _E = cvMat(3, 3, CV_64F, E );
-    CvMat _F = cvMat(3, 3, CV_64F, F );
-    CvMat _Q = cvMat(4,4, CV_64F, Q);
+    squareSize = _squareSize;
+
+
+   if(!haveInitialization)
+   {
+        initializeCalibration();
+   }
+
     if( displayCorners )
         cvNamedWindow( "corners", 1 );
 // READ IN THE LIST OF CHESSBOARDS:
-    if( !f )
-    {
-        fprintf(stderr, "can not open file %s\n", imageList );
-        return;
-    }
     for(i=0;; i++)
     {
         char buf[1024];
         int count = 0, result=0;
         lr = i % 2;
         vector<CvPoint2D32f>& pts = points[lr];
-        if( !fgets( buf, sizeof(buf)-3, f ))
-            break;
-        size_t len = strlen(buf);
-        while( len > 0 && isspace(buf[len-1]))
-            buf[--len] = '\0';
-        if( buf[0] == '#')
-            continue;
+
         IplImage* img = cvLoadImage( buf, 0 );
         if( !img )
             break;
@@ -163,7 +181,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _s
         }
         cvReleaseImage( &img );
     }
-    fclose(f);
+
     printf("\n");
 // HARVEST CHESSBOARD 3D OBJECT POINT LIST:
     nframes = active[0].size();//Number of good chessboads found
@@ -402,4 +420,14 @@ int calibmain(int argc, char *argv[])
     unsigned int useUncalibrated=0;
     StereoCalib(argv[1], nx, ny, useUncalibrated, squareSize);
     return 0;
+}
+
+
+
+
+int doCalibrationStep(unsigned int horizontalSquares,unsigned int verticalSquares,float calibSquareSize)
+{
+
+    StereoCalib(0, horizontalSquares, verticalSquares, 0 , calibSquareSize);
+
 }

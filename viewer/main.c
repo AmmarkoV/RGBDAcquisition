@@ -74,6 +74,9 @@ unsigned int drawDepth=1;
 unsigned int noinput=0;
 unsigned int waitKeyToStart=0;
 
+char executeEveryLoop[1024]={0};
+unsigned int executeEveryLoopPayload=0;
+
 char inputname[512]={0};
 unsigned int frameNum=0;
 unsigned int seekFrame=0;
@@ -315,6 +318,11 @@ int main(int argc, char *argv[])
   for (i=0; i<argc; i++)
   {
 
+    if (strcmp(argv[i],"-executeEveryLoop")==0) {
+                                                   fprintf(stderr,"Will Execute %s after each frame\n",argv[i+1]);
+                                                   snprintf(executeEveryLoop,1024,"%s",argv[i+1]);
+                                                   executeEveryLoopPayload=1;
+                                                } else
     if (strcmp(argv[i],"-processor")==0) {
                                           fprintf(stderr,"Adding Processor to Pipeline %s , postfix %s\n",argv[i+1],argv[i+2]);
                                           acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2],argc,argv);
@@ -517,6 +525,12 @@ int main(int argc, char *argv[])
             acquisitionSeekFrame(moduleID,devID,seekFrame);
           }
         }
+
+
+      if (executeEveryLoopPayload)
+      {
+         int i=system(executeEveryLoop);
+      }
 
     }
 

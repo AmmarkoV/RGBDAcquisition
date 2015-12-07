@@ -8,7 +8,7 @@
 #include "highgui.h"
 #include "cvaux.h"
 
-int doLKOpticalFlow(cv::Mat leftBGR,cv::Mat leftGray,cv::Mat lastLeftGray);
+int doLKOpticalFlow(cv::Mat leftBGR,cv::Mat Gray,cv::Mat lastGray);
 
 
 #endif // OPTICALFLOW_H_INCLUDED
