@@ -46,9 +46,6 @@
 using namespace std;
 
 
-    IplImage  *image=0;
-    char * opencv_pointer_retainer=0; // This is a kind of an ugly hack ( see lines noted with UGLY HACK ) to minimize memcpying between my VisCortex and OpenCV , without disturbing OpenCV
-
     int haveInitialization=0;
 
     int displayCorners = 1;
@@ -70,8 +67,14 @@ using namespace std;
     CvMat _M1,_M2,_D1,_D2,_R,_T,_E,_F,_Q;
 
 
+void dbg(int line,char * fileName)
+{
+    fprintf (stderr,"line : %d of file \"%s\".\n", line, fileName);
+}
 
-int initializeCalibration(unsigned int imageRGBWidth,unsigned int imageRGBHeight)
+
+int initializeCalibration(cv::Mat * leftImgRGB ,
+                          cv::Mat * rightImgRGB )
 {
      _M1 = cvMat(3, 3, CV_64F, M1 );
      _M2 = cvMat(3, 3, CV_64F, M2 );
@@ -83,10 +86,6 @@ int initializeCalibration(unsigned int imageRGBWidth,unsigned int imageRGBHeight
      _F = cvMat(3, 3, CV_64F, F );
      _Q = cvMat(4,4, CV_64F, Q);
 
-
-     image = cvCreateImage( cvSize(imageRGBWidth,imageRGBHeight), IPL_DEPTH_8U, 3 );
-     opencv_pointer_retainer = image->imageData; // UGLY HACK
-
     haveInitialization=1;
     return 1;
 }
@@ -95,18 +94,11 @@ int initializeCalibration(unsigned int imageRGBWidth,unsigned int imageRGBHeight
 
 int stopCalibration()
 {
-    image->imageData = opencv_pointer_retainer; // UGLY HACK
-    cvReleaseImage( &image );
 
     haveInitialization=0;
     return 1;
 }
 
-
-void dbg(int line,char * fileName)
-{
-    fprintf (stderr,"line : %d of file \"%s\".\n", line, fileName);
-}
 
 //
 // Given a list of chessboard images, the number of corners (nx, ny)
@@ -115,92 +107,61 @@ void dbg(int line,char * fileName)
 // matrix separately) stereo. Calibrate the cameras and display the
 // rectified results along with the computed disparity images.
 //
-static void StereoCalib(char* imageLeftRGB,char* imageRightRGB,
-                        unsigned int imageRGBWidth,unsigned int imageRGBHeight
-
-                        , int nx, int ny, int useUncalibrated, float _squareSize)
+static void StereoCalib(cv::Mat * leftImgRGB ,
+                        cv::Mat * rightImgRGB,
+                        cv::Mat * leftImgGray ,
+                        cv::Mat * rightImgGray,
+                        int nx, int ny, int useUncalibrated, float _squareSize)
 {
     int i, j, lr, nframes, n = nx*ny, N = 0;
-    vector<CvPoint2D32f> temp(n);
+    vector<CvPoint2D32f> LeftPoints(n);
+    vector<CvPoint2D32f> RightPoints(n);
     squareSize = _squareSize;
 
 
    if(!haveInitialization)
    {
-        initializeCalibration(imageRGBWidth,imageRGBHeight);
+        initializeCalibration(leftImgRGB,rightImgRGB);
    }
 
-  dbg(__LINE__,__FILE__);
-
-    if( displayCorners )
-        cvNamedWindow( "corners", 1 );
-
-
-  dbg(__LINE__,__FILE__);
-// READ IN THE LIST OF CHESSBOARDS:
-    for(i=0;; i++)
-    {
-        int count = 0, result=0;
-        lr = i % 2;
-        vector<CvPoint2D32f>& pts = points[lr];
+        // READ IN THE LIST OF CHESSBOARDS:
+        int count = 0, chessbordFoundL=0, chessbordFoundR=0;
 
          // UGLY HACK
-        if (i%2==0) { image->imageData=(char*) imageLeftRGB;  } else
-                    { image->imageData=(char*) imageRightRGB;  }
-        IplImage* img = image;
+        IplImage imgconvLeft=*leftImgRGB;
+        IplImage imgconvRight=*rightImgRGB;
+        IplImage imgconvGLeft=*leftImgGray;
+        IplImage imgconvGRight=*rightImgGray;
 
+        IplImage* imgL=&imgconvLeft;
+        IplImage* imgR=&imgconvRight;
+        IplImage* imgGL=&imgconvGLeft;
+        IplImage* imgGR=&imgconvGRight;
 
-        if( !img ) break;
-        imageSize = cvGetSize(img);
-        //imageNames[lr].push_back(buf);
+        imageSize = cvGetSize(imgL);
         //FIND CHESSBOARDS AND CORNERS THEREIN:
 
-            IplImage* timg = img;
-            result = cvFindChessboardCorners( timg, cvSize(nx, ny),
-                                              &temp[0], &count,
-                                              CV_CALIB_CB_ADAPTIVE_THRESH |
-                                              CV_CALIB_CB_NORMALIZE_IMAGE);
-            if( timg != img )
-                cvReleaseImage( &timg );
+        if ( cvFindChessboardCorners( imgL, cvSize(nx, ny), &LeftPoints[0], &count, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_NORMALIZE_IMAGE) )
+        {
+          cvFindCornerSubPix( imgGL, &LeftPoints[0], count, cvSize(11, 11), cvSize(-1,-1), cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 0.01) );
+          chessbordFoundL=1;
+        }
 
-            if( result )
-                break;
+        if ( cvFindChessboardCorners( imgR, cvSize(nx, ny), &RightPoints[0], &count, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_NORMALIZE_IMAGE) )
+        {
+          cvFindCornerSubPix( imgGR, &RightPoints[0], count, cvSize(11, 11), cvSize(-1,-1), cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 0.01) );
+          chessbordFoundR=1;
+        }
 
 
+        cvDrawChessboardCorners( imgL, cvSize(nx, ny), &LeftPoints[0],  count, chessbordFoundL );
+        cvDrawChessboardCorners( imgR, cvSize(nx, ny), &RightPoints[0],  count, chessbordFoundR );
 
+  return;
+
+  /*
+        vector<CvPoint2D32f>& pts = points[lr];
   dbg(__LINE__,__FILE__);
-
-        if( displayCorners )
-        {
-            dbg(__LINE__,__FILE__);
-            fprintf(stderr,"Image ( %u , %u ) , depth %u , channels %u \n",imageSize.width,imageSize.height,img->depth,img->nChannels);
-
-            IplImage* cimg = 0;
-            if (img->nChannels==1)
-                {
-                 cimg = cvCreateImage( imageSize, 8, 3 );
-                 dbg(__LINE__,__FILE__);
-                 cvCvtColor( img, cimg, CV_GRAY2BGR );
-                } else
-                { cimg = img; }
-
-
-
-            dbg(__LINE__,__FILE__);
-            cvDrawChessboardCorners( cimg, cvSize(nx, ny), &temp[0],
-                                     count, result );
-            cvShowImage( "corners", cimg );
-
-            if (cimg!=img)
-             { cvReleaseImage( &cimg ); }
-        }
-        else
-        {
-           putchar('.');
-        }
-
-
-return ;
 
         N = pts.size();
         pts.resize(N + n, cvPoint2D32f(0,0));
@@ -219,7 +180,7 @@ return ;
     }
 
   dbg(__LINE__,__FILE__);
-    printf("\n");
+
 // HARVEST CHESSBOARD 3D OBJECT POINT LIST:
     nframes = active[0].size();//Number of good chessboads found
     objectPoints.resize(nframes*n);
@@ -239,6 +200,8 @@ return ;
     cvZero(&_D1);
     cvZero(&_D2);
 
+  dbg(__LINE__,__FILE__);
+
 // CALIBRATE THE STEREO CAMERAS
     printf("Running stereo calibration ...");
     fflush(stdout);
@@ -252,6 +215,9 @@ return ;
                        CV_CALIB_ZERO_TANGENT_DIST +
                        CV_CALIB_SAME_FOCAL_LENGTH );
     printf(" done\n");
+
+      dbg(__LINE__,__FILE__);
+
 // CALIBRATION QUALITY CHECK
 // because the output fundamental matrix implicitly
 // includes all the output information,
@@ -283,6 +249,9 @@ return ;
         avgErr += err;
     }
     printf( "avg err = %g\n", avgErr/(nframes*n) );
+
+  dbg(__LINE__,__FILE__);
+
 //COMPUTE AND DISPLAY RECTIFICATION
     if( showUndistorted )
     {
@@ -303,7 +272,7 @@ return ;
         {
             CvMat _P1 = cvMat(3, 4, CV_64F, P1);
             CvMat _P2 = cvMat(3, 4, CV_64F, P2);
-            cvStereoRectify( &_M1, &_M2, &_D1, &_D2, imageSize, &_R, &_T, &_R1, &_R2, &_P1, &_P2, &_Q, 0/*CV_CALIB_ZERO_DISPARITY*/ );
+            cvStereoRectify( &_M1, &_M2, &_D1, &_D2, imageSize, &_R, &_T, &_R1, &_R2, &_P1, &_P2, &_Q, 0); //CV_CALIB_ZERO_DISPARITY
             isVerticalStereo = fabs(P2[1][3]) > fabs(P2[0][3]);
             //Precompute maps for cvRemap()
             cvInitUndistortRectifyMap(&_M1,&_D1,&_R1,&_P1,mx1,my1);
@@ -427,45 +396,18 @@ return ;
         cvReleaseMat( &img2r );
         cvReleaseMat( &disp );
     }
+    */
 }
 
-/*
-int calibmain(int argc, char *argv[])
+
+
+
+int doCalibrationStep(cv::Mat * leftImgRGB ,
+                      cv::Mat * rightImgRGB ,
+                        cv::Mat * leftImgGray ,
+                        cv::Mat * rightImgGray,
+                      unsigned int horizontalSquares,unsigned int verticalSquares,float calibSquareSize)
 {
-    int nx, ny;
-    float squareSize;
-    int fail = 0;
-    //Check command line
-    if (argc != 5)
-    {
-        fprintf(stderr,"USAGE: %s imageList nx ny squareSize\n",argv[0]);
-        fprintf(stderr,"\t imageList : Filename of the image list (string). Example : list.txt\n");
-        fprintf(stderr,"\t nx : Number of horizontal squares (int > 0). Example : 9\n");
-        fprintf(stderr,"\t ny : Number of vertical squares (int > 0). Example : 6\n");
-        fprintf(stderr,"\t squareSize : Size of a square (float > 0). Example : 2.5\n");
-        return 1;
-    }
-
-    nx = atoi(argv[2]);
-    ny = atoi(argv[3]);
-    squareSize = (float)atof(argv[4]);
-
-    if (nx <= 0)           { fail = 1; fprintf(stderr, "ERROR: nx value can not be <= 0\n"); }
-    if (ny <= 0)           { fail = 1; fprintf(stderr, "ERROR: ny value can not be <= 0\n"); }
-    if (squareSize <= 0.0) { fail = 1; fprintf(stderr, "ERROR: squareSize value can not be <= 0\n"); }
-
-    if(fail != 0) return 1;
-
-    unsigned int useUncalibrated=0;
-    //StereoCalib(argv[1], nx, ny, useUncalibrated, squareSize);
-    return 0;
-}
-*/
-
-
-
-int doCalibrationStep(char* imageLeftRGB,char* imageRightRGB,unsigned int imageRGBWidth,unsigned int imageRGBHeight,unsigned int horizontalSquares,unsigned int verticalSquares,float calibSquareSize)
-{
-  StereoCalib(imageLeftRGB,imageRightRGB,imageRGBWidth,imageRGBHeight, horizontalSquares, verticalSquares, 0 , calibSquareSize);
+  StereoCalib(leftImgRGB,rightImgRGB,leftImgGray,rightImgGray, horizontalSquares, verticalSquares, 0 , calibSquareSize);
   return 1;
 }

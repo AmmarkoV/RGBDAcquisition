@@ -12,7 +12,7 @@ unsigned int framesProcessed=0;
 
 int passNewFrame(unsigned char * colorFrame , unsigned int colorWidth ,unsigned int colorHeight , unsigned int swapColorFeeds , unsigned int shiftYLeft , unsigned int shiftYRight )
 {
-cv::Mat rgbImg(colorHeight,colorWidth,CV_8UC3,colorFrame);
+    cv::Mat rgbImg(colorHeight,colorWidth,CV_8UC3,colorFrame);
     //cv::Mat depthImg(depthHeight,depthWidth,CV_16UC1,depthFrame);
 
     std::cerr<<"Doing Left split of images..\n";
