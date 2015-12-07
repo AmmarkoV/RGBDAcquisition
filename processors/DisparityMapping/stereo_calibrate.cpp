@@ -46,6 +46,8 @@
 using namespace std;
 
 
+    IplImage  *image=0;
+    char * opencv_pointer_retainer=0; // This is a kind of an ugly hack ( see lines noted with UGLY HACK ) to minimize memcpying between my VisCortex and OpenCV , without disturbing OpenCV
 
     int haveInitialization=0;
 
@@ -69,7 +71,7 @@ using namespace std;
 
 
 
-int initializeCalibration()
+int initializeCalibration(unsigned int imageRGBWidth,unsigned int imageRGBHeight)
 {
      _M1 = cvMat(3, 3, CV_64F, M1 );
      _M2 = cvMat(3, 3, CV_64F, M2 );
@@ -81,6 +83,10 @@ int initializeCalibration()
      _F = cvMat(3, 3, CV_64F, F );
      _Q = cvMat(4,4, CV_64F, Q);
 
+
+     image = cvCreateImage( cvSize(imageRGBWidth,imageRGBHeight), IPL_DEPTH_8U, 3 );
+     opencv_pointer_retainer = image->imageData; // UGLY HACK
+
     haveInitialization=1;
     return 1;
 }
@@ -89,8 +95,17 @@ int initializeCalibration()
 
 int stopCalibration()
 {
+    image->imageData = opencv_pointer_retainer; // UGLY HACK
+    cvReleaseImage( &image );
+
     haveInitialization=0;
     return 1;
+}
+
+
+void dbg(int line,char * fileName)
+{
+    fprintf (stderr,"line : %d of file \"%s\".\n", line, fileName);
 }
 
 //
@@ -100,7 +115,10 @@ int stopCalibration()
 // matrix separately) stereo. Calibrate the cameras and display the
 // rectified results along with the computed disparity images.
 //
-static void StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _squareSize)
+static void StereoCalib(char* imageLeftRGB,char* imageRightRGB,
+                        unsigned int imageRGBWidth,unsigned int imageRGBHeight
+
+                        , int nx, int ny, int useUncalibrated, float _squareSize)
 {
     int i, j, lr, nframes, n = nx*ny, N = 0;
     vector<CvPoint2D32f> temp(n);
@@ -109,63 +127,81 @@ static void StereoCalib(const char* imageList, int nx, int ny, int useUncalibrat
 
    if(!haveInitialization)
    {
-        initializeCalibration();
+        initializeCalibration(imageRGBWidth,imageRGBHeight);
    }
+
+  dbg(__LINE__,__FILE__);
 
     if( displayCorners )
         cvNamedWindow( "corners", 1 );
+
+
+  dbg(__LINE__,__FILE__);
 // READ IN THE LIST OF CHESSBOARDS:
     for(i=0;; i++)
     {
-        char buf[1024];
         int count = 0, result=0;
         lr = i % 2;
         vector<CvPoint2D32f>& pts = points[lr];
 
-        IplImage* img = cvLoadImage( buf, 0 );
-        if( !img )
-            break;
+         // UGLY HACK
+        if (i%2==0) { image->imageData=(char*) imageLeftRGB;  } else
+                    { image->imageData=(char*) imageRightRGB;  }
+        IplImage* img = image;
+
+
+        if( !img ) break;
         imageSize = cvGetSize(img);
-        imageNames[lr].push_back(buf);
+        //imageNames[lr].push_back(buf);
         //FIND CHESSBOARDS AND CORNERS THEREIN:
-        for( int s = 1; s <= maxScale; s++ )
-        {
+
             IplImage* timg = img;
-            if( s > 1 )
-            {
-                timg = cvCreateImage(cvSize(img->width*s,img->height*s),
-                                     img->depth, img->nChannels );
-                cvResize( img, timg, CV_INTER_CUBIC );
-            }
             result = cvFindChessboardCorners( timg, cvSize(nx, ny),
                                               &temp[0], &count,
                                               CV_CALIB_CB_ADAPTIVE_THRESH |
                                               CV_CALIB_CB_NORMALIZE_IMAGE);
             if( timg != img )
                 cvReleaseImage( &timg );
-            if( result || s == maxScale )
-                for( j = 0; j < count; j++ )
-                {
-                    temp[j].x /= s;
-                    temp[j].y /= s;
-                }
+
             if( result )
                 break;
-        }
+
+
+
+  dbg(__LINE__,__FILE__);
+
         if( displayCorners )
         {
-            printf("%s\n", buf);
-            IplImage* cimg = cvCreateImage( imageSize, 8, 3 );
-            cvCvtColor( img, cimg, CV_GRAY2BGR );
+            dbg(__LINE__,__FILE__);
+            fprintf(stderr,"Image ( %u , %u ) , depth %u , channels %u \n",imageSize.width,imageSize.height,img->depth,img->nChannels);
+
+            IplImage* cimg = 0;
+            if (img->nChannels==1)
+                {
+                 cimg = cvCreateImage( imageSize, 8, 3 );
+                 dbg(__LINE__,__FILE__);
+                 cvCvtColor( img, cimg, CV_GRAY2BGR );
+                } else
+                { cimg = img; }
+
+
+
+            dbg(__LINE__,__FILE__);
             cvDrawChessboardCorners( cimg, cvSize(nx, ny), &temp[0],
                                      count, result );
             cvShowImage( "corners", cimg );
-            cvReleaseImage( &cimg );
-            if( cvWaitKey(3) == 27 ) //Allow ESC to quit
-                exit(-1);
+
+            if (cimg!=img)
+             { cvReleaseImage( &cimg ); }
         }
         else
-            putchar('.');
+        {
+           putchar('.');
+        }
+
+
+return ;
+
         N = pts.size();
         pts.resize(N + n, cvPoint2D32f(0,0));
         active[lr].push_back((uchar)result);
@@ -182,6 +218,7 @@ static void StereoCalib(const char* imageList, int nx, int ny, int useUncalibrat
         cvReleaseImage( &img );
     }
 
+  dbg(__LINE__,__FILE__);
     printf("\n");
 // HARVEST CHESSBOARD 3D OBJECT POINT LIST:
     nframes = active[0].size();//Number of good chessboads found
@@ -335,8 +372,8 @@ static void StereoCalib(const char* imageList, int nx, int ny, int useUncalibrat
         BMState->uniquenessRatio=15;
         for( i = 0; i < nframes; i++ )
         {
-            IplImage* img1=cvLoadImage(imageNames[0][i].c_str(),0);
-            IplImage* img2=cvLoadImage(imageNames[1][i].c_str(),0);
+            IplImage* img1=0;//=cvLoadImage(imageNames[0][i].c_str(),0);
+            IplImage* img2=0;//=cvLoadImage(imageNames[1][i].c_str(),0);
             if( img1 && img2 )
             {
                 CvMat part;
@@ -391,6 +428,8 @@ static void StereoCalib(const char* imageList, int nx, int ny, int useUncalibrat
         cvReleaseMat( &disp );
     }
 }
+
+/*
 int calibmain(int argc, char *argv[])
 {
     int nx, ny;
@@ -418,16 +457,15 @@ int calibmain(int argc, char *argv[])
     if(fail != 0) return 1;
 
     unsigned int useUncalibrated=0;
-    StereoCalib(argv[1], nx, ny, useUncalibrated, squareSize);
+    //StereoCalib(argv[1], nx, ny, useUncalibrated, squareSize);
     return 0;
 }
+*/
 
 
 
-
-int doCalibrationStep(unsigned int horizontalSquares,unsigned int verticalSquares,float calibSquareSize)
+int doCalibrationStep(char* imageLeftRGB,char* imageRightRGB,unsigned int imageRGBWidth,unsigned int imageRGBHeight,unsigned int horizontalSquares,unsigned int verticalSquares,float calibSquareSize)
 {
-
-    StereoCalib(0, horizontalSquares, verticalSquares, 0 , calibSquareSize);
-
+  StereoCalib(imageLeftRGB,imageRightRGB,imageRGBWidth,imageRGBHeight, horizontalSquares, verticalSquares, 0 , calibSquareSize);
+  return 1;
 }
