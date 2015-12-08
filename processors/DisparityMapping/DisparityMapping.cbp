@@ -45,6 +45,8 @@
 		<Unit filename="opticalFlow.h" />
 		<Unit filename="sgbm.cpp" />
 		<Unit filename="sgbm.h" />
+		<Unit filename="stereo_calib.cpp" />
+		<Unit filename="stereo_calib.h" />
 		<Unit filename="stereo_calibrate.cpp" />
 		<Unit filename="stereo_calibrate.h" />
 		<Extensions>

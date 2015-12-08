@@ -100,7 +100,7 @@ int stopAppending( char * filenameFinal )
   if (xmlFileOutput!=NULL)
   {
     fprintf(xmlFileOutput,"</imagelist>\n");
-    fprintf(xmlFileOutput,"</opencv_storage>\n");
+    fprintf(xmlFileOutput,"</opencv_storage>\n\n");
 
     fclose (xmlFileOutput);
     return 1;
@@ -224,10 +224,7 @@ static void StereoCalib(cv::Mat * leftImgRGB ,
           chessbordFoundR=1;
         }
 
-
-        cvDrawChessboardCorners( imgL, cvSize(nx, ny), &LeftPoints[0],  count, chessbordFoundL );
-        cvDrawChessboardCorners( imgR, cvSize(nx, ny), &RightPoints[0],  count, chessbordFoundR );
-
+        //This has to be done before we draw on the images and we ruin them..!
         if ( (chessbordFoundL) && (chessbordFoundR) )
         {
           appendImages( disparityCalibrationOutputPath,
@@ -237,6 +234,11 @@ static void StereoCalib(cv::Mat * leftImgRGB ,
                       );
            ++goodCalibrationFrames;
         }
+
+
+        cvDrawChessboardCorners( imgL, cvSize(nx, ny), &LeftPoints[0],  count, chessbordFoundL );
+        cvDrawChessboardCorners( imgR, cvSize(nx, ny), &RightPoints[0],  count, chessbordFoundR );
+
   return;
 
   /*

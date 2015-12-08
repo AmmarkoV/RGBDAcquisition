@@ -28,7 +28,7 @@ struct sgbmCalibrationStuff
 struct sgbmCalibrationStuff sgbmCalib;
 
 
-int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
+int oldKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
 {
   if (disparityCalibrationPath==0) { return 0; }
 
@@ -86,22 +86,25 @@ int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
 
 
 
+int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
+{
+ char intrinsic_filename[2048]={0};
+ char extrinsic_filename[2048]={0};
 
-/*
- Other way to read/write calibrations
-        // reading intrinsic parameters
-        FileStorage fs(intrinsic_filename, CV_STORAGE_READ);
+ snprintf(intrinsic_filename,2048,"%s/intrinsics.yml",disparityCalibrationPath);
+ snprintf(extrinsic_filename,2048,"%s/extrinsics.yml",disparityCalibrationPath);
+
+       FileStorage fs(intrinsic_filename, CV_STORAGE_READ);
         if(!fs.isOpened())
         {
             printf("Failed to open file %s\n", intrinsic_filename);
             return -1;
         }
 
-        Mat M1, D1, M2, D2;
-        fs["M1"] >> M1;
-        fs["D1"] >> D1;
-        fs["M2"] >> M2;
-        fs["D2"] >> D2;
+        fs["M1"] >> sgbmCalib.M1;
+        fs["D1"] >> sgbmCalib.D1;
+        fs["M2"] >> sgbmCalib.M2;
+        fs["D2"] >> sgbmCalib.D2;
 
         fs.open(extrinsic_filename, CV_STORAGE_READ);
         if(!fs.isOpened())
@@ -110,9 +113,9 @@ int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
             return -1;
         }
 
-        Mat R, T, R1, P1, R2, P2;
-        fs["R"] >> R;
-        fs["T"] >> T;*/
+        fs["R"] >> sgbmCalib.R;
+        fs["T"] >> sgbmCalib.T;
+}
 
 
 

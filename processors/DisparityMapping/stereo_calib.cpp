@@ -38,21 +38,6 @@
 using namespace cv;
 using namespace std;
 
-static int print_help()
-{
-    cout <<
-            " Given a list of chessboard images, the number of corners (nx, ny)\n"
-            " on the chessboards, and a flag: useCalibrated for \n"
-            "   calibrated (0) or\n"
-            "   uncalibrated \n"
-            "     (1: use cvStereoCalibrate(), 2: compute fundamental\n"
-            "         matrix separately) stereo. \n"
-            " Calibrate the cameras and display the\n"
-            " rectified results along with the computed disparity images.   \n" << endl;
-    cout << "Usage:\n ./stereo_calib -w board_width -h board_height [-nr /*dot not view results*/] <image list XML/YML file>\n" << endl;
-    return 0;
-}
-
 
 static void
 StereoCalibNew(const vector<string>& imagelist, Size boardSize, float usedSquareSize , bool useCalibrated=true, bool showRectified=true)
@@ -369,9 +354,8 @@ int stereoCalibMain(char * imageListFile , unsigned int boardWidth , unsigned in
     if(!ok || imagelist.empty())
     {
         cout << "can not open " << imagelistfn << " or the string list is empty" << endl;
-        return print_help();
     }
 
-    StereoCalibNew(imagelist, boardSize, boardRectangleSize , false, showRectified);
+    StereoCalibNew(imagelist, boardSize, boardRectangleSize , true, showRectified);
     return 0;
 }

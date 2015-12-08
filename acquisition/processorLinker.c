@@ -73,13 +73,8 @@ int closeAllProcessors()
    unsigned int processorID = 0;
       for (processorID=0; processorID<processorsLoaded; processorID++)
        {
-          if (
-               (processors[processorID].stop!=0)
-             )
-          {
-           (*processors[processorID].stop) ();
-          }
-
+          if (processors[processorID].stop!=0)
+                   { (*processors[processorID].stop) (); }
           unlinkProcessor(processorID);
        }
 
