@@ -634,6 +634,10 @@ int acquisitionStopModule(ModuleIdentifier moduleID)
     stopLocationServices();
    #endif // ENABLE_LOCATION_SERVICE
 
+   //Close all processors ..!
+    closeAllProcessors();
+
+
     if (*plugins[moduleID].stopModule!=0) { return (*plugins[moduleID].stopModule) (); }
     acquisitionUnloadPlugin(moduleID);
 

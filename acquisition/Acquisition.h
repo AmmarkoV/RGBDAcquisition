@@ -372,6 +372,7 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
  * @ingroup acquisitionCore
  * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
  * @retval 1=Success , 0=Failure
+ * @bug acquisitionStopModule stops all processors on stop , since stopping a module typically happens in the end ..
  */
 int acquisitionStopModule(ModuleIdentifier moduleID);
 

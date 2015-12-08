@@ -53,7 +53,8 @@ int linkToProcessor(char * processorName,char * processorLibPath ,  int processo
   processors[processorID].getColor     = linkProcessorFunction(processorID,"getColor_%s",processorLibPath);
 
   processors[processorID].processData  = linkProcessorFunction(processorID,"processData_%s",processorLibPath);
-  processors[processorID].cleanup  = linkProcessorFunction(processorID,"cleanup_%s",processorLibPath);
+  processors[processorID].cleanup      = linkProcessorFunction(processorID,"cleanup_%s",processorLibPath);
+  processors[processorID].stop         = linkProcessorFunction(processorID,"stop_%s",processorLibPath);
 
   return 1;
 }
@@ -69,7 +70,19 @@ int unlinkProcessor(int processorID)
 
 int closeAllProcessors()
 {
- fprintf(stderr,"closeAllProcessors not implemented\n");
+   unsigned int processorID = 0;
+      for (processorID=0; processorID<processorsLoaded; processorID++)
+       {
+          if (
+               (processors[processorID].stop!=0)
+             )
+          {
+           (*processors[processorID].stop) ();
+          }
+
+          unlinkProcessor(processorID);
+       }
+
   return 0;
 }
 

@@ -32,6 +32,9 @@ struct acquisitionProcessorInterface
    int (*processData) ();
    int (*cleanup) ();
 
+
+   int (*stop) ();
+
 };
 
 

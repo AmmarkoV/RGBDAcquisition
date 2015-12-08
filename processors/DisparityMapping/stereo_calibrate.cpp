@@ -42,11 +42,12 @@
 #include <ctype.h>
 
 #include "stereo_calibrate.h"
+#include "stereo_calib.h"
 
 using namespace std;
 
-
     int haveInitialization=0;
+    unsigned int goodCalibrationFrames=0;
 
     int displayCorners = 1;
     int showUndistorted = 1;
@@ -92,11 +93,79 @@ int initializeCalibration(cv::Mat * leftImgRGB ,
 
 
 
-int stopCalibration()
-{
 
-    haveInitialization=0;
+int stopAppending( char * filenameFinal )
+{
+  FILE * xmlFileOutput = fopen (filenameFinal,"a");
+  if (xmlFileOutput!=NULL)
+  {
+    fprintf(xmlFileOutput,"</imagelist>\n");
+    fprintf(xmlFileOutput,"</opencv_storage>\n");
+
+    fclose (xmlFileOutput);
     return 1;
+  }
+ return 0;
+}
+
+
+int finalizeCalibration(char * outputFolder,int nx, int ny, float _squareSize)
+{
+  char filenameFinal[1024]={0};
+  snprintf(filenameFinal,1024,"%s/stereo_calib.xml",outputFolder);
+  stopAppending(filenameFinal);
+
+  fprintf(stderr,"Now running part 2 of calibration code..!\n");
+  fprintf(stderr,"This might take a while( hang on.. ) \n");
+   stereoCalibMain(filenameFinal ,nx, ny,_squareSize);
+  fprintf(stderr,"done..\n");
+  haveInitialization=0;
+ return 1;
+}
+
+
+int appendImages(
+                  char * outputFolder,
+                  cv::Mat * leftImgRGB ,
+                  cv::Mat * rightImgRGB,
+                  unsigned int frameNumber
+                )
+{
+ char filenameFinal[1024]={0};
+ snprintf(filenameFinal,1024,"%s/left_%05u.jpg",outputFolder,frameNumber);
+ imwrite(filenameFinal,*leftImgRGB);
+
+ snprintf(filenameFinal,1024,"%s/right_%05u.jpg",outputFolder,frameNumber);
+ imwrite(filenameFinal,*rightImgRGB);
+
+ snprintf(filenameFinal,1024,"%s/stereo_calib.xml",outputFolder);
+ FILE * xmlFileOutput;
+ if (frameNumber==0)
+ {
+  xmlFileOutput = fopen (filenameFinal,"w");
+  if (xmlFileOutput!=NULL)
+  {
+    fprintf(xmlFileOutput,"<?xml version=\"1.0\"?>\n");
+    fprintf(xmlFileOutput,"<opencv_storage>\n");
+    fprintf(xmlFileOutput,"<imagelist>\n");
+    fprintf(xmlFileOutput,"\"%s/left_%05u.jpg\"\n",outputFolder,frameNumber);
+    fprintf(xmlFileOutput,"\"%s/right_%05u.jpg\"\n",outputFolder,frameNumber);
+    fclose (xmlFileOutput);
+  }
+ } else
+ {
+  xmlFileOutput = fopen (filenameFinal,"a");
+  if (xmlFileOutput!=NULL)
+  {
+    fprintf(xmlFileOutput,"\"%s/left_%05u.jpg\"\n",outputFolder,frameNumber);
+    fprintf(xmlFileOutput,"\"%s/right_%05u.jpg\"\n",outputFolder,frameNumber);
+    fclose (xmlFileOutput);
+  }
+ }
+
+
+
+
 }
 
 
@@ -111,7 +180,9 @@ static void StereoCalib(cv::Mat * leftImgRGB ,
                         cv::Mat * rightImgRGB,
                         cv::Mat * leftImgGray ,
                         cv::Mat * rightImgGray,
-                        int nx, int ny, int useUncalibrated, float _squareSize)
+                        int nx, int ny, int useUncalibrated, float _squareSize,
+                        char * disparityCalibrationOutputPath
+                        )
 {
     int i, j, lr, nframes, n = nx*ny, N = 0;
     vector<CvPoint2D32f> LeftPoints(n);
@@ -157,6 +228,15 @@ static void StereoCalib(cv::Mat * leftImgRGB ,
         cvDrawChessboardCorners( imgL, cvSize(nx, ny), &LeftPoints[0],  count, chessbordFoundL );
         cvDrawChessboardCorners( imgR, cvSize(nx, ny), &RightPoints[0],  count, chessbordFoundR );
 
+        if ( (chessbordFoundL) && (chessbordFoundR) )
+        {
+          appendImages( disparityCalibrationOutputPath,
+                        leftImgRGB ,
+                        rightImgRGB,
+                        goodCalibrationFrames
+                      );
+           ++goodCalibrationFrames;
+        }
   return;
 
   /*
@@ -406,8 +486,8 @@ int doCalibrationStep(cv::Mat * leftImgRGB ,
                       cv::Mat * rightImgRGB ,
                         cv::Mat * leftImgGray ,
                         cv::Mat * rightImgGray,
-                      unsigned int horizontalSquares,unsigned int verticalSquares,float calibSquareSize)
+                      unsigned int horizontalSquares,unsigned int verticalSquares,float calibSquareSize,char * disparityCalibrationOutputPath)
 {
-  StereoCalib(leftImgRGB,rightImgRGB,leftImgGray,rightImgGray, horizontalSquares, verticalSquares, 0 , calibSquareSize);
+  StereoCalib(leftImgRGB,rightImgRGB,leftImgGray,rightImgGray, horizontalSquares, verticalSquares, 0 , calibSquareSize,disparityCalibrationOutputPath);
   return 1;
 }

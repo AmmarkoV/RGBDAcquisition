@@ -27,6 +27,8 @@ int processData_DisparityMapping();
 
 int cleanup_DisparityMapping();
 
+int stop_DisparityMapping();
+
 #ifdef __cplusplus
 }
 #endif

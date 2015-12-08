@@ -4,7 +4,7 @@ find_package(OpenCV REQUIRED)
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
   
 
-add_library(DisparityMapping  SHARED  DisparityMapping.h DisparityMapping.cpp stereo_calibrate.cpp stereo_calibrate.h sgbm.cpp sgbm.h opticalFlow.cpp opticalFlow.h imageStream.cpp imageStream.h ) 
+add_library(DisparityMapping  SHARED  DisparityMapping.h DisparityMapping.cpp stereo_calibrate.cpp stereo_calibrate.h sgbm.cpp sgbm.h opticalFlow.cpp opticalFlow.h imageStream.cpp imageStream.h stereo_calib.cpp stereo_calib.h ) 
 target_link_libraries(DisparityMapping rt dl m Acquisition OperatingSystem Timers CalibrationLibrary ${OpenCV_LIBRARIES} ${LocationService_Libs} )
 set_target_properties(DisparityMapping PROPERTIES DEBUG_POSTFIX "D")
 add_dependencies(DisparityMapping Acquisition OperatingSystem Timers CalibrationLibrary)  
