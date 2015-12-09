@@ -14,13 +14,14 @@ FPS="30"
 
 
 
-./run_viewer.sh -module TEMPLATE -seek 100 -from calibraInternal   -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparityCalibrate 9 13 0.7 /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/newCalibrationOutput  $@
+#./run_viewer.sh -module TEMPLATE -seek 100 -from calibraInternal   -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparityCalibrate 9 13 0.7 /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/newCalibrationOutput  $@
 
 
 #  firstGPSCar firstGPSCar2 allimiagpscalibra firstGPSCar2 firstGPSCar3Pan
 #./run_viewer.sh -module TEMPLATE -from firstGPSToTheCity -seek 10  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparitySwapColorFeeds $@
 
-# -executeEveryLoop scrot
+./run_viewer.sh -module TEMPLATE -from calibraInternal firstGPSToTheCity -seek 10  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparityCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/newCalibrationOutput $@
+# -executeEveryLoop scrot -disparitySwapColorFeeds 
 
 #-disparityshiftYLeft 22 -maxFrames 500
 #-disparityCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/allimiagpscalibra/DisparityMappingCalibration 

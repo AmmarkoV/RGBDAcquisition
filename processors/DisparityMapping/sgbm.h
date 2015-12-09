@@ -11,6 +11,6 @@
 int oldKindOfDisplayCalibrationReading(char * disparityCalibrationPath);
 int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath);
 
-int doSGBM( cv::Mat leftBGR,cv::Mat rightBGR , unsigned int SADWindowSize ,  unsigned int speckleRange, char * disparityCalibrationPath);
+int doSGBM( cv::Mat *leftBGR,cv::Mat *rightBGR , unsigned int SADWindowSize ,  unsigned int speckleRange, char * disparityCalibrationPath);
 
 #endif // SGBM_H_INCLUDED

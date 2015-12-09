@@ -88,6 +88,7 @@ int oldKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
 
 int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
 {
+ fprintf(stderr,"newKindOfDisplayCalibrationReading(%s)\n",disparityCalibrationPath);
  char intrinsic_filename[2048]={0};
  char extrinsic_filename[2048]={0};
 
@@ -97,7 +98,7 @@ int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
        FileStorage fs(intrinsic_filename, CV_STORAGE_READ);
         if(!fs.isOpened())
         {
-            printf("Failed to open file %s\n", intrinsic_filename);
+            printf("Failed to open intrinsics file %s\n", intrinsic_filename);
             return -1;
         }
 
@@ -109,24 +110,30 @@ int newKindOfDisplayCalibrationReading(char * disparityCalibrationPath)
         fs.open(extrinsic_filename, CV_STORAGE_READ);
         if(!fs.isOpened())
         {
-            printf("Failed to open file %s\n", extrinsic_filename);
+            printf("Failed to open extrinsics file %s\n", extrinsic_filename);
             return -1;
         }
 
         fs["R"] >> sgbmCalib.R;
         fs["T"] >> sgbmCalib.T;
+        std::cout << "R : \n"<<sgbmCalib.R << "\n";
+        std::cout << "T : \n"<<sgbmCalib.T << "\n";
+
+        fs["R1"] >> sgbmCalib.R1;
+        fs["R2"] >> sgbmCalib.R2;
+        fs["P1"] >> sgbmCalib.P1;
+        fs["P2"] >> sgbmCalib.P2;
+        fs["Q"] >> sgbmCalib.Q;
+
+
+  sgbmCalib.calibrationIsSet=1;
+  return 1;
 }
 
 
 
-int doSGBM( cv::Mat leftBGR,cv::Mat rightBGR , unsigned int SADWindowSize ,  unsigned int speckleRange, char * disparityCalibrationPath)
+int doSGBM( cv::Mat *leftBGR,cv::Mat *rightBGR , unsigned int SADWindowSize ,  unsigned int speckleRange, char * disparityCalibrationPath)
 {
-
-    int argc=0;
-    char * argv=0;
-
-    const char* img1_filename = 0;
-    const char* img2_filename = 0;
     char* intrinsic_filename = disparityCalibrationPath;
     char* extrinsic_filename = disparityCalibrationPath;
     if (!sgbmCalib.calibrationIsSet) { intrinsic_filename = 0;  extrinsic_filename = 0; }
@@ -144,22 +151,11 @@ int doSGBM( cv::Mat leftBGR,cv::Mat rightBGR , unsigned int SADWindowSize ,  uns
     StereoVar var;
 
 
-    if( (intrinsic_filename != 0) ^ (extrinsic_filename != 0) )
-    {
-        printf("Command-line parameter error: either both intrinsic and extrinsic parameters must be specified, or none of them (when the stereo pair is already rectified)\n");
-        return -1;
-    }
-
-    if( extrinsic_filename == 0 && point_cloud_filename )
-    {
-        printf("Command-line parameter error: extrinsic and intrinsic parameters must be specified to compute the point cloud\n");
-        return -1;
-    }
 
     int color_mode = alg == STEREO_BM ? 0 : -1;
     Mat img1 ,img2 ;
-    img1 = leftBGR;
-    img2 = rightBGR;
+    img1 = *leftBGR;
+    img2 = *rightBGR;
 
     if( scale != 1.f )
     {
@@ -175,7 +171,7 @@ int doSGBM( cv::Mat leftBGR,cv::Mat rightBGR , unsigned int SADWindowSize ,  uns
 
     Rect roi1, roi2;
 
-    if( intrinsic_filename )
+    if( sgbmCalib.calibrationIsSet )
     {
         stereoRectify( sgbmCalib.M1, sgbmCalib.D1, sgbmCalib.M2, sgbmCalib.D2, img_size, sgbmCalib.R, sgbmCalib.T, sgbmCalib.R1, sgbmCalib.R2, sgbmCalib.P1, sgbmCalib.P2, sgbmCalib.Q, CALIB_ZERO_DISPARITY, -1, img_size, &roi1, &roi2 );
 
@@ -250,6 +246,24 @@ int doSGBM( cv::Mat leftBGR,cv::Mat rightBGR , unsigned int SADWindowSize ,  uns
     //disp = dispp.colRange(numberOfDisparities, img1p.cols);
     if( alg != STEREO_VAR ) { disp.convertTo(disp8, CV_8U, 255/(numberOfDisparities*16.)); } else
                             { disp.convertTo(disp8, CV_8U); }
+
+
+
+
+    cv::Point pt1=cv::Point(0,0);
+    cv::Point pt2=cv::Point(img1.cols,0);
+    cv::Scalar color=cv::Scalar(0,255,0);
+    unsigned int i=0;
+    unsigned int blockY=(unsigned int) img1.rows/15;
+    for (i=0; i<img1.rows/15; i++)
+    {
+       pt1.y=i*blockY; pt2.y=i*blockY;
+       cv::line(img1,pt1,pt2,   color, 1, 8, 0);
+       cv::line(img2,pt1,pt2,   color, 1, 8, 0);
+    }
+
+    img1.copyTo(*leftBGR);
+    img2.copyTo(*rightBGR);
 
 
     if( !no_display )
