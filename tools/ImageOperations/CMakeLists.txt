@@ -17,6 +17,8 @@ add_library(
             patternSets.c
             resize.c
             splitMPO.c 
+            bilateralFilter.c
+            bilateralFilter.h
            )
 
 target_link_libraries(ImageOperations rt dl m  )
