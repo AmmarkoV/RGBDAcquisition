@@ -1,6 +1,22 @@
 project( ImageOperations ) 
 cmake_minimum_required( VERSION 2.8.7 )
  
+
+
+
+IF( ENABLE_JPG )
+ MESSAGE("JPGs will be included in this codec build")
+ set(JPG_Libs jpeg ) 
+ENDIF( ENABLE_JPG )
+
+
+IF( ENABLE_PNG )
+ MESSAGE("PNGs will be included in this codec build")
+ set(PNG_Libs png ) 
+ENDIF( ENABLE_PNG )
+
+
+
 add_library(
             ImageOperations STATIC 
             depthClassifier.c
@@ -8,8 +24,7 @@ add_library(
             imageFilters.c
             findSubImage.c
             imageOps.c 
-            joinMPO.c
-            main.c
+            joinMPO.c 
             ocr.c
             ocr.h 
             patchComparison.c
@@ -24,6 +39,9 @@ add_library(
 target_link_libraries(ImageOperations rt dl m  )
 set_target_properties(ImageOperations PROPERTIES DEBUG_POSTFIX "D")   
          
+add_executable(imageopsutility imageOperationsTester.c ) 
+target_link_libraries(imageopsutility rt dl m Codecs ImageOperations ${PNG_Libs} ${JPG_Libs} ) 
+add_dependencies(imageopsutility Codecs ImageOperations)  
  
 
 set_target_properties(ImageOperations PROPERTIES 
@@ -32,4 +50,13 @@ set_target_properties(ImageOperations PROPERTIES
                        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                       )
+
+
+set_target_properties(imageopsutility PROPERTIES 
+                       DEBUG_POSTFIX "D"
+                       ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                       LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                      )
+
  
