@@ -36,6 +36,7 @@
 			<Add library="./libImageOperations.a" />
 		</Linker>
 		<Unit filename="bilateralFilter.h" />
+		<Unit filename="imageFilters.h" />
 		<Unit filename="imageOperationsTester.c">
 			<Option compilerVar="CC" />
 		</Unit>

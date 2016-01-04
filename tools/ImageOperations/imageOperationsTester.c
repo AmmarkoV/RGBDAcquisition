@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../Codecs/codecs.h"
-#include "bilateralFilter.h"
 
+//Stuff from ImageOperations
+#include "bilateralFilter.h"
+#include "imageFilters.h"
 
 int runFilter(char * filenameInput,char * filenameOutput)
 {
@@ -19,11 +21,14 @@ int runFilter(char * filenameInput,char * filenameOutput)
 
     if (outputImage!=0)
     {
+
+      contrast(outputImage,2.4);
+      /*
       bilateralFilter( outputImage->pixels ,  outputImage->width , outputImage->height ,
                        inputImage->pixels ,  inputImage->width , inputImage->height ,
                        5.0 , 4.0 , 3
                    );
-
+*/
 
     writeImageFile(outputImage,outputType ,filenameOutput);
 

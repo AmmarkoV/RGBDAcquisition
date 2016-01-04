@@ -26,6 +26,9 @@ extern "C"
 {
 #endif
 
+
+#include "../ImagePrimitives/image.h"
+
 //FORCE SOME LIBRARIES HERE MAYBE ( this breaks the CMake Way of enabling / disabling libs )
 //#define USE_JPG_FILES 1
 //#define USE_PNG_FILES 1
@@ -45,6 +48,7 @@ enum codecTypeList
    ASCII_CODEC
 };
 
+/*
 struct Image
 {
   unsigned char * pixels;
@@ -55,6 +59,7 @@ struct Image
   unsigned int image_size;
   unsigned int timestamp;
 };
+*/
 
 unsigned int simplePow(unsigned int base,unsigned int exp);
 
