@@ -31,6 +31,9 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add library="../Codecs/libCodecs.a" />
+		</Linker>
 		<Unit filename="imageOperationsTester.c">
 			<Option compilerVar="CC" />
 		</Unit>
