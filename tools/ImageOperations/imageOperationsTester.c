@@ -14,19 +14,22 @@ int runFilter(char * filenameInput,char * filenameOutput)
  if (inputImage!=0)
  {
     unsigned int outputType = guessFilenameTypeStupid(filenameOutput);
+    struct Image * outputImage = copyImage(inputImage);
 
 
-   bilateralFilter(unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
-                    unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
-
-                    float id, float cd , unsigned int dimension
+    if (outputImage!=0)
+    {
+      bilateralFilter( outputImage->pixels ,  outputImage->width , outputImage->height ,
+                       inputImage->pixels ,  inputImage->width , inputImage->height ,
+                       5.0 , 4.0 , 3
                    );
 
 
-    writeImageFile(inputImage,outputType ,filenameOutput);
+    writeImageFile(outputImage,outputType ,filenameOutput);
 
 
-
+    destroyImage(outputImage);
+   }
     destroyImage(inputImage);
     return 1;
  }

@@ -16,7 +16,7 @@ int bilateralFilter(unsigned char * target,  unsigned int targetWidth , unsigned
 
   if ( dimension != 3 )
   {
-    fprintf(stderr,"Cannot perform bilateral filter for dimensions other than 3x3\n");
+    //fprintf(stderr,"Cannot perform bilateral filter for dimensions other than 3x3\n");
     return 0;
   }
 
@@ -37,14 +37,13 @@ int bilateralFilter(unsigned char * target,  unsigned int targetWidth , unsigned
  return 1;
 }
 
-
+/*
 void convolution(unsigned char *_in, unsigned char *_out, int width, int height, int halfkernelsize, float id, float cd)
 {
   int kernelDim = 2*halfkernelsize+1;
 
 
   float sumWeight = 0;
-
 
   int x,y,i,j;
   unsigned int ctrIdx = y*width + x;
@@ -101,3 +100,4 @@ void convolution(unsigned char *_in, unsigned char *_out, int width, int height,
   _out[ctrIdx+2] = (int)(floor(_sum[2]));
   //_out[ctrIdx] = _in[ctrIdx].w;
 }
+*/

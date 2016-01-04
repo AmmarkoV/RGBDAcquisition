@@ -341,6 +341,21 @@ int destroyImage(struct Image * img)
     return 1;
 }
 
+
+struct Image * copyImage( struct Image * inputImage)
+{
+  if (inputImage==0) { fprintf(stderr,"Could not copy null image\n"); return 0; }
+  if (inputImage->pixels==0) { fprintf(stderr,"Could not copy null image buffer\n"); return 0; }
+
+ struct Image * newImage = createImage(inputImage->width,inputImage->height,inputImage->channels,inputImage->bitsperpixel );
+
+ memcpy(newImage->pixels,inputImage->pixels,inputImage->image_size);
+
+ return newImage;
+}
+
+
+
 unsigned int guessFilenameTypeStupid(char * filename)
 {
   fprintf(stderr,"Guessing filename type for `%s` \n" , filename);
