@@ -33,7 +33,9 @@
 		</Compiler>
 		<Linker>
 			<Add library="../Codecs/libCodecs.a" />
+			<Add library="./libImageOperations.a" />
 		</Linker>
+		<Unit filename="bilateralFilter.h" />
 		<Unit filename="imageOperationsTester.c">
 			<Option compilerVar="CC" />
 		</Unit>
