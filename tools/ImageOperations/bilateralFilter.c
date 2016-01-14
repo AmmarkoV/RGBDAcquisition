@@ -57,6 +57,9 @@ inline void do3x3BilateralFilterKernel( unsigned char * kernelStart, unsigned in
    if (channel==0) { output[0] = resultValue; }
    if (channel==1) { output[1]= resultValue; }
    if (channel==2) { output[2] = resultValue; }
+
+   //Go to the next channel
+   ++a; ++b; ++c; ++d; ++e; ++f; ++g; ++h; ++ii;
  }
 
 
@@ -67,7 +70,7 @@ inline void do3x3BilateralFilterKernel( unsigned char * kernelStart, unsigned in
 }
 
 
-int bilateralFilter(unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
+int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
                     unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
 
                     float id, float cd , unsigned int dimension
@@ -98,9 +101,13 @@ int bilateralFilter(unsigned char * target,  unsigned int targetWidth , unsigned
    unsigned char * sourceScanlinePTR = sourcePTR;
    unsigned char * sourceScanlineEnd = sourcePTR+(sourceWidth*3);
 
-   if ( (x+kernelWidth>=sourceWidth) || (y+kernelHeight>=sourceHeight) )
+   if (x+kernelWidth>=sourceWidth)
    {
 
+   } else
+   if (y+kernelHeight>=sourceHeight)
+   {
+      //We are on the right side of our buffer
    } else
    {
    //Get all the valid configurations of the scanline
@@ -110,8 +117,8 @@ int bilateralFilter(unsigned char * target,  unsigned int targetWidth , unsigned
       do3x3BilateralFilterKernel( sourceScanlinePTR , sourceWidth ,  id, cd  , spatialDifferences , outputRGB );
 
       unsigned char * outputR = sourceScanlinePTR + (sourceWidth*3) + 3;
-      unsigned char * outputG = outputR+3;
-      unsigned char * outputB = outputG+3;
+      unsigned char * outputG = outputR+1;
+      unsigned char * outputB = outputG+1;
 
       *outputR = outputRGB[0];
       *outputG = outputRGB[1];
@@ -121,16 +128,6 @@ int bilateralFilter(unsigned char * target,  unsigned int targetWidth , unsigned
       sourceScanlinePTR+=3;
     }
 
-
-   unsigned char * kernelStop=sourcePTR;
-   unsigned char * kernelScanlineStart=sourcePTR;
-   unsigned char * kernelScanlineStop=sourcePTR;
-   unsigned char * kernelScanlineStep=kernelScanlineStart+sourceWidth*3;
-
-    while (kernelScanlineStart < kernelScanlineStop)
-    {
-
-    }
    }
 
    //Keep X,Y Relative positiions
@@ -151,7 +148,9 @@ int bilateralFilter(unsigned char * target,  unsigned int targetWidth , unsigned
                     float id, float cd , unsigned int dimension
                    )
 {
+ return bilateralFilterInternal(target,targetWidth,targetHeight,source,sourceWidth,sourceHeight,id,cd,dimension);
 }
+
 /*
 void convolution(unsigned char *_in, unsigned char *_out, int width, int height, int halfkernelsize, float id, float cd)
 {

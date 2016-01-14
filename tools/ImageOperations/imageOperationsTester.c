@@ -23,12 +23,12 @@ int runFilter(char * filenameInput,char * filenameOutput)
     {
 
       contrast(outputImage,2.4);
-      /*
+
       bilateralFilter( outputImage->pixels ,  outputImage->width , outputImage->height ,
                        inputImage->pixels ,  inputImage->width , inputImage->height ,
                        5.0 , 4.0 , 3
                    );
-*/
+
 
     writeImageFile(outputImage,outputType ,filenameOutput);
 
