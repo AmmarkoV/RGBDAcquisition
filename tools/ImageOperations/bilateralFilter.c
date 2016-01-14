@@ -1,4 +1,6 @@
 #include "bilateralFilter.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #define sqrt2 1.414213562
 
@@ -9,7 +11,27 @@ inline unsigned char absSub(unsigned char value1,unsigned char value2)
  return (unsigned char) value2-value1;
 }
 
-inline void do3x3BilateralFilterKernel( unsigned char * kernelStart, unsigned int sourceWidth , float id, float cd , float * spatialDifferences  , unsigned char * output)
+
+inline unsigned char scaleIntensity(unsigned char sideValue,unsigned char centerValue,unsigned char absValueDiff,float distance)
+{
+  float scaledValueDiff =  (float) absValueDiff / distance;
+  float sideValueScaled = 0.0 ;
+
+
+  if (centerValue>sideValue) { sideValueScaled = centerValue - scaledValueDiff; } else
+                             { sideValueScaled = centerValue + scaledValueDiff; }
+
+
+  scaledValueDiff = (float) (sideValueScaled + centerValue) / 2;
+
+  unsigned char resultUC = (unsigned char) scaledValueDiff;
+
+  return resultUC;
+}
+
+
+
+inline void do3x3BilateralFilterKernel( unsigned char * kernelStart, unsigned int sourceWidth , float id, float cd , float * spatialDifferences , float spatialDifferenceDivisor , unsigned char * output)
 {
   /* 0a 1b 2c
      3d 4e 5f   e is anchor point (kernel center)
@@ -21,42 +43,44 @@ inline void do3x3BilateralFilterKernel( unsigned char * kernelStart, unsigned in
   d = a+sourceWidth * 3;   e = d+3;   f = e+3;
   g = d+sourceWidth * 3;   h = g+3;   ii = h+3;
 
-
  for (channel=0; channel<3; channel++)
  {
+
   unsigned char intensityDifferences[3*3];
   intensityDifferences[0]= absSub(*e,*a); intensityDifferences[1]= absSub(*e,*b); intensityDifferences[2]= absSub(*e,*c);
   intensityDifferences[3]= absSub(*e,*d); intensityDifferences[4]= 0;             intensityDifferences[5]= absSub(*e,*f);
   intensityDifferences[6]= absSub(*e,*g); intensityDifferences[7]= absSub(*e,*h); intensityDifferences[8]= absSub(*e,*ii);
 
-  unsigned int i=0,intensityDivisor=0;
+  unsigned char intensityAbsolute[3*3];
+  intensityAbsolute[0]= *a; intensityAbsolute[1]= *b; intensityAbsolute[2]= *c;
+  intensityAbsolute[3]= *d; intensityAbsolute[4]= *e; intensityAbsolute[5]= *f;
+  intensityAbsolute[6]= *g; intensityAbsolute[7]= *h; intensityAbsolute[8]= *ii;
+
+  unsigned int i=0,intensitySum=0,intensityDivisor=0;
+
+  intensitySum=*e;
+  intensityDivisor=1;
+
   for (i=0; i<9; i++)
   {
-    if ( intensityDifferences[i] < cd )
+    if ( intensityDifferences[i] > cd )
     {
-       intensityDivisor+=intensityDifferences[i];
-    } else
-    {
-       //This wont count
-       intensityDifferences[i]=0;
+      //intensitySum+=intensityAbsolute[i];
+      intensitySum+=scaleIntensity(intensityAbsolute[i],*e,intensityDifferences[i],spatialDifferences[i]);
+      ++intensityDivisor;
     }
   }
-  unsigned int kernelSum=0;
-  for (i=0; i<9; i++)
-  {
-    kernelSum+=intensityDifferences[i];
-  }
 
-
-  unsigned char resultValue=0;
+  float resultValueF=0.0;
   if (intensityDivisor!=0)
   {
-   resultValue = (unsigned char) kernelSum / intensityDivisor;
+   resultValueF = (float) intensitySum / intensityDivisor;
   }
 
-   if (channel==0) { output[0] = resultValue; }
-   if (channel==1) { output[1]= resultValue; }
-   if (channel==2) { output[2] = resultValue; }
+  unsigned char resultValue=(unsigned char) resultValueF;
+  if (channel==0) {   output[0] = resultValue; }
+  if (channel==1) {   output[1] = resultValue; }
+  if (channel==2) {   output[2] = resultValue; }
 
    //Go to the next channel
    ++a; ++b; ++c; ++d; ++e; ++f; ++g; ++h; ++ii;
@@ -83,7 +107,7 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
 
   if ( dimension != 3 )
   {
-    //fprintf(stderr,"Cannot perform bilateral filter for dimensions other than 3x3\n");
+    fprintf(stderr,"Cannot perform bilateral filter for dimensions other than 3x3\n");
     return 0;
   }
  unsigned int kernelWidth=dimension,kernelHeight=dimension;
@@ -93,6 +117,8 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
   float spatialDifferences[3*3]={ sqrt2 , 1 , sqrt2 ,
                                       1 , 0 , 1 ,
                                   sqrt2 , 1 , sqrt2 };
+  float spatialDifferenceDivisor=4+(4*sqrt2);
+
 
   unsigned int x=0,y=0;
 
@@ -100,6 +126,9 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
   {
    unsigned char * sourceScanlinePTR = sourcePTR;
    unsigned char * sourceScanlineEnd = sourcePTR+(sourceWidth*3);
+
+   unsigned char * targetScanlinePTR = targetPTR;
+   unsigned char * targetScanlineEnd = targetPTR+(targetWidth*3);
 
    if (x+kernelWidth>=sourceWidth)
    {
@@ -113,10 +142,11 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
    //Get all the valid configurations of the scanline
    while (sourceScanlinePTR < sourceScanlineEnd)
     {
+      //fprintf(stderr,"%u %u ",x,y);
       unsigned char outputRGB[3];
-      do3x3BilateralFilterKernel( sourceScanlinePTR , sourceWidth ,  id, cd  , spatialDifferences , outputRGB );
+      do3x3BilateralFilterKernel( sourceScanlinePTR , sourceWidth ,  id, cd  , spatialDifferences , spatialDifferenceDivisor , outputRGB );
 
-      unsigned char * outputR = sourceScanlinePTR + (sourceWidth*3) + 3;
+      unsigned char * outputR = targetScanlinePTR + (targetWidth*3) + 3;
       unsigned char * outputG = outputR+1;
       unsigned char * outputB = outputG+1;
 
@@ -126,16 +156,21 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
 
       ++x;
       sourceScanlinePTR+=3;
+      targetScanlinePTR+=3;
     }
+     sourcePTR = sourceScanlineEnd-3;
+     targetPTR = targetScanlineEnd-3;
 
    }
 
    //Keep X,Y Relative positiions
    ++x;
-   if (x==sourceWidth) { x=0; ++y; }
+   if (x>=sourceWidth) { x=0; ++y; }
    sourcePTR+=3;
+   targetPTR+=3;
   }
 
+ fprintf(stderr,"\n",x,y);
  return 1;
 }
 
@@ -148,6 +183,7 @@ int bilateralFilter(unsigned char * target,  unsigned int targetWidth , unsigned
                     float id, float cd , unsigned int dimension
                    )
 {
+ fprintf(stderr,"bilateralFilter(%0.2f %0.2f %u )\n",id,cd,dimension);
  return bilateralFilterInternal(target,targetWidth,targetHeight,source,sourceWidth,sourceHeight,id,cd,dimension);
 }
 
