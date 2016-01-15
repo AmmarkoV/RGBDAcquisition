@@ -1,8 +1,14 @@
 #include "bilateralFilter.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define sqrt2 1.414213562
+
+inline int isDimensionOdd(unsigned int dimension)
+{
+ return ( dimension % 2 !=0 );
+}
 
 
 inline unsigned char absSub(unsigned char value1,unsigned char value2)
@@ -29,6 +35,37 @@ inline unsigned char scaleIntensity(unsigned char sideValue,unsigned char center
   return resultUC;
 }
 
+
+
+inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor)
+{
+  float * newMat = (float*) malloc(sizeof(float) * dimension * dimension );
+  unsigned int x=0,y=0;
+
+  *divisor=0;
+
+  if(newMat==0)
+  {
+   unsigned int centerElement = (unsigned int) dimension /2 ;
+   float xMin,yMin;
+
+   float * newMatPtr = newMat;
+   for (y=0; y<dimension; y++)
+   {
+    for (x=0; x<dimension; x++)
+    {
+      xMin = ( centerElement - x );
+      yMin = ( centerElement - y );
+
+      *newMatPtr = (float) sqrt( (xMin*xMin) + (yMin*yMin) );
+      *divisor=*divisor + *newMatPtr;
+       ++newMatPtr;
+    }
+   }
+  }
+
+  return newMat;
+}
 
 
 inline void do3x3BilateralFilterKernel( unsigned char * kernelStart, unsigned int sourceWidth , float id, float cd , float * spatialDifferences , float spatialDifferenceDivisor , unsigned char * output)
@@ -105,6 +142,12 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
   unsigned char * targetPTR = target;
   unsigned char * targetLimit = target+(targetWidth*targetHeight*3) ;
 
+
+  if (!isDimensionOdd(dimension))
+  {
+    fprintf(stderr,"Not accepting even dimensions , there is no central point..\n");
+    return 0;
+  }
   if ( dimension != 3 )
   {
     fprintf(stderr,"Cannot perform bilateral filter for dimensions other than 3x3\n");
@@ -113,11 +156,14 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
  unsigned int kernelWidth=dimension,kernelHeight=dimension;
  unsigned int workableAreaStartX=0,workableAreaEndX=sourceWidth-kernelWidth,workableAreaStartY=sourceHeight-kernelHeight,workableAreaEndY;
 
+  float spatialDifferenceDivisor=0;
+  float * spatialDifferences = getSpatialDifferenceMatrix(dimension,&spatialDifferenceDivisor);
 
-  float spatialDifferences[3*3]={ sqrt2 , 1 , sqrt2 ,
-                                      1 , 0 , 1 ,
-                                  sqrt2 , 1 , sqrt2 };
-  float spatialDifferenceDivisor=4+(4*sqrt2);
+  if (spatialDifferences==0)
+  {
+   fprintf(stderr,"Could not allocate a spatial matrix..\n");
+    return 0;
+  }
 
 
   unsigned int x=0,y=0;
@@ -142,7 +188,6 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
    //Get all the valid configurations of the scanline
    while (sourceScanlinePTR < sourceScanlineEnd)
     {
-      //fprintf(stderr,"%u %u ",x,y);
       unsigned char outputRGB[3];
       do3x3BilateralFilterKernel( sourceScanlinePTR , sourceWidth ,  id, cd  , spatialDifferences , spatialDifferenceDivisor , outputRGB );
 
@@ -171,6 +216,8 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
   }
 
  fprintf(stderr,"\n",x,y);
+
+ free(spatialDifferences);
  return 1;
 }
 

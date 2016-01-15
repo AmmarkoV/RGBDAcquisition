@@ -32,7 +32,7 @@ int runFilter(int argc, char *argv[])
         {
           bilateralFilter( outputImage->pixels ,  outputImage->width , outputImage->height ,
                            inputImage->pixels ,  inputImage->width , inputImage->height ,
-                            atof(argv[i+1]) , atof(argv[i+2]) , 3
+                            atof(argv[i+1]) , atof(argv[i+2]) , atoi(argv[i+3])
                          );
         } else
         if ( strcmp(argv[i],"--contrast")==0 )
