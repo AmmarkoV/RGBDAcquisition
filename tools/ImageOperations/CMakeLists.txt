@@ -34,6 +34,8 @@ add_library(
             splitMPO.c 
             bilateralFilter.c
             bilateralFilter.h
+            summedAreaTables.c
+            summedAreaTables.h
            )
 
 target_link_libraries(ImageOperations rt dl m  )

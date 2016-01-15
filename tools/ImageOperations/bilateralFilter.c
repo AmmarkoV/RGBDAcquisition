@@ -44,7 +44,9 @@ inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor
 
   *divisor=0;
 
-  if(newMat==0)
+  fprintf(stderr,"getSpatialDifferenceMatrix(%u) = \n",dimension);
+
+  if(newMat!=0)
   {
    unsigned int centerElement = (unsigned int) dimension /2 ;
    float xMin,yMin;
@@ -54,13 +56,17 @@ inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor
    {
     for (x=0; x<dimension; x++)
     {
-      xMin = ( centerElement - x );
-      yMin = ( centerElement - y );
+      xMin = ( (float) centerElement - x );
+      yMin = ( (float) centerElement - y );
 
       *newMatPtr = (float) sqrt( (xMin*xMin) + (yMin*yMin) );
       *divisor=*divisor + *newMatPtr;
-       ++newMatPtr;
+
+      fprintf(stderr,"%0.4f    ",*newMatPtr);
+
+      ++newMatPtr;
     }
+    fprintf(stderr,"\n");
    }
   }
 
@@ -148,11 +154,7 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
     fprintf(stderr,"Not accepting even dimensions , there is no central point..\n");
     return 0;
   }
-  if ( dimension != 3 )
-  {
-    fprintf(stderr,"Cannot perform bilateral filter for dimensions other than 3x3\n");
-    return 0;
-  }
+
  unsigned int kernelWidth=dimension,kernelHeight=dimension;
  unsigned int workableAreaStartX=0,workableAreaEndX=sourceWidth-kernelWidth,workableAreaStartY=sourceHeight-kernelHeight,workableAreaEndY;
 
@@ -215,7 +217,6 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
    targetPTR+=3;
   }
 
- fprintf(stderr,"\n",x,y);
 
  free(spatialDifferences);
  return 1;

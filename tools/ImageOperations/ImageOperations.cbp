@@ -81,6 +81,10 @@
 		<Unit filename="splitMPO.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="summedAreaTables.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="summedAreaTables.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
