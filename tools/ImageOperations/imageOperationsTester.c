@@ -4,6 +4,7 @@
 
 //Stuff from ImageOperations
 #include "bilateralFilter.h"
+#include "summedAreaTables.h"
 #include "imageFilters.h"
 
 int runFilter(int argc, char *argv[])
@@ -38,6 +39,10 @@ int runFilter(int argc, char *argv[])
         if ( strcmp(argv[i],"--contrast")==0 )
         {
           contrast(outputImage,atof(argv[i+1]));
+        } else
+        if ( strcmp(argv[i],"--sattest")==0 )
+        {
+            summedAreaTableTest();
         }
       }
 
