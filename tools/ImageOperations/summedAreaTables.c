@@ -23,52 +23,43 @@ unsigned int * generateSummedAreaTableRGB(unsigned char * source,  unsigned int 
  unsigned char * inLimit = inPtr + (sourceWidth*sourceHeight*3) ;
 
  //First horizontal line is special since it has no vertical additions
- unsigned int pSumR=0,pSumG=0,pSumB=0,y=1;
+ unsigned int pSumR=0,pSumG=0,pSumB=0;
  while (inPtr<inLineLimit)
  {
    *satOut = (unsigned int) pSumR + (*inPtr); pSumR=*satOut; ++inPtr; ++satOut;
    *satOut = (unsigned int) pSumG + (*inPtr); pSumG=*satOut; ++inPtr; ++satOut;
    *satOut = (unsigned int) pSumB + (*inPtr); pSumB=*satOut; ++inPtr; ++satOut;
-   ++memplace;
  }
  inLineLimit+=nextLineOffset;
- fprintf(stderr,"generateSummedAreaTable  done with special first line\n");
 
  unsigned int *outUpPtr=sat , *outUpLeftPtr=sat , *outLeftPtr=satOut;
  //Ready for the main loop
  while (inPtr<inLimit)
  {
+    outLeftPtr=satOut;
     *satOut = (unsigned int) (*inPtr) + (*outUpPtr); ++inPtr; ++outUpPtr; ++satOut;
     *satOut = (unsigned int) (*inPtr) + (*outUpPtr); ++inPtr; ++outUpPtr; ++satOut;
     *satOut = (unsigned int) (*inPtr) + (*outUpPtr); ++inPtr; ++outUpPtr; ++satOut;
-    ++memplace;
 
     while (inPtr<inLineLimit)
     {
       *satOut = (unsigned int) (*inPtr) + (*outLeftPtr) +  (*outUpPtr);
       *satOut -= (*outUpLeftPtr);
-      fprintf(stderr,"MemR %u = UpLeft = %u , Up = %u , Left = %u , In = %u , Result = %u \n",memplace,(*outUpLeftPtr),(*outUpPtr),(*outLeftPtr),(unsigned int) (*inPtr),(*satOut));
       ++inPtr; ++outUpPtr; ++outUpLeftPtr; ++outLeftPtr; ++satOut;
 
       *satOut = (unsigned int) (*inPtr) + (*outLeftPtr) +  (*outUpPtr);
       *satOut -= (*outUpLeftPtr);
-      //fprintf(stderr,"MemG %u = UpLeft = %u , Up = %u , Left = %u , In = %u , Result = %u \n",memplace,(*outUpLeftPtr),(*outUpPtr),(*outLeftPtr),(*inPtr),(*satOut));
       ++inPtr; ++outUpPtr; ++outUpLeftPtr; ++outLeftPtr; ++satOut;
 
 
       *satOut = (unsigned int) (*inPtr) + (*outLeftPtr) +  (*outUpPtr);
       *satOut -= (*outUpLeftPtr);
-      //fprintf(stderr,"MemB %u = UpLeft = %u , Up = %u , Left = %u , In = %u , Result = %u \n",memplace,(*outUpLeftPtr),(*outUpPtr),(*outLeftPtr),(*inPtr),(*satOut));
       ++inPtr; ++outUpPtr; ++outUpLeftPtr; ++outLeftPtr; ++satOut;
 
-      ++memplace;
     }
-    ++y;
     inLineLimit+=nextLineOffset;
-    //outUpLeftPtr+=3;
+    if (inLineLimit>inLimit) { /* fprintf(stderr,"Border case\n"); */ inLineLimit=inLimit; }
     outUpLeftPtr=outUpPtr;
-
-   fprintf(stderr,"generateSummedAreaTable  done with %u line\n",y);
  }
 
 
@@ -81,18 +72,19 @@ int summedAreaTableTest()
 {
   fprintf(stderr,"summedAreaTableTest()\n");
   unsigned char sourceRGB[]={
-                             1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 ,
-                             1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 ,
-                             1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 ,
-                             1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 ,
-                             1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 ,
-                             1,1,1 , 1,1,1 , 1,1,1 , 1,1,1 , 1,1,1
+                             1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 ,
+                             1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 ,
+                             1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 ,
+                             1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 ,
+                             1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 ,
+                             1,0,2 , 1,0,2 , 1,0,2 , 1,0,2 , 1,0,2
                           } ;
 
  unsigned int * output = generateSummedAreaTableRGB(sourceRGB ,  5 , 5 );
 
  unsigned int x,y,z=0;
 
+ fprintf(stderr,"Input\n");
  for (y=0; y<5; y++)
  { for (x=0; x<5; x++)
    {
@@ -101,7 +93,9 @@ int summedAreaTableTest()
    }
    fprintf(stderr,"\n");
  }
+ fprintf(stderr,"\n\n\n\n\n\n");
 
+ fprintf(stderr,"Output\n");
  z=0;
  for (y=0; y<5; y++)
  { for (x=0; x<5; x++)
