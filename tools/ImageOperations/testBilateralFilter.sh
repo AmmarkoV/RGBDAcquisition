@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR" 
 
 SRCIMG="../../media/samples/test.jpg"
-WINDOWSIZE="5"
+WINDOWSIZE="7"
  
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes  ./imageopsutilityD $SRCIMG test.jpg --sattest  2> error.txt 
 #./imageopsutility $SRCIMG test.jpg --sattest 

@@ -137,9 +137,17 @@ inline void doGenericBilateralFilterKernel (
   }
   //fprintf(stderr,"out ( %0.2f %0.2f %0.2f ) ",outputF[0],outputF[1],outputF[2]);
 
-  outputF[0] /= sumWeight;
-  outputF[1] /= sumWeight;
-  outputF[2] /= sumWeight;
+  if (sumWeight==0)
+  {
+   outputF[0] =  (*centerElementR);
+   outputF[1] =  (*centerElementG);
+   outputF[2] =  (*centerElementB);
+  } else
+  {
+   outputF[0] /= sumWeight;
+   outputF[1] /= sumWeight;
+   outputF[2] /= sumWeight;
+  }
 
   output[0] = (unsigned char) outputF[0];
   output[1] = (unsigned char) outputF[1];
