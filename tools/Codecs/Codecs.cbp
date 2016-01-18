@@ -36,7 +36,13 @@
 		</Build>
 		<Compiler>
 			<Add option="-fPIC" />
+			<Add option="-DUSE_JPG_FILES" />
+			<Add option="-DUSE_PNG_FILES" />
 		</Compiler>
+		<Linker>
+			<Add library="png" />
+			<Add library="jpeg" />
+		</Linker>
 		<Unit filename="asciiInput.c">
 			<Option compilerVar="CC" />
 		</Unit>

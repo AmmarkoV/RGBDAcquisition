@@ -25,6 +25,7 @@
 
 #if USE_JPG_FILES
       #include "jpgInput.h"
+ // #warning "JPG Support active"
 #else
   #warning "JPG Support is disabled in this build of Image Codecs"
 #endif // USE_JPG_FILES
@@ -32,6 +33,7 @@
 
 #if USE_PNG_FILES
       #include "pngInput.h"
+  // #warning "PNG Support active"
 #else
   #warning "PNG Support is disabled in this build of Image Codecs"
 #endif // USE_PNG_FILES

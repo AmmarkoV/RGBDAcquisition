@@ -43,7 +43,8 @@ int runFilter(int argc, char *argv[])
         if ( strcmp(argv[i],"--sattest")==0 )
         {
             //summedAreaTableTest();
-            unsigned int * integralImageOutput = generateSummedAreaTableRGB(inputImage->pixels ,  inputImage->width , inputImage->height);
+            unsigned int * integralImageOutput = 0;
+            integralImageOutput = generateSummedAreaTableRGB(inputImage->pixels ,  inputImage->width , inputImage->height);
             if (integralImageOutput!=0)
             {
               free(integralImageOutput);

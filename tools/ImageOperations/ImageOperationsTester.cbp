@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="./ImageOperationsTester" prefix_auto="1" extension_auto="1" />
+				<Option output="./imageopsutilityD" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -16,7 +16,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="./ImageOperationsTester" prefix_auto="1" extension_auto="1" />
+				<Option output="./imageopsutility" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -32,8 +32,8 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
-			<Add option="-lpng" />
-			<Add option="-ljpeg" />
+			<Add library="png" />
+			<Add library="jpeg" />
 			<Add library="../Codecs/libCodecs.a" />
 			<Add library="./libImageOperations.a" />
 		</Linker>

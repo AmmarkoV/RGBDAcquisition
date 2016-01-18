@@ -11,33 +11,22 @@ inline int isDimensionOdd(unsigned int dimension)
 }
 
 
-inline unsigned char absSub(unsigned char value1,unsigned char value2)
+inline void swap2Floats(float * flA,float * flB)
 {
- if (value1>value2) { return (unsigned char) value1-value2; }
- return (unsigned char) value2-value1;
+  float intermediate = *flB;
+  *flB = *flA;
+  *flA = intermediate;
 }
 
-
-inline unsigned char scaleIntensity(unsigned char sideValue,unsigned char centerValue,unsigned char absValueDiff,float distance)
+inline float absFSub(float  value1,float  value2)
 {
-  float scaledValueDiff =  (float) absValueDiff / distance;
-  float sideValueScaled = 0.0 ;
-
-
-  if (centerValue>sideValue) { sideValueScaled = centerValue - scaledValueDiff; } else
-                             { sideValueScaled = centerValue + scaledValueDiff; }
-
-
-  scaledValueDiff = (float) (sideValueScaled + centerValue) / 2;
-
-  unsigned char resultUC = (unsigned char) scaledValueDiff;
-
-  return resultUC;
+ if (value1>value2) { return (float ) value1-value2; }
+ return (float ) value2-value1;
 }
 
 
 
-inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor)
+inline float * getSwappedSpatialDifferenceMatrix(unsigned int dimension,float * divisor)
 {
   float * newMat = (float*) malloc(sizeof(float) * dimension * dimension );
   unsigned int x=0,y=0;
@@ -70,71 +59,103 @@ inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor
    }
   }
 
+  //Do a swap to make the center item go to the start
+  unsigned int dimensionOffsetForCenter = (unsigned int) (dimension*dimension)/2;
+  float * kernelFPTR = newMat;
+  swap2Floats(kernelFPTR,(newMat+dimensionOffsetForCenter+0)); ++kernelFPTR;
+
   return newMat;
 }
 
 
-inline void do3x3BilateralFilterKernel( unsigned char * kernelStart, unsigned int sourceWidth , float id, float cd , float * spatialDifferences , float spatialDifferenceDivisor , unsigned char * output)
+inline void doGenericBilateralFilterKernel (
+                                             unsigned char * kernelStart,
+                                             unsigned int dimension ,
+                                             unsigned int sourceWidth ,
+                                             float id, float cd ,
+                                             float * spatialDifferences ,
+                                             float spatialDifferenceDivisor ,
+                                             float * tmpBuf ,
+                                             unsigned char * output
+                                            )
 {
-  /* 0a 1b 2c
-     3d 4e 5f   e is anchor point (kernel center)
-     6g 7h 8ii */
+  float outputF[3]={0};
 
-  unsigned int channel=0;
-  unsigned char *a , *b , *c , *d , *e , *f ,*g, *h , *ii;
-  a = kernelStart;         b = a+3;   c = b+3;
-  d = a+sourceWidth * 3;   e = d+3;   f = e+3;
-  g = d+sourceWidth * 3;   h = g+3;   ii = h+3;
+  unsigned int lineOffset = ( sourceWidth*3 ) - (dimension*3) ;
+  unsigned char * kernelPTR = kernelStart;
+  unsigned char * kernelLineEnd = kernelStart + (3*dimension);
+  unsigned char * kernelEnd = kernelStart + (sourceWidth*3*dimension);
 
- for (channel=0; channel<3; channel++)
- {
 
-  unsigned char intensityDifferences[3*3];
-  intensityDifferences[0]= absSub(*e,*a); intensityDifferences[1]= absSub(*e,*b); intensityDifferences[2]= absSub(*e,*c);
-  intensityDifferences[3]= absSub(*e,*d); intensityDifferences[4]= 0;             intensityDifferences[5]= absSub(*e,*f);
-  intensityDifferences[6]= absSub(*e,*g); intensityDifferences[7]= absSub(*e,*h); intensityDifferences[8]= absSub(*e,*ii);
-
-  unsigned char intensityAbsolute[3*3];
-  intensityAbsolute[0]= *a; intensityAbsolute[1]= *b; intensityAbsolute[2]= *c;
-  intensityAbsolute[3]= *d; intensityAbsolute[4]= *e; intensityAbsolute[5]= *f;
-  intensityAbsolute[6]= *g; intensityAbsolute[7]= *h; intensityAbsolute[8]= *ii;
-
-  unsigned int i=0,intensitySum=0,intensityDivisor=0;
-
-  intensitySum=*e;
-  intensityDivisor=1;
-
-  for (i=0; i<9; i++)
+  float * tmpBufPTR = tmpBuf;
+  //Get all input in tmpBuf so that we only access it..
+  while (kernelPTR < kernelEnd)
   {
-    if ( intensityDifferences[i] > cd )
+    while (kernelPTR < kernelLineEnd)
     {
-      //intensitySum+=intensityAbsolute[i];
-      intensitySum+=scaleIntensity(intensityAbsolute[i],*e,intensityDifferences[i],spatialDifferences[i]);
-      ++intensityDivisor;
+     *tmpBufPTR = (float) *kernelPTR;
+     ++tmpBufPTR;
+     ++kernelPTR;
     }
+   kernelPTR+=lineOffset;
   }
 
-  float resultValueF=0.0;
-  if (intensityDivisor!=0)
+  unsigned int dimensionOffsetForCenter = (unsigned int) (dimension*dimension*3)/2;
+  float * centerElementR = tmpBuf;
+  float * centerElementG = tmpBuf+1;
+  float * centerElementB = tmpBuf+2;
+  float * kernelFPTR = tmpBuf;
+  float * kernelFPTREnd = tmpBuf + (dimension*dimension*3);
+
+  float resR,resG,resB;
+
+
+  swap2Floats(kernelFPTR,(tmpBuf+dimensionOffsetForCenter+0)); ++kernelFPTR;
+  swap2Floats(kernelFPTR,(tmpBuf+dimensionOffsetForCenter+1)); ++kernelFPTR;
+  swap2Floats(kernelFPTR,(tmpBuf+dimensionOffsetForCenter+2)); ++kernelFPTR;
+
+  float * spatialDifferencesPTR = spatialDifferences+1;
+  float sumWeight=0.0;
+
+  while (kernelFPTR<kernelFPTREnd)
   {
-   resultValueF = (float) intensitySum / intensityDivisor;
+    float imageDist = *spatialDifferencesPTR;
+
+    resR = (*kernelFPTR+0) - *centerElementR;
+    resG = (*kernelFPTR+1) - *centerElementG;
+    resB = (*kernelFPTR+2) - *centerElementB;
+
+    float colorDist = sqrt( (float)( (resR)*(resR) + (resG)*(resG) + (resB)*(resB) ) );
+
+    float imW = (float) imageDist/id;
+    float coW = (float) colorDist/cd;
+
+    float currWeight = (float) 1.0f/( exp(imW*imW*0.5) * exp(coW*coW*0.5) );
+    sumWeight += currWeight;
+
+      outputF[0] += (float) currWeight * (*kernelFPTR); ++kernelFPTR;
+      outputF[1] += (float) currWeight * (*kernelFPTR); ++kernelFPTR;
+      outputF[2] += (float) currWeight * (*kernelFPTR); ++kernelFPTR;
+
+    ++spatialDifferencesPTR;
   }
 
-  unsigned char resultValue=(unsigned char) resultValueF;
-  if (channel==0) {   output[0] = resultValue; }
-  if (channel==1) {   output[1] = resultValue; }
-  if (channel==2) {   output[2] = resultValue; }
 
-   //Go to the next channel
-   ++a; ++b; ++c; ++d; ++e; ++f; ++g; ++h; ++ii;
- }
-
-
-
+  output[0] = (unsigned char) outputF[0] / sumWeight;
+  output[1] = (unsigned char) outputF[1] / sumWeight;
+  output[2] = (unsigned char) outputF[2] / sumWeight;
 
 
  return;
 }
+
+
+
+
+
+
+
+
 
 
 int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
@@ -146,7 +167,6 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
   unsigned char * sourcePTR = source;
   unsigned char * sourceLimit = source+(sourceWidth*sourceHeight*3) ;
   unsigned char * targetPTR = target;
-  unsigned char * targetLimit = target+(targetWidth*targetHeight*3) ;
 
 
   if (!isDimensionOdd(dimension))
@@ -156,10 +176,18 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
   }
 
  unsigned int kernelWidth=dimension,kernelHeight=dimension;
- unsigned int workableAreaStartX=0,workableAreaEndX=sourceWidth-kernelWidth,workableAreaStartY=sourceHeight-kernelHeight,workableAreaEndY;
+
+
+
+  float * tmpMat = (float*) malloc(sizeof(float) * dimension * dimension *3 );
+  if (tmpMat==0)
+  {
+   fprintf(stderr,"Could not allocate a tmp matrix..\n");
+    return 0;
+  }
 
   float spatialDifferenceDivisor=0;
-  float * spatialDifferences = getSpatialDifferenceMatrix(dimension,&spatialDifferenceDivisor);
+  float * spatialDifferences = getSwappedSpatialDifferenceMatrix(dimension,&spatialDifferenceDivisor);
 
   if (spatialDifferences==0)
   {
@@ -191,7 +219,7 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
    while (sourceScanlinePTR < sourceScanlineEnd)
     {
       unsigned char outputRGB[3];
-      do3x3BilateralFilterKernel( sourceScanlinePTR , sourceWidth ,  id, cd  , spatialDifferences , spatialDifferenceDivisor , outputRGB );
+      doGenericBilateralFilterKernel( sourceScanlinePTR , dimension , sourceWidth ,  id, cd  , spatialDifferences , spatialDifferenceDivisor , tmpMat , outputRGB );
 
       unsigned char * outputR = targetScanlinePTR + (targetWidth*3) + 3;
       unsigned char * outputG = outputR+1;

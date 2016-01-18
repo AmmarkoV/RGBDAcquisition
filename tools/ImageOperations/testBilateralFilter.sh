@@ -8,11 +8,8 @@ cd "$DIR"
 SRCIMG="../../media/samples/test.jpg"
 WINDOWSIZE="5"
  
-valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes  ./imageopsutility $SRCIMG test.jpg --sattest  2> error.txt
-
-
-#./imageopsutility $SRCIMG test.jpg --sattest
-exit 0
+#valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes  ./imageopsutilityD $SRCIMG test.jpg --sattest  2> error.txt 
+#./imageopsutility $SRCIMG test.jpg --sattest 
 
 ./imageopsutility $SRCIMG output0.jpg --contrast 2.9 --bilateral 0.4 0.4 $WINDOWSIZE
 ./imageopsutility $SRCIMG output1.jpg --contrast 2.9 --bilateral 1.0 1.0 $WINDOWSIZE
