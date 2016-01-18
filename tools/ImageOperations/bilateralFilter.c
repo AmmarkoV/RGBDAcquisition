@@ -10,23 +10,18 @@ inline int isDimensionOdd(unsigned int dimension)
  return ( dimension % 2 !=0 );
 }
 
-
-inline void swap2Floats(float * flA,float * flB)
-{
-  float intermediate = *flB;
-  *flB = *flA;
-  *flA = intermediate;
-}
-
 inline float absFSub(float  value1,float  value2)
 {
  if (value1>value2) { return (float ) value1-value2; }
  return (float ) value2-value1;
 }
 
+inline int isNaN(float f)
+{
+  return ( f != f );
+}
 
-
-inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor)
+inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor,float id)
 {
   float * newMat = (float*) malloc(sizeof(float) * dimension * dimension );
   unsigned int x=0,y=0;
@@ -48,7 +43,8 @@ inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor
       xMin = ( (float) centerElement - x );
       yMin = ( (float) centerElement - y );
 
-      *newMatPtr = (float) sqrt( (xMin*xMin) + (yMin*yMin) );
+      *newMatPtr = (float) sqrt( (xMin*xMin) + (yMin*yMin) ) / id;
+      *newMatPtr = exp( (*newMatPtr) * (*newMatPtr) * 0.5 );
       *divisor=*divisor + *newMatPtr;
 
       fprintf(stderr,"%0.4f    ",*newMatPtr);
@@ -74,7 +70,7 @@ inline void doGenericBilateralFilterKernel (
                                              unsigned char * output
                                             )
 {
-  // - - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+  // ================================================================
   unsigned int lineOffset = ( sourceWidth*3 ) - (dimension*3) ;
   unsigned char * kernelPTR = kernelStart;
   unsigned char * kernelLineEnd = kernelStart + (3*dimension);
@@ -90,12 +86,14 @@ inline void doGenericBilateralFilterKernel (
      ++kernelPTR;
     }
    kernelPTR+=lineOffset;
+   kernelLineEnd+=( sourceWidth*3 );
   }
-  // - - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+  // ================================================================
 
 
 
-  unsigned int dimensionOffsetForCenter = (unsigned int) (dimension*dimension*3)/2;
+  unsigned int dimensionOffsetForCenter = (unsigned int) (dimension*dimension)/2;
+  dimensionOffsetForCenter = dimensionOffsetForCenter * 3;
   float * centerElementR = tmpBuf+dimensionOffsetForCenter+0;
   float * centerElementG = tmpBuf+dimensionOffsetForCenter+1;
   float * centerElementB = tmpBuf+dimensionOffsetForCenter+2;
@@ -106,41 +104,46 @@ inline void doGenericBilateralFilterKernel (
   float resR,resG,resB;
 
 
-  float * spatialDifferencesPTR = spatialDifferences+1;
+  float * spatialDifferencesPTR = spatialDifferences;
   float sumWeight=0.0;
 
   while (kernelFPTR<kernelFPTREnd)
   {
-    float imageDist = *spatialDifferencesPTR;
-
-    resR = (float) (*kernelFPTR+0) - *centerElementR;
-    resG = (float) (*kernelFPTR+1) - *centerElementG;
-    resB = (float) (*kernelFPTR+2) - *centerElementB;
-    fprintf(stderr,"RGB ( %0.2f %0.2f %0.2f )",resR,resG,resB);
+    resR = (float) (*kernelFPTR+0) - (*centerElementR);
+    resG = (float) (*kernelFPTR+1) - (*centerElementG);
+    resB = (float) (*kernelFPTR+2) - (*centerElementB);
 
     float colorDist = (float) sqrt( (float)( (resR*resR) + (resG*resG) + (resB*resB) ) );
-    fprintf(stderr,"colorDist ( %0.2f )",colorDist);
-
-    float imW = (float) imageDist/id;
     float coW = (float) colorDist/cd;
-    //THIS GIVES NAN SOME TIMES
-    fprintf(stderr,"imW ( %0.2f ) coW  ( %0.2f ) ",imW,coW);
 
-    float currWeight = (float) 1.0f/( exp(imW*imW*0.5) * exp(coW*coW*0.5) );
-    fprintf(stderr,"currWeight ( %0.2f )",currWeight);
-    sumWeight += currWeight;
+    float exp_imW_Mul_imW_Mul_0_5 = *spatialDifferencesPTR;   ++spatialDifferencesPTR;//table is precalculated
+    float dividend = ( exp_imW_Mul_imW_Mul_0_5 * exp(coW*coW*0.5) );
+    float currWeight = (float) 1.0f/dividend;
 
-      outputF[0] += (float) currWeight * (*kernelFPTR); ++kernelFPTR;
-      outputF[1] += (float) currWeight * (*kernelFPTR); ++kernelFPTR;
-      outputF[2] += (float) currWeight * (*kernelFPTR); ++kernelFPTR;
+     if ( !isNaN(currWeight)  )
+    {
+     //fprintf(stderr,"currWeight ( 1/%0.2f = %0.2f )",dividend,currWeight);
+     sumWeight += currWeight;
 
-    ++spatialDifferencesPTR;
+     outputF[0] += (float) currWeight * (*kernelFPTR); ++kernelFPTR;
+     outputF[1] += (float) currWeight * (*kernelFPTR); ++kernelFPTR;
+     outputF[2] += (float) currWeight * (*kernelFPTR); ++kernelFPTR;
+    }
+     else
+    {
+      kernelFPTR+=3;
+    }
+
   }
-  fprintf(stderr,"out ( %0.2f %0.2f %0.2f ) ",outputF[0],outputF[1],outputF[2]);
+  //fprintf(stderr,"out ( %0.2f %0.2f %0.2f ) ",outputF[0],outputF[1],outputF[2]);
 
-  output[0] = (unsigned char) outputF[0] / sumWeight;
-  output[1] = (unsigned char) outputF[1] / sumWeight;
-  output[2] = (unsigned char) outputF[2] / sumWeight;
+  outputF[0] /= sumWeight;
+  outputF[1] /= sumWeight;
+  outputF[2] /= sumWeight;
+
+  output[0] = (unsigned char) outputF[0];
+  output[1] = (unsigned char) outputF[1];
+  output[2] = (unsigned char) outputF[2];
 
 
  return;
@@ -197,7 +200,7 @@ int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , 
   }
 
   float spatialDifferenceDivisor=0;
-  float * spatialDifferences = getSpatialDifferenceMatrix(dimension,&spatialDifferenceDivisor);
+  float * spatialDifferences = getSpatialDifferenceMatrix(dimension,&spatialDifferenceDivisor,id);
 
   if (spatialDifferences==0)
   {
