@@ -39,6 +39,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="bilateralFilter.h" />
+		<Unit filename="compareQuality.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="compareQuality.h" />
 		<Unit filename="convolutionFilter.c">
 			<Option compilerVar="CC" />
 		</Unit>

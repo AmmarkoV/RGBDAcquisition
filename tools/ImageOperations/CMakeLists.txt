@@ -36,6 +36,8 @@ add_library(
             bilateralFilter.h
             summedAreaTables.c
             summedAreaTables.h
+            compareQuality.c
+            compareQuality.h 
            )
 
 target_link_libraries(ImageOperations rt dl m  )
