@@ -74,9 +74,11 @@ unsigned int * generateSummedAreaTableRGB(unsigned char * source,  unsigned int 
 
 
 
-unsigned int getSATSum(unsigned int * sourceSAT ,  unsigned int sourceWidth , unsigned int sourceHeight ,  unsigned int x, unsigned int y , unsigned int blockWidth , unsigned int blockHeight )
+unsigned int getSATSumRGB(unsigned int *outR , unsigned int *outG , unsigned int *outB  ,
+                          unsigned int * sourceSAT ,  unsigned int sourceWidth , unsigned int sourceHeight ,
+                          unsigned int x, unsigned int y , unsigned int blockWidth , unsigned int blockHeight )
 {
-  unsigned int * sourceSATLimit = sourceSAT + (sourceHeight * sourceWidth);
+  unsigned int * sourceSATLimit = sourceSAT + (sourceHeight * sourceWidth*3);
 
 
   /*                            TOP
@@ -90,10 +92,10 @@ unsigned int getSATSum(unsigned int * sourceSAT ,  unsigned int sourceWidth , un
       _____________
       D + A - B - C
   */
-  unsigned int * A = sourceSAT + ( sourceWidth* (y+0) )           + (x+0);
-  unsigned int * B = sourceSAT + ( sourceWidth* (y+0) )           + (x+blockWidth);
-  unsigned int * C = sourceSAT + ( sourceWidth* (y+blockHeight) ) + (x+0);
-  unsigned int * D = sourceSAT + ( sourceWidth* (y+blockHeight) ) + (x+blockWidth);
+  unsigned int * A = sourceSAT + ( sourceWidth*3* (y+0) )           + ((x+0)*3);
+  unsigned int * B = sourceSAT + ( sourceWidth*3* (y+0) )           + ((x+blockWidth)*3);
+  unsigned int * C = sourceSAT + ( sourceWidth*3* (y+blockHeight) ) + ((x+0)*3);
+  unsigned int * D = sourceSAT + ( sourceWidth*3* (y+blockHeight) ) + ((x+blockWidth)*3);
 
   if (
        (A>=sourceSATLimit) ||
@@ -103,9 +105,77 @@ unsigned int getSATSum(unsigned int * sourceSAT ,  unsigned int sourceWidth , un
      ) { return 0; }
 
 
-  unsigned int sum = *D + *A ;
-  sum = sum - *B - *C;
-  return sum;
+  *outR = *D + *A ;
+  *outR = *outR - *B - *C;
+  ++A; ++B; ++C; ++D; //Next Channel
+
+  *outG = *D + *A ;
+  *outG = *outG - *B - *C;
+  ++A; ++B; ++C; ++D; //Next Channel
+
+  *outB = *D + *A ;
+  *outB = *outB - *B - *C;
+
+  return 1;
+}
+
+
+
+
+
+int meanFilterSAT(
+                  unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight , unsigned int targetChannels ,
+                  unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight , unsigned int sourceChannels ,
+                  unsigned int blockWidth , unsigned int blockHeight
+                 )
+{
+  fprintf(stderr,"meanFilterSAT(%p , %u , %u )\n",source,sourceWidth , sourceHeight);
+  if ( (sourceChannels!=3) || (targetChannels!=3) ) {return 0; }
+
+  if (
+       (target==0)||
+       (targetWidth!=sourceWidth)||
+       (targetHeight!=sourceHeight)
+     )
+{ return 0; }
+
+  unsigned int * sat = generateSummedAreaTableRGB(source,sourceWidth,sourceHeight);
+  if (sat==0) { free(target); return 0; }
+
+
+  fprintf(stderr," doing mean .. \n");
+  unsigned int halfBlockWidth = (unsigned int) blockWidth/2;
+  unsigned int halfBlockHeight = (unsigned int) blockHeight/2;
+  unsigned char * targetPTR = target ;
+  unsigned char * targetLimit = target;
+  unsigned int  sumR , sumG ,sumB  , blockSize = blockWidth*blockHeight;
+
+  unsigned int leftX=0,leftY=0;
+  float res;
+
+  for (leftY=halfBlockHeight; leftY<sourceHeight-halfBlockHeight; leftY++)
+  {
+    leftX=0;
+    targetPTR = target + (leftY*sourceWidth*3) + halfBlockWidth*3 ;
+    targetLimit = targetPTR + (sourceWidth*3) -(blockWidth*3) ;
+    while (targetPTR<targetLimit)
+    {
+      getSATSumRGB(&sumR,&sumG,&sumB,sat,sourceWidth,sourceHeight,leftX,leftY,blockWidth,blockHeight);
+
+      res = (float) sumR/blockSize;
+      *targetPTR = (unsigned char) res; ++targetPTR;
+
+      res = (float) sumG/blockSize;
+      *targetPTR = (unsigned char) res; ++targetPTR;
+
+      res = (float) sumB/blockSize;
+      *targetPTR = (unsigned char) res; ++targetPTR;
+
+      ++leftX;
+    }
+  }
+
+  return 1;
 }
 
 
@@ -140,6 +210,8 @@ int summedAreaTableTest()
  }
  fprintf(stderr,"\n\n\n\n\n\n");
 
+
+
  fprintf(stderr,"Output\n");
  z=0;
  for (y=0; y<5; y++)
@@ -151,6 +223,18 @@ int summedAreaTableTest()
    fprintf(stderr,"\n");
  }
  fprintf(stderr,"\n\n\n\n\n\n");
+
+
+  unsigned int outR , outG , outB;
+  getSATSumRGB(&outR,&outG,&outB,output,5,5,0,0,5,5);
+  fprintf(stderr,"Sum is %u %u %u \n",outR , outG , outB);
+
+
+
+
+
+
+
 
  free(output);
 

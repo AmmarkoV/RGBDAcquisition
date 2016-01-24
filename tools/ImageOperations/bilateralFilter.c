@@ -167,10 +167,9 @@ inline void doGenericBilateralFilterKernel (
 
 
 int bilateralFilterInternal(unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
-                    unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
-
-                    float id, float cd , unsigned int dimension
-                   )
+                            unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
+                            float id, float cd , unsigned int dimension
+                          )
 {
   unsigned char * sourcePTR = source;
   unsigned char * sourceLimit = source+(sourceWidth*sourceHeight*3) ;

@@ -9,8 +9,11 @@ SRCIMG="../../media/samples/test.jpg"
 SRCIMG="../../media/samples/big.jpg"
 WINDOWSIZE="7"
 
+time ./imageopsutility $SRCIMG outputMean.jpg --sattest
 
-time ./imageopsutility $SRCIMG outputGray.jpg --monochrome 
+time ./imageopsutility $SRCIMG outputMean.jpg --meansat 40 40
+exit 0
+time ./imageopsutility $SRCIMG outputGray.jpg --monochrome  
 time ./imageopsutility $SRCIMG outputDer.jpg --deriche 1.4 1
 exit 0
 

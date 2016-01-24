@@ -32,6 +32,14 @@ int runFilter(int argc, char *argv[])
       for (i=0; i<argc; i++)
       {
 
+        if ( strcmp(argv[i],"--meansat")==0 )
+        {
+           meanFilterSAT(
+                         outputImage->pixels ,  outputImage->width , outputImage->height , outputImage->channels ,
+                         inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
+                         atoi(argv[i+1]) , atoi(argv[i+2])
+                        );
+        } else
         if ( strcmp(argv[i],"--monochrome")==0 )
         {
           monochrome(outputImage);
@@ -59,7 +67,7 @@ int runFilter(int argc, char *argv[])
         } else
         if ( strcmp(argv[i],"--sattest")==0 )
         {
-            //summedAreaTableTest();
+            summedAreaTableTest();
             unsigned int * integralImageOutput = 0;
             integralImageOutput = generateSummedAreaTableRGB(inputImage->pixels ,  inputImage->width , inputImage->height);
             if (integralImageOutput!=0)
