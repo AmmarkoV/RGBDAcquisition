@@ -82,6 +82,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="resize.h" />
+		<Unit filename="special/dericheRecursiveGaussian.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="special/dericheRecursiveGaussian.h" />
 		<Unit filename="splitMPO.c">
 			<Option compilerVar="CC" />
 		</Unit>

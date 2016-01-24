@@ -29,6 +29,18 @@ int runFilter(int argc, char *argv[])
 
       for (i=0; i<argc; i++)
       {
+
+        if ( strcmp(argv[i],"--deriche")==0 )
+        {
+          monochrome(inputImage);
+
+          dericheRecursiveGaussianGray( inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
+                                         outputImage->pixels ,  outputImage->width , outputImage->height ,
+                                         atof(argv[i+1]) , atoi(argv[i+2])
+                                       );
+           outputImage->channels=1;
+        } else
+
         if ( strcmp(argv[i],"--bilateral")==0 )
         {
           bilateralFilter( outputImage->pixels ,  outputImage->width , outputImage->height ,

@@ -72,6 +72,43 @@ unsigned int * generateSummedAreaTableRGB(unsigned char * source,  unsigned int 
 
 
 
+
+
+unsigned int getSATSum(unsigned int * sourceSAT ,  unsigned int sourceWidth , unsigned int sourceHeight ,  unsigned int x, unsigned int y , unsigned int blockWidth , unsigned int blockHeight )
+{
+  unsigned int * sourceSATLimit = sourceSAT + (sourceHeight * sourceWidth);
+
+
+  /*                            TOP
+       -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+      L-  -  -  -  -  -  A  -  -  -  -  B  -  -  -  -  -  -R
+      E-  -  -  -  -  -  -  - REQUEST-  -  -  -  -  -  -  -I
+      F-  -  -  -  -  -  -  -   SUM  -  -  -  -  -  -  -  -G
+      T-  -  -  -  -  -  C  -  -  -  -  D  -  -  -  -  -  -H
+       -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -T
+                               BOTTOM
+      _____________
+      D + A - B - C
+  */
+  unsigned int * A = sourceSAT + ( sourceWidth* (y+0) )           + (x+0);
+  unsigned int * B = sourceSAT + ( sourceWidth* (y+0) )           + (x+blockWidth);
+  unsigned int * C = sourceSAT + ( sourceWidth* (y+blockHeight) ) + (x+0);
+  unsigned int * D = sourceSAT + ( sourceWidth* (y+blockHeight) ) + (x+blockWidth);
+
+  if (
+       (A>=sourceSATLimit) ||
+       (B>=sourceSATLimit) ||
+       (C>=sourceSATLimit) ||
+       (D>=sourceSATLimit)
+     ) { return 0; }
+
+
+  unsigned int sum = *D + *A ;
+  sum = sum - *B - *C;
+  return sum;
+}
+
+
 int summedAreaTableTest()
 {
   fprintf(stderr,"summedAreaTableTest()\n");

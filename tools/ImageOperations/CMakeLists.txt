@@ -37,7 +37,10 @@ add_library(
             summedAreaTables.c
             summedAreaTables.h
             compareQuality.c
-            compareQuality.h 
+            compareQuality.h
+ 
+            special/dericheRecursiveGaussian.c
+            special/dericheRecursiveGaussian.h
            )
 
 target_link_libraries(ImageOperations rt dl m  )
