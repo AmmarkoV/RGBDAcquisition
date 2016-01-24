@@ -11,7 +11,9 @@ WINDOWSIZE="7"
 
 time ./imageopsutility $SRCIMG outputMean.jpg --sattest
 
-time ./imageopsutility $SRCIMG outputMean.jpg --meansat 40 40
+time ./imageopsutility $SRCIMG outputMean2x2.jpg --meansat 2 2
+time ./imageopsutility $SRCIMG outputMean16x16.jpg --meansat 16 16
+time ./imageopsutility $SRCIMG outputMean40x40.jpg --meansat 40 40
 exit 0
 time ./imageopsutility $SRCIMG outputGray.jpg --monochrome  
 time ./imageopsutility $SRCIMG outputDer.jpg --deriche 1.4 1
