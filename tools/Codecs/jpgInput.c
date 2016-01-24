@@ -209,10 +209,28 @@ int WriteJPEGInternal( char *filename,struct Image * pic,char *mem,unsigned long
 	   jpeg_stdio_dest(&cinfo, outfile);
 	 }
 
+    int JPEGcolor_space;
+
 	cinfo.image_width = pic->width;
 	cinfo.image_height = pic->height;
-	cinfo.input_components = 3;//pic.depth bytes_per_pixel;
-    int JPEGcolor_space = JCS_RGB; /* or JCS_GRAYSCALE for grayscale images */
+
+	if (pic->channels==3)
+    {
+	 cinfo.input_components = 3;
+     JPEGcolor_space = JCS_RGB;
+    } else
+    if (pic->channels==1)
+    {
+    cinfo.input_components   = 1;
+    JPEGcolor_space  = JCS_GRAYSCALE;
+    } else
+    {
+     fprintf(stderr,"Can only handle RGB / or Monochrome images.. \n");
+     fclose(outfile);
+     return 0;
+    }
+
+
 	cinfo.in_color_space = (J_COLOR_SPACE) JPEGcolor_space;
     /* default compression parameters, we shouldn't be worried about these */
 	jpeg_set_defaults( &cinfo );

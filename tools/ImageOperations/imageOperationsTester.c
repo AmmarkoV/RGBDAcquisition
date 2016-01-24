@@ -6,6 +6,8 @@
 #include "bilateralFilter.h"
 #include "summedAreaTables.h"
 #include "imageFilters.h"
+#include "special/dericheRecursiveGaussian.h"
+
 
 int runFilter(int argc, char *argv[])
 {
@@ -30,6 +32,10 @@ int runFilter(int argc, char *argv[])
       for (i=0; i<argc; i++)
       {
 
+        if ( strcmp(argv[i],"--monochrome")==0 )
+        {
+          monochrome(outputImage);
+        } else
         if ( strcmp(argv[i],"--deriche")==0 )
         {
           monochrome(inputImage);
@@ -40,7 +46,6 @@ int runFilter(int argc, char *argv[])
                                        );
            outputImage->channels=1;
         } else
-
         if ( strcmp(argv[i],"--bilateral")==0 )
         {
           bilateralFilter( outputImage->pixels ,  outputImage->width , outputImage->height ,

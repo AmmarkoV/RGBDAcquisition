@@ -8,7 +8,12 @@ cd "$DIR"
 SRCIMG="../../media/samples/test.jpg"
 SRCIMG="../../media/samples/big.jpg"
 WINDOWSIZE="7"
- 
+
+
+time ./imageopsutility $SRCIMG outputGray.jpg --monochrome 
+time ./imageopsutility $SRCIMG outputDer.jpg --deriche 1.4 1
+exit 0
+
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes  ./imageopsutilityD $SRCIMG test.jpg --sattest  2> error.txt 
 #./imageopsutility $SRCIMG test.jpg --sattest 
 
