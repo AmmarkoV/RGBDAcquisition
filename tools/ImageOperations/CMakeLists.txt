@@ -34,6 +34,8 @@ add_library(
             splitMPO.c 
             bilateralFilter.c
             bilateralFilter.h
+            medianFilter.c
+            medianFilter.h
             summedAreaTables.c
             summedAreaTables.h
             compareQuality.c
