@@ -3,7 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+struct sortingValues
+{
+ unsigned char grayscale;
+ unsigned char * rPtr;
+};
 
 
 
@@ -16,8 +20,7 @@ inline void doMedianFilterKernel (
                                     unsigned int sourceWidth ,
                                     unsigned int sourceHeight ,
 
-                                    unsigned char * sortingBuffer,
-                                    unsigned char * labelBuffer,
+                                    struct sortingValues * sortingBuffer,
 
                                     unsigned char * output
                                   )
@@ -26,43 +29,39 @@ inline void doMedianFilterKernel (
   output[1]=kernelStart[1];
   output[2]=kernelStart[2];
 
-
   // ================================================================
   unsigned int lineOffset = ( sourceWidth*3 ) - (kernelWidth*3) ;
   unsigned char * kernelPTR = kernelStart;
   unsigned char * kernelLineEnd = kernelStart + (3*kernelWidth);
   unsigned char * kernelEnd = kernelStart + (sourceWidth*3*kernelHeight);
 
-  unsigned char * sortingBufferPTR = sortingBuffer;
+  struct sortingValues * sortingBufferPTR = sortingBuffer;
   unsigned int  sum=0;
   //Get all input in tmpBuf so that we only access it..
   while (kernelPTR < kernelEnd)
   {
     while (kernelPTR < kernelLineEnd)
     {
-     sum=kernelPTR;     ++kernelPTR;
-     sum+=kernelPTR;    ++kernelPTR;
-     sum+=kernelPTR;    ++kernelPTR;
-     *sortingBufferPTR = (unsigned char) sum/3;
+     sortingBufferPTR->rPtr = kernelPTR;
+     sum=*kernelPTR;     ++kernelPTR;
+     sum+=*kernelPTR;    ++kernelPTR;
+     sum+=*kernelPTR;    ++kernelPTR;
+     sortingBufferPTR->grayscale = (unsigned char) sum/3;
      ++sortingBufferPTR;
     }
    kernelPTR+=lineOffset;
    kernelLineEnd+=( sourceWidth*3 );
   }
 
-
-  int c, d, t;
+  struct sortingValues t;
+  int c, d;
   int numberOfElements = kernelWidth*kernelHeight;
-
-  for (c=0; c<numberOfElements; c++) { labelBuffer[c]=c; }
-
-
 
   for (c = 1 ; c <= numberOfElements - 1; c++)
   {
     d = c;
 
-    while ( d > 0 && sortingBuffer[d] < sortingBuffer[d-1])
+    while ( d > 0 && sortingBuffer[d].grayscale < sortingBuffer[d-1].grayscale)
     {
       //Swap Values --------------------
       t          = sortingBuffer[d];
@@ -70,31 +69,14 @@ inline void doMedianFilterKernel (
       sortingBuffer[d-1] = t;
       //---------------------------------
 
-      //Swap Buffers --------------------
-      t          = labelBuffer[d];
-      labelBuffer[d]   = labelBuffer[d-1];
-      labelBuffer[d-1] = t;
-      //---------------------------------
-
       d--;
     }
   }
 
-  //This is wrong..
-  unsigned int elementToPickLabel = labelBuffer[elementToPick];
-  unsigned int x = elementToPickLabel / kernelHeight;
-  unsigned int elementNegativeOffset = elementToPickLabel * kernelHeight;
-  unsigned int y = 0;
-  if ( numberOfElements>elementNegativeOffset )  { y =numberOfElements -elementNegativeOffset; }
-  if ( x>=kernelWidth )  { x=kernelWidth; }
-  if ( y>=kernelHeight ) { y=kernelHeight; }
-  //fprintf(stderr,"x(%u/%u)  y(%u/%u) | " ,x,kernelWidth , y,kernelHeight);
 
-
-  kernelPTR = kernelStart + ( y * sourceWidth * 3 ) + (x * 3);
-  output[0]=*kernelPTR; ++kernelPTR;
-  output[1]=*kernelPTR; ++kernelPTR;
-  output[2]=*kernelPTR;
+  output[0]=*sortingBuffer[elementToPick].rPtr; ++sortingBuffer[elementToPick].rPtr;
+  output[1]=*sortingBuffer[elementToPick].rPtr; ++sortingBuffer[elementToPick].rPtr;
+  output[2]=*sortingBuffer[elementToPick].rPtr;
 }
 
 
@@ -111,9 +93,10 @@ int medianFilter(
 
 
   unsigned int elementToPick = (kernelWidth * kernelHeight) / 2;
-  unsigned char * sortingBuffer = (unsigned char *) malloc(sizeof(unsigned char)  * kernelWidth * kernelHeight );
-  unsigned char * labelBuffer = (unsigned char *) malloc(sizeof(unsigned char)  * kernelWidth * kernelHeight );
+  //unsigned char * sortingBuffer = (unsigned char *) malloc(sizeof(unsigned char)  * kernelWidth * kernelHeight );
+  //unsigned char * labelBuffer = (unsigned char *) malloc(sizeof(unsigned char)  * kernelWidth * kernelHeight );
 
+  struct sortingValues * sortingBuffer = (struct sortingValues *) malloc(sizeof(struct sortingValues)  * kernelWidth * kernelHeight );
 
   while (sourcePTR < sourceLimit)
   {
@@ -147,7 +130,6 @@ int medianFilter(
                             sourceHeight ,
 
                             sortingBuffer,
-                            labelBuffer,
 
                             outputRGB
                            );
@@ -178,7 +160,6 @@ int medianFilter(
 
 
  free(sortingBuffer);
- free(labelBuffer);
 
  return 0;
 }
