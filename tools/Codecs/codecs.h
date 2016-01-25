@@ -80,6 +80,9 @@ int swapImageEndiannessRaw(unsigned char * pixels, unsigned int width,unsigned i
 
 
 int convertCodecImages(char * filenameInput , char * filenameOutput);
+
+
+unsigned int guessFilenameTypeStupid(char * filename);
 #ifdef __cplusplus
 }
 #endif

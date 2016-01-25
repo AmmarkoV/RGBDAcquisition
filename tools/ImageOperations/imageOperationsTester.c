@@ -5,6 +5,7 @@
 //Stuff from ImageOperations
 #include "bilateralFilter.h"
 #include "summedAreaTables.h"
+#include "medianFilter.h"
 #include "imageFilters.h"
 #include "special/dericheRecursiveGaussian.h"
 
@@ -31,7 +32,14 @@ int runFilter(int argc, char *argv[])
 
       for (i=0; i<argc; i++)
       {
-
+        if ( strcmp(argv[i],"--median")==0 )
+        {
+           medianFilter(
+                         outputImage->pixels ,  outputImage->width , outputImage->height ,
+                         inputImage->pixels ,  inputImage->width , inputImage->height  ,
+                         atoi(argv[i+1]) , atoi(argv[i+2])
+                        );
+        } else
         if ( strcmp(argv[i],"--meansat")==0 )
         {
            meanFilterSAT(

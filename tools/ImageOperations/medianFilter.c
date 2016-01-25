@@ -33,7 +33,7 @@ inline void doMedianFilterKernel (
   {
     while (kernelPTR < kernelLineEnd)
     {
-     sum=kernelPTR;    ++kernelPTR;
+     sum=kernelPTR;     ++kernelPTR;
      sum+=kernelPTR;    ++kernelPTR;
      sum+=kernelPTR;    ++kernelPTR;
      *sortingBufferPTR = (unsigned char) sum/3;
@@ -75,21 +75,23 @@ inline void doMedianFilterKernel (
   }
 
 
+  unsigned int elementToPickLabel = labelBuffer[elementToPick];
+  unsigned int x = elementToPickLabel / kernelHeight;
+  unsigned int y = numberOfElements - ( elementToPickLabel * kernelHeight );
 
 
 
-
-
-  output[0]=sortingBuffer[elementToPick];
-  output[1]=*kernelStart; ++kernelStart;
-  output[2]=*kernelStart;
+  kernelPTR = kernelStart + ( y * sourceWidth * 3 ) + x * 3;
+  output[0]=*kernelPTR; ++kernelPTR;
+  output[1]=*kernelPTR; ++kernelPTR;
+  output[2]=*kernelPTR;
 }
 
 
 int medianFilter(
                  unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
                  unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
-                 unsigned int blockWidth , unsigned int blockHeight
+                 unsigned int kernelWidth , unsigned int kernelHeight
                 )
 {
   unsigned char * sourcePTR = source;
@@ -98,9 +100,9 @@ int medianFilter(
   unsigned int x=0,y=0;
 
 
-  unsigned int elementToPick = (blockWidth * blockHeight) / 2;
-  unsigned char * sortingBuffer = (unsigned char *) malloc(sizeof(unsigned char)  * blockWidth * blockHeight );
-  unsigned char * labelBuffer = (unsigned char *) malloc(sizeof(unsigned char)  * blockWidth * blockHeight );
+  unsigned int elementToPick = (kernelWidth * kernelHeight) / 2;
+  unsigned char * sortingBuffer = (unsigned char *) malloc(sizeof(unsigned char)  * kernelWidth * kernelHeight );
+  unsigned char * labelBuffer = (unsigned char *) malloc(sizeof(unsigned char)  * kernelWidth * kernelHeight );
 
 
   while (sourcePTR < sourceLimit)
