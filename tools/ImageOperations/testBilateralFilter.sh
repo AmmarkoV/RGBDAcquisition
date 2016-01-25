@@ -9,12 +9,15 @@ SRCIMG="../../media/samples/test.jpg"
 SRCIMG="../../media/samples/big.jpg"
 WINDOWSIZE="7"
 
-time ./imageopsutility $SRCIMG outputMean.jpg --sattest
-
+#time ./imageopsutility $SRCIMG outputMedian3x3.jpg --median 3 3
+time ./imageopsutility $SRCIMG outputMedian6x6.jpg --median 6 6
+#time ./imageopsutility $SRCIMG outputMedian12x12.jpg --median 12 12
+exit 0
+time ./imageopsutility $SRCIMG outputMean.jpg --sattest 
 time ./imageopsutility $SRCIMG outputMean2x2.jpg --meansat 2 2
 time ./imageopsutility $SRCIMG outputMean16x16.jpg --meansat 16 16
 time ./imageopsutility $SRCIMG outputMean40x40.jpg --meansat 40 40
-exit 0
+
 time ./imageopsutility $SRCIMG outputGray.jpg --monochrome  
 time ./imageopsutility $SRCIMG outputDer.jpg --deriche 1.4 1
 exit 0

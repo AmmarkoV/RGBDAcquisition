@@ -1,5 +1,7 @@
 #include "medianFilter.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 
 
 
@@ -20,6 +22,11 @@ inline void doMedianFilterKernel (
                                     unsigned char * output
                                   )
 {
+  output[0]=kernelStart[0];
+  output[1]=kernelStart[1];
+  output[2]=kernelStart[2];
+
+
   // ================================================================
   unsigned int lineOffset = ( sourceWidth*3 ) - (kernelWidth*3) ;
   unsigned char * kernelPTR = kernelStart;
@@ -47,8 +54,7 @@ inline void doMedianFilterKernel (
   int c, d, t;
   int numberOfElements = kernelWidth*kernelHeight;
 
-  for (c=0; c<numberOfElements; c++)
-    { labelBuffer[c]=c; }
+  for (c=0; c<numberOfElements; c++) { labelBuffer[c]=c; }
 
 
 
@@ -74,14 +80,18 @@ inline void doMedianFilterKernel (
     }
   }
 
-
+  //This is wrong..
   unsigned int elementToPickLabel = labelBuffer[elementToPick];
   unsigned int x = elementToPickLabel / kernelHeight;
-  unsigned int y = numberOfElements - ( elementToPickLabel * kernelHeight );
+  unsigned int elementNegativeOffset = elementToPickLabel * kernelHeight;
+  unsigned int y = 0;
+  if ( numberOfElements>elementNegativeOffset )  { y =numberOfElements -elementNegativeOffset; }
+  if ( x>=kernelWidth )  { x=kernelWidth; }
+  if ( y>=kernelHeight ) { y=kernelHeight; }
+  //fprintf(stderr,"x(%u/%u)  y(%u/%u) | " ,x,kernelWidth , y,kernelHeight);
 
 
-
-  kernelPTR = kernelStart + ( y * sourceWidth * 3 ) + x * 3;
+  kernelPTR = kernelStart + ( y * sourceWidth * 3 ) + (x * 3);
   output[0]=*kernelPTR; ++kernelPTR;
   output[1]=*kernelPTR; ++kernelPTR;
   output[2]=*kernelPTR;
