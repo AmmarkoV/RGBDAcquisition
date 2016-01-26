@@ -34,7 +34,6 @@ int runFilter(int argc, char *argv[])
                                         outputImage->pixels ,  outputImage->width , outputImage->height ,
                                         atof(argv[i+1]) , atoi(argv[i+2])
                                        );
-          fprintf(stderr,"Deriche finished safely..");
         } else
         if ( strcmp(argv[i],"--median")==0 )
         {

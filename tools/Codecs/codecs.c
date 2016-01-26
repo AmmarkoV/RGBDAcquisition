@@ -341,6 +341,8 @@ struct Image * createImage( unsigned int width , unsigned int height , unsigned 
 {
   unsigned char * pixels = ( unsigned char * ) malloc(width * height * channels * (bitsPerPixel/8) * sizeof(unsigned char) );
   if (pixels==0) { fprintf(stderr,"Could not allocate a new %ux%u image \n",width,height); return 0; }
+
+  //We are very clean and we clear memory..
   memset(pixels,0,width * height * channels * (bitsPerPixel/8) * sizeof(unsigned char));
 
   struct Image * img =  createImageUsingExistingBuffer(width , height , channels , bitsPerPixel , pixels);
