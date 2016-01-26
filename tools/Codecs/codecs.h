@@ -75,6 +75,7 @@ int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned lon
 struct Image * createImageUsingExistingBuffer( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel , unsigned char * pixels);
 struct Image * createImage( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel);
 int destroyImage(struct Image * img);
+struct Image * createSameDimensionsImage( struct Image * inputImage);
 struct Image * copyImage( struct Image * inputImage);
 
 int swapImageEndianness(struct Image * img);

@@ -7,7 +7,7 @@
 
 int deriche1DPass(
                    unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
-                   unsigned char * target,  unsigned int targeteWidth , unsigned int targetHeight ,
+                   unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
                    unsigned int x, unsigned int y,
                    unsigned int direction,
                    float sigma ,
@@ -15,25 +15,33 @@ int deriche1DPass(
                  )
 {
  //First we compute the number of pixels in the line
- unsigned char * sourceStart = source + ( sourceWidth * y ) + x ;
- unsigned char * sourcePTR = sourceStart;
  unsigned char * sourceLimit = 0;
- unsigned char * targetPTR = target;
  unsigned int offsetToNextPixel=0;
  unsigned int bufferSize=0;
 
  if (direction==0)
-    {
+    { //X direction
+      x=0;
       sourceLimit = source + ( sourceWidth * y ) + sourceWidth ;
       offsetToNextPixel=1;
       bufferSize=sourceWidth;
+      //fprintf(stderr," x dim to %u ",bufferSize);
     } else
  if (direction==1)
-    {
+    { //Y direction
+      y=0;
       sourceLimit = source + ( sourceWidth * (sourceHeight-1) ) + x;
       offsetToNextPixel=sourceWidth;
       bufferSize=sourceHeight;
+      //fprintf(stderr," y dim to %u ",bufferSize);
+    } else
+    {
+      fprintf(stderr,"Unknown direction for deriche1DPass\n");
+      return 0;
     }
+
+ unsigned char * sourceStart = source + ( sourceWidth * y ) + x ;
+ unsigned char * sourcePTR = sourceStart;
 
  unsigned int i=0;
  float * y1 = ( float * ) malloc(sizeof(float) * bufferSize);
@@ -168,16 +176,13 @@ sourcePTR = sourceLimit;
 in1 = (float) *sourcePTR;
 in2 = (float) *sourcePTR;
 
-out1 = (n2 + n1 + n0)*in1 / (1.0e+00-d1-d2);
-out2 = (n2 + n1 + n0)*in1 / (1.0e+00-d1-d2);
+out1 = (n2 + n1 + n0)*in1 / (1.0e+00 - d1 - d2);
+out2 = (n2 + n1 + n0)*in1 / (1.0e+00 - d1 - d2);
 
 for ( i=(bufferSize-1); i>0; i-- )
 {
 	  in0  =  (float) *sourcePTR;
 	  sourcePTR=sourcePTR-offsetToNextPixel;
-
-	  in0  =  (float) *sourcePTR;
-	  sourcePTR=sourcePTR+offsetToNextPixel;
 
       out0 = n2*in2 + n1*in1 + n0*in0 + d1*out1 + d2*out2;
 
@@ -193,13 +198,10 @@ for ( i=(bufferSize-1); i>0; i-- )
 // The final result is the summation of the vectors produced by equations 15
 // and 16 of Deriche's paper.
 float yOut;
-
-
-targetPTR = target;
-unsigned char* targetLimit = target;
+unsigned char * targetPTR = target + ( targetWidth * y ) + x ;
 for (i=0; i<bufferSize; i++)
 {
-  float yOut = y1[i] + y2[i];
+  yOut = 254;// y1[i] + y2[i];
   *targetPTR = (unsigned char) yOut;
   targetPTR+=offsetToNextPixel;
 }
@@ -209,14 +211,14 @@ for (i=0; i<bufferSize; i++)
  free(y1);
  free(y2);
 
- return;
+ return 1;
 }
 
 
 
 int dericheRecursiveGaussianGray(
                                   unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight , unsigned int channels,
-                                  unsigned char * target,  unsigned int targeteWidth , unsigned int targetHeight ,
+                                  unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
                                   float sigma , unsigned int order
                                 )
 {
@@ -231,21 +233,21 @@ int dericheRecursiveGaussianGray(
      y=0;
      for (x=0; x<sourceWidth; x++)
        {
+           //fprintf(stderr,"X %u ",x);
            deriche1DPass(
                           source,  sourceWidth , sourceHeight ,
-                          target , targeteWidth , targetHeight ,
+                          target , targetWidth , targetHeight ,
                           x,y,  0, // X direction
                           sigma , order
                          );
        }
-
      x=0;
      for (y=0; y<sourceHeight; y++)
        {
-
+           //fprintf(stderr,"Y %u ",y);
            deriche1DPass(
-                          target , targeteWidth , targetHeight  ,
-                          target , targeteWidth , targetHeight ,
+                          target , targetWidth , targetHeight  ,
+                          target , targetWidth , targetHeight ,
                           x,y, 1, // Y direction
                           sigma , order
                          );

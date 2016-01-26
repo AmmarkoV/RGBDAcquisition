@@ -359,14 +359,32 @@ int destroyImage(struct Image * img)
 }
 
 
-struct Image * copyImage( struct Image * inputImage)
+
+
+struct Image * createSameDimensionsImage( struct Image * inputImage)
 {
   if (inputImage==0) { fprintf(stderr,"Could not copy null image\n"); return 0; }
   if (inputImage->pixels==0) { fprintf(stderr,"Could not copy null image buffer\n"); return 0; }
 
  struct Image * newImage = createImage(inputImage->width,inputImage->height,inputImage->channels,inputImage->bitsperpixel );
 
- memcpy(newImage->pixels,inputImage->pixels,inputImage->image_size);
+ return newImage;
+}
+
+
+struct Image * copyImage( struct Image * inputImage)
+{
+  if (inputImage==0) { fprintf(stderr,"Could not copy null image\n"); return 0; }
+  if (inputImage->pixels==0) { fprintf(stderr,"Could not copy null image buffer\n"); return 0; }
+
+ struct Image * newImage = createImage(inputImage->width,inputImage->height,inputImage->channels,inputImage->bitsperpixel );
+ unsigned int logicalSize = inputImage->width * inputImage->height * inputImage->channels * (inputImage->bitsperpixel /8);
+
+ if (logicalSize!=inputImage->image_size)
+ {
+   fprintf(stderr,"copyImage detected an initially bigger inputImage , will use current size.. \n");
+ }
+ memcpy(newImage->pixels,inputImage->pixels,logicalSize);
 
  return newImage;
 }

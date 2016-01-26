@@ -3,7 +3,7 @@
 
 int dericheRecursiveGaussianGray(
                                   unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight , unsigned int channels,
-                                  unsigned char * target,  unsigned int targeteWidth , unsigned int targetHeight ,
+                                  unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
                                   float sigma , unsigned int order
                                 );
 

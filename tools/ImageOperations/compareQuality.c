@@ -1,5 +1,5 @@
 #include "compareQuality.h"
-
+#include <math.h>
 
 inline unsigned char absUCPSub(unsigned char * value1,unsigned char * value2)
 {

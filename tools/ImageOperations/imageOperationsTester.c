@@ -16,24 +16,29 @@ int runFilter(int argc, char *argv[])
  char * filenameOutput=argv[2];
  unsigned int inputType = guessFilenameTypeStupid(filenameInput);
  struct Image * inputImage = readImage(filenameInput,inputType,0);
-
-
+ struct Image * outputImage = 0; //This will get allocated when and if needed
 
  if (inputImage!=0)
  {
     unsigned int outputType = guessFilenameTypeStupid(filenameOutput);
-    struct Image * outputImage = copyImage(inputImage);
-
-
-    if (outputImage!=0)
-    {
-
-      unsigned int i=0;
-
+    unsigned int i=0;
       for (i=0; i<argc; i++)
       {
+        if ( strcmp(argv[i],"--deriche")==0 )
+        {
+          monochrome(inputImage);
+          outputImage = createSameDimensionsImage(inputImage);
+          //outputImage = copyImage(inputImage);
+
+          dericheRecursiveGaussianGray( inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
+                                        outputImage->pixels ,  outputImage->width , outputImage->height ,
+                                        atof(argv[i+1]) , atoi(argv[i+2])
+                                       );
+          fprintf(stderr,"Deriche finished safely..");
+        } else
         if ( strcmp(argv[i],"--median")==0 )
         {
+           outputImage = copyImage(inputImage);
            medianFilter(
                          outputImage->pixels ,  outputImage->width , outputImage->height ,
                          inputImage->pixels ,  inputImage->width , inputImage->height  ,
@@ -42,6 +47,7 @@ int runFilter(int argc, char *argv[])
         } else
         if ( strcmp(argv[i],"--meansat")==0 )
         {
+           outputImage = copyImage(inputImage);
            meanFilterSAT(
                          outputImage->pixels ,  outputImage->width , outputImage->height , outputImage->channels ,
                          inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
@@ -50,21 +56,12 @@ int runFilter(int argc, char *argv[])
         } else
         if ( strcmp(argv[i],"--monochrome")==0 )
         {
+          outputImage = copyImage(inputImage);
           monochrome(outputImage);
-        } else
-        if ( strcmp(argv[i],"--deriche")==0 )
-        {
-          monochrome(inputImage);
-
-          dericheRecursiveGaussianGray( inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
-                                         outputImage->pixels ,  outputImage->width , outputImage->height ,
-                                         atof(argv[i+1]) , atoi(argv[i+2])
-                                       );
-           outputImage->channels=1;
-           refreshImage(outputImage);
         } else
         if ( strcmp(argv[i],"--bilateral")==0 )
         {
+          outputImage = copyImage(inputImage);
           bilateralFilter( outputImage->pixels ,  outputImage->width , outputImage->height ,
                            inputImage->pixels ,  inputImage->width , inputImage->height ,
                             atof(argv[i+1]) , atof(argv[i+2]) , atoi(argv[i+3])
@@ -72,6 +69,7 @@ int runFilter(int argc, char *argv[])
         } else
         if ( strcmp(argv[i],"--contrast")==0 )
         {
+          outputImage = copyImage(inputImage);
           contrast(outputImage,atof(argv[i+1]));
         } else
         if ( strcmp(argv[i],"--sattest")==0 )
@@ -87,18 +85,8 @@ int runFilter(int argc, char *argv[])
         }
       }
 
-
-
-
-
-
-
-
     writeImageFile(outputImage,outputType ,filenameOutput);
-
-
     destroyImage(outputImage);
-   }
     destroyImage(inputImage);
     return 1;
  }
