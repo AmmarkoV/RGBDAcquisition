@@ -61,6 +61,7 @@ int runFilter(int argc, char *argv[])
                                          atof(argv[i+1]) , atoi(argv[i+2])
                                        );
            outputImage->channels=1;
+           refreshImage(outputImage);
         } else
         if ( strcmp(argv[i],"--bilateral")==0 )
         {

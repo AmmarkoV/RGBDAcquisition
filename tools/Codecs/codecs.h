@@ -63,6 +63,8 @@ struct Image
 
 unsigned int simplePow(unsigned int base,unsigned int exp);
 
+int refreshImage(struct Image * img);
+
 struct Image * readImage( char *filename,unsigned int type,char read_only_header);
 unsigned char * readImageRaw( char *filename,unsigned int type,unsigned int *width,unsigned int *height,unsigned int *bitsperpixel , unsigned int *channels);
 

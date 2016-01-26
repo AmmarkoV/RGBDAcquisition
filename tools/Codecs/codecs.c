@@ -83,6 +83,21 @@ unsigned int simplePow(unsigned int base,unsigned int exp)
 }
 
 
+int refreshImage(struct Image * img)
+{
+  if (img==0)            { return 0; }
+  if (img->pixels == 0 ) { fprintf(stderr,"Image has no allocated pixel buffer \n"); return 0; }
+
+  unsigned int logicalSize = img->width * img->height * img->channels * (img->bitsperpixel /8);
+  if (img->image_size != logicalSize )
+    {
+      fprintf(stderr,"Image has an inconsistent size, adjusting it\n");
+      img->image_size = logicalSize;
+    }
+
+ return 1;
+}
+
 
 struct Image * readImage( char *filename,unsigned int type,char read_only_header)
 {

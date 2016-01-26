@@ -234,7 +234,7 @@ int dericheRecursiveGaussianGray(
            deriche1DPass(
                           source,  sourceWidth , sourceHeight ,
                           target , targeteWidth , targetHeight ,
-                          x,y,  0 /* X direction */,
+                          x,y,  0, // X direction
                           sigma , order
                          );
        }
@@ -246,7 +246,7 @@ int dericheRecursiveGaussianGray(
            deriche1DPass(
                           target , targeteWidth , targetHeight  ,
                           target , targeteWidth , targetHeight ,
-                          x,y,  1 /* Y direction */,
+                          x,y, 1, // Y direction
                           sigma , order
                          );
        }
