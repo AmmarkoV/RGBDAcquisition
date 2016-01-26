@@ -9,21 +9,26 @@ SRCIMG="../../media/samples/test.jpg"
 SRCIMG="../../media/samples/big.jpg"
 WINDOWSIZE="7"
 
-time ./imageopsutility $SRCIMG outputMean.jpg --sattest 
 
+time ./imageopsutility $SRCIMG outputDer.jpg --deriche 1.4 1
+exit 0
+
+time ./imageopsutility $SRCIMG outputGray.jpg --monochrome  
 
 time ./imageopsutility $SRCIMG outputMedian3x3.jpg --median 3 3
 time ./imageopsutility $SRCIMG outputMedian8x8.jpg --median 8 8
+#7minutes
 time ./imageopsutility $SRCIMG outputMedian16x16.jpg --median 16 16
-time ./imageopsutility $SRCIMG outputMedian32x32.jpg --median 32 32
-exit 0
+#This takes too long
+#time ./imageopsutility $SRCIMG outputMedian32x32.jpg --median 32 32
+
 time ./imageopsutility $SRCIMG outputMean3x3.jpg --meansat 3 3
 time ./imageopsutility $SRCIMG outputMean8x8.jpg --meansat 8 8
 time ./imageopsutility $SRCIMG outputMean16x16.jpg --meansat 16 16
 time ./imageopsutility $SRCIMG outputMean32x32.jpg --meansat 32 32
 
-time ./imageopsutility $SRCIMG outputGray.jpg --monochrome  
-time ./imageopsutility $SRCIMG outputDer.jpg --deriche 1.4 1
+time ./imageopsutility $SRCIMG outputMean.jpg --sattest 
+
 exit 0
 
 #valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes  ./imageopsutilityD $SRCIMG test.jpg --sattest  2> error.txt 

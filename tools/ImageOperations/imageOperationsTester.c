@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    fprintf(stderr,"Converting %s to %s !\n",argv[1],argv[2]);
+    fprintf(stderr,"Image Processing %s to %s !\n",argv[1],argv[2]);
       runFilter(argc,argv);
     return 0;
 }
