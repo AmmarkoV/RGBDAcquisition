@@ -73,6 +73,17 @@ int runFilter(int argc, char *argv[])
         } else
         if ( strcmp(argv[i],"--sattest")==0 )
         {
+            float * tmp = allocateGaussianKernel(3);
+            if (tmp!=0) { free(tmp); }
+
+            tmp = allocateGaussianKernel(9);
+            if (tmp!=0) { free(tmp); }
+
+
+            tmp = allocateGaussianKernel(15);
+            if (tmp!=0) { free(tmp); }
+
+
             summedAreaTableTest();
             unsigned int * integralImageOutput = 0;
             integralImageOutput = generateSummedAreaTableRGB(inputImage->pixels ,  inputImage->width , inputImage->height);

@@ -5,6 +5,55 @@
 
 
 
+
+float * allocateGaussianKernel(unsigned int dimension)
+{
+ float * gK = (float * ) malloc(sizeof(float) * dimension * dimension );
+ if (gK ==0 )  { return 0; }
+ float * gKPTR;
+
+  float sum = 0;
+  float tmp , w = 0 ;
+  unsigned int x0 = (unsigned int) dimension/2,y0 = (unsigned int) dimension/2;
+  unsigned int x,y;
+
+  for (y=0; y<dimension; y++)
+  {
+   for (x=0; x<dimension; x++)
+   {
+     gKPTR = gK + ( dimension * y ) + x ;
+
+     tmp =  (x-x0)*(x-x0);
+     tmp += (y-y0)*(y-y0);
+
+     *gKPTR =  exp(-1 * tmp );
+      sum += *gKPTR;
+   }
+  }
+
+
+ //Normalize and print..
+ fprintf(stderr,"Created a gaussian filter %ux%u \n",dimension,dimension);
+  if (sum>0.0005)
+  {
+   for (y=0; y<dimension; y++)
+   {
+    for (x=0; x<dimension; x++)
+    {
+     gKPTR = gK + ( dimension * y ) + x ;
+     *gKPTR =  *gKPTR  / sum ;
+     fprintf(stderr,"%03f  ",*gKPTR);
+    }
+    fprintf(stderr,"\n");
+   }
+  }
+
+ return gK;
+}
+
+
+
+
 int monochrome(struct Image * img)
 {
  if (img==0) { fprintf(stderr,"Function Monochrome given Null Image\n"); return 0; }

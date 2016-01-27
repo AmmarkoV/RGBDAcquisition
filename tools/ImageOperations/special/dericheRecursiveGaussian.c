@@ -233,7 +233,6 @@ int dericheRecursiveGaussianGray(
      y=0;
      for (x=0; x<sourceWidth; x++)
        {
-           //fprintf(stderr,"xS(%u,%u)",x,y);
            deriche1DPass(
                           source,  sourceWidth , sourceHeight ,
                           target , targetWidth , targetHeight ,
@@ -245,7 +244,6 @@ int dericheRecursiveGaussianGray(
      x=0;
      for (y=0; y<sourceHeight; y++)
        {
-           //fprintf(stderr,"yS(%u,%u)",x,y);
            deriche1DPass(
                           target , targetWidth , targetHeight  ,
                           target , targetWidth , targetHeight ,

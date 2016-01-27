@@ -43,6 +43,8 @@ add_library(
  
             special/dericheRecursiveGaussian.c
             special/dericheRecursiveGaussian.h
+            special/constantTimeBilateralFiltering.c
+            special/constantTimeBilateralFiltering.h
            )
 
 target_link_libraries(ImageOperations rt dl m  )

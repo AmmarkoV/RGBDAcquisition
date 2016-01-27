@@ -6,10 +6,12 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR" 
 
 SRCIMG="../../media/samples/test.jpg"
-SRCIMG="../../media/samples/big.jpg"
 SRCIMG="../../media/samples/lenna.png"
+SRCIMG="../../media/samples/big.jpg"
 WINDOWSIZE="7"
 
+time ./imageopsutility $SRCIMG outputDummy.jpg --sattest 
+exit 0
 
 time ./imageopsutility $SRCIMG outputDer_s5.png --deriche 5.0 0
 time ./imageopsutility $SRCIMG outputDer_s15.png --deriche 15.0 0
@@ -31,7 +33,6 @@ time ./imageopsutility $SRCIMG outputMean8x8.jpg --meansat 8 8
 time ./imageopsutility $SRCIMG outputMean16x16.jpg --meansat 16 16
 time ./imageopsutility $SRCIMG outputMean32x32.jpg --meansat 32 32
 
-time ./imageopsutility $SRCIMG outputMean.jpg --sattest 
 
 exit 0
 

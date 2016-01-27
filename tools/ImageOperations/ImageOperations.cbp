@@ -86,6 +86,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="resize.h" />
+		<Unit filename="special/constantTimeBilateralFiltering.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="special/constantTimeBilateralFiltering.h" />
 		<Unit filename="special/dericheRecursiveGaussian.c">
 			<Option compilerVar="CC" />
 		</Unit>
