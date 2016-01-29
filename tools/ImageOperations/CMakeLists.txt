@@ -41,10 +41,13 @@ add_library(
             compareQuality.c
             compareQuality.h
  
-            special/dericheRecursiveGaussian.c
             special/dericheRecursiveGaussian.h
-            special/constantTimeBilateralFiltering.c
+            special/dericheRecursiveGaussian.c
             special/constantTimeBilateralFiltering.h
+            special/constantTimeBilateralFiltering.c
+
+            tools/imageMatrix.h
+            tools/imageMatrix.c
            )
 
 target_link_libraries(ImageOperations rt dl m  )

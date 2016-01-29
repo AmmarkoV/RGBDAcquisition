@@ -101,6 +101,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="summedAreaTables.h" />
+		<Unit filename="tools/imageMatrix.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/imageMatrix.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
