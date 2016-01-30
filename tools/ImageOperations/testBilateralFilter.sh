@@ -10,7 +10,7 @@ SRCIMG="../../media/samples/lenna.png"
 SRCIMG="../../media/samples/big.jpg"
 WINDOWSIZE="7"
 
-time ./imageopsutility $SRCIMG outputCTBilateral.jpg --ctbilateral 5.0 5 
+time ./imageopsutility $SRCIMG outputCTBilateral.jpg --ctbilateral 5.0 5
 
 exit 0
 time ./imageopsutility $SRCIMG outputDummy.jpg --sattest 

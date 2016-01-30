@@ -16,17 +16,10 @@ struct ctbfPool
 
 #define SR  0.006
 #define SR2 2*SR
-inline float wKResponseF(float kBin , float in , float divider )
+inline float wKResponseUC(float kBin , unsigned char * in , float divider )
 {
-  float response = -1 * ( in - kBin )  * ( in - kBin );
-  response = response / (SR2);
-  return (float) exp(response)/divider;
-}
-
-
-inline float wKResponseUC(float kBin , unsigned char in , float divider )
-{
-  float response = -1 * ( in - kBin )  * ( in - kBin );
+  float inMinusK = *in - kBin;
+  float response = -1 * inMinusK  * inMinusK;
   response = response / (SR2);
   return (float) exp(response)/divider;
 }
@@ -35,11 +28,11 @@ inline float wKResponseUC(float kBin , unsigned char in , float divider )
 void populateWKMatrix( float * Wk , float k , float divider , unsigned char * source , unsigned int sourceWidth, unsigned int sourceHeight  )
 {
   float *WkPTR=Wk;
-  unsigned char *  sourcePTR=source , * sourceLimit = source + sourceWidth * sourceHeight;
+  unsigned char *  sourcePTR=source , *sourceLimit = source + sourceWidth * sourceHeight;
 
   while (sourcePTR < sourceLimit)
   {
-     *WkPTR = (float)  wKResponseUC(k , *sourcePTR , divider );
+     *WkPTR = (float)  wKResponseUC(k , sourcePTR , divider );
      ++WkPTR; ++sourcePTR;
   }
 }
@@ -114,17 +107,17 @@ for (i=0; i<bins; i++)
 
  //fprintf(stderr,"2xder");
  dericheRecursiveGaussianGrayF(
-                              ctfbp[i].Jk,  sourceWidth , sourceHeight , channels,
-                              tmp1,  targetWidth , targetHeight ,
-                              sigma , 0
-                             );
+                                ctfbp[i].Jk,  sourceWidth , sourceHeight , channels,
+                                tmp1,  targetWidth , targetHeight ,
+                                sigma , 0
+                              );
 
 
  dericheRecursiveGaussianGrayF(
-                              ctfbp[i].Wk,  sourceWidth , sourceHeight , channels,
-                              tmp2,  targetWidth , targetHeight ,
-                              sigma , 0
-                             );
+                                ctfbp[i].Wk,  sourceWidth , sourceHeight , channels,
+                                tmp2,  targetWidth , targetHeight ,
+                                sigma , 0
+                              );
 
 
  //fprintf(stderr,"jbk");
@@ -144,14 +137,16 @@ unsigned char *inVal ;
 unsigned char *resPTR = target;
 unsigned char *resLimit = target+targetWidth*targetHeight;
 float * jbkPTR;
-//float q_ceil , q_floor;
+
 unsigned int x=0,y=0;
+unsigned int iMin,iMax;
 
 while (resPTR<resLimit)
 {
  inVal = source + ( y * sourceWidth ) + x;
  i =  *inVal/step;
-
+ iMin = (unsigned int) ceil((float) *inVal/step );
+ iMax = (unsigned int) floor((float) *inVal/step );
 
  //fprintf(stderr,"i(%u,%u)=%u[%u/%u] ",x,y,*inVal,i,bins);
  //DO INTERPOLATION..
