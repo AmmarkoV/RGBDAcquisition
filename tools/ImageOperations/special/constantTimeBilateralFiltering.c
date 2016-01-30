@@ -10,7 +10,7 @@ struct ctbfPool
 {
   float * Wk;
   float * Jk;
-  unsigned char * JBk;
+  float * JBk;
 };
 
 #define SR  0.006
@@ -55,6 +55,10 @@ void populateJBkMatrix( float * JBk ,  float * der1 , float * der2  , unsigned i
   divide2DMatricesF(JBk, der1 , der2 , sourceWidth , sourceHeight );
 }
 
+
+
+
+
 int constantTimeBilateralFilter(
                                 unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight , unsigned int channels ,
                                 unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
@@ -77,6 +81,7 @@ int constantTimeBilateralFilter(
   {
     ctfbp[i].Wk =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight );
     ctfbp[i].Jk =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight );
+    ctfbp[i].JBk =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight );
   }
 
   float maxVal=255;
@@ -117,7 +122,26 @@ for (i=0; i<bins; i++)
 
 //TODO : Store Result on target
 
+unsigned char *resPTR = target;
+unsigned char *resLimit = target+targetWidth*targetHeight;
+float * jbkPTR;
+float q_ceil , q_floor;
+unsigned int x=0,y=0;
 
+while (resPTR<resLimit)
+{
+ //DO INTERPOLATION..
+ //q_ceil=ceil(val/D);
+ //q_floor=floor(val/D);
+ //a=(q_ceil*D-val)/D;
+ //tmp=(a)*JBk(i,j,q_floor+1)+(1-a)*JBk(i,j,q_ceil+1);
+ jbkPTR = ctfbp[i].JBk + ( y * targetWidth ) + x;
+ *resPTR = (unsigned char) *jbkPTR;
+
+ ++x;
+ if (x==targetWidth) { x=0; ++y; }
+ ++resPTR;
+}
 
 
 //Deallocated everything that is useless

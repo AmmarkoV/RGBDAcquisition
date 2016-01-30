@@ -24,6 +24,23 @@ int runFilter(int argc, char *argv[])
     unsigned int i=0;
       for (i=0; i<argc; i++)
       {
+
+
+
+        if ( strcmp(argv[i],"--ctbilateral")==0 )
+        {
+          monochrome(inputImage);
+          outputImage = createSameDimensionsImage(inputImage);
+          //outputImage = copyImage(inputImage);
+
+          constantTimeBilateralFilter(
+                                       inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
+                                       outputImage->pixels ,  outputImage->width , outputImage->height ,
+                                       atof(argv[i+1])  //sigma
+                                      ,atoi(argv[i+2]) //bins
+                                     );
+
+        } else
         if ( strcmp(argv[i],"--deriche")==0 )
         {
           monochrome(inputImage);
