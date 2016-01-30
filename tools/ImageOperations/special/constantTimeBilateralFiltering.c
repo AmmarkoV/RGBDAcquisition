@@ -6,6 +6,7 @@
 #include <math.h>
 
 
+
 struct ctbfPool
 {
   float * Wk;
@@ -47,12 +48,12 @@ void populateWKMatrix( float * Wk , float k , float divider , unsigned char * so
 
 void populateJKMatrix( float * Jk , float * Wk  , unsigned char * source , unsigned int sourceWidth, unsigned int sourceHeight  )
 {
-   multiply2DMatricesFWithUC(Jk,Wk,source,sourceWidth,sourceHeight);
+   multiply2DMatricesFWithUC(Jk,Wk,source,sourceWidth,sourceHeight,1);
 }
 
 void populateJBkMatrix( float * JBk ,  float * der1 , float * der2  , unsigned int sourceWidth, unsigned int sourceHeight )
 {
-  divide2DMatricesF(JBk, der1 , der2 , sourceWidth , sourceHeight );
+  divide2DMatricesF(JBk, der1 , der2 , sourceWidth , sourceHeight ,1);
 }
 
 
@@ -91,33 +92,35 @@ int constantTimeBilateralFilter(
   unsigned int quantizationStep  =  (unsigned int) maxVal / step;
   unsigned int k=0;
 
+fprintf(stderr,"Making bins : ");
 for (i=0; i<bins; i++)
 {
-
+ fprintf(stderr,".");
  populateWKMatrix( ctfbp[i].Wk , k , divider , source , sourceWidth , sourceHeight  );
  populateJKMatrix( ctfbp[i].Jk , ctfbp[i].Wk  , source , sourceWidth, sourceHeight  );
 
 
- dericheRecursiveGaussianGray(
+ dericheRecursiveGaussianGrayF(
                               ctfbp[i].Jk,  sourceWidth , sourceHeight , channels,
                               tmp1,  targetWidth , targetHeight ,
                               sigma , 0
                              );
 
 
- dericheRecursiveGaussianGray(
+ dericheRecursiveGaussianGrayF(
                               ctfbp[i].Wk,  sourceWidth , sourceHeight , channels,
                               tmp2,  targetWidth , targetHeight ,
                               sigma , 0
                              );
 
 
-  populateJBkMatrix(ctfbp[i].JBk ,  ctfbp[i].Jk , ctfbp[i].Wk  , sourceWidth, sourceHeight );
+  populateJBkMatrix(ctfbp[i].JBk ,  tmp1 , tmp2  , sourceWidth, sourceHeight );
 
 
 
  k+=quantizationStep;
 }
+ fprintf(stderr,"\n");
 
 
 //TODO : Store Result on target

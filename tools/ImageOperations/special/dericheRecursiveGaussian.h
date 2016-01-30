@@ -7,4 +7,10 @@ int dericheRecursiveGaussianGray(
                                   float sigma , unsigned int order
                                 );
 
+int dericheRecursiveGaussianGrayF(
+                                     float * source,  unsigned int sourceWidth , unsigned int sourceHeight , unsigned int channels,
+                                     float * target,  unsigned int targetWidth , unsigned int targetHeight ,
+                                     float sigma , unsigned int order
+                                   );
+
 #endif // DERICHERECURSIVEGAUSSIAN_H_INCLUDED

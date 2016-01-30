@@ -11,7 +11,7 @@ SRCIMG="../../media/samples/big.jpg"
 WINDOWSIZE="7"
 
 time ./imageopsutility $SRCIMG outputDummy.jpg --sattest 
-time ./imageopsutility $SRCIMG outputDummy.jpg --ctbilateral 5.0 255 
+time ./imageopsutility $SRCIMG outputDummy.jpg --ctbilateral 5.0 55 
 
 exit 0
 

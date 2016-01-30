@@ -254,3 +254,47 @@ int dericheRecursiveGaussianGray(
 
   return 1;
 }
+
+
+
+
+
+
+
+
+
+
+int dericheRecursiveGaussianGrayF(
+                                     float * source,  unsigned int sourceWidth , unsigned int sourceHeight , unsigned int channels,
+                                     float * target,  unsigned int targetWidth , unsigned int targetHeight ,
+                                     float sigma , unsigned int order
+                                   )
+{
+ unsigned char * castedIN = ( unsigned char * ) malloc(sizeof(float) * sourceWidth*sourceHeight*channels);
+ if (castedIN==0) { return 0; }
+
+ unsigned char * castedOUT = ( unsigned char * ) malloc(sizeof(float) * targetWidth*targetHeight*channels);
+ if (castedOUT==0) { return 0; }
+
+
+ castFloatImage2UChar(castedIN, source, sourceWidth, sourceHeight , channels);
+
+ if (
+     dericheRecursiveGaussianGray(
+                                  castedIN,  sourceWidth , sourceHeight , channels,
+                                  castedOUT,  targetWidth , targetHeight ,
+                                  sigma , order
+                                )
+    )
+    {
+
+      castUCharImage2Float(target , castedOUT , targetWidth, targetHeight , channels);
+
+    }
+
+
+ free(castedIN);
+ free(castedOUT);
+ return 1;
+}
+

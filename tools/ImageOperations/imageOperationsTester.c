@@ -35,8 +35,8 @@ int runFilter(int argc, char *argv[])
 
           constantTimeBilateralFilter(
                                        inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
-                                       outputImage->pixels ,  outputImage->width , outputImage->height ,
-                                       atof(argv[i+1])  //sigma
+                                       outputImage->pixels ,  outputImage->width , outputImage->height
+                                      ,atof(argv[i+1])  //sigma
                                       ,atoi(argv[i+2]) //bins
                                      );
 

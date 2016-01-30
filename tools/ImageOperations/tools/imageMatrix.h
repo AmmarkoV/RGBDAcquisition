@@ -2,10 +2,14 @@
 #define IMAGEMATRIX_H_INCLUDED
 
 
-unsigned char* divideTwoImages1Ch(unsigned char *  divisor , unsigned char * divider , unsigned int width,unsigned int height );
-int divide2DMatricesF(float * out , float * divider , float * divisor , unsigned int width , unsigned int height );
-int multiply2DMatricesF(float * out , float * mult1 , float * mult2 , unsigned int width , unsigned int height );
-int multiply2DMatricesFWithUC(float * out , float * mult1 , unsigned char * mult2 , unsigned int width , unsigned int height );
+int castUCharImage2Float(float * out , unsigned char * in, unsigned int width,unsigned int height , unsigned int channels);
+int castFloatImage2UChar(unsigned char * out , float * in, unsigned int width,unsigned int height , unsigned int channels);
+
+
+unsigned char* divideTwoImages(unsigned char *  dividend , unsigned char * divisor , unsigned int width,unsigned int height , unsigned int channels);
+int divide2DMatricesF(float * out , float * dividend , float * divisor , unsigned int width , unsigned int height , unsigned int channels);
+int multiply2DMatricesF(float * out , float * mult1 , float * mult2 , unsigned int width , unsigned int height, unsigned int channels );
+int multiply2DMatricesFWithUC(float * out , float * mult1 , unsigned char * mult2 , unsigned int width , unsigned int height, unsigned int channels );
 
 
 #endif // IMAGEMATRIX_H_INCLUDED
