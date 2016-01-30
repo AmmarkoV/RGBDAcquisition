@@ -25,12 +25,15 @@ int castUCharImage2Float(float * out , unsigned char * in, unsigned int width,un
 
 int castFloatImage2UChar(unsigned char * out , float * in, unsigned int width,unsigned int height , unsigned int channels)
 {
+  if ( (out==0) || (in==0) )
+    {
+      return 0;
+    }
+
   unsigned char *outPTR = out;
   unsigned char *outLimit = out + ( width * height * channels);
   float *inPTR = in;
 
-  if (out!=0)
-   {
      while(outPTR<outLimit)
      {
        *outPTR = (unsigned char) *inPTR;
@@ -38,7 +41,20 @@ int castFloatImage2UChar(unsigned char * out , float * in, unsigned int width,un
        ++inPTR;
      }
     return 1;
-   }
+}
+
+
+float * copyUCharImage2Float(unsigned char * in, unsigned int width,unsigned int height , unsigned int channels)
+{
+  float * out  = ( float * ) malloc(sizeof(float) * width * height * channels);
+  if (out!=0)
+  {
+  if (castUCharImage2Float(out , in, width, height , channels) )
+    {
+       return out;
+    }
+   free(out);
+  }
   return 0;
 }
 
@@ -67,11 +83,13 @@ unsigned char* divideTwoImages(unsigned char *  dividend , unsigned char * divis
 /*  dividend / divisor = quotient */
 int divide2DMatricesF(float * out , float * dividend , float * divisor , unsigned int width , unsigned int height , unsigned int channels)
 {
-  float *dividendPTR=dividend , *divisorPTR=divisor , *outPTR=outPTR , *outLimit=outPTR + (width * height * channels);
+  if ( (out==0)||(out==dividend)||(out==divisor) ) { return 0; }
+  float *dividendPTR=dividend , *divisorPTR=divisor , *outPTR=out , *outLimit=out + (width * height * channels);
 
   while (outPTR < outLimit)
   {
-     *outPTR = (float) (*dividendPTR) / (* divisorPTR) ;
+     if (*divisorPTR!=0) { *outPTR = (float) (*dividendPTR) / (*divisorPTR) ;  } else
+                         { *outPTR=0; }
      ++divisorPTR; ++dividendPTR; ++outPTR;
   }
  return 1;
@@ -80,7 +98,7 @@ int divide2DMatricesF(float * out , float * dividend , float * divisor , unsigne
 
 int multiply2DMatricesF(float * out , float * mult1 , float * mult2 , unsigned int width , unsigned int height , unsigned int channels)
 {
-  float *mult1PTR=mult1 , *mult2PTR=mult2 , *outPTR=outPTR , *outLimit=outPTR + (width * height * channels);
+  float *mult1PTR=mult1 , *mult2PTR=mult2 , *outPTR=out , *outLimit=out + (width * height * channels);
 
   while (outPTR < outLimit)
   {

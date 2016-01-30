@@ -35,7 +35,7 @@ inline float wKResponseUC(float kBin , unsigned char in , float divider )
 void populateWKMatrix( float * Wk , float k , float divider , unsigned char * source , unsigned int sourceWidth, unsigned int sourceHeight  )
 {
   float *WkPTR=Wk;
-  unsigned char *  sourcePTR=source , sourceLimit = source + sourceWidth * sourceHeight;
+  unsigned char *  sourcePTR=source , * sourceLimit = source + sourceWidth * sourceHeight;
 
   while (sourcePTR < sourceLimit)
   {
@@ -67,11 +67,16 @@ int constantTimeBilateralFilter(
                                 unsigned int bins
                                )
 {
+  if (channels!=1)
+  {
+    fprintf(stderr,"constantTimeBilateralFilter cannot work with more than 1 channels");
+    return 0;
+  }
   unsigned int doNormalization = 0;
 
-  float * tmp1 =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight );
+  float * tmp1 =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight * channels);
   if (tmp1==0) { return 0; }
-  float * tmp2 =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight );
+  float * tmp2 =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight * channels);
   if (tmp2==0) { free(tmp1); return 0; }
 
   unsigned int i=0;
@@ -80,9 +85,14 @@ int constantTimeBilateralFilter(
 
   for (i=0; i<bins; i++)
   {
-    ctfbp[i].Wk =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight );
-    ctfbp[i].Jk =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight );
-    ctfbp[i].JBk =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight );
+    ctfbp[i].Wk =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight * channels);
+    if (ctfbp[i].Wk==0) { fprintf(stderr,"Could not allocate a wK buffer\n"); }
+
+    ctfbp[i].Jk =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight * channels);
+    if (ctfbp[i].Jk==0) { fprintf(stderr,"Could not allocate a jK buffer\n"); }
+
+    ctfbp[i].JBk =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight * channels);
+    if (ctfbp[i].JBk==0) { fprintf(stderr,"Could not allocate a jK buffer\n"); }
   }
 
   float maxVal=255;
@@ -96,10 +106,13 @@ fprintf(stderr,"Making bins : ");
 for (i=0; i<bins; i++)
 {
  fprintf(stderr,".");
+ //fprintf(stderr,"wk");
  populateWKMatrix( ctfbp[i].Wk , k , divider , source , sourceWidth , sourceHeight  );
+ //fprintf(stderr,"jk");
  populateJKMatrix( ctfbp[i].Jk , ctfbp[i].Wk  , source , sourceWidth, sourceHeight  );
 
 
+ //fprintf(stderr,"2xder");
  dericheRecursiveGaussianGrayF(
                               ctfbp[i].Jk,  sourceWidth , sourceHeight , channels,
                               tmp1,  targetWidth , targetHeight ,
@@ -114,7 +127,8 @@ for (i=0; i<bins; i++)
                              );
 
 
-  populateJBkMatrix(ctfbp[i].JBk ,  tmp1 , tmp2  , sourceWidth, sourceHeight );
+ //fprintf(stderr,"jbk");
+ populateJBkMatrix(ctfbp[i].JBk ,  tmp1 , tmp2  , sourceWidth, sourceHeight );
 
 
 
@@ -124,39 +138,48 @@ for (i=0; i<bins; i++)
 
 
 //TODO : Store Result on target
+fprintf(stderr,"Collecting result \n");
 
+unsigned char *inVal ;
 unsigned char *resPTR = target;
 unsigned char *resLimit = target+targetWidth*targetHeight;
 float * jbkPTR;
-float q_ceil , q_floor;
+//float q_ceil , q_floor;
 unsigned int x=0,y=0;
 
 while (resPTR<resLimit)
 {
+ inVal = source + ( y * sourceWidth ) + x;
+ i =  *inVal/step;
+
+
+ //fprintf(stderr,"i(%u,%u)=%u[%u/%u] ",x,y,*inVal,i,bins);
  //DO INTERPOLATION..
  //q_ceil=ceil(val/D);
  //q_floor=floor(val/D);
  //a=(q_ceil*D-val)/D;
  //tmp=(a)*JBk(i,j,q_floor+1)+(1-a)*JBk(i,j,q_ceil+1);
  jbkPTR = ctfbp[i].JBk + ( y * targetWidth ) + x;
- *resPTR = (unsigned char) *jbkPTR;
+ float outIntensity = *jbkPTR * step;
+ *resPTR = (unsigned char) outIntensity;
 
  ++x;
- if (x==targetWidth) { x=0; ++y; }
+ if (x>=targetWidth) { x=0; ++y; }
  ++resPTR;
 }
 
 
+fprintf(stderr,"Deallocating everything \n");
 //Deallocated everything that is useless
   for (i=0; i<bins; i++)
   {
-    free( ctfbp[i].Wk  );
-    free( ctfbp[i].Jk  );
-    free( ctfbp[i].JBk );
+    if (ctfbp[i].Wk!=0 )  { free( ctfbp[i].Wk ); }
+    if (ctfbp[i].Jk!=0 )  { free( ctfbp[i].Jk  ); }
+    if (ctfbp[i].JBk!=0 ) { free( ctfbp[i].JBk ); }
   }
- free(ctfbp);
- free(tmp1);
- free(tmp2);
+ if (tmp1!=0 ) { free(tmp1); }
+ if (tmp2!=0 ) { free(tmp2); }
+ if (ctfbp!=0 ) { free(ctfbp); }
  return 1;
 }
 

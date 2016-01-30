@@ -25,7 +25,13 @@ char * readFileToMemory(char * filename,unsigned int *length )
 
   // copy the file into the buffer:
   result = fread (buffer,1,lSize,pFile);
-  if (result != lSize) { fprintf(stderr,"Could not read the whole file onto memory %s ",filename); fclose(pFile); return 0; }
+  if (result != lSize)
+    {
+      fprintf(stderr,"Could not read the whole file onto memory %s ",filename);
+      fclose(pFile);
+      free(buffer);
+      return 0;
+    }
 
   /* the whole file is now loaded in the memory buffer. */
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "../tools/imageMatrix.h"
 
 
 
@@ -270,11 +271,15 @@ int dericheRecursiveGaussianGrayF(
                                      float sigma , unsigned int order
                                    )
 {
- unsigned char * castedIN = ( unsigned char * ) malloc(sizeof(float) * sourceWidth*sourceHeight*channels);
+ if ( (source==0) ) { return 0; }
+ if (target==0) { return 0; }
+
+ int success=0;
+ unsigned char * castedIN = ( unsigned char * ) malloc(sizeof( unsigned char) * sourceWidth*sourceHeight*channels);
  if (castedIN==0) { return 0; }
 
- unsigned char * castedOUT = ( unsigned char * ) malloc(sizeof(float) * targetWidth*targetHeight*channels);
- if (castedOUT==0) { return 0; }
+ unsigned char * castedOUT = ( unsigned char * ) malloc(sizeof( unsigned char) * targetWidth*targetHeight*channels);
+ if (castedOUT==0) { free(castedIN); return 0; }
 
 
  castFloatImage2UChar(castedIN, source, sourceWidth, sourceHeight , channels);
@@ -287,14 +292,13 @@ int dericheRecursiveGaussianGrayF(
                                 )
     )
     {
-
       castUCharImage2Float(target , castedOUT , targetWidth, targetHeight , channels);
-
+      success=1;
     }
 
 
  free(castedIN);
  free(castedOUT);
- return 1;
+ return success;
 }
 

@@ -4,7 +4,7 @@
 
 int castUCharImage2Float(float * out , unsigned char * in, unsigned int width,unsigned int height , unsigned int channels);
 int castFloatImage2UChar(unsigned char * out , float * in, unsigned int width,unsigned int height , unsigned int channels);
-
+float * copyUCharImage2Float(unsigned char * in, unsigned int width,unsigned int height , unsigned int channels);
 
 unsigned char* divideTwoImages(unsigned char *  dividend , unsigned char * divisor , unsigned int width,unsigned int height , unsigned int channels);
 int divide2DMatricesF(float * out , float * dividend , float * divisor , unsigned int width , unsigned int height , unsigned int channels);

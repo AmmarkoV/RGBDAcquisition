@@ -10,13 +10,14 @@ SRCIMG="../../media/samples/lenna.png"
 SRCIMG="../../media/samples/big.jpg"
 WINDOWSIZE="7"
 
-time ./imageopsutility $SRCIMG outputDummy.jpg --sattest 
-time ./imageopsutility $SRCIMG outputDummy.jpg --ctbilateral 5.0 55 
+time ./imageopsutility $SRCIMG outputCTBilateral.jpg --ctbilateral 5.0 5 
 
 exit 0
+time ./imageopsutility $SRCIMG outputDummy.jpg --sattest 
 
 time ./imageopsutility $SRCIMG outputDer_s5.png --deriche 5.0 0
 time ./imageopsutility $SRCIMG outputDer_s15.png --deriche 15.0 0
+time ./imageopsutility $SRCIMG outputDer_Fs15.png --dericheF 15.0 0
 time ./imageopsutility $SRCIMG outputDer_s25.png --deriche 25.0 0
 timeout 5 gpicview outputDer_s5.png
 exit 0

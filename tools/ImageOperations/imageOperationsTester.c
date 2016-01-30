@@ -8,6 +8,7 @@
 #include "medianFilter.h"
 #include "imageFilters.h"
 #include "special/dericheRecursiveGaussian.h"
+#include "tools/imageMatrix.h"
 
 
 int runFilter(int argc, char *argv[])
@@ -51,6 +52,25 @@ int runFilter(int argc, char *argv[])
                                         outputImage->pixels ,  outputImage->width , outputImage->height ,
                                         atof(argv[i+1]) , atoi(argv[i+2])
                                        );
+        } else
+        if ( strcmp(argv[i],"--dericheF")==0 )
+        {
+          fprintf(stderr,"This is a test call for casting code , this shouldnt be normally used..\n");
+          monochrome(inputImage);
+          outputImage = createSameDimensionsImage(inputImage);
+
+          //outputImage = copyImage(inputImage);
+         float * inF = copyUCharImage2Float(inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels );
+         float * outF = (float*) malloc(sizeof(float) *  outputImage->width * outputImage->height *  outputImage->channels );
+
+         dericheRecursiveGaussianGrayF( inF ,  inputImage->width , inputImage->height , inputImage->channels ,
+                                         outF  ,  outputImage->width , outputImage->height ,
+                                         atof(argv[i+1]) , atoi(argv[i+2])
+                                        );
+
+         castFloatImage2UChar(outputImage->pixels, outF, outputImage->width , outputImage->height ,  outputImage->channels );
+         free(inF);
+         free(outF);
         } else
         if ( strcmp(argv[i],"--median")==0 )
         {
