@@ -1,45 +1,128 @@
 #include "convolutionFilter.h"
 
 
-
-
-
-int convolutionFilter(unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
-                      unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
-
-                      unsigned char * convolutionMatrix , unsigned int convolutionMatrixWidth , unsigned int convolutionMatrixHeight , unsigned int divisor ,
-
-                      unsigned int tX,  unsigned int tY  ,
-                      unsigned int sX,  unsigned int sY  ,
-                      unsigned int patchWidth , unsigned int patchHeight
-                     )
+inline int isFilterDimensionOdd(unsigned int dimension)
 {
-    /*
-  //Check for bounds -----------------------------------------
-  if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
-  if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
-  //----------------------------------------------------------
+ return ( dimension % 2 !=0 );
+}
 
-  unsigned char * targetPTR; unsigned char * targetLineLimitPTR; unsigned char * targetLimitPTR;   unsigned int targetLineSkip;
-  targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
-  targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
-  targetLineSkip = (targetWidth-width) * 3;
-  targetLineLimitPTR = targetPTR + (width*3) -3; //-3 is required here
 
-  fprintf(stderr,"BitBlt Color an area (%u,%u) of target image  starting at %u,%u  sized %u,%u with color RGB(%u,%u,%u)\n",width,height,tX,tY,targetWidth,targetHeight,R,G,B);
-  fprintf(stderr,"last Pixels @ %u,%u\n",tX+width,tY+height);
-  while ( targetPTR < targetLimitPTR )
+inline void doFilterKernel (
+                             float * sourceKernelPosition , float * kernelStart , unsigned int kernelWidth , unsigned int kernelHeight , float divisor ,
+                             unsigned int sourceWidth ,
+                             unsigned char * output
+                          )
+{
+  // ================================================================
+  unsigned int lineOffset = ( sourceWidth*3 ) - (kernelWidth*3) ;
+  float * imagePTR = sourceKernelPosition;
+  float * imageLineEnd = sourceKernelPosition + (3*kernelWidth);
+  float * imageEnd = sourceKernelPosition + (sourceWidth*3*kernelHeight);
+
+  float * kernelFPTR = kernelStart;
+  float * kernelFPTREnd = kernelStart + (kernelHeight*kernelWidth*3);
+
+  float resR=0,resG=0,resB=0;
+
+  while (imagePTR < imageEnd)
   {
-     while (targetPTR < targetLineLimitPTR)
-     {
-        //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
-        *targetPTR = R; ++targetPTR;
-        *targetPTR = G; ++targetPTR;
-        *targetPTR = B; ++targetPTR;
-     }
-    targetLineLimitPTR += targetWidth*3;
-    targetPTR+=targetLineSkip;
+    while (imagePTR < imageLineEnd)
+    {
+     resR+= (*kernelFPTR) * (*imagePTR); ++imagePTR;
+     resG+= (*kernelFPTR) * (*imagePTR); ++imagePTR;
+     resB+= (*kernelFPTR) * (*imagePTR); ++imagePTR;
+     ++kernelFPTR;
+    }
+   imagePTR+=lineOffset;
+   imageLineEnd+=( sourceWidth*3 );
   }
-  */
+
+  output[0] = (float) resR / divisor;
+  output[1] = (float) resG / divisor;
+  output[2] = (float) resB / divisor;
+
+ return;
+}
+
+
+
+int convolutionFilter3ChF(
+                          float * target,  unsigned int targetWidth , unsigned int targetHeight ,
+                          float * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
+                          float * convolutionMatrix , unsigned int kernelWidth , unsigned int kernelHeight , float divisor
+                         )
+{
+  float * sourcePTR = source;
+  float * sourceLimit = source+(sourceWidth*sourceHeight*3) ;
+  float * targetPTR = target;
+
+  if (
+       (!isFilterDimensionOdd(kernelWidth)) ||
+       (!isFilterDimensionOdd(kernelHeight))
+     )
+  {
+    return 0;
+  }
+
+
+  unsigned int x=0,y=0;
+  while (sourcePTR < sourceLimit)
+  {
+   float * sourceScanlinePTR = sourcePTR;
+   float * sourceScanlineEnd = sourcePTR+(sourceWidth*3);
+
+   float * targetScanlinePTR = targetPTR;
+   float * targetScanlineEnd = targetPTR+(targetWidth*3);
+
+   if (x+kernelWidth>=sourceWidth)
+   {
+
+   } else
+   if (y+kernelHeight>=sourceHeight)
+   {
+      //We are on the right side of our buffer
+   } else
+   {
+   float outputRGB[3];
+   //Get all the valid configurations of the scanline
+   while (sourceScanlinePTR < sourceScanlineEnd)
+    {
+      doFilterKernel ( sourceScanlinePTR  , convolutionMatrix , kernelWidth , kernelHeight , divisor , sourceWidth , outputRGB );
+
+      float * outputR = targetScanlinePTR + (targetWidth*3) + 3;
+      float * outputG = outputR+1;
+      float * outputB = outputG+1;
+
+      *outputR = outputRGB[0];
+      *outputG = outputRGB[1];
+      *outputB = outputRGB[2];
+
+      ++x;
+      sourceScanlinePTR+=3;
+      targetScanlinePTR+=3;
+    }
+     sourcePTR = sourceScanlineEnd-3;
+     targetPTR = targetScanlineEnd-3;
+
+   }
+
+   //Keep X,Y Relative positiions
+   ++x;
+   if (x>=sourceWidth) { x=0; ++y; }
+   sourcePTR+=3;
+   targetPTR+=3;
+  }
+
  return 1;
+}
+
+
+
+int convolutionFilter1ChF(
+                          float * target,  unsigned int targetWidth , unsigned int targetHeight ,
+                          float * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
+                          float * convolutionMatrix , unsigned int kernelWidth , unsigned int kernelHeight , float divisor
+                         )
+{
+  return 0;
 }

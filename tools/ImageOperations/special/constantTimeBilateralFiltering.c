@@ -1,6 +1,7 @@
 #include "dericheRecursiveGaussian.h"
 #include "constantTimeBilateralFiltering.h"
 #include "../tools/imageMatrix.h"
+#include "../imageFilters.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -75,6 +76,16 @@ int constantTimeBilateralFilter(
     return 0;
  }
 
+ float * convolutionMatrix=0;
+ unsigned int kernelWidth=15;
+ unsigned int kernelHeight=15;
+ float divisor=1.0;
+
+ if (useDeriche==0)
+ {
+    convolutionMatrix = allocateGaussianKernel(15,15);
+ }
+
 
   float * sourceNormalized =  ( float * ) malloc( sizeof( float ) * sourceWidth * sourceHeight * channels);
   if (sourceNormalized==0) { return 0; }
@@ -121,7 +132,7 @@ for (i=0; i<bins; i++)
 
  //fprintf(stderr,"2xder");
 
- if (useDeriche)
+ if (useDeriche==2)
  {
  dericheRecursiveGaussianGrayF(
                                 ctfbp[i].Jk,  sourceWidth , sourceHeight , channels,
@@ -136,10 +147,26 @@ for (i=0; i<bins; i++)
                                 sigma , 0
                               );
  } else
+ if (useDeriche==0)
+ {
+   convolutionFilter1ChF(
+                          tmp1,  targetWidth , targetHeight ,
+                          ctfbp[i].Jk,  sourceWidth , sourceHeight  ,
+                          convolutionMatrix , kernelWidth , kernelHeight , divisor
+                         );
+
+
+   convolutionFilter1ChF(
+                          tmp2,  targetWidth , targetHeight ,
+                          ctfbp[i].Wk,  sourceWidth , sourceHeight  ,
+                          convolutionMatrix , kernelWidth , kernelHeight , divisor
+                         );
+ } else
  {
     memcpy(tmp1,ctfbp[i].Jk,sourceWidth*sourceHeight*channels*sizeof(float));
     memcpy(tmp2,ctfbp[i].Wk,sourceWidth*sourceHeight*channels*sizeof(float));
  }
+
 
  //fprintf(stderr,"jbk");
  populateJBkMatrix(ctfbp[i].JBk ,  tmp1 , tmp2  , sourceWidth, sourceHeight );
@@ -192,7 +219,7 @@ fprintf(stderr,"Deallocating everything \n");
     if (ctfbp[i].JBk!=0 ) { free( ctfbp[i].JBk ); }
   }
 
-
+ if (convolutionMatrix!=0) { free(convolutionMatrix); }
  if (sourceNormalized !=0 ) { free(sourceNormalized ); }
  if (tmp1!=0 ) { free(tmp1); }
  if (tmp2!=0 ) { free(tmp2); }

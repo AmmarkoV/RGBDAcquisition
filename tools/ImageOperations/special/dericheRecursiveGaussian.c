@@ -95,6 +95,24 @@ return 1;
 
 
 
+
+/*
+    // - - - - - - - - - - - - - - - - - - - -
+
+
+
+
+
+
+
+
+                 UCHAR VERSION
+    // - - - - - - - - - - - - - - - - - - - -
+*/
+
+
+
+
 inline int deriche1DPassF(
                    float * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
                    float * target,  unsigned int targetWidth , unsigned int targetHeight ,
@@ -160,10 +178,10 @@ n2 = derp->p_filter[4];   // Note this is always == 0
 
 sourcePTR = sourceStart;
 in1 = (float) *sourcePTR;
-in2 = (float) *sourcePTR;
+in2 = in1;
 
 out1 = (float) ((n2 + n1 + n0)*in1)/(1.0e+00-d1-d2);
-out2 = (float) ((n2 + n1 + n0)*in1)/(1.0e+00-d1-d2);
+out2 = out1;
 
 for ( i=0; i<bufferSize; i++ )
 {
@@ -195,10 +213,10 @@ n2 = derp->n_filter[4];
 
 sourcePTR = sourceLimit-offsetToNextPixel; //We want the last good item
 in1 = (float) *sourcePTR;
-in2 = (float) *sourcePTR;
+in2 = in1;
 
 out1 = (float) ((n2 + n1 + n0)*in1) / (1.0e+00 - d1 - d2);
-out2 = (float) ((n2 + n1 + n0)*in1) / (1.0e+00 - d1 - d2);
+out2 = out1;
 
 for ( i=(bufferSize-1); i>0; i-- )
 {
@@ -386,10 +404,10 @@ n2 = derp->p_filter[4];   // Note this is always == 0
 
 sourcePTR = sourceStart;
 in1 = (float) *sourcePTR;
-in2 = (float) *sourcePTR;
+in2 = in1;
 
 out1 = (n2 + n1 + n0)*in1/(1.0e+00-d1-d2);
-out2 = (n2 + n1 + n0)*in1/(1.0e+00-d1-d2);
+out2 = out1;
 
 for ( i=0; i<bufferSize; i++ )
 {
@@ -421,10 +439,10 @@ n2 = derp->n_filter[4];
 
 sourcePTR = sourceLimit-offsetToNextPixel; //We want the last good item
 in1 = (float) *sourcePTR;
-in2 = (float) *sourcePTR;
+in2 = in1;
 
 out1 = (n2 + n1 + n0)*in1 / (1.0e+00 - d1 - d2);
-out2 = (n2 + n1 + n0)*in1 / (1.0e+00 - d1 - d2);
+out2 = out1;
 
 for ( i=(bufferSize-1); i>0; i-- )
 {
