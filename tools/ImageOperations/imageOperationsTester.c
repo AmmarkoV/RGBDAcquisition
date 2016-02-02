@@ -32,13 +32,13 @@ int runFilter(int argc, char *argv[])
         {
           monochrome(inputImage);
           outputImage = createSameDimensionsImage(inputImage);
-          //outputImage = copyImage(inputImage);
 
           constantTimeBilateralFilter(
                                        inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
                                        outputImage->pixels ,  outputImage->width , outputImage->height
-                                      ,atof(argv[i+1])  //sigma
+                                      ,atof(argv[i+1]) //sigma
                                       ,atoi(argv[i+2]) //bins
+                                      ,atoi(argv[i+3]) //useDeriche
                                      );
 
         } else
@@ -46,7 +46,6 @@ int runFilter(int argc, char *argv[])
         {
           monochrome(inputImage);
           outputImage = createSameDimensionsImage(inputImage);
-          //outputImage = copyImage(inputImage);
 
           dericheRecursiveGaussianGray( inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
                                         outputImage->pixels ,  outputImage->width , outputImage->height ,
@@ -110,14 +109,14 @@ int runFilter(int argc, char *argv[])
         } else
         if ( strcmp(argv[i],"--sattest")==0 )
         {
-            float * tmp = allocateGaussianKernel(3);
+            float * tmp = allocateGaussianKernel(3,5.0);
             if (tmp!=0) { free(tmp); }
 
-            tmp = allocateGaussianKernel(9);
+            tmp = allocateGaussianKernel(9,5.0);
             if (tmp!=0) { free(tmp); }
 
 
-            tmp = allocateGaussianKernel(15);
+            tmp = allocateGaussianKernel(15,5.0);
             if (tmp!=0) { free(tmp); }
 
 

@@ -4,15 +4,101 @@
 #include <math.h>
 #include "../tools/imageMatrix.h"
 
+ struct derichePrecalculations
+ {
+  float p_filter[5];
+  float n_filter[5];
+ };
 
 
+int dericheDoPrecalculations(  struct derichePrecalculations * derp , float sigma , unsigned int order )
+{
+//--- Now we prepare the constants which are applied in the equations
+float alpha = 0.0e+00;
+if ( sigma > 0.0e+00 )
+    {
+      alpha = 1.695e+00/sigma;
+    }
 
+/*  dividend / divisor = quotient */
+float dividend , divisor;
+float e =  exp(-alpha);
+float e2 = exp(-2 * alpha);
+
+float d2,d1,n0,n1,n2,in0,in1,in2,out0,out1,out2,norm;
+// Computing constants that will be applied depending on the order we want
+switch(order)
+ {
+		   case 0 :
+                  dividend=(1 - e) * (1 - e);
+                  divisor=(1 + 2 * alpha * e) - e2;
+			      norm =  (float) dividend/divisor;
+
+                  derp->p_filter[0] = -e2;
+			      derp->p_filter[1] = 2 * e;
+			      derp->p_filter[2] = norm;
+			      derp->p_filter[3] = norm * (alpha - 1) * e;
+			      derp->p_filter[4] = 0;
+
+			      derp->n_filter[0] = -e2;
+			      derp->n_filter[1] = 2 * e;
+			      derp->n_filter[2] = 0;
+			      derp->n_filter[3] = norm * (alpha + 1) * e;
+			      derp->n_filter[4] = -norm * e2;
+			      break;
+
+		   case 1 :
+		        //norm = (1 - e) * (1 - e) * (1 - e) / 2 / (1 + e);
+                  dividend=(1 - e) * (1 - e) * (1 - e);
+                  divisor= (float) 2 / (1 + e) ;
+			      norm =  (float) dividend/divisor;
+
+                  derp->p_filter[0] = -e2;
+			      derp->p_filter[1] = 2 * e;
+			      derp->p_filter[2] = 0;
+			      derp->p_filter[3] = -norm;
+			      derp->p_filter[4] = 0;
+
+                  derp->n_filter[0] = -e2;
+			      derp->n_filter[1] = 2 * e;
+			      derp->n_filter[2] = 0;
+			      derp->n_filter[3] = norm;
+			      derp->n_filter[4] = 0;
+			      break;
+
+		   case 2 :
+			    //norm = (1 - e)*(1 - e)*(1 - e)*(1 - e) / (1 + 2 * e - 2 * e * e2 - (e2)*(e2));
+                  dividend= (1 - e) * (1 - e) * (1 - e) * (1 - e);
+                  divisor=  (1 + 2 * e - 2 * e * e2 - (e2)*(e2));
+			      norm =  (float) dividend/divisor;
+
+                  derp->p_filter[0] = -e2;
+			      derp->p_filter[1] = 2 * e;
+			      derp->p_filter[2] = -norm;
+			      derp->p_filter[3] = (float) norm * (1 + alpha * (1 - e2) / (2 * alpha * e)) * e;
+			      derp->p_filter[4] = 0;
+
+                  derp->n_filter[0] = -e2;
+			      derp->n_filter[1] = 2 * e;
+			      derp->n_filter[2] = 0;
+			      derp->n_filter[3] = (float) -norm * (1 - alpha * (1 - e2) / (2 * alpha * e)) * e;
+			      derp->n_filter[4] = norm * e2;
+			      break;
+
+           default :
+            fprintf(stderr,"Unsupported order ( only signal (0) , first derivative [0] , second derivative [1] supported \n");
+            return 0;
+           break;
+ };
+return 1;
+}
 
 
 
 inline int deriche1DPassF(
                    float * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
                    float * target,  unsigned int targetWidth , unsigned int targetHeight ,
+                   struct derichePrecalculations * derp ,
                    unsigned int x, unsigned int y,
                    unsigned int direction,
                    float sigma ,
@@ -58,94 +144,26 @@ inline int deriche1DPassF(
  if (y2==0) { fprintf(stderr,"Could not allocate memory for y2 deriche\n");  free(y1); return 0; }
  for ( i=0; i<bufferSize; i++ ) { y2[i]=0.0; }
 
-//--- Now we prepare the constants which are applied in the equations
-float alpha = 0.0e+00;
-if ( sigma > 0.0e+00 )
-    {
-      alpha = 1.695e+00/sigma;
-    }
-
-float e =  exp(-alpha);
-float e2 = exp(-2 * alpha);
-
-float p_filter[5]={0};
-float n_filter[5]={0};
 
 float d2,d1,n0,n1,n2,in0,in1,in2,out0,out1,out2,norm;
 // Computing constants that will be applied depending on the order we want
-switch(order)
- {
-		   case 0 :
-			      norm = (1 - e) * (1 - e) / (1 + 2 * alpha * e - e2);
-
-                  p_filter[0] = -e2;
-			      p_filter[1] = 2 * e;
-			      p_filter[2] = norm;
-			      p_filter[3] = norm * (alpha - 1) * e;
-			      p_filter[4] = 0;
-
-			      n_filter[0] = -e2;
-			      n_filter[1] = 2 * e;
-			      n_filter[2] = 0;
-			      n_filter[3] = norm * (alpha + 1) * e;
-			      n_filter[4] = -norm * e2;
-			      break;
-
-		   case 1 :
-			      norm = (1 - e) * (1 - e) * (1 - e) / 2 / (1 + e);
-
-                  p_filter[0] = -e2;
-			      p_filter[1] = 2 * e;
-			      p_filter[2] = 0;
-			      p_filter[3] = -norm;
-			      p_filter[4] = 0;
-
-                  n_filter[0] = -e2;
-			      n_filter[1] = 2 * e;
-			      n_filter[2] = 0;
-			      n_filter[3] = norm;
-			      n_filter[4] = 0;
-			      break;
-
-		   case 2 :
-			      norm = (1 - e)*(1 - e)*(1 - e)*(1 - e) / (1 + 2 * e - 2 * e * e2 - (e2)*(e2));
-
-                  p_filter[0] = -e2;
-			      p_filter[1] = 2 * e;
-			      p_filter[2] = -norm;
-			      p_filter[3] = norm * (1 + alpha * (1 - e2) / (2 * alpha * e)) * e;
-			      p_filter[4] = 0;
-
-                  n_filter[0] = -e2;
-			      n_filter[1] = 2 * e;
-			      n_filter[2] = 0;
-			      n_filter[3] = -norm * (1 - alpha * (1 - e2) / (2 * alpha * e)) * e;
-			      n_filter[4] = norm * e2;
-			      break;
-
-           default :
-            fprintf(stderr,"Unsupported order ( only signal (0) , first derivative [0] , second derivative [1] supported \n");
-
-           break;
- };
-
 
 
 // We apply to the one dimensional direction of pixels
 
-d2 = p_filter[0];
-d1 = p_filter[1];
-n0 = p_filter[2];
-n1 = p_filter[3];
-n2 = p_filter[4];   // Note this is always == 0
+d2 = derp->p_filter[0];
+d1 = derp->p_filter[1];
+n0 = derp->p_filter[2];
+n1 = derp->p_filter[3];
+n2 = derp->p_filter[4];   // Note this is always == 0
 
 
 sourcePTR = sourceStart;
 in1 = (float) *sourcePTR;
 in2 = (float) *sourcePTR;
 
-out1 = (n2 + n1 + n0)*in1/(1.0e+00-d1-d2);
-out2 = (n2 + n1 + n0)*in1/(1.0e+00-d1-d2);
+out1 = (float) ((n2 + n1 + n0)*in1)/(1.0e+00-d1-d2);
+out2 = (float) ((n2 + n1 + n0)*in1)/(1.0e+00-d1-d2);
 
 for ( i=0; i<bufferSize; i++ )
 {
@@ -168,19 +186,19 @@ for ( i=0; i<bufferSize; i++ )
 //
 //    We run right to left accross the line of pixels
 //
-d2 = n_filter[0];
-d1 = n_filter[1];
-n0 = n_filter[2];   // Always == 0
-n1 = n_filter[3];
-n2 = n_filter[4];
+d2 = derp->n_filter[0];
+d1 = derp->n_filter[1];
+n0 = derp->n_filter[2];   // Always == 0
+n1 = derp->n_filter[3];
+n2 = derp->n_filter[4];
 
 
 sourcePTR = sourceLimit-offsetToNextPixel; //We want the last good item
 in1 = (float) *sourcePTR;
 in2 = (float) *sourcePTR;
 
-out1 = (n2 + n1 + n0)*in1 / (1.0e+00 - d1 - d2);
-out2 = (n2 + n1 + n0)*in1 / (1.0e+00 - d1 - d2);
+out1 = (float) ((n2 + n1 + n0)*in1) / (1.0e+00 - d1 - d2);
+out2 = (float) ((n2 + n1 + n0)*in1) / (1.0e+00 - d1 - d2);
 
 for ( i=(bufferSize-1); i>0; i-- )
 {
@@ -238,6 +256,10 @@ int dericheRecursiveGaussianGrayF(
      return 0;
   }
 
+  struct derichePrecalculations derp={0};
+  if (! dericheDoPrecalculations( &derp , sigma , order ) ) { return 0; }
+
+
   unsigned int x=0,y=0;
 
      y=0;
@@ -246,6 +268,7 @@ int dericheRecursiveGaussianGrayF(
            deriche1DPassF(
                           source,  sourceWidth , sourceHeight ,
                           target , targetWidth , targetHeight ,
+                          &derp ,
                           x,y,  1, // X direction
                           sigma , order
                          );
@@ -257,6 +280,7 @@ int dericheRecursiveGaussianGrayF(
            deriche1DPassF(
                           target , targetWidth , targetHeight  ,
                           target , targetWidth , targetHeight ,
+                          &derp ,
                           x,y, 0, // Y direction
                           sigma , order
                          );
@@ -277,8 +301,8 @@ int dericheRecursiveGaussianGrayF(
 
 
 
-        By the way this is the first thing I made that could be
-          also made using templates .. :P
+By the way this is the first thing I made that could be
+           also made using templates .. :P
 
 
 
@@ -298,15 +322,10 @@ int dericheRecursiveGaussianGrayF(
 
 
 
-
-
-
-
-
-
 inline int deriche1DPass(
                    unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
                    unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
+                   struct derichePrecalculations * derp ,
                    unsigned int x, unsigned int y,
                    unsigned int direction,
                    float sigma ,
@@ -352,86 +371,17 @@ inline int deriche1DPass(
  if (y2==0) { fprintf(stderr,"Could not allocate memory for y2 deriche\n");  free(y1); return 0; }
  for ( i=0; i<bufferSize; i++ ) { y2[i]=0.0; }
 
-//--- Now we prepare the constants which are applied in the equations
-float alpha = 0.0e+00;
-if ( sigma > 0.0e+00 )
-    {
-      alpha = 1.695e+00/sigma;
-    }
 
-float e =  exp(-alpha);
-float e2 = exp(-2 * alpha);
-
-float p_filter[5]={0};
-float n_filter[5]={0};
-
-float d2,d1,n0,n1,n2,in0,in1,in2,out0,out1,out2,norm;
-// Computing constants that will be applied depending on the order we want
-switch(order)
- {
-		   case 0 :
-			      norm = (1 - e) * (1 - e) / (1 + 2 * alpha * e - e2);
-
-                  p_filter[0] = -e2;
-			      p_filter[1] = 2 * e;
-			      p_filter[2] = norm;
-			      p_filter[3] = norm * (alpha - 1) * e;
-			      p_filter[4] = 0;
-
-			      n_filter[0] = -e2;
-			      n_filter[1] = 2 * e;
-			      n_filter[2] = 0;
-			      n_filter[3] = norm * (alpha + 1) * e;
-			      n_filter[4] = -norm * e2;
-			      break;
-
-		   case 1 :
-			      norm = (1 - e) * (1 - e) * (1 - e) / 2 / (1 + e);
-
-                  p_filter[0] = -e2;
-			      p_filter[1] = 2 * e;
-			      p_filter[2] = 0;
-			      p_filter[3] = -norm;
-			      p_filter[4] = 0;
-
-                  n_filter[0] = -e2;
-			      n_filter[1] = 2 * e;
-			      n_filter[2] = 0;
-			      n_filter[3] = norm;
-			      n_filter[4] = 0;
-			      break;
-
-		   case 2 :
-			      norm = (1 - e)*(1 - e)*(1 - e)*(1 - e) / (1 + 2 * e - 2 * e * e2 - (e2)*(e2));
-
-                  p_filter[0] = -e2;
-			      p_filter[1] = 2 * e;
-			      p_filter[2] = -norm;
-			      p_filter[3] = norm * (1 + alpha * (1 - e2) / (2 * alpha * e)) * e;
-			      p_filter[4] = 0;
-
-                  n_filter[0] = -e2;
-			      n_filter[1] = 2 * e;
-			      n_filter[2] = 0;
-			      n_filter[3] = -norm * (1 - alpha * (1 - e2) / (2 * alpha * e)) * e;
-			      n_filter[4] = norm * e2;
-			      break;
-
-           default :
-            fprintf(stderr,"Unsupported order ( only signal (0) , first derivative [0] , second derivative [1] supported \n");
-
-           break;
- };
-
+ float d2,d1,n0,n1,n2,in0,in1,in2,out0,out1,out2,norm;
 
 
 // We apply to the one dimensional direction of pixels
 
-d2 = p_filter[0];
-d1 = p_filter[1];
-n0 = p_filter[2];
-n1 = p_filter[3];
-n2 = p_filter[4];   // Note this is always == 0
+d2 = derp->p_filter[0];
+d1 = derp->p_filter[1];
+n0 = derp->p_filter[2];
+n1 = derp->p_filter[3];
+n2 = derp->p_filter[4];   // Note this is always == 0
 
 
 sourcePTR = sourceStart;
@@ -462,11 +412,11 @@ for ( i=0; i<bufferSize; i++ )
 //
 //    We run right to left accross the line of pixels
 //
-d2 = n_filter[0];
-d1 = n_filter[1];
-n0 = n_filter[2];   // Always == 0
-n1 = n_filter[3];
-n2 = n_filter[4];
+d2 = derp->n_filter[0];
+d1 = derp->n_filter[1];
+n0 = derp->n_filter[2];   // Always == 0
+n1 = derp->n_filter[3];
+n2 = derp->n_filter[4];
 
 
 sourcePTR = sourceLimit-offsetToNextPixel; //We want the last good item
@@ -527,6 +477,9 @@ int dericheRecursiveGaussianGray(
      return 0;
   }
 
+  struct derichePrecalculations derp={0};
+  if (! dericheDoPrecalculations( &derp , sigma , order ) ) {  return 0; }
+
   unsigned int x=0,y=0;
 
      y=0;
@@ -534,7 +487,8 @@ int dericheRecursiveGaussianGray(
        {
            deriche1DPass(
                           source,  sourceWidth , sourceHeight ,
-                          target , targetWidth , targetHeight ,
+                          target,  targetWidth , targetHeight ,
+                          &derp ,
                           x,y,  1, // X direction
                           sigma , order
                          );
@@ -544,8 +498,9 @@ int dericheRecursiveGaussianGray(
      for (y=0; y<sourceHeight; y++)
        {
            deriche1DPass(
-                          target , targetWidth , targetHeight  ,
-                          target , targetWidth , targetHeight ,
+                          target, targetWidth , targetHeight ,
+                          target, targetWidth , targetHeight ,
+                          &derp ,
                           x,y, 0, // Y direction
                           sigma , order
                          );
@@ -553,12 +508,4 @@ int dericheRecursiveGaussianGray(
 
   return 1;
 }
-
-
-
-
-
-
-
-
 

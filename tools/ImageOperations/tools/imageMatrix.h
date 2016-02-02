@@ -1,6 +1,7 @@
 #ifndef IMAGEMATRIX_H_INCLUDED
 #define IMAGEMATRIX_H_INCLUDED
 
+int castUCharImage2FloatAndNormalize(float * out , unsigned char * in, unsigned int width,unsigned int height , unsigned int channels);
 
 int castUCharImage2Float(float * out , unsigned char * in, unsigned int width,unsigned int height , unsigned int channels);
 int castFloatImage2UChar(unsigned char * out , float * in, unsigned int width,unsigned int height , unsigned int channels);

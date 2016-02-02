@@ -9,7 +9,7 @@ extern "C"
 
 #include "../ImagePrimitives/image.h"
 
-float * allocateGaussianKernel(unsigned int dimension);
+float * allocateGaussianKernel(unsigned int dimension,float sigma);
 int monochrome(struct Image * img);
 int contrast(struct Image * img,float scaleValue);
 

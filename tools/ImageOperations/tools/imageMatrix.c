@@ -4,6 +4,26 @@
 
 
 
+int castUCharImage2FloatAndNormalize(float * out , unsigned char * in, unsigned int width,unsigned int height , unsigned int channels)
+{
+  float *outPTR = out;
+  float *outLimit = out + ( width * height * channels);
+  unsigned char *inPTR = in;
+
+  if (out!=0)
+   {
+     while(outPTR<outLimit)
+     {
+       *outPTR = (float) *inPTR/255;
+       ++outPTR;
+       ++inPTR;
+     }
+    return 1;
+   }
+  return 0;
+}
+
+
 int castUCharImage2Float(float * out , unsigned char * in, unsigned int width,unsigned int height , unsigned int channels)
 {
   float *outPTR = out;

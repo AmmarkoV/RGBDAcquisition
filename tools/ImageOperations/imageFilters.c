@@ -2,11 +2,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 
 
 
-float * allocateGaussianKernel(unsigned int dimension)
+float * allocateGaussianKernel(unsigned int dimension,float sigma)
 {
  float * gK = (float * ) malloc(sizeof(float) * dimension * dimension );
  if (gK ==0 )  { return 0; }
@@ -16,6 +17,7 @@ float * allocateGaussianKernel(unsigned int dimension)
   float tmp , w = 0 ;
   unsigned int x0 = (unsigned int) dimension/2,y0 = (unsigned int) dimension/2;
   unsigned int x,y;
+  float sigmaSquared = sigma * sigma;
 
   for (y=0; y<dimension; y++)
   {
@@ -25,11 +27,12 @@ float * allocateGaussianKernel(unsigned int dimension)
 
      tmp =  (x-x0)*(x-x0);
      tmp += (y-y0)*(y-y0);
-
-     *gKPTR =  exp(-1 * tmp );
+     tmp = -1 * tmp / sigmaSquared;
+     *gKPTR =  exp( tmp ) / 2 * M_PI * sigmaSquared;
       sum += *gKPTR;
    }
   }
+
 
 
  //Normalize and print..
