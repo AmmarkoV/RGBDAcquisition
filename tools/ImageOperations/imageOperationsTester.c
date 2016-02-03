@@ -27,14 +27,39 @@ int runFilter(int argc, char *argv[])
       {
 
 
-
-        if ( strcmp(argv[i],"--ctbilateral")==0 )
+        if ( strcmp(argv[i],"--gaussian")==0 )
         {
           monochrome(inputImage);
           outputImage = createSameDimensionsImage(inputImage);
 
+
+         float * convolutionMatrix=allocateGaussianKernel(15,15);
+         unsigned int kernelWidth=15;
+         unsigned int kernelHeight=15;
+         float divisor=1.0;
+
+
+         float * inF = copyUCharImage2Float(inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels );
+         float * outF = (float*) malloc(sizeof(float) *  outputImage->width * outputImage->height *  outputImage->channels );
+
+         convolutionFilter1ChF(
+                                 outF ,  outputImage->width , outputImage->height ,
+                                 inF,  inputImage->width , inputImage->height ,
+                                 convolutionMatrix , kernelWidth , kernelHeight , divisor
+                              );
+
+
+         castFloatImage2UChar(outputImage->pixels, outF, outputImage->width , outputImage->height ,  outputImage->channels );
+         free(inF);
+         free(outF);
+
+        } else
+        if ( strcmp(argv[i],"--ctbilateral")==0 )
+        {
+          monochrome(inputImage);
+          outputImage = createSameDimensionsImage(inputImage);
           constantTimeBilateralFilter(
-                                       inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
+                                       inputImage->pixels  ,  inputImage->width , inputImage->height , inputImage->channels ,
                                        outputImage->pixels ,  outputImage->width , outputImage->height
                                       ,atof(argv[i+1]) //sigma
                                       ,atoi(argv[i+2]) //bins

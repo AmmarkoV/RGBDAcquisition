@@ -132,21 +132,6 @@ for (i=0; i<bins; i++)
 
  //fprintf(stderr,"2xder");
 
- if (useDeriche==2)
- {
- dericheRecursiveGaussianGrayF(
-                                ctfbp[i].Jk,  sourceWidth , sourceHeight , channels,
-                                tmp1,  targetWidth , targetHeight ,
-                                sigma , 0
-                              );
-
-
- dericheRecursiveGaussianGrayF(
-                                ctfbp[i].Wk,  sourceWidth , sourceHeight , channels,
-                                tmp2,  targetWidth , targetHeight ,
-                                sigma , 0
-                              );
- } else
  if (useDeriche==0)
  {
    convolutionFilter1ChF(
@@ -161,6 +146,21 @@ for (i=0; i<bins; i++)
                           ctfbp[i].Wk,  sourceWidth , sourceHeight  ,
                           convolutionMatrix , kernelWidth , kernelHeight , divisor
                          );
+ } else
+ if (useDeriche==1)
+ {
+ dericheRecursiveGaussianGrayF(
+                                tmp1,  targetWidth , targetHeight ,channels,
+                                ctfbp[i].Jk,  sourceWidth , sourceHeight ,
+                                sigma , 0
+                              );
+
+
+ dericheRecursiveGaussianGrayF(
+                                tmp2,  targetWidth , targetHeight , channels,
+                                ctfbp[i].Wk,  sourceWidth , sourceHeight ,
+                                sigma , 0
+                              );
  } else
  {
     memcpy(tmp1,ctfbp[i].Jk,sourceWidth*sourceHeight*channels*sizeof(float));

@@ -3,15 +3,15 @@
 
 
 int dericheRecursiveGaussianGrayF(
-                                     float * source,  unsigned int sourceWidth , unsigned int sourceHeight , unsigned int channels,
-                                     float * target,  unsigned int targetWidth , unsigned int targetHeight ,
+                                     float * target,  unsigned int targetWidth , unsigned int targetHeight , unsigned int channels,
+                                     float * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
                                      float sigma , unsigned int order
                                    );
 
 
 int dericheRecursiveGaussianGray(
-                                  unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight , unsigned int channels,
-                                  unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
+                                  unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight , unsigned int channels,
+                                  unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
                                   float sigma , unsigned int order
                                 );
 
