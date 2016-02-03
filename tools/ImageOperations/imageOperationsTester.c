@@ -76,8 +76,8 @@ int runFilter(int argc, char *argv[])
           monochrome(inputImage);
           outputImage = createSameDimensionsImage(inputImage);
           float sigma = atof(argv[i+1]);
-          dericheRecursiveGaussianGray( inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
-                                        outputImage->pixels ,  outputImage->width , outputImage->height ,
+          dericheRecursiveGaussianGray( outputImage->pixels ,  outputImage->width , outputImage->height , inputImage->channels ,
+                                        inputImage->pixels ,  inputImage->width , inputImage->height ,
                                         &sigma , atoi(argv[i+2])
                                        );
         } else
@@ -92,8 +92,8 @@ int runFilter(int argc, char *argv[])
          float * inF = copyUCharImage2Float(inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels );
          float * outF = (float*) malloc(sizeof(float) *  outputImage->width * outputImage->height *  outputImage->channels );
 
-         dericheRecursiveGaussianGrayF( inF ,  inputImage->width , inputImage->height , inputImage->channels ,
-                                         outF  ,  outputImage->width , outputImage->height ,
+         dericheRecursiveGaussianGrayF(  outF  ,  outputImage->width , outputImage->height ,  inputImage->channels ,
+                                         inF ,  inputImage->width , inputImage->height  ,
                                          &sigma , atoi(argv[i+2])
                                         );
 
