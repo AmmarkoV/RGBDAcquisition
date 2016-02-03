@@ -10,15 +10,15 @@ SRCIMG="../../media/samples/lenna.png"
 SRCIMG="../../media/samples/big.jpg"
 WINDOWSIZE="7"
 
+time ./imageopsutility $SRCIMG outputCTDerBilateral.jpg --ctbilateral 5.0 5 1
+exit 0
+time ./imageopsutility $SRCIMG outputCTNorBilateral.jpg --ctbilateral 5.0 5 0
+time ./imageopsutility $SRCIMG outputCTNulBilateral.jpg --ctbilateral 5.0 5 2
+exit 0
 time ./imageopsutility $SRCIMG outputDummy.jpg --sattest 
 time ./imageopsutility $SRCIMG outputGauss.jpg --gaussian
-exit 0 
-time ./imageopsutility $SRCIMG outputCTNorBilateral.jpg --ctbilateral 5.0 5 0
-time ./imageopsutility $SRCIMG outputCTDerBilateral.jpg --ctbilateral 5.0 5 1
-time ./imageopsutility $SRCIMG outputCTNulBilateral.jpg --ctbilateral 5.0 5 2
 time ./imageopsutility $SRCIMG outputDer_Fs15.png --dericheF 15.0 0
 
-exit 0
 
 time ./imageopsutility $SRCIMG outputDer_s5.png --deriche 5.0 0
 time ./imageopsutility $SRCIMG outputDer_s15.png --deriche 15.0 0

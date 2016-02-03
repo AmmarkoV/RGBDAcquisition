@@ -56,7 +56,7 @@ void populateJBkMatrix( float * JBk ,  float * der1 , float * der2  , unsigned i
 int constantTimeBilateralFilter(
                                 unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight , unsigned int channels ,
                                 unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
-                                float sigma ,
+                                float * sigma ,
                                 unsigned int bins ,
                                 int useDeriche
                                )
@@ -83,7 +83,7 @@ int constantTimeBilateralFilter(
 
  if (useDeriche==0)
  {
-    convolutionMatrix = allocateGaussianKernel(15,15);
+    convolutionMatrix = allocateGaussianKernel(15,15,1);
  }
 
 
@@ -152,14 +152,14 @@ for (i=0; i<bins; i++)
  dericheRecursiveGaussianGrayF(
                                 tmp1,  targetWidth , targetHeight ,channels,
                                 ctfbp[i].Jk,  sourceWidth , sourceHeight ,
-                                sigma , 0
+                                &sigma , 0
                               );
 
 
  dericheRecursiveGaussianGrayF(
                                 tmp2,  targetWidth , targetHeight , channels,
                                 ctfbp[i].Wk,  sourceWidth , sourceHeight ,
-                                sigma , 0
+                                &sigma , 0
                               );
  } else
  {

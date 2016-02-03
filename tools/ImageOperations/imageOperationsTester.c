@@ -32,22 +32,24 @@ int runFilter(int argc, char *argv[])
           monochrome(inputImage);
           outputImage = createSameDimensionsImage(inputImage);
 
-
-         float * convolutionMatrix=allocateGaussianKernel(15,15);
-         unsigned int kernelWidth=15;
-         unsigned int kernelHeight=15;
+         unsigned int normalizeGaussianKernel=1;
+         unsigned int kernelWidth=5;
+         unsigned int kernelHeight=5;
+         float * convolutionMatrix=allocateGaussianKernel(kernelWidth,kernelHeight,normalizeGaussianKernel);
          float divisor=1.0;
-
 
          float * inF = copyUCharImage2Float(inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels );
          float * outF = (float*) malloc(sizeof(float) *  outputImage->width * outputImage->height *  outputImage->channels );
 
+
          convolutionFilter1ChF(
                                  outF ,  outputImage->width , outputImage->height ,
                                  inF,  inputImage->width , inputImage->height ,
-                                 convolutionMatrix , kernelWidth , kernelHeight , divisor
+                                 convolutionMatrix , kernelWidth , kernelHeight , &divisor
                               );
 
+
+         free(convolutionMatrix);
 
          castFloatImage2UChar(outputImage->pixels, outF, outputImage->width , outputImage->height ,  outputImage->channels );
          free(inF);
@@ -58,10 +60,12 @@ int runFilter(int argc, char *argv[])
         {
           monochrome(inputImage);
           outputImage = createSameDimensionsImage(inputImage);
+
+          float sigma = atof(argv[i+1]);
           constantTimeBilateralFilter(
                                        inputImage->pixels  ,  inputImage->width , inputImage->height , inputImage->channels ,
                                        outputImage->pixels ,  outputImage->width , outputImage->height
-                                      ,atof(argv[i+1]) //sigma
+                                      ,&sigma //sigma
                                       ,atoi(argv[i+2]) //bins
                                       ,atoi(argv[i+3]) //useDeriche
                                      );
@@ -71,10 +75,10 @@ int runFilter(int argc, char *argv[])
         {
           monochrome(inputImage);
           outputImage = createSameDimensionsImage(inputImage);
-
+          float sigma = atof(argv[i+1]);
           dericheRecursiveGaussianGray( inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels ,
                                         outputImage->pixels ,  outputImage->width , outputImage->height ,
-                                        atof(argv[i+1]) , atoi(argv[i+2])
+                                        &sigma , atoi(argv[i+2])
                                        );
         } else
         if ( strcmp(argv[i],"--dericheF")==0 )
@@ -82,6 +86,7 @@ int runFilter(int argc, char *argv[])
           fprintf(stderr,"This is a test call for casting code , this shouldnt be normally used..\n");
           monochrome(inputImage);
           outputImage = createSameDimensionsImage(inputImage);
+          float sigma = atof(argv[i+1]);
 
           //outputImage = copyImage(inputImage);
          float * inF = copyUCharImage2Float(inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels );
@@ -89,7 +94,7 @@ int runFilter(int argc, char *argv[])
 
          dericheRecursiveGaussianGrayF( inF ,  inputImage->width , inputImage->height , inputImage->channels ,
                                          outF  ,  outputImage->width , outputImage->height ,
-                                         atof(argv[i+1]) , atoi(argv[i+2])
+                                         &sigma , atoi(argv[i+2])
                                         );
 
          castFloatImage2UChar(outputImage->pixels, outF, outputImage->width , outputImage->height ,  outputImage->channels );
@@ -134,14 +139,14 @@ int runFilter(int argc, char *argv[])
         } else
         if ( strcmp(argv[i],"--sattest")==0 )
         {
-            float * tmp = allocateGaussianKernel(3,5.0);
+            float * tmp = allocateGaussianKernel(3,5.0,1);
             if (tmp!=0) { free(tmp); }
 
-            tmp = allocateGaussianKernel(9,5.0);
+            tmp = allocateGaussianKernel(9,5.0,1);
             if (tmp!=0) { free(tmp); }
 
 
-            tmp = allocateGaussianKernel(15,5.0);
+            tmp = allocateGaussianKernel(15,5.0,1);
             if (tmp!=0) { free(tmp); }
 
 

@@ -265,7 +265,7 @@ for (i=0; i<bufferSize; i++)
 int dericheRecursiveGaussianGrayF(
                                      float * target,  unsigned int targetWidth , unsigned int targetHeight , unsigned int channels,
                                      float * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
-                                     float sigma , unsigned int order
+                                     float * sigma , unsigned int order
                                    )
 {
   if (channels!=1)
@@ -274,8 +274,15 @@ int dericheRecursiveGaussianGrayF(
      return 0;
   }
 
+  if (*sigma==0)
+  {
+    fprintf(stderr,"dericheRecursiveGaussianGrayF cannot work with zero sigma \n");
+    return 0;
+  }
+
+
   struct derichePrecalculations derp={0};
-  if (! dericheDoPrecalculations( &derp , sigma , order ) ) { return 0; }
+  if (! dericheDoPrecalculations( &derp , *sigma , order ) ) { return 0; }
 
 
   unsigned int x=0,y=0;
@@ -288,7 +295,7 @@ int dericheRecursiveGaussianGrayF(
                           target , targetWidth , targetHeight ,
                           &derp ,
                           x,y,  1, // X direction
-                          sigma , order
+                          *sigma , order
                          );
        }
 
@@ -300,7 +307,7 @@ int dericheRecursiveGaussianGrayF(
                           target , targetWidth , targetHeight ,
                           &derp ,
                           x,y, 0, // Y direction
-                          sigma , order
+                          *sigma , order
                          );
        }
 
@@ -486,7 +493,7 @@ for (i=0; i<bufferSize; i++)
 int dericheRecursiveGaussianGray(
                                   unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight , unsigned int channels,
                                   unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
-                                  float sigma , unsigned int order
+                                  float * sigma , unsigned int order
                                 )
 {
   if (channels!=1)
@@ -495,8 +502,14 @@ int dericheRecursiveGaussianGray(
      return 0;
   }
 
+  if (*sigma==0)
+  {
+    fprintf(stderr,"dericheRecursiveGaussianGray cannot work with zero sigma \n");
+    return 0;
+  }
+
   struct derichePrecalculations derp={0};
-  if (! dericheDoPrecalculations( &derp , sigma , order ) ) {  return 0; }
+  if (! dericheDoPrecalculations( &derp , *sigma , order ) ) {  return 0; }
 
   unsigned int x=0,y=0;
 
@@ -508,7 +521,7 @@ int dericheRecursiveGaussianGray(
                           target,  targetWidth , targetHeight ,
                           &derp ,
                           x,y,  1, // X direction
-                          sigma , order
+                          *sigma , order
                          );
        }
 
@@ -520,7 +533,7 @@ int dericheRecursiveGaussianGray(
                           target, targetWidth , targetHeight ,
                           &derp ,
                           x,y, 0, // Y direction
-                          sigma , order
+                          *sigma , order
                          );
        }
 

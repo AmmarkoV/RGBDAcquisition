@@ -7,7 +7,7 @@
 
 
 
-float * allocateGaussianKernel(unsigned int dimension,float sigma)
+float * allocateGaussianKernel(unsigned int dimension,float sigma , int normalize)
 {
  float * gK = (float * ) malloc(sizeof(float) * dimension * dimension );
  if (gK ==0 )  { return 0; }
@@ -44,7 +44,10 @@ float * allocateGaussianKernel(unsigned int dimension,float sigma)
     for (x=0; x<dimension; x++)
     {
      gKPTR = gK + ( dimension * y ) + x ;
-     *gKPTR =  *gKPTR  / sum ;
+     if (normalize)
+     {
+       *gKPTR =  *gKPTR  / sum ;
+     }
      fprintf(stderr,"%03f  ",*gKPTR);
     }
     fprintf(stderr,"\n");
