@@ -54,7 +54,7 @@ target_link_libraries(ImageOperations rt dl m  )
 set_target_properties(ImageOperations PROPERTIES DEBUG_POSTFIX "D")   
          
 add_executable(imageopsutility imageOperationsTester.c ) 
-target_link_libraries(imageopsutility rt dl m Codecs ImageOperations ${PNG_Libs} ${JPG_Libs} ) 
+target_link_libraries(imageopsutility rt dl m Codecs ImageOperations Timers ${PNG_Libs} ${JPG_Libs} ) 
 add_dependencies(imageopsutility Codecs ImageOperations)  
  
 

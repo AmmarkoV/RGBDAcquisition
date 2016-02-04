@@ -9,6 +9,14 @@
 #include "imageFilters.h"
 #include "special/dericheRecursiveGaussian.h"
 #include "tools/imageMatrix.h"
+#include "compareQuality.h"
+
+#define TIME_OPERATIONS 1
+
+
+#if TIME_OPERATIONS
+ #include "../Timers/timer.h"
+#endif // TIME_OPERATIONS
 
 
 int runFilter(int argc, char *argv[])
@@ -25,8 +33,17 @@ int runFilter(int argc, char *argv[])
     unsigned int i=0;
       for (i=0; i<argc; i++)
       {
+        if ( strcmp(argv[i],"--compare")==0 )
+        {
+          unsigned int outputType = guessFilenameTypeStupid(filenameOutput);
+          outputImage = readImage(filenameOutput,outputType ,0);
 
+          float noise = calculatePSNR( outputImage->pixels ,  outputImage->width , outputImage->height , inputImage->channels ,
+                                       inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels );
 
+           fprintf(stdout,"Detected Noise is %0.4f dB \n");
+           exit(0);
+        } else
         if ( strcmp(argv[i],"--gaussian")==0 )
         {
           monochrome(inputImage);
@@ -54,7 +71,6 @@ int runFilter(int argc, char *argv[])
          castFloatImage2UChar(outputImage->pixels, outF, outputImage->width , outputImage->height ,  outputImage->channels );
          free(inF);
          free(outF);
-
         } else
         if ( strcmp(argv[i],"--ctbilateral")==0 )
         {
@@ -179,7 +195,20 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    fprintf(stderr,"Image Processing %s to %s !\n",argv[1],argv[2]);
+
+#if TIME_OPERATIONS
+ StartTimer(0);
+#endif // TIME_OPERATIONS
+
+
+    fprintf(stdout,"Image Processing %s to %s !\n",argv[1],argv[2]);
       runFilter(argc,argv);
+
+
+#if TIME_OPERATIONS
+    EndTimer(0);
+    fprintf(stdout,"took %u microseconds !\n",GetLastTimer(0));
+#endif // TIME_OPERATIONS
+
     return 0;
 }

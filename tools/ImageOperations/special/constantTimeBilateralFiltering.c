@@ -77,13 +77,13 @@ int constantTimeBilateralFilter(
  }
 
  float * convolutionMatrix=0;
- unsigned int kernelWidth=15;
- unsigned int kernelHeight=15;
+ unsigned int kernelWidth=9;
+ unsigned int kernelHeight=kernelWidth;
  float divisor=1.0;
 
  if (useDeriche==0)
  {
-    convolutionMatrix = allocateGaussianKernel(15,15,1);
+    convolutionMatrix = allocateGaussianKernel(kernelWidth,*sigma,1);
  }
 
 

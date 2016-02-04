@@ -36,6 +36,7 @@
 			<Add library="jpeg" />
 			<Add library="../Codecs/libCodecs.a" />
 			<Add library="./libImageOperations.a" />
+			<Add library="../Timers/libTimers.a" />
 		</Linker>
 		<Unit filename="bilateralFilter.h" />
 		<Unit filename="imageFilters.h" />
