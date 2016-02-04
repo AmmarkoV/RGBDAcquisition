@@ -99,6 +99,12 @@ unsigned int GetLastTimer( unsigned int timer_num )
   return timers_array[timer_num].lastTimeMicroseconds;
 }
 
+
+unsigned int GetLastTimerMilliseconds( unsigned int timer_num )
+{
+  return (unsigned int) timers_array[timer_num].lastTimeMicroseconds / 1000;
+}
+
 unsigned int GetAverageTimer( unsigned int timer_num )
 {
   if (timers_array[timer_num].timesCounted == 0 ) { return 0; }

@@ -80,7 +80,7 @@ inline void doMedianFilterKernel (
 }
 
 
-int medianFilter(
+int medianFilter3ch(
                  unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
                  unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
                  unsigned int kernelWidth , unsigned int kernelHeight

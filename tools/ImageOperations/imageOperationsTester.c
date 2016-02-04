@@ -120,7 +120,7 @@ int runFilter(int argc, char *argv[])
         if ( strcmp(argv[i],"--median")==0 )
         {
            outputImage = copyImage(inputImage);
-           medianFilter(
+           medianFilter3ch(
                          outputImage->pixels ,  outputImage->width , outputImage->height ,
                          inputImage->pixels ,  inputImage->width , inputImage->height  ,
                          atoi(argv[i+1]) , atoi(argv[i+2])
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
 
 #if TIME_OPERATIONS
     EndTimer(0);
-    fprintf(stdout,"took %u microseconds !\n",GetLastTimer(0));
+    fprintf(stdout,"took %u milliseconds !\n",GetLastTimerMilliseconds(0));
 #endif // TIME_OPERATIONS
 
     return 0;

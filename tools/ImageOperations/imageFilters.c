@@ -27,12 +27,11 @@ float * allocateGaussianKernel(unsigned int dimension,float sigma , int normaliz
 
      tmp =  (x-x0)*(x-x0);
      tmp += (y-y0)*(y-y0);
-     tmp = -1 * tmp / sigmaSquared;
+     tmp = (float) -1 * tmp / sigmaSquared;
      *gKPTR =  exp( tmp ) / 2 * M_PI * sigmaSquared;
       sum += *gKPTR;
    }
   }
-
 
 
  //Normalize and print..

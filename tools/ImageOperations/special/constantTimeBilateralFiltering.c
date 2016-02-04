@@ -77,7 +77,7 @@ int constantTimeBilateralFilter(
  }
 
  float * convolutionMatrix=0;
- unsigned int kernelWidth=9;
+ unsigned int kernelWidth=21;
  unsigned int kernelHeight=kernelWidth;
  float divisor=1.0;
 
@@ -152,14 +152,14 @@ for (i=0; i<bins; i++)
  dericheRecursiveGaussianGrayF(
                                 tmp1,  targetWidth , targetHeight ,channels,
                                 ctfbp[i].Jk,  sourceWidth , sourceHeight ,
-                                &sigma , 0
+                                sigma , 0
                               );
 
 
  dericheRecursiveGaussianGrayF(
                                 tmp2,  targetWidth , targetHeight , channels,
                                 ctfbp[i].Wk,  sourceWidth , sourceHeight ,
-                                &sigma , 0
+                                sigma , 0
                               );
  } else
  {

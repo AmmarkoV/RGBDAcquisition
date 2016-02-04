@@ -45,7 +45,7 @@ void StartTimer( unsigned int timer_num );
 
 
 /**
- * @brief Stops a timer and returns the number of elapsed milliseconds
+ * @brief Stops a timer and returns the number of elapsed microseconds
  * @ingroup timers
  * @param timerNumber , the number that specifies what timer we want to start
  * @retval Number of Microseconds
@@ -54,13 +54,21 @@ unsigned int EndTimer( unsigned int timer_num );
 
 
 /**
- * @brief Get the number of elapsed milliseconds from last run of timer
+ * @brief Get the number of elapsed microseconds from last run of timer
  * @ingroup timers
  * @param timerNumber , the number that specifies what timer we want to start
  * @retval Number of Microseconds
  */
 unsigned int GetLastTimer( unsigned int timer_num );
 
+
+/**
+ * @brief Get the number of elapsed milliseconds from last run of timer
+ * @ingroup timers
+ * @param timerNumber , the number that specifies what timer we want to start
+ * @retval Number of Milliseconds
+ */
+unsigned int GetLastTimerMilliseconds( unsigned int timer_num );
 
 /**
  * @brief Get the average number of elapsed milliseconds from all of the runs of the specific timer
