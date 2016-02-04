@@ -16,6 +16,20 @@ SRCIMG="test.jpg"
 SRCIMG="lenna.png"
 
 SRCIMG="lenna.png"
+time ./imageopsutility $SRCPATH/$SRCIMG median3x3-$SRCIMG --median 3 3     >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG median8x8-$SRCIMG --median 8 8     >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG median16x16-$SRCIMG --median 16 16 >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG deriche_s5.png-$SRCIMG --deriche 5.0 0    >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG deriche_s15.png-$SRCIMG --deriche 15.0 0    >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG deriche_s25.png-$SRCIMG --deriche 25.0 0    >> results.txt
+
+
+SIGMA="5.0"
+time ./imageopsutility $SRCPATH/$SRCIMG fullBilateral-sigma=$SIGMA-$SRCIMG --bilateral $SIGMA $SIGMA $WINDOWSIZE    >> results.txt
+SIGMA="15.0"
+time ./imageopsutility $SRCPATH/$SRCIMG fullBilateral-sigma=$SIGMA-$SRCIMG --bilateral $SIGMA $SIGMA $WINDOWSIZE    >> results.txt
+
+
 SIGMA="5.0"
 BINS="5"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
@@ -38,12 +52,21 @@ time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SR
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
  ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
-
  
-
-
-
 SRCIMG="elina.jpg"
+time ./imageopsutility $SRCPATH/$SRCIMG median3x3-$SRCIMG --median 3 3     >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG median8x8-$SRCIMG --median 8 8     >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG median16x16-$SRCIMG --median 16 16 >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG deriche_s5.png-$SRCIMG --deriche 5.0 0    >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG deriche_s15.png-$SRCIMG --deriche 15.0 0    >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG deriche_s25.png-$SRCIMG --deriche 25.0 0    >> results.txt
+
+SIGMA="5.0"
+time ./imageopsutility $SRCPATH/$SRCIMG fullBilateral-sigma=$SIGMA-$SRCIMG --bilateral $SIGMA $SIGMA $WINDOWSIZE    >> results.txt
+SIGMA="15.0"
+time ./imageopsutility $SRCPATH/$SRCIMG fullBilateral-sigma=$SIGMA-$SRCIMG --bilateral $SIGMA $SIGMA $WINDOWSIZE    >> results.txt
+
+
 SIGMA="5.0"
 BINS="5"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
@@ -71,6 +94,19 @@ time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SR
 
 
 SRCIMG="big.jpg"
+time ./imageopsutility $SRCPATH/$SRCIMG median3x3-$SRCIMG --median 3 3     >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG median8x8-$SRCIMG --median 8 8     >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG median16x16-$SRCIMG --median 16 16 >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG deriche_s5.png-$SRCIMG --deriche 5.0 0    >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG deriche_s15.png-$SRCIMG --deriche 15.0 0    >> results.txt
+time ./imageopsutility $SRCPATH/$SRCIMG deriche_s25.png-$SRCIMG --deriche 25.0 0    >> results.txt
+
+SIGMA="5.0"
+time ./imageopsutility $SRCPATH/$SRCIMG fullBilateral-sigma=$SIGMA-$SRCIMG --bilateral $SIGMA $SIGMA $WINDOWSIZE    >> results.txt
+SIGMA="15.0"
+time ./imageopsutility $SRCPATH/$SRCIMG fullBilateral-sigma=$SIGMA-$SRCIMG --bilateral $SIGMA $SIGMA $WINDOWSIZE    >> results.txt
+
+
 SIGMA="5.0"
 BINS="5"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
@@ -112,10 +148,6 @@ timeout 5 gpicview outputDer_s5.png
 
 time ./imageopsutility $SRCPATH/$SRCIMG outputGray.jpg --monochrome      >> results.txt
 
-time ./imageopsutility $SRCPATH/$SRCIMG outputMedian3x3.jpg --median 3 3    >> results.txt
-time ./imageopsutility $SRCPATH/$SRCIMG outputMedian8x8.jpg --median 8 8    >> results.txt
-#7minutes
-time ./imageopsutility $SRCPATH/$SRCIMG outputMedian16x16.jpg --median 16 16    >> results.txt
 #This takes too long
 #time ./imageopsutility $SRCPATH/$SRCIMG outputMedian32x32.jpg --median 32 32  
 

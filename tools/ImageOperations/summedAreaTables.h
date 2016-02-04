@@ -7,6 +7,14 @@
 #define SUMMEDAREATABLES_H_INCLUDED
 
 
+/**@brief Allocate and output an integral image of a source rgb image
+ * @ingroup summedareatables
+
+ * @param Pointer to source image in floating point encoding
+ * @param width of source  image
+ * @param height of source image
+
+ * @retval Pointer to memory output,0=error */
 unsigned int * generateSummedAreaTableRGB(unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight );
 
 

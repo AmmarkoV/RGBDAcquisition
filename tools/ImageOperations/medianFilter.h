@@ -8,8 +8,8 @@
 
 
 /**
- * @brief Output the product of the multiplication of two floating point input images
- * @ingroup imageMatrix
+ * @brief Apply a median filter over an image
+ * @ingroup median
 
  * @param Pointer to target image in floating point encoding
  * @param width of target image
