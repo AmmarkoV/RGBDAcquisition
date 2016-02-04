@@ -21,8 +21,7 @@ BINS="5"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
+ ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
 
 
 SIGMA="15.0"
@@ -30,8 +29,7 @@ BINS="5"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
+ ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
 
 
 SIGMA="15.0"
@@ -39,11 +37,9 @@ BINS="15"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
+ ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
 
-
-exit 0
+ 
 
 
 
@@ -53,8 +49,7 @@ BINS="5"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
+ ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
 
 
 SIGMA="15.0"
@@ -62,8 +57,7 @@ BINS="5"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
+ ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
 
 
 SIGMA="15.0"
@@ -71,11 +65,9 @@ BINS="15"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
+ ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
 
-
-exit 0
+ 
 
 
 SRCIMG="big.jpg"
@@ -84,8 +76,7 @@ BINS="5"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
+ ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
 
 
 SIGMA="15.0"
@@ -93,8 +84,7 @@ BINS="5"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
+ ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
 
 
 SIGMA="15.0"
@@ -102,8 +92,7 @@ BINS="15"
 time ./imageopsutility $SRCPATH/$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 0    >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 1  >> results.txt
 time ./imageopsutility $SRCPATH/$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --ctbilateral $SIGMA $BINS 2    >> results.txt 
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
- ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG nulBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt
+ ./imageopsutility derBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG norBilateral-sigma=$SIGMA-bins=$BINS-$SRCIMG --compare >> results.txt 
 
 
 exit 0
