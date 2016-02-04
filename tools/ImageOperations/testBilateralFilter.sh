@@ -13,13 +13,17 @@ WINDOWSIZE="7"
 echo "New Running Batch" > results.txt
 
 
- ./imageopsutility outputCTDerBilateral.jpg outputCTNorBilateral.jpg --compare >> results.txt
-exit 0
-
-
 time ./imageopsutility $SRCIMG outputCTDerBilateral.jpg --ctbilateral 5.0 5 1  >> results.txt
 time ./imageopsutility $SRCIMG outputCTNorBilateral.jpg --ctbilateral 5.0 5 0    >> results.txt
 time ./imageopsutility $SRCIMG outputCTNulBilateral.jpg --ctbilateral 5.0 5 2    >> results.txt
+
+ ./imageopsutility outputCTDerBilateral.jpg outputCTNorBilateral.jpg --compare >> results.txt
+ ./imageopsutility outputCTDerBilateral.jpg outputCTNulBilateral.jpg --compare >> results.txt
+
+exit 0
+
+echo "Now Running Intermediate Filters" > results.txt
+
 
 time ./imageopsutility $SRCIMG outputDummy.jpg --sattest     >> results.txt
 time ./imageopsutility $SRCIMG outputGauss.jpg --gaussian    >> results.txt

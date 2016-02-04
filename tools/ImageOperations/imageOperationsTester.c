@@ -38,10 +38,10 @@ int runFilter(int argc, char *argv[])
           unsigned int outputType = guessFilenameTypeStupid(filenameOutput);
           outputImage = readImage(filenameOutput,outputType ,0);
 
-          float noise = calculatePSNR( outputImage->pixels ,  outputImage->width , outputImage->height , inputImage->channels ,
+          float noise = calculatePSNR( outputImage->pixels ,  outputImage->width , outputImage->height , outputImage->channels ,
                                        inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels );
 
-           fprintf(stdout,"Detected Noise is %0.4f dB \n");
+           fprintf(stdout,"Compared Detected Noise is %0.4f dB \n",noise);
            exit(0);
         } else
         if ( strcmp(argv[i],"--gaussian")==0 )
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 #endif // TIME_OPERATIONS
 
 
-    fprintf(stdout,"Image Processing %s to %s !\n",argv[1],argv[2]);
+    fprintf(stdout,"Image Processing %s -> %s !\n",argv[1],argv[2]);
       runFilter(argc,argv);
 
 
