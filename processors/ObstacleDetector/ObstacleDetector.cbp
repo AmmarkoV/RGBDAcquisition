@@ -34,6 +34,13 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Linker>
+			<Add library="../../tools/Codecs/libCodecs.a" />
+		</Linker>
+		<Unit filename="../ViewpointChange/viewpoint_change.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ViewpointChange/viewpoint_change.h" />
 		<Unit filename="ObstacleDetector.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
