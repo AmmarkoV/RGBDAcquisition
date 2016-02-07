@@ -832,10 +832,10 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
             fprintf(stderr,"colorFrame=%p , depthFrame=%p \n",colorFrame,depthFrame);
 
             if (colorFrame!=0)
-                 { acquisitionOverrideColorFrame(moduleID , devID , colorFrame , colorWidth*colorHeight*colorChannels ,colorWidth,colorHeight,colorChannels,colorBitsperpixel); }
+                 { acquisitionOverrideColorFrame(moduleID , devID , colorFrame , colorWidth*colorHeight*colorChannels*(colorBitsperpixel/8) ,colorWidth,colorHeight,colorChannels,colorBitsperpixel); }
 
             if (depthFrame!=0)
-                 { acquisitionOverrideDepthFrame(moduleID , devID , depthFrame , depthWidth*depthHeight*depthChannels ,depthWidth,depthHeight,depthChannels,depthBitsperpixel); }
+                 { acquisitionOverrideDepthFrame(moduleID , devID , depthFrame , depthWidth*depthHeight*depthChannels*(depthBitsperpixel/8) ,depthWidth,depthHeight,depthChannels,depthBitsperpixel); }
 
             (*processors[processorID].cleanup) ();
           } else

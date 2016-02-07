@@ -148,7 +148,7 @@ int addDataInput_DisparityMapping(unsigned int stream , void * data, unsigned in
   {
     unsigned int depthFrameSize = width*height*channels*(bitsperpixel/8);
     depthFrame = (unsigned short* ) malloc(depthFrameSize);
-    if (colorFrame!=0)
+    if (depthFrame!=0)
     {
       memcpy(depthFrame,data,depthFrameSize);
       depthWidth=width; depthHeight=height;  depthChannels=channels; depthBitsperpixel=bitsperpixel;

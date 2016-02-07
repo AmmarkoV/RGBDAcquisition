@@ -52,7 +52,7 @@ unsigned char * birdsEyeView(unsigned char * rgb,unsigned short * depth,unsigned
 {
   if (rgb==0)  { fprintf(stderr,"RGB is not allocated , cannot perform birdsEyeView transformation \n"); return 0; }
   if (depth==0)  { fprintf(stderr,"Depth is not allocated , cannot perform birdsEyeView transformation \n"); return 0; }
-  unsigned char * rgbPTR= rgb; unsigned char * rgbLimit = rgb + width*height*3;
+  unsigned char * rgbPTR= rgb , * rgbLimit = rgb + width*height*3;
   unsigned short * depthPTR= depth; //unsigned short * depthLimit = depth + width*height;
 
 
@@ -123,7 +123,7 @@ unsigned char * birdsEyeView(unsigned char * rgb,unsigned short * depth,unsigned
 
 
 
-
+/*
 unsigned char * birdsEyeViewBack(unsigned char * rgb,unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
 {
   if (rgb==0)  { fprintf(stderr,"RGB is not allocated , cannot perform birdsEyeView transformation \n"); return 0; }
@@ -148,9 +148,9 @@ unsigned char * birdsEyeViewBack(unsigned char * rgb,unsigned short * depth,unsi
   rgbPTR = rgbLimit - 3;
   depthPTR = depthLimit - 1;
 
-  unsigned char * rgbStart = rgb;
+  unsigned char * rgbStart = rgb; //+3
   //Only do half of the screen (height / 2)
-  rgbLimit = rgb + (width*(height/2)*3);
+  //rgbLimit = rgb + (width*(height/2)*3);
 
   //We go backways
   while ( rgbPTR>rgbStart )
@@ -190,7 +190,7 @@ unsigned char * birdsEyeViewBack(unsigned char * rgb,unsigned short * depth,unsi
 
   return birdEyeFrame;
 }
-
+*/
 
 
 unsigned short * getVolumesBirdsEyeView(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
