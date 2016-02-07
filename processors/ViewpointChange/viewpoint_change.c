@@ -14,14 +14,13 @@
 
 
 
-unsigned int FitImageInMask(struct Image * img, struct Image * mask)
+unsigned int FitImageInMask(unsigned char * imagePixels,unsigned char * maskPixels,unsigned int width , unsigned int height)
 {
-  if ( (img==0)||(mask==0) ) { fprintf(stderr,"Cannot FitImageInMask with empty Images\n"); return 0; }
-  if ( (img->pixels==0)||(mask->pixels==0) ) { fprintf(stderr,"Cannot FitImageInMask with empty frames\n"); return 0; }
+  if ( (imagePixels==0)||(maskPixels==0) ) { fprintf(stderr,"Cannot FitImageInMask with empty frames\n"); return 0; }
 
-  char * imgPtr = img->pixels;
-  char * imgLimit = imgPtr + (img->width * img->height * 3);
-  char * maskPtr = mask->pixels;
+  char * imgPtr = imagePixels;
+  char * imgLimit = imgPtr + ( width * height * 3);
+  char * maskPtr = maskPixels;
 
   unsigned int thisPixelCounts = 0;
   unsigned int count = 0;

@@ -1,4 +1,7 @@
-/***************************************************************************
+/**
+   @file codecs.h
+*  @brief The main Acquisition library that handles plugins and provides .
+**************************************************************************
 * Copyright (C) 2010 by Ammar Qammaz *
 * ammarkov@gmail.com *
 * *
@@ -61,6 +64,7 @@ struct Image
 };
 */
 
+
 unsigned int simplePow(unsigned int base,unsigned int exp);
 
 int refreshImage(struct Image * img);
@@ -74,9 +78,31 @@ int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned lon
 
 struct Image * createImageUsingExistingBuffer( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel , unsigned char * pixels);
 struct Image * createImage( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel);
+
+
+
+
+/**
+ * @brief Destroy loaded image
+ * @ingroup codecs
+ * @param Image structure pointer to be destroyed
+ * @retval 1=Success,0=Failure
+ */
 int destroyImage(struct Image * img);
+
+
 struct Image * createSameDimensionsImage( struct Image * inputImage);
+
+
+
+/**
+ * @brief Copy Image and return a newly allocated Image Structure
+ * @ingroup codecs
+ * @param Image structure pointer to be copied
+ * @retval Pointer to Image Structure ,0=Failure
+ */
 struct Image * copyImage( struct Image * inputImage);
+
 
 int swapImageEndianness(struct Image * img);
 int swapImageEndiannessRaw(unsigned char * pixels, unsigned int width,unsigned int height,unsigned int bitsperpixel , unsigned int channels);

@@ -2,11 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ObstacleDetector.h"
+#include "../../tools/ImagePrimitives/image.h"
+#include "../../tools/Codecs/codecs.h"
+
+
+
+struct Image * mask={0};
 
 
 int initArgs_ObstacleDetector(int argc, char *argv[])
 {
-
+  mask=readImage("processors/ObstacleDetector/corridorMask.png",PNG_CODEC,0);
 }
 
 int setConfigStr_ObstacleDetector(char * label,char * value)
@@ -57,5 +63,5 @@ int cleanup_ObstacleDetector()
 
 int stop_ObstacleDetector()
 {
-
+ destroyImage(mask);
 }
