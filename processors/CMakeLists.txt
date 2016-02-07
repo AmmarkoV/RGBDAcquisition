@@ -2,6 +2,7 @@ project( Processors )
 cmake_minimum_required( VERSION 2.8.7 ) 
 
 add_subdirectory (ViewpointChange/)
+add_subdirectory (ObstacleDetector/)
 
  
 IF( ENABLE_OPENCV ) 
