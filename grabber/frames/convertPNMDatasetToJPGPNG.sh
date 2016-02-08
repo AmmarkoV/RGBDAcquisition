@@ -4,8 +4,8 @@ cd $1
 
 mkdir ../$2
 
-cp color.calib ../$2/color.calib
-cp depth.calib ../$2/depth.calib
+cp *.calib ../$2/
+cp *.sh ../$2/
 
 echo "Converting Color Files"
 

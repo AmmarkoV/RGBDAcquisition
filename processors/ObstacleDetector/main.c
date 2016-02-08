@@ -96,7 +96,7 @@ unsigned char * getColor_ObstacleDetector(unsigned int * width, unsigned int * h
  return colorFrame;
 }
 
-
+q
 int processData_ObstacleDetector()
 {
   unsigned int DEPTH_RANGE = 10000;
