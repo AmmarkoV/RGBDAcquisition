@@ -13,7 +13,7 @@ extern "C"
 {
 #endif
 
-#include "../ImagePrimitives/image.h"
+#include "../Primitives/image.h"
 
 
 /**

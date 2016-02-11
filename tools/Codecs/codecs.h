@@ -30,7 +30,7 @@ extern "C"
 #endif
 
 
-#include "../ImagePrimitives/image.h"
+#include "../Primitives/image.h"
 
 //FORCE SOME LIBRARIES HERE MAYBE ( this breaks the CMake Way of enabling / disabling libs )
 //#define USE_JPG_FILES 1

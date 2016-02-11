@@ -4,7 +4,7 @@
 #include "ObstacleDetector.h"
 #include "../ViewpointChange/viewpoint_change.h"
 
-#include "../../tools/ImagePrimitives/image.h"
+#include "../../tools/Primitives/image.h"
 #include "../../tools/Codecs/codecs.h"
 
 unsigned int bleeps=0;
