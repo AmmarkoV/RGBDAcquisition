@@ -1,3 +1,7 @@
+#ifndef SKELETON_H_INCLUDED
+#define SKELETON_H_INCLUDED
+
+
 
 static const char * jointNames[] =
 {"head",
@@ -136,4 +140,7 @@ struct skeletonPointing
   unsigned char isLeftHand;
   unsigned char isRightHand;
 };
+
+
+#endif // SKELETON_H_INCLUDED
 
