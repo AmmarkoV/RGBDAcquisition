@@ -15,7 +15,7 @@ sudo ./bypassBTBS.sh /dev/rfcomm0&
 
 
 #sudo service gpsd start
-sudo gpsd -b -N -D 5 /dev/myGPS
+sudo gpsd -b -N -D 5 /dev/myGPSA&
 
 
 delay 2

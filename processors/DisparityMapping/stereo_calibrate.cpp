@@ -115,9 +115,16 @@ int finalizeCalibration(char * outputFolder,int nx, int ny, float _squareSize)
   snprintf(filenameFinal,1024,"%s/stereo_calib.xml",outputFolder);
   stopAppending(filenameFinal);
 
+  char outputIntrinsics[1024]={0};
+  char outputExtrinsics[1024]={0};
+  snprintf(outputIntrinsics,1024,"%s/intrinsics.yml",outputFolder);
+  snprintf(outputExtrinsics,1024,"%s/extrinsics.yml",outputFolder);
+
+
+
   fprintf(stderr,"Now running part 2 of calibration code..!\n");
   fprintf(stderr,"This might take a while( hang on.. ) \n");
-   stereoCalibMain(filenameFinal ,nx, ny,_squareSize);
+   stereoCalibMain(outputIntrinsics,outputExtrinsics,filenameFinal ,nx, ny,_squareSize);
   fprintf(stderr,"done..\n");
   haveInitialization=0;
  return 1;

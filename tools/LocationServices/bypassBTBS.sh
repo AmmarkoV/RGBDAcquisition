@@ -1,10 +1,10 @@
 #!/bin/bash
 
-sudo mkfifo /dev/myGPS
+sudo mkfifo /dev/myGPSA
 
 while [ -e $1 ]
 do
- cat $1 > /dev/myGPS
+ cat $1 > /dev/myGPSA
  sleep 1
 done 
 

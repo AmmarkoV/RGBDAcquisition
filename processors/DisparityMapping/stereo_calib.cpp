@@ -40,7 +40,7 @@ using namespace std;
 
 
 static void
-StereoCalibNew(const vector<string>& imagelist, Size boardSize, float usedSquareSize , bool useCalibrated=true, bool showRectified=true)
+StereoCalibNew(string extOutFile ,string intOutFile , const vector<string>& imagelist, Size boardSize, float usedSquareSize , bool useCalibrated=true, bool showRectified=true)
 {
     if( imagelist.size() % 2 != 0 )
     {
@@ -108,17 +108,16 @@ StereoCalibNew(const vector<string>& imagelist, Size boardSize, float usedSquare
                 double sf = 640./MAX(img.rows, img.cols);
                 resize(cimg, cimg1, Size(), sf, sf);
                 imshow("corners", cimg1);
-                char c = (char)waitKey(500);
-                if( c == 27 || c == 'q' || c == 'Q' ) //Allow ESC to quit
-                    exit(-1);
+                //char c = (char)waitKey(500);
+                //if( c == 27 || c == 'q' || c == 'Q' ) exit(-1); //Allow ESC to quit
+
             }
             else
                 putchar('.');
             if( !found )
                 break;
             cornerSubPix(img, corners, Size(11,11), Size(-1,-1),
-                         TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS,
-                                      30, 0.01));
+                         TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 0.01));
         }
         if( k == 2 )
         {
@@ -196,7 +195,7 @@ StereoCalibNew(const vector<string>& imagelist, Size boardSize, float usedSquare
     cout << "average reprojection err = " <<  err/npoints << endl;
 
     // save intrinsic parameters
-    FileStorage fs("intrinsics.yml", CV_STORAGE_WRITE);
+    FileStorage fs(intOutFile, CV_STORAGE_WRITE);
     if( fs.isOpened() )
     {
         fs << "M1" << cameraMatrix[0] << "D1" << distCoeffs[0] <<
@@ -214,7 +213,7 @@ StereoCalibNew(const vector<string>& imagelist, Size boardSize, float usedSquare
                   imageSize, R, T, R1, R2, P1, P2, Q,
                   CALIB_ZERO_DISPARITY, 1, imageSize, &validRoi[0], &validRoi[1]);
 
-    fs.open("extrinsics.yml", CV_STORAGE_WRITE);
+    fs.open(extOutFile, CV_STORAGE_WRITE);
     if( fs.isOpened() )
     {
         fs << "R" << R << "T" << T << "R1" << R1 << "R2" << R2 << "P1" << P1 << "P2" << P2 << "Q" << Q;
@@ -305,9 +304,10 @@ StereoCalibNew(const vector<string>& imagelist, Size boardSize, float usedSquare
             for( j = 0; j < canvas.cols; j += 16 )
                 line(canvas, Point(j, 0), Point(j, canvas.rows), Scalar(0, 255, 0), 1, 8);
         imshow("rectified", canvas);
-        char c = (char)waitKey();
-        if( c == 27 || c == 'q' || c == 'Q' )
-            break;
+
+
+        //char c = (char)waitKey();
+        //if( c == 27 || c == 'q' || c == 'Q' ) break;
     }
 }
 
@@ -327,7 +327,7 @@ static bool readStringList( const string& filename, vector<string>& l )
     return true;
 }
 
-int stereoCalibMain(char * imageListFile , unsigned int boardWidth , unsigned int boardHeight,float boardRectangleSize)
+int stereoCalibMain(char * outputIntrinsics,char * outputExtrinsics,char * imageListFile , unsigned int boardWidth , unsigned int boardHeight,float boardRectangleSize)
 {
     Size boardSize;
     string imagelistfn;
@@ -337,6 +337,8 @@ int stereoCalibMain(char * imageListFile , unsigned int boardWidth , unsigned in
     boardSize.height=boardHeight;
     imagelistfn = imageListFile;
 
+    string extOutFile=outputExtrinsics;
+    string intOutFile=outputIntrinsics;
 
     if( imagelistfn == "" )
     {
@@ -356,6 +358,6 @@ int stereoCalibMain(char * imageListFile , unsigned int boardWidth , unsigned in
         cout << "can not open " << imagelistfn << " or the string list is empty" << endl;
     }
 
-    StereoCalibNew(imagelist, boardSize, boardRectangleSize , true, showRectified);
+    StereoCalibNew( extOutFile , intOutFile , imagelist, boardSize, boardRectangleSize , true, showRectified);
     return 0;
 }
