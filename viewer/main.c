@@ -78,6 +78,8 @@ char executeEveryLoop[1024]={0};
 unsigned int executeEveryLoopPayload=0;
 
 char inputname[512]={0};
+int saveAsOriginalFrameNumber=0;
+unsigned int savedFrameNum=0;
 unsigned int frameNum=0;
 unsigned int seekFrame=0;
 unsigned int loopFrame=0;
@@ -168,12 +170,26 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
                   case 'S' :
 				  case 's' :
 				      fprintf(stderr,"S Key pressed , Saving Color/Depth frames\n");
-                      sprintf(outfilename,"colorFrame_%u_%05u",devID,frameNum);
-                      acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
-                      sprintf(outfilename,"depthFrame_%u_%05u",devID,frameNum);
-                      acquisitionSaveDepthFrame(moduleID,devID,outfilename);
-                      ++frameNum;
+                      if (saveAsOriginalFrameNumber)
+                      {
+                        savedFrameNum=frameNum;
+                        fprintf(stderr,"Saving %u using original Frame Numbers ( change by ommiting -saveAsOriginalFrameNumber ) \n",savedFrameNum);
+                      } else
+                      { fprintf(stderr,"Saving %u using seperate enumeration for saved images( change by using -saveAsOriginalFrameNumber ) \n",savedFrameNum); }
+
+                      if (drawColor)
+                      {
+                       sprintf(outfilename,"frames/colorFrame_%u_%05u",devID,savedFrameNum);
+                       acquisitionSaveColorFrame(moduleID,devID,outfilename);
+                      }
+
+                      if (drawDepth)
+                      {
+                       sprintf(outfilename,"frames/depthFrame_%u_%05u",devID,savedFrameNum);
+                       acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+                      }
+                      ++savedFrameNum;
                   break;
 
                   case 'Q' :
@@ -318,6 +334,9 @@ int main(int argc, char *argv[])
   for (i=0; i<argc; i++)
   {
 
+    if (strcmp(argv[i],"-saveAsOriginalFrameNumber")==0) {
+                                                           saveAsOriginalFrameNumber=1;
+                                                         } else
     if (strcmp(argv[i],"-nolocation")==0) {
                                             acquisitionSetLocation(moduleID,0);
                                           } else

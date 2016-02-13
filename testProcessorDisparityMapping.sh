@@ -26,7 +26,8 @@ FPS="30"
 
 ./run_viewer.sh -module TEMPLATE -from voltaAmmoudara/calibAmmoudaraA -seek 10 -nolocation -maxFrames 250 -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500 -disparityCalibrate  9 13 0.7 /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/voltaAmmoudara/calibration $@
 
-./run_viewer.sh -module TEMPLATE -from voltaAmmoudara/calibAmmoudaraA -seek 10  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparityUseCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/voltaAmmoudara/calibration/ $@
+#calibAmmoudaraA
+./run_viewer.sh -module TEMPLATE -from voltaAmmoudara/pameVoltelikocalib -seek 10  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparityUseCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/voltaAmmoudara/calibration/ $@
 
 #-disparityshiftYLeft 22 -maxFrames 500
 #-disparityCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/allimiagpscalibra/DisparityMappingCalibration 
