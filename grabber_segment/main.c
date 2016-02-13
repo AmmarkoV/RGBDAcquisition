@@ -187,6 +187,9 @@ int main(int argc, char *argv[])
   for (i=0; i<argc; i++)
   {
 
+      if (strcmp(argv[i],"-nolocation")==0) {
+                                            acquisitionSetLocation(0);
+                                          } else
      if ( (strcmp(argv[i],"-onlyDepth")==0)||
           (strcmp(argv[i],"-noColor")==0)) {
                                                segConfRGB.saveRGB = 0;

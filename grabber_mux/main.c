@@ -98,6 +98,9 @@ int main(int argc, char *argv[])
   unsigned int i=0;
   for (i=0; i<argc; i++)
   {
+     if (strcmp(argv[i],"-nolocation")==0) {
+                                            acquisitionSetLocation(0);
+                                          } else
      if (strcmp(argv[i],"-longExposure")==0)
      {
          longExposure=1;

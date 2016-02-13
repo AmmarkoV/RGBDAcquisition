@@ -61,6 +61,9 @@ int main(int argc, char *argv[])
   unsigned int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcmp(argv[i],"-nolocation")==0) {
+                                            acquisitionSetLocation(0);
+                                          } else
     if (strcmp(argv[i],"-processor")==0) {
                                           fprintf(stderr,"Adding Processor to Pipeline %s , postfix %s\n",argv[i+1],argv[i+2]);
                                           acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2],argc,argv);
