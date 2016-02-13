@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
   {
 
     if (strcmp(argv[i],"-nolocation")==0) {
-                                            acquisitionSetLocation(0);
+                                            acquisitionSetLocation(moduleID,0);
                                           } else
     if (strcmp(argv[i],"-executeEveryLoop")==0) {
                                                    fprintf(stderr,"Will Execute %s after each frame\n",argv[i+1]);

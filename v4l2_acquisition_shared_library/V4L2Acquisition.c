@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "V4L2Acquisition.h"
+#include "../tools/Primitives/modules.h"
 
 #define BUILD_V4L2 1
 
@@ -12,6 +13,18 @@
 #include "V4L2IntrinsicCalibration.h"
 #include <linux/videodev2.h>
 
+
+
+int getV4L2Capabilities(int devID,int capToAskFor)
+{
+  switch (capToAskFor)
+  {
+    case CAP_VERSION :            return CAP_ENUM_LIST_VERSION;  break;
+    case CAP_LIVESTREAM :         return 1;                      break;
+    case CAP_PROVIDES_LOCATIONS : return 0;                      break;
+  };
+ return 0;
+}
 
 int listV4L2Devices(int devID,char * output, unsigned int maxOutput)
 {

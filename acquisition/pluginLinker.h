@@ -40,6 +40,8 @@ struct acquisitionPluginInterface
 {
    void *handle;
 
+   int (*getModuleCapabilities) (int ,int);
+
    int (*startModule) (unsigned int,char *);
    int (*stopModule) ();
 
@@ -102,6 +104,8 @@ struct acquisitionPluginInterface
    unsigned int forcedWidth;
    unsigned int forcedHeight;
    unsigned int forceResolution;
+
+   unsigned int useLocationServicesForThisModule;
 };
 
 /**

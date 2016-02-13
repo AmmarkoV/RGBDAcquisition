@@ -5,6 +5,7 @@
 
 #include "../tools/Timers/timer.h"
 #include "../tools/OperatingSystem/OperatingSystem.h"
+#include "../tools/Primitives/modules.h"
 
 
    #if ENABLE_LOCATION_SERVICE
@@ -27,7 +28,7 @@ char warnDryRun=0;
 float minDistance = -10;
 float scaleFactor = 0.0021;
 
-int useLocationServices=1;
+int useLocationServices=1; //By Default don't veto location services
 
 unsigned int simulateTick=0;
 unsigned long simulatedTickValue=0;
@@ -616,6 +617,15 @@ int acquisitionUnloadPlugin(ModuleIdentifier moduleID)
   return  unlinkPlugin(moduleID);
 }
 
+int acquisitionGetModuleCapabilities(ModuleIdentifier moduleID , DeviceIdentifier devID,int capToAskFor)
+{
+  if (*plugins[moduleID].getModuleCapabilities!=0) { return (*plugins[moduleID].getModuleCapabilities) (devID,capToAskFor); }
+
+ MeaningfullWarningMessage(moduleID,0,"acquisitionGetModuleCapabilities");
+ return 0;
+}
+
+
 int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings)
 {
    #if ENABLE_LOCATION_SERVICE
@@ -877,6 +887,8 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
 
     StartTimer(FRAME_SNAP_DELAY);
 
+
+   //TODO : only poll location services if we have a live stream
    #if ENABLE_LOCATION_SERVICE
     if (useLocationServices)
       { pollLocationServices(); }
@@ -1653,8 +1665,9 @@ int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,cha
 
 
 
-int acquisitionSetLocation(int newState)
+int acquisitionSetLocation(ModuleIdentifier moduleID,int newState)
 {
  fprintf(stderr,"acquisitionSetLocation(%u)\n",newState);
  useLocationServices=newState;
+ plugins[moduleID].useLocationServicesForThisModule=newState;
 }

@@ -19,6 +19,7 @@ extern "C"
    int startV4L2Module(unsigned int max_devs,char * settings);
 
    #if BUILD_V4L2
+   int getV4L2Capabilities(int devID,int capToAskFor);
 
    int listV4L2Devices(int devID,char * output, unsigned int maxOutput);
    int getCurrentV4L2FrameNumber(int devID);

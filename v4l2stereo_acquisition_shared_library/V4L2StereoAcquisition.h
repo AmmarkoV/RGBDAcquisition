@@ -14,6 +14,9 @@ extern "C"
    int startV4L2StereoModule(unsigned int max_devs,char * settings);
 
    #if BUILD_V4L2
+
+   int getV4L2StereoCapabilities(int devID,int capToAskFor);
+
    int getV4L2Stereo(); // This has to be called AFTER startV4L2Stereo
    int stopV4L2StereoModule();
 

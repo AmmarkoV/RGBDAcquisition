@@ -199,6 +199,9 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
 
   //Start Stop ================================================================================================================
 
+
+  plugins[moduleID].getModuleCapabilities = linkFunction(moduleID,"get%sCapabilities",moduleName);
+
   plugins[moduleID].startModule = linkFunction(moduleID,"start%sModule",moduleName);
   plugins[moduleID].stopModule = linkFunction(moduleID,"stop%sModule",moduleName);
   plugins[moduleID].mapDepthToRGB = linkFunction(moduleID,"map%sDepthToRGB",moduleName);

@@ -369,6 +369,7 @@ void EditorFrame::OpenOverlayEditor(wxCommandEvent& event)
 
 int EditorFrame::initializeOverlay(char * pathForSceneFile)
 {
+   acquisitionSetLocation(overlayModule,0);
    if ( acquisitionStartModule(overlayModule,16 /*maxDevices*/ , 0 ) )
    {
 
@@ -440,6 +441,8 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
         //return 1;
     }
 
+
+   acquisitionSetLocation(moduleID,0);
 
    //We need to initialize our module before calling any related calls to the specific module..
    if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))

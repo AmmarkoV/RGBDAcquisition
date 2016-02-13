@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "V4L2StereoAcquisition.h"
 
+#include "../tools/Primitives/modules.h"
 
 #if BUILD_V4L2
 
@@ -27,6 +28,21 @@ struct v4l2StereoDevices
 };
 
 struct v4l2StereoDevices devices[MAX_DEVICES]={0};
+
+
+
+
+int getV4L2StereoCapabilities(int devID,int capToAskFor)
+{
+  switch (capToAskFor)
+  {
+    case CAP_VERSION :            return CAP_ENUM_LIST_VERSION;  break;
+    case CAP_LIVESTREAM :         return 1;                      break;
+    case CAP_PROVIDES_LOCATIONS : return 0;                      break;
+  };
+ return 0;
+}
+
 
 
 int startV4L2StereoModule(unsigned int max_devs,char * settings)

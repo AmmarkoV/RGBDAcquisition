@@ -99,7 +99,8 @@ int main(int argc, char *argv[])
   for (i=0; i<argc; i++)
   {
      if (strcmp(argv[i],"-nolocation")==0) {
-                                            acquisitionSetLocation(0);
+                                            acquisitionSetLocation(moduleID_1,0);
+                                            acquisitionSetLocation(moduleID_2,0);
                                           } else
      if (strcmp(argv[i],"-longExposure")==0)
      {

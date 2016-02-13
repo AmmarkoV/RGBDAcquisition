@@ -9,6 +9,7 @@
 #if BUILD_TEMPLATE
 #include "../acquisition/Acquisition.h"
 
+#include "../tools/Primitives/modules.h"
 
     #if USE_DIRECTORY_LISTING
      #include "../tools/OperatingSystem/OperatingSystem.h"
@@ -68,6 +69,21 @@ struct TemplateVirtualDevice
 };
 
 struct TemplateVirtualDevice device[MAX_TEMPLATE_DEVICES]={0};
+
+
+
+
+int getTemplateCapabilities(int devID,int capToAskFor)
+{
+  switch (capToAskFor)
+  {
+    case CAP_VERSION :            return CAP_ENUM_LIST_VERSION;  break;
+    case CAP_LIVESTREAM :         return 0;                      break;
+    case CAP_PROVIDES_LOCATIONS : return 1; fprintf(stderr,"TODO : Provide locations from Templates"); break;
+  };
+ return 0;
+}
+
 
 
 

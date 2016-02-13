@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
   {
 
       if (strcmp(argv[i],"-nolocation")==0) {
-                                            acquisitionSetLocation(0);
+                                            acquisitionSetLocation(moduleID_1,0);
                                           } else
      if ( (strcmp(argv[i],"-onlyDepth")==0)||
           (strcmp(argv[i],"-noColor")==0)) {

@@ -25,6 +25,7 @@ extern "C"
    #define BUILD_TEMPLATE 1
 
    #if BUILD_TEMPLATE
+   int getTemplateCapabilities(int devID,int capToAskFor);
 
    int enableTemplateStream(int devID,unsigned int streamID);
    int disableTemplateStream(int devID,unsigned int streamID);

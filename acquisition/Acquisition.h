@@ -869,10 +869,11 @@ int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,cha
 /**
  * @brief Set Location Services On or Off
  * @ingroup locationService
+ * @param moduleID ( see enum Acquisition_Possible_Modules )
  * @param Switch Location Services On or Off
  * @retval 1=Success , 0=Failure
  */
-int acquisitionSetLocation(int newState);
+int acquisitionSetLocation(ModuleIdentifier moduleID,int newState);
 
 
 #ifdef __cplusplus
