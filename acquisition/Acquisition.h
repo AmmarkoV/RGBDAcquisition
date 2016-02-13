@@ -864,6 +864,17 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
 int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName,char * processorLibPath,int argc, char *argv[]);
 
 
+
+
+/**
+ * @brief Set Location Services On or Off
+ * @ingroup locationService
+ * @param Switch Location Services On or Off
+ * @retval 1=Success , 0=Failure
+ */
+int acquisitionSetLocation(int newState);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -27,6 +27,8 @@ char warnDryRun=0;
 float minDistance = -10;
 float scaleFactor = 0.0021;
 
+int useLocationServices=1;
+
 unsigned int simulateTick=0;
 unsigned long simulatedTickValue=0;
 
@@ -380,6 +382,8 @@ int acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels , unsig
 int acquisitionSaveLocationStamp(char * filename)
 {
    #if ENABLE_LOCATION_SERVICE
+   if (useLocationServices)
+   {
    if (locationServicesOK())
    {
     FILE *fd=0;
@@ -403,9 +407,13 @@ int acquisitionSaveLocationStamp(char * filename)
    {
     return 0;
    }
+
+   }
    #else
     return 0;
    #endif
+
+return 0;
 }
 
 //Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
@@ -611,7 +619,8 @@ int acquisitionUnloadPlugin(ModuleIdentifier moduleID)
 int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings)
 {
    #if ENABLE_LOCATION_SERVICE
-    startLocationServices();
+   if (useLocationServices)
+     { startLocationServices(); }
    #endif // ENABLE_LOCATION_SERVICE
 
 
@@ -631,7 +640,8 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
 int acquisitionStopModule(ModuleIdentifier moduleID)
 {
    #if ENABLE_LOCATION_SERVICE
-    stopLocationServices();
+    if (useLocationServices)
+     { stopLocationServices(); }
    #endif // ENABLE_LOCATION_SERVICE
 
    //Close all processors ..!
@@ -868,7 +878,8 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
     StartTimer(FRAME_SNAP_DELAY);
 
    #if ENABLE_LOCATION_SERVICE
-    pollLocationServices();
+    if (useLocationServices)
+      { pollLocationServices(); }
    #endif // ENABLE_LOCATION_SERVICE
 
    EndTimer(FRAME_SNAP_DELAY);
@@ -922,11 +933,14 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
 
 
               #if ENABLE_LOCATION_SERVICE
-              char timestampFilename[4096]={0};
-              snprintf(timestampFilename, 4096, "%s_loc.txt",filename);
-              if (!acquisitionSaveLocationStamp(timestampFilename))
+              if (useLocationServices)
               {
-                fprintf(stderr,"Could not save location stamp [ %s ] \n",filename);
+               char timestampFilename[4096]={0};
+               snprintf(timestampFilename, 4096, "%s_loc.txt",filename);
+               if (!acquisitionSaveLocationStamp(timestampFilename))
+               {
+                 fprintf(stderr,"Could not save location stamp [ %s ] \n",filename);
+               }
               }
               #endif // ENABLE_LOCATION_SERVICE
 
@@ -1634,4 +1648,13 @@ int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,cha
   }
 
  return weSucceeded;
+}
+
+
+
+
+int acquisitionSetLocation(int newState)
+{
+ fprintf(stderr,"acquisitionSetLocation(%u)\n",newState);
+ useLocationServices=newState;
 }
