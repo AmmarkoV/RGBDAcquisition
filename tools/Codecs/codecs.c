@@ -415,7 +415,7 @@ unsigned int guessFilenameTypeStupid(char * filename)
   if (strcasestr(filename,".JPG")!=0)   { return JPG_CODEC; } else
   if (strcasestr(filename,".JPEG")!=0)  { return JPG_CODEC; } else
   if (strcasestr(filename,".PNG")!=0)   { return PNG_CODEC; } else
-  if (strcasestr(filename,".CPNM")!=0)  { return COMPATIBLE_PNM_CODEC ; } else
+  if (strcasestr(filename,".CPNM")!=0)  { return COMPATIBLE_PNM_CODEC; } else
   if (strcasestr(filename,".PNM")!=0)   { return PNM_CODEC; } else
   if (strcasestr(filename,".PPM")!=0)   { return PPM_CODEC; } else
   if (strcasestr(filename,".ASCII")!=0) { return ASCII_CODEC; } else

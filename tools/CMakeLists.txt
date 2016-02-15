@@ -9,6 +9,7 @@ add_subdirectory (Codecs/)
 add_subdirectory (AmMatrix/) 
 add_subdirectory (Quaternions/)
 add_subdirectory (ImageOperations/)
+add_subdirectory (DepthImagesConverter/)
 
 
 

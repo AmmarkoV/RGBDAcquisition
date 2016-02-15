@@ -161,6 +161,8 @@ int main( int argc, char** argv )
 
     if( argc == 3)
     {
+     fprintf(stderr,"3 args\n");
+
      if ( (strstr(argv[1],".png")!=0) && (strstr(argv[2],".pnm")!=0) )
      {
          fprintf(stderr,"Using my custom loader / writer \n");
