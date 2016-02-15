@@ -138,8 +138,20 @@ int readFromPNMDepthAndWriteToCPNMDepth(char * inputFilename,char *outputFilenam
     if (newImg==0) { fprintf(stderr,"Could not open %s\n",inputFilename); return 0; }
 
     fprintf(stderr,"Swapping Loaded Image with width : %u , height %u , channels %u , bitsperpixel %u\n",newImg->width,newImg->height,newImg->channels,newImg->bitsperpixel);
-
     writeImageFile(newImg,COMPATIBLE_PNM_CODEC,outputFilename);
+
+   return 0;
+}
+
+
+
+int readFromCPNMDepthAndWriteToPNMDepth(char * inputFilename,char *outputFilename)
+{
+    struct Image * newImg  = readImage(inputFilename,COMPATIBLE_PNM_CODEC,0);
+    if (newImg==0) { fprintf(stderr,"Could not open %s\n",inputFilename); return 0; }
+
+    fprintf(stderr,"Swapping Loaded Image with width : %u , height %u , channels %u , bitsperpixel %u\n",newImg->width,newImg->height,newImg->channels,newImg->bitsperpixel);
+    writeImageFile(newImg,PNM_CODEC,outputFilename);
 
    return 0;
 }
@@ -176,6 +188,11 @@ int main( int argc, char** argv )
      {
        fprintf(stderr,"Using my custom loader / writer \n");
        return readFromPNMDepthAndWriteToCPNMDepth(argv[1],argv[2]);
+     } else
+     if ( (strstr(argv[1],".cpnm")!=0) && (strstr(argv[2],".pnm")!=0) )
+     {
+       fprintf(stderr,"Using my custom loader / writer \n");
+       return readFromCPNMDepthAndWriteToPNMDepth(argv[1],argv[2]);
      } else
      {
        fprintf(stderr,"Could not find an extension combination that can be done with a trick %s -> %s \n",argv[1],argv[2]);
