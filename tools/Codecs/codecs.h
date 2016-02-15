@@ -46,6 +46,7 @@ enum codecTypeList
    NO_CODEC = 0,
    JPG_CODEC ,
    PPM_CODEC ,
+   COMPATIBLE_PNM_CODEC ,
    PNM_CODEC ,
    PNG_CODEC ,
    ASCII_CODEC

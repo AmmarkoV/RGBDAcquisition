@@ -150,6 +150,16 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
      break;
 
 
+
+      case COMPATIBLE_PNM_CODEC :
+       #if USE_PPM_FILES
+         ReadSwappedPPM(filename,img,read_only_header);
+       #else
+         fprintf(stderr,RED "Swapped PNM/PPM File requested (%s) , but this build of Codec Library does not have PNM/PPM Support :(" NORMAL , filename);
+       #endif
+      break;
+
+
      case PPM_CODEC :
      case PNM_CODEC :
      #if USE_PPM_FILES
@@ -213,6 +223,8 @@ unsigned char * readImageRaw( char *filename,unsigned int type,unsigned int *wid
 
 int swapImageEndianness(struct Image * img)
 {
+  if (img==0) { return 0; }
+  if (img->pixels==0) { return 0; }
   unsigned char * traverser=(unsigned char * ) img->pixels;
   unsigned char * traverserSwap1=(unsigned char * ) img->pixels;
   unsigned char * traverserSwap2=(unsigned char * ) img->pixels;
@@ -267,6 +279,10 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
 
 
      #if USE_PPM_FILES
+      case COMPATIBLE_PNM_CODEC :
+       WriteSwappedPPM(filename,pic);
+      break;
+
       case PPM_CODEC :
       case PNM_CODEC :
        WritePPM(filename,pic);
@@ -399,6 +415,7 @@ unsigned int guessFilenameTypeStupid(char * filename)
   if (strcasestr(filename,".JPG")!=0)   { return JPG_CODEC; } else
   if (strcasestr(filename,".JPEG")!=0)  { return JPG_CODEC; } else
   if (strcasestr(filename,".PNG")!=0)   { return PNG_CODEC; } else
+  if (strcasestr(filename,".CPNM")!=0)  { return COMPATIBLE_PNM_CODEC ; } else
   if (strcasestr(filename,".PNM")!=0)   { return PNM_CODEC; } else
   if (strcasestr(filename,".PPM")!=0)   { return PPM_CODEC; } else
   if (strcasestr(filename,".ASCII")!=0) { return ASCII_CODEC; } else

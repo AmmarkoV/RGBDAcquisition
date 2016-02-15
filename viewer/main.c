@@ -78,6 +78,7 @@ char executeEveryLoop[1024]={0};
 unsigned int executeEveryLoopPayload=0;
 
 char inputname[512]={0};
+int saveEveryFrame=0;
 int saveAsOriginalFrameNumber=0;
 unsigned int savedFrameNum=0;
 unsigned int frameNum=0;
@@ -152,10 +153,40 @@ void closeEverything()
 }
 
 
+int acquisitionSaveFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int framerate)
+{
+ char outfilename[1024]={0};
+    if (saveAsOriginalFrameNumber)
+                      {
+                        savedFrameNum=frameNum;
+                        fprintf(stderr,"Saving %u using original Frame Numbers ( change by ommiting -saveAsOriginalFrameNumber ) \n",savedFrameNum);
+                      } else
+                      { fprintf(stderr,"Saving %u using seperate enumeration for saved images( change by using -saveAsOriginalFrameNumber ) \n",savedFrameNum); }
+
+   if (drawColor)
+                      {
+                       sprintf(outfilename,"frames/colorFrame_%u_%05u",devID,savedFrameNum);
+                       acquisitionSaveColorFrame(moduleID,devID,outfilename);
+                      }
+
+   if (drawDepth)
+                      {
+                       sprintf(outfilename,"frames/depthFrame_%u_%05u",devID,savedFrameNum);
+                       acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+                      }
+   ++savedFrameNum;
+  return 1;
+}
+
+
 
 int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int framerate)
 {
     //GIVE TIME FOR REDRAW EVENTS ETC -------------------------------------------------------------------------
+    if (saveEveryFrame)
+     {
+       acquisitionSaveFrames(moduleID,devID,framerate);
+     }
 
     if (!noinput)
     {
@@ -163,33 +194,13 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
     int key = cvWaitKey(msWaitTime/3);
     if (key != -1)
 			{
-                char outfilename[1024]={0};
 				key = 0x000000FF & key;
 				switch (key)
 				{
                   case 'S' :
 				  case 's' :
 				      fprintf(stderr,"S Key pressed , Saving Color/Depth frames\n");
-
-                      if (saveAsOriginalFrameNumber)
-                      {
-                        savedFrameNum=frameNum;
-                        fprintf(stderr,"Saving %u using original Frame Numbers ( change by ommiting -saveAsOriginalFrameNumber ) \n",savedFrameNum);
-                      } else
-                      { fprintf(stderr,"Saving %u using seperate enumeration for saved images( change by using -saveAsOriginalFrameNumber ) \n",savedFrameNum); }
-
-                      if (drawColor)
-                      {
-                       sprintf(outfilename,"frames/colorFrame_%u_%05u",devID,savedFrameNum);
-                       acquisitionSaveColorFrame(moduleID,devID,outfilename);
-                      }
-
-                      if (drawDepth)
-                      {
-                       sprintf(outfilename,"frames/depthFrame_%u_%05u",devID,savedFrameNum);
-                       acquisitionSaveDepthFrame(moduleID,devID,outfilename);
-                      }
-                      ++savedFrameNum;
+                      acquisitionSaveFrames(moduleID,devID,framerate);
                   break;
 
                   case 'Q' :
@@ -333,7 +344,7 @@ int main(int argc, char *argv[])
   unsigned int i=0;
   for (i=0; i<argc; i++)
   {
-
+    if (strcmp(argv[i],"-saveEveryFrame")==0) {  saveEveryFrame=1; } else
     if (strcmp(argv[i],"-saveAsOriginalFrameNumber")==0) {
                                                            saveAsOriginalFrameNumber=1;
                                                          } else

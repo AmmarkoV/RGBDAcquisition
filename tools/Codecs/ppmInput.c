@@ -9,6 +9,38 @@
 #define PPMREADBUFLEN 256
 
 
+
+
+int swapDepthEndianness(struct Image * img)
+{
+  if (img==0) { return 0; }
+  if (img->pixels==0) { return 0; }
+  if (img->bitsperpixel!=16) { fprintf(stderr,"Only 16bit PNM files need swapping ( we have a %u bit x %u channels file )..\n",img->bitsperpixel , img->channels); return 0; }
+
+  unsigned char * traverser=(unsigned char * ) img->pixels;
+  unsigned char * traverserSwap1=(unsigned char * ) img->pixels;
+  unsigned char * traverserSwap2=(unsigned char * ) img->pixels;
+
+  unsigned int bytesperpixel = (img->bitsperpixel/8);
+  unsigned char * endOfMem = traverser + img->width * img->height * img->channels * bytesperpixel;
+
+  unsigned char tmp ;
+  while ( ( traverser < endOfMem)  )
+  {
+    traverserSwap1 = traverser;
+    traverserSwap2 = traverser+1;
+
+    tmp = *traverserSwap1;
+    *traverserSwap1 = *traverserSwap2;
+    *traverserSwap2 = tmp;
+
+    traverser += bytesperpixel;
+  }
+
+ return 1;
+}
+
+
 unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp)
 {
     //See http://en.wikipedia.org/wiki/Portable_anymap#File_format_description for this simple and useful format
@@ -116,6 +148,14 @@ int ReadPPM(char * filename,struct Image * pic,char read_only_header)
 
 
 
+int ReadSwappedPPM(char * filename,struct Image * pic,char read_only_header)
+{
+  ReadPPM(filename,pic,read_only_header);
+  swapDepthEndianness(pic);
+  return (pic->pixels!=0);
+}
+
+
 int WritePPM(char * filename,struct Image * pic)
 {
     //fprintf(stderr,"saveRawImageToFile(%s) called\n",filename);
@@ -165,6 +205,11 @@ int WritePPM(char * filename,struct Image * pic)
 
 
 
+int WriteSwappedPPM(char * filename,struct Image * pic)
+{
+   swapDepthEndianness(pic);
+   return WritePPM(filename,pic);
+}
 
 
 
