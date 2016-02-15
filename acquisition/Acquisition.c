@@ -911,8 +911,13 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
 {
     printCall(moduleID,devID,"acquisitionSaveColorFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
-    snprintf(filenameFull,2048,"%s.pnm",filename);
 
+
+    #if USE_REGULAR_BYTEORDER_FOR_PNM
+     sprintf(filenameFull,"%s.cpnm",filename);
+    #else
+     sprintf(filenameFull,"%s.pnm",filename);
+    #endif
 
 
          if (
@@ -984,8 +989,12 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
 {
     printCall(moduleID,devID,"acquisitionSaveDepthFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
-    sprintf(filenameFull,"%s.pnm",filename);
 
+    #if USE_REGULAR_BYTEORDER_FOR_PNM
+     sprintf(filenameFull,"%s.cpnm",filename);
+    #else
+     sprintf(filenameFull,"%s.pnm",filename);
+    #endif
 
           if (
               (*plugins[moduleID].getDepthPixels!=0) && (*plugins[moduleID].getDepthWidth!=0) && (*plugins[moduleID].getDepthHeight!=0) &&
@@ -1012,7 +1021,13 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
     printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame", __FILE__, __LINE__);
 
     char filenameFull[1024]={0};
-    sprintf(filenameFull,"%s.pnm",filename);
+
+
+    #if USE_REGULAR_BYTEORDER_FOR_PNM
+     sprintf(filenameFull,"%s.cpnm",filename);
+    #else
+     sprintf(filenameFull,"%s.pnm",filename);
+    #endif
 
     unsigned int width = 0 ;
     unsigned int height = 0 ;
@@ -1044,7 +1059,12 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
     printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame", __FILE__, __LINE__);
 
     char filenameFull[1024]={0};
-    sprintf(filenameFull,"%s.pnm",filename);
+
+    #if USE_REGULAR_BYTEORDER_FOR_PNM
+     sprintf(filenameFull,"%s.cpnm",filename);
+    #else
+     sprintf(filenameFull,"%s.pnm",filename);
+    #endif
 
     unsigned int width = 0 ;
     unsigned int height = 0 ;
