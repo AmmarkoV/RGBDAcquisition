@@ -161,7 +161,6 @@ int main( int argc, char** argv )
 
     if( argc == 3)
     {
-     fprintf(stderr,"3 args\n");
 
      if ( (strstr(argv[1],".png")!=0) && (strstr(argv[2],".pnm")!=0) )
      {
@@ -177,6 +176,9 @@ int main( int argc, char** argv )
      {
        fprintf(stderr,"Using my custom loader / writer \n");
        return readFromPNMDepthAndWriteToCPNMDepth(argv[1],argv[2]);
+     } else
+     {
+       fprintf(stderr,"Could not find an extension combination that can be done with a trick %s -> %s \n",argv[1],argv[2]);
      }
 
     }

@@ -17,7 +17,7 @@ FILES_TO_CONVERT=`ls | grep color`
 for f in $FILES_TO_CONVERT
 do 
  TARGETNAME=`basename $f .pnm`
- mv  $f ../$2/$TARGETNAME.cpnm
+ cp  $f ../$2/$TARGETNAME.cpnm
 done
 
 

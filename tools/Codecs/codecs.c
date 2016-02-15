@@ -153,7 +153,12 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 
       case COMPATIBLE_PNM_CODEC :
        #if USE_PPM_FILES
-         ReadSwappedPPM(filename,img,read_only_header);
+        if (!ReadSwappedPPM(filename,img,read_only_header))
+         {
+           fprintf(stderr,RED "Error reading file %s using swapped pnm reader" NORMAL , filename);
+           free(img);
+           img=0;
+         }
        #else
          fprintf(stderr,RED "Swapped PNM/PPM File requested (%s) , but this build of Codec Library does not have PNM/PPM Support :(" NORMAL , filename);
        #endif
