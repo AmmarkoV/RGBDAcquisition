@@ -127,7 +127,7 @@ int readFromPNGDepthAndWriteToCPNMDepth(char * inputFilename,char *outputFilenam
     writeImageFile(newImg,COMPATIBLE_PNM_CODEC,outputFilename);
 
    return 1;
-}
+
 }
 
 
