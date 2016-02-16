@@ -16,6 +16,6 @@ link_directories(${Boost_LIBRARY_DIRS})
 add_subdirectory(${CMAKE_SOURCE_DIR}/DepthSenseGrabberCore/)
 add_subdirectory(${CMAKE_SOURCE_DIR}/DepthSenseGrabberPNM/)
 
-find_package(OpenCV 2.4.10 REQUIRED)
+find_package(OpenCV 2.4.9 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 add_subdirectory(${CMAKE_SOURCE_DIR}/DepthSenseGrabberOpenCV/)

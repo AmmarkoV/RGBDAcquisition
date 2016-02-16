@@ -102,6 +102,36 @@ void saveColorFramePNM(char* fileName, uint8_t* pixels, int width, int height, i
 
 
 
+
+
+int swapDepthEndianness( uint16_t* pixels, int width, int height)
+{
+  if (pixels==0) { return 0; }
+
+  unsigned char * traverser=(unsigned char * ) pixels;
+  unsigned char * traverserSwap1=(unsigned char * ) pixels;
+  unsigned char * traverserSwap2=(unsigned char * ) pixels;
+
+  unsigned int bytesperpixel = 2;
+  unsigned char * endOfMem = traverser + width * height * 1 * bytesperpixel;
+
+  unsigned char tmp ;
+  while ( ( traverser < endOfMem)  )
+  {
+    traverserSwap1 = traverser;
+    traverserSwap2 = traverser+1;
+
+    tmp = *traverserSwap1;
+    *traverserSwap1 = *traverserSwap2;
+    *traverserSwap2 = tmp;
+
+    traverser += bytesperpixel;
+  }
+
+ return 1;
+}
+
+
 void saveDepthFramePNM(char* fileName, uint16_t* pixels, int width, int height, int timeStamp)
 {
     FILE *pFile=0;
@@ -112,6 +142,11 @@ void saveDepthFramePNM(char* fileName, uint16_t* pixels, int width, int height, 
         fprintf(pFile, "P5\n");
         fprintf(pFile, "#TIMESTAMP %i\n",timeStamp);
         fprintf(pFile, "%d %d\n%i\n", width, height, 65535);
+
+         //We have to swap the byte order to save "correctly Depth PNM" , this of course is slower
+         //but it is the "right thing to do"
+         swapDepthEndianness( pixels, width, height);
+
         fwrite(pixels,2,width*height,pFile);
         fflush(pFile);
         fclose(pFile);
