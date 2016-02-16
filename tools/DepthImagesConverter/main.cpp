@@ -115,6 +115,21 @@ int readFromPNGDepthAndWriteToPNMDepth(char * inputFilename,char *outputFilename
 }
 
 
+int readFromPNGDepthAndWriteToCPNMDepth(char * inputFilename,char *outputFilename)
+{
+    struct Image * newImg  = readImage(inputFilename,PNG_CODEC,0);
+    if (newImg==0) { fprintf(stderr,"Could not open %s\n",inputFilename); return 0; }
+
+    swapEndianness(newImg);
+
+    fprintf(stderr,"Loaded Image with width : %u , height %u , channels %u , bitsperpixel %u\n",newImg->width,newImg->height,newImg->channels,newImg->bitsperpixel);
+
+    writeImageFile(newImg,COMPATIBLE_PNM_CODEC,outputFilename);
+
+   return 1;
+}
+}
+
 
 int readFromPNMDepthAndWriteToPNGDepth(char * inputFilename,char *outputFilename)
 {
@@ -178,6 +193,11 @@ int main( int argc, char** argv )
      {
          fprintf(stderr,"Using my custom loader / writer \n");
          return readFromPNGDepthAndWriteToPNMDepth(argv[1],argv[2]);
+     } else
+     if ( (strstr(argv[1],".png")!=0) && (strstr(argv[2],".cpnm")!=0) )
+     {
+         fprintf(stderr,"Using my custom loader / writer \n");
+         return readFromPNGDepthAndWriteToCPNMDepth(argv[1],argv[2]);
      } else
      if ( (strstr(argv[1],".pnm")!=0) && (strstr(argv[2],".png")!=0) )
      {
