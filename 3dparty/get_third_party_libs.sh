@@ -256,6 +256,33 @@ fi
 
 
 
+if [ -d DepthSenseGrabber ]
+then
+echo "DepthSenseGrabber appears to already exist .."
+else
+  echo "Do you want to download DepthSenseGrabber ? " 
+  echo
+  echo -n " (Y/N)?"
+  read answer
+  if test "$answer" != "N" -a "$answer" != "n";
+  then  
+      git clone https://github.com/ph4m/DepthSenseGrabber
+      cd DepthSenseGrabber
+
+      #CMakeFile of caffe is bad :P 
+      mkdir build
+      cd build
+      cmake ..
+      make  
+
+      cd ..
+      cd ..
+  fi
+fi
+
+
+
+
 
 
 cd "$STARTDIR"

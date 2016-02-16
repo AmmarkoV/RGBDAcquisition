@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 project( RGBDAcquisitionProject ) 
 cmake_minimum_required( VERSION 2.8.7 )
 
@@ -16,6 +15,7 @@ OPTION (ENABLE_TEMPLATE ON)
 OPTION (ENABLE_V4L2 ON)
 OPTION (ENABLE_OPENNI1 OFF)
 OPTION (ENABLE_OPENNI2 ON)
+OPTION (ENABLE_DEPTHSENSE OFF)
 OPTION (ENABLE_NITE2 OFF)
 OPTION (ENABLE_OPENGL ON)
 OPTION (ENABLE_NETWORK ON)
@@ -66,6 +66,10 @@ IF( ENABLE_TEMPLATE )
 add_subdirectory (template_acquisition_shared_library/)
 ENDIF( ENABLE_TEMPLATE )
 
+IF( ENABLE_OPENGL )
+  add_subdirectory (opengl_acquisition_shared_library/)
+ENDIF( ENABLE_OPENGL )
+
 IF( ENABLE_V4L2 )
 add_subdirectory (v4l2_acquisition_shared_library/)
 add_subdirectory (v4l2stereo_acquisition_shared_library/)
@@ -91,9 +95,11 @@ IF( ENABLE_OPENNI2 )
   add_subdirectory (openni2_acquisition_shared_library/)
 ENDIF( ENABLE_OPENNI2 )
 
-IF( ENABLE_OPENGL )
-  add_subdirectory (opengl_acquisition_shared_library/)
-ENDIF( ENABLE_OPENGL )
+
+IF( ENABLE_DEPTHSENSE )
+add_subdirectory (depthsense_acquisition_shared_library/)
+ENDIF( ENABLE_DEPTHSENSE )
+
  
  
 #Composite ( bloated ;p ) parts 
@@ -114,28 +120,4 @@ ENDIF( ENABLE_OPENCV )
 #                    LIBRARY DESTINATION lib
 #                    ARCHIVE DESTINATION lib
 #                    RUNTIME DESTINATION bin)
- 
-
-=======
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-
-project(DepthSenseGrabber)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
-include (GenerateExportHeader)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/shared/cmake/Modules/")
-find_package(DepthSense REQUIRED)
-include_directories(${DEPTHSENSE_INCLUDE_DIR})
-
-find_package(Boost 1.46.0 COMPONENTS system thread REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-
-add_subdirectory(${CMAKE_SOURCE_DIR}/DepthSenseGrabberCore/)
-add_subdirectory(${CMAKE_SOURCE_DIR}/DepthSenseGrabberPNM/)
-
-find_package(OpenCV 2.4.9 REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-add_subdirectory(${CMAKE_SOURCE_DIR}/DepthSenseGrabberOpenCV/)
->>>>>>> e9fcfe2cf559d0194a4e4c8750ac1b697e390e6b
+  
