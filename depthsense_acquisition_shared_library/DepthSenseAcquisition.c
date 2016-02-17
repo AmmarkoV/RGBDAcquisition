@@ -10,25 +10,12 @@
 
 #include "../tools/Primitives/modules.h"
 
-#include <string.h>
-#include <math.h>
 
-#include "templateAcquisitionHelper.h"
-
-#define SAFEGUARD_VALUE 123123
-#define MAX_TEMPLATE_DEVICES 5
+#define MAX_DEPTHSENSE_DEVICES 5
 #define MAX_LINE_CALIBRATION 1024
 
 #define DEFAULT_FOCAL_LENGTH 120.0
 #define DEFAULT_PIXEL_SIZE 0.1052
-
-#define REALLOCATE_ON_EVERY_SNAP 0
- #if REALLOCATE_ON_EVERY_SNAP
-         #warning "Reallocating arrays on every frame ,  performance will be impacted by this "
-        #else
-         #warning "Not Reallocating arrays on every frame this means better performance but if stream dynamically changes resolution from frame to frame this could be a problem"
- #endif
-
 
 
 
@@ -41,9 +28,29 @@ struct DepthSenseVirtualDevice
  struct calibration calibDepth;
  unsigned int disableDepthStream;
 
+
+ char interpolateDepthFlag,saveColorAcqFlag,saveDepthAcqFlag,saveColorSyncFlag,saveDepthSyncFlag,saveConfidenceFlag;
+
+ char buildColorSyncFlag,buildDepthSyncFlag,buildConfidenceFlag;
+
+ int flagColorFormat; // VGA, WXGA or NHD
+
+ int widthColor, heightColor , widthDepthAcq ,heightDepthAcq;
+
+ unsigned char * pixelsColorSync;
+ unsigned char * pixelsColorAcq;
+
+ unsigned short * pixelsDepthAcq;
+ unsigned short * pixelsDepthSync;
+ unsigned short * pixelsConfidenceQVGA;
+
+
+ int frameCount;
+ int timeStamp;
+
 };
 
-struct DepthSenseVirtualDevice device[MAX_TEMPLATE_DEVICES]={0};
+struct DepthSenseVirtualDevice device[MAX_DEPTHSENSE_DEVICES]={0};
 
 
 
@@ -66,18 +73,12 @@ int mapDepthSenseDepthToRGB(int devID) { return 0; }
 int mapDepthSenseRGBToDepth(int devID) { return 0; }
 int switchDepthSenseToColorStream(int devID) { return 1; }
 
-int getDepthSenseNumberOfColorStreams(int devID) { return 1; /*TODO support multiple streams*/ }
+int getDepthSenseNumberOfColorStreams(int devID) { return 1; }
 
 double getDepthSenseColorPixelSize(int devID)   { return DEFAULT_PIXEL_SIZE; }
-double getDepthSenseColorFocalLength(int devID)
-{
-  return DEFAULT_FOCAL_LENGTH;
-}
+double getDepthSenseColorFocalLength(int devID) { return DEFAULT_FOCAL_LENGTH; }
 
-double getDepthSenseDepthFocalLength(int devID)
-{
-    return DEFAULT_FOCAL_LENGTH;
-}
+double getDepthSenseDepthFocalLength(int devID) { return DEFAULT_FOCAL_LENGTH; }
 double getDepthSenseDepthPixelSize(int devID) { return DEFAULT_PIXEL_SIZE; }
 
 
@@ -149,7 +150,52 @@ int listDepthSenseDevices(int devID,char * output, unsigned int maxOutput)
 
 int createDepthSenseDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
+   device[devID].flagColorFormat = FORMAT_VGA_ID; // VGA, WXGA or NHD
+
+   switch (device[devID].flagColorFormat)
+    {
+        case FORMAT_VGA_ID:
+              device[devID].widthColor = FORMAT_VGA_WIDTH;
+              device[devID].heightColor = FORMAT_VGA_HEIGHT;
+            break;
+        case FORMAT_WXGA_ID:
+              device[devID].widthColor = FORMAT_WXGA_WIDTH;
+              device[devID].heightColor = FORMAT_WXGA_HEIGHT;
+            break;
+        case FORMAT_NHD_ID:
+              device[devID].widthColor = FORMAT_NHD_WIDTH;
+              device[devID].heightColor = FORMAT_NHD_HEIGHT;
+            break;
+    };
+
+if (interpolateDepthFlag)
+    {
+        device[devID].widthDepthAcq = FORMAT_VGA_WIDTH;
+        device[devID].heightDepthAcq = FORMAT_VGA_HEIGHT;
+    } else
+    {
+        device[devID].widthDepthAcq = FORMAT_QVGA_WIDTH;
+        device[devID].heightDepthAcq = FORMAT_QVGA_HEIGHT;
+    }
+
+
+
+ device[devID].interpolateDepthFlag = 1;
+
+ device[devID].saveColorAcqFlag   = 1;
+ device[devID].saveDepthAcqFlag   = 1;
+ device[devID].saveColorSyncFlag  = 1;
+ device[devID].saveDepthSyncFlag  = 1;
+ device[devID].saveConfidenceFlag = 1;
+
+ device[devID].buildColorSyncFlag = device[devID].saveColorSyncFlag;
+ device[devID].buildDepthSyncFlag = device[devID].saveDepthSyncFlag;
+ device[devID].buildConfidenceFlag = device[devID].saveConfidenceFlag;
+
+
+  // return start_capture(flagColorFormat, interpolateDepthFlag, buildColorSyncFlag, buildDepthSyncFlag, buildConfidenceFlag);
  return 0;
+
 }
 
 
@@ -172,7 +218,24 @@ int getCurrentDepthSenseFrameNumber(int devID)
 
 int snapDepthSenseFrames(int devID)
 {
-  return 0;
+ device[devID].pixelsColorAcq = getPixelsColorsAcq();
+ device[devID].pixelsDepthSync = getPixelsDepthSync();
+ device[devID].pixelsConfidenceQVGA = getPixelsConfidenceQVGA();
+
+ if (device[devID].interpolateDepthFlag)
+    {
+         device[devID].pixelsDepthAcq = getPixelsDepthAcqVGA();
+         device[devID].pixelsColorSync = getPixelsColorSyncVGA();
+    } else
+    {
+         device[devID].pixelsDepthAcq = getPixelsDepthAcqQVGA();
+         device[devID].pixelsColorSync = getPixelsColorSyncQVGA();
+    }
+
+ device[devID].frameCount = getFrameCount();
+ device[devID].timeStamp = getTimeStamp();
+
+  return 1;
 }
 
 
@@ -194,34 +257,28 @@ int seekDepthSenseFrame(int devID,unsigned int seekFrame)
 
 
 //Color Frame getters
-unsigned long getLastDepthSenseColorTimestamp(int devID) { return device[devID].lastColorTimestamp; }
-int getDepthSenseColorWidth(int devID)        { return device[devID].templateColorWidth; }
-int getDepthSenseColorHeight(int devID)       { return device[devID].templateColorHeight; }
-int getDepthSenseColorDataSize(int devID)     { return device[devID].templateColorHeight*device[devID].templateColorWidth * 3; }
+unsigned long getLastDepthSenseColorTimestamp(int devID) { return device[devID].timeStamp; }
+int getDepthSenseColorWidth(int devID)        { return device[devID].widthColor; }
+int getDepthSenseColorHeight(int devID)       { return device[devID].heightColor; }
+int getDepthSenseColorDataSize(int devID)     { return device[devID].widthColor*device[devID].heightColor * 3; }
 int getDepthSenseColorChannels(int devID)     { return 3; }
 int getDepthSenseColorBitsPerPixel(int devID) { return 8; }
 
 // Frame Grabber should call this function for color frames
-unsigned char * getDepthSenseColorPixels(int devID)    { return device[devID].templateColorFrame; }
-
-
+unsigned char * getDepthSenseColorPixels(int devID)    { return device[devID].pixelsColorSync; }
 
 
    //Depth Frame getters
-unsigned long getLastDepthSenseDepthTimestamp(int devID) { return device[devID].lastDepthTimestamp; }
-int getDepthSenseDepthWidth(int devID)    { return device[devID].templateDepthWidth; }
-int getDepthSenseDepthHeight(int devID)   { return device[devID].templateDepthHeight; }
-int getDepthSenseDepthDataSize(int devID) { return device[devID].templateDepthWidth*device[devID].templateDepthHeight; }
+unsigned long getLastDepthSenseDepthTimestamp(int devID) { return device[devID].timeStamp; }
+int getDepthSenseDepthWidth(int devID)    { return device[devID].widthDepthAcq; }
+int getDepthSenseDepthHeight(int devID)   { return device[devID].heightDepthAcq; }
+int getDepthSenseDepthDataSize(int devID) { return device[devID].widthDepthAcq*device[devID].heightDepthAcq; }
 int getDepthSenseDepthChannels(int devID)     { return 1; }
 int getDepthSenseDepthBitsPerPixel(int devID) { return 16; }
 
 // Frame Grabber should call this function for depth frames
-char * getDepthSenseDepthPixels(int devID) { return (char *) device[devID].templateDepthFrame; }
+char * getDepthSenseDepthPixels(int devID) { return (char *) device[devID].pixelsDepthAcq ; }
 
-char * getDepthSenseDepthPixelsFlipped(int devID) {
-                                                  flipDepth(device[devID].templateDepthFrame,device[devID].templateDepthWidth, device[devID].templateDepthHeight);
-                                                  return (char *) device[devID].templateDepthFrame;
-                                                }
 
 #else
 //Null build

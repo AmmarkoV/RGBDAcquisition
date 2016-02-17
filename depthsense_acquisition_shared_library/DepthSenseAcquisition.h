@@ -83,7 +83,6 @@ extern "C"
    int getDepthSenseDepthBitsPerPixel(int devID);
 
    char * getDepthSenseDepthPixels(int devID);
-   char * getDepthSenseDepthPixelsFlipped(int devID);
 
    double getDepthSenseDepthFocalLength(int devID);
    double getDepthSenseDepthPixelSize(int devID);
