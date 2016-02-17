@@ -27,6 +27,7 @@
 				<item>OPENGL</item>
 				<item>TEMPLATE</item>
 				<item>NETWORK</item>
+				<item>DEPTHSENSE</item>
 			</content>
 			<selection>7</selection>
 			<pos>88,16</pos>

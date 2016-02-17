@@ -53,6 +53,7 @@ SelectModule::SelectModule(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	ComboBoxModule->Append(_("OPENGL"));
 	ComboBoxModule->SetSelection( ComboBoxModule->Append(_("TEMPLATE")) );
 	ComboBoxModule->Append(_("NETWORK"));
+	ComboBoxModule->Append(_("DEPTHSENSE"));
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Device :"), wxPoint(24,56), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Size"), wxPoint(24,104), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	TextCtrlWidth = new wxTextCtrl(this, ID_TEXTCTRL2, _("640"), wxPoint(80,100), wxSize(48,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));

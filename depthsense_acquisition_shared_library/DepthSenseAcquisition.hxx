@@ -1,12 +1,17 @@
 /** @file DepthSenseAcqusition.h
  *  @brief The plugin module that provides acquisition from DepthSense Sensors ( i.e. Prerecorded datasets )
+ *         In order to make these sensors run you will need to
+           0) get a DepthSense camera ( a DS325 is tested with this code )
+           1) get and install DepthSenseSDK-1.4.5.2151-amd64-gcc-tar.run or another similar version from the company site http://www.softkinetic.com/Support/Download?EntryId=516
+           2) get ph4m's DepthSense grabber , see 3dparty/get_third_party_libs.sh , you basically need to git clone https://github.com/ph4m/DepthSenseGrabber inside the 3dparty directory
+           3) ENABLE_DEPTHSENSE through cmake to build the acquisition module
  *
  *  @author Ammar Qammaz (AmmarkoV)
- *  @bug There is a weird bug with color frames when fscanf eats one more character than what it should , this is resolved using consequent fseek calls but it could be handled better
+ *  @bug There needs to be substantial cleaning of the DepthSenseAcquisition module
  */
 
-#ifndef TEMPLATEACQUISITION_H_INCLUDED
-#define TEMPLATEACQUISITION_H_INCLUDED
+#ifndef DEPTHSENSEACQUISITION_H_INCLUDED
+#define DEPTHSENSEACQUISITION_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C"
@@ -93,4 +98,4 @@ extern "C"
 }
 #endif
 
-#endif // TEMPLATEACQUISITION_H_INCLUDED
+#endif // DEPTHSENSEACQUISITION_H_INCLUDED

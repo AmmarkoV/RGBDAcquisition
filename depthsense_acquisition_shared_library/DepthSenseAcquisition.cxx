@@ -1,3 +1,8 @@
+//----------------------------------------------------------------------
+//If this thing does not compile please read carefully DepthSenseAcquisition.hxx
+//----------------------------------------------------------------------
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -20,7 +25,6 @@
 #include <vector>
 #include <exception>
 
-//THIS LIBRARY IS BASED ON PH4MS DepthSense grabber
 #include "../3dparty/DepthSenseGrabber/DepthSenseGrabberCore/DepthSenseGrabberCore.hxx"
 
 #define MAX_DEPTHSENSE_DEVICES 5
@@ -226,12 +230,12 @@ int destroyDepthSenseDevice(int devID)
 
 int getTotalDepthSenseFrameNumber(int devID)
 {
-    return 0;
+    return device[devID].frameCount;
 }
 
 int getCurrentDepthSenseFrameNumber(int devID)
 {
-  return 0;
+  return device[devID].frameCount;
 }
 
 
