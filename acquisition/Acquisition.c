@@ -530,6 +530,7 @@ int acquisitionGetModulesCount()
   if ( acquisitionIsModuleAvailiable(OPENNI1_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI1 module found \n");    ++modules; }
   if ( acquisitionIsModuleAvailiable(OPENNI2_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI2 module found \n");    ++modules; }
   if ( acquisitionIsModuleAvailiable(NETWORK_ACQUISITION_MODULE) )       { fprintf(stderr,"Network module found \n");    ++modules; }
+  if ( acquisitionIsModuleAvailiable(DEPTHSENSE_ACQUISITION_MODULE) )    { fprintf(stderr,"DepthSense module found \n"); ++modules; }
 
   return modules;
 }
@@ -546,7 +547,8 @@ ModuleIdentifier getModuleIdFromModuleName(char * moduleName)
           if (strcasecmp("V4L2",moduleName)==0 )   { moduleID = V4L2_ACQUISITION_MODULE;   } else
           if (strcasecmp("V4L2STEREO",moduleName)==0 )   { moduleID = V4L2STEREO_ACQUISITION_MODULE;   } else
           if (strcasecmp("TEMPLATE",moduleName)==0 )  { moduleID = TEMPLATE_ACQUISITION_MODULE; } else
-          if (strcasecmp("NETWORK",moduleName)==0 )   { moduleID = NETWORK_ACQUISITION_MODULE; }
+          if (strcasecmp("NETWORK",moduleName)==0 )   { moduleID = NETWORK_ACQUISITION_MODULE; } else
+          if (strcasecmp("DEPTHSENSE",moduleName)==0 )   { moduleID = DEPTHSENSE_ACQUISITION_MODULE; }
    return moduleID;
 }
 
@@ -563,6 +565,7 @@ char * getModuleNameFromModuleID(ModuleIdentifier moduleID)
       case OPENGL_ACQUISITION_MODULE :  return (char*) "OPENGL MODULE"; break;
       case TEMPLATE_ACQUISITION_MODULE    :  return (char*) "TEMPLATE MODULE"; break;
       case NETWORK_ACQUISITION_MODULE    :  return (char*) "NETWORK MODULE"; break;
+      case DEPTHSENSE_ACQUISITION_MODULE    :  return (char*) "DEPTHSENSE MODULE"; break;
     };
     return (char*) "UNKNOWN MODULE";
 }

@@ -62,6 +62,7 @@ enum Acquisition_Possible_Modules
     OPENGL_ACQUISITION_MODULE  ,
     TEMPLATE_ACQUISITION_MODULE  ,
     NETWORK_ACQUISITION_MODULE  ,
+    DEPTHSENSE_ACQUISITION_MODULE  ,
    //--------------------------------------------
     NUMBER_OF_POSSIBLE_MODULES
 };
