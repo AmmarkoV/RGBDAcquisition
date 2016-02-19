@@ -34,11 +34,10 @@ find_package(catkin REQUIRED COMPONENTS
   tf)
   
 #Messages -----------------------------------
-add_message_files(DIRECTORY msg FILES Person.msg PointEvents.msg Skeleton2D.msg Skeleton3D.msg SkeletonBBox.msg )
+add_message_files(DIRECTORY msg FILES a.msg )
 
 #Services -----------------------------------
-add_service_files(DIRECTORY srv FILES SetQuality.srv SetScale.srv )
-
+add_service_files(DIRECTORY srv FILES SetScale.srv )
 
 ## Generate added messages and services
 generate_messages(DEPENDENCIES std_msgs rgbd_acquisition)
@@ -46,19 +45,12 @@ generate_messages(DEPENDENCIES std_msgs rgbd_acquisition)
 #This needs to be after generate messages
 catkin_package()
 
-
-include_directories(${catkin_INCLUDEDIR}    
-		    ${OpenCV_INCLUDEDIR})
-
-
+include_directories( ${catkin_INCLUDEDIR} ${OpenCV_INCLUDEDIR} )
 add_executable(rgbd_acquisition  src/main.cpp   )
-
-#${Nite2_LIBRARY}
 target_link_libraries(rgbd_acquisition ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}  ${RGBDACQUISITION_LIBRARIES})
 
-## Add cmake target dependencies of the executable/library
-## as an example, message headers may need to be generated before nodes
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
-
 install(TARGETS rgbd_acquisition RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(FILES rgbd_acquisition.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+

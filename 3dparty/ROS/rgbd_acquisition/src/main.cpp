@@ -60,9 +60,7 @@ image_transport::Publisher pubDepth;
 ros::Publisher pubRGBInfo;
 ros::Publisher pubDepthInfo;
 
-     int useSkeleton=0,devID=0,moduleID=0;
-
-
+int devID=0,moduleID=0;
 int useRGBDAcqusition=0;
 volatile static bool first = true;
 
@@ -475,8 +473,6 @@ int main(int argc, char **argv)
      std::cout<<"virtual_baseline : "<<virtual_baseline<<std::endl;
      std::cout<<"Module_id : "<<module<<" length "<<module.length()<<"  devID : "<<moduleID<<std::endl;
      std::cout<<"Device_id : "<<from<<" length "<<from.length()<<"  devID : "<<devID<<std::endl;
-     std::cout<<"useSkeleton : "<<useSkeleton<<std::endl;
-     if (!useSkeleton) { std::cout<<"(please note that Nite2 is disabled , to re-enable rosservice call /rgbd_acquisition/resume_peopletracker"<<std::endl; }
      std::cout<<"--------------------------------------------------"<<std::endl;
 
 

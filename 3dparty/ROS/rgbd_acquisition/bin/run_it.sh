@@ -21,6 +21,7 @@ if [ -e $PATHOFBIN ]
 then
  echo "$green Running freshly compiled file $normal" 
 else 
+ echo "$red Could not find freshly compiled file @ $DIR/$PATHOFBIN $normal" 
 PATHOFBIN="./$BINNAME" 
   
 if [ ! -e $PATHOFBIN ]
