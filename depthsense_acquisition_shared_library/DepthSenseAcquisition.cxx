@@ -243,9 +243,9 @@ int getCurrentDepthSenseFrameNumber(int devID)
 
 int snapDepthSenseFrames(int devID)
 {
- device[devID].pixelsColorAcq = getPixelsColorsAcq();
- device[devID].pixelsDepthSync = getPixelsDepthSync();
- device[devID].pixelsConfidenceQVGA = getPixelsConfidenceQVGA();
+ //device[devID].pixelsColorAcq = getPixelsColorsAcq();
+ //device[devID].pixelsDepthSync = getPixelsDepthSync();
+ //device[devID].pixelsConfidenceQVGA = getPixelsConfidenceQVGA(); <- this is not really needed..
 
  if (device[devID].interpolateDepthFlag)
     {
@@ -253,8 +253,8 @@ int snapDepthSenseFrames(int devID)
          device[devID].pixelsColorSync = getPixelsColorSyncVGA();
     } else
     {
-         device[devID].pixelsDepthAcq =  device[devID].pixelsDepthSync;
-         device[devID].pixelsColorSync = device[devID].pixelsColorAcq;
+         device[devID].pixelsDepthAcq =  getPixelsDepthSync();
+         device[devID].pixelsColorSync = getPixelsColorsAcq();
     }
 
  device[devID].frameCount = getFrameCount();
