@@ -37,7 +37,6 @@
 #include "Acquisition.h"
 #include "calibration.h"
 
-#include "rgbd_acquisition/SetQuality.h"
 #include "rgbd_acquisition/SetScale.h"
 
 
@@ -531,11 +530,12 @@ int main(int argc, char **argv)
    #if EMMIT_CALIBRATION
     acquisitionSetColorCalibration(moduleID,devID,&calibRGB);
     acquisitionSetDepthCalibration(moduleID,devID,&calibDepth);
-   #endif // EMMIT_CALIBRATION    fprintf(stderr,"Set Far/Near to %f/%f\n",calib.farPlane,calib.nearPlane);
+   #endif // EMMIT_CALIBRATION
 
+  acquisitionMapDepthToRGB(moduleID,devID);
 
-   acquisitionMapDepthToRGB(moduleID,devID);
-
+  std::cout<<"Trying to open capture device.."<<std::endl;
+  ROS_INFO("Trying to open capture device..");
    if (!acquisitionOpenDevice(moduleID,devID,(char* ) from.c_str(),width,height,framerate))
         {
           fprintf(stderr,"Could not open device %u ( %s ) of module %s  ..\n",devID,from.c_str(),getModuleNameFromModuleID(moduleID));

@@ -70,6 +70,8 @@ unsigned int frameSnapped=0;
 #endif
 
 
+unsigned int forceMapDepthToRGB=0;
+unsigned int deviceInited[MAX_OPENNI2_DEVICES]={0};
 unsigned int lastDepthComesFromNite[MAX_OPENNI2_DEVICES]={0};
 unsigned int pauseFaceDetection = 0;
 unsigned int faceDetectionFramesBetweenScans = 2;
@@ -468,7 +470,8 @@ int readOpenNiColor(VideoStream &color , VideoFrameRef &colorFrame)
 */
 int mapOpenNI2DepthToRGB(int devID)
 {
-  device[devID].setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
+  forceMapDepthToRGB=1;
+  if (deviceInited[devID]) { device[devID].setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR); }
   return 1;
 }
 
@@ -580,7 +583,6 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
          return 0;
      }
 
-    unsigned int forceMapDepthToRGB=0;
     #if MOD_NITE2
        createNite2Device(devID,&device[devID]);
        forceMapDepthToRGB=1;
@@ -618,6 +620,8 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
      FocalLengthAndPixelSizeToCalibration(getOpenNI2ColorFocalLength(devID),getOpenNI2ColorPixelSize(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID),&calibRGB[devID]);
      FocalLengthAndPixelSizeToCalibration(getOpenNI2DepthFocalLength(devID),getOpenNI2DepthPixelSize(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID),&calibDepth[devID]);
     #endif
+
+    deviceInited[devID]=1;
 
     if (forceMapDepthToRGB)
        { mapOpenNI2DepthToRGB(devID); }
