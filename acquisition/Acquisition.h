@@ -681,6 +681,7 @@ int acquisitionGetDepth3DPointAtXYCameraSpace(ModuleIdentifier moduleID,DeviceId
  * @param Y3D The Y value of the output 3D point that corresponds to the 2D point we specified
  * @param Z3D The Z value of the output 3D point that corresponds to the 2D point we specified
  * @retval 1=Success 0=Failure
+   @bug This call should not poll calibration of device at each loop , it could be cached to be faster..
  */
 int acquisitionGetDepth3DPointAtXY(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  );
 
