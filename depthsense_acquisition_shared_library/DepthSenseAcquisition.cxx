@@ -85,8 +85,8 @@ int getDepthSenseCapabilities(int devID,int capToAskFor)
 
 
 
-int mapDepthSenseDepthToRGB(int devID) { return 0; }
-int mapDepthSenseRGBToDepth(int devID) { return 0; }
+int mapDepthSenseDepthToRGB(int devID) { device[devID].interpolateDepthFlag=1; return 1; }
+int mapDepthSenseRGBToDepth(int devID) { device[devID].interpolateDepthFlag=1; return 1; }
 int switchDepthSenseToColorStream(int devID) { return 1; }
 
 int getDepthSenseNumberOfColorStreams(int devID) { return 1; }
@@ -167,6 +167,8 @@ int listDepthSenseDevices(int devID,char * output, unsigned int maxOutput)
 
 int createDepthSenseDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
+   //TODO check here width/height for what is closer and select correct format
+
    device[devID].flagColorFormat = FORMAT_VGA_ID; // VGA, WXGA or NHD
    device[devID].interpolateDepthFlag = 1;
 
@@ -251,8 +253,8 @@ int snapDepthSenseFrames(int devID)
          device[devID].pixelsColorSync = getPixelsColorSyncVGA();
     } else
     {
-         device[devID].pixelsDepthAcq = getPixelsDepthAcqQVGA();
-         device[devID].pixelsColorSync = getPixelsColorSyncQVGA();
+         device[devID].pixelsDepthAcq =  device[devID].pixelsDepthSync;
+         device[devID].pixelsColorSync = device[devID].pixelsColorAcq;
     }
 
  device[devID].frameCount = getFrameCount();
