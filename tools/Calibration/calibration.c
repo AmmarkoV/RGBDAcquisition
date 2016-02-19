@@ -37,6 +37,14 @@
 
 #define RESPECT_LOCALES 0 //<- This should in my opinion be always 0
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+
 unsigned char warnUSLocale = 0;
 
 int forceUSLocaleToKeepOurSanity()
@@ -421,14 +429,17 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
 
 int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int x2d , unsigned int y2d  , unsigned short depthValue , float * x , float * y , float * z)
 {
+    *x=x2d;
+    *y=y2d;
+    *z = (float) depthValue;
     if (unlikely(calib==0) )
     {
-      fprintf(stderr,"Cannot transform2DProjectedPointTo3DPoint without a calibration \n ");
+      fprintf(stderr,RED "Cannot transform2DProjectedPointTo3DPoint without a calibration \n " NORMAL);
       return 0;
     } else
     if (unlikely( (calib->intrinsic[CALIB_INTR_FX]==0) || (calib->intrinsic[CALIB_INTR_FY]==0) ) )
     {
-      fprintf(stderr,"Focal Length is 0.0 , cannot transform2DProjectedPointTo3DPoint \n ");
+      fprintf(stderr,RED "Focal Length is 0.0 , cannot transform2DProjectedPointTo3DPoint \n " NORMAL);
       return 0;
     } else
     {
@@ -441,7 +452,7 @@ int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int
 
       *x = (float) (x2d - calib->intrinsic[CALIB_INTR_CX]) * (depthValue / calib->intrinsic[CALIB_INTR_FX]);
       *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
-      *z = (float) depthValue;
+      //*z = (float) depthValue;
      return 1;
     }
 

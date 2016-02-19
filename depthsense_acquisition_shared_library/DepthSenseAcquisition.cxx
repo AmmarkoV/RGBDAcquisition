@@ -220,25 +220,22 @@ if (device[devID].interpolateDepthFlag)
                         device[devID].buildConfidenceFlag
                       );
 
+
+    #if USE_CALIBRATION
+     //Populate our calibration data ( if we have them
+     FocalLengthAndPixelSizeToCalibration(getDepthSenseColorFocalLength(devID),getDepthSenseColorPixelSize(devID),getDepthSenseColorWidth(devID),getDepthSenseColorHeight(devID),&device[devID].calibRGB);
+     FocalLengthAndPixelSizeToCalibration(getDepthSenseDepthFocalLength(devID),getDepthSenseDepthPixelSize(devID),getDepthSenseDepthWidth(devID),getDepthSenseDepthHeight(devID),&device[devID].calibDepth);
+    #endif
+
   return 1;
 }
 
 
 
-int destroyDepthSenseDevice(int devID)
-{
-  return 1;
-}
+int destroyDepthSenseDevice(int devID)         { return 1; }
 
-int getTotalDepthSenseFrameNumber(int devID)
-{
-    return device[devID].frameCount;
-}
-
-int getCurrentDepthSenseFrameNumber(int devID)
-{
-  return device[devID].frameCount;
-}
+int getTotalDepthSenseFrameNumber(int devID)   { return device[devID].frameCount; }
+int getCurrentDepthSenseFrameNumber(int devID) { return device[devID].frameCount; }
 
 
 int snapDepthSenseFrames(int devID)
@@ -264,21 +261,9 @@ int snapDepthSenseFrames(int devID)
 }
 
 
-int controlDepthSenseFlow(int devID,float newFlowState)
-{
- return 0;
-}
-
-
-int seekRelativeDepthSenseFrame(int devID,signed int seekFrame)
-{
- return 0;
-}
-
-int seekDepthSenseFrame(int devID,unsigned int seekFrame)
-{
- return 0;
-}
+int controlDepthSenseFlow(int devID,float newFlowState)         { return 0; }
+int seekRelativeDepthSenseFrame(int devID,signed int seekFrame) { return 0; }
+int seekDepthSenseFrame(int devID,unsigned int seekFrame)       { return 0; }
 
 
 //Color Frame getters

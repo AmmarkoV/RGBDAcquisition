@@ -1,29 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="processorLinker.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2971" topLine="60" />
-		</Cursor>
-	</File>
-	<File name="Acquisition.h" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2731" topLine="57" />
-		</Cursor>
-	</File>
-	<File name="Acquisition.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="37396" topLine="1045" />
-		</Cursor>
-	</File>
-	<File name="acquisition_setup.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1173" topLine="0" />
-		</Cursor>
-	</File>
 	<File name="pluginLinker.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5397" topLine="230" />
+			<Cursor1 position="1657" topLine="9" />
+		</Cursor>
+	</File>
+	<File name="Acquisition.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2222" topLine="39" />
 		</Cursor>
 	</File>
 	<File name="processorLinker.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -31,9 +16,24 @@
 			<Cursor1 position="1328" topLine="17" />
 		</Cursor>
 	</File>
+	<File name="Acquisition.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="19189" topLine="586" />
+		</Cursor>
+	</File>
+	<File name="acquisition_setup.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1173" topLine="0" />
+		</Cursor>
+	</File>
 	<File name="pluginLinker.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4386" topLine="99" />
+			<Cursor1 position="4386" topLine="159" />
+		</Cursor>
+	</File>
+	<File name="processorLinker.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2971" topLine="60" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
