@@ -232,7 +232,7 @@ if (device[devID].interpolateDepthFlag)
 
 
 
-int destroyDepthSenseDevice(int devID)         { return 1; }
+int destroyDepthSenseDevice(int devID)         { stop_capture(); return 1; }
 
 int getTotalDepthSenseFrameNumber(int devID)   { return device[devID].frameCount; }
 int getCurrentDepthSenseFrameNumber(int devID) { return device[devID].frameCount; }
