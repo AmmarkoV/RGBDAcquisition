@@ -20,17 +20,17 @@ FPS="30"
 #  firstGPSCar firstGPSCar2 allimiagpscalibra firstGPSCar2 firstGPSCar3Pan
 #./run_viewer.sh -module TEMPLATE -from firstGPSToTheCity -seek 10  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparitySwapColorFeeds $@
 
-#calibraInternal
-#./run_viewer.sh -module TEMPLATE -from pameVoltelikocalib pameVolta2 voltaAthens calibraInternal  firstGPSToTheCity -seek 10  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparityUseCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/newCalibrationOutput $@
+#calibraInternal pameVoltelikocalib pameVolta2 voltaAthens 
+./run_viewer.sh -module TEMPLATE -from calibraInternal  firstGPSToTheCity -seek 10  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparityUseCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/newCalibrationOutput $@
 # -executeEveryLoop scrot -disparitySwapColorFeeds 
  
 #./run_viewer.sh -module V4L2STEREO -from /dev/video0,/dev/video1 -nolocation -resolution 1280 720 -fps 10 -resizeWindow 1920 500 -saveEveryFrame
 
 
-./run_viewer.sh -module TEMPLATE -from voltaAmmoudara/manual  -nolocation -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500 -disparityCalibrate  9 13 0.7 /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/voltaAmmoudara/calibration $@
+#./run_viewer.sh -module TEMPLATE -from voltaAmmoudara/manual  -nolocation -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500 -disparityCalibrate  9 13 0.7 /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/voltaAmmoudara/calibration $@
 
 #calibAmmoudaraA
-./run_viewer.sh -module TEMPLATE -from voltaAmmoudara/pameVoltelikocalib -seek 10  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparityUseCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/voltaAmmoudara/calibration/ $@
+#./run_viewer.sh -module TEMPLATE -from voltaAmmoudara/pameVoltelikocalib -seek 10  -noDepth -processor ../processors/DisparityMapping/libDisparityMapping.so  DisparityMapping -resizeWindow 1920 500   -disparitySADWindowSize 70 -disparityUseCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/voltaAmmoudara/calibration/ $@
 
 #-disparityshiftYLeft 22 -maxFrames 500
 #-disparityCalibration /home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/allimiagpscalibra/DisparityMappingCalibration 

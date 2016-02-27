@@ -324,6 +324,13 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
     switch (key)
     {
+        case 'o' :
+        case 'O' :
+             writeOpenGLColor("color.pnm",0,0,WIDTH,HEIGHT);
+             writeOpenGLDepth("depth.pnm",0,0,WIDTH,HEIGHT);
+            return 1;
+        break;
+
         case 1 : //SPACE??
         case ' ' :
             if (pauseTicking) { pauseTicking=0; } else { pauseTicking=1; }
