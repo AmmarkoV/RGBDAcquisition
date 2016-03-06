@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "cv.h"
 #include "highgui.h"
@@ -20,6 +21,8 @@
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
+
+#define UNIFY_LKFLOWS 1
 
 
 using namespace std;
@@ -181,6 +184,11 @@ unsigned char * getColor_DisparityMapping(unsigned int * width, unsigned int * h
 
 int processData_DisparityMapping()
 {
+    int retres=0;
+    // Start and end times
+    time_t startTime , endTime;
+    time(&startTime);
+
     unsigned char * colorPTR = colorFrame ;
 
     unsigned int x,y;
@@ -203,12 +211,33 @@ int processData_DisparityMapping()
    } else
    {
     fprintf(stderr,"doing regular loop\n");
-    doLKOpticalFlow(leftRGB,greyLeft,greyLastLeft);
-    doLKOpticalFlow(rightRGB,greyRight,greyLastRight);
+
+    #if UNIFY_LKFLOWS
+     doStereoLKOpticalFlow(
+                            leftRGB,greyLeft,greyLastLeft ,
+                            rightRGB,greyRight,greyLastRight
+                          );
+    #else
+     doLKOpticalFlow(leftRGB,greyLastLeft,greyLeft);
+     doLKOpticalFlow(rightRGB,greyLastRight,greyRight);
+    #endif // UNIFY_LKFLOWS
+
     doSGBM( &leftRGB, &rightRGB , SADWindowSize ,  speckleRange, disparityCalibrationPath );
-    return 1;
+    retres=1;
    }
-  return 0;
+
+
+
+ time(&endTime);
+
+ // Time elapsed
+ double seconds = difftime (endTime, startTime);
+
+ if (seconds == 0.0 ) { seconds = 0.0001; }
+ fprintf(stderr,"DisparityMapping Node Achieving %0.2f fps \n",(float) 1/seconds);
+
+
+ return retres;
 }
 
 

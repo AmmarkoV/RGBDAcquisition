@@ -31,6 +31,35 @@
 GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 
 
+#define U 0.5
+
+float cubeCoords[]={//X  Y  Z
+
+                      //Close Up LEFT
+                     -U, -U, -U,    1.0,  // bottom left
+                     -U,  U, -U,    1.0,  // top left
+                      U,  U, -U,    1.0,  // top right
+
+                     +U, -U, -U,    1.0,  // bottom right
+                     -U, -U, -U,    1.0,// bottom left corner
+                     +U, +U, -U,    1.0,// top left corner
+
+
+
+                     //Far Up LEFT
+                     -U, -U, U,    1.0,  // bottom left
+                     -U,  U, U,    1.0,  // top left
+                      U,  U, U,    1.0,  // top right
+
+                     +U, -U, U,    1.0,  // bottom right
+                     -U, -U, U,    1.0,// bottom left corner
+                     +U, +U, U,    1.0,// top left corner
+
+
+
+
+                  };
+
 int drawAxis(float x, float y , float z, float scale)
 {
  glLineWidth(6.0);
@@ -209,37 +238,14 @@ return 1;
 
 int drawCube()
 {
-   // glNewList(1, GL_COMPILE_AND_EXECUTE);
-    /* front face */
-    glBegin(GL_QUADS);
-      //glColor3f(0.0, 0.7, 0.1);  /* green */
-      glVertex3f(-1.0, 1.0, 1.0);
-      glVertex3f(1.0, 1.0, 1.0);
-      glVertex3f(1.0, -1.0, 1.0);
-      glVertex3f(-1.0, -1.0, 1.0);
+   fprintf(stderr,"DrawCube has %u vertices \n",sizeof(cubeCoords)/4);
+    //glBegin(GL_QUADS);
+    glBegin(GL_TRIANGLES);				// start drawing a pyramid
 
-      /* back face */
-      //glColor3f(0.9, 1.0, 0.0);  /* yellow */
-      glVertex3f(-1.0, 1.0, -1.0);
-      glVertex3f(1.0, 1.0, -1.0);
-      glVertex3f(1.0, -1.0, -1.0);
-      glVertex3f(-1.0, -1.0, -1.0);
-
-      /* top side face */
-      //glColor3f(0.2, 0.2, 1.0);  /* blue */
-      glVertex3f(-1.0, 1.0, 1.0);
-      glVertex3f(1.0, 1.0, 1.0);
-      glVertex3f(1.0, 1.0, -1.0);
-      glVertex3f(-1.0, 1.0, -1.0);
-
-      /* bottom side face */
-      //glColor3f(0.7, 0.0, 0.1);  /* red */
-      glVertex3f(-1.0, -1.0, 1.0);
-      glVertex3f(1.0, -1.0, 1.0);
-      glVertex3f(1.0, -1.0, -1.0);
-      glVertex3f(-1.0, -1.0, -1.0);
+      unsigned int i=0;
+      for (i=0; i<sizeof(cubeCoords)/(4*sizeof(float)); i++)
+        { glVertex3f(cubeCoords[i*4+0],cubeCoords[i*4+1], cubeCoords[i*4+2] ); }
     glEnd();
-   // glEndList();
     return 1;
 }
 
