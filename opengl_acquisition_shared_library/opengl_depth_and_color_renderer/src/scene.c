@@ -43,6 +43,9 @@ float nearPlane= 1; //<--this also
 float fieldOfView = 65;
 float scaleDepthTo =1000.0;
 
+int doCulling=1;
+
+
 //float depthUnit = 1.0;
 
 unsigned int userKeyFOVEnabled=0;
@@ -517,10 +520,11 @@ int initScene(char * confFile)
    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
 
-   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,    mat_ambient);
-   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    mat_diffuse);
-   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   mat_specular);
-   glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS,   mat_shininess); // <- this was glMateriali
+   GLenum faces=GL_FRONT;//GL_FRONT_AND_BACK;
+   glMaterialfv(faces, GL_AMBIENT,    mat_ambient);
+   glMaterialfv(faces, GL_DIFFUSE,    mat_diffuse);
+   glMaterialfv(faces, GL_SPECULAR,   mat_specular);
+   glMaterialfv(faces, GL_SHININESS,   mat_shininess); // <- this was glMateriali
    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up Front/Back lights\n"); }
   #else
    fprintf(stderr,"Please note that lighting is disabled via the USE_LIGHTS precompiler define\n");
@@ -533,6 +537,13 @@ int initScene(char * confFile)
   }
 
   //This is not needed -> :P  glCullFace(GL_FRONT_AND_BACK);
+  //Enable Culling
+  if (doCulling)
+  {
+   glFrontFace(GL_FRONT);
+   glCullFace(GL_BACK);
+   glEnable(GL_CULL_FACE);
+  }
 
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
   memset(models,0,scene->numberOfObjectTypes * sizeof(struct Model **));

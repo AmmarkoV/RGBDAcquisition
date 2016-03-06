@@ -804,15 +804,17 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 
             if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Error before setting up material @ drawOBJMesh\n"); }
 
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  obj->matList[ obj->groups[i].material].ambient);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  obj->matList[ obj->groups[i].material].diffuse);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, obj->matList[ obj->groups[i].material].specular);
+
+            GLenum faces=GL_FRONT;//GL_FRONT_AND_BACK;
+			glMaterialfv(faces, GL_AMBIENT,  obj->matList[ obj->groups[i].material].ambient);
+			glMaterialfv(faces, GL_DIFFUSE,  obj->matList[ obj->groups[i].material].diffuse);
+			glMaterialfv(faces, GL_SPECULAR, obj->matList[ obj->groups[i].material].specular);
             if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Error after setting up material for specularity @ drawOBJMesh\n"); }
 
             #if DISABLE_SHININESS
-			 glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+			 glMaterialf(faces, GL_SHININESS, 0.0 );
 			#else
-			 glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, obj->matList[ obj->groups[i].material].shine);
+			 glMaterialfv(faces, GL_SHININESS, obj->matList[ obj->groups[i].material].shine);
             #endif
             if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Error after setting up material for shininess @ drawOBJMesh\n"); }
 

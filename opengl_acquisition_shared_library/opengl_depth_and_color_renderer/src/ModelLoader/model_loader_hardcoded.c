@@ -14,6 +14,8 @@
 #include "model_loader_obj.h"
 #include "../tools.h"
 
+#include "../../../../tools/AmMatrix/matrixCalculations.h"
+
 #define DISABLE_GL_CALL_LIST 0
 #if DISABLE_GL_CALL_LIST
  #warning "Please note that glCallList is disabled and that has a really bad effect on graphics card performance"
@@ -33,54 +35,7 @@ GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 
 #define U 0.5
 
-float cubeCoords[]={ //X  Y  Z       W
-                      //Near
-                     -U, -U, -U,    1.0,  // bottom left
-                     -U,  U, -U,    1.0,  // top left
-                      U,  U, -U,    1.0,  // top right
-
-                     +U, -U, -U,    1.0,  // bottom right
-                     -U, -U, -U,    1.0,// bottom left corner
-                     +U, +U, -U,    1.0,// top left corner
-
-                     //Far
-                     -U, -U, U,    1.0,  // bottom left
-                     -U,  U, U,    1.0,  // top left
-                      U,  U, U,    1.0,  // top right
-
-                     +U, -U, U,    1.0,  // bottom right
-                     -U, -U, U,    1.0,// bottom left corner
-                     +U, +U, U,    1.0,// top left corner
-
-                     //Left
-                     -U, -U, -U,    1.0,  // bottom left
-                     -U,  U, -U,    1.0,  // top left
-                     -U,  U,  U,    1.0,  // top right
-
-                     -U, -U, -U,    1.0,  // bottom right
-                     -U, +U, +U,    1.0,// bottom left corner
-                     -U, -U,  U,    1.0,// top left corner
-
-                     //Right
-                      U, -U, -U,    1.0,  // bottom left
-                      U,  U, -U,    1.0,  // top left
-                      U,  U,  U,    1.0,  // top right
-
-                      U, -U, -U,    1.0,  // bottom right
-                      U, +U, +U,    1.0,// bottom left corner
-                      U, -U,  U,    1.0,// top left corner
-
-
-                     //Up
-                     -U,  U, -U,    1.0,  // bottom left
-                     -U,  U,  U,    1.0,  // top left
-                      U,  U,  U,    1.0,  // top right
-
-                     -U,  U, -U,    1.0,  // bottom right
-                      U,  U,  U,    1.0,// bottom left corner
-                      U,  U, -U,    1.0,// top left corner
-
-
+float planeCoords[]={ //X  Y  Z       W
                      //Bottom
                      -U, -U, -U,    1.0,  // bottom left
                      -U, -U,  U,    1.0,  // top left
@@ -91,21 +46,80 @@ float cubeCoords[]={ //X  Y  Z       W
                       U, -U, -U,    1.0,// top left corner
 
                   };
+float planeNormals[]={ //X  Y  Z       W
+                      //Bottom
+                      0.0000, 1.0000 , 0.0000 , 1.0 ,
+                      0.0000, 1.0000 , 0.0000 , 1.0
+                  };
+
+
+float cubeCoords[]=
+{
+-U,-U,-U,1.0,
+-U,-U, U,1.0,
+-U, U, U,1.0,
+ U, U,-U,1.0,
+-U,-U,-U,1.0,
+-U, U,-U,1.0,
+ U,-U, U,1.0,
+-U,-U,-U,1.0,
+ U,-U,-U,1.0,
+ U, U,-U,1.0,
+ U,-U,-U,1.0,
+-U,-U,-U,1.0,
+-U,-U,-U,1.0,
+-U, U, U,1.0,
+-U, U,-U,1.0,
+ U,-U, U,1.0,
+-U,-U, U,1.0,
+-U,-U,-U,1.0,
+-U, U, U,1.0,
+-U,-U, U,1.0,
+ U,-U, U,1.0,
+ U, U, U,1.0,
+ U,-U,-U,1.0,
+ U, U,-U,1.0,
+ U,-U,-U,1.0,
+ U, U, U,1.0,
+ U,-U, U,1.0,
+ U, U, U,1.0,
+ U, U,-U,1.0,
+-U, U,-U,1.0,
+ U, U, U,1.0,
+-U, U,-U,1.0,
+-U, U, U,1.0,
+ U, U, U,1.0,
+-U, U, U,1.0,
+ U,-U, U,1.0
+ };
+float cubeNormals[]={ //X  Y  Z  W
+                      -1.0000,-0.0000,-0.0000,1.0,
+                      0.0000,0.0000,-1.0000,1.0,
+                      0.0000,-1.0000,0.0000,1.0,
+                      0.0000,0.0000,-1.0000,1.0,
+                      -1.0000,-0.0000,0.0000,1.0,
+                      0.0000,-1.0000,0.0000,1.0,
+                      0.0000,-0.0000,1.0000,1.0,
+                      1.0000,0.0000,-0.0000,1.0,
+                      1.0000,-0.0000,0.0000,1.0,
+                      0.0000,1.0000,0.0000,1.0,
+                      -0.0000,1.0000,0.0000,1.0,
+                      0.0000,-0.0000,1.0000,1.0
+};
 
 
 
 
 float pyramidCoords[]={ //X  Y  Z       W
-
                      //Near
                      -U, -U, -U,    1.0,  // bottom left
-                      0, U,  0,    1.0,  // top left
                       U, -U, -U,    1.0,  // top right
+                      0, U,  0,    1.0,  // top left
 
                      //Far
                      -U, -U,  U,    1.0,  // bottom left
-                      0, U,  0,    1.0,  // top left
                       U, -U,  U,    1.0,  // top right
+                      0, U,  0,    1.0,  // top left
 
                      //Left
                      -U, -U, -U,    1.0,  // bottom left
@@ -114,25 +128,93 @@ float pyramidCoords[]={ //X  Y  Z       W
 
                      //Right
                       U, -U, -U,    1.0,  // bottom left
-                      0, U,  0,    1.0,  // top left
                       U, -U,  U,    1.0,  // top right
+                      0, U,  0,    1.0,  // top left
 
 
                      //Bottom
                      -U, -U, -U,    1.0,  // bottom left
-                     -U, -U,  U,    1.0,  // top left
                       U, -U,  U,    1.0,  // top right
+                     -U, -U,  U,    1.0,  // top left
 
                      -U, -U, -U,    1.0,  // bottom right
-                      U, -U,  U,    1.0,// bottom left corner
                       U, -U, -U,    1.0,// top left corner
+                      U, -U,  U,    1.0,// bottom left corner
 
                     };
+float pyramidNormals[]={ //X  Y  Z  W
+                      0.0000,-0.4472,0.8944,1.0,
+                      0.0000,0.4472,0.8944,1.0,
+                      0.8944,-0.4472,0.0000,1.0,
+                      -0.8944,-0.4472,-0.0000,1.0,
+                      0.0000,-1.0000,-0.0000,1.0,
+                      -0.0000,-1.0000,-0.0000,1.0
+
+};
 
 
 
 
+int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
+{
+   fprintf(stderr,"float xNormals[]={ //X  Y  Z  W\n");
 
+    float outputNormal[4]={0};
+    unsigned int i=0,z=0,z1=0,z2=0,z3=0;
+      for (i=0; i<coordLength/3; i++)
+        {
+          z=(i*3)*4;  z1=z;  outputNormal[0]=coords[z1+0];  outputNormal[1]=coords[z1+1]; outputNormal[2]=coords[z1+2];  outputNormal[3]=coords[z1+3];
+          z+=4;       z2=z;
+          z+=4;       z3=z;
+
+          findNormal(&outputNormal[0], &outputNormal[1], &outputNormal[2] ,
+                     coords[z2+0]   , coords[z2+1]   , coords[z2+2],
+                     coords[z3+0]   , coords[z3+1]   , coords[z3+2]
+                     );
+
+          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,1.0,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+        }
+   fprintf(stderr,"};\n");
+}
+
+
+int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coordLength)
+{
+    glBegin(GL_TRIANGLES);
+      unsigned int i=0,z=0;
+      for (i=0; i<coordLength/3; i++)
+        {
+                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
+          z=(i*3)*4;  glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
+
+                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
+          z+=4;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
+
+                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
+          z+=4;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
+        }
+    glEnd();
+    return 1;
+}
+
+int drawGenericTriangleMeshTranslatedScaled(float * coords , float * normals, unsigned int coordLength,float dx,float dy,float dz,float scale)
+{
+    glBegin(GL_TRIANGLES);
+      unsigned int i=0,z=0;
+      for (i=0; i<coordLength/3; i++)
+        {
+                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
+          z=(i*3)*4;  glVertex3f(scale*(dx+coords[z+0]),scale*(dy+coords[z+1]),scale*(dz+coords[z+2]));
+
+                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
+          z+=4;       glVertex3f(scale*(dx+coords[z+0]),scale*(dy+coords[z+1]),scale*(dz+coords[z+2]));
+
+                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
+          z+=4;       glVertex3f(scale*(dx+coords[z+0]),scale*(dy+coords[z+1]),scale*(dz+coords[z+2]));
+        }
+    glEnd();
+    return 1;
+}
 
 
 int drawAxis(float x, float y , float z, float scale)
@@ -146,23 +228,6 @@ int drawAxis(float x, float y , float z, float scale)
  glLineWidth(1.0);
  return 1;
 }
-
-int drawObjPlane(float x,float y,float z,float dimension)
-{
-   // glNewList(1, GL_COMPILE_AND_EXECUTE);
-    /* front face */
-    glBegin(GL_QUADS);
-      glNormal3f(0.0,1.0,0.0);
-      glVertex3f(x-dimension, 0.0, z-dimension);
-      glVertex3f(x+dimension, 0.0, z-dimension);
-      glVertex3f(x+dimension, 0.0, z+dimension);
-      glVertex3f(x-dimension, 0.0, z+dimension);
-    glEnd();
-    //glEndList();
-    return 1;
-}
-
-
 
 int drawGridPlane(float x,float y,float z , float scale)
 {
@@ -226,17 +291,14 @@ void drawSphere(unsigned int quality)
 
 int drawQuestion()
 {
-  //Todo draw a question mark here , this is an axis actually :P
-  float x=0,y=0,z=0,scale=1.0;
-  glLineWidth(6.0);
-  glBegin(GL_LINES);
-   glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+scale,y,z);
-   glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+scale,z);
-   glColor3f(0.0,0.0,1.0); glVertex3f(x,y,z); glVertex3f(x,y,z+scale);
-  glEnd();
-  glLineWidth(1.0);
-
-  //drawSphere(30);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , 0 , 0   , 0 ,0.5 );
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , 0 , -3*U , 0 ,0.5 );
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , U/2 , U   , 0 ,0.5);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , U , 2*U   , 0 ,0.3);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , U , 2.5*U   , 0 ,0.5);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , U ,2.8*U   , 0 ,0.3);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , 0 , 3*U   , 0 ,0.5);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , -U ,2.8*U   , 0 ,0.5);
  return 1;
 }
 
@@ -311,25 +373,28 @@ return 1;
 }
 
 
-
-int drawGenericTriangleMesh(float * coords , unsigned int coordLength)
+int drawObjPlane(float x,float y,float z,float dimension)
 {
-    glBegin(GL_TRIANGLES);
-      unsigned int i=0;
-      for (i=0; i<coordLength; i++)
-        { glVertex3f(coords[i*4+0],coords[i*4+1], coords[i*4+2] ); }
-    glEnd();
-    return 1;
+    fprintf(stderr,"Plane Normals");
+    calculateGenericTriangleNormals(planeCoords , sizeof(planeCoords)/(4*sizeof(float)) );
+
+    return drawGenericTriangleMesh(planeCoords , planeNormals , sizeof(planeCoords)/(4*sizeof(float)) );
 }
 
 int drawCube()
 {
-    return drawGenericTriangleMesh(cubeCoords , sizeof(cubeCoords)/(4*sizeof(float)) );
+    fprintf(stderr,"Cube Normals");
+    calculateGenericTriangleNormals(cubeCoords , sizeof(cubeCoords)/(4*sizeof(float)) );
+
+    return drawGenericTriangleMesh(cubeCoords , cubeNormals , sizeof(cubeCoords)/(4*sizeof(float)) );
 }
 
 void drawPyramid()
 {
-    return drawGenericTriangleMesh(pyramidCoords , sizeof(pyramidCoords)/(4*sizeof(float)) );
+    fprintf(stderr,"pyramidCoords Normals");
+    calculateGenericTriangleNormals(pyramidCoords , sizeof(pyramidCoords)/(4*sizeof(float)) );
+
+    return drawGenericTriangleMesh(pyramidCoords , pyramidNormals , sizeof(pyramidCoords)/(4*sizeof(float)) );
 }
 
 unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel)

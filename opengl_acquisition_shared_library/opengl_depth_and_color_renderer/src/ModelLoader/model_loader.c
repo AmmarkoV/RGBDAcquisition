@@ -243,13 +243,14 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
         glEnable(GL_COLOR_MATERIAL);
         if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after enabling color material\n"); }
 
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,    defaultAmbient);
+        GLenum faces=GL_FRONT;//GL_FRONT_AND_BACK;
+        glMaterialfv(faces, GL_AMBIENT,    defaultAmbient);
         if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,    defaultDiffuse);
+        glMaterialfv(faces, GL_DIFFUSE,    defaultDiffuse);
         if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,   defaultSpecular);
+        glMaterialfv(faces, GL_SPECULAR,   defaultSpecular);
         if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS,   defaultShininess);
+        glMaterialfv(faces, GL_SHININESS,   defaultShininess);
         if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
 
         if (mod->transparency==0.0)

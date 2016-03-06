@@ -21,6 +21,8 @@ extern float farPlane;
 extern float nearPlane;
 extern float scaleDepthTo;
 
+extern int doCulling;
+
 //extern float depthUnit;
 
 
