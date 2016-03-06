@@ -43,8 +43,7 @@ float planeCoords[]={ //X  Y  Z       W
 
                      -U, -U, -U,    1.0,  // bottom right
                       U, -U,  U,    1.0,// bottom left corner
-                      U, -U, -U,    1.0,// top left corner
-
+                      U, -U, -U,    1.0// top left corner
                   };
 float planeNormals[]={ //X  Y  Z       W
                       //Bottom
@@ -111,25 +110,25 @@ float cubeNormals[]={ //X  Y  Z  W
 
 
 float pyramidCoords[]={ //X  Y  Z       W
-                     //Near
-                     -U, -U, -U,    1.0,  // bottom left
-                      U, -U, -U,    1.0,  // top right
-                      0,  U,  0,    1.0,  // top left
-
                      //Far
-                     -U, -U,  U,    1.0,  // bottom left
+                     -U, -U, -U,    1.0,  // bottom left
                       0,  U,  0,    1.0,  // top left
-                      U, -U,  U,    1.0,  // top right
+                      U, -U, -U,    1.0,  // top right
+
+                     //Near
+                      -U, -U,  U,    1.0,  // bottom left
+                       U, -U,  U,    1.0,  // top right
+                       0,  U,  0,    1.0,  // top left
 
                      //Left
-                     -U, -U, -U,    1.0,  // bottom left
-                     -U, -U,  U,    1.0,  // top right
-                      0,  U,  0,    1.0,  // top left
+                      -U, -U, -U,    1.0,  // bottom left
+                      -U, -U,  U,    1.0,  // top right
+                       0,  U,  0,    1.0,  // top left
 
                      //Right
-                      U, -U, -U,    1.0,  // bottom left
-                      0,  U,  0,    1.0,  // top left
-                      U, -U,  U,    1.0,  // top right
+                       U, -U, -U,    1.0,  // bottom left
+                       0,  U,  0,    1.0,  // top left
+                       U, -U,  U,    1.0,  // top right
 
 
                      //Bottom
@@ -139,12 +138,12 @@ float pyramidCoords[]={ //X  Y  Z       W
 
                      -U, -U, -U,    1.0,  // bottom right
                       U, -U, -U,    1.0,// top left corner
-                      U, -U,  U,    1.0,// bottom left corner
+                      U, -U,  U,    1.0// bottom left corner
 
                     };
 float pyramidNormals[]={ //X  Y  Z  W
-                      0.0000,-0.4472,0.8944,1.0,
-                      0.0000,-0.4472,-0.8944,1.0,
+                      0.0000,0.4472,-0.8944,1.0,
+                      0.0000,0.4472,0.8944,1.0,
                       -0.8944,0.4472,0.0000,1.0,
                       0.8944,0.4472,0.0000,1.0,
                       0.0000,-1.0000,-0.0000,1.0,
