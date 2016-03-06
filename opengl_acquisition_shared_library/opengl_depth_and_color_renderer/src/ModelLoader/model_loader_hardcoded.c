@@ -33,9 +33,8 @@ GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 
 #define U 0.5
 
-float cubeCoords[]={//X  Y  Z
-
-                      //Close Up LEFT
+float cubeCoords[]={ //X  Y  Z       W
+                      //Near
                      -U, -U, -U,    1.0,  // bottom left
                      -U,  U, -U,    1.0,  // top left
                       U,  U, -U,    1.0,  // top right
@@ -44,9 +43,7 @@ float cubeCoords[]={//X  Y  Z
                      -U, -U, -U,    1.0,// bottom left corner
                      +U, +U, -U,    1.0,// top left corner
 
-
-
-                     //Far Up LEFT
+                     //Far
                      -U, -U, U,    1.0,  // bottom left
                      -U,  U, U,    1.0,  // top left
                       U,  U, U,    1.0,  // top right
@@ -55,10 +52,88 @@ float cubeCoords[]={//X  Y  Z
                      -U, -U, U,    1.0,// bottom left corner
                      +U, +U, U,    1.0,// top left corner
 
+                     //Left
+                     -U, -U, -U,    1.0,  // bottom left
+                     -U,  U, -U,    1.0,  // top left
+                     -U,  U,  U,    1.0,  // top right
+
+                     -U, -U, -U,    1.0,  // bottom right
+                     -U, +U, +U,    1.0,// bottom left corner
+                     -U, -U,  U,    1.0,// top left corner
+
+                     //Right
+                      U, -U, -U,    1.0,  // bottom left
+                      U,  U, -U,    1.0,  // top left
+                      U,  U,  U,    1.0,  // top right
+
+                      U, -U, -U,    1.0,  // bottom right
+                      U, +U, +U,    1.0,// bottom left corner
+                      U, -U,  U,    1.0,// top left corner
 
 
+                     //Up
+                     -U,  U, -U,    1.0,  // bottom left
+                     -U,  U,  U,    1.0,  // top left
+                      U,  U,  U,    1.0,  // top right
+
+                     -U,  U, -U,    1.0,  // bottom right
+                      U,  U,  U,    1.0,// bottom left corner
+                      U,  U, -U,    1.0,// top left corner
+
+
+                     //Bottom
+                     -U, -U, -U,    1.0,  // bottom left
+                     -U, -U,  U,    1.0,  // top left
+                      U, -U,  U,    1.0,  // top right
+
+                     -U, -U, -U,    1.0,  // bottom right
+                      U, -U,  U,    1.0,// bottom left corner
+                      U, -U, -U,    1.0,// top left corner
 
                   };
+
+
+
+
+float pyramidCoords[]={ //X  Y  Z       W
+
+                     //Near
+                     -U, -U, -U,    1.0,  // bottom left
+                      0, U,  0,    1.0,  // top left
+                      U, -U, -U,    1.0,  // top right
+
+                     //Far
+                     -U, -U,  U,    1.0,  // bottom left
+                      0, U,  0,    1.0,  // top left
+                      U, -U,  U,    1.0,  // top right
+
+                     //Left
+                     -U, -U, -U,    1.0,  // bottom left
+                      0, U,  0,    1.0,  // top left
+                     -U, -U,  U,    1.0,  // top right
+
+                     //Right
+                      U, -U, -U,    1.0,  // bottom left
+                      0, U,  0,    1.0,  // top left
+                      U, -U,  U,    1.0,  // top right
+
+
+                     //Bottom
+                     -U, -U, -U,    1.0,  // bottom left
+                     -U, -U,  U,    1.0,  // top left
+                      U, -U,  U,    1.0,  // top right
+
+                     -U, -U, -U,    1.0,  // bottom right
+                      U, -U,  U,    1.0,// bottom left corner
+                      U, -U, -U,    1.0,// top left corner
+
+                    };
+
+
+
+
+
+
 
 int drawAxis(float x, float y , float z, float scale)
 {
@@ -236,58 +311,25 @@ return 1;
 }
 
 
-int drawCube()
-{
-   fprintf(stderr,"DrawCube has %u vertices \n",sizeof(cubeCoords)/4);
-    //glBegin(GL_QUADS);
-    glBegin(GL_TRIANGLES);				// start drawing a pyramid
 
+int drawGenericTriangleMesh(float * coords , unsigned int coordLength)
+{
+    glBegin(GL_TRIANGLES);
       unsigned int i=0;
-      for (i=0; i<sizeof(cubeCoords)/(4*sizeof(float)); i++)
-        { glVertex3f(cubeCoords[i*4+0],cubeCoords[i*4+1], cubeCoords[i*4+2] ); }
+      for (i=0; i<coordLength; i++)
+        { glVertex3f(coords[i*4+0],coords[i*4+1], coords[i*4+2] ); }
     glEnd();
     return 1;
 }
 
+int drawCube()
+{
+    return drawGenericTriangleMesh(cubeCoords , sizeof(cubeCoords)/(4*sizeof(float)) );
+}
 
 void drawPyramid()
 {
-  // draw a pyramid (in smooth coloring mode)
-  glBegin(GL_POLYGON);				// start drawing a pyramid
-
-  // front face of pyramid
-  //glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Red
-  glVertex3f(0.0f, 1.0f, 0.0f);		        // Top of triangle (front)
-  //glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
-  glVertex3f(-1.0f,-1.0f, 1.0f);		// left of triangle (front)
-  //glColor3f(0.0f,0.0f,1.0f);			// Set The Color To Blue
-  glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)
-
-  // right face of pyramid
-  //glColor3f(1.0f,0.0f,0.0f);			// Red
-  glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Right)
-  //glColor3f(0.0f,0.0f,1.0f);			// Blue
-  glVertex3f( 1.0f,-1.0f, 1.0f);		// Left Of Triangle (Right)
-  //glColor3f(0.0f,1.0f,0.0f);			// Green
-  glVertex3f( 1.0f,-1.0f, -1.0f);		// Right Of Triangle (Right)
-
-  // back face of pyramid
-  //glColor3f(1.0f,0.0f,0.0f);			// Red
-  glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Back)
-  //glColor3f(0.0f,1.0f,0.0f);			// Green
-  glVertex3f( 1.0f,-1.0f, -1.0f);		// Left Of Triangle (Back)
-  //glColor3f(0.0f,0.0f,1.0f);			// Blue
-  glVertex3f(-1.0f,-1.0f, -1.0f);		// Right Of Triangle (Back)
-
-  // left face of pyramid.
-  //glColor3f(1.0f,0.0f,0.0f);			// Red
-  glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Left)
-  //glColor3f(0.0f,0.0f,1.0f);			// Blue
-  glVertex3f(-1.0f,-1.0f,-1.0f);		// Left Of Triangle (Left)
-  //glColor3f(0.0f,1.0f,0.0f);			// Green
-  glVertex3f(-1.0f,-1.0f, 1.0f);		// Right Of Triangle (Left)
-
-  glEnd();					// Done Drawing The Pyramid
+    return drawGenericTriangleMesh(pyramidCoords , sizeof(pyramidCoords)/(4*sizeof(float)) );
 }
 
 unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel)
