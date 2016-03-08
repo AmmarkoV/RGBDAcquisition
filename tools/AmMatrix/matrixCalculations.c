@@ -402,6 +402,84 @@ void buildOpenGLProjectionForIntrinsics   (
 }
 
 
+
+void lookAt(
+             float * matrix ,
+             float eyex, float eyey, float eyez,
+	         float centerx, float centery, float centerz,
+	         float upx, float upy, float upz
+	        )
+{
+
+   float m[16];
+   float x[3], y[3], z[3];
+   float mag;
+
+   /* Make rotation matrix */
+
+   /* Z vector */
+   z[0] = eyex - centerx;
+   z[1] = eyey - centery;
+   z[2] = eyez - centerz;
+   mag = sqrt( z[0] * z[0] + z[1] * z[1] + z[2] * z[2]);
+   if (mag)
+    {
+      z[0] /= mag;
+      z[1] /= mag;
+      z[2] /= mag;
+    }
+
+   /* Y vector */
+   y[0] = upx;
+   y[1] = upy;
+   y[2] = upz;
+
+   /* X vector = Y cross Z */
+   x[0] = y[1] * z[2] - y[2] * z[1];
+   x[1] = -y[0] * z[2] + y[2] * z[0];
+   x[2] = y[0] * z[1] - y[1] * z[0];
+
+   /* Recompute Y = Z cross X */
+   y[0] = z[1] * x[2] - z[2] * x[1];
+   y[1] = -z[0] * x[2] + z[2] * x[0];
+   y[2] = z[0] * x[1] - z[1] * x[0];
+
+   /* mpichler, 19950515 */
+   /* cross product gives area of parallelogram, which is < 1.0 for
+    * non-perpendicular unit-length vectors; so normalize x, y here
+    */
+
+   mag = sqrt(  x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
+   if (mag)
+    {
+      x[0] /= mag;
+      x[1] /= mag;
+      x[2] /= mag;
+    }
+
+   mag = sqrt( y[0] * y[0] + y[1] * y[1] + y[2] * y[2]);
+   if (mag)
+    {
+      y[0] /= mag;
+      y[1] /= mag;
+      y[2] /= mag;
+    }
+
+   float initial[16];
+   initial[0] = x[0]; initial[1] = x[1]; initial[2] = x[2]; initial[3] = 0.0;
+   initial[4] = y[0]; initial[5] = y[1]; initial[6] = y[2]; initial[7] = 0.0;
+   initial[8] = z[0]; initial[9] = z[1]; initial[10]= z[2]; initial[11]= 0.0;
+   initial[12]= 0.0;  initial[13]= 0.0;  initial[14]= 0.0;  initial[15]= 1.0;
+
+
+   /* Translate Eye to Origin */
+   //glTranslatef(-eyex, -eyey, -eyez);
+   float translation[16];
+   create4x4TranslationMatrix(translation , -eyex, -eyey, -eyez );
+   multiplyTwo4x4FMatrices(matrix , initial , translation);
+}
+
+
 float calculateDistance(float from_x,float from_y,float from_z,float to_x,float to_y,float to_z)
 {
    float vect_x = from_x - to_x;
