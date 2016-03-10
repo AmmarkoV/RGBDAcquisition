@@ -153,6 +153,17 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
 
 
 /**
+* @brief Multiply 2x 4x4 Float matrices ( A * B )
+* @ingroup AmMatrix
+* @param  Output 4x4 Float Matrix ( should be already allocated )
+* @param  Input 4x4 Float Matrix A
+* @param  Input 4x4 Float Matrix B
+* @retval 0=failure,1=success
+*/
+int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB)
+
+
+/**
 * @brief Multiply a 4x4 matrix with a Vector (3D Point)  A*V
 * @ingroup AmMatrix
 * @param  Output Vector ( should be already allocated )
