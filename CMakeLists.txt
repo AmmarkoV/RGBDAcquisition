@@ -3,10 +3,8 @@ cmake_minimum_required( VERSION 2.8.7 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/3dparty ${CMAKE_MODULE_PATH})
 
-#-march=native -mtune=native
-set(CMAKE_CXX_FLAGS "-fPIC  -O3 -fexpensive-optimizations -s") 
-set(CMAKE_C_FLAGS "-fPIC  -O3 -fexpensive-optimizations -s") 
       
+OPTION (COMPILE_FOR_PERFORMANCE OFF)
 OPTION (ENABLE_AMMARSERVER_BROADCAST ON)
 OPTION (ENABLE_FACEDETECTION_DEV OFF)
 OPTION (ENABLE_FREENECT ON)
@@ -21,6 +19,19 @@ OPTION (ENABLE_OPENGL ON)
 OPTION (ENABLE_NETWORK ON)
 OPTION (ENABLE_EDITOR ON)
 OPTION (ENABLE_LOCATION_SERVICE OFF)
+
+
+set(CMAKE_CXX_FLAGS "-fPIC -s") 
+set(CMAKE_C_FLAGS "-fPIC -s") 
+IF( COMPILE_FOR_PERFORMANCE )
+ #-march=native -mtune=native
+ set(CMAKE_CXX_FLAGS "-fPIC  -O3 -fexpensive-optimizations -s") 
+ set(CMAKE_C_FLAGS "-fPIC  -O3 -fexpensive-optimizations -s") 
+ENDIF( COMPILE_FOR_PERFORMANCE )
+
+
+
+
 #----
 find_package(OpenCV)
 if (OpenCV_FOUND)

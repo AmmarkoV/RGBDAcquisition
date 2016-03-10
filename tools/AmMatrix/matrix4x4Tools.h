@@ -160,7 +160,7 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
 * @param  Input 4x4 Float Matrix B
 * @retval 0=failure,1=success
 */
-int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB)
+int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB);
 
 
 /**

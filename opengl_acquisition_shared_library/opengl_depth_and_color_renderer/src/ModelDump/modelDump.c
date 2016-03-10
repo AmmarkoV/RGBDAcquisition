@@ -7,10 +7,10 @@
 
 int main(int argc, char **argv)
 {
-   if (argc<6)
+   if (argc<3)
    {
-     fprintf(stderr,"usage : Comparer path/To/FileA.scene path/To/FileB.scene numberOfFrames sumErrorForAllObjects generateAngleObjects \n");
+     fprintf(stderr,"usage : ModelDump path/To/FileA.obj path/To/FileB.c \n");
      return 0;
    }
-    return compareTrajectoryFiles("comparison.txt",argv[1],argv[2],atoi(argv[3]),atoi(argv[4]),atoi(argv[5]));
+    return int dumpModelFile(argv[1],argv[2]);
 }

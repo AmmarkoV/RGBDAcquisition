@@ -646,3 +646,19 @@ for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
  return 1;
 }
 
+
+
+
+/*
+   --------------------------------------------------------------------------------------
+                                    CONVERT MODEL FILE
+   --------------------------------------------------------------------------------------
+*/
+int dumpModelFile(const char * inputfile,const char * outputfile)
+{
+
+}
+
+
+
+
