@@ -4,5 +4,6 @@
 		<Project filename="src/OGLRendererSandbox.cbp" />
 		<Project filename="src/Renderer/Renderer.cbp" />
 		<Project filename="src/Comparer/Comparer.cbp" />
+		<Project filename="src/ModelDump/ModelDump.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

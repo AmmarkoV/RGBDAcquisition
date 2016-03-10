@@ -171,6 +171,8 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
                      );
 
           fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,1.0,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,1.0,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,1.0,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
         }
    fprintf(stderr,"};\n");
 }
