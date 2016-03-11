@@ -37,73 +37,97 @@ GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 
 float planeCoords[]={ //X  Y  Z       W
                      //Bottom
-                     -U, -U, -U,    1.0,  // bottom left
-                     -U, -U,  U,    1.0,  // top left
-                      U, -U,  U,    1.0,  // top right
+                     -U, -U, -U,   // bottom left
+                     -U, -U,  U,   // top left
+                      U, -U,  U,   // top right
 
-                     -U, -U, -U,    1.0,  // bottom right
-                      U, -U,  U,    1.0,// bottom left corner
-                      U, -U, -U,    1.0// top left corner
+                     -U, -U, -U,   // bottom right
+                      U, -U,  U,   // bottom left corner
+                      U, -U, -U   // top left corner
                   };
 float planeNormals[]={ //X  Y  Z       W
                       //Bottom
-                      0.0, 1.0 , 0.0 , 1.0 ,
-                      0.0, 1.0 , 0.0 , 1.0
+                      0.0, 1.0 , 0.0 ,
+                      0.0, 1.0 , 0.0
                   };
 
 
 float cubeCoords[]=
 {
--U,-U,-U,1.0,
--U,-U, U,1.0,
--U, U, U,1.0,
- U, U,-U,1.0,
--U,-U,-U,1.0,
--U, U,-U,1.0,
- U,-U, U,1.0,
--U,-U,-U,1.0,
- U,-U,-U,1.0,
- U, U,-U,1.0,
- U,-U,-U,1.0,
--U,-U,-U,1.0,
--U,-U,-U,1.0,
--U, U, U,1.0,
--U, U,-U,1.0,
- U,-U, U,1.0,
--U,-U, U,1.0,
--U,-U,-U,1.0,
--U, U, U,1.0,
--U,-U, U,1.0,
- U,-U, U,1.0,
- U, U, U,1.0,
- U,-U,-U,1.0,
- U, U,-U,1.0,
- U,-U,-U,1.0,
- U, U, U,1.0,
- U,-U, U,1.0,
- U, U, U,1.0,
- U, U,-U,1.0,
--U, U,-U,1.0,
- U, U, U,1.0,
--U, U,-U,1.0,
--U, U, U,1.0,
- U, U, U,1.0,
--U, U, U,1.0,
- U,-U, U,1.0
+-U,-U,-U,
+-U,-U, U,
+-U, U, U,
+ U, U,-U,
+-U,-U,-U,
+-U, U,-U,
+ U,-U, U,
+-U,-U,-U,
+ U,-U,-U,
+ U, U,-U,
+ U,-U,-U,
+-U,-U,-U,
+-U,-U,-U,
+-U, U, U,
+-U, U,-U,
+ U,-U, U,
+-U,-U, U,
+-U,-U,-U,
+-U, U, U,
+-U,-U, U,
+ U,-U, U,
+ U, U, U,
+ U,-U,-U,
+ U, U,-U,
+ U,-U,-U,
+ U, U, U,
+ U,-U, U,
+ U, U, U,
+ U, U,-U,
+-U, U,-U,
+ U, U, U,
+-U, U,-U,
+-U, U, U,
+ U, U, U,
+-U, U, U,
+ U,-U, U
  };
 float cubeNormals[]={ //X  Y  Z  W
-                      -1.0,0.0,0.0,1.0,
-                      0.0,0.0,-1.0,1.0,
-                      0.0,-1.0,0.0,1.0,
-                      0.0,0.0,-1.0,1.0,
-                      -1.0,0.0,0.0,1.0,
-                      0.0,-1.0,0.0,1.0,
-                      0.0,0.0,1.0,1.0,
-                      1.0,0.0,0.0,1.0,
-                      1.0,0.0,0.0,1.0,
-                      0.0,1.0,0.0,1.0,
-                      0.0,1.0,0.0,1.0,
-                      0.0,0.0,1.0,1.0
+                       -1.0000,-0.0000,-0.0000,
+                      -1.0000,-0.0000,-0.0000,
+                      -1.0000,-0.0000,-0.0000,
+                      0.0000,0.0000,-1.0000,
+                      0.0000,0.0000,-1.0000,
+                      0.0000,0.0000,-1.0000,
+                      0.0000,-1.0000,0.0000,
+                      0.0000,-1.0000,0.0000,
+                      0.0000,-1.0000,0.0000,
+                      0.0000,0.0000,-1.0000,
+                      0.0000,0.0000,-1.0000,
+                      0.0000,0.0000,-1.0000,
+                      -1.0000,-0.0000,0.0000,
+                      -1.0000,-0.0000,0.0000,
+                      -1.0000,-0.0000,0.0000,
+                      0.0000,-1.0000,0.0000,
+                      0.0000,-1.0000,0.0000,
+                      0.0000,-1.0000,0.0000,
+                      0.0000,-0.0000,1.0000,
+                      0.0000,-0.0000,1.0000,
+                      0.0000,-0.0000,1.0000,
+                      1.0000,0.0000,-0.0000,
+                      1.0000,0.0000,-0.0000,
+                      1.0000,0.0000,-0.0000,
+                      1.0000,-0.0000,0.0000,
+                      1.0000,-0.0000,0.0000,
+                      1.0000,-0.0000,0.0000,
+                      0.0000,1.0000,0.0000,
+                      0.0000,1.0000,0.0000,
+                      0.0000,1.0000,0.0000,
+                      -0.0000,1.0000,0.0000,
+                      -0.0000,1.0000,0.0000,
+                      -0.0000,1.0000,0.0000,
+                      0.0000,-0.0000,1.0000,
+                      0.0000,-0.0000,1.0000,
+                      0.0000,-0.0000,1.0000
 };
 
 
@@ -111,43 +135,43 @@ float cubeNormals[]={ //X  Y  Z  W
 
 float pyramidCoords[]={ //X  Y  Z       W
                      //Far
-                     -U, -U, -U,    1.0,  // bottom left
-                      0,  U,  0,    1.0,  // top left
-                      U, -U, -U,    1.0,  // top right
+                     -U, -U, -U,      // bottom left
+                      0,  U,  0,      // top left
+                      U, -U, -U,      // top right
 
                      //Near
-                      -U, -U,  U,    1.0,  // bottom left
-                       U, -U,  U,    1.0,  // top right
-                       0,  U,  0,    1.0,  // top left
+                      -U, -U,  U,      // bottom left
+                       U, -U,  U,      // top right
+                       0,  U,  0,      // top left
 
                      //Left
-                      -U, -U, -U,    1.0,  // bottom left
-                      -U, -U,  U,    1.0,  // top right
-                       0,  U,  0,    1.0,  // top left
+                      -U, -U, -U,      // bottom left
+                      -U, -U,  U,      // top right
+                       0,  U,  0,      // top left
 
                      //Right
-                       U, -U, -U,    1.0,  // bottom left
-                       0,  U,  0,    1.0,  // top left
-                       U, -U,  U,    1.0,  // top right
+                       U, -U, -U,      // bottom left
+                       0,  U,  0,      // top left
+                       U, -U,  U,      // top right
 
 
                      //Bottom
-                     -U, -U, -U,    1.0,  // bottom left
-                      U, -U,  U,    1.0,  // top right
-                     -U, -U,  U,    1.0,  // top left
+                     -U, -U, -U,      // bottom left
+                      U, -U,  U,      // top right
+                     -U, -U,  U,      // top left
 
-                     -U, -U, -U,    1.0,  // bottom right
-                      U, -U, -U,    1.0,// top left corner
-                      U, -U,  U,    1.0// bottom left corner
+                     -U, -U, -U,      // bottom right
+                      U, -U, -U,      // top left corner
+                      U, -U,  U       // bottom left corner
 
                     };
 float pyramidNormals[]={ //X  Y  Z  W
-                      0.0,0.4472,-0.8944,1.0,
-                      0.0,0.4472,0.8944,1.0,
-                      -0.8944,0.4472,0.0,1.0,
-                      0.8944,0.4472,0.0,1.0,
-                      0.0,-1.0,0.0,1.0,
-                      0.0,-1.0,0.0,1.0
+                      0.0,0.4472,-0.8944,
+                      0.0,0.4472,0.8944,
+                      -0.8944,0.4472,0.0,
+                      0.8944,0.4472,0.0,
+                      0.0,-1.0,0.0,
+                      0.0,-1.0,0.0
 };
 
 
@@ -161,18 +185,18 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
     unsigned int i=0,z=0,z1=0,z2=0,z3=0;
       for (i=0; i<coordLength/3; i++)
         {
-          z=(i*3)*4;  z1=z;  outputNormal[0]=coords[z1+0];  outputNormal[1]=coords[z1+1]; outputNormal[2]=coords[z1+2];  outputNormal[3]=coords[z1+3];
-          z+=4;       z2=z;
-          z+=4;       z3=z;
+          z=(i*3)*3;  z1=z;  outputNormal[0]=coords[z1+0];  outputNormal[1]=coords[z1+1]; outputNormal[2]=coords[z1+2];  outputNormal[3]=coords[z1+3];
+          z+=3;       z2=z;
+          z+=3;       z3=z;
 
           findNormal(&outputNormal[0], &outputNormal[1], &outputNormal[2] ,
                      coords[z2+0]   , coords[z2+1]   , coords[z2+2],
                      coords[z3+0]   , coords[z3+1]   , coords[z3+2]
                      );
 
-          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,1.0,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
-          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,1.0,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
-          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,1.0,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
         }
    fprintf(stderr,"};\n");
 }
@@ -185,13 +209,13 @@ int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coord
       for (i=0; i<coordLength/3; i++)
         {
                       glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z=(i*3)*4;  glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
+          z=(i*3)*3;  glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
 
                       glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z+=4;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
+          z+=3;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
 
                       glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z+=4;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
+          z+=3;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
         }
     glEnd();
     return 1;
@@ -204,13 +228,13 @@ int drawGenericTriangleMeshTranslatedScaled(float * coords , float * normals, un
       for (i=0; i<coordLength/3; i++)
         {
                       glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z=(i*3)*4;  glVertex3f(scale*(dx+coords[z+0]),scale*(dy+coords[z+1]),scale*(dz+coords[z+2]));
+          z=(i*3)*3;  glVertex3f(scale*(dx+coords[z+0]),scale*(dy+coords[z+1]),scale*(dz+coords[z+2]));
 
                       glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z+=4;       glVertex3f(scale*(dx+coords[z+0]),scale*(dy+coords[z+1]),scale*(dz+coords[z+2]));
+          z+=3;       glVertex3f(scale*(dx+coords[z+0]),scale*(dy+coords[z+1]),scale*(dz+coords[z+2]));
 
                       glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z+=4;       glVertex3f(scale*(dx+coords[z+0]),scale*(dy+coords[z+1]),scale*(dz+coords[z+2]));
+          z+=3;       glVertex3f(scale*(dx+coords[z+0]),scale*(dy+coords[z+1]),scale*(dz+coords[z+2]));
         }
     glEnd();
     return 1;
@@ -291,14 +315,14 @@ void drawSphere(unsigned int quality)
 
 int drawQuestion()
 {
-  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , 0 , 0   , 0 ,0.5 );
-  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , 0 , -3*U , 0 ,0.5 );
-  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , U/2 , U   , 0 ,0.5);
-  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , U , 2*U   , 0 ,0.3);
-  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , U , 2.5*U   , 0 ,0.5);
-  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , U ,2.8*U   , 0 ,0.3);
-  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , 0 , 3*U   , 0 ,0.5);
-  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(4*sizeof(float)) , -U ,2.8*U   , 0 ,0.5);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(3*sizeof(float)) , 0 , 0   , 0 ,0.5 );
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(3*sizeof(float)) , 0 , -3*U , 0 ,0.5 );
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(3*sizeof(float)) , U/2 , U   , 0 ,0.5);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(3*sizeof(float)) , U , 2*U   , 0 ,0.3);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(3*sizeof(float)) , U , 2.5*U   , 0 ,0.5);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(3*sizeof(float)) , U ,2.8*U   , 0 ,0.3);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(3*sizeof(float)) , 0 , 3*U   , 0 ,0.5);
+  drawGenericTriangleMeshTranslatedScaled(cubeCoords, cubeNormals,sizeof(cubeCoords)/(3*sizeof(float)) , -U ,2.8*U   , 0 ,0.5);
  return 1;
 }
 
@@ -376,25 +400,25 @@ return 1;
 int drawObjPlane(float x,float y,float z,float dimension)
 {
     fprintf(stderr,"Plane Normals");
-    calculateGenericTriangleNormals(planeCoords , sizeof(planeCoords)/(4*sizeof(float)) );
+    calculateGenericTriangleNormals(planeCoords , sizeof(planeCoords)/(3*sizeof(float)) );
 
-    return drawGenericTriangleMesh(planeCoords , planeNormals , sizeof(planeCoords)/(4*sizeof(float)) );
+    return drawGenericTriangleMesh(planeCoords , planeNormals , sizeof(planeCoords)/(3*sizeof(float)) );
 }
 
 int drawCube()
 {
     fprintf(stderr,"Cube Normals");
-    calculateGenericTriangleNormals(cubeCoords , sizeof(cubeCoords)/(4*sizeof(float)) );
+    calculateGenericTriangleNormals(cubeCoords , sizeof(cubeCoords)/(3*sizeof(float)) );
 
-    return drawGenericTriangleMesh(cubeCoords , cubeNormals , sizeof(cubeCoords)/(4*sizeof(float)) );
+    return drawGenericTriangleMesh(cubeCoords , cubeNormals , sizeof(cubeCoords)/(3*sizeof(float)) );
 }
 
 void drawPyramid()
 {
     fprintf(stderr,"pyramidCoords Normals");
-    calculateGenericTriangleNormals(pyramidCoords , sizeof(pyramidCoords)/(4*sizeof(float)) );
+    calculateGenericTriangleNormals(pyramidCoords , sizeof(pyramidCoords)/(3*sizeof(float)) );
 
-    return drawGenericTriangleMesh(pyramidCoords , pyramidNormals , sizeof(pyramidCoords)/(4*sizeof(float)) );
+    return drawGenericTriangleMesh(pyramidCoords , pyramidNormals , sizeof(pyramidCoords)/(3*sizeof(float)) );
 }
 
 unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel)

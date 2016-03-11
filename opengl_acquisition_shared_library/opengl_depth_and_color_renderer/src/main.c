@@ -656,7 +656,7 @@ for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
 */
 int dumpModelFile(const char * inputfile,const char * outputfile)
 {
-  struct OBJ_Model * newObj = loadObj("Models/",inputfile,0);
+  struct OBJ_Model * obj = loadObj("Models/",inputfile,0);
 
 
   fprintf(stderr,"Writing output %s \n",outputfile);
@@ -664,41 +664,95 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
     fd = fopen(outputfile,"w");
     if (fd!=0)
     {
-       unsigned int i=0;
-       if (newObj->numVertices>0)
-       {
-        fprintf(stderr,"Writing %u vertices .. \n",newObj->numVertices);
-        fprintf(fd,"const float %sVertices[] = { ",outputfile);
-        for (i=0; i<newObj->numVertices; i++)
-        {
-          fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
-                               newObj->vertexList[i].x,
-                               newObj->vertexList[i].y,
-                               newObj->vertexList[i].z
-                 );
-        }
-        fprintf(fd,"}; \n\n");
-       }
 
-       if (newObj->numNormals>1)
-       {
-        fprintf(stderr,"Writing %u normals .. \n",newObj->numNormals);
-        fprintf(fd,"const float %sNormals[] = { ",outputfile);
-        for (i=0; i<newObj->numNormals; i++)
-        {
-          fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
-                               newObj->normalList[i].n1,
-                               newObj->normalList[i].n2,
-                               newObj->normalList[i].n3
-                 );
-        }
+
+      fprintf(stderr,"Writing %u vertices .. \n",obj->numVertices);
+      fprintf(fd,"const float %sVertices[] = { ",outputfile);
+       unsigned int i=0,j=0;
+       for(i=0; i<obj->numGroups; i++)
+		{
+       for(j=0; j<obj->groups[i].numFaces; j++)
+			{
+
+				fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].x,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].y,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].z
+                       );
+				fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].x,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].y,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].z
+                       );
+				fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].x,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].y,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].z
+                       );
+			}
+		}
         fprintf(fd,"}; \n\n");
-       }
+
+
+
+        fprintf(stderr,"Writing %u normals .. \n",obj->numNormals);
+        fprintf(fd,"const float %sNormals[] = { ",outputfile);
+
+       for(i=0; i<obj->numGroups; i++)
+		{
+       for(j=0; j<obj->groups[i].numFaces; j++)
+			{
+              if( obj->groups[i].hasNormals)
+                  {
+                     fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n1 ,
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n2 ,
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n3
+                              );
+                     fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n1 ,
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n2 ,
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n3
+                              );
+
+                     fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n1 ,
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n2 ,
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n3
+                              );
+                  }
+				else
+				 {
+					fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
+                              );
+					fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
+                              );
+					fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
+                              );
+				}
+			}//FOR J
+		}
+
+        fprintf(fd,"}; \n\n");
+
+
+
+
+
        fflush(fd);
        fclose(fd);
     }
 
-  unloadObj(newObj);
+  unloadObj(obj);
 }
 
 
