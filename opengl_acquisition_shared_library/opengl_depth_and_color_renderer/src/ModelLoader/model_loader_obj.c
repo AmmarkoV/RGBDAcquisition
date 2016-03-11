@@ -1291,7 +1291,7 @@ int unloadObj(struct OBJ_Model * obj)
 
 }
 
-struct OBJ_Model * loadObj(char * directory,char * filename)
+struct OBJ_Model * loadObj(char * directory,char * filename,int compileDisplayList)
 {
     fprintf(stderr,"Starting to load object %s \n",filename);
     struct OBJ_Model * obj = ( struct OBJ_Model * ) malloc(sizeof(struct OBJ_Model));
@@ -1315,8 +1315,10 @@ struct OBJ_Model * loadObj(char * directory,char * filename)
     if (!prepareObject(obj))  { fprintf(stderr," Could not prepare object %s \n",filename); unloadObj(obj); return 0;}
     if (!calculateBoundingBox(obj)) { fprintf(stderr," Could not calculate bounding box for object %s \n",filename); unloadObj(obj); return 0;}
 
-
-    compileOBJList(obj);
+   if (compileDisplayList)
+   {
+     compileOBJList(obj);
+   }
 
 
    return obj;

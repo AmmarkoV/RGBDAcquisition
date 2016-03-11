@@ -141,7 +141,7 @@ struct Model * loadModel(char * directory,char * modelname)
   if ( strstr(modelname,".obj") != 0 )
     {
       mod->type = OBJ_MODEL;
-      struct  OBJ_Model *  newObj = (struct  OBJ_Model * ) loadObj(directory,modelname);
+      struct  OBJ_Model *  newObj = (struct  OBJ_Model * ) loadObj(directory,modelname,1);
       mod->model = newObj;//(struct  OBJ_Model * ) loadObj(directory,modelname);
       if (mod->model ==0 )
          {

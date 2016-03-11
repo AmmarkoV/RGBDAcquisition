@@ -156,9 +156,10 @@ GLuint getObjOGLList(struct OBJ_Model * obj);
 * @ingroup OBJModelLoader
 * @param String with the directory of the model
 * @param String with the filename of the model ( after the directory )
+* @param Compile the object to an OpenGL DisplayList
 * @retval 0=Failure , A pointer to an object model
 */
-struct OBJ_Model * loadObj(char * directory,char * filename);
+struct OBJ_Model * loadObj(char * directory,char * filename,int compileDisplayList);
 
 
 /**

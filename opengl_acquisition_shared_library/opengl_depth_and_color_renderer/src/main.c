@@ -656,7 +656,35 @@ for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
 */
 int dumpModelFile(const char * inputfile,const char * outputfile)
 {
+  struct OBJ_Model * newObj = loadObj("Models/",inputfile,0);
 
+
+
+    FILE *fd=0;
+    fd = fopen(outputfile,"w");
+    if (fd!=0)
+    {
+        fprintf(outputfile,"const float %sVertices[] = { ",outputfile);
+        unsigned int i=0;
+        for (i=0; i<newObj->numVertices; i++)
+        {
+          fprintf(outputfile," %0.4f , %0.4f , %0.4f , 1.0 , \n",newObj->vertexList[i].x,newObj->vertexList[i].y,newObj->vertexList[i].z);
+        }
+        fprintf(outputfile,"}; \n\n",outputfile);
+
+
+        fprintf(outputfile,"const float %sNormals[] = { ",outputfile);
+        for (i=0; i<newObj->numNormals; i++)
+        {
+          fprintf(outputfile," %0.4f , %0.4f , %0.4f , 1.0 , \n",newObj->normalList[i].n1,newObj->normalList[i].n2,newObj->normalList[i].n3);
+        }
+        fprintf(outputfile,"}; \n\n",outputfile);
+
+
+       fclose(fd);
+    }
+
+  unloadObj(newObj);
 }
 
 
