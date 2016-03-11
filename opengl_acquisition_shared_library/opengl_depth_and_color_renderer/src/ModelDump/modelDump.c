@@ -12,5 +12,5 @@ int main(int argc, char **argv)
      fprintf(stderr,"usage : ModelDump path/To/FileA.obj path/To/FileB.c \n");
      return 0;
    }
-    return int dumpModelFile(argv[1],argv[2]);
+    return dumpModelFile(argv[1],argv[2]);
 }

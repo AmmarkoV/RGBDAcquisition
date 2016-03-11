@@ -659,28 +659,42 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
   struct OBJ_Model * newObj = loadObj("Models/",inputfile,0);
 
 
-
+  fprintf(stderr,"Writing output %s \n",outputfile);
     FILE *fd=0;
     fd = fopen(outputfile,"w");
     if (fd!=0)
     {
-        fprintf(outputfile,"const float %sVertices[] = { ",outputfile);
-        unsigned int i=0;
+       unsigned int i=0;
+       if (newObj->numVertices>0)
+       {
+        fprintf(stderr,"Writing %u vertices .. \n",newObj->numVertices);
+        fprintf(fd,"const float %sVertices[] = { ",outputfile);
         for (i=0; i<newObj->numVertices; i++)
         {
-          fprintf(outputfile," %0.4f , %0.4f , %0.4f , 1.0 , \n",newObj->vertexList[i].x,newObj->vertexList[i].y,newObj->vertexList[i].z);
+          fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                               newObj->vertexList[i].x,
+                               newObj->vertexList[i].y,
+                               newObj->vertexList[i].z
+                 );
         }
-        fprintf(outputfile,"}; \n\n",outputfile);
+        fprintf(fd,"}; \n\n");
+       }
 
-
-        fprintf(outputfile,"const float %sNormals[] = { ",outputfile);
+       if (newObj->numNormals>1)
+       {
+        fprintf(stderr,"Writing %u normals .. \n",newObj->numNormals);
+        fprintf(fd,"const float %sNormals[] = { ",outputfile);
         for (i=0; i<newObj->numNormals; i++)
         {
-          fprintf(outputfile," %0.4f , %0.4f , %0.4f , 1.0 , \n",newObj->normalList[i].n1,newObj->normalList[i].n2,newObj->normalList[i].n3);
+          fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                               newObj->normalList[i].n1,
+                               newObj->normalList[i].n2,
+                               newObj->normalList[i].n3
+                 );
         }
-        fprintf(outputfile,"}; \n\n",outputfile);
-
-
+        fprintf(fd,"}; \n\n");
+       }
+       fflush(fd);
        fclose(fd);
     }
 
