@@ -47,8 +47,8 @@ float planeCoords[]={ //X  Y  Z       W
                   };
 float planeNormals[]={ //X  Y  Z       W
                       //Bottom
-                      0.0, 1.0 , 0.0 ,
-                      0.0, 1.0 , 0.0
+                      0.0f, 1.0f , 0.0f ,
+                      0.0f, 1.0f , 0.0f
                   };
 
 
@@ -92,42 +92,42 @@ float cubeCoords[]=
  U,-U, U
  };
 float cubeNormals[]={ //X  Y  Z  W
-                       -1.0000,-0.0000,-0.0000,
-                      -1.0000,-0.0000,-0.0000,
-                      -1.0000,-0.0000,-0.0000,
-                      0.0000,0.0000,-1.0000,
-                      0.0000,0.0000,-1.0000,
-                      0.0000,0.0000,-1.0000,
-                      0.0000,-1.0000,0.0000,
-                      0.0000,-1.0000,0.0000,
-                      0.0000,-1.0000,0.0000,
-                      0.0000,0.0000,-1.0000,
-                      0.0000,0.0000,-1.0000,
-                      0.0000,0.0000,-1.0000,
-                      -1.0000,-0.0000,0.0000,
-                      -1.0000,-0.0000,0.0000,
-                      -1.0000,-0.0000,0.0000,
-                      0.0000,-1.0000,0.0000,
-                      0.0000,-1.0000,0.0000,
-                      0.0000,-1.0000,0.0000,
-                      0.0000,-0.0000,1.0000,
-                      0.0000,-0.0000,1.0000,
-                      0.0000,-0.0000,1.0000,
-                      1.0000,0.0000,-0.0000,
-                      1.0000,0.0000,-0.0000,
-                      1.0000,0.0000,-0.0000,
-                      1.0000,-0.0000,0.0000,
-                      1.0000,-0.0000,0.0000,
-                      1.0000,-0.0000,0.0000,
-                      0.0000,1.0000,0.0000,
-                      0.0000,1.0000,0.0000,
-                      0.0000,1.0000,0.0000,
-                      -0.0000,1.0000,0.0000,
-                      -0.0000,1.0000,0.0000,
-                      -0.0000,1.0000,0.0000,
-                      0.0000,-0.0000,1.0000,
-                      0.0000,-0.0000,1.0000,
-                      0.0000,-0.0000,1.0000
+                      -1.0f,-0.0f,-0.0f,
+                      -1.0f,-0.0f,-0.0f,
+                      -1.0f,-0.0f,-0.0f,
+                       0.0f,0.0f,-1.0f,
+                       0.0f,0.0f,-1.0f,
+                       0.0f,0.0f,-1.0f,
+                       0.0f,-1.0f,0.0f,
+                       0.0f,-1.0f,0.0f,
+                       0.0f,-1.0f,0.0f,
+                       0.0f,0.0f,-1.0f,
+                       0.0f,0.0f,-1.0f,
+                       0.0f,0.0f,-1.0f,
+                      -1.0f,-0.0f,0.0f,
+                      -1.0f,-0.0f,0.0f,
+                      -1.0f,-0.0f,0.0f,
+                       0.0f,-1.0f,0.0f,
+                       0.0f,-1.0f,0.0f,
+                       0.0f,-1.0f,0.0f,
+                       0.0f,-0.0f,1.0f,
+                       0.0f,-0.0f,1.0f,
+                       0.0f,-0.0f,1.0f,
+                       1.0f,0.0f,-0.0f,
+                       1.0f,0.0f,-0.0f,
+                       1.0f,0.0f,-0.0f,
+                       1.0f,-0.0f,0.0f,
+                       1.0f,-0.0f,0.0f,
+                       1.0f,-0.0f,0.0f,
+                       0.0f,1.0f,0.0f,
+                       0.0f,1.0f,0.0f,
+                       0.0f,1.0f,0.0f,
+                      -0.0f,1.0f,0.0f,
+                      -0.0f,1.0f,0.0f,
+                      -0.0f,1.0f,0.0f,
+                       0.0f,-0.0f,1.0f,
+                       0.0f,-0.0f,1.0f,
+                       0.0f,-0.0f,1.0f
 };
 
 
@@ -185,7 +185,7 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
     unsigned int i=0,z=0,z1=0,z2=0,z3=0;
       for (i=0; i<coordLength/3; i++)
         {
-          z=(i*3)*3;  z1=z;  outputNormal[0]=coords[z1+0];  outputNormal[1]=coords[z1+1]; outputNormal[2]=coords[z1+2];  outputNormal[3]=coords[z1+3];
+          z=(i*3)*3;  z1=z;  outputNormal[0]=coords[z1+0];  outputNormal[1]=coords[z1+1]; outputNormal[2]=coords[z1+2];  outputNormal[3]=1.0f;
           z+=3;       z2=z;
           z+=3;       z3=z;
 
@@ -194,9 +194,9 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
                      coords[z3+0]   , coords[z3+1]   , coords[z3+2]
                      );
 
-          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
-          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
-          fprintf(stderr,"                      %0.4f,%0.4f,%0.4f,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
         }
    fprintf(stderr,"};\n");
 }
