@@ -16,6 +16,8 @@ uniform vec4 fogColorAndScale;
 uniform vec3 lightPosition;
 uniform vec4 lightColor;
 uniform vec4 lightMaterials;
+uniform vec4 materialColor;
+
 
 uniform mat4 modelViewProjection;
 uniform mat4 modelView;
@@ -24,7 +26,7 @@ uniform mat4 normalTransformation;
 
 void main()
 { 
-    vec4 vColor = vec4(1.0,0.0,0.0,1.0); 
+    //vec4 materialColor = vec4(1.0,0.0,0.0,1.0); 
     vec4 vPositionHom = vec4(vPosition,1.0);
 
     theV = modelViewProjection  * vec4(vPosition,1.0);
@@ -37,7 +39,7 @@ void main()
 
     //gl_Position = vec4(vPosition,1.0);
     gl_Position = theV; 
-    color = vColor;
+    color = materialColor;
     fog=0.0;
 }
  
