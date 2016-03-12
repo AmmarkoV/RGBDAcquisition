@@ -12,6 +12,8 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader.h
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.c
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.h
+            opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c
+            opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_hardcoded.c
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_hardcoded.h
             opengl_depth_and_color_renderer/src/save_to_file.c

@@ -16,6 +16,7 @@
 
 #include "glx.h"
 #include "ModelLoader/model_loader_obj.h"
+#include "ModelLoader/model_loader_tri.h"
 #include "scene.h"
 #include "tools.h"
 
@@ -654,7 +655,7 @@ for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
                                     CONVERT MODEL FILE
    --------------------------------------------------------------------------------------
 */
-int dumpModelFile(const char * inputfile,const char * outputfile)
+int dumpModelFileH(const char * inputfile,const char * outputfile)
 {
   struct OBJ_Model * obj = loadObj("Models/",inputfile,0);
 
@@ -759,6 +760,21 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
   unloadObj(obj);
 }
 
+
+int dumpModelFile(const char * inputfile,const char * outputfile)
+{
+  struct OBJ_Model * obj = loadObj("Models/",inputfile,0);
+  struct TRI_Model tri={0};
+  convertObjToTri(&tri , obj);
+
+  char headerOut[256];
+  snprintf(headerOut,256,"%s.h",outputfile);
+  saveModelTriHeader(outputfile,&tri);
+
+  snprintf(headerOut,256,"%s.tri",outputfile);
+  saveModelTri(outputfile,&tri);
+  unloadObj(obj);
+}
 
 
 

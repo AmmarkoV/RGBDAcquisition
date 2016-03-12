@@ -11,6 +11,8 @@ add_library(OGLRendererSandbox SHARED
             ModelLoader/model_loader.h
             ModelLoader/model_loader_obj.c
             ModelLoader/model_loader_obj.h
+            ModelLoader/model_loader_tri.c
+            ModelLoader/model_loader_tri.h
             ModelLoader/model_loader_hardcoded.c
             ModelLoader/model_loader_hardcoded.h
             save_to_file.c
