@@ -6,7 +6,8 @@ in  vec3 vNormal;
 
 out float fog;
 out vec4 color;
-out vec4 theLight;
+out vec4 theLightPosition;
+out vec4 theLightDirection;
 out vec4 theNormal;
 out vec4 theV;
  
@@ -29,8 +30,10 @@ void main()
     theV = modelViewProjection  * vec4(vPosition,1.0);
     theNormal = normalTransformation * vec4(vNormal,1.0);
     
-    theLight=vec4(lightPosition,1.0) - vPositionHom; 
-    normalize(theLight);    
+    theLightPosition=vec4(lightPosition,1.0) - vPositionHom; 
+    theLightDirection=-1*theLightPosition;
+    normalize(theLightPosition);    
+    normalize(theLightDirection);    
 
     //gl_Position = vec4(vPosition,1.0);
     gl_Position = theV; 

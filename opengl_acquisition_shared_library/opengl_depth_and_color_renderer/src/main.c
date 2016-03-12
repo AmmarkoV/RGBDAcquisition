@@ -674,21 +674,23 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
        for(j=0; j<obj->groups[i].numFaces; j++)
 			{
 
-				fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+				fprintf(fd," %0.4f , %0.4f , %0.4f , \n",
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].x,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].y,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].z
                        );
-				fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+				fprintf(fd," %0.4f , %0.4f , %0.4f , \n",
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].x,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].y,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].z
                        );
-				fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+				fprintf(fd," %0.4f , %0.4f , %0.4f ",
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].x,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].y,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].z
                        );
+
+			  if (j+1<obj->groups[i].numFaces) { fprintf(fd," , \n"); }
 			}
 		}
         fprintf(fd,"}; \n\n");
@@ -704,18 +706,18 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
 			{
               if( obj->groups[i].hasNormals)
                   {
-                     fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                     fprintf(fd," %0.4f , %0.4f , %0.4f , \n",
                                  obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n1 ,
                                  obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n2 ,
                                  obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n3
                               );
-                     fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                     fprintf(fd," %0.4f , %0.4f , %0.4f , \n",
                                  obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n1 ,
                                  obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n2 ,
                                  obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n3
                               );
 
-                     fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+                     fprintf(fd," %0.4f , %0.4f , %0.4f ",
                                  obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n1 ,
                                  obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n2 ,
                                  obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n3
@@ -723,22 +725,24 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
                   }
 				else
 				 {
-					fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+					fprintf(fd," %0.4f , %0.4f , %0.4f , \n",
                                  obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
                                  obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
                                  obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
                               );
-					fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+					fprintf(fd," %0.4f , %0.4f , %0.4f , \n",
                                  obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
                                  obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
                                  obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
                               );
-					fprintf(fd," %0.4f , %0.4f , %0.4f , 1.0 , \n",
+					fprintf(fd," %0.4f , %0.4f , %0.4f ",
                                  obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
                                  obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
                                  obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
                               );
 				}
+
+			  if (j+1<obj->groups[i].numFaces) { fprintf(fd," , \n"); }
 			}//FOR J
 		}
 
