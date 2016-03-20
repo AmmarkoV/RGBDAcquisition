@@ -18,7 +18,7 @@ struct Image
   unsigned int channels;
   unsigned int bitsperpixel;
   unsigned int image_size;
-  unsigned int timestamp;
+  unsigned long timestamp;
 };
 
  
