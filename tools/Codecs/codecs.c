@@ -341,7 +341,7 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
 
      #if USE_BMP_FILES
      case BMP_CODEC :
-         WriteBMP(filename,pic,0);
+         WriteBMP(filename,pic);
       break;
      #endif // USE_ASCII_FILES
 

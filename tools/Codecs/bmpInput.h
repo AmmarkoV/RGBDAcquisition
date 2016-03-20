@@ -95,6 +95,7 @@ typedef struct                       /**** Bitmap information structure ****/
 //extern int     SaveDIBitmap(const char *filename, BITMAPINFO *info, GLubyte *bits);
 
 int ReadBMP(char * filename,struct Image * pic,char read_only_header);
+int WriteBMP(char * filename,struct Image * pic);
 
 #  ifdef __cplusplus
 }

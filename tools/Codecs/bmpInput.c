@@ -522,7 +522,7 @@ int ReadBMP(char * filename,struct Image * pic,char read_only_header)
 }
 
 
-int WritePPM(char * filename,struct Image * pic)
+int WriteBMP(char * filename,struct Image * pic)
 {
   fprintf(stderr,"BMP writing is not tied up to rest of codec library %s\n",filename);
   //BITMAPINFO info={0};
