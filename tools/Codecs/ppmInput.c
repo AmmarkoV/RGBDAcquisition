@@ -186,7 +186,7 @@ int WritePPM(char * filename,struct Image * pic)
             return 1;
         }
 
-        fprintf(fd, "%d %d\n%u\n", pic->width, pic->height , simplePow(2 ,pic->bitsperpixel)-1);
+        fprintf(fd, "%d %d\n%u\n", pic->width, pic->height , simplePowCodecs(2 ,pic->bitsperpixel)-1);
 
         float tmp_n = (float) pic->bitsperpixel/ 8;
         tmp_n = tmp_n *  pic->width * pic->height * pic->channels ;

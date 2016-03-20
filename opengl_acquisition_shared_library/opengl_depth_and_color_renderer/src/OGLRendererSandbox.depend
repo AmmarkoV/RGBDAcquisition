@@ -189,16 +189,15 @@
 
 1360189243 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/ppm.h
 
-1433774194 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
+1458487951 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<GL/gl.h>
 	<GL/glx.h>
+	"../../../../tools/Codecs/codecs.h"
 	"../ModelLoader/model_loader.h"
 	"texture_loader.h"
-	"bmp.h"
-	"ppm.h"
 
 1433771604 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/tiledRenderer.c
 	<GL/gl.h>
@@ -378,7 +377,8 @@
 	"patternSets.h"
 	"../Codecs/codecs.h"
 
-1403101764 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/codecs.h
+1458488010 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/codecs.h
+	"../Primitives/image.h"
 
 1414500243 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/resize.c
 	"resize.h"
@@ -394,7 +394,7 @@
 
 1452271790 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/image.h
 
-1457805602 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c
+1457808463 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c
 	"model_loader_tri.h"
 	<stdio.h>
 	<stdlib.h>

@@ -49,6 +49,7 @@
 			<Add library="GL" />
 			<Add library="GLU" />
 			<Add library="X11" />
+			<Add library="../../../tools/Codecs/libCodecs.a" />
 		</Linker>
 		<Unit filename="../../../tools/AmMatrix/collisions.c">
 			<Option compilerVar="CC" />
@@ -131,14 +132,6 @@
 		</Unit>
 		<Unit filename="ModelLoader/model_loader_tri.h" />
 		<Unit filename="OGLRendererSandbox.h" />
-		<Unit filename="TextureLoader/bmp.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TextureLoader/bmp.h" />
-		<Unit filename="TextureLoader/ppm.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="TextureLoader/ppm.h" />
 		<Unit filename="TextureLoader/texture_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

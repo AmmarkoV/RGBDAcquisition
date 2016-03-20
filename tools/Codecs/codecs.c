@@ -79,7 +79,7 @@
 #define WHITE   "\033[37m"      /* White */
 
 
-unsigned int simplePow(unsigned int base,unsigned int exp)
+unsigned int simplePowCodecs(unsigned int base,unsigned int exp)
 {
     if (exp==0) return 1;
     unsigned int retres=base;
@@ -108,6 +108,26 @@ int refreshImage(struct Image * img)
 }
 
 
+unsigned int guessFilenameTypeStupid(char * filename)
+{
+  fprintf(stderr,"Guessing filename type for `%s` \n" , filename);
+  if (strcasestr(filename,".BMP")!=0)   { return BMP_CODEC; } else
+  if (strcasestr(filename,".RLE")!=0)   { return BMP_CODEC; } else
+  if (strcasestr(filename,".JPG")!=0)   { return JPG_CODEC; } else
+  if (strcasestr(filename,".JPEG")!=0)  { return JPG_CODEC; } else
+  if (strcasestr(filename,".PNG")!=0)   { return PNG_CODEC; } else
+  if (strcasestr(filename,".CPNM")!=0)  { return COMPATIBLE_PNM_CODEC; } else
+  if (strcasestr(filename,".PNM")!=0)   { return PNM_CODEC; } else
+  if (strcasestr(filename,".PPM")!=0)   { return PPM_CODEC; } else
+  if (strcasestr(filename,".ASCII")!=0) { return ASCII_CODEC; } else
+  if (strcasestr(filename,".TEXT")!=0) { return ASCII_CODEC; } else
+  if (strcasestr(filename,".TXT")!=0) { return ASCII_CODEC; }
+
+ return  NO_CODEC;
+}
+
+
+
 struct Image * readImage( char *filename,unsigned int type,char read_only_header)
 {
 
@@ -115,6 +135,15 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
    img = (struct Image *) malloc( sizeof(struct Image) );
    memset(img,0,sizeof(struct Image));
    img->pixels=0; // :P just to make sure
+
+
+   if (type==NO_CODEC)
+   {
+     unsigned int suggestedType = guessFilenameTypeStupid(filename);
+     type=suggestedType;
+     fprintf(stderr,"Using type %u loader for image %s \n",type,filename);
+   }
+
 
    switch (type)
    {
@@ -439,26 +468,6 @@ struct Image * copyImage( struct Image * inputImage)
  memcpy(newImage->pixels,inputImage->pixels,logicalSize);
 
  return newImage;
-}
-
-
-
-unsigned int guessFilenameTypeStupid(char * filename)
-{
-  fprintf(stderr,"Guessing filename type for `%s` \n" , filename);
-  if (strcasestr(filename,".BMP")!=0)   { return BMP_CODEC; } else
-  if (strcasestr(filename,".RLE")!=0)   { return BMP_CODEC; } else
-  if (strcasestr(filename,".JPG")!=0)   { return JPG_CODEC; } else
-  if (strcasestr(filename,".JPEG")!=0)  { return JPG_CODEC; } else
-  if (strcasestr(filename,".PNG")!=0)   { return PNG_CODEC; } else
-  if (strcasestr(filename,".CPNM")!=0)  { return COMPATIBLE_PNM_CODEC; } else
-  if (strcasestr(filename,".PNM")!=0)   { return PNM_CODEC; } else
-  if (strcasestr(filename,".PPM")!=0)   { return PPM_CODEC; } else
-  if (strcasestr(filename,".ASCII")!=0) { return ASCII_CODEC; } else
-  if (strcasestr(filename,".TEXT")!=0) { return ASCII_CODEC; } else
-  if (strcasestr(filename,".TXT")!=0) { return ASCII_CODEC; }
-
- return  NO_CODEC;
 }
 
 

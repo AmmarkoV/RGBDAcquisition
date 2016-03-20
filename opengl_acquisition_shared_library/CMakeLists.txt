@@ -1,6 +1,27 @@
 project( OpenGLAcquisition ) 
 cmake_minimum_required( VERSION 2.8.7 )  
   
+
+IF( ENABLE_JPG )
+ MESSAGE("JPGs will be included in this OpenGL Codec build")
+ set(JPG_Libs jpeg ) 
+ set(JPG_Parts jpgInput.c jpgInput.h jpgExifexternal.c jpgExifexternal.h jpgExiforient_embed.c jpgExiforient_embed.h )
+ set(JPG_Includes ${CMAKE_SOURCE_DIR}/3dparty/OpenNI2/Include/ )
+ add_definitions(-DUSE_JPG_FILES)
+ add_definitions(-DENABLE_JPG)
+ENDIF( ENABLE_JPG )
+
+
+IF( ENABLE_PNG )
+ MESSAGE("PNGs will be included in this OpenGL Codec build")
+ set(PNG_Libs png ) 
+ set(PNG_Parts pngInput.c pngInput.h)
+ set(PNG_Includes ${CMAKE_SOURCE_DIR}/3dparty/OpenNI2/Include/ )
+ add_definitions(-DUSE_PNG_FILES)
+ add_definitions(-DENABLE_PNG)
+ENDIF( ENABLE_PNG )
+
+
 add_library(OpenGLAcquisition SHARED 
             OpenGLAcquisition.c
             OpenGLAcquisition.h
@@ -44,11 +65,7 @@ add_library(OpenGLAcquisition SHARED
             ../tools/ImageOperations/patchComparison.c
             ../tools/ImageOperations/patchComparison.h 
             ../tools/ImageOperations/resize.c 
-            #Rest of the stuff 
-            opengl_depth_and_color_renderer/src/TextureLoader/bmp.c
-            opengl_depth_and_color_renderer/src/TextureLoader/bmp.h
-            opengl_depth_and_color_renderer/src/TextureLoader/ppm.c
-            opengl_depth_and_color_renderer/src/TextureLoader/ppm.h
+            #Rest of the stuff  
             opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
             opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h
             opengl_depth_and_color_renderer/src/TextureLoader/image_proc.c
@@ -66,7 +83,7 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/Interfaces/webInterface.c 
             opengl_depth_and_color_renderer/src/Interfaces/webInterface.h
            ) 
-target_link_libraries(OpenGLAcquisition rt m CalibrationLibrary GL GLU X11 ) 
+target_link_libraries(OpenGLAcquisition rt m CalibrationLibrary GL GLU X11 Codecs ${PNG_Libs} ${JPG_Libs}) 
  
  
 

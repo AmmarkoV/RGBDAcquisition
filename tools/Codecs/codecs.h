@@ -70,7 +70,7 @@ struct Image
 */
 
 
-unsigned int simplePow(unsigned int base,unsigned int exp);
+unsigned int simplePowCodecs(unsigned int base,unsigned int exp);
 
 int refreshImage(struct Image * img);
 

@@ -4,10 +4,9 @@
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
 
+#include "../../../../tools/Codecs/codecs.h"
 #include "../ModelLoader/model_loader.h"
 #include "texture_loader.h"
-#include "bmp.h"
-#include "ppm.h"
 
 
 
@@ -27,27 +26,10 @@ GLuint loadTexture(int type,char * directory ,char *fname)
 	GLubyte *bits;
 	unsigned int width=0;
 	unsigned int height=0;
+	unsigned int bitsperpixel=0;
+	unsigned int channels=0;
 
-
-  if ( strstr(fname,".bmp") != 0 )
-    {
-      //BMP LOADER HERE
-	  BITMAPINFO *info;
-	  bits=LoadDIBitmap(fname,&info);
-      if (bits==0) { printf("Cannot Make Texture of %s \n",fname); return 0;}
-      width = info->bmiHeader.biWidth ;
-      height = info->bmiHeader.biHeight;
-    }
-     else
-  if (
-      ( strstr(fname,".ppm") != 0 ) ||
-      ( strstr(fname,".pnm") != 0 )
-     )
-    {
-      //PPM LOADER
-      bits = ( GLubyte * ) ReadPPM((char *) fullPath,&width,&height);
-    }
-
+    bits = ( GLubyte * ) readImageRaw(fullPath,0 /*AUTO*/,&width,&height,&bitsperpixel,&channels);
 
     glGenTextures(1,&tex);
 	glBindTexture(GL_TEXTURE_2D,tex);
