@@ -58,16 +58,12 @@ GLuint loadTexture(int type,char * directory ,char *fname)
 
 	glTexImage2D ( GL_TEXTURE_2D, 0, 3, width, height , 0, GL_RGB, GL_UNSIGNED_BYTE, bits);
 
-
-
-    // mip mapping
+    //mip mapping
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_NEAREST);
-//	gluBuild2DMipmaps( GL_TEXTURE_2D, 3,
-	//	               info->bmiHeader.biWidth, info->bmiHeader.biHeight,
-		//			   GL_BGR_EXT, GL_UNSIGNED_BYTE, bits );
-
-
+    //gluBuild2DMipmaps( GL_TEXTURE_2D, 3,
+	//                   info->bmiHeader.biWidth, info->bmiHeader.biHeight,
+	//			         GL_BGR_EXT, GL_UNSIGNED_BYTE, bits );
 
     free(bits);
     fprintf(stderr,"Survived and made texture %u ",tex);
