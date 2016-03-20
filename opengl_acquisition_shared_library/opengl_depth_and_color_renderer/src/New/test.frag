@@ -1,17 +1,23 @@
 #version 150 core
  
+
+uniform sampler2D tex1;
+
+
 in vec4 theNormal;
 in vec4 theV;
 in vec4 theLightPosition;
 in vec4 theLightDirection;
 in vec4 color;
+in vec2 theTexCoords;
 
 out  vec4  colorOUT;
- 
 
 uniform vec4 fogColorAndScale; 
 uniform vec4 lightColor;
 uniform vec4 lightMaterials;
+
+
 float shininess=0.3;
 float constantAttenuation=0.2;
 float linearAttenuation=0.3;
@@ -187,8 +193,11 @@ void main()
                   Specular
                 );
      }
+    
+    vec4 colorUsed = color;
+    colorUsed = texture2D(tex1, theTexCoords );
 
-    colorOUT = color + Ambient   + Diffuse + Specular;
+    colorOUT = colorUsed + Ambient   + Diffuse + Specular;
     colorOUT[3]=1.0;
         
     //colorOUT = vec4(0.0,1.0,0.0,1.0); 

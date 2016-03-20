@@ -39,10 +39,7 @@ GLuint loadTexture(int type,char * directory ,char *fname)
 
 	GLuint tex=0;
 	GLubyte *bits;
-	unsigned int width=0;
-	unsigned int height=0;
-	unsigned int bitsperpixel=0;
-	unsigned int channels=0;
+	unsigned int width=0 , height=0 , bitsperpixel=0 , channels=0;
 
     bits = ( GLubyte * ) readImageRaw(fullPath,0 /*AUTO*/,&width,&height,&bitsperpixel,&channels);
 
@@ -56,7 +53,7 @@ GLuint loadTexture(int type,char * directory ,char *fname)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, type);
 	//glTexImage2D ( GL_TEXTURE_2D, 0, 3, width, height , 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, bits);
 
-	glTexImage2D ( GL_TEXTURE_2D, 0, 3, width, height , 0, GL_RGB, GL_UNSIGNED_BYTE, bits);
+	glTexImage2D ( GL_TEXTURE_2D, 0 /*BASE IMAGE LEVEL */,GL_RGB, width, height , 0,GL_RGB, GL_UNSIGNED_BYTE, bits);
 
     //mip mapping
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);

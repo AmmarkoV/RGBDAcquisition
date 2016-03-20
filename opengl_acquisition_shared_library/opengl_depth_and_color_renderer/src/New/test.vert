@@ -2,6 +2,7 @@
  
 in  vec3 vPosition; 
 in  vec3 vNormal;    
+in  vec2 vTexture;    
 //in  vec4 vMaterial; // Specular , Diffuse , Ambient , Shine(?)
  
 out vec4 color;
@@ -9,6 +10,7 @@ out vec4 theLightPosition;
 out vec4 theLightDirection;
 out vec4 theNormal;
 out vec4 theV;
+out vec2 theTexCoords;
  
 uniform vec4 fogColorAndScale;
 
@@ -37,6 +39,7 @@ void main()
  
     //gl_Position = vec4(vPosition,1.0);
     gl_Position = theV; 
+    theTexCoords = vTexture;
     color = materialColor; 
 }
  
