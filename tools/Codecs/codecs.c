@@ -66,8 +66,6 @@
 
 #define DEBUG_READING_IMAGES 0
 
-
-
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -120,8 +118,8 @@ unsigned int guessFilenameTypeStupid(char * filename)
   if (strcasestr(filename,".PNM")!=0)   { return PNM_CODEC; } else
   if (strcasestr(filename,".PPM")!=0)   { return PPM_CODEC; } else
   if (strcasestr(filename,".ASCII")!=0) { return ASCII_CODEC; } else
-  if (strcasestr(filename,".TEXT")!=0) { return ASCII_CODEC; } else
-  if (strcasestr(filename,".TXT")!=0) { return ASCII_CODEC; }
+  if (strcasestr(filename,".TEXT")!=0)  { return ASCII_CODEC; } else
+  if (strcasestr(filename,".TXT")!=0)   { return ASCII_CODEC; }
 
  return  NO_CODEC;
 }

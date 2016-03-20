@@ -4,10 +4,18 @@
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
 
-#include "../../../../tools/Codecs/codecs.h"
 #include "../ModelLoader/model_loader.h"
 #include "texture_loader.h"
 
+
+#define USE_CODECS_LIBRARY 1
+
+
+#if USE_CODECS_LIBRARY
+ #include "../../../../tools/Codecs/codecs.h"
+#else
+ #warning "NOT USING CODECS LIBRARY MEANS NO TEXTURES LOADED"
+#endif // USE_CODECS_LIBRARY
 
 
 // TODO HERE : CHECK FOR DUPLICATE TEXTURES , ETC ...
@@ -15,6 +23,13 @@
 
 GLuint loadTexture(int type,char * directory ,char *fname)
 {
+  #if USE_CODECS_LIBRARY
+   fprintf(stderr,"Using Codecs Library to load texture %s \n",fname);
+  #else
+   fprintf(stderr,"These library is compiled without the codecs Library\n Cannot load texture %s \n",fname);
+   return 0;
+  #endif // USE_CODECS_LIBRARY
+
     char fullPath[MAX_MODEL_PATHS*2 + 2 ]={0};
     strncpy(fullPath,directory,MAX_MODEL_PATHS);
     strcat(fullPath,"/");
