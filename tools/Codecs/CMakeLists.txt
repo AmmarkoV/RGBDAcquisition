@@ -26,6 +26,8 @@ add_library(
             Codecs STATIC
             ppmInput.c
             ppmInput.h
+            bmpInput.c
+            bmpInput.h
             asciiInput.c
             asciiInput.h
             ${PNG_Parts}

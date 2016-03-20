@@ -39,6 +39,15 @@
 #endif // USE_PNG_FILES
 
 
+#if USE_BMP_FILES
+      #include "bmpInput.h"
+  // #warning "BMP Support active"
+#else
+  #warning "BMP Support is disabled in this build of Image Codecs"
+#endif // USE_BMP_FILES
+
+
+
 #if USE_PPM_FILES
       #include "ppmInput.h"
 #else
@@ -194,6 +203,19 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
      break;
 
 
+     case BMP_CODEC :
+     #if USE_BMP_FILES
+       if (!ReadBMP(filename,img,read_only_header))
+         {
+           fprintf(stderr,RED "Error reading file %s using bmp reader" NORMAL , filename);
+           free(img);
+           img=0;
+         }
+     #else
+      fprintf(stderr,RED "BMP File requested (%s) , but this build of Codec Library does not have PNM/PPM Support :(" NORMAL , filename);
+     #endif
+     break;
+
 
       default :
        free(img);
@@ -316,6 +338,13 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
      #endif // USE_ASCII_FILES
 
 
+
+     #if USE_BMP_FILES
+     case BMP_CODEC :
+         WriteBMP(filename,pic,0);
+      break;
+     #endif // USE_ASCII_FILES
+
       default :
         break;
    };
@@ -417,6 +446,8 @@ struct Image * copyImage( struct Image * inputImage)
 unsigned int guessFilenameTypeStupid(char * filename)
 {
   fprintf(stderr,"Guessing filename type for `%s` \n" , filename);
+  if (strcasestr(filename,".BMP")!=0)   { return BMP_CODEC; } else
+  if (strcasestr(filename,".RLE")!=0)   { return BMP_CODEC; } else
   if (strcasestr(filename,".JPG")!=0)   { return JPG_CODEC; } else
   if (strcasestr(filename,".JPEG")!=0)  { return JPG_CODEC; } else
   if (strcasestr(filename,".PNG")!=0)   { return PNG_CODEC; } else

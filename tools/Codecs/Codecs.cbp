@@ -47,6 +47,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="asciiInput.h" />
+		<Unit filename="bmpInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bmpInput.h" />
 		<Unit filename="codecs.c">
 			<Option compilerVar="CC" />
 		</Unit>

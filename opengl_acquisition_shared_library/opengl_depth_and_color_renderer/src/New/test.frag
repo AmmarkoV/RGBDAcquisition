@@ -1,6 +1,5 @@
 #version 150 core
-
-in float fog;
+ 
 in vec4 theNormal;
 in vec4 theV;
 in vec4 theLightPosition;
@@ -196,7 +195,12 @@ void main()
     //colorOUT = color; //No shading done
        
     //Add Fog
-    //colorOUT = mix(fogColorAndScale, colorOUT, 1.0-fog);
+    //GL_EXP fog    
+    float fogScale = fogColorAndScale.w;
+    float fog=exp(- fogScale * abs(theV.w));
+    fog = clamp(fog, 0.0, 1.0);
+    vec4 fogColor = vec4(fogColorAndScale.r,fogColorAndScale.g,fogColorAndScale.b,1.0);     
+    colorOUT = mix(fogColor, colorOUT, fog);
 
     colorOUT = clamp(colorOUT, 0.0, 1.0);    
   

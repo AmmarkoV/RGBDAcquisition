@@ -36,6 +36,7 @@ extern "C"
 //#define USE_JPG_FILES 1
 //#define USE_PNG_FILES 1
 #define USE_PPM_FILES 1
+#define USE_BMP_FILES 1
 #define USE_ASCII_FILES 1
 
 
@@ -49,7 +50,10 @@ enum codecTypeList
    COMPATIBLE_PNM_CODEC ,
    PNM_CODEC ,
    PNG_CODEC ,
-   ASCII_CODEC
+   ASCII_CODEC ,
+   BMP_CODEC ,
+   //- - - - - - - - -
+   EXISTING_CODECS
 };
 
 /*

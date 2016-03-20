@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "codecs.h"
 #include "ppmInput.h"
 
 #define PRINT_COMMENTS 1
