@@ -768,7 +768,7 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
   convertObjToTri(&tri , obj);
 
   char headerOut[256];
-  saveModelTriHeader(outputfile,&tri);
+  //saveModelTriHeader(outputfile,&tri);
 
   snprintf(headerOut,256,"%s.tri",outputfile);
   saveModelTri(headerOut,&tri);

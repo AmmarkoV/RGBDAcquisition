@@ -33,23 +33,36 @@
 GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 
 
+#define TEXHALF 0.5
 #define U 0.5
+#define PLANE 18.0
 
 float planeCoords[]={ //X  Y  Z       W
                      //Bottom
-                     -U, -U, -U,   // bottom left
-                     -U, -U,  U,   // top left
-                      U, -U,  U,   // top right
+                      U*PLANE, -U*PLANE,  U*PLANE, //1.0,  // top right
+                     -U*PLANE, -U*PLANE,  U*PLANE, //1.0,  // top left
+                     -U*PLANE, -U*PLANE, -U*PLANE, //1.0,  // bottom left
 
-                     -U, -U, -U,   // bottom right
-                      U, -U,  U,   // bottom left corner
-                      U, -U, -U   // top left corner
+                      U*PLANE, -U*PLANE, -U*PLANE,  //, 1.0 // bottom right
+                      U*PLANE, -U*PLANE,  U*PLANE,//1.0,   // top right
+                     -U*PLANE, -U*PLANE, -U*PLANE //1.0,  // bottom left
                   };
 float planeNormals[]={ //X  Y  Z       W
                       //Bottom
-                      0.0f, 1.0f , 0.0f ,
-                      0.0f, 1.0f , 0.0f
+                      0.0f, 1.0f , 0.0f ,// 1.0,
+                      0.0f, 1.0f , 0.0f //, 1.0
                   };
+
+float planeTexCoords[]={ //X  Y  Z       W
+                        //Bottom
+                         1.0f, 1.0f, // top right
+                         0.0f, 1.0f, // top left
+                         0.0f, 0.0f, // bottom left
+
+                         1.0f, 0.0f,  // bottom right
+                         1.0f, 1.0f, // top right
+                         0.0f, 0.0f // bottom left
+                     };
 
 
 float cubeCoords[]=
@@ -129,41 +142,90 @@ float cubeNormals[]={ //X  Y  Z  W
                        0.0f,-0.0f,1.0f,
                        0.0f,-0.0f,1.0f
 };
-
+float cubeTexCoords[]={ //X  Y  Z       W
+                        //Bottom
+                         0.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 1.0f,
+                         1.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 0.0f,
+                         0.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 1.0f,
+                         1.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 0.0f,
+                         0.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 1.0f,
+                         1.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 0.0f,
+                         0.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 1.0f,
+                         1.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 0.0f,
+                         0.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 1.0f,
+                         1.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 0.0f,
+                         0.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 1.0f,
+                         1.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 0.0f,
+                         0.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 1.0f,
+                         1.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 0.0f,
+                         0.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 1.0f,
+                         1.0f, 1.0f,
+                         0.0f, 0.0f,
+                         1.0f, 0.0f
+                     };
 
 
 
 float pyramidCoords[]={ //X  Y  Z       W
                      //Far
                      -U, -U, -U,      // bottom left
-                      0,  U,  0,      // top left
-                      U, -U, -U,      // top right
+                      0,  U,  0,      // top
+                      U, -U, -U,      // bottom right
 
                      //Near
-                      -U, -U,  U,      // bottom left
+                      -U, -U,  U,      // top left
                        U, -U,  U,      // top right
-                       0,  U,  0,      // top left
+                       0,  U,  0,      // top
 
                      //Left
-                      -U, -U, -U,      // bottom left
-                      -U, -U,  U,      // top right
-                       0,  U,  0,      // top left
+                      -U, -U, -U,       // bottom left
+                      -U, -U,  U,      // top left
+                       0,  U,  0,      // top
 
                      //Right
-                       U, -U, -U,      // bottom left
-                       0,  U,  0,      // top left
+                       U, -U, -U,      // bottom right
+                       0,  U,  0,      // top
                        U, -U,  U,      // top right
 
 
                      //Bottom
-                     -U, -U, -U,      // bottom left
-                      U, -U,  U,      // top right
-                     -U, -U,  U,      // top left
+                     -U, -U,  U, //1.0,  // top left
+                     -U, -U, -U, //1.0,  // bottom left
+                      U, -U,  U, //1.0,  // top right
 
-                     -U, -U, -U,      // bottom right
-                      U, -U, -U,      // top left corner
-                      U, -U,  U       // bottom left corner
-
+                      U, -U,  U,//1.0,   // top right
+                     -U, -U, -U, //1.0,  // bottom left
+                      U, -U, -U  //, 1.0 // bottom right
                     };
 float pyramidNormals[]={ //X  Y  Z  W
                       0.0,0.4472,-0.8944,
@@ -173,6 +235,35 @@ float pyramidNormals[]={ //X  Y  Z  W
                       0.0,-1.0,0.0,
                       0.0,-1.0,0.0
 };
+float pyramidTexCoords[]={ //X  Y  Z       W
+                     //Far
+                         0.0f, 0.0f,    // bottom left
+                         TEXHALF, 0.0f, // top
+                         1.0f, 0.0f,    // bottom right
+
+                     //Near
+                         0.0f, 1.0f, // top left
+                         1.0f, 1.0f, // top right
+                         TEXHALF, 0.0f, // top
+
+                     //Left
+                         0.0f, 0.0f, // bottom left
+                         0.0f, 1.0f, // top left
+                         TEXHALF, 0.0f, // top
+
+                     //Right
+                         1.0f, 0.0f,  // bottom right
+                         TEXHALF, 0.0f, // top
+                         1.0f, 1.0f, // top right
+
+                     //Bottom
+                         0.0f, 1.0f, // top left
+                         0.0f, 0.0f, // bottom left
+                         1.0f, 1.0f, // top right
+                         1.0f, 1.0f, // top right
+                         0.0f, 0.0f, // bottom left
+                         1.0f, 0.0f  // bottom right
+                     };
 
 
 

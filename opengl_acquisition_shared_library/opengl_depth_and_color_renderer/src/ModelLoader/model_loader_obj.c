@@ -1291,6 +1291,8 @@ int unloadObj(struct OBJ_Model * obj)
 
 }
 
+
+
 struct OBJ_Model * loadObj(char * directory,char * filename,int compileDisplayList)
 {
     fprintf(stderr,"Starting to load object %s \n",filename);
@@ -1323,4 +1325,3 @@ struct OBJ_Model * loadObj(char * directory,char * filename,int compileDisplayLi
 
    return obj;
 }
-
