@@ -11,6 +11,7 @@ out vec4 theLightDirection;
 out vec4 theNormal;
 out vec4 theV;
 out vec2 theTexCoords;
+out vec3 theEnvReflectDirection;
  
 uniform vec4 fogColorAndScale;
 
@@ -18,8 +19,7 @@ uniform vec3 lightPosition;
 uniform vec4 lightColor;
 uniform vec4 lightMaterials;
 uniform vec4 materialColor;
-
-
+ 
 uniform mat4 modelViewProjection;
 uniform mat4 modelView;
 uniform mat4 normalTransformation;
@@ -41,6 +41,8 @@ void main()
     gl_Position = theV; 
     theTexCoords = vTexture;
     color = materialColor; 
+ 
+    theEnvReflectDirection= reflect(theV.xyz, vNormal); 
 }
  
  

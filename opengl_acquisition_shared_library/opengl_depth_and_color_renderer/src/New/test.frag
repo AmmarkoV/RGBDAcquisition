@@ -1,8 +1,7 @@
-#version 150 core
- 
-
+#version 150 core 
 uniform sampler2D tex1;
-
+uniform sampler2D normalTexture;
+uniform samplerCube skybox;
 
 in vec4 theNormal;
 in vec4 theV;
@@ -10,12 +9,20 @@ in vec4 theLightPosition;
 in vec4 theLightDirection;
 in vec4 color;
 in vec2 theTexCoords;
+in vec3 theEnvReflectDirection;
 
-out  vec4  colorOUT;
 
+
+out  vec4  colorOUT; 
+
+uniform vec4 textureStrength;
 uniform vec4 fogColorAndScale; 
 uniform vec4 lightColor;
 uniform vec4 lightMaterials;
+
+
+
+
 
 
 float shininess=0.3;
@@ -144,12 +151,14 @@ specular +=  lightColor * lightMaterials[2] * pf * attenuation;
 
 
 void main()
-{ 
-
+{   
+   vec3 texNormal = texture2D(normalTexture, theTexCoords).rgb ;    
+   vec4 usedNormal = mix(theNormal,vec4( normalize(texNormal) , 1.0 ),textureStrength[2]); 
+     
    vec4 eye=vec4(0.0,0.0,0.0,1.0);  
    vec4 L = theLightPosition;   
    vec4 E = normalize(-theV); // we are in Eye Coordinates, so EyePos is (0,0,0)  
-   //vec4 R = normalize(-reflect(L,theNormal));  
+   //vec4 R = normalize(-reflect(L,usedNormal));  
    vec4 R = normalize( L + E );
  
 
@@ -162,7 +171,7 @@ void main()
       DirectionalLight( 
                       theLightPosition ,
                       R,
-                      theNormal ,
+                      usedNormal ,
                       Ambient,
                       Diffuse,
                       Specular
@@ -172,7 +181,7 @@ void main()
      {
       PointLight( theLightPosition,
                  R,
-                 theNormal,
+                 usedNormal,
                  eye,
                  eye,
                  Ambient,
@@ -185,7 +194,7 @@ void main()
        SpotLight( theLightPosition,
                   theLightDirection,
                   R,
-                  theNormal,
+                  usedNormal,
                   eye,
                   eye,
                   Ambient,
@@ -194,8 +203,14 @@ void main()
                 );
      }
     
-    vec4 colorUsed = color;
-    colorUsed = texture2D(tex1, theTexCoords );
+    vec4 colorBasic = color;
+    vec4 colorTexture = texture2D(tex1,theTexCoords); 
+    vec3 envColor3 = vec3(texture(skybox,theEnvReflectDirection));
+    vec4 envColor = vec4(envColor3,1.0);    
+
+    vec4 colorUsed = mix(colorBasic,colorTexture,textureStrength[0]);
+    colorUsed = mix(colorUsed,envColor,textureStrength[1]); 
+
 
     colorOUT = colorUsed + Ambient   + Diffuse + Specular;
     colorOUT[3]=1.0;
@@ -214,4 +229,5 @@ void main()
     colorOUT = clamp(colorOUT, 0.0, 1.0);    
   
 }
+
 
