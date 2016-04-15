@@ -35,6 +35,7 @@ extern "C"
 //FORCE SOME LIBRARIES HERE MAYBE ( this breaks the CMake Way of enabling / disabling libs )
 //#define USE_JPG_FILES 1
 //#define USE_PNG_FILES 1
+#define USE_PFM_FILES 1
 #define USE_PPM_FILES 1
 #define USE_BMP_FILES 1
 #define USE_ASCII_FILES 1
@@ -46,6 +47,7 @@ enum codecTypeList
 {
    NO_CODEC = 0,
    JPG_CODEC ,
+   PFM_CODEC ,
    PPM_CODEC ,
    COMPATIBLE_PNM_CODEC ,
    PNM_CODEC ,

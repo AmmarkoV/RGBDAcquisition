@@ -56,6 +56,14 @@
 
 
 
+#if USE_PFM_FILES
+      #include "pfmInput.h"
+#else
+  #error "PFM Support is disabled in this build of Image Codecs and this doesnt make any sense since we have it hardcoded"
+#endif // USE_PPM_FILES
+
+
+
 
 #if USE_ASCII_FILES
       #include "asciiInput.h"
@@ -162,6 +170,26 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 	    #endif
      #else
        fprintf(stderr,RED "JPG File requested (%s) , but this build of Codec Library does not have JPG Support :(" NORMAL , filename);
+     #endif
+     break;
+
+     case PFM_CODEC :
+     #if USE_PFM_FILES
+       //fprintf(stderr,GREEN "PNG Loader active" NORMAL , filename);
+       if (!ReadPFM(filename,img,read_only_header))
+         {
+           fprintf(stderr,RED "Could error reading file %s using pfm reader" NORMAL , filename);
+           free(img);
+           img=0;
+         }
+        #if DEBUG_READING_IMAGES
+	     char ppmfilename[512]={0};
+	     strcpy(ppmfilename,filename);
+	     strcat(ppmfilename,".ppm");
+	     WritePPM(ppmfilename,img);
+	    #endif
+     #else
+       fprintf(stderr,RED "PNG File requested (%s) , but this build of Codec Library does not have PNG Support :(" NORMAL , filename);
      #endif
      break;
 

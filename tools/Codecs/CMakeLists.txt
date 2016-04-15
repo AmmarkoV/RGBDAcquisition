@@ -24,6 +24,8 @@ ENDIF( ENABLE_PNG )
 
 add_library(
             Codecs STATIC
+            pfmInput.c
+            pfmInput.h
             ppmInput.c
             ppmInput.h
             bmpInput.c

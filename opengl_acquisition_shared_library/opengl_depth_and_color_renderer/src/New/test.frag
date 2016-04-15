@@ -18,13 +18,11 @@ out  vec4  colorOUT;
 uniform vec4 textureStrength;
 uniform vec4 fogColorAndScale; 
 uniform vec4 lightColor;
+uniform vec4 HDRSettings;
 uniform vec4 lightMaterials;
 
 
-
-
-
-
+ 
 float shininess=0.3;
 float constantAttenuation=0.2;
 float linearAttenuation=0.3;
@@ -206,10 +204,15 @@ void main()
     vec4 colorBasic = color;
     vec4 colorTexture = texture2D(tex1,theTexCoords); 
     vec3 envColor3 = vec3(texture(skybox,theEnvReflectDirection));
+  
+ 
     vec4 envColor = vec4(envColor3,1.0);    
 
     vec4 colorUsed = mix(colorBasic,colorTexture,textureStrength[0]);
     colorUsed = mix(colorUsed,envColor,textureStrength[1]); 
+
+
+
 
 
     colorOUT = colorUsed + Ambient   + Diffuse + Specular;
@@ -226,7 +229,15 @@ void main()
     vec4 fogColor = vec4(fogColorAndScale.r,fogColorAndScale.g,fogColorAndScale.b,1.0);     
     colorOUT = mix(fogColor, colorOUT, fog);
 
-    colorOUT = clamp(colorOUT, 0.0, 1.0);    
+
+
+    float exposure = HDRSettings[0];
+    float gamma = HDRSettings[1];
+    vec4 mappedEnvColor = vec4(1.0) - exp(-colorOUT * exposure); 
+    mappedEnvColor = pow(mappedEnvColor, vec4(1.0 / gamma));
+
+
+    colorOUT = clamp(mappedEnvColor, 0.0, 1.0);    
   
 }
 
