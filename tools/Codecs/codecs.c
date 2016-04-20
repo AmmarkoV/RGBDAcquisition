@@ -189,7 +189,7 @@ struct Image * readImage( char *filename,unsigned int type,char read_only_header
 	     WritePPM(ppmfilename,img);
 	    #endif
      #else
-       fprintf(stderr,RED "PNG File requested (%s) , but this build of Codec Library does not have PNG Support :(" NORMAL , filename);
+       fprintf(stderr,RED "PFM File requested (%s) , but this build of Codec Library does not have PFM Support :(" NORMAL , filename);
      #endif
      break;
 

@@ -30,6 +30,7 @@ add_library(
             patchComparison.c
             patchComparison.h
             patternSets.c
+            projection.c
             resize.c
             splitMPO.c 
             bilateralFilter.c

@@ -67,6 +67,8 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="jpgInput.h" />
+		<Unit filename="pfmInput.cpp" />
+		<Unit filename="pfmInput.h" />
 		<Unit filename="pngInput.c">
 			<Option compilerVar="CC" />
 		</Unit>
