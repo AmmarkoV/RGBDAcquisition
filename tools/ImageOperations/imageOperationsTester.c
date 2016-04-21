@@ -40,13 +40,14 @@ int runFilter(int argc, char *argv[])
 
         if ( strcmp(argv[i],"--envcube")==0 )
         {
+          fprintf(stdout,"Converting Environment Cube \n");
           unsigned int outputType = guessFilenameTypeStupid(filenameOutput);
-          outputImage = readImage(filenameOutput,outputType ,0);
+          outputImage = createSameDimensionsImage(inputImage);
 
-          float noise = calculatePSNR( outputImage->pixels ,  outputImage->width , outputImage->height , outputImage->channels ,
-                                       inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels );
+         createCubeMapFace(  outputImage->pixels ,  outputImage->width , outputImage->height , outputImage->channels , outputImage->bitsperpixel ,
+                             inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels , inputImage->bitsperpixel
+                          );
 
-           fprintf(stdout,"Compared Detected Noise is %0.4f dB \n",noise);
            exit(0);
         } else
         if ( strcmp(argv[i],"--compare")==0 )

@@ -7,7 +7,7 @@
 #define PRINT_COMMENTS 1
 #define PPMREADBUFLEN 256
 
-float * ReadPFM(float * buffer , char * filename, unsigned int *width , unsigned int *height ,   unsigned int * bytesPerPixel , unsigned int * channels)
+float * ReadPFMRaw(float * buffer , char * filename, unsigned int *width , unsigned int *height ,   unsigned int * bytesPerPixel , unsigned int * channels)
 {
    * bytesPerPixel = 0;
    * channels = 0;
@@ -91,7 +91,7 @@ float * ReadPFM(float * buffer , char * filename, unsigned int *width , unsigned
 int ReadPFM(char * filename,struct Image * pic,char read_only_header)
 {
   pic->timestamp = 0;
-  pic->pixels = (unsigned char*) ReadPFM((float*) pic->pixels , filename, &pic->width, &pic->height ,&pic->bitsperpixel , &pic->channels );
+  pic->pixels = (unsigned char*) ReadPFMRaw((float*) pic->pixels , filename, &pic->width, &pic->height ,&pic->bitsperpixel , &pic->channels );
   pic->bitsperpixel = pic->bitsperpixel * 8; // ( we go from bytes to bits )
 
   return (pic->pixels!=0);
