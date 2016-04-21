@@ -48,7 +48,6 @@ int runFilter(int argc, char *argv[])
                              inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels , inputImage->bitsperpixel
                           );
 
-           exit(0);
         } else
         if ( strcmp(argv[i],"--compare")==0 )
         {
