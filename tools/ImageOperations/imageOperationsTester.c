@@ -11,6 +11,9 @@
 #include "tools/imageMatrix.h"
 #include "compareQuality.h"
 
+#include "projection.h"
+
+
 #define TIME_OPERATIONS 1
 
 
@@ -33,6 +36,19 @@ int runFilter(int argc, char *argv[])
     unsigned int i=0;
       for (i=0; i<argc; i++)
       {
+
+
+        if ( strcmp(argv[i],"--envcube")==0 )
+        {
+          unsigned int outputType = guessFilenameTypeStupid(filenameOutput);
+          outputImage = readImage(filenameOutput,outputType ,0);
+
+          float noise = calculatePSNR( outputImage->pixels ,  outputImage->width , outputImage->height , outputImage->channels ,
+                                       inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels );
+
+           fprintf(stdout,"Compared Detected Noise is %0.4f dB \n",noise);
+           exit(0);
+        } else
         if ( strcmp(argv[i],"--compare")==0 )
         {
           unsigned int outputType = guessFilenameTypeStupid(filenameOutput);

@@ -82,6 +82,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="patternSets.h" />
+		<Unit filename="projection.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="projection.h" />
 		<Unit filename="resize.c">
 			<Option compilerVar="CC" />
 		</Unit>

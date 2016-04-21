@@ -18,11 +18,11 @@ float faceTransform[6][2] =
 // (face). The ID of the face is given by faceId. The desired
 // width and height are given by width and height.
 
-void createCubeMapFace( char * in , unsigned int inWidth , unsigned int Height ,
-                        char * out , unsigned int outWidth ,unsigned int outHeight
-                       )
+
+void createCubeMapFace( char * in , unsigned int inWidth , unsigned int inHeight , unsigned int inChannels , unsigned int inBitsPerPixel ,
+                        char * out , unsigned int outWidth ,unsigned int outHeight , unsigned int outChannels , unsigned int outBitsPerPixel )
 {
-/*
+/*  http://stackoverflow.com/questions/29678510/convert-21-equirectangular-panorama-to-cube-map
 const Mat &in, Mat &face, int faceId = 0, const int width = -1, const int height = -1
     float inWidth = in.cols;
     float inHeight = in.rows;
