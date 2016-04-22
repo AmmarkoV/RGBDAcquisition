@@ -136,8 +136,11 @@ for(y = 0; y < height; y++)
 
           if (outX>=outWidth)  { outX=outWidth-1;  }
           if (outY>=outHeight) { outY=outHeight-1; }
-          unsigned int inPlace = y * inWidth + x;
-          unsigned int outPlace = outY * outWidth + outX;
+          unsigned int inPlace = y * inWidth*3 + x*3;
+          if (inPlace>=inWidth*inHeight*3) { inPlace=0; }
+          unsigned int outPlace = outY * outWidth *3 + outX *3;
+          if (outPlace>=outWidth*outHeight*3) { outPlace=0; }
+
           out[outPlace]=in[inPlace]; ++outPlace; // ++inPlace;
           out[outPlace]=in[inPlace]; ++outPlace; //++inPlace;
           out[outPlace]=in[inPlace];
@@ -207,7 +210,7 @@ float hypotMine(x,y)
 
 
 
-void createCubeMapFace(char * out , unsigned int outWidth ,unsigned int outHeight , unsigned int outChannels , unsigned int outBitsPerPixel ,
+void createCubeMapFacePython(char * out , unsigned int outWidth ,unsigned int outHeight , unsigned int outChannels , unsigned int outBitsPerPixel ,
                        char * in , unsigned int inWidth , unsigned int inHeight , unsigned int inChannels , unsigned int inBitsPerPixel
                         )
 {
@@ -257,25 +260,29 @@ void createCubeMapFace(char * out , unsigned int outWidth ,unsigned int outHeigh
             float nu = (float) vf-vi;
             // Pixel values of four corners
             unsigned int xA = (unsigned int) ui % inWidth, yA = (unsigned int ) clip(vi,0,inHeight-1);
-            unsigned int memplaceA =yA * inWidth + xA;
+            unsigned int memplaceA =yA * inWidth*3 + xA*3;
+            if (memplaceA>=inWidth*inHeight*3) { memplaceA=0; }
             A[0] = in[memplaceA+0];
             A[1] = in[memplaceA+1];
             A[2] = in[memplaceA+2];
 
             unsigned int xB = (unsigned int) u2 % inWidth, yB = (unsigned int ) clip(vi,0,inHeight-1);
-            unsigned int memplaceB =yB * inWidth + xB;
+            unsigned int memplaceB =yB * inWidth *3 + xB *3;
+            if (memplaceB>=inWidth*inHeight*3) { memplaceB=0; }
             B[0] = in[memplaceB+0];
             B[1] = in[memplaceB+1];
             B[2] = in[memplaceB+2];
 
             unsigned int xC = (unsigned int) ui % inWidth, yC = (unsigned int ) clip(v2,0,inHeight-1);
-            unsigned int memplaceC =yC * inWidth + xC;
+            unsigned int memplaceC =yC * inWidth *3 + xC *3;
+            if (memplaceC>=inWidth*inHeight*3) { memplaceC=0; }
             C[0] = in[memplaceC+0];
             C[1] = in[memplaceC+1];
             C[2] = in[memplaceC+2];
 
             unsigned int xD = (unsigned int) u2 % inWidth, yD = (unsigned int ) clip(v2,0,inHeight-1);
-            unsigned int memplaceD =yD * inWidth + xD;
+            unsigned int memplaceD =yD * inWidth *3 + xD *3;
+            if (memplaceD>=inWidth*inHeight*3) { memplaceD=0; }
             D[0] = in[memplaceD+0];
             D[1] = in[memplaceD+1];
             D[2] = in[memplaceD+2];
@@ -286,13 +293,26 @@ void createCubeMapFace(char * out , unsigned int outWidth ,unsigned int outHeigh
         float bCol= A[2]*(1-mu)*(1-nu) + B[2]*(mu)*(1-nu) + C[2]*(1-mu)*nu + D[2]*mu*nu;
 
        //outPix[i,j] = (int(round(r)),int(round(g)),int(round(b)))
-       out[j*outWidth + i + 0 ] = rCol;
-       out[j*outWidth + i + 1 ] = gCol;
-       out[j*outWidth + i + 2 ] = bCol;
+       unsigned int memplaceOUT =j * outWidth *3 + i *3;
+       if (memplaceOUT>=outWidth*outHeight*3) { memplaceOUT=0; }
+       out[memplaceOUT+ 0 ] = rCol;
+       out[memplaceOUT+ 1 ] = gCol;
+       out[memplaceOUT + 2 ] = bCol;
 
 
        }
    }
 }
 
+
+
+void createCubeMapFace(char * out , unsigned int outWidth ,unsigned int outHeight , unsigned int outChannels , unsigned int outBitsPerPixel ,
+                       char * in , unsigned int inWidth , unsigned int inHeight , unsigned int inChannels , unsigned int inBitsPerPixel
+                        )
+{
+   createCubeMapFacePython( out , outWidth , outHeight , outChannels ,  outBitsPerPixel ,
+                        in , inWidth , inHeight , inChannels , inBitsPerPixel
+                        );
+
+}
 
