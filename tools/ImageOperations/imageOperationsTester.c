@@ -43,7 +43,7 @@ int runFilter(int argc, char *argv[])
           fprintf(stdout,"Converting Environment Cube \n");
           unsigned int outputType = guessFilenameTypeStupid(filenameOutput);
           //outputImage = createSameDimensionsImage(inputImage);
-          outputImage = createImage( inputImage->width , inputImage->height*3 , 3 , 8 );
+          outputImage = createImage( inputImage->width , inputImage->height*2 , 3 , 8 );
 
          createCubeMapFace(  outputImage->pixels ,  outputImage->width , outputImage->height , outputImage->channels , outputImage->bitsperpixel ,
                              inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels , inputImage->bitsperpixel
