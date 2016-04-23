@@ -541,7 +541,7 @@ struct Image * createImageBitBlt( struct Image * inImg , unsigned int x , unsign
   struct Image * img = createImage( width , height , inImg->channels , inImg->bitsperpixel);
 
   //Bit BLT will replace all pixels so this is not needed ,this is a test to make sure it covers all the area..
-  memset(img->pixels,0,width * height * inImg->channels * (inImg->bitsperpixel/8) * sizeof(unsigned char));
+  //memset(img->pixels,0,width * height * inImg->channels * (inImg->bitsperpixel/8) * sizeof(unsigned char));
 
   bitBltCodecCopy(img->pixels, 0 ,  0 , width , height ,
                   inImg->pixels , x, y , inImg->width , inImg->height ,
