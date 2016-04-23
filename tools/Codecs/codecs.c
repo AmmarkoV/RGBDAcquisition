@@ -352,6 +352,11 @@ int swapImageEndiannessRaw(unsigned char * pixels, unsigned int width,unsigned i
 
 int writeImageFile(struct Image * pic,unsigned int type,char *filename)
 {
+ if (filename==0) {return 0; }
+ if (pic==0) {return 0; }
+ if (pic->pixels==0) {  return 0; }
+
+
    switch (type)
    {
      #if USE_JPG_FILES
@@ -477,10 +482,10 @@ int bitBltCodecCopy(unsigned char * target,  unsigned int tX,  unsigned int tY ,
   fprintf(stderr,"BitBlt size was width %u height %u \n",width,height);
   //Check for bounds -----------------------------------------
   unsigned int boundsCheckFired=0;
-  if (tX+width>=targetWidth) { width=targetWidth-tX-1;   boundsCheckFired+=1;  }
+  if (tX+width>=targetWidth) { width=targetWidth-tX;   boundsCheckFired+=1;  }
   if (tY+height>=targetHeight) { height=targetHeight-tY-1;  boundsCheckFired+=10;  }
 
-  if (sX+width>=sourceWidth) { width=sourceWidth-sX-1;  boundsCheckFired+=100; }
+  if (sX+width>=sourceWidth) { width=sourceWidth-sX;  boundsCheckFired+=100; }
   if (sY+height>=sourceHeight) { height=sourceHeight-sY-1; boundsCheckFired+=1000; }
   //----------------------------------------------------------
   if (boundsCheckFired) { fprintf(stderr,"Bounds Check fired %u ..!\n",boundsCheckFired) ;}
@@ -492,7 +497,7 @@ int bitBltCodecCopy(unsigned char * target,  unsigned int tX,  unsigned int tY ,
   unsigned char *  sourcePTR      = source+ MEMPLACE3(sX,sY,sourceWidth);
   unsigned char *  sourceLimitPTR = source+ MEMPLACE3((sX+width),(sY+height),sourceWidth);
   unsigned int     sourceLineSkip = (sourceWidth-width) * 3;
-  unsigned char *  sourceLineLimitPTR = sourcePTR + (width*3) -3; /*-3 is required here*/
+  unsigned char *  sourceLineLimitPTR = sourcePTR + (width*3) ; /*-3 is required here*/
   //fprintf(stderr,"SOURCE (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
   //fprintf(stderr,"sourcePTR is %p , limit is %p \n",sourcePTR,sourceLimitPTR);
   //fprintf(stderr,"sourceLineSkip is %u\n",        sourceLineSkip);
@@ -502,15 +507,15 @@ int bitBltCodecCopy(unsigned char * target,  unsigned int tX,  unsigned int tY ,
   unsigned char * targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
   unsigned char * targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
   unsigned int targetLineSkip = (targetWidth-width) * 3;
-  unsigned char * targetLineLimitPTR = targetPTR + (width*3) -3; /*-3 is required here*/
+  unsigned char * targetLineLimitPTR = targetPTR + (width*3) ; /*-3 is required here*/
   //fprintf(stderr,"TARGET (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
   //fprintf(stderr,"targetPTR is %p , limit is %p \n",targetPTR,targetLimitPTR);
   //fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
   //fprintf(stderr,"targetLineLimitPTR is %p\n",targetLineLimitPTR);
 
-  while ( (sourcePTR < sourceLimitPTR) && ( targetPTR+3 < targetLimitPTR ) )
+  while ( (sourcePTR < sourceLimitPTR) && ( targetPTR < targetLimitPTR ) )
   {
-     while ( (sourcePTR < sourceLineLimitPTR) && ((targetPTR+3 < targetLineLimitPTR)) )
+     while ( (sourcePTR < sourceLineLimitPTR) && ((targetPTR < targetLineLimitPTR)) )
      {
         //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
         *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
@@ -535,6 +540,8 @@ struct Image * createImageBitBlt( struct Image * inImg , unsigned int x , unsign
 {
   struct Image * img = createImage( width , height , inImg->channels , inImg->bitsperpixel);
 
+  //Bit BLT will replace all pixels so this is not needed ,this is a test to make sure it covers all the area..
+  memset(img->pixels,0,width * height * inImg->channels * (inImg->bitsperpixel/8) * sizeof(unsigned char));
 
   bitBltCodecCopy(img->pixels, 0 ,  0 , width , height ,
                   inImg->pixels , x, y , inImg->width , inImg->height ,

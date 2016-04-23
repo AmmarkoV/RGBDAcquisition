@@ -135,8 +135,13 @@ void createCubeMapFacePython(
             // interpolate
 
         float rCol= A[0]*(1-mu)*(1-nu) + B[0]*(mu)*(1-nu) + C[0]*(1-mu)*nu + D[0]*mu*nu;
+        if (rCol>255) { rCol=255; }
+
         float gCol= A[1]*(1-mu)*(1-nu) + B[1]*(mu)*(1-nu) + C[1]*(1-mu)*nu + D[1]*mu*nu;
+        if (gCol>255) { gCol=255; }
+
         float bCol= A[2]*(1-mu)*(1-nu) + B[2]*(mu)*(1-nu) + C[2]*(1-mu)*nu + D[2]*mu*nu;
+        if (bCol>255) { bCol=255; }
 
        //outPix[i,j] = (int(round(r)),int(round(g)),int(round(b)))
        unsigned int memplaceOUT =j * outWidth *3 + i *3;
@@ -170,8 +175,8 @@ void getCubeMap2DCoords(unsigned int inputWidth , unsigned int inputHeight , flo
    if ( (x<0) && (y==0) && (z==0) ) { *outX=*outWidth*1;    *outY=*outHeight; }  else
    if ( (x>0) && (y==0) && (z==0) ) { *outX=*outWidth*3;    *outY=*outHeight; }  else
 
-   if ( (x==0) && (y<0) && (z==0) ) { *outX=*outWidth*2;    *outY=*outHeight*2; }  else
-   if ( (x==0) && (y>0) && (z==0) ) { *outX=*outWidth*2;    *outY=*outHeight*0; }  else
+   if ( (x==0) && (y<0) && (z==0) ) { *outX=*outWidth*2 ;    *outY=*outHeight*2; }  else
+   if ( (x==0) && (y>0) && (z==0) ) { *outX=*outWidth*2 ;    *outY=*outHeight*0; }  else
 
    if ( (x==0) && (y==0) && (z<0) ) { *outX=*outWidth*0;    *outY=*outHeight*1; }  else
    if ( (x==0) && (y==0) && (z>0) ) { *outX=*outWidth*2;    *outY=*outHeight*1; }
