@@ -111,6 +111,8 @@ struct Image * createSameDimensionsImage( struct Image * inputImage);
 struct Image * copyImage( struct Image * inputImage);
 
 
+struct Image * createImageBitBlt( struct Image * inImg , unsigned int x , unsigned int y , unsigned int width , unsigned int height );
+
 int swapImageEndianness(struct Image * img);
 int swapImageEndiannessRaw(unsigned char * pixels, unsigned int width,unsigned int height,unsigned int bitsperpixel , unsigned int channels);
 

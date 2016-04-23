@@ -43,12 +43,41 @@ int runFilter(int argc, char *argv[])
           fprintf(stdout,"Converting Environment Cube \n");
           unsigned int outputType = guessFilenameTypeStupid(filenameOutput);
           //outputImage = createSameDimensionsImage(inputImage);
-          outputImage = createImage( inputImage->width , inputImage->height*2 , 3 , 8 );
+
+          unsigned int outputWidth = inputImage->width;
+          unsigned int outputHeight = (unsigned int ) (3*inputImage->width)/4;
+          outputImage = createImage( outputWidth , outputHeight , 3 , 8 );
 
          createCubeMapFace(  outputImage->pixels ,  outputImage->width , outputImage->height , outputImage->channels , outputImage->bitsperpixel ,
                              inputImage->pixels ,  inputImage->width , inputImage->height , inputImage->channels , inputImage->bitsperpixel
                           );
 
+
+         struct Image * partImg=0;
+         unsigned int outX=0 , outY=0 , outWidth=0 , outHeight=0;
+         getCubeMap2DCoords(outputWidth,outputHeight, /*x*/ -1 , /*y*/  0  , /*z*/  0 , &outX , &outY , &outWidth , &outHeight );
+         partImg=createImageBitBlt( outputImage , outX , outY , outWidth , outHeight );
+         writeImageFile(partImg,PPM_CODEC ,"new_mX.pnm"); destroyImage(partImg);
+
+         getCubeMap2DCoords(outputWidth,outputHeight, /*x*/  1 , /*y*/  0  , /*z*/  0 , &outX , &outY , &outWidth , &outHeight );
+         partImg=createImageBitBlt( outputImage , outX , outY , outWidth , outHeight );
+         writeImageFile(partImg,PPM_CODEC ,"new_pX.pnm"); destroyImage(partImg);
+
+         getCubeMap2DCoords(outputWidth,outputHeight, /*x*/  0 , /*y*/ -1  , /*z*/  0 , &outX , &outY , &outWidth , &outHeight );
+         partImg=createImageBitBlt( outputImage , outX , outY , outWidth , outHeight );
+         writeImageFile(partImg,PPM_CODEC ,"new_mY.pnm"); destroyImage(partImg);
+
+         getCubeMap2DCoords(outputWidth,outputHeight, /*x*/  0 , /*y*/  1  , /*z*/  0 , &outX , &outY , &outWidth , &outHeight );
+         partImg=createImageBitBlt( outputImage , outX , outY , outWidth , outHeight );
+         writeImageFile(partImg,PPM_CODEC ,"new_pY.pnm"); destroyImage(partImg);
+
+         getCubeMap2DCoords(outputWidth,outputHeight, /*x*/  0 , /*y*/  0  , /*z*/ -1 , &outX , &outY , &outWidth , &outHeight );
+         partImg=createImageBitBlt( outputImage , outX , outY , outWidth , outHeight );
+         writeImageFile(partImg,PPM_CODEC ,"new_mZ.pnm"); destroyImage(partImg);
+
+         getCubeMap2DCoords(outputWidth,outputHeight, /*x*/  0 , /*y*/  0  , /*z*/  1 , &outX , &outY , &outWidth , &outHeight );
+         partImg=createImageBitBlt( outputImage , outX , outY , outWidth , outHeight );
+         writeImageFile(partImg,PPM_CODEC ,"new_pZ.pnm"); destroyImage(partImg);
         } else
         if ( strcmp(argv[i],"--compare")==0 )
         {

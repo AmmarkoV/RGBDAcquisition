@@ -457,6 +457,94 @@ struct Image * createImage( unsigned int width , unsigned int height , unsigned 
 }
 
 
+
+
+
+#define MEMPLACE1(x,y,width) ( y * ( width  ) + x )
+#define MEMPLACE3(x,y,width) ( ( y * ( width * 3 ) ) + (x*3) )
+
+
+int bitBltCodecCopy(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
+                            unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
+                            unsigned int width , unsigned int height)
+{
+  if ( (target==0)||(source==0) ) { return 0; }
+  if ( (width==0)&&(height==0) ) { return 0; }
+  if ( (sourceWidth==0)&&(sourceHeight==0) ) { return 0; }
+
+  fprintf(stderr,"BitBlt an area of target image %u,%u  sized %u,%u \n",tX,tY,targetWidth,targetHeight);
+  fprintf(stderr,"BitBlt an area of source image %u,%u  sized %u,%u \n",sX,sY,sourceWidth,sourceHeight);
+  fprintf(stderr,"BitBlt size was width %u height %u \n",width,height);
+  //Check for bounds -----------------------------------------
+  unsigned int boundsCheckFired=0;
+  if (tX+width>=targetWidth) { width=targetWidth-tX-1;   boundsCheckFired+=1;  }
+  if (tY+height>=targetHeight) { height=targetHeight-tY-1;  boundsCheckFired+=10;  }
+
+  if (sX+width>=sourceWidth) { width=sourceWidth-sX-1;  boundsCheckFired+=100; }
+  if (sY+height>=sourceHeight) { height=sourceHeight-sY-1; boundsCheckFired+=1000; }
+  //----------------------------------------------------------
+  if (boundsCheckFired) { fprintf(stderr,"Bounds Check fired %u ..!\n",boundsCheckFired) ;}
+  fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
+  if ( (width==0) || (height==0) ) { fprintf(stderr,"Unacceptable size..\n"); return 0;}
+  if ( (width>sourceWidth) || (width>targetWidth) ) { fprintf(stderr,"Unacceptable size , too big..\n"); return 0;}
+  if ( (height>sourceHeight) || (height>targetHeight) ) { fprintf(stderr,"Unacceptable size , too big..\n"); return 0;}
+
+  unsigned char *  sourcePTR      = source+ MEMPLACE3(sX,sY,sourceWidth);
+  unsigned char *  sourceLimitPTR = source+ MEMPLACE3((sX+width),(sY+height),sourceWidth);
+  unsigned int     sourceLineSkip = (sourceWidth-width) * 3;
+  unsigned char *  sourceLineLimitPTR = sourcePTR + (width*3) -3; /*-3 is required here*/
+  //fprintf(stderr,"SOURCE (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX+width,sY+height);
+  //fprintf(stderr,"sourcePTR is %p , limit is %p \n",sourcePTR,sourceLimitPTR);
+  //fprintf(stderr,"sourceLineSkip is %u\n",        sourceLineSkip);
+  //fprintf(stderr,"sourceLineLimitPTR is %p\n",sourceLineLimitPTR);
+
+
+  unsigned char * targetPTR      = target + MEMPLACE3(tX,tY,targetWidth);
+  unsigned char * targetLimitPTR = target + MEMPLACE3((tX+width),(tY+height),targetWidth);
+  unsigned int targetLineSkip = (targetWidth-width) * 3;
+  unsigned char * targetLineLimitPTR = targetPTR + (width*3) -3; /*-3 is required here*/
+  //fprintf(stderr,"TARGET (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX+width,tY+height);
+  //fprintf(stderr,"targetPTR is %p , limit is %p \n",targetPTR,targetLimitPTR);
+  //fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
+  //fprintf(stderr,"targetLineLimitPTR is %p\n",targetLineLimitPTR);
+
+  while ( (sourcePTR < sourceLimitPTR) && ( targetPTR+3 < targetLimitPTR ) )
+  {
+     while ( (sourcePTR < sourceLineLimitPTR) && ((targetPTR+3 < targetLineLimitPTR)) )
+     {
+        //fprintf(stderr,"Reading Triplet sourcePTR %p targetPTR is %p\n",sourcePTR  ,targetPTR);
+        *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
+        *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
+        *targetPTR = *sourcePTR; ++targetPTR; ++sourcePTR;
+     }
+
+    sourceLineLimitPTR += sourceWidth*3;
+    targetLineLimitPTR += targetWidth*3;
+    sourcePTR+=sourceLineSkip;
+    targetPTR+=targetLineSkip;
+  }
+
+ return 1;
+}
+
+
+
+
+
+struct Image * createImageBitBlt( struct Image * inImg , unsigned int x , unsigned int y , unsigned int width , unsigned int height )
+{
+  struct Image * img = createImage( width , height , inImg->channels , inImg->bitsperpixel);
+
+
+  bitBltCodecCopy(img->pixels, 0 ,  0 , width , height ,
+                  inImg->pixels , x, y , inImg->width , inImg->height ,
+                  width , height);
+
+
+  return  img;
+}
+
+
 int destroyImage(struct Image * img)
 {
     if (img==0) {return 0; }
