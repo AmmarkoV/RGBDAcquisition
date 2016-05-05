@@ -123,6 +123,7 @@ ENDIF( ENABLE_EDITOR )
 
 IF( ENABLE_OPENCV ) 
  add_subdirectory (viewer/)
+ add_subdirectory (3dparty/OpenCVBindings)
 ELSE (ENABLE_OPENCV)
  MESSAGE("Viewer will not be compiled , OpenCV stuff missing? ( check ENABLE_OPENCV flag )..")
 ENDIF( ENABLE_OPENCV )
