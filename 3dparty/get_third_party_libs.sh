@@ -282,6 +282,29 @@ fi
 
 
 
+if [ -d opencv_contrib ]
+then
+echo "opencv_contrib appears to already exist .."
+else
+  echo "Do you want to download opencv_contrib ? " 
+  echo
+  echo -n " (Y/N)?"
+  read answer
+  if test "$answer" != "N" -a "$answer" != "n";
+  then  
+      git clone https://github.com/itseez/opencv_contrib/
+      cd opencv_contrib
+      
+      echo "cd <opencv_build_directory>"
+      echo "cmake -DOPENCV_EXTRA_MODULES_PATH=`pwd`/modules <opencv_source_directory>"
+      echo "make -j5"
+
+      cd ..
+  fi
+fi
+
+
+
 
 
 
