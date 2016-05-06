@@ -33,6 +33,7 @@ ENDIF( COMPILE_FOR_PERFORMANCE )
 
 
 #----
+MESSAGE("Trying to auto-sense OpenCV presence .. ")
 find_package(OpenCV)
 if (OpenCV_FOUND)
  OPTION (ENABLE_OPENCV ON) 
@@ -43,6 +44,11 @@ ELSE (OpenCV_FOUND)
  MESSAGE("OpenCV Not found , some parts like viewer etc will not be compiled")
 ENDIF(OpenCV_FOUND)
 #----
+
+
+
+
+
 OPTION (ENABLE_JPG OFF)
 OPTION (ENABLE_PNG OFF)
 

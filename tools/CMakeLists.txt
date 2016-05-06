@@ -10,9 +10,13 @@ add_subdirectory (AmMatrix/)
 add_subdirectory (Quaternions/)
 add_subdirectory (ImageOperations/)
 
-if(ENABLE_OPENCV_BASED_TOOLS)
- add_subdirectory (DepthImagesConverter/)
-ENDIF(ENABLE_OPENCV_BASED_TOOLS)
+
+IF( ENABLE_OPENCV ) 
+ if(ENABLE_OPENCV_BASED_TOOLS)
+  add_subdirectory (DepthImagesConverter/)
+ ENDIF(ENABLE_OPENCV_BASED_TOOLS)
+ENDIF( ENABLE_OPENCV )
+
  
 if (ENABLE_LOCATION_SERVICE)
  add_subdirectory (LocationServices/)
