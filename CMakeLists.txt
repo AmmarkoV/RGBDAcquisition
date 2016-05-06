@@ -19,6 +19,8 @@ OPTION (ENABLE_OPENGL ON)
 OPTION (ENABLE_NETWORK ON)
 OPTION (ENABLE_EDITOR ON)
 OPTION (ENABLE_LOCATION_SERVICE OFF)
+OPTION (ENABLE_OPENCV OFF)
+OPTION (ENABLE_OPENCV_BASED_TOOLS OFF)
 
 
 set(CMAKE_CXX_FLAGS "-fPIC -s") 
@@ -31,7 +33,7 @@ ENDIF( COMPILE_FOR_PERFORMANCE )
 
 
 
-
+IF( ENABLE_OPENCV ) 
 #----
 MESSAGE("Trying to auto-sense OpenCV presence .. ")
 find_package(OpenCV)
@@ -44,7 +46,7 @@ ELSE (OpenCV_FOUND)
  MESSAGE("OpenCV Not found , some parts like viewer etc will not be compiled")
 ENDIF(OpenCV_FOUND)
 #----
-
+ENDIF( ENABLE_OPENCV ) 
 
 
 
