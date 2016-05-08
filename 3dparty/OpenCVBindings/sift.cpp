@@ -6,55 +6,60 @@
 #include <opencv2/features2d/features2d.hpp>
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-const double THRESHOLD = 400;
+const double THRESHOLD = 380;
 
-/**
- * Calculate euclid distance
- */
-double euclidDistance(cv::Mat& vec1, cv::Mat& vec2) {
-  double sum = 0.0;
-  int dim = vec1.cols;
-  for (int i = 0; i < dim; i++) {
-    sum += (vec1.at<uchar>(0,i) - vec2.at<uchar>(0,i)) * (vec1.at<uchar>(0,i) - vec2.at<uchar>(0,i));
+
+void clear_line()
+{
+  fputs("\033[A\033[2K\033[A\033[2K",stdout);
+  rewind(stdout);
+  int i=ftruncate(1,0);
+  if (i!=0) { /*fprintf(stderr,"Error with ftruncate\n");*/ }
+}
+
+
+double sumDistanceOfAllDescriptors(cv::Mat& vec1, cv::Mat& vec2)
+{
+  double sum = 0.0 , diff = 0.0;
+  for (int i = 0; i < vec1.cols; i++)
+  {
+    diff = (vec1.at<uchar>(0,i) - vec2.at<uchar>(0,i)) ;
+    sum +=  diff * diff;
   }
   return sqrt(sum);
 }
 
-/**
- * Find the index of nearest neighbor point from keypoints.
- */
 int nearestNeighbor(cv::Mat& vec, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) {
   int neighbor = -1;
-  double minDist = 1e6;
+  double minDist = THRESHOLD+1;
 
-  for (int i = 0; i < descriptors.rows; i++) {
+  for (int i = 0; i < descriptors.rows; i++)
+  {
     cv::KeyPoint pt = keypoints[i];
     cv::Mat v = descriptors.row(i);
-    double d = euclidDistance(vec, v);
+    double d = sumDistanceOfAllDescriptors(vec, v);
     //printf("%d %f\n", v.cols, d);
-    if (d < minDist) {
-      minDist = d;
-      neighbor = i;
-    }
+    if (d < minDist) { minDist = d; neighbor = i; }
   }
 
-  if (minDist < THRESHOLD) {
-    return neighbor;
-  }
+  if (minDist < THRESHOLD) { return neighbor; } else
+                           { /*Failed */}
 
   return -1;
 }
 
-/**
- * Find pairs of points with the smallest distace between them
- */
 void findPairs(std::vector<cv::KeyPoint>& keypoints1, cv::Mat& descriptors1,
                std::vector<cv::KeyPoint>& keypoints2, cv::Mat& descriptors2,
                std::vector<cv::Point2f>& srcPoints, std::vector<cv::Point2f>& dstPoints) {
   for (int i = 0; i < descriptors1.rows; i++)
   {
-    fprintf(stderr,"%u / %u matches \n",i, descriptors1.rows);
+    clear_line();
+    fprintf(stderr,"Checking pairs , threshold %0.2f : \n",THRESHOLD);
+    fprintf(stderr,"%u / %u checks  - %u matches \n",i, descriptors1.rows , srcPoints.size());
     cv::KeyPoint pt1 = keypoints1[i];
     cv::Mat desc1 = descriptors1.row(i);
     int nn = nearestNeighbor(desc1, keypoints2, descriptors2);
@@ -68,10 +73,8 @@ void findPairs(std::vector<cv::KeyPoint>& keypoints1, cv::Mat& descriptors1,
 
 
 
-
-
-
 int visualizeMatches(
+                      char * filenameOutput ,
                       cv::Mat & left ,
                       std::vector<cv::KeyPoint>&keypointsLeft,
                       cv::Mat &descriptorsLeft,
@@ -106,6 +109,19 @@ int visualizeMatches(
       cv::circle(matchingImage, kp.pt, cvRound(kp.size*0.25), cv::Scalar(255,255,0), 1, 8, 0);
     }
 
+
+    for (int i=0; i<keypointsRight.size(); i++)
+    {
+      cv::KeyPoint kp = keypointsRight[i];
+
+      cv::Point2f rightPT = kp.pt;
+      rightPT.x += size.width;
+      rightPT.y += size.height;
+
+      cv::circle(matchingImage, rightPT , cvRound(kp.size*0.25), cv::Scalar(255,255,0), 1, 8, 0);
+    }
+
+
     // Draw line between nearest neighbor pairs
     for (int i = 0; i < (int)srcPoints.size(); ++i)
     {
@@ -117,9 +133,9 @@ int visualizeMatches(
     }
 
     // Display mathing image
-    cv::imwrite("sift_result_match.jpg", matchingImage);
+    cv::imwrite(filenameOutput , matchingImage);
     imshow("mywindow", matchingImage);
-    int c = cv::waitKey(0);
+    //int c = cv::waitKey(0);
 }
 
 
@@ -129,8 +145,11 @@ int visualizeMatches(
 
 int main(int argc, const char* argv[])
 {
-    cv::Mat left = cv::imread("uttower_left.JPG", 0); //Load as grayscale
-    cv::Mat right = cv::imread("uttower_right.JPG", 0); //Load as grayscale
+    cv::Mat left = cv::imread("uttower_left.JPG"  , CV_LOAD_IMAGE_COLOR);
+    if(! left.data ) { fprintf(stderr,"Left Image missing \n"); return 1; }
+
+    cv::Mat right = cv::imread("uttower_right.JPG", CV_LOAD_IMAGE_COLOR);
+    if(! right.data ) { fprintf(stderr,"Right Image missing \n"); return 1; }
 
 
     cv::DescriptorExtractor* extractor = new cv::SiftDescriptorExtractor();
@@ -166,6 +185,7 @@ int main(int argc, const char* argv[])
 
 
    visualizeMatches(
+                      "sift_result_match.jpg" ,
                       left ,
                       keypointsLeft,
                       descriptorsLeft,
