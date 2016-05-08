@@ -67,46 +67,21 @@ void findPairs(std::vector<cv::KeyPoint>& keypoints1, cv::Mat& descriptors1,
 }
 
 
-int main(int argc, const char* argv[])
+
+
+
+
+int visualizeMatches(
+                      cv::Mat & left ,
+                      std::vector<cv::KeyPoint>&keypointsLeft,
+                      cv::Mat &descriptorsLeft,
+                      cv::Mat & right ,
+                      std::vector<cv::KeyPoint> &keypointsRight,
+                      cv::Mat &descriptorsRight ,
+                      std::vector<cv::Point2f> &srcPoints ,
+                      std::vector<cv::Point2f> &dstPoints
+                    )
 {
-    const cv::Mat left = cv::imread("uttower_left.JPG", 0); //Load as grayscale
-    const cv::Mat right = cv::imread("uttower_right.JPG", 0); //Load as grayscale
-
-
-    cv::DescriptorExtractor* extractor = new cv::SiftDescriptorExtractor();
-    cv::SiftFeatureDetector detector;
-    std::vector<cv::KeyPoint> keypointsLeft;
-    cv::Mat descriptorsLeft;
-    detector.detect(left, keypointsLeft);
-    extractor->compute(left, keypointsLeft, descriptorsLeft);
-
-    // Add results to image and save.
-    cv::Mat output;
-    cv::drawKeypoints(left, keypointsLeft, output);
-    cv::imwrite("sift_result_left.jpg", output);
-
-
-    std::vector<cv::KeyPoint> keypointsRight;
-    cv::Mat descriptorsRight;
-    detector.detect(right, keypointsRight);
-    extractor->compute(right, keypointsRight, descriptorsRight);
-    cv::drawKeypoints(right, keypointsRight, output);
-    cv::imwrite("sift_result_right.jpg", output);
-
-    fprintf(stderr,"SIFT features ready \n");
-
-
-
-
-    std::vector<cv::Point2f> srcPoints;
-    std::vector<cv::Point2f> dstPoints;
-    findPairs(keypointsLeft, descriptorsLeft, keypointsRight, descriptorsRight, srcPoints, dstPoints);
-    printf("%zd keypoints are matched.\n", srcPoints.size());
-
-
-
-
-
 
  // Create a image for displaying mathing keypoints
 
@@ -145,6 +120,64 @@ int main(int argc, const char* argv[])
     cv::imwrite("sift_result_match.jpg", matchingImage);
     imshow("mywindow", matchingImage);
     int c = cv::waitKey(0);
+}
+
+
+
+
+
+
+int main(int argc, const char* argv[])
+{
+    cv::Mat left = cv::imread("uttower_left.JPG", 0); //Load as grayscale
+    cv::Mat right = cv::imread("uttower_right.JPG", 0); //Load as grayscale
+
+
+    cv::DescriptorExtractor* extractor = new cv::SiftDescriptorExtractor();
+    cv::SiftFeatureDetector detector;
+    std::vector<cv::KeyPoint> keypointsLeft;
+    cv::Mat descriptorsLeft;
+    detector.detect(left, keypointsLeft);
+    extractor->compute(left, keypointsLeft, descriptorsLeft);
+
+    // Add results to image and save.
+    cv::Mat output;
+    cv::drawKeypoints(left, keypointsLeft, output);
+    cv::imwrite("sift_result_left.jpg", output);
+
+
+    std::vector<cv::KeyPoint> keypointsRight;
+    cv::Mat descriptorsRight;
+    detector.detect(right, keypointsRight);
+    extractor->compute(right, keypointsRight, descriptorsRight);
+    cv::drawKeypoints(right, keypointsRight, output);
+    cv::imwrite("sift_result_right.jpg", output);
+
+    fprintf(stderr,"SIFT features ready \n");
+
+
+
+
+    std::vector<cv::Point2f> srcPoints;
+    std::vector<cv::Point2f> dstPoints;
+    findPairs(keypointsLeft, descriptorsLeft, keypointsRight, descriptorsRight, srcPoints, dstPoints);
+    printf("%zd keypoints are matched.\n", srcPoints.size());
+
+
+
+   visualizeMatches(
+                      left ,
+                      keypointsLeft,
+                      descriptorsLeft,
+                      right ,
+                      keypointsRight,
+                      descriptorsRight,
+                      srcPoints,
+                      dstPoints
+                    );
+
+
+
 
     return 0;
 }
