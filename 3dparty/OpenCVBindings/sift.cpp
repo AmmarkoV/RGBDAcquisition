@@ -93,7 +93,7 @@ int main(int argc, const char* argv[])
     cv::drawKeypoints(right, keypointsRight, output);
     cv::imwrite("sift_result_right.jpg", output);
 
-    fprintf(stderr,"SIFT features ready \n",);
+    fprintf(stderr,"SIFT features ready \n");
 
 
 
@@ -132,7 +132,8 @@ int main(int argc, const char* argv[])
     }
 
     // Draw line between nearest neighbor pairs
-    for (int i = 0; i < (int)srcPoints.size(); ++i) {
+    for (int i = 0; i < (int)srcPoints.size(); ++i)
+    {
       cv::Point2f pt1 = srcPoints[i];
       cv::Point2f pt2 = dstPoints[i];
       cv::Point2f from = pt1;
@@ -141,6 +142,7 @@ int main(int argc, const char* argv[])
     }
 
     // Display mathing image
+    cv::imwrite("sift_result_match.jpg", matchingImage);
     imshow("mywindow", matchingImage);
     int c = cv::waitKey(0);
 
