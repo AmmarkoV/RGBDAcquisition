@@ -76,7 +76,7 @@ void findPairs(std::vector<cv::KeyPoint>& keypoints1, cv::Mat& descriptors1,
 
 
 int visualizeMatches(
-                      char * filenameOutput ,
+                      const char * filenameOutput ,
                       cv::Mat & left ,
                       std::vector<cv::KeyPoint>&keypointsLeft,
                       cv::Mat &descriptorsLeft,
@@ -108,7 +108,8 @@ int visualizeMatches(
     //putText(matchingImage, text, cv::Point(0, cvRound(size.height + 30)), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 1, cv::Scalar(0,0,255));
 
 
-    for (int i=0; i<keypointsLeft.size(); i++){
+    for (unsigned int i=0; i<keypointsLeft.size(); i++)
+    {
       cv::KeyPoint kp = keypointsLeft[i];
       cv::circle(matchingImage, kp.pt, cvRound(kp.size*0.25), cv::Scalar(255,255,0), 1, 8, 0);
     }
@@ -127,7 +128,7 @@ int visualizeMatches(
 
 
     // Draw line between nearest neighbor pairs
-    for (int i = 0; i < (int)srcPoints.size(); ++i)
+    for (unsigned int i = 0; i < (int)srcPoints.size(); ++i)
     {
       cv::Point2f pt1 = srcPoints[i];
       cv::Point2f pt2 = dstPoints[i];
@@ -169,14 +170,12 @@ int checkAffineFitness(
   double a=M[0] , b=M[1] , c=M[2];
   double d=M[3] , e=M[4] , f=M[5];
 
-  double sx=0.0 , sy=0.0;
-  double dx=0.0 , dy=0.0;
-  double rx=0.0 , ry=0.0;
+  double sx=0.0 , sy=0.0 ,  dx=0.0 , dy=0.0 , rx=0.0 , ry=0.0;
 
   for (i=0; i<srcPoints.size(); i++)
   {
-    sx = srcPoints[i].x;  sy = srcPoints[i].y;
-    dx = dstPoints[i].x;  dy = dstPoints[i].y;
+    sx = (double) srcPoints[i].x;  sy = (double) srcPoints[i].y;
+    dx = (double) dstPoints[i].x;  dy = (double) dstPoints[i].y;
 
     rx = ( c + ( a * sx ) + ( b * sy ) ) - dx;
     ry = ( f + ( d * sx ) + ( e * sy ) ) - dy;
@@ -189,7 +188,8 @@ int checkAffineFitness(
     }
   }
 
-    fprintf(stderr,"%u inliers \n",inlierCount);
+  fprintf(stderr,"{ { a=%0.2f , b=%0.2f , c=%0.2f } , { d=%0.2f , e=%0.2f , f=%0.2f } }  ",a,b,c,d,e,f);
+  fprintf(stderr,"%u inliers / %u points \n",inlierCount , srcPoints.size());
   return inlierCount;
 }
 
@@ -221,11 +221,12 @@ int fitAffineTransformationMatchesRANSAC(
   double M[6]={0};
   cv::Point2f srcTri[3];
   cv::Point2f dstTri[3];
-  cv::Mat warp_mat( 2, 3,  CV_32FC1  );
+  cv::Mat warp_mat( 2, 3,  CV_64FC1  );
 
-  unsigned int i=0;
+  unsigned int i=0,z=0;
   for (i=0; i<loops; i++)
   {
+   fprintf(stderr," ____________________________________________________________ \n");
     //RANSAC pick 3 points
     ptA=rand()%srcPoints.size();
     ptB=rand()%srcPoints.size();
@@ -243,14 +244,18 @@ int fitAffineTransformationMatchesRANSAC(
    /// Get the Affine Transform
    //derive resultMatrix with Gauss Jordan
    warp_mat = cv::getAffineTransform( srcTri, dstTri );
+   std::cout << warp_mat<<"\n";
+
    M[0] = warp_mat.at<double>(0,0); M[1] = warp_mat.at<double>(0,1); M[2] = warp_mat.at<double>(0,2);
    M[3] = warp_mat.at<double>(1,0); M[4] = warp_mat.at<double>(1,1); M[5] = warp_mat.at<double>(1,2);
 
 
-   std::cout << warp_mat;
-   fprintf(stderr,"{ { %0.2f } , { %0.2f } }  = ",dstTri[0].x,dstTri[0].y);
-   fprintf(stderr,"{ { %0.2f , %0.2f , %0.2f } , { %0.2f , %0.2f , %0.2f } }  ",M[0],M[1],M[2],M[3],M[4],M[5]);
-   fprintf(stderr," . { { %0.2f } , { %0.2f } , { 1 } }  \n\n",srcTri[0].x,srcTri[0].y);
+   for (z=0; z<3; z++)
+   {
+    fprintf(stderr,"{ { %0.2f } , { %0.2f } }  = ",dstTri[z].x,dstTri[z].y);
+    fprintf(stderr,"{ { %0.2f , %0.2f , %0.2f } , { %0.2f , %0.2f , %0.2f } }  ",M[0],M[1],M[2],M[3],M[4],M[5]);
+    fprintf(stderr," . { { %0.2f } , { %0.2f } , { 1 } }  \n\n",srcTri[z].x,srcTri[z].y);
+   }
 
 
    checkAffineFitness( M , srcPoints , dstPoints );
