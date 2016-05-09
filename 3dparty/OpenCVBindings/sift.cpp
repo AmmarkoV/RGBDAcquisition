@@ -1,6 +1,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 //#include <opencv2/nonfree/nonfree.hpp>
 //#include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/features2d/features2d.hpp>
@@ -161,44 +162,58 @@ int fitAffineTransformationMatchesRANSAC(
                                           std::vector<cv::Point2f> &dstRANSACPoints
                                         )
 {
-  fprintf(stderr,"fitAffineTransformationMatchesRANSAC start \n");
+  fprintf(stderr,"fitAffineTransformationMatchesRANSAC start %0.2f \n",(float) srcPoints.size()/loops );
   if (srcPoints.size()<=3) { fprintf(stderr,"Cannot calculate an affine transformation without 3 or more point correspondances\n"); return 0; }
-  if (srcPoints.size()/loops <=10) { fprintf(stderr,"Too many loops of ransac for our problem \n");   }
-
-  //Affine transformation needs a 3x2 matrix and 3 points
-  //  |DST_X1 DST_X2 DST_X3|      | a   b   c |   | SRC_X1 SRC_X2 SRC_X3|
-  //  |DST_Y1 DST_Y2 DST_Y3|   =  | d   e   f | * | SRC_Y1 SRC_Y2 SRC_Y3|
-  //  |   1      1     1   |      | 0   0   1 |   |   1      1     1    |
+  if ((float)srcPoints.size()/loops <= 1.0 ) { fprintf(stderr,"Too many loops of ransac for our problem \n");   }
 
   //
-  // DST | x |  =  | a b c | * SRC | x |
-  //     | y |     | d e f |       | y |
+  // DST | x |  = M | a b c | * SRC | x |
+  //     | y |      | d e f |       | y |
   //                               | 1 |
   //{ {dx} , {dy } } = { { a ,b, c} , { d , e ,f  } } . { { sx } , { sy } , { 1 } }
+  //{ {dx} , {dy } } = { { c a * sx + b sy } ,  { f d sx + e sy } }
+  // { { c a * sx + b sy - dx } ,  { f d sx + e sy - dy } } = 0
+  //
+  //
 
   unsigned int ptA=0,ptB=0,ptC=0;
 
-  float resultMatrix[9]={0};
+  float M[6]={0};
+  cv::Point2f srcTri[3];
+  cv::Point2f dstTri[3];
+  cv::Mat warp_mat( 2, 3, CV_32FC1 );
 
   unsigned int i=0;
   for (i=0; i<loops; i++)
   {
-
+    //RANSAC pick 3 points
     ptA=rand()%srcPoints.size();
     ptB=rand()%srcPoints.size();
     ptC=rand()%srcPoints.size();
     do { ptB=rand()%srcPoints.size(); } while (ptB==ptA);
     do { ptC=rand()%srcPoints.size(); } while ( (ptC==ptA)||(ptB==ptC) );
 
+    dstTri[0].x = dstPoints[ptA].x; dstTri[0].y = dstPoints[ptA].y;
+    dstTri[1].x = dstPoints[ptB].x; dstTri[1].y = dstPoints[ptB].y;
+    dstTri[2].x = dstPoints[ptC].x; dstTri[2].y = dstPoints[ptC].y;
+    srcTri[0].x = srcPoints[ptA].x; srcTri[0].y = srcPoints[ptA].y;
+    srcTri[1].x = srcPoints[ptB].x; srcTri[1].y = srcPoints[ptB].y;
+    srcTri[2].x = srcPoints[ptC].x; srcTri[2].y = srcPoints[ptC].y;
 
-    fprintf(stderr,"SRC = { { %0.2f , %0.2f , 1 } , { %0.2f , %0.2f , 1 } , { %0.2f , %0.2f , 1 } }  ",dstPoints[ptA].x,dstPoints[ptA].y,dstPoints[ptB].x,dstPoints[ptB].y,dstPoints[ptC].x,dstPoints[ptC].y);
-    fprintf(stderr,"DST = { { %0.2f , %0.2f , 1 } , { %0.2f , %0.2f , 1 } , { %0.2f , %0.2f , 1 } }  ",srcPoints[ptA].x,srcPoints[ptA].y,srcPoints[ptB].x,srcPoints[ptB].y,srcPoints[ptC].x,srcPoints[ptC].y);
-    fprintf(stderr,"M = { { a , b , 1 } , { c , d , 1 } , { e , f , 1 } }  \n\n\n");
+   /// Get the Affine Transform
+   //derive resultMatrix with Gauss Jordan
+   warp_mat = cv::getAffineTransform( srcTri, dstTri );
+   M[0] = warp_mat.data[0];
+   M[1] = warp_mat.data[1];
+   M[2] = warp_mat.data[2];
+   M[3] = warp_mat.data[3];
+   M[4] = warp_mat.data[4];
+   M[5] = warp_mat.data[5];
 
 
-    //derive resultMatrix with Gauss Jordan
-
-
+   fprintf(stderr,"{ { %0.2f } { %0.2f } }  = ",dstTri[0].x,dstTri[0].y);
+   fprintf(stderr,"{ { %0.2f  %0.2f  %0.2f } , { %0.2f  %0.2f  %0.2f } }  ",M[0],M[1],M[2],M[3],M[4],M[5]);
+   fprintf(stderr," * { { %0.2f } , { %0.2f } , { 1 } }  \n\n",srcTri[0].x,srcTri[0].y);
 
   }
 
