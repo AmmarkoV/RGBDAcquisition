@@ -171,10 +171,10 @@ int fitAffineTransformationMatchesRANSAC(
   //  |   1      1     1   |      | 0   0   1 |   |   1      1     1    |
 
   //
-  // DST [ x  y  ] =  | a b c | * SRC [ x y 1 ]
-  //                  | d e f |
-
-
+  // DST | x |  =  | a b c | * SRC | x |
+  //     | y |     | d e f |       | y |
+  //                               | 1 |
+  //{ {dx} , {dy } } = { { a ,b, c} , { d , e ,f  } } . { { sx } , { sy } , { 1 } }
 
   unsigned int ptA=0,ptB=0,ptC=0;
 
