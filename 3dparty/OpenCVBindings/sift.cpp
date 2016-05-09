@@ -170,6 +170,7 @@ int checkAffineFitness(
   double a=M[0] , b=M[1] , c=M[2];
   double d=M[3] , e=M[4] , f=M[5];
 
+  double sumX=0,sumY=0;
   double sx=0.0 , sy=0.0 ,  dx=0.0 , dy=0.0 , rx=0.0 , ry=0.0;
 
   for (i=0; i<srcPoints.size(); i++)
@@ -177,19 +178,23 @@ int checkAffineFitness(
     sx = (double) srcPoints[i].x;  sy = (double) srcPoints[i].y;
     dx = (double) dstPoints[i].x;  dy = (double) dstPoints[i].y;
 
-    rx = ( c + ( a * sx ) + ( b * sy ) ) - dx;
-    ry = ( f + ( d * sx ) + ( e * sy ) ) - dy;
+    rx = ( c + ( a * sx ) + ( b * sy ) ) ;
+    ry = ( f + ( d * sx ) + ( e * sy ) ) ;
 
-    //fprintf(stderr,"Deviance %0.2f %0.2f \n",rx,ry);
+    //fprintf(stderr,"diff  %0.2f %0.2f vs %0.2f %0.2f  = ",rx,ry,dx,dy);
+    rx = abs(rx-dx); ry = abs(ry-dy);
+    //fprintf(stderr," %0.2f %0.2f \n",rx,ry);
 
-    if ( (abs(rx)<2.0)&&(abs(ry)<2.0) )
+    sumX+=rx; sumY+=ry;
+
+    if ( (rx<100)&&(ry<100) )
     {
        ++inlierCount;
     }
   }
 
   fprintf(stderr,"{ { a=%0.2f , b=%0.2f , c=%0.2f } , { d=%0.2f , e=%0.2f , f=%0.2f } }  ",a,b,c,d,e,f);
-  fprintf(stderr,"%u inliers / %u points \n",inlierCount , srcPoints.size());
+  fprintf(stderr,"%u inliers / %u points  , average ( %0.2f,%0.2f ) \n",inlierCount , srcPoints.size() , (float)sumX/srcPoints.size() , (float)sumY/srcPoints.size()  );
   return inlierCount;
 }
 
@@ -244,7 +249,7 @@ int fitAffineTransformationMatchesRANSAC(
    /// Get the Affine Transform
    //derive resultMatrix with Gauss Jordan
    warp_mat = cv::getAffineTransform( srcTri, dstTri );
-   std::cout << warp_mat<<"\n";
+   //std::cout << warp_mat<<"\n";
 
    M[0] = warp_mat.at<double>(0,0); M[1] = warp_mat.at<double>(0,1); M[2] = warp_mat.at<double>(0,2);
    M[3] = warp_mat.at<double>(1,0); M[4] = warp_mat.at<double>(1,1); M[5] = warp_mat.at<double>(1,2);
