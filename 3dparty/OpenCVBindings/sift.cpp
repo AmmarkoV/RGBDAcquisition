@@ -155,6 +155,45 @@ if (srcRANSACPoints.size()>0)
 }
 
 
+int checkAffineFitness(
+                         double * M ,
+                         std::vector<cv::Point2f> &srcPoints ,
+                         std::vector<cv::Point2f> &dstPoints
+                      )
+{
+
+  // { { c a * sx + b sy - dx } ,  { f d sx + e sy - dy } } = 0
+  unsigned int inlierCount=0;
+  unsigned int i=0;
+
+  double a=M[0] , b=M[1] , c=M[2];
+  double d=M[3] , e=M[4] , f=M[5];
+
+  double sx=0.0 , sy=0.0;
+  double dx=0.0 , dy=0.0;
+  double rx=0.0 , ry=0.0;
+
+  for (i=0; i<srcPoints.size(); i++)
+  {
+    sx = srcPoints[i].x;  sy = srcPoints[i].y;
+    dx = dstPoints[i].x;  dy = dstPoints[i].y;
+
+    rx = ( c + ( a * sx ) + ( b * sy ) ) - dx;
+    ry = ( f + ( d * sx ) + ( e * sy ) ) - dy;
+
+    //fprintf(stderr,"Deviance %0.2f %0.2f \n",rx,ry);
+
+    if ( (abs(rx)<2.0)&&(abs(ry)<2.0) )
+    {
+       ++inlierCount;
+    }
+  }
+
+    fprintf(stderr,"%u inliers \n",inlierCount);
+  return inlierCount;
+}
+
+
 int fitAffineTransformationMatchesRANSAC(
                                           unsigned int loops ,
                                           std::vector<cv::Point2f> &srcPoints ,
@@ -204,17 +243,17 @@ int fitAffineTransformationMatchesRANSAC(
    /// Get the Affine Transform
    //derive resultMatrix with Gauss Jordan
    warp_mat = cv::getAffineTransform( srcTri, dstTri );
-   M[0] = warp_mat.at<double>(0,0);
-   M[1] = warp_mat.at<double>(0,1);
-   M[2] = warp_mat.at<double>(0,2);
-   M[3] = warp_mat.at<double>(1,0);
-   M[4] = warp_mat.at<double>(1,1);
-   M[5] = warp_mat.at<double>(1,2);
-   std::cout << warp_mat;
+   M[0] = warp_mat.at<double>(0,0); M[1] = warp_mat.at<double>(0,1); M[2] = warp_mat.at<double>(0,2);
+   M[3] = warp_mat.at<double>(1,0); M[4] = warp_mat.at<double>(1,1); M[5] = warp_mat.at<double>(1,2);
 
+
+   std::cout << warp_mat;
    fprintf(stderr,"{ { %0.2f } , { %0.2f } }  = ",dstTri[0].x,dstTri[0].y);
    fprintf(stderr,"{ { %0.2f , %0.2f , %0.2f } , { %0.2f , %0.2f , %0.2f } }  ",M[0],M[1],M[2],M[3],M[4],M[5]);
    fprintf(stderr," . { { %0.2f } , { %0.2f } , { 1 } }  \n\n",srcTri[0].x,srcTri[0].y);
+
+
+   checkAffineFitness( M , srcPoints , dstPoints );
 
   }
 
