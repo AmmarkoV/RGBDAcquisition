@@ -6,6 +6,7 @@
 //#include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -178,10 +179,10 @@ int fitAffineTransformationMatchesRANSAC(
 
   unsigned int ptA=0,ptB=0,ptC=0;
 
-  float M[6]={0};
+  double M[6]={0};
   cv::Point2f srcTri[3];
   cv::Point2f dstTri[3];
-  cv::Mat warp_mat( 2, 3, CV_32FC1 );
+  cv::Mat warp_mat( 2, 3,  CV_32FC1  );
 
   unsigned int i=0;
   for (i=0; i<loops; i++)
@@ -203,17 +204,17 @@ int fitAffineTransformationMatchesRANSAC(
    /// Get the Affine Transform
    //derive resultMatrix with Gauss Jordan
    warp_mat = cv::getAffineTransform( srcTri, dstTri );
-   M[0] = warp_mat.data[0];
-   M[1] = warp_mat.data[1];
-   M[2] = warp_mat.data[2];
-   M[3] = warp_mat.data[3];
-   M[4] = warp_mat.data[4];
-   M[5] = warp_mat.data[5];
+   M[0] = warp_mat.at<double>(0,0);
+   M[1] = warp_mat.at<double>(0,1);
+   M[2] = warp_mat.at<double>(0,2);
+   M[3] = warp_mat.at<double>(1,0);
+   M[4] = warp_mat.at<double>(1,1);
+   M[5] = warp_mat.at<double>(1,2);
+   std::cout << warp_mat;
 
-
-   fprintf(stderr,"{ { %0.2f } { %0.2f } }  = ",dstTri[0].x,dstTri[0].y);
-   fprintf(stderr,"{ { %0.2f  %0.2f  %0.2f } , { %0.2f  %0.2f  %0.2f } }  ",M[0],M[1],M[2],M[3],M[4],M[5]);
-   fprintf(stderr," * { { %0.2f } , { %0.2f } , { 1 } }  \n\n",srcTri[0].x,srcTri[0].y);
+   fprintf(stderr,"{ { %0.2f } , { %0.2f } }  = ",dstTri[0].x,dstTri[0].y);
+   fprintf(stderr,"{ { %0.2f , %0.2f , %0.2f } , { %0.2f , %0.2f , %0.2f } }  ",M[0],M[1],M[2],M[3],M[4],M[5]);
+   fprintf(stderr," . { { %0.2f } , { %0.2f } , { 1 } }  \n\n",srcTri[0].x,srcTri[0].y);
 
   }
 
