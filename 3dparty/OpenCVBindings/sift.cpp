@@ -82,7 +82,9 @@ int visualizeMatches(
                       std::vector<cv::KeyPoint> &keypointsRight,
                       cv::Mat &descriptorsRight ,
                       std::vector<cv::Point2f> &srcPoints ,
-                      std::vector<cv::Point2f> &dstPoints
+                      std::vector<cv::Point2f> &dstPoints ,
+                      std::vector<cv::Point2f> &srcRANSACPoints ,
+                      std::vector<cv::Point2f> &dstRANSACPoints
                     )
 {
 
@@ -99,9 +101,9 @@ int visualizeMatches(
     cv::Mat roi2 = cv::Mat(matchingImage, cv::Rect(size.width, size.height, right.size().width, right.size().height));
     right.copyTo(roi2);
 
-    char text[256];
-    sprintf(text, "%zd/%zd keypoints matched.", srcPoints.size(), keypointsLeft.size());
-    putText(matchingImage, text, cv::Point(0, cvRound(size.height + 30)), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 1, cv::Scalar(0,0,255));
+    //char text[256];
+    //sprintf(text, "%zd/%zd keypoints matched.", srcPoints.size(), keypointsLeft.size());
+    //putText(matchingImage, text, cv::Point(0, cvRound(size.height + 30)), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 1, cv::Scalar(0,0,255));
 
 
     for (int i=0; i<keypointsLeft.size(); i++){
@@ -129,8 +131,20 @@ int visualizeMatches(
       cv::Point2f pt2 = dstPoints[i];
       cv::Point2f from = pt1;
       cv::Point2f to   = cv::Point(size.width + pt2.x, size.height + pt2.y);
+      cv::line(matchingImage, from, to, cv::Scalar(0, 0 , 255));
+    }
+
+if (srcRANSACPoints.size()>0)
+{    // Draw line between ransac neighbor pairs
+    for (int i = 0; i < (int)srcRANSACPoints.size(); ++i)
+    {
+      cv::Point2f pt1 = srcRANSACPoints[i];
+      cv::Point2f pt2 = dstRANSACPoints[i];
+      cv::Point2f from = pt1;
+      cv::Point2f to   = cv::Point(size.width + pt2.x, size.height + pt2.y);
       cv::line(matchingImage, from, to, cv::Scalar(0, 255, 255));
     }
+}
 
     // Display mathing image
     cv::imwrite(filenameOutput , matchingImage);
@@ -139,6 +153,58 @@ int visualizeMatches(
 }
 
 
+int fitAffineTransformationMatchesRANSAC(
+                                          unsigned int loops ,
+                                          std::vector<cv::Point2f> &srcPoints ,
+                                          std::vector<cv::Point2f> &dstPoints ,
+                                          std::vector<cv::Point2f> &srcRANSACPoints ,
+                                          std::vector<cv::Point2f> &dstRANSACPoints
+                                        )
+{
+  fprintf(stderr,"fitAffineTransformationMatchesRANSAC start \n");
+  if (srcPoints.size()<=3) { fprintf(stderr,"Cannot calculate an affine transformation without 3 or more point correspondances\n"); return 0; }
+  if (srcPoints.size()/loops <=10) { fprintf(stderr,"Too many loops of ransac for our problem \n");   }
+
+  //Affine transformation needs a 3x2 matrix and 3 points
+  //  |DST_X1 DST_X2 DST_X3|      | a   b   c |   | SRC_X1 SRC_X2 SRC_X3|
+  //  |DST_Y1 DST_Y2 DST_Y3|   =  | d   e   f | * | SRC_Y1 SRC_Y2 SRC_Y3|
+  //  |   1      1     1   |      | 0   0   1 |   |   1      1     1    |
+
+  //
+  // DST [ x  y  ] =  | a b c | * SRC [ x y 1 ]
+  //                  | d e f |
+
+
+
+  unsigned int ptA=0,ptB=0,ptC=0;
+
+  float resultMatrix[9]={0};
+
+  unsigned int i=0;
+  for (i=0; i<loops; i++)
+  {
+
+    ptA=rand()%srcPoints.size();
+    ptB=rand()%srcPoints.size();
+    ptC=rand()%srcPoints.size();
+    do { ptB=rand()%srcPoints.size(); } while (ptB==ptA);
+    do { ptC=rand()%srcPoints.size(); } while ( (ptC==ptA)||(ptB==ptC) );
+
+
+    fprintf(stderr,"SRC = { { %0.2f , %0.2f , 1 } , { %0.2f , %0.2f , 1 } , { %0.2f , %0.2f , 1 } }  ",dstPoints[ptA].x,dstPoints[ptA].y,dstPoints[ptB].x,dstPoints[ptB].y,dstPoints[ptC].x,dstPoints[ptC].y);
+    fprintf(stderr,"DST = { { %0.2f , %0.2f , 1 } , { %0.2f , %0.2f , 1 } , { %0.2f , %0.2f , 1 } }  ",srcPoints[ptA].x,srcPoints[ptA].y,srcPoints[ptB].x,srcPoints[ptB].y,srcPoints[ptC].x,srcPoints[ptC].y);
+    fprintf(stderr,"M = { { a , b , 1 } , { c , d , 1 } , { e , f , 1 } }  \n\n\n");
+
+
+    //derive resultMatrix with Gauss Jordan
+
+
+
+  }
+
+  fprintf(stderr,"fitAffineTransformationMatchesRANSAC done \n");
+  return 1;
+}
 
 
 
@@ -175,6 +241,8 @@ int main(int argc, const char* argv[])
     fprintf(stderr,"SIFT features ready \n");
 
 
+    std::vector<cv::Point2f> srcRANSACPoints;
+    std::vector<cv::Point2f> dstRANSACPoints;
 
 
     std::vector<cv::Point2f> srcPoints;
@@ -185,7 +253,7 @@ int main(int argc, const char* argv[])
 
 
    visualizeMatches(
-                      "sift_result_match.jpg" ,
+                      "sift_initial_match.jpg" ,
                       left ,
                       keypointsLeft,
                       descriptorsLeft,
@@ -193,9 +261,28 @@ int main(int argc, const char* argv[])
                       keypointsRight,
                       descriptorsRight,
                       srcPoints,
-                      dstPoints
+                      dstPoints,
+                      srcRANSACPoints,
+                      dstRANSACPoints
                     );
 
+
+
+   fitAffineTransformationMatchesRANSAC( 1000, srcPoints , dstPoints ,  srcRANSACPoints, dstRANSACPoints);
+
+   visualizeMatches(
+                      "sift_affine_match.jpg" ,
+                      left ,
+                      keypointsLeft,
+                      descriptorsLeft,
+                      right ,
+                      keypointsRight,
+                      descriptorsRight,
+                      srcPoints,
+                      dstPoints ,
+                      srcRANSACPoints,
+                      dstRANSACPoints
+                    );
 
 
 
