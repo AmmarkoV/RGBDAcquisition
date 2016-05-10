@@ -99,6 +99,15 @@ if (srcRANSACPoints.size()>0)
 int main(int argc, const char* argv[])
 {
 
+   double SIFTThreshold = 350.0;
+
+   unsigned int RANSACLoops = 1000;
+   unsigned int stitchedBorder=100;
+   double reprojectionThresholdX = 3.0;
+   double reprojectionThresholdY = 3.0;
+
+
+
     cv::Mat left = cv::imread("uttower_left.JPG"  , CV_LOAD_IMAGE_COLOR);
     if(! left.data ) { fprintf(stderr,"Left Image missing \n"); return 1; }
 
@@ -135,7 +144,7 @@ int main(int argc, const char* argv[])
 
     std::vector<cv::Point2f> srcPoints;
     std::vector<cv::Point2f> dstPoints;
-    findPairs(keypointsLeft, descriptorsLeft, keypointsRight, descriptorsRight, srcPoints, dstPoints);
+    findPairs( SIFTThreshold , keypointsLeft, descriptorsLeft, keypointsRight, descriptorsRight, srcPoints, dstPoints);
     //printf("%zd keypoints are matched.\n", srcPoints.size());
 
 
@@ -155,14 +164,14 @@ int main(int argc, const char* argv[])
                     );
 
 
-
    cv::Mat warp_mat( 2, 3,  CV_64FC1  );
    double M[6]={0};
-   fitAffineTransformationMatchesRANSAC( 1000, M , warp_mat, srcPoints , dstPoints ,  srcRANSACPoints, dstRANSACPoints);
+   fitAffineTransformationMatchesRANSAC( RANSACLoops , reprojectionThresholdX , reprojectionThresholdY , M , warp_mat, srcPoints , dstPoints ,  srcRANSACPoints, dstRANSACPoints);
 
 
    stitchAffineMatch(
                      "wrappedAffine.jpg"  ,
+                     stitchedBorder,
                      left ,
                      right ,
                      warp_mat

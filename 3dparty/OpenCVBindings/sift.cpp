@@ -11,7 +11,6 @@
 #include "affine.h"
 #include "tools.h"
 
-const double THRESHOLD = 350;
 
 
 
@@ -26,9 +25,10 @@ double sumDistanceOfAllDescriptors(cv::Mat& vec1, cv::Mat& vec2)
   return sqrt(sum);
 }
 
-int nearestNeighbor(cv::Mat& vec, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) {
+int nearestNeighbor(double thresholdSIFT , cv::Mat& vec, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors)
+{
   int neighbor = -1;
-  double minDist = THRESHOLD+1;
+  double minDist = thresholdSIFT+1;
 
   for (int i = 0; i < descriptors.rows; i++)
   {
@@ -39,24 +39,25 @@ int nearestNeighbor(cv::Mat& vec, std::vector<cv::KeyPoint>& keypoints, cv::Mat&
     if (d < minDist) { minDist = d; neighbor = i; }
   }
 
-  if (minDist < THRESHOLD) { return neighbor; } else
+  if (minDist < thresholdSIFT) { return neighbor; } else
                            { /*Failed */}
 
   return -1;
 }
 
-void findPairs(std::vector<cv::KeyPoint>& keypoints1, cv::Mat& descriptors1,
+void findPairs(double thresholdSIFT,
+               std::vector<cv::KeyPoint>& keypoints1, cv::Mat& descriptors1,
                std::vector<cv::KeyPoint>& keypoints2, cv::Mat& descriptors2,
                std::vector<cv::Point2f>& srcPoints, std::vector<cv::Point2f>& dstPoints)
 {
   for (int i = 0; i < descriptors1.rows; i++)
   {
     clear_line();
-    fprintf(stderr,"Checking SIFT pairs , threshold %0.2f : \n",THRESHOLD);
+    fprintf(stderr,"Checking SIFT pairs , threshold %0.2f : \n",thresholdSIFT);
     fprintf(stderr,"%u / %u checks  - %u matches \n",i, descriptors1.rows , srcPoints.size());
     cv::KeyPoint pt1 = keypoints1[i];
     cv::Mat desc1 = descriptors1.row(i);
-    int nn = nearestNeighbor(desc1, keypoints2, descriptors2);
+    int nn = nearestNeighbor(thresholdSIFT,desc1, keypoints2, descriptors2);
     if (nn >= 0) {
       cv::KeyPoint pt2 = keypoints2[nn];
       srcPoints.push_back(pt1.pt);

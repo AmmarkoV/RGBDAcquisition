@@ -3,7 +3,8 @@
 
 #include <opencv2/core/core.hpp>
 
-void findPairs(std::vector<cv::KeyPoint>& keypoints1, cv::Mat& descriptors1,
+void findPairs(double thresholdSIFT,
+               std::vector<cv::KeyPoint>& keypoints1, cv::Mat& descriptors1,
                std::vector<cv::KeyPoint>& keypoints2, cv::Mat& descriptors2,
                std::vector<cv::Point2f>& srcPoints, std::vector<cv::Point2f>& dstPoints);
 

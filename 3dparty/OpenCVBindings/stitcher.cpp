@@ -3,7 +3,6 @@
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-
 int myBlendImages( cv::Mat & out,
                    cv::Mat & left ,
                    cv::Mat & right )
@@ -48,19 +47,20 @@ int myBlendImages( cv::Mat & out,
 
 
 int stitchAffineMatch(
-                const char * filenameOutput ,
-                cv::Mat & left ,
-                cv::Mat & right ,
-                cv::Mat & warp_mat
-               )
+                       const char * filenameOutput ,
+                       unsigned int border,
+                       cv::Mat & left ,
+                       cv::Mat & right ,
+                       cv::Mat & warp_mat
+                     )
 {
     unsigned int borderX = left.size().width/2;
-    unsigned int borderY = 100;
+    unsigned int borderY = border;
 
     warp_mat.at<double>(0,2) += borderX;
     warp_mat.at<double>(1,2) += borderY;
 
-    cv::Size sz = cv::Size(/*left.size().width +*/ right.size().width  + borderX , /*left.size().height +*/ right.size().height + borderY );
+    cv::Size sz = cv::Size(/*left.size().width +*/ right.size().width  + borderX + border , /*left.size().height +*/ right.size().height + borderY + border );
     cv::Mat matchingImageLeft = cv::Mat::zeros(sz, CV_8UC3);
     cv::Mat matchingImageRight = cv::Mat::zeros(sz, CV_8UC3);
     cv::Mat matchingImageBlended = cv::Mat::zeros(sz, CV_8UC3);

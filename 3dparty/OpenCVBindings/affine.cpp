@@ -21,11 +21,14 @@ void checkAffineSolution ( double * outX ,double * outY , double * dstX,double *
 }
 
 int checkAffineFitness(
+                         double thresholdX,double thresholdY ,
                          double * M ,
                          std::vector<cv::Point2f> &srcPoints ,
                          std::vector<cv::Point2f> &dstPoints ,
                          double * avgX ,
                          double * avgY ,
+                         double * totAvgX ,
+                         double * totAvgY ,
                          std::vector<cv::Point2f> &srcRANSACPoints ,
                          std::vector<cv::Point2f> &dstRANSACPoints
                       )
@@ -41,6 +44,7 @@ int checkAffineFitness(
   double a=M[0] , b=M[1] , c=M[2];
   double d=M[3] , e=M[4] , f=M[5];
 
+  double totSumX=0,totSumY=0;
   double sumX=0,sumY=0;
   double sx=0.0 , sy=0.0 ,  dx=0.0 , dy=0.0 , rx=0.0 , ry=0.0;
 
@@ -59,8 +63,10 @@ int checkAffineFitness(
     if ( ry > dy ) { ry = ry - dy; } else { ry = dy - ry; }
     //fprintf(stderr," %0.2f %0.2f \n",rx,ry);
 
+    totSumX+=rx; totSumY+=ry;
 
-    if ( (rx<3)&&(ry<3) )
+
+    if ( (rx< thresholdX )&&(ry< thresholdY ) )
     {
        sumX+=rx; sumY+=ry;
        ++inlierCount;
@@ -78,6 +84,9 @@ int checkAffineFitness(
   *avgY = (double) sumY/inlierCount;
   }
 
+  *totAvgX=totSumX/srcPoints.size();
+  *totAvgY=totSumY/srcPoints.size();
+
   //fprintf(stderr,"{ { a=%0.2f , b=%0.2f , c=%0.2f } , { d=%0.2f , e=%0.2f , f=%0.2f } }  ",a,b,c,d,e,f);
   //fprintf(stderr,"%u inliers / %u points  , average ( %0.2f,%0.2f ) \n",inlierCount , srcPoints.size() , *avgX , *avgY );
   return inlierCount;
@@ -88,6 +97,7 @@ int checkAffineFitness(
 
 int fitAffineTransformationMatchesRANSAC(
                                           unsigned int loops ,
+                                          double thresholdX,double thresholdY ,
                                           double * M ,
                                           cv::Mat & warp_mat ,
                                           std::vector<cv::Point2f> &srcPoints ,
@@ -123,7 +133,8 @@ int fitAffineTransformationMatchesRANSAC(
   cv::Mat bestWarp_mat( 2, 3,  CV_64FC1  );
   double bestM[6]={0};
   unsigned int bestInliers=0;
-  double avgX,avgY,bestAvgX=66660.0,bestAvgY=66660.0;
+  double totAvgX=0,totAvgY=0,avgX=0,avgY=0;
+  double bestTotAvgX=66666,bestTotAvgY=66666,bestAvgX=66660.0,bestAvgY=66660.0;
 
   unsigned int i=0,z=0;
   for (i=0; i<loops; i++)
@@ -167,13 +178,13 @@ int fitAffineTransformationMatchesRANSAC(
   */
 
 
-   unsigned int inliers = checkAffineFitness( M , srcPoints , dstPoints , &avgX, &avgY , srcRANSACPoints , dstRANSACPoints );
+   unsigned int inliers = checkAffineFitness( thresholdX , thresholdY , M , srcPoints , dstPoints , &avgX, &avgY , &totAvgX , &totAvgY , srcRANSACPoints , dstRANSACPoints );
 
    if (inliers > bestInliers )
     {
       bestInliers = inliers;
-      bestAvgX = avgX;
-      bestAvgY = avgY;
+      bestAvgX = avgX;     bestAvgY = avgY;
+      bestTotAvgX=totAvgX; bestTotAvgY=totAvgY;
       for (z=0; z<6; z++) { bestM[z]=M[z]; }
       bestSrcRANSACPoints=srcRANSACPoints;
       bestDstRANSACPoints=dstRANSACPoints;
@@ -183,7 +194,7 @@ int fitAffineTransformationMatchesRANSAC(
 
     clear_line();
     fprintf(stderr,"RANSACing affine transform , %u / %u loops : \n",i,loops);
-    fprintf(stderr,"Best : %u inliers  , avg ( %0.2f , %0.2f )  \n",bestInliers,bestAvgX,bestAvgY);
+    fprintf(stderr,"Best : %u inliers  , avg ( %0.2f , %0.2f ) , global ( %0.2f , %0.2f )  \n",bestInliers,bestAvgX,bestAvgY , bestTotAvgX , bestTotAvgY);
 
 
     for (z=0; z<6; z++) { M[z]=bestM[z]; }
