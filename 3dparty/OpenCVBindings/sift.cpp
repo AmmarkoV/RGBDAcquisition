@@ -211,7 +211,7 @@ int checkAffineFitness(
     //fprintf(stderr," %0.2f %0.2f \n",rx,ry);
 
 
-    if ( (rx<5)&&(ry<5) )
+    if ( (rx<3)&&(ry<3) )
     {
        sumX+=rx; sumY+=ry;
        ++inlierCount;
@@ -348,6 +348,48 @@ int fitAffineTransformationMatchesRANSAC(
 }
 
 
+int blendImages( cv::Mat & out,
+                 cv::Mat & left ,
+                 cv::Mat & right )
+{
+   unsigned char lR=0,lG=0,lB=0,rR=0,rG=0,rB=0;
+   unsigned int leftBlank,rightBlank;
+   unsigned int x=0,y=0,offset=0,width=left.size().width;
+
+   for ( x=0; x<width; x++ )
+   {
+    for ( y=0; y<left.size().height; y++ )
+    {
+      offset=y*width*3+x*3;
+      lR=left.data[offset+0];  lG=left.data[offset+1];  lB=left.data[offset+2];
+      rR=right.data[offset+0]; rG=right.data[offset+1]; rB=right.data[offset+2];
+
+       if ( (  lR==0 ) && ( lG==0 ) && ( lB == 0 )  )  { leftBlank=1; }  else { leftBlank=0; }
+       if ( (  rR==0 ) && ( rG==0 ) && ( rB == 0 )  )  { rightBlank=1; } else { rightBlank=0; }
+
+       if ( (  leftBlank ) && ( rightBlank ) )  { } else
+       if ( (  !leftBlank ) && ( rightBlank ) )
+       {
+         out.data[offset+0]=lR;
+         out.data[offset+1]=lG;
+         out.data[offset+2]=lB;
+       } else
+       if ( (  leftBlank ) && ( !rightBlank ) )
+       {
+         out.data[offset+0]=rR;
+         out.data[offset+1]=rG;
+         out.data[offset+2]=rB;
+       } else
+       {
+         out.data[offset+0]=(lR+rR)/2;
+         out.data[offset+1]=(lG+rG)/2;
+         out.data[offset+2]=(lB+rB)/2;
+       }
+    }
+   }
+ return 1;
+}
+
 
 int stitchMatch(
                 const char * filenameOutput ,
@@ -363,32 +405,27 @@ int stitchMatch(
     warp_mat.at<double>(1,2) += borderY;
 
     cv::Size sz = cv::Size(left.size().width + right.size().width  + borderX , left.size().height + right.size().height + borderY );
-    cv::Mat matchingImage = cv::Mat::zeros(sz, CV_8UC3);
-
-    //cv::Rect roi( cv::Point( originX, originY ), cv::Size( width, height ));
-    //cv::Mat destinationROI = bigImage( roi );
-    //smallImage.copyTo( destinationROI );
-
-    //cv::Mat roi2 = cv::Mat(matchingImage, cv::Rect(size.width, size.height, right.size().width, right.size().height));
-    //right.copyTo(roi2);
+    cv::Mat matchingImageLeft = cv::Mat::zeros(sz, CV_8UC3);
+    cv::Mat matchingImageRight = cv::Mat::zeros(sz, CV_8UC3);
+    cv::Mat matchingImageBlended = cv::Mat::zeros(sz, CV_8UC3);
 
 
     // Draw camera frame
-    cv::Mat roi1 = cv::Mat(matchingImage, cv::Rect(borderX, borderY, right.size().width, right.size().height));
+    cv::Mat roi1 = cv::Mat(matchingImageRight, cv::Rect(borderX, borderY, right.size().width, right.size().height));
     right.copyTo(roi1);
 
 
    /// Apply the Affine Transform just found to the src image
    cv::Mat warp_dst = cv::Mat::zeros( left.rows, left.cols, left.type() );
-   //warpAffine( left, matchingImage /* warp_dst */ , warp_mat, /*warp_dst*/ matchingImage.size() );
-
-
-   //right.copyTo(roi1); //warp_dst
+   warpAffine( left, matchingImageLeft /* warp_dst */ , warp_mat, /*warp_dst*/ matchingImageLeft.size() );
 
    //double alpha = 0.5 , beta = ( 1.0 - alpha );
-   //addWeighted(   roi1 /*warp_dst*/  , alpha, right, beta, 0.0, matchingImage);
+   //addWeighted(   matchingImageLeft /*warp_dst*/  , alpha, matchingImageRight, beta, 0.0, matchingImageBlended);
 
-   cv::imwrite( filenameOutput  ,  matchingImage /* warp_dst */);
+
+   blendImages(matchingImageBlended , matchingImageLeft , matchingImageRight);
+
+   cv::imwrite( filenameOutput  ,  matchingImageBlended /* warp_dst */);
 
 }
 
