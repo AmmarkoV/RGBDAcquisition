@@ -111,7 +111,7 @@ int main(int argc, const char* argv[])
    char filenameLeft[512]={"uttower_left.JPG"};
    char filenameRight[512]={"uttower_right.JPG"};
 
-   if (argc>=2)
+   if (argc>=3)
    {
      snprintf(filenameLeft,512,"%s",argv[1]);
      snprintf(filenameRight,512,"%s",argv[2]);
