@@ -100,10 +100,8 @@ int fitHomographyTransformationMatchesRANSAC(
   //
   // DST | x |  = M | a b c | * SRC | x |
   //     | y |      | d e f |       | y |
-  //                                | 1 |
-  //{ {dx} , {dy } } = { { a ,b, c} , { d , e ,f  } } . { { sx } , { sy } , { 1 } }
-  //{ {dx} , {dy } } = { { c a * sx + b sy } ,  { f d sx + e sy } }
-  // { { c a * sx + b sy - dx } ,  { f d sx + e sy - dy } } = 0
+  //     | z |      | g h i |       | 1 |
+  //{ {dx} , {dy } , { dz }  } = { { a ,b, c} , { d , e ,f  }  , { g , h ,i  }  } . { { sx } , { sy } , { 1 } }
   //
   //
 
