@@ -12,5 +12,12 @@ int stitchAffineMatch(
                        cv::Mat & warp_mat
                      );
 
+int stitchHomographyMatch(
+                          const char * filenameOutput ,
+                          unsigned int border,
+                          cv::Mat & left ,
+                          cv::Mat & right ,
+                          cv::Mat & warp_mat
+                         );
 
 #endif // STITCHER_H_INCLUDED

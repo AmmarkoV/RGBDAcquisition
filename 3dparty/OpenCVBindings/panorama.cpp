@@ -9,6 +9,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "affine.h"
+#include "homography.h"
 #include "sift.h"
 #include "stitcher.h"
 #include "tools.h"
@@ -193,6 +194,34 @@ int main(int argc, const char* argv[])
                     );
 
 
+
+
+   cv::Mat homo_mat( 3, 3,  CV_64FC1  );
+   double H[6]={0};
+   fitHomographyTransformationMatchesRANSAC( RANSACLoops , reprojectionThresholdX , reprojectionThresholdY , H , homo_mat, srcPoints , dstPoints ,  srcRANSACPoints, dstRANSACPoints);
+
+
+   stitchHomographyMatch(
+                         "wrappedHomography.jpg"  ,
+                         stitchedBorder,
+                         left ,
+                         right ,
+                         homo_mat
+                        );
+
+   visualizeMatches(
+                      "sift_homography_match.jpg" ,
+                      left ,
+                      keypointsLeft,
+                      descriptorsLeft,
+                      right ,
+                      keypointsRight,
+                      descriptorsRight,
+                      srcPoints,
+                      dstPoints ,
+                      srcRANSACPoints,
+                      dstRANSACPoints
+                    );
 
     return 0;
 }

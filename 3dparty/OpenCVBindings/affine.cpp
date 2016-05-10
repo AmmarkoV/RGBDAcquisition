@@ -108,7 +108,7 @@ int fitAffineTransformationMatchesRANSAC(
 {
   fprintf(stderr,"fitAffineTransformationMatchesRANSAC start %0.2f \n",(float) srcPoints.size()/loops );
   if (srcPoints.size()<=3) { fprintf(stderr,"Cannot calculate an affine transformation without 3 or more point correspondances\n"); return 0; }
-  if ((float)srcPoints.size()/loops <= 1.0 ) { fprintf(stderr,"Too many loops of ransac for our problem \n");   }
+  if ((float)srcPoints.size()/loops <= 1.0 ) { fprintf(stderr,"Too few loops of ransac for our problem \n");   }
 
   //
   // DST | x |  = M | a b c | * SRC | x |

@@ -73,7 +73,47 @@ int stitchAffineMatch(
 
    /// Apply the Affine Transform just found to the src image
    cv::Mat warp_dst = cv::Mat::zeros( left.rows, left.cols, left.type() );
-   warpAffine( left, matchingImageLeft /* warp_dst */ , warp_mat, /*warp_dst*/ matchingImageLeft.size() );
+   cv::warpAffine( left, matchingImageLeft /* warp_dst */ , warp_mat, /*warp_dst*/ matchingImageLeft.size() );
+
+   //double alpha = 0.5 , beta = ( 1.0 - alpha );
+   //addWeighted(   matchingImageLeft /*warp_dst*/  , alpha, matchingImageRight, beta, 0.0, matchingImageBlended);
+   myBlendImages(matchingImageBlended , matchingImageLeft , matchingImageRight);
+
+   cv::imwrite( filenameOutput  ,  matchingImageBlended /* warp_dst */);
+
+}
+
+
+
+
+int stitchHomographyMatch(
+                          const char * filenameOutput ,
+                          unsigned int border,
+                          cv::Mat & left ,
+                          cv::Mat & right ,
+                          cv::Mat & warp_mat
+                         )
+{
+    unsigned int borderX = left.size().width/2;
+    unsigned int borderY = border;
+
+    warp_mat.at<double>(0,2) += borderX;
+    warp_mat.at<double>(1,2) += borderY;
+
+    cv::Size sz = cv::Size(/*left.size().width +*/ right.size().width  + borderX + border , /*left.size().height +*/ right.size().height + borderY + border );
+    cv::Mat matchingImageLeft = cv::Mat::zeros(sz, CV_8UC3);
+    cv::Mat matchingImageRight = cv::Mat::zeros(sz, CV_8UC3);
+    cv::Mat matchingImageBlended = cv::Mat::zeros(sz, CV_8UC3);
+
+
+    // Draw camera frame
+    cv::Mat roi1 = cv::Mat(matchingImageRight, cv::Rect(borderX, borderY, right.size().width, right.size().height));
+    right.copyTo(roi1);
+
+
+   /// Apply the Affine Transform just found to the src image
+   cv::Mat warp_dst = cv::Mat::zeros( left.rows, left.cols, left.type() );
+   cv::warpPerspective( left, matchingImageLeft /* warp_dst */ , warp_mat, /*warp_dst*/ matchingImageLeft.size() );
 
    //double alpha = 0.5 , beta = ( 1.0 - alpha );
    //addWeighted(   matchingImageLeft /*warp_dst*/  , alpha, matchingImageRight, beta, 0.0, matchingImageBlended);
