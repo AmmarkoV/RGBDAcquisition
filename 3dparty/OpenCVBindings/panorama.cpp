@@ -108,11 +108,21 @@ int main(int argc, const char* argv[])
    double reprojectionThresholdY = 3.0;
 
 
+   char filenameLeft[512]={"uttower_left.JPG"};
+   char filenameRight[512]={"uttower_right.JPG"};
 
-    cv::Mat left = cv::imread("uttower_left.JPG"  , CV_LOAD_IMAGE_COLOR);
+   if (argc>=2)
+   {
+     snprintf(filenameLeft,512,"%s",argv[1]);
+     snprintf(filenameRight,512,"%s",argv[2]);
+   }
+
+    fprintf(stderr,"Running SIFT on %s / %s \n" , filenameLeft , filenameRight);
+
+    cv::Mat left = cv::imread(filenameLeft  , CV_LOAD_IMAGE_COLOR);
     if(! left.data ) { fprintf(stderr,"Left Image missing \n"); return 1; }
 
-    cv::Mat right = cv::imread("uttower_right.JPG", CV_LOAD_IMAGE_COLOR);
+    cv::Mat right = cv::imread(filenameRight, CV_LOAD_IMAGE_COLOR);
     if(! right.data ) { fprintf(stderr,"Right Image missing \n"); return 1; }
 
 
@@ -126,7 +136,7 @@ int main(int argc, const char* argv[])
     // Add results to image and save.
     cv::Mat output;
     cv::drawKeypoints(left, keypointsLeft, output);
-    cv::imwrite("sift_result_left.jpg", output);
+    cv::imwrite("sift_features_left.jpg", output);
 
 
     std::vector<cv::KeyPoint> keypointsRight;
@@ -134,7 +144,7 @@ int main(int argc, const char* argv[])
     detector.detect(right, keypointsRight);
     extractor->compute(right, keypointsRight, descriptorsRight);
     cv::drawKeypoints(right, keypointsRight, output);
-    cv::imwrite("sift_result_right.jpg", output);
+    cv::imwrite("sift_features_right.jpg", output);
 
     //fprintf(stderr,"SIFT features ready \n");
 
@@ -197,7 +207,7 @@ int main(int argc, const char* argv[])
 
 
    cv::Mat homo_mat( 3, 3,  CV_64FC1  );
-   double H[6]={0};
+   double H[9]={0};
    fitHomographyTransformationMatchesRANSAC( RANSACLoops , reprojectionThresholdX , reprojectionThresholdY , H , homo_mat, srcPoints , dstPoints ,  srcRANSACPoints, dstRANSACPoints);
 
 

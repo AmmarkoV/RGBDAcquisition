@@ -6,6 +6,30 @@
 #include "homography.h"
 #include "tools.h"
 
+int errorFlag  = 0;
+
+void checkHomographySolution ( double * outX ,double * outY , double * dstX,double * dstY , double * M , double * srcX, double * srcY)
+{
+  double a=M[0] , b=M[1] , c=M[2];
+  double d=M[3] , e=M[4] , f=M[5];
+  double g=M[6] , h=M[7] , i2=M[8];
+
+  double outZ =  i2 + (g * *srcX) + (h * *srcY);
+  if (outZ==0) { outZ=1.0; errorFlag=1; }
+
+
+
+  *outX = c + ( (double) a * *srcX ) + ((double) b * *srcY );
+  *outX = (double) *outX / outZ;
+
+  *outY = f + ( (double) d * *srcX ) + ((double) e * *srcY );
+  *outY = (double) *outY / outZ;
+
+
+   if ( *outX > *dstX ) { *outX = *outX - *dstX; } else { *outX = *dstX - *outX; }
+   if ( *outY > *dstY ) { *outY = *outY - *dstY; } else { *outY = *dstY - *outY; }
+
+}
 
 
 int checkHomographyFitness(
@@ -33,7 +57,7 @@ int checkHomographyFitness(
 
   double totSumX=0,totSumY=0;
   double sumX=0,sumY=0;
-  double sx=0.0 , sy=0.0 ,  dx=0.0 , dy=0.0 , rx=0.0 , ry=0.0;
+  double sx=0.0 , sy=0.0 ,  dx=0.0 , dy=0.0 , rx=0.0 , ry=0.0 , rz =0.0;
 
 
 
@@ -43,12 +67,21 @@ int checkHomographyFitness(
     sx = (double) srcPoints[i].x;  sy = (double) srcPoints[i].y;
     dx = (double) dstPoints[i].x;  dy = (double) dstPoints[i].y;
 
+
+    rz = (double) i2 + (g * sx) + (h * sy);
+    if (rz==0) { rz=1.0; errorFlag=1; }
+
+
     rx = (double) c + ( a * sx ) + ( b * sy )  ;
+    rx = (double) rx/rz;
+
     ry = (double) f + ( d * sx ) + ( e * sy )  ;
+    ry = (double) ry/rz;
+
 
     if ( rx > dx ) { rx = rx - dx; } else { rx = dx - rx; }
     if ( ry > dy ) { ry = ry - dy; } else { ry = dy - ry; }
-    //fprintf(stderr," %0.2f %0.2f \n",rx,ry);
+
 
     totSumX+=rx; totSumY+=ry;
 
@@ -161,7 +194,7 @@ int fitHomographyTransformationMatchesRANSAC(
       bestInliers = inliers;
       bestAvgX = avgX;     bestAvgY = avgY;
       bestTotAvgX=totAvgX; bestTotAvgY=totAvgY;
-      for (z=0; z<6; z++) { bestM[z]=M[z]; }
+      for (z=0; z<9; z++) { bestM[z]=M[z]; }
       bestSrcRANSACPoints=srcRANSACPoints;
       bestDstRANSACPoints=dstRANSACPoints;
       bestWarp_mat = warp_mat;
@@ -169,17 +202,16 @@ int fitHomographyTransformationMatchesRANSAC(
 
 
     clear_line();
-    fprintf(stderr,"RANSACing affine transform , %u / %u loops : \n",i,loops);
+    fprintf(stderr,"RANSACing homography , %u / %u loops : \n",i,loops);
     fprintf(stderr,"Best : %u inliers  , avg ( %0.2f , %0.2f ) , global ( %0.2f , %0.2f )  \n",bestInliers,bestAvgX,bestAvgY , bestTotAvgX , bestTotAvgY);
 
 
-    for (z=0; z<6; z++) { M[z]=bestM[z]; }
+    for (z=0; z<9; z++) { M[z]=bestM[z]; }
     srcRANSACPoints=bestSrcRANSACPoints;
     dstRANSACPoints= bestDstRANSACPoints;
     warp_mat = bestWarp_mat;
 
   }
 
-  //fprintf(stderr,"fitAffineTransformationMatchesRANSAC done got %u inliers with avg ( %0.2f , %0.2f ) \n",bestInliers,bestAvgX,bestAvgY);
   return 1;
 }

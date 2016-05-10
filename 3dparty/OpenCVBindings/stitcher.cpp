@@ -3,6 +3,7 @@
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <stdio.h>
 int myBlendImages( cv::Mat & out,
                    cv::Mat & left ,
                    cv::Mat & right )
@@ -54,6 +55,7 @@ int stitchAffineMatch(
                        cv::Mat & warp_mat
                      )
 {
+    fprintf(stderr,"Stitching Affine Transformation Match : ");
     unsigned int borderX = left.size().width/2;
     unsigned int borderY = border;
 
@@ -80,7 +82,7 @@ int stitchAffineMatch(
    myBlendImages(matchingImageBlended , matchingImageLeft , matchingImageRight);
 
    cv::imwrite( filenameOutput  ,  matchingImageBlended /* warp_dst */);
-
+   fprintf(stderr,"done. \n");
 }
 
 
@@ -94,6 +96,7 @@ int stitchHomographyMatch(
                           cv::Mat & warp_mat
                          )
 {
+    fprintf(stderr,"Stitching Homography Match : ");
     unsigned int borderX = left.size().width/2;
     unsigned int borderY = border;
 
@@ -120,5 +123,5 @@ int stitchHomographyMatch(
    myBlendImages(matchingImageBlended , matchingImageLeft , matchingImageRight);
 
    cv::imwrite( filenameOutput  ,  matchingImageBlended /* warp_dst */);
-
+   fprintf(stderr,"done. \n");
 }
