@@ -39,7 +39,17 @@
 		<Linker>
 			<Add option="`pkg-config --libs opencv`" />
 		</Linker>
+		<Unit filename="affine.cpp" />
+		<Unit filename="affine.h" />
+		<Unit filename="homography.cpp" />
+		<Unit filename="homography.h" />
+		<Unit filename="panorama.cpp" />
 		<Unit filename="sift.cpp" />
+		<Unit filename="sift.h" />
+		<Unit filename="stitcher.cpp" />
+		<Unit filename="stitcher.h" />
+		<Unit filename="tools.cpp" />
+		<Unit filename="tools.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

@@ -47,7 +47,7 @@ int myBlendImages( cv::Mat & out,
 }
 
 
-int stitchMatch(
+int stitchAffineMatch(
                 const char * filenameOutput ,
                 cv::Mat & left ,
                 cv::Mat & right ,

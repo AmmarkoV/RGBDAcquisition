@@ -11,7 +11,6 @@
 #include "affine.h"
 #include "sift.h"
 #include "stitcher.h"
-#include "visualization.h"
 #include "tools.h"
 
 int visualizeMatches(
@@ -162,12 +161,12 @@ int main(int argc, const char* argv[])
    fitAffineTransformationMatchesRANSAC( 1000, M , warp_mat, srcPoints , dstPoints ,  srcRANSACPoints, dstRANSACPoints);
 
 
-   stitchMatch(
-                "wrapped.jpg"  ,
-                 left ,
-                 right ,
-                 warp_mat
-               );
+   stitchAffineMatch(
+                     "wrappedAffine.jpg"  ,
+                     left ,
+                     right ,
+                     warp_mat
+                    );
 
 
    visualizeMatches(

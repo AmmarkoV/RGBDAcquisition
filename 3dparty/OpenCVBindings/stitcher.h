@@ -4,7 +4,7 @@
 
 #include <opencv2/core/core.hpp>
 
-int stitchMatch(
+int stitchAffineMatch(
                 const char * filenameOutput ,
                 cv::Mat & left ,
                 cv::Mat & right ,
