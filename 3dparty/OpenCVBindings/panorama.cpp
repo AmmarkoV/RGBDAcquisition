@@ -2,6 +2,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+
+#include <opencv2/calib3d/calib3d.hpp>
 //#include <opencv2/nonfree/nonfree.hpp>
 //#include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/features2d/features2d.hpp>
@@ -107,6 +109,8 @@ int main(int argc, const char* argv[])
    double reprojectionThresholdX = 3.0;
    double reprojectionThresholdY = 3.0;
 
+   unsigned int useOpenCVHomographyEstimator=0;
+
 
    char filenameLeft[512]={"uttower_left.JPG"};
    char filenameRight[512]={"uttower_right.JPG"};
@@ -116,6 +120,32 @@ int main(int argc, const char* argv[])
      snprintf(filenameLeft,512,"%s",argv[1]);
      snprintf(filenameRight,512,"%s",argv[2]);
    }
+
+
+   for (unsigned int i=0; i<argc; i++)
+   {
+    if (strcmp(argv[i],"-opencv")==0) {
+                                        fprintf(stderr,"Using opencv homography estimator \n");
+                                        useOpenCVHomographyEstimator=1;
+                                       } else
+    if (strcmp(argv[i],"-loops")==0) {
+                                      RANSACLoops=atoi(argv[i+1]);
+                                      fprintf(stderr,"Using %u RANSAC loops\n",RANSACLoops);
+                                     } else
+    if (strcmp(argv[i],"-SIFTthreshold")==0)
+                                     {
+                                       SIFTThreshold=(double) atof(argv[i+1]);
+                                       fprintf(stderr,"Setting SIFT threshold to %0.2f\n",SIFTThreshold);
+                                      } else
+    if (strcmp(argv[i],"-ReprojectionThreshold")==0)
+                                     {
+                                       reprojectionThresholdX=(double)atof(argv[i+1]);
+                                       reprojectionThresholdY=reprojectionThresholdX;
+                                       fprintf(stderr,"Setting reprojection threshold to %0.2f,%0.2f \n",reprojectionThresholdX,reprojectionThresholdY);
+                                      }
+   }
+
+
 
     fprintf(stderr,"Running SIFT on %s / %s \n" , filenameLeft , filenameRight);
 
@@ -208,7 +238,14 @@ int main(int argc, const char* argv[])
 
    cv::Mat homo_mat( 3, 3,  CV_64FC1  );
    double H[9]={0};
-   fitHomographyTransformationMatchesRANSAC( RANSACLoops , reprojectionThresholdX , reprojectionThresholdY , H , homo_mat, srcPoints , dstPoints ,  srcRANSACPoints, dstRANSACPoints);
+
+   if (useOpenCVHomographyEstimator)
+   {
+    homo_mat = cv::findHomography(srcPoints , dstPoints , CV_RANSAC);
+   } else
+   {
+    fitHomographyTransformationMatchesRANSAC( RANSACLoops , reprojectionThresholdX , reprojectionThresholdY , H , homo_mat, srcPoints , dstPoints ,  srcRANSACPoints, dstRANSACPoints);
+   }
 
 
    stitchHomographyMatch(

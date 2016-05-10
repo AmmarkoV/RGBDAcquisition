@@ -6,7 +6,8 @@
 #include <stdio.h>
 int myBlendImages( cv::Mat & out,
                    cv::Mat & left ,
-                   cv::Mat & right )
+                   cv::Mat & right ,
+                   int blend )
 {
    unsigned char lR=0,lG=0,lB=0,rR=0,rG=0,rB=0;
    unsigned int leftBlank,rightBlank;
@@ -37,9 +38,17 @@ int myBlendImages( cv::Mat & out,
          out.data[offset+2]=rB;
        } else
        {
-         out.data[offset+0]=(lR+rR)/2;
-         out.data[offset+1]=(lG+rG)/2;
-         out.data[offset+2]=(lB+rB)/2;
+         if (blend)
+          {
+           out.data[offset+0]=(lR+rR)/2;
+           out.data[offset+1]=(lG+rG)/2;
+           out.data[offset+2]=(lB+rB)/2;
+          } else
+          {//If not blend right is copied on top
+           out.data[offset+0]=rR;
+           out.data[offset+1]=rG;
+           out.data[offset+2]=rB;
+          }
        }
     }
    }
@@ -79,7 +88,7 @@ int stitchAffineMatch(
 
    //double alpha = 0.5 , beta = ( 1.0 - alpha );
    //addWeighted(   matchingImageLeft /*warp_dst*/  , alpha, matchingImageRight, beta, 0.0, matchingImageBlended);
-   myBlendImages(matchingImageBlended , matchingImageLeft , matchingImageRight);
+   myBlendImages(matchingImageBlended , matchingImageLeft , matchingImageRight , 1 );
 
    cv::imwrite( filenameOutput  ,  matchingImageBlended /* warp_dst */);
    fprintf(stderr,"done. \n");
@@ -97,11 +106,12 @@ int stitchHomographyMatch(
                          )
 {
     fprintf(stderr,"Stitching Homography Match : ");
-    unsigned int borderX = left.size().width/2;
-    unsigned int borderY = border;
+    unsigned int borderX = 0;//  left.size().width/2;
+    unsigned int borderY = 0;// border;
 
     warp_mat.at<double>(0,2) += borderX;
     warp_mat.at<double>(1,2) += borderY;
+    warp_mat.at<double>(2,2) =  1.0;
 
     cv::Size sz = cv::Size(/*left.size().width +*/ right.size().width  + borderX + border , /*left.size().height +*/ right.size().height + borderY + border );
     cv::Mat matchingImageLeft = cv::Mat::zeros(sz, CV_8UC3);
@@ -118,9 +128,7 @@ int stitchHomographyMatch(
    cv::Mat warp_dst = cv::Mat::zeros( left.rows, left.cols, left.type() );
    cv::warpPerspective( left, matchingImageLeft /* warp_dst */ , warp_mat, /*warp_dst*/ matchingImageLeft.size() );
 
-   //double alpha = 0.5 , beta = ( 1.0 - alpha );
-   //addWeighted(   matchingImageLeft /*warp_dst*/  , alpha, matchingImageRight, beta, 0.0, matchingImageBlended);
-   myBlendImages(matchingImageBlended , matchingImageLeft , matchingImageRight);
+   myBlendImages(matchingImageBlended , matchingImageLeft , matchingImageRight , 0);
 
    cv::imwrite( filenameOutput  ,  matchingImageBlended /* warp_dst */);
    fprintf(stderr,"done. \n");

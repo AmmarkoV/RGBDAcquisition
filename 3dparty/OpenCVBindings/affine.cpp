@@ -205,6 +205,7 @@ int fitAffineTransformationMatchesRANSAC(
 
   }
 
+
   //fprintf(stderr,"fitAffineTransformationMatchesRANSAC done got %u inliers with avg ( %0.2f , %0.2f ) \n",bestInliers,bestAvgX,bestAvgY);
   return 1;
 }

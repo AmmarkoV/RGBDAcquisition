@@ -18,7 +18,6 @@ void checkHomographySolution ( double * outX ,double * outY , double * dstX,doub
   if (outZ==0) { outZ=1.0; errorFlag=1; }
 
 
-
   *outX = c + ( (double) a * *srcX ) + ((double) b * *srcY );
   *outX = (double) *outX / outZ;
 
@@ -179,13 +178,14 @@ int fitHomographyTransformationMatchesRANSAC(
    /// Get the Affine Transform
    //derive resultMatrix with SVD
    warp_mat = cv::getPerspectiveTransform( srcQuad, dstQuad );
-   fprintf(stderr," ____________________________________________________________ \n");
-   std::cout << warp_mat<<"\n";
+   //fprintf(stderr," ____________________________________________________________ \n");
+   //std::cout << warp_mat<<"\n";
 
    M[0] = warp_mat.at<double>(0,0); M[1] = warp_mat.at<double>(0,1); M[2] = warp_mat.at<double>(0,2);
    M[3] = warp_mat.at<double>(1,0); M[4] = warp_mat.at<double>(1,1); M[5] = warp_mat.at<double>(1,2);
    M[6] = warp_mat.at<double>(2,0); M[7] = warp_mat.at<double>(2,1); M[8] = warp_mat.at<double>(2,2);
 
+/*
    for (z=0; z<4; z++)
    {
     fprintf(stderr,"{ { %0.2f } , { %0.2f } , { 1 } }  = ",dstQuad[z].x,dstQuad[z].y);
@@ -198,7 +198,7 @@ int fitHomographyTransformationMatchesRANSAC(
 
      fprintf(stderr,"diff is %0.2f , %0.2f\n",outX , outY);
    }
-
+*/
 
 
    unsigned int inliers = checkHomographyFitness( thresholdX , thresholdY , M , srcPoints , dstPoints , &avgX, &avgY , &totAvgX , &totAvgY , srcRANSACPoints , dstRANSACPoints );
@@ -226,6 +226,9 @@ int fitHomographyTransformationMatchesRANSAC(
     warp_mat = bestWarp_mat;
 
   }
+
+  if (errorFlag)
+   { fprintf(stderr,"Had error points with null Z \n"); }
 
   return 1;
 }
