@@ -356,15 +356,39 @@ int stitchMatch(
                 cv::Mat & warp_mat
                )
 {
+    unsigned int borderX = left.size().width/2;
+    unsigned int borderY = 100;
+
+    warp_mat.at<double>(0,2) += borderX;
+    warp_mat.at<double>(1,2) += borderY;
+
+    cv::Size sz = cv::Size(left.size().width + right.size().width  + borderX , left.size().height + right.size().height + borderY );
+    cv::Mat matchingImage = cv::Mat::zeros(sz, CV_8UC3);
+
+    //cv::Rect roi( cv::Point( originX, originY ), cv::Size( width, height ));
+    //cv::Mat destinationROI = bigImage( roi );
+    //smallImage.copyTo( destinationROI );
+
+    //cv::Mat roi2 = cv::Mat(matchingImage, cv::Rect(size.width, size.height, right.size().width, right.size().height));
+    //right.copyTo(roi2);
+
+
+    // Draw camera frame
+    cv::Mat roi1 = cv::Mat(matchingImage, cv::Rect(borderX, borderY, right.size().width, right.size().height));
+    right.copyTo(roi1);
+
+
    /// Apply the Affine Transform just found to the src image
    cv::Mat warp_dst = cv::Mat::zeros( left.rows, left.cols, left.type() );
-   warpAffine( left, warp_dst, warp_mat, warp_dst.size() );
-   right.copyTo(warp_dst);
+   //warpAffine( left, matchingImage /* warp_dst */ , warp_mat, /*warp_dst*/ matchingImage.size() );
 
-   double alpha = 0.5; double beta = ( 1.0 - alpha );
-   addWeighted( warp_dst, alpha, right, beta, 0.0, warp_dst);
 
-   cv::imwrite( filenameOutput  , warp_dst);
+   //right.copyTo(roi1); //warp_dst
+
+   //double alpha = 0.5 , beta = ( 1.0 - alpha );
+   //addWeighted(   roi1 /*warp_dst*/  , alpha, right, beta, 0.0, matchingImage);
+
+   cv::imwrite( filenameOutput  ,  matchingImage /* warp_dst */);
 
 }
 
