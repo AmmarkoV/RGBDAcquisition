@@ -102,7 +102,7 @@ int fitHomographyTransformationMatchesRANSAC(
   //     | y |      | d e f |       | y |
   //     | z |      | g h i |       | 1 |
   //{ {dx} , {dy } , { dz }  } = { { a ,b, c} , { d , e ,f  }  , { g , h ,i  }  } . { { sx } , { sy } , { 1 } }
-  //
+  //{{c + a sx + b sy}, {f + d sx + e sy}, {i + g sx + h sy}}
   //
 
   unsigned int ptA=0,ptB=0,ptC=0,ptD=0;
