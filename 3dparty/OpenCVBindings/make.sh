@@ -1,13 +1,21 @@
 #!/bin/bash
  
+CDPATH="." 
 
-OPEN_CV_LIBS="/home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_calib3d.so -lopencv_calib3d /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_contrib.so -lopencv_contrib /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_core.so -lopencv_core /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_features2d.so -lopencv_features2d /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_flann.so -lopencv_flann /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_gpu.so -lopencv_gpu /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_highgui.so -lopencv_highgui /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_imgproc.so -lopencv_imgproc /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_legacy.so -lopencv_legacy /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_ml.so -lopencv_ml /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_objdetect.so -lopencv_objdetect /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_ocl.so -lopencv_ocl /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_photo.so -lopencv_photo /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_stitching.so -lopencv_stitching /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_superres.so -lopencv_superres /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_video.so -lopencv_video /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_videostab.so -lopencv_videostab /home/ammar/Documents/3dParty/opencv-2.4.9/build/lib/libopencv_nonfree.so.2.4.9"
+mkdir -p obj/Debug
 
-OPENCV_INCLUDES="-I/home/ammar/Documents/3dParty/opencv-2.4.9/include"
+g++ -Wall -fexceptions -fPIC -I/usr/include/opencv -g  -c $CDPATH/affine.cpp -o obj/Debug/affine.o
+g++ -Wall -fexceptions -fPIC -I/usr/include/opencv -g  -c $CDPATH/homography.cpp -o obj/Debug/homography.o
+g++ -Wall -fexceptions -fPIC -I/usr/include/opencv -g  -c $CDPATH/panorama.cpp -o obj/Debug/panorama.o
+g++ -Wall -fexceptions -fPIC -I/usr/include/opencv -g  -c $CDPATH/sift.cpp  -o obj/Debug/sift.o 
+g++ -Wall -fexceptions -fPIC -I/usr/include/opencv -g  -c $CDPATH/stitcher.cpp -o obj/Debug/stitcher.o
+g++ -Wall -fexceptions -fPIC -I/usr/include/opencv -g  -c $CDPATH/tools.cpp -o obj/Debug/tools.o
 
-g++ `pkg-config --cflags --libs opencv` -L. sift.cpp -o sift
+g++  -o panorama obj/Debug/affine.o obj/Debug/homography.o obj/Debug/panorama.o obj/Debug/sift.o obj/Debug/stitcher.o obj/Debug/tools.o  /usr/lib/x86_64-linux-gnu/libopencv_calib3d.so /usr/lib/x86_64-linux-gnu/libopencv_contrib.so /usr/lib/x86_64-linux-gnu/libopencv_core.so /usr/lib/x86_64-linux-gnu/libopencv_features2d.so /usr/lib/x86_64-linux-gnu/libopencv_flann.so /usr/lib/x86_64-linux-gnu/libopencv_gpu.so /usr/lib/x86_64-linux-gnu/libopencv_highgui.so /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so /usr/lib/x86_64-linux-gnu/libopencv_legacy.so /usr/lib/x86_64-linux-gnu/libopencv_ml.so /usr/lib/x86_64-linux-gnu/libopencv_nonfree.so /usr/lib/x86_64-linux-gnu/libopencv_objdetect.so /usr/lib/x86_64-linux-gnu/libopencv_ocl.so /usr/lib/x86_64-linux-gnu/libopencv_photo.so /usr/lib/x86_64-linux-gnu/libopencv_stitching.so /usr/lib/x86_64-linux-gnu/libopencv_superres.so /usr/lib/x86_64-linux-gnu/libopencv_ts.so /usr/lib/x86_64-linux-gnu/libopencv_video.so /usr/lib/x86_64-linux-gnu/libopencv_videostab.so -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect -lopencv_ocl -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts -lopencv_video -lopencv_videostab   
 
 
-#g++ $OPENCV_INCLUDES $OPEN_CV_LIBS  sift.cpp -o sift
+
+
+
 
 exit 0

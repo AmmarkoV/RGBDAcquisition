@@ -106,14 +106,24 @@ int stitchHomographyMatch(
                          )
 {
     fprintf(stderr,"Stitching Homography Match : ");
-    unsigned int borderX = 0;//  left.size().width/2;
+    unsigned int borderX = left.size().width;
     unsigned int borderY = 0;// border;
 
-    warp_mat.at<double>(0,2) += borderX;
-    warp_mat.at<double>(1,2) += borderY;
-    warp_mat.at<double>(2,2) =  1.0;
 
-    cv::Size sz = cv::Size(/*left.size().width +*/ right.size().width  + borderX + border , /*left.size().height +*/ right.size().height + borderY + border );
+    cv::Mat translation = cv::Mat::zeros(3,3,CV_64FC1);
+    cv::Mat translatedWarpMat = cv::Mat::zeros(3,3,CV_64FC1);
+
+
+    translation.at<double>(0,2) = borderX;
+    translation.at<double>(1,2) = borderY;
+    translation.at<double>(0,0) =  1.0;
+    translation.at<double>(1,1) =  1.0;
+    translation.at<double>(2,2) =  1.0;
+
+    translatedWarpMat = translation*warp_mat;
+
+
+    cv::Size sz = cv::Size( /*left.size().width +*/ right.size().width  + borderX + border , /*left.size().height +*/ right.size().height + borderY + border );
     cv::Mat matchingImageLeft = cv::Mat::zeros(sz, CV_8UC3);
     cv::Mat matchingImageRight = cv::Mat::zeros(sz, CV_8UC3);
     cv::Mat matchingImageBlended = cv::Mat::zeros(sz, CV_8UC3);
@@ -126,7 +136,7 @@ int stitchHomographyMatch(
 
    /// Apply the Affine Transform just found to the src image
    cv::Mat warp_dst = cv::Mat::zeros( left.rows, left.cols, left.type() );
-   cv::warpPerspective( left, matchingImageLeft /* warp_dst */ , warp_mat, /*warp_dst*/ matchingImageLeft.size() );
+   cv::warpPerspective( left, matchingImageLeft /* warp_dst */ , translatedWarpMat /*warp_mat*/ , /*warp_dst*/ matchingImageLeft.size() );
 
    myBlendImages(matchingImageBlended , matchingImageLeft , matchingImageRight , 0);
 
