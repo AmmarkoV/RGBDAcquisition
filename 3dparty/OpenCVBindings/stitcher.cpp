@@ -60,7 +60,7 @@ int stitchAffineMatch(
     warp_mat.at<double>(0,2) += borderX;
     warp_mat.at<double>(1,2) += borderY;
 
-    cv::Size sz = cv::Size(left.size().width + right.size().width  + borderX , left.size().height + right.size().height + borderY );
+    cv::Size sz = cv::Size(/*left.size().width +*/ right.size().width  + borderX , /*left.size().height +*/ right.size().height + borderY );
     cv::Mat matchingImageLeft = cv::Mat::zeros(sz, CV_8UC3);
     cv::Mat matchingImageRight = cv::Mat::zeros(sz, CV_8UC3);
     cv::Mat matchingImageBlended = cv::Mat::zeros(sz, CV_8UC3);
