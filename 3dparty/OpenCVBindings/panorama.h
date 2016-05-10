@@ -1,0 +1,6 @@
+#ifndef PANORAMA_H_INCLUDED
+#define PANORAMA_H_INCLUDED
+
+
+
+#endif // PANORAMA_H_INCLUDED
