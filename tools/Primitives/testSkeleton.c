@@ -6,6 +6,16 @@
 
 
 
+int doSkeletonConversions( struct skeletonHuman * skel )
+{
+  updateSkeletonAngles(skel);
+
+}
+
+
+
+
+
 int printJointField ( struct skeletonHuman * skel )
 {
   unsigned int i=0;
@@ -136,6 +146,7 @@ int parseJointList(const char * filename)
          printf("VAL = %s\n", val);
 
          parseJointField ( &skel , line ,  val );
+           doSkeletonConversions( &skel );
          printJointField ( &skel );
 
         }
