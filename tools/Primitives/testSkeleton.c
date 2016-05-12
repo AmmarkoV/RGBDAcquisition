@@ -74,7 +74,30 @@ int parseJointField ( struct skeletonHuman * skel , char * var , char * val)
          } else
   if (strcmp(var,"joints2D")==0)
          {
+           char * numStart = strchr(val , '[');
+           char * numEnd = strchr(val , ',');
+           if ( (numStart!=0) && (numEnd!=0) )
+           {
+            ++numStart; // Supposing we have [xyz.etc,
+            *numEnd=0;
 
+            unsigned int i=0;
+            for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+            {
+              //Grab Coordinate Y
+              skel->joint2D[i].x=atof(numStart);
+              numStart=numEnd+1;
+              if ( i==HUMAN_SKELETON_PARTS-1 )  { numEnd = strchr(numStart , ']'); } else
+                                                { numEnd = strchr(numStart , ','); }
+              if (numEnd!=0) { *numEnd=0; }
+
+              //Grab Coordinate Z
+              skel->joint2D[i].y=atof(numStart);
+              numStart=numEnd+1;
+              numEnd = strchr(numStart , ',');
+              if (numEnd!=0) { *numEnd=0; }
+            }
+           }
          } else
          {
            return 0;
