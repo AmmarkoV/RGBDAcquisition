@@ -160,7 +160,7 @@ enum humanMirroredSkeletonJoints
    HUMAN_SKELETON_MIRRORED_PARTS
 };
 
-   
+
 struct point2D
 {
     float x,y;
@@ -171,7 +171,10 @@ struct point3D
     float x,y,z;
 };
 
-struct skeletonHuman
+
+
+
+struct skeletonNAO
 {
   unsigned int observationNumber , observationTotal;
   unsigned int userID;
@@ -185,6 +188,27 @@ struct skeletonHuman
   struct point3D joint[HUMAN_SKELETON_PARTS];
   struct point2D joint2D[HUMAN_SKELETON_PARTS];
   float jointAccuracy[HUMAN_SKELETON_PARTS];
+};
+
+
+
+
+struct skeletonHuman
+{
+  unsigned int observationNumber , observationTotal;
+  unsigned int userID;
+
+  unsigned char isNew,isVisible,isOutOfScene,isLost;
+  unsigned char statusCalibrating,statusStoppedTracking, statusTracking,statusFailed;
+
+  struct point3D bbox[8];
+  struct point3D bboxDimensions;
+  struct point3D centerOfMass;
+  struct point3D joint[HUMAN_SKELETON_PARTS];
+  float  relativeJointAngle[HUMAN_SKELETON_PARTS];
+  float  absoluteJointAngle[HUMAN_SKELETON_PARTS];
+  struct point2D joint2D[HUMAN_SKELETON_PARTS];
+  float  jointAccuracy[HUMAN_SKELETON_PARTS];
 };
 
 
@@ -237,9 +261,51 @@ static void updateSkeletonBoundingBox(struct skeletonHuman * sk)
 
      sk->bboxDimensions.x = (float) sk->bbox[4].x-sk->bbox[2].x;
      sk->bboxDimensions.y = (float) sk->bbox[4].y-sk->bbox[2].y;
-     sk->bboxDimensions.z = (float) sk->bbox[4].z-sk->bbox[2].z; 
+     sk->bboxDimensions.z = (float) sk->bbox[4].z-sk->bbox[2].z;
 }
 
+
+
+
+
+
+
+static double GetAngleABC( double* a, double* b, double* c )
+{
+    double ab[3] = { b[0] - a[0], b[1] - a[1], b[2] - a[2] };
+    double bc[3] = { c[0] - b[0], c[1] - b[1], c[2] - b[2]  };
+
+    double abVec = sqrt(ab[0] * ab[0] + ab[1] * ab[1] + ab[2] * ab[2]);
+    double bcVec = sqrt(bc[0] * bc[0] + bc[1] * bc[1] + bc[2] * bc[2]);
+
+    double abNorm[3] = {ab[0] / abVec, ab[1] / abVec, ab[2] / abVec};
+    double bcNorm[3] = {bc[0] / bcVec, bc[1] / bcVec, bc[2] / bcVec};
+
+    double res = abNorm[0] * bcNorm[0] + abNorm[1] * bcNorm[1] + abNorm[2] * bcNorm[2];
+
+    return acos(res)*180.0/ 3.141592653589793;
+}
+
+
+
+static void updateSkeletonAngles(struct skeletonHuman * sk)
+{
+  unsigned int i=0;
+  for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+
+    //sk->relativeJointAngle[i];
+
+  }
+
+
+
+}
+
+
+static double convertSkeletonHumanToSkeletonNAO( struct skeletonNAO * nao , struct skeletonHuman * man)
+{
+}
 
 #ifdef __cplusplus
 }
