@@ -1,7 +1,7 @@
 #ifndef SKELETON_H_INCLUDED
 #define SKELETON_H_INCLUDED
 
-
+#include <math.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -206,7 +206,7 @@ struct skeletonHuman
   struct point3D centerOfMass;
   struct point3D joint[HUMAN_SKELETON_PARTS];
   float  relativeJointAngle[HUMAN_SKELETON_PARTS];
-  float  absoluteJointAngle[HUMAN_SKELETON_PARTS];
+
   struct point2D joint2D[HUMAN_SKELETON_PARTS];
   float  jointAccuracy[HUMAN_SKELETON_PARTS];
 };
