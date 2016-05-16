@@ -40,6 +40,20 @@ int printJointField ( struct skeletonHuman * skel )
   ++i;
   printf("%0.4f,%0.4f,%0.4f]\n",skel->joint[HUMAN_SKELETON_PARTS-1].x,skel->joint[HUMAN_SKELETON_PARTS-1].y,skel->joint[HUMAN_SKELETON_PARTS-1].z);
 
+
+
+
+  printf("relativeJointAngle: [");
+  for (i=0; i<HUMAN_SKELETON_PARTS-1; i++)
+  {
+     printf("%0.4f,%0.4f,%0.4f,",skel->relativeJointAngle[i].x,skel->relativeJointAngle[i].y,skel->relativeJointAngle[i].z);
+  }
+  ++i;
+  printf("%0.4f,%0.4f,%0.4f]\n",skel->relativeJointAngle[HUMAN_SKELETON_PARTS-1].x,skel->relativeJointAngle[HUMAN_SKELETON_PARTS-1].y,skel->relativeJointAngle[HUMAN_SKELETON_PARTS-1].z);
+
+
+
+
   printf("timestamp: %u\n", skel->observationNumber);
   printf("---\n");
 }
