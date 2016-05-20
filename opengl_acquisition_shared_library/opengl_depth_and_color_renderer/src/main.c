@@ -764,6 +764,12 @@ int dumpModelFileH(const char * inputfile,const char * outputfile)
 int dumpModelFile(const char * inputfile,const char * outputfile)
 {
   struct OBJ_Model * obj = loadObj("Models/",inputfile,0);
+
+  if (obj==0)
+  {
+    fprintf(stderr,"Could not load %s \n",inputfile);
+    return 0;
+  }
   struct TRI_Model tri={0};
   convertObjToTri(&tri , obj);
 

@@ -76,6 +76,8 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
 			}//FOR J
 		}
 
+      if (obj->texList!=0)
+      {
       posTex=0;
 	  for(i=0; i<obj->numGroups; i++)
 	   {
@@ -89,6 +91,7 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
               tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].v;
 			}
 		}
+      }
 
   return 1;
 }

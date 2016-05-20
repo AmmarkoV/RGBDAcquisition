@@ -8,7 +8,7 @@
 #define MODEL_LOADER_H_INCLUDED
 
 
-#define MAX_MODEL_PATHS 120
+#define MAX_MODEL_PATHS 250
 
 /**
 * @brief The structure that defines what a Model Consists of
