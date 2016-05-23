@@ -99,53 +99,17 @@ if (srcRANSACPoints.size()>0)
 
 
 
-int main(int argc, const char* argv[])
+
+
+
+int  sift_affine(const char * filenameLeft , const char * filenameRight ,  double SIFTThreshold ,
+                 unsigned int RANSACLoops ,
+                 unsigned int stitchedBorder ,
+                 double reprojectionThresholdX ,
+                 double reprojectionThresholdY ,
+                 unsigned int useOpenCVHomographyEstimator
+                 )
 {
-
-   double SIFTThreshold = 350.0;
-
-   unsigned int RANSACLoops = 1000;
-   unsigned int stitchedBorder=100;
-   double reprojectionThresholdX = 3.0;
-   double reprojectionThresholdY = 3.0;
-
-   unsigned int useOpenCVHomographyEstimator=0;
-
-
-   char filenameLeft[512]={"uttower_left.JPG"};
-   char filenameRight[512]={"uttower_right.JPG"};
-
-   if (argc>=3)
-   {
-     snprintf(filenameLeft,512,"%s",argv[1]);
-     snprintf(filenameRight,512,"%s",argv[2]);
-   }
-
-
-   for (unsigned int i=0; i<argc; i++)
-   {
-    if (strcmp(argv[i],"-opencv")==0) {
-                                        fprintf(stderr,"Using opencv homography estimator \n");
-                                        useOpenCVHomographyEstimator=1;
-                                       } else
-    if (strcmp(argv[i],"-loops")==0) {
-                                      RANSACLoops=atoi(argv[i+1]);
-                                      fprintf(stderr,"Using %u RANSAC loops\n",RANSACLoops);
-                                     } else
-    if (strcmp(argv[i],"-SIFTthreshold")==0)
-                                     {
-                                       SIFTThreshold=(double) atof(argv[i+1]);
-                                       fprintf(stderr,"Setting SIFT threshold to %0.2f\n",SIFTThreshold);
-                                      } else
-    if (strcmp(argv[i],"-ReprojectionThreshold")==0)
-                                     {
-                                       reprojectionThresholdX=(double)atof(argv[i+1]);
-                                       reprojectionThresholdY=reprojectionThresholdX;
-                                       fprintf(stderr,"Setting reprojection threshold to %0.2f,%0.2f \n",reprojectionThresholdX,reprojectionThresholdY);
-                                      }
-   }
-
-
 
     fprintf(stderr,"Running SIFT on %s / %s \n" , filenameLeft , filenameRight);
 
@@ -269,6 +233,66 @@ int main(int argc, const char* argv[])
                       srcRANSACPoints,
                       dstRANSACPoints
                     );
+}
+
+
+
+
+
+
+
+
+int main(int argc, const char* argv[])
+{
+
+   double SIFTThreshold = 350.0;
+
+   unsigned int RANSACLoops = 1000;
+   unsigned int stitchedBorder=100;
+   double reprojectionThresholdX = 3.0;
+   double reprojectionThresholdY = 3.0;
+
+   unsigned int useOpenCVHomographyEstimator=0;
+
+
+   char filenameLeft[512]={"uttower_left.JPG"};
+   char filenameRight[512]={"uttower_right.JPG"};
+
+   if (argc>=3)
+   {
+     snprintf(filenameLeft,512,"%s",argv[1]);
+     snprintf(filenameRight,512,"%s",argv[2]);
+   }
+
+
+   for (unsigned int i=0; i<argc; i++)
+   {
+    if (strcmp(argv[i],"-opencv")==0) {
+                                        fprintf(stderr,"Using opencv homography estimator \n");
+                                        useOpenCVHomographyEstimator=1;
+                                       } else
+    if (strcmp(argv[i],"-loops")==0) {
+                                      RANSACLoops=atoi(argv[i+1]);
+                                      fprintf(stderr,"Using %u RANSAC loops\n",RANSACLoops);
+                                     } else
+    if (strcmp(argv[i],"-SIFTthreshold")==0)
+                                     {
+                                       SIFTThreshold=(double) atof(argv[i+1]);
+                                       fprintf(stderr,"Setting SIFT threshold to %0.2f\n",SIFTThreshold);
+                                      } else
+    if (strcmp(argv[i],"-ReprojectionThreshold")==0)
+                                     {
+                                       reprojectionThresholdX=(double)atof(argv[i+1]);
+                                       reprojectionThresholdY=reprojectionThresholdX;
+                                       fprintf(stderr,"Setting reprojection threshold to %0.2f,%0.2f \n",reprojectionThresholdX,reprojectionThresholdY);
+                                      }
+   }
+
+
+   sift_affine(filenameLeft,filenameRight , SIFTThreshold , RANSACLoops , stitchedBorder ,
+                 reprojectionThresholdX ,
+                 reprojectionThresholdY ,
+                 useOpenCVHomographyEstimator);
 
     return 0;
 }

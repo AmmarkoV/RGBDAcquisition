@@ -11,6 +11,9 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/Models/Ammar.obj /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/Ammar.tri " />
+				<Option host_application="/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/ModelDumpD" />
+				<Option run_host_application_in_terminal="1" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -32,6 +35,8 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
+			<Add option="-lpng" />
+			<Add option="-ljpeg" />
 			<Add library="GL" />
 			<Add library="GLU" />
 			<Add library="X11" />
