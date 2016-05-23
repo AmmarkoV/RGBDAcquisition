@@ -28,15 +28,18 @@ int  reconstruct3D(const char * filenameLeft )
 
         printf("Retrieved line of length %zu :\n", read);
         printf("%s", lineStart);
-        char * varNameEnd = strchr(lineStart , ' ');
-        if (varNameEnd!=0)
-        {
-         *varNameEnd=0;
-         printf("VAR = %s\n", lineStart);
-         char * val = varNameEnd+1;
-         printf("VAL = %s\n", val);
 
-        }
+
+        char * num1 = lineStart; // number1 start to first ' '
+        char * num2 = strchr(num1 , ' ');
+        if (num2!=0) { *num2=0; ++num2; } else { fprintf(stderr,"oops"); }
+        char * num3 = strchr(num2 , ' ');
+        if (num3!=0) { *num3=0; ++num3; } else { fprintf(stderr,"oops"); }
+        char * num4 = strchr(num3, ' ');
+
+        printf("vals are |%s|%s|%s|%s| \n", num1,num2,num3,num4);
+        printf("floats are |%0.2f|%0.2f|%0.2f|%0.2f| \n",atof(num1),atof(num2),atof(num3),atof(num4));
+
     }
 
     fclose(fp);
