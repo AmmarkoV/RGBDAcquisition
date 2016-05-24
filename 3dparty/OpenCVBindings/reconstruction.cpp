@@ -1,9 +1,10 @@
 #include "reconstruction.h"
-
+#include "homography.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
@@ -59,8 +60,15 @@ int getPointListNumber(const char * filenameLeft )
 
 
 
-
-
+static float distance3D(float p1X , float p1Y  , float p1Z ,  float p2X , float p2Y , float p2Z)
+{
+  float vect_x = p1X - p2X;
+  float vect_y = p1Y - p2Y;
+  float vect_z = p1Z - p2Z;
+  float len = sqrt( vect_x*vect_x + vect_y*vect_y + vect_z*vect_z);
+  if(len == 0) len = 1.0f;
+return len;
+}
 
 struct Point2DCorrespondance * readPointList(const char * filenameLeft )
 {
@@ -130,15 +138,35 @@ return 0;
 
 
 
-
-
-
-
-int  reconstruct3D(const char * filenameLeft )
+int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
 {
+  unsigned int s=2;
   char filename[512]={0};
-  snprintf(filename,512,"%s/%s_matches.txt",filenameLeft ,filenameLeft);
 
+
+
+
+  snprintf(filename,512,"%s/%s1.jpg",filenameLeft ,filenameLeft);
+  cv::Mat image1 = cv::imread(filename  , CV_LOAD_IMAGE_COLOR);
+  if(! image1.data ) { fprintf(stderr,"Image1 missing \n"); return 0; }
+
+  snprintf(filename,512,"%s/%s2.jpg",filenameLeft ,filenameLeft);
+  cv::Mat image2 = cv::imread(filename, CV_LOAD_IMAGE_COLOR);
+  if(! image2.data ) { fprintf(stderr,"Image2 missing \n"); return 0; }
+
+  cv::Mat imageOutput = cv::imread(filename, CV_LOAD_IMAGE_COLOR);
+  cv::rectangle( imageOutput,
+                 cv::Point( 0  , 0 ),
+                 cv::Point( imageOutput.cols  , imageOutput.rows ),
+                 cv::Scalar( 0, 0, 0 ),
+                 -1,
+                 8
+              );
+
+  std::vector<cv::Point2f> srcPoints;
+  std::vector<cv::Point2f> dstPoints;
+
+  snprintf(filename,512,"%s/%s_matches.txt",filenameLeft ,filenameLeft);
   struct Point2DCorrespondance * correspondances = readPointList( filename );
   for (unsigned int i=0; i<correspondances->listCurrent; i++)
   {
@@ -148,7 +176,76 @@ int  reconstruct3D(const char * filenameLeft )
         correspondances->listSource[i].y ,
         correspondances->listTarget[i].x ,
         correspondances->listTarget[i].y  );
+
+
+
+      cv::Point2f srcPT; srcPT.x = correspondances->listSource[i].x; srcPT.y = correspondances->listSource[i].y;
+      cv::Point2f dstPT; dstPT.x = correspondances->listTarget[i].x; dstPT.y = correspondances->listTarget[i].y;
+      srcPoints.push_back(srcPT);
+      dstPoints.push_back(dstPT);
+
+      cv::rectangle( image1,
+                     cv::Point( correspondances->listSource[i].x-s  , correspondances->listSource[i].y-s ),
+                     cv::Point( correspondances->listSource[i].x+s  , correspondances->listSource[i].y+s ),
+                     cv::Scalar( 0, 255, 255 ),
+                     -1,
+                     8 );
+
+
+      cv::rectangle( image2,
+                     cv::Point( correspondances->listTarget[i].x-s  , correspondances->listTarget[i].y-s ),
+                     cv::Point( correspondances->listTarget[i].x+s  , correspondances->listTarget[i].y+s ),
+                     cv::Scalar( 0, 255, 255 ),
+                     -1,
+                     8 );
+
+
+    float depth = distance3D( correspondances->listSource[i].x ,correspondances->listSource[i].y , 0.0 ,   correspondances->listTarget[i].x , correspondances->listTarget[i].y , 0.0 );
+
+      cv::rectangle( imageOutput,
+                     cv::Point( correspondances->listTarget[i].x-s  , correspondances->listTarget[i].y-s ),
+                     cv::Point( correspondances->listTarget[i].x+s  , correspondances->listTarget[i].y+s ),
+                     cv::Scalar( depth, depth, depth ),
+                     -1,
+                     8 );
   }
+
+
+   cv::Mat fundMatCV( 3, 3,  CV_64FC1  );
+   double fundMat[9]={0};
+    std::vector<cv::Point2f> srcRANSACPoints;
+    std::vector<cv::Point2f> dstRANSACPoints;
+
+  if (useOpenCVEstimator)
+  {
+    fundMatCV = findFundamentalMat( srcPoints , dstPoints ,CV_FM_8POINT);
+    fprintf(stderr,"Fundamental Matrix OpenCV: \n");
+     std::cout << fundMatCV<<"\n";
+  } else
+  {
+   fitHomographyTransformationMatchesRANSAC(
+                                             1000 ,
+                                             5.0 , 5.0 ,
+                                             fundMat ,
+                                             fundMatCV ,
+                                             srcPoints ,
+                                             dstPoints ,
+                                             srcRANSACPoints ,
+                                             dstRANSACPoints
+                                            );
+
+   fprintf(stderr,"Fundamental Matrix Mine : \n");
+   for (unsigned int i=0; i<9; i+=3)
+    { fprintf(stderr," %0.2f %0.2f %0.2f  \n", fundMat[i+0], fundMat[i+1], fundMat[i+2] ); }
+  }
+
+
+
+
+    cv::imwrite("rec1.jpg", image1);
+    cv::imwrite("rec2.jpg", image2);
+    cv::imwrite("recDepth.jpg", imageOutput);
+
 
   float camera1Mat[16]={0};
   snprintf(filename,512,"%s/%s1_camera.txt",filenameLeft ,filenameLeft);
@@ -186,13 +283,12 @@ int  reconstruct3D(const char * filenameLeft )
 
 
 
-  snprintf(filename,512,"%s/%s1.jpg",filenameLeft ,filenameLeft);
-  cv::Mat image1 = cv::imread(filename  , CV_LOAD_IMAGE_COLOR);
-  if(! image1.data ) { fprintf(stderr,"Image1 missing \n"); return 0; }
+/*
+16.11 13.70 -67.35 -188.38
+ 0.83 -61.26 -27.99 -7.42
+ 0.17 -0.05 -0.08 0.57
+*/
 
-  snprintf(filename,512,"%s/%s2.jpg",filenameLeft ,filenameLeft);
-  cv::Mat image2 = cv::imread(filename, CV_LOAD_IMAGE_COLOR);
-  if(! image2.data ) { fprintf(stderr,"Image2 missing \n"); return 0; }
 
 
   return 1;

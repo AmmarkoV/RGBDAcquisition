@@ -44,6 +44,8 @@
 		<Unit filename="homography.cpp" />
 		<Unit filename="homography.h" />
 		<Unit filename="panorama.cpp" />
+		<Unit filename="reconstruction.cpp" />
+		<Unit filename="reconstruction.h" />
 		<Unit filename="sift.cpp" />
 		<Unit filename="sift.h" />
 		<Unit filename="stitcher.cpp" />

@@ -108,7 +108,7 @@ int  sift_affine(const char * filenameLeft , const char * filenameRight ,  doubl
                  unsigned int stitchedBorder ,
                  double reprojectionThresholdX ,
                  double reprojectionThresholdY ,
-                 unsigned int useOpenCVHomographyEstimator
+                 unsigned int useOpenCVEstimator
                  )
 {
 
@@ -204,7 +204,7 @@ int  sift_affine(const char * filenameLeft , const char * filenameRight ,  doubl
    cv::Mat homo_mat( 3, 3,  CV_64FC1  );
    double H[9]={0};
 
-   if (useOpenCVHomographyEstimator)
+   if (useOpenCVEstimator)
    {
     homo_mat = cv::findHomography(srcPoints , dstPoints , CV_RANSAC);
    } else
@@ -252,7 +252,7 @@ int main(int argc, const char* argv[])
    double reprojectionThresholdX = 3.0;
    double reprojectionThresholdY = 3.0;
 
-   unsigned int useOpenCVHomographyEstimator=0;
+   unsigned int useOpenCVEstimator=0;
 
 
    char filenameLeft[512]={"uttower_left.JPG"};
@@ -273,7 +273,7 @@ int main(int argc, const char* argv[])
    {
     if (strcmp(argv[i],"-opencv")==0) {
                                         fprintf(stderr,"Using opencv homography estimator \n");
-                                        useOpenCVHomographyEstimator=1;
+                                        useOpenCVEstimator=1;
                                       } else
     if (strcmp(argv[i],"-loops")==0)  {
                                        RANSACLoops=atoi(argv[i+1]);
@@ -294,11 +294,11 @@ int main(int argc, const char* argv[])
                                       sift_affine(filenameLeft,filenameRight , SIFTThreshold , RANSACLoops , stitchedBorder ,
                                                   reprojectionThresholdX ,
                                                   reprojectionThresholdY ,
-                                                  useOpenCVHomographyEstimator);
+                                                  useOpenCVEstimator);
                                       } else
     if (strcmp(argv[i],"-reconstruct")==0)
                                       {
-                                        reconstruct3D(filenameLeft);
+                                        reconstruct3D(filenameLeft , useOpenCVEstimator);
                                       }
 
 
