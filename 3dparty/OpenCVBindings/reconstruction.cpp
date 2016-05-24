@@ -108,10 +108,10 @@ struct Point2DCorrespondance * readPointList(const char * filenameLeft )
 
         char * num2 = strchr(num1 , ' ');
         while (*num2==' ') { *num2=0; ++num2; }
-        // printf("A) vals are |%s|%s|=======| \n", num1,num2 );
+
         char * num3 = strchr(num2 , ' ');
         while (*num3==' ') { *num3=0; ++num3; }
-        // printf("B) vals are |%s|%s|=======| \n", num1,num2 );
+
         char * num4 = strchr(num3, ' ');
         while (*num4==' ') { *num4=0; ++num4; }
 
