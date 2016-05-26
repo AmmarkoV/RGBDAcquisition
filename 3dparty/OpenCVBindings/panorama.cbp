@@ -41,6 +41,8 @@
 		</Linker>
 		<Unit filename="affine.cpp" />
 		<Unit filename="affine.h" />
+		<Unit filename="fundamental.cpp" />
+		<Unit filename="fundamental.h" />
 		<Unit filename="homography.cpp" />
 		<Unit filename="homography.h" />
 		<Unit filename="panorama.cpp" />

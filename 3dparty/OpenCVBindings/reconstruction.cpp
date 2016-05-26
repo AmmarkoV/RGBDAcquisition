@@ -1,5 +1,9 @@
 #include "reconstruction.h"
 #include "homography.h"
+#include "fundamental.h"
+#include "primitives.h"
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,19 +19,24 @@
 //#include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
-struct Point2D
-{
-  float x , y;
-};
 
 
-struct Point2DCorrespondance
+
+
+
+
+static double distance3D(double p1X , double p1Y  , double p1Z ,  double p2X , double p2Y , double p2Z)
 {
-  struct Point2D  * listSource;
-  struct Point2D  * listTarget;
-  unsigned int listCurrent;
-  unsigned int listMax;
-};
+  double vect_x = p1X - p2X;
+  double vect_y = p1Y - p2Y;
+  double vect_z = p1Z - p2Z;
+  double len = sqrt( vect_x*vect_x + vect_y*vect_y + vect_z*vect_z);
+  if(len == 0) len = 1.0f;
+return len;
+}
+
+
+
 
 int getPointListNumber(const char * filenameLeft )
 {
@@ -60,15 +69,10 @@ int getPointListNumber(const char * filenameLeft )
 
 
 
-static float distance3D(float p1X , float p1Y  , float p1Z ,  float p2X , float p2Y , float p2Z)
-{
-  float vect_x = p1X - p2X;
-  float vect_y = p1Y - p2Y;
-  float vect_z = p1Z - p2Z;
-  float len = sqrt( vect_x*vect_x + vect_y*vect_y + vect_z*vect_z);
-  if(len == 0) len = 1.0f;
-return len;
-}
+
+
+
+
 
 struct Point2DCorrespondance * readPointList(const char * filenameLeft )
 {
@@ -200,7 +204,7 @@ int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
                      8 );
 
 
-    float depth = distance3D( correspondances->listSource[i].x ,correspondances->listSource[i].y , 0.0 ,   correspondances->listTarget[i].x , correspondances->listTarget[i].y , 0.0 );
+    double depth = distance3D( correspondances->listSource[i].x ,correspondances->listSource[i].y , 0.0 ,   correspondances->listTarget[i].x , correspondances->listTarget[i].y , 0.0 );
 
       cv::rectangle( imageOutput,
                      cv::Point( correspondances->listTarget[i].x-s  , correspondances->listTarget[i].y-s ),
@@ -221,6 +225,15 @@ int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
     fundMatCV = findFundamentalMat( srcPoints , dstPoints ,CV_FM_8POINT);
     fprintf(stderr,"Fundamental Matrix OpenCV: \n");
      std::cout << fundMatCV<<"\n";
+
+   fundMat[0] = fundMatCV.at<double>(0,0); fundMat[1] = fundMatCV.at<double>(0,1); fundMat[2] = fundMatCV.at<double>(0,2);
+   fundMat[3] = fundMatCV.at<double>(1,0); fundMat[4] = fundMatCV.at<double>(1,1); fundMat[5] = fundMatCV.at<double>(1,2);
+   fundMat[6] = fundMatCV.at<double>(2,0); fundMat[7] = fundMatCV.at<double>(2,1); fundMat[8] = fundMatCV.at<double>(2,2);
+
+   fprintf(stderr,"Fundamental Matrix Copy : \n");
+   for (unsigned int i=0; i<9; i+=3)
+    { fprintf(stderr," %0.2f %0.2f %0.2f  \n", fundMat[i+0], fundMat[i+1], fundMat[i+2] ); }
+
   } else
   {
    fitHomographyTransformationMatchesRANSAC(
@@ -239,15 +252,14 @@ int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
     { fprintf(stderr," %0.2f %0.2f %0.2f  \n", fundMat[i+0], fundMat[i+1], fundMat[i+2] ); }
   }
 
-
-
+   testAverageFundamentalMatrixForAllPairs(correspondances , fundMat );
 
     cv::imwrite("rec1.jpg", image1);
     cv::imwrite("rec2.jpg", image2);
     cv::imwrite("recDepth.jpg", imageOutput);
 
 
-  float camera1Mat[16]={0};
+  double camera1Mat[16]={0};
   snprintf(filename,512,"%s/%s1_camera.txt",filenameLeft ,filenameLeft);
   struct Point2DCorrespondance * camera1 = readPointList( filename );
   camera1Mat[0] = camera1->listSource[0].x; camera1Mat[1] = camera1->listSource[0].y;
@@ -264,7 +276,7 @@ int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
    { fprintf(stderr," %0.2f %0.2f %0.2f %0.2f \n", camera1Mat[i+0], camera1Mat[i+1], camera1Mat[i+2], camera1Mat[i+3]); }
 
 
-  float camera2Mat[16]={0};
+  double camera2Mat[16]={0};
   snprintf(filename,512,"%s/%s2_camera.txt",filenameLeft ,filenameLeft);
   struct Point2DCorrespondance * camera2 = readPointList( filename );
   camera2Mat[0] = camera2->listSource[0].x; camera2Mat[1] = camera2->listSource[0].y;
@@ -293,39 +305,6 @@ int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
 
   return 1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
