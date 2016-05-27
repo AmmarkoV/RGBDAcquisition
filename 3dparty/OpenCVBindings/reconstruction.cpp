@@ -21,9 +21,7 @@
 
 
 
-
-
-
+  unsigned int s=2;
 
 static double distance3D(double p1X , double p1Y  , double p1Z ,  double p2X , double p2Y , double p2Z)
 {
@@ -38,117 +36,47 @@ return len;
 
 
 
-int getPointListNumber(const char * filenameLeft )
+int drawFeatures(cv::Mat srcImg , cv::Mat dstImg , struct Point2DCorrespondance * correspondances )
 {
-  fprintf(stderr,"reconstruct3D(%s)\n",filenameLeft);
-
-  char * line = NULL;
-  size_t len = 0;
-  ssize_t read;
-
-  FILE * fp = fopen(filenameLeft,"r");
-  if (fp!=0)
+  for (unsigned int i=0; i<correspondances->listCurrent; i++)
   {
+      cv::rectangle( srcImg,
+                     cv::Point( correspondances->listSource[i].x-s  , correspondances->listSource[i].y-s ),
+                     cv::Point( correspondances->listSource[i].x+s  , correspondances->listSource[i].y+s ),
+                     cv::Scalar( 0, 255, 255 ),
+                     -1,
+                     8 );
 
-    char * line = NULL;
-    size_t len = 0;
-    unsigned int numberOfLines=0;
 
-    while ((read = getline(&line, &len, fp)) != -1)
-    {
-        ++numberOfLines;
-    }
+      cv::rectangle( dstImg,
+                     cv::Point( correspondances->listTarget[i].x-s  , correspondances->listTarget[i].y-s ),
+                     cv::Point( correspondances->listTarget[i].x+s  , correspondances->listTarget[i].y+s ),
+                     cv::Scalar( 0, 255, 255 ),
+                     -1,
+                     8 );
+  }
+}
 
-    fclose(fp);
-    if (line) { free(line); }
-    return numberOfLines;
+int drawEpipolarLines(const char * filename , cv::Mat img , std::vector<cv::Point3f> epilines)
+{
+  cv::Mat epipoleImg = img;
+  cv::Scalar color(256,0,256);
+
+  for(size_t i=0; i<epilines.size(); i++)
+  {
+    cv::Point startPx(0,-epilines[i].z/epilines[i].y);
+    cv::Point endPx(img.cols,-(epilines[i].z+epilines[i].x*img.cols)/epilines[i].y);
+
+    cv::line(epipoleImg,startPx,endPx,color);
   }
 
- return 0;
+ cv::imwrite(filename  , epipoleImg);
 }
-
-
-
-
-
-
-
-
-struct Point2DCorrespondance * readPointList(const char * filenameLeft )
-{
-
-   struct Point2DCorrespondance * newList=0;
-
-
-   newList = (struct Point2DCorrespondance *) malloc( sizeof ( struct Point2DCorrespondance )  );
-
-   newList->listMax  =  getPointListNumber(filenameLeft);
-   newList->listSource = (struct Point2D *) malloc( sizeof ( struct Point2D ) * newList->listMax  );
-   newList->listTarget = (struct Point2D *) malloc( sizeof ( struct Point2D ) * newList->listMax  );
-   newList->listCurrent=0;
-
-  char * line = NULL;
-  size_t len = 0;
-  ssize_t read;
-
-  FILE * fp = fopen(filenameLeft,"r");
-  if (fp!=0)
-  {
-
-    char * line = NULL;
-    char * lineStart = line;
-    size_t len = 0;
-
-    while ((read = getline(&line, &len, fp)) != -1)
-    {
-        lineStart = line;
-        while (*lineStart==' ') { ++lineStart; }
-
-        //printf("Retrieved line of length %zu :\n", read);
-        //printf("%s", lineStart);
-
-
-        char * num1 = lineStart; // number1 start to first ' '
-
-        char * num2 = strchr(num1 , ' ');
-        while (*num2==' ') { *num2=0; ++num2; }
-
-        char * num3 = strchr(num2 , ' ');
-        while (*num3==' ') { *num3=0; ++num3; }
-
-        char * num4 = strchr(num3, ' ');
-        while (*num4==' ') { *num4=0; ++num4; }
-
-        //printf("vals are |%s|%s|%s|%s| \n", num1,num2,num3,num4);
-        //printf("floats are |%0.2f|%0.2f|%0.2f|%0.2f| \n",atof(num1),atof(num2),atof(num3),atof(num4));
-
-        newList->listSource[newList->listCurrent].x = atof(num1);
-        newList->listSource[newList->listCurrent].y = atof(num2);
-        newList->listTarget[newList->listCurrent].x = atof(num3);
-        newList->listTarget[newList->listCurrent].y = atof(num4);
-        ++newList->listCurrent;
-    }
-
-    fclose(fp);
-    if (line) { free(line); }
-    return newList;
-}
-
-fprintf(stderr,"Done.. \n");
-return 0;
-}
-
-
-
 
 
 int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
 {
-  unsigned int s=2;
   char filename[512]={0};
-
-
-
 
   snprintf(filename,512,"%s/%s1.jpg",filenameLeft ,filenameLeft);
   cv::Mat image1 = cv::imread(filename  , CV_LOAD_IMAGE_COLOR);
@@ -185,24 +113,9 @@ int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
 
       cv::Point2f srcPT; srcPT.x = correspondances->listSource[i].x; srcPT.y = correspondances->listSource[i].y;
       cv::Point2f dstPT; dstPT.x = correspondances->listTarget[i].x; dstPT.y = correspondances->listTarget[i].y;
+
       srcPoints.push_back(srcPT);
       dstPoints.push_back(dstPT);
-
-      cv::rectangle( image1,
-                     cv::Point( correspondances->listSource[i].x-s  , correspondances->listSource[i].y-s ),
-                     cv::Point( correspondances->listSource[i].x+s  , correspondances->listSource[i].y+s ),
-                     cv::Scalar( 0, 255, 255 ),
-                     -1,
-                     8 );
-
-
-      cv::rectangle( image2,
-                     cv::Point( correspondances->listTarget[i].x-s  , correspondances->listTarget[i].y-s ),
-                     cv::Point( correspondances->listTarget[i].x+s  , correspondances->listTarget[i].y+s ),
-                     cv::Scalar( 0, 255, 255 ),
-                     -1,
-                     8 );
-
 
     double depth = distance3D( correspondances->listSource[i].x ,correspondances->listSource[i].y , 0.0 ,   correspondances->listTarget[i].x , correspondances->listTarget[i].y , 0.0 );
 
@@ -213,6 +126,9 @@ int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
                      -1,
                      8 );
   }
+
+   drawFeatures( image1 , image2 , correspondances );
+
 
 
    cv::Mat fundMatCV( 3, 3,  CV_64FC1  );
@@ -254,9 +170,21 @@ int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
 
    testAverageFundamentalMatrixForAllPairs(correspondances , fundMat );
 
+
+
+  std::vector<cv::Point3f> epilines1 , epilines2 ;
+   cv::computeCorrespondEpilines(srcPoints,1,fundMatCV, epilines1);
+   cv::computeCorrespondEpilines(dstPoints,2,fundMatCV, epilines2);
+
+
     cv::imwrite("rec1.jpg", image1);
     cv::imwrite("rec2.jpg", image2);
     cv::imwrite("recDepth.jpg", imageOutput);
+
+   drawEpipolarLines("epipoles1.jpg",image1 , epilines1);
+   drawEpipolarLines("epipoles2.jpg",image2 , epilines2);
+
+
 
 
   double camera1Mat[16]={0};
@@ -292,6 +220,23 @@ int  reconstruct3D(const char * filenameLeft , unsigned int useOpenCVEstimator )
   fprintf(stderr,"Camera2 : \n");
   for (unsigned int i=0; i<14; i+=4)
    { fprintf(stderr," %0.2f %0.2f %0.2f %0.2f \n", camera2Mat[i+0], camera2Mat[i+1], camera2Mat[i+2], camera2Mat[i+3]); }
+
+
+
+    //H1, H2 – The output rectification homography matrices for the first and for the second images.
+    cv::Mat H1(4,4, CV_64FC1);
+    cv::Mat H2(4,4, CV_64FC1);
+
+   if (useOpenCVEstimator)
+  {
+    cv::stereoRectifyUncalibrated(dstPoints, srcPoints, fundMatCV , image2.size(), H1, H2);
+
+    fprintf(stderr,"Homography 1 : \n");
+    std::cout << H1<<"\n";
+
+    fprintf(stderr,"Homography 2 : \n");
+    std::cout << H2<<"\n";
+  }
 
 
 
