@@ -34,6 +34,34 @@ double testAverageFundamentalMatrixForAllPairs(  struct Point2DCorrespondance * 
 
   sumError = sumError/correspondances->listCurrent;
   fprintf(stderr," Avg reproj error %0.2f \n", sumError  );
+  return sumError;
+
+}
+
+
+
+int solveFundamentalMatrix(struct Point2DCorrespondance *  correspondances , double * F  )
+{
+  // xS * F  * xT = 0
+
+  // Pick 8 points
+  double A[8*9]={0};
+  double xSi,ySi ,xTi,yTi;
+
+
+  unsigned int  l=0;
+  l=0;
+  /* = */ A[0 + 9*l]=xSi*xTi; /* = */ A[1 + 9*l]=xSi*yTi; /* = */ A[2 + 9*l]=xSi; /* = */
+  /* = */ A[3 + 9*l]=ySi*xTi; /* = */ A[4 + 9*l]=ySi*yTi; /* = */ A[5 + 9*l]=ySi; /* = */
+  /* = */ A[6 + 9*l]=xTi;     /* = */ A[7 + 9*l]=yTi;     /* = */ A[8 + 9*l]=1.0; /* = */
 
 
 }
+
+
+
+
+
+
+
+

@@ -16,6 +16,7 @@ struct Point2DCorrespondance
 {
   struct Point2D  * listSource;
   struct Point2D  * listTarget;
+  struct Point2D  * depth;
   unsigned int listCurrent;
   unsigned int listMax;
 };
@@ -31,8 +32,6 @@ static int getPointListNumber(const char * filenameLeft )
 {
   fprintf(stderr,"reconstruct3D(%s)\n",filenameLeft);
 
-  char * line = NULL;
-  size_t len = 0;
   ssize_t read;
 
   FILE * fp = fopen(filenameLeft,"r");
@@ -74,10 +73,9 @@ static struct Point2DCorrespondance * readPointList(const char * filenameLeft )
    newList->listMax  =  getPointListNumber(filenameLeft);
    newList->listSource = (struct Point2D *) malloc( sizeof ( struct Point2D ) * newList->listMax  );
    newList->listTarget = (struct Point2D *) malloc( sizeof ( struct Point2D ) * newList->listMax  );
+   newList->depth      = (struct Point2D *) malloc( sizeof ( struct Point2D ) * newList->listMax  );
    newList->listCurrent=0;
 
-  char * line = NULL;
-  size_t len = 0;
   ssize_t read;
 
   FILE * fp = fopen(filenameLeft,"r");
