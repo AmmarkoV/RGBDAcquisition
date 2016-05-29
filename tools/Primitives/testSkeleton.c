@@ -4,12 +4,17 @@
 
 #include "skeleton.h"
 
-
+int frames =0;
 
 int doSkeletonConversions( struct skeletonHuman * skel )
 {
   updateSkeletonAngles(skel);
 
+  char filenameBuf[512]={0};
+  snprintf(filenameBuf,512,"skel%u.svg",frames);
+
+  visualizeSkeletonHuman(filenameBuf,  skel);
+  ++frames;
 }
 
 
