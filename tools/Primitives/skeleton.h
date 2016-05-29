@@ -411,7 +411,14 @@ static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman *
       for (i=0; i<HUMAN_SKELETON_PARTS; i++)
        {
         if (!skeletonEmptyJoint(sk,i))
-         { fprintf(fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"10\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n", sk->joint2D[i].x, sk->joint2D[i].y ); }
+         {
+          fprintf(fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"10\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n", sk->joint2D[i].x, sk->joint2D[i].y );
+          fprintf(fp,"<text x=\"%0.2f\" y=\"%0.2f\">\n",sk->joint2D[i].x-20, sk->joint2D[i].y-20   );
+          fprintf(fp,"  <tspan fill=\"red\">%0.2f</tspan>/",sk->relativeJointAngle[i].x);
+          fprintf(fp,"  <tspan fill=\"green\">%0.2f</tspan>/",sk->relativeJointAngle[i].y);
+          fprintf(fp,"  <tspan fill=\"blue\">%0.2f</tspan>\n",sk->relativeJointAngle[i].z);
+          fprintf(fp,"</text>\n"   );
+         }
 
        }
 
