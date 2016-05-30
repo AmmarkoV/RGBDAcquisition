@@ -231,14 +231,27 @@ struct skeletonPointing
 
 static int skeletonEmptyJoint(struct skeletonHuman * sk , unsigned int j1)
 {
+   //Check NotSet
    if (
         (sk->joint[j1].x==0) &&
         (sk->joint[j1].y==0) &&
         (sk->joint[j1].z==0)
-       )
-   {
-     return 1;
-   }
+       ) { return 1; }
+
+   //Check NotSet
+   if (
+        (sk->joint2D[j1].x==0) &&
+        (sk->joint2D[j1].y==0)
+       ) { return 1; }
+
+
+   //Check NaN
+   if (
+        (sk->joint[j1].x!=sk->joint[j1].x) ||
+        (sk->joint[j1].y!=sk->joint[j1].y) ||
+        (sk->joint[j1].z!=sk->joint[j1].z)
+       ) { return 1; }
+
   return 0;
 }
 
@@ -298,16 +311,15 @@ static void updateSkeletonBoundingBox(struct skeletonHuman * sk)
 
 
 
-
-static double getAngleABC( double* srcPoint, double* dstPoint, double* defaultPoint )
+static double get3DAngleABC( double* srcPoint, double* dstPoint, double* defaultPoint )
 {
- double *a = srcPoint, *b = dstPoint , *c = defaultPoint;
+ double *a = dstPoint, *b = srcPoint , *c = defaultPoint;
 /*
                       * dstPoint
                     /
                 /
             /
- srcPoint/
+ srcPoint/   Result
       *  -  -  -  -  -  *  defaultPoint
 
 */
@@ -327,18 +339,63 @@ static double getAngleABC( double* srcPoint, double* dstPoint, double* defaultPo
 
 
 
-static double getAngleABCRelative( double* srcPoint, double* dstPoint, double* srcDefaultPoint , double* dstDefaultPoint  )
+
+static double get2DAngleABC( double* srcPoint, double* dstPoint, double* defaultPoint )
 {
- double relativeSrc = 0;
- double relativeDst = *dstPoint - * srcPoint;
- double relativeDefaultDst = *dstDefaultPoint - * srcDefaultPoint;
+ double *a = dstPoint, *b = srcPoint , *c = defaultPoint;
+/*
+                      * dstPoint
+                    /
+                /
+            /
+ srcPoint/   Result
+      *  -  -  -  -  -  *  defaultPoint
+
+*/
+
+    double ab[3] = { b[0] - a[0], b[1] - a[1] };
+    double bc[3] = { c[0] - b[0], c[1] - b[1] };
+
+    double abVec = sqrt(ab[0] * ab[0] + ab[1] * ab[1] );
+    double bcVec = sqrt(bc[0] * bc[0] + bc[1] * bc[1] );
+
+    double abNorm[3] = {ab[0] / abVec, ab[1] / abVec };
+    double bcNorm[3] = {bc[0] / bcVec, bc[1] / bcVec };
+
+    double res = abNorm[0] * bcNorm[0] + abNorm[1] * bcNorm[1] ;
+
+    res = acos(res)*180.0/ 3.141592653589793;
+
+    fprintf(stderr,"angle(%0.2f,%0.2f,%0.2f) = %0.2f  [ ab=%0.2f bc=%0.2f abVec=%0.2f bcVec=%0.2f abNorm=%0.2f bcNorm=%0.2f ] ",*srcPoint,*dstPoint,*defaultPoint,res
+           ,ab,bc,abVec,bcVec,abNorm,bcNorm
+            );
 
 
- return getAngleABC(&relativeSrc,&relativeDst,&relativeDefaultDst);
+    return res;
 }
 
 
 
+static double getAngleABCRelative( double* srcPointA , double* srcPointB ,
+                                   double* dstPointA , double* dstPointB ,
+                                   double* srcDefaultPointA ,  double* srcDefaultPointB ,
+                                   double* dstDefaultPointA ,  double* dstDefaultPointB  )
+{
+ double relativeSrc[2] = { 0 , 0 };
+ double relativeDst[2] = { *dstPointA - * srcPointA, *dstPointB - * srcPointB };
+ double relativeDefaultDst[2] = { *dstDefaultPointA - * srcDefaultPointA , *dstDefaultPointB - * srcDefaultPointB };
+
+
+ return get2DAngleABC(relativeSrc,relativeDst,relativeDefaultDst);
+}
+
+
+enum Point2FlatArray
+{
+  p_X = 0 ,
+  p_Y ,
+  p_Z
+};
 
 
 static void updateSkeletonAngles(struct skeletonHuman * sk)
@@ -346,7 +403,7 @@ static void updateSkeletonAngles(struct skeletonHuman * sk)
   unsigned int i=0;
   unsigned int src=0,dst=0;
 
-  double srcD , dstD , srcDefD , dstDefD ;
+  double srcDA,srcDB , dstDA,dstDB , srcDefDA,srcDefDB , dstDefDA,dstDefDB;
   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
   {
      src = humanSkeletonJointsRelationMap[i];
@@ -354,25 +411,27 @@ static void updateSkeletonAngles(struct skeletonHuman * sk)
 
      if ( !skeletonSameJoints(src,dst) )
      {
-      srcD = (double) sk->joint[src].x; srcDefD = (double) defaultJoints[src*3+0];
-      dstD = (double) sk->joint[dst].x; dstDefD = (double) defaultJoints[dst*3+0];
-      sk->relativeJointAngle[i].x=getAngleABCRelative(&srcD,&dstD,&srcDefD,&dstDefD);
+      //Z and Y gives X
+      srcDA = (double) sk->joint[src].z; srcDB = (double) sk->joint[src].y;
+      dstDA = (double) sk->joint[dst].z; dstDB = (double) sk->joint[dst].y;
+      srcDefDA = (double) defaultJoints[src*3+p_Z]; srcDefDB = (double) defaultJoints[src*3+p_Y];
+      dstDefDA = (double) defaultJoints[dst*3+p_Z]; dstDefDB = (double) defaultJoints[dst*3+p_Y];
+      sk->relativeJointAngle[i].x=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
 
+      //Z and X gives Y
+      srcDA = (double) sk->joint[src].z; srcDB = (double) sk->joint[src].x;
+      dstDA = (double) sk->joint[dst].z; dstDB = (double) sk->joint[dst].x;
+      srcDefDA = (double) defaultJoints[src*3+p_Z]; srcDefDB = (double) defaultJoints[src*3+p_X];
+      dstDefDA = (double) defaultJoints[dst*3+p_Z]; dstDefDB = (double) defaultJoints[dst*3+p_X];
+      sk->relativeJointAngle[i].y=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
 
-      srcD = (double) sk->joint[src].y;
-      dstD = (double) sk->joint[dst].y;
-      srcDefD = (double) defaultJoints[src*3+1];
-      dstDefD = (double) defaultJoints[dst*3+1];
-      sk->relativeJointAngle[i].y=getAngleABCRelative(&srcD,&dstD,&srcDefD,&dstDefD);
-
-      srcD = (double) sk->joint[src].z;
-      dstD = (double) sk->joint[dst].z;
-      srcDefD = (double) defaultJoints[src*3+2];
-      dstDefD = (double) defaultJoints[dst*3+2];
-      sk->relativeJointAngle[i].z=getAngleABCRelative(&srcD,&dstD,&srcDefD,&dstDefD);
+      //X and Y gives Z
+      srcDA = (double) sk->joint[src].x; srcDB = (double) sk->joint[src].y;
+      dstDA = (double) sk->joint[dst].x; dstDB = (double) sk->joint[dst].y;
+      srcDefDA = (double) defaultJoints[src*3+p_X]; srcDefDB = (double) defaultJoints[src*3+p_Y];
+      dstDefDA = (double) defaultJoints[dst*3+p_X]; dstDefDB = (double) defaultJoints[dst*3+p_Y];
+      sk->relativeJointAngle[i].z=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
      }
-
-    //sk->relativeJointAngle[i];
 
   }
 
@@ -396,6 +455,9 @@ static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman *
   if (fp!=0)
   {
     fprintf(fp,"<svg width=\"640\" height=\"480\">\n");
+
+     fprintf(fp,"<text x=\"0\" y=\"20\">\n Timestamp %u\n</text>\n",sk->observationNumber);
+
       for (i=0; i<HUMAN_SKELETON_PARTS; i++)
        {
         src = humanSkeletonJointsRelationMap[i];
