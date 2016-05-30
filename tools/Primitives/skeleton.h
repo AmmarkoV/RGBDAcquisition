@@ -10,8 +10,9 @@ extern "C"
 
 
 
+static float defaultJoints2D[] = { 293.0, 37.0, 293.0, 100.0, 292.0, 170.0, 235.0, 99.0, 349.0, 101.0, 172.0, 144.0, 421.0, 128.0, 113.0, 176.0, 480.0, 144.0, 263.0, 242.0, 319.0, 242.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 291.0, 242.0 };
+static float defaultJoints[] = { -88.01861572265625, -655.5640258789062, 1717.0, -91.15103149414062, -464.8657531738281, 1764.83154296875, -93.02406311035156, -229.4916534423828, 1740.753173828125, -281.5615234375, -465.376708984375, 1757.0, 98.7568359375, -467.6025390625, 1785.0, -498.959716796875, -323.6999206542969, 1784.90966796875, 364.5001220703125, -404.3070373535156, 1923.611572265625, -673.8611450195312, -208.03506469726562, 1731.8184814453125, 562.7467651367188, -339.4126281738281, 1868.3612060546875, -185.67507934570312, 5.257970809936523, 1733.0770263671875, -4.1191253662109375, 6.506894111633301, 1700.2725830078125, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, -94.89710235595703, 5.882432460784912, 1716.6748046875 } ;
 
-static float defaultJoints[] = { 70.37139892578125, -488.10699462890625, 1605.5, -29.082809448242188, -314.5812072753906, 1605.500732421875, -29.102794647216797, -85.98794555664062, 1566.6517333984375, -214.7298126220703, -312.88775634765625, 1617.931640625, 73.657470703125, -311.418701171875, 1617.529541015625, -252.35317993164062, -527.5241088867188, 1616.2698974609375, 64.68223571777344, -578.2517700195312, 1656.204345703125, -245.8188018798828, -441.24560546875, 1435.18798828125, 128.5203857421875, -492.1353759765625, 1511.617431640625, -120.2656021118164, 128.38536071777344, 1526.885498046875, 62.020042419433594, 156.82525634765625, 1528.719970703125, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, -29.122779846191406, 142.60531616210938, 1527.802734375 };
 
 
 
@@ -353,23 +354,25 @@ static double get2DAngleABC( double* srcPoint, double* dstPoint, double* default
 
 */
 
-    double ab[3] = { b[0] - a[0], b[1] - a[1] };
-    double bc[3] = { c[0] - b[0], c[1] - b[1] };
+    double ab[2] = { b[0] - a[0], b[1] - a[1] };
+    double bc[2] = { c[0] - b[0], c[1] - b[1] };
 
     double abVec = sqrt(ab[0] * ab[0] + ab[1] * ab[1] );
     double bcVec = sqrt(bc[0] * bc[0] + bc[1] * bc[1] );
 
-    double abNorm[3] = {ab[0] / abVec, ab[1] / abVec };
-    double bcNorm[3] = {bc[0] / bcVec, bc[1] / bcVec };
+    double abNorm[2] = {ab[0] / abVec, ab[1] / abVec };
+    double bcNorm[2] = {bc[0] / bcVec, bc[1] / bcVec };
 
     double res = abNorm[0] * bcNorm[0] + abNorm[1] * bcNorm[1] ;
 
     res = acos(res)*180.0/ 3.141592653589793;
 
+
+   /*
     fprintf(stderr,"angle(%0.2f,%0.2f,%0.2f) = %0.2f  [ ab=%0.2f bc=%0.2f abVec=%0.2f bcVec=%0.2f abNorm=%0.2f bcNorm=%0.2f ] ",*srcPoint,*dstPoint,*defaultPoint,res
            ,ab,bc,abVec,bcVec,abNorm,bcNorm
             );
-
+   */
 
     return res;
 }
@@ -439,6 +442,41 @@ static void updateSkeletonAngles(struct skeletonHuman * sk)
 
 }
 
+static int convertSkeletonFlat3DJointsToPoint3D(struct point3D * out  , float * in )
+{
+  unsigned int i=0;
+  for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+    out[i].x = in[i*3+p_X];
+    out[i].y = in[i*3+p_Y];
+    out[i].z = in[i*3+p_Z];
+
+  }
+ return 1;
+}
+
+
+
+static int convertSkeletonFlat2DJointsToPoint2D(struct point2D * out  , float * in )
+{
+  unsigned int i=0;
+  for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+    out[i].x = in[i*2+p_X];
+    out[i].y = in[i*2+p_Y];
+
+  }
+ return 1;
+}
+
+
+int fillWithDefaultSkeleton(struct skeletonHuman * sk)
+{
+ convertSkeletonFlat3DJointsToPoint3D( sk->joint  , defaultJoints );
+ convertSkeletonFlat2DJointsToPoint2D( sk->joint2D , defaultJoints2D );
+  updateSkeletonAngles(sk);
+ return 1;
+}
 
 static double convertSkeletonHumanToSkeletonNAO( struct skeletonNAO * nao , struct skeletonHuman * man)
 {

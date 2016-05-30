@@ -189,6 +189,11 @@ int main(int argc, char *argv[])
     if (argc < 2 ) { fprintf(stderr,"Please give filename of joint list \n"); return 1; }
 
     printf("Running Converter on %s !\n",argv[1]);
+
+    struct skeletonHuman defaultPose={0};
+    fillWithDefaultSkeleton(&defaultPose);
+    visualizeSkeletonHuman("defaultPose.svg", &defaultPose );
+
     parseJointList(argv[1]);
     return 0;
 }
