@@ -15,6 +15,17 @@ static float defaultJoints[] = { -88.01861572265625, -655.5640258789062, 1717.0,
 
 
 
+#define dp 1700
+#define sx 320
+#define sy 100                        //head         neck         bodycenter   rightshoulder  leftshoulder     rightElbow      leftElbow       rightWrist    leftWrist
+static float NAOdefaultJoints2D[] = { sx+0,sy-94 , sx+0,sy+0    , sx+0,sy+22  , sx-191,sy+0 ,  sx+191,sy+0  , sx-191,sy+0   , sx+191,sy+0   , sx-191,sy+0 , sx+191,sy+0 ,
+                                     //rightLegRoot  leftLegRoot    rightKnee      leftKnee     rightAnckle      LeftAnckle    hip
+                                      sx-80,sy+122 , sx+80,sy+122,  sx-80,sy+200, sx+80,sy+200,  sx-80,sy+300 , sx+80,sy+300 , sx+0,sy+122 };
+static float NAOdefaultJoints[] = { 0,-194,dp, 0,0,dp , 0,222,dp , -191,0,dp , 191,0,dp , -191,0,dp-200 , 191,0,dp-200 ,
+                                    -191,0,dp-700 , 101,0,dp-700 ,  -80,322,dp , 80,322,dp  , -80,700,dp , 80,700,dp , -80,1000,dp , 80,1000,dp ,
+                                    0,322,dp
+                                  };
+
 
 
 static const char * jointNames[] =
@@ -401,7 +412,7 @@ enum Point2FlatArray
 };
 
 
-static void updateSkeletonAngles(struct skeletonHuman * sk)
+static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJoints)
 {
   unsigned int i=0;
   unsigned int src=0,dst=0;
@@ -435,12 +446,21 @@ static void updateSkeletonAngles(struct skeletonHuman * sk)
       dstDefDA = (double) defaultJoints[dst*3+p_X]; dstDefDB = (double) defaultJoints[dst*3+p_Y];
       sk->relativeJointAngle[i].z=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
      }
-
   }
-
-
-
 }
+
+
+
+static void updateSkeletonAngles(struct skeletonHuman * sk)
+{
+ updateSkeletonAnglesGeneric( sk , defaultJoints);
+}
+
+static void updateSkeletonAnglesNAO(struct skeletonHuman * sk)
+{
+ updateSkeletonAnglesGeneric( sk , NAOdefaultJoints);
+}
+
 
 static int convertSkeletonFlat3DJointsToPoint3D(struct point3D * out  , float * in )
 {
@@ -478,6 +498,16 @@ int fillWithDefaultSkeleton(struct skeletonHuman * sk)
  return 1;
 }
 
+
+int fillWithDefaultNAOSkeleton(struct skeletonHuman * sk)
+{
+ convertSkeletonFlat3DJointsToPoint3D( sk->joint  , NAOdefaultJoints );
+ convertSkeletonFlat2DJointsToPoint2D( sk->joint2D , NAOdefaultJoints2D );
+  updateSkeletonAngles(sk);
+ return 1;
+}
+
+
 static double convertSkeletonHumanToSkeletonNAO( struct skeletonNAO * nao , struct skeletonHuman * man)
 {
 }
@@ -485,16 +515,27 @@ static double convertSkeletonHumanToSkeletonNAO( struct skeletonNAO * nao , stru
 
 
 
-static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman * sk)
+static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman * sk , float scale)
 {
+  unsigned int origX=640,origY=480;
+  float origXHalf=(float) origX/2,origYHalf=(float) origY/2;
+
+
   unsigned int i=0;
   unsigned int src=0,dst=0;
   FILE * fp = fopen(filename,"w");
   if (fp!=0)
   {
-    fprintf(fp,"<svg width=\"640\" height=\"480\">\n");
+    fprintf(fp,"<svg width=\"%0.0f\" height=\"%0.0f\">\n" , origX*scale , origY*scale);
 
      fprintf(fp,"<text x=\"0\" y=\"20\">\n Timestamp %u\n</text>\n",sk->observationNumber);
+
+     fprintf(fp,"<line x1=\"%0.2f\" y1=\"%0.2f\" x2=\"%0.2f\" y2=\"%0.2f\" style=\"stroke:rgb(255,255,0);stroke-width:2;stroke-dasharray:10,10\" />\n",
+                (float) origXHalf*scale, 0.0 , (float)origXHalf*scale, (float) origY*scale );
+
+     fprintf(fp,"<line x1=\"%0.2f\" y1=\"%0.2f\" x2=\"%0.2f\" y2=\"%0.2f\" style=\"stroke:rgb(255,255,0);stroke-width:2;stroke-dasharray:10,10\" />\n",
+                 0.0 ,(float) origYHalf*scale , (float) origX*scale  , (float)origYHalf*scale );
+
 
       for (i=0; i<HUMAN_SKELETON_PARTS; i++)
        {
@@ -504,7 +545,7 @@ static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman *
         if ( ( !skeletonSameJoints(src,dst) ) && (!skeletonEmptyJoint(sk,src)) && (!skeletonEmptyJoint(sk,dst)) )
         {
          fprintf(fp,"<line x1=\"%0.2f\" y1=\"%0.2f\" x2=\"%0.2f\" y2=\"%0.2f\" style=\"stroke:rgb(255,0,0);stroke-width:2\" />\n",
-                 sk->joint2D[src].x, sk->joint2D[src].y , sk->joint2D[dst].x, sk->joint2D[dst].y );
+                 sk->joint2D[src].x*scale, sk->joint2D[src].y*scale , sk->joint2D[dst].x*scale, sk->joint2D[dst].y*scale );
         }
        }
 
@@ -512,8 +553,20 @@ static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman *
        {
         if (!skeletonEmptyJoint(sk,i))
          {
-          fprintf(fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"10\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n", sk->joint2D[i].x, sk->joint2D[i].y );
-          fprintf(fp,"<text x=\"%0.2f\" y=\"%0.2f\">\n",sk->joint2D[i].x-20, sk->joint2D[i].y-20   );
+          fprintf(fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"10\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n", sk->joint2D[i].x*scale, sk->joint2D[i].y*scale );
+
+
+          fprintf(fp,"<text x=\"%0.2f\" y=\"%0.2f\">\n",(sk->joint2D[i].x*scale)-40, (sk->joint2D[i].y*scale)-60   );
+          fprintf(fp,"  <tspan fill=\"red\">%s</tspan>",jointNames[i]);
+          fprintf(fp,"</text>\n"   );
+
+          fprintf(fp,"<text x=\"%0.2f\" y=\"%0.2f\">\n",(sk->joint2D[i].x*scale)-40, (sk->joint2D[i].y*scale)-40   );
+          fprintf(fp,"  <tspan fill=\"red\">%0.2f</tspan>,",sk->joint[i].x);
+          fprintf(fp,"  <tspan fill=\"green\">%0.2f</tspan>,",sk->joint[i].y);
+          fprintf(fp,"  <tspan fill=\"blue\">%0.2f</tspan>\n",sk->joint[i].z);
+          fprintf(fp,"</text>\n"   );
+
+          fprintf(fp,"<text x=\"%0.2f\" y=\"%0.2f\">\n",(sk->joint2D[i].x*scale)-40, (sk->joint2D[i].y*scale)-20   );
           fprintf(fp,"  <tspan fill=\"red\">%0.2f</tspan>/",sk->relativeJointAngle[i].x);
           fprintf(fp,"  <tspan fill=\"green\">%0.2f</tspan>/",sk->relativeJointAngle[i].y);
           fprintf(fp,"  <tspan fill=\"blue\">%0.2f</tspan>\n",sk->relativeJointAngle[i].z);

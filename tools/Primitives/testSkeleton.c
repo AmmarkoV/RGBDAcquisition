@@ -4,16 +4,18 @@
 
 #include "skeleton.h"
 
+float visualizationScale = 3.0;
 int frames =0;
 
 int doSkeletonConversions( struct skeletonHuman * skel )
 {
-  updateSkeletonAngles(skel);
+  //updateSkeletonAngles(skel);
+  updateSkeletonAnglesNAO(skel);
 
   char filenameBuf[512]={0};
   snprintf(filenameBuf,512,"skel%u.svg",frames);
 
-  visualizeSkeletonHuman(filenameBuf,  skel);
+  visualizeSkeletonHuman(filenameBuf,  skel, visualizationScale);
   ++frames;
 }
 
@@ -192,7 +194,11 @@ int main(int argc, char *argv[])
 
     struct skeletonHuman defaultPose={0};
     fillWithDefaultSkeleton(&defaultPose);
-    visualizeSkeletonHuman("defaultPose.svg", &defaultPose );
+    visualizeSkeletonHuman("defaultPose.svg", &defaultPose , visualizationScale );
+
+    struct skeletonHuman defaultNAOPose={0};
+    fillWithDefaultNAOSkeleton(&defaultNAOPose);
+    visualizeSkeletonHuman("defaultNAOPose.svg", &defaultNAOPose , visualizationScale );
 
     parseJointList(argv[1]);
     return 0;
