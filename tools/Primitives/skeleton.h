@@ -508,12 +508,6 @@ int fillWithDefaultNAOSkeleton(struct skeletonHuman * sk)
 }
 
 
-static double convertSkeletonHumanToSkeletonNAO( struct skeletonNAO * nao , struct skeletonHuman * man)
-{
-}
-
-
-
 
 static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman * sk , float scale)
 {

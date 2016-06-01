@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "skeleton.h"
+#include "nao_geometry.h"
 
 float visualizationScale = 3.0;
 int frames =0;
@@ -17,6 +18,20 @@ int doSkeletonConversions( struct skeletonHuman * skel )
 
   visualizeSkeletonHuman(filenameBuf,  skel, visualizationScale);
   ++frames;
+
+
+
+
+
+  struct naoCommand nao={0};
+  struct skeletonHuman sk={0};
+
+  setNAOMotorsFromHumanSkeleton( &nao , &sk );
+
+
+  snprintf(filenameBuf,512,"skel%u.txt",frames);
+  printoutNAOCommand( filenameBuf , &nao );
+  return 1;
 }
 
 
@@ -63,6 +78,7 @@ int printJointField ( struct skeletonHuman * skel )
 
   printf("timestamp: %u\n", skel->observationNumber);
   printf("---\n");
+  return 1;
 }
 
 
