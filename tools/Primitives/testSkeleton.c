@@ -10,27 +10,26 @@ int frames =0;
 
 int doSkeletonConversions( struct skeletonHuman * skel )
 {
-  //updateSkeletonAngles(skel);
-  updateSkeletonAnglesNAO(skel);
+  //if ( !skeletonEmpty(skel))
+  {
+   //updateSkeletonAngles(skel);
+   updateSkeletonAnglesNAO(skel);
+   fprintf(stderr,"doSkeletonConversions #%u ",frames);
+   char filenameBuf[512]={0};
+   snprintf(filenameBuf,512,"skel%u.svg",frames);
 
-  char filenameBuf[512]={0};
-  snprintf(filenameBuf,512,"skel%u.svg",frames);
+   visualizeSkeletonHuman(filenameBuf,  skel, visualizationScale);
 
-  visualizeSkeletonHuman(filenameBuf,  skel, visualizationScale);
-  ++frames;
+   struct naoCommand nao={0};
+   struct skeletonHuman sk={0};
 
+   setNAOMotorsFromHumanSkeleton( &nao , &sk );
+   snprintf(filenameBuf,512,"skel%u.skel",frames);
+   printoutNAOCommand( filenameBuf , &nao );
+  }
 
-
-
-
-  struct naoCommand nao={0};
-  struct skeletonHuman sk={0};
-
-  setNAOMotorsFromHumanSkeleton( &nao , &sk );
-
-
-  snprintf(filenameBuf,512,"skel%u.txt",frames);
-  printoutNAOCommand( filenameBuf , &nao );
+   cleanSkeleton(skel);
+   ++frames;
   return 1;
 }
 
@@ -172,8 +171,17 @@ int parseJointList(const char * filename)
 
     while ((read = getline(&line, &len, fp)) != -1)
     {
-       // printf("Retrieved line of length %zu :\n", read);
-       // printf("%s", line);
+       printf("Retrieved line of length %zu :\n", read);
+       printf("%s", line);
+
+
+
+      if (strstr(line,"---")!=0)
+      {
+           doSkeletonConversions( &skel );
+           printJointField ( &skel );
+      } else
+      {
         char * varNameEnd = strchr(line , ':');
         if (varNameEnd!=0)
         {
@@ -182,11 +190,9 @@ int parseJointList(const char * filename)
          char * val = varNameEnd+1;
          printf("VAL = %s\n", val);
 
-         parseJointField ( &skel , line ,  val );
-           doSkeletonConversions( &skel );
-         printJointField ( &skel );
-
+         parseJointField ( &skel , line ,  val  );
         }
+       }
     }
 
     fclose(fp);

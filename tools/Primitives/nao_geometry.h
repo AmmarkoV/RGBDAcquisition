@@ -251,16 +251,19 @@ int setNAOMotorsFromHumanSkeleton(struct naoCommand *  nao , struct skeletonHuma
   nao->jointMotor[RAnkleRoll] 	 = 0.0;//Right ankle joint right and left (X) 	-44.06 to 22.80 	-0.768992 to 0.397935
 
 
-  unsigned int i=0;
+  unsigned int i=0,addline=0;
   for (i=0; i<NUMBER_OF_NAO_JOINTS; i++)
   {
-    if (NAO_max[i]<nao->jointMotor[i]) { nao->jointMotor[i]=NAO_max[i]; fprintf(stderr,RED " joint %u @ max" NORMAL , i ); }
-    if (NAO_min[i]>nao->jointMotor[i]) { nao->jointMotor[i]=NAO_min[i]; fprintf(stderr,RED " joint %u @ min" NORMAL , i ); }
-
-
-    if (nao->jointMotor[i]!=nao->jointMotor[i]) { nao->jointMotor[i]=NAO_min[i]; fprintf(stderr,RED " joint %u @ NaN" NORMAL , i ); }
+    addline=0;
+    if (NAO_max[i]<nao->jointMotor[i]) { nao->jointMotor[i]=NAO_max[i]; fprintf(stderr,RED " joint %u @ max " NORMAL , i );          addline=1;}
+    if (NAO_min[i]>nao->jointMotor[i]) { nao->jointMotor[i]=NAO_min[i]; fprintf(stderr,RED " joint %u @ min " NORMAL , i );          addline=1;}
+    if (nao->jointMotor[i]!=nao->jointMotor[i]) { nao->jointMotor[i]=NAO_min[i]; fprintf(stderr,RED " joint %u @ NaN " NORMAL , i ); addline=1;}
   }
 
+  if (addline)
+  {
+    fprintf(stderr,"\n");
+  }
 
   return 1;
 }

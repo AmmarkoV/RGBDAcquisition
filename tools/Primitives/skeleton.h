@@ -241,6 +241,22 @@ struct skeletonPointing
 };
 
 
+static int cleanSkeleton(struct skeletonHuman * sk)
+{
+  unsigned int i=0;
+
+  for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+      sk->relativeJointAngle[i].x=0.0;   sk->relativeJointAngle[i].y=0.0; sk->relativeJointAngle[i].z=0.0;
+      sk->joint[i].x=0.0;   sk->joint[i].y=0.0; sk->joint[i].z=0.0;
+      sk->joint2D[i].x=0.0; sk->joint2D[i].y=0.0;
+      sk->jointAccuracy[i]=0.0;
+  }
+
+  return 1;
+}
+
+
 static int skeletonEmptyJoint(struct skeletonHuman * sk , unsigned int j1)
 {
    //Check NotSet
@@ -267,6 +283,25 @@ static int skeletonEmptyJoint(struct skeletonHuman * sk , unsigned int j1)
   return 0;
 }
 
+
+
+
+static int skeletonEmpty(struct skeletonHuman * sk)
+{
+  unsigned int i=0 , emptyJoints=0;
+  for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+    if ( skeletonEmptyJoint(sk,i) ) { ++emptyJoints; }
+  }
+
+  if (emptyJoints==HUMAN_SKELETON_MIRRORED_PARTS)
+    {
+     fprintf(stderr,  "All skeleton joints are empty.. \n"   );
+     return 1;
+    }
+
+  return 0;
+}
 
 static int skeletonSameJoints(unsigned int j1 , unsigned int j2)
 {
