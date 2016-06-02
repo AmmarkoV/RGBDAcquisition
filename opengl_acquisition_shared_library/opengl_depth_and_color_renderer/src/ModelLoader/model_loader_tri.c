@@ -5,7 +5,6 @@
 #include <string.h>
 
 
-
 #if HAVE_OBJ_CODE_AVAILIABLE
 int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
 {
@@ -17,10 +16,12 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
        tri->header.triType=1;
        tri->header.numberOfTriangles = obj->numGroups * obj->numFaces * 3 ;
        tri->header.numberOfNormals   = obj->numGroups * obj->numFaces * 3 ;
+       tri->header.numberOfColors    = obj->numGroups * obj->numFaces * 3 ;
 
        tri->textureCoords =   malloc(sizeof(float) * 2 * tri->header.numberOfTriangles);
        tri->triangleVertex = malloc(sizeof(float) * 3 * tri->header.numberOfTriangles);
        tri->normal = malloc(sizeof(float) * 3 * tri->header.numberOfNormals);
+       tri->colors = malloc(sizeof(float) * 3 * tri->header.numberOfColors);
        for(i=0; i<obj->numGroups; i++)
 	   {
         for(j=0; j<obj->groups[i].numFaces; j++)
@@ -93,6 +94,30 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
 		}
       }
 
+
+
+      pos=0;
+      if (obj->colorList!=0)
+      {
+       for(i=0; i<obj->numGroups; i++)
+	   {
+        for(j=0; j<obj->groups[i].numFaces; j++)
+			{
+			  tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].r;
+			  tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].g;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].b;
+
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].r;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].g;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].b;
+
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].r;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].g;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].b;
+			}
+		}
+      }
+
   return 1;
 }
 #endif // HAVE_OBJ_CODE_AVAILIABLE
@@ -121,6 +146,13 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
         triModel->textureCoords = ( float * ) malloc ( sizeof(float) * 2 * triModel->header.numberOfTriangles );
         n = fread(triModel->textureCoords , sizeof(float), 2 * triModel->header.numberOfTriangles , fd);
 
+
+        fprintf(stderr,"Reading %u bytes of colors\n",sizeof(float) * 3 *triModel->header.numberOfColors);
+        triModel->colors = ( float * ) malloc ( sizeof(float) * 3 * triModel->header.numberOfColors );
+        n = fread(triModel->colors , sizeof(float), 3 * triModel->header.numberOfColors , fd);
+
+
+
         fclose(fd);
         return 1;
     }
@@ -147,6 +179,8 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
         fwrite (triModel->normal         , 3*sizeof(float), triModel->header.numberOfNormals  , fd);
         fprintf(stderr,"Writing %u bytes of texture coords\n", sizeof(float) * 2 * triModel->header.numberOfTriangles);
         fwrite (triModel->textureCoords , 2*sizeof(float), triModel->header.numberOfTriangles, fd);
+        fprintf(stderr,"Writing %u bytes of colors\n", sizeof(float) * 3 * triModel->header.numberOfColors);
+        fwrite (triModel->colors , 3*sizeof(float), triModel->header.numberOfColors, fd);
 
         fflush(fd);
         fclose(fd);

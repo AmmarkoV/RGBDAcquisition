@@ -13,6 +13,7 @@ struct TRI_Header
      unsigned int floatSize;
      unsigned int numberOfTriangles;
      unsigned int numberOfNormals;
+     unsigned int numberOfColors;
 
 };
 
@@ -23,6 +24,7 @@ struct TRI_Model
    float * triangleVertex;
    float * normal;
    float * textureCoords;
+   float * colors;
 };
 
 

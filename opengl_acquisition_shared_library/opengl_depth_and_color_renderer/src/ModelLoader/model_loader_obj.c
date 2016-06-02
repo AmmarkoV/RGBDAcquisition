@@ -380,8 +380,24 @@ int calculateOBJBBox(struct OBJ_Model * obj)
 }
 
 
+int countChar(char  * str , unsigned int strLength , char seek , char termination)
+{
+  unsigned int count=0;
+  char * ptr = str;
+  char * target = str+strLength;
+  while ( (ptr < target) )
+  {
+    if (seek==*ptr) { ++count; }
+    ++ptr;
+  }
+
+ return count;
+}
+
 int readOBJ(struct OBJ_Model * obj)
 {
+  fprintf(stderr,"readOBJ  new \n");
+
   if (obj->filename == 0 ) { fprintf(stderr,"readOBJ called with a null filename , cannot continue \n"); return 0; }
   /* Read the .obj model from file FILENAME */
   /* All faces are converted to be triangles */
@@ -390,6 +406,7 @@ int readOBJ(struct OBJ_Model * obj)
   char buf1[128];
   long unsigned int    numvertices;		/* number of vertices in model */
   long unsigned int    numnormals;                 /* number of normals in model */
+  long unsigned int    numcolors;
   long unsigned int    numtexs;                 /* number of normals in texture coordintaes */
   long unsigned int    numfaces;			/* number of faces in model */
   long unsigned int    numgroups;			/* number of groups in model */
@@ -429,6 +446,7 @@ int readOBJ(struct OBJ_Model * obj)
   numtexs = 0;
   numvertices = 0;
   numnormals = 0;
+  numcolors = 0;
   numfaces = 0;
   cur_group = AddGroup(obj,"default");
   obj->groups[0].material=0;
@@ -442,7 +460,8 @@ int readOBJ(struct OBJ_Model * obj)
 		  loadMTL(obj,obj->directory ,buf1);
 		  printf("loadmtl %s survived\n", obj->matLib);
 	  }
-    switch(buf[0]) {
+    switch(buf[0])
+    {
     case '#':	fgets(buf, sizeof(buf), file);	 break;		// comment   eat up rest of line
 
     // v, vn, vt
@@ -452,6 +471,7 @@ int readOBJ(struct OBJ_Model * obj)
                   case '\0': // vertex  eat up rest of line
 	                         fgets(buf, sizeof(buf), file);
 	                         numvertices++;
+	                         if (countChar(buf,strlen(buf),' ',buf[1])==6) { numcolors++ ; } //meshlab extension for colors on obj files
 	              break;
                   case 'n': // normal  eat up rest of line
 	                         fgets(buf, sizeof(buf), file);
@@ -520,12 +540,15 @@ int readOBJ(struct OBJ_Model * obj)
   obj->numVertices  = numvertices;
   obj->numNormals   = numnormals;
   obj->numTexs = numtexs;
+  obj->numColors = numcolors;
 
   printf("Vertices : %ld\n",obj->numVertices);
   printf("Normals  : %ld\n",obj->numNormals);
   printf("Faces    : %ld\n",obj->numFaces);
   printf("Groups   : %ld\n",obj->numGroups);
   printf("Texes   : %ld\n",obj->numTexs);
+  printf("Colors   : %ld\n",obj->numColors);
+
   for(i=0; i<obj->numGroups; i++)
   {
 	  obj->groups[i].numFaces=0;
@@ -560,7 +583,13 @@ int readOBJ(struct OBJ_Model * obj)
   }
 
 
-   fprintf(stderr,"Second pass of the file\n");
+  if(obj->numColors!=0)
+  {
+    fprintf(stderr,"Allocating memory for colors\n");
+    obj->colorList=(RGBColors*)malloc(sizeof(RGBColors)*(obj->numColors+2));
+    if (obj->colorList == 0) { fprintf(stderr,"Could not allocate enough memory for colors struct\n"); }
+    memset (obj->colorList,0,sizeof(RGBColors)*(obj->numColors+2));
+  }
 
   // Second Pass
   rewind(file);
@@ -568,6 +597,8 @@ int readOBJ(struct OBJ_Model * obj)
   obj->numVertices = 1;
   obj->numNormals = 1;
   obj->numTexs = 1;
+  obj->customColor =( obj->numColors > 0 );
+  obj->numColors = 0;
   obj->numFaces = 0;
   material = 0;
   grp = 0;
@@ -592,11 +623,27 @@ int readOBJ(struct OBJ_Model * obj)
                   switch(buf[1])
                   {
                        case '\0': //  vertex
-	                              fscanf(file, "%f %f %f",
-	                              &obj->vertexList[obj->numVertices].x,
-	                              &obj->vertexList[obj->numVertices].y,
-	                              &obj->vertexList[obj->numVertices].z);
-	                              obj->numVertices++;
+                                  if ( obj->customColor )
+                                    {
+	                                 fscanf(file, "%f %f %f %f %f %f",
+	                                 &obj->vertexList[obj->numVertices].x,
+	                                 &obj->vertexList[obj->numVertices].y,
+	                                 &obj->vertexList[obj->numVertices].z,
+	                                 &obj->colorList[obj->numColors].r,
+	                                 &obj->colorList[obj->numColors].g,
+	                                 &obj->colorList[obj->numColors].g
+	                                 );
+	                                 obj->numVertices++;
+	                                 obj->numColors++;
+                                    } else
+                                    {
+	                                 fscanf(file, "%f %f %f",
+	                                 &obj->vertexList[obj->numVertices].x,
+	                                 &obj->vertexList[obj->numVertices].y,
+	                                 &obj->vertexList[obj->numVertices].z);
+	                                 obj->numVertices++;
+                                    }
+
 
 	                   break;
                        case 'n': // normal
@@ -740,7 +787,7 @@ int readOBJ(struct OBJ_Model * obj)
     }
   }
   fclose(file);
-  printf("Model has %ld faces\n",obj->numFaces);
+  printf("Model has %ld faces %u colors \n",obj->numFaces, obj->numColors);
   for(i=0; i<obj->numGroups; i++)
   {
 	 // fprintf(stderr,"Group %s has %ld faces and material %s, \t \n",obj->groups[i].name,obj->groups[i].numFaces,obj->matList[obj->groups[i].material].name);
@@ -867,6 +914,15 @@ void  drawOBJMesh(struct OBJ_Model * obj)
                                 );
                   }
 
+
+                if ( obj->faceList[ obj->groups[i].faceList[j]].v[0] < obj->numColors )
+                {
+                 glColor3f(
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].r,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].g,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].b
+                           );
+                }
 				glVertex3f(
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].x,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].y,
@@ -899,6 +955,15 @@ void  drawOBJMesh(struct OBJ_Model * obj)
                               );
 				}
 
+
+                if ( obj->faceList[ obj->groups[i].faceList[j]].v[1] < obj->numColors )
+                {
+                 glColor3f(
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].r,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].g,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].b
+                           );
+                }
 				glVertex3f(
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].x,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].y,
@@ -932,6 +997,14 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 				}
 
 
+                if ( obj->faceList[ obj->groups[i].faceList[j]].v[2] < obj->numColors )
+                {
+                 glColor3f(
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].r,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].g,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].b
+                           );
+                }
 				glVertex3f(
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].x,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].y,
@@ -1183,6 +1256,14 @@ int compileOBJList(struct OBJ_Model * obj)
                                 );
                   }
 
+                if ( obj->faceList[ obj->groups[i].faceList[j]].v[0] < obj->numColors )
+                {
+                 glColor3f(
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].r,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].g,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].b
+                           );
+                }
 				glVertex3f(
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].x,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].y,
@@ -1215,6 +1296,14 @@ int compileOBJList(struct OBJ_Model * obj)
                               );
 				}
 
+                if ( obj->faceList[ obj->groups[i].faceList[j]].v[1] < obj->numColors )
+                {
+                 glColor3f(
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].r,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].g,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].b
+                           );
+                }
 				glVertex3f(
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].x,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].y,
@@ -1248,6 +1337,14 @@ int compileOBJList(struct OBJ_Model * obj)
 				}
 
 
+                if ( obj->faceList[ obj->groups[i].faceList[j]].v[2] < obj->numColors )
+                {
+                 glColor3f(
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].r,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].g,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].b
+                           );
+                }
 				glVertex3f(
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].x,
                             obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].y,

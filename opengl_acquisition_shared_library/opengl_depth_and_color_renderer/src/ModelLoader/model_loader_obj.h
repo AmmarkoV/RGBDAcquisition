@@ -40,6 +40,10 @@ typedef struct { GLfloat n1, n2, n3;  } Vector;
 /**  @brief The structure that defines Vertexes*/
 typedef struct { GLfloat x,y,z; }       Vertex;
 
+
+/**  @brief The structure that defines Vertexes*/
+typedef struct { GLfloat r,g,b; }       RGBColors;
+
 /**  @brief The structure that defines Vertex-Face Normal  */
 typedef struct { GLfloat n1,n2,n3; } Normal;
 
@@ -104,6 +108,8 @@ struct OBJ_Model
 		Face * faceList;
 		//the number of faces
 		TexCoords * texList;
+		//the number of colors
+		RGBColors * colorList;
 		////the list of materials
 		Material * matList;
 		//the list of groups of our Mesh
@@ -127,6 +133,8 @@ struct OBJ_Model
 		long unsigned int numGroups;
 		//the number of materials
 		long unsigned int numMaterials;
+		//the number of colors
+		long unsigned int numColors;
 
 
 		//the name of the mtl file for the model
@@ -137,6 +145,8 @@ struct OBJ_Model
 		char directory[MAX_MODEL_PATHS];
 		//the display list id
 		GLuint dispList;
+
+		int customColor;
 };
 
 

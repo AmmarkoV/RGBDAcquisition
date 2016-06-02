@@ -1,7 +1,8 @@
 #version 150 core
  
 in  vec3 vPosition; 
-in  vec3 vNormal;    
+in  vec3 vNormal;   
+in  vec3 vColor;     
 in  vec2 vTexture;    
 //in  vec4 vMaterial; // Specular , Diffuse , Ambient , Shine(?)
  
