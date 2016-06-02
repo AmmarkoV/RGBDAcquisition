@@ -13,7 +13,7 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
 
    unsigned int i=0,j=0,pos=0,posTex=0;
 
-       tri->header.triType=1;
+       tri->header.triType=2;
        tri->header.numberOfTriangles = obj->numGroups * obj->numFaces * 3 ;
        tri->header.numberOfNormals   = obj->numGroups * obj->numFaces * 3 ;
        tri->header.numberOfColors    = obj->numGroups * obj->numFaces * 3 ;

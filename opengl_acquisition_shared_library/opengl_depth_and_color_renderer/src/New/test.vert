@@ -82,11 +82,11 @@ void main()
     gl_Position = theV; 
     theTexCoords = vTexture;
    
-    vec3 diffuseSphHar = materialColor.xyz;    
-    computeSphericalHarmonics (theNormal,HDRSettings[2],diffuseSphHar);
+    //vec3 diffuseSphHar = materialColor.xyz;    
+    //computeSphericalHarmonics (theNormal,HDRSettings[2],diffuseSphHar);
+    //color = vec4(diffuseSphHar,1.0); 
 
-
-    color = vec4(diffuseSphHar,1.0); 
+    color = vec4(vColor,1.0);
             
     theEnvReflectDirection= normalize(reflect(theV.xyz,vNormal)); 
 }
