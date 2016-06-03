@@ -557,7 +557,7 @@ int readOBJ(struct OBJ_Model * obj)
   if (wrongDecimalSeperatorBug)
   {
       fprintf(stderr,"\n\n\n\nThis OBJ file has a wrong seperator for floating point numbers \n");
-      fprintf(stderr,"         please use    sed -i 's/,/./g' filename         \n\n\n");
+      fprintf(stderr,"         please use    sed -i 's/,/./g' %s         \n\n\n",obj->filename);
 
   }
 
@@ -621,11 +621,12 @@ int readOBJ(struct OBJ_Model * obj)
   // Second Pass
   rewind(file);
 
+  //These dont work if they become 0 :P
   obj->numVertices = 1;
   obj->numNormals = 1;
   obj->numTexs = 1;
-  obj->customColor =( obj->numColors > 0 );
   obj->numColors = 1;
+  obj->customColor =( obj->numColors > 0 );
   obj->numFaces = 0;
   material = 0;
   grp = 0;

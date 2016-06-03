@@ -219,9 +219,7 @@ void main()
     colorOUT[3]=1.0;
         
     //colorOUT = vec4(0.0,1.0,0.0,1.0); 
-    //colorOUT = color; //No shading done
-       
-
+    //colorOUT = color; //No shading done 
     //colorOUT = colorBasic; // Just the basic color
 
     //Add Fog
