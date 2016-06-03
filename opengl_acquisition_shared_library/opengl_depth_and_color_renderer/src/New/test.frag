@@ -222,7 +222,7 @@ void main()
     //colorOUT = color; //No shading done
        
 
-    colorOUT = colorBasic; // Just 
+    //colorOUT = colorBasic; // Just the basic color
 
     //Add Fog
     //GL_EXP fog    

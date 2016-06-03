@@ -625,7 +625,7 @@ int readOBJ(struct OBJ_Model * obj)
   obj->numNormals = 1;
   obj->numTexs = 1;
   obj->customColor =( obj->numColors > 0 );
-  obj->numColors = 0;
+  obj->numColors = 1;
   obj->numFaces = 0;
   material = 0;
   grp = 0;
