@@ -380,6 +380,22 @@ int calculateOBJBBox(struct OBJ_Model * obj)
 }
 
 
+
+int floatingPointCheck(char  * str , unsigned int strLength )
+{
+  unsigned int count=0;
+  char * ptr = str;
+  char * target = str+strLength;
+  while ( (ptr < target) )
+  {
+    if (','==*ptr) { ++count; }
+    ++ptr;
+  }
+
+ return count;
+}
+
+
 int countChar(char  * str , unsigned int strLength , char seek , char termination)
 {
   unsigned int count=0;
@@ -396,7 +412,6 @@ int countChar(char  * str , unsigned int strLength , char seek , char terminatio
 
 int readOBJ(struct OBJ_Model * obj)
 {
-  fprintf(stderr,"readOBJ  new \n");
 
   if (obj->filename == 0 ) { fprintf(stderr,"readOBJ called with a null filename , cannot continue \n"); return 0; }
   /* Read the .obj model from file FILENAME */
@@ -404,6 +419,7 @@ int readOBJ(struct OBJ_Model * obj)
   FILE *file=0;
   char buf[128];
   char buf1[128];
+  unsigned int wrongDecimalSeperatorBug=0;
   long unsigned int    numvertices;		/* number of vertices in model */
   long unsigned int    numnormals;                 /* number of normals in model */
   long unsigned int    numcolors;
@@ -471,6 +487,7 @@ int readOBJ(struct OBJ_Model * obj)
                   case '\0': // vertex  eat up rest of line
 	                         fgets(buf, sizeof(buf), file);
 	                         numvertices++;
+	                         if (floatingPointCheck(buf,strlen(buf)) ) { ++wrongDecimalSeperatorBug; }
 	                         if (countChar(buf,strlen(buf),' ',buf[1])==6) { numcolors++ ; } //meshlab extension for colors on obj files
 	              break;
                   case 'n': // normal  eat up rest of line
@@ -535,6 +552,16 @@ int readOBJ(struct OBJ_Model * obj)
 
     }
   }
+
+
+  if (wrongDecimalSeperatorBug)
+  {
+      fprintf(stderr,"\n\n\n\nThis OBJ file has a wrong seperator for floating point numbers \n");
+      fprintf(stderr,"         please use    sed -i 's/,/./g' filename         \n\n\n");
+
+  }
+
+
 
   // set the stats in the model structure
   obj->numVertices  = numvertices;
@@ -631,10 +658,12 @@ int readOBJ(struct OBJ_Model * obj)
 	                                 &obj->vertexList[obj->numVertices].z,
 	                                 &obj->colorList[obj->numColors].r,
 	                                 &obj->colorList[obj->numColors].g,
-	                                 &obj->colorList[obj->numColors].g
+	                                 &obj->colorList[obj->numColors].b
 	                                 );
-	                                 obj->numVertices++;
-	                                 obj->numColors++;
+
+	                                  obj->numVertices++;
+	                                  obj->numColors++;
+
                                     } else
                                     {
 	                                 fscanf(file, "%f %f %f",

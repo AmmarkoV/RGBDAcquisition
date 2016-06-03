@@ -221,6 +221,9 @@ void main()
     //colorOUT = vec4(0.0,1.0,0.0,1.0); 
     //colorOUT = color; //No shading done
        
+
+    colorOUT = colorBasic; // Just 
+
     //Add Fog
     //GL_EXP fog    
     float fogScale = fogColorAndScale.w;
