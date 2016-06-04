@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define HAVE_OBJ_CODE_AVAILIABLE 1
 
 #if HAVE_OBJ_CODE_AVAILIABLE
 int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
