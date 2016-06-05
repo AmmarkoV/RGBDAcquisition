@@ -139,16 +139,16 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
     triModel->header.numberOfIndices       = 0;
 
 
-	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices       * sizeof(float));
-	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals        * sizeof(float));
-	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords  * sizeof(float));
-    triModel->colors         = (float*) malloc( triModel->header.numberOfColors         * sizeof(float));
+	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices  *3 *3    * sizeof(float));
+	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals   *3 *3     * sizeof(float));
+	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords *3 *2  * sizeof(float));
+    triModel->colors         = (float*) malloc( triModel->header.numberOfColors    *3  *3    * sizeof(float));
     triModel->indices        = 0;
 
     unsigned int i=0;
 
     unsigned int o=0,n=0,t=0,c=0;
-	for (i = 0; i < indexed->header.numberOfIndices; i++)
+	for (i = 0; i < indexed->header.numberOfIndices/3; i++)
     {
 		unsigned int faceTriA = indexed->indices[(i*3)+0];
 		unsigned int faceTriB = indexed->indices[(i*3)+1];
