@@ -280,9 +280,9 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
         if (triModel->header.numberOfIndices)
         {
-         fprintf(stderr,"Reading %u bytes of indices\n",sizeof(float) * 3 *triModel->header.numberOfIndices);
-         triModel->indices = ( float * ) malloc ( sizeof(float) * 3 * triModel->header.numberOfIndices );
-         n = fread(triModel->indices , sizeof(float), 3 * triModel->header.numberOfIndices , fd);
+         fprintf(stderr,"Reading %u bytes of indices\n",sizeof(unsigned int) * 3 *triModel->header.numberOfIndices);
+         triModel->indices = ( unsigned int * ) malloc ( sizeof(unsigned int) * 3 * triModel->header.numberOfIndices );
+         n = fread(triModel->indices , sizeof(unsigned int), 3 * triModel->header.numberOfIndices , fd);
         } else {  fprintf(stderr,"No indices specified \n"); }
 
 
@@ -333,8 +333,8 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 
         if (triModel->header.numberOfIndices)
         {
-        fprintf(stderr,"Writing %u bytes of indices\n", sizeof(float) * 3 * triModel->header.numberOfIndices);
-        fwrite (triModel->indices , 3*sizeof(float), triModel->header.numberOfIndices, fd);
+        fprintf(stderr,"Writing %u bytes of indices\n", sizeof(unsigned int) * 3 * triModel->header.numberOfIndices);
+        fwrite (triModel->indices , 3*sizeof(unsigned int ), triModel->header.numberOfIndices, fd);
         }
 
         fflush(fd);
