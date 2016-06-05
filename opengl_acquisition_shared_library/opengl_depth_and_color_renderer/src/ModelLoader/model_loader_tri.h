@@ -1,7 +1,7 @@
 #ifndef MODEL_LOADER_TRI_H_INCLUDED
 #define MODEL_LOADER_TRI_H_INCLUDED
 
-//#define HAVE_OBJ_CODE_AVAILIABLE  1
+#include "model_loader_setup.h"
 
 #if HAVE_OBJ_CODE_AVAILIABLE
  #include "model_loader_obj.h"
@@ -13,6 +13,7 @@ struct TRI_Header
 {
      unsigned int triType;
      unsigned int floatSize;
+     unsigned int drawType; //0 = triangles
      unsigned int numberOfVertices;
      unsigned int numberOfNormals;
      unsigned int numberOfTextureCoords;

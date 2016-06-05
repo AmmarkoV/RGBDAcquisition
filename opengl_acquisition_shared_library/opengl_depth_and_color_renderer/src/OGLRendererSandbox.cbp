@@ -127,6 +127,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ModelLoader/model_loader_obj.h" />
+		<Unit filename="ModelLoader/model_loader_setup.h" />
 		<Unit filename="ModelLoader/model_loader_tri.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -14,17 +14,18 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
    unsigned int i=0,j=0,pos=0,posTex=0;
 
        tri->header.triType=TRI_LOADER_VERSION;
-       tri->header.numberOfVertices     = obj->numGroups * obj->numFaces * 3 ;
+       tri->header.numberOfVertices      = obj->numGroups * obj->numFaces * 3 ;
        tri->header.numberOfNormals       = obj->numGroups * obj->numFaces * 3 ;
        tri->header.numberOfColors        = obj->numGroups * obj->numFaces * 3 ;
-       tri->header.numberOfTextureCoords = obj->numGroups * obj->numFaces * 3 ;
+       tri->header.numberOfTextureCoords = obj->numGroups * obj->numFaces * 2 ;
        tri->header.numberOfIndices   = 0; // We go full flat when converting an obj image
        tri->indices                  = 0; // We go full flat when converting an obj image
+       tri->header.drawType = 0;          // Triangles
 
-       tri->textureCoords =   malloc(sizeof(float) * 2 * tri->header.numberOfVertices);
-       tri->vertices = malloc(sizeof(float) * 3 * tri->header.numberOfVertices);
-       tri->normal = malloc(sizeof(float) * 3 * tri->header.numberOfNormals);
-       tri->colors = malloc(sizeof(float) * 3 * tri->header.numberOfColors);
+       tri->textureCoords =   malloc(sizeof(float)  * tri->header.numberOfVertices);
+       tri->vertices = malloc(sizeof(float) *  tri->header.numberOfVertices);
+       tri->normal = malloc(sizeof(float) *  tri->header.numberOfNormals);
+       tri->colors = malloc(sizeof(float) *  tri->header.numberOfColors);
        for(i=0; i<obj->numGroups; i++)
 	   {
         for(j=0; j<obj->groups[i].numFaces; j++)
