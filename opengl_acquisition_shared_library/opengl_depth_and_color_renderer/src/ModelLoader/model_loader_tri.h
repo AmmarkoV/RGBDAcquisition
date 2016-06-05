@@ -34,7 +34,7 @@ struct TRI_Model
    float * normal;
    float * textureCoords;
    float * colors;
-   float * indices;
+   unsigned int * indices;
 };
 
 
@@ -43,8 +43,13 @@ struct TRI_Model
 int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj);
 #endif // HAVE_OBJ_CODE_AVAILIABLE
 
+int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
+
 int loadModelTri(const char * filename , struct TRI_Model * triModel);
 int saveModelTri(const char * filename , struct TRI_Model * triModel);
+
+
+void deallocModelTri(struct TRI_Model * triModel);
 //int saveModelTriHeader(const char * filename , struct TRI_Model * triModel);
 
 

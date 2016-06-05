@@ -236,6 +236,25 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 }
 
 
+void deallocModelTri(struct TRI_Model * triModel)
+{
+  triModel->header.numberOfVertices = 0;
+  if (triModel->vertices!=0) { free(triModel->vertices); }
+
+  triModel->header.numberOfNormals = 0;
+  if (triModel->normal!=0) { free(triModel->normal); }
+
+  triModel->header.numberOfColors = 0;
+  if (triModel->colors!=0) { free(triModel->colors); }
+
+  triModel->header.numberOfTextureCoords = 0;
+  if (triModel->textureCoords!=0) { free(triModel->textureCoords); }
+
+  triModel->header.numberOfIndices = 0;
+  if (triModel->indices!=0) { free(triModel->indices); }
+}
+
+
 /*
 int saveModelTriHeader(const char * filename , struct TRI_Model * triModel)
 {
