@@ -5,6 +5,9 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+
+#include "skeleton.h"
+
 struct aiScene *g_scene = NULL;
 
 
@@ -32,17 +35,20 @@ struct aiNode *findnode(struct aiNode *node, char *name)
 // calculate absolute transform for node to do mesh skinning
 void transformnode(  aiMatrix4x4 *result, struct aiNode *node)
 {
-	if (node->mParent) {
+	if (node->mParent)
+    {
 		transformnode(result, node->mParent);
 		aiMultiplyMatrix4(result, &node->mTransformation);
-	} else {
+	} else
+	{
 		*result = node->mTransformation;
 	}
 }
 
 
 
-void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * triModel )
+
+void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
 {
     aiMatrix4x4 skin4;
     aiMatrix3x3 skin3;
@@ -61,10 +67,64 @@ void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * triMo
 
 
 		transformnode(&skin4, node);
-		aiMultiplyMatrix4(&skin4, &bone->mOffsetMatrix);
+
+		aiMatrix4x4 rotationMat;
+
+        unsigned int overrideHappened=0;
+        unsigned int i=0;
+
+        for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+        {
+            if (strcmp(boneName.C_Str(),smartBodyNames[i])==0)
+              {
+                 fprintf(stderr,"hook activated for %s \n",smartBodyNames[i]);
+
+
+//                 rotationMat.a1 = 1.0; rotationMat.a2 = 0.0;  rotationMat.a3 = 0.0;  rotationMat.a4 = 0.0;
+//                 rotationMat.b1 = 0.0; rotationMat.b2 = 1.0;  rotationMat.b3 = 0.0;  rotationMat.b4 = 0.0;
+//                 rotationMat.c1 = 0.0; rotationMat.c2 = 0.0;  rotationMat.c3 = 1.0;  rotationMat.c4 = 0.0;
+//                 rotationMat.d1 = 0.0; rotationMat.d2 = 0.0;  rotationMat.d3 = 0.0;  rotationMat.d4 = 1.0;
+
+
+                 rotationMat.FromEulerAnglesXYZ(
+                                               sk->relativeJointAngle[i].x,
+                                               sk->relativeJointAngle[i].y,
+                                               sk->relativeJointAngle[i].z
+                                              );
+
+
+                 fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , rotationMat.a1, rotationMat.a2,  rotationMat.a3,   rotationMat.a4 );
+		         fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , rotationMat.b1, rotationMat.b2,  rotationMat.b3,   rotationMat.b4 );
+		         fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , rotationMat.c1, rotationMat.c2,  rotationMat.c3,   rotationMat.c4 );
+		         fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , rotationMat.d1, rotationMat.d2,  rotationMat.d3,   rotationMat.d4 );
+                 fprintf(stderr," --- \n");
+
+		         aiMultiplyMatrix4(&skin4, &rotationMat);
+		         overrideHappened=1;
+              }
+        }
+        if (!overrideHappened)
+        {
+            fprintf(stderr," bone->mOffsetMatrix \n");
+
+           fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , bone->mOffsetMatrix.a1, bone->mOffsetMatrix.a2,  bone->mOffsetMatrix.a3,   bone->mOffsetMatrix.a4 );
+		   fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , bone->mOffsetMatrix.b1, bone->mOffsetMatrix.b2,  bone->mOffsetMatrix.b3,   bone->mOffsetMatrix.b4 );
+		   fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , bone->mOffsetMatrix.c1, bone->mOffsetMatrix.c2,  bone->mOffsetMatrix.c3,   bone->mOffsetMatrix.c4 );
+		   fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , bone->mOffsetMatrix.d1, bone->mOffsetMatrix.d2,  bone->mOffsetMatrix.d3,   bone->mOffsetMatrix.d4 );
+           fprintf(stderr," --- \n");
+
+          aiMultiplyMatrix4(&skin4, &bone->mOffsetMatrix);
+        }
+
+        fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , skin4.a1, skin4.a2,  skin4.a3,   skin4.a4 );
+		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , skin4.b1, skin4.b2,  skin4.b3,   skin4.b4 );
+		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , skin4.c1, skin4.c2,  skin4.c3,   skin4.c4 );
+		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , skin4.d1, skin4.d2,  skin4.d3,   skin4.d4 );
+
+
+
 		extract3x3(&skin3, &skin4);
 
-        unsigned int i=0;
 		for (i = 0; i < bone->mNumWeights; i++)
         {
 			int v = bone->mWeights[i].mVertexId;
@@ -72,15 +132,15 @@ void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * triMo
 
 			aiVector3D position = mesh->mVertices[v];
 			aiTransformVecByMatrix4(&position, &skin4);
-			triModel->vertices[v*3+0] += position.x * w;
-			triModel->vertices[v*3+1] += position.y * w;
-			triModel->vertices[v*3+2] += position.z * w;
+			indexed->vertices[v*3+0] += position.x * w;
+			indexed->vertices[v*3+1] += position.y * w;
+			indexed->vertices[v*3+2] += position.z * w;
 
 			aiVector3D normal = mesh->mNormals[v];
 			aiTransformVecByMatrix3(&normal, &skin3);
-			triModel->normal[v*3+0] += normal.x * w;
-			triModel->normal[v*3+1] += normal.y * w;
-			triModel->normal[v*3+2] += normal.z * w;
+			indexed->normal[v*3+0] += normal.x * w;
+			indexed->normal[v*3+1] += normal.y * w;
+			indexed->normal[v*3+2] += normal.z * w;
 		}
 
 	}
@@ -222,9 +282,6 @@ void prepareFlatMesh(struct aiScene *scene , int meshNumber , struct TRI_Model *
 }
 
 
-
-
-
 void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * triModel )
 {
     struct aiMesh * mesh = scene->mMeshes[meshNumber];
@@ -260,17 +317,17 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
     triModel->header.numberOfVertices      = mesh->mNumVertices*3;
     triModel->header.numberOfNormals       = mesh->mNumVertices*3;
-    triModel->header.numberOfTextureCoords = mesh->mNumVertices*3;
+    triModel->header.numberOfTextureCoords = mesh->mNumVertices*2;
     triModel->header.numberOfColors        = mesh->mNumVertices*3;
     triModel->header.numberOfIndices       = mesh->mNumFaces*3;
 
    //fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
 
-	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices * 3 *3  * sizeof(float));
-	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals  * 3 *3* sizeof(float));
-	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords    * 2  * sizeof(float));
-    triModel->colors         = (float*) malloc( triModel->header.numberOfColors * 3  *3 * sizeof(float));
-    triModel->indices        = (unsigned int*) malloc( triModel->header.numberOfIndices * 3 * sizeof(unsigned int));
+	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices * sizeof(float));
+	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals  * sizeof(float));
+	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords     * sizeof(float));
+    triModel->colors         = (float*) malloc( triModel->header.numberOfColors  * sizeof(float));
+    triModel->indices        = (unsigned int*) malloc( triModel->header.numberOfIndices  * sizeof(unsigned int));
 
     unsigned int i=0;
 
@@ -306,7 +363,6 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
 	}
 
-
    for (i = 0; i < mesh->mNumFaces; i++)
     {
 		struct aiFace *face = mesh->mFaces + i;
@@ -326,9 +382,24 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel )
       prepareFlatMesh(scene, 0,  triModel );
      #else
        struct TRI_Model indexedModel={0};
-      prepareMesh(scene, 0,  &indexedModel );
-      fillFlatModelTriFromIndexedModelTri(triModel , &indexedModel);
-      deallocModelTri(&indexedModel);
+       fprintf(stderr,"Reading mesh from collada \n");
+       prepareMesh(scene, 0,  &indexedModel );
+       fprintf(stderr,"Transforming mesh from collada \n");
+
+
+       struct skeletonHuman sk={0};
+
+
+       sk.relativeJointAngle[HUMAN_SKELETON_LEFT_SHOULDER].y=100;
+       sk.relativeJointAngle[HUMAN_SKELETON_RIGHT_SHOULDER].y=100;
+
+       transMesh( scene , 0 , &indexedModel , &sk );
+
+
+       fprintf(stderr,"Flattening mesh\n");
+       fillFlatModelTriFromIndexedModelTri(triModel , &indexedModel);
+       fprintf(stderr,"Deallocating intermediate mesh\n");
+       deallocModelTri(&indexedModel);
     #endif // USE_OK_CODE
 
     return ;
