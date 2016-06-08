@@ -196,31 +196,24 @@ void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * index
 
         for (i=0; i<HUMAN_SKELETON_PARTS; i++)
         {
-            if (strcmp(boneName.C_Str(),"JtShoulderRt")==0)
-            {
+            if (strcmp(boneName.C_Str(),smartBodyNames[i])==0)
+              {
+		       fprintf(stderr,"hooked with %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" ,jointNames[i] , sk->relativeJointAngle[i].x, sk->relativeJointAngle[i].y, sk->relativeJointAngle[i].z);
                modifiedSkeleton.bone[k].ScalingVec.x=1.0;
                modifiedSkeleton.bone[k].ScalingVec.y=1.0;
                modifiedSkeleton.bone[k].ScalingVec.z=1.0;
 
-               modifiedSkeleton.bone[k].TranslationVec.x=0.0;
-               modifiedSkeleton.bone[k].TranslationVec.y=0.0;
-               modifiedSkeleton.bone[k].TranslationVec.z=0.0;
-
-
-               modifiedSkeleton.bone[k].RotationQua.w=0.987;
-               modifiedSkeleton.bone[k].RotationQua.x=0.014;
-               modifiedSkeleton.bone[k].RotationQua.y=-0.113;
-               modifiedSkeleton.bone[k].RotationQua.z=-0.116;
-
+               modifiedSkeleton.bone[k].TranslationVec.x=sk->joint[i].x;
+               modifiedSkeleton.bone[k].TranslationVec.y=sk->joint[i].y;
+               modifiedSkeleton.bone[k].TranslationVec.z=sk->joint[i].z;
 
               aiMatrix4x4::Scaling(modifiedSkeleton.bone[k].ScalingVec,modifiedSkeleton.bone[k].scalingMat);
               aiMatrix4x4::Translation (modifiedSkeleton.bone[k].TranslationVec,modifiedSkeleton.bone[k].translationMat);
-              //aiMakeIdentity(&modifiedSkeleton.bone[k].translationMat);
-               aiMakeQuaternion( &modifiedSkeleton.bone[k].rotationMat , &modifiedSkeleton.bone[k].RotationQua );
+              //aiMakeQuaternion( &modifiedSkeleton.bone[k].rotationMat , &modifiedSkeleton.bone[k].RotationQua );
               modifiedSkeleton.bone[k].rotationMat.FromEulerAnglesXYZ(
-                                             170,
-                                             100,
-                                             0
+                                               sk->relativeJointAngle[i].x,
+                                               sk->relativeJointAngle[i].y,
+                                               sk->relativeJointAngle[i].z
                                              );
 
                modifiedSkeleton.bone[k].nodeTransform = modifiedSkeleton.bone[k].translationMat * modifiedSkeleton.bone[k].rotationMat * modifiedSkeleton.bone[k].scalingMat;
@@ -229,45 +222,21 @@ void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * index
 
                modifiedSkeleton.bone[k].finalTransform = m_GlobalInverseTransform * modifiedSkeleton.bone[k].globalTransform * bone->mOffsetMatrix;
                skin4 = modifiedSkeleton.bone[k].finalTransform;
+
+
                overrideHappened=1;
             }
 
-/*
-            if (strcmp(boneName.C_Str(),smartBodyNames[i])==0)
-              {
-                 fprintf(stderr,"hook activated for %s \n",smartBodyNames[i]);
-
-                 //aiMakeIdentity(&rotationMat)
-                 rotationMat.FromEulerAnglesXYZ(
-                                               sk->relativeJointAngle[i].x,
-                                               sk->relativeJointAngle[i].y,
-                                               sk->relativeJointAngle[i].z
-                                              );
-
-
-		         aiPrintMatrix(&rotationMat);
-                 fprintf(stderr," --- \n");
-
-		         aiMultiplyMatrix4(&skin4, &rotationMat);
-		         //aiMultiplyMatrix4(&skin4, &bone->mOffsetMatrix);
-		         overrideHappened=1;
-              }*/
         }
         if (!overrideHappened)
         {
-            fprintf(stderr," bone->mOffsetMatrix \n");
-           aiPrintMatrix(&bone->mOffsetMatrix);
-           fprintf(stderr," --- \n");
-
           aiMultiplyMatrix4(&skin4, &bone->mOffsetMatrix);
         }
 
        aiPrintMatrix(&skin4);
+	   extract3x3(&skin3, &skin4);
 
-
-
-		extract3x3(&skin3, &skin4);
-
+       //Update all vertices with current weighted transforms
 		for (i = 0; i < bone->mNumWeights; i++)
         {
 			int v = bone->mWeights[i].mVertexId;
@@ -516,37 +485,37 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 }
 
 
-#define USE_FLAT_CODE 0
-void prepareScene(struct aiScene *scene , struct TRI_Model * triModel )
+void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
+                                                                struct TRI_Model * outFlatModel ,
+                                                                struct TRI_Model * inOriginalIndexedModel ,
+                                                                struct skeletonHuman * sk
+                                                              )
+{
+       struct TRI_Model temporaryIndexedDeformedModel={0};
+       fprintf(stderr,"Copying to intermediate mesh\n");
+       copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel);
+       fprintf(stderr,"Transforming intermediate mesh\n");
+       transMesh( g_scene , 0 , &temporaryIndexedDeformedModel , sk );
+       fprintf(stderr,"Flattening intermediate mesh\n");
+       fillFlatModelTriFromIndexedModelTri(outFlatModel , &temporaryIndexedDeformedModel);
+
+       fprintf(stderr,"Deallocating intermediate mesh\n");
+       deallocModelTri(&temporaryIndexedDeformedModel);
+       fprintf(stderr,"Serving back flattened mesh\n");
+}
+
+
+
+
+void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct TRI_Model * originalModel)
 {
     fprintf(stderr,"Preparing scene with %u meshes\n",scene->mNumMeshes);
+    if (scene->mNumMeshes>1) { fprintf(stderr,"Can only handle single meshes atm \n"); }
 
-     #if USE_FLAT_CODE
-      prepareFlatMesh(scene, 0,  triModel );
-     #else
-       struct TRI_Model indexedModel={0};
        fprintf(stderr,"Reading mesh from collada \n");
-       prepareMesh(scene, 0,  &indexedModel );
-       fprintf(stderr,"Transforming mesh from collada \n");
-
-
-       struct skeletonHuman sk={0};
-
-       for (int i=0; i<HUMAN_SKELETON_PARTS; i++)
-       {
-       sk.relativeJointAngle[i].x=10;
- //      sk.relativeJointAngle[i].y=rand()%10;
-//       sk.relativeJointAngle[i].z=rand()%10;
-       }
-
-       transMesh( scene , 0 , &indexedModel , &sk );
-
-
+       prepareMesh(scene, 0,  originalModel );
        fprintf(stderr,"Flattening mesh\n");
-       fillFlatModelTriFromIndexedModelTri(triModel , &indexedModel);
-       fprintf(stderr,"Deallocating intermediate mesh\n");
-       deallocModelTri(&indexedModel);
-    #endif // USE_OK_CODE
+       fillFlatModelTriFromIndexedModelTri(triModel , originalModel);
 
     return ;
 
@@ -554,6 +523,7 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel )
 	for (i = 0; i < scene->mNumMeshes; i++)
     {
 		prepareMesh(scene, i,  triModel );
+		//TODO HANDLE MORE THAN ONE MESHES
 		//transformmesh(scene, meshlist + i);
 	}
 
@@ -561,7 +531,7 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel )
 
 
 
-int testAssimp(const char * filename  , struct TRI_Model * triModel)
+int testAssimp(const char * filename  , struct TRI_Model * triModel , struct TRI_Model * originalModel)
 {
 int flags = aiProcess_Triangulate;
 		flags |= aiProcess_JoinIdenticalVertices;
@@ -576,10 +546,11 @@ int flags = aiProcess_Triangulate;
             m_GlobalInverseTransform = g_scene->mRootNode->mTransformation;
             m_GlobalInverseTransform.Inverse();
 
-            prepareScene(g_scene,triModel);
+            prepareScene(g_scene,triModel,originalModel);
 
             return 1;
-		} else {
+		} else
+		{
 			fprintf(stderr, "cannot import scene: '%s'\n", filename);
 		}
 

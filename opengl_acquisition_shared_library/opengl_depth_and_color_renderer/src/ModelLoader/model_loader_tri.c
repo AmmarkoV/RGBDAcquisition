@@ -350,13 +350,36 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
 {
+  unsigned int bufSize;
+
   memset(triModelOUT,0,sizeof(struct TRI_Model));
   memcpy(&triModelOUT->header , &triModelIN->header , sizeof(struct TRI_Header));
-  if (triModelIN->vertices!=0)      { memcpy(triModelOUT->vertices      , triModelIN->vertices      , sizeof(float) * 3 * triModelIN->header.numberOfVertices); }
-  if (triModelIN->normal!=0)        { memcpy(triModelOUT->normal        , triModelIN->normal        , sizeof(float) * 3 * triModelIN->header.numberOfNormals); }
-  if (triModelIN->colors!=0)        { memcpy(triModelOUT->colors        , triModelIN->colors        , sizeof(float) * 3 * triModelIN->header.numberOfColors); }
-  if (triModelIN->textureCoords!=0) { memcpy(triModelOUT->textureCoords , triModelIN->textureCoords , sizeof(float) * 2 * triModelIN->header.numberOfTextureCoords); }
-  if (triModelIN->indices!=0)       { memcpy(triModelOUT->indices       , triModelIN->indices       , sizeof(unsigned int) * 3 * triModelIN->header.numberOfIndices); }
+
+
+  bufSize = sizeof(float) * 3 * triModelIN->header.numberOfVertices ;
+  if (triModelOUT->vertices!=0)  { free(triModelOUT->vertices); }
+  if (triModelIN->vertices!=0)   { triModelOUT->vertices = (float*) malloc(bufSize); }
+  memcpy(triModelOUT->vertices,triModelIN->vertices,bufSize);
+
+  bufSize =  sizeof(float) * 3 * triModelIN->header.numberOfNormals;
+  if (triModelOUT->normal!=0)  { free(triModelOUT->normal); }
+  if (triModelIN->normal!=0)   { triModelOUT->normal = (float*) malloc(bufSize); }
+  memcpy(triModelOUT->normal        , triModelIN->normal        , bufSize);
+
+  bufSize = sizeof(float) * 3 * triModelIN->header.numberOfColors;
+  if (triModelOUT->colors!=0)  { free(triModelOUT->colors); }
+  if (triModelIN->colors!=0)   { triModelOUT->colors=(float*) malloc(bufSize); }
+  memcpy(triModelOUT->colors        , triModelIN->colors        , bufSize);
+
+  bufSize = sizeof(float) * 2 * triModelIN->header.numberOfTextureCoords;
+  if (triModelOUT->textureCoords!=0)  { free(triModelOUT->textureCoords); }
+  if (triModelIN->textureCoords!=0)   { triModelOUT->textureCoords=(float*) malloc(bufSize); }
+  memcpy(triModelOUT->textureCoords , triModelIN->textureCoords , bufSize);
+
+  bufSize = sizeof(unsigned int) * 3 * triModelIN->header.numberOfIndices;
+  if (triModelOUT->indices!=0)  { free(triModelOUT->indices); }
+  if (triModelIN->indices!=0)   { triModelOUT->indices = (unsigned int*) malloc(bufSize); }
+  memcpy(triModelOUT->indices       , triModelIN->indices       , bufSize);
 }
 
 
