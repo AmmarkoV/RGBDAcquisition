@@ -345,6 +345,27 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 }
 
 
+
+
+
+void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
+{
+  memset(triModelOUT,0,sizeof(struct TRI_Model));
+  memcpy(&triModelOUT->header , &triModelIN->header , sizeof(struct TRI_Header));
+  if (triModelIN->vertices!=0)      { memcpy(triModelOUT->vertices      , triModelIN->vertices      , sizeof(float) * 3 * triModelIN->header.numberOfVertices); }
+  if (triModelIN->normal!=0)        { memcpy(triModelOUT->normal        , triModelIN->normal        , sizeof(float) * 3 * triModelIN->header.numberOfNormals); }
+  if (triModelIN->colors!=0)        { memcpy(triModelOUT->colors        , triModelIN->colors        , sizeof(float) * 3 * triModelIN->header.numberOfColors); }
+  if (triModelIN->textureCoords!=0) { memcpy(triModelOUT->textureCoords , triModelIN->textureCoords , sizeof(float) * 2 * triModelIN->header.numberOfTextureCoords); }
+  if (triModelIN->indices!=0)       { memcpy(triModelOUT->indices       , triModelIN->indices       , sizeof(unsigned int) * 3 * triModelIN->header.numberOfIndices); }
+}
+
+
+
+
+
+
+
+
 void deallocModelTri(struct TRI_Model * triModel)
 {
   triModel->header.numberOfVertices = 0;

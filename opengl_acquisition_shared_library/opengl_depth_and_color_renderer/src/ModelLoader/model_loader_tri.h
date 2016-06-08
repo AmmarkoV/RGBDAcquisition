@@ -48,7 +48,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 int loadModelTri(const char * filename , struct TRI_Model * triModel);
 int saveModelTri(const char * filename , struct TRI_Model * triModel);
 
-
+void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN );
 void deallocModelTri(struct TRI_Model * triModel);
 //int saveModelTriHeader(const char * filename , struct TRI_Model * triModel);
 

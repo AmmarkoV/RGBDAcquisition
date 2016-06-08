@@ -8,8 +8,38 @@
 
 #include "skeleton.h"
 
+
+
+struct boneItem
+{
+  aiMatrix4x4 finalTransform;
+  aiMatrix4x4 parentTransform;
+  aiMatrix4x4 nodeTransform;
+  aiMatrix4x4 globalTransform;
+
+  int interfere;
+
+  aiMatrix4x4 scalingMat;
+  aiMatrix4x4 translationMat;
+  aiMatrix4x4 rotationMat;
+  aiMatrix4x4 finalMat;
+
+  aiVector3D ScalingVec;
+  aiVector3D TranslationVec;
+  aiQuaternion RotationQua;
+
+};
+
+struct boneState
+{
+  struct boneItem bone[100];
+
+};
+
 struct aiScene *g_scene = NULL;
 aiMatrix4x4 m_GlobalInverseTransform;
+struct boneState modifiedSkeleton;
+
 
 
 void extract3x3( aiMatrix3x3 *m3,  aiMatrix4x4 *m4)
@@ -47,7 +77,97 @@ void transformnode(  aiMatrix4x4 *result, struct aiNode *node)
 }
 
 
+/*
+void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform)
+{
+    string NodeName(pNode->mName.data);
 
+    const aiAnimation* pAnimation = m_pScene->mAnimations[0];
+
+    Matrix4f NodeTransformation(pNode->mTransformation);
+
+    const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
+
+    if (pNodeAnim) {
+        // Interpolate scaling and generate scaling transformation matrix
+        aiVector3D Scaling;
+        CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
+        Matrix4f ScalingM;
+        ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
+
+        // Interpolate rotation and generate rotation transformation matrix
+        aiQuaternion RotationQ;
+        CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
+        Matrix4f RotationM = Matrix4f(RotationQ.GetMatrix());
+
+        // Interpolate translation and generate translation transformation matrix
+        aiVector3D Translation;
+        CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+        Matrix4f TranslationM;
+        TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
+
+        // Combine the above transformations
+        NodeTransformation = TranslationM * RotationM * ScalingM;
+    }
+
+    Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
+
+    if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) {
+        uint BoneIndex = m_BoneMapping[NodeName];
+        m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
+    }
+
+    for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
+        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
+    }
+}*/
+
+
+void aiMakeQuaternion(aiMatrix4x4 * am , aiQuaternion * qu)
+{
+    float yy2 = 2.0f * qu->y * qu->y;
+    float xy2 = 2.0f * qu->x * qu->y;
+    float xz2 = 2.0f * qu->x * qu->z;
+    float yz2 = 2.0f * qu->y * qu->z;
+    float zz2 = 2.0f * qu->z * qu->z;
+    float wz2 = 2.0f * qu->w * qu->z;
+    float wy2 = 2.0f * qu->w * qu->y;
+    float wx2 = 2.0f * qu->w * qu->x;
+    float xx2 = 2.0f * qu->x * qu->x;
+    am->a1 = - yy2 - zz2 + 1.0f;
+    am->a2 = xy2 + wz2;
+    am->a3 = xz2 - wy2;
+    am->a4 = 0;
+    am->b1 = xy2 - wz2;
+    am->b2 = - xx2 - zz2 + 1.0f;
+    am->b3 = yz2 + wx2;
+    am->b4 = 0;
+    am->c1 = xz2 + wy2;
+    am->c2 = yz2 - wx2;
+    am->c3 = - xx2 - yy2 + 1.0f;
+    am->c4 = 0.0f;
+    am->d1 = 0.0;
+    am->d2 = 0.0;
+    am->d3 = 0.0;
+    am->d4 = 1.0f;
+}
+
+void aiMakeIdentity(aiMatrix4x4 * am)
+{
+ am->a1 = 1.0; am->a2 = 0.0;  am->a3 = 0.0;  am->a4 = 0.0;
+ am->b1 = 0.0; am->b2 = 1.0;  am->b3 = 0.0;  am->b4 = 0.0;
+ am->c1 = 0.0; am->c2 = 0.0;  am->c3 = 1.0;  am->c4 = 0.0;
+ am->d1 = 0.0; am->d2 = 0.0;  am->d3 = 0.0;  am->d4 = 1.0;
+}
+
+
+void aiPrintMatrix(aiMatrix4x4 * am)
+{
+ fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , am->a1, am->a2,  am->a3,   am->a4 );
+ fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , am->b1, am->b2,  am->b3,   am->b4 );
+ fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , am->c1, am->c2,  am->c3,   am->c4 );
+ fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , am->d1, am->d2,  am->d3,   am->d4 );
+}
 
 void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
 {
@@ -69,24 +189,55 @@ void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * index
 
 		transformnode(&skin4, node);
 
-		aiMatrix4x4 rotationMat;
+        modifiedSkeleton.bone[k].parentTransform = skin4;
 
         unsigned int overrideHappened=0;
         unsigned int i=0;
 
         for (i=0; i<HUMAN_SKELETON_PARTS; i++)
         {
+            if (strcmp(boneName.C_Str(),"JtShoulderRt")==0)
+            {
+               modifiedSkeleton.bone[k].ScalingVec.x=1.0;
+               modifiedSkeleton.bone[k].ScalingVec.y=1.0;
+               modifiedSkeleton.bone[k].ScalingVec.z=1.0;
+
+               modifiedSkeleton.bone[k].TranslationVec.x=0.0;
+               modifiedSkeleton.bone[k].TranslationVec.y=0.0;
+               modifiedSkeleton.bone[k].TranslationVec.z=0.0;
+
+
+               modifiedSkeleton.bone[k].RotationQua.w=0.987;
+               modifiedSkeleton.bone[k].RotationQua.x=0.014;
+               modifiedSkeleton.bone[k].RotationQua.y=-0.113;
+               modifiedSkeleton.bone[k].RotationQua.z=-0.116;
+
+
+              aiMatrix4x4::Scaling(modifiedSkeleton.bone[k].ScalingVec,modifiedSkeleton.bone[k].scalingMat);
+              aiMatrix4x4::Translation (modifiedSkeleton.bone[k].TranslationVec,modifiedSkeleton.bone[k].translationMat);
+              //aiMakeIdentity(&modifiedSkeleton.bone[k].translationMat);
+               aiMakeQuaternion( &modifiedSkeleton.bone[k].rotationMat , &modifiedSkeleton.bone[k].RotationQua );
+              modifiedSkeleton.bone[k].rotationMat.FromEulerAnglesXYZ(
+                                             170,
+                                             100,
+                                             0
+                                             );
+
+               modifiedSkeleton.bone[k].nodeTransform = modifiedSkeleton.bone[k].translationMat * modifiedSkeleton.bone[k].rotationMat * modifiedSkeleton.bone[k].scalingMat;
+               modifiedSkeleton.bone[k].globalTransform = modifiedSkeleton.bone[k].parentTransform * modifiedSkeleton.bone[k].nodeTransform;
+
+
+               modifiedSkeleton.bone[k].finalTransform = m_GlobalInverseTransform * modifiedSkeleton.bone[k].globalTransform * bone->mOffsetMatrix;
+               skin4 = modifiedSkeleton.bone[k].finalTransform;
+               overrideHappened=1;
+            }
+
+/*
             if (strcmp(boneName.C_Str(),smartBodyNames[i])==0)
               {
                  fprintf(stderr,"hook activated for %s \n",smartBodyNames[i]);
 
-
-//                 rotationMat.a1 = 1.0; rotationMat.a2 = 0.0;  rotationMat.a3 = 0.0;  rotationMat.a4 = 0.0;
-//                 rotationMat.b1 = 0.0; rotationMat.b2 = 1.0;  rotationMat.b3 = 0.0;  rotationMat.b4 = 0.0;
-//                 rotationMat.c1 = 0.0; rotationMat.c2 = 0.0;  rotationMat.c3 = 1.0;  rotationMat.c4 = 0.0;
-//                 rotationMat.d1 = 0.0; rotationMat.d2 = 0.0;  rotationMat.d3 = 0.0;  rotationMat.d4 = 1.0;
-
-
+                 //aiMakeIdentity(&rotationMat)
                  rotationMat.FromEulerAnglesXYZ(
                                                sk->relativeJointAngle[i].x,
                                                sk->relativeJointAngle[i].y,
@@ -94,34 +245,24 @@ void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * index
                                               );
 
 
-                 fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , rotationMat.a1, rotationMat.a2,  rotationMat.a3,   rotationMat.a4 );
-		         fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , rotationMat.b1, rotationMat.b2,  rotationMat.b3,   rotationMat.b4 );
-		         fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , rotationMat.c1, rotationMat.c2,  rotationMat.c3,   rotationMat.c4 );
-		         fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , rotationMat.d1, rotationMat.d2,  rotationMat.d3,   rotationMat.d4 );
+		         aiPrintMatrix(&rotationMat);
                  fprintf(stderr," --- \n");
 
 		         aiMultiplyMatrix4(&skin4, &rotationMat);
-		         aiMultiplyMatrix4(&skin4, &bone->mOffsetMatrix);
+		         //aiMultiplyMatrix4(&skin4, &bone->mOffsetMatrix);
 		         overrideHappened=1;
-              }
+              }*/
         }
         if (!overrideHappened)
         {
             fprintf(stderr," bone->mOffsetMatrix \n");
-
-           fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , bone->mOffsetMatrix.a1, bone->mOffsetMatrix.a2,  bone->mOffsetMatrix.a3,   bone->mOffsetMatrix.a4 );
-		   fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , bone->mOffsetMatrix.b1, bone->mOffsetMatrix.b2,  bone->mOffsetMatrix.b3,   bone->mOffsetMatrix.b4 );
-		   fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , bone->mOffsetMatrix.c1, bone->mOffsetMatrix.c2,  bone->mOffsetMatrix.c3,   bone->mOffsetMatrix.c4 );
-		   fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , bone->mOffsetMatrix.d1, bone->mOffsetMatrix.d2,  bone->mOffsetMatrix.d3,   bone->mOffsetMatrix.d4 );
+           aiPrintMatrix(&bone->mOffsetMatrix);
            fprintf(stderr," --- \n");
 
           aiMultiplyMatrix4(&skin4, &bone->mOffsetMatrix);
         }
 
-        fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , skin4.a1, skin4.a2,  skin4.a3,   skin4.a4 );
-		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , skin4.b1, skin4.b2,  skin4.b3,   skin4.b4 );
-		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , skin4.c1, skin4.c2,  skin4.c3,   skin4.c4 );
-		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , skin4.d1, skin4.d2,  skin4.d3,   skin4.d4 );
+       aiPrintMatrix(&skin4);
 
 
 
