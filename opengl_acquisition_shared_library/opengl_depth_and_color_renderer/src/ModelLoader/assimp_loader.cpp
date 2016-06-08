@@ -357,17 +357,17 @@ void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
                                                                 struct skeletonHuman * sk
                                                               )
 {
-       struct TRI_Model temporaryIndexedDeformedModel={0};
-       fprintf(stderr,"Copying to intermediate mesh\n");
-       copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel);
-       fprintf(stderr,"Transforming intermediate mesh\n");
-       transMesh( g_scene , 0 , &temporaryIndexedDeformedModel , sk );
-       fprintf(stderr,"Flattening intermediate mesh\n");
-       fillFlatModelTriFromIndexedModelTri(outFlatModel , &temporaryIndexedDeformedModel);
+  struct TRI_Model temporaryIndexedDeformedModel={0};
+  fprintf(stderr,"Copying to intermediate mesh\n");
+  copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel);
+  fprintf(stderr,"Transforming intermediate mesh\n");
+  transMesh( g_scene , 0 , &temporaryIndexedDeformedModel , sk );
+  fprintf(stderr,"Flattening intermediate mesh\n");
+  fillFlatModelTriFromIndexedModelTri(outFlatModel , &temporaryIndexedDeformedModel);
 
-       fprintf(stderr,"Deallocating intermediate mesh\n");
-       deallocModelTri(&temporaryIndexedDeformedModel);
-       fprintf(stderr,"Serving back flattened mesh\n");
+  fprintf(stderr,"Deallocating intermediate mesh\n");
+  deallocModelTri(&temporaryIndexedDeformedModel);
+  fprintf(stderr,"Serving back flattened mesh\n");
 }
 
 
@@ -385,11 +385,12 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
 
  struct skeletonHuman sk={0};
 
-  unsigned int newVal = 200;// rand()%330;
+  unsigned int newVal = 300;// rand()%330;
   sk.relativeJointAngle[HUMAN_SKELETON_LEFT_KNEE].x=newVal;
+  sk.relativeJointAngle[HUMAN_SKELETON_LEFT_KNEE].y=newVal;
+
   sk.relativeJointAngle[HUMAN_SKELETON_RIGHT_KNEE].x=newVal;
-  sk.relativeJointAngle[HUMAN_SKELETON_LEFT_KNEE].x=newVal;
-  sk.relativeJointAngle[HUMAN_SKELETON_RIGHT_KNEE].x=newVal;
+  sk.relativeJointAngle[HUMAN_SKELETON_RIGHT_KNEE].y=newVal;
 
        transMesh( g_scene , 0 , originalModel , &sk );
 
