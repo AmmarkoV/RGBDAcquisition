@@ -9,6 +9,7 @@
 #include "skeleton.h"
 
 struct aiScene *g_scene = NULL;
+aiMatrix4x4 m_GlobalInverseTransform;
 
 
 void extract3x3( aiMatrix3x3 *m3,  aiMatrix4x4 *m4)
@@ -100,6 +101,7 @@ void transMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * index
                  fprintf(stderr," --- \n");
 
 		         aiMultiplyMatrix4(&skin4, &rotationMat);
+		         aiMultiplyMatrix4(&skin4, &bone->mOffsetMatrix);
 		         overrideHappened=1;
               }
         }
@@ -389,9 +391,12 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel )
 
        struct skeletonHuman sk={0};
 
-
-       sk.relativeJointAngle[HUMAN_SKELETON_LEFT_SHOULDER].y=100;
-       sk.relativeJointAngle[HUMAN_SKELETON_RIGHT_SHOULDER].y=100;
+       for (int i=0; i<HUMAN_SKELETON_PARTS; i++)
+       {
+       sk.relativeJointAngle[i].x=10;
+ //      sk.relativeJointAngle[i].y=rand()%10;
+//       sk.relativeJointAngle[i].z=rand()%10;
+       }
 
        transMesh( scene , 0 , &indexedModel , &sk );
 
@@ -427,6 +432,8 @@ int flags = aiProcess_Triangulate;
 		g_scene = (struct aiScene*) aiImportFile(  filename, flags);
 		if (g_scene)
         {
+            m_GlobalInverseTransform = g_scene->mRootNode->mTransformation;
+            m_GlobalInverseTransform.Inverse();
 
             prepareScene(g_scene,triModel);
 
