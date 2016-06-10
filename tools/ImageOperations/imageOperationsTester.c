@@ -38,6 +38,27 @@ int runFilter(int argc, char *argv[])
       {
 
 
+        if ( strcmp(argv[i],"--rgbcube")==0 )
+        {
+          unsigned int dim=32;
+          unsigned char R = (char) atoi(argv[i]+1);
+          unsigned char G = (char) atoi(argv[i]+2);
+          unsigned char B = (char) atoi(argv[i]+3);
+
+          outputImage = createImage( dim , dim , 3 , 8 );
+
+
+           bitbltColorRGB(outputImage->pixels ,   0  ,  0 , dim , dim ,  R ,  G ,  B , dim-1 , dim-1);
+
+           writeImageFile(outputImage,PPM_CODEC ,"new_mX.pnm");
+           writeImageFile(outputImage,PPM_CODEC ,"new_pX.pnm");
+           writeImageFile(outputImage,PPM_CODEC ,"new_mY.pnm");
+           writeImageFile(outputImage,PPM_CODEC ,"new_pY.pnm");
+           writeImageFile(outputImage,PPM_CODEC ,"new_mZ.pnm");
+           writeImageFile(outputImage,PPM_CODEC ,"new_pZ.pnm");
+          destroyImage(outputImage);
+
+        } else
         if ( strcmp(argv[i],"--envcube")==0 )
         {
           fprintf(stdout,"Converting Environment Cube \n");

@@ -8,6 +8,9 @@
 
 #include "skeleton.h"
 
+#define DO_TRANSFORM 0
+#define USE_NEW_TRANSFORM_MESH_CODE 1
+
 
 
 struct boneItem
@@ -16,6 +19,7 @@ struct boneItem
   aiMatrix4x4 parentTransform;
   aiMatrix4x4 nodeTransform;
   aiMatrix4x4 globalTransform;
+  aiMatrix4x4 boneBindTransform;
 
   int tampered;
 
@@ -29,12 +33,15 @@ struct boneItem
   aiQuaternion RotationQua;
 
   char name[128];
-  int parent;
-};
+  int itemID;
+  int parentItemID;
+  int parentlessNode;
+ };
 
 struct boneState
 {
   struct boneItem bone[100];
+  unsigned int numberOfBones;
 
 };
 
@@ -92,6 +99,34 @@ void aiMakeIdentity(aiMatrix4x4 * am)
 }
 
 
+int aiMatricesSame(aiMatrix4x4 * am , aiMatrix4x4 * bm)
+{
+ unsigned int similarity = 0;
+ similarity += (am->a1==bm->a1);
+ similarity += (am->a2==bm->a2);
+ similarity += (am->a3==bm->a3);
+ similarity += (am->a4==bm->a4);
+
+ similarity += (am->b1==bm->b1);
+ similarity += (am->b2==bm->b2);
+ similarity += (am->b3==bm->b3);
+ similarity += (am->b4==bm->b4);
+
+ similarity += (am->c1==bm->c1);
+ similarity += (am->c2==bm->c2);
+ similarity += (am->c3==bm->c3);
+ similarity += (am->c4==bm->c4);
+
+ similarity += (am->d1==bm->d1);
+ similarity += (am->d2==bm->d2);
+ similarity += (am->d3==bm->d3);
+ similarity += (am->d4==bm->d4);
+
+ return (similarity==16);
+}
+
+
+
 void aiPrintMatrix(aiMatrix4x4 * am)
 {
  fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , am->a1, am->a2,  am->a3,   am->a4 );
@@ -141,49 +176,14 @@ void transformNodeWithAllParentTransforms(  aiMatrix4x4 *result, struct aiNode *
 }
 
 
-void populateInternalRigState(struct aiScene *scene , int meshNumber, struct boneState * bones )
-{
-  fprintf(stderr,"Populating internal rig state \n" );
-  unsigned int i=0,k=0;
-  struct aiMesh * mesh = scene->mMeshes[meshNumber];
-  for (k = 0; k < mesh->mNumBones; k++)
-    {
-       struct aiBone *bone = mesh->mBones[k];
-	   struct aiNode *node = findNode(scene->mRootNode, bone->mName.data);
-       snprintf(bones->bone[k].name,128,"%s", bone->mName.data );
-       	if (node->mParent)
-           {
-             fprintf(stderr,"Node %s has a parent \n",node->mName.data);
-             struct aiNode * parentNode = node->mParent;
-             for (i=0; i<mesh->mNumBones; i++)
-                   {
-                     struct aiBone *searchBone = mesh->mBones[i];
-                     if (strcmp(searchBone->mName.data,parentNode->mName.data )==0)
-                     {
-                       fprintf(stderr,"Parent of %s is %s which has a boneID \n",searchBone->mName.data,parentNode->mName.data );
 
-                     }
-                   }
-           } else
-           {
-             fprintf(stderr,"Node %s has no parent \n",node->mName.data);
-           }
-    }
-}
-
-
-
-
-
-void transformMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
+void transformMeshOld(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
 {
     aiMatrix4x4 skin4;
 	unsigned int k;
 
     struct aiMesh * mesh = scene->mMeshes[meshNumber];
     fprintf(stderr,"  %d bones\n",mesh->mNumBones);
-
-    //populateInternalRigState(scene , meshNumber, &modifiedSkeleton );
 
    //Use the parent and node transforms
 	for (k = 0; k < mesh->mNumBones; k++)
@@ -202,6 +202,7 @@ void transformMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * i
 
         unsigned int overrideHappened=0;
         unsigned int i=0;
+
         for (i=0; i<HUMAN_SKELETON_PARTS; i++)
         {
             if (strcmp(boneName.C_Str(),smartBodyNames[i])==0)
@@ -215,10 +216,6 @@ void transformMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * i
                modifiedSkeleton.bone[k].TranslationVec.y=sk->joint[i].y;
                modifiedSkeleton.bone[k].TranslationVec.z=sk->joint[i].z;
 
-              // modifiedSkeleton.bone[k].TranslationVec.x=node->mTransformation.a4;
-              // modifiedSkeleton.bone[k].TranslationVec.y=node->mTransformation.b4;
-              // modifiedSkeleton.bone[k].TranslationVec.z=node->mTransformation.c4;
-
               aiMatrix4x4::Scaling(modifiedSkeleton.bone[k].ScalingVec,modifiedSkeleton.bone[k].scalingMat);
               aiMatrix4x4::Translation (modifiedSkeleton.bone[k].TranslationVec,modifiedSkeleton.bone[k].translationMat);
               //aiMakeQuaternion( &modifiedSkeleton.bone[k].rotationMat , &modifiedSkeleton.bone[k].RotationQua );
@@ -229,6 +226,7 @@ void transformMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * i
                                                                      );
 
                modifiedSkeleton.bone[k].nodeTransform   = modifiedSkeleton.bone[k].translationMat  * modifiedSkeleton.bone[k].rotationMat * modifiedSkeleton.bone[k].scalingMat;
+               //aiMakeIdentity(&modifiedSkeleton.bone[k].nodeTransform);
                //node->mTransformation = modifiedSkeleton.bone[k].nodeTransform;
                modifiedSkeleton.bone[k].globalTransform = modifiedSkeleton.bone[k].parentTransform * modifiedSkeleton.bone[k].nodeTransform;
                modifiedSkeleton.bone[k].finalTransform  = m_GlobalInverseTransform * modifiedSkeleton.bone[k].globalTransform  * bone->mOffsetMatrix;
@@ -271,6 +269,221 @@ void transformMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * i
 }
 
 
+void populateInternalRigState(struct aiScene *scene , int meshNumber, struct boneState * bones )
+{
+  fprintf(stderr,"Populating internal rig state \n" );
+  unsigned int i=0,k=0;
+  struct aiMesh * mesh = scene->mMeshes[meshNumber];
+
+  modifiedSkeleton.numberOfBones = mesh->mNumBones;
+
+  for (k = 0; k < mesh->mNumBones; k++)
+    {
+       struct aiBone *bone = mesh->mBones[k];
+	   struct aiNode *node = findNode(scene->mRootNode, bone->mName.data);
+       snprintf(bones->bone[k].name,128,"%s", bone->mName.data );
+
+       fprintf(stderr,"Bone %u is %s \n" , k ,bones->bone[k].name );
+
+       modifiedSkeleton.bone[k].nodeTransform = node->mTransformation;
+       modifiedSkeleton.bone[k].boneBindTransform = bone->mOffsetMatrix;
+       modifiedSkeleton.bone[k].itemID=k;
+
+       modifiedSkeleton.bone[k].parentlessNode=1;
+       if (node->mParent)
+           {
+             //fprintf(stderr,"Node %s has a parent \n",node->mName.data);
+             unsigned int foundParent = 0;
+             struct aiNode * parentNode = node->mParent;
+             for (i=0; i<mesh->mNumBones; i++)
+                   {
+                     struct aiBone *searchBone = mesh->mBones[i];
+                     if (strcmp(searchBone->mName.data,parentNode->mName.data )==0)
+                     {
+                       modifiedSkeleton.bone[k].parentlessNode=0;
+                       modifiedSkeleton.bone[k].parentItemID=i;
+                       fprintf(stderr,"Parent of %s is %s which has a boneID of %u \n",node->mName.data ,searchBone->mName.data,i);
+                       foundParent =1;
+                     }
+                   }
+
+             if (!foundParent)
+             {
+               fprintf(stderr,"Could not find parent , parent is marked as root..\n",i);
+             }
+           } else
+           {
+             fprintf(stderr,"Node %s has no parent , parent is marked as root..\n",node->mName.data);
+           }
+    }
+}
+
+
+
+void gatherAllParentTransformations(aiMatrix4x4 * newParentTransform ,  struct boneState * bones ,  unsigned int k )
+{
+ aiMatrix4x4 parentChain[30];
+ unsigned int nodeIDChain[30]={0};
+
+ fprintf(stderr,"Gathering all parent transformations of node %s : \n",bones->bone[k].name);
+ unsigned int z=0,chain=0;
+ parentChain[chain] = bones->bone[k].nodeTransform;
+ if (!bones->bone[k].parentlessNode)
+   {
+    z=bones->bone[k].parentItemID;
+    while (!bones->bone[z].parentlessNode)
+          {
+            fprintf(stderr," %u=%s ",chain,bones->bone[z].name);
+            ++chain;
+            parentChain[chain] = bones->bone[z].nodeTransform;
+            nodeIDChain[chain] = z;
+            z=bones->bone[z].parentItemID;
+          }
+     ++chain;
+     parentChain[chain] = bones->bone[z].nodeTransform;
+     nodeIDChain[chain] = z;
+     fprintf(stderr," %u=%s ",chain,bones->bone[z].name);
+   }
+
+
+  if (chain==0)
+  {
+   fprintf(stderr,"Its a single node\n");
+   //*newParentTransform = bones->bone[k].nodeTransform;
+   return ;
+  } else
+  if (chain==1)
+  {
+   fprintf(stderr,"Its a double node\n");
+   *newParentTransform = parentChain[1];
+   return ;
+  } else
+  {
+  fprintf(stderr,"And now executing a chain of %u multiplication: \n",chain);
+  while (chain>1)
+    {
+     fprintf(stderr," aiMultiplyMatrix4(%s,%s)\n",bones->bone[nodeIDChain[chain]].name,bones->bone[nodeIDChain[chain-1]].name);
+
+     aiMultiplyMatrix4( &parentChain[chain] , &parentChain[chain-1]);
+     parentChain[chain-1]=parentChain[chain];
+	 --chain;
+    }
+  fprintf(stderr,"done\n");
+  *newParentTransform = parentChain[2];
+  return ;
+  }
+
+
+}
+
+
+void transformMeshNew(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
+{
+    aiMatrix4x4 skin4;
+	unsigned int k,i,z;
+
+    struct aiMesh * mesh = scene->mMeshes[meshNumber];
+    fprintf(stderr,"  %d bones\n",mesh->mNumBones);
+
+    populateInternalRigState(scene , meshNumber, &modifiedSkeleton );
+
+   //Use the parent and node transforms
+
+ #if DO_TRANSFORM
+	for (k = 0; k < modifiedSkeleton.numberOfBones; k++)
+    {
+      //First decide on the node transformations taking place during this operation
+       for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+        {
+            if (strcmp(modifiedSkeleton.bone[k].name , smartBodyNames[i])==0)
+              {
+               fprintf(stderr,"hooked with %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" ,jointNames[i] , sk->relativeJointAngle[i].x, sk->relativeJointAngle[i].y, sk->relativeJointAngle[i].z);
+               modifiedSkeleton.bone[k].ScalingVec.x=1.0;
+               modifiedSkeleton.bone[k].ScalingVec.y=1.0;
+               modifiedSkeleton.bone[k].ScalingVec.z=1.0;
+
+               //modifiedSkeleton.bone[k].TranslationVec.x=sk->joint[i].x;
+               //modifiedSkeleton.bone[k].TranslationVec.y=sk->joint[i].y;
+               //modifiedSkeleton.bone[k].TranslationVec.z=sk->joint[i].z;
+
+              aiMatrix4x4::Scaling(modifiedSkeleton.bone[k].ScalingVec,modifiedSkeleton.bone[k].scalingMat);
+              aiMatrix4x4::Translation (modifiedSkeleton.bone[k].TranslationVec,modifiedSkeleton.bone[k].translationMat);
+              //aiMakeQuaternion( &modifiedSkeleton.bone[k].rotationMat , &modifiedSkeleton.bone[k].RotationQua );
+              modifiedSkeleton.bone[k].rotationMat.FromEulerAnglesXYZ(
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x),
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y),
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z)
+                                                                     );
+
+               modifiedSkeleton.bone[k].nodeTransform   = modifiedSkeleton.bone[k].translationMat  * modifiedSkeleton.bone[k].rotationMat * modifiedSkeleton.bone[k].scalingMat;
+              }
+        }
+    }
+ #endif // DO_TRANSFORM
+
+
+
+	for (k = 0; k < modifiedSkeleton.numberOfBones; k++)
+    {
+	   struct aiBone *bone = mesh->mBones[k];
+	   struct aiNode *node = findNode(scene->mRootNode, bone->mName.data);
+
+
+       gatherAllParentTransformations(&modifiedSkeleton.bone[k].parentTransform , &modifiedSkeleton , k );
+       modifiedSkeleton.bone[k].globalTransform = modifiedSkeleton.bone[k].parentTransform * modifiedSkeleton.bone[k].nodeTransform;
+       modifiedSkeleton.bone[k].finalTransform  = m_GlobalInverseTransform * modifiedSkeleton.bone[k].globalTransform  * modifiedSkeleton.bone[k].boneBindTransform;
+
+       //modifiedSkeleton.bone[k].finalTransform = m_GlobalInverseTransform * modifiedSkeleton.bone[k].parentTransform * modifiedSkeleton.bone[k].boneBindTransform;
+
+
+       //Update all vertices with current weighted transforms for current the current bone
+       //stored in skin3 and skin4
+       aiMatrix3x3 finalTransform3x3;
+	   extract3x3(&finalTransform3x3, &modifiedSkeleton.bone[k].finalTransform);
+       for (i = 0; i < bone->mNumWeights; i++)
+        {
+			unsigned int v = bone->mWeights[i].mVertexId;
+			float w = bone->mWeights[i].mWeight;
+
+			aiVector3D position;// = mesh->mVertices[v];
+			aiTransformVecByMatrix4(&position, &modifiedSkeleton.bone[k].finalTransform);
+			indexed->vertices[v*3+0] += position.x * w;
+			indexed->vertices[v*3+1] += position.y * w;
+			indexed->vertices[v*3+2] += position.z * w;
+
+			aiVector3D normal;// = mesh->mNormals[v];
+			aiTransformVecByMatrix3(&normal, &finalTransform3x3);
+			indexed->normal[v*3+0] += normal.x * w;
+			indexed->normal[v*3+1] += normal.y * w;
+			indexed->normal[v*3+2] += normal.z * w;
+		}
+	}
+}
+
+
+
+
+
+
+
+void transformMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
+{
+  #if USE_NEW_TRANSFORM_MESH_CODE
+    transformMeshNew(scene,meshNumber,indexed,sk);
+   #else
+    transformMeshOld(scene,meshNumber,indexed,sk);
+  #endif // NEWCODE
+ return;
+}
+
+
+
+
+
+
+
+
+
 void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * triModel )
 {
     struct aiMesh * mesh = scene->mMeshes[meshNumber];
@@ -285,11 +498,11 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 	for (k = 0; k < mesh->mNumBones; k++)
     {
 		aiString boneName = mesh->mBones[k]->mName;
-		fprintf(stderr,"   -bone %u - %s \n" , k , boneName.C_Str() );
-		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[0], mesh->mBones[k]->mOffsetMatrix[1], mesh->mBones[k]->mOffsetMatrix[2], mesh->mBones[k]->mOffsetMatrix[3] );
-		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[4], mesh->mBones[k]->mOffsetMatrix[5], mesh->mBones[k]->mOffsetMatrix[6], mesh->mBones[k]->mOffsetMatrix[7] );
-		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[8], mesh->mBones[k]->mOffsetMatrix[9], mesh->mBones[k]->mOffsetMatrix[10],mesh->mBones[k]->mOffsetMatrix[11] );
-		fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[12],mesh->mBones[k]->mOffsetMatrix[13], mesh->mBones[k]->mOffsetMatrix[14], mesh->mBones[k]->mOffsetMatrix[15] );
+		//fprintf(stderr,"   -bone %u - %s \n" , k , boneName.C_Str() );
+		//fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[0], mesh->mBones[k]->mOffsetMatrix[1], mesh->mBones[k]->mOffsetMatrix[2], mesh->mBones[k]->mOffsetMatrix[3] );
+		//fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[4], mesh->mBones[k]->mOffsetMatrix[5], mesh->mBones[k]->mOffsetMatrix[6], mesh->mBones[k]->mOffsetMatrix[7] );
+		//fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[8], mesh->mBones[k]->mOffsetMatrix[9], mesh->mBones[k]->mOffsetMatrix[10],mesh->mBones[k]->mOffsetMatrix[11] );
+		//fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[12],mesh->mBones[k]->mOffsetMatrix[13], mesh->mBones[k]->mOffsetMatrix[14], mesh->mBones[k]->mOffsetMatrix[15] );
 	}
 
 
