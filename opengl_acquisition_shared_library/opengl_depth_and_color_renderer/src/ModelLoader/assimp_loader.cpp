@@ -416,7 +416,7 @@ void transformMeshNew(struct aiScene *scene , int meshNumber , struct TRI_Model 
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].z)
                                                                      );
 
-              modifiedSkeleton.bone[k].nodeTransform = modifiedSkeleton.bone[k].nodeTransform * modifiedSkeleton.bone[k].translationMat  * modifiedSkeleton.bone[k].rotationMat * modifiedSkeleton.bone[k].scalingMat;
+              modifiedSkeleton.bone[k].nodeTransform =  modifiedSkeleton.bone[k].nodeTransform * modifiedSkeleton.bone[k].translationMat  * modifiedSkeleton.bone[k].rotationMat * modifiedSkeleton.bone[k].scalingMat;
             }
         }
     }
