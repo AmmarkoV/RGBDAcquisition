@@ -8,7 +8,7 @@
 
 #include "skeleton.h"
 
-#define DO_TRANSFORM 0
+#define DO_TRANSFORM 1
 #define USE_NEW_TRANSFORM_MESH_CODE 1
 
 
@@ -402,21 +402,22 @@ void transformMeshNew(struct aiScene *scene , int meshNumber , struct TRI_Model 
                modifiedSkeleton.bone[k].ScalingVec.y=1.0;
                modifiedSkeleton.bone[k].ScalingVec.z=1.0;
 
-               //modifiedSkeleton.bone[k].TranslationVec.x=sk->joint[i].x;
-               //modifiedSkeleton.bone[k].TranslationVec.y=sk->joint[i].y;
-               //modifiedSkeleton.bone[k].TranslationVec.z=sk->joint[i].z;
+               modifiedSkeleton.bone[k].TranslationVec.x=sk->joint[i].x;
+               modifiedSkeleton.bone[k].TranslationVec.y=sk->joint[i].y;
+               modifiedSkeleton.bone[k].TranslationVec.z=sk->joint[i].z;
 
               aiMatrix4x4::Scaling(modifiedSkeleton.bone[k].ScalingVec,modifiedSkeleton.bone[k].scalingMat);
               aiMatrix4x4::Translation (modifiedSkeleton.bone[k].TranslationVec,modifiedSkeleton.bone[k].translationMat);
               //aiMakeQuaternion( &modifiedSkeleton.bone[k].rotationMat , &modifiedSkeleton.bone[k].RotationQua );
+
               modifiedSkeleton.bone[k].rotationMat.FromEulerAnglesXYZ(
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].x),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].y),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].z)
                                                                      );
 
-               modifiedSkeleton.bone[k].nodeTransform   = modifiedSkeleton.bone[k].translationMat  * modifiedSkeleton.bone[k].rotationMat * modifiedSkeleton.bone[k].scalingMat;
-              }
+              modifiedSkeleton.bone[k].nodeTransform = modifiedSkeleton.bone[k].nodeTransform * modifiedSkeleton.bone[k].translationMat  * modifiedSkeleton.bone[k].rotationMat * modifiedSkeleton.bone[k].scalingMat;
+            }
         }
     }
  #endif // DO_TRANSFORM
