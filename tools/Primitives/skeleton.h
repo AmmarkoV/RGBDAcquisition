@@ -249,6 +249,7 @@ struct skeletonHuman
   struct point3D joint[HUMAN_SKELETON_PARTS];
   struct point2D joint2D[HUMAN_SKELETON_PARTS];
   float  jointAccuracy[HUMAN_SKELETON_PARTS];
+  unsigned int active[HUMAN_SKELETON_PARTS];
 
   struct point3D relativeJointAngle[HUMAN_SKELETON_PARTS];
 };
