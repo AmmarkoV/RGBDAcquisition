@@ -403,7 +403,7 @@ void readNodeHeirarchy(const aiMesh * mesh , const aiNode* pNode,  struct boneSt
               aiMatrix4x4::Translation (bones->bone[boneNumber].TranslationVec,bones->bone[boneNumber].translationMat);
               //aiMakeQuaternion( &bones.bone[k].rotationMat , &bones.bone[k].RotationQua );
 
-              bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
+               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].x),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].y),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].z)
@@ -423,7 +423,7 @@ void readNodeHeirarchy(const aiMesh * mesh , const aiNode* pNode,  struct boneSt
     }
     } else
     {
-    aiMatrix4x4 GlobalTransformation = ParentTransform * pNode->mTransformation;
+    aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
       fprintf(stderr,"Could not find %s bone , passing parent transform regardless\n",pNode->mName.data);
        for ( i = 0 ; i < pNode->mNumChildren ; i++)
        {
@@ -462,13 +462,13 @@ void transformMeshMk3(struct aiScene *scene , int meshNumber , struct TRI_Model 
 			unsigned int v = bone->mWeights[i].mVertexId;
 			float w = bone->mWeights[i].mWeight;
 
-			aiVector3D position;// = mesh->mVertices[v];
-			aiTransformVecByMatrix4(&position, &modifiedSkeleton.bone[k].finalTransform);
+			aiVector3D position = mesh->mVertices[v];
+			aiTransformVecByMatrix4(&position, &modifiedSkeleton.bone[k].finalTransform );
 			indexed->vertices[v*3+0] += position.x * w;
 			indexed->vertices[v*3+1] += position.y * w;
 			indexed->vertices[v*3+2] += position.z * w;
 
-			aiVector3D normal;// = mesh->mNormals[v];
+			aiVector3D normal = mesh->mNormals[v];
 			aiTransformVecByMatrix3(&normal, &finalTransform3x3);
 			indexed->normal[v*3+0] += normal.x * w;
 			indexed->normal[v*3+1] += normal.y * w;
