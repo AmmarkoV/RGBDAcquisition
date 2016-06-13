@@ -395,9 +395,9 @@ void readNodeHeirarchy(const aiMesh * mesh , const aiNode* pNode,  struct boneSt
                bones->bone[boneNumber].ScalingVec.y=1.0;
                bones->bone[boneNumber].ScalingVec.z=1.0;
 
-               bones->bone[boneNumber].TranslationVec.x=sk->joint[i].x;
-               bones->bone[boneNumber].TranslationVec.y=sk->joint[i].y;
-               bones->bone[boneNumber].TranslationVec.z=sk->joint[i].z;
+               bones->bone[boneNumber].TranslationVec.x=pNode->mTransformation.a4;//sk->joint[i].x;
+               bones->bone[boneNumber].TranslationVec.y=pNode->mTransformation.b4;//sk->joint[i].y;
+               bones->bone[boneNumber].TranslationVec.z=pNode->mTransformation.c4;//sk->joint[i].z;
 
               aiMatrix4x4::Scaling(bones->bone[boneNumber].ScalingVec,bones->bone[boneNumber].scalingMat);
               aiMatrix4x4::Translation (bones->bone[boneNumber].TranslationVec,bones->bone[boneNumber].translationMat);
