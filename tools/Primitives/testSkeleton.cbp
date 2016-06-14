@@ -33,6 +33,9 @@
 		</Compiler>
 		<Unit filename="nao_geometry.h" />
 		<Unit filename="skeleton.h" />
+		<Unit filename="skeletonBroadcaster.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="testSkeleton.c">
 			<Option compilerVar="CC" />
 		</Unit>

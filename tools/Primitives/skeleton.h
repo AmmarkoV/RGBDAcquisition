@@ -573,6 +573,12 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
             sk->relativeJointAngle[i].z=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
         }
+
+
+       sk->active[i]=0;
+       if ( (sk->relativeJointAngle[i].x!=0.0) && ( sk->relativeJointAngle[i].x==sk->relativeJointAngle[i].x ) ) {  sk->active[i]=1; }
+       if ( (sk->relativeJointAngle[i].y!=0.0) && ( sk->relativeJointAngle[i].y==sk->relativeJointAngle[i].y ) ) {  sk->active[i]=1; }
+       if ( (sk->relativeJointAngle[i].z!=0.0) && ( sk->relativeJointAngle[i].z==sk->relativeJointAngle[i].z ) ) {  sk->active[i]=1; }
     }
 }
 
@@ -617,7 +623,7 @@ static int convertSkeletonFlat2DJointsToPoint2D(struct point2D * out  , float * 
 }
 
 
-int fillWithDefaultSkeleton(struct skeletonHuman * sk)
+static int fillWithDefaultSkeleton(struct skeletonHuman * sk)
 {
     convertSkeletonFlat3DJointsToPoint3D( sk->joint  , defaultJoints );
     convertSkeletonFlat2DJointsToPoint2D( sk->joint2D , defaultJoints2D );
@@ -626,7 +632,7 @@ int fillWithDefaultSkeleton(struct skeletonHuman * sk)
 }
 
 
-int fillWithDefaultNAOSkeleton(struct skeletonHuman * sk)
+static int fillWithDefaultNAOSkeleton(struct skeletonHuman * sk)
 {
     convertSkeletonFlat3DJointsToPoint3D( sk->joint  , NAOdefaultJoints );
     convertSkeletonFlat2DJointsToPoint2D( sk->joint2D , NAOdefaultJoints2D );
