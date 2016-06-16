@@ -288,22 +288,13 @@ static int cleanSkeleton(struct skeletonHuman * sk)
 }
 
 
-static int skeletonEmptyJoint(struct skeletonHuman * sk , unsigned int j1)
+static int skeletonEmpty3DJoint(struct skeletonHuman * sk , unsigned int j1)
 {
     //Check NotSet
     if (
         (sk->joint[j1].x==0) &&
         (sk->joint[j1].y==0) &&
         (sk->joint[j1].z==0)
-    )
-    {
-        return 1;
-    }
-
-    //Check NotSet
-    if (
-        (sk->joint2D[j1].x==0) &&
-        (sk->joint2D[j1].y==0)
     )
     {
         return 1;
@@ -324,6 +315,30 @@ static int skeletonEmptyJoint(struct skeletonHuman * sk , unsigned int j1)
 }
 
 
+static int skeletonEmpty2DJoint(struct skeletonHuman * sk , unsigned int j1)
+{
+    //Check NotSet
+    if (
+        (sk->joint2D[j1].x==0) &&
+        (sk->joint2D[j1].y==0)
+    )
+    {
+        return 1;
+    }
+
+
+    //Check NaN
+    if (
+        (sk->joint[j1].x!=sk->joint2D[j1].x) ||
+        (sk->joint[j1].y!=sk->joint2D[j1].y)
+    )
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 
 
 static int skeletonEmpty(struct skeletonHuman * sk)
@@ -331,7 +346,7 @@ static int skeletonEmpty(struct skeletonHuman * sk)
     unsigned int i=0 , emptyJoints=0;
     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
-        if ( skeletonEmptyJoint(sk,i) )
+        if ( skeletonEmpty3DJoint(sk,i) )
         {
             ++emptyJoints;
         }
@@ -540,6 +555,11 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
 
         if ( !skeletonSameJoints(src,dst) )
         {
+           if (skeletonEmpty3DJoint( sk , src ) ) {  sk->active[i]=0; fprintf(stderr,"SRC Joint %s is empty \n" , jointNames[i]); } else
+           if (skeletonEmpty3DJoint( sk , dst ) ) {  sk->active[i]=0; fprintf(stderr,"DST Joint %s is empty \n" , jointNames[i]); }
+             else
+           {
+            sk->active[i]=1;
             //Z and Y gives X
             srcDA = (double) sk->joint[src].z;
             srcDB = (double) sk->joint[src].y;
@@ -572,14 +592,20 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             dstDefDA = (double) defaultJoints[dst*3+p_X];
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
             sk->relativeJointAngle[i].z=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
+           }
         }
 
 
-       sk->active[i]=0;
-       if ( (sk->relativeJointAngle[i].x!=0.0) && ( sk->relativeJointAngle[i].x==sk->relativeJointAngle[i].x ) ) {  sk->active[i]=1; }
-       if ( (sk->relativeJointAngle[i].y!=0.0) && ( sk->relativeJointAngle[i].y==sk->relativeJointAngle[i].y ) ) {  sk->active[i]=1; }
-       if ( (sk->relativeJointAngle[i].z!=0.0) && ( sk->relativeJointAngle[i].z==sk->relativeJointAngle[i].z ) ) {  sk->active[i]=1; }
+      // sk->active[i]=0;
+      // if ( (sk->relativeJointAngle[i].x!=0.0) && ( sk->relativeJointAngle[i].x==sk->relativeJointAngle[i].x ) ) {  sk->active[i]=1; }
+      // if ( (sk->relativeJointAngle[i].y!=0.0) && ( sk->relativeJointAngle[i].y==sk->relativeJointAngle[i].y ) ) {  sk->active[i]=1; }
+      // if ( (sk->relativeJointAngle[i].z!=0.0) && ( sk->relativeJointAngle[i].z==sk->relativeJointAngle[i].z ) ) {  sk->active[i]=1; }
     }
+
+
+    if ( !sk->active[HUMAN_SKELETON_LEFT_KNEE] )  { sk->active[HUMAN_SKELETON_LEFT_HIP]=0; }
+    if ( !sk->active[HUMAN_SKELETON_RIGHT_KNEE] ) { sk->active[HUMAN_SKELETON_RIGHT_HIP]=0; }
+
 }
 
 
@@ -669,7 +695,7 @@ static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman *
             src = humanSkeletonJointsRelationMap[i];
             dst = i;
 
-            if ( ( !skeletonSameJoints(src,dst) ) && (!skeletonEmptyJoint(sk,src)) && (!skeletonEmptyJoint(sk,dst)) )
+            if ( ( !skeletonSameJoints(src,dst) ) && (!skeletonEmpty2DJoint(sk,src)) && (!skeletonEmpty2DJoint(sk,dst)) )
             {
                 fprintf(fp,"<line x1=\"%0.2f\" y1=\"%0.2f\" x2=\"%0.2f\" y2=\"%0.2f\" style=\"stroke:rgb(255,0,0);stroke-width:2\" />\n",
                         sk->joint2D[src].x*scale, sk->joint2D[src].y*scale , sk->joint2D[dst].x*scale, sk->joint2D[dst].y*scale );
@@ -678,7 +704,7 @@ static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman *
 
         for (i=0; i<HUMAN_SKELETON_PARTS; i++)
         {
-            if (!skeletonEmptyJoint(sk,i))
+            if (!skeletonEmpty2DJoint(sk,i))
             {
                 fprintf(fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"10\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n", sk->joint2D[i].x*scale, sk->joint2D[i].y*scale );
 
