@@ -60,78 +60,6 @@ void extract3x3( aiMatrix3x3 *m3,  aiMatrix4x4 *m4)
 }
 
 
-/*
-
-void Matrix4f::InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ)
-{
-    m[0][0] = ScaleX; m[0][1] = 0.0f;   m[0][2] = 0.0f;   m[0][3] = 0.0f;
-    m[1][0] = 0.0f;   m[1][1] = ScaleY; m[1][2] = 0.0f;   m[1][3] = 0.0f;
-    m[2][0] = 0.0f;   m[2][1] = 0.0f;   m[2][2] = ScaleZ; m[2][3] = 0.0f;
-    m[3][0] = 0.0f;   m[3][1] = 0.0f;   m[3][2] = 0.0f;   m[3][3] = 1.0f;
-}
-
-void Matrix4f::InitRotateTransform(float RotateX, float RotateY, float RotateZ)
-{
-    Matrix4f rx, ry, rz;
-
-    const float x = ToRadian(RotateX);
-    const float y = ToRadian(RotateY);
-    const float z = ToRadian(RotateZ);
-
-    rx.m[0][0] = 1.0f; rx.m[0][1] = 0.0f   ; rx.m[0][2] = 0.0f    ; rx.m[0][3] = 0.0f;
-    rx.m[1][0] = 0.0f; rx.m[1][1] = cosf(x); rx.m[1][2] = -sinf(x); rx.m[1][3] = 0.0f;
-    rx.m[2][0] = 0.0f; rx.m[2][1] = sinf(x); rx.m[2][2] = cosf(x) ; rx.m[2][3] = 0.0f;
-    rx.m[3][0] = 0.0f; rx.m[3][1] = 0.0f   ; rx.m[3][2] = 0.0f    ; rx.m[3][3] = 1.0f;
-
-    ry.m[0][0] = cosf(y); ry.m[0][1] = 0.0f; ry.m[0][2] = -sinf(y); ry.m[0][3] = 0.0f;
-    ry.m[1][0] = 0.0f   ; ry.m[1][1] = 1.0f; ry.m[1][2] = 0.0f    ; ry.m[1][3] = 0.0f;
-    ry.m[2][0] = sinf(y); ry.m[2][1] = 0.0f; ry.m[2][2] = cosf(y) ; ry.m[2][3] = 0.0f;
-    ry.m[3][0] = 0.0f   ; ry.m[3][1] = 0.0f; ry.m[3][2] = 0.0f    ; ry.m[3][3] = 1.0f;
-
-    rz.m[0][0] = cosf(z); rz.m[0][1] = -sinf(z); rz.m[0][2] = 0.0f; rz.m[0][3] = 0.0f;
-    rz.m[1][0] = sinf(z); rz.m[1][1] = cosf(z) ; rz.m[1][2] = 0.0f; rz.m[1][3] = 0.0f;
-    rz.m[2][0] = 0.0f   ; rz.m[2][1] = 0.0f    ; rz.m[2][2] = 1.0f; rz.m[2][3] = 0.0f;
-    rz.m[3][0] = 0.0f   ; rz.m[3][1] = 0.0f    ; rz.m[3][2] = 0.0f; rz.m[3][3] = 1.0f;
-
-    *this = rz * ry * rx;
-}
-
-
-void Matrix4f::InitRotateTransform(const Quaternion& quat)
-{
-    float yy2 = 2.0f * quat.y * quat.y;
-    float xy2 = 2.0f * quat.x * quat.y;
-    float xz2 = 2.0f * quat.x * quat.z;
-    float yz2 = 2.0f * quat.y * quat.z;
-    float zz2 = 2.0f * quat.z * quat.z;
-    float wz2 = 2.0f * quat.w * quat.z;
-    float wy2 = 2.0f * quat.w * quat.y;
-    float wx2 = 2.0f * quat.w * quat.x;
-    float xx2 = 2.0f * quat.x * quat.x;
-    m[0][0] = - yy2 - zz2 + 1.0f;
-    m[0][1] = xy2 + wz2;
-    m[0][2] = xz2 - wy2;
-    m[0][3] = 0;
-    m[1][0] = xy2 - wz2;
-    m[1][1] = - xx2 - zz2 + 1.0f;
-    m[1][2] = yz2 + wx2;
-    m[1][3] = 0;
-    m[2][0] = xz2 + wy2;
-    m[2][1] = yz2 - wx2;
-    m[2][2] = - xx2 - yy2 + 1.0f;
-    m[2][3] = 0.0f;
-    m[3][0] = m[3][1] = m[3][2] = 0;
-    m[3][3] = 1.0f;
-}
-
-void Matrix4f::InitTranslationTransform(float x, float y, float z)
-{
-    m[0][0] = 1.0f; m[0][1] = 0.0f; m[0][2] = 0.0f; m[0][3] = x;
-    m[1][0] = 0.0f; m[1][1] = 1.0f; m[1][2] = 0.0f; m[1][3] = y;
-    m[2][0] = 0.0f; m[2][1] = 0.0f; m[2][2] = 1.0f; m[2][3] = z;
-    m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
-}*/
-
 void aiMakeQuaternion(aiMatrix4x4 * am , aiQuaternion * qu)
 {
     float yy2 = 2.0f * qu->y * qu->y;
@@ -217,8 +145,6 @@ float degrees_to_rad(float degrees)
     return degrees * (M_PI /180.0 );
 }
 
-
-
 // find a node by name in the hierarchy (for anims and bones)
 struct aiNode *findNode(struct aiNode *node, char *name)
 {
@@ -232,9 +158,6 @@ struct aiNode *findNode(struct aiNode *node, char *name)
 	 }
 	return NULL;
 }
-
-
-
 
 // find a node by name in the hierarchy (for anims and bones)
 unsigned int findBone(const aiMesh * mesh, const char *name , unsigned int * foundBone)
@@ -253,7 +176,6 @@ unsigned int findBone(const aiMesh * mesh, const char *name , unsigned int * fou
 	return 0;
 }
 
-
 // calculate absolute transform for node to do mesh skinning
 void transformNodeWithAllParentTransforms(  aiMatrix4x4 *result, struct aiNode *node)
 {
@@ -266,8 +188,6 @@ void transformNodeWithAllParentTransforms(  aiMatrix4x4 *result, struct aiNode *
 		*result = node->mTransformation;
 	}
 }
-
-
 
 void populateInternalRigState(struct aiScene *scene , int meshNumber, struct boneState * bones )
 {
@@ -319,54 +239,6 @@ void populateInternalRigState(struct aiScene *scene , int meshNumber, struct bon
     }
 }
 
-
-/*
-void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform)
-{
-    string NodeName(pNode->mName.data);
-
-    const aiAnimation* pAnimation = m_pScene->mAnimations[0];
-
-    Matrix4f NodeTransformation(pNode->mTransformation);
-
-    const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
-
-    if (pNodeAnim) {
-        // Interpolate scaling and generate scaling transformation matrix
-        aiVector3D Scaling;
-        CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-        Matrix4f ScalingM;
-        ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
-
-        // Interpolate rotation and generate rotation transformation matrix
-        aiQuaternion RotationQ;
-        CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
-        Matrix4f RotationM = Matrix4f(RotationQ.GetMatrix());
-
-        // Interpolate translation and generate translation transformation matrix
-        aiVector3D Translation;
-        CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-        Matrix4f TranslationM;
-        TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
-
-        // Combine the above transformations
-        NodeTransformation = TranslationM * RotationM * ScalingM;
-    }
-
-    Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
-
-    if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) {
-        uint BoneIndex = m_BoneMapping[NodeName];
-        m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
-    }
-
-    for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
-    }
-}
-*/
-
-
 void readNodeHeirarchy(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
 {
 
@@ -403,19 +275,23 @@ void readNodeHeirarchy(const aiMesh * mesh , const aiNode* pNode,  struct boneSt
               aiMatrix4x4::Translation (bones->bone[boneNumber].TranslationVec,bones->bone[boneNumber].translationMat);
               //aiMakeQuaternion( &bones.bone[k].rotationMat , &bones.bone[k].RotationQua );
 
+              aiPrintMatrix(&bones->bone[boneNumber].rotationMat );
+
                bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].x),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].y),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].z)
                                                                      );
 
-               NodeTransformation =  bones->bone[boneNumber].translationMat  * bones->bone[boneNumber].rotationMat * bones->bone[boneNumber].scalingMat;
+               NodeTransformation =  bones->bone[boneNumber].rotationMat  * bones->bone[boneNumber].translationMat ;// * bones->bone[boneNumber].scalingMat;
+              } else
+              {
+               fprintf(stderr," inactive %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" ,jointNames[i] , sk->relativeJointAngle[i].x, sk->relativeJointAngle[i].y, sk->relativeJointAngle[i].z);
               }
             }
         }
 
-    aiMatrix4x4 GlobalTransformation = ParentTransform * NodeTransformation;
-
+    aiMatrix4x4 GlobalTransformation = ParentTransform  * NodeTransformation;
     bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
     for ( i = 0 ; i < pNode->mNumChildren ; i++)
     {
@@ -423,8 +299,8 @@ void readNodeHeirarchy(const aiMesh * mesh , const aiNode* pNode,  struct boneSt
     }
     } else
     {
-    aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
-      fprintf(stderr,"Could not find %s bone , passing parent transform regardless\n",pNode->mName.data);
+      aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
+      fprintf(stderr,"        <!%s!>\n",pNode->mName.data);
        for ( i = 0 ; i < pNode->mNumChildren ; i++)
        {
          readNodeHeirarchy(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
@@ -435,7 +311,7 @@ void readNodeHeirarchy(const aiMesh * mesh , const aiNode* pNode,  struct boneSt
 }
 
 
-void transformMeshMk3(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
+void transformMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
 {
 
     aiMatrix4x4 Identity;
@@ -464,46 +340,18 @@ void transformMeshMk3(struct aiScene *scene , int meshNumber , struct TRI_Model 
 
 			aiVector3D position = mesh->mVertices[v];
 			aiTransformVecByMatrix4(&position, &modifiedSkeleton.bone[k].finalTransform );
-			indexed->vertices[v*3+0] += position.x * w;
-			indexed->vertices[v*3+1] += position.y * w;
-			indexed->vertices[v*3+2] += position.z * w;
+			indexed->vertices[v*3+0] += (float) position.x * w;
+			indexed->vertices[v*3+1] += (float) position.y * w;
+			indexed->vertices[v*3+2] += (float) position.z * w;
 
 			aiVector3D normal = mesh->mNormals[v];
 			aiTransformVecByMatrix3(&normal, &finalTransform3x3);
-			indexed->normal[v*3+0] += normal.x * w;
-			indexed->normal[v*3+1] += normal.y * w;
-			indexed->normal[v*3+2] += normal.z * w;
+			indexed->normal[v*3+0] += (float) normal.x * w;
+			indexed->normal[v*3+1] += (float) normal.y * w;
+			indexed->normal[v*3+2] += (float) normal.z * w;
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void transformMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
-{
-    transformMeshMk3( scene , meshNumber , indexed , sk );
- return;
-}
-
-
-
-
-
-
-
-
 
 void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * triModel )
 {
@@ -515,16 +363,6 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
     fprintf(stderr,"  %d bones\n",mesh->mNumBones);
 
-	unsigned int k;
-	for (k = 0; k < mesh->mNumBones; k++)
-    {
-		aiString boneName = mesh->mBones[k]->mName;
-		//fprintf(stderr,"   -bone %u - %s \n" , k , boneName.C_Str() );
-		//fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[0], mesh->mBones[k]->mOffsetMatrix[1], mesh->mBones[k]->mOffsetMatrix[2], mesh->mBones[k]->mOffsetMatrix[3] );
-		//fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[4], mesh->mBones[k]->mOffsetMatrix[5], mesh->mBones[k]->mOffsetMatrix[6], mesh->mBones[k]->mOffsetMatrix[7] );
-		//fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[8], mesh->mBones[k]->mOffsetMatrix[9], mesh->mBones[k]->mOffsetMatrix[10],mesh->mBones[k]->mOffsetMatrix[11] );
-		//fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , mesh->mBones[k]->mOffsetMatrix[12],mesh->mBones[k]->mOffsetMatrix[13], mesh->mBones[k]->mOffsetMatrix[14], mesh->mBones[k]->mOffsetMatrix[15] );
-	}
 
 
     fprintf(stderr,"%u color sets",AI_MAX_NUMBER_OF_COLOR_SETS);
@@ -583,7 +421,6 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
           triModel->colors[(i*3)+2] = mesh->mColors[colourSet][i].b;
         }
        }
-
 	}
 
    for (i = 0; i < mesh->mNumFaces; i++)
@@ -602,6 +439,8 @@ void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
                                                                 struct skeletonHuman * sk
                                                               )
 {
+  visualizeSkeletonHuman("deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton.svg",sk,3.0);
+
   struct TRI_Model temporaryIndexedDeformedModel={0};
   fprintf(stderr,"Copying to intermediate mesh\n");
   copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel);
@@ -614,9 +453,6 @@ void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
   deallocModelTri(&temporaryIndexedDeformedModel);
   fprintf(stderr,"Serving back flattened mesh\n");
 }
-
-
-
 
 void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct TRI_Model * originalModel)
 {
@@ -640,8 +476,6 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
 	}
 
 }
-
-
 
 int testAssimp(const char * filename  , struct TRI_Model * triModel , struct TRI_Model * originalModel)
 {
