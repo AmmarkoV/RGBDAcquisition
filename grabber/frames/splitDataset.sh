@@ -23,11 +23,23 @@ do
     then
        if [ ! -f "depthFrame_0_$XNUM.pnm" ] 
          then
+ 
+  if [ ! -f "colorFrame_0_$XNUM.jpg" ] 
+    then
+       if [ ! -f "depthFrame_0_$XNUM.png" ] 
+         then
           echo " "
           echo "Finished Frames"
           exit 0
        fi
   fi
+ 
+       fi
+  fi
+
+  mv "colorFrame_0_$XNUM.jpg" "../$TODATASET/colorFrame_0_$INUM.jpg"
+  mv "depthFrame_0_$XNUM.png" "../$TODATASET/depthFrame_0_$INUM.png"
+
 
   mv "colorFrame_0_$XNUM.pnm" "../$TODATASET/colorFrame_0_$INUM.pnm"
   mv "depthFrame_0_$XNUM.pnm" "../$TODATASET/depthFrame_0_$INUM.pnm"

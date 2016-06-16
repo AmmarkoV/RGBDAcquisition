@@ -23,6 +23,7 @@ OPTION (ENABLE_LOCATION_SERVICE OFF)
 OPTION (ENABLE_AUTOSENSING ON)
 OPTION (ENABLE_OPENCV OFF)
 OPTION (ENABLE_OPENCV_BASED_TOOLS OFF)
+OPTION (ENABLE_OPENCV_BINDINGS OFF)
 
 
 set(CMAKE_CXX_FLAGS "-fPIC -s") 
@@ -133,7 +134,9 @@ ENDIF( ENABLE_EDITOR )
 
 IF( ENABLE_OPENCV ) 
  add_subdirectory (viewer/)
- add_subdirectory (3dparty/OpenCVBindings)
+ IF( ENABLE_OPENCV_BINDINGS )
+  add_subdirectory (3dparty/OpenCVBindings)
+ ENDIF( ENABLE_OPENCV_BINDINGS )
 ELSE (ENABLE_OPENCV)
  MESSAGE("Viewer will not be compiled , OpenCV stuff missing? ( check ENABLE_OPENCV flag )..")
 ENDIF( ENABLE_OPENCV )

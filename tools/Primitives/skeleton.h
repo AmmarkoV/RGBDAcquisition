@@ -11,9 +11,9 @@ extern "C"
 
 
 static float defaultJoints2D[] = { 293.0, 37.0, 293.0, 100.0, 292.0, 170.0, 235.0, 99.0, 349.0, 101.0, 172.0, 144.0, 421.0, 128.0, 113.0, 176.0, 480.0, 144.0, 263.0, 242.0, 319.0, 242.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 291.0, 242.0 };
-static float defaultJoints[] = { -88.01861572265625, -655.5640258789062, 1717.0, -91.15103149414062, -464.8657531738281, 1764.83154296875, -93.02406311035156, -229.4916534423828, 1740.753173828125, -281.5615234375, -465.376708984375, 1757.0, 98.7568359375, -467.6025390625, 1785.0, -498.959716796875, -323.6999206542969, 1784.90966796875, 364.5001220703125, -404.3070373535156, 1923.611572265625, -673.8611450195312, -208.03506469726562, 1731.8184814453125, 562.7467651367188, -339.4126281738281, 1868.3612060546875, -185.67507934570312, 5.257970809936523, 1733.0770263671875, -4.1191253662109375, 6.506894111633301, 1700.2725830078125, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, -94.89710235595703, 5.882432460784912, 1716.6748046875 } ;
-
-
+//static float defaultJoints[] = { -88.01861572265625, -655.5640258789062, 1717.0, -91.15103149414062, -464.8657531738281, 1764.83154296875, -93.02406311035156, -229.4916534423828, 1740.753173828125, -281.5615234375, -465.376708984375, 1757.0, 98.7568359375, -467.6025390625, 1785.0, -498.959716796875, -323.6999206542969, 1784.90966796875, 364.5001220703125, -404.3070373535156, 1923.611572265625, -673.8611450195312, -208.03506469726562, 1731.8184814453125, 562.7467651367188, -339.4126281738281, 1868.3612060546875, -185.67507934570312, 5.257970809936523, 1733.0770263671875, -4.1191253662109375, 6.506894111633301, 1700.2725830078125, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, -94.89710235595703, 5.882432460784912, 1716.6748046875 } ;
+static float defaultJoints[] = { -198.40 , -271.72 , 1550.18 , -189.25 , -26.24 , 1621.38 , -192.95 , 152.67 , 1532.26 , -355.50 , -19.27 , 1638.30 , -23.20 , -33.19 , 1604.48 , -481.75 , 233.90 , 1551.29 , 148.30 , 197.92 , 1594.06 , -607.57 , 450.71 , 1439.28 , 310.77 , 401.31 , 1524.37 , -287.40 , 337.91 , 1459.85 , -106.44 , 325.15 , 1426.22 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -196.92 , 331.53 , 1443.04  } ;
+static float defaultAngleOffset[] = { -0.00 , -0.00 , -0.00 , -180.00 , -179.99 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -179.98 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -180.00 , -180.00 , -180.00 ,  0 } ;
 
 #define dp 1700
 #define sx 320
@@ -70,6 +70,30 @@ static const char * jointNames[] =
     "right_foot",
     "left_foot" ,
     "hip" ,
+//=================
+    "End of Joint Names"
+};
+
+
+
+static const char * jointNamesFormatted[] =
+{
+    "Head     ",
+    "Neck     " ,
+    "Torso    ",
+    "RShoulder",
+    "LShoulder",
+    "RElbow   ",
+    "LElbow   ",
+    "RHand    ",
+    "LHand    ",
+    "RHip     ",
+    "LHip     ",
+    "RKnee    ",
+    "LKnee    ",
+    "RFoot    ",
+    "LFoot    ",
+    "Hip      ",
 //=================
     "End of Joint Names"
 };
@@ -340,7 +364,6 @@ static int skeletonEmpty2DJoint(struct skeletonHuman * sk , unsigned int j1)
 }
 
 
-
 static int skeletonEmpty(struct skeletonHuman * sk)
 {
     unsigned int i=0 , emptyJoints=0;
@@ -352,7 +375,7 @@ static int skeletonEmpty(struct skeletonHuman * sk)
         }
     }
 
-    if (emptyJoints==HUMAN_SKELETON_MIRRORED_PARTS)
+    if (emptyJoints==HUMAN_SKELETON_PARTS)
     {
         fprintf(stderr,  "All skeleton joints are empty.. \n"   );
         return 1;
@@ -360,6 +383,29 @@ static int skeletonEmpty(struct skeletonHuman * sk)
 
     return 0;
 }
+
+
+
+static int skeleton2DEmpty(struct skeletonHuman * sk)
+{
+    unsigned int i=0 , emptyJoints=0;
+    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+    {
+        if ( skeletonEmpty2DJoint(sk,i) )
+        {
+            ++emptyJoints;
+        }
+    }
+
+    if (emptyJoints==HUMAN_SKELETON_PARTS)
+    {
+        fprintf(stderr,  "All skeleton joints are empty.. \n"   );
+        return 1;
+    }
+
+    return 0;
+}
+
 
 static int skeletonSameJoints(unsigned int j1 , unsigned int j2)
 {
@@ -570,6 +616,7 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             dstDefDA = (double) defaultJoints[dst*3+p_Z];
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
             sk->relativeJointAngle[i].x=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
+            sk->relativeJointAngle[i].x+=defaultAngleOffset[i*3+0];
 
             //Z and X gives Y
             srcDA = (double) sk->joint[src].z;
@@ -581,6 +628,7 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             dstDefDA = (double) defaultJoints[dst*3+p_Z];
             dstDefDB = (double) defaultJoints[dst*3+p_X];
             sk->relativeJointAngle[i].y=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
+            sk->relativeJointAngle[i].y+=defaultAngleOffset[i*3+1];
 
             //X and Y gives Z
             srcDA = (double) sk->joint[src].x;
@@ -592,6 +640,7 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             dstDefDA = (double) defaultJoints[dst*3+p_X];
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
             sk->relativeJointAngle[i].z=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
+            sk->relativeJointAngle[i].z+=defaultAngleOffset[i*3+2];
            }
         }
 
@@ -667,6 +716,47 @@ static int fillWithDefaultNAOSkeleton(struct skeletonHuman * sk)
 }
 
 
+static int printSkeletonHuman(struct skeletonHuman * sk)
+{
+ unsigned int i=0;
+ fprintf(stderr," \n");
+ fprintf(stderr," __________________________________________________________\n");
+ fprintf(stderr,"|SKELETON POSITIONAL DATA - - - - - - - - - - - - - - - - -|\n");
+ fprintf(stderr,"|   name            x               y                z     |\n");
+ fprintf(stderr,"|__________________________________________________________|\n");
+ for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+        {
+          fprintf(stderr,"|  %s    %8.2f        %8.2f         %8.2f  |\n",jointNamesFormatted[i],sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
+        }
+ fprintf(stderr,"|__________________________________________________________|\n\n\n");
+
+
+ fprintf(stderr," __________________________________________________________\n");
+ fprintf(stderr,"|SKELETON ROTATIONAL DATA - - - - - - - - - - - - - - - - -|\n");
+ fprintf(stderr,"|   name             x              y                z     |\n");
+ fprintf(stderr,"|__________________________________________________________|\n");
+ for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+        {
+          fprintf(stderr,"|  %s    %8.2f        %8.2f         %8.2f  |\n",jointNamesFormatted[i],sk->relativeJointAngle[i].x,sk->relativeJointAngle[i].y,sk->relativeJointAngle[i].z);
+        }
+ fprintf(stderr,"|__________________________________________________________|\n");
+
+ fprintf(stderr,"static float defaultJoints[] = { ");
+ for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+        {
+          fprintf(stderr,"%0.2f , %0.2f , %0.2f , ",sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
+        }
+ fprintf(stderr," 0 } ;\n");
+
+ fprintf(stderr,"static float defaultAngleOffset[] = { ");
+ for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+        {
+          fprintf(stderr,"%0.2f , %0.2f , %0.2f , ",-1*sk->relativeJointAngle[i].x,-1*sk->relativeJointAngle[i].y,-1*sk->relativeJointAngle[i].z);
+        }
+ fprintf(stderr," 0 } ;\n");
+
+return 0;
+}
 
 static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman * sk , float scale)
 {

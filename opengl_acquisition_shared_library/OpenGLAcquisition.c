@@ -51,8 +51,9 @@ int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int 
 
    startOGLRendererSandbox(openGL_WIDTH,openGL_HEIGHT,0 /*View Window*/,devName);
 
+   //THis is scene controlled , but one could force the grabber to render frame by frame uncommenting the following
    //Switch OGL Renderer to sequential mode so each frame snap will provide the next available rendering and nothing will be lost..!
-   changeOGLRendererGrabMode(1);
+   //changeOGLRendererGrabMode(1);
 
   return ((openGLColorFrame!=0) && (openGLDepthFrame!=0)) ;
 }

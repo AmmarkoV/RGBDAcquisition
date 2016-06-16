@@ -12,13 +12,19 @@ int doSkeletonConversions( struct skeletonHuman * skel )
 {
   //if ( !skeletonEmpty(skel))
   {
-   //updateSkeletonAngles(skel);
-   updateSkeletonAnglesNAO(skel);
+   updateSkeletonAngles(skel);
+    printSkeletonHuman(skel);
+
+   //updateSkeletonAnglesNAO(skel);
    fprintf(stderr,"doSkeletonConversions #%u ",frames);
    char filenameBuf[512]={0};
    snprintf(filenameBuf,512,"skel%u.svg",frames);
 
-   visualizeSkeletonHuman(filenameBuf,  skel, visualizationScale);
+   if (skeleton2DEmpty(skel))
+   {
+     visualizeSkeletonHuman(filenameBuf,  skel, visualizationScale);
+   }
+
 
    struct naoCommand nao={0};
    struct skeletonHuman sk={0};
