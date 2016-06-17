@@ -25,6 +25,8 @@ static float defaultJoints[] = { -198.40 , -271.72 , 1550.18 , -189.25 , -26.24 
 static float defaultAngleOffset[] = { -0.00 , -0.00 , -0.00 , -180.00 , -179.99 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -179.98 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -180.00 , -180.00 , -180.00 ,  0 } ;
 static float defaultAngleDirection[] = { 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 , 1.00 , 1.0 , 1.0 , 1.0 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 ,  0 } ;
 
+#define emptyBoundLow -0.01
+#define emptyBoundHigh 0.01
 #define dp 1700
 #define sx 320
 #define sy 100                        //head         neck         bodycenter   rightshoulder  leftshoulder     rightElbow      leftElbow       rightWrist    leftWrist
@@ -324,16 +326,6 @@ static int cleanSkeleton(struct skeletonHuman * sk)
 
 static int skeletonEmpty3DJoint(struct skeletonHuman * sk , unsigned int j1)
 {
-    //Check NotSet
-    if (
-        (sk->joint[j1].x==0) &&
-        (sk->joint[j1].y==0) &&
-        (sk->joint[j1].z==0)
-    )
-    {
-        return 1;
-    }
-
 
     //Check NaN
     if (
@@ -345,20 +337,24 @@ static int skeletonEmpty3DJoint(struct skeletonHuman * sk , unsigned int j1)
         return 1;
     }
 
+
+    //Check NotSet
+    if (
+        (emptyBoundLow < sk->joint[j1].x < emptyBoundHigh) &&
+        (emptyBoundLow < sk->joint[j1].y < emptyBoundHigh) &&
+        (emptyBoundLow < sk->joint[j1].z < emptyBoundHigh)
+    )
+    {
+        return 1;
+    }
+
+
     return 0;
 }
 
 
 static int skeletonEmpty2DJoint(struct skeletonHuman * sk , unsigned int j1)
 {
-    //Check NotSet
-    if (
-        (sk->joint2D[j1].x==0) &&
-        (sk->joint2D[j1].y==0)
-    )
-    {
-        return 1;
-    }
 
 
     //Check NaN
@@ -369,6 +365,16 @@ static int skeletonEmpty2DJoint(struct skeletonHuman * sk , unsigned int j1)
     {
         return 1;
     }
+
+    //Check NotSet
+    if (
+        (sk->joint2D[j1].x==0) &&
+        (sk->joint2D[j1].y==0)
+    )
+    {
+        return 1;
+    }
+
 
     return 0;
 }
@@ -609,13 +615,11 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
         src = humanSkeletonJointsRelationMap[i];
         dst = i;
 
+        if (skeletonEmpty3DJoint( sk , src ) ) {  sk->active[i]=0; fprintf(stderr,"updateSkeletonAnglesGeneric : SRC Joint %s is empty \n" , jointNames[i]); } else
+        if (skeletonEmpty3DJoint( sk , dst ) ) {  sk->active[i]=0; fprintf(stderr,"updateSkeletonAnglesGeneric : DST Joint %s is empty \n" , jointNames[i]); } else
         if ( !skeletonSameJoints(src,dst) )
         {
-           if (skeletonEmpty3DJoint( sk , src ) ) {  sk->active[i]=0; fprintf(stderr,"updateSkeletonAnglesGeneric : SRC Joint %s is empty \n" , jointNames[i]); } else
-           if (skeletonEmpty3DJoint( sk , dst ) ) {  sk->active[i]=0; fprintf(stderr,"updateSkeletonAnglesGeneric : DST Joint %s is empty \n" , jointNames[i]); }
-             else
            {
-            sk->active[i]=1;
             //Z and Y gives X
             srcDA = (double) sk->joint[src].z;
             srcDB = (double) sk->joint[src].y;
@@ -654,19 +658,21 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             sk->relativeJointAngle[i].z=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
             sk->relativeJointAngle[i].z+=defaultAngleOffset[i*3+2];
             sk->relativeJointAngle[i].z=sk->relativeJointAngle[i].z*defaultAngleDirection[i*3+2];
+
+            unsigned int NaNOutput=0;
+            if (sk->relativeJointAngle[i].x!=sk->relativeJointAngle[i].x) { NaNOutput=1; /*sk->relativeJointAngle[i].x=0.0;*/ }
+            if (sk->relativeJointAngle[i].y!=sk->relativeJointAngle[i].y) { NaNOutput=1; /*sk->relativeJointAngle[i].y=0.0;*/ }
+            if (sk->relativeJointAngle[i].z!=sk->relativeJointAngle[i].z) { NaNOutput=1; /*sk->relativeJointAngle[i].z=0.0;*/ }
+
+
+            // Check NaN output
+            if (NaNOutput)
+               { sk->active[i]=0; } else
+               { sk->active[i]=1; }
            }
         }
 
-
-      // sk->active[i]=0;
-      // if ( (sk->relativeJointAngle[i].x!=0.0) && ( sk->relativeJointAngle[i].x==sk->relativeJointAngle[i].x ) ) {  sk->active[i]=1; }
-      // if ( (sk->relativeJointAngle[i].y!=0.0) && ( sk->relativeJointAngle[i].y==sk->relativeJointAngle[i].y ) ) {  sk->active[i]=1; }
-      // if ( (sk->relativeJointAngle[i].z!=0.0) && ( sk->relativeJointAngle[i].z==sk->relativeJointAngle[i].z ) ) {  sk->active[i]=1; }
     }
-
-
-    if ( !sk->active[HUMAN_SKELETON_LEFT_KNEE] )  { sk->active[HUMAN_SKELETON_LEFT_HIP]=0; }
-    if ( !sk->active[HUMAN_SKELETON_RIGHT_KNEE] ) { sk->active[HUMAN_SKELETON_RIGHT_HIP]=0; }
 
 }
 
