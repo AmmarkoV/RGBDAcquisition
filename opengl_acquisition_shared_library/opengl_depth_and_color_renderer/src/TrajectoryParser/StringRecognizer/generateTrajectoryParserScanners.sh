@@ -1,6 +1,9 @@
 #!/bin/bash
 
-#gcc main.c fastStringParser.c -o StringRecognizer
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$DIR"
+
+gcc main.c fastStringParser.c -o StringRecognizer
 
 #for item in TrajectoryPrimitives test ; do
 

@@ -4,9 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 struct fastStringParser * fspHTTPHeader = 0;
 
+#define MAXIMUM_FILENAME_WITH_EXTENSION 1024
 #define MAXIMUM_LINE_LENGTH 1024
 #define MAXIMUM_LEVELS 123
 #define ACTIVATED_LEVELS 3
@@ -25,6 +27,7 @@ inline void convertTo_ENUM_ID(char *sPtr)
 
      if  (sPtr[source]=='_')  {  } else
      if  (sPtr[source]=='-')  { sPtr[target]='_'; } else
+     if  (sPtr[source]=='.')  { sPtr[target]='_'; } else
      if  (
               ( (sPtr[source]>='A') && (sPtr[source]<='Z' ) )  ||
               ( (sPtr[source]>='0') && (sPtr[source]<='9' ) )
@@ -48,6 +51,10 @@ inline void convertTo_ENUM_ID(char *sPtr)
 
 int fastStringParser_addString(struct fastStringParser * fsp, char * str)
 {
+  //TODO : Check here if there are smaller strings with the same prefix as us declared before
+  //here if found then swap them with current word
+
+
   unsigned int ourNum = fsp->stringsLoaded++;
   fsp->contents[ourNum].strLength=strlen(str);
 
@@ -79,10 +86,6 @@ int fastStringParser_addString(struct fastStringParser * fsp, char * str)
     if (fsp->contents[ourNum].str!=0) { free(fsp->contents[ourNum].str); fsp->contents[ourNum].str=0; }
     return 0;
   }
-
-
-
-
 
   return 0;
 }
@@ -206,7 +209,7 @@ int printAllEnumeratorItems(FILE * fp , struct fastStringParser * fsp,char * fun
   unsigned int i=0;
   for (i=0; i<fsp->stringsLoaded; i++)
   {
-    fprintf(fp," %s_%s,\n",fsp->functionName,fsp->contents[i].strIDFriendly);
+    fprintf(fp," %s_%s, // %u \n",fsp->functionName,fsp->contents[i].strIDFriendly,i+1);
   }
 
   fprintf(fp," %s_END_OF_ITEMS\n",fsp->functionName);
@@ -283,32 +286,54 @@ int recursiveTraverser(FILE * fp,struct fastStringParser * fsp,char * functionNa
 
 int export_C_Scanner(struct fastStringParser * fsp,char * functionName)
 {
+  if (fsp==0) { fprintf(stderr,"export_C_Scanner called with empty string parser\n"); return 0; }
+  if (functionName==0) { fprintf(stderr,"export_C_Scanner called with empty function name\n"); return 0; }
 
-  fsp->functionName  = (char* ) malloc(sizeof(1+strlen(functionName)));
-  strcpy(fsp->functionName,functionName);
+  unsigned int functionNameLength = strlen(functionName);
+  fsp->functionName  = (char* ) malloc(sizeof(char) * (1+functionNameLength));
+  if (fsp->functionName==0) { fprintf(stderr,"Could not allocate memory for function name\n"); return 0; }
+  strncpy(fsp->functionName,functionName,functionNameLength);
+  fsp->functionName[functionNameLength]=0;
+
   convertTo_ENUM_ID(fsp->functionName);
 
 
-  char filenameWithExtension[1024]={0};
+  char filenameWithExtension[MAXIMUM_FILENAME_WITH_EXTENSION+1]={0};
 
 
   //PRINT OUT THE HEADER
-
-  sprintf(filenameWithExtension,"%s.h",functionName);
+  snprintf(filenameWithExtension,MAXIMUM_FILENAME_WITH_EXTENSION,"%s.h",functionName);
   FILE * fp = fopen(filenameWithExtension,"w");
   if (fp == 0) { fprintf(stderr,"Could not open input file %s\n",functionName); return 0; }
+  fprintf(fp," ");
+
+
+  fprintf(fp,"/** @file %s.h\n",functionName);
+  fprintf(fp,"* @brief A tool that scans for a string in a very fast and robust way\n");
+  fprintf(fp,"* @author Ammar Qammaz (AmmarkoV)\n");
+  fprintf(fp,"*/\n\n");
 
   fprintf(fp,"#ifndef %s_H_INCLUDED\n",fsp->functionName);
   fprintf(fp,"#define %s_H_INCLUDED\n\n\n",fsp->functionName);
+
+
+      fprintf(fp,"/** @brief Enumerator for the IDs of %s so we can know what the result was*/\n",functionName);
       printAllEnumeratorItems(fp, fsp, functionName);
-  fprintf(fp,"\n\nint scanFor_%s(char * str,unsigned int strLength); \n\n",functionName);
+
+
+  fprintf(fp,"\n\n/** @brief Scan a string for one of the words of the %s word set\n",functionName);
+  fprintf(fp,"* @ingroup stringParsing\n");
+  fprintf(fp,"* @param Input String , to be scanned\n");
+  fprintf(fp,"* @param Length of Input String\n");
+  fprintf(fp,"* @retval See above enumerator*/\n");
+  fprintf(fp," int scanFor_%s(const char * str,unsigned int strLength); \n\n",functionName);
   fprintf(fp,"#endif\n");
   fclose(fp);
 
 
   //PRINT OUT THE MAIN FILE
 
-  sprintf(filenameWithExtension,"%s.c",functionName);
+  snprintf(filenameWithExtension,MAXIMUM_FILENAME_WITH_EXTENSION,"%s.c",functionName);
   fp = fopen(filenameWithExtension,"w");
   if (fp == 0) { fprintf(stderr,"Could not open input file %s\n",functionName); return 0; }
 
@@ -317,12 +342,17 @@ int export_C_Scanner(struct fastStringParser * fsp,char * functionName)
   for (i=0; i<MAXIMUM_LEVELS; i++ ) { cArray[i]=0;/*'A';*/ }
 
 
+  time_t t = time(NULL);
+  struct tm tm = *localtime(&t);
+
+
   fprintf(fp,"/* \
-                 \nThis file was automatically generated using StringRecognizer\
+                 \nThis file was automatically generated @ %02d-%02d-%02d %02d:%02d:%02d using StringRecognizer \
                  \nhttps://github.com/AmmarkoV/AmmarServer/tree/master/src/StringRecognizer\
                  \nPlease note that changes you make here may be automatically overwritten \
                  \nif the String Recognizer generator runs again..!\
-              \n */ \n\n");
+              \n */ \n\n" ,
+          tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,   tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 
   fprintf(fp,"#include <stdio.h>\n");
@@ -330,7 +360,7 @@ int export_C_Scanner(struct fastStringParser * fsp,char * functionName)
   fprintf(fp,"#include <ctype.h>\n");
   fprintf(fp,"#include \"%s.h\"\n\n",functionName);
 
-  fprintf(fp,"int scanFor_%s(char * str,unsigned int strLength) \n{\n",functionName);
+  fprintf(fp,"int scanFor_%s(const char * str,unsigned int strLength) \n{\n",functionName);
 
      fprintf(fp," if (str==0) { return 0; } \n");
      fprintf(fp," if (strLength<%u) { return 0; } \n\n",fsp->shortestStringLength);
@@ -361,7 +391,7 @@ struct fastStringParser * fastSTringParser_createRulesFromFile(char* filename,un
   if (fp == 0) { fprintf(stderr,"Could not open input file %s\n",filename); return 0; }
 
   struct fastStringParser *  fsp  = fastStringParser_initialize(totalStrings);
-  if (fsp==0) { return 0; }
+  if (fsp==0) { fclose(fp); return 0; }
 
   char line[MAXIMUM_LINE_LENGTH]={0};
   unsigned int lineLength=0;
@@ -392,11 +422,11 @@ struct fastStringParser * fastSTringParser_createRulesFromFile(char* filename,un
 
 
 
-int fastStringParser_close()
+int fastStringParser_close(struct fastStringParser * fsp)
 {
 
-
-    return 0;
+    fprintf(stderr,"TODO: Deallocate here\nClosing Fast String Parser\n");
+    return 1;
 }
 
 
