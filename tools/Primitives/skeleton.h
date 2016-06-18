@@ -380,7 +380,7 @@ static int skeletonEmpty2DJoint(struct skeletonHuman * sk , unsigned int j1)
 }
 
 
-static int skeletonEmpty(struct skeletonHuman * sk)
+static int skeleton3DEmpty(struct skeletonHuman * sk)
 {
     unsigned int i=0 , emptyJoints=0;
     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
@@ -538,7 +538,7 @@ static double get3DAngleABC( double* srcPoint, double* dstPoint, double* default
 
     double res = abNorm[0] * bcNorm[0] + abNorm[1] * bcNorm[1] + abNorm[2] * bcNorm[2];
 
-    return acos(res)*180.0/ 3.141592653589793;
+    return (double) acos(res)*180.0/ 3.141592653589793;
 }
 
 
@@ -568,7 +568,7 @@ static double get2DAngleABC( double* srcPoint, double* dstPoint, double* default
 
     double res = abNorm[0] * bcNorm[0] + abNorm[1] * bcNorm[1] ;
 
-    res = acos(res)*180.0/ 3.141592653589793;
+    res = (double) acos(res)*180.0/ 3.141592653589793;
 
 
     /*
@@ -580,6 +580,15 @@ static double get2DAngleABC( double* srcPoint, double* dstPoint, double* default
     return res;
 }
 
+double getAngle2PointsRad(double p1_x, double p1_y, double p2_x, double p2_y)
+{
+  return (double) acos((((p1_x * p2_x) + (p1_y * p2_y)) / (sqrt( p1_x*p1_x  + p1_y*p1_y ) * sqrt( p2_x*p2_x + p2_y*p2_y ))));
+}
+
+double getAngle2PointsDeg(double p1_x, double p1_y, double p2_x, double p2_y)
+{
+  return (double) getAngle2PointsRad(p1_x,p1_y,p2_x,p2_y) * 180 / 3.141592653589793;
+}
 
 
 static double getAngleABCRelative( double* srcPointA , double* srcPointB ,
@@ -591,8 +600,23 @@ static double getAngleABCRelative( double* srcPointA , double* srcPointB ,
     double relativeDst[2] = { *dstPointA - * srcPointA, *dstPointB - * srcPointB };
     double relativeDefaultDst[2] = { *dstDefaultPointA - * srcDefaultPointA , *dstDefaultPointB - * srcDefaultPointB };
 
+    double result;
 
-    return get2DAngleABC(relativeSrc,relativeDst,relativeDefaultDst);
+    //result = get2DAngleABC(relativeSrc,relativeDst,relativeDefaultDst);
+    result = getAngle2PointsDeg(relativeDst[0],relativeDst[1],relativeDefaultDst[0],relativeDefaultDst[1]) ;
+
+/*
+    fprintf(stderr,"getAngleABCRelative( A(%0.2f,%0.2f) B(%0.2f,%0.2f) C(%0.2f,%0.2f) ) = %0.2f \n",
+            relativeSrc[0],
+            relativeSrc[1],
+            relativeDst[0],
+            relativeDst[1],
+            relativeDefaultDst[0],
+            relativeDefaultDst[1],
+            result);
+*/
+
+    return result;
 }
 
 
@@ -614,12 +638,14 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
     {
         src = humanSkeletonJointsRelationMap[i];
         dst = i;
+        sk->active[i]=0;
 
-        if (skeletonEmpty3DJoint( sk , src ) ) {  sk->active[i]=0; fprintf(stderr,"updateSkeletonAnglesGeneric : SRC Joint %s is empty \n" , jointNames[i]); } else
-        if (skeletonEmpty3DJoint( sk , dst ) ) {  sk->active[i]=0; fprintf(stderr,"updateSkeletonAnglesGeneric : DST Joint %s is empty \n" , jointNames[i]); } else
-        if ( !skeletonSameJoints(src,dst) )
+        if (
+                 (!skeletonSameJoints(src,dst)  ) &&
+                 (!skeletonEmpty3DJoint(sk,src) ) &&
+                 (!skeletonEmpty3DJoint(sk,dst) )
+           )
         {
-           {
             //Z and Y gives X
             srcDA = (double) sk->joint[src].z;
             srcDB = (double) sk->joint[src].y;
@@ -630,8 +656,8 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             dstDefDA = (double) defaultJoints[dst*3+p_Z];
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
             sk->relativeJointAngle[i].x=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
-            sk->relativeJointAngle[i].x+=defaultAngleOffset[i*3+0];
-            sk->relativeJointAngle[i].x=sk->relativeJointAngle[i].x*defaultAngleDirection[i*3+0];
+            //sk->relativeJointAngle[i].x+=defaultAngleOffset[i*3+0];
+            //sk->relativeJointAngle[i].x=sk->relativeJointAngle[i].x*defaultAngleDirection[i*3+0];
 
             //Z and X gives Y
             srcDA = (double) sk->joint[src].z;
@@ -643,8 +669,8 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             dstDefDA = (double) defaultJoints[dst*3+p_Z];
             dstDefDB = (double) defaultJoints[dst*3+p_X];
             sk->relativeJointAngle[i].y=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
-            sk->relativeJointAngle[i].y+=defaultAngleOffset[i*3+1];
-            sk->relativeJointAngle[i].y=sk->relativeJointAngle[i].y*defaultAngleDirection[i*3+1];
+            //sk->relativeJointAngle[i].y+=defaultAngleOffset[i*3+1];
+            //sk->relativeJointAngle[i].y=sk->relativeJointAngle[i].y*defaultAngleDirection[i*3+1];
 
             //X and Y gives Z
             srcDA = (double) sk->joint[src].x;
@@ -656,8 +682,8 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             dstDefDA = (double) defaultJoints[dst*3+p_X];
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
             sk->relativeJointAngle[i].z=getAngleABCRelative(&srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
-            sk->relativeJointAngle[i].z+=defaultAngleOffset[i*3+2];
-            sk->relativeJointAngle[i].z=sk->relativeJointAngle[i].z*defaultAngleDirection[i*3+2];
+            //sk->relativeJointAngle[i].z+=defaultAngleOffset[i*3+2];
+            //sk->relativeJointAngle[i].z=sk->relativeJointAngle[i].z*defaultAngleDirection[i*3+2];
 
             unsigned int NaNOutput=0;
             if (sk->relativeJointAngle[i].x!=sk->relativeJointAngle[i].x) { NaNOutput=1; /*sk->relativeJointAngle[i].x=0.0;*/ }
@@ -666,10 +692,7 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
 
 
             // Check NaN output
-            if (NaNOutput)
-               { sk->active[i]=0; } else
-               { sk->active[i]=1; }
-           }
+            if (!NaNOutput) { sk->active[i]=1; }
         }
 
     }
@@ -775,14 +798,14 @@ static int printSkeletonHuman(struct skeletonHuman * sk)
         {
           fprintf(stderr,"%0.2f , %0.2f , %0.2f , ",sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
         }
- fprintf(stderr," 0 } ;\n");
+ fprintf(stderr," 0 } ;\n\n");
 
  fprintf(stderr,"static float defaultAngleOffset[] = { ");
  for (i=0; i<HUMAN_SKELETON_PARTS; i++)
         {
           fprintf(stderr,"%0.2f , %0.2f , %0.2f , ",-1*sk->relativeJointAngle[i].x,-1*sk->relativeJointAngle[i].y,-1*sk->relativeJointAngle[i].z);
         }
- fprintf(stderr," 0 } ;\n");
+ fprintf(stderr," 0 } ;\n\n");
 
 return 0;
 }
