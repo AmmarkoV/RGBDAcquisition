@@ -15,15 +15,21 @@ int frames =0;
 
 
 
-static int printout3DSkeleton(const char * filename ,struct skeletonHuman *  sk)
+static int printout3DSkeleton(const char * filename ,struct skeletonHuman *  sk,int frameNum)
 {
+
   unsigned int i=0;
 
   fprintf(stderr,YELLOW "printout3DSkeleton(%s)\n" NORMAL,filename);
 
-  FILE * fp = fopen(filename,"w");
+  FILE * fp=0;
+
+  if (frameNum==0)  { fp = fopen(filename,"w"); } else
+                    { fp = fopen(filename,"a"); }
   if (fp!=0)
   {
+   if (frameNum==0)
+   {
    fprintf(fp,"#This is a simple trajectory file..! \n");
    fprintf(fp,"#You can render it with this tool :\n");
    fprintf(fp,"#https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer\n");
@@ -46,19 +52,21 @@ static int printout3DSkeleton(const char * filename ,struct skeletonHuman *  sk)
    {
     fprintf(fp,"OBJECT(%s,joint,255,255,0,0 ,0, 0.5,0.5,0.5 , )\n",jointNames[i]);
    }
+   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+   {
+    fprintf(fp,"CONNECTOR(%s,%s,0,0,255,0,3.0)\n",jointNames[i],jointNames[humanSkeletonJointsRelationMap[i]]);
+   }
 
    fprintf(fp,"\n\n\nINTERPOLATE_TIME(1)\n\n\n");
-   fprintf(fp,"POS(camera,0,   -1.0,1.0, 2.0 , 0.0, 0.0,0.0,0.0 )\n");
+   }
+
+   fprintf(fp,"POS(camera,%u,   -1.0,1.0, 2.0 , 0.0, 0.0,0.0,0.0 )\n",frameNum*100);
 
    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
    {
-     fprintf(fp,"POS(%s,0,   %0.2f , %0.2f , %0.2f  , 00.0,0.0,0.0,0.0)\n",jointNames[i],sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
+     fprintf(fp,"POS(%s,%u,   %0.2f , %0.2f , %0.2f  , 00.0,0.0,0.0,0.0)\n",frameNum*100,jointNames[i],sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
    }
-   fprintf(fp,"POS(camera,30000,   0.0,1.0, 2.0 , 0.0, 0.0,0.0,0.0 )\n");
-   fprintf(fp,"POS(camera,60000,   1.0,1.0,  2.0 ,  0.0, 0.0,0.0,0.0 )\n");
-
-
-  fprintf(fp,"----------------------- \n");
+  fprintf(fp,"----------------------- \n\n\n");
   fclose(fp);
   }
  return 0;
@@ -94,8 +102,8 @@ int doSkeletonConversions( struct skeletonHuman * skel )
 
    if (!skeleton3DEmpty(skel))
    {
-   snprintf(filenameBuf,512,"skel3D%u.scene",frames);
-   printout3DSkeleton(filenameBuf,skel);
+   snprintf(filenameBuf,512,"skel3D.scene",frames);
+   printout3DSkeleton(filenameBuf,skel,frames);
    } else { fprintf(stderr,RED "Won't print out 3D scenes with skeletons for empty 3D skeleton info \n" NORMAL );}
 
 

@@ -9,6 +9,11 @@ IF( COMPILE_FOR_PERFORMANCE )
  set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
 ENDIF( COMPILE_FOR_PERFORMANCE )
       
+
+
+OPTION (ENABLE_JPG ON)
+OPTION (ENABLE_PNG ON)
+
 #Add the codecs needed for the correct building
 set(CODECS_DIRECTORY "../../tools/Codecs")
 add_subdirectory ( ${CODECS_DIRECTORY} RGBDAcquisition/Codecs )
