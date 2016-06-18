@@ -24,7 +24,6 @@ static float defaultJoints2D[] = { 293.0, 37.0, 293.0, 100.0, 292.0, 170.0, 235.
 //static float defaultJoints[] = { -198.40 , -271.72 , 1550.18 , -189.25 , -26.24 , 1621.38 , -192.95 , 152.67 , 1532.26 , -355.50 , -19.27 , 1638.30 , -23.20 , -33.19 , 1604.48 , -481.75 , 233.90 , 1551.29 , 148.30 , 197.92 , 1594.06 , -607.57 , 450.71 , 1439.28 , 310.77 , 401.31 , 1524.37 , -287.40 , 337.91 , 1459.85 , -106.44 , 325.15 , 1426.22 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -196.92 , 331.53 , 1443.04  } ;
 static float defaultJoints[] = { -231.97 , -265.90 , 1530.93 , -237.85 , -17.71 , 1590.09 , -235.94 , 167.26 , 1514.61 , -405.16 , -15.40 , 1578.78 , -71.55 , -20.01 , 1601.34 , -536.89 , 235.82 , 1502.25 , 103.58 , 204.24 , 1604.69 , -631.91 , 416.67 , 1361.09 , 260.63 , 344.62 , 1560.85 , -326.21 , 351.33 , 1434.62 , -141.93 , 353.07 , 1443.45 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -234.07 , 352.20 , 1439.03 ,  0 } ;
 
-#define ANGLE_CALCULATION_SHIFT 0
 static float defaultAngleOffset[] = { -0.00 , -0.00 , -0.00 , -180.00 , -179.99 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -179.98 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -180.00 , -180.00 , -180.00 ,  0 } ;
 static float defaultAngleDirection[] = { 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 , 1.00 , 1.0 , 1.0 , 1.0 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 ,  0 } ;
 
@@ -256,6 +255,21 @@ struct point3D
 
 
 
+
+enum Point2FlatArray
+{
+    p_X = 0 ,
+    p_Y ,
+    p_Z
+};
+
+
+static const char * const Point2FlatArrayNames[] =
+{
+    "X",
+    "Y",
+    "Z"
+};
 
 struct skeletonNAO
 {
@@ -596,24 +610,50 @@ static double getAngle2PointsDeg(double p1_x, double p1_y, double p2_x, double p
 
 static double getAngleABCRelative(
                                    unsigned int srcPoint , unsigned int dstPoint ,
-                                   double* srcPointA , double* srcPointB ,
-                                   double* dstPointA , double* dstPointB ,
-                                   double* srcDefaultPointA ,  double* srcDefaultPointB ,
-                                   double* dstDefaultPointA ,  double* dstDefaultPointB  )
+                                   double* srcObservedPointFirstDimension , double* srcObservedPointSecondDimension ,
+                                   double* dstObservedPointFirstDimension , double* dstObservedPointSecondDimension ,
+                                   double* srcDefaultPointFirstDimension ,  double* srcDefaultPointSecondDimension ,
+                                   double* dstDefaultPointFirstDimension ,  double* dstDefaultPointSecondDimension  ,
+                                   unsigned int FirstDimensionConvention,
+                                   unsigned int SecondDimensionConvention
+                                    )
 {
     double relativeSrc[2] = { 0 , 0 };
-    double relativeDst[2] = { ANGLE_CALCULATION_SHIFT + *dstPointA - * srcPointA, ANGLE_CALCULATION_SHIFT + *dstPointB - * srcPointB };
-    double relativeDefaultDst[2] = { ANGLE_CALCULATION_SHIFT +  *dstDefaultPointA - * srcDefaultPointA , ANGLE_CALCULATION_SHIFT + *dstDefaultPointB - * srcDefaultPointB };
+    double relativeDst[2] = {  *dstObservedPointFirstDimension - * srcObservedPointFirstDimension,  *dstObservedPointSecondDimension - * srcObservedPointSecondDimension };
+    double relativeDefaultDst[2] = { *dstDefaultPointFirstDimension - * srcDefaultPointFirstDimension ,  *dstDefaultPointSecondDimension - * srcDefaultPointSecondDimension };
 
     double result;
 
     //result = get2DAngleABC(relativeSrc,relativeDst,relativeDefaultDst);
     result = getAngle2PointsDeg(relativeDst[0],relativeDst[1],relativeDefaultDst[0],relativeDefaultDst[1]) ;
 
+  if (result>100)
+  {
+    fprintf(stderr,"getAngleABCRelative%s%s( Parent=%s / Child=%s )\n",Point2FlatArrayNames[FirstDimensionConvention],Point2FlatArrayNames[SecondDimensionConvention],jointNames[srcPoint],jointNames[dstPoint]);
 
-    fprintf(stderr,"getAngleABCRelative( Parent=%s / Child=%s ) A(%0.2f,%0.2f) B(%0.2f,%0.2f) C(%0.2f,%0.2f) ) = %0.2f \n",
+    fprintf(stderr,"%s Observed (%0.2f,%0.2f) - %s Observed (%0.2f,%0.2f) \n",
             jointNames[srcPoint],
+            *srcObservedPointFirstDimension,
+            *srcObservedPointSecondDimension,
+
             jointNames[dstPoint],
+            Point2FlatArrayNames[SecondDimensionConvention],
+            *dstObservedPointFirstDimension,
+            *dstObservedPointSecondDimension
+           );
+
+    fprintf(stderr,"%s Default (%0.2f,%0.2f) - %s Default (%0.2f,%0.2f) \n",
+            jointNames[srcPoint],
+            *srcDefaultPointFirstDimension,
+            *srcDefaultPointSecondDimension,
+
+            jointNames[dstPoint],
+            *dstDefaultPointFirstDimension,
+            *dstDefaultPointSecondDimension
+           );
+
+
+    fprintf(stderr,"A(%0.2f,%0.2f) B(%0.2f,%0.2f) C(%0.2f,%0.2f) ) = %0.2f \n",
             relativeSrc[0],
             relativeSrc[1],
             relativeDst[0],
@@ -623,17 +663,10 @@ static double getAngleABCRelative(
             result);
 
 
+  }
+
     return result;
 }
-
-
-enum Point2FlatArray
-{
-    p_X = 0 ,
-    p_Y ,
-    p_Z
-};
-
 
 static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJoints)
 {
@@ -653,7 +686,13 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
                  (!skeletonEmpty3DJoint(sk,dst) )
            )
         {
-            //Z and Y gives X
+
+            //We have just observed a skeleton pose , stored at sk->joint and we want to compare it to the defJoints pose
+            //So we actually have two points the parent (src) and the child (dst) and we want to calculate the angle there
+            //in order to do that
+            //We name A , B  the two vectors and we work on a plane every time so
+
+            //Z=A and Y=B gives X rotation
             srcDA = (double) sk->joint[src].z;
             srcDB = (double) sk->joint[src].y;
             dstDA = (double) sk->joint[dst].z;
@@ -662,7 +701,7 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             srcDefDB = (double) defaultJoints[src*3+p_Y];
             dstDefDA = (double) defaultJoints[dst*3+p_Z];
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
-            sk->relativeJointAngle[i].x=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
+            sk->relativeJointAngle[i].x=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB , p_Z , p_Y);
             //sk->relativeJointAngle[i].x+=defaultAngleOffset[i*3+0];
             //sk->relativeJointAngle[i].x=sk->relativeJointAngle[i].x*defaultAngleDirection[i*3+0];
 
@@ -675,7 +714,7 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             srcDefDB = (double) defaultJoints[src*3+p_X];
             dstDefDA = (double) defaultJoints[dst*3+p_Z];
             dstDefDB = (double) defaultJoints[dst*3+p_X];
-            sk->relativeJointAngle[i].y=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
+            sk->relativeJointAngle[i].y=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB , p_Z , p_X);
             //sk->relativeJointAngle[i].y+=defaultAngleOffset[i*3+1];
             //sk->relativeJointAngle[i].y=sk->relativeJointAngle[i].y*defaultAngleDirection[i*3+1];
 
@@ -688,7 +727,7 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             srcDefDB = (double) defaultJoints[src*3+p_Y];
             dstDefDA = (double) defaultJoints[dst*3+p_X];
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
-            sk->relativeJointAngle[i].z=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB);
+            sk->relativeJointAngle[i].z=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB , p_X , p_Y);
             //sk->relativeJointAngle[i].z+=defaultAngleOffset[i*3+2];
             //sk->relativeJointAngle[i].z=sk->relativeJointAngle[i].z*defaultAngleDirection[i*3+2];
 
@@ -786,7 +825,7 @@ static int printSkeletonHuman(struct skeletonHuman * sk)
 
  fprintf(stderr," \n");
  fprintf(stderr," __________________________________________________________\n");
- fprintf(stderr,"|SKELETON POSITIONAL DATA DIFF WITH NEUTRAL POSE- - - - - -|\n");
+ fprintf(stderr,"|SKELETON POSITIONAL DATA DEFAULTS- - - - - - - - - - - - -|\n");
  fprintf(stderr,"|   name            x               y                z     |\n");
  fprintf(stderr,"|__________________________________________________________|\n");
  for (i=0; i<HUMAN_SKELETON_PARTS; i++)
@@ -794,7 +833,28 @@ static int printSkeletonHuman(struct skeletonHuman * sk)
           fprintf(stderr,"|");
           if (sk->active[i]) { fprintf(stderr,GREEN " "); } else
                              { fprintf(stderr,RED " ");   }
-          fprintf(stderr," %s    %8.2f        %8.2f         %8.2f  ",jointNamesFormatted[i],sk->joint[i].x-defaultJoints[i*3+0],sk->joint[i].y-defaultJoints[i*3+1],sk->joint[i].z-defaultJoints[i*3+2]);
+          fprintf(stderr," %s    %8.2f        %8.2f         %8.2f  ",jointNamesFormatted[i],defaultJoints[i*3+0],defaultJoints[i*3+1],defaultJoints[i*3+2]);
+          fprintf(stderr,NORMAL"|\n" );
+        }
+ fprintf(stderr,"|__________________________________________________________|\n\n\n");
+
+
+ fprintf(stderr," \n");
+ fprintf(stderr," __________________________________________________________\n");
+ fprintf(stderr,"|SKELETON POSITIONAL DATA DIFF WITH NEUTRAL POSE- - - - - -|\n");
+ fprintf(stderr,"|   name            x               y                z     |\n");
+ fprintf(stderr,"|__________________________________________________________|\n");
+ for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+        {
+          fprintf(stderr,"|");
+          float diffX = sk->joint[i].x-defaultJoints[i*3+0];
+          float diffY = sk->joint[i].y-defaultJoints[i*3+1];
+          float diffZ = sk->joint[i].z-defaultJoints[i*3+2];
+          if ((fabs(diffX)<5) && (fabs(diffY)<5) && (fabs(diffZ)<5) ) { fprintf(stderr,GREEN " "); } else
+                                                                      { fprintf(stderr,RED " ");   }
+
+
+          fprintf(stderr," %s    %8.2f        %8.2f         %8.2f  ",jointNamesFormatted[i],diffX,diffY,diffZ);
           fprintf(stderr,NORMAL"|\n" );
         }
  fprintf(stderr,"|__________________________________________________________|\n\n\n");
