@@ -151,10 +151,6 @@ void readNodeHeirarchyNEW(const aiMesh * mesh , const aiNode* pNode,  struct bon
 
 
 
-
-
-
-
 struct boneItem
 {
   aiMatrix4x4 finalTransform;
@@ -325,8 +321,7 @@ void transformNodeWithAllParentTransforms(  aiMatrix4x4 *result, struct aiNode *
 
 void populateInternalRigState(struct aiScene *scene , int meshNumber, struct boneState * bones )
 {
-  fprintf(stderr,"Populating internal rig state \n" );
-
+  //fprintf(stderr,"Populating internal rig state \n" );
   unsigned int i=0 , k=0;
   struct aiMesh * mesh = scene->mMeshes[meshNumber];
 
@@ -338,7 +333,7 @@ void populateInternalRigState(struct aiScene *scene , int meshNumber, struct bon
 	   struct aiNode *node = findNode(scene->mRootNode, bone->mName.data);
        snprintf(bones->bone[k].name,128,"%s", bone->mName.data );
 
-       fprintf(stderr,"Bone %u is %s \n" , k ,bones->bone[k].name );
+       //fprintf(stderr,"Bone %u is %s \n" , k ,bones->bone[k].name );
 
        bones->bone[k].nodeTransform = node->mTransformation;
        bones->bone[k].nodeTransformInitial = node->mTransformation;
@@ -360,18 +355,18 @@ void populateInternalRigState(struct aiScene *scene , int meshNumber, struct bon
                      {
                        bones->bone[k].parentlessNode=0;
                        bones->bone[k].parentItemID=i;
-                       fprintf(stderr,"Parent of %s is %s which has a boneID of %u \n",node->mName.data ,searchBone->mName.data,i);
+                       //fprintf(stderr,"Parent of %s is %s which has a boneID of %u \n",node->mName.data ,searchBone->mName.data,i);
                        foundParent =1;
                      }
                    }
 
              if (!foundParent)
              {
-               fprintf(stderr,"Could not find parent , parent is marked as root..\n");
+               //fprintf(stderr,"Could not find parent , parent is marked as root..\n");
              }
            } else
            {
-             fprintf(stderr,"Node %s has no parent , parent is marked as root..\n",node->mName.data);
+             //fprintf(stderr,"Node %s has no parent , parent is marked as root..\n",node->mName.data);
            }
     }
 }
@@ -454,6 +449,7 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
 
 void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
 {
+
     //The goal here is to transform the mesh stored int indexed using a skeleton stored in sk
     struct aiMesh * mesh = scene->mMeshes[meshNumber];
     fprintf(stderr,"  %d bones\n",mesh->mNumBones);

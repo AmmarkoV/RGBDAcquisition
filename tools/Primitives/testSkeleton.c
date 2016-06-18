@@ -11,6 +11,32 @@ int frames =0;
 
 
 
+void broadcastHTTPSkeleton(struct skeletonHuman * skeletonFound,const char * whereto)
+{
+  char cmd[4096]={0};
+  char part[1024]={0};
+  unsigned int i=0;
+
+  for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+  {
+       snprintf(part,1024,"%0.2f_%0.2f_%0.2f_",
+                skeletonFound->joint[i].x ,
+                skeletonFound->joint[i].y ,
+                skeletonFound->joint[i].z );
+       strcat(cmd,part);
+  }
+
+  fprintf(stderr,"Will execute : \n");
+  fprintf(stderr,"%s%s \n",whereto,cmd);
+
+  char runStrCmd[4096]={0};
+  snprintf(runStrCmd,4096,"wget -qO- \"%s%s\" &> /dev/null &",whereto,cmd);
+  i=system(runStrCmd);
+
+  if (i==0) { fprintf(stderr,"Success\n"); } else
+            { fprintf(stderr,"Error\n");   }
+}
+
 
 
 
@@ -20,7 +46,7 @@ static int printout3DSkeleton(const char * filename ,struct skeletonHuman *  sk,
 
   unsigned int i=0;
 
-  fprintf(stderr,YELLOW "printout3DSkeleton(%s)\n" NORMAL,filename);
+  fprintf(stderr,YELLOW "printout3DSkeleton(%s,%u)\n" NORMAL,filename,frameNum);
 
   FILE * fp=0;
 
@@ -64,7 +90,7 @@ static int printout3DSkeleton(const char * filename ,struct skeletonHuman *  sk,
 
    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
    {
-     fprintf(fp,"POS(%s,%u,   %0.2f , %0.2f , %0.2f  , 00.0,0.0,0.0,0.0)\n",frameNum*100,jointNames[i],sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
+     fprintf(fp,"POS(%s,%u,   %0.2f , %0.2f , %0.2f  , 00.0,0.0,0.0,0.0)\n",jointNames[i],frameNum*100,sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
    }
   fprintf(fp,"----------------------- \n\n\n");
   fclose(fp);
@@ -107,7 +133,10 @@ int doSkeletonConversions( struct skeletonHuman * skel )
    } else { fprintf(stderr,RED "Won't print out 3D scenes with skeletons for empty 3D skeleton info \n" NORMAL );}
 
 
-
+   if (!skeleton3DEmpty(skel))
+   {
+    broadcastHTTPSkeleton(skel,"http://127.0.0.1:8080/sk.html?sk=");
+   }else { fprintf(stderr,RED "Won't broadcast 3D scenes for empty 3D skeleton info\n" NORMAL );}
 
    struct naoCommand nao={0};
    struct skeletonHuman sk={0};
@@ -117,6 +146,7 @@ int doSkeletonConversions( struct skeletonHuman * skel )
    //printoutNAOCommand( filenameBuf , &nao );
   }
 
+   usleep(1000*1000);
    cleanSkeleton(skel);
    ++frames;
   return 1;
