@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "skeleton.h"
-#include "nao_geometry.h"
+//#include "nao_geometry.h"
 
 float visualizationScale = 3.0;
 int frames =0;
+int delay=20;
 
-
+unsigned int broadCastOnly=0;
 
 
 void broadcastHTTPSkeleton(struct skeletonHuman * skeletonFound,const char * whereto)
@@ -41,27 +43,23 @@ void broadcastHTTPSkeleton(struct skeletonHuman * skeletonFound,const char * whe
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 int doSkeletonConversions( struct skeletonHuman * skel )
 {
-  //if ( !skeletonEmpty(skel))
-  {
-   updateSkeletonAngles(skel);
-    printSkeletonHuman(skel);
+   char filenameBuf[512]={0};
 
+   updateSkeletonAngles(skel);
+   printSkeletonHuman(skel);
+
+
+
+   if (
+        (frames==0) || // In order to refresh the visualization frame 0 is needed
+        (broadCastOnly==0) ||
+        (broadCastOnly==frames)
+       )
+   {
    //updateSkeletonAnglesNAO(skel);
    fprintf(stderr,"doSkeletonConversions #%u ",frames);
-   char filenameBuf[512]={0};
    snprintf(filenameBuf,512,"skel2D%u.svg",frames);
    if (!skeleton2DEmpty(skel))
    {
@@ -72,7 +70,7 @@ int doSkeletonConversions( struct skeletonHuman * skel )
 
    if (!skeleton3DEmpty(skel))
    {
-   snprintf(filenameBuf,512,"skel3D.scene",frames);
+   snprintf(filenameBuf,512,"skel3D.scene");
    visualize3DSkeletonHuman(filenameBuf,skel,frames);
    } else { fprintf(stderr,RED "Won't print out 3D scenes with skeletons for empty 3D skeleton info \n" NORMAL );}
 
@@ -81,16 +79,19 @@ int doSkeletonConversions( struct skeletonHuman * skel )
    {
     broadcastHTTPSkeleton(skel,"http://127.0.0.1:8080/sk.html?sk=");
    }else { fprintf(stderr,RED "Won't broadcast 3D scenes for empty 3D skeleton info\n" NORMAL );}
+   }
 
-   struct naoCommand nao={0};
+
+
+//   struct naoCommand nao={0};
    struct skeletonHuman sk={0};
 
    //setNAOMotorsFromHumanSkeleton( &nao , &sk );
    snprintf(filenameBuf,512,"skel%u.skel",frames);
    //printoutNAOCommand( filenameBuf , &nao );
-  }
 
-   usleep(20*1000);
+
+   usleep(delay*1000);
    cleanSkeleton(skel);
    ++frames;
   return 1;
@@ -276,6 +277,22 @@ int main(int argc, char *argv[])
     if (argc < 2 ) { fprintf(stderr,"Please give filename of joint list \n"); return 1; }
 
     printf("Running Converter on %s !\n",argv[1]);
+
+
+      unsigned int i=0;
+  for (i=0; i<argc; i++)
+  {
+    if (strcmp(argv[i],"-broadcastOnly")==0) {
+                                              broadCastOnly=atoi(argv[i+1]);
+                                              fprintf(stderr,"Will Broadcast only skeleton %u\n",broadCastOnly);
+                                             } else
+    if (strcmp(argv[i],"-delay")==0) {
+                                              delay=atoi(argv[i+1]);
+                                              fprintf(stderr,"Delay set to %u\n",delay);
+                                             }
+
+  }
+
 
     struct skeletonHuman defaultPose={0};
     fillWithDefaultSkeleton(&defaultPose);

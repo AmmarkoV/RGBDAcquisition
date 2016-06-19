@@ -75,7 +75,7 @@ unsigned int drawHardcodedModel(unsigned int modelType);
 * @retval 1=Success/0=Failure
 */
 int drawConnector(float * posA,float * posB,float * scale ,
-                  unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha );
+                  float * R , float * G , float * B , float * Alpha );
 
 
 

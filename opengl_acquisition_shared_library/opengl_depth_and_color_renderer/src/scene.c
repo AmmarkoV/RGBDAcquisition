@@ -797,10 +797,10 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
         drawConnector(pos1,
                       pos2,
                       &scale ,
-                      scene->connector[i].R ,
-                      scene->connector[i].G ,
-                      scene->connector[i].B ,
-                      scene->connector[i].Transparency );
+                      &scene->connector[i].R ,
+                      &scene->connector[i].G ,
+                      &scene->connector[i].B ,
+                      &scene->connector[i].Transparency );
        } else
        {
          fprintf(stderr,YELLOW "Could not determine position of objects for connector %u\n" NORMAL,i);

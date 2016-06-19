@@ -574,11 +574,11 @@ int drawConnector(
                   float * posA,
                   float * posB,
                   float * scale ,
-                  unsigned char R , unsigned char G , unsigned char B , unsigned char Alpha )
+                  float * R , float * G , float * B , float * Alpha )
 {
  glPushMatrix();
     glLineWidth(*scale);
-    glColor3f(R,G,B); //Alpha not used ?
+    glColor3f(*R,*G,*B); //Alpha not used ?
      glBegin(GL_LINES);
        glVertex3f(posA[0],posA[1],posA[2]);
        glVertex3f(posB[0],posB[1],posB[2]);

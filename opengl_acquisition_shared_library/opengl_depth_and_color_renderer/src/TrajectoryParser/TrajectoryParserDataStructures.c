@@ -412,6 +412,9 @@ int addConnectorToVirtualStream(
    stream->connector[pos].R = (float) R/255;
    stream->connector[pos].G = (float) G/255;
    stream->connector[pos].B = (float) B/255;
+
+   //fprintf(stderr,"addConnectorToVirtualStream (%0.2f , %0.2f , %0.2f ) \n",stream->connector[pos].R , stream->connector[pos].G,  stream->connector[pos].B);
+
    stream->connector[pos].Transparency = (float) Alpha/100;
    stream->connector[pos].scale = scale;
 

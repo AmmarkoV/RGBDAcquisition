@@ -2,6 +2,8 @@
 #define SKELETON_H_INCLUDED
 
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -1045,13 +1047,27 @@ static int visualize3DSkeletonHuman(const char * filename ,struct skeletonHuman 
    fprintf(fp,"MODELVIEW_MATRIX(1,0,0,0, 0,1,0,0 , 0,0,1,0 ,0,0,0,1)\n");
    fprintf(fp,"#We are now on MBV WORLD !!\n");
    fprintf(fp,"#--------------------------------------------------------------------------\n\n");
+
+   fprintf(fp,"\n#Default Joint Configuration\n");
+   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+   {
+    fprintf(fp,"OBJECT(def%s,joint,255,0,123,0 ,0, 0.3,0.3,0.3 , )\n",jointNames[i]);
+    fprintf(fp,"POS(def%s, 0 ,   %0.2f , %0.2f , %0.2f  , 00.0,0.0,0.0,0.0)\n",jointNames[i],defaultJoints[i*3+0],defaultJoints[i*3+1],defaultJoints[i*3+2]);
+   }
+   fprintf(fp,"\n\n");
+
+   fprintf(fp,"\n#Current Joints\n");
    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
    {
     fprintf(fp,"OBJECT(%s,joint,255,255,0,0 ,0, 0.5,0.5,0.5 , )\n",jointNames[i]);
    }
+
+   fprintf(fp,"\n\n");
    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
    {
+    fprintf(fp,"CONNECTOR(def%s,%s,0,200,100,0,2.0)\n",jointNames[i],jointNames[i]);
     fprintf(fp,"CONNECTOR(%s,%s,0,0,255,0,3.0)\n",jointNames[i],jointNames[humanSkeletonJointsParentRelationMap[i]]);
+    fprintf(fp,"CONNECTOR(def%s,def%s,255,0,123,0,3.0)\n",jointNames[i],jointNames[humanSkeletonJointsParentRelationMap[i]]);
    }
 
    fprintf(fp,"\n\n");
