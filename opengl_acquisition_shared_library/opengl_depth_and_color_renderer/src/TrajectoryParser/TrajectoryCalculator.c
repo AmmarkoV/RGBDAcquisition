@@ -727,14 +727,27 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
        fillPosWithNull(/*stream,ObjID,*/pos,scaleX,scaleY,scaleZ);
        return 1;
    } else
-   if  ( (stream->ignoreTime) || (stream->object[ObjID].MAX_numberOfFrames == 1 ) )
+   if  ( (stream->ignoreTime) || (stream->object[ObjID].MAX_numberOfFrames == 1 ) || ((stream->alwaysShowLastFrame)) )
    {
 
     //We might want to ignore time and just return frame after frame on each call!
     //Also if we only got one frame for the object there is no point in trying to interpolate time etc.. so just handle things here..
+
+
     if ( stream->object[ObjID].lastFrame +1 >= stream->object[ObjID].MAX_numberOfFrames ) { stream->object[ObjID].lastFrame  = 0; }
     FrameIDToReturn = stream->object[ObjID].lastFrame;
     ++stream->object[ObjID].lastFrame;
+
+
+    if (stream->alwaysShowLastFrame)
+    {
+      if (stream->object[ObjID].numberOfFrames>0)
+      {
+       FrameIDToReturn = stream->object[ObjID].numberOfFrames-1;
+       //fprintf(stderr,"Always showing last frame ( %u ) , F7 to change\n",FrameIDToReturn);
+      }
+    }
+
 
     //fprintf(stderr,"Simple Getter ObjID %u Frame %u\n",ObjID,FrameIDToReturn);
 

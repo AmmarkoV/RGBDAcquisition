@@ -41,62 +41,6 @@ void broadcastHTTPSkeleton(struct skeletonHuman * skeletonFound,const char * whe
 
 
 
-static int printout3DSkeleton(const char * filename ,struct skeletonHuman *  sk,int frameNum)
-{
-
-  unsigned int i=0;
-
-  fprintf(stderr,YELLOW "printout3DSkeleton(%s,%u)\n" NORMAL,filename,frameNum);
-
-  FILE * fp=0;
-
-  if (frameNum==0)  { fp = fopen(filename,"w"); } else
-                    { fp = fopen(filename,"a"); }
-  if (fp!=0)
-  {
-   if (frameNum==0)
-   {
-   fprintf(fp,"#This is a simple trajectory file..! \n");
-   fprintf(fp,"#You can render it with this tool :\n");
-   fprintf(fp,"#https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer\n");
-
-   fprintf(fp,"AUTOREFRESH(1500)\n");
-   fprintf(fp,"BACKGROUND(20,20,20)\n");
-   fprintf(fp,"MOVE_VIEW(1)\n");
-   fprintf(fp,"OBJECTTYPE(joint,sphere)\n\n");
-
-
-   fprintf(fp,"Bring our world to the MBV coordinate system\n");
-   fprintf(fp,"SCALE_WORLD(-0.01,-0.01,0.01)\n");
-   fprintf(fp,"MAP_ROTATIONS(-1,-1,1,zxy)\n");
-   fprintf(fp,"OFFSET_ROTATIONS(0,0,0)\n");
-   fprintf(fp,"EMULATE_PROJECTION_MATRIX(519.460494 , 0.0 , 324.420168 , 0.0 , 519.118667 , 229.823479 , 0 , 1)\n");
-   fprintf(fp,"MODELVIEW_MATRIX(1,0,0,0, 0,1,0,0 , 0,0,1,0 ,0,0,0,1)\n");
-   fprintf(fp,"We are now on MBV WORLD !!\n");
-   fprintf(fp,"--------------------------------------------------------------------------\n\n");
-   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
-   {
-    fprintf(fp,"OBJECT(%s,joint,255,255,0,0 ,0, 0.5,0.5,0.5 , )\n",jointNames[i]);
-   }
-   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
-   {
-    fprintf(fp,"CONNECTOR(%s,%s,0,0,255,0,3.0)\n",jointNames[i],jointNames[humanSkeletonJointsRelationMap[i]]);
-   }
-
-   fprintf(fp,"\n\n\nINTERPOLATE_TIME(1)\n\n\n");
-   }
-
-   fprintf(fp,"POS(camera,%u,   -1.0,1.0, 2.0 , 0.0, 0.0,0.0,0.0 )\n",frameNum*100);
-
-   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
-   {
-     fprintf(fp,"POS(%s,%u,   %0.2f , %0.2f , %0.2f  , 00.0,0.0,0.0,0.0)\n",jointNames[i],frameNum*100,sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
-   }
-  fprintf(fp,"----------------------- \n\n\n");
-  fclose(fp);
-  }
- return 0;
-}
 
 
 
@@ -121,7 +65,7 @@ int doSkeletonConversions( struct skeletonHuman * skel )
    snprintf(filenameBuf,512,"skel2D%u.svg",frames);
    if (!skeleton2DEmpty(skel))
    {
-    visualizeSkeletonHuman(filenameBuf,  skel, visualizationScale);
+    visualize2DSkeletonHuman(filenameBuf,  skel, visualizationScale);
    } else { fprintf(stderr,RED "Won't print out 2D scenes with skeletons for empty 2D skeleton info \n" NORMAL );}
 
 
@@ -129,7 +73,7 @@ int doSkeletonConversions( struct skeletonHuman * skel )
    if (!skeleton3DEmpty(skel))
    {
    snprintf(filenameBuf,512,"skel3D.scene",frames);
-   printout3DSkeleton(filenameBuf,skel,frames);
+   visualize3DSkeletonHuman(filenameBuf,skel,frames);
    } else { fprintf(stderr,RED "Won't print out 3D scenes with skeletons for empty 3D skeleton info \n" NORMAL );}
 
 
@@ -335,11 +279,11 @@ int main(int argc, char *argv[])
 
     struct skeletonHuman defaultPose={0};
     fillWithDefaultSkeleton(&defaultPose);
-    visualizeSkeletonHuman("defaultPose.svg", &defaultPose , visualizationScale );
+    visualize2DSkeletonHuman("defaultPose.svg", &defaultPose , visualizationScale );
 
     struct skeletonHuman defaultNAOPose={0};
     fillWithDefaultNAOSkeleton(&defaultNAOPose);
-    visualizeSkeletonHuman("defaultNAOPose.svg", &defaultNAOPose , visualizationScale );
+    visualize2DSkeletonHuman("defaultNAOPose.svg", &defaultNAOPose , visualizationScale );
 
     parseJointList(argv[1]);
     return 0;

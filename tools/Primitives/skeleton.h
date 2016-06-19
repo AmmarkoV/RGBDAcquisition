@@ -24,7 +24,8 @@ static float defaultJoints2D[] = { 293.0, 37.0, 293.0, 100.0, 292.0, 170.0, 235.
 //static float defaultJoints[] = { -198.40 , -271.72 , 1550.18 , -189.25 , -26.24 , 1621.38 , -192.95 , 152.67 , 1532.26 , -355.50 , -19.27 , 1638.30 , -23.20 , -33.19 , 1604.48 , -481.75 , 233.90 , 1551.29 , 148.30 , 197.92 , 1594.06 , -607.57 , 450.71 , 1439.28 , 310.77 , 401.31 , 1524.37 , -287.40 , 337.91 , 1459.85 , -106.44 , 325.15 , 1426.22 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -196.92 , 331.53 , 1443.04  } ;
 
 
-static float defaultJoints[] = { 95.22 , -206.78 , 894.68 , 100.28 , -7.70 , 1007.84 , 39.10 , 181.37 , 993.07 , -57.30 , -57.94 , 1033.44 , 257.52 , 42.43 , 982.30 , -244.55 , -159.58 , 973.53 , 337.66 , 244.03 , 956.93 , -358.99 , -311.49 , 930.33 , 219.46 , 361.54 , 888.95 , -108.66 , 343.77 , 996.15 , 64.31 , 397.03 , 960.33 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -22.18 , 370.40 , 978.24 ,  0 } ;
+//static float defaultJoints[] = { 95.22 , -206.78 , 894.68 , 100.28 , -7.70 , 1007.84 , 39.10 , 181.37 , 993.07 , -57.30 , -57.94 , 1033.44 , 257.52 , 42.43 , 982.30 , -244.55 , -159.58 , 973.53 , 337.66 , 244.03 , 956.93 , -358.99 , -311.49 , 930.33 , 219.46 , 361.54 , 888.95 , -108.66 , 343.77 , 996.15 , 64.31 , 397.03 , 960.33 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -22.18 , 370.40 , 978.24 ,  0 } ;
+static float defaultJoints[] = { -200.02 , -267.27 , 1554.63 , -197.00 , -20.79 , 1617.80 , -199.95 , 158.42 , 1529.32 , -363.91 , -19.62 , 1622.45 , -29.75 , -21.96 , 1613.14 , -484.64 , 224.27 , 1535.03 , 140.75 , 208.63 , 1609.01 , -606.35 , 452.19 , 1397.94 , 292.78 , 395.32 , 1556.93 , -295.08 , 338.17 , 1445.06 , -110.78 , 337.09 , 1436.65 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -202.93 , 337.63 , 1440.85 ,  0 } ;
 
 
 static float defaultAngleOffset[] = { -0.00 , -0.00 , -0.00 , -180.00 , -179.99 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -179.98 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -180.00 , -180.00 , -180.00 ,  0 } ;
@@ -181,7 +182,7 @@ enum humanSkeletonJoints
 };
 
 
-static const int humanSkeletonJointsRelationMap[] =
+static const int humanSkeletonJointsParentRelationMap[] =
 {
     // Parent                        Joint
     HUMAN_SKELETON_NECK,           //HUMAN_SKELETON_HEAD
@@ -201,6 +202,8 @@ static const int humanSkeletonJointsRelationMap[] =
     HUMAN_SKELETON_LEFT_KNEE,      //HUMAN_SKELETON_LEFT_FOOT
     HUMAN_SKELETON_TORSO,          //HUMAN_SKELETON_HIP
 };
+
+
 
 
 static const char * const humanSkeletonMirroredJointNames[] =
@@ -449,7 +452,7 @@ static int skeleton2DEmpty(struct skeletonHuman * sk)
 
 static int skeletonSameJoints(unsigned int j1 , unsigned int j2)
 {
-    if (humanSkeletonJointsRelationMap[j1]==j2)
+    if (humanSkeletonJointsParentRelationMap[j1]==j2)
     {
         return 1;
     }
@@ -706,14 +709,16 @@ static double getAngleABCRelative(
 
 static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJoints)
 {
+    unsigned int storeAt=0;
     unsigned int i=0;
     unsigned int src=0,dst=0;
 
     double srcDA,srcDB , dstDA,dstDB , srcDefDA,srcDefDB , dstDefDA,dstDefDB;
     for (i=0; i<HUMAN_SKELETON_PARTS; i++)
     {
-        src = humanSkeletonJointsRelationMap[i];
+        src = humanSkeletonJointsParentRelationMap[i];
         dst = i;
+        storeAt=src;
         sk->active[i]=0;
 
         if (
@@ -736,9 +741,9 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             srcDefDB = (double) defaultJoints[src*3+p_Y];
             dstDefDA = (double) defaultJoints[dst*3+p_Z];
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
-            sk->relativeJointAngle[i].x=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB , p_Z , p_Y);
-            //sk->relativeJointAngle[i].x+=defaultAngleOffset[i*3+0];
-            //sk->relativeJointAngle[i].x=sk->relativeJointAngle[i].x*defaultAngleDirection[i*3+0];
+            sk->relativeJointAngle[storeAt].x=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB , p_Z , p_Y);
+            //sk->relativeJointAngle[storeAt].x+=defaultAngleOffset[i*3+0];
+            //sk->relativeJointAngle[storeAt].x=sk->relativeJointAngle[i].x*defaultAngleDirection[i*3+0];
 
             //Z and X gives Y
             srcDA = (double) sk->joint[src].z;
@@ -749,9 +754,9 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             srcDefDB = (double) defaultJoints[src*3+p_X];
             dstDefDA = (double) defaultJoints[dst*3+p_Z];
             dstDefDB = (double) defaultJoints[dst*3+p_X];
-            sk->relativeJointAngle[i].y=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB , p_Z , p_X);
-            //sk->relativeJointAngle[i].y+=defaultAngleOffset[i*3+1];
-            //sk->relativeJointAngle[i].y=sk->relativeJointAngle[i].y*defaultAngleDirection[i*3+1];
+            sk->relativeJointAngle[storeAt].y=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB , p_Z , p_X);
+            //sk->relativeJointAngle[storeAt].y+=defaultAngleOffset[i*3+1];
+            //sk->relativeJointAngle[storeAt].y=sk->relativeJointAngle[i].y*defaultAngleDirection[i*3+1];
 
             //X and Y gives Z
             srcDA = (double) sk->joint[src].x;
@@ -762,9 +767,9 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
             srcDefDB = (double) defaultJoints[src*3+p_Y];
             dstDefDA = (double) defaultJoints[dst*3+p_X];
             dstDefDB = (double) defaultJoints[dst*3+p_Y];
-            sk->relativeJointAngle[i].z=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB , p_X , p_Y);
-            //sk->relativeJointAngle[i].z+=defaultAngleOffset[i*3+2];
-            //sk->relativeJointAngle[i].z=sk->relativeJointAngle[i].z*defaultAngleDirection[i*3+2];
+            sk->relativeJointAngle[storeAt].z=getAngleABCRelative(src,dst, &srcDA,&srcDB,&dstDA,&dstDB,&srcDefDA,&srcDefDB,&dstDefDA,&dstDefDB , p_X , p_Y);
+            //sk->relativeJointAngle[storeAt].z+=defaultAngleOffset[i*3+2];
+            //sk->relativeJointAngle[storeAt].z=sk->relativeJointAngle[i].z*defaultAngleDirection[i*3+2];
 
             unsigned int NaNOutput=0;
             if (sk->relativeJointAngle[i].x!=sk->relativeJointAngle[i].x) { NaNOutput=1; /*sk->relativeJointAngle[i].x=0.0;*/ }
@@ -777,7 +782,10 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
         } else
 
         {
-           fprintf(stderr,"Joint %s->%s combo empty while updating angles \n" , jointNames[src] , jointNames[dst]);
+            sk->relativeJointAngle[storeAt].x=0;
+            sk->relativeJointAngle[storeAt].y=0;
+            sk->relativeJointAngle[storeAt].z=0;
+           //fprintf(stderr,"Joint %s->%s combo empty while updating angles \n" , jointNames[src] , jointNames[dst]);
         }
 
     }
@@ -932,7 +940,7 @@ static int printSkeletonHuman(struct skeletonHuman * sk)
 return 0;
 }
 
-static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman * sk , float scale)
+static int visualize2DSkeletonHuman(const char * filename , struct skeletonHuman * sk , float scale)
 {
     unsigned int origX=640,origY=480;
     float origXHalf=(float) origX/2,origYHalf=(float) origY/2;
@@ -956,7 +964,7 @@ static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman *
 
         for (i=0; i<HUMAN_SKELETON_PARTS; i++)
         {
-            src = humanSkeletonJointsRelationMap[i];
+            src = humanSkeletonJointsParentRelationMap[i];
             dst = i;
 
             if ( ( !skeletonSameJoints(src,dst) ) && (!skeletonEmpty2DJoint(sk,src)) && (!skeletonEmpty2DJoint(sk,dst)) )
@@ -1002,6 +1010,64 @@ static int visualizeSkeletonHuman(const char * filename , struct skeletonHuman *
 }
 
 
+static int visualize3DSkeletonHuman(const char * filename ,struct skeletonHuman *  sk,int frameNum)
+{
+
+  unsigned int i=0;
+
+  fprintf(stderr,YELLOW "printout3DSkeleton(%s,%u)\n" NORMAL,filename,frameNum);
+
+  FILE * fp=0;
+
+  if (frameNum==0)  { fp = fopen(filename,"w"); } else
+                    { fp = fopen(filename,"a"); }
+  if (fp!=0)
+  {
+   if (frameNum==0)
+   {
+   fprintf(fp,"#This is a simple trajectory file..! \n");
+   fprintf(fp,"#You can render it with this tool :\n");
+   fprintf(fp,"#https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer\n");
+
+   fprintf(fp,"AUTOREFRESH(1500)\n");
+   fprintf(fp,"BACKGROUND(20,20,20)\n");
+   fprintf(fp,"MOVE_VIEW(1)\n");
+   //fprintf(fp,"ALWAYS_SHOW_LAST_FRAME(1)\n");
+   fprintf(fp,"INTERPOLATE_TIME(1)\n");
+   fprintf(fp,"OBJECTTYPE(joint,sphere)\n\n");
+
+
+   fprintf(fp,"#Bring our world to the MBV coordinate system\n");
+   fprintf(fp,"SCALE_WORLD(-0.01,-0.01,0.01)\n");
+   fprintf(fp,"MAP_ROTATIONS(-1,-1,1,zxy)\n");
+   fprintf(fp,"OFFSET_ROTATIONS(0,0,0)\n");
+   fprintf(fp,"EMULATE_PROJECTION_MATRIX(519.460494 , 0.0 , 324.420168 , 0.0 , 519.118667 , 229.823479 , 0 , 1)\n");
+   fprintf(fp,"MODELVIEW_MATRIX(1,0,0,0, 0,1,0,0 , 0,0,1,0 ,0,0,0,1)\n");
+   fprintf(fp,"#We are now on MBV WORLD !!\n");
+   fprintf(fp,"#--------------------------------------------------------------------------\n\n");
+   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+   {
+    fprintf(fp,"OBJECT(%s,joint,255,255,0,0 ,0, 0.5,0.5,0.5 , )\n",jointNames[i]);
+   }
+   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+   {
+    fprintf(fp,"CONNECTOR(%s,%s,0,0,255,0,3.0)\n",jointNames[i],jointNames[humanSkeletonJointsParentRelationMap[i]]);
+   }
+
+   fprintf(fp,"\n\n");
+   }
+
+   fprintf(fp,"POS(camera,%u,   -1.0,1.0, 2.0 , 0.0, 0.0,0.0,0.0 )\n",frameNum*100);
+
+   for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+   {
+     fprintf(fp,"POS(%s,%u,   %0.2f , %0.2f , %0.2f  , 00.0,0.0,0.0,0.0)\n",jointNames[i],frameNum*100,sk->joint[i].x,sk->joint[i].y,sk->joint[i].z);
+   }
+  fprintf(fp,"#----------------------- \n\n\n");
+  fclose(fp);
+  }
+ return 0;
+}
 
 #ifdef __cplusplus
 }

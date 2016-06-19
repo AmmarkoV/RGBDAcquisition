@@ -376,7 +376,11 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
                                       { userKeyFOVEnabled=0; }
             return 1;
        break;
-
+       case -60 : //F7 show last frame
+            if (scene->alwaysShowLastFrame==0) { scene->alwaysShowLastFrame=1; } else
+                                               { scene->alwaysShowLastFrame=0; }
+            return 1;
+       break;
 
        case -57: //F10 Dump to file
                writeVirtualStream(scene,"dump.scene");
