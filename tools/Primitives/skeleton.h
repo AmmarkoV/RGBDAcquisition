@@ -1036,7 +1036,8 @@ static int visualize3DSkeletonHuman(const char * filename ,struct skeletonHuman 
    fprintf(fp,"MOVE_VIEW(1)\n");
    //fprintf(fp,"ALWAYS_SHOW_LAST_FRAME(1)\n");
    fprintf(fp,"INTERPOLATE_TIME(1)\n");
-   fprintf(fp,"OBJECTTYPE(joint,sphere)\n\n");
+   fprintf(fp,"OBJECTTYPE(joint,sphere)\n");
+   fprintf(fp,"OBJECTTYPE(axis3D,axis)\n\n");
 
 
    fprintf(fp,"#Bring our world to the MBV coordinate system\n");
@@ -1054,6 +1055,8 @@ static int visualize3DSkeletonHuman(const char * filename ,struct skeletonHuman 
     fprintf(fp,"OBJECT(def%s,joint,255,0,123,0 ,0, 0.3,0.3,0.3 , )\n",jointNames[i]);
     fprintf(fp,"POS(def%s, 0 ,   %0.2f , %0.2f , %0.2f  , 00.0,0.0,0.0,0.0)\n",jointNames[i],defaultJoints[i*3+0],defaultJoints[i*3+1],defaultJoints[i*3+2]);
    }
+   fprintf(fp,"OBJECT(ourAxis,axis3D,255,0,123,0 ,0,1.3,1.3,1.3 , )\n");
+    fprintf(fp,"POS(ourAxis, 0 ,  500 , -200 , 1000  , 00.0,0.0,0.0,0.0)\n");
    fprintf(fp,"\n\n");
 
    fprintf(fp,"\n#Current Joints\n");

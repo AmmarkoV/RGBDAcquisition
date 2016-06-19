@@ -336,9 +336,9 @@ int drawAxis(float x, float y , float z, float scale)
 {
  glLineWidth(6.0);
  glBegin(GL_LINES);
-  glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+scale,y,z);
-  glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+scale,z);
-  glColor3f(0.0,0.0,1.0); glVertex3f(x,y,z); glVertex3f(x,y,z+scale);
+  glColor3f(1.0,0.0,0.0); glVertex3f(x,y,z); glVertex3f(x+scale,y,z); //Red is X
+  glColor3f(0.0,1.0,0.0); glVertex3f(x,y,z); glVertex3f(x,y+scale,z); //Green is Y
+  glColor3f(0.0,0.0,1.0); glVertex3f(x,y,z); glVertex3f(x,y,z+scale); //Blue is Z
  glEnd();
  glLineWidth(1.0);
  return 1;
@@ -587,8 +587,21 @@ int drawConnector(
  return 1;
 }
 
+
+#define NORMAL   "\033[0m"
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define BLUE    "\033[34m"      /* Blue */
+
+
 int initializeHardcodedCallLists()
 {
+  fprintf(stderr,"Initializing Hardcoded Call lists\n");
+  fprintf(stderr,"Axis color convention is : \n");
+  fprintf(stderr,RED "RED   = X \n" NORMAL);
+  fprintf(stderr,GREEN "GREEN = Y \n" NORMAL);
+  fprintf(stderr,BLUE "BLUE  = Z \n" NORMAL);
+
   unsigned int i=0;
   for (i=0; i<TOTAL_POSSIBLE_MODEL_TYPES; i++)
   {
