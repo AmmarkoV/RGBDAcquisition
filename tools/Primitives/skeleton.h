@@ -22,7 +22,10 @@ extern "C"
 static float defaultJoints2D[] = { 293.0, 37.0, 293.0, 100.0, 292.0, 170.0, 235.0, 99.0, 349.0, 101.0, 172.0, 144.0, 421.0, 128.0, 113.0, 176.0, 480.0, 144.0, 263.0, 242.0, 319.0, 242.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 291.0, 242.0 };
 //static float defaultJoints[] = { -88.01861572265625, -655.5640258789062, 1717.0, -91.15103149414062, -464.8657531738281, 1764.83154296875, -93.02406311035156, -229.4916534423828, 1740.753173828125, -281.5615234375, -465.376708984375, 1757.0, 98.7568359375, -467.6025390625, 1785.0, -498.959716796875, -323.6999206542969, 1784.90966796875, 364.5001220703125, -404.3070373535156, 1923.611572265625, -673.8611450195312, -208.03506469726562, 1731.8184814453125, 562.7467651367188, -339.4126281738281, 1868.3612060546875, -185.67507934570312, 5.257970809936523, 1733.0770263671875, -4.1191253662109375, 6.506894111633301, 1700.2725830078125, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, 0.0, 0.0, -0.0, -94.89710235595703, 5.882432460784912, 1716.6748046875 } ;
 //static float defaultJoints[] = { -198.40 , -271.72 , 1550.18 , -189.25 , -26.24 , 1621.38 , -192.95 , 152.67 , 1532.26 , -355.50 , -19.27 , 1638.30 , -23.20 , -33.19 , 1604.48 , -481.75 , 233.90 , 1551.29 , 148.30 , 197.92 , 1594.06 , -607.57 , 450.71 , 1439.28 , 310.77 , 401.31 , 1524.37 , -287.40 , 337.91 , 1459.85 , -106.44 , 325.15 , 1426.22 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -196.92 , 331.53 , 1443.04  } ;
-static float defaultJoints[] = { -231.97 , -265.90 , 1530.93 , -237.85 , -17.71 , 1590.09 , -235.94 , 167.26 , 1514.61 , -405.16 , -15.40 , 1578.78 , -71.55 , -20.01 , 1601.34 , -536.89 , 235.82 , 1502.25 , 103.58 , 204.24 , 1604.69 , -631.91 , 416.67 , 1361.09 , 260.63 , 344.62 , 1560.85 , -326.21 , 351.33 , 1434.62 , -141.93 , 353.07 , 1443.45 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -234.07 , 352.20 , 1439.03 ,  0 } ;
+
+
+static float defaultJoints[] = { 95.22 , -206.78 , 894.68 , 100.28 , -7.70 , 1007.84 , 39.10 , 181.37 , 993.07 , -57.30 , -57.94 , 1033.44 , 257.52 , 42.43 , 982.30 , -244.55 , -159.58 , 973.53 , 337.66 , 244.03 , 956.93 , -358.99 , -311.49 , 930.33 , 219.46 , 361.54 , 888.95 , -108.66 , 343.77 , 996.15 , 64.31 , 397.03 , 960.33 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , -22.18 , 370.40 , 978.24 ,  0 } ;
+
 
 static float defaultAngleOffset[] = { -0.00 , -0.00 , -0.00 , -180.00 , -179.99 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -179.98 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -180.00 , -179.99 , -180.00 , -180.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -0.00 , -180.00 , -180.00 , -180.00 ,  0 } ;
 static float defaultAngleDirection[] = { 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 , 1.00 , 1.0 , 1.0 , 1.0 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 , 1.00 ,  0 } ;
@@ -356,12 +359,16 @@ static int skeletonEmpty3DJoint(struct skeletonHuman * sk , unsigned int j1)
 
 
     //Check NotSet
+    //fprintf(stderr,"%0.2f < %0.2f < %0.2f  X \n ",emptyBoundLow , sk->joint[j1].x , emptyBoundHigh);
+    //fprintf(stderr,"%0.2f < %0.2f < %0.2f  Y \n ",emptyBoundLow , sk->joint[j1].y , emptyBoundHigh);
+    //fprintf(stderr,"%0.2f < %0.2f < %0.2f  Z \n ",emptyBoundLow , sk->joint[j1].z , emptyBoundHigh);
     if (
-        (emptyBoundLow < sk->joint[j1].x < emptyBoundHigh) &&
-        (emptyBoundLow < sk->joint[j1].y < emptyBoundHigh) &&
-        (emptyBoundLow < sk->joint[j1].z < emptyBoundHigh)
+        ( (emptyBoundLow < sk->joint[j1].x ) && ( sk->joint[j1].x < emptyBoundHigh) ) &&
+        ( (emptyBoundLow < sk->joint[j1].y ) && ( sk->joint[j1].y < emptyBoundHigh) ) &&
+        ( (emptyBoundLow < sk->joint[j1].z ) && ( sk->joint[j1].z < emptyBoundHigh) )
     )
     {
+        //fprintf(stderr,"Joint %s is empty \n",jointNames[j1]);
         return 1;
     }
 
@@ -531,46 +538,16 @@ static void updateSkeletonBoundingBox(struct skeletonHuman * sk)
 
 
 
-
-static double get3DAngleABC( double* srcPoint, double* dstPoint, double* defaultPoint )
+static double get2DAngleABCS( double* srcPoint, double* dstObservedPoint, double* dstDefaultPoint )
 {
-    double *a = dstPoint, *b = srcPoint , *c = defaultPoint;
+    double *a = dstObservedPoint, *b = srcPoint , *c = dstDefaultPoint;
     /*
-                          * dstPoint
-                        /
+                          * dstObservedPoint
+                        /          A
                     /
                 /
-     srcPoint/   Result
-          *  -  -  -  -  -  *  defaultPoint
-
-    */
-    double ab[3] = { b[0] - a[0], b[1] - a[1], b[2] - a[2] };
-    double bc[3] = { c[0] - b[0], c[1] - b[1], c[2] - b[2]  };
-
-    double abVec = sqrt(ab[0] * ab[0] + ab[1] * ab[1] + ab[2] * ab[2]);
-    double bcVec = sqrt(bc[0] * bc[0] + bc[1] * bc[1] + bc[2] * bc[2]);
-
-    double abNorm[3] = {ab[0] / abVec, ab[1] / abVec, ab[2] / abVec};
-    double bcNorm[3] = {bc[0] / bcVec, bc[1] / bcVec, bc[2] / bcVec};
-
-    double res = abNorm[0] * bcNorm[0] + abNorm[1] * bcNorm[1] + abNorm[2] * bcNorm[2];
-
-    return (double) acos(res)*180.0/ 3.141592653589793;
-}
-
-
-
-
-static double get2DAngleABC( double* srcPoint, double* dstPoint, double* defaultPoint )
-{
-    double *a = dstPoint, *b = srcPoint , *c = defaultPoint;
-    /*
-                          * dstPoint
-                        /
-                    /
-                /
-     srcPoint/   Result
-          *  -  -  -  -  -  *  defaultPoint
+     srcPoint/   Result               C
+         B *  -  -  -  -  -  *  dstDefaultPoint
 
     */
 
@@ -597,35 +574,94 @@ static double get2DAngleABC( double* srcPoint, double* dstPoint, double* default
     return res;
 }
 
-static double getAngle2PointsRad(double p1_x, double p1_y, double p2_x, double p2_y)
+
+static int getAngleABCOCV(  double* srcPoint, double* dstObservedPoint, double* dstDefaultPoint )
 {
-  return (double) acos((((p1_x * p2_x) + (p1_y * p2_y)) / (sqrt( p1_x*p1_x  + p1_y*p1_y ) * sqrt( p2_x*p2_x + p2_y*p2_y ))));
+    double *a = dstObservedPoint, *b = srcPoint , *c = dstDefaultPoint;
+    /*
+                          * dstObservedPoint
+                        /          A
+                    /
+                /
+     srcPoint/   Result               C
+         B *  -  -  -  -  -  *  dstDefaultPoint
+
+    */
+    double ab[2] = { b[0] - a[0], b[1] - a[1] };
+    double cb[2] = { c[0] - b[0], c[1] - b[1] };
+
+    float dot = (ab[0] * cb[0] + ab[1] * cb[1]); // dot product
+    float cross = (ab[0] * cb[1] - ab[1] * cb[0]); // cross product
+
+    float alpha = atan2(cross, dot);
+
+    return alpha * 180 / M_PI ;
 }
 
-static double getAngle2PointsDeg(double p1_x, double p1_y, double p2_x, double p2_y)
+
+
+
+
+
+
+static double get2DAngleABC( double* srcPoint, double* dstObservedPoint, double* dstDefaultPoint )
 {
-  return (double) getAngle2PointsRad(p1_x,p1_y,p2_x,p2_y) * 180 / 3.141592653589793;
+    double *a = dstObservedPoint, *b = srcPoint , *c = dstDefaultPoint;
+    /*
+                          * dstObservedPoint
+                        /          A
+                    /
+                /
+     srcPoint/   Result               C
+         B *  -  -  -  -  -  *  dstDefaultPoint
+
+    */
+
+    double ab[2] = { a[0] - b[0], a[1] - b[1] };
+    double cb[2] = { c[0] - b[0], c[1] - b[1] };
+
+    double abVec = sqrt(ab[0] * ab[0] + ab[1] * ab[1] );
+    double cbVec = sqrt(cb[0] * cb[0] + cb[1] * cb[1] );
+
+    double abNorm[2] = {ab[0] / abVec, ab[1] / abVec };
+    double cbNorm[2] = {cb[0] / cbVec, cb[1] / cbVec };
+
+    double res = abNorm[0] * cbNorm[0] + abNorm[1] * cbNorm[1] ;
+
+    res = (double) acos(res)*180.0/ 3.141592653589793;
+
+
+    /*
+     fprintf(stderr,"angle(%0.2f,%0.2f,%0.2f) = %0.2f  [ ab=%0.2f bc=%0.2f abVec=%0.2f bcVec=%0.2f abNorm=%0.2f bcNorm=%0.2f ] ",*srcPoint,*dstPoint,*defaultPoint,res
+            ,ab,bc,abVec,bcVec,abNorm,bcNorm
+             );
+    */
+
+    return res;
 }
 
 
 static double getAngleABCRelative(
                                    unsigned int srcPoint , unsigned int dstPoint ,
-                                   double* srcObservedPointFirstDimension , double* srcObservedPointSecondDimension ,
-                                   double* dstObservedPointFirstDimension , double* dstObservedPointSecondDimension ,
-                                   double* srcDefaultPointFirstDimension ,  double* srcDefaultPointSecondDimension ,
-                                   double* dstDefaultPointFirstDimension ,  double* dstDefaultPointSecondDimension  ,
-                                   unsigned int FirstDimensionConvention,
+                                   double* srcObservedPointFirstDimension ,  double* srcObservedPointSecondDimension ,
+                                   double* dstObservedPointFirstDimension ,  double* dstObservedPointSecondDimension ,
+                                   double* srcDefaultPointFirstDimension  ,  double* srcDefaultPointSecondDimension ,
+                                   double* dstDefaultPointFirstDimension  ,  double* dstDefaultPointSecondDimension  ,
+                                   unsigned int FirstDimensionConvention  ,
                                    unsigned int SecondDimensionConvention
                                     )
 {
-    double relativeSrc[2] = { 0 , 0 };
-    double relativeDst[2] = {  *dstObservedPointFirstDimension - * srcObservedPointFirstDimension,  *dstObservedPointSecondDimension - * srcObservedPointSecondDimension };
-    double relativeDefaultDst[2] = { *dstDefaultPointFirstDimension - * srcDefaultPointFirstDimension ,  *dstDefaultPointSecondDimension - * srcDefaultPointSecondDimension };
+    double offsetFirstDim   =  *srcDefaultPointFirstDimension  - *srcObservedPointFirstDimension;
+    double offsetSecondDim  =  *srcDefaultPointSecondDimension - *srcObservedPointSecondDimension;
 
-    double result;
+    double relativeDefaultSrc[2] = { *srcDefaultPointFirstDimension                 , *srcDefaultPointSecondDimension };
+    double relativeDst[2]        = { *dstObservedPointFirstDimension+offsetFirstDim ,  *dstObservedPointSecondDimension + offsetSecondDim};
+    double relativeDefaultDst[2] = { *dstDefaultPointFirstDimension                 ,  *dstDefaultPointSecondDimension  };
 
-    //result = get2DAngleABC(relativeSrc,relativeDst,relativeDefaultDst);
-    result = getAngle2PointsDeg(relativeDst[0],relativeDst[1],relativeDefaultDst[0],relativeDefaultDst[1]) ;
+    double result=0;
+
+    result = get2DAngleABC(relativeDefaultSrc,relativeDst,relativeDefaultDst);
+    //result = getAngleABCOCV(relativeDefaultSrc,relativeDst,relativeDefaultDst);
 
   if (result>100)
   {
@@ -654,8 +690,8 @@ static double getAngleABCRelative(
 
 
     fprintf(stderr,"A(%0.2f,%0.2f) B(%0.2f,%0.2f) C(%0.2f,%0.2f) ) = %0.2f \n",
-            relativeSrc[0],
-            relativeSrc[1],
+            relativeDefaultSrc[0],
+            relativeDefaultSrc[1],
             relativeDst[0],
             relativeDst[1],
             relativeDefaultDst[0],
@@ -686,7 +722,6 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
                  (!skeletonEmpty3DJoint(sk,dst) )
            )
         {
-
             //We have just observed a skeleton pose , stored at sk->joint and we want to compare it to the defJoints pose
             //So we actually have two points the parent (src) and the child (dst) and we want to calculate the angle there
             //in order to do that
@@ -739,6 +774,10 @@ static void updateSkeletonAnglesGeneric(struct skeletonHuman * sk , float * defJ
 
             // Check NaN output
             if (!NaNOutput) { sk->active[i]=1; }
+        } else
+
+        {
+           fprintf(stderr,"Joint %s->%s combo empty while updating angles \n" , jointNames[src] , jointNames[dst]);
         }
 
     }

@@ -141,12 +141,12 @@ int doSkeletonConversions( struct skeletonHuman * skel )
    struct naoCommand nao={0};
    struct skeletonHuman sk={0};
 
-   setNAOMotorsFromHumanSkeleton( &nao , &sk );
+   //setNAOMotorsFromHumanSkeleton( &nao , &sk );
    snprintf(filenameBuf,512,"skel%u.skel",frames);
    //printoutNAOCommand( filenameBuf , &nao );
   }
 
-   usleep(1000*1000);
+   usleep(20*1000);
    cleanSkeleton(skel);
    ++frames;
   return 1;
