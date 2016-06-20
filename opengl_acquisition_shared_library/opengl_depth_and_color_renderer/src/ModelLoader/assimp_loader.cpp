@@ -1,5 +1,7 @@
 #include "assimp_loader.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
@@ -411,12 +413,20 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
 
 
                //zxy 120 - xyz 012
+
                bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetZXY[i*3+2] ),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetZXY[i*3+0] ),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetZXY[i*3+1] )
                                                                       );
 
+/*
+               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetXYZ[i*3+0] ),
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetXYZ[i*3+1] ),
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetXYZ[i*3+2] )
+                                                                      );
+*/
                NodeTransformation =  bones->bone[boneNumber].translationMat  * bones->bone[boneNumber].rotationMat * bones->bone[boneNumber].scalingMat;
               } else
               {
@@ -586,7 +596,7 @@ void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
                                                                 struct skeletonHuman * sk
                                                               )
 {
-  visualizeSkeletonHuman("deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton.svg",sk,3.0);
+  //visualize2DSkeletonHuman("deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton.svg",sk,3.0);
 
   struct TRI_Model temporaryIndexedDeformedModel={0};
   fprintf(stderr,"Copying to intermediate mesh\n");
