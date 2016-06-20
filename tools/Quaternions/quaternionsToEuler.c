@@ -29,6 +29,9 @@ int main(int argc, char *argv[])
     quaternions[2] = atof(argv[3]);
     quaternions[3] = atof(argv[4]);
 
+
+    normalizeQuaternions(&quaternions[0],&quaternions[1],&quaternions[2],&quaternions[3]);
+
     quaternions2Euler(euler,quaternions,qXqYqZqW);
 
 

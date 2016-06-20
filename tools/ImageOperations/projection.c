@@ -55,7 +55,7 @@ float hypotMine(x,y)
 
 
 
-void createCubeMapFacePython(
+void createCubeMapFaceP(
                              char * out , unsigned int outWidth ,unsigned int outHeight , unsigned int outChannels , unsigned int outBitsPerPixel ,
                              char * in , unsigned int inWidth , unsigned int inHeight , unsigned int inChannels , unsigned int inBitsPerPixel
                             )
@@ -161,7 +161,7 @@ void createCubeMapFace(char * out , unsigned int outWidth ,unsigned int outHeigh
                        char * in , unsigned int inWidth , unsigned int inHeight , unsigned int inChannels , unsigned int inBitsPerPixel
                         )
 {
-   createCubeMapFacePython( out , outWidth , outHeight , outChannels ,  outBitsPerPixel ,
+   createCubeMapFaceP( out , outWidth , outHeight , outChannels ,  outBitsPerPixel ,
                         in , inWidth , inHeight , inChannels , inBitsPerPixel
                         );
 
