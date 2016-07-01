@@ -11,12 +11,8 @@ add_subdirectory (Quaternions/)
 add_subdirectory (ImageOperations/)
 
 
-#This automanages openCV settings
-  add_subdirectory (DepthImagesConverter/)
-IF( ENABLE_OPENCV ) 
- if(ENABLE_OPENCV_BASED_TOOLS)
- ENDIF(ENABLE_OPENCV_BASED_TOOLS)
-ENDIF( ENABLE_OPENCV )
+#DepthImagesConverter auto manages openCV settings in its own CMakeLists file
+ add_subdirectory (DepthImagesConverter/) 
 
  
 if (ENABLE_LOCATION_SERVICE)
