@@ -4,15 +4,27 @@
 *   @bug This handles only a few file types
 */
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#define USE_JPG_FILES 1
+#define USE_PNG_FILES 1
+#define USE_OPENCV 0
+
+
+#if USE_OPENCV
+ #include <opencv2/core/core.hpp>
+ #include <opencv2/highgui/highgui.hpp>
+ using namespace cv;
+#endif // USE_OPENCV
+
+
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+ using namespace std;
 
 #include "../Codecs/codecs.h"
 
-using namespace cv;
-using namespace std;
 
 /*
 unsigned short * convert24bitTo16bit(void * input24bit,unsigned int width , unsigned int height)
@@ -44,7 +56,7 @@ unsigned short * convert24bitTo16bit(void * input24bit,unsigned int width , unsi
     casterUint = (unsigned int *) byte1;
 
     //unsigned int outBit = *casterUint;
-    //*outputPointer = (unsigned short) outBit;
+    // *outputPointer = (unsigned short) outBit;
     *outputPointer = *casterUshort;
 
     ++outputPointer;
@@ -88,27 +100,6 @@ int readFromPNGDepthAndWriteToPNMDepth(char * inputFilename,char *outputFilename
 
     fprintf(stderr,"Loaded Image with width : %u , height %u , channels %u , bitsperpixel %u\n",newImg->width,newImg->height,newImg->channels,newImg->bitsperpixel);
 
-/*
-    namedWindow( "Display window", CV_WINDOW_AUTOSIZE );// Create a window for display.
-    IplImage  *imageDepthTest = cvCreateImage( cvSize(newImg->width,newImg->height), IPL_DEPTH_16U , 1 );
-    if (imageDepthTest==0) { fprintf(stderr,"Could not create a new Depth OpenCV Image\n");  return 0; }
-    char *opencv_depthTest_pointer_retainer = imageDepthTest->imageData; // UGLY HACK
-    imageDepthTest->imageData = (char *) newImg->pixels;
-
-
-    cvShowImage("RGBDAcquisition Depth Initial", imageDepthTest);
-
-    IplImage *rdepth8Test  = cvCreateImage(cvSize(newImg->width,newImg->height), IPL_DEPTH_8U, 1);
-    cvConvertScaleAbs(imageDepthTest, rdepth8Test, 255.0/2048,0);
-    cvShowImage("RGBDAcquisition Depth", rdepth8Test);
-    cvReleaseImage( &rdepth8Test );
-
-
-    imageDepthTest->imageData = opencv_depthTest_pointer_retainer; // UGLY HACK
-    cvReleaseImage( &imageDepthTest );
-    waitKey(0);
-
-*/
     writeImageFile(newImg,PNM_CODEC,outputFilename);
 
    return 1;
@@ -137,9 +128,15 @@ int readFromPNMDepthAndWriteToPNGDepth(char * inputFilename,char *outputFilename
     if (newImg==0) { fprintf(stderr,"Could not open %s\n",inputFilename); return 0; }
     swapEndianness(newImg);
 
-    fprintf(stderr,"Loaded Image with width : %u , height %u , channels %u , bitsperpixel %u\n",newImg->width,newImg->height,newImg->channels,newImg->bitsperpixel);
+    fprintf(stderr,"Loaded Image with width : %u , height %u , channels %u , bitsperpixel %u  ... ",newImg->width,newImg->height,newImg->channels,newImg->bitsperpixel);
 
-    writeImageFile(newImg,PNG_CODEC,outputFilename);
+    if ( writeImageFile(newImg,PNG_CODEC,outputFilename) )
+    {
+      fprintf(stderr," Success \n");
+    } else
+    {
+      fprintf(stderr," Failed \n");
+    }
 
    return 0;
 }
@@ -201,7 +198,7 @@ int main( int argc, char** argv )
      } else
      if ( (strstr(argv[1],".pnm")!=0) && (strstr(argv[2],".png")!=0) )
      {
-       fprintf(stderr,"Using my custom loader / writer \n");
+       fprintf(stderr,"Using my custom loader / writer from pnm (%s) to png (%s)  \n",argv[1],argv[2]);
        return readFromPNMDepthAndWriteToPNGDepth(argv[1],argv[2]);
      }else
      if ( (strstr(argv[1],".pnm")!=0) && (strstr(argv[2],".cpnm")!=0) )
@@ -225,10 +222,7 @@ int main( int argc, char** argv )
 
 
 
-
-
-
-
+   #if USE_OPENCV
     Mat image;
     image = imread(argv[1], CV_LOAD_IMAGE_COLOR);   // Read the file
 
@@ -264,6 +258,10 @@ int main( int argc, char** argv )
 
     if( argc >= 3) { imwrite(argv[2], image  ); } //Convert the image
      else          { waitKey(0); }  // Just show the window
+   #else
+    fprintf(stderr,"OpenCV Not compiled int , so not doing anything more.. \n");
+   #endif // USE_OPENCV
+
 
     return 0;
 }

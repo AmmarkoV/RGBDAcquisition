@@ -362,6 +362,10 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
      #if USE_JPG_FILES
       case JPG_CODEC :
        return WriteJPEGFile(pic,filename);
+     #else
+      case JPG_CODEC :
+      fprintf(stderr,"JPG file writing is not compiled in this build .. \n");
+      break;
      #endif // USE_JPG_FILES
 
 
@@ -373,6 +377,12 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
       case PPM_CODEC :
       case PNM_CODEC :
        WritePPM(filename,pic);
+      break;
+    #else
+      case COMPATIBLE_PNM_CODEC :
+      case PPM_CODEC :
+      case PNM_CODEC :
+      fprintf(stderr,"PPM file writing is not compiled in this build .. \n");
       break;
     #endif
 
@@ -387,6 +397,10 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
 	     WritePNG(ppmfilename,pic);
 	    #endif
       break;
+     #else
+      case PNG_CODEC :
+      fprintf(stderr,"PNG file writing is not compiled in this build .. \n");
+      break;
      #endif
 
 
@@ -395,6 +409,10 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
      case ASCII_CODEC :
          WriteASCII(filename,pic,0);
       break;
+     #else
+      case ASCII_CODEC :
+      fprintf(stderr,"ASCII file writing is not compiled in this build .. \n");
+      break;
      #endif // USE_ASCII_FILES
 
 
@@ -402,6 +420,10 @@ int writeImageFile(struct Image * pic,unsigned int type,char *filename)
      #if USE_BMP_FILES
      case BMP_CODEC :
          WriteBMP(filename,pic);
+      break;
+     #else
+      case BMP_CODEC :
+      fprintf(stderr,"BMP file writing is not compiled in this build .. \n");
       break;
      #endif // USE_ASCII_FILES
 
@@ -423,7 +445,8 @@ int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned lon
      #endif // USE_JPG_FILES
 
       default :
-        break;
+       fprintf(stderr,"file writing in memory is not availiable for this file type.. \n");
+      break;
    };
 
    return 0;

@@ -11,9 +11,10 @@ add_subdirectory (Quaternions/)
 add_subdirectory (ImageOperations/)
 
 
+#This automanages openCV settings
+  add_subdirectory (DepthImagesConverter/)
 IF( ENABLE_OPENCV ) 
  if(ENABLE_OPENCV_BASED_TOOLS)
-  add_subdirectory (DepthImagesConverter/)
  ENDIF(ENABLE_OPENCV_BASED_TOOLS)
 ENDIF( ENABLE_OPENCV )
 

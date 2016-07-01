@@ -38,6 +38,7 @@
 			<Add option="`pkg-config --libs opencv`" />
 			<Add option="-ljpeg" />
 			<Add option="-lpng" />
+			<Add library="../Codecs/libCodecs.a" />
 		</Linker>
 		<Unit filename="../Codecs/codecs.c">
 			<Option compilerVar="CC" />

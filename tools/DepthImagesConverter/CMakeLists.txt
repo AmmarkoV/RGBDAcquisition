@@ -3,9 +3,7 @@ cmake_minimum_required( VERSION 2.8.7 )
  
 find_package(OpenCV REQUIRED)
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
-
-
-
+ 
 IF( ENABLE_JPG )
  MESSAGE("JPGs will be included in this codec build")
  set(JPG_Libs jpeg ) 
@@ -25,8 +23,16 @@ IF( ENABLE_PNG )
  add_definitions(-DENABLE_PNG)
 ENDIF( ENABLE_PNG )
 
+
+IF( ENABLE_OPENCV )
+ MESSAGE("OpenCV will be included in this DepthImageConverter build")
+ set(OCV_Libs ${OpenCV_LIBRARIES} ) 
+ add_definitions(-DUSE_OPENCV) 
+ENDIF( ENABLE_OPENCV )
+
+
 add_executable(DepthImagesConverter main.cpp ) 
-target_link_libraries(DepthImagesConverter rt dl m Codecs ${PNG_Libs} ${JPG_Libs} ${OpenCV_LIBRARIES} )
+target_link_libraries(DepthImagesConverter rt dl m Codecs ${PNG_Libs} ${JPG_Libs} ${OCV_Libs} )
 set_target_properties(DepthImagesConverter PROPERTIES DEBUG_POSTFIX "D")
 add_dependencies(DepthImagesConverter Codecs)  
        
