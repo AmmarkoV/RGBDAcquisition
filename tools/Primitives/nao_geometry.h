@@ -194,17 +194,54 @@ struct naoCommand
    float orientationTheta;
 
    //JOINTS
-   float jointMotor[NUMBER_OF_NAO_JOINTS];
-   //float joints2DPos[NUMBER_OF_NAO_JOINTS*2];
-   //float joints3DPos[NUMBER_OF_NAO_JOINTS*3];
+   struct naoJoint joints[NUMBER_OF_NAO_JOINTS];
+   int active[NUMBER_OF_NAO_JOINTS];
 
    //CONFIGURATION PARAMETER
-   float Kp_Pitch, Ki_Pitch, Kd_Pitch;
-   float Kp_Roll, Ki_Roll, Kd_Roll;
+   float alpha, beta, gamma;
+
 
    //Last the timestamp
    unsigned long timestampEnd;
+
+   unsigned char saveCurrentRobotConfiguration;
+
+
+   unsigned int msgSize;
+   char msg[256];
 };
+
+
+static float rad_to_degrees(float radians)
+{
+    return radians * (180.0 / M_PI);
+}
+
+static float degrees_to_rad(float degrees)
+{
+    return degrees * (M_PI /180.0 );
+}
+
+
+static float interpolateMotor(float target , float current , float smoothing /*0.0 to 1.0*/ )
+{
+   if (smoothing>1.0) { smoothing=1.0; }
+   if (smoothing<0.0) { smoothing=0.0; }
+   float distance = target - current ;
+   float distanceScaled =  distance * smoothing;
+   return current + distanceScaled;
+}
+
+
+
+static int emptyNAOCommand(struct naoCommand * incomingCommand)
+{
+  if (incomingCommand)
+  {
+    memset(incomingCommand,0,sizeof(struct naoCommand));
+  }
+    return 1;
+}
 
 
 
