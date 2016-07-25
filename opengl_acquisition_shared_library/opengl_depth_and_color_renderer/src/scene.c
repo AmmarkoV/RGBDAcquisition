@@ -228,6 +228,8 @@ int updateProjectionMatrix()
     fprintf(stderr,"Custom projection matrix is declared\n");
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixd( scene->projectionMatrix ); // we load a matrix of Doubles
+
+    if ( (WIDTH==0) || (HEIGHT==0) ) { fprintf(stderr,"Null dimensions for viewport"); }
     glViewport(0,0,WIDTH,HEIGHT);
 
     print4x4DMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix );
@@ -268,6 +270,7 @@ int updateProjectionMatrix()
    glViewport(0, 0, WIDTH, HEIGHT);
   }
 
+  fprintf(stderr,"updateProjectionMatrix done\n",WIDTH,HEIGHT);
   return 1;
 }
 
@@ -275,6 +278,7 @@ int updateProjectionMatrix()
 
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 {
+   fprintf(stderr,"Window size changed to %u x %u\n",newWidth,newHeight);
    WIDTH=newWidth;
    HEIGHT=newHeight;
    updateProjectionMatrix();
@@ -502,7 +506,8 @@ int initScene(char * confFile)
   glMatrixMode(GL_PROJECTION);
 
   updateProjectionMatrix();
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after updating projection matrix\n"); }
+  if (checkOpenGLError(__FILE__, __LINE__))
+     { fprintf(stderr,"OpenGL error after updating projection matrix\n"); }
 
   /* establish initial viewport */
   /* pedantic, full window size is default viewport */
@@ -549,6 +554,7 @@ int initScene(char * confFile)
    glEnable(GL_CULL_FACE);
   }
 
+  fprintf(stderr,"Allocating model storage..\n");
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
   memset(models,0,scene->numberOfObjectTypes * sizeof(struct Model **));
 
@@ -692,7 +698,13 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
   for (i=1; i<scene->numberOfObjects; i++)
     {
-     scene->object[i].lastFrame = scene->ticks % scene->object[i].numberOfFrames;
+     if (scene->object[i].numberOfFrames<=1)
+     {
+       scene->object[i].lastFrame = 0;
+     } else
+     {
+       scene->object[i].lastFrame = scene->ticks % scene->object[i].numberOfFrames;
+     }
     }
 
   for (i=0; i<scene->numberOfEvents; i++)
