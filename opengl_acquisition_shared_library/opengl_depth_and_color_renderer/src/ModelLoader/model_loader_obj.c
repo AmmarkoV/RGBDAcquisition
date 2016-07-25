@@ -850,6 +850,149 @@ GLuint getDispList(struct OBJ_Model * obj)
 }
 
 
+void doOBJDrawCallsForGroup(struct OBJ_Model * obj , long unsigned int i)
+{
+ long unsigned int j;
+
+ glBegin(GL_TRIANGLES);
+			for(j=0; j<obj->groups[i].numFaces; j++)
+			{
+                if( obj->groups[i].hasNormals)
+                  {
+                    glNormal3f(
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n1 ,
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n2 ,
+                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n3
+                              );
+                  }
+				else
+				 {
+					glNormal3f(
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
+                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
+                              );
+				}
+
+				if( obj->groups[i].hasTex)
+				  {
+                    glTexCoord2f(
+                                  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].u,
+                                  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].v
+                                );
+                  }
+
+
+                if (
+                     (obj->faceList[ obj->groups[i].faceList[j]].v[0] < obj->numColors )&&
+                     (obj->colorList!=0)
+                   )
+                {
+                 glColor3f(
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].r,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].g,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].b
+                           );
+                }
+				glVertex3f(
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].x,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].y,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].z
+                          );
+
+
+				if( obj->groups[i].hasNormals)
+				 {
+                   glNormal3f(
+                               obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n1,
+                               obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n2,
+                               obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n3
+                             );
+				 }
+				else
+				 {
+                   glNormal3f(
+                               obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
+                               obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
+                               obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
+                              );
+				 }
+
+				if( obj->groups[i].hasTex)
+				{
+                  glTexCoord2f(
+                                obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].u,
+                                obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].v
+                              );
+				}
+
+
+                if (
+                     (obj->faceList[ obj->groups[i].faceList[j]].v[1] < obj->numColors )&&
+                     (obj->colorList!=0)
+                   )
+                {
+                 glColor3f(
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].r,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].g,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].b
+                           );
+                }
+				glVertex3f(
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].x,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].y,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].z
+                          );
+
+
+				if(obj->groups[i].hasNormals)
+				 {
+                    glNormal3f(
+                                obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n1,
+                                obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n2,
+                                obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n3
+                              );
+				 }
+				else
+                 {
+                    glNormal3f(
+                                obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
+                                obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
+                                obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
+                              );
+                 }
+
+				if( obj->groups[i].hasTex)
+				{
+                   glTexCoord2f(
+                                 obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].u,
+                                 obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].v
+                               );
+				}
+
+
+                if (
+                     (obj->faceList[ obj->groups[i].faceList[j]].v[2] < obj->numColors )&&
+                     (obj->colorList!=0)
+                   )
+                {
+                 glColor3f(
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].r,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].g,
+                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].b
+                           );
+                }
+				glVertex3f(
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].x,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].y,
+                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].z
+                          );
+
+			}//FOR J
+			glEnd();
+}
+
+
 
 void  drawOBJMesh(struct OBJ_Model * obj)
 {
@@ -916,135 +1059,7 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 
         if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Error before starting drawing triangles @ drawOBJMesh\n"); }
 
-			glBegin(GL_TRIANGLES);
-			for(j=0; j<obj->groups[i].numFaces; j++)
-			{
-                if( obj->groups[i].hasNormals)
-                  {
-                    glNormal3f(
-                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n1 ,
-                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n2 ,
-                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n3
-                              );
-                  }
-				else
-				 {
-					glNormal3f(
-                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
-                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
-                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
-                              );
-				}
-
-				if( obj->groups[i].hasTex)
-				  {
-                    glTexCoord2f(
-                                  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].u,
-                                  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].v
-                                );
-                  }
-
-
-                if ( obj->faceList[ obj->groups[i].faceList[j]].v[0] < obj->numColors )
-                {
-                 glColor3f(
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].r,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].g,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].b
-                           );
-                }
-				glVertex3f(
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].x,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].y,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].z
-                          );
-
-
-				if( obj->groups[i].hasNormals)
-				 {
-                   glNormal3f(
-                               obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n1,
-                               obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n2,
-                               obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n3
-                             );
-				 }
-				else
-				 {
-                   glNormal3f(
-                               obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
-                               obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
-                               obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
-                              );
-				 }
-
-				if( obj->groups[i].hasTex)
-				{
-                  glTexCoord2f(
-                                obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].u,
-                                obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].v
-                              );
-				}
-
-
-                if ( obj->faceList[ obj->groups[i].faceList[j]].v[1] < obj->numColors )
-                {
-                 glColor3f(
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].r,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].g,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].b
-                           );
-                }
-				glVertex3f(
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].x,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].y,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].z
-                          );
-
-
-				if( obj->groups[i].hasNormals)
-				 {
-                    glNormal3f(
-                                obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n1,
-                                obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n2,
-                                obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n3
-                              );
-				 }
-				else
-                 {
-                    glNormal3f(
-                                obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
-                                obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
-                                obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
-                              );
-                 }
-
-				if( obj->groups[i].hasTex)
-				{
-                   glTexCoord2f(
-                                 obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].u,
-                                 obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].v
-                               );
-				}
-
-
-                if ( obj->faceList[ obj->groups[i].faceList[j]].v[2] < obj->numColors )
-                {
-                 glColor3f(
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].r,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].g,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].b
-                           );
-                }
-				glVertex3f(
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].x,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].y,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].z
-                          );
-
-			}//FOR J
-			glEnd();
-
-
+           doOBJDrawCallsForGroup(obj,i);
 
         if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Initial Error after drawing triangles @ drawOBJMesh\n"); }
     }//FOR I
@@ -1258,131 +1273,8 @@ int compileOBJList(struct OBJ_Model * obj)
                glDisable(GL_TEXTURE_2D);
           }
 
-			glBegin(GL_TRIANGLES);
-           for(j=0; j<obj->groups[i].numFaces; j++)
-			{
-                if( obj->groups[i].hasNormals)
-                  {
-                    glNormal3f(
-                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n1 ,
-                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n2 ,
-                                 obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n3
-                              );
-                  }
-				else
-				 {
-					glNormal3f(
-                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
-                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
-                                 obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
-                              );
-				}
+           doOBJDrawCallsForGroup(obj,i);
 
-				if( obj->groups[i].hasTex)
-				  {
-                    glTexCoord2f(
-                                  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].u,
-                                  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].v
-                                );
-                  }
-
-                if ( obj->faceList[ obj->groups[i].faceList[j]].v[0] < obj->numColors )
-                {
-                 glColor3f(
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].r,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].g,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].b
-                           );
-                }
-				glVertex3f(
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].x,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].y,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].z
-                          );
-
-
-				if( obj->groups[i].hasNormals)
-				 {
-                   glNormal3f(
-                               obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n1,
-                               obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n2,
-                               obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n3
-                             );
-				 }
-				else
-				 {
-                   glNormal3f(
-                               obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
-                               obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
-                               obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
-                              );
-				 }
-
-				if( obj->groups[i].hasTex)
-				{
-                  glTexCoord2f(
-                                obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].u,
-                                obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].v
-                              );
-				}
-
-                if ( obj->faceList[ obj->groups[i].faceList[j]].v[1] < obj->numColors )
-                {
-                 glColor3f(
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].r,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].g,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].b
-                           );
-                }
-				glVertex3f(
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].x,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].y,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].z
-                          );
-
-
-				if( obj->groups[i].hasNormals)
-				 {
-                    glNormal3f(
-                                obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n1,
-                                obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n2,
-                                obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n3
-                              );
-				 }
-				else
-                 {
-                    glNormal3f(
-                                obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1,
-                                obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2,
-                                obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3
-                              );
-                 }
-
-				if( obj->groups[i].hasTex)
-				{
-                   glTexCoord2f(
-                                 obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].u,
-                                 obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].v
-                               );
-				}
-
-
-                if ( obj->faceList[ obj->groups[i].faceList[j]].v[2] < obj->numColors )
-                {
-                 glColor3f(
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].r,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].g,
-                           obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].b
-                           );
-                }
-				glVertex3f(
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].x,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].y,
-                            obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].z
-                          );
-
-			}//FOR J
-			glEnd();
 
 		}//FOR I
 	glEndList();

@@ -148,7 +148,7 @@ struct Model * loadModel(char * directory,char * modelname)
           #if USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
               mod->type = OBJ_QUESTION;
               mod->model = 0;
-              fprintf(stderr,RED "Failed to load object %s , will pretend it got loaded and use a fake object question mark instead\n" NORMAL,modelname);
+              fprintf(stderr,RED "Failed to load object `%s` , will pretend it got loaded and use a fake object question mark instead\n" NORMAL,modelname);
           #else
             free(mod);
             return 0 ;
