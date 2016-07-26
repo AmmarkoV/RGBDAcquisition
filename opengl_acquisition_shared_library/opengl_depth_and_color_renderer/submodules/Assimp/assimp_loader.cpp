@@ -8,7 +8,6 @@
 #include <assimp/postprocess.h>
 
 
-#include "../../../../tools/Primitives/skeleton.h"
 
 #define DO_TRANSFORM 1
 #define USE_NEW_TRANSFORM_MESH_CODE 1

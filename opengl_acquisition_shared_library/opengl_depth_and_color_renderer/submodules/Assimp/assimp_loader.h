@@ -3,6 +3,7 @@
 
 
 #include "../../src/ModelLoader/model_loader_tri.h"
+#include "../../../../tools/Primitives/skeleton.h"
 
 void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
                                                                 struct TRI_Model * outFlatModel ,

@@ -1,6 +1,13 @@
 #ifndef MODEL_LOADER_TRI_H_INCLUDED
 #define MODEL_LOADER_TRI_H_INCLUDED
 
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "model_loader_setup.h"
 
 #if HAVE_OBJ_CODE_AVAILIABLE
@@ -53,5 +60,8 @@ void deallocModelTri(struct TRI_Model * triModel);
 //int saveModelTriHeader(const char * filename , struct TRI_Model * triModel);
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MODEL_LOADER_TRI_H_INCLUDED

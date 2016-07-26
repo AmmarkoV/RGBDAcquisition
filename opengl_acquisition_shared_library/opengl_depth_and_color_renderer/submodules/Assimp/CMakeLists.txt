@@ -15,11 +15,12 @@ target_link_libraries(assimpLoader m assimp)
 
 
 add_executable(assimpTester 
+               assimp_main.cpp 
                assimp_loader.cpp
                assimp_loader.h 
                ../../src/ModelLoader/model_loader_tri.c
                ../../src/ModelLoader/model_loader_tri.h
-               assimp_main.cpp ) 
+               ) 
 target_link_libraries(assimpTester rt m assimp ) 
 #add_dependencies(assimpTester OGLRendererSandbox)  
 
