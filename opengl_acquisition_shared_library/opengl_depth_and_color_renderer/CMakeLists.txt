@@ -19,6 +19,7 @@ set(CODECS_DIRECTORY "../../tools/Codecs")
 add_subdirectory ( ${CODECS_DIRECTORY} RGBDAcquisition/Codecs )
 
 add_subdirectory (src/)
+add_subdirectory (submodules/Assimp)
 
 #First to make our handy tools
 add_subdirectory (src/Renderer/)
