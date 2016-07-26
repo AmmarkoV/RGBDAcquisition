@@ -146,7 +146,7 @@
 
 1457652365 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
 
-1464914058 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.c
+1469456936 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.c
 	"model_loader_obj.h"
 	<stdio.h>
 	<stdlib.h>
@@ -271,7 +271,7 @@
 	<ctype.h>
 	"TrajectoryPrimitives.h"
 
-1457653739 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c
+1469454007 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -285,7 +285,7 @@
 
 1466348595 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_hardcoded.h
 
-1466348604 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_hardcoded.c
+1466349994 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_hardcoded.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -298,7 +298,7 @@
 	"../tools.h"
 	"../../../../tools/AmMatrix/matrixCalculations.h"
 
-1466348685 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
+1469458294 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
 	<GL/gl.h>
 	<GL/glx.h>
 	<GL/glu.h>
@@ -405,4 +405,21 @@
 	"model_loader_obj.h"
 
 1465134706 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_setup.h
+
+1469531795 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_assimp.c
+	"model_loader_assimp.h"
+	<stdio.h>
+	<stdlib.h>
+	<assimp/cimport.h>
+	<assimp/scene.h>
+	<assimp/postprocess.h>
+	"../../../../tools/Primitives/skeleton.h"
+
+1465349935 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_assimp.h
+	"model_loader_tri.h"
+
+1466429498 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/skeleton.h
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
 

@@ -1,4 +1,4 @@
-#include "assimp_loader.h"
+#include "model_loader_assimp.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +8,7 @@
 #include <assimp/postprocess.h>
 
 
-#include "skeleton.h"
+#include "../../../../tools/Primitives/skeleton.h"
 
 #define DO_TRANSFORM 1
 #define USE_NEW_TRANSFORM_MESH_CODE 1

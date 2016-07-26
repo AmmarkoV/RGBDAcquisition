@@ -21,6 +21,7 @@ IF( ENABLE_PNG )
  add_definitions(-DENABLE_PNG)
 ENDIF( ENABLE_PNG )
 
+ 
 
 add_library(OpenGLAcquisition SHARED 
             OpenGLAcquisition.c
@@ -36,7 +37,7 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_hardcoded.c
-            opengl_depth_and_color_renderer/src/ModelLoader/model_loader_hardcoded.h
+            opengl_depth_and_color_renderer/src/ModelLoader/model_loader_hardcoded.h 
             opengl_depth_and_color_renderer/src/save_to_file.c
             opengl_depth_and_color_renderer/src/save_to_file.h
             opengl_depth_and_color_renderer/src/scene.c

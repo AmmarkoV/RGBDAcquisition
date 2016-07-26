@@ -119,6 +119,8 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ModelLoader/model_loader.h" />
+		<Unit filename="ModelLoader/model_loader_assimp.cpp" />
+		<Unit filename="ModelLoader/model_loader_assimp.h" />
 		<Unit filename="ModelLoader/model_loader_hardcoded.c">
 			<Option compilerVar="CC" />
 		</Unit>
