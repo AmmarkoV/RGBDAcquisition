@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/assimpTester" prefix_auto="1" extension_auto="1" />
+				<Option output="./assimpTester" prefix_auto="0" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -16,7 +16,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/assimpTester" prefix_auto="1" extension_auto="1" />
+				<Option output="./assimpTester" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -32,7 +32,16 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="main.cpp" />
+		<Linker>
+			<Add library="assimp" />
+		</Linker>
+		<Unit filename="../../src/ModelLoader/model_loader_tri.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/ModelLoader/model_loader_tri.h" />
+		<Unit filename="assimp_loader.cpp" />
+		<Unit filename="assimp_loader.h" />
+		<Unit filename="assimp_main.cpp" />
 		<Extensions>
 			<envvars />
 			<code_completion />

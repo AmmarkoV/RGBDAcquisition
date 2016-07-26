@@ -25,24 +25,6 @@
 #define WHITE   "\033[37m"      /* White */
 
 
-static float defaultJointsOffsetXYZ[] = {
-                                      0 , 0 , 0 ,
-                                      0 , 0 , 0 ,
-                                      0 , 0 , 20 ,
-                                      0 , 45 , 0 ,
-                                      0 , 45 , 0 ,
-                                      0 , 0 , 0 ,
-                                      0 , 0 , 0 ,
-                                      0 , 0 , 0 ,
-                                      0 , 0 , 0 ,
-                                      0 , 90 , -90 ,
-                                      0 , 90 , 90 ,
-                                      0 , 0 , 0 ,
-                                      0 , 0 , 0 ,
-                                      0 , 0 , -45 ,
-                                      0 , 0 , -45 ,
-                                      0 , -90 , -90
-                                     };
 
 static float defaultJointsOffsetZXY[] = {
                                          0 , 0 , 0 ,
@@ -62,93 +44,6 @@ static float defaultJointsOffsetZXY[] = {
                                          0 ,  -45 , 0 ,
                                          -90 , -90 , 0
                                         };
-
-
-
-
-/*
-
-void readNodeHeirarchyNEW(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
-{
-    //Print out node tree with space seperated readable form
-    if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
-                              { fprintf(stderr,"   "); }
-    fprintf(stderr,"%s\n" , pNode->mName.data);
-
-
-    //The default Node Transformation is no transformation at all , so if we don't have something to change
-    //NodeTransformation is going to have the default value
-    aiMatrix4x4 NodeTransformation=pNode->mTransformation;
-
-
-    //Assimp has two structures to facilitate rigged meshes , aiNodes and AiBones , they have their own indexing systems
-    //the next call will try to find the bone that is associated with the current pNode to store the resulting matrices
-    //at the correct place
-    unsigned int i=0 , foundBone=0 , usedBone=0;
-    unsigned int boneNumber=findBoneFromString(mesh,pNode->mName.data,&foundBone);
-
-    //If we found a bone then we can intervene because we have an inverse bind matrix
-    if  (foundBone)
-    {
-      //We search our internal (skeleton.h declared ) structure to find if we have some new data on the specific joint
-      for (i=0; i<HUMAN_SKELETON_PARTS; i++)
-        {
-          //In case there is a node in skeleton.h that corresponds to the specific aiBone we can try to check if it is currently active in our target skeleton model
-            if (strcmp(pNode->mName.data , smartBodyNames[i])==0)
-              {
-               //If we have a target in our skeleton model , we need to calculate the new Node Transformation
-               if ( sk->active[i] )
-               {
-               fprintf(stderr,GREEN "hooked with %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" NORMAL ,jointNames[i] , sk->relativeJointAngle[i].x, sk->relativeJointAngle[i].y, sk->relativeJointAngle[i].z);
-               bones->bone[boneNumber].ScalingVec.x=1.0;
-               bones->bone[boneNumber].ScalingVec.y=1.0;
-               bones->bone[boneNumber].ScalingVec.z=1.0;
-
-               bones->bone[boneNumber].TranslationVec.x=pNode->mTransformation.a4;
-               bones->bone[boneNumber].TranslationVec.y=pNode->mTransformation.b4;
-               bones->bone[boneNumber].TranslationVec.z=pNode->mTransformation.c4;
-
-               aiMatrix4x4::Scaling(bones->bone[boneNumber].ScalingVec,bones->bone[boneNumber].scalingMat);
-               aiMatrix4x4::Translation (bones->bone[boneNumber].TranslationVec,bones->bone[boneNumber].translationMat);
-               //aiMakeQuaternion( &bones->bone[boneNumber].rotationMat , &bones.bone[k].RotationQua );
-               //aiPrintMatrix(&bones->bone[boneNumber].rotationMat );
-
-               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffset[i*3+0] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffset[i*3+1] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffset[i*3+2] )
-                                                                     );
-
-               NodeTransformation =  bones->bone[boneNumber].translationMat * bones->bone[boneNumber].rotationMat * bones->bone[boneNumber].scalingMat;
-               usedBone=1;
-              } else
-              {
-               fprintf(stderr,YELLOW " inactive %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" NORMAL,jointNames[i] , sk->relativeJointAngle[i].x, sk->relativeJointAngle[i].y, sk->relativeJointAngle[i].z);
-              }
-            }
-        }
-    } else
-    {
-      fprintf(stderr,RED "        <!%s!>\n" NORMAL,pNode->mName.data);
-    }
-
-    aiMatrix4x4 GlobalTransformation = ParentTransform  * NodeTransformation;
-    if (!usedBone)
-        {
-          fprintf(stderr," did not use bone %u , %s\n", boneNumber , mesh->mBones[boneNumber]->mName.data);
-        } else
-        {
-          //we used bone , update its final transform
-        }
-
-    bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
-    for ( i = 0 ; i < pNode->mNumChildren ; i++)
-    {
-        readNodeHeirarchyNEW(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
-    }
-}
-
-*/
 
 
 
@@ -412,20 +307,12 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
 
 
                //zxy 120 - xyz 012
-
                bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetZXY[i*3+2] ),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetZXY[i*3+0] ),
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetZXY[i*3+1] )
                                                                       );
 
-/*
-               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetXYZ[i*3+0] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetXYZ[i*3+1] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetXYZ[i*3+2] )
-                                                                      );
-*/
                NodeTransformation =  bones->bone[boneNumber].translationMat  * bones->bone[boneNumber].rotationMat * bones->bone[boneNumber].scalingMat;
               } else
               {
@@ -458,7 +345,6 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
 
 void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
 {
-
     //The goal here is to transform the mesh stored int indexed using a skeleton stored in sk
     struct aiMesh * mesh = scene->mMeshes[meshNumber];
     fprintf(stderr,"  %d bones\n",mesh->mNumBones);
@@ -613,7 +499,8 @@ void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
 void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct TRI_Model * originalModel)
 {
     fprintf(stderr,"Preparing scene with %u meshes\n",scene->mNumMeshes);
-    if (scene->mNumMeshes>1) { fprintf(stderr,"Can only handle single meshes atm \n"); }
+    if (scene->mNumMeshes>1)
+        { fprintf(stderr,"Can only handle single meshes atm \n"); }
 
        fprintf(stderr,"Reading mesh from collada \n");
        prepareMesh(scene, 0,  originalModel );
