@@ -138,6 +138,35 @@ struct Model * loadModel(char * directory,char * modelname)
       mod->type = modType;
       mod->model = 0;
   } else
+ if ( strstr(modelname,".tri") != 0 )
+    {
+      mod->type = TRI_MODEL;
+      fprintf(stderr,RED "Cannot load tri model \n" NORMAL);
+    } else
+ if ( strstr(modelname,".ply") != 0 )
+    {
+      mod->type = OBJ_ASSIMP_MODEL;
+      struct  OBJ_Model *  newObj = (struct  OBJ_Model * ) loadObj(directory,modelname,1);
+      mod->model = newObj;//(struct  OBJ_Model * ) loadObj(directory,modelname);
+      if (mod->model ==0 )
+         {
+          #if USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
+              mod->type = OBJ_QUESTION;
+              mod->model = 0;
+              fprintf(stderr,RED "Failed to load object `%s` , will pretend it got loaded and use a fake object question mark instead\n" NORMAL,modelname);
+          #else
+            free(mod);
+            return 0 ;
+          #endif // USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
+         } else
+         {
+             //Populate 3D bounding box data
+             mod->minX = newObj->minX; mod->minY = newObj->minY;  mod->minZ = newObj->minZ;
+             mod->minX = newObj->maxX; mod->maxY = newObj->maxY;  mod->maxZ = newObj->maxZ;
+             fprintf(stderr,"new obj : min %0.2f %0.2f %0.2f  max %0.2f %0.2f %0.2f \n",newObj->minX,newObj->minY,newObj->minZ,newObj->maxX,newObj->maxY,newObj->maxZ);
+         }
+
+    } else
   if ( strstr(modelname,".obj") != 0 )
     {
       mod->type = OBJ_MODEL;
@@ -274,6 +303,15 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   float position[7]={0};
   updateModelPosition(mod,position);
 
+
+      if (mod->type==TRI_MODEL)
+      {
+         fprintf(stderr,"TODO : draw tri model here.. \n");
+      } else
+      if (mod->type==OBJ_ASSIMP_MODEL )
+      {
+         fprintf(stderr,"TODO : draw assimp model here.. \n");
+      } else
       if (mod->type==OBJ_MODEL)
       {
         if (mod->model!=0)

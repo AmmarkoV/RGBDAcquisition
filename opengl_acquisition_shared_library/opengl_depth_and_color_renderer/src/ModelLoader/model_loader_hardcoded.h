@@ -23,6 +23,8 @@ enum ModelTypes
     OBJ_BBOX,
     //-----------
     OBJ_MODEL,
+    TRI_MODEL,
+    OBJ_ASSIMP_MODEL,
     //-----------
     TOTAL_POSSIBLE_MODEL_TYPES
 };

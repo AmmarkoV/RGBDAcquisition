@@ -4,131 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-#if HAVE_OBJ_CODE_AVAILIABLE
-int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
-{
-   if (tri==0) { return 0; }
-   if (obj==0) { return 0; }
-
-   unsigned int i=0,j=0,pos=0,posTex=0;
-
-       tri->header.triType=TRI_LOADER_VERSION;
-       tri->header.numberOfVertices      = obj->numGroups * obj->numFaces * 3 ;
-       tri->header.numberOfNormals       = obj->numGroups * obj->numFaces * 3 ;
-       tri->header.numberOfColors        = obj->numGroups * obj->numFaces * 3 ;
-       tri->header.numberOfTextureCoords = obj->numGroups * obj->numFaces * 2 ;
-       tri->header.numberOfIndices   = 0; // We go full flat when converting an obj image
-       tri->indices                  = 0; // We go full flat when converting an obj image
-       tri->header.drawType = 0;          // Triangles
-
-       tri->textureCoords =   malloc(sizeof(float)  * tri->header.numberOfVertices);
-       tri->vertices = malloc(sizeof(float) *  tri->header.numberOfVertices);
-       tri->normal = malloc(sizeof(float) *  tri->header.numberOfNormals);
-       tri->colors = malloc(sizeof(float) *  tri->header.numberOfColors);
-       for(i=0; i<obj->numGroups; i++)
-	   {
-        for(j=0; j<obj->groups[i].numFaces; j++)
-			{
-			  tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].x;
-			  tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].y;
-              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].z;
-
-              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].x;
-              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].y;
-              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].z;
-
-              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].x;
-              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].y;
-              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].z;
-			}
-		}
-
-        pos=0;
-        for(i=0; i<obj->numGroups; i++)
-		{
-         for(j=0; j<obj->groups[i].numFaces; j++)
-			{
-              if( obj->groups[i].hasNormals)
-                  {
-                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n1;
-                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n2;
-                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n3;
-
-                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n1;
-                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n2;
-                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n3;
-
-
-                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n1;
-                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n2;
-                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n3;
-                  }
-				else
-				 {
-					tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1;
-                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2;
-                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3;
-
-                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1;
-                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2;
-                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3;
-
-                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1;
-                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2;
-                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3;
-				}
-			}//FOR J
-		}
-
-      if (obj->texList!=0)
-      {
-      posTex=0;
-	  for(i=0; i<obj->numGroups; i++)
-	   {
-        for(j=0; j<obj->groups[i].numFaces; j++)
-			{
-              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].u;
-              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].v;
-              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].u;
-              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].v;
-              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].u;
-              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].v;
-			}
-		}
-      }
-
-
-
-      pos=0;
-      if (obj->colorList!=0)
-      {
-       for(i=0; i<obj->numGroups; i++)
-	   {
-        for(j=0; j<obj->groups[i].numFaces; j++)
-			{
-			  tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].r;
-			  tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].g;
-              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].b;
-
-              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].r;
-              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].g;
-              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].b;
-
-              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].r;
-              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].g;
-              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].b;
-			}
-		}
-      }
-
-  return 1;
-}
-#endif // HAVE_OBJ_CODE_AVAILIABLE
-
-
-
-
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed)
 {
 
@@ -344,10 +219,6 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
   return 0;
 }
 
-
-
-
-
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
 {
   unsigned int bufSize;
@@ -381,12 +252,6 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
   if (triModelIN->indices!=0)   { triModelOUT->indices = (unsigned int*) malloc(bufSize); }
   memcpy(triModelOUT->indices       , triModelIN->indices       , bufSize);
 }
-
-
-
-
-
-
 
 
 void deallocModelTri(struct TRI_Model * triModel)
@@ -458,5 +323,127 @@ int saveModelTriHeader(const char * filename , struct TRI_Model * triModel)
 */
 
 
+
+
+#if HAVE_OBJ_CODE_AVAILIABLE
+int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
+{
+   if (tri==0) { return 0; }
+   if (obj==0) { return 0; }
+
+   unsigned int i=0,j=0,pos=0,posTex=0;
+
+       tri->header.triType=TRI_LOADER_VERSION;
+       tri->header.numberOfVertices      = obj->numGroups * obj->numFaces * 3 ;
+       tri->header.numberOfNormals       = obj->numGroups * obj->numFaces * 3 ;
+       tri->header.numberOfColors        = obj->numGroups * obj->numFaces * 3 ;
+       tri->header.numberOfTextureCoords = obj->numGroups * obj->numFaces * 2 ;
+       tri->header.numberOfIndices   = 0; // We go full flat when converting an obj image
+       tri->indices                  = 0; // We go full flat when converting an obj image
+       tri->header.drawType = 0;          // Triangles
+
+       tri->textureCoords =   malloc(sizeof(float)  * tri->header.numberOfVertices);
+       tri->vertices = malloc(sizeof(float) *  tri->header.numberOfVertices);
+       tri->normal = malloc(sizeof(float) *  tri->header.numberOfNormals);
+       tri->colors = malloc(sizeof(float) *  tri->header.numberOfColors);
+       for(i=0; i<obj->numGroups; i++)
+	   {
+        for(j=0; j<obj->groups[i].numFaces; j++)
+			{
+			  tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].x;
+			  tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].y;
+              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].z;
+
+              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].x;
+              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].y;
+              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].z;
+
+              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].x;
+              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].y;
+              tri->vertices[pos++] = obj->vertexList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].z;
+			}
+		}
+
+        pos=0;
+        for(i=0; i<obj->numGroups; i++)
+		{
+         for(j=0; j<obj->groups[i].numFaces; j++)
+			{
+              if( obj->groups[i].hasNormals)
+                  {
+                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n1;
+                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n2;
+                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[0]].n3;
+
+                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n1;
+                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n2;
+                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[1]].n3;
+
+
+                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n1;
+                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n2;
+                     tri->normal[pos++] = obj->normalList[ obj->faceList[ obj->groups[i].faceList[j]].n[2]].n3;
+                  }
+				else
+				 {
+					tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1;
+                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2;
+                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3;
+
+                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1;
+                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2;
+                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3;
+
+                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n1;
+                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n2;
+                    tri->normal[pos++] = obj->faceList[ obj->groups[i].faceList[j]].fc_normal.n3;
+				}
+			}//FOR J
+		}
+
+      if (obj->texList!=0)
+      {
+      posTex=0;
+	  for(i=0; i<obj->numGroups; i++)
+	   {
+        for(j=0; j<obj->groups[i].numFaces; j++)
+			{
+              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].u;
+              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[0]].v;
+              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].u;
+              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[1]].v;
+              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].u;
+              tri->textureCoords[posTex++] =  obj->texList[ obj->faceList[ obj->groups[i].faceList[j]].t[2]].v;
+			}
+		}
+      }
+
+
+
+      pos=0;
+      if (obj->colorList!=0)
+      {
+       for(i=0; i<obj->numGroups; i++)
+	   {
+        for(j=0; j<obj->groups[i].numFaces; j++)
+			{
+			  tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].r;
+			  tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].g;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[0]].b;
+
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].r;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].g;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[1]].b;
+
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].r;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].g;
+              tri->colors[pos++] = obj->colorList[ obj->faceList[ obj->groups[i].faceList[j]].v[2]].b;
+			}
+		}
+      }
+
+  return 1;
+}
+#endif // HAVE_OBJ_CODE_AVAILIABLE
 
 

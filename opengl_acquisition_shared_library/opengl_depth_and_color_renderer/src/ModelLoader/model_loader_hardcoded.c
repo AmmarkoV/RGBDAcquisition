@@ -535,15 +535,15 @@ unsigned int drawHardcodedModelRaw(unsigned int modelType)
 {
     switch (modelType)
     {
-      case OBJ_PLANE :     drawObjPlane(0,0,0, 0.5);             break;
+      case OBJ_PLANE     : drawObjPlane(0,0,0, 0.5);             break;
       case OBJ_GRIDPLANE : drawGridPlane( 0.0 , 0.0 , 0.0, 1.0); break;
-      case OBJ_AXIS :      drawAxis(0,0,0,1.0);                  break;
-      case OBJ_CUBE :      drawCube();                           break;
-      case OBJ_PYRAMID :   drawPyramid();                        break;
-      case OBJ_SPHERE  :   drawSphere( SPHERE_QUALITY );         break;
+      case OBJ_AXIS      : drawAxis(0,0,0,1.0);                  break;
+      case OBJ_CUBE      : drawCube();                           break;
+      case OBJ_PYRAMID   : drawPyramid();                        break;
+      case OBJ_SPHERE    : drawSphere( SPHERE_QUALITY );         break;
       case OBJ_INVISIBLE : /*DONT DRAW ANYTHING*/                break;
       case OBJ_QUESTION  : drawQuestion();                       break;
-      case OBJ_BBOX :  drawBoundingBox(0,0,0,-1.0,-1.0,-1.0,1.0,1.0,1.0); break;
+      case OBJ_BBOX      : drawBoundingBox(0,0,0,-1.0,-1.0,-1.0,1.0,1.0,1.0); break;
       default :
        return 0;
       break;
