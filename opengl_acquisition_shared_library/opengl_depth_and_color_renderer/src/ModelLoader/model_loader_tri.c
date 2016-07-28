@@ -363,14 +363,19 @@ void doTriDrawCalllist(struct TRI_Model * tri )
  unsigned int i=0,z=0;
       for (i=0; i<tri->header.numberOfVertices/3; i++)
         {
-                      glNormal3f(tri->normal[i+0],tri->normal[i+1],tri->normal[i+2]);
-          z=(i*3)*3;  glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
+         z=(i*3)*3;
+                      glNormal3f(tri->normal[z+0],tri->normal[z+1],tri->normal[z+2]);
+                      glColor3f(tri->colors[z+0],tri->colors[z+1],tri->colors[z+2]);
+                      glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
 
-                      glNormal3f(tri->normal[i+0],tri->normal[i+1],tri->normal[i+2]);
-          z+=3;       glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
-
-                      glNormal3f(tri->normal[i+0],tri->normal[i+1],tri->normal[i+2]);
-          z+=3;       glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
+         z+=3;
+                      glNormal3f(tri->normal[z+0],tri->normal[z+1],tri->normal[z+2]);
+                      glColor3f(tri->colors[z+0],tri->colors[z+1],tri->colors[z+2]);
+                      glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
+         z+=3;
+                      glNormal3f(tri->normal[z+0],tri->normal[z+1],tri->normal[z+2]);
+                      glColor3f(tri->colors[z+0],tri->colors[z+1],tri->colors[z+2]);
+                      glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
         }
 
 
