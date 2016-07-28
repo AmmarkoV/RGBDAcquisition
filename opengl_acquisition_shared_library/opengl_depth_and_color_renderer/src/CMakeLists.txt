@@ -23,6 +23,10 @@ IF( ENABLE_PNG )
 ENDIF( ENABLE_PNG )
 
  
+
+
+add_definitions(-DINCLUDE_OPENGL_CODE)
+
 add_library(OGLRendererSandbox SHARED  
             glx.c
             glx.h

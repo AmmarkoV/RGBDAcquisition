@@ -131,68 +131,57 @@ struct Model * loadModel(char * directory,char * modelname)
 
   snprintf(mod->pathOfModel,MAX_MODEL_PATHS,"%s/%s",directory,modelname);
 
+  unsigned int unableToLoad=1;
   unsigned int checkForHardcodedReturn=0;
   unsigned int modType = isModelnameAHardcodedModel(modelname,&checkForHardcodedReturn);
+
   if (checkForHardcodedReturn)
   {
       mod->type = modType;
       mod->model = 0;
+      unableToLoad=0;
   } else
  if ( strstr(modelname,".tri") != 0 )
     {
       mod->type = TRI_MODEL;
-      fprintf(stderr,RED "Cannot load tri model \n" NORMAL);
+      fprintf(stderr,YELLOW "loading tri model \n" NORMAL);
+
+      struct TRI_Model * triModel = allocateModelTri();
+      if (triModel !=0 )
+         {
+          if ( loadModelTri(modelname, triModel) )
+            {
+             mod->model=(void * ) triModel;
+             unableToLoad=0;
+             fprintf(stderr,GREEN " success \n" NORMAL);
+            } else { fprintf(stderr,RED " unable to load TRI model \n" NORMAL); }
+         } else { fprintf(stderr,RED " unable to allocate model \n" NORMAL); }
     } else
  if ( strstr(modelname,".ply") != 0 )
     {
       mod->type = OBJ_ASSIMP_MODEL;
-      struct  OBJ_Model *  newObj = (struct  OBJ_Model * ) loadObj(directory,modelname,1);
-      mod->model = newObj;//(struct  OBJ_Model * ) loadObj(directory,modelname);
-      if (mod->model ==0 )
-         {
-          #if USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
-              mod->type = OBJ_QUESTION;
-              mod->model = 0;
-              fprintf(stderr,RED "Failed to load object `%s` , will pretend it got loaded and use a fake object question mark instead\n" NORMAL,modelname);
-          #else
-            free(mod);
-            return 0 ;
-          #endif // USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
-         } else
-         {
-             //Populate 3D bounding box data
-             mod->minX = newObj->minX; mod->minY = newObj->minY;  mod->minZ = newObj->minZ;
-             mod->minX = newObj->maxX; mod->maxY = newObj->maxY;  mod->maxZ = newObj->maxZ;
-             fprintf(stderr,"new obj : min %0.2f %0.2f %0.2f  max %0.2f %0.2f %0.2f \n",newObj->minX,newObj->minY,newObj->minZ,newObj->maxX,newObj->maxY,newObj->maxZ);
-         }
-
+      fprintf(stderr,RED "TODO : loading ply model \n" NORMAL);
     } else
   if ( strstr(modelname,".obj") != 0 )
     {
       mod->type = OBJ_MODEL;
       struct  OBJ_Model *  newObj = (struct  OBJ_Model * ) loadObj(directory,modelname,1);
       mod->model = newObj;//(struct  OBJ_Model * ) loadObj(directory,modelname);
-      if (mod->model ==0 )
+      if (mod->model !=0 )
          {
-          #if USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
-              mod->type = OBJ_QUESTION;
-              mod->model = 0;
-              fprintf(stderr,RED "Failed to load object `%s` , will pretend it got loaded and use a fake object question mark instead\n" NORMAL,modelname);
-          #else
-            free(mod);
-            return 0 ;
-          #endif // USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
-         } else
-         {
+             unableToLoad=0;
              //Populate 3D bounding box data
              mod->minX = newObj->minX; mod->minY = newObj->minY;  mod->minZ = newObj->minZ;
              mod->minX = newObj->maxX; mod->maxY = newObj->maxY;  mod->maxZ = newObj->maxZ;
              fprintf(stderr,"new obj : min %0.2f %0.2f %0.2f  max %0.2f %0.2f %0.2f \n",newObj->minX,newObj->minY,newObj->minZ,newObj->maxX,newObj->maxY,newObj->maxZ);
          }
 
-    } else
+    }
+
+
+  if (unableToLoad)
     {
-      fprintf(stderr,"Could not understand how to load object %s \n",modelname);
+      fprintf(stderr,"Could not load object %s \n",modelname);
       fprintf(stderr,"Searched in directory %s \n",directory);
       fprintf(stderr,"Object %s was also not one of the hardcoded shapes\n",modelname);
       if (mod->model==0 )
@@ -217,6 +206,8 @@ void unloadModel(struct Model * mod)
 
     switch ( mod->type )
     {
+      case TRI_MODEL :
+          freeModelTri( (struct TRI_Model *) mod->model);
       case OBJ_MODEL :
           unloadObj( (struct  OBJ_Model * ) mod->model);
       break;
@@ -306,7 +297,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
 
       if (mod->type==TRI_MODEL)
       {
-         fprintf(stderr,"TODO : draw tri model here.. \n");
+         doTriDrawCalllist( (struct TRI_Model *) mod->model );
       } else
       if (mod->type==OBJ_ASSIMP_MODEL )
       {

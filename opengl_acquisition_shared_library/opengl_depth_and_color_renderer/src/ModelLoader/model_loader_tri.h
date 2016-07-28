@@ -52,11 +52,17 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj);
 
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
 
+struct TRI_Model * allocateModelTri();
+int freeModelTri(struct TRI_Model * triModel);
+
 int loadModelTri(const char * filename , struct TRI_Model * triModel);
 int saveModelTri(const char * filename , struct TRI_Model * triModel);
 
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN );
 void deallocModelTri(struct TRI_Model * triModel);
+
+void doTriDrawCalllist(struct TRI_Model * tri );
+
 //int saveModelTriHeader(const char * filename , struct TRI_Model * triModel);
 
 
