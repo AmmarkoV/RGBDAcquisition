@@ -34,10 +34,20 @@ struct TRI_Header
 };
 
 
+
+
+struct TRI_Bones_Header
+{
+  unsigned int boneParent;
+  unsigned int boneWeightsNumber;
+  unsigned int boneNameSize;
+  float inverseBindPose[16];
+};
+
 struct TRI_Bones
 {
-  unsigned int boneWeightsNumber;
-  char boneName[32];
+  struct TRI_Bones_Header info;
+  char*  boneName;
   float * weightValue;
   unsigned int * weightIndex;
 };

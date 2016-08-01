@@ -126,29 +126,50 @@ struct TRI_Model * allocateModelTri()
   return (struct TRI_Model * ) newModel;
 }
 
-int freeModelTri(struct TRI_Model * triModel)
-{
-  if (triModel!=0)
-  {
-      if (triModel->vertices!=0)      { free(triModel->vertices); }
-      if (triModel->normal!=0)        { free(triModel->normal); }
-      if (triModel->textureCoords!=0) { free(triModel->textureCoords); }
-      if (triModel->colors!=0)        { free(triModel->colors); }
-      if (triModel->indices!=0)       { free(triModel->indices); }
 
-      if (
+void deallocModelTri(struct TRI_Model * triModel)
+{
+  if (triModel==0) { return ; }
+
+  triModel->header.numberOfVertices = 0;
+  if (triModel->vertices!=0) { free(triModel->vertices); }
+
+  triModel->header.numberOfNormals = 0;
+  if (triModel->normal!=0) { free(triModel->normal); }
+
+  triModel->header.numberOfColors = 0;
+  if (triModel->colors!=0) { free(triModel->colors); }
+
+  triModel->header.numberOfTextureCoords = 0;
+  if (triModel->textureCoords!=0) { free(triModel->textureCoords); }
+
+  triModel->header.numberOfIndices = 0;
+  if (triModel->indices!=0) { free(triModel->indices); }
+
+   if (
            (triModel->header.numberOfBones>0) &&
            (triModel->bones!=0)
           )
       {
-        /* DEALLOC */
-        fprintf(stderr,"Deallocate bones here..\n");
+        unsigned int boneNum =0;
+        for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
+        {
+          free(triModel->bones[boneNum].boneName);
+          free(triModel->bones[boneNum].weightValue);
+          free(triModel->bones[boneNum].weightIndex);
+        }
       }
 
-      if (triModel->bones!=0)         { free(triModel->bones); }
+   if (triModel->bones!=0)         { free(triModel->bones); }
+}
+
+int freeModelTri(struct TRI_Model * triModel)
+{
+  if (triModel!=0)
+  {
+   deallocModelTri(triModel);
    free(triModel);
   }
-
  return 1;
 }
 
@@ -205,6 +226,36 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          n = fread(triModel->indices , sizeof(unsigned int), 3 * triModel->header.numberOfIndices , fd);
         } else {  fprintf(stderr,"No indices specified \n"); }
 
+        if (triModel->header.numberOfBones)
+        {
+         fprintf(stderr,"Reading %u bones\n",triModel->header.numberOfBones);
+
+
+         unsigned int boneNum=0;
+         for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
+         {
+          //First read dimensions of bone string and the number of weights for the bone..
+
+
+          n = fread(&triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header), 1 , fd);
+
+          //Allocate enough space for the bone string , read it  , and null terminate it
+          triModel->bones[boneNum].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneNum].info.boneNameSize+1) );
+          n = fread(triModel->bones[boneNum].boneName , sizeof(char), triModel->bones[boneNum].info.boneNameSize , fd);
+          triModel->bones[boneNum].boneName[triModel->bones[boneNum].info.boneNameSize]=0;
+
+          //Allocate enough space for the weight values , and read them
+          triModel->bones[boneNum].weightValue = ( char * ) malloc ( sizeof(triModel->bones[boneNum].weightValue) * (triModel->bones[boneNum].info.boneWeightsNumber) );
+          n = fread(triModel->bones[boneNum].weightValue , sizeof(triModel->bones[boneNum].weightValue) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+
+          //Allocate enough space for the weight indexes , and read them
+          triModel->bones[boneNum].weightIndex = ( char * ) malloc ( sizeof(triModel->bones[boneNum].weightIndex) * (triModel->bones[boneNum].info.boneWeightsNumber) );
+          n = fread(triModel->bones[boneNum].weightIndex , sizeof(triModel->bones[boneNum].weightIndex) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+         }
+
+
+        } else {  fprintf(stderr,"No bones specified \n"); }
+
 
         fclose(fd);
         return 1;
@@ -257,6 +308,23 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
         fwrite (triModel->indices , 3*sizeof(unsigned int ), triModel->header.numberOfIndices, fd);
         }
 
+
+        if (triModel->header.numberOfBones)
+        {
+         fprintf(stderr,"Writing %u bones\n",triModel->header.numberOfBones);
+
+         unsigned int boneNum=0;
+         for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
+         {
+          //fwrite ( const void * ptr, size_t size, size_t count, FILE * stream );
+          fwrite (&triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header) , 1 , fd);
+          fwrite (triModel->bones[boneNum].boneName , sizeof(char) , triModel->bones[boneNum].info.boneNameSize , fd);
+          fwrite (triModel->bones[boneNum].weightValue , sizeof(triModel->bones[boneNum].weightValue) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+          fwrite (triModel->bones[boneNum].weightIndex , sizeof(triModel->bones[boneNum].weightIndex) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+         }
+        }
+
+
         fflush(fd);
         fclose(fd);
         return 1;
@@ -296,142 +364,9 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
   if (triModelOUT->indices!=0)  { free(triModelOUT->indices); }
   if (triModelIN->indices!=0)   { triModelOUT->indices = (unsigned int*) malloc(bufSize); }
   memcpy(triModelOUT->indices       , triModelIN->indices       , bufSize);
+
+
 }
-
-
-void deallocModelTri(struct TRI_Model * triModel)
-{
-  triModel->header.numberOfVertices = 0;
-  if (triModel->vertices!=0) { free(triModel->vertices); }
-
-  triModel->header.numberOfNormals = 0;
-  if (triModel->normal!=0) { free(triModel->normal); }
-
-  triModel->header.numberOfColors = 0;
-  if (triModel->colors!=0) { free(triModel->colors); }
-
-  triModel->header.numberOfTextureCoords = 0;
-  if (triModel->textureCoords!=0) { free(triModel->textureCoords); }
-
-  triModel->header.numberOfIndices = 0;
-  if (triModel->indices!=0) { free(triModel->indices); }
-}
-
-
-/*
-int saveModelTriHeader(const char * filename , struct TRI_Model * triModel)
-{
-
-  char headerOut[256];
-  snprintf(headerOut,256,"%s.h",filename);
-
-  unsigned int i=0;
-  FILE *fd=0;
-  fd = fopen(headerOut,"w");
-  if (fd!=0)
-    {
-
-        fprintf(fd,"const float %sVertices[] = { \n",filename);
-        for (i=0; i<triModel->header.numberOfVertices; i++)
-        {
-          fprintf(
-                   fd,"%0.4f , %0.4f , %0.4f ",
-                   triModel->vertices[(i*3)+0],
-                   triModel->vertices[(i*3)+1],
-                   triModel->vertices[(i*3)+2]
-                  );
-
-          if (i+1<triModel->header.numberOfVertices) { fprintf(fd,", \n"); }
-        }
-        fprintf(fd,"}; \n\n");
-
-
-        fprintf(fd,"const float %sNormals[] = { \n",filename);
-        for (i=0; i<triModel->header.numberOfNormals; i++)
-        {
-           fprintf(
-                   fd,"%0.4f , %0.4f , %0.4f ",
-                   triModel->normal[(i*3)+0],
-                   triModel->normal[(i*3)+1],
-                   triModel->normal[(i*3)+2]
-                  );
-          if (i+1<triModel->header.numberOfNormals) { fprintf(fd,", \n"); }
-        }
-        fprintf(fd,"}; \n\n");
-
-       fflush(fd);
-       fclose(fd);
-       return 1;
-    }
-  return 0;
-}
-*/
-
-
-//#define INCLUDE_OPENGL_CODE 1
-void doTriDrawCalllist(struct TRI_Model * tri )
-{
- #if INCLUDE_OPENGL_CODE
-  unsigned int i=0,z=0;
-
-  glBegin(GL_TRIANGLES);
-    if (tri->header.numberOfIndices > 0 )
-    {
-     unsigned int faceTriA,faceTriB,faceTriC,faceTriA_X,faceTriA_Y,faceTriA_Z,faceTriB_X,faceTriB_Y,faceTriB_Z,faceTriC_X,faceTriC_Y,faceTriC_Z;
-
-     for (i = 0; i < tri->header.numberOfIndices/3; i++)
-     {
-      faceTriA = tri->indices[(i*3)+0];      faceTriB = tri->indices[(i*3)+1];      faceTriC = tri->indices[(i*3)+2];
-      faceTriA_X = (faceTriA*3)+0;           faceTriA_Y = (faceTriA*3)+1;           faceTriA_Z = (faceTriA*3)+2;
-      faceTriB_X = (faceTriB*3)+0;           faceTriB_Y = (faceTriB*3)+1;           faceTriB_Z = (faceTriB*3)+2;
-      faceTriC_X = (faceTriC*3)+0;           faceTriC_Y = (faceTriC*3)+1;           faceTriC_Z = (faceTriC*3)+2;
-
-      if (tri->normal)
-        { glNormal3f(tri->normal[faceTriA_X],tri->normal[faceTriA_Y],tri->normal[faceTriA_Z]); }
-      if ( tri->colors )
-        { glColor3f(tri->colors[faceTriA_X],tri->colors[faceTriA_Y],tri->colors[faceTriA_Z]);  }
-      glVertex3f(tri->vertices[faceTriA_X],tri->vertices[faceTriA_Y],tri->vertices[faceTriA_Z]);
-
-      if (tri->normal)
-        { glNormal3f(tri->normal[faceTriB_X],tri->normal[faceTriB_Y],tri->normal[faceTriB_Z]); }
-      if ( tri->colors )
-        { glColor3f(tri->colors[faceTriB_X],tri->colors[faceTriB_Y],tri->colors[faceTriB_Z]);  }
-      glVertex3f(tri->vertices[faceTriB_X],tri->vertices[faceTriB_Y],tri->vertices[faceTriB_Z]);
-
-      if (tri->normal)
-        { glNormal3f(tri->normal[faceTriC_X],tri->normal[faceTriC_Y],tri->normal[faceTriC_Z]); }
-      if ( tri->colors )
-        { glColor3f(tri->colors[faceTriC_X],tri->colors[faceTriC_Y],tri->colors[faceTriC_Z]);  }
-      glVertex3f(tri->vertices[faceTriC_X],tri->vertices[faceTriC_Y],tri->vertices[faceTriC_Z]);
-	 }
-    } else
-    {
-      for (i=0; i<tri->header.numberOfVertices/3; i++)
-        {
-         z=(i*3)*3;
-         if (tri->normal) { glNormal3f(tri->normal[z+0],tri->normal[z+1],tri->normal[z+2]); }
-         if (tri->colors) { glColor3f(tri->colors[z+0],tri->colors[z+1],tri->colors[z+2]);  }
-                            glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
-
-         z+=3;
-         if (tri->normal) { glNormal3f(tri->normal[z+0],tri->normal[z+1],tri->normal[z+2]); }
-         if (tri->colors) { glColor3f(tri->colors[z+0],tri->colors[z+1],tri->colors[z+2]);  }
-                            glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
-         z+=3;
-         if (tri->normal) { glNormal3f(tri->normal[z+0],tri->normal[z+1],tri->normal[z+2]); }
-         if (tri->colors) { glColor3f(tri->colors[z+0],tri->colors[z+1],tri->colors[z+2]);  }
-                            glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
-        }
-    }
-  glEnd();
- #else
-  fprintf(stderr,"OpenGL code not compiled in this model loader TRI code.. \n");
- #endif // INCLUDE_OPENGL_CODE
-}
-
-
-
-
 
 
 
@@ -455,12 +390,16 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
        tri->header.numberOfTextureCoords = obj->numGroups * obj->numFaces * 2 ;
        tri->header.numberOfIndices   = 0; // We go full flat when converting an obj image
        tri->indices                  = 0; // We go full flat when converting an obj image
-       tri->header.drawType = 0;          // Triangles
+       tri->header.numberOfBones     = 0; //Obj files dont have bones
+       tri->bones                    = 0; //Obj files dont have bones
+       tri->header.drawType = 0;     // Triangles
 
        tri->textureCoords = malloc(sizeof(float) *3 *2 * tri->header.numberOfVertices);
        tri->vertices      = malloc(sizeof(float) *3 *3*  tri->header.numberOfVertices);
        tri->normal        = malloc(sizeof(float) *3 *3*  tri->header.numberOfNormals);
        tri->colors        = malloc(sizeof(float) *3 *3*  tri->header.numberOfColors);
+
+
        for(i=0; i<obj->numGroups; i++)
 	   {
         for(j=0; j<obj->groups[i].numFaces; j++)
@@ -560,5 +499,67 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
   return 1;
 }
 #endif // HAVE_OBJ_CODE_AVAILIABLE
+
+
+//#define INCLUDE_OPENGL_CODE 1
+void doTriDrawCalllist(struct TRI_Model * tri )
+{
+ #if INCLUDE_OPENGL_CODE
+  unsigned int i=0,z=0;
+
+  glBegin(GL_TRIANGLES);
+    if (tri->header.numberOfIndices > 0 )
+    {
+     unsigned int faceTriA,faceTriB,faceTriC,faceTriA_X,faceTriA_Y,faceTriA_Z,faceTriB_X,faceTriB_Y,faceTriB_Z,faceTriC_X,faceTriC_Y,faceTriC_Z;
+
+     for (i = 0; i < tri->header.numberOfIndices/3; i++)
+     {
+      faceTriA = tri->indices[(i*3)+0];      faceTriB = tri->indices[(i*3)+1];      faceTriC = tri->indices[(i*3)+2];
+      faceTriA_X = (faceTriA*3)+0;           faceTriA_Y = (faceTriA*3)+1;           faceTriA_Z = (faceTriA*3)+2;
+      faceTriB_X = (faceTriB*3)+0;           faceTriB_Y = (faceTriB*3)+1;           faceTriB_Z = (faceTriB*3)+2;
+      faceTriC_X = (faceTriC*3)+0;           faceTriC_Y = (faceTriC*3)+1;           faceTriC_Z = (faceTriC*3)+2;
+
+      if (tri->normal)
+        { glNormal3f(tri->normal[faceTriA_X],tri->normal[faceTriA_Y],tri->normal[faceTriA_Z]); }
+      if ( tri->colors )
+        { glColor3f(tri->colors[faceTriA_X],tri->colors[faceTriA_Y],tri->colors[faceTriA_Z]);  }
+      glVertex3f(tri->vertices[faceTriA_X],tri->vertices[faceTriA_Y],tri->vertices[faceTriA_Z]);
+
+      if (tri->normal)
+        { glNormal3f(tri->normal[faceTriB_X],tri->normal[faceTriB_Y],tri->normal[faceTriB_Z]); }
+      if ( tri->colors )
+        { glColor3f(tri->colors[faceTriB_X],tri->colors[faceTriB_Y],tri->colors[faceTriB_Z]);  }
+      glVertex3f(tri->vertices[faceTriB_X],tri->vertices[faceTriB_Y],tri->vertices[faceTriB_Z]);
+
+      if (tri->normal)
+        { glNormal3f(tri->normal[faceTriC_X],tri->normal[faceTriC_Y],tri->normal[faceTriC_Z]); }
+      if ( tri->colors )
+        { glColor3f(tri->colors[faceTriC_X],tri->colors[faceTriC_Y],tri->colors[faceTriC_Z]);  }
+      glVertex3f(tri->vertices[faceTriC_X],tri->vertices[faceTriC_Y],tri->vertices[faceTriC_Z]);
+	 }
+    } else
+    {
+      for (i=0; i<tri->header.numberOfVertices/3; i++)
+        {
+         z=(i*3)*3;
+         if (tri->normal) { glNormal3f(tri->normal[z+0],tri->normal[z+1],tri->normal[z+2]); }
+         if (tri->colors) { glColor3f(tri->colors[z+0],tri->colors[z+1],tri->colors[z+2]);  }
+                            glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
+
+         z+=3;
+         if (tri->normal) { glNormal3f(tri->normal[z+0],tri->normal[z+1],tri->normal[z+2]); }
+         if (tri->colors) { glColor3f(tri->colors[z+0],tri->colors[z+1],tri->colors[z+2]);  }
+                            glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
+         z+=3;
+         if (tri->normal) { glNormal3f(tri->normal[z+0],tri->normal[z+1],tri->normal[z+2]); }
+         if (tri->colors) { glColor3f(tri->colors[z+0],tri->colors[z+1],tri->colors[z+2]);  }
+                            glVertex3f(tri->vertices[z+0],tri->vertices[z+1],tri->vertices[z+2]);
+        }
+    }
+  glEnd();
+ #else
+  fprintf(stderr,"OpenGL code not compiled in this model loader TRI code.. \n");
+ #endif // INCLUDE_OPENGL_CODE
+}
 
 

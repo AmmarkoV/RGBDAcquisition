@@ -271,7 +271,7 @@
 	<ctype.h>
 	"TrajectoryPrimitives.h"
 
-1469454007 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c
+1469722439 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -394,13 +394,15 @@
 
 1458492977 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/image.h
 
-1465350816 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c
+1470058484 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c
 	"model_loader_tri.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+	<GL/gl.h>
+	<GL/glx.h>
 
-1469720529 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h
+1470058250 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h
 	"model_loader_setup.h"
 	"model_loader_obj.h"
 
