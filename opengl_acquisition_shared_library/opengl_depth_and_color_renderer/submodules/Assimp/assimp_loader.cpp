@@ -71,6 +71,7 @@ struct boneItem
   int itemID;
   int parentItemID;
   int parentlessNode;
+  unsigned int numberOfWeights;
  };
 
 struct boneState
@@ -235,6 +236,7 @@ void populateInternalRigState(struct aiScene *scene , int meshNumber, struct bon
        bones->bone[k].nodeTransformInitial = node->mTransformation;
        bones->bone[k].boneInverseBindTransform = bone->mOffsetMatrix;
        bones->bone[k].itemID=k;
+       bones->bone[k].numberOfWeights = bone->mNumWeights;
 
        bones->bone[k].parentlessNode=1;
 
@@ -434,7 +436,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     triModel->indices        = (unsigned int*) malloc( triModel->header.numberOfIndices  * sizeof(unsigned int));
     triModel->bones          = (struct TRI_Bones*) malloc( triModel->header.numberOfBones  * sizeof(struct TRI_Bones));
 
-    unsigned int i=0;
+    unsigned int i=0,k=0;
 
     unsigned int o=0,n=0,t=0,c=0;
 	for (i = 0; i < mesh->mNumVertices; i++)
@@ -477,9 +479,28 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
 
     //Bones now..
+    struct boneState bones;
+    populateInternalRigState(scene , meshNumber, &bones);
     if (triModel->header.numberOfBones>0)
     {
+      for (i = 0; i < triModel->header.numberOfBones; i++)
+      {
+	   struct aiBone *bone = mesh->mBones[i];
+	   triModel->bones[i].info.boneNameSize = strlen(bones.bone[i].name);
 
+       float * rm = triModel->bones[i].info.inverseBindPose;
+       aiMatrix4x4 * am = &bones.bone[i].boneInverseBindTransform;
+       rm[0]=am->a1; rm[1]=am->a2;  rm[2]=am->a3;  rm[3]=am->a4;
+       rm[4]=am->b1; rm[5]=am->b2;  rm[6]=am->b3;  rm[7]=am->b4;
+       rm[8]=am->c1; rm[9]=am->c2;  rm[10]=am->c3; rm[11]=am->c4;
+       rm[12]=am->d1;rm[12]=am->d2; rm[13]=am->d3; rm[14]=am->d4;
+
+       triModel->bones[i].boneName = (char* ) malloc(sizeof(char) * (triModel->bones[i].info.boneNameSize+1) );
+       snprintf(triModel->bones[i].boneName,triModel->bones[i].info.boneNameSize+1,"%s",bones.bone[i].name);
+
+       triModel->bones[i].info.boneParent=bones.bone[i].parentItemID;
+       triModel->bones[i].info.boneWeightsNumber=bones.bone[i].numberOfWeights;
+	  }
     }
 }
 
