@@ -500,7 +500,16 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
        triModel->bones[i].info.boneParent=bones.bone[i].parentItemID;
        triModel->bones[i].info.boneWeightsNumber=bones.bone[i].numberOfWeights;
-	  }
+
+       triModel->bones[i].weightIndex = (unsigned int*) malloc(sizeof(unsigned int) * triModel->bones[i].info.boneWeightsNumber);
+       triModel->bones[i].weightValue = (float*) malloc(sizeof(float) * triModel->bones[i].info.boneWeightsNumber);
+
+       for (k = 0; k < triModel->header.numberOfBones; k++)
+         {
+           triModel->bones[i].weightIndex[k] = bone->mWeights[k].mVertexId;
+           triModel->bones[i].weightValue[k] = bone->mWeights[k].mWeight;
+	     }
+      }
     }
 }
 
