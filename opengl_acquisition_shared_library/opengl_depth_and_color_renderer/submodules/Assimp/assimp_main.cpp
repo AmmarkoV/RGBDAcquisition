@@ -4,6 +4,10 @@
 
 int main (int argc, char *argv[])
 {
+ if (argc<3)   { fprintf(stderr,"Not enough arguments , use as : \nassimpTester source.dae target.tri \n"); return 0; }
+
+
+ fprintf(stderr,"assimpTester %s %s \n",argv[1],argv[2]);
  struct TRI_Model flatModel;
  struct TRI_Model originalModel;
 
