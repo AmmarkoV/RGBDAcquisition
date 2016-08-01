@@ -21,14 +21,16 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
     triModel->header.numberOfTextureCoords = indexed->header.numberOfIndices*2;
     triModel->header.numberOfColors        = indexed->header.numberOfIndices*3;
     triModel->header.numberOfIndices       = 0;
+    triModel->header.numberOfBones         = 0; //indexed->header.numberOfBones;
 
+    fprintf(stderr,"\n\nwarning : Flattening a model loses its bone structure for now .. \n");
 
 	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices  *3 *3    * sizeof(float));
 	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals   *3 *3     * sizeof(float));
 	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords *3 *2  * sizeof(float));
     triModel->colors         = (float*) malloc( triModel->header.numberOfColors    *3  *3    * sizeof(float));
     triModel->indices        = 0;
-
+    triModel->bones          = 0;
     unsigned int i=0;
 
     unsigned int o=0,n=0,t=0,c=0;
@@ -119,6 +121,8 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 struct TRI_Model * allocateModelTri()
 {
   struct TRI_Model * newModel = (struct TRI_Model * ) malloc(sizeof(struct TRI_Model));
+  if (newModel!=0) // Clear new model if it was allocated..
+        { memset(newModel,0,sizeof(struct TRI_Model)); }
   return (struct TRI_Model * ) newModel;
 }
 
@@ -131,6 +135,17 @@ int freeModelTri(struct TRI_Model * triModel)
       if (triModel->textureCoords!=0) { free(triModel->textureCoords); }
       if (triModel->colors!=0)        { free(triModel->colors); }
       if (triModel->indices!=0)       { free(triModel->indices); }
+
+      if (
+           (triModel->header.numberOfBones>0) &&
+           (triModel->bones!=0)
+          )
+      {
+        /* DEALLOC */
+        fprintf(stderr,"Deallocate bones here..\n");
+      }
+
+      if (triModel->bones!=0)         { free(triModel->bones); }
    free(triModel);
   }
 
@@ -351,7 +366,6 @@ int saveModelTriHeader(const char * filename , struct TRI_Model * triModel)
   return 0;
 }
 */
-
 
 
 //#define INCLUDE_OPENGL_CODE 1

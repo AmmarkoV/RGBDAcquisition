@@ -26,13 +26,21 @@ struct TRI_Header
      unsigned int numberOfTextureCoords;
      unsigned int numberOfColors;
      unsigned int numberOfIndices;
+     unsigned int numberOfBones;
      //In order not to break this file format ever again
      unsigned int notUsed1;
      unsigned int notUsed2;
      unsigned int notUsed3;
-     unsigned int notUsed4;
 };
 
+
+struct TRI_Bones
+{
+  unsigned int boneWeightsNumber;
+  char boneName[32];
+  float * weightValue;
+  unsigned int * weightIndex;
+};
 
 struct TRI_Model
 {
@@ -41,6 +49,7 @@ struct TRI_Model
    float * normal;
    float * textureCoords;
    float * colors;
+   struct TRI_Bones * bones;
    unsigned int * indices;
 };
 
