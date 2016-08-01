@@ -8,11 +8,10 @@ int main (int argc, char *argv[])
 
 
  fprintf(stderr,"assimpTester %s %s \n",argv[1],argv[2]);
- struct TRI_Model flatModel;
- struct TRI_Model originalModel;
+ struct TRI_Model flatModel={0};
+ struct TRI_Model originalModel={0};
 
  testAssimp(argv[1],&flatModel,&originalModel);
-
 
  saveModelTri(argv[2], &originalModel);
 

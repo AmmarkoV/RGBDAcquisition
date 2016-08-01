@@ -230,27 +230,33 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
         {
          fprintf(stderr,"Reading %u bones\n",triModel->header.numberOfBones);
 
-
-         unsigned int boneNum=0;
-         for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
+         triModel->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * triModel->header.numberOfBones);
+         if (triModel->bones)
          {
+          unsigned int boneNum=0;
+          for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
+          {
           //First read dimensions of bone string and the number of weights for the bone..
-
-
+          fprintf(stderr,"Reading header for bone %u \n",boneNum);
           n = fread(&triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header), 1 , fd);
 
           //Allocate enough space for the bone string , read it  , and null terminate it
+
+          fprintf(stderr,"Allocating space for name %u \n",triModel->bones[boneNum].info.boneNameSize);
           triModel->bones[boneNum].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneNum].info.boneNameSize+1) );
           n = fread(triModel->bones[boneNum].boneName , sizeof(char), triModel->bones[boneNum].info.boneNameSize , fd);
           triModel->bones[boneNum].boneName[triModel->bones[boneNum].info.boneNameSize]=0;
+          fprintf(stderr,"Bone Name is %s \n",triModel->bones[boneNum].boneName);
 
           //Allocate enough space for the weight values , and read them
+          fprintf(stderr,"Allocating space for weights %u \n",triModel->bones[boneNum].info.boneWeightsNumber);
           triModel->bones[boneNum].weightValue = ( char * ) malloc ( sizeof(triModel->bones[boneNum].weightValue) * (triModel->bones[boneNum].info.boneWeightsNumber) );
           n = fread(triModel->bones[boneNum].weightValue , sizeof(triModel->bones[boneNum].weightValue) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
 
           //Allocate enough space for the weight indexes , and read them
           triModel->bones[boneNum].weightIndex = ( char * ) malloc ( sizeof(triModel->bones[boneNum].weightIndex) * (triModel->bones[boneNum].info.boneWeightsNumber) );
           n = fread(triModel->bones[boneNum].weightIndex , sizeof(triModel->bones[boneNum].weightIndex) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+          }
          }
 
 
@@ -276,7 +282,7 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
     {
         triModel->header.triType = TRI_LOADER_VERSION;
         triModel->header.floatSize =(unsigned int ) sizeof(float);
-        fwrite (&triModel->header        , sizeof(struct TRI_Header), 1 , fd);
+        fwrite (&triModel->header , sizeof(struct TRI_Header), 1 , fd);
 
         if (triModel->header.numberOfVertices)
         {
@@ -334,6 +340,11 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
 {
+  fprintf(stderr,"copyModelTri ignores bone structures..\n");
+  triModelOUT->bones=0;
+  triModelOUT->header.numberOfBones=0;
+
+
   unsigned int bufSize;
 
   memset(triModelOUT,0,sizeof(struct TRI_Model));
