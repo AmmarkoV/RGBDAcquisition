@@ -335,7 +335,7 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
     fprintf(stderr,"  %d bones\n",mesh->mNumBones);
 
 
-    //The first step to do is create an internal structure and gather all the information out of Assimp
+    //The first step to do is create an internal structure and gather all the data out of Assimp
     struct boneState modifiedSkeleton;
     populateInternalRigState(scene , meshNumber, &modifiedSkeleton );
 
@@ -502,10 +502,9 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
        rm[8]=am->c1; rm[9]=am->c2;  rm[10]=am->c3; rm[11]=am->c4;
        rm[12]=am->d1;rm[12]=am->d2; rm[13]=am->d3; rm[14]=am->d4;
 
-       triModel->bones[i].boneName = (char* ) malloc(sizeof(char) * (triModel->bones[i].info->boneNameSize+1) );
-       snprintf(triModel->bones[i].boneName,triModel->bones[i].info->boneNameSize+1,"%s",bones.bone[i].name);
+       triModel->bones[i].boneName = (char* ) malloc(sizeof(char) * (1+triModel->bones[i].info->boneNameSize) );
+       snprintf(triModel->bones[i].boneName,1+triModel->bones[i].info->boneNameSize,"%s",bones.bone[i].name);
 
-       //fprintf(stderr,"Bone %s %u/%u has %u weights \n" , triModel->bones[i].boneName , i , triModel->header.numberOfBones , triModel->bones[i].info.boneWeightsNumber);
        bufSize = sizeof(float) * triModel->bones[i].info->boneWeightsNumber;
        triModel->bones[i].weightValue = (float*)        malloc(bufSize);
        memset( triModel->bones[i].weightValue, 0 , bufSize );
@@ -517,9 +516,11 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
        for (k = 0; k < triModel->bones[i].info->boneWeightsNumber; k++)
          {
+           //triModel->bones[i].weightValue[k] = 0.0;
+           //triModel->bones[i].weightIndex[k] = 0;
+
            triModel->bones[i].weightValue[k] = bone->mWeights[k].mWeight;
            triModel->bones[i].weightIndex[k] = bone->mWeights[k].mVertexId;
-           //fprintf(stderr,"bone(%u-%u , %0.2f ,%u) \n",i,k,triModel->bones[i].weightValue[k],triModel->bones[i].weightIndex[k]);
 	     }
       }
     }
