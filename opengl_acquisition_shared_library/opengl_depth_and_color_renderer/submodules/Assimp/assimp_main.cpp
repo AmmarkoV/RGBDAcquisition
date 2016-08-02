@@ -8,22 +8,24 @@ int main (int argc, char *argv[])
 
 
  fprintf(stderr,"assimpTester %s %s \n",argv[1],argv[2]);
- struct TRI_Model flatModel={0};
- struct TRI_Model originalModel={0};
 
- testAssimp(argv[1],&flatModel,&originalModel);
- saveModelTri(argv[2], &originalModel);
+ struct TRI_Model *flatModel    =  allocateModelTri();
+ struct TRI_Model *originalModel=  allocateModelTri();
 
 
+ testAssimp(argv[1],flatModel,originalModel);
+ saveModelTri(argv[2], originalModel);
 
- struct TRI_Model reloadedModel={0};
- loadModelTri( argv[2] , &reloadedModel);
- saveModelTri( "resave.tri", &reloadedModel);
- deallocModelTri(&reloadedModel);
 
- //cant free because it is stack
- deallocModelTri(&flatModel);
- deallocModelTri(&originalModel);
+
+// struct TRI_Model *reloadedModel=  allocateModelTri();
+// loadModelTri( argv[2] , reloadedModel);
+// saveModelTri( "resave.tri", reloadedModel);
+// freeModelTri(reloadedModel);
+
+
+ freeModelTri(flatModel);
+ freeModelTri(originalModel);
 
  return 0;
 

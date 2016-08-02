@@ -46,7 +46,7 @@ struct TRI_Bones_Header
 
 struct TRI_Bones
 {
-  struct TRI_Bones_Header info;
+  struct TRI_Bones_Header * info;
   char*  boneName;
   float * weightValue;
   unsigned int * weightIndex;

@@ -419,7 +419,6 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 	triModel->textureCoords = (float*)            malloc( textureCoordsSize );
     triModel->colors        = (float*)            malloc( colorSize );
     triModel->indices       = (unsigned int*)     malloc( indexSize );
-    triModel->bones         = (struct TRI_Bones*) malloc( bonesSize );
 
 
     fprintf(stderr,"Allocating :   \n");
@@ -428,14 +427,13 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     fprintf(stderr,"  %d bytes of textureCoords \n",textureCoordsSize);
     fprintf(stderr,"  %d bytes of colors\n",colorSize);
     fprintf(stderr,"  %d bytes of indices\n",indexSize);
-    fprintf(stderr,"  %d bytes of bones\n",bonesSize);
+      fprintf(stderr,"  %d bytes of bones\n",bonesSize);
 
     memset(triModel->vertices, 0 , verticesSize );
     memset(triModel->normal, 0 , normalsSize );
     memset(triModel->textureCoords, 0 , textureCoordsSize );
     memset(triModel->colors, 0 , colorSize );
     memset(triModel->indices, 0 , indexSize );
-    memset(triModel->bones, 0 , bonesSize );
 
     unsigned int i=0,k=0;
 	for (i = 0; i < mesh->mNumVertices; i++)
@@ -483,39 +481,45 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     populateInternalRigState(scene , meshNumber, &bones);
     if (triModel->header.numberOfBones>0)
     {
+      triModel->bones         = (struct TRI_Bones*) malloc( bonesSize );
+      memset(triModel->bones, 0 , bonesSize );
+
       for (i = 0; i < triModel->header.numberOfBones; i++)
       {
-       memset(&triModel->bones[i].info,0,sizeof(struct TRI_Bones_Header));
+       triModel->bones[i].info = (struct TRI_Bones_Header*) malloc(sizeof(struct TRI_Bones_Header));
+       memset(triModel->bones[i].info,0,sizeof(struct TRI_Bones_Header));
+
+       triModel->bones[i].info->boneParent=bones.bone[i].parentItemID;
+       triModel->bones[i].info->boneWeightsNumber=bones.bone[i].numberOfWeights;
 
 	   struct aiBone *bone = mesh->mBones[i];
-	   triModel->bones[i].info.boneNameSize = strlen(bones.bone[i].name);
+	   triModel->bones[i].info->boneNameSize = strlen(bones.bone[i].name);
 
-       float * rm = triModel->bones[i].info.inverseBindPose;
+       float * rm = triModel->bones[i].info->inverseBindPose;
        aiMatrix4x4 * am = &bones.bone[i].boneInverseBindTransform;
        rm[0]=am->a1; rm[1]=am->a2;  rm[2]=am->a3;  rm[3]=am->a4;
        rm[4]=am->b1; rm[5]=am->b2;  rm[6]=am->b3;  rm[7]=am->b4;
        rm[8]=am->c1; rm[9]=am->c2;  rm[10]=am->c3; rm[11]=am->c4;
        rm[12]=am->d1;rm[12]=am->d2; rm[13]=am->d3; rm[14]=am->d4;
 
-       triModel->bones[i].boneName = (char* ) malloc(sizeof(char) * (triModel->bones[i].info.boneNameSize+1) );
-       snprintf(triModel->bones[i].boneName,triModel->bones[i].info.boneNameSize+1,"%s",bones.bone[i].name);
-
-       triModel->bones[i].info.boneParent=bones.bone[i].parentItemID;
-       triModel->bones[i].info.boneWeightsNumber=bones.bone[i].numberOfWeights;
+       triModel->bones[i].boneName = (char* ) malloc(sizeof(char) * (triModel->bones[i].info->boneNameSize+1) );
+       snprintf(triModel->bones[i].boneName,triModel->bones[i].info->boneNameSize+1,"%s",bones.bone[i].name);
 
        //fprintf(stderr,"Bone %s %u/%u has %u weights \n" , triModel->bones[i].boneName , i , triModel->header.numberOfBones , triModel->bones[i].info.boneWeightsNumber);
-       bufSize = sizeof(unsigned int) * triModel->bones[i].info.boneWeightsNumber;
-       triModel->bones[i].weightIndex = (unsigned int*) malloc(bufSize);
-       memset( triModel->bones[i].weightIndex, 0 , bufSize );
-
-       bufSize = sizeof(float) * triModel->bones[i].info.boneWeightsNumber;
+       bufSize = sizeof(float) * triModel->bones[i].info->boneWeightsNumber;
        triModel->bones[i].weightValue = (float*)        malloc(bufSize);
        memset( triModel->bones[i].weightValue, 0 , bufSize );
 
-       for (k = 0; k < triModel->bones[i].info.boneWeightsNumber; k++)
+       bufSize = sizeof(unsigned int) * triModel->bones[i].info->boneWeightsNumber;
+       triModel->bones[i].weightIndex = (unsigned int*) malloc(bufSize);
+       memset( triModel->bones[i].weightIndex, 0 , bufSize );
+
+
+       for (k = 0; k < triModel->bones[i].info->boneWeightsNumber; k++)
          {
-           triModel->bones[i].weightIndex[k] = bone->mWeights[k].mVertexId;
            triModel->bones[i].weightValue[k] = bone->mWeights[k].mWeight;
+           triModel->bones[i].weightIndex[k] = bone->mWeights[k].mVertexId;
+           //fprintf(stderr,"bone(%u-%u , %0.2f ,%u) \n",i,k,triModel->bones[i].weightValue[k],triModel->bones[i].weightIndex[k]);
 	     }
       }
     }
