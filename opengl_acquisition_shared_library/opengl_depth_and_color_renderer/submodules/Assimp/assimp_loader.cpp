@@ -429,12 +429,12 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
    //fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
 
-	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices * sizeof(float));
-	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals  * sizeof(float));
-	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords     * sizeof(float));
-    triModel->colors         = (float*) malloc( triModel->header.numberOfColors  * sizeof(float));
+	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices        * sizeof(float));
+	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals         * sizeof(float));
+	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords   * sizeof(float));
+    triModel->colors         = (float*) malloc( triModel->header.numberOfColors          * sizeof(float));
     triModel->indices        = (unsigned int*) malloc( triModel->header.numberOfIndices  * sizeof(unsigned int));
-    triModel->bones          = (struct TRI_Bones*) malloc( triModel->header.numberOfBones  * sizeof(struct TRI_Bones));
+    triModel->bones          = (struct TRI_Bones*) malloc( triModel->header.numberOfBones* sizeof(struct TRI_Bones));
 
     unsigned int i=0,k=0;
 

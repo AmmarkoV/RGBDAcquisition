@@ -174,6 +174,46 @@ int freeModelTri(struct TRI_Model * triModel)
 }
 
 
+void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
+{
+  fprintf(stderr,"copyModelTri ignores bone structures..\n");
+  triModelOUT->bones=0;
+  triModelOUT->header.numberOfBones=0;
+
+
+  unsigned int itemSize , count;
+
+  memset(triModelOUT,0,sizeof(struct TRI_Model));
+  memcpy(&triModelOUT->header , &triModelIN->header , sizeof(struct TRI_Header));
+
+  itemSize=sizeof(float)*3; count=triModelIN->header.numberOfVertices;
+  if (triModelOUT->vertices!=0)  { free(triModelOUT->vertices); }
+  if (triModelIN->vertices!=0)   { triModelOUT->vertices = (float*) malloc(itemSize*count); }
+  memcpy(triModelOUT->vertices,triModelIN->vertices,itemSize*count);
+
+  itemSize=sizeof(float)*3; count=triModelIN->header.numberOfNormals;
+  if (triModelOUT->normal!=0)  { free(triModelOUT->normal); }
+  if (triModelIN->normal!=0)   { triModelOUT->normal = (float*) malloc(itemSize*count); }
+  memcpy(triModelOUT->normal        , triModelIN->normal        , itemSize*count);
+
+  itemSize=sizeof(float)*3; count=triModelIN->header.numberOfColors;
+  if (triModelOUT->colors!=0)  { free(triModelOUT->colors); }
+  if (triModelIN->colors!=0)   { triModelOUT->colors=(float*) malloc(itemSize*count); }
+  memcpy(triModelOUT->colors        , triModelIN->colors        , itemSize*count);
+
+  itemSize=sizeof(float)*2; count=triModelIN->header.numberOfTextureCoords;
+  if (triModelOUT->textureCoords!=0)  { free(triModelOUT->textureCoords); }
+  if (triModelIN->textureCoords!=0)   { triModelOUT->textureCoords=(float*) malloc(itemSize*count); }
+  memcpy(triModelOUT->textureCoords , triModelIN->textureCoords , itemSize*count);
+
+  itemSize=sizeof(unsigned int)*3; count=triModelIN->header.numberOfIndices;
+  if (triModelOUT->indices!=0)  { free(triModelOUT->indices); }
+  if (triModelIN->indices!=0)   { triModelOUT->indices = (unsigned int*) malloc(itemSize*count); }
+  memcpy(triModelOUT->indices       , triModelIN->indices       , itemSize*count);
+
+ return ;
+}
+
 
 
 int loadModelTri(const char * filename , struct TRI_Model * triModel)
@@ -184,46 +224,52 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
   if (fd!=0)
     {
         size_t n;
+        unsigned int itemSize=0 , count=0;
 
         n = fread(&triModel->header , sizeof(struct TRI_Header), 1 , fd);
         if (triModel->header.floatSize!=sizeof(float)) { fprintf(stderr,"Size of float (%u/%u) is different , cannot load \n",triModel->header.floatSize,sizeof(float)); return 0; }
-        if (triModel->header.triType != TRI_LOADER_VERSION ) { fprintf(stderr,"Incompatible triloader file , cannot load \n",triModel->header.floatSize,sizeof(float)); return 0; }
+        if (triModel->header.triType != TRI_LOADER_VERSION )  { fprintf(stderr,"Incompatible triloader file , cannot load \n",triModel->header.floatSize,sizeof(float)); return 0; }
 
 
         if (triModel->header.numberOfVertices)
         {
-         fprintf(stderr,"Reading %u bytes of vertex\n",sizeof(float) * 3*3 * triModel->header.numberOfVertices);
-         triModel->vertices = ( float * ) malloc ( sizeof(float) * 3*3 * triModel->header.numberOfVertices );
-         n = fread(triModel->vertices , sizeof(float), 3 * triModel->header.numberOfVertices , fd);
+         itemSize=sizeof(float)*3; count=triModel->header.numberOfVertices;
+         fprintf(stderr,"Reading %u bytes of vertex\n", itemSize * count );
+         triModel->vertices = ( float * ) malloc ( itemSize * count );
+         n = fread(triModel->vertices , itemSize , count , fd);
         } else {  fprintf(stderr,"No vertices specified \n"); }
 
         if (triModel->header.numberOfNormals)
         {
-         fprintf(stderr,"Reading %u bytes of normal\n",sizeof(float) * 3*3 * triModel->header.numberOfNormals);
-         triModel->normal = ( float * ) malloc ( sizeof(float) * 3*3 * triModel->header.numberOfNormals );
-         n = fread(triModel->normal , sizeof(float), 3 * triModel->header.numberOfNormals , fd);
+         itemSize=sizeof(float)*3; count=triModel->header.numberOfNormals;
+         fprintf(stderr,"Reading %u bytes of normal\n", itemSize * count );
+         triModel->normal = ( float * ) malloc ( itemSize * count );
+         n = fread(triModel->normal , itemSize , count , fd);
         } else {  fprintf(stderr,"No normals specified \n"); }
 
 
         if (triModel->header.numberOfTextureCoords)
         {
-        fprintf(stderr,"Reading %u bytes of textures\n",sizeof(float) * 3*2 *triModel->header.numberOfTextureCoords);
-        triModel->textureCoords = ( float * ) malloc ( sizeof(float) * 3*2 * triModel->header.numberOfTextureCoords );
-        n = fread(triModel->textureCoords , sizeof(float), 2 * triModel->header.numberOfTextureCoords , fd);
+         itemSize=sizeof(float)*2; count=triModel->header.numberOfTextureCoords;
+         fprintf(stderr,"Reading %u bytes of textures\n",itemSize * count);
+         triModel->textureCoords = ( float * ) malloc ( itemSize * count );
+         n = fread(triModel->textureCoords , itemSize , count , fd);
         }  else {  fprintf(stderr,"No texture coords specified \n"); }
 
         if (triModel->header.numberOfColors)
         {
-         fprintf(stderr,"Reading %u bytes of colors\n",sizeof(float) * 3*3 *triModel->header.numberOfColors);
-         triModel->colors = ( float * ) malloc ( sizeof(float) * 3*3 * triModel->header.numberOfColors );
-         n = fread(triModel->colors , sizeof(float), 3 * triModel->header.numberOfColors , fd);
+         itemSize=sizeof(float)*3; count=triModel->header.numberOfColors;
+         fprintf(stderr,"Reading %u bytes of colors\n",itemSize * count);
+         triModel->colors = ( float * ) malloc ( itemSize * count );
+         n = fread(triModel->colors ,  itemSize , count , fd);
         } else {  fprintf(stderr,"No colors specified \n"); }
 
         if (triModel->header.numberOfIndices)
         {
-         fprintf(stderr,"Reading %u bytes of indices\n",sizeof(unsigned int) * 3*3 *triModel->header.numberOfIndices);
-         triModel->indices = ( unsigned int * ) malloc ( sizeof(unsigned int) * 3*3 * triModel->header.numberOfIndices );
-         n = fread(triModel->indices , sizeof(unsigned int), 3 * triModel->header.numberOfIndices , fd);
+         itemSize=sizeof(unsigned int)*3; count=triModel->header.numberOfIndices;
+         fprintf(stderr,"Reading %u bytes of indices\n",itemSize * count);
+         triModel->indices = ( unsigned int * ) malloc ( itemSize * count );
+         n = fread(triModel->indices , itemSize , count , fd);
         } else {  fprintf(stderr,"No indices specified \n"); }
 
         if (triModel->header.numberOfBones)
@@ -275,9 +321,10 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 int saveModelTri(const char * filename , struct TRI_Model * triModel)
 {
   fprintf(stderr,"Writing TRI model -> %s \n",filename );
-  unsigned int i=0;
-  FILE *fd=0;
-  fd = fopen(filename,"wb");
+  unsigned int i=0 , itemSize=0 , count=0;
+  //fwrite ( const void * ptr, size_t size, size_t count, FILE * stream );
+
+  FILE * fd = fopen(filename,"wb");
   if (fd!=0)
     {
         triModel->header.triType = TRI_LOADER_VERSION;
@@ -286,32 +333,37 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 
         if (triModel->header.numberOfVertices)
         {
-         fprintf(stderr,"Writing %u bytes of vertex\n", sizeof(float)  * 3  * triModel->header.numberOfVertices);
-         fwrite (triModel->vertices ,  3*sizeof(float), triModel->header.numberOfVertices, fd);
+         itemSize=sizeof(float)*3; count=triModel->header.numberOfVertices;
+         fprintf(stderr,"Writing %u bytes of vertex\n",itemSize*count);
+         fwrite (triModel->vertices , itemSize , count , fd);
         }
 
         if (triModel->header.numberOfNormals)
         {
-        fprintf(stderr,"Writing %u bytes of normal\n",sizeof(float)  * 3 * triModel->header.numberOfNormals);
-        fwrite (triModel->normal         ,  3*sizeof(float), triModel->header.numberOfNormals  , fd);
+         itemSize=sizeof(float)*3; count=triModel->header.numberOfNormals;
+         fprintf(stderr,"Writing %u bytes of normal\n",itemSize*count);
+         fwrite (triModel->normal , itemSize , count  , fd);
         }
 
         if (triModel->header.numberOfTextureCoords)
         {
-        fprintf(stderr,"Writing %u bytes of texture coords\n", sizeof(float) * 2 * triModel->header.numberOfTextureCoords);
-        fwrite (triModel->textureCoords , 2*sizeof(float), triModel->header.numberOfTextureCoords, fd);
+         itemSize=sizeof(float)*2; count=triModel->header.numberOfTextureCoords;
+         fprintf(stderr,"Writing %u bytes of texture coords\n",itemSize*count);
+         fwrite (triModel->textureCoords,itemSize , count,fd);
         }
 
         if (triModel->header.numberOfColors)
         {
-        fprintf(stderr,"Writing %u bytes of colors\n", sizeof(float)  * 3 * triModel->header.numberOfColors);
-        fwrite (triModel->colors , 3*sizeof(float), triModel->header.numberOfColors, fd);
+         itemSize=sizeof(float)*3; count=triModel->header.numberOfColors;
+         fprintf(stderr,"Writing %u bytes of colors\n",itemSize*count);
+         fwrite (triModel->colors , itemSize , count, fd);
         }
 
         if (triModel->header.numberOfIndices)
         {
-        fprintf(stderr,"Writing %u bytes of indices\n", sizeof(unsigned int)  * 3 * triModel->header.numberOfIndices);
-        fwrite (triModel->indices , 3*sizeof(unsigned int ), triModel->header.numberOfIndices, fd);
+         itemSize=sizeof(unsigned int)*3; count=triModel->header.numberOfIndices;
+         fprintf(stderr,"Writing %u bytes of indices\n",itemSize*count);
+         fwrite (triModel->indices ,itemSize , count, fd);
         }
 
 
@@ -322,7 +374,6 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
          unsigned int boneNum=0;
          for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
          {
-          //fwrite ( const void * ptr, size_t size, size_t count, FILE * stream );
           fwrite (&triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header) , 1 , fd);
           fwrite (triModel->bones[boneNum].boneName , sizeof(char) , triModel->bones[boneNum].info.boneNameSize , fd);
           fwrite (triModel->bones[boneNum].weightValue , sizeof(triModel->bones[boneNum].weightValue) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
@@ -336,47 +387,6 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
         return 1;
     }
   return 0;
-}
-
-void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
-{
-  fprintf(stderr,"copyModelTri ignores bone structures..\n");
-  triModelOUT->bones=0;
-  triModelOUT->header.numberOfBones=0;
-
-
-  unsigned int bufSize;
-
-  memset(triModelOUT,0,sizeof(struct TRI_Model));
-  memcpy(&triModelOUT->header , &triModelIN->header , sizeof(struct TRI_Header));
-
-
-  bufSize = sizeof(float)  * 3 * triModelIN->header.numberOfVertices ;
-  if (triModelOUT->vertices!=0)  { free(triModelOUT->vertices); }
-  if (triModelIN->vertices!=0)   { triModelOUT->vertices = (float*) malloc(bufSize); }
-  memcpy(triModelOUT->vertices,triModelIN->vertices,bufSize);
-
-  bufSize =  sizeof(float)  * 3 * triModelIN->header.numberOfNormals;
-  if (triModelOUT->normal!=0)  { free(triModelOUT->normal); }
-  if (triModelIN->normal!=0)   { triModelOUT->normal = (float*) malloc(bufSize); }
-  memcpy(triModelOUT->normal        , triModelIN->normal        , bufSize);
-
-  bufSize = sizeof(float) * 3 * triModelIN->header.numberOfColors;
-  if (triModelOUT->colors!=0)  { free(triModelOUT->colors); }
-  if (triModelIN->colors!=0)   { triModelOUT->colors=(float*) malloc(bufSize); }
-  memcpy(triModelOUT->colors        , triModelIN->colors        , bufSize);
-
-  bufSize = sizeof(float)  * 2 * triModelIN->header.numberOfTextureCoords;
-  if (triModelOUT->textureCoords!=0)  { free(triModelOUT->textureCoords); }
-  if (triModelIN->textureCoords!=0)   { triModelOUT->textureCoords=(float*) malloc(bufSize); }
-  memcpy(triModelOUT->textureCoords , triModelIN->textureCoords , bufSize);
-
-  bufSize = sizeof(unsigned int)  * 3 * triModelIN->header.numberOfIndices;
-  if (triModelOUT->indices!=0)  { free(triModelOUT->indices); }
-  if (triModelIN->indices!=0)   { triModelOUT->indices = (unsigned int*) malloc(bufSize); }
-  memcpy(triModelOUT->indices       , triModelIN->indices       , bufSize);
-
-
 }
 
 

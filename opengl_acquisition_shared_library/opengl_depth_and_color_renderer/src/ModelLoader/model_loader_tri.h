@@ -21,7 +21,7 @@ struct TRI_Header
      unsigned int triType;
      unsigned int floatSize;
      unsigned int drawType; //0 = triangles
-     unsigned int numberOfVertices;
+     unsigned int numberOfVertices; // the number of vertices
      unsigned int numberOfNormals;
      unsigned int numberOfTextureCoords;
      unsigned int numberOfColors;
