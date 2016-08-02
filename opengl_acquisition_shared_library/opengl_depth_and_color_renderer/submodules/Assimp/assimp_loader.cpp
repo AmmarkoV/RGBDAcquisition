@@ -439,6 +439,10 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     triModel->bones          = (struct TRI_Bones*) malloc( triModel->header.numberOfBones* sizeof(struct TRI_Bones));
 
     memset(triModel->vertices, 0, verticesSize );
+    memset(triModel->normal, 0, normalsSize );
+    memset(triModel->textureCoords, 0, textureCoordsSize );
+    memset(triModel->colors, 0, colorSize );
+    memset(triModel->indices, 0, indexSize );
 
     unsigned int i=0,k=0,o=0,n=0,t=0,c=0;
 	for (i = 0; i < mesh->mNumVertices; i++)

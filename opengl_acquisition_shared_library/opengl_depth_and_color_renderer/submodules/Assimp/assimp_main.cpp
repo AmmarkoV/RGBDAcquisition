@@ -12,11 +12,18 @@ int main (int argc, char *argv[])
  struct TRI_Model originalModel={0};
 
  testAssimp(argv[1],&flatModel,&originalModel);
-
  saveModelTri(argv[2], &originalModel);
 
- freeModelTri(&flatModel);
- freeModelTri(&originalModel);
+
+
+ struct TRI_Model reloadedModel={0};
+ loadModelTri( argv[2] , &reloadedModel);
+ saveModelTri( "resave.tri", &reloadedModel);
+ deallocModelTri(&reloadedModel);
+
+ //cant free because it is stack
+ deallocModelTri(&flatModel);
+ deallocModelTri(&originalModel);
 
  return 0;
 
