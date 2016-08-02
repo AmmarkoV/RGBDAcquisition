@@ -15,7 +15,6 @@
 
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed)
 {
-
     triModel->header.numberOfVertices      = indexed->header.numberOfIndices*3;
     triModel->header.numberOfNormals       = indexed->header.numberOfIndices*3;
     triModel->header.numberOfTextureCoords = indexed->header.numberOfIndices*2;
@@ -114,6 +113,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 
 
 	}
+ return 1;
 }
 
 
@@ -227,8 +227,8 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
         unsigned int itemSize=0 , count=0;
 
         n = fread(&triModel->header , sizeof(struct TRI_Header), 1 , fd);
-        if (triModel->header.floatSize!=sizeof(float)) { fprintf(stderr,"Size of float (%u/%u) is different , cannot load \n",triModel->header.floatSize,sizeof(float)); return 0; }
-        if (triModel->header.triType != TRI_LOADER_VERSION )  { fprintf(stderr,"Incompatible triloader file , cannot load \n",triModel->header.floatSize,sizeof(float)); return 0; }
+        if (triModel->header.floatSize!=sizeof(float))        { fprintf(stderr,"Size of float (%u/%u) is different , cannot load \n",triModel->header.floatSize,sizeof(float)); return 0; }
+        if (triModel->header.triType != TRI_LOADER_VERSION )  { fprintf(stderr,"Incompatible triloader file , cannot load \n"); return 0; }
 
 
         if (triModel->header.numberOfVertices)
@@ -298,12 +298,12 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
           //Allocate enough space for the weight values , and read them
           //fprintf(stderr,"Allocating space for weights %u \n",triModel->bones[boneNum].info.boneWeightsNumber);
           itemSize = sizeof(float); count = triModel->bones[boneNum].info.boneWeightsNumber;
-          triModel->bones[boneNum].weightValue = ( char * ) malloc ( itemSize * count );
+          triModel->bones[boneNum].weightValue = ( float * ) malloc ( itemSize * count );
           n = fread(triModel->bones[boneNum].weightValue , itemSize , count , fd);
 
           //Allocate enough space for the weight indexes , and read them
           itemSize = sizeof(unsigned int); count = triModel->bones[boneNum].info.boneWeightsNumber;
-          triModel->bones[boneNum].weightIndex = ( char * ) malloc ( itemSize * count );
+          triModel->bones[boneNum].weightIndex = ( unsigned int * ) malloc ( itemSize * count );
           n = fread(triModel->bones[boneNum].weightIndex , itemSize , count , fd);
           }
          }
@@ -323,7 +323,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 int saveModelTri(const char * filename , struct TRI_Model * triModel)
 {
   fprintf(stderr,"Writing TRI model -> %s \n",filename );
-  unsigned int i=0 , itemSize=0 , count=0;
+  unsigned int itemSize=0 , count=0;
 
   FILE * fd = fopen(filename,"wb");
   if (fd!=0)
@@ -375,10 +375,10 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
          unsigned int boneNum=0;
          for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
          {
-          fwrite (&triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header) , 1 , fd);
-          fwrite (triModel->bones[boneNum].boneName , sizeof(char) , triModel->bones[boneNum].info.boneNameSize , fd);
-          fwrite (triModel->bones[boneNum].weightValue , sizeof(float) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
-          fwrite (triModel->bones[boneNum].weightIndex , sizeof(unsigned int) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+          fwrite (&triModel->bones[boneNum].info        , sizeof(struct TRI_Bones_Header) , 1 , fd);
+          fwrite ( triModel->bones[boneNum].boneName    , sizeof(char)         , triModel->bones[boneNum].info.boneNameSize , fd);
+          fwrite ( triModel->bones[boneNum].weightValue , sizeof(float)        , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+          fwrite ( triModel->bones[boneNum].weightIndex , sizeof(unsigned int) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
          }
         }
 
