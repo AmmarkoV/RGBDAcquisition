@@ -138,6 +138,8 @@ int main(int argc, char **argv)
                 angleX=atof(argv[i+2]);
                 angleY=atof(argv[i+3]);
                 angleZ=atof(argv[i+4]);
+                columns=atoi(argv[i+5]);
+                rows=atoi(argv[i+6]);
             }
         }
         else if (strcmp(argv[i],"-from")==0)

@@ -277,6 +277,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bones\n",triModel->header.numberOfBones);
 
          triModel->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * triModel->header.numberOfBones);
+         memset(triModel->bones, 0 , sizeof(struct TRI_Bones) * triModel->header.numberOfBones);
          if (triModel->bones)
          {
           unsigned int boneNum=0,itemSize,count;
@@ -297,13 +298,15 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
           //Allocate enough space for the weight values , and read them
           //fprintf(stderr,"Allocating space for weights %u \n",triModel->bones[boneNum].info.boneWeightsNumber);
-          itemSize = sizeof(float); count = triModel->bones[boneNum].info.boneWeightsNumber;
+          itemSize = sizeof(float);        count = triModel->bones[boneNum].info.boneWeightsNumber;
           triModel->bones[boneNum].weightValue = ( float * ) malloc ( itemSize * count );
+          memset( triModel->bones[boneNum].weightValue , 0 , itemSize * count );
           n = fread(triModel->bones[boneNum].weightValue , itemSize , count , fd);
 
           //Allocate enough space for the weight indexes , and read them
           itemSize = sizeof(unsigned int); count = triModel->bones[boneNum].info.boneWeightsNumber;
           triModel->bones[boneNum].weightIndex = ( unsigned int * ) malloc ( itemSize * count );
+          memset( triModel->bones[boneNum].weightIndex , 0 , itemSize * count );
           n = fread(triModel->bones[boneNum].weightIndex , itemSize , count , fd);
           }
          }
@@ -376,9 +379,12 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
          for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
          {
           fwrite (&triModel->bones[boneNum].info        , sizeof(struct TRI_Bones_Header) , 1 , fd);
-          fwrite ( triModel->bones[boneNum].boneName    , sizeof(char)         , triModel->bones[boneNum].info.boneNameSize , fd);
-          fwrite ( triModel->bones[boneNum].weightValue , sizeof(float)        , triModel->bones[boneNum].info.boneWeightsNumber , fd);
-          fwrite ( triModel->bones[boneNum].weightIndex , sizeof(unsigned int) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+
+          fwrite ( triModel->bones[boneNum].boneName    , sizeof(char)                    , triModel->bones[boneNum].info.boneNameSize      , fd);
+
+          fwrite ( triModel->bones[boneNum].weightValue , sizeof(float)                   , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+
+          fwrite ( triModel->bones[boneNum].weightIndex , sizeof(unsigned int)            , triModel->bones[boneNum].info.boneWeightsNumber , fd);
          }
         }
 
