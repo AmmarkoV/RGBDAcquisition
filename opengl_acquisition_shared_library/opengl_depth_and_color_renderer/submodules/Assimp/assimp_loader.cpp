@@ -420,25 +420,27 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     fprintf(stderr,"Preparing mesh %u with %u colors \n",meshNumber,mesh->mNumFaces,meshNumber);
 	//xxxmesh->texture = loadmaterial(scene->mMaterials[mesh->mMaterialIndex]);
 
-    triModel->header.numberOfVertices      = mesh->mNumVertices*3;
-    triModel->header.numberOfNormals       = mesh->mNumVertices*3;
-    triModel->header.numberOfTextureCoords = mesh->mNumVertices*2;
-    triModel->header.numberOfColors        = mesh->mNumVertices*3;
-    triModel->header.numberOfIndices       = mesh->mNumFaces*3;
+    unsigned int verticesSize,normalsSize,textureCoordsSize,colorSize,indexSize;
+
+    triModel->header.numberOfVertices      = mesh->mNumVertices*3;    verticesSize     =triModel->header.numberOfVertices      * sizeof(float);
+    triModel->header.numberOfNormals       = mesh->mNumVertices*3;    normalsSize      =triModel->header.numberOfNormals       * sizeof(float);
+    triModel->header.numberOfTextureCoords = mesh->mNumVertices*2;    textureCoordsSize=triModel->header.numberOfTextureCoords * sizeof(float);
+    triModel->header.numberOfColors        = mesh->mNumVertices*3;    colorSize        =triModel->header.numberOfColors        * sizeof(float);
+    triModel->header.numberOfIndices       = mesh->mNumFaces*3;       indexSize        =triModel->header.numberOfIndices       * sizeof(unsigned int);
     triModel->header.numberOfBones         = mesh->mNumBones;
 
    //fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
 
-	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices        * sizeof(float));
-	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals         * sizeof(float));
-	triModel->textureCoords  = (float*) malloc( triModel->header.numberOfTextureCoords   * sizeof(float));
-    triModel->colors         = (float*) malloc( triModel->header.numberOfColors          * sizeof(float));
-    triModel->indices        = (unsigned int*) malloc( triModel->header.numberOfIndices  * sizeof(unsigned int));
+	triModel->vertices       = (float*)        malloc( verticesSize );
+	triModel->normal         = (float*)        malloc( normalsSize );
+	triModel->textureCoords  = (float*)        malloc( textureCoordsSize );
+    triModel->colors         = (float*)        malloc( colorSize );
+    triModel->indices        = (unsigned int*) malloc( indexSize );
     triModel->bones          = (struct TRI_Bones*) malloc( triModel->header.numberOfBones* sizeof(struct TRI_Bones));
 
-    unsigned int i=0,k=0;
+    memset(triModel->vertices, 0, verticesSize );
 
-    unsigned int o=0,n=0,t=0,c=0;
+    unsigned int i=0,k=0,o=0,n=0,t=0,c=0;
 	for (i = 0; i < mesh->mNumVertices; i++)
     {
 	    triModel->vertices[(i*3)+0] = mesh->mVertices[i].x;
@@ -446,15 +448,15 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 	    triModel->vertices[(i*3)+2] = mesh->mVertices[i].z;
       if (mesh->mNormals)
         {
-			triModel->normal[(i*3)+0] = mesh->mNormals[i].x;
-			triModel->normal[(i*3)+1] = mesh->mNormals[i].y;
-			triModel->normal[(i*3)+2] = mesh->mNormals[i].z;
+		 triModel->normal[(i*3)+0] = mesh->mNormals[i].x;
+		 triModel->normal[(i*3)+1] = mesh->mNormals[i].y;
+		 triModel->normal[(i*3)+2] = mesh->mNormals[i].z;
         }
 
       if (mesh->mTextureCoords[0])
         {
-			triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[0][i].x;
-			triModel->textureCoords[(i*2)+1] = 1 - mesh->mTextureCoords[0][i].y;
+		 triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[0][i].x;
+		 triModel->textureCoords[(i*2)+1] = 1 - mesh->mTextureCoords[0][i].y;
 		}
 
         unsigned int colourSet = 0;

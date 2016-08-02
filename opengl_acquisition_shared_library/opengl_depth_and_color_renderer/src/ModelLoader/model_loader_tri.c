@@ -322,7 +322,6 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 {
   fprintf(stderr,"Writing TRI model -> %s \n",filename );
   unsigned int i=0 , itemSize=0 , count=0;
-  //fwrite ( const void * ptr, size_t size, size_t count, FILE * stream );
 
   FILE * fd = fopen(filename,"wb");
   if (fd!=0)
