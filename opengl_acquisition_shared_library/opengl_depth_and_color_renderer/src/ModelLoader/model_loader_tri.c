@@ -233,7 +233,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
         if (triModel->header.numberOfVertices)
         {
-         itemSize=sizeof(float)*3; count=triModel->header.numberOfVertices;
+         itemSize=sizeof(float); count=triModel->header.numberOfVertices;
          fprintf(stderr,"Reading %u bytes of vertex\n", itemSize * count );
          triModel->vertices = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->vertices , itemSize , count , fd);
@@ -241,7 +241,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
         if (triModel->header.numberOfNormals)
         {
-         itemSize=sizeof(float)*3; count=triModel->header.numberOfNormals;
+         itemSize=sizeof(float); count=triModel->header.numberOfNormals;
          fprintf(stderr,"Reading %u bytes of normal\n", itemSize * count );
          triModel->normal = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->normal , itemSize , count , fd);
@@ -250,7 +250,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
         if (triModel->header.numberOfTextureCoords)
         {
-         itemSize=sizeof(float)*2; count=triModel->header.numberOfTextureCoords;
+         itemSize=sizeof(float); count=triModel->header.numberOfTextureCoords;
          fprintf(stderr,"Reading %u bytes of textures\n",itemSize * count);
          triModel->textureCoords = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->textureCoords , itemSize , count , fd);
@@ -258,7 +258,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
         if (triModel->header.numberOfColors)
         {
-         itemSize=sizeof(float)*3; count=triModel->header.numberOfColors;
+         itemSize=sizeof(float); count=triModel->header.numberOfColors;
          fprintf(stderr,"Reading %u bytes of colors\n",itemSize * count);
          triModel->colors = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->colors ,  itemSize , count , fd);
@@ -266,7 +266,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
         if (triModel->header.numberOfIndices)
         {
-         itemSize=sizeof(unsigned int)*3; count=triModel->header.numberOfIndices;
+         itemSize=sizeof(unsigned int); count=triModel->header.numberOfIndices;
          fprintf(stderr,"Reading %u bytes of indices\n",itemSize * count);
          triModel->indices = ( unsigned int * ) malloc ( itemSize * count );
          n = fread(triModel->indices , itemSize , count , fd);
@@ -279,32 +279,34 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          triModel->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * triModel->header.numberOfBones);
          if (triModel->bones)
          {
-          unsigned int boneNum=0;
+          unsigned int boneNum=0,itemSize,count;
           for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
           {
           //First read dimensions of bone string and the number of weights for the bone..
-          fprintf(stderr,"Reading header for bone %u \n",boneNum);
+          //fprintf(stderr,"Reading header for bone %u \n",boneNum);
           n = fread(&triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header), 1 , fd);
 
           //Allocate enough space for the bone string , read it  , and null terminate it
 
-          fprintf(stderr,"Allocating space for name %u \n",triModel->bones[boneNum].info.boneNameSize);
-          triModel->bones[boneNum].boneName = ( char * ) malloc ( sizeof(char) * (triModel->bones[boneNum].info.boneNameSize+1) );
-          n = fread(triModel->bones[boneNum].boneName , sizeof(char), triModel->bones[boneNum].info.boneNameSize , fd);
-          triModel->bones[boneNum].boneName[triModel->bones[boneNum].info.boneNameSize]=0;
-          fprintf(stderr,"Bone Name is %s \n",triModel->bones[boneNum].boneName);
+          //fprintf(stderr,"Allocating space for name %u \n",triModel->bones[boneNum].info.boneNameSize);
+          itemSize = sizeof(char);  count = triModel->bones[boneNum].info.boneNameSize;
+          triModel->bones[boneNum].boneName = ( char * ) malloc ( (itemSize+2)*count );
+          memset( triModel->bones[boneNum].boneName , 0 , (itemSize+2)*count );
+          n = fread(triModel->bones[boneNum].boneName , itemSize , count , fd);
+          //fprintf(stderr,"Bone Name is %s \n",triModel->bones[boneNum].boneName);
 
           //Allocate enough space for the weight values , and read them
-          fprintf(stderr,"Allocating space for weights %u \n",triModel->bones[boneNum].info.boneWeightsNumber);
-          triModel->bones[boneNum].weightValue = ( char * ) malloc ( sizeof(triModel->bones[boneNum].weightValue) * (triModel->bones[boneNum].info.boneWeightsNumber) );
-          n = fread(triModel->bones[boneNum].weightValue , sizeof(triModel->bones[boneNum].weightValue) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+          //fprintf(stderr,"Allocating space for weights %u \n",triModel->bones[boneNum].info.boneWeightsNumber);
+          itemSize = sizeof(float); count = triModel->bones[boneNum].info.boneWeightsNumber;
+          triModel->bones[boneNum].weightValue = ( char * ) malloc ( itemSize * count );
+          n = fread(triModel->bones[boneNum].weightValue , itemSize , count , fd);
 
           //Allocate enough space for the weight indexes , and read them
-          triModel->bones[boneNum].weightIndex = ( char * ) malloc ( sizeof(triModel->bones[boneNum].weightIndex) * (triModel->bones[boneNum].info.boneWeightsNumber) );
-          n = fread(triModel->bones[boneNum].weightIndex , sizeof(triModel->bones[boneNum].weightIndex) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+          itemSize = sizeof(unsigned int); count = triModel->bones[boneNum].info.boneWeightsNumber;
+          triModel->bones[boneNum].weightIndex = ( char * ) malloc ( itemSize * count );
+          n = fread(triModel->bones[boneNum].weightIndex , itemSize , count , fd);
           }
          }
-
 
         } else {  fprintf(stderr,"No bones specified \n"); }
 
@@ -332,35 +334,35 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 
         if (triModel->header.numberOfVertices)
         {
-         itemSize=sizeof(float)*3; count=triModel->header.numberOfVertices;
+         itemSize=sizeof(float); count=triModel->header.numberOfVertices;
          fprintf(stderr,"Writing %u bytes of vertex\n",itemSize*count);
          fwrite (triModel->vertices , itemSize , count , fd);
         }
 
         if (triModel->header.numberOfNormals)
         {
-         itemSize=sizeof(float)*3; count=triModel->header.numberOfNormals;
+         itemSize=sizeof(float); count=triModel->header.numberOfNormals;
          fprintf(stderr,"Writing %u bytes of normal\n",itemSize*count);
          fwrite (triModel->normal , itemSize , count  , fd);
         }
 
         if (triModel->header.numberOfTextureCoords)
         {
-         itemSize=sizeof(float)*2; count=triModel->header.numberOfTextureCoords;
+         itemSize=sizeof(float); count=triModel->header.numberOfTextureCoords;
          fprintf(stderr,"Writing %u bytes of texture coords\n",itemSize*count);
          fwrite (triModel->textureCoords,itemSize , count,fd);
         }
 
         if (triModel->header.numberOfColors)
         {
-         itemSize=sizeof(float)*3; count=triModel->header.numberOfColors;
+         itemSize=sizeof(float); count=triModel->header.numberOfColors;
          fprintf(stderr,"Writing %u bytes of colors\n",itemSize*count);
          fwrite (triModel->colors , itemSize , count, fd);
         }
 
         if (triModel->header.numberOfIndices)
         {
-         itemSize=sizeof(unsigned int)*3; count=triModel->header.numberOfIndices;
+         itemSize=sizeof(unsigned int); count=triModel->header.numberOfIndices;
          fprintf(stderr,"Writing %u bytes of indices\n",itemSize*count);
          fwrite (triModel->indices ,itemSize , count, fd);
         }
@@ -375,8 +377,8 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
          {
           fwrite (&triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header) , 1 , fd);
           fwrite (triModel->bones[boneNum].boneName , sizeof(char) , triModel->bones[boneNum].info.boneNameSize , fd);
-          fwrite (triModel->bones[boneNum].weightValue , sizeof(triModel->bones[boneNum].weightValue) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
-          fwrite (triModel->bones[boneNum].weightIndex , sizeof(triModel->bones[boneNum].weightIndex) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+          fwrite (triModel->bones[boneNum].weightValue , sizeof(float) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
+          fwrite (triModel->bones[boneNum].weightIndex , sizeof(unsigned int) , triModel->bones[boneNum].info.boneWeightsNumber , fd);
          }
         }
 

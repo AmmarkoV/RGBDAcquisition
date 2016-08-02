@@ -131,25 +131,10 @@ void aiMakeIdentity(aiMatrix4x4 * am)
 int aiMatricesSame(aiMatrix4x4 * am , aiMatrix4x4 * bm)
 {
  unsigned int similarity = 0;
- similarity += (am->a1==bm->a1);
- similarity += (am->a2==bm->a2);
- similarity += (am->a3==bm->a3);
- similarity += (am->a4==bm->a4);
-
- similarity += (am->b1==bm->b1);
- similarity += (am->b2==bm->b2);
- similarity += (am->b3==bm->b3);
- similarity += (am->b4==bm->b4);
-
- similarity += (am->c1==bm->c1);
- similarity += (am->c2==bm->c2);
- similarity += (am->c3==bm->c3);
- similarity += (am->c4==bm->c4);
-
- similarity += (am->d1==bm->d1);
- similarity += (am->d2==bm->d2);
- similarity += (am->d3==bm->d3);
- similarity += (am->d4==bm->d4);
+ similarity += (am->a1==bm->a1); similarity += (am->a2==bm->a2); similarity += (am->a3==bm->a3); similarity += (am->a4==bm->a4);
+ similarity += (am->b1==bm->b1); similarity += (am->b2==bm->b2); similarity += (am->b3==bm->b3); similarity += (am->b4==bm->b4);
+ similarity += (am->c1==bm->c1); similarity += (am->c2==bm->c2); similarity += (am->c3==bm->c3); similarity += (am->c4==bm->c4);
+ similarity += (am->d1==bm->d1); similarity += (am->d2==bm->d2); similarity += (am->d3==bm->d3); similarity += (am->d4==bm->d4);
 
  return (similarity==16);
 }
@@ -280,9 +265,7 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
     aiMatrix4x4 NodeTransformation=pNode->mTransformation;
 
 
-    unsigned int foundBone;
-    unsigned int boneNumber=findBoneFromString(mesh,pNode->mName.data,&foundBone);
-
+    unsigned int foundBone,boneNumber=findBoneFromString(mesh,pNode->mName.data,&foundBone);
 
     unsigned int i=0;
     if (foundBone)
@@ -431,18 +414,26 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
    //fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
 
-	triModel->vertices       = (float*)        malloc( verticesSize );
-	triModel->normal         = (float*)        malloc( normalsSize );
-	triModel->textureCoords  = (float*)        malloc( textureCoordsSize );
-    triModel->colors         = (float*)        malloc( colorSize );
-    triModel->indices        = (unsigned int*) malloc( indexSize );
-    triModel->bones          = (struct TRI_Bones*) malloc( triModel->header.numberOfBones* sizeof(struct TRI_Bones));
+	triModel->vertices      = (float*)            malloc( verticesSize );
+	triModel->normal        = (float*)            malloc( normalsSize );
+	triModel->textureCoords = (float*)            malloc( textureCoordsSize );
+    triModel->colors        = (float*)            malloc( colorSize );
+    triModel->indices       = (unsigned int*)     malloc( indexSize );
+    triModel->bones         = (struct TRI_Bones*) malloc( triModel->header.numberOfBones* sizeof(struct TRI_Bones));
 
-    memset(triModel->vertices, 0, verticesSize );
-    memset(triModel->normal, 0, normalsSize );
-    memset(triModel->textureCoords, 0, textureCoordsSize );
-    memset(triModel->colors, 0, colorSize );
-    memset(triModel->indices, 0, indexSize );
+
+    fprintf(stderr,"Allocating :   \n");
+    fprintf(stderr,"  %u bytes of vertices \n",verticesSize);
+    fprintf(stderr,"  %u bytes of normals \n",normalsSize);
+    fprintf(stderr,"  %d bytes of textureCoords \n",textureCoordsSize);
+    fprintf(stderr,"  %d bytes of colors\n",colorSize);
+    fprintf(stderr,"  %d bytes of indices\n",indexSize);
+
+    memset(triModel->vertices, 0 , verticesSize );
+    memset(triModel->normal, 0 , normalsSize );
+    memset(triModel->textureCoords, 0 , textureCoordsSize );
+    memset(triModel->colors, 0 , colorSize );
+    memset(triModel->indices, 0 , indexSize );
 
     unsigned int i=0,k=0,o=0,n=0,t=0,c=0;
 	for (i = 0; i < mesh->mNumVertices; i++)
@@ -507,9 +498,9 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
        triModel->bones[i].info.boneParent=bones.bone[i].parentItemID;
        triModel->bones[i].info.boneWeightsNumber=bones.bone[i].numberOfWeights;
 
-       fprintf(stderr,"Bone %s %u/%u has %u weights \n" , triModel->bones[i].boneName , i , triModel->header.numberOfBones , triModel->bones[i].info.boneWeightsNumber);
+       //fprintf(stderr,"Bone %s %u/%u has %u weights \n" , triModel->bones[i].boneName , i , triModel->header.numberOfBones , triModel->bones[i].info.boneWeightsNumber);
        triModel->bones[i].weightIndex = (unsigned int*) malloc(sizeof(unsigned int) * triModel->bones[i].info.boneWeightsNumber);
-       triModel->bones[i].weightValue = (float*) malloc(sizeof(float) * triModel->bones[i].info.boneWeightsNumber);
+       triModel->bones[i].weightValue = (float*)        malloc(sizeof(float)        * triModel->bones[i].info.boneWeightsNumber);
        for (k = 0; k < triModel->bones[i].info.boneWeightsNumber ; k++)
          {
            triModel->bones[i].weightIndex[k] = bone->mWeights[k].mVertexId;
