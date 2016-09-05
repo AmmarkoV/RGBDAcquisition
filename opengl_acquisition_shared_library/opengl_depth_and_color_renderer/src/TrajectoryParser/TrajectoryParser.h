@@ -56,6 +56,20 @@ enum PlaybackState
 };
 
 
+struct Joint
+{
+  float x , y , z , scaleX ,scaleY, scaleZ;
+  float rot1 , rot2 , rot3 , rot4;
+};
+
+
+struct JointState
+{
+ struct Joint * joint;
+ unsigned int numberOfJoints;
+};
+
+
 /**
 * @brief This holds the state for each known frame/position of each object!
 */
@@ -68,6 +82,8 @@ struct KeyFrame
    float R , G , B , Alpha ;
    unsigned char hasColor;
    unsigned char hasTrans;
+
+   struct JointState * jointList;
 
    //TimeStamp in milliseconds
    unsigned int time;
