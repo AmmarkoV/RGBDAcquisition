@@ -269,6 +269,27 @@ unsigned long getFileSize(char * filename)
 
 
 
+struct JointState * allocateEnoughJointSpaceForStateOfObjectID(
+                                                                struct VirtualStream * stream ,
+                                                                unsigned int ObjID
+                                                               )
+{
+ if (stream->object[ObjID].numberOfBones!=0)
+ {
+   fprintf(stderr,"Also allocating %u joints for this model..\n",stream->object[ObjID].numberOfBones);
+   struct JointState * js = ( struct JointState * ) malloc(sizeof(struct JointState));
+   if (js!=0)
+   {
+    unsigned int jointSize = stream->object[ObjID].numberOfBones * sizeof(struct Joint);
+    js->joint = ( struct Joint *) malloc(jointSize);
+    if (js->joint!=0)
+     { memset(js->joint,0,jointSize); }
+   }
+   return js;
+ }
+
+ return 0;
+}
 
 
 int addStateToObjectID(
@@ -304,6 +325,9 @@ int addStateToObjectID(
   stream->object[ObjID].frame[pos].G = G;
   stream->object[ObjID].frame[pos].B = B;
   stream->object[ObjID].frame[pos].Alpha = Alpha;
+
+  stream->object[ObjID].frame[pos].jointList=allocateEnoughJointSpaceForStateOfObjectID( stream , ObjID );
+
 
   if (coordLength > 0 ) {  stream->object[ObjID].frame[pos].x = coord[0]; }
   if (coordLength > 1 ) {  stream->object[ObjID].frame[pos].y = coord[1]; }
@@ -390,23 +414,22 @@ int addPoseToObjectState(
                               unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength
-                       )
+                        )
 {
-  //TODO :
-  /*
  unsigned int ObjFound = 0;
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
  if (ObjFound)
   {
-     return addPoseToObjectID(stream,ObjID,timeMilliseconds,coord,coordLength,
-                                     stream->object[ObjID].scaleX,
-                                     stream->object[ObjID].scaleY,
-                                     stream->object[ObjID].scaleZ,
-                                     stream->object[ObjID].R,
-                                     stream->object[ObjID].G,
-                                     stream->object[ObjID].B,
-                                     stream->object[ObjID].Transparency );
-  }*/
+    unsigned int pos = 0;
+    //
+    fprintf(stderr,"Todo here find closest position ..!");
+    if ( stream->object[ObjID].frame[pos].jointList !=0 )
+    {
+       fprintf(stderr,"Do joint name search here..!\n");
+       //stream->object[ObjID].frame[pos].jointList->joint[];
+    }
+  }
+
   fprintf(stderr,"Could not Find object %s \n",name);
   return 0;
 }
@@ -598,6 +621,9 @@ int addObjectToVirtualStream(
                  fprintf(stderr,"Please note that type %s couldn't be found for object %s \n",stream->object[pos].typeStr,stream->object[pos].name);
                  //listAllObjectTypeID(stream);
                }
+
+   stream->object[pos].numberOfBones=0;
+
 
    fprintf(stderr,"addedObject(%s,%s) with ID %u ,typeID %u \n",name,type,pos,stream->object[pos].type);
    ++stream->numberOfObjects;

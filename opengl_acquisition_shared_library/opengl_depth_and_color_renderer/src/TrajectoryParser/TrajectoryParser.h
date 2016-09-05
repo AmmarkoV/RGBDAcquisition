@@ -60,6 +60,7 @@ struct Joint
 {
   float x , y , z , scaleX ,scaleY, scaleZ;
   float rot1 , rot2 , rot3 , rot4;
+  float m[16];
 };
 
 
@@ -166,6 +167,7 @@ struct VirtualObject
    char typeStr[MAX_PATH+1];
    char value[MAX_PATH+1];
    ObjectTypeID type;
+   unsigned int numberOfBones;
 
    float R , G , B , Transparency;
    unsigned char nocolor;

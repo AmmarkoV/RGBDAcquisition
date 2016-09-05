@@ -309,7 +309,6 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
           }
          }
-
         } else {  fprintf(stderr,"No bones specified \n"); }
 
 
