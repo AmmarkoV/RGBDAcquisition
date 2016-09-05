@@ -167,7 +167,11 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                                                      &pos[POS_ANGLEX],&pos[POS_ANGLEY],&pos[POS_ANGLEZ]);
 
 
-                   drawModelAt(mod,pos[POS_X],pos[POS_Y],pos[POS_Z],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
+                   drawModelAt(
+                                mod,
+                                pos[POS_X],pos[POS_Y],pos[POS_Z],
+                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]
+                              );
                 }
             }
           fprintf(stderr,"Drawing stopped  @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);

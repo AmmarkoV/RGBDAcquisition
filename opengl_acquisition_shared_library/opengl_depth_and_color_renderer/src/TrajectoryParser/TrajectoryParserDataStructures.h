@@ -62,6 +62,17 @@ int addStateToObjectMini(
                               unsigned int coordLength
                        );
 
+
+int addPoseToStatesMini(
+                              struct VirtualStream * stream ,
+                              char * name  ,
+                              char * jointName,
+                              unsigned int timeMilliseconds ,
+                              float * coord ,
+                              unsigned int coordLength
+                       );
+
+
 int addConnectorToVirtualStream(
                                  struct VirtualStream * stream ,
                                  char * firstObject , char * secondObject ,

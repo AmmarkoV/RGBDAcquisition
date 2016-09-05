@@ -320,6 +320,36 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
           break;
 
 
+
+          case TRAJECTORYPRIMITIVES_POSE :
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               time = InputParser_GetWordInt(ipc,2);
+               InputParser_GetWord(ipc,3,nameB,MAX_PATH);
+
+               pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,4);
+               pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,5);
+               pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,6);
+               pos[3] = newstream->scaleWorld[3] * InputParser_GetWordFloat(ipc,7);
+               pos[4] = newstream->scaleWorld[4] * InputParser_GetWordFloat(ipc,8);
+               pos[5] = newstream->scaleWorld[5] * InputParser_GetWordFloat(ipc,9);
+               pos[6] = InputParser_GetWordFloat(ipc,10);
+               coordLength=7;
+
+               if (newstream->rotationsOverride)
+                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
+
+
+
+               //TODO :
+                  //Handle pose here
+                //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+                addPoseToStatesMini( newstream , name  , nameB , time , (float*) pos , coordLength );
+          break;
+
+
+
+
+          case TRAJECTORYPRIMITIVES_MOVE :
           case TRAJECTORYPRIMITIVES_POS :
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                time = InputParser_GetWordInt(ipc,2);
