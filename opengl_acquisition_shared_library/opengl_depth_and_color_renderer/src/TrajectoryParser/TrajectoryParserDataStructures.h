@@ -63,7 +63,7 @@ int addStateToObjectMini(
                        );
 
 
-int addPoseToStatesMini(
+int addPoseToObjectState(
                               struct VirtualStream * stream ,
                               char * name  ,
                               char * jointName,

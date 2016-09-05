@@ -338,12 +338,10 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
                if (newstream->rotationsOverride)
                      { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
-
-
                //TODO :
                   //Handle pose here
                 //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
-                addPoseToStatesMini( newstream , name  , nameB , time , (float*) pos , coordLength );
+                addPoseToObjectState( newstream , name  , nameB , time , (float*) pos , coordLength );
           break;
 
 

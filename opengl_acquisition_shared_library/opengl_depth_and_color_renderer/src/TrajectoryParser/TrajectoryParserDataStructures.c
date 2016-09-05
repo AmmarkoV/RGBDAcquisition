@@ -383,7 +383,7 @@ int addStateToObjectMini(
 }
 
 
-int addPoseToStatesMini(
+int addPoseToObjectState(
                               struct VirtualStream * stream ,
                               char * name  ,
                               char * jointName,
@@ -392,7 +392,8 @@ int addPoseToStatesMini(
                               unsigned int coordLength
                        )
 {
-
+  //TODO :
+  /*
  unsigned int ObjFound = 0;
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
  if (ObjFound)
@@ -405,7 +406,7 @@ int addPoseToStatesMini(
                                      stream->object[ObjID].G,
                                      stream->object[ObjID].B,
                                      stream->object[ObjID].Transparency );
-  }
+  }*/
   fprintf(stderr,"Could not Find object %s \n",name);
   return 0;
 }
