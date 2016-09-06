@@ -213,4 +213,11 @@ int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * s
 */
 int drawCube();
 
+
+//TODO Add explanation here
+int getModelBoneNumber(struct Model *mod);
+
+//TODO Add explanation here
+int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found);
+
 #endif // MODEL_LOADER_H_INCLUDED

@@ -426,6 +426,11 @@ int addPoseToObjectState(
     if ( stream->object[ObjID].frame[pos].jointList !=0 )
     {
        fprintf(stderr,"Do joint name search here..!\n");
+       int boneFound=0;
+       //struct Model * mod = ;
+
+       //getModelBoneIDFromBoneName(struct Model *mod,jointName,&boneFound);
+
        //stream->object[ObjID].frame[pos].jointList->joint[];
     }
   }

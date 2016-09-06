@@ -12,6 +12,7 @@
 #include "model_loader.h"
 #include "model_loader_hardcoded.h"
 #include "model_loader_obj.h"
+#include "model_loader_tri.h"
 #include "../tools.h"
 
 #define DISABLE_GL_CALL_LIST 0
@@ -444,4 +445,45 @@ int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * s
 
  return 1;
 }
+
+
+int getModelBoneNumber(struct Model *mod)
+{
+ if (mod->type==TRI_MODEL)
+ {
+  struct TRI_Model * triM = (struct TRI_Model * ) &mod->model;
+  if (triM!=0)
+   {
+     return triM->header.numberOfBones;
+   }
+ }
+ return 0;
+}
+
+
+int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
+{
+ *found=0;
+ if (mod->type==TRI_MODEL)
+ {
+  struct TRI_Model * triM = (struct TRI_Model * ) mod->model;
+  if (triM!=0)
+   {
+     unsigned int i=0;
+     unsigned int numberOfBones=getModelBoneNumber(mod);
+
+     for (i=0; i<numberOfBones; i++)
+     {
+       if (strcmp( triM->bones[i].boneName , boneName) == 0 )
+       {
+         *found=1;
+         return i;
+       }
+     }
+   }
+ }
+ return 0;
+}
+
+
 
