@@ -570,8 +570,18 @@ int initScene(char * confFile)
 
            if (models[i]!=0)
              { fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,getObjectTypeModel(scene,i) ,i ); } else
-             { fprintf(stderr,RED "Failed loading model %s ( %u ) \n" NORMAL,getObjectTypeModel(scene,i),i);            }
-         }
+             { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,getObjectTypeModel(scene,i),i);            }
+         } else
+         { fprintf(stderr,GREEN "Model %s , found already loaded \n" NORMAL,getObjectTypeModel(scene,i) ); }
+
+
+
+         if (models[i]!=0)
+           {
+             scene->object[i].modelPointer = (void *) models[i];
+           }
+
+
     }
 
   return 1;
