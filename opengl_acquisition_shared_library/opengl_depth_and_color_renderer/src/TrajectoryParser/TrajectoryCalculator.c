@@ -671,7 +671,41 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
 }
 
 
+int getExactStreamPosFromTimestamp(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAbsMilliseconds , int * foundExactTimestamp)
+{
+  *foundExactTimestamp=0;
 
+  fprintf(stderr,"getExactStreamPosFromTimestamp(obj=%u,time=%u) ",ObjID,timeAbsMilliseconds);
+
+  if (stream==0) { fprintf(stderr,"getExactStreamPosFromTimestamp called with null stream\n"); return 0; }
+  if (stream->object==0) { fprintf(stderr,"getExactStreamPosFromTimestamp called with null object array\n"); return 0; }
+  if (stream->numberOfObjects<=ObjID) { fprintf(stderr,"getExactStreamPosFromTimestamp ObjID %u is out of bounds (%u)\n",ObjID,stream->numberOfObjects); return 0; }
+  if ( (ObjID==0) && (stream->object[ObjID].frame == 0 )  ) { /*Special case with non declared cameras , it is ok , dont spam for every frame..! */ return 0; }
+     else
+  if (stream->object[ObjID].frame == 0 ) { fprintf(stderr,"getExactStreamPosFromTimestamp ObjID %u does not have a frame array allocated\n",ObjID); return 0; }
+
+  if ( (ObjID==0) && (stream->object[ObjID].numberOfFrames == 0 )  ) { /*Special case with non declared cameras , it is ok , dont spam for every frame..! */ return 0; }
+    else
+  if (stream->object[ObjID].numberOfFrames == 0 ) { fprintf(stderr,"getExactStreamPosFromTimestamp ObjID %u has 0 frames\n",ObjID); return 0; }
+
+
+
+
+
+  unsigned int pos=0;
+  for (pos=0; pos<stream->object[ObjID].numberOfFrames; pos++)
+  {
+    if (timeAbsMilliseconds == stream->object[ObjID].frame[pos].time )
+    {
+        fprintf(stderr,"FOUND!\n");
+        *foundExactTimestamp=1;
+        return pos;
+    }
+  }
+
+ fprintf(stderr,"not found!\n");
+ return 0;
+}
 
 
 

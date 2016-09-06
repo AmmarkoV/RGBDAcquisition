@@ -416,22 +416,33 @@ int addPoseToObjectState(
                               unsigned int coordLength
                         )
 {
+ int foundExactTimestamp=0;
  unsigned int ObjFound = 0;
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
  if (ObjFound)
   {
-    unsigned int pos = 0;
-    //
     fprintf(stderr,"Todo here find closest position ..!");
+    unsigned int pos=0;
     if ( stream->object[ObjID].frame[pos].jointList !=0 )
     {
+       pos = getExactStreamPosFromTimestamp(stream,ObjID,timeMilliseconds,&foundExactTimestamp);
+
+       if(foundExactTimestamp)
+       {
+       struct Model * mod = (struct Model *) stream->object[ObjID].modelPointer;
+
        fprintf(stderr,"Do joint name search here..!\n");
        int boneFound=0;
-       //struct Model * mod = ;
+       unsigned int boneID = getModelBoneIDFromBoneName(mod,jointName,&boneFound);
 
-       //getModelBoneIDFromBoneName(struct Model *mod,jointName,&boneFound);
-
-       //stream->object[ObjID].frame[pos].jointList->joint[];
+       if (boneFound)
+        {
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
+        }
+       }
     }
   }
 

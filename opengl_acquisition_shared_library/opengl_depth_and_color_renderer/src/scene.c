@@ -554,7 +554,7 @@ int initScene(char * confFile)
    glEnable(GL_CULL_FACE);
   }
 
-  fprintf(stderr,"Allocating model storage..\n");
+  fprintf(stderr,YELLOW "\nFinal step , allocating models in model storage..\n" NORMAL);
   models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
   memset(models,0,scene->numberOfObjectTypes * sizeof(struct Model **));
 
@@ -575,13 +575,8 @@ int initScene(char * confFile)
          { fprintf(stderr,GREEN "Model %s , found already loaded \n" NORMAL,getObjectTypeModel(scene,i) ); }
 
 
-
-         if (models[i]!=0)
-           {
-             scene->object[i].modelPointer = (void *) models[i];
-           }
-
-
+       //Also keep the model loaded as a reference..
+       scene->object[i].modelPointer = (void *) models[i];
     }
 
   return 1;

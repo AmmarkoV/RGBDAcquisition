@@ -270,8 +270,7 @@ float pyramidTexCoords[]={ //X  Y  Z       W
 
 int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
 {
-   fprintf(stderr,"float xNormals[]={ //X  Y  Z  W\n");
-
+   //fprintf(stderr,"float xNormals[]={ //X  Y  Z  W\n");
     float outputNormal[4]={0};
     unsigned int i=0,z=0,z1=0,z2=0,z3=0;
       for (i=0; i<coordLength/3; i++)
@@ -285,11 +284,11 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
                      coords[z3+0]   , coords[z3+1]   , coords[z3+2]
                      );
 
-          fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
-          fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
-          fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          //fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          //fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
+          //fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
         }
-   fprintf(stderr,"};\n");
+   //fprintf(stderr,"};\n");
 }
 
 
@@ -490,7 +489,6 @@ return 1;
 
 int drawObjPlane(float x,float y,float z,float dimension)
 {
-    fprintf(stderr,"Plane Normals");
     calculateGenericTriangleNormals(planeCoords , sizeof(planeCoords)/(3*sizeof(float)) );
 
     return drawGenericTriangleMesh(planeCoords , planeNormals , sizeof(planeCoords)/(3*sizeof(float)) );
@@ -498,7 +496,6 @@ int drawObjPlane(float x,float y,float z,float dimension)
 
 int drawCube()
 {
-    fprintf(stderr,"Cube Normals");
     calculateGenericTriangleNormals(cubeCoords , sizeof(cubeCoords)/(3*sizeof(float)) );
 
     return drawGenericTriangleMesh(cubeCoords , cubeNormals , sizeof(cubeCoords)/(3*sizeof(float)) );
@@ -506,7 +503,6 @@ int drawCube()
 
 void drawPyramid()
 {
-    fprintf(stderr,"pyramidCoords Normals");
     calculateGenericTriangleNormals(pyramidCoords , sizeof(pyramidCoords)/(3*sizeof(float)) );
 
     return drawGenericTriangleMesh(pyramidCoords , pyramidNormals , sizeof(pyramidCoords)/(3*sizeof(float)) );

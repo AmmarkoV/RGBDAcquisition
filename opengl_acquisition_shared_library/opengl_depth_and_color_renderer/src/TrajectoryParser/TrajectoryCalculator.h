@@ -35,6 +35,8 @@ int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,do
 */
 
 
+int getExactStreamPosFromTimestamp(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAbsMilliseconds , int * foundExactTimestamp);
+
 int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int FrameIDToReturn,float * pos,float * scaleX,float * scaleY,float * scaleZ);
 int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scaleX,float * scaleY,float * scaleZ,
                                  unsigned int PrevFrame,unsigned int NextFrame , unsigned int time );
