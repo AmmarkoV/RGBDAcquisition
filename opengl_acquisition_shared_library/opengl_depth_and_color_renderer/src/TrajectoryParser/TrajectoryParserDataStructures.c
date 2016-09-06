@@ -421,7 +421,6 @@ int addPoseToObjectState(
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
  if (ObjFound)
   {
-    fprintf(stderr,"Todo here find closest position ..!");
     unsigned int pos=0;
     if ( stream->object[ObjID].frame[pos].jointList !=0 )
     {
@@ -431,7 +430,6 @@ int addPoseToObjectState(
        {
        struct Model * mod = (struct Model *) stream->object[ObjID].modelPointer;
 
-       fprintf(stderr,"Do joint name search here..!\n");
        int boneFound=0;
        unsigned int boneID = getModelBoneIDFromBoneName(mod,jointName,&boneFound);
 
@@ -441,12 +439,12 @@ int addPoseToObjectState(
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
-        }
-       }
-    }
-  }
+           return 1;
+        } else { fprintf(stderr,"Could not find exact bone %u for %s \n",boneID,name); }
+       } else  { fprintf(stderr,"Could not find exact timestamp %u for %s \n",timeMilliseconds, name); }
+    } else     { fprintf(stderr,"Could not Find a joint list for %s ( model not loaded? )\n",name); }
+  } else       { fprintf(stderr,"Could not Find object %s \n",name); }
 
-  fprintf(stderr,"Could not Find object %s \n",name);
   return 0;
 }
 
