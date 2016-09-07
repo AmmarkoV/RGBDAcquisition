@@ -16,11 +16,12 @@
 struct Model
 {
     //Pointer to the model read in memory ( what model_loader_obj reads )
-    void * model;
+    void * modelInternalData;
     //This can actually be different types of struct depending on if we are talking about an obj/tri/hardcoded/etc model
     //We know the type byaccessing the "type" attribute of this struct
 
     int type; //See enum ModelTypes
+    unsigned int numberOfBones;
 
 
     float bbox2D[4]; //The 2D rendering output bounding box of the specific model

@@ -598,7 +598,7 @@ int loadObjectTypeModelForVirtualStream(
 
        )
    {
-    stream->objectTypes[objTypeID].numberOfBones =  0;// getModelListBoneNumber( modelStorage, stream->objectTypes[stream->object[pos].type].modelListArrayNumber);
+    stream->objectTypes[objTypeID].numberOfBones =  getModelListBoneNumber( stream->associatedModelList , stream->objectTypes[objTypeID].modelListArrayNumber);
     fprintf(stderr,GREEN "loadObjectTypeModelForVirtualStream succeeded\n" NORMAL);
     return 1;
    } else

@@ -150,7 +150,7 @@ unsigned int updateModelPosition(struct Model * model,float * position)
     if (model->type==OBJ_MODEL)
      {
       GLdouble posX=position[0],posY=position[1],posZ=position[2];
-      struct OBJ_Model * modelOBJ = (struct OBJ_Model *) model->model;
+      struct OBJ_Model * modelOBJ = (struct OBJ_Model *) model->modelInternalData;
 
       posX=position[0] - modelOBJ->boundBox.min.x;
       posY=position[1] - modelOBJ->boundBox.min.y;
@@ -218,7 +218,7 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
   if (checkForHardcodedReturn)
   {
       mod->type = modType;
-      mod->model = 0;
+      mod->modelInternalData = 0;
       unableToLoad=0;
   } else
  if ( strstr(modelname,".tri") != 0 )
@@ -231,7 +231,8 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
          {
           if ( loadModelTri(modelname, triModel) )
             {
-             mod->model=(void * ) triModel;
+             mod->numberOfBones = triModel->header.numberOfBones;
+             mod->modelInternalData=(void * ) triModel;
              unableToLoad=0;
              fprintf(stderr,GREEN " success \n" NORMAL);
             } else { fprintf(stderr,RED " unable to load TRI model \n" NORMAL); }
@@ -246,8 +247,8 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
     {
       mod->type = OBJ_MODEL;
       struct  OBJ_Model *  newObj = (struct  OBJ_Model * ) loadObj(directory,modelname,1);
-      mod->model = newObj;//(struct  OBJ_Model * ) loadObj(directory,modelname);
-      if (mod->model !=0 )
+      mod->modelInternalData = newObj;//(struct  OBJ_Model * ) loadObj(directory,modelname);
+      if (mod->modelInternalData !=0 )
          {
              unableToLoad=0;
              //Populate 3D bounding box data
@@ -263,11 +264,11 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
       fprintf(stderr,"Could not load object %s \n",modelname);
       fprintf(stderr,"Searched in directory %s \n",directory);
       fprintf(stderr,"Object %s was also not one of the hardcoded shapes\n",modelname);
-      if (mod->model==0 )
+      if (mod->modelInternalData==0 )
          {
           #if USE_QUESTIONMARK_FOR_FAILED_LOADED_MODELS
               mod->type = OBJ_QUESTION;
-              mod->model = 0;
+              mod->modelInternalData = 0;
               fprintf(stderr,RED "Failed to load object %s , will pretend it got loaded and use a fake object question mark instead\n" NORMAL,modelname);
           #else
             free(mod);
@@ -286,9 +287,9 @@ void unloadModel(struct Model * mod)
     switch ( mod->type )
     {
       case TRI_MODEL :
-          freeModelTri( (struct TRI_Model *) mod->model);
+          freeModelTri( (struct TRI_Model *) mod->modelInternalData);
       case OBJ_MODEL :
-          unloadObj( (struct  OBJ_Model * ) mod->model);
+          unloadObj( (struct  OBJ_Model * ) mod->modelInternalData);
       break;
     };
 }
@@ -403,7 +404,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       if (mod->type==TRI_MODEL)
       {
          //fprintf(stderr,"drawing TRI model\n");
-         doTriDrawCalllist( (struct TRI_Model *) mod->model );
+         doTriDrawCalllist( (struct TRI_Model *) mod->modelInternalData );
       } else
       if (mod->type==OBJ_ASSIMP_MODEL )
       {
@@ -412,16 +413,16 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       if (mod->type==OBJ_MODEL)
       {
         //fprintf(stderr,"drawing OBJ model\n");
-        if (mod->model!=0)
+        if (mod->modelInternalData!=0)
          {
            if (mod->highlight)
            {
-            struct  OBJ_Model *  drawOBJ = (struct  OBJ_Model * ) mod->model;
+            struct  OBJ_Model *  drawOBJ = (struct  OBJ_Model * ) mod->modelInternalData;
             drawBoundingBox(0,0,0,drawOBJ->minX,drawOBJ->minY,drawOBJ->minZ,drawOBJ->maxX,drawOBJ->maxY,drawOBJ->maxZ);
            }
 
            //A model has been created , and it can be served
-           GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->model);
+           GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->modelInternalData);
            if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after getObjOGLList\n"); }
 
            if ( (objlist!=0) && (!DISABLE_GL_CALL_LIST) )
@@ -430,7 +431,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
                if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing glCallList(%u)\n",objlist); }
              }  else
              { //Just feed the triangles to open gl one by one ( slow )
-               drawOBJMesh( ( struct OBJ_Model * ) mod->model);
+               drawOBJMesh( ( struct OBJ_Model * ) mod->modelInternalData);
                if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing all the triangles\n"); }
              }
          } else
@@ -526,7 +527,7 @@ int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transpare
 
 int getModelBBox(struct Model *mod , float * minX,  float * minY , float * minZ , float * maxX , float * maxY , float * maxZ)
 {
- struct OBJ_Model * objMod = (struct OBJ_Model * ) mod->model;
+ struct OBJ_Model * objMod = (struct OBJ_Model * ) mod->modelInternalData;
  * minX = objMod->boundBox.min.x;
  * minY = objMod->boundBox.min.y;
  * minZ = objMod->boundBox.min.z;
@@ -551,23 +552,44 @@ int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * s
 
 int getModelBoneNumber(struct Model *mod)
 {
+ if (mod==0) { fprintf(stderr,"empty model \n",mod->type); return 0;}
+ if (mod->type >= TOTAL_POSSIBLE_MODEL_TYPES)
+ {
+  fprintf(stderr,"impossible model type(%u)\n",mod->type);
+  return 0;
+ }
+
+ fprintf(stderr,"getModelBoneNumber(%s)\n",modelTypeNames[mod->type]);
  if (mod->type==TRI_MODEL)
  {
-  struct TRI_Model * triM = (struct TRI_Model * ) &mod->model;
+  struct TRI_Model * triM = (struct TRI_Model * ) &mod->modelInternalData;
   if (triM!=0)
    {
      return triM->header.numberOfBones;
    }
+ } else
+ {
+   fprintf(stderr,"getModelBoneNumber returning 0 if not TRI\n");
+
  }
+
  return 0;
 }
 
 
 int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNumber)
 {
-  struct Model *mod = &modelStorage->models[modelNumber];
+  fprintf(stderr,"getModelListBoneNumber(modelStorage,modelNumber=%u)\n",modelNumber);
+  if (modelNumber>=modelStorage->currentNumberOfModels)
+  {
+    fprintf(stderr," modelNumber is out of bounds\n");
+    return 0;
+  }
 
-  return getModelBoneNumber(&mod);
+  //struct Model *mod = &modelStorage->models[modelNumber];
+
+  //return getModelBoneNumber(&mod);
+  return 0;
 }
 
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
@@ -575,7 +597,7 @@ int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
  *found=0;
  if (mod->type==TRI_MODEL)
  {
-  struct TRI_Model * triM = (struct TRI_Model * ) mod->model;
+  struct TRI_Model * triM = (struct TRI_Model * ) mod->modelInternalData;
   if (triM!=0)
    {
      unsigned int i=0;
