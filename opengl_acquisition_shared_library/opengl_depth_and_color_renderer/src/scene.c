@@ -566,9 +566,9 @@ int initScene(char * confFile)
   unsigned int foundAlreadyExistingModel;
   unsigned int i=0;  //Object 0 is camera so we don't need to load a model or something for it
   unsigned int modelLocation=0;
-  for (i=1; i< scene->numberOfObjects ; i++)
+  for (i=1; i< scene->numberOfObjectTypes ; i++)
     {
-     fprintf(stderr,"Loading Model %s ( %u )\n",scene->object[i].name,i);
+     fprintf(stderr,"Loading Model %s - %s ( %u )\n",scene->object[i].typeStr , scene->object[i].value , i);
 
      loadModelToModelList(modelStorage  , "Models/",getObjectTypeModel(scene,i) , &scene->object[i].type );
      //Also keep the model loaded as a reference..

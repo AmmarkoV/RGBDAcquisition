@@ -583,7 +583,7 @@ int loadObjModelForVirtualStream(
                                  unsigned int objID
                                 )
 {
-  fprintf(stderr,"Loading object model..!\n");
+  fprintf(stderr,"loadObjModelForVirtualStream not implemented yet..!\n");
 
 /*
   unsigned int i=0;  //Object 0 is camera so we don't need to load a model or something for it
@@ -692,14 +692,6 @@ int addObjectToVirtualStream(
    }
 
 
-   loadObjModelForVirtualStream(
-                                 stream ,
-                                 stream->object[pos].name ,
-                                 stream->object[pos].typeStr ,
-                                 pos
-                                );
-
-
 
 
    return 1; // <- we always return
@@ -727,6 +719,15 @@ int addObjectTypeToVirtualStream(
     unsigned int pos = stream->numberOfObjectTypes;
     strcpy(stream->objectTypes[pos].name,type);
     strcpy(stream->objectTypes[pos].model,model);
+
+/*
+   loadObjModelForVirtualStream(
+                                 stream ,
+                                 stream->object[pos].name ,
+                                 stream->object[pos].typeStr ,
+                                 pos
+                                );
+*/
 
     fprintf(stderr,"addedObjectType(%s,%s) with ID %u \n",type,model,pos);
 
