@@ -576,6 +576,39 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream,char * ex
 }
 
 
+int loadObjModelForVirtualStream(
+                                 struct VirtualStream * stream ,
+                                 char * modelName ,
+                                 char * modelType ,
+                                 unsigned int objID
+                                )
+{
+  fprintf(stderr,"Loading object model..!\n");
+
+/*
+  unsigned int i=0;  //Object 0 is camera so we don't need to load a model or something for it
+  for (i=1; i<scene->numberOfObjectTypes; i++)
+    {
+         fprintf(stderr,"Loading Model %s ( %u )\n",scene->object[i].name,i);
+
+         models[i] = findModel(models,scene->numberOfObjectTypes,"Models/",getObjectTypeModel(scene,i));
+         if (models[i]==0)
+         { //If we can't find an already loaded version of the mesh we are looking for
+           models[i] = loadModel("Models/",getObjectTypeModel(scene,i));
+
+           if (models[i]!=0)
+             { fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,getObjectTypeModel(scene,i) ,i ); } else
+             { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,getObjectTypeModel(scene,i),i);            }
+         } else
+         { fprintf(stderr,GREEN "Model %s , found already loaded \n" NORMAL,getObjectTypeModel(scene,i) ); }
+
+
+       //Also keep the model loaded as a reference..
+       scene->object[i].modelPointer = (void *) models[i];
+    }
+    */
+}
+
 
 
 
@@ -657,6 +690,15 @@ int addObjectToVirtualStream(
        fprintf(stderr,"Cannot add initial position to new object\n");
     }
    }
+
+
+   loadObjModelForVirtualStream(
+                                 stream ,
+                                 stream->object[pos].name ,
+                                 stream->object[pos].typeStr ,
+                                 pos
+                                );
+
 
 
 
