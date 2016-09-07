@@ -269,7 +269,6 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
              mod->minX = newObj->maxX; mod->maxY = newObj->maxY;  mod->maxZ = newObj->maxZ;
              fprintf(stderr,"new obj : min %0.2f %0.2f %0.2f  max %0.2f %0.2f %0.2f \n",newObj->minX,newObj->minY,newObj->minZ,newObj->maxX,newObj->maxY,newObj->maxZ);
          }
-
     }
 
 
@@ -446,13 +445,11 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
  return 1;
 }
 
-
 int drawModel(struct Model * mod)
 {
     if (mod == 0) { fprintf(stderr,"Cannot draw model , it doesnt exist \n"); return 0; } //If mod = 0 accesing the fields below will lead in crashing..
     return drawModelAt(mod,mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
 }
-
 
 int addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
 {
@@ -498,8 +495,6 @@ int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,fl
   return 1;
 }
 
-
-
 int setModelColor(struct Model * mod,float *R,float *G,float *B,float *transparency,unsigned char * noColor)
 {
  if (mod==0) { return 0; }
@@ -526,7 +521,6 @@ int getModelBBox(struct Model *mod , float * minX,  float * minY , float * minZ 
  return 1;
 }
 
-
 int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * sizeZ )
 {
   float minX,minY,minZ,maxX,maxY,maxZ;
@@ -538,7 +532,6 @@ int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * s
 
  return 1;
 }
-
 
 int getModelBoneNumber(struct Model *mod)
 {
@@ -552,7 +545,6 @@ int getModelBoneNumber(struct Model *mod)
  }
  return 0;
 }
-
 
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
 {
@@ -577,6 +569,3 @@ int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
  }
  return 0;
 }
-
-
-
