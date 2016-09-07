@@ -232,6 +232,7 @@ int drawCube();
 
 //TODO Add explanation here
 int getModelBoneNumber(struct Model *mod);
+int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNumber);
 
 //TODO Add explanation here
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found);

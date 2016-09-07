@@ -81,10 +81,27 @@ int addConnectorToVirtualStream(
                                  char * typeStr
                                );
 
-int generateAngleObjectsForVirtualStream(struct VirtualStream * stream,char * excludeObjectType);
+int generateAngleObjectsForVirtualStream(struct VirtualStream * stream, struct ModelList * modelStorage,char * excludeObjectType);
 
+
+/**
+* @brief Add a new Object to the Virtual stream
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Name of the new object
+* @param Type of the new object ( see ObjectTypes )
+* @param R channel color
+* @param G channel color
+* @param B channel color
+* @param Alpha(Transparency) channel color
+* @param NoColor flag ( 1=Set 0=Not Set )
+* @param Pointer to an array of floats that defines initial position ( should be 3 or 4 floats long )
+* @param The length of the coords array ( typically 3 or 4 )
+* @param Particle number
+* @retval 1=Success , 0=Failure */
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
+                              struct ModelList * modelStorage,
                               char * name , char * type ,
                               unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
                               unsigned char noColor ,

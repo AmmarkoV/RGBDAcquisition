@@ -274,13 +274,15 @@ struct JointState * allocateEnoughJointSpaceForStateOfObjectID(
                                                                 unsigned int ObjID
                                                                )
 {
- if (stream->object[ObjID].numberOfBones!=0)
+ unsigned int numberOfBones=stream->objectTypes[stream->object[ObjID].type].numberOfBones;
+ fprintf(stderr,"allocateEnoughJointSpaceForStateOfObjectID  for objid %u has %u bones ..\n",ObjID,numberOfBones);
+ if (numberOfBones!=0)
  {
-   fprintf(stderr,"Also allocating %u joints for this model..\n",stream->object[ObjID].numberOfBones);
+   fprintf(stderr,"Also allocating %u joints for this model..\n",numberOfBones);
    struct JointState * js = ( struct JointState * ) malloc(sizeof(struct JointState));
    if (js!=0)
    {
-    unsigned int jointSize = stream->object[ObjID].numberOfBones * sizeof(struct Joint);
+    unsigned int jointSize = numberOfBones * sizeof(struct Joint);
     js->joint = ( struct Joint *) malloc(jointSize);
     if (js->joint!=0)
      { memset(js->joint,0,jointSize); }
@@ -506,7 +508,7 @@ int getObjectVirtualStreamPositionAtIndex(struct VirtualStream * stream,ObjectID
 }
 
 
-int generateAngleObjectsForVirtualStream(struct VirtualStream * stream,char * excludeObjectType)
+int generateAngleObjectsForVirtualStream(struct VirtualStream * stream, struct ModelList * modelStorage,char * excludeObjectType)
 {
   char name[512]={0};
 
@@ -543,6 +545,7 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream,char * ex
 
         addObjectToVirtualStream(
                                  stream ,
+                                 modelStorage,
                                  name , "autoGenAngleObject" ,
                                  255,0,255,0, /**/0,
                                  coords,7,
@@ -595,6 +598,7 @@ int loadObjectTypeModelForVirtualStream(
 
        )
    {
+    stream->objectTypes[objTypeID].numberOfBones =  0;// getModelListBoneNumber( modelStorage, stream->objectTypes[stream->object[pos].type].modelListArrayNumber);
     fprintf(stderr,GREEN "loadObjectTypeModelForVirtualStream succeeded\n" NORMAL);
     return 1;
    } else
@@ -607,6 +611,7 @@ int loadObjectTypeModelForVirtualStream(
 
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
+                              struct ModelList * modelStorage,
                               char * name , char * type ,
                               unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
                               unsigned char noColor ,
@@ -662,7 +667,8 @@ int addObjectToVirtualStream(
                  //listAllObjectTypeID(stream);
                }
 
-   stream->object[pos].numberOfBones=0;
+
+
 
 
    fprintf(stderr,"addedObject(%s,%s) with ID %u ,typeID %u \n",name,type,pos,stream->object[pos].type);

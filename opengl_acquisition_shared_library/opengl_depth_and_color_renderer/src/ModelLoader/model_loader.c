@@ -548,6 +548,7 @@ int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * s
  return 1;
 }
 
+
 int getModelBoneNumber(struct Model *mod)
 {
  if (mod->type==TRI_MODEL)
@@ -559,6 +560,14 @@ int getModelBoneNumber(struct Model *mod)
    }
  }
  return 0;
+}
+
+
+int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNumber)
+{
+  struct Model *mod = &modelStorage->models[modelNumber];
+
+  return getModelBoneNumber(&mod);
 }
 
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)

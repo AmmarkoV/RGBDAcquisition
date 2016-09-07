@@ -115,7 +115,7 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename)
 }
 
 
-int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc , unsigned int label , char * line , unsigned int words_count )
+int processCommand( struct VirtualStream * newstream , struct ModelList * modelStorage, struct InputParserC * ipc , unsigned int label , char * line , unsigned int words_count )
 {
 
   char name[MAX_PATH]={0};
@@ -148,7 +148,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
              case TRAJECTORYPRIMITIVES_GENERATE_ANGLE_OBJECTS            :
 
                  InputParser_GetWord(ipc,1,model,MAX_PATH);
-                 generateAngleObjectsForVirtualStream(newstream,model);
+                 generateAngleObjectsForVirtualStream(newstream,modelStorage,model);
                break;
 
 
@@ -271,7 +271,8 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
            case TRAJECTORYPRIMITIVES_OBJECT :
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
-               addObjectToVirtualStream(newstream , name,typeStr,
+               addObjectToVirtualStream(newstream ,
+                                        modelStorage, name,typeStr,
                                         (unsigned char) InputParser_GetWordInt(ipc,3),
                                         (unsigned char) InputParser_GetWordInt(ipc,4),
                                         (unsigned char) InputParser_GetWordInt(ipc,5),
@@ -290,7 +291,8 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
            case TRAJECTORYPRIMITIVES_COMPOSITE_OBJECT :
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                InputParser_GetWord(ipc,2,typeStr,MAX_PATH);
-               addObjectToVirtualStream(newstream , name,typeStr,
+               addObjectToVirtualStream(newstream ,
+                                        modelStorage, name,typeStr,
                                         (unsigned char) InputParser_GetWordInt(ipc,3),
                                         (unsigned char) InputParser_GetWordInt(ipc,4),
                                         (unsigned char) InputParser_GetWordInt(ipc,5),
@@ -635,7 +637,7 @@ int processCommand( struct VirtualStream * newstream , struct InputParserC * ipc
 
 
 
-int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filename)
+int appendVirtualStreamFromFile(struct VirtualStream * newstream , struct ModelList * modelStorage, char * filename)
 {
   #warning "Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser"
   #warning "This should probably be split down to some primitives and also support things like including a file from another file"
@@ -669,7 +671,7 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
       if ( words_count > 0 )
          {
              unsigned int label=scanFor_TrajectoryPrimitives(line,strlen(line));
-             processCommand(newstream,ipc,label,line,words_count);
+             processCommand(newstream,modelStorage,ipc,label,line,words_count);
          } // End of line containing tokens
     } //End of getting a line while reading the file
   }
@@ -737,7 +739,7 @@ int readVirtualStream(struct VirtualStream * newstream,struct ModelList * modelS
 
 
   fclose(fp);
-  return appendVirtualStreamFromFile(newstream,newstream->filename);
+  return appendVirtualStreamFromFile(newstream,modelStorage,newstream->filename);
 }
 
 

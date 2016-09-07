@@ -555,7 +555,7 @@ int initScene(char * confFile)
   if (doCulling)
   {
    glFrontFace(GL_CCW); //GL_CW / GL_CCW
-     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glFrontFace(GL_CW); \n"); }
+     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glFrontFace(GL_CCW); \n"); }
    glCullFace(GL_BACK);
      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glCullFace(GL_BACK); \n"); }
    glEnable(GL_CULL_FACE);
@@ -681,28 +681,9 @@ unsigned int *  getObject2DBoundingBoxList(unsigned int * bboxItemsSize)
  return result;
 }
 
-
-
-int drawAllObjectsAtPositionsFromTrajectoryParser()
+int doAllEventTriggers(unsigned int timestampToUse)
 {
- if (scene==0) { return 0; }
- if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling drawAllObjectsAtPositionsFromTrajectoryParser\n"); }
-
-
  unsigned int i;
- unsigned int timestampToUse = scene->ticks*100;
-
-  for (i=1; i<scene->numberOfObjects; i++)
-    {
-     if (scene->object[i].numberOfFrames<=1)
-     {
-       scene->object[i].lastFrame = 0;
-     } else
-     {
-       scene->object[i].lastFrame = scene->ticks % scene->object[i].numberOfFrames;
-     }
-    }
-
   for (i=0; i<scene->numberOfEvents; i++)
   {
      unsigned int objID_A = scene->event[i].objID_A , objID_B = scene->event[i].objID_B;
@@ -730,8 +711,30 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
         break;
       };
   }
+}
+
+int drawAllObjectsAtPositionsFromTrajectoryParser()
+{
+ if (scene==0) { return 0; }
+ if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling drawAllObjectsAtPositionsFromTrajectoryParser\n"); }
 
 
+ unsigned int i;
+ unsigned int timestampToUse = scene->ticks*100;
+
+  for (i=1; i<scene->numberOfObjects; i++)
+    {
+     if (scene->object[i].numberOfFrames<=1)
+     {
+       scene->object[i].lastFrame = 0;
+     } else
+     {
+       scene->object[i].lastFrame = scene->ticks % scene->object[i].numberOfFrames;
+     }
+    }
+
+
+  doAllEventTriggers(timestampToUse);
 
 
   unsigned char noColor=0;
@@ -746,7 +749,6 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
     fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime);
   }
 
-  //printModelList(modelStorage);
 
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<scene->numberOfObjects; i++)
@@ -798,7 +800,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
 
 
-
+  //Draw all connectors
   float * pos1 = (float*) &posStackA;
   float * pos2 = (float*) &posStackB;
 
