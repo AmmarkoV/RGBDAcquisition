@@ -39,6 +39,17 @@ struct Model
 
 
 
+struct ModelList
+{
+  struct Model * models;
+  unsigned int currentNumberOfModels;
+  unsigned int MAXNumberOfModels;
+};
+
+struct ModelList *  allocateModelList(unsigned int initialSpace);
+
+
+int printModelList(struct ModelList* modelStorage);
 
 /**
 * @brief Update Model Position triggers , ( 3D / 2D )
@@ -55,23 +66,25 @@ unsigned int updateModelPosition(struct Model * model,float * position);
 * @brief Find an already loaded model
 * @ingroup ModelLoader
 * @param Pointer of model array
-* @param number of models in model array
 * @param String of filename of the file to load
 * @param The "friendly" name of the model loaded
+* @param Did the operation find something..?
 * @retval 0=Could not find model , A pointer to an already loaded model structure
 */
-struct Model * findModel(struct Model ** models,  unsigned int numberOfModels,char * directory,char * modelname);
+unsigned int findModel(struct ModelList * modelStorage , char * directory,char * modelname ,int * found );
 
 
 
 /**
 * @brief Load a model from a file
 * @ingroup ModelLoader
+* @param Pointer to the model list
+* @param Where to write the loaded model
 * @param String of filename of the file to load
 * @param The "friendly" name of the model loaded
 * @retval 0=Error , A pointer to a model structure
 */
-struct Model * loadModel(char * directory,char * modelname);
+unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , char * directory,char * modelname);
 
 
 /**

@@ -34,7 +34,8 @@ struct shaderObject * loadedShader=0;
 //--------------------------------------
 
 struct VirtualStream * scene = 0;
-struct Model ** models=0;
+//struct Model ** models=0;
+struct ModelList * modelStorage;
 
 unsigned int tickUSleepTime=100;
 unsigned int pauseTicking=0;
@@ -555,29 +556,26 @@ int initScene(char * confFile)
   }
 
   fprintf(stderr,YELLOW "\nFinal step , allocating models in model storage..\n" NORMAL);
-  models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
-  memset(models,0,scene->numberOfObjectTypes * sizeof(struct Model **));
 
+  modelStorage = allocateModelList(scene->numberOfObjectTypes);
+
+//  models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
+//  memset(models,0,scene->numberOfObjectTypes * sizeof(struct Model **));
+
+
+  unsigned int foundAlreadyExistingModel;
   unsigned int i=0;  //Object 0 is camera so we don't need to load a model or something for it
-  for (i=1; i<scene->numberOfObjectTypes; i++)
+  unsigned int modelLocation=0;
+  for (i=1; i< scene->numberOfObjects ; i++)
     {
-         fprintf(stderr,"Loading Model %s ( %u )\n",scene->object[i].name,i);
+     fprintf(stderr,"Loading Model %s ( %u )\n",scene->object[i].name,i);
 
-         models[i] = findModel(models,scene->numberOfObjectTypes,"Models/",getObjectTypeModel(scene,i));
-         if (models[i]==0)
-         { //If we can't find an already loaded version of the mesh we are looking for
-           models[i] = loadModel("Models/",getObjectTypeModel(scene,i));
-
-           if (models[i]!=0)
-             { fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,getObjectTypeModel(scene,i) ,i ); } else
-             { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,getObjectTypeModel(scene,i),i);            }
-         } else
-         { fprintf(stderr,GREEN "Model %s , found already loaded \n" NORMAL,getObjectTypeModel(scene,i) ); }
-
-
-       //Also keep the model loaded as a reference..
-       scene->object[i].modelPointer = (void *) models[i];
+     loadModelToModelList(modelStorage  , "Models/",getObjectTypeModel(scene,i) , &scene->object[i].type );
+     //Also keep the model loaded as a reference..
+     scene->object[i].modelPointer = (void *) &modelStorage->models[i];
     }
+
+  printModelList(modelStorage);
 
   return 1;
 }
@@ -585,6 +583,8 @@ int initScene(char * confFile)
 
 int closeScene()
 {
+
+  deallocateModelList(&modelStorage);
 
   if ( ( selectedFragmentShader != 0) || ( selectedVertexShader != 0 ) )
   {
@@ -595,9 +595,9 @@ int closeScene()
   //Object 0 is camera
   for (i=1; i<scene->numberOfObjectTypes; i++)
     {
-       unloadModel(models[i]);
+//       unloadModel(models[i]);
     }
-  free(models);
+  //free(models);
 
   destroyVirtualStream(scene);
 
@@ -754,10 +754,16 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   {
     fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime);
   }
+
+  //printModelList(modelStorage);
+
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<scene->numberOfObjects; i++)
     {
-       struct Model * mod = models[scene->object[i].type];
+       fprintf(stderr,"Scene object %u/%u ( %s ) points to model %u \n",i,scene->numberOfObjects,scene->object[i].name , scene->object[i].type );
+       struct Model * mod = &modelStorage->models[scene->object[i].type];
+
+       fprintf(stderr,"Drawing model %u/%u ( %s ) \n",scene->object[i].type,modelStorage->currentNumberOfModels,mod->pathOfModel);
        float * pos = (float*) &posStackA;
        if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
        {
@@ -934,7 +940,8 @@ int setupPhotoshoot(
   configuration->angZVariance=angZVariance;
 
   configuration->scenePTR = (void *) scene;
-  configuration->modelPTR = (void *) models;
+  #warning "Models are disconnected from photoshoots setupPhotoshoot"
+  //configuration->modelPTR = (void *) models;
   return 1;
 }
 
@@ -965,7 +972,9 @@ void * createPhotoshoot(
   configuration->angZVariance=angZVariance;
 
   configuration->scenePTR = (void *) scene;
-  configuration->modelPTR = (void *) models;
+
+  #warning "Models are disconnected from photoshoots createPhotoshoot"
+//  configuration->modelPTR = (void *) models;
 
 
 

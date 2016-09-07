@@ -44,6 +44,100 @@ const GLfloat defaultShininess[] = { 5.0f };
 
 
 
+int growModelList(struct ModelList * modelStorage,unsigned int framesToAdd)
+{/*
+  if (framesToAdd == 0) { return 0 ; }
+  if (streamObj == 0) { fprintf(stderr,"Given an empty stream to grow \n"); return 0 ; }
+
+
+  struct KeyFrame * new_frame;
+  new_frame = (struct KeyFrame *) realloc( streamObj->frame, sizeof(struct KeyFrame)*( streamObj->MAX_numberOfFrames+framesToAdd ));
+
+   if (new_frame == 0 )
+    {
+       fprintf(stderr,"Cannot add %u frames to our currently %u sized frame buffer\n",framesToAdd,streamObj->MAX_numberOfFrames);
+       return 0;
+    } else
+     {
+      //Clean up all new object types allocated
+      void * clear_from_here  =  new_frame+streamObj->MAX_numberOfFrames;
+      memset(clear_from_here,0,framesToAdd * sizeof(struct KeyFrame));
+    }
+
+   streamObj->MAX_numberOfFrames+=framesToAdd;
+   streamObj->frame = new_frame ;*/
+  return 1;
+}
+
+
+struct ModelList *  allocateModelList(unsigned int initialSpace)
+{
+  struct ModelList * newModelList = (struct ModelList * ) malloc(sizeof(struct ModelList));
+
+  if (newModelList!=0)
+  {
+    newModelList->currentNumberOfModels = 0;
+    newModelList->MAXNumberOfModels = 0;
+
+
+    newModelList->models = (struct Model * ) malloc( initialSpace * sizeof(struct Model));
+
+    if (newModelList->models!=0)
+    {
+      newModelList->MAXNumberOfModels = initialSpace;
+      memset(newModelList->models,0,initialSpace * sizeof(struct Model));
+    }
+  }
+  return newModelList;
+}
+
+int deallocateModelList(struct ModelList* modelStorage)
+{
+  #warning "Deallocation not working yet.."
+  fprintf(stderr,"Deallocation does not work yet todo : \n");
+  return 0;
+}
+
+
+int loadModelToModelList(struct ModelList* modelStorage,char * modelDirectory,char * modelName , unsigned int * whereModelWasLoaded)
+{
+  int foundAlreadyExistingModel=0;
+  unsigned int modelLocation = findModel(modelStorage->models,modelDirectory,modelName, &foundAlreadyExistingModel);
+
+  if (!foundAlreadyExistingModel)
+   { //If we can't find an already loaded version of the mesh we are looking for
+     unsigned int whereToLoadModel=modelStorage->currentNumberOfModels;
+
+     if (loadModel(modelStorage,whereToLoadModel,modelDirectory,modelName))
+      {
+        *whereModelWasLoaded=whereToLoadModel;
+        ++modelStorage->currentNumberOfModels;
+        fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,modelName , whereToLoadModel );
+        return 1;
+      } else
+      { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,modelName, whereToLoadModel );        return 0; }
+    } else
+    {
+     *whereModelWasLoaded=modelLocation;
+     fprintf(stderr,GREEN "Model %s , found already loaded \n" NORMAL,modelName);
+     return 1;
+    }
+ return 0;
+}
+
+int printModelList(struct ModelList* modelStorage)
+{
+  fprintf(stderr,"Model List ________________________\n");
+  unsigned int i=0;
+  for (i=0; i<modelStorage->currentNumberOfModels; i++)
+  {
+    fprintf(stderr,YELLOW "%s" NORMAL , modelTypeNames[ modelStorage->models[i].type ]);
+    fprintf(stderr," %s \n" , modelStorage->models[i].pathOfModel);
+  }
+  fprintf(stderr,"____________________________________\n");
+ return 1;
+}
+
 unsigned int updateModelPosition(struct Model * model,float * position)
 {
       return 0;
@@ -91,41 +185,40 @@ unsigned int updateModelPosition(struct Model * model,float * position)
 }
 
 
-struct Model * findModel(struct Model ** models,  unsigned int numberOfModels,char * directory,char * modelname)
+unsigned int findModel(struct ModelList * modelStorage , char * directory,char * modelname ,int * found )
 {
+  *found = 0;
   char tmpPathOfModel[MAX_MODEL_PATHS]={0};
   snprintf(tmpPathOfModel,MAX_MODEL_PATHS,"%s/%s",directory,modelname);
 
   //fprintf(stderr,"Trying to find %s  .. ",tmpPathOfModel);
   unsigned int i=0;
-  for (i=0; i<numberOfModels; i++)
+  for (i=0; i<modelStorage->currentNumberOfModels; i++)
   {
-   if (models[i]!=0)
-   {
     //fprintf(stderr,"comparing %p %p \n",models[i],models[i]->pathOfModel);
-    if ( strcmp(tmpPathOfModel,models[i]->pathOfModel)==0)
+    if ( strcmp(tmpPathOfModel,modelStorage->models[i].pathOfModel)==0)
     {
+      *found=1;
       fprintf(stderr,GREEN "model ( %s ) is already loaded , no need to reload it \n" NORMAL,tmpPathOfModel);
-      return models[i];
+      return i;
     }
-   }
   }
 
-//fprintf(stderr,"not found \n");
+ fprintf(stderr,"not found \n");
 return 0;
 }
 
 
 
-struct Model * loadModel(char * directory,char * modelname)
+unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , char * directory,char * modelname)
 {
   if ( (directory==0) || (modelname==0) )
   {
-    fprintf(stderr,"loadModel failing , no modelname given");
+    fprintf(stderr,RED "loadModel failing , no modelname given \n" NORMAL );
     return 0;
   }
 
-  struct Model * mod = ( struct Model * ) malloc(sizeof(struct Model));
+  struct Model * mod =  &modelStorage->models[whereToLoadModel];
   if ( mod == 0 )  { fprintf(stderr,"Could not allocate enough space for model %s \n",modelname);  return 0; }
   memset(mod , 0 , sizeof(struct Model));
 
@@ -198,7 +291,7 @@ struct Model * loadModel(char * directory,char * modelname)
          }
     }
 
-  return mod;
+  return 1;
 }
 
 void unloadModel(struct Model * mod)

@@ -31,6 +31,27 @@ enum ModelTypes
 
 
 
+
+static const char * modelTypeNames[] =
+{
+    "NOTYPE",
+    "OBJ_AXIS",
+    "OBJ_PLANE",
+    "OBJ_GRIDPLANE",
+    "OBJ_CUBE",
+    "OBJ_PYRAMID",
+    "OBJ_SPHERE",
+    "OBJ_INVISIBLE",
+    "OBJ_QUESTION",
+    "OBJ_BBOX",
+    //-----------
+    "OBJ_MODEL",
+    "TRI_MODEL",
+    "OBJ_ASSIMP_MODEL",
+    //-----------
+    "End of ModelType Names"
+};
+
 int initializeHardcodedCallLists();
 
 /**

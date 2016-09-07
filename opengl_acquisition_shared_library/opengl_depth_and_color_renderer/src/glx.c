@@ -39,23 +39,26 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   GLXContext           cx;
   int                  dummy;
 
-  fprintf(stderr,"(1) open a connection to the X server\n");
+  int debugMessages=0;
+
+
+  if (debugMessages) { fprintf(stderr,"(1) open a connection to the X server\n"); }
   /*** (1) open a connection to the X server ***/
 
   dpy = XOpenDisplay(NULL);
   if (dpy == NULL) { fatalError("Could not open display"); }
 
-  fprintf(stderr,"(2) make sure OpenGL's GLX extension supported\n");
+  if (debugMessages) { fprintf(stderr,"(2) make sure OpenGL's GLX extension supported\n"); }
   /*** (2) make sure OpenGL's GLX extension supported ***/
 
   if(!glXQueryExtension(dpy, &dummy, &dummy))
     fatalError("X server has no OpenGL GLX extension");
 
-  fprintf(stderr,"(3) find an appropriate visual .. ");
+  if (debugMessages) { fprintf(stderr,"(3) find an appropriate visual .. "); }
   /*** (3) find an appropriate visual ***/
   /* find an OpenGL-capable RGB visual with depth buffer */
   vi = glXChooseVisual(dpy, DefaultScreen(dpy), dblBuf);
-  fprintf(stderr," survived \n");
+  if (debugMessages) { fprintf(stderr," survived \n"); }
   if (vi == NULL)
   {
     vi = glXChooseVisual(dpy, DefaultScreen(dpy), snglBuf);
@@ -65,7 +68,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   if(vi->class != TrueColor)
     fatalError("TrueColor visual required for this program");
 
-  fprintf(stderr,"(4) create an OpenGL rendering context\n");
+  if (debugMessages) { fprintf(stderr,"(4) create an OpenGL rendering context\n"); }
   /*** (4) create an OpenGL rendering context  ***/
 
   /* create an OpenGL rendering context */
@@ -74,7 +77,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   if (cx == NULL)
     { fatalError("could not create rendering context"); }
 
-  fprintf(stderr,"(5) create an X window with the selected visual\n");
+  if (debugMessages) { fprintf(stderr,"(5) create an X window with the selected visual\n"); }
   /*** (5) create an X window with the selected visual ***/
 
   /* create an X colormap since probably not using default visual */
@@ -88,12 +91,12 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
                       CWBorderPixel | CWColormap | CWEventMask, &swa);
   XSetStandardProperties(dpy, win, "OpenGL Control Window", "main", None, argv, argc, NULL);
 
-  fprintf(stderr,"(6) bind the rendering context to the window \n");
+  if (debugMessages) { fprintf(stderr,"(6) bind the rendering context to the window \n"); }
   /*** (6) bind the rendering context to the window ***/
 
   glXMakeCurrent(dpy, win, cx);
 
-  fprintf(stderr,"(7) request the X window to be displayed on the screen\n");
+  if (debugMessages) { fprintf(stderr,"(7) request the X window to be displayed on the screen\n"); }
   /*** (7) request the X window to be displayed on the screen ***/
 
   if (viewWindow)
