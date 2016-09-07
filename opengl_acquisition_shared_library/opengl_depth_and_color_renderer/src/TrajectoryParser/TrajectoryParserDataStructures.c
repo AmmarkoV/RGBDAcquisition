@@ -576,37 +576,31 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream,char * ex
 }
 
 
-int loadObjModelForVirtualStream(
-                                 struct VirtualStream * stream ,
-                                 char * modelName ,
-                                 char * modelType ,
-                                 unsigned int objID
-                                )
+int loadObjectTypeModelForVirtualStream(
+                                        struct VirtualStream * stream ,
+                                        char * modelName ,
+                                        char * modelType ,
+                                        unsigned int objTypeID
+                                       )
 {
-  fprintf(stderr,"loadObjModelForVirtualStream not implemented yet..!\n");
-
-/*
-  unsigned int i=0;  //Object 0 is camera so we don't need to load a model or something for it
-  for (i=1; i<scene->numberOfObjectTypes; i++)
-    {
-         fprintf(stderr,"Loading Model %s ( %u )\n",scene->object[i].name,i);
-
-         models[i] = findModel(models,scene->numberOfObjectTypes,"Models/",getObjectTypeModel(scene,i));
-         if (models[i]==0)
-         { //If we can't find an already loaded version of the mesh we are looking for
-           models[i] = loadModel("Models/",getObjectTypeModel(scene,i));
-
-           if (models[i]!=0)
-             { fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,getObjectTypeModel(scene,i) ,i ); } else
-             { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,getObjectTypeModel(scene,i),i);            }
-         } else
-         { fprintf(stderr,GREEN "Model %s , found already loaded \n" NORMAL,getObjectTypeModel(scene,i) ); }
+  fprintf(stderr,"Loading Model %s ( %u )\n",stream->objectTypes[objTypeID].name,objTypeID);
 
 
-       //Also keep the model loaded as a reference..
-       scene->object[i].modelPointer = (void *) models[i];
-    }
-    */
+   if (
+       loadModelToModelList(
+                            stream->associatedModelList ,
+                            "Models/" ,
+                            modelType ,
+                            &stream->objectTypes[objTypeID].modelListArrayNumber
+                           )
+
+       )
+   {
+    fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,modelType ,stream->objectTypes[objTypeID].modelListArrayNumber );
+    return 1;
+   } else
+   { fprintf(stderr,RED "Failed loading new model %s  \n" NORMAL,modelType);            }
+ return 0;
 }
 
 
@@ -720,14 +714,14 @@ int addObjectTypeToVirtualStream(
     strcpy(stream->objectTypes[pos].name,type);
     strcpy(stream->objectTypes[pos].model,model);
 
-/*
-   loadObjModelForVirtualStream(
-                                 stream ,
-                                 stream->object[pos].name ,
-                                 stream->object[pos].typeStr ,
-                                 pos
-                                );
-*/
+
+    loadObjectTypeModelForVirtualStream(
+                                        stream ,
+                                        stream->object[pos].name ,
+                                        stream->object[pos].typeStr ,
+                                        pos
+                                       );
+
 
     fprintf(stderr,"addedObjectType(%s,%s) with ID %u \n",type,model,pos);
 

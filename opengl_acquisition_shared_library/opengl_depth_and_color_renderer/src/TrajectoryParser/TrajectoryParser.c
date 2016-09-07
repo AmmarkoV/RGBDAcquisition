@@ -692,7 +692,7 @@ int appendVirtualStreamFromFile(struct VirtualStream * newstream , char * filena
 
 
 
-int readVirtualStream(struct VirtualStream * newstream)
+int readVirtualStream(struct VirtualStream * newstream,struct ModelList * modelStorage)
 {
   //Try and open filename to get the size ( this is needed for auto refresh functionality to work correctly..!
    FILE * fp = fopen(newstream->filename,"r");
@@ -731,6 +731,9 @@ int readVirtualStream(struct VirtualStream * newstream)
   newstream->rotationsOffset[0]=0.0; newstream->rotationsOffset[1]=0.0; newstream->rotationsOffset[2]=0.0;
 
   newstream->debug=0;
+
+  //We refresh our associated model Storage
+   newstream->associatedModelList = modelStorage;
 
 
   fclose(fp);
@@ -780,7 +783,7 @@ int destroyVirtualStream(struct VirtualStream * stream)
 
 
 
-int refreshVirtualStream(struct VirtualStream * newstream)
+int refreshVirtualStream(struct VirtualStream * newstream,struct ModelList * modelStorage)
 {
    #if PRINT_DEBUGGING_INFO
    fprintf(stderr,"refreshingVirtualStream\n");
@@ -791,12 +794,15 @@ int refreshVirtualStream(struct VirtualStream * newstream)
    //thats in order to keep the initial time / frame configuration
    //Object numbers , Object type numbers,  Frame numbers are cleaned by the destroyVirtualStreamInternal call
 
-   return readVirtualStream(newstream);
+   //We refresh our associated model Storage
+   newstream->associatedModelList = modelStorage;
+
+   return readVirtualStream(newstream,modelStorage);
 }
 
 
 
-struct VirtualStream * createVirtualStream(char * filename)
+struct VirtualStream * createVirtualStream(char * filename , struct ModelList * modelStorage)
 {
   //Allocate a virtual stream structure
   struct VirtualStream * newstream = (struct VirtualStream *) malloc(sizeof(struct VirtualStream));
@@ -807,6 +813,10 @@ struct VirtualStream * createVirtualStream(char * filename)
   memset(newstream,0,sizeof(struct VirtualStream));
   newstream->rate=1.0;
 
+  //We refresh our associated model Storage
+   newstream->associatedModelList = modelStorage;
+
+
   if (filename!=0)
   {
 
@@ -815,7 +825,7 @@ struct VirtualStream * createVirtualStream(char * filename)
      myStrCpy(newstream->filename,filename,MAX_PATH);
   fprintf(stderr,"strncpy returned\n");
 
-   if (!readVirtualStream(newstream))
+   if (!readVirtualStream(newstream,modelStorage))
     {
       fprintf(stderr,"Could not read Virtual Stream from file %s \n",filename);
       destroyVirtualStream(newstream);

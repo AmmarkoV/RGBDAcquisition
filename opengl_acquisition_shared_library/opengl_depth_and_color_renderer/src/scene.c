@@ -478,7 +478,11 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 int initScene(char * confFile)
 {
   fprintf(stderr,"Initializing Scene\n");
-  scene = createVirtualStream(confFile);
+
+  //Making enough space for a "handfull" of objects , this has to be allocated before creating the virtual stream to accomodate the 3D models
+  modelStorage = allocateModelList(64);
+
+  scene = createVirtualStream(confFile,modelStorage);
   fprintf(stderr,"createVirtualStream returned \n");
   if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
 
@@ -556,13 +560,15 @@ int initScene(char * confFile)
   }
 
   fprintf(stderr,YELLOW "\nFinal step , allocating models in model storage..\n" NORMAL);
-
-  modelStorage = allocateModelList(scene->numberOfObjectTypes);
+  fprintf(stderr,YELLOW "\nNow debug....\n" NORMAL);
+  exit (0);
 
 //  models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 //  memset(models,0,scene->numberOfObjectTypes * sizeof(struct Model **));
 
 
+/*
+  modelStorage = allocateModelList(scene->numberOfObjectTypes);
   unsigned int foundAlreadyExistingModel;
   unsigned int i=0;  //Object 0 is camera so we don't need to load a model or something for it
   unsigned int modelLocation=0;
@@ -574,7 +580,7 @@ int initScene(char * confFile)
      //Also keep the model loaded as a reference..
      scene->object[i].modelPointer = (void *) &modelStorage->models[i];
     }
-
+*/\
   printModelList(modelStorage);
 
   return 1;
@@ -760,13 +766,16 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<scene->numberOfObjects; i++)
     {
-       fprintf(stderr,"Scene object %u/%u ( %s ) points to model %u \n",i,scene->numberOfObjects,scene->object[i].name , scene->object[i].type );
-       struct Model * mod = &modelStorage->models[scene->object[i].type];
+       unsigned int objectType_WhichModelToDraw = scene->object[i].type;
 
-       fprintf(stderr,"Drawing model %u/%u ( %s ) \n",scene->object[i].type,modelStorage->currentNumberOfModels,mod->pathOfModel);
-       float * pos = (float*) &posStackA;
-       if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
+       if (objectType_WhichModelToDraw<modelStorage->currentNumberOfModels)
        {
+         struct Model * mod = &modelStorage->models[objectType_WhichModelToDraw ];
+
+         fprintf(stderr,"Drawing model %u/%u ( %s ) \n",objectType_WhichModelToDraw ,modelStorage->currentNumberOfModels,mod->pathOfModel);
+         float * pos = (float*) &posStackA;
+         if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
+        {
          //This is a stupid way of passing stuff to be drawn
          R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
          getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
@@ -786,7 +795,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
                 { print3DPoint2DWindowPosition(i , pos[0],pos[1],pos[2] ); }
 
          if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
-             { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , scene->object[i].type ); }
+             { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
 
 
         scene->object[i].bbox2D[0] = mod->bbox2D[0];         scene->object[i].bbox2D[1] = mod->bbox2D[1];
@@ -796,6 +805,10 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
        } else
        { fprintf(stderr,YELLOW "Could not determine position of object %s (%u) , so not drawing it\n" NORMAL,scene->object[i].name,i); }
        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after drawing object %u \n",i); }
+      } else
+      {
+       fprintf(stderr,YELLOW "Scene object %u/%u ( %s ) points to unallocated model %u/%u  , cannot draw it\n" NORMAL,i,scene->numberOfObjects,scene->object[i].name , objectType_WhichModelToDraw , modelStorage->currentNumberOfModels  );
+      }
     }
 
 

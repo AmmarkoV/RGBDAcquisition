@@ -13,7 +13,7 @@ extern "C" {
 /**  @brief The maximum path for Object Files/Object Names/Object Types  etc */
 #define MAX_PATH 250
 
-
+#include "../ModelLoader/model_loader.h"
 
 #define LINE_MAX_LENGTH 1024
 #define OBJECT_TYPES_TO_ADD_STEP 10
@@ -99,6 +99,7 @@ struct ObjectType
 {
    char name[MAX_PATH+1];
    char model[MAX_PATH+1];
+   unsigned int modelListArrayNumber;
 };
 
 
@@ -246,6 +247,8 @@ struct VirtualStream
     unsigned int numberOfEvents;
     struct VirtualEvent * event;
 
+    struct ModelList * associatedModelList;
+
     double scaleWorld[6];
     int rotationsOverride;
     int rotationsXYZ[3];
@@ -335,21 +338,21 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename);
 * @brief Read a VirtualStream from a file
 * @ingroup trajectoryParser
 * @param Pointer to a valid stream
-* @param Name of the input file that will populate the new virtual stream
+* @param Pointer to a model list that will accomodate the newly loaded models of this virtual stream
 * @bug  Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser
    This should probably be split down to some primitives and also support things like including a file from another file dynamic reload of models/objects explicit support for Quaternions / Rotation Matrices and getting rid of some intermediate
    parser declerations like arrowsX or objX
 * @retval 1=Success , 0=Failure */
-int readVirtualStream(struct VirtualStream * newstream/* , char * filename*/);
+int readVirtualStream(struct VirtualStream * newstream,struct ModelList * modelStorage);
 
 
 /**
 * @brief Create and allocate the structures to accomodate a virtual stream , and read it from a file ( see readVirtualStream )
 * @ingroup trajectoryParser
-* @param Pointer to a valid stream
 * @param Name of the input file that will populate the new virtual stream
+* @param Pointer to a model list that will accomodate the newly loaded models of this virtual stream
 * @retval 0=Failure , anything else is a pointer to a valid struct VirtualStream * stream */
-struct VirtualStream * createVirtualStream(char * filename);
+struct VirtualStream * createVirtualStream(char * filename,struct ModelList * modelStorage);
 
 /**
 * @brief Destroy and deallocate a virtual stream
@@ -361,7 +364,7 @@ int destroyVirtualStream(struct VirtualStream * stream);
 
 
 
-int refreshVirtualStream(struct VirtualStream * newstream);
+int refreshVirtualStream(struct VirtualStream * newstream,struct ModelList * modelStorage);
 
 /**
 * @brief Add a new Object to the Virtual stream

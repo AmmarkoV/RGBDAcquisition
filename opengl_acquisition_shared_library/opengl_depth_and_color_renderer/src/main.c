@@ -565,8 +565,8 @@ int snapOGLRendererPhotoshootSandbox(
 
 int compareTrajectoryFiles(const char * outputFile , const char * filenameA , const char * filenameB,unsigned int posesToCompare , unsigned totalDistancePerFrame,unsigned int useAngleObjects)
 {
-  struct VirtualStream * sceneA = createVirtualStream(filenameA);
-  struct VirtualStream * sceneB = createVirtualStream(filenameB);
+  struct VirtualStream * sceneA = createVirtualStream(filenameA,0);
+  struct VirtualStream * sceneB = createVirtualStream(filenameB,0);
 
 
   if ( (sceneA==0) || (sceneB==0) )

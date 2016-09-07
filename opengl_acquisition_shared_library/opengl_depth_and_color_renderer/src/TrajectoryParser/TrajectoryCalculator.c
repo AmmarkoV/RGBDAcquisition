@@ -742,7 +742,7 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
                 (stream->autoRefreshForce)
                )
              {
-              refreshVirtualStream(stream);
+              refreshVirtualStream(stream,stream->associatedModelList);
               stream->lastRefresh = timeAbsMilliseconds;
               stream->autoRefreshForce=0;
              }

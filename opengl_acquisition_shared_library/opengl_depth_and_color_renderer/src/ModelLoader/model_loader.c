@@ -99,31 +99,6 @@ int deallocateModelList(struct ModelList* modelStorage)
 }
 
 
-int loadModelToModelList(struct ModelList* modelStorage,char * modelDirectory,char * modelName , unsigned int * whereModelWasLoaded)
-{
-  int foundAlreadyExistingModel=0;
-  unsigned int modelLocation = findModel(modelStorage->models,modelDirectory,modelName, &foundAlreadyExistingModel);
-
-  if (!foundAlreadyExistingModel)
-   { //If we can't find an already loaded version of the mesh we are looking for
-     unsigned int whereToLoadModel=modelStorage->currentNumberOfModels;
-
-     if (loadModel(modelStorage,whereToLoadModel,modelDirectory,modelName))
-      {
-        *whereModelWasLoaded=whereToLoadModel;
-        ++modelStorage->currentNumberOfModels;
-        fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,modelName , whereToLoadModel );
-        return 1;
-      } else
-      { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,modelName, whereToLoadModel );        return 0; }
-    } else
-    {
-     *whereModelWasLoaded=modelLocation;
-     fprintf(stderr,GREEN "Model %s , found already loaded \n" NORMAL,modelName);
-     return 1;
-    }
- return 0;
-}
 
 int printModelList(struct ModelList* modelStorage)
 {
@@ -210,13 +185,14 @@ return 0;
 
 
 
-unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , char * directory,char * modelname)
+unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , char * directory,char * modelname )
 {
   if ( (directory==0) || (modelname==0) )
   {
     fprintf(stderr,RED "loadModel failing , no modelname given \n" NORMAL );
     return 0;
   }
+
 
   struct Model * mod =  &modelStorage->models[whereToLoadModel];
   if ( mod == 0 )  { fprintf(stderr,"Could not allocate enough space for model %s \n",modelname);  return 0; }
@@ -308,6 +284,32 @@ void unloadModel(struct Model * mod)
 }
 
 
+int loadModelToModelList(struct ModelList* modelStorage,char * modelDirectory,char * modelName , unsigned int * whereModelWasLoaded)
+{
+
+  int foundAlreadyExistingModel=0;
+  unsigned int modelLocation = findModel(modelStorage->models,modelDirectory,modelName, &foundAlreadyExistingModel);
+
+  if (!foundAlreadyExistingModel)
+   { //If we can't find an already loaded version of the mesh we are looking for
+     unsigned int whereToLoadModel=modelStorage->currentNumberOfModels;
+
+     if (loadModel(modelStorage,whereToLoadModel,modelDirectory,modelName))
+      {
+        *whereModelWasLoaded=whereToLoadModel;
+        ++modelStorage->currentNumberOfModels;
+        fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,modelName , whereToLoadModel );
+        return 1;
+      } else
+      { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,modelName, whereToLoadModel );        return 0; }
+    } else
+    {
+     *whereModelWasLoaded=modelLocation;
+     fprintf(stderr,GREEN "Model %s , found already loaded \n" NORMAL,modelName);
+     return 1;
+    }
+ return 0;
+}
 
 int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
 {

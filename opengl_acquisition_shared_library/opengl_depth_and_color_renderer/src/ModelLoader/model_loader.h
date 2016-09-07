@@ -17,12 +17,13 @@ struct Model
 {
     //Pointer to the model read in memory ( what model_loader_obj reads )
     void * model;
+    //This can actually be different types of struct depending on if we are talking about an obj/tri/hardcoded/etc model
+    //We know the type byaccessing the "type" attribute of this struct
 
     int type; //See enum ModelTypes
 
-    //Position / DimensionsglColor3f(1.0,0.0,0.0);
 
-    float bbox2D[4];
+    float bbox2D[4]; //The 2D rendering output bounding box of the specific model
 
     float x , y , z , heading , pitch , roll , scaleX , scaleY ,scaleZ;
     float minX,minY,minZ,maxX,maxY,maxZ;
@@ -51,6 +52,8 @@ struct ModelList *  allocateModelList(unsigned int initialSpace);
 
 int printModelList(struct ModelList* modelStorage);
 
+int loadModelToModelList(struct ModelList* modelStorage,char * modelDirectory,char * modelName , unsigned int * whereModelWasLoaded);
+
 /**
 * @brief Update Model Position triggers , ( 3D / 2D )
 * @ingroup ModelLoader
@@ -71,7 +74,7 @@ unsigned int updateModelPosition(struct Model * model,float * position);
 * @param Did the operation find something..?
 * @retval 0=Could not find model , A pointer to an already loaded model structure
 */
-unsigned int findModel(struct ModelList * modelStorage , char * directory,char * modelname ,int * found );
+//unsigned int findModel(struct ModelList * modelStorage , char * directory,char * modelname ,int * found );
 
 
 
@@ -84,7 +87,7 @@ unsigned int findModel(struct ModelList * modelStorage , char * directory,char *
 * @param The "friendly" name of the model loaded
 * @retval 0=Error , A pointer to a model structure
 */
-unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , char * directory,char * modelname);
+//unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , char * directory,char * modelname , unsigned int * loadedModelNumber);
 
 
 /**
