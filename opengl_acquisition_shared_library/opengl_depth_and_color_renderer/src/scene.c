@@ -559,28 +559,9 @@ int initScene(char * confFile)
    glEnable(GL_CULL_FACE);
   }
 
-  fprintf(stderr,YELLOW "\nFinal step , allocating models in model storage..\n" NORMAL);
-  fprintf(stderr,YELLOW "\nNow debug....\n" NORMAL);
- // exit (0);
+  fprintf(stderr,YELLOW "\nFinal step , we are done parsing %s ..\n" NORMAL , confFile);
 
-//  models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
-//  memset(models,0,scene->numberOfObjectTypes * sizeof(struct Model **));
-
-
-/*
-  modelStorage = allocateModelList(scene->numberOfObjectTypes);
-  unsigned int foundAlreadyExistingModel;
-  unsigned int i=0;  //Object 0 is camera so we don't need to load a model or something for it
-  unsigned int modelLocation=0;
-  for (i=1; i< scene->numberOfObjectTypes ; i++)
-    {
-     fprintf(stderr,"Loading Model %s - %s ( %u )\n",scene->object[i].typeStr , scene->object[i].value , i);
-
-     loadModelToModelList(modelStorage  , "Models/",getObjectTypeModel(scene,i) , &scene->object[i].type );
-     //Also keep the model loaded as a reference..
-     scene->object[i].modelPointer = (void *) &modelStorage->models[i];
-    }
-*/
+  fprintf(stderr,YELLOW "Which results in the following model state..\n\n" NORMAL );
   printModelList(modelStorage);
 
   return 1;
@@ -640,9 +621,8 @@ int tickScene()
 
 int getModelAtScreenCoordinates(unsigned int x , unsigned int y)
 {
-
-
- return 0;
+  fprintf(stderr,"getModelAtScreenCoordinates(%u,%u) not implemented\n",x,y);
+  return 0;
 }
 
 
