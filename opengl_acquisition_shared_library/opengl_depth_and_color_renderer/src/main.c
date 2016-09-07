@@ -51,6 +51,7 @@ unsigned int openGLGetComplaintsLeft=10;
 
 #define SCALE_REAL_DEPTH_OUTPUT 1
 float depthScale=0.1;
+unsigned int snapsPerformed=0;
 
 void internalTest()
 {
@@ -362,6 +363,7 @@ int enableShaders(char * vertShaderFilename , char * fragShaderFilename)
 int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,char * sceneFile)
 {
   fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
+  snapsPerformed=0;
 
   char * testP=0;
   fprintf(stderr,"starting glx code .. ");
@@ -408,7 +410,8 @@ int seekOGLRendererSandbox(int devID,unsigned int seekFrame)
 
 int snapOGLRendererSandbox()
 {
- if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before starting to snapOGLRendererSandbox \n"); }
+ ++snapsPerformed;
+ if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before starting to snapOGLRendererSandbox ( frame %u ) \n",snapsPerformed); }
     if (glx_checkEvents())
     {
       if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after checking glx_checkEvents()\n"); }

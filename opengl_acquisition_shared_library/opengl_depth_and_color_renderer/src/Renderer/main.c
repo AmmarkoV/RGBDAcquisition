@@ -221,7 +221,6 @@ int main(int argc, char **argv)
     unsigned int snappedFrames=0;
     while (1)
     {
-
         snapOGLRendererSandbox();
 
 

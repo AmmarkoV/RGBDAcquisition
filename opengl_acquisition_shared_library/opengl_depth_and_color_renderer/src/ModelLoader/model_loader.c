@@ -128,7 +128,7 @@ int printModelList(struct ModelList* modelStorage)
 
 unsigned int updateModelPosition(struct Model * model,float * position)
 {
-      return 0;
+     // return 0;
 
       if (model==0) { return 0; }
       if (position==0) { return 0; }

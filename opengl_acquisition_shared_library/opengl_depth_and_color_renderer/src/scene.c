@@ -554,15 +554,20 @@ int initScene(char * confFile)
   //Enable Culling
   if (doCulling)
   {
-   glFrontFace(GL_FRONT);
+   glFrontFace(GL_CCW); //GL_CW / GL_CCW
+     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glFrontFace(GL_CW); \n"); }
    glCullFace(GL_BACK);
+     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glCullFace(GL_BACK); \n"); }
    glEnable(GL_CULL_FACE);
+    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glEnable(GL_CULL_FACE); \n"); }
   }
 
   fprintf(stderr,YELLOW "\nFinal step , we are done parsing %s ..\n" NORMAL , confFile);
 
   fprintf(stderr,YELLOW "Which results in the following model state..\n\n" NORMAL );
   printModelList(modelStorage);
+
+
 
   return 1;
 }
