@@ -561,7 +561,7 @@ int initScene(char * confFile)
 
   fprintf(stderr,YELLOW "\nFinal step , allocating models in model storage..\n" NORMAL);
   fprintf(stderr,YELLOW "\nNow debug....\n" NORMAL);
-  exit (0);
+ // exit (0);
 
 //  models = (struct Model **) malloc(scene->numberOfObjectTypes * sizeof(struct Model **));
 //  memset(models,0,scene->numberOfObjectTypes * sizeof(struct Model **));
@@ -580,7 +580,7 @@ int initScene(char * confFile)
      //Also keep the model loaded as a reference..
      scene->object[i].modelPointer = (void *) &modelStorage->models[i];
     }
-*/\
+*/
   printModelList(modelStorage);
 
   return 1;
@@ -766,13 +766,13 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
   for (i=1; i<scene->numberOfObjects; i++)
     {
-       unsigned int objectType_WhichModelToDraw = scene->object[i].type;
+       unsigned int objectType_WhichModelToDraw = scene->objectTypes[scene->object[i].type].modelListArrayNumber;
 
        if (objectType_WhichModelToDraw<modelStorage->currentNumberOfModels)
        {
          struct Model * mod = &modelStorage->models[objectType_WhichModelToDraw ];
 
-         fprintf(stderr,"Drawing model %u/%u ( %s ) \n",objectType_WhichModelToDraw ,modelStorage->currentNumberOfModels,mod->pathOfModel);
+         //fprintf(stderr,"Drawing model %u/%u ( %s ) \n",objectType_WhichModelToDraw ,modelStorage->currentNumberOfModels,mod->pathOfModel);
          float * pos = (float*) &posStackA;
          if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
         {

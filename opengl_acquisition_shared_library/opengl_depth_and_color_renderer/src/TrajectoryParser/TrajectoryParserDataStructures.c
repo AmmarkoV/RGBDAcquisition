@@ -579,27 +579,26 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream,char * ex
 int loadObjectTypeModelForVirtualStream(
                                         struct VirtualStream * stream ,
                                         char * modelName ,
-                                        char * modelType ,
                                         unsigned int objTypeID
                                        )
 {
-  fprintf(stderr,"Loading Model %s ( %u )\n",stream->objectTypes[objTypeID].name,objTypeID);
+  fprintf(stderr,"Loading Model with name %s and objTypeID  %u \n",modelName,objTypeID);
 
 
    if (
        loadModelToModelList(
                             stream->associatedModelList ,
                             "Models/" ,
-                            modelType ,
-                            &stream->objectTypes[objTypeID].modelListArrayNumber
+                            modelName ,
+                            &stream->objectTypes[objTypeID].modelListArrayNumber //This gets back the correct model to draw
                            )
 
        )
    {
-    fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,modelType ,stream->objectTypes[objTypeID].modelListArrayNumber );
+    fprintf(stderr,GREEN "loadObjectTypeModelForVirtualStream succeeded\n" NORMAL);
     return 1;
    } else
-   { fprintf(stderr,RED "Failed loading new model %s  \n" NORMAL,modelType);            }
+   { fprintf(stderr,RED "loadObjectTypeModelForVirtualStream failed\n" NORMAL);            }
  return 0;
 }
 
@@ -702,7 +701,8 @@ int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int O
 
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,
-                                 char * type , char * model
+                                 char * type ,
+                                 char * model
                                 )
 {
     if (stream->MAX_numberOfObjectTypes<=stream->numberOfObjectTypes+1) { growVirtualStreamObjectsTypes(stream,OBJECT_TYPES_TO_ADD_STEP); }
@@ -715,15 +715,14 @@ int addObjectTypeToVirtualStream(
     strcpy(stream->objectTypes[pos].model,model);
 
 
+    fprintf(stderr,"addedObjectType(%s,%s) with ID %u , now to load model \n",type,model,pos);
     loadObjectTypeModelForVirtualStream(
                                         stream ,
-                                        stream->object[pos].name ,
-                                        stream->object[pos].typeStr ,
+                                        model ,
                                         pos
                                        );
 
 
-    fprintf(stderr,"addedObjectType(%s,%s) with ID %u \n",type,model,pos);
 
     ++stream->numberOfObjectTypes;
 

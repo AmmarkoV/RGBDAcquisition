@@ -364,9 +364,9 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
   fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
 
   char * testP=0;
-  fprintf(stderr,"starting glx code ..\n");
+  fprintf(stderr,"starting glx code .. ");
   start_glx_stuff(width,height,viewWindow,0,testP);
-  fprintf(stderr," ok\n");
+  fprintf(stderr,GREEN" ok\n" NORMAL);
   WIDTH=width;
   HEIGHT=height;
 

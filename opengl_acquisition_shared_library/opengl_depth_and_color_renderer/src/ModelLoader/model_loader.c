@@ -106,6 +106,7 @@ int printModelList(struct ModelList* modelStorage)
   unsigned int i=0;
   for (i=0; i<modelStorage->currentNumberOfModels; i++)
   {
+    fprintf(stderr,"%03u | " ,i);
     fprintf(stderr,YELLOW "%s" NORMAL , modelTypeNames[ modelStorage->models[i].type ]);
     fprintf(stderr," %s \n" , modelStorage->models[i].pathOfModel);
   }
@@ -298,14 +299,14 @@ int loadModelToModelList(struct ModelList* modelStorage,char * modelDirectory,ch
       {
         *whereModelWasLoaded=whereToLoadModel;
         ++modelStorage->currentNumberOfModels;
-        fprintf(stderr,GREEN "Model %s , is now loaded as model[%u] \n" NORMAL,modelName , whereToLoadModel );
+        fprintf(stderr,GREEN "Model %s is now loaded as model[%u] \n" NORMAL,modelName , whereToLoadModel );
         return 1;
       } else
       { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,modelName, whereToLoadModel );        return 0; }
     } else
     {
      *whereModelWasLoaded=modelLocation;
-     fprintf(stderr,GREEN "Model %s , found already loaded \n" NORMAL,modelName);
+     fprintf(stderr,GREEN "Model %s found already loaded \n" NORMAL,modelName);
      return 1;
     }
  return 0;
@@ -392,6 +393,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
 
       if (mod->type==TRI_MODEL)
       {
+         //fprintf(stderr,"drawing TRI model\n");
          doTriDrawCalllist( (struct TRI_Model *) mod->model );
       } else
       if (mod->type==OBJ_ASSIMP_MODEL )
@@ -400,6 +402,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       } else
       if (mod->type==OBJ_MODEL)
       {
+        //fprintf(stderr,"drawing OBJ model\n");
         if (mod->model!=0)
          {
            if (mod->highlight)
@@ -429,6 +432,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       if (drawHardcodedModel(mod->type))
       {
         //Success drawing hardcoded model
+        //fprintf(stderr,"drawing hardcoded model\n");
       } else
       {
          fprintf(stderr, "Cannot draw model , unknown type %u\n",mod->type );
