@@ -93,8 +93,20 @@ struct ModelList *  allocateModelList(unsigned int initialSpace)
 
 int deallocateModelList(struct ModelList* modelStorage)
 {
-  #warning "Deallocation not working yet.."
   fprintf(stderr,"Deallocation does not work yet todo : \n");
+
+  if (modelStorage==0) { return 1; }
+  if (modelStorage->models!=0)
+    {
+       unsigned int i=0;
+
+       for (i=0; i<modelStorage->currentNumberOfModels; i++)
+       {
+           unloadModel(&modelStorage->models[i]);
+       }
+       free(modelStorage->models);
+    }
+  free(modelStorage);
   return 0;
 }
 
@@ -167,11 +179,9 @@ unsigned int findModel(struct ModelList * modelStorage , char * directory,char *
   char tmpPathOfModel[MAX_MODEL_PATHS]={0};
   snprintf(tmpPathOfModel,MAX_MODEL_PATHS,"%s/%s",directory,modelname);
 
-  //fprintf(stderr,"Trying to find %s  .. ",tmpPathOfModel);
   unsigned int i=0;
   for (i=0; i<modelStorage->currentNumberOfModels; i++)
   {
-    //fprintf(stderr,"comparing %p %p \n",models[i],models[i]->pathOfModel);
     if ( strcmp(tmpPathOfModel,modelStorage->models[i].pathOfModel)==0)
     {
       *found=1;
@@ -180,7 +190,6 @@ unsigned int findModel(struct ModelList * modelStorage , char * directory,char *
     }
   }
 
- fprintf(stderr,"not found \n");
 return 0;
 }
 
