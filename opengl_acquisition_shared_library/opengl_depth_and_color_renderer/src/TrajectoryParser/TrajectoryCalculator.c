@@ -587,7 +587,7 @@ int fillPosWithFrame(
 
     if ( (joints!=0) && (stream->object[ObjID].frame[FrameIDToReturn].jointList!=0) )
     {
-       fprintf(stderr,"Populating joints for frame %u  ( %u joints ) \n",FrameIDToReturn ,
+       fprintf(stderr,"Populating non interpolated joints for frame %u  ( %u joints ) \n",FrameIDToReturn ,
                stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints);
        //TODO :
     }
@@ -683,18 +683,31 @@ int fillPosWithInterpolatedFrame(
 
 
     if ( (joints!=0) &&
-         (
-           (stream->object[ObjID].frame[PrevFrame].jointList!=0) ||
-           (stream->object[ObjID].frame[NextFrame].jointList!=0)
-         )
+         (stream->object[ObjID].frame[PrevFrame].jointList!=0) &&
+         (stream->object[ObjID].frame[NextFrame].jointList!=0)
         )
     {
-       fprintf(stderr,"Populating joints for frame %u  ( %u joints ) \n",PrevFrame ,
-               stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints);
+       fprintf(stderr,"Populating interpolated joints for frame %u  ( %u joints / obj %u ) \n",PrevFrame ,
+               stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints , ObjID);
+
+       unsigned int i=0;
+       for (i=0; i<stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints; i++)
+       {
+        float rotPrev,rotNext;
+
+        rotPrev = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot1;
+        rotNext = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot1;
+        interScale = (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
+        interScale += rotPrev;
+        //joints[i] = interScale;
+        #warning "TODO : Fix bones.."
+       }
+
+
        //TODO :
     } else
    {
-       fprintf(stderr,"Populating joints code ( joint %p , prev %p , next %p ) \n",
+       fprintf(stderr,"Cannot Populate joints with unallocated pointers( joint %p , prev %p , next %p ) \n",
                joints,
                stream->object[ObjID].frame[PrevFrame].jointList,
                stream->object[ObjID].frame[NextFrame].jointList
