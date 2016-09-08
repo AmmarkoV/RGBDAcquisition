@@ -715,7 +715,7 @@ int fillPosWithInterpolatedFrame(
        }
     } else
    {
-       fprintf(stderr,RED "Cannot Populate joints with unallocated pointers( joint %p , prev %p , next %p ) \n" NORMAL,
+       fprintf(stderr,RED "unallocated joints ( joint %p , prev %p , next %p ) \n" NORMAL,
                joints,
                stream->object[ObjID].frame[PrevFrame].jointList,
                stream->object[ObjID].frame[NextFrame].jointList
