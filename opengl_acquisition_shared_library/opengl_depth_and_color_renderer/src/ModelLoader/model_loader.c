@@ -550,33 +550,6 @@ int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * s
 }
 
 
-int getModelBoneNumber(struct Model *mod)
-{
- if (mod==0) { fprintf(stderr,"empty model \n",mod->type); return 0;}
- if (mod->type >= TOTAL_POSSIBLE_MODEL_TYPES)
- {
-  fprintf(stderr,"impossible model type(%u)\n",mod->type);
-  return 0;
- }
-
- fprintf(stderr,"getModelBoneNumber(%s)\n",modelTypeNames[mod->type]);
- if (mod->type==TRI_MODEL)
- {
-  struct TRI_Model * triM = (struct TRI_Model * ) &mod->modelInternalData;
-  if (triM!=0)
-   {
-     return triM->header.numberOfBones;
-   }
- } else
- {
-   fprintf(stderr,"getModelBoneNumber returning 0 if not TRI\n");
-
- }
-
- return 0;
-}
-
-
 int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNumber)
 {
   fprintf(stderr,"getModelListBoneNumber(modelStorage,modelNumber=%u)\n",modelNumber);
@@ -586,14 +559,12 @@ int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNum
     return 0;
   }
 
-  //struct Model *mod = &modelStorage->models[modelNumber];
-
-  //return getModelBoneNumber(&mod);
-  return 0;
+  return modelStorage->models[modelNumber].numberOfBones;
 }
 
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
 {
+ fprintf(stderr,"Searching model %s for a bone named %s \n",mod->pathOfModel , boneName);
  *found=0;
  if (mod->type==TRI_MODEL)
  {
@@ -601,12 +572,13 @@ int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
   if (triM!=0)
    {
      unsigned int i=0;
-     unsigned int numberOfBones=getModelBoneNumber(mod);
+     unsigned int numberOfBones=mod->numberOfBones;
 
      for (i=0; i<numberOfBones; i++)
      {
        if (strcmp( triM->bones[i].boneName , boneName) == 0 )
        {
+         fprintf(stderr,"found it , it is joint # %u \n" , i);
          *found=1;
          return i;
        }

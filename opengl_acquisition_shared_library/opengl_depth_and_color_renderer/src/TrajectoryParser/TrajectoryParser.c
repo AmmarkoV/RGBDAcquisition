@@ -342,7 +342,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                if (newstream->rotationsOverride)
                      { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 
-               addPoseToObjectState( newstream , name  , nameB , time , (float*) pos , coordLength );
+               addPoseToObjectState( newstream , modelStorage , name  , nameB , time , (float*) pos , coordLength );
           break;
 
 

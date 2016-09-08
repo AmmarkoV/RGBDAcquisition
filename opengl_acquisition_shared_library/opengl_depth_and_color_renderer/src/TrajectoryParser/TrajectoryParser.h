@@ -169,7 +169,6 @@ struct VirtualObject
    char typeStr[MAX_PATH+1];
    char value[MAX_PATH+1];
    ObjectTypeID type;
-   void * modelPointer;
 
    float R , G , B , Transparency;
    unsigned char nocolor;

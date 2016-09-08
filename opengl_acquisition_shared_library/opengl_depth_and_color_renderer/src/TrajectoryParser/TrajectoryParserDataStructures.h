@@ -65,6 +65,7 @@ int addStateToObjectMini(
 
 int addPoseToObjectState(
                               struct VirtualStream * stream ,
+                              struct ModelList * modelStorage,
                               char * name  ,
                               char * jointName,
                               unsigned int timeMilliseconds ,

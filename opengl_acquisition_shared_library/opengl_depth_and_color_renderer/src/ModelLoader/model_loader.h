@@ -231,8 +231,6 @@ int getModel3dSize(struct Model *mod , float * sizeX , float * sizeY , float * s
 int drawCube();
 
 
-//TODO Add explanation here
-int getModelBoneNumber(struct Model *mod);
 int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNumber);
 
 //TODO Add explanation here

@@ -411,6 +411,7 @@ int addStateToObjectMini(
 
 int addPoseToObjectState(
                               struct VirtualStream * stream ,
+                              struct ModelList * modelStorage,
                               char * name  ,
                               char * jointName,
                               unsigned int timeMilliseconds ,
@@ -426,11 +427,13 @@ int addPoseToObjectState(
     unsigned int pos=0;
     if ( stream->object[ObjID].frame[pos].jointList !=0 )
     {
+       fprintf(stderr,"TODO : this could crash.. \n");
        pos = getExactStreamPosFromTimestamp(stream,ObjID,timeMilliseconds,&foundExactTimestamp);
 
        if(foundExactTimestamp)
        {
-       struct Model * mod = (struct Model *) stream->object[ObjID].modelPointer;
+        unsigned int objectTypeID = stream->object[ObjID].type;
+        struct Model * mod = (struct Model *) &modelStorage->models[stream->objectTypes[objectTypeID].modelListArrayNumber];
 
        int boneFound=0;
        unsigned int boneID = getModelBoneIDFromBoneName(mod,jointName,&boneFound);
