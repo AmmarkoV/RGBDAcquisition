@@ -564,7 +564,12 @@ int fillPosWithFrame(
 
     if (FrameIDToReturn >= stream->object[ObjID].MAX_numberOfFrames )
      {
-         fprintf(stderr,"fillPosWithFrame asked to return frame out of bounds ( %u / %u / %u Max ) \n",FrameIDToReturn,stream->object[ObjID].numberOfFrames,stream->object[ObjID].MAX_numberOfFrames);
+         fprintf(
+                 stderr,"fillPosWithFrame asked to return frame out of bounds ( %u / %u / %u Max ) \n",
+                 FrameIDToReturn,
+                 stream->object[ObjID].numberOfFrames,
+                 stream->object[ObjID].MAX_numberOfFrames
+                );
          return 0;
      }
 
@@ -578,6 +583,15 @@ int fillPosWithFrame(
     *scaleX=stream->object[ObjID].frame[FrameIDToReturn].scaleX;
     *scaleY=stream->object[ObjID].frame[FrameIDToReturn].scaleY;
     *scaleZ=stream->object[ObjID].frame[FrameIDToReturn].scaleZ;
+
+
+    if ( (joints!=0) && (stream->object[ObjID].frame[FrameIDToReturn].jointList!=0) )
+    {
+       fprintf(stderr,"Populating joints for frame %u  ( %u joints ) \n",FrameIDToReturn ,
+               stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints);
+       //TODO :
+    }
+
     return 1;
 }
 
@@ -666,6 +680,26 @@ int fillPosWithInterpolatedFrame(
     pos[0]=interPos[0]; pos[1]=interPos[1]; pos[2]=interPos[2];
     pos[3]=interPos[3]; pos[4]=interPos[4]; pos[5]=interPos[5];
     pos[6]=interPos[6];
+
+
+    if ( (joints!=0) &&
+         (
+           (stream->object[ObjID].frame[PrevFrame].jointList!=0) ||
+           (stream->object[ObjID].frame[NextFrame].jointList!=0)
+         )
+        )
+    {
+       fprintf(stderr,"Populating joints for frame %u  ( %u joints ) \n",PrevFrame ,
+               stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints);
+       //TODO :
+    } else
+   {
+       fprintf(stderr,"Populating joints code ( joint %p , prev %p , next %p ) \n",
+               joints,
+               stream->object[ObjID].frame[PrevFrame].jointList,
+               stream->object[ObjID].frame[NextFrame].jointList
+               );
+   }
 
     #if PRINT_DEBUGGING_INFO
     fprintf(stderr,"ok \n");

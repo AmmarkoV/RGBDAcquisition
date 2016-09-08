@@ -444,11 +444,13 @@ int addPoseToObjectState(
         if (boneFound)
         {
            stream->object[ObjID].frame[pos].hasNonDefaultJointList = 1;  //Whatever we set it is now set..!
+           stream->object[ObjID].frame[pos].jointList->numberOfJoints = mod->numberOfBones;
 
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
+
            return 1;
         } else { fprintf(stderr,"Could not find exact bone %u for %s \n",boneID,name); }
        } else  { fprintf(stderr,"Could not find exact timestamp %u for %s \n",timeMilliseconds, name); }

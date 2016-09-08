@@ -758,6 +758,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   for (i=1; i<scene->numberOfObjects; i++)
     {
        unsigned int objectType_WhichModelToDraw = scene->objectTypes[scene->object[i].type].modelListArrayNumber;
+       unsigned int numberOfBones = scene->objectTypes[scene->object[i].type].numberOfBones;
 
        if (objectType_WhichModelToDraw<modelStorage->currentNumberOfModels)
        {
@@ -765,36 +766,40 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
          //fprintf(stderr,"Drawing model %u/%u ( %s ) \n",objectType_WhichModelToDraw ,modelStorage->currentNumberOfModels,mod->pathOfModel);
          float * pos = (float*) &posStackA;
+
+         joints=(float *) malloc(sizeof(float) * numberOfBones );
          if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,joints,&scaleX,&scaleY,&scaleZ) )
-        {
-         //This is a stupid way of passing stuff to be drawn
-         R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
-         getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
-         //fprintf(stderr,"Object %s should be RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name,R,G,B,trans,noColor);
-         setModelColor(mod,&R,&G,&B,&trans,&noColor);
-         mod->scaleX = scaleX;//scene->object[i].scale;
-         mod->scaleY = scaleY;//scene->object[i].scale;
-         mod->scaleZ = scaleZ;//scene->object[i].scale;
-         mod->wireframe = scene->renderWireframe;
-         mod->highlight = ( scene->selectedObject == i );
-         //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
+          {
+           //This is a stupid way of passing stuff to be drawn
+           R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
+           getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
+           //fprintf(stderr,"Object %s should be RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name,R,G,B,trans,noColor);
+           setModelColor(mod,&R,&G,&B,&trans,&noColor);
+           mod->scaleX = scaleX;//scene->object[i].scale;
+           mod->scaleY = scaleY;//scene->object[i].scale;
+           mod->scaleZ = scaleZ;//scene->object[i].scale;
+           mod->wireframe = scene->renderWireframe;
+           mod->highlight = ( scene->selectedObject == i );
+           //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
 
-         //fprintf(stderr,"Draw OBJ%u(%f %f %f , %f %f %f %f , trans %f )\n",i,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],pos[6],trans);
+           //fprintf(stderr,"Draw OBJ%u(%f %f %f , %f %f %f %f , trans %f )\n",i,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],pos[6],trans);
 
-         if (scene->debug)
+           if (scene->debug)
                 { print3DPoint2DWindowPosition(i , pos[0],pos[1],pos[2] ); }
 
-         if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
+           if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
              { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
 
 
-        scene->object[i].bbox2D[0] = mod->bbox2D[0];         scene->object[i].bbox2D[1] = mod->bbox2D[1];
-        scene->object[i].bbox2D[2] = mod->bbox2D[2];         scene->object[i].bbox2D[3] = mod->bbox2D[3];
-
-
+          scene->object[i].bbox2D[0] = mod->bbox2D[0];         scene->object[i].bbox2D[1] = mod->bbox2D[1];
+          scene->object[i].bbox2D[2] = mod->bbox2D[2];         scene->object[i].bbox2D[3] = mod->bbox2D[3];
        } else
        { fprintf(stderr,YELLOW "Could not determine position of object %s (%u) , so not drawing it\n" NORMAL,scene->object[i].name,i); }
+
+
+       if (joints!=0) { free(joints); joints=0; }
+
        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after drawing object %u \n",i); }
       } else
       {
