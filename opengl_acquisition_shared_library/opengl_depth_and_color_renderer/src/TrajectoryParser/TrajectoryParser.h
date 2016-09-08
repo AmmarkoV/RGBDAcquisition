@@ -85,6 +85,7 @@ struct KeyFrame
    unsigned char hasTrans;
 
    struct JointState * jointList;
+   unsigned char hasNonDefaultJointList;
 
    //TimeStamp in milliseconds
    unsigned int time;
@@ -397,7 +398,6 @@ int addStateToObjectID(
 
 
 
-
 /**
 * @brief Add a new Position at a specified time for an object using its name
 * @ingroup trajectoryParser
@@ -427,35 +427,6 @@ int addObjectTypeToVirtualStream(
                                  char * type , char * model
                                 );
 
-/**
-* @brief Calculate the position for an object at an absolute time interval
-* @ingroup trajectoryParser
-* @param Pointer to a valid stream
-* @param Object Id we want to get info about
-* @param Time in milliseconds ( absolute time value in milliseconds )
-* @param Output Array of floats , should be at least 4 floats long
-* @retval 1=Success , 0=Failure */
-int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeMilliseconds,float * pos, float * scaleX , float * scaleY ,float * scaleZ);
-
-/**
-* @brief Calculate the position for an object after a delta time interval
-* @ingroup trajectoryParser
-* @param Pointer to a valid stream
-* @param Object Id we want to get info about
-* @param Time in milliseconds ( a delta that has to be combined with last value , milliseconds )
-* @param Output Array of floats , should be at least 4 floats long
-* @retval 1=Success , 0=Failure */
-int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos, float * scaleX , float * scaleY ,float * scaleZ);
-
-
-/**
-* @brief Get an array of Floats , describing the last position of the objects
-* @ingroup trajectoryParser
-* @param Pointer to a valid stream
-* @param Object Id we want to get info about
-* @param Output Array of floats , should be at least 4 floats long
-* @retval 1=Success , 0=Failure */
-int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos, float * scaleX , float * scaleY ,float * scaleZ);
 
 
 #ifdef __cplusplus

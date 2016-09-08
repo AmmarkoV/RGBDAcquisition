@@ -363,8 +363,8 @@ int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned
   float posA[7]={0}; float scaleA_X,scaleA_Y,scaleA_Z;
   float posB[7]={0}; float scaleB_X,scaleB_Y,scaleB_Z;
 
-  calculateVirtualStreamPos(newstream,objIDA,atTime,posA,&scaleA_X,&scaleA_Y,&scaleA_Z);
-  calculateVirtualStreamPos(newstream,objIDB,atTime,posB,&scaleB_X,&scaleB_Y,&scaleB_Z);
+  calculateVirtualStreamPos(newstream,objIDA,atTime,posA,0,&scaleA_X,&scaleA_Y,&scaleA_Z);
+  calculateVirtualStreamPos(newstream,objIDB,atTime,posB,0,&scaleB_X,&scaleB_Y,&scaleB_Z);
 
   float distance =  calculateDistanceTra(posA[0],posA[1],posA[2],posB[0],posB[1],posB[2]);
   fprintf(stderr,"Distance %u from %u = %f\n",objIDA,objIDB,distance);
@@ -475,11 +475,6 @@ int unflipRotationAxis(float * rotX, float * rotY , float * rotZ , int where2Sen
 
 
 
-
-
-
-
-
 int fillPosWithNull(float * pos,float * scaleX ,float * scaleY,float * scaleZ)
 {
     #if PRINT_DEBUGGING_INFO
@@ -501,7 +496,15 @@ int fillPosWithNull(float * pos,float * scaleX ,float * scaleY,float * scaleZ)
 }
 
 
-int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scaleX,float * scaleY,float * scaleZ )
+int fillPosWithLastFrame(
+                          struct VirtualStream * stream,
+                          ObjectIDHandler ObjID,
+                          float * pos,
+                          float * joints,
+                          float * scaleX,
+                          float * scaleY,
+                          float * scaleZ
+                        )
 {
    if (stream==0) { fprintf(stderr,"Cannot fill position on empty stream \n"); return 0; }
    if (pos==0) { fprintf(stderr,"Cannot fill position on empty position \n"); return 0; }
@@ -534,36 +537,18 @@ int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,flo
     return 1;
 }
 
-/*
-int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos,double * scale )
-{
-   if (stream->object[ObjID].frame==0)
-    {
-      #if PRINT_WARNING_INFO
-      fprintf(stderr,"Cannot Access frames for object %u \n",ObjID);
-      #endif
-      return 0;
-    }
-
-    #if PRINT_DEBUGGING_INFO
-    fprintf(stderr,"Returning frame %u \n",FrameIDToReturn);
-    #endif
-
-    unsigned int FrameIDToReturn = stream->object[ObjID].numberOfFrames;
-    if (FrameIDToReturn>0) { --FrameIDToReturn; } //We have FrameIDToReturn frames so we grab the last one ( FrameIDToReturn -1 )
-    pos[0]=(double) stream->object[ObjID].frame[FrameIDToReturn].x;
-    pos[1]=(double) stream->object[ObjID].frame[FrameIDToReturn].y;
-    pos[2]=(double) stream->object[ObjID].frame[FrameIDToReturn].z;
-    pos[3]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot1;
-    pos[4]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot2;
-    pos[5]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot3;
-    pos[6]=(double) stream->object[ObjID].frame[FrameIDToReturn].rot4;
-    *scale=stream->object[ObjID].frame[FrameIDToReturn].scale;
-    return 1;
-}*/
 
 
-int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int FrameIDToReturn,float * pos,float * scaleX,float * scaleY,float * scaleZ)
+int fillPosWithFrame(
+                      struct VirtualStream * stream,
+                      ObjectIDHandler ObjID,
+                      unsigned int FrameIDToReturn,
+                      float * pos,
+                      float * joints,
+                      float * scaleX,
+                      float * scaleY,
+                      float * scaleZ
+                    )
 {
    if (stream->object[ObjID].frame==0)
     {
@@ -597,8 +582,18 @@ int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigne
 }
 
 
-int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scaleX,float * scaleY,float * scaleZ,
-                                 unsigned int PrevFrame,unsigned int NextFrame , unsigned int time )
+int fillPosWithInterpolatedFrame(
+                                  struct VirtualStream * stream,
+                                  ObjectIDHandler ObjID,
+                                  float * pos,
+                                  float * joints,
+                                  float * scaleX,
+                                  float * scaleY,
+                                  float * scaleZ,
+                                  unsigned int PrevFrame,
+                                  unsigned int NextFrame ,
+                                  unsigned int time
+                                )
 {
    if (stream->object[ObjID].frame==0)
     {
@@ -610,7 +605,16 @@ int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler O
 
    if (PrevFrame==NextFrame)
     {
-       return fillPosWithFrame(stream,ObjID,PrevFrame,pos,scaleX,scaleY,scaleZ);
+       return fillPosWithFrame(
+                                stream,
+                                ObjID,
+                                PrevFrame,
+                                pos,
+                                joints,
+                                scaleX,
+                                scaleY,
+                                scaleZ
+                              );
     }
 
 
@@ -709,7 +713,16 @@ int getExactStreamPosFromTimestamp(struct VirtualStream * stream,ObjectIDHandler
 
 
 
-int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAbsMilliseconds,float * pos,float * scaleX,float * scaleY,float * scaleZ)
+int calculateVirtualStreamPos(
+                               struct VirtualStream * stream,
+                               ObjectIDHandler ObjID,
+                               unsigned int timeAbsMilliseconds,
+                               float * pos,
+                               float * joints,
+                               float * scaleX,
+                               float * scaleY,
+                               float * scaleZ
+                             )
 {
    if (stream==0) { fprintf(stderr,"calculateVirtualStreamPos called with null stream\n"); return 0; }
    if (stream->object==0) { fprintf(stderr,"calculateVirtualStreamPos called with null object array\n"); return 0; }
@@ -784,8 +797,16 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
 
 
     //fprintf(stderr,"Simple Getter ObjID %u Frame %u\n",ObjID,FrameIDToReturn);
-
-    fillPosWithFrame(stream,ObjID,FrameIDToReturn,pos,scaleX,scaleY,scaleZ);
+    fillPosWithFrame(
+                      stream,
+                      ObjID,
+                      FrameIDToReturn,
+                      pos,
+                      joints,
+                      scaleX,
+                      scaleY,
+                      scaleZ
+                    );
     //fprintf(stderr,"fillPosWithFrame %u => ( %0.2f %0.2f %0.2f , %0.2f %0.2f %0.2f)\n",FrameIDToReturn,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
 
     FrameIDLast = FrameIDToReturn;
@@ -839,7 +860,18 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
 
     //We now have our Last and Next frame , all that remains is extracting the
     //interpolated time between them..!
-    return fillPosWithInterpolatedFrame(stream,ObjID,pos,scaleX,scaleY,scaleZ,FrameIDLast,FrameIDNext,timeAbsMilliseconds);
+    return fillPosWithInterpolatedFrame(
+                                         stream,
+                                         ObjID,
+                                         pos,
+                                         joints,
+                                         scaleX,
+                                         scaleY,
+                                         scaleZ,
+                                         FrameIDLast,
+                                         FrameIDNext,
+                                         timeAbsMilliseconds
+                                        );
 
    } /*!END OF INTERPOLATED FRAME GETTER*/
 
@@ -848,16 +880,50 @@ int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjI
 
 
 
-int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos,float * scaleX,float * scaleY, float * scaleZ)
+int calculateVirtualStreamPosAfterTime(
+                                        struct VirtualStream * stream,
+                                        ObjectIDHandler ObjID,
+                                        unsigned int timeAfterMilliseconds,
+                                        float * pos,
+                                        float * joints,
+                                        float * scaleX,
+                                        float * scaleY,
+                                        float * scaleZ
+                                      )
 {
    stream->object[ObjID].lastCalculationTime+=timeAfterMilliseconds;
-   return calculateVirtualStreamPos(stream,ObjID,stream->object[ObjID].lastCalculationTime,pos,scaleX,scaleY,scaleZ);
+   return calculateVirtualStreamPos(
+                                     stream,
+                                     ObjID,
+                                     stream->object[ObjID].lastCalculationTime,
+                                     pos,
+                                     joints,
+                                     scaleX,
+                                     scaleY,
+                                     scaleZ
+                                    );
 }
 
 
-int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scaleX,float * scaleY,float * scaleZ)
+int getVirtualStreamLastPosF(
+                              struct VirtualStream * stream,
+                              ObjectIDHandler ObjID,
+                              float * pos,
+                              float * joints,
+                              float * scaleX,
+                              float * scaleY,
+                              float * scaleZ
+                            )
 {
-    return fillPosWithLastFrame(stream,ObjID,pos,scaleX,scaleY,scaleZ);
+    return fillPosWithLastFrame(
+                                 stream,
+                                 ObjID,
+                                 pos,
+                                 joints,
+                                 scaleX,
+                                 scaleY,
+                                 scaleZ
+                                );
 }
 
 

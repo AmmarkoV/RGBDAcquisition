@@ -605,7 +605,7 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
 
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
 
- fprintf(stderr,"Comparing %u objects across %u poses ..!\n",sceneA->numberOfObjects , posesToCompare);
+ fprintf(stderr,"Comparing %u objects across %u poses (joints are disregarded) ..!\n",sceneA->numberOfObjects , posesToCompare);
 for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
    {
      float totalDistance=0;
@@ -616,8 +616,8 @@ for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
        float * posA = (float*) &posStackA;
        float * posB = (float*) &posStackB;
        if (
-             ( calculateVirtualStreamPos(sceneA,i,timestampToUse,posA,&scaleX,&scaleY,&scaleZ) ) &&
-             ( calculateVirtualStreamPos(sceneB,i,timestampToUse,posB,&scaleX,&scaleY,&scaleZ) )
+             ( calculateVirtualStreamPos(sceneA,i,timestampToUse,posA,0,&scaleX,&scaleY,&scaleZ) ) &&
+             ( calculateVirtualStreamPos(sceneB,i,timestampToUse,posB,0,&scaleX,&scaleY,&scaleZ) )
           )
        {
          float distance = calculateDistance(posA[0]*100,posA[1]*100,posA[2]*100,

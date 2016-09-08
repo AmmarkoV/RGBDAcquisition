@@ -275,7 +275,11 @@ struct JointState * allocateEnoughJointSpaceForStateOfObjectID(
                                                                )
 {
  unsigned int numberOfBones=stream->objectTypes[stream->object[ObjID].type].numberOfBones;
- fprintf(stderr,"allocateEnoughJointSpaceForStateOfObjectID  for objid %u has %u bones ..\n",ObjID,numberOfBones);
+
+ if (ObjID==0)
+    { /*Camera does not have joints*/ } else
+    { fprintf(stderr,"allocateEnoughJointSpaceForStateOfObjectID  for objid %u has %u bones ..\n",ObjID,numberOfBones); }
+
  if (numberOfBones!=0)
  {
    fprintf(stderr,"Also allocating %u joints for this model..\n",numberOfBones);
@@ -329,7 +333,7 @@ int addStateToObjectID(
   stream->object[ObjID].frame[pos].Alpha = Alpha;
 
   stream->object[ObjID].frame[pos].jointList=allocateEnoughJointSpaceForStateOfObjectID( stream , ObjID );
-
+  stream->object[ObjID].frame[pos].hasNonDefaultJointList = 0; // Initially not changed..!
 
   if (coordLength > 0 ) {  stream->object[ObjID].frame[pos].x = coord[0]; }
   if (coordLength > 1 ) {  stream->object[ObjID].frame[pos].y = coord[1]; }
@@ -427,7 +431,6 @@ int addPoseToObjectState(
     unsigned int pos=0;
     if ( stream->object[ObjID].frame[pos].jointList !=0 )
     {
-       fprintf(stderr,"TODO : this could crash.. \n");
        pos = getExactStreamPosFromTimestamp(stream,ObjID,timeMilliseconds,&foundExactTimestamp);
 
        if(foundExactTimestamp)
@@ -435,11 +438,13 @@ int addPoseToObjectState(
         unsigned int objectTypeID = stream->object[ObjID].type;
         struct Model * mod = (struct Model *) &modelStorage->models[stream->objectTypes[objectTypeID].modelListArrayNumber];
 
-       int boneFound=0;
-       unsigned int boneID = getModelBoneIDFromBoneName(mod,jointName,&boneFound);
+        int boneFound=0;
+        unsigned int boneID = getModelBoneIDFromBoneName(mod,jointName,&boneFound);
 
-       if (boneFound)
+        if (boneFound)
         {
+           stream->object[ObjID].frame[pos].hasNonDefaultJointList = 1;  //Whatever we set it is now set..!
+
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];

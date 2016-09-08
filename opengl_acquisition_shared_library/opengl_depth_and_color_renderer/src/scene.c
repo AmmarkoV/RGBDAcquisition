@@ -613,7 +613,7 @@ int tickScene()
    float scaleX = 1.0 , scaleY = 1.0 , scaleZ = 1.0;
 
   //Object 0 is camera  lets calculate its position
-   calculateVirtualStreamPos(scene,0,scene->ticks*tickUSleepTime,pos,&scaleX,&scaleY,&scaleZ);
+   calculateVirtualStreamPos(scene,0,scene->ticks*tickUSleepTime,pos,0,&scaleX,&scaleY,&scaleZ);
    camera_pos_x = userDeltacamera_pos_x + pos[0];  camera_pos_y = userDeltacamera_pos_y + pos[1]; camera_pos_z = userDeltacamera_pos_z + pos[2];
    camera_angle_x = userDeltacamera_angle_x + pos[3]; camera_angle_y = userDeltacamera_angle_y + pos[4]; camera_angle_z = userDeltacamera_angle_z + pos[5];
 
@@ -737,17 +737,21 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   doAllEventTriggers(timestampToUse);
 
 
+  if (scene->ticks%10==0)
+  {
+    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime);
+  }
+
+
+
   unsigned char noColor=0;
   float posStackA[7]={0};
   float posStackB[7]={0};
   float scaleX=1.0,scaleY=1.0,scaleZ=1.0;
   float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 
+  float * joints=0;
 
-  if (scene->ticks%10==0)
-  {
-    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime);
-  }
 
 
   //Object 0 is camera , so we draw object 1 To numberOfObjects-1
@@ -761,7 +765,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
          //fprintf(stderr,"Drawing model %u/%u ( %s ) \n",objectType_WhichModelToDraw ,modelStorage->currentNumberOfModels,mod->pathOfModel);
          float * pos = (float*) &posStackA;
-         if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,&scaleX,&scaleY,&scaleZ) )
+         if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,joints,&scaleX,&scaleY,&scaleZ) )
         {
          //This is a stupid way of passing stuff to be drawn
          R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
@@ -807,8 +811,8 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
   for (i=0; i<scene->numberOfConnectors; i++)
   {
     if (
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,&scaleX,&scaleY,&scaleZ) ) &&
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,&scaleX,&scaleY,&scaleZ) )
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,0,&scaleX,&scaleY,&scaleZ) ) &&
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,0,&scaleX,&scaleY,&scaleZ) )
         )
        {
         /*

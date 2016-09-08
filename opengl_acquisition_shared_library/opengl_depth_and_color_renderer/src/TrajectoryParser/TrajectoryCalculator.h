@@ -29,7 +29,7 @@ int convertQuaternionsToEulerAngles(struct VirtualStream * stream,double * euler
 
 
 int fillPosWithNull(float * pos,float * scaleX ,float * scaleY,float * scaleZ);
-int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scaleX,float * scaleY,float * scaleZ );
+int fillPosWithLastFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * joints,float * scaleX,float * scaleY,float * scaleZ );
 /*
 int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,double * pos,double * scale )
 */
@@ -37,13 +37,88 @@ int fillPosWithLastFrameD(struct VirtualStream * stream,ObjectIDHandler ObjID,do
 
 int getExactStreamPosFromTimestamp(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAbsMilliseconds , int * foundExactTimestamp);
 
-int fillPosWithFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int FrameIDToReturn,float * pos,float * scaleX,float * scaleY,float * scaleZ);
-int fillPosWithInterpolatedFrame(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scaleX,float * scaleY,float * scaleZ,
-                                 unsigned int PrevFrame,unsigned int NextFrame , unsigned int time );
-int calculateVirtualStreamPos(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAbsMilliseconds,float * pos,float * scaleX,float * scaleY,float * scaleZ);
+int fillPosWithFrame(
+                      struct VirtualStream * stream,
+                      ObjectIDHandler ObjID,
+                      unsigned int FrameIDToReturn,
+                      float * pos,
+                      float * joints,
+                      float * scaleX,
+                      float * scaleY,
+                      float * scaleZ
+                    );
 
-int calculateVirtualStreamPosAfterTime(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAfterMilliseconds,float * pos,float * scaleX,float * scaleY, float * scaleZ);
-int getVirtualStreamLastPosF(struct VirtualStream * stream,ObjectIDHandler ObjID,float * pos,float * scaleX,float * scaleY,float * scaleZ);
+
+
+int fillPosWithInterpolatedFrame(
+                                  struct VirtualStream * stream,
+                                  ObjectIDHandler ObjID,
+                                  float * pos,
+                                  float * joints,
+                                  float * scaleX,
+                                  float * scaleY,
+                                  float * scaleZ,
+                                  unsigned int PrevFrame,
+                                  unsigned int NextFrame ,
+                                  unsigned int time
+                                );
+
+
+/**
+* @brief Calculate the position for an object at an absolute time interval
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object Id we want to get info about
+* @param Time in milliseconds ( absolute time value in milliseconds )
+* @param Output Array of floats , should be at least 4 floats long
+* @retval 1=Success , 0=Failure */
+int calculateVirtualStreamPos(
+                               struct VirtualStream * stream,
+                               ObjectIDHandler ObjID,
+                               unsigned int timeMilliseconds,
+                               float * pos,
+                               float * joints,
+                               float * scaleX,
+                               float * scaleY,
+                               float * scaleZ
+                              );
+
+/**
+* @brief Calculate the position for an object after a delta time interval
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object Id we want to get info about
+* @param Time in milliseconds ( a delta that has to be combined with last value , milliseconds )
+* @param Output Array of floats , should be at least 4 floats long
+* @retval 1=Success , 0=Failure */
+int calculateVirtualStreamPosAfterTime(
+                                        struct VirtualStream * stream,
+                                        ObjectIDHandler ObjID,
+                                        unsigned int timeAfterMilliseconds,
+                                        float * pos,
+                                        float * joints,
+                                        float * scaleX,
+                                        float * scaleY,
+                                        float * scaleZ
+                                        );
+
+
+/**
+* @brief Get an array of Floats , describing the last position of the objects
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object Id we want to get info about
+* @param Output Array of floats , should be at least 4 floats long
+* @retval 1=Success , 0=Failure */
+int getVirtualStreamLastPosF(
+                             struct VirtualStream * stream,
+                             ObjectIDHandler ObjID,
+                             float * pos,
+                             float * joints,
+                             float * scaleX,
+                             float * scaleY,
+                             float * scaleZ
+                            );
 
 
 #endif // TRAJECTORYCALCULATOR_H_INCLUDED
