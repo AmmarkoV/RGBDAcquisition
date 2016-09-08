@@ -762,12 +762,12 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
        if (objectType_WhichModelToDraw<modelStorage->currentNumberOfModels)
        {
-         struct Model * mod = &modelStorage->models[objectType_WhichModelToDraw ];
+         struct Model * mod = &modelStorage->models[objectType_WhichModelToDraw];
 
          //fprintf(stderr,"Drawing model %u/%u ( %s ) \n",objectType_WhichModelToDraw ,modelStorage->currentNumberOfModels,mod->pathOfModel);
          float * pos = (float*) &posStackA;
 
-         joints=(float *) malloc(sizeof(float) * numberOfBones );
+         joints=(float *) malloc(sizeof(float) * numberOfBones * 4 );
          if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,joints,&scaleX,&scaleY,&scaleZ) )
           {
            //This is a stupid way of passing stuff to be drawn

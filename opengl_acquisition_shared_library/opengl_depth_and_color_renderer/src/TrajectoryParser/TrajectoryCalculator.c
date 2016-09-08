@@ -682,6 +682,8 @@ int fillPosWithInterpolatedFrame(
     pos[6]=interPos[6];
 
 
+    if (joints==0)
+    { /*No joints output ..*/ } else
     if ( (joints!=0) &&
          (stream->object[ObjID].frame[PrevFrame].jointList!=0) &&
          (stream->object[ObjID].frame[NextFrame].jointList!=0)
@@ -697,17 +699,23 @@ int fillPosWithInterpolatedFrame(
 
         rotPrev = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot1;
         rotNext = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot1;
-        interScale = (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
-        interScale += rotPrev;
-        //joints[i] = interScale;
-        #warning "TODO : Fix bones.."
+        joints[i*4+0] = rotPrev + (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
+
+        rotPrev = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot2;
+        rotNext = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot2;
+        joints[i*4+1] = rotPrev + (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
+
+        rotPrev = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot3;
+        rotNext = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot3;
+        joints[i*4+2] = rotPrev + (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
+
+        rotPrev = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot4;
+        rotNext = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot4;
+        joints[i*4+3] = rotPrev + (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
        }
-
-
-       //TODO :
     } else
    {
-       fprintf(stderr,"Cannot Populate joints with unallocated pointers( joint %p , prev %p , next %p ) \n",
+       fprintf(stderr,RED "Cannot Populate joints with unallocated pointers( joint %p , prev %p , next %p ) \n" NORMAL,
                joints,
                stream->object[ObjID].frame[PrevFrame].jointList,
                stream->object[ObjID].frame[NextFrame].jointList
