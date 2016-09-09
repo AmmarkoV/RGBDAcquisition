@@ -18,6 +18,10 @@
  #warning "Shininess is problematic ( apparently )"
 #endif // DISABLE_SHININESS
 
+
+#define NORMAL   "\033[0m"
+#define RED     "\033[31m"      /* Red */
+
 void calcFaceNormal(Normal *nrm,Vertex v1,Vertex v2,Vertex v3,int normalized)
 {
   /* Calculate cross product of vectors to calculate face normal (normalized) */
@@ -410,6 +414,35 @@ int countChar(char  * str , unsigned int strLength , char seek , char terminatio
  return count;
 }
 
+
+
+int saveOBJ(struct OBJ_Model * obj , char * filename)
+{
+  FILE * fp=fopen(filename,"w");
+  if(fp!=0)
+  {
+    unsigned int i=0;
+    for (i=0; i<obj->numNormals; i++)
+    {
+     fprintf(fp,"vn %0.5f %0.5f %0.5f\n",
+             obj->normalList[obj->numNormals].n1,
+	         obj->normalList[obj->numNormals].n2,
+	         obj->normalList[obj->numNormals].n3);
+
+
+     fprintf(fp,"v %0.5f %0.5f %0.5f\n",
+             obj->vertexList[obj->numVertices].x,
+	         obj->vertexList[obj->numVertices].y,
+	         obj->vertexList[obj->numVertices].z);
+    }
+
+
+    fclose(fp);
+  }
+}
+
+
+
 int readOBJ(struct OBJ_Model * obj)
 {
 
@@ -554,12 +587,6 @@ int readOBJ(struct OBJ_Model * obj)
   }
 
 
-  if (wrongDecimalSeperatorBug)
-  {
-      fprintf(stderr,"\n\n\n\nThis OBJ file has a wrong seperator for floating point numbers \n");
-      fprintf(stderr,"         please use    sed -i 's/,/./g' %s         \n\n\n",obj->filename);
-
-  }
 
 
 
@@ -575,6 +602,14 @@ int readOBJ(struct OBJ_Model * obj)
   printf("Groups   : %ld\n",obj->numGroups);
   printf("Texes   : %ld\n",obj->numTexs);
   printf("Colors   : %ld\n",obj->numColors);
+
+  if (wrongDecimalSeperatorBug)
+  {
+      fprintf(stderr,RED "! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !\n");
+      fprintf(stderr,RED "\n\n\n\nThis OBJ file has a wrong seperator for floating point numbers \n");
+      fprintf(stderr,"         please use    sed -i 's/,/./g' %s         \n\n\n" NORMAL,obj->filename);
+      fprintf(stderr,RED "! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !\n");
+  }
 
   for(i=0; i<obj->numGroups; i++)
   {

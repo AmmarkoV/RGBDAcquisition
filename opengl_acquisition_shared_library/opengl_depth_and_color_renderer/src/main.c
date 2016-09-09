@@ -777,13 +777,24 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
   convertObjToTri(&tri , obj);
 
   char headerOut[256];
-  //saveModelTriHeader(outputfile,&tri);
+  //
 
-  snprintf(headerOut,256,"%s.tri",outputfile);
-  saveModelTri(headerOut,&tri);
+  if (strstr(outputfile,".obj"))
+  {
+    saveOBJ(obj,outputfile);
+  } else
+  if (strstr(outputfile,".tri"))
+  {
+   snprintf(headerOut,256,"%s.tri",outputfile);
+   saveModelTri(headerOut,&tri);
 
-  struct TRI_Model triReload={0};
-  loadModelTri(headerOut, &triReload);
+   struct TRI_Model triReload={0};
+   loadModelTri(headerOut, &triReload);
+  } else
+  if (strstr(outputfile,".h"))
+  {
+    dumpModelFileH(inputfile,outputfile);
+  }
 
   unloadObj(obj);
 }

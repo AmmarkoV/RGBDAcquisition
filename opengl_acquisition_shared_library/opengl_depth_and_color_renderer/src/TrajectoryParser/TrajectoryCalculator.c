@@ -607,8 +607,17 @@ int fillJointsWithInterpolatedFrame(
                                   unsigned int MAX_stepTime
                                 )
 {
+       unsigned int numberOfJoints = 0;
+
+       if (stream->object[ObjID].frame[PrevFrame].jointList!=0)
+         { numberOfJoints = stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints; }
+       if (stream->object[ObjID].frame[NextFrame].jointList!=0)
+         { numberOfJoints = stream->object[ObjID].frame[NextFrame].jointList->numberOfJoints; }
+
+       if (numberOfJoints==0) { return 1; }
+
        unsigned int i=0;
-       for (i=0; i<stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints; i++)
+       for (i=0; i<numberOfJoints; i++)
        {
         float rotPrev[4]={0};
         float rotNext[4]={0};
@@ -733,8 +742,7 @@ int fillPosWithInterpolatedFrame(
     pos[6]=interPos[6];
 
 
-    if (joints==0)
-    { /*No joints output ..*/ } else
+    if (joints==0) { /*No joints output ..*/ } else
     if ( (joints!=0) &&
          (
           (stream->object[ObjID].frame[PrevFrame].jointList!=0) ||
@@ -755,11 +763,12 @@ int fillPosWithInterpolatedFrame(
                                        );
     } else
    {
+       /*
        fprintf(stderr,RED "unallocated joints ( out %p , prev %p , next %p ) \n" NORMAL,
                joints,
                stream->object[ObjID].frame[PrevFrame].jointList,
                stream->object[ObjID].frame[NextFrame].jointList
-               );
+               );*/
    }
 
     #if PRINT_DEBUGGING_INFO

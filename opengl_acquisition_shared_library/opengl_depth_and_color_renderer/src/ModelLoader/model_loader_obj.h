@@ -161,6 +161,9 @@ struct OBJ_Model
 GLuint getObjOGLList(struct OBJ_Model * obj);
 
 
+
+int saveOBJ(struct OBJ_Model * obj , char * filename);
+
 /**
 * @brief Load an Object (.OBJ) file
 * @ingroup OBJModelLoader

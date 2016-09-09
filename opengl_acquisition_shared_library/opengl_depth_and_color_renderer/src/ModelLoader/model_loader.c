@@ -114,7 +114,7 @@ int deallocateModelList(struct ModelList* modelStorage)
 
 int printModelList(struct ModelList* modelStorage)
 {
-  fprintf(stderr,"Model List __________________________________\n");
+  fprintf(stderr,"Model List ___________________________________________\n");
   unsigned int i=0;
   for (i=0; i<modelStorage->currentNumberOfModels; i++)
   {
@@ -124,7 +124,7 @@ int printModelList(struct ModelList* modelStorage)
             modelStorage->models[i].pathOfModel ,
             modelStorage->models[i].numberOfBones);
   }
-  fprintf(stderr,"______________________________________________\n");
+  fprintf(stderr,"______________________________________________________\n");
  return 1;
 }
 
