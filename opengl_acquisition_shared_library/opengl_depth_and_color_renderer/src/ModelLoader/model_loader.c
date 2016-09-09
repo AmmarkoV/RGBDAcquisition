@@ -114,15 +114,17 @@ int deallocateModelList(struct ModelList* modelStorage)
 
 int printModelList(struct ModelList* modelStorage)
 {
-  fprintf(stderr,"Model List ________________________\n");
+  fprintf(stderr,"Model List __________________________________\n");
   unsigned int i=0;
   for (i=0; i<modelStorage->currentNumberOfModels; i++)
   {
     fprintf(stderr,"%03u | " ,i);
     fprintf(stderr,YELLOW "%s" NORMAL , modelTypeNames[ modelStorage->models[i].type ]);
-    fprintf(stderr," %s \n" , modelStorage->models[i].pathOfModel);
+    fprintf(stderr," %s - %u joints \n" ,
+            modelStorage->models[i].pathOfModel ,
+            modelStorage->models[i].numberOfBones);
   }
-  fprintf(stderr,"____________________________________\n");
+  fprintf(stderr,"______________________________________________\n");
  return 1;
 }
 

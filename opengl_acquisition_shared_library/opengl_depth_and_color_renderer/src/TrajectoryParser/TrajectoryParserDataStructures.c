@@ -289,7 +289,10 @@ struct JointState * allocateEnoughJointSpaceForStateOfObjectID(
     unsigned int jointSize = numberOfBones * sizeof(struct Joint);
     js->joint = ( struct Joint *) malloc(jointSize);
     if (js->joint!=0)
-     { memset(js->joint,0,jointSize); }
+     {
+       memset(js->joint,0,jointSize);
+       js->numberOfJoints = numberOfBones;
+     }
    }
    return js;
  }
