@@ -596,6 +596,57 @@ int fillPosWithFrame(
 }
 
 
+
+int fillJointsWithInterpolatedFrame(
+                                  struct VirtualStream * stream,
+                                  ObjectIDHandler ObjID,
+                                  float * joints,
+                                  unsigned int PrevFrame,
+                                  unsigned int NextFrame ,
+                                  unsigned int our_stepTime,
+                                  unsigned int MAX_stepTime
+                                )
+{
+       unsigned int i=0;
+       for (i=0; i<stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints; i++)
+       {
+        float rotPrev[4]={0};
+        float rotNext[4]={0};
+
+        if ( (stream->object[ObjID].frame[PrevFrame].jointList!=0) &&
+              (stream->object[ObjID].frame[PrevFrame].hasNonDefaultJointList) )
+        {
+         rotPrev[0] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot1;
+         rotPrev[1] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot2;
+         rotPrev[2] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot3;
+         rotPrev[3] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot4;
+        }
+
+        if ( (stream->object[ObjID].frame[NextFrame].jointList!=0) &&
+              (stream->object[ObjID].frame[NextFrame].hasNonDefaultJointList) )
+        {
+         rotNext[0] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot1;
+         rotNext[1] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot2;
+         rotNext[2] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot3;
+         rotNext[3] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot4;
+        }
+
+        joints[i*4+0] = rotPrev[0] + (float) ( rotNext[0] - rotPrev[0] ) * our_stepTime / MAX_stepTime;
+        joints[i*4+1] = rotPrev[1] + (float) ( rotNext[1] - rotPrev[1] ) * our_stepTime / MAX_stepTime;
+        joints[i*4+2] = rotPrev[2] + (float) ( rotNext[2] - rotPrev[2] ) * our_stepTime / MAX_stepTime;
+        joints[i*4+3] = rotPrev[3] + (float) ( rotNext[3] - rotPrev[3] ) * our_stepTime / MAX_stepTime;
+      }
+  return 1;
+}
+
+
+
+
+
+
+
+
+
 int fillPosWithInterpolatedFrame(
                                   struct VirtualStream * stream,
                                   ObjectIDHandler ObjID,
@@ -685,37 +736,26 @@ int fillPosWithInterpolatedFrame(
     if (joints==0)
     { /*No joints output ..*/ } else
     if ( (joints!=0) &&
-         (stream->object[ObjID].frame[PrevFrame].jointList!=0) &&
-         (stream->object[ObjID].frame[NextFrame].jointList!=0)
+         (
+          (stream->object[ObjID].frame[PrevFrame].jointList!=0) ||
+          (stream->object[ObjID].frame[NextFrame].jointList!=0)
+         )
         )
     {
-       fprintf(stderr,"Populating interpolated joints for frame %u  ( %u joints / obj %u ) \n",PrevFrame ,
-               stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints , ObjID);
+       fprintf(stderr,"interpolating joints for frame %u  ( %u joints / obj %u ) \n",PrevFrame , stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints , ObjID);
 
-       unsigned int i=0;
-       for (i=0; i<stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints; i++)
-       {
-        float rotPrev,rotNext;
-
-        rotPrev = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot1;
-        rotNext = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot1;
-        joints[i*4+0] = rotPrev + (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
-
-        rotPrev = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot2;
-        rotNext = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot2;
-        joints[i*4+1] = rotPrev + (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
-
-        rotPrev = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot3;
-        rotNext = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot3;
-        joints[i*4+2] = rotPrev + (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
-
-        rotPrev = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot4;
-        rotNext = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot4;
-        joints[i*4+3] = rotPrev + (float) ( rotNext - rotPrev ) * our_stepTime / MAX_stepTime;
-       }
+       fillJointsWithInterpolatedFrame(
+                                        stream,
+                                        ObjID,
+                                        joints,
+                                        PrevFrame,
+                                        NextFrame ,
+                                        our_stepTime,
+                                        MAX_stepTime
+                                       );
     } else
    {
-       fprintf(stderr,RED "unallocated joints ( joint %p , prev %p , next %p ) \n" NORMAL,
+       fprintf(stderr,RED "unallocated joints ( out %p , prev %p , next %p ) \n" NORMAL,
                joints,
                stream->object[ObjID].frame[PrevFrame].jointList,
                stream->object[ObjID].frame[NextFrame].jointList
