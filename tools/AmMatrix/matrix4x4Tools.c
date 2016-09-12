@@ -126,6 +126,16 @@ void create4x4IdentityFMatrix(float * m)
 
 
 
+void convert4x4DMatrixto4x4F(float * d, double * m )
+{
+    d[0]=m[0];   d[1]=m[1];   d[2]=m[2];    d[3]=m[3];
+    d[4]=m[4];   d[5]=m[5];   d[6]=m[6];    d[7]=m[7];
+    d[8]=m[8];   d[9]=m[9];   d[10]=m[10];  d[11]=m[11];
+    d[12]=m[12]; d[13]=m[13]; d[14]=m[14];  d[15]=m[15];
+}
+
+
+
 void create4x4RotationMatrix(double * m , double angle, double x, double y, double z)
 {
     double c = cosf(angle * DEG2RAD);
@@ -158,6 +168,74 @@ void create4x4RotationMatrix(double * m , double angle, double x, double y, doub
     m[14]= 0;
     m[15]= 1;
 }
+
+
+
+void create4x4MatrixFromEulerAnglesXYZ(double * m ,double x, double y, double z)
+{
+	double cr = cos( x );
+	double sr = sin( x );
+	double cp = cos( y );
+	double sp = sin( y );
+	double cy = cos( z );
+	double sy = sin( z );
+
+	m[0] = cp*cy ;
+	m[1] = cp*sy;
+	m[2] = -sp ;
+	m[3] = 0; // 4x4
+
+
+	double srsp = sr*sp;
+	double crsp = cr*sp;
+
+	m[4] = srsp*cy-cr*sy ;
+	m[5] = srsp*sy+cr*cy ;
+	m[6] = sr*cp ;
+	m[7] = 0; // 4x4
+
+	m[8] =  crsp*cy+sr*sy ;
+	m[9] =  crsp*sy-sr*cy ;
+	m[10]= cr*cp ;
+    m[11]= 0; // 4x4
+
+    m[12]= 0;
+    m[13]= 0;
+    m[14]= 0;
+    m[15]= 1.0;
+
+}
+
+void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double qW)
+{
+    double yy2 = 2.0f * qY * qY;
+    double xy2 = 2.0f * qX * qY;
+    double xz2 = 2.0f * qX * qZ;
+    double yz2 = 2.0f * qY * qZ;
+    double zz2 = 2.0f * qZ * qZ;
+    double wz2 = 2.0f * qW * qZ;
+    double wy2 = 2.0f * qW * qY;
+    double wx2 = 2.0f * qW * qX;
+    double xx2 = 2.0f * qX * qX;
+    m[0]  = - yy2 - zz2 + 1.0f;
+    m[1]  = xy2 + wz2;
+    m[2]  = xz2 - wy2;
+    m[3]  = 0;
+    m[4]  = xy2 - wz2;
+    m[5]  = - xx2 - zz2 + 1.0f;
+    m[6]  = yz2 + wx2;
+    m[7]  = 0;
+    m[8]  = xz2 + wy2;
+    m[9]  = yz2 - wx2;
+    m[10] = - xx2 - yy2 + 1.0f;
+    m[11] = 0.0f;
+    m[12] = 0.0;
+    m[13] = 0.0;
+    m[14] = 0.0;
+    m[15] = 1.0f;
+}
+
+
 
 
 void create4x4TranslationMatrix(double * matrix , double x, double y, double z)

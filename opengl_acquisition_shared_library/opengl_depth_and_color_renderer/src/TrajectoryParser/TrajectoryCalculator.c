@@ -16,8 +16,10 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 
+#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include "../../../../tools/AmMatrix/quaternions.h"
+
 
 
 int accessOfObjectPositionIsOk(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn)
@@ -589,7 +591,24 @@ int fillPosWithFrame(
     {
        fprintf(stderr,"Populating non interpolated joints for frame %u  ( %u joints ) \n",FrameIDToReturn ,
                stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints);
-       //TODO :
+
+       unsigned int numberOfJoints = stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints;
+
+       float rotCur[4]={0};
+       unsigned int i=0;
+       for (i=0; i<numberOfJoints; i++)
+       {
+        rotCur[0] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot1;
+        rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
+        rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
+        rotCur[3] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot4;
+
+        float * f=&joints[16*i];
+        double m[16]={0};
+        create4x4MatrixFromEulerAnglesXYZ(&m,rotCur[0],rotCur[1],rotCur[2]);
+        convert4x4DMatrixto4x4F(f,&m);
+       }
+
     }
 
     return 1;
@@ -621,6 +640,7 @@ int fillJointsWithInterpolatedFrame(
        {
         float rotPrev[4]={0};
         float rotNext[4]={0};
+        float rotTot[4]={0};
 
         if ( (stream->object[ObjID].frame[PrevFrame].jointList!=0) &&
               (stream->object[ObjID].frame[PrevFrame].hasNonDefaultJointList) )
@@ -640,10 +660,16 @@ int fillJointsWithInterpolatedFrame(
          rotNext[3] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot4;
         }
 
-        joints[i*4+0] = rotPrev[0] + (float) ( rotNext[0] - rotPrev[0] ) * our_stepTime / MAX_stepTime;
-        joints[i*4+1] = rotPrev[1] + (float) ( rotNext[1] - rotPrev[1] ) * our_stepTime / MAX_stepTime;
-        joints[i*4+2] = rotPrev[2] + (float) ( rotNext[2] - rotPrev[2] ) * our_stepTime / MAX_stepTime;
-        joints[i*4+3] = rotPrev[3] + (float) ( rotNext[3] - rotPrev[3] ) * our_stepTime / MAX_stepTime;
+        rotTot[0] = rotPrev[0] + (float) ( rotNext[0] - rotPrev[0] ) * our_stepTime / MAX_stepTime;
+        rotTot[1] = rotPrev[1] + (float) ( rotNext[1] - rotPrev[1] ) * our_stepTime / MAX_stepTime;
+        rotTot[2] = rotPrev[2] + (float) ( rotNext[2] - rotPrev[2] ) * our_stepTime / MAX_stepTime;
+        rotTot[3] = rotPrev[3] + (float) ( rotNext[3] - rotPrev[3] ) * our_stepTime / MAX_stepTime;
+
+        float * f=&joints[16*i];
+        double m[16]={0};
+         create4x4MatrixFromEulerAnglesXYZ(&m,rotTot[0],rotTot[1],rotTot[2]);
+         convert4x4DMatrixto4x4F(f,&m);
+
       }
   return 1;
 }

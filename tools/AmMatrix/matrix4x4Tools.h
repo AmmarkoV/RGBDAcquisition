@@ -23,6 +23,14 @@ void free4x4Matrix(double ** mat);
 
 
 /**
+* @brief Convert a 4x4 Matrix from Double To Float
+* @ingroup AmMatrix
+* @param  Pointer to a float 4x4 output
+* @param  Pointer to a double 4x4 input
+*/
+void convert4x4DMatrixto4x4F(float * d, double * m );
+
+/**
 * @brief Printout an 4x4 Matrix that consists of floats
 * @ingroup AmMatrix
 * @param  Label for the printout ( cString )
@@ -88,6 +96,33 @@ void create4x4TranslationMatrix(double * matrix,double x, double y, double z);
 * @retval 0=Failure,1=Success
 */
 void create4x4ScalingMatrix(double * matrix,double sx, double sy, double sz);
+
+
+
+/**
+* @brief Convert a quaternion to 4x4 matrix
+* @ingroup AmMatrix
+* @param  Output already allocated 4x4 Matrix
+* @param  Quaternion on the X
+* @param  Quaternion on the Y
+* @param  Quaternion on the Z
+* @param  Quaternion on the W
+* @param  Degrees of rotation
+*/
+void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double qW);
+
+
+
+/**
+* @brief Convert a quaternion to 4x4 matrix
+* @ingroup AmMatrix
+* @param  Output already allocated 4x4 Matrix
+* @param  Rotation X
+* @param  Rotation Y
+* @param  Rotation Z
+*/
+void create4x4MatrixFromEulerAnglesXYZ(double * m ,double x, double y, double z);
+
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Rotation on the X axis
