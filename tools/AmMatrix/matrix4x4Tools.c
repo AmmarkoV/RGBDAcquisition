@@ -203,7 +203,6 @@ void create4x4MatrixFromEulerAnglesXYZ(double * m ,double x, double y, double z)
     m[13]= 0;
     m[14]= 0;
     m[15]= 1.0;
-
 }
 
 void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double qW)

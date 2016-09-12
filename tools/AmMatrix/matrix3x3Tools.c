@@ -99,6 +99,14 @@ void create3x3IdentityMatrix(double * m)
 }
 
 
+void convert3x3DMatrixto3x3F(float * d, double * m )
+{
+    d[0]=m[0];   d[1]=m[1];   d[2]=m[2];
+    d[3]=m[3];   d[4]=m[4];   d[5]=m[5];
+    d[6]=m[6];   d[7]=m[7];   d[8]=m[8];
+}
+
+
 
 
 void  create3x3EulerVectorRotationMatrix(double * matrix3x3,double * axisXYZ,double angle)
@@ -116,6 +124,33 @@ void  create3x3EulerVectorRotationMatrix(double * matrix3x3,double * axisXYZ,dou
   matrix3x3[6]=z*x*(1-cosA)-y*sinA;   /*|*/    matrix3x3[7]=z*y*(1-cosA)+x*sinA;    /*|*/    matrix3x3[8]=cosA+z*z*(1-cosA);
 }
 
+
+
+void create3x3MatrixFromEulerAnglesXYZ(double * m ,double x, double y, double z)
+{
+	double cr = cos( x );
+	double sr = sin( x );
+	double cp = cos( y );
+	double sp = sin( y );
+	double cy = cos( z );
+	double sy = sin( z );
+
+	m[0] = cp*cy ;
+	m[1] = cp*sy;
+	m[2] = -sp ;
+
+
+	double srsp = sr*sp;
+	double crsp = cr*sp;
+
+	m[3] = srsp*cy-cr*sy ;
+	m[4] = srsp*sy+cr*cy ;
+	m[5] = sr*cp ;
+
+	m[6] =  crsp*cy+sr*sy ;
+	m[7] =  crsp*sy-sr*cy ;
+	m[8]= cr*cp ;
+}
 
 
 void  create3x3EulerRotationXYZOrthonormalMatrix(double * matrix3x3,double * rotationsXYZ)

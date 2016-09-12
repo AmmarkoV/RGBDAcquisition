@@ -63,6 +63,19 @@ void copy3x3Matrix(double * out,double * in);
 void create3x3IdentityMatrix(double * m);
 
 
+void convert3x3DMatrixto3x3F(float * d, double * m );
+
+
+/**
+* @brief Set an allocated 3x3 matrix to contain a rotation (  )
+* @ingroup AmMatrix
+* @param   Output 3x3 Matrix
+* @param   Input angle X
+* @param   Input angle Y
+* @param   Input angle Z
+*/
+void create3x3MatrixFromEulerAnglesXYZ(double * m ,double x, double y, double z);
+
 
 /**
 * @brief Set an allocated 3x3 matrix to contain a rotation (  )
