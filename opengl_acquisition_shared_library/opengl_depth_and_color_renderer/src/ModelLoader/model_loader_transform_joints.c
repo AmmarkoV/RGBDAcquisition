@@ -3,16 +3,94 @@
 #include "model_loader_transform_joints.h"
 
 
-int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
-{
-  copyModelTri( triModelOut , triModelIn );
-
-
-
-}
 
 
 /*
+
+
+
+void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
+{
+
+    if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
+                              {  fprintf(stderr,"   "); }
+    fprintf(stderr,"%s\n" , pNode->mName.data);
+
+    aiMatrix4x4 NodeTransformation=pNode->mTransformation;
+
+
+    unsigned int foundBone;
+    unsigned int boneNumber=findBoneFromString(mesh,pNode->mName.data,&foundBone);
+
+
+    unsigned int i=0;
+    if (foundBone)
+    {
+    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
+        {
+            if (strcmp(pNode->mName.data , smartBodyNames[i])==0)
+              {
+               if ( sk->active[i] )
+               {
+               fprintf(stderr,GREEN "hooked with %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" NORMAL,jointNames[i] , sk->relativeJointAngle[i].x, sk->relativeJointAngle[i].y, sk->relativeJointAngle[i].z);
+               bones->bone[boneNumber].ScalingVec.x=1.0;
+               bones->bone[boneNumber].ScalingVec.y=1.0;
+               bones->bone[boneNumber].ScalingVec.z=1.0;
+
+               bones->bone[boneNumber].TranslationVec.x=pNode->mTransformation.a4;
+               bones->bone[boneNumber].TranslationVec.y=pNode->mTransformation.b4;
+               bones->bone[boneNumber].TranslationVec.z=pNode->mTransformation.c4;
+
+              aiMatrix4x4::Scaling(bones->bone[boneNumber].ScalingVec,bones->bone[boneNumber].scalingMat);
+              aiMatrix4x4::Translation (bones->bone[boneNumber].TranslationVec,bones->bone[boneNumber].translationMat);
+              //aiMakeQuaternion( &bones.bone[k].rotationMat , &bones.bone[k].RotationQua );
+              //aiPrintMatrix(&bones->bone[boneNumber].rotationMat );
+
+
+               //zxy 120 - xyz 012
+
+               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetZXY[i*3+2] ),
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetZXY[i*3+0] ),
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetZXY[i*3+1] )
+                                                                      );
+
+/*
+               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetXYZ[i*3+0] ),
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetXYZ[i*3+1] ),
+                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetXYZ[i*3+2] )
+                                                                      );
+*/
+               NodeTransformation =  bones->bone[boneNumber].translationMat  * bones->bone[boneNumber].rotationMat * bones->bone[boneNumber].scalingMat;
+              } else
+              {
+               fprintf(stderr, RED " inactive %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" NORMAL ,jointNames[i] ,
+                       sk->relativeJointAngle[i].x,
+                       sk->relativeJointAngle[i].y,
+                       sk->relativeJointAngle[i].z);
+              }
+            }
+        }
+
+    aiMatrix4x4 GlobalTransformation = ParentTransform  * NodeTransformation;
+    bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
+    for ( i = 0 ; i < pNode->mNumChildren ; i++)
+    {
+        readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+    }
+    } else
+    {
+      aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
+      fprintf(stderr,"        <!%s!>\n",pNode->mName.data);
+       for ( i = 0 ; i < pNode->mNumChildren ; i++)
+       {
+         readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+       }
+    }
+}
+
+
 
 void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
 {
@@ -67,3 +145,23 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
 	}
 }
 */
+
+
+
+
+
+
+int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize)
+{
+  copyModelTri( triModelOut , triModelIn );
+
+
+   unsigned int i=0;
+   for (i=0; i<triModelIn->header.numberOfBones; i++ )
+   {
+
+   }
+
+
+}
+

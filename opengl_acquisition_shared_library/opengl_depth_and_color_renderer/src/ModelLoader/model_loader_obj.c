@@ -418,22 +418,37 @@ int countChar(char  * str , unsigned int strLength , char seek , char terminatio
 
 int saveOBJ(struct OBJ_Model * obj , char * filename)
 {
+  //sed -i 's/,/./g' filename
   FILE * fp=fopen(filename,"w");
   if(fp!=0)
   {
     unsigned int i=0;
-    for (i=0; i<obj->numNormals; i++)
+    for (i=1; i<obj->numNormals; i++)
     {
      fprintf(fp,"vn %0.5f %0.5f %0.5f\n",
-             obj->normalList[obj->numNormals].n1,
-	         obj->normalList[obj->numNormals].n2,
-	         obj->normalList[obj->numNormals].n3);
+             obj->normalList[i].n1,
+	         obj->normalList[i].n2,
+	         obj->normalList[i].n3);
 
 
      fprintf(fp,"v %0.5f %0.5f %0.5f\n",
-             obj->vertexList[obj->numVertices].x,
-	         obj->vertexList[obj->numVertices].y,
-	         obj->vertexList[obj->numVertices].z);
+             obj->vertexList[i].x,
+	         obj->vertexList[i].y,
+	         obj->vertexList[i].z);
+    }
+
+
+    fprintf(fp,"\n");
+	for (i=0; i<obj->numFaces; i++)
+    {
+     fprintf(fp,"f %d//%d %d//%d %d//%d\n",
+             obj->faceList[i].v[0],
+	         obj->faceList[i].n[0],
+	         obj->faceList[i].v[1],
+	         obj->faceList[i].n[1],
+	         obj->faceList[i].v[2],
+	         obj->faceList[i].n[2]
+	         );
     }
 
 
