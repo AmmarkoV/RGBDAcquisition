@@ -55,13 +55,7 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
                                                                       degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetZXY[i*3+1] )
                                                                       );
 
-/*
-               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetXYZ[i*3+0] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetXYZ[i*3+1] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetXYZ[i*3+2] )
-                                                                      );
-*/
+
                NodeTransformation =  bones->bone[boneNumber].translationMat  * bones->bone[boneNumber].rotationMat * bones->bone[boneNumber].scalingMat;
               } else
               {
