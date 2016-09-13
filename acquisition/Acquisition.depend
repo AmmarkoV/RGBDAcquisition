@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1444726704 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.c
+1455743919 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.c
 	"pluginLinker.h"
 	<stdio.h>
 	<stdlib.h>
@@ -8,10 +8,10 @@
 	<time.h>
 	<dlfcn.h>
 
-1444726291 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.h
+1455361785 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/pluginLinker.h
 	"Acquisition.h"
 
-1449597840 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
+1473783464 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.h
 	<tools/Calibration/calibration.h>
 	"calibration.h"
 	"../tools/Calibration/calibration.h"
@@ -36,9 +36,9 @@
 
 1391515895 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/OperatingSystem/OperatingSystem.h
 
-1445089338 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/LocationServices/locationService.h
+1455324800 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/LocationServices/locationService.h
 
-1448061138 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/processorLinker.c
+1449602292 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/processorLinker.c
 	"processorLinker.h"
 	<stdio.h>
 	<stdlib.h>
@@ -49,4 +49,23 @@
 
 1449598062 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/processorLinker.h
 	"Acquisition.h"
+
+1473787681 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisitionFileOutput.c
+	"Acquisition.h"
+	"acquisition_setup.h"
+	"pluginLinker.h"
+	"processorLinker.h"
+	"acquisitionFileOutput.h"
+	"../tools/Timers/timer.h"
+	"../tools/OperatingSystem/OperatingSystem.h"
+	"../tools/Primitives/modules.h"
+	"../tools/LocationServices/locationService.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1473787828 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisitionFileOutput.h
+	"Acquisition.h"
+
+1455360974 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/modules.h
 
