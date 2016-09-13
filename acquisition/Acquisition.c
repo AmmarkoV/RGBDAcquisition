@@ -910,7 +910,7 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
     return snapResult;
 }
 
- int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+ int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
 {
     printCall(moduleID,devID,"acquisitionSaveColorFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
@@ -930,7 +930,6 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
          {
             int retres = acquisitionSaveRawImageToFile(
                                             filenameFull,
-                                            // (*plugins[moduleID].getColorPixels)      (devID),
                                             acquisitionGetColorFrame(moduleID,devID)        ,
                                             (*plugins[moduleID].getColorWidth)       (devID),
                                             (*plugins[moduleID].getColorHeight)      (devID),
@@ -988,7 +987,7 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
 
 
 
- int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+ int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
 {
     printCall(moduleID,devID,"acquisitionSaveDepthFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
@@ -1637,16 +1636,15 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
    StartTimer(FRAME_PASS_TO_TARGET_DELAY);
    char outfilename[2048]={0};
 
+    sprintf(outfilename,"%s/colorFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
+    acquisitionSaveColorFrame(moduleID,devID,outfilename,doCompression);
+
+    sprintf(outfilename,"%s/depthFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
+    acquisitionSaveDepthFrame(moduleID,devID,outfilename,doCompression);
+
    if (doCompression)
    {
      fprintf(stderr,RED "TODO : Compression not implemented yet \n" NORMAL);
-   } else
-   {
-    sprintf(outfilename,"%s/colorFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
-    acquisitionSaveColorFrame(moduleID,devID,outfilename);
-
-    sprintf(outfilename,"%s/depthFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
-    acquisitionSaveDepthFrame(moduleID,devID,outfilename);
    }
 
    EndTimer(FRAME_PASS_TO_TARGET_DELAY);

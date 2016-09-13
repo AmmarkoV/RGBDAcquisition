@@ -582,9 +582,9 @@ void EditorFrame::OnSavePair(wxCommandEvent& event)
  {
     char filename[512];
     sprintf(filename,"color%05u",lastFrameDrawn);
-    acquisitionSaveColorFrame(moduleID,devID,filename);
+    acquisitionSaveColorFrame(moduleID,devID,filename,compressRecordingOutput);
     sprintf(filename,"depth%05u",lastFrameDrawn);
-    acquisitionSaveDepthFrame(moduleID,devID,filename);
+    acquisitionSaveDepthFrame(moduleID,devID,filename,compressRecordingOutput);
  }
 
 

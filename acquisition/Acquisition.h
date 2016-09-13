@@ -764,22 +764,24 @@ int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID
  * @param filename , The filename of the target file
  * @retval 1=Success 0=Failure
  */
-int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress);
 /**
  * @brief  Save the depth frame on a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
  * @ingroup acquisitionSaveTo
  * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
  * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
  * @param filename , The filename of the target file
+ * @param compression , A switch that controls compression
  * @retval 1=Success 0=Failure
  */
-int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress);
 /**
  * @brief  Save the depth frame converted to 8-bit grayscale ( instead of 16bit grayscale ) to a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
  * @ingroup acquisitionSaveTo
  * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
  * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
  * @param filename , The filename of the target file
+ * @param compression , A switch that controls compression
  * @retval 1=Success 0=Failure
  */
 int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);

@@ -78,6 +78,7 @@ char executeEveryLoop[1024]={0};
 unsigned int executeEveryLoopPayload=0;
 
 char inputname[512]={0};
+int compressOutput=0;
 int saveEveryFrame=0;
 int saveAsOriginalFrameNumber=0;
 unsigned int savedFrameNum=0;
@@ -166,13 +167,13 @@ int acquisitionSaveFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
    if (drawColor)
                       {
                        sprintf(outfilename,"frames/colorFrame_%u_%05u",devID,savedFrameNum);
-                       acquisitionSaveColorFrame(moduleID,devID,outfilename);
+                       acquisitionSaveColorFrame(moduleID,devID,outfilename,compressOutput);
                       }
 
    if (drawDepth)
                       {
                        sprintf(outfilename,"frames/depthFrame_%u_%05u",devID,savedFrameNum);
-                       acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+                       acquisitionSaveDepthFrame(moduleID,devID,outfilename,compressOutput);
                       }
    ++savedFrameNum;
   return 1;
