@@ -2,11 +2,11 @@
 <wxsmith>
 	<object class="wxDialog" name="SelectTarget">
 		<title>Target Selection for REcording</title>
-		<size>339,212</size>
+		<size>339,238</size>
 		<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
 			<label>Target Selection</label>
 			<pos>16,16</pos>
-			<size>312,184</size>
+			<size>312,208</size>
 		</object>
 		<object class="wxComboBox" name="ID_COMBOBOX1" variable="ComboBoxTarget" member="yes">
 			<content>
@@ -34,14 +34,18 @@
 		</object>
 		<object class="wxButton" name="ID_BUTTON1" variable="ButtonRecord" member="yes">
 			<label>Record</label>
-			<pos>24,152</pos>
+			<pos>24,184</pos>
 			<size>192,29</size>
 			<handler function="OnButtonRecordClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON2" variable="ButtonCancel" member="yes">
 			<label>Cancel</label>
-			<pos>228,152</pos>
+			<pos>232,184</pos>
 			<handler function="OnButtonCancelClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxCompressOutput" member="yes">
+			<label>Compress output</label>
+			<pos>24,152</pos>
 		</object>
 	</object>
 </wxsmith>

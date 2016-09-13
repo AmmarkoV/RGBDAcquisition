@@ -1611,7 +1611,7 @@ int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier de
 
 
 
-int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber)
+int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber,int doCompression)
 {
   //fprintf(stderr,"acquisitionPassFramesToTarget not fully implemented yet! Module %u , Device %u = %s \n",moduleID,devID, module[moduleID].device[devID].outputString);
 
@@ -1636,11 +1636,19 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
   {
    StartTimer(FRAME_PASS_TO_TARGET_DELAY);
    char outfilename[2048]={0};
-   sprintf(outfilename,"%s/colorFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
-   acquisitionSaveColorFrame(moduleID,devID,outfilename);
 
-   sprintf(outfilename,"%s/depthFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
-   acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+   if (doCompression)
+   {
+     fprintf(stderr,RED "TODO : Compression not implemented yet \n" NORMAL);
+   } else
+   {
+    sprintf(outfilename,"%s/colorFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
+    acquisitionSaveColorFrame(moduleID,devID,outfilename);
+
+    sprintf(outfilename,"%s/depthFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
+    acquisitionSaveDepthFrame(moduleID,devID,outfilename);
+   }
+
    EndTimer(FRAME_PASS_TO_TARGET_DELAY);
 
   } else

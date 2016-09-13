@@ -18,6 +18,7 @@ char outputfoldername[512]={0};
 
 unsigned int delay = 0;
 unsigned int skippedFrames=0;
+int compressOutput=0;
 
 int calibrationSet = 0;
 struct calibration calib;
@@ -197,7 +198,7 @@ int main(int argc, char *argv[])
 
         acquisitionSnapFrames(moduleID,devID);
 
-        acquisitionPassFramesToTarget(moduleID,devID,frameNum);
+        acquisitionPassFramesToTarget(moduleID,devID,frameNum,compressOutput);
 
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));

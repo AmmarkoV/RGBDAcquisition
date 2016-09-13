@@ -300,6 +300,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     play=0;
     recording=0;
     recordedFrames=0;
+    compressRecordingOutput=0;
 
     framesSnapped=0;
     framesDrawn=0;
@@ -1070,7 +1071,7 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
 
      if (recording)
      {
-         acquisitionPassFramesToTarget(moduleID,devID,recordedFrames);
+         acquisitionPassFramesToTarget(moduleID,devID,recordedFrames,recordedFrames);
          ++recordedFrames;
 
          if (recordedFrames % 3 == 0 ) { Refresh(); /*Throttle window refreshes when recording*/}
@@ -1206,6 +1207,7 @@ void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
 {
   if (recording)
   {
+      fprintf(stderr,"Recording stopped\n");
       recording=0;
       acquisitionStopTargetForFrames(moduleID,devID);
       return;
@@ -1217,6 +1219,7 @@ void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
 
   targetSelector->ShowModal();
   if ( targetSelector->recording ) {
+                                     compressRecordingOutput = targetSelector->compressRecording;
                                      recordedFrames=0;
                                      recording=1;
                                      play=1;

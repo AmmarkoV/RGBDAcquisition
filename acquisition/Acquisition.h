@@ -847,9 +847,10 @@ int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier de
  * @param moduleID ( see enum Acquisition_Possible_Modules )
  * @param devID the number of the device we want to use
  * @param Incremental counter that specifies the number of this frame
+ * @param Perform Compression on the frames..
  * @retval 1=Success , 0=Failure
  */
-int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber);
+int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int frameNumber,int doCompression);
 
 
 

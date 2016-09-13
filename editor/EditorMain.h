@@ -52,6 +52,7 @@ class EditorFrame: public wxFrame
 
         int recording;
         int recordedFrames;
+        int compressRecordingOutput;
 
         int framesDrawn;
         int framesSnapped;

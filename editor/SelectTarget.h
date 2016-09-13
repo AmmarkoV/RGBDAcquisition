@@ -3,6 +3,7 @@
 
 //(*Headers(SelectTarget)
 #include <wx/combobox.h>
+#include <wx/checkbox.h>
 #include <wx/dialog.h>
 #include <wx/button.h>
 #include <wx/statbox.h>
@@ -20,6 +21,7 @@ class SelectTarget: public wxDialog
 		unsigned int moduleID;
 		unsigned int devID;
 		unsigned int recording;
+		unsigned int compressRecording;
 
 		//(*Declarations(SelectTarget)
 		wxTextCtrl* TextCtrlTargetPath;
@@ -27,6 +29,7 @@ class SelectTarget: public wxDialog
 		wxButton* ButtonCancel;
 		wxStaticBox* StaticBox1;
 		wxStaticText* LabelForTargetPath;
+		wxCheckBox* CheckBoxCompressOutput;
 		wxButton* ButtonRecord;
 		wxComboBox* ComboBoxTarget;
 		//*)
@@ -41,6 +44,7 @@ class SelectTarget: public wxDialog
 		static const long ID_TEXTCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
+		static const long ID_CHECKBOX1;
 		//*)
 
 	private:
