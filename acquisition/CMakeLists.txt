@@ -1,6 +1,23 @@
 project( Acquisition ) 
 cmake_minimum_required( VERSION 2.8.7 )   
  
+
+IF( ENABLE_JPG ) 
+ MESSAGE("Enabling JPG support on Template Acquisition..")
+ set(JPG_Libs jpeg ) 
+ add_definitions(-DENABLE_JPG)
+ add_definitions(-DUSE_CODEC_LIBRARY)
+ENDIF( ENABLE_JPG )
+
+
+IF( ENABLE_PNG ) 
+ MESSAGE("Enabling PNG support on Template Acquisition..")
+ set(PNG_Libs png ) 
+ add_definitions(-DENABLE_PNG)
+ add_definitions(-DUSE_CODEC_LIBRARY)
+ENDIF( ENABLE_PNG )
+
+
 IF( ENABLE_LOCATION_SERVICE )
  MESSAGE("Location Service Will Be included in Acquisition")
  set(LocationService_Libs LocationServices gps ) 
@@ -20,7 +37,7 @@ ENDIF( ENABLE_LOCATION_SERVICE )
               )
   
     add_library(Acquisition SHARED ${ACQUISITION_INGREDIENTS} ) 
-    target_link_libraries(Acquisition rt dl m Timers CalibrationLibrary OperatingSystem ${LocationService_Libs} ) 
+    target_link_libraries(Acquisition rt dl m Timers CalibrationLibrary OperatingSystem Codecs  ${PNG_Libs} ${JPG_Libs} ${LocationService_Libs} ) 
  
     set_target_properties(Acquisition PROPERTIES 
                           DEBUG_POSTFIX "D"

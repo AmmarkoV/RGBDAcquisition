@@ -13,6 +13,7 @@
 #include "../tools/Primitives/modules.h"
 
 
+
    #if ENABLE_LOCATION_SERVICE
     #include "../tools/LocationServices/locationService.h"
    #endif // ENABLE_LOCATION_SERVICE
@@ -20,6 +21,7 @@
 
 
 #if (ENABLE_PNG && ENABLE_JPG)
+  #include "../tools/Codecs/codecs.h"
   #define USE_CODEC_LIBRARY 1 //Not Using the codec library really simplifies build things but we lose png/jpg formats
   #warning "Acquisition Library Compiling With JPG/PNG output"
 #endif // ENABLE_PNG
@@ -452,9 +454,21 @@ int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier d
             )
          {
              #if USE_CODEC_LIBRARY
+             //fprintf(stderr,"using color codec library ( compress %u ) \n",compress);
              if (compress)
              {
-               fprintf(stderr,"saveCompressedColor not implemented..\n ");
+               struct Image * img = createImageUsingExistingBuffer( (*plugins[moduleID].getColorWidth)       (devID),
+                                                                    (*plugins[moduleID].getColorHeight)      (devID),
+                                                                    (*plugins[moduleID].getColorChannels)    (devID),
+                                                                    (*plugins[moduleID].getColorBitsPerPixel)(devID),
+                                                                    acquisitionGetColorFrame(moduleID,devID)
+                                                                  );
+
+               sprintf(filenameFull,"%s.jpg",filename);
+               writeImageFile(img,JPG_CODEC,filenameFull);
+
+               img->pixels=0;
+               destroyImage(img);
              } else
              #endif // USE_CODEC_LIBRARY
              {
@@ -527,9 +541,32 @@ int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier d
          {
 
              #if USE_CODEC_LIBRARY
+             //fprintf(stderr,"using depth codec library ( compress %u ) \n",compress);
              if (compress)
              {
-               fprintf(stderr,"saveCompressedDepth not implemented..\n ");
+               struct Image * img = createImageUsingExistingBuffer( (*plugins[moduleID].getDepthWidth)       (devID),
+                                                                    (*plugins[moduleID].getDepthHeight)      (devID),
+                                                                    (*plugins[moduleID].getDepthChannels)    (devID),
+                                                                    (*plugins[moduleID].getDepthBitsPerPixel)(devID),
+                                                                    acquisitionGetDepthFrame(moduleID,devID)
+                                                                  );
+
+               //Want Conformance to the NETPBM spec http://en.wikipedia.org/wiki/Netpbm_format#16-bit_extensions
+              if ((*plugins[moduleID].getDepthBitsPerPixel)(devID)==16)
+                 { swapEndiannessPNM(
+                                     acquisitionGetDepthFrame(moduleID,devID) ,
+                                     (*plugins[moduleID].getDepthWidth)       (devID),
+                                     (*plugins[moduleID].getDepthHeight)      (devID),
+                                     (*plugins[moduleID].getDepthChannels)    (devID),
+                                     (*plugins[moduleID].getDepthBitsPerPixel)(devID)
+                                    );
+                 }
+
+               sprintf(filenameFull,"%s.png",filename);
+               writeImageFile(img,PNG_CODEC,filenameFull);
+
+               img->pixels=0;
+               destroyImage(img);
              } else
              #endif //USE_CODEC_LIBRARY
              {

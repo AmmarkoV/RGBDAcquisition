@@ -1071,7 +1071,7 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
 
      if (recording)
      {
-         acquisitionPassFramesToTarget(moduleID,devID,recordedFrames,recordedFrames);
+         acquisitionPassFramesToTarget(moduleID,devID,recordedFrames,compressRecordingOutput);
          ++recordedFrames;
 
          if (recordedFrames % 3 == 0 ) { Refresh(); /*Throttle window refreshes when recording*/}
