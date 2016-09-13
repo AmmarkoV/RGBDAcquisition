@@ -539,82 +539,82 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
 
 
 
+
 int savePCD_PointCloud(char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
 {
-  return 0;
+   return _acfo_savePCD_PointCloud(filename,depthFrame ,colorFrame,width,height,cx,cy,fx,fy);
 }
-
-
 
 int savePCD_PointCloudNoEmpty(char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
 {
-  return 0;
+  return _acfo_savePCD_PointCloudNoEmpty( filename ,depthFrame , colorFrame , width ,height ,cx ,cy ,fx ,fy );
 }
 
 
 int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
-  return 0;
+  return _acfo_acquisitionSavePCDPointCoud(moduleID,devID,filename);
 }
 
 
 int swapEndiannessPNM(void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-  return 0;
+  return _acfo_swapEndiannessPNM( pixels , width , height , channels , bitsperpixel);
+
 }
 
 
 int acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-  return 0;
+  return _acfo_acquisitionSaveRawImageToFile( filename, pixels , width , height , channels , bitsperpixel);
 }
 
 
 int acquisitionSaveLocationStamp(char * filename)
 {
-  return 0;
+  return _acfo_acquisitionSaveLocationStamp( filename);
 }
 
 
 unsigned char * convertShortDepthToRGBDepth(unsigned short * depth,unsigned int width , unsigned int height)
 {
-  return 0;
+  return _acfo_convertShortDepthToRGBDepth( depth,width , height);
 }
 
 
 unsigned char * convertShortDepthToCharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
 {
-  return 0;
+  return _acfo_convertShortDepthToCharDepth( depth,width , height , min_depth , max_depth);
 }
 
 
 unsigned char * convertShortDepthTo3CharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth)
 {
-  return 0;
+  return _acfo_convertShortDepthTo3CharDepth(depth,width , height , min_depth , max_depth);
 }
 
 
 int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
 {
-  return 0;
+  return _acfo_acquisitionSaveColorFrame(moduleID,devID,filename, compress);
 }
 
 
 int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
 {
-  return 0;
+  return _acfo_acquisitionSaveDepthFrame(moduleID,devID,filename, compress);
 }
 
 
 int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
-  return 0;
+  return _acfo_acquisitionSaveColoredDepthFrame(moduleID,devID, filename);
 }
 
 
 int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
 {
-  return 0;
+  return  _acfo_acquisitionSaveDepthFrame1C(moduleID,devID, filename);
 }
 
 
