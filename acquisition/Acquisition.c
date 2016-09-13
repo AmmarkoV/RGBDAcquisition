@@ -1170,11 +1170,6 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
     sprintf(outfilename,"%s/depthFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
     acquisitionSaveDepthFrame(moduleID,devID,outfilename,doCompression);
 
-   if (doCompression)
-   {
-     fprintf(stderr,RED "TODO : Compression not implemented yet \n" NORMAL);
-   }
-
    EndTimer(FRAME_PASS_TO_TARGET_DELAY);
 
   } else

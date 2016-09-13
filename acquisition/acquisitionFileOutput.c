@@ -18,6 +18,12 @@
    #endif // ENABLE_LOCATION_SERVICE
 
 
+
+#if (ENABLE_PNG && ENABLE_JPG)
+  #define USE_CODEC_LIBRARY 1 //Not Using the codec library really simplifies build things but we lose png/jpg formats
+  #warning "Acquisition Library Compiling With JPG/PNG output"
+#endif // ENABLE_PNG
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -421,11 +427,17 @@ unsigned char * _acfo_convertShortDepthTo3CharDepth(unsigned short * depth,unsig
 
 
 
+
+
+
+
+
+
 int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
 {
     printCall(moduleID,devID,"acquisitionSaveColorFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
-
+    int retres =0;
 
     #if USE_REGULAR_BYTEORDER_FOR_PNM
      sprintf(filenameFull,"%s.cpnm",filename);
@@ -439,7 +451,14 @@ int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier d
               (*plugins[moduleID].getColorChannels!=0) && (*plugins[moduleID].getColorBitsPerPixel!=0)
             )
          {
-            int retres = acquisitionSaveRawImageToFile(
+             #if USE_CODEC_LIBRARY
+             if (compress)
+             {
+               fprintf(stderr,"saveCompressedColor not implemented..\n ");
+             } else
+             #endif // USE_CODEC_LIBRARY
+             {
+                retres = acquisitionSaveRawImageToFile(
                                             filenameFull,
                                             acquisitionGetColorFrame(moduleID,devID)        ,
                                             (*plugins[moduleID].getColorWidth)       (devID),
@@ -447,7 +466,6 @@ int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier d
                                             (*plugins[moduleID].getColorChannels)    (devID),
                                             (*plugins[moduleID].getColorBitsPerPixel)(devID)
                                            );
-
 
            // V4L2 Specific JPS compression ------------------------------------------------------------------------------------------------------------------------------
            if ( (retres) && (moduleID==V4L2STEREO_ACQUISITION_MODULE) )
@@ -460,6 +478,11 @@ int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier d
                            { fprintf(stderr,"Failure converting to jpeg\n"); }
               }
            // V4L2 Specific JPS compression ------------------------------------------------------------------------------------------------------------------------------
+
+             }
+
+
+
 
 
               #if ENABLE_LOCATION_SERVICE
@@ -489,6 +512,7 @@ int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier d
 {
     printCall(moduleID,devID,"acquisitionSaveDepthFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
+    int retres=0;
 
     #if USE_REGULAR_BYTEORDER_FOR_PNM
      sprintf(filenameFull,"%s.cpnm",filename);
@@ -501,7 +525,15 @@ int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier d
               (*plugins[moduleID].getDepthChannels!=0) && (*plugins[moduleID].getDepthBitsPerPixel!=0)
              )
          {
-            return acquisitionSaveRawImageToFile(
+
+             #if USE_CODEC_LIBRARY
+             if (compress)
+             {
+               fprintf(stderr,"saveCompressedDepth not implemented..\n ");
+             } else
+             #endif //USE_CODEC_LIBRARY
+             {
+              retres=acquisitionSaveRawImageToFile(
                                       filenameFull,
                                       // (*plugins[moduleID].getDepthPixels)      (devID),
                                       (unsigned char*) acquisitionGetDepthFrame(moduleID,devID)  ,
@@ -510,6 +542,8 @@ int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier d
                                       (*plugins[moduleID].getDepthChannels)    (devID),
                                       (*plugins[moduleID].getDepthBitsPerPixel)(devID)
                                      );
+              return retres;
+             }
          }
 
     MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveDepthFrame");

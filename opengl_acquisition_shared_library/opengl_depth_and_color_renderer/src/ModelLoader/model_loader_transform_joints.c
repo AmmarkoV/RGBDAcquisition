@@ -153,7 +153,7 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
    unsigned int i=0;
    for (i=0; i<triModelIn->header.numberOfBones; i++ )
    {
-
+        //TODO :
    }
 
 
