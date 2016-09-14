@@ -144,15 +144,48 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
 
 
 
-
 int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize)
 {
   copyModelTri( triModelOut , triModelIn );
 
 
-   unsigned int i=0;
-   for (i=0; i<triModelIn->header.numberOfBones; i++ )
+  double parentTransform[16]={0};
+  create4x4IdentityMatrix(&parentTransform) ;
+
+  double position[4]={0};
+  double normal[4]={0};
+
+
+   //We NEED to clear the vertices and normals since they are added uppon , not having
+   //the next two lines results in really weird and undebuggable visual behaviour
+   memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
+   memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
+
+
+   unsigned int k=0,i=0;
+   for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
+     for (i=0; i<triModelIn->bones[i].info->boneWeightsNumber; i++ )
+     {
+       unsigned int v = triModelIn->bones[i].weightIndex[k];
+       float w = triModelIn->bones[i].weightValue[k];
+
+       position[0] = triModelIn->vertices[v*3+0];
+       position[1] = triModelIn->vertices[v*3+1];
+       position[2] = triModelIn->vertices[v*3+2];
+       position[3] = triModelIn->vertices[v*3+3];
+      // aiTransformVecByMatrix4(&position, &modifiedSkeleton.bone[k].finalTransform );
+	   triModelOut->vertices[v*3+0] += (float) position[0] * w;
+	   triModelOut->vertices[v*3+1] += (float) position[1] * w;
+	   triModelOut->vertices[v*3+2] += (float) position[2] * w;
+
+	//   aiVector3D normal = mesh->mNormals[v];
+    //   aiTransformVecByMatrix3(&normal, &finalTransform3x3);
+	   triModelOut->normal[v*3+0] += (float) normal[0] * w;
+	   triModelOut->normal[v*3+1] += (float) normal[1] * w;
+	   triModelOut->normal[v*3+2] += (float) normal[2] * w;
+
+     }
         //TODO :
    }
 
