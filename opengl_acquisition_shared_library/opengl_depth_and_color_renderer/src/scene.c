@@ -14,6 +14,10 @@
 #include "../../../tools/AmMatrix/matrixCalculations.h"
 #include "TrajectoryParser/TrajectoryParser.h"
 #include "ModelLoader/model_loader.h"
+#include "ModelLoader/model_loader_hardcoded.h"
+#include "ModelLoader/model_loader_tri.h"
+#include "ModelLoader/model_loader_transform_joints.h"
+
 #include "scene.h"
 
 #include "OGLRendererSandbox.h"
@@ -767,7 +771,9 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          //fprintf(stderr,"Drawing model %u/%u ( %s ) \n",objectType_WhichModelToDraw ,modelStorage->currentNumberOfModels,mod->pathOfModel);
          float * pos = (float*) &posStackA;
 
-         joints=(float *) malloc(sizeof(float) * numberOfBones * 16 ); //The 4x4 Matrix per joint
+         if (numberOfBones>0) { joints=(float *) malloc(sizeof(float) * numberOfBones * 16 ); } else //The 4x4 Matrix per joint
+                              { joints=0; }
+
          if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,joints,&scaleX,&scaleY,&scaleZ) )
           {
            //This is a stupid way of passing stuff to be drawn
@@ -783,10 +789,27 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
            //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
 
+
            //fprintf(stderr,"Draw OBJ%u(%f %f %f , %f %f %f %f , trans %f )\n",i,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],pos[6],trans);
 
            if (scene->debug)
                 { print3DPoint2DWindowPosition(i , pos[0],pos[1],pos[2] ); }
+
+
+           if (
+                 (joints!=0) &&
+                 (mod->type==TRI_MODEL)
+              )
+           {
+            fprintf(stderr,"Doing joint transforms etc..!");
+            struct TRI_Model triModelOut={0};
+            struct TRI_Model *triModelIn=0;
+
+
+            doModelTransform( &triModelOut , triModelIn , joints , numberOfBones);
+
+           }
+
 
            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
              { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
