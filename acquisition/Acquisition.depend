@@ -18,13 +18,15 @@
 
 1413912572 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Calibration/calibration.h
 
-1449597800 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.c
+1473789961 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/Acquisition.c
 	"Acquisition.h"
 	"acquisition_setup.h"
 	"pluginLinker.h"
 	"processorLinker.h"
+	"acquisitionFileOutput.h"
 	"../tools/Timers/timer.h"
 	"../tools/OperatingSystem/OperatingSystem.h"
+	"../tools/Primitives/modules.h"
 	"../tools/LocationServices/locationService.h"
 	<stdio.h>
 	<stdlib.h>
