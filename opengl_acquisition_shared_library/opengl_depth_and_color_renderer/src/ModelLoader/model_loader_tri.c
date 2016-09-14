@@ -184,7 +184,9 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
 
   unsigned int itemSize , count;
 
+  fprintf(stderr,"Cleaning output model..\n");
   memset(triModelOUT,0,sizeof(struct TRI_Model));
+  fprintf(stderr,"Copying header..\n");
   memcpy(&triModelOUT->header , &triModelIN->header , sizeof(struct TRI_Header));
 
   itemSize=sizeof(float)*3; count=triModelIN->header.numberOfVertices;

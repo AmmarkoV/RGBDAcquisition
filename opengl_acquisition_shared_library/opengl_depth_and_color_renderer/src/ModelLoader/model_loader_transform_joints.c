@@ -182,6 +182,9 @@ void recursiveJointHeirarchyTransformer( struct TRI_Model * in  , int curBone , 
 
 int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize)
 {
+  fprintf(stderr,"doModelTransform deactivated.. \n");
+  return 0;
+
   if (triModelIn==0) { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
 
   copyModelTri( triModelOut , triModelIn );
@@ -204,15 +207,18 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
   recursiveJointHeirarchyTransformer( triModelIn , 0 , finalTransforms , parentTransform , 0 );
 
 
+   fprintf(stderr,"Clearing vertices & normals \n");
    //We NEED to clear the vertices and normals since they are added uppon , not having
    //the next two lines results in really weird and undebuggable visual behaviour
    memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
    memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
 
 
+
    unsigned int k=0,i=0;
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
+     fprintf(stderr,"Transforming %u bone\n",k);
      for (i=0; i<triModelIn->bones[i].info->boneWeightsNumber; i++ )
      {
        //V is the vertice we will be working in this loop

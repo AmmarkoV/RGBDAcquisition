@@ -801,9 +801,9 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
                  (mod->type==TRI_MODEL)
               )
            {
-            fprintf(stderr,"Doing joint transforms etc..!");
+            fprintf(stderr,"Doing joint transforms etc..!\n");
             struct TRI_Model triModelOut={0};
-            struct TRI_Model *triModelIn=0;
+            struct TRI_Model *triModelIn=(struct TRI_Model*) mod->modelInternalData;
 
 
             doModelTransform( &triModelOut , triModelIn , joints , numberOfBones);
