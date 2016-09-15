@@ -190,6 +190,8 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 {
   if (triModelIn==0) { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
 
+  printTRIBoneStructure(triModelIn);
+
   copyModelTri( triModelOut , triModelIn , 0);
 
 

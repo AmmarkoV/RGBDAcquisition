@@ -45,8 +45,8 @@ struct TRI_Bones_Header
   unsigned int boneWeightsNumber;
   unsigned int boneNameSize;
 //-------------------------------------------
-  float inverseBindPose[16];
-  float finalTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
+  double inverseBindPose[16];
+  double finalTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
 };
 
 struct TRI_Bones
@@ -73,6 +73,9 @@ struct TRI_Model
 #if HAVE_OBJ_CODE_AVAILIABLE
 int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj);
 #endif // HAVE_OBJ_CODE_AVAILIABLE
+
+
+void printTRIBoneStructure(struct TRI_Model * triModel);
 
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
 

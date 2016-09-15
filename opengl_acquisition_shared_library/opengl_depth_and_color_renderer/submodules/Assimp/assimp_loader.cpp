@@ -539,7 +539,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 	   struct aiBone *bone = mesh->mBones[i];
 	   triModel->bones[i].info->boneNameSize = strlen(bones.bone[i].name);
 
-       float * rm = triModel->bones[i].info->inverseBindPose;
+       double * rm = triModel->bones[i].info->inverseBindPose;
        aiMatrix4x4 * am = &bones.bone[i].boneInverseBindTransform;
        rm[0]=am->a1; rm[1]=am->a2;  rm[2]=am->a3;  rm[3]=am->a4;
        rm[4]=am->b1; rm[5]=am->b2;  rm[6]=am->b3;  rm[7]=am->b4;

@@ -12,6 +12,58 @@
 
 
 
+void print4x4DMatrixTRI(char * str , double * matrix4x4)
+{
+  fprintf( stderr, "  %s \n",str);
+  fprintf( stderr, "--------------------------------------\n");
+  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
+  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
+  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
+  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
+  fprintf( stderr, "--------------------------------------\n");
+
+}
+
+
+
+void printTRIBoneStructure(struct TRI_Model * triModel)
+{
+ unsigned int k=0, i=0 , parent , child ;
+   for (i=0; i<triModel->header.numberOfBones; i++)
+   {
+     fprintf(stderr,"Bone %u : %s \n",i,triModel->bones[i].boneName);
+     if (triModel->bones[i].info!=0)
+     {
+      fprintf(stderr," Weights Number %u \n",triModel->bones[i].info->boneWeightsNumber);
+      parent = triModel->bones[i].info->boneParent;
+      fprintf(stderr," Parent : %u %s \n",parent,triModel->bones[parent].boneName);
+
+      fprintf(stderr," Children : ");
+      for (k=0; k<triModel->bones[i].info->numberOfBoneChildren; k++)
+       {
+         child=triModel->bones[i].info->boneChild[k];
+         fprintf(stderr,"%u %s , ",child,triModel->bones[child].boneName);
+       }
+      fprintf(stderr,"\n");
+
+      print4x4DMatrixTRI("inverseBindPose", triModel->bones[i].info->inverseBindPose );
+      print4x4DMatrixTRI("finalTransformation", triModel->bones[i].info->finalTransformation );
+     }
+
+   }
+
+/*
+//-------------------------------------------
+  unsigned int boneChild[MAX_BONE_CHILDREN];
+  unsigned int numberOfBoneChildren;
+//-------------------------------------------
+  unsigned int boneWeightsNumber;
+  unsigned int boneNameSize;
+//-------------------------------------------
+*/
+}
+
+
 
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed)
 {
