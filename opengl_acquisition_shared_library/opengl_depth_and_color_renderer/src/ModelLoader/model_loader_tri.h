@@ -77,7 +77,9 @@ int freeModelTri(struct TRI_Model * triModel);
 int loadModelTri(const char * filename , struct TRI_Model * triModel);
 int saveModelTri(const char * filename , struct TRI_Model * triModel);
 
-void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN );
+void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN );
+
+void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures);
 void deallocModelTri(struct TRI_Model * triModel);
 
 void doTriDrawCalllist(struct TRI_Model * tri );

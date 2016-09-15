@@ -175,19 +175,34 @@ int freeModelTri(struct TRI_Model * triModel)
 }
 
 
-void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
+void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
 {
-  fprintf(stderr,"copyModelTri ignores bone structures..\n");
+  fprintf(stderr,"copyModelTriHeader ..\n");
   triModelOUT->bones=0;
   triModelOUT->header.numberOfBones=0;
 
 
-  unsigned int itemSize , count;
 
   fprintf(stderr,"Cleaning output model..\n");
   memset(triModelOUT,0,sizeof(struct TRI_Model));
   fprintf(stderr,"Copying header..\n");
   memcpy(&triModelOUT->header , &triModelIN->header , sizeof(struct TRI_Header));
+
+ return;
+}
+
+
+void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
+{
+  copyModelTriHeader( triModelOUT ,  triModelIN );
+
+  if(copyBoneStructures)
+  {
+    fprintf(stderr,"copyModelTri ignores bone structures..\n");
+
+  }
+
+  unsigned int itemSize , count;
 
   itemSize=sizeof(float)*3; count=triModelIN->header.numberOfVertices;
   if (triModelOUT->vertices!=0)  { free(triModelOUT->vertices); }

@@ -301,7 +301,7 @@
 	"../tools.h"
 	"../../../../tools/AmMatrix/matrixCalculations.h"
 
-1473704611 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
+1473888892 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
 	<GL/gl.h>
 	<GL/glx.h>
 	<GL/glu.h>
@@ -314,6 +314,9 @@
 	"../../../tools/AmMatrix/matrixCalculations.h"
 	"TrajectoryParser/TrajectoryParser.h"
 	"ModelLoader/model_loader.h"
+	"ModelLoader/model_loader_hardcoded.h"
+	"ModelLoader/model_loader_tri.h"
+	"ModelLoader/model_loader_transform_joints.h"
 	"scene.h"
 	"OGLRendererSandbox.h"
 
@@ -405,7 +408,7 @@
 	<GL/gl.h>
 	<GL/glx.h>
 
-1470162649 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h
+1473942402 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h
 	"model_loader_setup.h"
 	"model_loader_obj.h"
 

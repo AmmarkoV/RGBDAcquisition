@@ -100,10 +100,11 @@ void recursiveJointHeirarchyTransformer( struct TRI_Model * in  , int curBone , 
 
     if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
                               { fprintf(stderr,"   "); }
+    fprintf(stderr,"(%u) " , curBone );
     fprintf(stderr,"%s\n" , in->bones[curBone].boneName );
 
 
-    double NodeTransformation[16]; create4x4IdentityMatrix(&parentTransform) ;
+    double NodeTransformation[16]; create4x4IdentityMatrix(&NodeTransformation) ;
 
 
     unsigned int foundBone;
@@ -182,13 +183,9 @@ void recursiveJointHeirarchyTransformer( struct TRI_Model * in  , int curBone , 
 
 int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize)
 {
-  fprintf(stderr,"doModelTransform deactivated.. \n");
-  return 0;
-
   if (triModelIn==0) { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
 
-  copyModelTri( triModelOut , triModelIn );
-
+  copyModelTri( triModelOut , triModelIn , 0);
 
 
   double transPosition[4]={0};

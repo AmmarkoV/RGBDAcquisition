@@ -537,7 +537,7 @@ void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
 
   struct TRI_Model temporaryIndexedDeformedModel={0};
   fprintf(stderr,"Copying to intermediate mesh\n");
-  copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel);
+  copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel,0);
   fprintf(stderr,"Transforming intermediate mesh\n");
   transformMeshBasedOnSkeleton( g_scene , 0 , &temporaryIndexedDeformedModel , sk );
   fprintf(stderr,"Flattening intermediate mesh\n");
