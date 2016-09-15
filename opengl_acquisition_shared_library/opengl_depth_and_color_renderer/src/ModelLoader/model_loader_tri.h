@@ -16,6 +16,8 @@ extern "C"
 
 #define TRI_LOADER_VERSION 3
 
+#define MAX_BONE_CHILDREN 16
+
 struct TRI_Header
 {
      unsigned int triType;
@@ -33,15 +35,18 @@ struct TRI_Header
      unsigned int notUsed3;
 };
 
-
-
-
 struct TRI_Bones_Header
 {
   unsigned int boneParent;
+//-------------------------------------------
+  unsigned int boneChild[MAX_BONE_CHILDREN];
+  unsigned int numberOfBoneChildren;
+//-------------------------------------------
   unsigned int boneWeightsNumber;
   unsigned int boneNameSize;
+//-------------------------------------------
   float inverseBindPose[16];
+  float finalTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
 };
 
 struct TRI_Bones
