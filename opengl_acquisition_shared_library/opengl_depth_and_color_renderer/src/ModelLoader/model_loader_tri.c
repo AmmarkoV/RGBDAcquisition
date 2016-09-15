@@ -47,7 +47,8 @@ void printTRIBoneStructure(struct TRI_Model * triModel)
       fprintf(stderr,"\n");
 
       print4x4DMatrixTRI("inverseBindPose", triModel->bones[i].info->inverseBindPose );
-      print4x4DMatrixTRI("finalTransformation", triModel->bones[i].info->finalTransformation );
+      print4x4DMatrixTRI("finalGlobalTransformation", triModel->bones[i].info->finalGlobalTransformation );
+      print4x4DMatrixTRI("boneTransformation", triModel->bones[i].info->boneTransformation );
      }
 
    }

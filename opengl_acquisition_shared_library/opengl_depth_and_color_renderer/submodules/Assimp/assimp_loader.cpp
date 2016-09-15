@@ -448,6 +448,13 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     triModel->header.numberOfIndices       = mesh->mNumFaces*3;       indexSize        =triModel->header.numberOfIndices       * sizeof(unsigned int);
     triModel->header.numberOfBones         = mesh->mNumBones;         bonesSize        =triModel->header.numberOfBones         * sizeof(struct TRI_Bones);
 
+    double * gm = triModel->header.boneGlobalInverseTransform;
+    gm[0]=m_GlobalInverseTransform.a1;  gm[1]=m_GlobalInverseTransform.a2;  gm[2]=m_GlobalInverseTransform.a3;  gm[3]=m_GlobalInverseTransform.a4;
+    gm[4]=m_GlobalInverseTransform.b1;  gm[5]=m_GlobalInverseTransform.b2;  gm[6]=m_GlobalInverseTransform.b3;  gm[7]=m_GlobalInverseTransform.b4;
+    gm[8]=m_GlobalInverseTransform.c1;  gm[9]=m_GlobalInverseTransform.c2;  gm[10]=m_GlobalInverseTransform.c3; gm[11]=m_GlobalInverseTransform.c4;
+    gm[12]=m_GlobalInverseTransform.d1; gm[13]=m_GlobalInverseTransform.d2; gm[14]=m_GlobalInverseTransform.d3; gm[15]=m_GlobalInverseTransform.d4;
+
+
    //fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
 
 	triModel->vertices      = (float*)            malloc( verticesSize );
@@ -546,11 +553,19 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
        rm[8]=am->c1; rm[9]=am->c2;  rm[10]=am->c3; rm[11]=am->c4;
        rm[12]=am->d1;rm[13]=am->d2; rm[14]=am->d3; rm[15]=am->d4;
 
-       rm = triModel->bones[i].info->finalTransformation;
+       rm = triModel->bones[i].info->finalGlobalTransformation;
        rm[0]=1.0;  rm[1]=0.0;  rm[2]=0.0;  rm[3]=0.0;
        rm[4]=0.0;  rm[5]=1.0;  rm[6]=0.0;  rm[7]=0.0;
        rm[8]=0.0;  rm[9]=0.0;  rm[10]=1.0; rm[11]=0.0;
        rm[12]=0.0; rm[13]=0.0; rm[14]=0.0; rm[15]=1.0;
+
+       rm = triModel->bones[i].info->boneTransformation;
+       rm[0]=1.0;  rm[1]=0.0;  rm[2]=0.0;  rm[3]=0.0;
+       rm[4]=0.0;  rm[5]=1.0;  rm[6]=0.0;  rm[7]=0.0;
+       rm[8]=0.0;  rm[9]=0.0;  rm[10]=1.0; rm[11]=0.0;
+       rm[12]=0.0; rm[13]=0.0; rm[14]=0.0; rm[15]=1.0;
+
+
 
        triModel->bones[i].boneName = (char* ) malloc(sizeof(char) * (1+triModel->bones[i].info->boneNameSize) );
        snprintf(triModel->bones[i].boneName,1+triModel->bones[i].info->boneNameSize,"%s",bones.bone[i].name);

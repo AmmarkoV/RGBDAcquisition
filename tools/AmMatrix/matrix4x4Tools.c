@@ -485,6 +485,20 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
   return 1;
 }
 
+
+int multiplyThree4x4Matrices(double * result , double * matrixA , double * matrixB , double * matrixC)
+{
+  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (result==0) ) { return 0; }
+
+  int i=0;
+  double tmp[16];
+  i+=multiplyTwo4x4Matrices(&tmp,matrixB,matrixC);
+  i+=multiplyTwo4x4Matrices(result , matrixA , &tmp);
+
+  return (i==2);
+}
+
+
 int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB)
 {
   if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }

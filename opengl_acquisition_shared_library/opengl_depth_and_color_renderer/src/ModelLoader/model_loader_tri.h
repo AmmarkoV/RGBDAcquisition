@@ -14,7 +14,7 @@ extern "C"
  #include "model_loader_obj.h"
 #endif // HAVE_OBJ_CODE_AVAILIABLE
 
-#define TRI_LOADER_VERSION 3
+#define TRI_LOADER_VERSION 4
 
 #define MAX_BONE_CHILDREN 16
 
@@ -29,6 +29,8 @@ struct TRI_Header
      unsigned int numberOfColors;
      unsigned int numberOfIndices;
      unsigned int numberOfBones;
+     //In order not to break this file format ever again
+     double boneGlobalInverseTransform[16];
      //In order not to break this file format ever again
      unsigned int notUsed1;
      unsigned int notUsed2;
@@ -46,7 +48,9 @@ struct TRI_Bones_Header
   unsigned int boneNameSize;
 //-------------------------------------------
   double inverseBindPose[16];
-  double finalTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
+  double finalGlobalTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
+  double boneTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
+  unsigned char altered;
 };
 
 struct TRI_Bones

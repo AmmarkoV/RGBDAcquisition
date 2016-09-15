@@ -186,6 +186,7 @@ int transpose4x4MatrixD(double * mat) ;
 */
 int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB);
 
+int multiplyThree4x4Matrices(double * result , double * matrixA , double * matrixB , double * matrixC);
 
 /**
 * @brief Multiply 2x 4x4 Float matrices ( A * B )
