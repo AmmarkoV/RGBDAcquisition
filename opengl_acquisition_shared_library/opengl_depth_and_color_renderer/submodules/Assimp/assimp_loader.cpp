@@ -383,22 +383,27 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
 
 int populateMeshChildrenFromParents(struct TRI_Model * triModel)
 {
- if (triModel->header.numberOfBones>0)
-    {
-      unsigned int i=0;
-      for (i = 0; i < triModel->header.numberOfBones; i++)
-      {
-       unsigned int parentNode = triModel->bones[i].info->boneParent;
-       unsigned int childNode = i;
+ unsigned int i=0;
+ unsigned int numberOfBones = triModel->header.numberOfBones;
 
-        if (triModel->bones[parentNode].info->numberOfBoneChildren+1>=MAX_BONE_CHILDREN)
+ if (numberOfBones>0)
+    {
+      for (i = 0; i < numberOfBones; i++)
+      {
+       if (triModel->bones[i].info!=0)
+       {
+        unsigned int parentNode = triModel->bones[i].info->boneParent;
+        unsigned int childNode = i;
+
+        if (parentNode < numberOfBones)
         {
-         fprintf(stderr,"Reached limit of child bones per bone!  , Skipping..!\n ");
-        } else
-        {
+         if (triModel->bones[parentNode].info->numberOfBoneChildren<MAX_BONE_CHILDREN)
+         {
           triModel->bones[parentNode].info->boneChild[triModel->bones[parentNode].info->numberOfBoneChildren] = childNode;
           ++triModel->bones[parentNode].info->numberOfBoneChildren;
-        }
+         } else { fprintf(stderr,"Reached limit of child bones per bone!  , Skipping..!\n "); }
+        } else { fprintf(stderr,"Parent has an incorrect value %u/%u !  Skipping..!\n " , parentNode , numberOfBones); }
+       } else { fprintf(stderr,"Unallocated infos for bone %u/%u , Skipping ..!\n ",i,numberOfBones); }
       }
 
      return 1;
@@ -458,7 +463,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     fprintf(stderr,"  %d bytes of textureCoords \n",textureCoordsSize);
     fprintf(stderr,"  %d bytes of colors\n",colorSize);
     fprintf(stderr,"  %d bytes of indices\n",indexSize);
-      fprintf(stderr,"  %d bytes of bones\n",bonesSize);
+    fprintf(stderr,"  %d bytes of bones\n",bonesSize);
 
     memset(triModel->vertices, 0 , verticesSize );
     memset(triModel->normal, 0 , normalsSize );
@@ -501,12 +506,14 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     {
 		struct aiFace *face = mesh->mFaces + i;
 
-        if (face->mNumIndices!=3)
-		 { fprintf(stderr," \n\n\n\n\n Non triangulated face %u \n\n\n\n\n",face->mNumIndices); }
+        if (face->mNumIndices==3)
+		 {
+		  triModel->indices[(i*3)+0] = face->mIndices[0];
+		  triModel->indices[(i*3)+1] = face->mIndices[1];
+		  triModel->indices[(i*3)+2] = face->mIndices[2];
+         } else
+         { fprintf(stderr," \n\n\n\n\n Non triangulated face %u \n\n\n\n\n",face->mNumIndices); }
 
-		triModel->indices[(i*3)+0] = face->mIndices[0];
-		triModel->indices[(i*3)+1] = face->mIndices[1];
-		triModel->indices[(i*3)+2] = face->mIndices[2];
     }
 
 
@@ -527,13 +534,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
        triModel->bones[i].info->boneParent=bones.bone[i].parentItemID;
        triModel->bones[i].info->boneWeightsNumber=bones.bone[i].numberOfWeights;
 
-
-       populateMeshChildrenFromParents(triModel);
-       //for ( i = 0 ; i < pNode->mNumChildren ; i++)
-       // {
-       //  readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
-       // }
-
+       //Childs are calculated in the end with the populateMeshChildrenFromParents call..!
 
 	   struct aiBone *bone = mesh->mBones[i];
 	   triModel->bones[i].info->boneNameSize = strlen(bones.bone[i].name);
@@ -544,7 +545,6 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
        rm[4]=am->b1; rm[5]=am->b2;  rm[6]=am->b3;  rm[7]=am->b4;
        rm[8]=am->c1; rm[9]=am->c2;  rm[10]=am->c3; rm[11]=am->c4;
        rm[12]=am->d1;rm[13]=am->d2; rm[14]=am->d3; rm[15]=am->d4;
-
 
        rm = triModel->bones[i].info->finalTransformation;
        rm[0]=1.0;  rm[1]=0.0;  rm[2]=0.0;  rm[3]=0.0;
@@ -573,6 +573,9 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
            triModel->bones[i].weightIndex[k] = bone->mWeights[k].mVertexId;
 	     }
       }
+
+       populateMeshChildrenFromParents(triModel);
+
     }
 }
 
