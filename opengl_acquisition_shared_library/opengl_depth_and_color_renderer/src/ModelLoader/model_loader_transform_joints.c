@@ -108,7 +108,7 @@ void recursiveJointHeirarchyTransformer( struct TRI_Model * in  , int curBone , 
     create4x4IdentityMatrix(&NodeTransformation) ;
 
 
-    double * finalTransform = &finalTransforms[curBone*16];
+    double * finalTransform = finalTransforms[curBone].finalTransform;
     create4x4IdentityMatrix(finalTransform);
 
 
@@ -225,10 +225,11 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
 
 
+   fprintf(stderr,"Transforming bones : ");
    unsigned int k=0;
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
-     fprintf(stderr,"Transforming %u bone\n",k);
+     fprintf(stderr,"%u ",k);
      for (i=0; i<triModelIn->bones[i].info->boneWeightsNumber; i++ )
      {
        //V is the vertice we will be working in this loop
@@ -262,6 +263,7 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 	   triModelOut->normal[v*3+2] += (float) transNormal[2] * w;
      }
    }
+   fprintf(stderr," done \n");
 
 
   free(finalTransforms);
