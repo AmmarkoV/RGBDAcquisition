@@ -104,7 +104,12 @@ void recursiveJointHeirarchyTransformer( struct TRI_Model * in  , int curBone , 
     fprintf(stderr,"%s\n" , in->bones[curBone].boneName );
 
 
-    double NodeTransformation[16]; create4x4IdentityMatrix(&NodeTransformation) ;
+    double NodeTransformation[16];
+    create4x4IdentityMatrix(&NodeTransformation) ;
+
+
+    double * finalTransform = &finalTransforms[curBone*16];
+    create4x4IdentityMatrix(finalTransform);
 
 
     unsigned int foundBone;
@@ -197,6 +202,14 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
    struct TRI_Transform * finalTransforms = (struct TRI_Transform * ) malloc( triModelIn->header.numberOfBones * sizeof(struct TRI_Transform) );
    if (finalTransforms==0) { return 0; }
+   unsigned int i=0;
+
+   double * finalMatrix;
+   for (i=0; i<triModelIn->header.numberOfBones; i++)
+   {
+     finalMatrix = finalTransforms[i].finalTransform;
+     create4x4IdentityMatrix(finalMatrix);
+   }
 
 
   double parentTransform[16]={0};
@@ -212,7 +225,7 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
 
 
-   unsigned int k=0,i=0;
+   unsigned int k=0;
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
      fprintf(stderr,"Transforming %u bone\n",k);

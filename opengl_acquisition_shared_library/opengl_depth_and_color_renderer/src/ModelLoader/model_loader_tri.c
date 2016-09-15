@@ -196,38 +196,49 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
 {
   copyModelTriHeader( triModelOUT ,  triModelIN );
 
+
+  unsigned int itemSize , count , allocationSize;
+
+  itemSize=sizeof(float); count=triModelIN->header.numberOfVertices; allocationSize = itemSize * count;
+  fprintf(stderr,"Copying %u bytes of vertices ..\n", allocationSize);
+  if (triModelOUT->vertices!=0)  { free(triModelOUT->vertices); triModelOUT->vertices=0; }
+  if ((triModelIN->vertices!=0) && (allocationSize>0) )  { triModelOUT->vertices = (float*) malloc(allocationSize); }
+  memcpy(triModelOUT->vertices,triModelIN->vertices,allocationSize);
+
+  itemSize=sizeof(float); count=triModelIN->header.numberOfNormals; allocationSize = itemSize * count;
+  fprintf(stderr,"Copying %u bytes of normals ..\n", allocationSize);
+  if (triModelOUT->normal!=0)  { free(triModelOUT->normal); triModelOUT->normal=0; }
+  if ((triModelIN->normal!=0) && (allocationSize>0) )  { triModelOUT->normal = (float*) malloc(allocationSize); }
+  memcpy(triModelOUT->normal        , triModelIN->normal        , allocationSize);
+
+  itemSize=sizeof(float); count=triModelIN->header.numberOfColors; allocationSize = itemSize * count;
+  fprintf(stderr,"Copying %u bytes of colors ..\n", allocationSize);
+  if (triModelOUT->colors!=0)  { free(triModelOUT->colors); triModelOUT->colors=0; }
+  if ((triModelIN->colors!=0) && (allocationSize>0) )  { triModelOUT->colors=(float*) malloc(allocationSize); }
+  memcpy(triModelOUT->colors        , triModelIN->colors        , allocationSize);
+
+  itemSize=sizeof(float); count=triModelIN->header.numberOfTextureCoords; allocationSize = itemSize * count;
+  fprintf(stderr,"Copying %u bytes of textures ..\n", allocationSize);
+  if (triModelOUT->textureCoords!=0)  { free(triModelOUT->textureCoords); triModelOUT->textureCoords=0; }
+  if ((triModelIN->textureCoords!=0) && (allocationSize>0) )  { triModelOUT->textureCoords=(float*) malloc(allocationSize); }
+  memcpy(triModelOUT->textureCoords , triModelIN->textureCoords , allocationSize);
+
+  itemSize=sizeof(unsigned int); count=triModelIN->header.numberOfIndices; allocationSize = itemSize * count;
+  fprintf(stderr,"Copying %u bytes of indices ..\n", allocationSize);
+  if (triModelOUT->indices!=0)  { free(triModelOUT->indices); triModelOUT->indices=0; }
+  if ((triModelIN->indices!=0) && (allocationSize>0) )  { triModelOUT->indices = (unsigned int*) malloc(allocationSize); }
+  memcpy(triModelOUT->indices , triModelIN->indices       , allocationSize);
+
+
+
   if(copyBoneStructures)
   {
     fprintf(stderr,"copyModelTri ignores bone structures..\n");
-
+    triModelOUT->bones=0;
+  } else
+  {
+    triModelOUT->bones=0;
   }
-
-  unsigned int itemSize , count;
-
-  itemSize=sizeof(float)*3; count=triModelIN->header.numberOfVertices;
-  if (triModelOUT->vertices!=0)  { free(triModelOUT->vertices); }
-  if (triModelIN->vertices!=0)   { triModelOUT->vertices = (float*) malloc(itemSize*count); }
-  memcpy(triModelOUT->vertices,triModelIN->vertices,itemSize*count);
-
-  itemSize=sizeof(float)*3; count=triModelIN->header.numberOfNormals;
-  if (triModelOUT->normal!=0)  { free(triModelOUT->normal); }
-  if (triModelIN->normal!=0)   { triModelOUT->normal = (float*) malloc(itemSize*count); }
-  memcpy(triModelOUT->normal        , triModelIN->normal        , itemSize*count);
-
-  itemSize=sizeof(float)*3; count=triModelIN->header.numberOfColors;
-  if (triModelOUT->colors!=0)  { free(triModelOUT->colors); }
-  if (triModelIN->colors!=0)   { triModelOUT->colors=(float*) malloc(itemSize*count); }
-  memcpy(triModelOUT->colors        , triModelIN->colors        , itemSize*count);
-
-  itemSize=sizeof(float)*2; count=triModelIN->header.numberOfTextureCoords;
-  if (triModelOUT->textureCoords!=0)  { free(triModelOUT->textureCoords); }
-  if (triModelIN->textureCoords!=0)   { triModelOUT->textureCoords=(float*) malloc(itemSize*count); }
-  memcpy(triModelOUT->textureCoords , triModelIN->textureCoords , itemSize*count);
-
-  itemSize=sizeof(unsigned int)*3; count=triModelIN->header.numberOfIndices;
-  if (triModelOUT->indices!=0)  { free(triModelOUT->indices); }
-  if (triModelIN->indices!=0)   { triModelOUT->indices = (unsigned int*) malloc(itemSize*count); }
-  memcpy(triModelOUT->indices       , triModelIN->indices       , itemSize*count);
 
  return ;
 }
