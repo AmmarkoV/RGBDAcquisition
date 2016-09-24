@@ -144,7 +144,7 @@ int convolutionFilter3ChF(
 
 
 
-inline void doFilterKernel1ch (
+static inline void doFilterKernel1ch (
                              float * sourceKernelPosition , float * kernelStart , unsigned int kernelWidth , unsigned int kernelHeight , float divisor ,
                              unsigned int sourceWidth ,
                              float * output

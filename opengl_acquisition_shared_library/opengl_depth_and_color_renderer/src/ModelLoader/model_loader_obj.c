@@ -1119,7 +1119,7 @@ glPopAttrib();
 
 
 
-inline int findIntersectionInternal(struct OBJ_Model * obj,Face triangle, Vertex p1, Vertex p2, Vector * new_normal, Vector * intersection_point)
+static inline int findIntersectionInternal(struct OBJ_Model * obj,Face triangle, Vertex p1, Vertex p2, Vector * new_normal, Vector * intersection_point)
 {
 	Vector e1, e2, p, s, q;
 	Vector bcoords;
