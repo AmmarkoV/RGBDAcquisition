@@ -746,7 +746,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
     fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime);
   }
 
-
+  int enableTransformedRendering=1;
 
   unsigned char noColor=0;
   float posStackA[7]={0};
@@ -796,23 +796,32 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
                 { print3DPoint2DWindowPosition(i , pos[0],pos[1],pos[2] ); }
 
 
-           if (
-                 (joints!=0) &&
-                 (mod->type==TRI_MODEL)
-              )
+           if ( (modelHasASkinTransformation(mod,joints)) && (enableTransformedRendering) )
            {
+            //We need to do joint transforms before draw
             fprintf(stderr,"Doing joint transforms etc..!\n");
             struct TRI_Model triModelOut={0};
             struct TRI_Model *triModelIn=(struct TRI_Model*) mod->modelInternalData;
 
 
             doModelTransform( &triModelOut , triModelIn , joints , numberOfBones);
+            mod->modelInternalData = (void*) &triModelOut;
+            // - - - -
+            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
+              { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
+            // - - - -
 
+            mod->modelInternalData = (void*) triModelIn;
+            deallocModelTri(&triModelOut);
+
+           } else
+           {
+            //Regular <fast> drawing of model
+            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
+               { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
            }
 
 
-           if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
-             { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
 
 
           scene->object[i].bbox2D[0] = mod->bbox2D[0];         scene->object[i].bbox2D[1] = mod->bbox2D[1];

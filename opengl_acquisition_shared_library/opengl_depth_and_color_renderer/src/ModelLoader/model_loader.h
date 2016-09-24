@@ -55,6 +55,8 @@ int printModelList(struct ModelList* modelStorage);
 
 int loadModelToModelList(struct ModelList* modelStorage,char * modelDirectory,char * modelName , unsigned int * whereModelWasLoaded);
 
+int modelHasASkinTransformation(struct Model * model,float* joints);
+
 /**
 * @brief Update Model Position triggers , ( 3D / 2D )
 * @ingroup ModelLoader

@@ -128,6 +128,12 @@ int printModelList(struct ModelList* modelStorage)
  return 1;
 }
 
+int modelHasASkinTransformation(struct Model * model,float* joints)
+{
+  if (model==0) {return 0; }
+ return  ( (joints!=0) && (model->type==TRI_MODEL) );
+}
+
 unsigned int updateModelPosition(struct Model * model,float * position)
 {
      // return 0;
