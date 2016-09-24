@@ -113,7 +113,7 @@ return 1;
 
 
 
-inline int deriche1DPassF(
+static inline int deriche1DPassF(
                    float * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
                    float * target,  unsigned int targetWidth , unsigned int targetHeight ,
                    struct derichePrecalculations * derp ,
@@ -347,7 +347,7 @@ By the way this is the first thing I made that could be
 
 
 
-inline int deriche1DPass(
+static inline int deriche1DPass(
                    unsigned char * source,  unsigned int sourceWidth , unsigned int sourceHeight ,
                    unsigned char * target,  unsigned int targetWidth , unsigned int targetHeight ,
                    struct derichePrecalculations * derp ,

@@ -15,7 +15,7 @@ struct ctbfPool
 
 #define SR  0.006
 #define SR_MUL_2 2*SR
-inline float wKResponse(float kBin , float * in , float divider )
+static inline float wKResponse(float kBin , float * in , float divider )
 {
   float inMinusK = *in - kBin;
   float response = -1 * inMinusK  * inMinusK;

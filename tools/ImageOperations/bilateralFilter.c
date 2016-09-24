@@ -5,23 +5,23 @@
 
 #define sqrt2 1.414213562
 
-inline int isDimensionOdd(unsigned int dimension)
+static inline int isDimensionOdd(unsigned int dimension)
 {
  return ( dimension % 2 !=0 );
 }
 
-inline float absFSub(float  value1,float  value2)
+static inline float absFSub(float  value1,float  value2)
 {
  if (value1>value2) { return (float ) value1-value2; }
  return (float ) value2-value1;
 }
 
-inline int isNaN(float f)
+static inline int isNaN(float f)
 {
   return ( f != f );
 }
 
-inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor,float id)
+static inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor,float id)
 {
   float * newMat = (float*) malloc(sizeof(float) * dimension * dimension );
   unsigned int x=0,y=0;
@@ -59,7 +59,7 @@ inline float * getSpatialDifferenceMatrix(unsigned int dimension,float * divisor
 }
 
 
-inline void doGenericBilateralFilterKernel (
+static inline void doGenericBilateralFilterKernel (
                                              unsigned char * kernelStart,
                                              unsigned int dimension ,
                                              unsigned int sourceWidth ,

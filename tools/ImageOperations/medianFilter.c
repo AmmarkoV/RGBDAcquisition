@@ -11,7 +11,7 @@ struct sortingValues
 
 
 
-inline void doMedianFilterKernel (
+static inline void doMedianFilterKernel (
                                     unsigned char * kernelStart,
                                     unsigned int kernelWidth ,
                                     unsigned int kernelHeight ,
