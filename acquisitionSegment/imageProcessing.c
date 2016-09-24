@@ -116,8 +116,7 @@ float  distance3D(float * p1 , float * p2 , float * p3)
    return len;
 }
 
-
-inline float dotProduct(float * p1 , float * p2 )
+float dotProduct(float * p1 , float * p2 )
 {
     #warning "dotProduct is a very heavily used function , it needs to be optimized using AVX"
     return (float) ( p1[DIMX]*p2[DIMX] + p1[DIMY]*p2[DIMY] + p1[DIMZ]*p2[DIMZ] );

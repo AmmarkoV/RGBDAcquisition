@@ -54,13 +54,13 @@ struct normalArray
 };
 
 
-inline float getDepthValue(unsigned short * source , unsigned int x, unsigned int y , unsigned int width)
+static inline float getDepthValue(unsigned short * source , unsigned int x, unsigned int y , unsigned int width)
 {
   return (float) source[MEMPLACE1(x,y,width)];
 }
 
 
-inline int pointORNormalAreZero(float * point , float * normal)
+static inline int pointORNormalAreZero(float * point , float * normal)
 {
   if (
        ( (  FLOATISZERO(normal[0]) ) && (  FLOATISZERO(normal[1]) ) && (  FLOATISZERO(normal[2]) ) ) ||
