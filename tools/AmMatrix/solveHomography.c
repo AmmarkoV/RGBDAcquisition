@@ -11,7 +11,7 @@
 
 
 //http://ilab.usc.edu/wiki/index.php/Fast_Square_Root
-inline float sqrt_fast_approximationAgain(const float x)
+static inline float sqrt_fast_approximationAgain(const float x)
 {
   union
   {

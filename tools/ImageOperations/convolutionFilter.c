@@ -4,13 +4,13 @@
 #include <math.h>
 
 
-inline int isFilterDimensionOdd(unsigned int dimension)
+static inline int isFilterDimensionOdd(unsigned int dimension)
 {
  return ( dimension % 2 !=0 );
 }
 
 
-inline void doFilterKernel3ch (
+static inline void doFilterKernel3ch (
                              float * sourceKernelPosition , float * kernelStart , unsigned int kernelWidth , unsigned int kernelHeight , float divisor ,
                              unsigned int sourceWidth ,
                              float * output

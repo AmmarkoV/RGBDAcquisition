@@ -159,7 +159,7 @@ int InputParser_TrimCharacters(char * inpt , unsigned int length,char what2trim)
   return InputParser_TrimCharactersEnd(inpt,length,what2trim);
 }
 
-inline signed int Str2Int_internal(char * inpt,unsigned int start_from,unsigned int length)
+static inline signed int Str2Int_internal(char * inpt,unsigned int start_from,unsigned int length)
 {
     if ( inpt == 0 ) { fprintf(stderr,"Null string to Str2IntInternal!\n"); return 0;}
     int intresult;
@@ -197,7 +197,7 @@ inline signed int Str2Int_internal(char * inpt,unsigned int start_from,unsigned 
 
 
 
-inline unsigned char CheckIPCOk(struct InputParserC * ipc)
+static inline unsigned char CheckIPCOk(struct InputParserC * ipc)
 {
     if ( ipc->guardbyte1.checksum != ipc->guardbyte2.checksum ) { fprintf(stderr,"Input Parser - Wrong GuardChecksums #1\n"); return 0; }
     if ( ipc->guardbyte3.checksum != ipc->guardbyte4.checksum ) { fprintf(stderr,"Input Parser - Wrong GuardChecksums #2\n"); return 0; }
@@ -349,7 +349,7 @@ void InputParser_Destroy(struct InputParserC * ipc)
    CheckDelimeterNumOk..
    Checks if delimeter with number num has allocated space in memory
 */
-inline unsigned char CheckDelimeterNumOk(struct InputParserC * ipc,int num)
+static inline unsigned char CheckDelimeterNumOk(struct InputParserC * ipc,int num)
 {
     if ( ipc->max_delimeter_count <= num ) return 0;
     return 1;
@@ -395,7 +395,7 @@ unsigned char InputParser_SelfCheck(struct InputParserC * ipc)
    CheckWordNumOk..
    Checks if word with number num has allocated space in memory
 */
-inline unsigned char CheckWordNumOk(struct InputParserC * ipc,unsigned int num)
+unsigned char CheckWordNumOk(struct InputParserC * ipc,unsigned int num)
 {
   if ( CheckIPCOk(ipc)==0) { return 0; }
   if ( (ipc->tokenlist==0) || ( ipc->tokens_count <= num ) ) { return 0; }
