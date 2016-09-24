@@ -1,7 +1,7 @@
 #include "compareQuality.h"
 #include <math.h>
 
-inline unsigned char absUCPSub(unsigned char * value1,unsigned char * value2)
+static inline unsigned char absUCPSub(unsigned char * value1,unsigned char * value2)
 {
  if (*value1>*value2) { return (unsigned char) *value1-*value2; }
  return (float ) *value2-*value1;
