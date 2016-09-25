@@ -533,6 +533,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
       triModel->bones         = (struct TRI_Bones*) malloc( bonesSize );
       memset(triModel->bones, 0 , bonesSize );
 
+
       for (i = 0; i < triModel->header.numberOfBones; i++)
       {
        triModel->bones[i].info = (struct TRI_Bones_Header*) malloc(sizeof(struct TRI_Bones_Header));
@@ -581,15 +582,17 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
        for (k = 0; k < triModel->bones[i].info->boneWeightsNumber; k++)
          {
-           //triModel->bones[i].weightValue[k] = 0.0;
-           //triModel->bones[i].weightIndex[k] = 0;
-
            triModel->bones[i].weightValue[k] = bone->mWeights[k].mWeight;
            triModel->bones[i].weightIndex[k] = bone->mWeights[k].mVertexId;
 	     }
       }
 
        populateMeshChildrenFromParents(triModel);
+
+
+       fprintf(stderr,"TODO : This is not set correctly! \n");
+       findTRIBoneWithName(triModel,scene->mRootNode->mName.data,&triModel->header.rootBone);
+
 
     }
 }

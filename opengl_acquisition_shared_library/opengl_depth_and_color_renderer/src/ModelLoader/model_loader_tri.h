@@ -29,10 +29,9 @@ struct TRI_Header
      unsigned int numberOfColors;
      unsigned int numberOfIndices;
      unsigned int numberOfBones;
-     //In order not to break this file format ever again
      double boneGlobalInverseTransform[16];
+     unsigned int rootBone;
      //In order not to break this file format ever again
-     unsigned int notUsed1;
      unsigned int notUsed2;
      unsigned int notUsed3;
 };

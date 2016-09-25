@@ -230,9 +230,9 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
   double parentTransform[16]={0};
   create4x4IdentityMatrix(&parentTransform) ;
 
-  unsigned int rootBone = 0;
-  findTRIBoneWithName(triModelIn,"JtRoot",&rootBone);
-  recursiveJointHeirarchyTransformer( triModelIn , rootBone , finalTransforms , parentTransform , jointData , jointDataSize , 0 );
+  //findTRIBoneWithName(triModelIn,"JtRoot",&rootBone);
+  fprintf(stderr,"Root Bone is %s (%u) \n",triModelIn->bones[triModelIn->header.rootBone].boneName , triModelIn->header.rootBone );
+  recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone , finalTransforms , parentTransform , jointData , jointDataSize , 0 );
 
 
    //fprintf(stderr,"Clearing vertices & normals \n");
