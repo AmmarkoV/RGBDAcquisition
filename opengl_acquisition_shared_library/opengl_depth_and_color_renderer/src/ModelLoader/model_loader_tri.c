@@ -269,7 +269,7 @@ void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triM
 
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures)
 {
-  fprintf(stderr,MAGENTA "copyModelTriHeader ..\n" NORMAL);
+  //fprintf(stderr,MAGENTA "copyModelTri ..\n" NORMAL);
   if (triModelOUT==0) { return; }
   if (triModelIN==0)  { return; }
   copyModelTriHeader( triModelOUT ,  triModelIN );
@@ -313,7 +313,7 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
 
   if ( (copyBoneStructures) && (triModelIN->header.numberOfBones>0) )
   {
-    fprintf(stderr,GREEN "copyModelTri copying bone structures..\n" NORMAL);
+    //fprintf(stderr,GREEN "copyModelTri copying bone structures..\n" NORMAL);
 
      triModelOUT->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * triModelIN->header.numberOfBones);
      memset(triModelOUT->bones, 0 , sizeof(struct TRI_Bones) * triModelIN->header.numberOfBones);
