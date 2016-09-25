@@ -185,7 +185,6 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
   //Reduce spam
   //printTRIBoneStructure(triModelIn,0 /*Dont show all matrices*/);
-
   if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
   {
      fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL);
@@ -193,14 +192,11 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
   }
 
   copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
-  fprintf(stderr,RED "will not perform transform because of DEBUG..! \n" NORMAL);
-  return 1; //to test if copy works ok
+  //fprintf(stderr,RED "will not perform transform because of DEBUG..! \n" NORMAL);
+  //return 1; //to test if copy works ok
 
-  double transPosition[4]={0};
-  double position[4]={0};
-
-  double normal[4]={0};
-  double transNormal[4]={0};
+  double transPosition[4]={0}; double transNormal[4]={0};
+  double position[4]={0}; double normal[4]={0};
 
 
    struct TRI_Transform * finalTransforms = (struct TRI_Transform * ) malloc( triModelIn->header.numberOfBones * sizeof(struct TRI_Transform) );
@@ -234,20 +230,17 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
    unsigned int k=0;
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
-     fprintf(stderr,"%u ",k);
-
-     if (is4x4DIdentityMatrix(finalTransforms[k].finalTransform ))
-     {
-      fprintf(stderr,"Has identity transform \n");
-     }
+     //fprintf(stderr,"%u ",k);
+     //if (is4x4DIdentityMatrix(finalTransforms[k].finalTransform ))
+     //{ fprintf(stderr,"Has identity transform \n"); }
 
 
-     for (i=0; i<triModelIn->bones[i].info->boneWeightsNumber; i++ )
+     for (i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
      {
        //V is the vertice we will be working in this loop
-       unsigned int v = triModelIn->bones[i].weightIndex[k];
+       unsigned int v = triModelIn->bones[k].weightIndex[i];
        //W is the weight that we have for the specific bone
-       float w = triModelIn->bones[i].weightValue[k];
+       float w = triModelIn->bones[k].weightValue[i];
 
        //We load our input into position/normal
        position[0] = triModelIn->vertices[v*3+0];

@@ -805,7 +805,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
 
             doModelTransform( &triModelOut , triModelIn , joints , numberOfBones);
-            fprintf(stderr,"TriOUT Indices %u , TriIN Indices %u \n",triModelOut.header.numberOfIndices,triModelIn->header.numberOfIndices);
+            //fprintf(stderr,"TriOUT Indices %u , TriIN Indices %u \n",triModelOut.header.numberOfIndices,triModelIn->header.numberOfIndices);
 
             mod->modelInternalData = (void*) &triModelOut;
             // - - - -
