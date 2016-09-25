@@ -746,7 +746,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
     fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime);
   }
 
-  int enableTransformedRendering=0;
+  int enableTransformedRendering=1;
 
   unsigned char noColor=0;
   float posStackA[7]={0};

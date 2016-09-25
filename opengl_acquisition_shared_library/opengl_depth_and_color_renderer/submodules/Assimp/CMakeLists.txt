@@ -6,7 +6,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules ${CMAKE_MODUL
  
 add_library(assimpLoader SHARED  
             assimp_loader.cpp
-            assimp_loader.h 
+            assimp_loader.h  
+            assimp_compare_to_tri.cpp
+            assimp_compare_to_tri.h
                ../../src/ModelLoader/model_loader_tri.c
                ../../src/ModelLoader/model_loader_tri.h
            ) 
@@ -18,6 +20,8 @@ add_executable(assimpTester
                assimp_main.cpp 
                assimp_loader.cpp
                assimp_loader.h 
+               assimp_compare_to_tri.cpp
+               assimp_compare_to_tri.h
                ../../src/ModelLoader/model_loader_tri.c
                ../../src/ModelLoader/model_loader_tri.h
                ) 

@@ -46,6 +46,8 @@ void print4x4FMatrix(char * str , float * matrix4x4);
 */
 void print4x4DMatrix(char * str , double * matrix4x4);
 
+
+
 /**
 * @brief Copy a 4x4 Matrix to another
 * @ingroup AmMatrix
@@ -63,6 +65,7 @@ void copy4x4Matrix(double * out,double * in);
 */
 void create4x4IdentityMatrix(double * m) ;
 
+int is4x4DIdentityMatrix(double * m);
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous Translation rotation

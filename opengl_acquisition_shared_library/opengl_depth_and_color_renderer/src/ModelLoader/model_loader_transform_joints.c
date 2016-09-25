@@ -110,6 +110,7 @@ void recursiveJointHeirarchyTransformer(
                                          unsigned int recursionLevel
                                        )
 {
+    if (recursionLevel==14) { fprintf(stderr,"reached recursion level\n"); return; }
     unsigned int i=0;
     if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
                               { fprintf(stderr,"   "); }
@@ -133,21 +134,39 @@ void recursiveJointHeirarchyTransformer(
       //aiMatrix4x4 GlobalTransformation = ParentTransform  * NodeTransformation;
       multiplyTwo4x4Matrices(&globalTransformation,parentTransform,&nodeTransformation);
 
-      multiplyThree4x4Matrices( &globalTransformation,parentTransform,&nodeTransformation);
+
+      double * finalMatrix = finalTransforms[i].finalTransform;
+      multiplyThree4x4Matrices( finalMatrix, &globalTransformation,parentTransform,&nodeTransformation);
       //bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
       {
-       //readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+        //readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+        recursiveJointHeirarchyTransformer(
+                                           in  ,
+                                           in->bones[curBone].info->boneChild[i] ,
+                                           finalTransforms ,
+                                           parentTransform ,
+                                           jointData , jointDataSize ,
+                                           recursionLevel+1
+                                         );
       }
     } else
     {
+      //aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
       multiplyTwo4x4Matrices(&globalTransformation,parentTransform,&nodeTransformation);
 
-      //aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
       //fprintf(stderr,"        <!%s!>\n",pNode->mName.data);
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
         // readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+        recursiveJointHeirarchyTransformer(
+                                           in  ,
+                                           in->bones[curBone].info->boneChild[i] ,
+                                           finalTransforms ,
+                                           parentTransform ,
+                                           jointData , jointDataSize ,
+                                           recursionLevel+1
+                                         );
        }
     }
 
@@ -166,8 +185,14 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
   printTRIBoneStructure(triModelIn);
 
-  copyModelTri( triModelOut , triModelIn , 0);
+  if ( ( triModelOut->vertices ==0 ) || ( triModelOut->header.numberOfVertices ==0 ) )
+  {
+     fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL);
+    return 0;
+  }
 
+  copyModelTri( triModelOut , triModelIn , 0);
+  //return 1; to test if copy works ok
 
   double transPosition[4]={0};
   double position[4]={0};
@@ -183,14 +208,16 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
    double * finalMatrix;
    for (i=0; i<triModelIn->header.numberOfBones; i++)
    {
+     //fprintf(stderr,"Final Matrix %u \n" , i);
      finalMatrix = finalTransforms[i].finalTransform;
      create4x4IdentityMatrix(finalMatrix);
+     //print4x4DMatrix(" data ", finalMatrix);
    }
 
 
   double parentTransform[16]={0};
   create4x4IdentityMatrix(&parentTransform) ;
-  recursiveJointHeirarchyTransformer( triModelIn , 0 , finalTransforms , parentTransform , jointData , jointDataSize , 0 );
+  //recursiveJointHeirarchyTransformer( triModelIn , 0 , finalTransforms , parentTransform , jointData , jointDataSize , 0 );
 
 
    fprintf(stderr,"Clearing vertices & normals \n");
@@ -206,6 +233,13 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
      fprintf(stderr,"%u ",k);
+
+     if (is4x4DIdentityMatrix(finalTransforms[k].finalTransform ))
+     {
+      fprintf(stderr,"Has identity transform \n");
+     }
+
+
      for (i=0; i<triModelIn->bones[i].info->boneWeightsNumber; i++ )
      {
        //V is the vertice we will be working in this loop
@@ -223,6 +257,7 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
        normal[1]   = triModelIn->normal[v*3+1];
        normal[2]   = triModelIn->normal[v*3+2];
        normal[3]   = 1.0;
+
 
        //We transform input (initial) position with the transform we computed to get transPosition
        transform3DPointVectorUsing4x4Matrix(transPosition, finalTransforms[k].finalTransform ,position);
