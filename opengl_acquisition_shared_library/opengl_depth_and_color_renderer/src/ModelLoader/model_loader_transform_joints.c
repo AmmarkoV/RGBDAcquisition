@@ -110,12 +110,24 @@ void recursiveJointHeirarchyTransformer(
                                          unsigned int recursionLevel
                                        )
 {
-    if (recursionLevel==14) { fprintf(stderr,"reached recursion level\n"); return; }
+    unsigned int doDBGPrintout=0;
+    if (recursionLevel==40) { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT \n_____________________\n" NORMAL); return; }
     unsigned int i=0;
+
+
+    if (in->bones[curBone].info->altered)  { doDBGPrintout=1; }
+
+
+    if (doDBGPrintout)
+    {
     if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
                               { fprintf(stderr,"   "); }
-    fprintf(stderr,"(%u) " , curBone );
-    fprintf(stderr,"%s\n" , in->bones[curBone].boneName );
+     fprintf(stderr,"(%u) " , curBone );
+     fprintf(stderr,"%s\n" , in->bones[curBone].boneName );
+
+     if (in->bones[curBone].info->altered) { fprintf(stderr,GREEN "hooked  \n" NORMAL );  } else
+                                           { fprintf(stderr, RED " inactive  \n" NORMAL); }
+    }
 
 
     double nodeTransformation[16];
@@ -125,9 +137,6 @@ void recursiveJointHeirarchyTransformer(
     double * globalTransformation[16];
     create4x4IdentityMatrix(&globalTransformation);
 
-
-    if (in->bones[curBone].info->altered) { fprintf(stderr,GREEN "hooked  \n" NORMAL );  } else
-                                          { fprintf(stderr, RED " inactive  \n" NORMAL); }
 
   if (in->bones[curBone].info->altered)
     {
@@ -141,9 +150,10 @@ void recursiveJointHeirarchyTransformer(
      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
       {
         //readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+        unsigned int curBoneChild=in->bones[curBone].info->boneChild[i];
         recursiveJointHeirarchyTransformer(
                                            in  ,
-                                           in->bones[curBone].info->boneChild[i] ,
+                                           curBoneChild ,
                                            finalTransforms ,
                                            parentTransform ,
                                            jointData , jointDataSize ,
@@ -155,13 +165,17 @@ void recursiveJointHeirarchyTransformer(
       //aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
       multiplyTwo4x4Matrices(&globalTransformation,parentTransform,&nodeTransformation);
 
-      //fprintf(stderr,"        <!%s!>\n",pNode->mName.data);
+
+      //fprintf(stderr,"%s has %u children \n" , in->bones[curBone].boneName , in->bones[curBone].info->numberOfBoneChildren );
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
         // readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+        unsigned int curBoneChild=in->bones[curBone].info->boneChild[i];
+
+        //fprintf(stderr," recursing children %s (%u/%u) " , in->bones[curBoneChild].boneName , i, in->bones[curBone].info->numberOfBoneChildren );
         recursiveJointHeirarchyTransformer(
                                            in  ,
-                                           in->bones[curBone].info->boneChild[i] ,
+                                           curBoneChild ,
                                            finalTransforms ,
                                            parentTransform ,
                                            jointData , jointDataSize ,
@@ -215,10 +229,13 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
   double parentTransform[16]={0};
   create4x4IdentityMatrix(&parentTransform) ;
-  //recursiveJointHeirarchyTransformer( triModelIn , 0 , finalTransforms , parentTransform , jointData , jointDataSize , 0 );
+
+  unsigned int rootBone = 0;
+  findTRIBoneWithName(triModelIn,"JtRoot",&rootBone);
+  recursiveJointHeirarchyTransformer( triModelIn , rootBone , finalTransforms , parentTransform , jointData , jointDataSize , 0 );
 
 
-   fprintf(stderr,"Clearing vertices & normals \n");
+   //fprintf(stderr,"Clearing vertices & normals \n");
    //We NEED to clear the vertices and normals since they are added uppon , not having
    //the next two lines results in really weird and undebuggable visual behaviour
    memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
@@ -252,7 +269,6 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
        normal[1]   = triModelIn->normal[v*3+1];
        normal[2]   = triModelIn->normal[v*3+2];
        normal[3]   = 1.0;
-
 
        //We transform input (initial) position with the transform we computed to get transPosition
        transform3DPointVectorUsing4x4Matrix(transPosition, finalTransforms[k].finalTransform ,position);

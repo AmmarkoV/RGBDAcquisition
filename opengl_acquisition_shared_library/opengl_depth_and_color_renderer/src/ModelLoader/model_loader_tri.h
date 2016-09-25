@@ -89,6 +89,8 @@ int freeModelTri(struct TRI_Model * triModel);
 int loadModelTri(const char * filename , struct TRI_Model * triModel);
 int saveModelTri(const char * filename , struct TRI_Model * triModel);
 
+int findTRIBoneWithName(struct TRI_Model * triModel ,const char * name , unsigned int * boneNumResult);
+
 void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN );
 
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures);

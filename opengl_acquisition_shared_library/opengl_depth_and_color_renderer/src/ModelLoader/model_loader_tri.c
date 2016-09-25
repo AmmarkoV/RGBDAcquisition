@@ -258,13 +258,9 @@ int freeModelTri(struct TRI_Model * triModel)
 
 void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN )
 {
-  fprintf(stderr,"copyModelTriHeader ..\n");
-  triModelOUT->bones=0;
-  triModelOUT->header.numberOfBones=0;
-
-  fprintf(stderr,"Cleaning output model..\n");
+  //fprintf(stderr,"Cleaning output model..\n");
   memset(triModelOUT,0,sizeof(struct TRI_Model));
-  fprintf(stderr,"Copying header..\n");
+  //fprintf(stderr,"Copying header..\n");
   memcpy(&triModelOUT->header , &triModelIN->header , sizeof(struct TRI_Header));
 
  return;
@@ -282,31 +278,31 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
   unsigned int itemSize , count , allocationSize;
 
   itemSize=sizeof(float); count=triModelIN->header.numberOfVertices; allocationSize = itemSize * count;
-  fprintf(stderr,"Copying %u bytes of vertices ..\n", allocationSize);
+  //fprintf(stderr,"Copying %u bytes of vertices ..\n", allocationSize);
   if (triModelOUT->vertices!=0)  { free(triModelOUT->vertices); triModelOUT->vertices=0; }
   if ((triModelIN->vertices!=0) && (allocationSize>0) )  { triModelOUT->vertices = (float*) malloc(allocationSize); }
   memcpy(triModelOUT->vertices,triModelIN->vertices,allocationSize);
 
   itemSize=sizeof(float); count=triModelIN->header.numberOfNormals; allocationSize = itemSize * count;
-  fprintf(stderr,"Copying %u bytes of normals ..\n", allocationSize);
+  //fprintf(stderr,"Copying %u bytes of normals ..\n", allocationSize);
   if (triModelOUT->normal!=0)  { free(triModelOUT->normal); triModelOUT->normal=0; }
   if ((triModelIN->normal!=0) && (allocationSize>0) )  { triModelOUT->normal = (float*) malloc(allocationSize); }
   memcpy(triModelOUT->normal        , triModelIN->normal        , allocationSize);
 
   itemSize=sizeof(float); count=triModelIN->header.numberOfColors; allocationSize = itemSize * count;
-  fprintf(stderr,"Copying %u bytes of colors ..\n", allocationSize);
+  //fprintf(stderr,"Copying %u bytes of colors ..\n", allocationSize);
   if (triModelOUT->colors!=0)  { free(triModelOUT->colors); triModelOUT->colors=0; }
   if ((triModelIN->colors!=0) && (allocationSize>0) )  { triModelOUT->colors=(float*) malloc(allocationSize); }
   memcpy(triModelOUT->colors        , triModelIN->colors        , allocationSize);
 
   itemSize=sizeof(float); count=triModelIN->header.numberOfTextureCoords; allocationSize = itemSize * count;
-  fprintf(stderr,"Copying %u bytes of textures ..\n", allocationSize);
+  //fprintf(stderr,"Copying %u bytes of textures ..\n", allocationSize);
   if (triModelOUT->textureCoords!=0)  { free(triModelOUT->textureCoords); triModelOUT->textureCoords=0; }
   if ((triModelIN->textureCoords!=0) && (allocationSize>0) )  { triModelOUT->textureCoords=(float*) malloc(allocationSize); }
   memcpy(triModelOUT->textureCoords , triModelIN->textureCoords , allocationSize);
 
   itemSize=sizeof(unsigned int); count=triModelIN->header.numberOfIndices; allocationSize = itemSize * count;
-  fprintf(stderr,"Copying %u bytes of indices ..\n", allocationSize);
+  //fprintf(stderr,"Copying %u bytes of indices ..\n", allocationSize);
   if (triModelOUT->indices!=0)  { free(triModelOUT->indices); triModelOUT->indices=0; }
   if ((triModelIN->indices!=0) && (allocationSize>0) )  { triModelOUT->indices = (unsigned int*) malloc(allocationSize); }
   memcpy(triModelOUT->indices , triModelIN->indices       , allocationSize);
@@ -464,6 +460,25 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
   return 0;
 }
 
+
+int findTRIBoneWithName(struct TRI_Model * triModel ,const char * name , unsigned int * boneNumResult)
+{
+if ( (triModel->header.numberOfBones) && (triModel->bones!=0) )
+  {
+   unsigned int boneNum=0;
+   for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
+     {
+        if ( strcmp(name,triModel->bones[boneNum].boneName)==0)
+            {
+              //fprintf(stderr,GREEN "Found bone %s ( %u ) \n" NORMAL , name , boneNum);
+              *boneNumResult=boneNum;
+              return 1;
+            }
+     }
+  }
+  fprintf(stderr,RED "Could not find bone %s ( %u bones total ) \n" NORMAL , name , triModel->header.numberOfBones);
+ return 0;
+}
 
 
 
@@ -686,7 +701,7 @@ void doTriDrawCalllist(struct TRI_Model * tri )
   glBegin(GL_TRIANGLES);
     if (tri->header.numberOfIndices > 0 )
     {
-     fprintf(stderr,MAGENTA "drawing indexed TRI\n" NORMAL);
+     //fprintf(stderr,MAGENTA "drawing indexed TRI\n" NORMAL); //dbg msg to be sure what draw operation happens here..!
      unsigned int faceTriA,faceTriB,faceTriC,faceTriA_X,faceTriA_Y,faceTriA_Z,faceTriB_X,faceTriB_Y,faceTriB_Z,faceTriC_X,faceTriC_Y,faceTriC_Z;
 
      for (i = 0; i < tri->header.numberOfIndices/3; i++)
@@ -710,7 +725,7 @@ void doTriDrawCalllist(struct TRI_Model * tri )
 	 }
     } else
     {
-     fprintf(stderr,BLUE "drawing flat TRI\n" NORMAL);
+      //fprintf(stderr,BLUE "drawing flat TRI\n" NORMAL); //dbg msg to be sure what draw operation happens here..!
       for (i=0; i<tri->header.numberOfVertices/3; i++)
         {
          z=(i*3)*3;
