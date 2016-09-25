@@ -436,7 +436,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
         }
     fprintf(stderr," \n");
 
-    fprintf(stderr,"Preparing mesh %u with %u colors \n",meshNumber,mesh->mNumFaces,meshNumber);
+    fprintf(stderr,"Preparing mesh %u with %u colors \n",meshNumber,mesh->mNumFaces);
 	//xxxmesh->texture = loadmaterial(scene->mMaterials[mesh->mMaterialIndex]);
 
     unsigned int verticesSize,normalsSize,textureCoordsSize,colorSize,indexSize,bonesSize;
@@ -596,9 +596,10 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
 
 void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
-                                                                struct TRI_Model * outFlatModel ,
+                                                                struct TRI_Model * outModel ,
                                                                 struct TRI_Model * inOriginalIndexedModel ,
-                                                                struct skeletonHuman * sk
+                                                                struct skeletonHuman * sk ,
+                                                                int returnIndexedModel
                                                               )
 {
   //visualize2DSkeletonHuman("deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton.svg",sk,3.0);
@@ -608,15 +609,24 @@ void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
   copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel,0);
   fprintf(stderr,"Transforming intermediate mesh\n");
   transformMeshBasedOnSkeleton( g_scene , 0 , &temporaryIndexedDeformedModel , sk );
-  fprintf(stderr,"Flattening intermediate mesh\n");
-  fillFlatModelTriFromIndexedModelTri(outFlatModel , &temporaryIndexedDeformedModel);
 
-  fprintf(stderr,"Deallocating intermediate mesh\n");
-  deallocModelTri(&temporaryIndexedDeformedModel);
-  fprintf(stderr,"Serving back flattened mesh\n");
+
+  if (returnIndexedModel)
+  {
+   copyModelTri( outModel , &temporaryIndexedDeformedModel , 1);
+   fprintf(stderr,"Serving back indexed mesh\n");
+  }
+   else
+  {
+   fprintf(stderr,"Flattening intermediate mesh\n");
+   fillFlatModelTriFromIndexedModelTri(outModel , &temporaryIndexedDeformedModel);
+   fprintf(stderr,"Deallocating intermediate mesh\n");
+   deallocModelTri(&temporaryIndexedDeformedModel);
+   fprintf(stderr,"Serving back flattened mesh\n");
+  }
 }
 
-void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct TRI_Model * originalModel)
+void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct TRI_Model * originalModel , int returnIndexedModel)
 {
     fprintf(stderr,"Preparing scene with %u meshes\n",scene->mNumMeshes);
     if (scene->mNumMeshes>1)
@@ -625,8 +635,15 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
        fprintf(stderr,"Reading mesh from collada \n");
        prepareMesh(scene, 0,  originalModel );
 
-       fprintf(stderr,"Flattening mesh\n");
-       fillFlatModelTriFromIndexedModelTri(triModel , originalModel);
+       if (returnIndexedModel)
+       {
+        fprintf(stderr,"Giving back indexed mesh\n");
+        copyModelTri( triModel , originalModel , 1);
+       } else
+       {
+        fprintf(stderr,"Flattening mesh\n");
+        fillFlatModelTriFromIndexedModelTri(triModel , originalModel);
+       }
 
     return ;
 
@@ -655,7 +672,7 @@ int testAssimp(const char * filename  , struct TRI_Model * triModel , struct TRI
             m_GlobalInverseTransform = g_scene->mRootNode->mTransformation;
             m_GlobalInverseTransform.Inverse();
 
-            prepareScene(g_scene,triModel,originalModel);
+            prepareScene(g_scene,triModel,originalModel,1);
 
             aiReleaseImport(g_scene);
             return 1;

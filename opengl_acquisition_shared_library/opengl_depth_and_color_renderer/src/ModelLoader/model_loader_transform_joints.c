@@ -183,16 +183,18 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 {
   if (triModelIn==0) { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
 
-  printTRIBoneStructure(triModelIn);
+  //Reduce spam
+  //printTRIBoneStructure(triModelIn,0 /*Dont show all matrices*/);
 
-  if ( ( triModelOut->vertices ==0 ) || ( triModelOut->header.numberOfVertices ==0 ) )
+  if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
   {
      fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL);
     return 0;
   }
 
-  copyModelTri( triModelOut , triModelIn , 0);
-  //return 1; to test if copy works ok
+  copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
+  fprintf(stderr,RED "will not perform transform because of DEBUG..! \n" NORMAL);
+  return 1; //to test if copy works ok
 
   double transPosition[4]={0};
   double position[4]={0};
@@ -276,6 +278,6 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
 
   free(finalTransforms);
-
+ return 1;
 }
 

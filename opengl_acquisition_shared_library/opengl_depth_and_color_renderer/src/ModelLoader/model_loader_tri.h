@@ -79,7 +79,7 @@ int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj);
 #endif // HAVE_OBJ_CODE_AVAILIABLE
 
 
-void printTRIBoneStructure(struct TRI_Model * triModel);
+void printTRIBoneStructure(struct TRI_Model * triModel,int alsoPrintMatrices);
 
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
 

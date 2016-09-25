@@ -6,9 +6,10 @@
 #include "../../../../tools/Primitives/skeleton.h"
 
 void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
-                                                                struct TRI_Model * outFlatModel ,
+                                                                struct TRI_Model * outModel ,
                                                                 struct TRI_Model * inOriginalIndexedModel ,
-                                                                struct skeletonHuman * sk
+                                                                struct skeletonHuman * sk ,
+                                                                int returnIndexedModel
                                                               );
 
 int testAssimp(const char * filename  , struct TRI_Model * triModel , struct TRI_Model * originalModel);
