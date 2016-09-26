@@ -440,7 +440,7 @@ void findRootBoneOfMesh(struct aiScene *scene  , struct aiMesh * mesh , struct b
        if (!node->mParent)
        {
            //fprintf(stderr," and is parentless \n");
-           rootBone = k;
+           rootBone = k; break;
        } else
        {
            struct aiNode *parentNode = node->mParent;
@@ -448,7 +448,7 @@ void findRootBoneOfMesh(struct aiScene *scene  , struct aiMesh * mesh , struct b
            if ( strcmp(parentNode->mName.data , scene->mRootNode->mName.data)==0 )
            {
             //fprintf(stderr," Which is our root bone..! \n");
-            rootBone = k;
+            rootBone = k; break;
            }
        }
     }
