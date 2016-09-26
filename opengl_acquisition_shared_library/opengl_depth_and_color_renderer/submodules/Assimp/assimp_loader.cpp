@@ -171,6 +171,9 @@ struct aiNode *findNode(struct aiNode *node, char *name)
 	return NULL;
 }
 
+
+
+
 // find a node by name in the hierarchy (for anims and bones)
 unsigned int findBoneFromString(const aiMesh * mesh, const char *name , unsigned int * foundBone)
 {
@@ -343,6 +346,9 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
     //After we have it we can now use it to read the node heirarchy
     aiMatrix4x4 Identity;
     aiMakeIdentity(&Identity);
+
+
+    fprintf(stderr,"Root node is %s\n" , scene->mRootNode->mName.data);
     readNodeHeirarchyOLD(mesh,scene->mRootNode,&modifiedSkeleton,sk,Identity,0);
 
     //We NEED to clear the vertices and normals since they are added uppon , not having
@@ -412,6 +418,43 @@ int populateMeshChildrenFromParents(struct TRI_Model * triModel)
 }
 
 
+void findRootBoneOfMesh(struct aiScene *scene  , struct aiMesh * mesh , struct boneState * bones ,  struct TRI_Model * triModel)
+{
+ unsigned int rootBone=0 , foundRootBone=0;
+/*
+ fprintf(stderr,"TODO findRootBoneOfMesh : This is not set correctly! \n");
+ rootBone = findBoneFromString(mesh,scene->mRootNode->mName.data,&foundRootBone);
+ fprintf(stderr,"findBoneFromString says rootBone is %s (%u )  \n",triModel->bones[rootBone].boneName , rootBone );
+
+
+ findTRIBoneWithName(triModel,scene->mRootNode->mName.data,&triModel->header.rootBone);
+ fprintf(stderr,"findTRIBoneWithName says rootBone is %s (%u )  \n",triModel->bones[rootBone].boneName , rootBone );
+*/
+ //All this work to find the root bone..:(
+ unsigned int k=0;
+ for (k = 0; k < mesh->mNumBones; k++)
+    {
+       struct aiBone *bone = mesh->mBones[k];
+	   struct aiNode *node = findNode(scene->mRootNode, bone->mName.data);
+	   //fprintf(stderr,"Bone %s is associated to node %s ", bone->mName.data , node->mName.data);
+       if (!node->mParent)
+       {
+           //fprintf(stderr," and is parentless \n");
+           rootBone = k;
+       } else
+       {
+           struct aiNode *parentNode = node->mParent;
+           //fprintf(stderr," and has a parent ( %s ) \n" , parentNode->mName.data);
+           if ( strcmp(parentNode->mName.data , scene->mRootNode->mName.data)==0 )
+           {
+            //fprintf(stderr," Which is our root bone..! \n");
+            rootBone = k;
+           }
+       }
+    }
+ fprintf(stderr,"Search says root bone %s (%u )  \n",triModel->bones[rootBone].boneName , rootBone );
+ triModel->header.rootBone=rootBone;
+}
 
 
 
@@ -589,11 +632,8 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
        populateMeshChildrenFromParents(triModel);
 
-
-       fprintf(stderr,"TODO : This is not set correctly! \n");
-       findTRIBoneWithName(triModel,scene->mRootNode->mName.data,&triModel->header.rootBone);
-
-
+       //Final Step get Root Bone..!
+       findRootBoneOfMesh( scene  , mesh , &bones ,  triModel);
     }
 }
 
