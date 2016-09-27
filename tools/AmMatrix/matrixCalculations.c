@@ -107,6 +107,7 @@ int rayIntersectsRectangle(float *p, float *d,float *v0, float *v1, float *v2, f
    return 0;
 }
 
+/*
 //http://ilab.usc.edu/wiki/index.php/Fast_Square_Root
 static inline float sqrt_fast_approximation(const float x)
 {
@@ -120,7 +121,7 @@ static inline float sqrt_fast_approximation(const float x)
   u.i = (1<<29) + (u.i >> 1) - (1<<22);
   return u.x;
 }
-
+*/
 
 
 

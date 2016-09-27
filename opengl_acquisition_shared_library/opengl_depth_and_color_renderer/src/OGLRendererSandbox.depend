@@ -38,7 +38,7 @@
 	"solveLinearSystemGJ.h"
 	"solveHomography.h"
 
-1474756422 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixCalculations.h
+1475016213 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixCalculations.h
 
 1438089946 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/quaternions.h
 
@@ -301,7 +301,7 @@
 	"../tools.h"
 	"../../../../tools/AmMatrix/matrixCalculations.h"
 
-1474805620 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
+1474840656 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
 	<GL/gl.h>
 	<GL/glx.h>
 	<GL/glu.h>
@@ -400,7 +400,7 @@
 
 1458492977 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/image.h
 
-1474839864 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c
+1474847394 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c
 	"model_loader_tri.h"
 	<stdio.h>
 	<stdlib.h>
@@ -408,7 +408,7 @@
 	<GL/gl.h>
 	<GL/glx.h>
 
-1474846959 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h
+1475010863 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h
 	"model_loader_setup.h"
 	"model_loader_obj.h"
 
@@ -431,12 +431,15 @@
 	<stdio.h>
 	<stdlib.h>
 
-1474839620 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.c
+1475016181 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.c
 	"model_loader.h"
 	"model_loader_tri.h"
 	"model_loader_transform_joints.h"
 	<stdio.h>
 	<stdlib.h>
+	<string.h>
+	"../../../../tools/AmMatrix/matrixCalculations.h"
+	"../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 1473871496 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h
 

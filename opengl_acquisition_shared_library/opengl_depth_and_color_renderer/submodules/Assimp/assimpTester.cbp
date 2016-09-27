@@ -39,6 +39,8 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../src/ModelLoader/model_loader_tri.h" />
+		<Unit filename="assimp_compare_to_tri.cpp" />
+		<Unit filename="assimp_compare_to_tri.h" />
 		<Unit filename="assimp_loader.cpp" />
 		<Unit filename="assimp_loader.h" />
 		<Unit filename="assimp_main.cpp" />

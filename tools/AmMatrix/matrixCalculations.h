@@ -242,7 +242,23 @@ int rayIntersectsRectangle(float *p, float *d,float *v0, float *v1, float *v2, f
 * @bug Using an approximation of the sqrt is fast , but it should only be used for approximations and not accurate results
 Found at : http://ilab.usc.edu/wiki/index.php/Fast_Square_Root
 */
-static inline float sqrt_fast_approximation(const float x);
+//static inline float sqrt_fast_approximation(const float x);
+//http://ilab.usc.edu/wiki/index.php/Fast_Square_Root
+static inline float sqrt_fast_approximation(const float x)
+{
+  union
+  {
+    int i;
+    float x;
+  } u;
+
+  u.x = x;
+  u.i = (1<<29) + (u.i >> 1) - (1<<22);
+  return u.x;
+}
+
+
+
 
 
 /**

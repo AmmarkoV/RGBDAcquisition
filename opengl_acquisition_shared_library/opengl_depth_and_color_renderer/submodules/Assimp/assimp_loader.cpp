@@ -304,10 +304,7 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
                NodeTransformation =  bones->bone[boneNumber].translationMat  * bones->bone[boneNumber].rotationMat * bones->bone[boneNumber].scalingMat;
               } else
               {
-               fprintf(stderr, RED " inactive %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" NORMAL ,jointNames[i] ,
-                       sk->relativeJointAngle[i].x,
-                       sk->relativeJointAngle[i].y,
-                       sk->relativeJointAngle[i].z);
+                // fprintf(stderr, RED " inactive %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" NORMAL ,jointNames[i] , sk->relativeJointAngle[i].x, sk->relativeJointAngle[i].y, sk->relativeJointAngle[i].z);
               }
             }
         }
@@ -604,11 +601,11 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
        rm[12]=0.0; rm[13]=0.0; rm[14]=0.0; rm[15]=1.0;
 
        rm = triModel->bones[i].info->boneTransformation;
-       rm[0]=1.0;  rm[1]=0.0;  rm[2]=0.0;  rm[3]=0.0;
-       rm[4]=0.0;  rm[5]=1.0;  rm[6]=0.0;  rm[7]=0.0;
-       rm[8]=0.0;  rm[9]=0.0;  rm[10]=1.0; rm[11]=0.0;
-       rm[12]=0.0; rm[13]=0.0; rm[14]=0.0; rm[15]=1.0;
-
+       am = &bones.bone[i].nodeTransformInitial;
+       rm[0]=am->a1; rm[1]=am->a2;  rm[2]=am->a3;  rm[3]=am->a4;
+       rm[4]=am->b1; rm[5]=am->b2;  rm[6]=am->b3;  rm[7]=am->b4;
+       rm[8]=am->c1; rm[9]=am->c2;  rm[10]=am->c3; rm[11]=am->c4;
+       rm[12]=am->d1;rm[13]=am->d2; rm[14]=am->d3; rm[15]=am->d4;
 
 
        triModel->bones[i].boneName = (char* ) malloc(sizeof(char) * (1+triModel->bones[i].info->boneNameSize) );

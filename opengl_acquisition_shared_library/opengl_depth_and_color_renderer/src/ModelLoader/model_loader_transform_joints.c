@@ -4,8 +4,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
+#include "../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -110,42 +113,22 @@ void recursiveJointHeirarchyTransformer(
                                          unsigned int recursionLevel
                                        )
 {
-    unsigned int doDBGPrintout=0;
-    if (recursionLevel==40) { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT \n_____________________\n" NORMAL); return; }
+    if (recursionLevel>=40) { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT \n_____________________\n" NORMAL); return; }
     unsigned int i=0;
 
-
-    if (in->bones[curBone].info->altered)  { doDBGPrintout=1; }
-
-
-    if (doDBGPrintout)
-    {
-    if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
-                              { fprintf(stderr,"   "); }
-     fprintf(stderr,"(%u) " , curBone );
-     fprintf(stderr,"%s\n" , in->bones[curBone].boneName );
-
-     if (in->bones[curBone].info->altered) { fprintf(stderr,GREEN "hooked  \n" NORMAL );  } else
-                                           { fprintf(stderr, RED " inactive  \n" NORMAL); }
-    }
-
-
-    double nodeTransformation[16];
-    create4x4IdentityMatrix(&nodeTransformation) ;
-
-
-    double * globalTransformation[16];
-    create4x4IdentityMatrix(&globalTransformation);
+    double globalTransformation[16] , nodeTransformation[16];
+    create4x4IdentityMatrix(nodeTransformation) ;
+    create4x4IdentityMatrix(globalTransformation);
 
 
   if (in->bones[curBone].info->altered)
     {
       //aiMatrix4x4 GlobalTransformation = ParentTransform  * NodeTransformation;
-      multiplyTwo4x4Matrices(&globalTransformation,parentTransform,&nodeTransformation);
+      multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
 
 
       double * finalMatrix = finalTransforms[i].finalTransform;
-      multiplyThree4x4Matrices( finalMatrix, &globalTransformation,parentTransform,&nodeTransformation);
+      multiplyThree4x4Matrices( finalMatrix, globalTransformation,parentTransform,nodeTransformation);
       //bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
       {
@@ -163,7 +146,7 @@ void recursiveJointHeirarchyTransformer(
     } else
     {
       //aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
-      multiplyTwo4x4Matrices(&globalTransformation,parentTransform,&nodeTransformation);
+      multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
 
 
       //fprintf(stderr,"%s has %u children \n" , in->bones[curBone].boneName , in->bones[curBone].info->numberOfBoneChildren );
@@ -195,51 +178,45 @@ void recursiveJointHeirarchyTransformer(
 
 int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize)
 {
-  if (triModelIn==0) { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
-
-  //Reduce spam
-  //printTRIBoneStructure(triModelIn,0 /*Dont show all matrices*/);
+  if (triModelIn==0)
+                     { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
   if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
-  {
-     fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL);
-    return 0;
-  }
+                     { fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL); return 0; }
+  //Past checks..
 
-  copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
-  //fprintf(stderr,RED "will not perform transform because of DEBUG..! \n" NORMAL);
-  //return 1; //to test if copy works ok
+ struct TRI_Transform * finalTransforms = (struct TRI_Transform * ) malloc( triModelIn->header.numberOfBones * sizeof(struct TRI_Transform) );
+ if (finalTransforms==0) { return 0; }
 
-  double transPosition[4]={0}; double transNormal[4]={0};
-  double position[4]={0}; double normal[4]={0};
+ copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
+
+ double transPosition[4]={0} ,transNormal[4]={0} , position[4]={0} , normal[4]={0};
 
 
-   struct TRI_Transform * finalTransforms = (struct TRI_Transform * ) malloc( triModelIn->header.numberOfBones * sizeof(struct TRI_Transform) );
-   if (finalTransforms==0) { return 0; }
-   unsigned int i=0;
-
-   double * finalMatrix;
-   for (i=0; i<triModelIn->header.numberOfBones; i++)
+ unsigned int i=0;
+ for (i=0; i<triModelIn->header.numberOfBones; i++)
    {
-     //fprintf(stderr,"Final Matrix %u \n" , i);
-     finalMatrix = finalTransforms[i].finalTransform;
-     create4x4IdentityMatrix(finalMatrix);
-     //print4x4DMatrix(" data ", finalMatrix);
+     double * finalMatrix = finalTransforms[i].finalTransform;
+     //create4x4IdentityMatrix(finalMatrix);
+     unsigned int k=0;
+     for (k=0; k<16; k++)
+     {
+       finalMatrix[k] = jointData[i*16+k];
+     }
    }
 
 
   double parentTransform[16]={0};
-  create4x4IdentityMatrix(&parentTransform) ;
+  create4x4IdentityMatrix(parentTransform) ;
 
-  //findTRIBoneWithName(triModelIn,"JtRoot",&rootBone);
-  fprintf(stderr,"Root Bone is %s (%u) \n",triModelIn->bones[triModelIn->header.rootBone].boneName , triModelIn->header.rootBone );
-  recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone , finalTransforms , parentTransform , jointData , jointDataSize , 0 );
+   //This recursively calculates all matrix transforms and prepares the correct matrices
+   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone , finalTransforms , parentTransform , jointData , jointDataSize , 0 );
+   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-
-   //fprintf(stderr,"Clearing vertices & normals \n");
-   //We NEED to clear the vertices and normals since they are added uppon , not having
-   //the next two lines results in really weird and undebuggable visual behaviour
-   memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
-   memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
+  //We NEED to clear the vertices and normals since they are added uppon , not having
+  //the next two lines results in really weird and undebuggable visual behaviour
+  memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
+  memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
 
 
 
@@ -247,11 +224,8 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
    unsigned int k=0;
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
-     //fprintf(stderr,"%u ",k);
-     //if (is4x4DIdentityMatrix(finalTransforms[k].finalTransform ))
-     //{ fprintf(stderr,"Has identity transform \n"); }
-
-
+     if (!is4x4DIdentityMatrix(finalTransforms[k].finalTransform ))
+      { fprintf(stderr,"%u (%s) Has transform \n",k , triModelIn->bones[k].boneName); }
      for (i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
      {
        //V is the vertice we will be working in this loop
