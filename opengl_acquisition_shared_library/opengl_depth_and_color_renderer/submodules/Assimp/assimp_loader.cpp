@@ -386,6 +386,7 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
 
 int populateMeshChildrenFromParents(struct TRI_Model * triModel)
 {
+ fprintf(stderr,"populateMeshChildrenFromParents does not produce correct results \n");
  unsigned int i=0;
  unsigned int numberOfBones = triModel->header.numberOfBones;
 
@@ -415,18 +416,69 @@ int populateMeshChildrenFromParents(struct TRI_Model * triModel)
 }
 
 
+int findBoneNumFromAINode(const aiNode * pNode , struct aiMesh * mesh , unsigned int * boneNum)
+{
+    unsigned int k=0;
+  for (k = 0; k < mesh->mNumBones; k++)
+    {
+       struct aiBone *bone = mesh->mBones[k];
+       if (strcmp(pNode->mName.data , bone->mName.data)==0)
+              {
+                *boneNum = k;
+                return 1;
+              }
+
+    }
+ return 0;
+}
+
+
+void cloneChildrenTree(struct aiScene *scene  ,struct aiMesh * mesh , const aiNode* pNode , unsigned int depth ,  struct TRI_Model * triModel)
+{
+  unsigned int i=0 , boneParent=0 , boneChild=0;
+
+
+  fprintf(stderr,"%s has %u children : " , pNode->mName.data  , pNode->mNumChildren);
+     for ( i = 0 ; i < pNode->mNumChildren ; i++)
+        {
+            fprintf(stderr,"%s " , pNode->mChildren[i]->mName.data);
+        }
+  fprintf(stderr,"\n");
+
+
+  if (findBoneNumFromAINode(pNode , mesh , &boneParent))
+  {
+     triModel->bones[boneParent].info->numberOfBoneChildren = pNode->mNumChildren;
+     for ( i = 0 ; i < pNode->mNumChildren ; i++)
+        {
+          if (findBoneNumFromAINode(pNode->mChildren[i] , mesh , &boneChild))
+           {
+            triModel->bones[boneParent].info->boneChild[i]=boneChild;
+           } else
+           {
+            fprintf(stderr,"        Node %s(child) does not match a bone\n" ,  pNode->mChildren[i]->mName.data);
+           }
+        }
+  } else
+  {
+    fprintf(stderr,"         Node %s(parent) does not match a bone \n" ,  pNode->mName.data);
+  }
+
+ //Recurse down..
+ for ( i = 0 ; i < pNode->mNumChildren ; i++)
+        {
+          cloneChildrenTree(scene,mesh,pNode->mChildren[i],depth+1,triModel);
+        }
+ }
+
+
+
+
+
+
 void findRootBoneOfMesh(struct aiScene *scene  , struct aiMesh * mesh , struct boneState * bones ,  struct TRI_Model * triModel)
 {
  unsigned int rootBone=0 , foundRootBone=0;
-/*
- fprintf(stderr,"TODO findRootBoneOfMesh : This is not set correctly! \n");
- rootBone = findBoneFromString(mesh,scene->mRootNode->mName.data,&foundRootBone);
- fprintf(stderr,"findBoneFromString says rootBone is %s (%u )  \n",triModel->bones[rootBone].boneName , rootBone );
-
-
- findTRIBoneWithName(triModel,scene->mRootNode->mName.data,&triModel->header.rootBone);
- fprintf(stderr,"findTRIBoneWithName says rootBone is %s (%u )  \n",triModel->bones[rootBone].boneName , rootBone );
-*/
  //All this work to find the root bone..:(
  unsigned int k=0;
  for (k = 0; k < mesh->mNumBones; k++)
@@ -452,6 +504,10 @@ void findRootBoneOfMesh(struct aiScene *scene  , struct aiMesh * mesh , struct b
  fprintf(stderr,"Search says root bone %s (%u )  \n",triModel->bones[rootBone].boneName , rootBone );
  triModel->header.rootBone=rootBone;
 }
+
+
+
+
 
 
 
@@ -627,10 +683,15 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 	     }
       }
 
-       populateMeshChildrenFromParents(triModel);
+       //This doesn't work
+       //populateMeshChildrenFromParents(triModel);
+       cloneChildrenTree( scene  , mesh , scene->mRootNode , 0 ,  triModel);
 
        //Final Step get Root Bone..!
        findRootBoneOfMesh( scene  , mesh , &bones ,  triModel);
+
+       fprintf(stderr,"Doing printout of final bone structure as stored.. \n");
+       printTRIBoneStructure(triModel, 0);
     }
 }
 

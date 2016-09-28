@@ -15,94 +15,6 @@
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
-/*
-
-
-
-void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
-{
-
-    if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
-                              {  fprintf(stderr,"   "); }
-    fprintf(stderr,"%s\n" , pNode->mName.data);
-
-    aiMatrix4x4 NodeTransformation=pNode->mTransformation;
-
-
-    unsigned int foundBone;
-    unsigned int boneNumber=findBoneFromString(mesh,pNode->mName.data,&foundBone);
-
-
-    unsigned int i=0;
-    if (foundBone)
-    {
-    for (i=0; i<HUMAN_SKELETON_PARTS; i++)
-        {
-            if (strcmp(pNode->mName.data , smartBodyNames[i])==0)
-              {
-               if ( sk->active[i] )
-               {
-               fprintf(stderr,GREEN "hooked with %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" NORMAL,jointNames[i] , sk->relativeJointAngle[i].x, sk->relativeJointAngle[i].y, sk->relativeJointAngle[i].z);
-               bones->bone[boneNumber].ScalingVec.x=1.0;
-               bones->bone[boneNumber].ScalingVec.y=1.0;
-               bones->bone[boneNumber].ScalingVec.z=1.0;
-
-               bones->bone[boneNumber].TranslationVec.x=pNode->mTransformation.a4;
-               bones->bone[boneNumber].TranslationVec.y=pNode->mTransformation.b4;
-               bones->bone[boneNumber].TranslationVec.z=pNode->mTransformation.c4;
-
-              aiMatrix4x4::Scaling(bones->bone[boneNumber].ScalingVec,bones->bone[boneNumber].scalingMat);
-              aiMatrix4x4::Translation (bones->bone[boneNumber].TranslationVec,bones->bone[boneNumber].translationMat);
-              //aiMakeQuaternion( &bones.bone[k].rotationMat , &bones.bone[k].RotationQua );
-              //aiPrintMatrix(&bones->bone[boneNumber].rotationMat );
-
-
-               //zxy 120 - xyz 012
-
-               bones->bone[boneNumber].rotationMat.FromEulerAnglesXYZ(
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].z + defaultJointsOffsetZXY[i*3+2] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].x + defaultJointsOffsetZXY[i*3+0] ),
-                                                                      degrees_to_rad ( sk->relativeJointAngle[i].y + defaultJointsOffsetZXY[i*3+1] )
-                                                                      );
-
-
-               NodeTransformation =  bones->bone[boneNumber].translationMat  * bones->bone[boneNumber].rotationMat * bones->bone[boneNumber].scalingMat;
-              } else
-              {
-               fprintf(stderr, RED " inactive %s ( r.x=%0.2f r.y=%0.2f r.z=%0.2f ) !\n" NORMAL ,jointNames[i] ,
-                       sk->relativeJointAngle[i].x,
-                       sk->relativeJointAngle[i].y,
-                       sk->relativeJointAngle[i].z);
-              }
-            }
-        }
-
-    aiMatrix4x4 GlobalTransformation = ParentTransform  * NodeTransformation;
-    bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
-    for ( i = 0 ; i < pNode->mNumChildren ; i++)
-    {
-        readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
-    }
-    } else
-    {
-      aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
-      fprintf(stderr,"        <!%s!>\n",pNode->mName.data);
-       for ( i = 0 ; i < pNode->mNumChildren ; i++)
-       {
-         readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
-       }
-    }
-}
-
-
-*/
-
-
-
-
-
-
-
 
 void recursiveJointHeirarchyTransformer(
                                          struct TRI_Model * in  ,
@@ -124,11 +36,29 @@ void recursiveJointHeirarchyTransformer(
   if (in->bones[curBone].info->altered)
     {
       //aiMatrix4x4 GlobalTransformation = ParentTransform  * NodeTransformation;
+      print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->boneTransformation);
+
+      double translation[16] , rotation[16] , scaling[16];
+      create4x4IdentityMatrix(translation) ;
+      create4x4IdentityMatrix(rotation);
+      create4x4IdentityMatrix(scaling);
+
+      //Get Translation
+      translation[3] =in->bones[curBone].info->boneTransformation[3];
+      translation[7] =in->bones[curBone].info->boneTransformation[7];
+      translation[11]=in->bones[curBone].info->boneTransformation[11];
+
+      multiplyThree4x4Matrices( nodeTransformation, translation,rotation,scaling);
+
+
+      print4x4DMatrixTRI("Translation was .. ",translation);
+      print4x4DMatrixTRI("Scaling was .. ",scaling);
+      print4x4DMatrixTRI("Rotation was .. ",rotation);
+      print4x4DMatrixTRI("Node Transformation is now.. \n",nodeTransformation);
+
       multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
 
-
-      double * finalMatrix = finalTransforms[i].finalTransform;
-      multiplyThree4x4Matrices( finalMatrix, globalTransformation,parentTransform,nodeTransformation);
+      multiplyThree4x4Matrices( finalTransforms[i].finalTransform, globalTransformation,parentTransform,nodeTransformation);
       //bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
       {
@@ -145,11 +75,16 @@ void recursiveJointHeirarchyTransformer(
       }
     } else
     {
+      fprintf(stderr,"Unedited bone %u " , curBone);
+      fprintf(stderr,"%s has %u children \n" , in->bones[curBone].boneName , in->bones[curBone].info->numberOfBoneChildren );
+            for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
+       { fprintf(stderr," %s " , in->bones[in->bones[curBone].info->boneChild[i]].boneName );   }
+      fprintf(stderr,"\n");
+
       //aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
       multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
 
 
-      //fprintf(stderr,"%s has %u children \n" , in->bones[curBone].boneName , in->bones[curBone].info->numberOfBoneChildren );
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
         // readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
@@ -168,10 +103,6 @@ void recursiveJointHeirarchyTransformer(
     }
 
 }
-
-
-
-
 
 
 
@@ -202,6 +133,10 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
      {
        finalMatrix[k] = jointData[i*16+k];
      }
+
+     if (!is4x4DIdentityMatrix(finalMatrix))
+        { triModelIn->bones[i].info->altered=1; } else
+        { triModelIn->bones[i].info->altered=0; }
    }
 
 
@@ -224,8 +159,10 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
    unsigned int k=0;
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
-     if (!is4x4DIdentityMatrix(finalTransforms[k].finalTransform ))
-      { fprintf(stderr,"%u (%s) Has transform \n",k , triModelIn->bones[k].boneName); }
+     if (triModelIn->bones[k].info->altered)
+          { fprintf(stderr,"%u (%s) altered \n",k , triModelIn->bones[k].boneName); }
+
+
      for (i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
      {
        //V is the vertice we will be working in this loop
