@@ -204,11 +204,10 @@ void transformNodeWithAllParentTransforms(  aiMatrix4x4 *result, struct aiNode *
 	}
 }
 
-void populateInternalRigState(struct aiScene *scene , int meshNumber, struct boneState * bones )
+void populateInternalRigState(struct aiScene *scene ,  struct aiMesh * mesh , struct boneState * bones )
 {
   //fprintf(stderr,"Populating internal rig state \n" );
   unsigned int i=0 , k=0;
-  struct aiMesh * mesh = scene->mMeshes[meshNumber];
 
   bones->numberOfBones = mesh->mNumBones;
 
@@ -337,7 +336,7 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
 
     //The first step to do is create an internal structure and gather all the data out of Assimp
     struct boneState modifiedSkeleton;
-    populateInternalRigState(scene , meshNumber, &modifiedSkeleton );
+    populateInternalRigState(scene , scene->mMeshes[meshNumber] , &modifiedSkeleton );
 
 
     //After we have it we can now use it to read the node heirarchy
@@ -506,124 +505,37 @@ void findRootBoneOfMesh(struct aiScene *scene  , struct aiMesh * mesh , struct b
 }
 
 
-
-
-
-
-
-
-void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * triModel )
+void countNumberOfNodesInternal(struct aiNode *node , unsigned int * numberOfNodes)
 {
-    struct aiMesh * mesh = scene->mMeshes[meshNumber];
+  (*numberOfNodes)++;
 
-    fprintf(stderr,"Preparing mesh %u   \n",meshNumber);
-    fprintf(stderr,"  %u vertices \n",mesh->mNumVertices);
-    fprintf(stderr,"  %u normals \n",mesh->mNumVertices);
-    fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
-    fprintf(stderr,"  %d bones\n",mesh->mNumBones);
-
-
-
-    fprintf(stderr,"%u color sets",AI_MAX_NUMBER_OF_COLOR_SETS);
-    unsigned int colourSet = 0;
-        for (colourSet = 0; colourSet< AI_MAX_NUMBER_OF_COLOR_SETS; colourSet++)
+  unsigned int i=0;
+   for ( i = 0 ; i < node->mNumChildren ; i++)
         {
-          fprintf(stderr," c%u ",colourSet);
+          countNumberOfNodesInternal(node,numberOfNodes);
         }
-    fprintf(stderr," \n");
 
-    fprintf(stderr,"Preparing mesh %u with %u colors \n",meshNumber,mesh->mNumFaces);
-	//xxxmesh->texture = loadmaterial(scene->mMaterials[mesh->mMaterialIndex]);
+}
 
-    unsigned int verticesSize,normalsSize,textureCoordsSize,colorSize,indexSize,bonesSize;
-
-    triModel->header.numberOfVertices      = mesh->mNumVertices*3;    verticesSize     =triModel->header.numberOfVertices      * sizeof(float);
-    triModel->header.numberOfNormals       = mesh->mNumVertices*3;    normalsSize      =triModel->header.numberOfNormals       * sizeof(float);
-    triModel->header.numberOfTextureCoords = mesh->mNumVertices*2;    textureCoordsSize=triModel->header.numberOfTextureCoords * sizeof(float);
-    triModel->header.numberOfColors        = mesh->mNumVertices*3;    colorSize        =triModel->header.numberOfColors        * sizeof(float);
-    triModel->header.numberOfIndices       = mesh->mNumFaces*3;       indexSize        =triModel->header.numberOfIndices       * sizeof(unsigned int);
-    triModel->header.numberOfBones         = mesh->mNumBones;         bonesSize        =triModel->header.numberOfBones         * sizeof(struct TRI_Bones);
-
-    double * gm = triModel->header.boneGlobalInverseTransform;
-    gm[0]=m_GlobalInverseTransform.a1;  gm[1]=m_GlobalInverseTransform.a2;  gm[2]=m_GlobalInverseTransform.a3;  gm[3]=m_GlobalInverseTransform.a4;
-    gm[4]=m_GlobalInverseTransform.b1;  gm[5]=m_GlobalInverseTransform.b2;  gm[6]=m_GlobalInverseTransform.b3;  gm[7]=m_GlobalInverseTransform.b4;
-    gm[8]=m_GlobalInverseTransform.c1;  gm[9]=m_GlobalInverseTransform.c2;  gm[10]=m_GlobalInverseTransform.c3; gm[11]=m_GlobalInverseTransform.c4;
-    gm[12]=m_GlobalInverseTransform.d1; gm[13]=m_GlobalInverseTransform.d2; gm[14]=m_GlobalInverseTransform.d3; gm[15]=m_GlobalInverseTransform.d4;
+unsigned int countNumberOfNodes(struct aiScene *scene  , struct aiMesh * mesh )
+{
+  unsigned int numberOfNodes = 0;
+  countNumberOfNodesInternal(scene->mRootNode , &numberOfNodes);
+  return numberOfNodes;
+}
 
 
-   //fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
+void prepareNodeStructureOfMesh(struct aiScene *scene , struct aiMesh * mesh , struct TRI_Model * triModel )
+{
 
-	triModel->vertices      = (float*)            malloc( verticesSize );
-	triModel->normal        = (float*)            malloc( normalsSize );
-	triModel->textureCoords = (float*)            malloc( textureCoordsSize );
-    triModel->colors        = (float*)            malloc( colorSize );
-    triModel->indices       = (unsigned int*)     malloc( indexSize );
-
-
-    fprintf(stderr,"Allocating :   \n");
-    fprintf(stderr,"  %u bytes of vertices \n",verticesSize);
-    fprintf(stderr,"  %u bytes of normals \n",normalsSize);
-    fprintf(stderr,"  %d bytes of textureCoords \n",textureCoordsSize);
-    fprintf(stderr,"  %d bytes of colors\n",colorSize);
-    fprintf(stderr,"  %d bytes of indices\n",indexSize);
+    triModel->header.numberOfBones         = countNumberOfNodes( scene  , mesh );
+    unsigned int bonesSize                 =triModel->header.numberOfBones         * sizeof(struct TRI_Bones);
     fprintf(stderr,"  %d bytes of bones\n",bonesSize);
 
-    memset(triModel->vertices, 0 , verticesSize );
-    memset(triModel->normal, 0 , normalsSize );
-    memset(triModel->textureCoords, 0 , textureCoordsSize );
-    memset(triModel->colors, 0 , colorSize );
-    memset(triModel->indices, 0 , indexSize );
-
-    unsigned int i=0,k=0;
-	for (i = 0; i < mesh->mNumVertices; i++)
-    {
-	    triModel->vertices[(i*3)+0] = mesh->mVertices[i].x;
-	    triModel->vertices[(i*3)+1] = mesh->mVertices[i].y;
-	    triModel->vertices[(i*3)+2] = mesh->mVertices[i].z;
-      if (mesh->mNormals)
-        {
-		 triModel->normal[(i*3)+0] = mesh->mNormals[i].x;
-		 triModel->normal[(i*3)+1] = mesh->mNormals[i].y;
-		 triModel->normal[(i*3)+2] = mesh->mNormals[i].z;
-        }
-
-      if (mesh->mTextureCoords[0])
-        {
-		 triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[0][i].x;
-		 triModel->textureCoords[(i*2)+1] = 1 - mesh->mTextureCoords[0][i].y;
-		}
-
-        unsigned int colourSet = 0;
-        //for (colourSet = 0; colourSet< AI_MAX_NUMBER_OF_COLOR_SETS; colourSet++)
-        {
-          if(mesh->HasVertexColors(colourSet))
-         {
-          triModel->colors[(i*3)+0] = mesh->mColors[colourSet][i].r;
-          triModel->colors[(i*3)+1] = mesh->mColors[colourSet][i].g;
-          triModel->colors[(i*3)+2] = mesh->mColors[colourSet][i].b;
-         }
-       }
-	}
-
-   for (i = 0; i < mesh->mNumFaces; i++)
-    {
-		struct aiFace *face = mesh->mFaces + i;
-
-        if (face->mNumIndices==3)
-		 {
-		  triModel->indices[(i*3)+0] = face->mIndices[0];
-		  triModel->indices[(i*3)+1] = face->mIndices[1];
-		  triModel->indices[(i*3)+2] = face->mIndices[2];
-         } else
-         { fprintf(stderr," \n\n\n\n\n Non triangulated face %u \n\n\n\n\n",face->mNumIndices); }
-
-    }
-
-
     //Bones now..
-    unsigned int bufSize;
+    unsigned int i,k,bufSize;
     struct boneState bones;
-    populateInternalRigState(scene , meshNumber, &bones);
+    populateInternalRigState(scene , mesh , &bones);
     if (triModel->header.numberOfBones>0)
     {
       triModel->bones         = (struct TRI_Bones*) malloc( bonesSize );
@@ -693,6 +605,120 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
        fprintf(stderr,"Doing printout of final bone structure as stored.. \n");
        printTRIBoneStructure(triModel, 0);
     }
+
+}
+
+
+
+void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * triModel )
+{
+    struct aiMesh * mesh = scene->mMeshes[meshNumber];
+
+    fprintf(stderr,"Preparing mesh %u   \n",meshNumber);
+    fprintf(stderr,"  %u vertices \n",mesh->mNumVertices);
+    fprintf(stderr,"  %u normals \n",mesh->mNumVertices);
+    fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
+    fprintf(stderr,"  %d bones\n",mesh->mNumBones);
+
+
+
+    fprintf(stderr,"%u color sets",AI_MAX_NUMBER_OF_COLOR_SETS);
+    unsigned int colourSet = 0;
+        for (colourSet = 0; colourSet< AI_MAX_NUMBER_OF_COLOR_SETS; colourSet++)
+        {
+          fprintf(stderr," c%u ",colourSet);
+        }
+    fprintf(stderr," \n");
+
+    fprintf(stderr,"Preparing mesh %u with %u colors \n",meshNumber,mesh->mNumFaces);
+	//xxxmesh->texture = loadmaterial(scene->mMaterials[mesh->mMaterialIndex]);
+
+    unsigned int verticesSize,normalsSize,textureCoordsSize,colorSize,indexSize;
+
+    triModel->header.numberOfVertices      = mesh->mNumVertices*3;    verticesSize     =triModel->header.numberOfVertices      * sizeof(float);
+    triModel->header.numberOfNormals       = mesh->mNumVertices*3;    normalsSize      =triModel->header.numberOfNormals       * sizeof(float);
+    triModel->header.numberOfTextureCoords = mesh->mNumVertices*2;    textureCoordsSize=triModel->header.numberOfTextureCoords * sizeof(float);
+    triModel->header.numberOfColors        = mesh->mNumVertices*3;    colorSize        =triModel->header.numberOfColors        * sizeof(float);
+    triModel->header.numberOfIndices       = mesh->mNumFaces*3;       indexSize        =triModel->header.numberOfIndices       * sizeof(unsigned int);
+    triModel->header.numberOfBones         = 0;                       //bonesSize        =0; //Initially no bones allocated this will be done later..!
+
+    double * gm = triModel->header.boneGlobalInverseTransform;
+    gm[0]=m_GlobalInverseTransform.a1;  gm[1]=m_GlobalInverseTransform.a2;  gm[2]=m_GlobalInverseTransform.a3;  gm[3]=m_GlobalInverseTransform.a4;
+    gm[4]=m_GlobalInverseTransform.b1;  gm[5]=m_GlobalInverseTransform.b2;  gm[6]=m_GlobalInverseTransform.b3;  gm[7]=m_GlobalInverseTransform.b4;
+    gm[8]=m_GlobalInverseTransform.c1;  gm[9]=m_GlobalInverseTransform.c2;  gm[10]=m_GlobalInverseTransform.c3; gm[11]=m_GlobalInverseTransform.c4;
+    gm[12]=m_GlobalInverseTransform.d1; gm[13]=m_GlobalInverseTransform.d2; gm[14]=m_GlobalInverseTransform.d3; gm[15]=m_GlobalInverseTransform.d4;
+
+
+   //fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
+
+	triModel->vertices      = (float*)            malloc( verticesSize );
+	triModel->normal        = (float*)            malloc( normalsSize );
+	triModel->textureCoords = (float*)            malloc( textureCoordsSize );
+    triModel->colors        = (float*)            malloc( colorSize );
+    triModel->indices       = (unsigned int*)     malloc( indexSize );
+
+
+    fprintf(stderr,"Allocating :   \n");
+    fprintf(stderr,"  %u bytes of vertices \n",verticesSize);
+    fprintf(stderr,"  %u bytes of normals \n",normalsSize);
+    fprintf(stderr,"  %d bytes of textureCoords \n",textureCoordsSize);
+    fprintf(stderr,"  %d bytes of colors\n",colorSize);
+    fprintf(stderr,"  %d bytes of indices\n",indexSize);
+
+    memset(triModel->vertices, 0 , verticesSize );
+    memset(triModel->normal, 0 , normalsSize );
+    memset(triModel->textureCoords, 0 , textureCoordsSize );
+    memset(triModel->colors, 0 , colorSize );
+    memset(triModel->indices, 0 , indexSize );
+
+    unsigned int i=0,k=0;
+	for (i = 0; i < mesh->mNumVertices; i++)
+    {
+	    triModel->vertices[(i*3)+0] = mesh->mVertices[i].x;
+	    triModel->vertices[(i*3)+1] = mesh->mVertices[i].y;
+	    triModel->vertices[(i*3)+2] = mesh->mVertices[i].z;
+      if (mesh->mNormals)
+        {
+		 triModel->normal[(i*3)+0] = mesh->mNormals[i].x;
+		 triModel->normal[(i*3)+1] = mesh->mNormals[i].y;
+		 triModel->normal[(i*3)+2] = mesh->mNormals[i].z;
+        }
+
+      if (mesh->mTextureCoords[0])
+        {
+		 triModel->textureCoords[(i*2)+0] = mesh->mTextureCoords[0][i].x;
+		 triModel->textureCoords[(i*2)+1] = 1 - mesh->mTextureCoords[0][i].y;
+		}
+
+        unsigned int colourSet = 0;
+        //for (colourSet = 0; colourSet< AI_MAX_NUMBER_OF_COLOR_SETS; colourSet++)
+        {
+          if(mesh->HasVertexColors(colourSet))
+         {
+          triModel->colors[(i*3)+0] = mesh->mColors[colourSet][i].r;
+          triModel->colors[(i*3)+1] = mesh->mColors[colourSet][i].g;
+          triModel->colors[(i*3)+2] = mesh->mColors[colourSet][i].b;
+         }
+       }
+	}
+
+   for (i = 0; i < mesh->mNumFaces; i++)
+    {
+		struct aiFace *face = mesh->mFaces + i;
+
+        if (face->mNumIndices==3)
+		 {
+		  triModel->indices[(i*3)+0] = face->mIndices[0];
+		  triModel->indices[(i*3)+1] = face->mIndices[1];
+		  triModel->indices[(i*3)+2] = face->mIndices[2];
+         } else
+         { fprintf(stderr," \n\n\n\n\n Non triangulated face %u \n\n\n\n\n",face->mNumIndices); }
+
+    }
+
+
+   prepareNodeStructureOfMesh( scene , mesh , triModel );
+
 }
 
 
