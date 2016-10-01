@@ -36,7 +36,7 @@ void recursiveJointHeirarchyTransformer(
   if (in->bones[curBone].info->altered)
     {
       //aiMatrix4x4 GlobalTransformation = ParentTransform  * NodeTransformation;
-      print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->boneTransformation);
+      print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->parentTransformation);
 
       double translation[16] , rotation[16] , scaling[16];
       create4x4IdentityMatrix(translation) ;
@@ -44,9 +44,9 @@ void recursiveJointHeirarchyTransformer(
       create4x4IdentityMatrix(scaling);
 
       //Get Translation
-      translation[3] =in->bones[curBone].info->boneTransformation[3];
-      translation[7] =in->bones[curBone].info->boneTransformation[7];
-      translation[11]=in->bones[curBone].info->boneTransformation[11];
+      translation[3] =in->bones[curBone].info->parentTransformation[3];
+      translation[7] =in->bones[curBone].info->parentTransformation[7];
+      translation[11]=in->bones[curBone].info->parentTransformation[11];
 
       multiplyThree4x4Matrices( nodeTransformation, translation,rotation,scaling);
 

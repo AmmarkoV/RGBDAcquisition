@@ -429,7 +429,7 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
   parentNodeID=nodeNum;
    for ( i = 0 ; i < node->mNumChildren ; i++)
         {
-          fillInNodeAndBoneData(node ,  mesh , numberOfNodes , parentNodeID  , triModel);
+          fillInNodeAndBoneData(node->mChildren[i] ,  mesh , numberOfNodes , parentNodeID  , triModel);
         }
 
 }
