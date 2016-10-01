@@ -57,6 +57,7 @@ void print4x4DMatrix(char * str , double * matrix4x4);
 */
 void copy4x4Matrix(double * out,double * in);
 
+void copy4x4FMatrixToD(double * out,float * in);
 
 /**
 * @brief Set an allocated 4x4 matrix to Identity ( diagonal 1 , all else 0 )
@@ -66,6 +67,7 @@ void copy4x4Matrix(double * out,double * in);
 void create4x4IdentityMatrix(double * m) ;
 
 int is4x4DIdentityMatrix(double * m);
+int is4x4FIdentityMatrix(float  * m);
 
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous Translation rotation

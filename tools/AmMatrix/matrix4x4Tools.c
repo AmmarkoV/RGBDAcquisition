@@ -107,6 +107,14 @@ void copy4x4Matrix(double * out,double * in)
 }
 
 
+void copy4x4FMatrixToD(double * out,float * in)
+{
+  out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
+  out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
+  out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
+  out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
+}
+
 void create4x4IdentityMatrix(double * m)
 {
     m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
@@ -117,6 +125,17 @@ void create4x4IdentityMatrix(double * m)
 
 
 int is4x4DIdentityMatrix(double * m)
+{
+   return (
+    ( m[0] == 1.0)&&(m[1] == 0.0)&&(m[2] == 0.0)&& (m[3] == 0.0) &&
+    ( m[4] == 0.0)&&(m[5] == 1.0)&&(m[6] == 0.0)&& (m[7] == 0.0)&&
+    ( m[8] == 0.0)&&(m[9] == 0.0)&&(m[10] == 1.0)&&(m[11]== 0.0)&&
+    ( m[12]== 0.0)&&(m[13]== 0.0)&&(m[14] == 0.0)&&(m[15]== 1.0)
+           );
+}
+
+
+int is4x4FIdentityMatrix(float  * m)
 {
    return (
     ( m[0] == 1.0)&&(m[1] == 0.0)&&(m[2] == 0.0)&& (m[3] == 0.0) &&
