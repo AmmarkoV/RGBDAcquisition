@@ -25,62 +25,6 @@
 #define WHITE   "\033[37m"      /* White */
 
 
-
-static float defaultJointsOffsetZXY[] = {
-                                         0 , 0 , 0 ,
-                                         0 , 0 , 0 ,
-                                         0 , 20 , 0 ,
-                                         45 , 0, 0 ,
-                                         45 , 0 , 0 ,
-                                         0 , 0 , 0 ,
-                                         0 , 0 , 0 ,
-                                         0 , 0 , 0 ,
-                                         0 , 0 , 0 ,
-                                         90 , -90 , 0 ,
-                                         90 , 90 , 0 ,
-                                         0 , 0 , 0 ,
-                                         0 , 0 , 0 ,
-                                         0 ,  -45 , 0 ,
-                                         0 ,  -45 , 0 ,
-                                         -90 , -90 , 0
-                                        };
-
-
-
-struct boneItem
-{
-  aiMatrix4x4 finalTransform;
-  aiMatrix4x4 parentTransform;
-  aiMatrix4x4 nodeTransform;
-  aiMatrix4x4 nodeTransformInitial;
-  aiMatrix4x4 globalTransform;
-  aiMatrix4x4 boneInverseBindTransform;
-
-  int tampered;
-
-  aiMatrix4x4 scalingMat;
-  aiMatrix4x4 translationMat;
-  aiMatrix4x4 rotationMat;
-  aiMatrix4x4 finalMat;
-
-  aiVector3D ScalingVec;
-  aiVector3D TranslationVec;
-  aiQuaternion RotationQua;
-
-  char name[128];
-  int itemID;
-  int parentItemID;
-  int parentlessNode;
-  unsigned int numberOfWeights;
- };
-
-struct boneState
-{
-  struct boneItem bone[200];
-  unsigned int numberOfBones;
-
-};
-
 struct aiScene *g_scene = NULL;
 aiMatrix4x4 m_GlobalInverseTransform;
 
@@ -118,6 +62,15 @@ void aiMakeQuaternion(aiMatrix4x4 * am , aiQuaternion * qu)
     am->d2 = 0.0;
     am->d3 = 0.0;
     am->d4 = 1.0f;
+}
+
+
+void doubleMatMakeIdentity(double * am)
+{
+ am[0] = 1.0; am[1] = 0.0;  am[2] = 0.0;  am[3] = 0.0;
+ am[4] = 0.0; am[5] = 1.0;  am[6] = 0.0;  am[7] = 0.0;
+ am[8] = 0.0; am[9] = 0.0;  am[10]= 1.0;  am[11]= 0.0;
+ am[12]= 0.0; am[13]= 0.0;  am[14]= 0.0;  am[15]= 1.0;
 }
 
 void aiMakeIdentity(aiMatrix4x4 * am)
@@ -172,8 +125,6 @@ struct aiNode *findNode(struct aiNode *node, char *name)
 }
 
 
-
-
 // find a node by name in the hierarchy (for anims and bones)
 unsigned int findBoneFromString(const aiMesh * mesh, const char *name , unsigned int * foundBone)
 {
@@ -191,71 +142,8 @@ unsigned int findBoneFromString(const aiMesh * mesh, const char *name , unsigned
 	return 0;
 }
 
-// calculate absolute transform for node to do mesh skinning
-void transformNodeWithAllParentTransforms(  aiMatrix4x4 *result, struct aiNode *node)
-{
-	if (node->mParent)
-    {
-		transformNodeWithAllParentTransforms(result, node->mParent);
-		aiMultiplyMatrix4(result, &node->mTransformation);
-	} else
-	{
-		*result = node->mTransformation;
-	}
-}
 
-void populateInternalRigState(struct aiScene *scene ,  struct aiMesh * mesh , struct boneState * bones )
-{
-  //fprintf(stderr,"Populating internal rig state \n" );
-  unsigned int i=0 , k=0;
-
-  bones->numberOfBones = mesh->mNumBones;
-
-  for (k = 0; k < mesh->mNumBones; k++)
-    {
-       struct aiBone *bone = mesh->mBones[k];
-	   struct aiNode *node = findNode(scene->mRootNode, bone->mName.data);
-       snprintf(bones->bone[k].name,128,"%s", bone->mName.data );
-
-       //fprintf(stderr,"Bone %u is %s \n" , k ,bones->bone[k].name );
-
-       bones->bone[k].nodeTransform = node->mTransformation;
-       bones->bone[k].nodeTransformInitial = node->mTransformation;
-       bones->bone[k].boneInverseBindTransform = bone->mOffsetMatrix;
-       bones->bone[k].itemID=k;
-       bones->bone[k].numberOfWeights = bone->mNumWeights;
-
-       bones->bone[k].parentlessNode=1;
-
-       //Decide if the node is parentless
-       if (node->mParent)
-           {
-             //fprintf(stderr,"Node %s has a parent \n",node->mName.data);
-             unsigned int foundParent = 0;
-             struct aiNode * parentNode = node->mParent;
-             for (i=0; i<mesh->mNumBones; i++)
-                   {
-                     struct aiBone *searchBone = mesh->mBones[i];
-                     if (strcmp(searchBone->mName.data,parentNode->mName.data )==0)
-                     {
-                       bones->bone[k].parentlessNode=0;
-                       bones->bone[k].parentItemID=i;
-                       //fprintf(stderr,"Parent of %s is %s which has a boneID of %u \n",node->mName.data ,searchBone->mName.data,i);
-                       foundParent =1;
-                     }
-                   }
-
-             if (!foundParent)
-             {
-               //fprintf(stderr,"Could not find parent , parent is marked as root..\n");
-             }
-           } else
-           {
-             //fprintf(stderr,"Node %s has no parent , parent is marked as root..\n",node->mName.data);
-           }
-    }
-}
-
+/*
 
 void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
 {
@@ -326,7 +214,6 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
 }
 
 
-
 void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struct TRI_Model * indexed , struct skeletonHuman * sk )
 {
     //The goal here is to transform the mesh stored int indexed using a skeleton stored in sk
@@ -382,37 +269,7 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
 	}
 }
 
-
-int populateMeshChildrenFromParents(struct TRI_Model * triModel)
-{
- fprintf(stderr,"populateMeshChildrenFromParents does not produce correct results \n");
- unsigned int i=0;
- unsigned int numberOfBones = triModel->header.numberOfBones;
-
- if (numberOfBones>0)
-    {
-      for (i = 0; i < numberOfBones; i++)
-      {
-       if (triModel->bones[i].info!=0)
-       {
-        unsigned int parentNode = triModel->bones[i].info->boneParent;
-        unsigned int childNode = i;
-
-        if (parentNode < numberOfBones)
-        {
-         if (triModel->bones[parentNode].info->numberOfBoneChildren<MAX_BONE_CHILDREN)
-         {
-          triModel->bones[parentNode].info->boneChild[triModel->bones[parentNode].info->numberOfBoneChildren] = childNode;
-          ++triModel->bones[parentNode].info->numberOfBoneChildren;
-         } else { fprintf(stderr,"Reached limit of child bones per bone!  , Skipping..!\n "); }
-        } else { fprintf(stderr,"Parent has an incorrect value %u/%u !  Skipping..!\n " , parentNode , numberOfBones); }
-       } else { fprintf(stderr,"Unallocated infos for bone %u/%u , Skipping ..!\n ",i,numberOfBones); }
-      }
-
-     return 1;
-    }
- return 0;
-}
+ */
 
 
 int findBoneNumFromAINode(const aiNode * pNode , struct aiMesh * mesh , unsigned int * boneNum)
@@ -430,45 +287,6 @@ int findBoneNumFromAINode(const aiNode * pNode , struct aiMesh * mesh , unsigned
     }
  return 0;
 }
-
-
-void cloneChildrenTree(struct aiScene *scene  ,struct aiMesh * mesh , const aiNode* pNode , unsigned int depth ,  struct TRI_Model * triModel)
-{
-  unsigned int i=0 , boneParent=0 , boneChild=0;
-
-
-  fprintf(stderr,"%s has %u children : " , pNode->mName.data  , pNode->mNumChildren);
-     for ( i = 0 ; i < pNode->mNumChildren ; i++)
-        {
-            fprintf(stderr,"%s " , pNode->mChildren[i]->mName.data);
-        }
-  fprintf(stderr,"\n");
-
-
-  if (findBoneNumFromAINode(pNode , mesh , &boneParent))
-  {
-     triModel->bones[boneParent].info->numberOfBoneChildren = pNode->mNumChildren;
-     for ( i = 0 ; i < pNode->mNumChildren ; i++)
-        {
-          if (findBoneNumFromAINode(pNode->mChildren[i] , mesh , &boneChild))
-           {
-            triModel->bones[boneParent].info->boneChild[i]=boneChild;
-           } else
-           {
-            fprintf(stderr,"        Node %s(child) does not match a bone\n" ,  pNode->mChildren[i]->mName.data);
-           }
-        }
-  } else
-  {
-    fprintf(stderr,"         Node %s(parent) does not match a bone \n" ,  pNode->mName.data);
-  }
-
- //Recurse down..
- for ( i = 0 ; i < pNode->mNumChildren ; i++)
-        {
-          cloneChildrenTree(scene,mesh,pNode->mChildren[i],depth+1,triModel);
-        }
- }
 
 
 
@@ -524,6 +342,97 @@ unsigned int countNumberOfNodes(struct aiScene *scene  , struct aiMesh * mesh )
   return numberOfNodes;
 }
 
+void convertMatrixAIToAmMatrix(double * rm ,  aiMatrix4x4 * am)
+{
+ rm[0]=am->a1; rm[1]=am->a2;  rm[2]=am->a3;  rm[3]=am->a4;
+ rm[4]=am->b1; rm[5]=am->b2;  rm[6]=am->b3;  rm[7]=am->b4;
+ rm[8]=am->c1; rm[9]=am->c2;  rm[10]=am->c3; rm[11]=am->c4;
+ rm[12]=am->d1;rm[13]=am->d2; rm[14]=am->d3; rm[15]=am->d4;
+}
+
+
+void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigned int * numberOfNodes , unsigned int parentNodeID  , struct TRI_Model * triModel)
+{
+  struct aiBone *bone = 0;
+  unsigned int nodeNum = *numberOfNodes;
+  unsigned int boneNum = 0 , bufSize=0;
+
+
+  if (parentNodeID==nodeNum)
+  {
+    //We are the root node so we won't update in our parents children
+  } else
+  {
+    //We are a child of our parent so let's store that..!
+
+    triModel->bones[nodeNum].info->boneChild[triModel->bones[nodeNum].info->numberOfBoneChildren] = nodeNum;
+    ++triModel->bones[nodeNum].info->numberOfBoneChildren;
+  }
+
+  triModel->bones[nodeNum].info->altered = 0; //Originally unaltered mesh
+  triModel->bones[nodeNum].info->boneParent = parentNodeID;
+  //We pass the node name
+  triModel->bones[nodeNum].info->boneNameSize = strlen(node->mName.data);
+  triModel->bones[nodeNum].boneName = (char* ) malloc(sizeof(char) * (1+triModel->bones[nodeNum].info->boneNameSize) );
+  if (triModel->bones[nodeNum].boneName)
+        { snprintf(triModel->bones[nodeNum].boneName,1+triModel->bones[nodeNum].info->boneNameSize,"%s",node->mName.data); }
+
+   convertMatrixAIToAmMatrix(triModel->bones[nodeNum].info->parentTransformation,  &node->mTransformation);
+   doubleMatMakeIdentity(triModel->bones[nodeNum].info->finalGlobalTransformation);
+   doubleMatMakeIdentity(triModel->bones[nodeNum].info->inverseBindPose);
+
+
+  if (findBoneNumFromAINode( node ,  mesh , &boneNum ))
+    {
+      unsigned int k=0;
+      bone = mesh->mBones[boneNum];
+      convertMatrixAIToAmMatrix(triModel->bones[nodeNum].info->inverseBindPose,  &bone->mOffsetMatrix);
+      //We have an associated bone structure with our node ! :)
+      triModel->bones[nodeNum].info->boneWeightsNumber = bone->mNumWeights;
+
+      bufSize = sizeof(float) * triModel->bones[nodeNum].info->boneWeightsNumber;
+      triModel->bones[nodeNum].weightValue = (float*)        malloc(bufSize);
+      if (triModel->bones[nodeNum].weightValue)
+       {
+         //memset( triModel->bones[i].weightValue, 0 , bufSize );
+         for (k = 0; k < triModel->bones[nodeNum].info->boneWeightsNumber; k++)
+         {
+           triModel->bones[nodeNum].weightValue[k] = bone->mWeights[k].mWeight;
+         }
+       }
+
+       bufSize = sizeof(unsigned int) * triModel->bones[nodeNum].info->boneWeightsNumber;
+       triModel->bones[nodeNum].weightIndex = (unsigned int*) malloc(bufSize);
+
+       if (triModel->bones[nodeNum].weightIndex)
+       {
+        //memset( triModel->bones[i].weightIndex, 0 , bufSize );
+        for (k = 0; k < triModel->bones[nodeNum].info->boneWeightsNumber; k++)
+         {
+           triModel->bones[nodeNum].weightIndex[k] = bone->mWeights[k].mVertexId;
+	     }
+       }
+    } else
+    {
+      triModel->bones[nodeNum].info->boneWeightsNumber=0;
+      triModel->bones[nodeNum].weightValue=0;
+      triModel->bones[nodeNum].weightIndex=0;
+    }
+
+
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //We are done processing this node , going to the next one now..!
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  (*numberOfNodes)++;
+  unsigned int i=0;
+  parentNodeID=nodeNum;
+   for ( i = 0 ; i < node->mNumChildren ; i++)
+        {
+          fillInNodeAndBoneData(node ,  mesh , numberOfNodes , parentNodeID  , triModel);
+        }
+
+}
 
 void prepareNodeStructureOfMesh(struct aiScene *scene , struct aiMesh * mesh , struct TRI_Model * triModel )
 {
@@ -532,79 +441,21 @@ void prepareNodeStructureOfMesh(struct aiScene *scene , struct aiMesh * mesh , s
     unsigned int bonesSize                 =triModel->header.numberOfBones         * sizeof(struct TRI_Bones);
     fprintf(stderr,"  %d bytes of bones\n",bonesSize);
 
-    //Bones now..
-    unsigned int i,k,bufSize;
-    struct boneState bones;
-    populateInternalRigState(scene , mesh , &bones);
-    if (triModel->header.numberOfBones>0)
+
+    triModel->bones         = (struct TRI_Bones*) malloc( bonesSize );
+
+    if (triModel->bones)
     {
-      triModel->bones         = (struct TRI_Bones*) malloc( bonesSize );
       memset(triModel->bones, 0 , bonesSize );
 
-
-      for (i = 0; i < triModel->header.numberOfBones; i++)
-      {
-       triModel->bones[i].info = (struct TRI_Bones_Header*) malloc(sizeof(struct TRI_Bones_Header));
-       memset(triModel->bones[i].info,0,sizeof(struct TRI_Bones_Header));
-
-       triModel->bones[i].info->boneParent=bones.bone[i].parentItemID;
-       triModel->bones[i].info->boneWeightsNumber=bones.bone[i].numberOfWeights;
-
-       //Childs are calculated in the end with the populateMeshChildrenFromParents call..!
-
-	   struct aiBone *bone = mesh->mBones[i];
-	   triModel->bones[i].info->boneNameSize = strlen(bones.bone[i].name);
-
-       double * rm = triModel->bones[i].info->inverseBindPose;
-       aiMatrix4x4 * am = &bones.bone[i].boneInverseBindTransform;
-       rm[0]=am->a1; rm[1]=am->a2;  rm[2]=am->a3;  rm[3]=am->a4;
-       rm[4]=am->b1; rm[5]=am->b2;  rm[6]=am->b3;  rm[7]=am->b4;
-       rm[8]=am->c1; rm[9]=am->c2;  rm[10]=am->c3; rm[11]=am->c4;
-       rm[12]=am->d1;rm[13]=am->d2; rm[14]=am->d3; rm[15]=am->d4;
-
-       rm = triModel->bones[i].info->finalGlobalTransformation;
-       rm[0]=1.0;  rm[1]=0.0;  rm[2]=0.0;  rm[3]=0.0;
-       rm[4]=0.0;  rm[5]=1.0;  rm[6]=0.0;  rm[7]=0.0;
-       rm[8]=0.0;  rm[9]=0.0;  rm[10]=1.0; rm[11]=0.0;
-       rm[12]=0.0; rm[13]=0.0; rm[14]=0.0; rm[15]=1.0;
-
-       rm = triModel->bones[i].info->boneTransformation;
-       am = &bones.bone[i].nodeTransformInitial;
-       rm[0]=am->a1; rm[1]=am->a2;  rm[2]=am->a3;  rm[3]=am->a4;
-       rm[4]=am->b1; rm[5]=am->b2;  rm[6]=am->b3;  rm[7]=am->b4;
-       rm[8]=am->c1; rm[9]=am->c2;  rm[10]=am->c3; rm[11]=am->c4;
-       rm[12]=am->d1;rm[13]=am->d2; rm[14]=am->d3; rm[15]=am->d4;
-
-
-       triModel->bones[i].boneName = (char* ) malloc(sizeof(char) * (1+triModel->bones[i].info->boneNameSize) );
-       snprintf(triModel->bones[i].boneName,1+triModel->bones[i].info->boneNameSize,"%s",bones.bone[i].name);
-
-       bufSize = sizeof(float) * triModel->bones[i].info->boneWeightsNumber;
-       triModel->bones[i].weightValue = (float*)        malloc(bufSize);
-       memset( triModel->bones[i].weightValue, 0 , bufSize );
-
-       bufSize = sizeof(unsigned int) * triModel->bones[i].info->boneWeightsNumber;
-       triModel->bones[i].weightIndex = (unsigned int*) malloc(bufSize);
-       memset( triModel->bones[i].weightIndex, 0 , bufSize );
-
-
-       for (k = 0; k < triModel->bones[i].info->boneWeightsNumber; k++)
-         {
-           triModel->bones[i].weightValue[k] = bone->mWeights[k].mWeight;
-           triModel->bones[i].weightIndex[k] = bone->mWeights[k].mVertexId;
-	     }
-      }
-
-       //This doesn't work
-       //populateMeshChildrenFromParents(triModel);
-       cloneChildrenTree( scene  , mesh , scene->mRootNode , 0 ,  triModel);
-
-       //Final Step get Root Bone..!
-       findRootBoneOfMesh( scene  , mesh , &bones ,  triModel);
-
-       fprintf(stderr,"Doing printout of final bone structure as stored.. \n");
-       printTRIBoneStructure(triModel, 0);
+      unsigned int numberOfNodesFilled = 0;
+      fillInNodeAndBoneData(scene->mRootNode ,  mesh , &numberOfNodesFilled , 0 , triModel);
     }
+
+
+    fprintf(stderr,"Doing printout of final bone structure as stored.. \n");
+    printTRIBoneStructure(triModel, 0);
+
 
 }
 
@@ -722,36 +573,6 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 }
 
 
-void deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton(
-                                                                struct TRI_Model * outModel ,
-                                                                struct TRI_Model * inOriginalIndexedModel ,
-                                                                struct skeletonHuman * sk ,
-                                                                int returnIndexedModel
-                                                              )
-{
-  //visualize2DSkeletonHuman("deformOriginalModelAndBringBackFlatOneBasedOnThisSkeleton.svg",sk,3.0);
-
-  struct TRI_Model temporaryIndexedDeformedModel={0};
-  fprintf(stderr,"Copying to intermediate mesh\n");
-  copyModelTri(&temporaryIndexedDeformedModel,inOriginalIndexedModel,0);
-  fprintf(stderr,"Transforming intermediate mesh\n");
-  transformMeshBasedOnSkeleton( g_scene , 0 , &temporaryIndexedDeformedModel , sk );
-
-
-  if (returnIndexedModel)
-  {
-   copyModelTri( outModel , &temporaryIndexedDeformedModel , 1);
-   fprintf(stderr,"Serving back indexed mesh\n");
-  }
-   else
-  {
-   fprintf(stderr,"Flattening intermediate mesh\n");
-   fillFlatModelTriFromIndexedModelTri(outModel , &temporaryIndexedDeformedModel);
-   fprintf(stderr,"Deallocating intermediate mesh\n");
-   deallocModelTri(&temporaryIndexedDeformedModel);
-   fprintf(stderr,"Serving back flattened mesh\n");
-  }
-}
 
 void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct TRI_Model * originalModel , int returnIndexedModel)
 {

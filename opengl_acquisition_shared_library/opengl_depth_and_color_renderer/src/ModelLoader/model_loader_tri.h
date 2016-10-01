@@ -48,7 +48,7 @@ struct TRI_Bones_Header
 //-------------------------------------------
   double inverseBindPose[16];
   double finalGlobalTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
-  double boneTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
+  double parentTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
   unsigned char altered;
 };
 
