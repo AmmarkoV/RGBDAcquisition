@@ -25,7 +25,8 @@ void recursiveJointHeirarchyTransformer(
                                          unsigned int recursionLevel
                                        )
 {
-    if (recursionLevel>=40) { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT \n_____________________\n" NORMAL); return; }
+    if (recursionLevel>=in->header.numberOfBones+1)
+        { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT \n_____________________\n" NORMAL); return; }
     unsigned int i=0;
 
     double globalTransformation[16] , nodeTransformation[16];
