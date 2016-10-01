@@ -30,8 +30,7 @@ void recursiveJointHeirarchyTransformer(
     unsigned int i=0;
 
     double globalTransformation[16] , nodeTransformation[16];
-    create4x4IdentityMatrix(nodeTransformation) ;
-    create4x4IdentityMatrix(globalTransformation);
+    copy4x4Matrix(nodeTransformation,in->bones[curBone].info->parentTransformation);
 
 
   if (in->bones[curBone].info->altered)
@@ -69,18 +68,18 @@ void recursiveJointHeirarchyTransformer(
                                            in  ,
                                            curBoneChild ,
                                            finalTransforms ,
-                                           parentTransform ,
+                                           globalTransformation ,
                                            jointData , jointDataSize ,
                                            recursionLevel+1
                                          );
       }
     } else
     {
-      fprintf(stderr,"Unedited bone %u " , curBone);
-      fprintf(stderr,"%s has %u children \n" , in->bones[curBone].boneName , in->bones[curBone].info->numberOfBoneChildren );
-            for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
-       { fprintf(stderr," %s " , in->bones[in->bones[curBone].info->boneChild[i]].boneName );   }
-      fprintf(stderr,"\n");
+      //fprintf(stderr,"Unedited bone %u " , curBone);
+      //fprintf(stderr,"%s has %u children \n" , in->bones[curBone].boneName , in->bones[curBone].info->numberOfBoneChildren );
+      //      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
+      // { fprintf(stderr," %s " , in->bones[in->bones[curBone].info->boneChild[i]].boneName );   }
+      //fprintf(stderr,"\n");
 
       //aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
       multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
@@ -96,7 +95,7 @@ void recursiveJointHeirarchyTransformer(
                                            in  ,
                                            curBoneChild ,
                                            finalTransforms ,
-                                           parentTransform ,
+                                           globalTransformation ,
                                            jointData , jointDataSize ,
                                            recursionLevel+1
                                          );

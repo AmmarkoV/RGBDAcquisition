@@ -277,27 +277,6 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
         }
 }
 
-void prepareNodeAndBoneStructureOfMesh(struct aiScene *scene , struct aiMesh * mesh , struct TRI_Model * triModel )
-{
-    triModel->header.numberOfBones         = countNumberOfNodes( scene  , mesh );
-    unsigned int bonesSize                 =triModel->header.numberOfBones         * sizeof(struct TRI_Bones);
-    fprintf(stderr,"  %d bytes of bones ( %u nodes ) \n",bonesSize , triModel->header.numberOfBones);
-
-
-    triModel->bones         = (struct TRI_Bones*) malloc( bonesSize );
-    if (triModel->bones!=0)
-    {
-      memset(triModel->bones, 0 , bonesSize );
-      unsigned int numberOfNodesFilled = 0;
-      fillInNodeAndBoneData(scene->mRootNode ,  mesh , &numberOfNodesFilled , 0 , triModel);
-      fprintf(stderr,"Doing printout of final bone structure as stored.. \n");
-      printTRIBoneStructure(triModel, 0);
-    } else
-    {
-      fprintf(stderr,"Could not allocate enough space for bones.. \n");
-    }
-}
-
 
 
 void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * triModel )
@@ -407,8 +386,23 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     }
 
    triModel->header.rootBone=0; //Initial bone is always the root bone..!
-   prepareNodeAndBoneStructureOfMesh( scene , mesh , triModel );
+   triModel->header.numberOfBones         = countNumberOfNodes( scene  , mesh );
+   unsigned int bonesSize                 =triModel->header.numberOfBones         * sizeof(struct TRI_Bones);
+   fprintf(stderr,"  %d bytes of bones ( %u nodes ) \n",bonesSize , triModel->header.numberOfBones);
 
+
+    triModel->bones         = (struct TRI_Bones*) malloc( bonesSize );
+    if (triModel->bones!=0)
+    {
+      memset(triModel->bones, 0 , bonesSize );
+      unsigned int numberOfNodesFilled = 0;
+      fillInNodeAndBoneData(scene->mRootNode ,  mesh , &numberOfNodesFilled , 0 , triModel);
+      fprintf(stderr,"Doing printout of final bone structure as stored.. \n");
+      printTRIBoneStructure(triModel, 0);
+    } else
+    {
+      fprintf(stderr,"Could not allocate enough space for bones.. \n");
+    }
 }
 
 
