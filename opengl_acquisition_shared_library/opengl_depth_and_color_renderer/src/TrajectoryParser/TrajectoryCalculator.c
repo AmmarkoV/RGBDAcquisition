@@ -605,8 +605,8 @@ int fillPosWithFrame(
 
         float * f=&joints[16*i];
         double m[16]={0};
-        create4x4MatrixFromEulerAnglesXYZ(&m,rotCur[0],rotCur[1],rotCur[2]);
-        convert4x4DMatrixto4x4F(f,&m);
+        create4x4MatrixFromEulerAnglesXYZ(m,rotCur[0],rotCur[1],rotCur[2]);
+        copy4x4DMatrixToF(f,m);
        }
 
     }
@@ -626,6 +626,9 @@ int fillJointsWithInterpolatedFrame(
                                   unsigned int MAX_stepTime
                                 )
 {
+       float rotPrev[4]={0};
+       float rotNext[4]={0};
+       float rotTot[4]={0};
        unsigned int numberOfJoints = 0;
 
        if (stream->object[ObjID].frame[PrevFrame].jointList!=0)
@@ -638,10 +641,6 @@ int fillJointsWithInterpolatedFrame(
        unsigned int i=0;
        for (i=0; i<numberOfJoints; i++)
        {
-        float rotPrev[4]={0};
-        float rotNext[4]={0};
-        float rotTot[4]={0};
-
         if ( (stream->object[ObjID].frame[PrevFrame].jointList!=0) &&
               (stream->object[ObjID].frame[PrevFrame].hasNonDefaultJointList) )
         {
@@ -660,15 +659,21 @@ int fillJointsWithInterpolatedFrame(
          rotNext[3] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot4;
         }
 
-        rotTot[0] = rotPrev[0] + (float) ( rotNext[0] - rotPrev[0] ) * our_stepTime / MAX_stepTime;
-        rotTot[1] = rotPrev[1] + (float) ( rotNext[1] - rotPrev[1] ) * our_stepTime / MAX_stepTime;
-        rotTot[2] = rotPrev[2] + (float) ( rotNext[2] - rotPrev[2] ) * our_stepTime / MAX_stepTime;
-        rotTot[3] = rotPrev[3] + (float) ( rotNext[3] - rotPrev[3] ) * our_stepTime / MAX_stepTime;
+        float timeMultiplier = (float) our_stepTime / MAX_stepTime;
+
+        rotTot[0] = rotPrev[0] + (float) ( rotNext[0] - rotPrev[0] ) * timeMultiplier;
+        rotTot[1] = rotPrev[1] + (float) ( rotNext[1] - rotPrev[1] ) * timeMultiplier;
+        rotTot[2] = rotPrev[2] + (float) ( rotNext[2] - rotPrev[2] ) * timeMultiplier;
+        rotTot[3] = rotPrev[3] + (float) ( rotNext[3] - rotPrev[3] ) * timeMultiplier;
 
         float * f=&joints[16*i];
-        double m[16]={0};
-         create4x4MatrixFromEulerAnglesXYZ(&m,rotTot[0],rotTot[1],rotTot[2]);
-         convert4x4DMatrixto4x4F(f,&m);
+        double m[16];
+
+        //fprintf(stderr,"Rotation Prev (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,PrevFrame,i,rotPrev[0],rotPrev[1],rotPrev[2]);
+        //fprintf(stderr,"Rotation Next (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,NextFrame,i,rotNext[0],rotNext[1],rotNext[2]);
+        //fprintf(stderr,"Rotation Requested  is %0.2f %0.2f %0.2f ( mult %0.2f ) \n",rotTot[0],rotTot[1],rotTot[2],timeMultiplier);
+         create4x4MatrixFromEulerAnglesXYZ(m,rotTot[0],rotTot[1],rotTot[2]);
+         copy4x4DMatrixToF(f,m);
 
       }
   return 1;
@@ -776,7 +781,7 @@ int fillPosWithInterpolatedFrame(
          )
         )
     {
-       fprintf(stderr,"interpolating joints for frame %u  ( %u joints / obj %u ) \n",PrevFrame , stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints , ObjID);
+       //fprintf(stderr,"interpolating joints for frame %u  ( %u joints / obj %u ) \n",PrevFrame , stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints , ObjID);
 
        fillJointsWithInterpolatedFrame(
                                         stream,

@@ -115,6 +115,17 @@ void copy4x4FMatrixToD(double * out,float * in)
   out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
 }
 
+
+
+void copy4x4DMatrixToF(float * d, double * m )
+{
+    d[0]=(float)m[0];   d[1]=(float)m[1];   d[2]=(float)m[2];    d[3]=(float)m[3];
+    d[4]=(float)m[4];   d[5]=(float)m[5];   d[6]=(float)m[6];    d[7]=(float)m[7];
+    d[8]=(float)m[8];   d[9]=(float)m[9];   d[10]=(float)m[10];  d[11]=(float)m[11];
+    d[12]=(float)m[12]; d[13]=(float)m[13]; d[14]=(float)m[14];  d[15]=(float)m[15];
+}
+
+
 void create4x4IdentityMatrix(double * m)
 {
     m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
@@ -154,15 +165,6 @@ void create4x4IdentityFMatrix(float * m)
     m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
 }
 
-
-
-void convert4x4DMatrixto4x4F(float * d, double * m )
-{
-    d[0]=m[0];   d[1]=m[1];   d[2]=m[2];    d[3]=m[3];
-    d[4]=m[4];   d[5]=m[5];   d[6]=m[6];    d[7]=m[7];
-    d[8]=m[8];   d[9]=m[9];   d[10]=m[10];  d[11]=m[11];
-    d[12]=m[12]; d[13]=m[13]; d[14]=m[14];  d[15]=m[15];
-}
 
 
 
@@ -522,8 +524,8 @@ int multiplyThree4x4Matrices(double * result , double * matrixA , double * matri
 
   int i=0;
   double tmp[16];
-  i+=multiplyTwo4x4Matrices(&tmp,matrixB,matrixC);
-  i+=multiplyTwo4x4Matrices(result , matrixA , &tmp);
+  i+=multiplyTwo4x4Matrices(tmp,matrixB,matrixC);
+  i+=multiplyTwo4x4Matrices(result , matrixA , tmp);
 
   return (i==2);
 }

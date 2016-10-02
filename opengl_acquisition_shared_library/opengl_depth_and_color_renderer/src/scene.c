@@ -799,7 +799,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
            if ( (modelHasASkinTransformation(mod,joints)) && (enableTransformedRendering) )
            {
             //We need to do joint transforms before draw
-            fprintf(stderr,"Doing joint transforms..!\n");
+            //fprintf(stderr,"Doing joint transforms..!\n");
             struct TRI_Model triModelOut={0};
             struct TRI_Model *triModelIn=(struct TRI_Model*) mod->modelInternalData;
 

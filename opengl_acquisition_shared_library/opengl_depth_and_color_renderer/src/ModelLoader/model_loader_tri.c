@@ -451,7 +451,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
         } else {  fprintf(stderr,"No bones specified \n"); }
 
 
-        printTRIBoneStructure(triModel, 1);
+        //printTRIBoneStructure(triModel, 1);
         printTRIModel(triModel);
 
         fclose(fd);

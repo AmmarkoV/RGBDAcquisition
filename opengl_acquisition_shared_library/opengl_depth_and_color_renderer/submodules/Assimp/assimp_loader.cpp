@@ -223,14 +223,14 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
 
    convertMatrixAIToAmMatrix(triModel->bones[nodeNum].info->parentTransformation,  &node->mTransformation);
    doubleMatMakeIdentity(triModel->bones[nodeNum].info->finalGlobalTransformation);
-   doubleMatMakeIdentity(triModel->bones[nodeNum].info->inverseBindPose);
+   doubleMatMakeIdentity(triModel->bones[nodeNum].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
 
 
   if (findBoneNumFromAINode( node ,  mesh , &boneNum ))
     {
       unsigned int k=0;
       bone = mesh->mBones[boneNum];
-      convertMatrixAIToAmMatrix(triModel->bones[nodeNum].info->inverseBindPose,  &bone->mOffsetMatrix);
+      convertMatrixAIToAmMatrix(triModel->bones[nodeNum].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose,  &bone->mOffsetMatrix);
       //We have an associated bone structure with our node ! :)
       triModel->bones[nodeNum].info->boneWeightsNumber = bone->mNumWeights;
 

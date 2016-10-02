@@ -453,6 +453,7 @@ int addPoseToObjectState(
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
            stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
+           fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms %0.2f %0.2f %0.2f %0.2f \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2],coord[3]);
 
            return 1;
         } else { fprintf(stderr,"Could not find exact bone %u for %s \n",boneID,name); }

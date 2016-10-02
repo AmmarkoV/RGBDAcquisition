@@ -46,9 +46,9 @@ struct TRI_Bones_Header
   unsigned int boneWeightsNumber;
   unsigned int boneNameSize;
 //-------------------------------------------
-  double inverseBindPose[16];
-  double finalGlobalTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
-  double parentTransformation[16]; //This is actually just extra space to perform calculations on the spot..!
+  double matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose[16];
+  double finalGlobalTransformation[16]; //What will store the final global transformation
+  double parentTransformation[16]; // or node->mTransformation
   unsigned char altered;
 };
 

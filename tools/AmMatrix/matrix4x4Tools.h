@@ -22,13 +22,6 @@ double * alloc4x4Matrix();
 void free4x4Matrix(double ** mat);
 
 
-/**
-* @brief Convert a 4x4 Matrix from Double To Float
-* @ingroup AmMatrix
-* @param  Pointer to a float 4x4 output
-* @param  Pointer to a double 4x4 input
-*/
-void convert4x4DMatrixto4x4F(float * d, double * m );
 
 /**
 * @brief Printout an 4x4 Matrix that consists of floats
@@ -57,7 +50,23 @@ void print4x4DMatrix(char * str , double * matrix4x4);
 */
 void copy4x4Matrix(double * out,double * in);
 
+
+/**
+* @brief Convert a 4x4 Matrix from Float To Double
+* @ingroup AmMatrix
+* @param  Pointer to a double 4x4 output
+* @param  Pointer to a float 4x4 input
+*/
 void copy4x4FMatrixToD(double * out,float * in);
+
+
+/**
+* @brief Convert a 4x4 Matrix from Double To Float
+* @ingroup AmMatrix
+* @param  Pointer to a float 4x4 output
+* @param  Pointer to a double 4x4 input
+*/
+void copy4x4DMatrixToF(float * d, double * m );
 
 /**
 * @brief Set an allocated 4x4 matrix to Identity ( diagonal 1 , all else 0 )

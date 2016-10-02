@@ -19,31 +19,31 @@
 void recursiveJointHeirarchyTransformer(
                                          struct TRI_Model * in  ,
                                          int curBone ,
-                                         double * parentTransform ,
+                                         double * parentTransformUntouched ,
                                          float * jointData , unsigned int jointDataSize ,
                                          unsigned int recursionLevel
                                        )
 {
-    if (recursionLevel>=in->header.numberOfBones+1)
+  if (recursionLevel>=in->header.numberOfBones+1)
         { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT (%u/%u)\n_____________________\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
-    unsigned int i=0;
-
-    double globalTransformation[16] , nodeTransformation[16];
-    copy4x4Matrix(nodeTransformation,in->bones[curBone].info->parentTransformation);
 
 
-  if (in->bones[curBone].info->altered)
-    {
-      //aiMatrix4x4 GlobalTransformation = ParentTransform  * NodeTransformation;
-      print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->parentTransformation);
+   unsigned int i=0;
+   double parentTransform[16] , globalTransformation[16] , nodeTransformation[16];
+   copy4x4Matrix(parentTransform,parentTransformUntouched);
+   copy4x4Matrix(nodeTransformation,in->bones[curBone].info->parentTransformation);
 
+  if ( in->bones[curBone].info->boneWeightsNumber>0 )
+  {
+    if (in->bones[curBone].info->altered)
+      {
+      //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->parentTransformation);
       double translation[16] , rotation[16] , scaling[16];
-      create4x4IdentityMatrix(translation) ;
+      create4x4IdentityMatrix(translation);
       create4x4IdentityMatrix(rotation);
       create4x4IdentityMatrix(scaling);
 
-      copy4x4FMatrixToD(rotation,& jointData[curBone*16]);
-      //triModelIn->bones[k].info->finalGlobalTransformation
+      copy4x4FMatrixToD(rotation,&jointData[curBone*16]);
 
       //Get Translation
       translation[3] =in->bones[curBone].info->parentTransformation[3];
@@ -51,15 +51,22 @@ void recursiveJointHeirarchyTransformer(
       translation[11]=in->bones[curBone].info->parentTransformation[11];
 
       multiplyThree4x4Matrices( nodeTransformation, translation,rotation,scaling);
+      //print4x4DMatrixTRI("Translation was .. ",translation);
+      //print4x4DMatrixTRI("Scaling was .. ",scaling);
+      //print4x4DMatrixTRI("Rotation was .. ",rotation);
+      //print4x4DMatrixTRI("Node Transformation is now.. \n",nodeTransformation);
+      }
 
 
-      print4x4DMatrixTRI("Translation was .. ",translation);
-      print4x4DMatrixTRI("Scaling was .. ",scaling);
-      print4x4DMatrixTRI("Rotation was .. ",rotation);
-      print4x4DMatrixTRI("Node Transformation is now.. \n",nodeTransformation);
 
       multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
-      multiplyThree4x4Matrices( in->header.boneGlobalInverseTransform , globalTransformation,parentTransform,nodeTransformation);
+      multiplyThree4x4Matrices(
+                                 in->bones[curBone].info->finalGlobalTransformation ,
+                                 in->header.boneGlobalInverseTransform ,
+                                 globalTransformation,
+                                 in->bones[curBone].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose
+                              );
+
      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
       {
         unsigned int curBoneChild=in->bones[curBone].info->boneChild[i];
@@ -73,21 +80,10 @@ void recursiveJointHeirarchyTransformer(
       }
     } else
     {
-      //fprintf(stderr,"Unedited bone %u " , curBone);
-      //fprintf(stderr,"%s has %u children \n" , in->bones[curBone].boneName , in->bones[curBone].info->numberOfBoneChildren );
-      //      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
-      // { fprintf(stderr," %s " , in->bones[in->bones[curBone].info->boneChild[i]].boneName );   }
-      //fprintf(stderr,"\n");
-
-      //aiMatrix4x4 GlobalTransformation = ParentTransform  * pNode->mTransformation;
       multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
-
-
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
         unsigned int curBoneChild=in->bones[curBone].info->boneChild[i];
-
-        //fprintf(stderr," recursing children %s (%u/%u) " , in->bones[curBoneChild].boneName , i, in->bones[curBone].info->numberOfBoneChildren );
         recursiveJointHeirarchyTransformer(
                                            in  ,
                                            curBoneChild ,
@@ -97,10 +93,7 @@ void recursiveJointHeirarchyTransformer(
                                          );
        }
     }
-
 }
-
-
 
 
 int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize)
@@ -139,12 +132,12 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
 
 
-   fprintf(stderr,"Transforming bones : ");
+   //fprintf(stderr,"Transforming bones : ");
    unsigned int k=0;
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
-     if (triModelIn->bones[k].info->altered)
-          { fprintf(stderr,"%u (%s) altered \n",k , triModelIn->bones[k].boneName); }
+     //if (triModelIn->bones[k].info->altered)
+     //     { fprintf(stderr,"%u (%s) altered \n",k , triModelIn->bones[k].boneName); }
 
 
      for (i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
@@ -178,8 +171,7 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 	   triModelOut->normal[v*3+2] += (float) transNormal[2] * w;
      }
    }
-   fprintf(stderr," done \n");
+   //fprintf(stderr," done \n");
 
  return 1;
 }
-
