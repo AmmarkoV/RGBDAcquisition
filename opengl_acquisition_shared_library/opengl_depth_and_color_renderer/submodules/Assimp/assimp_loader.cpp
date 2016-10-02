@@ -26,13 +26,6 @@
 struct aiScene *g_scene = NULL;
 aiMatrix4x4 m_GlobalInverseTransform;
 
-void extract3x3( aiMatrix3x3 *m3,  aiMatrix4x4 *m4)
-{
-	m3->a1 = m4->a1; m3->a2 = m4->a2; m3->a3 = m4->a3;
-	m3->b1 = m4->b1; m3->b2 = m4->b2; m3->b3 = m4->b3;
-	m3->c1 = m4->c1; m3->c2 = m4->c2; m3->c3 = m4->c3;
-}
-
 void aiMakeQuaternion(aiMatrix4x4 * am , aiQuaternion * qu)
 {
     float yy2 = 2.0f * qu->y * qu->y;
@@ -96,16 +89,6 @@ void aiPrintMatrix(aiMatrix4x4 * am)
  fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , am->b1, am->b2,  am->b3,   am->b4 );
  fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , am->c1, am->c2,  am->c3,   am->c4 );
  fprintf(stderr,"   | %0.2f  | %0.2f  | %0.2f  | %0.2f  | \n" , am->d1, am->d2,  am->d3,   am->d4 );
-}
-
-float rad_to_degrees(float radians)
-{
-    return radians * (180.0 / M_PI);
-}
-
-float degrees_to_rad(float degrees)
-{
-    return degrees * (M_PI /180.0 );
 }
 
 // find a node by name in the hierarchy (for anims and bones)

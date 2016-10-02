@@ -203,8 +203,18 @@ void create4x4RotationMatrix(double * m , double angle, double x, double y, doub
 
 
 
-void create4x4MatrixFromEulerAnglesXYZ(double * m ,double x, double y, double z)
+static double degrees_to_rad(double degrees)
 {
+    return degrees * (M_PI /180.0 );
+}
+
+
+void create4x4MatrixFromEulerAnglesXYZ(double * m ,double eulX, double eulY, double eulZ)
+{
+    double x = degrees_to_rad(eulX);
+    double y = degrees_to_rad(eulY);
+    double z = degrees_to_rad(eulZ);
+
 	double cr = cos( x );
 	double sr = sin( x );
 	double cp = cos( y );

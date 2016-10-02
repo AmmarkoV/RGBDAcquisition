@@ -131,11 +131,11 @@ void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double
 * @brief Convert a quaternion to 4x4 matrix
 * @ingroup AmMatrix
 * @param  Output already allocated 4x4 Matrix
-* @param  Rotation X
-* @param  Rotation Y
-* @param  Rotation Z
+* @param  Rotation X in euler angles (0-360)
+* @param  Rotation Y in euler angles (0-360)
+* @param  Rotation Z in euler angles (0-360)
 */
-void create4x4MatrixFromEulerAnglesXYZ(double * m ,double x, double y, double z);
+void create4x4MatrixFromEulerAnglesXYZ(double * m ,double eulX, double eulY, double eulZ);
 
 
 /**
