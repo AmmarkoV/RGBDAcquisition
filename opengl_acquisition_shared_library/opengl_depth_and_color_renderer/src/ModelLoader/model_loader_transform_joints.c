@@ -106,6 +106,12 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
  copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
 
+ if ( (jointData==0) || (jointDataSize==0) )
+ {
+   fprintf(stderr,"doModelTransform called without joints to transform , so it will be just returning a null transformed copy of the input mesh , hope this is what you intended..\n");
+   return 1;
+ }
+
  double transPosition[4]={0} ,transNormal[4]={0} , position[4]={0} , normal[4]={0};
 
  unsigned int i=0;
