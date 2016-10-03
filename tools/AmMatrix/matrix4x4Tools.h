@@ -7,6 +7,11 @@
 #define MATRIX4X4TOOLS_H_INCLUDED
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /**
 * @brief Allocate a new 4x4 Matrix
 * @ingroup AmMatrix
@@ -231,5 +236,12 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
 * @retval 0=failure,1=success
 */
 int normalize3DPointVector(double * vec);
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // MATRIX4X4TOOLS_H_INCLUDED

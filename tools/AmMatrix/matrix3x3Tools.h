@@ -6,6 +6,11 @@
 #ifndef MATRIX3X3TOOLS_H_INCLUDED
 #define MATRIX3X3TOOLS_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 
 /**
 * @brief Allocate a new 3x3 Matrix
@@ -183,5 +188,9 @@ int transform2DPointVectorUsing3x3Matrix(double * resultPoint2D, double * transf
 */
 int normalize2DPointVector(double * vec);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MATRIX3X3TOOLS_H_INCLUDED
