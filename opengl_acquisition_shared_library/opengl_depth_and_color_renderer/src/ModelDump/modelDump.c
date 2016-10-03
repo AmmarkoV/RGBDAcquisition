@@ -17,6 +17,9 @@ int main(int argc, char **argv)
    for (i=0; i<argc; argc++)
    {
      if (strcmp(argv[i],"")==0)
+     {
+         //TODO Dump TRI Bone Structure etc
+     }
    }
 
     return dumpModelFile(argv[1],argv[2]);

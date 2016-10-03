@@ -1,4 +1,3 @@
-#include "model_loader.h"
 #include "model_loader_tri.h"
 #include "model_loader_transform_joints.h"
 

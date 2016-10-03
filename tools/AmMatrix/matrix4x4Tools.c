@@ -4,8 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#define PI (3.141592653589793)
 
-#include "matrixTools.h"
+#include "matrix4x4Tools.h"
 
 #define PRINT_MATRIX_DEBUGGING 0
 
@@ -49,7 +50,7 @@ enum mat4x4EItem
 
 double * alloc4x4Matrix()
 {
-  return malloc ( sizeof(double) * 16 );
+  return (double*) malloc ( sizeof(double) * 16 );
 }
 
 void free4x4Matrix(double ** mat)
@@ -170,6 +171,7 @@ void create4x4IdentityFMatrix(float * m)
 
 void create4x4RotationMatrix(double * m , double angle, double x, double y, double z)
 {
+    double const DEG2RAD=(double) PI/180;
     double c = cosf(angle * DEG2RAD);
     double s = sinf(angle * DEG2RAD);
     double xx = x * x;
