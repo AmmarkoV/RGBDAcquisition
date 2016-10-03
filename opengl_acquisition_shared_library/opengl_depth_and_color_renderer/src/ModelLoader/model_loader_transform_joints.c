@@ -96,6 +96,7 @@ void recursiveJointHeirarchyTransformer(
 }
 
 
+
 int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize)
 {
   if (triModelIn==0)

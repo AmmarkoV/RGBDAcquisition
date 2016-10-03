@@ -12,5 +12,12 @@ int main(int argc, char **argv)
      fprintf(stderr,"usage : ModelDump path/To/FileA.obj path/To/FileB.c \n");
      return 0;
    }
+
+   unsigned int i=0;
+   for (i=0; i<argc; argc++)
+   {
+     if (strcmp(argv[i],"")==0)
+   }
+
     return dumpModelFile(argv[1],argv[2]);
 }
