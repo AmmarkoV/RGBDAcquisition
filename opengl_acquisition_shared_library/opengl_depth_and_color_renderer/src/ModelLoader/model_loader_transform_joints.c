@@ -6,7 +6,6 @@
 #include <string.h>
 
 
-//#include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #define NORMAL   "\033[0m"
@@ -14,6 +13,26 @@
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
+
+
+float * mallocModelTransformJoints(
+                                    struct TRI_Model * triModelInput ,
+                                    unsigned int * jointDataSizeOutput
+                                   )
+{
+  float * returnMat = (float * ) malloc(sizeof(float) * 16 * triModelInput->header.numberOfBones);
+  if (returnMat)
+  {
+     *jointDataSizeOutput =  triModelInput->header.numberOfBones;
+     unsigned int i=0;
+     for (i=0; i<(*jointDataSizeOutput); i++)
+     {
+       float * mat = &returnMat[16*i];
+       create4x4IdentityFMatrix(mat);
+     }
+  }
+  return returnMat;
+}
 
 void recursiveJointHeirarchyTransformer(
                                          struct TRI_Model * in  ,

@@ -80,6 +80,9 @@ void copy4x4DMatrixToF(float * d, double * m );
 */
 void create4x4IdentityMatrix(double * m) ;
 
+
+void create4x4IdentityFMatrix(float * m);
+
 int is4x4DIdentityMatrix(double * m);
 int is4x4FIdentityMatrix(float  * m);
 

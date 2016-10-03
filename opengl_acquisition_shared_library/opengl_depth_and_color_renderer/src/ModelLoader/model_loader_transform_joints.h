@@ -9,6 +9,13 @@ extern "C"
 {
 #endif
 
+
+float * mallocModelTransformJoints(
+                                    struct TRI_Model * triModelInput ,
+                                    unsigned int * jointDataSizeOutput
+                                  );
+
+
 int doModelTransform(
                       struct TRI_Model * triModelOut ,
                       struct TRI_Model * triModelIn ,
