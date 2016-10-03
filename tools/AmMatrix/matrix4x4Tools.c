@@ -298,7 +298,7 @@ void create4x4ScalingMatrix(double * matrix , double sx, double sy, double sz)
 
 void create4x4RotationX(double * matrix,double degrees)
 {
-    double radians = degreesToRadians(degrees);
+    double radians = degrees_to_rad(degrees);
 
     create4x4IdentityMatrix(matrix);
 
@@ -311,7 +311,7 @@ void create4x4RotationX(double * matrix,double degrees)
 
 void create4x4RotationY(double * matrix,double degrees)
 {
-    double radians = degreesToRadians(degrees);
+    double radians = degrees_to_rad(degrees);
 
     create4x4IdentityMatrix(matrix);
 
@@ -324,7 +324,7 @@ void create4x4RotationY(double * matrix,double degrees)
 
 void create4x4RotationZ(double * matrix,double degrees)
 {
-    double radians = degreesToRadians(degrees);
+    double radians = degrees_to_rad(degrees);
 
     create4x4IdentityMatrix(matrix);
 
@@ -587,7 +587,7 @@ int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB)
 
 int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)
 {
-  if ( unlikely((resultPoint3D==0) || (transformation4x4==0) || (point3D==0)) ) { return 0; }
+  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0))  { return 0; }
 
 /*
    What we want to do ( in mathematica )
@@ -611,7 +611,7 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
   resultPoint3D[3] =  m[e15] * W + m[e12] * X + m[e13] * Y + m[e14] * Z;
 
   // Ok we have our results but now to normalize our vector
-  if (likely(resultPoint3D[3]!=0.0))
+  if (resultPoint3D[3]!=0.0)
   {
    resultPoint3D[0]/=resultPoint3D[3];
    resultPoint3D[1]/=resultPoint3D[3];
