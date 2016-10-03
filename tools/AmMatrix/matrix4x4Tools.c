@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define PI (3.141592653589793)
 
 #include "matrix4x4Tools.h"
 
@@ -171,7 +170,7 @@ void create4x4IdentityFMatrix(float * m)
 
 void create4x4RotationMatrix(double * m , double angle, double x, double y, double z)
 {
-    double const DEG2RAD=(double) PI/180;
+    double const DEG2RAD=(double) M_PI/180;
     double c = cosf(angle * DEG2RAD);
     double s = sinf(angle * DEG2RAD);
     double xx = x * x;

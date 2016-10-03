@@ -1,3 +1,10 @@
+/** @file model_loader_transform_joints.c
+ *  @brief  Recursive node transformations for TRIModels part of
+            https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
+
 #include "model_loader_tri.h"
 #include "model_loader_transform_joints.h"
 

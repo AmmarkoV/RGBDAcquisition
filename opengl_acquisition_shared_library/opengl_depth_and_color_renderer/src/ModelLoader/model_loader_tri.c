@@ -1,3 +1,9 @@
+/** @file model_loader_tri.c
+ *  @brief  TRIModels loader/writer and basic functions
+            part of  https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer
+ *  @author Ammar Qammaz (AmmarkoV)
+ */
+
 #include "model_loader_tri.h"
 
 #include <stdio.h>
