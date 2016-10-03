@@ -17,12 +17,12 @@
 
 1418730370 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrixTools.h
 
-1475348887 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix4x4Tools.c
+1475487231 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix4x4Tools.c
 	"matrix4x4Tools.h"
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
-	"matrixTools.h"
+	"matrix4x4Tools.h"
 
 1475426523 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/AmMatrix/matrix4x4Tools.h
 
