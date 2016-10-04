@@ -374,7 +374,27 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
         n = fread(&triModel->header , sizeof(struct TRI_Header), 1 , fd);
         if (triModel->header.floatSize!=sizeof(float))        { fprintf(stderr,"Size of float (%u/%lu) is different , cannot load \n",triModel->header.floatSize,sizeof(float)); return 0; }
-        if (triModel->header.triType != TRI_LOADER_VERSION )  { fprintf(stderr,"Incompatible triloader file , cannot load \n"); return 0; }
+        if (triModel->header.triType != TRI_LOADER_VERSION )
+            {//TRI_LOADER_VERSION changes can lead to bugs let's have a HUGE warning message
+             fprintf(stderr,RED " ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n");
+             fprintf(stderr," ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n");
+             fprintf(stderr," ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n" NORMAL);
+              fprintf(stderr,YELLOW"  Incompatible triloader file , cannot load \n");
+              if (triModel->header.triType>TRI_LOADER_VERSION )
+                {
+                  fprintf(stderr,"  You need to upgrade your TRI Loader code to be able to read it \n");
+                } else
+              if (triModel->header.triType>TRI_LOADER_VERSION )
+                {
+                  fprintf(stderr,"  This is an old file-version that was dropped!  \n");
+                }
+              fprintf(stderr,"       \n" NORMAL);
+             fprintf(stderr,RED " ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n");
+             fprintf(stderr," ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n");
+             fprintf(stderr," ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n" NORMAL);
+
+             return 0;
+            }
 
 
         if (triModel->header.numberOfVertices)

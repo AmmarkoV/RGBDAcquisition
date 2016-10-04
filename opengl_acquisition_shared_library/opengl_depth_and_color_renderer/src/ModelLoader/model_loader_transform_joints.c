@@ -3,8 +3,6 @@
             https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer
  *  @author Ammar Qammaz (AmmarkoV)
  */
-
-
 #include "model_loader_tri.h"
 #include "model_loader_transform_joints.h"
 
@@ -44,25 +42,28 @@ float * mallocModelTransformJoints(
 void recursiveJointHeirarchyTransformer(
                                          struct TRI_Model * in  ,
                                          int curBone ,
-                                         double * parentTransformUntouched ,
+                                         double * parentLocalTransformationUntouched ,
                                          float * jointData , unsigned int jointDataSize ,
                                          unsigned int recursionLevel
                                        )
 {
   if (recursionLevel>=in->header.numberOfBones+1)
-        { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT (%u/%u)\n_____________________\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
+        { fprintf(stderr,RED "BUG : REACHED RECURSION LIMIT (%u/%u)\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
 
 
    unsigned int i=0;
-   double parentTransform[16] , globalTransformation[16] , nodeTransformation[16];
-   copy4x4Matrix(parentTransform,parentTransformUntouched);
-   copy4x4Matrix(nodeTransformation,in->bones[curBone].info->parentTransformation);
+   double parentLocalTransformation[16] , globalTransformation[16] , currentNodeLocalTransformation[16];
+   copy4x4Matrix(parentLocalTransformation,parentLocalTransformationUntouched);
+   copy4x4Matrix(currentNodeLocalTransformation,in->bones[curBone].info->localTransformation);
 
-  if ( in->bones[curBone].info->boneWeightsNumber>0 )
+
+  //These prevent to recalculate nodes where there does not appear to be
+  //change..
+ if ( in->bones[curBone].info->boneWeightsNumber>0 )
   {
     if (in->bones[curBone].info->altered)
       {
-      //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->parentTransformation);
+      //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
       double translation[16] , rotation[16] , scaling[16];
       create4x4IdentityMatrix(translation);
       create4x4IdentityMatrix(rotation);
@@ -71,22 +72,20 @@ void recursiveJointHeirarchyTransformer(
       copy4x4FMatrixToD(rotation,&jointData[curBone*16]);
 
       //Get Translation
-      translation[3] =in->bones[curBone].info->parentTransformation[3];
-      translation[7] =in->bones[curBone].info->parentTransformation[7];
-      translation[11]=in->bones[curBone].info->parentTransformation[11];
+      translation[3] =in->bones[curBone].info->localTransformation[3];
+      translation[7] =in->bones[curBone].info->localTransformation[7];
+      translation[11]=in->bones[curBone].info->localTransformation[11];
 
-      multiplyThree4x4Matrices( nodeTransformation, translation,rotation,scaling);
+      multiplyThree4x4Matrices( currentNodeLocalTransformation, translation,rotation,scaling);
       //print4x4DMatrixTRI("Translation was .. ",translation);
       //print4x4DMatrixTRI("Scaling was .. ",scaling);
       //print4x4DMatrixTRI("Rotation was .. ",rotation);
-      //print4x4DMatrixTRI("Node Transformation is now.. \n",nodeTransformation);
+      //print4x4DMatrixTRI("Node Transformation is now.. \n",currentNodeLocalTransformation);
       }
 
-
-
-      multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
+      multiplyTwo4x4Matrices(globalTransformation,parentLocalTransformation,currentNodeLocalTransformation);
       multiplyThree4x4Matrices(
-                                 in->bones[curBone].info->finalGlobalTransformation ,
+                                 in->bones[curBone].info->finalVertexTransformation ,
                                  in->header.boneGlobalInverseTransform ,
                                  globalTransformation,
                                  in->bones[curBone].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose
@@ -105,7 +104,7 @@ void recursiveJointHeirarchyTransformer(
       }
     } else
     {
-      multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
+      multiplyTwo4x4Matrices(globalTransformation,parentLocalTransformation,currentNodeLocalTransformation);
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
         unsigned int curBoneChild=in->bones[curBone].info->boneChild[i];
@@ -120,27 +119,26 @@ void recursiveJointHeirarchyTransformer(
     }
 }
 
-
-
 int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize)
 {
   if (triModelIn==0)
                      { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
   if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
                      { fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL); return 0; }
-  //Past checks..
-
+ //Past checks..
  copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
 
  if ( (jointData==0) || (jointDataSize==0) )
  {
-   fprintf(stderr,"doModelTransform called without joints to transform , so it will be just returning a null transformed copy of the input mesh , hope this is what you intended..\n");
+   fprintf(stderr,"doModelTransform called without joints to transform , ");
+   fprintf(stderr,"so it will be just returning a null transformed copy of");
+   fprintf(stderr,"the input mesh , hope this is what you intended..\n");
    return 1;
  }
 
  double transPosition[4]={0} ,transNormal[4]={0} , position[4]={0} , normal[4]={0};
 
- unsigned int i=0;
+ unsigned int k=0,i=0;
  for (i=0; i<triModelIn->header.numberOfBones; i++)
    {
      float * jointI = &jointData[i*16];
@@ -150,7 +148,7 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
    }
 
   double parentTransform[16]={0};
-  create4x4IdentityMatrix(parentTransform) ;
+  create4x4IdentityMatrix(parentTransform) ; //Initial "parent" transform is Identity
 
    //This recursively calculates all matrix transforms and prepares the correct matrices
    //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -162,16 +160,8 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
   memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
   memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
 
-
-
-   //fprintf(stderr,"Transforming bones : ");
-   unsigned int k=0;
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
-     //if (triModelIn->bones[k].info->altered)
-     //     { fprintf(stderr,"%u (%s) altered \n",k , triModelIn->bones[k].boneName); }
-
-
      for (i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
      {
        //V is the vertice we will be working in this loop
@@ -191,19 +181,18 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
        normal[3]   = 1.0;
 
        //We transform input (initial) position with the transform we computed to get transPosition
-       transform3DPointVectorUsing4x4Matrix(transPosition, triModelIn->bones[k].info->finalGlobalTransformation ,position);
+       transform3DPointVectorUsing4x4Matrix(transPosition, triModelIn->bones[k].info->finalVertexTransformation ,position);
 	   triModelOut->vertices[v*3+0] += (float) transPosition[0] * w;
 	   triModelOut->vertices[v*3+1] += (float) transPosition[1] * w;
 	   triModelOut->vertices[v*3+2] += (float) transPosition[2] * w;
 
        //We transform input (initial) normal with the transform we computed to get transNormal
-       transform3DPointVectorUsing4x4Matrix(transNormal, triModelIn->bones[k].info->finalGlobalTransformation ,normal);
+       transform3DPointVectorUsing4x4Matrix(transNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
 	   triModelOut->normal[v*3+0] += (float) transNormal[0] * w;
 	   triModelOut->normal[v*3+1] += (float) transNormal[1] * w;
 	   triModelOut->normal[v*3+2] += (float) transNormal[2] * w;
      }
    }
-   //fprintf(stderr," done \n");
 
  return 1;
 }

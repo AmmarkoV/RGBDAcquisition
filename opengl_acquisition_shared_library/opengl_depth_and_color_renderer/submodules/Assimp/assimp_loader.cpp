@@ -204,8 +204,8 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
         { snprintf(triModel->bones[nodeNum].boneName,1+triModel->bones[nodeNum].info->boneNameSize,"%s",node->mName.data); }
 
 
-   convertMatrixAIToAmMatrix(triModel->bones[nodeNum].info->parentTransformation,  &node->mTransformation);
-   doubleMatMakeIdentity(triModel->bones[nodeNum].info->finalGlobalTransformation);
+   convertMatrixAIToAmMatrix(triModel->bones[nodeNum].info->localTransformation,  &node->mTransformation);
+   doubleMatMakeIdentity(triModel->bones[nodeNum].info->finalVertexTransformation);
    doubleMatMakeIdentity(triModel->bones[nodeNum].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose);
 
 

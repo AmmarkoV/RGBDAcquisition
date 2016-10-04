@@ -47,8 +47,8 @@ struct TRI_Bones_Header
   unsigned int boneNameSize;
 //-------------------------------------------
   double matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose[16];
-  double finalGlobalTransformation[16]; //What will store the final global transformation
-  double parentTransformation[16]; // or node->mTransformation
+  double finalVertexTransformation[16]; //What we will use
+  double localTransformation[16]; // or node->mTransformation
   unsigned char altered;
 };
 
