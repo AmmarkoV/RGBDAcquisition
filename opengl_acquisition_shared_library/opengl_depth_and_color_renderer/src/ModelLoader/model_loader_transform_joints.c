@@ -136,7 +136,7 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
    return 1;
  }
 
- double transPosition[4]={0} ,transNormal[4]={0} , position[4]={0} , normal[4]={0};
+ double transformedPosition[4]={0} ,transformedNormal[4]={0} , position[4]={0} , normal[4]={0};
 
  unsigned int k=0,i=0;
  for (i=0; i<triModelIn->header.numberOfBones; i++)
@@ -147,12 +147,12 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
         { triModelIn->bones[i].info->altered=0; }
    }
 
-  double parentTransform[16]={0};
-  create4x4IdentityMatrix(parentTransform) ; //Initial "parent" transform is Identity
+  double initialParentTransform[16]={0};
+  create4x4IdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
 
    //This recursively calculates all matrix transforms and prepares the correct matrices
    //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , parentTransform , jointData , jointDataSize , 0 );
+     recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
    //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   //We NEED to clear the vertices and normals since they are added uppon , not having
@@ -180,17 +180,17 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
        normal[2]   = triModelIn->normal[v*3+2];
        normal[3]   = 1.0;
 
-       //We transform input (initial) position with the transform we computed to get transPosition
-       transform3DPointVectorUsing4x4Matrix(transPosition, triModelIn->bones[k].info->finalVertexTransformation ,position);
-	   triModelOut->vertices[v*3+0] += (float) transPosition[0] * w;
-	   triModelOut->vertices[v*3+1] += (float) transPosition[1] * w;
-	   triModelOut->vertices[v*3+2] += (float) transPosition[2] * w;
+       //We transform input (initial) position with the transform we computed to get transformedPosition
+       transform3DPointVectorUsing4x4Matrix(transformedPosition, triModelIn->bones[k].info->finalVertexTransformation ,position);
+	   triModelOut->vertices[v*3+0] += (float) transformedPosition[0] * w;
+	   triModelOut->vertices[v*3+1] += (float) transformedPosition[1] * w;
+	   triModelOut->vertices[v*3+2] += (float) transformedPosition[2] * w;
 
-       //We transform input (initial) normal with the transform we computed to get transNormal
-       transform3DPointVectorUsing4x4Matrix(transNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
-	   triModelOut->normal[v*3+0] += (float) transNormal[0] * w;
-	   triModelOut->normal[v*3+1] += (float) transNormal[1] * w;
-	   triModelOut->normal[v*3+2] += (float) transNormal[2] * w;
+       //We transform input (initial) normal with the transform we computed to get transformedNormal
+       transform3DPointVectorUsing4x4Matrix(transformedNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
+	   triModelOut->normal[v*3+0] += (float) transformedNormal[0] * w;
+	   triModelOut->normal[v*3+1] += (float) transformedNormal[1] * w;
+	   triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
      }
    }
 
