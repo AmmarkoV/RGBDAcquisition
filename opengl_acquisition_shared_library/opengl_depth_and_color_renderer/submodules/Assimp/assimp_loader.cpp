@@ -183,7 +183,7 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
   {
     if (triModel->bones[parentNodeID].info->boneChild == 0 )
     {
-      fprintf(stderr,"Our parent %s(%u) does not have any space allocated (%p) to store his children %s(%u)..!\n",
+      fprintf(stderr,RED "BUG : Our parent %s(%u) does not have any space allocated (%p) to store his children %s(%u)..!\n" NORMAL,
                       triModel->bones[parentNodeID].boneName ,
                       parentNodeID ,
                       triModel->bones[parentNodeID].info->boneChild ,
@@ -193,13 +193,13 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
     } else
     if (triModel->bones[parentNodeID].info->allocatedNumberOfBoneChildren <= triModel->bones[parentNodeID].info->numberOfBoneChildren )
     {
-      fprintf(stderr,"Our parent did not allocate enough space for all his children , what a terrible parent..! \n");
+      fprintf(stderr,RED "BUG : Our parent did not allocate enough space for all his children , what a terrible parent..! \n" NORMAL);
     } else
     {
      //We are a child of our parent so let's store that..!
      unsigned int existingChildren = triModel->bones[parentNodeID].info->numberOfBoneChildren;
 
-     fprintf(stderr,"Node %u now has %u/%u children ( %u is a new one of them ) ..! \n ",parentNodeID , existingChildren+1 , triModel->bones[parentNodeID].info->allocatedNumberOfBoneChildren , nodeNum);
+     //fprintf(stderr,"Node %u now has %u/%u children ( %u is a new one of them ) ..! \n ",parentNodeID , existingChildren+1 , triModel->bones[parentNodeID].info->allocatedNumberOfBoneChildren , nodeNum);
      triModel->bones[parentNodeID].info->boneChild[existingChildren] = nodeNum;
      ++triModel->bones[parentNodeID].info->numberOfBoneChildren;
     }
@@ -213,7 +213,8 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
   triModel->bones[nodeNum].info->boneNameSize = strlen(node->mName.data);
   triModel->bones[nodeNum].boneName = (char* ) malloc(sizeof(char) * (1+triModel->bones[nodeNum].info->boneNameSize) );
   if (triModel->bones[nodeNum].boneName)
-        { snprintf(triModel->bones[nodeNum].boneName,1+triModel->bones[nodeNum].info->boneNameSize,"%s",node->mName.data); }
+        { memcpy(triModel->bones[nodeNum].boneName,node->mName.data ,triModel->bones[nodeNum].info->boneNameSize); }
+  triModel->bones[nodeNum].boneName[triModel->bones[nodeNum].info->boneNameSize]=0;
 
 
    convertMatrixAIToAmMatrix(triModel->bones[nodeNum].info->localTransformation,  &node->mTransformation);
@@ -269,12 +270,13 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
   //fprintf(stderr,"Node has %u children , including them ",node->mNumChildren);
   triModel->bones[nodeNum].info->allocatedNumberOfBoneChildren = node->mNumChildren;
   triModel->bones[nodeNum].info->numberOfBoneChildren = 0;
+  triModel->bones[nodeNum].info->boneChild = 0;
   if (node->mNumChildren>0)
   { //If we have children then we need to allocate enough space for them to fill in their selves
-  fprintf(stderr,"Node %s(%u) is a responsible parent with %u children allocating enough space for them.. \n",triModel->bones[nodeNum].boneName,nodeNum,node->mNumChildren);
-  triModel->bones[nodeNum].info->boneChild = (unsigned int *) malloc (sizeof(unsigned int) * node->mNumChildren );
+  //fprintf(stderr,"Node %s(%u) is a responsible parent with %u children allocating enough space for them.. \n",triModel->bones[nodeNum].boneName,nodeNum,node->mNumChildren);
+  triModel->bones[nodeNum].info->boneChild = (unsigned int *) malloc (  sizeof(unsigned int) * (node->mNumChildren+1) );
 
-  fprintf(stderr,"Allocated @ %p  \n",triModel->bones[nodeNum].info->boneChild);
+  //fprintf(stderr,"Allocated @ %p  \n",triModel->bones[nodeNum].info->boneChild);
 
    for ( i = 0 ; i < node->mNumChildren ; i++)
         {

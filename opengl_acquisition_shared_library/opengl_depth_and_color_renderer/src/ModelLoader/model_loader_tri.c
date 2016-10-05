@@ -71,7 +71,7 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
 
       if (triModel->bones[i].info->boneChild!=0)
       {
-      fprintf(stderr," Children : ");
+      fprintf(stderr," Children (%u) : " , triModel->bones[i].info->numberOfBoneChildren);
        for (k=0; k<triModel->bones[i].info->numberOfBoneChildren; k++)
         {
          child=triModel->bones[i].info->boneChild[k];
@@ -236,15 +236,26 @@ void deallocInternalsOfModelTri(struct TRI_Model * triModel)
         unsigned int boneNum =0;
         for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
         {
-          free(triModel->bones[boneNum].info->boneChild);
-          free(triModel->bones[boneNum].info);
-          free(triModel->bones[boneNum].boneName);
-          free(triModel->bones[boneNum].weightValue);
-          free(triModel->bones[boneNum].weightIndex);
+          if (triModel->bones[boneNum].info->boneChild!=0)
+           { free(triModel->bones[boneNum].info->boneChild); }
+
+          if (triModel->bones[boneNum].info!=0)
+           { free(triModel->bones[boneNum].info); }
+
+          if (triModel->bones[boneNum].boneName!=0)
+          { free(triModel->bones[boneNum].boneName); }
+
+          if (triModel->bones[boneNum].weightValue!=0)
+          { free(triModel->bones[boneNum].weightValue); }
+
+          if (triModel->bones[boneNum].weightIndex!=0)
+          { free(triModel->bones[boneNum].weightIndex); }
         }
       }
 
    if (triModel->bones!=0)         { free(triModel->bones); }
+
+   memset(triModel,0,sizeof(struct TRI_Model));
 }
 
 int freeModelTri(struct TRI_Model * triModel)
@@ -330,8 +341,9 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
          //Allocate enough space for the bone string , read it  , and null terminate it
          itemSize = sizeof(char);         count = triModelIN->bones[boneNum].info->boneNameSize;
          if (triModelOUT->bones[boneNum].boneName!=0) { free(triModelOUT->bones[boneNum].boneName); }
-         triModelOUT->bones[boneNum].boneName = ( char * ) malloc ( (itemSize)*(count+2) );
-         memcpy( triModelOUT->bones[boneNum].boneName , triModelIN->bones[boneNum].boneName , (itemSize)*(count+2) );
+         triModelOUT->bones[boneNum].boneName = ( char * ) malloc ( (itemSize)*(count+1) );
+         memcpy( triModelOUT->bones[boneNum].boneName , triModelIN->bones[boneNum].boneName , itemSize*count );
+         triModelOUT->bones[boneNum].boneName[triModelIN->bones[boneNum].info->boneNameSize]=0; //Null terminator..
 
          //Allocate enough space for the weight values , and read them
          itemSize = sizeof(float);        count = triModelIN->bones[boneNum].info->boneWeightsNumber;
@@ -346,14 +358,21 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
          memcpy( triModelOUT->bones[boneNum].weightIndex , triModelIN->bones[boneNum].weightIndex , itemSize * count );
 
          itemSize = sizeof(unsigned int); count = triModelIN->bones[boneNum].info->numberOfBoneChildren;
-         if (triModelOUT->bones[boneNum].info->boneChild!=0) { free(triModelOUT->bones[boneNum].info->boneChild); triModelOUT->bones[boneNum].info->boneChild=0;  }
-         if ((triModelIN->bones[boneNum].info->boneChild!=0) && (count!=0) )
+         if (triModelOUT->bones[boneNum].info->boneChild!=0)
+            {
+              free(triModelOUT->bones[boneNum].info->boneChild);
+              triModelOUT->bones[boneNum].info->boneChild=0;
+            }
+         if ( ( triModelIN->bones[boneNum].info->boneChild !=0 ) && (count>0) )
           {
-            triModelOUT->bones[boneNum].info->boneChild = (unsigned int *) malloc(  itemSize * count );
-            memcpy( triModelOUT->bones[boneNum].info->boneChild , triModelIN->bones[boneNum].info->boneChild ,  itemSize * count );
-          } else
-          {
-            triModelOUT->bones[boneNum].info->boneChild = 0;
+            triModelOUT->bones[boneNum].info->boneChild = (unsigned int *) malloc(  itemSize * (count+1) );
+            if (triModelOUT->bones[boneNum].info->boneChild !=0 )
+             {
+              memcpy( triModelOUT->bones[boneNum].info->boneChild , triModelIN->bones[boneNum].info->boneChild ,  itemSize * count );
+             } else
+             {
+              fprintf(stderr,"Cannot allocate enough memory for bone children..\n");
+             }
           }
         }
   } else
@@ -600,8 +619,8 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
 
           fwrite ( triModel->bones[boneNum].weightIndex , sizeof(unsigned int)            , triModel->bones[boneNum].info->boneWeightsNumber , fd);
 
-          if(triModel->bones[boneNum].info->numberOfBoneChildren>0)
-           { fwrite ( triModel->bones[boneNum].info->boneChild , sizeof(unsigned int)        , triModel->bones[boneNum].info->numberOfBoneChildren , fd); }
+          if ( (triModel->bones[boneNum].info->numberOfBoneChildren>0) && (triModel->bones[boneNum].info->boneChild) )
+           { fwrite ( triModel->bones[boneNum].info->boneChild , sizeof(unsigned int)     , triModel->bones[boneNum].info->numberOfBoneChildren , fd); }
 
          }
         }
