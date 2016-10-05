@@ -774,7 +774,9 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
     return 0;
   }
   struct TRI_Model tri={0};
-  convertObjToTri(&tri , obj);
+
+  fprintf(stderr,"TODO : move this away..");
+//  convertObjToTri(&tri , obj);
 
   char headerOut[256];
   //

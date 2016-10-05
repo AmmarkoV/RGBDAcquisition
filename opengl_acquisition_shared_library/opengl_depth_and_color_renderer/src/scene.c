@@ -814,7 +814,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
             // - - - -
 
             mod->modelInternalData = (void*) triModelIn;
-            deallocModelTri(&triModelOut);
+            deallocInternalsOfModelTri(&triModelOut);
 
            } else
            {

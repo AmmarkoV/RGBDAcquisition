@@ -7,10 +7,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#define DO_TRANSFORM 1
-#define USE_NEW_TRANSFORM_MESH_CODE 1
-
-
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -180,17 +176,33 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
   if (!triModel->bones[nodeNum].info) { fprintf(stderr,"Can't allocate enough space for bone info \n"); return; }
   memset(triModel->bones[nodeNum].info , 0 , sizeof (struct TRI_Bones_Header));
 
-
   if (parentNodeID==nodeNum)
   {
     //We are the root node so we won't update in our parents children
   } else
   {
-    //We are a child of our parent so let's store that..!
-    unsigned int existingChildren = triModel->bones[parentNodeID].info->numberOfBoneChildren;
-    //fprintf(stderr,"Node %u now has %u children ( %u is a new one of them ) ..! \n ",parentNodeID , existingChildren+1 , nodeNum);
-    triModel->bones[parentNodeID].info->boneChild[existingChildren] = nodeNum;
-    ++triModel->bones[parentNodeID].info->numberOfBoneChildren;
+    if (triModel->bones[parentNodeID].info->boneChild == 0 )
+    {
+      fprintf(stderr,"Our parent %s(%u) does not have any space allocated (%p) to store his children %s(%u)..!\n",
+                      triModel->bones[parentNodeID].boneName ,
+                      parentNodeID ,
+                      triModel->bones[parentNodeID].info->boneChild ,
+                      node->mName.data ,
+                      nodeNum
+             );
+    } else
+    if (triModel->bones[parentNodeID].info->allocatedNumberOfBoneChildren <= triModel->bones[parentNodeID].info->numberOfBoneChildren )
+    {
+      fprintf(stderr,"Our parent did not allocate enough space for all his children , what a terrible parent..! \n");
+    } else
+    {
+     //We are a child of our parent so let's store that..!
+     unsigned int existingChildren = triModel->bones[parentNodeID].info->numberOfBoneChildren;
+
+     fprintf(stderr,"Node %u now has %u/%u children ( %u is a new one of them ) ..! \n ",parentNodeID , existingChildren+1 , triModel->bones[parentNodeID].info->allocatedNumberOfBoneChildren , nodeNum);
+     triModel->bones[parentNodeID].info->boneChild[existingChildren] = nodeNum;
+     ++triModel->bones[parentNodeID].info->numberOfBoneChildren;
+    }
   }
 
 
@@ -253,11 +265,23 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
   parentNodeID=nodeNum; //We are the parent now..!
   (*numberOfNodes)++;   //We are going to the next node..!
   unsigned int i=0;
+
   //fprintf(stderr,"Node has %u children , including them ",node->mNumChildren);
+  triModel->bones[nodeNum].info->allocatedNumberOfBoneChildren = node->mNumChildren;
+  triModel->bones[nodeNum].info->numberOfBoneChildren = 0;
+  if (node->mNumChildren>0)
+  { //If we have children then we need to allocate enough space for them to fill in their selves
+  fprintf(stderr,"Node %s(%u) is a responsible parent with %u children allocating enough space for them.. \n",triModel->bones[nodeNum].boneName,nodeNum,node->mNumChildren);
+  triModel->bones[nodeNum].info->boneChild = (unsigned int *) malloc (sizeof(unsigned int) * node->mNumChildren );
+
+  fprintf(stderr,"Allocated @ %p  \n",triModel->bones[nodeNum].info->boneChild);
+
    for ( i = 0 ; i < node->mNumChildren ; i++)
         {
           fillInNodeAndBoneData(node->mChildren[i] ,  mesh , numberOfNodes , parentNodeID  , triModel);
         }
+
+  }
 }
 
 
@@ -286,6 +310,14 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 	//xxxmesh->texture = loadmaterial(scene->mMaterials[mesh->mMaterialIndex]);
 
     unsigned int verticesSize,normalsSize,textureCoordsSize,colorSize,indexSize;
+
+    triModel->header.triType = TRI_LOADER_VERSION;
+    triModel->header.floatSize = sizeof(float);
+    triModel->header.TRIMagic[0] = 'T';
+    triModel->header.TRIMagic[1] = 'R';
+    triModel->header.TRIMagic[2] = 'I';
+    triModel->header.TRIMagic[3] = '3';
+    triModel->header.TRIMagic[4] = 'D';
 
     triModel->header.numberOfVertices      = mesh->mNumVertices*3;    verticesSize     =triModel->header.numberOfVertices      * sizeof(float);
     triModel->header.numberOfNormals       = mesh->mNumVertices*3;    normalsSize      =triModel->header.numberOfNormals       * sizeof(float);
