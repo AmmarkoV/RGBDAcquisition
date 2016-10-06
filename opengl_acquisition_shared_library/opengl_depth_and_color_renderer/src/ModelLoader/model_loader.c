@@ -412,7 +412,15 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       if (mod->type==TRI_MODEL)
       {
          //fprintf(stderr,"drawing TRI model\n");
-         doTriDrawCalllist( (struct TRI_Model *) mod->modelInternalData );
+         struct TRI_Model * tri = (struct TRI_Model *) mod->modelInternalData;
+          doOGLGenericDrawCalllist(
+                                     tri->vertices ,       tri->header.numberOfVertices ,
+                                     tri->normal ,         tri->header.numberOfNormals ,
+                                     tri->textureCoords ,  tri->header.numberOfTextureCoords ,
+                                     tri->colors ,         tri->header.numberOfColors ,
+                                     tri->indices ,        tri->header.numberOfIndices
+                             );
+
       } else
       if (mod->type==OBJ_ASSIMP_MODEL )
       {

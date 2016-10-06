@@ -42,6 +42,8 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h
             opengl_depth_and_color_renderer/src/ModelLoader/model_converter.c
             opengl_depth_and_color_renderer/src/ModelLoader/model_converter.h
+            opengl_depth_and_color_renderer/src/Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c
+            opengl_depth_and_color_renderer/src/Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
             opengl_depth_and_color_renderer/src/save_to_file.c
             opengl_depth_and_color_renderer/src/save_to_file.h
             opengl_depth_and_color_renderer/src/scene.c
