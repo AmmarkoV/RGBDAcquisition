@@ -44,6 +44,8 @@ add_library(OGLRendererSandbox SHARED
             ModelLoader/model_loader_transform_joints.h
             ModelLoader/model_converter.c
             ModelLoader/model_converter.h
+            Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c
+            Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
             save_to_file.c
             save_to_file.h
             scene.c
