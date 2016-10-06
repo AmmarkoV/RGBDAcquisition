@@ -96,7 +96,7 @@ void recursiveJointHeirarchyTransformer(
 
      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
       {
-        unsigned int curBoneChild=in->bones[curBone].info->boneChild[i];
+        unsigned int curBoneChild=in->bones[curBone].boneChild[i];
         recursiveJointHeirarchyTransformer(
                                            in  ,
                                            curBoneChild ,
@@ -110,7 +110,7 @@ void recursiveJointHeirarchyTransformer(
       multiplyTwo4x4Matrices(globalTransformation,parentLocalTransformation,currentNodeLocalTransformation);
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
-        unsigned int curBoneChild=in->bones[curBone].info->boneChild[i];
+        unsigned int curBoneChild=in->bones[curBone].boneChild[i];
         recursiveJointHeirarchyTransformer(
                                            in  ,
                                            curBoneChild ,

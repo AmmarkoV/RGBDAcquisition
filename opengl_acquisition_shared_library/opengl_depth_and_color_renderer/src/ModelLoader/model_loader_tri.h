@@ -58,10 +58,16 @@ struct TRI_Bones_Header
   double finalVertexTransformation[16]; //What we will use in the end
   double localTransformation[16]; // or node->mTransformation
   unsigned char altered;
+
+  double minXRotation , x , maxXRotation;
+  double minYRotation , y , maxYRotation;
+  double minZRotation , z , maxZRotation;
+  unsigned char rotationLimitsSet;
+
+
 //-------------------------------------------
   unsigned int  allocatedNumberOfBoneChildren; //This is used when doing recursions , should be the same with numberOfBoneChildren
   unsigned int  numberOfBoneChildren;
-  unsigned int *boneChild;
 //-------------------------------------------
 };
 
@@ -71,6 +77,7 @@ struct TRI_Bones
   char*  boneName;
   float * weightValue;
   unsigned int * weightIndex;
+  unsigned int * boneChild;  //bone child structure 0-numberOfBoneChildren of bone ids
 };
 
 struct TRI_Model
