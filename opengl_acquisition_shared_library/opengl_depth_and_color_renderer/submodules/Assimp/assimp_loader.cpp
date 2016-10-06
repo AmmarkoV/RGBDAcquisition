@@ -455,7 +455,7 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
 
 }
 
-int testAssimp(const char * filename  , struct TRI_Model * triModel , struct TRI_Model * originalModel)
+int convertAssimpToTRI(const char * filename  , struct TRI_Model * triModel , struct TRI_Model * originalModel)
 {
     int flags = aiProcess_Triangulate;
 		flags |= aiProcess_JoinIdenticalVertices;

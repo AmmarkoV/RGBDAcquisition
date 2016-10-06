@@ -16,7 +16,7 @@ int main (int argc, char *argv[])
  struct TRI_Model *originalModel=  allocateModelTri();
 
 
- testAssimp(argv[2],flatModel,originalModel);
+ convertAssimpToTRI(argv[2],flatModel,originalModel);
  saveModelTri(argv[3], originalModel);
 
 
