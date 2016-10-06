@@ -526,22 +526,22 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 }
 
 
-int findTRIBoneWithName(struct TRI_Model * triModel ,const char * name , unsigned int * boneNumResult)
+int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName , unsigned int * boneIDResult)
 {
 if ( (triModel->header.numberOfBones) && (triModel->bones!=0) )
   {
    unsigned int boneNum=0;
    for (boneNum=0; boneNum<triModel->header.numberOfBones; boneNum++)
      {
-        if ( strcmp(name,triModel->bones[boneNum].boneName)==0)
+        if ( strcmp(searchName,triModel->bones[boneNum].boneName)==0)
             {
-              //fprintf(stderr,GREEN "Found bone %s ( %u ) \n" NORMAL , name , boneNum);
-              *boneNumResult=boneNum;
+              //fprintf(stderr,GREEN "Found bone %s ( %u ) \n" NORMAL , searchName , boneNum);
+              *boneIDResult=boneNum;
               return 1;
             }
      }
   }
-  fprintf(stderr,RED "Could not find bone %s ( %u bones total ) \n" NORMAL , name , triModel->header.numberOfBones);
+  fprintf(stderr,RED "Could not find bone %s ( %u bones total ) \n" NORMAL , searchName , triModel->header.numberOfBones);
  return 0;
 }
 

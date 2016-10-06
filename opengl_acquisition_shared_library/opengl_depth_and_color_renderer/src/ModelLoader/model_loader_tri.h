@@ -20,11 +20,21 @@ extern "C"
 
 #include "model_loader_setup.h"
 
+
+/**
+* @brief TRI_LOADER_VERSION is a compatibility switch , every time this changes it invalidates all older files in order
+         to keep the spec as clean as possible
+* @ingroup TRI
+*/
 #define TRI_LOADER_VERSION 5
 
+/**
+* @brief The header and initial file block of the TRI format , magic for the files is TRI3D
+* @ingroup TRI
+*/
 struct TRI_Header
 {
-     char TRIMagic[5];
+     char TRIMagic[5]; // TRI3D
      unsigned int triType;
      unsigned int floatSize;
      //These first values guarantee that there is compatibility between machines/versions etc
@@ -47,6 +57,12 @@ struct TRI_Header
      unsigned int notUsed5;
 };
 
+
+/**
+* @brief Each bone has a parent ( if the parent has the same ID as the node it is the root )  , some transforms , weights and limits
+         they are all stored here
+* @ingroup TRI
+*/
 struct TRI_Bones_Header
 {
   unsigned int boneParent;
@@ -71,6 +87,10 @@ struct TRI_Bones_Header
 //-------------------------------------------
 };
 
+/**
+* @brief Each bone has some static attributes stored in the info header and a variable number of weights/childs etc
+* @ingroup TRI
+*/
 struct TRI_Bones
 {
   struct TRI_Bones_Header * info;
@@ -80,6 +100,10 @@ struct TRI_Bones
   unsigned int * boneChild;  //bone child structure 0-numberOfBoneChildren of bone ids
 };
 
+/**
+* @brief A TRI Model skeleton in all its simplicity..!
+* @ingroup TRI
+*/
 struct TRI_Model
 {
    struct TRI_Header header;
@@ -109,14 +133,21 @@ void print4x4DMatrixTRI(char * str , double * matrix4x4);
 */
 void printTRIBoneStructure(struct TRI_Model * triModel,int alsoPrintMatrices);
 
+/**
+* @brief This function can flatten out an indexed TRI_Model , so it becomes literally an array of triangles with no indexing.
+*        Of course this will result in a bigger chunk of memory required , but it might be useful
+* @ingroup TRI
+* @param  output TRI structure with the resulting flat model , should be allocated via allocateModelTri
+* @param  input TRI structure with the loaded index model we want to process
+* @retval 0=Failure,1=Success
+*/
 int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI_Model * indexed);
-
-
 
 /**
 * @brief Allocate the space for a TRI model ( possibly to build a model from scratch ) , typically you don't want to do this , just use loadModelTri instead..!
 * @ingroup TRI
 * @param  input TRI structure with the loaded model we want freed
+* @retval 0=Failure or else a pointer to a newly allocated TRI_Model
 */
 struct TRI_Model * allocateModelTri();
 
@@ -124,6 +155,7 @@ struct TRI_Model * allocateModelTri();
 * @brief After being done with the model we can deallocate it , the model needs to have been allocated with allocateModelTri to be correctly freed
 * @ingroup TRI
 * @param  input TRI structure with the loaded model we want freed
+* @retval 0=Failure,1=Success
 */
 int freeModelTri(struct TRI_Model * triModel);
 
@@ -135,14 +167,44 @@ int freeModelTri(struct TRI_Model * triModel);
 void deallocInternalsOfModelTri(struct TRI_Model * triModel);
 
 
+/**
+* @brief  Load TRI model from a file
+* @ingroup TRI
+* @param  String with the filename we want to load from
+* @param  output structure to hold the TRI Model ( allocate with allocateModelTri )
+* @retval 0=Failure,1=Success
+*/
 int loadModelTri(const char * filename , struct TRI_Model * triModel);
+
+
+/**
+* @brief  Save TRI model to a file
+* @ingroup TRI
+* @param  String with the filename we want to load from
+* @param  input structure that hold the TRI Model we want to save
+* @retval 0=Failure,1=Success
+*/
 int saveModelTri(const char * filename , struct TRI_Model * triModel);
 
-int findTRIBoneWithName(struct TRI_Model * triModel ,const char * name , unsigned int * boneNumResult);
+/**
+* @brief  Search inside the bone tree of a TRI Model and get back a specific boneID
+* @ingroup TRI
+* @param  input TRI structure with the bones we want to search
+* @param  string with the name of the bone we are looking for
+* @param  output boneID if we found one
+* @retval 0=Bone Does not exist , 1=Bone found
+*/
+int findTRIBoneWithName(struct TRI_Model * triModel ,const char * searchName , unsigned int * boneIDResult);
 
-void copyModelTriHeader(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN );
+/**
+* @brief One pretty standard operations that is needed often is copying models around to edit them without destroying the original
+         This function does exactly that , with or without the bone structure.
+* @ingroup TRI
+* @param  output TRI model that will contain our fresh deep copy (  allocate with allocateModelTri )
+* @param  input TRI model
+* @param  switch to control copying bones
+*/
 void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN , int copyBoneStructures);
-
 
 /**
 * @brief If INCLUDE_OPENGL_CODE is declared ( so we have an openGL context )  we can use the fixed graphics pipeline and do the rendering of the file on the spot.
