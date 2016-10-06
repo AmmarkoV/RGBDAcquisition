@@ -31,7 +31,9 @@ enum ModelTypes
 
 
 
-
+/**
+* @brief An array of strings , this is has to correspond to enum ModelTypes
+*/
 static const char * modelTypeNames[] =
 {
     "NOTYPE",
