@@ -17,6 +17,7 @@
 #include "glx.h"
 #include "ModelLoader/model_loader_obj.h"
 #include "ModelLoader/model_loader_tri.h"
+#include "ModelLoader/model_converter.h"
 #include "scene.h"
 #include "tools.h"
 
@@ -775,8 +776,7 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
   }
   struct TRI_Model tri={0};
 
-  fprintf(stderr,"TODO : move this away..");
-//  convertObjToTri(&tri , obj);
+  convertObjToTri(&tri , obj);
 
   char headerOut[256];
   //
