@@ -30,7 +30,6 @@ add_dependencies(Renderer OGLRendererSandbox)
        
  
 set_target_properties(Renderer PROPERTIES 
-                       DEBUG_POSTFIX "D"
                        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
                        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
                        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"

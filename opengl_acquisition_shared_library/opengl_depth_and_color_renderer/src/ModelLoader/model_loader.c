@@ -190,12 +190,19 @@ unsigned int findModel(struct ModelList * modelStorage , char * directory,char *
   unsigned int i=0;
   for (i=0; i<modelStorage->currentNumberOfModels; i++)
   {
+   if (&modelStorage->models[i]==0)
+   {
+
+   } else
+   if (modelStorage->models[i].pathOfModel!=0)
+   {
     if ( strcmp(tmpPathOfModel,modelStorage->models[i].pathOfModel)==0)
     {
       *found=1;
       fprintf(stderr,GREEN "model ( %s ) is already loaded , no need to reload it \n" NORMAL,tmpPathOfModel);
       return i;
     }
+   }
   }
 
 return 0;

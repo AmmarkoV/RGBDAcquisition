@@ -25,7 +25,7 @@ void doOGLGenericDrawCalllist(
 
      for (i = 0; i < numberOfIndices/3; i++)
      {
-      faceTriA = indices[(i*3)+0];      faceTriB = indices[(i*3)+1];      faceTriC = indices[(i*3)+2];
+      faceTriA = indices[(i*3)+0];           faceTriB = indices[(i*3)+1];           faceTriC = indices[(i*3)+2];
       faceTriA_X = (faceTriA*3)+0;           faceTriA_Y = (faceTriA*3)+1;           faceTriA_Z = (faceTriA*3)+2;
       faceTriB_X = (faceTriB*3)+0;           faceTriB_Y = (faceTriB*3)+1;           faceTriB_Z = (faceTriB*3)+2;
       faceTriC_X = (faceTriC*3)+0;           faceTriC_Y = (faceTriC*3)+1;           faceTriC_Z = (faceTriC*3)+2;

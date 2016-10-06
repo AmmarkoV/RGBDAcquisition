@@ -29,7 +29,7 @@ add_dependencies(Comparer OGLRendererSandbox)
        
  
 set_target_properties(Comparer PROPERTIES 
-                       DEBUG_POSTFIX "D"
+                       #DEBUG_POSTFIX "D"
                        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
                        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
                        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"

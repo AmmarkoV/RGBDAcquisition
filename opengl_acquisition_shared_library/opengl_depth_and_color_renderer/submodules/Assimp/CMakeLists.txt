@@ -27,7 +27,7 @@ target_link_libraries(assimpTester rt m assimp )
  
 
 set_target_properties(assimpLoader PROPERTIES 
-                       DEBUG_POSTFIX "D"
+                       #DEBUG_POSTFIX "D"
                           ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                           LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -35,7 +35,7 @@ set_target_properties(assimpLoader PROPERTIES
 
 
 set_target_properties(assimpTester PROPERTIES 
-                       DEBUG_POSTFIX "D"
+                       #DEBUG_POSTFIX "D"
                           ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                           LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"

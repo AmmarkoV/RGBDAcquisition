@@ -37,6 +37,7 @@
 			<Add library="X11" />
 			<Add library="./libOGLRendererSandbox.so" />
 		</Linker>
+		<Unit filename="../Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

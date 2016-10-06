@@ -131,11 +131,10 @@ unsigned int FindMaterial(struct OBJ_Model * obj,char *name)
   for (i = 0; i<obj->numMaterials; i++)
   {
     if (!strcmp(obj->matList[i].name, name)) { return i; }
-
   }
 
   /* didn't find the name, so set it as the default material */
-  printf("FindMaterial():  TODO NOT RETURN 0 can't find material \"%s\".\n", name);
+  printf("FindMaterial(%s,%s):  TODO NOT RETURN 0 can't find material \"%s\".\n",obj->filename  , name, name);
   return 0;
 }
 
@@ -484,7 +483,7 @@ int readOBJ(struct OBJ_Model * obj)
   strcat(fname,"/");
   strncat(fname,obj->filename,MAX_MODEL_PATHS);
 
-  fprintf(stderr,"Opening %s ..\n",fname);
+  fprintf(stderr,"Opening File %s ..\n",fname);
   file=fopen(fname,"r");
   if(file==0) { fprintf(stderr,"Could not open file %s for reading Object\n",fname); return 0;  }
  // strcpy(name,filename);
@@ -1364,7 +1363,7 @@ int unloadObj(struct OBJ_Model * obj)
 
 struct OBJ_Model * loadObj(char * directory,char * filename,int compileDisplayList)
 {
-    fprintf(stderr,"Starting to load object %s \n",filename);
+    fprintf(stderr,"Starting to load  OBJ file %s \n",filename);
     struct OBJ_Model * obj = ( struct OBJ_Model * ) malloc(sizeof(struct OBJ_Model));
     if ( obj == 0 )  { fprintf(stderr,"Could not allocate enough space for model %s \n",filename);  return 0; }
 

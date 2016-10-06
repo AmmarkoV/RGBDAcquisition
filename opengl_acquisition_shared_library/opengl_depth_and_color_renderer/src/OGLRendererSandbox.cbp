@@ -141,6 +141,14 @@
 		</Unit>
 		<Unit filename="ModelLoader/model_loader_tri.h" />
 		<Unit filename="OGLRendererSandbox.h" />
+		<Unit filename="Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h" />
+		<Unit filename="Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h" />
 		<Unit filename="TextureLoader/texture_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>
