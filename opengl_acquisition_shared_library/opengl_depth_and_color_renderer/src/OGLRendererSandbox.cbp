@@ -149,6 +149,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h" />
+		<Unit filename="Rendering/ShaderPipeline/shader_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Rendering/ShaderPipeline/shader_loader.h" />
 		<Unit filename="TextureLoader/texture_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -188,10 +192,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="scene.h" />
-		<Unit filename="shader_loader.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="shader_loader.h" />
 		<Unit filename="tiledRenderer.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -6,7 +6,7 @@
 #include <GL/glext.h>
 
 #include "shader_loader.h"
-#include "tools.h"
+#include "../../tools.h"
 
 
 #define USE_FAILSAFE_SHADER 0

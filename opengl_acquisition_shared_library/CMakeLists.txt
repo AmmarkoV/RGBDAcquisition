@@ -30,6 +30,7 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/glx.h
             opengl_depth_and_color_renderer/src/main.c
             opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
+            #3D Models and how to load them  
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader.h
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.c
@@ -42,14 +43,22 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h
             opengl_depth_and_color_renderer/src/ModelLoader/model_converter.c
             opengl_depth_and_color_renderer/src/ModelLoader/model_converter.h
+            #Textures and how to load them 
+            opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
+            opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h
+            opengl_depth_and_color_renderer/src/TextureLoader/image_proc.c
+            opengl_depth_and_color_renderer/src/TextureLoader/image_proc.h
+            #OpenGL Rendering stuff  
             opengl_depth_and_color_renderer/src/Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c
             opengl_depth_and_color_renderer/src/Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
+            opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.c
+            opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h
+            opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/shader_loader.c
+            opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/shader_loader.h
             opengl_depth_and_color_renderer/src/save_to_file.c
             opengl_depth_and_color_renderer/src/save_to_file.h
             opengl_depth_and_color_renderer/src/scene.c
-            opengl_depth_and_color_renderer/src/scene.h
-            opengl_depth_and_color_renderer/src/shader_loader.c
-            opengl_depth_and_color_renderer/src/shader_loader.h
+            opengl_depth_and_color_renderer/src/scene.h 
             opengl_depth_and_color_renderer/src/tools.c
             opengl_depth_and_color_renderer/src/tools.h
             #AmMatrix dependencies 
@@ -73,10 +82,6 @@ add_library(OpenGLAcquisition SHARED
             ../tools/ImageOperations/patchComparison.h 
             ../tools/ImageOperations/resize.c 
             #Rest of the stuff  
-            opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
-            opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h
-            opengl_depth_and_color_renderer/src/TextureLoader/image_proc.c
-            opengl_depth_and_color_renderer/src/TextureLoader/image_proc.h
             opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c
             opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c

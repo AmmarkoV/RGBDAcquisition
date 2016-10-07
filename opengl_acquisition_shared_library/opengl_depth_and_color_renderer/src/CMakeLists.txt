@@ -32,6 +32,7 @@ add_library(OGLRendererSandbox SHARED
             glx.h
             main.c
             OGLRendererSandbox.h
+            #3D Models and how to load them   
             ModelLoader/model_loader.c
             ModelLoader/model_loader.h
             ModelLoader/model_loader_obj.c
@@ -44,16 +45,24 @@ add_library(OGLRendererSandbox SHARED
             ModelLoader/model_loader_transform_joints.h
             ModelLoader/model_converter.c
             ModelLoader/model_converter.h
+            #Textures and how to load them  
+            TextureLoader/texture_loader.c
+            TextureLoader/texture_loader.h
+            TextureLoader/image_proc.c
+            TextureLoader/image_proc.h
+            #OpenGL Rendering stuff  
             Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c
             Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
+            Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.c
+            Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h
+            Rendering/ShaderPipeline/shader_loader.c
+            Rendering/ShaderPipeline/shader_loader.h
+            tiledRenderer.c
+            tiledRenderer.h
             save_to_file.c
             save_to_file.h
             scene.c
             scene.h
-            shader_loader.c
-            shader_loader.h
-            tiledRenderer.c
-            tiledRenderer.h
             tools.c
             tools.h 
             #AmMatrix dependencies 
@@ -77,10 +86,6 @@ add_library(OGLRendererSandbox SHARED
             ../../../tools/ImageOperations/patchComparison.h 
             ../../../tools/ImageOperations/resize.c 
             #Rest of the stuff  
-            TextureLoader/texture_loader.c
-            TextureLoader/texture_loader.h
-            TextureLoader/image_proc.c
-            TextureLoader/image_proc.h
             TrajectoryParser/InputParser_C.c
             TrajectoryParser/InputParser_C.h
             TrajectoryParser/TrajectoryParser.c

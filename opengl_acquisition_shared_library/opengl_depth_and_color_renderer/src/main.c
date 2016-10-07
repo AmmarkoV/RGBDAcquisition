@@ -22,7 +22,7 @@
 #include "tools.h"
 
 #include "save_to_file.h"
-#include "shader_loader.h"
+#include "Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h"
 #include "../../../tools/AmMatrix/matrixCalculations.h"
 
 #include "../../../tools/ImageOperations/imageOps.h"
