@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
@@ -19,6 +20,70 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
+
+
+
+
+
+static float _triTrans_degrees_to_rad(float degrees)
+{
+    return degrees * (M_PI /180.0 );
+}
+
+
+static void _triTrans_create4x4MatrixFromEulerAnglesXYZ(float * m ,float eulX, float eulY, float eulZ)
+{
+    float x = _triTrans_degrees_to_rad(eulX);
+    float y = _triTrans_degrees_to_rad(eulY);
+    float z = _triTrans_degrees_to_rad(eulZ);
+
+	float cr = cos( x );
+	float sr = sin( x );
+	float cp = cos( y );
+	float sp = sin( y );
+	float cy = cos( z );
+	float sy = sin( z );
+
+	m[0] = cp*cy ;
+	m[1] = cp*sy;
+	m[2] = -sp ;
+	m[3] = 0; // 4x4
+
+
+	float srsp = sr*sp;
+	float crsp = cr*sp;
+
+	m[4] = srsp*cy-cr*sy ;
+	m[5] = srsp*sy+cr*cy ;
+	m[6] = sr*cp ;
+	m[7] = 0; // 4x4
+
+	m[8] =  crsp*cy+sr*sy ;
+	m[9] =  crsp*sy-sr*cy ;
+	m[10]= cr*cp ;
+    m[11]= 0; // 4x4
+
+    m[12]= 0;
+    m[13]= 0;
+    m[14]= 0;
+    m[15]= 1.0;
+}
+
+
+void transformTRIJoint(
+                                 struct TRI_Model * in ,
+                                 float * jointData ,
+                                 unsigned int jointDataSize ,
+
+                                 unsigned int jointToChange ,
+                                 float rotEulerX ,
+                                 float rotEulerY ,
+                                 float rotEulerZ
+                               )
+{
+  float * mat = &jointData[16*jointToChange];
+  _triTrans_create4x4MatrixFromEulerAnglesXYZ(mat,rotEulerX,rotEulerY,rotEulerZ);
+}
 
 
 

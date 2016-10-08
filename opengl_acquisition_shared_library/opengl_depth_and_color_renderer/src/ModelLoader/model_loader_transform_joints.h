@@ -17,8 +17,36 @@ extern "C"
 #endif
 
 
+
+
+
 /**
-* @brief Allocate all the 4x4 matrices needed to control a TRI_Model , this call also initializes them so they are ready for use..! , they need to be freed after beeing used
+* @brief Transform a TRI Joint using just 3 Euler Angles..!
+* @ingroup TRI
+* @param  input TRI structure with the loaded model
+* @param  allocated matrix array that will be altered
+* @param  size of allocated matrix array
+
+* @param  The joint to select in->bones[jointToChange].boneName to see what it was
+* @param  Rotation in Euler Angle axis X
+* @param  Rotation in Euler Angle axis Y
+* @param  Rotation in Euler Angle axis Z
+*/
+void transformTRIJoint(
+                        struct TRI_Model * in ,
+                        float * jointData ,
+                        unsigned int jointDataSize ,
+
+                        unsigned int jointToChange ,
+                        float rotEulerX ,
+                        float rotEulerY ,
+                        float rotEulerZ
+                      );
+
+
+
+/**
+* @brief Allocate all the 4x4 matrices needed to control a TRI_Model , this call also initializes them so they are ready for use..! , they need to be freed after being used
 * @ingroup TRI
 * @param  input TRI structure with the loaded model we want to allocate matrices for
 * @param  output number of 4x4 matrices allocated
