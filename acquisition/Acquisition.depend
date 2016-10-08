@@ -52,7 +52,7 @@
 1449598062 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/processorLinker.h
 	"Acquisition.h"
 
-1473787681 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisitionFileOutput.c
+1473804329 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisitionFileOutput.c
 	"Acquisition.h"
 	"acquisition_setup.h"
 	"pluginLinker.h"
@@ -62,6 +62,7 @@
 	"../tools/OperatingSystem/OperatingSystem.h"
 	"../tools/Primitives/modules.h"
 	"../tools/LocationServices/locationService.h"
+	"../tools/Codecs/codecs.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -70,4 +71,9 @@
 	"Acquisition.h"
 
 1455360974 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/modules.h
+
+1461443498 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/codecs.h
+	"../Primitives/image.h"
+
+1458492977 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/image.h
 

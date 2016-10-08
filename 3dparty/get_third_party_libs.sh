@@ -282,6 +282,40 @@ fi
 
 
 
+
+
+
+
+if [ -d librealsense ]
+then
+echo "Intel Realsense Driver appears to already exist .."
+else
+  echo "Do you want to download Intel Realsense Driver ? " 
+  echo
+  echo -n " (Y/N)?"
+  read answer
+  if test "$answer" != "N" -a "$answer" != "n";
+  then  
+      git clone https://github.com/IntelRealSense/librealsense/
+      cd librealsense
+
+      #CMakeFile of caffe is bad :P 
+      mkdir build
+      cd build
+      cmake ..
+      make  
+
+      cd ..
+      cd ..
+  fi
+fi
+
+
+
+
+
+
+
 if [ -d opencv_contrib ]
 then
 echo "opencv_contrib appears to already exist .."

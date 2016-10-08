@@ -1,0 +1,46 @@
+#ifndef FREENECTACQUISITION_H_INCLUDED
+#define FREENECTACQUISITION_H_INCLUDED
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include "../acquisition/acquisition_setup.h"
+
+#define BUILD_REALSENSE 1
+int startRealsenseModule(unsigned int max_devs,char * settings);
+
+#if BUILD_REALSENSE
+int stopRealsenseModule();
+
+int createRealsenseDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+
+int mapRealsenseDepthToRGB(int devID);
+
+int getRealsenseNumberOfDevices();
+
+int seekRealsenseFrame(int devID,unsigned int seekFrame);
+int snapRealsenseFrames(int devID);
+
+int getRealsenseColorWidth(int devID);
+int getRealsenseColorHeight(int devID);
+int getRealsenseColorDataSize(int devID);
+int getRealsenseColorChannels(int devID);
+int getRealsenseColorBitsPerPixel(int devID);
+char * getRealsenseColorPixels(int devID);
+
+int getRealsenseDepthWidth(int devID);
+int getRealsenseDepthHeight(int devID);
+int getRealsenseDepthDataSize(int devID);
+int getRealsenseDepthChannels(int devID);
+int getRealsenseDepthBitsPerPixel(int devID);
+char * getRealsenseDepthPixels(int devID);
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // FREENECTACQUISITION_H_INCLUDED
