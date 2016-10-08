@@ -62,11 +62,20 @@ add_subdirectory (3dparty/fast)
 
 
 if (ENABLE_FREENECT2)
-  add_subdirectory (3dparty/libfreenect2/examples/protonect)
+  add_subdirectory (3dparty/librealsense)
 ELSE (ENABLE_FREENECT2)
  #OPTION (ENABLE_OPENCV OFF)
  MESSAGE("Freenect2 not found , some parts will not be compiled")
 ENDIF(ENABLE_FREENECT2)
+
+
+if (ENABLE_REALSENSE)
+  add_definitions(-DBUILD_REALSENSE)
+  add_subdirectory (3dparty/libfreenect2/examples/protonect)
+  add_subdirectory (librealsense_acquisition_shared_library)
+ELSE (ENABLE_REALSENSE) 
+ MESSAGE("Realsense support will not be compiled")
+ENDIF(ENABLE_REALSENSE)
 
 
 #First to make our handy tools

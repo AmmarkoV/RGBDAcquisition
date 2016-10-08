@@ -1,5 +1,5 @@
-#ifndef FREENECTACQUISITION_H_INCLUDED
-#define FREENECTACQUISITION_H_INCLUDED
+#ifndef REALSENSEACQUISITION_H_INCLUDED
+#define REALSENSEACQUISITION_H_INCLUDED
 
 
 #ifdef __cplusplus
@@ -9,7 +9,7 @@ extern "C"
 
 #include "../acquisition/acquisition_setup.h"
 
-#define BUILD_REALSENSE 1
+//#define BUILD_REALSENSE 1
 int startRealsenseModule(unsigned int max_devs,char * settings);
 
 #if BUILD_REALSENSE

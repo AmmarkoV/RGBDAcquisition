@@ -28,6 +28,7 @@
 				<item>TEMPLATE</item>
 				<item>NETWORK</item>
 				<item>DEPTHSENSE</item>
+				<item>REALSENSE</item>
 			</content>
 			<selection>7</selection>
 			<pos>88,16</pos>

@@ -11,6 +11,9 @@ mkdir redist
 cd redist
 ln -s 
 
+
+ln -s ../../3dparty/librealsense/build/devel/lib/librealsense.so 
+
 binaries="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_mux/GrabberMux acquisitionBroadcast/acquisitionBroadcast synergiesAdapter/Adapter editor/Editor"
 
  for f in $binaries
@@ -78,6 +81,7 @@ ln -s grabber/frames grabbed_frames
 
 cd opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/
 ln -s ../../libOGLRendererSandbox.so
+
 
 
 cd "$STARTDIR"

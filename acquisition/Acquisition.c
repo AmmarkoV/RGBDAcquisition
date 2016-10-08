@@ -158,6 +158,7 @@ int acquisitionGetModulesCount()
   if ( acquisitionIsModuleAvailiable(OPENNI2_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI2 module found \n");    ++modules; }
   if ( acquisitionIsModuleAvailiable(NETWORK_ACQUISITION_MODULE) )       { fprintf(stderr,"Network module found \n");    ++modules; }
   if ( acquisitionIsModuleAvailiable(DEPTHSENSE_ACQUISITION_MODULE) )    { fprintf(stderr,"DepthSense module found \n"); ++modules; }
+  if ( acquisitionIsModuleAvailiable(REALSENSE_ACQUISITION_MODULE) )    { fprintf(stderr,"RealSense module found \n"); ++modules; }
 
   return modules;
 }
@@ -175,7 +176,8 @@ ModuleIdentifier getModuleIdFromModuleName(char * moduleName)
           if (strcasecmp("V4L2STEREO",moduleName)==0 )   { moduleID = V4L2STEREO_ACQUISITION_MODULE;   } else
           if (strcasecmp("TEMPLATE",moduleName)==0 )  { moduleID = TEMPLATE_ACQUISITION_MODULE; } else
           if (strcasecmp("NETWORK",moduleName)==0 )   { moduleID = NETWORK_ACQUISITION_MODULE; } else
-          if (strcasecmp("DEPTHSENSE",moduleName)==0 )   { moduleID = DEPTHSENSE_ACQUISITION_MODULE; }
+          if (strcasecmp("DEPTHSENSE",moduleName)==0 )   { moduleID = DEPTHSENSE_ACQUISITION_MODULE; } else
+          if (strcasecmp("REALSENSE",moduleName)==0 )   { moduleID = REALSENSE_ACQUISITION_MODULE; }
    return moduleID;
 }
 
@@ -193,6 +195,7 @@ char * getModuleNameFromModuleID(ModuleIdentifier moduleID)
       case TEMPLATE_ACQUISITION_MODULE    :  return (char*) "TEMPLATE MODULE"; break;
       case NETWORK_ACQUISITION_MODULE    :  return (char*) "NETWORK MODULE"; break;
       case DEPTHSENSE_ACQUISITION_MODULE    :  return (char*) "DEPTHSENSE MODULE"; break;
+      case REALSENSE_ACQUISITION_MODULE    :  return (char*) "REALSENSE MODULE"; break;
     };
     return (char*) "UNKNOWN MODULE";
 }
@@ -270,6 +273,9 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,cha
         { fprintf(stderr,RED "Could not find %s plugin shared object \n" NORMAL,getModuleNameFromModuleID(moduleID)); return 0; }
 
     if (*plugins[moduleID].startModule!=0) { return (*plugins[moduleID].startModule) (maxDevices,settings); }
+  } else
+  {
+    fprintf(stderr,RED "The plugin requested ( %s ) does not exist in the current plugin list , please recompile..\n" NORMAL,getModuleNameFromModuleID(moduleID));
   }
 
     MeaningfullWarningMessage(moduleID,0,"acquisitionStartModule");

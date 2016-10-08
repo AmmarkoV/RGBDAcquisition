@@ -4,7 +4,7 @@
 
 #include "RealsenseAcquisition.h"
 
-#define BUILD_REALSENSE 1
+//#define BUILD_REALSENSE 1
 
 #if BUILD_REALSENSE
 #include "../3dparty/librealsense/include/librealsense/rs.h"
@@ -12,6 +12,8 @@ rs_context * ctx = 0;
 rs_device * dev = 0;
 
 rs_error * e = 0;
+
+unsigned int frameCount=0;
 void check_error()
 {
     if(e)
@@ -75,10 +77,25 @@ int seekRealsenseFrame(int devID,unsigned int seekFrame)
   return 0;
 }
 
+
+
+int getTotalRealsenseFrameNumber(int devID)
+{
+ return 0;
+}
+
+
+int getCurrentRealsenseFrameNumber(int devID)
+{
+ return frameCount;
+}
+
+
 int snapRealsenseFrames(int devID)
 {
   rs_wait_for_frames(dev, &e);
   check_error();
+  ++frameCount;
   return 1;
 }
 
