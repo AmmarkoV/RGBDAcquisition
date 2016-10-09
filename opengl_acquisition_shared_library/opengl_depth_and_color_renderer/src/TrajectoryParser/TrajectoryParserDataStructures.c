@@ -593,6 +593,91 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream, struct M
 }
 
 
+
+
+
+//For now this is written without range checks..
+int splitRawFilenameToDirectoryFilenameAndExtension(
+                                                     const char * inputFilename,
+                                                     char * directory ,
+                                                     char * filename ,
+                                                     char * extension ,
+                                                     char * filenameWExtension,
+                                                     unsigned int outputSizes
+                                                    )
+{
+   //Basic case
+   strcpy(directory,"./");
+   strcpy(filename,inputFilename);
+   extension[0]=0;
+   unsigned int inputFilenameLength=strlen(inputFilename);
+   unsigned int extensionStart = inputFilenameLength , filenameStart = inputFilenameLength  ,filenameSpan = 0, directoryStart = inputFilenameLength , directorySpan = 0;
+
+
+   if (inputFilenameLength==0) { return 0; }
+   unsigned int i=inputFilenameLength-1;
+
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   //We first handle the extension
+   while ((i>0)&&(inputFilename[i]!='.')) { --i; }
+   if (i==0)
+     {
+       /* could not find the content type.. */
+       i=inputFilenameLength-1;
+     } else
+   if (i+1>=inputFilenameLength)
+     {
+       /* found the dot at i BUT it is the last character so no extension is possible..! */
+       i=inputFilenameLength-1;
+     } else
+     {
+       //we found a legit extension..!
+       extensionStart = i+1;
+       const char * startOfExtension = &inputFilename[i+1]; // do not include . ( dot )
+       strcpy(extension,startOfExtension);
+     }
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   //We then handle the directory/filename division
+   while ((i>0)&&(inputFilename[i]!='/')) { --i; }
+
+   filenameStart  = i;
+   filenameSpan = extensionStart - filenameStart;
+   const char * startOfFilename = &inputFilename[i+1]; // do not include . ( dot )
+   strncpy(filename,startOfFilename,filenameSpan);
+   filename[filenameSpan]=0;
+   if (filenameSpan>2) { filename[filenameSpan-2]=0; }
+
+   snprintf(filenameWExtension,"%s.%s",filename,extension);
+
+   if (i==0) {
+               //This whole thing is a filename
+               //If we could not find a directory it means the resulting string is all just a big filename
+               return 1;
+             } //<- could not find the content type..
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+  //If we reached this place we have a directory(!)
+
+   directoryStart  = i;
+   const char * startOfDirectory = &inputFilename[0]; // do not include . ( dot )
+   directorySpan = filenameStart;
+   strncpy(directory,startOfDirectory,directorySpan);
+   directory[directorySpan]=0;
+
+  return 1;
+}
+
+
+
 int loadObjectTypeModelForVirtualStream(
                                         struct VirtualStream * stream ,
                                         char * modelName ,
@@ -601,12 +686,28 @@ int loadObjectTypeModelForVirtualStream(
 {
   fprintf(stderr,"Loading Model with name %s and objTypeID  %u \n",modelName,objTypeID);
 
+   char directory[MAX_MODEL_PATHS]={0};
+   char filename[MAX_MODEL_PATHS]={0};
+   char extension[MAX_MODEL_PATHS]={0};
+   char filenameWExtension[MAX_MODEL_PATHS]={0};
+   splitRawFilenameToDirectoryFilenameAndExtension(
+                                                     modelName,
+                                                     directory ,
+                                                     filename ,
+                                                     extension ,
+                                                     filenameWExtension ,
+                                                     MAX_MODEL_PATHS
+                                                    );
+
+  fprintf(stderr,"Loading Model with name %s ( dir = %s , file = %s , ext = %s )  and objTypeID  %u \n",modelName,directory,filename,extension,objTypeID);
+
 
    if (
        loadModelToModelList(
                             stream->associatedModelList ,
-                            "Models/" ,
-                            modelName ,
+                            directory ,
+                            filename ,
+                            extension ,
                             &stream->objectTypes[objTypeID].modelListArrayNumber //This gets back the correct model to draw
                            )
 

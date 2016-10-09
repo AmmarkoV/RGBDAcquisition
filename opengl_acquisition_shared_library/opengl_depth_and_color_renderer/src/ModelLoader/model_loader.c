@@ -210,7 +210,7 @@ return 0;
 
 
 
-unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , char * directory,char * modelname )
+unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , const char * directory,const char * modelname , const char * extension )
 {
   if ( (directory==0) || (modelname==0) )
   {
@@ -218,13 +218,16 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
     return 0;
   }
 
+  char fullPathToFile[MAX_MODEL_PATHS]={0};
+  snprintf(fullPathToFile, MAX_MODEL_PATHS , "%s/%s.%s" , directory , modelname , extension);
+
 
   struct Model * mod =  &modelStorage->models[whereToLoadModel];
   if ( mod == 0 )  { fprintf(stderr,"Could not allocate enough space for model %s \n",modelname);  return 0; }
   memset(mod , 0 , sizeof(struct Model));
 
 
-  snprintf(mod->pathOfModel,MAX_MODEL_PATHS,"%s/%s",directory,modelname);
+  snprintf(mod->pathOfModel,MAX_MODEL_PATHS,"%s",fullPathToFile);
 
   unsigned int unableToLoad=1;
   unsigned int checkForHardcodedReturn=0;
@@ -236,7 +239,7 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
       mod->modelInternalData = 0;
       unableToLoad=0;
   } else
- if ( strstr(modelname,".tri") != 0 )
+ if ( strcmp(extension,"tri") == 0 )
     {
       mod->type = TRI_MODEL;
       fprintf(stderr,YELLOW "loading tri model \n" NORMAL);
@@ -244,7 +247,7 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
       struct TRI_Model * triModel = allocateModelTri();
       if (triModel !=0 )
          {
-          if ( loadModelTri(modelname, triModel) )
+          if ( loadModelTri(fullPathToFile, triModel) )
             {
              mod->numberOfBones = triModel->header.numberOfBones;
              mod->modelInternalData=(void * ) triModel;
@@ -253,12 +256,12 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
             } else { fprintf(stderr,RED " unable to load TRI model \n" NORMAL); }
          } else { fprintf(stderr,RED " unable to allocate model \n" NORMAL); }
     } else
- if ( strstr(modelname,".ply") != 0 )
+ if ( strcmp(extension,"ply") == 0 )
     {
       mod->type = OBJ_ASSIMP_MODEL;
       fprintf(stderr,RED "TODO : loading ply model \n" NORMAL);
     } else
-  if ( strstr(modelname,".obj") != 0 )
+  if ( strcmp(extension,"obj") == 0 )
     {
       mod->type = OBJ_MODEL;
       struct  OBJ_Model *  newObj = (struct  OBJ_Model * ) loadObj(directory,modelname,1);
@@ -310,7 +313,7 @@ void unloadModel(struct Model * mod)
 }
 
 
-int loadModelToModelList(struct ModelList* modelStorage,char * modelDirectory,char * modelName , unsigned int * whereModelWasLoaded)
+int loadModelToModelList(struct ModelList* modelStorage,const char * modelDirectory,const char * modelName , const char * modelExtension , unsigned int * whereModelWasLoaded)
 {
 
   int foundAlreadyExistingModel=0;
@@ -320,7 +323,7 @@ int loadModelToModelList(struct ModelList* modelStorage,char * modelDirectory,ch
    { //If we can't find an already loaded version of the mesh we are looking for
      unsigned int whereToLoadModel=modelStorage->currentNumberOfModels;
 
-     if (loadModel(modelStorage,whereToLoadModel,modelDirectory,modelName))
+     if (loadModel(modelStorage,whereToLoadModel,modelDirectory,modelName,modelExtension))
       {
         *whereModelWasLoaded=whereToLoadModel;
         ++modelStorage->currentNumberOfModels;

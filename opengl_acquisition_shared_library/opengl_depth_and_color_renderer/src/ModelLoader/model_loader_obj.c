@@ -463,81 +463,6 @@ int saveOBJ(struct OBJ_Model * obj , char * filename)
 }
 
 
-//For now this is written without range checks..
-int splitRawFilenameToDirectoryFilenameAndExtension(
-                                                     const char * inputFilename,
-                                                     char * directory ,
-                                                     char * filename ,
-                                                     char * extension ,
-                                                     unsigned int outputSizes
-                                                    )
-{
-   //Basic case
-   strcpy(directory,"./");
-   strcpy(filename,inputFilename);
-   extension[0]=0;
-   unsigned int inputFilenameLength=strlen(inputFilename);
-   unsigned int extensionStart = inputFilenameLength , filenameStart = inputFilenameLength  ,filenameSpan = 0, directoryStart = inputFilenameLength , directorySpan = 0;
-
-
-   if (inputFilenameLength==0) { return 0; }
-   unsigned int i=inputFilenameLength-1;
-
-   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   //We first handle the extension
-   while ((i>0)&&(inputFilename[i]!='.')) { --i; }
-   if (i==0)
-     {
-       /* could not find the content type.. */
-       i=inputFilenameLength-1;
-     } else
-   if (i+1>=inputFilenameLength)
-     {
-       /* found the dot at i BUT it is the last character so no extension is possible..! */
-       i=inputFilenameLength-1;
-     } else
-     {
-       //we found a legit extension..!
-       extensionStart = i+1;
-       const char * startOfExtension = &inputFilename[i+1]; // do not include . ( dot )
-       strcpy(extension,startOfExtension);
-     }
-   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   //We then handle the directory/filename division
-   while ((i>0)&&(inputFilename[i]!='/')) { --i; }
-
-   filenameStart  = i;
-   filenameSpan = extensionStart - filenameStart;
-   const char * startOfFilename = &inputFilename[i+1]; // do not include . ( dot )
-   strcpy(filename,startOfFilename);
-
-   if (i==0) {
-               //This whole thing is a filename
-               //If we could not find a directory it means the resulting string is all just a big filename
-               return 0;
-             } //<- could not find the content type..
-   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-  //If we reached this place we have a directory(!)
-
-   directoryStart  = i;
-   const char * startOfDirectory = &inputFilename[0]; // do not include . ( dot )
-   directorySpan = filenameStart;
-   strcpy(directory,startOfDirectory);
-
-  return 1;
-}
-
-
 
 int readOBJ(struct OBJ_Model * obj)
 {
@@ -560,10 +485,8 @@ int readOBJ(struct OBJ_Model * obj)
   int grp;
 
   fprintf(stderr,"TODO : proper string allocation here for filename %s \n",obj->filename);
-  char fname[2*MAX_MODEL_PATHS+2]={0};
-  strncpy(fname,obj->directory,MAX_MODEL_PATHS);
-  strcat(fname,"/");
-  strncat(fname,obj->filename,MAX_MODEL_PATHS);
+  char fname[2*MAX_MODEL_PATHS+1]={0};
+  snprintf(fname,2*MAX_MODEL_PATHS,"%s/%s.obj",obj->directory , obj->filename);
 
   fprintf(stderr,"Opening File %s ..\n",fname);
   file=fopen(fname,"r");
@@ -1447,7 +1370,7 @@ int unloadObj(struct OBJ_Model * obj)
 
 
 
-struct OBJ_Model * loadObj(char * directory,char * filename,int compileDisplayList)
+struct OBJ_Model * loadObj(char * directory,char * filename /*This does not have a .obj extension*/,int compileDisplayList)
 {
     fprintf(stderr,"Starting to load  OBJ file %s \n",filename);
     struct OBJ_Model * obj = ( struct OBJ_Model * ) malloc(sizeof(struct OBJ_Model));

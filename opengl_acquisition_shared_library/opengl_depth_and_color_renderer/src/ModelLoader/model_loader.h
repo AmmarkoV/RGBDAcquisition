@@ -53,7 +53,7 @@ struct ModelList *  allocateModelList(unsigned int initialSpace);
 
 int printModelList(struct ModelList* modelStorage);
 
-int loadModelToModelList(struct ModelList* modelStorage,char * modelDirectory,char * modelName , unsigned int * whereModelWasLoaded);
+int loadModelToModelList(struct ModelList* modelStorage,const char * modelDirectory,const char * modelName , const char * modelExtension  , unsigned int * whereModelWasLoaded);
 
 int modelHasASkinTransformation(struct Model * model,float* joints);
 
