@@ -476,13 +476,15 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
    strcpy(directory,"./");
    strcpy(filename,inputFilename);
    extension[0]=0;
-   unsigned int extensionStart = 0 , filenameStart = 0  ,filenameSpan = 0, directoryStart = 0;
-
-
    unsigned int inputFilenameLength=strlen(inputFilename);
+   unsigned int extensionStart = inputFilenameLength , filenameStart = inputFilenameLength  ,filenameSpan = 0, directoryStart = inputFilenameLength , directorySpan = 0;
+
+
    if (inputFilenameLength==0) { return 0; }
    unsigned int i=inputFilenameLength-1;
 
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
    //We first handle the extension
    while ((i>0)&&(inputFilename[i]!='.')) { --i; }
    if (i==0)
@@ -501,22 +503,36 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
        const char * startOfExtension = &inputFilename[i+1]; // do not include . ( dot )
        strcpy(extension,startOfExtension);
      }
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
    //We then handle the directory/filename division
    while ((i>0)&&(inputFilename[i]!='/')) { --i; }
+
+   filenameStart  = i;
+   filenameSpan = extensionStart - filenameStart;
+   const char * startOfFilename = &inputFilename[i+1]; // do not include . ( dot )
+   strcpy(filename,startOfFilename);
+
    if (i==0) {
                //This whole thing is a filename
-               filenameStart  = 0;
-               if (extension[0]!=0)
-               { //There is an extension
-                 filenameSpan = extensionStart - filenameStart;
-               }
                //If we could not find a directory it means the resulting string is all just a big filename
                return 0;
              } //<- could not find the content type..
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   // - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+
+  //If we reached this place we have a directory(!)
+
+   directoryStart  = i;
+   const char * startOfDirectory = &inputFilename[0]; // do not include . ( dot )
+   directorySpan = filenameStart;
+   strcpy(directory,startOfDirectory);
 
   return 1;
 }
