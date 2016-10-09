@@ -431,12 +431,13 @@
 	<stdio.h>
 	<stdlib.h>
 
-1475751715 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.c
+1475953818 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.c
 	"model_loader_tri.h"
 	"model_loader_transform_joints.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+	<math.h>
 	"../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 1475953949 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h

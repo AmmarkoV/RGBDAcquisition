@@ -123,18 +123,25 @@ float findMax(struct OBJ_Model * obj)
    return 0;
 }
 
-unsigned int FindMaterial(struct OBJ_Model * obj,char *name)
+unsigned int FindMaterial(struct OBJ_Model * obj,char *name,unsigned int * materialID)
 {
+  printf("FindMaterial(%s,%s)   called  \n",obj->filename  , name );
   /* Find material id NAME in MODEL */
   GLuint i;
 
+  if (obj->numMaterials==0)
+  {
+    fprintf(stderr,"No materials exist in file %s .. \n",obj->filename );
+    return 0;
+  }
+
   for (i = 0; i<obj->numMaterials; i++)
   {
-    if (!strcmp(obj->matList[i].name, name)) { return i; }
+    if (strcmp(obj->matList[i].name, name) == 0) { *materialID=i; return 1; }
   }
 
   /* didn't find the name, so set it as the default material */
-  printf("FindMaterial(%s,%s):  TODO NOT RETURN 0 can't find material \"%s\".\n",obj->filename  , name, name);
+  fprintf(stderr,"FindMaterial(%s,%s):  found nothing ..!  , can't find material \"%s\".\n",obj->filename  , name, name);
   return 0;
 }
 
@@ -196,7 +203,7 @@ void AddFacetoG(Group *g,long unsigned int fc)
 
 int loadMTL(struct OBJ_Model * obj,char * directory,char *filename)
 {
-
+  fprintf(stderr,"loadMTL(%s , directory = %s , filename = %s ) \n",obj->filename , directory ,filename );
   FILE *file;
   char buf[128];
   char buf1[128];
@@ -456,6 +463,65 @@ int saveOBJ(struct OBJ_Model * obj , char * filename)
 }
 
 
+//For now this is written without range checks..
+int splitRawFilenameToDirectoryFilenameAndExtension(
+                                                     const char * inputFilename,
+                                                     char * directory ,
+                                                     char * filename ,
+                                                     char * extension ,
+                                                     unsigned int outputSizes
+                                                    )
+{
+   //Basic case
+   strcpy(directory,"./");
+   strcpy(filename,inputFilename);
+   extension[0]=0;
+   unsigned int extensionStart = 0 , filenameStart = 0  ,filenameSpan = 0, directoryStart = 0;
+
+
+   unsigned int inputFilenameLength=strlen(inputFilename);
+   if (inputFilenameLength==0) { return 0; }
+   unsigned int i=inputFilenameLength-1;
+
+   //We first handle the extension
+   while ((i>0)&&(inputFilename[i]!='.')) { --i; }
+   if (i==0)
+     {
+       /* could not find the content type.. */
+       i=inputFilenameLength-1;
+     } else
+   if (i+1>=inputFilenameLength)
+     {
+       /* found the dot at i BUT it is the last character so no extension is possible..! */
+       i=inputFilenameLength-1;
+     } else
+     {
+       //we found a legit extension..!
+       extensionStart = i+1;
+       const char * startOfExtension = &inputFilename[i+1]; // do not include . ( dot )
+       strcpy(extension,startOfExtension);
+     }
+
+
+
+   //We then handle the directory/filename division
+   while ((i>0)&&(inputFilename[i]!='/')) { --i; }
+   if (i==0) {
+               //This whole thing is a filename
+               filenameStart  = 0;
+               if (extension[0]!=0)
+               { //There is an extension
+                 filenameSpan = extensionStart - filenameStart;
+               }
+               //If we could not find a directory it means the resulting string is all just a big filename
+               return 0;
+             } //<- could not find the content type..
+
+
+  return 1;
+}
+
+
 
 int readOBJ(struct OBJ_Model * obj)
 {
@@ -516,7 +582,7 @@ int readOBJ(struct OBJ_Model * obj)
   while(fscanf(file, "%s", buf) != EOF)
   {
 
-	  if(!strcmp(buf, "mtllib"))
+	  if(strcmp(buf, "mtllib")==0)
 	  {
 		  fscanf(file, "%s", buf1);
 		  strcpy(obj->matLib,  buf1);
@@ -687,10 +753,14 @@ int readOBJ(struct OBJ_Model * obj)
 	if(!strcmp(buf, "usemtl"))
 	{
 		  fscanf(file, "%s", buf1);
-		  mat = FindMaterial( obj, buf1);
-		  obj->groups[grp].material = mat;
-		  strcpy(obj->matLib, buf1);
-		  printf("loadmtl %s\n", obj->matLib);
+		  unsigned int foundMaterial;
+		  if ( FindMaterial( obj, buf1 , &foundMaterial) )
+          {
+		    mat = foundMaterial;
+		    obj->groups[grp].material = mat;
+		    strcpy(obj->matLib, buf1);
+		    printf("loadmtl %s\n", obj->matLib);
+          }
     }
 	switch(buf[0])
 	{
