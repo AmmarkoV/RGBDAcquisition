@@ -187,43 +187,14 @@ void recursiveJointHeirarchyTransformer(
     }
 }
 
-int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize)
+
+
+
+int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 {
-  if (triModelIn==0)
-                     { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
-  if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
-                     { fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL); return 0; }
- //Past checks..
- copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
-
- if ( (jointData==0) || (jointDataSize==0) )
- {
-   fprintf(stderr,"doModelTransform called without joints to transform , ");
-   fprintf(stderr,"so it will be just returning a null transformed copy of");
-   fprintf(stderr,"the input mesh , hope this is what you intended..\n");
-   return 1;
- }
-
- double transformedPosition[4]={0} ,transformedNormal[4]={0} , position[4]={0} , normal[4]={0};
-
- unsigned int k=0,i=0;
- for (i=0; i<triModelIn->header.numberOfBones; i++)
-   {
-     float * jointI = &jointData[i*16];
-     if (!is4x4FIdentityMatrix(jointI))
-        { triModelIn->bones[i].info->altered=1; } else
-        { triModelIn->bones[i].info->altered=0; }
-   }
-
-  double initialParentTransform[16]={0};
-  create4x4IdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
-
-   //This recursively calculates all matrix transforms and prepares the correct matrices
-   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
-   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  //We NEED to clear the vertices and normals since they are added uppon , not having
+  double transformedPosition[4]={0} ,transformedNormal[4]={0} , position[4]={0} , normal[4]={0};
+  unsigned int i,k;
+ //We NEED to clear the vertices and normals since they are added uppon , not having
   //the next two lines results in really weird and undebuggable visual behaviour
   memset(triModelOut->vertices, 0, triModelOut->header.numberOfVertices  * sizeof(float));
   memset(triModelOut->normal  , 0, triModelOut->header.numberOfNormals   * sizeof(float));
@@ -261,6 +232,68 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 	   triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
      }
    }
+
+}
+
+
+
+
+
+
+
+
+
+
+int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize , unsigned int autodetectAlteredMatrices)
+{
+  if (triModelIn==0)
+                     { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
+  if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
+                     { fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL); return 0; }
+ //Past checks..
+ copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
+
+ if ( (jointData==0) || (jointDataSize==0) )
+ {
+   fprintf(stderr,"doModelTransform called without joints to transform , ");
+   fprintf(stderr,"so it will be just returning a null transformed copy of");
+   fprintf(stderr,"the input mesh , hope this is what you intended..\n");
+   return 1;
+ }
+
+ if (!autodetectAlteredMatrices)
+     {
+        fprintf(stderr,"disabled autodetection of altered matrices might result in strange transformations being executed.. \n");
+     }
+
+ unsigned int i=0;
+ for (i=0; i<triModelIn->header.numberOfBones; i++)
+   {
+     float * jointI = &jointData[i*16];
+
+     if (autodetectAlteredMatrices)
+     {
+     if (!is4x4FIdentityMatrix(jointI))
+        { triModelIn->bones[i].info->altered=1; } else
+        { triModelIn->bones[i].info->altered=0; }
+
+     } else
+     {
+       //All matrices considered altered
+       triModelIn->bones[i].info->altered=1;
+     }
+   }
+
+  double initialParentTransform[16]={0};
+  create4x4IdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
+
+   //This recursively calculates all matrix transforms and prepares the correct matrices
+   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
+   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+   applyVertexTransformation( triModelOut ,  triModelIn );
 
  return 1;
 }

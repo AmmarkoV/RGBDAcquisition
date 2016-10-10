@@ -65,13 +65,15 @@ float * mallocModelTransformJoints(
 * @param  input TRI structure
 * @param  array of joints allocated using mallocModelTransformJoints
 * @param  number of joints got from the jointDataSizeOutput of mallocModelTransformJoints
+* @param  autodetect non-identity matrices on jointdata array and skip some calculations
 * @retval 0=Failure1=Success
 */
 int doModelTransform(
                       struct TRI_Model * triModelOut ,
                       struct TRI_Model * triModelIn ,
                       float * jointData ,
-                      unsigned int jointDataSize
+                      unsigned int jointDataSize ,
+                      unsigned int autodetectAlteredMatrices
                     );
 
 
