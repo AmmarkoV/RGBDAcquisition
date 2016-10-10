@@ -273,10 +273,8 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
 
      if (autodetectAlteredMatrices)
      {
-     if (!is4x4FIdentityMatrix(jointI))
-        { triModelIn->bones[i].info->altered=1; } else
-        { triModelIn->bones[i].info->altered=0; }
-
+       if (!is4x4FIdentityMatrix(jointI))  { triModelIn->bones[i].info->altered=1; } else
+                                           { triModelIn->bones[i].info->altered=0; }
      } else
      {
        //All matrices considered altered
@@ -287,11 +285,10 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
   double initialParentTransform[16]={0};
   create4x4IdentityMatrix(initialParentTransform) ; //Initial "parent" transform is Identity
 
-   //This recursively calculates all matrix transforms and prepares the correct matrices
-   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
-   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+  //This recursively calculates all matrix transforms and prepares the correct matrices
+  //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
+  //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
    applyVertexTransformation( triModelOut ,  triModelIn );
 
