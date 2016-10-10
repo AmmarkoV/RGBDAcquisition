@@ -9,6 +9,11 @@ extern "C"
 
 #include "../acquisition/acquisition_setup.h"
 
+   #if USE_CALIBRATION
+    #include "../tools/Calibration/calibration.h"
+   #endif
+
+
 //#define BUILD_REALSENSE 1
 int startRealsenseModule(unsigned int max_devs,char * settings);
 
@@ -16,6 +21,7 @@ int startRealsenseModule(unsigned int max_devs,char * settings);
 int stopRealsenseModule();
 
 int createRealsenseDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+int destroyRealsenseDevice(int devID);
 
 int mapRealsenseDepthToRGB(int devID);
 
@@ -37,6 +43,12 @@ int getRealsenseDepthDataSize(int devID);
 int getRealsenseDepthChannels(int devID);
 int getRealsenseDepthBitsPerPixel(int devID);
 char * getRealsenseDepthPixels(int devID);
+
+   #if USE_CALIBRATION
+    int getRealsenseColorCalibration(int devID,struct calibration * calib);
+    int getRealsenseDepthCalibration(int devID,struct calibration * calib);
+   #endif
+
 #endif
 
 #ifdef __cplusplus
