@@ -244,7 +244,14 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
 
 
-int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn , float * jointData , unsigned int jointDataSize , unsigned int autodetectAlteredMatrices)
+int doModelTransform(
+                      struct TRI_Model * triModelOut ,
+                      struct TRI_Model * triModelIn ,
+                      float * jointData ,
+                      unsigned int jointDataSize ,
+                      unsigned int autodetectAlteredMatrices ,
+                      unsigned int performVertexTransform
+                    )
 {
   if (triModelIn==0)
                      { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
@@ -290,7 +297,10 @@ int doModelTransform( struct TRI_Model * triModelOut , struct TRI_Model * triMod
    recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  if (performVertexTransform)
+  {
    applyVertexTransformation( triModelOut ,  triModelIn );
+  }
 
  return 1;
 }

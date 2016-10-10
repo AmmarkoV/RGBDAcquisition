@@ -804,7 +804,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
             struct TRI_Model *triModelIn=(struct TRI_Model*) mod->modelInternalData;
 
 
-            doModelTransform( &triModelOut , triModelIn , joints , numberOfBones , 1 );
+            doModelTransform( &triModelOut , triModelIn , joints , numberOfBones , 1/*Autodetect*/ , 1/*Do Transforms*/ );
             //fprintf(stderr,"TriOUT Indices %u , TriIN Indices %u \n",triModelOut.header.numberOfIndices,triModelIn->header.numberOfIndices);
 
             mod->modelInternalData = (void*) &triModelOut;
