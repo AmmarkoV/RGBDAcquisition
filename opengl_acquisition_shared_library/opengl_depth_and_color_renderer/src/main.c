@@ -51,7 +51,6 @@
 unsigned int openGLGetComplaintsLeft=10;
 
 #define SCALE_REAL_DEPTH_OUTPUT 1
-float depthScale=0.1;
 unsigned int snapsPerformed=0;
 
 void internalTest()
@@ -184,7 +183,7 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
                   depth[(height-yp-1)*width+xp]=(unsigned short) tmpF;
 
                   #if SCALE_REAL_DEPTH_OUTPUT
-                    depth[(height-yp-1)*width+xp]*=depthScale;
+                    depth[(height-yp-1)*width+xp]*=depthMemoryOutputScale;
                   #endif // SCALE_REAL_DEPTH_OUTPUT
                  #else
                   depth[(height-yp-1)*width+xp]=(unsigned short) posZ * scaleDepthTo;

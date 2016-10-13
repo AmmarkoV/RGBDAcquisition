@@ -54,6 +54,8 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 
+float depthMemoryOutputScale=0.1;
+
 //int (*saveSnapshot) (int,struct calibration *);
 
 
@@ -203,6 +205,11 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                addObjectTypeToVirtualStream( newstream , name, model );
              break;
 
+
+           case TRAJECTORYPRIMITIVES_SAVED_FILE_DEPTH_SCALE :
+                 fprintf(stderr,"Setting output depth scale..!\n");
+                 depthMemoryOutputScale = InputParser_GetWordFloat(ipc,1);
+           break;
 
            case TRAJECTORYPRIMITIVES_PROJECTION_MATRIX :
                  newstream->projectionMatrixDeclared=1;

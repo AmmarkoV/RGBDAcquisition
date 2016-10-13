@@ -35,7 +35,7 @@ extern "C" {
 #define INCREMENT_TIMER_FOR_EACH_OBJ 0
 
 
-
+extern float depthMemoryOutputScale;
 
 
 /**

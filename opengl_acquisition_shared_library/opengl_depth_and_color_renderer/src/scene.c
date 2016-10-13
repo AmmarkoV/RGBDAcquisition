@@ -338,6 +338,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
     {
         case 'o' :
         case 'O' :
+             fprintf(stderr,"Writing \n");
              writeOpenGLColor("color.pnm",0,0,WIDTH,HEIGHT);
              writeOpenGLDepth("depth.pnm",0,0,WIDTH,HEIGHT);
             return 1;
