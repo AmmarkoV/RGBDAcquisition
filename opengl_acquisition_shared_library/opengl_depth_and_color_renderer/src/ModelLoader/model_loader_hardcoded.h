@@ -21,6 +21,7 @@ enum ModelTypes
     OBJ_INVISIBLE,
     OBJ_QUESTION,
     OBJ_BBOX,
+    OBJ_FOG,
     //-----------
     OBJ_MODEL,
     TRI_MODEL,

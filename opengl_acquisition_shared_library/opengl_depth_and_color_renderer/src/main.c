@@ -349,17 +349,6 @@ int setKeyboardControl(int val)
   return 1;
 }
 
-int enableShaders(char * vertShaderFilename , char * fragShaderFilename)
-{
-  strncpy(fragmentShaderFile , fragShaderFilename,MAX_FILENAMES);
-  selectedFragmentShader = fragmentShaderFile;
-
-  strncpy(vertexShaderFile , vertShaderFilename,MAX_FILENAMES);
-  selectedVertexShader = vertexShaderFile;
-
-  return 1;
-}
-
 int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,char * sceneFile)
 {
   fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);

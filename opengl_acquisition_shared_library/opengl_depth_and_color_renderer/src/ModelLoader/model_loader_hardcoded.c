@@ -508,10 +508,24 @@ void drawPyramid()
     return drawGenericTriangleMesh(pyramidCoords , pyramidNormals , sizeof(pyramidCoords)/(3*sizeof(float)) );
 }
 
+
+void drawFog()
+{
+  glEnable(GL_FOG);
+  GLfloat fogColor[4] = {0.5, 0.5, 0.5, 1.0};
+  glFogi (GL_FOG_MODE, GL_EXP );
+  glFogfv (GL_FOG_COLOR, fogColor);
+  glFogf (GL_FOG_DENSITY, 0.35);
+  glHint (GL_FOG_HINT, GL_DONT_CARE);
+  glFogf (GL_FOG_START, 1.0);
+  glFogf (GL_FOG_END, 5.0);
+}
+
 unsigned int isModelnameAHardcodedModel(const char * modelname,unsigned int * itIsAHardcodedModel)
 {
   *itIsAHardcodedModel=1;
   unsigned int modType=0;
+   if ( strcmp(modelname,"fog") == 0 )        {  modType = OBJ_FOG;       }  else
    if ( strcmp(modelname,"plane") == 0 )      {  modType = OBJ_PLANE;     }  else
    if ( strcmp(modelname,"grid") == 0 )       {  modType = OBJ_GRIDPLANE; }  else
    if ( strcmp(modelname,"cube") == 0 )       {  modType = OBJ_CUBE;      }  else
@@ -531,6 +545,7 @@ unsigned int drawHardcodedModelRaw(unsigned int modelType)
 {
     switch (modelType)
     {
+      case OBJ_FOG       : drawFog();                            break;
       case OBJ_PLANE     : drawObjPlane(0,0,0, 0.5);             break;
       case OBJ_GRIDPLANE : drawGridPlane( 0.0 , 0.0 , 0.0, 1.0); break;
       case OBJ_AXIS      : drawAxis(0,0,0,1.0);                  break;

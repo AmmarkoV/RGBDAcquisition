@@ -55,6 +55,8 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h
             opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/shader_loader.c
             opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/shader_loader.h
+            opengl_depth_and_color_renderer/src/Rendering/ogl_rendering.c
+            opengl_depth_and_color_renderer/src/Rendering/ogl_rendering.h
             opengl_depth_and_color_renderer/src/save_to_file.c
             opengl_depth_and_color_renderer/src/save_to_file.h
             opengl_depth_and_color_renderer/src/scene.c

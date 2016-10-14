@@ -20,6 +20,9 @@
 
 #include "scene.h"
 
+#include "Rendering/ogl_rendering.h"
+
+
 #include "OGLRendererSandbox.h"
 
 #define NORMAL   "\033[0m"
@@ -29,13 +32,6 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 
-//Shader specific stuff ----------------
-char fragmentShaderFile[MAX_FILENAMES]={0};
-char * selectedFragmentShader = 0;
-char vertexShaderFile[MAX_FILENAMES]={0};
-char * selectedVertexShader = 0;
-struct shaderObject * loadedShader=0;
-//--------------------------------------
 
 struct VirtualStream * scene = 0;
 //struct Model ** models=0;
@@ -48,7 +44,6 @@ float nearPlane= 1; //<--this also
 float fieldOfView = 65;
 float scaleDepthTo =1000.0;
 
-int doCulling=1;
 
 
 //float depthUnit = 1.0;
@@ -494,78 +489,9 @@ int initScene(char * confFile)
   //This only enables keyfov if enabled in scene
   if (scene->userCanMoveCameraOnHisOwn) { userKeyFOVEnabled=1; }
 
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error while initializing scene\n"); }
-  glEnable(GL_DEPTH_TEST); /* enable depth buffering */
-  glDepthFunc(GL_LESS);    /* pedantic, GL_LESS is the default */
-  glDepthMask(GL_TRUE);
-  glClearDepth(1.0);       /* pedantic, 1.0 is the default */
 
-  //HQ settings
-  glEnable(GL_NORMALIZE);
-  glShadeModel(GL_SMOOTH);
-  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-  glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-  glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error while initializing HQ settings\n"); }
+  startOGLRendering();
 
-  /* frame buffer clears should be to black */
-  glClearColor(0.0, 0.0, 0.0, 0.0);
-
-  /* set up projection transform */
-  glMatrixMode(GL_PROJECTION);
-
-  updateProjectionMatrix();
-  if (checkOpenGLError(__FILE__, __LINE__))
-     { fprintf(stderr,"OpenGL error after updating projection matrix\n"); }
-
-  /* establish initial viewport */
-  /* pedantic, full window size is default viewport */
-
-
-  #warning "GL_COLOR does not even exist"
-  //glEnable(GL_COLOR);
-  //if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color \n"); }
-  glEnable(GL_COLOR_MATERIAL);
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color material\n"); }
-
-  #if USE_LIGHTS
-   glEnable(GL_LIGHT0);
-   glEnable(GL_LIGHTING);
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling lighting\n"); }
-   glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-   glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
-
-   GLenum faces=GL_FRONT;//GL_FRONT_AND_BACK;
-   glMaterialfv(faces, GL_AMBIENT,    mat_ambient);
-   glMaterialfv(faces, GL_DIFFUSE,    mat_diffuse);
-   glMaterialfv(faces, GL_SPECULAR,   mat_specular);
-   glMaterialfv(faces, GL_SHININESS,   mat_shininess); // <- this was glMateriali
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up Front/Back lights\n"); }
-  #else
-   fprintf(stderr,"Please note that lighting is disabled via the USE_LIGHTS precompiler define\n");
-  #endif // USE_LIGHTS
-
-
-  if ( ( selectedFragmentShader != 0) || ( selectedVertexShader != 0 ) )
-  {
-      loadedShader = loadShader(selectedVertexShader,selectedFragmentShader);
-  }
-
-  //This is not needed -> :P  glCullFace(GL_FRONT_AND_BACK);
-  //Enable Culling
-  if (doCulling)
-  {
-   glFrontFace(GL_CCW); //GL_CW / GL_CCW
-     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glFrontFace(GL_CCW); \n"); }
-   glCullFace(GL_BACK);
-     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glCullFace(GL_BACK); \n"); }
-   glEnable(GL_CULL_FACE);
-    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glEnable(GL_CULL_FACE); \n"); }
-  }
 
   fprintf(stderr,YELLOW "\nFinal step , we are done parsing %s ..\n" NORMAL , confFile);
 
@@ -580,13 +506,9 @@ int initScene(char * confFile)
 
 int closeScene()
 {
+  stopOGLRendering();
 
   deallocateModelList(&modelStorage);
-
-  if ( ( selectedFragmentShader != 0) || ( selectedVertexShader != 0 ) )
-  {
-      unloadShader(loadedShader);
-  }
 
   unsigned int i=0;
   //Object 0 is camera
