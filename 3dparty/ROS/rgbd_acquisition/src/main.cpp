@@ -463,6 +463,11 @@ int main(int argc, char **argv)
 
 
      std::cout<<"RGBDAcquisition Starting settings ----------------"<<std::endl;
+     
+     char cwd[1024];
+     if (getcwd(cwd, sizeof(cwd)) != NULL)
+      std::cout<<"Current working dir : " << cwd << std::endl;
+    
      std::cout<<"Name : "<<name<<std::endl;
      std::cout<<"Camera : "<<camera<<std::endl;
      std::cout<<"Frame : "<<frame<<std::endl;

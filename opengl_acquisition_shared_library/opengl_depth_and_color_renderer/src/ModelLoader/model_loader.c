@@ -212,6 +212,7 @@ return 0;
 
 unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , const char * directory,const char * modelname , const char * extension )
 {
+  fprintf(stderr,"loadModel ..  \n");
   if ( (directory==0) || (modelname==0) )
   {
     fprintf(stderr,RED "loadModel failing , no modelname given \n" NORMAL );
@@ -253,7 +254,10 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
              mod->modelInternalData=(void * ) triModel;
              unableToLoad=0;
              fprintf(stderr,GREEN " success \n" NORMAL);
-            } else { fprintf(stderr,RED " unable to load TRI model \n" NORMAL); }
+            } else
+            { fprintf(stderr,RED " unable to load TRI model \n" NORMAL);
+              freeModelTri(triModel);
+            }
          } else { fprintf(stderr,RED " unable to allocate model \n" NORMAL); }
     } else
  if ( strcmp(extension,"ply") == 0 )
@@ -315,19 +319,22 @@ void unloadModel(struct Model * mod)
 
 int loadModelToModelList(struct ModelList* modelStorage,const char * modelDirectory,const char * modelName , const char * modelExtension , unsigned int * whereModelWasLoaded)
 {
+  fprintf(stderr,"loadModelToModelList called .. \n");
+  if (modelStorage==0) { return 0; }
 
   int foundAlreadyExistingModel=0;
   unsigned int modelLocation = findModel(modelStorage->models,modelDirectory,modelName, &foundAlreadyExistingModel);
+ // fprintf(stderr,"findModel survived .. \n");
 
   if (!foundAlreadyExistingModel)
    { //If we can't find an already loaded version of the mesh we are looking for
      unsigned int whereToLoadModel=modelStorage->currentNumberOfModels;
-
+     fprintf(stderr,"before LoadModel.. \n");
      if (loadModel(modelStorage,whereToLoadModel,modelDirectory,modelName,modelExtension))
       {
+        fprintf(stderr,GREEN "Model %s is now loaded as model[%u] \n" NORMAL,modelName , whereToLoadModel );
         *whereModelWasLoaded=whereToLoadModel;
         ++modelStorage->currentNumberOfModels;
-        fprintf(stderr,GREEN "Model %s is now loaded as model[%u] \n" NORMAL,modelName , whereToLoadModel );
         return 1;
       } else
       { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,modelName, whereToLoadModel );        return 0; }

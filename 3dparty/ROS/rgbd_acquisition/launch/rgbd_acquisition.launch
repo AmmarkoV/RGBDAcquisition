@@ -21,7 +21,7 @@
    <!--  rosrun pcl_ros pointcloud_to_pcd input:=headcam/depth_registered/points/ -->
 
 
-    <node name="rgbd_acquisition" pkg="rgbd_acquisition" type="run_it.sh" required="true" output="screen"> 
+    <node name="rgbd_acquisition" pkg="rgbd_acquisition" type="run_it.sh" required="true" output="screen" cwd="node"> 
       <param name="camera" value="$(arg camera)" />
       <param name="deviceID" value="$(arg deviceID)" /> 
       <param name="moduleID" value="$(arg moduleID)" /> 
