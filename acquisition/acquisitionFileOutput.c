@@ -566,7 +566,9 @@ int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier d
                writeImageFile(img,PNG_CODEC,filenameFull);
 
                img->pixels=0;
+               retres = (img!=0);
                destroyImage(img);
+               return retres;
              } else
              #endif //USE_CODEC_LIBRARY
              {

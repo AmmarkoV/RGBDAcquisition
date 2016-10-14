@@ -18,7 +18,7 @@ char outputfoldername[512]={0};
 
 unsigned int delay = 0;
 unsigned int skippedFrames=0;
-int compressOutput=0;
+int compressOutput=1;
 
 int calibrationSet = 0;
 struct calibration calib;
@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
   unsigned int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcmp(argv[i],"-raw")==0)        { compressOutput=0;  } else
     if (strcmp(argv[i],"-nolocation")==0) {
                                             acquisitionSetLocation(moduleID,0);
                                           } else
