@@ -882,6 +882,45 @@ int renderScene()
 
 
 
+
+
+
+
+
+/*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+*/
+
+
+
+
+
+
+
+
+
+
+
+
 int setupPhotoshoot(
                         void * context,
                         int objID,
