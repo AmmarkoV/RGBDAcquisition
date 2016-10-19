@@ -17,7 +17,28 @@ extern "C"
 #endif
 
 
+#define MAX_BONES_PER_VERTICE 4
+struct TRI_Bones_Per_Vertex_Vertice_Item
+{
+  unsigned int bonesOfthisVertex;
+  float weightsOfThisVertex[MAX_BONES_PER_VERTICE];
+  unsigned int indicesOfThisVertex[MAX_BONES_PER_VERTICE];
+};
 
+
+struct TRI_Bones_Per_Vertex
+{
+  unsigned int numberOfBones;
+  unsigned int numberOfVertices;
+  unsigned int maxBonesPerVertex;
+
+  struct TRI_Bones_Per_Vertex_Vertice_Item * bonesPerVertex;
+};
+
+
+
+struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TRI_Model * in);
+void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in);
 
 
 /**

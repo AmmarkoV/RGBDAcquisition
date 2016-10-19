@@ -302,7 +302,7 @@
 	"../tools.h"
 	"../../../../tools/AmMatrix/matrixCalculations.h"
 
-1476399560 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
+1476460583 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.c
 	<GL/gl.h>
 	<GL/glx.h>
 	<GL/glu.h>
@@ -319,6 +319,7 @@
 	"ModelLoader/model_loader_tri.h"
 	"ModelLoader/model_loader_transform_joints.h"
 	"scene.h"
+	"Rendering/ogl_rendering.h"
 	"OGLRendererSandbox.h"
 
 1474756743 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/ImageOperations/convolutionFilter.c
@@ -431,7 +432,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1476126072 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.c
+1476882882 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.c
 	"model_loader_tri.h"
 	"model_loader_transform_joints.h"
 	<stdio.h>
@@ -440,7 +441,7 @@
 	<math.h>
 	"../../../../tools/AmMatrix/matrix4x4Tools.h"
 
-1476117157 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h
+1476883048 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h
 	"model_loader_tri.h"
 
 1475758821 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_converter.h
@@ -458,10 +459,14 @@
 
 1475784722 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
 
-1475793859 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.c
+1476462405 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.c
+	<GL/glew.h>
 	<GL/gl.h>
 	<GL/glx.h>
 	<GL/glu.h>
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
 	"ogl_shader_pipeline_renderer.h"
 
 1475793867 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h

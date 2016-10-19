@@ -65,6 +65,67 @@ static void _triTrans_create4x4MatrixFromEulerAnglesXYZ(float * m ,float eulX, f
 }
 
 
+
+struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TRI_Model * in)
+{
+  struct TRI_Bones_Per_Vertex * out = (struct TRI_Bones_Per_Vertex *) malloc(sizeof(struct TRI_Bones_Per_Vertex));
+  if (out==0) { return 0; }
+
+  out->numberOfBones = in->header.numberOfBones;
+  out->numberOfVertices = in->header.numberOfVertices;
+  out->bonesPerVertex = (struct TRI_Bones_Per_Vertex_Vertice_Item *)   malloc(sizeof(struct TRI_Bones_Per_Vertex_Vertice_Item) *  in->header.numberOfVertices);
+  if (out->bonesPerVertex==0) { return 0; }
+
+  memset(out->bonesPerVertex,0,sizeof(struct TRI_Bones_Per_Vertex_Vertice_Item) *  in->header.numberOfVertices);
+
+  unsigned int b=0 , w=0 , outOfSpace=0;
+  for (b=0; b<in->header.numberOfBones; b++)
+  {
+      for (w=0; w<in->bones[b].info->boneWeightsNumber; w++)
+      {
+         unsigned int boneIndex = in->bones[b].weightIndex[w];
+         struct TRI_Bones_Per_Vertex_Vertice_Item * bone =  &out->bonesPerVertex[boneIndex];
+
+
+          if (bone->bonesOfthisVertex < MAX_BONES_PER_VERTICE)
+          {
+            bone->indicesOfThisVertex[bone->bonesOfthisVertex] = b;
+            bone->weightsOfThisVertex[bone->bonesOfthisVertex] = in->bones[b].weightValue[w];
+            ++bone->bonesOfthisVertex;
+          } else
+          {
+            ++outOfSpace;
+          }
+      }
+  }
+
+  if (outOfSpace>0)
+  {
+    fprintf(stderr,"Vertices are set up to accomodate at most %u bones , %u vertices where too small for our input .. \n",MAX_BONES_PER_VERTICE,outOfSpace);
+  }
+ return out;
+}
+
+
+
+
+
+void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
+ {
+   if (in!=0)
+   {
+     if (in->bonesPerVertex!=0)
+     {
+      free(in->bonesPerVertex);
+     }
+    free(in);
+   }
+ }
+
+
+
+
+
 void transformTRIJoint(
                                  struct TRI_Model * in ,
                                  float * jointData ,
