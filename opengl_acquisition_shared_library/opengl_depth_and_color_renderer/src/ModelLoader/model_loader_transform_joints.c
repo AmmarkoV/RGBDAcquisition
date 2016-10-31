@@ -210,7 +210,7 @@ void colorCodeBones(struct TRI_Model * in)
       unsigned int indxID=bone->indicesOfThisVertex[0];
       unsigned int boneID=bone->boneIDOfThisVertex[0];
 
-      getDistinctColor3F_ForID(boneID,in->header.numberOfBones, &in->colors[indxID+0] , &in->colors[indxID+1] , &in->colors[indxID+2]);
+      getDistinctColor3F_ForID(boneID,in->header.numberOfBones, &in->colors[indxID*3+0] , &in->colors[indxID*3+1] , &in->colors[indxID*3+2]);
    }
 
    freeTransformTRIBonesToVertexBoneFormat(bpv);
