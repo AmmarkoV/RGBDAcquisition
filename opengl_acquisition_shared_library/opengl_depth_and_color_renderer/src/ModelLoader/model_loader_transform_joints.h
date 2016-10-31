@@ -23,6 +23,7 @@ struct TRI_Bones_Per_Vertex_Vertice_Item
   unsigned int bonesOfthisVertex;
   float weightsOfThisVertex[MAX_BONES_PER_VERTICE];
   unsigned int indicesOfThisVertex[MAX_BONES_PER_VERTICE];
+  unsigned int boneIDOfThisVertex[MAX_BONES_PER_VERTICE];
 };
 
 
@@ -40,6 +41,9 @@ struct TRI_Bones_Per_Vertex
 struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TRI_Model * in);
 void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in);
 
+
+//TODO : add description here..
+void colorCodeBones(struct TRI_Model * in);
 
 /**
 * @brief Transform a TRI Joint using just 3 Euler Angles..!

@@ -520,6 +520,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
         printTRIModel(triModel);
 
         fclose(fd);
+
         return 1;
     }
   return 0;

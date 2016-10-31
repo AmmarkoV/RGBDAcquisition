@@ -66,6 +66,76 @@ static void _triTrans_create4x4MatrixFromEulerAnglesXYZ(float * m ,float eulX, f
 
 
 
+
+
+
+
+void _triTrans_HSVtoRGB( float *r, float *g, float *b, float h, float s, float v )
+{
+	int i;
+	float f, p, q, t;
+
+	if( s == 0 ) {
+		// achromatic (grey)
+		*r = *g = *b = v;
+		return;
+	}
+
+	h /= 60;			// sector 0 to 5
+	i = floor( h );
+	f = h - i;			// factorial part of h
+	p = v * ( 1 - s );
+	q = v * ( 1 - s * f );
+	t = v * ( 1 - s * ( 1 - f ) );
+
+	switch( i ) {
+		case 0:
+			*r = v;
+			*g = t;
+			*b = p;
+			break;
+		case 1:
+			*r = q;
+			*g = v;
+			*b = p;
+			break;
+		case 2:
+			*r = p;
+			*g = v;
+			*b = t;
+			break;
+		case 3:
+			*r = p;
+			*g = q;
+			*b = v;
+			break;
+		case 4:
+			*r = t;
+			*g = p;
+			*b = v;
+			break;
+		default:		// case 5:
+			*r = v;
+			*g = p;
+			*b = q;
+			break;
+	}
+
+}
+
+
+
+void getDistinctColor3F_ForID(unsigned int id,unsigned maxID , float *oR,float *oG,float *oB)
+{
+  // assumes hue [0, 360), saturation [0, 100), lightness [0, 100)
+  float h = id * (unsigned int) 360/maxID;
+  float s = 90;
+  float v = 50;
+
+  _triTrans_HSVtoRGB( oR , oG, oB , h , s , v );
+}
+
+
 struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TRI_Model * in)
 {
   struct TRI_Bones_Per_Vertex * out = (struct TRI_Bones_Per_Vertex *) malloc(sizeof(struct TRI_Bones_Per_Vertex));
@@ -89,8 +159,10 @@ struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TR
 
           if (bone->bonesOfthisVertex < MAX_BONES_PER_VERTICE)
           {
-            bone->indicesOfThisVertex[bone->bonesOfthisVertex] = b;
+            bone->indicesOfThisVertex[bone->bonesOfthisVertex] = in->bones[b].weightIndex[w];
             bone->weightsOfThisVertex[bone->bonesOfthisVertex] = in->bones[b].weightValue[w];
+            bone->boneIDOfThisVertex[bone->bonesOfthisVertex]  = b;
+
             ++bone->bonesOfthisVertex;
           } else
           {
@@ -123,6 +195,28 @@ void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
  }
 
 
+
+
+void colorCodeBones(struct TRI_Model * in)
+{
+  struct TRI_Bones_Per_Vertex * bpv = allocTransformTRIBonesToVertexBoneFormat(in);
+  if (bpv!=0)
+  {
+   unsigned int i=0;
+   for (i=0; i<in->header.numberOfVertices; i++)
+   {
+      struct TRI_Bones_Per_Vertex_Vertice_Item * bone =  &bpv->bonesPerVertex[i];
+
+      unsigned int indxID=bone->indicesOfThisVertex[0];
+      unsigned int boneID=bone->boneIDOfThisVertex[0];
+
+      getDistinctColor3F_ForID(boneID,in->header.numberOfBones, &in->colors[indxID+0] , &in->colors[indxID+1] , &in->colors[indxID+2]);
+   }
+
+   freeTransformTRIBonesToVertexBoneFormat(bpv);
+  }
+
+}
 
 
 
@@ -313,8 +407,6 @@ int doModelTransform(
                      { fprintf(stderr,"doModelTransform called without input TRI Model \n"); return 0; }
   if ( ( triModelIn->vertices ==0 ) || ( triModelIn->header.numberOfVertices ==0 ) )
                      { fprintf(stderr,RED "Number of vertices is zero so can't do model transform using weights..\n" NORMAL); return 0; }
- //Past checks..
- copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
 
  if ( (jointData==0) || (jointDataSize==0) )
  {
@@ -355,6 +447,8 @@ int doModelTransform(
 
   if (performVertexTransform)
   {
+    //Past checks..
+   copyModelTri( triModelOut , triModelIn , 1 /*We also want bone data*/);
    applyVertexTransformation( triModelOut ,  triModelIn );
   }
 

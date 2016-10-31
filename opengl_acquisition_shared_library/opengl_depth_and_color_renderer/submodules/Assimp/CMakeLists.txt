@@ -19,7 +19,7 @@ add_executable(assimpTester
                assimp_loader.cpp
                assimp_loader.h  
                ../../src/ModelLoader/model_loader_tri.c
-               ../../src/ModelLoader/model_loader_tri.h
+               ../../src/ModelLoader/model_loader_tri.h 
                ) 
 target_link_libraries(assimpTester rt m assimp ) 
 #add_dependencies(assimpTester OGLRendererSandbox)  
