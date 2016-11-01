@@ -41,8 +41,11 @@ struct TRI_Bones_Per_Vertex
 struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TRI_Model * in);
 void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in);
 
-
-//TODO : add description here..
+/**
+* @brief Alter color information of model to reflect bone IDs
+* @ingroup TRI
+* @param  input TRI structure that we are going to work on..!
+*/
 void colorCodeBones(struct TRI_Model * in);
 
 /**

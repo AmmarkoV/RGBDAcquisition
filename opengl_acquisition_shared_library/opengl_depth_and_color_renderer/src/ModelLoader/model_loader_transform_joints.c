@@ -65,74 +65,139 @@ static void _triTrans_create4x4MatrixFromEulerAnglesXYZ(float * m ,float eulX, f
 }
 
 
-
-
-
-
-
-void _triTrans_HSVtoRGB( float *r, float *g, float *b, float h, float s, float v )
+/// Clamp a value to 0-255
+int Clamp(int i)
 {
-	int i;
-	float f, p, q, t;
-
-	if( s == 0 ) {
-		// achromatic (grey)
-		*r = *g = *b = v;
-		return;
-	}
-
-	h /= 60;			// sector 0 to 5
-	i = floor( h );
-	f = h - i;			// factorial part of h
-	p = v * ( 1 - s );
-	q = v * ( 1 - s * f );
-	t = v * ( 1 - s * ( 1 - f ) );
-
-	switch( i ) {
-		case 0:
-			*r = v;
-			*g = t;
-			*b = p;
-			break;
-		case 1:
-			*r = q;
-			*g = v;
-			*b = p;
-			break;
-		case 2:
-			*r = p;
-			*g = v;
-			*b = t;
-			break;
-		case 3:
-			*r = p;
-			*g = q;
-			*b = v;
-			break;
-		case 4:
-			*r = t;
-			*g = p;
-			*b = v;
-			break;
-		default:		// case 5:
-			*r = v;
-			*g = p;
-			*b = q;
-			break;
-	}
-
+  if (i < 0) return 0;
+  if (i > 255) return 255;
+  return i;
 }
 
+
+/// h is from 0-360
+/// s,v values are 0-1
+/// r,g,b values are 0-255
+void HsvToRgb(double h, double S, double V, float * r, float * g, float * b)
+{
+  // ######################################################################
+  // T. Nathan Mundhenk
+  // mundhenk@usc.edu
+  // C/C++ Macro HSV to RGB
+
+  double H = h;
+  while (H < 0) { H += 360; };
+  while (H >= 360) { H -= 360; };
+  double R, G, B;
+  if (V <= 0)
+    { R = G = B = 0; }
+  else if (S <= 0)
+  {
+    R = G = B = V;
+  }
+  else
+  {
+    double hf = H / 60.0;
+    int i = (int) hf;
+    double f = hf - i;
+    double pv = V * (1 - S);
+    double qv = V * (1 - S * f);
+    double tv = V * (1 - S * (1 - f));
+    switch (i)
+    {
+
+      // Red is the dominant color
+
+      case 0:
+        R = V;
+        G = tv;
+        B = pv;
+        break;
+
+      // Green is the dominant color
+
+      case 1:
+        R = qv;
+        G = V;
+        B = pv;
+        break;
+      case 2:
+        R = pv;
+        G = V;
+        B = tv;
+        break;
+
+      // Blue is the dominant color
+
+      case 3:
+        R = pv;
+        G = qv;
+        B = V;
+        break;
+      case 4:
+        R = tv;
+        G = pv;
+        B = V;
+        break;
+
+      // Red is the dominant color
+
+      case 5:
+        R = V;
+        G = pv;
+        B = qv;
+        break;
+
+      // Just in case we overshoot on our math by a little, we put these here. Since its a switch it won't slow us down at all to put these here.
+
+      case 6:
+        R = V;
+        G = tv;
+        B = pv;
+        break;
+      case -1:
+        R = V;
+        G = pv;
+        B = qv;
+        break;
+
+      // The color is not defined, we should throw an error.
+
+      default:
+        //LFATAL("i Value error in Pixel conversion, Value is %d", i);
+        R = G = B = V; // Just pretend its black/white
+        break;
+    }
+  }
+  *r = (float) Clamp((int)(R * 255.0));
+  *g = (float) Clamp((int)(G * 255.0));
+  *b = (float) Clamp((int)(B * 255.0));
+}
 
 
 void getDistinctColor3F_ForID(unsigned int id,unsigned maxID , float *oR,float *oG,float *oB)
 {
-  // assumes hue [0, 360), saturation [0, 100), lightness [0, 100)
-  float h = id * (unsigned int) 360/maxID;
-  float s = 90;
-  float v = 50;
 
-  _triTrans_HSVtoRGB( oR , oG, oB , h , s , v );
+  unsigned int sCoef=10;
+  unsigned int vCoef=40;
+
+
+
+  unsigned int hStep = (unsigned int) 360/maxID;
+  unsigned int sStep = (unsigned int) sCoef/maxID;
+  unsigned int vStep = (unsigned int) vCoef/maxID;
+
+
+  // assumes hue [0, 360), saturation [0, 100), lightness [0, 100)
+  float h = id * hStep ;
+  float s = (100-sCoef) + ( (sStep-sCoef) * sStep );
+  float v = (100-vCoef) + ( (vStep-vCoef) * vStep );
+
+  HsvToRgb(h, (float) s/100, (float) v/100 , oR , oG , oB);
+
+
+  *oR = (float) *oR / 255;
+  *oG = (float) *oG / 255;
+  *oB = (float) *oB / 255;
 }
 
 
@@ -195,24 +260,121 @@ void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
  }
 
 
+float * generatePalette(struct TRI_Model * in)
+{
+  unsigned int maxNumBones = in->header.numberOfBones;
+  fprintf(stderr,"generating palette for model with %u bones \n",maxNumBones);
+  unsigned int maxNumWeightBones=0;
+  unsigned int i=0 , numW =0;
+  float * gp = (float*) malloc(sizeof(float)*maxNumBones * 3);
+  if (gp!=0)
+  {
+   for (i=0; i<maxNumBones; i++)
+   {
+     getDistinctColor3F_ForID(
+                              i,
+                              maxNumBones,
+                              &gp[3*i+0],
+                              &gp[3*i+1],
+                              &gp[3*i+2]
+                             );
+   }
+
+/*
+   for (i=0; i<maxNumBones; i++)
+   {
+     if ( in->bones[i].info->boneWeightsNumber > 0 )
+     {
+         ++maxNumWeightBones;
+     }
+   }
+
+
+   for (i=0; i<maxNumBones; i++)
+   {
+    if ( in->bones[i].info->boneWeightsNumber > 0 )
+    {
+      getDistinctColor3F_ForID(
+                                numW,
+                                maxNumWeightBones,
+                                &gp[3*numW+0],
+                                &gp[3*numW+1],
+                                &gp[3*numW+2]
+                              );
+      ++numW;
+    } else
+    {
+      gp[3*numW+0]=0.0;
+      gp[3*numW+1]=0.0;
+      gp[3*numW+2]=0.0;
+    }
+   }
+   */
+
+  }
+
+ return gp;
+}
+
 
 
 void colorCodeBones(struct TRI_Model * in)
 {
+   if (in->bones==0)
+   {
+     fprintf(stderr,"No bones to colorcode \n");
+     return;
+   }
+
+
   struct TRI_Bones_Per_Vertex * bpv = allocTransformTRIBonesToVertexBoneFormat(in);
   if (bpv!=0)
   {
+   float * gp = generatePalette(in);
+   if (gp!=0)
+   {
+    if (in->colors==0)
+    {
+      in->header.numberOfColors = in->header.numberOfVertices;
+      in->colors = (float*) malloc(sizeof(float) * in->header.numberOfColors );
+    }
+
+   if (
+        (in->colors!=0) &&
+        (in->header.numberOfColors!=0) &&
+        (in->header.numberOfVertices!=0)
+       )
+   {
    unsigned int i=0;
    for (i=0; i<in->header.numberOfVertices; i++)
-   {
+    {
       struct TRI_Bones_Per_Vertex_Vertice_Item * bone =  &bpv->bonesPerVertex[i];
 
-      unsigned int indxID=bone->indicesOfThisVertex[0];
-      unsigned int boneID=bone->boneIDOfThisVertex[0];
+      float maxWeight = 0.0;
+      unsigned int z=0 , b=0;
+      for (z=0; z<bone->bonesOfthisVertex; z++)
+      {
+        if ( bone->weightsOfThisVertex[z]>maxWeight )
+            {
+              maxWeight=bone->weightsOfThisVertex[z];
+              b=z;
+            }
+      }
 
-      getDistinctColor3F_ForID(boneID,in->header.numberOfBones, &in->colors[indxID*3+0] , &in->colors[indxID*3+1] , &in->colors[indxID*3+2]);
+      unsigned int indxID=bone->indicesOfThisVertex[b];
+      unsigned int boneID=bone->boneIDOfThisVertex[b];
+      if (boneID>in->header.numberOfVertices)
+      {
+         fprintf(stderr,"Error bug detected \n"); boneID=0;
+      }
+
+      in->colors[indxID*3+0]=gp[boneID*3+0];
+      in->colors[indxID*3+1]=gp[boneID*3+1];
+      in->colors[indxID*3+2]=gp[boneID*3+2];
+    }
    }
-
+   free(gp);
+   }
    freeTransformTRIBonesToVertexBoneFormat(bpv);
   }
 
@@ -382,7 +544,7 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 	   triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
      }
    }
-
+ return 1;
 }
 
 
