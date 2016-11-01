@@ -264,9 +264,9 @@ float * generatePalette(struct TRI_Model * in)
 {
   unsigned int maxNumBones = in->header.numberOfBones;
   fprintf(stderr,"generating palette for model with %u bones \n",maxNumBones);
-  unsigned int maxNumWeightBones=0;
-  unsigned int i=0 , numW =0;
+  unsigned int maxNumWeightBones=0 , i=0 , numW =0;
   float * gp = (float*) malloc(sizeof(float)*maxNumBones * 3);
+
   if (gp!=0)
   {
    for (i=0; i<maxNumBones; i++)
@@ -279,38 +279,6 @@ float * generatePalette(struct TRI_Model * in)
                               &gp[3*i+2]
                              );
    }
-
-/*
-   for (i=0; i<maxNumBones; i++)
-   {
-     if ( in->bones[i].info->boneWeightsNumber > 0 )
-     {
-         ++maxNumWeightBones;
-     }
-   }
-
-
-   for (i=0; i<maxNumBones; i++)
-   {
-    if ( in->bones[i].info->boneWeightsNumber > 0 )
-    {
-      getDistinctColor3F_ForID(
-                                numW,
-                                maxNumWeightBones,
-                                &gp[3*numW+0],
-                                &gp[3*numW+1],
-                                &gp[3*numW+2]
-                              );
-      ++numW;
-    } else
-    {
-      gp[3*numW+0]=0.0;
-      gp[3*numW+1]=0.0;
-      gp[3*numW+2]=0.0;
-    }
-   }
-   */
-
   }
 
  return gp;
