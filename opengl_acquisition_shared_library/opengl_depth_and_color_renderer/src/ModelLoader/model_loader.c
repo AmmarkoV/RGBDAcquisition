@@ -253,7 +253,7 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
              mod->numberOfBones = triModel->header.numberOfBones;
              mod->modelInternalData=(void * ) triModel;
              unableToLoad=0;
-             colorCodeBones(triModel);
+             //colorCodeBones(triModel); //enable this to color code bones..
              fprintf(stderr,GREEN " success \n" NORMAL);
             } else
             { fprintf(stderr,RED " unable to load TRI model \n" NORMAL);
