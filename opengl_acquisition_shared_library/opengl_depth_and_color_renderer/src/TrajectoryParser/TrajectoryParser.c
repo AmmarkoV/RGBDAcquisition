@@ -127,7 +127,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
   char includeFile[MAX_PATH]={0};
   double euler[3];
   double quaternions[4];
-  float pos[7]={0};
+  float pos[16]={0};
   unsigned int i,satteliteObj,planetObj,item,frame,duration,time,coordLength,eventType=0,foundA=0,foundB=0,objIDA=0,objIDB=0;
 
 
@@ -332,7 +332,14 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
 
           case TRAJECTORYPRIMITIVES_POSE4X4 :
-               InputParser_GetWord(ipc,1,name,MAX_PATH);
+                InputParser_GetWord(ipc,1,name,MAX_PATH);
+                time = InputParser_GetWordInt(ipc,2);
+                InputParser_GetWord(ipc,3,nameB,MAX_PATH);
+
+                for (i=0; i<16; i++) { pos[0] = InputParser_GetWordFloat(ipc,4+i); }
+                coordLength=16;
+
+                addPoseToObjectState( newstream , modelStorage , name  , nameB , time , (float*) pos , coordLength );
           break;
 
 
@@ -341,19 +348,13 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                time = InputParser_GetWordInt(ipc,2);
                InputParser_GetWord(ipc,3,nameB,MAX_PATH);
 
-               //TODO : pos[0] is X , not RotX ?
                pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,4);
                pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,5);
                pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,6);
-               pos[3] = newstream->scaleWorld[3] * InputParser_GetWordFloat(ipc,7);
-               pos[4] = newstream->scaleWorld[4] * InputParser_GetWordFloat(ipc,8);
-               pos[5] = newstream->scaleWorld[5] * InputParser_GetWordFloat(ipc,9);
-               pos[6] = InputParser_GetWordFloat(ipc,10);
-               coordLength=7;
+               coordLength=3;
 
-               if (newstream->rotationsOverride)
-                     { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
-
+               //if (newstream->rotationsOverride)
+               //      { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
                addPoseToObjectState( newstream , modelStorage , name  , nameB , time , (float*) pos , coordLength );
           break;
 
