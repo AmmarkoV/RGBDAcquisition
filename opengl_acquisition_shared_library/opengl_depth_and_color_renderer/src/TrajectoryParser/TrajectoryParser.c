@@ -336,7 +336,10 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                 time = InputParser_GetWordInt(ipc,2);
                 InputParser_GetWord(ipc,3,nameB,MAX_PATH);
 
-                for (i=0; i<16; i++) { pos[0] = InputParser_GetWordFloat(ipc,4+i); }
+                for (i=0; i<16; i++)
+                     {
+                      pos[i] = InputParser_GetWordFloat(ipc,4+i);
+                     }
                 coordLength=16;
 
                 addPoseToObjectState( newstream , modelStorage , name  , nameB , time , (float*) pos , coordLength );
