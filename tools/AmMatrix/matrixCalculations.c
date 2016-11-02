@@ -27,6 +27,28 @@ enum mat4x4EItem
 };
 
 
+
+
+
+int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float step )
+{
+
+  double qA[4];
+  matrix4x42Quaternion(qA, 0 , a4);
+
+  double qB[4];
+  matrix4x42Quaternion(qB, 0 , b4);
+
+
+}
+
+
+
+
+
+
+
+
 int pointInsideBoundingBox3D(
                              float bboxX1,float bboxY1,float bboxZ1,
                              float bboxX2,float bboxY2,float bboxZ2,

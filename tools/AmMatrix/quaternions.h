@@ -87,6 +87,10 @@ int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW);
  */
 void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention);
 
+
+void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double * matrix4x4);
+void matrix3x32Quaternion(double * quaternions,int quaternionConvention,double * m3);
+
 /**
  * @brief Calculate the Inner Product of Two Quaternions
  * @ingroup quaternions

@@ -640,7 +640,6 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
 }
 
 
-
 int normalize3DPointVector(double * vec)
 {
   if ( vec[3]==1.0 ) { return 1; } else

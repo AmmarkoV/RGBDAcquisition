@@ -170,6 +170,13 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
 
 
 
+
+
+
+int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float step );
+
+
+
 /**
 * @brief Return the Inner Product of 2 3D points
 * @ingroup AmMatrix

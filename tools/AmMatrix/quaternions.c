@@ -297,7 +297,7 @@ void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternion
 }
 
 
-void Matrix4x42Quaternion(double * quaternions,int quaternionConvention,double * matrix4x4)
+void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double * matrix4x4)
 {
 //http://www.gamasutra.com/view/feature/131686/rotating_objects_using_quaternions.php
     double qX,qY,qZ,qW;
@@ -341,6 +341,21 @@ void Matrix4x42Quaternion(double * quaternions,int quaternionConvention,double *
         qW = q[3];
     }
 
+}
+
+
+
+
+void matrix3x32Quaternion(double * quaternions,int quaternionConvention,double * m3)
+{
+  double m4[16];
+
+  m4[0]=m3[0];  m4[1]=m3[1];  m4[2]=m3[2];  m4[3]=0.0;
+  m4[4]=m3[3];  m4[5]=m3[4];  m4[6]=m3[5];  m4[7]=0.0;
+  m4[8]=m3[6];  m4[9]=m3[7];  m4[10]=m3[8]; m4[11]=0.0;
+  m4[12]=0.0;   m4[13]=0.0;   m4[14]=0.0;   m4[15]=1.0;
+
+ matrix4x42Quaternion(quaternions,quaternionConvention,m4);
 }
 
 
