@@ -97,6 +97,8 @@ float * mallocModelTransformJoints(
                                   );
 
 
+void printModelTransform(struct TRI_Model * in);
+
 /**
 * @brief  Do model transform based on joints
 * @ingroup TRI

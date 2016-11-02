@@ -518,7 +518,24 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
 
 
+void printModelTransform(struct TRI_Model * in)
+{
+  unsigned int i=0,z=0;
 
+  for (i=0; i<in->header.numberOfBones; i++)
+    {
+      if (in->bones[i].info->altered)
+      {
+        fprintf(stderr,"POSE4x4(this,0,%s",in->bones[i].boneName);
+
+        for (z=0; z<16; z++)
+        {
+          fprintf(stderr,",%s",in->bones[i].info->finalVertexTransformation[z]);
+        }
+        fprintf(stderr,")\n");
+      }
+    }
+}
 
 
 
