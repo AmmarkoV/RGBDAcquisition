@@ -595,18 +595,41 @@ int fillPosWithFrame(
        unsigned int numberOfJoints = stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints;
 
        float rotCur[4]={0};
-       unsigned int i=0;
+       unsigned int i=0,z=0;
        for (i=0; i<numberOfJoints; i++)
        {
-        rotCur[0] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot1;
-        rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
-        rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
-        rotCur[3] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot4;
-
         float * f=&joints[16*i];
         double m[16]={0};
-        create4x4MatrixFromEulerAnglesXYZ(m,rotCur[0],rotCur[1],rotCur[2]);
-        copy4x4DMatrixToF(f,m);
+       if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useEulerRotation)
+        {
+         rotCur[0] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot1;
+         rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
+         rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
+         rotCur[3] = 0.0;
+
+         create4x4MatrixFromEulerAnglesXYZ(m,rotCur[0],rotCur[1],rotCur[2]);
+         copy4x4DMatrixToF(f,m);
+        } else
+        if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useQuaternion)
+        {
+         fprintf(stderr,"STUB: Quaternion input not tied in Trajectory calculator\n");
+         rotCur[0] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot1;
+         rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
+         rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
+         rotCur[3] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot4;
+
+         //create4x4MatrixFromQuaternion(m,rotCur[0],rotCur[1],rotCur[2],rotCur[3]);
+         //copy4x4DMatrixToF(f,m);
+        } else
+        if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useMatrix4x4)
+        { //If we want to use a 4x4 matrix then just copy it..
+          float *s = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].m;
+          for (z=0; z<16; z++)
+            {
+              f[z]=s[z];
+            }
+        }
+
        }
 
     }

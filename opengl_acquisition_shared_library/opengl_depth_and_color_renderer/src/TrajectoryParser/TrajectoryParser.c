@@ -331,12 +331,17 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
           break;
 
 
+          case TRAJECTORYPRIMITIVES_POSE4X4 :
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+          break;
+
 
           case TRAJECTORYPRIMITIVES_POSE :
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                time = InputParser_GetWordInt(ipc,2);
                InputParser_GetWord(ipc,3,nameB,MAX_PATH);
 
+               //TODO : pos[0] is X , not RotX ?
                pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,4);
                pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,5);
                pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,6);
