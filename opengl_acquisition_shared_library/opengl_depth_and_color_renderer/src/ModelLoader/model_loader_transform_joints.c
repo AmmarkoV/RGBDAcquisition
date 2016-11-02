@@ -530,7 +530,7 @@ void printModelTransform(struct TRI_Model * in)
 
         for (z=0; z<16; z++)
         {
-          fprintf(stderr,",%s",in->bones[i].info->finalVertexTransformation[z]);
+          fprintf(stderr,",%0.3f",in->bones[i].info->finalVertexTransformation[z]);
         }
         fprintf(stderr,")\n");
       }
