@@ -35,7 +35,7 @@ int accessOfObjectPositionIsOk(struct VirtualStream * stream,unsigned int ObjID,
      return 0;
    }
 
-   if (FrameIDToReturn>=stream->object[ObjID].numberOfFrames) { fprintf(stderr,"Position %u of Object %u is out of bounds\n"); return 0; }
+   if (FrameIDToReturn>=stream->object[ObjID].numberOfFrames) { fprintf(stderr,"Position %u of Object %u is out of bounds\n" , FrameIDToReturn , ObjID); return 0; }
  return 1;
 }
 
@@ -589,8 +589,11 @@ int fillPosWithFrame(
 
     if ( (joints!=0) && (stream->object[ObjID].frame[FrameIDToReturn].jointList!=0) )
     {
-       fprintf(stderr,"Populating non interpolated joints for frame %u  ( %u joints ) \n",FrameIDToReturn ,
-               stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints);
+       fprintf(stderr,
+               "Populating non interpolated joints for frame %u  ( %u joints ) \n",
+               FrameIDToReturn ,
+               stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints
+              );
 
        unsigned int numberOfJoints = stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints;
 
@@ -600,7 +603,7 @@ int fillPosWithFrame(
        {
         float * f=&joints[16*i];
         double m[16]={0};
-       if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useEulerRotation)
+        if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useEulerRotation)
         {
          rotCur[0] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot1;
          rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
@@ -628,6 +631,9 @@ int fillPosWithFrame(
             {
               f[z]=s[z];
             }
+        } else
+        {
+         fprintf(stderr,"fillPosWithFrame: Unknown way to fill joint matrix \n");
         }
 
        }
@@ -654,12 +660,13 @@ int fillJointsWithInterpolatedFrame(
        float rotTot[4]={0};
        unsigned int numberOfJoints = 0;
 
-       if (stream->object[ObjID].frame[PrevFrame].jointList!=0)
-         { numberOfJoints = stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints; }
-       if (stream->object[ObjID].frame[NextFrame].jointList!=0)
-         { numberOfJoints = stream->object[ObjID].frame[NextFrame].jointList->numberOfJoints; }
-
+       if (stream->object[ObjID].frame[PrevFrame].jointList!=0) { numberOfJoints = stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints; }
        if (numberOfJoints==0) { return 1; }
+
+       if (stream->object[ObjID].frame[NextFrame].jointList!=0) { numberOfJoints = stream->object[ObjID].frame[NextFrame].jointList->numberOfJoints; }
+       if (numberOfJoints==0) { return 1; }
+
+
        if (MAX_stepTime==0)   { return 0; }
 
        float timeMultiplier = (float) our_stepTime / MAX_stepTime;
@@ -682,6 +689,7 @@ int fillJointsWithInterpolatedFrame(
            )
          {
            // No joints declared so impossible to interpolate
+           // so doing nothing , dont print something because it will slow execution
          } else
         if (
             (
@@ -694,8 +702,7 @@ int fillJointsWithInterpolatedFrame(
             )
            )
         {
-         if (
-              (stream->object[ObjID].frame[PrevFrame].hasNonDefaultJointList) )
+         if (stream->object[ObjID].frame[PrevFrame].hasNonDefaultJointList)
          {
           rotPrev[0] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot1;
           rotPrev[1] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot2;
@@ -703,8 +710,7 @@ int fillJointsWithInterpolatedFrame(
           rotPrev[3] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot4;
          }
 
-         if (
-              (stream->object[ObjID].frame[NextFrame].hasNonDefaultJointList) )
+         if (stream->object[ObjID].frame[NextFrame].hasNonDefaultJointList)
          {
           rotNext[0] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot1;
           rotNext[1] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot2;
@@ -725,12 +731,13 @@ int fillJointsWithInterpolatedFrame(
          copy4x4DMatrixToF(f,m);
         } else
        if (
-             (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useMatrix4x4) &&
+             (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useMatrix4x4)
+             &&
              (stream->object[ObjID].frame[NextFrame].jointList->joint[i].useMatrix4x4)
           )
         {
         fprintf(stderr,"Rotation MAT4x4 (obj=%u pos=%u bone=%u ) \n",ObjID,PrevFrame,i);
-        slerp2RotTransMatrices4x4(
+        slerp2RotTransMatrices4x4F(
                                    f , //write straight to the output
                                    stream->object[ObjID].frame[PrevFrame].jointList->joint[i].m,
                                    stream->object[ObjID].frame[NextFrame].jointList->joint[i].m ,
@@ -759,7 +766,6 @@ int fillJointsWithInterpolatedFrame(
              }
 
         }
-
       }
   return 1;
 }

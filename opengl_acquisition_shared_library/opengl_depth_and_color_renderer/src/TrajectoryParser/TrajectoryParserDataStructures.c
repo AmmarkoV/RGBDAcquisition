@@ -286,14 +286,14 @@ struct JointState * allocateEnoughJointSpaceForStateOfObjectID(
    struct JointState * js = ( struct JointState * ) malloc(sizeof(struct JointState));
    if (js!=0)
    {
-    unsigned int jointSize = numberOfBones * sizeof(struct Joint);
-    js->joint = ( struct Joint *) malloc(jointSize);
+    unsigned int sizeJointTimesNumberOfBones = numberOfBones * sizeof(struct Joint);
+    js->joint = ( struct Joint *) malloc(sizeJointTimesNumberOfBones);
     if (js->joint!=0)
      {
-       memset(js->joint,0,jointSize);
+       memset(js->joint,0,sizeJointTimesNumberOfBones);
        js->numberOfJoints = numberOfBones;
-     }
-   }
+     } else { fprintf(stderr,"Could not allocate joint space for all joints of objID %u ", ObjID ); }
+   } else { fprintf(stderr,"Could not allocate joint space for objID %u ", ObjID ); }
    return js;
  }
 
@@ -345,7 +345,8 @@ int addStateToObjectID(
   if (coordLength > 3 ) {stream->object[ObjID].frame[pos].rot1 = coord[3]; }
   if (coordLength > 4 ) {stream->object[ObjID].frame[pos].rot2 = coord[4]; }
   if (coordLength > 5 ) {stream->object[ObjID].frame[pos].rot3 = coord[5]; }
-  if (coordLength > 6 ) {stream->object[ObjID].frame[pos].rot4 = coord[6]; stream->object[ObjID].frame[pos].isQuaternion = 1; }
+  if (coordLength > 6 ) {stream->object[ObjID].frame[pos].rot4 = coord[6]; }
+  if (coordLength==7) { stream->object[ObjID].frame[pos].isQuaternion = 1; }
 
   if (stream->object[ObjID].MAX_timeOfFrames <= stream->object[ObjID].frame[pos].time)
     {
