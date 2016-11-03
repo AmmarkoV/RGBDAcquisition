@@ -32,6 +32,12 @@ enum mat4x4EItem
 
 int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float step )
 {
+  if ( (result4==0) || (a4==0) || (b4==0) ) { return 0; }
+
+  //Enforce some limits on wrong values
+  if (step>1.0) { step=1.0; }
+   else
+  if (step<0.0) { step=0.0; }
 
   double qA[4];
   matrix4x42Quaternion(qA, 0 , a4);
@@ -39,7 +45,14 @@ int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float
   double qB[4];
   matrix4x42Quaternion(qB, 0 , b4);
 
+  double qOut[4];
+  quaternionSlerp( qOut, qA , qB, step);
+  quaternion2Matrix4x4(result4 , qOut , 0 );
 
+  result4[3]  = (qB[3]-qA[3]) * step;
+  result4[7]  = (qB[7]-qA[7]) * step;
+  result4[11] = (qB[11]-qA[11]) * step;
+ return 1;
 }
 
 

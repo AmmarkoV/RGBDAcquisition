@@ -297,6 +297,24 @@ void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternion
 }
 
 
+
+void quaternion2Matrix4x4(double * matrix4x4,double * quaternions,int quaternionConvention)
+{
+    //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
+    double qX,qY,qZ,qW;
+    handleQuaternionUnpackConvention(quaternions,&qX,&qY,&qZ,&qW,quaternionConvention);
+
+    double * m = matrix4x4;
+
+    m[0]=1 -(2*qY*qY) - (2*qZ*qZ); /*|*/  m[1]=(2*qX*qY) - (2*qZ*qW);     /*|*/ m[2]=(2*qX*qZ) + (2*qY*qW);          m[3]=0.0;
+    m[4]=(2*qX*qY) + (2*qZ*qW);    /*|*/  m[5]=1 - (2*qX*qX) - (2*qZ*qZ); /*|*/ m[6]=(2*qY*qZ) - (2*qX*qW);          m[7]=0.0;
+    m[8]=(2*qX*qZ) - (2*qY*qW);    /*|*/  m[9]=(2*qY*qZ) + (2*qX*qW);     /*|*/ m[10]=1 - (2*qX*qX) - (2*qY*qY);     m[11]=0.0;
+    m[12]=0.0;                            m[13]=0.0;                            m[14]=0.0;                           m[15]=1.0;
+
+    return ;
+}
+
+
 void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double * matrix4x4)
 {
 //http://www.gamasutra.com/view/feature/131686/rotating_objects_using_quaternions.php

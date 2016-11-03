@@ -87,6 +87,17 @@ int normalizeQuaternions(double *qX,double *qY,double *qZ,double *qW);
  */
 void quaternion2Matrix3x3(double * matrix3x3,double * quaternions,int quaternionConvention);
 
+/**
+ * @brief Convert Quaternion to a 4x4 Matrix
+ * @ingroup quaternions
+ * @param
+ * @param Output 4x4 double matrix
+ * @param Input quaternion
+ * @param Input quaternion convention used
+ */
+void quaternion2Matrix4x4(double * matrix4x4,double * quaternions,int quaternionConvention);
+
+
 
 void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double * matrix4x4);
 void matrix3x32Quaternion(double * quaternions,int quaternionConvention,double * m3);

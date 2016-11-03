@@ -172,7 +172,14 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
 
 
 
-
+/**
+ * @brief Perform Slerp function between 2 4x4 matrices representing rigid transformations
+ * @ingroup AmMatrix
+ * @param Output Matrix4x4
+ * @param Input Matrix4x4 A
+ * @param Input Matrix4x4 B
+ * @param Factor , typically should be 0.5 for half and half
+ */
 int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float step );
 
 
