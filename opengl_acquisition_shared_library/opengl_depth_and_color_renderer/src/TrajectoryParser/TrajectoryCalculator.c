@@ -597,7 +597,7 @@ int fillPosWithFrame(
 
        unsigned int numberOfJoints = stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints;
 
-       float rotCur[4]={0};
+       double rotCur[4]={0};
        unsigned int i=0,z=0;
        for (i=0; i<numberOfJoints; i++)
        {
@@ -615,14 +615,13 @@ int fillPosWithFrame(
         } else
         if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useQuaternion)
         {
-         fprintf(stderr,"STUB: Quaternion input not tied in Trajectory calculator\n");
          rotCur[0] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot1;
          rotCur[1] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot2;
          rotCur[2] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot3;
          rotCur[3] = stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].rot4;
 
-         //create4x4MatrixFromQuaternion(m,rotCur[0],rotCur[1],rotCur[2],rotCur[3]);
-         //copy4x4DMatrixToF(f,m);
+         quaternion2Matrix4x4(m,rotCur,0);
+         copy4x4DMatrixToF(f,m);
         } else
         if (stream->object[ObjID].frame[FrameIDToReturn].jointList->joint[i].useMatrix4x4)
         { //If we want to use a 4x4 matrix then just copy it..
