@@ -660,43 +660,105 @@ int fillJointsWithInterpolatedFrame(
          { numberOfJoints = stream->object[ObjID].frame[NextFrame].jointList->numberOfJoints; }
 
        if (numberOfJoints==0) { return 1; }
+       if (MAX_stepTime==0)   { return 0; }
+
+       float timeMultiplier = (float) our_stepTime / MAX_stepTime;
 
        unsigned int i=0;
        for (i=0; i<numberOfJoints; i++)
        {
-        if ( (stream->object[ObjID].frame[PrevFrame].jointList!=0) &&
-              (stream->object[ObjID].frame[PrevFrame].hasNonDefaultJointList) )
-        {
-         rotPrev[0] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot1;
-         rotPrev[1] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot2;
-         rotPrev[2] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot3;
-         rotPrev[3] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot4;
-        }
-
-        if ( (stream->object[ObjID].frame[NextFrame].jointList!=0) &&
-              (stream->object[ObjID].frame[NextFrame].hasNonDefaultJointList) )
-        {
-         rotNext[0] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot1;
-         rotNext[1] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot2;
-         rotNext[2] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot3;
-         rotNext[3] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot4;
-        }
-
-        float timeMultiplier = (float) our_stepTime / MAX_stepTime;
-
-        rotTot[0] = rotPrev[0] + (float) ( rotNext[0] - rotPrev[0] ) * timeMultiplier;
-        rotTot[1] = rotPrev[1] + (float) ( rotNext[1] - rotPrev[1] ) * timeMultiplier;
-        rotTot[2] = rotPrev[2] + (float) ( rotNext[2] - rotPrev[2] ) * timeMultiplier;
-        rotTot[3] = rotPrev[3] + (float) ( rotNext[3] - rotPrev[3] ) * timeMultiplier;
 
         float * f=&joints[16*i];
-        double m[16];
+        double m[16]={
+                       1.0 , 0.0 , 0.0 ,0.0 ,
+                       0.0 , 1.0 , 0.0 ,0.0 ,
+                       0.0 , 0.0 , 1.0 ,0.0 ,
+                       0.0 , 0.0 , 0.0 ,1.0
+                     };
 
-        //fprintf(stderr,"Rotation Prev (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,PrevFrame,i,rotPrev[0],rotPrev[1],rotPrev[2]);
-        //fprintf(stderr,"Rotation Next (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,NextFrame,i,rotNext[0],rotNext[1],rotNext[2]);
-        //fprintf(stderr,"Rotation Requested  is %0.2f %0.2f %0.2f ( mult %0.2f ) \n",rotTot[0],rotTot[1],rotTot[2],timeMultiplier);
+        if (
+            (stream->object[ObjID].frame[PrevFrame].jointList==0) ||
+            (stream->object[ObjID].frame[NextFrame].jointList==0)
+           )
+         {
+           // No joints declared so impossible to interpolate
+         } else
+        if (
+            (
+             (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useEulerRotation) ||
+             (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useQuaternion)
+            ) &&
+            (
+             (stream->object[ObjID].frame[NextFrame].jointList->joint[i].useEulerRotation) ||
+             (stream->object[ObjID].frame[NextFrame].jointList->joint[i].useQuaternion)
+            )
+           )
+        {
+         if (
+              (stream->object[ObjID].frame[PrevFrame].hasNonDefaultJointList) )
+         {
+          rotPrev[0] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot1;
+          rotPrev[1] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot2;
+          rotPrev[2] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot3;
+          rotPrev[3] = stream->object[ObjID].frame[PrevFrame].jointList->joint[i].rot4;
+         }
+
+         if (
+              (stream->object[ObjID].frame[NextFrame].hasNonDefaultJointList) )
+         {
+          rotNext[0] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot1;
+          rotNext[1] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot2;
+          rotNext[2] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot3;
+          rotNext[3] = stream->object[ObjID].frame[NextFrame].jointList->joint[i].rot4;
+         }
+
+
+         rotTot[0] = rotPrev[0] + (float) ( rotNext[0] - rotPrev[0] ) * timeMultiplier;
+         rotTot[1] = rotPrev[1] + (float) ( rotNext[1] - rotPrev[1] ) * timeMultiplier;
+         rotTot[2] = rotPrev[2] + (float) ( rotNext[2] - rotPrev[2] ) * timeMultiplier;
+         rotTot[3] = rotPrev[3] + (float) ( rotNext[3] - rotPrev[3] ) * timeMultiplier;
+
+        fprintf(stderr,"Rotation Prev (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,PrevFrame,i,rotPrev[0],rotPrev[1],rotPrev[2]);
+        fprintf(stderr,"Rotation Next (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,NextFrame,i,rotNext[0],rotNext[1],rotNext[2]);
+        fprintf(stderr,"Rotation Requested  is %0.2f %0.2f %0.2f ( mult %0.2f ) \n",rotTot[0],rotTot[1],rotTot[2],timeMultiplier);
          create4x4MatrixFromEulerAnglesXYZ(m,rotTot[0],rotTot[1],rotTot[2]);
          copy4x4DMatrixToF(f,m);
+        } else
+       if (
+             (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useMatrix4x4) &&
+             (stream->object[ObjID].frame[NextFrame].jointList->joint[i].useMatrix4x4)
+          )
+        {
+        fprintf(stderr,"Rotation MAT4x4 (obj=%u pos=%u bone=%u ) \n",ObjID,PrevFrame,i);
+        slerp2RotTransMatrices4x4(
+                                   f , //write straight to the output
+                                   stream->object[ObjID].frame[PrevFrame].jointList->joint[i].m,
+                                   stream->object[ObjID].frame[NextFrame].jointList->joint[i].m ,
+                                   timeMultiplier
+                                  );
+        } else
+        {
+          if (
+              (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].altered) ||
+              (stream->object[ObjID].frame[NextFrame].jointList->joint[i].altered)
+             )
+             {
+              fprintf(stderr,"Unknown interpolation combination  ( obj %u , joint %u ) only supporting Euler->Euler , M4x4->M4x4\n" , ObjID , i);
+              fprintf(stderr,"PrevFrame ( %u ) : \n",PrevFrame);
+              fprintf(stderr," euler  switch  : %u \n",stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useEulerRotation);
+              fprintf(stderr," quat   switch  : %u \n",stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useQuaternion);
+              fprintf(stderr," mat4x4 switch  : %u \n",stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useMatrix4x4);
+
+              fprintf(stderr,"NextFrame ( %u ): \n",NextFrame);
+              fprintf(stderr," euler  switch  : %u \n",stream->object[ObjID].frame[NextFrame].jointList->joint[i].useEulerRotation);
+              fprintf(stderr," quat   switch  : %u \n",stream->object[ObjID].frame[NextFrame].jointList->joint[i].useQuaternion);
+              fprintf(stderr," mat4x4 switch  : %u \n",stream->object[ObjID].frame[NextFrame].jointList->joint[i].useMatrix4x4);
+             } else
+             {
+               //No information set , we shouldnt even be trying for an interpolation
+             }
+
+        }
 
       }
   return 1;

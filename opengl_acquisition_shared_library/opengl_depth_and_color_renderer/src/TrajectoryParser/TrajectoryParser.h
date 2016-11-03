@@ -58,6 +58,7 @@ enum PlaybackState
 
 struct Joint
 {
+  char altered;
   float x , y , z , scaleX ,scaleY, scaleZ;
   char useEulerRotation;
   char useQuaternion;

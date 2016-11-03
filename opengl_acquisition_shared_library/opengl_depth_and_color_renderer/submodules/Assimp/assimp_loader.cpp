@@ -176,6 +176,15 @@ void fillInNodeAndBoneData(struct aiNode *node ,  struct aiMesh * mesh , unsigne
   if (!triModel->bones[nodeNum].info) { fprintf(stderr,"Can't allocate enough space for bone info \n"); return; }
   memset(triModel->bones[nodeNum].info , 0 , sizeof (struct TRI_Bones_Header));
 
+
+  //Make sure that the finalVertexTransformation is identity , so it will always make sense..
+  double * d = triModel->bones[nodeNum].info->finalVertexTransformation;
+  d[0]=1.0;  d[1]=0.0;  d[2]=0.0;  d[3]=0.0;
+  d[4]=0.0;  d[5]=1.0;  d[6]=0.0;  d[7]=0.0;
+  d[8]=0.0;  d[9]=0.0;  d[10]=1.0; d[11]=0.0;
+  d[12]=0.0; d[13]=0.0; d[14]=0.0; d[15]=1.0;
+
+
   if (parentNodeID==nodeNum)
   {
     //We are the root node so we won't update in our parents children

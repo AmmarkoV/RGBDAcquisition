@@ -452,6 +452,7 @@ int addPoseToObjectState(
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useQuaternion=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useMatrix4x4=0;
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=0;
 
            if (coordLength==3)
            {
@@ -460,6 +461,7 @@ int addPoseToObjectState(
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
            } else
            if (coordLength==4)
            {
@@ -469,14 +471,19 @@ int addPoseToObjectState(
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
            } else
            if (coordLength=16)
            {
            fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n",ObjID,pos,boneID,timeMilliseconds);
             stream->object[ObjID].frame[pos].jointList->joint[boneID].useMatrix4x4=1;
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
             unsigned int z=0;
             for (z=0; z<16; z++)
               { stream->object[ObjID].frame[pos].jointList->joint[boneID].m[z]=coord[z]; }
+           } else
+           {
+             fprintf(stderr,RED "Unknown coordinate length ( %u )  obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n" NORMAL,coordLength,ObjID,pos,boneID,timeMilliseconds);
            }
 
            return 1;

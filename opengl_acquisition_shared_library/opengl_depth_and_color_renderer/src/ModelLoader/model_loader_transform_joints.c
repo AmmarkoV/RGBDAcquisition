@@ -472,6 +472,7 @@ void recursiveJointHeirarchyTransformer(
 
 int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 {
+  fprintf(stderr,YELLOW "applying vertex transformation .. \n" NORMAL);
   double transformedPosition[4]={0} ,transformedNormal[4]={0} , position[4]={0} , normal[4]={0};
   unsigned int i,k;
  //We NEED to clear the vertices and normals since they are added uppon , not having
@@ -481,6 +482,13 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
 
    for (k=0; k<triModelIn->header.numberOfBones; k++ )
    {
+     if ( is4x4DZeroMatrix(triModelIn->bones[k].info->finalVertexTransformation) )
+     {
+       fprintf(stderr,RED "Joint Transform was zero for bone %s (%u) , there was a bug preparing the matrices \n" NORMAL,triModelIn->bones[k].boneName , k );
+       create4x4IdentityMatrix(triModelIn->bones[k].info->finalVertexTransformation);
+     }
+
+
      for (i=0; i<triModelIn->bones[k].info->boneWeightsNumber; i++ )
      {
        //V is the vertice we will be working in this loop

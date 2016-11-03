@@ -35,8 +35,7 @@ int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float
   if ( (result4==0) || (a4==0) || (b4==0) ) { return 0; }
 
   //Enforce some limits on wrong values
-  if (step>1.0) { step=1.0; }
-   else
+  if (step>1.0) { step=1.0; } else
   if (step<0.0) { step=0.0; }
 
   double qA[4];
@@ -58,6 +57,19 @@ int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float
 
 
 
+int slerp2RotTransMatrices4x4F(float * result4, float * a4, float * b4 , float step )
+{
+ double a4D[16],b4D[16],rD[16];
+
+
+ copy4x4FMatrixToD(a4D,a4);
+ copy4x4FMatrixToD(b4D,b4);
+
+   slerp2RotTransMatrices4x4( rD, a4D, b4D , step );
+
+ copy4x4DMatrixToF(result4, rD);
+ return 1;
+}
 
 
 

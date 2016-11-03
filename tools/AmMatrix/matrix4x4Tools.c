@@ -155,6 +155,17 @@ int floatEq(float element , float value )
  return 0;
 }
 
+int is4x4DZeroMatrix(double  * m)
+{
+   return (
+            ( m[0] == 0.0)&&(m[1] == 0.0)&&(m[2] == 0.0)&& (m[3] == 0.0) &&
+            ( m[4] == 0.0)&&(m[5] == 0.0)&&(m[6] == 0.0)&& (m[7] == 0.0)&&
+            ( m[8] == 0.0)&&(m[9] == 0.0)&&(m[10]== 0.0)&&(m[11]== 0.0)&&
+            ( m[12]== 0.0)&&(m[13]== 0.0)&&(m[14] == 0.0)&&(m[15]== 0.0)
+          );
+}
+
+
 
 int is4x4FIdentityMatrix(float  * m)
 {
@@ -633,7 +644,7 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
      print4x4DMatrix("Matrix was",transformation4x4);
      fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D[0],point3D[1],point3D[2],point3D[3]);
      fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2],resultPoint3D[3]);
-
+     return 0;
   }
 
  return 1;

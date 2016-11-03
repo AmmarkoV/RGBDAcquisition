@@ -173,16 +173,27 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
 
 
 /**
- * @brief Perform Slerp function between 2 4x4 matrices representing rigid transformations
+ * @brief Perform Slerp function between 2 4x4 matrices ( of doubles ) representing rigid transformations
  * @ingroup AmMatrix
- * @param Output Matrix4x4
- * @param Input Matrix4x4 A
- * @param Input Matrix4x4 B
+ * @param Output Matrix4x4  ( of doubles )
+ * @param Input Matrix4x4 A ( of doubles )
+ * @param Input Matrix4x4 B ( of doubles )
  * @param Factor , typically should be 0.5 for half and half
  */
 int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float step );
 
 
+
+
+/**
+ * @brief Perform Slerp function between 2 4x4 matrices ( of floats ) representing rigid transformations
+ * @ingroup AmMatrix
+ * @param Output Matrix4x4   ( of floats )
+ * @param Input Matrix4x4 A  ( of floats )
+ * @param Input Matrix4x4 B  ( of floats )
+ * @param Factor , typically should be 0.5 for half and half
+ */
+int slerp2RotTransMatrices4x4F(float * result4, float * a4, float * b4 , float step );
 
 /**
 * @brief Return the Inner Product of 2 3D points
