@@ -697,9 +697,21 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          if (numberOfBones>0) {
                                 //The 4x4 Matrix per joint
                                 joints=(float *) malloc(sizeof(float) * numberOfBones * 16);
-                                memset(joints,0,sizeof(float) * numberOfBones * 16); //Clear it ..
-                              } else
-                              { joints=0; }
+
+
+                                //memset(joints,0,sizeof(float) * numberOfBones * 16); //Clear it ..
+                                //We initialize Identity Matrices everywhere..
+                                unsigned int z;
+                                for (z=0; z<(numberOfBones); z++)
+                                 {
+                                  float * mat = &joints[16*z];
+
+                                  mat[0]=1.0;  mat[1]=0.0;  mat[2]=0.0;  mat[3]=0.0;
+                                  mat[4]=0.0;  mat[5]=1.0;  mat[6]=0.0;  mat[7]=0.0;
+                                  mat[8]=0.0;  mat[9]=0.0;  mat[10]=1.0; mat[11]=0.0;
+                                  mat[12]=0.0; mat[13]=0.0; mat[14]=0.0; mat[15]=1.0;
+                                 }
+                              }
 
          if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,joints,&scaleX,&scaleY,&scaleZ) )
           {
