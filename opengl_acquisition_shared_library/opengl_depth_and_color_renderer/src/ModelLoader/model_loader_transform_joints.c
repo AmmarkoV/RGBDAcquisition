@@ -472,7 +472,7 @@ void recursiveJointHeirarchyTransformer(
 
 int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )
 {
-  fprintf(stderr,YELLOW "applying vertex transformation .. \n" NORMAL);
+  //fprintf(stderr,YELLOW "applying vertex transformation .. \n" NORMAL);
   double transformedPosition[4]={0} ,transformedNormal[4]={0} , position[4]={0} , normal[4]={0};
   unsigned int i,k;
  //We NEED to clear the vertices and normals since they are added uppon , not having

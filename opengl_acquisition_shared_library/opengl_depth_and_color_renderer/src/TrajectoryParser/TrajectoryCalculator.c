@@ -654,6 +654,8 @@ int fillJointsWithInterpolatedFrame(
                                   unsigned int MAX_stepTime
                                 )
 {
+//This call will not work correctly if we mix 4x4 matrices , eulers and quaternions on prevFrame/nextFrame
+
        float rotPrev[4]={0};
        float rotNext[4]={0};
        float rotTot[4]={0};
@@ -694,7 +696,7 @@ int fillJointsWithInterpolatedFrame(
             (
              (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useEulerRotation) ||
              (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useQuaternion)
-            ) &&
+            ) ||
             (
              (stream->object[ObjID].frame[NextFrame].jointList->joint[i].useEulerRotation) ||
              (stream->object[ObjID].frame[NextFrame].jointList->joint[i].useQuaternion)
@@ -723,19 +725,19 @@ int fillJointsWithInterpolatedFrame(
          rotTot[2] = rotPrev[2] + (float) ( rotNext[2] - rotPrev[2] ) * timeMultiplier;
          rotTot[3] = rotPrev[3] + (float) ( rotNext[3] - rotPrev[3] ) * timeMultiplier;
 
-        fprintf(stderr,"Rotation Prev (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,PrevFrame,i,rotPrev[0],rotPrev[1],rotPrev[2]);
-        fprintf(stderr,"Rotation Next (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,NextFrame,i,rotNext[0],rotNext[1],rotNext[2]);
-        fprintf(stderr,"Rotation Requested  is %0.2f %0.2f %0.2f ( mult %0.2f ) \n",rotTot[0],rotTot[1],rotTot[2],timeMultiplier);
+        //fprintf(stderr,"Rotation Prev (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,PrevFrame,i,rotPrev[0],rotPrev[1],rotPrev[2]);
+        //fprintf(stderr,"Rotation Next (obj=%u pos=%u bone=%u ) is %0.2f %0.2f %0.2f \n",ObjID,NextFrame,i,rotNext[0],rotNext[1],rotNext[2]);
+        //fprintf(stderr,"Rotation Requested  is %0.2f %0.2f %0.2f ( mult %0.2f ) \n",rotTot[0],rotTot[1],rotTot[2],timeMultiplier);
          create4x4MatrixFromEulerAnglesXYZ(m,rotTot[0],rotTot[1],rotTot[2]);
          copy4x4DMatrixToF(f,m);
         } else
        if (
              (stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useMatrix4x4)
-             &&
+             ||
              (stream->object[ObjID].frame[NextFrame].jointList->joint[i].useMatrix4x4)
           )
         {
-        fprintf(stderr,"Rotation MAT4x4 (obj=%u pos=%u bone=%u ) \n",ObjID,PrevFrame,i);
+        //fprintf(stderr,"Rotation MAT4x4 (obj=%u pos=%u bone=%u ) \n",ObjID,PrevFrame,i);
         slerp2RotTransMatrices4x4F(
                                    f , //write straight to the output
                                    stream->object[ObjID].frame[PrevFrame].jointList->joint[i].m,
@@ -749,7 +751,7 @@ int fillJointsWithInterpolatedFrame(
               (stream->object[ObjID].frame[NextFrame].jointList->joint[i].altered)
              )
              {
-              fprintf(stderr,"Unknown interpolation combination  ( obj %u , joint %u ) only supporting Euler->Euler , M4x4->M4x4\n" , ObjID , i);
+              fprintf(stderr,RED "Unknown interpolation combination  ( obj %u , joint %u ) only supporting Euler->Euler , M4x4->M4x4\n" NORMAL , ObjID , i);
               fprintf(stderr,"PrevFrame ( %u ) : \n",PrevFrame);
               fprintf(stderr," euler  switch  : %u \n",stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useEulerRotation);
               fprintf(stderr," quat   switch  : %u \n",stream->object[ObjID].frame[PrevFrame].jointList->joint[i].useQuaternion);
