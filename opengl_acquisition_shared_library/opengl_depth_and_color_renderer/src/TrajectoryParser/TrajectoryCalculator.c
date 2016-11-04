@@ -863,7 +863,6 @@ int fillPosWithInterpolatedFrame(
     pos[6]=interPos[6];
 
 
-    if (joints==0) { /*No joints output ..*/ } else
     if ( (joints!=0) &&
          (
           (stream->object[ObjID].frame[PrevFrame].jointList!=0) ||
@@ -872,7 +871,6 @@ int fillPosWithInterpolatedFrame(
         )
     {
        //fprintf(stderr,"interpolating joints for frame %u  ( %u joints / obj %u ) \n",PrevFrame , stream->object[ObjID].frame[PrevFrame].jointList->numberOfJoints , ObjID);
-
        fillJointsWithInterpolatedFrame(
                                         stream,
                                         ObjID,
@@ -882,15 +880,7 @@ int fillPosWithInterpolatedFrame(
                                         our_stepTime,
                                         MAX_stepTime
                                        );
-    } else
-   {
-       /*
-       fprintf(stderr,RED "unallocated joints ( out %p , prev %p , next %p ) \n" NORMAL,
-               joints,
-               stream->object[ObjID].frame[PrevFrame].jointList,
-               stream->object[ObjID].frame[NextFrame].jointList
-               );*/
-   }
+    }
 
     #if PRINT_DEBUGGING_INFO
     fprintf(stderr,"ok \n");

@@ -470,6 +470,8 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
          triModel->bones = (struct TRI_Bones *) malloc(sizeof(struct TRI_Bones) * triModel->header.numberOfBones);
          memset(triModel->bones, 0 , sizeof(struct TRI_Bones) * triModel->header.numberOfBones);
+
+
          if (triModel->bones)
          {
           unsigned int boneNum=0,itemSize,count;
@@ -479,6 +481,10 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
           triModel->bones[boneNum].info = (struct TRI_Bones_Header*) malloc(sizeof(struct TRI_Bones_Header));
           memset( triModel->bones[boneNum].info , 0 , sizeof(struct TRI_Bones_Header) );
           n = fread(triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header), 1 , fd);
+
+          //Check value
+          //fprintf(stderr,"Bone %u \n",boneNum);
+          //print4x4DMatrixTRI("triModel->bones[boneNum].info->finalVertexTransformation", triModel->bones[boneNum].info->finalVertexTransformation);
 
           //Allocate enough space for the bone string , read it  , and null terminate it
           itemSize = sizeof(char);         count = triModel->bones[boneNum].info->boneNameSize;

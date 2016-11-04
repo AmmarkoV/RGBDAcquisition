@@ -36,7 +36,7 @@ struct Model
     unsigned char nocull , nocolor , wireframe , highlight;
 
     //-----------------
-    char pathOfModel[MAX_MODEL_PATHS];
+    char pathOfModel[MAX_MODEL_PATHS+1];
 };
 
 

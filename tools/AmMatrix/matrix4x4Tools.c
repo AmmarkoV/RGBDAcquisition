@@ -155,6 +155,16 @@ int floatEq(float element , float value )
  return 0;
 }
 
+
+int floatPEq(float * element , float value )
+{
+ const float machineFloatPercision= 0.0001;
+ if ( *element == value ) { return 1; }
+
+ if ( ( value-machineFloatPercision<*element ) && (( *element<value+machineFloatPercision )) ) { return 1; }
+ return 0;
+}
+
 int is4x4DZeroMatrix(double  * m)
 {
    return (
@@ -170,10 +180,10 @@ int is4x4DZeroMatrix(double  * m)
 int is4x4FIdentityMatrix(float  * m)
 {
    return (
-    ( floatEq(m[0],1.0) )&&(m[1] == 0.0)&&(m[2] == 0.0)&& (m[3] == 0.0) &&
-    ( m[4] == 0.0)&&(floatEq(m[5],1.0))&&(m[6] == 0.0)&& (m[7] == 0.0)&&
-    ( m[8] == 0.0)&&(m[9] == 0.0)&&(floatEq(m[10],1.0))&&(m[11]== 0.0)&&
-    ( m[12]== 0.0)&&(m[13]== 0.0)&&(m[14] == 0.0)&&(floatEq(m[15],1.0))
+    ( floatPEq(&m[0],1.0) )&&(m[1] == 0.0)&&(m[2] == 0.0)&& (m[3] == 0.0) &&
+    ( m[4] == 0.0)&&(floatPEq(&m[5],1.0))&&(m[6] == 0.0)&& (m[7] == 0.0)&&
+    ( m[8] == 0.0)&&(m[9] == 0.0)&&(floatPEq(&m[10],1.0))&&(m[11]== 0.0)&&
+    ( m[12]== 0.0)&&(m[13]== 0.0)&&(m[14] == 0.0)&&(floatPEq(&m[15],1.0))
            );
 }
 

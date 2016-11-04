@@ -694,7 +694,11 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
          //fprintf(stderr,"Drawing model %u/%u ( %s ) \n",objectType_WhichModelToDraw ,modelStorage->currentNumberOfModels,mod->pathOfModel);
          float * pos = (float*) &posStackA;
 
-         if (numberOfBones>0) { joints=(float *) malloc(sizeof(float) * numberOfBones * 16 ); } else //The 4x4 Matrix per joint
+         if (numberOfBones>0) {
+                                //The 4x4 Matrix per joint
+                                joints=(float *) malloc(sizeof(float) * numberOfBones * 16);
+                                memset(joints,0,sizeof(float) * numberOfBones * 16); //Clear it ..
+                              } else
                               { joints=0; }
 
          if ( calculateVirtualStreamPos(scene,i,timestampToUse,pos,joints,&scaleX,&scaleY,&scaleZ) )
