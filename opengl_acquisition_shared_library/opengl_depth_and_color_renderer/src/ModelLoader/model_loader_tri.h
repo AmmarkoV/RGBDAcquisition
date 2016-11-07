@@ -26,7 +26,7 @@ extern "C"
          to keep the spec as clean as possible
 * @ingroup TRI
 */
-#define TRI_LOADER_VERSION 5
+#define TRI_LOADER_VERSION 6
 
 /**
 * @brief The header and initial file block of the TRI format , magic for the files is TRI3D
@@ -36,6 +36,7 @@ struct TRI_Header
 {
      char TRIMagic[5]; // TRI3D
      unsigned int triType;
+     unsigned int nameSize;
      unsigned int floatSize;
      //These first values guarantee that there is compatibility between machines/versions etc
      unsigned int drawType; //0 = triangles , 1 = quads , // etc ( not used yet )
@@ -94,7 +95,7 @@ struct TRI_Bones_Header
 struct TRI_Bones
 {
   struct TRI_Bones_Header * info;
-  char*  boneName;
+  char *  boneName;
   float * weightValue;
   unsigned int * weightIndex;
   unsigned int * boneChild;  //bone child structure 0-numberOfBoneChildren of bone ids
@@ -107,6 +108,7 @@ struct TRI_Bones
 struct TRI_Model
 {
    struct TRI_Header header;
+   char *  name;
    float * vertices;
    float * normal;
    float * textureCoords;

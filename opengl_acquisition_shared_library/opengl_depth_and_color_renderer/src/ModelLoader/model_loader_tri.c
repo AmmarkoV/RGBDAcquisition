@@ -80,9 +80,12 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
        fprintf(stderr,"\n");
       }
 
-      //print4x4DMatrixTRI("inverseBindPose", triModel->bones[i].info->inverseBindPose );
-      //print4x4DMatrixTRI("finalGlobalTransformation", triModel->bones[i].info->finalGlobalTransformation );
-      //print4x4DMatrixTRI("boneTransformation", triModel->bones[i].info->boneTransformation );
+     if (alsoPrintMatrices)
+        {
+         print4x4DMatrixTRI("matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose", triModel->bones[i].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose );
+         print4x4DMatrixTRI("finalVertexTransformation", triModel->bones[i].info->finalVertexTransformation );
+         print4x4DMatrixTRI("localTransformation", triModel->bones[i].info->localTransformation );
+        }
      }
 
    }
@@ -92,6 +95,7 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
 {
     triModel->header.triType = TRI_LOADER_VERSION;
     triModel->header.floatSize = sizeof(float);
+    triModel->header.nameSize = indexed->header.nameSize;
     triModel->header.TRIMagic[0] = 'T';
     triModel->header.TRIMagic[1] = 'R';
     triModel->header.TRIMagic[2] = 'I';
@@ -105,6 +109,11 @@ int fillFlatModelTriFromIndexedModelTri(struct TRI_Model * triModel , struct TRI
     triModel->header.numberOfBones         = 0; //indexed->header.numberOfBones;
 
     fprintf(stderr,"\n\nwarning : Flattening a model loses its bone structure for now .. \n");
+
+    triModel->name = (char * ) malloc( (triModel->header.nameSize+1)  * sizeof(char));
+    memcpy(triModel->name , indexed->name , triModel->header.nameSize);
+    triModel->name[triModel->header.nameSize]=0;
+
 
 	triModel->vertices       = (float*) malloc( triModel->header.numberOfVertices  *3 *3    * sizeof(float));
 	triModel->normal         = (float*) malloc( triModel->header.numberOfNormals   *3 *3     * sizeof(float));
@@ -216,6 +225,9 @@ void deallocInternalsOfModelTri(struct TRI_Model * triModel)
   triModel->header.numberOfVertices = 0;
   if (triModel->vertices!=0) { free(triModel->vertices); }
 
+  triModel->header.nameSize = 0;
+  if (triModel->name!=0) { free(triModel->name); }
+
   triModel->header.numberOfNormals = 0;
   if (triModel->normal!=0) { free(triModel->normal); }
 
@@ -290,6 +302,13 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
 
 
   unsigned int itemSize , count , allocationSize;
+
+  itemSize=sizeof(char); count=triModelIN->header.nameSize; allocationSize = itemSize * count;
+  if (triModelOUT->name!=0)  { free(triModelOUT->name); triModelOUT->name=0; }
+  if ((triModelIN->name!=0) && (allocationSize>0) )  { triModelOUT->name = (char*) malloc(allocationSize+sizeof(char)); }
+  memcpy(triModelOUT->name,triModelIN->name,allocationSize);
+  triModelOUT->name[count]=0; //Null terminate
+
 
   itemSize=sizeof(float); count=triModelIN->header.numberOfVertices; allocationSize = itemSize * count;
   //fprintf(stderr,"Copying %u bytes of vertices ..\n", allocationSize);
@@ -421,6 +440,13 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
 
              return 0;
             }
+
+
+        //Write file name for internal usage..
+        triModel->name = ( char * ) malloc ( sizeof(char) * (triModel->header.nameSize+1) );
+        n = fread(triModel->name  , sizeof(char) , triModel->header.nameSize , fd);
+        triModel->name[triModel->header.nameSize]=0;
+        fprintf(stderr,"Internal name is -> %s \n",triModel->name);
 
 
         if (triModel->header.numberOfVertices)
@@ -562,6 +588,7 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
   FILE * fd = fopen(filename,"wb");
   if (fd!=0)
     {
+        triModel->header.nameSize=strlen(filename);
         triModel->header.triType = TRI_LOADER_VERSION;
         triModel->header.floatSize =(unsigned int ) sizeof(float);
         triModel->header.TRIMagic[0] = 'T';
@@ -571,6 +598,10 @@ int saveModelTri(const char * filename , struct TRI_Model * triModel)
         triModel->header.TRIMagic[4] = 'D';
 
         fwrite (&triModel->header , sizeof(struct TRI_Header), 1 , fd);
+
+
+        //Write file name for internal usage..
+        fwrite (filename, sizeof(char), triModel->header.nameSize , fd);
 
         if ( (triModel->header.numberOfVertices) && (triModel->vertices!=0) )
         {
