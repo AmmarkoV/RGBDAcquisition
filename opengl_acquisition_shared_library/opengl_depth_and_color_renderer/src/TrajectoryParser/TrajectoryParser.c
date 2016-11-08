@@ -351,9 +351,9 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                time = InputParser_GetWordInt(ipc,2);
                InputParser_GetWord(ipc,3,nameB,MAX_PATH);
 
-               pos[0] = newstream->scaleWorld[0] * InputParser_GetWordFloat(ipc,4);
-               pos[1] = newstream->scaleWorld[1] * InputParser_GetWordFloat(ipc,5);
-               pos[2] = newstream->scaleWorld[2] * InputParser_GetWordFloat(ipc,6);
+               pos[0] = InputParser_GetWordFloat(ipc,4);
+               pos[1] = InputParser_GetWordFloat(ipc,5);
+               pos[2] = InputParser_GetWordFloat(ipc,6);
                coordLength=3;
 
                //if (newstream->rotationsOverride)

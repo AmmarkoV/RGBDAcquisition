@@ -276,12 +276,13 @@ struct JointState * allocateEnoughJointSpaceForStateOfObjectID(
 {
  unsigned int numberOfBones=stream->objectTypes[stream->object[ObjID].type].numberOfBones;
 
+ if (numberOfBones!=0)
+ {
  if (ObjID==0)
     { /*Camera does not have joints*/ } else
     { fprintf(stderr,"allocateEnoughJointSpaceForStateOfObjectID  for objid %u has %u bones ..\n",ObjID,numberOfBones); }
 
- if (numberOfBones!=0)
- {
+
    fprintf(stderr,"Also allocating %u joints for this model..\n",numberOfBones);
    struct JointState * js = ( struct JointState * ) malloc(sizeof(struct JointState));
    if (js!=0)
