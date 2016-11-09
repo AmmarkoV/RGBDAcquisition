@@ -647,7 +647,9 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
 
  unsigned int i;
- unsigned int timestampToUse = scene->ticks*100;
+ unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
+
+
 
   for (i=1; i<scene->numberOfObjects; i++)
     {

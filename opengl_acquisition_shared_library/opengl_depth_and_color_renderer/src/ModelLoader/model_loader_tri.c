@@ -87,7 +87,6 @@ void printTRIBoneStructure(struct TRI_Model * triModel, int alsoPrintMatrices)
          print4x4DMatrixTRI("localTransformation", triModel->bones[i].info->localTransformation );
         }
      }
-
    }
 }
 
