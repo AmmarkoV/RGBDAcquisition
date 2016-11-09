@@ -45,7 +45,7 @@ extern "C"
 * @param  The point to test if it is inside or out
 * @retval  -1.0 if point is outside the cylinder or the distance squared from cylinder axis if point is inside.
 */
-float cylinderTest( float * pt1, float * pt2, float lengthsq, float radius_sq, float * testpt );
+float pointIsInsideCylinder( float * pt1, float * pt2, float lengthsq, float radius_sq, float * testpt );
 
 /**
 * @brief build Projection Matrix using Rodriguez Rotation and a translation ( typically coming from OpenCV )

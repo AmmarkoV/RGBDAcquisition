@@ -58,7 +58,7 @@ enum mat4x4EItem
 //
 //-----------------------------------------------------------------------------
 
-float cylinderTest( float * pt1, float * pt2, float lengthsq, float radius_sq, float * testpt )
+float pointIsInsideCylinder( float * pt1, float * pt2, float lengthsq, float radius_sq, float * testpt )
 {
 	float dx, dy, dz;	// vector d  from line segment point 1 to point 2
 	float pdx, pdy, pdz;	// vector pd from point 1 to test point

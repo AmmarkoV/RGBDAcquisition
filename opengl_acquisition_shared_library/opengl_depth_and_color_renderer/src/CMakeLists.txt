@@ -45,6 +45,8 @@ add_library(OGLRendererSandbox SHARED
             ModelLoader/model_loader_transform_joints.h
             ModelLoader/model_converter.c
             ModelLoader/model_converter.h
+            ModelLoader/model_editor.c
+            ModelLoader/model_editor.h
             #Textures and how to load them  
             TextureLoader/texture_loader.c
             TextureLoader/texture_loader.h
