@@ -13,6 +13,7 @@
 #include "model_loader_hardcoded.h"
 #include "model_loader_obj.h"
 #include "model_loader_tri.h"
+#include "model_editor.h"
 #include "../tools.h"
 
 #define DISABLE_GL_CALL_LIST 0
@@ -254,6 +255,18 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
              mod->modelInternalData=(void * ) triModel;
              unableToLoad=0;
              //colorCodeBones(triModel); //enable this to color code bones..
+
+             float cylA[3]={0.0,0.0,0.0};
+             float cylB[3]={0.0,1.0,0.0};
+
+             punchHoleThroughModel(
+                                   triModel ,
+                                   cylA ,
+                                   cylB ,
+                                   0.3 ,
+                                   100.0
+                                  );
+
              fprintf(stderr,GREEN " success \n" NORMAL);
             } else
             { fprintf(stderr,RED " unable to load TRI model \n" NORMAL);
