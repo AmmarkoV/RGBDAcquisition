@@ -5,9 +5,6 @@
 
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
 
-
-#define OUT 123.123
-
 int punchHoleThroughModel(
                           struct TRI_Model * triModel ,
                           float * cylA ,
@@ -37,8 +34,6 @@ int punchHoleThroughModel(
    }
  }
 
-
-
  unsigned int i0,i1,i2;
 
  for (indx=0; indx<triModel->header.numberOfIndices/3; indx++)
@@ -60,24 +55,10 @@ int punchHoleThroughModel(
       if (!res1) { oV=i1; } else
       if (!res2) { oV=i2; }
 
-      triModel->indices[indx*3+0]=i1;
-      triModel->indices[indx*3+1]=i1;
-      triModel->indices[indx*3+2]=i1;
+      triModel->indices[indx*3+0]=oV;
+      triModel->indices[indx*3+1]=oV;
+      triModel->indices[indx*3+2]=oV;
     }
- }
-
-
-
- for (i=0; i<triModel->header.numberOfVertices/3; i++)
- {
-   res1=pointIsInsideCylinder( cylA , cylB , lengthsq , radius_sq , &triModel->vertices[i*3+0] );
-
-   if (res1>0)
-   {
-      triModel->vertices[i*3+0]=0.0;
-      triModel->vertices[i*3+1]=0.0;
-      triModel->vertices[i*3+2]=0.0;
-   }
  }
 
 
@@ -85,21 +66,4 @@ int punchHoleThroughModel(
 
  return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
