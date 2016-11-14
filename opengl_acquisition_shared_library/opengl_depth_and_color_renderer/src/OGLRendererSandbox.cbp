@@ -119,6 +119,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ModelLoader/model_converter.h" />
+		<Unit filename="ModelLoader/model_editor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ModelLoader/model_editor.h" />
 		<Unit filename="ModelLoader/model_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

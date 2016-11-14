@@ -302,12 +302,14 @@ void copyModelTri(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN
 
   unsigned int itemSize , count , allocationSize;
 
-  itemSize=sizeof(char); count=triModelIN->header.nameSize; allocationSize = itemSize * count;
-  if (triModelOUT->name!=0)  { free(triModelOUT->name); triModelOUT->name=0; }
-  if ((triModelIN->name!=0) && (allocationSize>0) )  { triModelOUT->name = (char*) malloc(allocationSize+sizeof(char)); }
-  memcpy(triModelOUT->name,triModelIN->name,allocationSize);
-  triModelOUT->name[count]=0; //Null terminate
-
+  if (triModelIN->header.nameSize!=0)
+  {
+   itemSize=sizeof(char); count=triModelIN->header.nameSize; allocationSize = itemSize * count;
+   if (triModelOUT->name!=0)  { free(triModelOUT->name); triModelOUT->name=0; }
+   if ((triModelIN->name!=0) && (allocationSize>0) )  { triModelOUT->name = (char*) malloc(allocationSize+sizeof(char)); }
+   memcpy(triModelOUT->name,triModelIN->name,allocationSize);
+   triModelOUT->name[count]=0; //Null terminate
+  }
 
   itemSize=sizeof(float); count=triModelIN->header.numberOfVertices; allocationSize = itemSize * count;
   //fprintf(stderr,"Copying %u bytes of vertices ..\n", allocationSize);

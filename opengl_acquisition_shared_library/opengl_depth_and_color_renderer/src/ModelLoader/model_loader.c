@@ -256,9 +256,9 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
              unableToLoad=0;
              //colorCodeBones(triModel); //enable this to color code bones..
 
+
              float cylA[3]={0.0,0.0,0.0};
              float cylB[3]={0.0,1.0,0.0};
-
              punchHoleThroughModel(
                                    triModel ,
                                    cylA ,
