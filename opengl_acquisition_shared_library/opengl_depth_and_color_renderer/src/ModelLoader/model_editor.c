@@ -1,9 +1,12 @@
 #include "model_editor.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
 
 
-#define OUT 0.0
+#define OUT 123.123
 
 int punchHoleThroughModel(
                           struct TRI_Model * triModel ,
@@ -13,6 +16,11 @@ int punchHoleThroughModel(
                           float length
                           )
 {
+ char * selected = (char*) malloc(sizeof(char) * triModel->header.numberOfVertices);
+ if (selected==0) { return 0; }
+
+ memset(selected,0,sizeof(char) * triModel->header.numberOfVertices);
+
  unsigned int i=0 , indx=0;
 
  float res0=0.0,res1=0.0,res2=0.0;
@@ -25,14 +33,11 @@ int punchHoleThroughModel(
 
    if (res1>0)
    {
-      triModel->vertices[i*3+0]=OUT;
-      triModel->vertices[i*3+1]=OUT;
-      triModel->vertices[i*3+2]=OUT;
+      selected[i]=1;
    }
  }
 
 
-return 0;
 
  unsigned int i0,i1,i2;
 
@@ -42,30 +47,41 @@ return 0;
    i1=triModel->indices[indx*3+1];
    i2=triModel->indices[indx*3+2];
 
-  // res1=pointIsInsideCylinder( cylA , cylB , lengthsq , radius_sq , &triModel->vertices[i1] );
-  // res2=pointIsInsideCylinder( cylA , cylB , lengthsq , radius_sq , &triModel->vertices[i2] );
-  // res3=pointIsInsideCylinder( cylA , cylB , lengthsq , radius_sq , &triModel->vertices[i3] );
-
-   if ( (triModel->vertices[i0+0]==OUT) && (triModel->vertices[i0+1]==OUT) &&  (triModel->vertices[i0+2]==OUT) )   { res0=1; } else {res0=0;}
-   if ( (triModel->vertices[i1+0]==OUT) && (triModel->vertices[i1+1]==OUT) &&  (triModel->vertices[i1+2]==OUT) )   { res1=1; } else {res1=0;}
-   if ( (triModel->vertices[i2+0]==OUT) && (triModel->vertices[i2+1]==OUT) &&  (triModel->vertices[i2+2]==OUT) )   { res2=1; } else {res2=0;}
+   if ( selected[i0] )   { res0=1; } else {res0=0;}
+   if ( selected[i1] )   { res1=1; } else {res1=0;}
+   if ( selected[i2] )   { res2=1; } else {res2=0;}
 
 
-   if ( (res0) && (!res1) && (!res2) ) { triModel->indices[indx*3+0]=i1; }
-   if ( (!res0) && (res1) && (!res2) ) { triModel->indices[indx*3+1]=i2; }
-   if ( (!res0) && (!res1) && (res2) ) { triModel->indices[indx*3+2]=i0; }
+   if ( (res0) || (res1) || (res2) )
+    {
+      unsigned int oV = i1;
 
+      if (!res0) { oV=i0; } else
+      if (!res1) { oV=i1; } else
+      if (!res2) { oV=i2; }
 
-   if ( (res0) && (res1) && (!res2) ) { triModel->indices[indx*3+0]=i2;
-                                        triModel->indices[indx*3+1]=i2;   }
-   if ( (!res0) && (res1) && (res2) ) { triModel->indices[indx*3+1]=i0;
-                                        triModel->indices[indx*3+2]=i0;   }
-   if ( (res0) && (res1) && (!res2) ) { triModel->indices[indx*3+0]=i2;
-                                        triModel->indices[indx*3+1]=i2;   }
-
-
+      triModel->indices[indx*3+0]=i1;
+      triModel->indices[indx*3+1]=i1;
+      triModel->indices[indx*3+2]=i1;
+    }
  }
 
+
+
+ for (i=0; i<triModel->header.numberOfVertices/3; i++)
+ {
+   res1=pointIsInsideCylinder( cylA , cylB , lengthsq , radius_sq , &triModel->vertices[i*3+0] );
+
+   if (res1>0)
+   {
+      triModel->vertices[i*3+0]=0.0;
+      triModel->vertices[i*3+1]=0.0;
+      triModel->vertices[i*3+2]=0.0;
+   }
+ }
+
+
+ free(selected);
 
  return 0;
 }
