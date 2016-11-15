@@ -43,8 +43,8 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h
             opengl_depth_and_color_renderer/src/ModelLoader/model_converter.c
             opengl_depth_and_color_renderer/src/ModelLoader/model_converter.h
-            opengl_depth_and_color_renderer/src/ModelLoader/ModelLoader/model_editor.c
-            opengl_depth_and_color_renderer/src/ModelLoader/ModelLoader/model_editor.h
+            opengl_depth_and_color_renderer/src/ModelLoader/model_editor.c
+            opengl_depth_and_color_renderer/src/ModelLoader/model_editor.h
             #Textures and how to load them 
             opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
             opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h
