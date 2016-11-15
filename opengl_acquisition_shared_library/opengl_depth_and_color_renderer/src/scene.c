@@ -396,7 +396,6 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
     };
 
     if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input (%d) is disabled [ add MOVE_VIEW(1) to scene ]\n",(signed int) key); return 0; }
-    fprintf(stderr,"handleUserInput called for key %c ( %u ) \n",key,key);
     switch (key)
     {
        case 1 : userDeltacamera_angle_x+=1.0; break;
@@ -406,6 +405,16 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
        case 'P' :
        case 'p' :
             //Unpause/Pause..
+       break;
+
+
+///// -----------------------------------------------------------------------
+       case '[' :
+        scene->rate+=10;
+       break;
+       case ']' :
+        scene->rate-=10;
+        if (scene->rate<=0.1) { scene->rate=0.1;}
        break;
 
 ///// -----------------------------------------------------------------------
@@ -466,6 +475,10 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
        case 'Y' :
        case 'y' :
               rotateObject(scene->selectedObject,0.0,0.0,1.0,-1.0);
+       break;
+
+       default :
+        fprintf(stderr,"handleUserInput called for key %c ( %u ) \n",key,key);
        break;
 
     }
@@ -540,7 +553,9 @@ int tickScene()
    float scaleX = 1.0 , scaleY = 1.0 , scaleZ = 1.0;
 
   //Object 0 is camera  lets calculate its position
-   calculateVirtualStreamPos(scene,0,scene->ticks*tickUSleepTime,pos,0,&scaleX,&scaleY,&scaleZ);
+
+   unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
+   calculateVirtualStreamPos(scene,0,timestampToUse,pos,0,&scaleX,&scaleY,&scaleZ);
    camera_pos_x = userDeltacamera_pos_x + pos[0];  camera_pos_y = userDeltacamera_pos_y + pos[1]; camera_pos_z = userDeltacamera_pos_z + pos[2];
    camera_angle_x = userDeltacamera_angle_x + pos[3]; camera_angle_y = userDeltacamera_angle_y + pos[4]; camera_angle_z = userDeltacamera_angle_z + pos[5];
 
@@ -669,7 +684,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
   if (scene->ticks%10==0)
   {
-    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime);
+    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime,scene->rate);
   }
 
   int enableTransformedRendering=1;
