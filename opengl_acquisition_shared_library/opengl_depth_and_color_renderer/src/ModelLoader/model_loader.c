@@ -13,6 +13,7 @@
 #include "model_loader_hardcoded.h"
 #include "model_loader_obj.h"
 #include "model_loader_tri.h"
+#include "model_loader_transform_joints.h"
 #include "model_editor.h"
 #include "../tools.h"
 
@@ -445,6 +446,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
       {
          //fprintf(stderr,"drawing TRI model\n");
          struct TRI_Model * tri = (struct TRI_Model *) mod->modelInternalData;
+
           doOGLGenericDrawCalllist(
                                      tri->vertices ,       tri->header.numberOfVertices ,
                                      tri->normal ,         tri->header.numberOfNormals ,
@@ -453,6 +455,17 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
                                      tri->indices ,        tri->header.numberOfIndices
                              );
 
+/* Joints Drawing
+
+         unsigned int outputNumberOfJoints;
+         float * jointPositions = convertTRIBonesToJointPositions( tri , &outputNumberOfJoints );
+         if (jointPositions!=0)
+         {
+          doOGLBoneDrawCalllist( jointPositions , outputNumberOfJoints);
+          free(jointPositions);
+*/
+
+         }
       } else
       if (mod->type==OBJ_ASSIMP_MODEL )
       {

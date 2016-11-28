@@ -1,9 +1,90 @@
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/glu.h>
+#include <math.h>
 
 
 #include "ogl_fixed_pipeline_renderer.h"
+
+
+void doOGLBoneDrawCalllist( float * pos , unsigned int boneSizes)
+{
+
+
+  unsigned int bone=0;
+  for (bone=0; bone<boneSizes; bone++)
+  {
+
+   if ( (pos[bone*3+0]!=pos[bone*3+0]) ||
+        (pos[bone*3+1]!=pos[bone*3+1]) ||
+        (pos[bone*3+2]!=pos[bone*3+2])
+       )
+       {
+
+       } else
+       {
+
+
+     int quality=20;
+//    double r=1.0;
+    int lats=quality;
+    int longs=quality;
+  //---------------
+    int i, j;
+    for(i = 0; i <= lats; i++)
+    {
+       double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
+       double z0  = sin(lat0);
+       double zr0 =  cos(lat0);
+
+       double lat1 = M_PI * (-0.5 + (double) i / lats);
+       double z1 = sin(lat1);
+       double zr1 = cos(lat1);
+
+ glPushMatrix();
+  glTranslatef(pos[bone*3+0],pos[bone*3+1],pos[bone*3+2]);
+       glScalef( 0.1 , 0.1 , 0.1 );
+       glBegin(GL_QUAD_STRIP);
+       for(j = 0; j <= longs; j++)
+        {
+           double lng = 2 * M_PI * (double) (j - 1) / longs;
+           double x = cos(lng);
+           double y = sin(lng);
+
+           glNormal3f(x * zr0, y * zr0, z0);
+           glVertex3f(x * zr0, y * zr0, z0);
+           glNormal3f(x * zr1, y * zr1, z1);
+           glVertex3f(x * zr1, y * zr1, z1);
+        }
+       glEnd();
+
+ glTranslatef(-pos[bone*3+0],-pos[bone*3+1],-pos[bone*3+2]);
+glPopMatrix();
+
+
+
+       }
+   }
+
+
+
+
+
+
+
+  }
+
+
+
+
+/*
+   glBegin(GL_LINES);
+       glVertex3f(posA[0],posA[1],posA[2]);
+       glVertex3f(posB[0],posB[1],posB[2]);
+     glEnd();
+*/
+
+}
 
 
 void doOGLGenericDrawCalllist(

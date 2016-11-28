@@ -201,6 +201,39 @@ void getDistinctColor3F_ForID(unsigned int id,unsigned maxID , float *oR,float *
 }
 
 
+float * generatePalette(struct TRI_Model * in)
+{
+  unsigned int maxNumBones = in->header.numberOfBones;
+  fprintf(stderr,"generating palette for model with %u bones \n",maxNumBones);
+  unsigned int i=0 ;
+  float * gp = (float*) malloc(sizeof(float)*maxNumBones * 3);
+
+  if (gp!=0)
+  {
+   for (i=0; i<maxNumBones; i++)
+   {
+     getDistinctColor3F_ForID(
+                              i,
+                              maxNumBones,
+                              &gp[3*i+0],
+                              &gp[3*i+1],
+                              &gp[3*i+2]
+                             );
+   }
+  }
+
+ return gp;
+}
+
+
+
+/// -----------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------
+
+
+
 struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TRI_Model * in)
 {
   struct TRI_Bones_Per_Vertex * out = (struct TRI_Bones_Per_Vertex *) malloc(sizeof(struct TRI_Bones_Per_Vertex));
@@ -259,30 +292,87 @@ void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
    }
  }
 
+/// -----------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------
 
-float * generatePalette(struct TRI_Model * in)
+
+float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * outputNumberOfJoints)
 {
-  unsigned int maxNumBones = in->header.numberOfBones;
-  fprintf(stderr,"generating palette for model with %u bones \n",maxNumBones);
-  unsigned int maxNumWeightBones=0 , i=0 , numW =0;
-  float * gp = (float*) malloc(sizeof(float)*maxNumBones * 3);
+  float * outputJoints = ( float * )  malloc (sizeof(float) * in->header.numberOfBones * 3);
+  memset(outputJoints,0,sizeof(float) * in->header.numberOfBones * 3);
 
-  if (gp!=0)
+  unsigned int * outputNumberSamples = ( unsigned int * )  malloc (sizeof(unsigned int ) * in->header.numberOfBones);
+  memset(outputNumberSamples,0,sizeof(unsigned int) * in->header.numberOfBones);
+
+  *outputNumberOfJoints =  in->header.numberOfBones * 3;
+
+  struct TRI_Bones_Per_Vertex * bpv = allocTransformTRIBonesToVertexBoneFormat(in);
+  if (bpv!=0)
   {
-   for (i=0; i<maxNumBones; i++)
-   {
-     getDistinctColor3F_ForID(
-                              i,
-                              maxNumBones,
-                              &gp[3*i+0],
-                              &gp[3*i+1],
-                              &gp[3*i+2]
-                             );
+   unsigned int i=0;
+   for (i=0; i<in->header.numberOfVertices; i++)
+    {
+      struct TRI_Bones_Per_Vertex_Vertice_Item * bone =  &bpv->bonesPerVertex[i];
+
+      float maxWeight = 0.0;
+      unsigned int z=0 , b=0;
+      for (z=0; z<bone->bonesOfthisVertex; z++)
+      {
+        if ( bone->weightsOfThisVertex[z]>maxWeight )
+            {
+              maxWeight=bone->weightsOfThisVertex[z];
+              b=z;
+            }
+      }
+
+      unsigned int indxID=bone->indicesOfThisVertex[b];
+      unsigned int boneID=bone->boneIDOfThisVertex[b];
+
+
+      if (boneID>in->header.numberOfVertices)
+      {
+         fprintf(stderr,"Error bug detected \n"); boneID=0;
+      }
+
+
+      ++outputNumberSamples[boneID];
+      outputJoints[boneID*3+0]+=in->vertices[indxID*3+0];
+      outputJoints[boneID*3+1]+=in->vertices[indxID*3+1];
+      outputJoints[boneID*3+2]+=in->vertices[indxID*3+2];
    }
+
+
+   for (i=0; i< in->header.numberOfBones; i++)
+   {
+     outputJoints[i*3+0]=outputJoints[i*3+0]/outputNumberSamples[i];
+     outputJoints[i*3+1]=outputJoints[i*3+1]/outputNumberSamples[i];
+     outputJoints[i*3+2]=outputJoints[i*3+2]/outputNumberSamples[i];
+
+     fprintf(stderr,"Bone %u (%s) = ",i,in->bones[i].boneName);
+     fprintf(stderr," %0.2f,%0.2f,%0.2f \n ",outputJoints[i*3+0],outputJoints[i*3+1],outputJoints[i*3+2]);
+   }
+
+
+   free(outputNumberSamples);
+   freeTransformTRIBonesToVertexBoneFormat(bpv);
   }
 
- return gp;
+ return outputJoints;
 }
+
+
+
+
+
+
+
+
+/// -----------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------
+/// -----------------------------------------------------------------------------
 
 
 
