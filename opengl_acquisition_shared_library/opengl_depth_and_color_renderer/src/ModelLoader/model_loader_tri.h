@@ -26,7 +26,7 @@ extern "C"
          to keep the spec as clean as possible
 * @ingroup TRI
 */
-#define TRI_LOADER_VERSION 6
+#define TRI_LOADER_VERSION 7
 
 /**
 * @brief The header and initial file block of the TRI format , magic for the files is TRI3D
@@ -76,11 +76,17 @@ struct TRI_Bones_Header
   double localTransformation[16]; // or node->mTransformation
   unsigned char altered;
 
-  double minXRotation , x , maxXRotation;
-  double minYRotation , y , maxYRotation;
-  double minZRotation , z , maxZRotation;
-  unsigned char rotationLimitsSet;
+  //Bone center location and dimension
+  double x , dimX;
+  double y , dimY;
+  double z , dimZ;
+  unsigned char bonePositionSet;
 
+  //Bone rotation setting
+  double minXRotation , rotX , maxXRotation;
+  double minYRotation , rotY , maxYRotation;
+  double minZRotation , rotZ , maxZRotation;
+  unsigned char rotationSet , rotationLimitsSet;
 
 //-------------------------------------------
   unsigned int  allocatedNumberOfBoneChildren; //This is used when doing recursions , should be the same with numberOfBoneChildren

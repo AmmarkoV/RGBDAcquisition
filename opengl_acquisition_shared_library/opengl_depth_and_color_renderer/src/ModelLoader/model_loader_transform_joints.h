@@ -17,6 +17,11 @@ extern "C"
 #endif
 
 
+/**
+* @brief This is the maximum number of bones per vertice this is needed to allocate correctly the arrays on TRI_Bones_Per_Vertex_Vertice_Item , 4 is
+         a logical value..
+* @ingroup TRI
+*/
 #define MAX_BONES_PER_VERTICE 4
 struct TRI_Bones_Per_Vertex_Vertice_Item
 {
@@ -27,6 +32,10 @@ struct TRI_Bones_Per_Vertex_Vertice_Item
 };
 
 
+/**
+* @brief A different way to store TRI bones , per vertex ( for shader pose configuration )
+* @ingroup TRI
+*/
 struct TRI_Bones_Per_Vertex
 {
   unsigned int numberOfBones;
@@ -49,6 +58,31 @@ void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in);
 * @param  input TRI structure that we are going to work on..!
 */
 float * generatePalette(struct TRI_Model * in);
+
+
+
+/**
+* @brief Populate in->bone[x].info->x/y/z with the centers of the bone based on the current setup of the
+         model..
+* @ingroup TRI
+* @param  input TRI structure that we are going to work on..!
+* @param  output number of bones allocated ..!
+* @retval 0=Failure or else a pointer to an array of float triplets with x/y/z locations of each bone.
+* @bug  Please note that prior calling this function the program should have done a applyVertexTransformation or doModelTransform to set up the vertices , because this function just calculates
+the average of each bone. Please note that the output is in the coordinate space of the binding pose model and needs to be transformed/projected etc
+according to the real location of the mesh , this function is also quite resource heavy and needs to be improved..
+*/
+float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * outputNumberOfJoints);
+
+
+
+/**
+* @brief Populate in->bone[x].info->x/y/z with the centers of the bone based on the current setup of the
+         model..
+* @ingroup TRI
+* @param  input TRI structure that we are going to work on..!
+*/
+int setTRIModelBoneInitialPosition(struct TRI_Model * in);
 
 
 

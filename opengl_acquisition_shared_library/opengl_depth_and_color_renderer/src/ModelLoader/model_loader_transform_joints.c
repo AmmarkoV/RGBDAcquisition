@@ -298,6 +298,8 @@ void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
 /// -----------------------------------------------------------------------------
 
 
+//Please note that the output is in the coordinate space of the binding pose model and needs to be transformed/projected etc
+//according to the real location of the mesh
 float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * outputNumberOfJoints)
 {
   float * outputJoints = ( float * )  malloc (sizeof(float) * in->header.numberOfBones * 3);
@@ -363,9 +365,29 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
 }
 
 
+int setTRIModelBoneInitialPosition(struct TRI_Model * in)
+{
+   unsigned int outputNumberOfJoints;
+   float * pos = convertTRIBonesToJointPositions( in , &outputNumberOfJoints);
+   if (pos!=0)
+   {
+    unsigned int i=0;
+    for (i=0; i<in->header.numberOfBones; i++)
+    {
+     in->bones[i].info->x = pos[i*3+0];
+     in->bones[i].info->y = pos[i*3+1];
+     in->bones[i].info->z = pos[i*3+2];
 
+     fprintf(stderr,"Bone %u (%s) = ",i,in->bones[i].boneName);
+     fprintf(stderr," %0.2f,%0.2f,%0.2f \n ",pos[i*3+0],pos[i*3+1],pos[i*3+2]);
+    }
 
+    free(pos);
+    return 1;
+   }
 
+   return 0;
+}
 
 
 
@@ -556,8 +578,6 @@ void recursiveJointHeirarchyTransformer(
        }
     }
 }
-
-
 
 
 int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model * triModelIn )

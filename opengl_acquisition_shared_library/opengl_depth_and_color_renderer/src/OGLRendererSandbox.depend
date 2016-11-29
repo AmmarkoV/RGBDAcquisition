@@ -274,7 +274,7 @@
 	<ctype.h>
 	"TrajectoryPrimitives.h"
 
-1479140283 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c
+1480382004 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -285,6 +285,7 @@
 	"model_loader_hardcoded.h"
 	"model_loader_obj.h"
 	"model_loader_tri.h"
+	"model_loader_transform_joints.h"
 	"model_editor.h"
 	"../tools.h"
 
@@ -458,7 +459,7 @@
 	<GL/glu.h>
 	"ogl_fixed_pipeline_renderer.h"
 
-1475784722 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
+1480351704 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
 
 1476462405 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.c
 	<GL/glew.h>

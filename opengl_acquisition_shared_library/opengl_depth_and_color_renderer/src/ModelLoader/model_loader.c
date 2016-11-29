@@ -463,9 +463,8 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
          {
           doOGLBoneDrawCalllist( jointPositions , outputNumberOfJoints);
           free(jointPositions);
-*/
-
          }
+*/
       } else
       if (mod->type==OBJ_ASSIMP_MODEL )
       {
