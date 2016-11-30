@@ -499,6 +499,86 @@ float * mallocModelTransformJoints(
   return returnMat;
 }
 
+
+
+
+
+
+
+
+/* This is direct setting of the joint data , overwriting default values */
+void recursiveJointHeirarchyTransformerDirect(
+                                         struct TRI_Model * in  ,
+                                         int curBone ,
+                                         double * parentTransformUntouched ,
+                                         float * jointData , unsigned int jointDataSize ,
+                                         unsigned int recursionLevel
+                                       )
+{
+  if (recursionLevel>=in->header.numberOfBones+1)
+        { fprintf(stderr,RED "_____________________\n BUG : REACHED RECURSION LIMIT (%u/%u)\n_____________________\n" NORMAL,recursionLevel,in->header.numberOfBones); return; }
+
+
+   unsigned int i=0;
+   double parentTransform[16] , globalTransformation[16] , nodeTransformation[16];
+   copy4x4Matrix(parentTransform,parentTransformUntouched);
+   copy4x4Matrix(nodeTransformation,in->bones[curBone].info->localTransformation);
+
+  if ( in->bones[curBone].info->boneWeightsNumber>0 )
+  {
+	  //////////////////
+	  //NO, WRONG!! in->bones[curBone].info->altered is set by an arbitrary rot==identity (in the calling function) but nothing prevent it
+	  // from being so, especially when I try to debug it....
+	  //apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
+	  double newRot[16],nodeCopy[16];
+	  copy4x4FMatrixToD(newRot,&jointData[curBone*16]);
+	  copy4x4Matrix(nodeCopy,nodeTransformation);
+	  multiplyTwo4x4Matrices( nodeTransformation, nodeCopy,newRot);
+
+
+      multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
+      multiplyThree4x4Matrices(
+                                 in->bones[curBone].info->finalVertexTransformation ,
+                                 in->header.boneGlobalInverseTransform ,
+                                 globalTransformation,
+                                 in->bones[curBone].info->matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose
+                              );
+
+     for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
+      {
+        unsigned int curBoneChild=in->bones[curBone].boneChild[i];
+        recursiveJointHeirarchyTransformerDirect(
+                                           in  ,
+                                           curBoneChild ,
+                                           globalTransformation ,
+                                           jointData , jointDataSize ,
+                                           recursionLevel+1
+                                         );
+      }
+    } else
+    {
+      multiplyTwo4x4Matrices(globalTransformation,parentTransform,nodeTransformation);
+      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
+       {
+        unsigned int curBoneChild=in->bones[curBone].boneChild[i];
+        recursiveJointHeirarchyTransformerDirect(
+                                           in  ,
+                                           curBoneChild ,
+                                           globalTransformation ,
+                                           jointData , jointDataSize ,
+                                           recursionLevel+1
+                                         );
+       }
+    }
+}
+
+
+
+
+
+
+
+
 void recursiveJointHeirarchyTransformer(
                                          struct TRI_Model * in  ,
                                          int curBone ,
@@ -665,6 +745,7 @@ int doModelTransform(
                       float * jointData ,
                       unsigned int jointDataSize ,
                       unsigned int autodetectAlteredMatrices ,
+                      unsigned int directSettingOfMatrices ,
                       unsigned int performVertexTransform
                     )
 {
@@ -707,7 +788,13 @@ int doModelTransform(
 
   //This recursively calculates all matrix transforms and prepares the correct matrices
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
+  if (directSettingOfMatrices)
+  {
+    recursiveJointHeirarchyTransformerDirect( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
+  } else
+  {
+    recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
+  }
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   if (performVertexTransform)
