@@ -359,6 +359,7 @@ void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double *
         qW = q[3];
     }
 
+ handleQuaternionPackConvention(qX,qY,qZ,qW ,quaternions,quaternionConvention);
 }
 
 
