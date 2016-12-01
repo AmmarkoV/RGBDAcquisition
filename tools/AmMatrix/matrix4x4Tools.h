@@ -86,8 +86,10 @@ void create4x4IdentityFMatrix(float * m);
 int is4x4DZeroMatrix(double  * m);
 
 int is4x4DIdentityMatrix(double * m);
-int is4x4FIdentityMatrix(float  * m);
 
+
+int is4x4FIdentityMatrix(float  * m);
+int is4x4FIdentityMatrixPercisionCompensating(float  * m);
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous Translation rotation
 * @ingroup AmMatrix

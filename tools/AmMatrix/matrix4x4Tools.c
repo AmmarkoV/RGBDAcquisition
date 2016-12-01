@@ -188,6 +188,17 @@ int is4x4FIdentityMatrix(float  * m)
 }
 
 
+int is4x4FIdentityMatrixPercisionCompensating(float  * m)
+{
+   return (
+    (floatPEq(&m[0],1.0)) &&(floatPEq(&m[1],0.0)) &&(floatPEq(&m[2],0.0)) &&(floatPEq(&m[3],0.0)) &&
+    (floatPEq(&m[4],0.0)) &&(floatPEq(&m[5],1.0)) &&(floatPEq(&m[6],0.0)) &&(floatPEq(&m[7],0.0)) &&
+    (floatPEq(&m[8],0.0)) &&(floatPEq(&m[9],0.0)) &&(floatPEq(&m[10],1.0))&&(floatPEq(&m[11],0.0))&&
+    (floatPEq(&m[12],0.0))&&(floatPEq(&m[13],0.0))&&(floatPEq(&m[14],0.0))&&(floatPEq(&m[15],1.0))
+           );
+}
+
+
 void create4x4IdentityFMatrix(float * m)
 {
     m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
