@@ -131,6 +131,13 @@ float * mallocModelTransformJoints(
                                   );
 
 
+
+float * mallocModelTransformJointsEulerAnglesDegrees(
+                                                      struct TRI_Model * triModelInput ,
+                                                      float * jointData ,
+                                                      unsigned int jointDataSize
+                                                     );
+
 void printModelTransform(struct TRI_Model * in);
 
 /**

@@ -12,12 +12,14 @@
 #include <math.h>
 
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../tools/AmMatrix/quaternions.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
+
 
 
 static float _triTrans_degrees_to_rad(float degrees)
@@ -500,7 +502,36 @@ float * mallocModelTransformJoints(
 }
 
 
+float * mallocModelTransformJointsEulerAnglesDegrees(
+                                                      struct TRI_Model * triModelInput ,
+                                                      float * jointData ,
+                                                      unsigned int jointDataSize
+                                                     )
+{
+ float * returnMat = (float * ) malloc(sizeof(float) * 3 * triModelInput->header.numberOfBones);
+ if (returnMat)
+  {
+     double euler[4]={0};
+     double quaternions[4]={0};
+     double m4x4[16]={0};
 
+     unsigned int i=0;
+     for (i=0; i<jointDataSize; i++)
+     {
+       float * mat = &jointData[16*i];
+
+       copy4x4FMatrixToD(m4x4,mat);
+       matrix4x42Quaternion(quaternions,qXqYqZqW,m4x4);
+
+       quaternions2Euler(euler,quaternions,qXqYqZqW);
+
+       returnMat[i*3+0] = euler[0];
+       returnMat[i*3+1] = euler[1];
+       returnMat[i*3+2] = euler[2];
+     }
+  }
+  return returnMat;
+}
 
 
 
