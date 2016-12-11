@@ -117,7 +117,7 @@ if  ( event == EVENT_MBUTTONDOWN ) { fprintf(stderr,"Middle button of the mouse 
 
 int blockWaitingForKey()
 {
-    waitKey(1); //block for ever until key pressed
+    waitKey(0); //block for ever until key pressed
  return 1;
 }
 
@@ -255,7 +255,6 @@ if (drawDepth)
    }
 }
 
-   blockWaitingForKey();
   return 1;
 }
 
