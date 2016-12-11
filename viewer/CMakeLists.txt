@@ -17,3 +17,17 @@ set_target_properties(Viewer PROPERTIES
                        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                       )
+
+
+
+add_executable(ViewerNew main.cpp ) 
+#${OpenCV_LIBS} ?
+target_link_libraries(ViewerNew rt dl m Acquisition OperatingSystem Timers CalibrationLibrary ${OpenCV_LIBRARIES} ${LocationService_Libs} )
+set_target_properties(ViewerNew PROPERTIES DEBUG_POSTFIX "D")
+add_dependencies(ViewerNew Acquisition OperatingSystem Timers CalibrationLibrary) 
+set_target_properties(ViewerNew PROPERTIES 
+                       DEBUG_POSTFIX "D"
+                       ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                       LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                      )
