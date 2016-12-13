@@ -35,9 +35,9 @@ static float defaultAngleDirection[] = { 1.00 , 1.00 , 1.00 , 1.00 , 1.0 , 1.00 
 
 #define emptyBoundLow -0.01
 #define emptyBoundHigh 0.01
-static const int dp=1700;
-static const int sx=320;
-static const int sy=100;
+#define dp 1700
+#define sx 320
+#define sy 100
                                       //head         neck         bodycenter   rightshoulder  leftshoulder     rightElbow      leftElbow       rightWrist    leftWrist
 static float NAOdefaultJoints2D[] = { sx+0,sy-94 , sx+0,sy+0    , sx+0,sy+22  , sx-191,sy+0 ,  sx+191,sy+0  , sx-191,sy+0   , sx+191,sy+0   , sx-191,sy+0 , sx+191,sy+0 ,
                                       //rightLegRoot  leftLegRoot    rightKnee      leftKnee     rightAnckle      LeftAnckle    hip
