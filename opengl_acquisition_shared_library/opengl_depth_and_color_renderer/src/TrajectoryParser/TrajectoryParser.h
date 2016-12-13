@@ -271,6 +271,7 @@ struct VirtualStream
     char ignoreTime;
     char reverseLoop;
     char debug;
+    char silent;
 
 
     char renderWireframe;

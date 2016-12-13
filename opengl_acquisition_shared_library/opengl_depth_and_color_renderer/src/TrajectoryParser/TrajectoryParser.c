@@ -145,6 +145,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
              case TRAJECTORYPRIMITIVES_COMMENT : /*Comment , don't spam console etc*/ break;
              case TRAJECTORYPRIMITIVES_OBJ : break;
              case TRAJECTORYPRIMITIVES_ARROW  : break;
+             case TRAJECTORYPRIMITIVES_SILENT : newstream->silent=1;  break;
              case TRAJECTORYPRIMITIVES_DEBUG                             :  newstream->debug=1;           break;
 
              case TRAJECTORYPRIMITIVES_GENERATE_ANGLE_OBJECTS            :
@@ -473,7 +474,11 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
 
     default :
-             fprintf(stderr,RED "Can't recognize `%s` \n" NORMAL , line);
+
+        if (!newstream->silent)
+            {
+              fprintf(stderr,RED "Can't recognize `%s` \n" NORMAL , line);
+            }
     break;
   };
 
