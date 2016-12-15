@@ -624,7 +624,7 @@ int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNum
 
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
 {
- fprintf(stderr,"Searching model %s for a bone named %s \n",mod->pathOfModel , boneName);
+// fprintf(stderr,"Searching model %s for a bone named %s \n",mod->pathOfModel , boneName);
  *found=0;
  if (mod->type==TRI_MODEL)
  {
@@ -638,12 +638,14 @@ int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
      {
        if (strcmp( triM->bones[i].boneName , boneName) == 0 )
        {
-         fprintf(stderr,"found it , it is joint # %u \n" , i);
+        // fprintf(stderr,"found it , it is joint # %u \n" , i);
          *found=1;
          return i;
        }
      }
    }
  }
+
+  fprintf(stderr,"Searching model %s for a bone named %s , could not find it\n",mod->pathOfModel , boneName);
  return 0;
 }

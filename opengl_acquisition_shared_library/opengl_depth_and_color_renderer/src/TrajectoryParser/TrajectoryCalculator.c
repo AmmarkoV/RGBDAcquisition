@@ -896,7 +896,7 @@ int getExactStreamPosFromTimestamp(struct VirtualStream * stream,ObjectIDHandler
 {
   *foundExactTimestamp=0;
 
-  fprintf(stderr,"getExactStreamPosFromTimestamp(obj=%u,time=%u) ",ObjID,timeAbsMilliseconds);
+  //fprintf(stderr,"getExactStreamPosFromTimestamp(obj=%u,time=%u) ",ObjID,timeAbsMilliseconds);
 
   if (stream==0) { fprintf(stderr,"getExactStreamPosFromTimestamp called with null stream\n"); return 0; }
   if (stream->object==0) { fprintf(stderr,"getExactStreamPosFromTimestamp called with null object array\n"); return 0; }
@@ -918,13 +918,15 @@ int getExactStreamPosFromTimestamp(struct VirtualStream * stream,ObjectIDHandler
   {
     if (timeAbsMilliseconds == stream->object[ObjID].frame[pos].time )
     {
-        fprintf(stderr,"FOUND!\n");
+        //fprintf(stderr,"FOUND!\n");
         *foundExactTimestamp=1;
         return pos;
     }
   }
 
- fprintf(stderr,"not found!\n");
+
+  fprintf(stderr,"getExactStreamPosFromTimestamp(obj=%u,time=%u) not found \n",ObjID,timeAbsMilliseconds);
+  //fprintf(stderr,"not found!\n");
  return 0;
 }
 
