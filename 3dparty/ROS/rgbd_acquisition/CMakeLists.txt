@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rgbd_acquisition)
 
-find_package( OpenCV REQUIRED )
+#find_package( OpenCV REQUIRED )
 
 #We are using a stripped acquisition
 add_definitions(-DALL_HEADERS_IN_SAME_DIR)
 
 
 if(NOT OpenCV_DIR)
- find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV" HINTS    "/opt/ros/hydro/share/OpenCV/")
+ find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV" HINTS    "/opt/ros/hydro/kinetic/OpenCV/")
 endif(NOT OpenCV_DIR)
 
 set(RGBDACQUISITION_LIBRARIES  
@@ -45,7 +45,7 @@ generate_messages(DEPENDENCIES std_msgs rgbd_acquisition)
 #This needs to be after generate messages
 catkin_package()
 
-include_directories( ${catkin_INCLUDEDIR} ${OpenCV_INCLUDEDIR} )
+include_directories( ${catkin_INCLUDEDIR} ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDEDIR} )
 add_executable(rgbd_acquisition  src/main.cpp   )
 target_link_libraries(rgbd_acquisition ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}  ${RGBDACQUISITION_LIBRARIES})
 
