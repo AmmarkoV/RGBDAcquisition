@@ -83,7 +83,9 @@ int disableDesktopStream(int devID,unsigned int streamID)
 
 int startDesktopModule(unsigned int max_devs,char * settings)
 {
+    fprintf(stderr," initXwdLib : ");
     initXwdLib(0,0);
+    fprintf(stderr," ok \n");
     return 1;
 }
 
@@ -117,6 +119,8 @@ int listDesktopDevices(int devID,char * output, unsigned int maxOutput)
 
 int createDesktopDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
+  fprintf(stderr,"Be careful it is important you use -noDepth and the correct -resolution 1920 1080\n");
+  fprintf(stderr," allocating size ( %ux%u @ %u fps ) : ",width,height,framerate);
   device[devID].colorWidth = width;
   device[devID].colorHeight = height;
   device[devID].frameRate = framerate;
@@ -124,6 +128,7 @@ int createDesktopDevice(int devID,char * devName,unsigned int width,unsigned int
   device[devID].colorFrame = (unsigned char* ) malloc(sizeof(char) * 3 * width * height);
 
   if (device[devID].colorFrame!=0) { device[devID].intialized=1; }
+  fprintf(stderr," ok \n");
 
   return device[devID].intialized;
 }

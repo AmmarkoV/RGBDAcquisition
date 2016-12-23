@@ -64,6 +64,7 @@ enum Acquisition_Possible_Modules
     NETWORK_ACQUISITION_MODULE  ,
     DEPTHSENSE_ACQUISITION_MODULE  ,
     REALSENSE_ACQUISITION_MODULE  ,
+    DESKTOP_ACQUISITION_MODULE  ,
    //--------------------------------------------
     NUMBER_OF_POSSIBLE_MODULES
 };
