@@ -115,13 +115,13 @@ int compareSkeletons( unsigned int frameNum ,  struct skeletonHuman * skelA , st
           ( (skelB->joint[i].x!=0) && (skelB->joint[i].y!=0) && (skelB->joint[i].z!=0) )
          )
       {
-        float j1L = skeleton3DGetJointLength( skelA  ,  i);
-        float j2L = skeleton3DGetJointLength( skelB  ,  i);
+        float j1L = skeleton3DGetJointLength(skelA,i);
+        float j2L = skeleton3DGetJointLength(skelB,i);
 
-        float jLDis = j1L-j2L;
+        float jLDis = (float) j1L-j2L;
         if (jLDis<0) { jLDis= -1*jLDis; }
 
-        fprintf(stdout,"JointLengthDifference %s %u %0.2f \n",smartBodyNames[i],frameNum , jLDis );
+        fprintf(stdout,"JointLengthDifference %s %u %0.2f %0.2f %0.2f \n",smartBodyNames[i],frameNum , jLDis , j1L , j2L );
       }
     }
  }

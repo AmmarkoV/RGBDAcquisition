@@ -13,11 +13,15 @@ cd "$DIR"
 groundFile="$1/$1Ground.scene"
 secondRun="$1/$1.scene"
 
+./CompareBody --single $groundFile | grep "JointLengthDifference" | cut -d ' ' -f4 > $1/lengthdis.dat
 ./CompareBody --single $groundFile | grep "TotalDistance" | cut -d ' ' -f3 > $1/totaldis.dat
 ./CompareBody --single $groundFile | grep "JointDistance" | cut -d ' ' -f4 > $1/jointdis.dat
 ./CompareBody --single $groundFile | grep "PerJointDistance" | cut -d ' ' -f2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17   > $1/perjointdis.dat
   
 ./CompareBody --ground $groundFile $secondRun | grep "PerJointDistanceGround" | cut -d ' ' -f2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17   > $1/groundperjointdis.dat
+
+ gnuplot -e "set terminal png size 800,600 enhanced font 'Verdana,14' linewidth 1; set output \"$1/$1lengthdis.png\"; set xlabel \"Frame Number\"; set ylabel \"Error in mm\"; plot \"$1/lengthdis.dat\" using 1 with lines title \"Distance for all joints \" "
+
  
  gnuplot -e "set terminal png size 800,600 enhanced font 'Verdana,14' linewidth 1; set output \"$1/$1totaldis.png\"; set xlabel \"Frame Number\"; set ylabel \"Total Error in mm\"; plot \"$1/totaldis.dat\" using 1 with lines title \"Total Error for all joints \" "
 

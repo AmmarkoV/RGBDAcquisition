@@ -480,9 +480,8 @@ static float skel3Ddistance3D(
 static float skeleton3DGetJointLength(struct skeletonHuman * sk  ,  unsigned int j)
 {
   unsigned int pJ =  humanSkeletonJointsParentRelationMap[j];
-  if (!skeletonSameJoints(j,pJ))
+  if (j!=pJ)
   {
-
      return skel3Ddistance3D(
                               &sk->joint[j].x,
                               &sk->joint[j].y,
