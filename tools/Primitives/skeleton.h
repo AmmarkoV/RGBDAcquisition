@@ -462,6 +462,42 @@ static int skeletonSameJoints(unsigned int j1 , unsigned int j2)
     return 0;
 }
 
+
+
+static float skel3Ddistance3D(
+                       float * ptA_X , float * ptA_Y , float * ptA_Z ,
+                       float * ptB_X , float * ptB_Y , float * ptB_Z
+                      )
+{
+   float sqdiffX = (*ptA_X - *ptB_X);   sqdiffX = sqdiffX * sqdiffX;
+   float sqdiffY = (*ptA_Y - *ptB_Y);   sqdiffY = sqdiffY * sqdiffY;
+   float sqdiffZ = (*ptA_Z - *ptB_Z);   sqdiffZ = sqdiffZ * sqdiffZ;
+
+   return sqrt( (sqdiffX + sqdiffY + sqdiffZ) );
+}
+
+
+static float skeleton3DGetJointLength(struct skeletonHuman * sk  ,  unsigned int j)
+{
+  unsigned int pJ =  humanSkeletonJointsParentRelationMap[j];
+  if (!skeletonSameJoints(j,pJ))
+  {
+
+     return skel3Ddistance3D(
+                              &sk->joint[j].x,
+                              &sk->joint[j].y,
+                              &sk->joint[j].z,
+                              &sk->joint[pJ].x,
+                              &sk->joint[pJ].y,
+                              &sk->joint[pJ].z
+                            );
+  }
+ return 0.0;
+}
+
+
+
+
 static void updateSkeletonBoundingBox(struct skeletonHuman * sk)
 {
     //Use joints to extract bbox
