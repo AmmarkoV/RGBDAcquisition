@@ -684,7 +684,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
   if (scene->ticks%10==0)
   {
-    fprintf(stderr,"\rPlayback %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime,scene->rate);
+    fprintf(stderr,"\rPlayback  %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime,scene->rate);
   }
 
   int enableTransformedRendering=1;

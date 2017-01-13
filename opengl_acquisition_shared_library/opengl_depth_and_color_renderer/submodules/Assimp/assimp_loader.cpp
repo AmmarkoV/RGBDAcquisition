@@ -433,14 +433,40 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
 
 
 
-void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct TRI_Model * originalModel , int returnIndexedModel)
+void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct TRI_Model * originalModel , int returnIndexedModel , int selectMesh)
 {
     fprintf(stderr,"Preparing scene with %u meshes\n",scene->mNumMeshes);
     if (scene->mNumMeshes>1)
-        { fprintf(stderr,"Can only handle single meshes atm \n"); }
+     {
+     fprintf(stderr,"Can only handle single meshes atm \n");
+
+
+
+	 unsigned int i=0;
+	 for (i = 0; i < scene->mNumMeshes; i++)
+     {
+      struct aiMesh * mesh = scene->mMeshes[i];
+      fprintf(stderr,"Mesh #%u (%s)   \n",i , mesh->mName.data);
+      fprintf(stderr,"  %u vertices \n",mesh->mNumVertices);
+      fprintf(stderr,"  %u normals \n",mesh->mNumVertices);
+      fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
+      fprintf(stderr,"  %d bones\n",mesh->mNumBones);
+     }
+    }
+
+
+
+
+
+
+
+
+
+
+
 
        fprintf(stderr,"Reading mesh from collada \n");
-       prepareMesh(scene, 0,  originalModel );
+       prepareMesh(scene, selectMesh ,  originalModel );
 
        if (returnIndexedModel)
        {
@@ -464,7 +490,7 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
 
 }
 
-int convertAssimpToTRI(const char * filename  , struct TRI_Model * triModel , struct TRI_Model * originalModel)
+int convertAssimpToTRI(const char * filename  , struct TRI_Model * triModel , struct TRI_Model * originalModel , int selectMesh)
 {
     int flags = aiProcess_Triangulate;
 		flags |= aiProcess_JoinIdenticalVertices;
@@ -473,19 +499,21 @@ int convertAssimpToTRI(const char * filename  , struct TRI_Model * triModel , st
 		flags |= aiProcess_TransformUVCoords;
 		flags |= aiProcess_RemoveComponent;
 
-		g_scene = (struct aiScene*) aiImportFile(  filename, flags);
+		g_scene = (struct aiScene*) aiImportFile( filename, flags);
 		if (g_scene)
         {
             m_GlobalInverseTransform = g_scene->mRootNode->mTransformation;
             m_GlobalInverseTransform.Inverse();
 
-            prepareScene(g_scene,triModel,originalModel,1);
+            prepareScene(g_scene,triModel,originalModel,1,selectMesh);
 
             aiReleaseImport(g_scene);
             return 1;
 		} else
 		{
-			fprintf(stderr, "cannot import scene: '%s'\n", filename);
+			fprintf(stderr, "Assimp Cannot import scene: '%s'\n", filename);
+			fprintf(stderr, " error '%s'\n", aiGetErrorString());
+
 		}
 
   return 0;

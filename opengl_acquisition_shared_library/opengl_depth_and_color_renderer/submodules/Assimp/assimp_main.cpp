@@ -15,8 +15,15 @@ int main (int argc, char *argv[])
  struct TRI_Model *flatModel    =  allocateModelTri();
  struct TRI_Model *originalModel=  allocateModelTri();
 
+ int selectMesh=0;
+ if (argc>=5)
+  {
+     selectMesh=atoi(argv[4]);
+     fprintf(stderr,"Selecting mesh %u \n",selectMesh);
+   }
 
- convertAssimpToTRI(argv[2],flatModel,originalModel);
+
+ convertAssimpToTRI(argv[2],flatModel,originalModel,selectMesh);
  saveModelTri(argv[3], originalModel);
 
 
