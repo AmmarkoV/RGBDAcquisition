@@ -640,8 +640,8 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
                                                     )
 {
    //Basic case
-   strcpy(directory,"./");
-   strcpy(filename,inputFilename);
+   strcpy(directory,"./");         //strcpy also copies null terminator
+   strcpy(filename,inputFilename); //strcpy also copies null terminator
    extension[0]=0;
    unsigned int inputFilenameLength=strlen(inputFilename);
    unsigned int extensionStart = inputFilenameLength , filenameStart = inputFilenameLength  ,filenameSpan = 0, directoryStart = inputFilenameLength , directorySpan = 0;
@@ -657,6 +657,7 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
    if (i==0)
      {
        /* could not find the content type.. */
+       //fprintf(stderr,"Could not find extension..\n");
        i=inputFilenameLength-1;
      } else
    if (i+1>=inputFilenameLength)
@@ -692,6 +693,9 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
    if (i==0) {
                //This whole thing is a filename
                //If we could not find a directory it means the resulting string is all just a big filename
+
+               strcpy(filename,inputFilename); //fix bug if no directory is present.. , thisi s badly written
+               //fprintf(stderr,"This whole thing was just a filename all along (%s/%s) ..\n",filename,inputFilename);
                return 1;
              } //<- could not find the content type..
    // - - - - - - - - - - - - - - - - - - - - - - - - - - -

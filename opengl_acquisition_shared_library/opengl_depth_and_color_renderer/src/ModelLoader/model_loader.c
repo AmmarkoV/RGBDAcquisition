@@ -88,8 +88,14 @@ struct ModelList *  allocateModelList(unsigned int initialSpace)
     {
       newModelList->MAXNumberOfModels = initialSpace;
       memset(newModelList->models,0,initialSpace * sizeof(struct Model));
+    } else
+    {
+     fprintf(stderr,RED "ERROR : Failed allocating space for Models to be loaded in \n" NORMAL);
     }
-  }
+  } else
+  {
+     fprintf(stderr,RED "ERROR : Failed allocating space for Model List to be loaded in \n" NORMAL);
+   }
   return newModelList;
 }
 
@@ -185,6 +191,11 @@ unsigned int updateModelPosition(struct Model * model,float * position)
 
 unsigned int findModel(struct ModelList * modelStorage , char * directory,char * modelname ,int * found )
 {
+  if (modelStorage==0)         { fprintf(stderr,"Error cannot find model in empty modelStorage \n"); return 0; }
+  if (modelStorage->models==0) { fprintf(stderr,"Error cannot find allocated space for models..\n"); return 0; }
+
+  fprintf(stderr,"find model called will search among %u models.. \n",modelStorage->currentNumberOfModels);
+
   *found = 0;
   char tmpPathOfModel[MAX_MODEL_PATHS]={0};
   snprintf(tmpPathOfModel,MAX_MODEL_PATHS,"%s/%s",directory,modelname);
@@ -194,7 +205,7 @@ unsigned int findModel(struct ModelList * modelStorage , char * directory,char *
   {
    if (&modelStorage->models[i]==0)
    {
-
+     fprintf(stderr,RED "Model entry %u is corrupted .. \n" NORMAL,i);
    } else
    if (modelStorage->models[i].pathOfModel!=0)
    {
@@ -335,7 +346,7 @@ void unloadModel(struct Model * mod)
 
 int loadModelToModelList(struct ModelList* modelStorage,const char * modelDirectory,const char * modelName , const char * modelExtension , unsigned int * whereModelWasLoaded)
 {
-  fprintf(stderr,"loadModelToModelList called .. \n");
+  fprintf(stderr,"loadModelToModelList called (dir %s , name %s , ext %s ) .. \n",modelDirectory,modelName,modelExtension);
   if (modelStorage==0) { return 0; }
 
   int foundAlreadyExistingModel=0;

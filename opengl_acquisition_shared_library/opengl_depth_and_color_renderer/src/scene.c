@@ -493,7 +493,7 @@ int initScene(char * confFile)
   fprintf(stderr,"Initializing Scene\n");
 
   //Making enough space for a "handfull" of objects , this has to be allocated before creating the virtual stream to accomodate the 3D models
-  modelStorage = allocateModelList(64);
+  modelStorage = allocateModelList(128);
 
   scene = createVirtualStream(confFile,modelStorage);
   fprintf(stderr,"createVirtualStream returned \n");
