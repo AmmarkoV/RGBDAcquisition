@@ -145,7 +145,6 @@ void countNumberOfNodesInternal(struct aiNode *node , unsigned int * numberOfNod
         {
           countNumberOfNodesInternal(node->mChildren[i],numberOfNodes);
         }
-
 }
 
 unsigned int countNumberOfNodes(struct aiScene *scene  , struct aiMesh * mesh )
@@ -440,8 +439,6 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
      {
      fprintf(stderr,"Can only handle single meshes atm \n");
 
-
-
 	 unsigned int i=0;
 	 for (i = 0; i < scene->mNumMeshes; i++)
      {
@@ -450,7 +447,7 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
       fprintf(stderr,"  %u vertices \n",mesh->mNumVertices);
       fprintf(stderr,"  %u normals \n",mesh->mNumVertices);
       fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
-      fprintf(stderr,"  %d bones\n",mesh->mNumBones);
+      fprintf(stderr,"  %d or %d bones\n",mesh->mNumBones,countNumberOfNodes(scene,mesh));
      }
     }
 

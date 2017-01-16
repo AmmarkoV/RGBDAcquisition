@@ -144,7 +144,7 @@ double getV4L2ColorPixelSize(int devID)
 }
 
 
-
+#if USE_CALIBRATION
 int setV4L2Calibration(int devID,struct calibration * calib)
 {
   camera_feeds[devID].fx=calib->intrinsic[0];
@@ -201,7 +201,7 @@ int getV4L2DepthCalibration(int devID,struct calibration * calib) { return getV4
 
 int setV4L2ColorCalibration(int devID,struct calibration * calib) { return setV4L2Calibration(devID,calib); }
 int setV4L2DepthCalibration(int devID,struct calibration * calib) { return setV4L2Calibration(devID,calib); }
-
+#endif // USE_CALIBRATION
 
 
 

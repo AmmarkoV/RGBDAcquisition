@@ -40,11 +40,13 @@ extern "C"
 
 
 
+#if USE_CALIBRATION
    int getV4L2ColorCalibration(int devID,struct calibration * calib);
    int getV4L2DepthCalibration(int devID,struct calibration * calib);
 
    int setV4L2ColorCalibration(int devID,struct calibration * calib);
    int setV4L2DepthCalibration(int devID,struct calibration * calib);
+#endif
 
    //Color Frame getters
    int getV4L2ColorWidth(int devID);
