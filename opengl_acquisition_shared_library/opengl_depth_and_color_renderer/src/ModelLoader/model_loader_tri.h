@@ -26,38 +26,7 @@ extern "C"
          to keep the spec as clean as possible
 * @ingroup TRI
 */
-#define TRI_LOADER_VERSION 7
-
-/**
-* @brief The header and initial file block of the TRI format , magic for the files is TRI3D
-* @ingroup TRI
-*/
-struct TRI_Header
-{
-     char TRIMagic[5]; // TRI3D
-     unsigned int triType;
-     unsigned int nameSize;
-     unsigned int floatSize;
-     //These first values guarantee that there is compatibility between machines/versions etc
-     unsigned int drawType; //0 = triangles , 1 = quads , // etc ( not used yet )
-
-     unsigned int numberOfVertices; // the number of vertices
-     unsigned int numberOfNormals;
-     unsigned int numberOfTextureCoords;
-     unsigned int numberOfColors;
-     unsigned int numberOfIndices;
-     unsigned int numberOfBones;
-     unsigned int rootBone;
-     double boneGlobalInverseTransform[16];
-
-     //In order not to break this file format ever again
-     unsigned int notUsed1;
-     unsigned int notUsed2;
-     unsigned int notUsed3;
-     unsigned int notUsed4;
-     unsigned int notUsed5;
-};
-
+#define TRI_LOADER_VERSION 8
 
 /**
 * @brief Each bone has a parent ( if the parent has the same ID as the node it is the root )  , some transforms , weights and limits
@@ -107,6 +76,39 @@ struct TRI_Bones
   unsigned int * boneChild;  //bone child structure 0-numberOfBoneChildren of bone ids
 };
 
+
+
+/**
+* @brief The header and initial file block of the TRI format , magic for the files is TRI3D
+* @ingroup TRI
+*/
+struct TRI_Header
+{
+     char TRIMagic[5]; // TRI3D
+     unsigned int triType;
+     unsigned int nameSize;
+     unsigned int floatSize;
+     //These first values guarantee that there is compatibility between machines/versions etc
+     unsigned int drawType; //0 = triangles , 1 = quads , // etc ( not used yet )
+
+     unsigned int numberOfVertices; // the number of vertices
+     unsigned int numberOfNormals;
+     unsigned int numberOfTextureCoords;
+     unsigned int numberOfColors;
+     unsigned int numberOfIndices;
+     unsigned int numberOfBones;
+     unsigned int rootBone;
+     double boneGlobalInverseTransform[16];
+
+     //In order not to break this file format ever again
+     unsigned int notUsed1;
+     unsigned int notUsed2;
+     unsigned int notUsed3;
+     unsigned int notUsed4;
+     unsigned int notUsed5;
+};
+
+
 /**
 * @brief A TRI Model skeleton in all its simplicity..!
 * @ingroup TRI
@@ -122,6 +124,44 @@ struct TRI_Model
    struct TRI_Bones * bones;
    unsigned int * indices;
 };
+
+
+
+
+struct TRI_Container_Header
+{
+     char TRIMagic[5]; // TRI3D
+     unsigned int triType;
+     unsigned int nameSize;
+     unsigned int floatSize;
+     //These first values guarantee that there is compatibility between machines/versions etc
+
+     unsigned int numberOfMeshes; // the number of vertices
+
+     // - - - - - - - - - -
+     unsigned int notUsed1;
+     unsigned int notUsed2;
+     unsigned int notUsed3;
+     unsigned int notUsed4;
+     unsigned int notUsed5;
+     // - - - - - - - - - -
+};
+
+
+
+/**
+* @brief A TRI Container that might contain multiple meshes..!
+* @ingroup TRI
+*/
+struct TRI_Container
+{
+   struct TRI_Container_Header header;
+   char *  name;
+
+   float * meshTransformation;
+   struct TRI_Model * mesh;
+};
+
 
 
 

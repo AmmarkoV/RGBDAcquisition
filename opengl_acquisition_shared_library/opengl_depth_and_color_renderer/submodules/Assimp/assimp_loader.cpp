@@ -454,14 +454,6 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
 
 
 
-
-
-
-
-
-
-
-
        fprintf(stderr,"Reading mesh from collada \n");
        prepareMesh(scene, selectMesh ,  originalModel );
 
@@ -484,8 +476,53 @@ void prepareScene(struct aiScene *scene , struct TRI_Model * triModel , struct T
 		//TODO HANDLE MORE THAN ONE MESHES
 		//transformmesh(scene, meshlist + i);
 	}
-
 }
+
+
+
+void prepareTRIContainerScene(struct aiScene *scene , struct TRI_Container * triContainer)
+{
+  triContainer->header.triType = TRI_LOADER_VERSION;
+  triContainer->header.floatSize = sizeof(float);
+  triContainer->header.TRIMagic[0] = 'T';
+  triContainer->header.TRIMagic[1] = 'R';
+  triContainer->header.TRIMagic[2] = 'I';
+  triContainer->header.TRIMagic[3] = 'C';
+  triContainer->header.TRIMagic[4] = 'O';
+
+  unsigned int numberOfMeshes=scene->mNumMeshes;
+  unsigned int selectedMesh=0;
+
+  struct TRI_Model * meshList = (struct TRI_Model *) malloc(sizeof(struct TRI_Model) * numberOfMeshes);
+
+  if (meshList!=0)
+  {
+   for (selectedMesh=0; selectedMesh<numberOfMeshes; selectedMesh++)
+     {
+      struct aiMesh * mesh = scene->mMeshes[selectedMesh];
+      fprintf(stderr,"Mesh #%u (%s)   \n",selectedMesh , mesh->mName.data);
+      fprintf(stderr,"  %u vertices \n",mesh->mNumVertices);
+      fprintf(stderr,"  %u normals \n",mesh->mNumVertices);
+      fprintf(stderr,"  %d faces \n",mesh->mNumFaces);
+      fprintf(stderr,"  %d or %d bones\n",mesh->mNumBones,countNumberOfNodes(scene,mesh));
+
+
+
+      fprintf(stderr,"Reading mesh from collada \n");
+      prepareMesh(scene,selectedMesh,&meshList[selectedMesh] );
+     }
+   }
+
+
+  return ;
+}
+
+
+
+
+
+
+
 
 int convertAssimpToTRI(const char * filename  , struct TRI_Model * triModel , struct TRI_Model * originalModel , int selectMesh)
 {
