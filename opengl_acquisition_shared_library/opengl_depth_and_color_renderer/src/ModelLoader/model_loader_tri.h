@@ -226,3 +226,4 @@ void doTriDrawCalllist(struct TRI_Model * tri );
 #endif
 
 #endif // MODEL_LOADER_TRI_H_INCLUDED
+
