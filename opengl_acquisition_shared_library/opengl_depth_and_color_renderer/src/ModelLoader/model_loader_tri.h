@@ -171,7 +171,7 @@ struct TRI_Container
 * @param  string label to include in the printout
 * @param  pointer to the 4x4 double matrix
 */
-void print4x4DMatrixTRI(char * str , double * matrix4x4);
+void print4x4DMatrixTRI(const char * str , double * matrix4x4);
 
 /**
 * @brief Printout the bone structure of a TRI model

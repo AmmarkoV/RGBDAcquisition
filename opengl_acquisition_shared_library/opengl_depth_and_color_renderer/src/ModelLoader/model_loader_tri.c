@@ -35,7 +35,7 @@
 
 
 
-void print4x4DMatrixTRI(char * str , double * matrix4x4)
+void print4x4DMatrixTRI(const char * str , double * matrix4x4)
 {
   fprintf( stderr, "  %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
