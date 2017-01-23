@@ -86,6 +86,7 @@ class EditorFrame: public wxFrame
         void OnButtonExecuteClick(wxCommandEvent& event);
         void OnButtonSendDirectCommandClick(wxCommandEvent& event);
         void OnButtonAFClick(wxCommandEvent& event);
+        void OnOverlaySliderCmdScroll(wxScrollEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -116,6 +117,7 @@ class EditorFrame: public wxFrame
         static const long ID_CHECKBOX2;
         static const long ID_CHECKBOX3;
         static const long ID_BUTTON14;
+        static const long ID_SLIDER2;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
@@ -135,6 +137,7 @@ class EditorFrame: public wxFrame
         wxButton* buttonNextFrame;
         wxStatusBar* Status;
         wxStaticText* totalFramesLabel;
+        wxSlider* OverlaySlider;
         wxButton* buttonRecord;
         wxButton* Button1;
         wxButton* ButtonSendDirectCommand;

@@ -98,6 +98,7 @@ int mux2RGBAndDepthFramesColorNonTrans( unsigned char * rgbBase, unsigned char *
    unsigned int TookBaseloops=0;
    unsigned int loops=0;
 
+   if (rgbTransparency>100) { rgbTransparency=100; }
    float transparencyOverlayFactor = (float) (100-rgbTransparency) / 100;
    float transparencyBaseFactor = (float)  rgbTransparency / 100;
 

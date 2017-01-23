@@ -159,6 +159,7 @@ const long EditorFrame::ID_BUTTON13 = wxNewId();
 const long EditorFrame::ID_CHECKBOX2 = wxNewId();
 const long EditorFrame::ID_CHECKBOX3 = wxNewId();
 const long EditorFrame::ID_BUTTON14 = wxNewId();
+const long EditorFrame::ID_SLIDER2 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
@@ -223,6 +224,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     CheckBoxPluginProc = new wxCheckBox(this, ID_CHECKBOX3, _("PlugIn Proc"), wxPoint(1304,528), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
     CheckBoxPluginProc->SetValue(false);
     ButtonAF = new wxButton(this, ID_BUTTON14, _("AF"), wxPoint(1416,524), wxSize(37,29), 0, wxDefaultValidator, _T("ID_BUTTON14"));
+    OverlaySlider = new wxSlider(this, ID_SLIDER2, 50, 0, 100, wxPoint(976,544), wxSize(312,27), 0, wxDefaultValidator, _T("ID_SLIDER2"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -261,9 +263,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Timer.SetOwner(this, ID_TIMER1);
     Timer.Start(33, false);
 
-    //http://forums.codeblocks.org/index.php?topic=15260.0 <- these where useless
-    //wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|
-    Connect(ID_SLIDER1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorFrame::OnFrameSliderCmdScroll);
+    Connect(ID_SLIDER1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorFrame::OnFrameSliderCmdScroll);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonPreviousFrameClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonPlayClick);
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnbuttonStopClick);
@@ -893,7 +893,8 @@ int  EditorFrame::refreshAllOverlays()
                                 depthFrame  , overlayDepth , depthOut ,
                                 trR,trG,trB,
                                 shiftX,shiftY,
-                                width , height , 0 ,
+                                width , height ,
+                                (unsigned int) OverlaySlider->GetValue() ,
                                 muxMode
                               );
 
@@ -967,6 +968,7 @@ void EditorFrame::guiSnapFrames(int doSnap)
   if (doSnap)
           {
             acquisitionSnapFrames(moduleID,devID);
+            //OverlaySlider->GetValue();
 
             if ( (overlayFramesExist) && ( CheckBoxOverlay->GetValue() ) )
               {
@@ -1356,4 +1358,9 @@ void EditorFrame::OnButtonAFClick(wxCommandEvent& event)
    segmentGetDepthBlobDimensions(depthFrame,width,height,afPoints[0].x1,afPoints[0].y1,afPoints[0].width,afPoints[0].height,&dimX,&dimY,&dimZ);
    ++afPointsActive=1;
   }
+}
+
+void EditorFrame::OnOverlaySliderCmdScroll(wxScrollEvent& event)
+{
+    wxMessageBox(wxT("Test"),wxT("Test"));
 }
