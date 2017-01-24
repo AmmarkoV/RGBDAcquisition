@@ -218,6 +218,9 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
   plugins[moduleID].enableStream  = linkFunction(moduleID,"enable%sStream",moduleName);
   plugins[moduleID].disableStream = linkFunction(moduleID,"disable%sStream",moduleName);
 
+  plugins[moduleID].passUserInput = linkFunction(moduleID,"passUserInput%s",moduleName);
+
+
   plugins[moduleID].getNumberOfDevices = linkFunction(moduleID,"get%sNumberOfDevices",moduleName);
   plugins[moduleID].getTotalFrameNumber =  linkFunction(moduleID,"getTotal%sFrameNumber",moduleName);
   plugins[moduleID].getCurrentFrameNumber = linkFunction(moduleID,"getCurrent%sFrameNumber",moduleName);

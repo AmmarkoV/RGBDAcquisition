@@ -4,6 +4,12 @@
 #include "TrajectoryParser.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int printObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn);
+
 int movePositionOfObjectTrajectorySt(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float relX,float relY,float relZ);
 int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float * relX,float * relY,float * relZ);
 int rotatePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float *x,float *y,float *z,float *angleDegrees);
@@ -119,6 +125,11 @@ int getVirtualStreamLastPosF(
                              float * scaleY,
                              float * scaleZ
                             );
+
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif // TRAJECTORYCALCULATOR_H_INCLUDED

@@ -731,6 +731,18 @@ int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier d
 }
 
 
+int acquisitionPassKeystroke(ModuleIdentifier moduleID , DeviceIdentifier devID, char key)
+{
+  //If getNumberOfColorStreams is declared for the plugin return its values
+  if (*plugins[moduleID].passUserInput!=0)
+       { return (*plugins[moduleID].passUserInput) (devID,key,0,0,0); } else
+
+  //If we don't find it return 0
+  MeaningfullWarningMessage(moduleID,devID,"acquisitionGetNumberOfColorStreams");
+  return 0;
+}
+
+
 
 
 

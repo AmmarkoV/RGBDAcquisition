@@ -342,6 +342,11 @@ double getOpenGLPixelSize()
 }
 
 
+int passUserInput(char key,int state,unsigned int x, unsigned int y)
+{
+ return handleUserInput(key,state,x,y);
+}
+
 
 int setKeyboardControl(int val)
 {

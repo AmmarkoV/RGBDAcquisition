@@ -558,6 +558,18 @@ int acquisitionOverrideColorFrame(ModuleIdentifier moduleID , DeviceIdentifier d
 
 
 
+
+/**
+ * @brief  Some modules have a control channel , we can pass data to them through here (like a virtual keyboard)
+ * @ingroup acquisitionCore
+ * @param moduleID , An integer value describing a module ( see enum Acquisition_Possible_Modules )
+ * @param deviceID , An integer value that describes one of the possible devices to be used for the module specified by moduleID
+ * @param deviceID , Key to Pass
+ * @retval  1=Success 0=Failure
+ */
+int acquisitionPassKeystroke(ModuleIdentifier moduleID , DeviceIdentifier devID, char key);
+
+
 /**
  * @brief  Some modules have more than one Color streams , this function returns the number of existing modules
  * @ingroup acquisitionCore

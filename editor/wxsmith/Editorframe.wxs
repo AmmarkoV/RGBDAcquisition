@@ -102,20 +102,12 @@
 			<size>64,29</size>
 			<handler function="OnButtonExecuteClick" entry="EVT_BUTTON" />
 		</object>
-		<object class="wxListCtrl" name="ID_LISTCTRL2" variable="ListCtrl1" member="yes">
-			<pos>1320,264</pos>
-			<size>152,208</size>
-			<style>wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL</style>
-		</object>
-		<object class="wxButton" name="ID_BUTTON12" variable="Button1" member="yes">
-			<label>Remove</label>
-			<pos>1320,472</pos>
-		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxOverlay" member="yes">
 			<label>Overlay Active</label>
 			<pos>976,528</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TextCtrlDirectCommand" member="yes">
+			<value>print</value>
 			<pos>1320,228</pos>
 			<size>120,27</size>
 			<style>wxTE_PROCESS_ENTER</style>
@@ -144,6 +136,122 @@
 			<value>50</value>
 			<pos>976,544</pos>
 			<size>312,27</size>
+		</object>
+		<object class="wxButton" name="ID_BUTTON12" variable="ButtonPlusXPos" member="yes">
+			<label>+</label>
+			<pos>1328,296</pos>
+			<size>24,24</size>
+			<handler function="OnButtonPlusXPosClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText1" member="yes">
+			<label>X Pos</label>
+			<pos>1360,300</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText2" member="yes">
+			<label>Y Pos</label>
+			<pos>1360,324</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText3" member="yes">
+			<label>Z Pos</label>
+			<pos>1360,348</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText4" member="yes">
+			<label>X Rot</label>
+			<pos>1360,380</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText5" member="yes">
+			<label>Y Rot</label>
+			<pos>1360,404</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText6" member="yes">
+			<label>Z Rot</label>
+			<pos>1360,428</pos>
+		</object>
+		<object class="wxButton" name="ID_BUTTON15" variable="ButtonMinusPosX" member="yes">
+			<label>-</label>
+			<pos>1400,296</pos>
+			<size>24,24</size>
+			<handler function="OnButtonMinusPosXClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON16" variable="ButtonMinusPosY" member="yes">
+			<label>-</label>
+			<pos>1400,320</pos>
+			<size>24,24</size>
+			<handler function="OnButtonMinusPosYClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON17" variable="ButtonMinusPosZ" member="yes">
+			<label>-</label>
+			<pos>1400,344</pos>
+			<size>24,24</size>
+			<handler function="OnButtonMinusPosZClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON18" variable="ButtonPlusPosY" member="yes">
+			<label>+</label>
+			<pos>1328,320</pos>
+			<size>24,24</size>
+			<handler function="OnButtonPlusPosYClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON19" variable="ButtonPlusPosZ" member="yes">
+			<label>+</label>
+			<pos>1328,344</pos>
+			<size>24,24</size>
+			<handler function="OnButtonPlusPosZClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+			<pos>1312,256</pos>
+			<size>176,16</size>
+		</object>
+		<object class="wxButton" name="ID_BUTTON20" variable="ButtonPrev3DObj" member="yes">
+			<label>&lt;</label>
+			<pos>1328,264</pos>
+			<size>30,24</size>
+			<handler function="OnButtonPrev3DObjClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText7" member="yes">
+			<label>3D Object</label>
+			<pos>1366,268</pos>
+		</object>
+		<object class="wxButton" name="ID_BUTTON21" variable="ButtonNext3DObj" member="yes">
+			<label>&gt;</label>
+			<pos>1440,264</pos>
+			<size>30,24</size>
+			<handler function="OnButtonNext3DObjClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON22" variable="ButtonMinusRotX" member="yes">
+			<label>-</label>
+			<pos>1400,376</pos>
+			<size>24,24</size>
+			<handler function="OnButtonMinusRotXClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON23" variable="ButtonMinusRotY" member="yes">
+			<label>-</label>
+			<pos>1400,400</pos>
+			<size>24,24</size>
+			<handler function="OnButtonMinusRotYClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON24" variable="ButtonMinusRotZ" member="yes">
+			<label>-</label>
+			<pos>1400,424</pos>
+			<size>24,24</size>
+			<handler function="OnButtonMinusRotZClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON25" variable="ButtonPlusRotX" member="yes">
+			<label>+</label>
+			<pos>1328,376</pos>
+			<size>24,24</size>
+			<handler function="OnButtonPlusRotXClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON26" variable="ButtonPlusRotY" member="yes">
+			<label>+</label>
+			<pos>1328,400</pos>
+			<size>24,24</size>
+			<handler function="OnButtonPlusRotYClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON27" variable="ButtonPlusRotZ" member="yes">
+			<label>+</label>
+			<pos>1328,424</pos>
+			<size>24,24</size>
+			<handler function="OnButtonPlusRotZClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">

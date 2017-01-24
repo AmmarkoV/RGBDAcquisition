@@ -151,8 +151,6 @@ const long EditorFrame::ID_LISTCTRL1 = wxNewId();
 const long EditorFrame::ID_BUTTON9 = wxNewId();
 const long EditorFrame::ID_BUTTON10 = wxNewId();
 const long EditorFrame::ID_BUTTON11 = wxNewId();
-const long EditorFrame::ID_LISTCTRL2 = wxNewId();
-const long EditorFrame::ID_BUTTON12 = wxNewId();
 const long EditorFrame::ID_CHECKBOX1 = wxNewId();
 const long EditorFrame::ID_TEXTCTRL2 = wxNewId();
 const long EditorFrame::ID_BUTTON13 = wxNewId();
@@ -160,6 +158,28 @@ const long EditorFrame::ID_CHECKBOX2 = wxNewId();
 const long EditorFrame::ID_CHECKBOX3 = wxNewId();
 const long EditorFrame::ID_BUTTON14 = wxNewId();
 const long EditorFrame::ID_SLIDER2 = wxNewId();
+const long EditorFrame::ID_BUTTON12 = wxNewId();
+const long EditorFrame::ID_STATICTEXT4 = wxNewId();
+const long EditorFrame::ID_STATICTEXT5 = wxNewId();
+const long EditorFrame::ID_STATICTEXT6 = wxNewId();
+const long EditorFrame::ID_STATICTEXT7 = wxNewId();
+const long EditorFrame::ID_STATICTEXT8 = wxNewId();
+const long EditorFrame::ID_STATICTEXT9 = wxNewId();
+const long EditorFrame::ID_BUTTON15 = wxNewId();
+const long EditorFrame::ID_BUTTON16 = wxNewId();
+const long EditorFrame::ID_BUTTON17 = wxNewId();
+const long EditorFrame::ID_BUTTON18 = wxNewId();
+const long EditorFrame::ID_BUTTON19 = wxNewId();
+const long EditorFrame::ID_STATICLINE1 = wxNewId();
+const long EditorFrame::ID_BUTTON20 = wxNewId();
+const long EditorFrame::ID_STATICTEXT10 = wxNewId();
+const long EditorFrame::ID_BUTTON21 = wxNewId();
+const long EditorFrame::ID_BUTTON22 = wxNewId();
+const long EditorFrame::ID_BUTTON23 = wxNewId();
+const long EditorFrame::ID_BUTTON24 = wxNewId();
+const long EditorFrame::ID_BUTTON25 = wxNewId();
+const long EditorFrame::ID_BUTTON26 = wxNewId();
+const long EditorFrame::ID_BUTTON27 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
@@ -213,11 +233,9 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     ButtonAdd = new wxButton(this, ID_BUTTON9, _("+"), wxPoint(1320,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON9"));
     ButtonRemove = new wxButton(this, ID_BUTTON10, _("-"), wxPoint(1360,192), wxSize(40,29), 0, wxDefaultValidator, _T("ID_BUTTON10"));
     ButtonExecute = new wxButton(this, ID_BUTTON11, _("="), wxPoint(1408,192), wxSize(64,29), 0, wxDefaultValidator, _T("ID_BUTTON11"));
-    ListCtrl1 = new wxListCtrl(this, ID_LISTCTRL2, wxPoint(1320,264), wxSize(152,208), wxLC_REPORT|wxLC_SINGLE_SEL|wxVSCROLL, wxDefaultValidator, _T("ID_LISTCTRL2"));
-    Button1 = new wxButton(this, ID_BUTTON12, _("Remove"), wxPoint(1320,472), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     CheckBoxOverlay = new wxCheckBox(this, ID_CHECKBOX1, _("Overlay Active"), wxPoint(976,528), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     CheckBoxOverlay->SetValue(false);
-    TextCtrlDirectCommand = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxPoint(1320,228), wxSize(120,27), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    TextCtrlDirectCommand = new wxTextCtrl(this, ID_TEXTCTRL2, _("print"), wxPoint(1320,228), wxSize(120,27), wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL2"));
     ButtonSendDirectCommand = new wxButton(this, ID_BUTTON13, _(">"), wxPoint(1440,228), wxSize(29,29), 0, wxDefaultValidator, _T("ID_BUTTON13"));
     CheckBoxOverlayDepth = new wxCheckBox(this, ID_CHECKBOX2, _("Overlay Respect Depth"), wxPoint(1104,528), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
     CheckBoxOverlayDepth->SetValue(false);
@@ -225,6 +243,28 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     CheckBoxPluginProc->SetValue(false);
     ButtonAF = new wxButton(this, ID_BUTTON14, _("AF"), wxPoint(1416,524), wxSize(37,29), 0, wxDefaultValidator, _T("ID_BUTTON14"));
     OverlaySlider = new wxSlider(this, ID_SLIDER2, 50, 0, 100, wxPoint(976,544), wxSize(312,27), 0, wxDefaultValidator, _T("ID_SLIDER2"));
+    ButtonPlusXPos = new wxButton(this, ID_BUTTON12, _("+"), wxPoint(1328,296), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON12"));
+    StaticText1 = new wxStaticText(this, ID_STATICTEXT4, _("X Pos"), wxPoint(1360,300), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    StaticText2 = new wxStaticText(this, ID_STATICTEXT5, _("Y Pos"), wxPoint(1360,324), wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+    StaticText3 = new wxStaticText(this, ID_STATICTEXT6, _("Z Pos"), wxPoint(1360,348), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    StaticText4 = new wxStaticText(this, ID_STATICTEXT7, _("X Rot"), wxPoint(1360,380), wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+    StaticText5 = new wxStaticText(this, ID_STATICTEXT8, _("Y Rot"), wxPoint(1360,404), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+    StaticText6 = new wxStaticText(this, ID_STATICTEXT9, _("Z Rot"), wxPoint(1360,428), wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+    ButtonMinusPosX = new wxButton(this, ID_BUTTON15, _("-"), wxPoint(1400,296), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON15"));
+    ButtonMinusPosY = new wxButton(this, ID_BUTTON16, _("-"), wxPoint(1400,320), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON16"));
+    ButtonMinusPosZ = new wxButton(this, ID_BUTTON17, _("-"), wxPoint(1400,344), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON17"));
+    ButtonPlusPosY = new wxButton(this, ID_BUTTON18, _("+"), wxPoint(1328,320), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON18"));
+    ButtonPlusPosZ = new wxButton(this, ID_BUTTON19, _("+"), wxPoint(1328,344), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON19"));
+    StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxPoint(1312,256), wxSize(176,16), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+    ButtonPrev3DObj = new wxButton(this, ID_BUTTON20, _("<"), wxPoint(1328,264), wxSize(30,24), 0, wxDefaultValidator, _T("ID_BUTTON20"));
+    StaticText7 = new wxStaticText(this, ID_STATICTEXT10, _("3D Object"), wxPoint(1366,268), wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+    ButtonNext3DObj = new wxButton(this, ID_BUTTON21, _(">"), wxPoint(1440,264), wxSize(30,24), 0, wxDefaultValidator, _T("ID_BUTTON21"));
+    ButtonMinusRotX = new wxButton(this, ID_BUTTON22, _("-"), wxPoint(1400,376), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON22"));
+    ButtonMinusRotY = new wxButton(this, ID_BUTTON23, _("-"), wxPoint(1400,400), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON23"));
+    ButtonMinusRotZ = new wxButton(this, ID_BUTTON24, _("-"), wxPoint(1400,424), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON24"));
+    ButtonPlusRotX = new wxButton(this, ID_BUTTON25, _("+"), wxPoint(1328,376), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON25"));
+    ButtonPlusRotY = new wxButton(this, ID_BUTTON26, _("+"), wxPoint(1328,400), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON26"));
+    ButtonPlusRotZ = new wxButton(this, ID_BUTTON27, _("+"), wxPoint(1328,424), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON27"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -278,6 +318,20 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonExecuteClick);
     Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonSendDirectCommandClick);
     Connect(ID_BUTTON14,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonAFClick);
+    Connect(ID_BUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPlusXPosClick);
+    Connect(ID_BUTTON15,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonMinusPosXClick);
+    Connect(ID_BUTTON16,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonMinusPosYClick);
+    Connect(ID_BUTTON17,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonMinusPosZClick);
+    Connect(ID_BUTTON18,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPlusPosYClick);
+    Connect(ID_BUTTON19,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPlusPosZClick);
+    Connect(ID_BUTTON20,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPrev3DObjClick);
+    Connect(ID_BUTTON21,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonNext3DObjClick);
+    Connect(ID_BUTTON22,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonMinusRotXClick);
+    Connect(ID_BUTTON23,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonMinusRotYClick);
+    Connect(ID_BUTTON24,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonMinusRotZClick);
+    Connect(ID_BUTTON25,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPlusRotXClick);
+    Connect(ID_BUTTON26,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPlusRotYClick);
+    Connect(ID_BUTTON27,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPlusRotZClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -1044,7 +1098,8 @@ void EditorFrame::guiSnapFrames(int doSnap)
 
   } else
   {
-      fprintf(stderr,"Will not refresh bitmaps (acquisitionGetCurrentFrameNumber does not indicate a new frame availiable)..\n" );
+     //Be silent when doing nothing..
+     // fprintf(stderr,"Will not refresh bitmaps (acquisitionGetCurrentFrameNumber does not indicate a new frame availiable)..\n" );
   }
 
 
@@ -1329,6 +1384,11 @@ void EditorFrame::OnButtonSendDirectCommandClick(wxCommandEvent& event)
 {
   //wxMessageBox(wxT("Test"),wxT("Test"));
 
+  wxString cmd = TextCtrlDirectCommand->GetValue();
+
+  if (cmd.Cmp("print")==0) { acquisitionPassKeystroke(overlayModule,overlayDevice,-59); }
+
+
 }
 
 void EditorFrame::OnButtonAFClick(wxCommandEvent& event)
@@ -1362,5 +1422,80 @@ void EditorFrame::OnButtonAFClick(wxCommandEvent& event)
 
 void EditorFrame::OnOverlaySliderCmdScroll(wxScrollEvent& event)
 {
-    wxMessageBox(wxT("Test"),wxT("Test"));
+  //  wxMessageBox(wxT("Test"),wxT("Test"));
+}
+
+
+/* 3D Overlay manipulation..!*/
+
+void EditorFrame::OnButtonPlusXPosClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'a');
+}
+
+void EditorFrame::OnButtonMinusPosXClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'d');
+}
+
+void EditorFrame::OnButtonPlusPosYClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'w');
+}
+
+void EditorFrame::OnButtonMinusPosYClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'s');
+}
+
+void EditorFrame::OnButtonPlusPosZClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'q');
+}
+
+void EditorFrame::OnButtonMinusPosZClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'z');
+}
+
+
+
+void EditorFrame::OnButtonPlusRotXClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'t');
+}
+
+void EditorFrame::OnButtonMinusRotXClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'g');
+}
+
+void EditorFrame::OnButtonPlusRotYClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'f');
+}
+
+void EditorFrame::OnButtonMinusRotYClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'h');
+}
+
+void EditorFrame::OnButtonPlusRotZClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'r');
+}
+
+void EditorFrame::OnButtonMinusRotZClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,'y');
+}
+
+void EditorFrame::OnButtonPrev3DObjClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,9);
+}
+
+void EditorFrame::OnButtonNext3DObjClick(wxCommandEvent& event)
+{
+    acquisitionPassKeystroke(overlayModule,overlayDevice,10);
 }

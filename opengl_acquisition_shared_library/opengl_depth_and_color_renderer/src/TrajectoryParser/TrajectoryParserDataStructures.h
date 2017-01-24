@@ -4,6 +4,10 @@
 
 #include "TrajectoryParser.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int framesToAdd);
 int growVirtualStreamObjectsTypes(struct VirtualStream * stream,unsigned int objectsTypesToAdd);
@@ -131,5 +135,10 @@ int addEventToVirtualStream(
 
 
 void myStrCpy(char * destination,char * source,unsigned int maxDestinationSize);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // TRAJECTORYPARSERDATASTRUCTURES_H_INCLUDED

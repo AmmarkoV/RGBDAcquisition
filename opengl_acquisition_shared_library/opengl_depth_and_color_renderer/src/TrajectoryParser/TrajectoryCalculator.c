@@ -53,6 +53,39 @@ int movePositionOfObjectTrajectorySt(struct VirtualStream * stream,unsigned int 
  return 1;
 }
 
+int printObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn)
+{
+    FrameIDToReturn=FrameIDToReturn%stream->object[ObjID].numberOfFrames;
+    if (!accessOfObjectPositionIsOk(stream,ObjID,FrameIDToReturn)) { return 0; }
+
+    fprintf(stderr,"printObjectTrajectory\n");
+
+    fprintf(stderr,"POS=\"%0.2f %0.2f %0.2f\"\n",
+            stream->object[ObjID].frame[FrameIDToReturn].x,
+            stream->object[ObjID].frame[FrameIDToReturn].y,
+            stream->object[ObjID].frame[FrameIDToReturn].z);
+
+   if ( stream->object[ObjID].frame[FrameIDToReturn].isQuaternion )
+   {
+    fprintf(stderr,"QUAT=\"%0.2f %0.2f %0.2f %0.2f\"\n",
+            stream->object[ObjID].frame[FrameIDToReturn].rot1,
+            stream->object[ObjID].frame[FrameIDToReturn].rot2,
+            stream->object[ObjID].frame[FrameIDToReturn].rot3,
+            stream->object[ObjID].frame[FrameIDToReturn].rot4
+            );
+   } else
+   {
+    fprintf(stderr,"ROT=\"%0.2f %0.2f %0.2f\"\n",
+            stream->object[ObjID].frame[FrameIDToReturn].rot1,
+            stream->object[ObjID].frame[FrameIDToReturn].rot2,
+            stream->object[ObjID].frame[FrameIDToReturn].rot3
+            );
+   }
+
+
+ return 1;
+}
+
 int movePositionOfObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsigned int FrameIDToReturn,float * relX,float * relY,float * relZ)
 {
     FrameIDToReturn=FrameIDToReturn%stream->object[ObjID].numberOfFrames;

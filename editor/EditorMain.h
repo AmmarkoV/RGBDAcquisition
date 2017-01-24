@@ -18,6 +18,7 @@
 #include <wx/slider.h>
 #include <wx/statusbr.h>
 #include <wx/statbox.h>
+#include <wx/statline.h>
 #include <wx/frame.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -87,6 +88,20 @@ class EditorFrame: public wxFrame
         void OnButtonSendDirectCommandClick(wxCommandEvent& event);
         void OnButtonAFClick(wxCommandEvent& event);
         void OnOverlaySliderCmdScroll(wxScrollEvent& event);
+        void OnButtonPlusXPosClick(wxCommandEvent& event);
+        void OnButtonMinusPosXClick(wxCommandEvent& event);
+        void OnButtonPlusPosYClick(wxCommandEvent& event);
+        void OnButtonMinusPosYClick(wxCommandEvent& event);
+        void OnButtonPlusPosZClick(wxCommandEvent& event);
+        void OnButtonMinusPosZClick(wxCommandEvent& event);
+        void OnButtonPlusRotXClick(wxCommandEvent& event);
+        void OnButtonMinusRotXClick(wxCommandEvent& event);
+        void OnButtonPlusRotYClick(wxCommandEvent& event);
+        void OnButtonMinusRotYClick(wxCommandEvent& event);
+        void OnButtonPlusRotZClick(wxCommandEvent& event);
+        void OnButtonMinusRotZClick(wxCommandEvent& event);
+        void OnButtonPrev3DObjClick(wxCommandEvent& event);
+        void OnButtonNext3DObjClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -109,8 +124,6 @@ class EditorFrame: public wxFrame
         static const long ID_BUTTON9;
         static const long ID_BUTTON10;
         static const long ID_BUTTON11;
-        static const long ID_LISTCTRL2;
-        static const long ID_BUTTON12;
         static const long ID_CHECKBOX1;
         static const long ID_TEXTCTRL2;
         static const long ID_BUTTON13;
@@ -118,6 +131,28 @@ class EditorFrame: public wxFrame
         static const long ID_CHECKBOX3;
         static const long ID_BUTTON14;
         static const long ID_SLIDER2;
+        static const long ID_BUTTON12;
+        static const long ID_STATICTEXT4;
+        static const long ID_STATICTEXT5;
+        static const long ID_STATICTEXT6;
+        static const long ID_STATICTEXT7;
+        static const long ID_STATICTEXT8;
+        static const long ID_STATICTEXT9;
+        static const long ID_BUTTON15;
+        static const long ID_BUTTON16;
+        static const long ID_BUTTON17;
+        static const long ID_BUTTON18;
+        static const long ID_BUTTON19;
+        static const long ID_STATICLINE1;
+        static const long ID_BUTTON20;
+        static const long ID_STATICTEXT10;
+        static const long ID_BUTTON21;
+        static const long ID_BUTTON22;
+        static const long ID_BUTTON23;
+        static const long ID_BUTTON24;
+        static const long ID_BUTTON25;
+        static const long ID_BUTTON26;
+        static const long ID_BUTTON27;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
@@ -137,39 +172,59 @@ class EditorFrame: public wxFrame
         wxButton* buttonNextFrame;
         wxStatusBar* Status;
         wxStaticText* totalFramesLabel;
+        wxButton* ButtonPlusRotZ;
+        wxButton* ButtonPlusRotY;
         wxSlider* OverlaySlider;
         wxButton* buttonRecord;
-        wxButton* Button1;
+        wxButton* ButtonMinusPosX;
+        wxStaticText* StaticText1;
         wxButton* ButtonSendDirectCommand;
         wxButton* ButtonAdd;
         wxButton* buttonStop;
         wxStaticBox* StaticBox2;
         wxTextCtrl* TextCtrlDirectCommand;
+        wxButton* ButtonMinusPosY;
+        wxButton* ButtonPrev3DObj;
+        wxStaticText* StaticText3;
         wxTextCtrl* currentFrameTextCtrl;
         wxStaticText* StaticTextJumpTo;
         wxStaticText* dashForFramesRemainingLabel;
         wxMenuItem* MenuItem3;
+        wxStaticLine* StaticLine1;
         wxButton* buttonPreviousFrame;
+        wxButton* ButtonMinusPosZ;
         wxSlider* FrameSlider;
         wxMenuItem* MenuItem9;
+        wxButton* ButtonMinusRotX;
         wxMenu* Menu4;
-        wxListCtrl* ListCtrl1;
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;
+        wxStaticText* StaticText7;
         wxButton* ButtonAcquisitionGraph;
         wxButton* ButtonAF;
         wxMenuItem* MenuItem5;
         wxCheckBox* CheckBoxPluginProc;
         wxTimer Timer;
+        wxStaticText* StaticText4;
         wxListCtrl* ListCtrlPoints;
+        wxStaticText* StaticText5;
         wxMenuItem* MenuItem10;
+        wxStaticText* StaticText2;
         wxButton* ButtonCalibration;
+        wxButton* ButtonNext3DObj;
+        wxButton* ButtonMinusRotY;
+        wxButton* ButtonPlusPosZ;
         wxButton* ButtonRemove;
         wxMenuItem* MenuItem7;
         wxMenuItem* MenuItem4;
         wxMenuItem* MenuItem6;
+        wxStaticText* StaticText6;
         wxCheckBox* CheckBoxOverlayDepth;
+        wxButton* ButtonPlusXPos;
+        wxButton* ButtonPlusPosY;
+        wxButton* ButtonMinusRotZ;
         wxCheckBox* CheckBoxOverlay;
+        wxButton* ButtonPlusRotX;
         wxButton* ButtonSegmentation;
         wxMenuItem* MenuItem8;
         //*)

@@ -65,6 +65,11 @@ unsigned int getOpenGLWidth();
 */
 unsigned int getOpenGLHeight();
 
+
+
+
+int passUserInput(char key,int state,unsigned int x, unsigned int y);
+
 /**
 * @brief Enable Keyboard control ( this has to be called after initializing a scene , otherwise it does nothing )
 * @ingroup OGLRendererSandbox

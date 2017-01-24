@@ -29,10 +29,9 @@ int stopOpenGLModule() ;
 int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate) ;
 int destroyOpenGLDevice(int devID) ;
 
+int passUserInputOpenGL(int devID,char key,int state,unsigned int x, unsigned int y);
 
 int changeOGLRendererGrabMode(unsigned int sequentialModeOn);
-
-
 
 int seekRelativeOpenGLFrame(int devID,signed int seekFrame);
 int seekOpenGLFrame(int devID,unsigned int seekFrame);

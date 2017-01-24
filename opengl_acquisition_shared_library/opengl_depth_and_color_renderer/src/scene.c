@@ -44,7 +44,7 @@ float nearPlane= 1; //<--this also
 float fieldOfView = 65;
 float scaleDepthTo =1000.0;
 
-
+float moveSpeed=0.5;
 
 //float depthUnit = 1.0;
 
@@ -285,6 +285,33 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
    return 1;
 }
 
+int printObjectData(unsigned int objectToPrint)
+{
+    fprintf(stderr,"==========================================================================\n");
+    fprintf(stderr,"==========================================================================\n");
+    fprintf(stderr,"==========================================================================\n");
+    fprintf(stderr,"Object %u ",objectToPrint);
+    if (objectToPrint==0)
+        { fprintf(stderr,"( It is really the camera )");
+        }  else
+        {
+         fprintf(stderr,"\n");
+
+
+         unsigned int frameNumber = scene->ticks;
+         printObjectTrajectory(
+                               scene,
+                               objectToPrint,
+                               frameNumber
+                              );
+        }
+    fprintf(stderr,"==========================================================================\n");
+    fprintf(stderr,"==========================================================================\n");
+    fprintf(stderr,"==========================================================================\n");
+  return 1;
+}
+
+
 int moveObject(unsigned objToMove , float X , float Y , float Z)
 {
   if (objToMove==0)
@@ -351,6 +378,12 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
             return 1;
        break;
 
+       case 10 : // NOTHING! :P
+             if (scene->selectedObject>0) { --scene->selectedObject; } else
+                                          { scene->selectedObject = scene->numberOfObjects-1; }
+            return 1;
+       break;
+
 
        case -66 : //F1
             if (tickUSleepTime<=10) { tickUSleepTime=0; } else
@@ -387,6 +420,12 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
             return 1;
        break;
 
+       case -59 : //F8 show print object configuration
+             printObjectData(scene->selectedObject);
+            return 1;
+       break;
+
+
        case -57: //F10 Dump to file
                writeVirtualStream(scene,"dump.scene");
                saveSnapshotOfObjects();
@@ -421,32 +460,32 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
        case 'W' :
        case 'w' :
-              moveObject(scene->selectedObject,0.0,1.0,0.0);
+              moveObject(scene->selectedObject,0.0,moveSpeed,0.0);
        break;
 
        case 'S' :
        case 's' :
-              moveObject(scene->selectedObject,0.0,-1.0,0.0);
+              moveObject(scene->selectedObject,0.0,-1*moveSpeed,0.0);
        break;
 
        case 'A' :
        case 'a' :
-              moveObject(scene->selectedObject,1.0,0.0,0.0);
+              moveObject(scene->selectedObject,moveSpeed,0.0,0.0);
        break;
 
        case 'D' :
        case 'd' :
-              moveObject(scene->selectedObject,-1.0,0.0,0.0);
+              moveObject(scene->selectedObject,-1*moveSpeed,0.0,0.0);
        break;
 
        case 'Q' :
        case 'q' :
-              moveObject(scene->selectedObject,0.0,0.0,1.0);
+              moveObject(scene->selectedObject,0.0,0.0,moveSpeed);
        break;
 
        case 'Z' :
        case 'z' :
-              moveObject(scene->selectedObject,0.0,0.0,-1.0);
+              moveObject(scene->selectedObject,0.0,0.0,-1*moveSpeed);
        break;
 
 

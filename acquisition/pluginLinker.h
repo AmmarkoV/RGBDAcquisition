@@ -57,6 +57,8 @@ struct acquisitionPluginInterface
 
    int (*getNumberOfDevices) ();
 
+   int (*passUserInput) (int,char,int,unsigned int,unsigned int);
+
 
    unsigned long (*getLastColorTimestamp) (int);
    unsigned long (*getLastDepthTimestamp) (int);
