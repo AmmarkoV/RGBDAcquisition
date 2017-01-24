@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="GetExtrinsics">
+		<title>Get Extrinsics</title>
+		<size>582,118</size>
+		<pos_arg>1</pos_arg>
+		<size_arg>1</size_arg>
+		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+			<label>Width</label>
+			<pos>24,48</pos>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL1" variable="SpinCtrl1" member="yes">
+			<value>6</value>
+			<min>3</min>
+			<pos>72,40</pos>
+			<size>48,27</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+			<label>Height</label>
+			<pos>136,48</pos>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL2" variable="SpinCtrl2" member="yes">
+			<value>9</value>
+			<min>3</min>
+			<pos>192,40</pos>
+			<size>48,27</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+			<label>Size</label>
+			<pos>272,48</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
+			<value>0.02</value>
+			<pos>304,40</pos>
+			<size>48,27</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+			<label>units</label>
+			<pos>360,48</pos>
+		</object>
+		<object class="wxButton" name="ID_BUTTON1" variable="ButtonGetExtrinsics" member="yes">
+			<label>Get Extrinsics</label>
+			<pos>416,40</pos>
+			<handler function="OnButtonGetExtrinsicsClick" entry="EVT_BUTTON" />
+		</object>
+	</object>
+</wxsmith>
