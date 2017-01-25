@@ -1386,7 +1386,7 @@ void EditorFrame::OnButtonSendDirectCommandClick(wxCommandEvent& event)
 
   wxString cmd = TextCtrlDirectCommand->GetValue();
 
-  if (cmd.Cmp("print")==0) { acquisitionPassKeystroke(overlayModule,overlayDevice,-59); }
+  if (cmd.Cmp(wxT("print"))==0) { acquisitionPassKeystroke(overlayModule,overlayDevice,-59); }
 
 
 }
