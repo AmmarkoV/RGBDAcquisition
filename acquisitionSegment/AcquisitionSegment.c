@@ -288,6 +288,8 @@ int printDepthSegmentationData(char * label , struct SegmentationFeaturesDepth *
   fprintf(stderr,"Depth Bounding Box State : %u \n",dat->enableBBox);
   fprintf(stderr,"Depth Bounding Box %0.2f,%0.2f,%0.2f -> %0.2f,%0.2f,%0.2f\n",dat->bboxX1,dat->bboxY1,dat->bboxZ1,dat->bboxX2,dat->bboxY2,dat->bboxZ2);
 
+  if ( dat->invert) { fprintf(stderr,"Depth Selection will be inverted\n"); } else
+                    { fprintf(stderr,"Depth Selection will be used as it is without an inversion\n"); }
   return 1;
 }
 

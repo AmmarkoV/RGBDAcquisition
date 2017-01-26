@@ -16,6 +16,9 @@
 
 int invertSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int * selectedCount)
 {
+  if (selected==0)      { fprintf(stderr,"Cannot flip non allocated selection\n");         return 0; }
+  if (selectedCount==0) { fprintf(stderr,"Cannot flip non allocated selection counter\n"); return 0; }
+
   *selectedCount =  width*height - *selectedCount;
   unsigned char * selectedPTR = selected;
   unsigned char * selectedLimit = selected + width * height;

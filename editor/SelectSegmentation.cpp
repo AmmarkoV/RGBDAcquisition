@@ -342,8 +342,8 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
 
 
 
-  CheckBoxInvertDepth->SetValue( (selectedDepthConf.invert!=0) );
-  CheckBoxInvertRGB->SetValue( (selectedRGBConf.invert!=0) );
+  CheckBoxInvertDepth->SetValue( (bool) (selectedDepthConf.invert!=0) );
+  CheckBoxInvertRGB->SetValue( (bool) (selectedRGBConf.invert!=0) );
 
   ChoiceCombination->SetSelection(selectedCombinationMode);
 
@@ -409,15 +409,13 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
     this->selectedDepthConf.autoPlaneSegmentationMinimumDistancePoint = 830;
     this->selectedDepthConf.autoPlaneSegmentationMaximumDistancePoint = 3000;
 
-
-    if ( CheckBoxInvertDepth->IsChecked() ) { this->selectedDepthConf.invert=1;  } else
-                                             { this->selectedDepthConf.invert=0;  }
-
     selectedDepthConf.enablePlaneSegmentation=1;
    } else
    {
     selectedDepthConf.enablePlaneSegmentation=0;
    }
+
+
 
 
   if (cropDepthX1->GetValue().ToLong(&value)) {  selectedDepthConf.minX = value; }
@@ -433,8 +431,11 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
   selectedDepthConf.minDepth = minDepth->GetValue();
   selectedDepthConf.maxDepth = maxDepth->GetValue();
 
-  //selectedDepthConf.
+  if ( CheckBoxInvertDepth->IsChecked() ) { this->selectedDepthConf.invert=1; } else
+                                            { this->selectedDepthConf.invert=0; }
 
+  if ( CheckBoxInvertRGB->IsChecked() ) { this->selectedRGBConf.invert=1;  } else
+                                          { this->selectedRGBConf.invert=0;  }
 
    if (CheckBoxSegmentMovement->IsChecked())
         {
@@ -480,10 +481,6 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
 
 
   selectedCombinationMode = ChoiceCombination->GetSelection();
-
-
-    if ( CheckBoxInvertRGB->IsChecked() ) { this->selectedRGBConf.invert=1;  } else
-                                             { this->selectedRGBConf.invert=0;  }
 
 
   return 1;
