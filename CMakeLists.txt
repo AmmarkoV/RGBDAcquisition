@@ -113,7 +113,7 @@ ENDIF( ENABLE_V4L2 )
 IF( ENABLE_DESKTOP )
 add_subdirectory (3dparty/xwd-1.0.5)
 add_subdirectory (desktop_acquisition_shared_library/)
-ENDIF( ENABLE_TEMPLATE )
+ENDIF( ENABLE_DESKTOP )
 
  
 IF( ENABLE_NETWORK )
@@ -145,7 +145,14 @@ ENDIF( ENABLE_DEPTHSENSE )
  
 #Composite ( bloated ;p ) parts 
 IF( ENABLE_EDITOR )
-add_subdirectory (editor/)
+
+ FIND_PACKAGE(wxWidgets)
+ IF(wxWidgets_FOUND)
+   add_subdirectory (editor/)
+ ELSE(wxWidgets_FOUND)
+   MESSAGE("wxWidgets not found , cannot build editor!")
+ ENDIF(wxWidgets_FOUND)
+
 ENDIF( ENABLE_EDITOR )
 
 

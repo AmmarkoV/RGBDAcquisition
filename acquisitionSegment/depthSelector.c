@@ -134,8 +134,11 @@ int justSelectAllDepthPixels(struct SegmentationFeaturesDepth * segConf , unsign
 }
 
 
-unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int width , unsigned int height , struct SegmentationFeaturesDepth * segConf , struct calibration * calib,unsigned int * selectedPixels)
+unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsigned int inputFrameWidth , unsigned int inputFrameHeight , struct SegmentationFeaturesDepth * segConf , struct calibration * calib,unsigned int * selectedPixels)
 {
+ unsigned int width = inputFrameWidth;
+ unsigned int height = inputFrameHeight;
+
  unsigned char * selectedDepth   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
  if (selectedDepth==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
 
@@ -375,7 +378,7 @@ if ( segConf->enablePlaneSegmentation )
  //-----------------------------------------------------------------------------
 
   if (segConf->invert)
-     { invertSelection(selectedDepth , width ,   height ,selectedPixels); }
+     { invertSelection(selectedDepth , inputFrameWidth ,   inputFrameHeight ,selectedPixels); }
 
 
  free(sourceCopy);

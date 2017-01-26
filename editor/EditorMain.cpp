@@ -456,6 +456,8 @@ int EditorFrame::stopOverlay()
 
 void EditorFrame::OnOpenModule(wxCommandEvent& event)
 {
+
+
    if (alreadyInitialized)
    {
     removeOldSegmentedFrames();
@@ -630,7 +632,9 @@ void EditorFrame::OnQuit(wxCommandEvent& event)
 void EditorFrame::OnAbout(wxCommandEvent& event)
 {
     //wxString msg = wxbuildinfo(long_f);
+    fprintf(stderr,"Compiled against wxWidgets %u.%u.%u \n",wxMAJOR_VERSION,wxMINOR_VERSION,wxRELEASE_NUMBER);
     wxMessageBox(wxT("Thank you for using RGBDAcquisition , a GPL project\nWritten by AmmarkoV\nHosted at https://github.com/AmmarkoV/RGBDAcquisition"), wxT("RGBDAcquisition Editor"));
+
 }
 
 

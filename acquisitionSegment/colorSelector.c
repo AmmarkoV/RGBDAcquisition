@@ -132,8 +132,11 @@ int justSelectAllRGBPixels(struct SegmentationFeaturesRGB * segConf , unsigned i
   return 0;
 }
 
-unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int width , unsigned int height , struct SegmentationFeaturesRGB * segConf, struct calibration * calib,unsigned int * selectedPixels)
+unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned int inputFrameWidth , unsigned int inputFrameHeight , struct SegmentationFeaturesRGB * segConf, struct calibration * calib,unsigned int * selectedPixels)
 {
+ unsigned int width = inputFrameWidth;
+ unsigned int height = inputFrameHeight;
+
  //This will be our response segmentation
  unsigned char * selectedRGB   = (unsigned char*) malloc(width*height*sizeof(unsigned char));
  if (selectedRGB==0) { fprintf(stderr,"Could not allocate memory for RGB Selection\n"); return 0; }
@@ -229,7 +232,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
 
 
   if (segConf->invert)
-     { invertSelection(selectedRGB , width ,   height ,selectedPixels); }
+     { invertSelection(selectedRGB , inputFrameWidth ,   inputFrameHeight ,selectedPixels); }
 
 
 

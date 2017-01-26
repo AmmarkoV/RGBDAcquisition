@@ -26,8 +26,8 @@
  * @bug   Pixel flood pre needs to be reconnected
  */
 unsigned char * selectSegmentationForRGBFrame( unsigned char * source ,
-                                               unsigned int width ,
-                                               unsigned int height ,
+                                               unsigned int inputFrameWidth ,
+                                               unsigned int inputFrameHeight ,
                                                struct SegmentationFeaturesRGB * segConf,
                                                struct calibration * calib,
                                                unsigned int * selectedPixels

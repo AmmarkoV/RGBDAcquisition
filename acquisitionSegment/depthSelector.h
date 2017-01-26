@@ -28,8 +28,8 @@ int removeDepthFloodFillBeforeProcessing(unsigned short * source , unsigned int 
  */
 unsigned char * selectSegmentationForDepthFrame(
                                                  unsigned short * source ,
-                                                 unsigned int width ,
-                                                 unsigned int height ,
+                                                 unsigned int inputFrameWidth ,
+                                                 unsigned int inputFrameHeight ,
                                                  struct SegmentationFeaturesDepth * segConf ,
                                                  struct calibration * calib,
                                                  unsigned int * selectedPixels
