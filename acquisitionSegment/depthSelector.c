@@ -142,7 +142,7 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
  //if we don't need to segment , conserve our CPU
  if (justSelectAllDepthPixels(segConf,width,height))
     {
-      fprintf(stderr,"Just Selecting All Depth Frame \n");
+      fprintf(stderr,"======== Just Selecting All Depth Frame ======== \n");
       *selectedPixels=width*height;
       memset(selectedDepth,1,width*height*sizeof(unsigned char));
       return selectedDepth;
@@ -185,7 +185,7 @@ unsigned char * selectSegmentationForDepthFrame(unsigned short * source , unsign
      depth = sourcePixels++;
      selected = ((*depth != 0)&&((segConf->minDepth <= *depth) && (*depth <= segConf->maxDepth)));
      *selectedPtr=selected;
-     selectedPixels+=selected;
+     *selectedPixels+=selected;
 
      ++selectedPtr;
     }
@@ -268,7 +268,7 @@ if (segConf->enableBBox)
                    (segConf->bboxZ1<world3D[2])&& (segConf->bboxZ2>world3D[2])
                 );
 
-       if (!selected) { *selectedPtr=0; --selectedPixels; } //New Pixel , just got denied
+       if (!selected) { *selectedPtr=0; *selectedPixels-=1; } //New Pixel , just got denied
      }//If it was selected and not null project it into 3d Space
 
      ++selectedPtr;

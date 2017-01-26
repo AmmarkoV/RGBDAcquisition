@@ -141,7 +141,7 @@ unsigned char * selectSegmentationForRGBFrame(unsigned char * source , unsigned 
  //if we don't need to segment , conserve our CPU
  if (justSelectAllRGBPixels(segConf,width,height))
     {
-      fprintf(stderr,"Just Selecting All RGB Frame \n");
+      fprintf(stderr,"======== Just Selecting All RGB Frame ======== \n");
       *selectedPixels=width*height;
       memset(selectedRGB,1,width*height*sizeof(unsigned char));
       return selectedRGB;
