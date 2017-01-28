@@ -9,9 +9,20 @@ extern "C"
 
 #include "../acquisition/acquisition_setup.h"
 
+#if USE_CALIBRATION
+    #include "../tools/Calibration/calibration.h"
+#endif
+
+
 int startFreenectModule(unsigned int max_devs,char * settings);
 
 #if BUILD_FREENECT
+
+double getFreenectColorPixelSize(int devID);
+double getFreenectColorFocalLength(int devID);
+double getFreenectDepthPixelSize(int devID);
+double getFreenectDepthFocalLength(int devID);
+
 int stopFreenectModule();
 
 int createFreenectDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
@@ -36,6 +47,17 @@ int getFreenectDepthDataSize(int devID);
 int getFreenectDepthChannels(int devID);
 int getFreenectDepthBitsPerPixel(int devID);
 char * getFreenectDepthPixels(int devID);
+
+
+
+
+#if USE_CALIBRATION
+ int getFreenectColorCalibration(int devID,struct calibration * calib);
+ int getFreenectDepthCalibration(int devID,struct calibration * calib);
+ int setFreenectColorCalibration(int devID,struct calibration * calib);
+ int setFreenectDepthCalibration(int devID,struct calibration * calib);
+#endif
+
 #endif
 
 #ifdef __cplusplus
