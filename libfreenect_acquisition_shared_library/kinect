@@ -1,0 +1,4 @@
+SUBSYSTEM=="usb", ATTR{idProduct}=="045e", ATTR{idVendor}=="02ae", MODE:="0666", OWNER:="root", GROUP:="video"
+SUBSYSTEM=="usb", ATTR{idProduct}=="045e", ATTR{idVendor}=="02b0", MODE:="0666", OWNER:="root", GROUP:="video"
+SUBSYSTEM=="usb", ATTR{idProduct}=="045e", ATTR{idVendor}=="02ad", MODE:="0666", OWNER:="root", GROUP:="video"
+

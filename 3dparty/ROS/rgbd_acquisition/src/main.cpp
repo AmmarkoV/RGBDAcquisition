@@ -43,6 +43,20 @@
 
 #define NODE_NAME "rgbd_acquisition"
 
+
+
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
+
 char tfRoot[512]={"frame"};
 
 //These are the static declarations of the various parts of this ROS package
@@ -523,13 +537,13 @@ int main(int argc, char **argv)
 
   if (!acquisitionIsModuleAvailiable(moduleID))
    {
-       fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
+       fprintf(stderr,RED "\n\n\nThe module you are trying to use is not linked in this build\n of the Acquisition library..\n\n\n" NORMAL);
        return 1;
    }
 
   if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
    {
-       fprintf(stderr,"Could not start module %s ..\n",getModuleNameFromModuleID(moduleID));
+       fprintf(stderr,RED "Could not start module %s ..\n" NORMAL,getModuleNameFromModuleID(moduleID));
        return 1;
    }
 
@@ -545,7 +559,7 @@ int main(int argc, char **argv)
   ROS_INFO("Trying to open capture device..");
    if (!acquisitionOpenDevice(moduleID,devID,(char* ) from.c_str(),width,height,framerate))
         {
-          fprintf(stderr,"Could not open device %u ( %s ) of module %s  ..\n",devID,from.c_str(),getModuleNameFromModuleID(moduleID));
+          fprintf(stderr,RED "Could not open device %u ( %s ) of module %s  ..\n" NORMAL,devID,from.c_str(),getModuleNameFromModuleID(moduleID));
           return 1;
         }
 

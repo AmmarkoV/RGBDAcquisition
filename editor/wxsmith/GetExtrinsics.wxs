@@ -10,7 +10,7 @@
 			<pos>24,48</pos>
 		</object>
 		<object class="wxSpinCtrl" name="ID_SPINCTRL1" variable="SpinCtrl1" member="yes">
-			<value>6</value>
+			<value>9</value>
 			<min>3</min>
 			<pos>72,40</pos>
 			<size>48,27</size>
@@ -20,7 +20,7 @@
 			<pos>136,48</pos>
 		</object>
 		<object class="wxSpinCtrl" name="ID_SPINCTRL2" variable="SpinCtrl2" member="yes">
-			<value>9</value>
+			<value>13</value>
 			<min>3</min>
 			<pos>192,40</pos>
 			<size>48,27</size>
@@ -30,7 +30,7 @@
 			<pos>272,48</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
-			<value>0.02</value>
+			<value>0.07</value>
 			<pos>304,40</pos>
 			<size>48,27</size>
 		</object>

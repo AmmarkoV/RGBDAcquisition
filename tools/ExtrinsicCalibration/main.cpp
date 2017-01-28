@@ -273,6 +273,7 @@ int main( int argc, char** argv )
     float square_size = 1.0 , aspect_ratio = 1.0;
     int viewResult = 0;
     int writeResult = 1;
+    int writeResultImage = 0;
 
     char calibFile[MAX_FILENAME_STRING]={0};
     char imageFile[MAX_FILENAME_STRING]={0};
@@ -287,7 +288,9 @@ int main( int argc, char** argv )
     if (strcmp(argv[i],"-c")==0) { strncpy(calibFile,argv[i+1],MAX_FILENAME_STRING);      } else
     if (strcmp(argv[i],"-i")==0) { strncpy(imageFile,argv[i+1],MAX_FILENAME_STRING);      } else
     if (strcmp(argv[i],"-v")==0) { viewResult=1;   } else
-    if (strcmp(argv[i],"-n")==0) { writeResult=0;   }
+    if (strcmp(argv[i],"--writeImage")==0) { writeResultImage=1;   } else
+    if (strcmp(argv[i],"-n")==0)   { writeResult=0;   }
+
   }
 
 
@@ -326,7 +329,9 @@ int main( int argc, char** argv )
     cvReleaseImage( &view_gray );
 
     cvDrawChessboardCorners( view, board_size, image_points_buf, count, found );
-    if ( viewResult ) cvShowImage( "Image View", view );
+    if ( viewResult )        cvShowImage( "Image View", view );
+    if (writeResultImage)  {  cvSaveImage( "extcalibrate.jpg", view , 0 ); }
+
 
     struct calibration calib={0};
     ReadCalibration(calibFile,&calib);
@@ -372,8 +377,7 @@ int main( int argc, char** argv )
     fprintf( stderr, "  %f ",rotM.data.fl[6]); fprintf( stderr, "%f ",rotM.data.fl[7]); fprintf( stderr, "%f\n",rotM.data.fl[8]);
 
 
-
-    if ( viewResult ) { cvWaitKey(0); }
+    if ( viewResult ) { cvWaitKey(1); }
 
     return 0;
 }

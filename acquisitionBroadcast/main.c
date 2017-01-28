@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 
 
  if (possibleModules==0) { AmmServer_Error("Acquisition Library is linked to zero modules , can't possibly do anything..\n"); return 1; }
- if (!acquisitionIsModuleAvailiable(moduleID)) {AmmServer_Error("The module you are trying to use is not linked in this build of the Acquisition library..\n"); return 1; }
+ if (!acquisitionIsModuleAvailiable(moduleID))  { AmmServer_Error("The module you are trying to use is not linked in this build of the Acquisition library..\n"); return 1; }
 
  fprintf(stderr,"Will Try to open module\n");
  if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 )) { AmmServer_Error("Could not start module %s ..\n",getModuleNameFromModuleID(moduleID)); return 1; }

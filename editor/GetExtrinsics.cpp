@@ -30,13 +30,13 @@ GetExtrinsics::GetExtrinsics(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	SetClientSize(wxSize(582,118));
 	Move(wxDefaultPosition);
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Width"), wxPoint(24,48), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	SpinCtrl1 = new wxSpinCtrl(this, ID_SPINCTRL1, _T("6"), wxPoint(72,40), wxSize(48,27), 0, 3, 100, 6, _T("ID_SPINCTRL1"));
-	SpinCtrl1->SetValue(_T("6"));
+	SpinCtrl1 = new wxSpinCtrl(this, ID_SPINCTRL1, _T("9"), wxPoint(72,40), wxSize(48,27), 0, 3, 100, 9, _T("ID_SPINCTRL1"));
+	SpinCtrl1->SetValue(_T("9"));
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Height"), wxPoint(136,48), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	SpinCtrl2 = new wxSpinCtrl(this, ID_SPINCTRL2, _T("9"), wxPoint(192,40), wxSize(48,27), 0, 3, 100, 9, _T("ID_SPINCTRL2"));
-	SpinCtrl2->SetValue(_T("9"));
+	SpinCtrl2 = new wxSpinCtrl(this, ID_SPINCTRL2, _T("13"), wxPoint(192,40), wxSize(48,27), 0, 3, 100, 13, _T("ID_SPINCTRL2"));
+	SpinCtrl2->SetValue(_T("13"));
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Size"), wxPoint(272,48), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	TextCtrl1 = new wxTextCtrl(this, ID_TEXTCTRL1, _("0.02"), wxPoint(304,40), wxSize(48,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	TextCtrl1 = new wxTextCtrl(this, ID_TEXTCTRL1, _("0.07"), wxPoint(304,40), wxSize(48,27), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("units"), wxPoint(360,48), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	ButtonGetExtrinsics = new wxButton(this, ID_BUTTON1, _("Get Extrinsics"), wxPoint(416,40), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 
@@ -62,7 +62,7 @@ void GetExtrinsics::OnButtonGetExtrinsicsClick(wxCommandEvent& event)
 
 
  acquisitionSaveRawImageToFile((char *) "getExtrinsics.pnm",acquisitionGetColorFrame(moduleID,devID), width , height , channels , bitsperpixel);
- sprintf(what2run,"../tools/ExtrinsicCalibration/extrinsicCalibration  -v -w %u -h %u -s %0.5f -i getExtrinsics.pnm -c colorAR.calib",w,h,s);
+ sprintf(what2run,"../tools/ExtrinsicCalibration/extrinsicCalibration  -v -w %u -h %u -s %0.5f -i getExtrinsics.pnm -c colorAR.calib --writeImage",w,h,s);
 
  fprintf(stderr,"What will run %s \n",what2run);
 
