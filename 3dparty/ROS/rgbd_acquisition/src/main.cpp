@@ -240,34 +240,36 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
                            struct calibration  * calib
                          )
 {
-  //convert & publish RGB Stream - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  IplImage *imageRGB = cvCreateImageHeader( cvSize(colorWidth,colorHeight), IPL_DEPTH_8U ,3);
-  imageRGB->imageData = (char *) color;
-
-   cv_bridge::CvImage out_RGB_msg;
-   //out_RGB_msg.header   = in_msg->header; // Same timestamp and tf frame as input image
+  //We want to populate this
+  ros::Time sampleTime = ros::Time::now();
+  cv_bridge::CvImage out_RGB_msg;
    out_RGB_msg.encoding = sensor_msgs::image_encodings::RGB8; // Or whatever
-   out_RGB_msg.image    = imageRGB; // Your cv::Mat
-
-   ros::Time sampleTime = ros::Time::now();
-
-
    out_RGB_msg.header.frame_id= tfRoot;
    out_RGB_msg.header.stamp= sampleTime;
-   pubRGB.publish(out_RGB_msg.toImageMsg());
+
+  cv_bridge::CvImage out_Depth_msg;
+   out_Depth_msg.header.frame_id= tfRoot;
+   out_Depth_msg.header.stamp= sampleTime;
+   out_Depth_msg.encoding = sensor_msgs::image_encodings::TYPE_16UC1; // Or whatever
+
+
+  //convert & publish RGB Stream - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //IplImage *imageRGB = cvCreateImageHeader( cvSize(colorWidth,colorHeight), IPL_DEPTH_8U ,3);
+  //imageRGB->imageData = (char *) color;
+  //out_RGB_msg.header   = in_msg->header; // Same timestamp and tf frame as input image
+
+    cv::Mat imageRGBMat(cv::Size(colorWidth, colorHeight), CV_8UC3, (char *) color, cv::Mat::AUTO_STEP);
+    out_RGB_msg.image = imageRGBMat; // Your cv::Mat
+    pubRGB.publish(out_RGB_msg.toImageMsg());
 
 
   //convert & publish Depth Stream - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  IplImage *imageDepth = cvCreateImageHeader( cvSize(depthWidth,depthHeight), IPL_DEPTH_16U ,1);
-  imageDepth->imageData = (char *) depth;
+  //IplImage *imageDepth = cvCreateImageHeader( cvSize(depthWidth,depthHeight), IPL_DEPTH_16U ,1);
+  //imageDepth->imageData = (char *) depth;
+  //out_Depth_msg.image    = imageDepth; // Your cv::Mat
 
-   cv_bridge::CvImage out_Depth_msg;
-   //out_Depth_msg.header   = in_msg->header; // Same timestamp and tf frame as input image
-   out_Depth_msg.encoding = sensor_msgs::image_encodings::TYPE_16UC1; // Or whatever
-   out_Depth_msg.image    = imageDepth; // Your cv::Mat
-
-   out_Depth_msg.header.frame_id= tfRoot;
-   out_Depth_msg.header.stamp= sampleTime;
+   cv::Mat imageDepthMat(cv::Size(depthWidth, depthHeight), CV_16UC1, (char *) depth , cv::Mat::AUTO_STEP);
+   out_Depth_msg.image    = imageDepthMat;
    pubDepth.publish(out_Depth_msg.toImageMsg());
 
 
@@ -323,8 +325,8 @@ bool publishImagesFrames(unsigned char * color , unsigned int colorWidth , unsig
    ros::spinOnce();
 
    //Deallocate constructed OpenCV images
-   cvReleaseImageHeader( &imageRGB );
-   cvReleaseImageHeader( &imageDepth );
+   //cvReleaseImageHeader( &imageRGB );
+   //cvReleaseImageHeader( &imageDepth );
 
    return true;
 }
@@ -463,11 +465,11 @@ int main(int argc, char **argv)
 
 
      std::cout<<"RGBDAcquisition Starting settings ----------------"<<std::endl;
-     
+
      char cwd[1024];
      if (getcwd(cwd, sizeof(cwd)) != NULL)
       std::cout<<"Current working dir : " << cwd << std::endl;
-    
+
      std::cout<<"Name : "<<name<<std::endl;
      std::cout<<"Camera : "<<camera<<std::endl;
      std::cout<<"Frame : "<<frame<<std::endl;

@@ -1,15 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rgbd_acquisition)
-
-#find_package( OpenCV REQUIRED )
-
+ 
 #We are using a stripped acquisition
 add_definitions(-DALL_HEADERS_IN_SAME_DIR)
-
-
+ 
 if(NOT OpenCV_DIR)
- find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV" HINTS    "/opt/ros/hydro/kinetic/OpenCV/")
+ find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV" HINTS    "/opt/ros/kinetic/share/OpenCV/")
 endif(NOT OpenCV_DIR)
+FIND_PACKAGE(OpenCV REQUIRED)
+
 
 set(RGBDACQUISITION_LIBRARIES  
     "${CMAKE_CURRENT_SOURCE_DIR}/bin/libCalibrationLibrary.a"
