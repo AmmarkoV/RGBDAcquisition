@@ -1278,6 +1278,13 @@ void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
       return;
   }
 
+  if ( acquisitionGetTotalFrameNumber(moduleID,devID)>0 )
+  {
+    //It is not a live stream so we should really compress..
+    compressRecordingOutput=1;
+  }
+
+
   SelectTarget * targetSelector = new SelectTarget(this, wxID_ANY);
 
   targetSelector->moduleID = moduleID;
