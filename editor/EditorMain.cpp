@@ -1277,10 +1277,12 @@ void EditorFrame::OnbuttonRecordClick(wxCommandEvent& event)
       acquisitionStopTargetForFrames(moduleID,devID);
       return;
   }
+
   SelectTarget * targetSelector = new SelectTarget(this, wxID_ANY);
 
   targetSelector->moduleID = moduleID;
   targetSelector->devID = devID;
+  targetSelector->compressRecording = compressRecordingOutput;//Retain previous selection..!
 
   targetSelector->ShowModal();
   if ( targetSelector->recording ) {

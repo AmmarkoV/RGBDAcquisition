@@ -49,6 +49,8 @@ SelectTarget::SelectTarget(wxWindow* parent,wxWindowID id)
 	//*)
 
 	recording=0;
+
+   CheckBoxCompressOutput->SetValue( (compressRecording!=0) );
 }
 
 SelectTarget::~SelectTarget()
