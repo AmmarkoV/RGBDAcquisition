@@ -56,8 +56,8 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-
-char tfRoot[512]={"frame"};
+//Initial Frame name , will be overwritten by launch file..!
+char tfRoot[512]={"map"}; 
 
 //These are the static declarations of the various parts of this ROS package
 int key = 0;

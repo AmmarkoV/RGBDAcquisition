@@ -87,12 +87,17 @@ int main(int argc, char **argv)
     for (i=0; i<argc; i++)
     {
 
-        if (strcmp(argv[i],"-test")==0)
+        if (strcmp(argv[i],"-from")==0)
+        {
+            fprintf(stderr,"Parameter Syntax is --from NOT -from ..!! \n");
+            exit(0);
+        } else
+        if (strcmp(argv[i],"--test")==0)
         {
             internalTest();
             exit(0);
         }
-        else if (strcmp(argv[i],"-intrinsics")==0)
+        else if (strcmp(argv[i],"--intrinsics")==0)
         {
             if (i+8<argc)
             {
@@ -104,7 +109,7 @@ int main(int argc, char **argv)
                 setOpenGLIntrinsicCalibration( (double*) camera);
             }
         }
-        else if (strcmp(argv[i],"-extrinsics")==0)
+        else if (strcmp(argv[i],"--extrinsics")==0)
         {
             if (i+7<argc)
             {
@@ -118,8 +123,8 @@ int main(int argc, char **argv)
                 setOpenGLExtrinsicCalibration( (double*) rodriguez, (double*) translation , scaleToDepthUnit);
             }
         }
-        else if ( (strcmp(argv[i],"-resolution")==0) ||
-                  (strcmp(argv[i],"-size")==0) )
+        else if ( (strcmp(argv[i],"--resolution")==0) ||
+                  (strcmp(argv[i],"--size")==0) )
         {
             if (i+2<argc)
             {
@@ -128,8 +133,8 @@ int main(int argc, char **argv)
             }
         }
         else if (
-            (strcmp(argv[i],"-photo")==0) ||
-            (strcmp(argv[i],"-photoshoot")==0)
+            (strcmp(argv[i],"--photo")==0) ||
+            (strcmp(argv[i],"--photoshoot")==0)
         )
         {
             if (i+4<argc)
@@ -142,14 +147,14 @@ int main(int argc, char **argv)
                 rows=atoi(argv[i+6]);
             }
         }
-        else if (strcmp(argv[i],"-from")==0)
+        else if (strcmp(argv[i],"--from")==0)
         {
             if (i+1<argc)
             {
                 readFromArg = i+1 ;
             }
         }
-        else if (strcmp(argv[i],"-to")==0)
+        else if (strcmp(argv[i],"--to")==0)
         {
             if (i+1<argc)
             {
@@ -158,15 +163,15 @@ int main(int argc, char **argv)
                 fprintf(stderr,"Will write data to %s\n",argv[writeToArg]);
             }
         }
-        else if (strcmp(argv[i],"-shader")==0)
+        else if (strcmp(argv[i],"--shader")==0)
         {
             enableShaders(argv[i+1],argv[i+2]);
         }
-        else if (strcmp(argv[i],"-keyboard")==0)
+        else if (strcmp(argv[i],"--keyboard")==0)
         {
             forceKeyboardControl=1;
         }
-        else if (strcmp(argv[i],"-maxFrames")==0)
+        else if (strcmp(argv[i],"--maxFrames")==0)
         {
             maxFrames=atoi(argv[i+1]);
         }

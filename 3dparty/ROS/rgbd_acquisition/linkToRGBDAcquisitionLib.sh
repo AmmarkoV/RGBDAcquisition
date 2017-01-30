@@ -43,6 +43,10 @@ ln -s $DATASETS/libfreenect_acquisition_shared_library/libFreenectAcquisition.so
 ln -s  /usr/local/lib/libfreenect_sync.so.0.5
 ln -s  /usr/local/lib/libfreenect.so.0.5
 
+ln -s $DATASETS/librealsense_acquisition_shared_library/libRealsenseAcquisition.so
+#ln -s  /usr/local/lib/libfreenect_sync.so.0.5
+#ln -s  /usr/local/lib/libfreenect.so.0.5
+
 
 ln -s $DATASETS/editor/Editor
 ln -s $DATASETS/viewer/Viewer

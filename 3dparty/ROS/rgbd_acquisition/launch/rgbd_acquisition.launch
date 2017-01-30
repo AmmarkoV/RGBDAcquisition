@@ -1,8 +1,8 @@
 <launch>   
     <!-- name of the "camera" -->
-    <arg name="camera" value="headcam"/> 
+    <arg name="camera" value="camera"/> 
     <!-- name of the root frame -->
-    <arg name="frame" value="frame"/> 
+    <arg name="frame" value="camera_pose"/> 
 
     <!-- device_id can have the following formats:
          "B00367707227042B": Use device with given serial number
