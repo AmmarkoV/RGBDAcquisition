@@ -49,6 +49,8 @@ int getFreenectDepthBitsPerPixel(int devID);
 char * getFreenectDepthPixels(int devID);
 
 
+int getTotalFreenectFrameNumber(int devID);
+int getCurrentFreenectFrameNumber(int devID);
 
 
 #if USE_CALIBRATION

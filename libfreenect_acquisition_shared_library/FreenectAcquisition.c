@@ -23,6 +23,7 @@
 
 int rgb_mode[MAX_DEVS]={FREENECT_VIDEO_RGB};
 int depth_mode[MAX_DEVS]={FREENECT_DEPTH_11BIT};
+int numberOfFramesSnapped[MAX_DEVS]={0};
 
 
 
@@ -130,6 +131,7 @@ int seekFreenectFrame(int devID,unsigned int seekFrame)
 
 int snapFreenectFrames(int devID)
 {
+  numberOfFramesSnapped[devID]+=1;
   return 1;
 }
 
@@ -166,6 +168,16 @@ char * getFreenectDepthPixels(int devID)
   return depth;
 }
 
+int getTotalFreenectFrameNumber(int devID)
+{
+  //This is a live device so we don't know how many frames there will be..
+  return 0;
+}
+
+int getCurrentFreenectFrameNumber(int devID)
+{
+  return numberOfFramesSnapped[devID];
+}
 
 
 #if USE_CALIBRATION
