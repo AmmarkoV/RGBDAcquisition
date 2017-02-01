@@ -4,10 +4,13 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <locale.h>
 
 #include "../AmMatrix/quaternions.h"
+
+int comma=0;
 
 int forceUSLocaleToKeepOurSanity()
 {
@@ -20,6 +23,12 @@ int main(int argc, char *argv[])
 {
     forceUSLocaleToKeepOurSanity();
     if (argc<4) { printf("QuaternionsToEuler quatX quatY quatZ quatW, you did not provide 4 arguments\n"); return 1; }
+
+    unsigned int i=0;
+    for (i=0; i<argc; i++)
+    {
+      if (strcmp("--comma",argv[i])==0) { comma=1; }
+    }
 
     double euler[3]={0};
 
@@ -35,7 +44,7 @@ int main(int argc, char *argv[])
     quaternions2Euler(euler,quaternions,qXqYqZqW);
 
 
-    printf("%f %f %f\n",euler[0],euler[1],euler[2]);
-
+     if (comma) {  printf("%f,%f,%f\n",euler[0],euler[1],euler[2]); } else
+                {  printf("%f %f %f\n",euler[0],euler[1],euler[2]); }
     return 0;
 }

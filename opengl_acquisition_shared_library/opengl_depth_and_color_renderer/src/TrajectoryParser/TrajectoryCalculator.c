@@ -58,7 +58,9 @@ int printObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsig
     FrameIDToReturn=FrameIDToReturn%stream->object[ObjID].numberOfFrames;
     if (!accessOfObjectPositionIsOk(stream,ObjID,FrameIDToReturn)) { return 0; }
 
-    fprintf(stderr,"printObjectTrajectory\n");
+    fprintf(stderr,"printObjectTrajectory quaternions are qXqYqZqW\n");
+    double euler[3];
+    double quaternions[4];
 
     fprintf(stderr,"POS=\"%0.2f %0.2f %0.2f\"\n",
             stream->object[ObjID].frame[FrameIDToReturn].x,
@@ -67,20 +69,21 @@ int printObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsig
 
    if ( stream->object[ObjID].frame[FrameIDToReturn].isQuaternion )
    {
-    fprintf(stderr,"QUAT=\"%0.2f %0.2f %0.2f %0.2f\"\n",
-            stream->object[ObjID].frame[FrameIDToReturn].rot1,
-            stream->object[ObjID].frame[FrameIDToReturn].rot2,
-            stream->object[ObjID].frame[FrameIDToReturn].rot3,
-            stream->object[ObjID].frame[FrameIDToReturn].rot4
-            );
+    quaternions[0]=stream->object[ObjID].frame[FrameIDToReturn].rot1;
+    quaternions[1]=stream->object[ObjID].frame[FrameIDToReturn].rot2;
+    quaternions[2]=stream->object[ObjID].frame[FrameIDToReturn].rot3;
+    quaternions[3]=stream->object[ObjID].frame[FrameIDToReturn].rot4;
+    quaternions2Euler(euler,quaternions,1);
    } else
    {
-    fprintf(stderr,"ROT=\"%0.2f %0.2f %0.2f\"\n",
-            stream->object[ObjID].frame[FrameIDToReturn].rot1,
-            stream->object[ObjID].frame[FrameIDToReturn].rot2,
-            stream->object[ObjID].frame[FrameIDToReturn].rot3
-            );
+    euler[0]=stream->object[ObjID].frame[FrameIDToReturn].rot1;
+    euler[1]=stream->object[ObjID].frame[FrameIDToReturn].rot2;
+    euler[2]=stream->object[ObjID].frame[FrameIDToReturn].rot3;
+    euler2Quaternions(quaternions,euler,1);
    }
+
+  fprintf(stderr,"ROT=\"%0.2f %0.2f %0.2f\"\n", euler[0],euler[1], euler[2] );
+  fprintf(stderr,"QUAT=\"%0.2f %0.2f %0.2f %0.2f\"\n", quaternions[0],quaternions[1], quaternions[2], quaternions[3] );
 
 
  return 1;
