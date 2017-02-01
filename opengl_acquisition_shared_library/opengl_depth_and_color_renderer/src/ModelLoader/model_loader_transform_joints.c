@@ -777,7 +777,8 @@ int doModelTransform(
                       unsigned int jointDataSize ,
                       unsigned int autodetectAlteredMatrices ,
                       unsigned int directSettingOfMatrices ,
-                      unsigned int performVertexTransform
+                      unsigned int performVertexTransform  ,
+                      unsigned int jointAxisConvention
                     )
 {
   if (triModelIn==0)

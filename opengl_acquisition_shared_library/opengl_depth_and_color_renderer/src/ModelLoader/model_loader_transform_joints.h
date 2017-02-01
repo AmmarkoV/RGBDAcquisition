@@ -150,6 +150,7 @@ void printModelTransform(struct TRI_Model * in);
 * @param  autodetect non-identity matrices on jointdata array and skip some calculations
 * @param  use direct setting of final matrices ( only needed if you really know what you want in the final matrices )
 * @param  perform vertex transforms ( if not triModelOut will be the same as triModelIn )
+* @param  jointAxisConvention , 0 = default
 * @retval 0=Failure1=Success
 */
 int doModelTransform(
@@ -159,7 +160,8 @@ int doModelTransform(
                       unsigned int jointDataSize ,
                       unsigned int autodetectAlteredMatrices,
                       unsigned int directSettingOfMatrices ,
-                      unsigned int performVertexTransform
+                      unsigned int performVertexTransform  ,
+                      unsigned int jointAxisConvention
                     );
 
 
