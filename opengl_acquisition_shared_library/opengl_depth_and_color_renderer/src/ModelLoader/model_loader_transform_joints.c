@@ -796,7 +796,7 @@ int doModelTransform(
 
  if (!autodetectAlteredMatrices)
      {
-        fprintf(stderr,"disabled autodetection of altered matrices might result in strange transformations being executed.. \n");
+       // fprintf(stderr,"disabled autodetection of altered matrices might result in strange transformations being executed.. \n");
      }
 
  unsigned int i=0;
