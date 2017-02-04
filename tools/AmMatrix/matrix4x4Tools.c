@@ -207,7 +207,29 @@ void create4x4IdentityFMatrix(float * m)
     m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
 }
 
+void convert4x4MatrixToRPY(double *m ,double *roll,double *pitch,double *yaw)
+{
+ if (m[0] == 1.0f)
+        {
+          *yaw = atan2f( m[2], m[11]);
+          *pitch = 0;
+          *roll = 0;
+        }
+        else
+ if (m[0] == -1.0f)
+        {
+          *yaw = atan2f(m[2], m[11]);
+          *pitch = 0;
+          *roll = 0;
+        }
+        else
+        {
+          *yaw = atan2(-m[8],m[0]);
+          *pitch = asin(m[4]);
+          *roll = atan2(-m[6],m[5]);
+        }
 
+}
 
 
 void create4x4RotationMatrix(double * m , double angle, double x, double y, double z)
