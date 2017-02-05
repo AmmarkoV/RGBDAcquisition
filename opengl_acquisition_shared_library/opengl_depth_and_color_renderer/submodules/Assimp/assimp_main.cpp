@@ -2,7 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../src/ModelLoader/model_loader_tri.h"
+
 #include "assimp_loader.h"
+#include "assimp_bvh.h"
+
+
+
+
+
 
 int main (int argc, char *argv[])
 {
@@ -11,6 +18,9 @@ int main (int argc, char *argv[])
 
  fprintf(stderr,"assimpTester %s %s %s \n",argv[1],argv[2],argv[3]);
 
+
+ if (strstr(argv[2],".dae")!=0)
+ {
 
  struct TRI_Model *flatModel    =  allocateModelTri();
  struct TRI_Model *originalModel=  allocateModelTri();
@@ -39,6 +49,15 @@ int main (int argc, char *argv[])
 
  freeModelTri(flatModel);
  freeModelTri(originalModel);
+
+
+ } else
+ if (strstr(argv[2],".bvh")!=0)
+ {
+   doBVHConversion(argv[2]);
+
+ }
+
 
  return 0;
 

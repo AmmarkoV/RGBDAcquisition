@@ -18,6 +18,8 @@ add_executable(assimpTester
                assimp_main.cpp 
                assimp_loader.cpp
                assimp_loader.h  
+               assimp_bvh.cpp
+               assimp_bvh.h
                ../../src/ModelLoader/model_loader_tri.c
                ../../src/ModelLoader/model_loader_tri.h 
                ) 
