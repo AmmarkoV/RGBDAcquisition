@@ -625,12 +625,13 @@ int fillPosWithFrame(
 
     if ( (joints!=0) && (stream->object[ObjID].frame[FrameIDToReturn].jointList!=0) )
     {
+        /*
        fprintf(stderr,
                "Populating non interpolated joints for frame %u  ( %u joints ) \n",
                FrameIDToReturn ,
                stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints
               );
-
+*/
        unsigned int numberOfJoints = stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints;
 
        double rotCur[4]={0};
@@ -668,7 +669,8 @@ int fillPosWithFrame(
             }
         } else
         {
-         fprintf(stderr,"fillPosWithFrame: Unknown way to fill joint matrix \n");
+         //fprintf(stderr,"fillPosWithFrame: Empty Joint -> Identity Matrix %u #%u/%u \n",FrameIDToReturn,i,numberOfJoints);
+         create4x4IdentityFMatrix(f);
         }
 
        }
