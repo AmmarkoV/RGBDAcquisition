@@ -932,6 +932,7 @@ int fillPosWithInterpolatedFrame(
 
 int getExactStreamPosFromTimestamp(struct VirtualStream * stream,ObjectIDHandler ObjID,unsigned int timeAbsMilliseconds , int * foundExactTimestamp)
 {
+  if (foundExactTimestamp==0) { fprintf(stderr,"getExactStreamPosFromTimestamp called with no place to place output\n"); return 0; }
   *foundExactTimestamp=0;
 
   //fprintf(stderr,"getExactStreamPosFromTimestamp(obj=%u,time=%u) ",ObjID,timeAbsMilliseconds);
@@ -949,14 +950,18 @@ int getExactStreamPosFromTimestamp(struct VirtualStream * stream,ObjectIDHandler
 
 
 
-
+  if (stream->debug)
+  {
+    fprintf(stderr,"searching positions in %u frames\n",stream->object[ObjID].numberOfFrames);
+  }
 
   unsigned int pos=0;
   for (pos=0; pos<stream->object[ObjID].numberOfFrames; pos++)
   {
     if (timeAbsMilliseconds == stream->object[ObjID].frame[pos].time )
     {
-        //fprintf(stderr,"FOUND!\n");
+         if (stream->debug)
+              { fprintf(stderr,"FOUND!\n"); }
         *foundExactTimestamp=1;
         return pos;
     }

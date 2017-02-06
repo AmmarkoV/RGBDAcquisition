@@ -326,6 +326,8 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
          }
     }
 
+
+  mod->initialized=1;
   return 1;
 }
 
@@ -635,8 +637,21 @@ int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNum
 
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
 {
-// fprintf(stderr,"Searching model %s for a bone named %s \n",mod->pathOfModel , boneName);
+ #warning "getModelBoneIDFromBoneName segfaults ?"
+// fprintf(stderr,"getModelBoneIDFromBoneName(boneName=%s)\n",boneName);
+if (found==0) { return 0; }
  *found=0;
+
+if (mod==0)   { return 0; }
+if (boneName==0)   { return 0; }
+
+if (mod->initialized!=1)
+{
+  fprintf(stderr,"model is not initialized not doing getModelBoneIDFromBoneName(boneName=%s)\n",boneName);
+  return 0;
+}
+ //fprintf(stderr,"Searching model %s for a bone named %s \n",mod->pathOfModel , boneName);
+
  if (mod->type==TRI_MODEL)
  {
   struct TRI_Model * triM = (struct TRI_Model * ) mod->modelInternalData;
@@ -647,6 +662,7 @@ int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
 
      for (i=0; i<numberOfBones; i++)
      {
+       fprintf(stderr,"comp %u \n" , i);
        if (strcmp( triM->bones[i].boneName , boneName) == 0 )
        {
         // fprintf(stderr,"found it , it is joint # %u \n" , i);
@@ -655,6 +671,9 @@ int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
        }
      }
    }
+ } else
+ {
+  fprintf(stderr,"Unsupported model type\n");
  }
 
   fprintf(stderr,"Searching model %s for a bone named %s , could not find it\n",mod->pathOfModel , boneName);

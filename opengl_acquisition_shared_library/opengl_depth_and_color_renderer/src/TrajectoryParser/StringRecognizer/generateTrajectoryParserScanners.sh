@@ -5,6 +5,9 @@ cd "$DIR"
 
 gcc main.c fastStringParser.c -o StringRecognizer
 
+
+if [ -e StringRecognizer ]
+then
 #for item in TrajectoryPrimitives test ; do
 
 item="TrajectoryPrimitives"
@@ -17,6 +20,8 @@ item="TrajectoryPrimitives"
 
     rm "$item.c" "$item.h"
 #done
-
+else
+ echo "Could not compile String recognizer..!" 
+fi
  
 exit 0

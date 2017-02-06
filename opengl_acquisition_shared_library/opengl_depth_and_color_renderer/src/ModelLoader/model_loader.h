@@ -20,6 +20,7 @@ struct Model
     //This can actually be different types of struct depending on if we are talking about an obj/tri/hardcoded/etc model
     //We know the type byaccessing the "type" attribute of this struct
 
+    int initialized;
     int type; //See enum ModelTypes
     unsigned int numberOfBones;
 

@@ -62,8 +62,7 @@ int doBVHConversion(char * sourceBVH)
           for (frameNum=0; frameNum<animNode->mNumRotationKeys; frameNum++)
           {
             aiQuatKey * q = &animNode->mRotationKeys[frameNum];
-            fprintf(stderr,"POSEQ(human,%u,%s,%0.2f,%0.2f,%0.2f,%0.2f)\n",frameNum,animNode->mNodeName.data,q->mValue.x,q->mValue.y,q->mValue.z,q->mValue.w );
-
+            fprintf(stdout,"POSEQ(human,%u,%s,%0.2f,%0.2f,%0.2f,%0.2f)\n",frameNum,animNode->mNodeName.data,q->mValue.x,q->mValue.y,q->mValue.z,q->mValue.w );
           }
           /*
 aiVectorKey * 	mPositionKeys

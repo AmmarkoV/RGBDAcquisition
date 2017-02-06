@@ -184,18 +184,29 @@ void listAllObjectTypeID(struct VirtualStream * stream)
 
 ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found)
 {
+  if (found==0) { fprintf(stderr,"Can't get object id without a valid value to return if found\n"); return 0; }
+  *found=0;
+
+  if (name==0) { fprintf(stderr,"Can't get object id without a valid name\n"); return 0; }
   if (stream==0) { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",name); }
   if (stream->object==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object array\n",name); }
 
-  *found=0;
   unsigned int i=0;
+
+  if (stream->debug)
+   { fprintf(stderr,"Searching %s among %u objects \n",name,stream->numberOfObjects); }
   for (i=0; i<stream->numberOfObjects; i++ )
    {
+     if (stream->object[i].name!=0)
+     {
        if (dummy_strcasecmp_internal(name,stream->object[i].name)==0)
          {
+          if (stream->debug)
+               { fprintf(stderr,"Found it @ stream->object[%u]\n",i); }
               *found=1;
               return i;
          }
+     }
    }
 
    return 0;
@@ -428,6 +439,10 @@ int addPoseToObjectState(
                               unsigned int coordLength
                         )
 {
+ if (stream==0)                                     {   fprintf(stderr,"Invalid stream \n"); return 0; }
+ if (modelStorage==0)                               {   fprintf(stderr,"Invalid model storage \n"); return 0; }
+ if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"Invalid values to add as a pose \n"); return 0; }
+
  int foundExactTimestamp=0;
  unsigned int ObjFound = 0;
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
@@ -441,8 +456,13 @@ int addPoseToObjectState(
        if(foundExactTimestamp)
        {
         unsigned int objectTypeID = stream->object[ObjID].type;
-        struct Model * mod = (struct Model *) &modelStorage->models[stream->objectTypes[objectTypeID].modelListArrayNumber];
 
+        unsigned int modelID = stream->objectTypes[objectTypeID].modelListArrayNumber;
+        if (modelID<modelStorage->currentNumberOfModels)
+        {
+        struct Model * mod = (struct Model *) &modelStorage->models[modelID];
+        if (mod!=0)
+        {
         int boneFound=0;
         unsigned int boneID = getModelBoneIDFromBoneName(mod,jointName,&boneFound);
 
@@ -450,6 +470,7 @@ int addPoseToObjectState(
         {
            stream->object[ObjID].frame[pos].hasNonDefaultJointList = 1;  //Whatever we set it is now set..!
            stream->object[ObjID].frame[pos].jointList->numberOfJoints = mod->numberOfBones;
+
 
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useQuaternion=0;
@@ -490,6 +511,8 @@ int addPoseToObjectState(
 
            return 1;
         } else { fprintf(stderr,"Could not find exact bone %u for %s \n",boneID,name); }
+        } else { fprintf(stderr,"Could not find data of model %u for %s \n",modelID,name); }
+        } else { fprintf(stderr,"Could not find exact model %u for %s \n",modelID,name); }
        } else  { fprintf(stderr,"Could not find exact timestamp %u for %s \n",timeMilliseconds, name); }
     } else     { fprintf(stderr,"Could not Find a joint list for %s ( model not loaded? )\n",name); }
   } else       { fprintf(stderr,"Could not Find object %s \n",name); }

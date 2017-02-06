@@ -190,6 +190,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
              case TRAJECTORYPRIMITIVES_INCLUDE :
               InputParser_GetWord(ipc,1,includeFile,MAX_PATH);
+              fprintf(stderr,YELLOW "Including.. %s..!\n" NORMAL,includeFile);
               if (appendVirtualStreamFromFile(newstream,includeFile))
               {
                 fprintf(stderr,GREEN "Successfully included file %s..!" NORMAL,includeFile);
@@ -344,6 +345,21 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                 coordLength=16;
 
                 addPoseToObjectState( newstream , modelStorage , name  , nameB , time , (float*) pos , coordLength );
+          break;
+
+
+          case TRAJECTORYPRIMITIVES_POSEQ :
+              InputParser_GetWord(ipc,1,name,MAX_PATH);
+               time = InputParser_GetWordInt(ipc,2);
+               InputParser_GetWord(ipc,3,nameB,MAX_PATH);
+
+               pos[0] = InputParser_GetWordFloat(ipc,4);
+               pos[1] = InputParser_GetWordFloat(ipc,5);
+               pos[2] = InputParser_GetWordFloat(ipc,6);
+               pos[3] = InputParser_GetWordFloat(ipc,7);
+               coordLength=4;
+
+               addPoseToObjectState( newstream , modelStorage , name  , nameB , time , (float*) pos , coordLength );
           break;
 
 

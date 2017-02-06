@@ -17,7 +17,7 @@ char acceptedChars[]="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
 
 
 
-inline void convertTo_ENUM_ID(char *sPtr)
+void convertTo_ENUM_ID(char *sPtr)
 {
   unsigned int source=0 , target=0 , holdIt=0;
 
