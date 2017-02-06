@@ -48,6 +48,25 @@ int doBVHConversion(char * sourceBVH)
 
 
        unsigned int selectedNodeOfAnimationChannel=0;
+
+
+       unsigned int posesToGenerate=0;
+       for (selectedNodeOfAnimationChannel=0; selectedNodeOfAnimationChannel<anim->mNumChannels; selectedNodeOfAnimationChannel++)
+        {
+          struct aiNodeAnim * animNode = anim->mChannels[selectedNodeOfAnimationChannel];
+
+          if (posesToGenerate<animNode->mNumPositionKeys) { posesToGenerate = animNode->mNumPositionKeys; }
+          if (posesToGenerate<animNode->mNumRotationKeys) { posesToGenerate = animNode->mNumRotationKeys; }
+          if (posesToGenerate<animNode->mNumScalingKeys)  { posesToGenerate = animNode->mNumScalingKeys; }
+        }
+
+
+       for (selectedNodeOfAnimationChannel=0; selectedNodeOfAnimationChannel<posesToGenerate; selectedNodeOfAnimationChannel++)
+        {
+           fprintf(stdout,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)\n",selectedNodeOfAnimationChannel);
+        }
+
+
        for (selectedNodeOfAnimationChannel=0; selectedNodeOfAnimationChannel<anim->mNumChannels; selectedNodeOfAnimationChannel++)
         {
           struct aiNodeAnim * animNode = anim->mChannels[selectedNodeOfAnimationChannel];

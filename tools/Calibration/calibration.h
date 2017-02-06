@@ -137,6 +137,9 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
  */
 int WriteCalibration(char * filename,struct calibration * calib);
 
+
+int WriteCalibrationROS(char * filename,struct calibration * calib);
+
 /**
  * @brief  Write a basic calibration parameters to screen
  * @ingroup calibration

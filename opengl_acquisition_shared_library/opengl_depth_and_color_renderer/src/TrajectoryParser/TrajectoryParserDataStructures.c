@@ -458,12 +458,16 @@ int addPoseToObjectState(
         unsigned int objectTypeID = stream->object[ObjID].type;
 
         unsigned int modelID = stream->objectTypes[objectTypeID].modelListArrayNumber;
+        fprintf(stderr,"Accessing model %u/%u\n", modelID,modelStorage->currentNumberOfModels);
         if (modelID<modelStorage->currentNumberOfModels)
         {
         struct Model * mod = (struct Model *) &modelStorage->models[modelID];
         if (mod!=0)
         {
         int boneFound=0;
+
+        fprintf(stderr,"Set mod->initialized=%u\n", mod->initialized);
+
         unsigned int boneID = getModelBoneIDFromBoneName(mod,jointName,&boneFound);
 
         if (boneFound)

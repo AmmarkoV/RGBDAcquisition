@@ -80,6 +80,7 @@ struct ModelList *  allocateModelList(unsigned int initialSpace)
   {
     newModelList->currentNumberOfModels = 0;
     newModelList->MAXNumberOfModels = 0;
+    newModelList->GUARD_BYTE=123123;
 
 
     newModelList->models = (struct Model * ) malloc( initialSpace * sizeof(struct Model));
@@ -326,7 +327,7 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
          }
     }
 
-
+  mod->GUARD_BYTE = modelStorage->GUARD_BYTE;
   mod->initialized=1;
   return 1;
 }
@@ -358,19 +359,19 @@ int loadModelToModelList(struct ModelList* modelStorage,const char * modelDirect
   if (!foundAlreadyExistingModel)
    { //If we can't find an already loaded version of the mesh we are looking for
      unsigned int whereToLoadModel=modelStorage->currentNumberOfModels;
-     fprintf(stderr,"before LoadModel.. \n");
+     fprintf(stderr,"before LoadModel @ %u .. \n",whereToLoadModel);
      if (loadModel(modelStorage,whereToLoadModel,modelDirectory,modelName,modelExtension))
       {
         fprintf(stderr,GREEN "Model %s is now loaded as model[%u] \n" NORMAL,modelName , whereToLoadModel );
         *whereModelWasLoaded=whereToLoadModel;
-        ++modelStorage->currentNumberOfModels;
+        modelStorage->currentNumberOfModels+=1;
         return 1;
       } else
       { fprintf(stderr,RED "Failed loading new model %s ( %u ) \n" NORMAL,modelName, whereToLoadModel );        return 0; }
     } else
     {
      *whereModelWasLoaded=modelLocation;
-     fprintf(stderr,GREEN "Model %s found already loaded \n" NORMAL,modelName);
+     fprintf(stderr,GREEN "Model %s found already loaded @ %u \n" NORMAL,modelName,modelLocation);
      return 1;
     }
  return 0;
@@ -638,7 +639,7 @@ int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNum
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
 {
  #warning "getModelBoneIDFromBoneName segfaults ?"
-// fprintf(stderr,"getModelBoneIDFromBoneName(boneName=%s)\n",boneName);
+fprintf(stderr,"getModelBoneIDFromBoneName(boneName=%s)\n",boneName);
 if (found==0) { return 0; }
  *found=0;
 
@@ -659,10 +660,11 @@ if (mod->initialized!=1)
    {
      unsigned int i=0;
      unsigned int numberOfBones=mod->numberOfBones;
+      fprintf(stderr,"getModelBoneIDFromBoneName will search through %u bones \n",numberOfBones);
 
      for (i=0; i<numberOfBones; i++)
      {
-       fprintf(stderr,"comp %u \n" , i);
+       //fprintf(stderr,"comp %u \n" , i);
        if (strcmp( triM->bones[i].boneName , boneName) == 0 )
        {
         // fprintf(stderr,"found it , it is joint # %u \n" , i);

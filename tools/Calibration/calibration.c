@@ -378,6 +378,102 @@ int WriteCalibration(char * filename,struct calibration * calib)
 
 
 
+
+
+
+
+int WriteCalibrationROS(char * filename,struct calibration * calib)
+{
+  if ((filename==0)||(calib==0)) { return 0; }
+  forceUSLocaleToKeepOurSanity();
+
+  FILE * fp = 0;
+  fp = fopen(filename,"w");
+  if (fp == 0 ) {  return 0; }
+fprintf( fp, "%YAML:1.0\n");
+fprintf( fp, " \n");
+fprintf( fp, "#-------------------------------------------------------------------------------------------- \n");
+fprintf( fp, "# Camera Parameters. Adjust them! \n");
+fprintf( fp, "#-------------------------------------------------------------------------------------------- \n");
+fprintf( fp, " \n");
+fprintf( fp, "# Camera calibration and distortion parameters (OpenCV) \n");
+fprintf( fp, "Camera.fx: %f \n",calib->intrinsic[CALIB_INTR_FX]);
+fprintf( fp, "Camera.fy: %f \n",calib->intrinsic[CALIB_INTR_FY]);
+fprintf( fp, "Camera.cx: %f \n",calib->intrinsic[CALIB_INTR_CX]);
+fprintf( fp, "Camera.cy: %f \n",calib->intrinsic[CALIB_INTR_CY]);
+fprintf( fp, " \n");
+fprintf( fp, "Camera.k1: %f \n",calib->k1);
+fprintf( fp, "Camera.k2: %f \n",calib->k2);
+fprintf( fp, "Camera.p1: %f \n",calib->p1);
+fprintf( fp, "Camera.p2: %f \n",calib->p2);
+fprintf( fp, "Camera.k3: %f \n",calib->k3);
+fprintf( fp, " \n");
+fprintf( fp, "Camera.width: %u \n",calib->width);
+fprintf( fp, "Camera.height: %u \n",calib->height);
+fprintf( fp, " \n");
+fprintf( fp, "# Camera frames per second \n");
+fprintf( fp, "Camera.fps: 30.0 \n");
+fprintf( fp, " \n");
+fprintf( fp, "# IR projector baseline times fx (aprox.) \n");
+fprintf( fp, "Camera.bf: 40.0 \n");
+fprintf( fp, " \n");
+fprintf( fp, "# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale) \n");
+fprintf( fp, "Camera.RGB: 1 \n");
+fprintf( fp, " \n");
+fprintf( fp, "# Close/Far threshold. Baseline times. \n");
+fprintf( fp, "ThDepth: 40.0 \n");
+fprintf( fp, " \n");
+fprintf( fp, "# Deptmap values factor \n");
+fprintf( fp, "DepthMapFactor: 1.0 \n");
+fprintf( fp, " \n");
+fprintf( fp, "#-------------------------------------------------------------------------------------------- \n");
+fprintf( fp, "# ORB Parameters \n");
+fprintf( fp, "#-------------------------------------------------------------------------------------------- \n");
+fprintf( fp, " \n");
+fprintf( fp, "# ORB Extractor: Number of features per image \n");
+fprintf( fp, "ORBextractor.nFeatures: 1000 \n");
+fprintf( fp, " \n");
+fprintf( fp, "# ORB Extractor: Scale factor between levels in the scale pyramid \n");
+fprintf( fp, "ORBextractor.scaleFactor: 1.2 \n");
+fprintf( fp, " \n");
+fprintf( fp, "# ORB Extractor: Number of levels in the scale pyramid \n");
+fprintf( fp, "ORBextractor.nLevels: 8 \n");
+fprintf( fp, " \n");
+fprintf( fp, "# ORB Extractor: Fast threshold \n");
+fprintf( fp, "# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response. \n");
+fprintf( fp, "# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST \n");
+fprintf( fp, "# You can lower these values if your images have low contrast \n");
+fprintf( fp, "ORBextractor.iniThFAST: 20 \n");
+fprintf( fp, "ORBextractor.minThFAST: 7 \n");
+fprintf( fp, " \n");
+fprintf( fp, "#-------------------------------------------------------------------------------------------- \n");
+fprintf( fp, "# Viewer Parameters \n");
+fprintf( fp, "#-------------------------------------------------------------------------------------------- \n");
+fprintf( fp, "Viewer.KeyFrameSize: 0.05 \n");
+fprintf( fp, "Viewer.KeyFrameLineWidth: 1 \n");
+fprintf( fp, "Viewer.GraphLineWidth: 0.9 \n");
+fprintf( fp, "Viewer.PointSize:2 \n");
+fprintf( fp, "Viewer.CameraSize: 0.08 \n");
+fprintf( fp, "Viewer.CameraLineWidth: 3 \n");
+fprintf( fp, "Viewer.ViewpointX: 0 \n");
+fprintf( fp, "Viewer.ViewpointY: -0.7 \n");
+fprintf( fp, "Viewer.ViewpointZ: -1.8 \n");
+fprintf( fp, "Viewer.ViewpointF: 500 \n");
+
+
+ fclose(fp);
+
+ return 1;
+}
+
+
+
+
+
+
+
+
+
 double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibration * calib)
 {
  if (calib==0) { fprintf(stderr,"No calibration file provided , returning null 4x4 transformation matrix \n"); return 0;  }

@@ -8,7 +8,7 @@
 #define MODEL_LOADER_H_INCLUDED
 
 
-#define MAX_MODEL_PATHS 250
+#define MAX_MODEL_PATHS 512
 
 /**
 * @brief The structure that defines what a Model Consists of
@@ -38,15 +38,17 @@ struct Model
 
     //-----------------
     char pathOfModel[MAX_MODEL_PATHS+1];
+    unsigned int GUARD_BYTE;
 };
 
 
 
 struct ModelList
 {
-  struct Model * models;
   unsigned int currentNumberOfModels;
   unsigned int MAXNumberOfModels;
+  struct Model * models;
+  unsigned int GUARD_BYTE;
 };
 
 struct ModelList *  allocateModelList(unsigned int initialSpace);

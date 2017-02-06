@@ -157,6 +157,14 @@ bool setHighFramerate(std_srvs::Empty::Request& request, std_srvs::Empty::Respon
 
 
 
+bool saveROSCalibrationFile(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+  struct calibration calib;
+  acquisitionGetColorCalibration(moduleID,devID,&calib);
+  WriteCalibrationROS("calibration.yaml",&calib);
+    return true;
+}
+
 
 bool visualizeOn(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -502,12 +510,13 @@ int main(int argc, char **argv)
      framerateState=MEDIUM_FRAMERATE; //By default we go to medium!
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
-     ros::ServiceServer visualizeOnService      = nh.advertiseService(name+"/visualize_on", visualizeOn);
-     ros::ServiceServer visualizeOffService     = nh.advertiseService(name+"/visualize_off", visualizeOff);
-     ros::ServiceServer terminateService        = nh.advertiseService(name+"/terminate", terminate);
-     ros::ServiceServer pauseService            = nh.advertiseService(name+"/pause", pause);
-     ros::ServiceServer resumeService           = nh.advertiseService(name+"/resume", resume);
-     ros::ServiceServer setScaleService         = nh.advertiseService(name+"/setScale", setScale);
+     ros::ServiceServer saveROSCalibrationService  = nh.advertiseService(name+"/saveROSCalibration", saveROSCalibrationFile);
+     ros::ServiceServer visualizeOnService         = nh.advertiseService(name+"/visualize_on", visualizeOn);
+     ros::ServiceServer visualizeOffService        = nh.advertiseService(name+"/visualize_off", visualizeOff);
+     ros::ServiceServer terminateService           = nh.advertiseService(name+"/terminate", terminate);
+     ros::ServiceServer pauseService               = nh.advertiseService(name+"/pause", pause);
+     ros::ServiceServer resumeService              = nh.advertiseService(name+"/resume", resume);
+     ros::ServiceServer setScaleService            = nh.advertiseService(name+"/setScale", setScale);
 
      //Framerate switches
      ros::ServiceServer setStoppedFramerateService   = nh.advertiseService(name+"/setStoppedFramerate", setStoppedFramerate);
