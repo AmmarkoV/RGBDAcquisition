@@ -135,10 +135,10 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
  * @param  Pointer , Pointer to the calibration to be written to the file
  * @retval 1=Success , 0=Failure
  */
-int WriteCalibration(char * filename,struct calibration * calib);
+int WriteCalibration(const char * filename,struct calibration * calib);
 
 
-int WriteCalibrationROS(char * filename,struct calibration * calib);
+int WriteCalibrationROS(const char * filename,struct calibration * calib);
 
 /**
  * @brief  Write a basic calibration parameters to screen

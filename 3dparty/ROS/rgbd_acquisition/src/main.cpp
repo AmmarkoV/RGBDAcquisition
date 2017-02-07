@@ -57,7 +57,7 @@
 #define WHITE   "\033[37m"      /* White */
 
 //Initial Frame name , will be overwritten by launch file..!
-char tfRoot[512]={"map"}; 
+char tfRoot[512]={"map"};
 
 //These are the static declarations of the various parts of this ROS package
 int key = 0;
@@ -161,8 +161,8 @@ bool saveROSCalibrationFile(std_srvs::Empty::Request& request, std_srvs::Empty::
 {
   struct calibration calib;
   acquisitionGetColorCalibration(moduleID,devID,&calib);
-  WriteCalibrationROS("calibration.yaml",&calib);
-    return true;
+  WriteCalibrationROS("~/calibration.yaml",&calib);
+  return true;
 }
 
 
