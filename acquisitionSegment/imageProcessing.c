@@ -137,6 +137,14 @@ float  signedDistanceFromPlane(float * origin , float * normal , float * pN)
 }
 
 
+int getDepthBlobExt(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int *sX,unsigned int *sY,
+                        unsigned int *width,unsigned int *height )
+{
+
+ fprintf(stderr,"\n\getDepthBlobExt [ start(%u,%u) size(%u %u) ]\n\n" , *sX,*sY , *width , *height );
+}
+
 
 int getDepthBlobAverage(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
                         unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,

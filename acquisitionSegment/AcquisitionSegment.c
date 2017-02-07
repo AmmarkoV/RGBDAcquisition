@@ -319,6 +319,17 @@ int segmentGetDepthBlobDimensions(unsigned short * frame , unsigned int frameWid
 
 
 
+int segmentGetPointArea(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int *sX,unsigned int *sY,
+                        unsigned int *width,unsigned int *height )
+{
+
+ fprintf(stderr,"\n\nsegmentGetPointArea [ start(%u,%u) size(%u %u) ]\n\n" , *sX,*sY , *width , *height );
+ getDepthBlobExt(frame,frameWidth,frameHeight,sX,sY,width,height);
+}
+
+
+
 unsigned char * mallocSelectVolume(unsigned short * depthFrame , unsigned int frameWidth , unsigned int frameHeight ,
                                    unsigned int sX,unsigned int sY , float sensitivity )
 {

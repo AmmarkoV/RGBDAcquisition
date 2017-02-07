@@ -3,5 +3,6 @@
 	<Workspace title="Workspace">
 		<Project filename="../3dparty/fast/fast.cbp" />
 		<Project filename="Editor.cbp" />
+		<Project filename="../acquisitionSegment/acquisitionSegment.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

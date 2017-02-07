@@ -855,6 +855,9 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
 
              //This was just used for a test : mallocSelectVolume(depthFrame,width,height,sX,sY,1.0);
              unsigned int nonCenterX,nonCenterY,wantedWidth=300,wantedHeight=200;
+
+             segmentGetPointArea(depthFrame,width,height,&sX,&sY,&wantedWidth,&wantedHeight);
+
              convertCenterCoordinatesToUpperLeft(&nonCenterX,&nonCenterY,sX,sY,&wantedWidth,&wantedHeight,width,height);
              segmentGetDepthBlobDimensions(depthFrame,width,height,nonCenterX,nonCenterY,wantedWidth,wantedHeight,&dimX,&dimY,&dimZ);
              afPointsActive=1;

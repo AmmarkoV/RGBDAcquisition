@@ -288,6 +288,13 @@ int segmentGetDepthBlobDimensions(unsigned short * frame , unsigned int frameWid
                                   float * centerX , float * centerY , float * centerZ);
 
 
+
+
+
+int segmentGetPointArea(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int *sX,unsigned int *sY,unsigned int *width,unsigned int *height );
+
+
 /**
  * @brief  stub , planned functionality for the future
  * @ingroup acquisitionSegment

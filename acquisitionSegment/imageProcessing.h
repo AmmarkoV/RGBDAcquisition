@@ -41,6 +41,10 @@ void crossProductFrom3Points(float * p1 , float * p2  , float * p3  , float * no
 float dotProduct(float * p1 , float * p2 );
 float  signedDistanceFromPlane(float * origin , float * normal , float * pN );
 
+int getDepthBlobExt(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
+                        unsigned int *sX,unsigned int *sY,
+                        unsigned int *width,unsigned int *height );
+
 
 int getDepthBlobAverage(unsigned short * frame , unsigned int frameWidth , unsigned int frameHeight,
                         unsigned int sX,unsigned int sY,unsigned int width,unsigned int height,
