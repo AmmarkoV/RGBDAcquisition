@@ -384,7 +384,7 @@ int WriteCalibration(const char * filename,struct calibration * calib)
 
 int WriteCalibrationROS(const char * filename,struct calibration * calib)
 {
-  if ((filename==0)||(calib==0)) { return 0; }
+  if ((filename==0)||(calib==0)) { fprintf(stderr,"Cannot write calibration\n (Null pointers)\n"); return 0; }
   forceUSLocaleToKeepOurSanity();
 
   FILE * fp = 0;

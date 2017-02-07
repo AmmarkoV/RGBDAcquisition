@@ -38,7 +38,7 @@
 #include "calibration.h"
 
 #include "rgbd_acquisition/SetScale.h"
-
+#include <unistd.h>
 
 
 #define NODE_NAME "rgbd_acquisition"
@@ -161,7 +161,16 @@ bool saveROSCalibrationFile(std_srvs::Empty::Request& request, std_srvs::Empty::
 {
   struct calibration calib;
   acquisitionGetColorCalibration(moduleID,devID,&calib);
-  WriteCalibrationROS("~/calibration.yaml",&calib);
+
+    char cwd[1024];
+   if (getcwd(cwd, sizeof(cwd)) != NULL)
+       fprintf(stdout, "Current working dir: %s\n", cwd);
+   else
+    {   
+      perror("getcwd() error");
+      return true;
+    }
+  WriteCalibrationROS("calibration.yaml",&calib);
   return true;
 }
 
