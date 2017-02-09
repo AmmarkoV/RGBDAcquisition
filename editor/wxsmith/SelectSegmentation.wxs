@@ -459,37 +459,46 @@
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX8" variable="CheckBoxInvertRGB" member="yes">
 			<label>Invert RGB</label>
-			<pos>44,480</pos>
+			<pos>32,480</pos>
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX9" variable="CheckBoxInvertDepth" member="yes">
 			<label>Invert Depth</label>
-			<pos>182,480</pos>
+			<pos>144,480</pos>
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX10" variable="CheckBoxErode" member="yes">
 			<label>Erode</label>
-			<pos>120,456</pos>
+			<pos>104,456</pos>
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX11" variable="CheckBoxDilate" member="yes">
 			<label>Dilate</label>
-			<pos>44,456</pos>
+			<pos>32,456</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT30" variable="StaticText30" member="yes">
 			<label>x</label>
-			<pos>248,456</pos>
+			<pos>232,456</pos>
 		</object>
 		<object class="wxSpinCtrl" name="ID_SPINCTRL19" variable="SpinCtrlKernWidth" member="yes">
 			<value>4</value>
 			<min>1</min>
 			<max>10</max>
-			<pos>192,452</pos>
+			<pos>180,452</pos>
 			<size>48,28</size>
 		</object>
 		<object class="wxSpinCtrl" name="ID_SPINCTRL20" variable="SpinCtrlKernHeight" member="yes">
 			<value>4</value>
 			<min>1</min>
 			<max>10</max>
-			<pos>264,452</pos>
+			<pos>244,452</pos>
 			<size>48,27</size>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL21" variable="SpinCtrlKernThreshold" member="yes">
+			<value>0</value>
+			<pos>314,452</pos>
+			<size>48,27</size>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT31" variable="StaticText31" member="yes">
+			<label>&lt;</label>
+			<pos>296,456</pos>
 		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>

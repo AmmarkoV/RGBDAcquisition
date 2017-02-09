@@ -127,23 +127,11 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
   unsigned int selectedDepthCount=0;
   unsigned char * selectedDepth = selectSegmentationForDepthFrame(Depth , width , height , segConfDepth , calib , &selectedDepthCount);
 
-  if (segConfRGB->erode)
-  {
-   erodeSelection(selectedRGB, width , height, segConfRGB->kernWidth , segConfRGB->kernHeight);
-  }
-  if (segConfRGB->dilate)
-  {
-   dilateSelection(selectedRGB, width , height, segConfRGB->kernWidth , segConfRGB->kernHeight);
-  }
+  if (segConfRGB->erode)    { erodeSelection(selectedRGB, width , height, segConfRGB->kernWidth , segConfRGB->kernHeight , segConfRGB->kernThreshold); }
+  if (segConfRGB->dilate)   { dilateSelection(selectedRGB, width , height, segConfRGB->kernWidth , segConfRGB->kernHeight , segConfRGB->kernThreshold);  }
 
-  if (segConfDepth->erode)
-  {
-   erodeSelection(selectedDepth , width , height, segConfDepth->kernWidth , segConfDepth->kernHeight);
-  }
-  if (segConfDepth->dilate)
-  {
-   dilateSelection(selectedDepth , width , height, segConfDepth->kernWidth , segConfDepth->kernHeight);
-  }
+  if (segConfDepth->erode)  { erodeSelection(selectedDepth , width , height, segConfDepth->kernWidth , segConfDepth->kernHeight , segConfDepth->kernThreshold); }
+  if (segConfDepth->dilate) { dilateSelection(selectedDepth , width , height, segConfDepth->kernWidth , segConfDepth->kernHeight , segConfDepth->kernThreshold); }
 
 
   if (
@@ -237,6 +225,7 @@ int initializeRGBSegmentationConfiguration(struct SegmentationFeaturesRGB * segC
    segConfRGB->erode=0;
    segConfRGB->kernWidth=0;
    segConfRGB->kernHeight=0;
+   segConfRGB->kernThreshold=0;
 
   return 1;
 }
@@ -283,6 +272,7 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
    segConfDepth->erode=0;
    segConfDepth->kernWidth=0;
    segConfDepth->kernHeight=0;
+   segConfDepth->kernThreshold=0;
 
   return 1;
 }

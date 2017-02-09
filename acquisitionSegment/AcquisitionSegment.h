@@ -90,6 +90,7 @@ struct SegmentationFeaturesRGB
    int erode;
    unsigned int kernWidth;
    unsigned int kernHeight;
+   unsigned int kernThreshold;
 };
 
 
@@ -137,6 +138,7 @@ struct SegmentationFeaturesDepth
    int erode;
    int kernWidth;
    int kernHeight;
+   unsigned int kernThreshold;
 };
 
 

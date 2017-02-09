@@ -17,7 +17,7 @@
 
 
 
-int dilateSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight)
+int dilateSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight , unsigned int kernThreshold)
 {
   fprintf(stderr,"Dilate not implemented yet called %ux%u\n",kernWidth,kernHeight);
 
@@ -26,29 +26,68 @@ int dilateSelection(unsigned char * selected , unsigned int width , unsigned int
 
 
 
-int erodeSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight)
+int countUnselectedAtPos (unsigned char * selected, unsigned int width , unsigned int height ,
+                          unsigned char * kernStart , unsigned int kernX, unsigned int kernY ,
+                          unsigned int kernWidth , unsigned int kernHeight )
+{
+  if (height < kernY+kernHeight) { return 0; }
+  if (width  < kernX+kernWidth ) { return 0; }
+
+  unsigned char * selectedPTR = kernStart;
+  unsigned char * selectedLimit     = selectedPTR + kernWidth + (kernHeight*width);
+  unsigned char * selectedLineLimit = kernStart + kernWidth;
+
+  unsigned int holesEncountered=0;
+  while (selectedPTR<selectedLimit)
+   {
+    while (selectedPTR<selectedLineLimit)
+    {
+      holesEncountered+=(*selectedPTR==0);
+      ++selectedPTR;
+    }
+    kernStart+=width;
+    selectedLineLimit+=width;
+    selectedPTR=kernStart;
+   }
+
+ if (holesEncountered!=0)
+ {
+  //fprintf(stderr," %ux%u=%u \n",kernX,kernY,holesEncountered);
+ }
+
+ return holesEncountered;
+}
+
+
+int erodeSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight , unsigned int kernThreshold)
 {
   if (selected==0)      { fprintf(stderr,"Cannot flip non allocated selection\n");         return 0; }
 
   unsigned int numberOfPixels = width*height;
-  fprintf(stderr,"Erode not implemented yet called %ux%u\n",kernWidth,kernHeight);
-
-  fprintf(stderr,"Erode called %ux%u\n",kernWidth,kernHeight);
-
-
-/*
-  if (numberOfPixels>(*selectedCount)) { *selectedCount =  numberOfPixels - (*selectedCount); } else
-                                       { *selectedCount = 0; }
+  fprintf(stderr,"Erode called %ux%u threshold %u \n",kernWidth,kernHeight,kernThreshold);
 
   unsigned char * selectedPTR = selected;
   unsigned char * selectedLimit = selected + numberOfPixels;
 
+  unsigned int kX=0, kY=0;
+
   while (selectedPTR<selectedLimit)
    {
-     *selectedPTR=(*selectedPTR==0);
-     ++selectedPTR;
+    while (kX<width)
+     {
+       *selectedPTR=(
+            countUnselectedAtPos( selected,width,height,
+                                  selectedPTR,kX,kY,
+                                  kernWidth,kernHeight ) < kernThreshold
+          );
+
+      ++kX;
+      ++selectedPTR;
+     }
+    kX=0;
+    ++kY;
    }
-*/
+
  return 1;
 }
 
