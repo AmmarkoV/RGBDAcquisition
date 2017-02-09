@@ -17,12 +17,21 @@
 
 
 
+int dilateSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight)
+{
+  fprintf(stderr,"Dilate not implemented yet called %ux%u\n",kernWidth,kernHeight);
+
+ return 1;
+}
+
+
 
 int erodeSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight)
 {
   if (selected==0)      { fprintf(stderr,"Cannot flip non allocated selection\n");         return 0; }
 
   unsigned int numberOfPixels = width*height;
+  fprintf(stderr,"Erode not implemented yet called %ux%u\n",kernWidth,kernHeight);
 
   fprintf(stderr,"Erode called %ux%u\n",kernWidth,kernHeight);
 

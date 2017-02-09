@@ -10,6 +10,7 @@ extern "C"
 #endif
 
 
+int dilateSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight);
 int erodeSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight);
 
 int invertSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int * selectedCount);

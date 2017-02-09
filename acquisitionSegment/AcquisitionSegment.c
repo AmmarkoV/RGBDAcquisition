@@ -129,14 +129,21 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
 
   if (segConfRGB->erode)
   {
-   erodeSelection(selectedRGB , width , height, segConfRGB->kernWidth , segConfRGB->kernHeight);
+   erodeSelection(selectedRGB, width , height, segConfRGB->kernWidth , segConfRGB->kernHeight);
+  }
+  if (segConfRGB->dilate)
+  {
+   dilateSelection(selectedRGB, width , height, segConfRGB->kernWidth , segConfRGB->kernHeight);
   }
 
   if (segConfDepth->erode)
   {
    erodeSelection(selectedDepth , width , height, segConfDepth->kernWidth , segConfDepth->kernHeight);
   }
-
+  if (segConfDepth->dilate)
+  {
+   dilateSelection(selectedDepth , width , height, segConfDepth->kernWidth , segConfDepth->kernHeight);
+  }
 
 
   if (
