@@ -127,6 +127,17 @@ int   segmentRGBAndDepthFrame (    unsigned char * RGB ,
   unsigned int selectedDepthCount=0;
   unsigned char * selectedDepth = selectSegmentationForDepthFrame(Depth , width , height , segConfDepth , calib , &selectedDepthCount);
 
+  if (segConfRGB->erode)
+  {
+   erodeSelection(selectedRGB , width , height, segConfRGB->kernWidth , segConfRGB->kernHeight);
+  }
+
+  if (segConfDepth->erode)
+  {
+   erodeSelection(selectedDepth , width , height, segConfDepth->kernWidth , segConfDepth->kernHeight);
+  }
+
+
 
   if (
        (selectedDepthCount==width*height) &&
@@ -215,6 +226,11 @@ int initializeRGBSegmentationConfiguration(struct SegmentationFeaturesRGB * segC
 
    segConfRGB->isInitialized=1;
    segConfRGB->invert=0;
+   segConfRGB->dilate=0;
+   segConfRGB->erode=0;
+   segConfRGB->kernWidth=0;
+   segConfRGB->kernHeight=0;
+
   return 1;
 }
 
@@ -256,6 +272,11 @@ int initializeDepthSegmentationConfiguration(struct SegmentationFeaturesDepth* s
 
    segConfDepth->isInitialized=1;
    segConfDepth->invert=0;
+   segConfDepth->dilate=0;
+   segConfDepth->erode=0;
+   segConfDepth->kernWidth=0;
+   segConfDepth->kernHeight=0;
+
   return 1;
 }
 

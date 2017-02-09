@@ -86,6 +86,10 @@ struct SegmentationFeaturesRGB
    //----------------
    int isInitialized;
    int invert;
+   int dilate;
+   int erode;
+   unsigned int kernWidth;
+   unsigned int kernHeight;
 };
 
 
@@ -129,6 +133,10 @@ struct SegmentationFeaturesDepth
    //----------------
    int isInitialized;
    int invert;
+   int dilate;
+   int erode;
+   int kernWidth;
+   int kernHeight;
 };
 
 

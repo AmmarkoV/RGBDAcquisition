@@ -102,6 +102,11 @@ const long SelectSegmentation::ID_STATICTEXT29 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX7 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX8 = wxNewId();
 const long SelectSegmentation::ID_CHECKBOX9 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX10 = wxNewId();
+const long SelectSegmentation::ID_CHECKBOX11 = wxNewId();
+const long SelectSegmentation::ID_STATICTEXT30 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL19 = wxNewId();
+const long SelectSegmentation::ID_SPINCTRL20 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SelectSegmentation,wxDialog)
@@ -117,7 +122,7 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	StaticBox2 = new wxStaticBox(this, ID_STATICBOX2, _("Depth"), wxPoint(376,16), wxSize(328,496), 0, _T("ID_STATICBOX2"));
 	ButtonCancel = new wxButton(this, ID_BUTTON1, _("Cancel"), wxPoint(624,520), wxSize(85,56), 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	ButtonOk = new wxButton(this, ID_BUTTON2, _("Ok"), wxPoint(368,520), wxSize(248,56), 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	StaticBox1 = new wxStaticBox(this, ID_STATICBOX1, _("RGB"), wxPoint(16,16), wxSize(352,400), 0, _T("ID_STATICBOX1"));
+	StaticBox1 = new wxStaticBox(this, ID_STATICBOX1, _("RGB"), wxPoint(16,16), wxSize(352,376), 0, _T("ID_STATICBOX1"));
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Minimum : "), wxPoint(40,66), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	minR = new wxSpinCtrl(this, ID_SPINCTRL1, _T("0"), wxPoint(128,64), wxSize(56,23), 0, 0, 255, 0, _T("ID_SPINCTRL1"));
 	minR->SetValue(_T("0"));
@@ -204,7 +209,7 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	CheckBoxSegmentMovement->SetValue(false);
 	StaticText20 = new wxStaticText(this, ID_STATICTEXT20, _("Movement Threshold"), wxPoint(392,120), wxDefaultSize, 0, _T("ID_STATICTEXT20"));
 	TextCtrlMovementThreshold = new wxTextCtrl(this, ID_TEXTCTRL24, _("100"), wxPoint(552,114), wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL24"));
-	CheckBoxSegmentRGBMovement = new wxCheckBox(this, ID_CHECKBOX4, _("Segment RGB Movement"), wxPoint(40,200), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+	CheckBoxSegmentRGBMovement = new wxCheckBox(this, ID_CHECKBOX4, _("Segment RGB Movement"), wxPoint(24,200), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
 	CheckBoxSegmentRGBMovement->SetValue(false);
 	StaticText21 = new wxStaticText(this, ID_STATICTEXT21, _("Threshold"), wxPoint(40,256), wxDefaultSize, 0, _T("ID_STATICTEXT21"));
 	SpinCtrlMovementR = new wxSpinCtrl(this, ID_SPINCTRL13, _T("10"), wxPoint(120,240), wxSize(56,27), 0, 0, 255, 10, _T("ID_SPINCTRL13"));
@@ -245,6 +250,15 @@ SelectSegmentation::SelectSegmentation(wxWindow* parent,wxWindowID id)
 	CheckBoxInvertRGB->SetValue(false);
 	CheckBoxInvertDepth = new wxCheckBox(this, ID_CHECKBOX9, _("Invert Depth"), wxPoint(182,480), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX9"));
 	CheckBoxInvertDepth->SetValue(false);
+	CheckBoxErode = new wxCheckBox(this, ID_CHECKBOX10, _("Erode"), wxPoint(120,456), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX10"));
+	CheckBoxErode->SetValue(false);
+	CheckBoxDilate = new wxCheckBox(this, ID_CHECKBOX11, _("Dilate"), wxPoint(44,456), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX11"));
+	CheckBoxDilate->SetValue(false);
+	StaticText30 = new wxStaticText(this, ID_STATICTEXT30, _("x"), wxPoint(248,456), wxDefaultSize, 0, _T("ID_STATICTEXT30"));
+	SpinCtrlKernWidth = new wxSpinCtrl(this, ID_SPINCTRL19, _T("4"), wxPoint(192,452), wxSize(48,28), 0, 1, 10, 4, _T("ID_SPINCTRL19"));
+	SpinCtrlKernWidth->SetValue(_T("4"));
+	SpinCtrlKernHeight = new wxSpinCtrl(this, ID_SPINCTRL20, _T("4"), wxPoint(264,452), wxSize(48,27), 0, 1, 10, 4, _T("ID_SPINCTRL20"));
+	SpinCtrlKernHeight->SetValue(_T("4"));
 	FileDialogExport = new wxFileDialog(this, _("Export Segmentation To File"), wxEmptyString, wxEmptyString, _(".txt"), wxFD_DEFAULT_STYLE|wxFD_SAVE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SelectSegmentation::OnButtonCancelClick);
@@ -318,7 +332,7 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
    val.Clear(); val.Printf(wxT("%u"),selectedRGBConf.maxX); cropRGBX2->SetValue(val);
    val.Clear(); val.Printf(wxT("%u"),selectedRGBConf.maxY); cropRGBY2->SetValue(val);
 
-   minR->SetValue( selectedRGBConf.minR );
+   minR->SetValue(selectedRGBConf.minR );
    minG->SetValue(selectedRGBConf.minG);
    minB->SetValue(selectedRGBConf.minB);
    maxR->SetValue(selectedRGBConf.maxR);
@@ -344,6 +358,19 @@ int SelectSegmentation::reloadSegmentationFormFromValues()
 
   CheckBoxInvertDepth->SetValue( (bool) (selectedDepthConf.invert!=0) );
   CheckBoxInvertRGB->SetValue( (bool) (selectedRGBConf.invert!=0) );
+
+  CheckBoxErode->SetValue( (bool) ( (selectedRGBConf.erode!=0)||((selectedDepthConf.erode!=0)) ) );
+  CheckBoxDilate->SetValue( (bool) ( (selectedRGBConf.dilate!=0)||((selectedDepthConf.dilate!=0)) ) );
+
+
+
+   SpinCtrlKernHeight->SetValue(selectedRGBConf.kernHeight);
+   SpinCtrlKernHeight->SetValue(selectedDepthConf.kernHeight);
+
+   SpinCtrlKernWidth->SetValue(selectedRGBConf.kernWidth);
+   SpinCtrlKernWidth->SetValue(selectedDepthConf.kernWidth);
+
+
 
   ChoiceCombination->SetSelection(selectedCombinationMode);
 
@@ -432,10 +459,22 @@ int SelectSegmentation::saveSegmentationValuesFromForm()
   selectedDepthConf.maxDepth = maxDepth->GetValue();
 
   if ( CheckBoxInvertDepth->IsChecked() ) { this->selectedDepthConf.invert=1; } else
-                                            { this->selectedDepthConf.invert=0; }
+                                          { this->selectedDepthConf.invert=0; }
 
   if ( CheckBoxInvertRGB->IsChecked() ) { this->selectedRGBConf.invert=1;  } else
                                           { this->selectedRGBConf.invert=0;  }
+
+
+  if ( CheckBoxErode->IsChecked() )  { this->selectedRGBConf.erode=1;   this->selectedDepthConf.erode=1;  } else
+                                     { this->selectedRGBConf.erode=0;   this->selectedDepthConf.erode=1;  }
+  if ( CheckBoxDilate->IsChecked() ) { this->selectedRGBConf.dilate=1;  this->selectedDepthConf.dilate=1; } else
+                                     { this->selectedRGBConf.dilate=0;  this->selectedDepthConf.dilate=1; }
+
+
+  selectedRGBConf.kernWidth=SpinCtrlKernWidth->GetValue();
+  selectedDepthConf.kernWidth=SpinCtrlKernWidth->GetValue();
+  selectedRGBConf.kernHeight=SpinCtrlKernHeight->GetValue();
+  selectedDepthConf.kernHeight=SpinCtrlKernHeight->GetValue();
 
    if (CheckBoxSegmentMovement->IsChecked())
         {

@@ -10,6 +10,8 @@ extern "C"
 #endif
 
 
+int erodeSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight);
+
 int invertSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int * selectedCount);
 
 int executeSegmentationRGB(unsigned char * RGB , unsigned char * selectedRGB , unsigned int width , unsigned int height ,  struct SegmentationFeaturesRGB * segConf ,unsigned int selectedRGBCount , unsigned int combinationMode);

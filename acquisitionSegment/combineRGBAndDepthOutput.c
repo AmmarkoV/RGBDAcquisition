@@ -14,6 +14,38 @@
  #define unlikely(x)   x
 #endif
 
+
+
+
+
+int erodeSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int kernWidth , unsigned int kernHeight)
+{
+  if (selected==0)      { fprintf(stderr,"Cannot flip non allocated selection\n");         return 0; }
+
+  unsigned int numberOfPixels = width*height;
+
+  fprintf(stderr,"Erode called %ux%u\n",kernWidth,kernHeight);
+
+
+/*
+  if (numberOfPixels>(*selectedCount)) { *selectedCount =  numberOfPixels - (*selectedCount); } else
+                                       { *selectedCount = 0; }
+
+  unsigned char * selectedPTR = selected;
+  unsigned char * selectedLimit = selected + numberOfPixels;
+
+  while (selectedPTR<selectedLimit)
+   {
+     *selectedPTR=(*selectedPTR==0);
+     ++selectedPTR;
+   }
+*/
+ return 1;
+}
+
+
+
+
 int invertSelection(unsigned char * selected , unsigned int width , unsigned int height , unsigned int * selectedCount)
 {
   if (selected==0)      { fprintf(stderr,"Cannot flip non allocated selection\n");         return 0; }

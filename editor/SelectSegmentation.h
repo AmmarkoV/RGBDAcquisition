@@ -65,6 +65,7 @@ class SelectSegmentation: public wxDialog
 		wxSpinCtrl* minB;
 		wxSpinCtrl* minR;
 		wxStaticText* StaticText20;
+		wxCheckBox* CheckBoxErode;
 		wxStaticText* StaticText18;
 		wxChoice* ChoiceCombination;
 		wxTextCtrl* bboxMinZ;
@@ -76,6 +77,7 @@ class SelectSegmentation: public wxDialog
 		wxCheckBox* CheckBoxReplaceColor;
 		wxStaticBox* StaticBox2;
 		wxCheckBox* CheckBoxInvertRGB;
+		wxCheckBox* CheckBoxDilate;
 		wxStaticText* StaticText3;
 		wxSpinCtrl* maxG;
 		wxButton* ButtonCancel;
@@ -97,12 +99,14 @@ class SelectSegmentation: public wxDialog
 		wxStaticText* StaticText7;
 		wxSpinCtrl* maxDepth;
 		wxTextCtrl* planeP2Y;
+		wxSpinCtrl* SpinCtrlKernHeight;
 		wxSpinCtrl* eraseDepth;
 		wxStaticText* StaticText4;
 		wxCheckBox* CheckBoxSegmentRGBMovement;
 		wxSpinCtrl* minDepth;
 		wxCheckBox* CheckBoxSegmentMovement;
 		wxStaticText* StaticText5;
+		wxStaticText* StaticText30;
 		wxTextCtrl* planeNormalSize;
 		wxStaticText* StaticText2;
 		wxStaticText* StaticText27;
@@ -119,6 +123,7 @@ class SelectSegmentation: public wxDialog
 		wxStaticText* StaticText29;
 		wxSpinCtrl* replaceG;
 		wxSpinCtrl* replaceR;
+		wxSpinCtrl* SpinCtrlKernWidth;
 		wxSpinCtrl* SpinCtrlMovementB;
 		wxSpinCtrl* eraseColorR;
 		wxStaticText* StaticText9;
@@ -228,6 +233,11 @@ class SelectSegmentation: public wxDialog
 		static const long ID_CHECKBOX7;
 		static const long ID_CHECKBOX8;
 		static const long ID_CHECKBOX9;
+		static const long ID_CHECKBOX10;
+		static const long ID_CHECKBOX11;
+		static const long ID_STATICTEXT30;
+		static const long ID_SPINCTRL19;
+		static const long ID_SPINCTRL20;
 		//*)
 
 	private:

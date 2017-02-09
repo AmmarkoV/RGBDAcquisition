@@ -22,7 +22,7 @@
 		<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
 			<label>RGB</label>
 			<pos>16,16</pos>
-			<size>352,400</size>
+			<size>352,376</size>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 			<label>Minimum : </label>
@@ -332,7 +332,7 @@
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX4" variable="CheckBoxSegmentRGBMovement" member="yes">
 			<label>Segment RGB Movement</label>
-			<pos>40,200</pos>
+			<pos>24,200</pos>
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT21" variable="StaticText21" member="yes">
 			<label>Threshold</label>
@@ -464,6 +464,32 @@
 		<object class="wxCheckBox" name="ID_CHECKBOX9" variable="CheckBoxInvertDepth" member="yes">
 			<label>Invert Depth</label>
 			<pos>182,480</pos>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX10" variable="CheckBoxErode" member="yes">
+			<label>Erode</label>
+			<pos>120,456</pos>
+		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX11" variable="CheckBoxDilate" member="yes">
+			<label>Dilate</label>
+			<pos>44,456</pos>
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT30" variable="StaticText30" member="yes">
+			<label>x</label>
+			<pos>248,456</pos>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL19" variable="SpinCtrlKernWidth" member="yes">
+			<value>4</value>
+			<min>1</min>
+			<max>10</max>
+			<pos>192,452</pos>
+			<size>48,28</size>
+		</object>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL20" variable="SpinCtrlKernHeight" member="yes">
+			<value>4</value>
+			<min>1</min>
+			<max>10</max>
+			<pos>264,452</pos>
+			<size>48,27</size>
 		</object>
 		<object class="wxFileDialog" variable="FileDialogExport" member="yes">
 			<message>Export Segmentation To File</message>
