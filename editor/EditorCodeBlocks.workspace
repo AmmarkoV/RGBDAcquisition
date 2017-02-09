@@ -2,7 +2,7 @@
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
 		<Project filename="../3dparty/fast/fast.cbp" />
-		<Project filename="Editor.cbp" />
 		<Project filename="../acquisitionSegment/acquisitionSegment.cbp" />
+		<Project filename="Editor.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
