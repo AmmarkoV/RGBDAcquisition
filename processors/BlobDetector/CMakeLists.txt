@@ -1,7 +1,10 @@
 project( BlobDetector ) 
 cmake_minimum_required( VERSION 2.8.7 )   
  
-add_library(BlobDetector SHARED BlobDetector.h BlobDetector.c  ) 
+add_library(BlobDetector SHARED BlobDetector.h BlobDetector.c
+            ../../tools/ImageOperations/imageOps.c
+            ../../tools/ImageOperations/imageOps.h
+           ) 
 target_link_libraries(BlobDetector m rt ) 
  
 
