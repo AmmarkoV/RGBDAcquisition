@@ -18,8 +18,8 @@ typedef struct {
 struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs)
 {
   unsigned short * depthPTR = depth;
-  unsigned short * depthLimit = depth + (width*height*sizeof(unsigned short));
-  unsigned int lineOffset = (width*sizeof(unsigned short));
+  unsigned short * depthLimit = depth + (width*height);
+  unsigned int lineOffset = (width);
   unsigned short * depthLineLimit = depth + lineOffset;
 
   unsigned int x=0;
