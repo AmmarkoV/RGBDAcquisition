@@ -7,6 +7,15 @@ extern "C"
 {
 #endif
 
+struct xyP { float x, y; } ;
+
+struct xyList {
+                 unsigned int maxListLength;
+                 unsigned int listLength;
+                 struct xyP* data;
+                } ;
+
+
 
 int initArgs_BlobDetector(int argc, char *argv[]);
 

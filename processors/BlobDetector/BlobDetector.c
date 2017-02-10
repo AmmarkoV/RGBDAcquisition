@@ -6,23 +6,11 @@
 
 
 
-typedef struct { float x, y; } xy;
-
-typedef struct {
-                 unsigned int listLength;
-                 struct xy* list;
-                } xyList;
-
-
-
 int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , unsigned int height ,
                                  unsigned int x , unsigned int y ,
                                  unsigned int * xSum , unsigned int * ySum ,
                                  unsigned long * depthSum , unsigned int * depthSamples , unsigned int recursionLevel)
 {
-  //fprintf(stderr,"floodEraseAndGetAverageDepth blob @ %ux%u \n" ,x,y );
-
-
   unsigned short * depthVal = depth + x + (width*y) ;
 
   if (*depthVal!=0)
@@ -85,6 +73,10 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
 
 struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs)
 {
+  struct xyList * output = (struct xyList*) malloc(sizeof(struct xyList));
+
+  output->data = (struct xyP*) malloc(maxBlobs * sizeof(struct xyP));
+
   unsigned short * depthPTR = depth;
   unsigned short * depthLimit = depth + (width*height);
   unsigned int lineOffset = (width);
