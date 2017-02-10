@@ -15,6 +15,74 @@ typedef struct {
 
 
 
+int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , unsigned int height ,
+                                 unsigned int x , unsigned int y ,
+                                 unsigned int * xSum , unsigned int * ySum ,
+                                 unsigned long * depthSum , unsigned int * depthSamples , unsigned int recursionLevel)
+{
+  //fprintf(stderr,"floodEraseAndGetAverageDepth blob @ %ux%u \n" ,x,y );
+
+
+  unsigned short * depthVal = depth + x + (width*y) ;
+
+  if (*depthVal!=0)
+  {
+       *depthSum += *depthVal;
+       *depthSamples += 1;
+       *xSum+=x;
+       *ySum+=y;
+
+       *depthVal=0;
+  } else
+  {
+    return 0;
+  }
+
+
+
+  if (x>0)
+  {
+   floodEraseAndGetAverageDepth(depth,width,height,
+                                x-1,y,
+                                xSum,ySum,
+                                depthSum,depthSamples,
+                                recursionLevel+1);
+  }
+  if (y>0)
+  {
+   floodEraseAndGetAverageDepth(depth,width,height,
+                                x,y-1,
+                                xSum,ySum,
+                                depthSum,depthSamples,
+                                recursionLevel+1);
+  }
+
+
+
+  if (x<width-1)
+  {
+   floodEraseAndGetAverageDepth(depth,width,height,
+                                x+1,y,
+                                xSum,ySum,
+                                depthSum,depthSamples,
+                                recursionLevel+1);
+  }
+  if (y<height-1)
+  {
+   floodEraseAndGetAverageDepth(depth,width,height,
+                                x,y+1,
+                                xSum,ySum,
+                                depthSum,depthSamples,
+                                recursionLevel+1);
+  }
+
+ return 1;
+}
+
+
+
+
+
 struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs)
 {
   unsigned short * depthPTR = depth;
@@ -24,6 +92,14 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
 
   unsigned int x=0;
   unsigned int y=0;
+  unsigned int avgX=0;
+  unsigned int avgY=0;
+
+  unsigned long depthSum;
+  unsigned int depthSamples;
+  unsigned int recursionLevel;
+
+  unsigned int blobNumber=0;
 
   while (depthPTR<depthLimit)
   {
@@ -31,7 +107,17 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
      {
       if (*depthPTR>0)
        {
-        fprintf(stderr,"Found blob @ %ux%u \n" ,x,y);
+         depthSum=0;
+         depthSamples=0;
+         recursionLevel=0;
+         avgX=0;
+         avgY=0;
+         floodEraseAndGetAverageDepth(depth , width , height , x , y  , &avgX , &avgY, &depthSum , &depthSamples, recursionLevel);
+         float depthValue = (float) depthSum/depthSamples;
+         float avgXf = avgX/depthSamples;
+         float avgYf = avgY/depthSamples;
+         fprintf(stderr,"Found blob #%u  @ %ux%u    ==>  %0.2f,%0.2f  = %0.2f\n" , blobNumber ,x,y , avgXf, avgYf , depthValue);
+         ++blobNumber;
        }
       ++x;
       ++depthPTR;
@@ -39,9 +125,7 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
     depthLineLimit+=lineOffset;
     ++y;
     x=0;
-
   }
-
 
  return 0;
 }
