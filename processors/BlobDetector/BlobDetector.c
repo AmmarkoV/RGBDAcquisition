@@ -46,15 +46,6 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
   }
 
 
-  if ( (x>0)&&(y>0))
-  {
-   floodEraseAndGetAverageDepth(depth,width,height,
-                                x-1,y-1,
-                                xSum,ySum,
-                                depthSum,depthSamples,
-                                recursionLevel+1);
-  }
-
 
 
   if (x<width-1)
@@ -73,6 +64,31 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
                                 depthSum,depthSamples,
                                 recursionLevel+1);
   }
+
+
+
+
+
+  if ( (x>0)&&(y>0))
+  {
+   floodEraseAndGetAverageDepth(depth,width,height,
+                                x-1,y-1,
+                                xSum,ySum,
+                                depthSum,depthSamples,
+                                recursionLevel+1);
+  }
+
+
+  if ( (x>0)&&(y<height-1))
+  {
+   floodEraseAndGetAverageDepth(depth,width,height,
+                                x-1,y+1,
+                                xSum,ySum,
+                                depthSum,depthSamples,
+                                recursionLevel+1);
+  }
+
+
   if ( (x<width-1)&&(y<height-1))
   {
    floodEraseAndGetAverageDepth(depth,width,height,
@@ -83,6 +99,14 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
   }
 
 
+  if ( (x<width-1)&&(y>0))
+  {
+   floodEraseAndGetAverageDepth(depth,width,height,
+                                x+1,y-1,
+                                xSum,ySum,
+                                depthSum,depthSamples,
+                                recursionLevel+1);
+  }
  return 1;
 }
 
@@ -90,7 +114,7 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
 
 
 
-struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs)
+struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs , unsigned int minBlobSize)
 {
   struct xyList * output = (struct xyList*) malloc(sizeof(struct xyList));
   output->listLength=maxBlobs;
@@ -99,7 +123,7 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
 
   unsigned short * depthPTR = depth;
   unsigned short * depthLimit = depth + (width*height);
-  unsigned int lineOffset = (width);
+  unsigned int lineOffset = width;
   unsigned short * depthLineLimit = depth + lineOffset;
 
   unsigned int x=0;
@@ -125,21 +149,28 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
          avgX=0;
          avgY=0;
          floodEraseAndGetAverageDepth(depth , width , height , x , y  , &avgX , &avgY, &depthSum , &depthSamples, recursionLevel);
-         float depthValue = (float) depthSum/depthSamples;
-         float avgXf = (float) avgX/depthSamples;
-         float avgYf = (float) avgY/depthSamples;
-         //fprintf(stderr,"Frame %u Found blob #%u  @ %ux%u    ==>  %0.2f,%0.2f  = %0.2f\n" , framesProcessed , blobNumber ,x,y , avgXf, avgYf , depthValue);
-         fprintf(stdout,"%u,%u,%0.2f,%0.2f,%0.2f,%u\n" , framesProcessed , blobNumber, avgXf, avgYf , depthValue,depthSamples);
-
-         output->data[blobNumber].x = avgXf;
-         output->data[blobNumber].y = avgYf;
-         output->listLength=blobNumber;
-
-         ++blobNumber;
-         if (maxBlobs<=blobNumber)
+         if (minBlobSize<=depthSamples)
          {
-          fprintf(stderr,"Cannot accomodate more than %u blobs\n",maxBlobs);
-          return output;
+          float depthValue = (float) depthSum/depthSamples;
+          float avgXf = (float) avgX/depthSamples;
+          float avgYf = (float) avgY/depthSamples;
+          //fprintf(stderr,"Frame %u Found blob #%u  @ %ux%u    ==>  %0.2f,%0.2f  = %0.2f\n" , framesProcessed , blobNumber ,x,y , avgXf, avgYf , depthValue);
+          fprintf(stdout,"%u,%u,%0.2f,%0.2f,%0.2f,%u\n" , framesProcessed , blobNumber, avgXf, avgYf , depthValue,depthSamples);
+
+          output->data[blobNumber].x = avgXf;
+          output->data[blobNumber].y = avgYf;
+
+          ++blobNumber;
+          output->listLength=blobNumber;
+          if (maxBlobs<=blobNumber)
+          {
+           fprintf(stderr,"Cannot accomodate more than %u blobs\n",maxBlobs);
+           return output;
+          }
+         } else
+         {
+          fprintf(stderr,"Filtered out blob #%u @ Frame %u  with only %u samples\n" , blobNumber  , framesProcessed , depthSamples );
+
          }
        }
       ++x;
@@ -155,13 +186,13 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
 
 
 
-struct xyList * extractBlobsFromDepthMapNewBuffer(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs)
+struct xyList * extractBlobsFromDepthMapNewBuffer(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs , unsigned int minBlobSize)
 {
   unsigned short * ourcopy = malloc(sizeof(unsigned short) * width * height );
   memcpy(ourcopy,(unsigned short *) depth,sizeof(unsigned short) * width * height  );
 
 
-   struct xyList *  retres = extractBlobsFromDepthMap( (unsigned short *) ourcopy,width,height,128);
+   struct xyList *  retres = extractBlobsFromDepthMap( (unsigned short *) ourcopy,width,height,128,minBlobSize);
 
   free(ourcopy);
 
@@ -205,7 +236,7 @@ int addDataInput_BlobDetector(unsigned int stream , void * data, unsigned int wi
  fprintf(stderr,"addDataInput_BlobDetector %u (%ux%u)\n" , stream , width, height);
  if (stream==1)
  {
-   extractBlobsFromDepthMapNewBuffer( (unsigned short *) data,width,height,128);
+   extractBlobsFromDepthMapNewBuffer( (unsigned short *) data,width,height,128,30);
    ++framesProcessed;
 
   return 1;

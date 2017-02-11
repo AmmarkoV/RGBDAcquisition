@@ -1414,7 +1414,7 @@ void EditorFrame::OnButtonSendDirectCommandClick(wxCommandEvent& event)
 void EditorFrame::DoBlobTracking()
 {
   //std::cerr<<"Doing blob tracking..\n";
-  struct xyList * result = extractBlobsFromDepthMapNewBuffer(depthFrame,width,height,50);
+  struct xyList * result = extractBlobsFromDepthMapNewBuffer(depthFrame,width,height,50 , 70 );
   if (result!=0)
   {
       unsigned int i=0;
