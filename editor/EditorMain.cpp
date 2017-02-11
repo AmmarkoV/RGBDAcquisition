@@ -1413,10 +1413,8 @@ void EditorFrame::OnButtonSendDirectCommandClick(wxCommandEvent& event)
 
 void EditorFrame::DoBlobTracking()
 {
-  std::cerr<<"Doing blob tracking..\n";
-
-  struct xyList * result = extractBlobsFromDepthMap(depthFrame,width,height,30);
-
+  //std::cerr<<"Doing blob tracking..\n";
+  struct xyList * result = extractBlobsFromDepthMapNewBuffer(depthFrame,width,height,50);
   if (result!=0)
   {
       unsigned int i=0;
@@ -1435,7 +1433,8 @@ void EditorFrame::DoBlobTracking()
            ListCtrlPoints->SetItem(tmp, 1, txt);
        }
        ListCtrlPoints->Show();
-
+     free(result->data);
+    free(result);
   }
 }
 

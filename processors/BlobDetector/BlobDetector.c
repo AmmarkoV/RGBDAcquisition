@@ -46,6 +46,16 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
   }
 
 
+  if ( (x>0)&&(y>0))
+  {
+   floodEraseAndGetAverageDepth(depth,width,height,
+                                x-1,y-1,
+                                xSum,ySum,
+                                depthSum,depthSamples,
+                                recursionLevel+1);
+  }
+
+
 
   if (x<width-1)
   {
@@ -63,6 +73,15 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
                                 depthSum,depthSamples,
                                 recursionLevel+1);
   }
+  if ( (x<width-1)&&(y<height-1))
+  {
+   floodEraseAndGetAverageDepth(depth,width,height,
+                                x+1,y+1,
+                                xSum,ySum,
+                                depthSum,depthSamples,
+                                recursionLevel+1);
+  }
+
 
  return 1;
 }
@@ -136,6 +155,18 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
 
 
 
+struct xyList * extractBlobsFromDepthMapNewBuffer(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs)
+{
+  unsigned short * ourcopy = malloc(sizeof(unsigned short) * width * height );
+  memcpy(ourcopy,(unsigned short *) depth,sizeof(unsigned short) * width * height  );
+
+
+   struct xyList *  retres = extractBlobsFromDepthMap( (unsigned short *) ourcopy,width,height,128);
+
+  free(ourcopy);
+
+ return retres;
+}
 
 
 
@@ -174,8 +205,10 @@ int addDataInput_BlobDetector(unsigned int stream , void * data, unsigned int wi
  fprintf(stderr,"addDataInput_BlobDetector %u (%ux%u)\n" , stream , width, height);
  if (stream==1)
  {
-  extractBlobsFromDepthMap( (unsigned short *) data,width,height,30);
-  ++framesProcessed;
+   extractBlobsFromDepthMapNewBuffer( (unsigned short *) data,width,height,128);
+   ++framesProcessed;
+
+  return 1;
  }
  return 0;
 }
