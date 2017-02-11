@@ -24,6 +24,7 @@
 #include "AddNewElement.h"
 
 #include "../processors/ViewpointChange/ViewpointChange.h"
+#include "../processors/BlobDetector/BlobDetector.h"
 
 #define USE_BIRDVIEW_LOGIC 1
 
@@ -67,6 +68,7 @@ unsigned short * segmentedDepth=0;
 unsigned char trR=255,trG=255,trB=255;
 unsigned int shiftX=0,shiftY=0;
 
+unsigned int doBlobsEveryFrame=0;
 
 struct AF_Rectangle
 {
@@ -704,6 +706,7 @@ if  ( whereFrom->GetItemCount() > 0 )
             unsigned int ptX,ptY;
             ptX = getwxListInteger(whereFrom,0,i);
             ptY = getwxListInteger(whereFrom,1,i);
+            fprintf(stderr,"feature %i => %u,%u \n",i,ptX,ptY);
 
             dc.DrawRectangle(x+ptX,y+ptY,3,3);
          }
@@ -934,6 +937,8 @@ int  EditorFrame::refreshAllOverlays()
      retres=1;
     }
 
+  if (doBlobsEveryFrame)
+      { DoBlobTracking(); }
 
    if ( (overlayFramesExist) && ( CheckBoxOverlay->GetValue() ) )
     {
@@ -1403,12 +1408,43 @@ void EditorFrame::OnButtonSendDirectCommandClick(wxCommandEvent& event)
   wxString cmd = TextCtrlDirectCommand->GetValue();
 
   if (cmd.Cmp(wxT("print"))==0) { acquisitionPassKeystroke(overlayModule,overlayDevice,-59); }
+}
 
 
+void EditorFrame::DoBlobTracking()
+{
+  std::cerr<<"Doing blob tracking..\n";
+
+  struct xyList * result = extractBlobsFromDepthMap(depthFrame,width,height,30);
+
+  if (result!=0)
+  {
+      unsigned int i=0;
+
+      ListCtrlPoints->DeleteAllItems();
+
+      ListCtrlPoints->Hide();
+      for (i=0; i<result->listLength; i++)
+       {
+           wxString txt; txt<<wxT("2d");
+           long tmp = ListCtrlPoints->InsertItem(0,txt);
+           fprintf(stderr,"Inserting item %lu \n",tmp);
+            txt.clear(); txt<<(unsigned int) result->data[i].x;
+           ListCtrlPoints->SetItem(tmp, 0, txt);
+            txt.clear(); txt<<(unsigned int) result->data[i].y;
+           ListCtrlPoints->SetItem(tmp, 1, txt);
+       }
+       ListCtrlPoints->Show();
+
+  }
 }
 
 void EditorFrame::OnButtonAFClick(wxCommandEvent& event)
 {
+  DoBlobTracking();
+  doBlobsEveryFrame=1;
+  return ;
+
   unsigned int width , height , channels , bitsperpixel;
   acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
 

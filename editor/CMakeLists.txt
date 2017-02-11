@@ -23,6 +23,7 @@ add_executable(Editor
                AddNewElement.cpp
                Tools.cpp
                Tools.h 
+               ../processors/BlobDetector/BlobDetector.c
               ) 
  
 

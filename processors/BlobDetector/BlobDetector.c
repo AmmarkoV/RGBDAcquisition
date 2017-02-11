@@ -4,7 +4,7 @@
 #include "BlobDetector.h"
 #include "../../tools/ImageOperations/imageOps.h"
 
-
+unsigned int framesProcessed=0;
 
 int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , unsigned int height ,
                                  unsigned int x , unsigned int y ,
@@ -74,6 +74,7 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
 struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs)
 {
   struct xyList * output = (struct xyList*) malloc(sizeof(struct xyList));
+  output->listLength=maxBlobs;
 
   output->data = (struct xyP*) malloc(maxBlobs * sizeof(struct xyP));
 
@@ -106,10 +107,21 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
          avgY=0;
          floodEraseAndGetAverageDepth(depth , width , height , x , y  , &avgX , &avgY, &depthSum , &depthSamples, recursionLevel);
          float depthValue = (float) depthSum/depthSamples;
-         float avgXf = avgX/depthSamples;
-         float avgYf = avgY/depthSamples;
-         fprintf(stderr,"Found blob #%u  @ %ux%u    ==>  %0.2f,%0.2f  = %0.2f\n" , blobNumber ,x,y , avgXf, avgYf , depthValue);
+         float avgXf = (float) avgX/depthSamples;
+         float avgYf = (float) avgY/depthSamples;
+         //fprintf(stderr,"Frame %u Found blob #%u  @ %ux%u    ==>  %0.2f,%0.2f  = %0.2f\n" , framesProcessed , blobNumber ,x,y , avgXf, avgYf , depthValue);
+         fprintf(stdout,"%u,%u,%0.2f,%0.2f,%0.2f,%u\n" , framesProcessed , blobNumber, avgXf, avgYf , depthValue,depthSamples);
+
+         output->data[blobNumber].x = avgXf;
+         output->data[blobNumber].y = avgYf;
+         output->listLength=blobNumber;
+
          ++blobNumber;
+         if (maxBlobs<=blobNumber)
+         {
+          fprintf(stderr,"Cannot accomodate more than %u blobs\n",maxBlobs);
+          return output;
+         }
        }
       ++x;
       ++depthPTR;
@@ -119,7 +131,7 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
     x=0;
   }
 
- return 0;
+ return output;
 }
 
 
@@ -132,6 +144,7 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
 
 int initArgs_BlobDetector(int argc, char *argv[])
 {
+ fprintf(stdout,"Frame,Blob,X,Y,Z,Samples\n");
  return 0;
 
 }
@@ -157,10 +170,12 @@ unsigned char * getDataOutput_BlobDetector(unsigned int stream , unsigned int * 
 
 int addDataInput_BlobDetector(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
+
  fprintf(stderr,"addDataInput_BlobDetector %u (%ux%u)\n" , stream , width, height);
  if (stream==1)
  {
-  extractBlobsFromDepthMap( (unsigned short *) data,width,height,10);
+  extractBlobsFromDepthMap( (unsigned short *) data,width,height,30);
+  ++framesProcessed;
  }
  return 0;
 }

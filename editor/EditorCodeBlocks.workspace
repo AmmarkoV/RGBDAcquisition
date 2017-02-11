@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
+		<Project filename="../processors/BlobDetector/BlobDetector.cbp" />
 		<Project filename="../3dparty/fast/fast.cbp" />
 		<Project filename="../acquisitionSegment/acquisitionSegment.cbp" />
 		<Project filename="Editor.cbp" />

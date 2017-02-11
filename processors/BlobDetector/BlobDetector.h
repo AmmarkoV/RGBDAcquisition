@@ -16,6 +16,7 @@ struct xyList {
                 } ;
 
 
+struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs);
 
 int initArgs_BlobDetector(int argc, char *argv[]);
 

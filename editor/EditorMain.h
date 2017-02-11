@@ -37,6 +37,7 @@ class EditorFrame: public wxFrame
         int stopOverlay();
         int DrawFeaturesAtFeed(wxDC & dc , unsigned int x , unsigned int y, wxListCtrl* whereFrom);
         int DrawAFPoints(wxDC & dc , unsigned int x , unsigned int y );
+        void DoBlobTracking();
 
         void onIdle(wxIdleEvent& evt);
         int doGlobalSeek(long jumpTo);
