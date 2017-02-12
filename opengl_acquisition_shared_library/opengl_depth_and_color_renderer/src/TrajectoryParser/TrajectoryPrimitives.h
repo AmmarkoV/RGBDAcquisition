@@ -1,4 +1,5 @@
- /** @file TrajectoryPrimitives.h
+
+/** @file TrajectoryPrimitives.h
 * @brief A tool that scans for a string in a very fast and robust way
 * @author Ammar Qammaz (AmmarkoV)
 */
@@ -53,6 +54,7 @@ enum {
  TRAJECTORYPRIMITIVES_HAND_POINTS, // 41 
  TRAJECTORYPRIMITIVES_PQ, // 42 
  TRAJECTORYPRIMITIVES_P, // 43 
+ TRAJECTORYPRIMITIVES_TEST, // 44 
  TRAJECTORYPRIMITIVES_END_OF_ITEMS
 };
 

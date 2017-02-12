@@ -3,8 +3,8 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+echo "Refreshing StringRecognizer build"
 gcc main.c fastStringParser.c -o StringRecognizer
-
 
 if [ -e StringRecognizer ]
 then
