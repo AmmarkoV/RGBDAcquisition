@@ -795,7 +795,6 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
                ListCtrlPoints->Hide();
                wxString txt; txt<<wxT("2d");
                long tmp = ListCtrlPoints->InsertItem(0,txt);
-               fprintf(stderr,"Inserting item %lu \n",tmp);
                 //ListCtrlPoints->SetItemData(tmp, i);
                 //ListCtrlPoints->SetItemData(tmp, i);
                txt.clear(); txt<<x;

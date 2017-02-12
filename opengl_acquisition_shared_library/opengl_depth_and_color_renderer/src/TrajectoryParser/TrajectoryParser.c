@@ -29,6 +29,7 @@
 
 #include "../ModelLoader/model_loader.h"
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../tools/AmMatrix/quaternions.h"
 //Using normalizeQuaternionsTJP #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,7 +60,7 @@ float depthMemoryOutputScale=0.1;
 //int (*saveSnapshot) (int,struct calibration *);
 
 
-int writeVirtualStream(struct VirtualStream * newstream,char * filename)
+int writeVirtualStream(struct VirtualStream * newstream,const char * filename)
 {
   if (newstream==0) { fprintf(stderr,"Cannot writeVirtualStream(%s) , virtual stream does not exist\n",filename); return 0; }
   FILE * fp = fopen(filename,"w");
@@ -136,7 +137,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
   if (newstream->debug)
      {
-      fprintf(stderr,"Label %u =>  Line  %s \n",label,line);
+      fprintf(stderr,"Label %u =>  Line  %s / words %u \n",label,line,words_count);
      }
 
 
@@ -191,7 +192,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
              case TRAJECTORYPRIMITIVES_INCLUDE :
               InputParser_GetWord(ipc,1,includeFile,MAX_PATH);
               fprintf(stderr,YELLOW "Including.. %s..!\n" NORMAL,includeFile);
-              if (appendVirtualStreamFromFile(newstream,includeFile))
+              if (appendVirtualStreamFromFile(newstream,modelStorage,includeFile))
               {
                 fprintf(stderr,GREEN "Successfully included file %s..!" NORMAL,includeFile);
               } else
@@ -687,7 +688,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
 
 
-int appendVirtualStreamFromFile(struct VirtualStream * newstream , struct ModelList * modelStorage, char * filename)
+int appendVirtualStreamFromFile(struct VirtualStream * newstream , struct ModelList * modelStorage,const char * filename)
 {
   #warning "Code of readVirtualStream is *quickly* turning to shit after a chain of unplanned insertions on the parser"
   #warning "This should probably be split down to some primitives and also support things like including a file from another file"
@@ -854,7 +855,7 @@ int refreshVirtualStream(struct VirtualStream * newstream,struct ModelList * mod
 
 
 
-struct VirtualStream * createVirtualStream(char * filename , struct ModelList * modelStorage)
+struct VirtualStream * createVirtualStream(const char * filename , struct ModelList * modelStorage)
 {
   //Allocate a virtual stream structure
   struct VirtualStream * newstream = (struct VirtualStream *) malloc(sizeof(struct VirtualStream));

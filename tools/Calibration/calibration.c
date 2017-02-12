@@ -390,7 +390,7 @@ int WriteCalibrationROS(const char * filename,struct calibration * calib)
   FILE * fp = 0;
   fp = fopen(filename,"w");
   if (fp == 0 ) {  return 0; }
-  fprintf( fp, "%YAML:1.0\n");
+  fprintf( fp, "%%YAML:1.0\n");
   fprintf( fp, " \n");
   fprintf( fp, "#-------------------------------------------------------------------------------------------- \n");
   fprintf( fp, "# Camera Parameters. Adjust them! \n");

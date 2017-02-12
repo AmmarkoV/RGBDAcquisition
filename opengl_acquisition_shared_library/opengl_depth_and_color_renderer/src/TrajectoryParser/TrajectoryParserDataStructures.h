@@ -22,10 +22,10 @@ static int dummy_strcasecmp_internal(char * input1, char * input2);
 
 void listAllObjectTypeID(struct VirtualStream * stream);
 
-ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);
+ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, unsigned int * found);
 
 
-ObjectTypeID getObjectTypeID(struct VirtualStream * stream,char * typeName,unsigned int * found);
+ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName,unsigned int * found);
 
 char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID);
 
@@ -134,7 +134,7 @@ int addEventToVirtualStream(
                            );
 
 
-void myStrCpy(char * destination,char * source,unsigned int maxDestinationSize);
+void myStrCpy(char * destination,const char * source,unsigned int maxDestinationSize);
 
 
 #ifdef __cplusplus

@@ -290,7 +290,7 @@ struct VirtualStream
 * @param Name of the object
 * @param Output unsigned int that is set to 1 if we found the object , or 0 if we didn't find the object
 * @retval ObjID if found is 1 can also be 0 ( ObjID 0 is the camera */
-ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found);
+ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, unsigned int * found);
 
 /**
 * @brief Get a String with the model of a typeID
@@ -330,6 +330,8 @@ char * getModelOfObjectID(struct VirtualStream * stream,ObjectIDHandler ObjID);
 int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned int objIDA,unsigned int objIDB);
 
 
+int appendVirtualStreamFromFile(struct VirtualStream * newstream , struct ModelList * modelStorage,const char * filename);
+
 /**
 * @brief Write a VirtualStream to a file  , so state can be loaded on another run/machine etc
 * @ingroup trajectoryParser
@@ -337,7 +339,7 @@ int objectsCollide(struct VirtualStream * newstream,unsigned int atTime,unsigned
 * @param Name of the output file that will hold the text file describing this particular virtual stream
 * @bug The writeVirtualStream function hasn't been updated for a long time and probably no longer reflects the full state of a virtual stream
 * @retval 1=Success , 0=Failure */
-int writeVirtualStream(struct VirtualStream * newstream,char * filename);
+int writeVirtualStream(struct VirtualStream * newstream,const char * filename);
 
 /**
 * @brief Read a VirtualStream from a file
@@ -357,7 +359,7 @@ int readVirtualStream(struct VirtualStream * newstream,struct ModelList * modelS
 * @param Name of the input file that will populate the new virtual stream
 * @param Pointer to a model list that will accomodate the newly loaded models of this virtual stream
 * @retval 0=Failure , anything else is a pointer to a valid struct VirtualStream * stream */
-struct VirtualStream * createVirtualStream(char * filename,struct ModelList * modelStorage);
+struct VirtualStream * createVirtualStream(const char * filename,struct ModelList * modelStorage);
 
 /**
 * @brief Destroy and deallocate a virtual stream

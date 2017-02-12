@@ -183,7 +183,7 @@ void listAllObjectTypeID(struct VirtualStream * stream)
   for (i=0; i<stream->numberOfObjectTypes; i++ ) { fprintf(stderr,"%u - %s => %s \n",i,stream->objectTypes[i].name,stream->objectTypes[i].model); }
 }
 
-ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned int * found)
+ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, unsigned int * found)
 {
   if (found==0) { fprintf(stderr,"Can't get object id without a valid value to return if found\n"); return 0; }
   *found=0;
@@ -220,7 +220,7 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned 
    return 0;
 }
 
-ObjectTypeID getObjectTypeID(struct VirtualStream * stream,char * typeName,unsigned int * found)
+ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName,unsigned int * found)
 {
   if (stream==0) { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",typeName); }
   if (stream->objectTypes==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object type array\n",typeName); }
@@ -955,7 +955,7 @@ int addEventToVirtualStream(
 
 
 
-void myStrCpy(char * destination,char * source,unsigned int maxDestinationSize)
+void myStrCpy(char * destination,const char * source,unsigned int maxDestinationSize)
 {
   unsigned int i=0;
   while ( (i<maxDestinationSize) && (source[i]!=0) ) { destination[i]=source[i]; ++i; }
