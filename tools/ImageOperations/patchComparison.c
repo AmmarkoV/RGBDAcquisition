@@ -15,7 +15,7 @@ unsigned int compareDepthPatches( unsigned short * patchADepth , unsigned int pA
                                   unsigned int patchWidth, unsigned int patchHeight )
 {
   if ( (patchADepth==0)||(patchBDepth==0) ) { return 0; }
-  if ( (patchWidth==0)||(patchWidth==0) ) { return 0; }
+  if ( (patchWidth==0) ||(patchHeight==0) ) { return 0; }
   if ( (pAImageWidth==0)||(pAImageHeight==0) ) { return 0; }
   if ( (pBImageWidth==0)||(pBImageHeight==0) ) { return 0; }
 
@@ -297,7 +297,7 @@ unsigned int colorVariance( unsigned char * pixels , unsigned int imageWidth ,un
   lastG = *pTmp_PTR; ++pTmp_PTR;
   lastB = *pTmp_PTR; ++pTmp_PTR;
 
-  signed int thisScore=0;
+//  signed int thisScore=0;
   unsigned int score=0;
 
   while (pA_PTR < pA_LimitPTR)

@@ -37,5 +37,7 @@ char * loadFileToMem(char * filename,unsigned long * file_length);
 float RGB2OGL(unsigned int colr);
 
 
+int _glhProjectf(float objx, float objy, float objz, float *modelview, float *projection, int *viewport, float *windowCoordinate);
+int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *projection, int *viewport, float *objectCoordinate);
 
 #endif // TOOLS_H_INCLUDED

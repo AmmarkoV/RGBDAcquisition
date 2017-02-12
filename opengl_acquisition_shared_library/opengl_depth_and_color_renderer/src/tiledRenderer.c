@@ -30,28 +30,27 @@ int tiledRenderer_get2DCenter(void * trConf ,
                               unsigned int column, unsigned int row ,
                               float * x2D , float *y2D , float * z2D)
 {
-      GLint viewport[4];
-      GLdouble modelview[16];
-      GLdouble projection[16];
+      int viewport[4];
+      float modelview[16];
+      float projection[16];
+      float win[3]={0};
 
+      glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
+      glGetFloatv( GL_PROJECTION_MATRIX, projection );
+      glGetIntegerv( GL_VIEWPORT, viewport );
 
       float x3D , y3D , z3D , angleX , angleY , angleZ;
       tiledRenderer_get3DCenterForTile(trConf , column, row ,&x3D , &y3D , &z3D , &angleX , &angleY , &angleZ);
-      GLdouble posX = x3D , posY = y3D , posZ = z3D;
-      GLdouble winX, winY, winZ=0.0;
+      float posX = x3D , posY = y3D , posZ = z3D;
 
-      glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-      glGetDoublev( GL_PROJECTION_MATRIX, projection );
-      glGetIntegerv( GL_VIEWPORT, viewport );
-
-      gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
+      _glhProjectf( posX, posY, posZ , modelview, projection, viewport, win);
 
       //fprintf(stderr,"Column/Row %u/%u ( %0.2f,%0.2f,%0.2f ) -> %0.2f %0.2f %0.2f\n",column, x3D , y3D , z3D , row , winX , winY , winZ);
 
       struct tiledRendererConfiguration * trConfPTR = (struct tiledRendererConfiguration *) trConf;
-      *x2D = winX;
-      *y2D = winY;
-      *z2D = winZ;
+      *x2D = win[0];
+      *y2D = win[1];
+      *z2D = win[2];
       return 0;
 }
 

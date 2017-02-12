@@ -157,7 +157,7 @@ static inline void doFilterKernel1ch (
   float * imageEnd = sourceKernelPosition + (sourceWidth*1*kernelHeight);
 
   float * kernelFPTR = kernelStart;
-  float * kernelFPTREnd = kernelStart + (kernelHeight*kernelWidth*1);
+  //float * kernelFPTREnd = kernelStart + (kernelHeight*kernelWidth*1);
 
   float res=0;
   //divisor=1;

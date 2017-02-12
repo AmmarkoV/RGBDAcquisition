@@ -9,6 +9,10 @@
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
 
+//For now only using the fixed pipeline renderer..
+#include "../Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h"
+
+
 #include "model_loader.h"
 #include "model_loader_hardcoded.h"
 #include "model_loader_obj.h"
@@ -16,6 +20,9 @@
 #include "model_loader_transform_joints.h"
 #include "model_editor.h"
 #include "../tools.h"
+
+
+
 
 #define DISABLE_GL_CALL_LIST 0
 #if DISABLE_GL_CALL_LIST
@@ -74,6 +81,7 @@ int growModelList(struct ModelList * modelStorage,unsigned int framesToAdd)
 
 struct ModelList *  allocateModelList(unsigned int initialSpace)
 {
+  fprintf(stderr,"allocateModelList(%u)\n",initialSpace);
   struct ModelList * newModelList = (struct ModelList * ) malloc(sizeof(struct ModelList));
 
   if (newModelList!=0)
@@ -87,8 +95,8 @@ struct ModelList *  allocateModelList(unsigned int initialSpace)
 
     if (newModelList->models!=0)
     {
-      newModelList->MAXNumberOfModels = initialSpace;
       memset(newModelList->models,0,initialSpace * sizeof(struct Model));
+      newModelList->MAXNumberOfModels = initialSpace;
     } else
     {
      fprintf(stderr,RED "ERROR : Failed allocating space for Models to be loaded in \n" NORMAL);
@@ -96,7 +104,7 @@ struct ModelList *  allocateModelList(unsigned int initialSpace)
   } else
   {
      fprintf(stderr,RED "ERROR : Failed allocating space for Model List to be loaded in \n" NORMAL);
-   }
+  }
   return newModelList;
 }
 
@@ -124,6 +132,7 @@ int deallocateModelList(struct ModelList* modelStorage)
 int printModelList(struct ModelList* modelStorage)
 {
   fprintf(stderr,"Model List ___________________________________________\n");
+  fprintf(stderr,"%u/%u full ___________________________________________\n" , modelStorage->currentNumberOfModels , modelStorage->MAXNumberOfModels);
   unsigned int i=0;
   for (i=0; i<modelStorage->currentNumberOfModels; i++)
   {
@@ -145,43 +154,42 @@ int modelHasASkinTransformation(struct Model * model,float* joints)
 
 unsigned int updateModelPosition(struct Model * model,float * position)
 {
-     // return 0;
-
       if (model==0) { return 0; }
       if (position==0) { return 0; }
 
-      GLint viewport[4];
-      GLdouble modelview[16];
-      GLdouble projection[16];
+      int viewport[4];
+      float modelview[16];
+      float projection[16];
 
-      GLdouble winX, winY, winZ=0.0;
+      //float winX, winY, winZ=0.0;
+      float win[3]={0};
+
 
       #warning "It is inneficient to query all the tables for each position update..!"
       //fprintf(stderr,"This should not work it should only be called when the draw operation is ready , otherwise the matrices received here are irrelevant\n");
-      glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-      glGetDoublev( GL_PROJECTION_MATRIX, projection );
+      glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
+      glGetFloatv( GL_PROJECTION_MATRIX, projection );
       glGetIntegerv( GL_VIEWPORT, viewport );
 
-      GLdouble posX=0.0,posY=0.0,posZ=0.0;
 
     if (model->type==OBJ_MODEL)
      {
-      GLdouble posX=position[0],posY=position[1],posZ=position[2];
+      float posX=position[0],posY=position[1],posZ=position[2];
       struct OBJ_Model * modelOBJ = (struct OBJ_Model *) model->modelInternalData;
 
       posX=position[0] - modelOBJ->boundBox.min.x;
       posY=position[1] - modelOBJ->boundBox.min.y;
       posZ=position[2] - modelOBJ->boundBox.min.z;
-      gluProject( posX * model->scaleX , posY* model->scaleY , posZ * model->scaleZ , modelview, projection, viewport, &winX, &winY, &winZ);
-      model->bbox2D[0]=winX;
-      model->bbox2D[1]=winY;
+      _glhUnProjectf( posX * model->scaleX , posY* model->scaleY , posZ * model->scaleZ , modelview, projection, viewport, win); //gluProject
+      model->bbox2D[0]=win[0];
+      model->bbox2D[1]=win[1];
 
       posX=position[0] + modelOBJ->boundBox.max.x;
       posY=position[1] + modelOBJ->boundBox.max.y;
       posZ=position[2] + modelOBJ->boundBox.max.z;
-      gluProject( posX* model->scaleX , posY* model->scaleY , posZ * model->scaleZ , modelview, projection, viewport, &winX, &winY, &winZ);
-      model->bbox2D[2]=winX;
-      model->bbox2D[3]=winY;
+      _glhUnProjectf( posX* model->scaleX , posY* model->scaleY , posZ * model->scaleZ , modelview, projection, viewport, win); //gluProject
+      model->bbox2D[2]=win[0];
+      model->bbox2D[3]=win[1];
 
       return 1;
      }
@@ -190,10 +198,17 @@ unsigned int updateModelPosition(struct Model * model,float * position)
 }
 
 
-unsigned int findModel(struct ModelList * modelStorage , char * directory,char * modelname ,int * found )
+unsigned int findModel(struct ModelList * modelStorage ,const char * directory,const char * modelname ,int * found  )
 {
-  if (modelStorage==0)         { fprintf(stderr,"Error cannot find model in empty modelStorage \n"); return 0; }
-  if (modelStorage->models==0) { fprintf(stderr,"Error cannot find allocated space for models..\n"); return 0; }
+  if (modelStorage==0)                    { fprintf(stderr,RED "Error cannot find model in empty modelStorage \n" NORMAL);              return 0; }
+  if (modelStorage->models==0)            { fprintf(stderr,RED "Error cannot find allocated space for models..\n" NORMAL);              return 0; }
+  if (modelStorage->MAXNumberOfModels==0) { fprintf(stderr,RED "Do not need to search for model in unallocated model list..\n" NORMAL); return 0; }
+
+  if (modelStorage->MAXNumberOfModels <= modelStorage->currentNumberOfModels)
+  {
+    fprintf(stderr,RED "ERROR : we have loaded more than max possible models ? %u/%u models.. \n" NORMAL,modelStorage->currentNumberOfModels , modelStorage->MAXNumberOfModels);
+    return 0;
+  }
 
   fprintf(stderr,"find model called will search among %u models.. \n",modelStorage->currentNumberOfModels);
 
@@ -230,6 +245,12 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
   if ( (directory==0) || (modelname==0) )
   {
     fprintf(stderr,RED "loadModel failing , no modelname given \n" NORMAL );
+    return 0;
+  }
+
+  if (modelStorage->MAXNumberOfModels <= whereToLoadModel)
+  {
+    fprintf(stderr,RED "Cannot load model in slot %u/%u \n" NORMAL , whereToLoadModel, modelStorage->MAXNumberOfModels);
     return 0;
   }
 
@@ -349,11 +370,11 @@ void unloadModel(struct Model * mod)
 
 int loadModelToModelList(struct ModelList* modelStorage,const char * modelDirectory,const char * modelName , const char * modelExtension , unsigned int * whereModelWasLoaded)
 {
-  fprintf(stderr,"loadModelToModelList called (dir %s , name %s , ext %s ) .. \n",modelDirectory,modelName,modelExtension);
-  if (modelStorage==0) { return 0; }
+  if (modelStorage==0) { fprintf(stderr,"cannot loadModelToModelList without an allocated model list..\n"); return 0; }
+  fprintf(stderr,"loadModelToModelList called (dir %s , name %s , ext %s )  , %u/%u .. \n",modelDirectory,modelName,modelExtension , modelStorage->currentNumberOfModels , modelStorage->MAXNumberOfModels );
 
   int foundAlreadyExistingModel=0;
-  unsigned int modelLocation = findModel(modelStorage->models,modelDirectory,modelName, &foundAlreadyExistingModel);
+  unsigned int modelLocation = findModel(modelStorage,modelDirectory,modelName, &foundAlreadyExistingModel);
  // fprintf(stderr,"findModel survived .. \n");
 
   if (!foundAlreadyExistingModel)

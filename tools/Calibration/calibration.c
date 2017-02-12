@@ -521,7 +521,12 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
   return 0;
 }
 
-int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int x2d , unsigned int y2d  , unsigned short depthValue , float * x , float * y , float * z)
+
+
+
+
+
+int transform2DFProjectedPointTo3DPoint(struct calibration * calib , float x2d , float y2d  , unsigned short depthValue , float * x , float * y , float * z)
 {
     *x=x2d;
     *y=y2d;
@@ -550,6 +555,15 @@ int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int
      return 1;
     }
 
+}
+
+
+
+int transform2DProjectedPointTo3DPoint(struct calibration * calib , unsigned int x2d , unsigned int y2d  , unsigned short depthValue , float * x , float * y , float * z)
+{
+ float x2dF=(float) x2d;
+ float y2dF=(float) y2d;
+ return transform2DFProjectedPointTo3DPoint(calib,x2dF,y2dF,depthValue,x,y,z);
 }
 
 

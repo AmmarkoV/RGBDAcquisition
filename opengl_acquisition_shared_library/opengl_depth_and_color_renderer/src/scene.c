@@ -615,26 +615,26 @@ int getModelAtScreenCoordinates(unsigned int x , unsigned int y)
 
 int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
 {
-      GLint viewport[4];
-      GLdouble modelview[16];
-      GLdouble projection[16];
+      int viewport[4];
+      float modelview[16];
+      float projection[16];
 
-      GLdouble posX = x3D , posY = y3D , posZ = z3D;
-      GLdouble winX, winY, winZ=0.0;
+      float posX = x3D , posY = y3D , posZ = z3D;
+      float win[3]={0};
 
-      glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-      glGetDoublev( GL_PROJECTION_MATRIX, projection );
+      glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
+      glGetFloatv( GL_PROJECTION_MATRIX, projection );
       glGetIntegerv( GL_VIEWPORT, viewport );
 
       #warning "All the functions that use gluProject / unproject should be moved in a seperate compartment"
-      gluProject( posX, posY, posZ , modelview, projection, viewport, &winX, &winY, &winZ);
+      _glhProjectf( posX, posY, posZ , modelview, projection, viewport, win );
 
       if  (
-            (winX < 0) || (winX >= WIDTH) ||
-            (winY < 0) || (winY >= HEIGHT)
+            (win[0] < 0) || (win[0] >= WIDTH) ||
+            (win[1] < 0) || (win[1] >= HEIGHT)
           )
       {
-         fprintf(stderr,"Warn : Object %u offscreen ( %0.2f , %0.2f , %0.2f ) will end up at %0.2f,%0.2f(%0.2f)\n" , objID , x3D , y3D , z3D , winX,winY , winZ);
+         fprintf(stderr,"Warn : Object %u offscreen ( %0.2f , %0.2f , %0.2f ) will end up at %0.2f,%0.2f(%0.2f)\n" , objID , x3D , y3D , z3D , win[0],win[1],win[2]);
       }
   return 1;
 }

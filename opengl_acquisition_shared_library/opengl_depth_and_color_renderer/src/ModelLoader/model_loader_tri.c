@@ -419,6 +419,8 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
         unsigned int itemSize=0 , count=0;
 
         n = fread(&triModel->header , sizeof(struct TRI_Header), 1 , fd);
+        if (n!= sizeof(struct TRI_Header)) { fprintf(stderr,"Incomplete read of TRI Header\n"); }
+
         if (triModel->header.floatSize!=sizeof(float))        { fprintf(stderr,"Size of float (%u/%lu) is different , cannot load \n",triModel->header.floatSize,sizeof(float)); return 0; }
         if (triModel->header.triType != TRI_LOADER_VERSION )
             {//TRI_LOADER_VERSION changes can lead to bugs let's have a HUGE warning message
@@ -439,6 +441,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
              fprintf(stderr," ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n");
              fprintf(stderr," ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n" NORMAL);
 
+             fclose(fd);
              return 0;
             }
 
@@ -446,6 +449,8 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
         //Write file name for internal usage..
         triModel->name = ( char * ) malloc ( sizeof(char) * (triModel->header.nameSize+1) );
         n = fread(triModel->name  , sizeof(char) , triModel->header.nameSize , fd);
+        if (n!=sizeof(char) *triModel->header.nameSize) { fprintf(stderr,"Incomplete read of header name field\n"); }
+
         triModel->name[triModel->header.nameSize]=0;
         fprintf(stderr,"Internal name is -> %s \n",triModel->name);
 
@@ -456,6 +461,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of vertex\n", itemSize * count );
          triModel->vertices = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->vertices , itemSize , count , fd);
+         if (n!=itemSize*count) { fprintf(stderr,"Incomplete read of vertices\n"); }
         } else {  fprintf(stderr,"No vertices specified \n"); }
 
         if (triModel->header.numberOfNormals)
@@ -464,6 +470,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of normal\n", itemSize * count );
          triModel->normal = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->normal , itemSize , count , fd);
+         if (n!=itemSize*count) { fprintf(stderr,"Incomplete read of normals\n"); }
         } else {  fprintf(stderr,"No normals specified \n"); }
 
 
@@ -473,6 +480,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of textures\n",itemSize * count);
          triModel->textureCoords = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->textureCoords , itemSize , count , fd);
+         if (n!=itemSize*count) { fprintf(stderr,"Incomplete read of textures\n"); }
         }  else {  fprintf(stderr,"No texture coords specified \n"); }
 
         if (triModel->header.numberOfColors)
@@ -481,6 +489,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of colors\n",itemSize * count);
          triModel->colors = ( float * ) malloc ( itemSize * count );
          n = fread(triModel->colors ,  itemSize , count , fd);
+         if (n!=itemSize*count) { fprintf(stderr,"Incomplete read of colors\n"); }
         } else {  fprintf(stderr,"No colors specified \n"); }
 
         if (triModel->header.numberOfIndices)
@@ -489,6 +498,8 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
          fprintf(stderr,"Reading %u bytes of indices\n",itemSize * count);
          triModel->indices = ( unsigned int * ) malloc ( itemSize * count );
          n = fread(triModel->indices , itemSize , count , fd);
+         if (n!=itemSize*count) { fprintf(stderr,"Incomplete read of indices\n"); }
+
         } else {  fprintf(stderr,"No indices specified \n"); }
 
         if (triModel->header.numberOfBones)
@@ -508,6 +519,7 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
           triModel->bones[boneNum].info = (struct TRI_Bones_Header*) malloc(sizeof(struct TRI_Bones_Header));
           memset( triModel->bones[boneNum].info , 0 , sizeof(struct TRI_Bones_Header) );
           n = fread(triModel->bones[boneNum].info , sizeof(struct TRI_Bones_Header), 1 , fd);
+          if (n!=itemSize*count) { fprintf(stderr,"Incomplete read of bone header\n"); }
 
           //Check value
           //fprintf(stderr,"Bone %u \n",boneNum);
@@ -518,19 +530,22 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
           triModel->bones[boneNum].boneName = ( char * ) malloc ( (itemSize+2)*count );
           memset( triModel->bones[boneNum].boneName , 0 , (itemSize+2)*count );
           n = fread(triModel->bones[boneNum].boneName , itemSize , count , fd);
+          if (n!=itemSize*count) { fprintf(stderr,"Incomplete read of bone names\n"); }
+
 
           //Allocate enough space for the weight values , and read them
           itemSize = sizeof(float);        count = triModel->bones[boneNum].info->boneWeightsNumber;
           triModel->bones[boneNum].weightValue = ( float * ) malloc ( itemSize * count );
           memset( triModel->bones[boneNum].weightValue , 0 , itemSize * count );
           n = fread(triModel->bones[boneNum].weightValue , itemSize , count , fd);
+          if (n!=itemSize*count) { fprintf(stderr,"Incomplete read of bone weight values\n"); }
 
           //Allocate enough space for the weight indexes , and read them
           itemSize = sizeof(unsigned int); count = triModel->bones[boneNum].info->boneWeightsNumber;
           triModel->bones[boneNum].weightIndex = ( unsigned int * ) malloc ( itemSize * count );
           memset( triModel->bones[boneNum].weightIndex , 0 , itemSize * count );
           n = fread(triModel->bones[boneNum].weightIndex , itemSize , count , fd);
-
+          if (n!=itemSize*count) { fprintf(stderr,"Incomplete read of bone weight indices\n"); }
 
 
           if (triModel->bones[boneNum].info->numberOfBoneChildren == 0 )

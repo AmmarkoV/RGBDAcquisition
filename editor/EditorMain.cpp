@@ -1414,19 +1414,29 @@ void EditorFrame::OnButtonSendDirectCommandClick(wxCommandEvent& event)
 void EditorFrame::DoBlobTracking()
 {
   //std::cerr<<"Doing blob tracking..\n";
-  struct xyList * result = extractBlobsFromDepthMapNewBuffer(depthFrame,width,height,50 , 70 );
+  struct xyList * result = extractBlobsFromDepthMapNewBuffer(depthFrame,width,height, 40  , 170 );
   if (result!=0)
   {
       unsigned int i=0;
 
+      float xC , yC , zC;
+
       ListCtrlPoints->DeleteAllItems();
 
       ListCtrlPoints->Hide();
+      fprintf(stdout,"blob,frame,id,x,y,z\n",result->data[i].x, result->data[i].y, result->data[i].z);
       for (i=0; i<result->listLength; i++)
        {
+           transform2DFProjectedPointTo3DPoint(&calib,
+                                               result->data[i].x,
+                                               result->data[i].y,
+                                               result->data[i].z,
+                                               &xC,&yC,&zC);
+
+           fprintf(stdout,"blob,%u,%u,%0.2f,%0.2f,%0.2f\n",framesSnapped,i,result->data[i].x, result->data[i].y, result->data[i].z);
+
            wxString txt; txt<<wxT("2d");
            long tmp = ListCtrlPoints->InsertItem(0,txt);
-           fprintf(stderr,"Inserting item %lu \n",tmp);
             txt.clear(); txt<<(unsigned int) result->data[i].x;
            ListCtrlPoints->SetItem(tmp, 0, txt);
             txt.clear(); txt<<(unsigned int) result->data[i].y;

@@ -1,5 +1,7 @@
 #include "model_converter.h"
 
+#include <stdlib.h>
+
 
 int convertObjToTri(struct TRI_Model * tri , struct OBJ_Model * obj)
 {

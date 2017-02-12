@@ -213,7 +213,7 @@ int saveRawImageToFile(char * filename,char *comments ,unsigned char * pixels , 
 
 
 
-        fprintf(fd, "%d %d\n%u\n", width, height , simplePowInline(2 ,bitsperpixel)-1);
+        fprintf(fd, "%u %u\n%u\n", width, height , simplePowInline(2 ,bitsperpixel)-1);
 
         float tmp_n = (float) bitsperpixel/ 8;
         tmp_n = tmp_n * width * height * channels ;
@@ -701,12 +701,15 @@ int printOutHistogram(char * filename, unsigned int * RHistogram_1 , unsigned in
   char command[1024]={0};
   sprintf(command,"gnuplot -e 'set terminal png; set output \"RED%s.png\"; set title \"3D random points\"; plot \"RED%s\" with lines'",filename,filename);
   i=system(command);
+  if (i!=0) { fprintf(stderr,"Error running gnuplot \n"); }
 
   sprintf(command,"gnuplot -e 'set terminal png; set output \"GREEN%s.png\"; set title \"3D random points\"; plot \"GREEN%s\" with lines'",filename,filename);
   i=system(command);
+  if (i!=0) { fprintf(stderr,"Error running gnuplot \n"); }
 
   sprintf(command,"gnuplot -e 'set terminal png; set output \"BLUE%s.png\"; set title \"3D random points\"; plot \"BLUE%s\" with lines'",filename,filename);
   i=system(command);
+  if (i!=0) { fprintf(stderr,"Error running gnuplot \n"); }
  return 1;
 }
 

@@ -14,7 +14,7 @@ float * allocateGaussianKernel(unsigned int dimension,float sigma , int normaliz
  float * gKPTR;
 
   float sum = 0;
-  float tmp , w = 0 ;
+  float tmp;// , w = 0 ;
   unsigned int x0 = (unsigned int) dimension/2,y0 = (unsigned int) dimension/2;
   unsigned int x,y;
   float sigmaSquared = sigma * sigma;
@@ -98,7 +98,7 @@ int contrast(struct Image * img,float scaleValue)
  if (img->channels!=3) { fprintf(stderr,"Function contrast assumes 3byte array\n"); return 0; }
 
  BYTE * input_frame = img->pixels;
- unsigned int col_med;
+ //unsigned int col_med;
  unsigned int image_size= img->width * img->height * img->channels * (img->bitsperpixel/8);
 
  register BYTE *out_px = (BYTE *) input_frame;

@@ -52,6 +52,7 @@ M///////////////////////////////////////////////////////////////////////////////
 #define MAX(a,b)            ( (a)<(b) ? b:a )
 
 
+
 int icvSort( double *array, int length )
 {
  int i, j, index;

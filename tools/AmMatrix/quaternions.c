@@ -61,7 +61,7 @@ void handleQuaternionPackConvention(double qX,double qY,double qZ,double qW , do
         break;
 
     default :
-        fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
+        fprintf(stderr,"Unhandled quaternion order given (%d) \n",quaternionConvention);
         break;
     }
 }
@@ -84,7 +84,7 @@ void handleQuaternionUnpackConvention(double * packedQuaternionInput,double *qXO
         break;
 
     default :
-        fprintf(stderr,"Unhandled quaternion order given (%u) \n",quaternionConvention);
+        fprintf(stderr,"Unhandled quaternion order given (%d) \n",quaternionConvention);
         break;
     }
 }

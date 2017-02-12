@@ -401,7 +401,7 @@ int normalize2DPointVector(double * vec)
 
   vec[0]=vec[0]/vec[2];
   vec[1]=vec[1]/vec[2];
-  vec[2]=vec[2]/vec[2];
+  vec[2]=1.0; //vec[2]/vec[2];
 
   return 1;
 }

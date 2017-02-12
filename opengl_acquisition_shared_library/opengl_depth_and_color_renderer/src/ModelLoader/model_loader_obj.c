@@ -1056,7 +1056,7 @@ void  drawOBJMesh(struct OBJ_Model * obj)
 {
         glPushAttrib(GL_ALL_ATTRIB_BITS); //We dont want the attributes we use here to poison the rest of the drawing
         if (obj == 0 ) { fprintf(stderr,"drawOBJMesh called with unloaded object \n"); return; }
-        long unsigned int i,j;
+        long unsigned int i;
 
         glDisable(GL_CULL_FACE);
 
@@ -1279,7 +1279,7 @@ int compileOBJList(struct OBJ_Model * obj)
 	*/
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
-	long unsigned int i,j;
+	long unsigned int i;
 
 	//generate an empty display list, and save its id in dispList
 	obj->dispList=glGenLists(1);
@@ -1370,7 +1370,7 @@ int unloadObj(struct OBJ_Model * obj)
 
 
 
-struct OBJ_Model * loadObj(char * directory,char * filename /*This does not have a .obj extension*/,int compileDisplayList)
+struct OBJ_Model * loadObj(const char * directory,const char * filename /*This does not have a .obj extension*/,int compileDisplayList)
 {
     fprintf(stderr,"Starting to load  OBJ file %s \n",filename);
     struct OBJ_Model * obj = ( struct OBJ_Model * ) malloc(sizeof(struct OBJ_Model));

@@ -62,7 +62,7 @@ float pointIsInsideCylinder( float * pt1, float * pt2, float lengthsq, float rad
 {
 	float dx, dy, dz;	// vector d  from line segment point 1 to point 2
 	float pdx, pdy, pdz;	// vector pd from point 1 to test point
-	float dot, dsq;
+	float dot;
 
 	dx = pt2[0] - pt1[0];	// translate so pt1 is origin.  Make vector from
 	dy = pt2[1] - pt1[1];     // pt1 to pt2.  Need for this is easily eliminated
@@ -100,6 +100,7 @@ float pointIsInsideCylinder( float * pt1, float * pt2, float lengthsq, float rad
 
 		// distance squared to the cylinder axis:
 
+		float dsq;
 		dsq = (pdx*pdx + pdy*pdy + pdz*pdz) - dot*dot/lengthsq;
 
 		if( dsq > radius_sq )
@@ -124,19 +125,21 @@ int slerp2RotTransMatrices4x4(double * result4, double * a4, double * b4 , float
   if (step>1.0) { step=1.0; } else
   if (step<0.0) { step=0.0; }
 
+  int conventionToUseInternally = 0;
+
   double qA[4];
-  matrix4x42Quaternion(qA, 0 , a4);
+  matrix4x42Quaternion(qA, conventionToUseInternally , a4);
 
   double qB[4];
-  matrix4x42Quaternion(qB, 0 , b4);
+  matrix4x42Quaternion(qB, conventionToUseInternally , b4);
 
   double qOut[4];
   quaternionSlerp( qOut, qA , qB, step);
-  quaternion2Matrix4x4(result4 , qOut , 0 );
+  quaternion2Matrix4x4(result4 , qOut , conventionToUseInternally );
 
-  result4[3]  = (qB[3]-qA[3]) * step;
-  result4[7]  = (qB[7]-qA[7]) * step;
-  result4[11] = (qB[11]-qA[11]) * step;
+  result4[3]  = (b4[3]-a4[3]) * step;
+  result4[7]  = (b4[7]-a4[7]) * step;
+  result4[11] = (b4[11]-a4[11]) * step;
  return 1;
 }
 
@@ -544,8 +547,6 @@ void lookAt(
 	         float upx, float upy, float upz
 	        )
 {
-
-   float m[16];
    float x[3], y[3], z[3];
    float mag;
 
@@ -609,8 +610,9 @@ void lookAt(
    /* Translate Eye to Origin */
    //glTranslatef(-eyex, -eyey, -eyez);
    float translation[16];
-   create4x4TranslationMatrix(translation , -eyex, -eyey, -eyez );
+   create4x4FTranslationMatrix(translation , -eyex, -eyey, -eyez );
    multiplyTwo4x4FMatrices(matrix , initial , translation);
+
 }
 
 

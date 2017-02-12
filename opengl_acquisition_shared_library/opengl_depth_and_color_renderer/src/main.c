@@ -585,11 +585,11 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
 
 
   unsigned int i=0;
-  unsigned int ticks;
+ // unsigned int ticks;
   float posStackA[7]={0};
   float posStackB[7]={0};
   float scaleX=1.0,scaleY=1.0,scaleZ=1.0;
-  float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
+  //float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
 
 
 

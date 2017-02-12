@@ -107,6 +107,12 @@ void convert4x4MatrixToRPY(double *m ,double *roll,double *pitch,double *yaw);
 */
 void create4x4RotationMatrix(double * m,double angle, double x, double y, double z) ;
 
+
+
+
+void create4x4FTranslationMatrix(float * matrix , float x, float y, float z);
+
+
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous 3D Translation
 * @ingroup AmMatrix

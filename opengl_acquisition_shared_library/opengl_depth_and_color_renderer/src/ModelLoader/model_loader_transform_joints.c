@@ -244,7 +244,7 @@ struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TR
   out->numberOfBones = in->header.numberOfBones;
   out->numberOfVertices = in->header.numberOfVertices;
   out->bonesPerVertex = (struct TRI_Bones_Per_Vertex_Vertice_Item *)   malloc(sizeof(struct TRI_Bones_Per_Vertex_Vertice_Item) *  in->header.numberOfVertices);
-  if (out->bonesPerVertex==0) { return 0; }
+  if (out->bonesPerVertex==0) { free(out); return 0; }
 
   memset(out->bonesPerVertex,0,sizeof(struct TRI_Bones_Per_Vertex_Vertice_Item) *  in->header.numberOfVertices);
 
@@ -359,10 +359,10 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
    }
 
 
-   free(outputNumberSamples);
    freeTransformTRIBonesToVertexBoneFormat(bpv);
   }
 
+ free(outputNumberSamples);
  return outputJoints;
 }
 

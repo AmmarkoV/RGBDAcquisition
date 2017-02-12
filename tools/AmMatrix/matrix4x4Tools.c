@@ -342,6 +342,13 @@ void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double
 }
 
 
+void create4x4FTranslationMatrix(float * matrix , float x, float y, float z)
+{
+    create4x4IdentityFMatrix(matrix);
+    // Translate slots.
+    matrix[3] = x; matrix[7] = y; matrix[11] = z;
+}
+
 
 
 void create4x4TranslationMatrix(double * matrix , double x, double y, double z)

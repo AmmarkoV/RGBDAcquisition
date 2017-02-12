@@ -7,7 +7,7 @@ extern "C"
 {
 #endif
 
-struct xyP { float x, y; } ;
+struct xyP { float x, y , z; } ;
 
 struct xyList {
                  unsigned int maxListLength;

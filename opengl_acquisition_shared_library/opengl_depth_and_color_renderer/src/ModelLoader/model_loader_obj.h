@@ -172,7 +172,9 @@ int saveOBJ(struct OBJ_Model * obj , char * filename);
 * @param Compile the object to an OpenGL DisplayList
 * @retval 0=Failure , A pointer to an object model
 */
-struct OBJ_Model * loadObj(char * directory,char * filename,int compileDisplayList);
+struct OBJ_Model * loadObj(const char * directory,
+                           const char * filename,
+                           int compileDisplayList);
 
 
 /**

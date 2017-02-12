@@ -107,6 +107,9 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
                                 depthSum,depthSamples,
                                 recursionLevel+1);
   }
+
+
+
  return 1;
 }
 
@@ -117,7 +120,8 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
 struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int width , unsigned int height , unsigned int maxBlobs , unsigned int minBlobSize)
 {
   struct xyList * output = (struct xyList*) malloc(sizeof(struct xyList));
-  output->listLength=maxBlobs;
+  output->maxListLength=maxBlobs;
+  output->listLength=0;
 
   output->data = (struct xyP*) malloc(maxBlobs * sizeof(struct xyP));
 
@@ -141,7 +145,9 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
   {
     while (depthPTR<depthLineLimit)
      {
-      if (*depthPTR>0)
+      if (*depthPTR==0)
+       {
+       } else
        {
          depthSum=0;
          depthSamples=0;
@@ -159,6 +165,7 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
 
           output->data[blobNumber].x = avgXf;
           output->data[blobNumber].y = avgYf;
+          output->data[blobNumber].z = depthValue;
 
           ++blobNumber;
           output->listLength=blobNumber;
@@ -169,7 +176,7 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
           }
          } else
          {
-          fprintf(stderr,"Filtered out blob #%u @ Frame %u  with only %u samples\n" , blobNumber  , framesProcessed , depthSamples );
+          fprintf(stderr,"Filtered out blob #%u @ Frame %u  with only %u samples ( min %u )\n" , blobNumber  , framesProcessed , depthSamples ,minBlobSize );
 
          }
        }
@@ -192,7 +199,7 @@ struct xyList * extractBlobsFromDepthMapNewBuffer(unsigned short * depth , unsig
   memcpy(ourcopy,(unsigned short *) depth,sizeof(unsigned short) * width * height  );
 
 
-   struct xyList *  retres = extractBlobsFromDepthMap( (unsigned short *) ourcopy,width,height,128,minBlobSize);
+   struct xyList *  retres = extractBlobsFromDepthMap( (unsigned short *) ourcopy,width,height,maxBlobs,minBlobSize);
 
   free(ourcopy);
 
@@ -236,7 +243,7 @@ int addDataInput_BlobDetector(unsigned int stream , void * data, unsigned int wi
  fprintf(stderr,"addDataInput_BlobDetector %u (%ux%u)\n" , stream , width, height);
  if (stream==1)
  {
-   extractBlobsFromDepthMapNewBuffer( (unsigned short *) data,width,height,128,30);
+   extractBlobsFromDepthMapNewBuffer( (unsigned short *) data,width,height,128,40);
    ++framesProcessed;
 
   return 1;

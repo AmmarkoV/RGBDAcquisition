@@ -22,8 +22,8 @@ unsigned char * downscaleRGBImagePure(
                                   unsigned int quality
                                  )
 {
-  float widthRatioF=originalWidth/newWidth;
-  float heightRatioF=originalHeight/newHeight;
+  //float widthRatioF=originalWidth/newWidth;
+  //float heightRatioF=originalHeight/newHeight;
 
   unsigned char * output = (unsigned char * ) malloc(sizeof(unsigned char) * 3 * newWidth * newHeight );
   if (output==0) { fprintf(stderr,"Could not allocate an image for resizing ( %u,%u ) => ( %u,%u)\n",originalWidth,originalHeight,newWidth , newHeight); return 0; }

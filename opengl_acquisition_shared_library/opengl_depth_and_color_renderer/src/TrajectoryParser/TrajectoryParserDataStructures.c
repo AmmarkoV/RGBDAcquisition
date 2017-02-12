@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "TrajectoryCalculator.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -193,8 +194,15 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,char * name, unsigned 
 
   unsigned int i=0;
 
+  if (stream->MAX_numberOfObjects<=stream->numberOfObjects)
+    {
+     fprintf(stderr,"number of objects is larger than maximum objects ????? %u/%u objects \n",stream->numberOfObjects,stream->MAX_numberOfObjects);
+     return 0;
+    }
+
   if (stream->debug)
-   { fprintf(stderr,"Searching %s among %u objects \n",name,stream->numberOfObjects); }
+    { fprintf(stderr,"Searching %s among %u/%u objects \n",name,stream->numberOfObjects , stream->MAX_numberOfObjects); }
+
   for (i=0; i<stream->numberOfObjects; i++ )
    {
      if (stream->object[i].name!=0)
@@ -715,7 +723,7 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
    filename[filenameSpan]=0;
    if (filenameSpan>2) { filename[filenameSpan-2]=0; }
 
-   snprintf(filenameWExtension,"%s.%s",filename,extension);
+   snprintf(filenameWExtension,outputSizes,"%s.%s",filename,extension);
 
    if (i==0) {
                //This whole thing is a filename

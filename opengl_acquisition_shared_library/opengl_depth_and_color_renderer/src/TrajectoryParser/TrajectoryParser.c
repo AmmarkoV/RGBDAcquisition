@@ -84,10 +84,10 @@ int writeVirtualStream(struct VirtualStream * newstream,char * filename)
       fprintf(fp,"\nOBJECT(%s,%s,%u,%u,%u,%u,%u,%0.2f,%0.2f,%0.2f,%s)\n",
               newstream->object[i].name,
               newstream->object[i].typeStr,
-              (int) newstream->object[i].R/255,
-              (int) newstream->object[i].G/255,
-              (int) newstream->object[i].B/255,
-              (int) newstream->object[i].Transparency/255,
+              (unsigned int) newstream->object[i].R/255,
+              (unsigned int) newstream->object[i].G/255,
+              (unsigned int) newstream->object[i].B/255,
+              (unsigned int) newstream->object[i].Transparency/255,
               newstream->object[i].nocolor,
               newstream->object[i].scaleX,
               newstream->object[i].scaleY,
@@ -491,7 +491,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
     default :
 
-        if (!newstream->silent)
+        if ( /*(!newstream->silent)||*/ (newstream->debug) )
             {
               fprintf(stderr,RED "Can't recognize `%s` \n" NORMAL , line);
             }

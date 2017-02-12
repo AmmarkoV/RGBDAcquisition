@@ -501,7 +501,7 @@ int drawCube()
     return drawGenericTriangleMesh(cubeCoords , cubeNormals , sizeof(cubeCoords)/(3*sizeof(float)) );
 }
 
-void drawPyramid()
+int drawPyramid()
 {
     calculateGenericTriangleNormals(pyramidCoords , sizeof(pyramidCoords)/(3*sizeof(float)) );
 

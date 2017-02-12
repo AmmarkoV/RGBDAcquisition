@@ -4,15 +4,16 @@ cmake_minimum_required( VERSION 2.8.7 )
 set(CMAKE_CXX_FLAGS "-fPIC ")
 set(CMAKE_C_FLAGS "-fPIC")
 
-IF( COMPILE_FOR_PERFORMANCE )
- set(CMAKE_CXX_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
- set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
-ENDIF( COMPILE_FOR_PERFORMANCE )
-      
-
-
+OPTION (ENABLE_HIGH_PERFORMANCE_BUILD OFF)
 OPTION (ENABLE_JPG ON)
 OPTION (ENABLE_PNG ON)
+
+IF( ENABLE_HIGH_PERFORMANCE_BUILD )
+ set(CMAKE_CXX_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
+ set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
+ENDIF( ENABLE_HIGH_PERFORMANCE_BUILD )
+      
+
 
 #Add the codecs needed for the correct building
 set(CODECS_DIRECTORY "../../tools/Codecs")

@@ -173,6 +173,26 @@ double * allocate4x4MatrixForPointTransformationBasedOnCalibration(struct calibr
 int transform3DPointUsingCalibration(struct calibration * calib , float * x , float * y , float * z);
 
 
+
+
+
+
+
+
+/**
+ * @brief  This call will transform a projected 2D point with a known depth value to a 3D point using a calibration
+ * @ingroup calibration
+ * @param  Pointer , Pointer to the calibration
+ * @param  X2D , Input 2D point floating point subpixel accuracy
+ * @param  Y2D , Input 2D point floating point subpixel accuracy
+ * @param  DepthValue of the 2D point specified
+ * @param  X3D , Output 3D point
+ * @param  Y3D , Output 3D point
+ * @param  Z3D , Output 3D point
+ * @retval 1=Success , 0=Failure
+ */
+int transform2DFProjectedPointTo3DPoint(struct calibration * calib , float x2d , float y2d  , unsigned short depthValue , float * x , float * y , float * z);
+
 /**
  * @brief  This call will transform a projected 2D point with a known depth value to a 3D point using a calibration
  * @ingroup calibration
