@@ -6,13 +6,28 @@
 
 unsigned int framesProcessed=0;
 
+
+
+#define MAX_RECURSION_LEVEL 1250
+
+
+
 int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , unsigned int height ,
                                  unsigned int x , unsigned int y ,
                                  unsigned int * xSum , unsigned int * ySum ,
-                                 unsigned long * depthSum , unsigned int * depthSamples , unsigned int recursionLevel)
+                                 unsigned long * depthSum , unsigned int * depthSamples ,
+                                 unsigned int recursionLevel , unsigned int * recursionLevelHits
+                                 )
 {
-  unsigned short * depthVal = depth + x + (width*y) ;
+  if (recursionLevel>=MAX_RECURSION_LEVEL)
+  {
+    *recursionLevelHits+=1;
+    return 0;
+  }
 
+
+  unsigned short * depthVal = depth + x + (width*y) ;
+  unsigned short * depthWOff;
   if (*depthVal!=0)
   {
        *depthSum += *depthVal;
@@ -30,19 +45,27 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
 
   if (x>0)
   {
+   depthWOff=depthVal-1;
+   if (*depthWOff!=0)
+   {
    floodEraseAndGetAverageDepth(depth,width,height,
                                 x-1,y,
                                 xSum,ySum,
                                 depthSum,depthSamples,
-                                recursionLevel+1);
+                                recursionLevel+1, recursionLevelHits);
+   }
   }
   if (y>0)
   {
+   depthWOff=depthVal-width;
+   if (*depthWOff!=0)
+   {
    floodEraseAndGetAverageDepth(depth,width,height,
                                 x,y-1,
                                 xSum,ySum,
                                 depthSum,depthSamples,
-                                recursionLevel+1);
+                                recursionLevel+1, recursionLevelHits);
+   }
   }
 
 
@@ -50,19 +73,27 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
 
   if (x<width-1)
   {
-   floodEraseAndGetAverageDepth(depth,width,height,
+   depthWOff=depthVal+1;
+   if (*depthWOff!=0)
+   {
+    floodEraseAndGetAverageDepth(depth,width,height,
                                 x+1,y,
                                 xSum,ySum,
                                 depthSum,depthSamples,
-                                recursionLevel+1);
+                                recursionLevel+1, recursionLevelHits);
+   }
   }
   if (y<height-1)
   {
+   depthWOff=depthVal+width;
+   if (*depthWOff!=0)
+   {
    floodEraseAndGetAverageDepth(depth,width,height,
                                 x,y+1,
                                 xSum,ySum,
                                 depthSum,depthSamples,
-                                recursionLevel+1);
+                                recursionLevel+1, recursionLevelHits);
+   }
   }
 
 
@@ -71,41 +102,57 @@ int floodEraseAndGetAverageDepth(unsigned short * depth , unsigned int width , u
 
   if ( (x>0)&&(y>0))
   {
+   depthWOff=depthVal-width-1;
+   if (*depthWOff!=0)
+   {
    floodEraseAndGetAverageDepth(depth,width,height,
                                 x-1,y-1,
                                 xSum,ySum,
                                 depthSum,depthSamples,
-                                recursionLevel+1);
+                                recursionLevel+1, recursionLevelHits);
+   }
   }
 
 
   if ( (x>0)&&(y<height-1))
   {
+   depthWOff=depthVal+width-1;
+   if (*depthWOff!=0)
+   {
    floodEraseAndGetAverageDepth(depth,width,height,
                                 x-1,y+1,
                                 xSum,ySum,
                                 depthSum,depthSamples,
-                                recursionLevel+1);
+                                recursionLevel+1, recursionLevelHits);
+   }
   }
 
 
   if ( (x<width-1)&&(y<height-1))
   {
+   depthWOff=depthVal+width+1;
+   if (*depthWOff!=0)
+   {
    floodEraseAndGetAverageDepth(depth,width,height,
                                 x+1,y+1,
                                 xSum,ySum,
                                 depthSum,depthSamples,
-                                recursionLevel+1);
+                                recursionLevel+1, recursionLevelHits);
+   }
   }
 
 
   if ( (x<width-1)&&(y>0))
   {
+   depthWOff=depthVal-width+1;
+   if (*depthWOff!=0)
+   {
    floodEraseAndGetAverageDepth(depth,width,height,
                                 x+1,y-1,
                                 xSum,ySum,
                                 depthSum,depthSamples,
-                                recursionLevel+1);
+                                recursionLevel+1, recursionLevelHits);
+   }
   }
 
 
@@ -140,6 +187,7 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
   unsigned int recursionLevel;
 
   unsigned int blobNumber=0;
+  unsigned int recursionLevelHits = 0;
 
   while (depthPTR<depthLimit)
   {
@@ -154,7 +202,14 @@ struct xyList * extractBlobsFromDepthMap(unsigned short * depth , unsigned int w
          recursionLevel=0;
          avgX=0;
          avgY=0;
-         floodEraseAndGetAverageDepth(depth , width , height , x , y  , &avgX , &avgY, &depthSum , &depthSamples, recursionLevel);
+
+
+         floodEraseAndGetAverageDepth(depth , width , height , x , y  , &avgX , &avgY, &depthSum , &depthSamples, recursionLevel , &recursionLevelHits);
+         if (recursionLevelHits>0)
+         {
+           fprintf(stderr,"Hit Recursion limits %u times \n",recursionLevelHits);
+         }
+
          if (minBlobSize<=depthSamples)
          {
           float depthValue = (float) depthSum/depthSamples;
