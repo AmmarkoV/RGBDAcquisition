@@ -482,6 +482,19 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
          //fprintf(stderr,"drawing TRI model\n");
          struct TRI_Model * tri = (struct TRI_Model *) mod->modelInternalData;
 
+          if (mod->showSkeleton)
+          {
+           /* Joints Drawing */
+           unsigned int outputNumberOfJoints;
+           unsigned int * parentNode= convertTRIBonesToParentList( tri , &outputNumberOfJoints); // outputNumberOfJoints will be overwritten
+           float * jointPositions = convertTRIBonesToJointPositions( tri , &outputNumberOfJoints );
+           if (jointPositions!=0)
+             {
+              doOGLBoneDrawCalllist( jointPositions , parentNode , outputNumberOfJoints);
+              free(jointPositions);
+             }
+          } else
+          {
           doOGLGenericDrawCalllist(
                                      tri->vertices ,       tri->header.numberOfVertices ,
                                      tri->normal ,         tri->header.numberOfNormals ,
@@ -490,16 +503,8 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
                                      tri->indices ,        tri->header.numberOfIndices
                              );
 
-/* Joints Drawing
+          }
 
-         unsigned int outputNumberOfJoints;
-         float * jointPositions = convertTRIBonesToJointPositions( tri , &outputNumberOfJoints );
-         if (jointPositions!=0)
-         {
-          doOGLBoneDrawCalllist( jointPositions , outputNumberOfJoints);
-          free(jointPositions);
-         }
-*/
       } else
       if (mod->type==OBJ_ASSIMP_MODEL )
       {

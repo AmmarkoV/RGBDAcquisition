@@ -61,6 +61,10 @@ float * generatePalette(struct TRI_Model * in);
 
 
 
+
+
+unsigned int * convertTRIBonesToParentList(struct TRI_Model * in , unsigned int * outputNumberOfBones);
+
 /**
 * @brief Populate in->bone[x].info->x/y/z with the centers of the bone based on the current setup of the
          model..

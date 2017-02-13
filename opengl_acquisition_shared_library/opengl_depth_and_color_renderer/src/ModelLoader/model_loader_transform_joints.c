@@ -300,6 +300,32 @@ void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
 /// -----------------------------------------------------------------------------
 
 
+
+
+
+
+unsigned int * convertTRIBonesToParentList(struct TRI_Model * in , unsigned int * outputNumberOfBones)
+{
+
+  *outputNumberOfBones =  in->header.numberOfBones;
+  unsigned int * parentNode = ( unsigned int * )  malloc (sizeof(unsigned int) * in->header.numberOfBones);
+
+if (parentNode!=0)
+{
+   memset(parentNode,0,sizeof(unsigned int) * in->header.numberOfBones);
+
+   unsigned int i=0;
+   for (i=0; i< in->header.numberOfBones; i++)
+   {
+     parentNode[i] = in->bones[i].info->boneParent;
+   }
+}
+ return parentNode;
+}
+
+
+
+
 //Please note that the output is in the coordinate space of the binding pose model and needs to be transformed/projected etc
 //according to the real location of the mesh
 float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * outputNumberOfJoints)

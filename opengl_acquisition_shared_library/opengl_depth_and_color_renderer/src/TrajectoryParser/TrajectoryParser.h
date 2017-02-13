@@ -267,6 +267,7 @@ struct VirtualStream
     unsigned int lastRefresh;
     unsigned int fileSize;
 
+    char showSkeleton;
     char alwaysShowLastFrame;
     char ignoreTime;
     char reverseLoop;

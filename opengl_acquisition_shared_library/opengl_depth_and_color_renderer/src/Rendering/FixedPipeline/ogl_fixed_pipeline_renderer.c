@@ -6,13 +6,34 @@
 
 #include "ogl_fixed_pipeline_renderer.h"
 
+#define boneSphere 0.05
 
-void doOGLBoneDrawCalllist( float * pos , unsigned int boneSizes)
+void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
 {
-
-
   unsigned int bone=0;
-  for (bone=0; bone<boneSizes; bone++)
+
+
+  glLineWidth(6.0);
+  for (bone=0; bone<boneSizes/3; bone++)
+  {
+     unsigned int parentBone = parentNode[bone];
+
+     if (parentBone!=bone)
+     {
+       if (parentBone<boneSizes/3)
+       {
+        glBegin(GL_LINES);
+         glColor3f(0.8,0.0,1.0);
+         glVertex3f(pos[parentBone*3+0],pos[parentBone*3+1],pos[parentBone*3+2]);
+         glColor3f(0.8,0.0,1.0);
+         glVertex3f(pos[bone*3+0],pos[bone*3+1],pos[bone*3+2]);
+        glEnd();
+       }
+     }
+  }
+  glLineWidth(1.0);
+
+  for (bone=0; bone<boneSizes/3; bone++)
   {
 
    if ( (pos[bone*3+0]!=pos[bone*3+0]) ||
@@ -43,8 +64,9 @@ void doOGLBoneDrawCalllist( float * pos , unsigned int boneSizes)
 
  glPushMatrix();
   glTranslatef(pos[bone*3+0],pos[bone*3+1],pos[bone*3+2]);
-       glScalef( 0.1 , 0.1 , 0.1 );
+       glScalef( boneSphere , boneSphere , boneSphere );
        glBegin(GL_QUAD_STRIP);
+       glColor3f(0.10,0.82,0.76);
        for(j = 0; j <= longs; j++)
         {
            double lng = 2 * M_PI * (double) (j - 1) / longs;
@@ -76,12 +98,8 @@ glPopMatrix();
 
 
 
-
 /*
-   glBegin(GL_LINES);
-       glVertex3f(posA[0],posA[1],posA[2]);
-       glVertex3f(posB[0],posB[1],posB[2]);
-     glEnd();
+
 */
 
 }
