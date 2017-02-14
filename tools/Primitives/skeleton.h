@@ -49,6 +49,59 @@ static float NAOdefaultJoints[] = { 0,-194,dp, 0,0,dp , 0,222,dp , -191,0,dp , 1
                                   };
 
 
+static const char * COCOBodyNames[] =
+{
+  "Nose",
+  "Neck",
+  "RShoulder",
+  "RElbow",
+  "RWrist",
+  "LShoulder",
+  "LElbow",
+  "LWrist",
+  "RHip",
+  "RKnee",
+  "RAnkle",
+  "LHip",
+  "LKnee",
+  "LAnkle",
+  "REye",
+  "LEye",
+  "REar",
+  "LEar",
+  "Bkg",
+//=================
+    "End of Joint Names"
+};
+
+
+enum COCOSkeletonJoints
+{
+  COCO_Nose,
+  COCO_Neck,
+  COCO_RShoulder,
+  COCO_RElbow,
+  COCO_RWrist,
+  COCO_LShoulder,
+  COCO_LElbow,
+  COCO_LWrist,
+  COCO_RHip,
+  COCO_RKnee,
+  COCO_RAnkle,
+  COCO_LHip,
+  COCO_LKnee,
+  COCO_LAnkle,
+  COCO_REye,
+  COCO_LEye,
+  COCO_REar,
+  COCO_LEar,
+  COCO_Bkg,
+   //---------------------
+  COCO_PARTS
+};
+
+
+
 
 static const char * smartBodyNames[] =
 {
@@ -297,6 +350,18 @@ struct skeletonNAO
 };
 
 
+
+struct skeletonCOCO
+{
+    unsigned int observationNumber , observationTotal;
+    unsigned int userID;
+
+    struct point3D bbox[8];
+
+    float  jointAccuracy[COCO_PARTS];
+    unsigned int active[COCO_PARTS];
+    struct point2D joint2D[COCO_PARTS];
+};
 
 
 struct skeletonHuman

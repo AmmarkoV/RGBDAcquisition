@@ -302,6 +302,13 @@ int main(int argc, char *argv[])
     fillWithDefaultNAOSkeleton(&defaultNAOPose);
     visualize2DSkeletonHuman("defaultNAOPose.svg", &defaultNAOPose , visualizationScale );
 
-    parseJointList(argv[1]);
+
+    if (strstr(argv[1],".json")!=0)
+    {
+      parseJsonCOCOSkeleton(argv[1]);
+    } else
+    {
+     parseJointList(argv[1]);
+    }
     return 0;
 }
