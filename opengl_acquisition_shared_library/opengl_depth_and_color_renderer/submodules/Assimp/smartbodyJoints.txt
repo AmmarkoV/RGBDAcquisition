@@ -1,0 +1,312 @@
+
+Bone 1 : JtRoot 
+ Weights Number 21006 
+ Parent : 0 RootNode 
+ Children (2) : 2 JtPelvis , 15 JtSpineA , 
+Bone 2 : JtPelvis 
+ Weights Number 0 
+ Parent : 1 JtRoot 
+ Children (2) : 3 JtHipRt , 9 JtHipLf , 
+Bone 3 : JtHipRt 
+ Weights Number 17813 
+ Parent : 2 JtPelvis 
+ Children (1) : 4 JtKneeRt , 
+Bone 4 : JtKneeRt 
+ Weights Number 9840 
+ Parent : 3 JtHipRt 
+ Children (1) : 5 JtAnkleRt , 
+Bone 5 : JtAnkleRt 
+ Weights Number 4706 
+ Parent : 4 JtKneeRt 
+ Children (1) : 6 JtBallRt , 
+Bone 6 : JtBallRt 
+ Weights Number 2375 
+ Parent : 5 JtAnkleRt 
+ Children (1) : 7 JtToeRt , 
+Bone 7 : JtToeRt 
+ Weights Number 0 
+ Parent : 6 JtBallRt 
+ Children (1) : 8 JtHeelRt , 
+Bone 8 : JtHeelRt 
+ Weights Number 0 
+ Parent : 7 JtToeRt 
+Bone 9 : JtHipLf 
+ Weights Number 16816 
+ Parent : 2 JtPelvis 
+ Children (1) : 10 JtKneeLf , 
+Bone 10 : JtKneeLf 
+ Weights Number 10777 
+ Parent : 9 JtHipLf 
+ Children (1) : 11 JtAnkleLf , 
+Bone 11 : JtAnkleLf 
+ Weights Number 3558 
+ Parent : 10 JtKneeLf 
+ Children (1) : 12 JtBallLf , 
+Bone 12 : JtBallLf 
+ Weights Number 2002 
+ Parent : 11 JtAnkleLf 
+ Children (1) : 13 JtToeLf , 
+Bone 13 : JtToeLf 
+ Weights Number 0 
+ Parent : 12 JtBallLf 
+ Children (1) : 14 JtHeelLf , 
+Bone 14 : JtHeelLf 
+ Weights Number 0 
+ Parent : 13 JtToeLf 
+Bone 15 : JtSpineA 
+ Weights Number 17804 
+ Parent : 1 JtRoot 
+ Children (1) : 16 JtSpineB , 
+Bone 16 : JtSpineB 
+ Weights Number 16039 
+ Parent : 15 JtSpineA 
+ Children (1) : 17 JtSpineC , 
+Bone 17 : JtSpineC 
+ Weights Number 19014 
+ Parent : 16 JtSpineB 
+ Children (3) : 18 JtNeckA , 64 JtClavicleRt , 77 JtClavicleLf , 
+Bone 18 : JtNeckA 
+ Weights Number 4727 
+ Parent : 17 JtSpineC 
+ Children (1) : 19 JtNeckB , 
+Bone 19 : JtNeckB 
+ Weights Number 3644 
+ Parent : 18 JtNeckA 
+ Children (1) : 20 JtSkullA , 
+Bone 20 : JtSkullA 
+ Weights Number 5405 
+ Parent : 19 JtNeckB 
+ Children (3) : 21 JtSkullB , 22 JtLowerFaceParent , 41 JtUpperFaceParent , 
+Bone 21 : JtSkullB 
+ Weights Number 0 
+ Parent : 20 JtSkullA 
+Bone 22 : JtLowerFaceParent 
+ Weights Number 0 
+ Parent : 20 JtSkullA 
+ Children (10) : 23 JtCheekLowerRt , 24 JtLipCornerLf , 25 JtCheekLowerLf , 26 JtCheekUpperRt , 27 JtLipUpperMid , 28 JtLipUpperRt , 29 JtCheekUpperLf , 30 JtLipUpperLf , 31 JtJaw , 40 JtLipCornerRt , 
+Bone 23 : JtCheekLowerRt 
+ Weights Number 187 
+ Parent : 22 JtLowerFaceParent 
+Bone 24 : JtLipCornerLf 
+ Weights Number 0 
+ Parent : 22 JtLowerFaceParent 
+Bone 25 : JtCheekLowerLf 
+ Weights Number 0 
+ Parent : 22 JtLowerFaceParent 
+Bone 26 : JtCheekUpperRt 
+ Weights Number 0 
+ Parent : 22 JtLowerFaceParent 
+Bone 27 : JtLipUpperMid 
+ Weights Number 0 
+ Parent : 22 JtLowerFaceParent 
+Bone 28 : JtLipUpperRt 
+ Weights Number 0 
+ Parent : 22 JtLowerFaceParent 
+Bone 29 : JtCheekUpperLf 
+ Weights Number 0 
+ Parent : 22 JtLowerFaceParent 
+Bone 30 : JtLipUpperLf 
+ Weights Number 0 
+ Parent : 22 JtLowerFaceParent 
+Bone 31 : JtJaw 
+ Weights Number 930 
+ Parent : 22 JtLowerFaceParent 
+ Children (2) : 32 JtJawBack , 37 JtTongueA , 
+Bone 32 : JtJawBack 
+ Weights Number 0 
+ Parent : 31 JtJaw 
+ Children (1) : 33 JtJawFront , 
+Bone 33 : JtJawFront 
+ Weights Number 0 
+ Parent : 32 JtJawBack 
+ Children (3) : 34 JtLipLowerMid , 35 JtLipLowerRt , 36 JtLipLowerLf , 
+Bone 34 : JtLipLowerMid 
+ Weights Number 0 
+ Parent : 33 JtJawFront 
+Bone 35 : JtLipLowerRt 
+ Weights Number 0 
+ Parent : 33 JtJawFront 
+Bone 36 : JtLipLowerLf 
+ Weights Number 0 
+ Parent : 33 JtJawFront 
+Bone 37 : JtTongueA 
+ Weights Number 357 
+ Parent : 31 JtJaw 
+ Children (1) : 38 JtTongueB , 
+Bone 38 : JtTongueB 
+ Weights Number 0 
+ Parent : 37 JtTongueA 
+ Children (1) : 39 JtTongueC , 
+Bone 39 : JtTongueC 
+ Weights Number 0 
+ Parent : 38 JtTongueB 
+Bone 40 : JtLipCornerRt 
+ Weights Number 5 
+ Parent : 22 JtLowerFaceParent 
+Bone 41 : JtUpperFaceParent 
+ Weights Number 0 
+ Parent : 20 JtSkullA 
+ Children (12) : 42 JtBrowParentRt , 47 JtEyelidLowerLf , 48 JtUpperNoseLf , 50 JtEyelidUpperLf , 51 JtBrowParentLf , 56 JtEyelidLowerRt , 57 JtEyeRt , 58 JtUpperNoseRt , 60 JtEyelidUpperRt , 61 JtEarLf , 62 JtEarRt , 63 JtEyeLf , 
+Bone 42 : JtBrowParentRt 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+ Children (4) : 43 JtEyebrow04Rt , 44 JtEyebrow02Rt , 45 JtEyebrow01Rt , 46 JtEyebrow03Rt , 
+Bone 43 : JtEyebrow04Rt 
+ Weights Number 0 
+ Parent : 42 JtBrowParentRt 
+Bone 44 : JtEyebrow02Rt 
+ Weights Number 0 
+ Parent : 42 JtBrowParentRt 
+Bone 45 : JtEyebrow01Rt 
+ Weights Number 0 
+ Parent : 42 JtBrowParentRt 
+Bone 46 : JtEyebrow03Rt 
+ Weights Number 0 
+ Parent : 42 JtBrowParentRt 
+Bone 47 : JtEyelidLowerLf 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+Bone 48 : JtUpperNoseLf 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+ Children (1) : 49 JtLowerNoseLf , 
+Bone 49 : JtLowerNoseLf 
+ Weights Number 0 
+ Parent : 48 JtUpperNoseLf 
+Bone 50 : JtEyelidUpperLf 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+Bone 51 : JtBrowParentLf 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+ Children (4) : 52 JtEyebrow04Lf , 53 JtEyebrow01Lf , 54 JtEyebrow02Lf , 55 JtEyebrow03Lf , 
+Bone 52 : JtEyebrow04Lf 
+ Weights Number 0 
+ Parent : 51 JtBrowParentLf 
+Bone 53 : JtEyebrow01Lf 
+ Weights Number 0 
+ Parent : 51 JtBrowParentLf 
+Bone 54 : JtEyebrow02Lf 
+ Weights Number 0 
+ Parent : 51 JtBrowParentLf 
+Bone 55 : JtEyebrow03Lf 
+ Weights Number 0 
+ Parent : 51 JtBrowParentLf 
+Bone 56 : JtEyelidLowerRt 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+Bone 57 : JtEyeRt 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+Bone 58 : JtUpperNoseRt 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+ Children (1) : 59 JtLowerNoseRt , 
+Bone 59 : JtLowerNoseRt 
+ Weights Number 0 
+ Parent : 58 JtUpperNoseRt 
+Bone 60 : JtEyelidUpperRt 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+Bone 61 : JtEarLf 
+ Weights Number 377 
+ Parent : 41 JtUpperFaceParent 
+Bone 62 : JtEarRt 
+ Weights Number 474 
+ Parent : 41 JtUpperFaceParent 
+Bone 63 : JtEyeLf 
+ Weights Number 0 
+ Parent : 41 JtUpperFaceParent 
+Bone 64 : JtClavicleRt 
+ Weights Number 5807 
+ Parent : 17 JtSpineC 
+ Children (1) : 65 JtShoulderRt , 
+Bone 65 : JtShoulderRt 
+ Weights Number 5582 
+ Parent : 64 JtClavicleRt 
+ Children (2) : 66 JtUpperArmTwistBRt , 76 JtUpperArmTwistARt , 
+Bone 66 : JtUpperArmTwistBRt 
+ Weights Number 3933 
+ Parent : 65 JtShoulderRt 
+ Children (1) : 67 JtElbowRt , 
+Bone 67 : JtElbowRt 
+ Weights Number 2562 
+ Parent : 66 JtUpperArmTwistBRt 
+ Children (2) : 68 JtForearmTwistBRt , 75 JtForearmTwistARt , 
+Bone 68 : JtForearmTwistBRt 
+ Weights Number 1744 
+ Parent : 67 JtElbowRt 
+ Children (1) : 69 JtWristRt , 
+Bone 69 : JtWristRt 
+ Weights Number 1832 
+ Parent : 68 JtForearmTwistBRt 
+ Children (5) : 70 JtThumbARt , 71 JtRingARt , 72 JtMiddleARt , 73 JtLittleARt , 74 JtIndexARt , 
+Bone 70 : JtThumbARt 
+ Weights Number 187 
+ Parent : 69 JtWristRt 
+Bone 71 : JtRingARt 
+ Weights Number 0 
+ Parent : 69 JtWristRt 
+Bone 72 : JtMiddleARt 
+ Weights Number 0 
+ Parent : 69 JtWristRt 
+Bone 73 : JtLittleARt 
+ Weights Number 0 
+ Parent : 69 JtWristRt 
+Bone 74 : JtIndexARt 
+ Weights Number 0 
+ Parent : 69 JtWristRt 
+Bone 75 : JtForearmTwistARt 
+ Weights Number 2201 
+ Parent : 67 JtElbowRt 
+Bone 76 : JtUpperArmTwistARt 
+ Weights Number 4561 
+ Parent : 65 JtShoulderRt 
+Bone 77 : JtClavicleLf 
+ Weights Number 5063 
+ Parent : 17 JtSpineC 
+ Children (1) : 78 JtShoulderLf , 
+Bone 78 : JtShoulderLf 
+ Weights Number 6104 
+ Parent : 77 JtClavicleLf 
+ Children (2) : 79 JtUpperArmTwistBLf , 89 JtUpperArmTwistALf , 
+Bone 79 : JtUpperArmTwistBLf 
+ Weights Number 3512 
+ Parent : 78 JtShoulderLf 
+ Children (1) : 80 JtElbowLf , 
+Bone 80 : JtElbowLf 
+ Weights Number 3100 
+ Parent : 79 JtUpperArmTwistBLf 
+ Children (2) : 81 JtForearmTwistALf , 82 JtForearmTwistBLf , 
+Bone 81 : JtForearmTwistALf 
+ Weights Number 2178 
+ Parent : 80 JtElbowLf 
+Bone 82 : JtForearmTwistBLf 
+ Weights Number 1988 
+ Parent : 80 JtElbowLf 
+ Children (1) : 83 JtWristLf , 
+Bone 83 : JtWristLf 
+ Weights Number 1966 
+ Parent : 82 JtForearmTwistBLf 
+ Children (5) : 84 JtThumbALf , 85 JtLittleALf , 86 JtIndexALf , 87 JtMiddleALf , 88 JtRingALf , 
+Bone 84 : JtThumbALf 
+ Weights Number 0 
+ Parent : 83 JtWristLf 
+Bone 85 : JtLittleALf 
+ Weights Number 0 
+ Parent : 83 JtWristLf 
+Bone 86 : JtIndexALf 
+ Weights Number 0 
+ Parent : 83 JtWristLf 
+Bone 87 : JtMiddleALf 
+ Weights Number 0 
+ Parent : 83 JtWristLf 
+Bone 88 : JtRingALf 
+ Weights Number 0 
+ Parent : 83 JtWristLf 
+Bone 89 : JtUpperArmTwistALf 
+ Weights Number 4640 
+ Parent : 78 JtShoulderLf 
+
+
+

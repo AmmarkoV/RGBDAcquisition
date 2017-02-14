@@ -83,7 +83,7 @@ int printObjectTrajectory(struct VirtualStream * stream,unsigned int ObjID,unsig
    }
 
   fprintf(stderr,"ROT=\"%0.2f %0.2f %0.2f\"\n", euler[0],euler[1], euler[2] );
-  fprintf(stderr,"QUAT=\"%0.2f %0.2f %0.2f %0.2f\"\n", quaternions[0],quaternions[1], quaternions[2], quaternions[3] );
+  fprintf(stderr,"QUAT=\"%f %f %f %f\"\n", quaternions[0],quaternions[1], quaternions[2], quaternions[3] );
 
 
  return 1;

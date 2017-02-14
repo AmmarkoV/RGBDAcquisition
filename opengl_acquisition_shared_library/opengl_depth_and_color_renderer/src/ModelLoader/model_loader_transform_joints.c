@@ -336,7 +336,7 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
   unsigned int * outputNumberSamples = ( unsigned int * )  malloc (sizeof(unsigned int ) * in->header.numberOfBones);
   memset(outputNumberSamples,0,sizeof(unsigned int) * in->header.numberOfBones);
 
-  *outputNumberOfJoints =  in->header.numberOfBones * 3;
+  *outputNumberOfJoints =  in->header.numberOfBones;
 
   struct TRI_Bones_Per_Vertex * bpv = allocTransformTRIBonesToVertexBoneFormat(in);
   if (bpv!=0)

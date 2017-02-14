@@ -14,13 +14,13 @@ void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned 
 
 
   glLineWidth(6.0);
-  for (bone=0; bone<boneSizes/3; bone++)
+  for (bone=0; bone<boneSizes; bone++)
   {
      unsigned int parentBone = parentNode[bone];
 
      if (parentBone!=bone)
      {
-       if (parentBone<boneSizes/3)
+       if (parentBone<boneSizes)
        {
         glBegin(GL_LINES);
          glColor3f(0.8,0.0,1.0);
@@ -33,7 +33,7 @@ void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned 
   }
   glLineWidth(1.0);
 
-  for (bone=0; bone<boneSizes/3; bone++)
+  for (bone=0; bone<boneSizes; bone++)
   {
 
    if ( (pos[bone*3+0]!=pos[bone*3+0]) ||
