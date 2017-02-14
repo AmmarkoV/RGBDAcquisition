@@ -466,7 +466,7 @@ int addPoseToObjectState(
         unsigned int objectTypeID = stream->object[ObjID].type;
 
         unsigned int modelID = stream->objectTypes[objectTypeID].modelListArrayNumber;
-        fprintf(stderr,"Accessing model %u/%u\n", modelID,modelStorage->currentNumberOfModels);
+        //fprintf(stderr,"Accessing model %u/%u\n", modelID,modelStorage->currentNumberOfModels);
         if (modelID<modelStorage->currentNumberOfModels)
         {
         struct Model * mod = (struct Model *) &modelStorage->models[modelID];
@@ -474,7 +474,7 @@ int addPoseToObjectState(
         {
         int boneFound=0;
 
-        fprintf(stderr,"Set mod->initialized=%u\n", mod->initialized);
+        //fprintf(stderr,"Set mod->initialized=%u\n", mod->initialized);
 
         unsigned int boneID = getModelBoneIDFromBoneName(mod,jointName,&boneFound);
 
@@ -491,7 +491,8 @@ int addPoseToObjectState(
 
            if (coordLength==3)
            {
-           fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms euler angle (%0.2f %0.2f %0.2f) \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2]);
+            if (stream->debug)
+                { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms euler angle (%0.2f %0.2f %0.2f) \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2]); }
             stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=1;
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
@@ -500,7 +501,8 @@ int addPoseToObjectState(
            } else
            if (coordLength==4)
            {
-           fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms quaternion(%0.2f %0.2f %0.2f %0.2f) \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2],coord[3]);
+            if (stream->debug)
+                { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms quaternion(%0.2f %0.2f %0.2f %0.2f) \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2],coord[3]); }
             stream->object[ObjID].frame[pos].jointList->joint[boneID].useQuaternion=1;
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
@@ -510,7 +512,8 @@ int addPoseToObjectState(
            } else
            if (coordLength=16)
            {
-           fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n",ObjID,pos,boneID,timeMilliseconds);
+            if (stream->debug)
+                 { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n",ObjID,pos,boneID,timeMilliseconds); }
             stream->object[ObjID].frame[pos].jointList->joint[boneID].useMatrix4x4=1;
             stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
             unsigned int z=0;

@@ -1,28 +1,26 @@
 #!/bin/bash
 
-THEFILE="bvh.conf"
-sed -i 's/,/./g' $THEFILE
-
-sed -i 's/Hips/JtHipRt/g' $THEFILE
-sed -i 's/spine/JtSpineA/g' $THEFILE
-sed -i 's/spine1/JtSpineB/g' $THEFILE
-sed -i 's/spine2/JtSpineC/g' $THEFILE
+THEFILE="bvh.conf" 
+#sed -i 's/Hips/JtHipRt/g' $THEFILE
+#sed -i 's/spine/JtSpineA/g' $THEFILE
+#sed -i 's/spine1/JtSpineB/g' $THEFILE
+#sed -i 's/spine2/JtSpineC/g' $THEFILE
 sed -i 's/Neck/JtNeckA/g' $THEFILE
 sed -i 's/Head/JtNeckB/g' $THEFILE
 
 sed -i 's/RightShoulder/JtShoulderRt/g' $THEFILE
 sed -i 's/RightArm/JtElbowRt/g' $THEFILE
+sed -i 's/RightHand/JtWristRt/g' $THEFILE
 #sed -i 's/RightArmRoll/
 #sed -i 's/RightForeArm/
 #sed -i 's/RightForeArmRoll/
-sed -i 's/RightHand/JtWristRt/g' $THEFILE
 
 sed -i 's/LeftShoulder/JtShoulderLf/g' $THEFILE
 sed -i 's/LeftArm/JtElbowLf/g' $THEFILE
+sed -i 's/LeftHand/JtWristLf/g' $THEFILE
 #sed -i 's/LeftArmRoll/
 #sed -i 's/LeftForeArm/
 #sed -i 's/LeftForeArmRoll/
-sed -i 's/LeftHand/JtWristLf/g' $THEFILE
 
 sed -i 's/RightUpLeg/JtHipRt/g' $THEFILE
 #sed -i 's/RightUpLegRoll/

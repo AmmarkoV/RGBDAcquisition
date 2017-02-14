@@ -664,8 +664,7 @@ int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNum
 
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
 {
- #warning "getModelBoneIDFromBoneName segfaults ?"
-fprintf(stderr,"getModelBoneIDFromBoneName(boneName=%s)\n",boneName);
+//fprintf(stderr,"getModelBoneIDFromBoneName(boneName=%s)\n",boneName);
 if (found==0) { return 0; }
  *found=0;
 
@@ -686,7 +685,7 @@ if (mod->initialized!=1)
    {
      unsigned int i=0;
      unsigned int numberOfBones=mod->numberOfBones;
-      fprintf(stderr,"getModelBoneIDFromBoneName will search through %u bones \n",numberOfBones);
+    //fprintf(stderr,"getModelBoneIDFromBoneName will search through %u bones \n",numberOfBones);
 
      for (i=0; i<numberOfBones; i++)
      {
