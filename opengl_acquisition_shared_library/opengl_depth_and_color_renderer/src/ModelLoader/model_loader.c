@@ -482,6 +482,19 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
          //fprintf(stderr,"drawing TRI model\n");
          struct TRI_Model * tri = (struct TRI_Model *) mod->modelInternalData;
 
+          if (mod->showSkeleton)
+          {
+           /* Joints Drawing */
+           unsigned int outputNumberOfJoints;
+           unsigned int * parentNode= convertTRIBonesToParentList( tri , &outputNumberOfJoints); // outputNumberOfJoints will be overwritten
+           float * jointPositions = convertTRIBonesToJointPositions( tri , &outputNumberOfJoints );
+           if (jointPositions!=0)
+             {
+              doOGLBoneDrawCalllist( jointPositions , parentNode , outputNumberOfJoints);
+              free(jointPositions);
+             }
+          } else
+          {
           doOGLGenericDrawCalllist(
                                      tri->vertices ,       tri->header.numberOfVertices ,
                                      tri->normal ,         tri->header.numberOfNormals ,
@@ -490,16 +503,8 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
                                      tri->indices ,        tri->header.numberOfIndices
                              );
 
-/* Joints Drawing
+          }
 
-         unsigned int outputNumberOfJoints;
-         float * jointPositions = convertTRIBonesToJointPositions( tri , &outputNumberOfJoints );
-         if (jointPositions!=0)
-         {
-          doOGLBoneDrawCalllist( jointPositions , outputNumberOfJoints);
-          free(jointPositions);
-         }
-*/
       } else
       if (mod->type==OBJ_ASSIMP_MODEL )
       {
@@ -659,8 +664,7 @@ int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNum
 
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
 {
- #warning "getModelBoneIDFromBoneName segfaults ?"
-fprintf(stderr,"getModelBoneIDFromBoneName(boneName=%s)\n",boneName);
+//fprintf(stderr,"getModelBoneIDFromBoneName(boneName=%s)\n",boneName);
 if (found==0) { return 0; }
  *found=0;
 
@@ -681,7 +685,7 @@ if (mod->initialized!=1)
    {
      unsigned int i=0;
      unsigned int numberOfBones=mod->numberOfBones;
-      fprintf(stderr,"getModelBoneIDFromBoneName will search through %u bones \n",numberOfBones);
+    //fprintf(stderr,"getModelBoneIDFromBoneName will search through %u bones \n",numberOfBones);
 
      for (i=0; i<numberOfBones; i++)
      {

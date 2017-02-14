@@ -342,6 +342,15 @@ double getOpenGLPixelSize()
 }
 
 
+
+int passUserCommand(const char * command,const char * value)
+{
+ return 0;
+// return handleUserInput(key,state,x,y);
+}
+
+
+
 int passUserInput(char key,int state,unsigned int x, unsigned int y)
 {
  return handleUserInput(key,state,x,y);
@@ -465,7 +474,7 @@ int saveSnapshotOfObjects()
         {
          saveTileRGBToFile(0,i,rgb, minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
          saveTileDepthToFile(0,i,zshortbuffer,  minX,minY,WIDTH,HEIGHT,pWidth,pHeight);
-        }  
+        }
       }
 
       free(bbox2D);

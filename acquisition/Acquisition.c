@@ -229,6 +229,68 @@ void MeaningfullWarningMessage(ModuleIdentifier moduleFailed,DeviceIdentifier de
 
 
 
+unsigned char * fastRGBDoubleSizer(unsigned char * rgb,unsigned int rgbWidth,unsigned int rgbHeight)
+{
+  #warning "fastRGBDoubleSizer can be improved "
+  fprintf(stderr,"Will now double the incoming frame with dimensions %u x %u ( %u size ) \n" ,rgbWidth,rgbHeight , rgbWidth*rgbHeight*3);
+  unsigned int doubleWidth = rgbWidth*2;
+  unsigned int doubleHeight = rgbHeight*2;
+  fprintf(stderr,"New image will be %u x %u ( %u size ) \n" ,doubleWidth,doubleHeight , doubleWidth*doubleHeight*3);
+
+  unsigned char * result = (unsigned char*) malloc(sizeof(unsigned char)*3*doubleWidth*doubleHeight);
+
+
+  if (result!=0)
+  {
+    unsigned char * pt2x        = result;
+    unsigned char * pt2xLimit   = result + doubleWidth * doubleHeight *3;
+    unsigned char * pt          = rgb;
+    unsigned char * ptLineLimit = rgb + rgbWidth*3;
+    unsigned char * ptLimit     = rgb + rgbWidth*rgbHeight*3;
+    unsigned int line=0;
+    unsigned char r,g,b;
+
+    while  ( (pt2x<pt2xLimit)&&(pt<ptLimit) )
+    {
+     unsigned char * ptStartLine = pt;
+
+     //First Line
+     while(pt<ptLineLimit)
+     {
+      r=*pt; ++pt;
+      g=*pt; ++pt;
+      b=*pt; ++pt;
+
+      *pt2x=r; ++pt2x;
+      *pt2x=g; ++pt2x;
+      *pt2x=b; ++pt2x;
+      *pt2x=r; ++pt2x;
+      *pt2x=g; ++pt2x;
+      *pt2x=b; ++pt2x;
+      }
+
+     //Second Line
+     pt = ptStartLine;
+     while(pt<ptLineLimit)
+     {
+      r=*pt; ++pt;
+      g=*pt; ++pt;
+      b=*pt; ++pt;
+
+      *pt2x=r; ++pt2x;
+      *pt2x=g; ++pt2x;
+      *pt2x=b; ++pt2x;
+      *pt2x=r; ++pt2x;
+      *pt2x=g; ++pt2x;
+      *pt2x=b; ++pt2x;
+      }
+
+     ++line;
+     ptLineLimit+=rgbWidth*3;
+    }
+  }
+ return result;
+}
 
 /*! ------------------------------------------
     BASIC START STOP MECHANISMS FOR MODULES..

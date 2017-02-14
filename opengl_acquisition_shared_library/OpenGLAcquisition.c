@@ -59,10 +59,15 @@ int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int 
 }
 
 
+
+int passUserCommandOpenGL(const char * command,const char * value)
+{
+ return passUserCommand(command,value);
+}
+
 int passUserInputOpenGL(int devID,char key,int state,unsigned int x, unsigned int y)
 {
  return passUserInput(key,state,x,y);
-
 }
 
 int destroyOpenGLDevice(int devID)

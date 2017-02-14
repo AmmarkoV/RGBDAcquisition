@@ -9,6 +9,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#define LIMIT_AT 1000
+
 int doBVHConversion(char * sourceBVH)
 {
   fprintf(stderr,"BVH converter activated..!\n");
@@ -64,6 +66,7 @@ int doBVHConversion(char * sourceBVH)
        for (selectedNodeOfAnimationChannel=0; selectedNodeOfAnimationChannel<posesToGenerate; selectedNodeOfAnimationChannel++)
         {
            fprintf(stdout,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)\n",selectedNodeOfAnimationChannel);
+            if(selectedNodeOfAnimationChannel>LIMIT_AT) { break; }
         }
 
 
@@ -82,6 +85,8 @@ int doBVHConversion(char * sourceBVH)
           {
             aiQuatKey * q = &animNode->mRotationKeys[frameNum];
             fprintf(stdout,"POSEQ(human,%u,%s,%0.2f,%0.2f,%0.2f,%0.2f)\n",frameNum,animNode->mNodeName.data,q->mValue.x,q->mValue.y,q->mValue.z,q->mValue.w );
+            if(frameNum>LIMIT_AT) { break; }
+
           }
           /*
 aiVectorKey * 	mPositionKeys
@@ -103,6 +108,8 @@ aiVectorKey * 	mScalingKeys
 
  	  //Duration of the animation in ticks.
  	  //aiMeshAnim ** 	mMeshChannels
+
+ 	  break;
      }
 
 

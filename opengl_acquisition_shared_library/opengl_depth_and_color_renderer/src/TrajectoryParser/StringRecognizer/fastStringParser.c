@@ -244,7 +244,10 @@ int recursiveTraverser(FILE * fp,struct fastStringParser * fsp,char * functionNa
         if ( fastStringParser_hasStringsWithNConsecutiveChars(fsp,&resStringResultIndex,cArray,level+1)  )
         {
           addLevelSpaces(fp , level);
-          fprintf(fp," case \'%c\' : \n",cArray[level]);
+
+          if (cArray[level]==0)
+              { fprintf(fp," case 0 : /*Null Terminator*/ \n"); } else
+              { fprintf(fp," case \'%c\' : \n",cArray[level]);  }
            if ( level < ACTIVATED_LEVELS-1 ) { recursiveTraverser(fp,fsp,functionName,cArray,level+1); } else
                                              { printIfAllPossibleStrings(fp , fsp , cArray, level+1); }
           addLevelSpaces(fp , level);
@@ -303,9 +306,10 @@ int export_C_Scanner(struct fastStringParser * fsp,char * functionName)
 
   //PRINT OUT THE HEADER
   snprintf(filenameWithExtension,MAXIMUM_FILENAME_WITH_EXTENSION,"%s.h",functionName);
-  FILE * fp = fopen(filenameWithExtension,"w");
+  FILE * fp = fopen(filenameWithExtension,"wb");
   if (fp == 0) { fprintf(stderr,"Could not open input file %s\n",functionName); return 0; }
-  fprintf(fp," ");
+  fflush(fp);
+  fprintf(fp,"\n");
 
 
   fprintf(fp,"/** @file %s.h\n",functionName);
@@ -334,8 +338,11 @@ int export_C_Scanner(struct fastStringParser * fsp,char * functionName)
   //PRINT OUT THE MAIN FILE
 
   snprintf(filenameWithExtension,MAXIMUM_FILENAME_WITH_EXTENSION,"%s.c",functionName);
-  fp = fopen(filenameWithExtension,"w");
+  fp = fopen(filenameWithExtension,"wb");
   if (fp == 0) { fprintf(stderr,"Could not open input file %s\n",functionName); return 0; }
+
+  fflush(fp);
+  fprintf(fp,"\n");
 
   char cArray[MAXIMUM_LEVELS]={0};
   int i=0;

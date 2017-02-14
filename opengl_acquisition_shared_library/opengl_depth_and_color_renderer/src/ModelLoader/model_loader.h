@@ -34,7 +34,7 @@ struct Model
     float colorR , colorG , colorB , transparency;
 
     //Flags
-    unsigned char nocull , nocolor , wireframe , highlight;
+    unsigned char nocull , nocolor , wireframe , highlight , showSkeleton;
 
     //-----------------
     char pathOfModel[MAX_MODEL_PATHS+1];

@@ -430,6 +430,12 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
                writeVirtualStream(scene,"dump.scene");
                saveSnapshotOfObjects();
              return 1;
+
+       case 'I': //Show model internal
+       case 'i':
+            if (scene->showSkeleton==0) { scene->showSkeleton=1; } else
+                                        { scene->showSkeleton=0; }
+             return 1;
        break;
 
     };
@@ -781,6 +787,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
            mod->scaleY = scaleY;//scene->object[i].scale;
            mod->scaleZ = scaleZ;//scene->object[i].scale;
            mod->wireframe = scene->renderWireframe;
+           mod->showSkeleton = scene->showSkeleton;
            mod->highlight = ( scene->selectedObject == i );
            //fprintf(stderr,"Model %s is now RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",scene->object[i].name, mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 

@@ -67,7 +67,7 @@ unsigned int getOpenGLHeight();
 
 
 
-
+int passUserCommand(const char * command,const char * value);
 int passUserInput(char key,int state,unsigned int x, unsigned int y);
 
 /**
