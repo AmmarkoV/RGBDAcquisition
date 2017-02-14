@@ -531,7 +531,8 @@ float * mallocModelTransformJoints(
 float * mallocModelTransformJointsEulerAnglesDegrees(
                                                       struct TRI_Model * triModelInput ,
                                                       float * jointData ,
-                                                      unsigned int jointDataSize
+                                                      unsigned int jointDataSize ,
+                                                      unsigned int method
                                                      )
 {
  float * returnMat = (float * ) malloc(sizeof(float) * 3 * triModelInput->header.numberOfBones);
