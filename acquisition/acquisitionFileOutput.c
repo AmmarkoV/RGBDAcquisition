@@ -343,6 +343,33 @@ int _acfo_acquisitionSaveLocationStamp(char * filename)
 return 0;
 }
 
+
+
+
+int _acfo_acquisitionSaveTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
+{
+ unsigned long colorTS = acquisitionGetColorTimestamp(moduleID,devID);
+ unsigned long depthTS = acquisitionGetDepthTimestamp(moduleID,devID);
+
+ if ( (colorTS!=0) || (depthTS!=0) )
+ {
+  FILE *fd=0;
+  fd = fopen(filename,"w");
+
+    if (fd!=0)
+    {
+     fprintf(fd,"ts_color(%lu)\n",colorTS);
+     fprintf(fd,"ts_depth(%lu)\n",depthTS);
+
+     fflush(fd);
+     fclose(fd);
+    return 1;
+    }
+ }
+ return 0;
+}
+
+
 //Ok this is basically casting the 2 bytes of depth into 3 RGB bytes leaving one color channel off (the blue one)
 //depth is casted to char to simplify things , but that adds sizeof(short) to the pointer arethemetic!
 unsigned char * _acfo_convertShortDepthToRGBDepth(unsigned short * depth,unsigned int width , unsigned int height)

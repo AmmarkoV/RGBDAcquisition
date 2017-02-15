@@ -11,6 +11,7 @@
 #include "FeedScreenMemory.h"
 #include "Tools.h"
 #include <wx/msgdlg.h>
+#include <wx/time.h>
 
 #include "../acquisitionSegment/AcquisitionSegment.h"
 #include "../acquisition_mux/AcquisitionMux.h"
@@ -67,6 +68,9 @@ unsigned char * segmentedRGB=0;
 unsigned short * segmentedDepth=0;
 unsigned char trR=255,trG=255,trB=255;
 unsigned int shiftX=0,shiftY=0;
+
+wxLongLong startTime;
+
 
 unsigned int doBlobsEveryFrame=0;
 
@@ -401,6 +405,9 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
      fallenBody = viewPointChange_ReadPPM((char*) "emergency.pnm",&width,&height,&channels,&bitsperpixel,0);
     #endif // USE_BIRDVIEW_LOGIC
 
+
+
+   startTime =  wxGetUTCTimeMillis();
      //Todo -> acquisitionOpenDevice(OPENGL_ACQUISITION_MODULE,9,"Scenes/dragon.conf",width,height,30);
     //Connect( wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(EditorFrame::onIdle) );
 }
@@ -1160,6 +1167,8 @@ void EditorFrame::OnbuttonPlayClick(wxCommandEvent& event)
 {
     fprintf(stderr,"Play Button Clicked ( current frame = %u ) \n", acquisitionGetCurrentFrameNumber(moduleID,devID));
     play=1;
+    startTime =  wxGetUTCTimeMillis();
+
 }
 
 void EditorFrame::OnbuttonStopClick(wxCommandEvent& event)
@@ -1431,6 +1440,10 @@ void EditorFrame::DoBlobTracking()
 
       ListCtrlPoints->Hide();
       fprintf(stdout,"blob,frame,id,x,y,z\n",result->data[i].x, result->data[i].y, result->data[i].z);
+      wxLongLong curTime =  wxGetUTCTimeMillis()-startTime;
+      unsigned long curTimeL = curTime.ToLong();
+
+
       for (i=0; i<result->listLength; i++)
        {
            transform2DFProjectedPointTo3DPoint(&calib,

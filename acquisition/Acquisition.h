@@ -770,6 +770,10 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
  * @retval 1=Success 0=Failure
  */
 int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+
+
+int acquisitionSaveTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
+
 /**
  * @brief  Save the color frame on a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
  * @ingroup acquisitionSaveTo

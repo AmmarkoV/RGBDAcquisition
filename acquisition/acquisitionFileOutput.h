@@ -22,6 +22,8 @@ int _acfo_acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels ,
 
 int _acfo_acquisitionSaveLocationStamp(char * filename);
 
+int _acfo_acquisitionSaveTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
+
 
 unsigned char * _acfo_convertShortDepthToRGBDepth(unsigned short * depth,unsigned int width , unsigned int height);
 

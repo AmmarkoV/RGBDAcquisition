@@ -665,6 +665,12 @@ unsigned char * convertShortDepthTo3CharDepth(unsigned short * depth,unsigned in
 }
 
 
+int acquisitionSaveTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
+{
+  return _acfo_acquisitionSaveTimestamp(moduleID,devID,filename);
+}
+
+
 int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
 {
   return _acfo_acquisitionSaveColorFrame(moduleID,devID,filename, compress);
@@ -1252,6 +1258,9 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
 
     sprintf(outfilename,"%s/depthFrame_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
     acquisitionSaveDepthFrame(moduleID,devID,outfilename,doCompression);
+
+    sprintf(outfilename,"%s/info_%u_%05u",module[moduleID].device[devID].outputString,devID,frameNumber);
+    acquisitionSaveTimestamp(moduleID,devID,outfilename);
 
    EndTimer(FRAME_PASS_TO_TARGET_DELAY);
 

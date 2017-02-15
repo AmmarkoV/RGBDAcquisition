@@ -373,6 +373,8 @@ int snapTemplateFrames(int devID)
        fprintf(stderr,"Refreshed calibration data %u \n",device[devID].cycle);
      }
 
+    #warning "TODO : lastColorTimestamp / lastDepthTimestamp , read from new info file .. "
+
     getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].colorExtension);
     if (FileExists(file_name_test))
      {
