@@ -59,6 +59,37 @@ int main(int argc, char *argv[])
        return 1;
    }
 
+FILE *fp;
+
+fp = fopen("coco.scene","w");
+
+if (fp!=0)
+{
+  fprintf(fp,"%s",
+   "#This is the way to render like the mbv renderer :)\n\
+AUTOREFRESH(1500)\n\
+BACKGROUND(255,255,255)\n\
+\n\
+#Bring our world to the MBV coordinate system\n\
+SCALE_WORLD(-0.01,-0.01,0.01)\n\
+MAP_ROTATIONS(-1,-1,1,zxy)\n\
+OFFSET_ROTATIONS(0,0,0)\n\
+EMULATE_PROJECTION_MATRIX(535.423889 , 0.0 , 320.000000 , 0.0 , 533.484680 , 240.000000 , 0 , 1) # <-\n\
+#MODELVIEW_MATRIX(1,0,0,0, 0,1,0,0 , 0,0,1,0 ,0,0,0,1)\n\
+\n\
+#MOVE_VIEW(1)\n\
+INTERPOLATE_TIME(0)\n\
+RATE(1)\n"
+  );
+
+fprintf(fp,"OBJECT_TYPE(objSphere,sphere)  \n");
+for (i=0; i<COCO_PARTS; i++)
+{
+    fprintf(fp,"RIGID_OBJECT(joint%u_0,objSphere, 0,255,0,0,0 ,0.19,0.19,0.19 )\n",i);
+    //TODO ALSO ADD CONNECTORS HERE..
+}
+fprintf(fp,"\n");
+
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
   {
@@ -74,6 +105,8 @@ int main(int argc, char *argv[])
           return 1;
         }
 
+  maxFramesToGrab=acquisitionGetTotalFrameNumber(moduleID,devID);
+  struct skeletonCOCO skel={0};
 
    while  ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) )
     {
@@ -83,19 +116,42 @@ int main(int argc, char *argv[])
 
        // acquisitionPassFramesToTarget(moduleID,devID,frameNum,0);
 
+
+        char outfilename[1024]={0};
+         sprintf(outfilename,"frames/%s/dnnOut/colorFrame_%u_%05u.json",inputname,devID,frameNum);
+         fprintf(stderr," will read %s \n",outfilename);
+         //acquisitionSaveColorFrame(moduleID,devID,outfilename);
+         parseJsonCOCOSkeleton(outfilename,&skel);
+
+
+         unsigned int i=0;
+         for(i=0; i<COCO_PARTS; i++)
+         {
+           acquisitionGetDepth3DPointAtXYCameraSpace( moduleID,devID,
+                                                     (unsigned int) skel.joint2D[i].x,
+                                                     (unsigned int) skel.joint2D[i].y,
+                                                     &skel.joint[i].x,
+                                                     &skel.joint[i].y,
+                                                     &skel.joint[i].z
+                                                    );
+
+           fprintf(fp,"MOVE(joint%u_0,%u,%0.2f,%0.2f,%0.2f,0.0,0.0,0.0,1.0)\n",i,frameNum,skel.joint[i].x,skel.joint[i].y,skel.joint[i].z);
+         }
+        fprintf(fp,"\n");
+
+
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
         ++frameNum;
 
 
-        char outfilename[1024]={0};
-         sprintf(outfilename,"%s/dnnOut/colorFrame_%u_%05u.json",inputname,devID,frameNum);
-         fprintf(stderr," will read %s \n",outfilename);
-         //acquisitionSaveColorFrame(moduleID,devID,outfilename);
-         parseJsonCOCOSkeleton(outfilename);
-
-
     }
+
+
+ fclose(fp);
+
+}
+
 
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
 
