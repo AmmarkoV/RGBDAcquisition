@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../../acquisition/Acquisition.h"
 #include "../../tools/AmMatrix/matrixCalculations.h"
 
