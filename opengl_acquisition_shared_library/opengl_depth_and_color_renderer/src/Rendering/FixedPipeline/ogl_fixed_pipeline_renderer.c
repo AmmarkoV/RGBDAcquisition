@@ -23,9 +23,9 @@ void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned 
        if (parentBone<boneSizes)
        {
         glBegin(GL_LINES);
-         glColor3f(0.8,0.0,1.0);
+         glColor3f(0.4,0.01,0.0);
          glVertex3f(pos[parentBone*3+0],pos[parentBone*3+1],pos[parentBone*3+2]);
-         glColor3f(0.8,0.0,1.0);
+         glColor3f(0.4,0.01,0.0);
          glVertex3f(pos[bone*3+0],pos[bone*3+1],pos[bone*3+2]);
         glEnd();
        }
@@ -66,7 +66,7 @@ void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned 
   glTranslatef(pos[bone*3+0],pos[bone*3+1],pos[bone*3+2]);
        glScalef( boneSphere , boneSphere , boneSphere );
        glBegin(GL_QUAD_STRIP);
-       glColor3f(0.10,0.82,0.76);
+       glColor3f(0.74,0.01,1.0);
        for(j = 0; j <= longs; j++)
         {
            double lng = 2 * M_PI * (double) (j - 1) / longs;

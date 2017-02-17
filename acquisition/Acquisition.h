@@ -670,6 +670,9 @@ unsigned int acquisitionCopyDepthFrame(ModuleIdentifier moduleID,DeviceIdentifie
  */
 unsigned int acquisitionCopyDepthFramePPM(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned short * mem,unsigned int memlength);
 
+int acquisitionGetDepth3DPointAtXYCameraSpaceWithCalib(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  );
+
+
 /**
  * @brief  Return the depth value ( according to camera space ) of a 2d point on our frame
  * @ingroup acquisitionCore

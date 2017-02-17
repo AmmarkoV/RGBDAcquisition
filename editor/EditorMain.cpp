@@ -817,7 +817,8 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
               acquisitionGetColorRGBAtXY(moduleID,devID,mouse_x,mouse_y,&r,&g,&b);
 
               float x,y,z;
-              if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z) )
+              if (acquisitionGetDepth3DPointAtXYCameraSpaceWithCalib(moduleID,devID,&calib,mouse_x,mouse_y,&x,&y,&z) )
+              //if ( acquisitionGetDepth3DPointAtXY(moduleID,devID,mouse_x,mouse_y,&x,&y,&z) )
               {
                 wxString msg;
 
@@ -1278,6 +1279,7 @@ void EditorFrame::OnButtonCalibrationClick(wxCommandEvent& event)
       if ( calibrationSelector->userLikesTheNewCalibration )
           {
             acquisitionSetColorCalibration(moduleID,devID,&calibrationSelector->calib);
+            memcpy(&calib,&calibrationSelector->calib,sizeof(struct calibration));
           }
    }
 
@@ -1442,6 +1444,9 @@ void EditorFrame::DoBlobTracking()
       fprintf(stdout,"blob,frame,id,x,y,z\n");
 //      wxLongLong curTime =  wxGetUTCTimeMillis()-startTime;
 //    unsigned long curTimeL = curTime.ToLong();
+
+
+      acquisitionGetColorCalibration(moduleID,devID,&calib);
 
 
       for (i=0; i<result->listLength; i++)

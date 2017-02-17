@@ -26,8 +26,8 @@
 #define DEFAULT_WIDTH 640
 #define DEFAULT_HEIGHT 480
 
-#define DEFAULT_FX 535.423874
-#define DEFAULT_FY 533.484654
+#define DEFAULT_FX 535.423666
+#define DEFAULT_FY 533.484666
 
 //Default Kinect things for reference
 #define DEFAULT_FOCAL_LENGTH 120.0
@@ -301,7 +301,7 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
 
 int PrintCalibration(struct calibration * calib)
 {
-  if (calib==0) { return 0; }
+  if (calib==0) { fprintf(stderr,"No calibration structure provided for printout \n"); return 0; }
   fprintf(stderr, "Dimensions ( %u x %u ) \n",calib->width,calib->height);
   fprintf(stderr, "fx %0.2f fy %0.2f cx %0.2f cy %0.2f\n",calib->intrinsic[CALIB_INTR_FX],calib->intrinsic[CALIB_INTR_FY],
                                                           calib->intrinsic[CALIB_INTR_CX],calib->intrinsic[CALIB_INTR_CY]);
@@ -528,6 +528,9 @@ int transform3DPointUsingCalibration(struct calibration * calib , float * x , fl
 
 int transform2DFProjectedPointTo3DPoint(struct calibration * calib , float x2d , float y2d  , unsigned short depthValue , float * x , float * y , float * z)
 {
+   //PrintCalibration(calib);
+
+
     *x=x2d;
     *y=y2d;
     *z = (float) depthValue;
@@ -543,16 +546,22 @@ int transform2DFProjectedPointTo3DPoint(struct calibration * calib , float x2d ,
     } else
     {
 
-     /*
+    /*
      fprintf(stderr,"Cx,Cy (%0.2f,%0.2f) , Fx,Fy (%0.2f,%0.2f) \n ",calib->intrinsic[CALIB_INTR_CX],
                                                                     calib->intrinsic[CALIB_INTR_CY],
                                                                     calib->intrinsic[CALIB_INTR_FX],
-                                                                    calib->intrinsic[CALIB_INTR_FY]);*/
+                                                                    calib->intrinsic[CALIB_INTR_FY]);
 
-      *x = (float) (x2d - calib->intrinsic[CALIB_INTR_CX]) * (depthValue / calib->intrinsic[CALIB_INTR_FX]);
-      *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
-      //*z = (float) depthValue;
-     return 1;
+*/
+    *x = (float) (x2d - calib->intrinsic[CALIB_INTR_CX]) * (depthValue / calib->intrinsic[CALIB_INTR_FX]);
+    *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
+    //*z = (float) depthValue;
+
+    fprintf(stderr," x3D %0.2f =  x2d(%0.2f) - cx(%0.2f) * ( depth(%u) / fx(%0.2f) )\n" , *x , x2d , calib->intrinsic[CALIB_INTR_CX] ,depthValue , calib->intrinsic[CALIB_INTR_FX] );
+    fprintf(stderr," y3D %0.2f =  y2d(%0.2f) - cy(%0.2f) * ( depth(%u) / fy(%0.2f) )\n" , *y , y2d , calib->intrinsic[CALIB_INTR_CY] ,depthValue , calib->intrinsic[CALIB_INTR_FY] );
+    fprintf(stderr," z3D %0.2f\n",*z);
+
+    return 1;
     }
 
 }

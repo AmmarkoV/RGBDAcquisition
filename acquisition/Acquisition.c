@@ -721,7 +721,7 @@ int acquisitionGetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
-   printCall(moduleID,devID,"acquisitionGetColorCalibration", __FILE__, __LINE__);
+   printCall(moduleID,devID,"acquisitionSetColorCalibration", __FILE__, __LINE__);
    if (*plugins[moduleID].setColorCalibration!=0) { return (*plugins[moduleID].setColorCalibration) (devID,calib); }
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetColorCalibration");
    return 0;
@@ -729,7 +729,7 @@ int acquisitionSetColorCalibration(ModuleIdentifier moduleID,DeviceIdentifier de
 
 int acquisitionSetDepthCalibration(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib)
 {
-   printCall(moduleID,devID,"acquisitionGetDepthCalibration", __FILE__, __LINE__);
+   printCall(moduleID,devID,"acquisitionSetDepthCalibration", __FILE__, __LINE__);
    if (*plugins[moduleID].setDepthCalibration!=0) { return (*plugins[moduleID].setDepthCalibration) (devID,calib); }
    MeaningfullWarningMessage(moduleID,devID,"acquisitionGetDepthCalibration");
    return 0;
@@ -1056,6 +1056,15 @@ unsigned short acquisitionGetDepthValueAtXY(ModuleIdentifier moduleID,DeviceIden
     return result;
 }
 
+
+
+int acquisitionGetDepth3DPointAtXYCameraSpaceWithCalib(ModuleIdentifier moduleID,DeviceIdentifier devID,struct calibration * calib,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  )
+{
+    unsigned short depthValue = acquisitionGetDepthValueAtXY(moduleID,devID,x2d,y2d);
+    if (depthValue==0) { fprintf(stderr,"acquisitionGetDepth3DPointAtXYCameraSpace point %u,%u has no depth\n",x2d,y2d); return 0; }
+
+    return transform2DProjectedPointTo3DPoint(calib , x2d , y2d  , depthValue , x , y , z);
+}
 
 int acquisitionGetDepth3DPointAtXYCameraSpace(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int x2d, unsigned int y2d , float *x, float *y , float *z  )
 {

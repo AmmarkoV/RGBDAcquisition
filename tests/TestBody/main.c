@@ -4,6 +4,7 @@
 #include "../../acquisition/Acquisition.h"
 #include "../../tools/AmMatrix/matrixCalculations.h"
 #include "../../tools/Primitives/jsonCocoSkeleton.h"
+#include "../../tools/Primitives/skeleton.h"
 
 unsigned int devID=0;
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
@@ -85,8 +86,8 @@ RATE(1)\n"
 fprintf(fp,"OBJECT_TYPE(objSphere,sphere)  \n");
 for (i=0; i<COCO_PARTS; i++)
 {
-    fprintf(fp,"RIGID_OBJECT(joint%u_0,objSphere, 0,255,0,0,0 ,0.19,0.19,0.19 )\n",i);
-    //TODO ALSO ADD CONNECTORS HERE..
+    fprintf(fp,"RIGID_OBJECT(%s,objSphere, 189,3,243,0,0 ,0.59,0.59,0.59 )\n",COCOBodyNames[i]);
+    fprintf(fp,"CONNECTOR(%s,%s, 123,3,0,0,10)\n",COCOBodyNames[i],COCOBodyNames[COCOSkeletonJointsParentRelationMap[i]] );
 }
 fprintf(fp,"\n");
 
@@ -135,7 +136,7 @@ fprintf(fp,"\n");
                                                      &skel.joint[i].z
                                                     );
 
-           fprintf(fp,"MOVE(joint%u_0,%u,%0.2f,%0.2f,%0.2f,0.0,0.0,0.0,1.0)\n",i,frameNum,skel.joint[i].x,skel.joint[i].y,skel.joint[i].z);
+           fprintf(fp,"MOVE(%s,%u,%0.2f,%0.2f,%0.2f,0.0,0.0,0.0,1.0)\n",COCOBodyNames[i],frameNum,skel.joint[i].x,skel.joint[i].y,skel.joint[i].z);
          }
         fprintf(fp,"\n");
 

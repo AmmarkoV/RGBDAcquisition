@@ -101,6 +101,31 @@ enum COCOSkeletonJoints
 };
 
 
+static const int COCOSkeletonJointsParentRelationMap[] =
+{
+    // Parent                        Joint
+  COCO_Nose,                        //COCO_Nose,
+  COCO_Nose,                        //COCO_Neck,
+  COCO_Neck,                        //COCO_RShoulder,
+  COCO_RShoulder,                   //COCO_RElbow,
+  COCO_RElbow,                      //COCO_RWrist,
+  COCO_Neck,                        //COCO_LShoulder,
+  COCO_LShoulder,                   //COCO_LElbow,
+  COCO_LElbow,                      //COCO_LWrist,
+  COCO_Neck,                        //COCO_RHip,
+  COCO_RHip,                        //COCO_RKnee,
+  COCO_RKnee,                       //COCO_RAnkle,
+  COCO_Neck,                        //COCO_LHip,
+  COCO_LHip,                        //COCO_LKnee,
+  COCO_LKnee,                       //COCO_LAnkle,
+  COCO_Nose,                        //COCO_REye,
+  COCO_Nose,                        //COCO_LEye,
+  COCO_REye,                        //COCO_REar,
+  COCO_LEye,                        //COCO_LEar,
+  COCO_Bkg                          //COCO_Bkg
+};
+
+
 
 
 static const char * smartBodyNames[] =
@@ -361,6 +386,7 @@ struct skeletonCOCO
     float  jointAccuracy[COCO_PARTS];
     unsigned int active[COCO_PARTS];
     struct point2D joint2D[COCO_PARTS];
+    struct point3D joint[COCO_PARTS];
 };
 
 

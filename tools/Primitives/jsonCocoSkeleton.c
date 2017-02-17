@@ -9,10 +9,9 @@
 #include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h"
 
 
-int parseJsonCOCOSkeleton(const char * filename)
+int parseJsonCOCOSkeleton(const char * filename , struct skeletonCOCO * skel)
 {
   fprintf(stderr,"Running COCO 2D skeleton \n");
-  struct skeletonHuman skel={0};
 
   char * line = NULL;
   size_t len = 0;
@@ -41,9 +40,6 @@ int parseJsonCOCOSkeleton(const char * filename)
     size_t len = 0;
 
 
-
-    struct skeletonCOCO skel={0};
-
     while ((read = getline(&line, &len, fp)) != -1)
     {
        //printf("Retrieved line of length %zu :\n", read);
@@ -66,11 +62,11 @@ int parseJsonCOCOSkeleton(const char * filename)
        {
         InputParser_GetWord(ipc,i,str,512);
         printf("Joint %u ( %s ) ",i,COCOBodyNames[i]);
-        skel.jointAccuracy[i] = InputParser_GetWordFloat(ipc,1+i*3+2);
-        skel.joint2D[i].x     = InputParser_GetWordFloat(ipc,1+i*3+0);
-        skel.joint2D[i].y     = InputParser_GetWordFloat(ipc,1+i*3+1);
+        skel->jointAccuracy[i] = InputParser_GetWordFloat(ipc,1+i*3+2);
+        skel->joint2D[i].x     = InputParser_GetWordFloat(ipc,1+i*3+0);
+        skel->joint2D[i].y     = InputParser_GetWordFloat(ipc,1+i*3+1);
 
-        printf("Pos ( x=%0.2f,y=%0.2f ) Precision %0.2f \n",skel.joint2D[i].x,skel.joint2D[i].y,skel.jointAccuracy[i]);
+        printf("Pos ( x=%0.2f,y=%0.2f ) Precision %0.2f \n",skel->joint2D[i].x,skel->joint2D[i].y,skel->jointAccuracy[i]);
        }
        }
        //    doSkeletonConversions( &skel );
