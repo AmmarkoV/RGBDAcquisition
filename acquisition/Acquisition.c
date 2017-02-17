@@ -1206,6 +1206,21 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
     //fprintf(stderr,"acquisitionInitiateTargetForFrames! Module %u , Device %u = %s \n",moduleID,devID, module[moduleID].device[devID].outputString);
     //Prepare path
     makepath(target);
+    //Store Calibration here..
+
+    char finalTarget[2048];
+    struct calibration calibRGB={0};
+    struct calibration calibDepth={0};
+
+    acquisitionGetColorCalibration(moduleID,devID,&calibRGB);
+    snprintf(finalTarget,2048,"%s/color.calib",target);
+    WriteCalibration(finalTarget,&calibRGB);
+
+    acquisitionGetDepthCalibration(moduleID,devID,&calibDepth);
+    snprintf(finalTarget,2048,"%s/depth.calib",target);
+    WriteCalibration(finalTarget,&calibDepth);
+
+
     return 1;
   }
 
