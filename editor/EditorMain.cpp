@@ -1429,7 +1429,7 @@ void EditorFrame::DoBlobTracking()
       whereFrom = segmentedDepth;
     }
 
-  struct xyList * result = extractBlobsFromDepthMapNewBuffer(whereFrom,width,height, 40  , 170 );
+  struct xyList * result = extractBlobsFromDepthMapNewBuffer(whereFrom,width,height, 40  , 130 );
   if (result!=0)
   {
       unsigned int i=0;
@@ -1439,7 +1439,7 @@ void EditorFrame::DoBlobTracking()
       ListCtrlPoints->DeleteAllItems();
 
       ListCtrlPoints->Hide();
-      fprintf(stdout,"blob,frame,id,x,y,z\n",result->data[i].x, result->data[i].y, result->data[i].z);
+      fprintf(stdout,"blob,frame,id,x,y,z\n");
 //      wxLongLong curTime =  wxGetUTCTimeMillis()-startTime;
 //    unsigned long curTimeL = curTime.ToLong();
 
@@ -1452,7 +1452,7 @@ void EditorFrame::DoBlobTracking()
                                                result->data[i].z,
                                                &xC,&yC,&zC);
 
-           fprintf(stdout,"blob,%u,%u,%0.2f,%0.2f,%0.2f\n",framesSnapped,i,result->data[i].x, result->data[i].y, result->data[i].z);
+           fprintf(stdout,"blob,%u,%u,%0.2f,%0.2f,%0.2f\n",framesSnapped,i,xC,yC,zC);
 
            wxString txt; txt<<wxT("2d");
            long tmp = ListCtrlPoints->InsertItem(0,txt);

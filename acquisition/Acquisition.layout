@@ -2,9 +2,9 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="processorLinker.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="acquisitionFileOutput.c" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1521" topLine="27" />
+			<Cursor1 position="10580" topLine="636" />
 		</Cursor>
 	</File>
 	<File name="acquisition_setup.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -14,12 +14,17 @@
 	</File>
 	<File name="Acquisition.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="43820" topLine="850" />
+			<Cursor1 position="38040" topLine="96" />
 		</Cursor>
 	</File>
-	<File name="Acquisition.c" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="pluginLinker.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="9673" topLine="226" />
+			<Cursor1 position="1929" topLine="222" />
+		</Cursor>
+	</File>
+	<File name="processorLinker.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1233" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="pluginLinker.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -27,24 +32,19 @@
 			<Cursor1 position="4386" topLine="48" />
 		</Cursor>
 	</File>
+	<File name="Acquisition.c" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="28773" topLine="759" />
+		</Cursor>
+	</File>
+	<File name="processorLinker.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1521" topLine="27" />
+		</Cursor>
+	</File>
 	<File name="acquisitionFileOutput.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="processorLinker.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1233" topLine="11" />
-		</Cursor>
-	</File>
-	<File name="acquisitionFileOutput.c" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="20763" topLine="542" />
-		</Cursor>
-	</File>
-	<File name="pluginLinker.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1929" topLine="230" />
+			<Cursor1 position="1095" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
