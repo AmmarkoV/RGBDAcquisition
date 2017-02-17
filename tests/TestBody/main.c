@@ -3,7 +3,7 @@
 #include <string.h>
 #include "../../acquisition/Acquisition.h"
 #include "../../tools/AmMatrix/matrixCalculations.h"
-
+#include "../../tools/Primitives/jsonCocoSkeleton.h"
 
 unsigned int devID=0;
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
@@ -53,6 +53,18 @@ int main(int argc, char *argv[])
 
   }
 
+  if (!acquisitionIsModuleAvailiable(moduleID))
+   {
+       fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
+       return 1;
+   }
+
+  //We need to initialize our module before calling any related calls to the specific module..
+  if (!acquisitionStartModule(moduleID,16 /*maxDevices*/ , 0 ))
+  {
+       fprintf(stderr,"Could not start module %s ..\n",getModuleNameFromModuleID(moduleID));
+       return 1;
+   }
 
   char * devName = inputname;
   if (strlen(inputname)<1) { devName=0; }
@@ -80,6 +92,7 @@ int main(int argc, char *argv[])
          sprintf(outfilename,"%s/dnnOut/colorFrame_%u_%05u.json",inputname,devID,frameNum);
          fprintf(stderr," will read %s \n",outfilename);
          //acquisitionSaveColorFrame(moduleID,devID,outfilename);
+         parseJsonCOCOSkeleton(outfilename);
 
 
     }

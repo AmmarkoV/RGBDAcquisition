@@ -32,13 +32,19 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
-			<Add library="./libRGBDAcquisition.so" />
+			<Add library="./libAcquisition.so" />
 			<Add library="../../tools/Calibration/libCalibrationLibrary.a" />
 			<Add library="../../tools/Timers/libTimers.a" />
 			<Add library="../../tools/OperatingSystem/libOperatingSystem.a" />
 			<Add library="../../tools/Codecs/libCodecs.a" />
+			<Add library="png" />
+			<Add library="jpeg" />
 		</Linker>
 		<Unit filename="../../acquisition/Acquisition.h" />
+		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h" />
 		<Unit filename="../../tools/AmMatrix/collisions.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -72,6 +78,11 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../tools/AmMatrix/solveLinearSystemGJ.h" />
+		<Unit filename="../../tools/Primitives/jsonCocoSkeleton.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../tools/Primitives/jsonCocoSkeleton.h" />
+		<Unit filename="../../tools/Primitives/skeleton.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
