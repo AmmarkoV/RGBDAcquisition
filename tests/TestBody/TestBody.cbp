@@ -31,6 +31,14 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add library="./libRGBDAcquisition.so" />
+			<Add library="../../tools/Calibration/libCalibrationLibrary.a" />
+			<Add library="../../tools/Timers/libTimers.a" />
+			<Add library="../../tools/OperatingSystem/libOperatingSystem.a" />
+			<Add library="../../tools/Codecs/libCodecs.a" />
+		</Linker>
+		<Unit filename="../../acquisition/Acquisition.h" />
 		<Unit filename="../../tools/AmMatrix/collisions.c">
 			<Option compilerVar="CC" />
 		</Unit>
