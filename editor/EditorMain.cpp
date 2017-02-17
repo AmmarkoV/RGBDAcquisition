@@ -11,7 +11,7 @@
 #include "FeedScreenMemory.h"
 #include "Tools.h"
 #include <wx/msgdlg.h>
-#include <wx/time.h>
+//#include <wx/time.h>
 
 #include "../acquisitionSegment/AcquisitionSegment.h"
 #include "../acquisition_mux/AcquisitionMux.h"
@@ -407,7 +407,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
 
 
 
-   startTime =  wxGetUTCTimeMillis();
+   //startTime =  wxGetUTCTimeMillis();
      //Todo -> acquisitionOpenDevice(OPENGL_ACQUISITION_MODULE,9,"Scenes/dragon.conf",width,height,30);
     //Connect( wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(EditorFrame::onIdle) );
 }
@@ -1167,7 +1167,7 @@ void EditorFrame::OnbuttonPlayClick(wxCommandEvent& event)
 {
     fprintf(stderr,"Play Button Clicked ( current frame = %u ) \n", acquisitionGetCurrentFrameNumber(moduleID,devID));
     play=1;
-    startTime =  wxGetUTCTimeMillis();
+//    startTime =  wxGetUTCTimeMillis();
 
 }
 
@@ -1440,8 +1440,8 @@ void EditorFrame::DoBlobTracking()
 
       ListCtrlPoints->Hide();
       fprintf(stdout,"blob,frame,id,x,y,z\n",result->data[i].x, result->data[i].y, result->data[i].z);
-      wxLongLong curTime =  wxGetUTCTimeMillis()-startTime;
-      unsigned long curTimeL = curTime.ToLong();
+//      wxLongLong curTime =  wxGetUTCTimeMillis()-startTime;
+//    unsigned long curTimeL = curTime.ToLong();
 
 
       for (i=0; i<result->listLength; i++)
