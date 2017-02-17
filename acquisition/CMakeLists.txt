@@ -49,7 +49,7 @@ ENDIF( ENABLE_LOCATION_SERVICE )
 
 
     add_library(RGBDAcquisition SHARED ${ACQUISITION_INGREDIENTS} ) 
-    target_link_libraries(RGBDAcquisition rt dl m Timers CalibrationLibrary OperatingSystem ) 
+    target_link_libraries(RGBDAcquisition rt dl m Timers CalibrationLibrary OperatingSystem Codecs  ${PNG_Libs} ${JPG_Libs} ${LocationService_Libs}  ) 
     set_target_properties(RGBDAcquisition PROPERTIES 
                           DEBUG_POSTFIX "D"
                           ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
