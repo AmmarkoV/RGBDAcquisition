@@ -906,6 +906,10 @@ int renderScene()
       if (useCustomModelViewMatrix)
          {
            fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
+           fprintf(stderr,"%0.4f %0.4f %0.4f %0.4f \n",scene->modelViewMatrix[0],scene->modelViewMatrix[1],scene->modelViewMatrix[2],scene->modelViewMatrix[3]);
+           fprintf(stderr,"%0.4f %0.4f %0.4f %0.4f \n",scene->modelViewMatrix[4],scene->modelViewMatrix[5],scene->modelViewMatrix[6],scene->modelViewMatrix[7]);
+           fprintf(stderr,"%0.4f %0.4f %0.4f %0.4f \n",scene->modelViewMatrix[8],scene->modelViewMatrix[9],scene->modelViewMatrix[10],scene->modelViewMatrix[11]);
+           fprintf(stderr,"%0.4f %0.4f %0.4f %0.4f \n",scene->modelViewMatrix[12],scene->modelViewMatrix[13],scene->modelViewMatrix[14],scene->modelViewMatrix[15]);
          }
 
    if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting modelview matrix\n"); }

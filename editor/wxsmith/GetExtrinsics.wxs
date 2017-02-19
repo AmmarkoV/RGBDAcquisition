@@ -9,8 +9,8 @@
 			<label>Width</label>
 			<pos>24,48</pos>
 		</object>
-		<object class="wxSpinCtrl" name="ID_SPINCTRL1" variable="SpinCtrl1" member="yes">
-			<value>9</value>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL1" variable="Width" member="yes">
+			<value>7</value>
 			<min>3</min>
 			<pos>72,40</pos>
 			<size>48,27</size>
@@ -19,8 +19,8 @@
 			<label>Height</label>
 			<pos>136,48</pos>
 		</object>
-		<object class="wxSpinCtrl" name="ID_SPINCTRL2" variable="SpinCtrl2" member="yes">
-			<value>13</value>
+		<object class="wxSpinCtrl" name="ID_SPINCTRL2" variable="Height" member="yes">
+			<value>4</value>
 			<min>3</min>
 			<pos>192,40</pos>
 			<size>48,27</size>
@@ -29,8 +29,8 @@
 			<label>Size</label>
 			<pos>272,48</pos>
 		</object>
-		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
-			<value>0.07</value>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="Scale" member="yes">
+			<value>0.03</value>
 			<pos>304,40</pos>
 			<size>48,27</size>
 		</object>

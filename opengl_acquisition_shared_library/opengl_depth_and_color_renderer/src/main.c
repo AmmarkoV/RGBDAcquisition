@@ -309,6 +309,8 @@ int setOpenGLIntrinsicCalibration(double * camera)
   cameraMatrix[6]=camera[6];
   cameraMatrix[7]=camera[7];
   cameraMatrix[8]=camera[8];
+
+  updateProjectionMatrix();
   return 1;
 }
 

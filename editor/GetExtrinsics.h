@@ -1,6 +1,9 @@
 #ifndef GETEXTRINSICS_H
 #define GETEXTRINSICS_H
 
+
+#include "../acquisition/Acquisition.h"
+
 //(*Headers(GetExtrinsics)
 #include <wx/spinctrl.h>
 #include <wx/dialog.h>
@@ -13,6 +16,7 @@ class GetExtrinsics: public wxDialog
 {
 	public:
 
+        struct calibration calib;
 		unsigned int moduleID;
 		unsigned int devID;
 
@@ -20,14 +24,14 @@ class GetExtrinsics: public wxDialog
 		virtual ~GetExtrinsics();
 
 		//(*Declarations(GetExtrinsics)
+		wxSpinCtrl* Height;
 		wxStaticText* StaticText1;
+		wxSpinCtrl* Width;
 		wxStaticText* StaticText3;
+		wxTextCtrl* Scale;
 		wxButton* ButtonGetExtrinsics;
-		wxSpinCtrl* SpinCtrl2;
-		wxTextCtrl* TextCtrl1;
 		wxStaticText* StaticText4;
 		wxStaticText* StaticText2;
-		wxSpinCtrl* SpinCtrl1;
 		//*)
 
 	protected:

@@ -1337,12 +1337,42 @@ void EditorFrame::OnButtonGetExtrinsics(wxCommandEvent& event)
    GetExtrinsics * extrinsicsSelector = new GetExtrinsics(this, wxID_ANY);
 
 
+  memcpy(&extrinsicsSelector->calib,&calib,sizeof(struct calibration));
+
+  calib.extrinsicParametersSet=0;
+  calib.extrinsicRotationRodriguez[0]=0;
+  calib.extrinsicRotationRodriguez[1]=0;
+  calib.extrinsicRotationRodriguez[2]=0;
+  calib.extrinsicTranslation[0]=0;
+  calib.extrinsicTranslation[1]=0;
+  calib.extrinsicTranslation[2]=0;
+  calib.extrinsic[0]=0;   calib.extrinsic[1]=0;   calib.extrinsic[2]=0;   calib.extrinsic[3]=0;
+  calib.extrinsic[4]=0;   calib.extrinsic[5]=0;   calib.extrinsic[6]=0;   calib.extrinsic[7]=0;
+  calib.extrinsic[8]=0;   calib.extrinsic[9]=0;   calib.extrinsic[10]=0;  calib.extrinsic[11]=0;
+  calib.extrinsic[12]=0;  calib.extrinsic[13]=0;  calib.extrinsic[14]=0;  calib.extrinsic[15]=0;
+
+
+  WriteCalibration("colorAR.calib",&calib);
+
   extrinsicsSelector->moduleID = moduleID;
   extrinsicsSelector->devID = devID;
 
   extrinsicsSelector->ShowModal();
 
-   delete  extrinsicsSelector;
+  PrintCalibration(&extrinsicsSelector->calib);
+
+  acquisitionSetColorCalibration(overlayModule,overlayDevice,&extrinsicsSelector->calib);
+  acquisitionSetDepthCalibration(overlayModule,overlayDevice,&extrinsicsSelector->calib);
+
+
+  memcpy(&calib,&extrinsicsSelector->calib,sizeof(struct calibration));
+
+
+  acquisitionSnapFrames(overlayModule,overlayDevice);;
+  guiSnapFrames(0); //Get New Frames
+  Refresh();
+
+  delete  extrinsicsSelector;
 }
 
 void EditorFrame::OnButtonAddClick(wxCommandEvent& event)

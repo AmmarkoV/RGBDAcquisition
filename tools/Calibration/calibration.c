@@ -303,12 +303,12 @@ int PrintCalibration(struct calibration * calib)
 {
   if (calib==0) { fprintf(stderr,"No calibration structure provided for printout \n"); return 0; }
   fprintf(stderr, "Dimensions ( %u x %u ) \n",calib->width,calib->height);
-  fprintf(stderr, "fx %0.2f fy %0.2f cx %0.2f cy %0.2f\n",calib->intrinsic[CALIB_INTR_FX],calib->intrinsic[CALIB_INTR_FY],
+  fprintf(stderr, "fx %0.5f fy %0.5f cx %0.5f cy %0.5f\n",calib->intrinsic[CALIB_INTR_FX],calib->intrinsic[CALIB_INTR_FY],
                                                           calib->intrinsic[CALIB_INTR_CX],calib->intrinsic[CALIB_INTR_CY]);
-  fprintf(stderr, "k1 %0.2f k2 %0.2f p1 %0.2f p2 %0.2f k3 %0.2f\n",calib->k1,calib->k2,calib->p1,calib->p2,calib->k3);
+  fprintf(stderr, "k1 %0.5f k2 %0.5f p1 %0.5f p2 %0.5f k3 %0.5f\n",calib->k1,calib->k2,calib->p1,calib->p2,calib->k3);
 
-  fprintf(stderr, "Tx %0.2f %0.2f %0.2f \n",calib->extrinsicTranslation[0],calib->extrinsicTranslation[1],calib->extrinsicTranslation[2]);
-  fprintf(stderr, "Rodriguez %0.2f %0.2f %0.2f \n",calib->extrinsicRotationRodriguez[0],calib->extrinsicRotationRodriguez[1],calib->extrinsicRotationRodriguez[2]);
+  fprintf(stderr, "Tx %0.5f %0.5f %0.5f \n",calib->extrinsicTranslation[0],calib->extrinsicTranslation[1],calib->extrinsicTranslation[2]);
+  fprintf(stderr, "Rodriguez %0.5f %0.5f %0.5f \n",calib->extrinsicRotationRodriguez[0],calib->extrinsicRotationRodriguez[1],calib->extrinsicRotationRodriguez[2]);
 
   return 0;
 }

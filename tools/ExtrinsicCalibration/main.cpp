@@ -325,12 +325,13 @@ int main( int argc, char** argv )
     // improve the found corners' coordinate accuracy
     view_gray = cvCreateImage( cvGetSize(view), 8, 1 );
     cvCvtColor( view, view_gray, CV_BGR2GRAY );
+     cvShowImage( "Gray View", view_gray );
     cvFindCornerSubPix( view_gray, image_points_buf, count, cvSize(11,11),cvSize(-1,-1), cvTermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1 ));
-    cvReleaseImage( &view_gray );
 
     cvDrawChessboardCorners( view, board_size, image_points_buf, count, found );
-    if ( viewResult )        cvShowImage( "Image View", view );
-    if (writeResultImage)  {  cvSaveImage( "extcalibrate.jpg", view , 0 ); }
+    if ( viewResult )      {  cvShowImage( "Image View", view );          }
+    if (writeResultImage)  {  cvSaveImage( "extcalibrate.jpg", view, 0 ); }
+    cvReleaseImage( &view_gray );
 
 
     struct calibration calib={0};
@@ -377,7 +378,7 @@ int main( int argc, char** argv )
     fprintf( stderr, "  %f ",rotM.data.fl[6]); fprintf( stderr, "%f ",rotM.data.fl[7]); fprintf( stderr, "%f\n",rotM.data.fl[8]);
 
 
-    if ( viewResult ) { cvWaitKey(1); }
+    if ( viewResult ) { cvWaitKey(0); }
 
     return 0;
 }
