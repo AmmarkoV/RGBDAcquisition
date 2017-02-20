@@ -478,6 +478,7 @@ int main(int argc, char **argv)
      private_node_handle_.param("highRate", highRate, int(30));
      private_node_handle_.param("midRate", midRate, int(15));
      private_node_handle_.param("lowRate", lowRate, int(5));
+     framerate = highRate;
      //private_node_handle_.param("scaleDepth", scaleDepth, float(1.0));
 
      private_node_handle_.param("deviceID", from, std::string(""));

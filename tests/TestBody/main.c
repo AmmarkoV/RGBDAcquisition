@@ -5,11 +5,13 @@
 #include "../../tools/AmMatrix/matrixCalculations.h"
 #include "../../tools/Primitives/jsonCocoSkeleton.h"
 #include "../../tools/Primitives/skeleton.h"
+#include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h"
 
 unsigned int devID=0;
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
 char inputname[512]={0};
+char modelname[512]={0};
 
 void closeEverything()
 {
@@ -37,15 +39,21 @@ int main(int argc, char *argv[])
   unsigned int i=0;
   for (i=0; i<argc; i++)
   {
-    if (strcmp(argv[i],"-dev")==0)      {
+    if (strcmp(argv[i],"--dev")==0)      {
                                            devID = atoi(argv[i+1]);
                                            fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],devID);
                                          } else
     if (
-        (strcmp(argv[i],"-from")==0) ||
+        (strcmp(argv[i],"--from")==0) ||
         (strcmp(argv[i],"-i")==0)
        )
        { strcat(inputname,argv[i+1]); fprintf(stderr,"Input , set to %s  \n",inputname); }
+        else
+    if (
+        (strcmp(argv[i],"--model")==0) ||
+        (strcmp(argv[i],"-m")==0)
+       )
+       { strcat(modelname,argv[i+1]); fprintf(stderr,"Model , set to %s  \n",modelname); }
              else
     if (strcmp(argv[i],"-fps")==0)       {
                                              framerate=atoi(argv[i+1]);
@@ -59,6 +67,13 @@ int main(int argc, char *argv[])
        fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
        return 1;
    }
+
+
+
+struct TRI_Model triModel={0};
+
+if (strlen(modelname)>0)
+ { loadModelTri(modelname,&triModel); }
 
 FILE *fp;
 
@@ -82,6 +97,13 @@ EMULATE_PROJECTION_MATRIX(535.423889 , 0.0 , 320.000000 , 0.0 , 533.484680 , 240
 INTERPOLATE_TIME(0)\n\
 RATE(1)\n"
   );
+
+
+if (strlen(modelname)>0)
+ { fprintf(fp,"OBJECT_TYPE(smartBody,%s)  \n",modelname);
+   fprintf(fp,"RIGID_OBJECT(body,smartBody, 0,0,0,0,0 ,10.0,10.0,10.0 )\n");
+
+ }
 
 fprintf(fp,"OBJECT_TYPE(objSphere,sphere)  \n");
 for (i=0; i<COCO_PARTS; i++)
@@ -141,6 +163,12 @@ fprintf(fp,"\n");
         fprintf(fp,"\n");
 
 
+        float x,y,z,qX,qY,qZ,qW;
+
+        convertCOCO_To_Smartbody_TRI(&skel,&triModel,&x,&y,&z,&qX,&qY,&qZ,&qW);
+
+        fprintf(fp,"MOVE(body,%u,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",frameNum,x,y,z,qX,qY,qZ,qW);
+
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
         ++frameNum;
@@ -150,6 +178,10 @@ fprintf(fp,"\n");
 
 
  fclose(fp);
+
+
+if (strlen(modelname)>0)
+ { deallocInternalsOfModelTri(&triModel); }
 
 }
 

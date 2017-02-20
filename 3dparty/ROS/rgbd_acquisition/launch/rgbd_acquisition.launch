@@ -26,7 +26,7 @@
       <param name="deviceID" value="$(arg deviceID)" /> 
       <param name="moduleID" value="$(arg moduleID)" /> 
       <param name="frame" value="$(arg frame)" /> 
-      <param name="highRate" value="30" /> 
+      <param name="highRate" value="50" /> 
       <param name="midRate" value="15" /> 
       <param name="lowRate" value="5" /> 
       <param name="useSkeleton" value="0" />  
