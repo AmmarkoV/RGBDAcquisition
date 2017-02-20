@@ -160,14 +160,16 @@ fprintf(fp,"\n");
 
            fprintf(fp,"MOVE(%s,%u,%0.2f,%0.2f,%0.2f,0.0,0.0,0.0,1.0)\n",COCOBodyNames[i],frameNum,skel.joint[i].x,skel.joint[i].y,skel.joint[i].z);
          }
+
+
+       if (strlen(modelname)>0)
+        {
+         float x,y,z,qX,qY,qZ,qW;
+         convertCOCO_To_Smartbody_TRI(&skel,&triModel,&x,&y,&z,&qX,&qY,&qZ,&qW);
+         fprintf(fp,"MOVE(body,%u,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",frameNum,x,y,z,qX,qY,qZ,qW);
+        }
+
         fprintf(fp,"\n");
-
-
-        float x,y,z,qX,qY,qZ,qW;
-
-        convertCOCO_To_Smartbody_TRI(&skel,&triModel,&x,&y,&z,&qX,&qY,&qZ,&qW);
-
-        fprintf(fp,"MOVE(body,%u,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",frameNum,x,y,z,qX,qY,qZ,qW);
 
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
