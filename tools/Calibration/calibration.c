@@ -301,6 +301,7 @@ int ReadCalibration(char * filename,unsigned int width,unsigned int height,struc
 
 int PrintCalibration(struct calibration * calib)
 {
+  fprintf(stderr, "---------------------------------------------------------------------\n");
   if (calib==0) { fprintf(stderr,"No calibration structure provided for printout \n"); return 0; }
   fprintf(stderr, "Dimensions ( %u x %u ) \n",calib->width,calib->height);
   fprintf(stderr, "fx %0.5f fy %0.5f cx %0.5f cy %0.5f\n",calib->intrinsic[CALIB_INTR_FX],calib->intrinsic[CALIB_INTR_FY],
@@ -309,6 +310,7 @@ int PrintCalibration(struct calibration * calib)
 
   fprintf(stderr, "Tx %0.5f %0.5f %0.5f \n",calib->extrinsicTranslation[0],calib->extrinsicTranslation[1],calib->extrinsicTranslation[2]);
   fprintf(stderr, "Rodriguez %0.5f %0.5f %0.5f \n",calib->extrinsicRotationRodriguez[0],calib->extrinsicRotationRodriguez[1],calib->extrinsicRotationRodriguez[2]);
+  fprintf(stderr, "---------------------------------------------------------------------\n");
 
   return 0;
 }

@@ -617,8 +617,12 @@ int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int
 
     #if USE_CALIBRATION
      //Populate our calibration data ( if we have them
+     fprintf(stdout,"Processing Color Calibration \n");
      FocalLengthAndPixelSizeToCalibration(getOpenNI2ColorFocalLength(devID),getOpenNI2ColorPixelSize(devID),getOpenNI2ColorWidth(devID),getOpenNI2ColorHeight(devID),&calibRGB[devID]);
+     PrintCalibration(&calibRGB[devID]);
+     fprintf(stdout,"Processing Depth Calibration \n");
      FocalLengthAndPixelSizeToCalibration(getOpenNI2DepthFocalLength(devID),getOpenNI2DepthPixelSize(devID),getOpenNI2DepthWidth(devID),getOpenNI2DepthHeight(devID),&calibDepth[devID]);
+     PrintCalibration(&calibDepth[devID]);
     #endif
 
     deviceInited[devID]=1;
@@ -770,7 +774,7 @@ double getOpenNI2ColorFocalLength(int devID)
 
 
        if ( (width==640)&&(height==480) ) { return (double) 531.15 * zpps; } else
-       if ( (width==320)&&(height==240) ) { return (double) 285.63 * zpps; } else
+       if ( (width==320)&&(height==240) ) { return (double) 285.63 * zpps; } else //
                                           {
                                              fprintf(stderr,"Unknown set of dimensions for the OpenNI2 sensor , do not know a good focal length value to use\n");
                                           }

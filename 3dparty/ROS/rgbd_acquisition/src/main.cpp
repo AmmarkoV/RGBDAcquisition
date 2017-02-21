@@ -77,9 +77,9 @@ int devID=0,moduleID=0;
 int useRGBDAcqusition=0;
 volatile static bool first = true;
 
-unsigned int width = 640;
-unsigned int height = 480;
-unsigned int framerate = 30;
+int width = 640;
+int height = 480;
+int framerate = 30;
 
 unsigned int draw_out = 0;
 unsigned int counter = 0;
@@ -468,17 +468,21 @@ int main(int argc, char **argv)
      std::string module;
      std::string name;
      std::string camera;
-     std::string frame;
+     std::string frame; 
      int highRate,midRate,lowRate;
 
      ros::NodeHandle private_node_handle_("~");
      private_node_handle_.param("name", name, std::string("rgbd_acquisition"));
      private_node_handle_.param("camera", camera, std::string("camera"));
      private_node_handle_.param("frame", frame, std::string("frame"));
+
+     private_node_handle_.param("width", width, int(640));
+     private_node_handle_.param("height", height, int(480));
+     private_node_handle_.param("framerate", framerate , int(30)); 
      private_node_handle_.param("highRate", highRate, int(30));
      private_node_handle_.param("midRate", midRate, int(15));
      private_node_handle_.param("lowRate", lowRate, int(5));
-     framerate = highRate;
+     highRate=framerate;
      //private_node_handle_.param("scaleDepth", scaleDepth, float(1.0));
 
      private_node_handle_.param("deviceID", from, std::string(""));
@@ -505,6 +509,7 @@ int main(int argc, char **argv)
      std::cout<<"Name : "<<name<<std::endl;
      std::cout<<"Camera : "<<camera<<std::endl;
      std::cout<<"Frame : "<<frame<<std::endl;
+     std::cout<<"Mode : "<<width<<"x"<<height<<":"<<framerate<<std::endl;
      std::cout<<"High Rate : "<<highRate<<std::endl;
      std::cout<<"Mid Rate : "<<midRate<<std::endl;
      std::cout<<"Low Rate : "<<lowRate<<std::endl;
@@ -517,7 +522,7 @@ int main(int argc, char **argv)
      ros::Rate high_loop_rate(highRate); //  hz should be our target performance
      ros::Rate medium_loop_rate(midRate); //  hz should be our target performance
      ros::Rate low_loop_rate(lowRate); //  hz should be our target performance
-     framerateState=MEDIUM_FRAMERATE; //By default we go to medium!
+     framerateState=HIGH_FRAMERATE; //By default we go to medium!
 
      //We advertise the services we want accessible using "rosservice call *w/e*"
      ros::ServiceServer saveROSCalibrationService  = nh.advertiseService(name+"/saveROSCalibration", saveROSCalibrationFile);

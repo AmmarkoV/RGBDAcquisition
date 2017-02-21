@@ -25,6 +25,9 @@
       <param name="camera" value="$(arg camera)" />
       <param name="deviceID" value="$(arg deviceID)" /> 
       <param name="moduleID" value="$(arg moduleID)" /> 
+      <param name="width" value="$(arg width)" /> 
+      <param name="height" value="$(arg height)" /> 
+      <param name="framerate" value="$(arg framerate)" /> 
       <param name="frame" value="$(arg frame)" /> 
       <param name="highRate" value="50" /> 
       <param name="midRate" value="15" /> 
