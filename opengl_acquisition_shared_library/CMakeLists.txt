@@ -72,6 +72,8 @@ add_library(OpenGLAcquisition SHARED
             ../tools/AmMatrix/matrix3x3Tools.h
             ../tools/AmMatrix/matrix4x4Tools.c
             ../tools/AmMatrix/matrix4x4Tools.h
+            ../tools/AmMatrix/matrixProject.c
+            ../tools/AmMatrix/matrixProject.h
             ../tools/AmMatrix/matrixCalculations.c
             ../tools/AmMatrix/matrixCalculations.h
             ../tools/AmMatrix/solveLinearSystemGJ.c

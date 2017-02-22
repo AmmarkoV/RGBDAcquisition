@@ -50,6 +50,8 @@
 			<Add library="GLU" />
 			<Add library="X11" />
 			<Add library="../../../tools/Codecs/libCodecs.a" />
+			<Add library="jpeg" />
+			<Add library="png" />
 		</Linker>
 		<Unit filename="../../../tools/AmMatrix/collisions.c">
 			<Option compilerVar="CC" />
@@ -67,6 +69,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../tools/AmMatrix/matrixCalculations.h" />
+		<Unit filename="../../../tools/AmMatrix/matrixProject.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../tools/AmMatrix/matrixProject.h" />
 		<Unit filename="../../../tools/AmMatrix/ocvStaging.c">
 			<Option compilerVar="CC" />
 		</Unit>

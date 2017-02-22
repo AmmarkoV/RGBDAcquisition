@@ -15,9 +15,9 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
   if (coco->joint[COCO_LHip].y < coco->joint[COCO_RHip].y) { *y=coco->joint[COCO_LHip].y; } else { *y=coco->joint[COCO_RHip].y; }
   if (coco->joint[COCO_LHip].z < coco->joint[COCO_RHip].z) { *z=coco->joint[COCO_LHip].z; } else { *z=coco->joint[COCO_RHip].z; }
 
-  *x=absF((coco->joint[COCO_LHip].x-coco->joint[COCO_RHip].x)/2);
-  *y=absF((coco->joint[COCO_LHip].y-coco->joint[COCO_RHip].y)/2);
-  *z=absF((coco->joint[COCO_LHip].z-coco->joint[COCO_RHip].z)/2);
+  *x+=absF((coco->joint[COCO_LHip].x-coco->joint[COCO_RHip].x)/2);
+  *y+=absF((coco->joint[COCO_LHip].y-coco->joint[COCO_RHip].y)/2);
+  *z+=absF((coco->joint[COCO_LHip].z-coco->joint[COCO_RHip].z)/2);
 
 
 
