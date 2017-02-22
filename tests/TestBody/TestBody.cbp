@@ -41,6 +41,14 @@
 			<Add library="jpeg" />
 		</Linker>
 		<Unit filename="../../acquisition/Acquisition.h" />
+		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h" />
+		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h" />
 		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -61,6 +69,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../tools/AmMatrix/matrixCalculations.h" />
+		<Unit filename="../../tools/AmMatrix/matrixProject.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../tools/AmMatrix/matrixProject.h" />
 		<Unit filename="../../tools/AmMatrix/matrixTools.h" />
 		<Unit filename="../../tools/AmMatrix/ocvStaging.c">
 			<Option compilerVar="CC" />
@@ -86,6 +98,10 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="smartbody_trI_converter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="smartbody_trI_converter.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
