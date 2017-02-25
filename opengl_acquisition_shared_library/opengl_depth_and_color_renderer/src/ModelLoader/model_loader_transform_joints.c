@@ -330,10 +330,22 @@ if (parentNode!=0)
 //according to the real location of the mesh
 float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * outputNumberOfJoints)
 {
+  if (in==0)                   { return 0; }
+  if (outputNumberOfJoints==0) { return 0; }
+
   float * outputJoints = ( float * )  malloc (sizeof(float) * in->header.numberOfBones * 3);
+  if(outputJoints!=0)
+  {
   memset(outputJoints,0,sizeof(float) * in->header.numberOfBones * 3);
 
   unsigned int * outputNumberSamples = ( unsigned int * )  malloc (sizeof(unsigned int ) * in->header.numberOfBones);
+  if (outputNumberSamples==0)
+  {
+    fprintf(stderr,"Could not allocate internal sample space , convertTRIBonesToJointPositions will fail \n");
+    free(outputJoints);
+    *outputNumberOfJoints=0;
+    return 0;
+  }
   memset(outputNumberSamples,0,sizeof(unsigned int) * in->header.numberOfBones);
 
   *outputNumberOfJoints =  in->header.numberOfBones;
@@ -389,8 +401,83 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
   }
 
  free(outputNumberSamples);
+
+ }
  return outputJoints;
 }
+
+
+
+unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * joints , unsigned int numberOfJoints)
+{
+  fprintf(stderr,"getClosestVertexToJointPosition \n");
+  unsigned int * outputPositions = ( unsigned int * )  malloc (sizeof(unsigned int ) * numberOfJoints );
+
+  if (outputPositions!=0)
+  {
+   memset(outputPositions,0,sizeof(unsigned int ) * numberOfJoints);
+
+   unsigned int i=0,v=0;
+   float x,y,z,diffX,diffY,diffZ , bestDistance=10000000000 , worstDistance=0 , currentDistance;
+
+   fprintf(stderr,"searching best vertices for %u joints \n",numberOfJoints);
+   for (i=0; i<numberOfJoints; i++)
+   {
+     x=joints[i*3+0];
+     y=joints[i*3+1];
+     z=joints[i*3+2];
+
+     if (
+          (x!=x) ||
+          (y!=y) ||
+          (z!=z)
+         )
+     {
+       //IGNORE NAN VALUE
+     } else
+     {
+     bestDistance=10000000000;
+     worstDistance=0;
+     fprintf(stderr,"now doing vertice search among %u vertices \n",in->header.numberOfVertices/3);
+     for (v=0; v<in->header.numberOfVertices/3; v++)
+     {
+       diffX=x-in->vertices[v*3+0];
+       diffY=y-in->vertices[v*3+1];
+       diffZ=z-in->vertices[v*3+2];
+
+       currentDistance = (diffX*diffX) + (diffY*diffY) + (diffZ*diffZ);
+       if ( currentDistance < bestDistance )
+       {
+         outputPositions[i]=v;
+         bestDistance=currentDistance;
+       }
+       if ( currentDistance > worstDistance )
+       {
+         worstDistance=currentDistance ;
+       }
+
+       if (bestDistance==0)  //Cant find a better match..
+          {break;}
+     }
+
+     fprintf(stderr,"Bone %u (%s) = ",i,in->bones[i].boneName);
+     fprintf(stderr," %0.2f,%0.2f,%0.2f \n ",joints[i*3+0],joints[i*3+1],joints[i*3+2]);
+     fprintf(stderr," Best Vertice is %u with a distance of %0.2f ( worst %0.2f ) \n ",outputPositions[i],sqrt(bestDistance),sqrt(worstDistance));
+     }
+   }
+
+
+  }
+ return outputPositions;
+}
+
+
+
+
+
+
+
+
 
 
 int setTRIModelBoneInitialPosition(struct TRI_Model * in)

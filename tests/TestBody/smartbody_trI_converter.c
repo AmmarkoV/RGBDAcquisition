@@ -1,4 +1,6 @@
 #include "smartbody_trI_converter.h"
+#include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h"
+#include "../../tools/AmMatrix/matrixProject.h"
 
 
 float absF(float abs)
@@ -6,6 +8,16 @@ float absF(float abs)
  if(abs<0) { return -abs; }
  return abs;
 }
+
+
+
+
+
+
+
+
+
+
 
 int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * triModel ,
                                  float *x , float *y , float *z ,
@@ -18,6 +30,16 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
   *x+=absF((coco->joint[COCO_LHip].x-coco->joint[COCO_RHip].x)/2);
   *y+=absF((coco->joint[COCO_LHip].y-coco->joint[COCO_RHip].y)/2);
   *z+=absF((coco->joint[COCO_LHip].z-coco->joint[COCO_RHip].z)/2);
+
+  unsigned int outputNumberOfJoints;
+  float * triJoints = convertTRIBonesToJointPositions(triModel,&outputNumberOfJoints);
+  if (triJoints!=0)
+  {
+    unsigned int  * verticesToKeep = getClosestVertexToJointPosition(triModel,triJoints,outputNumberOfJoints);
+
+    free(triJoints);
+  }
+
 
 
 

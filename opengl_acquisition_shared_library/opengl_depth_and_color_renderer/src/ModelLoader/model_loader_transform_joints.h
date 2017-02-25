@@ -79,6 +79,7 @@ according to the real location of the mesh , this function is also quite resourc
 float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * outputNumberOfJoints);
 
 
+unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * joints , unsigned int numberOfJoints);
 
 /**
 * @brief Populate in->bone[x].info->x/y/z with the centers of the bone based on the current setup of the
