@@ -11,6 +11,33 @@ float absF(float abs)
 
 
 
+float getCOCOAndSmartBodyDistance(struct skeletonCOCO * coco,struct TRI_Model * triModel)
+{
+  float score=10000000;
+
+  unsigned int outputNumberOfJoints;
+  float * triJoints = convertTRIBonesToJointPositions(triModel,&outputNumberOfJoints);
+  if (triJoints!=0)
+  {
+   score=0;
+    unsigned int i=0;
+    for (i=0; i<COCO_PARTS; i++)
+    {
+      unsigned triJointAddr;
+      if ( findTRIBoneWithName(triModel ,smartBodyNames[i], &triJointAddr) )
+      {
+       float diffX = coco->joint[COCO_LHip].x - triModel->joint[triJointAddr*3+0];
+       float diffY = coco->joint[COCO_LHip].y - triModel->joint[triJointAddr*3+1];
+       float diffZ = coco->joint[COCO_LHip].z - triModel->joint[triJointAddr*3+2];
+       score+=sqrt((diffX*diffX)+(diffY*diffY)+(diffZ*diffZ));
+      }
+     }
+   free(triJoints);
+  }
+
+ return score;
+}
+
 
 
 
@@ -36,7 +63,10 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
   if (triJoints!=0)
   {
     unsigned int  * verticesToKeep = getClosestVertexToJointPosition(triModel,triJoints,outputNumberOfJoints);
-
+    if (verticesToKeep!=0)
+    {
+      free(verticesToKeep);
+    }
     free(triJoints);
   }
 

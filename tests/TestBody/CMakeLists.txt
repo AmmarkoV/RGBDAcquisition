@@ -1,7 +1,7 @@
 project( TestBody ) 
 cmake_minimum_required( VERSION 2.8.7 ) 
      
-add_executable(TestBody main.c  smartbody_trI_converter.c
+add_executable(TestBody main.c  smartbody_tri_converter.c
 ../../../tools/AmMatrix/matrixProject.c
 ../../../tools/AmMatrix/matrixProject.h
 ../../../tools/Primitives/jsonCocoSkeleton.h

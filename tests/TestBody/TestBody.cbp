@@ -98,10 +98,10 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="smartbody_trI_converter.c">
+		<Unit filename="smartbody_tri_converter.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="smartbody_trI_converter.h" />
+		<Unit filename="smartbody_tri_converter.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
