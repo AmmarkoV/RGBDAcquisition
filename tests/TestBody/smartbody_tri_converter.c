@@ -1,15 +1,12 @@
-#include "smartbody_trI_converter.h"
+#include "smartbody_tri_converter.h"
 #include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h"
 #include "../../tools/AmMatrix/matrixProject.h"
-
 
 float absF(float abs)
 {
  if(abs<0) { return -abs; }
  return abs;
 }
-
-
 
 float getCOCOAndSmartBodyDistance(struct skeletonCOCO * coco,struct TRI_Model * triModel)
 {
@@ -23,12 +20,12 @@ float getCOCOAndSmartBodyDistance(struct skeletonCOCO * coco,struct TRI_Model * 
     unsigned int i=0;
     for (i=0; i<COCO_PARTS; i++)
     {
-      unsigned triJointAddr;
+      unsigned triJointAddr=0;
       if ( findTRIBoneWithName(triModel ,smartBodyNames[i], &triJointAddr) )
       {
-       float diffX = coco->joint[COCO_LHip].x - triModel->joint[triJointAddr*3+0];
-       float diffY = coco->joint[COCO_LHip].y - triModel->joint[triJointAddr*3+1];
-       float diffZ = coco->joint[COCO_LHip].z - triModel->joint[triJointAddr*3+2];
+       float diffX = coco->joint[i].x - triJoints[triJointAddr*3+0];
+       float diffY = coco->joint[i].y - triJoints[triJointAddr*3+1];
+       float diffZ = coco->joint[i].z - triJoints[triJointAddr*3+2];
        score+=sqrt((diffX*diffX)+(diffY*diffY)+(diffZ*diffZ));
       }
      }
@@ -37,14 +34,6 @@ float getCOCOAndSmartBodyDistance(struct skeletonCOCO * coco,struct TRI_Model * 
 
  return score;
 }
-
-
-
-
-
-
-
-
 
 int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * triModel ,
                                  float *x , float *y , float *z ,
@@ -69,8 +58,6 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
     }
     free(triJoints);
   }
-
-
 
 
   *qX=0.707107;

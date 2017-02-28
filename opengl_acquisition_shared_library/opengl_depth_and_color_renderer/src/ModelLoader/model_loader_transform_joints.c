@@ -299,11 +299,6 @@ void freeTransformTRIBonesToVertexBoneFormat(struct TRI_Bones_Per_Vertex * in)
 /// -----------------------------------------------------------------------------
 /// -----------------------------------------------------------------------------
 
-
-
-
-
-
 unsigned int * convertTRIBonesToParentList(struct TRI_Model * in , unsigned int * outputNumberOfBones)
 {
 
@@ -322,9 +317,6 @@ if (parentNode!=0)
 }
  return parentNode;
 }
-
-
-
 
 //Please note that the output is in the coordinate space of the binding pose model and needs to be transformed/projected etc
 //according to the real location of the mesh

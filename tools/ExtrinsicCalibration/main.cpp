@@ -80,7 +80,8 @@ int ReadCalibration(char * filename,struct calibration * calib)
      if ( (line[0]=='%') && (line[1]=='T') && (line[2]==0) ) { category=3;    } else
      if ( (line[0]=='%') && (line[1]=='R') && (line[2]==0) ) { category=4;    } else
         {
-          fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
+          //TOO MUCH SPAM!
+          //fprintf(stderr,"Line %u ( %s ) is category %u lines %u \n",i,line,category,linesAtCurrentCategory);
           if (category==1)
           {
            calib->intrinsicParametersSet=1;

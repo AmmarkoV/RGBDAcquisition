@@ -71,9 +71,13 @@ int main(int argc, char *argv[])
 
 
 struct TRI_Model triModel={0};
+struct TRI_Model triModelJoints={0};
 
 if (strlen(modelname)>0)
- { loadModelTri(modelname,&triModel); }
+ {
+  loadModelTri(modelname,&triModel);
+  //triModelJoints
+ }
 
 FILE *fp;
 
@@ -130,6 +134,8 @@ fprintf(fp,"\n");
 
   maxFramesToGrab=acquisitionGetTotalFrameNumber(moduleID,devID);
   struct skeletonCOCO skel={0};
+
+
 
    while  ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) )
     {
