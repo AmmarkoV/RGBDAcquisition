@@ -76,7 +76,7 @@ struct TRI_Model triModelJoints={0};
 if (strlen(modelname)>0)
  {
   loadModelTri(modelname,&triModel);
-  //triModelJoints
+  compressTRIModelToJointOnly(&triModelJoints,&triModel);
  }
 
 FILE *fp;

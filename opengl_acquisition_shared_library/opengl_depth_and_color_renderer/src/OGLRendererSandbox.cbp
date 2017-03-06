@@ -150,6 +150,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ModelLoader/model_loader_tri.h" />
+		<Unit filename="ModelLoader/model_processor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ModelLoader/model_processor.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c">
 			<Option compilerVar="CC" />

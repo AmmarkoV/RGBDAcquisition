@@ -81,6 +81,16 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
 
 unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * joints , unsigned int numberOfJoints);
 
+
+
+
+
+
+
+void compressTRIModelToJointOnly(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN);
+
+
+
 /**
 * @brief Populate in->bone[x].info->x/y/z with the centers of the bone based on the current setup of the
          model..

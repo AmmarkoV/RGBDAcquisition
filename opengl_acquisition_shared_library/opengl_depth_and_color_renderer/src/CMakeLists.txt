@@ -43,6 +43,8 @@ add_library(OGLRendererSandbox SHARED
             ModelLoader/model_loader_hardcoded.h 
             ModelLoader/model_loader_transform_joints.c
             ModelLoader/model_loader_transform_joints.h
+            ModelLoader/model_processor.c
+            ModelLoader/model_processor.h
             ModelLoader/model_converter.c
             ModelLoader/model_converter.h
             ModelLoader/model_editor.c
