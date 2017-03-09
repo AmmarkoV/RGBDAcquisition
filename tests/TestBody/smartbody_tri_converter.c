@@ -39,6 +39,13 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
                                  float *x , float *y , float *z ,
                                  float *qX,float *qY,float *qZ,float *qW )
 {
+ unsigned int jointDataSizeOutput=0;
+ float * jointSolution = mallocModelTransformJoints(
+                                                     triModel,
+                                                     &jointDataSizeOutput
+                                                   );
+
+
   if (coco->joint[COCO_LHip].x < coco->joint[COCO_RHip].x) { *x=coco->joint[COCO_LHip].x; } else { *x=coco->joint[COCO_RHip].x; }
   if (coco->joint[COCO_LHip].y < coco->joint[COCO_RHip].y) { *y=coco->joint[COCO_LHip].y; } else { *y=coco->joint[COCO_RHip].y; }
   if (coco->joint[COCO_LHip].z < coco->joint[COCO_RHip].z) { *z=coco->joint[COCO_LHip].z; } else { *z=coco->joint[COCO_RHip].z; }
@@ -47,6 +54,37 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
   *y+=absF((coco->joint[COCO_LHip].y-coco->joint[COCO_RHip].y)/2);
   *z+=absF((coco->joint[COCO_LHip].z-coco->joint[COCO_RHip].z)/2);
 
+
+  float currentSolution=0;
+  float bestSolution=100000;
+  unsigned int jointToChange=0;
+  findTRIBoneWithName(triModel ,smartBodyNames[HUMAN_SKELETON_RIGHT_SHOULDER] , &jointToChange);
+
+  unsigned int i=0;
+  for (i=0; i<100; i++)
+  {
+     transformTRIJoint(
+                        triModel,
+                        jointSolution,
+                        jointDataSizeOutput,
+
+                        jointToChange ,
+                        (float) -50+i ,
+                        0 ,
+                        0
+                      );
+
+
+    currentSolution=getCOCOAndSmartBodyDistance(coco,triModel);
+
+    fprintf(stderr,"Trying %s joint (config %0.2f %0.2f %0.2f ) \n",smartBodyNames[HUMAN_SKELETON_RIGHT_SHOULDER],
+             triModel->bones[jointToChange].info->rotX,
+             triModel->bones[jointToChange].info->rotY,
+             triModel->bones[jointToChange].info->rotZ);
+  }
+
+  if (getCOCOAndSmartBodyDistance(coco,triModel))
+  /*
   unsigned int outputNumberOfJoints;
   float * triJoints = convertTRIBonesToJointPositions(triModel,&outputNumberOfJoints);
   if (triJoints!=0)
@@ -54,10 +92,14 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
     unsigned int  * verticesToKeep = getClosestVertexToJointPosition(triModel,triJoints,outputNumberOfJoints);
     if (verticesToKeep!=0)
     {
+
+
+
+
       free(verticesToKeep);
     }
     free(triJoints);
-  }
+  }*/
 
 
   *qX=0.707107;

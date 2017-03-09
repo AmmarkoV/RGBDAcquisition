@@ -559,9 +559,10 @@ int transform2DFProjectedPointTo3DPoint(struct calibration * calib , float x2d ,
     *y = (float) (y2d - calib->intrinsic[CALIB_INTR_CY]) * (depthValue / calib->intrinsic[CALIB_INTR_FY]);
     //*z = (float) depthValue;
 
-    fprintf(stderr," x3D %0.2f =  x2d(%0.2f) - cx(%0.2f) * ( depth(%u) / fx(%0.2f) )\n" , *x , x2d , calib->intrinsic[CALIB_INTR_CX] ,depthValue , calib->intrinsic[CALIB_INTR_FX] );
-    fprintf(stderr," y3D %0.2f =  y2d(%0.2f) - cy(%0.2f) * ( depth(%u) / fy(%0.2f) )\n" , *y , y2d , calib->intrinsic[CALIB_INTR_CY] ,depthValue , calib->intrinsic[CALIB_INTR_FY] );
-    fprintf(stderr," z3D %0.2f\n",*z);
+    //Debug transform2DFProjectedPointTo3DPoint
+    //fprintf(stderr," x3D %0.2f =  x2d(%0.2f) - cx(%0.2f) * ( depth(%u) / fx(%0.2f) )\n" , *x , x2d , calib->intrinsic[CALIB_INTR_CX] ,depthValue , calib->intrinsic[CALIB_INTR_FX] );
+    //fprintf(stderr," y3D %0.2f =  y2d(%0.2f) - cy(%0.2f) * ( depth(%u) / fy(%0.2f) )\n" , *y , y2d , calib->intrinsic[CALIB_INTR_CY] ,depthValue , calib->intrinsic[CALIB_INTR_FY] );
+    //fprintf(stderr," z3D %0.2f\n",*z);
 
     return 1;
     }

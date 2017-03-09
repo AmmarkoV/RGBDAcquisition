@@ -380,12 +380,18 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
 
    for (i=0; i< in->header.numberOfBones; i++)
    {
-     outputJoints[i*3+0]=outputJoints[i*3+0]/outputNumberSamples[i];
-     outputJoints[i*3+1]=outputJoints[i*3+1]/outputNumberSamples[i];
-     outputJoints[i*3+2]=outputJoints[i*3+2]/outputNumberSamples[i];
+     if (outputNumberSamples[i]>0)
+     {
+      outputJoints[i*3+0]=outputJoints[i*3+0]/outputNumberSamples[i];
+      outputJoints[i*3+1]=outputJoints[i*3+1]/outputNumberSamples[i];
+      outputJoints[i*3+2]=outputJoints[i*3+2]/outputNumberSamples[i];
 
-     fprintf(stderr,"Bone %u (%s) = ",i,in->bones[i].boneName);
-     fprintf(stderr," %0.2f,%0.2f,%0.2f \n ",outputJoints[i*3+0],outputJoints[i*3+1],outputJoints[i*3+2]);
+      fprintf(stderr,"Bone %u (%s) = ",i,in->bones[i].boneName);
+      fprintf(stderr," %0.2f,%0.2f,%0.2f  ( %u samples ) \n ",outputJoints[i*3+0],outputJoints[i*3+1],outputJoints[i*3+2],outputNumberSamples[i]);
+     } else
+     {
+      //fprintf(stderr,"Bone %u (%s) has no samples.. \n",i,in->bones[i].boneName);
+     }
    }
 
 
@@ -577,6 +583,12 @@ void transformTRIJoint(
                                  float rotEulerZ
                                )
 {
+  //This is needed for meta reasons
+  in->bones[jointToChange].info->rotX = rotEulerX;
+  in->bones[jointToChange].info->rotY = rotEulerY;
+  in->bones[jointToChange].info->rotZ = rotEulerZ;
+
+  //We set the 4x4 Matrix that is what is used for the transform..
   float * mat = &jointData[16*jointToChange];
   _triTrans_create4x4MatrixFromEulerAnglesXYZ(mat,rotEulerX,rotEulerY,rotEulerZ);
 }
@@ -820,28 +832,35 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        //W is the weight that we have for the specific bone
        float w = triModelIn->bones[k].weightValue[i];
 
+
+       //Vertice transformation ----------------------------------------------
        //We load our input into position/normal
        position[0] = triModelIn->vertices[v*3+0];
        position[1] = triModelIn->vertices[v*3+1];
        position[2] = triModelIn->vertices[v*3+2];
        position[3] = 1.0;
 
-       normal[0]   = triModelIn->normal[v*3+0];
-       normal[1]   = triModelIn->normal[v*3+1];
-       normal[2]   = triModelIn->normal[v*3+2];
-       normal[3]   = 1.0;
-
        //We transform input (initial) position with the transform we computed to get transformedPosition
        transform3DPointVectorUsing4x4Matrix(transformedPosition, triModelIn->bones[k].info->finalVertexTransformation ,position);
 	   triModelOut->vertices[v*3+0] += (float) transformedPosition[0] * w;
 	   triModelOut->vertices[v*3+1] += (float) transformedPosition[1] * w;
 	   triModelOut->vertices[v*3+2] += (float) transformedPosition[2] * w;
+       //----------------------------------------------------------------------
+
+
+       //Normal transformation ----------------------------------------------
+       normal[0]   = triModelIn->normal[v*3+0];
+       normal[1]   = triModelIn->normal[v*3+1];
+       normal[2]   = triModelIn->normal[v*3+2];
+       normal[3]   = 1.0;
 
        //We transform input (initial) normal with the transform we computed to get transformedNormal
        transform3DPointVectorUsing4x4Matrix(transformedNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
 	   triModelOut->normal[v*3+0] += (float) transformedNormal[0] * w;
 	   triModelOut->normal[v*3+1] += (float) transformedNormal[1] * w;
 	   triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
+	   //----------------------------------------------------------------------
+
      }
    }
  return 1;
