@@ -187,7 +187,7 @@ RATE(1)\n"
                     if (strlen(modelname)>0)
                         {
                             float x,y,z,qX,qY,qZ,qW;
-                            convertCOCO_To_Smartbody_TRI(&skel,&triModelJoints,&x,&y,&z,&qX,&qY,&qZ,&qW);
+                            convertCOCO_To_Smartbody_TRI(&skel,&triModel,&x,&y,&z,&qX,&qY,&qZ,&qW); //triModelJoints
                             fprintf(fp,"MOVE(body,%u,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",frameNum,x,y,z,qX,qY,qZ,qW);
                         }
 

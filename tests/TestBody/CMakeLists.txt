@@ -15,7 +15,6 @@ add_executable(TestBody main.c  smartbody_tri_converter.c
 ../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_processor.h
 ../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c
 ../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
-
 ) 
 target_link_libraries(TestBody rt dl m Acquisition OperatingSystem Timers CalibrationLibrary ${LocationService_Libs} )
 set_target_properties(TestBody PROPERTIES DEBUG_POSTFIX "D")

@@ -1,8 +1,11 @@
 #include "model_processor.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 
 void compressTRIModelToJointOnly(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN)
 {
+  fprintf(stderr,"compressTRIModelToJointOnly does not work correctly yet.. \n");
+
   copyModelTri(triModelOUT,triModelIN,1);
 
   unsigned int outputNumberOfJoints;
