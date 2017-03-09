@@ -6,6 +6,7 @@
 #include "../../tools/Primitives/jsonCocoSkeleton.h"
 #include "../../tools/Primitives/skeleton.h"
 #include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h"
+#include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_processor.h"
 
 unsigned int devID=0;
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//

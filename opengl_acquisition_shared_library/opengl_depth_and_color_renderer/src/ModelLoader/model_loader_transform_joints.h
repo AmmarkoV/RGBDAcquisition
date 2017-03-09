@@ -87,7 +87,6 @@ unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * 
 
 
 
-void compressTRIModelToJointOnly(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN);
 
 
 

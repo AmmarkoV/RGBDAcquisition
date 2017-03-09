@@ -11,6 +11,8 @@ add_executable(TestBody main.c  smartbody_tri_converter.c
 ../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h
 ../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.c
 ../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_tri.h
+../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_processor.c
+../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_processor.h
 ../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c
 ../../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
 

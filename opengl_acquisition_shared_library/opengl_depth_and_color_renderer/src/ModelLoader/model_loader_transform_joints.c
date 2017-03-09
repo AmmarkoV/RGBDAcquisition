@@ -467,31 +467,6 @@ unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * 
 
 
 
-void compressTRIModelToJointOnly(struct TRI_Model * triModelOUT , struct TRI_Model * triModelIN)
-{
-  copyModelTri(triModelOUT,triModelIN,1)
-
-  unsigned int outputNumberOfJoints;
-  float * triJoints = convertTRIBonesToJointPositions(triModelOUT,&outputNumberOfJoints);
-  if (triJoints!=0)
-  {
-    unsigned int  * verticesToKeep = getClosestVertexToJointPosition(triModelOUT,triJoints,outputNumberOfJoints);
-    if (verticesToKeep!=0)
-    {
-      //----------------------
-
-
-
-      //----------------------
-      free(verticesToKeep);
-    }
-    free(triJoints);
-  }
- return;
-}
-
-
-
 
 
 int setTRIModelBoneInitialPosition(struct TRI_Model * in)
