@@ -88,8 +88,12 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
   unsigned long startTime,endTime;
   float  bestSelection=666;
   unsigned int i=0;
+
+  float testI=0;
   for (i=0; i<10; i++)
   {
+   testI=(float) -50+(i*10);
+
    startTime = getTickCountMicroseconds();
    fprintf(stderr,"Trying %s joint ",smartBodyNames[HUMAN_SKELETON_RIGHT_SHOULDER]);
 
@@ -99,24 +103,37 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
                         jointDataSizeOutput,
 
                         jointToChange ,
-                        (float) -50+(i*10) ,
+                        testI,
                         0 ,
                         0
                       );
 
+      struct TRI_Model tmVT = {0};
+      doModelTransform(
+                         &tmVT , //We won't make an output model..!
+                         triModel ,
 
-    currentSolution=getCOCOAndSmartBodyDistance(coco,triModel);
+                         jointSolution,
+                         jointDataSizeOutput ,
+
+                         1, //Auto detect default matrices ( speedup )
+                         1, //We want direct setting of matrices
+                         1,  //We actually don't want to perform the vertex transform we only want the matrices
+                         0
+                        );
+    currentSolution=getCOCOAndSmartBodyDistance(coco,&tmVT);
+    deallocInternalsOfModelTri(&tmVT);
 
     if (currentSolution<bestSolution)
     {
-     fprintf(stderr,"Better solution found..\n");
+     fprintf(stderr,"Better solution found (%0.2f) ..\n",testI);
      fprintf(stderr,"(config %0.2f %0.2f %0.2f ) \n",
              triModel->bones[jointToChange].info->rotX,
              triModel->bones[jointToChange].info->rotY,
              triModel->bones[jointToChange].info->rotZ);
 
      bestSolution=currentSolution;
-     bestSelection=(float) -50+(i*10);
+     bestSelection=testI;
     }
 
    endTime = getTickCountMicroseconds();

@@ -148,7 +148,8 @@ RATE(1)\n"
                     return 1;
                 }
 
-            maxFramesToGrab=acquisitionGetTotalFrameNumber(moduleID,devID);
+            if (maxFramesToGrab==0)
+              { maxFramesToGrab=acquisitionGetTotalFrameNumber(moduleID,devID); }
             struct skeletonCOCO skel= {0};
 
 
@@ -200,7 +201,7 @@ RATE(1)\n"
 
                 }
 
-
+            fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
             fclose(fp);
 
 
@@ -212,7 +213,6 @@ RATE(1)\n"
         }
 
 
-    fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
 
     closeEverything();
 
