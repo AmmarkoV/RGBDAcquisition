@@ -49,6 +49,224 @@ static float NAOdefaultJoints[] = { 0,-194,dp, 0,0,dp , 0,222,dp , -191,0,dp , 1
                                   };
 
 
+
+static const char * smartBodyNames[] =
+{
+    "JtUpperFaceParent",
+    "JtNeckB" ,
+    "JtSpineB",
+    "JtShoulderRt",
+    "JtShoulderLf",
+    "JtElbowRt",
+    "JtElbowLf",
+    "JtWristRt",
+    "JtWristLf",
+    "JtHipRt",
+    "JtHipLf",
+    "JtKneeRt",
+    "JtKneeLf",
+    "JtAnkleRt",
+    "JtAnkleLf" ,
+    "JtSpineA" ,
+//=================
+    "End of Joint Names" ,
+    "Unknown"
+};
+
+
+static const char * jointNames[] =
+{
+    "head",
+    "neck" ,
+    "torso",
+    "right_shoulder",
+    "left_shoulder",
+    "right_elbow",
+    "left_elbow",
+    "right_hand",
+    "left_hand",
+    "right_hip",
+    "left_hip",
+    "right_knee",
+    "left_knee",
+    "right_foot",
+    "left_foot" ,
+    "hip" ,
+//=================
+    "End of Joint Names" ,
+    "Unknown"
+};
+
+
+
+static const char * jointNamesFormatted[] =
+{
+    "Head     ",
+    "Neck     " ,
+    "Torso    ",
+    "RShoulder",
+    "LShoulder",
+    "RElbow   ",
+    "LElbow   ",
+    "RHand    ",
+    "LHand    ",
+    "RHip     ",
+    "LHip     ",
+    "RKnee    ",
+    "LKnee    ",
+    "RFoot    ",
+    "LFoot    ",
+    "Hip      ",
+//=================
+    "End of Joint Names" ,
+    "Unknown"
+};
+
+
+static const char * tgbtNames[] =
+{
+    "head",
+    "neck",
+    "bodyCenter",
+    "rightShoulder",
+    "leftShoulder",
+    "rightElbow",
+    "leftElbow",
+    "rightWrist",
+    "leftWrist",
+    "rightLegRoot",
+    "leftLegRoot",
+    "rightKnee",
+    "leftKnee",
+    "rightAnkle",
+    "leftAnkle",
+    "hip",
+//--------------------
+    "End Of TGBT Names" ,
+    "Unknown"
+};
+
+static const char * const humanSkeletonJointNames[] =
+{
+    "HUMAN_SKELETON_HEAD",
+    "HUMAN_SKELETON_NECK",
+    "HUMAN_SKELETON_TORSO",
+    "HUMAN_SKELETON_RIGHT_SHOULDER",
+    "HUMAN_SKELETON_LEFT_SHOULDER",
+    "HUMAN_SKELETON_RIGHT_ELBOW",
+    "HUMAN_SKELETON_LEFT_ELBOW",
+    "HUMAN_SKELETON_RIGHT_HAND",
+    "HUMAN_SKELETON_LEFT_HAND",
+    "HUMAN_SKELETON_RIGHT_HIP",
+    "HUMAN_SKELETON_LEFT_HIP",
+    "HUMAN_SKELETON_RIGHT_KNEE",
+    "HUMAN_SKELETON_LEFT_KNEE",
+    "HUMAN_SKELETON_RIGHT_FOOT",
+    "HUMAN_SKELETON_LEFT_FOOT",
+    "HUMAN_SKELETON_HIP" ,
+    "Unknown"
+};
+
+enum humanSkeletonJoints
+{
+    HUMAN_SKELETON_HEAD = 0,
+    HUMAN_SKELETON_NECK,
+    HUMAN_SKELETON_TORSO,
+    HUMAN_SKELETON_RIGHT_SHOULDER,
+    HUMAN_SKELETON_LEFT_SHOULDER,
+    HUMAN_SKELETON_RIGHT_ELBOW,
+    HUMAN_SKELETON_LEFT_ELBOW,
+    HUMAN_SKELETON_RIGHT_HAND,
+    HUMAN_SKELETON_LEFT_HAND,
+    HUMAN_SKELETON_RIGHT_HIP,
+    HUMAN_SKELETON_LEFT_HIP,
+    HUMAN_SKELETON_RIGHT_KNEE,
+    HUMAN_SKELETON_LEFT_KNEE,
+    HUMAN_SKELETON_RIGHT_FOOT,
+    HUMAN_SKELETON_LEFT_FOOT,
+    HUMAN_SKELETON_HIP,
+    //---------------------
+    HUMAN_SKELETON_PARTS,
+    HUMAN_SKELETON_UNKNOWN
+};
+
+
+static const int humanSkeletonJointsParentRelationMap[] =
+{
+    // Parent                        Joint
+    HUMAN_SKELETON_NECK,           //HUMAN_SKELETON_HEAD
+    HUMAN_SKELETON_TORSO,           //HUMAN_SKELETON_NECK
+    HUMAN_SKELETON_TORSO,           //HUMAN_SKELETON_TORSO
+    HUMAN_SKELETON_NECK,           //HUMAN_SKELETON_RIGHT_SHOULDER
+    HUMAN_SKELETON_NECK,           //HUMAN_SKELETON_LEFT_SHOULDER
+    HUMAN_SKELETON_RIGHT_SHOULDER, //HUMAN_SKELETON_RIGHT_ELBOW
+    HUMAN_SKELETON_LEFT_SHOULDER,  //HUMAN_SKELETON_LEFT_ELBOW
+    HUMAN_SKELETON_RIGHT_ELBOW,    //HUMAN_SKELETON_RIGHT_HAND
+    HUMAN_SKELETON_LEFT_ELBOW,     //HUMAN_SKELETON_LEFT_HAND
+    HUMAN_SKELETON_HIP,            //HUMAN_SKELETON_RIGHT_HIP
+    HUMAN_SKELETON_HIP,            //HUMAN_SKELETON_LEFT_HIP
+    HUMAN_SKELETON_RIGHT_HIP,      //HUMAN_SKELETON_RIGHT_KNEE
+    HUMAN_SKELETON_LEFT_HIP,       //HUMAN_SKELETON_LEFT_KNEE
+    HUMAN_SKELETON_LEFT_KNEE,      //HUMAN_SKELETON_RIGHT_FOOT
+    HUMAN_SKELETON_LEFT_KNEE,      //HUMAN_SKELETON_LEFT_FOOT
+    HUMAN_SKELETON_TORSO,          //HUMAN_SKELETON_HIP
+    HUMAN_SKELETON_UNKNOWN
+};
+
+
+
+
+static const char * const humanSkeletonMirroredJointNames[] =
+{
+    "HUMAN_SKELETON_MIRRORED_HEAD",
+    "HUMAN_SKELETON_MIRRORED_NECK",
+    "HUMAN_SKELETON_MIRRORED_TORSO",
+    "HUMAN_SKELETON_MIRRORED_LEFT_SHOULDER",
+    "HUMAN_SKELETON_MIRRORED_RIGHT_SHOULDER",
+    "HUMAN_SKELETON_MIRRORED_LEFT_ELBOW",
+    "HUMAN_SKELETON_MIRRORED_RIGHT_ELBOW",
+    "HUMAN_SKELETON_MIRRORED_LEFT_HAND",
+    "HUMAN_SKELETON_MIRRORED_RIGHT_HAND",
+    "HUMAN_SKELETON_MIRRORED_LEFT_HIP",
+    "HUMAN_SKELETON_MIRRORED_RIGHT_HIP",
+    "HUMAN_SKELETON_MIRRORED_LEFT_KNEE",
+    "HUMAN_SKELETON_MIRRORED_RIGHT_KNEE",
+    "HUMAN_SKELETON_MIRRORED_LEFT_FOOT",
+    "HUMAN_SKELETON_MIRRORED_RIGHT_FOOT",
+    "HUMAN_SKELETON_MIRRORED_HIP" ,
+    "Unknown"
+};
+
+enum humanMirroredSkeletonJoints
+{
+    HUMAN_SKELETON_MIRRORED_HEAD = 0,
+    HUMAN_SKELETON_MIRRORED_NECK,
+    HUMAN_SKELETON_MIRRORED_TORSO,
+    HUMAN_SKELETON_MIRRORED_LEFT_SHOULDER,
+    HUMAN_SKELETON_MIRRORED_RIGHT_SHOULDER,
+    HUMAN_SKELETON_MIRRORED_LEFT_ELBOW,
+    HUMAN_SKELETON_MIRRORED_RIGHT_ELBOW,
+    HUMAN_SKELETON_MIRRORED_LEFT_HAND,
+    HUMAN_SKELETON_MIRRORED_RIGHT_HAND,
+    HUMAN_SKELETON_MIRRORED_LEFT_HIP,
+    HUMAN_SKELETON_MIRRORED_RIGHT_HIP,
+    HUMAN_SKELETON_MIRRORED_LEFT_KNEE,
+    HUMAN_SKELETON_MIRRORED_RIGHT_KNEE,
+    HUMAN_SKELETON_MIRRORED_LEFT_FOOT,
+    HUMAN_SKELETON_MIRRORED_RIGHT_FOOT,
+    HUMAN_SKELETON_MIRRORED_HIP,
+    //---------------------
+    HUMAN_SKELETON_MIRRORED_PARTS
+};
+
+
+
+
+
+
+
+
+
 static const char * COCOBodyNames[] =
 {
   "Nose",
@@ -100,44 +318,30 @@ enum COCOSkeletonJoints
   COCO_PARTS
 };
 
-
-/*
-enum humanSkeletonJoints
+static const int cocoMapToSmartBody[] =
 {
-    COCO_MAP_TO_SMARTBODY_Head       = HUMAN_SKELETON_HEAD ,
-    COCO_MAP_TO_SMARTBODY_Neck       = HUMAN_SKELETON_NECK ,
-    COCO_UNMAPPED_TO_SMARTBODY_TORSO = HUMAN_SKELETON_TORSO,
-    COCO_MAP_TO_SMARTBODY_RShoulder  = HUMAN_SKELETON_RIGHT_SHOULDER ,
-    COCO_MAP_TO_SMARTBODY_RElbow,
-    COCO_MAP_TO_SMARTBODY_RWrist,
-    COCO_MAP_TO_SMARTBODY_LShoulder,
-    COCO_MAP_TO_SMARTBODY_LElbow,
-    COCO_MAP_TO_SMARTBODY_LWrist,
-    COCO_MAP_TO_SMARTBODY_RHip,
-    COCO_MAP_TO_SMARTBODY_RKnee,
-    COCO_MAP_TO_SMARTBODY_RAnkle,
-    COCO_MAP_TO_SMARTBODY_LHip,
-    COCO_MAP_TO_SMARTBODY_LKnee,
-    COCO_MAP_TO_SMARTBODY_LAnkle,
-
-    HUMAN_SKELETON_TORSO,
+    // Values Of Smartbody for a value of coco
+    HUMAN_SKELETON_HEAD,
+    HUMAN_SKELETON_NECK,
     HUMAN_SKELETON_RIGHT_SHOULDER,
-    HUMAN_SKELETON_LEFT_SHOULDER,
     HUMAN_SKELETON_RIGHT_ELBOW,
-    HUMAN_SKELETON_LEFT_ELBOW,
     HUMAN_SKELETON_RIGHT_HAND,
+    HUMAN_SKELETON_LEFT_SHOULDER,
+    HUMAN_SKELETON_LEFT_ELBOW,
     HUMAN_SKELETON_LEFT_HAND,
     HUMAN_SKELETON_RIGHT_HIP,
-    HUMAN_SKELETON_LEFT_HIP,
     HUMAN_SKELETON_RIGHT_KNEE,
-    HUMAN_SKELETON_LEFT_KNEE,
     HUMAN_SKELETON_RIGHT_FOOT,
+    HUMAN_SKELETON_LEFT_HIP,
+    HUMAN_SKELETON_LEFT_KNEE,
     HUMAN_SKELETON_LEFT_FOOT,
-    HUMAN_SKELETON_HIP,
-    //---------------------
-    COCO_MAP_TO_SMARTBODY_PARTS
+    HUMAN_SKELETON_UNKNOWN,
+    HUMAN_SKELETON_UNKNOWN,
+    HUMAN_SKELETON_UNKNOWN,
+    HUMAN_SKELETON_UNKNOWN,
+    HUMAN_SKELETON_UNKNOWN,
+    HUMAN_SKELETON_UNKNOWN
 };
-*/
 
 
 static const int COCOSkeletonJointsParentRelationMap[] =
@@ -166,207 +370,6 @@ static const int COCOSkeletonJointsParentRelationMap[] =
 
 
 
-
-static const char * smartBodyNames[] =
-{
-    "JtUpperFaceParent",
-    "JtNeckB" ,
-    "JtSpineB",
-    "JtShoulderRt",
-    "JtShoulderLf",
-    "JtElbowRt",
-    "JtElbowLf",
-    "JtWristRt",
-    "JtWristLf",
-    "JtHipRt",
-    "JtHipLf",
-    "JtKneeRt",
-    "JtKneeLf",
-    "JtAnkleRt",
-    "JtAnkleLf" ,
-    "JtSpineA" ,
-//=================
-    "End of Joint Names"
-};
-
-
-static const char * jointNames[] =
-{
-    "head",
-    "neck" ,
-    "torso",
-    "right_shoulder",
-    "left_shoulder",
-    "right_elbow",
-    "left_elbow",
-    "right_hand",
-    "left_hand",
-    "right_hip",
-    "left_hip",
-    "right_knee",
-    "left_knee",
-    "right_foot",
-    "left_foot" ,
-    "hip" ,
-//=================
-    "End of Joint Names"
-};
-
-
-
-static const char * jointNamesFormatted[] =
-{
-    "Head     ",
-    "Neck     " ,
-    "Torso    ",
-    "RShoulder",
-    "LShoulder",
-    "RElbow   ",
-    "LElbow   ",
-    "RHand    ",
-    "LHand    ",
-    "RHip     ",
-    "LHip     ",
-    "RKnee    ",
-    "LKnee    ",
-    "RFoot    ",
-    "LFoot    ",
-    "Hip      ",
-//=================
-    "End of Joint Names"
-};
-
-
-static const char * tgbtNames[] =
-{
-    "head",
-    "neck",
-    "bodyCenter",
-    "rightShoulder",
-    "leftShoulder",
-    "rightElbow",
-    "leftElbow",
-    "rightWrist",
-    "leftWrist",
-    "rightLegRoot",
-    "leftLegRoot",
-    "rightKnee",
-    "leftKnee",
-    "rightAnkle",
-    "leftAnkle",
-    "hip",
-//--------------------
-    "End Of TGBT Names"
-};
-
-static const char * const humanSkeletonJointNames[] =
-{
-    "HUMAN_SKELETON_HEAD",
-    "HUMAN_SKELETON_NECK",
-    "HUMAN_SKELETON_TORSO",
-    "HUMAN_SKELETON_RIGHT_SHOULDER",
-    "HUMAN_SKELETON_LEFT_SHOULDER",
-    "HUMAN_SKELETON_RIGHT_ELBOW",
-    "HUMAN_SKELETON_LEFT_ELBOW",
-    "HUMAN_SKELETON_RIGHT_HAND",
-    "HUMAN_SKELETON_LEFT_HAND",
-    "HUMAN_SKELETON_RIGHT_HIP",
-    "HUMAN_SKELETON_LEFT_HIP",
-    "HUMAN_SKELETON_RIGHT_KNEE",
-    "HUMAN_SKELETON_LEFT_KNEE",
-    "HUMAN_SKELETON_RIGHT_FOOT",
-    "HUMAN_SKELETON_LEFT_FOOT",
-    "HUMAN_SKELETON_HIP"
-};
-
-enum humanSkeletonJoints
-{
-    HUMAN_SKELETON_HEAD = 0,
-    HUMAN_SKELETON_NECK,
-    HUMAN_SKELETON_TORSO,
-    HUMAN_SKELETON_RIGHT_SHOULDER,
-    HUMAN_SKELETON_LEFT_SHOULDER,
-    HUMAN_SKELETON_RIGHT_ELBOW,
-    HUMAN_SKELETON_LEFT_ELBOW,
-    HUMAN_SKELETON_RIGHT_HAND,
-    HUMAN_SKELETON_LEFT_HAND,
-    HUMAN_SKELETON_RIGHT_HIP,
-    HUMAN_SKELETON_LEFT_HIP,
-    HUMAN_SKELETON_RIGHT_KNEE,
-    HUMAN_SKELETON_LEFT_KNEE,
-    HUMAN_SKELETON_RIGHT_FOOT,
-    HUMAN_SKELETON_LEFT_FOOT,
-    HUMAN_SKELETON_HIP,
-    //---------------------
-    HUMAN_SKELETON_PARTS
-};
-
-
-static const int humanSkeletonJointsParentRelationMap[] =
-{
-    // Parent                        Joint
-    HUMAN_SKELETON_NECK,           //HUMAN_SKELETON_HEAD
-    HUMAN_SKELETON_TORSO,           //HUMAN_SKELETON_NECK
-    HUMAN_SKELETON_TORSO,           //HUMAN_SKELETON_TORSO
-    HUMAN_SKELETON_NECK,           //HUMAN_SKELETON_RIGHT_SHOULDER
-    HUMAN_SKELETON_NECK,           //HUMAN_SKELETON_LEFT_SHOULDER
-    HUMAN_SKELETON_RIGHT_SHOULDER, //HUMAN_SKELETON_RIGHT_ELBOW
-    HUMAN_SKELETON_LEFT_SHOULDER,  //HUMAN_SKELETON_LEFT_ELBOW
-    HUMAN_SKELETON_RIGHT_ELBOW,    //HUMAN_SKELETON_RIGHT_HAND
-    HUMAN_SKELETON_LEFT_ELBOW,     //HUMAN_SKELETON_LEFT_HAND
-    HUMAN_SKELETON_HIP,            //HUMAN_SKELETON_RIGHT_HIP
-    HUMAN_SKELETON_HIP,            //HUMAN_SKELETON_LEFT_HIP
-    HUMAN_SKELETON_RIGHT_HIP,      //HUMAN_SKELETON_RIGHT_KNEE
-    HUMAN_SKELETON_LEFT_HIP,       //HUMAN_SKELETON_LEFT_KNEE
-    HUMAN_SKELETON_LEFT_KNEE,      //HUMAN_SKELETON_RIGHT_FOOT
-    HUMAN_SKELETON_LEFT_KNEE,      //HUMAN_SKELETON_LEFT_FOOT
-    HUMAN_SKELETON_TORSO,          //HUMAN_SKELETON_HIP
-};
-
-
-
-
-static const char * const humanSkeletonMirroredJointNames[] =
-{
-    "HUMAN_SKELETON_MIRRORED_HEAD",
-    "HUMAN_SKELETON_MIRRORED_NECK",
-    "HUMAN_SKELETON_MIRRORED_TORSO",
-    "HUMAN_SKELETON_MIRRORED_LEFT_SHOULDER",
-    "HUMAN_SKELETON_MIRRORED_RIGHT_SHOULDER",
-    "HUMAN_SKELETON_MIRRORED_LEFT_ELBOW",
-    "HUMAN_SKELETON_MIRRORED_RIGHT_ELBOW",
-    "HUMAN_SKELETON_MIRRORED_LEFT_HAND",
-    "HUMAN_SKELETON_MIRRORED_RIGHT_HAND",
-    "HUMAN_SKELETON_MIRRORED_LEFT_HIP",
-    "HUMAN_SKELETON_MIRRORED_RIGHT_HIP",
-    "HUMAN_SKELETON_MIRRORED_LEFT_KNEE",
-    "HUMAN_SKELETON_MIRRORED_RIGHT_KNEE",
-    "HUMAN_SKELETON_MIRRORED_LEFT_FOOT",
-    "HUMAN_SKELETON_MIRRORED_RIGHT_FOOT",
-    "HUMAN_SKELETON_MIRRORED_HIP"
-};
-
-enum humanMirroredSkeletonJoints
-{
-    HUMAN_SKELETON_MIRRORED_HEAD = 0,
-    HUMAN_SKELETON_MIRRORED_NECK,
-    HUMAN_SKELETON_MIRRORED_TORSO,
-    HUMAN_SKELETON_MIRRORED_LEFT_SHOULDER,
-    HUMAN_SKELETON_MIRRORED_RIGHT_SHOULDER,
-    HUMAN_SKELETON_MIRRORED_LEFT_ELBOW,
-    HUMAN_SKELETON_MIRRORED_RIGHT_ELBOW,
-    HUMAN_SKELETON_MIRRORED_LEFT_HAND,
-    HUMAN_SKELETON_MIRRORED_RIGHT_HAND,
-    HUMAN_SKELETON_MIRRORED_LEFT_HIP,
-    HUMAN_SKELETON_MIRRORED_RIGHT_HIP,
-    HUMAN_SKELETON_MIRRORED_LEFT_KNEE,
-    HUMAN_SKELETON_MIRRORED_RIGHT_KNEE,
-    HUMAN_SKELETON_MIRRORED_LEFT_FOOT,
-    HUMAN_SKELETON_MIRRORED_RIGHT_FOOT,
-    HUMAN_SKELETON_MIRRORED_HIP,
-    //---------------------
-    HUMAN_SKELETON_MIRRORED_PARTS
-};
 
 
 struct point2D

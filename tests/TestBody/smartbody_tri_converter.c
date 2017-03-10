@@ -2,6 +2,26 @@
 #include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_transform_joints.h"
 #include "../../tools/AmMatrix/matrixProject.h"
 
+
+#include <sys/time.h>
+#include <time.h>
+
+unsigned long tickBase = 0;
+
+unsigned long getTickCountMicroseconds()
+{
+   struct timespec ts;
+   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
+
+   if (tickBase==0)
+   {
+     tickBase = ts.tv_sec*1000000 + ts.tv_nsec/1000;
+     return 0;
+   }
+
+   return ( ts.tv_sec*1000000 + ts.tv_nsec/1000 ) - tickBase;
+}
+
 float absF(float abs)
 {
  if(abs<0) { return -abs; }
@@ -21,7 +41,9 @@ float getCOCOAndSmartBodyDistance(struct skeletonCOCO * coco,struct TRI_Model * 
     unsigned triJointAddr=0;
     for (i=0; i<COCO_PARTS; i++)
     {
-      if ( findTRIBoneWithName(triModel ,smartBodyNames[i], &triJointAddr) )
+     if (cocoMapToSmartBody[i]<HUMAN_SKELETON_PARTS)
+     {
+      if ( findTRIBoneWithName(triModel ,smartBodyNames[cocoMapToSmartBody[i]], &triJointAddr) )
       {
        float diffX = coco->joint[i].x - triJoints[triJointAddr*3+0];
        float diffY = coco->joint[i].y - triJoints[triJointAddr*3+1];
@@ -29,6 +51,8 @@ float getCOCOAndSmartBodyDistance(struct skeletonCOCO * coco,struct TRI_Model * 
        score+=sqrt((diffX*diffX)+(diffY*diffY)+(diffZ*diffZ));
       }
      }
+    }
+
    free(triJoints);
   }
 
@@ -60,9 +84,13 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
   unsigned int jointToChange=0;
   findTRIBoneWithName(triModel ,smartBodyNames[HUMAN_SKELETON_RIGHT_SHOULDER] , &jointToChange);
 
+
+  unsigned long startTime,endTime;
+  float  bestSelection=666;
   unsigned int i=0;
-  for (i=0; i<100; i++)
+  for (i=0; i<10; i++)
   {
+   startTime = getTickCountMicroseconds();
    fprintf(stderr,"Trying %s joint ",smartBodyNames[HUMAN_SKELETON_RIGHT_SHOULDER]);
 
      transformTRIJoint(
@@ -71,7 +99,7 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
                         jointDataSizeOutput,
 
                         jointToChange ,
-                        (float) -50+i ,
+                        (float) -50+(i*10) ,
                         0 ,
                         0
                       );
@@ -79,28 +107,21 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
 
     currentSolution=getCOCOAndSmartBodyDistance(coco,triModel);
 
-    fprintf(stderr,"(config %0.2f %0.2f %0.2f ) \n",
+    if (currentSolution<bestSolution)
+    {
+     fprintf(stderr,"Better solution found..\n");
+     fprintf(stderr,"(config %0.2f %0.2f %0.2f ) \n",
              triModel->bones[jointToChange].info->rotX,
              triModel->bones[jointToChange].info->rotY,
              triModel->bones[jointToChange].info->rotZ);
-  }
 
-  /*
-  unsigned int outputNumberOfJoints;
-  float * triJoints = convertTRIBonesToJointPositions(triModel,&outputNumberOfJoints);
-  if (triJoints!=0)
-  {
-    unsigned int  * verticesToKeep = getClosestVertexToJointPosition(triModel,triJoints,outputNumberOfJoints);
-    if (verticesToKeep!=0)
-    {
-
-
-
-
-      free(verticesToKeep);
+     bestSolution=currentSolution;
+     bestSelection=(float) -50+(i*10);
     }
-    free(triJoints);
-  }*/
+
+   endTime = getTickCountMicroseconds();
+   fprintf(stderr,"%lu microseconds.. \n",endTime-startTime);
+  }
 
 
   *qX=0.707107;

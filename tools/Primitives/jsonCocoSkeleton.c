@@ -13,8 +13,8 @@ int parseJsonCOCOSkeleton(const char * filename , struct skeletonCOCO * skel)
 {
   fprintf(stderr,"Running COCO 2D skeleton \n");
 
-  char * line = NULL;
-  size_t len = 0;
+//  char * line = NULL;
+//  size_t len = 0;
   ssize_t read;
 
   FILE * fp = fopen(filename,"r");
@@ -61,12 +61,12 @@ int parseJsonCOCOSkeleton(const char * filename , struct skeletonCOCO * skel)
        for (i=0; i<COCO_PARTS; i++)
        {
         InputParser_GetWord(ipc,i,str,512);
-        printf("Joint %u ( %s ) ",i,COCOBodyNames[i]);
+        //printf("Joint %u ( %s ) ",i,COCOBodyNames[i]);
         skel->jointAccuracy[i] = InputParser_GetWordFloat(ipc,1+i*3+2);
         skel->joint2D[i].x     = InputParser_GetWordFloat(ipc,1+i*3+0);
         skel->joint2D[i].y     = InputParser_GetWordFloat(ipc,1+i*3+1);
 
-        printf("Pos ( x=%0.2f,y=%0.2f ) Precision %0.2f \n",skel->joint2D[i].x,skel->joint2D[i].y,skel->jointAccuracy[i]);
+        //printf("Pos ( x=%0.2f,y=%0.2f ) Precision %0.2f \n",skel->joint2D[i].x,skel->joint2D[i].y,skel->jointAccuracy[i]);
        }
        }
        //    doSkeletonConversions( &skel );

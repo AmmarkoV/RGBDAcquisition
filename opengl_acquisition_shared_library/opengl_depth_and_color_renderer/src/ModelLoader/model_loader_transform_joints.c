@@ -386,8 +386,8 @@ float * convertTRIBonesToJointPositions(struct TRI_Model * in , unsigned int * o
       outputJoints[i*3+1]=outputJoints[i*3+1]/outputNumberSamples[i];
       outputJoints[i*3+2]=outputJoints[i*3+2]/outputNumberSamples[i];
 
-      fprintf(stderr,"Bone %u (%s) = ",i,in->bones[i].boneName);
-      fprintf(stderr," %0.2f,%0.2f,%0.2f  ( %u samples ) \n ",outputJoints[i*3+0],outputJoints[i*3+1],outputJoints[i*3+2],outputNumberSamples[i]);
+      //fprintf(stderr,"Bone %u (%s) = ",i,in->bones[i].boneName);
+      //fprintf(stderr," %0.2f,%0.2f,%0.2f  ( %u samples ) \n ",outputJoints[i*3+0],outputJoints[i*3+1],outputJoints[i*3+2],outputNumberSamples[i]);
      } else
      {
       //fprintf(stderr,"Bone %u (%s) has no samples.. \n",i,in->bones[i].boneName);
