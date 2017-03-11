@@ -21,9 +21,8 @@ do
  convert $f -resize "640x480>^"  $STYLE_MODEL/images/content/job.jpg
 
  cd $STYLE_MODEL 
- cp $STYLE_MODEL/res2.jpg $STYLE_MODEL/res.jpg
-  
-#optirun python style.py -s images/style/starry_night.jpg -c images/content/job.jpg -m caffenet -g 0 -o res.jpg
+# cp $STYLE_MODEL/res2.jpg $STYLE_MODEL/res.jpg
+  optirun python style.py -s images/style/starry_night.jpg -c images/content/job.jpg -m caffenet -g 0 -o res.jpg
  cd "$DIR/neuralVid"
  cp $STYLE_MODEL/res.jpg $f
  rm $STYLE_MODEL/res.jpg
