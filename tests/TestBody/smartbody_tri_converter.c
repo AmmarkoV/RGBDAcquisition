@@ -30,7 +30,7 @@ float absF(float abs)
 
 float getCOCOAndSmartBodyDistance(struct skeletonCOCO * coco,struct TRI_Model * triModel)
 {
-  float score=10000000;
+  float score=10000000,addedToScore=0;
 
   unsigned int outputNumberOfJoints;
   float * triJoints = convertTRIBonesToJointPositions(triModel,&outputNumberOfJoints);
@@ -48,7 +48,11 @@ float getCOCOAndSmartBodyDistance(struct skeletonCOCO * coco,struct TRI_Model * 
        float diffX = coco->joint[i].x - triJoints[triJointAddr*3+0];
        float diffY = coco->joint[i].y - triJoints[triJointAddr*3+1];
        float diffZ = coco->joint[i].z - triJoints[triJointAddr*3+2];
-       score+=sqrt((diffX*diffX)+(diffY*diffY)+(diffZ*diffZ));
+       addedToScore=sqrt((diffX*diffX)+(diffY*diffY)+(diffZ*diffZ));
+       fprintf(stderr,"Joint %s has diffs = %0.2f " ,smartBodyNames[cocoMapToSmartBody[i]], addedToScore);
+       fprintf(stderr,"( %0.2f %0.2f %0.2f ) -> " ,coco->joint[i].x,coco->joint[i].y,coco->joint[i].z);
+       fprintf(stderr,"( %0.2f %0.2f %0.2f )  \n" ,triJoints[triJointAddr*3+0],triJoints[triJointAddr*3+1],triJoints[triJointAddr*3+2]);
+       score+=addedToScore;
       }
      }
     }
@@ -82,7 +86,7 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
 
 
   float currentSolution=0;
-  float bestSolution=100000;
+  float bestSolution=1000000;
   unsigned int jointToChange=0;
   findTRIBoneWithName(triModel ,smartBodyNames[HUMAN_SKELETON_RIGHT_SHOULDER] , &jointToChange);
 
@@ -97,7 +101,7 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
    testI=(float) -50+(i*10);
 
    startTime = getTickCountMicroseconds();
-   fprintf(stderr,"Trying %s joint ",smartBodyNames[HUMAN_SKELETON_RIGHT_SHOULDER]);
+   fprintf(stderr,"Trying %s joint value %0.2f ",smartBodyNames[HUMAN_SKELETON_RIGHT_SHOULDER],testI);
 
      transformTRIJoint(
                         triModel,
@@ -126,10 +130,12 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
     currentSolution=getCOCOAndSmartBodyDistance(coco,&tmVT);
     deallocInternalsOfModelTri(&tmVT);
 
+   fprintf(stderr,"score=%0.2f ",currentSolution);
+
     if (currentSolution<bestSolution)
     {
-     fprintf(stderr,"Better solution found (%0.2f) ..\n",testI);
-     fprintf(stderr,"(config %0.2f %0.2f %0.2f ) \n",
+     fprintf(stderr,"\n\nBetter solution found (%0.2f) ..\n",testI);
+     fprintf(stderr,"(config %0.2f %0.2f %0.2f ) \n\n",
              triModel->bones[jointToChange].info->rotX,
              triModel->bones[jointToChange].info->rotY,
              triModel->bones[jointToChange].info->rotZ);

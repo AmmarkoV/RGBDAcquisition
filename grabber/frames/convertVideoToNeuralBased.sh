@@ -40,6 +40,6 @@ done
 
 THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"` 
 cd "$DIR/$IMAGE_FOLDER"
-avconv -i %07d.jpg -y -r 20 -threads 8 -b 30000k -s 640x480  ../outHD_$THEDATETAG.mp4 
+avconv -i %07d.jpg -y -r 20 -threads 8 -b 30000k -s 640x480  ../outHD_$1_using_$2_$THEDATETAG.mp4 
 
 exit 0
