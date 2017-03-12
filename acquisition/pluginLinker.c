@@ -111,6 +111,8 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
    ldPath= getenv("LD_LIBRARY_PATH");
    if (ldPath!=0)        { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPath);  }
 
+
+   fprintf(stderr,RED "Could not find plugin library %s..\n " NORMAL,libName);
    return 0;
 }
 

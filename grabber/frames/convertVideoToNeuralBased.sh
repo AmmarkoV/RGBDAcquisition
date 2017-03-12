@@ -13,6 +13,8 @@ mkdir neuralVid
 
 avconv -i $1 neuralVid/%07d.jpg 
 
+count=1
+
 cd "$DIR/neuralVid"
 FILES_TO_CONVERT=`ls | grep .jpg`
 for f in $FILES_TO_CONVERT
@@ -25,6 +27,10 @@ do
  cd "$DIR/neuralVid"
  cp $STYLE_MODEL/res.jpg $f
  rm $STYLE_MODEL/res.jpg
+
+
+  count=$((count + 1))
+  echo "Frame $count" > $DIR/neuralVid/progress.txt
 done
 
 THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"` 

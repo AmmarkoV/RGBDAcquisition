@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
     if (!acquisitionIsModuleAvailiable(moduleID))
         {
-            fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
+            fprintf(stderr,"The module (%s) you are trying to use is not linked in this build of the Acquisition library..\n",getModuleNameFromModuleID(moduleID));
             return 1;
         }
 

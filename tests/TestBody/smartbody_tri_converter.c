@@ -63,6 +63,8 @@ int convertCOCO_To_Smartbody_TRI(struct skeletonCOCO * coco,struct TRI_Model * t
                                  float *x , float *y , float *z ,
                                  float *qX,float *qY,float *qZ,float *qW )
 {
+ fprintf(stderr,"convertCOCO_To_Smartbody_TRI \n");
+
  unsigned int jointDataSizeOutput=0;
  float * jointSolution = mallocModelTransformJoints(
                                                      triModel,
