@@ -2,7 +2,7 @@
 
 STYLE_MODEL="/home/ammar/Documents/3dParty/style-transfer"
 STYLE_FILE="$STYLE_MODEL/images/style/work$2.jpg"
-IMAGE_FOLDER=$2_Vid
+IMAGE_FOLDER=$1_using_$2_Video
 
 cp $2 $STYLE_FILE
 
