@@ -358,11 +358,11 @@ void create4x4TranslationMatrix(double * matrix , double x, double y, double z)
     matrix[3] = x; matrix[7] = y; matrix[11] = z;
 }
 
-void create4x4ScalingMatrix(double * matrix , double sx, double sy, double sz)
+void create4x4ScalingMatrix(double * matrix , double scaleX, double scaleY, double scaleZ)
 {
     create4x4IdentityMatrix(matrix);
     // Scale slots.
-    matrix[0] = sx; matrix[5] = sy; matrix[10] = sz;
+    matrix[0] = scaleX; matrix[5] = scaleY; matrix[10] = scaleZ;
 }
 
 

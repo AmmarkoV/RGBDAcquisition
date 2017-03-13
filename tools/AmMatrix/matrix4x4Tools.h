@@ -133,7 +133,7 @@ void create4x4TranslationMatrix(double * matrix,double x, double y, double z);
 * @param  Scaling on the Z
 * @retval 0=Failure,1=Success
 */
-void create4x4ScalingMatrix(double * matrix,double sx, double sy, double sz);
+void create4x4ScalingMatrix(double * matrix,double scaleX, double scaleY, double scaleZ);
 
 
 
