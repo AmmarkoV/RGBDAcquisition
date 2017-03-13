@@ -7,6 +7,25 @@
 #ifndef OGL_SHADER_PIPELINE_RENDERER_H_INCLUDED
 #define OGL_SHADER_PIPELINE_RENDERER_H_INCLUDED
 
+/**
+* @brief This call renders a mesh using shaders..!
+* @ingroup Rendering
+
+* @param Vertice data
+* @param Number of Vertices
+
+* @param Normal data
+* @param Number of Normals
+
+* @param Texture Coordinate data
+* @param Number of Texture Coordinates
+
+* @param Color data
+* @param Number of Colors
+
+* @param Indexing data for vertices
+* @param Number of Indices
+*/
 void doOGLShaderDrawCalllist(
                               float * vertices ,       unsigned int numberOfVertices ,
                               float * normal ,         unsigned int numberOfNormals ,

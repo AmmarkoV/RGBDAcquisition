@@ -25,13 +25,13 @@ FILES_TO_CONVERT=`ls | grep .jpg`
 for f in $FILES_TO_CONVERT
 do 
  TARGETNAME=`basename $f .jpg` 
- convert $f -resize "640x480>^"  $STYLE_MODEL/images/content/job.jpg
+ convert $f -resize "640x480>^"  $STYLE_MODEL/images/content/job$2.jpg
 
  cd $STYLE_MODEL 
- python style.py -s $STYLE_FILE -c images/content/job.jpg -m caffenet -g 0 -o res.jpg
+ python style.py -s $STYLE_FILE -c images/content/job$2.jpg -m caffenet -g 0 -o res$2.jpg
  cd "$DIR/$IMAGE_FOLDER"
- cp $STYLE_MODEL/res.jpg $f
- rm $STYLE_MODEL/res.jpg
+ cp $STYLE_MODEL/res$2.jpg $f
+ rm $STYLE_MODEL/res$2.jpg
 
 
   count=$((count + 1))

@@ -18,7 +18,7 @@ void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode , unsigned i
 
 
 /**
-* @brief This call renders a mesh
+* @brief This call renders a mesh using the old fixed OpenGL pipeline
 * @ingroup Rendering
 
 * @param Vertice data
