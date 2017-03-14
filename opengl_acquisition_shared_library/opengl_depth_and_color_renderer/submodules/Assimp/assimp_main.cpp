@@ -19,7 +19,9 @@ int main (int argc, char *argv[])
  fprintf(stderr,"assimpTester %s %s %s \n",argv[1],argv[2],argv[3]);
 
 
- if (strstr(argv[2],".dae")!=0)
+ if ( (strstr(argv[2],".dae")!=0) ||
+    (strstr(argv[2],".obj")!=0) )
+
  {
 
  struct TRI_Model *flatModel    =  allocateModelTri();
