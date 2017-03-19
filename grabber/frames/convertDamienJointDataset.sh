@@ -17,7 +17,9 @@ if [ $i -ne 0 ]; then
  qX=`echo $line | cut -d ' ' -f5`
  qY=`echo $line | cut -d ' ' -f6`
  qZ=`echo $line | cut -d ' ' -f7`
- echo "MOVE(human,$i,$X,$Y,$Z,$qW,$qX,$qY,$qZ)"  
+ #echo "MOVE(human,$i,$X,$Y,$Z,$qW,$qX,$qY,$qZ)"  
+ echo "MOVE(human,$i,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)"  
+
  
  jNum=8 
  for j in {1..16..1}
