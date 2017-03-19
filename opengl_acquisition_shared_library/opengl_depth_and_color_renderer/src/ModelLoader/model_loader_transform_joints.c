@@ -27,7 +27,47 @@ static float _triTrans_degrees_to_rad(float degrees)
     return degrees * (M_PI /180.0 );
 }
 
+static void _triTrans_create4x4MatrixFromEulerAnglesZYX(float * m ,float eulX, float eulY, float eulZ)
+{
+    //roll = X , pitch = Y , yaw = Z
+    double x = degrees_to_rad(eulX);
+    double y = degrees_to_rad(eulY);
+    double z = degrees_to_rad(eulZ);
 
+
+	double cr = cos(z);
+	double sr = sin(z);
+	double cp = cos(y);
+	double sp = sin(y);
+	double cy = cos(x);
+	double sy = sin(x);
+
+	double srsp = sr*sp;
+	double crsp = cr*sp;
+
+	m[0] = cr*cp;
+	m[1] = crsp*sy - sr*cy;
+	m[2] = crsp*cy + sr*sy;
+	m[3] = 0;  // 4x4
+
+	m[4] = sr*cp;
+	m[5] = srsp*sy + cr*cy;
+	m[6] = srsp*cy - cr*sy;
+	m[7] = 0;  // 4x4
+
+	m[8] = -sp;
+	m[9] = cp*sy;
+	m[10] = cp*cy;
+	m[11] = 0;  // 4x4
+
+     // 4x4 last row
+	m[12] = 0;
+	m[13] = 0;
+	m[14] = 0;
+	m[15] = 1;
+}
+
+/*
 static void _triTrans_create4x4MatrixFromEulerAnglesXYZ(float * m ,float eulX, float eulY, float eulZ)
 {
     float x = _triTrans_degrees_to_rad(eulX);
@@ -64,7 +104,7 @@ static void _triTrans_create4x4MatrixFromEulerAnglesXYZ(float * m ,float eulX, f
     m[13]= 0;
     m[14]= 0;
     m[15]= 1.0;
-}
+}*/
 
 
 /// Clamp a value to 0-255
@@ -578,9 +618,9 @@ void transformTRIJoint(
                                  unsigned int jointDataSize ,
 
                                  unsigned int jointToChange ,
-                                 float rotEulerX ,
-                                 float rotEulerY ,
-                                 float rotEulerZ
+                                 float rotEulerX , //Roll
+                                 float rotEulerY , //Pitch
+                                 float rotEulerZ   //Yaw
                                )
 {
   //This is needed for meta reasons
@@ -590,7 +630,9 @@ void transformTRIJoint(
 
   //We set the 4x4 Matrix that is what is used for the transform..
   float * mat = &jointData[16*jointToChange];
-  _triTrans_create4x4MatrixFromEulerAnglesXYZ(mat,rotEulerX,rotEulerY,rotEulerZ);
+
+  _triTrans_create4x4MatrixFromEulerAnglesZYX(mat,rotEulerX,rotEulerY,rotEulerZ);
+  //_triTrans_create4x4MatrixFromEulerAnglesXYZ(mat,rotEulerX,rotEulerY,rotEulerZ);
 }
 
 
@@ -748,7 +790,7 @@ void recursiveJointHeirarchyTransformer(
  if ( in->bones[curBone].info->boneWeightsNumber>0 )
   {
     if (in->bones[curBone].info->altered)
-      {
+     {
       //print4x4DMatrixTRI("mTransformation was .. \n",in->bones[curBone].info->localTransformation);
       double translation[16] , rotation[16] , scaling[16];
       create4x4IdentityMatrix(translation);
