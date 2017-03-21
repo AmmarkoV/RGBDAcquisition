@@ -40,18 +40,17 @@ struct motionStats
 
 int printMotionStats(struct motionStats * st)
 {
-  fprintf(stderr,"#!/bin/bash\n\n");
-  fprintf(stderr,"# joints %u\n",st->numberOfJoints);
+  fprintf(stdout,"#!/bin/bash\n\n");
   unsigned int i=0;
   for (i=0; i<st->numberOfJoints; i++)
   {
-   fprintf(stderr,"min_%s=\"%0.2f %0.2f %0.2f\n",st->name[i].value,
+   fprintf(stdout,"min_%s=\"%0.2f %0.2f %0.2f\"\n",st->name[i].value,
                                                st->minimum[i].x ,
                                                st->minimum[i].y ,
                                                st->minimum[i].z
                                                );
 
-   fprintf(stderr,"max_%s=\"%0.2f %0.2f %0.2f\n",st->name[i].value,
+   fprintf(stdout,"max_%s=\"%0.2f %0.2f %0.2f\"\n",st->name[i].value,
                                                st->maximum[i].x ,
                                                st->maximum[i].y ,
                                                st->maximum[i].z
@@ -66,53 +65,53 @@ int printMotionStats(struct motionStats * st)
          (st->minimum[i].z==0 )
        )
     {
-        fprintf(stderr,"var_%s=\"0 0 0\n",st->name[i].value);
+        fprintf(stdout,"var_%s=\"0 0 0\"\n",st->name[i].value);
     } else
     {
-        fprintf(stderr,"var_%s=\"5 5 5\n",st->name[i].value);
+        fprintf(stdout,"var_%s=\"5 5 5\"\n",st->name[i].value);
     }
 
-   fprintf(stderr,"\n");
+   fprintf(stdout,"\n");
   }
 
 //---------------------------------------------------------
-fprintf(stderr,"JOINT_MINIMUMS=\"");
+fprintf(stdout,"JOINT_MINIMUMS=\"");
   for (i=0; i<st->numberOfJoints; i++)
   {
-    fprintf(stderr,"$min_%s ",st->name[i].value);
+    fprintf(stdout,"$min_%s ",st->name[i].value);
   }
-fprintf(stderr,"\"\n\n");
+fprintf(stdout,"\"\n\n");
 //---------------------------------------------------------
-fprintf(stderr,"JOINT_MAXIMUMS=\"");
+fprintf(stdout,"JOINT_MAXIMUMS=\"");
   for (i=0; i<st->numberOfJoints; i++)
   {
-    fprintf(stderr,"$max_%s ",st->name[i].value);
+    fprintf(stdout,"$max_%s ",st->name[i].value);
   }
-fprintf(stderr,"\"\n\n");
+fprintf(stdout,"\"\n\n");
 //---------------------------------------------------------
-fprintf(stderr,"JOINT_VARIANCE=\"");
+fprintf(stdout,"JOINT_VARIANCE=\"");
   for (i=0; i<st->numberOfJoints; i++)
   {
-    fprintf(stderr,"$var_%s ",st->name[i].value);
+    fprintf(stdout,"$var_%s ",st->name[i].value);
   }
-fprintf(stderr,"\"\n\n");
+fprintf(stdout,"\"\n\n");
 //---------------------------------------------------------
 
 
-fprintf(stderr,"JOINTS_NUMBER=\"%u\"\n",st->numberOfJoints);
+fprintf(stdout,"JOINTS_NUMBER=\"%u\"\n",st->numberOfJoints);
 
 //---------------------------------------------------------
-fprintf(stderr,"JOINTS_IDS=\"");
+fprintf(stdout,"JOINTS_IDS=\"");
   for (i=0; i<st->numberOfJoints; i++)
   {
-    fprintf(stderr,"%s ",st->name[i].value);
+    fprintf(stdout,"%s ",st->name[i].value);
   }
-fprintf(stderr,"\"\n\n");
+fprintf(stdout,"\"\n\n");
 //---------------------------------------------------------
 
-fprintf(stderr,"JOINTS_ENABLED=\"--joints $JOINTS_NUMBER $JOINTS_IDS\"\n\n");
+fprintf(stdout,"JOINTS_ENABLED=\"--joints $JOINTS_NUMBER $JOINTS_IDS\"\n\n");
 
-
+return 1;
 
 }
 
@@ -129,7 +128,7 @@ int getJointMemoryID(struct motionStats * st , const char * name , unsigned int 
     {
       if (strcmp(name,st->name[i].value)==0)
       {
-       //fprintf(stderr,"Found it @ %s \n",name);
+       //fprintf(stdout,"Found it @ %s \n",name);
        *where2work=i;
        return 1;
       }
@@ -160,7 +159,7 @@ int processCommand(struct InputParserC * ipc , struct motionStats * st ,char * l
 {
   if (InputParser_WordCompareAuto(ipc,0,"POSE"))
    {
-    //fprintf(stderr,"Found Frame %u \n",InputParser_GetWordInt(ipc,1));
+    //fprintf(stdout,"Found Frame %u \n",InputParser_GetWordInt(ipc,1));
     char str[128];
     if (InputParser_GetWord(ipc,3,str,128)!=0)
     {//Flush next frame
@@ -191,7 +190,7 @@ int main(int argc, char **argv)
 
  struct motionStats st={0};
 
- fprintf(stdout,"Opening file %s\n",filename);
+ fprintf(stderr,"Opening file %s\n",filename);
    FILE * fp = fopen(filename,"r");
    if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
 
