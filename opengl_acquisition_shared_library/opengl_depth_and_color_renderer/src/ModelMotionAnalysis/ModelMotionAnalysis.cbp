@@ -44,9 +44,12 @@
 			<Add library="GL" />
 			<Add library="GLU" />
 			<Add library="X11" />
-			<Add library="./libOGLRendererSandbox.so" />
 			<Add directory="../../" />
 		</Linker>
+		<Unit filename="../TrajectoryParser/InputParser_C.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../TrajectoryParser/InputParser_C.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -40,7 +40,8 @@ struct motionStats
 
 int printMotionStats(struct motionStats * st)
 {
-
+  fprintf(stderr,"#!/bin/bash\n\n");
+  fprintf(stderr,"# joints %u\n",st->numberOfJoints);
   unsigned int i=0;
   for (i=0; i<st->numberOfJoints; i++)
   {
@@ -55,7 +56,63 @@ int printMotionStats(struct motionStats * st)
                                                st->maximum[i].y ,
                                                st->maximum[i].z
                                                );
+
+    if (
+         (st->minimum[i].x==st->maximum[i].x ) &&
+         (st->minimum[i].y==st->maximum[i].y ) &&
+         (st->minimum[i].z==st->maximum[i].z ) &&
+         (st->minimum[i].x==0 ) &&
+         (st->minimum[i].y==0 ) &&
+         (st->minimum[i].z==0 )
+       )
+    {
+        fprintf(stderr,"var_%s=\"0 0 0\n",st->name[i].value);
+    } else
+    {
+        fprintf(stderr,"var_%s=\"5 5 5\n",st->name[i].value);
+    }
+
+   fprintf(stderr,"\n");
   }
+
+//---------------------------------------------------------
+fprintf(stderr,"JOINT_MINIMUMS=\"");
+  for (i=0; i<st->numberOfJoints; i++)
+  {
+    fprintf(stderr,"$min_%s ",st->name[i].value);
+  }
+fprintf(stderr,"\"\n\n");
+//---------------------------------------------------------
+fprintf(stderr,"JOINT_MAXIMUMS=\"");
+  for (i=0; i<st->numberOfJoints; i++)
+  {
+    fprintf(stderr,"$max_%s ",st->name[i].value);
+  }
+fprintf(stderr,"\"\n\n");
+//---------------------------------------------------------
+fprintf(stderr,"JOINT_VARIANCE=\"");
+  for (i=0; i<st->numberOfJoints; i++)
+  {
+    fprintf(stderr,"$var_%s ",st->name[i].value);
+  }
+fprintf(stderr,"\"\n\n");
+//---------------------------------------------------------
+
+
+fprintf(stderr,"JOINTS_NUMBER=\"%u\"\n",st->numberOfJoints);
+
+//---------------------------------------------------------
+fprintf(stderr,"JOINTS_IDS=\"");
+  for (i=0; i<st->numberOfJoints; i++)
+  {
+    fprintf(stderr,"%s ",st->name[i].value);
+  }
+fprintf(stderr,"\"\n\n");
+//---------------------------------------------------------
+
+fprintf(stderr,"JOINTS_ENABLED=\"--joints $JOINTS_NUMBER $JOINTS_IDS\"\n\n");
+
+
 
 }
 
@@ -78,7 +135,7 @@ int getJointMemoryID(struct motionStats * st , const char * name , unsigned int 
       }
     }
   }
-
+ *where2work = st->numberOfJoints;
  strncpy(st->name[*where2work].value,name,128);
  ++st->numberOfJoints;
  return 1;
