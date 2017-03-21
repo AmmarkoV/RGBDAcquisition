@@ -152,14 +152,27 @@ void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double
 
 
 /**
-* @brief Convert a quaternion to 4x4 matrix
+* @brief Convert a quaternion to 4x4 matrix XYZ convention ( weird )
+* @ingroup AmMatrix
+* @param  Output already allocated 4x4 Matrix
+* @param  Rotation X in euler angles (0-360)
+* @param  Rotation Y in euler angles (0-360)
+* @param  Rotation Z in euler angles (0-360)
+* @bug This should probably not be used and maybe altogether removed, but kept for historical reasons :P
+*/
+void create4x4MatrixFromEulerAnglesXYZ(double * m ,double eulX, double eulY, double eulZ);
+
+
+
+/**
+* @brief Convert a quaternion to 4x4 matrix ZYX convention ( standard )
 * @ingroup AmMatrix
 * @param  Output already allocated 4x4 Matrix
 * @param  Rotation X in euler angles (0-360)
 * @param  Rotation Y in euler angles (0-360)
 * @param  Rotation Z in euler angles (0-360)
 */
-void create4x4MatrixFromEulerAnglesXYZ(double * m ,double eulX, double eulY, double eulZ);
+void create4x4MatrixFromEulerAnglesZYX(double * m ,double eulX, double eulY, double eulZ);
 
 
 /**

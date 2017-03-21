@@ -509,6 +509,7 @@ int main(int argc, char **argv)
      std::cout<<"Name : "<<name<<std::endl;
      std::cout<<"Camera : "<<camera<<std::endl;
      std::cout<<"Frame : "<<frame<<std::endl;
+     std::cout<<"TF Root : "<<tfRoot<<std::endl;
      std::cout<<"Mode : "<<width<<"x"<<height<<":"<<framerate<<std::endl;
      std::cout<<"High Rate : "<<highRate<<std::endl;
      std::cout<<"Mid Rate : "<<midRate<<std::endl;
