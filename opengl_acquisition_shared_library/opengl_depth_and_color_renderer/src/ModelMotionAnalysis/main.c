@@ -11,19 +11,119 @@
 
 #include "../TrajectoryParser/InputParser_C.h"
 
-int processCommand(struct InputParserC * ipc ,char * line , unsigned int words_count)
+#define MAX_JOINTS 128
+
+struct Point3D
+{
+ float x;
+ float y;
+ float z;
+};
+
+struct staticStr
+{
+ char value[128];
+};
+
+struct motionStats
+{
+  unsigned int numberOfJoints;
+
+  unsigned int numberOfSamples[MAX_JOINTS];
+  struct Point3D minimum[MAX_JOINTS];
+  struct Point3D maximum[MAX_JOINTS];
+  struct Point3D variability[MAX_JOINTS];
+  struct staticStr name[MAX_JOINTS];
+
+};
+
+
+int printMotionStats(struct motionStats * st)
+{
+
+  unsigned int i=0;
+  for (i=0; i<st->numberOfJoints; i++)
+  {
+   fprintf(stderr,"min_%s=\"%0.2f %0.2f %0.2f\n",st->name[i].value,
+                                               st->minimum[i].x ,
+                                               st->minimum[i].y ,
+                                               st->minimum[i].z
+                                               );
+
+   fprintf(stderr,"max_%s=\"%0.2f %0.2f %0.2f\n",st->name[i].value,
+                                               st->maximum[i].x ,
+                                               st->maximum[i].y ,
+                                               st->maximum[i].z
+                                               );
+  }
+
+}
+
+
+int getJointMemoryID(struct motionStats * st , const char * name , unsigned int * where2work )
+{
+  if (st->numberOfJoints>=MAX_JOINTS) { return 0; }
+
+  if (st->numberOfJoints==0)
+  { *where2work=0; } else
+  {
+    unsigned int i=0;
+    for (i=0; i<st->numberOfJoints; i++)
+    {
+      if (strcmp(name,st->name[i].value)==0)
+      {
+       //fprintf(stderr,"Found it @ %s \n",name);
+       *where2work=i;
+       return 1;
+      }
+    }
+  }
+
+ strncpy(st->name[*where2work].value,name,128);
+ ++st->numberOfJoints;
+ return 1;
+}
+
+
+int updateJoint(struct motionStats * st , unsigned int i, float x , float y , float z)
+{
+ if (x<st->minimum[i].x) { st->minimum[i].x=x; }
+ if (y<st->minimum[i].y) { st->minimum[i].y=y; }
+ if (z<st->minimum[i].z) { st->minimum[i].z=z; }
+
+ if (x>st->maximum[i].x) { st->maximum[i].x=x; }
+ if (y>st->maximum[i].y) { st->maximum[i].y=y; }
+ if (z>st->maximum[i].z) { st->maximum[i].z=z; }
+
+ return 1;
+}
+
+
+int processCommand(struct InputParserC * ipc , struct motionStats * st ,char * line , unsigned int words_count)
 {
   if (InputParser_WordCompareAuto(ipc,0,"POSE"))
    {
     //fprintf(stderr,"Found Frame %u \n",InputParser_GetWordInt(ipc,1));
-    char str[512];
-    if (InputParser_GetWord(ipc,1,str,512)!=0)
+    char str[128];
+    if (InputParser_GetWord(ipc,3,str,128)!=0)
     {//Flush next frame
-      fprintf(stdout,".");
+      //fprintf(stdout," Pose %s  ",str);
+
+      float x = InputParser_GetWordFloat(ipc,4);
+      float y = InputParser_GetWordFloat(ipc,5);
+      float z = InputParser_GetWordFloat(ipc,6);
+
+      unsigned int where2work=0;
+      if  ( getJointMemoryID(st,str,&where2work) )
+      {
+        updateJoint(st,where2work,x,y,z);
+      }
+
+
+      //fprintf(stdout," %0.2f %0.2f %0.2f \n",x,y,z);
       return 1;
     }
    }
-
 
   return 0;
 }
@@ -31,6 +131,8 @@ int main(int argc, char **argv)
 {
  char filename[]="hyps.scene";
  char line [512]={0};
+
+ struct motionStats st={0};
 
  fprintf(stdout,"Opening file %s\n",filename);
    FILE * fp = fopen(filename,"r");
@@ -50,10 +152,12 @@ int main(int argc, char **argv)
       unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
       if ( words_count > 0 )
          {
-             processCommand(ipc,line,words_count);
+             processCommand(ipc,&st,line,words_count);
          } // End of line containing tokens
     } //End of getting a line while reading the file
   }
+
+  printMotionStats(&st);
 
   fclose(fp);
   InputParser_Destroy(ipc);
