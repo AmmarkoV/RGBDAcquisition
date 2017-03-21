@@ -6,6 +6,7 @@ function getarg {
                 }  
 
 i=0
+frame=0
 joints=""
 while IFS='' read -r line || [[ -n "$line" ]]; do
 #echo "Line $i: $line"
@@ -17,8 +18,9 @@ if [ $i -ne 0 ]; then
  qX=`echo $line | cut -d ' ' -f5`
  qY=`echo $line | cut -d ' ' -f6`
  qZ=`echo $line | cut -d ' ' -f7`
- echo "MOVE(human,$i,$X,$Y,$Z,$qW,$qX,$qY,$qZ)"  
- #echo "MOVE(human,$i,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)"  
+ echo "FRAME($frame)"  
+ echo "MOVE(human,$frame,$X,$Y,$Z,$qW,$qX,$qY,$qZ)"  
+ #echo "MOVE(human,$frame,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)"  
 
  
  jNum=8 
@@ -32,9 +34,10 @@ if [ $i -ne 0 ]; then
   Z=`getarg "$line" $jNum` 
   ((jNum=jNum+1))
    
-  echo "POSE(human,$i,$sJoint,$X,$Y,$Z)"
+  echo "POSE(human,$frame,$sJoint,$X,$Y,$Z)"
  done
  echo ""
+ ((frame=frame+1))
 else
  #Write header once in the start 
  echo "AUTOREFRESH(1500)"
@@ -52,6 +55,7 @@ else
  echo "OBJECT_TYPE(humanMesh,Models/AmmarH.tri)"
  echo "RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,10.0,10.0,10.0)" 
  echo "INTERPOLATE_TIME(1)" 
+ echo ""
  #And get the joint list 
  joints="$line "
 fi
