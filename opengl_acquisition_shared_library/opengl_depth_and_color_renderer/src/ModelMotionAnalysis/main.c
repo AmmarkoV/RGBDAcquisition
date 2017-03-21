@@ -9,63 +9,30 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "../TrajectoryParser/InputParser_C.h"
 
-int processCommand(struct InputParserC * ipc , unsigned int label , char * line , unsigned int words_count ,HandBodyModels::UpperBodyModel &converter, std::vector<HandBodyModels::UpperBodyModel> &outputModels)
+int processCommand(struct InputParserC * ipc ,char * line , unsigned int words_count)
 {
-  if (InputParser_WordCompareAuto(ipc,0,"FRAME"))
+  if (InputParser_WordCompareAuto(ipc,0,"POSE"))
    {
     //fprintf(stderr,"Found Frame %u \n",InputParser_GetWordInt(ipc,1));
-    if (InputParser_GetWordInt(ipc,1)!=0)
+    char str[512];
+    if (InputParser_GetWord(ipc,1,str,512)!=0)
     {//Flush next frame
-      outputModels.push_back(converter);
       fprintf(stdout,".");
       return 1;
     }
    }
 
 
- unsigned int i=0;
- for (i=0; i<COCO_PARTS; i++)
- {
-  if (InputParser_WordCompareAuto(ipc,1,(char*) COCOBodyNames[i]))
-   {
-    if (BJ::INCORRECT != cocoMapToUpperBodyTrackerBodyJoint[i])
-    {
-     converter.setPosition(
-                           (BJ::BodyJointType) cocoMapToUpperBodyTrackerBodyJoint[i],
-                            cv::Point3f(
-                                        InputParser_GetWordFloat(ipc,3),
-                                        InputParser_GetWordFloat(ipc,4),
-                                        InputParser_GetWordFloat(ipc,5)
-                                       )
-                          );
-      //fprintf(stdout,"Joint %s = ( %0.2f %0.2f %0.2f )\n" , COCOBodyNames[i] , InputParser_GetWordFloat(ipc,3), InputParser_GetWordFloat(ipc,4), InputParser_GetWordFloat(ipc,5));
-      return 1;
-    }
-   }
- }
   return 0;
 }
 int main(int argc, char **argv)
 {
+ char filename[]="hyps.scene";
+ char line [512]={0};
 
-
-    return 0;
-}
-
-
-
-int main(int argc, char** argv)
-{
-   std::vector<HandBodyModels::UpperBodyModel> outputModels;
-   HandBodyModels::UpperBodyModel converter;
-
-   char filename[]="coco.scene";
-   char line [512]={0};
-
-
-   fprintf(stdout,"Opening file %s\n",filename);
-
+ fprintf(stdout,"Opening file %s\n",filename);
    FILE * fp = fopen(filename,"r");
    if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
 
@@ -83,7 +50,7 @@ int main(int argc, char** argv)
       unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
       if ( words_count > 0 )
          {
-             processCommand(ipc,0,line,words_count,converter,outputModels);
+             processCommand(ipc,line,words_count);
          } // End of line containing tokens
     } //End of getting a line while reading the file
   }
@@ -91,6 +58,5 @@ int main(int argc, char** argv)
   fclose(fp);
   InputParser_Destroy(ipc);
 
-  fprintf(stdout,"\nDumping to CSV\n");
-  HandBodyModels::UpperBodyModel::saveToCsvFile("test.csv",outputModels);
+ return 0;
 }

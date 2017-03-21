@@ -24,7 +24,7 @@ IF( ENABLE_PNG )
 ENDIF( ENABLE_PNG )
 
 
-add_executable(ModelMotionAnalysis main.c ) 
+add_executable(ModelMotionAnalysis main.c ../TrajectoryParser/InputParser_C.c ../TrajectoryParser/InputParser_C.h) 
 target_link_libraries(ModelMotionAnalysis rt m GL GLU X11 OGLModelMotionAnalysisSandbox Codecs  ${PNG_Libs} ${JPG_Libs} ) 
 add_dependencies(ModelMotionAnalysis OGLModelMotionAnalysisSandbox)  
        
