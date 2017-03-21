@@ -19,7 +19,6 @@ do
  cp $f  "$DIR/$2/colorFrame_0_$TARGETNAME_TRIMMED.png"
 done
 cd ..
-cd ..
 
 
 echo "Converting Depth Files"
@@ -29,7 +28,7 @@ for f in $FILES_TO_CONVERT
 do 
  TARGETNAME=`basename $f .png`
  TARGETNAME_TRIMMED=${TARGETNAME:1:${#TARGETNAME}}
- cp "$f" "$DIR/$2/depthFrame_0_$TARGETNAME_TRIMMED.pnm"
+ cp "$f" "$DIR/$2/depthFrame_0_$TARGETNAME_TRIMMED.png"
 done
 cd ..
 cd ..

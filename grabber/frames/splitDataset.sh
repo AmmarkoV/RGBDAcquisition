@@ -18,31 +18,46 @@ do
   newIndx=$((i-X)) 
   XNUM=`printf %05u $i`
   INUM=`printf %05u $newIndx`
- 
-  if [ ! -f "colorFrame_0_$XNUM.pnm" ] 
+   
+  foundColor=0
+  if [ -f "colorFrame_0_$XNUM.png" ] 
     then
-       if [ ! -f "depthFrame_0_$XNUM.pnm" ] 
-         then
- 
-  if [ ! -f "colorFrame_0_$XNUM.jpg" ] 
+     mv "colorFrame_0_$XNUM.png" "../$TODATASET/colorFrame_0_$INUM.png"
+     foundColor=1
+    fi
+
+  if [ -f "colorFrame_0_$XNUM.pnm" ] 
     then
-       if [ ! -f "depthFrame_0_$XNUM.png" ] 
-         then
-          echo " "
-          echo "Finished Frames"
-          exit 0
-       fi
+     mv "colorFrame_0_$XNUM.pnm" "../$TODATASET/colorFrame_0_$INUM.pnm"
+     foundColor=1
+    fi
+
+  if [ -f "colorFrame_0_$XNUM.jpg" ] 
+    then
+     mv "colorFrame_0_$XNUM.jpg" "../$TODATASET/colorFrame_0_$INUM.jpg"
+     foundColor=1
+    fi
+
+  foundDepth=0
+  if [ -f "depthFrame_0_$XNUM.png" ] 
+    then
+     mv "depthFrame_0_$XNUM.png" "../$TODATASET/depthFrame_0_$INUM.png"
+     foundDepth=1
+   fi 
+  if [ -f "depthFrame_0_$XNUM.pnm" ] 
+    then
+     mv "depthFrame_0_$XNUM.pnm" "../$TODATASET/depthFrame_0_$INUM.pnm"
+     foundDepth=1
+   fi  
+    
+  if  [ "$foundColor" -eq "0" ]
+    then
+     if [ "$foundDepth" -eq "0" ]
+      then
+        echo "Finished @ $INUM frame"
+        exit 0
+      fi
   fi
- 
-       fi
-  fi
-
-  mv "colorFrame_0_$XNUM.jpg" "../$TODATASET/colorFrame_0_$INUM.jpg"
-  mv "depthFrame_0_$XNUM.png" "../$TODATASET/depthFrame_0_$INUM.png"
-
-
-  mv "colorFrame_0_$XNUM.pnm" "../$TODATASET/colorFrame_0_$INUM.pnm"
-  mv "depthFrame_0_$XNUM.pnm" "../$TODATASET/depthFrame_0_$INUM.pnm"
    
   echo -n "."
 done
