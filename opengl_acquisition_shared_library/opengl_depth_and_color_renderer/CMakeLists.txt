@@ -26,6 +26,7 @@ add_subdirectory (submodules/Assimp)
 add_subdirectory (src/Renderer/)
 add_subdirectory (src/Comparer/)
 add_subdirectory (src/ModelDump/)
+add_subdirectory (src/ModelMotionAnalysis/)
  
  
 
