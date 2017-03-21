@@ -49,10 +49,9 @@ static float NAOdefaultJoints[] = { 0,-194,dp, 0,0,dp , 0,222,dp , -191,0,dp , 1
                                   };
 
 
-
 static const char * smartBodyNames[] =
 {
-    "JtUpperFaceParent",
+    "JtLowerNoseLf",
     "JtNeckB" ,
     "JtSpineB",
     "JtShoulderRt",
