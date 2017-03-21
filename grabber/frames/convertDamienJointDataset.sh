@@ -1,6 +1,6 @@
 #!/bin/bash 
 #JtHipRt JtKneeRt JtAnkleRt JtHipLf JtKneeLf JtAnkleLf JtSpineA JtSpineB JtNeckB JtUpperFaceParent JtShoulderRt JtElbowRt JtWristRt JtShoulderLf JtElbowLf JtWristLf
-
+#JtLowerNoseLf  JtNeckB  JtSpineB  JtShoulderRt  JtShoulderLf  JtElbowRt  JtElbowLf  JtWristRt  JtWristLf  JtHipRt  JtHipLf  JtKneeRt  JtKneeLf  JtAnkleRt  JtAnkleLf  JtSpineA
 function getarg {
                   echo "$1" |tr '\r' ' ' |  cut -d ' ' -f$2   
                 }  
@@ -17,8 +17,8 @@ if [ $i -ne 0 ]; then
  qX=`echo $line | cut -d ' ' -f5`
  qY=`echo $line | cut -d ' ' -f6`
  qZ=`echo $line | cut -d ' ' -f7`
- #echo "MOVE(human,$i,$X,$Y,$Z,$qW,$qX,$qY,$qZ)"  
- echo "MOVE(human,$i,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)"  
+ echo "MOVE(human,$i,$X,$Y,$Z,$qW,$qX,$qY,$qZ)"  
+ #echo "MOVE(human,$i,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)"  
 
  
  jNum=8 
