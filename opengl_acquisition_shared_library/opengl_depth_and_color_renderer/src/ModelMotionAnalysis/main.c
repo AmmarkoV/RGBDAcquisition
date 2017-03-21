@@ -51,6 +51,7 @@ struct motionStats
   struct Pose3D max;
   struct Pose3D end;
 
+  struct Point3D startJoint[MAX_JOINTS];
   unsigned int numberOfSamples[MAX_JOINTS];
   struct Point3D minimum[MAX_JOINTS];
   struct Point3D maximum[MAX_JOINTS];
@@ -69,7 +70,8 @@ int printMotionStats(struct motionStats * st)
 
 fprintf(stdout,"POSE_MINIMUMS=\"%0.2f %0.2f %0.2f\" \n",st->min.x,st->min.y,st->min.z);
 fprintf(stdout,"POSE_MAXIMUMS=\"%0.2f %0.2f %0.2f\" \n",st->max.x,st->max.y,st->max.z);
-fprintf(stdout,"POSE_START=\"%0.2f %0.2f %0.2f\" \n\n" ,st->start.x,st->start.y,st->start.z);
+fprintf(stdout,"POSE_START=\"%0.2f %0.2f %0.2f\" \n" ,st->start.x,st->start.y,st->start.z);
+fprintf(stdout,"ROT_START=\"%0.2f %0.2f %0.2f %0.2f\" \n\n" ,st->start.qW,st->start.qX,st->start.qY,st->start.qZ);
 
 
 
@@ -144,6 +146,27 @@ fprintf(stdout,"\"\n\n");
 //---------------------------------------------------------
 fprintf(stdout,"JOINTS_ENABLED=\"--joints $JOINTS_NUMBER $JOINTS_IDS\"\n\n");
 
+
+
+for (i=0; i<st->numberOfJoints; i++)
+  {
+    fprintf(stdout,"%s=\"%0.2f %0.2f %0.2f\"\n",st->name[i].value,
+                                                st->startJoint[i].x,
+                                                st->startJoint[i].y,
+                                                st->startJoint[i].z
+                                               );
+  }
+
+
+
+//---------------------------------------------------------
+fprintf(stdout,"\nJOINT_POSITION=\"");
+  for (i=0; i<st->numberOfJoints; i++)
+  {
+    fprintf(stdout,"$%s ",st->name[i].value);
+  }
+fprintf(stdout,"\"\n\n\n\n");
+
 return 1;
 
 }
@@ -184,6 +207,16 @@ int updateJoint(struct motionStats * st , unsigned int i, float x , float y , fl
  if (y>st->maximum[i].y) { st->maximum[i].y=y; }
  if (z>st->maximum[i].z) { st->maximum[i].z=z; }
 
+
+ if (st->numberOfSamples[i]==0)
+ {
+  st->startJoint[i].x=x;
+  st->startJoint[i].y=y;
+  st->startJoint[i].z=z;
+ }
+
+ st->numberOfSamples[i]+=1;
+
  return 1;
 }
 
@@ -200,6 +233,15 @@ int updatePosition(struct motionStats * st , float x , float y , float z , float
 
      if (!st->startSet)
      {
+       st->min.x=x;
+       st->min.y=y;
+       st->min.z=z;
+
+       st->max.x=x;
+       st->max.y=y;
+       st->max.z=z;
+
+
        st->startSet=1;
        st->start.x=x;
        st->start.y=y;
