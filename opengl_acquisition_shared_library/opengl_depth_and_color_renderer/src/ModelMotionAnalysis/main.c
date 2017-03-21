@@ -69,15 +69,7 @@ int printMotionStats(struct motionStats * st)
 
 
 fprintf(stdout,"POSE_MINIMUMS=\"%0.2f %0.2f %0.2f\" \n",st->min.x,st->min.y,st->min.z);
-fprintf(stdout,"POSE_MAXIMUMS=\"%0.2f %0.2f %0.2f\" \n",st->max.x,st->max.y,st->max.z);
-fprintf(stdout,"POSE_START=\"%0.2f %0.2f %0.2f\" \n" ,st->start.x,st->start.y,st->start.z);
-fprintf(stdout,"ROT_START=\"%0.2f %0.2f %0.2f %0.2f\" \n\n" ,st->start.qW,st->start.qX,st->start.qY,st->start.qZ);
-
-
-
-
-
-
+fprintf(stdout,"POSE_MAXIMUMS=\"%0.2f %0.2f %0.2f\" \n\n",st->max.x,st->max.y,st->max.z);
 
   for (i=0; i<st->numberOfJoints; i++)
   {
@@ -148,6 +140,8 @@ fprintf(stdout,"JOINTS_ENABLED=\"--joints $JOINTS_NUMBER $JOINTS_IDS\"\n\n");
 
 
 
+fprintf(stdout,"POSE_START=\"%0.2f %0.2f %0.2f\" \n" ,st->start.x,st->start.y,st->start.z);
+fprintf(stdout,"ROT_START=\"%0.5f %0.5f %0.5f %0.5f\" \n" ,st->start.qW,st->start.qX,st->start.qY,st->start.qZ);
 for (i=0; i<st->numberOfJoints; i++)
   {
     fprintf(stdout,"%s=\"%0.2f %0.2f %0.2f\"\n",st->name[i].value,
