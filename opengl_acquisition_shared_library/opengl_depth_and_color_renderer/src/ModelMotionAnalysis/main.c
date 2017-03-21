@@ -25,9 +25,31 @@ struct staticStr
  char value[128];
 };
 
+
+
+struct Pose3D
+{
+ float x;
+ float y;
+ float z;
+
+ float qW;
+ float qX;
+ float qY;
+ float qZ;
+};
+
+
+
 struct motionStats
 {
   unsigned int numberOfJoints;
+
+  int startSet;
+  struct Pose3D start;
+  struct Pose3D min;
+  struct Pose3D max;
+  struct Pose3D end;
 
   unsigned int numberOfSamples[MAX_JOINTS];
   struct Point3D minimum[MAX_JOINTS];
@@ -42,6 +64,19 @@ int printMotionStats(struct motionStats * st)
 {
   fprintf(stdout,"#!/bin/bash\n\n");
   unsigned int i=0;
+
+
+
+fprintf(stdout,"POSE_MINIMUMS=\"%0.2f %0.2f %0.2f\" \n",st->min.x,st->min.y,st->min.z);
+fprintf(stdout,"POSE_MAXIMUMS=\"%0.2f %0.2f %0.2f\" \n",st->max.x,st->max.y,st->max.z);
+fprintf(stdout,"POSE_START=\"%0.2f %0.2f %0.2f\" \n\n" ,st->start.x,st->start.y,st->start.z);
+
+
+
+
+
+
+
   for (i=0; i<st->numberOfJoints; i++)
   {
    fprintf(stdout,"min_%s=\"%0.2f %0.2f %0.2f\"\n",st->name[i].value,
@@ -99,7 +134,6 @@ fprintf(stdout,"\"\n\n");
 
 
 fprintf(stdout,"JOINTS_NUMBER=\"%u\"\n",st->numberOfJoints);
-
 //---------------------------------------------------------
 fprintf(stdout,"JOINTS_IDS=\"");
   for (i=0; i<st->numberOfJoints; i++)
@@ -108,7 +142,6 @@ fprintf(stdout,"JOINTS_IDS=\"");
   }
 fprintf(stdout,"\"\n\n");
 //---------------------------------------------------------
-
 fprintf(stdout,"JOINTS_ENABLED=\"--joints $JOINTS_NUMBER $JOINTS_IDS\"\n\n");
 
 return 1;
@@ -155,16 +188,64 @@ int updateJoint(struct motionStats * st , unsigned int i, float x , float y , fl
 }
 
 
+int updatePosition(struct motionStats * st , float x , float y , float z , float qW ,float qX , float qY , float qZ)
+{
+ if (x<st->min.x) { st->min.x=x; }
+ if (y<st->min.y) { st->min.y=y; }
+ if (z<st->min.z) { st->min.z=z; }
+
+ if (x>st->max.x) { st->max.x=x; }
+ if (y>st->max.y) { st->max.y=y; }
+ if (z>st->max.z) { st->max.z=z; }
+
+     if (!st->startSet)
+     {
+       st->startSet=1;
+       st->start.x=x;
+       st->start.y=y;
+       st->start.z=z;
+
+       st->start.qW=qW;
+       st->start.qX=qX;
+       st->start.qY=qY;
+       st->start.qZ=qZ;
+     }
+
+ st->end.x=x;
+ st->end.y=y;
+ st->end.z=z;
+
+ st->end.qW=qW;
+ st->end.qX=qX;
+ st->end.qY=qY;
+ st->end.qZ=qZ;
+
+ return 1;
+}
+
+
 int processCommand(struct InputParserC * ipc , struct motionStats * st ,char * line , unsigned int words_count)
 {
+  if (InputParser_WordCompareAuto(ipc,0,"MOVE"))
+   {
+      float x = InputParser_GetWordFloat(ipc,3);
+      float y = InputParser_GetWordFloat(ipc,4);
+      float z = InputParser_GetWordFloat(ipc,5);
+
+      float qW = InputParser_GetWordFloat(ipc,6);
+      float qX = InputParser_GetWordFloat(ipc,7);
+      float qY = InputParser_GetWordFloat(ipc,8);
+      float qZ = InputParser_GetWordFloat(ipc,9);
+
+      updatePosition(st,x,y,z,qW,qX,qY,qZ);
+   }
+    else
   if (InputParser_WordCompareAuto(ipc,0,"POSE"))
    {
     //fprintf(stdout,"Found Frame %u \n",InputParser_GetWordInt(ipc,1));
     char str[128];
     if (InputParser_GetWord(ipc,3,str,128)!=0)
     {//Flush next frame
-      //fprintf(stdout," Pose %s  ",str);
-
       float x = InputParser_GetWordFloat(ipc,4);
       float y = InputParser_GetWordFloat(ipc,5);
       float z = InputParser_GetWordFloat(ipc,6);
