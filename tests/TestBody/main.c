@@ -161,7 +161,7 @@ RATE(1)\n"
                     acquisitionSnapFrames(moduleID,devID);
 
                     // acquisitionPassFramesToTarget(moduleID,devID,frameNum,0);
-
+                    fprintf(fp,"FRAME(%u)\n",frameNum);
 
                     char outfilename[1024]= {0};
                     sprintf(outfilename,"frames/%s/dnnOut/colorFrame_%u_%05u.json",inputname,devID,frameNum);
@@ -188,8 +188,8 @@ RATE(1)\n"
                     if (strlen(modelname)>0)
                         {
                             float x,y,z,qX,qY,qZ,qW;
-                            convertCOCO_To_Smartbody_TRI(&skel,&triModel,&x,&y,&z,&qX,&qY,&qZ,&qW); //triModelJoints
-                            fprintf(fp,"MOVE(body,%u,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",frameNum,x,y,z,qX,qY,qZ,qW);
+                            //convertCOCO_To_Smartbody_TRI(&skel,&triModel,&x,&y,&z,&qX,&qY,&qZ,&qW); //triModelJoints
+                            //fprintf(fp,"MOVE(body,%u,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",frameNum,x,y,z,qX,qY,qZ,qW);
                         }
 
                     fprintf(fp,"\n");
