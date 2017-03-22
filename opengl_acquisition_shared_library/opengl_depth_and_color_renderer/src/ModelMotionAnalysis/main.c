@@ -122,9 +122,9 @@ fprintf(stdout,"POSE_MAXIMUMS=\"%0.2f %0.2f %0.2f\" \n\n",st->max.x,st->max.y,st
     } else
     {
         fprintf(stdout,"var_%s=\"%0.2f %0.2f %0.2f\"\n",st->name[i].value,
-                st->variability[i].x/st->numberOfSamples[i],
-                st->variability[i].y/st->numberOfSamples[i],
-                st->variability[i].z/st->numberOfSamples[i]
+                2*st->variability[i].x/st->numberOfSamples[i],
+                2*st->variability[i].y/st->numberOfSamples[i],
+                2*st->variability[i].z/st->numberOfSamples[i]
                 );
     }
 
@@ -244,9 +244,9 @@ int updateJoint(struct motionStats * st , unsigned int i, float x , float y , fl
    st->current[i].z=z;
  } else
  {
-   st->previous[i].x=st->previous[i].x;
-   st->previous[i].y=st->previous[i].y;
-   st->previous[i].z=st->previous[i].z;
+   st->previous[i].x=st->current[i].x;
+   st->previous[i].y=st->current[i].y;
+   st->previous[i].z=st->current[i].z;
 
    st->current[i].x=x;
    st->current[i].y=y;
