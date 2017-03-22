@@ -53,6 +53,11 @@ struct motionStats
 
   struct Point3D startJoint[MAX_JOINTS];
   unsigned int numberOfSamples[MAX_JOINTS];
+
+  struct Point3D previous[MAX_JOINTS];
+  struct Point3D current[MAX_JOINTS];
+
+
   struct Point3D minimum[MAX_JOINTS];
   struct Point3D maximum[MAX_JOINTS];
   struct Point3D variability[MAX_JOINTS];
@@ -216,6 +221,27 @@ int updateJoint(struct motionStats * st , unsigned int i, float x , float y , fl
   st->startJoint[i].x=x;
   st->startJoint[i].y=y;
   st->startJoint[i].z=z;
+ }
+
+ if ( st->numberOfSamples[i]==0)
+ {
+   st->current[i].x=x;
+   st->current[i].y=y;
+   st->current[i].z=z;
+ } else
+ {
+   st->previous[i].x=st->previous[i].x;
+   st->previous[i].y=st->previous[i].y;
+   st->previous[i].z=st->previous[i].z;
+
+   st->current[i].x=x;
+   st->current[i].y=y;
+   st->current[i].z=z;
+
+
+  // float diffX = abs(st->current[i].x - st->previous[i].x);
+
+
  }
 
  st->numberOfSamples[i]+=1;
