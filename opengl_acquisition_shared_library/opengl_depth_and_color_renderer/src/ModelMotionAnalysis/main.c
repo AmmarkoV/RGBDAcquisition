@@ -260,10 +260,14 @@ int updatePosition(struct motionStats * st , float x , float y , float z , float
 }
 
 
-int processCommand(struct InputParserC * ipc , struct motionStats * st ,char * line , unsigned int words_count)
+int processCommand(struct InputParserC * ipc , struct motionStats * st ,char * line , unsigned int words_count , unsigned int startAtFrame)
 {
+
   if (InputParser_WordCompareAuto(ipc,0,"MOVE"))
    {
+      int frameNum = InputParser_GetWordInt(ipc,2);
+      if (frameNum<startAtFrame) { return 0; }
+
       float x = InputParser_GetWordFloat(ipc,3);
       float y = InputParser_GetWordFloat(ipc,4);
       float z = InputParser_GetWordFloat(ipc,5);
@@ -278,6 +282,9 @@ int processCommand(struct InputParserC * ipc , struct motionStats * st ,char * l
     else
   if (InputParser_WordCompareAuto(ipc,0,"POSE"))
    {
+    int frameNum = InputParser_GetWordInt(ipc,2);
+    if (frameNum<startAtFrame) { return 0; }
+
     //fprintf(stdout,"Found Frame %u \n",InputParser_GetWordInt(ipc,1));
     char str[128];
     if (InputParser_GetWord(ipc,3,str,128)!=0)
@@ -304,6 +311,7 @@ int main(int argc, char **argv)
 {
  char filename[]="hyps.scene";
  char line [512]={0};
+ unsigned int startAtFrame =15;
 
  struct motionStats st={0};
 
@@ -325,7 +333,7 @@ int main(int argc, char **argv)
       unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
       if ( words_count > 0 )
          {
-             processCommand(ipc,&st,line,words_count);
+             processCommand(ipc,&st,line,words_count,startAtFrame);
          } // End of line containing tokens
     } //End of getting a line while reading the file
   }
