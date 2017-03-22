@@ -98,15 +98,15 @@ fprintf(stdout,"POSE_MAXIMUMS=\"%0.2f %0.2f %0.2f\" \n\n",st->max.x,st->max.y,st
         (_mma_floatEq(st->maximum[i].x-st->minimum[i].x,0.0)) &&
         (_mma_floatEq(st->maximum[i].y-st->minimum[i].y,0.0)) &&
         (_mma_floatEq(st->maximum[i].z-st->minimum[i].z,0.0)) &&
-         (_mma_floatEq(st->minimum[i].x,0.0)) &&
-         (_mma_floatEq(st->minimum[i].y,0.0)) &&
-         (_mma_floatEq(st->minimum[i].z,0.0))
+        (_mma_floatEq(st->minimum[i].x,0.0)) &&
+        (_mma_floatEq(st->minimum[i].y,0.0)) &&
+        (_mma_floatEq(st->minimum[i].z,0.0))
        )
     {
         fprintf(stdout,"var_%s=\"0 0 0\"\n",st->name[i].value);
     } else
     {
-        fprintf(stdout,"var_%s=\"5 5 5\"\n",st->name[i].value);
+        fprintf(stdout,"var_%s=\"7 7 7\"\n",st->name[i].value);
     }
 
    fprintf(stdout,"\n");
