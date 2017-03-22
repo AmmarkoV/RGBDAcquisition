@@ -135,27 +135,38 @@ void create4x4IdentityMatrix(double * m)
 }
 
 
+
+int doublePEq(double * element , double value )
+{
+ const double machineFloatPercision= 0.0001;
+ if ( *element == value ) { return 1; }
+
+ if ( ( value-machineFloatPercision<*element ) && (( *element<value+machineFloatPercision )) ) { return 1; }
+ return 0;
+}
+
 int is4x4DIdentityMatrix(double * m)
 {
    return (
-    ( m[0] == 1.0)&&(m[1] == 0.0)&&(m[2] == 0.0)&& (m[3] == 0.0) &&
-    ( m[4] == 0.0)&&(m[5] == 1.0)&&(m[6] == 0.0)&& (m[7] == 0.0)&&
-    ( m[8] == 0.0)&&(m[9] == 0.0)&&(m[10] == 1.0)&&(m[11]== 0.0)&&
-    ( m[12]== 0.0)&&(m[13]== 0.0)&&(m[14] == 0.0)&&(m[15]== 1.0)
+    (doublePEq(&m[0],1.0)) &&(doublePEq(&m[1],0.0)) &&(doublePEq(&m[2],0.0)) &&(doublePEq(&m[3],0.0)) &&
+    (doublePEq(&m[4],0.0)) &&(doublePEq(&m[5],1.0)) &&(doublePEq(&m[6],0.0)) &&(doublePEq(&m[7],0.0)) &&
+    (doublePEq(&m[8],0.0)) &&(doublePEq(&m[9],0.0)) &&(doublePEq(&m[10],1.0))&&(doublePEq(&m[11],0.0))&&
+    (doublePEq(&m[12],0.0))&&(doublePEq(&m[13],0.0))&&(doublePEq(&m[14],0.0))&&(doublePEq(&m[15],1.0))
            );
 }
 
 
-int floatEq(float element , float value )
+int is4x4DZeroMatrix(double  * m)
 {
- const float machineFloatPercision= 0.0001;
- if ( element == value ) { return 1; }
-
- if ( ( value-machineFloatPercision<element ) && (( element<value+machineFloatPercision )) ) { return 1; }
- return 0;
+   return (
+    (doublePEq(&m[0],0.0)) &&(doublePEq(&m[1],0.0)) &&(doublePEq(&m[2],0.0)) &&(doublePEq(&m[3],0.0)) &&
+    (doublePEq(&m[4],0.0)) &&(doublePEq(&m[5],0.0)) &&(doublePEq(&m[6],0.0)) &&(doublePEq(&m[7],0.0)) &&
+    (doublePEq(&m[8],0.0)) &&(doublePEq(&m[9],0.0)) &&(doublePEq(&m[10],0.0))&&(doublePEq(&m[11],0.0))&&
+    (doublePEq(&m[12],0.0))&&(doublePEq(&m[13],0.0))&&(doublePEq(&m[14],0.0))&&(doublePEq(&m[15],0.0))
+           );
 }
 
-
+ 
 int floatPEq(float * element , float value )
 {
  const float machineFloatPercision= 0.0001;
@@ -165,25 +176,14 @@ int floatPEq(float * element , float value )
  return 0;
 }
 
-int is4x4DZeroMatrix(double  * m)
-{
-   return (
-            ( m[0] == 0.0)&&(m[1] == 0.0)&&(m[2] == 0.0)&& (m[3] == 0.0) &&
-            ( m[4] == 0.0)&&(m[5] == 0.0)&&(m[6] == 0.0)&& (m[7] == 0.0)&&
-            ( m[8] == 0.0)&&(m[9] == 0.0)&&(m[10]== 0.0)&&(m[11]== 0.0)&&
-            ( m[12]== 0.0)&&(m[13]== 0.0)&&(m[14] == 0.0)&&(m[15]== 0.0)
-          );
-}
-
-
 
 int is4x4FIdentityMatrix(float  * m)
 {
    return (
-    ( floatPEq(&m[0],1.0) )&&(m[1] == 0.0)&&(m[2] == 0.0)&& (m[3] == 0.0) &&
-    ( m[4] == 0.0)&&(floatPEq(&m[5],1.0))&&(m[6] == 0.0)&& (m[7] == 0.0)&&
-    ( m[8] == 0.0)&&(m[9] == 0.0)&&(floatPEq(&m[10],1.0))&&(m[11]== 0.0)&&
-    ( m[12]== 0.0)&&(m[13]== 0.0)&&(m[14] == 0.0)&&(floatPEq(&m[15],1.0))
+    (floatPEq(&m[0],1.0)) &&(floatPEq(&m[1],0.0)) &&(floatPEq(&m[2],0.0)) &&(floatPEq(&m[3],0.0)) &&
+    (floatPEq(&m[4],0.0)) &&(floatPEq(&m[5],1.0)) &&(floatPEq(&m[6],0.0)) &&(floatPEq(&m[7],0.0)) &&
+    (floatPEq(&m[8],0.0)) &&(floatPEq(&m[9],0.0)) &&(floatPEq(&m[10],1.0))&&(floatPEq(&m[11],0.0))&&
+    (floatPEq(&m[12],0.0))&&(floatPEq(&m[13],0.0))&&(floatPEq(&m[14],0.0))&&(floatPEq(&m[15],1.0))
            );
 }
 

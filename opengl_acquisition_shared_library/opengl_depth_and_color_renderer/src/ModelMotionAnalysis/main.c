@@ -60,6 +60,15 @@ struct motionStats
 
 };
 
+int _mma_floatEq(float element , float value )
+{
+ const float machineFloatPercision= 0.001;
+ if ( element == value ) { return 1; }
+
+ if ( ( value-machineFloatPercision<element ) && (( element<value+machineFloatPercision )) ) { return 1; }
+ return 0;
+}
+
 
 int printMotionStats(struct motionStats * st)
 {
@@ -86,12 +95,12 @@ fprintf(stdout,"POSE_MAXIMUMS=\"%0.2f %0.2f %0.2f\" \n\n",st->max.x,st->max.y,st
                                                );
 
     if (
-         (st->minimum[i].x==st->maximum[i].x ) &&
-         (st->minimum[i].y==st->maximum[i].y ) &&
-         (st->minimum[i].z==st->maximum[i].z ) &&
-         (st->minimum[i].x==0 ) &&
-         (st->minimum[i].y==0 ) &&
-         (st->minimum[i].z==0 )
+        (_mma_floatEq(st->maximum[i].x-st->minimum[i].x,0.0)) &&
+        (_mma_floatEq(st->maximum[i].y-st->minimum[i].y,0.0)) &&
+        (_mma_floatEq(st->maximum[i].z-st->minimum[i].z,0.0)) &&
+         (_mma_floatEq(st->minimum[i].x,0.0)) &&
+         (_mma_floatEq(st->minimum[i].y,0.0)) &&
+         (_mma_floatEq(st->minimum[i].z,0.0))
        )
     {
         fprintf(stdout,"var_%s=\"0 0 0\"\n",st->name[i].value);
