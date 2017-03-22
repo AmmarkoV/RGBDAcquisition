@@ -21,7 +21,7 @@ OURVER=`lsb_release -a | grep Release | cut  -f2`
 echo "Our Distro is $OURDISTRO $OURVER"
 
 
-NAME="hobbitSignTrackerTest$OURDISTRO$OURVER-$THEDATETAG"
+NAME="RGBDAcquisitionROSNode$OURDISTRO$OURVER-$THEDATETAG"
  
 
 tar cvfjh "$NAME.tar.bz2" rgbd_acquisition/

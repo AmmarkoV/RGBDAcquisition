@@ -65,6 +65,13 @@ struct motionStats
 
 };
 
+
+float _mma_abs(float value)
+{
+ if (value<0) { return -1 * value;}
+ return value;
+}
+
 int _mma_floatEq(float element , float value )
 {
  const float machineFloatPercision= 0.001;
@@ -100,18 +107,25 @@ fprintf(stdout,"POSE_MAXIMUMS=\"%0.2f %0.2f %0.2f\" \n\n",st->max.x,st->max.y,st
                                                );
 
     if (
+        (
         (_mma_floatEq(st->maximum[i].x-st->minimum[i].x,0.0)) &&
         (_mma_floatEq(st->maximum[i].y-st->minimum[i].y,0.0)) &&
         (_mma_floatEq(st->maximum[i].z-st->minimum[i].z,0.0)) &&
         (_mma_floatEq(st->minimum[i].x,0.0)) &&
         (_mma_floatEq(st->minimum[i].y,0.0)) &&
         (_mma_floatEq(st->minimum[i].z,0.0))
+        ) ||
+        (st->numberOfSamples[i]==0)
        )
     {
         fprintf(stdout,"var_%s=\"0 0 0\"\n",st->name[i].value);
     } else
     {
-        fprintf(stdout,"var_%s=\"7 7 7\"\n",st->name[i].value);
+        fprintf(stdout,"var_%s=\"%0.2f %0.2f %0.2f\"\n",st->name[i].value,
+                st->variability[i].x/st->numberOfSamples[i],
+                st->variability[i].y/st->numberOfSamples[i],
+                st->variability[i].z/st->numberOfSamples[i]
+                );
     }
 
    fprintf(stdout,"\n");
@@ -239,9 +253,14 @@ int updateJoint(struct motionStats * st , unsigned int i, float x , float y , fl
    st->current[i].z=z;
 
 
-  // float diffX = abs(st->current[i].x - st->previous[i].x);
+   float diffX = _mma_abs(st->current[i].x - st->previous[i].x);
+   float diffY = _mma_abs(st->current[i].y - st->previous[i].y);
+   float diffZ = _mma_abs(st->current[i].z - st->previous[i].z);
 
 
+   st->variability[i].x += diffX;
+   st->variability[i].y += diffY;
+   st->variability[i].z += diffZ;
  }
 
  st->numberOfSamples[i]+=1;
