@@ -7,6 +7,7 @@ cd "$DIR"
 cd $1
 mkdir -p $DIR/$2
  
+cp hyps.txt "$DIR/$2/hyps.txt"
 
 echo "Converting Color Files"
 cd color
