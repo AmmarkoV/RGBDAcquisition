@@ -13,6 +13,7 @@ ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MO
 
 char inputname[512]= {0};
 char modelname[512]= {0};
+char outFilename[512]= {0};
 
 void closeEverything()
 {
@@ -33,6 +34,8 @@ int main(int argc, char *argv[])
     fprintf(stderr,"TestBody started \n");
     acquisitionRegisterTerminationSignal(&closeEverything);
 
+    snprintf(outFilename,512,"coco.scene");
+
     unsigned int width=640,height=480,framerate=30;
     unsigned int frameNum=0;
     unsigned int maxFramesToGrab=0;
@@ -40,6 +43,10 @@ int main(int argc, char *argv[])
     unsigned int i=0;
     for (i=0; i<argc; i++)
         {
+           if (strcmp(argv[i],"-o")==0)
+                {
+                   snprintf(outFilename,512,"%s",argv[i+1]);
+                }
             if (strcmp(argv[i],"--dev")==0)
                 {
                     devID = atoi(argv[i+1]);
@@ -93,7 +100,8 @@ int main(int argc, char *argv[])
 
     FILE *fp;
 
-    fp = fopen("coco.scene","w");
+    fprintf(stderr,"Writing output to %s \n",outFilename);
+    fp = fopen(outFilename,"w");
 
     if (fp!=0)
         {

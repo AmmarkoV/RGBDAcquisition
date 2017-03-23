@@ -361,21 +361,17 @@ int processCommand(struct InputParserC * ipc , struct motionStats * st ,char * l
 
   return 0;
 }
-int main(int argc, char **argv)
-{
- char filename[]="hyps.scene";
- char line [512]={0};
- unsigned int startAtFrame =15;
 
- struct motionStats st={0};
+
+
+int appendFileMotionStats(char * filename,struct motionStats *st,struct InputParserC * ipc,unsigned int startAtFrame)
+{
+ char line [512]={0};
 
  fprintf(stderr,"Opening file %s\n",filename);
-   FILE * fp = fopen(filename,"r");
-   if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
+ FILE * fp = fopen(filename,"r");
+ if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
 
-   struct InputParserC * ipc=0;
-   ipc = InputParser_Create(512,5);
-   if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n"); fclose(fp); return 0; }
 
    while (!feof(fp))
    {
@@ -387,14 +383,36 @@ int main(int argc, char **argv)
       unsigned int words_count = InputParser_SeperateWords(ipc,line,0);
       if ( words_count > 0 )
          {
-             processCommand(ipc,&st,line,words_count,startAtFrame);
+             processCommand(ipc,st,line,words_count,startAtFrame);
          } // End of line containing tokens
     } //End of getting a line while reading the file
   }
 
-  printMotionStats(&st);
 
   fclose(fp);
+  return 1;
+}
+
+
+
+
+
+
+int main(int argc, char **argv)
+{
+ char filename[]="hyps.scene";
+ unsigned int startAtFrame =15;
+
+ struct motionStats st={0};
+
+ struct InputParserC * ipc=0;
+ ipc = InputParser_Create(512,5);
+ if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n");  return 0; }
+
+  appendFileMotionStats(filename,&st,ipc,startAtFrame);
+
+  printMotionStats(&st);
+
   InputParser_Destroy(ipc);
 
  return 0;

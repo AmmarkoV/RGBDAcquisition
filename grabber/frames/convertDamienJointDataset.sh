@@ -5,6 +5,11 @@ function getarg {
                   echo "$1" |tr '\r' ' ' |  cut -d ' ' -f$2   
                 }  
 
+
+#make sure the start is ok..!
+sed -i 's/ JtLowerNoseLf/JtLowerNoseLf/g' $1
+
+
 i=0
 frame=0
 joints=""
