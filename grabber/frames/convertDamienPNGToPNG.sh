@@ -5,7 +5,7 @@ cd "$DIR"
  
 
 cd $1
-mkdir $DIR/$2
+mkdir -p $DIR/$2
  
 
 echo "Converting Color Files"
