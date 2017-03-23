@@ -370,7 +370,7 @@ int appendFileMotionStats(char * filename,struct motionStats *st,struct InputPar
 
  fprintf(stderr,"Opening file %s\n",filename);
  FILE * fp = fopen(filename,"r");
- if (fp == 0 ) { fprintf(stderr,"Cannot open trajectory stream %s \n",filename); return 0; }
+ if (fp == 0 ) { fprintf(stderr,"Cannot open stream %s \n",filename); return 0; }
 
 
    while (!feof(fp))
@@ -400,7 +400,13 @@ int appendFileMotionStats(char * filename,struct motionStats *st,struct InputPar
 
 int main(int argc, char **argv)
 {
- char filename[]="hyps.scene";
+ if (argc<2)
+ {
+     fprintf(stderr,"./ModelMotionAnalysis file1 file2 etc..\n");
+     fprintf(stderr,"_______________________________________\n");
+     return 0;
+ }
+
  unsigned int startAtFrame =15;
 
  struct motionStats st={0};
@@ -409,7 +415,11 @@ int main(int argc, char **argv)
  ipc = InputParser_Create(512,5);
  if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n");  return 0; }
 
-  appendFileMotionStats(filename,&st,ipc,startAtFrame);
+  for (int i=1; i<argc; i++)
+  {
+    // fprintf(stderr,"%u - %s\n",i,argv[i]);
+    appendFileMotionStats(argv[i],&st,ipc,startAtFrame);
+  }
 
   printMotionStats(&st);
 
