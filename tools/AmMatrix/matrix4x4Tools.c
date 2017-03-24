@@ -166,7 +166,7 @@ int is4x4DZeroMatrix(double  * m)
            );
 }
 
- 
+
 int floatPEq(float * element , float value )
 {
  const float machineFloatPercision= 0.0001;
@@ -697,6 +697,57 @@ int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB)
 
   return 1;
 }
+
+
+int transform3DNormalVectorUsing3x3PartOf4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)
+{
+  if ( (resultPoint3D==0) || (transformation4x4==0) || (point3D==0))  { return 0; }
+
+
+  if (point3D[3]!=0.0)
+  {
+    fprintf(stderr,"Error with W coordinate transform3DNormalVectorUsing3x3PartOf4x4Matrix , should be zero  \n");
+    return 0;
+  }
+
+  double * m = transformation4x4;
+  register double X=point3D[0],Y=point3D[1],W=point3D[2];
+  /*
+  What we want to do ( in mathematica )
+   { {me0,me1,me2} , {me3,me4,me5} , {me6,me7,me8} } * { { X } , { Y } , { W } }
+
+   This gives us
+
+  {
+    {me2 W + me0 X + me1 Y},
+    {me5 W + me3 X + me4 Y},
+    {me8 W + me6 X + me7 Y}
+  }
+*/
+
+  double * me0=&m[e0] , * me1=&m[e1] , * me2=&m[e2]  ;  //m[e3]  ignored
+  double * me3=&m[e4] , * me4=&m[e5] , * me5=&m[e6]  ;  //m[e7]  ignored
+  double * me6=&m[e8] , * me7=&m[e9] , * me8=&m[e10] ;  //m[e11] ignored
+  //       last line ignored since we only want 3x3
+
+
+  resultPoint3D[0] =  (*me2) * W + (*me0) * X + (*me1) * Y;
+  resultPoint3D[1] =  (*me5) * W + (*me3) * X + (*me4) * Y;
+  resultPoint3D[2] =  (*me8) * W + (*me6) * X + (*me7) * Y;
+  resultPoint3D[3] =  0;
+
+ // Ok we have our results but now to normalize our vector
+  if(resultPoint3D[2]!=0.0)
+  {
+   resultPoint3D[0]/=resultPoint3D[2];
+   resultPoint3D[1]/=resultPoint3D[2];
+   resultPoint3D[2]=1.0; //resultPoint3D[2]/=resultPoint3D[2];
+  }
+
+  return 1;
+}
+
+
 
 
 int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D)

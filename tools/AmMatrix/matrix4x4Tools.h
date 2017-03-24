@@ -261,6 +261,18 @@ int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB);
 int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D);
 
 
+
+/**
+* @brief Multiply a the 3x3 rotational part of a 4x4 matrix with a Normal Vector (3D Point)  A*V
+         Basically just performing a (3x3) x (3x1) operation from a (4x4) x (4x1) input
+* @ingroup AmMatrix
+* @param  Output Vector ( should be already allocated )
+* @param  Input 4x4 Matrix A
+* @param  Input Vector 4x1 V where W coordinate should be 0
+* @retval 0=failure,1=success
+*/
+int transform3DNormalVectorUsing3x3PartOf4x4Matrix(double * resultPoint3D, double * transformation4x4, double * point3D);
+
 /**
 * @brief Normalize a 4x1 matrix with a Vector (3D Point)
 * @ingroup AmMatrix

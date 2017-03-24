@@ -855,10 +855,10 @@ int applyVertexTransformation( struct TRI_Model * triModelOut , struct TRI_Model
        normal[0]   = triModelIn->normal[v*3+0];
        normal[1]   = triModelIn->normal[v*3+1];
        normal[2]   = triModelIn->normal[v*3+2];
-       normal[3]   = 1.0;
+       normal[3]   = 0.0;
 
        //We transform input (initial) normal with the transform we computed to get transformedNormal
-       transform3DPointVectorUsing4x4Matrix(transformedNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
+       transform3DNormalVectorUsing3x3PartOf4x4Matrix(transformedNormal, triModelIn->bones[k].info->finalVertexTransformation ,normal);
 	   triModelOut->normal[v*3+0] += (float) transformedNormal[0] * w;
 	   triModelOut->normal[v*3+1] += (float) transformedNormal[1] * w;
 	   triModelOut->normal[v*3+2] += (float) transformedNormal[2] * w;
