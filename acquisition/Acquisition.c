@@ -149,6 +149,8 @@ int acquisitionGetModulesCount()
 {
   unsigned int modules = 0;
 
+  fprintf(stderr,"Querying for Acquisition plug-ins : \n");
+
   if ( acquisitionIsModuleAvailiable(V4L2_ACQUISITION_MODULE) )          { fprintf(stderr,"V4L2 module found \n");       ++modules; }
   if ( acquisitionIsModuleAvailiable(V4L2STEREO_ACQUISITION_MODULE) )    { fprintf(stderr,"V4L2Stereo module found \n"); ++modules; }
   if ( acquisitionIsModuleAvailiable(OPENGL_ACQUISITION_MODULE) )        { fprintf(stderr,"OpenGL module found \n");     ++modules; }

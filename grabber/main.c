@@ -13,6 +13,13 @@
 #include "../acquisition/Acquisition.h"
 #include "../tools/Calibration/calibration.h"
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
 char inputname[512]={0};
 char outputfoldername[512]={0};
 
@@ -53,7 +60,7 @@ int main(int argc, char *argv[])
 
   if (possibleModules==0)
     {
-       fprintf(stderr,"Acquisition Library is linked to zero modules , can't possibly do anything..\n");
+       fprintf(stderr,RED "Acquisition Library is linked to zero modules , can't possibly do anything..\n" NORMAL);
        return 1;
     }
 

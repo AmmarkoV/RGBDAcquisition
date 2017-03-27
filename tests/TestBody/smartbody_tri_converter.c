@@ -30,7 +30,7 @@ float absF(float abs)
 }
 
 //We want to compare each corresponding joint of a coco skeleton to a smartbody skeleton ( inside a TRI_Model structure )
-float getCOCOAndSmartBodyDistance(struct skeletonCOCO * coco,double * m4x4ModelView,struct TRI_Model * triModel)
+float getCOCOAndSmartBodyDistance(const struct skeletonCOCO * coco,double * m4x4ModelView,struct TRI_Model * triModel)
 {
   float score=10000000,addedToScore=0;
 

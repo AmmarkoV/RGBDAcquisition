@@ -66,40 +66,31 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
 {
    char* ldPreloadPath;
    ldPreloadPath= getenv("LD_PRELOAD");
-   if (ldPreloadPath!=0) { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPreloadPath); }
+   if (ldPreloadPath!=0) { fprintf(stderr,"Todo Implement check in LD_PRELOAD paths : `%s` \n",ldPreloadPath); }
 
 
    char pathTester[2048]={0};
 
-  /*
-   if (getcwd(pathTester, sizeof(pathTester)) != 0)
-         fprintf(stdout, "Current working dir: %s\n", pathTester);
-  */
-
-   sprintf(pathTester,"%s/%s",possiblePath,libName);
+   snprintf(pathTester,2048,"%s/%s",possiblePath,libName);
    if (acquisitionFileExists(pathTester))
                                  {
                                    //fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
-                                   strncpy(pathOut,pathTester,pathOutLength);
+                                   snprintf(pathOut,pathOutLength,"%s/%s",possiblePath,libName);
                                    return 1;
                                  }
 
-   sprintf(pathTester,"./%s",libName);
+   snprintf(pathTester,2048,"./%s",libName);
    if (acquisitionFileExists(libName))
-                                {
+                                 {
                                    //fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
-                                   //strncpy(pathOut,libName,pathOutLength);
-
-                                   strcpy(pathOut,"./"); //<-TODO CHECK BOUNDS HERE ETC..
-                                   strcat(pathOut,libName);
-
+                                   snprintf(pathOut,pathOutLength,"./%s",libName);
                                    return 1;
                                  }
 
    if (acquisitionFileExists(libName))
-                                {
+                                 {
                                    //fprintf(stderr,"Found plugin %s at standard dir \n",libName);
-                                   strcat(pathOut,libName);
+                                   snprintf(pathOut,pathOutLength,"%s",libName);
                                    return 1;
                                  }
 
@@ -109,10 +100,66 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
    // They look like /opt/ros/groovy/lib:/usr/local/cuda-4.2/cuda/lib64:/usr/local/cuda-4.2/cuda/lib
    char* ldPath;
    ldPath= getenv("LD_LIBRARY_PATH");
-   if (ldPath!=0)        { fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPath);  }
+   if (ldPath!=0)
+     {
+       //fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPath);
+       char * directoriesToCheck = (char*) malloc(sizeof(char) * strlen(ldPath) );
+
+       char * endOfPath=1;
+       char * startOfPath=directoriesToCheck;
+       if (directoriesToCheck!=0)
+       {
+        strncpy(directoriesToCheck,ldPath,strlen(ldPath));
+
+        while (endOfPath!=0)
+          {
+           endOfPath = strstr(startOfPath,":");
+           if (endOfPath!=0)
+           {
+             *endOfPath=0;
 
 
-   fprintf(stderr,RED "Could not find plugin library %s..\n " NORMAL,libName);
+              //========================================================
+              //   fprintf(stderr,"Check @ %s\n",startOfPath);
+              //========================================================
+                 sprintf(pathTester,"%s/%s",startOfPath,libName);
+                 if (acquisitionFileExists(pathTester))
+                                 {
+                                     fprintf(stderr,"Found plugin %s at %s/%s\n",libName,startOfPath,libName);
+                                     snprintf(pathOut,pathOutLength,"%s/%s",startOfPath,libName);
+                                     free(directoriesToCheck);
+                                     return 1;
+                                 }
+              //========================================================
+
+
+
+
+             startOfPath=endOfPath+1;
+           }
+          }
+          //========================================================
+          // fprintf(stderr,"Last Check @ %s\n",startOfPath);
+          //========================================================
+           sprintf(pathTester,"%s/%s",startOfPath,libName);
+           if (acquisitionFileExists(pathTester))
+                                 {
+                                     fprintf(stderr,"Found plugin %s at %s/%s\n",libName,startOfPath,libName);
+                                     snprintf(pathOut,pathOutLength,"%s/%s",startOfPath,libName);
+                                     free(directoriesToCheck);
+                                     return 1;
+                                 }
+          //========================================================
+
+        free(directoriesToCheck);
+       }
+     }
+
+
+   fprintf(stderr,YELLOW "Could not find plugin library %s..\n " NORMAL,libName);
+   if (getcwd(pathTester, 2048) != 0)
+         fprintf(stdout, "  working dir was : %s\n", pathTester);
+
    return 0;
 }
 
