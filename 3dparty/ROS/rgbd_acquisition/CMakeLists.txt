@@ -51,6 +51,6 @@ target_link_libraries(rgbd_acquisition ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}  
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 
 install(TARGETS rgbd_acquisition RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-install(FILES rgbd_acquisition.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+#install(FILES rgbd_acquisition.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 
