@@ -129,6 +129,7 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
 int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
 {
    if (getPluginPathFromEnvVariable("LD_PRELOAD",libName,pathOut,pathOutLength)) { return 1; }
+   if (getPluginPathFromEnvVariable("RGBD_ACQUISITION",libName,pathOut,pathOutLength)) { return 1; }
 
    char pathTester[2048]={0};
 
