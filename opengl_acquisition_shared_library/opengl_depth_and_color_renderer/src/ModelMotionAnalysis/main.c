@@ -414,8 +414,9 @@ int main(int argc, char **argv)
  struct InputParserC * ipc=0;
  ipc = InputParser_Create(512,5);
  if (ipc==0)  { fprintf(stderr,"Cannot allocate memory for new stream\n");  return 0; }
-
-  for (int i=1; i<argc; i++)
+  
+  unsigned int i;
+  for (i=1; i<argc; i++)
   {
     // fprintf(stderr,"%u - %s\n",i,argv[i]);
     appendFileMotionStats(argv[i],&st,ipc,startAtFrame);
