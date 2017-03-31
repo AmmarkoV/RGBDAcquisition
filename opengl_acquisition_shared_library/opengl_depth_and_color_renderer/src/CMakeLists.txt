@@ -104,6 +104,8 @@ add_library(OGLRendererSandbox SHARED
             TrajectoryParser/TrajectoryCalculator.h 
             TrajectoryParser/TrajectoryPrimitives.c 
             TrajectoryParser/TrajectoryPrimitives.h
+            TrajectoryParser/hashmap.c 
+            TrajectoryParser/hashmap.h
             Interfaces/webInterface.c 
             Interfaces/webInterface.h
            ) 

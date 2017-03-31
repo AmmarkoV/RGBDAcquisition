@@ -195,6 +195,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TrajectoryParser/TrajectoryPrimitives.h" />
+		<Unit filename="TrajectoryParser/hashmap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TrajectoryParser/hashmap.h" />
 		<Unit filename="glx.c">
 			<Option compilerVar="CC" />
 		</Unit>

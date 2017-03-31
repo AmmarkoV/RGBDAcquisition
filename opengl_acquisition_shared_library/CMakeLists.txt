@@ -100,6 +100,8 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.h  
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.c 
             opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.h
+            opengl_depth_and_color_renderer/src/TrajectoryParser/hashmap.c 
+            opengl_depth_and_color_renderer/src/TrajectoryParser/hashmap.h
             opengl_depth_and_color_renderer/src/Interfaces/webInterface.c 
             opengl_depth_and_color_renderer/src/Interfaces/webInterface.h
            ) 
