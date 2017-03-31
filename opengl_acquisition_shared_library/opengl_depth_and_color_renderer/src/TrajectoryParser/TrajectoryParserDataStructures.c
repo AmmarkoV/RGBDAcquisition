@@ -139,7 +139,7 @@ int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int conne
 }
 
 
-
+#define CASE_SENSITIVE_OBJECT_NAMES 1
 
 static int dummy_strcasecmp_internal(char * input1, char * input2)
 {
