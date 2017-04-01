@@ -27,6 +27,7 @@ unsigned long hashFunction(const char *str);
 /** @brief An entry on the hash map flattened out for ease of use  */
 struct hashMapEntry
 {
+  unsigned int index;
   unsigned long keyHash;
   unsigned int keyLength;
   char * key;
