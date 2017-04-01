@@ -206,7 +206,7 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
 
  unsigned int success;
  unsigned long index;
- success = hashMap_FindIndex(stream->objectHash,name,&index);
+ success = hashMap_GetULongPayload(stream->objectHash,name,&index);
  *found=(success==1);
  return index;
 
@@ -232,6 +232,14 @@ ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName
 {
   if (stream==0) { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",typeName); }
   if (stream->objectTypes==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object type array\n",typeName); }
+
+
+ unsigned int success;
+ unsigned long index;
+ success = hashMap_GetULongPayload(stream->objectTypesHash,typeName,&index);
+ *found=(success==1);
+ return index;
+
 
   *found=0;
   unsigned int i=0;

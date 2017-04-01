@@ -827,6 +827,8 @@ int destroyVirtualStreamInternal(struct VirtualStream * stream,int also_destrstr
 
   hashMap_Destroy(stream->objectHash);
   hashMap_Destroy(stream->objectTypesHash);
+  hashMap_Destroy(stream->connectorHash);
+  hashMap_Destroy(stream->eventHash);
 
 
 
@@ -875,6 +877,8 @@ struct VirtualStream * createVirtualStream(const char * filename , struct ModelL
 
   newstream->objectHash = hashMap_Create(200,200,0);
   newstream->objectTypesHash = hashMap_Create(200,200,0);
+  newstream->connectorHash = hashMap_Create(200,200,0);
+  newstream->eventHash = hashMap_Create(200,200,0);
 
   //We refresh our associated model Storage
    newstream->associatedModelList = modelStorage;

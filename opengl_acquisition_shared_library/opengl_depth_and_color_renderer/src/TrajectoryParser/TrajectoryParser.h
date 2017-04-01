@@ -250,10 +250,12 @@ struct VirtualStream
     unsigned int MAX_numberOfConnectors;
     unsigned int numberOfConnectors;
     struct VirtualConnector *connector;
+    struct hashMap * connectorHash;
 
     unsigned int MAX_numberOfEvents;
     unsigned int numberOfEvents;
     struct VirtualEvent * event;
+    struct hashMap * eventHash;
 
     struct ModelList * associatedModelList;
 
