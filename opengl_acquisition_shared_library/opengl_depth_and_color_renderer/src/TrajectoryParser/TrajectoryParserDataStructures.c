@@ -12,6 +12,7 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
+#define USE_HASHMAPS 1
 
 int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int framesToAdd)
 {
@@ -139,7 +140,6 @@ int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int conne
 }
 
 
-#define CASE_SENSITIVE_OBJECT_NAMES 1
 
 static int dummy_strcasecmp_internal(char * input1, char * input2)
 {
@@ -192,7 +192,6 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
   if (stream==0) { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",name); }
   if (stream->object==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object array\n",name); }
 
-  unsigned int i=0;
 
   if (stream->MAX_numberOfObjects<=stream->numberOfObjects)
     {
@@ -204,13 +203,14 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
     { fprintf(stderr,"Searching %s among %u/%u objects \n",name,stream->numberOfObjects , stream->MAX_numberOfObjects); }
 
 
+ #if USE_HASHMAPS
  unsigned int success;
  unsigned long index;
  success = hashMap_GetULongPayload(stream->objectHash,name,&index);
  *found=success;
  return (unsigned int) index;
-
- /*
+ #else
+  unsigned int i=0;
   for (i=0; i<stream->numberOfObjects; i++ )
    {
      if (stream->object[i].name!=0)
@@ -226,7 +226,8 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
    }
 
    return 0;
-   */
+ #endif // USE_HASHMAPS
+
 }
 
 ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName,unsigned int * found)
@@ -234,14 +235,13 @@ ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName
   if (stream==0) { fprintf(stderr,"Can't get object id (%s) for un allocated stream\n",typeName); }
   if (stream->objectTypes==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object type array\n",typeName); }
 
-
+ #if USE_HASHMAPS
  unsigned int success;
  unsigned long index;
  success = hashMap_GetULongPayload(stream->objectTypesHash,typeName,&index);
  *found=success;
  return (unsigned int) index;
-
-/*
+ #else
   *found=0;
   unsigned int i=0;
   for (i=0; i<stream->numberOfObjectTypes; i++ )
@@ -254,7 +254,7 @@ ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName
          //else { fprintf(stderr,"ObjType `%s` != `%s` requested \n",stream->objectTypes[i].name,typeName); }
    }
    return 0;
-*/
+ #endif // USE_HASHMAPS
 }
 
 char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID)
@@ -819,7 +819,7 @@ int loadObjectTypeModelForVirtualStream(
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
                               struct ModelList * modelStorage,
-                              char * name , char * type ,
+                              const char * name , const char * type ,
                               unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
                               unsigned char noColor ,
                               float * coords ,
@@ -840,7 +840,9 @@ int addObjectToVirtualStream(
    //Clearing  everything is done in growVirtualStreamObjects so no need to do it here
    //memset((void*) &stream->object[pos],0,sizeof(struct VirtualObject));
 
+   #if USE_HASHMAPS
    hashMap_AddULong(stream->objectHash,name,pos);
+   #endif // USE_HASHMAPS
 
    strcpy(stream->object[pos].name,name);
    strcpy(stream->object[pos].typeStr,type);
@@ -916,8 +918,8 @@ int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int O
 
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,
-                                 char * type ,
-                                 char * model
+                                 const char * type ,
+                                 const char * model
                                 )
 {
     if (stream->MAX_numberOfObjectTypes<=stream->numberOfObjectTypes+1) { growVirtualStreamObjectsTypes(stream,OBJECT_TYPES_TO_ADD_STEP); }
@@ -927,7 +929,10 @@ int addObjectTypeToVirtualStream(
     //We have the space so lets fill our new object spot ..!
     unsigned int pos = stream->numberOfObjectTypes;
 
+    #if USE_HASHMAPS
     hashMap_AddULong(stream->objectTypesHash,type,pos);
+    #endif // USE_HASHMAPS
+
     strcpy(stream->objectTypes[pos].name,type);
     strcpy(stream->objectTypes[pos].model,model);
 

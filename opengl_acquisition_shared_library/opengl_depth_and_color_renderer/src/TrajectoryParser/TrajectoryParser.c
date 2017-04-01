@@ -886,11 +886,11 @@ struct VirtualStream * createVirtualStream(const char * filename , struct ModelL
   memset(newstream,0,sizeof(struct VirtualStream));
   newstream->rate=1.0;
 
-
-  newstream->objectHash = hashMap_Create(200,200,0);
-  newstream->objectTypesHash = hashMap_Create(200,200,0);
-  newstream->connectorHash = hashMap_Create(200,200,0);
-  newstream->eventHash = hashMap_Create(200,200,0);
+  int useSorting=0;
+  newstream->objectHash = hashMap_Create(200,200,0,useSorting);
+  newstream->objectTypesHash = hashMap_Create(200,200,0,useSorting);
+  newstream->connectorHash = hashMap_Create(200,200,0,useSorting);
+  newstream->eventHash = hashMap_Create(200,200,0,useSorting);
 
   //We refresh our associated model Storage
    newstream->associatedModelList = modelStorage;

@@ -393,56 +393,6 @@ int removeObjectFromVirtualStream(struct VirtualStream * stream ,  unsigned int 
 
 
 
-/**
-* @brief Add a new Position at a specified time for an object using its ObjectID
-* @ingroup trajectoryParser
-* @param Pointer to a valid stream
-* @param Object ID we want to add the position to
-* @param The time ine Milliseconds
-* @retval 1=Success , 0=Failure */
-int addStateToObjectID(
-                               struct VirtualStream * stream ,
-                               unsigned int ObjID  ,
-                               unsigned int timeMilliseconds ,
-                               float * coord ,
-                               unsigned int coordLength ,
-                               float scaleX , float scaleY ,float scaleZ ,
-                               float R , float G , float B , float Alpha
-                       );
-
-
-
-/**
-* @brief Add a new Position at a specified time for an object using its name
-* @ingroup trajectoryParser
-* @param Pointer to a valid stream
-* @param String with the name of the object we want to add the position to
-* @param The time ine Milliseconds
-* @retval 1=Success , 0=Failure */
-int addStateToObject(
-                              struct VirtualStream * stream ,
-                              char * name  ,
-                              unsigned int timeMilliseconds ,
-                              float * coord ,
-                              unsigned int coordLength,
-                               float scaleX , float scaleY ,float scaleZ ,
-                              float R , float G , float B , float Alpha
-                       );
-
-/**
-* @brief Create a new Object Type definition
-* @ingroup trajectoryParser
-* @param Pointer to a valid stream
-* @param Object Type we want to Create
-* @param The model it will use
-* @retval 1=Success , 0=Failure */
-int addObjectTypeToVirtualStream(
-                                 struct VirtualStream * stream ,
-                                 char * type , char * model
-                                );
-
-
-
 #ifdef __cplusplus
 }
 #endif

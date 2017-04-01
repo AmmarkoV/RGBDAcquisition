@@ -49,7 +49,7 @@ int hashMap_Grow(struct hashMap * hm,unsigned int growthSize)
   return 0;
 }
 
-struct hashMap * hashMap_Create(unsigned int initialEntries,unsigned int entryAllocationStep,void * clearItemFunction)
+struct hashMap * hashMap_Create(unsigned int initialEntries,unsigned int entryAllocationStep,void * clearItemFunction , unsigned int useSorting)
 {
   struct hashMap * hm = (struct hashMap *)  malloc(sizeof(struct hashMap));
   if (hm==0)  { fprintf(stderr,"Could not allocate a new hashmap"); return 0; }
@@ -60,6 +60,7 @@ struct hashMap * hashMap_Create(unsigned int initialEntries,unsigned int entryAl
   hm->entryAllocationStep=entryAllocationStep;
   hm->maxNumberOfEntries=0;
   hm->curNumberOfEntries=0;
+  hm->useSorting=useSorting;
 
   if (!hashMap_Grow(hm,initialEntries) )
   {
@@ -191,14 +192,21 @@ int cmpHashTableItems (const void * a, const void * b)
 
 int hashMap_Sort(struct hashMap * hm)
 {
+  if (!hm->useSorting) { fprintf(stderr,"Sorting is disabled for this hashmap\n"); return 0; }
   if (!hashMap_IsOK(hm)) { return 0; }
-  qsort( hm->entries , hm->curNumberOfEntries , sizeof(struct hashMapEntry), cmpHashTableItems);
+  qsort(
+         hm->entries ,
+         hm->curNumberOfEntries ,
+         sizeof(struct hashMapEntry),
+         cmpHashTableItems
+        );
   hm->isSorted=1;
   return 1;
 }
 
 int hashMap_BSearch(struct hashMap* hm,const char *  key , unsigned long keyHash,unsigned long * index)
 {
+  if (!hm->useSorting) { fprintf(stderr,"Sorting is disabled for this hashmap\n"); return 0; }
   struct hashMapEntry needle = {0};
   needle.keyHash = keyHash;
 
@@ -339,7 +347,7 @@ return 1;
 int hashMap_FindIndex(struct hashMap * hm,const char * key,unsigned long * index)
 {
   if (!hashMap_IsOK(hm)) { return 0;}
-  if (!hm->isSorted) { hashMap_PrepareForQueries(hm); }
+  if ( (!hm->isSorted) && (hm->useSorting) ) { hashMap_PrepareForQueries(hm); }
 
   unsigned long i=0;
   unsigned long keyHash = hashFunction(key);
@@ -355,7 +363,7 @@ int hashMap_FindIndex(struct hashMap * hm,const char * key,unsigned long * index
   }
 
   //If the hashmap is sorted we do a fast binary search
- if (hm->isSorted)
+ if ( (hm->isSorted) && (hm->useSorting) )
  {
    return hashMap_BSearch(hm,key,keyHash,index);
  } else
@@ -412,9 +420,9 @@ int hashMap_GetPayload(struct hashMap * hm,const char * key,void * payload)
   unsigned long i=0;
   if (hashMap_FindIndex(hm,key,&i))
     {
-       fprintf(stderr,"Payload was pointing to %p and now it is pointing to ",payload);
+        fprintf(stderr,"Payload was pointing to %p and now it is pointing to ",payload);
         payload = hm->entries[i].payload;
-       fprintf(stderr,"%p \n",payload);
+        fprintf(stderr,"%p \n",payload);
        return 1;
     }
   return 0;
@@ -424,7 +432,11 @@ int hashMap_GetPayload(struct hashMap * hm,const char * key,void * payload)
 int hashMap_GetULongPayload(struct hashMap * hm,const char * key,unsigned long * payload)
 {
   unsigned long i=*payload;
-  if (hashMap_FindIndex(hm,key,&i)) {  *payload = (unsigned long) hm->entries[i].payload; return 1; }
+  if (hashMap_FindIndex(hm,key,&i))
+     {
+       *payload = (unsigned long) hm->entries[i].payload;
+      return 1;
+     }
   return 0;
 }
 

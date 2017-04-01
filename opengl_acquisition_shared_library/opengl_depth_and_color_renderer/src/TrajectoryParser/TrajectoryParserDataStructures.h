@@ -37,7 +37,13 @@ unsigned long getFileSize(char * filename);
 
 
 
-
+/**
+* @brief Add a new Position at a specified time for an object using its ObjectID
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param Object ID we want to add the position to
+* @param The time ine Milliseconds
+* @retval 1=Success , 0=Failure */
 int addStateToObjectID(
                                struct VirtualStream * stream ,
                                unsigned int ObjID  ,
@@ -48,6 +54,15 @@ int addStateToObjectID(
                                float R , float G , float B , float Alpha
                        );
 
+
+
+/**
+* @brief Add a new Position at a specified time for an object using its name
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @param String with the name of the object we want to add the position to
+* @param The time ine Milliseconds
+* @retval 1=Success , 0=Failure */
 int addStateToObject(
                               struct VirtualStream * stream ,
                               char * name  ,
@@ -107,7 +122,7 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream, struct M
 int addObjectToVirtualStream(
                               struct VirtualStream * stream ,
                               struct ModelList * modelStorage,
-                              char * name , char * type ,
+                              const char * name ,const char * type ,
                               unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
                               unsigned char noColor ,
                               float * coords ,
@@ -121,7 +136,7 @@ int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int O
 
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,
-                                 char * type , char * model
+                                 const char * type , const char * model
                                 );
 
 int addEventToVirtualStream(

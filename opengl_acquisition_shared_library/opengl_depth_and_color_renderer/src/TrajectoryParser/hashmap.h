@@ -47,7 +47,7 @@ struct hashMap
   void * clearItemCallbackFunction;
 
   unsigned int isSorted;
-
+  unsigned int useSorting;
   #if HASHMAP_BE_THREAD_SAFE
    pthread_mutex_t hm_addLock;
    pthread_mutex_t hm_fileLock;
@@ -61,7 +61,7 @@ struct hashMap
 * @param Allocation step for new allocations
 * @param Pointer to a function that clears an item
 * @retval Hashmap Structure or , 0=Failure */
-struct hashMap * hashMap_Create(unsigned int initialEntries , unsigned int entryAllocationStep,void * clearItemFunction);
+struct hashMap * hashMap_Create(unsigned int initialEntries , unsigned int entryAllocationStep,void * clearItemFunction, unsigned int useSorting);
 
 /**
 * @brief Destroy and deallocate a hash map
