@@ -207,8 +207,8 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
  unsigned int success;
  unsigned long index;
  success = hashMap_GetULongPayload(stream->objectHash,name,&index);
- *found=(success==1);
- return index;
+ *found=success;
+ return (unsigned int) index;
 
  /*
   for (i=0; i<stream->numberOfObjects; i++ )
@@ -223,9 +223,10 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
               return i;
          }
      }
-   }*/
+   }
 
    return 0;
+   */
 }
 
 ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName,unsigned int * found)
@@ -237,10 +238,10 @@ ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName
  unsigned int success;
  unsigned long index;
  success = hashMap_GetULongPayload(stream->objectTypesHash,typeName,&index);
- *found=(success==1);
- return index;
+ *found=success;
+ return (unsigned int) index;
 
-
+/*
   *found=0;
   unsigned int i=0;
   for (i=0; i<stream->numberOfObjectTypes; i++ )
@@ -252,8 +253,8 @@ ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName
          }
          //else { fprintf(stderr,"ObjType `%s` != `%s` requested \n",stream->objectTypes[i].name,typeName); }
    }
-
    return 0;
+*/
 }
 
 char * getObjectTypeModel(struct VirtualStream * stream,ObjectTypeID typeID)

@@ -197,15 +197,21 @@ int hashMap_Sort(struct hashMap * hm)
   return 1;
 }
 
-int hashMap_BSearch(struct hashMap* hm,char *  key , unsigned long keyHash,unsigned long * index)
+int hashMap_BSearch(struct hashMap* hm,const char *  key , unsigned long keyHash,unsigned long * index)
 {
   struct hashMapEntry needle = {0};
   needle.keyHash = keyHash;
 
-  struct hashMapEntry * pItem = (struct hashMapEntry *) bsearch ((void*) &needle, (void*) hm->entries , hm->curNumberOfEntries , sizeof(struct hashMapEntry), cmpHashTableItems);
+  struct hashMapEntry * pItem = (struct hashMapEntry *) bsearch (
+                                                                  (void*) &needle,
+                                                                  (void*) hm->entries ,
+                                                                  hm->curNumberOfEntries ,
+                                                                  sizeof(struct hashMapEntry),
+                                                                  cmpHashTableItems
+                                                                );
   if (pItem!=0) {
                   *index = pItem->index;
-                  printf ("%ul is in the array[%u] (%s vs %s) .\n",keyHash,*index , pItem->key , key);
+                  //printf ("%ul is in the array[%u] (%s vs %s) .\n",keyHash,*index , pItem->key , key);
 
                   if (*index>=hm->curNumberOfEntries)
                   {
@@ -214,7 +220,7 @@ int hashMap_BSearch(struct hashMap* hm,char *  key , unsigned long keyHash,unsig
                   }
                  return 1;
                 }
-                else { printf ("%ul is not in the array of %u elements .\n",keyHash , hm->curNumberOfEntries ); }
+                //else { printf ("%ul is not in the array of %u elements .\n",keyHash , hm->curNumberOfEntries ); }
   return 0;
 }
 
@@ -348,15 +354,13 @@ int hashMap_FindIndex(struct hashMap * hm,const char * key,unsigned long * index
     }
   }
 
+  //If the hashmap is sorted we do a fast binary search
  if (hm->isSorted)
  {
-   if (hashMap_BSearch(hm,key,keyHash,index))
-    {
-     return 1;
-    }
+   return hashMap_BSearch(hm,key,keyHash,index);
  } else
  {
- //Stupid and slow serial search
+ //If the hashmap is not sorted then we have to do a stupid and really slow serial search
   while ( i < hm->curNumberOfEntries )
   {
     if ( hm->entries[i].keyHash == keyHash )
@@ -446,6 +450,17 @@ int hashMap_ContainsValue(struct hashMap * hm,void * val)
 }
 
 
+
+int hashMap_Print(struct hashMap * hm,const char * title)
+{
+  fprintf(stderr,"Hash map %s Printout -----------------------------------\n",title);
+  unsigned int i=0;
+  for (i=0; i<hm->curNumberOfEntries; i++)
+  {
+   fprintf(stderr,"#%u - %s => %lu \n",i,hm->entries[i].key , (unsigned long) hm->entries[i].payload);
+  }
+  fprintf(stderr,"---------------------------------------------------------\n",title);
+}
 
 
 int hashMap_SaveToFile(struct hashMap * hm,const char * filename)

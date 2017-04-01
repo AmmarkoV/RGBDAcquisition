@@ -193,6 +193,18 @@ int hashMap_GetMaxNumberOfEntries(struct hashMap * hm);
 * @retval Number of entries */
 int hashMap_GetCurrentNumberOfEntries(struct hashMap * hm);
 
+
+
+
+/**
+* @brief Console printout of hashmap contents ( useful when debugging )
+* @ingroup hashmap
+* @param HashMap structure
+* @param Title to add
+* @retval 1=Success,0=Fail*/
+int hashMap_Print(struct hashMap * hm , const char * title);
+
+
 /**
 * @brief Load hash map from a file
 * @ingroup hashmap

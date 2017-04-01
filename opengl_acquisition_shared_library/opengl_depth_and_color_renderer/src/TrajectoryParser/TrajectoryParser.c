@@ -439,6 +439,14 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                hashMap_PrepareForQueries(newstream->objectHash);
                hashMap_PrepareForQueries(newstream->connectorHash);
                hashMap_PrepareForQueries(newstream->eventHash);
+
+               /*
+               hashMap_Print(newstream->objectTypesHash,"Object Types");
+               hashMap_Print(newstream->objectHash,"Object");
+               hashMap_Print(newstream->connectorHash,"Connectors");
+               hashMap_Print(newstream->eventHash,"Events");
+               exit(0);
+               */
           break;
 
           case TRAJECTORYPRIMITIVES_PQ :
