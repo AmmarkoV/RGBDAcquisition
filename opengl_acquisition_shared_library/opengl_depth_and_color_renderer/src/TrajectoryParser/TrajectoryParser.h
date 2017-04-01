@@ -14,6 +14,7 @@ extern "C" {
 #define MAX_PATH 250
 
 #include "../ModelLoader/model_loader.h"
+#include "hashmap.h"
 
 #define LINE_MAX_LENGTH 1024
 #define OBJECT_TYPES_TO_ADD_STEP 10
@@ -236,11 +237,14 @@ struct VirtualStream
     unsigned int MAX_numberOfObjectTypes;
     unsigned int numberOfObjectTypes;
     struct ObjectType * objectTypes;
+    struct hashMap * objectTypesHash;
+
 
     unsigned int MAX_numberOfObjects;
     unsigned int numberOfObjects;
     unsigned int selectedObject;
     struct VirtualObject * object;
+    struct hashMap * objectHash;
 
 
     unsigned int MAX_numberOfConnectors;

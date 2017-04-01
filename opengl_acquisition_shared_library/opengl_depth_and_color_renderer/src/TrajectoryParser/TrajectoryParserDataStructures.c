@@ -203,6 +203,14 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
   if (stream->debug)
     { fprintf(stderr,"Searching %s among %u/%u objects \n",name,stream->numberOfObjects , stream->MAX_numberOfObjects); }
 
+
+ unsigned int success;
+ unsigned long index;
+ success = hashMap_FindIndex(stream->objectHash,name,&index);
+ *found=(success==1);
+ return index;
+
+ /*
   for (i=0; i<stream->numberOfObjects; i++ )
    {
      if (stream->object[i].name!=0)
@@ -215,7 +223,7 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
               return i;
          }
      }
-   }
+   }*/
 
    return 0;
 }
@@ -823,6 +831,8 @@ int addObjectToVirtualStream(
    //Clearing  everything is done in growVirtualStreamObjects so no need to do it here
    //memset((void*) &stream->object[pos],0,sizeof(struct VirtualObject));
 
+   hashMap_AddULong(stream->objectHash,name,pos);
+
    strcpy(stream->object[pos].name,name);
    strcpy(stream->object[pos].typeStr,type);
    stream->object[pos].R = (float) R/255;
@@ -907,6 +917,8 @@ int addObjectTypeToVirtualStream(
 
     //We have the space so lets fill our new object spot ..!
     unsigned int pos = stream->numberOfObjectTypes;
+
+    hashMap_AddULong(stream->objectTypesHash,type,pos);
     strcpy(stream->objectTypes[pos].name,type);
     strcpy(stream->objectTypes[pos].model,model);
 
