@@ -434,8 +434,12 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
               }
           break;
 
-
-
+          case TRAJECTORYPRIMITIVES_DONE_DECLARING_OBJECTS :
+               hashMap_PrepareForQueries(newstream->objectTypesHash);
+               hashMap_PrepareForQueries(newstream->objectHash);
+               hashMap_PrepareForQueries(newstream->connectorHash);
+               hashMap_PrepareForQueries(newstream->eventHash);
+          break;
 
           case TRAJECTORYPRIMITIVES_PQ :
                //PQ(ID,X,Y,Z,QX,QY,QZ,QW)

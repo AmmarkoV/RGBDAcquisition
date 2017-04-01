@@ -1,6 +1,6 @@
 
 /*                  
-This file was automatically generated @ 13-02-2017 01:39:44 using StringRecognizer                  
+This file was automatically generated @ 01-04-2017 22:30:33 using StringRecognizer                  
 https://github.com/AmmarkoV/AmmarServer/tree/master/src/StringRecognizer                 
 Please note that changes you make here may be automatically overwritten                  
 if the String Recognizer generator runs again..!              
@@ -57,8 +57,16 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
     }; 
  break; 
  case 'D' : 
-     if (strLength<5) { return 0; } 
-     if ( strncasecmp(str,"DEBUG",5) == 0 ) { return TRAJECTORYPRIMITIVES_DEBUG; } 
+     switch (toupper(str[1])) { 
+     case 'E' : 
+         if (strLength<5) { return 0; } 
+         if ( strncasecmp(str,"DEBUG",5) == 0 ) { return TRAJECTORYPRIMITIVES_DEBUG; } 
+     break; 
+     case 'O' : 
+         if (strLength<22) { return 0; } 
+         if ( strncasecmp(str,"DONE_DECLARING_OBJECTS",22) == 0 ) { return TRAJECTORYPRIMITIVES_DONE_DECLARING_OBJECTS; } 
+     break; 
+    }; 
  break; 
  case 'E' : 
      switch (toupper(str[1])) { 
@@ -208,16 +216,8 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
     }; 
  break; 
  case 'T' : 
-     switch (toupper(str[1])) { 
-     case 'E' : 
-         if (strLength<4) { return 0; } 
-         if ( strncasecmp(str,"TEST",4) == 0 ) { return TRAJECTORYPRIMITIVES_TEST; } 
-     break; 
-     case 'I' : 
-         if (strLength<9) { return 0; } 
-         if ( strncasecmp(str,"TIMESTAMP",9) == 0 ) { return TRAJECTORYPRIMITIVES_TIMESTAMP; } 
-     break; 
-    }; 
+     if (strLength<9) { return 0; } 
+     if ( strncasecmp(str,"TIMESTAMP",9) == 0 ) { return TRAJECTORYPRIMITIVES_TIMESTAMP; } 
  break; 
 }; 
  return 0;

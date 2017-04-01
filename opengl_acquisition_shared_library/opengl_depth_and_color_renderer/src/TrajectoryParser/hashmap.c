@@ -120,6 +120,7 @@ void hashMap_Clear(struct hashMap * hm)
   unsigned int i=0;
   unsigned int entryNumber = hm->curNumberOfEntries; //cur
 
+  hm->isSorted=0;
   hm->curNumberOfEntries = 0;
   fprintf(stderr,"hashMap_Clear with %u , %u ( %u max ) entries \n", i , entryNumber ,  hm->maxNumberOfEntries );
 
@@ -191,6 +192,7 @@ int hashMap_Sort(struct hashMap * hm)
 {
   if (!hashMap_IsOK(hm)) { return 0; }
   qsort( hm->entries , hm->curNumberOfEntries , sizeof(struct hashMapEntry), cmpHashTableItems);
+  hm->isSorted=1;
   return 1;
 }
 
@@ -273,6 +275,9 @@ int hashMap_Add(struct hashMap * hm,const char * key,void * val,unsigned int val
 
   }
 
+  hm->isSorted=0;
+
+
   #if HASHMAP_BE_THREAD_SAFE
    pthread_mutex_unlock (&hm->hm_addLock); // LOCK PROTECTED OPERATION -------------------------------------------
   #endif // HASHMAP_BE_THREAD_SAFE
@@ -286,6 +291,18 @@ int hashMap_AddULong(struct hashMap * hm,const char * key,unsigned long val)
   void * valPTRForm=0;
   valPTRForm = (void *) val;
   return hashMap_Add(hm,key,valPTRForm,0);
+}
+
+int hashMap_PrepareForQueries(struct hashMap *hm)
+{
+  if (!hashMap_IsOK(hm)) { return 0;}
+
+  if (!hm->isSorted)
+  {
+     hashMap_Sort(hm);
+  }
+
+return 1;
 }
 
 

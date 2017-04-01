@@ -45,6 +45,8 @@ struct hashMap
 
   void * clearItemCallbackFunction;
 
+  unsigned int isSorted;
+
   #if HASHMAP_BE_THREAD_SAFE
    pthread_mutex_t hm_addLock;
    pthread_mutex_t hm_fileLock;
@@ -73,6 +75,14 @@ void hashMap_Destroy(struct hashMap * hm);
 * @param HashMap
 * @retval 1=Success,0=Failure */
 int hashMap_Sort(struct hashMap * hm);
+
+
+/**
+* @brief Hint that we are done adding things to hash map and we are ready for queries
+* @ingroup hashmap
+* @param HashMap
+* @retval 1=Success,0=Failure */
+int hashMap_PrepareForQueries(struct hashMap *hm);
 
 /**
 * @brief Add a new key to hash map
