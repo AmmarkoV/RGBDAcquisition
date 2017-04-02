@@ -188,6 +188,7 @@ int cmpHashTableItems (const void * a, const void * b)
   if ( ia->keyHash <  ib->keyHash ) return -1;
   if ( ia->keyHash == ib->keyHash ) return 0;
   if ( ia->keyHash >  ib->keyHash ) return 1;
+ return 0;
 }
 
 int hashMap_Sort(struct hashMap * hm)
@@ -209,10 +210,11 @@ int hashMap_BSearch(struct hashMap* hm,const char *  key , unsigned long keyHash
   if (!hm->useSorting) { fprintf(stderr,"Sorting is disabled for this hashmap\n"); return 0; }
   struct hashMapEntry needle = {0};
   needle.keyHash = keyHash;
+  struct hashMapEntry * haystack = hm->entries;
 
   struct hashMapEntry * pItem = (struct hashMapEntry *) bsearch (
                                                                   (void*) &needle,
-                                                                  (void*) hm->entries ,
+                                                                  (void*) haystack ,
                                                                   hm->curNumberOfEntries ,
                                                                   sizeof(struct hashMapEntry),
                                                                   cmpHashTableItems
@@ -362,8 +364,8 @@ int hashMap_FindIndex(struct hashMap * hm,const char * key,unsigned long * index
     }
   }
 
-  //If the hashmap is sorted we do a fast binary search
- if ( (hm->isSorted) && (hm->useSorting) )
+  //If the hashmap is sorted and "big" we do a fast binary search
+ if ( (hm->isSorted) && (hm->useSorting) && ( hm->curNumberOfEntries>10 ) )
  {
    return hashMap_BSearch(hm,key,keyHash,index);
  } else
@@ -471,7 +473,8 @@ int hashMap_Print(struct hashMap * hm,const char * title)
   {
    fprintf(stderr,"#%u - %s => %lu \n",i,hm->entries[i].key , (unsigned long) hm->entries[i].payload);
   }
-  fprintf(stderr,"---------------------------------------------------------\n",title);
+  fprintf(stderr,"---------------------------------------------------------\n");
+  return 1;
 }
 
 

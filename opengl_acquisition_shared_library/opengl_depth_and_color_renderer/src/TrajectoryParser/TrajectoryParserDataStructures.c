@@ -204,10 +204,8 @@ ObjectIDHandler getObjectID(struct VirtualStream * stream,const char * name, uns
 
 
  #if USE_HASHMAPS
- unsigned int success;
  unsigned long index;
- success = hashMap_GetULongPayload(stream->objectHash,name,&index);
- *found=success;
+ *found=(hashMap_GetULongPayload(stream->objectHash,name,&index)!=0);
  return (unsigned int) index;
  #else
   unsigned int i=0;
@@ -236,10 +234,8 @@ ObjectTypeID getObjectTypeID(struct VirtualStream * stream,const char * typeName
   if (stream->objectTypes==0) { fprintf(stderr,"Can't get object id (%s) for un allocated object type array\n",typeName); }
 
  #if USE_HASHMAPS
- unsigned int success;
  unsigned long index;
- success = hashMap_GetULongPayload(stream->objectTypesHash,typeName,&index);
- *found=success;
+ *found=(hashMap_GetULongPayload(stream->objectTypesHash,typeName,&index)!=0);
  return (unsigned int) index;
  #else
   *found=0;
@@ -316,7 +312,7 @@ struct JointState * allocateEnoughJointSpaceForStateOfObjectID(
  {
  if (ObjID==0)
     { /*Camera does not have joints*/ } else
-    { fprintf(stderr,"allocateEnoughJointSpaceForStateOfObjectID  for objid %u has %u bones ..\n",ObjID,numberOfBones); }
+    { fprintf(stderr,"allocateEnoughJointSpaceForStateOfObjectID for objid %u has %u bones ..\n",ObjID,numberOfBones); }
 
 
    fprintf(stderr,"Also allocating %u joints for this model..\n",numberOfBones);
@@ -415,7 +411,7 @@ int addStateToObject(
                               float R , float G , float B , float Alpha
                        )
 {
-
+ //fprintf(stderr,"addStateToObject\n");
  unsigned int ObjFound = 0;
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
  if (ObjFound)
@@ -435,9 +431,9 @@ int addStateToObjectMini(
                               unsigned int coordLength
                        )
 {
-
  unsigned int ObjFound = 0;
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
+ //fprintf(stderr,"addStateToObjectMini(%s,id=%u,found=%u)\n",name,ObjID,ObjFound);
  if (ObjFound)
   {
      return addStateToObjectID(stream,ObjID,timeMilliseconds,coord,coordLength,
@@ -470,7 +466,10 @@ int addPoseToObjectState(
 
  int foundExactTimestamp=0;
  unsigned int ObjFound = 0;
+ //fprintf(stderr,"Adding pose to object %s \n",name);
  unsigned int ObjID = getObjectID(stream,name,&ObjFound);
+
+ //fprintf(stderr,"Object Found = %u , Object ID = %u \n",ObjFound,ObjID);
  if (ObjFound)
   {
     unsigned int pos=0;
