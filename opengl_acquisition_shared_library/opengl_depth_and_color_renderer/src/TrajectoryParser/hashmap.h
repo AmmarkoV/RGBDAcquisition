@@ -221,4 +221,12 @@ int hashMap_LoadToFile(struct hashMap * hm,const char * filename);
 * @retval 1=Success,0=Fail*/
 int hashMap_SaveToFile(struct hashMap * hm,const char * filename);
 
+
+
+/**
+* @brief Perform an internal test to check if library is working ok
+* @ingroup hashmap
+* @retval 1=Success,0=Fail*/
+int hashMap_Test(int useSorting);
+
 #endif // HASHMAP_H_INCLUDED

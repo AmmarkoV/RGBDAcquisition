@@ -550,5 +550,54 @@ int hashMap_LoadToFile(struct hashMap * hm,const char * filename)
 
 
 
+int hashMap_GetUniqueStringForItem( char * strOut , unsigned int strOutLength , unsigned int itemID, unsigned int totalItems )
+{
+  unsigned int charsToUse='z'-'a';
+  unsigned int charactersThatAreNeeded = strOutLength / charsToUse;
+  unsigned int i=0;
 
+
+  for (i=0; i<charactersThatAreNeeded; i++)
+   {
+      //TODO : 
+   }
+
+
+
+}
+
+int hashMap_Test(int useSorting)
+{
+ struct hashMap * hm = hashMap_Create(5,1,0,useSorting);
+ if (hm==0) { return 0; }
+
+ char testName[4]={0};
+
+ unsigned int i=0;
+ for (i=0; i<20; i++)
+ {
+     testName[0]='a'+i;
+     testName[1]='a'+i;
+     testName[2]='a'+i;
+     testName[3]=0;
+     hashMap_AddULong(hm,testName,20-i);
+ }
+ 
+ hashMap_PrepareForQueries(hm);
+ 
+unsigned long payload;
+ for (i=0; i<20; i++)
+ {
+     testName[0]='a'+i;
+     testName[1]='a'+i;
+     testName[2]='a'+i;
+     testName[3]=0;
+     hashMap_GetULongPayload(hm,testName,&payload); 
+     if (payload!=20-i)
+     { fprintf(stderr,"Error with %s value %lu instead of %u\n",testName,payload,20-i); }
+ }
+
+ hashMap_Destroy(hm);
+ return 1;
+}
 
