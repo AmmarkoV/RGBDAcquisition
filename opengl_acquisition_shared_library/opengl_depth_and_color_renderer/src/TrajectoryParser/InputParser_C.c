@@ -24,7 +24,7 @@
 int warningsAboutIncorrectlyAllocatedStackIssued = 0;
 
 
-char _ipc_ver[]=" 0.358 written from scratch - 8/2/10 \0";
+char _ipc_ver[]=" 0.359\0";  //26/4/2017
 
 
 /*
@@ -403,6 +403,34 @@ unsigned char CheckWordNumOk(struct InputParserC * ipc,unsigned int num)
 
   return 1;
 }
+
+
+/*
+   InputParser_GetWord..
+   Copies token with number (num) to c string (wheretostore) , variable storagesize contains the total size of wheretostore..!
+*/
+unsigned int InputParser_IsEmptyWord(struct InputParserC * ipc,unsigned int num)
+{
+  if ( CheckWordNumOk(ipc,num) == 0 ) { return 1; }
+  if ( ipc->tokenlist[num].length == 0 ) { return 1; }
+
+  unsigned int i=0;
+  for ( i = ipc->tokenlist[num].token_start; i<ipc->tokenlist[num].token_start+ipc->tokenlist[num].length; i++ )
+    {
+      switch (ipc->str[i])
+      {
+        case 10 : break;
+        case 13 : break;
+        case ' ' : break;
+        default :
+         return 0;
+      };
+    }
+
+ return 1;
+}
+
+
 
 /*
    InputParser_GetWord..

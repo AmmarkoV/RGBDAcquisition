@@ -11,6 +11,7 @@ do
  ./generateDamienDefaultCalibration.sh $D/depth.calib 
 
  ./convertDamienJointDataset.sh $D/hyps.txt > $D/hyps.scene
+ cp $D/hyps.txt $D/hyps.scene
 
  #we run the Neural network and get its 2D output
  ./runRTPose.sh $D 
