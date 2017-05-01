@@ -49,7 +49,7 @@ struct NetworkVirtualDevice
 extern struct NetworkVirtualDevice networkDevice[MAX_NETWORK_DEVICES];
 
 
-   int networkBackbone_startPushingToRemote(char * ip , int port);
+   int networkBackbone_startPushingToRemote(char * ip , int port, unsigned int width , unsigned int height);
    int networkBackbone_stopPushingToRemote(int frameServerID);
    int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void*  pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
 
