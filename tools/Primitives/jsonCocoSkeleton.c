@@ -9,6 +9,7 @@
 #include "../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h"
 
 
+
 int parseJsonCOCOSkeleton(const char * filename , struct skeletonCOCO * skel)
 {
   fprintf(stderr,"Running COCO 2D skeleton \n");
@@ -16,6 +17,7 @@ int parseJsonCOCOSkeleton(const char * filename , struct skeletonCOCO * skel)
 //  char * line = NULL;
 //  size_t len = 0;
   ssize_t read;
+  unsigned int frameNumber =0;
 
   FILE * fp = fopen(filename,"r");
   if (fp!=0)
@@ -68,6 +70,8 @@ int parseJsonCOCOSkeleton(const char * filename , struct skeletonCOCO * skel)
 
         //printf("Pos ( x=%0.2f,y=%0.2f ) Precision %0.2f \n",skel->joint2D[i].x,skel->joint2D[i].y,skel->jointAccuracy[i]);
        }
+
+      ++frameNumber;
        }
        //    doSkeletonConversions( &skel );
        //    printJointField ( &skel );

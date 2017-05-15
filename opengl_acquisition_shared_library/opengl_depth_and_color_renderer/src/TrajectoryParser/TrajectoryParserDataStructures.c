@@ -12,7 +12,7 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
-#define USE_HASHMAPS 1
+#define USE_HASHMAPS 0
 
 int growVirtualStreamFrames(struct VirtualObject * streamObj,unsigned int framesToAdd)
 {

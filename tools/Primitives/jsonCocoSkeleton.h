@@ -1,6 +1,8 @@
 #ifndef JSONCOCOSKELETON_H_INCLUDED
 #define JSONCOCOSKELETON_H_INCLUDED
 
+
+#if REDIFINE_COCO_SKELETON
 static const char * COCOBodyNames[] =
 {
   "Nose",
@@ -51,6 +53,7 @@ enum COCOSkeletonJoints
    //---------------------
   COCO_PARTS
 };
+#endif // REDIFINE_COCO_SKELETON
 
 
 int parseJsonCOCOSkeleton(const char * filename , struct skeletonCOCO * skel);

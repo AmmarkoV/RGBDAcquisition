@@ -1255,6 +1255,27 @@ static int visualize3DSkeletonHuman(const char * filename ,struct skeletonHuman 
  return 0;
 }
 
+
+
+
+
+
+static int printCOCOSkeletonCSV(struct skeletonCOCO * sk,unsigned int frameNumber)
+{
+  unsigned int i;
+  if (frameNumber==0)
+  {
+    for (i=0; i<COCO_PARTS-1; i++) { fprintf(stdout,"%s_X,%s_Y,%s_ACC,",COCOBodyNames[i],COCOBodyNames[i],COCOBodyNames[i]); }
+    i=COCO_PARTS-1;
+    fprintf(stdout,"%s_X,%s_Y,%s_ACC\n",COCOBodyNames[i],COCOBodyNames[i],COCOBodyNames[i]);
+  }
+
+  for (i=0; i<COCO_PARTS-1; i++) { fprintf(stdout,"%0.2f,%0.2f,%0.2f,",sk->joint2D[i].x ,sk->joint2D[i].y ,sk->jointAccuracy[i]); }
+  i=COCO_PARTS-1;
+  fprintf(stdout,"%0.2f,%0.2f,%0.2f\n",sk->joint2D[i].x ,sk->joint2D[i].y ,sk->jointAccuracy[i]);
+ return 1;
+}
+
 #ifdef __cplusplus
 }
 #endif

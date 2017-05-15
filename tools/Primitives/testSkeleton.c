@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "skeleton.h"
+#include "jsonCocoSkeleton.h"
 //#include "nao_geometry.h"
 
 float visualizationScale = 3.0;
@@ -276,7 +277,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 2 ) { fprintf(stderr,"Please give filename of joint list \n"); return 1; }
 
-    printf("Running Converter on %s !\n",argv[1]);
+    fprintf(stderr,"Running Converter on %s !\n",argv[1]);
 
 
       unsigned int i=0;
@@ -305,10 +306,16 @@ int main(int argc, char *argv[])
 
     if (strstr(argv[1],".json")!=0)
     {
-      parseJsonCOCOSkeleton(argv[1]);
+      struct skeletonCOCO skel={0};
+      parseJsonCOCOSkeleton(argv[1],&skel);
+
+      unsigned int frameNumber = 0;
+      if (argc>=3) { frameNumber=atoi(argv[2]); }
+      printCOCOSkeletonCSV(&skel,frameNumber);
     } else
     {
      parseJointList(argv[1]);
+
     }
     return 0;
 }

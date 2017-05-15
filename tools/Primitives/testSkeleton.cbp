@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="/home/ammar/Documents/Programming/FORTH/input_acquisition/grabbed_frames/MHAD101-frames/51-frames/pair_00/seq_1/dnnOut/0000_s10_a06_r01.json 1  " />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -31,6 +32,14 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h" />
+		<Unit filename="jsonCocoSkeleton.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jsonCocoSkeleton.h" />
 		<Unit filename="nao_geometry.h" />
 		<Unit filename="skeleton.h" />
 		<Unit filename="testSkeleton.c">
