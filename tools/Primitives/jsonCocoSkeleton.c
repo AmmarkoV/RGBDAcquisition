@@ -12,7 +12,7 @@
 
 int parseJsonCOCOSkeleton(const char * filename , struct skeletonCOCO * skel)
 {
-  fprintf(stderr,"Running COCO 2D skeleton \n");
+ //fprintf(stderr,"Running COCO 2D skeleton (%s)\n",filename);
 
 //  char * line = NULL;
 //  size_t len = 0;
@@ -81,6 +81,6 @@ int parseJsonCOCOSkeleton(const char * filename , struct skeletonCOCO * skel)
     if (line) { free(line); }
     return 1;
   }
-
+  fprintf(stderr,"Unable to open (%s)\n",filename);
   return 0;
 }

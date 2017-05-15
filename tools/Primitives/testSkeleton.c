@@ -277,10 +277,10 @@ int main(int argc, char *argv[])
 {
     if (argc < 2 ) { fprintf(stderr,"Please give filename of joint list \n"); return 1; }
 
-    fprintf(stderr,"Running Converter on %s !\n",argv[1]);
+  fprintf(stderr,"Running Converter on %s !\n",argv[1]);
 
 
-      unsigned int i=0;
+  unsigned int i=0;
   for (i=0; i<argc; i++)
   {
     if (strcmp(argv[i],"-broadcastOnly")==0) {
@@ -295,13 +295,6 @@ int main(int argc, char *argv[])
   }
 
 
-    struct skeletonHuman defaultPose={0};
-    fillWithDefaultSkeleton(&defaultPose);
-    visualize2DSkeletonHuman("defaultPose.svg", &defaultPose , visualizationScale );
-
-    struct skeletonHuman defaultNAOPose={0};
-    fillWithDefaultNAOSkeleton(&defaultNAOPose);
-    visualize2DSkeletonHuman("defaultNAOPose.svg", &defaultNAOPose , visualizationScale );
 
 
     if (strstr(argv[1],".json")!=0)
@@ -314,8 +307,15 @@ int main(int argc, char *argv[])
       printCOCOSkeletonCSV(&skel,frameNumber);
     } else
     {
-     parseJointList(argv[1]);
+     struct skeletonHuman defaultPose={0};
+     fillWithDefaultSkeleton(&defaultPose);
+     visualize2DSkeletonHuman("defaultPose.svg", &defaultPose , visualizationScale );
 
+     struct skeletonHuman defaultNAOPose={0};
+     fillWithDefaultNAOSkeleton(&defaultNAOPose);
+     visualize2DSkeletonHuman("defaultNAOPose.svg", &defaultNAOPose , visualizationScale );
+
+     parseJointList(argv[1]);
     }
     return 0;
 }
