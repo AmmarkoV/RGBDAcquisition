@@ -253,7 +253,7 @@ int _acfo_acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels ,
 
     #if USE_REGULAR_BYTEORDER_FOR_PNM
      //Want Conformance to the NETPBM spec http://en.wikipedia.org/wiki/Netpbm_format#16-bit_extensions
-     if (bitsperpixel==16) { swapEndiannessPNM(pixels , width , height , channels , bitsperpixel); }
+     if (bitsperpixel==16) { _acfo_swapEndiannessPNM(pixels , width , height , channels , bitsperpixel); }
     #else
       #warning "We are using Our Local Byte Order for saving files , this makes things fast but is incompatible with other PNM loaders"
     #endif // USE_REGULAR_BYTEORDER_FOR_PNM
