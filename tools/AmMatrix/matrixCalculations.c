@@ -181,7 +181,6 @@ int pointInsideBoundingBox3D(
 /*
   TAKEN FROM http://www.lighthouse3d.com/opengl/maths/index.php?raytriint
 */
-
 int rayIntersectsTriangle(float *p, float *d,float *v0, float *v1, float *v2)
 {
 	float e1[3],e2[3],h[3],s[3],q[3];
@@ -654,35 +653,35 @@ void findNormal(float *outX, float *outY, float *outZ,float v1x, float v1y, floa
  float temp_length;
  float CNormal[4];
 
-temp_v1[x] = v1x - v2x;
-temp_v1[y] = v1y - v2y;
-temp_v1[z] = v1z - v2z;
+ temp_v1[x] = v1x - v2x;
+ temp_v1[y] = v1y - v2y;
+ temp_v1[z] = v1z - v2z;
 
-temp_v2[x] = v2x - v3x;
-temp_v2[y] = v2y - v3y;
-temp_v2[z] = v2z - v3z;
+ temp_v2[x] = v2x - v3x;
+ temp_v2[y] = v2y - v3y;
+ temp_v2[z] = v2z - v3z;
 
-// calculate cross product
-CNormal[x] = temp_v1[y]*temp_v2[z] - temp_v1[z]*temp_v2[y];
-CNormal[y] = temp_v1[z]*temp_v2[x] - temp_v1[x]*temp_v2[z];
-CNormal[z] = temp_v1[x]*temp_v2[y] - temp_v1[y]*temp_v2[x];
+ // calculate cross product
+ CNormal[x] = temp_v1[y]*temp_v2[z] - temp_v1[z]*temp_v2[y];
+ CNormal[y] = temp_v1[z]*temp_v2[x] - temp_v1[x]*temp_v2[z];
+ CNormal[z] = temp_v1[x]*temp_v2[y] - temp_v1[y]*temp_v2[x];
 
-// normalize normal
-temp_length =(CNormal[x]*CNormal[x])+ (CNormal[y]*CNormal[y])+ (CNormal[z]*CNormal[z]);
+ // normalize normal
+ temp_length =(CNormal[x]*CNormal[x])+ (CNormal[y]*CNormal[y])+ (CNormal[z]*CNormal[z]);
 
-temp_length = sqrt(temp_length);
+ temp_length = sqrt(temp_length);
 
-// prevent n/0
-if (temp_length == 0) { temp_length = 1;}
+ // prevent n/0
+ if (temp_length == 0) { temp_length = 1;}
 
-CNormal[x] /= temp_length;
-CNormal[y] /= temp_length;
-CNormal[z] /= temp_length;
+ CNormal[x] /= temp_length;
+ CNormal[y] /= temp_length;
+ CNormal[z] /= temp_length;
 
 
-*outX=CNormal[x];
-*outY=CNormal[y];
-*outZ=CNormal[z];
+ *outX=CNormal[x];
+ *outY=CNormal[y];
+ *outZ=CNormal[z];
 }
 
 
@@ -851,15 +850,13 @@ void testMatrices()
   double A[16]={ 1 ,2 ,3 ,4,
                  5 ,6 ,7 ,8,
                  9 ,10,11,12,
-                 13,14,15,16
-                };
+                 13,14,15,16 };
 
 
   double B[16]={ 1 ,2 ,3 ,4,
                  4 ,3 ,2 ,1,
                  1 ,2 ,3 ,4,
-                 4 ,3 ,2 ,1
-                };
+                 4 ,3 ,2 ,1 };
 
   double Res[16]={0};
 
