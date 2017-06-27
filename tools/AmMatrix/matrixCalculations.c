@@ -644,13 +644,15 @@ void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ
 
 
 void findNormal(float *outX, float *outY, float *outZ,float v1x, float v1y, float v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z )
-{ int x = 1;
-  int y = 2;
-  int z = 3;
-  float temp_v1[4];
-  float temp_v2[4];
-  float temp_lenght;
-  float CNormal[4];
+{
+ const int x = 0;
+ const int y = 1;
+ const int z = 2;
+
+ float temp_v1[4];
+ float temp_v2[4];
+ float temp_length;
+ float CNormal[4];
 
 temp_v1[x] = v1x - v2x;
 temp_v1[y] = v1y - v2y;
@@ -666,16 +668,16 @@ CNormal[y] = temp_v1[z]*temp_v2[x] - temp_v1[x]*temp_v2[z];
 CNormal[z] = temp_v1[x]*temp_v2[y] - temp_v1[y]*temp_v2[x];
 
 // normalize normal
-temp_lenght =(CNormal[x]*CNormal[x])+ (CNormal[y]*CNormal[y])+ (CNormal[z]*CNormal[z]);
+temp_length =(CNormal[x]*CNormal[x])+ (CNormal[y]*CNormal[y])+ (CNormal[z]*CNormal[z]);
 
-temp_lenght = sqrt(temp_lenght);
+temp_length = sqrt(temp_length);
 
 // prevent n/0
-if (temp_lenght == 0) { temp_lenght = 1;}
+if (temp_length == 0) { temp_length = 1;}
 
-CNormal[x] /= temp_lenght;
-CNormal[y] /= temp_lenght;
-CNormal[z] /= temp_lenght;
+CNormal[x] /= temp_length;
+CNormal[y] /= temp_length;
+CNormal[z] /= temp_length;
 
 
 *outX=CNormal[x];
