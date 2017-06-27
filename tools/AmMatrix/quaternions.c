@@ -413,3 +413,18 @@ void quaternionRotate(double * quaternion , double rotX , double rotY, double ro
    quaternion[0]=result[0]; quaternion[1]=result[1]; quaternion[2]=result[2]; quaternion[3]=result[3];
 }
 
+
+//http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
+void quaternionFromTwoVectors(double * quaternionOutput , double * vA , double * vB)
+{
+    double dotProductOfVectors = vA[0]*vB[0] + vA[1]*vB[1] + vA[2]*vB[2];
+    float m = sqrt(2.f + 2.f * dotProductOfVectors);
+    float wD = (1.f / m);
+
+    //Doing CrossProduct
+    quaternionOutput[0] = wD * ( vA[1]*vB[2] - vA[2]*vB[1] );
+    quaternionOutput[1] = wD * ( vA[2]*vB[0] - vA[0]*vB[2] );
+    quaternionOutput[2] = wD * ( vA[0]*vB[1] - vA[1]*vB[0] );
+    quaternionOutput[3] = 0.5f * m; //qW
+}
+

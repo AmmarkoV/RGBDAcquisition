@@ -280,6 +280,7 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
           z+=3;       z3=z;
 
           findNormal(&outputNormal[0], &outputNormal[1], &outputNormal[2] ,
+                     coords[z1+0]   , coords[z1+1]   , coords[z1+2],
                      coords[z2+0]   , coords[z2+1]   , coords[z2+2],
                      coords[z3+0]   , coords[z3+1]   , coords[z3+2]
                      );

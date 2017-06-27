@@ -386,9 +386,12 @@ void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ
 /**
 * @brief Calculate the normal between three 3d points
 * @ingroup OGLTools
-* @param Input Point 1/Output X
-* @param Input Point 1/Output Y
-* @param Input Point 1/Output Z
+* @param Output X
+* @param Output Y
+* @param Output Z
+* @param Point 1 - X
+* @param Point 1 - Y
+* @param Point 1 - Z
 * @param Point 2 - X
 * @param Point 2 - Y
 * @param Point 2 - Z
@@ -397,7 +400,7 @@ void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ
 * @param Point 3 - Z
 * @retval A float describing the distance
 */
-void findNormal(float *v1x, float *v1y, float *v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z );
+void findNormal(float *outX, float *outY, float *outZ,float v1x, float v1y, float v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z );
 
 
 /**

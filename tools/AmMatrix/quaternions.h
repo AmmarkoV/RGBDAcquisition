@@ -145,6 +145,8 @@ double anglesBetweenQuaternions(double qAX,double qAY,double qAZ,double qAW ,
 void quaternionRotate(double * quaternion , double rotX , double rotY, double rotZ , double angleDegrees , int quaternionConvention);
 
 
+void quaternionFromTwoVectors(double * quaternionOutput , double * vA , double * vB);
+
 #ifdef __cplusplus
 }
 #endif

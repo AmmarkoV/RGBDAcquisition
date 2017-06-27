@@ -643,7 +643,7 @@ void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ
 
 
 
-void findNormal(float *v1x, float *v1y, float *v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z )
+void findNormal(float *outX, float *outY, float *outZ,float v1x, float v1y, float v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z )
 { int x = 1;
   int y = 2;
   int z = 3;
@@ -652,9 +652,9 @@ void findNormal(float *v1x, float *v1y, float *v1z, float v2x, float v2y, float 
   float temp_lenght;
   float CNormal[4];
 
-temp_v1[x] = *v1x - v2x;
-temp_v1[y] = *v1y - v2y;
-temp_v1[z] = *v1z - v2z;
+temp_v1[x] = v1x - v2x;
+temp_v1[y] = v1y - v2y;
+temp_v1[z] = v1z - v2z;
 
 temp_v2[x] = v2x - v3x;
 temp_v2[y] = v2y - v3y;
@@ -678,9 +678,9 @@ CNormal[y] /= temp_lenght;
 CNormal[z] /= temp_lenght;
 
 
-*v1x=CNormal[x];
-*v1y=CNormal[y];
-*v1z=CNormal[z];
+*outX=CNormal[x];
+*outY=CNormal[y];
+*outZ=CNormal[z];
 }
 
 
