@@ -42,6 +42,8 @@ struct TemplateVirtualDevice
 {
  char intialized;
  char readFromDir[MAX_DIR_PATH]; // <- this sucks i know :P
+ char subDirectoryColor[MAX_DIR_PATH]; // <- this sucks even more but it happens :P
+ char subDirectoryDepth[MAX_DIR_PATH]; // <- this sucks even more but it happens :P
  char colorExtension[MAX_EXTENSION_PATH];
  char depthExtension[MAX_EXTENSION_PATH];
  unsigned int cycle;
@@ -232,7 +234,8 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
  device[devID].templateDepthHeight=height;
  device[devID].colorExtension[0]=0;
  device[devID].depthExtension[0]=0;
-
+ device[devID].subDirectoryColor[0]=0;
+ device[devID].subDirectoryDepth[0]=0;
 
    if (devName==0) { strcpy(device[devID].readFromDir,""); } else
      {
@@ -240,19 +243,52 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                                 { strncpy(device[devID].readFromDir,devName,MAX_DIR_PATH);  }
      }
 
-  findExtensionOfDataset(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension,device[devID].cycle);
+  findSubdirsOfDataset(
+                        devID,
+                        device[devID].readFromDir,
+                        device[devID].subDirectoryColor,
+                        device[devID].subDirectoryDepth
+                      );
+
+
+  findExtensionOfDataset(
+                          devID,
+                          device[devID].readFromDir,
+                          device[devID].subDirectoryColor,
+                          device[devID].subDirectoryDepth,
+                          device[devID].colorExtension,
+                          device[devID].depthExtension,
+                          device[devID].cycle
+                        );
   fprintf(stderr,"Extension of dataset `%s` dev %u for Color Frames is %s , starting @ %u\n",device[devID].readFromDir,devID,device[devID].colorExtension,device[devID].cycle);
   fprintf(stderr,"Extension of dataset `%s` dev %u for Depth Frames is %s , starting @ %u\n",device[devID].readFromDir,devID,device[devID].depthExtension,device[devID].cycle);
 
 
-  device[devID].totalFrames=findLastFrame(devID,device[devID].readFromDir,device[devID].colorExtension,device[devID].depthExtension);
+  device[devID].totalFrames=findLastFrame(
+                                           devID,
+                                           device[devID].readFromDir,
+                                           device[devID].subDirectoryColor,
+                                           device[devID].subDirectoryDepth,
+                                           device[devID].colorExtension,
+                                           device[devID].depthExtension
+                                          );
   fprintf(stderr,"Dataset %s consists of %u frame pairs \n",device[devID].readFromDir,device[devID].totalFrames);
 
   unsigned int failedStream=0;
   unsigned int widthInternal=0; unsigned int heightInternal=0; unsigned long timestampInternal=0;
 
   char file_name_test[MAX_DIR_PATH]={0};
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , device[devID].cycle ,device[devID].readFromDir,device[devID].colorExtension);
+  getFilenameForNextResource(
+                              file_name_test ,
+                              MAX_DIR_PATH ,
+                              RESOURCE_COLOR_FILE ,
+                              devID ,
+                              device[devID].cycle ,
+                              device[devID].readFromDir,
+                              device[devID].subDirectoryColor,
+                              device[devID].subDirectoryDepth,
+                              device[devID].colorExtension
+                            );
   unsigned char * tmpColor = ReadImageFile(0,file_name_test,device[devID].colorExtension,&widthInternal,&heightInternal, &timestampInternal);
   if (tmpColor==0) { fprintf(stderr,YELLOW "Could not open initial color file %s \n",file_name_test);  }
   if ( (widthInternal!=width) || (heightInternal!=height) )
@@ -272,7 +308,17 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   }
 
 
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].depthExtension);
+  getFilenameForNextResource(
+                              file_name_test ,
+                              MAX_DIR_PATH ,
+                              RESOURCE_DEPTH_FILE ,
+                              devID ,
+                              device[devID].cycle,
+                              device[devID].readFromDir,
+                              device[devID].subDirectoryColor,
+                              device[devID].subDirectoryDepth,
+                              device[devID].depthExtension
+                            );
   unsigned short * tmpDepth = (unsigned short *) ReadImageFile(0,file_name_test,device[devID].depthExtension,&widthInternal,&heightInternal, &timestampInternal);
   if (tmpDepth==0) { fprintf(stderr,YELLOW "Could not open initial depth file %s \n",file_name_test);  }
   if ( (widthInternal!=width) || (heightInternal!=height) )
@@ -292,11 +338,31 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
   }
 
   NullCalibration(device[devID].templateColorWidth,device[devID].templateColorHeight,&device[devID].calibRGB);
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].colorExtension);
+  getFilenameForNextResource(
+                             file_name_test ,
+                             MAX_DIR_PATH ,
+                             RESOURCE_COLOR_CALIBRATION_FILE ,
+                             devID ,
+                             device[devID].cycle,
+                             device[devID].readFromDir,
+                             device[devID].subDirectoryColor,
+                             device[devID].subDirectoryDepth,
+                             device[devID].colorExtension
+                             );
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibRGB) ) { fprintf(stderr,"Could not read color calibration\n"); }
 
   NullCalibration(device[devID].templateDepthWidth,device[devID].templateDepthHeight,&device[devID].calibDepth);
-  getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_CALIBRATION_FILE , devID ,device[devID].cycle,device[devID].readFromDir,device[devID].depthExtension);
+  getFilenameForNextResource(
+                              file_name_test ,
+                              MAX_DIR_PATH ,
+                              RESOURCE_DEPTH_CALIBRATION_FILE ,
+                              devID ,
+                              device[devID].cycle,
+                              device[devID].readFromDir,
+                              device[devID].subDirectoryColor,
+                              device[devID].subDirectoryDepth,
+                              device[devID].depthExtension
+                            );
   if ( ! ReadCalibration(file_name_test,widthInternal,heightInternal,&device[devID].calibDepth) ) { fprintf(stderr,"Could not read depth calibration\n"); }
 
   if (device[devID].templateColorFrame==0) { fprintf(stderr,RED " Could not open , color frame Template acquisition will not process this data\n"); }
@@ -357,7 +423,14 @@ int snapTemplateFrames(int devID)
     //-----------------------------------------------------------------
     //Extra check , stupid case with mixed signals
     //-----------------------------------------------------------------
-    unsigned int devIDRead = retreiveDatasetDeviceIDToReadFrom( devID , device[devID].cycle , device[devID].readFromDir , device[devID].colorExtension);
+    unsigned int devIDRead = retreiveDatasetDeviceIDToReadFrom(
+                                                               devID ,
+                                                               device[devID].cycle ,
+                                                               device[devID].readFromDir ,
+                                                               device[devID].subDirectoryColor,
+                                                               device[devID].subDirectoryDepth,
+                                                               device[devID].colorExtension
+                                                              );
     //-----------------------------------------------------------------
 
 
@@ -367,7 +440,17 @@ int snapTemplateFrames(int devID)
 
 
     //TODO : Check the next line , does it make sense ?
-    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_LIVE_CALIBRATION_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,0/*calib files are special*/);
+    getFilenameForNextResource(
+                                file_name_test ,
+                                MAX_DIR_PATH ,
+                                RESOURCE_LIVE_CALIBRATION_FILE ,
+                                devIDRead ,
+                                device[devID].cycle,
+                                device[devID].readFromDir,
+                                device[devID].subDirectoryColor,
+                                device[devID].subDirectoryDepth,
+                                0/*calib files are special*/
+                               );
     if ( RefreshCalibration(file_name_test,&device[devID].calibRGB) )
      {
        fprintf(stderr,"Refreshed calibration data %u \n",device[devID].cycle);
@@ -375,7 +458,17 @@ int snapTemplateFrames(int devID)
 
     #warning "TODO : lastColorTimestamp / lastDepthTimestamp , read from new info file .. "
 
-    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].colorExtension);
+    getFilenameForNextResource(
+                                file_name_test ,
+                                MAX_DIR_PATH ,
+                                RESOURCE_COLOR_FILE ,
+                                devIDRead ,
+                                device[devID].cycle,
+                                device[devID].readFromDir,
+                                device[devID].subDirectoryColor,
+                                device[devID].subDirectoryDepth,
+                                device[devID].colorExtension
+                              );
     if (FileExists(file_name_test))
      {
        #if REALLOCATE_ON_EVERY_SNAP
@@ -385,7 +478,17 @@ int snapTemplateFrames(int devID)
        ++found_frames;
      }
 
-    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devIDRead ,device[devID].cycle,device[devID].readFromDir,device[devID].depthExtension);
+    getFilenameForNextResource(
+                                file_name_test ,
+                                MAX_DIR_PATH ,
+                                RESOURCE_DEPTH_FILE ,
+                                devIDRead ,
+                                device[devID].cycle,
+                                device[devID].readFromDir,
+                                device[devID].subDirectoryColor,
+                                device[devID].subDirectoryDepth,
+                                device[devID].depthExtension
+                              );
     if (FileExists(file_name_test))
      {
       #if REALLOCATE_ON_EVERY_SNAP

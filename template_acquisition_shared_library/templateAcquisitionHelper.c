@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #define PRINT_COMMENTS 1
 
@@ -20,6 +21,17 @@
 
 
 #ifndef USE_CODEC_LIBRARY
+
+int directoryExists(const char* folder)
+{
+ struct stat sb;
+
+ if (stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode))
+    {
+        return 1;
+    }
+ return 0;
+}
 
 
 int swapEndiannessInternalPNM(void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
@@ -206,7 +218,17 @@ int flipDepth(unsigned short * depth,unsigned int width , unsigned int height )
 
 
 //Single place to change filename conventions :)
-void getFilenameForNextResource(char * filename , unsigned int maxSize , unsigned int resType , unsigned int devID , unsigned int cycle, char * readFromDir , char * extension )
+void getFilenameForNextResource(
+                                char * filename ,
+                                unsigned int maxSize ,
+                                unsigned int resType ,
+                                unsigned int devID ,
+                                unsigned int cycle,
+                                char * readFromDir ,
+                                char * colorSubDirectory ,
+                                char * depthSubDirectory ,
+                                char * extension
+                                )
 {
   devID=0; //<- test
   switch (resType)
@@ -221,7 +243,14 @@ void getFilenameForNextResource(char * filename , unsigned int maxSize , unsigne
 
 
 
-unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int cycle , char * readFromDir , char * extension)
+unsigned int retreiveDatasetDeviceIDToReadFrom(
+                                               unsigned int devID ,
+                                               unsigned int cycle ,
+                                               char * readFromDir ,
+                                               char * colorSubDirectory ,
+                                               char * depthSubDirectory ,
+                                               char * extension
+                                              )
 {
  char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
  if (file_name_test==0) { fprintf(stderr,"Could not retreiveDatasetDeviceID , no space for string\n"); return 0; }
@@ -230,9 +259,9 @@ unsigned int retreiveDatasetDeviceIDToReadFrom(unsigned int devID , unsigned int
  unsigned int devIDInc=devID;
  while ( (devIDInc >=0 ) && (!decided) )
     {
-      getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devIDInc , cycle, readFromDir , extension );
+      getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devIDInc , cycle, readFromDir , colorSubDirectory, depthSubDirectory, extension );
       if (FileExists(file_name_test)) {  decided=1; }
-      getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devIDInc , cycle, readFromDir , extension );
+      getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devIDInc , cycle, readFromDir , colorSubDirectory, depthSubDirectory, extension );
       if (FileExists(file_name_test)) {  decided=1; }
 
       if (devIDInc==0) { break; decided=1; } else
@@ -267,10 +296,30 @@ void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,
  #endif // USE_CODEC_LIBRARY
 }
 
+unsigned int findSubdirsOfDataset(int devID, char * readFromDir , char * subColor , char * subDepth )
+{
+    strcpy(subColor,"./");
+    strcpy(subDepth,"./");
+
+    char folder[2048];
+    snprintf(folder,2048,"%s/color/",readFromDir);
+    if (directoryExists(folder)) { strcpy(subColor,"color/"); }
+
+    snprintf(folder,2048,"%s/depth/",readFromDir);
+    if (directoryExists(folder)) { strcpy(subColor,"depth/"); }
+ return 1;
+}
 
 
-
-unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * colorExtension , char * depthExtension,unsigned int startingFrame)
+unsigned int findExtensionOfDataset(
+                                     int devID,
+                                     char * readFromDir ,
+                                     char * colorSubDirectory ,
+                                     char * depthSubDirectory ,
+                                     char * colorExtension ,
+                                     char * depthExtension,
+                                     unsigned int startingFrame
+                                   )
 {
   unsigned int colorSet=0,depthSet=0;
   char * file_name_test = (char* ) malloc(MAX_DIR_PATH * sizeof(char));
@@ -284,7 +333,7 @@ unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * color
    if (i==2) { strncpy(colorExtension,"jpg",MAX_EXTENSION_PATH); } else
    if (i==3) { strncpy(colorExtension,"jps",MAX_EXTENSION_PATH); }
 
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , startingFrame , readFromDir , colorExtension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , startingFrame , readFromDir ,colorSubDirectory , depthExtension , colorExtension );
    if ( FileExists(file_name_test) ) { colorSet=1; break; }
 
    ++i;
@@ -298,7 +347,7 @@ unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * color
    if (i==2) { strncpy(depthExtension,"jpg",MAX_EXTENSION_PATH); } else
    if (i==2) { strncpy(depthExtension,"jps",MAX_EXTENSION_PATH); }
 
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , startingFrame , readFromDir , depthExtension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , startingFrame , readFromDir ,colorSubDirectory , depthExtension , depthExtension );
    if ( FileExists(file_name_test) ) { depthSet=1; break; }
 
    ++i;
@@ -311,7 +360,14 @@ unsigned int findExtensionOfDataset(int devID, char * readFromDir , char * color
 
 
 
-unsigned int findLastFrame(int devID, char * readFromDir , char * colorExtension, char * depthExtension)
+unsigned int findLastFrame(
+                           int devID,
+                           char * readFromDir ,
+                           char * colorSubDirectory ,
+                           char * depthSubDirectory ,
+                           char * colorExtension,
+                           char * depthExtension
+                           )
 {
   unsigned int totalFrames=0;
   unsigned int i=0;
@@ -323,9 +379,9 @@ unsigned int findLastFrame(int devID, char * readFromDir , char * colorExtension
   while (i<100000)
   {
    totalFrames = i;
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , i, readFromDir , colorExtension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , i, readFromDir ,colorSubDirectory , depthExtension , colorExtension );
    if ( ! FileExists(file_name_test) ) { break; }
-   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , i, readFromDir , depthExtension );
+   getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , i, readFromDir ,colorSubDirectory , depthExtension , depthExtension );
    if ( ! FileExists(file_name_test) ) { break; }
    ++i;
   }

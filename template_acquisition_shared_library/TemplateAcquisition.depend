@@ -103,3 +103,33 @@
 	"codecs.h"
 	"ppmInput.h"
 
+1499784773 source:/home/ammar/Documents/Programming/RGBDAcquisition/template_acquisition_shared_library/TemplateAcquisition.c
+	<stdio.h>
+	<stdlib.h>
+	"TemplateAcquisition.h"
+	"../acquisition/Acquisition.h"
+	"../tools/Primitives/modules.h"
+	"../tools/OperatingSystem/OperatingSystem.h"
+	<string.h>
+	<math.h>
+	"templateAcquisitionHelper.h"
+
+1455564556 /home/ammar/Documents/Programming/RGBDAcquisition/template_acquisition_shared_library/TemplateAcquisition.h
+	"../acquisition/acquisition_setup.h"
+	"../tools/Calibration/calibration.h"
+
+1386348970 /home/ammar/Documents/Programming/RGBDAcquisition/acquisition/acquisition_setup.h
+
+1486913139 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Calibration/calibration.h
+
+1489065858 /home/ammar/Documents/Programming/RGBDAcquisition/acquisition/Acquisition.h
+	<tools/Calibration/calibration.h>
+	"calibration.h"
+	"../tools/Calibration/calibration.h"
+
+1455564556 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Primitives/modules.h
+
+1393325835 /home/ammar/Documents/Programming/RGBDAcquisition/tools/OperatingSystem/OperatingSystem.h
+
+1499784374 /home/ammar/Documents/Programming/RGBDAcquisition/template_acquisition_shared_library/templateAcquisitionHelper.h
+
