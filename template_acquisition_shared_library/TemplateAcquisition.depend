@@ -103,7 +103,7 @@
 	"codecs.h"
 	"ppmInput.h"
 
-1499784773 source:/home/ammar/Documents/Programming/RGBDAcquisition/template_acquisition_shared_library/TemplateAcquisition.c
+1499788443 source:/home/ammar/Documents/Programming/RGBDAcquisition/template_acquisition_shared_library/TemplateAcquisition.c
 	<stdio.h>
 	<stdlib.h>
 	"TemplateAcquisition.h"
@@ -131,5 +131,18 @@
 
 1393325835 /home/ammar/Documents/Programming/RGBDAcquisition/tools/OperatingSystem/OperatingSystem.h
 
-1499784374 /home/ammar/Documents/Programming/RGBDAcquisition/template_acquisition_shared_library/templateAcquisitionHelper.h
+1499787889 /home/ammar/Documents/Programming/RGBDAcquisition/template_acquisition_shared_library/templateAcquisitionHelper.h
+
+1499788367 source:/home/ammar/Documents/Programming/RGBDAcquisition/template_acquisition_shared_library/templateAcquisitionHelper.c
+	"templateAcquisitionHelper.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/stat.h>
+	"../tools/Codecs/codecs.h"
+
+1467405290 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Codecs/codecs.h
+	"../Primitives/image.h"
+
+1460647486 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Primitives/image.h
 

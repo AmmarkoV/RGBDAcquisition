@@ -51,6 +51,7 @@ struct TemplateVirtualDevice
  unsigned int totalFrames;
  unsigned int safeGUARD;
 
+ unsigned int filenameStyle;
 
  unsigned int templateColorWidth;
  unsigned int templateColorHeight;
@@ -171,6 +172,7 @@ int startTemplateModule(unsigned int max_devs,char * settings)
         strncpy(device[devID].depthExtension,"pnm",MAX_EXTENSION_PATH);
 
         device[devID].cycle=0;
+        device[devID].filenameStyle=0;
         device[devID].intialized=0;
 
         device[devID].safeGUARD = SAFEGUARD_VALUE;
@@ -253,6 +255,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
   findExtensionOfDataset(
                           devID,
+                          &device[devID].filenameStyle,
                           device[devID].readFromDir,
                           device[devID].subDirectoryColor,
                           device[devID].subDirectoryDepth,
@@ -266,6 +269,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
 
   device[devID].totalFrames=findLastFrame(
                                            devID,
+                                          &device[devID].filenameStyle,
                                            device[devID].readFromDir,
                                            device[devID].subDirectoryColor,
                                            device[devID].subDirectoryDepth,
@@ -284,6 +288,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                               RESOURCE_COLOR_FILE ,
                               devID ,
                               device[devID].cycle ,
+                              &device[devID].filenameStyle,
                               device[devID].readFromDir,
                               device[devID].subDirectoryColor,
                               device[devID].subDirectoryDepth,
@@ -314,6 +319,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                               RESOURCE_DEPTH_FILE ,
                               devID ,
                               device[devID].cycle,
+                              &device[devID].filenameStyle,
                               device[devID].readFromDir,
                               device[devID].subDirectoryColor,
                               device[devID].subDirectoryDepth,
@@ -344,6 +350,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                              RESOURCE_COLOR_CALIBRATION_FILE ,
                              devID ,
                              device[devID].cycle,
+                             &device[devID].filenameStyle,
                              device[devID].readFromDir,
                              device[devID].subDirectoryColor,
                              device[devID].subDirectoryDepth,
@@ -358,6 +365,7 @@ int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned in
                               RESOURCE_DEPTH_CALIBRATION_FILE ,
                               devID ,
                               device[devID].cycle,
+                              &device[devID].filenameStyle,
                               device[devID].readFromDir,
                               device[devID].subDirectoryColor,
                               device[devID].subDirectoryDepth,
@@ -426,6 +434,7 @@ int snapTemplateFrames(int devID)
     unsigned int devIDRead = retreiveDatasetDeviceIDToReadFrom(
                                                                devID ,
                                                                device[devID].cycle ,
+                                                              &device[devID].filenameStyle,
                                                                device[devID].readFromDir ,
                                                                device[devID].subDirectoryColor,
                                                                device[devID].subDirectoryDepth,
@@ -446,6 +455,7 @@ int snapTemplateFrames(int devID)
                                 RESOURCE_LIVE_CALIBRATION_FILE ,
                                 devIDRead ,
                                 device[devID].cycle,
+                               &device[devID].filenameStyle,
                                 device[devID].readFromDir,
                                 device[devID].subDirectoryColor,
                                 device[devID].subDirectoryDepth,
@@ -464,6 +474,7 @@ int snapTemplateFrames(int devID)
                                 RESOURCE_COLOR_FILE ,
                                 devIDRead ,
                                 device[devID].cycle,
+                               &device[devID].filenameStyle,
                                 device[devID].readFromDir,
                                 device[devID].subDirectoryColor,
                                 device[devID].subDirectoryDepth,
@@ -484,6 +495,7 @@ int snapTemplateFrames(int devID)
                                 RESOURCE_DEPTH_FILE ,
                                 devIDRead ,
                                 device[devID].cycle,
+                               &device[devID].filenameStyle,
                                 device[devID].readFromDir,
                                 device[devID].subDirectoryColor,
                                 device[devID].subDirectoryDepth,
@@ -524,6 +536,7 @@ int snapTemplateFrames(int devID)
 int controlTemplateFlow(int devID,float newFlowState)
 {
   device[devID].cycleFlow = newFlowState;
+  return 1;
 }
 
 

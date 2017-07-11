@@ -37,6 +37,7 @@ unsigned int findSubdirsOfDataset(int devID, char * readFromDir , char * subColo
 
 unsigned int findExtensionOfDataset(
                                      int devID,
+                                     unsigned int * style ,
                                      char * readFromDir ,
                                      char * colorSubDirectory ,
                                      char * depthSubDirectory ,
@@ -47,6 +48,7 @@ unsigned int findExtensionOfDataset(
 
 unsigned int findLastFrame(
                            int devID,
+                           unsigned int * style ,
                            char * readFromDir ,
                            char * colorSubDirectory ,
                            char * depthSubDirectory ,
@@ -61,6 +63,7 @@ void getFilenameForNextResource(
                                 unsigned int resType ,
                                 unsigned int devID ,
                                 unsigned int cycle,
+                                unsigned int * style,
                                 char * readFromDir ,
                                 char * colorSubDirectory ,
                                 char * depthSubDirectory ,
@@ -70,6 +73,7 @@ void getFilenameForNextResource(
 unsigned int retreiveDatasetDeviceIDToReadFrom(
                                                unsigned int devID ,
                                                unsigned int cycle ,
+                                               unsigned int * style,
                                                char * readFromDir ,
                                                char * colorSubDirectory ,
                                                char * depthSubDirectory ,
