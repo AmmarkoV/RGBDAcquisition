@@ -25,8 +25,10 @@ enum resourceFilename
    RESOURCE_LIVE_CALIBRATION_FILE,
 };
 
+int _tacq_directoryExists(const char* folder);
+int fileExists(char * filename);
+
 int makeFrameNoInput(unsigned char * frame , unsigned int width , unsigned int height , unsigned int channels);
-int FileExists(char * filename);
 unsigned char * ReadPNM(unsigned char * buffer , char * filename,unsigned int *width,unsigned int *height,unsigned long * timestamp);
 int flipDepth(unsigned short * depth,unsigned int width , unsigned int height );
 

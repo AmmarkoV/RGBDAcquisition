@@ -18,10 +18,6 @@
 
 #define PPMREADBUFLEN 256
 
-
-
-#ifndef USE_CODEC_LIBRARY
-
 int _tacq_directoryExists(const char* folder)
 {
  struct stat sb;
@@ -50,6 +46,8 @@ int fileExists(char * filename)
  //fprintf(stderr,"no\n");
  return 0;
 }
+
+#ifndef USE_CODEC_LIBRARY
 
 int swapEndiannessInternalPNM(void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {

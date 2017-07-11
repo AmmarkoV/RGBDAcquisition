@@ -480,7 +480,7 @@ int snapTemplateFrames(int devID)
                                 device[devID].subDirectoryDepth,
                                 device[devID].colorExtension
                               );
-    if (FileExists(file_name_test))
+    if (fileExists(file_name_test))
      {
        #if REALLOCATE_ON_EVERY_SNAP
          if (device[devID].templateColorFrame!=0) { free(device[devID].templateColorFrame); device[devID].templateColorFrame=0; }
@@ -501,7 +501,7 @@ int snapTemplateFrames(int devID)
                                 device[devID].subDirectoryDepth,
                                 device[devID].depthExtension
                               );
-    if (FileExists(file_name_test))
+    if (fileExists(file_name_test))
      {
       #if REALLOCATE_ON_EVERY_SNAP
         if (device[devID].templateDepthFrame!=0) { free(device[devID].templateDepthFrame); device[devID].templateDepthFrame=0; }
