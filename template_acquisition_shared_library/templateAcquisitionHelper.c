@@ -34,6 +34,17 @@ int directoryExists(const char* folder)
 }
 
 
+int fileExists(char * filename)
+{
+ FILE *fp = fopen(filename,"r");
+ if( fp ) { /* exists */
+            fclose(fp);
+            return 1;
+          }
+ /* doesnt exist */
+ return 0;
+}
+
 int swapEndiannessInternalPNM(void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
   unsigned char * traverser=(unsigned char * ) pixels;
@@ -185,17 +196,6 @@ int makeFrameNoInput(unsigned char * frame , unsigned int width , unsigned int h
 }
 
 
-int FileExists(char * filename)
-{
- FILE *fp = fopen(filename,"r");
- if( fp ) { /* exists */
-            fclose(fp);
-            return 1;
-          }
- /* doesnt exist */
- return 0;
-}
-
 
 int flipDepth(unsigned short * depth,unsigned int width , unsigned int height )
 {
@@ -233,8 +233,8 @@ void getFilenameForNextResource(
   devID=0; //<- test
   switch (resType)
   {
-    case RESOURCE_COLOR_FILE : sprintf(filename,"frames/%s/colorFrame_%u_%05u.%s",readFromDir,devID,cycle,extension); break;
-    case RESOURCE_DEPTH_FILE : sprintf(filename,"frames/%s/depthFrame_%u_%05u.%s",readFromDir,devID,cycle,extension); break;
+    case RESOURCE_COLOR_FILE : sprintf(filename,"frames/%s/%s/colorFrame_%u_%05u.%s",readFromDir,colorSubDirectory,devID,cycle,extension); break;
+    case RESOURCE_DEPTH_FILE : sprintf(filename,"frames/%s/%s/depthFrame_%u_%05u.%s",readFromDir,depthSubDirectory,devID,cycle,extension); break;
     case RESOURCE_COLOR_CALIBRATION_FILE :  sprintf(filename,"frames/%s/color.calib",readFromDir); break;
     case RESOURCE_DEPTH_CALIBRATION_FILE :  sprintf(filename,"frames/%s/depth.calib",readFromDir); break;
     case RESOURCE_LIVE_CALIBRATION_FILE : sprintf(filename,"frames/%s/cameraPose_%u_%05u.calib",readFromDir,devID,cycle);
@@ -260,9 +260,9 @@ unsigned int retreiveDatasetDeviceIDToReadFrom(
  while ( (devIDInc >=0 ) && (!decided) )
     {
       getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devIDInc , cycle, readFromDir , colorSubDirectory, depthSubDirectory, extension );
-      if (FileExists(file_name_test)) {  decided=1; }
+      if (fileExists(file_name_test)) {  decided=1; }
       getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devIDInc , cycle, readFromDir , colorSubDirectory, depthSubDirectory, extension );
-      if (FileExists(file_name_test)) {  decided=1; }
+      if (fileExists(file_name_test)) {  decided=1; }
 
       if (devIDInc==0) { break; decided=1; } else
                        { --devIDInc; }
@@ -334,7 +334,7 @@ unsigned int findExtensionOfDataset(
    if (i==3) { strncpy(colorExtension,"jps",MAX_EXTENSION_PATH); }
 
    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , startingFrame , readFromDir ,colorSubDirectory , depthExtension , colorExtension );
-   if ( FileExists(file_name_test) ) { colorSet=1; break; }
+   if ( fileExists(file_name_test) ) { colorSet=1; break; }
 
    ++i;
   }
@@ -348,7 +348,7 @@ unsigned int findExtensionOfDataset(
    if (i==2) { strncpy(depthExtension,"jps",MAX_EXTENSION_PATH); }
 
    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , startingFrame , readFromDir ,colorSubDirectory , depthExtension , depthExtension );
-   if ( FileExists(file_name_test) ) { depthSet=1; break; }
+   if ( fileExists(file_name_test) ) { depthSet=1; break; }
 
    ++i;
   }
@@ -380,9 +380,9 @@ unsigned int findLastFrame(
   {
    totalFrames = i;
    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , i, readFromDir ,colorSubDirectory , depthExtension , colorExtension );
-   if ( ! FileExists(file_name_test) ) { break; }
+   if ( ! fileExists(file_name_test) ) { break; }
    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , i, readFromDir ,colorSubDirectory , depthExtension , depthExtension );
-   if ( ! FileExists(file_name_test) ) { break; }
+   if ( ! fileExists(file_name_test) ) { break; }
    ++i;
   }
 
