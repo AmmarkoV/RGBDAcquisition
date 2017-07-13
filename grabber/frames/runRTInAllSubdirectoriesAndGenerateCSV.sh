@@ -6,7 +6,7 @@ cd "$DIR"
 
 for f in $(find $1 -depth -type d); do  
        echo "Running Neural Network on Dataset.. $f" 
-       ./runRTPose.sh $f 
+       ./runRTPose.sh $f #/color <- for damien files 
 done
  
 echo "Compressing All Output.."

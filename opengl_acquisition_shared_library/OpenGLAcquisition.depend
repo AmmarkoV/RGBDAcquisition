@@ -459,3 +459,125 @@
 
 1458492977 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/image.h
 
+1438258174 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/collisions.c
+	"collisions.h"
+	<stdio.h>
+	<stdlib.h>
+
+1422530486 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/collisions.h
+
+1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix3x3Tools.c
+	"matrix3x3Tools.h"
+	"matrixTools.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+
+1475489090 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix3x3Tools.h
+
+1422530486 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixTools.h
+
+1490876106 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix4x4Tools.c
+	"matrix4x4Tools.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"matrix4x4Tools.h"
+
+1490876106 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix4x4Tools.h
+
+1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/ocvStaging.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"ocvStaging.h"
+
+1403179476 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/ocvStaging.h
+
+1475480703 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveHomography.c
+	"solveHomography.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"matrixTools.h"
+	"matrix3x3Tools.h"
+	"matrix4x4Tools.h"
+
+1403179476 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveHomography.h
+
+1436529754 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveLinearSystemGJ.c
+	"solveLinearSystemGJ.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"matrix3x3Tools.h"
+	"matrix4x4Tools.h"
+	"solveHomography.h"
+
+1403179476 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveLinearSystemGJ.h
+
+1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/convolutionFilter.c
+	"convolutionFilter.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+
+1454931753 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/convolutionFilter.h
+
+1423141180 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/depthClassifier.c
+	"depthClassifier.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1423141180 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/depthClassifier.h
+
+1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageFilters.c
+	"imageFilters.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+
+1455564556 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageFilters.h
+	"../Primitives/image.h"
+
+1460647486 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Primitives/image.h
+
+1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageOps.c
+	"imageOps.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
+1453705997 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageOps.h
+
+1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/patchComparison.c
+	"patchComparison.h"
+	<stdio.h>
+
+1385981940 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/patchComparison.h
+
+1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/resize.c
+	"resize.h"
+	<stdio.h>
+	<stdlib.h>
+
+1416393090 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/resize.h
+
+1473421078 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.c
+	<X11/X.h>
+	<X11/keysym.h>
+	<stdio.h>
+	<stdlib.h>
+	<GL/glx.h>
+	<GL/gl.h>
+	"scene.h"
+	"glx.h"
+
+1476718419 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/scene.h
+
+1389863812 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.h
+
