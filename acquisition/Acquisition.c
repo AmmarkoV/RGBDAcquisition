@@ -151,17 +151,17 @@ int acquisitionGetModulesCount()
 
   fprintf(stderr,"Querying for Acquisition plug-ins : \n");
 
-  if ( acquisitionIsModuleAvailiable(V4L2_ACQUISITION_MODULE) )          { fprintf(stderr,"V4L2 module found \n");       ++modules; }
-  if ( acquisitionIsModuleAvailiable(V4L2STEREO_ACQUISITION_MODULE) )    { fprintf(stderr,"V4L2Stereo module found \n"); ++modules; }
-  if ( acquisitionIsModuleAvailiable(OPENGL_ACQUISITION_MODULE) )        { fprintf(stderr,"OpenGL module found \n");     ++modules; }
-  if ( acquisitionIsModuleAvailiable(TEMPLATE_ACQUISITION_MODULE) )      { fprintf(stderr,"Template module found \n");   ++modules; }
-  if ( acquisitionIsModuleAvailiable(FREENECT_ACQUISITION_MODULE) )      { fprintf(stderr,"Freenect module found \n");   ++modules; }
-  if ( acquisitionIsModuleAvailiable(OPENNI1_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI1 module found \n");    ++modules; }
-  if ( acquisitionIsModuleAvailiable(OPENNI2_ACQUISITION_MODULE) )       { fprintf(stderr,"OpenNI2 module found \n");    ++modules; }
-  if ( acquisitionIsModuleAvailiable(NETWORK_ACQUISITION_MODULE) )       { fprintf(stderr,"Network module found \n");    ++modules; }
-  if ( acquisitionIsModuleAvailiable(DEPTHSENSE_ACQUISITION_MODULE) )    { fprintf(stderr,"DepthSense module found \n"); ++modules; }
-  if ( acquisitionIsModuleAvailiable(DESKTOP_ACQUISITION_MODULE) )       { fprintf(stderr,"Desktop module found \n");    ++modules; }
-  if ( acquisitionIsModuleAvailiable(REALSENSE_ACQUISITION_MODULE) )     { fprintf(stderr,"RealSense module found \n");  ++modules; }
+  if ( acquisitionIsModuleAvailiable(V4L2_ACQUISITION_MODULE) )          { fprintf(stderr,GREEN "V4L2 module found \n" NORMAL);       ++modules; }
+  if ( acquisitionIsModuleAvailiable(V4L2STEREO_ACQUISITION_MODULE) )    { fprintf(stderr,GREEN "V4L2Stereo module found \n" NORMAL); ++modules; }
+  if ( acquisitionIsModuleAvailiable(OPENGL_ACQUISITION_MODULE) )        { fprintf(stderr,GREEN "OpenGL module found \n" NORMAL);     ++modules; }
+  if ( acquisitionIsModuleAvailiable(TEMPLATE_ACQUISITION_MODULE) )      { fprintf(stderr,GREEN "Template module found \n" NORMAL);   ++modules; }
+  if ( acquisitionIsModuleAvailiable(FREENECT_ACQUISITION_MODULE) )      { fprintf(stderr,GREEN "Freenect module found \n" NORMAL);   ++modules; }
+  if ( acquisitionIsModuleAvailiable(OPENNI1_ACQUISITION_MODULE) )       { fprintf(stderr,GREEN "OpenNI1 module found \n" NORMAL);    ++modules; }
+  if ( acquisitionIsModuleAvailiable(OPENNI2_ACQUISITION_MODULE) )       { fprintf(stderr,GREEN "OpenNI2 module found \n" NORMAL);    ++modules; }
+  if ( acquisitionIsModuleAvailiable(NETWORK_ACQUISITION_MODULE) )       { fprintf(stderr,GREEN "Network module found \n" NORMAL);    ++modules; }
+  if ( acquisitionIsModuleAvailiable(DEPTHSENSE_ACQUISITION_MODULE) )    { fprintf(stderr,GREEN "DepthSense module found \n" NORMAL); ++modules; }
+  if ( acquisitionIsModuleAvailiable(DESKTOP_ACQUISITION_MODULE) )       { fprintf(stderr,GREEN "Desktop module found \n" NORMAL);    ++modules; }
+  if ( acquisitionIsModuleAvailiable(REALSENSE_ACQUISITION_MODULE) )     { fprintf(stderr,GREEN "RealSense module found \n" NORMAL);  ++modules; }
 
   return modules;
 }
