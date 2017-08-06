@@ -78,6 +78,7 @@ unsigned int savedFrameNum=0;
 unsigned int frameNum=0;
 unsigned int seekFrame=0;
 unsigned int loopFrame=0;
+unsigned int delay=0;
 
 char RGBwindowName[250]={0};
 char DepthwindowName[250]={0};
@@ -278,6 +279,7 @@ int main (int argc, char *argv[])
   unsigned int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcmp(argv[i],"-delay")==0) {  delay=atoi(argv[i+1]); } else
     if (strcmp(argv[i],"-saveEveryFrame")==0) {  saveEveryFrame=1; } else
     if (strcmp(argv[i],"-saveAsOriginalFrameNumber")==0) {
                                                            saveAsOriginalFrameNumber=1;
@@ -499,6 +501,10 @@ int main (int argc, char *argv[])
          int i=system(executeEveryLoop);
       }
 
+      if (delay>0)
+      {
+         usleep(delay);
+      }
     }
 
     fprintf(stderr,"Done viewing %u frames! \n",frameNum);
