@@ -490,12 +490,14 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
            float * jointPositions = convertTRIBonesToJointPositions( tri , &outputNumberOfJoints );
            if (jointPositions!=0)
              {
-              doOGLBoneDrawCalllist( jointPositions , parentNode , outputNumberOfJoints);
+              renderOGLBones(jointPositions,parentNode,outputNumberOfJoints);
               free(jointPositions);
              }
           } else
           {
-          doOGLGenericDrawCalllist(
+           //doOGLGenericDrawCalllist
+             renderOGL
+            (
                                      tri->vertices ,       tri->header.numberOfVertices ,
                                      tri->normal ,         tri->header.numberOfNormals ,
                                      tri->textureCoords ,  tri->header.numberOfTextureCoords ,

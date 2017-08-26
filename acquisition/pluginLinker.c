@@ -53,7 +53,7 @@ char * getPluginStr(int moduleID,int strID)
 struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES]={0};
 
 void * remoteNetworkDLhandle=0;
-int (*startPushingToRemoteNetwork) (char * , int);
+int (*startPushingToRemoteNetwork) (char * , int , unsigned int , unsigned int );
 int (*stopPushingToRemoteNetwork) (int);
 int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsigned int,unsigned int);
 

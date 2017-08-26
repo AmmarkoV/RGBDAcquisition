@@ -10,8 +10,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
+#include "../tools.h"
 
 
 #define MAX_FILENAMES 512
@@ -21,6 +23,7 @@ char * selectedFragmentShader = 0;
 char vertexShaderFile[MAX_FILENAMES]={0};
 char * selectedVertexShader = 0;
 struct shaderObject * loadedShader=0;
+int useShaders=0;
 //--------------------------------------
 
 int doCulling=1;
@@ -33,6 +36,7 @@ int enableShaders(char * vertShaderFilename , char * fragShaderFilename)
   strncpy(vertexShaderFile , vertShaderFilename,MAX_FILENAMES);
   selectedVertexShader = vertexShaderFile;
 
+  useShaders=1;
   return 1;
 }
 
@@ -112,9 +116,26 @@ int startOGLRendering()
    glEnable(GL_CULL_FACE);
     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glEnable(GL_CULL_FACE); \n"); }
   }
-
+ return 1;
 }
 
+
+
+
+int renderOGLBones( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
+{
+  switch (useShaders)
+  {
+    case 0 :
+         doOGLBoneDrawCalllist(pos,parentNode,boneSizes);
+    break;
+
+    case 1 :
+         doOGLBoneDrawCalllist(pos,parentNode,boneSizes);
+    break;
+  };
+  return 1;
+}
 
 
 int renderOGL(
@@ -126,13 +147,30 @@ int renderOGL(
              )
 {
 
-   doOGLGenericDrawCalllist(
+  switch (useShaders)
+  {
+    case 0 :
+    doOGLGenericDrawCalllist(
                               vertices ,       numberOfVertices ,
                               normal ,         numberOfNormals ,
                               textureCoords ,  numberOfTextureCoords ,
                               colors ,         numberOfColors ,
                               indices ,        numberOfIndices
                              );
+    break;
+
+    case 1 :
+        doOGLGenericDrawCalllist(
+                              vertices ,       numberOfVertices ,
+                              normal ,         numberOfNormals ,
+                              textureCoords ,  numberOfTextureCoords ,
+                              colors ,         numberOfColors ,
+                              indices ,        numberOfIndices
+                             );
+    break;
+
+  };
+
   return 1;
 }
 
@@ -146,6 +184,6 @@ int stopOGLRendering()
   {
       unloadShader(loadedShader);
   }
-
+ return 1;
 }
 

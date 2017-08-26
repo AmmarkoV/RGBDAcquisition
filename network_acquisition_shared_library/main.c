@@ -44,7 +44,7 @@ struct NetworkVirtualDevice networkDevice[MAX_NETWORK_DEVICES]={0};
 
 //This call creates a FrameServer that binds to the IP and port given and from there on starts to
 //service the clients that connect to it by sending frames to them..
-int networkBackbone_startPushingToRemoteOLD(char * ip , int port)
+int networkBackbone_startPushingToRemoteOLD(char * ip , int port ,  unsigned int width , unsigned int height)
 {
   fprintf(stderr,"networkBackbone_startPushingToRemote(%s,%u) called \n",ip,port);
   return StartFrameServer(0,ip,port);

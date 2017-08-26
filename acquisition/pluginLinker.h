@@ -118,7 +118,7 @@ struct acquisitionPluginInterface
 extern struct acquisitionPluginInterface plugins[NUMBER_OF_POSSIBLE_MODULES];
 
 extern void * remoteNetworkDLhandle;
-extern int (*startPushingToRemoteNetwork) (char * , int);
+extern int (*startPushingToRemoteNetwork) (char * , int , unsigned int,unsigned int);
 extern int (*stopPushingToRemoteNetwork) (int);
 extern int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsigned int,unsigned int);
 

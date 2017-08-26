@@ -13,6 +13,14 @@
 */
 int startOGLRendering();
 
+
+
+int renderOGLBones(
+                 float * pos ,
+                 unsigned int * parentNode ,
+                 unsigned int boneSizes
+                );
+
 int renderOGL(
                float * vertices ,       unsigned int numberOfVertices ,
                float * normal ,         unsigned int numberOfNormals ,
