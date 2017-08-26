@@ -36,6 +36,8 @@ int enableShaders(char * vertShaderFilename , char * fragShaderFilename)
   strncpy(vertexShaderFile , vertShaderFilename,MAX_FILENAMES);
   selectedVertexShader = vertexShaderFile;
 
+  startOGLShaderPipeline();
+
   useShaders=1;
   return 1;
 }

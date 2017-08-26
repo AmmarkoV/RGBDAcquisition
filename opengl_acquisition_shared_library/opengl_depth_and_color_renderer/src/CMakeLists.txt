@@ -23,7 +23,13 @@ IF( ENABLE_PNG )
 ENDIF( ENABLE_PNG )
 
  
-
+IF( ENABLE_SHADERS )
+ MESSAGE("Shaders will be included in this codec build")
+ set(GLEW_Libs glew ) 
+ set(GLEW_Parts  )
+ set(GLEW_Includes  ) 
+ add_definitions(-DUSE_GLEW)
+ENDIF( ENABLE_SHADERS )
 
 add_definitions(-DINCLUDE_OPENGL_CODE)
 
@@ -109,7 +115,7 @@ add_library(OGLRendererSandbox SHARED
             Interfaces/webInterface.c 
             Interfaces/webInterface.h
            ) 
-target_link_libraries(OGLRendererSandbox m GL GLU X11 Codecs  ${PNG_Libs} ${JPG_Libs} ) 
+target_link_libraries(OGLRendererSandbox m GL GLU X11 Codecs  ${PNG_Libs} ${JPG_Libs} ${GLEW_Libs} ) 
  
  
 

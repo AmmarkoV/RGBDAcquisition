@@ -1,13 +1,40 @@
-#define USE_GLEW 0
-
 
 #if USE_GLEW
 #include <GL/glew.h>
+
+
+// Here we decide which of the two versions we want to use
+// If your systems supports both, choose to uncomment USE_OPENGL32
+// otherwise choose to uncomment USE_OPENGL21
+// GLView cna also help you decide before running this program:
+//
+// FOR MACOSX only, please use OPENGL32 for AntTweakBar to work properly
+//
+#define USE_OPENGL32
+
+
+#define USE_SIMPLE_SHADERS 0
+
+
+// GLFW lib
+// http://www.glfw.org/documentation.html
+#ifdef USE_OPENGL32
+    #ifndef _WIN32
+        #define GLFW_INCLUDE_GL3
+        #define USE_GL3
+        #define GLFW_NO_GLU
+        #define GL3_PROTOTYPES 1
+    #endif
 #endif
+
+#endif
+
+
 
 #include <GL/gl.h>
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/glu.h>
+#include <GL/glut.h>
 
 
 #include <stdio.h>
@@ -15,6 +42,17 @@
 #include <unistd.h>
 
 #include "ogl_shader_pipeline_renderer.h"
+
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
 
 
 
@@ -28,55 +66,82 @@ void doOGLShaderDrawCalllist(
                               unsigned int * indices , unsigned int numberOfIndices
                              )
 {
-  unsigned int i=0,z=0;
+/*
 
 
-  glBegin(GL_TRIANGLES);
-    if (numberOfIndices > 0 )
+void pushObjectToBufferData(
+                             unsigned int * verticeCount ,
+                             const float * vertices , unsigned int verticesLength ,
+                             const float * normals , unsigned int normalsLength ,
+                             const float * colors , unsigned int colorsLength ,
+                             const float * texcoords , unsigned int texCoordsLength ,
+                             int generateNewBuffer ,
+                             GLuint buffer
+                           )
+{*/
+
+#if USE_GLEW
+
+    glBindBuffer( GL_ARRAY_BUFFER, buffer );        checkOpenGLError(__FILE__, __LINE__);
+
+
+
+    *verticeCount+=(unsigned int ) verticesLength/(3*sizeof(float));
+    fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,*verticeCount,verticesLength);
+    fprintf(stderr,GREEN "Pushing %u vertices (%u bytes) and %u normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,verticesLength/sizeof(float),verticesLength,normalsLength/sizeof(float),normalsLength,colorsLength,texCoordsLength);
+  if (generateNewBuffer)
+   {
+    glBufferData( GL_ARRAY_BUFFER, verticesLength + normalsLength  + colorsLength + texCoordsLength ,NULL, GL_STREAM_DRAW ); checkOpenGLError(__FILE__, __LINE__);
+
+    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , verticesLength , vertices );                  checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, verticesLength                         , normalsLength  , normals );                   checkOpenGLError(__FILE__, __LINE__);
+
+    if ( (colors!=0) && (colorsLength!=0) )
     {
-     //fprintf(stderr,MAGENTA "drawing indexed TRI\n" NORMAL); //dbg msg to be sure what draw operation happens here..!
-     unsigned int faceTriA,faceTriB,faceTriC,faceTriA_X,faceTriA_Y,faceTriA_Z,faceTriB_X,faceTriB_Y,faceTriB_Z,faceTriC_X,faceTriC_Y,faceTriC_Z;
-
-     for (i = 0; i < numberOfIndices/3; i++)
-     {
-      faceTriA = indices[(i*3)+0];           faceTriB = indices[(i*3)+1];           faceTriC = indices[(i*3)+2];
-      faceTriA_X = (faceTriA*3)+0;           faceTriA_Y = (faceTriA*3)+1;           faceTriA_Z = (faceTriA*3)+2;
-      faceTriB_X = (faceTriB*3)+0;           faceTriB_Y = (faceTriB*3)+1;           faceTriB_Z = (faceTriB*3)+2;
-      faceTriC_X = (faceTriC*3)+0;           faceTriC_Y = (faceTriC*3)+1;           faceTriC_Z = (faceTriC*3)+2;
-
-      if (normal)   { glNormal3f(normal[faceTriA_X],normal[faceTriA_Y],normal[faceTriA_Z]); }
-      if ( colors ) { glColor3f(colors[faceTriA_X],colors[faceTriA_Y],colors[faceTriA_Z]);  }
-      glVertex3f(vertices[faceTriA_X],vertices[faceTriA_Y],vertices[faceTriA_Z]);
-
-      if (normal)   { glNormal3f(normal[faceTriB_X],normal[faceTriB_Y],normal[faceTriB_Z]); }
-      if ( colors ) { glColor3f(colors[faceTriB_X],colors[faceTriB_Y],colors[faceTriB_Z]);  }
-      glVertex3f(vertices[faceTriB_X],vertices[faceTriB_Y],vertices[faceTriB_Z]);
-
-      if (normal)   { glNormal3f(normal[faceTriC_X],normal[faceTriC_Y],normal[faceTriC_Z]); }
-      if ( colors ) { glColor3f(colors[faceTriC_X],colors[faceTriC_Y],colors[faceTriC_Z]);  }
-      glVertex3f(vertices[faceTriC_X],vertices[faceTriC_Y],vertices[faceTriC_Z]);
-	 }
-    } else
-    {
-      //fprintf(stderr,BLUE "drawing flat TRI\n" NORMAL); //dbg msg to be sure what draw operation happens here..!
-      for (i=0; i<numberOfVertices/3; i++)
-        {
-         z=(i*3)*3;
-         if (normal) { glNormal3f(normal[z+0],normal[z+1],normal[z+2]); }
-         if (colors) { glColor3f(colors[z+0],colors[z+1],colors[z+2]);  }
-                            glVertex3f(vertices[z+0],vertices[z+1],vertices[z+2]);
-
-         z+=3;
-         if (normal) { glNormal3f(normal[z+0],normal[z+1],normal[z+2]); }
-         if (colors) { glColor3f(colors[z+0],colors[z+1],colors[z+2]);  }
-                            glVertex3f(vertices[z+0],vertices[z+1],vertices[z+2]);
-         z+=3;
-         if (normal) { glNormal3f(normal[z+0],normal[z+1],normal[z+2]); }
-         if (colors) { glColor3f(colors[z+0],colors[z+1],colors[z+2]);  }
-                            glVertex3f(vertices[z+0],vertices[z+1],vertices[z+2]);
-        }
+     glBufferSubData( GL_ARRAY_BUFFER, verticesLength + normalsLength , colorsLength , colors );                     checkOpenGLError(__FILE__, __LINE__);
     }
-  glEnd();
+    if ( (texcoords!=0) && (texCoordsLength!=0) )
+    {
+     glBufferSubData( GL_ARRAY_BUFFER, verticesLength + normalsLength + colorsLength, texCoordsLength , texcoords ); checkOpenGLError(__FILE__, __LINE__);
+    }
+   }
+
+
+    vPosition = glGetAttribLocation( program, "vPosition" );                                   checkOpenGLError(__FILE__, __LINE__);
+    glEnableVertexAttribArray( vPosition );                                                    checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );             checkOpenGLError(__FILE__, __LINE__);
+
+     vNormal = glGetAttribLocation( program, "vNormal" );                                      checkOpenGLError(__FILE__, __LINE__);
+     glEnableVertexAttribArray( vNormal );                                                     checkOpenGLError(__FILE__, __LINE__);
+     glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(verticesLength) ); checkOpenGLError(__FILE__, __LINE__);
+
+
+    if ( (colors!=0) && (colorsLength!=0) )
+    {
+     vColor = glGetAttribLocation( program, "vColor" );
+     glEnableVertexAttribArray( vColor );
+     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( verticesLength + normalsLength ) );
+     checkOpenGLError(__FILE__, __LINE__);
+    }
+
+
+    textureStrengthLocation = glGetUniformLocation(program, "textureStrength");  checkOpenGLError(__FILE__, __LINE__);
+    if ( (texcoords!=0) && (texCoordsLength!=0) )
+    {
+     vTexture = glGetAttribLocation( program, "vTexture" );
+     glEnableVertexAttribArray( vTexture );
+     glVertexAttribPointer( vTexture, 2, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( verticesLength + normalsLength + colorsLength) );
+     checkOpenGLError(__FILE__, __LINE__);
+
+     //textureStrength[0]=1.0;
+    } else
+    { textureStrength[0]=0.0; }
+
+
+
+#endif // USE_GLEW
+
+
 }
 
 
@@ -107,6 +172,4 @@ int startOGLShaderPipeline()
     fprintf(stderr,"Renderer: %s \n",glGetString (GL_RENDERER) );
     fprintf(stderr,"Version: %s \n",glGetString (GL_VERSION) );
 #endif
-
-
 }

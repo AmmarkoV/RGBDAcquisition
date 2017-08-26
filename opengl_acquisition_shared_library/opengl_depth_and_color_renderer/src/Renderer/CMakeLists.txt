@@ -23,9 +23,16 @@ IF( ENABLE_PNG )
  add_definitions(-DENABLE_PNG)
 ENDIF( ENABLE_PNG )
 
+IF( ENABLE_SHADERS )
+ MESSAGE("Shaders will be included in this codec build")
+ set(GLEW_Libs glew ) 
+ set(GLEW_Parts  )
+ set(GLEW_Includes  ) 
+ add_definitions(-DUSE_GLEW)
+ENDIF( ENABLE_SHADERS )
 
 add_executable(Renderer main.c ) 
-target_link_libraries(Renderer rt m GL GLU X11 OGLRendererSandbox Codecs  ${PNG_Libs} ${JPG_Libs} ) 
+target_link_libraries(Renderer rt m GL GLU X11 OGLRendererSandbox Codecs  ${PNG_Libs} ${JPG_Libs}  ${GLEW_Libs}  ) 
 add_dependencies(Renderer OGLRendererSandbox)  
        
  
