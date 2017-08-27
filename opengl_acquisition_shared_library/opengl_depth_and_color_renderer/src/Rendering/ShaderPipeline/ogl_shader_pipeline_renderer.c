@@ -1,3 +1,4 @@
+//#define USE_GLEW
 
 #if USE_GLEW
 #include <GL/glew.h>
@@ -56,7 +57,8 @@
 
 
 
-
+GLuint buffer;
+unsigned int verticeCount;
 
 void doOGLShaderDrawCalllist(
                               float * vertices ,       unsigned int numberOfVertices ,
@@ -86,23 +88,23 @@ void pushObjectToBufferData(
 
 
 
-    *verticeCount+=(unsigned int ) verticesLength/(3*sizeof(float));
-    fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,*verticeCount,verticesLength);
-    fprintf(stderr,GREEN "Pushing %u vertices (%u bytes) and %u normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,verticesLength/sizeof(float),verticesLength,normalsLength/sizeof(float),normalsLength,colorsLength,texCoordsLength);
+    verticeCount+=(unsigned int ) numberOfVertices/(3*sizeof(float));
+    fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,verticeCount,numberOfVertices);
+    fprintf(stderr,GREEN "Pushing %u vertices (%u bytes) and %u normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,numberOfVertices/sizeof(float),numberOfVertices,normalsLength/sizeof(float),normalsLength,colorsLength,texCoordsLength);
   if (generateNewBuffer)
    {
-    glBufferData( GL_ARRAY_BUFFER, verticesLength + normalsLength  + colorsLength + texCoordsLength ,NULL, GL_STREAM_DRAW ); checkOpenGLError(__FILE__, __LINE__);
+    glBufferData( GL_ARRAY_BUFFER, numberOfVertices + normalsLength  + colorsLength + texCoordsLength ,NULL, GL_STREAM_DRAW ); checkOpenGLError(__FILE__, __LINE__);
 
-    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , verticesLength , vertices );                  checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, verticesLength                         , normalsLength  , normals );                   checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );                  checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                         , normalsLength  , normals );                   checkOpenGLError(__FILE__, __LINE__);
 
     if ( (colors!=0) && (colorsLength!=0) )
     {
-     glBufferSubData( GL_ARRAY_BUFFER, verticesLength + normalsLength , colorsLength , colors );                     checkOpenGLError(__FILE__, __LINE__);
+     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + normalsLength , colorsLength , colors );                     checkOpenGLError(__FILE__, __LINE__);
     }
     if ( (texcoords!=0) && (texCoordsLength!=0) )
     {
-     glBufferSubData( GL_ARRAY_BUFFER, verticesLength + normalsLength + colorsLength, texCoordsLength , texcoords ); checkOpenGLError(__FILE__, __LINE__);
+     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + normalsLength + colorsLength, texCoordsLength , texcoords ); checkOpenGLError(__FILE__, __LINE__);
     }
    }
 
