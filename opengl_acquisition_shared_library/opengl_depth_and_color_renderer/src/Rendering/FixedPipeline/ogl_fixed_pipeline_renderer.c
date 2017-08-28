@@ -107,7 +107,7 @@ glPopMatrix();
 
 void doOGLGenericDrawCalllist(
                               float * vertices ,       unsigned int numberOfVertices ,
-                              float * normal ,         unsigned int numberOfNormals ,
+                              float * normals ,         unsigned int numberOfNormals ,
                               float * textureCoords ,  unsigned int numberOfTextureCoords ,
                               float * colors ,         unsigned int numberOfColors ,
                               unsigned int * indices , unsigned int numberOfIndices
@@ -129,15 +129,15 @@ void doOGLGenericDrawCalllist(
       faceTriB_X = (faceTriB*3)+0;           faceTriB_Y = (faceTriB*3)+1;           faceTriB_Z = (faceTriB*3)+2;
       faceTriC_X = (faceTriC*3)+0;           faceTriC_Y = (faceTriC*3)+1;           faceTriC_Z = (faceTriC*3)+2;
 
-      if (normal)   { glNormal3f(normal[faceTriA_X],normal[faceTriA_Y],normal[faceTriA_Z]); }
+      if (normals)   { glNormal3f(normals[faceTriA_X],normals[faceTriA_Y],normals[faceTriA_Z]); }
       if ( colors ) { glColor3f(colors[faceTriA_X],colors[faceTriA_Y],colors[faceTriA_Z]);  }
       glVertex3f(vertices[faceTriA_X],vertices[faceTriA_Y],vertices[faceTriA_Z]);
 
-      if (normal)   { glNormal3f(normal[faceTriB_X],normal[faceTriB_Y],normal[faceTriB_Z]); }
+      if (normals)   { glNormal3f(normals[faceTriB_X],normals[faceTriB_Y],normals[faceTriB_Z]); }
       if ( colors ) { glColor3f(colors[faceTriB_X],colors[faceTriB_Y],colors[faceTriB_Z]);  }
       glVertex3f(vertices[faceTriB_X],vertices[faceTriB_Y],vertices[faceTriB_Z]);
 
-      if (normal)   { glNormal3f(normal[faceTriC_X],normal[faceTriC_Y],normal[faceTriC_Z]); }
+      if (normals)   { glNormal3f(normals[faceTriC_X],normals[faceTriC_Y],normals[faceTriC_Z]); }
       if ( colors ) { glColor3f(colors[faceTriC_X],colors[faceTriC_Y],colors[faceTriC_Z]);  }
       glVertex3f(vertices[faceTriC_X],vertices[faceTriC_Y],vertices[faceTriC_Z]);
 	 }
@@ -147,16 +147,16 @@ void doOGLGenericDrawCalllist(
       for (i=0; i<numberOfVertices/3; i++)
         {
          z=(i*3)*3;
-         if (normal) { glNormal3f(normal[z+0],normal[z+1],normal[z+2]); }
+         if (normals) { glNormal3f(normals[z+0],normals[z+1],normals[z+2]); }
          if (colors) { glColor3f(colors[z+0],colors[z+1],colors[z+2]);  }
                             glVertex3f(vertices[z+0],vertices[z+1],vertices[z+2]);
 
          z+=3;
-         if (normal) { glNormal3f(normal[z+0],normal[z+1],normal[z+2]); }
+         if (normals) { glNormal3f(normals[z+0],normals[z+1],normals[z+2]); }
          if (colors) { glColor3f(colors[z+0],colors[z+1],colors[z+2]);  }
                             glVertex3f(vertices[z+0],vertices[z+1],vertices[z+2]);
          z+=3;
-         if (normal) { glNormal3f(normal[z+0],normal[z+1],normal[z+2]); }
+         if (normals) { glNormal3f(normals[z+0],normals[z+1],normals[z+2]); }
          if (colors) { glColor3f(colors[z+0],colors[z+1],colors[z+2]);  }
                             glVertex3f(vertices[z+0],vertices[z+1],vertices[z+2]);
         }

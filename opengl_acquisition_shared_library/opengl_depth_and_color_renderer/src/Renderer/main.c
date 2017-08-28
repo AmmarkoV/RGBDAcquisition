@@ -165,6 +165,7 @@ int main(int argc, char **argv)
         }
         else if (strcmp(argv[i],"--shader")==0)
         {
+            //char * vertShaderFilename , char * fragShaderFilename );
             enableShaders(argv[i+1],argv[i+2]);
         }
         else if (strcmp(argv[i],"--keyboard")==0)

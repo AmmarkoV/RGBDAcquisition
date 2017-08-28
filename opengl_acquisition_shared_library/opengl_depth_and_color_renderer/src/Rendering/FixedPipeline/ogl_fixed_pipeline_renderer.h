@@ -38,7 +38,7 @@ void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode , unsigned i
 */
 void doOGLGenericDrawCalllist(
                               float * vertices ,       unsigned int numberOfVertices ,
-                              float * normal ,         unsigned int numberOfNormals ,
+                              float * normals ,         unsigned int numberOfNormals ,
                               float * textureCoords ,  unsigned int numberOfTextureCoords ,
                               float * colors ,         unsigned int numberOfColors ,
                               unsigned int * indices , unsigned int numberOfIndices

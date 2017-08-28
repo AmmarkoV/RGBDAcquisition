@@ -1,4 +1,4 @@
-//#define USE_GLEW
+#define USE_GLEW 1
 
 #if USE_GLEW
 #include <GL/glew.h>
@@ -44,6 +44,7 @@
 
 #include "ogl_shader_pipeline_renderer.h"
 
+#include "../../tools.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -60,9 +61,22 @@
 GLuint buffer;
 unsigned int verticeCount;
 
+
+int         windowWidth=640, windowHeight=480;
+GLuint      skyboxProgram=0 , skyboxVAO=0;
+GLuint      program=0;
+GLuint      vao=0;
+GLuint      bufferVao=0;
+GLuint      bufferSkyboxVao=0;
+
+ GLuint vPosition , vNormal , vColor , vTexture , lightPositionLocation  , materialColorLocation;
+ GLuint fogLocation  , modelViewMatrixLocation  , modelViewProjectionMatrixLocation  , normalTransformationLocation;
+ GLuint lightColorLocation , hdrColorLocation , lightMaterialsLocation , texture1Location , normalTextureLocation , skyboxLocation , textureStrengthLocation ;
+
+
 void doOGLShaderDrawCalllist(
                               float * vertices ,       unsigned int numberOfVertices ,
-                              float * normal ,         unsigned int numberOfNormals ,
+                              float * normals ,         unsigned int numberOfNormals ,
                               float * textureCoords ,  unsigned int numberOfTextureCoords ,
                               float * colors ,         unsigned int numberOfColors ,
                               unsigned int * indices , unsigned int numberOfIndices
@@ -73,10 +87,10 @@ void doOGLShaderDrawCalllist(
 
 void pushObjectToBufferData(
                              unsigned int * verticeCount ,
-                             const float * vertices , unsigned int verticesLength ,
-                             const float * normals , unsigned int normalsLength ,
-                             const float * colors , unsigned int colorsLength ,
-                             const float * texcoords , unsigned int texCoordsLength ,
+                             const float * vertices , unsigned int numberOfVertices ,
+                             const float * normals , unsigned int numberOfNormals ,
+                             const float * colors , unsigned int numberOfColors ,
+                             const float * texcoords , unsigned int numberOfTextureCoords ,
                              int generateNewBuffer ,
                              GLuint buffer
                            )
@@ -90,21 +104,23 @@ void pushObjectToBufferData(
 
     verticeCount+=(unsigned int ) numberOfVertices/(3*sizeof(float));
     fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,verticeCount,numberOfVertices);
-    fprintf(stderr,GREEN "Pushing %u vertices (%u bytes) and %u normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,numberOfVertices/sizeof(float),numberOfVertices,normalsLength/sizeof(float),normalsLength,colorsLength,texCoordsLength);
+    fprintf(stderr,GREEN "Pushing %u vertices (%u bytes) and %u normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,numberOfVertices/sizeof(float),numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
+
+  int generateNewBuffer=1;
   if (generateNewBuffer)
    {
-    glBufferData( GL_ARRAY_BUFFER, numberOfVertices + normalsLength  + colorsLength + texCoordsLength ,NULL, GL_STREAM_DRAW ); checkOpenGLError(__FILE__, __LINE__);
+    glBufferData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals  + numberOfColors + numberOfTextureCoords ,NULL, GL_STREAM_DRAW ); checkOpenGLError(__FILE__, __LINE__);
 
     glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );                  checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                         , normalsLength  , normals );                   checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                         , numberOfNormals  , normals );                   checkOpenGLError(__FILE__, __LINE__);
 
-    if ( (colors!=0) && (colorsLength!=0) )
+    if ( (colors!=0) && (numberOfColors!=0) )
     {
-     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + normalsLength , colorsLength , colors );                     checkOpenGLError(__FILE__, __LINE__);
+     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals , numberOfColors , colors );                     checkOpenGLError(__FILE__, __LINE__);
     }
-    if ( (texcoords!=0) && (texCoordsLength!=0) )
+    if ( (textureCoords!=0) && (numberOfTextureCoords!=0) )
     {
-     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + normalsLength + colorsLength, texCoordsLength , texcoords ); checkOpenGLError(__FILE__, __LINE__);
+     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals + numberOfColors, numberOfTextureCoords , textureCoords ); checkOpenGLError(__FILE__, __LINE__);
     }
    }
 
@@ -115,29 +131,29 @@ void pushObjectToBufferData(
 
      vNormal = glGetAttribLocation( program, "vNormal" );                                      checkOpenGLError(__FILE__, __LINE__);
      glEnableVertexAttribArray( vNormal );                                                     checkOpenGLError(__FILE__, __LINE__);
-     glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(verticesLength) ); checkOpenGLError(__FILE__, __LINE__);
+     glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) ); checkOpenGLError(__FILE__, __LINE__);
 
 
-    if ( (colors!=0) && (colorsLength!=0) )
+    if ( (colors!=0) && (numberOfColors!=0) )
     {
      vColor = glGetAttribLocation( program, "vColor" );
      glEnableVertexAttribArray( vColor );
-     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( verticesLength + normalsLength ) );
+     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( numberOfVertices + numberOfNormals ) );
      checkOpenGLError(__FILE__, __LINE__);
     }
 
 
     textureStrengthLocation = glGetUniformLocation(program, "textureStrength");  checkOpenGLError(__FILE__, __LINE__);
-    if ( (texcoords!=0) && (texCoordsLength!=0) )
+    if ( (textureCoords!=0) && (numberOfTextureCoords!=0) )
     {
      vTexture = glGetAttribLocation( program, "vTexture" );
      glEnableVertexAttribArray( vTexture );
-     glVertexAttribPointer( vTexture, 2, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( verticesLength + normalsLength + colorsLength) );
+     glVertexAttribPointer( vTexture, 2, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( numberOfVertices + numberOfNormals + numberOfColors) );
      checkOpenGLError(__FILE__, __LINE__);
 
      //textureStrength[0]=1.0;
     } else
-    { textureStrength[0]=0.0; }
+    { /*textureStrength[0]=0.0;*/ }
 
 
 
