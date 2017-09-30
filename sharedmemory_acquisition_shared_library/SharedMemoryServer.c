@@ -8,60 +8,54 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SHMSZ     27
+#include "SharedMemoryServer.h"
 
 struct sharedMemoryDevices
 {
     int shmid;
     key_t key;
     char *shm, *s;
+
+    unsigned int activeFeeds;
+    struct feedInformation feeds[16];
 };
 
 struct sharedMemoryDevices serverDevice[5];
 
 
-int startSharedMemoryBroadcast()
+int startSharedMemoryBroadcast(int devID, unsigned int width , unsigned int height )
 {
+  serverDevice[devID].key = 5678;
+  serverDevice[devID].activeFeeds = 2;
+
+  if ((serverDevice[devID].shmid = shmget(serverDevice[0].key, sizeof(struct sharedMemoryDevices) , IPC_CREAT |0666)) < 0) { fprintf(stderr,"Could not attach shared memory..!\n"); }
+    if ((serverDevice[devID].shm = shmat(serverDevice[0].shmid, NULL, 0)) == (char *) -1) {
+        perror("shmat");
+    }
+
+
 
 }
 
 
-int transmitSharedMemoryFrames(int devID)
+int sharedMemoryServer_pushImageToRemote(int devID, int streamNumber , void* pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
 
     /*
      * We need to get the segment named
      * "5678", created by the server.
      */
-    serverDevice[0].key = 5678;
 
     /*
      * Locate the segment.
      */
-    if ((serverDevice[0].shmid = shmget(serverDevice[0].key, SHMSZ, 0666)) < 0) {
-        perror("shmget");
-    }
+
 
     /*
      * Now we attach the segment to our data space.
      */
-    if ((serverDevice[0].shm = shmat(serverDevice[0].shmid, NULL, 0)) == (char *) -1) {
-        perror("shmat");
-    }
 
-    /*
-     * Now read what the server put in the memory.
-     */
-    for (serverDevice[0].s = serverDevice[0].shm; *serverDevice[0].s != NULL; serverDevice[0].s++)
-        putchar(*serverDevice[0].s);
-    putchar('\n');
 
-    /*
-     * Finally, change the first character of the
-     * segment to '*', indicating we have read
-     * the segment.
-     */
-    *serverDevice[0].shm = '*';
 
     exit(0);
 }

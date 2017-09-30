@@ -1,4 +1,4 @@
-/** @file SharedMemory.h
+/** @file SharedMemoryServer.h
  *  @brief A Way to Send and receive images via Linux SharedMemory
  *
  *  @author Ammar Qammaz (AmmarkoV)
@@ -20,6 +20,8 @@ int sharedMemoryTest();
 
 struct feedInformation
 {
+  void * frame;
+
   unsigned int width;
   unsigned int height;
   unsigned int channels;

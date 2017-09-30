@@ -49,7 +49,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="SharedMemory.h" />
-		 
+		<Unit filename="SharedMemoryServer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SharedMemoryServer.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
