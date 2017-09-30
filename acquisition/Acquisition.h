@@ -113,6 +113,9 @@ struct acquisitionDeviceStates
   //File output
   unsigned char fileOutput;
 
+  //Shared Memory Output
+  unsigned char sharedMemoryOutput;
+
   //Network output
   unsigned char networkOutput;
   int frameServerID ;

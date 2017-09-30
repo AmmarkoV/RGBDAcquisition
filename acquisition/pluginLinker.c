@@ -236,8 +236,6 @@ void * linkFunction(ModuleIdentifier moduleID,char * functionName,char * moduleN
 
 int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
 {
-
-   char *error;
    char functionNameStr[1024]={0};
 
    if (!getPluginPath(modulePossiblePath,moduleLib,functionNameStr,1024))

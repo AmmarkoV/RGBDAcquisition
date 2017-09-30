@@ -1189,6 +1189,11 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
     module[moduleID].device[devID].dryRunOutput=1;
     return 1;
   } else
+  if (strstr(target,"shm://")!=0)
+  {
+    module[moduleID].device[devID].sharedMemoryOutput=1;
+    return 1;
+  } else
   if ( strstr(target,"tcp://")!=0 )
   {
     if (
@@ -1204,7 +1209,9 @@ int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifie
       {
        if  (*startPushingToRemoteNetwork!=0)
          {
-            module[moduleID].device[devID].frameServerID = (*startPushingToRemoteNetwork) ("0.0.0.0",1234);
+            unsigned int width ,height , channels , bitsperpixel;
+            acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
+            module[moduleID].device[devID].frameServerID = (*startPushingToRemoteNetwork) ("0.0.0.0",1234,width ,height);
             module[moduleID].device[devID].networkOutput=1;
             return 1;
          }
@@ -1247,6 +1254,10 @@ int acquisitionStopTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier de
     //If we were using networkOutput lets stop using it!
     if (stopPushingToRemoteNetwork==0) { fprintf(stderr,RED "stopPushingToRemoteNetwork has not been linked to network plugin\n" NORMAL); return 0; }
     return (*stopPushingToRemoteNetwork) (module[moduleID].device[devID].frameServerID);
+  } else
+  if (module[moduleID].device[devID].sharedMemoryOutput)
+  {
+    fprintf(stderr,RED "acquisitionStopTargetForFrames implementation for shared memory pls\n" NORMAL);
   }
   return 1;
 }
@@ -1273,6 +1284,10 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
     acquisitionGetDepthFrame(moduleID,devID);
     //Done doing nothing with our input..!
     EndTimer(FRAME_PASS_TO_TARGET_DELAY);
+  } else
+  if (module[moduleID].device[devID].sharedMemoryOutput)
+  {
+     fprintf(stderr,RED "Implement shm transmission here..\n" NORMAL);
   } else
   if (module[moduleID].device[devID].fileOutput)
   {
@@ -1340,4 +1355,5 @@ int acquisitionSetLocation(ModuleIdentifier moduleID,int newState)
  fprintf(stderr,"acquisitionSetLocation(%u)\n",newState);
  useLocationServices=newState;
  plugins[moduleID].useLocationServicesForThisModule=newState;
+ return 1;
 }
