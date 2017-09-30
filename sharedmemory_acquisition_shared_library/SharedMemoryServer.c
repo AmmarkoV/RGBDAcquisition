@@ -29,9 +29,7 @@ int startSharedMemoryBroadcast(int devID, unsigned int width , unsigned int heig
   serverDevice[devID].activeFeeds = 2;
 
   if ((serverDevice[devID].shmid = shmget(serverDevice[0].key, sizeof(struct sharedMemoryDevices) , IPC_CREAT |0666)) < 0) { fprintf(stderr,"Could not attach shared memory..!\n"); }
-    if ((serverDevice[devID].shm = shmat(serverDevice[0].shmid, NULL, 0)) == (char *) -1) {
-        perror("shmat");
-    }
+  if ((serverDevice[devID].feeds[0] = shmat(serverDevice[0].shmid, NULL, 0)) == (char *) -1) { perror("shmat"); }
 
 
 

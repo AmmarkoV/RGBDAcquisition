@@ -20,12 +20,11 @@ int sharedMemoryTest();
 
 struct feedInformation
 {
-  void * frame;
-
   unsigned int width;
   unsigned int height;
   unsigned int channels;
   unsigned int bitsperpixel;
+  void * frame;
 };
 
 #ifdef __cplusplus
