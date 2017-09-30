@@ -10,51 +10,43 @@
 
 #define SHMSZ     27
 
+struct sharedMemoryDevices
+{
+    int shmid;
+    key_t key;
+    char *shm, *s;
+};
+
+struct sharedMemoryDevices device[5];
 
 int startSharedMemoryModule(unsigned int max_devs,char * settings)
 {
 
 }
 
+int createSharedMemoryDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+{
+  /*
+   * We need to get the segment named * "5678", created by the server.
+   */
+  device[devID].key = 5678;
+
+  /* * Locate the segment. */
+  if ((device[devID].shmid = shmget(device[devID].key, SHMSZ, 0666)) < 0) { return 0; }
+
+  /* * Now we attach the segment to our data space. */
+  if ((device[devID].shm = shmat(device[devID].shmid, NULL, 0)) == (char *) -1) { return 0; }
+
+}
 
 int snapSharedMemoryFrames(int devID)
 {
 
-}
-
-int start()
-{
-    int shmid;
-    key_t key;
-    char *shm, *s;
-
-    /*
-     * We need to get the segment named
-     * "5678", created by the server.
-     */
-    key = 5678;
-
-    /*
-     * Locate the segment.
-     */
-    if ((shmid = shmget(key, SHMSZ, 0666)) < 0) {
-        perror("shmget");
-        exit(1);
-    }
-
-    /*
-     * Now we attach the segment to our data space.
-     */
-    if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
-        perror("shmat");
-        exit(1);
-    }
-
     /*
      * Now read what the server put in the memory.
      */
-    for (s = shm; *s != NULL; s++)
-        putchar(*s);
+    for (device[devID].s = device[devID].shm; *device[devID].s != NULL; device[devID].s++)
+        putchar(*device[devID].s);
     putchar('\n');
 
     /*
@@ -62,13 +54,7 @@ int start()
      * segment to '*', indicating we have read
      * the segment.
      */
-    *shm = '*';
-
-    exit(0);
-}
-
-
-int sharedMemoryTest()
-{
+    *device[devID].shm = '*';
 
 }
+
