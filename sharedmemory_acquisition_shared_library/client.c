@@ -1,4 +1,3 @@
-
 /*
  * shm-client - client program to demonstrate shared memory.
  */
@@ -6,23 +5,10 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #define SHMSZ     27
 
-
-int startSharedMemoryModule(unsigned int max_devs,char * settings)
-{
-
-}
-
-
-int snapSharedMemoryFrames(int devID)
-{
-
-}
-
-int start()
+main()
 {
     int shmid;
     key_t key;
@@ -58,17 +44,11 @@ int start()
     putchar('\n');
 
     /*
-     * Finally, change the first character of the
-     * segment to '*', indicating we have read
+     * Finally, change the first character of the 
+     * segment to '*', indicating we have read 
      * the segment.
      */
     *shm = '*';
 
     exit(0);
-}
-
-
-int sharedMemoryTest()
-{
-
 }
