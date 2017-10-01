@@ -45,6 +45,7 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
+#define MAX_RECORDED_FRAMES 10000
 #define USE_NONDEFAULT_CALIBRATIONS 1
 
 //Initial Frame name , will be overwritten by launch file..!
@@ -64,6 +65,9 @@ image_transport::Publisher pubDepth;
 ros::Publisher pubRGBInfo;
 ros::Publisher pubDepthInfo;
 
+float depthScale=1.0;
+int useFloatDepth=0;
+
 int devID=0,moduleID=0;
 int useRGBDAcqusition=0;
 volatile static bool first = true;
@@ -78,9 +82,12 @@ unsigned int counter = 0;
 unsigned int colorWidth, colorHeight , colorChannels , colorBitsperpixel;
 unsigned int depthWidth, depthHeight , depthChannels , depthBitsperpixel;
 
+unsigned int recording=0;
+unsigned int recordedFrames=0;
+unsigned int frameTimestamp=0;
 
 unsigned int doVisualization=1;
-
+int rate=30;
 
 #if USE_NONDEFAULT_CALIBRATIONS
  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::CameraInfo> RgbdSyncPolicy;
@@ -216,13 +223,13 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
           if (recordedFrames>MAX_RECORDED_FRAMES)
           {
             fprintf(stderr,"Automatic Cut Off of recording activated..");
-            stopDumpInternal();
+           // stopDumpInternal();
           }
 
-
+/*
    runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
                                     (unsigned short*) depthPTR ,  depthWidth , depthHeight ,
-                                     &calib , frameTimestamp );
+                                     &calib , frameTimestamp );*/
 
 
 //if (useFloatDepth)
@@ -431,3 +438,6 @@ int main(int argc, char **argv)
 	catch(...)               { ROS_ERROR("Unknown Error"); return 1; }
 	ROS_ERROR("Shutdown complete");
 	return 0;
+}
+
+

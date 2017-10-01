@@ -46,7 +46,7 @@ catkin_package()
 
 include_directories( ${catkin_INCLUDEDIR} ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDEDIR} )
 add_executable(ros_dumper  src/main.cpp   )
-target_link_libraries(ros_dumper ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}  ${RGBDACQUISITION_LIBRARIES})
+target_link_libraries(ros_dumper ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
 
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 
