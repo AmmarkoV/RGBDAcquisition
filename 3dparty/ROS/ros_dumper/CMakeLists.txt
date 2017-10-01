@@ -8,21 +8,11 @@ if(NOT OpenCV_DIR)
  find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV" HINTS    "/opt/ros/kinetic/share/OpenCV/")
 endif(NOT OpenCV_DIR)
 FIND_PACKAGE(OpenCV REQUIRED)
-
-
-set(RGBDACQUISITION_LIBRARIES  
-    "${CMAKE_CURRENT_SOURCE_DIR}/bin/libCalibrationLibrary.a"
-    "${CMAKE_CURRENT_SOURCE_DIR}/bin/libCodecs.a"
-    "${CMAKE_CURRENT_SOURCE_DIR}/bin/libOperatingSystem.a"
-    "${CMAKE_CURRENT_SOURCE_DIR}/bin/libTimers.a"
-    "${CMAKE_CURRENT_SOURCE_DIR}/bin/libAcquisition.so" 
-) 
-
+ 
 
 find_package(catkin REQUIRED COMPONENTS 
   sensor_msgs 
-  OpenCV 
-  sensor_msgs
+  OpenCV
   cv_bridge 
   roscpp 
   std_msgs 

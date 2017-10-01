@@ -175,6 +175,7 @@ int doDrawOutFrame( unsigned char * rgbFrame , unsigned int rgbWidth , unsigned 
   //After we have our bgr Frame ready and we added the FPS text , lets show it!
   cv::imshow("Received Depth",depthNorm);
   cv::imshow("Received RGB",bgrMat);
+  cv::waitKey(1);
 
   return 1;
 }
@@ -307,14 +308,14 @@ void loopEvent()
   //ROS_INFO("Loop Event started");
   //We spin from this thread to keep thread synchronization problems at bay
   ros::spinOnce();
+     ros::Rate loop_rate_fullSpeed(30); //  hz should be our target performance
+  loop_rate_fullSpeed.sleep();
 }
 
 
 int main(int argc, char **argv)
 {
    ROS_INFO("Starting Up!!");
-
-
    try
 	{
 	 ROS_INFO("Initializing ROS");
@@ -334,10 +335,10 @@ int main(int argc, char **argv)
 
      private_node_handle_.param("frame", frame, std::string("frame"));
      private_node_handle_.param("HTTPTarget", HTTPTarget, std::string("127.0.0.1"));
-     private_node_handle_.param("fromDepthTopic", fromDepthTopic, std::string("/headcam/depth_registered/image_rect"));
-     private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string("/headcam/depth_registered/camera_info"));
-     private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("/headcam/rgb/image_rect_color"));
-     private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/headcam/rgb/camera_info"));
+     private_node_handle_.param("fromDepthTopic", fromDepthTopic, std::string("/camera/depth_registered/image_raw"));
+     private_node_handle_.param("fromDepthTopicInfo", fromDepthTopicInfo, std::string("/camera/depth_registered/camera_info"));
+     private_node_handle_.param("fromRGBTopic", fromRGBTopic, std::string("/camera/rgb/image_raw"));
+     private_node_handle_.param("fromRGBTopicInfo", fromRGBTopicInfo, std::string("/camera/rgb/camera_info"));
      private_node_handle_.param("name", name, std::string("skeleton_detector"));
      private_node_handle_.param("rate", rate, int(5));
      private_node_handle_.param("depth32FC1", useFloatDepth, int(0));
@@ -367,10 +368,6 @@ int main(int argc, char **argv)
      std::cerr<<"ros_dump , Depth feed "<<fromDepthTopic<<" \n";
      std::cerr<<"ros_dump , Depth Info "<<fromDepthTopicInfo<<" \n";
      std::cerr<<"ros_dump , TF Parent ("<<frame<<") \n";
-
-
-
-
 
 
     image_transport::ImageTransport it(nh);
