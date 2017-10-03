@@ -31,10 +31,6 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../../../tools/Primitives/CompareBody/InputParser_C.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../../tools/Primitives/CompareBody/InputParser_C.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
