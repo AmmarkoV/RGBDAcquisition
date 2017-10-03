@@ -57,8 +57,8 @@ int parseFile(const char * filename)
         {
            *foundContentAfterColon=0;
            snprintf(subtype,512,"%s",line);
-           snprintf(content,512,"%s",foundContentAfterColon+1);
-           printf("SUBTYPE(%s)\n",subtype);
+           snprintf(content,512,"%s",foundContentAfterColon+2);
+           printf("SUBTYPE(%s)\n",subtype+2);
            printf("CONTENT(%s)\n",content);
         }
 

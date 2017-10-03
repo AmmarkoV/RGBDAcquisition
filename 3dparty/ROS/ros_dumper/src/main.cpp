@@ -82,7 +82,7 @@ unsigned int counter = 0;
 unsigned int colorWidth, colorHeight , colorChannels , colorBitsperpixel;
 unsigned int depthWidth, depthHeight , depthChannels , depthBitsperpixel;
 
-unsigned int recording=0;
+unsigned int recording=1;
 unsigned int recordedFrames=0;
 unsigned int frameTimestamp=0;
 
@@ -219,8 +219,17 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
  }
 
 
+ if (recording)
+    {
+       char filenameOut[512];
+       snprintf(filenameOut,512,"colorFrame_0_%05u.jpg",recordedFrames);
+       cv::imwrite(filenameOut,orig_rgb_img->image);
 
-          if (recording) { ++recordedFrames; }
+       snprintf(filenameOut,512,"depthFrame_0_%05u.png",recordedFrames);
+       cv::imwrite(filenameOut,orig_depth_img->image);
+
+      ++recordedFrames;
+    }
           if (recordedFrames>MAX_RECORDED_FRAMES)
           {
             fprintf(stderr,"Automatic Cut Off of recording activated..");
