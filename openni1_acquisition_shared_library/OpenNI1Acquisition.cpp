@@ -132,6 +132,7 @@ int startOpenNI1Module(unsigned int max_devs,char * settings)
 
 int mapOpenNI1DepthToRGB(int devID)
 {
+  printf("mapOpenNI1DepthToRGB\n");
   if (!depthGenerators[devID]) { return 0; }
   if (!imageGenerators[devID]) { return 0; }
 
@@ -152,6 +153,7 @@ int mapOpenNI1DepthToRGB(int devID)
 
 int mapOpenNI1RGBToDepth(int devID)
 {
+  printf("mapOpenNI1RGBToDepth\n");
   if (!imageGenerators[devID]) { return 0; }
   if (!depthGenerators[devID]) { return 0; }
 
