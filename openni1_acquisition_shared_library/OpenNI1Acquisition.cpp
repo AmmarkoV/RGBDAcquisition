@@ -315,8 +315,8 @@ char * getOpenNI1ColorPixels(int devID)
 {
     //return (char*) imageGenerators[devID].GetImageMap();
     //return (char*) imageGeneratorsMetaData[devID].Data();
-    //return (char*) imageGenerators[devID].GetRGB24ImageMap();
-    return (char*) imageGeneratorsMetaData[devID].RGB24Data();
+    return (char*) imageGenerators[devID].GetRGB24ImageMap();
+    //return (char*) imageGeneratorsMetaData[devID].RGB24Data();
 }
 
 
