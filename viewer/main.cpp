@@ -235,10 +235,14 @@ if (drawColor)
     //DRAW RGB FRAME -------------------------------------------------------------------------------------
     if ( acquisitionGetColorFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) )
     {
-      Mat rgbImage(Size(width, height), CV_8UC3, (char *) acquisitionGetColorFrame(moduleID,devID) , Mat::AUTO_STEP);
-      Mat bgrImage;
-      cv::cvtColor(rgbImage, rgbImage, CV_RGB2BGR );
-      imshow( "RGB Feed", rgbImage);
+      char * colorFrame = (char *) acquisitionGetColorFrame(moduleID,devID);
+      if (colorFrame)
+      {
+       Mat rgbImage(Size(width, height), CV_8UC3, colorFrame , Mat::AUTO_STEP);
+       Mat bgrImage;
+       cv::cvtColor(rgbImage, rgbImage, CV_RGB2BGR );
+       imshow( "RGB Feed", rgbImage);
+      }
     }
 }
 
@@ -249,11 +253,15 @@ if (drawDepth)
     //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
     if ( acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel) )
     {
-      Mat depthImage(Size(width, height), CV_16UC1, (char *) acquisitionGetDepthFrame(moduleID,devID) , Mat::AUTO_STEP);
-      //Mat depthImageV(depthImage, true);
-      depthImage.convertTo(depthImage, CV_8UC1, 255.0 / 10000);
-      //depthImage.convertTo(depthImageV, CV_8UC1, 1/255);
-      imshow( "Depth Feed", depthImage);
+      char * depthFrame = (char *) acquisitionGetDepthFrame(moduleID,devID);
+      if (depthFrame)
+      {
+       Mat depthImage(Size(width, height), CV_16UC1, depthFrame, Mat::AUTO_STEP);
+       //Mat depthImageV(depthImage, true);
+       depthImage.convertTo(depthImage, CV_8UC1, 255.0 / 10000);
+       //depthImage.convertTo(depthImageV, CV_8UC1, 1/255);
+       imshow( "Depth Feed", depthImage);
+      }
    }
 }
 
