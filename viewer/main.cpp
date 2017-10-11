@@ -229,7 +229,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
     unsigned int colorWidth = 640;
     unsigned int width , height , channels , bitsperpixel;
 
-
+fprintf(stderr,"Color\n");
 if (drawColor)
 {
     //DRAW RGB FRAME -------------------------------------------------------------------------------------
@@ -243,6 +243,7 @@ if (drawColor)
 }
 
 
+fprintf(stderr,"Depth\n");
 if (drawDepth)
 {
     //DRAW DEPTH FRAME -------------------------------------------------------------------------------------
@@ -466,11 +467,9 @@ int main (int argc, char *argv[])
            fprintf(stderr,"Frame Number is : %u\n",frameNum);
         }
         acquisitionStartTimer(0);
-
-        fprintf(stderr,"Snap \n");
+ 
         acquisitionSnapFrames(moduleID,devID);
-
-        fprintf(stderr,"Display \n");
+ 
         acquisitionDisplayFrames(moduleID,devID,framerate);
 
        if (devID2!=UNINITIALIZED_DEVICE)
