@@ -10,6 +10,12 @@
 #include <XnCppWrapper.h>
 #include <XnLog.h>
 
+/* This does not work ..
+if you get an error that you can't find XnOS.h just make sure the makefile is correct..!
+#include <ni/XnOS.h>
+#include <ni/XnCppWrapper.h>
+#include <ni/XnLog.h>
+*/
 
 using namespace std;
 using namespace xn;
