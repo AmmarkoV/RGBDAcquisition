@@ -456,7 +456,9 @@ int main (int argc, char *argv[])
          cvSetMouseCallback(RGBwindowName, CallBackFunc, NULL);
         }
      #endif
+   
 
+   fprintf(stderr,"Ready to enter grabbing loop \n");
    while ( (!stop) && ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) ) )
     {
         if (verbose)
