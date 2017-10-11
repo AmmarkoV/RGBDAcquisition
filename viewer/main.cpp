@@ -229,7 +229,7 @@ int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,un
     unsigned int colorWidth = 640;
     unsigned int width , height , channels , bitsperpixel;
 
-fprintf(stderr,"Color\n");
+//fprintf(stderr,"Color\n");
 if (drawColor)
 {
     //DRAW RGB FRAME -------------------------------------------------------------------------------------
@@ -247,7 +247,7 @@ if (drawColor)
 }
 
 
-fprintf(stderr,"Depth\n");
+//fprintf(stderr,"Depth\n");
 if (drawDepth)
 {
     //DRAW DEPTH FRAME -------------------------------------------------------------------------------------

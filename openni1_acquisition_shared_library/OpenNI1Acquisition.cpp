@@ -287,13 +287,20 @@ int snapOpenNI1Frames(int devID)
  //rc = ctx.WaitAnyUpdateAll();
  //if (rc != XN_STATUS_OK) { printf("Read failed: %s\n", xnGetStatusString(rc)); return 0; }
 
-    rc = imageGenerators[devID].WaitAndUpdateData();
-    if (rc != XN_STATUS_OK) { printf("Image Generator could not wait for new data ( %s )\n",xnGetStatusString(rc)); return 0; }
-    imageGenerators[devID].GetMetaData(imageGeneratorsMetaData[devID]);
 
-    rc = depthGenerators[devID].WaitAndUpdateData();
-    if (rc != XN_STATUS_OK) { printf("Depth Generator could not wait for new data ( %s )\n",xnGetStatusString(rc)); return 0; }
-    depthGenerators[devID].GetMetaData(depthGeneratorsMetaData[devID]);
+    if (imageGenerators[devID])
+      {
+       rc = imageGenerators[devID].WaitAndUpdateData();
+       if (rc != XN_STATUS_OK) { printf("Image Generator could not wait for new data ( %s )\n",xnGetStatusString(rc)); return 0; }
+       imageGenerators[devID].GetMetaData(imageGeneratorsMetaData[devID]);
+      }
+
+    if (depthGenerators[devID])
+      {
+       rc = depthGenerators[devID].WaitAndUpdateData();
+       if (rc != XN_STATUS_OK) { printf("Depth Generator could not wait for new data ( %s )\n",xnGetStatusString(rc)); return 0; }
+       depthGenerators[devID].GetMetaData(depthGeneratorsMetaData[devID]);
+      }
 
  return 1;
 }
@@ -306,10 +313,10 @@ int getOpenNI1ColorChannels(int devID) { return 3; }
 int getOpenNI1ColorBitsPerPixel(int devID) { return 8; }
 char * getOpenNI1ColorPixels(int devID)
 {
-    return (char*) imageGenerators[devID].GetImageMap();
+    //return (char*) imageGenerators[devID].GetImageMap();
     //return (char*) imageGeneratorsMetaData[devID].Data();
     //return (char*) imageGenerators[devID].GetRGB24ImageMap();
-    //return (char*) imageGeneratorsMetaData[devID].RGB24Data();
+    return (char*) imageGeneratorsMetaData[devID].RGB24Data();
 }
 
 
