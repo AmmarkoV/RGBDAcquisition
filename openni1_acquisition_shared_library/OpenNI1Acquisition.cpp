@@ -133,6 +133,7 @@ int startOpenNI1Module(unsigned int max_devs,char * settings)
 int mapOpenNI1DepthToRGB(int devID)
 {
   if (!depthGenerators[devID]) { return 0; }
+  if (!imageGenerators[devID]) { return 0; }
 
   XnBool isSupported = depthGenerators[devID].IsCapabilitySupported("AlternativeViewPoint");
   if(isSupported)
@@ -152,6 +153,7 @@ int mapOpenNI1DepthToRGB(int devID)
 int mapOpenNI1RGBToDepth(int devID)
 {
   if (!imageGenerators[devID]) { return 0; }
+  if (!depthGenerators[devID]) { return 0; }
 
   XnBool isSupported = imageGenerators[devID].IsCapabilitySupported("AlternativeViewPoint");
   if(isSupported)
