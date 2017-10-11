@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "OpenNI1Acquisition.h"
-
+#define BUILD_OPENNI1 1
 
 #if BUILD_OPENNI1
 
@@ -141,10 +141,11 @@ int mapOpenNI1DepthToRGB(int devID)
       if(XN_STATUS_OK != res)
       {
          printf("Getting and setting AlternativeViewPoint failed: %s\n", xnGetStatusString(res));
+         return 0;
       }
+     return 1;
    }
-
-  return 1;
+ return 0;
 }
 
 
@@ -159,10 +160,11 @@ int mapOpenNI1RGBToDepth(int devID)
       if(XN_STATUS_OK != res)
       {
          printf("Getting and setting AlternativeViewPoint failed: %s\n", xnGetStatusString(res));
+         return 0;
       }
+     return 1;
    }
-
-  return 1;
+ return 0;
 }
 
 
@@ -267,7 +269,7 @@ if (imageGeneratorsMetaData[devID].PixelFormat() != XN_PIXEL_FORMAT_RGB24)
 
 
 
- //fprintf(stderr,"We seem to have correctly initialized OpenNI1 %u , %s \n",devID,devName);
+ fprintf(stderr,"We seem to have correctly initialized OpenNI1 %u , %s \n",devID,devName);
  return 1;
 }
 
