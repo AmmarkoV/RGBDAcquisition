@@ -284,8 +284,8 @@ int snapOpenNI1Frames(int devID)
 {
   XnStatus rc = XN_STATUS_OK;
  // Read a new frame
- //rc = ctx.WaitAnyUpdateAll();
- //if (rc != XN_STATUS_OK) { printf("Read failed: %s\n", xnGetStatusString(rc)); return 0; }
+ rc = ctx.WaitAnyUpdateAll();
+ if (rc != XN_STATUS_OK) { printf("Read failed: %s\n", xnGetStatusString(rc)); return 0; }
 
 
     if (imageGenerators[devID])
