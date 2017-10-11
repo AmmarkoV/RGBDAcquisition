@@ -467,8 +467,10 @@ int main (int argc, char *argv[])
         }
         acquisitionStartTimer(0);
 
+        fprintf(stderr,"Snap \n");
         acquisitionSnapFrames(moduleID,devID);
 
+        fprintf(stderr,"Display \n");
         acquisitionDisplayFrames(moduleID,devID,framerate);
 
        if (devID2!=UNINITIALIZED_DEVICE)
