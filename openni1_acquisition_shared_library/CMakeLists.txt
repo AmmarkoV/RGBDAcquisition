@@ -11,7 +11,7 @@ LINK_DIRECTORIES(${OPENNI1_LIBRARY_DIRS})
 
 
 add_library(OpenNI1Acquisition SHARED OpenNI1Acquisition.cpp OpenNI1Acquisition.h ) 
-target_link_libraries(OpenNI1Acquisition rt CalibrationLibrary ${OPENNI1_LIBRARIES} ) 
+target_link_libraries(OpenNI1Acquisition rt CalibrationLibrary ${OPENNI1_LIBRARIES}  OpenNI ) 
 
 
 set_target_properties(OpenNI1Acquisition PROPERTIES 
