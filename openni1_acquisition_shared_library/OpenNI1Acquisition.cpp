@@ -244,12 +244,14 @@ int createOpenNI1Device(int devID,char * devName,unsigned int width,unsigned int
     imageGenerators[devID].GetMirrorCap().SetMirror(false);
     imageGenerators[devID].GetMetaData(imageGeneratorsMetaData[devID]);
 
-
     fprintf(stderr,"Image grabber @ %ux%u\n",imageGeneratorsMetaData[devID].FullXRes(),imageGeneratorsMetaData[devID].FullYRes());
 
+/*------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------ */
 
-    //rc = ctx.StartGeneratingAll();
-    //if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not start generating everything",rc);  }
+    rc = ctx.StartGeneratingAll();
+    if (rc != XN_STATUS_OK) {  SignalOpenNIError("Could not start generating everything",rc);  }
 
 
     // Hybrid mode isn't supported in this sample
