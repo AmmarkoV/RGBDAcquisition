@@ -163,13 +163,27 @@ int parseFile(const char * filename)
 
 
 
+int parseSTDIN()
+{
+	int ch;
+	/* read character by character from stdin */
+	do {
+		ch = fgetc(stdin);
+		putchar(ch);
+	} while (ch != EOF);
+  return 1;
+}
+
+
+
 int main(int argc, char** argv)
 {
     if (argc<=1)
     {
-        fprintf(stderr,"No arguments provided..\n");
-        return 1;
+      return ( parseSTDIN() == 1 );
+    } else
+    {
+      return ( parseFile(argv[1]) == 1 );
     }
-    parseFile(argv[1]);
     return 0;
 }
