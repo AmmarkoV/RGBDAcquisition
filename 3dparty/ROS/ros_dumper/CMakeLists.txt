@@ -39,8 +39,14 @@ add_executable(ros_dumper  src/main.cpp   )
 target_link_libraries(ros_dumper ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
 
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
+ 
+#Put output at bin folder
+set_target_properties(${PROJECT_NAME} PROPERTIES 
+                          ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
+                          LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
+                          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
+                         )
 
-install(TARGETS ros_dumper RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-#install(FILES ros_dumper.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(FILES ${PROJECT_NAME}.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 

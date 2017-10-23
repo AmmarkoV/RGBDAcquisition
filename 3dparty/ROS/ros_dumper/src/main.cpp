@@ -86,6 +86,8 @@ unsigned int recording=1;
 unsigned int recordedFrames=0;
 unsigned int frameTimestamp=0;
 
+ros::Time begin;
+
 unsigned int doVisualization=1;
 int rate=30;
 
@@ -181,6 +183,21 @@ int doDrawOutFrame( unsigned char * rgbFrame , unsigned int rgbWidth , unsigned 
 }
 
 
+int appendTimestamps(const char * fileout,unsigned int recordedFrames,unsigned long timestamp)
+{
+  if (recordedFrames==0) 
+  { 
+     FILE * fp = fopen(fileout,"w");
+     if (fp!=0) {fprintf(fp,"%%time\n%lu\n",timestamp); fclose(fp); return 1; }  
+  }
+   else
+  {
+    FILE * fp = fopen(fileout,"a");
+    if (fp!=0) { fprintf(fp,"%lu\n",timestamp); fclose(fp); return 1; } 
+  }
+  return 0;
+}
+
 
 #if USE_NONDEFAULT_CALIBRATIONS
 //RGBd Callback is called every time we get a new pair of frames , it is synchronized to the main thread
@@ -217,17 +234,25 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
   depthPTR = (unsigned short*) orig_depth_img->image.data;
  }
-
-
+ 
+  
  if (recording)
     {
+       ros::Time time = ros::Time::now();
+       if ( recordedFrames==0) { begin=time; }       
+
+       
+       ros::Duration timestamp = time - begin; 
+       //appendTimestamps("imageTimestamps",recordedFrames,(unsigned long) timestamp.toNSec()/1000000);
+       appendTimestamps("imageTimestamps",recordedFrames,time.toNSec());
+ 
        char filenameOut[512];
        snprintf(filenameOut,512,"colorFrame_0_%05u.jpg",recordedFrames);
        cv::imwrite(filenameOut,orig_rgb_img->image);
 
        snprintf(filenameOut,512,"depthFrame_0_%05u.png",recordedFrames);
        cv::imwrite(filenameOut,orig_depth_img->image);
-
+        
       ++recordedFrames;
     }
           if (recordedFrames>MAX_RECORDED_FRAMES)
