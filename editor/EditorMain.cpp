@@ -190,6 +190,7 @@ const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
 const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
+const long EditorFrame::ID_MENUSCANHUMAN = wxNewId();
 const long EditorFrame::idMenuQuit = wxNewId();
 const long EditorFrame::ID_MENUSEGMENTATION = wxNewId();
 const long EditorFrame::ID_MENUGETEXTRINSICS = wxNewId();
@@ -282,6 +283,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     MenuItem5->Enable(false);
     MenuItem4 = new wxMenuItem(Menu1, ID_MENUSAVEPCD, _("Save Frame as PCD"), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(MenuItem4);
+    MenuItem11 = new wxMenuItem(Menu1, ID_MENUSCANHUMAN, _("Scan Human"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem11);
     MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
     Menu1->Append(MenuItem1);
     MenuBar1->Append(Menu1, _("&File"));

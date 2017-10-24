@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="ScanHuman">
+		<size>669,543</size>
+		<pos_arg>1</pos_arg>
+		<size_arg>1</size_arg>
+		<object class="wxGauge" name="ID_GAUGE1" variable="Progress" member="yes">
+			<pos>24,496</pos>
+			<size>608,28</size>
+		</object>
+		<object class="wxStaticBox" name="ID_STATICBOX1" variable="StaticBox1" member="yes">
+			<label>Scan Human Dataset</label>
+			<pos>16,8</pos>
+			<size>632,520</size>
+		</object>
+		<object class="wxButton" name="ID_BUTTON1" variable="ButtonCapture" member="yes">
+			<label>Capture</label>
+			<pos>24,72</pos>
+			<size>128,30</size>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrlDataset" member="yes">
+			<pos>24,40</pos>
+			<size>128,28</size>
+		</object>
+		<object class="wxButton" name="ID_BUTTON2" variable="ButtonRestart" member="yes">
+			<label>Restart</label>
+			<pos>24,104</pos>
+			<size>128,30</size>
+		</object>
+	</object>
+</wxsmith>

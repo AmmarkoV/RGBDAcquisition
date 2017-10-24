@@ -269,6 +269,9 @@
 				<object class="wxMenuItem" name="ID_MENUSAVEPCD" variable="MenuItem4" member="yes">
 					<label>Save Frame as PCD</label>
 				</object>
+				<object class="wxMenuItem" name="ID_MENUSCANHUMAN" variable="MenuItem11" member="yes">
+					<label>Scan Human</label>
+				</object>
 				<object class="wxMenuItem" name="idMenuQuit" variable="MenuItem1" member="no">
 					<label>Quit</label>
 					<accel>Alt-F4</accel>

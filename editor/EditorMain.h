@@ -158,6 +158,7 @@ class EditorFrame: public wxFrame
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
         static const long ID_MENUSAVEPCD;
+        static const long ID_MENUSCANHUMAN;
         static const long idMenuQuit;
         static const long ID_MENUSEGMENTATION;
         static const long ID_MENUGETEXTRINSICS;
@@ -200,6 +201,7 @@ class EditorFrame: public wxFrame
         wxMenu* Menu4;
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;
+        wxMenuItem* MenuItem11;
         wxStaticText* StaticText7;
         wxButton* ButtonAcquisitionGraph;
         wxButton* ButtonAF;
