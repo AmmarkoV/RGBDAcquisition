@@ -80,6 +80,7 @@ class EditorFrame: public wxFrame
         void OncurrentFrameTextCtrlText(wxCommandEvent& event);
         void OnFrameSliderCmdScroll(wxScrollEvent& event);
         void OnButtonSegmentationClick(wxCommandEvent& event);
+        void OnButtonScanHuman(wxCommandEvent& event);
         void OnButtonCalibrationClick(wxCommandEvent& event);
         void OnbuttonRecordClick(wxCommandEvent& event);
         void OnButtonAcquisitionGraphClick(wxCommandEvent& event);

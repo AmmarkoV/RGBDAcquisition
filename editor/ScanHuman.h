@@ -37,6 +37,7 @@ class ScanHuman: public wxDialog
 	private:
 
 		//(*Handlers(ScanHuman)
+		void OnButtonCaptureClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

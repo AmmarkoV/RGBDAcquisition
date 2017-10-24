@@ -21,6 +21,7 @@
 #include "SelectModule.h"
 #include "SelectTarget.h"
 #include "SelectSegmentation.h"
+#include "ScanHuman.h"
 #include "GetExtrinsics.h"
 #include "AddNewElement.h"
 
@@ -354,6 +355,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_MENUOPENMODULE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnOpenModule);
     Connect(ID_MENUSEGMENTATION,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
     Connect(ID_MENUGETEXTRINSICS,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonGetExtrinsics);
+    Connect(ID_MENUSCANHUMAN,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonScanHuman);
 
     Connect(ID_MENUOVERLAYEDITOR,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OpenOverlayEditor);
 
@@ -1163,7 +1165,8 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
      }
     }
 
-  wxYield();
+  //wxYield();
+  wxYieldIfNeeded();
   //wxThread::Sleep(0.4);
 }
 
@@ -1232,6 +1235,27 @@ void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
     guiSnapFrames(1); //Get New Frames
     Refresh(); // <- This draws the window!
 }
+
+
+
+void EditorFrame::OnButtonScanHuman(wxCommandEvent& event)
+{
+ //OnButtonScanHuman(wxCommandEvent& event);
+ ScanHuman  * scanHumanMenu = new ScanHuman(this, wxID_ANY);
+
+ scanHumanMenu->ShowModal();
+
+ delete  scanHumanMenu;
+
+
+ refreshAllOverlays();
+ lastFrameDrawn+=1000;
+ guiSnapFrames(0); //Get New Frames
+ Refresh();
+}
+
+
+
 
 void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 {
