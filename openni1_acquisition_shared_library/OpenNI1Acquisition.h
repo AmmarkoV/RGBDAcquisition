@@ -31,6 +31,10 @@ extern "C"
    int destroyOpenNI1Device(int devID);
    int snapOpenNI1Frames(int devID);
 
+
+   int getTotalOpenNI1FrameNumber(int devID);
+   int getCurrentOpenNI1FrameNumber(int devID);
+
    //Color Frame getters
    int getOpenNI1ColorWidth(int devID);
    int getOpenNI1ColorHeight(int devID);

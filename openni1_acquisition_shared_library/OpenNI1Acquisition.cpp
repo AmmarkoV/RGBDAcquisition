@@ -29,6 +29,8 @@ Device devices[MAX_OPENNI_DEVICES];
 DepthGenerator depthGenerators[MAX_OPENNI_DEVICES]={0};
 ImageGenerator imageGenerators[MAX_OPENNI_DEVICES]={0};
 
+unsigned int currentAllocatedDevices = 0;
+
 DepthMetaData depthGeneratorsMetaData[MAX_OPENNI_DEVICES];
 ImageMetaData imageGeneratorsMetaData[MAX_OPENNI_DEVICES];
 ScriptNode script;
@@ -43,7 +45,7 @@ Context ctx;
 
 int startOpenNI1Module(unsigned int max_devs,char * settings)
 {
-
+ currentAllocatedDevices  = max_devs;
  EnumerationErrors errors;
  XnStatus rc;
 
@@ -306,6 +308,34 @@ int snapOpenNI1Frames(int devID)
 
  return 1;
 }
+
+
+int badDeviceID(int devID,const char * callFile,unsigned int callLine)
+{
+  if (devID<=currentAllocatedDevices) { return 0; }
+  fprintf(stderr,"Bad Device ID detected (%i/%i) , File %s : Line %u , ignoring request\n",devID,currentAllocatedDevices,callFile,callLine);
+  return 1;
+}
+
+
+
+
+int getTotalOpenNI1FrameNumber(int devID)
+{
+  if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+  #warning "Todo , check here for oni file length etc..\n"
+  //fprintf(stderr,"Todo , check here for oni file length etc..\n");
+  return 0;
+}
+
+int getCurrentOpenNI1FrameNumber(int devID)
+{
+  if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+  unsigned int frameNumber = xnGetFrameID(imageGenerators[devID]);
+  //fprintf(stderr,"xnGetFrameID = %u \n",frameNumber);
+  return frameNumber;
+}
+
 
 //Color Frame getters
 int getOpenNI1ColorWidth(int devID) { return imageGeneratorsMetaData[devID].FullXRes(); }
