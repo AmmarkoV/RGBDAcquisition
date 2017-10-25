@@ -1157,16 +1157,20 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
          acquisitionPassFramesToTarget(moduleID,devID,recordedFrames,compressRecordingOutput);
          ++recordedFrames;
 
-         if (recordedFrames % 3 == 0 ) { Refresh(); /*Throttle window refreshes when recording*/}
+         if (recordedFrames % 3 == 0 )
+            {
+              Refresh(); /*Throttle window refreshes when recording*/
+              wxYieldIfNeeded();
+            }
      } else
      {
        Refresh();
+       wxYieldIfNeeded();
        //if (framesDrawn%2 == 0 ) { Refresh();  /*Throttle window refreshes when viewing*/ }
      }
     }
 
   //wxYield();
-  wxYieldIfNeeded();
   //wxThread::Sleep(0.4);
 }
 
