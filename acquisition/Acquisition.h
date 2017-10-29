@@ -273,7 +273,7 @@ unsigned char * convertShortDepthTo3CharDepth(unsigned short * depth,unsigned in
  * @param String with the friendly name of a module
  * @retval 0 or NO_ACQUISITION_MODULE means that input was incorrect , On Success on of enum Acquisition_Possible_Modules values will be returned
  */
-ModuleIdentifier getModuleIdFromModuleName(char * moduleName);
+ModuleIdentifier getModuleIdFromModuleName(const char * moduleName);
 
 
 /**

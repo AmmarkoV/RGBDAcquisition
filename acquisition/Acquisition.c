@@ -167,7 +167,7 @@ int acquisitionGetModulesCount()
 }
 
 
-ModuleIdentifier getModuleIdFromModuleName(char * moduleName)
+ModuleIdentifier getModuleIdFromModuleName(const char * moduleName)
 {
    ModuleIdentifier moduleID = 0;
           if (strcasecmp("FREENECT",moduleName)==0 )  { moduleID = FREENECT_ACQUISITION_MODULE; } else
