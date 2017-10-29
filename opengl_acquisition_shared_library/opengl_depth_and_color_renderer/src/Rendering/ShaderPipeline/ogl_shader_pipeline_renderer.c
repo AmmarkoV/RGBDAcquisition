@@ -1,4 +1,3 @@
-#define USE_GLEW 1
 
 #if USE_GLEW
 #include <GL/glew.h>
@@ -167,6 +166,7 @@ void pushObjectToBufferData(
 int startOGLShaderPipeline()
 {
 #if USE_GLEW
+#warning "Using GLEW"
   glewInit();
   fprintf(stderr,"Using GLEW %s \n",glewGetString(GLEW_VERSION));
 
