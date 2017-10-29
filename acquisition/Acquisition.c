@@ -66,7 +66,7 @@ int acquisitionSimulateTime(unsigned long timeInMillisecs)
   return 1;
 }
 
-unsigned long GetTickCount()
+unsigned long acquisitionGetTickCount()
 {
    if (simulateTick) { return simulatedTickValue; }
    return GetTickCountMilliseconds();
@@ -85,7 +85,7 @@ int acquisitionFileExists(char * filename)
   return 0;
 }
 
-int makepath(char * path)
+int makepath(const char * path)
 {
   if (path==0) { return 0; }
     char command[2048];
@@ -326,7 +326,7 @@ int acquisitionGetModuleCapabilities(ModuleIdentifier moduleID , DeviceIdentifie
 }
 
 
-int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings)
+int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,const char * settings)
 {
    #if ENABLE_LOCATION_SERVICE
    if (useLocationServices)
@@ -437,7 +437,7 @@ int acquisitionChangeResolution(ModuleIdentifier moduleID,DeviceIdentifier devID
 }
 
 
-int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     printCall(moduleID,devID,"acquisitionOpenDevice", __FILE__, __LINE__);
     if (plugins[moduleID].createDevice!=0) { return (*plugins[moduleID].createDevice) (devID,devName,width,height,framerate); }
@@ -522,7 +522,7 @@ int acquisitionControlFlow(ModuleIdentifier moduleID,DeviceIdentifier devID,floa
 
 int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-   unsigned int processorsCalled=0;
+   //unsigned int processorsCalled=0;
    unsigned int colorWidth, colorHeight, colorChannels, colorBitsperpixel;
    unsigned int depthWidth, depthHeight, depthChannels, depthBitsperpixel;
 
@@ -624,7 +624,7 @@ int savePCD_PointCloudNoEmpty(char * filename ,unsigned short * depthFrame ,unsi
 }
 
 
-int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
 {
   return _acfo_acquisitionSavePCDPointCoud(moduleID,devID,filename);
 }
@@ -673,25 +673,25 @@ int acquisitionSaveTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID,co
 }
 
 
-int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
+int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename, int compress)
 {
   return _acfo_acquisitionSaveColorFrame(moduleID,devID,filename, compress);
 }
 
 
-int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
+int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename, int compress)
 {
   return _acfo_acquisitionSaveDepthFrame(moduleID,devID,filename, compress);
 }
 
 
-int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
 {
   return _acfo_acquisitionSaveColoredDepthFrame(moduleID,devID, filename);
 }
 
 
-int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
 {
   return  _acfo_acquisitionSaveDepthFrame1C(moduleID,devID, filename);
 }
@@ -934,7 +934,7 @@ int acquisitionOverrideDepthFrame(ModuleIdentifier moduleID , DeviceIdentifier d
   //In case the frame is not allocated ( or it was but it was not big enough ) , we have to malloc a new memory chunk to accomodate our frame
   if ( module[moduleID].device[devID].overrideDepthFrame==0 )
   {
-      module[moduleID].device[devID].overrideDepthFrame = ( unsigned char * ) malloc(newDepthByteSize /* *sizeof(unsigned short) */ );
+      module[moduleID].device[devID].overrideDepthFrame = ( unsigned short * ) malloc(newDepthByteSize /* *sizeof(unsigned short) */ );
       if (module[moduleID].device[devID].overrideDepthFrame==0)
       {
         module[moduleID].device[devID].overrideDepthFrameByteSize  = 0;
@@ -1182,7 +1182,7 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
 /*
    LAST BUT NOT LEAST acquisition can also relay its state through a TCP/IP network
 */
-int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,char * target)
+int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * target)
 {
   if (strstr(target,"/dev/null")!=0)
   {
@@ -1330,7 +1330,7 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
 
 
 
-int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName,char * processorLibPath,int argc, char *argv[])
+int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * processorName,const char * processorLibPath,int argc,const char *argv[])
 {
   unsigned int weSucceeded=0;
   unsigned int where2LoadProcessor = module[moduleID].device[devID].processorsLoaded;

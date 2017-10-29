@@ -4,14 +4,17 @@
 #include "Acquisition.h"
 
 
-int _acfo_savePCD_PointCloud(char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy );
+unsigned int _acfo_simplePow(unsigned int base,unsigned int exp);
+
+
+int _acfo_savePCD_PointCloud(const char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy );
 
 
 
-int _acfo_savePCD_PointCloudNoEmpty(char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy );
+int _acfo_savePCD_PointCloudNoEmpty(const char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy );
 
 
-int _acfo_acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+int _acfo_acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
 
 
 int _acfo_swapEndiannessPNM(void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel);
@@ -34,13 +37,13 @@ unsigned char * _acfo_convertShortDepthToCharDepth(unsigned short * depth,unsign
 unsigned char * _acfo_convertShortDepthTo3CharDepth(unsigned short * depth,unsigned int width , unsigned int height , unsigned int min_depth , unsigned int max_depth);
 
 
-int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress);
+int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename, int compress);
 
-int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress);
+int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename, int compress);
 
 
-int _acfo_acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+int _acfo_acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
 
-int _acfo_acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+int _acfo_acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
 
 #endif // ACQUISITIONFILEOUTPUT_H_INCLUDED

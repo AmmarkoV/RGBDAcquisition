@@ -19,7 +19,7 @@ unsigned int processorsLoaded=0;
 struct acquisitionProcessorInterface processors[MAX_NUMBER_OF_PROCESSORS]={0};
 
 
-void * linkProcessorFunction(int moduleID,char * functionName,char * moduleName)
+void * linkProcessorFunction(int moduleID,const char * functionName,const char * moduleName)
 {
   char functionNameStr[1024]={0};
   char *error;
@@ -34,7 +34,7 @@ void * linkProcessorFunction(int moduleID,char * functionName,char * moduleName)
 
 
 
-int linkToProcessor(char * processorName,char * processorLibPath ,  int processorID)
+int linkToProcessor(const char * processorName,const char * processorLibPath ,  int processorID)
 {
    processors[processorID].handle = dlopen (processorName, RTLD_LAZY);
    if (!processors[processorID].handle)
@@ -81,7 +81,7 @@ int closeAllProcessors()
   return 0;
 }
 
-int bringProcessorOnline(char * processorName,char * processorLibPath,unsigned int *loadedID,int argc, char *argv[])
+int bringProcessorOnline(const char * processorName,const char * processorLibPath,unsigned int *loadedID,int argc,const char *argv[])
 {
  fprintf(stderr,"bringProcessorOnline not implemented\n");
  unsigned int where2TryToLoad = processorsLoaded;

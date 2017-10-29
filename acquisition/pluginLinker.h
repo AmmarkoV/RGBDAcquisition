@@ -42,7 +42,7 @@ struct acquisitionPluginInterface
 
    int (*getModuleCapabilities) (int ,int);
 
-   int (*startModule) (unsigned int,char *);
+   int (*startModule) (unsigned int,const char *);
    int (*stopModule) ();
 
    int (*mapDepthToRGB) (int);
@@ -51,7 +51,7 @@ struct acquisitionPluginInterface
 
    int (*listDevices) (int,char *,unsigned int);
    int (*changeResolution) (unsigned int,unsigned int);
-   int (*createDevice)  (int,char *,unsigned int,unsigned int,unsigned int);
+   int (*createDevice)  (int,const char *,unsigned int,unsigned int,unsigned int);
    int (*destroyDevice) (int);
 
 
