@@ -24,13 +24,14 @@
 
 1386338530 /home/ammar/Documents/Programming/FORTH/input_acquisition/acquisition/acquisition_setup.h
 
-1431613946 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.h
+1503761014 /home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.h
 
-1444724121 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.c
+1503761014 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/templateAcquisitionHelper.c
 	"templateAcquisitionHelper.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+	<sys/stat.h>
 	"../tools/Codecs/codecs.h"
 
 1423836254 source:/home/ammar/Documents/Programming/FORTH/input_acquisition/template_acquisition_shared_library/TemplateAcquisition.c
@@ -52,7 +53,8 @@
 	"pngInput.h"
 	"ppmInput.h"
 
-1444312143 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/codecs.h
+1461443498 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/codecs.h
+	"../Primitives/image.h"
 
 1372525293 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Codecs/jpgInput.h
 	"codecs.h"
@@ -145,4 +147,6 @@
 	"../Primitives/image.h"
 
 1460647486 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Primitives/image.h
+
+1458492977 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/image.h
 

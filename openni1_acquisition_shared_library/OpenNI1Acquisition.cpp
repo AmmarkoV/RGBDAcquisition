@@ -43,7 +43,7 @@ Context ctx;
 #endif
 
 
-int startOpenNI1Module(unsigned int max_devs,char * settings)
+int startOpenNI1Module(unsigned int max_devs,const char * settings)
 {
  currentAllocatedDevices  = max_devs;
  EnumerationErrors errors;
@@ -56,7 +56,10 @@ int startOpenNI1Module(unsigned int max_devs,char * settings)
     if (strstr(settings,".xml")!=0) { useXMLFile=1; }
    }
 
-   if (useXMLFile) { rc = ctx.InitFromXmlFile(settings); } else
+   if (useXMLFile) {
+                     rc = ctx.InitFromXmlFile(settings);  //call to ‘xnInitFromXmlFile’ declared with attribute warning: This function is deprecated: Please use xnInitFromXmlFileEx() instead
+                     //rc=ctx.xnInitFromXmlFileEx()
+                   } else
                    { rc = ctx.Init(); }
 
  if (rc == XN_STATUS_NO_NODE_PRESENT)
@@ -185,7 +188,7 @@ int stopOpenNI1Module()
 }
 
 
-int SignalOpenNIError(char * description , XnStatus rc)
+int SignalOpenNIError(const char * description , XnStatus rc)
 {
   if (rc != XN_STATUS_OK) { printf("Error : %s ( %s )\n",description,xnGetStatusString(rc)); return 1; }
   return 0;
@@ -193,7 +196,7 @@ int SignalOpenNIError(char * description , XnStatus rc)
 
 
    //Basic Per Device Operations
-int createOpenNI1Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int createOpenNI1Device(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     XnStatus rc;
     XnMapOutputMode mapMode;

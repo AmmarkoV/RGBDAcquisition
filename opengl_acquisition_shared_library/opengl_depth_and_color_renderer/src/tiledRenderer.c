@@ -3,6 +3,7 @@
 #include "tiledRenderer.h"
 
 #include <stdio.h>
+#include "../../../tools/AmMatrix/matrixProject.h"
 
 #include "TrajectoryParser/TrajectoryParser.h"
 #include "ModelLoader/model_loader.h"
@@ -47,7 +48,7 @@ int tiledRenderer_get2DCenter(void * trConf ,
 
       //fprintf(stderr,"Column/Row %u/%u ( %0.2f,%0.2f,%0.2f ) -> %0.2f %0.2f %0.2f\n",column, x3D , y3D , z3D , row , winX , winY , winZ);
 
-      struct tiledRendererConfiguration * trConfPTR = (struct tiledRendererConfiguration *) trConf;
+      //struct tiledRendererConfiguration * trConfPTR = (struct tiledRendererConfiguration *) trConf;
       *x2D = win[0];
       *y2D = win[1];
       *z2D = win[2];
@@ -109,6 +110,7 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
         trConf->op.angZStep=0;
 
       fprintf(stderr,"Drawing starts @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",trConf->op.posXBegining,trConf->op.posYBegining  ,  trConf->angleX-trConf->angXVariance , trConf->angleY-trConf->angYVariance , trConf->angleZ);
+ return 1;
 }
 
 
@@ -153,7 +155,7 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
          mod->scaleY = scene->object[i].scaleY;
          mod->scaleZ = scene->object[i].scaleZ;
 
-        int x,y,z;
+        unsigned int x,y;
 
         tiledRenderer_CalculateLoops(trConf);
 

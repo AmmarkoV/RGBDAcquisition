@@ -155,7 +155,7 @@ int disableTemplateStream(int devID,unsigned int streamID)
 
 
 
-int startTemplateModule(unsigned int max_devs,char * settings)
+int startTemplateModule(unsigned int max_devs,const char * settings)
 {
     unsigned int devID = 0;
     for (devID=0; devID<MAX_TEMPLATE_DEVICES; devID++)
@@ -225,7 +225,7 @@ int listTemplateDevices(int devID,char * output, unsigned int maxOutput)
 }
 
 
-int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int createTemplateDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
  // We may want to start from a non zero frame : device[devID].cycle=0;
  fprintf(stderr,"Creating a template device starting from frame %u \n",device[devID].cycle);
@@ -542,7 +542,7 @@ int controlTemplateFlow(int devID,float newFlowState)
 
 int seekRelativeTemplateFrame(int devID,signed int seekFrame)
 {
-  if (!deviceIsSafeToUse(devID)) { fprintf(stderr,YELLOW "Device %u is not safe to use At %s , Line %u" NORMAL , __FILE__ , __LINE__ ); return 0; }
+  if (!deviceIsSafeToUse(devID)) { fprintf(stderr,YELLOW "Device %u is not safe to use At %s , Line %u" NORMAL , devID, __FILE__ , __LINE__ ); return 0; }
 
   if (device[devID].cycle + seekFrame < 0 )  { device[devID].cycle=0; } else
                                              { device[devID].cycle += seekFrame; }
@@ -551,7 +551,7 @@ int seekRelativeTemplateFrame(int devID,signed int seekFrame)
 
 int seekTemplateFrame(int devID,unsigned int seekFrame)
 {
-  if (!deviceIsSafeToUse(devID)) { fprintf(stderr,YELLOW "Device %u is not safe to use At %s , Line %u" NORMAL , __FILE__ , __LINE__ ); return 0; }
+  if (!deviceIsSafeToUse(devID)) { fprintf(stderr,YELLOW "Device %u is not safe to use At %s , Line %u" NORMAL , devID , __FILE__ , __LINE__ ); return 0; }
 
   device[devID].cycle = seekFrame;
   return 1;

@@ -20,7 +20,7 @@ struct calibration calibRGB;
 struct calibration calibDepth;
 
 
-int startOpenGLModule(unsigned int max_devs,char * settings)
+int startOpenGLModule(unsigned int max_devs,const char * settings)
 {
   return 1;
 }
@@ -35,7 +35,7 @@ int stopOpenGLModule()
    return 1;
 }
 
-int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
   if ( ( openGL_WIDTH <= width ) &&  ( openGL_HEIGHT <= height ) )
    {

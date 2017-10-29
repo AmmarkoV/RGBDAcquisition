@@ -97,7 +97,7 @@ enum howToOpenDevice
 
 
 
-int initializeOpenNI(unsigned int MAX_DEVICES_NEEDED,char * settings)
+int initializeOpenNI(unsigned int MAX_DEVICES_NEEDED,const char * settings)
 {
    unsigned int openMode=OPENNI2_OPEN_REGULAR_ENUM;
    if (settings!=0)
@@ -220,7 +220,7 @@ const char * getURIForDeviceNumber(int deviceNumber,char * outURI,unsigned int m
    return openni::ANY_DEVICE;
 }
 
-int initializeOpenNIDevice(int deviceID , char * deviceName  , Device &device , VideoStream &color , VideoStream &depth ,unsigned int width ,unsigned int height , unsigned int fps)
+int initializeOpenNIDevice(int deviceID ,const  char * deviceName  , Device &device , VideoStream &color , VideoStream &depth ,unsigned int width ,unsigned int height , unsigned int fps)
 {
    unsigned int openMode=OPENNI2_OPEN_REGULAR_ENUM; /* 0 = regular deviceID and enumeration*/
    if (deviceName!=0)
@@ -493,7 +493,7 @@ int badDeviceID(int devID,const char * callFile,unsigned int callLine)
 }
 
 
-int startOpenNI2Module(unsigned int max_devs,char * settings)
+int startOpenNI2Module(unsigned int max_devs,const char * settings)
 {
     currentAllocatedDevices  = max_devs;
     int retres = initializeOpenNI(max_devs,settings);
@@ -574,7 +574,7 @@ int snapOpenNI2Frames(int devID)
   return retres;
 }
 
-int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int createOpenNI2Device(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
   if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
     if (! initializeOpenNIDevice(devID,devName,device[devID],color[devID],depth[devID],width,height,framerate) )

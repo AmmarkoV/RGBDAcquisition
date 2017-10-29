@@ -20,7 +20,7 @@ extern "C"
    #endif
 
    //Initialization of Template
-   int startTemplateModule(unsigned int max_devs,char * settings);
+   int startTemplateModule(unsigned int max_devs,const char * settings);
    //TemplateAcquisition does not conflict with anything so we default to building it
    #define BUILD_TEMPLATE 1
 
@@ -40,7 +40,7 @@ extern "C"
 
    //Basic Per Device Operations
    int listTemplateDevices(int devID,char * output, unsigned int maxOutput);
-   int createTemplateDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+   int createTemplateDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyTemplateDevice(int devID);
 
    int getTotalTemplateFrameNumber(int devID);

@@ -15,7 +15,7 @@ extern "C"
 
 
    //Initialization of OpenNI2
-   int startOpenNI2Module(unsigned int max_devs,char * settings);
+   int startOpenNI2Module(unsigned int max_devs,const char * settings);
 
    #if BUILD_OPENNI2
    int getOpenNI2NumberOfDevices(); // This has to be called AFTER startOpenNI2
@@ -25,7 +25,7 @@ extern "C"
    int mapOpenNI2RGBToDepth(int devID);
 
    //Basic Per Device Operations
-   int createOpenNI2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+   int createOpenNI2Device(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyOpenNI2Device(int devID);
    int snapOpenNI2Frames(int devID);
 

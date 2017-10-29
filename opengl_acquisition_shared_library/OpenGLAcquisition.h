@@ -21,12 +21,12 @@ extern "C"
 #include "../acquisition/acquisition_setup.h"
 
 
-int startOpenGLModule(unsigned int max_devs,char * settings);
+int startOpenGLModule(unsigned int max_devs,const char * settings);
 
 #if BUILD_OPENGL
 int getOpenGLNumberOfDevices() ;
 int stopOpenGLModule() ;
-int createOpenGLDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate) ;
+int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate) ;
 int destroyOpenGLDevice(int devID) ;
 
 

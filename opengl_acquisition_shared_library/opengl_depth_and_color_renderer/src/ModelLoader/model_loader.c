@@ -11,7 +11,9 @@
 
 //For now only using the fixed pipeline renderer..
 #include "../Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h"
+#include "../Rendering/ogl_rendering.h"
 
+#include "../../../../tools/AmMatrix/matrixProject.h"
 
 #include "model_loader.h"
 #include "model_loader_hardcoded.h"

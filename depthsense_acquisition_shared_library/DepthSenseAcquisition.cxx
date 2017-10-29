@@ -139,7 +139,7 @@ int disableDepthSenseStream(int devID,unsigned int streamID)
 
 
 
-int startDepthSenseModule(unsigned int max_devs,char * settings)
+int startDepthSenseModule(unsigned int max_devs,const char * settings)
 {
  fprintf(stderr,"Starting depthsense module doesnt do much.. \n");
  return 1;
@@ -165,7 +165,7 @@ int listDepthSenseDevices(int devID,char * output, unsigned int maxOutput)
 }
 
 
-int createDepthSenseDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int createDepthSenseDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
    //TODO check here width/height for what is closer and select correct format
 
