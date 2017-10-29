@@ -14,7 +14,7 @@ extern "C"
 #endif
 
 
-int startFreenectModule(unsigned int max_devs,char * settings);
+int startFreenectModule(unsigned int max_devs,const char * settings);
 
 #if BUILD_FREENECT
 
@@ -25,7 +25,7 @@ double getFreenectDepthFocalLength(int devID);
 
 int stopFreenectModule();
 
-int createFreenectDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+int createFreenectDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate);
 
 int mapFreenectDepthToRGB(int devID);
 

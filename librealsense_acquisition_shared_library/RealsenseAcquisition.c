@@ -37,7 +37,7 @@ int check_error()
 }
 
 
-int startRealsenseModule(unsigned int max_devs,char * settings)
+int startRealsenseModule(unsigned int max_devs,const char * settings)
 {
  /* Create a context object. This object owns the handles to all connected realsense devices. */
     ctx = rs_create_context(RS_API_VERSION, &e);
@@ -61,7 +61,7 @@ int startRealsenseModule(unsigned int max_devs,char * settings)
   return 1;
 }
 
-int createRealsenseDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int createRealsenseDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     /* This call will access only a single device, based on the devID identifier..*/
     device[devID].dev = rs_get_device(ctx, devID , &e);

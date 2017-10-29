@@ -52,7 +52,7 @@ struct VideoFeedSettings
 struct Video
 {
   /* DEVICE NAME */
-  char * videoinp;
+  const char * videoinp;
   unsigned int frameNumber;
   unsigned int height;
   unsigned int width;
@@ -114,12 +114,12 @@ extern struct Video * camera_feeds;
 
 unsigned char * ReturnDecodedLiveFrame(int webcam_id);
 
-char FileExistsVideoInput(char * filename);
+char FileExistsVideoInput(const char * filename);
 
 int VideoInput_InitializeLibrary(int numofinputs);
 int VideoInput_DeinitializeLibrary();
 
-int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth,int framespersecond,char snapshots_on,struct VideoFeedSettings videosettings);
+int VideoInput_OpenFeed(int inpt,const char * viddev,int width,int height,int bitdepth,int framespersecond,char snapshots_on,struct VideoFeedSettings videosettings);
 
 
 #endif // V4L2WRAPPER_H_INCLUDED

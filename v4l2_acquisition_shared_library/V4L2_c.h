@@ -54,7 +54,7 @@ struct V4L2_c_interface
   unsigned int n_buffers;
 };
 
-int populateAndStart_v4l2intf(struct V4L2_c_interface * v4l2_interface,char * device,int method_used);
+int populateAndStart_v4l2intf(struct V4L2_c_interface * v4l2_interface,const char * device,int method_used);
 int destroy_v4l2intf(struct V4L2_c_interface * v4l2_interface);
 int getFileDescriptor_v4l2intf(struct V4L2_c_interface * v4l2_interface);
 

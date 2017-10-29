@@ -15,12 +15,12 @@ extern "C"
 
 
 //#define BUILD_REALSENSE 1
-int startRealsenseModule(unsigned int max_devs,char * settings);
+int startRealsenseModule(unsigned int max_devs,const char * settings);
 
 #if BUILD_REALSENSE
 int stopRealsenseModule();
 
-int createRealsenseDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+int createRealsenseDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate);
 int destroyRealsenseDevice(int devID);
 
 int mapRealsenseDepthToRGB(int devID);

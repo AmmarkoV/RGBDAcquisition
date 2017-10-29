@@ -25,7 +25,7 @@ static int xioctl(int fd,int request,void * arg)
    return r;
 };
 
-int populateAndStart_v4l2intf(struct V4L2_c_interface * v4l2_interface,char * device,int method_used)
+int populateAndStart_v4l2intf(struct V4L2_c_interface * v4l2_interface,const char * device,int method_used)
 {
   if (v4l2_interface==0) { fprintf(stderr,"Populate populate_v4l2intf called with an unallocated v4l2intf \n"); return 0; }
   memset(v4l2_interface,0,sizeof(struct V4L2_c_interface));

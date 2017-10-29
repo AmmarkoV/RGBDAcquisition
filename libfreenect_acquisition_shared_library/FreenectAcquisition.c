@@ -70,7 +70,7 @@ double getFreenectDepthFocalLength(int devID)
 
 
 
-int startFreenectModule(unsigned int max_devs,char * settings)
+int startFreenectModule(unsigned int max_devs,const char * settings)
 {
   fprintf(stderr,"Please note that the calibration data coming out of the freenect module is dummy..\n");
   uint32_t ts;
@@ -84,7 +84,7 @@ int startFreenectModule(unsigned int max_devs,char * settings)
   return 1;
 }
 
-int createFreenectDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int createFreenectDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
   uint32_t ts;
   char * rgb;//, * depth;

@@ -65,7 +65,7 @@ int getCurrentV4L2FrameNumber(int devID)
 }
 
 
-int startV4L2Module(unsigned int max_devs,char * settings)
+int startV4L2Module(unsigned int max_devs,const char * settings)
 {
  return VideoInput_InitializeLibrary(10);
 }
@@ -92,7 +92,7 @@ int getDevIDForV4L2Name(char * devName)
 }
 
    //Basic Per Device Operations
-int createV4L2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int createV4L2Device(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
  struct VideoFeedSettings videosettings={0};
  char BITRATE=32;

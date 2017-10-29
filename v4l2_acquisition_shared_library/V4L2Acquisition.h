@@ -16,7 +16,7 @@ extern "C"
    #include "../acquisition/acquisition_setup.h"
 
    //Initialization of V4L2
-   int startV4L2Module(unsigned int max_devs,char * settings);
+   int startV4L2Module(unsigned int max_devs,const char * settings);
 
    #if BUILD_V4L2
    int getV4L2Capabilities(int devID,int capToAskFor);
@@ -32,7 +32,7 @@ extern "C"
    int getDevIDForV4L2Name(char * devName);
 
    //Basic Per Device Operations
-   int createV4L2Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+   int createV4L2Device(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyV4L2Device(int devID);
 
    int seekV4L2Frame(int devID,unsigned int seekFrame);

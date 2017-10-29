@@ -164,7 +164,7 @@ int VideoInput_DeinitializeLibrary()
 
 
 
-char FileExistsVideoInput(char * filename)
+char FileExistsVideoInput(const char * filename)
 {
  FILE *fp = fopen(filename,"r");
  if( fp ) { /* exists */
@@ -176,7 +176,7 @@ char FileExistsVideoInput(char * filename)
  return 0;
 }
 
-int VideoInput_OpenFeed(int inpt,char * viddev,int width,int height,int bitdepth,int framespersecond,char snapshots_on,struct VideoFeedSettings videosettings)
+int VideoInput_OpenFeed(int inpt,const char * viddev,int width,int height,int bitdepth,int framespersecond,char snapshots_on,struct VideoFeedSettings videosettings)
 {
    camera_feeds[inpt].video_simulation=NO_VIDEO_AVAILIABLE;
    printf("Initializing Video Feed %u ( %s ) @ %u/%u \n",inpt,viddev,width,height);
