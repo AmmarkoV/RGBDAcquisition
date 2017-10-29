@@ -1036,8 +1036,7 @@ int setupPhotoshoot(
   configuration->angZVariance=angZVariance;
 
   configuration->scenePTR = (void *) scene;
-  #warning "TODO:FIX THIS MODEL CODE"
-  //configuration->modelPTR = (void *) models;
+  configuration->modelPTR = (void *) modelStorage;
   return 1;
 }
 
@@ -1068,8 +1067,7 @@ void * createPhotoshoot(
   configuration->angZVariance=angZVariance;
 
   configuration->scenePTR = (void *) scene;
-  #warning "TODO:FIX THIS MODEL CODE"
-  //configuration->modelPTR = (void *) models;
+  configuration->modelPTR = (void *) modelStorage;
 
 
   return (void*) configuration;

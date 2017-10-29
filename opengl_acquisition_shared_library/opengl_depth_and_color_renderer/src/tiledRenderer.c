@@ -144,7 +144,7 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
 
        unsigned int i=trConf->objID;
        fprintf(stderr,"Accessing models (%u).. \n",scene->object[i].type);
-       struct Model * mod = models[0];
+       struct Model * mod = models[scene->object[i].type];
        if (mod==0) { fprintf(stderr,"Model not allocated.. \n"); return 0;}
        float * pos = (float*) &posStack;
 
