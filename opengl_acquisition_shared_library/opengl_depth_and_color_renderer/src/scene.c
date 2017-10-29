@@ -1036,7 +1036,7 @@ int setupPhotoshoot(
   configuration->angZVariance=angZVariance;
 
   configuration->scenePTR = (void *) scene;
-  #warning "Models are disconnected from photoshoots setupPhotoshoot"
+  #warning "TODO:FIX THIS MODEL CODE"
   //configuration->modelPTR = (void *) models;
   return 1;
 }
@@ -1068,10 +1068,8 @@ void * createPhotoshoot(
   configuration->angZVariance=angZVariance;
 
   configuration->scenePTR = (void *) scene;
-
-  #warning "Models are disconnected from photoshoots createPhotoshoot"
-//  configuration->modelPTR = (void *) models;
-
+  #warning "TODO:FIX THIS MODEL CODE"
+  //configuration->modelPTR = (void *) models;
 
 
   return (void*) configuration;
