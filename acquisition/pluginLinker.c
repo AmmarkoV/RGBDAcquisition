@@ -130,6 +130,8 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
 {
    if (getPluginPathFromEnvVariable("LD_PRELOAD",libName,pathOut,pathOutLength)) { return 1; }
    if (getPluginPathFromEnvVariable("RGBD_ACQUISITION",libName,pathOut,pathOutLength)) { return 1; }
+   if (getPluginPathFromEnvVariable("RGBDACQUISITION_PATH",libName,pathOut,pathOutLength)) { return 1; }
+   if (getPluginPathFromEnvVariable("RGBDACQUISITION_REDIST",libName,pathOut,pathOutLength)) { return 1; }
 
    char pathTester[2048]={0};
 
