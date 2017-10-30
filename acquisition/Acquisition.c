@@ -44,6 +44,9 @@ int acquisitionRegisterTerminationSignal(void * callback)
 
  int acquisitionCleanOverrides(ModuleIdentifier moduleID,DeviceIdentifier devID)
  {
+   if (moduleID>=NUMBER_OF_POSSIBLE_MODULES) { return 0; }
+   if (devID>=NUMBER_OF_POSSIBLE_DEVICES) { return 0; }
+
     if ( module[moduleID].device[devID].overrideColorFrame!=0 )
         {
           free(module[moduleID].device[devID].overrideColorFrame);
@@ -440,6 +443,9 @@ int acquisitionChangeResolution(ModuleIdentifier moduleID,DeviceIdentifier devID
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     printCall(moduleID,devID,"acquisitionOpenDevice", __FILE__, __LINE__);
+    module[moduleID].device[devID].overrideColorFrame=0;
+    module[moduleID].device[devID].overrideDepthFrame=0;
+
     if (plugins[moduleID].createDevice!=0) { return (*plugins[moduleID].createDevice) (devID,devName,width,height,framerate); }
     MeaningfullWarningMessage(moduleID,devID,"acquisitionOpenDevice");
     return 0;
