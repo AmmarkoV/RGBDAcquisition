@@ -128,35 +128,36 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
 
 int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
 {
+   //LD_PRELOAD proeceeds our lookups..!
    if (getPluginPathFromEnvVariable("LD_PRELOAD",libName,pathOut,pathOutLength))              { return 1; }
-   if (getPluginPathFromEnvVariable("RGBD_ACQUISITION",libName,pathOut,pathOutLength))        { return 1; }
-   if (getPluginPathFromEnvVariable("RGBDACQUISITION_PATH",libName,pathOut,pathOutLength))    { return 1; }
-   if (getPluginPathFromEnvVariable("RGBDACQUISITION_REDIST",libName,pathOut,pathOutLength))  { return 1; }
 
-   char pathTester[2048]={0};
-
-   snprintf(pathTester,2048,"%s/%s",possiblePath,libName);
-   if (acquisitionFileExists(pathTester))
+   //First of all let's check current directory
+   if (acquisitionFileExists(libName))
                                  {
-                                   //fprintf(stderr,"Found plugin %s at Path %s\n",libName,possiblePath);
-                                   snprintf(pathOut,pathOutLength,"%s/%s",possiblePath,libName);
+                                   fprintf(stderr,GREEN "Found plugin %s at current directory \n" NORMAL,libName);
+                                   snprintf(pathOut,pathOutLength,"%s",libName);
                                    return 1;
                                  }
 
-   snprintf(pathTester,2048,"./%s",libName);
+   char pathTester[4096]={0};
+   snprintf(pathTester,4096,"./%s",libName);
    if (acquisitionFileExists(libName))
                                  {
-                                   //fprintf(stderr,"Found plugin %s at CurrentDir\n",libName);
+                                   fprintf(stderr,GREEN "Found plugin %s at current directory but by using a trick\n" NORMAL,libName);
                                    snprintf(pathOut,pathOutLength,"./%s",libName);
                                    return 1;
                                  }
 
-   if (acquisitionFileExists(libName))
+
+   snprintf(pathTester,4096,"%s/%s",possiblePath,libName);
+   if (acquisitionFileExists(pathTester))
                                  {
-                                   //fprintf(stderr,"Found plugin %s at standard dir \n",libName);
-                                   snprintf(pathOut,pathOutLength,"%s",libName);
+                                   fprintf(stderr,GREEN "Found plugin %s at predictable subpath %s\n" NORMAL,libName,possiblePath);
+                                   snprintf(pathOut,pathOutLength,"%s/%s",possiblePath,libName);
                                    return 1;
                                  }
+
+
 
 
    if (getPluginPathFromEnvVariable("LD_LIBRARY_PATH",libName,pathOut,pathOutLength))
@@ -165,12 +166,28 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
        return 1;
      }
 
+   if (getPluginPathFromEnvVariable("RGBD_ACQUISITION",libName,pathOut,pathOutLength))
+     {
+       fprintf(stderr,YELLOW "Found plugin at obsolete old environent variable , consider exporting RGBDACQUISITION_REDIST\n" NORMAL);
+       return 1;
+     }
+
+   if (getPluginPathFromEnvVariable("RGBDACQUISITION_PATH",libName,pathOut,pathOutLength))
+    {
+      fprintf(stderr,YELLOW "Found plugin at root dir environent variable which is weird , consider exporting RGBDACQUISITION_REDIST \n" NORMAL);
+      return 1;
+    }
+   if (getPluginPathFromEnvVariable("RGBDACQUISITION_REDIST",libName,pathOut,pathOutLength))
+    {
+      fprintf(stderr,GREEN "Found plugin with RGBDACQUISITION_REDIST environment var\n" NORMAL);
+      return 1;
+    }
 
 
 
 
    fprintf(stderr,YELLOW "Could not find plugin library %s..\n " NORMAL,libName);
-   if (getcwd(pathTester, 2048) != 0)
+   if (getcwd(pathTester, 4096) != 0)
          fprintf(stdout, "  working dir was : %s\n", pathTester);
 
    return 0;
@@ -188,7 +205,7 @@ int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char 
 
    if (!getPluginPath(modulePossiblePath,moduleLib,functionNameStr,1024))
        {
-          fprintf(stderr,RED "Could not find %s (try adding it to current directory)\n" NORMAL , moduleLib);
+          fprintf(stderr,RED "Could not find netlib %s (try adding it to current directory)\n" NORMAL , moduleLib);
           return 0;
        }
 
