@@ -87,9 +87,9 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
 
 
               //========================================================
-              //   fprintf(stderr,"Check @ %s\n",startOfPath);
-              //========================================================
                  snprintf(pathTester,4096,"%s/%s",startOfPath,libName);
+                 fprintf(stderr,"Check @ %s\n",pathTester);
+              //========================================================
                  if (acquisitionFileExists(pathTester))
                                  {
                                      fprintf(stderr,"Found plugin %s at %s/%s\n",libName,startOfPath,libName);
@@ -106,9 +106,9 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
            }
           }
           //========================================================
-          // fprintf(stderr,"Last Check @ %s\n",startOfPath);
+            snprintf(pathTester,4096,"%s/%s",startOfPath,libName);
+            fprintf(stderr,"Last Check @ %s\n",pathTester);
           //========================================================
-           snprintf(pathTester,4096,"%s/%s",startOfPath,libName);
            if (acquisitionFileExists(pathTester))
                                  {
                                      fprintf(stderr,GREEN "Found plugin %s at %s/%s\n" NORMAL,libName,startOfPath,libName);
@@ -128,7 +128,7 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
 
 int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
 {
-   fprintf(stderr,GREEN "Now searching for plugin %s \n" NORMAL,libName);
+   //fprintf(stderr,GREEN "Now searching for plugin %s \n" NORMAL,libName);
 
    //LD_PRELOAD proeceeds our lookups..!
    if (getPluginPathFromEnvVariable("LD_PRELOAD",libName,pathOut,pathOutLength))              { return 1; }
