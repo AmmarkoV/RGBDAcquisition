@@ -29,7 +29,8 @@ char * pluginStrings[] = {   "dummyName" , "dummyPath "                         
                              "Network"   ,"../network_acquisition_shared_library/"    , "libNetworkAcquisition.so"     ,
                              "DepthSense"   ,"../depthsense_acquisition_shared_library/"    , "libDepthSenseAcquisition.so"     ,
                              "Realsense"   ,"../librealsense_acquisition_shared_library/"    , "libRealsenseAcquisition.so"     ,
-                             "Desktop"   ,"../desktop_acquisition_shared_library/"    , "libDesktopAcquisition.so"     ,
+                             "Desktop"   ,"../desktop_acquisition_shared_library/"           , "libDesktopAcquisition.so"     ,
+                             "Scripted"   ,"../scripted_acquisition_shared_library/"         , "dummy.so"     ,
                              //----------------------------------------------------------------------------
                              "Dont Erase the following!! they serve as a working warning if a new plugin is introduced but not specified here"  ,
                              "Dont Forget to add name for new plugin here "  ,

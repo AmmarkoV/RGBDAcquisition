@@ -3,7 +3,7 @@
 
 #include "Acquisition.h"
 
-int executeScriptFromFile(const char * filename);
+int executeScriptFromFile(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
 
 
 #endif // ACQUISITIONFILEOUTPUT_H_INCLUDED

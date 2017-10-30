@@ -3,6 +3,7 @@
 #include "pluginLinker.h"
 #include "processorLinker.h"
 #include "acquisitionFileOutput.h"
+#include "acquisitionScriptInput.h"
 
 #include "../tools/Timers/timer.h"
 #include "../tools/OperatingSystem/OperatingSystem.h"
@@ -172,20 +173,23 @@ int acquisitionGetModulesCount()
 
 ModuleIdentifier getModuleIdFromModuleName(const char * moduleName)
 {
-   ModuleIdentifier moduleID = 0;
-          if (strcasecmp("FREENECT",moduleName)==0 )  { moduleID = FREENECT_ACQUISITION_MODULE; } else
-          if (strcasecmp("OPENNI",moduleName)==0 )  { moduleID = OPENNI1_ACQUISITION_MODULE;  } else
-          if (strcasecmp("OPENNI1",moduleName)==0 )  { moduleID = OPENNI1_ACQUISITION_MODULE;  } else
-          if (strcasecmp("OPENNI2",moduleName)==0 )  { moduleID = OPENNI2_ACQUISITION_MODULE;  } else
-          if (strcasecmp("OPENGL",moduleName)==0 )   { moduleID = OPENGL_ACQUISITION_MODULE;   } else
-          if (strcasecmp("V4L2",moduleName)==0 )   { moduleID = V4L2_ACQUISITION_MODULE;   } else
-          if (strcasecmp("V4L2STEREO",moduleName)==0 )   { moduleID = V4L2STEREO_ACQUISITION_MODULE;   } else
-          if (strcasecmp("TEMPLATE",moduleName)==0 )  { moduleID = TEMPLATE_ACQUISITION_MODULE; } else
-          if (strcasecmp("NETWORK",moduleName)==0 )   { moduleID = NETWORK_ACQUISITION_MODULE; } else
-          if (strcasecmp("DEPTHSENSE",moduleName)==0 )   { moduleID = DEPTHSENSE_ACQUISITION_MODULE; } else
-          if (strcasecmp("DESKTOP",moduleName)==0 )   { moduleID = DESKTOP_ACQUISITION_MODULE; } else
-          if (strcasecmp("REALSENSE",moduleName)==0 )   { moduleID = REALSENSE_ACQUISITION_MODULE; }
-   return moduleID;
+ ModuleIdentifier moduleID = 0;
+   if (strcasecmp("FREENECT",moduleName)==0 )   { moduleID = FREENECT_ACQUISITION_MODULE; }   else
+   if (strcasecmp("OPENNI",moduleName)==0 )     { moduleID = OPENNI1_ACQUISITION_MODULE;  }   else
+   if (strcasecmp("OPENNI1",moduleName)==0 )    { moduleID = OPENNI1_ACQUISITION_MODULE;  }   else
+   if (strcasecmp("OPENNI2",moduleName)==0 )    { moduleID = OPENNI2_ACQUISITION_MODULE;  }   else
+   if (strcasecmp("OPENGL",moduleName)==0 )     { moduleID = OPENGL_ACQUISITION_MODULE;   }   else
+   if (strcasecmp("V4L2",moduleName)==0 )       { moduleID = V4L2_ACQUISITION_MODULE;   }     else
+   if (strcasecmp("V4L2STEREO",moduleName)==0 ) { moduleID = V4L2STEREO_ACQUISITION_MODULE; } else
+   if (strcasecmp("TEMPLATE",moduleName)==0 )   { moduleID = TEMPLATE_ACQUISITION_MODULE; }   else
+   if (strcasecmp("NETWORK",moduleName)==0 )    { moduleID = NETWORK_ACQUISITION_MODULE; }    else
+   if (strcasecmp("DEPTHSENSE",moduleName)==0 ) { moduleID = DEPTHSENSE_ACQUISITION_MODULE; } else
+   if (strcasecmp("DESKTOP",moduleName)==0 )    { moduleID = DESKTOP_ACQUISITION_MODULE; }    else
+   if (strcasecmp("REALSENSE",moduleName)==0 )  { moduleID = REALSENSE_ACQUISITION_MODULE; }  else
+   if (strcasecmp("SCRIPT",moduleName)==0 )     { moduleID = SCRIPTED_ACQUISITION_MODULE; }   else
+   if (strcasecmp("SCRIPTED",moduleName)==0 )   { moduleID = SCRIPTED_ACQUISITION_MODULE; }
+
+ return moduleID;
 }
 
 
@@ -204,6 +208,7 @@ char * getModuleNameFromModuleID(ModuleIdentifier moduleID)
       case DEPTHSENSE_ACQUISITION_MODULE    :  return (char*) "DEPTHSENSE MODULE"; break;
       case DESKTOP_ACQUISITION_MODULE    :  return (char*) "DESKTOP MODULE"; break;
       case REALSENSE_ACQUISITION_MODULE    :  return (char*) "REALSENSE MODULE"; break;
+      case SCRIPTED_ACQUISITION_MODULE    :  return (char*) "SCRIPTED MODULE"; break;
     };
     return (char*) "UNKNOWN MODULE";
 }
@@ -336,6 +341,13 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,con
      { startLocationServices(); }
    #endif // ENABLE_LOCATION_SERVICE
 
+  if (moduleID==SCRIPTED_ACQUISITION_MODULE)
+  {
+    //Special case for scripts
+     fprintf(stderr,"Scripts don't need module start..\n");
+    return 1;
+  }
+
 
   if (moduleID < NUMBER_OF_POSSIBLE_MODULES)
   {
@@ -443,6 +455,14 @@ int acquisitionChangeResolution(ModuleIdentifier moduleID,DeviceIdentifier devID
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     printCall(moduleID,devID,"acquisitionOpenDevice", __FILE__, __LINE__);
+
+    if (moduleID==SCRIPTED_ACQUISITION_MODULE)
+    {
+     //Special case for scripts
+     fprintf(stderr,"Script initialization starting..");
+     return executeScriptFromFile(moduleID,devID,devName);
+    }
+
     if (moduleID>=NUMBER_OF_POSSIBLE_MODULES) { MeaningfullWarningMessage(moduleID,devID,"Incorrect ModuleID"); return 0; }
     if (devID>=NUMBER_OF_POSSIBLE_DEVICES)    { MeaningfullWarningMessage(moduleID,devID,"Incorrect DeviceID"); return 0; }
 

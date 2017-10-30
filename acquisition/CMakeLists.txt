@@ -35,6 +35,8 @@ ENDIF( ENABLE_LOCATION_SERVICE )
                  acquisitionFileOutput.h
                  acquisitionScriptInput.c
                  acquisitionScriptInput.h
+                 ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c
+                 ../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
                  acquisition_setup.h
               )
   
