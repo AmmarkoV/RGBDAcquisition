@@ -60,7 +60,7 @@ int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsign
 
 
 
-int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut, unsigned int pathOutLength )
+int getPluginPathFromEnvVariable(const char * envVar ,const char * libName , char * pathOut, unsigned int pathOutLength )
 {
    // They look like /opt/ros/groovy/lib:/usr/local/cuda-4.2/cuda/lib64:/usr/local/cuda-4.2/cuda/lib
    char pathTester[4096]={0};
@@ -70,13 +70,19 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
    if (ldPath!=0)
      {
        //fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPath);
-       char * directoriesToCheck = (char*) malloc(sizeof(char) * strlen(ldPath) );
+       char * directoriesToCheck = (char*) malloc(sizeof(char) * (strlen(ldPath)+1) );
+       if (directoriesToCheck==0)
+       {
+         fprintf(stderr,"Could not allocate a small chunk of memory to formulate strings for Environment check\n");
+         return 0;
+       }
 
        char * endOfPath=directoriesToCheck;
        char * startOfPath=directoriesToCheck;
        if (directoriesToCheck!=0)
        {
         strncpy(directoriesToCheck,ldPath,strlen(ldPath));
+        directoriesToCheck[strlen(ldPath)]=0; //Ensure null termination
 
         while (endOfPath!=0)
           {
@@ -101,7 +107,7 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
 
 
 
-
+             *endOfPath=':'; // Restore string to its prior state..
              startOfPath=endOfPath+1;
            }
           }
