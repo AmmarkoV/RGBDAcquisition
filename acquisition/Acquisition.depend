@@ -77,3 +77,58 @@
 
 1458492977 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/image.h
 
+1509356060 source:/home/ammar/Documents/Programming/RGBDAcquisition/acquisition/acquisitionFileOutput.c
+	"Acquisition.h"
+	"acquisition_setup.h"
+	"pluginLinker.h"
+	"processorLinker.h"
+	"acquisitionFileOutput.h"
+	"../tools/Timers/timer.h"
+	"../tools/OperatingSystem/OperatingSystem.h"
+	"../tools/Primitives/modules.h"
+	"../tools/LocationServices/locationService.h"
+	"../tools/Codecs/codecs.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1509356060 /home/ammar/Documents/Programming/RGBDAcquisition/acquisition/Acquisition.h
+	<tools/Calibration/calibration.h>
+	"calibration.h"
+	"../tools/Calibration/calibration.h"
+
+1509356060 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Calibration/calibration.h
+
+1386348970 /home/ammar/Documents/Programming/RGBDAcquisition/acquisition/acquisition_setup.h
+
+1509356060 /home/ammar/Documents/Programming/RGBDAcquisition/acquisition/pluginLinker.h
+	"Acquisition.h"
+
+1509356060 /home/ammar/Documents/Programming/RGBDAcquisition/acquisition/processorLinker.h
+	"Acquisition.h"
+
+1509356060 /home/ammar/Documents/Programming/RGBDAcquisition/acquisition/acquisitionFileOutput.h
+	"Acquisition.h"
+
+1454931753 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Timers/timer.h
+
+1393325835 /home/ammar/Documents/Programming/RGBDAcquisition/tools/OperatingSystem/OperatingSystem.h
+
+1455564556 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Primitives/modules.h
+
+1455564556 /home/ammar/Documents/Programming/RGBDAcquisition/tools/LocationServices/locationService.h
+
+1467405290 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Codecs/codecs.h
+	"../Primitives/image.h"
+
+1460647486 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Primitives/image.h
+
+1509356060 source:/home/ammar/Documents/Programming/RGBDAcquisition/acquisition/processorLinker.c
+	"processorLinker.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<unistd.h>
+	<time.h>
+	<dlfcn.h>
+

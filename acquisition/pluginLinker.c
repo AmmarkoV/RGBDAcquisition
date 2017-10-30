@@ -63,7 +63,7 @@ int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsign
 int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut, unsigned int pathOutLength )
 {
    // They look like /opt/ros/groovy/lib:/usr/local/cuda-4.2/cuda/lib64:/usr/local/cuda-4.2/cuda/lib
-   char pathTester[2048]={0};
+   char pathTester[4096]={0};
 
    char* ldPath;
    ldPath= getenv(envVar);
@@ -89,11 +89,11 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
               //========================================================
               //   fprintf(stderr,"Check @ %s\n",startOfPath);
               //========================================================
-                 snprintf(pathTester,2048,"%s/%s",startOfPath,libName);
+                 snprintf(pathTester,4096,"%s/%s",startOfPath,libName);
                  if (acquisitionFileExists(pathTester))
                                  {
                                      fprintf(stderr,"Found plugin %s at %s/%s\n",libName,startOfPath,libName);
-                                     snprintf(pathOut,pathOutLength,"%s/%s",startOfPath,libName);
+                                     snprintf(pathOut,pathOutLength,GREEN "%s/%s" NORMAL,startOfPath,libName);
                                      free(directoriesToCheck);
                                      return 1;
                                  }
@@ -108,10 +108,10 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
           //========================================================
           // fprintf(stderr,"Last Check @ %s\n",startOfPath);
           //========================================================
-           snprintf(pathTester,2048,"%s/%s",startOfPath,libName);
+           snprintf(pathTester,4096,"%s/%s",startOfPath,libName);
            if (acquisitionFileExists(pathTester))
                                  {
-                                     fprintf(stderr,"Found plugin %s at %s/%s\n",libName,startOfPath,libName);
+                                     fprintf(stderr,GREEN "Found plugin %s at %s/%s\n" NORMAL,libName,startOfPath,libName);
                                      snprintf(pathOut,pathOutLength,"%s/%s",startOfPath,libName);
                                      free(directoriesToCheck);
                                      return 1;
@@ -128,10 +128,10 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
 
 int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
 {
-   if (getPluginPathFromEnvVariable("LD_PRELOAD",libName,pathOut,pathOutLength)) { return 1; }
-   if (getPluginPathFromEnvVariable("RGBD_ACQUISITION",libName,pathOut,pathOutLength)) { return 1; }
-   if (getPluginPathFromEnvVariable("RGBDACQUISITION_PATH",libName,pathOut,pathOutLength)) { return 1; }
-   if (getPluginPathFromEnvVariable("RGBDACQUISITION_REDIST",libName,pathOut,pathOutLength)) { return 1; }
+   if (getPluginPathFromEnvVariable("LD_PRELOAD",libName,pathOut,pathOutLength))              { return 1; }
+   if (getPluginPathFromEnvVariable("RGBD_ACQUISITION",libName,pathOut,pathOutLength))        { return 1; }
+   if (getPluginPathFromEnvVariable("RGBDACQUISITION_PATH",libName,pathOut,pathOutLength))    { return 1; }
+   if (getPluginPathFromEnvVariable("RGBDACQUISITION_REDIST",libName,pathOut,pathOutLength))  { return 1; }
 
    char pathTester[2048]={0};
 
@@ -159,7 +159,11 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
                                  }
 
 
-   if (getPluginPathFromEnvVariable("LD_LIBRARY_PATH",libName,pathOut,pathOutLength)) { return 1; }
+   if (getPluginPathFromEnvVariable("LD_LIBRARY_PATH",libName,pathOut,pathOutLength))
+     {
+       fprintf(stderr,GREEN "Found plugin %s at LD_LIBRARY_PATH\n" NORMAL,libName);
+       return 1;
+     }
 
 
 
