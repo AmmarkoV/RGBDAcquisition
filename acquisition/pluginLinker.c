@@ -63,7 +63,7 @@ int (*pushImageToRemoteNetwork) (int,int,void *,unsigned int,unsigned int,unsign
 int getPluginPathFromEnvVariable(const char * envVar ,const char * libName , char * pathOut, unsigned int pathOutLength )
 {
    // They look like /opt/ros/groovy/lib:/usr/local/cuda-4.2/cuda/lib64:/usr/local/cuda-4.2/cuda/lib
-   char pathTester[4096]={0};
+   char pathTester[4097]={0};
 
    char* ldPath;
    ldPath= getenv(envVar);
@@ -147,7 +147,7 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
                                    return 1;
                                  }
 
-   char pathTester[4096]={0};
+   char pathTester[4097]={0};
    snprintf(pathTester,4096,"./%s",libName);
    if (acquisitionFileExists(libName))
                                  {
@@ -209,7 +209,7 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
 int linkToNetworkTransmission(char * moduleName,char * modulePossiblePath ,char * moduleLib)
 {
    char *error;
-   char functionNameStr[1024]={0};
+   char functionNameStr[1025]={0};
 
    if (!getPluginPath(modulePossiblePath,moduleLib,functionNameStr,1024))
        {
@@ -253,7 +253,7 @@ int isPluginLoaded(ModuleIdentifier moduleID)
 void * linkFunction(ModuleIdentifier moduleID,char * functionName,char * moduleName)
 {
   char *error;
-  char functionNameStr[1024]={0};
+  char functionNameStr[1025]={0};
   sprintf(functionNameStr,functionName,moduleName);
   void * linkPtr = dlsym(plugins[moduleID].handle, functionNameStr );
   if ((error = dlerror()) != NULL)
@@ -267,7 +267,7 @@ void * linkFunction(ModuleIdentifier moduleID,char * functionName,char * moduleN
 
 int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,  ModuleIdentifier moduleID)
 {
-   char functionNameStr[1024]={0};
+   char functionNameStr[1025]={0};
 
    if (!getPluginPath(modulePossiblePath,moduleLib,functionNameStr,1024))
        {

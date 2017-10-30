@@ -53,6 +53,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="acquisitionFileOutput.h" />
+		<Unit filename="acquisitionScriptInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="acquisitionScriptInput.h" />
 		<Unit filename="acquisition_setup.h" />
 		<Unit filename="pluginLinker.c">
 			<Option compilerVar="CC" />

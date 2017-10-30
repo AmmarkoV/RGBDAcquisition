@@ -33,6 +33,8 @@ ENDIF( ENABLE_LOCATION_SERVICE )
                  processorLinker.h 
                  acquisitionFileOutput.c
                  acquisitionFileOutput.h
+                 acquisitionScriptInput.c
+                 acquisitionScriptInput.h
                  acquisition_setup.h
               )
   
