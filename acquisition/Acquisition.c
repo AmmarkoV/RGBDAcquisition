@@ -443,6 +443,9 @@ int acquisitionChangeResolution(ModuleIdentifier moduleID,DeviceIdentifier devID
 int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     printCall(moduleID,devID,"acquisitionOpenDevice", __FILE__, __LINE__);
+    if (moduleID>=NUMBER_OF_POSSIBLE_MODULES) { MeaningfullWarningMessage(moduleID,devID,"Incorrect ModuleID"); return 0; }
+    if (devID>=NUMBER_OF_POSSIBLE_DEVICES)    { MeaningfullWarningMessage(moduleID,devID,"Incorrect DeviceID"); return 0; }
+
     module[moduleID].device[devID].overrideColorFrame=0;
     module[moduleID].device[devID].overrideDepthFrame=0;
 
