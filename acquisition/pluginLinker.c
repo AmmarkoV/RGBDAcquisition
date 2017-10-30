@@ -94,7 +94,7 @@ int getPluginPathFromEnvVariable(const char * envVar ,const char * libName , cha
 
               //========================================================
                  snprintf(pathTester,4096,"%s/%s",startOfPath,libName);
-                 fprintf(stderr,"Check @ %s\n",pathTester);
+              //   fprintf(stderr,"Check @ %s\n",pathTester);
               //========================================================
                  if (acquisitionFileExists(pathTester))
                                  {
@@ -113,7 +113,7 @@ int getPluginPathFromEnvVariable(const char * envVar ,const char * libName , cha
           }
           //========================================================
             snprintf(pathTester,4096,"%s/%s",startOfPath,libName);
-            fprintf(stderr,"Last Check @ %s\n",pathTester);
+          //  fprintf(stderr,"Last Check @ %s\n",pathTester);
           //========================================================
            if (acquisitionFileExists(pathTester))
                                  {
