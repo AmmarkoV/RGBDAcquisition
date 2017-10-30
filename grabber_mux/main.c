@@ -14,6 +14,7 @@ char inputname2[512]={0};
 
 unsigned int defaultWidth=640;
 unsigned int defaultHeight=480;
+unsigned int defaultFramerate=30;
 unsigned int transparency=0;
 unsigned char transR=0,transG=0,transB=0;
 signed int shiftX=0;
@@ -238,6 +239,18 @@ int main(int argc, char *argv[])
                                          }
   }
 
+  if (moduleID_1==SCRIPTED_ACQUISITION_MODULE)
+  {
+   if ( acquisitionGetScriptModuleAndDeviceID( &moduleID_1 , &devID_1 , &defaultWidth , &defaultHeight, &defaultFramerate, 0, inputname1, 512 ) )
+         { fprintf(stderr,"Loaded configuration from script file 1 ..\n"); }
+  }
+
+  if (moduleID_2==SCRIPTED_ACQUISITION_MODULE)
+  {
+   if ( acquisitionGetScriptModuleAndDeviceID( &moduleID_2 , &devID_2 , &defaultWidth , &defaultHeight, &defaultFramerate, 0, inputname2, 512 ) )
+         { fprintf(stderr,"Loaded configuration from script file 2 ..\n"); }
+  }
+
 
   if (!acquisitionIsModuleAvailiable(moduleID_1))
    {
@@ -293,10 +306,10 @@ int main(int argc, char *argv[])
   if (strlen(inputname2)<1) { devName2=0; }
 
     //Initialize Every OpenNI Device
-    acquisitionOpenDevice(moduleID_1,devID_1,devName1,defaultWidth,defaultHeight,25);
+    acquisitionOpenDevice(moduleID_1,devID_1,devName1,defaultWidth,defaultHeight,defaultFramerate);
     acquisitionMapDepthToRGB(moduleID_1,devID_1);
 
-    acquisitionOpenDevice(moduleID_2,devID_2,devName2,defaultWidth,defaultHeight,25);
+    acquisitionOpenDevice(moduleID_2,devID_2,devName2,defaultWidth,defaultHeight,defaultFramerate);
     acquisitionMapDepthToRGB(moduleID_2,devID_2);
 
 

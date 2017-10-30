@@ -390,6 +390,22 @@ int main (int argc,const char *argv[])
   if (framerate==0) { fprintf(stderr,"Zero is an invalid value for framerate , using 1\n"); framerate=1; }
 
 
+if (moduleID==SCRIPTED_ACQUISITION_MODULE)
+  {
+  if (
+      acquisitionGetScriptModuleAndDeviceID(
+                                            &moduleID ,
+                                            &devID ,
+                                            &width ,
+                                            &height,
+                                            &framerate,
+                                            0,
+                                            inputname,
+                                            512
+                                           )
+      )
+      { fprintf(stderr,"Loaded configuration from script file..\n"); }
+  }
 
 
 

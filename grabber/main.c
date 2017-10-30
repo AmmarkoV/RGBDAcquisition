@@ -133,6 +133,25 @@ int main(int argc, char *argv[])
   }
 
 
+  if (moduleID==SCRIPTED_ACQUISITION_MODULE)
+  {
+  if (
+      acquisitionGetScriptModuleAndDeviceID(
+                                            &moduleID ,
+                                            &devID ,
+                                            &width ,
+                                            &height,
+                                            &framerate,
+                                            0,
+                                            inputname,
+                                            512
+                                           )
+      )
+      { fprintf(stderr,"Loaded configuration from script file..\n"); }
+  }
+
+
+
   if (!acquisitionIsModuleAvailiable(moduleID))
    {
        fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");

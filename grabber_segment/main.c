@@ -23,6 +23,9 @@ struct calibration calib;
 char outputfoldername[512]={0};
 char inputname[512]={0};
 
+unsigned int width=640;
+unsigned int height=480;
+unsigned int framerate=30;
 
 //We want to grab multiple frames in this example if the user doesnt supply a parameter default is 10..
 unsigned int frameNum=0,maxFramesToGrab=10;
@@ -167,10 +170,10 @@ int main(int argc, char *argv[])
    struct SegmentationFeaturesDepth segConfDepth={0};
 
    //We want to initialize our segConfRGB for "valid" guessed for our resolution
-   initializeRGBSegmentationConfiguration(&segConfRGB,640,480);
+   initializeRGBSegmentationConfiguration(&segConfRGB,width,height);
 
    //We want to initialize our segConfDepth for "valid" guessed for our resolution
-   initializeDepthSegmentationConfiguration(&segConfDepth,640,480);
+   initializeDepthSegmentationConfiguration(&segConfDepth,width,height);
 
 
    //After the initialization we would like to convert all arguments ( argc,argv ) to the appropriate values
@@ -248,6 +251,25 @@ int main(int argc, char *argv[])
   }
 
 
+if (moduleID_1==SCRIPTED_ACQUISITION_MODULE)
+  {
+  if (
+      acquisitionGetScriptModuleAndDeviceID(
+                                            &moduleID_1 ,
+                                            &devID_1 ,
+                                            &width ,
+                                            &height,
+                                            &framerate,
+                                            0,
+                                            inputname,
+                                            512
+                                           )
+      )
+      { fprintf(stderr,"Loaded configuration from script file..\n"); }
+  }
+
+
+
   if (!acquisitionIsModuleAvailiable(moduleID_1))
    {
        fprintf(stderr,"The module you are trying to use as module A is not linked in this build of the Acquisition library..\n");
@@ -280,7 +302,7 @@ int main(int argc, char *argv[])
       }
 
     //Initialize Every OpenNI Device
-    acquisitionOpenDevice(moduleID_1,devID_1,devName,640,480,25);
+    acquisitionOpenDevice(moduleID_1,devID_1,devName,width,height,framerate);
     acquisitionMapDepthToRGB(moduleID_1,devID_1);
 
 

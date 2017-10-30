@@ -334,6 +334,48 @@ int acquisitionGetModuleCapabilities(ModuleIdentifier moduleID , DeviceIdentifie
 }
 
 
+
+int acquisitionGetScriptModuleAndDeviceID(
+                                          ModuleIdentifier * moduleID ,
+                                          DeviceIdentifier * devID ,
+                                          unsigned int *width ,
+                                          unsigned int *height,
+                                          unsigned int *framerate,
+                                          char * configuration,
+                                          char * deviceName,
+                                          unsigned int stringMaxLength
+                                         )
+{
+  fprintf(stderr,"acquisitionGetScriptModuleAndDeviceID \n");
+  if (*moduleID==SCRIPTED_ACQUISITION_MODULE)
+  {
+
+    executeScriptFromFile(module,*moduleID,*devID,deviceName);
+
+    fprintf(stderr,"original configuration : ");
+    fprintf(stderr,"module:%s dev:%u width:%u height:%u rate:%u\n",getModuleNameFromModuleID(*moduleID),*devID,*width,*height,*framerate);
+
+    int res= getRealModuleAndDevice(
+                                  module,
+                                  moduleID ,
+                                  devID ,
+                                  width ,
+                                  height,
+                                  framerate,
+                                  configuration,
+                                  deviceName,
+                                  stringMaxLength
+                                 );
+
+    fprintf(stderr,"redirected configuration : ");
+    fprintf(stderr,"module:%s dev:%u width:%u height:%u rate:%u\n",getModuleNameFromModuleID(*moduleID),*devID,*width,*height,*framerate);
+
+    return res;
+  }
+  return 1;
+}
+
+
 int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,const char * settings)
 {
    #if ENABLE_LOCATION_SERVICE
@@ -344,8 +386,9 @@ int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,con
   if (moduleID==SCRIPTED_ACQUISITION_MODULE)
   {
     //Special case for scripts
-     fprintf(stderr,"Scripts don't need module start..\n");
-    return 1;
+    fprintf(stderr,"Script reached module entry this is wrong , please use acquisitionGetScriptModuleAndDeviceID..");
+
+    return 0;
   }
 
 
@@ -459,8 +502,8 @@ int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,const
     if (moduleID==SCRIPTED_ACQUISITION_MODULE)
     {
      //Special case for scripts
-     fprintf(stderr,"Script initialization starting..");
-     return executeScriptFromFile(moduleID,devID,devName);
+     fprintf(stderr,"Script reached device entry this is wrong , please use acquisitionGetScriptModuleAndDeviceID..");
+     return 0;
     }
 
     if (moduleID>=NUMBER_OF_POSSIBLE_MODULES) { MeaningfullWarningMessage(moduleID,devID,"Incorrect ModuleID"); return 0; }

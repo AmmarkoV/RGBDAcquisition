@@ -4,44 +4,106 @@
 
 #include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h"
 
-int acquisitionExecuteString(struct InputParserC * ipc,ModuleIdentifier moduleID,DeviceIdentifier devID,const char * command)
+int acquisitionExecuteString(struct InputParserC * ipc,struct acquisitionModuleStates * state, ModuleIdentifier moduleID,DeviceIdentifier devID,const char * command)
 {
   InputParser_SeperateWordsCC(ipc,command,1);
 
   char tag[512];
   char moduleString[512];
-  char configString[512];
-  char deviceString[512];
-  InputParser_GetLowercaseWord(ipc,0,tag,512);
+  InputParser_GetWord(ipc,0,tag,512);
+
   if (strcmp(tag,"acquisitionStartModule")==0)
   {
     fprintf(stderr,"acquisitionStartModule\n");
-    InputParser_GetLowercaseWord(ipc,1,moduleString,512);
+    InputParser_GetUpcaseWord(ipc,1,moduleString,512);
     unsigned int selectedModuleID=getModuleIdFromModuleName(moduleString);
-    acquisitionStartModule(selectedModuleID,1,configString);
+    InputParser_GetWord(ipc,1,state[moduleID].device[devID].configuration,102);
+
+    state[moduleID].device[devID].redirectModuleID = selectedModuleID;
+    state[moduleID].device[devID].redirectDeviceID = 0;
+    state[moduleID].device[devID].useRedirect=1; //Use redirects
+
+    //acquisitionStartModule(selectedModuleID,1,state[moduleID].device[devID].configuration);
   } else
   if (strcmp(tag,"acquisitionOpenDevice")==0)
   {
     fprintf(stderr,"acquisitionOpenDevice\n");
-    InputParser_GetLowercaseWord(ipc,1,moduleString,512);
+    InputParser_GetUpcaseWord(ipc,1,moduleString,512);
     unsigned int selectedModuleID=getModuleIdFromModuleName(moduleString);
+
+
+
     unsigned int selectedDeviceID=InputParser_GetWordInt(ipc,2);
-    InputParser_GetLowercaseWord(ipc,3,deviceString,512);
-    unsigned int width,height,framerate;
+    InputParser_GetWord(ipc,3,state[moduleID].device[devID].deviceName,1024);
+
+    state[moduleID].device[devID].redirectModuleID = selectedModuleID;
+    state[moduleID].device[devID].redirectDeviceID = selectedDeviceID;
+    state[moduleID].device[devID].useRedirect=1; //Use redirects
 
 
-    width=InputParser_GetWordInt(ipc,4);
-    height=InputParser_GetWordInt(ipc,5);
-    framerate=InputParser_GetWordInt(ipc,6);
+    state[moduleID].device[devID].width=InputParser_GetWordInt(ipc,4);
+    state[moduleID].device[devID].height=InputParser_GetWordInt(ipc,5);
+    state[moduleID].device[devID].framerate=InputParser_GetWordInt(ipc,6);
 
-    acquisitionOpenDevice(selectedModuleID,selectedDeviceID,deviceString,width,height,framerate);
+    /*
+    acquisitionOpenDevice(
+                          selectedModuleID,
+                          selectedDeviceID,
+                          state[moduleID].device[devID].deviceName,
+                          state[moduleID].device[devID].width,
+                          state[moduleID].device[devID].height,
+                          state[moduleID].device[devID].framerate
+                         );*/
+  } else
+  {
+    fprintf(stderr,"unknown line : %s \n",command);
   }
 return 1;
 }
 
 
+int getRealModuleAndDevice(
+                           struct acquisitionModuleStates * state,
+                           ModuleIdentifier * moduleID ,
+                           DeviceIdentifier * devID ,
+                           unsigned int * width ,
+                           unsigned int * height,
+                           unsigned int * framerate,
+                           char * configuration,
+                           char * deviceName,
+                           unsigned int stringMaxLength
+                          )
+{
+    unsigned int scModuleID=*moduleID;
+    unsigned int scDevID=*devID;
 
-int executeScriptFromFile(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
+    if (state[scModuleID].device[scDevID].useRedirect)
+    {
+     *moduleID  = state[scModuleID].device[scDevID].redirectModuleID;
+     *devID     = state[scModuleID].device[scDevID].redirectDeviceID;
+
+     *width     = state[scModuleID].device[scDevID].width;
+     *height    = state[scModuleID].device[scDevID].height;
+     *framerate = state[scModuleID].device[scDevID].framerate;
+
+     if (configuration!=0)
+     {
+       snprintf(configuration,stringMaxLength,"%s",state[scModuleID].device[scDevID].configuration);
+     }
+
+     if (deviceName!=0)
+     {
+       snprintf(deviceName,stringMaxLength,"%s",state[scModuleID].device[scDevID].deviceName);
+     }
+
+     return 1;
+    }
+  return 0;
+}
+
+
+
+int executeScriptFromFile(struct acquisitionModuleStates * state,ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
 {
   ssize_t read;
 
@@ -55,7 +117,7 @@ int executeScriptFromFile(ModuleIdentifier moduleID,DeviceIdentifier devID,const
 
     while ((read = getline(&line, &len, fp)) != -1)
     {
-     acquisitionExecuteString(ipc,moduleID,devID,line);
+     acquisitionExecuteString(ipc,state,moduleID,devID,line);
     }
 
     InputParser_Destroy(ipc);
@@ -63,5 +125,7 @@ int executeScriptFromFile(ModuleIdentifier moduleID,DeviceIdentifier devID,const
     if (line) { free(line); }
     return 1;
   }
+
+ fprintf(stderr,"Could not execute acquisition script from %s\n",filename);
  return 0;
 }

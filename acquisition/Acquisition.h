@@ -109,7 +109,14 @@ struct processorData
  */
 struct acquisitionDeviceStates
 {
-  char outputString[1024];
+  //Redirect..!
+  unsigned int redirectModuleID;
+  unsigned int redirectDeviceID;
+  unsigned char useRedirect;
+
+  unsigned int width;
+  unsigned int height;
+  unsigned int framerate;
 
   //File output
   unsigned char fileOutput;
@@ -135,6 +142,9 @@ struct acquisitionDeviceStates
   unsigned short * overrideDepthFrame;
   unsigned int overrideDepthFrameByteSize;
 
+  char configuration[1024];
+  char deviceName[1024];
+  char outputString[1024];
 };
 
 
@@ -364,6 +374,19 @@ int acquisitionEnableStream(ModuleIdentifier moduleID,DeviceIdentifier devID,uns
  * @retval 1=Yes , 0=No
  */
 int acquisitionDisableStream(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int streamID);
+
+
+
+int acquisitionGetScriptModuleAndDeviceID(
+                                          ModuleIdentifier * moduleID ,
+                                          DeviceIdentifier * devID ,
+                                          unsigned int *width ,
+                                          unsigned int *height,
+                                          unsigned int *framerate,
+                                          char * configuration,
+                                          char * deviceName,
+                                          unsigned int stringMaxLength
+                                         );
 
 
 /**
