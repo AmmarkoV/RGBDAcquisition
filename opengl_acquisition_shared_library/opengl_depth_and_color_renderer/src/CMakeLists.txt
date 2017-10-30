@@ -31,6 +31,8 @@ IF( ENABLE_SHADERS )
  add_definitions(-DUSE_GLEW)
 ENDIF( ENABLE_SHADERS )
 
+ 
+
 add_definitions(-DINCLUDE_OPENGL_CODE)
 
 add_library(OGLRendererSandbox SHARED  
@@ -78,12 +80,12 @@ add_library(OGLRendererSandbox SHARED
             tools.c
             tools.h 
             #AmMatrix dependencies 
-            ../../../tools/AmMatrix/quaternions.c
-            ../../../tools/AmMatrix/quaternions.h
             ../../../tools/AmMatrix/matrix3x3Tools.c
             ../../../tools/AmMatrix/matrix3x3Tools.h
             ../../../tools/AmMatrix/matrix4x4Tools.c
             ../../../tools/AmMatrix/matrix4x4Tools.h
+            ../../../tools/AmMatrix/quaternions.c
+            ../../../tools/AmMatrix/quaternions.h
             ../../../tools/AmMatrix/matrixProject.c
             ../../../tools/AmMatrix/matrixProject.c
             ../../../tools/AmMatrix/matrixCalculations.c

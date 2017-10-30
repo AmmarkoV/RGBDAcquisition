@@ -44,6 +44,7 @@
 			<Add library="../acquisitionSegment/libAcquisitionSegment.a" />
 			<Add library="../acquisition_mux/libAcquisitionMux.a" />
 			<Add library="../processors/ViewpointChange/libViewpointChange.a" />
+			<Add library="../../../RGBDAcquisition/processors/BlobDetector/libBlobDetector.so" />
 		</Linker>
 		<Unit filename="AddNewElement.cpp" />
 		<Unit filename="AddNewElement.h" />
@@ -55,6 +56,8 @@
 		<Unit filename="FeedScreenMemory.h" />
 		<Unit filename="GetExtrinsics.cpp" />
 		<Unit filename="GetExtrinsics.h" />
+		<Unit filename="ScanHuman.cpp" />
+		<Unit filename="ScanHuman.h" />
 		<Unit filename="SelectAcquisitionGraph.cpp" />
 		<Unit filename="SelectAcquisitionGraph.h" />
 		<Unit filename="SelectCalibration.cpp" />
@@ -70,6 +73,7 @@
 		<Unit filename="wxsmith/AddNewElement.wxs" />
 		<Unit filename="wxsmith/Editorframe.wxs" />
 		<Unit filename="wxsmith/GetExtrinsics.wxs" />
+		<Unit filename="wxsmith/ScanHuman.wxs" />
 		<Unit filename="wxsmith/SelectAcquisitionGraph.wxs" />
 		<Unit filename="wxsmith/SelectCalibration.wxs" />
 		<Unit filename="wxsmith/SelectModule.wxs" />
@@ -89,6 +93,7 @@
 					<wxDialog wxs="wxsmith/SelectTarget.wxs" src="SelectTarget.cpp" hdr="SelectTarget.h" fwddecl="0" i18n="1" name="SelectTarget" language="CPP" />
 					<wxDialog wxs="wxsmith/GetExtrinsics.wxs" src="GetExtrinsics.cpp" hdr="GetExtrinsics.h" fwddecl="0" i18n="1" name="GetExtrinsics" language="CPP" />
 					<wxDialog wxs="wxsmith/AddNewElement.wxs" src="AddNewElement.cpp" hdr="AddNewElement.h" fwddecl="0" i18n="1" name="AddNewElement" language="CPP" />
+					<wxDialog wxs="wxsmith/ScanHuman.wxs" src="ScanHuman.cpp" hdr="ScanHuman.h" fwddecl="0" i18n="1" name="ScanHuman" language="CPP" />
 				</resources>
 			</wxsmith>
 			<debugger />

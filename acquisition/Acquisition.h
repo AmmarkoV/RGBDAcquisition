@@ -177,6 +177,8 @@ int acquisitionCleanOverrides(ModuleIdentifier moduleID,DeviceIdentifier devID);
 int acquisitionFileExists(char * filename);
 
 
+unsigned long acquisitionGetTickCount();
+
 /**
  * @brief Start one of the timers in our timer pool
  * @ingroup misc
@@ -273,7 +275,7 @@ unsigned char * convertShortDepthTo3CharDepth(unsigned short * depth,unsigned in
  * @param String with the friendly name of a module
  * @retval 0 or NO_ACQUISITION_MODULE means that input was incorrect , On Success on of enum Acquisition_Possible_Modules values will be returned
  */
-ModuleIdentifier getModuleIdFromModuleName(char * moduleName);
+ModuleIdentifier getModuleIdFromModuleName(const char * moduleName);
 
 
 /**
@@ -371,7 +373,7 @@ int acquisitionDisableStream(ModuleIdentifier moduleID,DeviceIdentifier devID,un
  * @param A string that passes module specific settings , can also be null
  * @retval 1=Success , 0=Failure
  */
-int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,char * settings);
+int acquisitionStartModule(ModuleIdentifier moduleID,unsigned int maxDevices,const char * settings);
 
 /**
  * @brief  Stop using a module , the module will be automatically unloaded , no further calls should be made to this module ( and if they are made they will fail )
@@ -412,7 +414,7 @@ int acquisitionListDevices(ModuleIdentifier moduleID,DeviceIdentifier devID,char
  * @param The framerate we *WISH* to have ( this might not be what the device returns )
  * @retval  1 = Success , 0=Failure
  */
-int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+int acquisitionOpenDevice(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate);
 
 
 /**
@@ -775,7 +777,7 @@ int acquisitionGetDepthFrameDimensions(ModuleIdentifier moduleID,DeviceIdentifie
  * @param filename , The filename of the target file
  * @retval 1=Success 0=Failure
  */
-int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+int acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
 
 
 int acquisitionSaveTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
@@ -788,7 +790,7 @@ int acquisitionSaveTimestamp(ModuleIdentifier moduleID,DeviceIdentifier devID,co
  * @param filename , The filename of the target file
  * @retval 1=Success 0=Failure
  */
-int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress);
+int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename, int compress);
 /**
  * @brief  Save the depth frame on a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
  * @ingroup acquisitionSaveTo
@@ -798,7 +800,7 @@ int acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,c
  * @param compression , A switch that controls compression
  * @retval 1=Success 0=Failure
  */
-int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress);
+int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename, int compress);
 /**
  * @brief  Save the depth frame converted to 8-bit grayscale ( instead of 16bit grayscale ) to a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
  * @ingroup acquisitionSaveTo
@@ -808,7 +810,7 @@ int acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,c
  * @param compression , A switch that controls compression
  * @retval 1=Success 0=Failure
  */
-int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
 /**
  * @brief  Save the depth frame converted to RGB values to a PPM/PNM file ( see http://en.wikipedia.org/wiki/Portable_anymap )
  * @ingroup acquisitionSaveTo
@@ -817,7 +819,7 @@ int acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID
  * @param filename , The filename of the target file
  * @retval 1=Success 0=Failure
  */
-int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename);
+int acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename);
 
 /* Deprecated
 double acqusitionGetColorFocalLength(ModuleIdentifier moduleID,DeviceIdentifier devID);
@@ -856,7 +858,7 @@ int acquisitionMapRGBToDepth(ModuleIdentifier moduleID,DeviceIdentifier devID);
  * @param Target is a string that can be tcp://ip:port , /dev/null/ , or a filename . Depending on its value it initializes network , loopback , or file output
  * @retval 1=Success , 0=Failure
  */
-int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,char * target);
+int acquisitionInitiateTargetForFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * target);
 
 /**
  * @brief Gracefully stop writing to Target of stream
@@ -890,7 +892,7 @@ int acquisitionPassFramesToTarget(ModuleIdentifier moduleID,DeviceIdentifier dev
  * @param argv value of intialization arguments
  * @retval 1=Success , 0=Failure
  */
-int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,char * processorName,char * processorLibPath,int argc, char *argv[]);
+int acquisitionAddProcessor(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * processorName,const char * processorLibPath,int argc,const char *argv[]);
 
 
 

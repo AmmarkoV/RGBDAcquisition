@@ -82,7 +82,7 @@ struct calibration
  * @bug RGBDAcquisition forces floating points using US locale ( i.e. 3.14 instead of 3,14 ) Locales exist for a reason ,
  *      If someone wants to respect them he should consider setting RESPECT_LOCALES to 1 in calibration.c and recompiling everything
  */
-float internationalAtof(char * str);
+float internationalAtof(const char * str);
 
 /**
  * @brief  Populate a struct calibration with "default" values
@@ -114,7 +114,7 @@ int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,
  * @param  Pointer , Pointer to the calibration to be filled with the values of the file
  * @retval 1=Success , 0=Failure
  */
-int RefreshCalibration(char * filename,struct calibration * calib);
+int RefreshCalibration(const char * filename,struct calibration * calib);
 
 
 /**
@@ -126,7 +126,7 @@ int RefreshCalibration(char * filename,struct calibration * calib);
  * @param  Pointer , Pointer to the calibration to be filled with the values of the file
  * @retval 1=Success , 0=Failure
  */
-int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib);
+int ReadCalibration(const char * filename,unsigned int width,unsigned int height,struct calibration * calib);
 
 /**
  * @brief  Write a file and with the calibration specified into struct calibration * calib

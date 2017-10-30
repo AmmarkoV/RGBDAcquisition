@@ -25,7 +25,7 @@ extern "C"
    #endif
 
    //Initialization of DepthSense
-   int startDepthSenseModule(unsigned int max_devs,char * settings);
+   int startDepthSenseModule(unsigned int max_devs,const char * settings);
    //DepthSenseAcquisition does not conflict with anything so we default to building it
    #define BUILD_DEPTHSENSE 1
 
@@ -45,7 +45,7 @@ extern "C"
 
    //Basic Per Device Operations
    int listDepthSenseDevices(int devID,char * output, unsigned int maxOutput);
-   int createDepthSenseDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+   int createDepthSenseDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyDepthSenseDevice(int devID);
 
    int getTotalDepthSenseFrameNumber(int devID);

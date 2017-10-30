@@ -104,6 +104,7 @@ ENDIF( ENABLE_TEMPLATE )
 
 IF( ENABLE_OPENGL )
   add_subdirectory (opengl_acquisition_shared_library/)
+  #add_subdirectory (opengl_acquisition_shared_library/opengl_depth_and_color_renderer)
 ENDIF( ENABLE_OPENGL )
 
 IF( ENABLE_V4L2 )

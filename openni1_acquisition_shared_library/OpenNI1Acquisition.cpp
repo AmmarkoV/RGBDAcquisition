@@ -29,6 +29,8 @@ Device devices[MAX_OPENNI_DEVICES];
 DepthGenerator depthGenerators[MAX_OPENNI_DEVICES]={0};
 ImageGenerator imageGenerators[MAX_OPENNI_DEVICES]={0};
 
+unsigned int currentAllocatedDevices = 0;
+
 DepthMetaData depthGeneratorsMetaData[MAX_OPENNI_DEVICES];
 ImageMetaData imageGeneratorsMetaData[MAX_OPENNI_DEVICES];
 ScriptNode script;
@@ -41,9 +43,9 @@ Context ctx;
 #endif
 
 
-int startOpenNI1Module(unsigned int max_devs,char * settings)
+int startOpenNI1Module(unsigned int max_devs,const char * settings)
 {
-
+ currentAllocatedDevices  = max_devs;
  EnumerationErrors errors;
  XnStatus rc;
 
@@ -54,7 +56,10 @@ int startOpenNI1Module(unsigned int max_devs,char * settings)
     if (strstr(settings,".xml")!=0) { useXMLFile=1; }
    }
 
-   if (useXMLFile) { rc = ctx.InitFromXmlFile(settings); } else
+   if (useXMLFile) {
+                     rc = ctx.InitFromXmlFile(settings);  //call to ‘xnInitFromXmlFile’ declared with attribute warning: This function is deprecated: Please use xnInitFromXmlFileEx() instead
+                     //rc=ctx.xnInitFromXmlFileEx()
+                   } else
                    { rc = ctx.Init(); }
 
  if (rc == XN_STATUS_NO_NODE_PRESENT)
@@ -183,7 +188,7 @@ int stopOpenNI1Module()
 }
 
 
-int SignalOpenNIError(char * description , XnStatus rc)
+int SignalOpenNIError(const char * description , XnStatus rc)
 {
   if (rc != XN_STATUS_OK) { printf("Error : %s ( %s )\n",description,xnGetStatusString(rc)); return 1; }
   return 0;
@@ -191,7 +196,7 @@ int SignalOpenNIError(char * description , XnStatus rc)
 
 
    //Basic Per Device Operations
-int createOpenNI1Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate)
+int createOpenNI1Device(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate)
 {
     XnStatus rc;
     XnMapOutputMode mapMode;
@@ -306,6 +311,34 @@ int snapOpenNI1Frames(int devID)
 
  return 1;
 }
+
+
+int badDeviceID(int devID,const char * callFile,unsigned int callLine)
+{
+  if (devID<=currentAllocatedDevices) { return 0; }
+  fprintf(stderr,"Bad Device ID detected (%i/%i) , File %s : Line %u , ignoring request\n",devID,currentAllocatedDevices,callFile,callLine);
+  return 1;
+}
+
+
+
+
+int getTotalOpenNI1FrameNumber(int devID)
+{
+  if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+  #warning "Todo , check here for oni file length etc..\n"
+  //fprintf(stderr,"Todo , check here for oni file length etc..\n");
+  return 0;
+}
+
+int getCurrentOpenNI1FrameNumber(int devID)
+{
+  if (badDeviceID(devID,__FILE__,__LINE__)) { return 0; }
+  unsigned int frameNumber = xnGetFrameID(imageGenerators[devID]);
+  //fprintf(stderr,"xnGetFrameID = %u \n",frameNumber);
+  return frameNumber;
+}
+
 
 //Color Frame getters
 int getOpenNI1ColorWidth(int devID) { return imageGeneratorsMetaData[devID].FullXRes(); }

@@ -72,7 +72,7 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
        //fprintf(stderr,"Todo Implement check in paths : `%s` \n",ldPath);
        char * directoriesToCheck = (char*) malloc(sizeof(char) * strlen(ldPath) );
 
-       char * endOfPath=1;
+       char * endOfPath=directoriesToCheck;
        char * startOfPath=directoriesToCheck;
        if (directoriesToCheck!=0)
        {

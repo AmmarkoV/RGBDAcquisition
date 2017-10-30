@@ -21,6 +21,7 @@
 #include "SelectModule.h"
 #include "SelectTarget.h"
 #include "SelectSegmentation.h"
+#include "ScanHuman.h"
 #include "GetExtrinsics.h"
 #include "AddNewElement.h"
 
@@ -190,6 +191,7 @@ const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
 const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
+const long EditorFrame::ID_MENUSCANHUMAN = wxNewId();
 const long EditorFrame::idMenuQuit = wxNewId();
 const long EditorFrame::ID_MENUSEGMENTATION = wxNewId();
 const long EditorFrame::ID_MENUGETEXTRINSICS = wxNewId();
@@ -282,6 +284,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     MenuItem5->Enable(false);
     MenuItem4 = new wxMenuItem(Menu1, ID_MENUSAVEPCD, _("Save Frame as PCD"), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(MenuItem4);
+    MenuItem11 = new wxMenuItem(Menu1, ID_MENUSCANHUMAN, _("Scan Human"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem11);
     MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
     Menu1->Append(MenuItem1);
     MenuBar1->Append(Menu1, _("&File"));
@@ -351,6 +355,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_MENUOPENMODULE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnOpenModule);
     Connect(ID_MENUSEGMENTATION,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
     Connect(ID_MENUGETEXTRINSICS,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonGetExtrinsics);
+    Connect(ID_MENUSCANHUMAN,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonScanHuman);
 
     Connect(ID_MENUOVERLAYEDITOR,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OpenOverlayEditor);
 
@@ -1152,15 +1157,20 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
          acquisitionPassFramesToTarget(moduleID,devID,recordedFrames,compressRecordingOutput);
          ++recordedFrames;
 
-         if (recordedFrames % 3 == 0 ) { Refresh(); /*Throttle window refreshes when recording*/}
+         if (recordedFrames % 3 == 0 )
+            {
+              Refresh(); /*Throttle window refreshes when recording*/
+              wxYieldIfNeeded();
+            }
      } else
      {
        Refresh();
+       wxYieldIfNeeded();
        //if (framesDrawn%2 == 0 ) { Refresh();  /*Throttle window refreshes when viewing*/ }
      }
     }
 
-  wxYield();
+  //wxYield();
   //wxThread::Sleep(0.4);
 }
 
@@ -1229,6 +1239,27 @@ void EditorFrame::OnFrameSliderCmdScroll(wxScrollEvent& event)
     guiSnapFrames(1); //Get New Frames
     Refresh(); // <- This draws the window!
 }
+
+
+
+void EditorFrame::OnButtonScanHuman(wxCommandEvent& event)
+{
+ //OnButtonScanHuman(wxCommandEvent& event);
+ ScanHuman  * scanHumanMenu = new ScanHuman(this, wxID_ANY);
+
+ scanHumanMenu->ShowModal();
+
+ delete  scanHumanMenu;
+
+
+ refreshAllOverlays();
+ lastFrameDrawn+=1000;
+ guiSnapFrames(0); //Get New Frames
+ Refresh();
+}
+
+
+
 
 void EditorFrame::OnButtonSegmentationClick(wxCommandEvent& event)
 {

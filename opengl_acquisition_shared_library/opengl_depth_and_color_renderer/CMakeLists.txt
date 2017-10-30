@@ -17,8 +17,8 @@ ENDIF( ENABLE_HIGH_PERFORMANCE_BUILD )
 
 
 #Add the codecs needed for the correct building
-set(CODECS_DIRECTORY "../../tools/Codecs")
-add_subdirectory ( ${CODECS_DIRECTORY} RGBDAcquisition/Codecs )
+set(CODECS_DIRECTORY "../../tools/Codecs") 
+add_subdirectory ( ${CODECS_DIRECTORY} RGBDAcquisition/Codecs)
 
 add_subdirectory (src/)
 add_subdirectory (submodules/Assimp)

@@ -369,7 +369,7 @@ int setKeyboardControl(int val)
   return 1;
 }
 
-int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,char * sceneFile)
+int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile)
 {
   fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
   snapsPerformed=0;

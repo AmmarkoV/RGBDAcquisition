@@ -13,7 +13,7 @@ extern "C"
 #endif
 
    //Initialization of Desktop
-   int startDesktopModule(unsigned int max_devs,char * settings);
+   int startDesktopModule(unsigned int max_devs,const char * settings);
    //DesktopAcquisition does not conflict with anything so we default to building it
 
    int getDesktopCapabilities(int devID,int capToAskFor);
@@ -31,7 +31,7 @@ extern "C"
 
    //Basic Per Device Operations
    int listDesktopDevices(int devID,char * output, unsigned int maxOutput);
-   int createDesktopDevice(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+   int createDesktopDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyDesktopDevice(int devID);
 
    int getTotalDesktopFrameNumber(int devID);

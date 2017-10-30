@@ -54,7 +54,7 @@ unsigned int _acfo_simplePow(unsigned int base,unsigned int exp)
 }
 
 
-int _acfo_savePCD_PointCloud(char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
+int _acfo_savePCD_PointCloud(const char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
 {
     if(depthFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) depth frame , will not write any file output\n",filename); return 0; }
     if(colorFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) color frame , will not write any file output\n",filename); return 0; }
@@ -125,7 +125,7 @@ int _acfo_savePCD_PointCloud(char * filename ,unsigned short * depthFrame ,unsig
 
 
 
-int _acfo_savePCD_PointCloudNoEmpty(char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
+int _acfo_savePCD_PointCloudNoEmpty(const char * filename ,unsigned short * depthFrame ,unsigned char * colorFrame , unsigned int width , unsigned int height , float cx , float cy , float fx , float fy )
 {
     if(depthFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) depth frame , will not write any file output\n",filename); return 0; }
     if(colorFrame==0) { fprintf(stderr,"saveToPCD_PointCloud(%s) called for an unallocated (empty) color frame , will not write any file output\n",filename); return 0; }
@@ -206,7 +206,7 @@ int _acfo_savePCD_PointCloudNoEmpty(char * filename ,unsigned short * depthFrame
 }
 
 
- int _acfo_acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+ int _acfo_acquisitionSavePCDPointCoud(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
 {
   unsigned int width;
   unsigned int height;
@@ -214,8 +214,8 @@ int _acfo_savePCD_PointCloudNoEmpty(char * filename ,unsigned short * depthFrame
   unsigned int bitsperpixel;
   acquisitionGetDepthFrameDimensions(moduleID,devID,&width,&height,&channels,&bitsperpixel);
 
-  return savePCD_PointCloud(filename,acquisitionGetDepthFrame(moduleID,devID),acquisitionGetColorFrame(moduleID,devID),
-                            width,height,width/2,height/2, 1.0 /*DUMMY fx*/, 1.0 /*DUMMY fy*/ );
+  return _acfo_savePCD_PointCloud(filename,acquisitionGetDepthFrame(moduleID,devID),acquisitionGetColorFrame(moduleID,devID),
+                                  width,height,width/2,height/2, 1.0 /*DUMMY fx*/, 1.0 /*DUMMY fy*/ );
 }
 
 
@@ -282,7 +282,7 @@ int _acfo_acquisitionSaveRawImageToFile(char * filename,unsigned char * pixels ,
         GetDateString(timeStampStr,"TIMESTAMP",1,0,0,0,0,0,0,0);
         fprintf(fd, "#%s\n", timeStampStr );*/
 
-        fprintf(fd, "#TIMESTAMP %lu\n",GetTickCount());
+        fprintf(fd, "#TIMESTAMP %lu\n",acquisitionGetTickCount());
 
 
         fprintf(fd, "%d %d\n%u\n", width, height , _acfo_simplePow(2 ,bitsperpixel)-1);
@@ -462,9 +462,9 @@ unsigned char * _acfo_convertShortDepthTo3CharDepth(unsigned short * depth,unsig
 
 
 
-int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
+int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename, int compress)
 {
-    printCall(moduleID,devID,"acquisitionSaveColorFrame", __FILE__, __LINE__);
+//    printCall(moduleID,devID,"acquisitionSaveColorFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
     int retres =0;
 
@@ -541,17 +541,17 @@ int _acfo_acquisitionSaveColorFrame(ModuleIdentifier moduleID,DeviceIdentifier d
             return retres;
          }
 
-
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColorFrame");
+fprintf(stderr,"Error calling acquisitionSaveColorFrame\n");
+//    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColorFrame");
     return 0;
 }
 
 
 
 
-int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename, int compress)
+int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename, int compress)
 {
-    printCall(moduleID,devID,"acquisitionSaveDepthFrame", __FILE__, __LINE__);
+    //printCall(moduleID,devID,"acquisitionSaveDepthFrame", __FILE__, __LINE__);
     char filenameFull[2048]={0};
     int retres=0;
 
@@ -612,15 +612,16 @@ int _acfo_acquisitionSaveDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier d
              }
          }
 
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveDepthFrame");
+fprintf(stderr,"Error calling acquisitionSaveDepthFrame\n");
+//    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveDepthFrame");
     return 0;
 }
 
 
 
-int _acfo_acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+int _acfo_acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
 {
-    printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame", __FILE__, __LINE__);
+   // printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame", __FILE__, __LINE__);
 
     char filenameFull[1024]={0};
 
@@ -651,14 +652,15 @@ int _acfo_acquisitionSaveColoredDepthFrame(ModuleIdentifier moduleID,DeviceIdent
         }
       }
 
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColoredDepthFrame");
+      fprintf(stderr,"Error calling acquisitionSaveColoredDepthFrame\n");
+//    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColoredDepthFrame");
     return 0;
 }
 
 
-int _acfo_acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,char * filename)
+int _acfo_acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier devID,const char * filename)
 {
-    printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame", __FILE__, __LINE__);
+    //printCall(moduleID,devID,"acquisitionSaveColoredDepthFrame", __FILE__, __LINE__);
 
     char filenameFull[1024]={0};
 
@@ -688,7 +690,9 @@ int _acfo_acquisitionSaveDepthFrame1C(ModuleIdentifier moduleID,DeviceIdentifier
         }
       }
 
-    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColoredDepthFrame");
+      fprintf(stderr,"Error calling acquisitionSaveColoredDepthFrame\n");
+
+//    MeaningfullWarningMessage(moduleID,devID,"acquisitionSaveColoredDepthFrame");
     return 0;
 }
 

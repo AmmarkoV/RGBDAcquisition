@@ -121,7 +121,7 @@ int FocalLengthAndPixelSizeToCalibration(double focalLength , double pixelSize ,
 
 
 
-float internationalAtof(char * str)
+float internationalAtof(const char * str)
 {
   #if RESPECT_LOCALES
    return atof(str);
@@ -142,7 +142,7 @@ float internationalAtof(char * str)
 
 
 
-int RefreshCalibration(char * filename,struct calibration * calib)
+int RefreshCalibration(const char * filename,struct calibration * calib)
 {
   if ((filename==0)||(calib==0)) { return 0; }
   forceUSLocaleToKeepOurSanity();
@@ -291,7 +291,7 @@ int RefreshCalibration(char * filename,struct calibration * calib)
 }
 
 
-int ReadCalibration(char * filename,unsigned int width,unsigned int height,struct calibration * calib)
+int ReadCalibration(const char * filename,unsigned int width,unsigned int height,struct calibration * calib)
 {
   if ((filename==0)||(calib==0)) { return 0; }
   //First free

@@ -34,6 +34,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then
+     cd "$DIR"
      git clone git://github.com/OpenKinect/libfreenect2.git
      cd libfreenect2
      sudo depends/install_ubuntu.sh
@@ -67,6 +68,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then
+     cd "$DIR"
      sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  
      git clone git://github.com/OpenKinect/libfreenect.git
      cd libfreenect
@@ -131,6 +133,17 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then
+     cd "$DIR"
+     git clone https://github.com/avin2/SensorKinect
+     cd SensorKinect/Bin
+     tar xjf SensorKinect093-Bin-Linux-x64-v5.1.2.1.tar.bz2
+     cd Sensor-Bin-Linux-x64-v5.1.2.1
+     ./install.sh
+
+
+
+
+
      sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  
      git clone git://github.com/OpenNI/OpenNI.git 
      cd OpenNI/Platform/Linux/CreateRedist
@@ -188,6 +201,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then
+     cd "$DIR"
      sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  libudev-dev
      git clone git://github.com/OpenNI/OpenNI2.git
      cd OpenNI2
@@ -236,6 +250,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then 
+      cd "$DIR"
       sudo apt-get install libprotobuf-dev libleveldb-dev libsnappy-dev libopencv-dev libboost-all-dev libhdf5-serial-dev libgflags-dev libgoogle-glog-dev liblmdb-dev protobuf-compiler 
       git clone https://github.com/BVLC/caffe.git
       cd caffe
@@ -266,6 +281,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then  
+      cd "$DIR"
       git clone https://github.com/ph4m/DepthSenseGrabber
       cd DepthSenseGrabber
 
@@ -296,6 +312,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then  
+      cd "$DIR"
       git clone https://github.com/IntelRealSense/librealsense/
       cd librealsense
 
@@ -326,6 +343,7 @@ else
   read answer
   if test "$answer" != "N" -a "$answer" != "n";
   then  
+      cd "$DIR"
       git clone https://github.com/itseez/opencv_contrib/
       cd opencv_contrib
       
@@ -338,10 +356,7 @@ else
 fi
 
 
-
-
-
-
+ 
 cd "$STARTDIR"
 
 exit 0

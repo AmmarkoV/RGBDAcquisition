@@ -269,7 +269,7 @@ if (drawDepth)
 }
 
 
-int main (int argc, char *argv[])
+int main (int argc,const char *argv[])
 {
  fprintf(stderr,"Generic Grabber Application based on Acquisition lib .. \n");
  unsigned int possibleModules = acquisitionGetModulesCount();

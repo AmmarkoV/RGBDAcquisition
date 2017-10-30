@@ -3,6 +3,7 @@
 #include "tiledRenderer.h"
 
 #include <stdio.h>
+#include "../../../tools/AmMatrix/matrixProject.h"
 
 #include "TrajectoryParser/TrajectoryParser.h"
 #include "ModelLoader/model_loader.h"
@@ -47,7 +48,7 @@ int tiledRenderer_get2DCenter(void * trConf ,
 
       //fprintf(stderr,"Column/Row %u/%u ( %0.2f,%0.2f,%0.2f ) -> %0.2f %0.2f %0.2f\n",column, x3D , y3D , z3D , row , winX , winY , winZ);
 
-      struct tiledRendererConfiguration * trConfPTR = (struct tiledRendererConfiguration *) trConf;
+      //struct tiledRendererConfiguration * trConfPTR = (struct tiledRendererConfiguration *) trConf;
       *x2D = win[0];
       *y2D = win[1];
       *z2D = win[2];
@@ -109,6 +110,7 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
         trConf->op.angZStep=0;
 
       fprintf(stderr,"Drawing starts @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",trConf->op.posXBegining,trConf->op.posYBegining  ,  trConf->angleX-trConf->angXVariance , trConf->angleY-trConf->angYVariance , trConf->angleZ);
+ return 1;
 }
 
 
@@ -124,8 +126,6 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
   struct Model ** models = ( struct Model ** ) trConf->modelPTR;
 
 
-
-
   fprintf(stderr,"Photoshooting Object %u -> %s \n",trConf->objID,scene->object[trConf->objID].name);
   fprintf(stderr,"Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",trConf->rows,trConf->columns,trConf->distance,trConf->angleX,trConf->angleY,trConf->angleZ);
   fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",trConf->angXVariance,trConf->angYVariance,trConf->angZVariance);
@@ -135,26 +135,34 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                 { setupTiledRendererOGL(0.0,0.0,0.0); }
 
 
+  fprintf(stderr,"setupTiledRendererOGL done \n");
   if (scene!=0)
     {
        unsigned char noColor=0;
        float posStack[POS_COORD_LENGTH]={0};
        float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
+
        unsigned int i=trConf->objID;
-
+       fprintf(stderr,"Accessing models (%u).. \n",scene->object[i].type);
        struct Model * mod = models[scene->object[i].type];
+       if (mod==0) { fprintf(stderr,"Model not allocated.. \n"); return 0;}
        float * pos = (float*) &posStack;
-         //This is a stupid way of passing stuff to be drawn
-         R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
-         getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
 
-         setModelColor(mod,&R,&G,&B,&trans,&noColor);
-         mod->scaleX = scene->object[i].scaleX;
-         mod->scaleY = scene->object[i].scaleY;
-         mod->scaleZ = scene->object[i].scaleZ;
+       fprintf(stderr,"getObjectColorsTrans Colors.. \n");
+       //This is a stupid way of passing stuff to be drawn
+       R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
+       getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
 
-        int x,y,z;
+       fprintf(stderr,"Setting Colors.. ");
+       setModelColor(mod,&R,&G,&B,&trans,&noColor);
+       fprintf(stderr,"done\n");
+       mod->scaleX = scene->object[i].scaleX;
+       mod->scaleY = scene->object[i].scaleY;
+       mod->scaleZ = scene->object[i].scaleZ;
 
+        unsigned int x,y;
+
+        fprintf(stderr,"tiledRenderer_CalculateLoops \n");
         tiledRenderer_CalculateLoops(trConf);
 
        for (y=0; y<=trConf->op.snapsVertical; y++)
@@ -166,6 +174,7 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                                                      &pos[POS_ANGLEX],&pos[POS_ANGLEY],&pos[POS_ANGLEZ]);
 
 
+                   fprintf(stderr,"Draw %u,%u \n",x,y);
                    drawModelAt(
                                 mod,
                                 pos[POS_X],pos[POS_Y],pos[POS_Z],

@@ -199,7 +199,7 @@ int main(int argc, char **argv)
     if (photoShootOBJ)
     {
         float angXVariance=60,angYVariance=60,angZVariance=30;
-        //fprintf(stderr,"Making a photoshoot of object %u",photoShootOBJ);
+        fprintf(stderr,"Making a photoshoot of object %u",photoShootOBJ);
 
         void * oglPhotoShoot = createOGLRendererPhotoshootSandbox( photoShootOBJ,columns,rows,distance,angleX,angleY,angleZ,angXVariance,angYVariance,angZVariance );
 

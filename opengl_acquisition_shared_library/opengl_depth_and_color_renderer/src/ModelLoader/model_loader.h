@@ -53,6 +53,7 @@ struct ModelList
 
 struct ModelList *  allocateModelList(unsigned int initialSpace);
 
+int deallocateModelList(struct ModelList* modelStorage);
 
 int printModelList(struct ModelList* modelStorage);
 

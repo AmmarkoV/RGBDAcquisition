@@ -80,6 +80,7 @@ class EditorFrame: public wxFrame
         void OncurrentFrameTextCtrlText(wxCommandEvent& event);
         void OnFrameSliderCmdScroll(wxScrollEvent& event);
         void OnButtonSegmentationClick(wxCommandEvent& event);
+        void OnButtonScanHuman(wxCommandEvent& event);
         void OnButtonCalibrationClick(wxCommandEvent& event);
         void OnbuttonRecordClick(wxCommandEvent& event);
         void OnButtonAcquisitionGraphClick(wxCommandEvent& event);
@@ -158,6 +159,7 @@ class EditorFrame: public wxFrame
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
         static const long ID_MENUSAVEPCD;
+        static const long ID_MENUSCANHUMAN;
         static const long idMenuQuit;
         static const long ID_MENUSEGMENTATION;
         static const long ID_MENUGETEXTRINSICS;
@@ -200,6 +202,7 @@ class EditorFrame: public wxFrame
         wxMenu* Menu4;
         wxStaticBox* StaticBoxVideoFeed;
         wxButton* buttonPlay;
+        wxMenuItem* MenuItem11;
         wxStaticText* StaticText7;
         wxButton* ButtonAcquisitionGraph;
         wxButton* ButtonAF;

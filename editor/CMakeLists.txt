@@ -20,6 +20,8 @@ add_executable(Editor
                SelectSegmentation.h
                SelectTarget.cpp
                SelectTarget.h
+               ScanHuman.cpp
+               ScanHuman.h
                AddNewElement.cpp
                Tools.cpp
                Tools.h 

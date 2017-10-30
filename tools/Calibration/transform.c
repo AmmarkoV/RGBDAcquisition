@@ -19,7 +19,7 @@ enum VecDims
 
 
 
-unsigned char *  registerUndistortedColorToUndistortedDepthFrame
+unsigned char * registerUndistortedColorToUndistortedDepthFrame
                                           (
                                            unsigned char * undistortedRgb , unsigned int rgbWidth , unsigned int rgbHeight , struct calibration * rgbCalibration ,
                                            unsigned short * undistortedDepth , unsigned int depthWidth , unsigned int depthHeight , struct calibration * depthCalibration ,
@@ -102,6 +102,6 @@ unsigned char *  registerUndistortedColorToUndistortedDepthFrame
    x_d = x_d % rgbWidth;
   }
 
-  return 1;
+  return output;
 }
 

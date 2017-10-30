@@ -12,7 +12,11 @@
 #include "tools.h"
 
 #include "../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../tools/AmMatrix/matrixProject.h"
+#include "../../../tools/AmMatrix/matrix4x4Tools.h"
+
 #include "TrajectoryParser/TrajectoryParser.h"
+#include "TrajectoryParser/TrajectoryCalculator.h"
 #include "ModelLoader/model_loader.h"
 #include "ModelLoader/model_loader_hardcoded.h"
 #include "ModelLoader/model_loader_tri.h"
@@ -270,7 +274,7 @@ int updateProjectionMatrix()
    glViewport(0, 0, WIDTH, HEIGHT);
   }
 
-  fprintf(stderr,"updateProjectionMatrix done\n",WIDTH,HEIGHT);
+  fprintf(stderr,"updateProjectionMatrix ( %u x %u ) done\n",WIDTH,HEIGHT);
   return 1;
 }
 
@@ -601,6 +605,8 @@ int tickScene()
 
    unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
    calculateVirtualStreamPos(scene,0,timestampToUse,pos,0,&scaleX,&scaleY,&scaleZ);
+
+
    camera_pos_x = userDeltacamera_pos_x + pos[0];  camera_pos_y = userDeltacamera_pos_y + pos[1]; camera_pos_z = userDeltacamera_pos_z + pos[2];
    camera_angle_x = userDeltacamera_angle_x + pos[3]; camera_angle_y = userDeltacamera_angle_y + pos[4]; camera_angle_z = userDeltacamera_angle_z + pos[5];
 
@@ -698,6 +704,7 @@ int doAllEventTriggers(unsigned int timestampToUse)
         break;
       };
   }
+ return 1;
 }
 
 int drawAllObjectsAtPositionsFromTrajectoryParser()
@@ -916,7 +923,7 @@ int renderScene()
    //print4x4DMatrix("OpenGL ModelView Matrix Given by Trajectory Parser", scene->modelViewMatrix );
   } //else //<- this else
   //If setOpenGLExtrinsicCalibration has set a custom MODELVIEW matrix we will use it
-  #warning "Is this else required?"
+
   if (useCustomModelViewMatrix)
   {
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
@@ -1029,8 +1036,7 @@ int setupPhotoshoot(
   configuration->angZVariance=angZVariance;
 
   configuration->scenePTR = (void *) scene;
-  #warning "Models are disconnected from photoshoots setupPhotoshoot"
-  //configuration->modelPTR = (void *) models;
+  configuration->modelPTR = (void *) modelStorage;
   return 1;
 }
 
@@ -1061,10 +1067,7 @@ void * createPhotoshoot(
   configuration->angZVariance=angZVariance;
 
   configuration->scenePTR = (void *) scene;
-
-  #warning "Models are disconnected from photoshoots createPhotoshoot"
-//  configuration->modelPTR = (void *) models;
-
+  configuration->modelPTR = (void *) modelStorage;
 
 
   return (void*) configuration;

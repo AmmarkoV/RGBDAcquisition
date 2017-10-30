@@ -15,7 +15,7 @@ extern "C"
 
 
    //Initialization of OpenNI1
-   int startOpenNI1Module(unsigned int max_devs,char * settings);
+   int startOpenNI1Module(unsigned int max_devs,const char * settings);
 
    #if BUILD_OPENNI1
 
@@ -27,9 +27,13 @@ extern "C"
    int mapOpenNI1RGBToDepth(int devID);
 
    //Basic Per Device Operations
-   int createOpenNI1Device(int devID,char * devName,unsigned int width,unsigned int height,unsigned int framerate);
+   int createOpenNI1Device(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate);
    int destroyOpenNI1Device(int devID);
    int snapOpenNI1Frames(int devID);
+
+
+   int getTotalOpenNI1FrameNumber(int devID);
+   int getCurrentOpenNI1FrameNumber(int devID);
 
    //Color Frame getters
    int getOpenNI1ColorWidth(int devID);
