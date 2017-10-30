@@ -70,7 +70,7 @@ unsigned int frameSnapped=0;
 #endif
 
 
-unsigned int forceMapDepthToRGB=0;
+unsigned int forceMapDepthToRGB=1;
 unsigned int deviceInited[MAX_OPENNI2_DEVICES]={0};
 unsigned int lastDepthComesFromNite[MAX_OPENNI2_DEVICES]={0};
 unsigned int pauseFaceDetection = 0;
