@@ -128,6 +128,8 @@ int getPluginPathFromEnvVariable(char * envVar ,char * libName , char * pathOut,
 
 int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned int pathOutLength)
 {
+   fprintf(stderr,GREEN "Now searching for plugin %s \n" NORMAL,libName);
+
    //LD_PRELOAD proeceeds our lookups..!
    if (getPluginPathFromEnvVariable("LD_PRELOAD",libName,pathOut,pathOutLength))              { return 1; }
 
