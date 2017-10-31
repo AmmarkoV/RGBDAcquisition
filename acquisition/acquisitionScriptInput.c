@@ -10,8 +10,8 @@ int acquisitionExecuteString(struct InputParserC * ipc,struct acquisitionModuleS
   if (command==0) { return 0; }
   InputParser_SeperateWordsCC(ipc,command,1);
 
-  char tag[512];
-  char moduleString[512];
+  char tag[512]={0};
+  char moduleString[512]={0};
   InputParser_GetWord(ipc,0,tag,512);
 
   if (strcmp(tag,"acquisitionStartModule")==0)
