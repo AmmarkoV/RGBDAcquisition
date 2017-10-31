@@ -96,7 +96,7 @@ int getRealModuleAndDevice(
        snprintf(deviceName,stringMaxLength,"%s",state[scModuleID].device[scDevID].deviceName);
      }
 
-     return 1;
+     return (*moduleID!=SCRIPTED_ACQUISITION_MODULE);
     }
   return 0;
 }
