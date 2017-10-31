@@ -1,11 +1,13 @@
 #include "acquisitionScriptInput.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h"
 
 int acquisitionExecuteString(struct InputParserC * ipc,struct acquisitionModuleStates * state, ModuleIdentifier moduleID,DeviceIdentifier devID,const char * command)
 {
+  if (command==0) { return 0; }
   InputParser_SeperateWordsCC(ipc,command,1);
 
   char tag[512];
@@ -56,7 +58,8 @@ int acquisitionExecuteString(struct InputParserC * ipc,struct acquisitionModuleS
                          );*/
   } else
   {
-    fprintf(stderr,"unknown line : %s \n",command);
+    if (command[0]!='#')
+         { fprintf(stderr,"unknown line : %s \n",command); }
   }
 return 1;
 }
