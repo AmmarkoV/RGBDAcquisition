@@ -127,5 +127,9 @@ int executeScriptFromFile(struct acquisitionModuleStates * state,ModuleIdentifie
   }
 
  fprintf(stderr,"Could not execute acquisition script from %s\n",filename);
+
+ char workingPath[4096]={0};
+   if (getcwd(workingPath, 4096) != 0)
+         fprintf(stdout, "  Working directory was : %s\n", workingPath);
  return 0;
 }
