@@ -199,11 +199,18 @@ int main(int argc, char **argv)
     if (photoShootOBJ)
     {
         float angXVariance=60,angYVariance=60,angZVariance=30;
-        fprintf(stderr,"Making a photoshoot of object %u",photoShootOBJ);
+        fprintf(stderr,"Making a photoshoot of object %u with a size %ux%u image output\n",photoShootOBJ,width,height);
 
-        void * oglPhotoShoot = createOGLRendererPhotoshootSandbox( photoShootOBJ,columns,rows,distance,angleX,angleY,angleZ,angXVariance,angYVariance,angZVariance );
+        void * oglPhotoShoot = createOGLRendererPhotoshootSandbox(
+                                                                   photoShootOBJ,
+                                                                   columns,rows,
+                                                                   distance,
+                                                                   angleX,angleY,angleZ,
+                                                                   angXVariance,angYVariance,angZVariance
+                                                                  );
 
         snapOGLRendererPhotoshootSandbox(oglPhotoShoot , photoShootOBJ,columns,rows,distance,angleX,angleY,angleZ,angXVariance,angYVariance,angZVariance);
+        fprintf(stderr,"Writing photoshoot output in a file with size %ux%u\n",width,height);
         writeOpenGLColor("color.pnm",0,0,width,height);
         writeOpenGLDepth("depth.pnm",0,0,width,height);
 

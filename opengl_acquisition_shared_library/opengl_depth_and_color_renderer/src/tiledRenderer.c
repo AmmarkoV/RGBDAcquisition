@@ -46,7 +46,7 @@ int tiledRenderer_get2DCenter(void * trConf ,
 
       _glhProjectf( posX, posY, posZ , modelview, projection, viewport, win);
 
-      //fprintf(stderr,"Column/Row %u/%u ( %0.2f,%0.2f,%0.2f ) -> %0.2f %0.2f %0.2f\n",column, x3D , y3D , z3D , row , winX , winY , winZ);
+      fprintf(stderr,"Column/Row %u/%u ( %0.2f,%0.2f,%0.2f ) -> %0.2f %0.2f %0.2f\n",column,row , x3D , y3D , z3D , win[0] , win[1] , win[2]);
 
       //struct tiledRendererConfiguration * trConfPTR = (struct tiledRendererConfiguration *) trConf;
       *x2D = win[0];
@@ -93,23 +93,28 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
         if (sizeY>widthToUse) { widthToUse = sizeY; }
         if (sizeZ>widthToUse) { widthToUse = sizeY; }
 
-        trConf->op.OGLUnitWidth=widthToUse+2.0;
-        trConf->op.OGLUnitHeight=widthToUse+2.0;
+        trConf->op.OGLUnitWidth =widthToUse+1.0;
+        trConf->op.OGLUnitHeight=widthToUse+1.0;
 
         trConf->op.snapsHorizontal=trConf->columns;
-        trConf->op.snapsVertical=trConf->rows;
+        trConf->op.snapsVertical  =trConf->rows;
 
-        trConf->op.posOffsetX = 0;
-        trConf->op.posOffsetY = 0;
+        float halfSnapsHorizontal = (float) trConf->columns/2;
+        float halfSnapsVertical   = (float) trConf->rows/2;
 
-        trConf->op.posXBegining= -1*(trConf->op.posOffsetX+(float) trConf->op.snapsHorizontal/2)*trConf->op.OGLUnitWidth;
-        trConf->op.posYBegining= -1*(trConf->op.posOffsetY+(float) trConf->op.snapsVertical/2)  *trConf->op.OGLUnitHeight;
+        trConf->op.posOffsetX = -0.5;
+        trConf->op.posOffsetY = -0.5;
+
+        trConf->op.posXBegining= -1*(trConf->op.posOffsetX+halfSnapsHorizontal)*trConf->op.OGLUnitWidth;
+        trConf->op.posYBegining= -1*(trConf->op.posOffsetY+halfSnapsVertical)  *trConf->op.OGLUnitHeight;
 
         trConf->op.angXStep = (float)(2*trConf->angXVariance)/trConf->op.snapsHorizontal;
         trConf->op.angYStep = (float)(2*trConf->angYVariance)/trConf->op.snapsVertical  ;
         trConf->op.angZStep=0;
 
-      fprintf(stderr,"Drawing starts @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",trConf->op.posXBegining,trConf->op.posYBegining  ,  trConf->angleX-trConf->angXVariance , trConf->angleY-trConf->angYVariance , trConf->angleZ);
+        fprintf(stderr,"Drawing starts @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",trConf->op.posXBegining,trConf->op.posYBegining  ,  trConf->angleX-trConf->angXVariance , trConf->angleY-trConf->angYVariance , trConf->angleZ);
+        fprintf(stderr,"Tile Size selected is %u,%u -> %u,%u \n",trConf->op.snapsHorizontal , trConf->op.snapsVertical , trConf->columns , trConf->rows);
+
  return 1;
 }
 
@@ -160,12 +165,20 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
        mod->scaleY = scene->object[i].scaleY;
        mod->scaleZ = scene->object[i].scaleZ;
 
+/*
+       pos[POS_X]=0; pos[POS_Y]=0; pos[POS_Z]=-30;
+                   drawModelAt(
+                                mod,
+                                pos[POS_X],pos[POS_Y],pos[POS_Z],
+                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]
+                              );
+*/
         unsigned int x,y;
 
-        fprintf(stderr,"tiledRenderer_CalculateLoops \n");
+        fprintf(stderr,"Calculating loops for tiled renderer..\n");
         tiledRenderer_CalculateLoops(trConf);
 
-       for (y=0; y<=trConf->op.snapsVertical; y++)
+       for (y=0; y<trConf->op.snapsVertical; y++)
           {
             for (x=0; x<trConf->op.snapsHorizontal; x++)
                {
@@ -174,7 +187,7 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                                                      &pos[POS_ANGLEX],&pos[POS_ANGLEY],&pos[POS_ANGLEZ]);
 
 
-                   fprintf(stderr,"Draw %u,%u \n",x,y);
+                   fprintf(stderr,"Draw %u,%u @ %0.2f %0.2f %0.2f\n",x,y,pos[POS_X],pos[POS_Y],pos[POS_Z]);
                    drawModelAt(
                                 mod,
                                 pos[POS_X],pos[POS_Y],pos[POS_Z],
