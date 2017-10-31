@@ -1,15 +1,17 @@
 #include "acquisitionScriptInput.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h"
 
 int acquisitionExecuteString(struct InputParserC * ipc,struct acquisitionModuleStates * state, ModuleIdentifier moduleID,DeviceIdentifier devID,const char * command)
 {
+  if (command==0) { return 0; }
   InputParser_SeperateWordsCC(ipc,command,1);
 
-  char tag[512];
-  char moduleString[512];
+  char tag[512]={0};
+  char moduleString[512]={0};
   InputParser_GetWord(ipc,0,tag,512);
 
   if (strcmp(tag,"acquisitionStartModule")==0)
@@ -56,7 +58,8 @@ int acquisitionExecuteString(struct InputParserC * ipc,struct acquisitionModuleS
                          );*/
   } else
   {
-    fprintf(stderr,"unknown line : %s \n",command);
+    if (command[0]!='#')
+         { fprintf(stderr,"unknown line : %s \n",command); }
   }
 return 1;
 }
@@ -96,7 +99,7 @@ int getRealModuleAndDevice(
        snprintf(deviceName,stringMaxLength,"%s",state[scModuleID].device[scDevID].deviceName);
      }
 
-     return 1;
+     return (*moduleID!=SCRIPTED_ACQUISITION_MODULE);
     }
   return 0;
 }
@@ -127,5 +130,9 @@ int executeScriptFromFile(struct acquisitionModuleStates * state,ModuleIdentifie
   }
 
  fprintf(stderr,"Could not execute acquisition script from %s\n",filename);
+
+ char workingPath[4096]={0};
+   if (getcwd(workingPath, 4096) != 0)
+         fprintf(stdout, "  Working directory was : %s\n", workingPath);
  return 0;
 }
