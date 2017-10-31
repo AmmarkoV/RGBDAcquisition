@@ -187,7 +187,7 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                                                      &pos[POS_ANGLEX],&pos[POS_ANGLEY],&pos[POS_ANGLEZ]);
 
 
-                   fprintf(stderr,"Draw %u,%u @ %0.2f %0.2f %0.2f\n",x,y,pos[POS_X],pos[POS_Y],pos[POS_Z]);
+                   //fprintf(stderr,"Draw %u,%u @ %0.2f %0.2f %0.2f\n",x,y,pos[POS_X],pos[POS_Y],pos[POS_Z]);
                    drawModelAt(
                                 mod,
                                 pos[POS_X],pos[POS_Y],pos[POS_Z],
