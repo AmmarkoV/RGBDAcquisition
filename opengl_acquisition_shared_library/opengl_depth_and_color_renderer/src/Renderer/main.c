@@ -31,8 +31,9 @@ unsigned int height=480;
 unsigned int forceKeyboardControl=0;
 
 unsigned int columns=22,rows=21;
-float distance = 30;
+float distance = 2;
 
+int framerate=30;
 
 static int myMkdir(const char * prefix,const char * dirname)
 {
@@ -87,6 +88,12 @@ int main(int argc, char **argv)
     for (i=0; i<argc; i++)
     {
 
+
+
+        if (strcmp(argv[i],"--asap")==0)
+        {
+            framerate=0;
+        } else
         if (strcmp(argv[i],"-from")==0)
         {
             fprintf(stderr,"Parameter Syntax is --from NOT -from ..!! \n");
@@ -234,7 +241,7 @@ int main(int argc, char **argv)
     unsigned int snappedFrames=0;
     while (1)
     {
-        snapOGLRendererSandbox();
+        snapOGLRendererSandbox(framerate);
 
 
         if (doFileOutput)

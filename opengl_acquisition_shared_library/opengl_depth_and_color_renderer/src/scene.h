@@ -95,7 +95,7 @@ int initScene(char * confFile);
 * @ingroup Scene
 * @retval 1=Success , 0=Failure
 */
-int tickScene();
+int tickScene(unsigned int framerate);
 
 
 /**

@@ -15,8 +15,8 @@ int tiledRenderer_get3DCenterForTile(struct tiledRendererConfiguration * trConf 
                                      float * x3D , float * y3D , float * z3D ,
                                      float * angleX , float * angleY , float * angleZ)
 {
-  *x3D = trConf->op.posXBegining + (column * trConf->op.OGLUnitWidth);
-  *y3D = trConf->op.posYBegining + (row * trConf->op.OGLUnitHeight);
+  *x3D = 0;//trConf->op.posXBegining + (column * trConf->op.OGLUnitWidth);
+  *y3D = 0;//trConf->op.posYBegining + (row * trConf->op.OGLUnitHeight);
   *z3D = 0 - trConf->distance ;
 
   *angleX = trConf->angleX - trConf->angXVariance + (trConf->op.angXStep *  column);
@@ -120,8 +120,7 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
 
 
 
-
-int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
+int tiledRenderer_RenderOLD( struct tiledRendererConfiguration * trConf)
 {
   if (trConf==0) { fprintf(stderr,"Could not render with null configuration\n"); return 0; }
   if (trConf->scenePTR==0) { fprintf(stderr,"Could not render with null scene\n"); return 0; }
@@ -189,6 +188,105 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                                                      &pos[POS_ANGLEX],&pos[POS_ANGLEY],&pos[POS_ANGLEZ]);
 
 
+                   //fprintf(stderr,"Draw %u,%u @ %0.2f %0.2f %0.2f\n",x,y,pos[POS_X],pos[POS_Y],pos[POS_Z]);
+                   drawModelAt(
+                                mod,
+                                pos[POS_X],pos[POS_Y],pos[POS_Z],
+                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]
+                              );
+                }
+            }
+          fprintf(stderr,"Drawing stopped  @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
+        }
+
+   glPopMatrix();
+  return 1 ;
+}
+
+int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
+{
+  if (trConf==0) { fprintf(stderr,"Could not render with null configuration\n"); return 0; }
+  if (trConf->scenePTR==0) { fprintf(stderr,"Could not render with null scene\n"); return 0; }
+  if (trConf->modelPTR==0) { fprintf(stderr,"Could not render with null model\n"); return 0; }
+
+  struct VirtualStream * scene = (struct VirtualStream *)  trConf->scenePTR;
+  struct Model ** models = ( struct Model ** ) trConf->modelPTR;
+
+
+  fprintf(stderr,"Photoshooting Object %u -> %s \n",trConf->objID,scene->object[trConf->objID].name);
+  fprintf(stderr,"Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",trConf->rows,trConf->columns,trConf->distance,trConf->angleX,trConf->angleY,trConf->angleZ);
+  fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",trConf->angXVariance,trConf->angYVariance,trConf->angZVariance);
+
+
+  if (scene!=0) { setupTiledRendererOGL((float)scene->backgroundR,(float)scene->backgroundG,(float)scene->backgroundB); } else
+                { setupTiledRendererOGL(0.0,0.0,0.0); }
+
+
+  fprintf(stderr,"setupTiledRendererOGL done \n");
+  if (scene!=0)
+    {
+       unsigned char noColor=0;
+       float posStack[POS_COORD_LENGTH]={0};
+       float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
+
+       unsigned int i=trConf->objID;
+       fprintf(stderr,"Accessing models (%u).. \n",scene->object[i].type);
+       struct Model * mod = models[scene->object[i].type];
+       if (mod==0) { fprintf(stderr,"Model not allocated.. \n"); return 0;}
+       float * pos = (float*) &posStack;
+
+       fprintf(stderr,"getObjectColorsTrans Colors.. \n");
+       //This is a stupid way of passing stuff to be drawn
+       R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
+       getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
+
+       fprintf(stderr,"Setting Colors.. ");
+       setModelColor(mod,&R,&G,&B,&trans,&noColor);
+       fprintf(stderr,"done\n");
+       mod->scaleX = scene->object[i].scaleX;
+       mod->scaleY = scene->object[i].scaleY;
+       mod->scaleZ = scene->object[i].scaleZ;
+
+/*
+       pos[POS_X]=0; pos[POS_Y]=0; pos[POS_Z]=-30;
+                   drawModelAt(
+                                mod,
+                                pos[POS_X],pos[POS_Y],pos[POS_Z],
+                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]
+                              );
+*/
+        unsigned int x,y;
+
+
+
+        fprintf(stderr,"Calculating loops for tiled renderer..\n");
+        tiledRenderer_CalculateLoops(trConf);
+
+
+       fprintf(stderr,"Will try to fit %ux%u tiles to a %ux%u area\n",trConf->op.snapsHorizontal,trConf->op.snapsVertical,WIDTH,HEIGHT);
+        unsigned int tileWidth  =  (unsigned int) WIDTH/trConf->op.snapsHorizontal;
+        unsigned int tileHeight  = (unsigned int) HEIGHT/trConf->op.snapsVertical;
+       fprintf(stderr,"Tile sizes will be %ux%u\n",tileWidth,tileHeight);
+
+
+       pos[POS_Z]=0-trConf->distance;
+
+       for (y=0; y<trConf->op.snapsVertical; y++)
+          {
+            for (x=0; x<trConf->op.snapsHorizontal; x++)
+               {
+                   glViewport (x*tileWidth, y*tileHeight, tileWidth, tileHeight);
+                   glMatrixMode (GL_PROJECTION);                       // Select The Projection Matrix
+                   glLoadIdentity ();                          // Reset The Projection Matrix
+                   // Set Up Perspective Mode To Fit 1/4 The Screen (Size Of A Viewport)
+                   gluPerspective( 85.0, (GLfloat)(tileWidth)/(GLfloat)(tileHeight), 0.1f, 13500.0 );
+                   glMatrixMode(GL_MODELVIEW );
+
+
+
+                   tiledRenderer_get3DCenterForTile( trConf , x , y ,
+                                                     &pos[POS_X],&pos[POS_Y],&pos[POS_Z],
+                                                     &pos[POS_ANGLEX],&pos[POS_ANGLEY],&pos[POS_ANGLEZ]);
                    //fprintf(stderr,"Draw %u,%u @ %0.2f %0.2f %0.2f\n",x,y,pos[POS_X],pos[POS_Y],pos[POS_Z]);
                    drawModelAt(
                                 mod,

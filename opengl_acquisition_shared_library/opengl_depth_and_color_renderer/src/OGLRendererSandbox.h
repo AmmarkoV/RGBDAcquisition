@@ -203,7 +203,7 @@ int seekOGLRendererSandbox(int devID,unsigned int seekFrame);
 * @ingroup OGLRendererSandbox
 * @retval 0=Failure , 1=Success
 */
-int snapOGLRendererSandbox();
+int snapOGLRendererSandbox(unsigned int framerate);
 
 
 

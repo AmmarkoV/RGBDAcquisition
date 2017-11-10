@@ -417,14 +417,14 @@ int seekOGLRendererSandbox(int devID,unsigned int seekFrame)
 }
 
 
-int snapOGLRendererSandbox()
+int snapOGLRendererSandbox(unsigned int framerate)
 {
  ++snapsPerformed;
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before starting to snapOGLRendererSandbox ( frame %u ) \n",snapsPerformed); }
     if (glx_checkEvents())
     {
       if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after checking glx_checkEvents()\n"); }
-      tickScene();
+      tickScene(framerate);
       if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after ticking scene\n"); }
       redraw();
       if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after redrawing scene\n"); }

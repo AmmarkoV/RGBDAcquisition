@@ -590,7 +590,7 @@ int closeScene()
 
 
 
-int tickScene()
+int tickScene(unsigned int framerate)
 {
    if (pauseTicking)
    {
@@ -613,8 +613,14 @@ int tickScene()
    camera_pos_x = userDeltacamera_pos_x + pos[0];  camera_pos_y = userDeltacamera_pos_y + pos[1]; camera_pos_z = userDeltacamera_pos_z + pos[2];
    camera_angle_x = userDeltacamera_angle_x + pos[3]; camera_angle_y = userDeltacamera_angle_y + pos[4]; camera_angle_z = userDeltacamera_angle_z + pos[5];
 
-   if (tickUSleepTime>0)
-    { usleep(tickUSleepTime); }
+   if (framerate>0)
+   {
+    //if (lastFramerate>)
+    //TODO: sleep enough time for framerate to succeed
+    if (tickUSleepTime>0)
+     { usleep(tickUSleepTime); }
+   }
+
 
    ++scene->ticks;
    return 1;
