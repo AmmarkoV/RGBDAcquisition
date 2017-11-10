@@ -1,0 +1,49 @@
+#version 150 core
+uniform mat4 MVP_TopLeft;
+uniform mat4 MVP_TopRight;
+uniform mat4 MVP_BottomLeft;
+uniform mat4 MVP_BottomRight;
+layout(triangles) in;
+layout(GL_TRIANGLES​, max_vertices = 12​) out;
+out int SubWindowID;
+void main(void) {
+    SubWindowID = 0;
+    for (int i = 0; i < 3; i++) {
+        gl_Position = MVP_TopLeft*gl_in[i].gl_Position;
+        //Shift the coordinates into the mini-window
+        gl_Position.x = (0.5*gl_Position.x - 0.5);
+        gl_Position.y = (0.5*gl_Position.y + 0.5);
+        EmitVertex();
+    }
+    EmitPrimitive();
+
+    SubWindowID = 1;
+    for (int i = 0; i < 3; i++) {
+        gl_Position = MVP_TopRight*gl_in[i].gl_Position;
+        //Shift the coordinates into the mini-window
+        gl_Position.x = (0.5*gl_Position.x + 0.5);
+        gl_Position.y = (0.5*gl_Position.y + 0.5);
+        EmitVertex();
+    }
+    EmitPrimitive();
+
+    SubWindowID = 2;
+    for (int i = 0; i < 3; i++) {
+        gl_Position = MVP_BottomLeft*gl_in[i].gl_Position;
+        //Shift the coordinates into the mini-window
+        gl_Position.x = (0.5*gl_Position.x - 0.5);
+        gl_Position.y = (0.5*gl_Position.y - 0.5);
+        EmitVertex();
+    }
+    EmitPrimitive();
+
+    SubWindowID = 3;
+    for (int i = 0; i < 3; i++) {
+        gl_Position = MVP_BottomRight*gl_in[i].gl_Position;
+        //Shift the coordinates into the mini-window
+        gl_Position.x = (0.5*gl_Position.x + 0.5);
+        gl_Position.y = (0.5*gl_Position.y - 0.5);
+        EmitVertex();
+    }
+    EmitPrimitive();
+}

@@ -50,6 +50,9 @@ float scaleDepthTo =1000.0;
 
 float moveSpeed=0.5;
 
+unsigned long lastRenderingTime=0;
+float lastFramerate=0;
+
 //float depthUnit = 1.0;
 
 unsigned int userKeyFOVEnabled=0;
@@ -736,7 +739,7 @@ int drawAllObjectsAtPositionsFromTrajectoryParser()
 
   if (scene->ticks%10==0)
   {
-    fprintf(stderr,"\rPlayback  %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",(float) timestampToUse/1000,scene->ticks,tickUSleepTime,scene->rate);
+    fprintf(stderr,"\r%0.2f FPS - Playback  %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",lastFramerate,(float) timestampToUse/1000,scene->ticks,tickUSleepTime,scene->rate);
   }
 
   int enableTransformedRendering=1;
@@ -961,6 +964,16 @@ int renderScene()
   drawAllObjectsAtPositionsFromTrajectoryParser();
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after drawing all objects\n"); }
+
+
+  //Get Framerate..
+  unsigned long now=GetTickCountMilliseconds();
+  unsigned long elapsedTime=now-lastRenderingTime;
+  if (elapsedTime==0) { elapsedTime=1; }
+  lastFramerate = (float) 1000/(elapsedTime);
+  lastRenderingTime = now;
+  //fprintf(stderr,"%0.2f fps running\n",lastFramerate);
+
 
   ++framesRendered;
 

@@ -8,6 +8,9 @@
 #define TOOLS_H_INCLUDED
 
 
+
+unsigned long GetTickCountMilliseconds();
+
 /**
 * @brief check for the last opengl error occured
 * @ingroup OGLTools

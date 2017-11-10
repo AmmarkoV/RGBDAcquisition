@@ -182,6 +182,8 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
           {
             for (x=0; x<trConf->op.snapsHorizontal; x++)
                {
+                 //glViewport (0, 0, (GLsizei)(width), (GLsizei)(height));
+
                    tiledRenderer_get3DCenterForTile( trConf , x , y ,
                                                      &pos[POS_X],&pos[POS_Y],&pos[POS_Z],
                                                      &pos[POS_ANGLEX],&pos[POS_ANGLEY],&pos[POS_ANGLEZ]);

@@ -10,6 +10,28 @@
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
 
+
+#include <sys/time.h>
+#include <unistd.h>
+#include <time.h>
+
+unsigned long tickBase = 0;
+
+unsigned long GetTickCountMilliseconds()
+{
+   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
+   struct timespec ts;
+   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
+
+   if (tickBase==0)
+   {
+     tickBase = ts.tv_sec*1000 + ts.tv_nsec/1000000;
+     return 0;
+   }
+
+   return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBase;
+}
+
 void printOpenGLError(int errorCode)
 {
   switch (errorCode)
