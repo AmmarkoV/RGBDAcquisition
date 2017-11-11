@@ -271,6 +271,7 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
 
        pos[POS_Z]=0-trConf->distance;
 
+       unsigned long started=GetTickCountMilliseconds();
        for (y=0; y<trConf->op.snapsVertical; y++)
           {
             for (x=0; x<trConf->op.snapsHorizontal; x++)
@@ -295,8 +296,20 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                               );
                 }
             }
-          fprintf(stderr,"Drawing stopped  @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
-        }
+      unsigned long now=GetTickCountMilliseconds();
+      unsigned long elapsedTime=now-started;
+      if (elapsedTime==0) { elapsedTime=1; }
+      float lastFramerate = (float) 1000/(elapsedTime);
+
+      fprintf(stderr,"Framerate = %0.2f Drawing stopped  @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",
+                    lastFramerate,
+                    posStack[POS_X],
+                    posStack[POS_Y],
+                    pos[POS_ANGLEX],
+                    pos[POS_ANGLEY],
+                    pos[POS_ANGLEZ]
+              );
+    }
 
    glPopMatrix();
   return 1 ;

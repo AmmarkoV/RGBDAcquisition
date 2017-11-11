@@ -83,6 +83,7 @@ int main(int argc, char **argv)
     rodriguez[2]=0.0;
 
     setOpenGLNearFarPlanes(1,15000);
+    unsigned int viewWindow=1;
 
     int i=0;
     for (i=0; i<argc; i++)
@@ -137,6 +138,7 @@ int main(int argc, char **argv)
             {
                 width=atof(argv[i+1]);
                 height=atof(argv[i+2]);
+                fprintf(stderr,"Resolution selected is (%ux%u)\n",width,height);
             }
         }
         else if (
@@ -146,6 +148,7 @@ int main(int argc, char **argv)
         {
             if (i+4<argc)
             {
+                viewWindow=0;
                 photoShootOBJ=atoi(argv[i+1]);
                 angleX=atof(argv[i+2]);
                 angleY=atof(argv[i+3]);
@@ -186,14 +189,15 @@ int main(int argc, char **argv)
     }
 
 
+
     int started = 0;
     if (readFromArg!=0)
     {
-        started=startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,argv[readFromArg]);
+        started=startOGLRendererSandbox(width,height,viewWindow /*View OpenGL Window*/,argv[readFromArg]);
     }
     else
     {
-        started=startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/
+        started=startOGLRendererSandbox(width,height,viewWindow /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/
     }
 
 
@@ -205,7 +209,7 @@ int main(int argc, char **argv)
 
     if (photoShootOBJ)
     {
-        float angXVariance=60,angYVariance=60,angZVariance=30;
+        float angXVariance=360,angYVariance=360,angZVariance=360;
         fprintf(stderr,"Making a photoshoot of object %u with a size %ux%u image output\n",photoShootOBJ,width,height);
 
         void * oglPhotoShoot = createOGLRendererPhotoshootSandbox(

@@ -32,7 +32,7 @@
 #include "OGLRendererSandbox.h"
 
 #define OPTIMIZE_DEPTH_EXTRACTION 1
-#define FLIP_OPEN_GL_IMAGES 1
+#define FLIP_OPEN_GL_IMAGES 0
 #define REAL_DEPTH 1
 
 #if REAL_DEPTH
@@ -375,7 +375,7 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
   snapsPerformed=0;
 
   char * testP=0;
-  fprintf(stderr,"starting glx code .. ");
+  fprintf(stderr,"starting glx code with a window request ( %ux%u ).. ",width,height);
   start_glx_stuff(width,height,viewWindow,0,testP);
   fprintf(stderr,GREEN" ok\n" NORMAL);
   WIDTH=width;

@@ -72,10 +72,17 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   /*** (4) create an OpenGL rendering context  ***/
 
   /* create an OpenGL rendering context */
-  cx = glXCreateContext(dpy, vi, /* no shared dlists */ None,
-                        /* direct rendering if possible */ GL_TRUE);
+  cx = glXCreateContext(dpy,
+                        vi,
+                        /* no shared dlists */ None,
+                        /* direct rendering if possible */ GL_TRUE
+                        );
   if (cx == NULL)
     { fatalError("could not create rendering context"); }
+
+  if ( ! glXIsDirect ( dpy, cx ) ) { printf( "Indirect GLX rendering context obtained\n" ); } else
+                                   { printf( "Direct GLX rendering context obtained\n" );   }
+
 
   if (debugMessages) { fprintf(stderr,"(5) create an X window with the selected visual\n"); }
   /*** (5) create an X window with the selected visual ***/
@@ -86,26 +93,58 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   swa.border_pixel = 0;
   swa.event_mask = KeyPressMask    | ExposureMask
                  | ButtonPressMask | StructureNotifyMask;
-  win = XCreateWindow(dpy, RootWindow(dpy, vi->screen), 0, 0,
-                      WIDTH, HEIGHT, 0, vi->depth, InputOutput, vi->visual,
-                      CWBorderPixel | CWColormap | CWEventMask, &swa);
-  XSetStandardProperties(dpy, win, "OpenGL Control Window", "main", None, argv, argc, NULL);
 
-  if (debugMessages) { fprintf(stderr,"(6) bind the rendering context to the window \n"); }
-  /*** (6) bind the rendering context to the window ***/
 
-  glXMakeCurrent(dpy, win, cx);
 
-  if (debugMessages) { fprintf(stderr,"(7) request the X window to be displayed on the screen\n"); }
-  /*** (7) request the X window to be displayed on the screen ***/
 
   if (viewWindow)
     {
+        win = XCreateWindow(dpy,
+                      RootWindow(dpy, vi->screen), 0, 0,
+                      WIDTH, HEIGHT,
+                      0, vi->depth,
+                      InputOutput,
+                      vi->visual,
+                      CWBorderPixel | CWColormap | CWEventMask, &swa);
+       XSetStandardProperties(dpy, win, "OpenGL Control Window", "main", None, argv, argc, NULL);
+
+       if (debugMessages) { fprintf(stderr,"(6) bind the rendering context to the window \n"); }
+       /*** (6) bind the rendering context to the window ***/
+
+
+       glXMakeCurrent(dpy, win, cx);
+       if (debugMessages) { fprintf(stderr,"(7) request the X window to be displayed on the screen\n"); }
+       /*** (7) request the X window to be displayed on the screen ***/
       //Request the window to get Displayed
       XMapWindow(dpy, win);
       //Wait for window to be visible
       XEvent event;
       XIfEvent( dpy, &event, WaitForNotify, (XPointer) win );
+    } else
+    {
+      fprintf(stderr,"Will not display a window..\n");
+
+      static int visualAttribs[] = { None };
+      int numberOfFramebufferConfigurations = 0;
+      GLXFBConfig* fbConfigs = glXChooseFBConfig( dpy, DefaultScreen(dpy), visualAttribs, numberOfFramebufferConfigurations );
+
+      int pbufferAttribs[] = { WIDTH,  32, HEIGHT, 32, None };
+      GLXPbuffer pbuffer = glXCreatePbuffer( dpy,fbConfigs[0], pbufferAttribs );
+
+      if (pbuffer==0) { fatalError("glXCreatePbuffer failed..\n"); }
+
+      // clean up:
+      XFree( fbConfigs );
+      XSync( dpy, False );
+
+      if ( !glXMakeContextCurrent( dpy, pbuffer, pbuffer, cx ) )
+      {
+        fatalError("Could not start rendering to pbuffer fbo");
+
+      }
+
+
+      //glXMakeContextCurrent(dpy,None,None,cx);
     }
 
 
@@ -161,6 +200,7 @@ int glx_checkEvents()
           break;
         case ConfigureNotify:
           //glViewport(0, 0, event.xconfigure.width, event.xconfigure.height);
+          fprintf(stderr,"Received window configuration event..\n");
           windowSizeUpdated(event.xconfigure.width, event.xconfigure.height);
           /* fall through... */
         case Expose:
