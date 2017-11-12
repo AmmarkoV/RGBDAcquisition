@@ -13,6 +13,7 @@
 
 unsigned int openGL_WIDTH=640;
 unsigned int openGL_HEIGHT=480;
+unsigned int openGL_Framerate=0;
 char * openGLColorFrame = 0;
 short * openGLDepthFrame = 0;
 
@@ -42,6 +43,8 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
         openGL_HEIGHT=height;
         openGL_WIDTH=width;
    }
+
+   openGL_Framerate=framerate;
 
   if(openGLColorFrame!=0) { openGLColorFrame= (char*) realloc(openGLColorFrame,sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3); } else
                           { openGLColorFrame = (char*)  malloc(sizeof(char) * openGL_WIDTH*openGL_HEIGHT*3); }
@@ -83,7 +86,7 @@ int seekRelativeOpenGLFrame(int devID,signed int seekFrame) { return seekRelativ
 
 int seekOpenGLFrame(int devID,unsigned int seekFrame) {  return seekOGLRendererSandbox(devID,seekFrame); }
 
-int snapOpenGLFrames(int devID) { return snapOGLRendererSandbox(); }
+int snapOpenGLFrames(int devID) { return snapOGLRendererSandbox(openGL_Framerate); }
 
 //Color Frame getters
 int getOpenGLColorWidth(int devID) { return openGL_WIDTH; }

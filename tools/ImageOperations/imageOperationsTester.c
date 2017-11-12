@@ -7,6 +7,7 @@
 #include "summedAreaTables.h"
 #include "medianFilter.h"
 #include "imageFilters.h"
+#include "learnImage.h"
 #include "special/dericheRecursiveGaussian.h"
 #include "tools/imageMatrix.h"
 #include "compareQuality.h"
@@ -37,7 +38,10 @@ int runFilter(int argc, char *argv[])
       for (i=0; i<argc; i++)
       {
 
-
+        if ( strcmp(argv[i],"--learn")==0 )
+        {
+          learnImage(argv[i+1],atoi(argv[i+2]),atoi(argv[i+3]));
+        } else
         if ( strcmp(argv[i],"--rgbcube")==0 )
         {
           unsigned int dim=32;

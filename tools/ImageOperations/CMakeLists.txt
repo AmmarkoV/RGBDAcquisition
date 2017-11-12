@@ -41,6 +41,8 @@ add_library(
             summedAreaTables.h
             compareQuality.c
             compareQuality.h
+            learnImage.c
+            learnImage.h
  
             special/dericheRecursiveGaussian.h
             special/dericheRecursiveGaussian.c

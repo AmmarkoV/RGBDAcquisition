@@ -586,3 +586,136 @@
 
 1389863812 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.h
 
+1498564749 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixCalculations.c
+	"matrixCalculations.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"quaternions.h"
+	"matrixTools.h"
+	"matrix3x3Tools.h"
+	"matrix4x4Tools.h"
+	"solveLinearSystemGJ.h"
+	"solveHomography.h"
+
+1498562751 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixCalculations.h
+
+1498561298 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/quaternions.h
+
+1498562163 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/quaternions.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"quaternions.h"
+
+1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.c
+	"model_loader_obj.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"../TextureLoader/texture_loader.h"
+
+1486913139 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.h
+	<GL/gl.h>
+	<GL/glx.h>
+	"model_loader.h"
+
+1509356060 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/model_loader.h
+
+1369923821 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.h
+
+1438258174 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/save_to_file.c
+	"save_to_file.h"
+	<stdio.h>
+	<stdlib.h>
+
+1438258174 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/save_to_file.h
+
+1438258174 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/ppm.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"ppm.h"
+
+1369923821 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/ppm.h
+
+1460647486 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TextureLoader/texture_loader.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	"../ModelLoader/model_loader.h"
+	"texture_loader.h"
+	"../../../../tools/Codecs/codecs.h"
+
+1467405290 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Codecs/codecs.h
+	"../Primitives/image.h"
+
+1493212867 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c
+	"InputParser_C.h"
+	<math.h>
+	<stdio.h>
+
+1493213095 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+
+1490106973 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.c
+	"TrajectoryCalculator.h"
+	"TrajectoryParserDataStructures.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"../../../../tools/AmMatrix/matrix4x4Tools.h"
+	"../../../../tools/AmMatrix/matrixCalculations.h"
+	"../../../../tools/AmMatrix/quaternions.h"
+
+1485349768 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryCalculator.h
+	"TrajectoryParser.h"
+
+1491383284 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.h
+	"../ModelLoader/model_loader.h"
+	"hashmap.h"
+
+1491383284 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/hashmap.h
+	<pthread.h>
+
+1491383284 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.h
+	"TrajectoryParser.h"
+
+1493982307 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParser.c
+	"TrajectoryParser.h"
+	"TrajectoryParserDataStructures.h"
+	"TrajectoryCalculator.h"
+	"TrajectoryPrimitives.h"
+	"../ModelLoader/model_loader.h"
+	"../../../../tools/AmMatrix/matrixCalculations.h"
+	"../../../../tools/AmMatrix/quaternions.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<math.h>
+	"InputParser_C.h"
+
+1491383284 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.h
+
+1494345938 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryParserDataStructures.c
+	"TrajectoryParserDataStructures.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"TrajectoryCalculator.h"
+
+1491383284 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/TrajectoryPrimitives.c
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+	"TrajectoryPrimitives.h"
+

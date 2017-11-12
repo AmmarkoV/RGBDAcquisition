@@ -177,8 +177,8 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 
 
       // clean up:
-      //XFree( fbConfigs );
-      //XSync( dpy, False );
+      XFree( fbConfigs );
+      XSync( dpy, False );
 
       fprintf(stderr,"glXMakeContextCurrent\n");
       if ( !glXMakeContextCurrent( dpy, pbuffer, pbuffer, cx ) )

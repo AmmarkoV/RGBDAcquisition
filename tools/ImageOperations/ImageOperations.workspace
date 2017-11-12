@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
-		<Project filename="../../../FORTH/input_acquisition/tools/Timers/Timers.cbp" />
-		<Project filename="../../../FORTH/input_acquisition/tools/Codecs/Codecs.cbp" />
-		<Project filename="../../../FORTH/input_acquisition/tools/ImageOperations/ImageOperations.cbp" />
-		<Project filename="../../../FORTH/input_acquisition/tools/ImageOperations/ImageOperationsTester.cbp" />
+		<Project filename="../../../../RGBDAcquisition/tools/ImageOperations/ImageOperationsTester.cbp" />
+		<Project filename="../../../../RGBDAcquisition/tools/ImageOperations/ImageOperations.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
