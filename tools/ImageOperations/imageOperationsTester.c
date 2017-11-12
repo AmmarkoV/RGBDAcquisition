@@ -42,6 +42,7 @@ int runFilter(int argc, char *argv[])
         {
           destroyImage(inputImage);
           learnImage(filenameInput,atoi(argv[i+1]),atoi(argv[i+2]));
+          exit(0);
         } else
         if ( strcmp(argv[i],"--rgbcube")==0 )
         {
