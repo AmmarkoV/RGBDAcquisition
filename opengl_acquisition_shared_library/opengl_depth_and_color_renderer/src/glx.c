@@ -54,6 +54,12 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   if(!glXQueryExtension(dpy, &dummy, &dummy))
     fatalError("X server has no OpenGL GLX extension");
 
+
+
+  //Two seperate glx initialization procedures wether we want a window or offscreen rendering..
+  if (viewWindow)
+    {
+
   if (debugMessages) { fprintf(stderr,"(3) find an appropriate visual .. "); }
   /*** (3) find an appropriate visual ***/
   /* find an OpenGL-capable RGB visual with depth buffer */
@@ -96,9 +102,6 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 
 
 
-
-  if (viewWindow)
-    {
         win = XCreateWindow(dpy,
                       RootWindow(dpy, vi->screen), 0, 0,
                       WIDTH, HEIGHT,
@@ -124,23 +127,63 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
     {
       fprintf(stderr,"Will not display a window..\n");
 
-      static int visualAttribs[] = { None };
+      //static int visualAttribs[] = { None };
+      int w=WIDTH, h=HEIGHT;
+      int visualAttribs[]={
+                           GLX_RENDER_TYPE, GLX_RGBA_BIT,
+                           GLX_MAX_PBUFFER_WIDTH, w,
+                           GLX_MAX_PBUFFER_HEIGHT, h,
+                           GLX_RED_SIZE, 4,
+                           GLX_GREEN_SIZE, 4,
+                           GLX_BLUE_SIZE, 4,
+                           GLX_DRAWABLE_TYPE,GLX_PBUFFER_BIT,
+                           GLX_DEPTH_SIZE, 24,
+                           None
+                           };
+
       int numberOfFramebufferConfigurations = 0;
-      GLXFBConfig* fbConfigs = glXChooseFBConfig( dpy, DefaultScreen(dpy), visualAttribs, numberOfFramebufferConfigurations );
+      fprintf(stderr,"glXChooseFBConfig\n");
+      GLXFBConfig* fbConfigs = glXChooseFBConfig( dpy, DefaultScreen(dpy), visualAttribs, &numberOfFramebufferConfigurations );
+      if ( (fbConfigs == NULL) || (numberOfFramebufferConfigurations <= 0) )
+        {
+            fatalError("P-Buffers not supported.\n");
+        }
 
-      int pbufferAttribs[] = { WIDTH,  32, HEIGHT, 32, None };
+
+     int pbufferAttribs[]={
+                           GLX_PBUFFER_WIDTH, w,
+                           GLX_PBUFFER_HEIGHT, h,
+                           GLX_NONE
+                          };
+
+      fprintf(stderr,"glXCreatePbuffer\n");
       GLXPbuffer pbuffer = glXCreatePbuffer( dpy,fbConfigs[0], pbufferAttribs );
+      if (pbuffer==0)
+        {
+            fatalError("glXCreatePbuffer failed..\n");
+        }
 
-      if (pbuffer==0) { fatalError("glXCreatePbuffer failed..\n"); }
+        cx = glXCreateNewContext(
+                                 dpy,
+                                 fbConfigs[0],
+                                 GLX_RGBA_TYPE,
+                                 NULL,
+                                 GL_TRUE
+                                 );
+        if (!cx)
+        {
+         fatalError("Failed to create graphics context.\n");
+        }
+
 
       // clean up:
-      XFree( fbConfigs );
-      XSync( dpy, False );
+      //XFree( fbConfigs );
+      //XSync( dpy, False );
 
+      fprintf(stderr,"glXMakeContextCurrent\n");
       if ( !glXMakeContextCurrent( dpy, pbuffer, pbuffer, cx ) )
       {
         fatalError("Could not start rendering to pbuffer fbo");
-
       }
 
 
