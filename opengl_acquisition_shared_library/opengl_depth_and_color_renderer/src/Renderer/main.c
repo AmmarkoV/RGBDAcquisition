@@ -31,7 +31,7 @@ unsigned int height=480;
 unsigned int forceKeyboardControl=0;
 
 unsigned int columns=22,rows=21;
-float distance = 2;
+float distance = 1.5;
 
 int framerate=30;
 

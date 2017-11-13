@@ -6,3 +6,4 @@ cd ..
 ./Renderer --from Scenes/photo.conf --photo 1 0 0 0 32 32 --size 4096 4096
 timeout 5 gpicview color.pnm
 ./imageopsutility color.pnm --learn 32 32
+Scripts/make_video.sh

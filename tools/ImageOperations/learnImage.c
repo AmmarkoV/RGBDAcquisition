@@ -3,6 +3,30 @@
 #include <stdlib.h>
 #include "../Codecs/codecs.h"
 
+
+struct pixel
+{
+  unsigned int * indexes;
+  unsigned int * compressed;
+  unsigned int numberOfPixelsPresent;
+  unsigned int numberOfPixelsAbsent;
+};
+
+
+
+struct imageOccupationGrid
+{
+  struct pixel * pixels;
+};
+
+
+
+
+
+
+
+
+
 int learnImage(const char * filename ,unsigned int numberOfHorizontalTiles,unsigned int numberOfVerticalTiles)
 {
    struct Image * inputImage = readImage(filename,guessFilenameTypeStupid(filename),0);
@@ -22,7 +46,7 @@ int learnImage(const char * filename ,unsigned int numberOfHorizontalTiles,unsig
         if (part!=0)
         {
           char tileString[512]={0};
-          snprintf(tileString,512,"tile-%u.jpg",i);
+          snprintf(tileString,512,"tile-%05d.jpg",i);
           writeImageFile(part,JPG_CODEC,tileString);
           destroyImage(part);
         }
