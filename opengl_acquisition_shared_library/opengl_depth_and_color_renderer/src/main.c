@@ -32,7 +32,7 @@
 #include "OGLRendererSandbox.h"
 
 #define OPTIMIZE_DEPTH_EXTRACTION 1
-#define FLIP_OPEN_GL_IMAGES 0
+#define FLIP_OPEN_GL_IMAGES 1
 #define REAL_DEPTH 1
 
 #if REAL_DEPTH

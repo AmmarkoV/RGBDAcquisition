@@ -2,6 +2,6 @@
 #define LEARNIMAGE_H_INCLUDED
 
 
-int learnImage(const char * filename , unsigned int tileWidth , unsigned int tileHeight);
+int learnImage(const char * filename ,unsigned int numberOfHorizontalTiles,unsigned int numberOfVerticalTiles);
 
 #endif // LEARNIMAGE_H_INCLUDED
