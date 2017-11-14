@@ -12,7 +12,7 @@ unsigned int framesProcessed=0;
 struct darknetContext
 {
  image **alphabet;
- network net;
+ network * net;
  layer l;
 
  float nms;
@@ -68,11 +68,11 @@ int init_yolo(
     dc.alphabet = load_alphabet();
     dc.net= parse_network_cfg(cfgfile);
     if(weightfile){
-                   load_weights(&dc.net, weightfile);
+                   load_weights(dc.net, weightfile);
                   }
-    dc.l = dc.net.layers[dc.net.n-1];
+    dc.l = dc.net->layers[dc.net->n-1];
 
-    set_batch_network(&dc.net, 1);
+    set_batch_network(dc.net, 1);
     srand(2222222);
 
 
@@ -138,7 +138,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     show_image(im, "original");
     save_image(im, "original");
     fprintf(stderr,"resizing image..\n");
-    image sized = resize_image(im, dc.net.w, dc.net.h);
+    image sized = resize_image(im, dc.net->w, dc.net->h);
     float *X = sized.data;
 
     fprintf(stderr,"detecting.. ");
