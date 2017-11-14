@@ -31,20 +31,19 @@ char *voc_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "c
 
 image load_image_from_buffer(void * pixels , unsigned int width, unsigned int height, unsigned int channels)
 {
-    char * data = (char*) pixels;
+    unsigned char * data = (unsigned char*) pixels;
     int w=width, h=height, c=channels , step=width*channels;
     int i,j,k;
     image im = make_image(w, h, c);
 
 
-    for(k = 0; k < c; ++k)
+    for(i = 0; i < h; ++i)
     {
-        for(j = 0; j < h; ++j)
+      for(k= 0; k < c; ++k)
         {
-            for(i = 0; i < w; ++i){
-                int dst_index = i + w*j + w*h*k;
-                int src_index = k + c*i + c*w*j;
-                im.data[dst_index] = (float)data[src_index]/255.;
+            for(j = 0; j < w; ++j)
+            {
+                im.data[k*w*h + i*w + j] = (float) data[i*step + j*c + k]/255.;
             }
         }
     }
@@ -76,10 +75,11 @@ int init_yolo(
     srand(2222222);
 
 
-    int j;
     dc.nms=.4;
     dc.boxes = calloc(dc.l.side * dc.l.side * dc.l.n, sizeof(box));
     dc.probs = calloc(dc.l.side * dc.l.side * dc.l.n, sizeof(float *));
+
+    int j;
     for(j = 0; j < dc.l.side*dc.l.side*dc.l.n; ++j)
          { dc.probs[j] = calloc(dc.l.classes, sizeof(float *)); }
 
@@ -136,16 +136,16 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     fprintf(stderr,"casting image..\n");
     image im=load_image_from_buffer(data, width, height, channels);
     show_image(im, "original");
-    save_image(im, "original");
+    //save_image(im, "original");
     fprintf(stderr,"resizing image..\n");
     image sized = resize_image(im, dc.net->w, dc.net->h);
     float *X = sized.data;
 
     fprintf(stderr,"detecting.. ");
-    network_predict(dc.net, X);
+    float *prediction = network_predict(dc.net, X);
     fprintf(stderr,"done\n");
 
-    fprintf(stderr,"getting results..\n");
+    fprintf(stderr,"getting results ( %u outputs.. ) ..\n",dc.l.outputs);
     get_detection_boxes(dc.l, 1, 1, dc.threshold, dc.probs, dc.boxes, 0);
 
     if (dc.nms)
