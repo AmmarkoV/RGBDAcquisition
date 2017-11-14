@@ -43,7 +43,7 @@ image load_image_from_buffer(void * pixels , unsigned int width, unsigned int he
         {
             for(j = 0; j < w; ++j)
             {
-                im.data[k*w*h + i*w + j] = (float) data[i*step + j*c + k]/255.;
+                im.data[k*w*h + i*w + j] = (float) data[i*step + j*c + k]/255.1; //Prevent saturation
             }
         }
     }
@@ -108,24 +108,6 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
                  );
 }
 
-int setConfigStr_DarknetProcessor(char * label,char * value)
-{
- return 0;
-
-}
-
-int setConfigInt_DarknetProcessor(char * label,int value)
-{
- return 0;
-
-}
-
-
-
-unsigned char * getDataOutput_DarknetProcessor(unsigned int stream , unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)
-{
- return 0;
-}
 
 int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
@@ -145,7 +127,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     float *prediction = network_predict(dc.net, X);
     fprintf(stderr,"done\n");
 
-    fprintf(stderr,"getting results ( %u outputs.. ) ..\n",dc.l.outputs);
+    fprintf(stderr,"getting results ( %u outputs , %u boxes ) ..\n",dc.l.outputs );
     get_detection_boxes(dc.l, 1, 1, dc.threshold, dc.probs, dc.boxes, 0);
 
     if (dc.nms)
@@ -166,6 +148,23 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 }
 
 
+
+int setConfigStr_DarknetProcessor(char * label,char * value)
+{
+ return 0;
+
+}
+
+int setConfigInt_DarknetProcessor(char * label,int value)
+{
+ return 0;
+
+}
+
+unsigned char * getDataOutput_DarknetProcessor(unsigned int stream , unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)
+{
+ return 0;
+}
 
 unsigned short * getDepth_DarknetProcessor(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)
 {
