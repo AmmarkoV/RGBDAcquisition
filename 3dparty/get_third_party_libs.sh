@@ -356,6 +356,27 @@ else
 fi
 
 
+
+if [ -d darknet ]
+then
+echo "darknet appears to already exist .."
+else
+  echo "Do you want to download darknet ? " 
+  echo
+  echo -n " (Y/N)?"
+  read answer
+  if test "$answer" != "N" -a "$answer" != "n";
+  then  
+      cd "$DIR"
+      git clone https://github.com/pjreddie/darknet
+      cd darknet
+      make
+      
+      cd ..
+  fi
+fi
+
+
  
 cd "$STARTDIR"
 

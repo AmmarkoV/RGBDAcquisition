@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "DarknetProcessor.h"
 #include "../../tools/ImageOperations/imageOps.h"
 #include "../../3dparty/darknet/include/darknet.h"
@@ -8,31 +9,100 @@
 unsigned int framesProcessed=0;
 
 
-
-
-void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const char *filename, char **names, int classes, int delay, char *prefix, int avg_frames, float hier, int w, int h, int frames, int fullscreen)
+struct darknetContext
 {
-    /*
-    demo_frame = avg_frames;
-    predictions = calloc(demo_frame, sizeof(float*));
-    image **alphabet = load_alphabet();
-    demo_names = names;
-    demo_alphabet = alphabet;
-    demo_classes = classes;
-    demo_thresh = thresh;
-    demo_hier = hier;
-    printf("Demo\n");
-    net = load_network(cfgfile, weightfile, 0);
-    set_batch_network(net, 1);*/
-//    pthread_t detect_thread;
-//    pthread_t fetch_thread;
+ image **alphabet;
+ network net;
+ layer l;
+
+ float nms;
+ box *boxes;
+ float **probs;
+
+ float threshold;
+};
+
+
+struct darknetContext dc;
+
+char *voc_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
+
+
+
+image load_image_from_buffer(void * pixels , unsigned int width, unsigned int height, unsigned int channels)
+{
+    char * data = (char*) pixels;
+    int w=width, h=height, c=channels;
+    int i,j,k;
+    image im = make_image(w, h, c);
+    for(k = 0; k < c; ++k){
+        for(j = 0; j < h; ++j){
+            for(i = 0; i < w; ++i){
+                int dst_index = i + w*j + w*h*k;
+                int src_index = k + c*i + c*w*j;
+                im.data[dst_index] = (float)data[src_index]/255.;
+            }
+        }
+    }
+    //free(data);
+    return im;
+}
+
+
+
+
+int init_yolo(
+                const char *cfgfile,
+                const char *weightfile,
+                float thresh
+               )
+{
+    if (!cfgfile)    { return 0; }
+    if (!weightfile) { return 0; }
+
+    dc.alphabet = load_alphabet();
+    dc.net= parse_network_cfg(cfgfile);
+    if(weightfile){
+                   load_weights(&dc.net, weightfile);
+                  }
+    dc.l = dc.net.layers[dc.net.n-1];
+
+    set_batch_network(&dc.net, 1);
+    srand(2222222);
+
+
+    int j;
+    dc.nms=.4;
+    dc.boxes = calloc(dc.l.side * dc.l.side * dc.l.n, sizeof(box));
+    dc.probs = calloc(dc.l.side * dc.l.side * dc.l.n, sizeof(float *));
+    for(j = 0; j < dc.l.side*dc.l.side*dc.l.n; ++j)
+         { dc.probs[j] = calloc(dc.l.classes, sizeof(float *)); }
+
+
+ return 1;
 }
 
 int initArgs_DarknetProcessor(int argc, char *argv[])
 {
- fprintf(stdout,"Frame,Blob,X,Y,Z,Samples\n");
- return 0;
+ char * cfgFile=0;
+ char * weightFile=0;
+ float threshold=0.4;
 
+
+ unsigned int i=0;
+ for (i=0; i<argc; i++)
+ {
+   if (strstr(argv[i],".cfg")!=0) { cfgFile=argv[i]; }
+   if (strstr(argv[i],".weights")!=0) { weightFile=argv[i]; }
+ }
+
+ init_yolo(
+           cfgFile,
+           weightFile,
+           threshold
+           );
+
+ return 0;
 }
 
 int setConfigStr_DarknetProcessor(char * label,char * value)
@@ -57,9 +127,29 @@ unsigned char * getDataOutput_DarknetProcessor(unsigned int stream , unsigned in
 int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
 
- fprintf(stderr,"addDataInput_DarknetProcessor %u (%ux%u)\n" , stream , width, height);
- if (stream==1)
+ fprintf(stderr,"addDataInput_DarknetProcessor %u (%ux%u) channels=%u\n" , stream , width, height,channels);
+ if (stream==0)
  {
+    image im=load_image_from_buffer(data, width, height, channels);
+    fprintf(stderr,"resizing image..\n");
+    image sized = resize_image(im, dc.net.w, dc.net.h);
+    float *X = sized.data;
+
+    fprintf(stderr,"detecting..\n");
+    network_predict(dc.net, X);
+
+    fprintf(stderr,"getting results..\n");
+    get_detection_boxes(dc.l, 1, 1, dc.threshold, dc.probs, dc.boxes, 0);
+
+    if (dc.nms)
+         { do_nms_sort(dc.boxes, dc.probs, dc.l.side* dc.l.side* dc.l.n, dc.l.classes, dc.nms); }
+
+    draw_detections(im, dc.l.side * dc.l.side * dc.l.n  , dc.threshold , dc.boxes, dc.probs, 0, voc_names, dc.alphabet, 20);
+        save_image(im, "predictions");
+        show_image(im, "predictions");
+
+        free_image(im);
+        free_image(sized);
 
    ++framesProcessed;
   return 1;
