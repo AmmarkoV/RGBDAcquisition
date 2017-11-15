@@ -304,7 +304,8 @@ int main (int argc,const char *argv[])
     if (strcmp(argv[i],"-processor")==0) {
                                           fprintf(stderr,"Adding Processor to Pipeline %s , postfix %s\n",argv[i+1],argv[i+2]);
                                           if (!acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2],argc,argv))
-                                          { fprintf(stderr,"Stopping execution..\n"); return 1; }
+                                          { fprintf(stderr,"Stopping execution..\n"); return 1; }else
+                                          { fprintf(stderr,"Successfuly added processor..\n");  }
                                          } else
     if (strcmp(argv[i],"-waitKey")==0) {
                                          fprintf(stderr,"Waiting for key to be pressed to start\n");
@@ -475,11 +476,14 @@ if (moduleID==SCRIPTED_ACQUISITION_MODULE)
 
      #if INTERCEPT_MOUSE_IN_WINDOWS
       //Create a window
+      if (drawColor)
+      {
        cvNamedWindow(RGBwindowName, 1);
       //set the callback function for any mouse event
        if (!noinput)
         {
          cvSetMouseCallback(RGBwindowName, CallBackFunc, NULL);
+        }
         }
      #endif
 

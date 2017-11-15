@@ -346,9 +346,7 @@ int main(int argc, char *argv[])
   unsigned int i=0;
   for (i=0; i<argc; i++)
   {
-
-
-    if (strcmp(argv[i],"-delay")==0) {  delay=atoi(argv[i+1]); } else
+    if (strcmp(argv[i],"-delay")==0) { delay=atoi(argv[i+1]); } else
     if (strcmp(argv[i],"-saveEveryFrame")==0) {  saveEveryFrame=1; } else
     if (strcmp(argv[i],"-saveAsOriginalFrameNumber")==0) {
                                                            saveAsOriginalFrameNumber=1;
@@ -364,7 +362,8 @@ int main(int argc, char *argv[])
     if (strcmp(argv[i],"-processor")==0) {
                                           fprintf(stderr,"Adding Processor to Pipeline %s , postfix %s\n",argv[i+1],argv[i+2]);
                                           if (!acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2],argc,argv))
-                                          { fprintf(stderr,"Stopping execution..\n"); return 1; }
+                                          { fprintf(stderr,"Stopping execution..\n"); return 1; } else
+                                          { fprintf(stderr,"Successfuly added processor..\n");  }
                                          } else
     if (strcmp(argv[i],"-waitKey")==0) {
                                          fprintf(stderr,"Waiting for key to be pressed to start\n");
@@ -533,12 +532,15 @@ int main(int argc, char *argv[])
 
      #if INTERCEPT_MOUSE_IN_WINDOWS
       //Create a window
+    if (drawColor)
+    {
        cvNamedWindow(RGBwindowName, 1);
       //set the callback function for any mouse event
        if (!noinput)
         {
          cvSetMouseCallback(RGBwindowName, CallBackFunc, NULL);
         }
+     }
      #endif
 
    while ( (!stop) && ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) ) )

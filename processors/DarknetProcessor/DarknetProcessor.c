@@ -3,11 +3,13 @@
 #include <string.h>
 #include <math.h>
 #include "DarknetProcessor.h"
+
+#define GPU 1
+
 #include "../../tools/ImageOperations/imageOps.h"
 #include "../../3dparty/darknet/include/darknet.h"
 
 unsigned int framesProcessed=0;
-
 
 struct darknetContext
 {
@@ -101,7 +103,6 @@ int init_yolo(
             for(j = 0; j < l.w* l.h * l.n; ++j) dc.masks[j] = calloc( l.coords-4, sizeof(float *));
         }
     fprintf(stderr,"Done with initialization ..\n");
-
  return 1;
 }
 
@@ -110,7 +111,7 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
  char * cfgFile=0;
  char * weightFile=0;
  char * dataFile=0;
- float threshold=0.25;
+ float threshold=0.35;
 
 
  unsigned int i=0;
@@ -121,8 +122,9 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
    if (strstr(argv[i],".data")!=0) { dataFile=argv[i]; }
  }
 
+ #if GPU
   fprintf(stderr,"Thinking about GPUS\n");
-  signed int gpu_index = find_int_arg(argc, argv, "-i", 0);
+  signed int gpu_index = find_int_arg(argc, argv, "-gpuid", 0);
   if(find_arg(argc, argv, "-nogpu"))
     {
         gpu_index = -1;
@@ -136,6 +138,7 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
                         fprintf(stderr,"Running without GPU ( gpu_index=%d )..\n",gpu_index);
                       }
 
+                      /*
  char *gpu_list = find_char_arg(argc, argv, "-gpus", 0);
  int *gpus = 0;
  int gpu = 0;
@@ -160,9 +163,8 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
               gpus = &gpu;
               ngpus = 1;
              }
-
-
- // signed int gpu_index = 0;
+*/
+#endif // GPU
 
  return init_yolo(
                    cfgFile,
@@ -190,7 +192,6 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
     fprintf(stderr,"detecting.. ");
     float *prediction = network_predict(dc.net /*Neural Net*/, sized.data /*Search Image*/);
-
     fprintf(stderr,"done ( %u )\n",l.outputs);
 
 
