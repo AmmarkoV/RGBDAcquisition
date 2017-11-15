@@ -11,7 +11,8 @@ cd redist
 if [ -e $BIN ]
 then
  ldd $BIN | grep not
- LD_LIBRARY_PATH=.:../3dparty/libfreenect/build/lib  valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes  ./$BIN $@  2> ../error.txt
+ #LD_LIBRARY_PATH=.:../3dparty/libfreenect/build/lib  
+ valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes  ./$BIN $@  2> ../error.txt
 else
  if [ -e $ORIGINALDIRBIN ]
    then 

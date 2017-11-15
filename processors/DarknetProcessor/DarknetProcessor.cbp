@@ -33,16 +33,24 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="`pkg-config --cflags opencv`" />
 			<Add option="-fPIC" />
 		</Compiler>
 		<Linker>
-			<Add library="../../3dparty/darknet/libdarknet.so" />
+			<Add option="`pkg-config --libs opencv`" />
+			<Add option="-L/usr/local/cuda/lib64" />
+			<Add library="../../../3dparty/darknet/libdarknet.a" />
+			<Add library="rt" />
+			<Add library="dl" />
+			<Add library="m" />
+			<Add library="pthread" />
+			<Add library="cuda" />
+			<Add library="cudart" />
+			<Add library="cublas" />
+			<Add library="curand" />
+			<Add library="stdc++" />
 		</Linker>
 		<Unit filename="../../3dparty/darknet/include/darknet.h" />
-		<Unit filename="../../tools/ImageOperations/imageOps.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../tools/ImageOperations/imageOps.h" />
 		<Unit filename="DarknetProcessor.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -27,7 +27,6 @@ struct darknetContext
  float hierarchyThreshold;
 };
 
-
 struct darknetContext dc={0};
 
 
@@ -70,6 +69,9 @@ int init_yolo(
 
     dc.alphabet = load_alphabet();
 
+    fprintf(stderr,"Data Source : %s\n",datafile);
+    fprintf(stderr,"CFG Source : %s\n",cfgfile);
+    fprintf(stderr,"Weight Source : %s\n",weightfile);
 
     list *options = read_data_cfg(datafile);
     int classes = option_find_int(options, "classes", 20);
@@ -137,29 +139,26 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
  if (stream==0)
  {
     image im=load_image_from_buffer(data, width, height, channels);
+    //save_image(im, "original");
+
     //image sized = resize_image(im, dc.net->w, dc.net->h);
     image sized = letterbox_image(im, dc.net->w, dc.net->h);
-
+    //save_image(sized, "sized");
 
     layer l = dc.net->layers[dc.net->n-1];
 
     fprintf(stderr,"detecting.. ");
     float *prediction = network_predict(dc.net /*Neural Net*/, sized.data /*Search Image*/);
-    fprintf(stderr,"done ( %u )\n",dc.l.outputs);
+    fprintf(stderr,"done ( %u )\n",l.outputs);
 
-
-    float * predictionCurrent = (float *) calloc(l.outputs, sizeof(float));
-
-
-    unsigned int detections =  l.w * l.h * l.n;
-
-
-    if(l.type == DETECTION)   {
-                               fprintf(stderr,"getting_detection_boxes .. ");
-                               get_detection_boxes(l, 1, 1, dc.threshold, dc.probs, dc.boxes, 0);
-                              }
+    if (l.outputs!=0)
+    {
+     if(l.type == DETECTION)   {
+                                fprintf(stderr,"getting_detection_boxes .. ");
+                                get_detection_boxes(l, 1, 1, dc.threshold, dc.probs, dc.boxes, 0);
+                               }
                               else
-    if (l.type == REGION)  {
+     if (l.type == REGION)    {
                                fprintf(stderr,"getting_region_boxes .. ");
                                get_region_boxes(l, im.w, im.h, dc.net->w, dc.net->h, dc.threshold, dc.probs, dc.boxes, 0, 0, 0, dc.hierarchyThreshold, 1);
                               } else
@@ -168,16 +167,19 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
                               }
     fprintf(stderr,"done\n");
 
-
-
     if (dc.nms)
          { do_nms_sort(dc.boxes, dc.probs, l.w*l.h*l.n, l.classes, dc.nms); }
 
     printf("Objects (%u classes):\n\n",l.classes);
 
+    unsigned int detections =  l.w * l.h * l.n;
     draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.masks, dc.names , dc.alphabet, l.classes);
     save_image(im, "predictions");
     show_image(im, "predictions");
+    } else
+    {
+     fprintf(stderr,"Failed to run network ( prediction points to %p )..\n",prediction);
+    }
 
     free_image(im);
     free_image(sized);
