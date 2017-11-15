@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="DarknetProcessor.cbp" />
+		<Project filename="../../viewer/Viewer.cbp" />
+		<Project filename="../../acquisition/Acquisition.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

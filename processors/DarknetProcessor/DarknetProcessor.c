@@ -13,15 +13,12 @@ struct darknetContext
 {
  image **alphabet;
  network * net;
- layer l;
 
  float nms;
  box *boxes;
  float **probs;
  float **masks;
- char **names;// = get_labels(name_list);
-
- float *avg;
+ char **names;
 
  float threshold;
  float hierarchyThreshold;
@@ -84,25 +81,26 @@ int init_yolo(
 
     srand(2222222);
 
-    dc.l = dc.net->layers[dc.net->n-1];
+    fprintf(stderr,"Retreiving last layer\n");
+    layer l = dc.net->layers[dc.net->n-1];
     dc.nms=.4;
     dc.threshold=thresh;
     dc.hierarchyThreshold=0.5;
 
-    dc.avg = (float *)   calloc(dc.l.outputs, sizeof(float));
-
-    dc.boxes = (box *)   calloc( dc.l.w * dc.l.h * dc.l.n, sizeof(box));
-    dc.probs = (float **)calloc( dc.l.w * dc.l.h * dc.l.n, sizeof(float *));
+    fprintf(stderr,"Allocating space ..\n");
+    dc.boxes = (box *)   calloc( l.w * l.h * l.n, sizeof(box));
+    dc.probs = (float **)calloc( l.w * l.h * l.n, sizeof(float *));
 
     int j;
-    for(j = 0; j < dc.l.w * dc.l.h * dc.l.n; ++j)
-         { dc.probs[j] = (float *)calloc(dc.l.classes+1, sizeof(float)); }
+    for(j = 0; j < l.w * l.h * l.n; ++j)
+         { dc.probs[j] = (float *)calloc( l.classes+1, sizeof(float)); }
 
-     if (dc.l.coords > 4)
+     if ( l.coords > 4)
         {
-            dc.masks = calloc(dc.l.w*dc.l.h*dc.l.n, sizeof(float*));
-            for(j = 0; j < dc.l.w*dc.l.h*dc.l.n; ++j) dc.masks[j] = calloc(dc.l.coords-4, sizeof(float *));
+            dc.masks = calloc( l.w *  l.h * l.n, sizeof(float*));
+            for(j = 0; j < l.w* l.h * l.n; ++j) dc.masks[j] = calloc( l.coords-4, sizeof(float *));
         }
+    fprintf(stderr,"Done with initialization ..\n");
 
  return 1;
 }
@@ -122,6 +120,49 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
    if (strstr(argv[i],".weights")!=0) { weightFile=argv[i]; }
    if (strstr(argv[i],".data")!=0) { dataFile=argv[i]; }
  }
+
+  fprintf(stderr,"Thinking about GPUS\n");
+  signed int gpu_index = find_int_arg(argc, argv, "-i", 0);
+  if(find_arg(argc, argv, "-nogpu"))
+    {
+        gpu_index = -1;
+    }
+
+   if(gpu_index >= 0) {
+                        fprintf(stderr,"Setting CUDA device ( gpu_index=%d )..\n",gpu_index);
+                        cuda_set_device(gpu_index);
+                      } else
+                      {
+                        fprintf(stderr,"Running without GPU ( gpu_index=%d )..\n",gpu_index);
+                      }
+
+ char *gpu_list = find_char_arg(argc, argv, "-gpus", 0);
+ int *gpus = 0;
+ int gpu = 0;
+ int ngpus = 0;
+ if(gpu_list){
+              printf("%s\n", gpu_list);
+              int len = strlen(gpu_list);
+              ngpus = 1;
+              int i;
+              for(i = 0; i < len; ++i){
+                                        if (gpu_list[i] == ',') ++ngpus;
+                                      }
+              gpus = calloc(ngpus, sizeof(int));
+              for(i = 0; i < ngpus; ++i)
+              {
+               gpus[i] = atoi(gpu_list);
+               gpu_list = strchr(gpu_list, ',')+1;
+              }
+             } else
+             {
+              gpu = gpu_index;
+              gpus = &gpu;
+              ngpus = 1;
+             }
+
+
+ // signed int gpu_index = 0;
 
  return init_yolo(
                    cfgFile,
@@ -149,7 +190,9 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
     fprintf(stderr,"detecting.. ");
     float *prediction = network_predict(dc.net /*Neural Net*/, sized.data /*Search Image*/);
+
     fprintf(stderr,"done ( %u )\n",l.outputs);
+
 
     if (l.outputs!=0)
     {

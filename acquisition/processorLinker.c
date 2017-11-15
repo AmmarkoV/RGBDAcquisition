@@ -40,6 +40,13 @@ int linkToProcessor(const char * processorName,const char * processorLibPath ,  
    if (!processors[processorID].handle)
        {
         fprintf (stderr,RED "Failed while loading code for %s plugin from %s\n Error : %s\n" NORMAL, processorName , processorLibPath , dlerror());
+
+
+        char pathTester[4097]={0};
+        if (getcwd(pathTester, 4096) != 0)
+         fprintf(stdout, "  working dir was : %s\n", pathTester);
+
+
         return 0;
        }
     dlerror();    /* Clear any existing error */

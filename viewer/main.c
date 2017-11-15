@@ -363,7 +363,8 @@ int main(int argc, char *argv[])
                                                 } else
     if (strcmp(argv[i],"-processor")==0) {
                                           fprintf(stderr,"Adding Processor to Pipeline %s , postfix %s\n",argv[i+1],argv[i+2]);
-                                          acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2],argc,argv);
+                                          if (!acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2],argc,argv))
+                                          { fprintf(stderr,"Stopping execution..\n"); return 1; }
                                          } else
     if (strcmp(argv[i],"-waitKey")==0) {
                                          fprintf(stderr,"Waiting for key to be pressed to start\n");

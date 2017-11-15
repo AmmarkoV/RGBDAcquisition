@@ -303,7 +303,8 @@ int main (int argc,const char *argv[])
                                                 } else
     if (strcmp(argv[i],"-processor")==0) {
                                           fprintf(stderr,"Adding Processor to Pipeline %s , postfix %s\n",argv[i+1],argv[i+2]);
-                                          acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2],argc,argv);
+                                          if (!acquisitionAddProcessor(moduleID,devID,argv[i+1],argv[i+2],argc,argv))
+                                          { fprintf(stderr,"Stopping execution..\n"); return 1; }
                                          } else
     if (strcmp(argv[i],"-waitKey")==0) {
                                          fprintf(stderr,"Waiting for key to be pressed to start\n");
@@ -481,7 +482,7 @@ if (moduleID==SCRIPTED_ACQUISITION_MODULE)
          cvSetMouseCallback(RGBwindowName, CallBackFunc, NULL);
         }
      #endif
-   
+
 
    fprintf(stderr,"Ready to enter grabbing loop \n");
    while ( (!stop) && ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) ) )
@@ -491,9 +492,9 @@ if (moduleID==SCRIPTED_ACQUISITION_MODULE)
            fprintf(stderr,"Frame Number is : %u\n",frameNum);
         }
         acquisitionStartTimer(0);
- 
+
         acquisitionSnapFrames(moduleID,devID);
- 
+
         acquisitionDisplayFrames(moduleID,devID,framerate);
 
        if (devID2!=UNINITIALIZED_DEVICE)
