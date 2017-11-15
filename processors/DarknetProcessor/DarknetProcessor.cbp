@@ -35,6 +35,7 @@
 		<Compiler>
 			<Add option="`pkg-config --cflags opencv`" />
 			<Add option="-fPIC" />
+			<Add directory="/usr/local/cuda/include/ " />
 		</Compiler>
 		<Linker>
 			<Add option="`pkg-config --libs opencv`" />

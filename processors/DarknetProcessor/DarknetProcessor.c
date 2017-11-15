@@ -5,8 +5,7 @@
 #include "DarknetProcessor.h"
 
 #define GPU 1
-
-#include "../../tools/ImageOperations/imageOps.h"
+//if define GPU1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
 #include "../../3dparty/darknet/include/darknet.h"
 
 unsigned int framesProcessed=0;
@@ -137,34 +136,7 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
                       {
                         fprintf(stderr,"Running without GPU ( gpu_index=%d )..\n",gpu_index);
                       }
-
-                      /*
- char *gpu_list = find_char_arg(argc, argv, "-gpus", 0);
- int *gpus = 0;
- int gpu = 0;
- int ngpus = 0;
- if(gpu_list){
-              printf("%s\n", gpu_list);
-              int len = strlen(gpu_list);
-              ngpus = 1;
-              int i;
-              for(i = 0; i < len; ++i){
-                                        if (gpu_list[i] == ',') ++ngpus;
-                                      }
-              gpus = calloc(ngpus, sizeof(int));
-              for(i = 0; i < ngpus; ++i)
-              {
-               gpus[i] = atoi(gpu_list);
-               gpu_list = strchr(gpu_list, ',')+1;
-              }
-             } else
-             {
-              gpu = gpu_index;
-              gpus = &gpu;
-              ngpus = 1;
-             }
-*/
-#endif // GPU
+ #endif // GPU
 
  return init_yolo(
                    cfgFile,
