@@ -206,14 +206,14 @@ int setV4L2DepthCalibration(int devID,struct calibration * calib) { return setV4
 
 
 //V4L2 doesnt have any specific dDepth frame getters , so we just return null
-int getV4L2DepthWidth(int devID) { return 0; }
-int getV4L2DepthHeight(int devID) { return 0; }
-int getV4L2DepthDataSize(int devID) { return 0; }
-int getV4L2DepthChannels(int devID) { return 0; }
-int getV4L2DepthBitsPerPixel(int devID) {  return 0; }
-char * getV4L2DepthPixels(int devID) { return 0; }
+int getV4L2DepthWidth(int devID)          { return 0; }
+int getV4L2DepthHeight(int devID)         { return 0; }
+int getV4L2DepthDataSize(int devID)       { return 0; }
+int getV4L2DepthChannels(int devID)       { return 0; }
+int getV4L2DepthBitsPerPixel(int devID)   {  return 0; }
+char * getV4L2DepthPixels(int devID)      { return 0; }
 double getV4L2DepthFocalLength(int devID) {  return 0; }
-double getV4L2DepthPixelSize(int devID) { return 0; }
+double getV4L2DepthPixelSize(int devID)   { return 0; }
 
 #else
 //Null build

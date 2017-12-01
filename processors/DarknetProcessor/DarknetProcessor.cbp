@@ -51,11 +51,15 @@
 			<Add library="curand" />
 			<Add library="stdc++" />
 		</Linker>
-		<Unit filename="../../3dparty/darknet/include/darknet.h" />
+		<Unit filename="../../../../../3dParty/darknet/include/darknet.h" />
 		<Unit filename="DarknetProcessor.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="DarknetProcessor.h" />
+		<Unit filename="recordOutput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="recordOutput.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

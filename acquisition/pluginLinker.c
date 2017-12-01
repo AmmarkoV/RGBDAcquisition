@@ -144,7 +144,7 @@ int getPluginPath(char * possiblePath, char * libName , char * pathOut, unsigned
    if (acquisitionFileExists(libName))
                                  {
                                    fprintf(stderr,GREEN "Found plugin %s at current directory \n" NORMAL,libName);
-                                   snprintf(pathOut,pathOutLength,"%s",libName);
+                                   snprintf(pathOut,pathOutLength,"./%s",libName);
                                    return 1;
                                  }
 
@@ -279,7 +279,7 @@ int linkToPlugin(char * moduleName,char * modulePossiblePath ,char * moduleLib ,
    plugins[moduleID].handle = dlopen (functionNameStr, RTLD_LAZY);
    if (!plugins[moduleID].handle)
        {
-        fprintf (stderr,RED "Failed while loading code for %s plugin from %s\n Error : %s\n" NORMAL, moduleName , functionNameStr , dlerror());
+        fprintf (stderr,RED "Failed while loading code for `%s` plugin from `%s`\n Error : %s\n" NORMAL, moduleName , functionNameStr , dlerror());
         return 0;
        }
 

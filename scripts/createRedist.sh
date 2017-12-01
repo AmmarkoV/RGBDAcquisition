@@ -27,7 +27,7 @@ binaries="grabber/Grabber viewer/Viewer grabber_segment/GrabberSegment grabber_m
   done 
 
 
-libraries="acquisition/libAcquisition.so libfreenect_acquisition_shared_library/libFreenectAcquisition.so opengl_acquisition_shared_library/libOpenGLAcquisition.so openni1_acquisition_shared_library/libOpenNI1Acquisition.so openni2_acquisition_shared_library/libOpenNI2Acquisition.so template_acquisition_shared_library/libTemplateAcquisition.so v4l2_acquisition_shared_library/libV4L2Acquisition.so v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so"
+libraries="acquisition/libAcquisition.so libfreenect_acquisition_shared_library/libFreenectAcquisition.so opengl_acquisition_shared_library/libOpenGLAcquisition.so openni1_acquisition_shared_library/libOpenNI1Acquisition.so openni2_acquisition_shared_library/libOpenNI2Acquisition.so template_acquisition_shared_library/libTemplateAcquisition.so v4l2_acquisition_shared_library/libV4L2Acquisition.so v4l2stereo_acquisition_shared_library/libV4L2StereoAcquisition.so
 
  for f in $libraries
            do  

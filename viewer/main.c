@@ -585,6 +585,7 @@ int main(int argc, char *argv[])
       if (executeEveryLoopPayload)
       {
          int i=system(executeEveryLoop);
+         if (i!=0) { fprintf(stderr,"Could not execute payload\n"); }
       }
 
       if (delay>0)

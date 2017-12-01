@@ -531,6 +531,7 @@ if (moduleID==SCRIPTED_ACQUISITION_MODULE)
       if (executeEveryLoopPayload)
       {
          int i=system(executeEveryLoop);
+         if (i!=0) { fprintf(stderr,"Could not execute payload\n"); }
       }
 
       if (delay>0)
