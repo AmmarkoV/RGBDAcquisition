@@ -2,6 +2,14 @@
 #define RECORDOUTPUT_H_INCLUDED
 
 
-int processOutput();
+int logEvent(
+              unsigned int frameNumber,
+              float x,
+              float y,
+              float width,
+              float height,
+              const char * label,
+              float probability
+            );
 
 #endif // RECORDOUTPUT_H_INCLUDED

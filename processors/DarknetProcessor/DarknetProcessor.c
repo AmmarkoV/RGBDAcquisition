@@ -3,6 +3,8 @@
 #include <string.h>
 #include <math.h>
 #include "DarknetProcessor.h"
+#include "recordOutput.h"
+
 
 #define GPU 1
 //if define GPU1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
@@ -189,6 +191,21 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     printf("Objects (%u classes):\n\n",l.classes);
 
     unsigned int detections =  l.w * l.h * l.n;
+
+    unsigned int i=0;
+    for (i=0; i<detections; i++)
+    {
+    logEvent(
+              framesProcessed,
+              dc.boxes[i].x,
+              dc.boxes[i].y,
+              dc.boxes[i].w,
+              dc.boxes[i].h,
+              dc.names[i],
+              1.0//TODO:dc.probs[i]
+            );
+    }
+
     draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.masks, dc.names , dc.alphabet, l.classes);
     save_image(im, "predictions");
     show_image(im, "predictions");
