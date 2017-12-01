@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
 #include "DarknetProcessor.h"
 #include "recordOutput.h"
+
 
 
 #define GPU 1
@@ -28,7 +30,7 @@ struct darknetContext
 };
 
 struct darknetContext dc={0};
-
+FILE * fp=0;
 
 image load_image_from_buffer(void * pixels , unsigned int width, unsigned int height, unsigned int channels)
 {
@@ -140,6 +142,8 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
                       }
  #endif // GPU
 
+ fp=startLogging("surveilance.log");
+
  return init_yolo(
                    cfgFile,
                    weightFile,
@@ -192,19 +196,32 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
     unsigned int detections =  l.w * l.h * l.n;
 
-    unsigned int i=0;
-    for (i=0; i<detections; i++)
+
+   time_t clock = time(NULL);
+   struct tm * ptm = gmtime ( &clock );
+
+    unsigned int i=0,j=0;
+    for(i = 0; i <detections; ++i)
     {
-    logEvent(
-              framesProcessed,
-              dc.boxes[i].x,
-              dc.boxes[i].y,
-              dc.boxes[i].w,
-              dc.boxes[i].h,
-              dc.names[i],
-              1.0//TODO:dc.probs[i]
-            );
-    }
+        for(j = 0; j < l.classes; ++j){
+            if (dc.probs[i][j] >  dc.threshold)
+            {
+               logEvent(
+                        fp,
+                        ptm,
+                        framesProcessed,
+                        dc.boxes[i].x,
+                        dc.boxes[i].y,
+                        dc.boxes[i].w,
+                        dc.boxes[i].h,
+                        dc.names[j],
+                        dc.probs[i][j]*100
+                      );
+            }
+        }
+    } // End for loop
+
+    fflush(fp);
 
     draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.masks, dc.names , dc.alphabet, l.classes);
     save_image(im, "predictions");
@@ -270,6 +287,7 @@ int cleanup_DarknetProcessor()
 
 int stop_DarknetProcessor()
 {
+ stopLogging(fp);
  return 0;
 
 }
