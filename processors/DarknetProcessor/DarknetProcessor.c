@@ -122,9 +122,9 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
  unsigned int i=0;
  for (i=0; i<argc; i++)
  {
-   if (strstr(argv[i],".cfg")!=0)     { cfgFile=argv[i]; }
-   if (strstr(argv[i],".weights")!=0) { weightFile=argv[i]; }
-   if (strstr(argv[i],".data")!=0)    { dataFile=argv[i]; }
+   if (strstr(argv[i],".cfg")!=0)      { cfgFile=argv[i]; }
+   if (strstr(argv[i],".weights")!=0)  { weightFile=argv[i]; }
+   if (strstr(argv[i],".data")!=0)     { dataFile=argv[i]; }
    if (strstr(argv[i],"--payload")!=0) { payload=argv[i+1]; }
  }
 
@@ -230,6 +230,10 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
                       int i=system(payload);
                       if (i!=0)
                       { fprintf(stderr,"Payload (%s) failed..\n",payload); }
+
+                      char recordFile[512]={0};
+                      snprintf(recordFile,512,"record_%u",framesProcessed);
+                      save_image(im,recordFile);
                      }
                   }
             }
@@ -237,12 +241,6 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     } // End for loop
 
     fflush(fp);
-
-
-    char recordFile[512]={0};
-    snprintf(recordFile,512,"record_%u",framesProcessed);
-    save_image(im,recordFile);
-
 
 
     //show_image(im, "predictions");

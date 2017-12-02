@@ -40,7 +40,7 @@
 		<Linker>
 			<Add option="`pkg-config --libs opencv`" />
 			<Add option="-L/usr/local/cuda/lib64" />
-			<Add library="/home/ammar/Documents/Programming/3dparty/darknet/libdarknet.so" />
+			<Add library="../../3dparty/darknet/libdarknet.so" />
 			<Add library="rt" />
 			<Add library="dl" />
 			<Add library="m" />
