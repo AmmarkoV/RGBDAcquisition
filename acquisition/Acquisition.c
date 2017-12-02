@@ -618,13 +618,10 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
 
            (*processors[processorID].processData) ();
 
-            fprintf(stderr,"going to do further calls \n");
-
+            //fprintf(stderr,"going to do further calls \n");
             unsigned short * depthFrame = (*processors[processorID].getDepth) ( &depthWidth, &depthHeight, &depthChannels, &depthBitsperpixel) ;
             unsigned char *  colorFrame = (*processors[processorID].getColor) ( &colorWidth, &colorHeight, &colorChannels, &colorBitsperpixel) ;
-
-
-            fprintf(stderr,"colorFrame=%p , depthFrame=%p \n",colorFrame,depthFrame);
+            //fprintf(stderr,"colorFrame=%p , depthFrame=%p \n",colorFrame,depthFrame);
 
             if (colorFrame!=0)
                  { acquisitionOverrideColorFrame(moduleID , devID , colorFrame , colorWidth*colorHeight*colorChannels*(colorBitsperpixel/8) ,colorWidth,colorHeight,colorChannels,colorBitsperpixel); }

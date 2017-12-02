@@ -114,7 +114,7 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
  char * cfgFile=0;
  char * weightFile=0;
  char * dataFile=0;
- float threshold=0.35;
+ float threshold=0.55; // was 0.35
 
 
  unsigned int i=0;
@@ -155,8 +155,7 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
 
 int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
-
- fprintf(stderr,"addDataInput_DarknetProcessor %u (%ux%u) channels=%u\n" , stream , width, height,channels);
+ //fprintf(stderr,"addDataInput_DarknetProcessor %u (%ux%u) channels=%u\n" , stream , width, height,channels);
  if (stream==0)
  {
     image im=load_image_from_buffer(data, width, height, channels);
@@ -168,37 +167,39 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
     layer l = dc.net->layers[dc.net->n-1];
 
-    fprintf(stderr,"detecting.. ");
+    //fprintf(stderr,"detecting.. ");
     float *prediction = network_predict(dc.net /*Neural Net*/, sized.data /*Search Image*/);
-    fprintf(stderr,"done ( %u )\n",l.outputs);
+    //fprintf(stderr,"done ( %u )\n",l.outputs);
 
 
     if (l.outputs!=0)
     {
      if(l.type == DETECTION)   {
-                                fprintf(stderr,"getting_detection_boxes .. ");
+                                //fprintf(stderr,"getting_detection_boxes .. ");
                                 get_detection_boxes(l, 1, 1, dc.threshold, dc.probs, dc.boxes, 0);
                                }
                               else
      if (l.type == REGION)    {
-                               fprintf(stderr,"getting_region_boxes .. ");
+                               //fprintf(stderr,"getting_region_boxes .. ");
                                get_region_boxes(l, im.w, im.h, dc.net->w, dc.net->h, dc.threshold, dc.probs, dc.boxes, 0, 0, 0, dc.hierarchyThreshold, 1);
                               } else
                               {
                                error("Last layer must produce detections\n");
                               }
-    fprintf(stderr,"done\n");
+    //fprintf(stderr,"done\n");
 
     if (dc.nms)
          { do_nms_sort(dc.boxes, dc.probs, l.w*l.h*l.n, l.classes, dc.nms); }
 
-    printf("Objects (%u classes):\n\n",l.classes);
+    //printf("Objects (%u classes):\n\n",l.classes);
 
     unsigned int detections =  l.w * l.h * l.n;
 
 
    time_t clock = time(NULL);
    struct tm * ptm = gmtime ( &clock );
+
+    draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.masks, dc.names , dc.alphabet, l.classes);
 
     unsigned int i=0,j=0;
     for(i = 0; i <detections; ++i)
@@ -223,8 +224,13 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
     fflush(fp);
 
-    draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.masks, dc.names , dc.alphabet, l.classes);
-    save_image(im, "predictions");
+
+    char recordFile[512]={0};
+    snprintf(recordFile,512,"record%u",framesProcessed);
+    save_image(im,recordFile);
+
+
+
     show_image(im, "predictions");
     } else
     {
