@@ -29,6 +29,8 @@ struct darknetContext
  float hierarchyThreshold;
 };
 
+
+char * payload=0;
 struct darknetContext dc={0};
 FILE * fp=0;
 
@@ -120,9 +122,10 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
  unsigned int i=0;
  for (i=0; i<argc; i++)
  {
-   if (strstr(argv[i],".cfg")!=0) { cfgFile=argv[i]; }
+   if (strstr(argv[i],".cfg")!=0)     { cfgFile=argv[i]; }
    if (strstr(argv[i],".weights")!=0) { weightFile=argv[i]; }
-   if (strstr(argv[i],".data")!=0) { dataFile=argv[i]; }
+   if (strstr(argv[i],".data")!=0)    { dataFile=argv[i]; }
+   if (strstr(argv[i],"--payload")!=0) { payload=argv[i+1]; }
  }
 
  #if GPU
@@ -218,6 +221,17 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
                         dc.names[j],
                         dc.probs[i][j]*100
                       );
+
+
+               if (strcmp(dc.names[j],"person")==0)
+                  {
+                    if (payload!=0)
+                    {
+                      int i=system(payload);
+                      if (i!=0)
+                      { fprintf(stderr,"Payload (%s) failed..\n",payload); }
+                     }
+                  }
             }
         }
     } // End for loop
@@ -226,12 +240,12 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
 
     char recordFile[512]={0};
-    snprintf(recordFile,512,"record%u",framesProcessed);
+    snprintf(recordFile,512,"record_%u",framesProcessed);
     save_image(im,recordFile);
 
 
 
-    show_image(im, "predictions");
+    //show_image(im, "predictions");
     } else
     {
      fprintf(stderr,"Failed to run network ( prediction points to %p )..\n",prediction);
