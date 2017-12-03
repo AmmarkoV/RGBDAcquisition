@@ -225,18 +225,17 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
                if (strcmp(dc.names[j],"person")==0)
                   {
-                    if (payload!=0)
-                    {
-                      int i=system(payload);
-                      if (i!=0)
-                      { fprintf(stderr,"Payload (%s) failed..\n",payload); }
-
-                      if ( dc.boxes[i].h > 130 )
-                      { //if it is a standing human..
+                   if ( dc.boxes[i].h > 130 )
+                     {
+                      if (payload!=0)
+                      {
+                        int i=system(payload);
+                        if (i!=0) { fprintf(stderr,"Payload (%s) failed..\n",payload); }
+                      }
+                       //if it is a standing human..
                         char recordFile[512]={0};
                         snprintf(recordFile,512,"record_%u",framesProcessed);
                         save_image(im,recordFile);
-                      }
                      }
                   }
             }
