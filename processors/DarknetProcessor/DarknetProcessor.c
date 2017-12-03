@@ -225,7 +225,8 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
                if (strcmp(dc.names[j],"person")==0)
                   {
-                   if ( dc.boxes[i].h > 130 )
+                   fprintf(stderr,"%0.2f\n",dc.boxes[i].h);
+                   if ( dc.boxes[i].h > 0.3 )
                      {
                       if (payload!=0)
                       {
