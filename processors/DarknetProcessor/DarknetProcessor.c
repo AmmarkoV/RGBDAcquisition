@@ -6,8 +6,6 @@
 #include "DarknetProcessor.h"
 #include "recordOutput.h"
 
-
-
 #define GPU 1
 //if define GPU1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
 #include "../../3dparty/darknet/include/darknet.h"
@@ -29,10 +27,8 @@ struct darknetContext
  float hierarchyThreshold;
 };
 
-
 char * payload=0;
 struct darknetContext dc={0};
-FILE * fp=0;
 
 image load_image_from_buffer(void * pixels , unsigned int width, unsigned int height, unsigned int channels)
 {
@@ -56,9 +52,6 @@ image load_image_from_buffer(void * pixels , unsigned int width, unsigned int he
     //free(data);
     return im;
 }
-
-
-
 
 int init_yolo(
                 const char *cfgfile,
@@ -145,7 +138,8 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
                       }
  #endif // GPU
 
- fp=startLogging("surveilance.log");
+ framesProcessed=resumeFrameOutput();
+ fprintf(stderr,"Resuming @ %u\n",framesProcessed);
 
  return init_yolo(
                    cfgFile,
@@ -205,6 +199,17 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.masks, dc.names , dc.alphabet, l.classes);
 
     unsigned int i=0,j=0;
+
+
+    char directoryToUse[1024];
+    snprintf(directoryToUse,1024,"%u_%02u_%02u", EPOCH_YEAR_IN_TM_YEAR+ptm->tm_year, ptm->tm_mon+1, ptm->tm_mday);
+    useLoggingDirectory(directoryToUse);
+
+
+    char logFile[1024];
+    snprintf(logFile,1024,"%s/surveilance.log",directoryToUse);
+
+    FILE * fp = startLogging(logFile);
     for(i = 0; i <detections; ++i)
     {
         for(j = 0; j < l.classes; ++j){
@@ -225,7 +230,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
                if (strcmp(dc.names[j],"person")==0)
                   {
-                   fprintf(stderr,"%0.2f\n",dc.boxes[i].h);
+                   //fprintf(stderr,"%0.2f\n",dc.boxes[i].h);
                    if ( dc.boxes[i].h > 0.3 )
                      {
                       if (payload!=0)
@@ -235,16 +240,15 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
                       }
                        //if it is a standing human..
                         char recordFile[512]={0};
-                        snprintf(recordFile,512,"record_%u",framesProcessed);
+                        snprintf(recordFile,512,"%s/record_%u",directoryToUse,framesProcessed);
                         save_image(im,recordFile);
                      }
                   }
             }
         }
     } // End for loop
-
     fflush(fp);
-
+    stopLogging(fp);
 
     //show_image(im, "predictions");
     } else
@@ -260,8 +264,6 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
  }
  return 0;
 }
-
-
 
 int setConfigStr_DarknetProcessor(char * label,char * value)
 {
@@ -298,18 +300,14 @@ int processData_DarknetProcessor()
 
 }
 
-
 int cleanup_DarknetProcessor()
 {
 
  return 0;
 }
 
-
 int stop_DarknetProcessor()
 {
- stopLogging(fp);
  return 0;
 
 }
-

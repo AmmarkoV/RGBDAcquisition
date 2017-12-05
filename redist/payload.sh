@@ -1,5 +1,7 @@
 #!/bin/bash
 
+exit 0
+
 xdotool mousemove --sync 1 1
 xdotool mousemove --sync 100 100
 
@@ -15,7 +17,5 @@ if [ "${RESULT:-null}" = null ]; then
 else
     echo "running"
 fi
-
-
-
+ 
 exit 0

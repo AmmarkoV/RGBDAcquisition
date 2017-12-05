@@ -4,6 +4,15 @@
 #include <stdio.h>
 #include <time.h>
 
+
+
+#define EPOCH_YEAR_IN_TM_YEAR 1900
+
+int makeDirectory(const char * path);
+int useLoggingDirectory(const char * path);
+
+int resumeFrameOutput();
+
 FILE * startLogging(const char * filename);
 
 int logEvent(
