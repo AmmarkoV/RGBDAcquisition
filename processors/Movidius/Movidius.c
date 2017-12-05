@@ -31,10 +31,8 @@
 #define NAME_SIZE 100
 
 // graph file name - assume we are running in this directory: ncsdk/examples/caffe/GoogLeNet/cpp
-#define GRAPH_FILE_NAME "../graph"
+#define GRAPH_FILE_NAME "/home/ammar/Documents/3dParty/ncsdk/examples/caffe/GoogLeNet/graph"
 
-// image file name - assume we are running in this directory: ncsdk/examples/caffe/GoogLeNet/cpp
-#define IMAGE_FILE_NAME "../../../data/images/nps_electric_guitar.png"
 
 
 // 16 bits.  will use this to store half precision floats since C++ has no
@@ -44,6 +42,17 @@ typedef unsigned short half;
 // GoogleNet image dimensions, network mean values for each channel in BGR order.
 const int networkDim = 224;
 float networkMean[] = {0.40787054*255.0, 0.45752458*255.0, 0.48109378*255.0};
+
+
+struct labelContents
+{
+  unsigned int numberOfLabels;
+  char ** content;
+};
+
+struct labelContents labels={0};
+
+
 
 struct movidiusContext
 {
@@ -62,6 +71,46 @@ struct movidiusContext
 };
 
 struct movidiusContext mov={0};
+
+
+
+
+int loadLabels(const char * filename , struct labelContents * labels )
+{
+  labels->content = (char ** ) malloc(sizeof(char ** ) * 10000);
+
+  ssize_t readA;
+  int result=1;
+
+  FILE * fpA = fopen(filename,"r");
+  if  (fpA!=0)
+  {
+
+    char * lineA = NULL;
+    size_t lenA = 0;
+
+    while  ((readA = getline(&lineA, &lenA, fpA)) != -1)
+    {
+      lineA[strcspn(lineA, "\r\n")] = 0; // works for LF, CR, CRLF, LFCR, ...
+
+
+      labels->content[labels->numberOfLabels]=lineA;
+      ++labels->numberOfLabels;
+      lineA=0;
+    }
+
+    //if (lineA) { free(lineA); }
+  }
+
+  if (fpA!=0) { fclose(fpA); return 1; }
+ return 0;
+}
+
+
+
+
+
+
 
 
 // Load a graph file
@@ -165,18 +214,18 @@ half *LoadImageFromMemory(const char *buf , unsigned int bufW, unsigned int bufH
 	img = buf;
 	if(!img)
 	{
-		printf("The picture %s could not be loaded\n");
+		printf("The picture could not be loaded\n");
 		return 0;
 	}
 	imgresized = (unsigned char*) malloc(3*reqsize*reqsize);
 	if(!imgresized)
 	{
-		free(img);
+		//free(img);
 		perror("malloc");
 		return 0;
 	}
 	stbir_resize_uint8(img, width, height, 0, imgresized, reqsize, reqsize, 0, 3);
-	free(img);
+	//free(img);
 	imgfp32 = (float*) malloc(sizeof(*imgfp32) * reqsize * reqsize * 3);
 	if(!imgfp32)
 	{
@@ -228,6 +277,8 @@ half *LoadImageFromMemory(const char *buf , unsigned int bufW, unsigned int bufH
 
 int initArgs_Movidius(int argc, char *argv[])
 {
+    if (!loadLabels("../processors/Movidius/synset_words.txt",&labels )) { exit(0); }
+
 
     mov.retCode = mvncGetDeviceName(0, mov.devName, NAME_SIZE);
     if (mov.retCode != MVNC_OK)
@@ -274,7 +325,8 @@ int initArgs_Movidius(int argc, char *argv[])
 
 int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
-
+ if (stream==0)
+ {
         // LoadImage will read image from disk, convert channels to floats
         // subtract network mean for each value in each channel.  Then, convert
         // floats to half precision floats and return pointer to the buffer
@@ -299,7 +351,7 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
         else
         {   // the inference has been started, now call mvncGetResult() for the
             // inference result
-            printf("Successfully loaded the tensor for image %s\n", IMAGE_FILE_NAME);
+            //printf("Successfully loaded the tensor for image %ux%ux3\n", width,height);
 
             void* resultData16;
             void* userParam;
@@ -307,13 +359,13 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
             mov.retCode = mvncGetResult(mov.graphHandle, &resultData16, &lenResultData, &userParam);
             if (mov.retCode == MVNC_OK)
             {   // Successfully got the result.  The inference result is in the buffer pointed to by resultData
-                printf("Successfully got the inference result for image %s\n", IMAGE_FILE_NAME);
-                printf("resultData is %d bytes which is %d 16-bit floats.\n", lenResultData, lenResultData/(int)sizeof(half));
+                //printf("Successfully got the inference result for image\n");
+                //printf("resultData is %d bytes which is %d 16-bit floats.\n", lenResultData, lenResultData/(int)sizeof(half));
 
                 // convert half precision floats to full floats
                 int numResults = lenResultData / sizeof(half);
                 float* resultData32;
-	        resultData32 = (float*)malloc(numResults * sizeof(*resultData32));
+	            resultData32 = (float*)malloc(numResults * sizeof(*resultData32));
                 fp16tofloat(resultData32, (unsigned char*)resultData16, numResults);
 
                 float maxResult = 0.0;
@@ -327,16 +379,16 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
                         maxIndex = index;
                     }
                 }
-                printf("Index of top result is: %d\n", maxIndex);
-                printf("Probability of top result is: %f\n", resultData32[maxIndex]);
+                printf("Index of top result is: %d , probability %f\n", maxIndex , resultData32[maxIndex]);
+                if (labels.content[maxIndex]!=0 ) { printf("This is %s \n",labels.content[maxIndex]); }
             }
         }
 
-         free(imageBufFp16);
+         //free(imageBufFp16);
 	     return 1;
 
         }
-
+  }
   return 0;
 }
 
