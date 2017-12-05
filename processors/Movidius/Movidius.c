@@ -204,9 +204,9 @@ half *LoadImage(const char *path, int reqsize, float *mean)
 
 
 
-half *LoadImageFromMemory(const char *buf , unsigned int bufW, unsigned int bufH , int reqsize, float *mean)
+half *LoadImageFromMemory(const char *buf , unsigned int bufW, unsigned int bufH  , unsigned int bufChans, int reqsize, float *mean)
 {
-	int width=bufW, height=bufH, cp=3, i;
+	int width=bufW, height=bufH, cp=bufChans, i;
 	unsigned char *img, *imgresized;
 	float *imgfp32;
 	half *imgfp16;
@@ -332,7 +332,7 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
         // floats to half precision floats and return pointer to the buffer
         // of half precision floats (Fp16s)
         //half* imageBufFp16 = LoadImage(IMAGE_FILE_NAME, networkDim, networkMean);
-        half* imageBufFp16 = LoadImageFromMemory( (const char* ) data , width ,height, networkDim, networkMean);
+        half* imageBufFp16 = LoadImageFromMemory( (const char* ) data , width ,height , channels, networkDim, networkMean);
 
 
         if (imageBufFp16!=0)
