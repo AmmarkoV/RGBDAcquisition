@@ -12,7 +12,7 @@ if [ -e $BIN ]
 then
  ldd $BIN | grep not
 #LD_LIBRARY_PATH=.:../3dparty/libfreenect/build/lib:$LD_LIBRARY_PATH 
- ./$BIN $@
+ LD_LIBRARY_PATH=. ./$BIN $@
 else
  if [ -e $ORIGINALDIRBIN ]
    then 
