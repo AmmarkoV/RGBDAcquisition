@@ -1,6 +1,7 @@
 project( DarknetProcessor ) 
 cmake_minimum_required( VERSION 2.8.7 )   
  
+INCLUDE_DIRECTORIES("/usr/local/cuda/include") 
 add_library(DarknetProcessor SHARED DarknetProcessor.h DarknetProcessor.c recordOutput.h recordOutput.c
             ../../tools/ImageOperations/imageOps.c
             ../../tools/ImageOperations/imageOps.h

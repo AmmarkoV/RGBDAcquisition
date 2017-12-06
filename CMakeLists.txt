@@ -27,6 +27,9 @@ OPTION (ENABLE_AUTOSENSING ON)
 OPTION (ENABLE_OPENCV OFF)
 OPTION (ENABLE_OPENCV_BASED_TOOLS OFF)
 OPTION (ENABLE_OPENCV_BINDINGS OFF)
+  
+OPTION (ENABLE_PROCESSOR_DARKNET OFF)
+OPTION (ENABLE_PROCESSOR_MOVIDIUS OFF)
 
 
 set(CMAKE_CXX_FLAGS "-fPIC -s") 
@@ -83,9 +86,9 @@ ENDIF(ENABLE_REALSENSE)
 
 #First to make our handy tools
 add_subdirectory (tools/)
- 
-#First to make our handy processor plugins
-add_subdirectory (processors/)
+  
+#Then make our handy processor plugins 
+add_subdirectory (processors/) 
 
 #This is the core library
 add_subdirectory (acquisition/)
@@ -177,6 +180,15 @@ IF( ENABLE_OPENCV )
 ELSE (ENABLE_OPENCV)
  MESSAGE("Viewer will not be compiled , OpenCV stuff missing? ( check ENABLE_OPENCV flag )..")
 ENDIF( ENABLE_OPENCV )
+
+
+
+
+
+
+
+
+
 
 # TODO FIX INSTALLATION DIRECTORIES 
 

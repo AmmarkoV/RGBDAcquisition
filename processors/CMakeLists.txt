@@ -14,3 +14,17 @@ ELSE (ENABLE_OPENCV_BASED_TOOLS)
 ENDIF(ENABLE_OPENCV_BASED_TOOLS)
 ENDIF( ENABLE_OPENCV )
 
+
+#-------------------------------------------------------
+  IF(ENABLE_PROCESSOR_DARKNET) 
+    add_subdirectory (DarknetProcessor/) 
+  ELSE (ENABLE_PROCESSOR_DARKNET)
+    MESSAGE("Will not use DarknetProcessor")
+  ENDIF(ENABLE_PROCESSOR_DARKNET)
+#-------------------------------------------------------
+  IF(ENABLE_PROCESSOR_MOVIDIUS) 
+    add_subdirectory (Movidius/) 
+  ELSE (ENABLE_PROCESSOR_MOVIDIUS)
+    MESSAGE("Will not use Movidius")
+  ENDIF(ENABLE_PROCESSOR_MOVIDIUS)
+#-------------------------------------------------------
