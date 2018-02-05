@@ -108,8 +108,8 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
         trConf->op.posXBegining= -1*(trConf->op.posOffsetX+halfSnapsHorizontal)*trConf->op.OGLUnitWidth;
         trConf->op.posYBegining= -1*(trConf->op.posOffsetY+halfSnapsVertical)  *trConf->op.OGLUnitHeight;
 
-        trConf->op.angXStep = (float)(2*trConf->angXVariance)/trConf->op.snapsHorizontal;
-        trConf->op.angYStep = (float)(2*trConf->angYVariance)/trConf->op.snapsVertical  ;
+        trConf->op.angXStep = (float)(trConf->angXVariance)/trConf->op.snapsHorizontal;
+        trConf->op.angYStep = (float)(trConf->angYVariance)/trConf->op.snapsVertical  ;
         trConf->op.angZStep=0;
 
         fprintf(stderr,"Drawing starts @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",trConf->op.posXBegining,trConf->op.posYBegining  ,  trConf->angleX-trConf->angXVariance , trConf->angleY-trConf->angYVariance , trConf->angleZ);
