@@ -24,6 +24,8 @@ fi
 
 BINARIES_THAT_NEED_LIBS="`../scripts/binariesThatNeedLibs.sh`"
 
+
+# ---------------------------------------------------------------------
 if [ -d libfreenect2 ]
 then
 echo "Freenect appears to already exist .."
@@ -57,7 +59,7 @@ fi
 
 
 
-
+# ---------------------------------------------------------------------
 if [ -d libfreenect ]
 then
 echo "Freenect appears to already exist .."
@@ -122,7 +124,7 @@ fi
 #ln -s ../../../Lib/ x64-Release
 #cd ../../../../
 
-
+# ---------------------------------------------------------------------
 if [ -d OpenNI ]
 then
 echo "OpenNI1 appears to already exist .."
@@ -191,6 +193,7 @@ fi
 #ln -s ../Redist/ x64-Release
 #cd ..
 
+# ---------------------------------------------------------------------
 if [ -d OpenNI2 ]
 then
 echo "OpenNI2 appears to already exist .."
@@ -239,7 +242,7 @@ else
 fi
 
 
-
+# ---------------------------------------------------------------------
 if [ -d caffe ]
 then
 echo "Caffe appears to already exist .."
@@ -270,7 +273,7 @@ fi
 
 
 
-
+# ---------------------------------------------------------------------
 if [ -d DepthSenseGrabber ]
 then
 echo "DepthSenseGrabber appears to already exist .."
@@ -301,7 +304,7 @@ fi
 
 
 
-
+# ---------------------------------------------------------------------
 if [ -d librealsense ]
 then
 echo "Intel Realsense Driver appears to already exist .."
@@ -332,7 +335,7 @@ fi
 
 
 
-
+# ---------------------------------------------------------------------
 if [ -d opencv_contrib ]
 then
 echo "opencv_contrib appears to already exist .."
@@ -357,6 +360,7 @@ fi
 
 
 
+# ---------------------------------------------------------------------
 if [ -d darknet ]
 then
 echo "darknet appears to already exist .."
@@ -375,6 +379,28 @@ else
       cd ..
   fi
 fi
+
+# ---------------------------------------------------------------------
+if [ -d ncsdk ]
+then
+echo "Movidius Neural Compute Stick appears to already exist .."
+else
+  echo "Do you want to download Movidius Neural Compute Stick ? " 
+  echo
+  echo -n " (Y/N)?"
+  read answer
+  if test "$answer" != "N" -a "$answer" != "n";
+  then  
+      cd "$DIR"
+      git clone https://github.com/movidius/ncsdk/
+      cd ncsdk
+      make all
+      
+      cd ..
+  fi
+fi
+
+
 
 
  
