@@ -185,15 +185,15 @@ int doDrawOutFrame( unsigned char * rgbFrame , unsigned int rgbWidth , unsigned 
 
 int appendTimestamps(const char * fileout,unsigned int recordedFrames,unsigned long timestamp)
 {
-  if (recordedFrames==0) 
-  { 
+  if (recordedFrames==0)
+  {
      FILE * fp = fopen(fileout,"w");
-     if (fp!=0) {fprintf(fp,"%%time\n%lu\n",timestamp); fclose(fp); return 1; }  
+     if (fp!=0) {fprintf(fp,"%%time\n%lu\n",timestamp); fclose(fp); return 1; }
   }
    else
   {
     FILE * fp = fopen(fileout,"a");
-    if (fp!=0) { fprintf(fp,"%lu\n",timestamp); fclose(fp); return 1; } 
+    if (fp!=0) { fprintf(fp,"%lu\n",timestamp); fclose(fp); return 1; }
   }
   return 0;
 }
@@ -234,25 +234,25 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
   orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
   depthPTR = (unsigned short*) orig_depth_img->image.data;
  }
- 
-  
+
+
  if (recording)
     {
        ros::Time time = ros::Time::now();
-       if ( recordedFrames==0) { begin=time; }       
+       if ( recordedFrames==0) { begin=time; }
 
-       
-       ros::Duration timestamp = time - begin; 
+
+       ros::Duration timestamp = time - begin;
        //appendTimestamps("imageTimestamps",recordedFrames,(unsigned long) timestamp.toNSec()/1000000);
        appendTimestamps("imageTimestamps",recordedFrames,time.toNSec());
- 
+
        char filenameOut[512];
        snprintf(filenameOut,512,"colorFrame_0_%05u.jpg",recordedFrames);
        cv::imwrite(filenameOut,orig_rgb_img->image);
 
        snprintf(filenameOut,512,"depthFrame_0_%05u.png",recordedFrames);
        cv::imwrite(filenameOut,orig_depth_img->image);
-        
+
       ++recordedFrames;
     }
           if (recordedFrames>MAX_RECORDED_FRAMES)
@@ -285,55 +285,76 @@ void rgbdCallback(const sensor_msgs::Image::ConstPtr rgb_img_msg,
 void rgbdCallbackNoCalibration(const sensor_msgs::Image::ConstPtr rgb_img_msg,
                                  const sensor_msgs::Image::ConstPtr depth_img_msg  )
 {
- if (paused) { return; } //If we are paused spend no time with new input
-  //A new pair of frames has arrived , copy and convert them so that they are ready
-  colorWidth = rgb_img_msg->width;   colorHeight = rgb_img_msg->height;
-  depthWidth = depth_img_msg->width; depthHeight = depth_img_msg->height;
+if (paused) { return; } //If we are paused spend no time with new input
+ //Using Intrinsic camera matrix for the raw (distorted) input images.
 
+ colorWidth = rgb_img_msg->width;   colorHeight = rgb_img_msg->height;
+ depthWidth = depth_img_msg->width; depthHeight = depth_img_msg->height;
+ int i=0;
+
+  //A new pair of frames has arrived , copy and convert them so that they are ready
  cv_bridge::CvImageConstPtr orig_rgb_img;
  cv_bridge::CvImageConstPtr orig_depth_img;
- orig_rgb_img = cv_bridge::toCvShare(rgb_img_msg, "rgb8");
+ orig_rgb_img = cv_bridge::toCvCopy(rgb_img_msg, "rgb8");
+
+ unsigned short* depthPTR = 0;
+ int usedTemporaryBufferForConversion = 0;
 
  if (useFloatDepth)
  {
-  try
-  {
-  orig_depth_img = cv_bridge::toCvShare(depth_img_msg, sensor_msgs::image_encodings::TYPE_32FC1);
-  }
-    catch (cv_bridge::Exception& e)
-    {
-        ROS_ERROR("Could not convert to '32FC1'.");
-        return;
-    }
-  depthToCV16UC1(orig_depth_img,orig_depth_img);
+  orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_32FC1);
+  depthPTR = get16UC1from32FC1( (float*) orig_depth_img->image.data , depthWidth , depthHeight , depthScale);
+  usedTemporaryBufferForConversion = 1;
  } else
  {
-  try
-  {
-   orig_depth_img = cv_bridge::toCvShare(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
-  }
-    catch (cv_bridge::Exception& e)
-    {
-        ROS_ERROR("Could not convert to '16UC1'.");
-        return;
-    }
+  orig_depth_img = cv_bridge::toCvCopy(depth_img_msg, sensor_msgs::image_encodings::TYPE_16UC1);
+  depthPTR = (unsigned short*) orig_depth_img->image.data;
  }
 
-          if (recording) { ++recordedFrames; }
+
+ if (recording)
+    {
+       ros::Time time = ros::Time::now();
+       if ( recordedFrames==0) { begin=time; }
+
+
+       ros::Duration timestamp = time - begin;
+       //appendTimestamps("imageTimestamps",recordedFrames,(unsigned long) timestamp.toNSec()/1000000);
+       appendTimestamps("imageTimestamps",recordedFrames,time.toNSec());
+
+       char filenameOut[512];
+       snprintf(filenameOut,512,"colorFrame_0_%05u.jpg",recordedFrames);
+       cv::imwrite(filenameOut,orig_rgb_img->image);
+
+       snprintf(filenameOut,512,"depthFrame_0_%05u.png",recordedFrames);
+       cv::imwrite(filenameOut,orig_depth_img->image);
+
+      ++recordedFrames;
+    }
           if (recordedFrames>MAX_RECORDED_FRAMES)
           {
             fprintf(stderr,"Automatic Cut Off of recording activated..");
-            stopDumpInternal();
+           // stopDumpInternal();
           }
 
-  runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
-                                   (unsigned short*) orig_depth_img->image.data ,  depthWidth , depthHeight ,
-                                     0 , frameTimestamp );
+/*
+   runServicesThatNeedColorAndDepth((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
+                                    (unsigned short*) depthPTR ,  depthWidth , depthHeight ,
+                                     &calib , frameTimestamp );*/
 
+
+//if (useFloatDepth)
+{
+  doDrawOutFrame((unsigned char*) orig_rgb_img->image.data, colorWidth , colorHeight ,
+                                   (unsigned short*) depthPTR ,  depthWidth , depthHeight);
+}
+
+ if (usedTemporaryBufferForConversion) { free(depthPTR); }
  ++frameTimestamp;
+
  //After running (at least) once it is not a first run any more!
  first = false;
-return;
+ return;
 }
 #endif
 
