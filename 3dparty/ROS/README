@@ -1,0 +1,6 @@
+Don't forget useful tools when trying to find out what is happening with rostopics are..
+
+rosrun rqt_image_view rqt_image_view frame:=/ros/frame/path/here
+rosrun rqt_bag rqt_bag
+
+etc..
