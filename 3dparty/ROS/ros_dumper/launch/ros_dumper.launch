@@ -24,6 +24,8 @@
     <node name="ros_dumper" pkg="ros_dumper" type="run_it.sh" required="true" output="screen" cwd="node"> 
       <param name="camera" value="$(arg camera)" /> 
       <param name="frame" value="$(arg frame)" /> 
+      <param name="fromRGBTopic" value="$(arg fromRGBTopic)" /> 
+      <param name="fromDepthTopic" value="$(arg fromDepthTopic)" />  
       <param name="highRate" value="50" /> 
       <param name="midRate" value="15" /> 
       <param name="lowRate" value="5" /> 
