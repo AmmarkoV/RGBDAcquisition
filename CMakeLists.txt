@@ -66,6 +66,11 @@ OPTION (ENABLE_PNG OFF)
 add_subdirectory (3dparty/fast)
 
 
+IF( ENABLE_AMMARSERVER_BROADCAST )
+  #add_subdirectory (3dparty/AmmarServer/src/AmmServerlib) 
+  add_subdirectory (3dparty/AmmarServer/) 
+ENDIF( ENABLE_AMMARSERVER_BROADCAST )
+
 
 if (ENABLE_FREENECT2)
   add_subdirectory (3dparty/librealsense)

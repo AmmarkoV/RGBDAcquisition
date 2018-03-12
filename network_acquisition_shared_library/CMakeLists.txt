@@ -6,6 +6,7 @@ cmake_minimum_required( VERSION 2.8.7 )
 set(AmmarServer_Parts daemon.c )
 IF(ENABLE_AMMARSERVER_BROADCAST)
  set(AmmarServer_Parts daemon_ammarserver.c )
+ set(AmmarServer_Libs AmmarServer )
  add_definitions(-DUSE_AMMARSERVER)
 ENDIF(ENABLE_AMMARSERVER_BROADCAST)
 
@@ -21,7 +22,7 @@ add_library(NetworkAcquisition SHARED
             ../tools/Codecs/jpgInput.c
             ../tools/Codecs/jpgInput.h
            ) 
-target_link_libraries(NetworkAcquisition rt m CalibrationLibrary OperatingSystem) 
+target_link_libraries(NetworkAcquisition rt m CalibrationLibrary OperatingSystem ${AmmarServer_Libs} ) 
  
  
 
