@@ -40,6 +40,7 @@
 			<Add option="-pthread" />
 			<Add option="-ljpeg" />
 			<Add option="-lpng" />
+			<Add library="../../FORTH/input_acquisition/3dparty/AmmarServer/src/AmmServerlib/libAmmarServer.a" />
 		</Linker>
 		<Unit filename="../tools/Codecs/codecs.c">
 			<Option compilerVar="CC" />

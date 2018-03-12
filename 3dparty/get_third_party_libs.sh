@@ -22,6 +22,33 @@ fi
 
 
 
+if [ -d AmmarServer ]
+then
+echo "AmmarServer appears to already exist .."
+else
+  echo "Do you want to download AmmarServer ( networking support ) ? " 
+  echo
+  echo -n " (Y/N)?"
+  read answer
+  if test "$answer" != "N" -a "$answer" != "n";
+  then
+     cd "$DIR"
+     git clone https://github.com/AmmarkoV/AmmarServer
+     cd AmmarServer
+     sudo scripts/get_dependencies.sh
+     mkdir build
+     cd build
+     cmake ..
+     make
+     cd ../../../
+     #should be at 3dparty dir
+     cd 3dparty   
+  fi
+fi
+
+
+
+
 BINARIES_THAT_NEED_LIBS="`../scripts/binariesThatNeedLibs.sh`"
 
 

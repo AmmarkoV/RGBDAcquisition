@@ -59,6 +59,9 @@ int networkBackbone_stopPushingToRemote(int frameServerID)
 
 int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void* pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
+  UpdateFrameServerImages(frameServerID,streamNumber,pixels,width,height,channels,bitsperpixel);
+
+
   if (streamNumber==0) //Color
   {
       networkDevice[0].okToSendColorFrame=0;
