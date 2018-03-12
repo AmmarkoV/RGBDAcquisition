@@ -33,12 +33,14 @@ struct NetworkVirtualDevice
  unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
  unsigned long lastColorTimestamp;
  unsigned long compressedColorSize;
+ unsigned long colorFrameSize;
  unsigned char * colorFrame;
  volatile int okToSendColorFrame;
 
 
  unsigned int depthWidth , depthHeight , depthChannels , depthBitsperpixel;
  unsigned long lastDepthTimestamp;
+ unsigned long depthFrameSize;
  unsigned short * depthFrame;
  volatile int okToSendDepthFrame;
 

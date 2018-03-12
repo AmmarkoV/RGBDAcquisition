@@ -197,18 +197,18 @@ char * getModuleNameFromModuleID(ModuleIdentifier moduleID)
 {
   switch (moduleID)
     {
-      case V4L2_ACQUISITION_MODULE    :  return (char*) "V4L2 MODULE"; break;
+      case V4L2_ACQUISITION_MODULE          :  return (char*) "V4L2 MODULE";       break;
       case V4L2STEREO_ACQUISITION_MODULE    :  return (char*) "V4L2STEREO MODULE"; break;
-      case FREENECT_ACQUISITION_MODULE:  return (char*) "FREENECT MODULE"; break;
-      case OPENNI1_ACQUISITION_MODULE :  return (char*) "OPENNI1 MODULE"; break;
-      case OPENNI2_ACQUISITION_MODULE :  return (char*) "OPENNI2 MODULE"; break;
-      case OPENGL_ACQUISITION_MODULE :  return (char*) "OPENGL MODULE"; break;
-      case TEMPLATE_ACQUISITION_MODULE    :  return (char*) "TEMPLATE MODULE"; break;
-      case NETWORK_ACQUISITION_MODULE    :  return (char*) "NETWORK MODULE"; break;
+      case FREENECT_ACQUISITION_MODULE      :  return (char*) "FREENECT MODULE";   break;
+      case OPENNI1_ACQUISITION_MODULE       :  return (char*) "OPENNI1 MODULE";    break;
+      case OPENNI2_ACQUISITION_MODULE       :  return (char*) "OPENNI2 MODULE";    break;
+      case OPENGL_ACQUISITION_MODULE        :  return (char*) "OPENGL MODULE";     break;
+      case TEMPLATE_ACQUISITION_MODULE      :  return (char*) "TEMPLATE MODULE";   break;
+      case NETWORK_ACQUISITION_MODULE       :  return (char*) "NETWORK MODULE";    break;
       case DEPTHSENSE_ACQUISITION_MODULE    :  return (char*) "DEPTHSENSE MODULE"; break;
-      case DESKTOP_ACQUISITION_MODULE    :  return (char*) "DESKTOP MODULE"; break;
-      case REALSENSE_ACQUISITION_MODULE    :  return (char*) "REALSENSE MODULE"; break;
-      case SCRIPTED_ACQUISITION_MODULE    :  return (char*) "SCRIPTED MODULE"; break;
+      case DESKTOP_ACQUISITION_MODULE       :  return (char*) "DESKTOP MODULE";    break;
+      case REALSENSE_ACQUISITION_MODULE     :  return (char*) "REALSENSE MODULE";  break;
+      case SCRIPTED_ACQUISITION_MODULE      :  return (char*) "SCRIPTED MODULE";   break;
     };
     return (char*) "UNKNOWN MODULE";
 }

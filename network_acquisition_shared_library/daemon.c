@@ -14,7 +14,7 @@ int UpdateFrameServerImages(int frameServerID, int streamNumber , void* pixels ,
   #if USE_AMMARSERVER
     ammarserver_UpdateFrameServerImages(frameServerID,streamNumber,pixels,width,height,channels,bitsperpixel);
   #endif // USE_AMMARSERVER
-  fprintf(stderr,"StartFrameServer: NetworkAcquisition backbone not implemented , please use the ENABLE_AMMARSERVER_BROADCAST in CMake \n");
+  fprintf(stderr,"UpdateFrameServerImages: NetworkAcquisition backbone not implemented , please use the ENABLE_AMMARSERVER_BROADCAST in CMake \n");
   return 0;
 }
 

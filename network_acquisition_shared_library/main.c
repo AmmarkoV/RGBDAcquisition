@@ -59,58 +59,7 @@ int networkBackbone_stopPushingToRemote(int frameServerID)
 
 int networkBackbone_pushImageToRemote(int frameServerID, int streamNumber , void* pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-  UpdateFrameServerImages(frameServerID,streamNumber,pixels,width,height,channels,bitsperpixel);
-
-
-  if (streamNumber==0) //Color
-  {
-      networkDevice[0].okToSendColorFrame=0;
-      networkDevice[0].colorWidth=width;
-      networkDevice[0].colorHeight=height;
-      networkDevice[0].colorChannels=channels;
-      networkDevice[0].colorBitsperpixel=bitsperpixel;
-      networkDevice[0].colorFrame = (unsigned char*) pixels;
-      networkDevice[0].compressedColorSize=0; // Not using compression
-
-      /*
-      struct Image * img = createImageUsingExistingBuffer(width,height,channels,bitsperpixel,pixels);
-      networkDevice[0].compressedColorSize=64*1024; //64KBmax
-      char * compressedPixels = (char* ) malloc(sizeof(char) * networkDevice[0].compressedColorSize);
-      WriteJPEGInternal("dummyName.jpg",img,compressedPixels,&networkDevice[0].compressedColorSize);
-      networkDevice[0].colorFrame = (char*) compressedPixels;
-      fprintf(stderr,"Compressed from %u bytes\n",networkDevice[0].compressedColorSize);*/
-
-
-      networkDevice[0].okToSendColorFrame=1;
-
-
-      while (networkDevice[0].okToSendColorFrame==1)
-       {
-         usleep(1000);
-         fprintf(stderr,"Cf.");
-       }
-  }
-   else
- if (streamNumber==1) //Depth
-  {
-      networkDevice[0].okToSendDepthFrame=0;
-      networkDevice[0].depthWidth=width;
-      networkDevice[0].depthHeight=height;
-      networkDevice[0].depthChannels=channels;
-      networkDevice[0].depthBitsperpixel=bitsperpixel;
-      networkDevice[0].depthFrame = (unsigned short*) pixels;
-
-      networkDevice[0].okToSendDepthFrame=1;
-
-
-      while (networkDevice[0].okToSendDepthFrame==1)
-       {
-         usleep(1000);
-         fprintf(stderr,"Df.");
-       }
-  }
-
-  return 0;
+  return UpdateFrameServerImages(frameServerID,streamNumber,pixels,width,height,channels,bitsperpixel);
 }
 
 /**

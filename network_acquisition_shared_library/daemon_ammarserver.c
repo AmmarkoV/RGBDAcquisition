@@ -23,19 +23,6 @@ char templates_root[MAX_FILE_PATH]="public_html/templates/";
 unsigned int hits=0;
 
 
-struct imageStorage
-{
-  char * data;
-  unsigned int dataSize;
-  unsigned int width;
-  unsigned int height;
-  unsigned int framenumber;
-  unsigned int depth;
-
-};
-
-
-struct imageStorage storage[12]={0};
 
 //The decleration of some dynamic content resources..
 struct AmmServer_Instance  * default_server=0;
@@ -73,9 +60,26 @@ void * prepare_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   ++hits;
 
-  AmmServer_Success("Returning new frame..");
-  memcpy(rqst->content,storage[0].data,storage[0].dataSize);
-  rqst->contentSize=storage[0].dataSize;
+
+  if ( _GETcmp(rqst,"stream","color") == 0 )
+  {
+     AmmServer_Success("Returning new color frame..");
+     memcpy(rqst->content,networkDevice[0].colorFrame,networkDevice[0].colorFrameSize);
+     rqst->contentSize=networkDevice[0].colorFrameSize;
+  } else
+  if ( _GETcmp(rqst,"stream","depth") == 0 )
+  {
+     AmmServer_Success("Returning new depth frame..");
+     memcpy(rqst->content,networkDevice[0].depthFrame,networkDevice[0].depthFrameSize);
+     rqst->contentSize=networkDevice[0].depthFrameSize;
+  } else
+  {
+    snprintf(
+             rqst->content,rqst->MAXcontentSize,"<!DOCTYPE html>\n<html>\
+             <body>Could not find what to return..</body></html>"
+             );
+    rqst->contentSize=strlen(rqst->content);
+  }
 
   return 0;
 }
@@ -90,8 +94,8 @@ void init_dynamic_content()
 //This function destroys all Resource Handlers and free's all allocated memory..!
 void close_dynamic_content()
 {
-    AmmServer_RemoveResourceHandler(default_server,&indexContext,1);
-    AmmServer_RemoveResourceHandler(default_server,&frameContext,1);
+  AmmServer_RemoveResourceHandler(default_server,&indexContext,1);
+  AmmServer_RemoveResourceHandler(default_server,&frameContext,1);
 }
 
 
@@ -200,55 +204,6 @@ int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , vo
   return 0;
 }
 
-void * ammarserver_ServeClient(void * ptr)
-{
-    /*
-  fprintf(stderr,"Serve Client called ..\n");
-  struct PassToHTTPThread * context = (struct PassToHTTPThread *) ptr;
-  if (context->keep_var_on_stack!=1)
-   {
-     error("KeepVarOnStack is not properly set , this is a bug .. \n Will not serve request");
-     fprintf(stderr,"Bad new thread context is pointing to %p\n",context);
-     return 0;
-   }
-  int instanceID = context->id;
-  int clientsock = context->clientsock;
-  context->keep_var_on_stack=2;
-
-  while (serverDevices[0].serverRunning)
-   {
-         if (networkDevice[0].okToSendColorFrame)
-         {
-           struct Image * img = createImageUsingExistingBuffer(networkDevice[0].colorWidth,networkDevice[0].colorHeight,networkDevice[0].colorChannels,
-                                                               networkDevice[0].colorBitsperpixel,networkDevice[0].colorFrame);
-           networkDevice[0].compressedColorSize=64*1024; //64KBmax
-           char * compressedPixels = (char* ) malloc(sizeof(char) * networkDevice[0].compressedColorSize);
-           WriteJPEGInternal("dummyName.jpg",img,compressedPixels,&networkDevice[0].compressedColorSize);
-           networkDevice[0].colorFrame = (char*) compressedPixels;
-           fprintf(stderr,"Compressed from %u bytes\n",networkDevice[0].compressedColorSize);
-
-
-           sendImageSocket( clientsock ,networkDevice[0].colorFrame, networkDevice[0].colorWidth , networkDevice[0].colorHeight , networkDevice[0].colorChannels , networkDevice[0].colorBitsperpixel , networkDevice[0].compressedColorSize );
-
-           free(compressedPixels);
-           networkDevice[0].okToSendColorFrame=0;
-         }
-
-         if (networkDevice[0].okToSendDepthFrame)
-         {
-           sendImageSocket( clientsock ,networkDevice[0].depthFrame, networkDevice[0].depthWidth , networkDevice[0].depthHeight , networkDevice[0].depthChannels , networkDevice[0].depthBitsperpixel );
-           networkDevice[0].okToSendDepthFrame=0;
-         }
-        // sendImageSocket(clientsock , char * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel );
-     //fprintf(stderr,"Serve Client looped\n");
-     usleep(1000);
-   }
-*/
-
-
-  int close_connection=0; // <- if this is set it means Serve Client must stop
- return 0;
-}
 
 
 int ammarserver_StopFrameServer(unsigned int devID)
