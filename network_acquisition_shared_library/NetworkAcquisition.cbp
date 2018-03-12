@@ -54,6 +54,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="daemon.h" />
+		<Unit filename="daemon_ammarserver.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="daemon_ammarserver.h" />
+		<Unit filename="daemon_standalone.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="daemon_standalone.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -1,10 +1,18 @@
 project( NetworkAcquisition ) 
 cmake_minimum_required( VERSION 2.8.7 )   
   
+
+
+set(AmmarServer_Parts daemon.c )
+IF(ENABLE_AMMARSERVER_BROADCAST)
+ set(AmmarServer_Parts daemon_ammarserver.c )
+ add_definitions(-DUSE_AMMARSERVER)
+ENDIF(ENABLE_AMMARSERVER_BROADCAST)
+
 add_library(NetworkAcquisition SHARED 
             main.c
             NetworkAcquisition.h
-            daemon.c
+            ${AmmarServer_Parts}
             daemon.h
             networkFramework.c
             networkFramework.h 
