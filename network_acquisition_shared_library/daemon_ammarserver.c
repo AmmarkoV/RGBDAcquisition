@@ -45,7 +45,7 @@ void * prepare_index_content_callback(struct AmmServer_DynamicRequest  * rqst)
      setInterval(refreshFeed,100);\
     </script>\
     </head>\
-    <body><img  id=\"vfi\" src=\"framebuffer.jpg?t=%u\"></body></html>",
+    <body><img  id=\"vfi\" src=\"framebuffer.jpg?stream=color&t=%u\"></body></html>",
     rand()%1000000
     );
   rqst->contentSize=strlen(rqst->content);
@@ -54,32 +54,37 @@ void * prepare_index_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
 
 
-
-
 void * prepare_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   ++hits;
-
-
   if ( _GETcmp(rqst,"stream","color") == 0 )
   {
      AmmServer_Success("Returning new color frame..");
-     memcpy(rqst->content,networkDevice[0].colorFrame,networkDevice[0].colorFrameSize);
-     rqst->contentSize=networkDevice[0].colorFrameSize;
+     if (networkDevice[0].colorFrame!=0)
+     {
+      memcpy(rqst->content,networkDevice[0].colorFrame,networkDevice[0].colorFrameSize);
+      rqst->contentSize=networkDevice[0].colorFrameSize;
+      return 0;
+     }
   } else
   if ( _GETcmp(rqst,"stream","depth") == 0 )
   {
      AmmServer_Success("Returning new depth frame..");
-     memcpy(rqst->content,networkDevice[0].depthFrame,networkDevice[0].depthFrameSize);
-     rqst->contentSize=networkDevice[0].depthFrameSize;
-  } else
-  {
+     if (networkDevice[0].depthFrame!=0)
+     {
+      memcpy(rqst->content,networkDevice[0].depthFrame,networkDevice[0].depthFrameSize);
+      rqst->contentSize=networkDevice[0].depthFrameSize;
+      return 0;
+     }
+  }
+
+
     snprintf(
              rqst->content,rqst->MAXcontentSize,"<!DOCTYPE html>\n<html>\
              <body>Could not find what to return..</body></html>"
              );
     rqst->contentSize=strlen(rqst->content);
-  }
+
 
   return 0;
 }
@@ -161,6 +166,7 @@ int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , vo
       networkDevice[0].colorChannels=channels;
       networkDevice[0].colorBitsperpixel=bitsperpixel;
       networkDevice[0].colorFrame = (unsigned char*) pixels;
+      networkDevice[0].colorFrameSize=width*height*channels*(bitsperpixel/8); // Not using compression
       networkDevice[0].compressedColorSize=0; // Not using compression
 
       /*
@@ -190,7 +196,7 @@ int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , vo
       networkDevice[0].depthChannels=channels;
       networkDevice[0].depthBitsperpixel=bitsperpixel;
       networkDevice[0].depthFrame = (unsigned short*) pixels;
-
+      networkDevice[0].depthFrameSize = width*height*channels*(bitsperpixel/8);
       networkDevice[0].okToSendDepthFrame=1;
 
 

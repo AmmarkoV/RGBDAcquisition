@@ -14,6 +14,7 @@ add_library(NetworkAcquisition SHARED
             main.c
             NetworkAcquisition.h
             ${AmmarServer_Parts}
+            daemon.c
             daemon.h
             networkFramework.c
             networkFramework.h 
