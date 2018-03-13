@@ -168,17 +168,7 @@ int ammarserver_StartFrameServer(unsigned int devID , char * bindAddr , int bind
     init_dynamic_content();
     //stats.html and formtest.html should be availiable from now on..!
 
-    /*
-         while ( (AmmServer_Running(default_server))  )
-           {
-             //Main thread should just sleep and let the background threads do the hard work..!
-             //In other applications the programmer could use the main thread to do anything he likes..
-             //The only caveat is that he would takeup more CPU time from the server and that he would have to poll
-             //the AmmServer_Running() call once in a while to make sure everything is in order
-             //usleep(60000);
-             sleep(1);
-           }
-*/
+    if (AmmServer_Running(default_server))  { return 1; }
     return 0;
 }
 
@@ -197,6 +187,7 @@ int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , vo
       networkDevice[0].colorFrame = (unsigned char*) pixels;
       networkDevice[0].colorFrameSize=width*height*channels*(bitsperpixel/8); // Not using compression
       networkDevice[0].compressedColorSize=0; // Not using compression
+      return 1;
   }
    else
  if (streamNumber==1) //Depth
@@ -208,7 +199,7 @@ int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , vo
       networkDevice[0].depthBitsperpixel=bitsperpixel;
       networkDevice[0].depthFrame = (unsigned short*) pixels;
       networkDevice[0].depthFrameSize = width*height*channels*(bitsperpixel/8);
-      networkDevice[0].okToSendDepthFrame=1;
+      return 1;
   }
 
   return 0;
@@ -224,7 +215,7 @@ int ammarserver_StopFrameServer(unsigned int devID)
     //Stop the server and clean state
     AmmServer_Stop(default_server);
     AmmServer_Warning("Ammar Server stopped\n");
- return 0;
+ return 1;
 }
 
 #endif // USE_AMMARSERVER

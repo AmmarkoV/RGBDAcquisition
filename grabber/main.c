@@ -23,6 +23,8 @@
 char inputname[512]={0};
 char outputfoldername[512]={0};
 
+unsigned int seekFrame=0;
+unsigned int loopFrame =0;
 unsigned int delay = 0;
 unsigned int skippedFrames=0;
 int compressOutput=1;
@@ -70,6 +72,10 @@ int main(int argc, char *argv[])
   for (i=0; i<argc; i++)
   {
     if (strcmp(argv[i],"-raw")==0)        { compressOutput=0;  } else
+    if (strcmp(argv[i],"-loop")==0)      {
+                                           loopFrame=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting loop to %u \n",loopFrame);
+                                         } else
     if (strcmp(argv[i],"-nolocation")==0) {
                                             acquisitionSetLocation(moduleID,0);
                                           } else
@@ -98,6 +104,10 @@ int main(int argc, char *argv[])
                                                return 1;
                                              }
                                            } else
+    if (strcmp(argv[i],"-seek")==0)      {
+                                           seekFrame=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting seek to %u \n",seekFrame);
+                                         } else
     if (strcmp(argv[i],"-maxFrames")==0) {
                                            maxFramesToGrab=atoi(argv[i+1]);
                                            fprintf(stderr,"Setting frame grab to %u \n",maxFramesToGrab);
@@ -229,7 +239,6 @@ int main(int argc, char *argv[])
 
         acquisitionStopTimer(0);
         if (frameNum%25==0) fprintf(stderr,"%0.2f fps\n",acquisitionGetTimerFPS(0));
-        ++frameNum;
 
         /*
          If someone would like to manually save things instead of using acquisitionPassFramesToTarget he could call the following calls ,left here for future reference
@@ -251,6 +260,18 @@ int main(int argc, char *argv[])
          sprintf(outfilename,"%s/coloreddepthFrame_%u_%05u.pnm",outputfoldername,devID,frameNum);
          acquisitionSaveColoredDepthFrame(moduleID,devID,outfilename);
         */
+
+        if (loopFrame!=0)
+        {
+          //fprintf(stderr,"%u%%(%u+%u)==%u\n",frameNum,loopFrame,seekFrame,frameNum%(loopFrame+seekFrame));
+          if ( frameNum%(loopFrame)==0)
+          {
+            fprintf(stderr,"Looping Dataset , we reached frame %u ( %u ) , going back to %u\n",frameNum,loopFrame,seekFrame);
+            acquisitionSeekFrame(moduleID,devID,seekFrame);
+          }
+        }
+
+       ++frameNum;
     }
 
     fprintf(stderr,"Done grabbing %u frames! \n",maxFramesToGrab);
