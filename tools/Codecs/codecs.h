@@ -82,6 +82,7 @@ unsigned char * readImageRaw( char *filename,unsigned int type,unsigned int *wid
 int writeImageFile(struct Image * pic,unsigned int type,char *filename);
 int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned long * mem_size);
 
+int populateImage(struct Image * img , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel, unsigned char * pixels);
 
 struct Image * createImageUsingExistingBuffer( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel , unsigned char * pixels);
 struct Image * createImage( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel);

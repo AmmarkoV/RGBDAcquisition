@@ -453,11 +453,11 @@ int writeImageMemory(struct Image * pic,unsigned int type,char *mem,unsigned lon
 }
 
 
-struct Image * createImageUsingExistingBuffer( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel , unsigned char * pixels)
+
+
+int populateImage(struct Image * img , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel, unsigned char * pixels)
 {
-  struct Image * img = 0;
-  img = (struct Image *) malloc( sizeof(struct Image) );
-  if (img == 0 ) { fprintf(stderr,"Could not allocate a new image %ux%u %u channels %u bitsperpixel\n",width,height,channels,bitsPerPixel); return 0; }
+  if (img == 0 ) { fprintf(stderr,"Could not populateImage empty image\n"); return 0; }
   memset(img,0,sizeof(struct Image));
 
   img->width = width;
@@ -468,6 +468,27 @@ struct Image * createImageUsingExistingBuffer( unsigned int width , unsigned int
   img->pixels = pixels;
   return  img;
 }
+
+
+
+
+struct Image * createImageUsingExistingBuffer( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel , unsigned char * pixels)
+{
+  struct Image * img = 0;
+  img = (struct Image *) malloc( sizeof(struct Image) );
+  if (img == 0 ) { fprintf(stderr,"Could not allocate a new image %ux%u %u channels %u bitsperpixel\n",width,height,channels,bitsPerPixel); return 0; }
+
+
+  if ( populateImage(img,width,height,channels,bitsPerPixel,pixels) )
+  {
+    return img;
+  }
+
+  free(img);
+  return  0;
+}
+
+
 
 
 struct Image * createImage( unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsPerPixel)

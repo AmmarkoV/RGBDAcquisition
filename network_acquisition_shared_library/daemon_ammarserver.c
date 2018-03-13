@@ -22,8 +22,6 @@ char templates_root[MAX_FILE_PATH]="public_html/templates/";
 
 unsigned int hits=0;
 
-
-
 //The decleration of some dynamic content resources..
 struct AmmServer_Instance  * default_server=0;
 
@@ -40,7 +38,7 @@ void * prepare_index_content_callback(struct AmmServer_DynamicRequest  * rqst)
     {\
       var randomnumber=Math.floor(Math.random()*100000);\
       document.getElementById(\"vfi\").style.visibility='visible';\
-      document.getElementById(\"vfi\").src=\"framebuffer.jpg?t=\"+randomnumber;\
+      document.getElementById(\"vfi\").src=\"framebuffer.jpg?stream=color&t=\"+randomnumber;\
     }\
      setInterval(refreshFeed,100);\
     </script>\
@@ -57,14 +55,42 @@ void * prepare_index_content_callback(struct AmmServer_DynamicRequest  * rqst)
 void * prepare_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 {
   ++hits;
+  AmmServer_Success("in prepare_frame_content_callback");
   if ( _GETcmp(rqst,"stream","color") == 0 )
   {
      AmmServer_Success("Returning new color frame..");
      if (networkDevice[0].colorFrame!=0)
      {
-      memcpy(rqst->content,networkDevice[0].colorFrame,networkDevice[0].colorFrameSize);
-      rqst->contentSize=networkDevice[0].colorFrameSize;
+      struct Image img = {0};
+      populateImage(
+                     &img,
+                     networkDevice[0].colorWidth,
+                     networkDevice[0].colorHeight,
+                     networkDevice[0].colorChannels,
+                     networkDevice[0].colorBitsperpixel,
+                     networkDevice[0].colorFrame
+                    );
+
+      networkDevice[0].compressedColorSize = 128*1024*1024;
+      char * compressedPixels = (char* ) malloc(sizeof(char) * networkDevice[0].compressedColorSize);
+      if ( WriteJPEGInternal("dummy.jpg",&img,compressedPixels,&networkDevice[0].compressedColorSize) )
+      {
+         AmmServer_Success("Successfully compressed JPEG frame..");
+      } else
+      {
+         AmmServer_Warning("Could not compress JPEG frame..");
+      }
+
+      memcpy(rqst->content,compressedPixels,networkDevice[0].compressedColorSize);
+      rqst->contentSize=networkDevice[0].compressedColorSize;
+
+      free(compressedPixels);
+
+      AmmServer_Success("color frame ok..");
       return 0;
+     } else
+     {
+         AmmServer_Warning("Color frame is empty..");
      }
   } else
   if ( _GETcmp(rqst,"stream","depth") == 0 )
@@ -74,8 +100,16 @@ void * prepare_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
      {
       memcpy(rqst->content,networkDevice[0].depthFrame,networkDevice[0].depthFrameSize);
       rqst->contentSize=networkDevice[0].depthFrameSize;
+      AmmServer_Success("depth frame ok..");
       return 0;
+     } else
+     {
+         AmmServer_Warning("Depth frame is empty..");
      }
+  } else
+  {
+     unsigned int valueLength = 0;
+     AmmServer_Warning("Incorrect frame stream requested (%s) ..",_GET(rqst,"stream",&valueLength));
   }
 
 
@@ -157,7 +191,7 @@ int ammarserver_StartFrameServer(unsigned int devID , char * bindAddr , int bind
 
 int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , void* pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-
+  fprintf(stderr,"updateStream(%u)",streamNumber);
   if (streamNumber==0) //Color
   {
       networkDevice[0].okToSendColorFrame=0;
