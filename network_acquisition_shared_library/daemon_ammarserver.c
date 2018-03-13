@@ -168,6 +168,7 @@ int ammarserver_StartFrameServer(unsigned int devID , char * bindAddr , int bind
     init_dynamic_content();
     //stats.html and formtest.html should be availiable from now on..!
 
+    /*
          while ( (AmmServer_Running(default_server))  )
            {
              //Main thread should just sleep and let the background threads do the hard work..!
@@ -177,13 +178,7 @@ int ammarserver_StartFrameServer(unsigned int devID , char * bindAddr , int bind
              //usleep(60000);
              sleep(1);
            }
-
-    //Delete dynamic content allocations and remove stats.html and formtest.html from the server
-    close_dynamic_content();
-
-    //Stop the server and clean state
-    AmmServer_Stop(default_server);
-    AmmServer_Warning("Ammar Server stopped\n");
+*/
     return 0;
 }
 
@@ -191,7 +186,7 @@ int ammarserver_StartFrameServer(unsigned int devID , char * bindAddr , int bind
 
 int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , void* pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
-  fprintf(stderr,"updateStream(%u)",streamNumber);
+  //fprintf(stderr,"updateStream(%u)",streamNumber);
   if (streamNumber==0) //Color
   {
       networkDevice[0].okToSendColorFrame=0;
@@ -202,24 +197,6 @@ int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , vo
       networkDevice[0].colorFrame = (unsigned char*) pixels;
       networkDevice[0].colorFrameSize=width*height*channels*(bitsperpixel/8); // Not using compression
       networkDevice[0].compressedColorSize=0; // Not using compression
-
-      /*
-      struct Image * img = createImageUsingExistingBuffer(width,height,channels,bitsperpixel,pixels);
-      networkDevice[0].compressedColorSize=64*1024; //64KBmax
-      char * compressedPixels = (char* ) malloc(sizeof(char) * networkDevice[0].compressedColorSize);
-      WriteJPEGInternal("dummyName.jpg",img,compressedPixels,&networkDevice[0].compressedColorSize);
-      networkDevice[0].colorFrame = (char*) compressedPixels;
-      fprintf(stderr,"Compressed from %u bytes\n",networkDevice[0].compressedColorSize);*/
-
-
-      networkDevice[0].okToSendColorFrame=1;
-
-
-      while (networkDevice[0].okToSendColorFrame==1)
-       {
-         usleep(1000);
-         fprintf(stderr,"Cf.");
-       }
   }
    else
  if (streamNumber==1) //Depth
@@ -232,13 +209,6 @@ int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , vo
       networkDevice[0].depthFrame = (unsigned short*) pixels;
       networkDevice[0].depthFrameSize = width*height*channels*(bitsperpixel/8);
       networkDevice[0].okToSendDepthFrame=1;
-
-
-      while (networkDevice[0].okToSendDepthFrame==1)
-       {
-         usleep(1000);
-         fprintf(stderr,"Df.");
-       }
   }
 
   return 0;
@@ -248,6 +218,12 @@ int ammarserver_UpdateFrameServerImages(int frameServerID, int streamNumber , vo
 
 int ammarserver_StopFrameServer(unsigned int devID)
 {
+    //Delete dynamic content allocations and remove stats.html and formtest.html from the server
+    close_dynamic_content();
+
+    //Stop the server and clean state
+    AmmServer_Stop(default_server);
+    AmmServer_Warning("Ammar Server stopped\n");
  return 0;
 }
 
