@@ -21,6 +21,7 @@ extern "C"
 #endif
 
 #include "../acquisition/acquisition_setup.h"
+#include <pthread.h>
 
 #define MAX_NETWORK_DEVICES 5
 
@@ -30,6 +31,8 @@ struct NetworkVirtualDevice
  unsigned int cycle;
 
 
+
+ pthread_mutex_t colorLock;
  unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
  unsigned long lastColorTimestamp;
  unsigned long compressedColorSize;
@@ -38,6 +41,7 @@ struct NetworkVirtualDevice
  volatile int okToSendColorFrame;
 
 
+ pthread_mutex_t depthLock;
  unsigned int depthWidth , depthHeight , depthChannels , depthBitsperpixel;
  unsigned long lastDepthTimestamp;
  unsigned long depthFrameSize;

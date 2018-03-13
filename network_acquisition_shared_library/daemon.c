@@ -4,6 +4,8 @@
 #include <stdlib.h>
 
 
+#define USE_AMMARSERVER 1
+
 #if USE_AMMARSERVER
  #include "daemon_ammarserver.h"
 #endif // USE_AMMARSERVER

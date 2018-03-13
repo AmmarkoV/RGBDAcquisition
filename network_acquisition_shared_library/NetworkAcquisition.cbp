@@ -15,6 +15,7 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-fPIC" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -26,6 +27,7 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-fPIC" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -41,6 +43,8 @@
 			<Add option="-ljpeg" />
 			<Add option="-lpng" />
 			<Add library="../../FORTH/input_acquisition/3dparty/AmmarServer/src/AmmServerlib/libAmmarServer.a" />
+			<Add library="../../FORTH/input_acquisition/3dparty/AmmarServer/src/Hashmap/libHashmap.a" />
+			<Add library="../../FORTH/input_acquisition/3dparty/AmmarServer/src/InputParser/libInputParser_C.a" />
 		</Linker>
 		<Unit filename="../tools/Codecs/codecs.c">
 			<Option compilerVar="CC" />

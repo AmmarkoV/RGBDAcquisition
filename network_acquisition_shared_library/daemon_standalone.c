@@ -2,13 +2,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 #include "../tools/Codecs/codecs.h"
 #include "../tools/Codecs/jpgInput.h"
 
 #include "NetworkAcquisition.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <pthread.h>
 
 #include <sys/types.h>
@@ -73,6 +73,7 @@ void * standalone_ServeClient(void * ptr)
 
 
   int close_connection=0; // <- if this is set it means Serve Client must stop
+  return 0;
 }
 
 
