@@ -54,6 +54,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../tools/Codecs/jpgInput.h" />
+		<Unit filename="../tools/Codecs/pngInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../tools/Codecs/pngInput.h" />
 		<Unit filename="NetworkAcquisition.h" />
 		<Unit filename="daemon.c">
 			<Option compilerVar="CC" />

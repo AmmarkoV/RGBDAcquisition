@@ -44,6 +44,7 @@ struct NetworkVirtualDevice
  pthread_mutex_t depthLock;
  unsigned int depthWidth , depthHeight , depthChannels , depthBitsperpixel;
  unsigned long lastDepthTimestamp;
+ unsigned long compressedDepthSize;
  unsigned long depthFrameSize;
  unsigned short * depthFrame;
  volatile int okToSendDepthFrame;

@@ -85,6 +85,28 @@ void * prepare_frame_content_callback(struct AmmServer_DynamicRequest  * rqst)
 
       pthread_mutex_lock (&networkDevice[0].depthLock);   // LOCK PROTECTED OPERATION -------------------------------------------
 
+
+      struct Image img = {0};
+      populateImage(
+                     &img,
+                     networkDevice[0].depthWidth,
+                     networkDevice[0].depthHeight,
+                     networkDevice[0].depthChannels,
+                     networkDevice[0].depthBitsperpixel,
+                     networkDevice[0].depthFrame
+                    );
+
+      networkDevice[0].compressedDepthSize = MAX_JPEG_SIZE;
+      char * compressedPixels = (char* ) malloc(sizeof(char) * networkDevice[0].compressedDepthSize);
+      if ( WriteJPEGInternal("dummy.png",&img,compressedPixels,&networkDevice[0].compressedDepthSize) )
+      {
+         AmmServer_Success("Successfully compressed PNG frame..");
+      } else
+      {
+         AmmServer_Warning("Could not compress PNGframe..");
+      }
+
+
        memcpy(rqst->content,networkDevice[0].depthFrame,networkDevice[0].depthFrameSize);
        rqst->contentSize=networkDevice[0].depthFrameSize;
 
