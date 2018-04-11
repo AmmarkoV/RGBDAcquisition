@@ -608,9 +608,9 @@ void EditorFrame::OnOpenModule(wxCommandEvent& event)
 
    alreadyInitialized=1;
    //This hangs the window -> guiSnapFrames();
-   wxYield();
+   wxYieldIfNeeded();
    wxThread::Sleep(0.4);
-   wxYield();
+   wxYieldIfNeeded();
 
 }
 
@@ -904,7 +904,7 @@ void EditorFrame::OnMotion(wxMouseEvent& event)
        }
 
   wxSleep(0.01);
-  wxYield();
+  wxYieldIfNeeded();
 }
 
 
@@ -1170,7 +1170,7 @@ void EditorFrame::OnTimerTrigger(wxTimerEvent& event)
      }
     }
 
-  //wxYield();
+  //wxYieldIfNeeded();
   //wxThread::Sleep(0.4);
 }
 
