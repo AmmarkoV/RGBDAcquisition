@@ -6,17 +6,25 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 #-----------------------------------------------------------
 
+
+
+
+
 # https://github.com/AmmarkoV/RGBDAcquisition <- this is the library that provides
 # unified access  to OpenNI2 etc , to get it just execute 
 # git clone git://github.com/AmmarkoV/RGBDAcquisition
 
 # After you successfully compile it , please update the DATASETS path that follows and comment the next definition
-DATASETS="/home/ammar/Documents/Programming/RGBDAcquisition"
+#DATASETS_SEARCH="/home/ammar/Documents/Programming/RGBDAcquisition"
 
-# Or let it be autoconfigured but with uglier paths..!
-DATASETS="$DIR/../../../"
+# Or let it be autoconfigured initially with uglier paths but i fix them..!
+DATASETS_SEARCH="$DIR/../../../"
 
-
+#Fix Dir to be prettier for bashrc etc..
+cd $DATASETS_SEARCH
+DATASETS=`pwd`
+cd $DIR
+#Ready to make links
 
 cd src  
 ln -s $DATASETS/acquisition/Acquisition.h
@@ -53,8 +61,19 @@ ln -s $DATASETS/viewer/Viewer
  
 
 
+if cat ~/.bashrc | grep -q "RGBDACQUISITION_PATH="
+then
+   echo "RGBDAcquisition PATH seems to be set up on bashrc!"  
+else
+   echo "Including RGBDAcquisition to .bashrc" 
+   sh -c "echo \"export RGBDACQUISITION_PATH=$DATASETS\" >> ~/.bashrc"
+   sh -c "echo \"export RGBDACQUISITION_REDIST=$DATASETS/redist\" >> ~/.bashrc"
+   source ~/.bashrc
+fi
 
 
 #-----------------------------------------------------------
 cd "$STARTDIR"
+
+
 exit 0
