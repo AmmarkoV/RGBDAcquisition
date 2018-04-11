@@ -22,8 +22,8 @@ int initArgs_BodyDetector(int argc, char *argv[])
 {
  fprintf(stdout,"initArgs_BodyDetector\n");
 
- fubgtUpperBodyTracker_Initialize(640,480,"../");
- fubgtUpperBodyTracker_setVisualization(1);
+ fubgtUpperBodyTracker_Initialize(640,480,"../",argc,argv);
+ //fubgtUpperBodyTracker_setVisualization(1);
  return 0;
 
 }
@@ -66,13 +66,6 @@ int addDataInput_BodyDetector(unsigned int stream , void * data, unsigned int wi
 
    ++framesProcessed;
 
-
-   fubgtUpperBodyTracker_NewFrame( colorFrame, colorWidth, colorHeight,
-                                   depthFrame , depthWidth , depthHeight,
-                                   &frameCalibration,
-                                   0,
-                                   framesProcessed);
-
   return 1;
  }
 
@@ -88,17 +81,21 @@ unsigned short * getDepth_BodyDetector(unsigned int * width, unsigned int * heig
 
 }
 
-
 unsigned char * getColor_BodyDetector(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)
 {
  return 0;
 
 }
 
-
-
 int processData_BodyDetector()
 {
+
+   fubgtUpperBodyTracker_NewFrame( colorFrame, colorWidth, colorHeight,
+                                   depthFrame , depthWidth , depthHeight,
+                                   &frameCalibration,
+                                   0,
+                                   framesProcessed);
+
  return 0;
 
 }

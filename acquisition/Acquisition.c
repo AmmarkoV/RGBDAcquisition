@@ -632,12 +632,12 @@ int acquisitionDoProcessorSubsystem(ModuleIdentifier moduleID,DeviceIdentifier d
             (*processors[processorID].cleanup) ();
           } else
           {
-            fprintf(stderr,"Cannot run processor %u , it hasn't got all relevant calls implemented \n",processorID);
+            fprintf(stderr,RED "Cannot run processor %u , it hasn't got all relevant calls implemented \n",processorID);
             fprintf(stderr," processData=%u ",(processors[processorID].processData!=0) );
             fprintf(stderr," cleanup=%u ",(processors[processorID].cleanup!=0) );
             fprintf(stderr," addDataInput=%u ",(processors[processorID].addDataInput!=0) );
             fprintf(stderr," getDepth=%u ",(processors[processorID].getDepth!=0) );
-            fprintf(stderr," getColor=%u ",(processors[processorID].getColor!=0));
+            fprintf(stderr," getColor=%u \n" NORMAL,(processors[processorID].getColor!=0));
           }
 
        }

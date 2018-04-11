@@ -28,7 +28,7 @@ int addDataInput_BodyDetector(unsigned int stream , void * data, unsigned int wi
 
 
 unsigned short * getDepth_BodyDetector(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel);
-unsigned char * getColor_BodyDetector(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel);
+unsigned char  * getColor_BodyDetector(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel);
 
 
 int processData_BodyDetector();

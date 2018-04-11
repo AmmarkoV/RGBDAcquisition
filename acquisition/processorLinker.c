@@ -36,7 +36,7 @@ void * linkProcessorFunction(int moduleID,const char * functionName,const char *
 
 int linkToProcessor(const char * processorName,const char * processorLibPath ,  int processorID)
 {
-   processors[processorID].handle = dlopen (processorName, RTLD_LAZY);
+   processors[processorID].handle = dlopen (processorName, RTLD_NOW); //RTLD_LAZY
    if (!processors[processorID].handle)
        {
         fprintf (stderr,RED "Failed while loading code for %s plugin from %s\n Error : %s\n" NORMAL, processorName , processorLibPath , dlerror());
@@ -51,17 +51,60 @@ int linkToProcessor(const char * processorName,const char * processorLibPath ,  
        }
     dlerror();    /* Clear any existing error */
 
+  unsigned int missingCalls = 0;
   processors[processorID].initArgs     = linkProcessorFunction(processorID,"initArgs_%s",processorLibPath);
+  missingCalls+=(processors[processorID].initArgs==0);
+
   processors[processorID].setConfigStr = linkProcessorFunction(processorID,"setConfigStr_%s",processorLibPath);
+  missingCalls+=(processors[processorID].setConfigStr==0);
+
   processors[processorID].setConfigInt = linkProcessorFunction(processorID,"setConfigInt_%s",processorLibPath);
+  missingCalls+=(processors[processorID].setConfigInt==0);
+
   processors[processorID].getDataOutput= linkProcessorFunction(processorID,"getDataOutput_%s",processorLibPath);
+  missingCalls+=(processors[processorID].getDataOutput==0);
+
   processors[processorID].addDataInput = linkProcessorFunction(processorID,"addDataInput_%s",processorLibPath);
+  missingCalls+=(processors[processorID].addDataInput==0);
+
   processors[processorID].getDepth     = linkProcessorFunction(processorID,"getDepth_%s",processorLibPath);
+  missingCalls+=(processors[processorID].getDepth==0);
+
   processors[processorID].getColor     = linkProcessorFunction(processorID,"getColor_%s",processorLibPath);
+  missingCalls+=(processors[processorID].getColor==0);
 
   processors[processorID].processData  = linkProcessorFunction(processorID,"processData_%s",processorLibPath);
+  missingCalls+=(processors[processorID].processData==0);
+
   processors[processorID].cleanup      = linkProcessorFunction(processorID,"cleanup_%s",processorLibPath);
+  missingCalls+=(processors[processorID].cleanup==0);
+
   processors[processorID].stop         = linkProcessorFunction(processorID,"stop_%s",processorLibPath);
+  missingCalls+=(processors[processorID].stop==0);
+
+
+
+  fprintf(stderr," Processor Address Table\n");
+  fprintf(stderr,"  Missing Calls = %u \n",missingCalls);
+  fprintf(stderr," initArgs=%p\n ",processors[processorID].initArgs  );
+  fprintf(stderr," setConfigStr=%p\n ",processors[processorID].setConfigStr);
+  fprintf(stderr," setConfigInt=%p\n ",processors[processorID].setConfigInt);
+  fprintf(stderr," getDataOutput=%p\n ",processors[processorID].getDataOutput);
+  fprintf(stderr," addDataInput=%p\n ",processors[processorID].addDataInput);
+  fprintf(stderr," getDepth=%p\n ",processors[processorID].getDepth);
+  fprintf(stderr," getColor=%p\n ",processors[processorID].getColor);
+
+  fprintf(stderr," processData=%p\n ",processors[processorID].processData);
+  fprintf(stderr," cleanup=%p\n ",processors[processorID].cleanup );
+  fprintf(stderr," stop=%p\n ",processors[processorID].stop );
+
+
+  if (missingCalls==10)
+  {
+    fprintf(stderr,RED " All calls are missing, failed to load..\n " NORMAL);
+    return 0;
+  }
+
 
   return 1;
 }

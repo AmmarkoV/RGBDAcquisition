@@ -20,7 +20,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 
 add_executable(Viewer main.cpp )  
-target_link_libraries(Viewer rt dl m Acquisition OperatingSystem Timers CalibrationLibrary ${OpenCV_LIBRARIES} ${LocationService_Libs} )
+target_link_libraries(Viewer rt dl m RGBDAcquisition OperatingSystem Timers CalibrationLibrary ${OpenCV_LIBRARIES} ${LocationService_Libs} )
 set_target_properties(Viewer PROPERTIES DEBUG_POSTFIX "D")
 add_dependencies(Viewer Acquisition OperatingSystem Timers CalibrationLibrary) 
 set_target_properties(Viewer PROPERTIES 

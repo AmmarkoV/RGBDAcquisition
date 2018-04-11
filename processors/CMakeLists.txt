@@ -15,6 +15,14 @@ ENDIF(ENABLE_OPENCV_BASED_TOOLS)
 ENDIF( ENABLE_OPENCV )
 
 
+
+#-------------------------------------------------------
+  IF(ENABLE_PROCESSOR_BODYTRACKER) 
+    add_subdirectory (BodyTracker/) 
+  ELSE (ENABLE_PROCESSOR_BODYTRACKER)
+    MESSAGE("Will not use BodyTracker")
+  ENDIF(ENABLE_PROCESSOR_BODYTRACKER)
+
 #-------------------------------------------------------
   IF(ENABLE_PROCESSOR_DARKNET) 
     add_subdirectory (DarknetProcessor/) 

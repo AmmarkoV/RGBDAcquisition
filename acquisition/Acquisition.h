@@ -25,8 +25,8 @@
  */
 
 
-#ifndef ACQUISITION_H_INCLUDED
-#define ACQUISITION_H_INCLUDED
+#ifndef RGBD_ACQUISITION_H_INCLUDED
+#define RGBD_ACQUISITION_H_INCLUDED
 
 
 #ifdef __cplusplus
@@ -935,4 +935,4 @@ int acquisitionSetLocation(ModuleIdentifier moduleID,int newState);
 }
 #endif
 
-#endif // ACQUISITION_H_INCLUDED
+#endif // RGBD_ACQUISITION_H_INCLUDED
