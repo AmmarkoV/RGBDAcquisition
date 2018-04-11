@@ -28,7 +28,7 @@ cd $DIR
 
 cd src  
 ln -s $DATASETS/acquisition/Acquisition.h
-ln -s $DATASETS/Calibration/calibration.h
+ln -s $DATASETS/tools/Calibration/calibration.h
 cd ..
 
 
