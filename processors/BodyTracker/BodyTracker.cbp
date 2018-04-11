@@ -51,7 +51,6 @@
 			<Add library="forth_skeleton_tracker_redist/libBulletDynamics.so.2.81" />
 			<Add library="forth_skeleton_tracker_redist/libLinearMath.so.2.81" />
 			<Add library="forth_skeleton_tracker_redist/libBulletCollision.so.2.81" />
-			<Add library="forth_skeleton_tracker_redist/libPhysics.so" />
 		</Linker>
 		<Unit filename="../../tools/ImageOperations/imageOps.c">
 			<Option compilerVar="CC" />
