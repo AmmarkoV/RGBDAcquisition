@@ -11,6 +11,8 @@
 
 #include "../BodyTracker/forth_skeleton_tracker_redist/headers/FORTHUpperBodyGestureTrackerLib.h"
 
+#define LINK_GESTURE_TESTER 1
+
 using namespace std;
 
 char inputname[512]={0};
@@ -26,6 +28,68 @@ ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MO
 
 struct calibrationFUBGT gestureCalibration={0};
 struct calibrationFUBGT * activeGestureCalibration = 0;
+
+
+void testerGesture(struct handGesture * gesture)
+{
+  int payload=0;
+  char command[512]={0};
+    switch (gesture->gestureID)
+    {
+     case GESTURE_NONE   :   break;
+     case GESTURE_CANCEL : payload=1; snprintf(command,512,"wget http://127.0.0.1:8080/index.html?RIGHT=1 -o wgetres"); break;
+     case GESTURE_HELP   : payload=1; snprintf(command,512,"eject &");  break;
+     case GESTURE_YES    : payload=1; snprintf(command,512,"wget http://192.168.1.19:8080/commander.html?activate=a -o wgetres");   break;
+     case GESTURE_NO     : payload=1; snprintf(command,512,"wget http://192.168.1.19:8080/commander.html?deactivate=a -o wgetres");    break;
+     case GESTURE_REWARD : payload=1; snprintf(command,512,"wget http://127.0.0.1:8080/index.html?STARS=1 -o wgetres");    break;
+     case GESTURE_POINT  : break;
+     case GESTURE_COME   : break;
+     case GESTURE_WAVE   : return; /*disabled*/ break;
+     default :              break;
+    };
+
+
+ if (payload)
+ {
+   int i=system(command);
+
+   if (i==0) { fprintf(stderr,"Success executing `%s`\n",command); } else
+             { fprintf(stderr,"Failed executing `%s`\n",command); }
+ }
+
+}
+
+
+void broadcastNewGesture(unsigned int frameNumber,struct handGesture * gesture)
+{
+    if (gesture==0)  { return ; }
+
+    #if LINK_GESTURE_TESTER
+     testerGesture(gesture); // simple tester function for debugging
+    #endif
+
+    switch (gesture->gestureID)
+    {
+     case GESTURE_NONE   : fprintf(stderr,"G_NONE");   break;
+     case GESTURE_CANCEL : fprintf(stderr,"G_CANCEL"); break;
+     case GESTURE_HELP   : fprintf(stderr,"G_HELP");   break;
+     case GESTURE_YES    : fprintf(stderr,"G_YES");    break;
+     case GESTURE_NO     : fprintf(stderr,"G_NO");     break;
+     case GESTURE_REWARD : fprintf(stderr,"G_REWARD"); break;
+     case GESTURE_POINT  : fprintf(stderr,"G_POINT");  break;
+     case GESTURE_COME   : fprintf(stderr,"G_COME");  break;
+     case GESTURE_WAVE   : fprintf(stderr,"G_WAVE"); return; /*disabled*/ break;
+     default :             fprintf(stderr,"G_NOTFOUND"); break;
+    };
+
+    return ;
+}
+
+
+void broadcastNewSkeleton(unsigned int frameNumber,unsigned int skeletonID , struct skeletonHuman * skeletonFound )
+{
+}
+
 
 int updateCalibration()
 {
@@ -211,6 +275,10 @@ int main(int argc, char *argv[])
 
 
    fubgtUpperBodyTracker_Initialize(colorWidth,colorHeight,"../",argc,argv);
+   fubgtUpperBodyTracker_useGestures(1);
+
+   //fubgtUpperBodyTracker_RegisterSkeletonDetectedEvent((void *) &broadcastNewSkeleton);
+    fubgtUpperBodyTracker_RegisterGestureDetectedEvent((void *) &broadcastNewGesture);
 
    countdownDelay(delay);
    fprintf(stderr,"Starting Grabbing!\n");
