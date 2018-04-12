@@ -48,6 +48,7 @@ int updateCalibration()
          activeGestureCalibration = &gestureCalibration;
        }  else
        {
+         fprintf(stderr,"Could not get Calibration\n");
          activeGestureCalibration =0;
          return 0;
        }
@@ -224,7 +225,7 @@ int main(int argc, char *argv[])
         fubgtUpperBodyTracker_NewFrame        (acquisitionGetColorFrame(moduleID,devID) , colorWidth,colorHeight ,
                                                acquisitionGetDepthFrame(moduleID,devID) , depthWidth,depthHeight ,
                                                activeGestureCalibration,
-                                               1,
+                                               0,
                                                frameNum);
         ++frameNum;
     }

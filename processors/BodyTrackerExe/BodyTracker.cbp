@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="../BodyTracker/forth_skeleton_tracker_redist" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -32,8 +33,10 @@
 			<Add option="-Wall" />
 			<Add option="`pkg-config --cflags opencv`" />
 			<Add option="-fPIC" />
+			<Add directory="-I/usr/local/include/opencv -I/usr/local/include" />
 		</Compiler>
 		<Linker>
+			<Add option="-lopencv_shape -lopencv_stitching -lopencv_objdetect -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_ml -lopencv_imgproc -lopencv_flann -lopencv_core" />
 			<Add library="GL" />
 			<Add library="GLU" />
 			<Add library="X11" />
@@ -43,6 +46,41 @@
 			<Add library="../../tools/OperatingSystem/libOperatingSystem.a" />
 			<Add library="rt" />
 			<Add library="dl" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libAcquisition.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libArticulatedTracking.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libCore.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libcudpp.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libDecoding.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libFORTHUpperBodyGestureTrackerAdapter.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libHandTrackerLib.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libLibraries.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libMBVOpenMesh.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libOptimization.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libParticleFilter.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libPhysics.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libRendering.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libboost_chrono.so.1.57.0" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libboost_context.so.1.57.0" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libboost_coroutine.so.1.57.0" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libboost_filesystem.so.1.57.0" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libboost_log.so.1.57.0" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libboost_program_options.so.1.57.0" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libboost_serialization.so.1.57.0" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libboost_system.so.1.57.0" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libboost_thread.so.1.57.0" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libDecoding.so" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libGLEW.so.1.13" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libOpenMeshCore.so.3.3" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libBulletCollision.so.2.81" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libBulletDynamics.so.2.81" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libBulletSoftBody.so.2.81" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libLinearMath.so.2.81" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libopencv_objdetect.so.3.2" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libopencv_video.so.3.2" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libopencv_videoio.so.3.2" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libopencv_calib3d.so.3.2" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libopencv_core.so.3.2" />
+			<Add library="../BodyTracker/forth_skeleton_tracker_redist/libopencv_highgui.so.3.2" />
 		</Linker>
 		<Unit filename="main.cpp" />
 		<Extensions>
