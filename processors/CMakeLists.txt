@@ -19,6 +19,7 @@ ENDIF( ENABLE_OPENCV )
 #-------------------------------------------------------
   IF(ENABLE_PROCESSOR_BODYTRACKER) 
     add_subdirectory (BodyTracker/) 
+    add_subdirectory (BodyTrackerExe/) 
   ELSE (ENABLE_PROCESSOR_BODYTRACKER)
     MESSAGE("Will not use BodyTracker")
   ENDIF(ENABLE_PROCESSOR_BODYTRACKER)
