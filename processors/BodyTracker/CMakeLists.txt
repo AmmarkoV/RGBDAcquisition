@@ -1,6 +1,7 @@
 project( BodyTracker ) 
 cmake_minimum_required( VERSION 2.8.7 )   
  
+ 
 add_library(BodyTracker SHARED BodyTracker.h BodyTracker.c
             ../../tools/ImageOperations/imageOps.c
             ../../tools/ImageOperations/imageOps.h
