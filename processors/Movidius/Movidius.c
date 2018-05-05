@@ -31,7 +31,7 @@
 #define NAME_SIZE 100
 
 // graph file name - assume we are running in this directory: ncsdk/examples/caffe/GoogLeNet/cpp
-#define GRAPH_FILE_NAME "/home/ammar/Documents/3dParty/ncsdk/examples/caffe/GoogLeNet/graph"
+#define GRAPH_FILE_NAME "../processors/Movidius/googlenet/graph"
 
 
 
@@ -277,7 +277,7 @@ half *LoadImageFromMemory(const char *buf , unsigned int bufW, unsigned int bufH
 
 int initArgs_Movidius(int argc, char *argv[])
 {
-    if (!loadLabels("../processors/Movidius/synset_words.txt",&labels )) { exit(0); }
+    if (!loadLabels("../processors/Movidius/googlenet/words.txt",&labels )) { exit(0); }
 
 
     mov.retCode = mvncGetDeviceName(0, mov.devName, NAME_SIZE);
