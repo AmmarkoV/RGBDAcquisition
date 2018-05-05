@@ -116,11 +116,6 @@ int loadLabels(const char * filename , struct labelContents * labels )
 
 
 
-
-
-
-
-
 // Load a graph file
 // caller must free the buffer returned.
 void *LoadFile(const char *path, unsigned int *length)
@@ -289,12 +284,11 @@ float *LoadImageFromMemory32(const char *buf , unsigned int bufW, unsigned int b
 	imgresized = (unsigned char*) malloc(3*reqsize*reqsize);
 	if(!imgresized)
 	{
-		free(img);
 		perror("malloc");
 		return 0;
 	}
 	stbir_resize_uint8(img, width, height, 0, imgresized, reqsize, reqsize, 0, 3);
-	free(img);
+
     unsigned int imageSize = sizeof(*imgfp32) * reqsize * reqsize * 3;
 	imgfp32 = (float*) malloc(imageSize);
 	if(!imgfp32)
@@ -438,7 +432,8 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
         // floats to half precision floats and return pointer to the buffer
         // of half precision floats (Fp16s)
         //half* imageBufFp16 = LoadImage(IMAGE_FILE_NAME, networkDim, networkMean);
-        //half* imageBufFp16 = LoadImageFromMemory32( (const char* ) data , width ,height , channels, networkDim, networkMean);
+        //half* imageBufFp16 = LoadImageFromMemory16( (const char* ) data , width ,height , channels, networkDim, networkMean);
+
         float * imageBufFp32 = LoadImageFromMemory32( (const char* ) data , width ,height , channels, networkDim, networkMean);
 
 
@@ -460,7 +455,7 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
         else
         {   // the inference has been started, now call mvncGetResult() for the
             // inference result
-            printf("Successfully loaded the tensor for image \n");
+            //printf("Successfully loaded the tensor for image \n");
 
             // queue inference
             mov.retCode = ncGraphQueueInference(mov.graphHandle, &mov.bufferIn, 1, &mov.bufferOut, 1);
@@ -497,9 +492,9 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
             }
             else
             {   // Successfully got the result.  The inference result is in the buffer pointed to by resultData
-                printf("Successfully got the inference result for image \n");
+                //printf("Successfully got the inference result for image \n");
                 unsigned int numResults =  outputDataLength / sizeof(float);
-                printf("resultData length is %d \n", numResults);
+                //printf("resultData length is %d \n", numResults);
                 float *fresult = (float*) result;
 
                 float maxResult = 0.0;
