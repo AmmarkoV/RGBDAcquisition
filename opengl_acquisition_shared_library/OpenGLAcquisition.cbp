@@ -113,10 +113,6 @@
 		</Unit>
 		<Unit filename="opengl_depth_and_color_renderer/src/ModelLoader/model_loader_obj.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/OGLRendererSandbox.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/bmp.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/bmp.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/TextureLoader/ppm.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -160,9 +156,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="opengl_depth_and_color_renderer/src/scene.h" />
-		<Unit filename="opengl_depth_and_color_renderer/src/shader_loader.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="opengl_depth_and_color_renderer/src/shader_loader.h" />
 		<Unit filename="opengl_depth_and_color_renderer/src/tools.c">
 			<Option compilerVar="CC" />
