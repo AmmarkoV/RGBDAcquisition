@@ -11,6 +11,12 @@
 #include "scene.h"
 #include "glx.h"
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+
+
 static int snglBuf[] = {GLX_RGBA, GLX_DEPTH_SIZE, 24, None};
 static int dblBuf[]  = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None};
 
@@ -21,8 +27,8 @@ GLboolean  doubleBuffer = GL_TRUE;
 
 void fatalError(char *message)
 {
-  fprintf(stderr, "main: %s\n", message);
-  exit(1);
+  fprintf(stderr, RED "fatal Error: %s\n" NORMAL, message);
+  //exit(1);
 }
 
 static Bool WaitForNotify( Display *dpy, XEvent *event, XPointer arg )
@@ -46,13 +52,20 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   /*** (1) open a connection to the X server ***/
 
   dpy = XOpenDisplay(NULL);
-  if (dpy == NULL) { fatalError("Could not open display"); }
+  if (dpy == NULL)
+    {
+     fatalError("Could not open display");
+     return 0;
+    }
 
   if (debugMessages) { fprintf(stderr,"(2) make sure OpenGL's GLX extension supported\n"); }
   /*** (2) make sure OpenGL's GLX extension supported ***/
 
   if(!glXQueryExtension(dpy, &dummy, &dummy))
-    fatalError("X server has no OpenGL GLX extension");
+    {
+      fatalError("X server has no OpenGL GLX extension");
+      return 0;
+    }
 
 
 
@@ -68,11 +81,18 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   if (vi == NULL)
   {
     vi = glXChooseVisual(dpy, DefaultScreen(dpy), snglBuf);
-    if (vi == NULL) fatalError("no RGB visual with depth buffer");
+    if (vi == NULL)
+    {
+      fatalError("no RGB visual with depth buffer");
+      return 0;
+    }
     doubleBuffer = GL_FALSE;
   }
   if(vi->class != TrueColor)
+  {
     fatalError("TrueColor visual required for this program");
+    return 0;
+  }
 
   if (debugMessages) { fprintf(stderr,"(4) create an OpenGL rendering context\n"); }
   /*** (4) create an OpenGL rendering context  ***/
@@ -84,7 +104,10 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
                         /* direct rendering if possible */ GL_TRUE
                         );
   if (cx == NULL)
-    { fatalError("could not create rendering context"); }
+    {
+      fatalError("could not create rendering context");
+      return 0;
+    }
 
   if ( ! glXIsDirect ( dpy, cx ) ) { printf( "Indirect GLX rendering context obtained\n" ); } else
                                    { printf( "Direct GLX rendering context obtained\n" );   }
@@ -147,6 +170,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
       if ( (fbConfigs == NULL) || (numberOfFramebufferConfigurations <= 0) )
         {
             fatalError("P-Buffers not supported.\n");
+            return 0;
         }
 
 
@@ -161,6 +185,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
       if (pbuffer==0)
         {
             fatalError("glXCreatePbuffer failed..\n");
+            return 0;
         }
 
         cx = glXCreateNewContext(
@@ -173,6 +198,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
         if (!cx)
         {
          fatalError("Failed to create graphics context.\n");
+         return 0;
         }
 
 
@@ -184,6 +210,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
       if ( !glXMakeContextCurrent( dpy, pbuffer, pbuffer, cx ) )
       {
         fatalError("Could not start rendering to pbuffer fbo");
+        return 0;
       }
 
 

@@ -52,7 +52,18 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
   if(openGLDepthFrame!=0) { openGLDepthFrame= (short*) realloc(openGLDepthFrame,sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); } else
                           { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); }
 
-   startOGLRendererSandbox(openGL_WIDTH,openGL_HEIGHT,0 /*View Window*/,devName);
+
+   if (!startOGLRendererSandbox(openGL_WIDTH,openGL_HEIGHT,0 /*View Window*/,devName) )
+   {
+     fprintf(stderr,"Could not start openGL context with a p-buffer..");
+     fprintf(stderr,"Will now try to start it with a visible window..");
+     if (!startOGLRendererSandbox(openGL_WIDTH,openGL_HEIGHT,1 /*View Window*/,devName) )
+     {
+        return 0;
+        //return ((openGLColorFrame!=0) && (openGLDepthFrame!=0)) ;
+     }
+   }
+
 
    //THis is scene controlled , but one could force the grabber to render frame by frame uncommenting the following
    //Switch OGL Renderer to sequential mode so each frame snap will provide the next available rendering and nothing will be lost..!

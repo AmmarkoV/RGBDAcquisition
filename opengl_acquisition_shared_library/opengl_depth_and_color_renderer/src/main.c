@@ -375,8 +375,11 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
   snapsPerformed=0;
 
   char * testP=0;
-  fprintf(stderr,"starting glx code with a window request ( %ux%u ).. ",width,height);
-  start_glx_stuff(width,height,viewWindow,0,testP);
+  fprintf(stderr,"trying to start glx code with a window request ( %ux%u , viewWindow=%u ).. ",width,height,viewWindow);
+   if ( !start_glx_stuff(width,height,viewWindow,0,testP) )
+   {
+     return 0;
+   }
   fprintf(stderr,GREEN" ok\n" NORMAL);
   WIDTH=width;
   HEIGHT=height;
