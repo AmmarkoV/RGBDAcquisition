@@ -165,12 +165,14 @@ target_link_libraries(
                       BulletCollision 
                       BulletDynamics 
                       BulletSoftBody
-                      #OpenCVObjDetect
-                      #OpenCVVideo  
-                      #OpenCVVideoIO
-                      #OpenCVCalib3D
-                      #OpenCVCore
-                      ${OpenCV_LIBRARIES} 
+                      #Use given OpenCV libraries to avoid problems
+                      OpenCVObjDetect
+                      OpenCVVideo  
+                      OpenCVVideoIO
+                      OpenCVCalib3D
+                      OpenCVCore
+                      #Use system OpenCV libraries ( this might create problems )
+                      #${OpenCV_LIBRARIES} 
                       ${LocationService_Libs} 
                       ) 
  
