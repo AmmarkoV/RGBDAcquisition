@@ -32,6 +32,9 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-fPIC" />
+		</Compiler>
 		<Unit filename="../../tools/ImageOperations/imageOps.c">
 			<Option compilerVar="CC" />
 		</Unit>

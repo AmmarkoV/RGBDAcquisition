@@ -8,9 +8,21 @@
  **************************************************************/
 
 #include "EditorMain.h"
+
+//I got some really weird compilation errors at one point that where fixed by changing
+// CMake _filename variable to /usr/include/wx-3.0/wx/version.h
+
+#include <wx/msgdlg.h>
+#include <wx/filename.h>
+#include <wx/dc.h>
+#include <wx/dcclient.h>
+#include <wx/wx.h>
+#include <wx/utils.h>
+#include <wx/dir.h>
+
 #include "FeedScreenMemory.h"
 #include "Tools.h"
-#include <wx/msgdlg.h>
+
 //#include <wx/time.h>
 
 #include "../acquisitionSegment/AcquisitionSegment.h"
