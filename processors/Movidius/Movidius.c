@@ -29,20 +29,28 @@
 
 // somewhat arbitrary buffer size for the device name
 #define NAME_SIZE 100
+#define USE_GOOGLENET 1
 
-// graph file name - assume we are running in this directory: ncsdk/examples/caffe/GoogLeNet/cpp
+#if USE_GOOGLENET
+// GoogleNet image dimensions, network mean values for each channel in BGR order.
+const int networkDimX = 224;
+const int networkDimY = 224;
+float networkMean[] = {0.40787054*255.0, 0.45752458*255.0, 0.48109378*255.0};
 #define WORDS_FILE_NAME "../processors/Movidius/googlenet/words.txt"
 #define GRAPH_FILE_NAME "../processors/Movidius/googlenet/graph"
-
+#else
+const int networkDimX = 448;
+const int networkDimY = 448;
+float * networkMean = 0;
+#define WORDS_FILE_NAME "../processors/Movidius/tinyyolo/words.txt"
+#define GRAPH_FILE_NAME "../processors/Movidius/tinyyolo/graph"
+#endif
 
 
 // 16 bits.  will use this to store half precision floats since C++ has no
 // built in support for it.
 typedef unsigned short half;
 
-// GoogleNet image dimensions, network mean values for each channel in BGR order.
-const int networkDim = 224;
-float networkMean[] = {0.40787054*255.0, 0.45752458*255.0, 0.48109378*255.0};
 
 
 struct labelContents
@@ -57,9 +65,6 @@ struct labelContents labels={0};
 
 struct movidiusContext
 {
-  const int networkDim;
-  float networkMean[3];
-
   ncStatus_t retCode;
   struct ncDeviceHandle_t * deviceHandle;
   char devName[NAME_SIZE];
@@ -110,7 +115,12 @@ int loadLabels(const char * filename , struct labelContents * labels )
     //if (lineA) { free(lineA); }
   }
 
-  if (fpA!=0) { fclose(fpA); return 1; }
+  if (fpA!=0)
+     {
+       fprintf(stderr,"Loaded %u labels \n",labels->numberOfLabels);
+       fclose(fpA);
+       return 1;
+     }
  return 0;
 }
 
@@ -269,7 +279,7 @@ half *LoadImageFromMemory16(const char *buf , unsigned int bufW, unsigned int bu
 
 
 
-float *LoadImageFromMemory32(const char *buf , unsigned int bufW, unsigned int bufH  , unsigned int bufChans, int reqsize, float *mean)
+float *LoadImageFromMemory32(const char *buf , unsigned int bufW, unsigned int bufH  , unsigned int bufChans, int reqsizeX, int reqsizeY, float *mean)
 {
 	int width=bufW, height=bufH, cp=bufChans, i ;
 	unsigned char *img, *imgresized;
@@ -281,15 +291,15 @@ float *LoadImageFromMemory32(const char *buf , unsigned int bufW, unsigned int b
 		printf("The picture could not be loaded\n");
 		return 0;
 	}
-	imgresized = (unsigned char*) malloc(3*reqsize*reqsize);
+	imgresized = (unsigned char*) malloc(3*reqsizeX*reqsizeY);
 	if(!imgresized)
 	{
 		perror("malloc");
 		return 0;
 	}
-	stbir_resize_uint8(img, width, height, 0, imgresized, reqsize, reqsize, 0, 3);
+	stbir_resize_uint8(img, width, height, 0, imgresized, reqsizeX, reqsizeY, 0, 3);
 
-    unsigned int imageSize = sizeof(*imgfp32) * reqsize * reqsize * 3;
+    unsigned int imageSize = sizeof(*imgfp32) * reqsizeX * reqsizeY * 3;
 	imgfp32 = (float*) malloc(imageSize);
 	if(!imgfp32)
 	{
@@ -297,23 +307,28 @@ float *LoadImageFromMemory32(const char *buf , unsigned int bufW, unsigned int b
 		perror("malloc");
 		return 0;
 	}
-	for(i = 0; i < reqsize * reqsize * 3; i++)
+	for(i = 0; i < reqsizeX * reqsizeY * 3; i++)
 		imgfp32[i] = imgresized[i];
 	free(imgresized);
-	for(i = 0; i < reqsize*reqsize; i++)
-	{
+
+    if (mean!=0)
+    {
+	 for(i = 0; i < reqsizeX*reqsizeY; i++)
+	  {
 		float blue, green, red;
-		blue = imgfp32[3*i+2];
+	 	blue = imgfp32[3*i+2];
 		green = imgfp32[3*i+1];
 		red = imgfp32[3*i+0];
 
-		imgfp32[3*i+0] = blue-mean[0];
-		imgfp32[3*i+1] = green-mean[1];
-		imgfp32[3*i+2] = red-mean[2];
+		 imgfp32[3*i+0] = blue-mean[0];
+		 imgfp32[3*i+1] = green-mean[1];
+		 imgfp32[3*i+2] = red-mean[2];
+
 
 		// uncomment to see what values are getting passed to mvncLoadTensor() before conversion to half float
 		//printf("Blue: %f, Grean: %f,  Red: %f \n", imgfp32[3*i+0], imgfp32[3*i+1], imgfp32[3*i+2]);
-	}
+	  }
+    }
 	return imgfp32;
 }
 
@@ -432,16 +447,16 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
         // floats to half precision floats and return pointer to the buffer
         // of half precision floats (Fp16s)
         //half* imageBufFp16 = LoadImage(IMAGE_FILE_NAME, networkDim, networkMean);
-        //half* imageBufFp16 = LoadImageFromMemory16( (const char* ) data , width ,height , channels, networkDim, networkMean);
+        //half* imageBufFp16 = LoadImageFromMemory16( (const char* ) data , width ,height , channels, networkDimX , networkDimY, networkMean);
 
-        float * imageBufFp32 = LoadImageFromMemory32( (const char* ) data , width ,height , channels, networkDim, networkMean);
+        float * imageBufFp32 = LoadImageFromMemory32( (const char* ) data , width ,height , channels, networkDimX , networkDimY , networkMean);
 
 
         if (imageBufFp32!=0)
         {
         // calculate the length of the buffer that contains the half precision floats.
         // 3 channels * width * height * sizeof a 16bit float
-        unsigned int lenBufFp32 = 3*networkDim*networkDim*sizeof(*imageBufFp32);
+        unsigned int lenBufFp32 = 3*networkDimX*networkDimY*sizeof(*imageBufFp32);
 
 
         // Write tensor to input fifo
@@ -509,10 +524,17 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
                     }
                 }
 
-
-                printf("Index of top result is: %d\n", maxIndex);
-                printf("Probability of top result is: %f\n", fresult[maxIndex]);
-                if (labels.content[maxIndex]!=0 ) { printf("This is %s \n",labels.content[maxIndex]); }
+                if (fresult[maxIndex]>0.20)
+                {
+                  printf("Index of top result is: %d\n", maxIndex);
+                  printf("Probability of top result is: %f\n", fresult[maxIndex]);
+                  if (maxIndex<labels.numberOfLabels)
+                   {
+                    if (labels.content[maxIndex]!=0 )
+                        { printf("This is %s \n",labels.content[maxIndex]); }
+                   } else
+                   { printf("Incorrect result(?) \n"); }
+                }
             }
             free(result);
             free(imageBufFp32);
