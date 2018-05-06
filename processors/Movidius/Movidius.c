@@ -29,18 +29,23 @@
 
 // somewhat arbitrary buffer size for the device name
 #define NAME_SIZE 100
-#define USE_GOOGLENET 1
+
+#define USE_GOOGLENET 0
+
+float minimumConfidence = 0.3;
 
 #if USE_GOOGLENET
 // GoogleNet image dimensions, network mean values for each channel in BGR order.
 const int networkDimX = 224;
 const int networkDimY = 224;
+int packedInfo = 0;
 float networkMean[] = {0.40787054*255.0, 0.45752458*255.0, 0.48109378*255.0};
 #define WORDS_FILE_NAME "../processors/Movidius/googlenet/words.txt"
 #define GRAPH_FILE_NAME "../processors/Movidius/googlenet/graph"
 #else
 const int networkDimX = 448;
 const int networkDimY = 448;
+int packedInfo = 1;
 float * networkMean = 0;
 #define WORDS_FILE_NAME "../processors/Movidius/tinyyolo/words.txt"
 #define GRAPH_FILE_NAME "../processors/Movidius/tinyyolo/graph"
@@ -219,8 +224,8 @@ half *LoadImage(const char *path, int reqsize, float *mean)
 
 half *LoadImageFromMemory16(const char *buf , unsigned int bufW, unsigned int bufH  , unsigned int bufChans, int reqsize, float *mean)
 {
-	int width=bufW, height=bufH, cp=bufChans, i;
-	const char *img = buf;
+	int width=bufW, height=bufH, i;
+	const unsigned char *img = (const unsigned char *) buf;
 	unsigned char *imgresized;
 	float *imgfp32;
 	half *imgfp16;
@@ -281,10 +286,10 @@ half *LoadImageFromMemory16(const char *buf , unsigned int bufW, unsigned int bu
 
 float *LoadImageFromMemory32(const char *buf , unsigned int bufW, unsigned int bufH  , unsigned int bufChans, int reqsizeX, int reqsizeY, float *mean)
 {
-	int width=bufW, height=bufH, cp=bufChans, i ;
-	unsigned char *img, *imgresized;
+	int width=bufW, height=bufH, i ;
+	const unsigned char *img = (const unsigned char *) buf;
+	unsigned char *imgresized;
 	float *imgfp32;
-	img = buf;
 
 	if(!img)
 	{
@@ -438,6 +443,69 @@ int initArgs_Movidius(int argc, char *argv[])
 
 
 
+int processTinyYOLO(float * results , unsigned int resultsLength)
+{
+ printf("got back %u resultData \n", resultsLength );
+ int i=0;
+
+ float x,y,w,h,confidence,category;
+
+ for (i=0; i<resultsLength; i++)
+   {
+
+    category   =  results[i*6+0];
+    x =  results[i*6+1];
+    y =  results[i*6+2];
+    w =  results[i*6+3];
+    h =  results[i*6+4];
+    confidence =  results[i*6+5];
+
+
+
+
+    printf("%u= ",i);
+    printf("cat=%0.2f ",category);
+    printf("x=%0.2f ",x);
+    printf("y=%0.2f ",y);
+    printf("w=%0.2f ",w);
+    printf("h=%0.2f ",h);
+    printf("conf=%0.2f\n",confidence);
+   }
+ return 1;
+}
+
+
+
+int processGoogleNet(float * results , unsigned int resultsLength)
+{
+  float maxResult = 0.0;
+  int maxIndex = -1;
+  for (int index = 0; index < resultsLength; index++)
+                {
+                    // printf("Category %d is: %f\n", index, resultData32[index]);
+                    if (results[index] > maxResult)
+                    {
+                        maxResult = results[index];
+                        maxIndex = index;
+                    }
+                }
+
+   if (results[maxIndex]>=minimumConfidence)
+                {
+                  printf("Index of top result is: %d\n", maxIndex);
+                  printf("Probability of top result is: %f\n", results[maxIndex]);
+                  if (maxIndex<labels.numberOfLabels)
+                   {
+                    if (labels.content[maxIndex]!=0 )
+                        { printf("This is %s \n",labels.content[maxIndex]); }
+                   } else
+                   { printf("Incorrect result(?) \n"); }
+                }
+ return 1;
+}
+
+
+
 int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
  if (stream==0)
@@ -509,32 +577,18 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
             {   // Successfully got the result.  The inference result is in the buffer pointed to by resultData
                 //printf("Successfully got the inference result for image \n");
                 unsigned int numResults =  outputDataLength / sizeof(float);
-                //printf("resultData length is %d \n", numResults);
                 float *fresult = (float*) result;
-
-                float maxResult = 0.0;
-                int maxIndex = -1;
-                for (int index = 0; index < numResults; index++)
+                //printf("resultData length is %d \n", numResults);
+                if (packedInfo)
                 {
-                    // printf("Category %d is: %f\n", index, resultData32[index]);
-                    if (fresult[index] > maxResult)
-                    {
-                        maxResult = fresult[index];
-                        maxIndex = index;
-                    }
+                  processTinyYOLO(fresult, (unsigned int) outputDataLength/6);
+                }  else
+                {
+                  processGoogleNet(fresult,numResults);
                 }
 
-                if (fresult[maxIndex]>0.20)
-                {
-                  printf("Index of top result is: %d\n", maxIndex);
-                  printf("Probability of top result is: %f\n", fresult[maxIndex]);
-                  if (maxIndex<labels.numberOfLabels)
-                   {
-                    if (labels.content[maxIndex]!=0 )
-                        { printf("This is %s \n",labels.content[maxIndex]); }
-                   } else
-                   { printf("Incorrect result(?) \n"); }
-                }
+
+
             }
             free(result);
             free(imageBufFp32);

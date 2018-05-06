@@ -2,7 +2,7 @@
 
 // Copied from Numpy
 
-static unsigned half2float(unsigned short h)
+unsigned half2float(unsigned short h)
 {
     unsigned short h_exp, h_sig;
     unsigned f_sgn, f_exp, f_sig;
@@ -154,7 +154,7 @@ void floattofp16(unsigned char *dst, float *src, unsigned nelem)
 	unsigned i;
 	unsigned short *_dst = (unsigned short *)dst;
 	unsigned *_src = (unsigned *)src;
-	
+
 	for(i = 0; i < nelem; i++)
 		_dst[i] = float2half(_src[i]);
 }
@@ -164,7 +164,7 @@ void fp16tofloat(float *dst, unsigned char *src, unsigned nelem)
 	unsigned i;
 	unsigned *_dst = (unsigned *)dst;
 	unsigned short *_src = (unsigned short *)src;
-	
+
 	for(i = 0; i < nelem; i++)
 		_dst[i] = half2float(_src[i]);
 }
