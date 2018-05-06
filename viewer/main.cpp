@@ -239,9 +239,17 @@ if (drawColor)
       if (colorFrame)
       {
        Mat rgbImage(Size(width, height), CV_8UC3, colorFrame , Mat::AUTO_STEP);
-       Mat bgrImage;
-       cv::cvtColor(rgbImage, rgbImage, CV_RGB2BGR );
-       imshow( "RGB Feed", rgbImage);
+       
+       #define ZERO_COPY 0
+       
+       #if ZERO_COPY 
+        cv::cvtColor(rgbImage, rgbImage, CV_RGB2BGR );
+        imshow( "RGB Feed", rgbImage);
+       #else 
+        Mat bgrImage;
+        cv::cvtColor(rgbImage,bgrImage,  CV_RGB2BGR );
+        imshow( "RGB Feed", bgrImage);
+       #endif
       }
     }
 }
