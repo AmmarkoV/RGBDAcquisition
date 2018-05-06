@@ -1,39 +1,22 @@
-// Copyright 2017 Intel Corporation.
-// The source code, information and material ("Material") contained herein is
-// owned by Intel Corporation or its suppliers or licensors, and title to such
-// Material remains with Intel Corporation or its suppliers or licensors.
-// The Material contains proprietary information of Intel or its suppliers and
-// licensors. The Material is protected by worldwide copyright laws and treaty
-// provisions.
-// No part of the Material may be used, copied, reproduced, modified, published,
-// uploaded, posted, transmitted, distributed or disclosed in any way without
-// Intel's prior express written permission. No license under any patent,
-// copyright or other intellectual property rights in the Material is granted to
-// or conferred upon you, either expressly, by implication, inducement, estoppel
-// or otherwise.
-// Any license under such intellectual property rights must be express and
-// approved by Intel in writing.
+//This code is loosely  based on intel's examples
+//For the movidius NCS SDK
+//https://github.com/movidius/ncsdk/tree/master/examples
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-#define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include "stb_image_resize.h"
-
-#include "fp16.h"
 #include <mvnc.h>
+#include "imageConversions.h"
 
 
-// somewhat arbitrary buffer size for the device name
-#define NAME_SIZE 100
+
 
 #define USE_GOOGLENET 0
 
-float minimumConfidence = 0.3;
 
+
+
+
+float minimumConfidence = 0.4;
 #if USE_GOOGLENET
 // GoogleNet image dimensions, network mean values for each channel in BGR order.
 const int networkDimX = 224;
@@ -52,17 +35,6 @@ float * networkMean = 0;
 #endif
 
 
-// 16 bits.  will use this to store half precision floats since C++ has no
-// built in support for it.
-typedef unsigned short half;
-
-
-
-struct labelContents
-{
-  unsigned int numberOfLabels;
-  char ** content;
-};
 
 struct labelContents labels={0};
 
@@ -72,7 +44,10 @@ struct movidiusContext
 {
   ncStatus_t retCode;
   struct ncDeviceHandle_t * deviceHandle;
-  char devName[NAME_SIZE];
+
+  struct ncDeviceHandle_t * deviceHandle0;
+  struct ncDeviceHandle_t * deviceHandle1;
+  struct ncDeviceHandle_t * deviceHandle2;
 
   unsigned int graphFileLen;
   void* graphFileBuf;
@@ -86,264 +61,93 @@ struct movidiusContext
   struct ncTensorDescriptor_t inputTensorDesc;
   struct ncTensorDescriptor_t outputTensorDesc;
 
-  //void* graphHandle;
 };
 
 struct movidiusContext mov={0};
 
-
-
-
-int loadLabels(const char * filename , struct labelContents * labels )
+// Opens one NCS device.
+// Param deviceIndex is the zero-based index of the device to open
+// Param deviceHandle is the address of a device handle that will be set
+//                    if opening is successful
+// Returns true if works or false if doesn't.
+int openOneNCS(int deviceIndex, struct ncDeviceHandle_t **deviceHandle)
 {
-  labels->content = (char ** ) malloc(sizeof(char ** ) * 10000);
-
-  ssize_t readA;
-
-  FILE * fpA = fopen(filename,"r");
-  if  (fpA!=0)
-  {
-
-    char * lineA = NULL;
-    size_t lenA = 0;
-
-    while  ((readA = getline(&lineA, &lenA, fpA)) != -1)
-    {
-      lineA[strcspn(lineA, "\r\n")] = 0; // works for LF, CR, CRLF, LFCR, ...
-
-
-      labels->content[labels->numberOfLabels]=lineA;
-      ++labels->numberOfLabels;
-      lineA=0;
+    ncStatus_t retCode;
+    retCode = ncDeviceCreate(deviceIndex, deviceHandle);
+    if (retCode != NC_OK)
+    {   // failed to get this device's name, maybe none plugged in.
+        printf("Error - NCS device at index %d not found\n", deviceIndex);
+        return 0;
     }
 
-    //if (lineA) { free(lineA); }
-  }
-
-  if (fpA!=0)
-     {
-       fprintf(stderr,"Loaded %u labels \n",labels->numberOfLabels);
-       fclose(fpA);
-       return 1;
-     }
- return 0;
-}
-
-
-
-// Load a graph file
-// caller must free the buffer returned.
-void *LoadFile(const char *path, unsigned int *length)
-{
-	FILE *fp;
-	char *buf;
-
-	fp = fopen(path, "rb");
-	if(fp == NULL)
-		return 0;
-	fseek(fp, 0, SEEK_END);
-	*length = ftell(fp);
-	rewind(fp);
-	if(!(buf = (char*) malloc(*length)))
-	{
-		fclose(fp);
-		return 0;
-	}
-	if(fread(buf, 1, *length, fp) != *length)
-	{
-		fclose(fp);
-		free(buf);
-		return 0;
-	}
-	fclose(fp);
-	return buf;
-}
-
-
-half *LoadImage(const char *path, int reqsize, float *mean)
-{
-	int width, height, cp, i;
-	unsigned char *img, *imgresized;
-	float *imgfp32;
-	half *imgfp16;
-
-	img = stbi_load(path, &width, &height, &cp, 3);
-	if(!img)
-	{
-		printf("The picture %s could not be loaded\n", path);
-		return 0;
-	}
-	imgresized = (unsigned char*) malloc(3*reqsize*reqsize);
-	if(!imgresized)
-	{
-		free(img);
-		perror("malloc");
-		return 0;
-	}
-	stbir_resize_uint8(img, width, height, 0, imgresized, reqsize, reqsize, 0, 3);
-	free(img);
-	imgfp32 = (float*) malloc(sizeof(*imgfp32) * reqsize * reqsize * 3);
-	if(!imgfp32)
-	{
-		free(imgresized);
-		perror("malloc");
-		return 0;
-	}
-	for(i = 0; i < reqsize * reqsize * 3; i++)
-		imgfp32[i] = imgresized[i];
-	free(imgresized);
-	imgfp16 = (half*) malloc(sizeof(*imgfp16) * reqsize * reqsize * 3);
-	if(!imgfp16)
-	{
-		free(imgfp32);
-		perror("malloc");
-		return 0;
-	}
-	for(i = 0; i < reqsize*reqsize; i++)
-	{
-		float blue, green, red;
-                blue = imgfp32[3*i+2];
-                green = imgfp32[3*i+1];
-                red = imgfp32[3*i+0];
-
-                imgfp32[3*i+0] = blue-mean[0];
-                imgfp32[3*i+1] = green-mean[1];
-                imgfp32[3*i+2] = red-mean[2];
-
-                // uncomment to see what values are getting passed to mvncLoadTensor() before conversion to half float
-                //printf("Blue: %f, Grean: %f,  Red: %f \n", imgfp32[3*i+0], imgfp32[3*i+1], imgfp32[3*i+2]);
-	}
-	floattofp16((unsigned char *)imgfp16, imgfp32, 3*reqsize*reqsize);
-	free(imgfp32);
-	return imgfp16;
-}
-
-
-
-
-
-half *LoadImageFromMemory16(const char *buf , unsigned int bufW, unsigned int bufH  , unsigned int bufChans, int reqsize, float *mean)
-{
-	int width=bufW, height=bufH, i;
-	const unsigned char *img = (const unsigned char *) buf;
-	unsigned char *imgresized;
-	float *imgfp32;
-	half *imgfp16;
-
-	if(!img)
-	{
-		printf("The picture could not be loaded\n");
-		return 0;
-	}
-	imgresized = (unsigned char*) malloc(3*reqsize*reqsize);
-	if(!imgresized)
-	{
-		//free(img);
-		perror("malloc");
-		return 0;
-	}
-	stbir_resize_uint8(img, width, height, 0, imgresized, reqsize, reqsize, 0, 3);
-	//free(img);
-	imgfp32 = (float*) malloc(sizeof(*imgfp32) * reqsize * reqsize * 3);
-	if(!imgfp32)
-	{
-		free(imgresized);
-		perror("malloc");
-		return 0;
-	}
-	for(i = 0; i < reqsize * reqsize * 3; i++)
-		imgfp32[i] = imgresized[i];
-	free(imgresized);
-	imgfp16 = (half*) malloc(sizeof(*imgfp16) * reqsize * reqsize * 3);
-	if(!imgfp16)
-	{
-		free(imgfp32);
-		perror("malloc");
-		return 0;
-	}
-	for(i = 0; i < reqsize*reqsize; i++)
-	{
-		float blue, green, red;
-                blue = imgfp32[3*i+2];
-                green = imgfp32[3*i+1];
-                red = imgfp32[3*i+0];
-
-                imgfp32[3*i+0] = blue-mean[0];
-                imgfp32[3*i+1] = green-mean[1];
-                imgfp32[3*i+2] = red-mean[2];
-
-                // uncomment to see what values are getting passed to mvncLoadTensor() before conversion to half float
-                //printf("Blue: %f, Grean: %f,  Red: %f \n", imgfp32[3*i+0], imgfp32[3*i+1], imgfp32[3*i+2]);
-	}
-	floattofp16((unsigned char *)imgfp16, imgfp32, 3*reqsize*reqsize);
-	free(imgfp32);
-	return imgfp16;
-}
-
-
-
-
-
-float *LoadImageFromMemory32(const char *buf , unsigned int bufW, unsigned int bufH  , unsigned int bufChans, int reqsizeX, int reqsizeY, float *mean)
-{
-	int width=bufW, height=bufH, i ;
-	const unsigned char *img = (const unsigned char *) buf;
-	unsigned char *imgresized;
-	float *imgfp32;
-
-	if(!img)
-	{
-		printf("The picture could not be loaded\n");
-		return 0;
-	}
-	imgresized = (unsigned char*) malloc(3*reqsizeX*reqsizeY);
-	if(!imgresized)
-	{
-		perror("malloc");
-		return 0;
-	}
-	stbir_resize_uint8(img, width, height, 0, imgresized, reqsizeX, reqsizeY, 0, 3);
-
-    unsigned int imageSize = sizeof(*imgfp32) * reqsizeX * reqsizeY * 3;
-	imgfp32 = (float*) malloc(imageSize);
-	if(!imgfp32)
-	{
-		free(imgresized);
-		perror("malloc");
-		return 0;
-	}
-	for(i = 0; i < reqsizeX * reqsizeY * 3; i++)
-		imgfp32[i] = imgresized[i];
-	free(imgresized);
-
-    if (mean!=0)
-    {
-	 for(i = 0; i < reqsizeX*reqsizeY; i++)
-	  {
-		float blue, green, red;
-	 	blue = imgfp32[3*i+2];
-		green = imgfp32[3*i+1];
-		red = imgfp32[3*i+0];
-
-		 imgfp32[3*i+0] = blue-mean[0];
-		 imgfp32[3*i+1] = green-mean[1];
-		 imgfp32[3*i+2] = red-mean[2];
-
-
-		// uncomment to see what values are getting passed to mvncLoadTensor() before conversion to half float
-		//printf("Blue: %f, Grean: %f,  Red: %f \n", imgfp32[3*i+0], imgfp32[3*i+1], imgfp32[3*i+2]);
-	  }
+    // Try to open the NCS device via the device name
+    retCode = ncDeviceOpen(*deviceHandle);
+    if (retCode != NC_OK)
+    {   // failed to open the device.
+        printf("Error - Could not open NCS device at index %d\n", deviceIndex);
+        return 0;
     }
-	return imgfp32;
+
+    // deviceHandle is ready to use now.
+    // Pass it to other NC API calls as needed and close it when finished.
+    printf("Successfully opened NCS device at index %d %p!\n", deviceIndex,*deviceHandle);
+    return 1;
 }
 
 
+// Loads a compiled network graph onto the NCS device.
+// Param deviceHandle is the open device handle for the device that will allocate the graph
+// Param graphFilename is the name of the compiled network graph file to load on the NCS
+// Param graphHandle is the address of the graph handle that will be created internally.
+//                   the caller must call mvncDeallocateGraph when done with the handle.
+// Returns true if works or false if doesn't.
+void * loadGraphToNCS(
+                      struct ncDeviceHandle_t* deviceHandle,
+                      const char* graphFilename,
+                      unsigned int * graphFileLength,
+                      struct ncGraphHandle_t** graphHandle
+                     )
+{
+    ncStatus_t retCode;
+    int rc = 0;
+    unsigned int mem, memMax, length;
 
+    // Read in a graph file
+    void* graphFileBuf = LoadFile(graphFilename, graphFileLength);
 
+    length = sizeof(unsigned int);
+    // Read device memory info
+    rc = ncDeviceGetOption(deviceHandle, NC_RO_DEVICE_CURRENT_MEMORY_USED, (void **)&mem, &length);
+    rc += ncDeviceGetOption(deviceHandle, NC_RO_DEVICE_MEMORY_SIZE, (void **)&memMax, &length);
+    if(rc)
+        printf("ncDeviceGetOption failed, rc=%d\n", rc);
+    else
+        printf("Current memory used on device is %d out of %d\n", mem, memMax);
 
+    // allocate the graph
+    retCode = ncGraphCreate("graph", graphHandle);
+    if (retCode)
+    {
+        printf("ncGraphCreate failed, retCode=%d\n", retCode);
+        return 0;
+    }
 
+    // Send graph to device
+    retCode = ncGraphAllocate(deviceHandle, *graphHandle, graphFileBuf, *graphFileLength);
+    if (retCode != NC_OK)
+    {   // error allocating graph
+        printf("Could not allocate graph for file: %s\n", graphFilename);
+        printf("Error from ncGraphAllocate is: %d\n", retCode);
+        return 0;
+    }
 
+    // successfully allocated graph.  Now graphHandle is ready to go.
+    // use graphHandle for other API calls and call ncGraphDestroy
+    // when done with it.
+    printf("Successfully allocated graph for %s\n", graphFilename);
 
+    return graphFileBuf;
+}
 
 
 int initArgs_Movidius(int argc, char *argv[])
@@ -353,44 +157,19 @@ int initArgs_Movidius(int argc, char *argv[])
     int loglevel = 2;
     mov.retCode = ncGlobalSetOption(NC_RW_LOG_LEVEL, &loglevel, sizeof(loglevel));
 
-    mov.retCode = ncDeviceCreate(0, &mov.deviceHandle);
-    if(mov.retCode != NC_OK)
+
+    if (!openOneNCS(0 /* Device ID for first device */,&mov.deviceHandle))
     {
-        printf("Error - No NCS devices found.\n");
-        printf("    ncStatus value: %d\n", mov.retCode);
+        printf("Could not open NCS device 0\n");
         return 0;
+
     }
 
-    // Try to open the NCS device via the device name
-    mov.retCode = ncDeviceOpen(mov.deviceHandle);
-    if (mov.retCode != NC_OK)
-    {   // failed to open the device.
-        printf("Could not open NCS device\n");
-        return 0;
-    }
-
-    // deviceHandle is ready to use now.
-    // Pass it to other NC API calls as needed and close it when finished.
-    printf("Successfully opened NCS device!\n");
-
-
-    // Now read in a graph file
-    mov.graphFileBuf = LoadFile(GRAPH_FILE_NAME, &mov.graphFileLen);
-
-    // Init graph handle
-    mov.retCode = ncGraphCreate("graph", &mov.graphHandle);
-    if (mov.retCode != NC_OK)
+    mov.graphFileBuf=loadGraphToNCS(mov.deviceHandle,GRAPH_FILE_NAME,&mov.graphFileLen,&mov.graphHandle);
+    if (!mov.graphFileBuf)
     {
-        printf("Error - ncGraphCreate failed\n");
-        return 0;
-    }
-
-    // Send graph to device
-    mov.retCode = ncGraphAllocate(mov.deviceHandle, mov.graphHandle, mov.graphFileBuf, mov.graphFileLen);
-    if (mov.retCode != NC_OK)
-    {   // error allocating graph
         printf("Could not allocate graph for file: %s\n", GRAPH_FILE_NAME);
-        printf("Error from ncGraphAllocate is: %d\n", mov.retCode);
+        return 0;
     }
     else
     {
@@ -443,40 +222,65 @@ int initArgs_Movidius(int argc, char *argv[])
 
 
 
-int processTinyYOLO(float * results , unsigned int resultsLength)
+int processTinyYOLO(float * results , unsigned int resultsLength ,char * pixels, unsigned int imageWidth, unsigned int imageHeight)
 {
  printf("got back %u resultData \n", resultsLength );
- int i=0;
 
+
+
+ int i=0;
  float x,y,w,h,confidence,category;
 
- for (i=0; i<resultsLength; i++)
+ for (i=0; i<resultsLength/6; i++)
    {
+    #define TRANSPOSED 0
 
-    category   =  results[i*6+0];
-    x =  results[i*6+1];
-    y =  results[i*6+2];
-    w =  results[i*6+3];
-    h =  results[i*6+4];
-    confidence =  results[i*6+5];
+    #if TRANSPOSED
+     category   =  results[(i+0)*6];
+     x =  results[(i+1)*6];
+     y =  results[(i+2)*6];
+     w =  results[(i+3)*6]/2;
+     h =  results[(i+4)*6]/2;
+     confidence =  results[(i+5)*6];
+    #else
+     category   =  results[(i*6)+0];
+     x =  results[(i*6)+1];
+     y =  results[(i*6)+2];
+     w =  results[(i*6)+3]/2;
+     h =  results[(i*6)+4]/2;
+     confidence =  results[(i*6)+5];
+    #endif
+
+	float xmin = x-w , xmax = x+w , ymin = y-h , ymax = y+h;
+    if (xmin<0)          { xmin = 0; }
+    if (ymin<0)          { ymin = 0; }
+    if (xmax>imageWidth) { xmax = imageWidth;  }
+    if (ymax>imageHeight){ ymax = imageHeight; }
 
 
+    x*=imageWidth; y*=imageHeight;
+    w*=imageWidth; h*=imageHeight;
 
+    xmin*=imageWidth; ymin*=imageHeight;
+    xmax*=imageWidth; ymax*=imageHeight;
 
-    printf("%u= ",i);
-    printf("cat=%0.2f ",category);
-    printf("x=%0.2f ",x);
-    printf("y=%0.2f ",y);
-    printf("w=%0.2f ",w);
-    printf("h=%0.2f ",h);
-    printf("conf=%0.2f\n",confidence);
+    if (confidence>minimumConfidence)
+     {
+      printf("%u> ",i);
+      printf("cat=%0.2f ",category);
+      printf("x1=%0.2f ",xmin);
+      printf("y1=%0.2f ",ymin);
+      printf("x2=%0.2f ",xmax);
+      printf("y2=%0.2f ",ymax);
+      printf("conf=%0.2f\n",confidence);
+     }
    }
  return 1;
 }
 
 
 
-int processGoogleNet(float * results , unsigned int resultsLength)
+int processGoogleNet(float * results , unsigned int resultsLength )
 {
   float maxResult = 0.0;
   int maxIndex = -1;
@@ -581,7 +385,7 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
                 //printf("resultData length is %d \n", numResults);
                 if (packedInfo)
                 {
-                  processTinyYOLO(fresult, (unsigned int) outputDataLength/6);
+                  processTinyYOLO(fresult, numResults , data , width , height);
                 }  else
                 {
                   processGoogleNet(fresult,numResults);
@@ -601,6 +405,40 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
   }
   return 0;
 }
+
+
+int stop_Movidius()
+{
+ mov.retCode = ncGraphDestroy(&mov.graphHandle);
+ if (mov.retCode != NC_OK)
+        {
+            printf("Error - Failed to deallocate graph!");
+            exit(-1);
+        }
+
+  mov.retCode = ncFifoDestroy(&mov.bufferOut);
+  if (mov.retCode != NC_OK)
+        {
+            printf("Error - Failed to deallocate fifo!");
+            exit(-1);
+        }
+
+  mov.retCode = ncFifoDestroy(&mov.bufferIn);
+  if (mov.retCode != NC_OK)
+        {
+            printf("Error - Failed to deallocate fifo!");
+            exit(-1);
+        }
+  mov.graphHandle = NULL;
+
+
+  if (mov.graphFileBuf!=0) { free(mov.graphFileBuf); }
+  mov.retCode = ncDeviceClose(mov.deviceHandle);
+  mov.deviceHandle = NULL;
+
+ return 1;
+}
+
 
 
 
@@ -645,40 +483,6 @@ int cleanup_Movidius()
 
  return 0;
 }
-
-int stop_Movidius()
-{
- mov.retCode = ncGraphDestroy(&mov.graphHandle);
- if (mov.retCode != NC_OK)
-        {
-            printf("Error - Failed to deallocate graph!");
-            exit(-1);
-        }
-
-  mov.retCode = ncFifoDestroy(&mov.bufferOut);
-  if (mov.retCode != NC_OK)
-        {
-            printf("Error - Failed to deallocate fifo!");
-            exit(-1);
-        }
-
-  mov.retCode = ncFifoDestroy(&mov.bufferIn);
-  if (mov.retCode != NC_OK)
-        {
-            printf("Error - Failed to deallocate fifo!");
-            exit(-1);
-        }
-  mov.graphHandle = NULL;
-
-
-  free(mov.graphFileBuf);
-  mov.retCode = ncDeviceClose(mov.deviceHandle);
-  mov.deviceHandle = NULL;
-
- return 1;
-}
-
-
 
 
 
