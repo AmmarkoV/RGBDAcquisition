@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mvnc.h>
+#include <math.h>
 #include "imageConversions.h"
 
 
@@ -34,6 +35,10 @@ float * networkMean = 0;
 #define GRAPH_FILE_NAME "../processors/Movidius/tinyyolo/graph"
 #endif
 
+struct box
+{
+    float x,y,w,h;
+};
 
 
 struct labelContents labels={0};
@@ -221,10 +226,42 @@ int initArgs_Movidius(int argc, char *argv[])
 
 
 
+void  convert_yolo_detections(float *predictions, int classes, int num, int square, int side, float w, float h, float thresh, float **probs,struct  box *boxes, int only_objectness)
+{
+    int i,j,n;
+    for (i = 0; i < side*side; ++i){
+        int row = i / side;
+        int col = i % side;
+        for(n = 0; n < num; ++n){
+            int index = i*num + n;
+            int p_index = side*side*classes + i*num + n;
+            float scale = predictions[p_index];
+//printf("side : %d , index : %d , p_index : %d , prediction : %f\n",side,index,p_index,scale);
+            int box_index = side*side*(classes + num) + (i*num + n)*4;
+            boxes[index].x = (predictions[box_index + 0] + col) / side * w;
+            boxes[index].y = (predictions[box_index + 1] + row) / side * h;
+            boxes[index].w = pow(predictions[box_index + 2], (square?2:1)) * w;
+            boxes[index].h = pow(predictions[box_index + 3], (square?2:1)) * h;
+
+			for(j = 0; j < classes; ++j){
+				int class_index = i*classes;
+				float prob = scale*predictions[class_index+j]; //
+
+				probs[index][j] = (prob > thresh) ? prob : 0;
+			}
+
+			if(only_objectness){
+				probs[index][0] = scale;
+			}
+        }
+    }
+}
+
+
 int processTinyYOLO(float * results , unsigned int resultsLength ,char * pixels, unsigned int imageWidth, unsigned int imageHeight)
 {
  printf("got back %u resultData \n", resultsLength );
-
+ return 0;
 
 
  int i=0;
@@ -257,11 +294,11 @@ int processTinyYOLO(float * results , unsigned int resultsLength ,char * pixels,
     if (ymax>imageHeight){ ymax = imageHeight; }
 
 
-    x*=imageWidth; y*=imageHeight;
-    w*=imageWidth; h*=imageHeight;
+    //x*=imageWidth; y*=imageHeight;
+    //w*=imageWidth; h*=imageHeight;
 
-    xmin*=imageWidth; ymin*=imageHeight;
-    xmax*=imageWidth; ymax*=imageHeight;
+    //xmin*=imageWidth; ymin*=imageHeight;
+    //xmax*=imageWidth; ymax*=imageHeight;
 
     if (confidence>minimumConfidence)
      {
