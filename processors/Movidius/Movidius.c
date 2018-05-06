@@ -16,7 +16,7 @@
 
 
 
-float minimumConfidence = 0.4;
+float minimumConfidence = 0.3;
 #if USE_GOOGLENET
 // GoogleNet image dimensions, network mean values for each channel in BGR order.
 const int networkDimX = 224;
@@ -176,7 +176,6 @@ int initArgs_Movidius(int argc, char *argv[])
         // successfully allocated graph.  Now graphHandle is ready to go.
         // use graphHandle for other API calls and call mvncDeallocateGraph
         // when done with it.
-        printf("Successfully allocated graph for %s\n", GRAPH_FILE_NAME);
 
         // Read tensor descriptors
         unsigned int length = sizeof(struct ncTensorDescriptor_t);
