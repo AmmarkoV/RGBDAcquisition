@@ -36,10 +36,6 @@ float * networkMean = 0;
 #define GRAPH_FILE_NAME "../processors/Movidius/tinyyolo/graph"
 #endif
 
-
-
-
-
 struct labelContents labels={0};
 
 

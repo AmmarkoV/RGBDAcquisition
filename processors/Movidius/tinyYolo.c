@@ -20,6 +20,7 @@ const int BATCH_SIZE=1;
 #define NUM_TOP_CLASSES 2
 
 
+float colors[6][3] = { {1,0,1}, {0,0,1},{0,1,1},{0,1,0},{1,1,0},{1,0,0} };
 
 struct box{
     float x, y, w, h;
@@ -32,6 +33,19 @@ struct sortable_bbox{
     int idx_class;
     float **probs;
 };
+
+
+float get_color(int c, int x, int max)
+{
+    float ratio = ((float)x/max)*5;
+    int i = floor(ratio);
+    int j = ceil(ratio);
+    ratio -= i;
+    float r = (1-ratio) * colors[i][c] + ratio*colors[j][c];
+    //printf("%f\n", r);
+    return r;
+}
+
 
 int nms_comparator(const void *pa, const void *pb)
 {
@@ -140,7 +154,9 @@ void  convert_yolo_detections(float *predictions, int classes, int num, int squa
 
 
 //https://github.com/TLESORT/YOLO-TensorRT-GIE-/blob/master/YOLODraw.cpp
-void draw_detections(int num, float thresh, struct box *boxes, float **probs, const char **names)
+void draw_detections(
+                     char * pixels, unsigned int imageWidth, unsigned int imageHeight  ,
+                     int num, float thresh, struct box *boxes, float **probs, const char **names)
 {
     int i;
     for(i = 0; i < num; ++i){
@@ -154,23 +170,27 @@ void draw_detections(int num, float thresh, struct box *boxes, float **probs, co
         float prob = probs[i][idx_class];
         if(prob > thresh){
             int width = pow(prob, 1./2.)*10+1;
-            printf("%s: %.2f\n", names[idx_class], prob);
-            /*
-            int offset = idx_class*17 % NUM_CLASSES;
-            float red = get_color(0,offset,NUM_CLASSES) * 255;
-            float green = get_color(1,offset,NUM_CLASSES) * 255;
-            float blue = get_color(2,offset,NUM_CLASSES) * 255;
-            box b = boxes[i];
 
-            int left  = (b.x-b.w/2.)*im.cols;
-            int right = (b.x+b.w/2.)*im.cols;
-            int top   = (b.y-b.h/2.)*im.rows;
-            int bot   = (b.y+b.h/2.)*im.rows;
+            int offset = idx_class*17 % NUM_CLASSES;
+            float red   = get_color(0,offset,NUM_CLASSES) * 255;
+            float green = get_color(1,offset,NUM_CLASSES) * 255;
+            float blue  = get_color(2,offset,NUM_CLASSES) * 255;
+            struct box b = boxes[i];
+
+            float left  = (float) ((float) b.x-b.w/2.)*imageWidth;
+            float right = (float) ((float) b.x+b.w/2.)*imageWidth;
+            float top   = (float) ((float) b.y-b.h/2.)*imageHeight;
+            float bot   = (float) ((float) b.y+b.h/2.)*imageHeight;
+
 
             if(left < 0) left = 0;
-            if(right > im.cols-1) right = im.cols-1;
+            if(right > imageWidth-1) right = imageWidth-1;
             if(top < 0) top = 0;
-            if(bot > im.rows-1) bot = im.rows-1;
+            if(bot > imageHeight-1) bot = imageHeight-1;
+
+            printf("%s: %.2f - (%0.2f,%0.2f)->(%0.2f,%0.2f)\n", names[idx_class], prob , left,right,top,bot);
+            /*
+
 			cv::Size szTxt = cv::getTextSize(names[idx_class], cv::FONT_HERSHEY_SIMPLEX, TEXT_SCALE, 1, NULL);
 			cv::rectangle(im, cv::Rect(left, top-1-szTxt.height, szTxt.width, szTxt.height), cv::Scalar(red, green, blue), -1);
 			//cv::putText(im, names[idx_class], cv::Point(left, top-2), cv::FONT_HERSHEY_SIMPLEX, TEXT_SCALE, cv::Scalar(255, 255, 255), 2);
@@ -184,11 +204,6 @@ void draw_detections(int num, float thresh, struct box *boxes, float **probs, co
 
 int processTinyYOLO(struct labelContents * labels, float * results , unsigned int resultsLength ,char * pixels, unsigned int imageWidth, unsigned int imageHeight , float minimumConfidence)
 {
- printf("got back %u resultData \n", resultsLength );
-
-
-
-
     struct box *boxes = (struct box*)calloc(NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, sizeof(struct box));
 	float **probs = (float**)calloc(NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, sizeof(float *));
 	for(int j = 0; j < NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES; ++j)
@@ -199,11 +214,18 @@ int processTinyYOLO(struct labelContents * labels, float * results , unsigned in
 	do_nms_sort(boxes, probs, NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, NUM_CLASSES, (float)0.5);
 
 
-    draw_detections( NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, minimumConfidence, boxes, probs, labels->content);
+    draw_detections( pixels,imageWidth, imageHeight ,
+                     NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, minimumConfidence, boxes, probs,(const char **) labels->content);
 
- return 0;
+
+    free(boxes);
+      for(int j = 0; j < NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES; ++j)
+      free (probs[j]);
+    free(probs);
+
+ return 1;
 /*
-
+ printf("got back %u resultData \n", resultsLength );
  int i=0;
  float x,y,w,h,confidence,category;
 
