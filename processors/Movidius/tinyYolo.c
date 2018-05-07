@@ -153,6 +153,69 @@ void  convert_yolo_detections(float *predictions, int classes, int num, int squa
 }
 
 
+
+
+
+int blitRGB( char * target , unsigned int targetWidth , unsigned int targetHeight ,
+                     unsigned char r , unsigned char g , unsigned b,
+                     unsigned int xS,unsigned int yS, unsigned int width , unsigned int height)
+{
+  fprintf(stderr,"blitRGB(%u,%u,%u,%u)\n",xS,yS,width,height);
+
+  if (xS>=targetWidth) { xS=targetWidth-1;  }
+  if (yS>=targetHeight) { yS=targetHeight-1;  }
+
+  if (xS+width>=targetWidth) { width=targetWidth-xS-1;  }
+  if (yS+height>=targetHeight) { height=targetHeight-yS-1;  }
+
+  unsigned int x,y;
+  for (y=xS; y<height; y++)
+  {
+    for (x=yS; x<width; x++)
+    {
+      unsigned int position = ((x*3) + (y*targetWidth*3));
+
+      target[ position + 0  ] = r;
+      target[ position + 1  ] = g;
+      target[ position + 2  ] = b;
+    }
+  }
+ return 1;
+}
+
+
+
+int drawRectangleRGB(char * target,  unsigned int targetWidth , unsigned int targetHeight ,
+                     unsigned char r , unsigned char g , unsigned char b,unsigned int thickness,
+                     unsigned int x1,unsigned int y1, unsigned int x2, unsigned int y2)
+{
+  //Make sure x1,y1, x2,y2 are ordered correctly
+  unsigned int tmp;
+  if (x1>x2)  { tmp=x2; x2=x1; x1=tmp; }
+  if (y1>y2)  { tmp=y2; y2=y1; y1=tmp; }
+
+
+  //Make sure x1,y1, x2,y2 have enough space for our thickness
+  if (x1+thickness>=targetWidth)  { x1=targetWidth-thickness-1;  }
+  if (y1+thickness>=targetHeight) { y1=targetHeight-thickness-1;  }
+  if (x2<thickness)               { x2=thickness;  }
+  if (y2<thickness)               { y2=thickness;  }
+
+
+  //Calculate width/height
+  unsigned int width = x2-x1;
+  unsigned int height = y2-y1;
+
+  //Blit in the rectangle
+  blitRGB(target,targetWidth,targetHeight, r,g ,b,  x1 ,y1 , width , thickness);
+  blitRGB(target,targetWidth,targetHeight, r,g ,b,  x1 ,y2-thickness , width , thickness);
+  blitRGB(target,targetWidth,targetHeight, r,g ,b,  x1 ,y1 , thickness , height );
+  blitRGB(target,targetWidth,targetHeight, r,g ,b,  x2-thickness , y1 , thickness, height);
+  return 1;
+}
+
+
+
 //https://github.com/TLESORT/YOLO-TensorRT-GIE-/blob/master/YOLODraw.cpp
 void draw_detections(
                      char * pixels, unsigned int imageWidth, unsigned int imageHeight  ,
@@ -169,7 +232,7 @@ void draw_detections(
 		}
         float prob = probs[i][idx_class];
         if(prob > thresh){
-            int width = pow(prob, 1./2.)*10+1;
+            //int width = pow(prob, 1./2.)*10+1;
 
             int offset = idx_class*17 % NUM_CLASSES;
             float red   = get_color(0,offset,NUM_CLASSES) * 255;
@@ -177,10 +240,14 @@ void draw_detections(
             float blue  = get_color(2,offset,NUM_CLASSES) * 255;
             struct box b = boxes[i];
 
-            float left  = (float) ((float) b.x-b.w/2.)*imageWidth;
-            float right = (float) ((float) b.x+b.w/2.)*imageWidth;
-            float top   = (float) ((float) b.y-b.h/2.)*imageHeight;
-            float bot   = (float) ((float) b.y+b.h/2.)*imageHeight;
+            float halfW = (float) b.w/2.;
+            float halfH = (float) b.h/2.;
+
+
+            float left  = (float) (b.x-halfW)*imageWidth;
+            float right = (float) (b.x+halfW)*imageWidth;
+            float top   = (float) (b.y-halfH)*imageHeight;
+            float bot   = (float) (b.y+halfH)*imageHeight;
 
 
             if(left < 0) left = 0;
@@ -188,7 +255,9 @@ void draw_detections(
             if(top < 0) top = 0;
             if(bot > imageHeight-1) bot = imageHeight-1;
 
-            printf("%s: %.2f - (%0.2f,%0.2f)->(%0.2f,%0.2f)\n", names[idx_class], prob , left,right,top,bot);
+            printf("%s: %.2f - (%0.2f,%0.2f)->(%0.2f,%0.2f)\n", names[idx_class], prob , left,top,right,bot);
+
+            drawRectangleRGB(pixels,imageWidth,imageHeight, (unsigned char) red,(unsigned char) green, (unsigned char) blue, 3, left,top,right,bot);
             /*
 
 			cv::Size szTxt = cv::getTextSize(names[idx_class], cv::FONT_HERSHEY_SIMPLEX, TEXT_SCALE, 1, NULL);

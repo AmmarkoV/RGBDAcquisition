@@ -247,6 +247,7 @@ float *LoadImageFromMemory32(const char *buf , unsigned int bufW, unsigned int b
 		 imgfp32[3*i+0] = blue-mean[0];
 		 imgfp32[3*i+1] = green-mean[1];
 		 imgfp32[3*i+2] = red-mean[2];
+
 		// uncomment to see what values are getting passed to mvncLoadTensor() before conversion to half float
 		//printf("Blue: %f, Grean: %f,  Red: %f \n", imgfp32[3*i+0], imgfp32[3*i+1], imgfp32[3*i+2]);
 	  }
