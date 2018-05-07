@@ -18,9 +18,9 @@
 
 
 
-float minimumConfidence = 0.6;
 #if USE_GOOGLENET
 // GoogleNet image dimensions, network mean values for each channel in BGR order.
+float minimumConfidence = 0.6;
 const int networkDimX = 224;
 const int networkDimY = 224;
 int packedInfo = 0;
@@ -28,6 +28,7 @@ float networkMean[] = {0.40787054*255.0, 0.45752458*255.0, 0.48109378*255.0};
 #define WORDS_FILE_NAME "../processors/Movidius/googlenet/words.txt"
 #define GRAPH_FILE_NAME "../processors/Movidius/googlenet/graph"
 #else
+float minimumConfidence = 0.9;
 const int networkDimX = 448;
 const int networkDimY = 448;
 int packedInfo = 1;

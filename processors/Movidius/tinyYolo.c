@@ -22,20 +22,18 @@ const int BATCH_SIZE=1;
 
 float colors[6][3] = { {1,0,1}, {0,0,1},{0,1,1},{0,1,0},{1,1,0},{1,0,0} };
 
-struct box{
+struct box
+{
     float x, y, w, h;
 };
 
 
-
-struct sortable_bbox{
+struct sortable_bbox
+{
     int index;
     int idx_class;
     float **probs;
 };
-
-
-
 
 
 float get_color(int c, int x, int max)
@@ -71,25 +69,25 @@ float overlap(float x1, float w1, float x2, float w2)
     return right - left;
 }
 
-float box_intersection(struct box a, struct box b)
+float box_intersection(struct box *a, struct box *b)
 {
-    float w = overlap(a.x, a.w, b.x, b.w);
-    float h = overlap(a.y, a.h, b.y, b.h);
+    float w = overlap(a->x, a->w, b->x, b->w);
+    float h = overlap(a->y, a->h, b->y, b->h);
     if(w < 0 || h < 0) return 0;
     float area = w*h;
     return area;
 }
 
-float box_union(struct box a, struct box b)
+float box_union(struct box *a, struct box *b)
 {
     float i = box_intersection(a, b);
-    float u = a.w*a.h + b.w*b.h - i;
+    float u = a->w*a->h + b->w*b->h - i;
     return u;
 }
 
-float box_iou(struct box a, struct box b)
+float box_iou(struct box *a, struct box *b)
 {
-    return box_intersection(a, b)/box_union(a, b);
+    return (float) box_intersection(a, b)/box_union(a, b);
 }
 
 //https://github.com/TLESORT/YOLO-TensorRT-GIE-/blob/master/YOLODraw.cpp
@@ -114,7 +112,7 @@ void do_nms_sort(struct box *boxes, float **probs, int total, int classes, float
             struct box a = boxes[s[i].index];
             for(j = i+1; j < total; ++j){
                 struct box b = boxes[s[j].index];
-                if (box_iou(a, b) > thresh){
+                if (box_iou(&a, &b) > thresh){
                     probs[s[j].index][k] = 0;
                 }
             }
@@ -123,37 +121,7 @@ void do_nms_sort(struct box *boxes, float **probs, int total, int classes, float
     free(s);
 }
 
-//https://github.com/TLESORT/YOLO-TensorRT-GIE-/blob/master/YOLODraw.cpp
-void  convert_yolo_detections(float *predictions, int classes, int num, int square, int side, float w, float h, float thresh, float **probs,struct  box *boxes, int only_objectness)
-{
-    int i,j,n;
-    for (i = 0; i < side*side; ++i){
-        int row = i / side;
-        int col = i % side;
-        for(n = 0; n < num; ++n){
-            int index = i*num + n;
-            int p_index = side*side*classes + i*num + n;
-            float scale = predictions[p_index];
-            //printf("side : %d , index : %d , p_index : %d , prediction : %f\n",side,index,p_index,scale);
-            int box_index = side*side*(classes + num) + (i*num + n)*4;
-            boxes[index].x = (predictions[box_index + 0] + col) / side * w;
-            boxes[index].y = (predictions[box_index + 1] + row) / side * h;
-            boxes[index].w = pow(predictions[box_index + 2], (square?2:1)) * w;
-            boxes[index].h = pow(predictions[box_index + 3], (square?2:1)) * h;
 
-			for(j = 0; j < classes; ++j){
-				int class_index = i*classes;
-				float prob = scale*predictions[class_index+j]; //
-
-				probs[index][j] = (prob > thresh) ? prob : 0;
-			}
-
-			if(only_objectness){
-				probs[index][0] = scale;
-			}
-        }
-    }
-}
 
 
 //https://github.com/TLESORT/YOLO-TensorRT-GIE-/blob/master/YOLODraw.cpp
@@ -211,36 +179,91 @@ void draw_detections(
 
 
 
+//https://github.com/TLESORT/YOLO-TensorRT-GIE-/blob/master/YOLODraw.cpp
+void  convert_yolo_detections(float *predictions, int classes, int num, int square, int side, float w, float h, float thresh, float **probs,struct  box *boxes, int only_objectness)
+{
+// Interpret the output from a single inference of TinyYolo (GetResult)
+// and filter out objects/boxes with low probabilities.
+// output is the array of floats returned from the API GetResult but converted
+// to float32 format.
+// input_image_width is the width of the input image
+// input_image_height is the height of the input image
+// Returns a list of lists. each of the inner lists represent one found object and contain
+// the following 6 values:
+//    string that is network classification ie 'cat', or 'chair' etc
+//    float value for box center X pixel location within source image
+//    float value for box center Y pixel location within source image
+//    float value for box width in pixels within source image
+//    float value for box height in pixels within source image
+//    float value that is the probability for the network classification.
+
+    int i,j,n;
+    for (i = 0; i < side*side; ++i)
+      {
+        int row = i / side;
+        int col = i % side;
+
+        for(n = 0; n < num; ++n)
+        {
+            int index = i*num + n;
+            int p_index = side*side*classes + i*num + n;
+            float scale = predictions[p_index];
+            //printf("side : %d , index : %d , p_index : %d , prediction : %f\n",side,index,p_index,scale);
+            int box_index = side*side*(classes + num) + (i*num + n)*4;
+            boxes[index].x = (float) (predictions[box_index + 0] + col) / (side * w);
+            boxes[index].y = (float) (predictions[box_index + 1] + row) / (side * h);
+            boxes[index].w = pow(predictions[box_index + 2], square /*(square?2:1)*/) * w;
+            boxes[index].h = pow(predictions[box_index + 3], square /*(square?2:1)*/) * h;
+
+			for(j = 0; j < classes; ++j)
+               {
+				int class_index = i*classes;
+				float prob = scale*predictions[class_index+j]; //
+
+
+                if (prob > thresh) { probs[index][j] = prob; } else
+                                   { probs[index][j] = 0.0;  }
+			   }
+
+			if(only_objectness)
+               {
+				probs[index][0] = scale;
+			   }
+        }
+    }
+}
+
+
 int processTinyYOLO(struct labelContents * labels, float * results , unsigned int resultsLength ,char * pixels, unsigned int imageWidth, unsigned int imageHeight , float minimumConfidence)
 {
-
-  unsigned int fontWidth;
-  unsigned int fontHeight;
-  unsigned int fontBytesPerPixel;
-  unsigned int fontChannels;
-
-  unsigned char * fontPixels = ReadPNMDrawing(0,"/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Drawing/font.pnm"
-                                              ,&fontWidth,&fontHeight,0,&fontBytesPerPixel , &fontChannels);
-
-  if (fontPixels!=0)
-  {
-   writePPMDrawing("/home/ammar/Documents/Programming/FORTH/input_acquisition/processors/Movidius/out.pnm",fontPixels , fontWidth , fontHeight,fontChannels,fontBytesPerPixel);
-
-   free(fontPixels);
-  }
-
-  //  drawRectangleRGB(pixels,imageWidth,imageHeight, 255,0,0, 5 , 300,220, 480,320);
-  //
-  //return 1;
-
+    printf("got back %u resultData \n", resultsLength );
     struct box *boxes = (struct box*)calloc(NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, sizeof(struct box));
 	float **probs = (float**)calloc(NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, sizeof(float *));
 	for(int j = 0; j < NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES; ++j)
 		probs[j] = (float*)calloc(NUM_CLASSES, sizeof(float *));
 
+	convert_yolo_detections(
+                             results,          //predictions
+                             NUM_CLASSES,      //classes
+                             NUM_TOP_CLASSES,  //num
+                             2,                //square
+                             NUM_CELLS,        //side
+                             1,                //w
+                             1,                //h
+                             minimumConfidence,//threshold
+                             probs,            //probability Output
+                             boxes,            //Objects Output
+                             0                 //onlyObjectness
+                            );
 
-	convert_yolo_detections(results, NUM_CLASSES, NUM_TOP_CLASSES, 1, NUM_CELLS, 1, 1, minimumConfidence, probs, boxes, 0);
-	do_nms_sort(boxes, probs, NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, NUM_CLASSES, (float)0.5);
+
+	do_nms_sort(
+                 boxes, //boxes
+                 probs, //probabilities
+                 NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, //total
+                 NUM_CLASSES,  //classes
+                 minimumConfidence   //threshold
+                );
 
 
     draw_detections( pixels,imageWidth, imageHeight ,

@@ -84,8 +84,10 @@ int linkToProcessor(const char * processorName,const char * processorLibPath ,  
 
 
 
-  fprintf(stderr," Processor Address Table\n");
+  fprintf(stderr," Processor Loaded..\n");
   fprintf(stderr,"  Missing Calls = %u \n",missingCalls);
+  /*
+  fprintf(stderr," Processor Address Table\n");
   fprintf(stderr," initArgs=%p\n ",processors[processorID].initArgs  );
   fprintf(stderr," setConfigStr=%p\n ",processors[processorID].setConfigStr);
   fprintf(stderr," setConfigInt=%p\n ",processors[processorID].setConfigInt);
@@ -97,7 +99,7 @@ int linkToProcessor(const char * processorName,const char * processorLibPath ,  
   fprintf(stderr," processData=%p\n ",processors[processorID].processData);
   fprintf(stderr," cleanup=%p\n ",processors[processorID].cleanup );
   fprintf(stderr," stop=%p\n ",processors[processorID].stop );
-
+*/
 
   if (missingCalls==10)
   {
