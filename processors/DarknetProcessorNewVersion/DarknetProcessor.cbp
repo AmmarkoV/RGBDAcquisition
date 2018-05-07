@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="DarknetProcessor" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="./libDarknetProcessor" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="./libDarknetProcessor" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="`pkg-config --cflags opencv`" />
+			<Add option="-fPIC" />
+			<Add directory="/usr/local/cuda/include/ " />
+		</Compiler>
+		<Linker>
+			<Add option="`pkg-config --libs opencv`" />
+			<Add option="-L/usr/local/cuda/lib64" />
+			<Add library="../../3dparty/darknet/libdarknet.so" />
+			<Add library="rt" />
+			<Add library="dl" />
+			<Add library="m" />
+			<Add library="pthread" />
+			<Add library="cuda" />
+			<Add library="cudart" />
+			<Add library="cublas" />
+			<Add library="curand" />
+			<Add library="stdc++" />
+		</Linker>
+		<Unit filename="../../../../../3dParty/darknet/include/darknet.h" />
+		<Unit filename="DarknetProcessor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="DarknetProcessor.h" />
+		<Unit filename="recordOutput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="recordOutput.h" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
