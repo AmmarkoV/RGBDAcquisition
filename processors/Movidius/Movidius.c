@@ -20,7 +20,7 @@
 
 #if USE_GOOGLENET
 // GoogleNet image dimensions, network mean values for each channel in BGR order.
-float minimumConfidence = 0.6;
+float minimumConfidence = 0.4;
 const int networkDimX = 224;
 const int networkDimY = 224;
 int packedInfo = 0;

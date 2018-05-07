@@ -50,9 +50,9 @@ float get_color(int c, int x, int max)
 
 int nms_comparator(const void *pa, const void *pb)
 {
-    struct sortable_bbox a = *(struct sortable_bbox *)pa;
-    struct sortable_bbox b = *(struct sortable_bbox *)pb;
-    float diff = a.probs[a.index][b.idx_class] - b.probs[b.index][b.idx_class];
+    struct sortable_bbox *a = (struct sortable_bbox *)pa;
+    struct sortable_bbox *b = (struct sortable_bbox *)pb;
+    float diff = a->probs[a->index][b->idx_class] - b->probs[b->index][b->idx_class];
     if(diff < 0) return 1;
     else if(diff > 0) return -1;
     return 0;
@@ -90,37 +90,6 @@ float box_iou(struct box *a, struct box *b)
     return (float) box_intersection(a, b)/box_union(a, b);
 }
 
-//https://github.com/TLESORT/YOLO-TensorRT-GIE-/blob/master/YOLODraw.cpp
-void do_nms_sort(struct box *boxes, float **probs, int total, int classes, float thresh)
-{
-    int i, j, k;
-    struct sortable_bbox *s = (struct sortable_bbox*)calloc(total, sizeof(struct sortable_bbox));
-
-    for(i = 0; i < total; ++i){
-        s[i].index = i;
-        s[i].idx_class = 0;
-        s[i].probs = probs;
-    }
-
-    for(k = 0; k < classes; ++k){
-        for(i = 0; i < total; ++i){
-            s[i].idx_class = k;
-        }
-        qsort(s, total, sizeof(struct sortable_bbox), nms_comparator);
-        for(i = 0; i < total; ++i){
-            if(probs[s[i].index][k] == 0) continue;
-            struct box a = boxes[s[i].index];
-            for(j = i+1; j < total; ++j){
-                struct box b = boxes[s[j].index];
-                if (box_iou(&a, &b) > thresh){
-                    probs[s[j].index][k] = 0;
-                }
-            }
-        }
-    }
-    free(s);
-}
-
 
 
 
@@ -130,16 +99,24 @@ void draw_detections(
                      int num, float thresh, struct box *boxes, float **probs, const char **names)
 {
     int i;
-    for(i = 0; i < num; ++i){
+    for(i = 0; i < num; ++i)
+     {
 		float max = -1e10; int idx_class = -1;
-		for (int j = 0; j < NUM_CLASSES; ++j) {
-			if (probs[i][j] > max) {
+
+		//Find biggest probability for i
+		for (int j = 0; j < NUM_CLASSES; ++j)
+		{
+			if (probs[i][j] > max)
+			{
 				max = probs[i][j];
 				idx_class = j;
 			}
 		}
-        float prob = probs[i][idx_class];
-        if(prob > thresh){
+
+        float prob = 0.0;
+        if (idx_class!=-1) { prob = probs[i][idx_class]; }
+        if(prob > thresh)
+         {
             //int width = pow(prob, 1./2.)*10+1;
 
             int offset = idx_class*17 % NUM_CLASSES;
@@ -152,16 +129,16 @@ void draw_detections(
             float halfH = (float) b.h/2.;
 
 
-            float left  = (float) (b.x-halfW)*imageWidth;
-            float right = (float) (b.x+halfW)*imageWidth;
-            float top   = (float) (b.y-halfH)*imageHeight;
-            float bot   = (float) (b.y+halfH)*imageHeight;
+            float left  = (float) (b.x-halfW);
+            float right = (float) (b.x+halfW);
+            float top   = (float) (b.y-halfH);
+            float bot   = (float) (b.y+halfH);
 
 
-            if(left < 0) left = 0;
-            if(right > imageWidth-1) right = imageWidth-1;
-            if(top < 0) top = 0;
-            if(bot > imageHeight-1) bot = imageHeight-1;
+            if(left < 0)             { left = 0; }
+            if(right > imageWidth-1) { right = imageWidth-1; }
+            if(top < 0)              { top = 0; }
+            if(bot > imageHeight-1)  { bot = imageHeight-1; }
 
             printf("%s: %.2f - (%0.2f,%0.2f)->(%0.2f,%0.2f)\n", names[idx_class], prob , left,top,right,bot);
 
@@ -179,8 +156,50 @@ void draw_detections(
 
 
 
+
 //https://github.com/TLESORT/YOLO-TensorRT-GIE-/blob/master/YOLODraw.cpp
-void  convert_yolo_detections(float *predictions, int classes, int num, int square, int side, float w, float h, float thresh, float **probs,struct  box *boxes, int only_objectness)
+void do_nms_sort(struct box *boxes, float **probs, int total, int classes, float thresh)
+{
+    int i, j, k;
+    struct sortable_bbox *s = (struct sortable_bbox*)calloc(total, sizeof(struct sortable_bbox));
+
+    for(i = 0; i < total; ++i)
+      {
+        s[i].index = i;
+        s[i].idx_class = 0;
+        s[i].probs = probs;
+      }
+
+    for(k = 0; k < classes; ++k)
+     {
+        for(i = 0; i < total; ++i)
+        {
+            s[i].idx_class = k;
+        }
+
+        qsort(s, total, sizeof(struct sortable_bbox), nms_comparator);
+
+        for(i = 0; i < total; ++i)
+        {
+            if(probs[s[i].index][k] == 0) continue;
+            struct box a = boxes[s[i].index];
+            for(j = i+1; j < total; ++j){
+                struct box b = boxes[s[j].index];
+                if (box_iou(&a, &b) > thresh){
+                    probs[s[j].index][k] = 0;
+                }
+            }
+        }
+    }
+
+
+    free(s);
+}
+
+
+
+//https://github.com/Guanghan/darknet/blob/master/src/yolo.c#L95
+void  convert_yolo_detections(float *predictions, int classes, int num, int side, float w, float h, float thresh, float **probs,struct  box *boxes, int only_objectness)
 {
 // Interpret the output from a single inference of TinyYolo (GetResult)
 // and filter out objects/boxes with low probabilities.
@@ -197,6 +216,9 @@ void  convert_yolo_detections(float *predictions, int classes, int num, int squa
 //    float value for box height in pixels within source image
 //    float value that is the probability for the network classification.
 
+     //classes = 20
+     //num = 2
+     //side = 7
     int i,j,n;
     for (i = 0; i < side*side; ++i)
       {
@@ -206,14 +228,15 @@ void  convert_yolo_detections(float *predictions, int classes, int num, int squa
         for(n = 0; n < num; ++n)
         {
             int index = i*num + n;
-            int p_index = side*side*classes + i*num + n;
+            int p_index = side*side*classes /*980*/ + i*num + n;
             float scale = predictions[p_index];
+
             //printf("side : %d , index : %d , p_index : %d , prediction : %f\n",side,index,p_index,scale);
-            int box_index = side*side*(classes + num) + (i*num + n)*4;
+            int box_index = (side*side*(classes + num)) + (i*num + n)*4;
             boxes[index].x = (float) (predictions[box_index + 0] + col) / (side * w);
             boxes[index].y = (float) (predictions[box_index + 1] + row) / (side * h);
-            boxes[index].w = pow(predictions[box_index + 2], square /*(square?2:1)*/) * w;
-            boxes[index].h = pow(predictions[box_index + 3], square /*(square?2:1)*/) * h;
+            boxes[index].w = (predictions[box_index + 2]*predictions[box_index + 2]) * w;
+            boxes[index].h = (predictions[box_index + 3]*predictions[box_index + 3]) * h;
 
 			for(j = 0; j < classes; ++j)
                {
@@ -234,6 +257,7 @@ void  convert_yolo_detections(float *predictions, int classes, int num, int squa
 }
 
 
+
 int processTinyYOLO(struct labelContents * labels, float * results , unsigned int resultsLength ,char * pixels, unsigned int imageWidth, unsigned int imageHeight , float minimumConfidence)
 {
     printf("got back %u resultData \n", resultsLength );
@@ -246,10 +270,9 @@ int processTinyYOLO(struct labelContents * labels, float * results , unsigned in
                              results,          //predictions
                              NUM_CLASSES,      //classes
                              NUM_TOP_CLASSES,  //num
-                             2,                //square
                              NUM_CELLS,        //side
-                             1,                //w
-                             1,                //h
+                             imageWidth,                //w
+                             imageHeight,                //h
                              minimumConfidence,//threshold
                              probs,            //probability Output
                              boxes,            //Objects Output
