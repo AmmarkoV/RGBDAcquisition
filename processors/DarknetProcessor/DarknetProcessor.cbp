@@ -50,6 +50,7 @@
 			<Add library="cublas" />
 			<Add library="curand" />
 			<Add library="stdc++" />
+			<Add library="cudnn" />
 		</Linker>
 		<Unit filename="../../../../../3dParty/darknet/include/darknet.h" />
 		<Unit filename="DarknetProcessor.c">

@@ -12,6 +12,8 @@
 //if define GPU1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
 #include "../../3dparty/darknet/include/darknet.h"
 
+#define OLD_VERSION 1
+
 unsigned int framesProcessed=0;
 
 struct darknetContext
@@ -24,6 +26,8 @@ struct darknetContext
  float **probs;
  float **masks;
  char **names;
+
+ detection *dets;
 
  float threshold;
  float hierarchyThreshold;
@@ -186,9 +190,16 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
                                error("Last layer must produce detections\n");
                               }
     //fprintf(stderr,"done\n");
-
+    #if OLD_VERSION
     if (dc.nms)
          { do_nms_sort(dc.boxes, dc.probs, l.w*l.h*l.n, l.classes, dc.nms); }
+    #else
+    /* NEW CODE*/
+     int nboxes = 0;
+     dc.dets = get_network_boxes(dc.net, 1, 1, dc.threshold, 0, 0, 0, &nboxes);
+     if (dc.nms)
+         { do_nms_sort(dc.dets, l.w*l.h*l.n, l.classes, dc.nms); }
+    #endif
 
     //printf("Objects (%u classes):\n\n",l.classes);
 
@@ -198,8 +209,12 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
    time_t clock = time(NULL);
    struct tm * ptm = gmtime ( &clock );
 
-    draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.masks, dc.names , dc.alphabet, l.classes);
-
+    #if OLD_VERSION
+     draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.names , dc.alphabet, l.classes);
+    #else
+     int num = l.side*l.side*l.n;
+     draw_detections(im, dc.dets,num, dc.threshold, dc.names, dc.alphabet, l.classes);
+    #endif
     unsigned int i=0,j=0;
 
 
