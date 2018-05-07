@@ -39,16 +39,26 @@
 		<Linker>
 			<Add option="-lmvnc" />
 		</Linker>
+		<Unit filename="../../tools/Drawing/drawing.h" />
+		<Unit filename="Movidius.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Movidius.h" />
+		<Unit filename="MovidiusTypes.h" />
 		<Unit filename="fp16.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="fp16.h" />
-		<Unit filename="Movidius.c">
+		<Unit filename="imageConversions.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="imageConversions.h" />
 		<Unit filename="stb_image.h" />
 		<Unit filename="stb_image_resize.h" />
+		<Unit filename="tinyYolo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyYolo.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
