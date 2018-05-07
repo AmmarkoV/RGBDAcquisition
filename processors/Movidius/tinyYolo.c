@@ -8,7 +8,6 @@
 #include <math.h>
 
 #include "../../tools/Drawing/drawing.h"
-#include "../../tools/Drawing/font.h"
 
 // stuff we know about the network and the caffe input/output blobs
 static const int INPUT_H = 448;
@@ -214,13 +213,24 @@ void draw_detections(
 
 int processTinyYOLO(struct labelContents * labels, float * results , unsigned int resultsLength ,char * pixels, unsigned int imageWidth, unsigned int imageHeight , float minimumConfidence)
 {
-  //char * f = mallocFont();
-  //writePPMDrawing("/home/ammar/Documents/Programming/FORTH/input_acquisition/processors/Movidius/font.pnm",f,fontHeight  ,fontWidth ,3,8);
-  //free(f);
 
+  unsigned int fontWidth;
+  unsigned int fontHeight;
+  unsigned int fontBytesPerPixel;
+  unsigned int fontChannels;
+
+  unsigned char * fontPixels = ReadPNMDrawing(0,"/home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Drawing/font.pnm"
+                                              ,&fontWidth,&fontHeight,0,&fontBytesPerPixel , &fontChannels);
+
+  if (fontPixels!=0)
+  {
+   writePPMDrawing("/home/ammar/Documents/Programming/FORTH/input_acquisition/processors/Movidius/out.pnm",fontPixels , fontWidth , fontHeight,fontChannels,fontBytesPerPixel);
+
+   free(fontPixels);
+  }
 
   //  drawRectangleRGB(pixels,imageWidth,imageHeight, 255,0,0, 5 , 300,220, 480,320);
-  //  writePPMDrawing("/home/ammar/Documents/Programming/FORTH/input_acquisition/processors/Movidius/out.pnm",pixels , imageWidth , imageHeight,3,8);
+  //
   //return 1;
 
     struct box *boxes = (struct box*)calloc(NUM_CELLS*NUM_CELLS*NUM_TOP_CLASSES, sizeof(struct box));
