@@ -6,6 +6,8 @@
 #include "DarknetProcessor.h"
 #include "recordOutput.h"
 
+#include "../../tools/Drawing/drawing.h"
+
 #define GPU 1
 //if define GPU1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
 #include "../../3dparty/darknet/include/darknet.h"
@@ -244,6 +246,18 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
                         save_image(im,recordFile);
                      }
                   }
+
+              float halfW = (float) dc.boxes[i].w/2;
+              float halfH = (float) dc.boxes[i].h/2;
+
+              unsigned int x1 = (dc.boxes[i].x-halfW) *width;
+              unsigned int y1 = (dc.boxes[i].y-halfH) *height;
+              unsigned int x2 = (dc.boxes[i].x+halfW) *width;
+              unsigned int y2 = (dc.boxes[i].y+halfH) *height;
+
+
+              drawRectangleRGB(data,width,height, 255,0,0,  3, x1 , y1 , x2 , y2 );
+
             }
         }
     } // End for loop
