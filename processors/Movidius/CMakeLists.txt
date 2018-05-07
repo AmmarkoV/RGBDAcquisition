@@ -1,7 +1,7 @@
 project( Movidius ) 
 cmake_minimum_required( VERSION 2.8.7 )   
  
-add_library(Movidius SHARED Movidius.h Movidius.c imageConversions.c fp16.c ) 
+add_library(Movidius SHARED Movidius.h Movidius.c imageConversions.c fp16.c tinyYolo.c ) 
 target_link_libraries(Movidius m rt mvnc) 
  
 

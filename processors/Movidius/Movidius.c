@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mvnc.h>
-#include <math.h>
 #include "imageConversions.h"
 
+#include "MovidiusTypes.h"
+#include "tinyYolo.h"
 
 
 
@@ -17,7 +18,7 @@
 
 
 
-float minimumConfidence = 0.3;
+float minimumConfidence = 0.4;
 #if USE_GOOGLENET
 // GoogleNet image dimensions, network mean values for each channel in BGR order.
 const int networkDimX = 224;
@@ -35,10 +36,8 @@ float * networkMean = 0;
 #define GRAPH_FILE_NAME "../processors/Movidius/tinyyolo/graph"
 #endif
 
-struct box
-{
-    float x,y,w,h;
-};
+
+
 
 
 struct labelContents labels={0};
@@ -226,95 +225,6 @@ int initArgs_Movidius(int argc, char *argv[])
 
 
 
-void  convert_yolo_detections(float *predictions, int classes, int num, int square, int side, float w, float h, float thresh, float **probs,struct  box *boxes, int only_objectness)
-{
-    int i,j,n;
-    for (i = 0; i < side*side; ++i){
-        int row = i / side;
-        int col = i % side;
-        for(n = 0; n < num; ++n){
-            int index = i*num + n;
-            int p_index = side*side*classes + i*num + n;
-            float scale = predictions[p_index];
-//printf("side : %d , index : %d , p_index : %d , prediction : %f\n",side,index,p_index,scale);
-            int box_index = side*side*(classes + num) + (i*num + n)*4;
-            boxes[index].x = (predictions[box_index + 0] + col) / side * w;
-            boxes[index].y = (predictions[box_index + 1] + row) / side * h;
-            boxes[index].w = pow(predictions[box_index + 2], (square?2:1)) * w;
-            boxes[index].h = pow(predictions[box_index + 3], (square?2:1)) * h;
-
-			for(j = 0; j < classes; ++j){
-				int class_index = i*classes;
-				float prob = scale*predictions[class_index+j]; //
-
-				probs[index][j] = (prob > thresh) ? prob : 0;
-			}
-
-			if(only_objectness){
-				probs[index][0] = scale;
-			}
-        }
-    }
-}
-
-
-int processTinyYOLO(float * results , unsigned int resultsLength ,char * pixels, unsigned int imageWidth, unsigned int imageHeight)
-{
- printf("got back %u resultData \n", resultsLength );
- return 0;
-
-
- int i=0;
- float x,y,w,h,confidence,category;
-
- for (i=0; i<resultsLength/6; i++)
-   {
-    #define TRANSPOSED 0
-
-    #if TRANSPOSED
-     category   =  results[(i+0)*6];
-     x =  results[(i+1)*6];
-     y =  results[(i+2)*6];
-     w =  results[(i+3)*6]/2;
-     h =  results[(i+4)*6]/2;
-     confidence =  results[(i+5)*6];
-    #else
-     category   =  results[(i*6)+0];
-     x =  results[(i*6)+1];
-     y =  results[(i*6)+2];
-     w =  results[(i*6)+3]/2;
-     h =  results[(i*6)+4]/2;
-     confidence =  results[(i*6)+5];
-    #endif
-
-	float xmin = x-w , xmax = x+w , ymin = y-h , ymax = y+h;
-    if (xmin<0)          { xmin = 0; }
-    if (ymin<0)          { ymin = 0; }
-    if (xmax>imageWidth) { xmax = imageWidth;  }
-    if (ymax>imageHeight){ ymax = imageHeight; }
-
-
-    //x*=imageWidth; y*=imageHeight;
-    //w*=imageWidth; h*=imageHeight;
-
-    //xmin*=imageWidth; ymin*=imageHeight;
-    //xmax*=imageWidth; ymax*=imageHeight;
-
-    if (confidence>minimumConfidence)
-     {
-      printf("%u> ",i);
-      printf("cat=%0.2f ",category);
-      printf("x1=%0.2f ",xmin);
-      printf("y1=%0.2f ",ymin);
-      printf("x2=%0.2f ",xmax);
-      printf("y2=%0.2f ",ymax);
-      printf("conf=%0.2f\n",confidence);
-     }
-   }
- return 1;
-}
-
-
 
 int processGoogleNet(float * results , unsigned int resultsLength )
 {
@@ -421,7 +331,7 @@ int addDataInput_Movidius(unsigned int stream , void * data, unsigned int width,
                 //printf("resultData length is %d \n", numResults);
                 if (packedInfo)
                 {
-                  processTinyYOLO(fresult, numResults , data , width , height);
+                  processTinyYOLO(&labels,fresult, numResults , data , width , height, minimumConfidence);
                 }  else
                 {
                   processGoogleNet(fresult,numResults);

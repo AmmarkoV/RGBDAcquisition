@@ -3,13 +3,8 @@
 
 #include "imageConversions.h"
 
+#include "MovidiusTypes.h"
 
-
-struct labelContents
-{
-  unsigned int numberOfLabels;
-  char ** content;
-};
 
 // 16 bits.  will use this to store half precision floats since C has no
 // built in support for it.
