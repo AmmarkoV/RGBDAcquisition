@@ -27,7 +27,11 @@ struct darknetContext
  float **masks;
  char **names;
 
- detection *dets;
+ #if OLD_VERSION
+
+ #else
+  detection *dets;
+ #endif // OLD_VERSION
 
  float threshold;
  float hierarchyThreshold;
@@ -210,7 +214,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
    struct tm * ptm = gmtime ( &clock );
 
     #if OLD_VERSION
-     draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.names , dc.alphabet, l.classes);
+     draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.masks, dc.names , dc.alphabet, l.classes);
     #else
      int num = l.side*l.side*l.n;
      draw_detections(im, dc.dets,num, dc.threshold, dc.names, dc.alphabet, l.classes);
