@@ -6,33 +6,38 @@
 #include "DarknetProcessor.h"
 #include "recordOutput.h"
 
+//This is only used for the drawRectangleRGB, if you remove it it is not needed..
 #include "../../tools/Drawing/drawing.h"
 
-//if define GPU1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
+//if define GPU 1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
 #define GPU 1
 #include "../../3dparty/darknet/include/darknet.h"
 
-unsigned int framesProcessed=0;
 
+
+//A structure that holds all the stuff
 struct darknetContext
 {
  image **alphabet; //This carries the fonts ( https://github.com/pjreddie/darknet/tree/master/data/labels )..
-
- network * net; //This is the loaded network where all the magic happens
-
- float **probs;
- char  **names;
-
- detection *dets; //The new detections structure that carries detections
+ network * net;    //This is the loaded network where all the magic happens
+ float **probs;    //Probabilities of blocks
+ char  **names;    //Names of Classes
+ detection *dets;  //The new detections structure that carries detections
 
  float nms;
  float threshold; //Our threshold for what is acceptable
- float hierarchyThreshold;
 };
 
+//This can be a pointer to a string with a path to a script
+//that will get executed every time we have a person detected
 char * payload=0;
+
+unsigned int framesProcessed=0;
+
+//Our static darknet context
 struct darknetContext dc={0};
 
+//This image converts a raw pointer to an image structure as needed by stb_image
 image load_image_from_buffer(void * pixels , unsigned int width, unsigned int height, unsigned int channels)
 {
     unsigned char * data = (unsigned char*) pixels;
@@ -58,12 +63,13 @@ int init_yolo(
                 const char *cfgfile,
                 const char *weightfile,
                 const char *datafile,
-                float thresh
+                float threshold
                )
 {
-    if (!cfgfile)    { return 0; }
-    if (!weightfile) { return 0; }
-    if (!datafile) { return 0; }
+    if ( (!cfgfile) || (!weightfile) || (!datafile) )  { return 0; }
+
+    //Random Seed
+    srand(time(NULL));
 
     dc.alphabet = load_alphabet();
 
@@ -71,22 +77,20 @@ int init_yolo(
     fprintf(stderr,"CFG Source : %s\n",cfgfile);
     fprintf(stderr,"Weight Source : %s\n",weightfile);
 
-    list *options = read_data_cfg(datafile);
-    int classes = option_find_int(options, "classes", 20);
+    list *options   = read_data_cfg(datafile);
+    int classes     = option_find_int(options, "classes", 20);
     char *name_list = option_find_str(options, "names", "data/names.list");
-    dc.names = get_labels(name_list);
+    dc.names        = get_labels(name_list);
+    dc.nms=.4;
+    dc.threshold=threshold;
 
     dc.net = load_network(cfgfile, weightfile, 0);
     set_batch_network(dc.net, 1);
 
 
-    srand(2222222);
-
     fprintf(stderr,"Retreiving last layer\n");
     layer l = dc.net->layers[dc.net->n-1];
-    dc.nms=.4;
-    dc.threshold=thresh;
-    dc.hierarchyThreshold=0.5;
+
 
     fprintf(stderr,"Allocating space ..\n");
     dc.probs = (float **)calloc( l.w * l.h * l.n, sizeof(float *));
@@ -111,10 +115,11 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
  unsigned int i=0;
  for (i=0; i<argc; i++)
  {
-   if (strstr(argv[i],".cfg")!=0)      { cfgFile=argv[i]; }
-   if (strstr(argv[i],".weights")!=0)  { weightFile=argv[i]; }
-   if (strstr(argv[i],".data")!=0)     { dataFile=argv[i]; }
-   if (strstr(argv[i],"--payload")!=0) { payload=argv[i+1]; }
+   if (strstr(argv[i],".cfg")!=0)        { cfgFile=argv[i]; }
+   if (strstr(argv[i],".weights")!=0)    { weightFile=argv[i]; }
+   if (strstr(argv[i],".data")!=0)       { dataFile=argv[i]; }
+   if (strstr(argv[i],"--payload")!=0)   { payload=argv[i+1]; }
+   if (strstr(argv[i],"--threshold")!=0) { threshold=atof(argv[i+1]); }
  }
 
  #if GPU
@@ -132,15 +137,18 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
                       {
                         fprintf(stderr,"Running without GPU ( gpu_index=%d )..\n",gpu_index);
                       }
+ #else
+   fprintf(stderr,"Processor is compiled without GPU define, if Darknet is compiled WITH it you may experience crazy problems since ");
+   fprintf(stderr,"Darknet ABI changes depending on this flag..!\n");
  #endif // GPU
 
  framesProcessed=resumeFrameOutput();
  fprintf(stderr,"Resuming @ %u\n",framesProcessed);
 
  return init_yolo(
-                   cfgFile,
-                   weightFile,
-                   dataFile,
+                   cfgFile,    //"yourpath/yolo.cfg"
+                   weightFile, //"yourpath/yolo.weights"
+                   dataFile,   //"yourpath/coco.data"
                    threshold
                  );
 }
@@ -163,7 +171,7 @@ int receiveDetection(
                        float detectionWidth,
                        float detectionHeight,
 
-                       //System Stuff
+                       //System/Logging Stuff
                        FILE * logOutputFile,
                        char * directoryToUseForOutput,
                        struct tm * currentTime,
@@ -280,7 +288,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
      //This is just to log time..
      time_t clock = time(NULL);
-     struct tm * ptm = gmtime ( &clock );
+     struct tm * currentTime = gmtime ( &clock );
 
 
      //Rectangles, labels etc are added to im
@@ -290,7 +298,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
      //This is the directory we want to dump output ( plus the date )
      char directoryToUse[1024];
-     snprintf(directoryToUse,1024,"%u_%02u_%02u", EPOCH_YEAR_IN_TM_YEAR+ptm->tm_year, ptm->tm_mon+1, ptm->tm_mday);
+     snprintf(directoryToUse,1024,"%u_%02u_%02u", EPOCH_YEAR_IN_TM_YEAR+currentTime->tm_year, currentTime->tm_mon+1, currentTime->tm_mday);
      useLoggingDirectory(directoryToUse);
 
 
@@ -314,16 +322,16 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
                               data, width, height ,
                               &im,
                               //Detection Stuff
-                              j,
-                              dc.dets[i].prob[j],
-                              dc.dets[i].bbox.x,
-                              dc.dets[i].bbox.y,
-                              dc.dets[i].bbox.w,
-                              dc.dets[i].bbox.h,
+                              j,                  //Class
+                              dc.dets[i].prob[j], //Probability
+                              dc.dets[i].bbox.x,  //X
+                              dc.dets[i].bbox.y,  //Y
+                              dc.dets[i].bbox.w,  //Width
+                              dc.dets[i].bbox.h,  //Height
                               //System stuff
                               fp,
                               directoryToUse,
-                              ptm,
+                              currentTime,
                               framesProcessed
                             );
             }
