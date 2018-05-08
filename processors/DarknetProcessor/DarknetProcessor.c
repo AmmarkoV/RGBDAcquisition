@@ -20,14 +20,12 @@ struct darknetContext
 
  network * net; //This is the loaded network where all the magic happens
 
- float nms;
- //box   *boxes;
  float **probs;
- //float **masks;
  char  **names;
 
  detection *dets; //The new detections structure that carries detections
 
+ float nms;
  float threshold; //Our threshold for what is acceptable
  float hierarchyThreshold;
 };
@@ -91,21 +89,12 @@ int init_yolo(
     dc.hierarchyThreshold=0.5;
 
     fprintf(stderr,"Allocating space ..\n");
-    //dc.boxes = (box *)   calloc( l.w * l.h * l.n, sizeof(box));
     dc.probs = (float **)calloc( l.w * l.h * l.n, sizeof(float *));
 
     int j;
     for(j = 0; j < l.w * l.h * l.n; ++j)
          { dc.probs[j] = (float *)calloc( l.classes+1, sizeof(float)); }
 
-     if ( l.coords > 4)
-        {
-           // dc.masks = calloc( l.w *  l.h * l.n, sizeof(float*));
-            for(j = 0; j < l.w* l.h * l.n; ++j)
-            {
-             // dc.masks[j] = calloc( l.coords-4, sizeof(float *));
-            }
-        }
     fprintf(stderr,"Done with initialization ..\n");
  return 1;
 }
@@ -341,6 +330,9 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
         }
     }
 
+    //Free Detections
+    free_detections(dc.dets,nboxes);
+
     //Done with current frame
     fflush(fp);
     stopLogging(fp);
@@ -387,6 +379,34 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
 
 
+int stop_DarknetProcessor()
+{
+    int j;
+    layer l = dc.net->layers[dc.net->n-1];
+
+    if (dc.probs!=0)
+    {
+     for(j = 0; j < l.w * l.h * l.n; ++j)
+         { free(dc.probs[j]); }
+
+     free(dc.probs);
+     dc.probs =0;
+    }
+
+
+    free_network(dc.net);
+
+    //TODO: dealloc these
+    //image **alphabet; //This carries the fonts ( https://github.com/pjreddie/darknet/tree/master/data/labels )..
+    //char  **names;
+
+  return 0;
+}
+
+
+
+
+
 // ---------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
@@ -403,6 +423,5 @@ int setConfigInt_DarknetProcessor(char * label,int value)    { return 0; }
 unsigned char * getDataOutput_DarknetProcessor(unsigned int stream , unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel) { return 0; }
 int processData_DarknetProcessor() { return 0; }
 int cleanup_DarknetProcessor()     { return 0; }
-int stop_DarknetProcessor()        { return 0; }
 unsigned short * getDepth_DarknetProcessor(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)  { return 0; }
 unsigned char * getColor_DarknetProcessor(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)   { return 0; }
