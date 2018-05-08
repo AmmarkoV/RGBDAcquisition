@@ -12,8 +12,6 @@
 //if define GPU1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
 #include "../../3dparty/darknet/include/darknet.h"
 
-#define OLD_VERSION 0
-
 unsigned int framesProcessed=0;
 
 struct darknetContext
@@ -27,11 +25,7 @@ struct darknetContext
  float **masks;
  char **names;
 
- #if OLD_VERSION
-
- #else
-  detection *dets;
- #endif // OLD_VERSION
+ detection *dets;
 
  float threshold;
  float hierarchyThreshold;
@@ -261,44 +255,16 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     //fprintf(stderr,"done ( %u )\n",l.outputs);
 
 
-    int networkProducedAResult = 0;
-
-    #if OLD_VERSION
-      networkProducedAResult=l.outputs;
-    #else
-      networkProducedAResult=1;
-    #endif // OLD_VERSION
-
-
-
+    int networkProducedAResult = 1;
     if (networkProducedAResult)
     {
-    #if OLD_VERSION
-     if(l.type == DETECTION)   {
-                                //fprintf(stderr,"getting_detection_boxes .. ");
-                                get_detection_boxes(l, 1, 1, dc.threshold, dc.probs, dc.boxes, 0);
-                               }
-                              else
-     if (l.type == REGION)    {
-                               //fprintf(stderr,"getting_region_boxes .. ");
-                               get_region_boxes(l, im.w, im.h, dc.net->w, dc.net->h, dc.threshold, dc.probs, dc.boxes, 0, 0, 0, dc.hierarchyThreshold, 1);
-                              } else
-                              {
-                               error("Last layer must produce detections\n");
-                              }
-    //fprintf(stderr,"done\n");
-
-    if (dc.nms)
-         { do_nms_sort(dc.boxes, dc.probs, l.w*l.h*l.n, l.classes, dc.nms); }
-    #else
-    /* NEW CODE*/
      int nboxes = 0;
      dc.dets = get_network_boxes(dc.net, 1, 1, dc.threshold, 0, 0, 0, &nboxes);
      if (dc.nms)
          { do_nms_sort(dc.dets, l.w*l.h*l.n, l.classes, dc.nms); }
 
       get_detection_detections(l, 1 , 1 , dc.threshold, dc.dets);
-    #endif
+
 
     //printf("Objects (%u classes):\n\n",l.classes);
 
@@ -307,12 +273,9 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
    time_t clock = time(NULL);
    struct tm * ptm = gmtime ( &clock );
 
-    #if OLD_VERSION
-     draw_detections(im, detections , dc.threshold, dc.boxes, dc.probs, dc.masks, dc.names , dc.alphabet, l.classes);
-    #else
      int num = l.side*l.side*l.n;
      draw_detections(im, dc.dets,num, dc.threshold, dc.names, dc.alphabet, l.classes);
-    #endif
+
     unsigned int i=0,j=0;
 
 
@@ -325,33 +288,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     snprintf(logFile,1024,"%s/surveilance.log",directoryToUse);
 
     FILE * fp = startLogging(logFile);
-    #if OLD_VERSION
-    unsigned int detections =  l.w * l.h * l.n;
-    for(i = 0; i <detections; ++i)
-    {
-        for(j = 0; j < l.classes; ++j){
-            if (dc.probs[i][j] >  dc.threshold)
-            {
-             receiveDetection(
-                              data, width, height ,
-                              &im,
-                              //Detection Stuff
-                              j,
-                              dc.probs[i][j],
-                              dc.boxes[i].x,
-                              dc.boxes[i].y,
-                              dc.boxes[i].w,
-                              dc.boxes[i].h,
-                              //System stuff
-                              fp,
-                              directoryToUse,
-                              ptm,
-                              framesProcessed
-                            );
-            }
-        }
-    } // End for loop
-    #else
+
      for(i = 0; i < nboxes; ++i)
       {
         for(j = 0; j < l.classes; ++j)
@@ -377,7 +314,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
             }
         }
     }
-    #endif // OLD_VERSION
+
     fflush(fp);
     stopLogging(fp);
 
