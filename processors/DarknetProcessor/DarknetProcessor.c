@@ -8,8 +8,8 @@
 
 #include "../../tools/Drawing/drawing.h"
 
-#define GPU 1
 //if define GPU1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
+#define GPU 1
 #include "../../3dparty/darknet/include/darknet.h"
 
 unsigned int framesProcessed=0;
@@ -39,10 +39,10 @@ image load_image_from_buffer(void * pixels , unsigned int width, unsigned int he
 {
     unsigned char * data = (unsigned char*) pixels;
     int w=width, h=height, c=channels , step=width*channels;
-    int i,j,k;
+
     image im = make_image(w, h, c);
 
-
+    int i,j,k;
     for(i = 0; i < h; ++i)
     {
       for(k= 0; k < c; ++k)
@@ -53,8 +53,6 @@ image load_image_from_buffer(void * pixels , unsigned int width, unsigned int he
             }
         }
     }
-
-    //free(data);
     return im;
 }
 
@@ -103,7 +101,10 @@ int init_yolo(
      if ( l.coords > 4)
         {
             dc.masks = calloc( l.w *  l.h * l.n, sizeof(float*));
-            for(j = 0; j < l.w* l.h * l.n; ++j) dc.masks[j] = calloc( l.coords-4, sizeof(float *));
+            for(j = 0; j < l.w* l.h * l.n; ++j)
+            {
+              dc.masks[j] = calloc( l.coords-4, sizeof(float *));
+            }
         }
     fprintf(stderr,"Done with initialization ..\n");
  return 1;
@@ -114,6 +115,7 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
  char * cfgFile=0;
  char * weightFile=0;
  char * dataFile=0;
+
  float threshold=0.55; // was 0.35
 
 
@@ -184,6 +186,7 @@ int receiveDetection(
 
   if (probability >  dc.threshold)
    {
+      //Calculate coordinates from floats..
       float halfWidth  = (float) detectionWidth/2;
       float halfHeight = (float) detectionHeight/2;
 
@@ -197,10 +200,16 @@ int receiveDetection(
       if (x2>inputWidth)  { x2=inputWidth;  }
       if (y2>inputHeight) { y2=inputHeight; }
 
+
+      //This uses my own drawing "../../tools/Drawing/drawing.h" methods , you might want to comment out
       drawRectangleRGB(inputPixels,inputWidth,inputHeight, 255,0,0,  3, (unsigned int) x1 , (unsigned int) y1 , (unsigned int) x2 , (unsigned int) y2 );
+
+
+      //This outputs detection to stderr
       fprintf(stderr,"%s-> %f%% @ %f %f %f %f\n", dc.names[classification], probability*100, x1, y1, detectionWidth, detectionHeight);
 
 
+      //This outputs detection to logfile
                logEvent(
                         logOutputFile,
                         currentTime,
@@ -214,9 +223,9 @@ int receiveDetection(
                       );
 
 
-               if (strcmp(dc.names[classification],"person")==0)
+      //If we this is a person we want to save the image / execute scripts etc..
+       if (strcmp(dc.names[classification],"person")==0)
                   {
-                   //fprintf(stderr,"%0.2f\n",dc.boxes[i].h);
                    if (detectionHeight > 0.3 )
                      {
                       if (payload!=0)
@@ -264,9 +273,10 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
 
     if (prediction!=0)
-    {
-     //We got back something which needs to be decoded
+    {//We got back something which needs to be decoded
 
+
+     //This will hold the number of boxes
      int nboxes = 0;
 
      //We get back the detections as per the YOLO paper
@@ -335,6 +345,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     fflush(fp);
     stopLogging(fp);
 
+    //If we have OpenCV this will output a window
     //show_image(im, "predictions");
     } else
     {
@@ -345,7 +356,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     free_image(im);
     free_image(sized);
 
-   ++framesProcessed;
+    ++framesProcessed;
   return 1;
  }
  return 0;
