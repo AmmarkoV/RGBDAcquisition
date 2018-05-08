@@ -12,7 +12,7 @@
 //if define GPU1 is not used then nothing will work as it is supposed to be if we are doing a GPU build..
 #include "../../3dparty/darknet/include/darknet.h"
 
-#define OLD_VERSION 1
+#define OLD_VERSION 0
 
 unsigned int framesProcessed=0;
 
@@ -160,6 +160,88 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
 }
 
 
+
+
+int receiveDetection(
+                       //This is the image we will draw to return back to output
+                       void * inputPixels, unsigned int inputWidth, unsigned int inputHeight,
+
+                       //This is the image internally used by the neural network
+                       image * im,
+
+                       //Detection Details
+                       int   classification ,
+                       float probability,
+                       float x,
+                       float y,
+                       float detectionWidth,
+                       float detectionHeight,
+
+                       //System Stuff
+                       FILE * logOutputFile,
+                       char * directoryToUseForOutput,
+                       struct tm * currentTime,
+                       unsigned int frameNumber
+                    )
+{
+  if (x>1.0) { return 0; }
+  if (y>1.0) { return 0; }
+
+  if (probability >  dc.threshold)
+   {
+      float halfWidth  = (float) detectionWidth/2;
+      float halfHeight = (float) detectionHeight/2;
+
+      float x1 = (x-halfWidth)  *inputWidth;
+      float y1 = (y-halfHeight) *inputHeight;
+      float x2 = (x+halfWidth)  *inputWidth;
+      float y2 = (y+halfHeight) *inputHeight;
+
+      if (x1<0) { x1=0; }
+      if (y1<0) { y1=0; }
+      if (x2>inputWidth)  { x2=inputWidth;  }
+      if (y2>inputHeight) { y2=inputHeight; }
+
+      drawRectangleRGB(inputPixels,inputWidth,inputHeight, 255,0,0,  3, (unsigned int) x1 , (unsigned int) y1 , (unsigned int) x2 , (unsigned int) y2 );
+      fprintf(stderr,"%s-> %f%% @ %f %f %f %f\n", dc.names[classification], probability*100, x1, y1, detectionWidth, detectionHeight);
+
+
+               logEvent(
+                        logOutputFile,
+                        currentTime,
+                        framesProcessed,
+                        x1,
+                        y1,
+                        detectionWidth,
+                        detectionHeight,
+                        dc.names[classification],
+                        probability*100
+                      );
+
+
+               if (strcmp(dc.names[classification],"person")==0)
+                  {
+                   //fprintf(stderr,"%0.2f\n",dc.boxes[i].h);
+                   if (detectionHeight > 0.3 )
+                     {
+                      if (payload!=0)
+                      {
+                        int i=system(payload);
+                        if (i!=0) { fprintf(stderr,"Payload (%s) failed..\n",payload); }
+                      }
+                       //if it is a standing human..
+                        char recordFile[512]={0};
+                        snprintf(recordFile,512,"%s/record_%u",directoryToUseForOutput,frameNumber);
+                        save_image(*im,recordFile);
+                     }
+                  }
+
+     return 1;
+   }
+ return 0;
+}
+
+
 int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
  //fprintf(stderr,"addDataInput_DarknetProcessor %u (%ux%u) channels=%u\n" , stream , width, height,channels);
@@ -168,8 +250,8 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     image im=load_image_from_buffer(data, width, height, channels);
     //save_image(im, "original");
 
-    //image sized = resize_image(im, dc.net->w, dc.net->h);
-    image sized = letterbox_image(im, dc.net->w, dc.net->h);
+    image sized = resize_image(im, dc.net->w, dc.net->h);
+    //image sized = letterbox_image(im, dc.net->w, dc.net->h);
     //save_image(sized, "sized");
 
     layer l = dc.net->layers[dc.net->n-1];
@@ -179,8 +261,19 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     //fprintf(stderr,"done ( %u )\n",l.outputs);
 
 
-    if (l.outputs!=0)
+    int networkProducedAResult = 0;
+
+    #if OLD_VERSION
+      networkProducedAResult=l.outputs;
+    #else
+      networkProducedAResult=1;
+    #endif // OLD_VERSION
+
+
+
+    if (networkProducedAResult)
     {
+    #if OLD_VERSION
      if(l.type == DETECTION)   {
                                 //fprintf(stderr,"getting_detection_boxes .. ");
                                 get_detection_boxes(l, 1, 1, dc.threshold, dc.probs, dc.boxes, 0);
@@ -194,7 +287,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
                                error("Last layer must produce detections\n");
                               }
     //fprintf(stderr,"done\n");
-    #if OLD_VERSION
+
     if (dc.nms)
          { do_nms_sort(dc.boxes, dc.probs, l.w*l.h*l.n, l.classes, dc.nms); }
     #else
@@ -203,11 +296,12 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
      dc.dets = get_network_boxes(dc.net, 1, 1, dc.threshold, 0, 0, 0, &nboxes);
      if (dc.nms)
          { do_nms_sort(dc.dets, l.w*l.h*l.n, l.classes, dc.nms); }
+
+      get_detection_detections(l, 1 , 1 , dc.threshold, dc.dets);
     #endif
 
     //printf("Objects (%u classes):\n\n",l.classes);
 
-    unsigned int detections =  l.w * l.h * l.n;
 
 
    time_t clock = time(NULL);
@@ -231,55 +325,59 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     snprintf(logFile,1024,"%s/surveilance.log",directoryToUse);
 
     FILE * fp = startLogging(logFile);
+    #if OLD_VERSION
+    unsigned int detections =  l.w * l.h * l.n;
     for(i = 0; i <detections; ++i)
     {
         for(j = 0; j < l.classes; ++j){
             if (dc.probs[i][j] >  dc.threshold)
             {
-               logEvent(
-                        fp,
-                        ptm,
-                        framesProcessed,
-                        dc.boxes[i].x,
-                        dc.boxes[i].y,
-                        dc.boxes[i].w,
-                        dc.boxes[i].h,
-                        dc.names[j],
-                        dc.probs[i][j]*100
-                      );
-
-
-               if (strcmp(dc.names[j],"person")==0)
-                  {
-                   //fprintf(stderr,"%0.2f\n",dc.boxes[i].h);
-                   if ( dc.boxes[i].h > 0.3 )
-                     {
-                      if (payload!=0)
-                      {
-                        int i=system(payload);
-                        if (i!=0) { fprintf(stderr,"Payload (%s) failed..\n",payload); }
-                      }
-                       //if it is a standing human..
-                        char recordFile[512]={0};
-                        snprintf(recordFile,512,"%s/record_%u",directoryToUse,framesProcessed);
-                        save_image(im,recordFile);
-                     }
-                  }
-
-              float halfW = (float) dc.boxes[i].w/2;
-              float halfH = (float) dc.boxes[i].h/2;
-
-              unsigned int x1 = (dc.boxes[i].x-halfW) *width;
-              unsigned int y1 = (dc.boxes[i].y-halfH) *height;
-              unsigned int x2 = (dc.boxes[i].x+halfW) *width;
-              unsigned int y2 = (dc.boxes[i].y+halfH) *height;
-
-
-              drawRectangleRGB(data,width,height, 255,0,0,  3, x1 , y1 , x2 , y2 );
-
+             receiveDetection(
+                              data, width, height ,
+                              &im,
+                              //Detection Stuff
+                              j,
+                              dc.probs[i][j],
+                              dc.boxes[i].x,
+                              dc.boxes[i].y,
+                              dc.boxes[i].w,
+                              dc.boxes[i].h,
+                              //System stuff
+                              fp,
+                              directoryToUse,
+                              ptm,
+                              framesProcessed
+                            );
             }
         }
     } // End for loop
+    #else
+     for(i = 0; i < nboxes; ++i)
+      {
+        for(j = 0; j < l.classes; ++j)
+        {
+            if (dc.dets[i].prob[j])
+            {
+              receiveDetection(
+                              data, width, height ,
+                              &im,
+                              //Detection Stuff
+                              j,
+                              dc.dets[i].prob[j],
+                              dc.dets[i].bbox.x,
+                              dc.dets[i].bbox.y,
+                              dc.dets[i].bbox.w,
+                              dc.dets[i].bbox.h,
+                              //System stuff
+                              fp,
+                              directoryToUse,
+                              ptm,
+                              framesProcessed
+                            );
+            }
+        }
+    }
+    #endif // OLD_VERSION
     fflush(fp);
     stopLogging(fp);
 
@@ -298,49 +396,47 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
  return 0;
 }
 
-int setConfigStr_DarknetProcessor(char * label,char * value)
-{
- return 0;
 
-}
 
-int setConfigInt_DarknetProcessor(char * label,int value)
-{
- return 0;
 
-}
 
-unsigned char * getDataOutput_DarknetProcessor(unsigned int stream , unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)
-{
- return 0;
-}
 
-unsigned short * getDepth_DarknetProcessor(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)
-{
- return 0;
 
-}
 
-unsigned char * getColor_DarknetProcessor(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)
-{
- return 0;
 
-}
 
-int processData_DarknetProcessor()
-{
- return 0;
 
-}
 
-int cleanup_DarknetProcessor()
-{
 
- return 0;
-}
 
-int stop_DarknetProcessor()
-{
- return 0;
 
-}
+
+
+
+
+
+
+
+
+
+
+
+// ---------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+// The rest of the processor interface calls are not implemented so they are just included here as a reminder .. :P
+// ---------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+int setConfigStr_DarknetProcessor(char * label,char * value) { return 0; }
+int setConfigInt_DarknetProcessor(char * label,int value)    { return 0; }
+unsigned char * getDataOutput_DarknetProcessor(unsigned int stream , unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel) { return 0; }
+int processData_DarknetProcessor() { return 0; }
+int cleanup_DarknetProcessor()     { return 0; }
+int stop_DarknetProcessor()        { return 0; }
+unsigned short * getDepth_DarknetProcessor(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)  { return 0; }
+unsigned char * getColor_DarknetProcessor(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)   { return 0; }
