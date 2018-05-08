@@ -40,6 +40,7 @@
 		<Linker>
 			<Add option="`pkg-config --libs opencv`" />
 			<Add option="-L/usr/local/cuda/lib64" />
+			<Add option="/usr/local/cuda/lib64/libcudart.so" />
 			<Add library="../../3dparty/darknet/libdarknet.so" />
 			<Add library="rt" />
 			<Add library="dl" />
@@ -52,7 +53,7 @@
 			<Add library="stdc++" />
 			<Add library="cudnn" />
 		</Linker>
-		<Unit filename="../../../../../3dParty/darknet/include/darknet.h" />
+		<Unit filename="../../3dparty/darknet/include/darknet.h" />
 		<Unit filename="DarknetProcessor.c">
 			<Option compilerVar="CC" />
 		</Unit>

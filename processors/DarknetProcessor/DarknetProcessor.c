@@ -21,9 +21,9 @@ struct darknetContext
  network * net; //This is the loaded network where all the magic happens
 
  float nms;
- box   *boxes;
+ //box   *boxes;
  float **probs;
- float **masks;
+ //float **masks;
  char  **names;
 
  detection *dets; //The new detections structure that carries detections
@@ -91,7 +91,7 @@ int init_yolo(
     dc.hierarchyThreshold=0.5;
 
     fprintf(stderr,"Allocating space ..\n");
-    dc.boxes = (box *)   calloc( l.w * l.h * l.n, sizeof(box));
+    //dc.boxes = (box *)   calloc( l.w * l.h * l.n, sizeof(box));
     dc.probs = (float **)calloc( l.w * l.h * l.n, sizeof(float *));
 
     int j;
@@ -100,10 +100,10 @@ int init_yolo(
 
      if ( l.coords > 4)
         {
-            dc.masks = calloc( l.w *  l.h * l.n, sizeof(float*));
+           // dc.masks = calloc( l.w *  l.h * l.n, sizeof(float*));
             for(j = 0; j < l.w* l.h * l.n; ++j)
             {
-              dc.masks[j] = calloc( l.coords-4, sizeof(float *));
+             // dc.masks[j] = calloc( l.coords-4, sizeof(float *));
             }
         }
     fprintf(stderr,"Done with initialization ..\n");
