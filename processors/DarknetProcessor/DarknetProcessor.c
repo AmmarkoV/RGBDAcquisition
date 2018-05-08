@@ -38,7 +38,7 @@ unsigned int framesProcessed=0;
 struct darknetContext dc={0};
 
 //This image converts a raw pointer to an image structure as needed by stb_image
-image load_image_from_buffer(void * pixels , unsigned int width, unsigned int height, unsigned int channels)
+image convertBufferToImage(void * pixels , unsigned int width, unsigned int height, unsigned int channels)
 {
     unsigned char * data = (unsigned char*) pixels;
     int w=width, h=height, c=channels , step=width*channels;
@@ -59,12 +59,12 @@ image load_image_from_buffer(void * pixels , unsigned int width, unsigned int he
     return im;
 }
 
-int init_yolo(
-                const char *cfgfile,
-                const char *weightfile,
-                const char *datafile,
-                float threshold
-               )
+int internalDarknetInitialization(
+                                  const char *cfgfile,
+                                  const char *weightfile,
+                                  const char *datafile,
+                                  float threshold
+                                 )
 {
     if ( (!cfgfile) || (!weightfile) || (!datafile) )  { return 0; }
 
@@ -145,12 +145,12 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
  framesProcessed=resumeFrameOutput();
  fprintf(stderr,"Resuming @ %u\n",framesProcessed);
 
- return init_yolo(
-                   cfgFile,    //"yourpath/yolo.cfg"
-                   weightFile, //"yourpath/yolo.weights"
-                   dataFile,   //"yourpath/coco.data"
-                   threshold
-                 );
+ return internalDarknetInitialization(
+                                       cfgFile,    //"yourpath/yolo.cfg"
+                                       weightFile, //"yourpath/yolo.weights"
+                                       dataFile,   //"yourpath/coco.data"
+                                       threshold
+                                     );
 }
 
 
@@ -249,7 +249,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
  if (stream==0)
  {
     //This is the original input image that was given to addDataInput_DarknetProcessor
-    image im=load_image_from_buffer(data, width, height, channels);
+    image im=convertBufferToImage(data, width, height, channels);
 
 
     //We might want to resize the image to make it 448x448
@@ -345,7 +345,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
     fflush(fp);
     stopLogging(fp);
 
-    //If we have OpenCV this will output a window
+    //If we have OpenCV enabled in Darknet build this will output a window
     //show_image(im, "predictions");
     } else
     {
