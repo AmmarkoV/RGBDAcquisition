@@ -16,18 +16,19 @@ unsigned int framesProcessed=0;
 
 struct darknetContext
 {
- image **alphabet;
- network * net;
+ image **alphabet; //This carries the fonts ( https://github.com/pjreddie/darknet/tree/master/data/labels )..
+
+ network * net; //This is the loaded network where all the magic happens
 
  float nms;
- box *boxes;
+ box   *boxes;
  float **probs;
  float **masks;
- char **names;
+ char  **names;
 
- detection *dets;
+ detection *dets; //The new detections structure that carries detections
 
- float threshold;
+ float threshold; //Our threshold for what is acceptable
  float hierarchyThreshold;
 };
 
@@ -46,7 +47,7 @@ image load_image_from_buffer(void * pixels , unsigned int width, unsigned int he
     {
       for(k= 0; k < c; ++k)
         {
-            for(j = 0; j < w; ++j)
+          for(j = 0; j < w; ++j)
             {
                 im.data[k*w*h + i*w + j] = (float) data[i*step + j*c + k]/255.1; //Prevent saturation
             }
@@ -241,60 +242,75 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
  //fprintf(stderr,"addDataInput_DarknetProcessor %u (%ux%u) channels=%u\n" , stream , width, height,channels);
  if (stream==0)
  {
+    //This is the original input image that was given to addDataInput_DarknetProcessor
     image im=load_image_from_buffer(data, width, height, channels);
-    //save_image(im, "original");
 
+
+    //We might want to resize the image to make it 448x448
     image sized = resize_image(im, dc.net->w, dc.net->h);
+
+    //But another idea could be to letterbox it to 448x448 , which is disabled
     //image sized = letterbox_image(im, dc.net->w, dc.net->h);
+
+    //We can also dump it to disk to view it , also disabled
     //save_image(sized, "sized");
 
+
+    //This is the final layer of the net
     layer l = dc.net->layers[dc.net->n-1];
 
-    //fprintf(stderr,"detecting.. ");
+    //Detecting happens here
     float *prediction = network_predict(dc.net /*Neural Net*/, sized.data /*Search Image*/);
-    //fprintf(stderr,"done ( %u )\n",l.outputs);
 
 
-    int networkProducedAResult = 1;
-    if (networkProducedAResult)
+    if (prediction!=0)
     {
+     //We got back something which needs to be decoded
+
      int nboxes = 0;
+
+     //We get back the detections as per the YOLO paper
      dc.dets = get_network_boxes(dc.net, 1, 1, dc.threshold, 0, 0, 0, &nboxes);
-     if (dc.nms)
-         { do_nms_sort(dc.dets, l.w*l.h*l.n, l.classes, dc.nms); }
 
-      get_detection_detections(l, 1 , 1 , dc.threshold, dc.dets);
+     //The detections are sorted and duplicates discarded
+     if (dc.nms) { do_nms_sort(dc.dets, l.w*l.h*l.n, l.classes, dc.nms); }
 
-
-    //printf("Objects (%u classes):\n\n",l.classes);
-
+     //Detections are detected..! :P
+     get_detection_detections(l, 1 , 1 , dc.threshold, dc.dets);
 
 
-   time_t clock = time(NULL);
-   struct tm * ptm = gmtime ( &clock );
+     //This is just to log time..
+     time_t clock = time(NULL);
+     struct tm * ptm = gmtime ( &clock );
 
+
+     //Rectangles, labels etc are added to im
      int num = l.side*l.side*l.n;
      draw_detections(im, dc.dets,num, dc.threshold, dc.names, dc.alphabet, l.classes);
 
-    unsigned int i=0,j=0;
+
+     //This is the directory we want to dump output ( plus the date )
+     char directoryToUse[1024];
+     snprintf(directoryToUse,1024,"%u_%02u_%02u", EPOCH_YEAR_IN_TM_YEAR+ptm->tm_year, ptm->tm_mon+1, ptm->tm_mday);
+     useLoggingDirectory(directoryToUse);
 
 
-    char directoryToUse[1024];
-    snprintf(directoryToUse,1024,"%u_%02u_%02u", EPOCH_YEAR_IN_TM_YEAR+ptm->tm_year, ptm->tm_mon+1, ptm->tm_mday);
-    useLoggingDirectory(directoryToUse);
+     //This surveilance.log will be appended with the last results
+     char logFile[1024];
+     snprintf(logFile,1024,"%s/surveilance.log",directoryToUse);
 
+     FILE * fp = startLogging(logFile);
 
-    char logFile[1024];
-    snprintf(logFile,1024,"%s/surveilance.log",directoryToUse);
-
-    FILE * fp = startLogging(logFile);
-
+     //Go Through all detections
+     unsigned int i=0,j=0;
      for(i = 0; i < nboxes; ++i)
       {
         for(j = 0; j < l.classes; ++j)
         {
+            //If probability is not zero
             if (dc.dets[i].prob[j])
             {
+              //This detection is important and we need to consider it
               receiveDetection(
                               data, width, height ,
                               &im,
@@ -315,6 +331,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
         }
     }
 
+    //Done with current frame
     fflush(fp);
     stopLogging(fp);
 
@@ -324,6 +341,7 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
      fprintf(stderr,"Failed to run network ( prediction points to %p )..\n",prediction);
     }
 
+    //Free memory to ensure no leaks..
     free_image(im);
     free_image(sized);
 
