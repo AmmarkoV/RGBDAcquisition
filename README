@@ -25,8 +25,11 @@ Switching them on and recompiling the library will generate the required plugins
 
 There is also a GUI editor (ENABLE_EDITOR) based on wxWidgets that can be used as a graphical tool to acquire datasets, record them and then even segment them and do various simple processing tasks on them. 
 
+after building it you can run it by issuing :
+./run_editor.sh
 
-The project is divided in libraries applications and tools
+
+The project is divided in libraries, applications, processors and tools
 
 Applications include :
 a Grabber , which can grab frames from the inputs and save them to disk 
@@ -34,7 +37,7 @@ a Muxer   , which can combine 2 frame streams in to a new one and save it to dis
 a Broadcaster , which can transmit a stream through HTTP protocol
 a Viewer   , which can view a stream
 a Segmenter , which can discard or label parts of a stream
-an Editor , which is quite experimental and doesnt do anything for now ;P
+an Editor , which is a graphical way to manage your datasets
 
 Tools include :
 Intrinsic / Extrinsic calibration using opencv
@@ -42,6 +45,7 @@ Convertors from/to Euler/Quaternions
 Undistorting images ( intrinsic )
 Converting from 16bit PNG depths to PNM
 Calibrating a camera intrinsics/extrinsics using OpenCV 
+A ROS module to publish image streams using this library
 
 Libraries include :
 V4L2 acquisition
@@ -55,14 +59,16 @@ libFreenect acquisition
 OpenGL simulation acquistiion
 Template acquisition ( from images )
 
-To test it issue 
+Processors include :
+Darknet Neural Network processing
+Movidius/Intel Neural Compute Stick processing
+Simple obstacle detection 
+ 
 
-./run_grabber.sh -maxFrames 10
-
-You can select from the modules linked by using  them as a parameter..
+When grabbing datasets you can select from the modules linked by using  them as a parameter..
 For example
-./run_grabber.sh -maxFrames 10 -module OPENNI2 -to outdir 
-this will grab 10 frames from module OpenNI ( provided it is compiled in ) and write them to grabber/frames/outdir
+./run_grabber.sh -maxFrames 10 -module OPENNI2 -from 0 -to outdir 
+this will grab 10 frames (-maxFrames 10) from the first(-from 0) OpenNI2 device (-module OPENNI2) plugged in ( provided it is compiled in ) and then write the output to grabber/frames/outdir
 
 Possible choices for modules are :
 V4L2
@@ -83,6 +89,10 @@ There are also processors that can process the acquired images
 For example assuming that you have a webcam connected, you have installed the darknet repository on the 3dparty directory and downloaded the appropriate weight files and you have also enabled the flags ENABLE_OPENCV, ENABLE_V4L2, ENABLE_PROCESSOR_DARKNET using cmake-gui you can process incoming images using darknet with the following command. 
   
 ./run_viewer.sh -module V4L2 -from /dev/video0  -noDepth -processor ../processors/DarknetProcessor/libDarknetProcessor.so  DarknetProcessor  $DIR/3dparty/darknet/yolo.weights $DIR/3dparty/darknet/cfg/yolo.cfg  $DIR/3dparty/darknet/cfg/coco.data --payload ./payload.sh $@
+
+in order to dump 100 frames from your V4L2 Webcam to grabber/frames/v4l2test directory you can do
+
+./run_grabber.sh -module V4L2 -from /dev/video0 -noDepth -maxFrames 100 -to v4l2test
 
 ----------------------------
 
