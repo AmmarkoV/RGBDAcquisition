@@ -1,8 +1,4 @@
-This is the RGBD project.. 
-
-If you want to download OpenNI , OpenNI2 , LibFreenect , please issue 
-cd 3dparty && ./get_third_party_libs.sh
-
+This is the RGBDAcquisition project, a Linux RGBD image acquisition toolkit .. 
 
 To compile the library issue :
 
@@ -11,19 +7,23 @@ cd build
 cmake .. 
 make 
 
-Due to making things that require OpenNI , OpenNI2 , libFreenect , OpenGL , OpenCV and other stuff by just issuing the make script will stop in the first failure. 
-If you want specific things just type make <tab> and see the specifics that you need 
-for example one might only need the grabber , template module and the acquisition plugin so he could just run 
 
-make grabber_grabber  acquisition_acquisition template_acquisition_shared_library_templateacquisition 
+Since this library has plug-ins that are tied to V4L2,OpenNI,OpenNI2,Intel Realsense,Depthsense Kinetic,OpenGL,wxWidgets,OpenCV and other back-ends each has its own dependecies and when you first clone the repository and do this first build only the basic things will get built
 
-And this way skip everything else that is irrelevant to him.. 
+If you want to download OpenNI , OpenNI2 , LibFreenect etc , please issue 
+cd 3dparty && ./get_third_party_libs.sh
 
-Another way to deal with missing dependencies is through the acquisition/acquisition_setup.h file which can deactivate compilation of certain modules..
+The script will ask you a series of questions and will try to download and setup the libraries you request.
 
+if you wan to enable specific camera systems etc (and provided that their installations are ok) you can issue 
 
+cd build 
+cmake-gui ..
 
-To compile the tools ,  if you dont have OpenCV you might not be able to build all of them
+and there you will find a big list of ENABLE_X items  (ENABLE_OPENNI2,ENABLE_JPG,ENABLE_OPENGL etc ).
+Switching them on and recompiling the library will generate the required plugins to use them.
+
+There is also a GUI editor (ENABLE_EDITOR) based on wxWidgets that can be used as a graphical tool to acquire datasets, record them and then even segment them and do various simple processing tasks on them. 
 
 
 The project is divided in libraries applications and tools
@@ -48,7 +48,10 @@ V4L2 acquisition
 V4L2 Stereo acquisition
 OpenNI1 acquisition
 OpenNI2 acquisition
-libFreenect acquisition
+DepthSense Soft Kinetic acquisition
+Intel Realsense acquisition
+Desktop Recording (X11) Acquition
+libFreenect acquisition 
 OpenGL simulation acquistiion
 Template acquisition ( from images )
 
@@ -58,23 +61,32 @@ To test it issue
 
 You can select from the modules linked by using  them as a parameter..
 For example
-./run_grabber.sh -maxFrames 10 -module OPENNI1 -to outdir 
+./run_grabber.sh -maxFrames 10 -module OPENNI2 -to outdir 
 this will grab 10 frames from module OpenNI ( provided it is compiled in ) and write them to grabber/frames/outdir
 
 Possible choices for modules are :
-FREENECT  
-OPENNI1 
-OPENNI2 
-OPENGL 
-V4L2 
-V4L2STEREO 
-TEMPLATE 
-NETWORK <- not working 
- 
+V4L2
+V4L2STEREO
+FREENECT
+OPENNI1
+OPENNI2
+OPENGL
+TEMPLATE
+NETWORK <-currently not working 
+DEPTHSENSE 
+REALSENSE 
+DESKTOP 
+SCRIPTED 
+
+
+There are also processors that can process the acquired images 
+For example assuming that you have a webcam connected, you have installed the darknet repository on the 3dparty directory and downloaded the appropriate weight files and you have also enabled the flags ENABLE_OPENCV, ENABLE_V4L2, ENABLE_PROCESSOR_DARKNET using cmake-gui you can process incoming images using darknet with the following command. 
+  
+./run_viewer.sh -module V4L2 -from /dev/video0  -noDepth -processor ../processors/DarknetProcessor/libDarknetProcessor.so  DarknetProcessor  $DIR/3dparty/darknet/yolo.weights $DIR/3dparty/darknet/cfg/yolo.cfg  $DIR/3dparty/darknet/cfg/coco.data --payload ./payload.sh $@
 
 ----------------------------
 
-In order to keep repository sizes small , and If you want to use acquisitionBroadcast you should run ./getBroadcastDependencies.sh to clone the full AmmarServer library instead of the NULL version of the library currently installed
+In order to keep repository sizes small , and If you want to use acquisitionBroadcast you should run ./getBroadcastDependencies.sh to clone the full AmmarServer library which is not included since it has its own repository (https://github.com/AmmarkoV/AmmarServer/)
 To test it try 
 wget http://127.0.0.1:8080/rgb.ppm -O rgb.ppm
 wget http://127.0.0.1:8080/depth.ppm -O depth.ppm
