@@ -1,4 +1,15 @@
-This is the RGBDAcquisition project, a Linux RGBD image acquisition toolkit .. 
+![RGBDAcquisition](https://raw.githubusercontent.com/AmmarkoV/RGBDAcquisition/master/doc/imgBig.jpg)
+
+
+# RGBDAcquisition Project
+## A Linux RGBD image acquisition toolkit .. 
+
+This is a collection of utilities that help me record and organize RGBD datasets for my computer vision needs.
+The main feature is compatibility with a lot of different sensors and a streamlined approach to storing the datasets in order to segment them and use them for various experiments etc.  
+
+
+## Building
+------------------------------------------------------------------ 
 
 To compile the library issue :
 
@@ -31,7 +42,9 @@ after building it you can run it by issuing :
 
 The project is divided in libraries, applications, processors and tools
 
-Applications include :
+
+## Applications
+------------------------------------------------------------------ 
 a Grabber , which can grab frames from the inputs and save them to disk 
 a Muxer   , which can combine 2 frame streams in to a new one and save it to disk
 a Broadcaster , which can transmit a stream through HTTP protocol
@@ -39,7 +52,8 @@ a Viewer   , which can view a stream
 a Segmenter , which can discard or label parts of a stream
 an Editor , which is a graphical way to manage your datasets
 
-Tools include :
+## Tools
+------------------------------------------------------------------ 
 Intrinsic / Extrinsic calibration using opencv
 Convertors from/to Euler/Quaternions
 Undistorting images ( intrinsic )
@@ -47,7 +61,8 @@ Converting from 16bit PNG depths to PNM
 Calibrating a camera intrinsics/extrinsics using OpenCV 
 A ROS module to publish image streams using this library
 
-Libraries include :
+## Libraries
+------------------------------------------------------------------ 
 V4L2 acquisition
 V4L2 Stereo acquisition
 OpenNI1 acquisition
@@ -59,7 +74,8 @@ libFreenect acquisition
 OpenGL simulation acquistiion
 Template acquisition ( from images )
 
-Processors include :
+## Processors
+------------------------------------------------------------------ 
 Darknet Neural Network processing
 Movidius/Intel Neural Compute Stick processing
 Simple obstacle detection 
