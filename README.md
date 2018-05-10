@@ -45,40 +45,42 @@ The project is divided in libraries, applications, processors and tools
 
 ## Applications
 ------------------------------------------------------------------ 
-a Grabber , which can grab frames from the inputs and save them to disk 
-a Muxer   , which can combine 2 frame streams in to a new one and save it to disk
-a Broadcaster , which can transmit a stream through HTTP protocol
-a Viewer   , which can view a stream
-a Segmenter , which can discard or label parts of a stream
-an Editor , which is a graphical way to manage your datasets
+- a Grabber , which can grab frames from the inputs and save them to disk 
+- a Muxer   , which can combine 2 frame streams in to a new one and save it to disk
+- a Broadcaster , which can transmit a stream through HTTP protocol
+- a Viewer   , which can view a stream
+- a Segmenter , which can discard or label parts of a stream
+- an Editor , which is a graphical way to manage your datasets
 
 ## Tools
 ------------------------------------------------------------------ 
-Intrinsic / Extrinsic calibration using opencv
-Convertors from/to Euler/Quaternions
-Undistorting images ( intrinsic )
-Converting from 16bit PNG depths to PNM
-Calibrating a camera intrinsics/extrinsics using OpenCV 
-A ROS module to publish image streams using this library
+- Intrinsic / Extrinsic calibration using opencv
+- Convertors from/to Euler/Quaternions
+- Undistorting images ( intrinsic )
+- Converting from 16bit PNG depths to PNM
+- Calibrating a camera intrinsics/extrinsics using OpenCV 
+- A ROS module to publish image streams using this library
+- A programmable OpenGL scene simulator 
+- A *Lot* of reusable code that does various simple computer vision tasks
 
 ## Libraries
 ------------------------------------------------------------------ 
-V4L2 acquisition
-V4L2 Stereo acquisition
-OpenNI1 acquisition
-OpenNI2 acquisition
-DepthSense Soft Kinetic acquisition
-Intel Realsense acquisition
-Desktop Recording (X11) Acquition
-libFreenect acquisition 
-OpenGL simulation acquistiion
-Template acquisition ( from images )
+- V4L2 acquisition
+- V4L2 Stereo acquisition
+- OpenNI1 acquisition
+- OpenNI2 acquisition
+- DepthSense Soft Kinetic acquisition
+- Intel Realsense acquisition
+- Desktop Recording (X11) Acquition
+- libFreenect acquisition 
+- OpenGL simulation acquistiion
+- Template acquisition ( from images )
 
 ## Processors
 ------------------------------------------------------------------ 
-Darknet Neural Network processing
-Movidius/Intel Neural Compute Stick processing
-Simple obstacle detection 
+- Darknet Neural Network processing
+- Movidius/Intel Neural Compute Stick processing
+- Simple obstacle detection 
  
 
 When grabbing datasets you can select from the modules linked by using  them as a parameter..
