@@ -37,6 +37,27 @@ unsigned int framesProcessed=0;
 //Our static darknet context
 struct darknetContext dc={0};
 
+
+unsigned int countLinesOfFile(const char * path)
+{
+  FILE *fp = fopen(path,"r");
+  if (fp!=0)
+  {
+    unsigned int lines=0;
+    while(!feof(fp))
+     {
+      char ch = fgetc(fp);
+      if(ch == '\n')
+      {
+       lines++;
+      }
+     }
+    fclose(fp);
+    return lines;
+  }
+  return 0;
+}
+
 //This image converts a raw pointer to an image structure as needed by stb_image
 image convertBufferToImage(void * pixels , unsigned int width, unsigned int height, unsigned int channels)
 {
@@ -63,7 +84,9 @@ int internalDarknetInitialization(
                                   const char *cfgfile,
                                   const char *weightfile,
                                   const char *datafile,
-                                  float threshold
+                                  const char *namelistfile,
+                                  float threshold,
+                                  float nms
                                  )
 {
     if ( (!cfgfile) || (!weightfile) || (!datafile) )  { return 0; }
@@ -73,15 +96,25 @@ int internalDarknetInitialization(
 
     dc.alphabet = load_alphabet();
 
+    fprintf(stderr,"--------------- Darknet Configuration ---------------\n");
     fprintf(stderr,"Data Source : %s\n",datafile);
+    fprintf(stderr,"Names list Source : %s\n",namelistfile);
     fprintf(stderr,"CFG Source : %s\n",cfgfile);
     fprintf(stderr,"Weight Source : %s\n",weightfile);
+    fprintf(stderr,"Threshold : %0.2f\n",threshold);
+    fprintf(stderr,"NMS : %0.2f\n",nms);
 
-    list *options   = read_data_cfg(datafile);
-    int classes     = option_find_int(options, "classes", 20);
-    char *name_list = option_find_str(options, "names", "data/names.list");
-    dc.names        = get_labels(name_list);
-    dc.nms=.4;
+    //list *options   = read_data_cfg(datafile);
+    //int classes     = option_find_int(options, "classes", 20);
+    //char *name_list = option_find_str(options, "names", namelistfile);
+
+    int classes = countLinesOfFile(namelistfile);
+    fprintf(stderr,"Number of Classes : %u\n",classes);
+    fprintf(stderr,"----------------------------------------------------\n");
+
+
+    dc.names        = get_labels(namelistfile);
+    dc.nms=nms;
     dc.threshold=threshold;
 
     dc.net = load_network(cfgfile, weightfile, 0);
@@ -108,8 +141,10 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
  char * cfgFile=0;
  char * weightFile=0;
  char * dataFile=0;
+ char * namelistFile=0;
 
  float threshold=0.55; // was 0.35
+ float nms=0.4;
 
 
  unsigned int i=0;
@@ -118,8 +153,10 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
    if (strstr(argv[i],".cfg")!=0)        { cfgFile=argv[i]; }
    if (strstr(argv[i],".weights")!=0)    { weightFile=argv[i]; }
    if (strstr(argv[i],".data")!=0)       { dataFile=argv[i]; }
+   if (strstr(argv[i],".names")!=0)      { namelistFile=argv[i]; }
    if (strstr(argv[i],"--payload")!=0)   { payload=argv[i+1]; }
    if (strstr(argv[i],"--threshold")!=0) { threshold=atof(argv[i+1]); }
+   if (strstr(argv[i],"--nms")!=0)       { nms=atof(argv[i+1]); }
  }
 
  #if GPU
@@ -149,7 +186,9 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
                                        cfgFile,    //"yourpath/yolo.cfg"
                                        weightFile, //"yourpath/yolo.weights"
                                        dataFile,   //"yourpath/coco.data"
-                                       threshold
+                                       namelistFile,//"data/names.list"
+                                       threshold,
+                                       nms
                                      );
 }
 
