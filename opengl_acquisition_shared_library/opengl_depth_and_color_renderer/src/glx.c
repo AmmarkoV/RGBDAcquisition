@@ -67,7 +67,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
       return 0;
     }
 
-
+  //viewWindow=1; //FORCE
 
   //Two seperate glx initialization procedures wether we want a window or offscreen rendering..
   if (viewWindow)

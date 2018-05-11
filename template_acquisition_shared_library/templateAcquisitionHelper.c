@@ -294,10 +294,11 @@ void * ReadImageFile(void * existingBuffer ,char * filename , char * extension ,
    if (existingBuffer!=0) { free(existingBuffer); existingBuffer=0; }
 
    unsigned int type=0;
-   if (strcmp(extension,"pnm")==0) { type=PNM_CODEC; } else
-   if (strcmp(extension,"png")==0) { type=PNG_CODEC; } else
-   if (strcmp(extension,"jpg")==0) { type=JPG_CODEC; } else
-   if (strcmp(extension,"jps")==0) { type=JPG_CODEC; } else
+   if (strcmp(extension,"pnm")==0)  { type=PNM_CODEC; } else
+   if (strcmp(extension,"cpnm")==0) { type=COMPATIBLE_PNM_CODEC; } else
+   if (strcmp(extension,"png")==0)  { type=PNG_CODEC; } else
+   if (strcmp(extension,"jpg")==0)  { type=JPG_CODEC; } else
+   if (strcmp(extension,"jps")==0)  { type=JPG_CODEC; } else
    if (strcmp(extension,"jpeg")==0) { type=JPG_CODEC; }
    unsigned int bitsperpixel,channels;
    //fprintf(stderr,"Reading %s , using Codec Library .. ",filename);
@@ -348,7 +349,8 @@ unsigned int findExtensionOfDataset(
    if (i==0) { strncpy(colorExtension,"pnm",MAX_EXTENSION_PATH); } else
    if (i==1) { strncpy(colorExtension,"png",MAX_EXTENSION_PATH); } else
    if (i==2) { strncpy(colorExtension,"jpg",MAX_EXTENSION_PATH); } else
-   if (i==3) { strncpy(colorExtension,"jps",MAX_EXTENSION_PATH); }
+   if (i==3) { strncpy(colorExtension,"jps",MAX_EXTENSION_PATH); } else
+   if (i==4) { strncpy(colorExtension,"cpnm",MAX_EXTENSION_PATH); }
 
    tryStyle=0;
    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_COLOR_FILE , devID , startingFrame , &tryStyle , readFromDir ,colorSubDirectory , depthSubDirectory , colorExtension );
@@ -367,7 +369,8 @@ unsigned int findExtensionOfDataset(
    if (i==0) { strncpy(depthExtension,"pnm",MAX_EXTENSION_PATH); } else
    if (i==1) { strncpy(depthExtension,"png",MAX_EXTENSION_PATH); } else
    if (i==2) { strncpy(depthExtension,"jpg",MAX_EXTENSION_PATH); } else
-   if (i==2) { strncpy(depthExtension,"jps",MAX_EXTENSION_PATH); }
+   if (i==3) { strncpy(depthExtension,"jps",MAX_EXTENSION_PATH); }else
+   if (i==4) { strncpy(colorExtension,"cpnm",MAX_EXTENSION_PATH); }
 
    tryStyle=0;
    getFilenameForNextResource(file_name_test , MAX_DIR_PATH , RESOURCE_DEPTH_FILE , devID , startingFrame , &tryStyle , readFromDir ,colorSubDirectory , depthSubDirectory , depthExtension );
