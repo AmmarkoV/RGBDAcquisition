@@ -1,4 +1,4 @@
-![OpenGL Renderer/Simulator](https://raw.githubusercontent.com/AmmarkoV/RGBDAcquisition/master/doc/imgBig.jpg)
+![OpenGL Renderer/Simulator](https://raw.githubusercontent.com/AmmarkoV/RGBDAcquisition/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/doc/logo.png)
 This is an GNU/Linux oriented OpenGL renderer that can be used as a simple scripting engine to create simulated datasets..!
 
 
