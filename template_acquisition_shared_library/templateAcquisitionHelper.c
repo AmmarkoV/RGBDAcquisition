@@ -20,6 +20,7 @@
 
 int _tacq_directoryExists(const char* folder)
 {
+ if (folder==0) { return 0; }
  struct stat sb;
 
  //fprintf(stderr,"Checking if directory (%s) exists : ",folder);
@@ -35,6 +36,7 @@ int _tacq_directoryExists(const char* folder)
 
 int fileExists(char * filename)
 {
+ if (filename==0) { return 0; }
  //fprintf(stderr,"Checking if file (%s) exists : ",filename);
  FILE *fp = fopen(filename,"r");
  if( fp ) { /* exists */

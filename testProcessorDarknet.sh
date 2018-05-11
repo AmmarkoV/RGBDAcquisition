@@ -13,12 +13,19 @@ ln -s $DIR/3dparty
 cd $DIR
 
 
+
+#YOLOv3
+#./run_viewer.sh -module V4L2 -from /dev/video0  -noDepth -processor ../processors/DarknetProcessor/libDarknetProcessor.so  DarknetProcessor  $DIR/3dparty/darknet/yolov3.weights $DIR/3dparty/darknet/cfg/yolov3.cfg  $DIR/3dparty/darknet/cfg/coco.data $DIR/3dparty/darknet/data/coco.names --payload ./payload.sh $@
+
+
+#YOLO
 ./run_viewer.sh -module V4L2 -from /dev/video0  -noDepth -processor ../processors/DarknetProcessor/libDarknetProcessor.so  DarknetProcessor  $DIR/3dparty/darknet/yolo.weights $DIR/3dparty/darknet/cfg/yolo.cfg  $DIR/3dparty/darknet/cfg/coco.data $DIR/3dparty/darknet/data/coco.names --payload ./payload.sh $@
-
-#./run_viewer.sh -module TEMPLATE -from naobasic  -noDepth  -processor ../processors/DarknetProcessor/libDarknetProcessor.so  DarknetProcessor  $DIR/3dparty/darknet/yolo.weights $DIR/3dparty/darknet/cfg/yolo.cfg  $DIR/3dparty/darknet/cfg/coco.data $@
  
+#CIFAR
+#./run_viewer.sh -module V4L2 -from /dev/video0  -noDepth -processor ../processors/DarknetProcessor/libDarknetProcessor.so  DarknetProcessor  $DIR/3dparty/darknet/backup/cifar_small.weights $DIR/3dparty/darknet/cfg/cifar_small.cfg  $DIR/3dparty/darknet/cfg/cifar.data  $DIR/3dparty/darknet/data/cifar/labels.txt --payload ./payload.sh $@
 
+#TINYYOLO
+#./run_viewer.sh -module V4L2 -from /dev/video0  -noDepth -processor ../processors/DarknetProcessor/libDarknetProcessor.so  DarknetProcessor  $DIR/3dparty/darknet/yolov2-tiny.weights $DIR/3dparty/darknet/cfg/yolov2-tiny.cfg $DIR/3dparty/darknet/data/coco.names --noVisualization --noFileOutput --payload ./payload.sh $@
 
-#./run_viewer.sh -module V4L2 -from /dev/video0  -noDepth -processor ../processors/DarknetProcessor/libDarknetProcessor.so  DarknetProcessor  $DIR/3dparty/darknet/backup/cifar_small.weights $DIR/3dparty/darknet/cfg/cifar_small.cfg  $DIR/3dparty/darknet/cfg/cifar.data --payload ./payload.sh $@
 
 exit 0 
