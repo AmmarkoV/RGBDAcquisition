@@ -1,10 +1,30 @@
-A simple package that exports a 2D color and depth map from a 3D Scene using OpenGL
+![OpenGL Renderer/Simulator](https://raw.githubusercontent.com/AmmarkoV/RGBDAcquisition/master/doc/imgBig.jpg)
+This is an GNU/Linux oriented OpenGL renderer that can be used as a simple scripting engine to create simulated datasets..!
 
-Linux Only :P 
 
-Issue 
+
+## Building
+------------------------------------------------------------------ 
+
+To compile the library issue :
+
+```
+mkdir build 
+cd build 
+cmake .. 
 make 
-to compile the project
+```
+
+## Running
+------------------------------------------------------------------ 
+To run you basically feed the Renderer with a scene file and you get back an OpenGL window where you can see what is happening.
+Editing the scene file updates results live on the Renderer 
 
 
-issue ./Render to start the renderer , on every click color.pnm and depth.pnm get the image active data 
+```
+./Renderer --from Scenes/hardcodedTest.conf
+```
+
+
+Using the key O you can dump an RGB and Depth image to disk
+

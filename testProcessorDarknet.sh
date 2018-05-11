@@ -27,5 +27,8 @@ cd $DIR
 #TINYYOLO
 #./run_viewer.sh -module V4L2 -from /dev/video0  -noDepth -processor ../processors/DarknetProcessor/libDarknetProcessor.so  DarknetProcessor  $DIR/3dparty/darknet/yolov2-tiny.weights $DIR/3dparty/darknet/cfg/yolov2-tiny.cfg $DIR/3dparty/darknet/data/coco.names --noVisualization --noFileOutput --payload ./payload.sh $@
 
+#Run in editor
+#./run_editor.sh /home/ammar/Documents/Programming/RGBDAcquisition/3dparty/darknet/yolo.weights /home/ammar/Documents/Programming/RGBDAcquisition/3dparty/darknet/cfg/yolo.cfg  /home/ammar/Documents/Programming/RGBDAcquisition/3dparty/darknet/cfg/coco.data /home/ammar/Documents/Programming/RGBDAcquisition/3dparty/darknet/data/coco.names
+
 
 exit 0 
