@@ -18,12 +18,20 @@ IMPLEMENT_APP(EditorApp);
 
 bool EditorApp::OnInit()
 {
+
     //(*AppInitialize
     bool wxsOK = true;
     wxInitAllImageHandlers();
     if ( wxsOK )
     {
     	EditorFrame* Frame = new EditorFrame(0);
+
+
+        //Recover commandline options
+        Frame->argc = this->argc;
+        Frame->argv = (char**) this->argv;
+        std::cout<<"We have "<<this->argc<<" command line arguments \n";
+
     	Frame->Show();
     	SetTopWindow(Frame);
     }

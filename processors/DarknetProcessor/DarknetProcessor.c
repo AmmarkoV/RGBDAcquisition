@@ -13,6 +13,7 @@
 #define GPU 1
 #include "../../3dparty/darknet/include/darknet.h"
 
+int haveInitialization=0;
 int produceFileOutput=1;
 int produceRGBOutput=1;
 
@@ -169,6 +170,7 @@ int internalDarknetInitialization(
          { dc.probs[j] = (float *)calloc( l.classes+1, sizeof(float)); }
 
     fprintf(stderr,"Done with initialization ..\n");
+    haveInitialization=1;
  return 1;
 }
 
@@ -339,6 +341,12 @@ int receiveDetection(
 
 int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
+ if (!haveInitialization)
+    {
+      fprintf(stderr,"Darknet Processor was not initialized properly and will not do anything..\n");
+      return 0;
+    }
+
  //fprintf(stderr,"addDataInput_DarknetProcessor %u (%ux%u) channels=%u\n" , stream , width, height,channels);
  if (stream==0)
  {

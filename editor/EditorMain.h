@@ -10,6 +10,8 @@
 #ifndef EDITORMAIN_H
 #define EDITORMAIN_H
 
+
+
 //(*Headers(EditorFrame)
 #include <wx/checkbox.h>
 #include <wx/listctrl.h>
@@ -59,6 +61,9 @@ class EditorFrame: public wxFrame
 
         int framesDrawn;
         int framesSnapped;
+
+        int argc;
+        char ** argv;
 
     private:
 

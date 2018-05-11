@@ -42,8 +42,16 @@
 
 #define USE_BIRDVIEW_LOGIC 1
 
+#define NORMAL "\033[0m"
+#define BLACK "\033[30m" /* Black */
+#define RED "\033[31m" /* Red */
+#define GREEN "\033[32m" /* Green */
+#define YELLOW "\033[33m" /* Yellow */
 
 #define OVERLAY_EDITOR_SCENE_FILE "Scenes/editor.conf"
+
+int argc=0;
+char ** argv=0;
 
 ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 unsigned int devID=0;
@@ -1677,5 +1685,31 @@ void EditorFrame::OnChoiceProcessorSelect(wxCommandEvent& event)
   wxString selectionStr = ChoiceProcessor->GetString(selection);
   snprintf(processorLoaded,1024,selectionStr.mb_str());
   fprintf(stderr,"Processor Selected : `%s`\n",processorLoaded);
+
+  char processorPath[1024]={0};
+  snprintf(processorPath,1024,"../processors/%s/lib%s.so",processorLoaded,processorLoaded);
+
+
+  if (this->argc==0)
+  {
+    fprintf(stderr,RED "Please note that processors need arguments to work correctly, you provided none..\n" NORMAL);
+  } else
+  {
+   fprintf(stderr,"We had %u arguments \n",this->argc);
+   if (this->argv!=0)
+   {
+    int i=0;
+
+    for (i=0; i<this->argc; i++)
+    {
+      fprintf(stderr,"%u -> %s \n",i,this->argv[i]);
+    }
+   } else
+   {
+     fprintf(stderr,"But the argument strings were incorrect\n");
+   }
+  }
+
+  acquisitionAddProcessor(moduleID,devID,processorPath,processorLoaded,this->argc,(const char**) this->argv);
 
 }
