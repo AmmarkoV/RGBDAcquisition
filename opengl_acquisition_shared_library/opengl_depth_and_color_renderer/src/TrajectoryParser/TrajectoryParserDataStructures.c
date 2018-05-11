@@ -619,7 +619,7 @@ int generateAngleObjectsForVirtualStream(struct VirtualStream * stream, struct M
   unsigned int duration=10000;
 
   float scale=0.03; // 0.025
-  addObjectTypeToVirtualStream(stream,"autoGenAngleObject","sphere");
+  addObjectTypeToVirtualStream(stream,"autoGenAngleObject","sphere",0);
 
 
   float coords[7]={100,100,100,0,0,0,0};
@@ -915,6 +915,42 @@ int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int O
 }
 
 
+int modelFileExists(char * filename)
+{
+ if (filename==0) { return 0; }
+ //fprintf(stderr,"Checking if file (%s) exists : ",filename);
+ FILE *fp = fopen(filename,"r");
+ if( fp ) { /* exists */
+            fclose(fp);
+            //fprintf(stderr,"yes\n");
+            return 1;
+          }
+ /* doesnt exist */
+ //fprintf(stderr,"no\n");
+ return 0;
+}
+
+
+int downloadModel(const char * model , const char * path)
+{
+    fprintf(stderr,YELLOW "downloadModel `%s` `%s`\n" NORMAL,model,path);
+  if (!modelFileExists(model))
+  {
+    fprintf(stderr,YELLOW "We don't have the model so we will try to download it from `%s`\n" NORMAL,path);
+
+    char runScript[1024]={0};
+    snprintf(runScript,1024,"Scripts/downloadModel.sh \"%s\"",path);
+    int i=system(runScript);
+    if (i==0)
+       {
+          return 1;
+       }
+  }
+  return 0;
+}
+
+
+
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,
                                  const char * type ,
@@ -929,42 +965,29 @@ int addObjectTypeToVirtualStream(
     //We have the space so lets fill our new object spot ..!
     unsigned int pos = stream->numberOfObjectTypes;
 
-    #if USE_HASHMAPS
-    hashMap_AddULong(stream->objectTypesHash,type,pos);
-    #endif // USE_HASHMAPS
 
-    strcpy(stream->objectTypes[pos].name,type);
-    strcpy(stream->objectTypes[pos].model,model);
+     if (downloadModel(model,webLink))
+      {
 
+       #if USE_HASHMAPS
+         hashMap_AddULong(stream->objectTypesHash,type,pos);
+       #endif // USE_HASHMAPS
 
+       strcpy(stream->objectTypes[pos].name,type);
+       strcpy(stream->objectTypes[pos].model,model);
 
-    fprintf(stderr,"addedObjectType(%s,%s) with ID %u , now to load model \n",type,model,pos);
-    if ( !loadObjectTypeModelForVirtualStream(
+       fprintf(stderr,"addedObjectType(%s,%s) with ID %u , now to load model \n",type,model,pos);
+       if (loadObjectTypeModelForVirtualStream(
                                               stream ,
                                               model ,
                                               pos
                                              ) )
-    {
-       fprintf(stderr,"We don't have the model so we will try to download it from %s\n",webLink);
+       { ++stream->numberOfObjectTypes;
+         return 1; }
+      } else
+      { fprintf(stderr,"Could not find model\n"); }
 
-       char runScript[1024]={0};
-       snprintf(runScript,1024,"Scripts/downloadModel.sh %s",webLink);
-       int i=system(runScript);
-       if (i==0)
-       {
-            loadObjectTypeModelForVirtualStream(
-                                                stream ,
-                                                 model ,
-                                                pos
-                                               );
-       }
-    }
-
-
-
-    ++stream->numberOfObjectTypes;
-
-    return 1; // <- we a
+    return 0;
 }
 
 

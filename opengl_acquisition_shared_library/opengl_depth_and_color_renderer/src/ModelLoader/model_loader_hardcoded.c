@@ -39,13 +39,13 @@ GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 
 float planeCoords[]={ //X  Y  Z       W
                      //Bottom
-                      U*PLANE, -U*PLANE,  U*PLANE, //1.0,  // top right
-                     -U*PLANE, -U*PLANE,  U*PLANE, //1.0,  // top left
-                     -U*PLANE, -U*PLANE, -U*PLANE, //1.0,  // bottom left
+                      U*PLANE, 0,  U*PLANE, //1.0,  // top right
+                     -U*PLANE, 0,  U*PLANE, //1.0,  // top left
+                     -U*PLANE, 0, -U*PLANE, //1.0,  // bottom left
 
-                      U*PLANE, -U*PLANE, -U*PLANE,  //, 1.0 // bottom right
-                      U*PLANE, -U*PLANE,  U*PLANE,//1.0,   // top right
-                     -U*PLANE, -U*PLANE, -U*PLANE //1.0,  // bottom left
+                      U*PLANE, 0, -U*PLANE,  //, 1.0 // bottom right
+                      U*PLANE, 0,  U*PLANE,//1.0,   // top right
+                     -U*PLANE, 0, -U*PLANE //1.0,  // bottom left
                   };
 float planeNormals[]={ //X  Y  Z       W
                       //Bottom
