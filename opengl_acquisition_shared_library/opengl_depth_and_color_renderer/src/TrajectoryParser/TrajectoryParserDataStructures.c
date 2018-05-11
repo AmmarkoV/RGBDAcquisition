@@ -918,7 +918,8 @@ int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int O
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,
                                  const char * type ,
-                                 const char * model
+                                 const char * model,
+                                 const char * webLink
                                 )
 {
     if (stream->MAX_numberOfObjectTypes<=stream->numberOfObjectTypes+1) { growVirtualStreamObjectsTypes(stream,OBJECT_TYPES_TO_ADD_STEP); }
@@ -936,12 +937,28 @@ int addObjectTypeToVirtualStream(
     strcpy(stream->objectTypes[pos].model,model);
 
 
+
     fprintf(stderr,"addedObjectType(%s,%s) with ID %u , now to load model \n",type,model,pos);
-    loadObjectTypeModelForVirtualStream(
-                                        stream ,
-                                        model ,
-                                        pos
-                                       );
+    if ( !loadObjectTypeModelForVirtualStream(
+                                              stream ,
+                                              model ,
+                                              pos
+                                             ) )
+    {
+       fprintf(stderr,"We don't have the model so we will try to download it from %s\n",webLink);
+
+       char runScript[1024]={0};
+       snprintf(runScript,1024,"Scripts/downloadModel.sh %s",webLink);
+       int i=system(runScript);
+       if (i==0)
+       {
+            loadObjectTypeModelForVirtualStream(
+                                                stream ,
+                                                 model ,
+                                                pos
+                                               );
+       }
+    }
 
 
 

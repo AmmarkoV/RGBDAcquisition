@@ -205,7 +205,9 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
             case TRAJECTORYPRIMITIVES_OBJECTTYPE :
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                InputParser_GetWord(ipc,2,model,MAX_PATH);
-               addObjectTypeToVirtualStream( newstream , name, model );
+               InputParser_GetWord(ipc,3,nameB,MAX_PATH);
+
+               addObjectTypeToVirtualStream( newstream , name, model , nameB /*Path*/ );
              break;
 
 

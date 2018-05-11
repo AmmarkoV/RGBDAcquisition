@@ -136,7 +136,8 @@ int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int O
 
 int addObjectTypeToVirtualStream(
                                  struct VirtualStream * stream ,
-                                 const char * type , const char * model
+                                 const char * type , const char * model,
+                                 const char * webLink
                                 );
 
 int addEventToVirtualStream(
