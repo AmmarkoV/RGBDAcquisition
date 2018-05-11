@@ -22,6 +22,7 @@
 #include <wx/frame.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/choice.h>
 #include <wx/timer.h>
 //*)
 
@@ -104,6 +105,7 @@ class EditorFrame: public wxFrame
         void OnButtonMinusRotZClick(wxCommandEvent& event);
         void OnButtonPrev3DObjClick(wxCommandEvent& event);
         void OnButtonNext3DObjClick(wxCommandEvent& event);
+        void OnChoiceProcessorSelect(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(EditorFrame)
@@ -155,6 +157,7 @@ class EditorFrame: public wxFrame
         static const long ID_BUTTON25;
         static const long ID_BUTTON26;
         static const long ID_BUTTON27;
+        static const long ID_CHOICE1;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEPAIR;
         static const long ID_MENUSAVEDEPTH;
@@ -178,6 +181,7 @@ class EditorFrame: public wxFrame
         wxButton* ButtonPlusRotZ;
         wxButton* ButtonPlusRotY;
         wxSlider* OverlaySlider;
+        wxChoice* ChoiceProcessor;
         wxButton* buttonRecord;
         wxButton* ButtonMinusPosX;
         wxStaticText* StaticText1;

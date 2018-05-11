@@ -85,8 +85,7 @@ int logEvent(
    if (strcmp(label,"person")==0)
    {
     fprintf(
-            fp,
-            "detection(%u,%u,%u,%u,%u,%u,%u,%s,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",
+            fp, "detection(%u,%u,%u,%u,%u,%u,%u,%s,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",
 
             //Year/Month/Day
             EPOCH_YEAR_IN_TM_YEAR+ptm->tm_year,

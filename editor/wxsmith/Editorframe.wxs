@@ -124,12 +124,12 @@
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX3" variable="CheckBoxPluginProc" member="yes">
 			<label>PlugIn Proc</label>
-			<pos>1304,528</pos>
+			<pos>1320,540</pos>
 		</object>
 		<object class="wxButton" name="ID_BUTTON14" variable="ButtonAF" member="yes">
-			<label>AF</label>
-			<pos>1416,524</pos>
-			<size>37,29</size>
+			<label>Run</label>
+			<pos>1416,536</pos>
+			<size>61,29</size>
 			<handler function="OnButtonAFClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxSlider" name="ID_SLIDER2" variable="OverlaySlider" member="yes">
@@ -252,6 +252,21 @@
 			<pos>1328,424</pos>
 			<size>24,24</size>
 			<handler function="OnButtonPlusRotZClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxChoice" name="ID_CHOICE1" variable="ChoiceProcessor" member="yes">
+			<content>
+				<item>AutoFocus</item>
+				<item>DarknetProcessor</item>
+				<item>BlobDetector</item>
+				<item>ViewpointChange</item>
+				<item>ObstacleDetector</item>
+				<item>MovidiusProcessor</item>
+				<item>DisparityMapping</item>
+			</content>
+			<selection>0</selection>
+			<pos>1312,504</pos>
+			<size>168,29</size>
+			<handler function="OnChoiceProcessorSelect" entry="EVT_CHOICE" />
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">

@@ -29,6 +29,8 @@
 				<item>NETWORK</item>
 				<item>DEPTHSENSE</item>
 				<item>REALSENSE</item>
+				<item>DESKTOP</item>
+				<item>SCRIPTED</item>
 			</content>
 			<selection>7</selection>
 			<pos>88,16</pos>

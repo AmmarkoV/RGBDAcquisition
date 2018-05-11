@@ -85,6 +85,9 @@ unsigned int shiftX=0,shiftY=0;
 wxLongLong startTime;
 
 
+char processorLoaded[1024]={"AutoFocus"};
+
+
 unsigned int doBlobsEveryFrame=0;
 
 struct AF_Rectangle
@@ -199,6 +202,7 @@ const long EditorFrame::ID_BUTTON24 = wxNewId();
 const long EditorFrame::ID_BUTTON25 = wxNewId();
 const long EditorFrame::ID_BUTTON26 = wxNewId();
 const long EditorFrame::ID_BUTTON27 = wxNewId();
+const long EditorFrame::ID_CHOICE1 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
@@ -259,9 +263,9 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     ButtonSendDirectCommand = new wxButton(this, ID_BUTTON13, _(">"), wxPoint(1440,228), wxSize(29,29), 0, wxDefaultValidator, _T("ID_BUTTON13"));
     CheckBoxOverlayDepth = new wxCheckBox(this, ID_CHECKBOX2, _("Overlay Respect Depth"), wxPoint(1104,528), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
     CheckBoxOverlayDepth->SetValue(false);
-    CheckBoxPluginProc = new wxCheckBox(this, ID_CHECKBOX3, _("PlugIn Proc"), wxPoint(1304,528), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+    CheckBoxPluginProc = new wxCheckBox(this, ID_CHECKBOX3, _("PlugIn Proc"), wxPoint(1320,540), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
     CheckBoxPluginProc->SetValue(false);
-    ButtonAF = new wxButton(this, ID_BUTTON14, _("AF"), wxPoint(1416,524), wxSize(37,29), 0, wxDefaultValidator, _T("ID_BUTTON14"));
+    ButtonAF = new wxButton(this, ID_BUTTON14, _("Run"), wxPoint(1416,536), wxSize(61,29), 0, wxDefaultValidator, _T("ID_BUTTON14"));
     OverlaySlider = new wxSlider(this, ID_SLIDER2, 50, 0, 100, wxPoint(976,544), wxSize(312,27), 0, wxDefaultValidator, _T("ID_SLIDER2"));
     ButtonPlusXPos = new wxButton(this, ID_BUTTON12, _("+"), wxPoint(1328,296), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON12"));
     StaticText1 = new wxStaticText(this, ID_STATICTEXT4, _("X Pos"), wxPoint(1360,300), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -285,6 +289,14 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     ButtonPlusRotX = new wxButton(this, ID_BUTTON25, _("+"), wxPoint(1328,376), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON25"));
     ButtonPlusRotY = new wxButton(this, ID_BUTTON26, _("+"), wxPoint(1328,400), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON26"));
     ButtonPlusRotZ = new wxButton(this, ID_BUTTON27, _("+"), wxPoint(1328,424), wxSize(24,24), 0, wxDefaultValidator, _T("ID_BUTTON27"));
+    ChoiceProcessor = new wxChoice(this, ID_CHOICE1, wxPoint(1312,504), wxSize(168,29), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
+    ChoiceProcessor->SetSelection( ChoiceProcessor->Append(_("AutoFocus")) );
+    ChoiceProcessor->Append(_("DarknetProcessor"));
+    ChoiceProcessor->Append(_("BlobDetector"));
+    ChoiceProcessor->Append(_("ViewpointChange"));
+    ChoiceProcessor->Append(_("ObstacleDetector"));
+    ChoiceProcessor->Append(_("MovidiusProcessor"));
+    ChoiceProcessor->Append(_("DisparityMapping"));
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem6 = new wxMenuItem(Menu1, ID_MENUOPENMODULE, _("Open Module"), wxEmptyString, wxITEM_NORMAL);
@@ -354,6 +366,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON25,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPlusRotXClick);
     Connect(ID_BUTTON26,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPlusRotYClick);
     Connect(ID_BUTTON27,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorFrame::OnButtonPlusRotZClick);
+    Connect(ID_CHOICE1,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&EditorFrame::OnChoiceProcessorSelect);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnAbout);
     Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&EditorFrame::OnTimerTrigger);
@@ -1656,4 +1669,13 @@ void EditorFrame::OnButtonPrev3DObjClick(wxCommandEvent& event)
 void EditorFrame::OnButtonNext3DObjClick(wxCommandEvent& event)
 {
     acquisitionPassKeystroke(overlayModule,overlayDevice,10);
+}
+
+void EditorFrame::OnChoiceProcessorSelect(wxCommandEvent& event)
+{
+  int selection = ChoiceProcessor->GetSelection();
+  wxString selectionStr = ChoiceProcessor->GetString(selection);
+  snprintf(processorLoaded,1024,selectionStr.mb_str());
+  fprintf(stderr,"Processor Selected : `%s`\n",processorLoaded);
+
 }
