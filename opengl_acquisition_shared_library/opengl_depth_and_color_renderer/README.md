@@ -21,6 +21,13 @@ To run you basically feed the Renderer with a scene file and you get back an Ope
 Editing the scene file updates results live on the Renderer 
 
 
+In order to replay the logo image up you can issue 
+```
+./Renderer --from Scenes/logo.conf
+```
+
+
+
 ```
 ./Renderer --from Scenes/hardcodedTest.conf
 ```
