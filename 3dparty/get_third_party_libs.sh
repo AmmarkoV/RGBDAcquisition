@@ -132,14 +132,6 @@ fi
 
 
 
-
-
-
-
-
-
-
-
 #wget http://www.openni.org/wp-content/uploads/2012/12/OpenNI-Bin-Dev-Linux-Arm-v1.5.4.0.tar.zip
 #unzip OpenNI-Bin-Dev-Linux-Arm-v1.5.4.0.tar.zip
 #rm OpenNI-Bin-Dev-Linux-Arm-v1.5.4.0.tar.zip

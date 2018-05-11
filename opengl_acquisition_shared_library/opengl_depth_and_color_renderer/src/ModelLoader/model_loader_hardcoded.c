@@ -35,7 +35,7 @@ GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 
 #define TEXHALF 0.5
 #define U 0.5
-#define PLANE 18.0
+#define PLANE 108.0
 
 float planeCoords[]={ //X  Y  Z       W
                      //Bottom
