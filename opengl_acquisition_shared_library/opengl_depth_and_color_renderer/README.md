@@ -34,4 +34,7 @@ In order to replay the logo image up you can issue
 
 
 Using the key O you can dump an RGB and Depth image to disk
-
+You can use W,S,A,D to move the camera around
+You can use [,] to speed playback down or up
+You can use P to pause
+You can use Space to pause
