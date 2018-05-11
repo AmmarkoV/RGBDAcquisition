@@ -934,12 +934,17 @@ int modelFileExists(char * filename)
 int downloadModel(const char * model , const char * path)
 {
     fprintf(stderr,YELLOW "downloadModel `%s` `%s`\n" NORMAL,model,path);
-  if (!modelFileExists(model))
+
+  unsigned int itIsAHardcodedModel;
+  isModelnameAHardcodedModel(model,&itIsAHardcodedModel);
+
+  if (itIsAHardcodedModel) {return 1;}
+  if (modelFileExists(model)) { return 1; } else
   {
     fprintf(stderr,YELLOW "We don't have the model so we will try to download it from `%s`\n" NORMAL,path);
 
     char runScript[1024]={0};
-    snprintf(runScript,1024,"Scripts/downloadModel.sh \"%s\"",path);
+    snprintf(runScript,1024,"Models/downloadModel.sh \"%s\"",path);
     int i=system(runScript);
     if (i==0)
        {
