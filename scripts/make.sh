@@ -2,20 +2,24 @@
  
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
+cd ..
 
 mkdir build
 cd build
-
 cmake ..
 
 make
 notify-send "Done Compiling RGBDAcquisition"
 
 
-cd /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/build
+cd "$DIR"
+cd ..
+mkdir -p opengl_acquisition_shared_library/opengl_depth_and_color_renderer/build
+cd opengl_acquisition_shared_library/opengl_depth_and_color_renderer/build
+
 make 
 notify-send "Done Compiling OpenGLRenderer"
 
-cd ..
+cd "$DIR"
 
 exit 0
