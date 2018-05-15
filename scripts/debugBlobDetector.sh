@@ -1,17 +1,18 @@
 #!/bin/bash
 STARTDIR=`pwd`
-BIN="Editor"
-DIR="editor"
+BIN="Viewer"
+DIR="viewer"
 ORIGINALDIRBIN="../$DIR/$BIN"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
+cd ..
 cd redist 
 
 if [ -e $BIN ]
 then
  ldd $BIN | grep not
- LD_LIBRARY_PATH=.:../3dparty/libfreenect/build/lib  valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes  ./$BIN $@  2> ../error.txt
+ LD_LIBRARY_PATH=.:../3dparty/libfreenect/build/lib  valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes  ./$BIN -from NAO -processor ../processors/BlobDetector/libBlobDetector.so BlobDetector $@  2> ../error.txt
 else
  if [ -e $ORIGINALDIRBIN ]
    then 
