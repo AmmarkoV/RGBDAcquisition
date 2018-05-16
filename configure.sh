@@ -1,12 +1,12 @@
 #!/bin/bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$DIR"
+
+cd scripts
 ./get-dependencies.sh
-
-cd 3dparty
-./get_third_party_libs.sh
-
-cd ..
-
+ 
+cd "$DIR"
 scripts/refreshLinksTo3dParty.sh
 scripts/createRedist.sh
 
