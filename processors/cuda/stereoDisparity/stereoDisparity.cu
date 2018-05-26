@@ -21,6 +21,7 @@
 
 // includes, kernels
 #include <cuda_runtime.h>
+#include "sdkHelper.h"
 #include "stereoDisparity_kernel.cuh"
 
 
