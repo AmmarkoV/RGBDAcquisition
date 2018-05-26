@@ -52,12 +52,105 @@ main(int argc, char **argv)
     runTest(argc, argv);
 }
 
+int writeResult(char * file1,char * file2,unsigned int * odata, unsigned int w , unsigned int h )
+{
+    unsigned int cpuCheckSum = 0;
+    for (unsigned int i=0 ; i<w *h ; i++)
+    {
+        cpuCheckSum += odata[i];
+    }
+    printf("CPU Checksum = %u, ", cpuCheckSum);
+
+    // write out the resulting disparity image.
+    unsigned char *dispOut = (unsigned char *)malloc(w*h);
+    char fnameOut[512];
+    snprintf(fnameOut,512,"output_CPU_%s_%s.pgm",file1,file2);
+    for (unsigned int i=0; i<w*h; i++) { dispOut[i] = (int)odata[i]; }
+    for (unsigned int i=0; i<w*h; i++) { dispOut[i] = (int)odata[i]; }
+
+    printf("CPU image: <%s>\n", fnameOut);
+    sdkSavePGM(fnameOut, dispOut, w, h);
+
+    free(dispOut);
+}
+
+
+
+int doCPUonly(int argc, char **argv)
+{
+    // Load image data
+    //allocate mem for the images on host side
+    //initialize pointers to NULL to request lib call to allocate as needed
+    // PPM images are loaded into 4 byte/pixel memory (RGBX)
+    unsigned char *h_img0 = NULL;
+    unsigned char *h_img1 = NULL;
+    unsigned char *h_img2 = NULL;
+    unsigned char *h_img3 = NULL;
+    unsigned int w, h;
+    char *fname0 = sdkFindFilePath("stereo.im0.640x533.ppm", argv[0]);
+    char *fname1 = sdkFindFilePath("stereo.im1.640x533.ppm", argv[0]);
+    char *fname2 = sdkFindFilePath("stereo.im2.640x533.ppm", argv[0]);
+    char *fname3 = sdkFindFilePath("stereo.im3.640x533.ppm", argv[0]);
+
+
+
+
+    printf("Loaded <%s> as image 0\n", fname0);
+    if (!sdkLoadPPM4ub(fname0, &h_img0, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname0); }
+
+    printf("Loaded <%s> as image 1\n", fname1);
+    if (!sdkLoadPPM4ub(fname1, &h_img1, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname1); }
+
+    printf("Loaded <%s> as image 2\n", fname1);
+    if (!sdkLoadPPM4ub(fname2, &h_img2, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname2); }
+
+    printf("Loaded <%s> as image 2\n", fname3);
+    if (!sdkLoadPPM4ub(fname3, &h_img3, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname3); }
+
+    unsigned int numData = w*h;
+    unsigned int memSize = sizeof(int) * numData;
+
+    //allocate mem for the result on host side
+    unsigned int *h_odata = (unsigned int *)malloc(memSize);
+
+    //initialize the memory
+
+    printf("Computing CPU reference...\n");
+    for (unsigned int i = 0; i < numData; i++) h_odata[i] = 0;
+    compareImagesCPU((unsigned int *)h_img0, (unsigned int *)h_img1, (unsigned int *)h_odata, w, h);
+    writeResult("im0","im1",h_odata,w,h);
+
+
+    printf("Computing CPU reference...\n");
+    for (unsigned int i = 0; i < numData; i++) h_odata[i] = 0;
+    compareImagesCPU((unsigned int *)h_img0, (unsigned int *)h_img2, (unsigned int *)h_odata, w, h);
+    writeResult("im0","im2",h_odata,w,h);
+
+
+    printf("Computing CPU reference...\n");
+    for (unsigned int i = 0; i < numData; i++) h_odata[i] = 0;
+    compareImagesCPU((unsigned int *)h_img0, (unsigned int *)h_img3, (unsigned int *)h_odata, w, h);
+    writeResult("im0","im3",h_odata,w,h);
+
+
+
+ return 0;
+}
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //! CUDA Sample for calculating depth maps
 ////////////////////////////////////////////////////////////////////////////////
 void
 runTest(int argc, char **argv)
 {
+    doCPUonly(argc,argv);
+    return;
+
+
+
     cudaDeviceProp deviceProp;
     deviceProp.major = 0;
     deviceProp.minor = 0;
@@ -154,7 +247,7 @@ runTest(int argc, char **argv)
     assert(offset == 0);
 
     // First run the warmup kernel (which we'll use to get the GPU in the correct max power state
-    stereoDisparityKernel<<<numBlocks, numThreads>>>(d_img0, d_img1, d_odata, w, h, minDisp, maxDisp);
+    compareImagesKernel<<<numBlocks, numThreads>>>(d_img0, d_img1, d_odata, w, h, minDisp, maxDisp);
     cudaDeviceSynchronize();
 
     // Allocate CUDA events that we'll use for timing
@@ -162,13 +255,13 @@ runTest(int argc, char **argv)
     checkCudaErrors(cudaEventCreate(&start));
     checkCudaErrors(cudaEventCreate(&stop));
 
-    printf("Launching CUDA stereoDisparityKernel()\n");
+    printf("Launching CUDA compareImagesKernel()\n");
 
     // Record the start event
     checkCudaErrors(cudaEventRecord(start, NULL));
 
     // launch the stereoDisparity kernel
-    stereoDisparityKernel<<<numBlocks, numThreads>>>(d_img0, d_img1, d_odata, w, h, minDisp, maxDisp);
+    compareImagesKernel<<<numBlocks, numThreads>>>(d_img0, d_img1, d_odata, w, h, minDisp, maxDisp);
 
     // Record the stop event
     checkCudaErrors(cudaEventRecord(stop, NULL));
@@ -217,7 +310,7 @@ runTest(int argc, char **argv)
 
     //compute reference solution
     printf("Computing CPU reference...\n");
-    cpu_gold_stereo((unsigned int *)h_img0, (unsigned int *)h_img1, (unsigned int *)h_odata, w, h, minDisp, maxDisp);
+    compareImagesCPU((unsigned int *)h_img0, (unsigned int *)h_img1, (unsigned int *)h_odata, w, h);
     unsigned int cpuCheckSum = 0;
 
     for (unsigned int i=0 ; i<w *h ; i++)

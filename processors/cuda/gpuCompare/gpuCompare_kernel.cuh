@@ -70,7 +70,7 @@ __device__ unsigned int __usad4(unsigned int A, unsigned int B, unsigned int C=0
 //! @param maxDisparity rightmost search range
 ////////////////////////////////////////////////////////////////////////////////
 __global__ void
-stereoDisparityKernel(unsigned int *g_img0, unsigned int *g_img1,
+compareImagesKernel(unsigned int *g_img0, unsigned int *g_img1,
                       unsigned int *g_odata,
                       int w, int h,
                       int minDisparity, int maxDisparity)
@@ -84,8 +84,6 @@ stereoDisparityKernel(unsigned int *g_img0, unsigned int *g_img1,
     unsigned int imLeft;
     unsigned int imRight;
     unsigned int cost;
-    unsigned int bestCost = 9999999;
-    unsigned int bestDisparity = 0;
     __shared__ unsigned int diff[blockSize_y+2*RAD][blockSize_x+2*RAD];
 
     // store needed values for left image into registers (constant indexed local vars)
@@ -162,64 +160,33 @@ stereoDisparityKernel(unsigned int *g_img0, unsigned int *g_img1,
             cost += diff[sidy+i][sidx];
         }
 
-        // see if it is better or not
-        if (cost < bestCost)
-        {
-            bestCost = cost;
-            bestDisparity = d+8;
-        }
-
         __syncthreads();
 
     }
 
     if (tidy < h && tidx < w)
     {
-        g_odata[tidy*w + tidx] = bestDisparity;
+        g_odata[tidy*w + tidx] = cost;
     }
 }
 
-void cpu_gold_stereo(unsigned int *img0, unsigned int *img1, unsigned int *odata,
-                     int w, int h, int minDisparity, int maxDisparity)
+void compareImagesCPU(
+                       unsigned int *img0,
+                       unsigned int *img1,
+                       unsigned int *odata,
+                       int w,
+                       int h
+                     )
 {
-    for (int y = 0 ; y< h ; y++)
+    for (int y = 0 ; y< h-1 ; y++)
     {
         for (int x = 0 ; x< w ; x++)
         {
-            unsigned int bestCost = 9999999;
-            unsigned int bestDisparity = 0;
-
-            for (int d=minDisparity; d<=maxDisparity; d++)
-            {
-                unsigned int cost = 0;
-
-                for (int i=-RAD; i<=RAD; i++)
-                {
-                    for (int j=-RAD; j<=RAD; j++)
-                    {
-                        //border clamping
-                        int yy,xx,xxd;
-                        yy = y+i;
-
-                        if (yy < 0) yy = 0;
-
-                        if (yy >= h) yy = h-1;
-
-                        xx = x+j;
-
-                        if (xx < 0) xx = 0;
-
-                        if (xx >= w) xx = w-1;
-
-                        xxd = x+j+d;
-
-                        if (xxd < 0) xxd = 0;
-
-                        if (xxd >= w) xxd = w-1;
+             unsigned int cost = 0;
 
                         // sum abs diff across components
-                        unsigned char *A = (unsigned char *)&img0[yy*w + xx];
-                        unsigned char *B = (unsigned char *)&img1[yy*w + xxd];
+                        unsigned char *A = (unsigned char *)&img0[y*w + x];
+                        unsigned char *B = (unsigned char *)&img1[y*w + x];
                         unsigned int absdiff = 0;
 
                         for (int k=0; k<4; k++)
@@ -228,19 +195,9 @@ void cpu_gold_stereo(unsigned int *img0, unsigned int *img1, unsigned int *odata
                         }
 
                         cost += absdiff;
-                    }
-                }
-
-                if (cost < bestCost)
-                {
-                    bestCost = cost;
-                    bestDisparity = d+8;
-                }
-
-            }// end for disparities
 
             // store to best disparity
-            odata[y*w + x ] = bestDisparity;
+            odata[y*w + x ] = cost;
         }
     }
 }
