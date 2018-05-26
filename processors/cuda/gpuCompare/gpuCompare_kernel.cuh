@@ -66,14 +66,13 @@ __device__ unsigned int __usad4(unsigned int A, unsigned int B, unsigned int C=0
 //! @param g_odata disparity map output in global memory,  unsigned int output/pixel
 //! @param w image width in pixels
 //! @param h image height in pixels
-//! @param minDisparity leftmost search range
-//! @param maxDisparity rightmost search range
 ////////////////////////////////////////////////////////////////////////////////
 __global__ void
 compareImagesKernel(unsigned int *g_img0, unsigned int *g_img1,
                       unsigned int *g_odata,
-                      int w, int h,
-                      int minDisparity, int maxDisparity)
+                      int w, int h
+                      //,int minDisparity, int maxDisparity
+                      )
 {
     // access thread id
     const int tidx = blockDim.x * blockIdx.x + threadIdx.x;
@@ -98,8 +97,9 @@ compareImagesKernel(unsigned int *g_img0, unsigned int *g_img1,
     }
 
     // for a fixed camera system this could be hardcoded and loop unrolled
-    for (int d=minDisparity; d<=maxDisparity; d++)
-    {
+   int d=0;
+   // for (int d=minDisparity; d<=maxDisparity; d++)
+   // {
         //LEFT
 #pragma unroll
         for (int i=0; i<STEPS; i++)
@@ -162,7 +162,7 @@ compareImagesKernel(unsigned int *g_img0, unsigned int *g_img1,
 
         __syncthreads();
 
-    }
+   // }
 
     if (tidy < h && tidx < w)
     {
@@ -184,17 +184,17 @@ void compareImagesCPU(
         {
              unsigned int cost = 0;
 
-                        // sum abs diff across components
-                        unsigned char *A = (unsigned char *)&img0[y*w + x];
-                        unsigned char *B = (unsigned char *)&img1[y*w + x];
-                        unsigned int absdiff = 0;
+             // sum abs diff across components
+             unsigned char *A = (unsigned char *)&img0[y*w + x];
+             unsigned char *B = (unsigned char *)&img1[y*w + x];
+             unsigned int absdiff = 0;
 
-                        for (int k=0; k<4; k++)
-                        {
-                            absdiff += abs((int)(A[k] - B[k]));
-                        }
+             for (int k=0; k<4; k++)
+              {
+               absdiff += abs((int)(A[k] - B[k]));
+              }
 
-                        cost += absdiff;
+            cost += absdiff;
 
             // store to best disparity
             odata[y*w + x ] = cost;
