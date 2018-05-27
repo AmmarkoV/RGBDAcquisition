@@ -152,7 +152,33 @@ int doCPUonly(int argc, char **argv)
 
 
 
+int queryGPUIsOk(int argc, char **argv)
+{
+    cudaDeviceProp deviceProp;
+    deviceProp.major = 0;
+    deviceProp.minor = 0;
+    int dev = 0;
 
+    // This will pick the best possible CUDA capable device
+    dev = findCudaDevice(argc, (const char **)argv);
+
+    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, dev));
+
+    // Statistics about the GPU device
+    printf("> GPU device has %d Multi-Processors, SM %d.%d compute capabilities\n\n",
+           deviceProp.multiProcessorCount, deviceProp.major, deviceProp.minor);
+
+    int version = (deviceProp.major * 0x10 + deviceProp.minor);
+
+    if (version < 0x20)
+    {
+        printf("%s: requires a minimum CUDA compute 2.0 capability\n", sSDKsample);
+        exit(EXIT_SUCCESS);
+        return 0;
+    }
+
+return 0;
+}
 
 
 
@@ -191,29 +217,10 @@ int doGPUonly(int argc, char **argv)
     unsigned int *h_odata = (unsigned int *)malloc(memSize);
 
     //initialize the memory
-
-    cudaDeviceProp deviceProp;
-    deviceProp.major = 0;
-    deviceProp.minor = 0;
-    int dev = 0;
-
-    // This will pick the best possible CUDA capable device
-    dev = findCudaDevice(argc, (const char **)argv);
-
-    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, dev));
-
-    // Statistics about the GPU device
-    printf("> GPU device has %d Multi-Processors, SM %d.%d compute capabilities\n\n",
-           deviceProp.multiProcessorCount, deviceProp.major, deviceProp.minor);
-
-    int version = (deviceProp.major * 0x10 + deviceProp.minor);
-
-    if (version < 0x20)
+    if (!queryGPUIsOk(argc,argv))
     {
-        printf("%s: requires a minimum CUDA compute 2.0 capability\n", sSDKsample);
-        exit(EXIT_SUCCESS);
+        return 0;
     }
-
 
 
     dim3 numThreads = dim3(blockSize_x, blockSize_y, 1);
