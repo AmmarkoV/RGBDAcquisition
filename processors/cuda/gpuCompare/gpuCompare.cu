@@ -1,11 +1,5 @@
 /*
- * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
- *
- * Please refer to the NVIDIA end user license agreement (EULA) associated
- * with this source code for terms and conditions that govern your use of
- * this software. Any use, reproduction, disclosure, or distribution of
- * this software and related documentation outside the terms of the EULA
- * is strictly prohibited.
+Based on the NVIDA Sample
  *
  */
 
@@ -29,9 +23,6 @@
 #include <helper_functions.h>  // helper for shared that are common to CUDA Samples
 #include <helper_cuda.h>       // helper for checking cuda initialization and error checking
 #include <helper_string.h>     // helper functions for string parsing
-
-
-static const char *sSDKsample = "[stereoDisparity]\0";
 
 int iDivUp(int a, int b)
 {
@@ -61,12 +52,12 @@ int writeResult(
                 unsigned int h
                )
 {
-    unsigned int cpuCheckSum = 0;
+    unsigned int checkSum = 0;
     for (unsigned int i=0 ; i<w *h ; i++)
     {
-        cpuCheckSum += odata[i];
+        checkSum += odata[i];
     }
-    printf("CPU Checksum = %u, ", cpuCheckSum);
+    printf("%s Checksum = %u, ",device, checkSum);
 
     // write out the resulting disparity image.
     unsigned char *dispOut = (unsigned char *)malloc(w*h);
@@ -172,12 +163,12 @@ int queryGPUIsOk(int argc, char **argv)
 
     if (version < 0x20)
     {
-        printf("%s: requires a minimum CUDA compute 2.0 capability\n", sSDKsample);
+        printf("Program requires a minimum CUDA compute 2.0 capability\n");
         exit(EXIT_SUCCESS);
         return 0;
     }
 
-return 0;
+return 1;
 }
 
 
@@ -243,6 +234,8 @@ int doGPUonly(int argc, char **argv)
     checkCudaErrors(cudaMemcpy(d_img1,  h_img1, memSize, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaMemcpy(d_odata, h_odata, memSize, cudaMemcpyHostToDevice));
 
+
+    printf("Done with copies..\n");
     size_t offset = 0;
     cudaChannelFormatDesc ca_desc0 = cudaCreateChannelDesc<unsigned int>();
     cudaChannelFormatDesc ca_desc1 = cudaCreateChannelDesc<unsigned int>();
@@ -341,7 +334,8 @@ int doGPUonly(int argc, char **argv)
 void
 runTest(int argc, char **argv)
 {
-    doCPUonly(argc,argv);
+    //doCPUonly(argc,argv);
+    doGPUonly(argc,argv);
     return;
 
 
