@@ -56,11 +56,12 @@ int startOGLRendering()
   switch (rendererOptions.useShaders)
   {
     case 0 :
-         startFixedOGLRendering(&rendererOptions);
+             startFixedOGLRendering(&rendererOptions);
     break;
 
     case 1 :
-         startShaderOGLRendering(&rendererOptions);
+             fprintf(stderr,"enableShaders has already started the OGL Shader pipeline\n");
+             //startShaderOGLRendering(&rendererOptions);
     break;
   };
  return 1;
@@ -74,11 +75,11 @@ int renderOGLBones( float * pos , unsigned int * parentNode ,  unsigned int bone
   switch (rendererOptions.useShaders)
   {
     case 0 :
-         doOGLBoneDrawCalllist(pos,parentNode,boneSizes);
+         doOGLFixedBoneDrawCalllist(pos,parentNode,boneSizes);
     break;
 
     case 1 :
-         doOGLBoneDrawCalllist(pos,parentNode,boneSizes);
+         doOGLShaderBoneDrawCalllist(pos,parentNode,boneSizes);
     break;
   };
   return 1;
@@ -126,11 +127,18 @@ int renderOGL(
 
 int stopOGLRendering()
 {
-
-  if ( ( rendererOptions.selectedFragmentShader != 0) || ( rendererOptions.selectedVertexShader != 0 ) )
+switch (rendererOptions.useShaders)
   {
-      unloadShader(rendererOptions.loadedShader);
-  }
- return 1;
+    case 0 :
+     return stopOGLFixedRendering(&rendererOptions);
+    break;
+
+    case 1 :
+     return stopOGLShaderRendering(&rendererOptions);
+    break;
+  };
+
+
+ return 0;
 }
 

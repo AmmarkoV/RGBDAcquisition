@@ -79,6 +79,46 @@ GLuint      bufferSkyboxVao=0;
 
 
 
+int startOGLShaderPipeline(struct rendererConfiguration * config)
+{
+#if USE_GLEW
+#warning "Using GLEW"
+  glewInit();
+  fprintf(stderr,"Using GLEW %s \n",glewGetString(GLEW_VERSION));
+
+  if (GLEW_VERSION_3_2)
+    {
+      fprintf(stderr,"Yay! OpenGL 3.2 is supported and GLSL 1.5!\n");
+    }
+
+	if (glewIsSupported("GL_ARB_vertex_buffer_object"))   { fprintf(stderr,"ARB VBO's are supported\n");  } else
+    if (glewIsSupported("GL_APPLE_vertex_buffer_object")) { fprintf(stderr,"APPLE VBO's are supported\n");} else
+		                                                  { fprintf(stderr,"VBO's are not supported,program will not run!!!\n"); }
+
+
+	if (glewIsSupported("GL_ARB_vertex_array_object"))    { fprintf(stderr,"ARB VAO's are supported\n"); } else
+	//this is the name of the extension for GL2.1 in MacOSX
+    if (glewIsSupported("GL_APPLE_vertex_array_object"))  { fprintf(stderr,"APPLE VAO's are supported\n"); } else
+		                                                  { fprintf(stderr,"VAO's are not supported, program will not run!!!\n"); }
+
+
+    fprintf(stderr,"Vendor: %s \n",glGetString (GL_VENDOR) );
+    fprintf(stderr,"Renderer: %s \n",glGetString (GL_RENDERER) );
+    fprintf(stderr,"Version: %s \n",glGetString (GL_VERSION) );
+
+
+    if ( ( config->selectedFragmentShader != 0) || ( config->selectedVertexShader != 0 ) )
+     {
+      config->loadedShader = loadShader(config->selectedVertexShader,config->selectedFragmentShader);
+     }
+
+
+    return 1;
+#else
+    return 0;
+#endif
+}
+
 
 
 int startShaderOGLRendering(struct rendererConfiguration * config)
@@ -140,11 +180,6 @@ int startShaderOGLRendering(struct rendererConfiguration * config)
   #endif // USE_LIGHTS
 
 
-  if ( ( config->selectedFragmentShader != 0) || ( config->selectedVertexShader != 0 ) )
-  {
-      config->loadedShader = loadShader(config->selectedVertexShader,config->selectedFragmentShader);
-  }
-
   //This is not needed -> :P  glCullFace(GL_FRONT_AND_BACK);
   //Enable Culling
   if (config->doCulling)
@@ -163,9 +198,23 @@ int startShaderOGLRendering(struct rendererConfiguration * config)
 
 
 
+int stopOGLShaderRendering(struct rendererConfiguration * config)
+{
+
+  if ( ( config->selectedFragmentShader != 0) || ( config->selectedVertexShader != 0 ) )
+  {
+      unloadShader(config->loadedShader);
+  }
+ return 1;
+}
 
 
 
+
+void doOGLShaderBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
+{
+ fprintf(stderr,"OpenGL Bone Drawing not implemented for shaders..\n");
+}
 
 
 
@@ -267,32 +316,3 @@ void pushObjectToBufferData(
 }
 
 
-
-int startOGLShaderPipeline()
-{
-#if USE_GLEW
-#warning "Using GLEW"
-  glewInit();
-  fprintf(stderr,"Using GLEW %s \n",glewGetString(GLEW_VERSION));
-
-  if (GLEW_VERSION_3_2)
-    {
-      fprintf(stderr,"Yay! OpenGL 3.2 is supported and GLSL 1.5!\n");
-    }
-
-	if (glewIsSupported("GL_ARB_vertex_buffer_object"))   { fprintf(stderr,"ARB VBO's are supported\n");  } else
-    if (glewIsSupported("GL_APPLE_vertex_buffer_object")) { fprintf(stderr,"APPLE VBO's are supported\n");} else
-		                                                  { fprintf(stderr,"VBO's are not supported,program will not run!!!\n"); }
-
-
-	if (glewIsSupported("GL_ARB_vertex_array_object"))    { fprintf(stderr,"ARB VAO's are supported\n"); } else
-	//this is the name of the extension for GL2.1 in MacOSX
-    if (glewIsSupported("GL_APPLE_vertex_array_object"))  { fprintf(stderr,"APPLE VAO's are supported\n"); } else
-		                                                  { fprintf(stderr,"VAO's are not supported, program will not run!!!\n"); }
-
-
-    fprintf(stderr,"Vendor: %s \n",glGetString (GL_VENDOR) );
-    fprintf(stderr,"Renderer: %s \n",glGetString (GL_RENDERER) );
-    fprintf(stderr,"Version: %s \n",glGetString (GL_VERSION) );
-#endif
-}

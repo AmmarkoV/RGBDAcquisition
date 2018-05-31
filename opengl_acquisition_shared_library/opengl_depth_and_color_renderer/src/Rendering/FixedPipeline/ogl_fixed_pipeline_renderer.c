@@ -89,14 +89,17 @@ int startFixedOGLRendering(struct rendererConfiguration * config)
 }
 
 
+int stopOGLFixedRendering(struct rendererConfiguration * config)
+{
+  return 1;
+}
 
 
 
 
 
 
-
-void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
+void doOGLFixedBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
 {
   unsigned int bone=0;
 
@@ -150,8 +153,9 @@ void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned 
        double z1 = sin(lat1);
        double zr1 = cos(lat1);
 
- glPushMatrix();
-  glTranslatef(pos[bone*3+0],pos[bone*3+1],pos[bone*3+2]);
+  //---------------
+   glPushMatrix();
+    glTranslatef(pos[bone*3+0],pos[bone*3+1],pos[bone*3+2]);
        glScalef( boneSphere , boneSphere , boneSphere );
        glBegin(GL_QUAD_STRIP);
        glColor3f(0.74,0.01,1.0);
@@ -168,28 +172,16 @@ void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned 
         }
        glEnd();
 
- glTranslatef(-pos[bone*3+0],-pos[bone*3+1],-pos[bone*3+2]);
-glPopMatrix();
+   glTranslatef(-pos[bone*3+0],-pos[bone*3+1],-pos[bone*3+2]);
+  glPopMatrix();
+  //---------------
 
 
 
        }
    }
 
-
-
-
-
-
-
   }
-
-
-
-/*
-
-*/
-
 }
 
 

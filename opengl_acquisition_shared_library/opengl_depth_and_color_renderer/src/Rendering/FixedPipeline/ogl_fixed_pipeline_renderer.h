@@ -9,7 +9,7 @@
 #include "../ogl_rendering.h"
 
 int startFixedOGLRendering(struct rendererConfiguration * config);
-
+int stopOGLFixedRendering(struct rendererConfiguration * config);
 
 
 
@@ -22,7 +22,7 @@ int startFixedOGLRendering(struct rendererConfiguration * config);
          if an array element's parent is itself it is the root node..!
 * @param The number of bones
 */
-void doOGLBoneDrawCalllist( float * pos , unsigned int * parentNode , unsigned int boneSizes);
+void doOGLFixedBoneDrawCalllist( float * pos , unsigned int * parentNode , unsigned int boneSizes);
 
 
 /**
