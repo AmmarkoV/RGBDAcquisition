@@ -97,10 +97,10 @@ int doCPUonly(int argc, char **argv)
     printf("Loaded <%s> as image 1\n", fname1);
     if (!sdkLoadPPM4ub(fname1, &h_img1, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname1); }
 
-    printf("Loaded <%s> as image 2\n", fname1);
+    printf("Loaded <%s> as image 2\n", fname2);
     if (!sdkLoadPPM4ub(fname2, &h_img2, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname2); }
 
-    printf("Loaded <%s> as image 2\n", fname3);
+    printf("Loaded <%s> as image 3\n", fname3);
     if (!sdkLoadPPM4ub(fname3, &h_img3, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname3); }
 
     unsigned int numData = w*h;
@@ -195,10 +195,10 @@ int doGPUonly(int argc, char **argv)
     printf("Loaded <%s> as image 1\n", fname1);
     if (!sdkLoadPPM4ub(fname1, &h_img1, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname1); return 0; }
 
-    printf("Loaded <%s> as image 2\n", fname1);
+    printf("Loaded <%s> as image 2\n", fname2);
     if (!sdkLoadPPM4ub(fname2, &h_img2, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname2); return 0; }
 
-    printf("Loaded <%s> as image 2\n", fname3);
+    printf("Loaded <%s> as image 3\n", fname3);
     if (!sdkLoadPPM4ub(fname3, &h_img3, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname3); return 0; }
 
     unsigned int numData = w*h;
@@ -248,14 +248,17 @@ int doGPUonly(int argc, char **argv)
     tex2Dright.addressMode[1] = cudaAddressModeClamp;
     tex2Dright.filterMode     = cudaFilterModePoint;
     tex2Dright.normalized     = false;
-    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dleft,  d_img0, ca_desc0, w, h, w*4));
+
+
+    printf("Ready to bind texture %u x %u = %u ..\n",w,h,w*4);
+    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dleft,  d_img0, ca_desc0, w, h, w*4 ));
     assert(offset == 0);
 
-    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dright, d_img1, ca_desc1, w, h, w*4));
+    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dright, d_img1, ca_desc1, w, h, w*4 ));
     assert(offset == 0);
 
     // First run the warmup kernel (which we'll use to get the GPU in the correct max power state
-    printf("Start \n");
+    printf("Start test run ? \n");
     compareImagesKernel<<<numBlocks, numThreads>>>(d_img0, d_img1, d_odata, w, h );
     cudaDeviceSynchronize();
 
@@ -294,14 +297,6 @@ int doGPUonly(int argc, char **argv)
     printf("GPU processing time : %.4f (ms)\n", msecTotal);
     printf("Pixel throughput    : %.3f Mpixels/sec\n", ((float)(w *h*1000.f)/msecTotal)/1000000);
 
-    // calculate sum of resultant GPU image
-    unsigned int checkSum = 0;
-
-    for (unsigned int i=0 ; i<w *h ; i++)
-    {
-        checkSum += h_odata[i];
-    }
-    printf("GPU Checksum = %u, ", checkSum);
 
 
     checkCudaErrors(cudaFree(d_odata));
@@ -335,7 +330,7 @@ int doGPUonly(int argc, char **argv)
 void
 runTest(int argc, char **argv)
 {
-    //doCPUonly(argc,argv);
+    doCPUonly(argc,argv);
     doGPUonly(argc,argv);
     return;
 

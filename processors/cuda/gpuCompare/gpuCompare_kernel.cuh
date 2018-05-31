@@ -67,13 +67,17 @@ __device__ unsigned int __usad4(unsigned int A, unsigned int B, unsigned int C=0
 //! @param w image width in pixels
 //! @param h image height in pixels
 ////////////////////////////////////////////////////////////////////////////////
+/*
 __global__ void
-compareImagesKernel(unsigned int *g_img0, unsigned int *g_img1,
+compareImagesKernel(
+                      unsigned int *g_img0, unsigned int *g_img1,
                       unsigned int *g_odata,
                       int w, int h
                       //,int minDisparity, int maxDisparity
                       )
 {
+int minDisparity=1;
+int maxDisparity=3;
     // access thread id
     const int tidx = blockDim.x * blockIdx.x + threadIdx.x;
     const int tidy = blockDim.y * blockIdx.y + threadIdx.y;
@@ -83,6 +87,8 @@ compareImagesKernel(unsigned int *g_img0, unsigned int *g_img1,
     unsigned int imLeft;
     unsigned int imRight;
     unsigned int cost;
+    unsigned int bestCost = 9999999;
+    unsigned int bestDisparity = 0;
     __shared__ unsigned int diff[blockSize_y+2*RAD][blockSize_x+2*RAD];
 
     // store needed values for left image into registers (constant indexed local vars)
@@ -97,9 +103,9 @@ compareImagesKernel(unsigned int *g_img0, unsigned int *g_img1,
     }
 
     // for a fixed camera system this could be hardcoded and loop unrolled
-   int d=0;
-   // for (int d=minDisparity; d<=maxDisparity; d++)
-   // {
+    //for (int d=minDisparity; d<=maxDisparity; d++)
+    int d=0;
+    {
         //LEFT
 #pragma unroll
         for (int i=0; i<STEPS; i++)
@@ -160,15 +166,108 @@ compareImagesKernel(unsigned int *g_img0, unsigned int *g_img1,
             cost += diff[sidy+i][sidx];
         }
 
+        // see if it is better or not
+        if (cost < bestCost)
+        {
+            bestCost = cost;
+            bestDisparity = d+8;
+        }
+
         __syncthreads();
 
-   // }
+    }
 
     if (tidy < h && tidx < w)
     {
-        g_odata[tidy*w + tidx] = cost;
+        g_odata[tidy*w + tidx] = bestDisparity;
     }
 }
+*/
+
+
+__global__ void
+compareImagesKernel22(
+                      unsigned int *g_img0, unsigned int *g_img1,
+                      unsigned int *g_odata,
+                      int w, int h
+                      //,int minDisparity, int maxDisparity
+                      )
+{
+    // access thread id
+    const int tidx = blockDim.x * blockIdx.x + threadIdx.x;
+    const int tidy = blockDim.y * blockIdx.y + threadIdx.y;
+    const unsigned int sidx = threadIdx.x+RAD;
+    const unsigned int sidy = threadIdx.y+RAD;
+
+
+    unsigned int cost;
+  //  __shared__ unsigned int diff[blockSize_y+2*RAD][blockSize_x+2*RAD];
+
+    // store needed values for left image into registers (constant indexed local vars)
+    unsigned int imLeft[STEPS];
+    unsigned int imRight[STEPS];
+    unsigned int diffL[STEPS];
+
+
+    unsigned int imLeftCUDAPTR;
+    unsigned int imRightCUDAPTR;
+
+#pragma unroll
+    for (int i=0; i<STEPS; i++)
+    {
+        imLeft[i] = tex2D(tex2Dleft, tidx-RAD, tidy+i);
+        imRight[i] = tex2D(tex2Dright, tidx-RAD+blockSize_x, tidy+i);
+    }
+
+    imLeftCUDAPTR=imLeft[0];
+    imRightCUDAPTR=imRight[0];
+    cost = __usad4(imLeftCUDAPTR, imRightCUDAPTR);
+
+    if (tidy < h && tidx+STEPS < w)
+    {
+    #pragma unroll
+     for (int i=0; i<STEPS; i++)
+       {
+        g_odata[tidy*w + tidx+i]=cost;
+       }
+    }
+
+   __syncthreads();
+
+}
+
+__global__ void
+compareImagesKernel(
+                      unsigned int *g_img0, unsigned int *g_img1,
+                      unsigned int *g_odata,
+                      int w, int h
+                      //,int minDisparity, int maxDisparity
+                      )
+{
+    // access thread id
+    const int tidx = blockDim.x * blockIdx.x + threadIdx.x;
+    const int tidy = blockDim.y * blockIdx.y + threadIdx.y;
+    const unsigned int sidx = threadIdx.x+RAD;
+    const unsigned int sidy = threadIdx.y+RAD;
+
+
+    if (tidy < h && tidx+blockSize_x < w)
+    {
+    #pragma unroll
+     for (int i=0; i<blockSize_x; i++)
+       {
+        unsigned int valA = tex2D(tex2Dleft, tidx-RAD, tidy+i);
+        unsigned int valB = tex2D(tex2Dright, tidx-RAD, tidy+i);
+        g_odata[tidy*w + tidx+i]= __usad(valA,valB,0);
+       }
+    }
+
+   __syncthreads();
+
+}
+
+
+
 
 void compareImagesCPU(
                        unsigned int *img0,
