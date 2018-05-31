@@ -190,16 +190,16 @@ int doGPUonly(int argc, char **argv)
     char *fname3 = sdkFindFilePath("stereo.im3.640x533.ppm", argv[0]);
 
     printf("Loaded <%s> as image 0\n", fname0);
-    if (!sdkLoadPPM4ub(fname0, &h_img0, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname0); }
+    if (!sdkLoadPPM4ub(fname0, &h_img0, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname0); return 0; }
 
     printf("Loaded <%s> as image 1\n", fname1);
-    if (!sdkLoadPPM4ub(fname1, &h_img1, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname1); }
+    if (!sdkLoadPPM4ub(fname1, &h_img1, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname1); return 0; }
 
     printf("Loaded <%s> as image 2\n", fname1);
-    if (!sdkLoadPPM4ub(fname2, &h_img2, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname2); }
+    if (!sdkLoadPPM4ub(fname2, &h_img2, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname2); return 0; }
 
     printf("Loaded <%s> as image 2\n", fname3);
-    if (!sdkLoadPPM4ub(fname3, &h_img3, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname3); }
+    if (!sdkLoadPPM4ub(fname3, &h_img3, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname3); return 0; }
 
     unsigned int numData = w*h;
     unsigned int memSize = sizeof(int) * numData;
@@ -255,6 +255,7 @@ int doGPUonly(int argc, char **argv)
     assert(offset == 0);
 
     // First run the warmup kernel (which we'll use to get the GPU in the correct max power state
+    printf("Start \n");
     compareImagesKernel<<<numBlocks, numThreads>>>(d_img0, d_img1, d_odata, w, h );
     cudaDeviceSynchronize();
 
