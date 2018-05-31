@@ -7,6 +7,17 @@
 #ifndef OGL_SHADER_PIPELINE_RENDERER_H_INCLUDED
 #define OGL_SHADER_PIPELINE_RENDERER_H_INCLUDED
 
+
+
+#include "../ogl_rendering.h"
+
+
+int startShaderOGLRendering(struct rendererConfiguration * config);
+
+
+
+
+
 /**
 * @brief This call renders a mesh using shaders..!
 * @ingroup Rendering

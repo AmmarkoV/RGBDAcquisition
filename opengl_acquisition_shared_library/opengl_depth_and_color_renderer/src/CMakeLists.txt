@@ -25,7 +25,7 @@ ENDIF( ENABLE_PNG )
  
 IF( ENABLE_SHADERS )
  MESSAGE("Shaders will be included in this codec build")
- set(GLEW_Libs glew ) 
+ set(GLEW_Libs GLEW )  #sudo apt-get install libglew-dev
  set(GLEW_Parts  )
  set(GLEW_Includes  ) 
  add_definitions(-DUSE_GLEW)

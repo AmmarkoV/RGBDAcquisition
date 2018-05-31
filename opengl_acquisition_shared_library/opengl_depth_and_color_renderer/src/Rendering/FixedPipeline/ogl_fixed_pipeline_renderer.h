@@ -6,6 +6,14 @@
 #ifndef OGL_FIXED_PIPELINE_RENDERER_H_INCLUDED
 #define OGL_FIXED_PIPELINE_RENDERER_H_INCLUDED
 
+#include "../ogl_rendering.h"
+
+int startFixedOGLRendering(struct rendererConfiguration * config);
+
+
+
+
+
 /**
 * @brief This call renders and visualizes (using spheres) an array of bones
 * @ingroup Rendering

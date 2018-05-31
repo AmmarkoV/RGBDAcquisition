@@ -6,6 +6,27 @@
 #define OGL_RENDERING_H_INCLUDED
 
 
+#define MAX_SHADER_FILENAMES 512
+
+struct rendererConfiguration
+{
+//Shader specific stuff ----------------
+char fragmentShaderFile[MAX_SHADER_FILENAMES];
+char * selectedFragmentShader;
+char vertexShaderFile[MAX_SHADER_FILENAMES];
+char * selectedVertexShader;
+struct shaderObject * loadedShader;
+int useShaders;
+//--------------------------------------
+
+int doCulling;
+};
+
+
+
+int resetRendererOptions();
+
+
 
 /**
 * @brief Before starting to render something using OGL we need to call this function to initialize everything

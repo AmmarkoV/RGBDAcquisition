@@ -403,6 +403,82 @@ void vectorDirection(float src_x,float src_y,float src_z,float targ_x,float targ
 void findNormal(float *outX, float *outY, float *outZ,float v1x, float v1y, float v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z );
 
 
+
+
+
+/**
+* @brief Calculate an OpenGL frustrum matrix using floats
+* @ingroup OGLTools
+* @param Output Matrix
+* @param Left Limit
+* @param Right Limit
+* @param Bottom Limit
+* @param Top Limit
+* @param Z Near
+* @param Z Far
+*/
+void glhFrustumf2(
+                  float *matrix,
+                  float left,
+                  float right,
+                  float bottom,
+                  float top,
+                  float znear,
+                  float zfar
+                 );
+
+
+
+
+/**
+* @brief Calculate an OpenGL perspective matrix using floats
+* @ingroup OGLTools
+* @param Output Matrix
+* @param Field Of View in Degrees
+* @param Aspect Ratio
+* @param Z Near
+* @param Z Far
+*/
+void glhPerspectivef2(
+                      float *matrix,
+                      float fovyInDegrees,
+                      float aspectRatioV,
+                      float znear,
+                      float zfar
+                     );
+
+
+
+
+/**
+* @brief Calculate an OpenGL perspective matrix using doubles
+* @ingroup OGLTools
+* @param Output Matrix
+* @param Field Of View in Degrees
+* @param Aspect Ratio
+* @param Z Near
+* @param Z Far
+*/
+void gldPerspective(
+                     double * matrix,
+                     double fovx,
+                     double aspect,
+                     double zNear,
+                     double zFar
+                   );
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
 * @brief Internally Test Matrix subsystem
 * @ingroup AmMatrix

@@ -838,6 +838,103 @@ int pointFromRelationWithObjectToAbsolute_PosXYZQuaternionXYZW(double * absolute
 
 
 
+//matrix will receive the calculated perspective matrix.
+//You would have to upload to your shader
+// or use glLoadMatrixf if you aren't using shaders.
+void glhFrustumf2(
+                  float *matrix,
+                  float left,
+                  float right,
+                  float bottom,
+                  float top,
+                  float znear,
+                  float zfar
+                 )
+{
+    float temp, temp2, temp3, temp4;
+    temp = 2.0 * znear;
+    temp2 = right - left;
+    temp3 = top - bottom;
+    temp4 = zfar - znear;
+    matrix[0] = temp / temp2;
+    matrix[1] = 0.0;
+    matrix[2] = 0.0;
+    matrix[3] = 0.0;
+    matrix[4] = 0.0;
+    matrix[5] = temp / temp3;
+    matrix[6] = 0.0;
+    matrix[7] = 0.0;
+    matrix[8] = (right + left) / temp2;
+    matrix[9] = (top + bottom) / temp3;
+    matrix[10] = (-zfar - znear) / temp4;
+    matrix[11] = -1.0;
+    matrix[12] = 0.0;
+    matrix[13] = 0.0;
+    matrix[14] = (-temp * zfar) / temp4;
+    matrix[15] = 0.0;
+}
+
+
+void glhPerspectivef2(
+                      float *matrix,
+                      float fovyInDegrees,
+                      float aspectRatioV,
+                      float znear,
+                      float zfar
+                     )
+{
+    float ymax, xmax;
+    ymax = znear * tan(fovyInDegrees * M_PI / 360.0);
+    //ymin = -ymax;
+    //xmin = -ymax * aspectRatioV;
+    xmax = ymax * aspectRatioV;
+    glhFrustumf2(matrix, -xmax, xmax, -ymax, ymax, znear, zfar);
+}
+
+
+
+
+void gldPerspective(
+                     double *matrix,
+                     double fovx,
+                     double aspect,
+                     double zNear,
+                     double zFar
+                   )
+{
+   // This code is based off the MESA source for gluPerspective
+   // *NOTE* This assumes GL_PROJECTION is the current matrix
+   double xmin, xmax, ymin, ymax;
+
+   xmax = zNear * tan(fovx * M_PI / 360.0);
+   xmin = -xmax;
+
+   ymin = xmin / aspect;
+   ymax = xmax / aspect;
+
+   // Set up the projection matrix
+   matrix[0] = (2.0 * zNear) / (xmax - xmin);
+   matrix[1] = 0.0;
+   matrix[2] = 0.0;
+   matrix[3] = 0.0;
+   matrix[4] = 0.0;
+   matrix[5] = (2.0 * zNear) / (ymax - ymin);
+   matrix[6] = 0.0;
+   matrix[7] = 0.0;
+   matrix[8] = (xmax + xmin) / (xmax - xmin);
+   matrix[9] = (ymax + ymin) / (ymax - ymin);
+   matrix[10] = -(zFar + zNear) / (zFar - zNear);
+   matrix[11] = -1.0;
+   matrix[12] = 0.0;
+   matrix[13] = 0.0;
+   matrix[14] = -(2.0 * zFar * zNear) / (zFar - zNear);
+   matrix[15] = 0.0;
+
+   // Add to current matrix
+   //glMultMatrixd(matrix);
+}
+
+
 
 
 void testMatrices()

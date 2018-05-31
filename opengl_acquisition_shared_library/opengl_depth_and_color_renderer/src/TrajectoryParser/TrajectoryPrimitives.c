@@ -1,6 +1,6 @@
 
 /*                  
-This file was automatically generated @ 01-04-2017 22:30:33 using StringRecognizer                  
+This file was automatically generated @ 31-05-2018 19:47:50 using StringRecognizer                  
 https://github.com/AmmarkoV/AmmarServer/tree/master/src/StringRecognizer                 
 Please note that changes you make here may be automatically overwritten                  
 if the String Recognizer generator runs again..!              
@@ -204,6 +204,10 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
      case 'C' : 
          if (strLength<11) { return 0; } 
          if ( strncasecmp(str,"SCALE_WORLD",11) == 0 ) { return TRAJECTORYPRIMITIVES_SCALE_WORLD; } 
+     break; 
+     case 'H' : 
+         if (strLength<6) { return 0; } 
+         if ( strncasecmp(str,"SHADER",6) == 0 ) { return TRAJECTORYPRIMITIVES_SHADER; } 
      break; 
      case 'I' : 
          if (strLength<6) { return 0; } 

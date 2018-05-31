@@ -188,6 +188,16 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
              break;
 
 
+             case TRAJECTORYPRIMITIVES_SHADER :
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,nameB,MAX_PATH);
+
+               enableShaders(name,nameB);
+             break;
+
+
+
+
 
              case TRAJECTORYPRIMITIVES_INCLUDE :
               InputParser_GetWord(ipc,1,includeFile,MAX_PATH);
