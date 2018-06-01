@@ -194,39 +194,53 @@ compareImagesKernel(
                       unsigned int haystackWidth,
                       unsigned int haystackHeight,
 
-
-                      unsigned int *g_odata,
-
-                      unsigned int haystackTilesX,
-                      unsigned int haystackTilesY
+                      unsigned int *g_odata
                       )
 {
-    // access thread id
-
     const unsigned int haystackPixelX = blockDim.x * blockIdx.x + threadIdx.x;
     const unsigned int haystackPixelY = blockDim.y * blockIdx.y + threadIdx.y;
     const unsigned int needlePixelX = haystackPixelX % needleWidth;
     const unsigned int needlePixelY = haystackPixelY % needleHeight;
 
+    unsigned int haystackTilesX = haystackPixelX / needleWidth;
+    unsigned int haystackTilesY = haystackPixelY / needleHeight;
 
     const unsigned int outputElement= haystackTilesX + (haystackTilesY*haystackTilesX);
 
+    unsigned int totalScore=0;
     //This will be faster
-    //__shared__ unsigned int diff[blockSize_y+2*RAD][blockSize_x+2*RAD];
+    __shared__ unsigned int diff[64][64];
 
-    if ((haystackPixelY < haystackHeight) && (haystackPixelX+blockSize_x < haystackHeight))
-    {
     #pragma unroll
-     for (int i=0; i<blockSize_x; i++)
+    for (int y=0; y<blockSize_y; y++)
+     {
+      #pragma unroll
+      for (int x=0; x<blockSize_x; x++)
        {
-        unsigned int valA = tex2D(tex2Dneedle, needlePixelX, needlePixelY+i);
-        unsigned int valB = tex2D(tex2Dhaystack, haystackPixelX, haystackPixelY+i);
-        g_odata[outputElement]= __usad(valA,valB,0);
+           diff[x][y]=tex2D(tex2Dneedle, needlePixelX+x, needlePixelY+y);
        }
+     }
+     __syncthreads();
+
+
+    //if ((haystackPixelY < haystackHeight) && (haystackPixelX+blockSize_x < haystackHeight))
+    {
+    //#pragma unroll
+    for (int y=0; y<blockSize_y; y++)
+     {
+     // int y=0;
+      #pragma unroll
+      for (int x=0; x<blockSize_x; x++)
+       {
+        unsigned int valA = diff[x][y];//tex2D(tex2Dneedle, needlePixelX+x, needlePixelY+y);
+        unsigned int valB = tex2D(tex2Dhaystack, haystackPixelX+x, haystackPixelY+y);
+        totalScore+= __usad4(valA,valB); //__usad
+       }
+     }
     }
 
-   __syncthreads();
-
+  g_odata[outputElement] += totalScore;
+  __syncthreads();
 }
 
 

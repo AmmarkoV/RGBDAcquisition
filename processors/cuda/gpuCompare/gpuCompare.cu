@@ -297,10 +297,7 @@ int doGPUonly(int argc, char **argv)
                                                     haystackWidth,haystackHeight,
 
 
-                                                    d_odata,
-
-                                                    haystackTilesX,
-                                                    haystackTilesY
+                                                    d_odata
                                                    );
     cudaDeviceSynchronize();
 
@@ -323,10 +320,7 @@ int doGPUonly(int argc, char **argv)
                                                     haystackWidth,haystackHeight,
 
 
-                                                    d_odata,
-
-                                                    haystackTilesX,
-                                                    haystackTilesY
+                                                    d_odata
                                                    );
     //Copy result from device to host for verification
     checkCudaErrors(cudaMemcpy(h_odata, d_odata, odataSize, cudaMemcpyDeviceToHost));
@@ -373,8 +367,10 @@ int doGPUonly(int argc, char **argv)
     checkCudaErrors(cudaEventElapsedTime(&msecTotal, start, stop));
 
 
-    printf("Input Size  [%dx%d], ", haystackWidth, haystackHeight);
-    printf("Kernel size [%dx%d], ", needleWidth, needleHeight);
+    printf("Block Number [%d]\n", numBlocks);
+    printf("Thread Number [%d]\n", numThreads);
+    printf("Input Size  [%dx%d]\n", haystackWidth, haystackHeight);
+    printf("Kernel size [%dx%d]\n", needleWidth, needleHeight);
 
     printf("GPU processing time : %.4f (ms)\n", msecTotal);
    // printf("Pixel throughput    : %.3f Mpixels/sec\n", ((float)(w *h*1000.f)/msecTotal)/1000000);
