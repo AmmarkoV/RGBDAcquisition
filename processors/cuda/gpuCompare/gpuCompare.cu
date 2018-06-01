@@ -212,29 +212,30 @@ int doGPUonly(int argc, char **argv)
     //initialize pointers to NULL to request lib call to allocate as needed
     // PPM images are loaded into 4 byte/pixel memory (RGBX)
     unsigned char *h_needle = NULL;
-    unsigned int needleWidth, needleHeight , needleSize;
+    unsigned int needleWidth=0, needleHeight=0 , needleSize=0;
 
     unsigned char *h_haystack = NULL;
-    unsigned int haystackWidth, haystackHeight ,haystackSize;
+    unsigned int haystackWidth=0, haystackHeight=0 ,haystackSize=0;
 
     char *needle   = sdkFindFilePath("needle2.pnm", argv[0]);
     char *haystack = sdkFindFilePath("haystack.pnm", argv[0]);
 
     printf("Loaded <%s> needle\n", needle);
-    if (!sdkLoadPPM4ub(needle, &h_needle, &needleWidth, &needleHeight))    { fprintf(stderr, "Failed to load <%s>\n", needle); }
-    needleSize=needleWidth*needleHeight*4;
+    if (!sdkLoadPPM4ub(needle, &h_needle, &needleWidth, &needleHeight))            { fprintf(stderr, "Failed to load <%s>\n", needle);  return 0; }
+    needleSize=sizeof(char) *needleWidth*needleHeight * 4;
 
     printf("Loaded <%s> haystack\n", haystack);
-    if (!sdkLoadPPM4ub(haystack, &h_haystack, &haystackWidth, &haystackHeight))    { fprintf(stderr, "Failed to load <%s>\n", haystack); }
-    haystackSize=haystackWidth*haystackHeight*4;
+    if (!sdkLoadPPM4ub(haystack, &h_haystack, &haystackWidth, &haystackHeight))    { fprintf(stderr, "Failed to load <%s>\n", haystack); return 0; }
+    haystackSize=sizeof(char) * haystackWidth*haystackHeight * 4;
 
 
 
     unsigned int haystackTilesX = 16;
     unsigned int haystackTilesY = 16;
     //allocate mem for the result on host side
-    unsigned int *h_odata = (unsigned int *)malloc( sizeof(unsigned int ) * haystackTilesX * haystackTilesY);
-    unsigned int odataSize = haystackTilesX*haystackTilesY;
+    unsigned int odataSize = sizeof(int) * haystackTilesX*haystackTilesY;
+    unsigned int *h_odata = (unsigned int *)malloc(odataSize);
+    if (h_odata==0) { fprintf(stderr, "Failed to allocate output\n"); return 0; }
     memset(h_odata,0, sizeof(unsigned int ) * haystackTilesX * haystackTilesY );
 
     //initialize the memory
@@ -252,14 +253,14 @@ int doGPUonly(int argc, char **argv)
     // allocate device memory for result
     unsigned int *d_odata, *d_needle, *d_haystack;
 
-    checkCudaErrors(cudaMalloc((void **) &d_odata, odataSize));
     checkCudaErrors(cudaMalloc((void **) &d_needle, needleSize));
     checkCudaErrors(cudaMalloc((void **) &d_haystack, haystackSize ));
+    checkCudaErrors(cudaMalloc((void **) &d_odata, odataSize));
 
     // copy host memory to device to initialize to zeros
-    checkCudaErrors(cudaMemcpy(d_needle,    h_needle, needleSize, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_needle,    h_needle,   needleSize,   cudaMemcpyHostToDevice));
     checkCudaErrors(cudaMemcpy(d_haystack,  h_haystack, haystackSize, cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemcpy(d_odata, h_odata, odataSize, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_odata,     h_odata,    odataSize,    cudaMemcpyHostToDevice));
 
 
     printf("Done with copies..\n");
@@ -267,25 +268,40 @@ int doGPUonly(int argc, char **argv)
     cudaChannelFormatDesc ca_desc0 = cudaCreateChannelDesc<unsigned int>();
     cudaChannelFormatDesc ca_desc1 = cudaCreateChannelDesc<unsigned int>();
 
-    tex2Dleft.addressMode[0] = cudaAddressModeClamp;
-    tex2Dleft.addressMode[1] = cudaAddressModeClamp;
-    tex2Dleft.filterMode     = cudaFilterModePoint;
-    tex2Dleft.normalized     = false;
-    tex2Dright.addressMode[0] = cudaAddressModeClamp;
-    tex2Dright.addressMode[1] = cudaAddressModeClamp;
-    tex2Dright.filterMode     = cudaFilterModePoint;
-    tex2Dright.normalized     = false;
+    tex2Dneedle.addressMode[0] = cudaAddressModeClamp;
+    tex2Dneedle.addressMode[1] = cudaAddressModeClamp;
+    tex2Dneedle.filterMode     = cudaFilterModePoint;
+    tex2Dneedle.normalized     = false;
+
+    tex2Dhaystack.addressMode[0] = cudaAddressModeClamp;
+    tex2Dhaystack.addressMode[1] = cudaAddressModeClamp;
+    tex2Dhaystack.filterMode     = cudaFilterModePoint;
+    tex2Dhaystack.normalized     = false;
 
 
-    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dleft,  d_needle, ca_desc0,   needleWidth,needleHeight, needleSize ));
+    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dneedle,   d_needle,   ca_desc0,   needleWidth,    needleHeight,   needleWidth*4 ));
     assert(offset == 0);
 
-    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dright, d_haystack, ca_desc1, haystackWidth , haystackHeight, haystackSize));
+    printf("Creating texture %ux%u , size %u \n",haystackWidth , haystackHeight, haystackSize);
+    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dhaystack, d_haystack, ca_desc1,   haystackWidth , haystackHeight, haystackWidth*4));
     assert(offset == 0);
 
     // First run the warmup kernel (which we'll use to get the GPU in the correct max power state
     printf("Start test run ? \n");
-    //compareImagesKernel<<<numBlocks, numThreads>>>(d_needle, d_haystack, d_odata, w, h );
+
+    compareImagesKernel<<<numBlocks, numThreads>>>(
+                                                    d_needle,
+                                                    needleWidth,  needleHeight,
+
+                                                    d_haystack,
+                                                    haystackWidth,haystackHeight,
+
+
+                                                    d_odata,
+
+                                                    haystackTilesX,
+                                                    haystackTilesY
+                                                   );
     cudaDeviceSynchronize();
 
     // Allocate CUDA events that we'll use for timing
@@ -299,7 +315,19 @@ int doGPUonly(int argc, char **argv)
     checkCudaErrors(cudaEventRecord(start, NULL));
 
     // launch the stereoDisparity kernel
-    //compareImagesKernel<<<numBlocks, numThreads>>>(d_needle, d_haystack, d_odata, w, h );
+    compareImagesKernel<<<numBlocks, numThreads>>>(
+                                                    d_needle,
+                                                    needleWidth,  needleHeight,
+
+                                                    d_haystack,
+                                                    haystackWidth,haystackHeight,
+
+
+                                                    d_odata,
+
+                                                    haystackTilesX,
+                                                    haystackTilesY
+                                                   );
     //Copy result from device to host for verification
     checkCudaErrors(cudaMemcpy(h_odata, d_odata, odataSize, cudaMemcpyDeviceToHost));
 

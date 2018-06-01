@@ -23,8 +23,8 @@
 // (see convolution CUDA Sample for example)
 #define STEPS 3
 
-texture<unsigned int, cudaTextureType2D, cudaReadModeElementType> tex2Dleft;
-texture<unsigned int, cudaTextureType2D, cudaReadModeElementType> tex2Dright;
+texture<unsigned int, cudaTextureType2D, cudaReadModeElementType> tex2Dneedle;
+texture<unsigned int, cudaTextureType2D, cudaReadModeElementType> tex2Dhaystack;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,81 +184,44 @@ int maxDisparity=3;
 }
 */
 
-
-__global__ void
-compareImagesKernel22(
-                      unsigned int *g_img0, unsigned int *g_img1,
-                      unsigned int *g_odata,
-                      int w, int h
-                      //,int minDisparity, int maxDisparity
-                      )
-{
-    // access thread id
-    const int tidx = blockDim.x * blockIdx.x + threadIdx.x;
-    const int tidy = blockDim.y * blockIdx.y + threadIdx.y;
-    const unsigned int sidx = threadIdx.x+RAD;
-    const unsigned int sidy = threadIdx.y+RAD;
-
-
-    unsigned int cost;
-  //  __shared__ unsigned int diff[blockSize_y+2*RAD][blockSize_x+2*RAD];
-
-    // store needed values for left image into registers (constant indexed local vars)
-    unsigned int imLeft[STEPS];
-    unsigned int imRight[STEPS];
-    unsigned int diffL[STEPS];
-
-
-    unsigned int imLeftCUDAPTR;
-    unsigned int imRightCUDAPTR;
-
-#pragma unroll
-    for (int i=0; i<STEPS; i++)
-    {
-        imLeft[i] = tex2D(tex2Dleft, tidx-RAD, tidy+i);
-        imRight[i] = tex2D(tex2Dright, tidx-RAD+blockSize_x, tidy+i);
-    }
-
-    imLeftCUDAPTR=imLeft[0];
-    imRightCUDAPTR=imRight[0];
-    cost = __usad4(imLeftCUDAPTR, imRightCUDAPTR);
-
-    if (tidy < h && tidx+STEPS < w)
-    {
-    #pragma unroll
-     for (int i=0; i<STEPS; i++)
-       {
-        g_odata[tidy*w + tidx+i]=cost;
-       }
-    }
-
-   __syncthreads();
-
-}
-
 __global__ void
 compareImagesKernel(
-                      unsigned int *g_img0, unsigned int *g_img1,
+                      unsigned int *g_needle,
+                      unsigned int needleWidth,
+                      unsigned int needleHeight,
+
+                      unsigned int *g_haystack,
+                      unsigned int haystackWidth,
+                      unsigned int haystackHeight,
+
+
                       unsigned int *g_odata,
-                      int w, int h
-                      //,int minDisparity, int maxDisparity
+
+                      unsigned int haystackTilesX,
+                      unsigned int haystackTilesY
                       )
 {
     // access thread id
-    const int tidx = blockDim.x * blockIdx.x + threadIdx.x;
-    const int tidy = blockDim.y * blockIdx.y + threadIdx.y;
-    const unsigned int sidx = threadIdx.x+RAD;
-    const unsigned int sidy = threadIdx.y+RAD;
+
+    const unsigned int haystackPixelX = blockDim.x * blockIdx.x + threadIdx.x;
+    const unsigned int haystackPixelY = blockDim.y * blockIdx.y + threadIdx.y;
+    const unsigned int needlePixelX = haystackPixelX % needleWidth;
+    const unsigned int needlePixelY = haystackPixelY % needleHeight;
 
 
-    if (tidy < h && tidx+blockSize_x < w)
+    const unsigned int outputElement= haystackTilesX + (haystackTilesY*haystackTilesX);
+
+    //This will be faster
+    //__shared__ unsigned int diff[blockSize_y+2*RAD][blockSize_x+2*RAD];
+
+    if ((haystackPixelY < haystackHeight) && (haystackPixelX+blockSize_x < haystackHeight))
     {
     #pragma unroll
      for (int i=0; i<blockSize_x; i++)
        {
-        unsigned int valA = tex2D(tex2Dleft, tidx-RAD, tidy+i);
-        unsigned int valB = tex2D(tex2Dright, tidx-RAD, tidy+i);
-        g_odata[tidy*w + tidx+i]= __usad(valA,valB,0);
+        unsigned int valA = tex2D(tex2Dneedle, needlePixelX, needlePixelY+i);
+        unsigned int valB = tex2D(tex2Dhaystack, haystackPixelX, haystackPixelY+i);
+        g_odata[outputElement]= __usad(valA,valB,0);
        }
     }
 
