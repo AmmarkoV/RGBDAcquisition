@@ -269,35 +269,121 @@ compareImagesKernel(
 
 
 
+
+
+#define MEMPLACE4(x,y,width) ( ( y * ( width * 4 ) ) + (x*4) )
+
+unsigned int sadRGBA(unsigned char * target,  unsigned int tX,  unsigned int tY , unsigned int targetWidth , unsigned int targetHeight ,
+                     unsigned char * source , unsigned int sX, unsigned int sY  , unsigned int sourceWidth , unsigned int sourceHeight ,
+                     unsigned int width , unsigned int height)
+{
+  unsigned int sum=0;
+  unsigned int lineNum=0;
+
+  unsigned int sX2 = sX+width;
+  unsigned int sY2 = sY+height;
+
+  unsigned int tX2 = tX+width;
+  unsigned int tY2 = tY+height;
+
+
+  unsigned char *  sourcePTR      = source+ MEMPLACE4(sX,sY,sourceWidth);
+  unsigned char *  sourceLimitPTR = source+ MEMPLACE4(sX2,sY2,sourceWidth);
+  unsigned char *  sourceFrameLimitPTR = source + sourceWidth*sourceHeight*4;
+  unsigned int     sourceLineSkip = (sourceWidth-width) * 4;
+  unsigned char *  sourceLineLimitPTR = sourcePTR + (width*4) -4; /*-3 is required here*/
+  if (sourceLimitPTR>sourceFrameLimitPTR) { sourceFrameLimitPTR = sourceLimitPTR; }
+/*
+  fprintf(stderr,"SOURCE (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",sourceWidth,sourceHeight,sX,sY,sX2,sY2);
+  fprintf(stderr,"sourcePTR is %p , limit is %p \n",sourcePTR,sourceLimitPTR);
+  fprintf(stderr,"sourceLineSkip is %u\n",        sourceLineSkip);
+  fprintf(stderr,"sourceLineLimitPTR is %p\n",sourceLineLimitPTR);*/
+
+
+  unsigned char * targetPTR      = target + MEMPLACE4(tX,tY,targetWidth);
+  unsigned char * targetLimitPTR = target + MEMPLACE4(tX2,tY2,targetWidth);
+  unsigned char * targetFrameLimitPTR = target + targetWidth*targetHeight*4;
+  if (targetLimitPTR>targetFrameLimitPTR) { targetFrameLimitPTR = targetLimitPTR; }
+
+  unsigned int targetLineSkip = (targetWidth-width) * 4;
+  unsigned char * targetLineLimitPTR = targetPTR + (width*4) -4; /*-3 is required here*/
+  /*
+  fprintf(stderr,"TARGET (RGB size %u/%u)  Starts at %u,%u and ends at %u,%u\n",targetWidth,targetHeight,tX,tY,tX2,tY2);
+  fprintf(stderr,"targetPTR is %p , limit is %p \n",targetPTR,targetLimitPTR);
+  fprintf(stderr,"targetLineSkip is %u\n", targetLineSkip);
+  fprintf(stderr,"targetLineLimitPTR is %p\n",targetLineLimitPTR);*/
+
+  while ( (sourcePTR < sourceLimitPTR) && ( targetPTR+4 < targetLimitPTR ) && (lineNum<height))
+  {
+
+     while ( (sourcePTR < sourceLineLimitPTR) && ((targetPTR+4 < targetLineLimitPTR)) )
+     {
+        sum+= abs( (int) *targetPTR - *sourcePTR ); ++targetPTR; ++sourcePTR;
+        sum+= abs( (int) *targetPTR - *sourcePTR ); ++targetPTR; ++sourcePTR;
+        sum+= abs( (int) *targetPTR - *sourcePTR ); ++targetPTR; ++sourcePTR;
+        /*sum+= abs( (int) *targetPTR - *sourcePTR );*/ ++targetPTR; ++sourcePTR;
+     }
+
+    sourceLineLimitPTR += sourceWidth*4;
+    targetLineLimitPTR += targetWidth*4;
+    sourcePTR+=sourceLineSkip;
+    targetPTR+=targetLineSkip;
+
+    //fprintf(stderr,"Line %u , Score %u \n",lineNum,sum);
+    ++lineNum;
+  }
+
+ return sum;
+}
+
+
+
+
+
+
+
 void compareImagesCPU(
-                       unsigned int *img0,
-                       unsigned int *img1,
-                       unsigned int *odata,
-                       int w,
-                       int h
+                       unsigned char *needle,
+                       unsigned int needleWidth,
+                       unsigned int needleHeight,
+
+                       unsigned char *haystack,
+                       unsigned int haystackWidth,
+                       unsigned int haystackHeight,
+
+                       unsigned int haystackItemsX,
+                       unsigned int haystackItemsY,
+
+                       unsigned int *odata
                      )
 {
-    for (int y = 0 ; y< h-1 ; y++)
+  unsigned int scoreOutputID=0;
+  unsigned int currentScore=0;
+
+
+  for (int hY=0; hY<haystackItemsY; hY++)
+  {
+   for (int hX=0; hX<haystackItemsX; hX++)
     {
-        for (int x = 0 ; x< w ; x++)
+        if  ( (hY==haystackItemsY-1) && (hX==haystackItemsX-1) )
         {
-             unsigned int cost = 0;
+          fprintf(stderr,"Edge case does not work.. \n");
+          odata[scoreOutputID]=6666666;
+        } else
+        {
+        fprintf(stderr,"Tile(%u,%u)",hX,hY);
+         odata[scoreOutputID]=sadRGBA(
+                                       haystack,
+                                       hX*needleWidth,  hY*needleHeight , haystackWidth , haystackHeight ,
+                                       needle  ,
+                                       0 , 0 , needleWidth , needleHeight ,
+                                       needleWidth , needleHeight
+                                      );
 
-             // sum abs diff across components
-             unsigned char *A = (unsigned char *)&img0[y*w + x];
-             unsigned char *B = (unsigned char *)&img1[y*w + x];
-             unsigned int absdiff = 0;
-
-             for (int k=0; k<4; k++)
-              {
-               absdiff += abs((int)(A[k] - B[k]));
-              }
-
-            cost += absdiff;
-
-            // store to best disparity
-            odata[y*w + x ] = cost;
         }
+
+        ++scoreOutputID;
     }
+  }
 }
 #endif // #ifndef _STEREODISPARITY_KERNEL_H_

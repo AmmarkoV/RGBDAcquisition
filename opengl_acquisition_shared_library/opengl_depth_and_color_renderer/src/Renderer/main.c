@@ -54,6 +54,31 @@ static int myMkdir(const char * prefix,const char * dirname)
 }
 
 
+
+
+int reallyFastCheckForLinuxGPUWithoutPBuffer()
+{
+   FILE * fp = popen("glxinfo | grep NVIDIA", "r");
+   if (fp == 0 ) { return 1; }
+
+ /* Read the output a line at a time - output it. */
+
+  char what2GetBack[513]={0};
+
+  fgets(what2GetBack,512, fp);
+  /* close */
+  pclose(fp);
+
+  fprintf(stderr,"reallyFastCheckForLinuxGPUWithoutPBuffer = %s \n",what2GetBack);
+
+  if (strlen(what2GetBack)<1) { return 1; }
+
+  return 0;
+}
+
+
+
+
 int main(int argc, char **argv)
 {
 
@@ -148,7 +173,7 @@ int main(int argc, char **argv)
         {
             if (i+4<argc)
             {
-                viewWindow=0;
+                viewWindow=reallyFastCheckForLinuxGPUWithoutPBuffer();
                 photoShootOBJ=atoi(argv[i+1]);
                 angleX=atof(argv[i+2]);
                 angleY=atof(argv[i+3]);

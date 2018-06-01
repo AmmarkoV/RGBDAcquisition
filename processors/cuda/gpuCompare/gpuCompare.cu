@@ -24,6 +24,25 @@ Based on the NVIDA Sample
 #include <helper_cuda.h>       // helper for checking cuda initialization and error checking
 #include <helper_string.h>     // helper functions for string parsing
 
+
+unsigned long tickBase = 0;
+unsigned long GetTickCountMilliseconds()
+{
+   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
+   struct timespec ts;
+   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
+
+   if (tickBase==0)
+   {
+     tickBase = ts.tv_sec*1000 + ts.tv_nsec/1000000;
+     return 0;
+   }
+
+   return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBase;
+}
+
+
+
 int iDivUp(int a, int b)
 {
     return ((a % b) != 0) ? (a / b + 1) : (a / b);
@@ -81,60 +100,72 @@ int doCPUonly(int argc, char **argv)
     //allocate mem for the images on host side
     //initialize pointers to NULL to request lib call to allocate as needed
     // PPM images are loaded into 4 byte/pixel memory (RGBX)
-    unsigned char *h_img0 = NULL;
-    unsigned char *h_img1 = NULL;
-    unsigned char *h_img2 = NULL;
-    unsigned char *h_img3 = NULL;
-    unsigned int w, h;
-    char *fname0 = sdkFindFilePath("stereo.im0.640x533.ppm", argv[0]);
-    char *fname1 = sdkFindFilePath("stereo.im1.640x533.ppm", argv[0]);
-    char *fname2 = sdkFindFilePath("stereo.im2.640x533.ppm", argv[0]);
-    char *fname3 = sdkFindFilePath("stereo.im3.640x533.ppm", argv[0]);
+    unsigned char *h_needle   = NULL;
+    unsigned int needleWidth, needleHeight;
 
-    printf("Loaded <%s> as image 0\n", fname0);
-    if (!sdkLoadPPM4ub(fname0, &h_img0, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname0); }
+    unsigned char *h_haystack = NULL;
+    unsigned int haystackWidth, haystackHeight;
 
-    printf("Loaded <%s> as image 1\n", fname1);
-    if (!sdkLoadPPM4ub(fname1, &h_img1, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname1); }
+    char *needle   = sdkFindFilePath("needle2.pnm", argv[0]);
+    char *haystack = sdkFindFilePath("haystack.pnm", argv[0]);
 
-    printf("Loaded <%s> as image 2\n", fname2);
-    if (!sdkLoadPPM4ub(fname2, &h_img2, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname2); }
+    printf("Loaded <%s> needle\n", needle);
+    if (!sdkLoadPPM4ub(needle, &h_needle, &needleWidth, &needleHeight))    { fprintf(stderr, "Failed to load <%s>\n", needle); }
 
-    printf("Loaded <%s> as image 3\n", fname3);
-    if (!sdkLoadPPM4ub(fname3, &h_img3, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname3); }
+    printf("Loaded <%s> haystack\n", haystack);
+    if (!sdkLoadPPM4ub(haystack, &h_haystack, &haystackWidth, &haystackHeight))    { fprintf(stderr, "Failed to load <%s>\n", haystack); }
 
-    unsigned int numData = w*h;
-    unsigned int memSize = sizeof(int) * numData;
+
+    unsigned int haystackTilesX = 16;
+    unsigned int haystackTilesY = 16;
+
 
     //allocate mem for the result on host side
-    unsigned int *h_odata = (unsigned int *)malloc(memSize);
+    unsigned int *h_odata = (unsigned int *)malloc( sizeof(unsigned int ) * haystackTilesX * haystackTilesY);
+    memset(h_odata,0, sizeof(unsigned int ) * haystackTilesX * haystackTilesY );
 
-    //initialize the memory
+    printf("Performing CPU  search...\n");
+    printf("Needle Dimensions %ux%u ...\n",needleWidth,needleHeight);
+    printf("Haystack Dimensions %ux%u ...\n",haystackWidth,haystackHeight);
 
-    printf("Computing CPU reference...\n");
-    for (unsigned int i = 0; i < numData; i++) h_odata[i] = 0;
-    compareImagesCPU((unsigned int *)h_img0, (unsigned int *)h_img1, (unsigned int *)h_odata, w, h);
-    writeResult("CPU","im0","im1",h_odata,w,h);
+    unsigned long startTimer = GetTickCountMilliseconds();
+    compareImagesCPU(
+                     h_needle,
+                     needleWidth,
+                     needleHeight,
+
+                     h_haystack,
+                     haystackWidth,
+                     haystackHeight,
+
+                     haystackTilesX,
+                     haystackTilesY,
+
+                     h_odata
+                    );
+    unsigned long endTimer = GetTickCountMilliseconds();
 
 
-    printf("Computing CPU reference...\n");
-    for (unsigned int i = 0; i < numData; i++) h_odata[i] = 0;
-    compareImagesCPU((unsigned int *)h_img0, (unsigned int *)h_img2, (unsigned int *)h_odata, w, h);
-    writeResult("CPU","im0","im2",h_odata,w,h);
+    unsigned int bestID=666 , bestScore=9999999;
+    printf("Results are ...\n");
+    for (int i=0; i<haystackTilesX*haystackTilesY; i++)
+    {
+      printf("R[%u]=%u ",i,h_odata[i]);
+      if (h_odata[i]<bestScore)
+      {
+        bestScore = h_odata[i];
+        bestID = i;
+      }
+    }
+    printf("\n\n\n");
+
+    printf("Best candidate is %u with score %u ...\n",bestID,bestScore);
+    printf("Found it in %lu milliseconds ...\n",endTimer-startTimer);
 
 
-    printf("Computing CPU reference...\n");
-    for (unsigned int i = 0; i < numData; i++) h_odata[i] = 0;
-    compareImagesCPU((unsigned int *)h_img0, (unsigned int *)h_img3, (unsigned int *)h_odata, w, h);
-    writeResult("CPU","im0","im3",h_odata,w,h);
-
-
-
-    if (h_odata != NULL) free(h_odata);
-    if (h_img0 != NULL)  free(h_img0);
-    if (h_img1 != NULL)  free(h_img1);
-    if (h_img2 != NULL)  free(h_img2);
-    if (h_img3 != NULL)  free(h_img3);
+    if (h_odata != NULL)     free(h_odata);
+    if (h_needle != NULL)    free(h_needle);
+    if (h_haystack != NULL)  free(h_haystack);
 
  return 0;
 }
