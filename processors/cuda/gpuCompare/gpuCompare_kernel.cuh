@@ -14,8 +14,9 @@
 #ifndef _STEREODISPARITY_KERNEL_H_
 #define _STEREODISPARITY_KERNEL_H_
 
-#define blockSize_x 32
+#define blockSize_x 8
 #define blockSize_y 8
+
 
 // RAD is the radius of the region of support for the search
 #define RAD 8
@@ -187,12 +188,10 @@ int maxDisparity=3;
 __global__ void
 compareImagesKernel(
                       unsigned int *g_needle,
-                      unsigned int needleWidth,
-                      unsigned int needleHeight,
+                      unsigned int needleWidth,   unsigned int needleHeight,
 
                       unsigned int *g_haystack,
-                      unsigned int haystackWidth,
-                      unsigned int haystackHeight,
+                      unsigned int haystackWidth, unsigned int haystackHeight,
 
                       unsigned int *g_odata
                       )
@@ -211,37 +210,66 @@ compareImagesKernel(
     //This will be faster
     __shared__ unsigned int diff[64][64];
 
-    #pragma unroll
-    for (int y=0; y<blockSize_y; y++)
-     {
-      #pragma unroll
-      for (int x=0; x<blockSize_x; x++)
-       {
-           diff[x][y]=tex2D(tex2Dneedle, needlePixelX+x, needlePixelY+y);
-       }
-     }
+
+     diff[needlePixelX][needlePixelY]=tex2D(tex2Dneedle, needlePixelX, needlePixelY);
      __syncthreads();
 
 
-    //if ((haystackPixelY < haystackHeight) && (haystackPixelX+blockSize_x < haystackHeight))
+    if ((haystackPixelY < haystackHeight) && (haystackPixelX+blockSize_x < haystackHeight))
     {
     //#pragma unroll
-    for (int y=0; y<blockSize_y; y++)
+   // for (int y=0; y<blockSize_y; y++)
      {
      // int y=0;
       #pragma unroll
-      for (int x=0; x<blockSize_x; x++)
+     // for (int x=0; x<blockSize_x; x++)
        {
-        unsigned int valA = diff[x][y];//tex2D(tex2Dneedle, needlePixelX+x, needlePixelY+y);
-        unsigned int valB = tex2D(tex2Dhaystack, haystackPixelX+x, haystackPixelY+y);
+        unsigned int valA = diff[needlePixelX][needlePixelY];//tex2D(tex2Dneedle, needlePixelX+x, needlePixelY+y);
+        unsigned int valB = tex2D(tex2Dhaystack, haystackPixelX, haystackPixelY);
         totalScore+= __usad4(valA,valB); //__usad
        }
      }
+     g_odata[outputElement] += totalScore;
     }
 
-  g_odata[outputElement] += totalScore;
   __syncthreads();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+   ---------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------
+
+   ---------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------
+*/
+
+
+
+
+
 
 
 
