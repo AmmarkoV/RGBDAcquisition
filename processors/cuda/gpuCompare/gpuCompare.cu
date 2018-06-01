@@ -146,6 +146,7 @@ int doCPUonly(int argc, char **argv)
     unsigned long endTimer = GetTickCountMilliseconds();
 
 
+    //---------------------------------------------------------------------------------------------------
     unsigned int bestID=666 , bestScore=9999999;
     printf("Results are ...\n");
     for (int i=0; i<haystackTilesX*haystackTilesY; i++)
@@ -161,7 +162,7 @@ int doCPUonly(int argc, char **argv)
 
     printf("Best candidate is %u with score %u ...\n",bestID,bestScore);
     printf("Found it in %lu milliseconds ...\n",endTimer-startTimer);
-
+    //---------------------------------------------------------------------------------------------------
 
     if (h_odata != NULL)     free(h_odata);
     if (h_needle != NULL)    free(h_needle);
@@ -210,33 +211,31 @@ int doGPUonly(int argc, char **argv)
     //allocate mem for the images on host side
     //initialize pointers to NULL to request lib call to allocate as needed
     // PPM images are loaded into 4 byte/pixel memory (RGBX)
-    unsigned char *h_img0 = NULL;
-    unsigned char *h_img1 = NULL;
-    unsigned char *h_img2 = NULL;
-    unsigned char *h_img3 = NULL;
-    unsigned int w, h;
-    char *fname0 = sdkFindFilePath("stereo.im0.640x533.ppm", argv[0]);
-    char *fname1 = sdkFindFilePath("stereo.im1.640x533.ppm", argv[0]);
-    char *fname2 = sdkFindFilePath("stereo.im2.640x533.ppm", argv[0]);
-    char *fname3 = sdkFindFilePath("stereo.im3.640x533.ppm", argv[0]);
+    unsigned char *h_needle = NULL;
+    unsigned int needleWidth, needleHeight , needleSize;
 
-    printf("Loaded <%s> as image 0\n", fname0);
-    if (!sdkLoadPPM4ub(fname0, &h_img0, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname0); return 0; }
+    unsigned char *h_haystack = NULL;
+    unsigned int haystackWidth, haystackHeight ,haystackSize;
 
-    printf("Loaded <%s> as image 1\n", fname1);
-    if (!sdkLoadPPM4ub(fname1, &h_img1, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname1); return 0; }
+    char *needle   = sdkFindFilePath("needle2.pnm", argv[0]);
+    char *haystack = sdkFindFilePath("haystack.pnm", argv[0]);
 
-    printf("Loaded <%s> as image 2\n", fname2);
-    if (!sdkLoadPPM4ub(fname2, &h_img2, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname2); return 0; }
+    printf("Loaded <%s> needle\n", needle);
+    if (!sdkLoadPPM4ub(needle, &h_needle, &needleWidth, &needleHeight))    { fprintf(stderr, "Failed to load <%s>\n", needle); }
+    needleSize=needleWidth*needleHeight*4;
 
-    printf("Loaded <%s> as image 3\n", fname3);
-    if (!sdkLoadPPM4ub(fname3, &h_img3, &w, &h))    { fprintf(stderr, "Failed to load <%s>\n", fname3); return 0; }
+    printf("Loaded <%s> haystack\n", haystack);
+    if (!sdkLoadPPM4ub(haystack, &h_haystack, &haystackWidth, &haystackHeight))    { fprintf(stderr, "Failed to load <%s>\n", haystack); }
+    haystackSize=haystackWidth*haystackHeight*4;
 
-    unsigned int numData = w*h;
-    unsigned int memSize = sizeof(int) * numData;
 
+
+    unsigned int haystackTilesX = 16;
+    unsigned int haystackTilesY = 16;
     //allocate mem for the result on host side
-    unsigned int *h_odata = (unsigned int *)malloc(memSize);
+    unsigned int *h_odata = (unsigned int *)malloc( sizeof(unsigned int ) * haystackTilesX * haystackTilesY);
+    unsigned int odataSize = haystackTilesX*haystackTilesY;
+    memset(h_odata,0, sizeof(unsigned int ) * haystackTilesX * haystackTilesY );
 
     //initialize the memory
     if (!queryGPUIsOk(argc,argv))
@@ -246,24 +245,21 @@ int doGPUonly(int argc, char **argv)
 
 
     dim3 numThreads = dim3(blockSize_x, blockSize_y, 1);
-    dim3 numBlocks = dim3(iDivUp(w, numThreads.x), iDivUp(h, numThreads.y));
+    dim3 numBlocks = dim3(iDivUp( haystackWidth, numThreads.x), iDivUp(haystackHeight, numThreads.y));
 
 
-    //initialize the memory
-    for (unsigned int i = 0; i < numData; i++)
-        h_odata[i] = 0;
 
     // allocate device memory for result
-    unsigned int *d_odata, *d_img0, *d_img1;
+    unsigned int *d_odata, *d_needle, *d_haystack;
 
-    checkCudaErrors(cudaMalloc((void **) &d_odata, memSize));
-    checkCudaErrors(cudaMalloc((void **) &d_img0, memSize));
-    checkCudaErrors(cudaMalloc((void **) &d_img1, memSize));
+    checkCudaErrors(cudaMalloc((void **) &d_odata, odataSize));
+    checkCudaErrors(cudaMalloc((void **) &d_needle, needleSize));
+    checkCudaErrors(cudaMalloc((void **) &d_haystack, haystackSize ));
 
     // copy host memory to device to initialize to zeros
-    checkCudaErrors(cudaMemcpy(d_img0,  h_img0, memSize, cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemcpy(d_img1,  h_img1, memSize, cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemcpy(d_odata, h_odata, memSize, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_needle,    h_needle, needleSize, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_haystack,  h_haystack, haystackSize, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_odata, h_odata, odataSize, cudaMemcpyHostToDevice));
 
 
     printf("Done with copies..\n");
@@ -281,16 +277,15 @@ int doGPUonly(int argc, char **argv)
     tex2Dright.normalized     = false;
 
 
-    printf("Ready to bind texture %u x %u = %u ..\n",w,h,w*4);
-    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dleft,  d_img0, ca_desc0, w, h, w*4 ));
+    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dleft,  d_needle, ca_desc0,   needleWidth,needleHeight, needleSize ));
     assert(offset == 0);
 
-    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dright, d_img1, ca_desc1, w, h, w*4 ));
+    checkCudaErrors(cudaBindTexture2D(&offset, tex2Dright, d_haystack, ca_desc1, haystackWidth , haystackHeight, haystackSize));
     assert(offset == 0);
 
     // First run the warmup kernel (which we'll use to get the GPU in the correct max power state
     printf("Start test run ? \n");
-    compareImagesKernel<<<numBlocks, numThreads>>>(d_img0, d_img1, d_odata, w, h );
+    //compareImagesKernel<<<numBlocks, numThreads>>>(d_needle, d_haystack, d_odata, w, h );
     cudaDeviceSynchronize();
 
     // Allocate CUDA events that we'll use for timing
@@ -304,16 +299,44 @@ int doGPUonly(int argc, char **argv)
     checkCudaErrors(cudaEventRecord(start, NULL));
 
     // launch the stereoDisparity kernel
-    compareImagesKernel<<<numBlocks, numThreads>>>(d_img0, d_img1, d_odata, w, h );
+    //compareImagesKernel<<<numBlocks, numThreads>>>(d_needle, d_haystack, d_odata, w, h );
     //Copy result from device to host for verification
-    checkCudaErrors(cudaMemcpy(h_odata, d_odata, memSize, cudaMemcpyDeviceToHost));
-    writeResult("GPU","im0","im1",h_odata,w,h);
+    checkCudaErrors(cudaMemcpy(h_odata, d_odata, odataSize, cudaMemcpyDeviceToHost));
+
 
     // Record the stop event
     checkCudaErrors(cudaEventRecord(stop, NULL));
 
     // Wait for the stop event to complete
     checkCudaErrors(cudaEventSynchronize(stop));
+
+
+
+
+    //---------------------------------------------------------------------------------------------------
+    unsigned int bestID=666 , bestScore=9999999;
+    printf("Results are ...\n");
+    for (int i=0; i<haystackTilesX*haystackTilesY; i++)
+    {
+      printf("R[%u]=%u ",i,h_odata[i]);
+      if (h_odata[i]<bestScore)
+      {
+        bestScore = h_odata[i];
+        bestID = i;
+      }
+    }
+    printf("\n\n\n");
+
+    printf("Best candidate is %u with score %u ...\n",bestID,bestScore);
+    //---------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 
     // Check to make sure the kernel didn't fail
     getLastCudaError("Kernel execution failed");
@@ -322,23 +345,21 @@ int doGPUonly(int argc, char **argv)
     checkCudaErrors(cudaEventElapsedTime(&msecTotal, start, stop));
 
 
-    printf("Input Size  [%dx%d], ", w, h);
-    printf("Kernel size [%dx%d], ", (2*RAD+1), (2*RAD+1));
+    printf("Input Size  [%dx%d], ", haystackWidth, haystackHeight);
+    printf("Kernel size [%dx%d], ", needleWidth, needleHeight);
 
     printf("GPU processing time : %.4f (ms)\n", msecTotal);
-    printf("Pixel throughput    : %.3f Mpixels/sec\n", ((float)(w *h*1000.f)/msecTotal)/1000000);
+   // printf("Pixel throughput    : %.3f Mpixels/sec\n", ((float)(w *h*1000.f)/msecTotal)/1000000);
 
 
 
     checkCudaErrors(cudaFree(d_odata));
-    checkCudaErrors(cudaFree(d_img0));
-    checkCudaErrors(cudaFree(d_img1));
+    checkCudaErrors(cudaFree(d_needle));
+    checkCudaErrors(cudaFree(d_haystack));
 
     if (h_odata != NULL) free(h_odata);
-    if (h_img0 != NULL)  free(h_img0);
-    if (h_img1 != NULL)  free(h_img1);
-    if (h_img2 != NULL)  free(h_img2);
-    if (h_img3 != NULL)  free(h_img3);
+    if (h_needle != NULL)  free(h_needle);
+    if (h_haystack != NULL)  free(h_haystack);
 
 
  return 0;
