@@ -67,7 +67,7 @@ compareImagesKernel(
                       unsigned int maximumDifference
                       )
 {
-    //Our big haystack image sized 1024x1024 has arrived on the GPU, the particular
+    //Our big haystack image sized 1024x1024 ( 16x16 tiles ) has arrived on the GPU, the particular
     //Call is specifically targeted on haystack pixel (haystackPixelX,haystackPixelY)
     const unsigned int haystackPixelX = blockDim.x * blockIdx.x + threadIdx.x;
     const unsigned int haystackPixelY = blockDim.y * blockIdx.y + threadIdx.y;
@@ -75,17 +75,21 @@ compareImagesKernel(
     //This is the result offset to temporarilly store all results
     //const unsigned int resultOffset = haystackPixelX + haystackPixelY * blockDim.x * gridDim.x;
 
+    //Our needle image sized 64x64 is also on the GPU
     //Each haystack pixel has to be compared with the according needle pixel (needlePixelX,needlePixelY)
     //We can calculate this very easily
     const unsigned int needlePixelX = haystackPixelX % needleWidth;
     const unsigned int needlePixelY = haystackPixelY % needleHeight;
 
-    //We would also like to know which tile we are performing summation for
-    unsigned int haystackTilesX = haystackPixelX / needleWidth;
-    unsigned int haystackTilesY = haystackPixelY / needleHeight;
+    //We would also like to know which tile we are performing SAD for
+    unsigned int haystackTileX = haystackPixelX / needleWidth;
+    unsigned int haystackTileY = haystackPixelY / needleHeight;
+
+    unsigned int totalNumberOfHaystackTilesX  = haystackWidth / needleWidth;
+    unsigned int totalNumberOfHaystackTilesY  = haystackHeight / needleHeight;
 
     //Finally we will output our sum here..
-    const unsigned int outputElement= haystackTilesX + (haystackTilesY*16);
+    const unsigned int outputElement= haystackTileX + (haystackTileY * totalNumberOfHaystackTilesX );
 
     //This will be faster
     __shared__ unsigned int dest[16][16];
@@ -95,7 +99,7 @@ compareImagesKernel(
     unsigned int currentDifference;
 
     //We make sure all of our blocks have cleaned shared memory
-     dest[haystackTilesX][haystackTilesY]=0;
+     dest[haystackTileX][haystackTileY]=0;
      __syncthreads();
 
     //Everything is in SYNC so now only if we are inside the compareable area
@@ -113,13 +117,28 @@ compareImagesKernel(
         //if (currentDifference>maximumDifference) { currentDifference=maximumDifference; }
     }
 
-     //This is probably wrong..!
-     dest[haystackTilesX][haystackTilesY]+=currentDifference;
+     //This is the group value that is faster to write to..!
+
+     if (
+          (haystackTileX<totalNumberOfHaystackTilesX) &&
+          (haystackTileY<totalNumberOfHaystackTilesY)
+         )
+         {
+          dest[haystackTileX][haystackTileY]+=currentDifference;
+         }
      __syncthreads();
 
      //This is probably wrong..!
-     g_odata[outputElement] += dest[haystackTilesX][haystackTilesY];
-     __syncthreads();
+          if (
+          (haystackTileX<totalNumberOfHaystackTilesX) &&
+          (haystackTileY<totalNumberOfHaystackTilesY)
+         )
+         {
+          g_odata[outputElement] += dest[haystackTileX][haystackTileY];
+         }
+
+     //Is this needed?
+     //__syncthreads();
 }
 
 

@@ -346,7 +346,7 @@ int doGPUonly(int argc, char **argv)
 
                                                     d_odata,
 
-                                                    100 //Maximum Difference allowed
+                                                    1000 //Maximum Difference allowed
                                                    );
     cudaDeviceSynchronize();
 
