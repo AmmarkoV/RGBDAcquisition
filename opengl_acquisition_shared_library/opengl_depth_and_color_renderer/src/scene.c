@@ -588,7 +588,7 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
             (win[1] < 0) || (win[1] >= HEIGHT)
           )
       {
-         fprintf(stderr,"Warn : Object %u offscreen ( %0.2f , %0.2f , %0.2f ) will end up at %0.2f,%0.2f(%0.2f)\n" , objID , x3D , y3D , z3D , win[0],win[1],win[2]);
+         fprintf(stderr,RED "Warn : Object %u offscreen ( %0.2f , %0.2f , %0.2f ) will end up at %0.2f,%0.2f(%0.2f)\n" NORMAL , objID , x3D , y3D , z3D , win[0],win[1],win[2]);
       }
   return 1;
 }
@@ -876,8 +876,8 @@ int renderScene()
     //glScalef(1.0,1.0,-1.0); //These are now taken into account using scene files ( see SCALE_WORLD , MAP_ROTATIONS )
     //glRotatef(180,0.0,0,-1.0);
 
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting custom modelview matrix\n"); }
 
+     checkOpenGLError(__FILE__, __LINE__);
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
   {
