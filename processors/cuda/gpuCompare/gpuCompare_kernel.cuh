@@ -14,8 +14,8 @@
 #ifndef _STEREODISPARITY_KERNEL_H_
 #define _STEREODISPARITY_KERNEL_H_
 
-#define blockSize_x 32
-#define blockSize_y 32
+#define threadSize_x 32
+#define threadSize_y 32
 
 
 // RAD is the radius of the region of support for the search
@@ -85,7 +85,7 @@ compareImagesKernel(
     unsigned int haystackTilesY = haystackPixelY / needleHeight;
 
     //Finally we will output our sum here..
-    const unsigned int outputElement= haystackTilesX + (haystackTilesY*haystackTilesX);
+    const unsigned int outputElement= haystackTilesX + (haystackTilesY*16);
 
     //This will be faster
     __shared__ unsigned int dest[16][16];
@@ -99,7 +99,7 @@ compareImagesKernel(
      __syncthreads();
 
     //Everything is in SYNC so now only if we are inside the compareable area
-    if ((haystackPixelY < haystackHeight) && (haystackPixelX+blockSize_x < haystackHeight))
+    if ((haystackPixelY < haystackHeight) && (haystackPixelX < haystackWidth))
     {
         //We should get the needle and haystack values
         unsigned int needleValue   = tex2D(tex2Dneedle, needlePixelX, needlePixelY);
@@ -118,7 +118,7 @@ compareImagesKernel(
      __syncthreads();
 
      //This is probably wrong..!
-     g_odata[outputElement] = dest[haystackTilesX][haystackTilesY];
+     g_odata[outputElement] += dest[haystackTilesX][haystackTilesY];
      __syncthreads();
 }
 

@@ -290,8 +290,8 @@ int doGPUonly(int argc, char **argv)
     //-----------------------------------------------------------------------------
 
 
-    fprintf(stderr,"We will use %ux%u threads\n",blockSize_x,blockSize_y);
-    dim3 numThreads = dim3(blockSize_x, blockSize_y, 1);
+    fprintf(stderr,"We will use %ux%u threads\n",threadSize_x,threadSize_y);
+    dim3 numThreads = dim3(threadSize_x, threadSize_y, 1);
     dim3 numBlocks  = dim3(iDivUp( haystackWidth, numThreads.x), iDivUp(haystackHeight, numThreads.y));
     fprintf(stderr,"Which means %ux%u blocks\n",numBlocks.x,numBlocks.y);
 
