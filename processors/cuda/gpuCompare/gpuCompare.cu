@@ -334,8 +334,6 @@ int doGPUonly(int argc, char **argv)
     assert(offset == 0);
 
     // First run the warmup kernel (which we'll use to get the GPU in the correct max power state
-    printf("Start test run ? \n");
-
     compareImagesKernel<<<numBlocks, numThreads>>>(
                                                     d_needle,
                                                     needleWidth,  needleHeight,

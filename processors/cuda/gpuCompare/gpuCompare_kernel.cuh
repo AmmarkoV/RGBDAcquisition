@@ -92,7 +92,7 @@ compareImagesKernel(
     const unsigned int outputElement= haystackTileX + (haystackTileY * totalNumberOfHaystackTilesX );
 
     //This will be faster
-    __shared__ unsigned int dest[16][16];
+    //__shared__ unsigned int dest[16][16];
 
 
     //This will hold the difference
@@ -101,7 +101,7 @@ compareImagesKernel(
     unsigned int oneHits=0;
 
     //We make sure all of our blocks have cleaned shared memory
-     dest[haystackTileX][haystackTileY]=0;
+     //dest[haystackTileX][haystackTileY]=0;
      __syncthreads();
 
     //Everything is in SYNC so now only if we are inside the compareable area
@@ -118,12 +118,13 @@ compareImagesKernel(
         //oneHits =   ( (needleValue) ^ (haystackValue)  );
 
         //If their absolute difference is more than a threshold , then threshold it
-        currentDifference = max( currentDifference , maximumDifference);
+        //currentDifference = max( currentDifference , maximumDifference);
+
         //if (currentDifference>maximumDifference) { currentDifference=maximumDifference; }
     }
 
      //This is the group value that is faster to write to..!
-
+/*
      if (
           (haystackTileX<totalNumberOfHaystackTilesX) &&
           (haystackTileY<totalNumberOfHaystackTilesY)
@@ -131,7 +132,7 @@ compareImagesKernel(
          {
           dest[haystackTileX][haystackTileY]+=currentDifference;
          }
-     __syncthreads();
+     __syncthreads();*/
 
      //This is probably wrong..!
           if (
@@ -139,7 +140,7 @@ compareImagesKernel(
           (haystackTileY<totalNumberOfHaystackTilesY)
          )
          {
-          g_odata[outputElement] += dest[haystackTileX][haystackTileY];
+          g_odata[outputElement] += currentDifference;// dest[haystackTileX][haystackTileY];
          }
 
      //Is this needed?
