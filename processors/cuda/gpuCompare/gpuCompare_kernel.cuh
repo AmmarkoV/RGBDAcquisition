@@ -97,6 +97,8 @@ compareImagesKernel(
 
     //This will hold the difference
     unsigned int currentDifference;
+    unsigned int bothHits=0;
+    unsigned int oneHits=0;
 
     //We make sure all of our blocks have cleaned shared memory
      dest[haystackTileX][haystackTileY]=0;
@@ -111,6 +113,9 @@ compareImagesKernel(
 
         //Calculate their absolute distance  | needleValue - haystackValue | + 0
         currentDifference= __usad(needleValue,haystackValue,0); //__usad4
+
+        bothHits =  ( (needleValue) && (haystackValue)  );
+        //oneHits =   ( (needleValue) ^ (haystackValue)  );
 
         //If their absolute difference is more than a threshold , then threshold it
         currentDifference = max( currentDifference , maximumDifference);
