@@ -270,6 +270,7 @@ float pyramidTexCoords[]={ //X  Y  Z       W
 
 int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
 {
+ if (coords==0) { return 0; }
    //fprintf(stderr,"float xNormals[]={ //X  Y  Z  W\n");
     float outputNormal[4]={0};
     unsigned int i=0,z=0,z1=0,z2=0,z3=0;
@@ -290,6 +291,7 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
           //fprintf(stderr,"                      %0.4ff,%0.4ff,%0.4ff,\n",outputNormal[0],outputNormal[1],outputNormal[2]);
         }
    //fprintf(stderr,"};\n");
+  return 1;
 }
 
 

@@ -6,6 +6,8 @@
 
 #include "TrajectoryCalculator.h"
 
+#include "../ModelLoader/model_loader_hardcoded.h"
+
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -141,7 +143,7 @@ int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int conne
 
 
 
-static int dummy_strcasecmp_internal(char * input1, char * input2)
+int dummy_strcasecmp_internal(char * input1, char * input2)
 {
   #if CASE_SENSITIVE_OBJECT_NAMES
     return strcmp(input1,input2);
@@ -403,7 +405,7 @@ int addStateToObjectID(
 
 int addStateToObject(
                               struct VirtualStream * stream ,
-                              char * name  ,
+                              const char * name  ,
                               unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength ,
@@ -771,7 +773,7 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
 
 int loadObjectTypeModelForVirtualStream(
                                         struct VirtualStream * stream ,
-                                        char * modelName ,
+                                        const char * modelName ,
                                         unsigned int objTypeID
                                        )
 {
@@ -915,7 +917,7 @@ int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int O
 }
 
 
-int modelFileExists(char * filename)
+int modelFileExists(const char * filename)
 {
  if (filename==0) { return 0; }
  //fprintf(stderr,"Checking if file (%s) exists : ",filename);

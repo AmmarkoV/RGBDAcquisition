@@ -506,7 +506,7 @@ int closeScene()
 {
   stopOGLRendering();
 
-  deallocateModelList(&modelStorage);
+  deallocateModelList(modelStorage);
 
   unsigned int i=0;
   //Object 0 is camera

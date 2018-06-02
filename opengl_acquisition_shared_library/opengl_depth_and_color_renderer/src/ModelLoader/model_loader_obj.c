@@ -6,6 +6,8 @@
 #include <math.h>
 #include "../TextureLoader/texture_loader.h"
 
+#include "../tools.h"
+
 #define reallocationStep 500
 
 #define CALCULATE_3D_BOUNDING_BOX 1

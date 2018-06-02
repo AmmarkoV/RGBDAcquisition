@@ -71,6 +71,9 @@ int setupPhotoshoot(
                    );
 
 
+unsigned int *  getObject2DBoundingBoxList(unsigned int * bboxItemsSize);
+int updateProjectionMatrix();
+
 
 /**
 * @brief Render A Scene in "photoshoot" mode , means take multiple "photos" according to a createPhotoshoot context

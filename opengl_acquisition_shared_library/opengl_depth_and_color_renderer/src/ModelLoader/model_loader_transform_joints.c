@@ -274,7 +274,7 @@ struct TRI_Bones_Per_Vertex * allocTransformTRIBonesToVertexBoneFormat(struct TR
 
   if (outOfSpace>0)
   {
-    fprintf(stderr,"Vertices are set up to accomodate at most %u bones , %u vertices where too small for our input .. \n",MAX_BONES_PER_VERTICE,outOfSpace);
+    fprintf(stderr,"Vertices are set up to accomodate at most %d bones , %u vertices where too small for our input .. \n",MAX_BONES_PER_VERTICE,outOfSpace);
   }
  return out;
 }

@@ -18,7 +18,7 @@ int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int conne
 
 
 
-static int dummy_strcasecmp_internal(char * input1, char * input2);
+int dummy_strcasecmp_internal(char * input1, char * input2);
 
 void listAllObjectTypeID(struct VirtualStream * stream);
 
@@ -65,7 +65,7 @@ int addStateToObjectID(
 * @retval 1=Success , 0=Failure */
 int addStateToObject(
                               struct VirtualStream * stream ,
-                              char * name  ,
+                              const char * name  ,
                               unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength ,

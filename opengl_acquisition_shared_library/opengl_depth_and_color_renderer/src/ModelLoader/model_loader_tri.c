@@ -427,7 +427,12 @@ int loadModelTri(const char * filename , struct TRI_Model * triModel)
         n = fread(&triModel->header , sizeof(struct TRI_Header), 1 , fd);
         if (n!= sizeof(struct TRI_Header)) { fprintf(stderr,"Incomplete read of TRI Header\n"); }
 
-        if (triModel->header.floatSize!=sizeof(float))        { fprintf(stderr,"Size of float (%u/%lu) is different , cannot load \n",triModel->header.floatSize,sizeof(float)); return 0; }
+        if (triModel->header.floatSize!=sizeof(float))
+             {
+                 fprintf(stderr,"Size of float (%u/%lu) is different , cannot load \n",triModel->header.floatSize,sizeof(float));
+                 fclose(fd);
+                 return 0;
+             }
         if (triModel->header.triType != TRI_LOADER_VERSION )
             {//TRI_LOADER_VERSION changes can lead to bugs let's have a HUGE warning message
              fprintf(stderr,RED " ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! \n");

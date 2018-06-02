@@ -176,7 +176,7 @@ unsigned int updateModelPosition(struct Model * model,float * position)
 
     if (model->type==OBJ_MODEL)
      {
-      float posX=position[0],posY=position[1],posZ=position[2];
+      float posX,posY,posZ;
       struct OBJ_Model * modelOBJ = (struct OBJ_Model *) model->modelInternalData;
 
       posX=position[0] - modelOBJ->boundBox.min.x;
@@ -549,7 +549,7 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
         //fprintf(stderr,"drawing hardcoded model\n");
       } else
       {
-         fprintf(stderr, "Cannot draw model , unknown type %u\n",mod->type );
+         fprintf(stderr, "Cannot draw model , unknown type %d\n",mod->type );
       }
 
 

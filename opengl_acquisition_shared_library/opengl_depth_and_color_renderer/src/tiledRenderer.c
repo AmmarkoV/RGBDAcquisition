@@ -4,10 +4,15 @@
 
 #include <stdio.h>
 #include "../../../tools/AmMatrix/matrixProject.h"
+#include "../../../tools/AmMatrix/matrixCalculations.h"
 
 #include "TrajectoryParser/TrajectoryParser.h"
+
 #include "ModelLoader/model_loader.h"
+
+
 #include "scene.h"
+#include "tools.h"
 
 
 
@@ -280,7 +285,26 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                    glMatrixMode (GL_PROJECTION);                       // Select The Projection Matrix
                    glLoadIdentity ();                          // Reset The Projection Matrix
                    // Set Up Perspective Mode To Fit 1/4 The Screen (Size Of A Viewport)
-                   gluPerspective( 85.0, (GLfloat)(tileWidth)/(GLfloat)(tileHeight), 0.1f, 13500.0 );
+
+
+
+                   #define USE_OUR_OWN 1
+
+                   #if USE_OUR_OWN
+                    double matrixD[16];
+                    gldPerspective(
+                                   matrixD,
+                                   85.0,
+                                   (double) tileWidth/tileHeight,
+                                   0.1,
+                                   13500.0
+                                  );
+                    glMultMatrixd(matrixD);
+                   #else
+                    gluPerspective( 85.0, (GLfloat)(tileWidth)/(GLfloat)(tileHeight), 0.1f, 13500.0 );
+                   #endif // USE_OUR_OWN
+
+
                    glMatrixMode(GL_MODELVIEW );
 
 

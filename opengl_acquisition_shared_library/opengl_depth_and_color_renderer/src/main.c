@@ -15,11 +15,20 @@
 #include <X11/keysym.h>
 
 #include "glx.h"
+#include "ModelLoader/model_loader_hardcoded.h"
 #include "ModelLoader/model_loader_obj.h"
 #include "ModelLoader/model_loader_tri.h"
 #include "ModelLoader/model_converter.h"
 #include "scene.h"
 #include "tools.h"
+
+
+
+#include "TrajectoryParser/TrajectoryParserDataStructures.h"
+#include "TrajectoryParser/TrajectoryCalculator.h"
+
+
+
 
 #include "save_to_file.h"
 #include "Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h"
@@ -272,13 +281,15 @@ void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned in
 void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
     short * zshortbuffer = (short *) malloc((width-x)*(height-y)*sizeof(short));
-    if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth to file %s \n",depthfile); return; }
+    if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth to file %s \n",depthfile); return; } else
+        {
+         getOpenGLDepth(zshortbuffer,x,y,width,height);
 
-    getOpenGLDepth(zshortbuffer,x,y,width,height);
+         saveRawImageToFileOGLR(depthfile,zshortbuffer,(width-x),(height-y),1,16);
 
-    saveRawImageToFileOGLR(depthfile,zshortbuffer,(width-x),(height-y),1,16);
+         free(zshortbuffer); zshortbuffer=0;
+        }
 
-    if (zshortbuffer!=0) { free(zshortbuffer); zshortbuffer=0; }
 
     return ;
 }
@@ -374,7 +385,7 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
   fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
   snapsPerformed=0;
 
-  char * testP=0;
+  char ** testP=0;
   fprintf(stderr,"trying to start glx code with a window request ( %ux%u , viewWindow=%u ).. ",width,height,viewWindow);
    if ( !start_glx_stuff(width,height,viewWindow,0,testP) )
    {
@@ -402,7 +413,7 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
 
 int changeOGLRendererGrabMode(unsigned int sequentialModeOn)
 {
-  sceneIgnoreTime(sequentialModeOn);
+  return  sceneIgnoreTime(sequentialModeOn);
 }
 
 
@@ -451,7 +462,7 @@ int saveSnapshotOfObjects()
   char * rgb = (char *) malloc((WIDTH)*(HEIGHT)*sizeof(char)*3);
   if (rgb==0) { fprintf(stderr,"Could not allocate a buffer to write color \n"); return 0; }
   short * zshortbuffer = (short *) malloc((WIDTH)*(HEIGHT)*sizeof(short));
-  if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth \n"); free(rgb); return; }
+  if (zshortbuffer==0) { fprintf(stderr,"Could not allocate a buffer to write depth \n"); free(rgb); return 0; }
 
   getOpenGLColor(rgb, 0, 0, WIDTH,HEIGHT);
   getOpenGLDepth(zshortbuffer,0,0,WIDTH,HEIGHT);
@@ -491,7 +502,7 @@ int saveSnapshotOfObjects()
 
  if (rgb!=0) { free(rgb); rgb=0; }
  if (zshortbuffer!=0) { free(zshortbuffer); zshortbuffer=0; }
-
+ return 1;
 }
 
 
@@ -594,8 +605,9 @@ int compareTrajectoryFiles(const char * outputFile , const char * filenameA , co
 
   if (useAngleObjects)
   {
-   generateAngleObjectsForVirtualStream(sceneA,"objSphere");
-   generateAngleObjectsForVirtualStream(sceneB,"objSphere");
+    //This is broken ? 3/6/2018
+//   generateAngleObjectsForVirtualStream(sceneA,"objSphere");
+//   generateAngleObjectsForVirtualStream(sceneB,"objSphere");
   }
 
 
@@ -669,6 +681,7 @@ for (timestampToUse=0; timestampToUse<posesToCompare; timestampToUse++)
 */
 int dumpModelFileH(const char * inputfile,const char * outputfile)
 {
+  int result=0;
   struct OBJ_Model * obj = loadObj("Models/",inputfile,0);
 
 
@@ -767,14 +780,17 @@ int dumpModelFileH(const char * inputfile,const char * outputfile)
 
        fflush(fd);
        fclose(fd);
+       result=1;
     }
 
   unloadObj(obj);
+  return result;
 }
 
 
 int dumpModelFile(const char * inputfile,const char * outputfile)
 {
+  int result =0 ;
   struct OBJ_Model * obj = loadObj("Models/",inputfile,0);
 
   if (obj==0)
@@ -791,22 +807,23 @@ int dumpModelFile(const char * inputfile,const char * outputfile)
 
   if (strstr(outputfile,".obj"))
   {
-    saveOBJ(obj,outputfile);
+    result = saveOBJ(obj,outputfile);
   } else
   if (strstr(outputfile,".tri"))
   {
    snprintf(headerOut,256,"%s.tri",outputfile);
-   saveModelTri(headerOut,&tri);
+   result = saveModelTri(headerOut,&tri);
 
    struct TRI_Model triReload={0};
    loadModelTri(headerOut, &triReload);
   } else
   if (strstr(outputfile,".h"))
   {
-    dumpModelFileH(inputfile,outputfile);
+    result = dumpModelFileH(inputfile,outputfile);
   }
 
   unloadObj(obj);
+  return result;
 }
 
 
