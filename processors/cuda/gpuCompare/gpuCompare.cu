@@ -191,6 +191,49 @@ int queryGPUIsOk(int argc, char **argv)
     printf("> GPU device has %d Multi-Processors, SM %d.%d compute capabilities\n\n",
            deviceProp.multiProcessorCount, deviceProp.major, deviceProp.minor);
 
+
+
+
+    printf("  Maximum Texture Dimension Size (x,y,z)         1D=(%d), 2D=(%d, %d), 3D=(%d, %d, %d)\n",
+               deviceProp.maxTexture1D   , deviceProp.maxTexture2D[0], deviceProp.maxTexture2D[1],
+               deviceProp.maxTexture3D[0], deviceProp.maxTexture3D[1], deviceProp.maxTexture3D[2]);
+        printf("  Maximum Layered 1D Texture Size, (num) layers  1D=(%d), %d layers\n",
+               deviceProp.maxTexture1DLayered[0], deviceProp.maxTexture1DLayered[1]);
+        printf("  Maximum Layered 2D Texture Size, (num) layers  2D=(%d, %d), %d layers\n",
+               deviceProp.maxTexture2DLayered[0], deviceProp.maxTexture2DLayered[1], deviceProp.maxTexture2DLayered[2]);
+
+
+        printf("  Total amount of constant memory:               %lu bytes\n", deviceProp.totalConstMem);
+        printf("  Total amount of shared memory per block:       %lu bytes\n", deviceProp.sharedMemPerBlock);
+        printf("  Total number of registers available per block: %d\n", deviceProp.regsPerBlock);
+        printf("  Warp size:                                     %d\n", deviceProp.warpSize);
+        printf("  Maximum number of threads per multiprocessor:  %d\n", deviceProp.maxThreadsPerMultiProcessor);
+        printf("  Maximum number of threads per block:           %d\n", deviceProp.maxThreadsPerBlock);
+        printf("  Max dimension size of a thread block (x,y,z): (%d, %d, %d)\n",
+               deviceProp.maxThreadsDim[0],
+               deviceProp.maxThreadsDim[1],
+               deviceProp.maxThreadsDim[2]);
+        printf("  Max dimension size of a grid size    (x,y,z): (%d, %d, %d)\n",
+               deviceProp.maxGridSize[0],
+               deviceProp.maxGridSize[1],
+               deviceProp.maxGridSize[2]);
+        printf("  Maximum memory pitch:                          %lu bytes\n", deviceProp.memPitch);
+        printf("  Texture alignment:                             %lu bytes\n", deviceProp.textureAlignment);
+        printf("  Concurrent copy and kernel execution:          %s with %d copy engine(s)\n", (deviceProp.deviceOverlap ? "Yes" : "No"), deviceProp.asyncEngineCount);
+        printf("  Run time limit on kernels:                     %s\n", deviceProp.kernelExecTimeoutEnabled ? "Yes" : "No");
+        printf("  Integrated GPU sharing Host Memory:            %s\n", deviceProp.integrated ? "Yes" : "No");
+        printf("  Support host page-locked memory mapping:       %s\n", deviceProp.canMapHostMemory ? "Yes" : "No");
+        printf("  Alignment requirement for Surfaces:            %s\n", deviceProp.surfaceAlignment ? "Yes" : "No");
+        printf("  Device has ECC support:                        %s\n", deviceProp.ECCEnabled ? "Enabled" : "Disabled");
+
+
+
+
+
+
+
+
+
     int version = (deviceProp.major * 0x10 + deviceProp.minor);
 
     if (version < 0x20)
@@ -207,6 +250,13 @@ return 1;
 
 int doGPUonly(int argc, char **argv)
 {
+
+    //Check if GPU is ok to proceede
+    if (!queryGPUIsOk(argc,argv))
+    {
+        return 0;
+    }
+
     // Load image data
     //allocate mem for the images on host side
     //initialize pointers to NULL to request lib call to allocate as needed
@@ -229,24 +279,21 @@ int doGPUonly(int argc, char **argv)
     haystackSize=sizeof(char) * haystackWidth*haystackHeight * 4;
 
 
-
     unsigned int haystackTilesX = 16;
     unsigned int haystackTilesY = 16;
+
     //allocate mem for the result on host side
     unsigned int odataSize = sizeof(int) * haystackTilesX*haystackTilesY;
     unsigned int *h_odata = (unsigned int *)malloc(odataSize);
     if (h_odata==0) { fprintf(stderr, "Failed to allocate output\n"); return 0; }
     memset(h_odata,0, sizeof(unsigned int ) * haystackTilesX * haystackTilesY );
-
-    //initialize the memory
-    if (!queryGPUIsOk(argc,argv))
-    {
-        return 0;
-    }
+    //-----------------------------------------------------------------------------
 
 
+    fprintf(stderr,"We will use %ux%u threads\n",blockSize_x,blockSize_y);
     dim3 numThreads = dim3(blockSize_x, blockSize_y, 1);
-    dim3 numBlocks = dim3(iDivUp( haystackWidth, numThreads.x), iDivUp(haystackHeight, numThreads.y));
+    dim3 numBlocks  = dim3(iDivUp( haystackWidth, numThreads.x), iDivUp(haystackHeight, numThreads.y));
+    fprintf(stderr,"Which means %ux%u blocks\n",numBlocks.x,numBlocks.y);
 
 
 
@@ -297,7 +344,9 @@ int doGPUonly(int argc, char **argv)
                                                     haystackWidth,haystackHeight,
 
 
-                                                    d_odata
+                                                    d_odata,
+
+                                                    100 //Maximum Difference allowed
                                                    );
     cudaDeviceSynchronize();
 
@@ -320,7 +369,9 @@ int doGPUonly(int argc, char **argv)
                                                     haystackWidth,haystackHeight,
 
 
-                                                    d_odata
+                                                    d_odata ,
+
+                                                    100 //Maximum Difference allowed
                                                    );
     //Copy result from device to host for verification
     checkCudaErrors(cudaMemcpy(h_odata, d_odata, odataSize, cudaMemcpyDeviceToHost));
@@ -367,8 +418,8 @@ int doGPUonly(int argc, char **argv)
     checkCudaErrors(cudaEventElapsedTime(&msecTotal, start, stop));
 
 
-    printf("Block Number [%d]\n", numBlocks);
-    printf("Thread Number [%d]\n", numThreads);
+    printf("Block Number [%d x %d]\n", numBlocks.x , numBlocks.y);
+    printf("Thread Number [%d x %d]\n", numThreads.x , numThreads.y);
     printf("Input Size  [%dx%d]\n", haystackWidth, haystackHeight);
     printf("Kernel size [%dx%d]\n", needleWidth, needleHeight);
 

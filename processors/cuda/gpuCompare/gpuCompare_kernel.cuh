@@ -14,8 +14,8 @@
 #ifndef _STEREODISPARITY_KERNEL_H_
 #define _STEREODISPARITY_KERNEL_H_
 
-#define blockSize_x 8
-#define blockSize_y 8
+#define blockSize_x 32
+#define blockSize_y 32
 
 
 // RAD is the radius of the region of support for the search
@@ -53,137 +53,6 @@ __device__ unsigned int __usad4(unsigned int A, unsigned int B, unsigned int C=0
     return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//! Simple stereo disparity kernel to test atomic instructions
-//! Algorithm Explanation:
-//! For stereo disparity this performs a basic block matching scheme.
-//! The sum of abs. diffs between and area of the candidate pixel in the left images
-//! is computed against different horizontal shifts of areas from the right.
-//! The shift at which the difference is minimum is taken as how far that pixel
-//! moved between left/right image pairs.   The recovered motion is the disparity map
-//! More motion indicates more parallax indicates a closer object.
-//! @param g_img1  image 1 in global memory, RGBA, 4 bytes/pixel
-//! @param g_img2  image 2 in global memory
-//! @param g_odata disparity map output in global memory,  unsigned int output/pixel
-//! @param w image width in pixels
-//! @param h image height in pixels
-////////////////////////////////////////////////////////////////////////////////
-/*
-__global__ void
-compareImagesKernel(
-                      unsigned int *g_img0, unsigned int *g_img1,
-                      unsigned int *g_odata,
-                      int w, int h
-                      //,int minDisparity, int maxDisparity
-                      )
-{
-int minDisparity=1;
-int maxDisparity=3;
-    // access thread id
-    const int tidx = blockDim.x * blockIdx.x + threadIdx.x;
-    const int tidy = blockDim.y * blockIdx.y + threadIdx.y;
-    const unsigned int sidx = threadIdx.x+RAD;
-    const unsigned int sidy = threadIdx.y+RAD;
-
-    unsigned int imLeft;
-    unsigned int imRight;
-    unsigned int cost;
-    unsigned int bestCost = 9999999;
-    unsigned int bestDisparity = 0;
-    __shared__ unsigned int diff[blockSize_y+2*RAD][blockSize_x+2*RAD];
-
-    // store needed values for left image into registers (constant indexed local vars)
-    unsigned int imLeftA[STEPS];
-    unsigned int imLeftB[STEPS];
-
-    for (int i=0; i<STEPS; i++)
-    {
-        int offset = -RAD + i*RAD;
-        imLeftA[i] = tex2D(tex2Dleft, tidx-RAD, tidy+offset);
-        imLeftB[i] = tex2D(tex2Dleft, tidx-RAD+blockSize_x, tidy+offset);
-    }
-
-    // for a fixed camera system this could be hardcoded and loop unrolled
-    //for (int d=minDisparity; d<=maxDisparity; d++)
-    int d=0;
-    {
-        //LEFT
-#pragma unroll
-        for (int i=0; i<STEPS; i++)
-        {
-            int offset = -RAD + i*RAD;
-            //imLeft = tex2D( tex2Dleft, tidx-RAD, tidy+offset );
-            imLeft = imLeftA[i];
-            imRight = tex2D(tex2Dright, tidx-RAD+d, tidy+offset);
-            cost = __usad4(imLeft, imRight);
-            diff[sidy+offset][sidx-RAD] = cost;
-        }
-
-        //RIGHT
-#pragma unroll
-
-        for (int i=0; i<STEPS; i++)
-        {
-            int offset = -RAD + i*RAD;
-
-            if (threadIdx.x < 2*RAD)
-            {
-                //imLeft = tex2D( tex2Dleft, tidx-RAD+blockSize_x, tidy+offset );
-                imLeft = imLeftB[i];
-                imRight = tex2D(tex2Dright, tidx-RAD+blockSize_x+d, tidy+offset);
-                cost = __usad4(imLeft, imRight);
-                diff[sidy+offset][sidx-RAD+blockSize_x] = cost;
-            }
-        }
-
-        __syncthreads();
-
-        // sum cost horizontally
-#pragma unroll
-
-        for (int j=0; j<STEPS; j++)
-        {
-            int offset = -RAD + j*RAD;
-            cost = 0;
-#pragma unroll
-
-            for (int i=-RAD; i<=RAD ; i++)
-            {
-                cost += diff[sidy+offset][sidx+i];
-            }
-
-            __syncthreads();
-            diff[sidy+offset][sidx] = cost;
-            __syncthreads();
-
-        }
-
-        // sum cost vertically
-        cost = 0;
-#pragma unroll
-
-        for (int i=-RAD; i<=RAD ; i++)
-        {
-            cost += diff[sidy+i][sidx];
-        }
-
-        // see if it is better or not
-        if (cost < bestCost)
-        {
-            bestCost = cost;
-            bestDisparity = d+8;
-        }
-
-        __syncthreads();
-
-    }
-
-    if (tidy < h && tidx < w)
-    {
-        g_odata[tidy*w + tidx] = bestDisparity;
-    }
-}
-*/
 
 __global__ void
 compareImagesKernel(
@@ -193,46 +62,64 @@ compareImagesKernel(
                       unsigned int *g_haystack,
                       unsigned int haystackWidth, unsigned int haystackHeight,
 
-                      unsigned int *g_odata
+                      unsigned int *g_odata ,
+
+                      unsigned int maximumDifference
                       )
 {
+    //Our big haystack image sized 1024x1024 has arrived on the GPU, the particular
+    //Call is specifically targeted on haystack pixel (haystackPixelX,haystackPixelY)
     const unsigned int haystackPixelX = blockDim.x * blockIdx.x + threadIdx.x;
     const unsigned int haystackPixelY = blockDim.y * blockIdx.y + threadIdx.y;
+
+    //This is the result offset to temporarilly store all results
+    //const unsigned int resultOffset = haystackPixelX + haystackPixelY * blockDim.x * gridDim.x;
+
+    //Each haystack pixel has to be compared with the according needle pixel (needlePixelX,needlePixelY)
+    //We can calculate this very easily
     const unsigned int needlePixelX = haystackPixelX % needleWidth;
     const unsigned int needlePixelY = haystackPixelY % needleHeight;
 
+    //We would also like to know which tile we are performing summation for
     unsigned int haystackTilesX = haystackPixelX / needleWidth;
     unsigned int haystackTilesY = haystackPixelY / needleHeight;
 
+    //Finally we will output our sum here..
     const unsigned int outputElement= haystackTilesX + (haystackTilesY*haystackTilesX);
 
-    unsigned int totalScore=0;
     //This will be faster
-    __shared__ unsigned int diff[64][64];
+    __shared__ unsigned int dest[16][16];
 
 
-     diff[needlePixelX][needlePixelY]=tex2D(tex2Dneedle, needlePixelX, needlePixelY);
+    //This will hold the difference
+    unsigned int currentDifference;
+
+    //We make sure all of our blocks have cleaned shared memory
+     dest[haystackTilesX][haystackTilesY]=0;
      __syncthreads();
 
-
+    //Everything is in SYNC so now only if we are inside the compareable area
     if ((haystackPixelY < haystackHeight) && (haystackPixelX+blockSize_x < haystackHeight))
     {
-    //#pragma unroll
-   // for (int y=0; y<blockSize_y; y++)
-     {
-     // int y=0;
-      #pragma unroll
-     // for (int x=0; x<blockSize_x; x++)
-       {
-        unsigned int valA = diff[needlePixelX][needlePixelY];//tex2D(tex2Dneedle, needlePixelX+x, needlePixelY+y);
-        unsigned int valB = tex2D(tex2Dhaystack, haystackPixelX, haystackPixelY);
-        totalScore+= __usad4(valA,valB); //__usad
-       }
-     }
-     g_odata[outputElement] += totalScore;
+        //We should get the needle and haystack values
+        unsigned int needleValue   = tex2D(tex2Dneedle, needlePixelX, needlePixelY);
+        unsigned int haystackValue = tex2D(tex2Dhaystack, haystackPixelX, haystackPixelY);
+
+        //Calculate their absolute distance  | needleValue - haystackValue | + 0
+        currentDifference= __usad(needleValue,haystackValue,0); //__usad4
+
+        //If their absolute difference is more than a threshold , then threshold it
+        currentDifference = max( currentDifference , maximumDifference);
+        //if (currentDifference>maximumDifference) { currentDifference=maximumDifference; }
     }
 
-  __syncthreads();
+     //This is probably wrong..!
+     dest[haystackTilesX][haystackTilesY]+=currentDifference;
+     __syncthreads();
+
+     //This is probably wrong..!
+     g_odata[outputElement] = dest[haystackTilesX][haystackTilesY];
+     __syncthreads();
 }
 
 
@@ -363,7 +250,6 @@ void compareImagesCPU(
                      )
 {
   unsigned int scoreOutputID=0;
-  unsigned int currentScore=0;
 
 
   for (int hY=0; hY<haystackItemsY; hY++)
