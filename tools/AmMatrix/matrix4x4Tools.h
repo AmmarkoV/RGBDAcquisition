@@ -283,6 +283,34 @@ int normalize3DPointVector(double * vec);
 
 
 
+/**
+* @brief Produce a rotation and translation that will bring the scene to the coordinate frame of the camera in order to properly
+         render objects..!
+
+          This code produces the same matrix as the one produced by the following openGL calls
+
+          glLoadIdentity();
+          glRotatef(rotationX_angleDegrees,-1.0,0,0);
+          glRotatef(rotationY_angleDegrees,0,-1.0,0);
+          glRotatef(rotationZ_angleDegrees,0,0,-1.0); }
+          glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
+* @ingroup AmMatrix
+* @param  Input/Output Vector
+* @retval 0=failure,1=success
+*/
+void create4x4CameraModelViewMatrixForRendering(
+                                                double * m ,
+                                                //Rotation Component
+                                                double rotationX_angleDegrees,
+                                                double rotationY_angleDegrees,
+                                                double rotationZ_angleDegrees ,
+                                                //Translation Component
+                                                double translationX_angleDegrees,
+                                                double translationY_angleDegrees,
+                                                double translationZ_angleDegrees
+                                               );
+
+
 #ifdef __cplusplus
 }
 #endif

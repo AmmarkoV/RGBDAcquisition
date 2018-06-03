@@ -813,3 +813,47 @@ int normalize3DPointVector(double * vec)
 
   return 1;
 }
+
+
+
+
+
+void create4x4CameraModelViewMatrixForRendering(
+                                                double * m ,
+                                                //Rotation Component
+                                                double rotationX_angleDegrees,
+                                                double rotationY_angleDegrees,
+                                                double rotationZ_angleDegrees ,
+                                                //Translation Component
+                                                double translationX_angleDegrees,
+                                                double translationY_angleDegrees,
+                                                double translationZ_angleDegrees
+                                               )
+{
+    if (m==0) {return;}
+
+    double intermediateMatrixRX[16];
+    double intermediateMatrixRY[16];
+    double intermediateMatrixRZ[16];
+    create4x4RotationMatrix(  intermediateMatrixRX, rotationX_angleDegrees,  -1.0,   0.0,   0.0);
+    create4x4RotationMatrix(  intermediateMatrixRY, rotationY_angleDegrees,   0.0,  -1.0,   0.0);
+    create4x4RotationMatrix(  intermediateMatrixRZ, rotationZ_angleDegrees,   0.0,   0.0,  -1.0);
+
+    double intermediateMatrixRotation[16];
+    multiplyThree4x4Matrices(
+                              intermediateMatrixRotation ,
+                              intermediateMatrixRX ,
+                              intermediateMatrixRY ,
+                              intermediateMatrixRZ
+                            );
+
+    double intermediateMatrixTranslation[16];
+    create4x4TranslationMatrix(
+                               intermediateMatrixTranslation,
+                               -translationX_angleDegrees,
+                               -translationY_angleDegrees,
+                               -translationZ_angleDegrees
+                              );
+
+    multiplyTwo4x4Matrices(m,intermediateMatrixRotation,intermediateMatrixTranslation);
+}
