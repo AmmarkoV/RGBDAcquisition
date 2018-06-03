@@ -838,10 +838,11 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
  int result = 0;
 
   if ( (scene!=0) && ( scene->modelViewMatrixDeclared ) )
-  { //Scene configuration overwrites local configuration
-   glLoadMatrixd( scene->modelViewMatrix ); // we load a matrix of Doubles
+  {
+     //Scene configuration overwrites local configuration
+     glLoadMatrixd( scene->modelViewMatrix ); // we load a matrix of Doubles
 
-   copy4x4Matrix(scene->activeModelViewMatrix , scene->modelViewMatrix);
+     copy4x4Matrix(scene->activeModelViewMatrix , scene->modelViewMatrix);
       if (useCustomModelViewMatrix)
          {
            fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
@@ -853,9 +854,8 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
 
    checkOpenGLError(__FILE__, __LINE__);
    result = 1;
-   //print4x4DMatrix("OpenGL ModelView Matrix Given by Trajectory Parser", scene->modelViewMatrix );
-  } //else //<- this else
-  //If setOpenGLExtrinsicCalibration has set a custom MODELVIEW matrix we will use it
+   return 1;
+  }
 
   if (useCustomModelViewMatrix)
   {
@@ -863,18 +863,16 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
     glLoadMatrixd((const GLdouble*) customModelViewMatrix);
     copy4x4Matrix(scene->activeModelViewMatrix , customModelViewMatrix);
 
-    // We flip our coordinate system so it comes straight
-
-    //glRotatef(90,-1.0,0,0); //TODO FIX THESE
-    //glScalef(1.0,1.0,-1.0); //These are now taken into account using scene files ( see SCALE_WORLD , MAP_ROTATIONS )
-    //glRotatef(180,0.0,0,-1.0);
-     checkOpenGLError(__FILE__, __LINE__);
+    /* We flip our coordinate system so it comes straight
+       glRotatef(90,-1.0,0,0); //TODO FIX THESE
+       glScalef(1.0,1.0,-1.0); //These are now taken into account using scene files ( see SCALE_WORLD , MAP_ROTATIONS )
+       glRotatef(180,0.0,0,-1.0);
+       checkOpenGLError(__FILE__, __LINE__); */
      result = 1;
   } else
   // we create a modelview matrix on the fly by using the camera declared in trajectory parser
   {
-    /* fprintf(stderr,"Using on the fly rotate/translate rot x,y,z ( %0.2f,%0.2f,%0.2f ) trans x,y,z, (  %0.2f,%0.2f,%0.2f ) \n",
-                       camera_angle_x,camera_angle_y,camera_angle_z, camera_pos_x,camera_pos_y,camera_pos_z ); */
+    /* fprintf(stderr,"Using on the fly rotate/translate rot x,y,z ( %0.2f,%0.2f,%0.2f ) trans x,y,z, (  %0.2f,%0.2f,%0.2f ) \n", camera_angle_x,camera_angle_y,camera_angle_z, camera_pos_x,camera_pos_y,camera_pos_z ); */
 
     create4x4CameraModelViewMatrixForRendering(
                                                 scene->activeModelViewMatrix ,
@@ -887,15 +885,16 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
                                                 camera_pos_y,
                                                 camera_pos_z
                                                );
+    transpose4x4MatrixD(scene->activeModelViewMatrix);
     glLoadMatrixd(scene->activeModelViewMatrix);
 
-/*
+    /*
     glLoadIdentity();
     if (camera_angle_x!=0.0)  { glRotatef(camera_angle_x,-1.0,0,0); }// Rotate around x
     if (camera_angle_y!=0.0)  { glRotatef(camera_angle_y,0,-1.0,0); }// Rotate around y
     if (camera_angle_z!=0.0)  { glRotatef(camera_angle_z,0,0,-1.0); }// Rotate around z
     glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
-    checkOpenGLError(__FILE__, __LINE__);*/
+    checkOpenGLError(__FILE__, __LINE__); */
     result = 1;
   }
 
@@ -915,19 +914,6 @@ int renderScene()
   glEnable (GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW );
-
-
-
-
-  /*
-
-       double activeProjectionMatrix[16];
-     double activeModelViewMatrix[16];
-     double activeModelViewProjectionMatrix[16];
-     double activeNormalTransformation[16];
-  */
-
-
 
   setupSceneCameraBeforeRendering(scene);
 

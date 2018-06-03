@@ -400,6 +400,75 @@ int loadModelToModelList(struct ModelList* modelStorage,const char * modelDirect
  return 0;
 }
 
+
+
+int drawTRIModel(struct Model * mod)
+{
+  struct TRI_Model * tri = (struct TRI_Model *) mod->modelInternalData;
+
+  if (mod->showSkeleton)
+          {
+           /* Joints Drawing */
+           unsigned int outputNumberOfJoints;
+           unsigned int * parentNode= convertTRIBonesToParentList( tri , &outputNumberOfJoints); // outputNumberOfJoints will be overwritten
+           float * jointPositions = convertTRIBonesToJointPositions( tri , &outputNumberOfJoints );
+           if (jointPositions!=0)
+             {
+              renderOGLBones(jointPositions,parentNode,outputNumberOfJoints);
+              free(jointPositions);
+             }
+          } else
+          {
+           //doOGLGenericDrawCalllist
+             renderOGL
+            (
+                                     tri->vertices ,       tri->header.numberOfVertices ,
+                                     tri->normal ,         tri->header.numberOfNormals ,
+                                     tri->textureCoords ,  tri->header.numberOfTextureCoords ,
+                                     tri->colors ,         tri->header.numberOfColors ,
+                                     tri->indices ,        tri->header.numberOfIndices
+                             );
+
+          }
+  return 1;
+}
+
+
+
+
+int drawOBJModel(struct Model * mod)
+{
+ //fprintf(stderr,"drawing OBJ model\n");
+ if (mod->modelInternalData!=0)
+         {
+           if (mod->highlight)
+           {
+            struct  OBJ_Model *  drawOBJ = (struct  OBJ_Model * ) mod->modelInternalData;
+            drawBoundingBox(0,0,0,drawOBJ->minX,drawOBJ->minY,drawOBJ->minZ,drawOBJ->maxX,drawOBJ->maxY,drawOBJ->maxZ);
+           }
+
+           //A model has been created , and it can be served
+           GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->modelInternalData);
+           if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after getObjOGLList\n"); }
+
+           if ( (objlist!=0) && (!DISABLE_GL_CALL_LIST) )
+             { //We have compiled a list of the triangles for better performance
+               glCallList(objlist);
+               if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing glCallList(%u)\n",objlist); }
+             }  else
+             { //Just feed the triangles to open gl one by one ( slow )
+               drawOBJMesh( ( struct OBJ_Model * ) mod->modelInternalData);
+               if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing all the triangles\n"); }
+             }
+         } else
+         { fprintf(stderr,"Could not draw unspecified model\n"); }
+         glDisable(GL_TEXTURE_2D); //TODO : <-- change drawOBJMesh , Calllist so that they dont leave textures on! :P
+}
+
+
+
+
+
 int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
 {
  if (mod==0)
@@ -479,85 +548,34 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   updateModelPosition(mod,position);
 
 
-      if (mod->type==TRI_MODEL)
-      {
-         //fprintf(stderr,"drawing TRI model\n");
-         struct TRI_Model * tri = (struct TRI_Model *) mod->modelInternalData;
+    switch(mod->type)
+    {
+        case TRI_MODEL :
+               drawTRIModel(mod);
+        break;
 
-          if (mod->showSkeleton)
-          {
-           /* Joints Drawing */
-           unsigned int outputNumberOfJoints;
-           unsigned int * parentNode= convertTRIBonesToParentList( tri , &outputNumberOfJoints); // outputNumberOfJoints will be overwritten
-           float * jointPositions = convertTRIBonesToJointPositions( tri , &outputNumberOfJoints );
-           if (jointPositions!=0)
-             {
-              renderOGLBones(jointPositions,parentNode,outputNumberOfJoints);
-              free(jointPositions);
-             }
-          } else
-          {
-           //doOGLGenericDrawCalllist
-             renderOGL
-            (
-                                     tri->vertices ,       tri->header.numberOfVertices ,
-                                     tri->normal ,         tri->header.numberOfNormals ,
-                                     tri->textureCoords ,  tri->header.numberOfTextureCoords ,
-                                     tri->colors ,         tri->header.numberOfColors ,
-                                     tri->indices ,        tri->header.numberOfIndices
-                             );
+        case OBJ_ASSIMP_MODEL :
+                fprintf(stderr,"TODO : draw assimp model here.. \n");
+        break;
 
-          }
+        case OBJ_MODEL :
+               drawOBJModel(mod);
+        break;
 
-      } else
-      if (mod->type==OBJ_ASSIMP_MODEL )
-      {
-         fprintf(stderr,"TODO : draw assimp model here.. \n");
-      } else
-      if (mod->type==OBJ_MODEL)
-      {
-        //fprintf(stderr,"drawing OBJ model\n");
-        if (mod->modelInternalData!=0)
-         {
-           if (mod->highlight)
-           {
-            struct  OBJ_Model *  drawOBJ = (struct  OBJ_Model * ) mod->modelInternalData;
-            drawBoundingBox(0,0,0,drawOBJ->minX,drawOBJ->minY,drawOBJ->minZ,drawOBJ->maxX,drawOBJ->maxY,drawOBJ->maxZ);
-           }
+        default :
+               if (! drawHardcodedModel(mod->type) )
+               {
+                  fprintf(stderr, "Cannot draw model , unknown type %d\n",mod->type );
+               }
+        break;
+    }
 
-           //A model has been created , and it can be served
-           GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->modelInternalData);
-           if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after getObjOGLList\n"); }
-
-           if ( (objlist!=0) && (!DISABLE_GL_CALL_LIST) )
-             { //We have compiled a list of the triangles for better performance
-               glCallList(objlist);
-               if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing glCallList(%u)\n",objlist); }
-             }  else
-             { //Just feed the triangles to open gl one by one ( slow )
-               drawOBJMesh( ( struct OBJ_Model * ) mod->modelInternalData);
-               if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing all the triangles\n"); }
-             }
-         } else
-         { fprintf(stderr,"Could not draw unspecified model\n"); }
-         glDisable(GL_TEXTURE_2D); //TODO : <-- change drawOBJMesh , Calllist so that they dont leave textures on! :P
-
-      } else
-      if (drawHardcodedModel(mod->type))
-      {
-        //Success drawing hardcoded model
-        //fprintf(stderr,"drawing hardcoded model\n");
-      } else
-      {
-         fprintf(stderr, "Cannot draw model , unknown type %d\n",mod->type );
-      }
-
-
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing geometry\n"); }
+  if (checkOpenGLError(__FILE__, __LINE__))
+     { fprintf(stderr,"drawModelAt error after drawing geometry\n"); }
 
   if (mod->transparency!=0.0) {glDisable(GL_BLEND);  }
-  if (mod->nocolor) {glEnable(GL_COLOR); glEnable(GL_COLOR_MATERIAL); }
-  if (mod->nocull)  {glEnable(GL_CULL_FACE); }
+  if (mod->nocolor)           {glEnable(GL_COLOR); glEnable(GL_COLOR_MATERIAL); }
+  if (mod->nocull)            {glEnable(GL_CULL_FACE); }
 
   glTranslatef(-x,-y,-z);
   //glDisable(GL_NORMALIZE);
