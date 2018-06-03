@@ -846,6 +846,20 @@ int renderScene()
   glMatrixMode(GL_MODELVIEW );
 
 
+
+
+  /*
+
+       double activeProjectionMatrix[16];
+     double activeModelViewMatrix[16];
+     double activeModelViewProjectionMatrix[16];
+     double activeNormalTransformation[16];
+  */
+
+
+
+
+
   if ( (scene!=0) && ( scene->modelViewMatrixDeclared ) )
   { //Scene configuration overwrites local configuration
 
@@ -861,7 +875,7 @@ int renderScene()
            fprintf(stderr,"%0.4f %0.4f %0.4f %0.4f \n",scene->modelViewMatrix[12],scene->modelViewMatrix[13],scene->modelViewMatrix[14] ,scene->modelViewMatrix[15]);
          }
 
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting modelview matrix\n"); }
+   checkOpenGLError(__FILE__, __LINE__);
    //print4x4DMatrix("OpenGL ModelView Matrix Given by Trajectory Parser", scene->modelViewMatrix );
   } //else //<- this else
   //If setOpenGLExtrinsicCalibration has set a custom MODELVIEW matrix we will use it
@@ -889,12 +903,9 @@ int renderScene()
     */
     glLoadIdentity();
 
-    if (camera_angle_x!=0.0)
-      glRotatef(camera_angle_x,-1.0,0,0); // Rotate around x
-    if (camera_angle_y!=0.0)
-      glRotatef(camera_angle_y,0,-1.0,0); // Rotate around y
-    if (camera_angle_z!=0.0)
-      glRotatef(camera_angle_z,0,0,-1.0); // Rotate around z
+    if (camera_angle_x!=0.0)  { glRotatef(camera_angle_x,-1.0,0,0); }// Rotate around x
+    if (camera_angle_y!=0.0)  { glRotatef(camera_angle_y,0,-1.0,0); }// Rotate around y
+    if (camera_angle_z!=0.0)  { glRotatef(camera_angle_z,0,0,-1.0); }// Rotate around z
 
     glTranslatef(-camera_pos_x, -camera_pos_y, -camera_pos_z);
     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting specifying camera position\n"); }

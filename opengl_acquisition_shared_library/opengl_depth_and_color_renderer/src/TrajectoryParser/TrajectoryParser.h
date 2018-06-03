@@ -217,6 +217,23 @@ struct VirtualObject
 */
 struct VirtualStream
 {
+
+    //--------------------------------------------------------
+    // These are the matrices actively used by OpenGL
+    // to render the scene
+    //--------------------------------------------------------
+     double activeProjectionMatrix[16];
+     double activeModelViewMatrix[16];
+     double activeModelViewProjectionMatrix[16];
+     double activeNormalTransformation[16];
+    //--------------------------------------------------------
+    //--------------------------------------------------------
+
+
+    //--------------------------------------------------------
+    // These are matrices declared on the scene file that
+    // control the view of the camera for our scene
+    //--------------------------------------------------------
     int projectionMatrixDeclared;
     double projectionMatrix[16];
 
@@ -230,7 +247,9 @@ struct VirtualStream
     int extrinsicsDeclared;
     double extrinsicTranslation[3];
     double extrinsicRodriguezRotation[3];
-
+    //--------------------------------------------------------
+    //--------------------------------------------------------
+    //--------------------------------------------------------
 
     float backgroundR,backgroundG,backgroundB;
 
