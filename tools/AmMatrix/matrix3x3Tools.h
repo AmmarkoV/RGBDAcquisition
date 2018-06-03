@@ -33,7 +33,7 @@ void free3x3Matrix(double ** mat);
 * @param  Label for the printout ( cString )
 * @param  Pointer to a Pointer of an allocated float matrix
 */
-void print3x3FMatrix(char * str , float * matrix3x3);
+void print3x3FMatrix(const char * str , float * matrix3x3);
 
 /**
 * @brief Printout an 3x3 Matrix that consists of doubles
@@ -41,7 +41,7 @@ void print3x3FMatrix(char * str , float * matrix3x3);
 * @param  Label for the printout ( cString )
 * @param  Pointer to a Pointer of an allocated doubles matrix
 */
-void print3x3DMatrix(char * str , double * matrix3x3);
+void print3x3DMatrix(const char * str , double * matrix3x3);
 
 /**
 * @brief Printout an 3x3 Matrix that consists of doubles in Scilab Friendly mode
@@ -49,7 +49,7 @@ void print3x3DMatrix(char * str , double * matrix3x3);
 * @param  Label for the printout ( cString )
 * @param  Pointer to a Pointer of an allocated doubles matrix
 */
-void print3x3DScilabMatrix(char * str , double * matrix3x3);
+void print3x3DScilabMatrix(const char * str , double * matrix3x3);
 
 /**
 * @brief Copy a 3x3 Matrix to another

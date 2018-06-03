@@ -34,7 +34,7 @@ void free4x4Matrix(double ** mat);
 * @param  Label for the printout ( cString )
 * @param  Pointer to a Pointer of an allocated float matrix
 */
-void print4x4FMatrix(char * str , float * matrix4x4);
+void print4x4FMatrix(const char * str , float * matrix4x4);
 
 /**
 * @brief Printout an 4x4 Matrix that consists of doubles
@@ -42,7 +42,7 @@ void print4x4FMatrix(char * str , float * matrix4x4);
 * @param  Label for the printout ( cString )
 * @param  Pointer to a Pointer of an allocated doubles matrix
 */
-void print4x4DMatrix(char * str , double * matrix4x4);
+void print4x4DMatrix(const char * str , double * matrix4x4);
 
 
 
@@ -280,6 +280,48 @@ int transform3DNormalVectorUsing3x3PartOf4x4Matrix(double * resultPoint3D, doubl
 * @retval 0=failure,1=success
 */
 int normalize3DPointVector(double * vec);
+
+
+/*
+*/
+
+
+
+/**
+* @brief Produce a rotation and translation that will bring the scene to the coordinate frame of the camera in order to properly
+         render objects..!
+
+          This code produces the same matrix as the one produced by the following openGL calls
+
+          glTranslatef(x,y,z);
+          if ( roll!=0 )    { glRotatef(roll,0.0,0.0,1.0); }
+          if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
+          if ( pitch!=0 )   { glRotatef(pitch,1.0,0.0,0.0); }
+
+          if ( (scaleX!=1.0) || (scaleY!=1.0) || (scaleZ!=1.0) )
+                       {
+                         glScalef( scaleX , scaleY , scaleZ );
+                       }
+* @ingroup AmMatrix
+* @param  Input/Output Vector
+* @retval 0=failure,1=success
+*/
+void create4x4ModelTransformation(
+                                  double * m ,
+                                  //Rotation Component
+                                  double roll,
+                                  double pitch,
+                                  double yaw,
+                                  //Translation Component
+                                  double x, double y, double z ,
+                                  double scaleX, double scaleY, double scaleZ
+                                 );
+
+
+
+
+
+
 
 
 

@@ -1,5 +1,3 @@
-#include "matrix4x4Tools.h"
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,7 +58,7 @@ void free4x4Matrix(double ** mat)
   *mat=0;
 }
 
-void print4x4FMatrix(char * str , float * matrix4x4)
+void print4x4FMatrix(const char * str , float * matrix4x4)
 {
   #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, " 4x4 float %s \n",str);
@@ -73,7 +71,7 @@ void print4x4FMatrix(char * str , float * matrix4x4)
   #endif // PRINT_MATRIX_DEBUGGING
 }
 
-void print4x4DMatrix(char * str , double * matrix4x4)
+void print4x4DMatrix(const char * str , double * matrix4x4)
 {
   #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, " 4x4 double %s \n",str);
@@ -87,7 +85,7 @@ void print4x4DMatrix(char * str , double * matrix4x4)
 }
 
 
-void print4x4DMathematicaMatrix(char * str , double * matrix3x3)
+void print4x4DMathematicaMatrix(const char * str , double * matrix3x3)
 {
   #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "%s = { { %f , %f , %f ,%f } , { %f , %f , %f , %f } , { %f , %f , %f , %f } , { %f , %f , %f , %f } }\n",str,
@@ -815,7 +813,61 @@ int normalize3DPointVector(double * vec)
 }
 
 
+void create4x4ModelTransformation(
+                                  double * m ,
+                                  //Rotation Component
+                                  double roll,
+                                  double pitch,
+                                  double yaw,
+                                  //Translation Component
+                                  double x, double y, double z ,
+                                  double scaleX, double scaleY, double scaleZ
+                                 )
+{
+   if (m==0) {return;}
 
+
+    double intermediateMatrixTranslation[16];
+    create4x4TranslationMatrix(
+                               intermediateMatrixTranslation,
+                               x,
+                               y,
+                               z
+                              );
+
+
+    double intermediateMatrixPitch[16];
+    double intermediateMatrixHeading[16];
+    double intermediateMatrixRoll[16];
+    create4x4RotationMatrix(  intermediateMatrixRoll   , roll,      0.0,   0.0,   1.0);
+    create4x4RotationMatrix(  intermediateMatrixHeading, yaw,   0.0,   1.0,   0.0);
+    create4x4RotationMatrix(  intermediateMatrixPitch  , pitch,     1.0,   0.0,   0.0);
+
+    double intermediateMatrixRotation[16];
+    multiplyThree4x4Matrices(
+                              intermediateMatrixRotation ,
+                              intermediateMatrixRoll ,
+                              intermediateMatrixHeading ,
+                              intermediateMatrixPitch
+                            );
+
+
+
+
+  if ( (scaleX!=1.0) || (scaleY!=1.0) || (scaleZ!=1.0) )
+      {
+        double intermediateScalingMatrix[16];
+        create4x4ScalingMatrix(intermediateScalingMatrix,scaleX,scaleY,scaleZ);
+        multiplyThree4x4Matrices(m,intermediateMatrixTranslation,intermediateMatrixRotation,intermediateScalingMatrix);
+      } else
+      {
+         multiplyTwo4x4Matrices(m,intermediateMatrixTranslation,intermediateMatrixRotation);
+      }
+
+
+
+
+}
 
 
 void create4x4CameraModelViewMatrixForRendering(

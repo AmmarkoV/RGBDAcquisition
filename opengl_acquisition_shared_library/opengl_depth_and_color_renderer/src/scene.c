@@ -655,12 +655,12 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling drawAllObjectsAtPositionsFromTrajectoryParser\n"); }
 
 
- unsigned int i;
 
  unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
 
 
 
+  unsigned int i;
   for (i=1; i<scene->numberOfObjects; i++)
     {
      if (scene->object[i].numberOfFrames<=1)
@@ -846,10 +846,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
       if (useCustomModelViewMatrix)
          {
            fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
-           fprintf(stderr,"%0.4f %0.4f %0.4f %0.4f \n",scene->modelViewMatrix[0] ,scene->modelViewMatrix[1] ,scene->modelViewMatrix[2]  ,scene->modelViewMatrix[3]);
-           fprintf(stderr,"%0.4f %0.4f %0.4f %0.4f \n",scene->modelViewMatrix[4] ,scene->modelViewMatrix[5] ,scene->modelViewMatrix[6]  ,scene->modelViewMatrix[7]);
-           fprintf(stderr,"%0.4f %0.4f %0.4f %0.4f \n",scene->modelViewMatrix[8] ,scene->modelViewMatrix[9] ,scene->modelViewMatrix[10] ,scene->modelViewMatrix[11]);
-           fprintf(stderr,"%0.4f %0.4f %0.4f %0.4f \n",scene->modelViewMatrix[12],scene->modelViewMatrix[13],scene->modelViewMatrix[14] ,scene->modelViewMatrix[15]);
+           print4x4DMatrix("Scene declared modelview matrix", scene->modelViewMatrix);
          }
 
    checkOpenGLError(__FILE__, __LINE__);

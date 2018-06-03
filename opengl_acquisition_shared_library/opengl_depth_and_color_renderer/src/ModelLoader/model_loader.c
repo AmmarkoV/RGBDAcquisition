@@ -14,6 +14,7 @@
 #include "../Rendering/ogl_rendering.h"
 
 #include "../../../../tools/AmMatrix/matrixProject.h"
+#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #include "model_loader.h"
 #include "model_loader_hardcoded.h"
@@ -448,21 +449,21 @@ int drawOBJModel(struct Model * mod)
            }
 
            //A model has been created , and it can be served
-           GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->modelInternalData);
-           if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after getObjOGLList\n"); }
+           GLuint objlist  =  getObjOGLList( ( struct OBJ_Model * ) mod->modelInternalData);     checkOpenGLError(__FILE__, __LINE__);
 
            if ( (objlist!=0) && (!DISABLE_GL_CALL_LIST) )
              { //We have compiled a list of the triangles for better performance
-               glCallList(objlist);
-               if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing glCallList(%u)\n",objlist); }
+               glCallList(objlist);                                                              checkOpenGLError(__FILE__, __LINE__);
              }  else
              { //Just feed the triangles to open gl one by one ( slow )
-               drawOBJMesh( ( struct OBJ_Model * ) mod->modelInternalData);
-               if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after drawing all the triangles\n"); }
+               drawOBJMesh( ( struct OBJ_Model * ) mod->modelInternalData);                      checkOpenGLError(__FILE__, __LINE__);
              }
          } else
          { fprintf(stderr,"Could not draw unspecified model\n"); }
-         glDisable(GL_TEXTURE_2D); //TODO : <-- change drawOBJMesh , Calllist so that they dont leave textures on! :P
+
+ glDisable(GL_TEXTURE_2D);
+ //TODO : <-- change drawOBJMesh , Calllist so that they dont leave textures on! :P
+ return 1;
 }
 
 
@@ -477,7 +478,12 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
     return 0;
   }
 
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt called while on an erroneous state :(\n"); }
+  if (checkOpenGLError(__FILE__, __LINE__))
+  {
+     fprintf(stderr,"drawModelAt called while on an erroneous state :(\n");
+  }
+
+
   glPushMatrix();
   //glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 
@@ -490,94 +496,91 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
     calling glEnable with the argument GL_NORMALIZE.*/
 
   if (mod->nocull) { glDisable(GL_CULL_FACE); }
-  glTranslatef(x,y,z);
-  if ( roll!=0 )    { glRotatef(roll,0.0,0.0,1.0); }
-  if ( heading!=0 ) { glRotatef(heading,0.0,1.0,0.0); }
-  if ( pitch!=0 )   { glRotatef(pitch,1.0,0.0,0.0); }
-
-  if ( (mod->scaleX!=1.0) ||
-       (mod->scaleY!=1.0) ||
-       (mod->scaleZ!=1.0) )
-                       {
-                         glScalef( mod->scaleX , mod->scaleY , mod->scaleZ );
-                         if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"Could not scale :(\n"); }
-                         //fprintf(stderr,"Scaling model by %f %f %f\n",mod->scaleX,mod->scaleY,mod->scaleZ);
-                       }
 
 
+
+   double modelTransformation[16];
+   create4x4ModelTransformation(
+                                  modelTransformation,
+                                  //Rotation Component
+                                  (double) roll,
+                                  (double) pitch,
+                                  (double) heading,
+                                  //Translation Component
+                                  (double) x,
+                                  (double) y,
+                                  (double) z ,
+                                  //Scale Component
+                                  (double) mod->scaleX,
+                                  (double) mod->scaleY,
+                                  (double) mod->scaleZ
+                                 );
+  transpose4x4MatrixD(modelTransformation);
+  glMultMatrixd(modelTransformation);
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying dimensions \n"); }
 
        // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
       if (mod->nocolor!=0)  { glDisable(GL_COLOR_MATERIAL);   } else
-      {//We Have a color to set
-        //glEnable(GL_COLOR); <- not even an opengl command :P
-        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after enabling color\n"); }
-        glEnable(GL_COLOR_MATERIAL);
-        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after enabling color material\n"); }
+      {
+        //We Have a color to set
+        glEnable(GL_COLOR_MATERIAL);                            checkOpenGLError(__FILE__, __LINE__);
+
 
         GLenum faces=GL_FRONT;//GL_FRONT_AND_BACK;
-        glMaterialfv(faces, GL_AMBIENT,    defaultAmbient);
-        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
-        glMaterialfv(faces, GL_DIFFUSE,    defaultDiffuse);
-        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
-        glMaterialfv(faces, GL_SPECULAR,   defaultSpecular);
-        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
-        glMaterialfv(faces, GL_SHININESS,   defaultShininess);
-        if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error regarding color/materials\n"); }
+        glMaterialfv(faces, GL_AMBIENT,    defaultAmbient);     checkOpenGLError(__FILE__, __LINE__);
+        glMaterialfv(faces, GL_DIFFUSE,    defaultDiffuse);     checkOpenGLError(__FILE__, __LINE__);
+        glMaterialfv(faces, GL_SPECULAR,   defaultSpecular);    checkOpenGLError(__FILE__, __LINE__);
+        glMaterialfv(faces, GL_SHININESS,   defaultShininess);  checkOpenGLError(__FILE__, __LINE__);
+
 
         if (mod->transparency==0.0)
         {
-          //fprintf(stderr,"SET RGB(%0.2f,%0.2f,%0.2f)\n",mod->colorR, mod->colorG, mod->colorB);
-          glColor3f(mod->colorR,mod->colorG,mod->colorB);
+          glColor3f(mod->colorR,mod->colorG,mod->colorB);       checkOpenGLError(__FILE__, __LINE__);
         }
         else
-        { glEnable(GL_BLEND);			// Turn Blending On
-          glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-          //fprintf(stderr,"SET RGBA(%0.2f,%0.2f,%0.2f,%0.2f)\n",mod->colorR, mod->colorG, mod->colorB, mod->transparency);
-          glColor4f(mod->colorR,mod->colorG,mod->colorB,mod->transparency);
+        {
+          // Turn Blending On
+          glEnable(GL_BLEND);	                                             checkOpenGLError(__FILE__, __LINE__);
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE);                                 checkOpenGLError(__FILE__, __LINE__);
+          glColor4f(mod->colorR,mod->colorG,mod->colorB,mod->transparency);  checkOpenGLError(__FILE__, __LINE__);
         }
       }
 
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying color/materials\n"); }
+  //---------------------------------------------------------------------------
+  if (checkOpenGLError(__FILE__, __LINE__))
+    { fprintf(stderr,"drawModelAt error after specifying color/materials\n"); }
+  //---------------------------------------------------------------------------
 
-    //fprintf(stderr,"Drawing RGB(%0.2f,%0.2f,%0.2f) , Transparency %0.2f , ColorDisabled %u\n",mod->colorR, mod->colorG, mod->colorB, mod->transparency,mod->nocolor );
 
   //We have all the files
   float position[7]={0};
   updateModelPosition(mod,position);
 
-
     switch(mod->type)
     {
-        case TRI_MODEL :
-               drawTRIModel(mod);
-        break;
-
-        case OBJ_ASSIMP_MODEL :
-                fprintf(stderr,"TODO : draw assimp model here.. \n");
-        break;
-
-        case OBJ_MODEL :
-               drawOBJModel(mod);
-        break;
-
+        case TRI_MODEL        :  drawTRIModel(mod); break;
+        case OBJ_MODEL        :  drawOBJModel(mod); break;
+        case OBJ_ASSIMP_MODEL :  fprintf(stderr,"TODO : drawAssimpModel\n");  break;
+        //-----------------------------------------------------------------------------------
         default :
-               if (! drawHardcodedModel(mod->type) )
-               {
-                  fprintf(stderr, "Cannot draw model , unknown type %d\n",mod->type );
-               }
+                     if (! drawHardcodedModel(mod->type) )
+                        {
+                         fprintf(stderr, "Cannot draw model , unknown type %d\n",mod->type );
+                        }
         break;
     }
 
+  //---------------------------------------------------------------------------
   if (checkOpenGLError(__FILE__, __LINE__))
      { fprintf(stderr,"drawModelAt error after drawing geometry\n"); }
+  //---------------------------------------------------------------------------
 
   if (mod->transparency!=0.0) {glDisable(GL_BLEND);  }
   if (mod->nocolor)           {glEnable(GL_COLOR); glEnable(GL_COLOR_MATERIAL); }
   if (mod->nocull)            {glEnable(GL_CULL_FACE); }
 
-  glTranslatef(-x,-y,-z);
+  //glTranslatef(-x,-y,-z);
   //glDisable(GL_NORMALIZE);
   glPopMatrix();
  return 1;

@@ -37,7 +37,7 @@ void free3x3Matrix(double ** mat)
 }
 
 
-void print3x3FMatrix(char * str , float * matrix3x3)
+void print3x3FMatrix(const char * str , float * matrix3x3)
 {
   #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "  3x3 float %s \n",str);
@@ -49,7 +49,7 @@ void print3x3FMatrix(char * str , float * matrix3x3)
   #endif // PRINT_MATRIX_DEBUGGING
 }
 
-void print3x3DMatrix(char * str , double * matrix3x3)
+void print3x3DMatrix(const char * str , double * matrix3x3)
 {
   #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "  3x3 double %s \n",str);
@@ -63,7 +63,7 @@ void print3x3DMatrix(char * str , double * matrix3x3)
 
 
 
-void print3x3DMathematicaMatrix(char * str , double * matrix3x3)
+void print3x3DMathematicaMatrix(const char * str , double * matrix3x3)
 {
   #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "%s = { { %f ,",str,matrix3x3[0]);  fprintf( stderr, "%f ,",matrix3x3[1]);  fprintf( stderr, "%f } , ",matrix3x3[2]);
@@ -72,7 +72,7 @@ void print3x3DMathematicaMatrix(char * str , double * matrix3x3)
   #endif // PRINT_MATRIX_DEBUGGING
 }
 
-void print3x3DScilabMatrix(char * str , double * matrix3x3)
+void print3x3DScilabMatrix(const char * str , double * matrix3x3)
 {
   #if PRINT_MATRIX_DEBUGGING
   fprintf( stderr, "%s = [ %f ",str,matrix3x3[0]);  fprintf( stderr, "%f ",matrix3x3[1]);  fprintf( stderr, "%f ; ",matrix3x3[2]);
