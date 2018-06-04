@@ -45,8 +45,11 @@
 #include <unistd.h>
 
 #include "ogl_shader_pipeline_renderer.h"
+#include "shader_loader.h"
 
 #include "../../Tools/tools.h"
+
+#include "../../Scene/scene.h" //just for updateProjectionMatrix
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */

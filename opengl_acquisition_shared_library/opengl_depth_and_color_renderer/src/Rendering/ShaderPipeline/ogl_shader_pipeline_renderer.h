@@ -12,7 +12,10 @@
 #include "../ogl_rendering.h"
 
 
+int startOGLShaderPipeline(struct rendererConfiguration * config);
+
 int startShaderOGLRendering(struct rendererConfiguration * config);
+
 int stopOGLShaderRendering(struct rendererConfiguration * config);
 
 void doOGLShaderBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsigned int boneSizes);
