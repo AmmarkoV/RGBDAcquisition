@@ -52,25 +52,6 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight);
 
 int handleUserInput(char key,int state,unsigned int x, unsigned int y);
 
-void * createPhotoshoot(
-                        int objID,
-                        unsigned int columns , unsigned int rows ,
-                        float distance,
-                        float angleX,float angleY,float angleZ ,
-                        float angXVariance ,float angYVariance , float angZVariance
-                       );
-
-
-int setupPhotoshoot(
-                     void * context,
-                     int objID,
-                     unsigned int columns , unsigned int rows ,
-                     float distance,
-                     float angleX,float angleY,float angleZ ,
-                     float angXVariance ,float angYVariance , float angZVariance
-                   );
-
-
 unsigned int *  getObject2DBoundingBoxList(unsigned int * bboxItemsSize);
 int updateProjectionMatrix();
 

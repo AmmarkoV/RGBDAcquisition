@@ -75,6 +75,8 @@ add_library(OGLRendererSandbox SHARED
             tiledRenderer.h
             save_to_file.c
             save_to_file.h
+            Scene/photoShootingScene.h
+            Scene/photoShootingScene.c
             scene.c
             scene.h
             tools.c
