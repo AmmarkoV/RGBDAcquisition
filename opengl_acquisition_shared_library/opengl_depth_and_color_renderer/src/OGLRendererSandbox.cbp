@@ -171,6 +171,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Rendering/ogl_rendering.h" />
+		<Unit filename="Scene/control.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Scene/control.h" />
 		<Unit filename="Scene/photoShootingScene.c">
 			<Option compilerVar="CC" />
 		</Unit>
