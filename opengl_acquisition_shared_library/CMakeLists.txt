@@ -26,8 +26,8 @@ ENDIF( ENABLE_PNG )
 add_library(OpenGLAcquisition SHARED 
             OpenGLAcquisition.c
             OpenGLAcquisition.h
-            opengl_depth_and_color_renderer/src/glx.c
-            opengl_depth_and_color_renderer/src/glx.h
+            opengl_depth_and_color_renderer/src/System/glx.h
+            opengl_depth_and_color_renderer/src/System/glx.c
             opengl_depth_and_color_renderer/src/main.c
             opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
             #3D Models and how to load them  

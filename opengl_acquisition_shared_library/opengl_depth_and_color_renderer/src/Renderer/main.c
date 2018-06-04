@@ -19,7 +19,7 @@
 #include <X11/X.h>    /* X11 constant (e.g. TrueColor) */
 #include <X11/keysym.h>
 
-#include "../glx.h"
+#include "../System/glx.h"
 
 
 int readFromArg=0,writeToArg=0,doFileOutput=0;

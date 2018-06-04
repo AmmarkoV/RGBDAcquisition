@@ -14,7 +14,7 @@
 #include <X11/X.h>    /* X11 constant (e.g. TrueColor) */
 #include <X11/keysym.h>
 
-#include "glx.h"
+#include "System/glx.h"
 #include "ModelLoader/model_loader_hardcoded.h"
 #include "ModelLoader/model_loader_obj.h"
 #include "ModelLoader/model_loader_tri.h"

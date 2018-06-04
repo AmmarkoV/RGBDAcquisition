@@ -35,9 +35,9 @@ ENDIF( ENABLE_SHADERS )
 
 add_definitions(-DINCLUDE_OPENGL_CODE)
 
-add_library(OGLRendererSandbox SHARED  
-            glx.c
-            glx.h
+add_library(OGLRendererSandbox SHARED 
+            System/glx.h
+            System/glx.c
             main.c
             OGLRendererSandbox.h
             #3D Models and how to load them   

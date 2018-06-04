@@ -8,7 +8,7 @@
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/gl.h>
 
-#include "Scene/scene.h"
+#include "../Scene/scene.h"
 #include "glx.h"
 
 
