@@ -330,6 +330,7 @@ struct VirtualStream
     struct hashMap * eventHash;
 
     struct ModelList * associatedModelList;
+    void * modelStorage;
 
     double scaleWorld[6];
     int rotationsOverride;
@@ -361,6 +362,9 @@ struct VirtualStream
 
     char filename[MAX_PATH+1];
 };
+
+
+int doneAddingObjectsToVirtualStream(struct VirtualStream * newstream);
 
 /**
 * @brief Get the ObjectID by using the name of an Object

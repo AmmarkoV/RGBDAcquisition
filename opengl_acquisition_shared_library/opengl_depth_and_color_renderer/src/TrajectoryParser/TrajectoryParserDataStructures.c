@@ -910,6 +910,43 @@ int addObjectToVirtualStream(
 }
 
 
+
+
+
+int addSimpleObject(
+                    struct VirtualStream * stream ,
+                    const char * type ,
+                    unsigned char R, unsigned char G , unsigned char B ,
+                    float * coords ,
+                    float scale
+                   )
+{
+  char autoName[512];
+  snprintf(autoName,512,"autoObject%u",stream->numberOfObjects);
+
+  return
+  addObjectToVirtualStream(
+                              stream ,
+                              stream->modelStorage,
+                              autoName, type ,
+                              R,G,B,0,
+                              0,
+                              coords,
+                              6,
+                              scale,
+                              scale,
+                              scale,
+                              0
+                            );
+}
+
+
+
+
+
+
+
+
 int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int ObjID )
 {
  fprintf(stderr,"removeObjectFromVirtualStream is a stub , it is not implemented , ObjID %u stayed in stream (%p) \n",ObjID,stream);

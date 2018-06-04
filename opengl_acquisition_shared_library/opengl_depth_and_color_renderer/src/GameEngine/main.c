@@ -22,6 +22,8 @@
 #include "../System/glx.h"
 #include "../Scene/scene.h"
 
+#include "../TrajectoryParser/TrajectoryParserDataStructures.h"
+
 
 
 int main(int argc, char **argv)
@@ -30,7 +32,7 @@ int main(int argc, char **argv)
 
     int readFromArg =0;
 
-    int i=0;
+    unsigned int i=0;
     for (i=0; i<argc; i++)
     {
        if (strcmp(argv[i],"--from")==0)
@@ -61,13 +63,47 @@ int main(int argc, char **argv)
 
     struct VirtualStream * scene = getLoadedScene();
 
+    /*
+                              struct VirtualStream * stream ,
+                              struct ModelList * modelStorage,
+                              const char * name ,const char * type ,
+                              unsigned char R, unsigned char G , unsigned char B , unsigned char Alpha ,
+                              unsigned char noColor ,
+                              float * coords ,
+                              unsigned int coordLength ,
+                              float scaleX,
+                              float scaleY,
+                              float scaleZ,
+                              unsigned int particleNumber*/
+
+
+
+    char aString[512]={0};
+    float coords[7]={0,0,4,0,0,0};
+    for (i=0; i<100; i++)
+    {
+     addSimpleObject(
+                     scene,
+                     "cube",
+                     0/*R*/,255/*G*/,0/*B*/,
+                     coords ,
+                     1.0
+                   );
+
+     coords[0]+=1;
+    }
+    doneAddingObjectsToVirtualStream(scene);
+
+
+
+
     unsigned int snappedFrames=0;
     while (1)
     {
         snapOGLRendererSandbox(framerate);
 
-        scene->cameraPose.posX+=1;
-        scene->cameraUserDelta.posX+=1;
+        //scene->cameraPose.posX+=1;
+        //scene->cameraUserDelta.posX+=1;
 
 
        ++snappedFrames;

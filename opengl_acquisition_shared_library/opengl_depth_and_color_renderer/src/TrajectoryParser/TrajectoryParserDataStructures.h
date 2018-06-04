@@ -132,6 +132,15 @@ int addObjectToVirtualStream(
                               float scaleZ,
                               unsigned int particleNumber
                             );
+
+int addSimpleObject(
+                    struct VirtualStream * stream ,
+                    const char * type ,
+                    unsigned char R, unsigned char G , unsigned char B ,
+                    float * coords ,
+                    float scale
+                   );
+
 int removeObjectFromVirtualStream(struct VirtualStream * stream , unsigned int ObjID );
 
 int addObjectTypeToVirtualStream(

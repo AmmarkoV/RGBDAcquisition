@@ -58,7 +58,23 @@
 float depthMemoryOutputScale=0.1;
 
 //int (*saveSnapshot) (int,struct calibration *);
+int doneAddingObjectsToVirtualStream(struct VirtualStream * newstream)
+{
+               hashMap_PrepareForQueries(newstream->objectTypesHash);
+               hashMap_PrepareForQueries(newstream->objectHash);
+               hashMap_PrepareForQueries(newstream->connectorHash);
+               hashMap_PrepareForQueries(newstream->eventHash);
 
+
+               /*
+               hashMap_Print(newstream->objectTypesHash,"Object Types");
+               hashMap_Print(newstream->objectHash,"Object");
+               hashMap_Print(newstream->connectorHash,"Connectors");
+               hashMap_Print(newstream->eventHash,"Events");
+               exit(0);
+               */
+    return 1;
+}
 
 int writeVirtualStream(struct VirtualStream * newstream,const char * filename)
 {
@@ -447,18 +463,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
           break;
 
           case TRAJECTORYPRIMITIVES_DONE_DECLARING_OBJECTS :
-               hashMap_PrepareForQueries(newstream->objectTypesHash);
-               hashMap_PrepareForQueries(newstream->objectHash);
-               hashMap_PrepareForQueries(newstream->connectorHash);
-               hashMap_PrepareForQueries(newstream->eventHash);
-
-               /*
-               hashMap_Print(newstream->objectTypesHash,"Object Types");
-               hashMap_Print(newstream->objectHash,"Object");
-               hashMap_Print(newstream->connectorHash,"Connectors");
-               hashMap_Print(newstream->eventHash,"Events");
-               exit(0);
-               */
+              doneAddingObjectsToVirtualStream(newstream);
           break;
 
           case TRAJECTORYPRIMITIVES_PQ :

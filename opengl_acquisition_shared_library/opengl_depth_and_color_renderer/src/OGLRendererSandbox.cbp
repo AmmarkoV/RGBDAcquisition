@@ -223,15 +223,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TrajectoryParser/hashmap.h" />
-		<Unit filename="glx.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="glx.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="save_to_file.h" />
-		<Unit filename="tools.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

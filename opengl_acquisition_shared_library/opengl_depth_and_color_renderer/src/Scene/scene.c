@@ -254,6 +254,8 @@ int initScene(char * confFile)
   scene = createVirtualStream(confFile,modelStorage);
   fprintf(stderr,"createVirtualStream returned \n");
   if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
+  scene->modelStorage = (void*) modelStorage;
+
 
   //This only enables keyfov if enabled in scene
   if (scene->userCanMoveCameraOnHisOwn) { scene->controls.userKeyFOVEnabled=1; }

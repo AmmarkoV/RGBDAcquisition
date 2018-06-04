@@ -5,5 +5,6 @@
 		<Project filename="src/Renderer/Renderer.cbp" />
 		<Project filename="src/Comparer/Comparer.cbp" />
 		<Project filename="src/ModelDump/ModelDump.cbp" />
+		<Project filename="src/GameEngine/GameEngine.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
