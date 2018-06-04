@@ -62,9 +62,13 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/Rendering/ogl_rendering.c
             opengl_depth_and_color_renderer/src/Rendering/ogl_rendering.h
             opengl_depth_and_color_renderer/src/save_to_file.c
-            opengl_depth_and_color_renderer/src/save_to_file.h
-            opengl_depth_and_color_renderer/src/scene.c
-            opengl_depth_and_color_renderer/src/scene.h 
+            opengl_depth_and_color_renderer/src/save_to_file.h 
+            opengl_depth_and_color_renderer/src/Scene/scene.h
+            opengl_depth_and_color_renderer/src/Scene/scene.c
+            opengl_depth_and_color_renderer/src/Scene/control.h
+            opengl_depth_and_color_renderer/src/Scene/control.c
+            opengl_depth_and_color_renderer/src/Scene/photoShootingScene.h
+            opengl_depth_and_color_renderer/src/Scene/photoShootingScene.c
             opengl_depth_and_color_renderer/src/tools.c
             opengl_depth_and_color_renderer/src/tools.h
             #AmMatrix dependencies 

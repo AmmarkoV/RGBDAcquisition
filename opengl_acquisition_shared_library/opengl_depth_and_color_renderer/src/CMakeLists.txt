@@ -75,10 +75,12 @@ add_library(OGLRendererSandbox SHARED
             tiledRenderer.h
             save_to_file.c
             save_to_file.h
+            Scene/scene.h
+            Scene/scene.c
+            Scene/control.h
+            Scene/control.c
             Scene/photoShootingScene.h
             Scene/photoShootingScene.c
-            scene.c
-            scene.h
             tools.c
             tools.h 
             #AmMatrix dependencies 
