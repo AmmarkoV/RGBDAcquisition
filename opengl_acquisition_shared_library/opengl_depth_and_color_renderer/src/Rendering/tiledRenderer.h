@@ -8,9 +8,9 @@
 #define TILEDRENDERER_H_INCLUDED
 
 
-#include "TrajectoryParser/TrajectoryParser.h"
-#include "ModelLoader/model_loader.h"
-#include "Scene/scene.h"
+#include "../TrajectoryParser/TrajectoryParser.h"
+#include "../ModelLoader/model_loader.h"
+#include "../Scene/scene.h"
 
 
 /**

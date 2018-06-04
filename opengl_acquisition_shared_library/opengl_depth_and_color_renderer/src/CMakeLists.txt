@@ -71,8 +71,8 @@ add_library(OGLRendererSandbox SHARED
             Rendering/ShaderPipeline/shader_loader.h
             Rendering/ogl_rendering.c
             Rendering/ogl_rendering.h
-            tiledRenderer.c
-            tiledRenderer.h
+            Rendering/tiledRenderer.c
+            Rendering/tiledRenderer.h
             save_to_file.c
             save_to_file.h
             Scene/scene.h

@@ -1,5 +1,5 @@
 #include "photoShootingScene.h"
-#include "../tiledRenderer.h"
+#include "../Rendering/tiledRenderer.h"
 
 
 

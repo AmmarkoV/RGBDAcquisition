@@ -3,16 +3,16 @@
 #include "tiledRenderer.h"
 
 #include <stdio.h>
-#include "../../../tools/AmMatrix/matrixProject.h"
-#include "../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../tools/AmMatrix/matrixProject.h"
+#include "../../../../tools/AmMatrix/matrixCalculations.h"
 
-#include "TrajectoryParser/TrajectoryParser.h"
+#include "../TrajectoryParser/TrajectoryParser.h"
 
-#include "ModelLoader/model_loader.h"
+#include "../ModelLoader/model_loader.h"
 
 
-#include "Scene/scene.h"
-#include "tools.h"
+#include "../Scene/scene.h"
+#include "../tools.h"
 
 
 

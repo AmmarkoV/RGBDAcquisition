@@ -8,7 +8,6 @@
 
 #include <math.h>
 
-#include "../tiledRenderer.h"
 #include "../tools.h"
 
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
@@ -24,6 +23,7 @@
 #include "scene.h"
 
 #include "../Rendering/ogl_rendering.h"
+#include "../Rendering/tiledRenderer.h"
 
 
 #include "../OGLRendererSandbox.h"
