@@ -10,7 +10,7 @@
 
 #include "TrajectoryParser/TrajectoryParser.h"
 #include "ModelLoader/model_loader.h"
-#include "scene.h"
+#include "Scene/scene.h"
 
 
 /**

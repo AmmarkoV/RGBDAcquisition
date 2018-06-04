@@ -15,7 +15,6 @@
 #include "../../../tools/AmMatrix/matrixProject.h"
 #include "../../../tools/AmMatrix/matrix4x4Tools.h"
 
-#include "TrajectoryParser/TrajectoryParser.h"
 #include "TrajectoryParser/TrajectoryCalculator.h"
 #include "ModelLoader/model_loader.h"
 #include "ModelLoader/model_loader_hardcoded.h"
@@ -60,7 +59,6 @@ unsigned int userKeyFOVEnabled=0;
 int WIDTH=640;
 int HEIGHT=480;
 
-int framesRendered =0 ;
 
 
 
@@ -100,16 +98,11 @@ const GLfloat mat_specular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
 const GLfloat mat_shininess[]  = { 5.0f };
 
 
-float camera_pos_x = 0.0f; float camera_pos_y = 0.0f; float camera_pos_z = 8.0f;
-float camera_angle_x = 0.0f; float camera_angle_y = 0.0f; float camera_angle_z = 0.0f;
 
-
-float userDeltacamera_pos_x = 0.0f; float userDeltacamera_pos_y = 0.0f; float userDeltacamera_pos_z = 0.0f;
-float userDeltacamera_angle_x = 0.0f; float userDeltacamera_angle_y = 0.0f; float userDeltacamera_angle_z = 0.0f;
-
-//unsigned int ticks = 0;
-
-unsigned int selectedOBJ=1;
+struct VirtualStream *  getLoadedScene()
+{
+    return scene;
+}
 
 
 int sceneSeekTime(unsigned int seekTime)

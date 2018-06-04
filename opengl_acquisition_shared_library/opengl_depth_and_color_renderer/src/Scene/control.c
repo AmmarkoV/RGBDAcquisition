@@ -7,6 +7,8 @@
 
 int printObjectData(unsigned int objectToPrint)
 {
+    struct VirtualStream * scene = getLoadedScene();
+
     fprintf(stderr,"==========================================================================\n");
     fprintf(stderr,"==========================================================================\n");
     fprintf(stderr,"==========================================================================\n");
@@ -34,11 +36,13 @@ int printObjectData(unsigned int objectToPrint)
 
 int moveObject(unsigned objToMove , float X , float Y , float Z)
 {
-  if (objToMove==0)
-  {
-    userDeltacamera_pos_x+=X;
-    userDeltacamera_pos_y+=Y;
-    userDeltacamera_pos_z+=Z;
+  struct VirtualStream * scene = getLoadedScene();
+
+  if (objToMove==CAMERA_OBJECT)
+  {//If we want to move the camera ( which is object 0)
+    scene->cameraUserDelta.posX+=X;
+    scene->cameraUserDelta.posY+=Y;
+    scene->cameraUserDelta.posZ+=Z;
     fprintf(stderr,"Moving camera %0.2f %0.2f %0.2f..!\n",X,Y,Z);
   } else
   {
@@ -53,11 +57,13 @@ int moveObject(unsigned objToMove , float X , float Y , float Z)
 
 int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleDegrees)
 {
-  if (objToMove==0)
-  {
-    if ( (X==1.0) && (Y==0.0) && (Z==0.0) ) { userDeltacamera_angle_x+=angleDegrees; } else
-    if ( (X==0.0) && (Y==1.0) && (Z==0.0) ) { userDeltacamera_angle_y+=angleDegrees; } else
-    if ( (X==0.0) && (Y==0.0) && (Z==1.0) ) { userDeltacamera_angle_z+=angleDegrees; } else
+  struct VirtualStream * scene = getLoadedScene();
+
+  if (objToMove==CAMERA_OBJECT)
+  {//If we want to rotate the camera ( which is object 0)
+    if ( (X==1.0) && (Y==0.0) && (Z==0.0) ) { scene->cameraUserDelta.posX+=angleDegrees; } else
+    if ( (X==0.0) && (Y==1.0) && (Z==0.0) ) { scene->cameraUserDelta.posY+=angleDegrees; } else
+    if ( (X==0.0) && (Y==0.0) && (Z==1.0) ) { scene->cameraUserDelta.posZ+=angleDegrees; } else
         {
            fprintf(stderr,"Unhandled camera rotation %0.2f %0.2f %0.2f %0.2f..!\n",X,Y,Z,angleDegrees);
            return 0;

@@ -11,7 +11,7 @@
 #include "ModelLoader/model_loader.h"
 
 
-#include "scene.h"
+#include "Scene/scene.h"
 #include "tools.h"
 
 

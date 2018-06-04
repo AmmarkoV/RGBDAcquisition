@@ -7,6 +7,7 @@
 #define SCENE_H_INCLUDED
 
 
+#include "../TrajectoryParser/TrajectoryParser.h"
 
 extern int WIDTH;
 extern int HEIGHT;
@@ -30,6 +31,10 @@ extern int useCustomModelViewMatrix;
 extern double customModelViewMatrix[16];
 extern double customTranslation[3];
 extern double customRodriguezRotation[3];
+
+
+
+struct VirtualStream *  getLoadedScene();
 
 int sceneSeekTime(unsigned int seekTime);
 int sceneIgnoreTime(unsigned int newSettingMode);

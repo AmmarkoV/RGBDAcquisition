@@ -19,7 +19,7 @@
 #include "ModelLoader/model_loader_obj.h"
 #include "ModelLoader/model_loader_tri.h"
 #include "ModelLoader/model_converter.h"
-#include "scene.h"
+#include "Scene/scene.h"
 #include "tools.h"
 
 

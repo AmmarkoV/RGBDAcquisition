@@ -35,6 +35,7 @@ extern "C" {
 //This is retarded , i have to remake parsing to fix this
 #define INCREMENT_TIMER_FOR_EACH_OBJ 0
 
+#define CAMERA_OBJECT 0
 
 extern float depthMemoryOutputScale;
 
@@ -211,6 +212,20 @@ struct VirtualObject
 };
 
 
+struct CameraPose
+{
+  float  posX,posY,posZ;
+  float  angleX,angleY,angleZ;
+};
+
+
+struct VirtualStreamControls
+{
+  unsigned int selectedOBJ;
+  unsigned int framesRendered;
+};
+
+
 
 /**
 * @brief A VirtualObject structure holds many objects each of which have their own characteristics
@@ -250,6 +265,22 @@ struct VirtualStream
     //--------------------------------------------------------
     //--------------------------------------------------------
     //--------------------------------------------------------
+
+
+    // -----------------------------------------------------------------------------
+    // --------- USER CAMERA CONTROL , i.e when overriding scene camera ------------
+    // -----------------------------------------------------------------------------
+    struct CameraPose cameraPose;
+    struct CameraPose cameraUserDelta;
+    //------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 
     float backgroundR,backgroundG,backgroundB;
 
