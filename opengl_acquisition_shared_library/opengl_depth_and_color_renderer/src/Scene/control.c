@@ -64,9 +64,9 @@ int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleD
 
   if (objToMove==CAMERA_OBJECT)
   {//If we want to rotate the camera ( which is object 0)
-    if ( (X==1.0) && (Y==0.0) && (Z==0.0) ) { scene->cameraUserDelta.posX+=angleDegrees; } else
-    if ( (X==0.0) && (Y==1.0) && (Z==0.0) ) { scene->cameraUserDelta.posY+=angleDegrees; } else
-    if ( (X==0.0) && (Y==0.0) && (Z==1.0) ) { scene->cameraUserDelta.posZ+=angleDegrees; } else
+    if ( (X==1.0) && (Y==0.0) && (Z==0.0) ) { scene->cameraUserDelta.angleX+=angleDegrees; } else
+    if ( (X==0.0) && (Y==1.0) && (Z==0.0) ) { scene->cameraUserDelta.angleY+=angleDegrees; } else
+    if ( (X==0.0) && (Y==0.0) && (Z==1.0) ) { scene->cameraUserDelta.angleZ+=angleDegrees; } else
         {
            fprintf(stderr,"Unhandled camera rotation %0.2f %0.2f %0.2f %0.2f..!\n",X,Y,Z,angleDegrees);
            return 0;
