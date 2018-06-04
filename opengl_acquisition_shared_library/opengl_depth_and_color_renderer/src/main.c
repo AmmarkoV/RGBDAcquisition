@@ -20,7 +20,9 @@
 #include "ModelLoader/model_loader_tri.h"
 #include "ModelLoader/model_converter.h"
 #include "Scene/scene.h"
-#include "tools.h"
+
+#include "Tools/tools.h"
+#include "Tools/save_to_file.h"
 
 
 
@@ -30,7 +32,6 @@
 
 
 
-#include "save_to_file.h"
 #include "Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h"
 #include "Rendering/tiledRenderer.h"
 

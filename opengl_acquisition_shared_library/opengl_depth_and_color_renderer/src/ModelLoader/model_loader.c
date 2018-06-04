@@ -22,7 +22,8 @@
 #include "model_loader_tri.h"
 #include "model_loader_transform_joints.h"
 #include "model_editor.h"
-#include "../tools.h"
+
+#include "../Tools/tools.h"
 
 
 

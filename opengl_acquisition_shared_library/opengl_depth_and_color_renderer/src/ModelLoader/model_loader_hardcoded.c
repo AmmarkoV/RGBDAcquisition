@@ -12,7 +12,7 @@
 #include "model_loader.h"
 #include "model_loader_hardcoded.h"
 #include "model_loader_obj.h"
-#include "../tools.h"
+#include "../Tools/tools.h"
 
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
 

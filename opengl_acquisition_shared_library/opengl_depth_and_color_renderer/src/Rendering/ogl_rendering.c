@@ -13,7 +13,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "../tools.h"
+#include "../Tools/tools.h"
 
 
 struct rendererConfiguration rendererOptions={0};

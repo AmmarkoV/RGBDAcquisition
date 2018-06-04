@@ -6,7 +6,7 @@
 #include <math.h>
 #include "../TextureLoader/texture_loader.h"
 
-#include "../tools.h"
+#include "../Tools/tools.h"
 
 #define reallocationStep 500
 

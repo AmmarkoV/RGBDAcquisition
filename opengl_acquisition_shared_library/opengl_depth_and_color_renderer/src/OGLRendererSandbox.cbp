@@ -171,6 +171,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Rendering/ogl_rendering.h" />
+		<Unit filename="Rendering/tiledRenderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Rendering/tiledRenderer.h" />
 		<Unit filename="Scene/control.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -187,6 +191,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="TextureLoader/texture_loader.h" />
+		<Unit filename="Tools/save_to_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Tools/save_to_file.h" />
+		<Unit filename="Tools/tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Tools/tools.h" />
 		<Unit filename="TrajectoryParser/InputParser_C.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -218,17 +230,7 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="save_to_file.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="save_to_file.h" />
-		<Unit filename="tiledRenderer.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="tiledRenderer.h" />
-		<Unit filename="tools.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="tools.h" />
 		<Extensions>
 			<envvars />

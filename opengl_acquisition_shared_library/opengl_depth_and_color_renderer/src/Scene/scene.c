@@ -8,7 +8,7 @@
 
 #include <math.h>
 
-#include "../tools.h"
+#include "../Tools/tools.h"
 
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include "../../../../tools/AmMatrix/matrixProject.h"

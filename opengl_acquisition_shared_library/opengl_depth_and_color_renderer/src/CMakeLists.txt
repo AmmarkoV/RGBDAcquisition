@@ -73,16 +73,16 @@ add_library(OGLRendererSandbox SHARED
             Rendering/ogl_rendering.h
             Rendering/tiledRenderer.c
             Rendering/tiledRenderer.h
-            save_to_file.c
-            save_to_file.h
+            Tools/tools.h 
+            Tools/tools.c
+            Tools/save_to_file.c
+            Tools/save_to_file.h
             Scene/scene.h
             Scene/scene.c
             Scene/control.h
             Scene/control.c
             Scene/photoShootingScene.h
             Scene/photoShootingScene.c
-            tools.c
-            tools.h 
             #AmMatrix dependencies 
             ../../../tools/AmMatrix/matrix3x3Tools.c
             ../../../tools/AmMatrix/matrix3x3Tools.h
