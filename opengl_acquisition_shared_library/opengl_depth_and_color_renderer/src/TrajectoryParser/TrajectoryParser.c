@@ -886,6 +886,34 @@ int refreshVirtualStream(struct VirtualStream * newstream,struct ModelList * mod
 }
 
 
+int setVirtualStreamDefaults(struct VirtualStream * scene)
+{
+  scene->rate=1.0;
+
+
+  scene->controls.selectedOBJ=0;
+  scene->controls.framesRendered=0;
+
+
+  scene->controls.tickUSleepTime=100;
+  scene->controls.pauseTicking=0;
+  scene->controls.farPlane = 255; //<--be aware that this has an effect on the depth maps generated
+  scene->controls.nearPlane= 1; //<--this also
+  scene->controls.fieldOfView = 65;
+  scene->controls.scaleDepthTo =1000.0;
+
+  scene->controls.moveSpeed=0.5;
+
+  scene->controls.lastRenderingTime=0;
+  scene->controls.lastFramerate=0;
+
+  //float depthUnit = 1.0;
+
+  scene->controls.userKeyFOVEnabled=0;
+  return 1;
+}
+
+
 
 struct VirtualStream * createVirtualStream(const char * filename , struct ModelList * modelStorage)
 {
@@ -896,7 +924,10 @@ struct VirtualStream * createVirtualStream(const char * filename , struct ModelL
 
   //Clear the whole damn thing..
   memset(newstream,0,sizeof(struct VirtualStream));
-  newstream->rate=1.0;
+
+  //Set values that are needed
+  //newstream->rate=1.0;
+  setVirtualStreamDefaults(newstream);
 
   int useSorting=0;
   newstream->objectHash = hashMap_Create(200,200,0,useSorting);

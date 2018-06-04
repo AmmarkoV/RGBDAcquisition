@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../TrajectoryParser/TrajectoryCalculator.h"
+
+#include "../OGLRendererSandbox.h"
 
 int printObjectData(unsigned int objectToPrint)
 {
@@ -82,7 +85,9 @@ int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleD
 
 int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
-    switch (key)
+  struct VirtualStream * scene = getLoadedScene();
+
+  switch (key)
     {
         case 'o' :
         case 'O' :
@@ -94,7 +99,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
         case 1 : //SPACE??
         case ' ' :
-            if (pauseTicking) { pauseTicking=0; } else { pauseTicking=1; }
+            if (scene->controls.pauseTicking) { scene->controls.pauseTicking=0; } else { scene->controls.pauseTicking=1; }
             return 1;
         break;
 
@@ -112,14 +117,14 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 
        case -66 : //F1
-            if (tickUSleepTime<=10) { tickUSleepTime=0; } else
-                                    { tickUSleepTime-=10; }
-             fprintf(stderr,"tickUSleepTime is now %u \n",tickUSleepTime);
+            if (scene->controls.tickUSleepTime<=10) { scene->controls.tickUSleepTime=0; } else
+                                                    { scene->controls.tickUSleepTime-=10; }
+             fprintf(stderr,"tickUSleepTime is now %u \n",scene->controls.tickUSleepTime);
             return 1;
        break;
        case -65 : //F2
-            tickUSleepTime+=10;
-            fprintf(stderr,"tickUSleepTime is now %u \n",tickUSleepTime);
+            scene->controls.tickUSleepTime+=10;
+            fprintf(stderr,"tickUSleepTime is now %u \n",scene->controls.tickUSleepTime);
             return 1;
        break;
        case -64 : //F3
@@ -136,8 +141,8 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
             return 1;
        break;
        case -61 : //F6 refresh
-            if (userKeyFOVEnabled==0) { userKeyFOVEnabled=1; } else
-                                      { userKeyFOVEnabled=0; }
+            if (scene->controls.userKeyFOVEnabled==0) { scene->controls.userKeyFOVEnabled=1; } else
+                                                      { scene->controls.userKeyFOVEnabled=0; }
             return 1;
        break;
        case -60 : //F7 show last frame
@@ -166,12 +171,12 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
     };
 
-    if (!userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input (%d) is disabled [ add MOVE_VIEW(1) to scene ]\n",(signed int) key); return 0; }
+    if (!scene->controls.userKeyFOVEnabled) { fprintf(stderr,"User FOV change by keyboard input (%d) is disabled [ add MOVE_VIEW(1) to scene ]\n",(signed int) key); return 0; }
     switch (key)
     {
-       case 1 : userDeltacamera_angle_x+=1.0; break;
-       case 2 : userDeltacamera_angle_y+=1.0; break;
-       case 3 : userDeltacamera_angle_z+=1.0; break;
+       case 1 : scene->cameraUserDelta.angleX+=1.0; break;
+       case 2 : scene->cameraUserDelta.angleY+=1.0; break;
+       case 3 : scene->cameraUserDelta.angleZ+=1.0; break;
 
        case 'P' :
        case 'p' :
@@ -192,32 +197,32 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
        case 'W' :
        case 'w' :
-              moveObject(scene->selectedObject,0.0,moveSpeed,0.0);
+              moveObject(scene->selectedObject,0.0,scene->controls.moveSpeed,0.0);
        break;
 
        case 'S' :
        case 's' :
-              moveObject(scene->selectedObject,0.0,-1*moveSpeed,0.0);
+              moveObject(scene->selectedObject,0.0,-1*scene->controls.moveSpeed,0.0);
        break;
 
        case 'A' :
        case 'a' :
-              moveObject(scene->selectedObject,moveSpeed,0.0,0.0);
+              moveObject(scene->selectedObject,scene->controls.moveSpeed,0.0,0.0);
        break;
 
        case 'D' :
        case 'd' :
-              moveObject(scene->selectedObject,-1*moveSpeed,0.0,0.0);
+              moveObject(scene->selectedObject,-1*scene->controls.moveSpeed,0.0,0.0);
        break;
 
        case 'Q' :
        case 'q' :
-              moveObject(scene->selectedObject,0.0,0.0,moveSpeed);
+              moveObject(scene->selectedObject,0.0,0.0,scene->controls.moveSpeed);
        break;
 
        case 'Z' :
        case 'z' :
-              moveObject(scene->selectedObject,0.0,0.0,-1*moveSpeed);
+              moveObject(scene->selectedObject,0.0,0.0,-1*scene->controls.moveSpeed);
        break;
 
 

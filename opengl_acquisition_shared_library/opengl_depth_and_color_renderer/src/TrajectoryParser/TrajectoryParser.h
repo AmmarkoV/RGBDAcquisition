@@ -223,6 +223,24 @@ struct VirtualStreamControls
 {
   unsigned int selectedOBJ;
   unsigned int framesRendered;
+
+
+  unsigned int tickUSleepTime;
+  unsigned int pauseTicking;
+  float farPlane; //<--be aware that this has an effect on the depth maps generated
+  float nearPlane; //<--this also
+  float fieldOfView;
+  float scaleDepthTo;
+
+  float moveSpeed;
+
+  unsigned long lastRenderingTime;
+  float lastFramerate;
+
+  //float depthUnit = 1.0;
+
+  unsigned int userKeyFOVEnabled;
+
 };
 
 
@@ -276,7 +294,11 @@ struct VirtualStream
 
 
 
-
+    //------------------------------------------------------------------------------
+    //User controls to view and render the scene differently
+    //------------------------------------------------------------------------------
+    struct VirtualStreamControls controls;
+    //------------------------------------------------------------------------------
 
 
 
@@ -408,6 +430,19 @@ int writeVirtualStream(struct VirtualStream * newstream,const char * filename);
    parser declerations like arrowsX or objX
 * @retval 1=Success , 0=Failure */
 int readVirtualStream(struct VirtualStream * newstream,struct ModelList * modelStorage);
+
+
+
+
+/**
+* @brief This is a very important call that enforces the default rendering rates etc on a new virtual stream.
+         This call is automatically invoked from createVirtualStream for new streams so you only need to call it if you want
+         to reset it.
+* @ingroup trajectoryParser
+* @param Pointer to a valid stream
+* @retval 0=Failure,1=Success */
+int setVirtualStreamDefaults(struct VirtualStream * scene);
+
 
 
 /**

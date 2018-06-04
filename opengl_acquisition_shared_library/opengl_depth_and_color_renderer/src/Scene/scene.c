@@ -8,25 +8,25 @@
 
 #include <math.h>
 
-#include "tiledRenderer.h"
-#include "tools.h"
+#include "../tiledRenderer.h"
+#include "../tools.h"
 
-#include "../../../tools/AmMatrix/matrixCalculations.h"
-#include "../../../tools/AmMatrix/matrixProject.h"
-#include "../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../tools/AmMatrix/matrixProject.h"
+#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 
-#include "TrajectoryParser/TrajectoryCalculator.h"
-#include "ModelLoader/model_loader.h"
-#include "ModelLoader/model_loader_hardcoded.h"
-#include "ModelLoader/model_loader_tri.h"
-#include "ModelLoader/model_loader_transform_joints.h"
+#include "../TrajectoryParser/TrajectoryCalculator.h"
+#include "../ModelLoader/model_loader.h"
+#include "../ModelLoader/model_loader_hardcoded.h"
+#include "../ModelLoader/model_loader_tri.h"
+#include "../ModelLoader/model_loader_transform_joints.h"
 
 #include "scene.h"
 
-#include "Rendering/ogl_rendering.h"
+#include "../Rendering/ogl_rendering.h"
 
 
-#include "OGLRendererSandbox.h"
+#include "../OGLRendererSandbox.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -39,22 +39,6 @@
 struct VirtualStream * scene = 0;
 //struct Model ** models=0;
 struct ModelList * modelStorage;
-
-unsigned int tickUSleepTime=100;
-unsigned int pauseTicking=0;
-float farPlane = 255; //<--be aware that this has an effect on the depth maps generated
-float nearPlane= 1; //<--this also
-float fieldOfView = 65;
-float scaleDepthTo =1000.0;
-
-float moveSpeed=0.5;
-
-unsigned long lastRenderingTime=0;
-float lastFramerate=0;
-
-//float depthUnit = 1.0;
-
-unsigned int userKeyFOVEnabled=0;
 
 int WIDTH=640;
 int HEIGHT=480;
@@ -105,6 +89,33 @@ struct VirtualStream *  getLoadedScene()
 }
 
 
+float sceneGetNearPlane()
+{
+ return scene->controls.nearPlane;
+}
+
+float sceneGetDepthScalingPrameter()
+{
+  return scene->controls.scaleDepthTo;
+}
+
+
+int sceneSetDepthScalingPrameter(float newScaleDepthTo)
+{
+  if (scene==0) { return 0; }
+  scene->controls.scaleDepthTo=newScaleDepthTo;
+  return 1;
+}
+
+
+int sceneSetNearFarPlanes(float near, float far)
+{
+  if (scene==0) { return 0; }
+  scene->controls.nearPlane=near;
+  scene->controls.farPlane=far;
+  return 1;
+}
+
 int sceneSeekTime(unsigned int seekTime)
 {
   if (scene==0) { return 0; }
@@ -117,8 +128,8 @@ int sceneSeekTime(unsigned int seekTime)
 int sceneIgnoreTime(unsigned int newSettingMode)
 {
   if (scene==0) { return 0; }
-  if (newSettingMode)   { scene->ignoreTime = 1; tickUSleepTime=0; scene->rate=1.0;  } else
-                        { scene->ignoreTime = 0; tickUSleepTime=100; scene->rate=1.0; }
+  if (newSettingMode)   { scene->ignoreTime = 1; scene->controls.tickUSleepTime=0;   scene->rate=1.0;  } else
+                        { scene->ignoreTime = 0; scene->controls.tickUSleepTime=100; scene->rate=1.0; }
 
   return 1;
 }
@@ -151,7 +162,7 @@ int updateProjectionMatrix()
      double skew = 0.0;
      double cx = scene->emulateProjectionMatrix[2];
      double cy = scene->emulateProjectionMatrix[5];
-     buildOpenGLProjectionForIntrinsics( scene->projectionMatrix , viewport , fx, fy, skew, cx,  cy, WIDTH, HEIGHT, nearPlane, farPlane);
+     buildOpenGLProjectionForIntrinsics( scene->projectionMatrix , viewport , fx, fy, skew, cx,  cy, WIDTH, HEIGHT, scene->controls.nearPlane, scene->controls.farPlane);
      scene->projectionMatrixDeclared =1;
      fprintf(stderr,"Updated projection matrix using 3x3 matrix");
   }
@@ -183,8 +194,8 @@ int updateProjectionMatrix()
                                              cameraMatrix[5],
                                              WIDTH,
                                              HEIGHT,
-                                             nearPlane ,
-                                             farPlane
+                                             scene->controls.nearPlane ,
+                                             scene->controls.farPlane
                                            );
 
    print4x4DMatrix("OpenGL Projection Matrix", customProjectionMatrix );
@@ -201,7 +212,13 @@ int updateProjectionMatrix()
 
    double matrix[16]={0};
 
-   gldPerspective(matrix, (double) fieldOfView, (double) WIDTH/HEIGHT, (double) nearPlane, (double) farPlane);
+   gldPerspective(
+                  matrix,
+                  (double) scene->controls.fieldOfView,
+                  (double) WIDTH/HEIGHT,
+                  (double) scene->controls.nearPlane,
+                  (double) scene->controls.farPlane
+                 );
    glMultMatrixd(matrix);
 
    //glFrustum(-1.0, 1.0, -1.0, 1.0, nearPlane , farPlane);
@@ -239,7 +256,7 @@ int initScene(char * confFile)
   if (scene==0) { fprintf(stderr,RED "Could not read scene data \n" NORMAL); return 0; }
 
   //This only enables keyfov if enabled in scene
-  if (scene->userCanMoveCameraOnHisOwn) { userKeyFOVEnabled=1; }
+  if (scene->userCanMoveCameraOnHisOwn) { scene->controls.userKeyFOVEnabled=1; }
 
 
   startOGLRendering();
@@ -279,7 +296,7 @@ int closeScene()
 
 int tickScene(unsigned int framerate)
 {
-   if (pauseTicking)
+   if (scene->controls.pauseTicking)
    {
        //No Tick
        return 0;
@@ -297,15 +314,21 @@ int tickScene(unsigned int framerate)
    calculateVirtualStreamPos(scene,0,timestampToUse,pos,0,&scaleX,&scaleY,&scaleZ);
 
 
-   camera_pos_x = userDeltacamera_pos_x + pos[0];  camera_pos_y = userDeltacamera_pos_y + pos[1]; camera_pos_z = userDeltacamera_pos_z + pos[2];
-   camera_angle_x = userDeltacamera_angle_x + pos[3]; camera_angle_y = userDeltacamera_angle_y + pos[4]; camera_angle_z = userDeltacamera_angle_z + pos[5];
+
+   scene->cameraPose.posX = scene->cameraUserDelta.posX + pos[0];
+   scene->cameraPose.posY = scene->cameraUserDelta.posY + pos[1];
+   scene->cameraPose.posZ = scene->cameraUserDelta.posZ + pos[2];
+
+   scene->cameraPose.angleX = scene->cameraUserDelta.angleX + pos[3];
+   scene->cameraPose.angleY = scene->cameraUserDelta.angleY + pos[4];
+   scene->cameraPose.angleZ = scene->cameraUserDelta.angleZ + pos[5];
 
    if (framerate>0)
    {
     //if (lastFramerate>)
     //TODO: sleep enough time for framerate to succeed
-    if (tickUSleepTime>0)
-     { usleep(tickUSleepTime); }
+    if (scene->controls.tickUSleepTime>0)
+              { usleep(scene->controls.tickUSleepTime); }
    }
 
 
@@ -432,7 +455,13 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
 
   if (scene->ticks%10==0)
   {
-    fprintf(stderr,"\r%0.2f FPS - Playback  %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",lastFramerate,(float) timestampToUse/1000,scene->ticks,tickUSleepTime,scene->rate);
+    fprintf(stderr,"\r%0.2f FPS - Playback  %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",
+            scene->controls.lastFramerate,
+            (float) timestampToUse/1000,
+            scene->ticks,
+            scene->controls.tickUSleepTime,
+            scene->rate
+            );
   }
 
   int enableTransformedRendering=1;
@@ -628,13 +657,13 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
     create4x4CameraModelViewMatrixForRendering(
                                                 scene->activeModelViewMatrix ,
                                                 //Rotation Component
-                                                camera_angle_x,
-                                                camera_angle_y,
-                                                camera_angle_z,
+                                                scene->cameraPose.angleX,
+                                                scene->cameraPose.angleY,
+                                                scene->cameraPose.angleZ,
                                                 //Translation Component
-                                                camera_pos_x,
-                                                camera_pos_y,
-                                                camera_pos_z
+                                                scene->cameraPose.posX,
+                                                scene->cameraPose.posY,
+                                                scene->cameraPose.posZ
                                                );
     transpose4x4MatrixD(scene->activeModelViewMatrix);
     glLoadMatrixd(scene->activeModelViewMatrix);
@@ -679,12 +708,12 @@ int renderScene()
   //------------------- Calculate Framerate -----------------------
   //---------------------------------------------------------------
   unsigned long now=GetTickCountMilliseconds();
-  unsigned long elapsedTime=now-lastRenderingTime;
+  unsigned long elapsedTime=now-scene->controls.lastRenderingTime;
   if (elapsedTime==0) { elapsedTime=1; }
-  lastFramerate = (float) 1000/(elapsedTime);
-  lastRenderingTime = now;
+  scene->controls.lastFramerate = (float) 1000/(elapsedTime);
+  scene->controls.lastRenderingTime = now;
   //---------------------------------------------------------------
-  ++framesRendered;
+  ++scene->controls.framesRendered;
   //---------------------------------------------------------------
 
  return 1;

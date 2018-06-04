@@ -169,6 +169,8 @@ int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int wi
     glGetDoublev( GL_PROJECTION_MATRIX, projection );
     glGetIntegerv( GL_VIEWPORT, viewport );
 
+
+    float scaleDepthTo = sceneGetDepthScalingPrameter();
      unsigned int xp = 0, yp = 0;
 
      for (yp=0; yp<height; yp++)
@@ -307,9 +309,7 @@ void redraw(void)
 
 int setOpenGLNearFarPlanes(double near , double far)
 {
- farPlane=far;
- nearPlane=near;
- return 1;
+ return sceneSetNearFarPlanes((float) near, (float) far);
 }
 
 int setOpenGLIntrinsicCalibration(double * camera)
@@ -335,7 +335,7 @@ int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , doub
   useCustomModelViewMatrix=1;
   convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(customModelViewMatrix , rodriguez , translation , scaleToDepthUnit);
 
-  scaleDepthTo = (float) scaleToDepthUnit;
+  sceneSetDepthScalingPrameter( (float) scaleToDepthUnit);
 
   customTranslation[0] = translation[0];
   customTranslation[1] = translation[1];
@@ -350,7 +350,7 @@ int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , doub
 
 double getOpenGLFocalLength()
 {
- return nearPlane;
+ return sceneGetNearPlane();
 }
 
 double getOpenGLPixelSize()

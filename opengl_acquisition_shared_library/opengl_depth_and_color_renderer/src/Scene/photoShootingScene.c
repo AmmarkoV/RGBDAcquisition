@@ -95,7 +95,8 @@ int renderPhotoshoot( void * context  )
   int i= tiledRenderer_Render(configuration);
 
   if (i) {
-           //framesRendered++;
+           struct VirtualStream * scene = ( struct VirtualStream* ) configuration->scenePTR;
+           scene->controls.framesRendered++;
            return 1;
          }
   return 0;
