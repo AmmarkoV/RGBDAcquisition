@@ -53,6 +53,7 @@ __device__ unsigned int __usad4(unsigned int A, unsigned int B, unsigned int C=0
     return result;
 }
 
+/*
 
 __global__ void
 compareImagesKernel(
@@ -67,7 +68,7 @@ compareImagesKernel(
                       unsigned int maximumDifference
                       )
 {
-    //Our big haystack image sized 1024x1024 ( 16x16 tiles ) has arrived on the GPU, the particular
+    //Our big haystack image sized 1024x1024 ( 16x16 tiles sized 64x64 pixels each ) has arrived on the GPU, the particular
     //Call is specifically targeted on haystack pixel (haystackPixelX,haystackPixelY)
     const unsigned int haystackPixelX = blockDim.x * blockIdx.x + threadIdx.x;
     const unsigned int haystackPixelY = blockDim.y * blockIdx.y + threadIdx.y;
@@ -92,7 +93,7 @@ compareImagesKernel(
     const unsigned int outputElement= haystackTileX + (haystackTileY * totalNumberOfHaystackTilesX );
 
     //This will be faster
-    //__shared__ unsigned int dest[16][16];
+    __shared__ unsigned int dest[16][16];
 
 
     //This will hold the difference
@@ -101,7 +102,7 @@ compareImagesKernel(
     unsigned int oneHits=0;
 
     //We make sure all of our blocks have cleaned shared memory
-     //dest[haystackTileX][haystackTileY]=0;
+     dest[haystackTileX][haystackTileY]=0;
      __syncthreads();
 
     //Everything is in SYNC so now only if we are inside the compareable area
@@ -121,18 +122,18 @@ compareImagesKernel(
         //currentDifference = max( currentDifference , maximumDifference);
 
         //if (currentDifference>maximumDifference) { currentDifference=maximumDifference; }
-    }
 
-     //This is the group value that is faster to write to..!
-/*
-     if (
-          (haystackTileX<totalNumberOfHaystackTilesX) &&
-          (haystackTileY<totalNumberOfHaystackTilesY)
-         )
+        if (
+            (haystackTileX<totalNumberOfHaystackTilesX) &&
+            (haystackTileY<totalNumberOfHaystackTilesY)
+           )
          {
           dest[haystackTileX][haystackTileY]+=currentDifference;
          }
-     __syncthreads();*/
+    }
+
+     //This is the group value that is faster to write to..!
+     __syncthreads();
 
      //This is probably wrong..!
           if (
@@ -140,11 +141,132 @@ compareImagesKernel(
           (haystackTileY<totalNumberOfHaystackTilesY)
          )
          {
-          g_odata[outputElement] += currentDifference;// dest[haystackTileX][haystackTileY];
+          g_odata[outputElement] +=  dest[haystackTileX][haystackTileY]; //currentDifference;//
          }
 
      //Is this needed?
      //__syncthreads();
+}
+
+
+*/
+
+
+
+__global__ void
+reduce2(unsigned int *g_idata, unsigned int *g_odata, unsigned int n)
+{
+    __shared__ unsigned int sdata[64*64];
+
+    // load shared mem
+    unsigned int tid = threadIdx.x;
+    unsigned int i = blockIdx.x*blockDim.x + threadIdx.x;
+
+    sdata[tid] = (i < n) ? g_idata[i] : 0;
+
+    __syncthreads();
+
+    // do reduction in shared mem
+    for (unsigned int s=blockDim.x/2; s>0; s>>=1)
+    {
+        if (tid < s)
+        {
+            sdata[tid] += sdata[tid + s];
+        }
+
+        __syncthreads();
+    }
+
+    // write result for this block to global mem
+    if (tid == 0) g_odata[blockIdx.x] = sdata[0];
+}
+
+
+
+
+
+
+__global__ void
+compareImagesKernel(
+                      //This is a global memory buffer to hold the intermediate results..
+                      unsigned int *g_subtracted,
+
+                      unsigned int *g_needle,
+                      unsigned int needleWidth,   unsigned int needleHeight,
+
+                      unsigned int *g_haystack,
+                      unsigned int haystackWidth, unsigned int haystackHeight,
+
+                      unsigned int *g_odata ,
+
+                      unsigned int maximumDifference
+                      )
+{
+    //Our big haystack image sized 1024x1024 ( 16x16 tiles sized 64x64 pixels each ) has arrived on the GPU, the particular
+    //Call is specifically targeted on haystack pixel (haystackPixelX,haystackPixelY)
+    const unsigned int haystackPixelX = blockDim.x * blockIdx.x + threadIdx.x;
+    const unsigned int haystackPixelY = blockDim.y * blockIdx.y + threadIdx.y;
+
+    //This is the result offset to temporarilly store all results
+    //const unsigned int resultOffset = haystackPixelX + haystackPixelY * blockDim.x * gridDim.x;
+
+    //Our needle image sized 64x64 is also on the GPU
+    //Each haystack pixel has to be compared with the according needle pixel (needlePixelX,needlePixelY)
+    //We can calculate this very easily
+    const unsigned int needlePixelX = haystackPixelX % needleWidth;
+    const unsigned int needlePixelY = haystackPixelY % needleHeight;
+    const unsigned int needlePTR    = needlePixelX  + (needlePixelY * needleWidth );
+
+    //We would also like to know which tile we are performing SAD for
+    unsigned int haystackTileX = haystackPixelX / needleWidth;
+    unsigned int haystackTileY = haystackPixelY / needleHeight;
+
+    unsigned int totalNumberOfHaystackTilesX  = haystackWidth / needleWidth;
+    unsigned int totalNumberOfHaystackTilesY  = haystackHeight / needleHeight;
+
+    //Finally we will output our sum here..
+    const unsigned int outputTile         = haystackTileX  + (haystackTileY * totalNumberOfHaystackTilesX );
+    const unsigned int outputDiffHaystack = haystackPixelX + (haystackPixelY * haystackWidth );
+
+
+    //We make sure all of our blocks have cleaned shared memory
+    // __syncthreads();
+
+    //For 1024x1024 we execute using 32x32 cuda blocks
+    __shared__ unsigned int sdata[32*32];
+    //Each of our 16x16 tiles sized (64x64) holds will be reflected by 4 blocks of sdata..!
+
+
+    //Everything is in SYNC so now only if we are inside the compareable area
+    if ((haystackPixelY < haystackHeight) && (haystackPixelX < haystackWidth))
+    {
+        //We should get the needle and haystack values
+        unsigned int needleValue   = tex2D(tex2Dneedle, needlePixelX, needlePixelY);
+        unsigned int haystackValue = tex2D(tex2Dhaystack, haystackPixelX, haystackPixelY);
+
+        //Calculate their absolute distance  | needleValue - haystackValue | + 0
+        sdata[needlePTR] = __usad(needleValue,haystackValue,0);
+        g_subtracted[outputDiffHaystack]= sdata[needlePTR];
+    }
+     __syncthreads();
+
+
+    // do reduction in shared mem
+    for (unsigned int s=0; s<4; s++)
+    {
+        if (needlePixelX < s)
+        {
+            sdata[needlePixelX] += sdata[needlePixelX + s];
+        }
+
+        __syncthreads();
+    }
+
+    // write result for this block to global mem
+    if (needlePixelX == 0) g_odata[outputTile] = sdata[0];
+
+
+
 }
 
 

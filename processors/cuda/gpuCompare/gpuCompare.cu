@@ -92,6 +92,111 @@ int writeResult(
     return 1;
 }
 
+int writeCUDALayoutToSVG(const char * svgOut,
+                         unsigned int haystackWidth,unsigned int haystackHeight,
+                         unsigned int needleWidth,unsigned int needleHeight,
+
+                         unsigned int blocksX,unsigned int blocksY,
+                         unsigned int threadsX,unsigned int threadsY
+                         )
+{
+    FILE * fp=0;
+
+    fp = fopen(svgOut,"w");
+
+    unsigned int offX=500,offY=100,x,y;
+
+    unsigned int tilesX=haystackWidth/needleWidth;
+    unsigned int tilesY=haystackHeight/needleHeight;
+
+    if (fp!=0)
+    {
+      fprintf(fp,"<svg width=\"2000\" height=\"3000\" >\n");
+      fprintf(fp,"<rect width=\"2000\" height=\"3000\" style=\"fill:rgb(255,255,255);stroke-width:3;stroke:rgb(255,255,255)\" />\n");
+
+      fprintf(fp,"<style>\n");
+      fprintf(fp,"  .small { font: italic 13px sans-serif; }\n");
+      fprintf(fp,"  .label { font: bold 30px sans-serif; }\n");
+      fprintf(fp,"</style>\n");
+
+      //fprintf(fp," <rect x=\"%u\" y=\"%u\"  width=\"%u\" height=\"%u\" style=\"fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)\" /> \n", offX,offY, haystackWidth,haystackHeight );
+
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> Our needle's width is %u pixels</text>\n",1000+offX,offY-30,needleWidth);
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\" transform=\"rotate(90,%u %u)\" > Our needle's height is %u pixels</text>\n",1000+offX-80,offY+20,offX-80,offY+20,needleHeight);
+
+             fprintf(fp," <rect x=\"%u\" y=\"%u\"  width=\"%u\" height=\"%u\" style=\"fill:rgb(123,123,123);stroke-width:3;stroke:rgb(50,0,0)\" /> \n",
+                     1000+offX + x*needleWidth ,
+                     offY + y*needleHeight,
+                     needleWidth,
+                     needleHeight );
+
+
+
+
+
+
+
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> Haystack Width is %u pixels</text>\n",offX,offY-30,haystackWidth);
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\" transform=\"rotate(90,%u %u)\" > Haystack Height is %u pixels</text>\n",offX-80,offY+20,offX-80,offY+20,haystackHeight);
+        for (y=0; y<tilesY; y++)
+         {
+          for (x=0; x<tilesX; x++)
+           {
+             fprintf(fp," <rect x=\"%u\" y=\"%u\"  width=\"%u\" height=\"%u\" style=\"fill:rgb(123,123,123);stroke-width:3;stroke:rgb(50,0,0)\" /> \n",
+                     offX + x*needleWidth ,
+                     offY + y*needleHeight,
+                     needleWidth,
+                     needleHeight );
+
+           }
+         }
+
+
+       offY+=1200;
+
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> We have %u Blocks at Dimension X </text>\n",offX,offY-30,blocksX);
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\" transform=\"rotate(90,%u %u)\" > We have %u Blocks at Dimension Y </text>\n",offX-80,offY+20,offX-80,offY+20,blocksY);
+        //fprintf(fp," <rect x=\"%u\" y=\"%u\"  width=\"%u\" height=\"%u\" style=\"fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)\" /> \n", offX,offY, haystackWidth,haystackHeight );
+        for (y=0; y<blocksX; y++)
+         {
+          for (x=0; x<blocksY; x++)
+           {
+             fprintf(fp," <rect x=\"%u\" y=\"%u\"  width=\"%u\" height=\"%u\" style=\"fill:rgb(123,123,123);stroke-width:3;stroke:rgb(50,0,0)\" /> \n",
+                     offX + x*threadsX ,
+                     offY + y*threadsY,
+                     needleWidth,
+                     needleHeight );
+
+           }
+         }
+
+
+
+      fprintf(fp,"</svg>\n");
+      fclose(fp);
+    }
+
+
+
+
+}
+
+
+int testSetArray(unsigned int * arr, unsigned int width ,unsigned int height,unsigned int value)
+{
+  unsigned int * arrPTR = arr;
+  unsigned int * arrEnd= arr + width * height;
+ // unsigned int inc=0;
+
+  fprintf(stderr,"testSetArray (%ux%u) to %u : ",width,height,value);
+  while (arrPTR<arrEnd)
+  {
+   //fprintf(stderr,"%u ",inc); ++inc;
+   *arrPTR = value;
+    ++arrPTR;
+  }
+ return 1;
+}
 
 
 int doCPUonly(int argc, char **argv)
@@ -114,6 +219,9 @@ int doCPUonly(int argc, char **argv)
 
     printf("Loaded <%s> haystack\n", haystack);
     if (!sdkLoadPPM4ub(haystack, &h_haystack, &haystackWidth, &haystackHeight))    { fprintf(stderr, "Failed to load <%s>\n", haystack); }
+
+    testSetArray((unsigned int*) h_needle,needleWidth,needleHeight,1);
+    testSetArray((unsigned int*) h_haystack,haystackWidth,haystackHeight,2);
 
 
     unsigned int haystackTilesX = 16;
@@ -278,6 +386,8 @@ int doGPUonly(int argc, char **argv)
     if (!sdkLoadPPM4ub(haystack, &h_haystack, &haystackWidth, &haystackHeight))    { fprintf(stderr, "Failed to load <%s>\n", haystack); return 0; }
     haystackSize=sizeof(char) * haystackWidth*haystackHeight * 4;
 
+    testSetArray((unsigned int*) h_needle,needleWidth,needleHeight,1);
+    testSetArray((unsigned int*) h_haystack,haystackWidth,haystackHeight,2);
 
     unsigned int haystackTilesX = 16;
     unsigned int haystackTilesY = 16;
@@ -295,18 +405,26 @@ int doGPUonly(int argc, char **argv)
     dim3 numBlocks  = dim3(iDivUp( haystackWidth, numThreads.x), iDivUp(haystackHeight, numThreads.y));
     fprintf(stderr,"Which means %ux%u blocks\n",numBlocks.x,numBlocks.y);
 
+    writeCUDALayoutToSVG("gpuCompare.svg",
+                         haystackWidth,haystackHeight,
+                         needleWidth  ,needleHeight,
+                         numBlocks.x,  numBlocks.y,
+                         numThreads.x, numThreads.y
+                         );
 
 
     // allocate device memory for result
-    unsigned int *d_odata, *d_needle, *d_haystack;
+    unsigned int *d_odata, *d_needle, *d_haystack , * d_haystackDiffed;
 
     checkCudaErrors(cudaMalloc((void **) &d_needle, needleSize));
     checkCudaErrors(cudaMalloc((void **) &d_haystack, haystackSize ));
+    checkCudaErrors(cudaMalloc((void **) &d_haystackDiffed, haystackSize ));
     checkCudaErrors(cudaMalloc((void **) &d_odata, odataSize));
 
     // copy host memory to device to initialize to zeros
     checkCudaErrors(cudaMemcpy(d_needle,    h_needle,   needleSize,   cudaMemcpyHostToDevice));
     checkCudaErrors(cudaMemcpy(d_haystack,  h_haystack, haystackSize, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemset(d_haystackDiffed,0,haystackSize ));
     checkCudaErrors(cudaMemcpy(d_odata,     h_odata,    odataSize,    cudaMemcpyHostToDevice));
 
 
@@ -333,8 +451,10 @@ int doGPUonly(int argc, char **argv)
     checkCudaErrors(cudaBindTexture2D(&offset, tex2Dhaystack, d_haystack, ca_desc1,   haystackWidth , haystackHeight, haystackWidth*4));
     assert(offset == 0);
 
+    /*
     // First run the warmup kernel (which we'll use to get the GPU in the correct max power state
     compareImagesKernel<<<numBlocks, numThreads>>>(
+                                                    d_haystackDiffed,
                                                     d_needle,
                                                     needleWidth,  needleHeight,
 
@@ -345,7 +465,7 @@ int doGPUonly(int argc, char **argv)
                                                     d_odata,
 
                                                     1000 //Maximum Difference allowed
-                                                   );
+                                                   );*/
     cudaDeviceSynchronize();
 
     // Allocate CUDA events that we'll use for timing
@@ -360,6 +480,7 @@ int doGPUonly(int argc, char **argv)
 
     // launch the stereoDisparity kernel
     compareImagesKernel<<<numBlocks, numThreads>>>(
+                                                    d_haystackDiffed,
                                                     d_needle,
                                                     needleWidth,  needleHeight,
 
