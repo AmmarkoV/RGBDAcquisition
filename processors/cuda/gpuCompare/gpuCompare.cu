@@ -104,15 +104,15 @@ int writeCUDALayoutToSVG(const char * svgOut,
 
     fp = fopen(svgOut,"w");
 
-    unsigned int offX=500,offY=100,x,y;
+    unsigned int offX=100,offY=100,x,y;
 
     unsigned int tilesX=haystackWidth/needleWidth;
     unsigned int tilesY=haystackHeight/needleHeight;
 
     if (fp!=0)
     {
-      fprintf(fp,"<svg width=\"2000\" height=\"3000\" >\n");
-      fprintf(fp,"<rect width=\"2000\" height=\"3000\" style=\"fill:rgb(255,255,255);stroke-width:3;stroke:rgb(255,255,255)\" />\n");
+      fprintf(fp,"<svg width=\"1500\" height=\"3000\" >\n");
+      fprintf(fp,"<rect width=\"1500\" height=\"3000\" style=\"fill:rgb(255,255,255);stroke-width:3;stroke:rgb(255,255,255)\" />\n");
 
       fprintf(fp,"<style>\n");
       fprintf(fp,"  .small { font: italic 13px sans-serif; }\n");
@@ -121,12 +121,13 @@ int writeCUDALayoutToSVG(const char * svgOut,
 
       //fprintf(fp," <rect x=\"%u\" y=\"%u\"  width=\"%u\" height=\"%u\" style=\"fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)\" /> \n", offX,offY, haystackWidth,haystackHeight );
 
-      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> Our needle's width is %u pixels</text>\n",1000+offX,offY-30,needleWidth);
-      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\" transform=\"rotate(90,%u %u)\" > Our needle's height is %u pixels</text>\n",1000+offX-80,offY+20,offX-80,offY+20,needleHeight);
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\">Needle</text>\n",1100+offX,offY-30);
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\">Width %u</text>\n",1100+offX,offY+30,needleWidth);
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\" transform=\"rotate(90,%u %u)\" >Height %u</text>\n",1150+offX-80,offY+20,1150+offX-80,offY+40,needleHeight);
 
              fprintf(fp," <rect x=\"%u\" y=\"%u\"  width=\"%u\" height=\"%u\" style=\"fill:rgb(123,123,123);stroke-width:3;stroke:rgb(50,0,0)\" /> \n",
-                     1000+offX + x*needleWidth ,
-                     offY + y*needleHeight,
+                     1200+offX + x*needleWidth ,
+                     offY + 80 + y*needleHeight,
                      needleWidth,
                      needleHeight );
 
@@ -154,8 +155,8 @@ int writeCUDALayoutToSVG(const char * svgOut,
 
        offY+=1200;
 
-      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> We have %u Blocks at Dimension X </text>\n",offX,offY-30,blocksX);
-      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\" transform=\"rotate(90,%u %u)\" > We have %u Blocks at Dimension Y </text>\n",offX-80,offY+20,offX-80,offY+20,blocksY);
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> %u Blocks at Dimension X </text>\n",offX,offY-30,blocksX);
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\" transform=\"rotate(90,%u %u)\" > %u Blocks at Dimension Y </text>\n",offX-80,offY+20,offX-80,offY+20,blocksY);
         //fprintf(fp," <rect x=\"%u\" y=\"%u\"  width=\"%u\" height=\"%u\" style=\"fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)\" /> \n", offX,offY, haystackWidth,haystackHeight );
         for (y=0; y<blocksX; y++)
          {
@@ -169,8 +170,29 @@ int writeCUDALayoutToSVG(const char * svgOut,
 
            }
          }
+        for (y=0; y<tilesY; y++)
+         {
+          for (x=0; x<tilesX; x++)
+           {
+             fprintf(fp," <rect x=\"%u\" y=\"%u\"  width=\"%u\" height=\"%u\" style=\"fill:rgba(123,123,123,200);stroke-width:3;stroke:rgb(150,0,0)\" fill-opacity=\"0.4\"  /> \n",
+                     offX + x*needleWidth ,
+                     offY + y*needleHeight,
+                     needleWidth,
+                     needleHeight );
+
+           }
+         }
+
+      offY+=1200;
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> Thread Size ( %u , %u ) </text>\n",offX,offY-30,threadsX,threadsY);
 
 
+      offY+=60;
+      unsigned int blocksPerTileX = (unsigned int) needleWidth/threadsX;
+      unsigned int blocksPerTileY = (unsigned int) needleHeight/threadsY;
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> Each Tile is covered by %u blocks (%u,%u) </text>\n",offX,offY-30,
+              blocksPerTileX+blocksPerTileY,blocksPerTileX,blocksPerTileY
+              );
 
       fprintf(fp,"</svg>\n");
       fclose(fp);
@@ -359,12 +381,6 @@ return 1;
 int doGPUonly(int argc, char **argv)
 {
 
-    //Check if GPU is ok to proceede
-    if (!queryGPUIsOk(argc,argv))
-    {
-        return 0;
-    }
-
     // Load image data
     //allocate mem for the images on host side
     //initialize pointers to NULL to request lib call to allocate as needed
@@ -412,6 +428,12 @@ int doGPUonly(int argc, char **argv)
                          numThreads.x, numThreads.y
                          );
 
+
+    //Check if GPU is ok to proceede
+    if (!queryGPUIsOk(argc,argv))
+    {
+        return 0;
+    }
 
     // allocate device memory for result
     unsigned int *d_odata, *d_needle, *d_haystack , * d_haystackDiffed;
