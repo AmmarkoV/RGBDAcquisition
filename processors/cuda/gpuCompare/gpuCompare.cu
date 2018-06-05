@@ -187,12 +187,20 @@ int writeCUDALayoutToSVG(const char * svgOut,
       fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> Thread Size ( %u , %u ) </text>\n",offX,offY-30,threadsX,threadsY);
 
 
+      offY+=100;
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> Each comparison is  performed</text>\n",offX,offY-30 );
+
+
       offY+=60;
       unsigned int blocksPerTileX = (unsigned int) needleWidth/threadsX;
       unsigned int blocksPerTileY = (unsigned int) needleHeight/threadsY;
-      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> Each Tile is covered by %u blocks (%u,%u) </text>\n",offX,offY-30,
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\">by %u blocks (%u,%u) </text>\n",offX,offY-30,
               blocksPerTileX+blocksPerTileY,blocksPerTileX,blocksPerTileY
               );
+
+      offY+=100;
+      fprintf(fp," <text x=\"%u\" y=\"%u\" fill=\"red\" class=\"label\" font-size=\"82\"> Each of the threads subtracts one pixel</text>\n",20,offY-30 );
+
 
       fprintf(fp,"</svg>\n");
       fclose(fp);
