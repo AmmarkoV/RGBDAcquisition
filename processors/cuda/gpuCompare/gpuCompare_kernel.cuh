@@ -83,11 +83,35 @@ reduce2(unsigned int *g_idata, unsigned int *g_odata, unsigned int n)
 }
 
 
+void reduceThe4ResultsPerTileIntoOneInPlace(unsigned int * results , unsigned int numberOfTilesX,unsigned int numberOfTilesY,unsigned int resultsPerTile)
+{
+  unsigned int outputCounter =0 ;
+  unsigned int inputCounter =0 ;
+
+  unsigned int i=0;
+  for (i=0; i<numberOfTilesX*numberOfTilesY)
+  {
+    unsigned int pos = inputCounter;
+    unsigned int currentResult = results[pos+0] + results[pos+1] + results[pos+2] + results[pos+3];
+
+    result[outputCounter]=currentResult;
+
+    outputCounter+=1;
+    inputCounter+=4;
+  }
+
+  for (i=outputCounter; i<numberOfTilesX*numberOfTilesY*4)
+  {
+      result[i]=0;
+  }
+}
+
+
 
 __global__ void
 compareImagesKernel(
                       //This is a global memory buffer to hold the intermediate results..
-                      unsigned int *g_subtracted,
+                      //unsigned int *g_subtracted,
 
                       unsigned int *g_needle,
                       unsigned int needleWidth,   unsigned int needleHeight,
@@ -100,42 +124,136 @@ compareImagesKernel(
                       unsigned int maximumDifference
                       )
 {
+    /*
+              We have two rectangular regions (textures), The one is our BIG haystack ( 1024x1024 pixel )  and the second is our small ( 64x64 pixel ) needle
+
+                    Haystack 1024x1024 pixels (16x16 tiles)                           Needle 64x64 pixels
+               ________________________________________________                              __
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|                             |__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+              |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|
+
+              We basically want to compare our 64x64 needle to all of the boxes of our haystack in parallel..
+              Since CUDA has tighter limitations though we cannot just tile on the 64x64 needle but we have to split
+              it in smaller chunks in order to accomodate our GPU limits.
+
+
+              The maximum threads possible per block is 1024 ( = 32x32 ) so using this configuration  we will split each 64x64 tile into 4  32x32 chunks.
+              Each of the CUDA blocks will process 1/4 of a tile
+              Each of the CUDA blocks will use 32x32 threads
+              Each of the threads will process ONE pixel and we will maximize throughput that way..
+
+                Zoomed:
+
+              One Haystack Tile contains 64x64 pixels
+              and will be computed by 4 different blocks
+                ______________ ______________
+               |              |              |
+               |              |              |
+               |  Block(X,Y)  | Block(X+1,Y) |
+               |              |              |
+               |______________|______________|
+               |              |              |
+               |              |              |
+               | Block(X,Y+1) |Block(X+1,Y+1)|
+               |              |              |
+               |______________|______________|
+
+
+               Doing the Substraction of Absolute Differences ( SAD ) is very straight-forward, however we want to also reduce
+               the results to fewer values that can be then quickly transported back to system memory holding our final results
+               We will output 4 results for each of the tiles and the CPU will have to do the final 4 part summation, this is faster
+               than doing more global memory hits inside the CUDA code..
+
+                 Zoomed:
+
+                  Block (X,Y)
+                ________________
+               |                |
+               |    Threads     |
+               |    (32,32)     |
+               | One for every  |
+               |     pixel      |
+               |________________|
+
+
+              Each of the blocks will also have some shared memory ( sdata[32x32] ) which will hold its results
+
+
+
+              Our final result vector will be formatted like this example :
+
+              g_odata [ 16 x 16 x 4 ]
+              --
+              g_odata [ 0 ] = Result 1/4 of Tile 0,0
+              g_odata [ 1 ] = Result 2/4 of Tile 0,0
+              g_odata [ 2 ] = Result 3/4 of Tile 0,0
+              g_odata [ 3 ] = Result 4/4 of Tile 0,0
+              --
+              g_odata [ 4 ] = Result 1/4 of Tile 1,0
+              g_odata [ 5 ] = Result 2/4 of Tile 1,0
+              g_odata [ 6 ] = Result 3/4 of Tile 1,0
+              g_odata [ 7 ] = Result 4/4 of Tile 1,0
+              --
+
+              ...
+
+
+              So in order for the CPU to get the final value for Tile 0 it will have to sum all of its parts..
+
+    */
+
+
+
     //Our big haystack image sized 1024x1024 ( 16x16 tiles sized 64x64 pixels each ) has arrived on the GPU, the particular
-    //Call is specifically targeted on haystack pixel (haystackPixelX,haystackPixelY)
+    //Each block will target a specific pixel of the haystack texture and here we find out which..
     const unsigned int haystackPixelX = blockDim.x * blockIdx.x + threadIdx.x;
     const unsigned int haystackPixelY = blockDim.y * blockIdx.y + threadIdx.y;
 
-    //This is the result offset to temporarilly store all results
-    //const unsigned int resultOffset = haystackPixelX + haystackPixelY * blockDim.x * gridDim.x;
 
-    //Our needle image sized 64x64 is also on the GPU
+    //Our needle image sized 64x64 is also a GPU texture
     //Each haystack pixel has to be compared with the according needle pixel (needlePixelX,needlePixelY)
-    //We can calculate this very easily
     const unsigned int needlePixelX = haystackPixelX % needleWidth;
     const unsigned int needlePixelY = haystackPixelY % needleHeight;
+    //Or in terms of a 1D index pointer..
     const unsigned int needlePTR    = needlePixelX  + (needlePixelY * needleWidth );
 
     //We would also like to know which tile we are performing SAD for
     unsigned int haystackTileX = haystackPixelX / needleWidth;
     unsigned int haystackTileY = haystackPixelY / needleHeight;
 
+    //Finally we calculate the number of haystack Tiles (16x16)
     unsigned int totalNumberOfHaystackTilesX  = haystackWidth / needleWidth;
     unsigned int totalNumberOfHaystackTilesY  = haystackHeight / needleHeight;
-
-    //Finally we will output our sum here..
-    const unsigned int outputTile         = haystackTileX  + (haystackTileY * totalNumberOfHaystackTilesX );
-    const unsigned int outputDiffHaystack = haystackPixelX + (haystackPixelY * haystackWidth );
+    //------------------------------------------------------------------------------------------
 
 
-    //We make sure all of our blocks have cleaned shared memory
-    // __syncthreads();
 
-    //For 1024x1024 we execute using 32x32 cuda blocks
-    __shared__ unsigned int sdata[threadSize_x*threadSize_y];
+    //------------------------------------------------------------------------------------------
+    //As mentioned in the intro comment for 1024x1024 we execute using 32x32 cuda blocks
+    //Each block has a shared memory of threadSizeX x threadSizeY ( 32x32 )
     //Each of our 16x16 tiles sized (64x64) holds will be reflected by 4 blocks of sdata..!
+    __shared__ unsigned int sdata[threadSize_x*threadSize_y];
+    //So each thread will use its sdata slot to keep one value
+    unsigned int sdataPTR   = threadIdx.x + ( threadIdx.y * threadSize_x);
+    //We also need the limit to make sure no overflows occur
+    unsigned int sdataLimit = threadSize_x*threadSize_y;
 
 
-    //Everything is in SYNC so now only if we are inside the compareable area
+    //If we are inside the compareable area we need to calulate the difference
     if ((haystackPixelY < haystackHeight) && (haystackPixelX < haystackWidth))
     {
         //We should get the needle and haystack values
@@ -143,19 +261,26 @@ compareImagesKernel(
         unsigned int haystackValue = tex2D(tex2Dhaystack, haystackPixelX, haystackPixelY);
 
         //Calculate their absolute distance  | needleValue - haystackValue | + 0
-        sdata[needlePTR] = __usad(needleValue,haystackValue,0);
-        g_subtracted[outputDiffHaystack]= sdata[needlePTR];
+        if (sdataPTR < sdataLimit)
+        {
+           sdata[sdataPTR] = __usad(needleValue,haystackValue,0);
+        }
     }
-     __syncthreads();
+
+    //We need to make sure all threads are in sync to go on
+    __syncthreads();
 
 
+    //---------------------------------------------------------------------------
+    //sdata now holds all results , we now need to sum them performing reduction
+    //---------------------------------------------------------------------------
 
     // do horizontal reduction in shared mem
     for (unsigned int s=blockDim.x/2; s>0; s>>=1)
     {
         if (threadIdx.x < s)
         {
-            sdata[needlePTR] += sdata[needlePTR + s];
+            sdata[sdataPTR] += sdata[sdataPTR + s];
         }
         __syncthreads();
     }
@@ -167,22 +292,35 @@ compareImagesKernel(
     {
         if (threadIdx.y < s)
         {
-            sdata[needlePTR] += sdata[needlePTR + s*threadSize_x];
+            sdata[sdataPTR] += sdata[sdataPTR + s*threadSize_x];
         }
         __syncthreads();
     }
 
+    //Each tile has 4 chunks ..
+    const unsigned int outputTileNumberOfChunksX  =  blockDim.x/ ( haystackWidth/needleWidth ) ;
+    const unsigned int outputTileNumberOfChunksY  =  blockDim.y/ ( haystackHeight/needleHeight );
+
+    const unsigned int chunkX    =  blockIdx.x%outputTileNumberOfChunksX;
+    const unsigned int chunkY    =  blockIdx.y%outputTileNumberOfChunksY;
+    const unsigned int chunkPTR  =  chunkX + (chunkY * outputTileNumberOfChunksX);
 
 
-
+    //Finally we will output our sum here..
+    const unsigned int outputTile         = haystackTileX*4  + (haystackTileY * totalNumberOfHaystackTilesX*4 );
     // write result for this block to global mem
+
+
+
+    //Only one thread from each block is going to get inside the next statement
     if (
           (threadIdx.x == 0) &&
           (threadIdx.y == 0)
         )
-    { g_odata[outputTile] = sdata[0]; }
-
-
+    {
+      //And is going to store its 1/4 of a result in the correct place
+      g_odata[outputTile+chunkPTR] = sdata[0];
+    }
 
 }
 

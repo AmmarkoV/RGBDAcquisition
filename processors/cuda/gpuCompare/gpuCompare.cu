@@ -218,7 +218,7 @@ int testSetArray(unsigned int * arr, unsigned int width ,unsigned int height,uns
   unsigned int * arrEnd= arr + width * height;
  // unsigned int inc=0;
 
-  fprintf(stderr,"testSetArray (%ux%u) to %u : ",width,height,value);
+  fprintf(stderr,"testSetArray (%ux%u) to %u  \n",width,height,value);
   while (arrPTR<arrEnd)
   {
    //fprintf(stderr,"%u ",inc); ++inc;
@@ -417,7 +417,14 @@ int doGPUonly(int argc, char **argv)
     unsigned int haystackTilesY = 16;
 
     //allocate mem for the result on host side
-    unsigned int odataSize = sizeof(int) * haystackTilesX*haystackTilesY;
+
+    //Each of the
+    unsigned int blocksPerTileX = (unsigned int) needleWidth/threadSize_x;
+    unsigned int blocksPerTileY = (unsigned int) needleHeight/threadSize_y;
+    unsigned int resultsPerTile =  blocksPerTileX + blocksPerTileY;
+    printf("We expect %ux%u x %u results\n", haystackTilesX, haystackTilesY,resultsPerTile);
+    unsigned int odataSize = sizeof(unsigned int) * haystackTilesX*haystackTilesY * resultsPerTile;
+
     unsigned int *h_odata = (unsigned int *)malloc(odataSize);
     if (h_odata==0) { fprintf(stderr, "Failed to allocate output\n"); return 0; }
     memset(h_odata,0, sizeof(unsigned int ) * haystackTilesX * haystackTilesY );
@@ -444,17 +451,17 @@ int doGPUonly(int argc, char **argv)
     }
 
     // allocate device memory for result
-    unsigned int *d_odata, *d_needle, *d_haystack , * d_haystackDiffed;
+    unsigned int *d_odata, *d_needle, *d_haystack;// , * d_haystackDiffed;
 
     checkCudaErrors(cudaMalloc((void **) &d_needle, needleSize));
     checkCudaErrors(cudaMalloc((void **) &d_haystack, haystackSize ));
-    checkCudaErrors(cudaMalloc((void **) &d_haystackDiffed, haystackSize ));
+    //checkCudaErrors(cudaMalloc((void **) &d_haystackDiffed, haystackSize ));
     checkCudaErrors(cudaMalloc((void **) &d_odata, odataSize));
 
     // copy host memory to device to initialize to zeros
     checkCudaErrors(cudaMemcpy(d_needle,    h_needle,   needleSize,   cudaMemcpyHostToDevice));
     checkCudaErrors(cudaMemcpy(d_haystack,  h_haystack, haystackSize, cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemset(d_haystackDiffed,0,haystackSize ));
+    //checkCudaErrors(cudaMemset(d_haystackDiffed,0,haystackSize ));
     checkCudaErrors(cudaMemcpy(d_odata,     h_odata,    odataSize,    cudaMemcpyHostToDevice));
 
 
@@ -481,10 +488,9 @@ int doGPUonly(int argc, char **argv)
     checkCudaErrors(cudaBindTexture2D(&offset, tex2Dhaystack, d_haystack, ca_desc1,   haystackWidth , haystackHeight, haystackWidth*4));
     assert(offset == 0);
 
-    /*
+
     // First run the warmup kernel (which we'll use to get the GPU in the correct max power state
     compareImagesKernel<<<numBlocks, numThreads>>>(
-                                                    d_haystackDiffed,
                                                     d_needle,
                                                     needleWidth,  needleHeight,
 
@@ -495,7 +501,7 @@ int doGPUonly(int argc, char **argv)
                                                     d_odata,
 
                                                     1000 //Maximum Difference allowed
-                                                   );*/
+                                                   );
     cudaDeviceSynchronize();
 
     // Allocate CUDA events that we'll use for timing
@@ -510,7 +516,6 @@ int doGPUonly(int argc, char **argv)
 
     // launch the stereoDisparity kernel
     compareImagesKernel<<<numBlocks, numThreads>>>(
-                                                    d_haystackDiffed,
                                                     d_needle,
                                                     needleWidth,  needleHeight,
 
@@ -524,6 +529,9 @@ int doGPUonly(int argc, char **argv)
                                                    );
     //Copy result from device to host for verification
     checkCudaErrors(cudaMemcpy(h_odata, d_odata, odataSize, cudaMemcpyDeviceToHost));
+
+
+    reduceThe4ResultsPerTileIntoOneInPlace(h_odata,haystackWidth/needleWidth,haystackHeight/needleHeight,unsigned int resultsPerTile)
 
 
     // Record the stop event
