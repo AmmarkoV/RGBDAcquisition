@@ -92,6 +92,8 @@ int writeResult(
     return 1;
 }
 
+
+/*
 int writeCUDALayoutToSVG(const char * svgOut,
                          unsigned int haystackWidth,unsigned int haystackHeight,
                          unsigned int needleWidth,unsigned int needleHeight,
@@ -104,7 +106,7 @@ int writeCUDALayoutToSVG(const char * svgOut,
 
     fp = fopen(svgOut,"w");
 
-    unsigned int offX=100,offY=100,x,y;
+    unsigned int offX=100,offY=100,x=0,y=0;
 
     unsigned int tilesX=haystackWidth/needleWidth;
     unsigned int tilesY=haystackHeight/needleHeight;
@@ -204,12 +206,13 @@ int writeCUDALayoutToSVG(const char * svgOut,
 
       fprintf(fp,"</svg>\n");
       fclose(fp);
+      return 1;
     }
 
 
 
-
-}
+ return 0;
+}*/
 
 
 int testSetArray(unsigned int * arr, unsigned int width ,unsigned int height,unsigned int value)
@@ -427,7 +430,20 @@ int doGPUonly(int argc, char **argv)
 
     unsigned int *h_odata = (unsigned int *)malloc(odataSize);
     if (h_odata==0) { fprintf(stderr, "Failed to allocate output\n"); return 0; }
-    memset(h_odata,0, sizeof(unsigned int ) * haystackTilesX * haystackTilesY );
+    memset(h_odata,0, odataSize);
+    //-----------------------------------------------------------------------------
+
+    unsigned int bothDataSize = sizeof(unsigned int) * haystackTilesX*haystackTilesY * resultsPerTile;
+    unsigned int *h_bothData = (unsigned int *)malloc(bothDataSize);
+    if (h_bothData==0) { fprintf(stderr, "Failed to allocate output\n"); return 0; }
+    memset(h_bothData,0, bothDataSize);
+    //-----------------------------------------------------------------------------
+
+
+    unsigned int missDataSize = sizeof(unsigned int) * haystackTilesX*haystackTilesY * resultsPerTile;
+    unsigned int *h_missData = (unsigned int *)malloc(missDataSize);
+    if (h_missData==0) { fprintf(stderr, "Failed to allocate output\n"); return 0; }
+    memset(h_missData,0, missDataSize);
     //-----------------------------------------------------------------------------
 
 
@@ -436,12 +452,13 @@ int doGPUonly(int argc, char **argv)
     dim3 numBlocks  = dim3(iDivUp( haystackWidth, numThreads.x), iDivUp(haystackHeight, numThreads.y));
     fprintf(stderr,"Which means %ux%u blocks\n",numBlocks.x,numBlocks.y);
 
+    /*
     writeCUDALayoutToSVG("gpuCompare.svg",
                          haystackWidth,haystackHeight,
                          needleWidth  ,needleHeight,
                          numBlocks.x,  numBlocks.y,
                          numThreads.x, numThreads.y
-                         );
+                         );*/
 
 
     //Check if GPU is ok to proceede
@@ -451,18 +468,20 @@ int doGPUonly(int argc, char **argv)
     }
 
     // allocate device memory for result
-    unsigned int *d_odata, *d_needle, *d_haystack;// , * d_haystackDiffed;
+    unsigned int *d_odata, *d_bothData, *d_missData , *d_needle, *d_haystack;// , * d_haystackDiffed;
 
     checkCudaErrors(cudaMalloc((void **) &d_needle, needleSize));
     checkCudaErrors(cudaMalloc((void **) &d_haystack, haystackSize ));
-    //checkCudaErrors(cudaMalloc((void **) &d_haystackDiffed, haystackSize ));
     checkCudaErrors(cudaMalloc((void **) &d_odata, odataSize));
+    checkCudaErrors(cudaMalloc((void **) &d_bothData, bothDataSize));
+    checkCudaErrors(cudaMalloc((void **) &d_missData, missDataSize));
 
     // copy host memory to device to initialize to zeros
     checkCudaErrors(cudaMemcpy(d_needle,    h_needle,   needleSize,   cudaMemcpyHostToDevice));
     checkCudaErrors(cudaMemcpy(d_haystack,  h_haystack, haystackSize, cudaMemcpyHostToDevice));
-    //checkCudaErrors(cudaMemset(d_haystackDiffed,0,haystackSize ));
     checkCudaErrors(cudaMemcpy(d_odata,     h_odata,    odataSize,    cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_bothData,  h_bothData, bothDataSize, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_missData,  h_missData, missDataSize, cudaMemcpyHostToDevice));
 
 
     printf("Done with copies..\n");
@@ -489,6 +508,7 @@ int doGPUonly(int argc, char **argv)
     assert(offset == 0);
 
 
+    printf("Launching CUDA compareImagesKernel warmup()\n");
     // First run the warmup kernel (which we'll use to get the GPU in the correct max power state
     compareImagesKernel<<<numBlocks, numThreads>>>(
                                                     d_needle,
@@ -499,6 +519,8 @@ int doGPUonly(int argc, char **argv)
 
 
                                                     d_odata,
+                                                    d_bothData,
+                                                    d_missData,
 
                                                     1000 //Maximum Difference allowed
                                                    );
@@ -524,15 +546,26 @@ int doGPUonly(int argc, char **argv)
 
 
                                                     d_odata ,
+                                                    d_bothData,
+                                                    d_missData,
 
                                                     100 //Maximum Difference allowed
                                                    );
+
+
+    printf("Copying back results\n");
     //Copy result from device to host for verification
-    checkCudaErrors(cudaMemcpy(h_odata, d_odata, odataSize, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(h_odata,    d_odata,    odataSize,    cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(h_bothData, d_bothData, bothDataSize, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(h_missData, d_missData, missDataSize, cudaMemcpyDeviceToHost));
 
 
-    reduceThe4ResultsPerTileIntoOneInPlace(h_odata,haystackWidth/needleWidth,haystackHeight/needleHeight,unsigned int resultsPerTile)
+    printf("Reducing 4 results into one\n");
+    reduceThe4ResultsPerTileIntoOneInPlace(h_odata,haystackWidth/needleWidth,haystackHeight/needleHeight,4);
+    reduceThe4ResultsPerTileIntoOneInPlace(h_bothData,haystackWidth/needleWidth,haystackHeight/needleHeight,4);
+    reduceThe4ResultsPerTileIntoOneInPlace(h_missData,haystackWidth/needleWidth,haystackHeight/needleHeight,4);
 
+    printf("Done..\n");
 
     // Record the stop event
     checkCudaErrors(cudaEventRecord(stop, NULL));

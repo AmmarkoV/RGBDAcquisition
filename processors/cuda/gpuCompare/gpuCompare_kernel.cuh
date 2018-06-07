@@ -83,28 +83,30 @@ reduce2(unsigned int *g_idata, unsigned int *g_odata, unsigned int n)
 }
 
 
+__host__
 void reduceThe4ResultsPerTileIntoOneInPlace(unsigned int * results , unsigned int numberOfTilesX,unsigned int numberOfTilesY,unsigned int resultsPerTile)
 {
   unsigned int outputCounter =0 ;
-  unsigned int inputCounter =0 ;
+  unsigned int inputCounter  =0 ;
 
   unsigned int i=0;
-  for (i=0; i<numberOfTilesX*numberOfTilesY)
+  for (i=0; i<numberOfTilesX*numberOfTilesY; i++)
   {
     unsigned int pos = inputCounter;
     unsigned int currentResult = results[pos+0] + results[pos+1] + results[pos+2] + results[pos+3];
 
-    result[outputCounter]=currentResult;
+    results[outputCounter]=currentResult;
 
     outputCounter+=1;
     inputCounter+=4;
   }
 
-  for (i=outputCounter; i<numberOfTilesX*numberOfTilesY*4)
+  for (i=outputCounter; i<numberOfTilesX*numberOfTilesY*4; i++)
   {
-      result[i]=0;
+    results[i]=0;
   }
 }
+
 
 
 
@@ -120,6 +122,8 @@ compareImagesKernel(
                       unsigned int haystackWidth, unsigned int haystackHeight,
 
                       unsigned int *g_odata ,
+                      unsigned int *g_bothData ,
+                      unsigned int *g_missData ,
 
                       unsigned int maximumDifference
                       )
@@ -211,8 +215,12 @@ compareImagesKernel(
 
               ...
 
+              etc
+
+              ...
 
               So in order for the CPU to get the final value for Tile 0 it will have to sum all of its parts..
+              we can do that using the reduceThe4ResultsPerTileIntoOneInPlace call implemented above..
 
     */
 
@@ -228,8 +236,7 @@ compareImagesKernel(
     //Each haystack pixel has to be compared with the according needle pixel (needlePixelX,needlePixelY)
     const unsigned int needlePixelX = haystackPixelX % needleWidth;
     const unsigned int needlePixelY = haystackPixelY % needleHeight;
-    //Or in terms of a 1D index pointer..
-    const unsigned int needlePTR    = needlePixelX  + (needlePixelY * needleWidth );
+
 
     //We would also like to know which tile we are performing SAD for
     unsigned int haystackTileX = haystackPixelX / needleWidth;
@@ -237,16 +244,17 @@ compareImagesKernel(
 
     //Finally we calculate the number of haystack Tiles (16x16)
     unsigned int totalNumberOfHaystackTilesX  = haystackWidth / needleWidth;
-    unsigned int totalNumberOfHaystackTilesY  = haystackHeight / needleHeight;
+  //unsigned int totalNumberOfHaystackTilesY  = haystackHeight / needleHeight; //<- not used
     //------------------------------------------------------------------------------------------
-
 
 
     //------------------------------------------------------------------------------------------
     //As mentioned in the intro comment for 1024x1024 we execute using 32x32 cuda blocks
     //Each block has a shared memory of threadSizeX x threadSizeY ( 32x32 )
     //Each of our 16x16 tiles sized (64x64) holds will be reflected by 4 blocks of sdata..!
-    __shared__ unsigned int sdata[threadSize_x*threadSize_y];
+    __shared__ unsigned int  sdata[threadSize_x*threadSize_y]; // 16384 of 49152 remaining bytes
+    __shared__ unsigned char both[threadSize_x*threadSize_y];  //  4096 of 32768 remaining bytes
+    __shared__ unsigned char miss[threadSize_x*threadSize_y];  //  4096 of 28672 remaining bytes
     //So each thread will use its sdata slot to keep one value
     unsigned int sdataPTR   = threadIdx.x + ( threadIdx.y * threadSize_x);
     //We also need the limit to make sure no overflows occur
@@ -263,7 +271,9 @@ compareImagesKernel(
         //Calculate their absolute distance  | needleValue - haystackValue | + 0
         if (sdataPTR < sdataLimit)
         {
-           sdata[sdataPTR] = __usad(needleValue,haystackValue,0);
+           sdata[sdataPTR] = min ( __usad(needleValue,haystackValue,0) , maximumDifference );
+           both[sdataPTR]  = ((needleValue) && (haystackValue));
+           miss[sdataPTR]  = (((needleValue) && (!haystackValue)) || ((!needleValue) && (haystackValue)) );
         }
     }
 
@@ -281,6 +291,8 @@ compareImagesKernel(
         if (threadIdx.x < s)
         {
             sdata[sdataPTR] += sdata[sdataPTR + s];
+            both[sdataPTR]  +=  both[sdataPTR + s];
+            miss[sdataPTR]  +=  miss[sdataPTR + s];
         }
         __syncthreads();
     }
@@ -293,6 +305,8 @@ compareImagesKernel(
         if (threadIdx.y < s)
         {
             sdata[sdataPTR] += sdata[sdataPTR + s*threadSize_x];
+            both[sdataPTR]  +=  both[sdataPTR + s*threadSize_x];
+            miss[sdataPTR]  +=  miss[sdataPTR + s*threadSize_x];
         }
         __syncthreads();
     }
@@ -320,6 +334,8 @@ compareImagesKernel(
     {
       //And is going to store its 1/4 of a result in the correct place
       g_odata[outputTile+chunkPTR] = sdata[0];
+      g_bothData [outputTile+chunkPTR] = both[0];
+      g_missData [outputTile+chunkPTR] = miss[0];
     }
 
 }
