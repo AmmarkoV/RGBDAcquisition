@@ -41,6 +41,11 @@ void doOGLShaderBoneDrawCalllist( float * pos , unsigned int * parentNode ,  uns
 * @param Number of Indices
 */
 void doOGLShaderDrawCalllist(
+                              float * projectionMatrix ,
+                              float * viewMatrix ,
+                              float * modelMatrix ,
+                              float * mvpMatrix ,
+                              //-------------------------------------------------------
                               float * vertices ,       unsigned int numberOfVertices ,
                               float * normals ,         unsigned int numberOfNormals ,
                               float * textureCoords ,  unsigned int numberOfTextureCoords ,

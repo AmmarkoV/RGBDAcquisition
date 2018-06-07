@@ -231,6 +231,11 @@ void doOGLShaderBoneDrawCalllist( float * pos , unsigned int * parentNode ,  uns
 
 
 void doOGLShaderDrawCalllist(
+                              float * projectionMatrix ,
+                              float * viewMatrix ,
+                              float * modelMatrix ,
+                              float * mvpMatrix ,
+                              //-----------------------------------------------------
                               float * vertices ,       unsigned int numberOfVertices ,
                               float * normals ,         unsigned int numberOfNormals ,
                               float * textureCoords ,  unsigned int numberOfTextureCoords ,
@@ -238,6 +243,14 @@ void doOGLShaderDrawCalllist(
                               unsigned int * indices , unsigned int numberOfIndices
                              )
 {
+
+// uniform mat4 MVP;
+//uniform mat4 V;
+//uniform mat4 M;
+
+
+
+
 /*
 
 

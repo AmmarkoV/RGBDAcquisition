@@ -334,19 +334,7 @@ int setOpenGLIntrinsicCalibration(double * camera)
 
 int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , double scaleToDepthUnit)
 {
-  useCustomModelViewMatrix=1;
-  convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(customModelViewMatrix , rodriguez , translation , scaleToDepthUnit);
-
-  sceneSetDepthScalingPrameter( (float) scaleToDepthUnit);
-
-  customTranslation[0] = translation[0];
-  customTranslation[1] = translation[1];
-  customTranslation[2] = translation[2];
-
-  customRodriguezRotation[0] = rodriguez[0];
-  customRodriguezRotation[1] = rodriguez[1];
-  customRodriguezRotation[2] = rodriguez[2];
-  return 1;
+  return sceneSetOpenGLExtrinsicCalibration(getLoadedScene(),rodriguez,translation,scaleToDepthUnit);
 }
 
 
@@ -526,12 +514,16 @@ int saveSnapshotOfObjects()
 
 
 void * createOGLRendererPhotoshootSandbox(
+                                           void * scene,
+                                           void * modelStorage,
                                            int objID, unsigned int columns , unsigned int rows , float distance,
                                            float angleX,float angleY,float angleZ,
                                            float angXVariance ,float angYVariance , float angZVariance
                                          )
 {
   return createPhotoshoot(
+                           scene,
+                           modelStorage,
                            objID,
                            columns , rows ,
                            distance,
@@ -568,7 +560,6 @@ int snapOGLRendererPhotoshootSandbox(
                                      float angXVariance ,float angYVariance , float angZVariance
                                     )
 {
-
     setupPhotoshoot( photoConf , objID, columns , rows , distance,
                      angleX, angleY, angleZ , angXVariance , angYVariance , angZVariance );
 

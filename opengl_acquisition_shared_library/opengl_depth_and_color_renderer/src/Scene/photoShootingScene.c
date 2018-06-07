@@ -17,8 +17,6 @@
 
 
 int setupPhotoshoot(
-                        void * scene,
-                        void * modelStorage,
                         void * context,
                         int objID,
                         unsigned int columns , unsigned int rows ,
@@ -41,8 +39,9 @@ int setupPhotoshoot(
   configuration->angYVariance=angYVariance;
   configuration->angZVariance=angZVariance;
 
-  configuration->scenePTR = (void *) scene;
-  configuration->modelPTR = (void *) modelStorage;
+  //These should already have been set during allocation
+  //configuration->scenePTR = (void *) scene;
+  //configuration->modelStoragePTR = (void*) modelStorage;
   return 1;
 }
 
@@ -59,7 +58,8 @@ void * createPhotoshoot(
 
   struct tiledRendererConfiguration * configuration = 0;
 
-  configuration = (struct tiledRendererConfiguration * ) malloc(sizeof( struct tiledRendererConfiguration));
+  configuration = (struct tiledRendererConfiguration * ) malloc(sizeof(struct tiledRendererConfiguration));
+  memset(configuration,0,sizeof(struct tiledRendererConfiguration));
   if (configuration == 0) { fprintf(stderr,"Could not allocate a configuration structure\n"); return 0; }
 
 
@@ -75,7 +75,7 @@ void * createPhotoshoot(
   configuration->angZVariance=angZVariance;
 
   configuration->scenePTR = (void *) scene;
-  configuration->modelPTR = (void *) modelStorage;
+  configuration->modelStoragePTR = (void*) modelStorage;
 
 
   return (void*) configuration;

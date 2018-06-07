@@ -53,7 +53,7 @@ struct tiledRendererDetail
 struct tiledRendererConfiguration
 {
   void * scenePTR;
-  void * modelPTR;
+  void * modelStoragePTR;
   unsigned int objID;
 
   unsigned int columns;

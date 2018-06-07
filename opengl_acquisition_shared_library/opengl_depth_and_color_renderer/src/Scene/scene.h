@@ -22,24 +22,28 @@ extern int useIntrinsicMatrix;
 extern double cameraMatrix[9];
 
 
-extern int useCustomModelViewMatrix;
-extern double customModelViewMatrix[16];
-extern double customTranslation[3];
-extern double customRodriguezRotation[3];
+//extern int useCustomModelViewMatrix;
+//extern double customModelViewMatrix[16];
+//extern double customTranslation[3];
+//extern double customRodriguezRotation[3];
 
 
 
 struct VirtualStream *  getLoadedScene();
+struct ModelList *  getLoadedModelStorage();
 
 
 
 float sceneGetNearPlane();
-int sceneSetDepthScalingPrameter(float newScaleDepthTo);
+
 int sceneSetNearFarPlanes(float near, float far);
 float sceneGetDepthScalingPrameter();
 
 int sceneSeekTime(unsigned int seekTime);
 int sceneIgnoreTime(unsigned int newSettingMode);
+
+
+int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * rodriguez,double * translation , double scaleToDepthUnit);
 
 /**
 * @brief Render A Scene

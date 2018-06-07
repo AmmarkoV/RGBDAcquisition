@@ -90,6 +90,11 @@ int renderOGLBones( float * pos , unsigned int * parentNode ,  unsigned int bone
 
 
 int renderOGL(
+               float * projectionMatrix ,
+               float * viewMatrix ,
+               float * modelMatrix ,
+               float * mvpMatrix ,
+               //-------------------------------------------------------
                float * vertices ,       unsigned int numberOfVertices ,
                float * normal ,         unsigned int numberOfNormals ,
                float * textureCoords ,  unsigned int numberOfTextureCoords ,
@@ -102,6 +107,11 @@ int renderOGL(
   {
     case 0 :
      doOGLGenericDrawCalllist(
+                              projectionMatrix ,
+                              viewMatrix ,
+                              modelMatrix ,
+                              mvpMatrix ,
+                              //-------------------------------------------------------
                               vertices ,       numberOfVertices ,
                               normal ,         numberOfNormals ,
                               textureCoords ,  numberOfTextureCoords ,
@@ -112,6 +122,11 @@ int renderOGL(
 
     case 1 :
       doOGLShaderDrawCalllist(
+                              projectionMatrix ,
+                              viewMatrix ,
+                              modelMatrix ,
+                              mvpMatrix ,
+                              //-------------------------------------------------------
                               vertices ,       numberOfVertices ,
                               normal ,         numberOfNormals ,
                               textureCoords ,  numberOfTextureCoords ,

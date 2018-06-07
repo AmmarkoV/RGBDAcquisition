@@ -404,7 +404,7 @@ int loadModelToModelList(struct ModelList* modelStorage,const char * modelDirect
 
 
 
-int drawTRIModel(struct Model * mod)
+int drawTRIModel(struct VirtualStream * scene , struct Model * mod)
 {
   struct TRI_Model * tri = (struct TRI_Model *) mod->modelInternalData;
 
@@ -423,7 +423,11 @@ int drawTRIModel(struct Model * mod)
           {
            //doOGLGenericDrawCalllist
              renderOGL
-            (
+            (  //TODO
+                                    0,// scene->activeProjectionMatrix,
+                                    0,// scene->activeViewMatrix,
+                                    0,// scene->activeModelMatrix,
+                                    0,// scene->activeModelViewProjectionMatrix,
                                      tri->vertices ,       tri->header.numberOfVertices ,
                                      tri->normal ,         tri->header.numberOfNormals ,
                                      tri->textureCoords ,  tri->header.numberOfTextureCoords ,
@@ -438,7 +442,7 @@ int drawTRIModel(struct Model * mod)
 
 
 
-int drawOBJModel(struct Model * mod)
+int drawOBJModel(struct VirtualStream * scene ,struct Model * mod)
 {
  //fprintf(stderr,"drawing OBJ model\n");
  if (mod->modelInternalData!=0)
@@ -559,9 +563,9 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   updateModelPosition(mod,position);
 
     switch(mod->type)
-    {
-        case TRI_MODEL        :  drawTRIModel(mod); break;
-        case OBJ_MODEL        :  drawOBJModel(mod); break;
+    {                                  //TODO: drawTRIModel(0,mod);
+        case TRI_MODEL        :  drawTRIModel(0,mod); break;
+        case OBJ_MODEL        :  drawOBJModel(0,mod); break;
         case OBJ_ASSIMP_MODEL :  fprintf(stderr,"TODO : drawAssimpModel\n");  break;
         //-----------------------------------------------------------------------------------
         default :
@@ -581,7 +585,6 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   if (mod->nocolor)           {glEnable(GL_COLOR); glEnable(GL_COLOR_MATERIAL); }
   if (mod->nocull)            {glEnable(GL_CULL_FACE); }
 
-  //glTranslatef(-x,-y,-z);
   //glDisable(GL_NORMALIZE);
   glPopMatrix();
  return 1;

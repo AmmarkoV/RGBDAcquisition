@@ -273,6 +273,8 @@ struct VirtualStream
     int modelViewMatrixDeclared;
     double modelViewMatrix[16];
 
+    int useCustomModelViewMatrix;
+    double customModelViewMatrix[16];
 
     int emulateProjectionMatrixDeclared;
     double emulateProjectionMatrix[9];

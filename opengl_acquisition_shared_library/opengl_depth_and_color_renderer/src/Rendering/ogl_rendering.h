@@ -43,6 +43,11 @@ int renderOGLBones(
                 );
 
 int renderOGL(
+               float * projectionMatrix ,
+               float * viewMatrix ,
+               float * modelMatrix ,
+               float * mvpMatrix ,
+               //-------------------------------------------------------
                float * vertices ,       unsigned int numberOfVertices ,
                float * normal ,         unsigned int numberOfNormals ,
                float * textureCoords ,  unsigned int numberOfTextureCoords ,

@@ -87,7 +87,7 @@ void setupTiledRendererOGL(float backgroundR,float backgroundG,float backgroundB
 int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
 {
         struct VirtualStream * scene = (struct VirtualStream *)  trConf->scenePTR;
-        struct Model ** models = ( struct Model ** ) trConf->modelPTR;
+        struct Model ** models = ( struct Model ** ) trConf->modelStoragePTR;
         unsigned int i=trConf->objID;
         struct Model * mod = models[scene->object[i].type];
 
@@ -124,98 +124,16 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
 }
 
 
-
-int tiledRenderer_RenderOLD( struct tiledRendererConfiguration * trConf)
-{
-  if (trConf==0) { fprintf(stderr,"Could not render with null configuration\n"); return 0; }
-  if (trConf->scenePTR==0) { fprintf(stderr,"Could not render with null scene\n"); return 0; }
-  if (trConf->modelPTR==0) { fprintf(stderr,"Could not render with null model\n"); return 0; }
-
-  struct VirtualStream * scene = (struct VirtualStream *)  trConf->scenePTR;
-  struct Model ** models = ( struct Model ** ) trConf->modelPTR;
-
-
-  fprintf(stderr,"Photoshooting Object %u -> %s \n",trConf->objID,scene->object[trConf->objID].name);
-  fprintf(stderr,"Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",trConf->rows,trConf->columns,trConf->distance,trConf->angleX,trConf->angleY,trConf->angleZ);
-  fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",trConf->angXVariance,trConf->angYVariance,trConf->angZVariance);
-
-
-  if (scene!=0) { setupTiledRendererOGL((float)scene->backgroundR,(float)scene->backgroundG,(float)scene->backgroundB); } else
-                { setupTiledRendererOGL(0.0,0.0,0.0); }
-
-
-  fprintf(stderr,"setupTiledRendererOGL done \n");
-  if (scene!=0)
-    {
-       unsigned char noColor=0;
-       float posStack[POS_COORD_LENGTH]={0};
-       float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
-
-       unsigned int i=trConf->objID;
-       fprintf(stderr,"Accessing models (%u).. \n",scene->object[i].type);
-       struct Model * mod = models[scene->object[i].type];
-       if (mod==0) { fprintf(stderr,"Model not allocated.. \n"); return 0;}
-       float * pos = (float*) &posStack;
-
-       fprintf(stderr,"getObjectColorsTrans Colors.. \n");
-       //This is a stupid way of passing stuff to be drawn
-       R=1.0f; G=1.0f;  B=1.0f; trans=0.0f; noColor=0;
-       getObjectColorsTrans(scene,i,&R,&G,&B,&trans,&noColor);
-
-       fprintf(stderr,"Setting Colors.. ");
-       setModelColor(mod,&R,&G,&B,&trans,&noColor);
-       fprintf(stderr,"done\n");
-       mod->scaleX = scene->object[i].scaleX;
-       mod->scaleY = scene->object[i].scaleY;
-       mod->scaleZ = scene->object[i].scaleZ;
-
-/*
-       pos[POS_X]=0; pos[POS_Y]=0; pos[POS_Z]=-30;
-                   drawModelAt(
-                                mod,
-                                pos[POS_X],pos[POS_Y],pos[POS_Z],
-                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]
-                              );
-*/
-        unsigned int x,y;
-
-        fprintf(stderr,"Calculating loops for tiled renderer..\n");
-        tiledRenderer_CalculateLoops(trConf);
-
-       for (y=0; y<trConf->op.snapsVertical; y++)
-          {
-            for (x=0; x<trConf->op.snapsHorizontal; x++)
-               {
-                 //glViewport (0, 0, (GLsizei)(width), (GLsizei)(height));
-
-                   tiledRenderer_get3DCenterForTile( trConf , x , y ,
-                                                     &pos[POS_X],&pos[POS_Y],&pos[POS_Z],
-                                                     &pos[POS_ANGLEX],&pos[POS_ANGLEY],&pos[POS_ANGLEZ]);
-
-
-                   //fprintf(stderr,"Draw %u,%u @ %0.2f %0.2f %0.2f\n",x,y,pos[POS_X],pos[POS_Y],pos[POS_Z]);
-                   drawModelAt(
-                                mod,
-                                pos[POS_X],pos[POS_Y],pos[POS_Z],
-                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]
-                              );
-                }
-            }
-          fprintf(stderr,"Drawing stopped  @ %0.2f %0.2f -> %0.2f %0.2f %0.2f \n",posStack[POS_X],posStack[POS_Y],pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]);
-        }
-
-   glPopMatrix();
-  return 1 ;
-}
-
 int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
 {
   if (trConf==0) { fprintf(stderr,"Could not render with null configuration\n"); return 0; }
   if (trConf->scenePTR==0) { fprintf(stderr,"Could not render with null scene\n"); return 0; }
-  if (trConf->modelPTR==0) { fprintf(stderr,"Could not render with null model\n"); return 0; }
+  if (trConf->modelStoragePTR==0) { fprintf(stderr,"Could not render with null model\n"); return 0; }
 
   struct VirtualStream * scene = (struct VirtualStream *)  trConf->scenePTR;
-  struct Model ** models = ( struct Model ** ) trConf->modelPTR;
+
+  struct ModelList * modelstorage = ( struct ModelList* ) trConf->modelStoragePTR;
+  if (modelstorage->models==0) { fprintf(stderr,"ModelList not properly allocated..\n"); return 0; }
 
 
   fprintf(stderr,"Photoshooting Object %u -> %s \n",trConf->objID,scene->object[trConf->objID].name);
@@ -236,7 +154,11 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
 
        unsigned int i=trConf->objID;
        fprintf(stderr,"Accessing models (%u).. \n",scene->object[i].type);
-       struct Model * mod = models[scene->object[i].type];
+
+       fprintf(stderr,"I think i broke the photoshooting here : ");
+       if (scene->object[i].type>=modelstorage->currentNumberOfModels) { fprintf(stderr,"Model not allocated.. \n"); return 0; }
+
+       struct Model * mod = &modelstorage->models[scene->object[i].type];
        if (mod==0) { fprintf(stderr,"Model not allocated.. \n"); return 0;}
        float * pos = (float*) &posStack;
 

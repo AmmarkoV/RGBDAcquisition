@@ -186,6 +186,11 @@ void doOGLFixedBoneDrawCalllist( float * pos , unsigned int * parentNode ,  unsi
 
 
 void doOGLGenericDrawCalllist(
+                              float * projectionMatrix ,
+                              float * viewMatrix ,
+                              float * modelMatrix ,
+                              float * mvpMatrix ,
+                              //-------------------------------------------------------
                               float * vertices ,       unsigned int numberOfVertices ,
                               float * normals ,         unsigned int numberOfNormals ,
                               float * textureCoords ,  unsigned int numberOfTextureCoords ,

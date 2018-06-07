@@ -4,8 +4,6 @@
 
 
 int setupPhotoshoot(
-                        void * scene,
-                        void * modelStorage,
                         void * context,
                         int objID,
                         unsigned int columns , unsigned int rows ,

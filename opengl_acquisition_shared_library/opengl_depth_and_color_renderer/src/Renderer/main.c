@@ -238,6 +238,8 @@ int main(int argc, char **argv)
         fprintf(stderr,"Making a photoshoot of object %u with a size %ux%u image output\n",photoShootOBJ,width,height);
 
         void * oglPhotoShoot = createOGLRendererPhotoshootSandbox(
+                                                                   getLoadedScene(),
+                                                                   getLoadedModelStorage(),
                                                                    photoShootOBJ,
                                                                    columns,rows,
                                                                    distance,

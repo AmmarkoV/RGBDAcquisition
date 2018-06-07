@@ -58,16 +58,17 @@ double customProjectionMatrix[16]={0};
 
 
 
-
+/*
 int useCustomModelViewMatrix=0;
 double customModelViewMatrix[16]={
                                    1.0 , 0.0 , 0.0 , 0.0 ,
                                    0.0 , 1.0 , 0.0 , 0.0 ,
                                    0.0 , 0.0 , 1.0 , 0.0 ,
                                    0.0 , 0.0 , 0.0 , 1.0
-                                 };
-double customTranslation[3]={0};
-double customRodriguezRotation[3]={0};
+                                 };*/
+
+//double customTranslation[3]={0};
+//double customRodriguezRotation[3]={0};
 
 
 #define USE_LIGHTS 1
@@ -88,6 +89,11 @@ struct VirtualStream *  getLoadedScene()
     return scene;
 }
 
+struct ModelList *  getLoadedModelStorage()
+{
+    return modelStorage;
+}
+
 
 float sceneGetNearPlane()
 {
@@ -99,13 +105,6 @@ float sceneGetDepthScalingPrameter()
   return scene->controls.scaleDepthTo;
 }
 
-
-int sceneSetDepthScalingPrameter(float newScaleDepthTo)
-{
-  if (scene==0) { return 0; }
-  scene->controls.scaleDepthTo=newScaleDepthTo;
-  return 1;
-}
 
 
 int sceneSetNearFarPlanes(float near, float far)
@@ -144,6 +143,37 @@ int sceneSwitchKeyboardControl(int newVal)
   }
  return 1;
 }
+
+
+
+
+int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * rodriguez,double * translation , double scaleToDepthUnit)
+{
+  if (scene==0) { fprintf(stderr,"Cannot access virtual stream to sceneSetOpenGLExtrinsicCalibration\n"); return 0; }
+
+  scene->useCustomModelViewMatrix=1;
+  convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(scene->customModelViewMatrix , rodriguez , translation , scaleToDepthUnit);
+
+  scene->controls.scaleDepthTo=(float) scaleToDepthUnit;
+
+
+  scene->extrinsicsDeclared = 1;
+  scene->extrinsicTranslation[0] = translation[0];
+  scene->extrinsicTranslation[1] = translation[1];
+  scene->extrinsicTranslation[2] = translation[2];
+
+  scene->extrinsicRodriguezRotation[0] = rodriguez[0];
+  scene->extrinsicRodriguezRotation[1] = rodriguez[1];
+  scene->extrinsicRodriguezRotation[2] = rodriguez[2];
+
+  return 1;
+}
+
+
+
+
+
+
 
 int updateProjectionMatrix()
 {
@@ -268,8 +298,6 @@ int initScene(char * confFile)
 
   fprintf(stderr,YELLOW "Which results in the following model state..\n\n" NORMAL );
   printModelList(modelStorage);
-
-
 
   return 1;
 }
@@ -628,7 +656,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
      glLoadMatrixd( scene->modelViewMatrix ); // we load a matrix of Doubles
 
      copy4x4Matrix(scene->activeModelViewMatrix , scene->modelViewMatrix);
-      if (useCustomModelViewMatrix)
+      if (scene->useCustomModelViewMatrix)
          {
            fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
            print4x4DMatrix("Scene declared modelview matrix", scene->modelViewMatrix);
@@ -639,11 +667,11 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
    return 1;
   }
 
-  if (useCustomModelViewMatrix)
+  if (scene->useCustomModelViewMatrix)
   {
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
-    glLoadMatrixd((const GLdouble*) customModelViewMatrix);
-    copy4x4Matrix(scene->activeModelViewMatrix , customModelViewMatrix);
+    glLoadMatrixd((const GLdouble*) scene->customModelViewMatrix);
+    copy4x4Matrix(scene->activeModelViewMatrix , scene->customModelViewMatrix);
 
     /* We flip our coordinate system so it comes straight
        glRotatef(90,-1.0,0,0); //TODO FIX THESE

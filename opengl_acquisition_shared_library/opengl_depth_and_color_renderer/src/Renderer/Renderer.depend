@@ -15,3 +15,19 @@
 
 1388407773 /home/ammar/Documents/Programming/FORTH/input_acquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.h
 
+1528113100 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Renderer/main.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	"../OGLRendererSandbox.h"
+	<GL/glx.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<X11/X.h>
+	<X11/keysym.h>
+	"../System/glx.h"
+
+1510399263 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/OGLRendererSandbox.h
+
+1389863812 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/System/glx.h
+

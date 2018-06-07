@@ -243,6 +243,8 @@ int saveSnapshotOfObjects();
 * @retval 0=Failure, or a pointer to a photoshoot context
 */
 void * createOGLRendererPhotoshootSandbox(
+                                           void * scene,
+                                           void * modelStorage,
                                            int objID, unsigned int columns , unsigned int rows , float distance,
                                            float angleX,float angleY,float angleZ,
                                            float angXVariance ,float angYVariance , float angZVariance
