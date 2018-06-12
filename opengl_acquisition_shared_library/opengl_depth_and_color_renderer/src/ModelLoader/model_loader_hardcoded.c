@@ -297,6 +297,9 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
 
 int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coordLength)
 {
+    #define OLD_WAY_TO_DRAW 0
+
+    #if OLD_WAY_TO_DRAW
     glBegin(GL_TRIANGLES);
       unsigned int i=0,z=0;
       for (i=0; i<coordLength/3; i++)
@@ -311,6 +314,21 @@ int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coord
           z+=3;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
         }
     glEnd();
+    #else
+    return  renderOGL(
+                      0,//float * projectionMatrix ,
+                      0,//float * viewMatrix ,
+                      0,//float * modelMatrix ,
+                      0,//float * mvpMatrix ,
+                      //-------------------------------------------------------
+                      coords ,      coordLength ,
+                      normals ,     coordLength ,
+                      0 ,         0,
+                      0 ,         0,
+                      0 ,         0
+                     );
+    #endif
+
     return 1;
 }
 

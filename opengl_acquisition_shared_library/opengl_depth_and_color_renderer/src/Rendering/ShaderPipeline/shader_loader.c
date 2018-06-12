@@ -29,6 +29,10 @@ static const char *fragment_source =
 };
 
 
+int useShader(struct shaderObject * shader)
+{
+  return glUseProgram(shader->ProgramObject);
+}
 
 struct shaderObject * loadShader(char * vertexShaderChar,char * fragmentShaderChar)
 {

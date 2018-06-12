@@ -63,7 +63,6 @@
 
 
 
-GLuint buffer;
 unsigned int verticeCount;
 
 
@@ -142,7 +141,7 @@ int startShaderOGLRendering(struct rendererConfiguration * config)
   glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error while initializing HQ settings\n"); }
 
-  /* frame buffer clears should be to black */
+  /* framebuffer clears should be to black */
   glClearColor(0.0, 0.0, 0.0, 0.0);
 
   /* set up projection transform */
@@ -226,8 +225,8 @@ void doOGLShaderBoneDrawCalllist( float * pos , unsigned int * parentNode ,  uns
 
 
 
-
-
+//Just to make codeblocks display the function without the grayout
+//#define USE_GLEW 1
 
 
 void doOGLShaderDrawCalllist(
@@ -243,30 +242,13 @@ void doOGLShaderDrawCalllist(
                               unsigned int * indices , unsigned int numberOfIndices
                              )
 {
-
+  fprintf(stderr,"doOGLShaderDrawCalllist\n");
 // uniform mat4 MVP;
 //uniform mat4 V;
 //uniform mat4 M;
-
-
-
-
-/*
-
-
-void pushObjectToBufferData(
-                             unsigned int * verticeCount ,
-                             const float * vertices , unsigned int numberOfVertices ,
-                             const float * normals , unsigned int numberOfNormals ,
-                             const float * colors , unsigned int numberOfColors ,
-                             const float * texcoords , unsigned int numberOfTextureCoords ,
-                             int generateNewBuffer ,
-                             GLuint buffer
-                           )
-{*/
-
 #if USE_GLEW
 
+    GLuint buffer=0;
     glBindBuffer( GL_ARRAY_BUFFER, buffer );        checkOpenGLError(__FILE__, __LINE__);
 
 
@@ -275,32 +257,40 @@ void pushObjectToBufferData(
     fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,verticeCount,numberOfVertices);
     fprintf(stderr,GREEN "Pushing %u vertices (%u bytes) and %u normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,numberOfVertices/sizeof(float),numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
 
+
   int generateNewBuffer=1;
   if (generateNewBuffer)
    {
-    glBufferData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals  + numberOfColors + numberOfTextureCoords ,NULL, GL_STREAM_DRAW ); checkOpenGLError(__FILE__, __LINE__);
+    glBufferData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals  + numberOfColors + numberOfTextureCoords ,NULL, GL_STREAM_DRAW );   checkOpenGLError(__FILE__, __LINE__);
 
-    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );                  checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                         , numberOfNormals  , normals );                   checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );                              checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                         , numberOfNormals  , normals );                             checkOpenGLError(__FILE__, __LINE__);
 
     if ( (colors!=0) && (numberOfColors!=0) )
     {
-     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals , numberOfColors , colors );                     checkOpenGLError(__FILE__, __LINE__);
+     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals , numberOfColors , colors );                                     checkOpenGLError(__FILE__, __LINE__);
     }
     if ( (textureCoords!=0) && (numberOfTextureCoords!=0) )
     {
-     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals + numberOfColors, numberOfTextureCoords , textureCoords ); checkOpenGLError(__FILE__, __LINE__);
+     glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals + numberOfColors, numberOfTextureCoords , textureCoords );       checkOpenGLError(__FILE__, __LINE__);
     }
    }
 
+	//modelViewProjectionMatrixLocation = glGetUniformLocation(program, "MVP");                                                              checkOpenGLError(__FILE__, __LINE__);
+	//modelViewMatrixLocation = glGetUniformLocation(program, "MV");                                                                         checkOpenGLError(__FILE__, __LINE__);
 
-    vPosition = glGetAttribLocation( program, "vPosition" );                                   checkOpenGLError(__FILE__, __LINE__);
-    glEnableVertexAttribArray( vPosition );                                                    checkOpenGLError(__FILE__, __LINE__);
-    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );             checkOpenGLError(__FILE__, __LINE__);
 
-     vNormal = glGetAttribLocation( program, "vNormal" );                                      checkOpenGLError(__FILE__, __LINE__);
-     glEnableVertexAttribArray( vNormal );                                                     checkOpenGLError(__FILE__, __LINE__);
-     glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) ); checkOpenGLError(__FILE__, __LINE__);
+
+
+
+
+    vPosition = glGetAttribLocation( program, "vPosition" );                                                                               checkOpenGLError(__FILE__, __LINE__);
+    glEnableVertexAttribArray( vPosition );                                                                                                checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );                                                         checkOpenGLError(__FILE__, __LINE__);
+
+    vNormal = glGetAttribLocation( program, "vNormal" );                                                                                   checkOpenGLError(__FILE__, __LINE__);
+    glEnableVertexAttribArray( vNormal );                                                                                                  checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) );                                            checkOpenGLError(__FILE__, __LINE__);
 
 
     if ( (colors!=0) && (numberOfColors!=0) )

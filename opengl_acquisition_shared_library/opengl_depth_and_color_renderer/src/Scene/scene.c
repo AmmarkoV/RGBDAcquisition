@@ -270,7 +270,7 @@ int initScene(char * confFile)
   resetRendererOptions();
 
   //Making enough space for a "handfull" of objects , this has to be allocated before creating the virtual stream to accomodate the 3D models
-  modelStorage = allocateModelList(128);
+  modelStorage = allocateModelList(256);
 
   scene = createVirtualStream(confFile,modelStorage);
   fprintf(stderr,"createVirtualStream returned \n");
@@ -447,6 +447,52 @@ int doAllEventTriggers(unsigned int timestampToUse)
  return 1;
 }
 
+
+
+
+int drawAllConnectors(struct VirtualStream * scene,unsigned int timestampToUse, float scaleX, float scaleY, float scaleZ)
+{
+  //Draw all connectors
+  float posStackA[7]={0};
+  float posStackB[7]={0};
+  float * pos1 = (float*) &posStackA;
+  float * pos2 = (float*) &posStackB;
+
+  unsigned int i=0;
+  for (i=0; i<scene->numberOfConnectors; i++)
+  {
+    if (
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,0,&scaleX,&scaleY,&scaleZ) ) &&
+        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,0,&scaleX,&scaleY,&scaleZ) )
+        )
+       {
+        /*
+        fprintf(stderr,"Draw drawConnector %u( Object %u ( %f %f %f ) to Object %u ( %f %f %f )  )\n",i,
+                       scene->connector[i].objID_A , pos1[0],pos1[1],pos1[2],
+                       scene->connector[i].objID_B , pos2[0],pos2[1],pos2[2]);*/
+        float scale = (float) scene->connector[i].scale;
+
+        drawConnector(pos1,
+                      pos2,
+                      &scale ,
+                      &scene->connector[i].R ,
+                      &scene->connector[i].G ,
+                      &scene->connector[i].B ,
+                      &scene->connector[i].Transparency );
+       } else
+       {
+         fprintf(stderr,YELLOW "Could not determine position of objects for connector %u\n" NORMAL,i);
+       }
+  }
+
+ return 1;
+}
+
+
+
+
+
+
 int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * scene)
 {
  if (scene==0) { return 0; }
@@ -599,35 +645,7 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
 
 
 
-  //Draw all connectors
-  float * pos1 = (float*) &posStackA;
-  float * pos2 = (float*) &posStackB;
-
-  for (i=0; i<scene->numberOfConnectors; i++)
-  {
-    if (
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,0,&scaleX,&scaleY,&scaleZ) ) &&
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,0,&scaleX,&scaleY,&scaleZ) )
-        )
-       {
-        /*
-        fprintf(stderr,"Draw drawConnector %u( Object %u ( %f %f %f ) to Object %u ( %f %f %f )  )\n",i,
-                       scene->connector[i].objID_A , pos1[0],pos1[1],pos1[2],
-                       scene->connector[i].objID_B , pos2[0],pos2[1],pos2[2]);*/
-        float scale = (float) scene->connector[i].scale;
-
-        drawConnector(pos1,
-                      pos2,
-                      &scale ,
-                      &scene->connector[i].R ,
-                      &scene->connector[i].G ,
-                      &scene->connector[i].B ,
-                      &scene->connector[i].Transparency );
-       } else
-       {
-         fprintf(stderr,YELLOW "Could not determine position of objects for connector %u\n" NORMAL,i);
-       }
-  }
+    drawAllConnectors(scene , timestampToUse , scaleX, scaleY, scaleZ);
 
 
   return 1;

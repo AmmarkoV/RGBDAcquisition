@@ -22,7 +22,7 @@ struct rendererConfiguration rendererOptions={0};
 int resetRendererOptions()
 {
   rendererOptions.doCulling  = 1;
-  rendererOptions.useShaders = 0;
+  //rendererOptions.useShaders = 0;
   return 1;
 }
 
@@ -102,7 +102,7 @@ int renderOGL(
                unsigned int * indices , unsigned int numberOfIndices
              )
 {
-
+  fprintf(stderr,"renderOGL => rendererOptions.useShaders=%u",rendererOptions.useShaders);
   switch (rendererOptions.useShaders)
   {
     case 0 :

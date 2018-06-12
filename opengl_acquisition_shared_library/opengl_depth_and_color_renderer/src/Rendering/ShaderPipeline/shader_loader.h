@@ -32,6 +32,12 @@ struct shaderObject
 
 
 
+int useShader(struct shaderObject * shader);
+
+
+
+
+
 /**
 * @brief Load a pair of vertex and fragment shaders and populate a shader structure
 * @ingroup OGLShaders
