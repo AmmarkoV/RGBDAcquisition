@@ -9,6 +9,17 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 
+#include "glx3.h"
+
+#include "../Scene/scene.h"
+
+GLboolean  doubleBufferGLX3 = GL_TRUE;
+
+Display   *display;
+Window     win;
+GLXContext ctx = 0;
+Colormap cmap;
+
 #define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
 #define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
@@ -53,14 +64,14 @@ static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
     return 0;
 }
 
-int start_glx3_stuffB(int argc, char* argv[])
+int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 {
-  Display *display = XOpenDisplay(NULL);
+  display = XOpenDisplay(NULL);
 
   if (!display)
   {
     printf("Failed to open X display\n");
-    exit(1);
+    return 0;
   }
 
   // Get a matching FB config
@@ -89,7 +100,7 @@ int start_glx3_stuffB(int argc, char* argv[])
        ( ( glx_major == 1 ) && ( glx_minor < 3 ) ) || ( glx_major < 1 ) )
   {
     printf("Invalid GLX version");
-    exit(1);
+    return 0;
   }
 
   printf( "Getting matching framebuffer configs\n" );
@@ -98,7 +109,7 @@ int start_glx3_stuffB(int argc, char* argv[])
   if (!fbc)
   {
     printf( "Failed to retrieve a framebuffer config\n" );
-    exit(1);
+    return 0;
   }
   printf( "Found %d matching FB configs.\n", fbcount );
 
@@ -139,29 +150,29 @@ int start_glx3_stuffB(int argc, char* argv[])
 
   printf( "Creating colormap\n" );
   XSetWindowAttributes swa;
-  Colormap cmap;
   swa.colormap = cmap = XCreateColormap( display,
                                          RootWindow( display, vi->screen ),
                                          vi->visual, AllocNone );
   swa.background_pixmap = None ;
   swa.border_pixel      = 0;
-  swa.event_mask        = StructureNotifyMask;
+  //swa.event_mask        = StructureNotifyMask;
+  swa.event_mask        =  KeyPressMask    | ExposureMask  | ButtonPressMask | StructureNotifyMask;
 
   printf( "Creating window\n" );
-  Window win = XCreateWindow( display, RootWindow( display, vi->screen ),
-                              0, 0, 640 /*Width*/, 480/*Height*/, 0, vi->depth, InputOutput,
+  win = XCreateWindow( display, RootWindow( display, vi->screen ),
+                              0, 0, WIDTH /*Width*/, HEIGHT/*Height*/, 0, vi->depth, InputOutput,
                               vi->visual,
                               CWBorderPixel|CWColormap|CWEventMask, &swa );
   if ( !win )
   {
     printf( "Failed to create window.\n" );
-    exit(1);
+    return 0;
   }
 
   // Done with the visual info data
   XFree( vi );
 
-  XStoreName( display, win, "GL 3.0 Window" );
+  XStoreName( display, win, "OpenGL3.x+ Control Window" );
 
   printf( "Mapping window\n" );
   XMapWindow( display, win );
@@ -176,7 +187,6 @@ int start_glx3_stuffB(int argc, char* argv[])
   glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
            glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
 
-  GLXContext ctx = 0;
 
   // Install an X error handler so the application won't exit if GL 3.0
   // context allocation fails.
@@ -246,7 +256,7 @@ int start_glx3_stuffB(int argc, char* argv[])
   if ( ctxErrorOccurred || !ctx )
   {
     printf( "Failed to create an OpenGL context\n" );
-    exit(1);
+    return 0;
   }
 
   // Verifying that context is a direct context
@@ -262,6 +272,8 @@ int start_glx3_stuffB(int argc, char* argv[])
   printf( "Making context current\n" );
   glXMakeCurrent( display, win, ctx );
 
+
+  /*
   glClearColor( 0, 0.5, 1, 1 );
   glClear( GL_COLOR_BUFFER_BIT );
   glXSwapBuffers ( display, win );
@@ -272,14 +284,92 @@ int start_glx3_stuffB(int argc, char* argv[])
   glClear ( GL_COLOR_BUFFER_BIT );
   glXSwapBuffers ( display, win );
 
-  sleep( 1 );
+  sleep( 1 );*/
 
+  return 1;
+}
+
+int stop_glx3_stuff()
+{
   glXMakeCurrent( display, 0, 0 );
   glXDestroyContext( display, ctx );
 
   XDestroyWindow( display, win );
   XFreeColormap( display, cmap );
   XCloseDisplay( display );
-
-  return 0;
+  return 1;
 }
+
+
+
+
+
+
+
+int glx3_endRedraw()
+{
+  if (doubleBufferGLX3) glXSwapBuffers(display, win);/* buffer swap does implicit glFlush */
+  else glFlush();  /* explicit flush for single buffered case */
+  return 1;
+}
+
+
+int glx3_checkEvents()
+{
+  //GLboolean            needRedraw = GL_FALSE, recalcModelView = GL_TRUE;
+  XEvent  event;
+     while(XPending(display))
+     {
+      XNextEvent(display, &event);
+      switch (event.type)
+      {
+        case KeyPress:
+        {
+          KeySym     keysym;
+          XKeyEvent *kevent;
+          char       buffer[1];
+          // It is necessary to convert the keycode to a
+          // keysym before checking if it is an escape */
+          kevent = (XKeyEvent *) &event;
+          if (   (XLookupString((XKeyEvent *)&event,buffer,1,&keysym,NULL) == 1)
+              && (keysym == (KeySym)XK_Escape) )
+            exit(0);
+
+
+          handleUserInput(keysym,1,0,0);
+
+
+          break;
+        }
+        case ButtonRelease:
+        case ButtonPress:
+          switch (event.xbutton.button)
+          {
+            case 1: handleUserInput(1,(event.type==ButtonPress),event.xmotion.x_root,event.xmotion.y_root); break;
+            case 2: handleUserInput(2,(event.type==ButtonPress),event.xmotion.x_root,event.xmotion.y_root); break;
+            case 3: handleUserInput(3,(event.type==ButtonPress),event.xmotion.x_root,event.xmotion.y_root); break;
+          }
+          break;
+        case ConfigureNotify:
+          //glViewport(0, 0, event.xconfigure.width, event.xconfigure.height);
+          fprintf(stderr,"Received window configuration event..\n");
+          windowSizeUpdated(event.xconfigure.width, event.xconfigure.height);
+          /* fall through... */
+        case Expose:
+             #warning "redraws are not handled ?"
+             // needRedraw=GL_TRUE;
+          break;
+      }
+    }; /* loop to compress events */
+
+
+         return 1;
+
+     return 0;
+}
+
+
+
+
+
+

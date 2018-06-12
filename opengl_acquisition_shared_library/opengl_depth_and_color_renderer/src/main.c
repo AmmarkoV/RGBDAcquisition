@@ -59,7 +59,7 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
-unsigned int openGLVersion=2;
+unsigned int openGLVersion=3;
 unsigned int openGLGetComplaintsLeft=10;
 
 #define SCALE_REAL_DEPTH_OUTPUT 1

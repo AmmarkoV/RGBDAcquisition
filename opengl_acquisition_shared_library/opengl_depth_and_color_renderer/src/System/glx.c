@@ -22,7 +22,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int openGLVersion,int viewWindow,int ar
 
     case 3:
     case 4:
-
+      return start_glx3_stuff(WIDTH,HEIGHT,viewWindow,argc,argv);
     break;
   };
   return 0;
@@ -41,7 +41,7 @@ int glx_endRedraw(int openGLVersion)
 
     case 3:
     case 4:
-
+      return glx3_endRedraw();
     break;
   };
   return 1;
@@ -59,7 +59,7 @@ int glx_checkEvents(int openGLVersion)
 
     case 3:
     case 4:
-
+      return glx3_checkEvents();
     break;
   };
      return 0;

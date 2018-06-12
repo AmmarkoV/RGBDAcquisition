@@ -132,7 +132,7 @@ int start_glx2_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
                       InputOutput,
                       vi->visual,
                       CWBorderPixel | CWColormap | CWEventMask, &swa);
-       XSetStandardProperties(dpy, win, "OpenGL Control Window", "main", None, argv, argc, NULL);
+       XSetStandardProperties(dpy, win, "OpenGL2.x Control Window", "main", None, argv, argc, NULL);
 
        if (debugMessages) { fprintf(stderr,"(6) bind the rendering context to the window \n"); }
        /*** (6) bind the rendering context to the window ***/
