@@ -191,6 +191,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="System/glx.h" />
+		<Unit filename="System/glx2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="System/glx2.h" />
+		<Unit filename="System/glx3.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="System/glx3.h" />
 		<Unit filename="TextureLoader/texture_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

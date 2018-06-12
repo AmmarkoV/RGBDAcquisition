@@ -1,5 +1,5 @@
 //From : https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
-//Compile using :  gcc -o gl3 glx3.cpp -lGL -lX11
+//Compile using :  gcc -o gl3 glx3.c -lGL -lX11
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
