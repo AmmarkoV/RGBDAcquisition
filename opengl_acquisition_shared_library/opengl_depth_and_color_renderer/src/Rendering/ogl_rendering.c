@@ -102,7 +102,7 @@ int renderOGL(
                unsigned int * indices , unsigned int numberOfIndices
              )
 {
-  fprintf(stderr,"renderOGL => rendererOptions.useShaders=%u",rendererOptions.useShaders);
+
   switch (rendererOptions.useShaders)
   {
     case 0 :
@@ -121,6 +121,9 @@ int renderOGL(
     break;
 
     case 1 :
+      fprintf(stderr,"shader draw is under construction please deactivate shaders from CMake..\n");
+      fprintf(stderr,"renderOGL => rendererOptions.useShaders=%u\n",rendererOptions.useShaders);
+      useShader(rendererOptions.loadedShader);
       doOGLShaderDrawCalllist(
                               projectionMatrix ,
                               viewMatrix ,

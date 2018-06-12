@@ -79,6 +79,9 @@ GLuint      bufferSkyboxVao=0;
 
 
 
+//Just to make codeblocks display the function without the grayout
+//#define USE_GLEW 1
+
 
 
 int startOGLShaderPipeline(struct rendererConfiguration * config)
@@ -115,16 +118,6 @@ int startOGLShaderPipeline(struct rendererConfiguration * config)
      }
 
 
-    return 1;
-#else
-    return 0;
-#endif
-}
-
-
-
-int startShaderOGLRendering(struct rendererConfiguration * config)
-{
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error while initializing scene\n"); }
   glEnable(GL_DEPTH_TEST); /* enable depth buffering */
@@ -193,8 +186,19 @@ int startShaderOGLRendering(struct rendererConfiguration * config)
    glEnable(GL_CULL_FACE);
     if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error glEnable(GL_CULL_FACE); \n"); }
   }
- return 1;
+
+
+
+
+
+
+    return 1;
+#else
+    return 0;
+#endif
 }
+
+
 
 
 
@@ -225,9 +229,6 @@ void doOGLShaderBoneDrawCalllist( float * pos , unsigned int * parentNode ,  uns
 
 
 
-//Just to make codeblocks display the function without the grayout
-//#define USE_GLEW 1
-
 
 void doOGLShaderDrawCalllist(
                               float * projectionMatrix ,
@@ -236,18 +237,16 @@ void doOGLShaderDrawCalllist(
                               float * mvpMatrix ,
                               //-----------------------------------------------------
                               float * vertices ,       unsigned int numberOfVertices ,
-                              float * normals ,         unsigned int numberOfNormals ,
+                              float * normals ,        unsigned int numberOfNormals ,
                               float * textureCoords ,  unsigned int numberOfTextureCoords ,
                               float * colors ,         unsigned int numberOfColors ,
                               unsigned int * indices , unsigned int numberOfIndices
                              )
 {
   fprintf(stderr,"doOGLShaderDrawCalllist\n");
-// uniform mat4 MVP;
-//uniform mat4 V;
-//uniform mat4 M;
-#if USE_GLEW
 
+
+#if USE_GLEW
     GLuint buffer=0;
     glBindBuffer( GL_ARRAY_BUFFER, buffer );        checkOpenGLError(__FILE__, __LINE__);
 
@@ -264,7 +263,7 @@ void doOGLShaderDrawCalllist(
     glBufferData( GL_ARRAY_BUFFER, numberOfVertices + numberOfNormals  + numberOfColors + numberOfTextureCoords ,NULL, GL_STREAM_DRAW );   checkOpenGLError(__FILE__, __LINE__);
 
     glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );                              checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                         , numberOfNormals  , normals );                             checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                       , numberOfNormals  , normals );                               checkOpenGLError(__FILE__, __LINE__);
 
     if ( (colors!=0) && (numberOfColors!=0) )
     {
@@ -278,10 +277,6 @@ void doOGLShaderDrawCalllist(
 
 	//modelViewProjectionMatrixLocation = glGetUniformLocation(program, "MVP");                                                              checkOpenGLError(__FILE__, __LINE__);
 	//modelViewMatrixLocation = glGetUniformLocation(program, "MV");                                                                         checkOpenGLError(__FILE__, __LINE__);
-
-
-
-
 
 
     vPosition = glGetAttribLocation( program, "vPosition" );                                                                               checkOpenGLError(__FILE__, __LINE__);

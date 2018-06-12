@@ -37,6 +37,10 @@ GLuint hardcodedObjlist[TOTAL_POSSIBLE_MODEL_TYPES]={0};
 #define U 0.5
 #define PLANE 108.0
 
+
+#define OLD_WAY_TO_DRAW 0
+
+
 float planeCoords[]={ //X  Y  Z       W
                      //Bottom
                       U*PLANE, 0,  U*PLANE, //1.0,  // top right
@@ -47,6 +51,7 @@ float planeCoords[]={ //X  Y  Z       W
                       U*PLANE, 0,  U*PLANE,//1.0,   // top right
                      -U*PLANE, 0, -U*PLANE //1.0,  // bottom left
                   };
+
 float planeNormals[]={ //X  Y  Z       W
                       //Bottom
                       0.0f, 1.0f , 0.0f ,// 1.0,
@@ -266,6 +271,9 @@ float pyramidTexCoords[]={ //X  Y  Z       W
                      };
 
 
+float sphereCoords[SPHERE_QUALITY*SPHERE_QUALITY*3]={0};
+float sphereNormals[SPHERE_QUALITY*SPHERE_QUALITY*3]={0};
+
 
 
 int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
@@ -297,9 +305,20 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
 
 int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coordLength)
 {
-    #define OLD_WAY_TO_DRAW 0
-
-    #if OLD_WAY_TO_DRAW
+    #if USE_GLEW
+    return  renderOGL(
+                      0,//float * projectionMatrix ,
+                      0,//float * viewMatrix ,
+                      0,//float * modelMatrix ,
+                      0,//float * mvpMatrix ,
+                      //-------------------------------------------------------
+                      coords ,      coordLength ,
+                      normals ,     coordLength ,
+                      0 ,         0,
+                      0 ,         0,
+                      0 ,         0
+                     );
+    #else
     glBegin(GL_TRIANGLES);
       unsigned int i=0,z=0;
       for (i=0; i<coordLength/3; i++)
@@ -314,19 +333,6 @@ int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coord
           z+=3;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
         }
     glEnd();
-    #else
-    return  renderOGL(
-                      0,//float * projectionMatrix ,
-                      0,//float * viewMatrix ,
-                      0,//float * modelMatrix ,
-                      0,//float * mvpMatrix ,
-                      //-------------------------------------------------------
-                      coords ,      coordLength ,
-                      normals ,     coordLength ,
-                      0 ,         0,
-                      0 ,         0,
-                      0 ,         0
-                     );
     #endif
 
     return 1;
@@ -395,6 +401,43 @@ void drawSphere(unsigned int quality)
 //    double r=1.0;
     int lats=quality;
     int longs=quality;
+  //---------------
+    int i, j;
+    for(i = 0; i <= lats; i++)
+    {
+       double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
+       double z0  = sin(lat0);
+       double zr0 =  cos(lat0);
+
+       double lat1 = M_PI * (-0.5 + (double) i / lats);
+       double z1 = sin(lat1);
+       double zr1 = cos(lat1);
+
+       glBegin(GL_QUAD_STRIP);
+       for(j = 0; j <= longs; j++)
+        {
+           double lng = 2 * M_PI * (double) (j - 1) / longs;
+           double x = cos(lng);
+           double y = sin(lng);
+
+           glNormal3f(x * zr0, y * zr0, z0);
+           glVertex3f(x * zr0, y * zr0, z0);
+           glNormal3f(x * zr1, y * zr1, z1);
+           glVertex3f(x * zr1, y * zr1, z1);
+        }
+       glEnd();
+   }
+}
+
+
+
+void initializeSphere()
+{
+  fprintf(stderr,"TODO : initializeSphere not implemented because it has quads instead of triangles..\n");
+  return;
+//    double r=1.0;
+    int lats=SPHERE_QUALITY;
+    int longs=SPHERE_QUALITY;
   //---------------
     int i, j;
     for(i = 0; i <= lats; i++)
@@ -586,7 +629,12 @@ unsigned int drawHardcodedModelRaw(unsigned int modelType)
 
 unsigned int drawHardcodedModel(unsigned int modelType)
 {
-    #if DISABLE_GL_CALL_LIST
+   //
+   #if USE_GLEW
+   fprintf(stderr,"shader mode is under construction please not that things might be invisible.. | drawHardcodedModel(%u)\n",modelType);
+     return drawHardcodedModelRaw(modelType);
+   #else
+   #if DISABLE_GL_CALL_LIST
       drawHardcodedModelRaw(modelType);
     #else
       if ( modelType >= TOTAL_POSSIBLE_MODEL_TYPES )
@@ -597,8 +645,9 @@ unsigned int drawHardcodedModel(unsigned int modelType)
 
       if (hardcodedObjlist[modelType]!=0)
         { glCallList(hardcodedObjlist[modelType]); }
+      return 1;
     #endif // DISABLE_GL_CALL_LIST
-  return 1;
+   #endif // OLD_WAY_TO_DRAW
 }
 
 
@@ -633,6 +682,8 @@ int initializeHardcodedCallLists()
   fprintf(stderr,RED "RED   = X \n" NORMAL);
   fprintf(stderr,GREEN "GREEN = Y \n" NORMAL);
   fprintf(stderr,BLUE "BLUE  = Z \n" NORMAL);
+
+  initializeSphere();
 
   unsigned int i=0;
   for (i=0; i<TOTAL_POSSIBLE_MODEL_TYPES; i++)
