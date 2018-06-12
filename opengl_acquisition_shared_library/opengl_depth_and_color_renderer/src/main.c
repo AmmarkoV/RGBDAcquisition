@@ -59,6 +59,7 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
+unsigned int openGLVersion=2;
 unsigned int openGLGetComplaintsLeft=10;
 
 #define SCALE_REAL_DEPTH_OUTPUT 1
@@ -305,7 +306,7 @@ void redraw(void)
 {
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error just after receiving a redraw command\n"); }
     renderScene();
-    glx_endRedraw();
+  glx_endRedraw(openGLVersion);
 }
 
 
@@ -365,7 +366,7 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
 
   char ** testP=0;
   fprintf(stderr,"trying to start glx code with a window request ( %ux%u , viewWindow=%u ).. ",width,height,viewWindow);
-   if ( !start_glx_stuff(width,height,viewWindow,0,testP) )
+   if ( !start_glx_stuff(width,height,openGLVersion,viewWindow,0,testP) )
    {
      return 0;
    }
@@ -413,7 +414,7 @@ int snapOGLRendererSandbox(unsigned int framerate)
 {
  ++snapsPerformed;
  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before starting to snapOGLRendererSandbox ( frame %u ) \n",snapsPerformed); }
-    if (glx_checkEvents())
+    if (glx_checkEvents(openGLVersion))
     {
       if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after checking glx_checkEvents()\n"); }
       tickScene(framerate);
@@ -552,7 +553,7 @@ int snapOGLRendererPhotoshootSandbox(
                      angleX, angleY, angleZ , angXVariance , angYVariance , angZVariance );
 
 
-    if (glx_checkEvents())
+    if (glx_checkEvents(openGLVersion))
     {
       renderPhotoshoot(photoConf);
       return 1;

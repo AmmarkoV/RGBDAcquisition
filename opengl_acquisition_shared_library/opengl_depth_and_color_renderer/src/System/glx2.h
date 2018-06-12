@@ -1,10 +1,10 @@
-/** @file glx.h
- *  @brief  X Server bindings to create an OpenGL context and start rendering to a window
+/** @file glx2.h
+ *  @brief  X Server bindings to create an OpenGL 2.x context and start rendering to a window
  *  @author Ammar Qammaz (AmmarkoV)
  */
 
-#ifndef GLX_H_INCLUDED
-#define GLX_H_INCLUDED
+#ifndef GLX2_H_INCLUDED
+#define GLX2_H_INCLUDED
 
 
 /**
@@ -17,7 +17,7 @@
 * @param argv, Pointer to an array of strings from main
 * @retval 1=Success , 0=Failure
 */
-int start_glx_stuff(int WIDTH,int HEIGHT,int openGLVersion,int viewWindow,int argc, char **argv);
+int start_glx2_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv);
 
 
 /**
@@ -25,7 +25,7 @@ int start_glx_stuff(int WIDTH,int HEIGHT,int openGLVersion,int viewWindow,int ar
 * @ingroup X11
 * @retval 1=Success , 0=Failure
 */
-int glx_endRedraw(int openGLVersion);
+int glx2_endRedraw();
 
 
 /**
@@ -33,6 +33,6 @@ int glx_endRedraw(int openGLVersion);
 * @ingroup X11
 * @retval 1=Success , 0=Failure
 */
-int glx_checkEvents(int openGLVersion);
+int glx2_checkEvents();
 
-#endif // GLX_H_INCLUDED
+#endif // GLX2_H_INCLUDED

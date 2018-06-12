@@ -15,15 +15,15 @@ typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXC
 
 // Helper to check for extension string presence.  Adapted from:
 //   http://www.opengl.org/resources/features/OGLextensions/
-static bool isExtensionSupported(const char *extList, const char *extension)
+static int isExtensionSupported(const char *extList, const char *extension)
 {
   const char *start;
   const char *where, *terminator;
-  
+
   /* Extension names should not have spaces. */
   where = strchr(extension, ' ');
   if (where || *extension == '\0')
-    return false;
+    return 0;
 
   /* It takes a bit of care to be fool-proof about parsing the
      OpenGL extensions string. Don't be fooled by sub-strings,
@@ -38,22 +38,22 @@ static bool isExtensionSupported(const char *extList, const char *extension)
 
     if ( where == start || *(where - 1) == ' ' )
       if ( *terminator == ' ' || *terminator == '\0' )
-        return true;
+        return 1;
 
     start = terminator;
   }
 
-  return false;
+  return 0;
 }
 
-static bool ctxErrorOccurred = false;
+static int ctxErrorOccurred = 0;
 static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
 {
-    ctxErrorOccurred = true;
+    ctxErrorOccurred = 1;
     return 0;
 }
 
-int main(int argc, char* argv[])
+int start_glx3_stuffB(int argc, char* argv[])
 {
   Display *display = XOpenDisplay(NULL);
 
@@ -83,9 +83,9 @@ int main(int argc, char* argv[])
     };
 
   int glx_major, glx_minor;
- 
+
   // FBConfigs were added in GLX version 1.3.
-  if ( !glXQueryVersion( display, &glx_major, &glx_minor ) || 
+  if ( !glXQueryVersion( display, &glx_major, &glx_minor ) ||
        ( ( glx_major == 1 ) && ( glx_minor < 3 ) ) || ( glx_major < 1 ) )
   {
     printf("Invalid GLX version");
@@ -115,9 +115,9 @@ int main(int argc, char* argv[])
       int samp_buf, samples;
       glXGetFBConfigAttrib( display, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf );
       glXGetFBConfigAttrib( display, fbc[i], GLX_SAMPLES       , &samples  );
-      
+
       printf( "  Matching fbconfig %d, visual ID 0x%2x: SAMPLE_BUFFERS = %d,"
-              " SAMPLES = %d\n", 
+              " SAMPLES = %d\n",
               i, vi -> visualid, samp_buf, samples );
 
       if ( best_fbc < 0 || samp_buf && samples > best_num_samp )
@@ -141,16 +141,16 @@ int main(int argc, char* argv[])
   XSetWindowAttributes swa;
   Colormap cmap;
   swa.colormap = cmap = XCreateColormap( display,
-                                         RootWindow( display, vi->screen ), 
+                                         RootWindow( display, vi->screen ),
                                          vi->visual, AllocNone );
   swa.background_pixmap = None ;
   swa.border_pixel      = 0;
   swa.event_mask        = StructureNotifyMask;
 
   printf( "Creating window\n" );
-  Window win = XCreateWindow( display, RootWindow( display, vi->screen ), 
-                              0, 0, 100, 100, 0, vi->depth, InputOutput, 
-                              vi->visual, 
+  Window win = XCreateWindow( display, RootWindow( display, vi->screen ),
+                              0, 0, 640 /*Width*/, 480/*Height*/, 0, vi->depth, InputOutput,
+                              vi->visual,
                               CWBorderPixel|CWColormap|CWEventMask, &swa );
   if ( !win )
   {
@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
   // Note this error handler is global.  All display connections in all threads
   // of a process use the same error handler, so be sure to guard against other
   // threads issuing X commands while this code is running.
-  ctxErrorOccurred = false;
+  ctxErrorOccurred = 0;
   int (*oldHandler)(Display*, XErrorEvent*) =
       XSetErrorHandler(&ctxErrorHandler);
 
@@ -228,11 +228,11 @@ int main(int argc, char* argv[])
       // GLX_CONTEXT_MINOR_VERSION_ARB = 0
       context_attribs[3] = 0;
 
-      ctxErrorOccurred = false;
+      ctxErrorOccurred = 0;
 
       printf( "Failed to create GL 3.0 context"
               " ... using old-style GLX context\n" );
-      ctx = glXCreateContextAttribsARB( display, bestFbc, 0, 
+      ctx = glXCreateContextAttribsARB( display, bestFbc, 0,
                                         True, context_attribs );
     }
   }

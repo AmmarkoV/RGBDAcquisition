@@ -38,6 +38,10 @@ add_definitions(-DINCLUDE_OPENGL_CODE)
 add_library(OGLRendererSandbox SHARED 
             System/glx.h
             System/glx.c
+            System/glx2.h
+            System/glx2.c
+            System/glx3.h
+            System/glx3.c
             main.c
             OGLRendererSandbox.h
             #3D Models and how to load them   
