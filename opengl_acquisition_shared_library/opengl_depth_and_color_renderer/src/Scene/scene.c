@@ -35,40 +35,13 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 
-
 struct VirtualStream * scene = 0;
-//struct Model ** models=0;
 struct ModelList * modelStorage;
 
 int WIDTH=640;
 int HEIGHT=480;
 
 
-
-
-int useIntrinsicMatrix=0;
-double cameraMatrix[9]={
-                        0.0 , 0.0 , 0.0 ,
-                        0.0 , 0.0 , 0.0 ,
-                        0.0 , 0.0 , 0.0
-                       };
-
-
-double customProjectionMatrix[16]={0};
-
-
-
-/*
-int useCustomModelViewMatrix=0;
-double customModelViewMatrix[16]={
-                                   1.0 , 0.0 , 0.0 , 0.0 ,
-                                   0.0 , 1.0 , 0.0 , 0.0 ,
-                                   0.0 , 0.0 , 1.0 , 0.0 ,
-                                   0.0 , 0.0 , 0.0 , 1.0
-                                 };*/
-
-//double customTranslation[3]={0};
-//double customRodriguezRotation[3]={0};
 
 
 #define USE_LIGHTS 1
@@ -170,6 +143,24 @@ int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * ro
 }
 
 
+int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,double * camera)
+{
+  if (scene==0) { fprintf(stderr,"Cannot sceneSetOpenGLIntrinsicCalibration without an initialized VirtualStream\n"); return 0;}
+
+  scene->useIntrinsicMatrix=1;
+  scene->cameraMatrix[0]=camera[0];
+  scene->cameraMatrix[1]=camera[1];
+  scene->cameraMatrix[2]=camera[2];
+  scene->cameraMatrix[3]=camera[3];
+  scene->cameraMatrix[4]=camera[4];
+  scene->cameraMatrix[5]=camera[5];
+  scene->cameraMatrix[6]=camera[6];
+  scene->cameraMatrix[7]=camera[7];
+  scene->cameraMatrix[8]=camera[8];
+
+  updateProjectionMatrix();
+  return 1;
+}
 
 
 
@@ -181,7 +172,7 @@ int updateProjectionMatrix()
   if (scene==0) { fprintf(stderr,"No Scene declared yet , don't know how to update proj matrix\n"); return 0; }
   if ( scene->emulateProjectionMatrixDeclared)
   {
-     if (useIntrinsicMatrix)
+     if (scene->useIntrinsicMatrix)
      {
        fprintf(stderr,YELLOW "Please note that intrinsics have been passed as an argument but we also have a projection matrix from trajectory parser , we will use the latter\n" NORMAL);
      }
@@ -209,29 +200,29 @@ int updateProjectionMatrix()
     print4x4DMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix );
 
   } else
-  if (useIntrinsicMatrix)
+  if (scene->useIntrinsicMatrix)
   {
    int viewport[4]={0};
 
    fprintf(stderr,"Using intrinsics to build projection matrix\n");
    buildOpenGLProjectionForIntrinsics   (
-                                             customProjectionMatrix  ,
+                                             scene->customProjectionMatrix  ,
                                              viewport ,
-                                             cameraMatrix[0],
-                                             cameraMatrix[4],
+                                             scene->cameraMatrix[0],
+                                             scene->cameraMatrix[4],
                                              0.0,
-                                             cameraMatrix[2],
-                                             cameraMatrix[5],
+                                             scene->cameraMatrix[2],
+                                             scene->cameraMatrix[5],
                                              WIDTH,
                                              HEIGHT,
                                              scene->controls.nearPlane ,
                                              scene->controls.farPlane
                                            );
 
-   print4x4DMatrix("OpenGL Projection Matrix", customProjectionMatrix );
+   print4x4DMatrix("OpenGL Projection Matrix", scene->customProjectionMatrix );
 
    glMatrixMode(GL_PROJECTION);
-   glLoadMatrixd(customProjectionMatrix); // we load a matrix of Doubles
+   glLoadMatrixd(scene->customProjectionMatrix); // we load a matrix of Doubles
    glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
   }
     else

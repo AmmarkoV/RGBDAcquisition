@@ -18,8 +18,8 @@ extern int doCulling;
 
 
 
-extern int useIntrinsicMatrix;
-extern double cameraMatrix[9];
+//extern int useIntrinsicMatrix;
+//extern double cameraMatrix[9];
 
 
 //extern int useCustomModelViewMatrix;
@@ -45,6 +45,7 @@ int sceneIgnoreTime(unsigned int newSettingMode);
 
 int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * rodriguez,double * translation , double scaleToDepthUnit);
 
+int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,double * camera);
 /**
 * @brief Render A Scene
 * @ingroup Scene

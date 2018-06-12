@@ -316,19 +316,7 @@ int setOpenGLNearFarPlanes(double near , double far)
 
 int setOpenGLIntrinsicCalibration(double * camera)
 {
-  useIntrinsicMatrix=1;
-  cameraMatrix[0]=camera[0];
-  cameraMatrix[1]=camera[1];
-  cameraMatrix[2]=camera[2];
-  cameraMatrix[3]=camera[3];
-  cameraMatrix[4]=camera[4];
-  cameraMatrix[5]=camera[5];
-  cameraMatrix[6]=camera[6];
-  cameraMatrix[7]=camera[7];
-  cameraMatrix[8]=camera[8];
-
-  updateProjectionMatrix();
-  return 1;
+  return sceneSetOpenGLIntrinsicCalibration(getLoadedScene(),camera);
 }
 
 

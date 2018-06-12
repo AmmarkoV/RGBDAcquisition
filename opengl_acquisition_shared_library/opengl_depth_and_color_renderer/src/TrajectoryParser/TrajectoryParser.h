@@ -273,6 +273,10 @@ struct VirtualStream
     int modelViewMatrixDeclared;
     double modelViewMatrix[16];
 
+
+    int useCustomProjectionMatrix;
+    double customProjectionMatrix[16];
+
     int useCustomModelViewMatrix;
     double customModelViewMatrix[16];
 
@@ -282,6 +286,9 @@ struct VirtualStream
     int extrinsicsDeclared;
     double extrinsicTranslation[3];
     double extrinsicRodriguezRotation[3];
+
+    int useIntrinsicMatrix;
+    double cameraMatrix[9];
     //--------------------------------------------------------
     //--------------------------------------------------------
     //--------------------------------------------------------
