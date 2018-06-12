@@ -1,18 +1,8 @@
 #include "photoShootingScene.h"
 #include "../Rendering/tiledRenderer.h"
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
-
-
-
-
-
-
-
-
 
 
 

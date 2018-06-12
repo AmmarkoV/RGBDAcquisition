@@ -52,7 +52,7 @@
 const GLfloat defaultAmbient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLfloat defaultDiffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
 const GLfloat defaultSpecular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
-const GLfloat defaultShininess[] = { 5.0f };
+const GLfloat defaultShininess[]  = { 5.0f };
 
 
 

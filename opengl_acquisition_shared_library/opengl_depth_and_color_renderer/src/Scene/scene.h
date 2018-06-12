@@ -12,23 +12,6 @@
 extern int WIDTH;
 extern int HEIGHT;
 
-extern int doCulling;
-
-//extern float depthUnit;
-
-
-
-//extern int useIntrinsicMatrix;
-//extern double cameraMatrix[9];
-
-
-//extern int useCustomModelViewMatrix;
-//extern double customModelViewMatrix[16];
-//extern double customTranslation[3];
-//extern double customRodriguezRotation[3];
-
-
-
 struct VirtualStream *  getLoadedScene();
 struct ModelList *  getLoadedModelStorage();
 
