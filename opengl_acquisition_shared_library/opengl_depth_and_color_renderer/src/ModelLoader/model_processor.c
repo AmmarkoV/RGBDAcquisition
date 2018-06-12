@@ -19,7 +19,7 @@ void compressTRIModelToJointOnly(struct TRI_Model * triModelOUT , struct TRI_Mod
 
        //We want to only keep the vertices in the list so we will make a copy of the vertices and replace buffers one by one..!
 
-       float * compressedNormals = (float *) malloc (sizeof(float) * 3 *  outputNumberOfJoints * 3 /*We keep 3 copies of each vertice to make triangles..! */);
+       float * compressedNormals  = (float *) malloc (sizeof(float) * 3 *  outputNumberOfJoints * 3 /*We keep 3 copies of each vertice to make triangles..! */);
        float * compressedVertices = (float *) malloc (sizeof(float) * 3 *  outputNumberOfJoints * 3 /*We keep 3 copies of each vertice to make triangles..! */);
        unsigned int * compressedIndices = (unsigned int *) malloc (sizeof(unsigned int) * outputNumberOfJoints * 3 /*We keep 3 copies of each vertice to make triangles..! */);
 

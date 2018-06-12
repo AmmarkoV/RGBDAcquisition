@@ -63,7 +63,6 @@ void printOpenGLError(int errorCode)
   };
 }
 
-
 int checkOpenGLError(char * file , int  line)
 {
   int err=glGetError();
@@ -76,7 +75,6 @@ int checkOpenGLError(char * file , int  line)
     }
  return 0;
 }
-
 
 char * loadFileToMem(char * filename,unsigned long * file_length)
 {
@@ -114,11 +112,7 @@ char * loadFileToMem(char * filename,unsigned long * file_length)
   return buffer;
 }
 
-
 float RGB2OGL(unsigned int colr)
 {
   return (float) colr/255;
 }
-
-
-

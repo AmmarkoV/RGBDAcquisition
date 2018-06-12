@@ -34,14 +34,11 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
-
 struct VirtualStream * scene = 0;
 struct ModelList * modelStorage;
 
 int WIDTH=640;
 int HEIGHT=480;
-
-
 
 
 #define USE_LIGHTS 1
@@ -54,8 +51,6 @@ const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
 const GLfloat mat_specular[]   = { 0.1f, 0.1f, 0.1f, 1.0f };
 const GLfloat mat_shininess[]  = { 5.0f };
-
-
 
 struct VirtualStream *  getLoadedScene()
 {
@@ -96,7 +91,6 @@ int sceneSeekTime(unsigned int seekTime)
   return 1;
 }
 
-
 int sceneIgnoreTime(unsigned int newSettingMode)
 {
   if (scene==0) { return 0; }
@@ -106,8 +100,6 @@ int sceneIgnoreTime(unsigned int newSettingMode)
   return 1;
 }
 
-
-
 int sceneSwitchKeyboardControl(int newVal)
 {
   if (scene!=0)
@@ -116,9 +108,6 @@ int sceneSwitchKeyboardControl(int newVal)
   }
  return 1;
 }
-
-
-
 
 int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * rodriguez,double * translation , double scaleToDepthUnit)
 {
@@ -142,7 +131,6 @@ int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * ro
   return 1;
 }
 
-
 int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,double * camera)
 {
   if (scene==0) { fprintf(stderr,"Cannot sceneSetOpenGLIntrinsicCalibration without an initialized VirtualStream\n"); return 0;}
@@ -161,10 +149,6 @@ int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,double * cam
   updateProjectionMatrix();
   return 1;
 }
-
-
-
-
 
 int updateProjectionMatrix()
 {
@@ -250,8 +234,6 @@ int updateProjectionMatrix()
   return 1;
 }
 
-
-
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 {
    fprintf(stderr,"Window size changed to %u x %u\n",newWidth,newHeight);
@@ -260,7 +242,6 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
    updateProjectionMatrix();
    return 1;
 }
-
 
 int initScene(char * confFile)
 {
@@ -293,7 +274,6 @@ int initScene(char * confFile)
   return 1;
 }
 
-
 int closeScene()
 {
   stopOGLRendering();
@@ -312,8 +292,6 @@ int closeScene()
 
   return 1;
 }
-
-
 
 int tickScene(unsigned int framerate)
 {
@@ -363,8 +341,6 @@ int getModelAtScreenCoordinates(unsigned int x , unsigned int y)
   return 0;
 }
 
-
-
 int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
 {
       int viewport[4];
@@ -390,7 +366,6 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
       }
   return 1;
 }
-
 
 unsigned int *  getObject2DBoundingBoxList(unsigned int * bboxItemsSize)
 {
@@ -447,9 +422,6 @@ int doAllEventTriggers(unsigned int timestampToUse)
  return 1;
 }
 
-
-
-
 int drawAllConnectors(struct VirtualStream * scene,unsigned int timestampToUse, float scaleX, float scaleY, float scaleZ)
 {
   //Draw all connectors
@@ -488,11 +460,6 @@ int drawAllConnectors(struct VirtualStream * scene,unsigned int timestampToUse, 
  return 1;
 }
 
-
-
-
-
-
 int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * scene)
 {
  if (scene==0) { return 0; }
@@ -520,6 +487,7 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
   doAllEventTriggers(timestampToUse);
 
 
+  //This is actually the only visible console output..
   if (scene->ticks%10==0)
   {
     fprintf(stderr,"\r%0.2f FPS - Playback  %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",
@@ -530,6 +498,7 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
             scene->rate
             );
   }
+  //---------------------------------------------------
 
   int enableTransformedRendering=1;
 
@@ -651,10 +620,6 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
   return 1;
 }
 
-
-
-
-
 int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
 {
  int result = 0;
@@ -720,10 +685,6 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
   return result;
 }
 
-
-
-
-
 int renderScene()
 {
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error before calling renderScene\n"); }
@@ -741,8 +702,6 @@ int renderScene()
   if (checkOpenGLError(__FILE__, __LINE__))
     { fprintf(stderr,RED "OpenGL error after done drawing all objects\n" NORMAL ); }
 
-
-
   //---------------------------------------------------------------
   //------------------- Calculate Framerate -----------------------
   //---------------------------------------------------------------
@@ -757,6 +716,3 @@ int renderScene()
 
  return 1;
 }
-
-
-

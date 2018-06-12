@@ -17,9 +17,7 @@
  #warning "NOT USING CODECS LIBRARY MEANS NO TEXTURES LOADED"
 #endif // USE_CODECS_LIBRARY
 
-
 // TODO HERE : CHECK FOR DUPLICATE TEXTURES , ETC ...
-
 
 GLuint loadTexture(int type,char * directory ,char *fname)
 {
@@ -66,11 +64,3 @@ GLuint loadTexture(int type,char * directory ,char *fname)
     fprintf(stderr,"Survived and made texture %u ",tex);
 	return tex;
 }
-
-
-
-
-
-
-
-

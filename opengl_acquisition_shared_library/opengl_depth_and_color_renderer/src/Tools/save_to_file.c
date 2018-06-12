@@ -16,8 +16,6 @@ unsigned int simplePow(unsigned int base,unsigned int exp)
     return retres;
 }
 
-
-
 int _ogl_swapEndiannessPNM(void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {
   unsigned char * traverser=(unsigned char * ) pixels;
@@ -42,9 +40,6 @@ int _ogl_swapEndiannessPNM(void * pixels , unsigned int width , unsigned int hei
 
  return 1;
 }
-
-
-
 
 int saveRawImageToFileOGLR(char * filename,void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
 {

@@ -260,5 +260,3 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
     }
   return 1;
 }
-
-

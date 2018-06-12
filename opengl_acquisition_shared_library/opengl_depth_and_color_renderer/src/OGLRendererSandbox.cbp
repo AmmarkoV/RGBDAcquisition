@@ -187,6 +187,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Scene/scene.h" />
+		<Unit filename="System/glx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="System/glx.h" />
 		<Unit filename="TextureLoader/texture_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

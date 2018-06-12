@@ -14,8 +14,6 @@
 #include "../Scene/scene.h"
 #include "../Tools/tools.h"
 
-
-
 int tiledRenderer_get3DCenterForTile(struct tiledRendererConfiguration * trConf , unsigned int column,unsigned int row ,
                                      float * x3D , float * y3D , float * z3D ,
                                      float * angleX , float * angleY , float * angleZ)
@@ -30,7 +28,6 @@ int tiledRenderer_get3DCenterForTile(struct tiledRendererConfiguration * trConf 
 
   return 1;
 }
-
 
 int tiledRenderer_get2DCenter(void * trConf ,
                               unsigned int column, unsigned int row ,
@@ -60,11 +57,6 @@ int tiledRenderer_get2DCenter(void * trConf ,
       return 0;
 }
 
-
-
-
-
-
 void setupTiledRendererOGL(float backgroundR,float backgroundG,float backgroundB)
 {
   glClearColor(backgroundR,backgroundG,backgroundB,0.0);
@@ -80,9 +72,6 @@ void setupTiledRendererOGL(float backgroundR,float backgroundG,float backgroundB
   glTranslatef(0,0,0);
 
 }
-
-
-
 
 int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
 {
@@ -122,7 +111,6 @@ int tiledRenderer_CalculateLoops( struct tiledRendererConfiguration * trConf)
 
  return 1;
 }
-
 
 int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
 {
@@ -260,8 +248,3 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
    glPopMatrix();
   return 1 ;
 }
-
-
-
-
-
