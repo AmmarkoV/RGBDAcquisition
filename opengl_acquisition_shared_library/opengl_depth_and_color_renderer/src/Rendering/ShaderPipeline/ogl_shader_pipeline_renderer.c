@@ -88,7 +88,13 @@ int startOGLShaderPipeline(struct rendererConfiguration * config)
 {
 #if USE_GLEW
 #warning "Using GLEW"
-  glewInit();
+
+   if (glewInit() != GLEW_OK)
+   {
+		fprintf(stderr, "Failed to initialize GLEW\n");
+	 	return 0;
+   }
+
   fprintf(stderr,"Using GLEW %s \n",glewGetString(GLEW_VERSION));
 
   if (GLEW_VERSION_3_2)

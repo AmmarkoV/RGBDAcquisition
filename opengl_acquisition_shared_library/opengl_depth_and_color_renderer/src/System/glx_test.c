@@ -206,7 +206,8 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 int doDrawing()
 {
-
+   fprintf(stderr," doDrawing \n"); 
+		
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -215,13 +216,14 @@ int doDrawing()
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS); 
 
-	GLuint VertexArrayID;
+	GLuint VertexArrayID=0;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders 
-    struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
-    if (sho==0) { fprintf(stderr,"Could not load..\n"); return 0; }	
+    fprintf(stderr," loadShader \n"); 
+	struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
+    if (sho==0) { fprintf(stderr,"Could not load..\n"); exit(1); }	
     GLuint programID = sho->ProgramObject;
    
  
@@ -238,11 +240,11 @@ int doDrawing()
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
     
-    float MVP[4][4]={0};
+    float MVP[16]={0};
    
 
 	do{
-
+        fprintf(stderr,"."); 
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -251,7 +253,7 @@ int doDrawing()
 
 		// Send our transformation to the currently bound shader, 
 		// in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, MVP);
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -329,6 +331,13 @@ int main(int argc, char **argv)
 
   glx3_endRedraw();
   
+  if (glewInit() != GLEW_OK) 
+   {
+		fprintf(stderr, "Failed to initialize GLEW\n");
+	 	return 1;
+   }
+
+
 
   doDrawing();
 
