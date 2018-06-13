@@ -29,6 +29,43 @@ static const char *fragment_source =
 };
 
 
+char * loadShaderFileToMem(char * filename,unsigned long * file_length)
+{
+  if (filename==0)  { fprintf(stderr,"Could not load shader incorrect filename \n"); return 0; }
+  if (file_length==0)  { fprintf(stderr,"Could not load shader %s , incorrect file length parameter \n",filename); return 0; }
+
+  FILE * pFile;
+  long lSize;
+  char * buffer;
+  size_t result;
+
+  pFile = fopen ( filename , "rb" );
+  if (pFile==0) { fprintf(stderr,"Could not open shader file %s \n",filename); return 0;}
+
+  // obtain file size :
+  fseek (pFile , 0 , SEEK_END);
+  lSize = ftell (pFile);
+  rewind (pFile);
+
+  // allocate memory to contain the whole file:
+  buffer = (char*) malloc ( (sizeof(char)*lSize)+1 );
+  if (buffer == 0) {fprintf(stderr,"Could not allocate %u bytes of memory for shader file %s \n",(unsigned int ) lSize,filename);   fclose (pFile); return 0; }
+
+  // copy the file into the buffer:
+  result = fread (buffer,1,lSize,pFile);
+  if (result != lSize) {fputs ("Reading error",stderr); free(buffer);  fclose (pFile); return 0; }
+
+  /* the whole file is now loaded in the memory buffer. */
+
+  // terminate
+  fclose (pFile);
+
+  buffer[lSize]=0; //Add a null termination for shader usage
+  *file_length = lSize;
+  return buffer;
+}
+
+
 int useShader(struct shaderObject * shader)
 {
   return glUseProgramObjectARB(shader->ProgramObject);
@@ -47,10 +84,10 @@ struct shaderObject * loadShader(char * vertexShaderChar,char * fragmentShaderCh
   sh->vertexShaderObject = glCreateShader(GL_VERTEX_SHADER);
   sh->fragmentShaderObject = glCreateShader(GL_FRAGMENT_SHADER);
 
-  sh->vertMem=loadFileToMem(vertexShaderChar,&sh->vertMemLength);
+  sh->vertMem=loadShaderFileToMem(vertexShaderChar,&sh->vertMemLength);
   if ( (sh->vertMem==0)||(sh->vertMemLength==0)) { fprintf(stderr,"Could not load vertex shader in memory..\n"); }
 
-  sh->fragMem=loadFileToMem(fragmentShaderChar,&sh->fragMemLength);
+  sh->fragMem=loadShaderFileToMem(fragmentShaderChar,&sh->fragMemLength);
   if ( (sh->fragMem==0)||(sh->fragMemLength==0)) { fprintf(stderr,"Could not load fragment shader in memory..\n"); }
 
   fprintf(stderr,"VERTEX SHADER (%lu bytes long) \n\n %s \n",sh->vertMemLength,sh->vertMem);
