@@ -1,4 +1,4 @@
-/** @file glx2.h
+/** @file glx3.h
  *  @brief  X Server bindings to create an OpenGL 3.x+ context and start rendering to a window
  *  @author Ammar Qammaz (AmmarkoV)
  */

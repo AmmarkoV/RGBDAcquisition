@@ -286,6 +286,7 @@ int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 
   sleep( 1 );*/
 
+  printf( "GLX3.0 context ready..\n" );
   return 1;
 }
 
