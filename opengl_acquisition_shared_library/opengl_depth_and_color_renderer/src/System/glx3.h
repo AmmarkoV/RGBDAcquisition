@@ -20,6 +20,8 @@
 int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv);
 
 
+int stop_glx3_stuff();
+
 /**
 * @brief After drawing everything on our OpenGL window this call swaps buffers and outputs
 * @ingroup X11
