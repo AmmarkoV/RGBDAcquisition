@@ -487,6 +487,9 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
   doAllEventTriggers(timestampToUse);
 
 
+
+
+
   //This is actually the only visible console output..
   if (scene->ticks%10==0)
   {
@@ -499,6 +502,17 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
             );
   }
   //---------------------------------------------------
+
+
+/*
+  int viewport[4];
+  float modelview[16];
+  float projection[16];
+  glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
+  glGetFloatv( GL_PROJECTION_MATRIX, projection );
+  glGetIntegerv( GL_VIEWPORT, viewport );
+  print4x4FMatrix("Projection",projection);
+  print4x4FMatrix("ModelView",modelview);*/
 
   int enableTransformedRendering=1;
 

@@ -31,6 +31,19 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add option="-lGL" />
+			<Add option="-lX11" />
+			<Add option="-lGLEW" />
+		</Linker>
+		<Unit filename="../../../../tools/AmMatrix/matrix4x4Tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../Rendering/ShaderPipeline/shader_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/shader_loader.h" />
 		<Unit filename="glx3.c">
 			<Option compilerVar="CC" />
 		</Unit>

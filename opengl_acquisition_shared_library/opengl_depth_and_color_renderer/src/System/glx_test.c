@@ -13,6 +13,8 @@
 
 
 #include "glx3.h"
+
+#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
 #define U 0.5
@@ -97,7 +99,7 @@ float cubeNormals[]={ //X  Y  Z  W
 };
 
 
-static const GLfloat g_vertex_buffer_data[] = { 
+static const GLfloat g_vertex_buffer_data[] = {
 		-1.0f,-1.0f,-1.0f,
 		-1.0f,-1.0f, 1.0f,
 		-1.0f, 1.0f, 1.0f,
@@ -137,7 +139,7 @@ static const GLfloat g_vertex_buffer_data[] = {
 	};
 
 	// One color for each vertex. They were generated randomly.
-	static const GLfloat g_color_buffer_data[] = { 
+	static const GLfloat g_color_buffer_data[] = {
 		0.583f,  0.771f,  0.014f,
 		0.609f,  0.115f,  0.436f,
 		0.327f,  0.483f,  0.844f,
@@ -178,7 +180,7 @@ static const GLfloat g_vertex_buffer_data[] = {
 
 int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coordLength)
 {
-    
+
     glBegin(GL_TRIANGLES);
       unsigned int i=0,z=0;
       for (i=0; i<coordLength/3; i++)
@@ -192,41 +194,56 @@ int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coord
                       glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
           z+=3;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
         }
-    glEnd(); 
+    glEnd();
     return 1;
 }
 
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 {
+    return 0;
 }
 
 int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
+    return 0;
 }
 
 int doDrawing()
 {
-   fprintf(stderr," doDrawing \n"); 
-		
+   fprintf(stderr," doDrawing \n");
+
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
-	glDepthFunc(GL_LESS); 
+	glDepthFunc(GL_LESS);
 
 	GLuint VertexArrayID=0;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	// Create and compile our GLSL program from the shaders 
-    fprintf(stderr," loadShader \n"); 
+	// Create and compile our GLSL program from the shaders
+    fprintf(stderr," loadShader \n");
 	struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
-    if (sho==0) { fprintf(stderr,"Could not load..\n"); exit(1); }	
+    if (sho==0) { fprintf(stderr,"Could not load..\n"); exit(1); }
     GLuint programID = sho->ProgramObject;
-   
- 
+
+    float projectionMatrix[]={ -1.673200,0.000000,0.000000,0.000000,
+                                0.000000,2.222853,0.000000,0.000000,
+                                0.000000,0.000000,1.007874,1.000000,
+                                0.000000,0.000000,-2.007874,0.000000};
+
+    float modelViewMatrix[]={  -10.000000,0.000001,0.000000,0.000000,
+                                 0.000000,0.000000,10.000000,0.000000,
+                                 0.000001,10.000000,-0.000000,0.000000,
+                                 0.192310,0.549760,22.997351,1.000000
+                            };
+
+    float MVP[16];
+
+    multiplyTwo4x4FMatrices(MVP,projectionMatrix,modelViewMatrix);
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
@@ -239,19 +256,18 @@ int doDrawing()
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeNormals), cubeNormals, GL_STATIC_DRAW);
-    
-    float MVP[16]={0};
-   
+
+
 
 	do{
-        fprintf(stderr,"."); 
+        fprintf(stderr,".");
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Use our shader
 		glUseProgram(programID);
 
-		// Send our transformation to the currently bound shader, 
+		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, MVP);
 
@@ -327,11 +343,11 @@ int main(int argc, char **argv)
   //glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
   //glGetFloatv( GL_PROJECTION_MATRIX, projection );
   //glGetIntegerv( GL_VIEWPORT, viewport );
-  glViewport(0,0,WIDTH,HEIGHT);  
+  glViewport(0,0,WIDTH,HEIGHT);
 
   glx3_endRedraw();
-  
-  if (glewInit() != GLEW_OK) 
+
+  if (glewInit() != GLEW_OK)
    {
 		fprintf(stderr, "Failed to initialize GLEW\n");
 	 	return 1;
@@ -349,7 +365,7 @@ int main(int argc, char **argv)
      usleep(100);
      glx3_endRedraw();
    }
-  
+
   stop_glx3_stuff();
  return 0;
 }

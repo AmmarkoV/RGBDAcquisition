@@ -523,6 +523,10 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   transpose4x4MatrixD(modelTransformation);
   glMultMatrixd(modelTransformation);
 
+  //print4x4DMatrix("ModelTransform",modelTransformation);
+  //exit (0);
+
+
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying dimensions \n"); }
 
        // MAGIC NO COLOR VALUE :P MEANS NO COLOR SELECTION
