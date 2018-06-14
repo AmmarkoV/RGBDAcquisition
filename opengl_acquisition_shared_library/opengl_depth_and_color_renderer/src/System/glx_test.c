@@ -227,7 +227,8 @@ int doDrawing()
 
 	// Create and compile our GLSL program from the shaders
     fprintf(stderr," loadShader \n");
-	struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
+	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
+	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
     if (sho==0) { fprintf(stderr,"Could not load..\n"); exit(1); }
     GLuint programID = sho->ProgramObject;
 
@@ -247,17 +248,7 @@ int doDrawing()
     multiplyTwo4x4FMatrices(MVP,projectionMatrix,modelViewMatrix);
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-/*
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeCoords), cubeCoords, GL_STATIC_DRAW);
 
-	GLuint colorbuffer;
-	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeNormals), cubeNormals, GL_STATIC_DRAW);
-*/
 
     float * vertices = cubeCoords;
     float * normals = cubeNormals;
