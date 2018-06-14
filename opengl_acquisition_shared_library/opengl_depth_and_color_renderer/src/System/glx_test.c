@@ -255,19 +255,8 @@ int doDrawing()
     unsigned int numberOfVertices = sizeof(cubeCoords);
     unsigned int numberOfNormals = sizeof(cubeNormals);
 
-    glBufferData( GL_ARRAY_BUFFER, numberOfVertices +  numberOfNormals /* + numberOfColors + numberOfTextureCoords */,NULL, GL_STREAM_DRAW );
 
-    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );
-    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                       , numberOfNormals  , normals );
-
-    GLuint vPosition = glGetAttribLocation( programID, "vPosition" );
-    glEnableVertexAttribArray( vPosition );
-    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );
-
-    GLuint vNormal = glGetAttribLocation( programID, "vNormal" );
-    glEnableVertexAttribArray( vNormal );
-    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) );
-
+   fprintf(stderr,"Ready to start rendering : ");
 
     //GLuint vColor = glGetAttribLocation( programID, "vColor" );
     //glEnableVertexAttribArray( vColor );
@@ -286,36 +275,29 @@ int doDrawing()
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, MVP);
-/*
-		// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
 
-		// 2nd attribute buffer : colors
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glVertexAttribPointer(
-			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-			3,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
-*/
+   fprintf(stderr,"BufferStart");
+		glBufferData( GL_ARRAY_BUFFER, numberOfVertices +  numberOfNormals /* + numberOfColors + numberOfTextureCoords */,NULL, GL_STREAM_DRAW );
+
+        glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );
+        glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                       , numberOfNormals  , normals );
+   fprintf(stderr," ok ");
+
+        GLuint vPosition = glGetAttribLocation( programID, "vPosition" );
+        glEnableVertexAttribArray( vPosition );
+        glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );
+   fprintf(stderr," vPosition ok ");
+
+        GLuint vNormal = glGetAttribLocation( programID, "vNormal" );
+        glEnableVertexAttribArray( vNormal );
+        glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) );
+   fprintf(stderr," vNormal ok ");
+
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, 36*3); // 12*3 indices starting at 0 -> 12 triangles
 
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
+		//glDisableVertexAttribArray(0);
+		//glDisableVertexAttribArray(1);
 
 		// Swap buffers
         glx3_endRedraw();
