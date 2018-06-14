@@ -18,6 +18,7 @@
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
 #define U 0.5
+#define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 float cubeCoords[]=
 {
@@ -246,7 +247,7 @@ int doDrawing()
     multiplyTwo4x4FMatrices(MVP,projectionMatrix,modelViewMatrix);
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-
+/*
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -256,6 +257,30 @@ int doDrawing()
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeNormals), cubeNormals, GL_STATIC_DRAW);
+*/
+
+    float * vertices = cubeCoords;
+    float * normals = cubeNormals;
+    unsigned int numberOfVertices = sizeof(cubeCoords);
+    unsigned int numberOfNormals = sizeof(cubeNormals);
+
+    glBufferData( GL_ARRAY_BUFFER, numberOfVertices +  numberOfNormals /* + numberOfColors + numberOfTextureCoords */,NULL, GL_STREAM_DRAW );
+
+    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );
+    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                       , numberOfNormals  , normals );
+
+    GLuint vPosition = glGetAttribLocation( programID, "vPosition" );
+    glEnableVertexAttribArray( vPosition );
+    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );
+
+    GLuint vNormal = glGetAttribLocation( programID, "vNormal" );
+    glEnableVertexAttribArray( vNormal );
+    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) );
+
+
+    //GLuint vColor = glGetAttribLocation( programID, "vColor" );
+    //glEnableVertexAttribArray( vColor );
+    //glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( numberOfVertices + numberOfNormals ) );
 
 
 
@@ -270,7 +295,7 @@ int doDrawing()
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, MVP);
-
+/*
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -294,7 +319,7 @@ int doDrawing()
 			0,                                // stride
 			(void*)0                          // array buffer offset
 		);
-
+*/
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, 36*3); // 12*3 indices starting at 0 -> 12 triangles
 
@@ -308,8 +333,8 @@ int doDrawing()
 	while( 1 );
 
 	// Cleanup VBO and shader
-	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &colorbuffer);
+	//glDeleteBuffers(1, &vertexbuffer);
+	//glDeleteBuffers(1, &colorbuffer);
 	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &VertexArrayID);
 
