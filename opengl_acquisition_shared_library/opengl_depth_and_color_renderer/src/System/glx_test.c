@@ -293,8 +293,11 @@ int doDrawing()
         glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) );
    fprintf(stderr," vNormal ok ");
 
+
 		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 36*3); // 12*3 indices starting at 0 -> 12 triangles
+		glDrawArrays(GL_TRIANGLES, 0, 12*3); // 12*3 indices starting at 0 -> 12 triangles
+   fprintf(stderr," glDrawArrays ok ");
+
 
 		//glDisableVertexAttribArray(0);
 		//glDisableVertexAttribArray(1);
