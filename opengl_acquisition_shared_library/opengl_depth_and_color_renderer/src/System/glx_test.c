@@ -17,8 +17,17 @@
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
-#define U 0.5
+#define U 3.5
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
+
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+
+
+unsigned int NumVertices=0;
+	GLuint vao=0;
 
 float cubeCoords[]=
 {
@@ -179,6 +188,52 @@ static const GLfloat g_vertex_buffer_data[] = {
 		0.982f,  0.099f,  0.879f
 	};
 
+
+void printOpenGLError(int errorCode)
+{
+  switch (errorCode)
+  {
+    case  GL_NO_ERROR       :
+         fprintf(stderr,"No error has been recorded.");
+        break;
+    case  GL_INVALID_ENUM   :
+         fprintf(stderr,"An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag.\n");
+        break;
+    case  GL_INVALID_VALUE  :
+         fprintf(stderr,"A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag.");
+        break;
+    case  GL_INVALID_OPERATION :
+         fprintf(stderr,"The specified operation is not allowed in the current state. The offending command is ignored and has no other side effect than to set the error flag.");
+        break;
+    case  GL_INVALID_FRAMEBUFFER_OPERATION :
+         fprintf(stderr,"The framebuffer object is not complete. The offending command is ignored and has no other side effect than to set the error flag.");
+        break;
+    case  GL_OUT_OF_MEMORY :
+         fprintf(stderr,"There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded.");
+        break;
+    case  GL_STACK_UNDERFLOW :
+         fprintf(stderr,"An attempt has been made to perform an operation that would cause an internal stack to underflow.");
+        break;
+    case  GL_STACK_OVERFLOW :
+         fprintf(stderr,"An attempt has been made to perform an operation that would cause an internal stack to overflow.");
+     break;
+  };
+}
+
+
+int checkOpenGLError(char * file , int  line)
+{
+  int err=glGetError();
+  if (err !=  GL_NO_ERROR /*0*/ )
+    {
+      fprintf(stderr,RED "OpenGL Error (%u) : %s %u \n ", err , file ,line );
+      printOpenGLError(err);
+      fprintf(stderr,"\n" NORMAL);
+      return 1;
+    }
+ return 0;
+}
+
 int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coordLength)
 {
 
@@ -209,21 +264,87 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
     return 0;
 }
 
+
+
+
+
+
+
+
+
+
+
+GLuint
+pushObjectToBufferData(
+                             GLuint programID  ,
+                             const float * vertices , unsigned int verticesLength ,
+                             const float * normals , unsigned int normalsLength ,
+                             const float * colors , unsigned int colorsLength
+                           )
+{
+    glGenVertexArrays(1, &vao);
+    checkOpenGLError(__FILE__, __LINE__);
+    glBindVertexArray(vao);
+    checkOpenGLError(__FILE__, __LINE__);
+
+
+    // Create and initialize a buffer object on the server side (GPU)
+    GLuint      buffer;
+    glGenBuffers( 1, &buffer );
+    checkOpenGLError(__FILE__, __LINE__);
+    glBindBuffer( GL_ARRAY_BUFFER, buffer );
+
+    NumVertices+=(unsigned int ) verticesLength/(3*sizeof(float));
+    fprintf(stderr,"Will DrawArray(GL_TRIANGLES,0,%u) - %u \n"  ,NumVertices,verticesLength);
+    fprintf(stderr,"Pushing %u vertices (%u bytes) and %u normals (%u bytes) as our object \n"  ,verticesLength/sizeof(float),verticesLength,normalsLength/sizeof(float),normalsLength);
+    glBufferData( GL_ARRAY_BUFFER, verticesLength + normalsLength  + colorsLength  ,NULL, GL_STATIC_DRAW );
+     checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , verticesLength , vertices );
+     checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, verticesLength                         , normalsLength  , normals );
+     checkOpenGLError(__FILE__, __LINE__);
+
+    if ( (colors!=0) && (colorsLength!=0) )
+    {
+     glBufferSubData( GL_ARRAY_BUFFER, verticesLength + normalsLength , colorsLength , colors );
+     checkOpenGLError(__FILE__, __LINE__);
+    }
+
+    GLuint vPosition = glGetAttribLocation( programID, "vPosition" );
+     checkOpenGLError(__FILE__, __LINE__);
+    glEnableVertexAttribArray( vPosition );
+     checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );
+    checkOpenGLError(__FILE__, __LINE__);
+
+    /*
+    GLuint vNormal = glGetAttribLocation( programID, "vNormal" );
+    checkOpenGLError(__FILE__, __LINE__);
+     glEnableVertexAttribArray( vNormal );
+    checkOpenGLError(__FILE__, __LINE__);
+     glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(verticesLength) );
+     checkOpenGLError(__FILE__, __LINE__);*/
+
+
+    if ( (colors!=0) && (colorsLength!=0) )
+    {
+     GLuint vColor = glGetAttribLocation( programID, "vColor" );
+     glEnableVertexAttribArray( vColor );
+     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( verticesLength + normalsLength ) );
+     checkOpenGLError(__FILE__, __LINE__);
+    }
+
+  return buffer;
+}
+
+
+
+
+
 int doDrawing()
 {
    fprintf(stderr," doDrawing \n");
 
-	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-
-	// Enable depth test
-	glEnable(GL_DEPTH_TEST);
-	// Accept fragment if it closer to the camera than the former one
-	glDepthFunc(GL_LESS);
-
-	GLuint VertexArrayID=0;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders
     fprintf(stderr," loadShader \n");
@@ -243,9 +364,14 @@ int doDrawing()
                                  0.192310,0.549760,22.997351,1.000000
                             };
 
-    float MVP[16];
+    float MVP[16]={-1.09,0.00,-1.45,0.00,
+-0.99,2.07,0.75,0.00,
+-0.69,-0.52,0.52,5.64,
+-0.69,-0.51,0.51,5.83
+};
+   transpose4x4Matrix(MVP);
 
-    multiplyTwo4x4FMatrices(MVP,projectionMatrix,modelViewMatrix);
+//    multiplyTwo4x4FMatrices(MVP,projectionMatrix,modelViewMatrix);
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
@@ -254,68 +380,79 @@ int doDrawing()
     float * normals = cubeNormals;
     unsigned int numberOfVertices = sizeof(cubeCoords);
     unsigned int numberOfNormals = sizeof(cubeNormals);
-
-    glBufferData( GL_ARRAY_BUFFER, numberOfVertices +  numberOfNormals /* + numberOfColors + numberOfTextureCoords */,NULL, GL_STREAM_DRAW );
-
-    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );
-    glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                       , numberOfNormals  , normals );
-
-    GLuint vPosition = glGetAttribLocation( programID, "vPosition" );
-    glEnableVertexAttribArray( vPosition );
-    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );
-
-    GLuint vNormal = glGetAttribLocation( programID, "vNormal" );
-    glEnableVertexAttribArray( vNormal );
-    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) );
-
-
-    //GLuint vColor = glGetAttribLocation( programID, "vColor" );
-    //glEnableVertexAttribArray( vColor );
-    //glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( numberOfVertices + numberOfNormals ) );
+    unsigned int wireFrame=0;
 
 
 
-	do{
-        fprintf(stderr,".");
-		// Clear the screen
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Use our shader
 		glUseProgram(programID);
 
+	// Dark blue background
+	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+
+	// Enable depth test
+	glEnable(GL_DEPTH_TEST);
+	// Accept fragment if it closer to the camera than the former one
+	glDepthFunc(GL_LESS);
+
+	GLuint VertexArrayID=0;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+
+
+
+		pushObjectToBufferData(
+                                 programID  ,
+                                 vertices ,  numberOfVertices ,
+                                 normals ,  numberOfNormals ,
+                                 0 , 0
+                              );
+
+
+
+	do{
+
+       glUseProgram(programID);
+       checkOpenGLError(__FILE__, __LINE__);
+
+       glBindVertexArray(vao);
+        checkOpenGLError(__FILE__, __LINE__);
+
+        fprintf(stderr,".");
+		// Clear the screen
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, MVP);
-/*
-		// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
 
-		// 2nd attribute buffer : colors
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glVertexAttribPointer(
-			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-			3,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
-*/
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 36*3); // 12*3 indices starting at 0 -> 12 triangles
 
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
+
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+          glDisable(GL_CULL_FACE);
+
+
+
+
+         if (wireFrame)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+        checkOpenGLError(__FILE__, __LINE__);
+        glDrawArrays( GL_TRIANGLES, 0, NumVertices );
+        checkOpenGLError(__FILE__, __LINE__);
+
+       glPopAttrib();
+       glBindVertexArray(0);
+       checkOpenGLError(__FILE__, __LINE__);
+
+
+
+
+
 
 		// Swap buffers
         glx3_endRedraw();

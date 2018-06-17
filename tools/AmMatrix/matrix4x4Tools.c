@@ -578,6 +578,30 @@ int invert4x4MatrixD(double * result,double * mat)
  return 1;
 }
 
+
+int transpose4x4Matrix(float * mat)
+{
+  if (mat==0) { return 0; }
+  /*       -------  TRANSPOSE ------->
+      0   1   2   3           0  4  8   12
+      4   5   6   7           1  5  9   13
+      8   9   10  11          2  6  10  14
+      12  13  14  15          3  7  11  15   */
+
+  float tmp;
+  tmp = mat[1]; mat[1]=mat[4];  mat[4]=tmp;
+  tmp = mat[2]; mat[2]=mat[8];  mat[8]=tmp;
+  tmp = mat[3]; mat[3]=mat[12]; mat[12]=tmp;
+
+
+  tmp = mat[6]; mat[6]=mat[9]; mat[9]=tmp;
+  tmp = mat[13]; mat[13]=mat[7]; mat[7]=tmp;
+  tmp = mat[14]; mat[14]=mat[11]; mat[11]=tmp;
+
+  return 1;
+}
+
+
 int transpose4x4MatrixD(double * mat)
 {
   if (mat==0) { return 0; }

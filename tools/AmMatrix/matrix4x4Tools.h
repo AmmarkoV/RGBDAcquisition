@@ -218,6 +218,8 @@ double det4x4Matrix(double * mat) ;
 int invert4x4MatrixD(double * result,double * mat) ;
 
 
+int transpose4x4Matrix(float * mat);
+
 /**
 * @brief Transpose an allocated 4x4 matrix to Identity ( diagonal 1 , all else 0 )
 * @ingroup AmMatrix

@@ -2,7 +2,7 @@
 
 
 in  vec3 vPosition;
-in  vec3 vNormal;   
+//in  vec3 vNormal;   
  
 out vec4 color;
 
