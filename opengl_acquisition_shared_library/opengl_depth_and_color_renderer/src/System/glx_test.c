@@ -382,7 +382,6 @@ int doDrawing()
     unsigned int numberOfNormals = sizeof(cubeNormals);
     unsigned int wireFrame=0;
 
-<<<<<<< HEAD
 
 
 
@@ -400,8 +399,6 @@ int doDrawing()
 	GLuint VertexArrayID=0;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
-=======
->>>>>>> e48eafcafd4e8a5e4589c77a99ffec81fe5180fa
 
    fprintf(stderr,"Ready to start rendering : ");
 
@@ -432,7 +429,6 @@ int doDrawing()
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, MVP);
 
-<<<<<<< HEAD
 
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -458,33 +454,7 @@ int doDrawing()
 
 
 
-=======
-   fprintf(stderr,"BufferStart");
-		glBufferData( GL_ARRAY_BUFFER, numberOfVertices +  numberOfNormals /* + numberOfColors + numberOfTextureCoords */,NULL, GL_STREAM_DRAW );
 
-        glBufferSubData( GL_ARRAY_BUFFER, 0                                      , numberOfVertices , vertices );
-        glBufferSubData( GL_ARRAY_BUFFER, numberOfVertices                       , numberOfNormals  , normals );
-   fprintf(stderr," ok ");
-
-        GLuint vPosition = glGetAttribLocation( programID, "vPosition" );
-        glEnableVertexAttribArray( vPosition );
-        glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );
-   fprintf(stderr," vPosition ok ");
-
-        GLuint vNormal = glGetAttribLocation( programID, "vNormal" );
-        glEnableVertexAttribArray( vNormal );
-        glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(numberOfVertices) );
-   fprintf(stderr," vNormal ok ");
-
-
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 12*3); // 12*3 indices starting at 0 -> 12 triangles
-   fprintf(stderr," glDrawArrays ok ");
-
-
-		//glDisableVertexAttribArray(0);
-		//glDisableVertexAttribArray(1);
->>>>>>> e48eafcafd4e8a5e4589c77a99ffec81fe5180fa
 
 		// Swap buffers
         glx3_endRedraw();
