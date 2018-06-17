@@ -98,6 +98,8 @@ add_library(OGLRendererSandbox SHARED
             ../../../tools/AmMatrix/matrixProject.c
             ../../../tools/AmMatrix/matrixCalculations.c
             ../../../tools/AmMatrix/matrixCalculations.h
+            ../../../tools/AmMatrix/matrixOpenGL.c
+            ../../../tools/AmMatrix/matrixOpenGL.h
             ../../../tools/AmMatrix/solveLinearSystemGJ.c
             ../../../tools/AmMatrix/solveLinearSystemGJ.h
             #ImageOperations dependencies

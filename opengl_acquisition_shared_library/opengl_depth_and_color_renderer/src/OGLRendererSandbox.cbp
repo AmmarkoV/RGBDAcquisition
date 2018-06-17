@@ -69,6 +69,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../tools/AmMatrix/matrixCalculations.h" />
+		<Unit filename="../../../tools/AmMatrix/matrixOpenGL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../tools/AmMatrix/matrixOpenGL.h" />
 		<Unit filename="../../../tools/AmMatrix/matrixProject.c">
 			<Option compilerVar="CC" />
 		</Unit>
