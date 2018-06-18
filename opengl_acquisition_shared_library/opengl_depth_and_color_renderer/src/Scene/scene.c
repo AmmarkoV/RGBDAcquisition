@@ -167,7 +167,7 @@ int updateProjectionMatrix()
      double skew = 0.0;
      double cx = scene->emulateProjectionMatrix[2];
      double cy = scene->emulateProjectionMatrix[5];
-     buildOpenGLProjectionForIntrinsics( scene->projectionMatrix , viewport , fx, fy, skew, cx,  cy, WIDTH, HEIGHT, scene->controls.nearPlane, scene->controls.farPlane);
+     buildOpenGLProjectionForIntrinsicsD( scene->projectionMatrix , viewport , fx, fy, skew, cx,  cy, WIDTH, HEIGHT, scene->controls.nearPlane, scene->controls.farPlane);
      scene->projectionMatrixDeclared =1;
      fprintf(stderr,"Updated projection matrix using 3x3 matrix");
   }
@@ -189,7 +189,7 @@ int updateProjectionMatrix()
    int viewport[4]={0};
 
    fprintf(stderr,"Using intrinsics to build projection matrix\n");
-   buildOpenGLProjectionForIntrinsics   (
+   buildOpenGLProjectionForIntrinsicsD   (
                                              scene->customProjectionMatrix  ,
                                              viewport ,
                                              scene->cameraMatrix[0],

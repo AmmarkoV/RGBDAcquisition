@@ -231,7 +231,7 @@ void buildOpenGLProjectionForIntrinsicsD  (
                                              double farPlane
                                            )
 {
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsics according to old Ammar code Image ( %u x %u )\n",imageWidth,imageHeight);
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsicsD according to old Ammar code Image ( %u x %u )\n",imageWidth,imageHeight);
    fprintf(stderr,"fx %0.2f fy %0.2f , cx %0.2f , cy %0.2f , skew %0.2f \n",fx,fy,cx,cy,skew);
    fprintf(stderr,"Near %0.2f Far %0.2f \n",nearPlane,farPlane);
 

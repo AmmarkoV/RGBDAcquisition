@@ -229,7 +229,7 @@ int checkOpenGLError(char * file , int  line)
   int err=glGetError();
   if (err !=  GL_NO_ERROR /*0*/ )
     {
-      fprintf(stderr,RED "OpenGL Error (%u) : %s %u \n ", err , file ,line );
+      fprintf(stderr,RED "OpenGL Error (%d) : %s %d \n ", err , file ,line );
       printOpenGLError(err);
       fprintf(stderr,"\n" NORMAL);
       return 1;
@@ -299,7 +299,7 @@ pushObjectToBufferData(
 
     NumVertices+=(unsigned int ) verticesLength/(3*sizeof(float));
     fprintf(stderr,"Will DrawArray(GL_TRIANGLES,0,%u) - %u \n"  ,NumVertices,verticesLength);
-    fprintf(stderr,"Pushing %u vertices (%u bytes) and %u normals (%u bytes) as our object \n"  ,verticesLength/sizeof(float),verticesLength,normalsLength/sizeof(float),normalsLength);
+    fprintf(stderr,"Pushing %lu vertices (%u bytes) and %u normals (%u bytes) as our object \n"  ,verticesLength/sizeof(float),verticesLength,normalsLength/sizeof(float),normalsLength);
     glBufferData( GL_ARRAY_BUFFER, verticesLength + normalsLength  + colorsLength  ,NULL, GL_STATIC_DRAW );
      checkOpenGLError(__FILE__, __LINE__);
     glBufferSubData( GL_ARRAY_BUFFER, 0                                      , verticesLength , vertices );
@@ -364,15 +364,17 @@ int doDrawing()
      double skew = 0.0;
      double cx = (double) WIDTH/2;
      double cy = (double) HEIGHT/2;
-     buildOpenGLProjectionForIntrinsics(
-                                        projectionMatrixD ,
+     double near = 0.1;
+     double far = 10000.0;
+     buildOpenGLProjectionForIntrinsicsD(
+                                         projectionMatrixD ,
                                          viewport ,
                                          fx, fy,
                                          skew,
                                          cx,  cy,
                                          WIDTH, HEIGHT,
-                                         0.1,
-                                         1000
+                                         near,
+                                         far
                                          );
 
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
