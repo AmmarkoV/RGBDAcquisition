@@ -17,7 +17,7 @@
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
-#define U 3.5
+#define U 1.0
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 
@@ -112,47 +112,9 @@ float cubeNormals[]={ //X  Y  Z  W
 };
 
 
-static const GLfloat g_vertex_buffer_data[] = {
-		-1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f,
-		 1.0f, 1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		 1.0f,-1.0f,-1.0f,
-		 1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		 1.0f,-1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,
-		 1.0f,-1.0f,-1.0f,
-		 1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f,-1.0f,
-		 1.0f, 1.0f, 1.0f,
-		 1.0f,-1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,
-		 1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f,
-		 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f,
-		 1.0f,-1.0f, 1.0f
-	};
 
-	// One color for each vertex. They were generated randomly.
-	static const GLfloat g_color_buffer_data[] = {
+// One color for each vertex. They were generated randomly.
+static const GLfloat cubeColor[] = {
 		0.583f,  0.771f,  0.014f,
 		0.609f,  0.115f,  0.436f,
 		0.327f,  0.483f,  0.844f,
@@ -378,21 +340,19 @@ int doDrawing()
                                          );
 
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
-
+     glViewport(0,0,WIDTH,HEIGHT);
 
 
      double modelViewMatrixD[16];
      create4x4ModelTransformation(
                                   modelViewMatrixD,
                                   //Rotation Component
-                                  0.5 ,//roll
+                                  40.0 ,//roll
                                   0.0 ,//pitch
                                   0.0 ,//yaw
 
-                                  //Translation Component
-                                  0.0  ,//X
-                                  0.0  ,//Y
-                                  100 ,//Z
+                                  //Translation Component (XYZ)
+                                  -959.231,-54.976,2699.735,
 
                                   1.0,//scaleX,
                                   1.0,//scaleY,
@@ -443,7 +403,7 @@ int doDrawing()
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);*/
 
-    fprintf(stderr,"Ready to start pushing geometry : ");
+    fprintf(stderr,"Ready to start pushing geometry  ");
 		pushObjectToBufferData(
                                  programID  ,
                                  vertices ,  numberOfVertices ,
@@ -458,7 +418,7 @@ int doDrawing()
        fprintf(stderr,".");
 
        //Select Shader to render with
-       glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
+       //glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
 
        //Select Vertex Array Object To Render
        glBindVertexArray(vao);                   checkOpenGLError(__FILE__, __LINE__);
@@ -490,11 +450,6 @@ int doDrawing()
        glPopAttrib();
        glBindVertexArray(0);
        checkOpenGLError(__FILE__, __LINE__);
-
-
-
-
-
 
 
 		// Swap buffers
@@ -532,7 +487,7 @@ int main(int argc, char **argv)
 
   glClearColor ( 1, 0.5, 0, 1 );
   glClear ( GL_COLOR_BUFFER_BIT );
-  glMatrixMode(GL_MODELVIEW );
+  //glMatrixMode(GL_MODELVIEW );
 
 
   //glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
