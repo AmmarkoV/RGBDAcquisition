@@ -11,7 +11,7 @@
 #include "../Tools/tools.h"
 
 #include "../../../../tools/AmMatrix/matrixCalculations.h"
-#include "../../../../tools/AmMatrix/matrixProject.h"
+#include "../../../../tools/AmMatrix/matrixOpenGL.h"
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #include "../TrajectoryParser/TrajectoryCalculator.h"

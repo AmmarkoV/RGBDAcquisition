@@ -94,8 +94,8 @@ add_library(OGLRendererSandbox SHARED
             ../../../tools/AmMatrix/matrix4x4Tools.h
             ../../../tools/AmMatrix/quaternions.c
             ../../../tools/AmMatrix/quaternions.h
-            ../../../tools/AmMatrix/matrixProject.c
-            ../../../tools/AmMatrix/matrixProject.c
+            #../../../tools/AmMatrix/matrixProject.c
+            #../../../tools/AmMatrix/matrixProject.c
             ../../../tools/AmMatrix/matrixCalculations.c
             ../../../tools/AmMatrix/matrixCalculations.h
             ../../../tools/AmMatrix/matrixOpenGL.c

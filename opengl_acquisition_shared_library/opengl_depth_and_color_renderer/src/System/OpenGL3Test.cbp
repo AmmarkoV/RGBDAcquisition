@@ -40,6 +40,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../tools/AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.h" />
 		<Unit filename="../Rendering/ShaderPipeline/shader_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -40,7 +40,6 @@
 		<Linker>
 			<Add library="png" />
 			<Add library="jpeg" />
-			<Add library="assimp" />
 			<Add library="GL" />
 			<Add library="GLU" />
 			<Add library="X11" />

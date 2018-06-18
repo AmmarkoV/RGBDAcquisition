@@ -13,7 +13,7 @@
 #include "../Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h"
 #include "../Rendering/ogl_rendering.h"
 
-#include "../../../../tools/AmMatrix/matrixProject.h"
+#include "../../../../tools/AmMatrix/matrixOpenGL.h"
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #include "model_loader.h"
