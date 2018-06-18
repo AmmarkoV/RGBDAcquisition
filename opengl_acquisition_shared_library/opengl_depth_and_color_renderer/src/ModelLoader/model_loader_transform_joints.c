@@ -612,7 +612,7 @@ float * mallocModelTransformJoints(
      for (i=0; i<(*jointDataSizeOutput); i++)
      {
        float * mat = &returnMat[16*i];
-       create4x4IdentityFMatrix(mat);
+       create4x4IdentityMatrixF(mat);
      }
   }
   return returnMat;

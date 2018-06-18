@@ -670,7 +670,7 @@ int fillPosWithFrame(
         } else
         {
          //fprintf(stderr,"fillPosWithFrame: Empty Joint -> Identity Matrix %u #%u/%u \n",FrameIDToReturn,i,numberOfJoints);
-         create4x4IdentityFMatrix(f);
+         create4x4IdentityMatrixF(f);
         }
 
        }

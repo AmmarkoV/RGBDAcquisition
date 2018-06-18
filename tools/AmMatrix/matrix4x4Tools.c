@@ -141,6 +141,13 @@ void create4x4IdentityMatrix(double * m)
 }
 
 
+void create4x4IdentityMatrixF(float * m)
+{
+    m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
+    m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
+    m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
+    m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
+}
 
 int doublePEq(double * element , double value )
 {
@@ -204,14 +211,6 @@ int is4x4FIdentityMatrixPercisionCompensating(float  * m)
            );
 }
 
-
-void create4x4IdentityFMatrix(float * m)
-{
-    m[0] = 1.0;  m[1] = 0.0;  m[2] = 0.0;   m[3] = 0.0;
-    m[4] = 0.0;  m[5] = 1.0;  m[6] = 0.0;   m[7] = 0.0;
-    m[8] = 0.0;  m[9] = 0.0;  m[10] = 1.0;  m[11] =0.0;
-    m[12]= 0.0;  m[13]= 0.0;  m[14] = 0.0;  m[15] = 1.0;
-}
 
 void convert4x4MatrixToRPY(double *m ,double *roll,double *pitch,double *yaw)
 {
@@ -394,7 +393,7 @@ void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double
 
 void create4x4FTranslationMatrix(float * matrix , float x, float y, float z)
 {
-    create4x4IdentityFMatrix(matrix);
+    create4x4IdentityMatrixF(matrix);
     // Translate slots.
     matrix[3] = x; matrix[7] = y; matrix[11] = z;
 }

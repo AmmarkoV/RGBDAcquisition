@@ -211,7 +211,7 @@ void buildOpenGLProjectionForIntrinsics   (
    //TROUBLESHOOTING Left To Right Hand conventions , Thanks Damien 24-06-15
    float identMat[16];
    float finalFrutstrum[16];
-   create4x4IdentityMatrix(identMat);
+   create4x4IdentityMatrixF(identMat);
    identMat[10]=-1;
    multiplyTwo4x4FMatrices(finalFrutstrum,identMat,frustum);
    copy4x4FMatrix(frustum,finalFrutstrum);
