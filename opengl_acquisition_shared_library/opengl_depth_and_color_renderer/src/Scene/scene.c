@@ -643,7 +643,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
      //Scene configuration overwrites local configuration
      glLoadMatrixd( scene->modelViewMatrix ); // we load a matrix of Doubles
 
-     copy4x4Matrix(scene->activeModelViewMatrix , scene->modelViewMatrix);
+     copy4x4DMatrix(scene->activeModelViewMatrix , scene->modelViewMatrix);
       if (scene->useCustomModelViewMatrix)
          {
            fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
@@ -659,7 +659,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
   {
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
     glLoadMatrixd((const GLdouble*) scene->customModelViewMatrix);
-    copy4x4Matrix(scene->activeModelViewMatrix , scene->customModelViewMatrix);
+    copy4x4DMatrix(scene->activeModelViewMatrix , scene->customModelViewMatrix);
 
     /* We flip our coordinate system so it comes straight
        glRotatef(90,-1.0,0,0); //TODO FIX THESE

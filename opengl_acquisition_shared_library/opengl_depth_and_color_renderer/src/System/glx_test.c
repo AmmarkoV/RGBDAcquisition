@@ -410,7 +410,7 @@ int doDrawing()
                    -0.69,-0.51,0.51,5.83
                   };
 
-   copy4x4DMatrixToF(MVP , MVPD );
+   //copy4x4DMatrixToF(MVP , MVPD );
    transpose4x4Matrix(MVP);
 
  	// Get a handle for our "MVP" uniform
@@ -426,24 +426,24 @@ int doDrawing()
 
 
 
-		// Use our shader
-		glUseProgram(programID);
+	// Use our shader
+	glUseProgram(programID);
 
-	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	// Black background
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
+
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
+/*
 	GLuint VertexArrayID=0;
 	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
+	glBindVertexArray(VertexArrayID);*/
 
-   fprintf(stderr,"Ready to start rendering : ");
-
-
+    fprintf(stderr,"Ready to start pushing geometry : ");
 		pushObjectToBufferData(
                                  programID  ,
                                  vertices ,  numberOfVertices ,
@@ -452,22 +452,22 @@ int doDrawing()
                               );
 
 
+    fprintf(stderr,"Ready to render: ");
 
 	do{
+       fprintf(stderr,".");
 
-       glUseProgram(programID);
-       checkOpenGLError(__FILE__, __LINE__);
+       //Select Shader to render with
+       glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
 
-       glBindVertexArray(vao);
-        checkOpenGLError(__FILE__, __LINE__);
+       //Select Vertex Array Object To Render
+       glBindVertexArray(vao);                   checkOpenGLError(__FILE__, __LINE__);
 
-        fprintf(stderr,".");
-		// Clear the screen
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 
-		// Send our transformation to the currently bound shader,
-		// in the "MVP" uniform
+
+		// Send our transformation to the currently bound shader, in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, MVP);
 
 
@@ -478,14 +478,14 @@ int doDrawing()
 
 
 
-         if (wireFrame)
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+         //-------------------------------------------------
+         if (wireFrame) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+          checkOpenGLError(__FILE__, __LINE__);
+         //-------------------------------------------------
 
 
-        checkOpenGLError(__FILE__, __LINE__);
-        glDrawArrays( GL_TRIANGLES, 0, NumVertices );
-        checkOpenGLError(__FILE__, __LINE__);
+         glDrawArrays( GL_TRIANGLES, 0, NumVertices );   checkOpenGLError(__FILE__, __LINE__);
 
        glPopAttrib();
        glBindVertexArray(0);
@@ -507,7 +507,8 @@ int doDrawing()
 	//glDeleteBuffers(1, &vertexbuffer);
 	//glDeleteBuffers(1, &colorbuffer);
 	glDeleteProgram(programID);
-	glDeleteVertexArrays(1, &VertexArrayID);
+	glDeleteVertexArrays(1, &vao);
+	//glDeleteVertexArrays(1, &VertexArrayID);
 
 }
 

@@ -670,8 +670,8 @@ void recursiveJointHeirarchyTransformerDirect(
 
    unsigned int i=0;
    double parentTransform[16] , globalTransformation[16] , nodeTransformation[16];
-   copy4x4Matrix(parentTransform,parentTransformUntouched);
-   copy4x4Matrix(nodeTransformation,in->bones[curBone].info->localTransformation);
+   copy4x4DMatrix(parentTransform,parentTransformUntouched);
+   copy4x4DMatrix(nodeTransformation,in->bones[curBone].info->localTransformation);
 
   if ( in->bones[curBone].info->boneWeightsNumber>0 )
   {
@@ -681,7 +681,7 @@ void recursiveJointHeirarchyTransformerDirect(
 	  //apply the rotation matrix on top of the default one (inverse rot of the matrixThatTransformsFromMeshSpaceToBoneSpaceInBindPose)
 	  double newRot[16],nodeCopy[16];
 	  copy4x4FMatrixToD(newRot,&jointData[curBone*16]);
-	  copy4x4Matrix(nodeCopy,nodeTransformation);
+	  copy4x4DMatrix(nodeCopy,nodeTransformation);
 	  multiplyTwo4x4Matrices( nodeTransformation, nodeCopy,newRot);
 
 
@@ -742,8 +742,8 @@ void recursiveJointHeirarchyTransformer(
 
    unsigned int i=0;
    double parentLocalTransformation[16] , globalTransformation[16] , currentNodeLocalTransformation[16];
-   copy4x4Matrix(parentLocalTransformation,parentLocalTransformationUntouched);
-   copy4x4Matrix(currentNodeLocalTransformation,in->bones[curBone].info->localTransformation);
+   copy4x4DMatrix(parentLocalTransformation,parentLocalTransformationUntouched);
+   copy4x4DMatrix(currentNodeLocalTransformation,in->bones[curBone].info->localTransformation);
 
 
   //These prevent to recalculate nodes where there does not appear to be
