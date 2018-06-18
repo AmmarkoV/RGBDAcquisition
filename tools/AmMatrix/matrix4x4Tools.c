@@ -96,7 +96,15 @@ void print4x4DMathematicaMatrix(const char * str , double * matrix3x3)
   #endif // PRINT_MATRIX_DEBUGGING
 }
 
-void copy4x4Matrix(double * out,double * in)
+void copy4x4FMatrix(float * out,float * in)
+{
+  out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
+  out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
+  out[8]=in[8];   out[9]=in[9];   out[10]=in[10]; out[11]=in[11];
+  out[12]=in[12]; out[13]=in[13]; out[14]=in[14]; out[15]=in[15];
+}
+
+void copy4x4DMatrix(double * out,double * in)
 {
   out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
   out[4]=in[4];   out[5]=in[5];   out[6]=in[6];   out[7]=in[7];
@@ -495,7 +503,7 @@ int invert4x4MatrixD(double * result,double * mat)
  double detA = det4x4Matrix(mat);
  if (detA==0.0)
     {
-      copy4x4Matrix(result,mat);
+      copy4x4DMatrix(result,mat);
       fprintf(stderr,"Matrix 4x4 cannot be inverted (det = 0)\n");
       return 0;
     }

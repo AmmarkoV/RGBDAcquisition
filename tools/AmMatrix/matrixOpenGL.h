@@ -34,7 +34,6 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
 
 
 
-
 /**
 * @brief build OpenGL Projection Matrix simulating a "real" camera
 * @ingroup AmMatrix
@@ -45,6 +44,28 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
 * @retval 0=Failure,1=Success
 */
 void buildOpenGLProjectionForIntrinsics   (
+                                             float * frustum,
+                                             int * viewport ,
+                                             float fx,
+                                             float fy,
+                                             float skew,
+                                             float cx, float cy,
+                                             unsigned int imageWidth, unsigned int imageHeight,
+                                             float nearPlane,
+                                             float farPlane
+                                           );
+
+
+/**
+* @brief build OpenGL Projection Matrix simulating a "real" camera
+* @ingroup AmMatrix
+* @param  Output Array 4x1 of resulting relative position ( X,Y,Z,W )
+* @param  Input Array 4x1 of object Position ( X,Y,Z,W )
+* @param  Input Array 3x3 of object Rotation
+* @param  Input Array 4x1 of absolute 3D position of the point ( X,Y,Z,W )
+* @retval 0=Failure,1=Success
+*/
+void buildOpenGLProjectionForIntrinsicsD   (
                                              double * frustum,
                                              int * viewport ,
                                              double fx,

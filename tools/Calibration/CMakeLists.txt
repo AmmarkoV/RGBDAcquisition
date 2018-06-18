@@ -13,6 +13,8 @@ add_library(CalibrationLibrary STATIC
             ../AmMatrix/matrix3x3Tools.h 
             ../AmMatrix/matrixCalculations.c
             ../AmMatrix/matrixCalculations.h
+            ../AmMatrix/matrixOpenGL.c
+            ../AmMatrix/matrixOpenGL.h
             ../AmMatrix/solveLinearSystemGJ.c
             ../AmMatrix/solveLinearSystemGJ.h
             ../AmMatrix/ocvStaging.c

@@ -11,6 +11,7 @@
 #include "undistort.h"
 #include "../AmMatrix/matrix4x4Tools.h"
 #include "../AmMatrix/matrixCalculations.h"
+#include "../AmMatrix/matrixOpenGL.h"
 
 
 #if __GNUC__

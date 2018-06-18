@@ -26,6 +26,9 @@
 #define RED     "\033[31m"      /* Red */
 
 
+  int WIDTH=640;
+  int HEIGHT=480;
+
 unsigned int NumVertices=0;
 	GLuint vao=0;
 
@@ -353,26 +356,62 @@ int doDrawing()
     if (sho==0) { fprintf(stderr,"Could not load..\n"); exit(1); }
     GLuint programID = sho->ProgramObject;
 
-    float projectionMatrix[]={ -1.673200,0.000000,0.000000,0.000000,
-                                0.000000,2.222853,0.000000,0.000000,
-                                0.000000,0.000000,1.007874,1.000000,
-                                0.000000,0.000000,-2.007874,0.000000};
 
-    float modelViewMatrix[]={  -10.000000,0.000001,0.000000,0.000000,
-                                 0.000000,0.000000,10.000000,0.000000,
-                                 0.000001,10.000000,-0.000000,0.000000,
-                                 0.192310,0.549760,22.997351,1.000000
-                            };
+     double projectionMatrixD[16];
+     int viewport[4]={0};
+     double fx = 535.423889;
+     double fy = 533.48468;
+     double skew = 0.0;
+     double cx = (double) WIDTH/2;
+     double cy = (double) HEIGHT/2;
+     buildOpenGLProjectionForIntrinsics(
+                                        projectionMatrixD ,
+                                         viewport ,
+                                         fx, fy,
+                                         skew,
+                                         cx,  cy,
+                                         WIDTH, HEIGHT,
+                                         0.1,
+                                         1000
+                                         );
 
-    float MVP[16]={-1.09,0.00,-1.45,0.00,
--0.99,2.07,0.75,0.00,
--0.69,-0.52,0.52,5.64,
--0.69,-0.51,0.51,5.83
-};
+     //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+
+
+
+     double modelViewMatrixD[16];
+     create4x4ModelTransformation(
+                                  modelViewMatrixD,
+                                  //Rotation Component
+                                  0.5 ,//roll
+                                  0.0 ,//pitch
+                                  0.0 ,//yaw
+
+                                  //Translation Component
+                                  0.0  ,//X
+                                  0.0  ,//Y
+                                  100 ,//Z
+
+                                  1.0,//scaleX,
+                                  1.0,//scaleY,
+                                  1.0//scaleZ
+                                 );
+
+
+    double MVPD[16];
+    multiplyTwo4x4Matrices(MVPD,projectionMatrixD,modelViewMatrixD);
+
+    float MVP[16]={
+                   -1.09,0.00,-1.45,0.00,
+                   -0.99,2.07,0.75,0.00,
+                   -0.69,-0.52,0.52,5.64,
+                   -0.69,-0.51,0.51,5.83
+                  };
+
+   copy4x4DMatrixToF(MVP , MVPD );
    transpose4x4Matrix(MVP);
 
-//    multiplyTwo4x4FMatrices(MVP,projectionMatrix,modelViewMatrix);
-	// Get a handle for our "MVP" uniform
+ 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 
@@ -485,8 +524,6 @@ int doDrawing()
 
 int main(int argc, char **argv)
 {
-  int WIDTH=640;
-  int HEIGHT=480;
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
 
 

@@ -9,8 +9,8 @@ add_library(
             matrix4x4Tools.c
             matrixCalculations.c
             matrixCalculations.h
-            matrixProject.c
-            matrixProject.h
+            matrixOpenGL.c
+            matrixOpenGL.h 
             ocvStaging.c
             ocvStaging.h
             solveHomography.c

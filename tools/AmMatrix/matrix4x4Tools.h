@@ -47,14 +47,23 @@ void print4x4DMatrix(const char * str , double * matrix4x4);
 
 
 /**
-* @brief Copy a 4x4 Matrix to another
+* @brief Copy a 4x4 Matrix of doubles to another
 * @ingroup AmMatrix
 * @param  Output Matrix
 * @param  Input Matrix
 * @param  Pointer to a Pointer of an allocated doubles matrix
 */
-void copy4x4Matrix(double * out,double * in);
+void copy4x4DMatrix(double * out,double * in);
 
+
+/**
+* @brief Copy a 4x4 Matrix of floats to another
+* @ingroup AmMatrix
+* @param  Output Matrix
+* @param  Input Matrix
+* @param  Pointer to a Pointer of an allocated doubles matrix
+*/
+void copy4x4FMatrix(float * out,float * in);
 
 /**
 * @brief Convert a 4x4 Matrix from Float To Double

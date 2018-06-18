@@ -273,18 +273,9 @@ int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
   glXMakeCurrent( display, win, ctx );
 
 
-  /*
-  glClearColor( 0, 0.5, 1, 1 );
-  glClear( GL_COLOR_BUFFER_BIT );
-  glXSwapBuffers ( display, win );
-
-  sleep( 1 );
-
-  glClearColor ( 1, 0.5, 0, 1 );
-  glClear ( GL_COLOR_BUFFER_BIT );
-  glXSwapBuffers ( display, win );
-
-  sleep( 1 );*/
+ // glClearColor( 0, 0.0, 0, 1 );
+ // glClear( GL_COLOR_BUFFER_BIT );
+ // glXSwapBuffers ( display, win );
 
   printf( "GLX3.0 context ready..\n" );
   return 1;
