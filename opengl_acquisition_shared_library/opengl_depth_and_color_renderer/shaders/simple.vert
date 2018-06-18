@@ -10,7 +10,7 @@ uniform vec3 lightPosition;
 
 void main()
 {
-    vec4 vColor = vec4(1.0,0.0,0.0,1.0); 
+    vec4 vColor = vec4(0.4,0.5,0.0,1.0); 
     gl_Position = vec4(vPosition,1.0);
     color = vColor;
 }

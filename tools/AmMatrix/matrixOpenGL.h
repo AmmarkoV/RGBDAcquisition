@@ -159,6 +159,7 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
 
 
 
+  void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix);
 
 
 #ifdef __cplusplus

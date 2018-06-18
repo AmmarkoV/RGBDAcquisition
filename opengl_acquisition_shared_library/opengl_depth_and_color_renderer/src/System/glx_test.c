@@ -15,6 +15,7 @@
 #include "glx3.h"
 
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../tools/AmMatrix/matrixOpenGL.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
 #define U 1.0
@@ -30,9 +31,9 @@
   int HEIGHT=480;
 
 unsigned int NumVertices=0;
-	GLuint vao=0;
+GLuint vao=0;
 
-float cubeCoords[]=
+static const float cubeCoords[]=
 {
 -U,-U,-U,
 -U,-U, U,
@@ -72,7 +73,7 @@ float cubeCoords[]=
  U,-U, U
  };
 
-float cubeNormals[]={ //X  Y  Z  W
+static const float cubeNormals[]={ //X  Y  Z  W
                       -1.0f,-0.0f,-0.0f,
                       -1.0f,-0.0f,-0.0f,
                       -1.0f,-0.0f,-0.0f,
@@ -114,7 +115,7 @@ float cubeNormals[]={ //X  Y  Z  W
 
 
 // One color for each vertex. They were generated randomly.
-static const GLfloat cubeColor[] = {
+static const float cubeColor[] = {
 		0.583f,  0.771f,  0.014f,
 		0.609f,  0.115f,  0.436f,
 		0.327f,  0.483f,  0.844f,
@@ -247,40 +248,30 @@ pushObjectToBufferData(
                              const float * colors , unsigned int colorsLength
                            )
 {
-    glGenVertexArrays(1, &vao);
-    checkOpenGLError(__FILE__, __LINE__);
-    glBindVertexArray(vao);
-    checkOpenGLError(__FILE__, __LINE__);
+    glGenVertexArrays(1, &vao);              checkOpenGLError(__FILE__, __LINE__);
+    glBindVertexArray(vao);                  checkOpenGLError(__FILE__, __LINE__);
 
 
     // Create and initialize a buffer object on the server side (GPU)
     GLuint      buffer;
-    glGenBuffers( 1, &buffer );
-    checkOpenGLError(__FILE__, __LINE__);
-    glBindBuffer( GL_ARRAY_BUFFER, buffer );
+    glGenBuffers( 1, &buffer );                 checkOpenGLError(__FILE__, __LINE__);
+    glBindBuffer( GL_ARRAY_BUFFER, buffer );    checkOpenGLError(__FILE__, __LINE__);
 
     NumVertices+=(unsigned int ) verticesLength/(3*sizeof(float));
     fprintf(stderr,"Will DrawArray(GL_TRIANGLES,0,%u) - %u \n"  ,NumVertices,verticesLength);
     fprintf(stderr,"Pushing %lu vertices (%u bytes) and %u normals (%u bytes) as our object \n"  ,verticesLength/sizeof(float),verticesLength,normalsLength/sizeof(float),normalsLength);
-    glBufferData( GL_ARRAY_BUFFER, verticesLength + normalsLength  + colorsLength  ,NULL, GL_STATIC_DRAW );
-     checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , verticesLength , vertices );
-     checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, verticesLength                         , normalsLength  , normals );
-     checkOpenGLError(__FILE__, __LINE__);
+    glBufferData( GL_ARRAY_BUFFER, verticesLength + normalsLength  + colorsLength  ,NULL, GL_STATIC_DRAW );   checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , verticesLength , vertices );   checkOpenGLError(__FILE__, __LINE__);
+    glBufferSubData( GL_ARRAY_BUFFER, verticesLength                         , normalsLength  , normals );    checkOpenGLError(__FILE__, __LINE__);
 
     if ( (colors!=0) && (colorsLength!=0) )
     {
-     glBufferSubData( GL_ARRAY_BUFFER, verticesLength + normalsLength , colorsLength , colors );
-     checkOpenGLError(__FILE__, __LINE__);
+     glBufferSubData( GL_ARRAY_BUFFER, verticesLength + normalsLength , colorsLength , colors );               checkOpenGLError(__FILE__, __LINE__);
     }
 
-    GLuint vPosition = glGetAttribLocation( programID, "vPosition" );
-     checkOpenGLError(__FILE__, __LINE__);
-    glEnableVertexAttribArray( vPosition );
-     checkOpenGLError(__FILE__, __LINE__);
-    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );
-    checkOpenGLError(__FILE__, __LINE__);
+    GLuint vPosition = glGetAttribLocation( programID, "vPosition" );               checkOpenGLError(__FILE__, __LINE__);
+    glEnableVertexAttribArray( vPosition );                                         checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );  checkOpenGLError(__FILE__, __LINE__);
 
     /*
     GLuint vNormal = glGetAttribLocation( programID, "vNormal" );
@@ -326,8 +317,8 @@ int doDrawing()
      double skew = 0.0;
      double cx = (double) WIDTH/2;
      double cy = (double) HEIGHT/2;
-     double near = 0.1;
-     double far = 10000.0;
+     double near = 1.0;
+     double far = 255.0;
      buildOpenGLProjectionForIntrinsicsD(
                                          projectionMatrixD ,
                                          viewport ,
@@ -340,38 +331,11 @@ int doDrawing()
                                          );
 
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
-     glViewport(0,0,WIDTH,HEIGHT);
+     //glViewport(0,0,WIDTH,HEIGHT);
 
 
-     double modelViewMatrixD[16];
-     create4x4ModelTransformation(
-                                  modelViewMatrixD,
-                                  //Rotation Component
-                                  40.0 ,//roll
-                                  0.0 ,//pitch
-                                  0.0 ,//yaw
-
-                                  //Translation Component (XYZ)
-                                  -959.231,-54.976,2699.735,
-
-                                  1.0,//scaleX,
-                                  1.0,//scaleY,
-                                  1.0//scaleZ
-                                 );
-
-
-    double MVPD[16];
-    multiplyTwo4x4Matrices(MVPD,projectionMatrixD,modelViewMatrixD);
-
-    float MVP[16]={
-                   -1.09,0.00,-1.45,0.00,
-                   -0.99,2.07,0.75,0.00,
-                   -0.69,-0.52,0.52,5.64,
-                   -0.69,-0.51,0.51,5.83
-                  };
-
-   //copy4x4DMatrixToF(MVP , MVPD );
-   transpose4x4Matrix(MVP);
+     double viewMatrixD[16];
+     create4x4IdentityMatrix(viewMatrixD);
 
  	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
@@ -398,11 +362,6 @@ int doDrawing()
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
-/*
-	GLuint VertexArrayID=0;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);*/
-
     fprintf(stderr,"Ready to start pushing geometry  ");
 		pushObjectToBufferData(
                                  programID  ,
@@ -418,12 +377,54 @@ int doDrawing()
        fprintf(stderr,".");
 
        //Select Shader to render with
-       //glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
+       glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
+
+       glClearColor( 0, 0.0, 0, 1 );
+       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
+
 
        //Select Vertex Array Object To Render
        glBindVertexArray(vao);                   checkOpenGLError(__FILE__, __LINE__);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
+
+
+
+     //-------------------------------------------------------------------
+        double roll=(double)  (rand()%360);
+        double pitch=(double) (rand()%360);
+        double yaw=(double)   (rand()%360);
+
+
+        double x=(double)  (1000-rand()%2000);
+        double y=(double) (100-rand()%200);
+        double z=(double)  (2000+rand()%1000);
+
+       fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)",x,y,z,roll,pitch,yaw);
+
+
+       double modelMatrixD[16];
+       create4x4ModelTransformation(
+                                    modelMatrixD,
+                                    //Rotation Component
+                                    roll,//roll
+                                    pitch ,//pitch
+                                    yaw ,//yaw
+
+                                    //Translation Component (XYZ)
+                                    x,y,z,
+
+                                    1.0,//scaleX,
+                                    1.0,//scaleY,
+                                    1.0//scaleZ
+                                   );
+
+
+      double MVPD[16];
+      float MVP[16]={0};
+      getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
+      copy4x4DMatrixToF(MVP , MVPD );
+      transpose4x4Matrix(MVP);
+      //-------------------------------------------------------------------
 
 
 
@@ -433,7 +434,7 @@ int doDrawing()
 
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
-          glDisable(GL_CULL_FACE);
+         glDisable(GL_CULL_FACE);
 
 
 
@@ -484,19 +485,6 @@ int main(int argc, char **argv)
 {
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
 
-
-  glClearColor ( 1, 0.5, 0, 1 );
-  glClear ( GL_COLOR_BUFFER_BIT );
-  //glMatrixMode(GL_MODELVIEW );
-
-
-  //glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
-  //glGetFloatv( GL_PROJECTION_MATRIX, projection );
-  //glGetIntegerv( GL_VIEWPORT, viewport );
-  glViewport(0,0,WIDTH,HEIGHT);
-
-  glx3_endRedraw();
-
   if (glewInit() != GLEW_OK)
    {
 		fprintf(stderr, "Failed to initialize GLEW\n");
@@ -505,17 +493,7 @@ int main(int argc, char **argv)
 
 
 
-  doDrawing();
-/*
-  while (1)
-   {
-     glx3_checkEvents();
-     fprintf(stderr,".");
-     drawGenericTriangleMesh(cubeCoords,cubeNormals,36*3);
-     usleep(100);
-     glx3_endRedraw();
-   }*/
-
+   doDrawing();
 
   stop_glx3_stuff();
  return 0;

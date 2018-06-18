@@ -752,3 +752,10 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
   }
 
 
+
+  void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix)
+  {
+	 //MVP = Projection * View * Model || Remember, matrix multiplication is the other way around
+     multiplyThree4x4Matrices(output, projectionMatrix , viewMatrix , modelMatrix );
+
+  }

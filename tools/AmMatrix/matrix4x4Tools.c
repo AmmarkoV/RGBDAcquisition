@@ -848,9 +848,9 @@ int normalize3DPointVector(double * vec)
 void create4x4ModelTransformation(
                                   double * m ,
                                   //Rotation Component
-                                  double roll,
-                                  double pitch,
-                                  double yaw,
+                                  double rollInDegrees,
+                                  double pitchInDegrees,
+                                  double yawInDegrees,
                                   //Translation Component
                                   double x, double y, double z ,
                                   double scaleX, double scaleY, double scaleZ
@@ -871,9 +871,9 @@ void create4x4ModelTransformation(
     double intermediateMatrixPitch[16];
     double intermediateMatrixHeading[16];
     double intermediateMatrixRoll[16];
-    create4x4RotationMatrix(  intermediateMatrixRoll   , roll,      0.0,   0.0,   1.0);
-    create4x4RotationMatrix(  intermediateMatrixHeading, yaw,   0.0,   1.0,   0.0);
-    create4x4RotationMatrix(  intermediateMatrixPitch  , pitch,     1.0,   0.0,   0.0);
+    create4x4RotationMatrix(  intermediateMatrixRoll   , rollInDegrees,      0.0,   0.0,   1.0);
+    create4x4RotationMatrix(  intermediateMatrixHeading, yawInDegrees,       0.0,   1.0,   0.0);
+    create4x4RotationMatrix(  intermediateMatrixPitch  , pitchInDegrees,     1.0,   0.0,   0.0);
 
     double intermediateMatrixRotation[16];
     multiplyThree4x4Matrices(
@@ -895,10 +895,6 @@ void create4x4ModelTransformation(
       {
          multiplyTwo4x4Matrices(m,intermediateMatrixTranslation,intermediateMatrixRotation);
       }
-
-
-
-
 }
 
 

@@ -320,9 +320,9 @@ int normalize3DPointVector(double * vec);
 void create4x4ModelTransformation(
                                   double * m ,
                                   //Rotation Component
-                                  double roll,
-                                  double pitch,
-                                  double yaw,
+                                  double rollInDegrees,
+                                  double pitchInDegrees,
+                                  double yawInDegrees,
                                   //Translation Component
                                   double x, double y, double z ,
                                   double scaleX, double scaleY, double scaleZ
