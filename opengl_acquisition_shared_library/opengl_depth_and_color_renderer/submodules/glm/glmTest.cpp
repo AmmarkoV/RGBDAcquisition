@@ -4,7 +4,22 @@
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../tools/AmMatrix/matrixOpenGL.h"
+
 using namespace glm;
+
+void print4x4OurMatrix(const char * str , float * matrix4x4)
+{
+  fprintf( stderr, " 4x4 float %s \n",str);
+  fprintf( stderr, "--------------------------------------\n");
+  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
+  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
+  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
+  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
+  fprintf( stderr, "--------------------------------------\n");
+}
 
 
 void printOutGLMMatrix(const char * label , glm::mat4 matrix)
@@ -14,7 +29,6 @@ void printOutGLMMatrix(const char * label , glm::mat4 matrix)
   fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f,\n",matrix[1][0],matrix[1][1],matrix[1][2],matrix[1][3]);
   fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f,\n",matrix[2][0],matrix[2][1],matrix[2][2],matrix[2][3]);
   fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f\n\n",matrix[3][0],matrix[3][1],matrix[3][2],matrix[3][3]);
-
 }
 
 int main( void )

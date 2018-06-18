@@ -115,7 +115,7 @@ static const float cubeNormals[]={ //X  Y  Z  W
 
 
 // One color for each vertex. They were generated randomly.
-static const float cubeColor[] = {
+static const float cubeColors[] = {
 		0.583f,  0.771f,  0.014f,
 		0.609f,  0.115f,  0.436f,
 		0.327f,  0.483f,  0.844f,
@@ -343,8 +343,10 @@ int doDrawing()
 
     float * vertices = cubeCoords;
     float * normals = cubeNormals;
+    float * colors = cubeColors;
     unsigned int numberOfVertices = sizeof(cubeCoords);
     unsigned int numberOfNormals = sizeof(cubeNormals);
+    unsigned int numberOfColors = sizeof(cubeColors);
     unsigned int wireFrame=0;
 
 
@@ -367,7 +369,7 @@ int doDrawing()
                                  programID  ,
                                  vertices ,  numberOfVertices ,
                                  normals ,  numberOfNormals ,
-                                 0 , 0
+                                 colors , numberOfColors
                               );
 
 
@@ -421,10 +423,10 @@ int doDrawing()
 
       double MVPD[16];
       float MVP[16]={-1.0864,-0.9937,-0.6874,-0.6860,
-0.0000,2.0702,-0.5155,-0.5145,
--1.4485,0.7453,0.5155,0.5145,
-0.0000,0.0000,5.6424,5.8310
-};
+                      0.0000,2.0702,-0.5155,-0.5145,
+                     -1.4485,0.7453,0.5155,0.5145,
+                      0.0000,0.0000,5.6424,5.8310
+                     };
      // getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
      // copy4x4DMatrixToF(MVP , MVPD );
 //transpose4x4Matrix(MVP);
@@ -433,7 +435,7 @@ int doDrawing()
 
 
 		// Send our transformation to the currently bound shader, in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, MVP);
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
 
 
 
