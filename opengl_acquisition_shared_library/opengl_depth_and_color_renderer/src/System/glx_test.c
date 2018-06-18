@@ -273,13 +273,10 @@ pushObjectToBufferData(
     glEnableVertexAttribArray( vPosition );                                         checkOpenGLError(__FILE__, __LINE__);
     glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );  checkOpenGLError(__FILE__, __LINE__);
 
-    /*
-    GLuint vNormal = glGetAttribLocation( programID, "vNormal" );
-    checkOpenGLError(__FILE__, __LINE__);
-     glEnableVertexAttribArray( vNormal );
-    checkOpenGLError(__FILE__, __LINE__);
-     glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(verticesLength) );
-     checkOpenGLError(__FILE__, __LINE__);*/
+
+    GLuint vNormal = glGetAttribLocation( programID, "vNormal" );                             checkOpenGLError(__FILE__, __LINE__);
+    glEnableVertexAttribArray( vNormal );                                                     checkOpenGLError(__FILE__, __LINE__);
+    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(verticesLength) ); checkOpenGLError(__FILE__, __LINE__);
 
 
     if ( (colors!=0) && (colorsLength!=0) )
@@ -399,7 +396,7 @@ int doDrawing()
 
         double x=0;//(double)  (1000-rand()%2000);
         double y=0;//(double) (100-rand()%200);
-        double z=(double)  (100+rand()%1000);
+        double z=(double)  (1000+rand()%1000);
 
        fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)",x,y,z,roll,pitch,yaw);
 
@@ -426,10 +423,12 @@ int doDrawing()
                       0.0000,2.0702,-0.5155,-0.5145,
                      -1.4485,0.7453,0.5155,0.5145,
                       0.0000,0.0000,5.6424,5.8310
-                     };
-     // getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
-     // copy4x4DMatrixToF(MVP , MVPD );
-//transpose4x4Matrix(MVP);
+                     }; //If you use this you will view the object..
+
+
+      // getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
+      // copy4x4DMatrixToF(MVP , MVPD );
+      // transpose4x4Matrix(MVP);
       //-------------------------------------------------------------------
 
 

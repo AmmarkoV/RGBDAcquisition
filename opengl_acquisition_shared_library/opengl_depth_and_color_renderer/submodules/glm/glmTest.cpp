@@ -10,7 +10,7 @@
 
 using namespace glm;
 
-void print4x4OurMatrix(const char * str , float * matrix4x4)
+void print4x4OurMatrixD(const char * str , double * matrix4x4)
 {
   fprintf( stderr, " 4x4 float %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
@@ -51,6 +51,30 @@ int main( void )
     printOutGLMMatrix("GLM View",View);
     printOutGLMMatrix("GLM Model",Model);
     printOutGLMMatrix("GLM MVP",MVP);
+
+
+
+    double ourProjection[16];
+     gldPerspective(
+                     ourProjection,
+                     45.0f,
+                     4.0/3.0f,
+                     0.1f,
+                     100.0f
+                   );
+
+    double ourView[16]={0};
+
+    double ourModel[16];
+    create4x4IdentityMatrix(ourModel);
+
+    double ourMVP[16];
+    getModelViewProjectionMatrixFromMatrices(ourMVP,ourProjection,ourView,ourModel);
+
+    print4x4OurMatrixD("Our Projection",ourProjection);
+    print4x4OurMatrixD("Our View",ourView);
+    print4x4OurMatrixD("Our Model",ourModel);
+    print4x4OurMatrixD("Our MVP",ourMVP);
 
 	return 0;
 }

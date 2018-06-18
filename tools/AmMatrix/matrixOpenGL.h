@@ -137,7 +137,7 @@ void glhPerspectivef2(
 */
 void gldPerspective(
                      double * matrix,
-                     double fovx,
+                     double fovxInDegrees,
                      double aspect,
                      double zNear,
                      double zFar

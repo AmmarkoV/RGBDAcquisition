@@ -337,7 +337,7 @@ void glhPerspectivef2(
 
 void gldPerspective(
                      double *matrix,
-                     double fovx,
+                     double fovxInDegrees,
                      double aspect,
                      double zNear,
                      double zFar
@@ -347,7 +347,7 @@ void gldPerspective(
    // *NOTE* This assumes GL_PROJECTION is the current matrix
    double xmin, xmax, ymin, ymax;
 
-   xmax = zNear * tan(fovx * M_PI / 360.0);
+   xmax = zNear * tan(fovxInDegrees * M_PI / 360.0);
    xmin = -xmax;
 
    ymin = xmin / aspect;
@@ -749,6 +749,56 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
       return 1;
   }
 
+int
+glLookAt(
+         double * m,
+         double eyex,double eyey,double eyez,
+         double centerx,double centery,double centerz,
+         double upx,double upy, double upz
+        )
+{
+    fprintf(stderr,"glLookAt not implemented");
+    exit(1);
+    /*
+    double forward[3], side[3], up[3];
+
+    forward[0] = centerx - eyex;
+    forward[1] = centery - eyey;
+    forward[2] = centerz - eyez;
+
+    up[0] = upx;
+    up[1] = upy;
+    up[2] = upz;
+
+    normalize(forward);
+
+    // Side = forward x up
+    cross(forward, up, side);
+    normalize(side);
+
+    // Recompute up as: up = side x forward
+    cross(side, forward, up);
+
+    __gluMakeIdentityf(&m[0][0]);
+
+
+
+
+    m[0][0] = side[0];
+    m[1][0] = side[1];
+    m[2][0] = side[2];
+
+    m[0][1] = up[0];
+    m[1][1] = up[1];
+    m[2][1] = up[2];
+
+    m[0][2] = -forward[0];
+    m[1][2] = -forward[1];
+    m[2][2] = -forward[2];
+
+    glMultMatrixf(&m[0][0]);
+    glTranslated(-eyex, -eyey, -eyez);*/
+}
 
 
   void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix)
