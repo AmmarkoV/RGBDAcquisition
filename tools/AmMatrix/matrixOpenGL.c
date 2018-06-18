@@ -805,8 +805,4 @@ glLookAt(
   {
 	 //MVP = Projection * View * Model || Remember, matrix multiplication is the other way around
      multiplyThree4x4Matrices(output, projectionMatrix , viewMatrix , modelMatrix );
-
-     //Test
-     //multiplyThree4x4Matrices(output, modelMatrix  , viewMatrix , projectionMatrix  );
-
   }
