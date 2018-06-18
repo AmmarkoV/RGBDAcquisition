@@ -33,10 +33,10 @@ int main( void )
 	glm::mat4 MVP        = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
 
-    printOutGLMMatrix("Projection",Projection);
-    printOutGLMMatrix("View",View);
-    printOutGLMMatrix("Model",Model);
-    printOutGLMMatrix("MVP",MVP);
+    printOutGLMMatrix("GLM Projection",Projection);
+    printOutGLMMatrix("GLM View",View);
+    printOutGLMMatrix("GLM Model",Model);
+    printOutGLMMatrix("GLM MVP",MVP);
 
 	return 0;
 }

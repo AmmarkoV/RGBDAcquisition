@@ -395,9 +395,9 @@ int doDrawing()
         double yaw=(double)   (rand()%360);
 
 
-        double x=(double)  (1000-rand()%2000);
-        double y=(double) (100-rand()%200);
-        double z=(double)  (2000+rand()%1000);
+        double x=0;//(double)  (1000-rand()%2000);
+        double y=0;//(double) (100-rand()%200);
+        double z=(double)  (100+rand()%1000);
 
        fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)",x,y,z,roll,pitch,yaw);
 
@@ -420,10 +420,14 @@ int doDrawing()
 
 
       double MVPD[16];
-      float MVP[16]={0};
-      getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
-      copy4x4DMatrixToF(MVP , MVPD );
-      transpose4x4Matrix(MVP);
+      float MVP[16]={-1.0864,-0.9937,-0.6874,-0.6860,
+0.0000,2.0702,-0.5155,-0.5145,
+-1.4485,0.7453,0.5155,0.5145,
+0.0000,0.0000,5.6424,5.8310
+};
+     // getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
+     // copy4x4DMatrixToF(MVP , MVPD );
+//transpose4x4Matrix(MVP);
       //-------------------------------------------------------------------
 
 

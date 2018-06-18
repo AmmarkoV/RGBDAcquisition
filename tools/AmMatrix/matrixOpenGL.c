@@ -733,8 +733,7 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
       //and store in A[16]
       MultiplyMatrices4by4OpenGL_FLOAT(A, projection, modelview);
       //Now compute the inverse of matrix A
-      if(glhInvertMatrixf2(A, m)==0)
-         return 0;
+      if(glhInvertMatrixf2(A, m)==0) {return 0;}
       //Transformation of normalized coordinates between -1 and 1
       in[0]=(winx-(float)viewport[0])/(float)viewport[2]*2.0-1.0;
       in[1]=(winy-(float)viewport[1])/(float)viewport[3]*2.0-1.0;
@@ -742,8 +741,7 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
       in[3]=1.0;
       //Objects coordinates
       MultiplyMatrixByVector4by4OpenGL_FLOAT(out, m, in);
-      if(out[3]==0.0)
-         return 0;
+      if(out[3]==0.0) {return 0;}
       out[3]=1.0/out[3];
       objectCoordinate[0]=out[0]*out[3];
       objectCoordinate[1]=out[1]*out[3];
@@ -757,5 +755,8 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
   {
 	 //MVP = Projection * View * Model || Remember, matrix multiplication is the other way around
      multiplyThree4x4Matrices(output, projectionMatrix , viewMatrix , modelMatrix );
+
+     //Test
+     //multiplyThree4x4Matrices(output, modelMatrix  , viewMatrix , projectionMatrix  );
 
   }
