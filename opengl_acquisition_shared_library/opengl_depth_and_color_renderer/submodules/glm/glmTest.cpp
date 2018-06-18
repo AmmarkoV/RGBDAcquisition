@@ -10,6 +10,15 @@
 
 using namespace glm;
 
+void copyGLMMatrix(double * ourMat,glm::mat4 glmMat)
+{
+   ourMat[0]=glmMat[0][0];  ourMat[1]=glmMat[1][0];  ourMat[2]=glmMat[2][0];  ourMat[3]=glmMat[3][0];
+   ourMat[4]=glmMat[0][1];  ourMat[5]=glmMat[1][1];  ourMat[6]=glmMat[2][1];  ourMat[7]=glmMat[3][1];
+   ourMat[8]=glmMat[0][2];  ourMat[9]=glmMat[1][2];  ourMat[10]=glmMat[2][2]; ourMat[11]=glmMat[3][2];
+   ourMat[12]=glmMat[0][3]; ourMat[13]=glmMat[1][3]; ourMat[14]=glmMat[2][3]; ourMat[15]=glmMat[3][3];
+}
+
+
 void print4x4OurMatrixD(const char * str , double * matrix4x4)
 {
   fprintf( stderr, " 4x4 float %s \n",str);
@@ -62,8 +71,10 @@ int main( void )
                      0.1f,
                      100.0f
                    );
+    copyGLMMatrix(ourProjection,Projection);
 
     double ourView[16]={0};
+    copyGLMMatrix(ourView,View);
 
     double ourModel[16];
     create4x4IdentityMatrix(ourModel);
