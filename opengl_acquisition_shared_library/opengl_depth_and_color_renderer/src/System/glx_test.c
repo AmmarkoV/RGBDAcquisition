@@ -511,7 +511,7 @@ int main(int argc, char **argv)
 
 
   doDrawing();
-
+/*
   while (1)
    {
      glx3_checkEvents();
@@ -519,7 +519,8 @@ int main(int argc, char **argv)
      drawGenericTriangleMesh(cubeCoords,cubeNormals,36*3);
      usleep(100);
      glx3_endRedraw();
-   }
+   }*/
+
 
   stop_glx3_stuff();
  return 0;
