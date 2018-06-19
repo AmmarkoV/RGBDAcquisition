@@ -324,6 +324,7 @@ int doDrawing()
                                          near,
                                          far
                                          );
+     transpose4x4MatrixD(projectionMatrixD);
 
      glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
      //glViewport(0,0,WIDTH,HEIGHT);
@@ -391,18 +392,18 @@ int doDrawing()
         double pitch=0.0;//(double) (rand()%90);
         double yaw=0.0;//(double)   (rand()%90);
 
-
-        double x=959.231f;//(double)  (1000-rand()%2000);
+        double x=-259.231f;//(double)  (1000-rand()%2000);
         double y=-54.976f;//(double) (100-rand()%200);
-        double z=2300.0f;//(double)  (700+rand()%1000);
+        double z=2699.735f;//(double)  (700+rand()%1000);
 
        fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)",x,y,z,roll,pitch,yaw);
 
 
-       double modelMatrixD[16]={-10.0000,0.0000,0.0000,0.0000,
-                                  0.0000,0.0000,10.0000,0.0000,
-                                  0.0000,10.0000,-0.0000,0.0000,
-                                  0.1923,0.5498,22.9974,1.0000
+       double modelMatrixD[16]={
+                                10.0000,0.0000,0.0000,0.0000,
+                                0.0000,10.0000,0.0000,0.0000,
+                                0.0000,0.0000,10.0000,0.0000,
+                                2.5923,0.5498,26.9974,1.0000
                                 };
      //  transpose4x4MatrixD(modelMatrixD);
 
@@ -418,9 +419,9 @@ int doDrawing()
                                     (double) y/100,
                                     (double) z/100,
 
-                                    13.0,//scaleX,
-                                    13.0,//scaleY,
-                                    13.0//scaleZ
+                                    10.0,//scaleX,
+                                    10.0,//scaleY,
+                                    10.0//scaleZ
                                    );
       //print4x4DMatrix("Our Model",modelMatrixD,1);
 
@@ -436,10 +437,10 @@ int doDrawing()
                       0.0000,0.0000,5.6424,5.8310
                      }; //If you use this you will view the object..
 
-/*
+
        getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
        copy4x4DMatrixToF(MVP , MVPD );
-       transpose4x4Matrix(MVP);*/
+       transpose4x4Matrix(MVP);
 
 
        print4x4FMatrix("Our MVP ready for OpenGL",MVP,1);
