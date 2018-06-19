@@ -282,14 +282,15 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 GLuint
 pushObjectToBufferData(
+                             GLuint *vao ,
                              GLuint programID  ,
                              const float * vertices , unsigned int verticesLength ,
                              const float * normals , unsigned int normalsLength ,
                              const float * colors , unsigned int colorsLength
                            )
 {
-    glGenVertexArrays(1, &vao);              checkOpenGLError(__FILE__, __LINE__);
-    glBindVertexArray(vao);                  checkOpenGLError(__FILE__, __LINE__);
+    glGenVertexArrays(1, vao);              checkOpenGLError(__FILE__, __LINE__);
+    glBindVertexArray(*vao);                checkOpenGLError(__FILE__, __LINE__);
 
 
     // Create and initialize a buffer object on the server side (GPU)
@@ -366,6 +367,104 @@ void prepareMatrices(
 }
 
 
+
+int drawObjectAT(GLuint programID,
+                 GLuint vao,
+                 GLuint MatrixID,
+                 double x,
+                 double y,
+                 double z,
+                 double roll,
+                 double pitch,
+                 double yaw,
+
+                 double * projectionMatrixD,
+                 double * viewportMatrixD,
+                 double * viewMatrixD
+                 )
+{
+       //Select Shader to render with
+       glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
+
+       //Select Vertex Array Object To Render
+       glBindVertexArray(vao);                   checkOpenGLError(__FILE__, __LINE__);
+
+
+       // roll+=1.0;
+       // pitch+=1.5;
+
+       fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)",x,y,z,roll,pitch,yaw);
+
+
+       double modelMatrixD[16];
+       create4x4ModelTransformation(
+                                    modelMatrixD,
+                                    //Rotation Component
+                                    roll,//roll
+                                    pitch ,//pitch
+                                    yaw ,//yaw
+
+                                    //Translation Component (XYZ)
+                                    (double) x/100,
+                                    (double) y/100,
+                                    (double) z/100,
+
+                                    10.0,//scaleX,
+                                    10.0,//scaleY,
+                                    10.0//scaleZ
+                                   );
+
+
+       double MVPD[16];
+       float MVP[16];
+       getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
+       copy4x4DMatrixToF(MVP , MVPD );
+       transpose4x4Matrix(MVP);
+      //-------------------------------------------------------------------
+
+
+
+		// Send our transformation to the currently bound shader, in the "MVP" uniform
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
+
+
+
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+         //Our flipped view needs front culling..
+         glCullFace(GL_FRONT);
+         glEnable(GL_CULL_FACE);
+
+
+
+
+         //-------------------------------------------------
+         //if (wireFrame) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
+         //               glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+         // checkOpenGLError(__FILE__, __LINE__);
+         //-------------------------------------------------
+
+
+         glDrawArrays( GL_TRIANGLES, 0, NumVertices );   checkOpenGLError(__FILE__, __LINE__);
+
+
+       glPopAttrib();
+       glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int doDrawing()
 {
    fprintf(stderr," doDrawing \n");
@@ -405,14 +504,6 @@ int doDrawing()
     unsigned int numberOfColors = sizeof(cubeColors);*/
     unsigned int wireFrame=0;
 
-    float * vertices = pyramidCoords;
-    float * normals = pyramidNormals;
-    float * colors = cubeColors;
-    unsigned int numberOfVertices = sizeof(pyramidCoords);
-    unsigned int numberOfNormals = sizeof(pyramidNormals);
-    unsigned int numberOfColors = sizeof(pyramidCoords);
-
-
 
 	// Use our shader
 	glUseProgram(programID);
@@ -427,11 +518,25 @@ int doDrawing()
 	glDepthFunc(GL_LESS);
 
     fprintf(stderr,"Ready to start pushing geometry  ");
-		pushObjectToBufferData(
+
+    GLuint cubeVAO;
+    pushObjectToBufferData(
+                                 &cubeVAO,
                                  programID  ,
-                                 vertices ,  numberOfVertices ,
-                                 normals ,  numberOfNormals ,
-                                 colors , numberOfColors
+                                 pyramidCoords ,  sizeof(pyramidCoords) ,
+                                 pyramidNormals ,  sizeof(pyramidNormals) ,
+                                 cubeColors , sizeof(pyramidCoords)
+                              );
+
+
+
+    GLuint pyramidVAO;
+    pushObjectToBufferData(
+                                 &pyramidVAO,
+                                 programID  ,
+                                 pyramidCoords ,  sizeof(pyramidCoords) ,
+                                 pyramidNormals ,  sizeof(pyramidNormals) ,
+                                 cubeColors , sizeof(pyramidCoords)
                               );
 
 
@@ -451,87 +556,42 @@ int doDrawing()
 
 	do{
        fprintf(stderr,".");
-
-       //Select Shader to render with
-       glUseProgram(programID);                  checkOpenGLError(__FILE__, __LINE__);
-
        glClearColor( 0, 0.0, 0, 1 );
        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 
-       //Select Vertex Array Object To Render
-       glBindVertexArray(vao);                   checkOpenGLError(__FILE__, __LINE__);
+     drawObjectAT(
+                  programID,
+                  cubeVAO,
+                  MatrixID,
+                  x,
+                  y,
+                  z,
+                  roll,
+                  pitch,
+                  yaw,
+
+                  projectionMatrixD,
+                  viewportMatrixD,
+                  viewMatrixD
+                 );
 
 
-       // roll+=1.0;
-       // pitch+=1.5;
+     drawObjectAT(
+                  programID,
+                  pyramidVAO,
+                  MatrixID,
+                  x+500,
+                  y,
+                  z,
+                  roll,
+                  pitch,
+                  yaw,
 
-       fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)",x,y,z,roll,pitch,yaw);
-
-
-       double modelMatrixD[16];
-       create4x4ModelTransformation(
-                                    modelMatrixD,
-                                    //Rotation Component
-                                    roll,//roll
-                                    pitch ,//pitch
-                                    yaw ,//yaw
-
-                                    //Translation Component (XYZ)
-                                    (double) x/100,
-                                    (double) y/100,
-                                    (double) z/100,
-
-                                    10.0,//scaleX,
-                                    10.0,//scaleY,
-                                    10.0//scaleZ
-                                   );
-
-
-      double MVPD[16];
-      float MVP[16]; //If you use this you will view the object..
-
-
-       getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
-       copy4x4DMatrixToF(MVP , MVPD );
-
-       double MVPViewportedD[16];
-       multiplyTwo4x4Matrices(MVPViewportedD,viewportMatrixD,MVPD);
-      // copy4x4DMatrixToF(MVP , MVPViewportedD );
-
-       transpose4x4Matrix(MVP);
-
-
-       print4x4FMatrix("Our MVP ready for OpenGL",MVP,1);
-      //-------------------------------------------------------------------
-
-
-
-		// Send our transformation to the currently bound shader, in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
-
-
-
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-         glDisable(GL_CULL_FACE);
-
-
-
-
-         //-------------------------------------------------
-         if (wireFrame) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
-                        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-          checkOpenGLError(__FILE__, __LINE__);
-         //-------------------------------------------------
-
-
-         glDrawArrays( GL_TRIANGLES, 0, NumVertices );   checkOpenGLError(__FILE__, __LINE__);
-
-
-       glPopAttrib();
-       glBindVertexArray(0);
-       checkOpenGLError(__FILE__, __LINE__);
-
+                  projectionMatrixD,
+                  viewportMatrixD,
+                  viewMatrixD
+                 );
 
 		// Swap buffers
         glx3_endRedraw();
@@ -543,7 +603,8 @@ int doDrawing()
 	//glDeleteBuffers(1, &vertexbuffer);
 	//glDeleteBuffers(1, &colorbuffer);
 	glDeleteProgram(programID);
-	glDeleteVertexArrays(1, &vao);
+	glDeleteVertexArrays(1, &pyramidVAO);
+	glDeleteVertexArrays(1, &cubeVAO);
 	//glDeleteVertexArrays(1, &VertexArrayID);
 
 }
