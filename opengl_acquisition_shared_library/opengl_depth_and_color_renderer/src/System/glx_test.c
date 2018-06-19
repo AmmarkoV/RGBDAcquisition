@@ -155,6 +155,48 @@ static const float cubeColors[] = {
 	};
 
 
+
+float pyramidCoords[]={ //X  Y  Z       W
+                     //Far
+                     -U, -U, -U,      // bottom left
+                      0,  U,  0,      // top
+                      U, -U, -U,      // bottom right
+
+                     //Near
+                      -U, -U,  U,      // top left
+                       U, -U,  U,      // top right
+                       0,  U,  0,      // top
+
+                     //Left
+                      -U, -U, -U,       // bottom left
+                      -U, -U,  U,      // top left
+                       0,  U,  0,      // top
+
+                     //Right
+                       U, -U, -U,      // bottom right
+                       0,  U,  0,      // top
+                       U, -U,  U,      // top right
+
+
+                     //Bottom
+                     -U, -U,  U, //1.0,  // top left
+                     -U, -U, -U, //1.0,  // bottom left
+                      U, -U,  U, //1.0,  // top right
+
+                      U, -U,  U,//1.0,   // top right
+                     -U, -U, -U, //1.0,  // bottom left
+                      U, -U, -U  //, 1.0 // bottom right
+                    };
+float pyramidNormals[]={ //X  Y  Z  W
+                      0.0,0.4472,-0.8944,
+                      0.0,0.4472,0.8944,
+                      -0.8944,0.4472,0.0,
+                      0.8944,0.4472,0.0,
+                      0.0,-1.0,0.0,
+                      0.0,-1.0,0.0
+};
+
+
 void printOpenGLError(int errorCode)
 {
   switch (errorCode)
@@ -315,11 +357,10 @@ void prepareMatrices(
                                          far
                                          );
      transpose4x4MatrixD(projectionMatrixD); //We want our own Row Major format..
-     glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+     //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
 
 
-
-     create4x4IdentityMatrix(viewMatrixD);
+     create4x4ScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
 
      glGetViewportMatrix(viewportMatrixD, viewport[0],viewport[1],viewport[2],viewport[3],near,far);
 }
@@ -355,15 +396,21 @@ int doDrawing()
  	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
-
+/*
     float * vertices = cubeCoords;
     float * normals = cubeNormals;
     float * colors = cubeColors;
     unsigned int numberOfVertices = sizeof(cubeCoords);
     unsigned int numberOfNormals = sizeof(cubeNormals);
-    unsigned int numberOfColors = sizeof(cubeColors);
+    unsigned int numberOfColors = sizeof(cubeColors);*/
     unsigned int wireFrame=0;
 
+    float * vertices = pyramidCoords;
+    float * normals = pyramidNormals;
+    float * colors = cubeColors;
+    unsigned int numberOfVertices = sizeof(pyramidCoords);
+    unsigned int numberOfNormals = sizeof(pyramidNormals);
+    unsigned int numberOfColors = sizeof(pyramidCoords);
 
 
 
@@ -388,6 +435,7 @@ int doDrawing()
                               );
 
 
+
     fprintf(stderr,"Ready to render: ");
 
      //-------------------------------------------------------------------
@@ -395,7 +443,7 @@ int doDrawing()
         double pitch=0.0;//(double) (rand()%90);
         double yaw=0.0;//(double)   (rand()%90);
 
-        double x=0.231f;//(double)  (1000-rand()%2000);
+        double x=-259.231f;//(double)  (1000-rand()%2000);
         double y=-54.976f;//(double) (100-rand()%200);
         double z=2699.735f;//(double)  (700+rand()%1000);
      //-------------------------------------------------------------------
@@ -415,8 +463,8 @@ int doDrawing()
        glBindVertexArray(vao);                   checkOpenGLError(__FILE__, __LINE__);
 
 
-        roll+=1.0;
-        pitch+=1.5;
+       // roll+=1.0;
+       // pitch+=1.5;
 
        fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)",x,y,z,roll,pitch,yaw);
 
