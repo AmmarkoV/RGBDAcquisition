@@ -19,17 +19,6 @@ void copyGLMMatrix(double * ourMat,glm::mat4 glmMat)
 }
 
 
-void print4x4OurMatrixD(const char * str , double * matrix4x4)
-{
-  fprintf( stderr, " 4x4 float %s \n",str);
-  fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
-  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
-  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
-  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
-  fprintf( stderr, "--------------------------------------\n");
-}
-
 
 void printOutGLMMatrix(const char * label , glm::mat4 matrix)
 {
@@ -82,10 +71,10 @@ int main( void )
     double ourMVP[16];
     getModelViewProjectionMatrixFromMatrices(ourMVP,ourProjection,ourView,ourModel);
 
-    print4x4OurMatrixD("Our Projection",ourProjection);
-    print4x4OurMatrixD("Our View",ourView);
-    print4x4OurMatrixD("Our Model",ourModel);
-    print4x4OurMatrixD("Our MVP",ourMVP);
+    print4x4DMatrix("Our Projection",ourProjection,1);
+    print4x4DMatrix("Our View",ourView,1);
+    print4x4DMatrix("Our Model",ourModel,1);
+    print4x4DMatrix("Our MVP",ourMVP,1);
 
 	return 0;
 }

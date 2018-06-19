@@ -105,7 +105,7 @@ int convertRodriguezAndTranslationTo4x4DUnprojectionMatrix(double * result4x4, d
    m[12]= 0.0;          m[13]= 0.0;         m[14]=0.0;          m[15]=1.0;
 
 
-  print4x4DMatrix("ModelView", result4x4);
+  print4x4DMatrix("ModelView", result4x4,0);
   free4x4Matrix(&matrix3x3Rotation);
   return 1;
 }
@@ -803,6 +803,18 @@ glLookAt(
 
   void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix)
   {
+
+    fprintf(stderr,"Asked To perform multiplication MVP = Projection * View * Model");
+
+    print4x4DMatrix("projectionMatrix",projectionMatrix,1);
+    print4x4DMatrix("viewMatrix",viewMatrix,1);
+    print4x4DMatrix("modelMatrix",modelMatrix,1);
+
 	 //MVP = Projection * View * Model || Remember, matrix multiplication is the other way around
+     ///THIS IS THE CORRECT WAY
      multiplyThree4x4Matrices(output, projectionMatrix , viewMatrix , modelMatrix );
+
+     //Anapoda
+     //multiplyThree4x4Matrices(output, modelMatrix  ,viewMatrix ,projectionMatrix );
+    print4x4DMatrix("MVP=",output,1);
   }

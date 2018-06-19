@@ -58,30 +58,40 @@ void free4x4Matrix(double ** mat)
   *mat=0;
 }
 
-void print4x4FMatrix(const char * str , float * matrix4x4)
+void print4x4FMatrix(const char * str , float * matrix4x4,int forcePrint)
 {
   #if PRINT_MATRIX_DEBUGGING
+   forcePrint=1;
+  #endif // PRINT_MATRIX_DEBUGGING
+
+  if (forcePrint)
+  {
   fprintf( stderr, " 4x4 float %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
-  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
-  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
-  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
+  fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f,\n",matrix4x4[0],matrix4x4[1],matrix4x4[2],matrix4x4[3]);
+  fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f,\n",matrix4x4[4],matrix4x4[5],matrix4x4[6],matrix4x4[7]);
+  fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f,\n",matrix4x4[8],matrix4x4[9],matrix4x4[10],matrix4x4[11]);
+  fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f\n",matrix4x4[12],matrix4x4[13],matrix4x4[14],matrix4x4[15]);
   fprintf( stderr, "--------------------------------------\n");
-  #endif // PRINT_MATRIX_DEBUGGING
+  }
 }
 
-void print4x4DMatrix(const char * str , double * matrix4x4)
+void print4x4DMatrix(const char * str , double * matrix4x4,int forcePrint)
 {
   #if PRINT_MATRIX_DEBUGGING
+   forcePrint=1;
+  #endif // PRINT_MATRIX_DEBUGGING
+
+  if (forcePrint)
+  {
   fprintf( stderr, " 4x4 double %s \n",str);
   fprintf( stderr, "--------------------------------------\n");
-  fprintf( stderr, "  %f ",matrix4x4[0]);  fprintf( stderr, "%f ",matrix4x4[1]);  fprintf( stderr, "%f ",matrix4x4[2]);  fprintf( stderr, "%f\n",matrix4x4[3]);
-  fprintf( stderr, "  %f ",matrix4x4[4]);  fprintf( stderr, "%f ",matrix4x4[5]);  fprintf( stderr, "%f ",matrix4x4[6]);  fprintf( stderr, "%f\n",matrix4x4[7]);
-  fprintf( stderr, "  %f ",matrix4x4[8]);  fprintf( stderr, "%f ",matrix4x4[9]);  fprintf( stderr, "%f ",matrix4x4[10]); fprintf( stderr, "%f\n",matrix4x4[11]);
-  fprintf( stderr, "  %f ",matrix4x4[12]); fprintf( stderr, "%f ",matrix4x4[13]); fprintf( stderr, "%f ",matrix4x4[14]); fprintf( stderr, "%f\n",matrix4x4[15]);
+  fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f,\n",matrix4x4[0],matrix4x4[1],matrix4x4[2],matrix4x4[3]);
+  fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f,\n",matrix4x4[4],matrix4x4[5],matrix4x4[6],matrix4x4[7]);
+  fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f,\n",matrix4x4[8],matrix4x4[9],matrix4x4[10],matrix4x4[11]);
+  fprintf(stderr,"%0.4f,%0.4f,%0.4f,%0.4f\n",matrix4x4[12],matrix4x4[13],matrix4x4[14],matrix4x4[15]);
   fprintf( stderr, "--------------------------------------\n");
-  #endif // PRINT_MATRIX_DEBUGGING
+  }
 }
 
 
@@ -815,7 +825,7 @@ int transform3DPointVectorUsing4x4Matrix(double * resultPoint3D, double * transf
   } else
   {
      fprintf(stderr,"Error with W coordinate after multiplication of 3D Point with 4x4 Matrix\n");
-     print4x4DMatrix("Matrix was",transformation4x4);
+     print4x4DMatrix("Matrix was",transformation4x4,1);
      fprintf(stderr,"Input Point was %0.2f %0.2f %0.2f %0.2f \n",point3D[0],point3D[1],point3D[2],point3D[3]);
      fprintf(stderr,"Output Point was %0.2f %0.2f %0.2f %0.2f \n",resultPoint3D[0],resultPoint3D[1],resultPoint3D[2],resultPoint3D[3]);
      return 0;
@@ -856,6 +866,10 @@ void create4x4ModelTransformation(
                                  )
 {
    if (m==0) {return;}
+
+    fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f)",rollInDegrees,pitchInDegrees,yawInDegrees);
+    fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f)",x,y,z);
+    fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
 
 
     double intermediateMatrixTranslation[16];

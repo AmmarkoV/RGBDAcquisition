@@ -181,7 +181,7 @@ int updateProjectionMatrix()
     if ( (WIDTH==0) || (HEIGHT==0) ) { fprintf(stderr,"Null dimensions for viewport"); }
     glViewport(0,0,WIDTH,HEIGHT);
 
-    print4x4DMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix );
+    print4x4DMatrix("OpenGL Projection Matrix Given by Trajectory Parser", scene->projectionMatrix ,0 );
 
   } else
   if (scene->useIntrinsicMatrix)
@@ -203,7 +203,7 @@ int updateProjectionMatrix()
                                              scene->controls.farPlane
                                            );
 
-   print4x4DMatrix("OpenGL Projection Matrix", scene->customProjectionMatrix );
+   print4x4DMatrix("OpenGL Projection Matrix", scene->customProjectionMatrix , 0 );
 
    glMatrixMode(GL_PROJECTION);
    glLoadMatrixd(scene->customProjectionMatrix); // we load a matrix of Doubles
@@ -647,7 +647,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
       if (scene->useCustomModelViewMatrix)
          {
            fprintf(stderr,"Please not that the model view matrix has been overwritten by the scene configuration parameter\n");
-           print4x4DMatrix("Scene declared modelview matrix", scene->modelViewMatrix);
+           print4x4DMatrix("Scene declared modelview matrix", scene->modelViewMatrix , 0);
          }
 
    checkOpenGLError(__FILE__, __LINE__);

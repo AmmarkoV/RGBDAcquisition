@@ -18,7 +18,7 @@
 #include "../../../../tools/AmMatrix/matrixOpenGL.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
-#define U 1.0
+#define U 0.5
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 
@@ -238,8 +238,6 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 
 
-
-
 GLuint
 pushObjectToBufferData(
                              GLuint programID  ,
@@ -327,7 +325,7 @@ int doDrawing()
                                          far
                                          );
 
-     //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+     glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
      //glViewport(0,0,WIDTH,HEIGHT);
 
 
@@ -389,19 +387,25 @@ int doDrawing()
 
 
      //-------------------------------------------------------------------
-        double roll=(double)  (rand()%360);
-        double pitch=(double) (rand()%360);
-        double yaw=(double)   (rand()%360);
+        double roll=0.0;//(double)  (rand()%90);
+        double pitch=0.0;//(double) (rand()%90);
+        double yaw=0.0;//(double)   (rand()%90);
 
 
-        double x=0;//(double)  (1000-rand()%2000);
-        double y=0;//(double) (100-rand()%200);
-        double z=(double)  (1000+rand()%1000);
+        double x=959.231f;//(double)  (1000-rand()%2000);
+        double y=-54.976f;//(double) (100-rand()%200);
+        double z=2300.0f;//(double)  (700+rand()%1000);
 
        fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)",x,y,z,roll,pitch,yaw);
 
 
-       double modelMatrixD[16];
+       double modelMatrixD[16]={-10.0000,0.0000,0.0000,0.0000,
+                                  0.0000,0.0000,10.0000,0.0000,
+                                  0.0000,10.0000,-0.0000,0.0000,
+                                  0.1923,0.5498,22.9974,1.0000
+                                };
+     //  transpose4x4MatrixD(modelMatrixD);
+
        create4x4ModelTransformation(
                                     modelMatrixD,
                                     //Rotation Component
@@ -410,25 +414,35 @@ int doDrawing()
                                     yaw ,//yaw
 
                                     //Translation Component (XYZ)
-                                    x,y,z,
+                                    (double) x/100,
+                                    (double) y/100,
+                                    (double) z/100,
 
-                                    1.0,//scaleX,
-                                    1.0,//scaleY,
-                                    1.0//scaleZ
+                                    13.0,//scaleX,
+                                    13.0,//scaleY,
+                                    13.0//scaleZ
                                    );
+      //print4x4DMatrix("Our Model",modelMatrixD,1);
 
 
-      double MVPD[16];
+      double MVPD[16]={-1.0864,-0.9937,-0.6874,-0.6860,
+                      0.0000,2.0702,-0.5155,-0.5145,
+                     -1.4485,0.7453,0.5155,0.5145,
+                      0.0000,0.0000,5.6424,5.8310
+                      };
       float MVP[16]={-1.0864,-0.9937,-0.6874,-0.6860,
                       0.0000,2.0702,-0.5155,-0.5145,
                      -1.4485,0.7453,0.5155,0.5145,
                       0.0000,0.0000,5.6424,5.8310
                      }; //If you use this you will view the object..
 
+/*
+       getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
+       copy4x4DMatrixToF(MVP , MVPD );
+       transpose4x4Matrix(MVP);*/
 
-      // getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
-      // copy4x4DMatrixToF(MVP , MVPD );
-      // transpose4x4Matrix(MVP);
+
+       print4x4FMatrix("Our MVP ready for OpenGL",MVP,1);
       //-------------------------------------------------------------------
 
 
@@ -453,6 +467,18 @@ int doDrawing()
 
          glDrawArrays( GL_TRIANGLES, 0, NumVertices );   checkOpenGLError(__FILE__, __LINE__);
 
+         /*
+         glMatrixMode(GL_PROJECTION);
+       transpose4x4MatrixD(projectionMatrixD);
+         glLoadMatrixd( projectionMatrixD ); // we load a matrix of Doubles
+       transpose4x4MatrixD(projectionMatrixD);
+
+         glMatrixMode(GL_MODELVIEW);
+       transpose4x4MatrixD(modelMatrixD);
+         glLoadMatrixd( modelMatrixD ); // we load a matrix of Doubles
+       transpose4x4MatrixD(modelMatrixD);
+          drawGenericTriangleMesh(cubeCoords, cubeNormals , NumVertices);*/
+
        glPopAttrib();
        glBindVertexArray(0);
        checkOpenGLError(__FILE__, __LINE__);
@@ -460,7 +486,8 @@ int doDrawing()
 
 		// Swap buffers
         glx3_endRedraw();
-
+        sleep(1);
+        z+=100;
 	} // Check if the ESC key was pressed or the window was closed
 	while( 1 );
 

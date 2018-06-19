@@ -34,7 +34,7 @@ void free4x4Matrix(double ** mat);
 * @param  Label for the printout ( cString )
 * @param  Pointer to a Pointer of an allocated float matrix
 */
-void print4x4FMatrix(const char * str , float * matrix4x4);
+void print4x4FMatrix(const char * str , float * matrix4x4,int forcePrint);
 
 /**
 * @brief Printout an 4x4 Matrix that consists of doubles
@@ -42,7 +42,7 @@ void print4x4FMatrix(const char * str , float * matrix4x4);
 * @param  Label for the printout ( cString )
 * @param  Pointer to a Pointer of an allocated doubles matrix
 */
-void print4x4DMatrix(const char * str , double * matrix4x4);
+void print4x4DMatrix(const char * str , double * matrix4x4,int forcePrint);
 
 
 
