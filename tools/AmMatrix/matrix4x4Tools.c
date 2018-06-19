@@ -867,9 +867,9 @@ void create4x4ModelTransformation(
 {
    if (m==0) {return;}
 
-    fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f)",rollInDegrees,pitchInDegrees,yawInDegrees);
-    fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f)",x,y,z);
-    fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
+    //fprintf(stderr,"Asked for a model transformation with RPY(%0.2f,%0.2f,%0.2f)",rollInDegrees,pitchInDegrees,yawInDegrees);
+    //fprintf(stderr,"XYZ(%0.2f,%0.2f,%0.2f)",x,y,z);
+    //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
 
 
     double intermediateMatrixTranslation[16];

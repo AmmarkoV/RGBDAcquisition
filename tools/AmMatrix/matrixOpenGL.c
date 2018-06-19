@@ -829,17 +829,15 @@ void glGetViewportMatrix(double * m , double startX,double startY, double width,
   void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix)
   {
 
-    fprintf(stderr,"Asked To perform multiplication MVP = Projection * View * Model");
+    //fprintf(stderr,"Asked To perform multiplication MVP = Projection * View * Model");
 
-    print4x4DMatrix("projectionMatrix",projectionMatrix,1);
-    print4x4DMatrix("viewMatrix",viewMatrix,1);
-    print4x4DMatrix("modelMatrix",modelMatrix,1);
+    //print4x4DMatrix("projectionMatrix",projectionMatrix,1);
+    //print4x4DMatrix("viewMatrix",viewMatrix,1);
+    //print4x4DMatrix("modelMatrix",modelMatrix,1);
 
 	 //MVP = Projection * View * Model || Remember, matrix multiplication is the other way around
-     ///THIS IS THE CORRECT WAY
+     ///THIS IS THE CORRECT WAY TO PERFORM THE MULTIPLICATION WITH OUR ROW MAJOR MATRICES
      multiplyThree4x4Matrices(output, projectionMatrix , viewMatrix , modelMatrix );
 
-     //Anapoda
-     //multiplyThree4x4Matrices(output, modelMatrix  ,viewMatrix ,projectionMatrix );
-    print4x4DMatrix("MVP=",output,1);
+     //print4x4DMatrix("MVP=",output,1);
   }

@@ -30,8 +30,6 @@
   int WIDTH=640;
   int HEIGHT=480;
 
-unsigned int NumVertices=0;
-GLuint vao=0;
 
 static const float cubeCoords[]=
 {
@@ -298,7 +296,7 @@ pushObjectToBufferData(
     glGenBuffers( 1, &buffer );                 checkOpenGLError(__FILE__, __LINE__);
     glBindBuffer( GL_ARRAY_BUFFER, buffer );    checkOpenGLError(__FILE__, __LINE__);
 
-    NumVertices+=(unsigned int ) verticesLength/(3*sizeof(float));
+    unsigned int NumVertices=(unsigned int ) verticesLength/(3*sizeof(float));
     fprintf(stderr,"Will DrawArray(GL_TRIANGLES,0,%u) - %u \n"  ,NumVertices,verticesLength);
     fprintf(stderr,"Pushing %lu vertices (%u bytes) and %u normals (%u bytes) as our object \n"  ,verticesLength/sizeof(float),verticesLength,normalsLength/sizeof(float),normalsLength);
     glBufferData( GL_ARRAY_BUFFER, verticesLength + normalsLength  + colorsLength  ,NULL, GL_STATIC_DRAW );   checkOpenGLError(__FILE__, __LINE__);
@@ -371,6 +369,9 @@ void prepareMatrices(
 int drawObjectAT(GLuint programID,
                  GLuint vao,
                  GLuint MatrixID,
+                 unsigned int triangleCount,
+
+
                  double x,
                  double y,
                  double z,
@@ -389,11 +390,7 @@ int drawObjectAT(GLuint programID,
        //Select Vertex Array Object To Render
        glBindVertexArray(vao);                   checkOpenGLError(__FILE__, __LINE__);
 
-
-       // roll+=1.0;
-       // pitch+=1.5;
-
-       fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)",x,y,z,roll,pitch,yaw);
+       //fprintf(stderr,"XYZRPY(%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f)\n",x,y,z,roll,pitch,yaw);
 
 
        double modelMatrixD[16];
@@ -444,7 +441,7 @@ int drawObjectAT(GLuint programID,
          //-------------------------------------------------
 
 
-         glDrawArrays( GL_TRIANGLES, 0, NumVertices );   checkOpenGLError(__FILE__, __LINE__);
+         glDrawArrays( GL_TRIANGLES, 0, triangleCount );   checkOpenGLError(__FILE__, __LINE__);
 
 
        glPopAttrib();
@@ -494,14 +491,6 @@ int doDrawing()
 
  	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-
-/*
-    float * vertices = cubeCoords;
-    float * normals = cubeNormals;
-    float * colors = cubeColors;
-    unsigned int numberOfVertices = sizeof(cubeCoords);
-    unsigned int numberOfNormals = sizeof(cubeNormals);
-    unsigned int numberOfColors = sizeof(cubeColors);*/
     unsigned int wireFrame=0;
 
 
@@ -520,17 +509,19 @@ int doDrawing()
     fprintf(stderr,"Ready to start pushing geometry  ");
 
     GLuint cubeVAO;
+    unsigned int cubeTriangleCount  =  (unsigned int )  sizeof(cubeCoords)/(3*sizeof(float));
     pushObjectToBufferData(
                                  &cubeVAO,
-                                 programID  ,
-                                 pyramidCoords ,  sizeof(pyramidCoords) ,
-                                 pyramidNormals ,  sizeof(pyramidNormals) ,
-                                 cubeColors , sizeof(pyramidCoords)
+                                 programID   ,
+                                 cubeCoords  ,  sizeof(cubeCoords) ,
+                                 cubeNormals ,  sizeof(cubeNormals) ,
+                                 cubeColors  , sizeof(cubeColors)
                               );
 
 
 
     GLuint pyramidVAO;
+    unsigned int pyramidTriangleCount  =  (unsigned int )  sizeof(pyramidCoords)/(3*sizeof(float));
     pushObjectToBufferData(
                                  &pyramidVAO,
                                  programID  ,
@@ -559,12 +550,15 @@ int doDrawing()
        glClearColor( 0, 0.0, 0, 1 );
        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
+       roll+=1.0;
+       pitch+=1.5;
 
      drawObjectAT(
                   programID,
                   cubeVAO,
                   MatrixID,
-                  x,
+                  cubeTriangleCount,
+                  x-400,
                   y,
                   z,
                   roll,
@@ -581,7 +575,8 @@ int doDrawing()
                   programID,
                   pyramidVAO,
                   MatrixID,
-                  x+500,
+                  pyramidTriangleCount,
+                  x+1100,
                   y,
                   z,
                   roll,
@@ -605,8 +600,6 @@ int doDrawing()
 	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &pyramidVAO);
 	glDeleteVertexArrays(1, &cubeVAO);
-	//glDeleteVertexArrays(1, &VertexArrayID);
-
 }
 
 
