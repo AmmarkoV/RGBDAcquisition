@@ -219,7 +219,8 @@ void buildOpenGLProjectionForIntrinsics   (
 }
 
 
-void buildOpenGLProjectionForIntrinsicsD  (
+void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD
+                                           (
                                              double * frustum,
                                              int * viewport ,
                                              double fx,
@@ -799,6 +800,30 @@ glLookAt(
     glMultMatrixf(&m[0][0]);
     glTranslated(-eyex, -eyey, -eyez);*/
 }
+
+void glGetViewportMatrix(double * m , double startX,double startY, double width,double height , double near , double far)
+{ //See https://en.wikibooks.org/wiki/GLSL_Programming/Vertex_Transformations
+  m[0]=width/2;
+  m[1]=0.0f;
+  m[2]=0.0f;
+  m[3]=startX + (width/2);
+
+  m[4]=0.0f;
+  m[5]=height/2;
+  m[6]=0.0f;
+  m[7]=startY+(height/2);
+
+  m[8]=0.0f;
+  m[9]=0.0f;
+  m[10]=(far-near)/2;
+  m[11]=(near+far)/2;
+
+  m[12]=0.0f;
+  m[13]=0.0f;
+  m[14]=0.0f;
+  m[15]=1.0f;
+}
+
 
 
   void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix)

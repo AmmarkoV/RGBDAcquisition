@@ -65,7 +65,7 @@ void buildOpenGLProjectionForIntrinsics   (
 * @param  Input Array 4x1 of absolute 3D position of the point ( X,Y,Z,W )
 * @retval 0=Failure,1=Success
 */
-void buildOpenGLProjectionForIntrinsicsD   (
+void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD(
                                              double * frustum,
                                              int * viewport ,
                                              double fx,
@@ -157,7 +157,7 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
 
 
 
-
+void glGetViewportMatrix(double * m , double startX,double startY, double width,double height , double near , double far);
 
   void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix);
 
