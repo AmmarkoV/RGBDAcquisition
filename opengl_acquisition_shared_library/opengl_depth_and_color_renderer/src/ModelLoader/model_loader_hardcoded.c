@@ -69,6 +69,17 @@ float planeTexCoords[]={ //X  Y  Z       W
                          0.0f, 0.0f // bottom left
                      };
 
+	// The fullscreen quad's FBO
+static const float g_quad_vertex_buffer_data[] =
+    {
+		-1.0f, -1.0f, 0.0f,
+		 1.0f, -1.0f, 0.0f,
+		-1.0f,  1.0f, 0.0f,
+		-1.0f,  1.0f, 0.0f,
+		 1.0f, -1.0f, 0.0f,
+		 1.0f,  1.0f, 0.0f,
+	};
+
 
 float cubeCoords[]=
 {
