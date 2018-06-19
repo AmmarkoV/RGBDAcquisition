@@ -395,7 +395,7 @@ int doDrawing()
         double pitch=0.0;//(double) (rand()%90);
         double yaw=0.0;//(double)   (rand()%90);
 
-        double x=-259.231f;//(double)  (1000-rand()%2000);
+        double x=0.231f;//(double)  (1000-rand()%2000);
         double y=-54.976f;//(double) (100-rand()%200);
         double z=2699.735f;//(double)  (700+rand()%1000);
      //-------------------------------------------------------------------
