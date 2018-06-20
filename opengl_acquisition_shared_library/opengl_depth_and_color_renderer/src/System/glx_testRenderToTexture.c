@@ -548,6 +548,168 @@ int initializeFramebuffer(GLuint * FramebufferName, GLuint * renderedTexture, GL
 
 
 
+int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+{
+    double depth_bias=0.0; double depth_scale=1.0;
+    glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
+    glGetDoublev(GL_DEPTH_SCALE, &depth_scale); // Returns 1.0
+
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"getOpenGLDepth() : Error getting depth bias/scale \n"); }
+
+    float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
+    if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
+    memset(zbuffer,0,(width-x)*(height-y)*sizeof(float));
+    glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
+
+
+    /*
+       Not sure I am calculating the correct depth here..
+    */
+
+    memset(depth,0 , (width-x)*(height-y)*2 );
+
+
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLdouble posX, posY, posZ=0.0;
+
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+    glGetDoublev( GL_PROJECTION_MATRIX, projection );
+    glGetIntegerv( GL_VIEWPORT, viewport );
+
+
+    float scaleDepthTo = 1.0f;//sceneGetDepthScalingPrameter();
+     unsigned int xp = 0, yp = 0;
+
+     for (yp=0; yp<height; yp++)
+       {
+         for ( xp=0 ; xp<width; xp++)
+            {
+                float tmpF=zbuffer[yp*width+xp];
+
+                #if OPTIMIZE_DEPTH_EXTRACTION
+                if (tmpF==0)
+                {
+                  //Do nothing , fast path
+                } else
+                #endif // OPTIMIZE_DEPTH_EXTRACTION
+                if (tmpF<depth_scale)
+                {
+                 gluUnProject((double) xp , (double) yp, (double) tmpF , modelview, projection, viewport, &posX, &posY, &posZ);
+
+
+
+
+                 #if REAL_DEPTH
+                  tmpF = sqrt( (posX*posX) + (posY*posY) + (posZ*posZ) ) * scaleDepthTo;
+                  depth[(height-yp-1)*width+xp]=(unsigned short) tmpF;
+
+                  #if SCALE_REAL_DEPTH_OUTPUT
+                    depth[(height-yp-1)*width+xp]*=depthMemoryOutputScale;
+                  #endif // SCALE_REAL_DEPTH_OUTPUT
+                 #else
+                  depth[(height-yp-1)*width+xp]=(unsigned short) posZ * scaleDepthTo;
+                 #endif // REAL_DEPTH
+
+                }
+            }
+       }
+
+    if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
+
+
+   if (checkOpenGLError(__FILE__, __LINE__))
+      { fprintf(stderr,"OpenGL error after getOpenGLDepth() \n"); }
+
+    return 1;
+}
+
+
+
+
+
+
+
+
+
+
+int downloadFramebufferGLREADPIXEL(const char * filename , GLuint tex)
+{
+   unsigned short * pixelsD = (unsigned short * ) malloc(sizeof(unsigned short) * WIDTH * HEIGHT);
+
+   if (pixelsD!=0)
+   {
+     getOpenGLDepth(pixelsD,0,0,WIDTH,HEIGHT);
+
+     saveRawImageToFileOGLR(
+                            filename,
+                            pixelsD ,
+                            WIDTH,
+                            HEIGHT,
+                            1,
+                            16
+                           );
+
+      free(pixelsD);
+      return 1;
+    }
+
+ return 0;
+}
+
+
+
+int downloadFramebuffer(const char * filename , GLuint tex)
+{
+   float * pixelsF = (float * ) malloc(sizeof(float) * WIDTH * HEIGHT);
+
+   if (pixelsF!=0)
+   {
+    glGetTexImage ( GL_TEXTURE_2D,
+                   tex,
+                   GL_DEPTH_COMPONENT,
+                   GL_FLOAT,
+                   pixelsF);
+    checkOpenGLError(__FILE__, __LINE__);
+
+
+
+    char * pixelsC = (char * ) malloc(sizeof(char) * 3 * WIDTH * HEIGHT);
+    if (pixelsC!=0)
+    {
+     float * pixelsFPTR = pixelsF;
+     char  * pixelPTR = pixelsC;
+     char  * pixelLimit = pixelsC+(3 * WIDTH * HEIGHT);
+
+     while (pixelPTR<pixelLimit)
+     {
+       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
+       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
+       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
+       pixelsFPTR++;
+     }
+
+
+    saveRawImageToFileOGLR(
+                           filename,
+                           pixelsC ,
+                           WIDTH,
+                           HEIGHT,
+                           3,
+                           8
+                          );
+
+      return 1;
+
+    }
+   free(pixelsF);
+  }
+ return 0;
+}
+
+
 int drawFramebuffer(
                        GLuint programFrameBufferID,
                        GLuint quad_vertexbuffer,
@@ -592,57 +754,17 @@ int drawFramebuffer(
 		// Draw the triangles !
 		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
 
+
+         fprintf(stderr,"Writing Depth :");
+          downloadFramebuffer("depth.pnm",renderedTexture);
+         fprintf(stderr,"done .\n");
+
+
 		glDisableVertexAttribArray(0);
 }
 
 
-int downloadFramebuffer(const char * filename , GLuint tex)
-{
-   float * pixelsF = (float * ) malloc(sizeof(float) * WIDTH * HEIGHT);
 
-   if (pixelsF!=0)
-   {
-    glGetTexImage ( GL_TEXTURE_2D,
-                   tex,
-                   GL_DEPTH_COMPONENT,
-                   GL_FLOAT,
-                   pixelsF);
-    checkOpenGLError(__FILE__, __LINE__);
-
-
-
-    char * pixelsC = (char * ) malloc(sizeof(char) * 3 * WIDTH * HEIGHT);
-    if (pixelsC!=0)
-    {
-     float * pixelsFPTR = pixelsF;
-     char * pixelPTR = pixelsC;
-     char * pixelLimit = pixelsC+(3 * WIDTH * HEIGHT);
-
-     while (pixelPTR<pixelLimit)
-     {
-       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
-       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
-       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
-       pixelsFPTR++;
-     }
-
-
-    saveRawImageToFileOGLR(
-                           filename,
-                           pixelsC ,
-                           WIDTH,
-                           HEIGHT,
-                           3,
-                           8
-                          );
-
-      return 1;
-
-    }
-   free(pixelsF);
-  }
- return 0;
-}
 
 
 
@@ -804,10 +926,6 @@ int doDrawing()
                         texID,
                         timeID
                        );
-
-         fprintf(stderr,"Writing Depth :");
-          downloadFramebuffer("depth.pnm",renderedDepth);
-         fprintf(stderr,"done .\n");
 
 
 		// Swap buffers
