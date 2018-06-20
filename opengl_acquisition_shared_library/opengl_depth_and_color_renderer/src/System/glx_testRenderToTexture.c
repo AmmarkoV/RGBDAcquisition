@@ -523,7 +523,7 @@ int initializeFramebuffer(GLuint * FramebufferName, GLuint * renderedTexture, GL
 	//// Alternative : Depth texture. Slower, but you can sample it later in your shader
 	glGenTextures(1, depthTexture);
 	glBindTexture(GL_TEXTURE_2D, *depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, WIDTH, HEIGHT, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, WIDTH, HEIGHT, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0); //GL_UNSIGNED_BYTE
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -598,28 +598,48 @@ int drawFramebuffer(
 
 int downloadFramebuffer(const char * filename , GLuint tex)
 {
-    char * pixels = (char * ) malloc(sizeof(char) * 4 * WIDTH * HEIGHT);
+   float * pixelsF = (float * ) malloc(sizeof(float) * WIDTH * HEIGHT);
 
-   if (pixels!=0)
+   if (pixelsF!=0)
    {
     glGetTexImage ( GL_TEXTURE_2D,
                    tex,
-                   GL_RGB, // GL will convert to this format
-                   GL_UNSIGNED_BYTE,
-                   pixels);
+                   GL_DEPTH_COMPONENT,
+                   GL_FLOAT,
+                   pixelsF);
     checkOpenGLError(__FILE__, __LINE__);
+
+
+
+    char * pixelsC = (char * ) malloc(sizeof(char) * 3 * WIDTH * HEIGHT);
+    if (pixelsC!=0)
+    {
+     float * pixelsFPTR = pixelsF;
+     char * pixelPTR = pixelsC;
+     char * pixelLimit = pixelsC+(3 * WIDTH * HEIGHT);
+
+     while (pixelPTR<pixelLimit)
+     {
+       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
+       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
+       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
+       pixelsFPTR++;
+     }
+
 
     saveRawImageToFileOGLR(
                            filename,
-                           pixels ,
+                           pixelsC ,
                            WIDTH,
                            HEIGHT,
                            3,
                            8
                           );
 
-   free(pixels);
-   return 1;
+      return 1;
+
+    }
+   free(pixelsF);
   }
  return 0;
 }
@@ -786,7 +806,7 @@ int doDrawing()
                        );
 
          fprintf(stderr,"Writing Depth :");
-         downloadFramebuffer("depth.pnm",renderedDepth);
+          downloadFramebuffer("depth.pnm",renderedDepth);
          fprintf(stderr,"done .\n");
 
 
