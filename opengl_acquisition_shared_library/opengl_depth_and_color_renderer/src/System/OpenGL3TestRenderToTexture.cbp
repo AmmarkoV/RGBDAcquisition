@@ -48,6 +48,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Rendering/ShaderPipeline/shader_loader.h" />
+		<Unit filename="../Tools/save_to_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Tools/save_to_file.h" />
 		<Unit filename="glx3.c">
 			<Option compilerVar="CC" />
 		</Unit>

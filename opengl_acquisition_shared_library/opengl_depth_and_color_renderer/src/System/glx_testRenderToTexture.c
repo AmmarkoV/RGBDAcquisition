@@ -15,6 +15,8 @@
 
 #include <time.h>
 
+#include "../Tools/save_to_file.h"
+
 #include "glx3.h"
 
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
@@ -485,7 +487,7 @@ int drawObjectAT(GLuint programID,
 
 
 
-int initializeFramebuffer(GLuint * FramebufferName, GLuint * renderedTexture)
+int initializeFramebuffer(GLuint * FramebufferName, GLuint * renderedTexture, GLuint * depthTexture)
 {
  // ---------------------------------------------
 	// Render to Texture - specific code begins here
@@ -519,20 +521,19 @@ int initializeFramebuffer(GLuint * FramebufferName, GLuint * renderedTexture)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
 
 	//// Alternative : Depth texture. Slower, but you can sample it later in your shader
-	//GLuint depthTexture;
-	//glGenTextures(1, &depthTexture);
-	//glBindTexture(GL_TEXTURE_2D, depthTexture);
-	//glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, 1024, 768, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glGenTextures(1, depthTexture);
+	glBindTexture(GL_TEXTURE_2D, *depthTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, WIDTH, HEIGHT, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// Set "renderedTexture" as our colour attachement #0
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, *renderedTexture, 0);
 
 	//// Depth texture alternative :
-	//glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, *depthTexture, 0);
 
 
 	// Set the list of draw buffers.
@@ -542,7 +543,7 @@ int initializeFramebuffer(GLuint * FramebufferName, GLuint * renderedTexture)
 	// Always check that our framebuffer is ok
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) { return 0; }
 
-
+  return 1;
 }
 
 
@@ -551,7 +552,8 @@ int drawFramebuffer(
                        GLuint programFrameBufferID,
                        GLuint quad_vertexbuffer,
                        GLuint renderedTexture,
-                       GLuint texID
+                       GLuint texID,
+                       GLuint timeID
                    )
 {
 
@@ -593,6 +595,34 @@ int drawFramebuffer(
 		glDisableVertexAttribArray(0);
 }
 
+
+int downloadFramebuffer(const char * filename , GLuint tex)
+{
+    char * pixels = (char * ) malloc(sizeof(char) * 4 * WIDTH * HEIGHT);
+
+   if (pixels!=0)
+   {
+    glGetTexImage ( GL_TEXTURE_2D,
+                   tex,
+                   GL_RGB, // GL will convert to this format
+                   GL_UNSIGNED_BYTE,
+                   pixels);
+    checkOpenGLError(__FILE__, __LINE__);
+
+    saveRawImageToFileOGLR(
+                           filename,
+                           pixels ,
+                           WIDTH,
+                           HEIGHT,
+                           3,
+                           8
+                          );
+
+   free(pixels);
+   return 1;
+  }
+ return 0;
+}
 
 
 
@@ -682,7 +712,8 @@ int doDrawing()
 
      GLuint FramebufferName = 0;
      GLuint renderedTexture;
-     initializeFramebuffer(&FramebufferName,&renderedTexture);
+     GLuint renderedDepth;
+     initializeFramebuffer(&FramebufferName,&renderedTexture,&renderedDepth);
 
 	 GLuint quad_vertexbuffer;
 	 glGenBuffers(1, &quad_vertexbuffer);
@@ -691,6 +722,8 @@ int doDrawing()
 
 	 // Create and compile our GLSL program from the shaders
 	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
+	 // Create and compile our GLSL program from the shaders
+	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "time");
 
 
 	do{
@@ -747,9 +780,14 @@ int doDrawing()
         drawFramebuffer(
                         programFrameBufferID,
                         quad_vertexbuffer,
-                        renderedTexture,
-                        texID
+                        renderedDepth,//renderedTexture,
+                        texID,
+                        timeID
                        );
+
+         fprintf(stderr,"Writing Depth :");
+         downloadFramebuffer("depth.pnm",renderedDepth);
+         fprintf(stderr,"done .\n");
 
 
 		// Swap buffers
