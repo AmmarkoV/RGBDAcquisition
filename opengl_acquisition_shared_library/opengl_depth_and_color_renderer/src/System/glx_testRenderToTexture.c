@@ -667,6 +667,7 @@ int downloadFramebuffer(const char * filename , GLuint tex)
 
    if (pixelsF!=0)
    {
+    glBindTexture(GL_TEXTURE_2D, tex);
     glGetTexImage ( GL_TEXTURE_2D,
                    tex,
                    GL_DEPTH_COMPONENT,
@@ -922,7 +923,8 @@ int doDrawing()
         drawFramebuffer(
                         programFrameBufferID,
                         quad_vertexbuffer,
-                        renderedDepth,//renderedTexture,
+                        //renderedDepth,
+                        renderedTexture,
                         texID,
                         timeID
                        );
