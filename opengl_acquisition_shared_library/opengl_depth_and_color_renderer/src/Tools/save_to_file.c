@@ -41,7 +41,7 @@ int _ogl_swapEndiannessPNM(void * pixels , unsigned int width , unsigned int hei
  return 1;
 }
 
-int saveRawImageToFileOGLR(char * filename,void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperpixel)
+int saveRawImageToFileOGLR(char * filename,void * pixels , unsigned int width , unsigned int height , unsigned int channels , unsigned int bitsperchannel)
 {
     if(pixels==0) { fprintf(stderr,"saveRawImageToFileOGLR(%s) called for an unallocated (empty) frame , will not write any file output\n",filename); return 0; }
     FILE *fd=0;
@@ -49,12 +49,12 @@ int saveRawImageToFileOGLR(char * filename,void * pixels , unsigned int width , 
 
      #if USE_REGULAR_BYTEORDER_FOR_PNM
      //Want Conformance to the NETPBM spec http://en.wikipedia.org/wiki/Netpbm_format#16-bit_extensions
-     if (bitsperpixel==16) { _ogl_swapEndiannessPNM(pixels , width , height , channels , bitsperpixel); }
+     if (bitsperchannel==16) { _ogl_swapEndiannessPNM(pixels , width , height , channels , bitsperchannel); }
     #else
       #warning "We are using Our Local Byte Order for saving files , this makes things fast but is incompatible with other PNM loaders"
     #endif // USE_REGULAR_BYTEORDER_FOR_PNM
 
-    if (bitsperpixel>16) fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n");
+    if (bitsperchannel>16) fprintf(stderr,"PNM does not support more than 2 bytes per pixel..!\n");
     if (fd!=0)
     {
         unsigned int n;
@@ -67,9 +67,9 @@ int saveRawImageToFileOGLR(char * filename,void * pixels , unsigned int width , 
             return 1;
         }
 
-        fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperpixel)-1);
+        fprintf(fd, "%d %d\n%u\n", width, height , simplePow(2 ,bitsperchannel)-1);
 
-        float tmp_n = (float) bitsperpixel/ 8;
+        float tmp_n = (float) bitsperchannel/ 8;
         tmp_n = tmp_n *  width * height * channels ;
         n = (unsigned int) tmp_n;
 

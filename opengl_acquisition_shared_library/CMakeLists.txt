@@ -67,6 +67,9 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/Rendering/ogl_rendering.h
             opengl_depth_and_color_renderer/src/Rendering/tiledRenderer.h
             opengl_depth_and_color_renderer/src/Rendering/tiledRenderer.c
+            opengl_depth_and_color_renderer/src/Rendering/downloadFromRenderer.c
+            opengl_depth_and_color_renderer/src/Rendering/downloadFromRenderer.h
+            
  
             opengl_depth_and_color_renderer/src/Tools/tools.h
             opengl_depth_and_color_renderer/src/Tools/tools.c
