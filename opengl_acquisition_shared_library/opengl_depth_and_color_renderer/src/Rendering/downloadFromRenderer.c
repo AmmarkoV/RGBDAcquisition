@@ -36,7 +36,7 @@ int downloadOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned in
        if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
 
        glReadPixels(x + X_OFFSET, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
-       checkFrameGettersForError("Flipped Color Getter");
+       //checkFrameGettersForError("Flipped Color Getter");
 
       //SLOW INVERSION CODE :P
        unsigned int yp = 0;
@@ -63,7 +63,7 @@ int downloadOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned in
 
 #warning "TODO : add Horizontal flipping  <- is the output mirrored ?"
 
-int downloadOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+int downloadOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale)
 {
     double depth_bias=0.0; double depth_scale=1.0;
     glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
@@ -72,7 +72,7 @@ int downloadOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned
     float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     glReadPixels(x + X_OFFSET , y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
-    checkFrameGettersForError("Z-Buffer Getter");
+    //checkFrameGettersForError("Z-Buffer Getter");
     /*
        Not sure I am calculating the correct depth here..
     */
@@ -115,7 +115,7 @@ int downloadOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned
 
 
 
-int downloadOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+int downloadOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale)
 {
     double depth_bias=0.0; double depth_scale=1.0;
     glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
@@ -128,7 +128,7 @@ int downloadOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned i
     if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
     memset(zbuffer,0,(width-x)*(height-y)*sizeof(float));
     glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
-    checkFrameGettersForError("Depth Getter");
+    //checkFrameGettersForError("Depth Getter");
 
     /*
        Not sure I am calculating the correct depth here..
@@ -147,7 +147,7 @@ int downloadOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned i
     glGetIntegerv( GL_VIEWPORT, viewport );
 
 
-    float scaleDepthTo = sceneGetDepthScalingPrameter();
+    float scaleDepthTo = depthScale;// sceneGetDepthScalingPrameter();
      unsigned int xp = 0, yp = 0;
 
      for (yp=0; yp<height; yp++)
@@ -189,3 +189,125 @@ int downloadOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned i
 
     return 1;
 }
+
+
+
+
+
+
+
+
+
+
+
+int downloadOpenGLDepthFromTexture(const char * filename , unsigned int tex , unsigned int width , unsigned int height)
+{
+   float * pixelsF = (float * ) malloc(sizeof(float) * width * height);
+
+   if (pixelsF!=0)
+   {
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glGetTexImage ( GL_TEXTURE_2D,
+                   tex,
+                   GL_DEPTH_COMPONENT,
+                   GL_FLOAT,
+                   pixelsF);
+    checkOpenGLError(__FILE__, __LINE__);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    char * pixelsC = (char * ) malloc(sizeof(char) * 3 * width * height);
+    if (pixelsC!=0)
+    {
+     float * pixelsFPTR = pixelsF;
+     char  * pixelPTR = pixelsC;
+     char  * pixelLimit = pixelsC+(3 * width * height);
+
+     while (pixelPTR<pixelLimit)
+     {
+       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
+       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
+       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
+       pixelsFPTR++;
+     }
+
+
+    saveRawImageToFileOGLR(
+                           filename,
+                           pixelsC ,
+                           width,
+                           height,
+                           1,
+                           16
+                          );
+
+     free(pixelsC);
+      return 1;
+
+    }
+   free(pixelsF);
+  }
+ return 0;
+}
+
+
+int downloadOpenGLColorFromTexture(const char * filename , unsigned int tex, unsigned int width , unsigned int height)
+{
+   char * pixels3C = (char* ) malloc(sizeof(char) * 4 * width * height);
+
+   if (pixels3C!=0)
+   {
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glGetTexImage ( GL_TEXTURE_2D,
+                   tex,
+                   GL_RGB,
+                   GL_UNSIGNED_BYTE,
+                   pixels3C);
+    checkOpenGLError(__FILE__, __LINE__);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    char * pixelsC = (char * ) malloc(sizeof(char) * 3 * width * height);
+    if (pixelsC!=0)
+    {
+     float * pixels3CPTR = pixels3C;
+     char  * pixelPTR = pixelsC;
+     char  * pixelLimit = pixelsC+(3 * width * height);
+
+     while (pixelPTR<pixelLimit)
+     {
+       *pixelPTR  = (unsigned char) *pixels3CPTR;  pixelPTR++;       pixels3CPTR++;
+       *pixelPTR  = (unsigned char) *pixels3CPTR;  pixelPTR++;       pixels3CPTR++;
+       *pixelPTR  = (unsigned char) *pixels3CPTR;  pixelPTR++;       pixels3CPTR++;
+     }
+
+
+     saveRawImageToFileOGLR(
+                           filename,
+                           pixelsC ,
+                           width,
+                           height,
+                           3,
+                           8
+                          );
+      free(pixelsC);
+
+      return 1;
+
+    }
+   free(pixels3C);
+  }
+ return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

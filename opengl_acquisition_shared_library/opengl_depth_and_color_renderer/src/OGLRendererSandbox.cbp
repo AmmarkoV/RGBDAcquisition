@@ -48,6 +48,7 @@
 		<Linker>
 			<Add library="GL" />
 			<Add library="GLU" />
+			<Add library="GLEW" />
 			<Add library="X11" />
 			<Add library="../../../tools/Codecs/libCodecs.a" />
 			<Add library="jpeg" />
@@ -167,6 +168,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Rendering/ShaderPipeline/shader_loader.h" />
+		<Unit filename="Rendering/downloadFromRenderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Rendering/downloadFromRenderer.h" />
 		<Unit filename="Rendering/ogl_rendering.c">
 			<Option compilerVar="CC" />
 		</Unit>

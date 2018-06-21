@@ -80,7 +80,7 @@ void checkFrameGettersForError(char * from)
 
 int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
-   return downloadOpenGLDepth(depth,x,y,width,height);
+   return downloadOpenGLDepth(depth,x,y,width,height,sceneGetDepthScalingPrameter());
 }
 
 unsigned int getOpenGLWidth()

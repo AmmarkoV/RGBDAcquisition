@@ -8,8 +8,15 @@
 
 int downloadOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
 
-int downloadOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
+int downloadOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale);
 
-int downloadOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
+int downloadOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale);
+
+
+
+int downloadOpenGLColorFromTexture(const char * filename , unsigned int tex, unsigned int width , unsigned int height);
+int downloadOpenGLDepthFromTexture(const char * filename , unsigned int tex , unsigned int width , unsigned int height);
+
+
 #endif // OGL_DOWNLOADFROMRENDERER_H_INCLUDED
 

@@ -547,132 +547,6 @@ int initializeFramebuffer(GLuint * FramebufferName, GLuint * renderedTexture, GL
 }
 
 
-int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
-{
-  GLint ext_format, ext_type;
-
-  #warning "GL_IMPLEMENTATION_COLOR_READ_TYPE manually declared .."
-  #define GL_IMPLEMENTATION_COLOR_READ_TYPE   		0x8B9A
-  #define GL_IMPLEMENTATION_COLOR_READ_FORMAT 		0x8B9B
-  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &ext_format);
-  glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &ext_type);
-
-    #if FLIP_OPEN_GL_IMAGES
-       char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
-       if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
-
-       glReadPixels(x + X_OFFSET, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,inverter);
-       checkFrameGettersForError("Flipped Color Getter");
-
-      //SLOW INVERSION CODE :P
-       unsigned int yp = 0;
-       unsigned int stride = (width-x)*3;
-
-       for (yp=0; yp<height; yp++)
-       {
-         char * where_to = &color[yp*stride];
-         char * where_from = &inverter[(height-1-yp)*stride];
-         memcpy(where_to , where_from , stride * sizeof(char));
-       }
-      free(inverter);
-    #else
-       glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE,color);
-       checkFrameGettersForError("Normal Color Getter");
-    #endif
-
-
-   if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"OpenGL error after getOpenGLColor() \n"); }
-
-   return 1;
-}
-
-
-int getOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
-{
-    double depth_bias=0.0; double depth_scale=1.0;
-    glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
-    glGetDoublev(GL_DEPTH_SCALE, &depth_scale); // Returns 1.0
-
-   if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"getOpenGLDepth() : Error getting depth bias/scale \n"); }
-
-    float * zbuffer = (float *) malloc((width-x)*(height-y)*sizeof(float));
-    if (zbuffer==0) { fprintf(stderr,"Could not allocate a zbuffer to read depth\n"); return 0; }
-    memset(zbuffer,0,(width-x)*(height-y)*sizeof(float));
-    glReadPixels(x, y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT,zbuffer);
-
-
-    /*
-       Not sure I am calculating the correct depth here..
-    */
-
-    memset(depth,0 , (width-x)*(height-y)*2 );
-
-
-    GLint viewport[4];
-    GLdouble modelview[16];
-    GLdouble projection[16];
-    GLdouble posX, posY, posZ=0.0;
-
-    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-    glGetDoublev( GL_PROJECTION_MATRIX, projection );
-    glGetIntegerv( GL_VIEWPORT, viewport );
-
-
-    float scaleDepthTo = 1.0f;//sceneGetDepthScalingPrameter();
-     unsigned int xp = 0, yp = 0;
-
-     for (yp=0; yp<height; yp++)
-       {
-         for ( xp=0 ; xp<width; xp++)
-            {
-                float tmpF=zbuffer[yp*width+xp];
-
-                #if OPTIMIZE_DEPTH_EXTRACTION
-                if (tmpF==0)
-                {
-                  //Do nothing , fast path
-                } else
-                #endif // OPTIMIZE_DEPTH_EXTRACTION
-                if (tmpF<depth_scale)
-                {
-                 gluUnProject((double) xp , (double) yp, (double) tmpF , modelview, projection, viewport, &posX, &posY, &posZ);
-
-
-
-
-                 #if REAL_DEPTH
-                  tmpF = sqrt( (posX*posX) + (posY*posY) + (posZ*posZ) ) * scaleDepthTo;
-                  depth[(height-yp-1)*width+xp]=(unsigned short) tmpF;
-
-                  #if SCALE_REAL_DEPTH_OUTPUT
-                    depth[(height-yp-1)*width+xp]*=depthMemoryOutputScale;
-                  #endif // SCALE_REAL_DEPTH_OUTPUT
-                 #else
-                  depth[(height-yp-1)*width+xp]=(unsigned short) posZ * scaleDepthTo;
-                 #endif // REAL_DEPTH
-
-                }
-            }
-       }
-
-    if (zbuffer!=0) { free(zbuffer); zbuffer=0; }
-
-
-   if (checkOpenGLError(__FILE__, __LINE__))
-      { fprintf(stderr,"OpenGL error after getOpenGLDepth() \n"); }
-
-    return 1;
-}
-
-
-
-
-
-
-
-
 
 
 int downloadFramebufferGLREADPIXEL(const char * filename , GLuint tex)
@@ -681,7 +555,7 @@ int downloadFramebufferGLREADPIXEL(const char * filename , GLuint tex)
 
    if (pixelsD!=0)
    {
-     getOpenGLDepth(pixelsD,0,0,WIDTH,HEIGHT);
+     downloadOpenGLDepth(pixelsD,0,0,WIDTH,HEIGHT,1.0);
 
      saveRawImageToFileOGLR(
                             filename,
@@ -710,7 +584,7 @@ int downloadColorFramebufferGLREADPIXEL(const char * filename , GLuint tex)
 
    if (pixelsC!=0)
    {
-     getOpenGLColor(pixelsC,0,0,WIDTH,HEIGHT);
+     downloadOpenGLColor(pixelsC,0,0,WIDTH,HEIGHT);
 
      saveRawImageToFileOGLR(
                             filename,
@@ -730,105 +604,6 @@ int downloadColorFramebufferGLREADPIXEL(const char * filename , GLuint tex)
 
 
 
-int downloadDepthFramebuffer(const char * filename , GLuint tex)
-{
-   float * pixelsF = (float * ) malloc(sizeof(float) * WIDTH * HEIGHT);
-
-   if (pixelsF!=0)
-   {
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glGetTexImage ( GL_TEXTURE_2D,
-                   tex,
-                   GL_DEPTH_COMPONENT,
-                   GL_FLOAT,
-                   pixelsF);
-    checkOpenGLError(__FILE__, __LINE__);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    char * pixelsC = (char * ) malloc(sizeof(char) * 3 * WIDTH * HEIGHT);
-    if (pixelsC!=0)
-    {
-     float * pixelsFPTR = pixelsF;
-     char  * pixelPTR = pixelsC;
-     char  * pixelLimit = pixelsC+(3 * WIDTH * HEIGHT);
-
-     while (pixelPTR<pixelLimit)
-     {
-       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
-       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
-       *pixelPTR  = (unsigned char) *pixelsFPTR;  pixelPTR++;
-       pixelsFPTR++;
-     }
-
-
-    saveRawImageToFileOGLR(
-                           filename,
-                           pixelsC ,
-                           WIDTH,
-                           HEIGHT,
-                           1,
-                           16
-                          );
-
-     free(pixelsC);
-      return 1;
-
-    }
-   free(pixelsF);
-  }
- return 0;
-}
-
-
-int downloadColorFramebuffer(const char * filename , GLuint tex)
-{
-   char * pixels3C = (char* ) malloc(sizeof(char) * 4 * WIDTH * HEIGHT);
-
-   if (pixels3C!=0)
-   {
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glGetTexImage ( GL_TEXTURE_2D,
-                   tex,
-                   GL_RGB,
-                   GL_UNSIGNED_BYTE,
-                   pixels3C);
-    checkOpenGLError(__FILE__, __LINE__);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    char * pixelsC = (char * ) malloc(sizeof(char) * 3 * WIDTH * HEIGHT);
-    if (pixelsC!=0)
-    {
-     float * pixels3CPTR = pixels3C;
-     char  * pixelPTR = pixelsC;
-     char  * pixelLimit = pixelsC+(3 * WIDTH * HEIGHT);
-
-     while (pixelPTR<pixelLimit)
-     {
-       *pixelPTR  = (unsigned char) *pixels3CPTR;  pixelPTR++;       pixels3CPTR++;
-       *pixelPTR  = (unsigned char) *pixels3CPTR;  pixelPTR++;       pixels3CPTR++;
-       *pixelPTR  = (unsigned char) *pixels3CPTR;  pixelPTR++;       pixels3CPTR++;
-     }
-
-
-     saveRawImageToFileOGLR(
-                           filename,
-                           pixelsC ,
-                           WIDTH,
-                           HEIGHT,
-                           3,
-                           8
-                          );
-      free(pixelsC);
-
-      return 1;
-
-    }
-   free(pixels3C);
-  }
- return 0;
-}
-
 
 
 int drawFramebuffer(
@@ -836,7 +611,8 @@ int drawFramebuffer(
                        GLuint quad_vertexbuffer,
                        GLuint renderedTexture,
                        GLuint texID,
-                       GLuint timeID
+                       GLuint timeID,
+                       GLuint resolutionID
                    )
 {
 
@@ -858,7 +634,10 @@ int drawFramebuffer(
 		// Set our "renderedTexture" sampler to use Texture Unit 0
 		glUniform1i(texID, 0);
 
-		glUniform1f(timeID, (float)(GetTickCountMilliseconds()*10.0f) );
+		glUniform1f(timeID, (float)(GetTickCountMilliseconds()/1000.0f) );
+
+		glUniform3f(resolutionID, WIDTH, HEIGHT , 1);
+
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -875,13 +654,13 @@ int drawFramebuffer(
 		// Draw the triangles !
 		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
 
-
+/*
          fprintf(stderr,"Writing Color :");
           //downloadColorFramebuffer("color.pnm",renderedTexture);
           downloadColorFramebufferGLREADPIXEL("color.pnm",renderedTexture);
          fprintf(stderr,"done .\n");
 
-
+*/
 		glDisableVertexAttribArray(0);
 }
 
@@ -898,7 +677,7 @@ int doDrawing()
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
 	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
-	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebuffer.frag");
+	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebufferFlow.frag");
 
     GLuint programID = sho->ProgramObject;
     GLuint programFrameBufferID = textureFramebuffer->ProgramObject;
@@ -987,7 +766,9 @@ int doDrawing()
 	 // Create and compile our GLSL program from the shaders
 	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
 	 // Create and compile our GLSL program from the shaders
-	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "time");
+	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "iTime");
+
+	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
 
 	do{
@@ -1047,7 +828,8 @@ int doDrawing()
                         //renderedDepth,
                         renderedTexture,
                         texID,
-                        timeID
+                        timeID,
+                        resolutionID
                        );
 
 
