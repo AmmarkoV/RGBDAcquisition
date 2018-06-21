@@ -9,52 +9,30 @@ uniform sampler2D renderedTexture;
 uniform float iTime;
 
 
-// Mellow purple flow background - Del 16/06/2018
-//https://www.shadertoy.com/view/ldVfWm
-const float pi = 3.14159;
+const float GA =2.399; 
+const mat2 rot = mat2(cos(GA),sin(GA),-sin(GA),cos(GA));
 
-vec3 MellowPurple(vec2 pos)
+// 	simplyfied version of Dave Hoskins blur
+vec3 dof(sampler2D tex,vec2 uv,float rad)
 {
-    pos *= 0.5;
-    vec3 col = vec3(0.32,0.29,0.65);
-    float d = length(pos);
-    float tt = iTime*0.08;
-    float iter = (pos.x*pos.y);
-    iter *= 0.5+sin(pos.x*0.5+tt*0.95)+0.5;
-    float r = sin(sin(tt)*pos.y);
-    r += .4;
-    float d1 = sin(tt+pos.x+pos.y);
-    float val = sin(tt+iter*pi );
-    float brightness = 0.25 / abs( d1 * val - r);
-//    brightness +=  0.25 /abs( d1+0.1 * val - r);
-//    brightness += 0.25 / abs( d1-0.1 * val - r);
-    brightness +=  0.25 /abs( d1+0.4 * val - r);
-    brightness += 0.25 / abs( d1-0.4 * val - r);
-    brightness *= 0.05;
-    brightness = brightness/(brightness + 1.);
-    brightness*=0.75-d;
-    col += brightness;
-    return col;
-}
-
-
-vec3 overlayForeground(vec3 background , vec3 foreground)
-{
-  if ( dot(foreground,foreground) != 0.0 ) { return foreground; }  
-  return background;
+	vec3 acc=vec3(0);
+    vec2 pixel=vec2(.002*iResolution.y/iResolution.x,.002),angle=vec2(0,rad);;
+    rad=1.;
+	for (int j=0;j<80;j++)
+    {  
+        rad += 1./rad;
+	    angle*=rot;
+        vec4 col=texture(tex,uv+pixel*(rad-1.)*angle);
+		acc+=col.xyz;
+	}
+	return acc/80.;
 }
 
 
 void main()
 {  
-	vec2 pos = ( UV - .5 /** iResolution.xy*/ );// / iResolution.y;     
+    //color = texture( renderedTexture, UV  ).xyz;
     
-    //Just Burn Both
-    //color = MellowPurple(pos) + texture( renderedTexture, UV  ).xyz;
-    
-    //Only Mellow 
-    //color = MellowPurple(pos);
-      
-    //Blend Both
-    color = overlayForeground ( MellowPurple(pos) , texture( renderedTexture, UV  ).xyz );
+    //Depth Of Field 
+    color =  dof(renderedTexture,UV,1.5);
 }

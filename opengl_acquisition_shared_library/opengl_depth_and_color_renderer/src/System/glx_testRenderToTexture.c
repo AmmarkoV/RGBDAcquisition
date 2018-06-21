@@ -34,6 +34,9 @@
 
   int WIDTH=640;
   int HEIGHT=480;
+  float lastFramerate = 60;
+  unsigned long lastRenderingTime = 0;
+  unsigned int framesRendered=0;
 
 
 static const float cubeCoords[]=
@@ -677,7 +680,7 @@ int doDrawing()
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
 	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
-	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebufferFlow.frag");
+	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebufferSea.frag");
 
     GLuint programID = sho->ProgramObject;
     GLuint programFrameBufferID = textureFramebuffer->ProgramObject;
@@ -777,8 +780,11 @@ int doDrawing()
 		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
 
+  //-----------------------------------------------
+  if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
+  //-----------------------------------------------
 
-       fprintf(stderr,".");
+
        glClearColor( 0, 0.0, 0, 1 );
        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
@@ -835,7 +841,20 @@ int doDrawing()
 
 		// Swap buffers
         glx3_endRedraw();
-        usleep(10);
+        usleep(5);
+
+      //---------------------------------------------------------------
+      //------------------- Calculate Framerate -----------------------
+      //---------------------------------------------------------------
+      unsigned long now=GetTickCountMilliseconds();
+      unsigned long elapsedTime=now-lastRenderingTime;
+      if (elapsedTime==0) { elapsedTime=1; }
+       lastFramerate = (float) 1000/(elapsedTime);
+       lastRenderingTime = now;
+       //---------------------------------------------------------------
+        ++framesRendered;
+       //---------------------------------------------------------------
+
 	} // Check if the ESC key was pressed or the window was closed
 	while( 1 );
 
