@@ -325,7 +325,7 @@ int doDrawing()
        pitch+=1.5;
 
     //
-    //glViewport(WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2);
+     glViewport(WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2);
 
      drawObjectAT(
                   programID,
@@ -344,6 +344,46 @@ int doDrawing()
                   viewMatrixD
                  );
 
+     glViewport(WIDTH/2, 0, WIDTH/2, HEIGHT/2);
+
+     drawObjectAT(
+                  programID,
+                  cubeVAO,
+                  MatrixID,
+                  cubeTriangleCount,
+                  x-400,
+                  y,
+                  z,
+                  roll,
+                  pitch,
+                  yaw,
+
+                  projectionMatrixD,
+                  viewportMatrixD,
+                  viewMatrixD
+                 );
+
+    glViewport(0, HEIGHT/2, WIDTH/2, HEIGHT/2);
+
+     drawObjectAT(
+                  programID,
+                  pyramidVAO,
+                  MatrixID,
+                  pyramidTriangleCount,
+                  x+1100,
+                  y,
+                  z,
+                  roll,
+                  pitch,
+                  yaw,
+
+                  projectionMatrixD,
+                  viewportMatrixD,
+                  viewMatrixD
+                 );
+
+
+    glViewport(0, 0, WIDTH/2, HEIGHT/2);
 
      drawObjectAT(
                   programID,
