@@ -16,6 +16,8 @@
 #include <time.h>
 
 #include "../Tools/save_to_file.h"
+#include "../Tools/tools.h"
+#include "../ModelLoader/hardcoded_shapes.h"
 
 #include "glx3.h"
 
@@ -23,7 +25,6 @@
 #include "../../../../tools/AmMatrix/matrixOpenGL.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
-#define U 0.5
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 
@@ -32,250 +33,11 @@
 #define RED     "\033[31m"      /* Red */
 
 
-  int WIDTH=640;
-  int HEIGHT=480;
-  float lastFramerate = 60;
-  unsigned long lastRenderingTime = 0;
-  unsigned int framesRendered=0;
-
-
-static const float cubeCoords[]=
-{
--U,-U,-U,
--U,-U, U,
--U, U, U,
- U, U,-U,
--U,-U,-U,
--U, U,-U,
- U,-U, U,
--U,-U,-U,
- U,-U,-U,
- U, U,-U,
- U,-U,-U,
--U,-U,-U,
--U,-U,-U,
--U, U, U,
--U, U,-U,
- U,-U, U,
--U,-U, U,
--U,-U,-U,
--U, U, U,
--U,-U, U,
- U,-U, U,
- U, U, U,
- U,-U,-U,
- U, U,-U,
- U,-U,-U,
- U, U, U,
- U,-U, U,
- U, U, U,
- U, U,-U,
--U, U,-U,
- U, U, U,
--U, U,-U,
--U, U, U,
- U, U, U,
--U, U, U,
- U,-U, U
- };
-
-static const float cubeNormals[]={ //X  Y  Z  W
-                      -1.0f,-0.0f,-0.0f,
-                      -1.0f,-0.0f,-0.0f,
-                      -1.0f,-0.0f,-0.0f,
-                       0.0f,0.0f,-1.0f,
-                       0.0f,0.0f,-1.0f,
-                       0.0f,0.0f,-1.0f,
-                       0.0f,-1.0f,0.0f,
-                       0.0f,-1.0f,0.0f,
-                       0.0f,-1.0f,0.0f,
-                       0.0f,0.0f,-1.0f,
-                       0.0f,0.0f,-1.0f,
-                       0.0f,0.0f,-1.0f,
-                      -1.0f,-0.0f,0.0f,
-                      -1.0f,-0.0f,0.0f,
-                      -1.0f,-0.0f,0.0f,
-                       0.0f,-1.0f,0.0f,
-                       0.0f,-1.0f,0.0f,
-                       0.0f,-1.0f,0.0f,
-                       0.0f,-0.0f,1.0f,
-                       0.0f,-0.0f,1.0f,
-                       0.0f,-0.0f,1.0f,
-                       1.0f,0.0f,-0.0f,
-                       1.0f,0.0f,-0.0f,
-                       1.0f,0.0f,-0.0f,
-                       1.0f,-0.0f,0.0f,
-                       1.0f,-0.0f,0.0f,
-                       1.0f,-0.0f,0.0f,
-                       0.0f,1.0f,0.0f,
-                       0.0f,1.0f,0.0f,
-                       0.0f,1.0f,0.0f,
-                      -0.0f,1.0f,0.0f,
-                      -0.0f,1.0f,0.0f,
-                      -0.0f,1.0f,0.0f,
-                       0.0f,-0.0f,1.0f,
-                       0.0f,-0.0f,1.0f,
-                       0.0f,-0.0f,1.0f
-};
-
-
-
-// One color for each vertex. They were generated randomly.
-static const float cubeColors[] = {
-		0.583f,  0.771f,  0.014f,
-		0.609f,  0.115f,  0.436f,
-		0.327f,  0.483f,  0.844f,
-		0.822f,  0.569f,  0.201f,
-		0.435f,  0.602f,  0.223f,
-		0.310f,  0.747f,  0.185f,
-		0.597f,  0.770f,  0.761f,
-		0.559f,  0.436f,  0.730f,
-		0.359f,  0.583f,  0.152f,
-		0.483f,  0.596f,  0.789f,
-		0.559f,  0.861f,  0.639f,
-		0.195f,  0.548f,  0.859f,
-		0.014f,  0.184f,  0.576f,
-		0.771f,  0.328f,  0.970f,
-		0.406f,  0.615f,  0.116f,
-		0.676f,  0.977f,  0.133f,
-		0.971f,  0.572f,  0.833f,
-		0.140f,  0.616f,  0.489f,
-		0.997f,  0.513f,  0.064f,
-		0.945f,  0.719f,  0.592f,
-		0.543f,  0.021f,  0.978f,
-		0.279f,  0.317f,  0.505f,
-		0.167f,  0.620f,  0.077f,
-		0.347f,  0.857f,  0.137f,
-		0.055f,  0.953f,  0.042f,
-		0.714f,  0.505f,  0.345f,
-		0.783f,  0.290f,  0.734f,
-		0.722f,  0.645f,  0.174f,
-		0.302f,  0.455f,  0.848f,
-		0.225f,  0.587f,  0.040f,
-		0.517f,  0.713f,  0.338f,
-		0.053f,  0.959f,  0.120f,
-		0.393f,  0.621f,  0.362f,
-		0.673f,  0.211f,  0.457f,
-		0.820f,  0.883f,  0.371f,
-		0.982f,  0.099f,  0.879f
-	};
-
-
-
-float pyramidCoords[]={ //X  Y  Z       W
-                     //Far
-                     -U, -U, -U,      // bottom left
-                      0,  U,  0,      // top
-                      U, -U, -U,      // bottom right
-
-                     //Near
-                      -U, -U,  U,      // top left
-                       U, -U,  U,      // top right
-                       0,  U,  0,      // top
-
-                     //Left
-                      -U, -U, -U,       // bottom left
-                      -U, -U,  U,      // top left
-                       0,  U,  0,      // top
-
-                     //Right
-                       U, -U, -U,      // bottom right
-                       0,  U,  0,      // top
-                       U, -U,  U,      // top right
-
-
-                     //Bottom
-                     -U, -U,  U, //1.0,  // top left
-                     -U, -U, -U, //1.0,  // bottom left
-                      U, -U,  U, //1.0,  // top right
-
-                      U, -U,  U,//1.0,   // top right
-                     -U, -U, -U, //1.0,  // bottom left
-                      U, -U, -U  //, 1.0 // bottom right
-                    };
-float pyramidNormals[]={ //X  Y  Z  W
-                      0.0,0.4472,-0.8944,
-                      0.0,0.4472,0.8944,
-                      -0.8944,0.4472,0.0,
-                      0.8944,0.4472,0.0,
-                      0.0,-1.0,0.0,
-                      0.0,-1.0,0.0
-};
-
-
-	// The fullscreen quad's FBO
-static const GLfloat g_quad_vertex_buffer_data[] =
-    {
-		-1.0f, -1.0f, 0.0f,
-		 1.0f, -1.0f, 0.0f,
-		-1.0f,  1.0f, 0.0f,
-		-1.0f,  1.0f, 0.0f,
-		 1.0f, -1.0f, 0.0f,
-		 1.0f,  1.0f, 0.0f,
-	};
-
-
-unsigned long tickBase = 0;
-
-unsigned long GetTickCountMilliseconds()
-{
-   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
-   struct timespec ts;
-   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
-
-   if (tickBase==0)
-   {
-     tickBase = ts.tv_sec*1000 + ts.tv_nsec/1000000;
-     return 0;
-   }
-
-   return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBase;
-}
-
-void printOpenGLError(int errorCode)
-{
-  switch (errorCode)
-  {
-    case  GL_NO_ERROR       :
-         fprintf(stderr,"No error has been recorded.");
-        break;
-    case  GL_INVALID_ENUM   :
-         fprintf(stderr,"An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag.\n");
-        break;
-    case  GL_INVALID_VALUE  :
-         fprintf(stderr,"A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag.");
-        break;
-    case  GL_INVALID_OPERATION :
-         fprintf(stderr,"The specified operation is not allowed in the current state. The offending command is ignored and has no other side effect than to set the error flag.");
-        break;
-    case  GL_INVALID_FRAMEBUFFER_OPERATION :
-         fprintf(stderr,"The framebuffer object is not complete. The offending command is ignored and has no other side effect than to set the error flag.");
-        break;
-    case  GL_OUT_OF_MEMORY :
-         fprintf(stderr,"There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded.");
-        break;
-    case  GL_STACK_UNDERFLOW :
-         fprintf(stderr,"An attempt has been made to perform an operation that would cause an internal stack to underflow.");
-        break;
-    case  GL_STACK_OVERFLOW :
-         fprintf(stderr,"An attempt has been made to perform an operation that would cause an internal stack to overflow.");
-     break;
-  };
-}
-
-
-int checkOpenGLError(char * file , int  line)
-{
-  int err=glGetError();
-  if (err !=  GL_NO_ERROR /*0*/ )
-    {
-      fprintf(stderr,RED "OpenGL Error (%d) : %s %d \n ", err , file ,line );
-      printOpenGLError(err);
-      fprintf(stderr,"\n" NORMAL);
-      return 1;
-    }
- return 0;
-}
+int WIDTH=640;
+int HEIGHT=480;
+float lastFramerate = 60;
+unsigned long lastRenderingTime = 0;
+unsigned int framesRendered=0;
 
 
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
@@ -427,6 +189,7 @@ int drawObjectAT(GLuint programID,
 
        glPopAttrib();
        glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
+       return 1;
 }
 
 
@@ -553,6 +316,7 @@ int drawFramebuffer(
 
 */
 		glDisableVertexAttribArray(0);
+		return 1;
 }
 
 
@@ -601,7 +365,6 @@ int doDrawing()
 
  	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-    unsigned int wireFrame=0;
 
 
 	// Use our shader
