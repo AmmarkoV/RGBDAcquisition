@@ -173,6 +173,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Rendering/ShaderPipeline/shader_loader.h" />
+		<Unit filename="Rendering/ShaderPipeline/uploadGeometry.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Rendering/downloadFromRenderer.c">
 			<Option compilerVar="CC" />
 		</Unit>

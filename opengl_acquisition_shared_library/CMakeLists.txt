@@ -61,6 +61,8 @@ add_library(OpenGLAcquisition SHARED
             opengl_depth_and_color_renderer/src/Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
             opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/render_buffer.c
             opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/render_buffer.h
+            opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/uploadGeometry.h
+            opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/uploadGeometry.c 
             opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.c
             opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h
             opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/shader_loader.c

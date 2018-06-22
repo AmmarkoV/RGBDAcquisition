@@ -71,6 +71,8 @@ add_library(OGLRendererSandbox SHARED
             Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
             Rendering/ShaderPipeline/render_buffer.c
             Rendering/ShaderPipeline/render_buffer.h
+            Rendering/ShaderPipeline/uploadGeometry.h
+            Rendering/ShaderPipeline/uploadGeometry.c 
             Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.c
             Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h
             Rendering/ShaderPipeline/shader_loader.c

@@ -292,7 +292,7 @@ int doDrawing()
      GLuint FramebufferName = 0;
      GLuint renderedTexture;
      GLuint renderedDepth;
-     initializeFramebuffer(&FramebufferName,&renderedTexture,&renderedDepth);
+     initializeFramebuffer(&FramebufferName,&renderedTexture,&renderedDepth,WIDTH,HEIGHT);
 
 	 GLuint quad_vertexbuffer;
 	 glGenBuffers(1, &quad_vertexbuffer);
@@ -323,6 +323,9 @@ int doDrawing()
 
        roll+=1.0;
        pitch+=1.5;
+
+    //
+    //glViewport(WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2);
 
      drawObjectAT(
                   programID,
@@ -368,7 +371,8 @@ int doDrawing()
                         renderedTexture,
                         texID,
                         timeID,
-                        resolutionID
+                        resolutionID,
+                        WIDTH,HEIGHT
                        );
 
 
