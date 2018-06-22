@@ -27,7 +27,6 @@
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 #include "../Rendering/ShaderPipeline/render_buffer.h"
 
-#define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 
 #define NORMAL   "\033[0m"
@@ -52,58 +51,6 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
     return 0;
 }
 
-
-
-GLuint
-pushObjectToBufferData(
-                             GLuint *vao ,
-                             GLuint programID  ,
-                             const float * vertices , unsigned int verticesLength ,
-                             const float * normals , unsigned int normalsLength ,
-                             const float * colors , unsigned int colorsLength
-                           )
-{
-    glGenVertexArrays(1, vao);              checkOpenGLError(__FILE__, __LINE__);
-    glBindVertexArray(*vao);                checkOpenGLError(__FILE__, __LINE__);
-
-
-    // Create and initialize a buffer object on the server side (GPU)
-    GLuint      buffer;
-    glGenBuffers( 1, &buffer );                 checkOpenGLError(__FILE__, __LINE__);
-    glBindBuffer( GL_ARRAY_BUFFER, buffer );    checkOpenGLError(__FILE__, __LINE__);
-
-    unsigned int NumVertices=(unsigned int ) verticesLength/(3*sizeof(float));
-    fprintf(stderr,"Will DrawArray(GL_TRIANGLES,0,%u) - %u \n"  ,NumVertices,verticesLength);
-    fprintf(stderr,"Pushing %lu vertices (%u bytes) and %u normals (%u bytes) as our object \n"  ,verticesLength/sizeof(float),verticesLength,normalsLength/sizeof(float),normalsLength);
-    glBufferData( GL_ARRAY_BUFFER, verticesLength + normalsLength  + colorsLength  ,NULL, GL_STATIC_DRAW );   checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, 0                                      , verticesLength , vertices );   checkOpenGLError(__FILE__, __LINE__);
-    glBufferSubData( GL_ARRAY_BUFFER, verticesLength                         , normalsLength  , normals );    checkOpenGLError(__FILE__, __LINE__);
-
-    if ( (colors!=0) && (colorsLength!=0) )
-    {
-     glBufferSubData( GL_ARRAY_BUFFER, verticesLength + normalsLength , colorsLength , colors );               checkOpenGLError(__FILE__, __LINE__);
-    }
-
-    GLuint vPosition = glGetAttribLocation( programID, "vPosition" );               checkOpenGLError(__FILE__, __LINE__);
-    glEnableVertexAttribArray( vPosition );                                         checkOpenGLError(__FILE__, __LINE__);
-    glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(0) );  checkOpenGLError(__FILE__, __LINE__);
-
-
-    GLuint vNormal = glGetAttribLocation( programID, "vNormal" );                             checkOpenGLError(__FILE__, __LINE__);
-    glEnableVertexAttribArray( vNormal );                                                     checkOpenGLError(__FILE__, __LINE__);
-    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET(verticesLength) ); checkOpenGLError(__FILE__, __LINE__);
-
-
-    if ( (colors!=0) && (colorsLength!=0) )
-    {
-     GLuint vColor = glGetAttribLocation( programID, "vColor" );
-     glEnableVertexAttribArray( vColor );
-     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,BUFFER_OFFSET( verticesLength + normalsLength ) );
-     checkOpenGLError(__FILE__, __LINE__);
-    }
-
-  return buffer;
-}
 
 
 
@@ -253,28 +200,36 @@ int doDrawing()
     fprintf(stderr,"Ready to start pushing geometry  ");
 
     GLuint cubeVAO;
+    GLuint cubeArrayBuffer;
     unsigned int cubeTriangleCount  =  (unsigned int )  sizeof(cubeCoords)/(3*sizeof(float));
-    pushObjectToBufferData(
-                                 &cubeVAO,
-                                 programID   ,
-                                 cubeCoords  ,  sizeof(cubeCoords) ,
-                                 cubeNormals ,  sizeof(cubeNormals) ,
-                                 cubeColors  , sizeof(cubeColors)
-                              );
 
+    pushObjectToBufferData(
+                             1,
+                             &cubeVAO,
+                             &cubeArrayBuffer,
+                             programID  ,
+                             cubeCoords  ,  sizeof(cubeCoords) ,
+                             cubeNormals ,  sizeof(cubeNormals) ,
+                             0 ,  0, //No Texture
+                             cubeColors  ,  sizeof(cubeColors),
+                             0, 0 //Not Indexed..
+                           );
 
 
     GLuint pyramidVAO;
+    GLuint pyramidArrayBuffer;
     unsigned int pyramidTriangleCount  =  (unsigned int )  sizeof(pyramidCoords)/(3*sizeof(float));
     pushObjectToBufferData(
-                                 &pyramidVAO,
-                                 programID  ,
-                                 pyramidCoords ,  sizeof(pyramidCoords) ,
-                                 pyramidNormals ,  sizeof(pyramidNormals) ,
-                                 cubeColors , sizeof(pyramidCoords)
-                              );
-
-
+                             1,
+                             &pyramidVAO,
+                             &pyramidArrayBuffer,
+                             programID  ,
+                             pyramidCoords  ,  sizeof(pyramidCoords) ,
+                             pyramidNormals ,  sizeof(pyramidNormals) ,
+                             0 ,  0, //No Texture
+                             cubeColors  ,  sizeof(cubeColors), //Lol passing cube colors instead.. :P
+                             0, 0 //Not Indexed..
+                           );
 
     fprintf(stderr,"Ready to render: ");
 
