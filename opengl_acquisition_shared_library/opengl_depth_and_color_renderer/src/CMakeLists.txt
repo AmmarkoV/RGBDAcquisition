@@ -69,6 +69,8 @@ add_library(OGLRendererSandbox SHARED
             #OpenGL Rendering stuff  
             Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c
             Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
+            Rendering/ShaderPipeline/render_buffer.c
+            Rendering/ShaderPipeline/render_buffer.h
             Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.c
             Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h
             Rendering/ShaderPipeline/shader_loader.c

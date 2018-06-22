@@ -165,6 +165,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h" />
+		<Unit filename="Rendering/ShaderPipeline/render_buffer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Rendering/ShaderPipeline/render_buffer.h" />
 		<Unit filename="Rendering/ShaderPipeline/shader_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

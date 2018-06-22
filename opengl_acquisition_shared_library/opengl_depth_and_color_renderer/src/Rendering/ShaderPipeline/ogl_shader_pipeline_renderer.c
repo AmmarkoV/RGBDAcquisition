@@ -316,10 +316,9 @@ void doOGLShaderDrawCalllist(
     { /*textureStrength[0]=0.0;*/ }
 
 
-
+#else
+ fprintf(stderr,"doOGLShaderDrawCalllist disabled because of glew not compiled in..\n");
 #endif // USE_GLEW
-
-
 }
 
 
