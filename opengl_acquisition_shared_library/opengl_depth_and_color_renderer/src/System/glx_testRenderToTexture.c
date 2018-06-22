@@ -277,24 +277,6 @@ int checkOpenGLError(char * file , int  line)
  return 0;
 }
 
-int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coordLength)
-{
-    glBegin(GL_TRIANGLES);
-      unsigned int i=0,z=0;
-      for (i=0; i<coordLength/3; i++)
-        {
-                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z=(i*3)*3;  glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
-
-                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z+=3;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
-
-                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z+=3;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
-        }
-    glEnd();
-    return 1;
-}
 
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 {

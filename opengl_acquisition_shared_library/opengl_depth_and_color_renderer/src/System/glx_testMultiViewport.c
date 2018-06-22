@@ -277,25 +277,6 @@ int checkOpenGLError(char * file , int  line)
  return 0;
 }
 
-int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coordLength)
-{
-
-    glBegin(GL_TRIANGLES);
-      unsigned int i=0,z=0;
-      for (i=0; i<coordLength/3; i++)
-        {
-                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z=(i*3)*3;  glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
-
-                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z+=3;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
-
-                      glNormal3f(normals[i+0],normals[i+1],normals[i+2]);
-          z+=3;       glVertex3f(coords[z+0],coords[z+1],coords[z+2]);
-        }
-    glEnd();
-    return 1;
-}
 
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 {
@@ -367,40 +348,6 @@ pushObjectToBufferData(
 }
 
 
-void prepareMatrices(
-                    double * projectionMatrixD,
-                    double * viewMatrixD,
-                    double * viewportMatrixD
-                    )
-{
-
-     int viewport[4]={0};
-     double fx = 535.423889;
-     double fy = 533.48468;
-     double skew = 0.0;
-     double cx = (double) WIDTH/2;
-     double cy = (double) HEIGHT/2;
-     double near = 1.0;
-     double far = 255.0;
-     buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD(
-                                         projectionMatrixD ,
-                                         viewport ,
-                                         fx, fy,
-                                         skew,
-                                         cx,  cy,
-                                         WIDTH, HEIGHT,
-                                         near,
-                                         far
-                                         );
-     transpose4x4MatrixD(projectionMatrixD); //We want our own Row Major format..
-     //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
-
-
-     create4x4ScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
-
-     glGetViewportMatrix(viewportMatrixD, viewport[0],viewport[1],viewport[2],viewport[3],near,far);
-}
-
 
 
 int drawObjectAT(GLuint programID,
@@ -464,12 +411,9 @@ int drawObjectAT(GLuint programID,
 
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
-         //Our flipped view needs front culling..
-         glCullFace(GL_FRONT);
-         glEnable(GL_CULL_FACE);
-
-
-
+        //Our flipped view needs front culling..
+        glCullFace(GL_FRONT);
+        glEnable(GL_CULL_FACE);
 
          //-------------------------------------------------
          //if (wireFrame) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
@@ -552,61 +496,6 @@ int initializeFramebuffer(GLuint * FramebufferName, GLuint * renderedTexture, GL
 
 
 
-int downloadFramebufferGLREADPIXEL(const char * filename , GLuint tex)
-{
-   unsigned short * pixelsD = (unsigned short * ) malloc(sizeof(unsigned short) * WIDTH * HEIGHT);
-
-   if (pixelsD!=0)
-   {
-     downloadOpenGLDepth(pixelsD,0,0,WIDTH,HEIGHT,1.0);
-
-     saveRawImageToFileOGLR(
-                            filename,
-                            pixelsD ,
-                            WIDTH,
-                            HEIGHT,
-                            1,
-                            16
-                           );
-
-      free(pixelsD);
-      return 1;
-    }
-
- return 0;
-}
-
-
-
-
-
-
-int downloadColorFramebufferGLREADPIXEL(const char * filename , GLuint tex)
-{
-   unsigned char * pixelsC = (unsigned char * ) malloc(sizeof(unsigned char) * 3 * WIDTH * HEIGHT);
-
-   if (pixelsC!=0)
-   {
-     downloadOpenGLColor(pixelsC,0,0,WIDTH,HEIGHT);
-
-     saveRawImageToFileOGLR(
-                            filename,
-                            pixelsC ,
-                            WIDTH,
-                            HEIGHT,
-                            3,
-                            8
-                           );
-
-      free(pixelsC);
-      return 1;
-    }
-
- return 0;
-}
-
-
-
 
 
 int drawFramebuffer(
@@ -660,7 +549,6 @@ int drawFramebuffer(
 /*
          fprintf(stderr,"Writing Color :");
           //downloadColorFramebuffer("color.pnm",renderedTexture);
-          downloadColorFramebufferGLREADPIXEL("color.pnm",renderedTexture);
          fprintf(stderr,"done .\n");
 
 */
@@ -675,12 +563,13 @@ int drawFramebuffer(
 int doDrawing()
 {
    fprintf(stderr," doDrawing \n");
-
-
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
 	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
+	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
+
 	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebufferSea.frag");
+    if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
     GLuint programID = sho->ProgramObject;
     GLuint programFrameBufferID = textureFramebuffer->ProgramObject;
@@ -692,7 +581,17 @@ int doDrawing()
      double projectionMatrixD[16];
      double viewportMatrixD[16];
      double viewMatrixD[16];
-     prepareMatrices(
+
+     prepareRenderingMatrices(
+                     535.423889, //fx
+                     533.48468,  //fy
+                     0.0,        //skew
+                     WIDTH/2,    //cx
+                     HEIGHT/2,   //cy
+                     WIDTH,      //Window Width
+                     HEIGHT,     //Window Height
+                     1.0,        //Near
+                     255.0,      //Far
                      projectionMatrixD,
                      viewMatrixD,
                      viewportMatrixD
@@ -870,15 +769,6 @@ int doDrawing()
 
 
 
-
-
-
-
-
-
-
-
-
 int main(int argc, char **argv)
 {
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
@@ -896,3 +786,4 @@ int main(int argc, char **argv)
   stop_glx3_stuff();
  return 0;
 }
+
