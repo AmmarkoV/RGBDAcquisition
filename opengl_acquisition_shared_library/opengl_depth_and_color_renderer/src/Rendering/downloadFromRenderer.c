@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/gl.h>
@@ -18,6 +19,10 @@
 #endif // REAL_DEPTH
 
 #define X_OFFSET 0 //This should always be 0 and probably removed also  :P
+
+
+//This is a nice blog post on the subject
+//http://lektiondestages.blogspot.com/2013/01/reading-opengl-backbuffer-to-system.html
 
 
 

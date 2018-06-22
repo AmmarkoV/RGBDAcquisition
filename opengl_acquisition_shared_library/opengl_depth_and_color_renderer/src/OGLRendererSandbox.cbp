@@ -122,6 +122,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Interfaces/webInterface.h" />
+		<Unit filename="ModelLoader/hardcoded_shapes.h" />
 		<Unit filename="ModelLoader/model_converter.c">
 			<Option compilerVar="CC" />
 		</Unit>

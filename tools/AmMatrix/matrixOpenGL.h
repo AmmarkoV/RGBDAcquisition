@@ -157,10 +157,25 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
 
 
 
-void glGetViewportMatrix(double * m , double startX,double startY, double width,double height , double near , double far);
+  void glGetViewportMatrix(double * m , double startX,double startY, double width,double height , double near , double far);
 
   void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix);
 
+
+  void prepareRenderingMatrices(
+                              double fx ,
+                              double fy ,
+                              double skew ,
+                              double cx,
+                              double cy,
+                              double windowWidth,
+                              double windowHeight,
+                              double near,
+                              double far,
+                              double * projectionMatrixD,
+                              double * viewMatrixD,
+                              double * viewportMatrixD
+                             );
 
 #ifdef __cplusplus
 }
