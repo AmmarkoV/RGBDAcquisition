@@ -26,6 +26,7 @@
 
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 #include "../Rendering/ShaderPipeline/render_buffer.h"
+#include "../Rendering/ShaderPipeline/uploadGeometry.h"
 
 
 
@@ -34,8 +35,8 @@
 #define RED     "\033[31m"      /* Red */
 
 
-int WIDTH=640;
-int HEIGHT=480;
+int WIDTH=2560;
+int HEIGHT=1920;
 float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered=0;
@@ -137,7 +138,100 @@ int drawObjectAT(GLuint programID,
 
 
 
+int doTiledDrawing(
+                   int programID,
+                   GLuint MVPMatrixID ,
+                   GLuint cubeVao,
+                   unsigned int cubeTriangleCount,
+                   GLuint pyramidVao,
+                   unsigned int pyramidTriangleCount,
+                   unsigned int tilesX,
+                   unsigned int tilesY
+                   )
+{
 
+     double projectionMatrixD[16];
+     double viewportMatrixD[16];
+     double viewMatrixD[16];
+
+     prepareRenderingMatrices(
+                     535.423889, //fx
+                     533.48468,  //fy
+                     0.0,        //skew
+                     WIDTH/2,    //cx
+                     HEIGHT/2,   //cy
+                     WIDTH,      //Window Width
+                     HEIGHT,     //Window Height
+                     1.0,        //Near
+                     255.0,      //Far
+                     projectionMatrixD,
+                     viewMatrixD,
+                     viewportMatrixD
+                    );
+
+     //-------------------------------------------------------------------
+        double roll=0.0;//(double)  (rand()%90);
+        double pitch=0.0;//(double) (rand()%90);
+        double yaw=0.0;//(double)   (rand()%90);
+
+        double x=-259.231f;//(double)  (1000-rand()%2000);
+        double y=-54.976f;//(double) (100-rand()%200);
+        double z=2699.735f;//(double)  (700+rand()%1000);
+     //-------------------------------------------------------------------
+
+  unsigned int viewportWidth = WIDTH / tilesX;
+  unsigned int viewportHeight = HEIGHT / tilesY;
+
+  unsigned int tx,ty;
+  for (ty=0; ty<tilesY; ty++)
+  {
+    for (tx=0; tx<tilesX; tx++)
+    {
+       roll+=1.0;
+       pitch+=1.5;
+
+     glViewport(viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight );
+
+     //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
+     drawObjectAT(
+                  programID,
+                  cubeVao,
+                  MVPMatrixID,
+                  cubeTriangleCount,
+                  x-400,
+                  y,
+                  z,
+                  roll,
+                  pitch,
+                  yaw,
+
+                  projectionMatrixD,
+                  viewportMatrixD,
+                  viewMatrixD
+                 );
+
+     drawObjectAT(
+                  programID,
+                  pyramidVao,
+                  MVPMatrixID,
+                  pyramidTriangleCount,
+                  x+1100,
+                  y,
+                  z,
+                  roll,
+                  pitch,
+                  yaw,
+
+                  projectionMatrixD,
+                  viewportMatrixD,
+                  viewMatrixD
+                 );
+
+
+    }
+  }
+  return 1;
+}
 
 
 
@@ -160,29 +254,10 @@ int doDrawing()
 
 
 
-     double projectionMatrixD[16];
-     double viewportMatrixD[16];
-     double viewMatrixD[16];
-
-     prepareRenderingMatrices(
-                     535.423889, //fx
-                     533.48468,  //fy
-                     0.0,        //skew
-                     WIDTH/2,    //cx
-                     HEIGHT/2,   //cy
-                     WIDTH,      //Window Width
-                     HEIGHT,     //Window Height
-                     1.0,        //Near
-                     255.0,      //Far
-                     projectionMatrixD,
-                     viewMatrixD,
-                     viewportMatrixD
-                    );
-
 
 
  	// Get a handle for our "MVP" uniform
-	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
 
 
 	// Use our shader
@@ -202,7 +277,6 @@ int doDrawing()
     GLuint cubeVAO;
     GLuint cubeArrayBuffer;
     unsigned int cubeTriangleCount  =  (unsigned int )  sizeof(cubeCoords)/(3*sizeof(float));
-
     pushObjectToBufferData(
                              1,
                              &cubeVAO,
@@ -233,15 +307,6 @@ int doDrawing()
 
     fprintf(stderr,"Ready to render: ");
 
-     //-------------------------------------------------------------------
-        double roll=0.0;//(double)  (rand()%90);
-        double pitch=0.0;//(double) (rand()%90);
-        double yaw=0.0;//(double)   (rand()%90);
-
-        double x=-259.231f;//(double)  (1000-rand()%2000);
-        double y=-54.976f;//(double) (100-rand()%200);
-        double z=2699.735f;//(double)  (700+rand()%1000);
-     //-------------------------------------------------------------------
 
 
      GLuint FramebufferName = 0;
@@ -268,94 +333,25 @@ int doDrawing()
 		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
 
-  //-----------------------------------------------
-  if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
-  //-----------------------------------------------
+       //-----------------------------------------------
+        if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
+       //-----------------------------------------------
 
 
-       glClearColor( 0, 0.0, 0, 1 );
-       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
+        glClearColor( 0, 0.0, 0, 1 );
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
-       roll+=1.0;
-       pitch+=1.5;
-
-    //
-     glViewport(WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2);
-
-     drawObjectAT(
-                  programID,
-                  cubeVAO,
-                  MatrixID,
-                  cubeTriangleCount,
-                  x-400,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw,
-
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
-                 );
-
-     glViewport(WIDTH/2, 0, WIDTH/2, HEIGHT/2);
-
-     drawObjectAT(
-                  programID,
-                  cubeVAO,
-                  MatrixID,
-                  cubeTriangleCount,
-                  x-400,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw,
-
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
-                 );
-
-    glViewport(0, HEIGHT/2, WIDTH/2, HEIGHT/2);
-
-     drawObjectAT(
-                  programID,
-                  pyramidVAO,
-                  MatrixID,
-                  pyramidTriangleCount,
-                  x+1100,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw,
-
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
-                 );
-
-
-    glViewport(0, 0, WIDTH/2, HEIGHT/2);
-
-     drawObjectAT(
-                  programID,
-                  pyramidVAO,
-                  MatrixID,
-                  pyramidTriangleCount,
-                  x+1100,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw,
-
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
-                 );
+      //--------------------------------------
+      doTiledDrawing(
+                     programID,
+                     MVPMatrixID,
+                     cubeVAO,
+                     cubeTriangleCount,
+                     pyramidVAO,
+                     pyramidTriangleCount,
+                     16,
+                     16
+                    );
 
 
         //We have accumulated all data on the framebuffer and will now draw it back..
@@ -373,7 +369,7 @@ int doDrawing()
 
 		// Swap buffers
         glx3_endRedraw();
-        usleep(5);
+        usleep(1);
 
       //---------------------------------------------------------------
       //------------------- Calculate Framerate -----------------------
