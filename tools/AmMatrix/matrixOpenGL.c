@@ -232,9 +232,9 @@ void buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD
                                              double farPlane
                                            )
 {
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsicsD according to old Ammar code Image ( %u x %u )\n",imageWidth,imageHeight);
-   fprintf(stderr,"fx %0.2f fy %0.2f , cx %0.2f , cy %0.2f , skew %0.2f \n",fx,fy,cx,cy,skew);
-   fprintf(stderr,"Near %0.2f Far %0.2f \n",nearPlane,farPlane);
+//   fprintf(stderr,"buildOpenGLProjectionForIntrinsicsD according to old Ammar code Image ( %u x %u )\n",imageWidth,imageHeight);
+//   fprintf(stderr,"fx %0.2f fy %0.2f , cx %0.2f , cy %0.2f , skew %0.2f \n",fx,fy,cx,cy,skew);
+//   fprintf(stderr,"Near %0.2f Far %0.2f \n",nearPlane,farPlane);
 
    if (farPlane==0.0)
    {
@@ -879,6 +879,7 @@ void prepareRenderingMatrices(
                                          far
                                          );
      transpose4x4MatrixD(projectionMatrixD); //We want our own Row Major format..
+     //fprintf(stderr,"viewport(%u,%u,%u,%u)\n",viewport[0],viewport[1],viewport[2],viewport[3]);
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
 
 
@@ -889,8 +890,46 @@ void prepareRenderingMatrices(
 
 
 
+void correctProjectionMatrixForDifferentViewport(
+                                                  double * out,
+                                                  double * projectionMatrix,
+                                                  double * originalViewport,
+                                                  double * newViewport
+                                                )
+{
+    //https://stackoverflow.com/questions/7604322/clip-matrix-for-3d-perspective-projection#20180585
+    double originalViewportX = originalViewport[0];
+    double originalViewportY = originalViewport[1];
+    double originalViewportWidth = originalViewport[2];
+    double originalViewportHeight = originalViewport[3];
 
 
+    double newViewportX = newViewport[0];
+    double newViewportY = newViewport[1];
+    double newViewportWidth = newViewport[2];
+    double newViewportHeight = newViewport[3];
+
+
+
+	double xC = (newViewportX - 0.5f * originalViewportWidth - originalViewportX) / originalViewportWidth;
+	double yC = -(newViewportY - 0.5f * originalViewportHeight - originalViewportY) / originalViewportHeight;
+	double wC = (double) newViewportWidth/originalViewportWidth;
+	double hC = (double) newViewportHeight/originalViewportHeight;
+
+
+	double correction[16]={0};
+
+	correction[0]= (1.0 / wC);
+	correction[3]= -2.0 * (xC + wC / 2.f) * (1.0 / wC);
+	correction[5]= (1.f / hC);
+	correction[7]= -2.0 * (yC - hC / 2.f) * (1.f / hC);
+    //transpose4x4MatrixD(correction);
+
+
+    multiplyTwo4x4Matrices(out,correction,projectionMatrix);
+    //or ?
+    //multiplyTwo4x4Matrices(out,projectionMatrix,correction);
+}
 
 
 

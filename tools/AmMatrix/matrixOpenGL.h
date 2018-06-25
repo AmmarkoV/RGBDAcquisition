@@ -177,6 +177,14 @@ int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *
                               double * viewportMatrixD
                              );
 
+
+void correctProjectionMatrixForDifferentViewport(
+                                                  double * out,
+                                                  double * projectionMatrix,
+                                                  double * originalViewport,
+                                                  double * newViewport
+                                                );
+
 #ifdef __cplusplus
 }
 #endif

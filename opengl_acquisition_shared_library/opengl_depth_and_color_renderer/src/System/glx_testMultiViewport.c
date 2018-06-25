@@ -17,7 +17,9 @@
 
 #include "../Tools/save_to_file.h"
 #include "../Tools/tools.h"
+
 #include "../ModelLoader/hardcoded_shapes.h"
+#include "../ModelLoader/model_loader_tri.h"
 
 #include "glx3.h"
 
@@ -35,12 +37,15 @@
 #define RED     "\033[31m"      /* Red */
 
 
-int WIDTH=2560;
-int HEIGHT=1920;
+int WIDTH=640;
+int HEIGHT=480;
 float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered=0;
 
+
+struct TRI_Model indexedTriModel={0};
+struct TRI_Model triModel={0};
 
 int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 {
@@ -179,8 +184,8 @@ int doTiledDrawing(
         double z=2699.735f;//(double)  (700+rand()%1000);
      //-------------------------------------------------------------------
 
-  unsigned int viewportWidth = WIDTH / tilesX;
-  unsigned int viewportHeight = HEIGHT / tilesY;
+  unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;
+  unsigned int viewportHeight = (unsigned int) HEIGHT / tilesY;
 
   unsigned int tx,ty;
   for (ty=0; ty<tilesY; ty++)
@@ -191,6 +196,16 @@ int doTiledDrawing(
        pitch+=1.5;
 
      glViewport(viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight );
+
+
+     double newViewport[4]={viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight};
+     double projectionMatrixViewportCorrected[16];
+     correctProjectionMatrixForDifferentViewport(
+                                                  projectionMatrixViewportCorrected,
+                                                  projectionMatrixD,
+                                                  viewportMatrixD,
+                                                  newViewport
+                                                );
 
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
      drawObjectAT(
@@ -234,7 +249,82 @@ int doTiledDrawing(
 }
 
 
+int doSingleDrawing(
+                   int programID,
+                   GLuint MVPMatrixID ,
+                   GLuint cubeVao,
+                   unsigned int cubeTriangleCount,
+                   GLuint pyramidVao,
+                   unsigned int pyramidTriangleCount,
+                   unsigned int tilesX,
+                   unsigned int tilesY)
+{
 
+     double projectionMatrixD[16];
+     double viewportMatrixD[16];
+     double viewMatrixD[16];
+
+     prepareRenderingMatrices(
+                     535.423889, //fx
+                     533.48468,  //fy
+                     0.0,        //skew
+                     WIDTH/2,    //cx
+                     HEIGHT/2,   //cy
+                     WIDTH,      //Window Width
+                     HEIGHT,     //Window Height
+                     1.0,        //Near
+                     255.0,      //Far
+                     projectionMatrixD,
+                     viewMatrixD,
+                     viewportMatrixD
+                    );
+
+
+     //-------------------------------------------------------------------
+        double roll=0.0;//(double)  (rand()%90);
+        double pitch=0.0;//(double) (rand()%90);
+        double yaw=0.0;//(double)   (rand()%90);
+
+        double x=-259.231f;//(double)  (1000-rand()%2000);
+        double y=-54.976f;//(double) (100-rand()%200);
+        double z=2699.735f;//(double)  (700+rand()%1000);
+     //-------------------------------------------------------------------
+     //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
+     drawObjectAT(
+                  programID,
+                  cubeVao,
+                  MVPMatrixID,
+                  cubeTriangleCount,
+                  x-400,
+                  y,
+                  z,
+                  roll,
+                  pitch,
+                  yaw,
+
+                  projectionMatrixD,
+                  viewportMatrixD,
+                  viewMatrixD
+                 );
+
+     drawObjectAT(
+                  programID,
+                  pyramidVao,
+                  MVPMatrixID,
+                  pyramidTriangleCount,
+                  x+1100,
+                  y,
+                  z,
+                  roll,
+                  pitch,
+                  yaw+180,
+
+                  projectionMatrixD,
+                  viewportMatrixD,
+                  viewMatrixD
+                 );
+ return 1;
+}
 
 int doDrawing()
 {
@@ -244,7 +334,7 @@ int doDrawing()
 	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
-	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebufferSea.frag");
+	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebuffer.frag");
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
     GLuint programID = sho->ProgramObject;
@@ -274,6 +364,7 @@ int doDrawing()
 
     fprintf(stderr,"Ready to start pushing geometry  ");
 
+
     GLuint cubeVAO;
     GLuint cubeArrayBuffer;
     unsigned int cubeTriangleCount  =  (unsigned int )  sizeof(cubeCoords)/(3*sizeof(float));
@@ -290,21 +381,21 @@ int doDrawing()
                            );
 
 
-    GLuint pyramidVAO;
-    GLuint pyramidArrayBuffer;
-    unsigned int pyramidTriangleCount  =  (unsigned int )  sizeof(pyramidCoords)/(3*sizeof(float));
+    GLuint humanVAO;
+    GLuint humanArrayBuffer;
+    unsigned int humanTriangleCount  =  (unsigned int)  triModel.header.numberOfVertices/3;
     pushObjectToBufferData(
                              1,
-                             &pyramidVAO,
-                             &pyramidArrayBuffer,
+                             &humanVAO,
+                             &humanArrayBuffer,
                              programID  ,
-                             pyramidCoords  ,  sizeof(pyramidCoords) ,
-                             pyramidNormals ,  sizeof(pyramidNormals) ,
-                             0 ,  0, //No Texture
-                             cubeColors  ,  sizeof(cubeColors), //Lol passing cube colors instead.. :P
+                             triModel.vertices  ,  triModel.header.numberOfVertices * sizeof(float) ,
+                             triModel.normal    ,  triModel.header.numberOfNormals  * sizeof(float),
+                             0,0,
+                             //triModel.textureCoords  ,  triModel.header.numberOfTextureCoords ,
+                             triModel.colors  ,  triModel.header.numberOfColors  * sizeof(float) ,
                              0, 0 //Not Indexed..
                            );
-
     fprintf(stderr,"Ready to render: ");
 
 
@@ -341,18 +432,34 @@ int doDrawing()
         glClearColor( 0, 0.0, 0, 1 );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
+
+      #define TRY_MULTI 1
       //--------------------------------------
+      #if TRY_MULTI
       doTiledDrawing(
                      programID,
                      MVPMatrixID,
                      cubeVAO,
                      cubeTriangleCount,
-                     pyramidVAO,
-                     pyramidTriangleCount,
+                     humanVAO,
+                     humanTriangleCount,
                      16,
                      16
                     );
-
+      #else
+      //--------------------------------------
+      doSingleDrawing(
+                     programID,
+                     MVPMatrixID,
+                     cubeVAO,
+                     cubeTriangleCount,
+                     humanVAO,
+                     humanTriangleCount,
+                     16,
+                     16
+                    );
+      //--------------------------------------
+      #endif // TRY_MULTI
 
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebuffer(
@@ -390,7 +497,7 @@ int doDrawing()
 	//glDeleteBuffers(1, &vertexbuffer);
 	//glDeleteBuffers(1, &colorbuffer);
 	glDeleteProgram(programID);
-	glDeleteVertexArrays(1, &pyramidVAO);
+	glDeleteVertexArrays(1, &humanVAO);
 	glDeleteVertexArrays(1, &cubeVAO);
 }
 
@@ -409,6 +516,14 @@ int main(int argc, char **argv)
    }
 
 
+   if (!loadModelTri("../../Models/Ammar.tri", &indexedTriModel ) )
+   {
+     fprintf(stderr,"please cd ../../Models/\n");
+     fprintf(stderr,"and then wget http://ammar.gr/models/Ammar.tri\n");
+     return 0;
+   }
+
+   fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
 
    doDrawing();
 
