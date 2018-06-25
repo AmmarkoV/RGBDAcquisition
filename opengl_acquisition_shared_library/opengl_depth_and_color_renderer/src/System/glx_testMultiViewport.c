@@ -37,11 +37,18 @@
 #define RED     "\033[31m"      /* Red */
 
 
-int origWIDTH=640;
-int origHEIGHT=480;
+//Change this to change MultiRendering numbers
+#define originalWIDTH 640
+#define originalHEIGHT 480
+#define tilesToDoX 16
+#define tilesToDoY 16
+#define shrinkingFactor 4
+//--------------------------------------------
 
-int WIDTH=2560;
-int HEIGHT=1920;
+
+
+unsigned int WIDTH=(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
+unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
 
 float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
@@ -167,10 +174,10 @@ int doTiledDrawing(
                      535.423889, //fx
                      533.48468,  //fy
                      0.0,        //skew
-                     origWIDTH/2,    //cx
-                     origHEIGHT/2,   //cy
-                     origWIDTH,      //Window Width
-                     origHEIGHT,     //Window Height
+                     originalWIDTH/2,    //cx
+                     originalHEIGHT/2,   //cy
+                     originalWIDTH,      //Window Width
+                     originalHEIGHT,     //Window Height
                      1.0,        //Near
                      255.0,      //Far
                      projectionMatrixD,
@@ -447,8 +454,8 @@ int doDrawing()
                      cubeTriangleCount,
                      humanVAO,
                      humanTriangleCount,
-                     16,
-                     16
+                     tilesToDoX,
+                     tilesToDoY
                     );
       #else
       //--------------------------------------
