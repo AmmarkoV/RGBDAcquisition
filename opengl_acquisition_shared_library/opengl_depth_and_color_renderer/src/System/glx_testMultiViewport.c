@@ -437,9 +437,9 @@ int doDrawing()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 
-      #define TRY_MULTI 1
+      #define DO_MULTI 1
       //--------------------------------------
-      #if TRY_MULTI
+      #if DO_MULTI
       doTiledDrawing(
                      programID,
                      MVPMatrixID,
@@ -463,7 +463,7 @@ int doDrawing()
                      16
                     );
       //--------------------------------------
-      #endif // TRY_MULTI
+      #endif // DO_MULTI
 
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebuffer(
