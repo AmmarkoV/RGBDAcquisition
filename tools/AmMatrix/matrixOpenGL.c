@@ -898,6 +898,8 @@ void correctProjectionMatrixForDifferentViewport(
                                                 )
 {
     //https://stackoverflow.com/questions/7604322/clip-matrix-for-3d-perspective-projection#20180585
+    //https://www.opengl.org/discussion_boards/printthread.php?t=165751&page=1
+    //https://github.com/gamedev-net/nehe-opengl/tree/master/linux/lesson22
     double originalViewportX = originalViewport[0];
     double originalViewportY = originalViewport[1];
     double originalViewportWidth = originalViewport[2];

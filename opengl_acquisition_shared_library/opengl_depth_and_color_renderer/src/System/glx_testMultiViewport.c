@@ -37,8 +37,12 @@
 #define RED     "\033[31m"      /* Red */
 
 
-int WIDTH=640;
-int HEIGHT=480;
+int origWIDTH=640;
+int origHEIGHT=480;
+
+int WIDTH=2560;
+int HEIGHT=1920;
+
 float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered=0;
@@ -163,10 +167,10 @@ int doTiledDrawing(
                      535.423889, //fx
                      533.48468,  //fy
                      0.0,        //skew
-                     WIDTH/2,    //cx
-                     HEIGHT/2,   //cy
-                     WIDTH,      //Window Width
-                     HEIGHT,     //Window Height
+                     origWIDTH/2,    //cx
+                     origHEIGHT/2,   //cy
+                     origWIDTH,      //Window Width
+                     origHEIGHT,     //Window Height
                      1.0,        //Near
                      255.0,      //Far
                      projectionMatrixD,

@@ -45,10 +45,22 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.h" />
+		<Unit filename="../ModelLoader/model_loader_tri.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ModelLoader/model_loader_tri.h" />
+		<Unit filename="../Rendering/ShaderPipeline/render_buffer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/render_buffer.h" />
 		<Unit filename="../Rendering/ShaderPipeline/shader_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Rendering/ShaderPipeline/shader_loader.h" />
+		<Unit filename="../Rendering/ShaderPipeline/uploadGeometry.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Rendering/ShaderPipeline/uploadGeometry.h" />
 		<Unit filename="../Rendering/downloadFromRenderer.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -57,6 +69,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Tools/save_to_file.h" />
+		<Unit filename="../Tools/tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Tools/tools.h" />
 		<Unit filename="glx3.c">
 			<Option compilerVar="CC" />
 		</Unit>
