@@ -48,7 +48,7 @@ int initArgs_FaceDetector(int argc, char *argv[])
 
  // Load Face cascade (.xml file)
  face_cascade.load( "/usr/share/opencv/haarcascades/haarcascade_frontalface_alt2.xml" );
- cv::namedWindow( "window1", 1 );
+ //cv::namedWindow( "window1", 1 );
 
 
  fprintf(stderr,GREEN "_________________________________________________________________\n\n" NORMAL);
@@ -139,7 +139,7 @@ int processData_FaceDetector()
     cv::cvtColor(colImNeeds_RGB_2_BGR_Flip, image, CV_RGB2BGR);
     cv::Mat depthIm(cv::Size(depthWidth,depthHeight), CV_16UC1, (char *) depthFrame , cv::Mat::AUTO_STEP);
 
-   imshow( "window1", image );
+  /////// imshow( "window1", image );
 
     // Detect faces
     std::vector<cv::Rect> faces;
