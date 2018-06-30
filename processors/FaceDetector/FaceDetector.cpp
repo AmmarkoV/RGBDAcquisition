@@ -11,6 +11,12 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
+
+#if USE_AMMARSERVER
+#include "../../../../AmmarServer/src/AmmClient/AmmClient.h"
+#endif // USE_AMMARSERVER
+
+
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -34,6 +40,10 @@ cv::CascadeClassifier face_cascade;
 int transmit= 0;
 
 
+#if USE_AMMARSERVER
+struct AmmClient_Instance * client=0;
+#endif // USE_AMMARSERVER
+
 int initArgs_FaceDetector(int argc, char *argv[])
 {
   fprintf(stderr,GREEN "\nFace Detector now parsing initialization parameters\n" NORMAL);
@@ -50,6 +60,9 @@ int initArgs_FaceDetector(int argc, char *argv[])
  face_cascade.load( "/usr/share/opencv/haarcascades/haarcascade_frontalface_alt2.xml" );
  //cv::namedWindow( "window1", 1 );
 
+#if USE_AMMARSERVER
+ client =  AmmClient_Initialize("127.0.0.1",8080,100);
+#endif // USE_AMMARSERVER
 
  fprintf(stderr,GREEN "_________________________________________________________________\n\n" NORMAL);
  return 1;
@@ -125,11 +138,16 @@ unsigned char * getColor_FaceDetector(unsigned int * width, unsigned int * heigh
 int transmitHeadPosition(float x,  float y , float z)
 {
   char url[512]={0};
-  fprintf(stderr,"transmitHeadPosition(%0.2f,%0.2f,%0.2f)\n",x,y,z);
-
+ #if USE_AMMARSERVER
+    fprintf(stderr,"transmitHeadPosition(%0.2f,%0.2f,%0.2f) via ammarserver\n",x,y,z);
+    snprintf(url,512,"GET /control.html?x=%0.2f&y=%0.2f&z=%0.2f&qX=0&qY=0&qZ=0 HTTP/1.1\nConnection: keep-alive\n\n",x,y,z);
+    AmmClient_Send(client,url,strlen(url),1);
+#else
+  fprintf(stderr,"transmitHeadPosition(%0.2f,%0.2f,%0.2f) via wget\n",x,y,z);
   snprintf(url,512,"wget -qO- \"http://127.0.0.1:8080/control.html?x=%0.2f&y=%0.2f&z=%0.2f&qX=0&qY=0&qZ=0\" &> /dev/null ",x,y,z);
   int i=system(url);
- return (i==0);
+  return (i==0);
+#endif // USE_AMMARSERVER
 }
 
 
@@ -168,7 +186,7 @@ int processData_FaceDetector()
          float x = (float) ( (float) colorWidth/2)  - faces[0].x;
          float y = (float) ( (float) colorHeight/2) - faces[0].y;
          float z = (float) ( (float) faces[i].width-150) ;
-         transmitHeadPosition( (float) -x/20, (float) y/20 , z/20);
+         transmitHeadPosition( (float) -x/50, (float) y/50 , z/50);
         }
        }
     }
