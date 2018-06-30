@@ -31,7 +31,7 @@ char disparityCalibrationPath[DISPARITYMAPPING_STRING_SIZE]={0};
 char disparityCalibrationOutputPath[DISPARITYMAPPING_STRING_SIZE]={0};
 
 cv::CascadeClassifier face_cascade;
-
+int transmit= 0;
 
 
 int initArgs_FaceDetector(int argc, char *argv[])
@@ -42,7 +42,7 @@ int initArgs_FaceDetector(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
-
+    if (strcmp(argv[i],"--transmit")==0) { transmit=1;}
 
   }
 
@@ -158,8 +158,19 @@ int processData_FaceDetector()
     // Draw circles on the detected faces
     for( int i = 0; i < faces.size(); i++ )
     {
+       if (faces[i].width>110)
+       {
         cv::Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
         cv::ellipse( image, center, cv::Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, cv::Scalar( 255, 0, 255 ), 4, 8, 0 );
+
+        if (transmit)
+        {
+         float x = (float) ( (float) colorWidth/2)  - faces[0].x;
+         float y = (float) ( (float) colorHeight/2) - faces[0].y;
+         float z = 0.0;
+         transmitHeadPosition( (float) -x/20, (float) y/20 , z);
+        }
+       }
     }
 
    imshow( "Detected Face", image );
@@ -167,15 +178,6 @@ int processData_FaceDetector()
 
  time(&endTime);
 
-  if (faces.size()>0)
-   {
-    float x = (float) ( (float) colorWidth/2)  - faces[0].x;
-    float y = (float) ( (float) colorHeight/2) - faces[0].y;
-    float z = 0.0;
-
-
-    transmitHeadPosition( (float) -x/10, (float) y/10 , z);
-   }
 
 
  // Time elapsed

@@ -264,14 +264,12 @@ int initScene(int argc, char *argv[],char * confFile)
 
 
 
+  #if USE_AMMARSERVER
   if (!initializeWebInterface(argc,argv,scene))
   {
-      #if USE_AMMARSERVER
-       fprintf(stderr,"Web interface failed to be initialized..\n");
-      #else
-       fprintf(stderr,"Web interface is not compiled in..\n");
-      #endif // USE_AMMARSERVER
+       fprintf(stderr,"Web interface failed..\n");
   }
+  #endif // USE_AMMARSERVER
 
 
 
