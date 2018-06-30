@@ -44,7 +44,30 @@ void * prepareCameraControlCallback(struct AmmServer_DynamicRequest  * rqst)
 
   if (sceneToControl!=0)
   {
-    sceneSetOpenGLExtrinsicCalibration(sceneToControl,rotation,translation,1000.0);
+    //sceneSetOpenGLExtrinsicCalibration(sceneToControl,rotation,translation,1000.0);
+
+
+    fprintf(stderr,"Camera was @ %0.2f %0.2f %0.2f ",sceneToControl->cameraPose.posX,sceneToControl->cameraPose.posY,sceneToControl->cameraPose.posZ);
+    sceneToControl->cameraPose.posX=translation[0];
+    sceneToControl->cameraPose.posY=translation[1];
+    sceneToControl->cameraPose.posZ=translation[2];
+    fprintf(stderr,"Camera is now @ %0.2f %0.2f %0.2f ",sceneToControl->cameraPose.posX,sceneToControl->cameraPose.posY,sceneToControl->cameraPose.posZ);
+
+    sceneToControl->useCustomModelViewMatrix=1;
+    create4x4CameraModelViewMatrixForRendering(
+                                                    sceneToControl->customModelViewMatrix  ,
+                                                    //Rotation Component
+                                                    sceneToControl->cameraPose.angleX,
+                                                    sceneToControl->cameraPose.angleY,
+                                                    sceneToControl->cameraPose.angleZ,
+
+                                                    //Translation Component
+                                                    sceneToControl->cameraPose.posX,
+                                                    sceneToControl->cameraPose.posY,
+                                                    sceneToControl->cameraPose.posZ
+                                                  );
+    transpose4x4MatrixD(sceneToControl->customModelViewMatrix);
+
     setupSceneCameraBeforeRendering(sceneToControl);
   }
 

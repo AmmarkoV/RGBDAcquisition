@@ -532,9 +532,9 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
   glGetFloatv( GL_PROJECTION_MATRIX, projection );
   glGetIntegerv( GL_VIEWPORT, viewport );
-  print4x4FMatrix("Projection",projection,1);
-  print4x4FMatrix("ModelView",modelview,1);
-  print4x4DMatrix("ModelTransform",modelTransformation,1);
+  print4x4FMatrix("Projection",projection,0);
+  print4x4FMatrix("ModelView",modelview,0);
+  print4x4DMatrix("ModelTransform",modelTransformation,0);
  // exit (0);
 
   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"drawModelAt error after specifying dimensions \n"); }

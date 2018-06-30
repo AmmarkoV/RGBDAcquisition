@@ -1,6 +1,8 @@
 
+#if USE_GLEW
 // Include GLEW
 #include <GL/glew.h>
+#endif // USE_GLEW
 
 #include "render_buffer.h"
 
@@ -19,6 +21,7 @@ int initializeFramebuffer(
                           unsigned int height
                          )
 {
+    #if USE_GLEW
     // ---------------------------------------------
 	// Render to Texture - specific code begins here
 	// ---------------------------------------------
@@ -72,7 +75,10 @@ int initializeFramebuffer(
 	// Always check that our framebuffer is ok
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) { return 0; }
 
-  return 1;
+   return 1;
+  #else
+   return 0;
+  #endif
 }
 
 
@@ -92,6 +98,7 @@ int drawFramebuffer(
                    )
 {
 
+    #if USE_GLEW
 
 		// Render to the screen
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -138,5 +145,8 @@ int drawFramebuffer(
 */
 		glDisableVertexAttribArray(0);
   return 1;
+  #else
+   return 0;
+  #endif
 }
 

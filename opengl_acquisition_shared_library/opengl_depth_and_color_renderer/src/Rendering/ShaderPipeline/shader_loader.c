@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if USE_GLEW
 // Include GLEW
 #include <GL/glew.h>
+#endif // USE_GLEW
+
 
 #include <GL/gl.h>
 #include <GL/glx.h>

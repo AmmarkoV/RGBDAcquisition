@@ -1,7 +1,10 @@
 #include <stdio.h>
 
+#if USE_GLEW
 // Include GLEW
 #include <GL/glew.h>
+#endif // USE_GLEW
+
 
 #include "uploadGeometry.h"
 
@@ -26,6 +29,7 @@ pushObjectToBufferData(
                              const unsigned int * indices , unsigned int sizeOfIndices
                            )
 {
+    #if USE_GLEW
     if (generateNewVao)
     {
       glGenVertexArrays(1, vao);
@@ -97,5 +101,8 @@ pushObjectToBufferData(
 
     }
 
-  return 1;
+   return 1;
+  #else
+   return 0;
+  #endif
 }

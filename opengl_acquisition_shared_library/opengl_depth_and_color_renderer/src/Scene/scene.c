@@ -666,8 +666,8 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
   if (scene->useCustomModelViewMatrix)
   {
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
-    glLoadMatrixd((const GLdouble*) scene->customModelViewMatrix);
     copy4x4DMatrix(scene->activeModelViewMatrix , scene->customModelViewMatrix);
+    glLoadMatrixd((const GLdouble*) scene->customModelViewMatrix);
 
     /* We flip our coordinate system so it comes straight
        glRotatef(90,-1.0,0,0); //TODO FIX THESE

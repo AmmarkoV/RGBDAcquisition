@@ -33,7 +33,11 @@ add_subdirectory (submodules/Assimp)
 ENDIF( ENABLE_ASSIMP )
 
 #First to make our handy tools
+IF( ENABLE_SHADERS )
 add_subdirectory (src/GameEngine/)
+ENDIF( ENABLE_SHADERS )
+
+
 add_subdirectory (src/Renderer/)
 add_subdirectory (src/Comparer/)
 add_subdirectory (src/ModelDump/)

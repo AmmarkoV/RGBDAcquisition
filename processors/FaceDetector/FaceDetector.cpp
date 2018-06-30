@@ -122,6 +122,16 @@ unsigned char * getColor_FaceDetector(unsigned int * width, unsigned int * heigh
 }
 
 
+int transmitHeadPosition(float x,  float y , float z)
+{
+  char url[512]={0};
+  fprintf(stderr,"transmitHeadPosition(%0.2f,%0.2f,%0.2f)\n",x,y,z);
+
+  snprintf(url,512,"wget -qO- \"http://127.0.0.1:8080/control.html?x=%0.2f&y=%0.2f&z=%0.2f&qX=0&qY=0&qZ=0\" &> /dev/null ",x,y,z);
+  int i=system(url);
+ return (i==0);
+}
+
 
 
 int processData_FaceDetector()
@@ -154,7 +164,19 @@ int processData_FaceDetector()
 
    imshow( "Detected Face", image );
 
+
  time(&endTime);
+
+  if (faces.size()>0)
+   {
+    float x = (float) ( (float) colorWidth/2)  - faces[0].x;
+    float y = (float) ( (float) colorHeight/2) - faces[0].y;
+    float z = 0.0;
+
+
+    transmitHeadPosition( (float) -x/10, (float) y/10 , z);
+   }
+
 
  // Time elapsed
  double seconds = difftime (endTime, startTime);
