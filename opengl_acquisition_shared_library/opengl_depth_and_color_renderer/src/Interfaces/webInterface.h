@@ -8,6 +8,7 @@
 #define WEB_INTERFACE_H_INCLUDED
 
 
+int initializeWebInterface(int argc, char *argv[]);
 
 #endif
 

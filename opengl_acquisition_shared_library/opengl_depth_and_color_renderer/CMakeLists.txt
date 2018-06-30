@@ -9,13 +9,17 @@ OPTION (ENABLE_JPG ON)
 OPTION (ENABLE_PNG ON)
 OPTION (ENABLE_SHADERS ON)
 OPTION (ENABLE_ASSIMP OFF)
+OPTION (ENABLE_AMMARSERVER OFF)
 
 IF( ENABLE_HIGH_PERFORMANCE_BUILD )
  set(CMAKE_CXX_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
  set(CMAKE_C_FLAGS "-fPIC -march=native -mtune=native -O3 -fexpensive-optimizations -s") 
 ENDIF( ENABLE_HIGH_PERFORMANCE_BUILD )
       
-
+IF( ENABLE_AMMARSERVER )
+ add_subdirectory (submodules/AmmarServer/) 
+ add_definitions(-DUSE_AMMARSERVER)
+ENDIF( ENABLE_AMMARSERVER )
 
 #Add the codecs needed for the correct building
 set(CODECS_DIRECTORY "../../tools/Codecs") 

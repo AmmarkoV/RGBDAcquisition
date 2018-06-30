@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     int started = 0;
     if (readFromArg!=0)
     {
-        started=startOGLRendererSandbox(width,height,1 /*View OpenGL Window*/,argv[readFromArg]);
+        started=startOGLRendererSandbox(argc,argv,width,height,1 /*View OpenGL Window*/,argv[readFromArg]);
     }
 
     if (!started)

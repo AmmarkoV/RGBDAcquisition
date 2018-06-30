@@ -32,6 +32,11 @@ IF( ENABLE_SHADERS )
 ENDIF( ENABLE_SHADERS )
 
  
+IF( ENABLE_AMMARSERVER )
+ MESSAGE("Shaders will be included in this codec build")
+ set(HTTP_Libs AmmarServer )  #sudo apt-get install libglew-dev 
+ add_definitions(-DUSE_AMMARSERVER)
+ENDIF( ENABLE_AMMARSERVER )
 
 add_definitions(-DINCLUDE_OPENGL_CODE)
 
@@ -133,7 +138,7 @@ add_library(OGLRendererSandbox SHARED
             Interfaces/webInterface.c 
             Interfaces/webInterface.h
            ) 
-target_link_libraries(OGLRendererSandbox m GL GLU X11 Codecs  ${PNG_Libs} ${JPG_Libs} ${GLEW_Libs} ) 
+target_link_libraries(OGLRendererSandbox m GL GLU X11 Codecs  ${PNG_Libs} ${JPG_Libs} ${GLEW_Libs} ${HTTP_Libs} ) 
  
  
 

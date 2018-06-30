@@ -190,7 +190,9 @@ int setKeyboardControl(int val)
   return 1;
 }
 
-int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile)
+
+
+int startOGLRendererSandbox(int argc, char *argv[],unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile)
 {
   fprintf(stderr,"startOGLRendererSandbox(%u,%u,%u,%s)\n",width,height,viewWindow,sceneFile);
   snapsPerformed=0;
@@ -215,8 +217,8 @@ int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned in
   //( char *)   malloc(sizeof(32)*sizeof(char));
   //strncpy(defaultSceneFile,"scene.conf",32);
 
-  if (sceneFile == 0 ) { return initScene(defaultSceneFile);  } else
-                       { return initScene(sceneFile);    }
+  if (sceneFile == 0 ) { return initScene(argc,argv,defaultSceneFile);  } else
+                       { return initScene(argc,argv,sceneFile);    }
 
   return 1;
 }

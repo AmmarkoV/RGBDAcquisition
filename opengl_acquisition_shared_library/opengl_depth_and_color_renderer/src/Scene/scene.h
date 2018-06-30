@@ -64,10 +64,12 @@ int renderPhotoshoot( void * context );
 /**
 * @brief Initialize a scene using a configuration file
 * @ingroup Scene
+* @param argc ( can be null )
+* @param argv ( can be null )
 * @param String with a path to a configuration file
 * @retval 1=Success , 0=Failure
 */
-int initScene(char * confFile);
+int initScene(int argc, char *argv[],char * confFile);
 
 /**
 * @brief Tick time so that model positions in the scene are updated

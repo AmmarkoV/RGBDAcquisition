@@ -243,7 +243,7 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
    return 1;
 }
 
-int initScene(char * confFile)
+int initScene(int argc, char *argv[],char * confFile)
 {
   fprintf(stderr,"Initializing Scene\n");
 
@@ -261,6 +261,14 @@ int initScene(char * confFile)
 
   //This only enables keyfov if enabled in scene
   if (scene->userCanMoveCameraOnHisOwn) { scene->controls.userKeyFOVEnabled=1; }
+
+
+
+  if (!initializeWebInterface(argc,argv))
+  {
+
+  }
+
 
 
   startOGLRendering();

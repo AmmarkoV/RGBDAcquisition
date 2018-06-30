@@ -218,11 +218,11 @@ int main(int argc, char **argv)
     int started = 0;
     if (readFromArg!=0)
     {
-        started=startOGLRendererSandbox(width,height,viewWindow /*View OpenGL Window*/,argv[readFromArg]);
+        started=startOGLRendererSandbox(argc,argv,width,height,viewWindow /*View OpenGL Window*/,argv[readFromArg]);
     }
     else
     {
-        started=startOGLRendererSandbox(width,height,viewWindow /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/
+        started=startOGLRendererSandbox(argc,argv,width,height,viewWindow /*View OpenGL Window*/,0); /*0 defaults to scene.conf*/
     }
 
 

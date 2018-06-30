@@ -170,13 +170,15 @@ void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned in
 /**
 * @brief Start OGLRenderer Sandbox
 * @ingroup OGLRendererSandbox
+* @param argc , can be null if you dont want to provide it
+* @param argv , can be null if you dont want to provide it
 * @param Width of rendering surface
 * @param Height of rendering surface
 * @param Switch ( 1 = View Window , 0 = Disable Window )
 * @param Filename of the scene file that describes the scene to be played out
 * @retval 0=Failure,1=Success
 */
-int startOGLRendererSandbox(unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile);
+int startOGLRendererSandbox(int argc, char *argv[],unsigned int width,unsigned int height , unsigned int viewWindow ,const char * sceneFile);
 
 
 
