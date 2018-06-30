@@ -19,6 +19,8 @@ ENDIF( ENABLE_HIGH_PERFORMANCE_BUILD )
 IF( ENABLE_AMMARSERVER )
  add_subdirectory (submodules/AmmarServer/) 
  add_definitions(-DUSE_AMMARSERVER)
+
+ execute_process(COMMAND submodules/linkAmmarServer.sh)
 ENDIF( ENABLE_AMMARSERVER )
 
 #Add the codecs needed for the correct building

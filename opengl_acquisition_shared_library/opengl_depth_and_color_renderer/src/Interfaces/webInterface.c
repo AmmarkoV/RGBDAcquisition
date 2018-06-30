@@ -1,9 +1,6 @@
 #include "webInterface.h"
 
-
-#define USE_AMMARSERVER 1
-
-
+ 
 
 #if USE_AMMARSERVER
 

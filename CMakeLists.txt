@@ -129,7 +129,9 @@ ENDIF( ENABLE_DESKTOP )
 
  
 IF( ENABLE_NETWORK )
+IF( ENABLE_AMMARSERVER )
   add_subdirectory (network_acquisition_shared_library/)
+ENDIF( ENABLE_AMMARSERVER )
 ENDIF( ENABLE_NETWORK )
  
 IF( ENABLE_FREENECT )
