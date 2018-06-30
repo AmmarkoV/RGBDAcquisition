@@ -8,7 +8,9 @@
 #define WEB_INTERFACE_H_INCLUDED
 
 
-int initializeWebInterface(int argc, char *argv[]);
+#include "../TrajectoryParser/TrajectoryParser.h"
+
+int initializeWebInterface(int argc, char *argv[],struct VirtualStream * scene);
 
 #endif
 

@@ -29,6 +29,11 @@ int sceneIgnoreTime(unsigned int newSettingMode);
 int sceneSetOpenGLExtrinsicCalibration(struct VirtualStream * scene, double * rodriguez,double * translation , double scaleToDepthUnit);
 
 int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,double * camera);
+
+
+
+int setupSceneCameraBeforeRendering(struct VirtualStream * scene);
+
 /**
 * @brief Render A Scene
 * @ingroup Scene

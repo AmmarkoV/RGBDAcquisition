@@ -264,7 +264,7 @@ int initScene(int argc, char *argv[],char * confFile)
 
 
 
-  if (!initializeWebInterface(argc,argv))
+  if (!initializeWebInterface(argc,argv,scene))
   {
 
   }
