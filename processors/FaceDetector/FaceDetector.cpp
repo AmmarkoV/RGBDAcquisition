@@ -25,6 +25,7 @@
 
 using namespace std;
 
+unsigned long tickBaseFD=0;
 unsigned char * colorFrame = 0;
 unsigned int colorWidth=0,colorHeight=0,colorChannels=0,colorBitsperpixel=0;
 
@@ -69,6 +70,20 @@ int initArgs_FaceDetector(int argc, char *argv[])
 }
 
 
+unsigned long GetTickCountMillisecondsFD()
+{
+   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
+   struct timespec ts;
+   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
+
+   if (tickBaseFD==0)
+   {
+     tickBaseFD = ts.tv_sec*1000 + ts.tv_nsec/1000000;
+     return 0;
+   }
+
+   return ( ts.tv_sec*1000 + ts.tv_nsec/1000000 ) - tickBaseFD;
+}
 
 int setConfigStr_FaceDetector(char * label,char * value)
 {
@@ -156,8 +171,8 @@ int processData_FaceDetector()
 {
     int retres=0;
     // Start and end times
-    time_t startTime , endTime;
-    time(&startTime);
+
+    unsigned long startTime=GetTickCountMillisecondsFD();
 
     unsigned char * colorPTR = colorFrame ;
 
@@ -165,13 +180,16 @@ int processData_FaceDetector()
     cv::Mat colImNeeds_RGB_2_BGR_Flip(cv::Size(colorWidth,colorHeight), CV_8UC3, (char *) colorFrame, cv::Mat::AUTO_STEP);
     cv::Mat image;
     cv::cvtColor(colImNeeds_RGB_2_BGR_Flip, image, CV_RGB2BGR);
-    cv::Mat depthIm(cv::Size(depthWidth,depthHeight), CV_16UC1, (char *) depthFrame , cv::Mat::AUTO_STEP);
+    //cv::Mat depthIm(cv::Size(depthWidth,depthHeight), CV_16UC1, (char *) depthFrame , cv::Mat::AUTO_STEP);
 
   /////// imshow( "window1", image );
 
     // Detect faces
     std::vector<cv::Rect> faces;
     face_cascade.detectMultiScale( image, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
+
+    unsigned long endTime=GetTickCountMillisecondsFD();
+
 
     // Draw circles on the detected faces
     for( int i = 0; i < faces.size(); i++ )
@@ -186,7 +204,7 @@ int processData_FaceDetector()
          float x = (float) ( (float) colorWidth/2)  - faces[0].x;
          float y = (float) ( (float) colorHeight/2) - faces[0].y;
          float z = (float) ( (float) faces[i].width-150) ;
-         transmitHeadPosition( (float) -x/50, (float) y/50 , z/50);
+         transmitHeadPosition( (float) -x/60, (float) y/60 , z/15);
         }
        }
     }
@@ -194,7 +212,6 @@ int processData_FaceDetector()
    imshow( "Detected Face", image );
 
 
- time(&endTime);
 
 
 
@@ -202,7 +219,7 @@ int processData_FaceDetector()
  double seconds = difftime (endTime, startTime);
 
  if (seconds == 0.0 ) { seconds = 0.0001; }
- fprintf(stderr,"FaceDetector Node Achieving %0.2f fps \n",(float) 1/seconds);
+ fprintf(stderr,"FaceDetector Node Achieving %0.2f fps \n",(float) 1000/(endTime-startTime));
 
 
  return retres;
