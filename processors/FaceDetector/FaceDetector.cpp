@@ -167,8 +167,8 @@ int processData_FaceDetector()
         {
          float x = (float) ( (float) colorWidth/2)  - faces[0].x;
          float y = (float) ( (float) colorHeight/2) - faces[0].y;
-         float z = 0.0;
-         transmitHeadPosition( (float) -x/20, (float) y/20 , z);
+         float z = (float) ( (float) faces[i].width-150) ;
+         transmitHeadPosition( (float) -x/20, (float) y/20 , z/20);
         }
        }
     }
