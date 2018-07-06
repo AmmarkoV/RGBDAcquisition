@@ -536,7 +536,11 @@ main(int argc, char **argv)
     {
      if (acquisitionOpenDevice(moduleID,devID,"human",640,480,30))
         {
-         while ( acquisitionGetCurrentFrameNumber(moduleID,devID) <  acquisitionGetTotalFrameNumber(moduleID,devID) )
+           unsigned short *gpuDepth;
+           checkCudaErrors(cudaMalloc((void **) &d_haystack, haystackSize ));
+
+
+          while ( acquisitionGetCurrentFrameNumber(moduleID,devID) <  acquisitionGetTotalFrameNumber(moduleID,devID) )
            {
             acquisitionSnapFrames(moduleID,devID);
             fprintf(stderr,".");
