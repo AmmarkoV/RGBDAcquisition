@@ -46,6 +46,9 @@ struct viewerSettings
  unsigned int devID;
  unsigned int devID2;
  ModuleIdentifier moduleID;
+
+ unsigned int width,height,framerate;
+ unsigned int maxFramesToGrab;
 };
 
 
@@ -88,11 +91,123 @@ static void initializeViewerSettings(struct viewerSettings * vs)
   vs->devID2=UNINITIALIZED_DEVICE;
   vs->moduleID = 0;//OPENNI1_ACQUISITION_MODULE;//
 
+
+  vs->width=640; vs->height=480; vs->framerate=30;
+  vs->frameNum=0; vs->maxFramesToGrab=0;
 }
 
 
 
+static int initializeViewerSettingsFromArguments(struct viewerSettings * vs,int argc,const char *argv[])
+{
+  initializeViewerSettings(vs);
 
+  unsigned int i;
+  for (i=0; i<argc; i++)
+  {
+    if (strcmp(argv[i],"-delay")==0) { vs->delay=atoi(argv[i+1]); } else
+    if (strcmp(argv[i],"-saveEveryFrame")==0) {  vs->saveEveryFrame=1; } else
+    if (strcmp(argv[i],"-saveAsOriginalFrameNumber")==0) {
+                                                           vs->saveAsOriginalFrameNumber=1;
+                                                         } else
+    if (strcmp(argv[i],"-nolocation")==0) {
+                                            acquisitionSetLocation(vs->moduleID,0);
+                                          } else
+    if (strcmp(argv[i],"-executeEveryLoop")==0) {
+                                                   fprintf(stderr,"Will Execute %s after each frame\n",argv[i+1]);
+                                                   snprintf(vs->executeEveryLoop,1024,"%s",argv[i+1]);
+                                                   vs->executeEveryLoopPayload=1;
+                                                } else
+    if (strcmp(argv[i],"-processor")==0) {
+                                          fprintf(stderr,"Adding Processor to Pipeline %s , postfix %s\n",argv[i+1],argv[i+2]);
+                                          if (!acquisitionAddProcessor(vs->moduleID,vs->devID,argv[i+1],argv[i+2],argc,argv))
+                                          { fprintf(stderr,"Stopping execution..\n"); return 1; } else
+                                          { fprintf(stderr,"Successfuly added processor..\n");  }
+                                         } else
+    if (strcmp(argv[i],"-waitKey")==0) {
+                                         fprintf(stderr,"Waiting for key to be pressed to start\n");
+                                         vs->waitKeyToStart=1;
+                                        } else
+    if (strcmp(argv[i],"-noinput")==0) {
+                                         fprintf(stderr,"Disabling user input\n");
+                                         vs->noinput=1;
+                                        } else
+    if (strcmp(argv[i],"-resolution")==0) {
+                                             vs->width=atoi(argv[i+1]);
+                                             vs->height=atoi(argv[i+2]);
+                                             fprintf(stderr,"Resolution set to %u x %u \n",vs->width,vs->height);
+                                           } else
+    if (strcmp(argv[i],"-moveWindow")==0) {
+                                           vs->moveWindowX=atoi(argv[i+1]);
+                                           vs->moveWindowY=atoi(argv[i+2]);
+                                           vs->doMoveWindow=1;
+                                           fprintf(stderr,"Setting window position to %u %u\n",vs->moveWindowX,vs->moveWindowY);
+                                         } else
+    if (strcmp(argv[i],"-resizeWindow")==0) {
+                                             vs->windowX=atoi(argv[i+1]);
+                                             vs->windowY=atoi(argv[i+2]);
+                                             fprintf(stderr,"Window Sizes set to %u x %u \n",vs->windowX,vs->windowY);
+                                           } else
+    if (strcmp(argv[i],"-v")==0)           {
+                                             vs->verbose=1;
+                                           } else
+     if ( (strcmp(argv[i],"-onlyDepth")==0)||
+          (strcmp(argv[i],"-noColor")==0)) {
+                                               vs->drawColor = 0;
+                                           } else
+     if ( (strcmp(argv[i],"-onlyColor")==0)||
+          (strcmp(argv[i],"-noDepth")==0)) {
+                                               vs->drawDepth = 0;
+                                           } else
+    if (strcmp(argv[i],"-calibration")==0) {
+                                             vs->calibrationSet=1;
+                                             if (!ReadCalibration(argv[i+1],vs->width,vs->height,&vs->calib) )
+                                             {
+                                               fprintf(stderr,"Could not read calibration file `%s`\n",argv[i+1]);
+                                               return 1;
+                                             }
+                                           } else
+    if (strcmp(argv[i],"-seek")==0)      {
+                                           vs->seekFrame=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting seek to %u \n",vs->seekFrame);
+                                         } else
+
+    if (strcmp(argv[i],"-loop")==0)      {
+                                           vs->loopFrame=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting loop to %u \n",vs->loopFrame);
+                                         } else
+    if (strcmp(argv[i],"-maxFrames")==0) {
+                                           vs->maxFramesToGrab=atoi(argv[i+1]);
+                                           fprintf(stderr,"Setting frame grab to %u \n",vs->maxFramesToGrab);
+                                         } else
+    if (strcmp(argv[i],"-module")==0)    {
+                                           vs->moduleID = getModuleIdFromModuleName(argv[i+1]);
+                                           fprintf(stderr,"Overriding Module Used , set to %s ( %u ) \n",getModuleNameFromModuleID(vs->moduleID),vs->moduleID);
+                                         } else
+    if ( (strcmp(argv[i],"-dev")==0) ||
+         (strcmp(argv[i],"-dev1")==0) )
+                                         {
+                                           vs->devID = atoi(argv[i+1]);
+                                           fprintf(stderr,"Overriding device Used , set to %s ( %u ) \n",argv[i+1],vs->devID);
+                                         } else
+    if   (strcmp(argv[i],"-dev2")==0)    {
+                                           vs->devID2 = atoi(argv[i+1]);
+                                           fprintf(stderr,"Overriding device #2 Used , set to %s ( %u ) \n",argv[i+1],vs->devID2);
+                                         } else
+    if (
+        (strcmp(argv[i],"-from")==0) ||
+        (strcmp(argv[i],"-i")==0)
+       )
+       { strcat(vs->inputname,argv[i+1]); fprintf(stderr,"Input , set to %s  \n",vs->inputname); }
+      else
+    if (strcmp(argv[i],"-fps")==0)       {
+                                             vs->framerate=atoi(argv[i+1]);
+                                             fprintf(stderr,"Framerate , set to %u  \n",vs->framerate);
+                                         }
+  }
+
+ return 1;
+}
 
 
 #endif // VIEWERSETTINGS_H_INCLUDED
