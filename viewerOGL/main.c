@@ -279,7 +279,7 @@ int acquisitionCreateDisplay(struct viewerSettings * config,ModuleIdentifier mod
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
 	textureFramebuffer = loadShader("../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/shaders/virtualFramebuffer.vert",
-                                    "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/shaders/virtualFramebuffer.frag"
+                                    "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/shaders/virtualFramebufferTextureInput.frag"
                                     //"../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/shaders/virtualFramebufferFlow.frag"
                                     );
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
