@@ -66,6 +66,7 @@ static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
 
 int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 {
+
   display = XOpenDisplay(NULL);
 
   if (!display)
@@ -271,6 +272,8 @@ int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 
   printf( "Making context current\n" );
   glXMakeCurrent( display, win, ctx );
+
+
 
 
  // glClearColor( 0, 0.0, 0, 1 );

@@ -44,6 +44,23 @@ unsigned long GetTickCountMilliseconds()
 }
 
 
+unsigned long GetTickCountMicroseconds()
+{
+   //This returns a monotnic "uptime" value in milliseconds , it behaves like windows GetTickCount() but its not the same..
+   struct timespec ts;
+   if ( clock_gettime(CLOCK_MONOTONIC,&ts) != 0) { return 0; }
+
+   if (tickBase==0)
+   {
+     tickBase = ts.tv_sec*1000000 + ts.tv_nsec/1000;
+     return 0;
+   }
+
+   return ( ts.tv_sec*1000000 + ts.tv_nsec/1000 ) - tickBase;
+}
+
+
+
 
 int iDivUp(int a, int b)
 {
@@ -532,17 +549,31 @@ main(int argc, char **argv)
   unsigned int devID    = 0;
 
 
+   unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
+   acquisitionGetColorFrameDimensions(moduleID,devID,&colorWidth,&colorHeight,&colorChannels,&colorBitsperpixel);
+
+   unsigned int depthWidth , depthHeight , depthChannels , depthBitsperpixel;
+   acquisitionGetDepthFrameDimensions(moduleID,devID,&depthWidth,&depthHeight,&depthChannels,&depthBitsperpixel);
+
   if (acquisitionStartModule(moduleID,1,0))
     {
      if (acquisitionOpenDevice(moduleID,devID,"human",640,480,30))
         {
            unsigned short *gpuDepth;
-           checkCudaErrors(cudaMalloc((void **) &d_haystack, haystackSize ));
+           unsigned int gpuDepthSize = depthWidth*depthHeight*depthChannels*(depthBitsperpixel/8)*sizeof(char);
+           checkCudaErrors(cudaMalloc((void **) &gpuDepth,  gpuDepthSize));
 
 
           while ( acquisitionGetCurrentFrameNumber(moduleID,devID) <  acquisitionGetTotalFrameNumber(moduleID,devID) )
            {
-            acquisitionSnapFrames(moduleID,devID);
+            acquisitionSnapFrames(moduleID,devID); //We get a new frame
+
+            unsigned long startUploadTime = GetTickCountMicroseconds();
+            checkCudaErrors(cudaMemcpy(gpuDepth,acquisitionGetDepthFrame(moduleID,devID), gpuDepthSize, cudaMemcpyHostToDevice)); //We upload it
+            unsigned long endUploadTime = GetTickCountMicroseconds();
+            fprintf(stderr,"%u microseconds to upload to GPU\n",endUploadTime-startUploadTime);
+
+
             fprintf(stderr,".");
            }
 

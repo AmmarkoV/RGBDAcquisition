@@ -14,58 +14,28 @@
 
 #include "../tools/Common/viewerSettings.h"
 
-#define INTERCEPT_MOUSE_IN_WINDOWS 1
+// Include GLEW
+#include <GL/glew.h>
 
-#define NORMAL "\033[0m"
-#define BLACK "\033[30m" /* Black */
-#define RED "\033[31m" /* Red */
-#define GREEN "\033[32m" /* Green */
-#define YELLOW "\033[33m" /* Yellow */
-
-
-#define USE_NEW_OPENCV_HEADERS 1
-
-#if USE_NEW_OPENCV_HEADERS
- //#include <opencv2/opencv.hpp>
- #include <opencv2/imgproc/imgproc_c.h>
- #include <opencv2/legacy/legacy.hpp>
- #include "opencv2/highgui/highgui.hpp"
-#else
- #include <cv.h>
- #include <cxcore.h>
- #include <highgui.h>
-#endif
+//GLU
+#include <GL/gl.h>
+#include <GL/glx.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
 
 
 
-#if INTERCEPT_MOUSE_IN_WINDOWS
-enum
+int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
 {
-    EVENT_MOUSEMOVE      =0,
-    EVENT_LBUTTONDOWN    =1,
-    EVENT_RBUTTONDOWN    =2,
-    EVENT_MBUTTONDOWN    =3,
-    EVENT_LBUTTONUP      =4,
-    EVENT_RBUTTONUP      =5,
-    EVENT_MBUTTONUP      =6,
-    EVENT_LBUTTONDBLCLK  =7,
-    EVENT_RBUTTONDBLCLK  =8,
-    EVENT_MBUTTONDBLCLK  =9
-};
+    return 0;
+}
 
-enum
+int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
-    EVENT_FLAG_LBUTTON   =1,
-    EVENT_FLAG_RBUTTON   =2,
-    EVENT_FLAG_MBUTTON   =4,
-    EVENT_FLAG_CTRLKEY   =8,
-    EVENT_FLAG_SHIFTKEY  =16,
-    EVENT_FLAG_ALTKEY    =32
-};
-#endif
+    return 0;
+}
 
-
-struct viewerSettings config={0};
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/System/glx3.h"
 
 
 volatile int stop=0;
@@ -100,50 +70,16 @@ struct calibration calib;
 #define UNINITIALIZED_DEVICE 66666
   unsigned int devID=0;
   unsigned int devID2=UNINITIALIZED_DEVICE;
-  ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;/
-
-
-
-#if INTERCEPT_MOUSE_IN_WINDOWS
-void CallBackFunc(int event, int x, int y, int flags, void* userdata)
-{
-if  ( event == EVENT_LBUTTONDOWN )
-    {
-     fprintf(stderr,"Left button of the mouse is clicked - position (%u,%u)\n",x,y);
-     float x3D,y3D,z3D;
-     acquisitionGetDepth3DPointAtXYCameraSpace(moduleID,devID,x,y,&x3D,&y3D,&z3D);
-     fprintf(stderr,"acquisitionGetDepthValueAtXY(%u,%u) = %u \n",x,y,acquisitionGetDepthValueAtXY(moduleID,devID,x,y));
-     fprintf(stderr,"acquisitionGetDepth3DPointAtXYCameraSpace(%u,%u) = %0.2f , %0.2f , %0.2f\n",x,y,x3D,y3D,z3D);
-
-    } else
-if  ( event == EVENT_RBUTTONDOWN ) { fprintf(stderr,"Right button of the mouse is clicked - position (%u,%u)\n",x,y); } else
-if  ( event == EVENT_MBUTTONDOWN ) { fprintf(stderr,"Middle button of the mouse is clicked - position (%u,%u)\n",x,y); }
-// Commented out because it spams a lot -> else if  ( event == EVENT_MOUSEMOVE )   { fprintf(stderr,"Mouse move over the window - position (%u,%u)\n",x,y); }
-}
-#endif
-
-int blockWaitingForKey()
-{
-    cvWaitKey(0); //block for ever until key pressed
- return 1;
-}
-
-
-int acquisitionStopDisplayingFrames(ModuleIdentifier moduleID,DeviceIdentifier devID)
-{
-  	 cvDestroyWindow(RGBwindowName);
-   	 cvDestroyWindow(DepthwindowName);
-   	 return 1;
-}
+  ModuleIdentifier moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
 
 
 
-void closeEverything(struct viewerSettings * config)
+void closeEverything()
 {
  fprintf(stderr,"Gracefully closing everything .. ");
 
- acquisitionStopDisplayingFrames(moduleID,devID);
+// acquisitionStopDisplayingFrames(moduleID,devID);
  /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
  acquisitionCloseDevice(moduleID,devID);
 
@@ -185,7 +121,7 @@ int acquisitionSaveFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsig
 }
 
 
-
+/*
 int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int framerate)
 {
     //GIVE TIME FOR REDRAW EVENTS ETC -------------------------------------------------------------------------
@@ -328,6 +264,31 @@ if (drawDepth)
 }
 
   return 1;
+}
+*/
+
+
+int acquisitionCreateDisplay(ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+  unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
+  acquisitionGetColorFrameDimensions(moduleID,devID,&colorWidth,&colorHeight,&colorChannels,&colorBitsperpixel);
+
+  if (!start_glx3_stuff(colorWidth,colorHeight,1,0,0)) { fprintf(stderr,"Could not initialize"); return 1;}
+
+
+  if (glewInit() != GLEW_OK)
+   {
+		fprintf(stderr, "Failed to initialize GLEW\n");
+	 	return 0;
+   }
+  return 1;
+}
+
+int acquisitionDisplayFrames(ModuleIdentifier moduleID,DeviceIdentifier devID,unsigned int framerate)
+{
+
+
+ return 1;
 }
 
 
@@ -534,18 +495,8 @@ int main(int argc, char *argv[])
           acquisitionSeekFrame(moduleID,devID,seekFrame);
       }
 
-     #if INTERCEPT_MOUSE_IN_WINDOWS
-      //Create a window
-    if (drawColor)
-    {
-       cvNamedWindow(RGBwindowName, 1);
-      //set the callback function for any mouse event
-       if (!noinput)
-        {
-         cvSetMouseCallback(RGBwindowName, CallBackFunc, NULL);
-        }
-     }
-     #endif
+   acquisitionCreateDisplay(moduleID,devID);
+
 
    while ( (!stop) && ( (maxFramesToGrab==0)||(frameNum<maxFramesToGrab) ) )
     {
@@ -572,7 +523,7 @@ int main(int argc, char *argv[])
        if ( waitKeyToStart>0 )
        {
          --waitKeyToStart;
-         blockWaitingForKey();
+         //blockWaitingForKey();
        }
 
         if (loopFrame!=0)
@@ -601,7 +552,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Done viewing %u frames! \n",frameNum);
 
-    closeEverything(&config);
+    closeEverything();
 
     return 0;
 }

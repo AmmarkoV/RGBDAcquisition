@@ -446,6 +446,8 @@ int drawObjectAT(GLuint programID,
 
        glPopAttrib();
        glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
+
+       return 1;
 }
 
 
@@ -616,15 +618,14 @@ int doDrawing()
 
 int main(int argc, char **argv)
 {
-  start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
+  if (!start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv)) { fprintf(stderr,"Could not initialize"); return 1;}
+
 
   if (glewInit() != GLEW_OK)
    {
 		fprintf(stderr, "Failed to initialize GLEW\n");
-	 	return 1;
+	 	return 0;
    }
-
-
 
    doDrawing();
 
