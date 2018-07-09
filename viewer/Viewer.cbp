@@ -46,6 +46,7 @@
 			<Add library="dl" />
 			<Add library="../tools/OperatingSystem/libOperatingSystem.a" />
 		</Linker>
+		<Unit filename="../tools/Common/viewerSettings.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
