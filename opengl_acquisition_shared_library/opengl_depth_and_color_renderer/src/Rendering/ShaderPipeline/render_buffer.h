@@ -23,4 +23,18 @@ int drawFramebuffer(
                        unsigned int height
                    );
 
+
+
+int drawFramebufferFromTexture(
+                               GLuint textureToDraw,
+                       GLuint programFrameBufferID,
+                       GLuint quad_vertexbuffer,
+                       GLuint renderedTexture,
+                       GLuint texID,
+                       GLuint timeID,
+                       GLuint resolutionID,
+                       unsigned int width,
+                       unsigned int height
+                   );
+
 #endif // RENDER_BUFFER_H_INCLUDED

@@ -127,36 +127,6 @@ void closeEverything(struct viewerSettings * config)
 }
 
 
-int acquisitionSaveFrames(
-                          struct viewerSettings * config,
-                          ModuleIdentifier moduleID,
-                          DeviceIdentifier devID,
-                          unsigned int framerate
-                         )
-{
- char outfilename[1024]={0};
-    if (config->saveAsOriginalFrameNumber)
-                      {
-                        config->savedFrameNum=config->frameNum;
-                        fprintf(stderr,"Saving %u using original Frame Numbers ( change by ommiting -saveAsOriginalFrameNumber ) \n",config->savedFrameNum);
-                      } else
-                      { fprintf(stderr,"Saving %u using seperate enumeration for saved images( change by using -saveAsOriginalFrameNumber ) \n",config->savedFrameNum); }
-
-   if (config->drawColor)
-                      {
-                       sprintf(outfilename,"frames/colorFrame_%u_%05u",devID,config->savedFrameNum);
-                       acquisitionSaveColorFrame(moduleID,devID,outfilename,config->compressOutput);
-                      }
-
-   if (config->drawDepth)
-                      {
-                       sprintf(outfilename,"frames/depthFrame_%u_%05u",devID,config->savedFrameNum);
-                       acquisitionSaveDepthFrame(moduleID,devID,outfilename,config->compressOutput);
-                      }
-   ++config->savedFrameNum;
-  return 1;
-}
-
 
 
 int acquisitionDisplayFrames(

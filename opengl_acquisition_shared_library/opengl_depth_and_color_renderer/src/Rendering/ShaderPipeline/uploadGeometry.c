@@ -103,6 +103,7 @@ pushObjectToBufferData(
 
    return 1;
   #else
+   #warning "USE_GLEW not defined, uploadGeometry will not be included.."
    return 0;
   #endif
 }
