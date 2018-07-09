@@ -391,7 +391,6 @@ int acquisitionDisplayFrames(struct viewerSettings * config,ModuleIdentifier mod
 		// Swap buffers
 
   glx3_endRedraw();
-        usleep(1);
  return 1;
 }
 
