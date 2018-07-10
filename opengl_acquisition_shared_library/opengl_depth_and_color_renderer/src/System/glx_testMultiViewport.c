@@ -174,10 +174,10 @@ int doTiledDrawing(
                      535.423889, //fx
                      533.48468,  //fy
                      0.0,        //skew
-                     originalWIDTH/2,    //cx
-                     originalHEIGHT/2,   //cy
-                     originalWIDTH,      //Window Width
-                     originalHEIGHT,     //Window Height
+                     (double) originalWIDTH/2,    //cx
+                     (double) originalHEIGHT/2,   //cy
+                     (double) originalWIDTH,      //Window Width
+                     (double) originalHEIGHT,     //Window Height
                      1.0,        //Near
                      255.0,      //Far
                      projectionMatrixD,
@@ -526,8 +526,11 @@ int main(int argc, char **argv)
 	 	return 1;
    }
 
+   #define modelToLoad "../../Models/Ammar.tri"
+   //#define modelToLoad "../../submodules/Assimp/Ammar_1k.tri"
 
-   if (!loadModelTri("../../Models/Ammar.tri", &indexedTriModel ) )
+
+   if (!loadModelTri(modelToLoad, &indexedTriModel ) )
    {
      fprintf(stderr,"please cd ../../Models/\n");
      fprintf(stderr,"and then wget http://ammar.gr/models/Ammar.tri\n");
