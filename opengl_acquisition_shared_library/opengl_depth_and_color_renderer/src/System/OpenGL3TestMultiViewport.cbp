@@ -30,6 +30,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-DUSE_GLEW" />
 		</Compiler>
 		<Linker>
 			<Add option="-lGL" />

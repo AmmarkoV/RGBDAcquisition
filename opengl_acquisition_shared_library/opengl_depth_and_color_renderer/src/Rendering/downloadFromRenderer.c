@@ -9,6 +9,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include "../Tools/tools.h"
 
 #define OPTIMIZE_DEPTH_EXTRACTION 1
 #define FLIP_OPEN_GL_IMAGES 1

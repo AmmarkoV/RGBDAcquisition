@@ -487,7 +487,7 @@ int doDrawing()
 
 		// Swap buffers
         glx3_endRedraw();
-        usleep(1);
+       // usleep(1);
 
       //---------------------------------------------------------------
       //------------------- Calculate Framerate -----------------------

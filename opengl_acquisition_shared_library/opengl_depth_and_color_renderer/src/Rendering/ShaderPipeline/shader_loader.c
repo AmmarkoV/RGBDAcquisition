@@ -4,6 +4,8 @@
 #if USE_GLEW
 // Include GLEW
 #include <GL/glew.h>
+#else
+ #warning "USE_GLEW not defined , shader code is useless.."
 #endif // USE_GLEW
 
 
