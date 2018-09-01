@@ -19,6 +19,7 @@ ENDIF( ENABLE_OPENCV )
 
 #-------------------------------------------------------
   IF(ENABLE_PROCESSOR_BODYTRACKER) 
+    MESSAGE("Will use BodyTracker")
     add_subdirectory (BodyTracker/) 
     add_subdirectory (BodyTrackerExe/) 
   ELSE (ENABLE_PROCESSOR_BODYTRACKER)
@@ -27,12 +28,14 @@ ENDIF( ENABLE_OPENCV )
 
 #-------------------------------------------------------
   IF(ENABLE_PROCESSOR_DARKNET) 
+    MESSAGE("Will use DarknetProcessor")
     add_subdirectory (DarknetProcessor/) 
   ELSE (ENABLE_PROCESSOR_DARKNET)
     MESSAGE("Will not use DarknetProcessor")
   ENDIF(ENABLE_PROCESSOR_DARKNET)
 #-------------------------------------------------------
   IF(ENABLE_PROCESSOR_MOVIDIUS) 
+    MESSAGE("Will use Movidius")
     add_subdirectory (Movidius/) 
   ELSE (ENABLE_PROCESSOR_MOVIDIUS)
     MESSAGE("Will not use Movidius")

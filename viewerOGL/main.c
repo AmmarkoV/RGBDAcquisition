@@ -444,6 +444,7 @@ int main(int argc,const char *argv[])
        return 1;
     }
 
+  config.moduleID=TEMPLATE_ACQUISITION_MODULE;
   initializeViewerSettingsFromArguments(&config,argc,argv);
 
   if (config.framerate==0) { fprintf(stderr,"Zero is an invalid value for framerate , using 1\n"); config.framerate=1; }
@@ -468,7 +469,7 @@ int main(int argc,const char *argv[])
 
   if (!acquisitionIsModuleAvailiable(config.moduleID))
    {
-       fprintf(stderr,"The module you are trying to use is not linked in this build of the Acquisition library..\n");
+       fprintf(stderr,"The module you are trying to use (%u) is not linked in this build of the Acquisition library..\n",config.moduleID);
        return 1;
    }
 
