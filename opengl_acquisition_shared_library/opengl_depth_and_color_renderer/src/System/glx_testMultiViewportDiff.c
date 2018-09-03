@@ -337,6 +337,51 @@ int uploadColorImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,Dev
 
 
 
+int uploadDepthImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,DeviceIdentifier devID)
+{
+  unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
+  acquisitionGetColorFrameDimensions(moduleID,devID,&colorWidth,&colorHeight,&colorChannels,&colorBitsperpixel);
+
+  glUseProgram(programID);
+
+    if (colorTextureUploaded)
+     {
+       glDeleteTextures(1,&colorTexture);
+       colorTextureUploaded=0;
+     }
+
+
+
+    glEnable(GL_TEXTURE_2D);
+    glGenTextures(1,&colorTexture);
+    colorTextureUploaded=1;
+    glBindTexture(GL_TEXTURE_2D,colorTexture);
+
+      /* LOADING TEXTURE --WITHOUT-- MIPMAPING - IT IS LOADED RAW*/
+      glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);                       //GL_RGB
+      glTexImage2D(
+                    GL_TEXTURE_2D,
+                    0,
+                    GL_RGB,
+                    colorWidth ,
+                    colorHeight,
+                    0,
+                    GL_RGB,
+                    GL_UNSIGNED_BYTE,
+                    (const GLvoid *) acquisitionGetColorFrame(moduleID,devID)
+                  );
+
+    glFlush();
+    return 1;
+}
+
+
+
 
 
 

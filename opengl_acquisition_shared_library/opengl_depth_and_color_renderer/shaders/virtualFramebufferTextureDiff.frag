@@ -26,9 +26,9 @@ void main()
     if ( (renderData.x==0) && (renderData.y==0) && (renderData.z==0) )
      {} else
      {
-	color.x = abs(renderData.x - diffData.x); 
-    color.y = abs(renderData.y - diffData.y); 
-    color.z = abs(renderData.z - diffData.z);  
+	  color.x = abs(renderData.x - diffData.x); 
+      color.y = abs(renderData.y - diffData.y); 
+      color.z = abs(renderData.z - diffData.z);  
      }
 
     //color = diffData;
