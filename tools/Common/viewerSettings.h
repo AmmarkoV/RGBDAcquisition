@@ -91,7 +91,7 @@ static void initializeViewerSettings(struct viewerSettings * vs)
   #define UNINITIALIZED_DEVICE 66666
   vs->devID=0;
   vs->devID2=UNINITIALIZED_DEVICE;
-  vs->moduleID = 0;//OPENNI1_ACQUISITION_MODULE;//
+  vs->moduleID = TEMPLATE_ACQUISITION_MODULE;//OPENNI1_ACQUISITION_MODULE;//
 
 
   vs->width=640; vs->height=480; vs->framerate=30;
@@ -102,6 +102,17 @@ static void initializeViewerSettings(struct viewerSettings * vs)
 
 static int initializeViewerSettingsFromArguments(struct viewerSettings * vs,int argc,const char *argv[])
 {
+  fprintf(stderr,"Generic Grabber Application based on Acquisition lib .. \n");
+  unsigned int possibleModules = acquisitionGetModulesCount();
+  fprintf(stderr,"Linked to %u modules.. \n",possibleModules);
+
+  if (possibleModules==0)
+    {
+       fprintf(stderr,"Acquisition Library is linked to zero modules , can't possibly do anything..\n");
+       return 0;
+    }
+
+
   initializeViewerSettings(vs);
 
   unsigned int i;
@@ -207,6 +218,39 @@ static int initializeViewerSettingsFromArguments(struct viewerSettings * vs,int 
                                              fprintf(stderr,"Framerate , set to %u  \n",vs->framerate);
                                          }
   }
+
+
+
+
+  if (vs->framerate==0) { fprintf(stderr,"Zero is an invalid value for framerate , using 1\n"); vs->framerate=1; }
+
+  if (vs->moduleID==SCRIPTED_ACQUISITION_MODULE)
+  {
+  if (
+      acquisitionGetScriptModuleAndDeviceID(
+                                            &vs->moduleID ,
+                                            &vs->devID ,
+                                            &vs->width ,
+                                            &vs->height,
+                                            &vs->framerate,
+                                            0,
+                                            vs->inputname,
+                                            512
+                                           )
+      )
+      { fprintf(stderr,"Loaded configuration from script file..\n"); }
+  }
+
+
+  if (!acquisitionIsModuleAvailiable(vs->moduleID))
+   {
+       fprintf(stderr,"The module you are trying to use (%u) is not linked in this build of the Acquisition library..\n",vs->moduleID);
+       return 1;
+   }
+
+
+
+
 
  return 1;
 }

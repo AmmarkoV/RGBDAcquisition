@@ -256,7 +256,7 @@ int uploadColorImageAsTexture(ModuleIdentifier moduleID,DeviceIdentifier devID)
                   );
 
     glFlush();
-
+    return 1;
 }
 
 
@@ -432,46 +432,10 @@ void closeEverything(struct viewerSettings * config)
 
 int main(int argc,const char *argv[])
 {
- fprintf(stderr,"Generic Grabber Application based on Acquisition lib .. \n");
- unsigned int possibleModules = acquisitionGetModulesCount();
- fprintf(stderr,"Linked to %u modules.. \n",possibleModules);
+  acquisitionRegisterTerminationSignal(&closeEverything);
 
- acquisitionRegisterTerminationSignal(&closeEverything);
-
-  if (possibleModules==0)
-    {
-       fprintf(stderr,"Acquisition Library is linked to zero modules , can't possibly do anything..\n");
-       return 1;
-    }
-
-  config.moduleID=TEMPLATE_ACQUISITION_MODULE;
   initializeViewerSettingsFromArguments(&config,argc,argv);
 
-  if (config.framerate==0) { fprintf(stderr,"Zero is an invalid value for framerate , using 1\n"); config.framerate=1; }
-
-  if (config.moduleID==SCRIPTED_ACQUISITION_MODULE)
-  {
-  if (
-      acquisitionGetScriptModuleAndDeviceID(
-                                            &config.moduleID ,
-                                            &config.devID ,
-                                            &config.width ,
-                                            &config.height,
-                                            &config.framerate,
-                                            0,
-                                            config.inputname,
-                                            512
-                                           )
-      )
-      { fprintf(stderr,"Loaded configuration from script file..\n"); }
-  }
-
-
-  if (!acquisitionIsModuleAvailiable(config.moduleID))
-   {
-       fprintf(stderr,"The module you are trying to use (%u) is not linked in this build of the Acquisition library..\n",config.moduleID);
-       return 1;
-   }
 
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(config.moduleID,16 /*maxDevices*/ , 0 ))
