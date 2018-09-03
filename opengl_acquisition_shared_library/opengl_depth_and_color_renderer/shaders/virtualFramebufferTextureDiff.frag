@@ -22,11 +22,15 @@ void main()
     vec2 verticalFlip=UVDiffTexture;
     verticalFlip.y = 1.0f - verticalFlip.y;
     vec3 diffData = texture( diffedTexture, verticalFlip ).xyz ; 
-
+   
+    if ( (renderData.x==0) && (renderData.y==0) && (renderData.z==0) )
+     {} else
+     {
 	color.x = abs(renderData.x - diffData.x); 
     color.y = abs(renderData.y - diffData.y); 
     color.z = abs(renderData.z - diffData.z);  
-    
+     }
+
     //color = diffData;
 	//color = texture( renderedTexture, UV ).xyz ;
 	//color = texture( renderedTexture, UV + 0.005*vec2( sin(iTime+1024.0*UV.x),cos(iTime+768.0*UV.y)) ).xyz ; 
