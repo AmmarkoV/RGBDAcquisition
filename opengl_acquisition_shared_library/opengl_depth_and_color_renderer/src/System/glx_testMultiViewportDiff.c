@@ -167,6 +167,8 @@ int doTiledDiffDrawing(
                        int programID,
                        GLuint textureToDiff,
                        GLuint textureDiffSampler,
+                       GLuint tileSizeX,
+                       GLuint tileSizeY,
                        GLuint MVPMatrixID ,
                        GLuint cubeVao,
                        unsigned int cubeTriangleCount,
@@ -177,11 +179,16 @@ int doTiledDiffDrawing(
                     )
 {
      // Bind our texture in Texture Unit 0
-	 glActiveTexture(GL_TEXTURE0);
+	 glActiveTexture(GL_TEXTURE1);
 	 glBindTexture(GL_TEXTURE_2D, textureToDiff);
 
 	 // Set our "renderedTexture" sampler to use Texture Unit 0
-	 glUniform1i(textureDiffSampler, 0);
+	 glUniform1i(textureDiffSampler, 1);
+
+     //Update our tile size..
+	 glUniform1i(tileSizeX,tilesX);
+	 glUniform1i(tileSizeY,tilesY);
+
 
      double projectionMatrixD[16];
      double viewportMatrixD[16];
@@ -338,23 +345,23 @@ int doDrawing()
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
-	struct shaderObject * sho = loadShader("../../shaders/simpleDiff.vert", "../../shaders/simpleDiff.frag");
+	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
-	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebuffer.frag");
+	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebufferTextureDiff.vert", "../../shaders/virtualFramebufferTextureDiff.frag");
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
     GLuint programID = sho->ProgramObject;
     GLuint programFrameBufferID = textureFramebuffer->ProgramObject;
 
 
-
-
-
-
-
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
+
+
+	// Use our shader
+	//glUseProgram(programFrameBufferID);
+
 
 
 	// Use our shader
@@ -419,9 +426,11 @@ int doDrawing()
 
 	 // Create and compile our GLSL program from the shaders
 	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
-	 GLuint textureDiffSampler = glGetUniformLocation(programFrameBufferID, "diffTexture");
+	 GLuint textureDiffSampler = glGetUniformLocation(programFrameBufferID, "diffedTexture");
 	 // Create and compile our GLSL program from the shaders
 	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "iTime");
+	 GLuint tileSizeX = glGetUniformLocation(programFrameBufferID, "tileSizeX");
+	 GLuint tileSizeY = glGetUniformLocation(programFrameBufferID, "tileSizeY");
 
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
@@ -444,13 +453,15 @@ int doDrawing()
 
         //Get a new pair of frames and upload as texture..
         acquisitionSnapFrames(config.moduleID,config.devID);
-        uploadColorImageAsTexture(programID,config.moduleID,config.devID);
+        uploadColorImageAsTexture(programFrameBufferID,config.moduleID,config.devID);
 
 
         doTiledDiffDrawing(
                            programID,
                            colorTexture,
                            textureDiffSampler,
+                           tileSizeX,
+                           tileSizeY,
                            MVPMatrixID,
                            cubeVAO,
                            cubeTriangleCount,
