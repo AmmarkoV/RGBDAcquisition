@@ -52,8 +52,8 @@
 
 struct viewerSettings config={0};
 
-unsigned int colorTextureUploaded=0;
-GLuint colorTexture;
+unsigned int diffTextureUploaded=0;
+GLuint diffTexture;
 GLuint colorTexGLSLId;
 
 unsigned int WIDTH=(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
@@ -295,18 +295,18 @@ int uploadColorImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,Dev
 
   glUseProgram(programID);
 
-    if (colorTextureUploaded)
+    if (diffTextureUploaded)
      {
-       glDeleteTextures(1,&colorTexture);
-       colorTextureUploaded=0;
+       glDeleteTextures(1,&diffTexture);
+       diffTextureUploaded=0;
      }
 
 
 
     glEnable(GL_TEXTURE_2D);
-    glGenTextures(1,&colorTexture);
-    colorTextureUploaded=1;
-    glBindTexture(GL_TEXTURE_2D,colorTexture);
+    glGenTextures(1,&diffTexture);
+    diffTextureUploaded=1;
+    glBindTexture(GL_TEXTURE_2D,diffTexture);
 
       /* LOADING TEXTURE --WITHOUT-- MIPMAPING - IT IS LOADED RAW*/
       glPixelStorei(GL_UNPACK_ALIGNMENT,1);
@@ -315,6 +315,7 @@ int uploadColorImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,Dev
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);                       //GL_RGB
+      checkOpenGLError(__FILE__, __LINE__);
       glTexImage2D(
                     GL_TEXTURE_2D,
                     0,
@@ -326,6 +327,7 @@ int uploadColorImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,Dev
                     GL_UNSIGNED_BYTE,
                     (const GLvoid *) acquisitionGetColorFrame(moduleID,devID)
                   );
+      checkOpenGLError(__FILE__, __LINE__);
 
     glFlush();
     return 1;
@@ -339,23 +341,23 @@ int uploadColorImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,Dev
 
 int uploadDepthImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
-  unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
-  acquisitionGetColorFrameDimensions(moduleID,devID,&colorWidth,&colorHeight,&colorChannels,&colorBitsperpixel);
+  unsigned int depthWidth , depthHeight , depthChannels , depthBitsperpixel;
+  acquisitionGetColorFrameDimensions(moduleID,devID,&depthWidth,&depthHeight,&depthChannels,&depthBitsperpixel);
 
   glUseProgram(programID);
 
-    if (colorTextureUploaded)
+    if (diffTextureUploaded)
      {
-       glDeleteTextures(1,&colorTexture);
-       colorTextureUploaded=0;
+       glDeleteTextures(1,&diffTexture);
+       diffTextureUploaded=0;
      }
 
 
 
     glEnable(GL_TEXTURE_2D);
-    glGenTextures(1,&colorTexture);
-    colorTextureUploaded=1;
-    glBindTexture(GL_TEXTURE_2D,colorTexture);
+    glGenTextures(1,&diffTexture);
+    diffTextureUploaded=1;
+    glBindTexture(GL_TEXTURE_2D,diffTexture);
 
       /* LOADING TEXTURE --WITHOUT-- MIPMAPING - IT IS LOADED RAW*/
       glPixelStorei(GL_UNPACK_ALIGNMENT,1);
@@ -364,17 +366,19 @@ int uploadDepthImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,Dev
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);                       //GL_RGB
+      checkOpenGLError(__FILE__, __LINE__);
       glTexImage2D(
                     GL_TEXTURE_2D,
                     0,
-                    GL_RGB,
-                    colorWidth ,
-                    colorHeight,
+                    GL_R16UI,
+                    depthWidth ,
+                    depthHeight,
                     0,
-                    GL_RGB,
-                    GL_UNSIGNED_BYTE,
-                    (const GLvoid *) acquisitionGetColorFrame(moduleID,devID)
+                    GL_RED_INTEGER,
+                    GL_UNSIGNED_SHORT,
+                    (const GLvoid *) acquisitionGetDepthFrame(moduleID,devID)
                   );
+      checkOpenGLError(__FILE__, __LINE__);
 
     glFlush();
     return 1;
@@ -390,7 +394,7 @@ int doDrawing()
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
-	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
+	struct shaderObject * sho = loadShader("../../shaders/simpleDepth.vert", "../../shaders/simpleDepth.frag");
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
 	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebufferTextureDiff.vert", "../../shaders/virtualFramebufferTextureDiff.frag");
@@ -498,12 +502,13 @@ int doDrawing()
 
         //Get a new pair of frames and upload as texture..
         acquisitionSnapFrames(config.moduleID,config.devID);
-        uploadColorImageAsTexture(programFrameBufferID,config.moduleID,config.devID);
+        //uploadColorImageAsTexture(programFrameBufferID,config.moduleID,config.devID);
+        uploadDepthImageAsTexture(programFrameBufferID,config.moduleID,config.devID);
 
 
         doTiledDiffDrawing(
                            programID,
-                           colorTexture,
+                           diffTexture,
                            textureDiffSampler,
                            tileSizeX,
                            tileSizeY,
