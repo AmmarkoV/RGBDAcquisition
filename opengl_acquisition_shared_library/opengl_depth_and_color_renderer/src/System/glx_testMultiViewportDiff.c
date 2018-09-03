@@ -163,17 +163,25 @@ int drawObjectAT(GLuint programID,
 
 
 
-int doTiledDrawing(
-                   int programID,
-                   GLuint MVPMatrixID ,
-                   GLuint cubeVao,
-                   unsigned int cubeTriangleCount,
-                   GLuint pyramidVao,
-                   unsigned int pyramidTriangleCount,
-                   unsigned int tilesX,
-                   unsigned int tilesY
-                   )
+int doTiledDiffDrawing(
+                       int programID,
+                       GLuint textureToDiff,
+                       GLuint textureDiffSampler,
+                       GLuint MVPMatrixID ,
+                       GLuint cubeVao,
+                       unsigned int cubeTriangleCount,
+                       GLuint pyramidVao,
+                       unsigned int pyramidTriangleCount,
+                       unsigned int tilesX,
+                       unsigned int tilesY
+                    )
 {
+     // Bind our texture in Texture Unit 0
+	 glActiveTexture(GL_TEXTURE0);
+	 glBindTexture(GL_TEXTURE_2D, textureToDiff);
+
+	 // Set our "renderedTexture" sampler to use Texture Unit 0
+	 glUniform1i(textureDiffSampler, 0);
 
      double projectionMatrixD[16];
      double viewportMatrixD[16];
@@ -269,86 +277,6 @@ int doTiledDrawing(
 }
 
 
-int doSingleDrawing(
-                   int programID,
-                   GLuint MVPMatrixID ,
-                   GLuint cubeVao,
-                   unsigned int cubeTriangleCount,
-                   GLuint pyramidVao,
-                   unsigned int pyramidTriangleCount,
-                   unsigned int tilesX,
-                   unsigned int tilesY)
-{
-
-     double projectionMatrixD[16];
-     double viewportMatrixD[16];
-     double viewMatrixD[16];
-
-     prepareRenderingMatrices(
-                     535.423889, //fx
-                     533.48468,  //fy
-                     0.0,        //skew
-                     WIDTH/2,    //cx
-                     HEIGHT/2,   //cy
-                     WIDTH,      //Window Width
-                     HEIGHT,     //Window Height
-                     1.0,        //Near
-                     255.0,      //Far
-                     projectionMatrixD,
-                     viewMatrixD,
-                     viewportMatrixD
-                    );
-
-
-     //-------------------------------------------------------------------
-        double roll=0.0;//(double)  (rand()%90);
-        double pitch=0.0;//(double) (rand()%90);
-        double yaw=0.0;//(double)   (rand()%90);
-
-        double x=-259.231f;//(double)  (1000-rand()%2000);
-        double y=-54.976f;//(double) (100-rand()%200);
-        double z=2699.735f;//(double)  (700+rand()%1000);
-     //-------------------------------------------------------------------
-     //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
-     drawObjectAT(
-                  programID,
-                  cubeVao,
-                  MVPMatrixID,
-                  cubeTriangleCount,
-                  x-400,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw,
-
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
-                 );
-
-     drawObjectAT(
-                  programID,
-                  pyramidVao,
-                  MVPMatrixID,
-                  pyramidTriangleCount,
-                  x+1100,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw+180,
-
-                  projectionMatrixD,
-                  viewportMatrixD,
-                  viewMatrixD
-                 );
- return 1;
-}
-
-
-
-
 
 
 
@@ -410,7 +338,7 @@ int doDrawing()
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
-	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
+	struct shaderObject * sho = loadShader("../../shaders/simpleDiff.vert", "../../shaders/simpleDiff.frag");
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
 	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebuffer.frag");
@@ -491,6 +419,7 @@ int doDrawing()
 
 	 // Create and compile our GLSL program from the shaders
 	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
+	 GLuint textureDiffSampler = glGetUniformLocation(programFrameBufferID, "diffTexture");
 	 // Create and compile our GLSL program from the shaders
 	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "iTime");
 
@@ -498,6 +427,7 @@ int doDrawing()
 
 
 	do{
+
         // Render to our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
@@ -512,33 +442,24 @@ int doDrawing()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 
-      #define DO_MULTI 1
-      //--------------------------------------
-      #if DO_MULTI
-      doTiledDrawing(
-                     programID,
-                     MVPMatrixID,
-                     cubeVAO,
-                     cubeTriangleCount,
-                     humanVAO,
-                     humanTriangleCount,
-                     tilesToDoX,
-                     tilesToDoY
-                    );
-      #else
-      //--------------------------------------
-      doSingleDrawing(
-                     programID,
-                     MVPMatrixID,
-                     cubeVAO,
-                     cubeTriangleCount,
-                     humanVAO,
-                     humanTriangleCount,
-                     16,
-                     16
-                    );
-      //--------------------------------------
-      #endif // DO_MULTI
+        //Get a new pair of frames and upload as texture..
+        acquisitionSnapFrames(config.moduleID,config.devID);
+        uploadColorImageAsTexture(programID,config.moduleID,config.devID);
+
+
+        doTiledDiffDrawing(
+                           programID,
+                           colorTexture,
+                           textureDiffSampler,
+                           MVPMatrixID,
+                           cubeVAO,
+                           cubeTriangleCount,
+                           humanVAO,
+                           humanTriangleCount,
+                           tilesToDoX,
+                           tilesToDoY
+                          );
+
 
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebuffer(
@@ -584,6 +505,8 @@ int doDrawing()
 
 
 
+
+
 int main(int argc, char **argv)
 {
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
@@ -607,7 +530,37 @@ int main(int argc, char **argv)
 
    fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
 
+
+
+
+
+
+  /* ACQUISITION INITIALIZATION ---------------------------------------------------------------------*/
+  /* ------------------------------------------------------------------------------------------------*/
+  /* ------------------------------------------------------------------------------------------------*/
+  acquisitionRegisterTerminationSignal(&acquisitionDefaultTerminator);
+  initializeViewerSettingsFromArguments(&config,argc,argv);
+
+
+  //We need to initialize our module before calling any related calls to the specific module..
+  if (!acquisitionStartModule(config.moduleID,16 /*maxDevices*/ , 0 ))
+   {
+       fprintf(stderr,"Could not start module %s ..\n",getModuleNameFromModuleID(config.moduleID));
+       return 1;
+   }
+
+  if (!acquisitionOpenDevice(config.moduleID,config.devID,config.inputname,config.width,config.height,config.framerate) )
+   {
+          fprintf(stderr,"Could not open device %u ( %s ) of module %s  ..\n",config.devID, config.inputname,getModuleNameFromModuleID(config.moduleID));
+          return 1;
+   }
+/* ------------------------------------------------------------------------------------------------*/
+/* ------------------------------------------------------------------------------------------------*/
+
    doDrawing();
+
+
+   acquisitionDefaultTerminator(&config);
 
   stop_glx3_stuff();
  return 0;

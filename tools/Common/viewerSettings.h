@@ -289,4 +289,27 @@ static int acquisitionSaveFrames(
 }
 
 
+
+static void acquisitionDefaultTerminator(struct viewerSettings * config)
+{
+ fprintf(stderr,"Gracefully closing everything .. ");
+
+ /*The first argument (Dev ID) could also be ANY_OPENNI2_DEVICE for a single camera setup */
+ acquisitionCloseDevice(config->moduleID,config->devID);
+
+ if (config->devID2!=UNINITIALIZED_DEVICE)
+        {
+          acquisitionCloseDevice(
+                                  config->moduleID,
+                                  config->devID2
+                                );
+        }
+
+ acquisitionStopModule(config->moduleID);
+
+ fprintf(stderr,"Done\n");
+ exit(0);
+}
+
+
 #endif // VIEWERSETTINGS_H_INCLUDED
