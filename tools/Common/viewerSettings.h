@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define NORMAL "\033[0m"
 #define BLACK "\033[30m" /* Black */

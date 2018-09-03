@@ -31,6 +31,9 @@
 #include "../Rendering/ShaderPipeline/uploadGeometry.h"
 
 
+#include "../../../../acquisition/Acquisition.h"
+#include "../../../../tools/Calibration/calibration.h"
+#include "../../../../tools/Common/viewerSettings.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -46,6 +49,12 @@
 //--------------------------------------------
 
 
+
+struct viewerSettings config={0};
+
+unsigned int colorTextureUploaded=0;
+GLuint colorTexture;
+GLuint colorTexGLSLId;
 
 unsigned int WIDTH=(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
 unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
@@ -344,12 +353,12 @@ int doSingleDrawing(
 
 
 
-int uploadColorImageAsTexture(ModuleIdentifier moduleID,DeviceIdentifier devID)
+int uploadColorImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,DeviceIdentifier devID)
 {
   unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
   acquisitionGetColorFrameDimensions(moduleID,devID,&colorWidth,&colorHeight,&colorChannels,&colorBitsperpixel);
 
-  glUseProgram(textureFramebuffer->ProgramObject);
+  glUseProgram(programID);
 
     if (colorTextureUploaded)
      {
