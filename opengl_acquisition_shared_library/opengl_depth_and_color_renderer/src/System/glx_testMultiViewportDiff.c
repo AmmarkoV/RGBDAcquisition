@@ -133,17 +133,15 @@ int drawObjectAT(GLuint programID,
        transpose4x4Matrix(MVP);
       //-------------------------------------------------------------------
 
-
-
-		// Send our transformation to the currently bound shader, in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
+      // Send our transformation to the currently bound shader, in the "MVP" uniform
+      glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
 
 
 
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-        //Our flipped view needs front culling..
-        glCullFace(GL_FRONT);
-        glEnable(GL_CULL_FACE);
+      glPushAttrib(GL_ALL_ATTRIB_BITS);
+      //Our flipped view needs front culling..
+      glCullFace(GL_FRONT);
+      glEnable(GL_CULL_FACE);
 
          //-------------------------------------------------
          //if (wireFrame) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
