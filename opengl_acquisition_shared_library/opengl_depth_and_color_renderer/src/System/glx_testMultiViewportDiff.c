@@ -143,25 +143,27 @@ int drawObjectAT(GLuint programID,
       glCullFace(GL_FRONT);
       glEnable(GL_CULL_FACE);
 
-         //-------------------------------------------------
-         //if (wireFrame) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
-         //               glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-         // checkOpenGLError(__FILE__, __LINE__);
-         //-------------------------------------------------
+      //-------------------------------------------------
+      //if (wireFrame) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else
+      //               glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      // checkOpenGLError(__FILE__, __LINE__);
+      //-------------------------------------------------
 
 
-         glDrawArrays( GL_TRIANGLES, 0, triangleCount );   checkOpenGLError(__FILE__, __LINE__);
+      glDrawArrays( GL_TRIANGLES, 0, triangleCount );   checkOpenGLError(__FILE__, __LINE__);
 
 
-       glPopAttrib();
-       glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
-       return 1;
+      glPopAttrib();
+      glBindVertexArray(0); checkOpenGLError(__FILE__, __LINE__);
+
+  return 1;
 }
 
 
 
 int doTiledDiffDrawing(
                        int programID,
+                       int programFrameBufferID,
                        GLuint textureToDiff,
                        GLuint textureDiffSampler,
                        GLuint tileSizeX,
@@ -175,6 +177,7 @@ int doTiledDiffDrawing(
                        unsigned int tilesY
                     )
 {
+     glUseProgram(programFrameBufferID);
      // Bind our texture in Texture Unit 0
 	 glActiveTexture(GL_TEXTURE1);
 	 glBindTexture(GL_TEXTURE_2D, textureToDiff);
@@ -192,20 +195,19 @@ int doTiledDiffDrawing(
      double viewMatrixD[16];
 
      prepareRenderingMatrices(
-                     535.423889, //fx
-                     533.48468,  //fy
-                     0.0,        //skew
-                     (double) originalWIDTH/2,    //cx
-                     (double) originalHEIGHT/2,   //cy
-                     (double) originalWIDTH,      //Window Width
-                     (double) originalHEIGHT,     //Window Height
-                     1.0,        //Near
-                     255.0,      //Far
-                     projectionMatrixD,
-                     viewMatrixD,
-                     viewportMatrixD
-                    );
-
+                              535.423889, //fx
+                              533.48468,  //fy
+                              0.0,        //skew
+                              (double) originalWIDTH/2,    //cx
+                              (double) originalHEIGHT/2,   //cy
+                              (double) originalWIDTH,      //Window Width
+                              (double) originalHEIGHT,     //Window Height
+                              1.0,        //Near
+                              255.0,      //Far
+                              projectionMatrixD,
+                              viewMatrixD,
+                              viewportMatrixD
+                             );
      //-------------------------------------------------------------------
         double roll=0.0;//(double)  (rand()%90);
         double pitch=0.0;//(double) (rand()%90);
@@ -270,9 +272,6 @@ int doTiledDiffDrawing(
                   pyramidTriangleCount,
 
                   25.37,-87.19,2665.56,
-                  //x+1100,
-                  //y,
-                  //z,
                   euler[0],
                   euler[1],
                   euler[2],
@@ -361,12 +360,6 @@ int doDrawing()
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
 
-
-	// Use our shader
-	//glUseProgram(programFrameBufferID);
-
-
-
 	// Use our shader
 	glUseProgram(programID);
 
@@ -438,21 +431,18 @@ int doDrawing()
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
 
-	do{
-
+	do
+     {
         // Render to our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-
 
        //-----------------------------------------------
         if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
        //-----------------------------------------------
 
-
         glClearColor( 0, 0.0, 0, 1 );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
-
 
         //Get a new pair of frames and upload as texture..
         acquisitionSnapFrames(config.moduleID,config.devID);
@@ -466,6 +456,7 @@ int doDrawing()
 
         doTiledDiffDrawing(
                            programID,
+                           programFrameBufferID,
                            diffTexture,
                            textureDiffSampler,
                            tileSizeX,
@@ -561,8 +552,6 @@ int main(int argc,const char **argv)
 
    fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
 
-
-
   /* ACQUISITION INITIALIZATION ---------------------------------------------------------------------*/
   /* ------------------------------------------------------------------------------------------------*/
   /* ------------------------------------------------------------------------------------------------*/
@@ -581,13 +570,13 @@ int main(int argc,const char **argv)
           fprintf(stderr,"Could not open device %u ( %s ) of module %s  ..\n",config.devID, config.inputname,getModuleNameFromModuleID(config.moduleID));
           return 1;
    }
-/* ------------------------------------------------------------------------------------------------*/
-/* ------------------------------------------------------------------------------------------------*/
+  /* ------------------------------------------------------------------------------------------------*/
+  /* ------------------------------------------------------------------------------------------------*/
 
-   doDrawing();
+  doDrawing();
 
 
-   acquisitionDefaultTerminator(&config);
+  acquisitionDefaultTerminator(&config);
 
   stop_glx3_stuff();
  return 0;

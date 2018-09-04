@@ -828,7 +828,6 @@ void glGetViewportMatrix(double * m , double startX,double startY, double width,
 
   void getModelViewProjectionMatrixFromMatrices(double * output, double * projectionMatrix,double * viewMatrix,double * modelMatrix)
   {
-
     //fprintf(stderr,"Asked To perform multiplication MVP = Projection * View * Model");
 
     //print4x4DMatrix("projectionMatrix",projectionMatrix,1);
@@ -838,14 +837,8 @@ void glGetViewportMatrix(double * m , double startX,double startY, double width,
 	 //MVP = Projection * View * Model || Remember, matrix multiplication is the other way around
      ///THIS IS THE CORRECT WAY TO PERFORM THE MULTIPLICATION WITH OUR ROW MAJOR MATRICES
      multiplyThree4x4Matrices(output, projectionMatrix , viewMatrix , modelMatrix );
-
      //print4x4DMatrix("MVP=",output,1);
   }
-
-
-
-
-
 
 
 
