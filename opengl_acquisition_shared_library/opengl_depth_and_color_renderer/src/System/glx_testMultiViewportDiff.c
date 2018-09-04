@@ -31,6 +31,7 @@
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 #include "../Rendering/ShaderPipeline/render_buffer.h"
 #include "../Rendering/ShaderPipeline/uploadGeometry.h"
+#include "../Rendering/ShaderPipeline/uploadTextures.h"
 
 
 #include "../../../../acquisition/Acquisition.h"
@@ -298,57 +299,6 @@ int doTiledDiffDrawing(
 
 
 
-
-
-
-int uploadColorImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,DeviceIdentifier devID)
-{
-  unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
-  acquisitionGetColorFrameDimensions(moduleID,devID,&colorWidth,&colorHeight,&colorChannels,&colorBitsperpixel);
-
-  glUseProgram(programID);
-
-    if (diffTextureUploaded)
-     {
-       glDeleteTextures(1,&diffTexture);
-       diffTextureUploaded=0;
-     }
-
-
-
-    glEnable(GL_TEXTURE_2D);
-    glGenTextures(1,&diffTexture);
-    diffTextureUploaded=1;
-    glBindTexture(GL_TEXTURE_2D,diffTexture);
-
-      /* LOADING TEXTURE --WITHOUT-- MIPMAPING - IT IS LOADED RAW*/
-      glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);                       //GL_RGB
-      checkOpenGLError(__FILE__, __LINE__);
-      glTexImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    GL_RGB,
-                    colorWidth ,
-                    colorHeight,
-                    0,
-                    GL_RGB,
-                    GL_UNSIGNED_BYTE,
-                    (const GLvoid *) acquisitionGetColorFrame(moduleID,devID)
-                  );
-      checkOpenGLError(__FILE__, __LINE__);
-
-    glFlush();
-    return 1;
-}
-
-
-
-
 void performComputeShaderOperation(struct computeShaderObject  * diffComputer)
 {
     glUseProgram(diffComputer->computeShaderProgram);
@@ -357,56 +307,43 @@ void performComputeShaderOperation(struct computeShaderObject  * diffComputer)
     //checkErrors("Dispatch compute shader");
 }
 
-
-
-int uploadDepthImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,DeviceIdentifier devID)
+int uploadColorImageAsTextureFromAcquisition(
+                                              GLuint programID  ,
+                                              ModuleIdentifier moduleID,
+                                              DeviceIdentifier devID
+                                            )
 {
-  unsigned int depthWidth , depthHeight , depthChannels , depthBitsperpixel;
-  acquisitionGetColorFrameDimensions(moduleID,devID,&depthWidth,&depthHeight,&depthChannels,&depthBitsperpixel);
+  unsigned int colorWidth , colorHeight , colorChannels , colorBitsperpixel;
+  acquisitionGetColorFrameDimensions(moduleID,devID,&colorWidth,&colorHeight,&colorChannels,&colorBitsperpixel);
 
-  glUseProgram(programID);
-
-    if (diffTextureUploaded)
-     {
-       glDeleteTextures(1,&diffTexture);
-       diffTextureUploaded=0;
-     }
-
-
-
-    glEnable(GL_TEXTURE_2D);
-    glGenTextures(1,&diffTexture);
-    diffTextureUploaded=1;
-    glBindTexture(GL_TEXTURE_2D,diffTexture);
-
-      /* LOADING TEXTURE --WITHOUT-- MIPMAPING - IT IS LOADED RAW*/
-      glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);                       //GL_RGB
-      checkOpenGLError(__FILE__, __LINE__);
-      glTexImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    GL_R16UI,
-                    depthWidth ,
-                    depthHeight,
-                    0,
-                    GL_RED_INTEGER,
-                    GL_UNSIGNED_SHORT,
-                    (const GLvoid *) acquisitionGetDepthFrame(moduleID,devID)
-                  );
-      checkOpenGLError(__FILE__, __LINE__);
-
-    glFlush();
-    return 1;
+  return
+  uploadColorImageAsTexture(
+                            programID,
+                            &diffTexture,
+                            &diffTextureUploaded,
+                            acquisitionGetColorFrame(moduleID,devID),
+                            colorWidth , colorHeight , colorChannels , colorBitsperpixel
+                           );
 }
 
+int uploadDepthImageAsTextureFromAcquisition(
+                                              GLuint programID  ,
+                                              ModuleIdentifier moduleID,
+                                              DeviceIdentifier devID
+                                            )
+{
+  unsigned int depthWidth , depthHeight , depthChannels , depthBitsperpixel;
+  acquisitionGetDepthFrameDimensions(moduleID,devID,&depthWidth,&depthHeight,&depthChannels,&depthBitsperpixel);
 
-
-
+  return
+  uploadDepthImageAsTexture(
+                            programID,
+                            &diffTexture,
+                            &diffTextureUploaded,
+                            acquisitionGetDepthFrame(moduleID,devID),
+                            depthWidth , depthHeight , depthChannels , depthBitsperpixel
+                           );
+}
 
 
 int doDrawing()
@@ -529,7 +466,11 @@ int doDrawing()
         //Get a new pair of frames and upload as texture..
         acquisitionSnapFrames(config.moduleID,config.devID);
         //uploadColorImageAsTexture(programFrameBufferID,config.moduleID,config.devID);
-        uploadDepthImageAsTexture(programFrameBufferID,config.moduleID,config.devID);
+        uploadDepthImageAsTextureFromAcquisition(
+                                                  programFrameBufferID,
+                                                  config.moduleID,
+                                                  config.devID
+                                                );
 
 
         doTiledDiffDrawing(
