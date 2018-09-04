@@ -548,8 +548,9 @@ int doDrawing()
                           );
 
 
-
-        glDispatchCompute(32, 32, 1);
+	#if USE_COMPUTE_SHADER
+        performComputeShaderOperation(diffComputer);
+    #endif // USE_COMPUTE_SHADER
 
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebuffer(
