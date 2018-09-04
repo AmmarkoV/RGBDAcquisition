@@ -349,6 +349,13 @@ int uploadColorImageAsTexture( GLuint programID  , ModuleIdentifier moduleID,Dev
 
 
 
+void performComputeShaderOperation(struct computeShaderObject  * diffComputer)
+{
+    glUseProgram(diffComputer->computeShaderProgram);
+    //glUniform1f(glGetUniformLocation(computeHandle, "roll"), (float)frame*0.01f);
+    glDispatchCompute(512/16, 512/16, 1); // 512^2 threads in blocks of 16^2
+    //checkErrors("Dispatch compute shader");
+}
 
 
 
@@ -589,8 +596,7 @@ int doDrawing()
     #endif // USE_COMPUTE_SHADER
 
 
-
-
+  return 1;
 }
 
 
@@ -621,9 +627,6 @@ int main(int argc,const char **argv)
    }
 
    fillFlatModelTriFromIndexedModelTri(&triModel,&indexedTriModel);
-
-
-
 
 
 
