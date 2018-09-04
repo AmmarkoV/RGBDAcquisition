@@ -18,7 +18,7 @@ int uploadColorImageAsTexture(
                                GLuint programID,
                                GLuint *textureID,
                                unsigned int * alreadyUploaded,
-                               unsigned short * colorPixels,
+                               unsigned char * colorPixels,
                                unsigned int colorWidth ,
                                unsigned int colorHeight ,
                                unsigned int colorChannels ,

@@ -54,8 +54,6 @@
 #define shrinkingFactor 4
 //--------------------------------------------
 
-
-
 struct viewerSettings config={0};
 
 unsigned int diffTextureUploaded=0;
@@ -69,7 +67,6 @@ float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
 unsigned int framesRendered=0;
 
-
 struct TRI_Model indexedTriModel={0};
 struct TRI_Model triModel={0};
 
@@ -82,10 +79,6 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
     return 0;
 }
-
-
-
-
 
 int drawObjectAT(GLuint programID,
                  GLuint vao,
@@ -577,7 +570,6 @@ int main(int argc,const char **argv)
   /* ------------------------------------------------------------------------------------------------*/
   acquisitionRegisterTerminationSignal(&acquisitionDefaultTerminator);
   initializeViewerSettingsFromArguments(&config,argc,argv);
-
 
   //We need to initialize our module before calling any related calls to the specific module..
   if (!acquisitionStartModule(config.moduleID,16 /*maxDevices*/ , 0 ))
