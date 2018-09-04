@@ -18,7 +18,7 @@
 */
 struct shaderObject
 {
-  GLuint vertexShader, fragmentShader;
+ // GLuint vertexShader, fragmentShader;
   int ProgramObject;
   int vertexShaderObject;
   int fragmentShaderObject;
@@ -31,6 +31,7 @@ struct shaderObject
 };
 
 
+char * loadShaderFileToMem(char * filename,unsigned long * file_length);
 
 int useShader(struct shaderObject * shader);
 

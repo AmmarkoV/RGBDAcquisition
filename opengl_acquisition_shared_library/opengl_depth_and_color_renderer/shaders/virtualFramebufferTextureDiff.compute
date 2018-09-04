@@ -1,0 +1,47 @@
+#version 430 core
+#define SIZE 256
+#define CLUSTERS 5
+
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+struct Cluster {
+    vec3 cntr;
+    uint size;
+};
+coherent restrict layout(std430, binding = 0) buffer destBuffer {
+    Cluster clusters[CLUSTERS];
+};
+shared uint sizeCache[SIZE];
+
+void main() {
+    const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    const uint id = pos.y * (gl_WorkGroupSize.x + gl_NumWorkGroups.x) + pos.x;
+
+    if(id < CLUSTERS) {
+        clusters[id].size = 0;
+    }
+
+    memoryBarrierShared();
+    barrier();
+    sizeCache[gl_LocalInvocationIndex] = 1;
+    int stepv = (SIZE >> 1); 
+    while(stepv > 0) { //reduction over data in each working group
+        if (gl_LocalInvocationIndex < stepv) {
+            sizeCache[gl_LocalInvocationIndex] += sizeCache[gl_LocalInvocationIndex + stepv];
+        }
+        memoryBarrierShared();
+        barrier();
+        stepv = (stepv >> 1);
+    }
+    if (gl_LocalInvocationIndex == 0) {
+        atomicAdd(clusters[0].size, sizeCache[0]);
+    }
+
+    memoryBarrier();
+    barrier();
+
+    if(id == 0) {
+        clusters[0].size = 23; //this doesn't do what I would expect
+        clusters[1].size = 13; //this works
+    }
+}

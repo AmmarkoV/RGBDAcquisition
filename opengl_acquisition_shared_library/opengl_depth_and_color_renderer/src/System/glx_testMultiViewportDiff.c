@@ -27,6 +27,7 @@
 #include "../../../../tools/AmMatrix/matrixOpenGL.h"
 #include "../../../../tools/AmMatrix/quaternions.h"
 
+#include "../Rendering/ShaderPipeline/computeShader.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 #include "../Rendering/ShaderPipeline/render_buffer.h"
 #include "../Rendering/ShaderPipeline/uploadGeometry.h"
@@ -39,6 +40,9 @@
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
+
+
+#define USE_COMPUTE_SHADER 0
 
 
 //Change this to change MultiRendering numbers
@@ -409,6 +413,12 @@ int doDrawing()
 	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebufferTextureDiff.vert", "../../shaders/virtualFramebufferTextureDiff.frag");
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
+    #if USE_COMPUTE_SHADER
+    struct computeShaderObject  * diffComputer = loadComputeShader("../../shaders/virtualFramebufferTextureDiff.compute");
+    if (diffComputer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
+    GLuint computeProgramID = diffComputer->computeShaderProgram;
+    #endif // USE_COMPUTE_SHADER
+
     GLuint programID = sho->ProgramObject;
     GLuint programFrameBufferID = textureFramebuffer->ProgramObject;
 
@@ -531,6 +541,9 @@ int doDrawing()
                           );
 
 
+
+        glDispatchCompute(32, 32, 1);
+
         //We have accumulated all data on the framebuffer and will now draw it back..
         drawFramebuffer(
                         programFrameBufferID,
@@ -564,11 +577,20 @@ int doDrawing()
 	while( 1 );
 
 	// Cleanup VBO and shader
-	//glDeleteBuffers(1, &vertexbuffer);
-	//glDeleteBuffers(1, &colorbuffer);
-	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &humanVAO);
 	glDeleteVertexArrays(1, &cubeVAO);
+
+
+	unloadShader(sho);
+	unloadShader(textureFramebuffer);
+
+	#if USE_COMPUTE_SHADER
+     unloadComputeShader(diffComputer);
+    #endif // USE_COMPUTE_SHADER
+
+
+
+
 }
 
 
