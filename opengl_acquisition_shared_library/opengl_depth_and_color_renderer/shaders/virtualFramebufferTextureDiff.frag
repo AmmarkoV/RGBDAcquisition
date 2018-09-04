@@ -21,14 +21,7 @@ uniform float iTime;
 float packColor(vec3 color) {
     return color.r + color.g * 256.0 + color.b * 256.0 * 256.0;
 }
-
-
-uint packColorU(vec3 color) 
-{
-    float intermediate = color.r + color.g * 256.0 + color.b * 256.0 * 256.0;
-    return uint(intermediate);
-}
-
+ 
 vec3 unpackColor(float f) {
     vec3 color;
     color.b = floor(f / 256.0 / 256.0);
@@ -49,16 +42,13 @@ void main()
     UVDiffTexture.y = UV.y*tileSizeY;
     vec2 verticalFlip=UVDiffTexture;
     verticalFlip.y = 1.0f - verticalFlip.y;
-
-    //Difference calculation as Uints
-    //uint diffTextureDepth = texture( diffedTexture, verticalFlip ).x;
-    //uint renderTextureDepth = packColorU(renderData); 
-    //uint discrepancy = abs(renderTextureDepth - diffTextureDepth); 
+ 
     
     //Difference calculation as Floats
     float diffTextureDepth = texture( diffedTexture, verticalFlip ).x;
     float renderTextureDepth = packColor(renderData); 
     float discrepancy = abs(renderTextureDepth - diffTextureDepth); 
+   // float discrepancy = abs(renderTextureDepth ); 
     
     //if ( int(renderTextureDepth)!=0)
      {

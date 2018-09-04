@@ -33,7 +33,7 @@ void main()
     gl_Position = MVP *  vec4(vPosition,1.0);
     
     float depth;
-    depth = 10000 * gl_Position.z/gl_Position.w;
+    depth = 10000 * gl_Position.z;///gl_Position.w;
     //depth = (-gl_Position.z-gl_DepthRange.near)/(gl_DepthRange.far-gl_DepthRange.near); // will map near..far to 0..1
     //depth = (gl_Position.z-gl_DepthRange.near)/(gl_DepthRange.far-gl_DepthRange.near); // will map near..far to 0..1
     

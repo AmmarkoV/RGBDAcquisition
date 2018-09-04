@@ -48,6 +48,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.h" />
+		<Unit filename="../../../../tools/AmMatrix/quaternions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../tools/AmMatrix/quaternions.h" />
 		<Unit filename="../ModelLoader/model_loader_tri.c">
 			<Option compilerVar="CC" />
 		</Unit>

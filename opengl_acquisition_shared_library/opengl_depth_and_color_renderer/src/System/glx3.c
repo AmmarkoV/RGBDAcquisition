@@ -64,7 +64,7 @@ static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
     return 0;
 }
 
-int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
+int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc,const char **argv)
 {
 
   display = XOpenDisplay(NULL);

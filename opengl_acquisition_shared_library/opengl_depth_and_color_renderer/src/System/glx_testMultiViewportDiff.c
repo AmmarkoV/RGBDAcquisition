@@ -25,6 +25,7 @@
 
 #include "../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include "../../../../tools/AmMatrix/matrixOpenGL.h"
+#include "../../../../tools/AmMatrix/quaternions.h"
 
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 #include "../Rendering/ShaderPipeline/render_buffer.h"
@@ -43,8 +44,8 @@
 //Change this to change MultiRendering numbers
 #define originalWIDTH 640
 #define originalHEIGHT 480
-#define tilesToDoX 16
-#define tilesToDoY 16
+#define tilesToDoX 8
+#define tilesToDoY 8
 #define shrinkingFactor 4
 //--------------------------------------------
 
@@ -214,6 +215,12 @@ int doTiledDiffDrawing(
         double pitch=0.0;//(double) (rand()%90);
         double yaw=0.0;//(double)   (rand()%90);
 
+
+        double quaternion[4]={-1.00,-0.13,-0.03,0.09};
+        double euler[3]={0.0,0.0,0.0};
+        euler2Quaternions(quaternion,euler,qXqYqZqW);
+
+        //25.37,-87.19,2665.56,-1.00,-0.13,-0.03,0.09,0.59,0.54,0.11,-0.90,0.18,0.21,-0.43,0.65,-0.53,-1.13,0.60,0.10,0.32,-0.17,-0.09,-0.34,0.30,-0.05,0.05,0.78,0.00,-1.91,0.68,-0.07,-0.01,4.00,0.11,1.92,-0.73
         double x=-259.231f;//(double)  (1000-rand()%2000);
         double y=-54.976f;//(double) (100-rand()%200);
         double z=2699.735f;//(double)  (700+rand()%1000);
@@ -265,12 +272,14 @@ int doTiledDiffDrawing(
                   pyramidVao,
                   MVPMatrixID,
                   pyramidTriangleCount,
-                  x+1100,
-                  y,
-                  z,
-                  roll,
-                  pitch,
-                  yaw,
+
+                  25.37,-87.19,2665.56,
+                  //x+1100,
+                  //y,
+                  //z,
+                  euler[0],
+                  euler[1],
+                  euler[2],
 
                   projectionMatrixD,
                   viewportMatrixD,
@@ -568,7 +577,7 @@ int doDrawing()
 
 
 
-int main(int argc, char **argv)
+int main(int argc,const char **argv)
 {
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
 
