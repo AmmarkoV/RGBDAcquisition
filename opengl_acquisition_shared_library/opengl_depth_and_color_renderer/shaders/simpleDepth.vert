@@ -42,7 +42,7 @@ vec3 unpackColor(float f)
 void main()
 {
     //Draw like you would normally draw in a shader
-    //color = vColor;
+    //color = vColor; 
  
     //Calculate final position in window
     gl_Position = MVP *  vec4(vPosition,1.0);
@@ -50,16 +50,12 @@ void main()
     //But we want to store the real position a.k.a. depth as a `color`
     vec4 position3D =  MV*vec4(vPosition,1.0);
 
-    float depth;
-    depth = position3D.z;// / position3D.w;
-    //depth = (-gl_Position.z-gl_DepthRange.near)/(gl_DepthRange.far-gl_DepthRange.near); // will map near..far to 0..1
-    //depth = (depth+gl_DepthRange.near)/(gl_DepthRange.far-gl_DepthRange.near); // will map near..far to 0..1
-    
-    //if ( (depth>2000) && (depth<3000)) 
+    //Get Depth in mm
+    float depth = 100*position3D.z;// / position3D.w; 
+
+    //Segment image specific depths
+    //if ( (depth>2300) && (depth<2800) ) 
     {
      color=unpackColor(depth);  
-    } 
-    //else { color = vec3(0); }
-
-    //color=vec3(depth,depth,depth); 
+    }  
 }

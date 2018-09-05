@@ -106,31 +106,23 @@ void main()
     //Difference calculation as Floats
     float diffTextureDepth = float(texture( diffedTexture, verticalFlip ).x);
     float renderTextureDepth = packColor(renderData); 
-    float discrepancy = abs(renderTextureDepth - diffTextureDepth); 
-   // float discrepancy = abs(renderTextureDepth ); 
+    float discrepancy = abs(renderTextureDepth - diffTextureDepth);  
     
-    //if ( int(renderTextureDepth)!=0)
+    if (renderTextureDepth>0)
      {
-	  color.x = discrepancy/4000;
-      color.y = discrepancy/4000; 
-      color.z = discrepancy/4000;  
+	  color.x = discrepancy/5000;
+      color.y = 0.0; 
+      color.z = 0.0;   
      }
      
     //If there is both renderings and observations signal it
-    if ( (int(renderTextureDepth)>0) &&(int(diffTextureDepth)>0) )
-    { 
-      color.y = 1.0; 
-      
-      //If there is good renderings signal 
-      if (discrepancy>1.0) 
-      {
-       color.z = 1.0; 
-      }
-    }   else
-   if ( (int(renderTextureDepth)>0)  )
-    { 
-      color.z = 1.0;       
-    } 
+    if ( (renderTextureDepth>0) && (diffTextureDepth>0) )
+    {  
+      if (discrepancy<100)
+       { 
+         color.y = 1.0;       
+       }  
+   }   
     
    //If we want to repack everything .. ( we probably don't ) 
    // color = unpackColor(float(discrepancy));

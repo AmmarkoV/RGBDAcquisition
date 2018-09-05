@@ -259,6 +259,7 @@ int doTiledDiffDrawing(
                                                 );
 
      //fprintf(stderr,"glViewport(%u,%u,%u,%u)\n",viewportWidth*tx, viewportHeight*ty, viewportWidth , viewportHeight);
+     /*
      drawObjectAT(
                   programID,
                   cubeVao,
@@ -275,7 +276,7 @@ int doTiledDiffDrawing(
                   projectionMatrixD,
                   viewportMatrixD,
                   viewMatrixD
-                 );
+                 );*/
 
      drawObjectAT(
                   programID,
@@ -284,7 +285,7 @@ int doTiledDiffDrawing(
                   MVMatrixID,
                   pyramidTriangleCount,
 
-                  25.37,-87.19,2565.56,
+                  25.37,-87.19,1850.0,
                   euler[0],
                   euler[1],
                   euler[2],
