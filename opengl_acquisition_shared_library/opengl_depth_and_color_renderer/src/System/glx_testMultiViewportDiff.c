@@ -539,7 +539,7 @@ int doDrawing()
 }
 
 
-
+/*
 
 #define thirdByte 65536.0
 #define secondByte 256.0
@@ -573,8 +573,6 @@ void unpackColor(float * colorRGB , float f)
 
 }
 
-
-
   void testPackUnpack()
   {
       unsigned int i=0;
@@ -602,7 +600,7 @@ void unpackColor(float * colorRGB , float f)
 
     exit(0);
   }
-
+*/
 
 
 

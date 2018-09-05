@@ -64,25 +64,7 @@ vec4 reduce(sampler2D ch0, sampler2D ch1, int mi, vec2 c) {
     return r;
 }
 
-
-
-
-
  
-float packColorS(vec3 color) 
-{
-    return color.r + color.g * 256.0 + color.b * 256.0 * 256.0;
-}
- 
-vec3 unpackColorS(float f) 
-{
-    vec3 color;
-    color.b = floor(f / 256.0 / 256.0);
-    color.g = floor((f - color.b * 256.0 * 256.0) / 256.0);
-    color.r = floor(f - color.b * 256.0 * 256.0 - color.g * 256.0);
-    // now we have a vec3 with the 3 components in range [0..255]. Let's normalize it!
-    return color / 255.0;
-}
 
 #define thirdByte 65536.0
 #define secondByte 256.0
@@ -129,20 +111,28 @@ void main()
     
     //if ( int(renderTextureDepth)!=0)
      {
-	  color.x = discrepancy;
-      color.y = discrepancy; 
-      color.z = discrepancy;  
+	  color.x = discrepancy/4000;
+      color.y = discrepancy/4000; 
+      color.z = discrepancy/4000;  
      }
      
+    //If there is both renderings and observations signal it
     if ( (int(renderTextureDepth)>0) &&(int(diffTextureDepth)>0) )
     { 
       color.y = 1.0; 
+      
+      //If there is good renderings signal 
+      if (discrepancy>1.0) 
+      {
+       color.z = 1.0; 
+      }
+    }   else
+   if ( (int(renderTextureDepth)>0)  )
+    { 
+      color.z = 1.0;       
     } 
     
-    color = unpackColor(float(discrepancy));
-
-    //color = diffData;
-	//color = texture( renderedTexture, UV ).xyz ;
-	//color = texture( renderedTexture, UV + 0.005*vec2( sin(iTime+1024.0*UV.x),cos(iTime+768.0*UV.y)) ).xyz ; 
+   //If we want to repack everything .. ( we probably don't ) 
+   // color = unpackColor(float(discrepancy));
 }
  
