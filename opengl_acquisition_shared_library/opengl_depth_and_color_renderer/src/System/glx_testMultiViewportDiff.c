@@ -238,6 +238,8 @@ int doTiledDiffDrawing(
   unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;
   unsigned int viewportHeight = (unsigned int) HEIGHT / tilesY;
 
+
+
   unsigned int tx,ty;
   for (ty=0; ty<tilesY; ty++)
   {
@@ -278,6 +280,10 @@ int doTiledDiffDrawing(
                   viewMatrixD
                  );*/
 
+     float xDivergance = 300 - rand()%600;
+     float yDivergance = 300 - rand()%600;
+     float zDivergance = 300 - rand()%600;
+
      drawObjectAT(
                   programID,
                   pyramidVao,
@@ -285,7 +291,9 @@ int doTiledDiffDrawing(
                   MVMatrixID,
                   pyramidTriangleCount,
 
-                  25.37,-87.19,1850.0,
+                  25.37 + xDivergance,
+                 -87.19 + yDivergance,
+                  1850.0+ zDivergance,
                   euler[0],
                   euler[1],
                   euler[2],
