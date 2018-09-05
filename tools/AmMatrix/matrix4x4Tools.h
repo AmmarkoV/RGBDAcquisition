@@ -80,7 +80,7 @@ void copy4x4FMatrixToD(double * out,float * in);
 * @param  Pointer to a float 4x4 output
 * @param  Pointer to a double 4x4 input
 */
-void copy4x4DMatrixToF(float * d, double * m );
+void copy4x4DMatrixToF(float * dest, double * m );
 
 /**
 * @brief Set an allocated 4x4 matrix to Identity ( diagonal 1 , all else 0 )

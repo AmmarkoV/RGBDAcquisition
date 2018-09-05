@@ -133,12 +133,12 @@ void copy4x4FMatrixToD(double * out,float * in)
 
 
 
-void copy4x4DMatrixToF(float * d, double * m )
+void copy4x4DMatrixToF(float * dest, double * m )
 {
-    d[0]=(float)m[0];   d[1]=(float)m[1];   d[2]=(float)m[2];    d[3]=(float)m[3];
-    d[4]=(float)m[4];   d[5]=(float)m[5];   d[6]=(float)m[6];    d[7]=(float)m[7];
-    d[8]=(float)m[8];   d[9]=(float)m[9];   d[10]=(float)m[10];  d[11]=(float)m[11];
-    d[12]=(float)m[12]; d[13]=(float)m[13]; d[14]=(float)m[14];  d[15]=(float)m[15];
+    dest[0]=(float)m[0];   dest[1]=(float)m[1];   dest[2]=(float)m[2];    dest[3]=(float)m[3];
+    dest[4]=(float)m[4];   dest[5]=(float)m[5];   dest[6]=(float)m[6];    dest[7]=(float)m[7];
+    dest[8]=(float)m[8];   dest[9]=(float)m[9];   dest[10]=(float)m[10];  dest[11]=(float)m[11];
+    dest[12]=(float)m[12]; dest[13]=(float)m[13]; dest[14]=(float)m[14];  dest[15]=(float)m[15];
 }
 
 
@@ -641,6 +641,8 @@ int transpose4x4MatrixD(double * mat)
   return 1;
 }
 
+
+//matrixA x matrixB
 int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB)
 {
   if ( (matrixA==0) || (matrixB==0) || (result==0) ) { return 0; }

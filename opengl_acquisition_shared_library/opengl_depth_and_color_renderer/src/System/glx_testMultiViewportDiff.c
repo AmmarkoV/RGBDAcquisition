@@ -14,6 +14,7 @@
 
 
 #include <time.h>
+#include <math.h>
 
 #include "../Tools/save_to_file.h"
 #include "../Tools/tools.h"
@@ -82,7 +83,8 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 int drawObjectAT(GLuint programID,
                  GLuint vao,
-                 GLuint MatrixID,
+                 GLuint MVPMatrixID,
+                 GLuint MVMatrixID ,
                  unsigned int triangleCount,
 
 
@@ -131,10 +133,18 @@ int drawObjectAT(GLuint programID,
        getModelViewProjectionMatrixFromMatrices(MVPD,projectionMatrixD,viewMatrixD,modelMatrixD);
        copy4x4DMatrixToF(MVP , MVPD );
        transpose4x4Matrix(MVP);
+
+
+       double MVD[16];
+       float MV[16];
+       multiplyTwo4x4Matrices(MVD, viewMatrixD , modelMatrixD );
+       copy4x4DMatrixToF(MV , MVD );
+       transpose4x4Matrix(MV);
       //-------------------------------------------------------------------
 
       // Send our transformation to the currently bound shader, in the "MVP" uniform
-      glUniformMatrix4fv(MatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
+      glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE/*TRANSPOSE*/, MVP);
+      glUniformMatrix4fv(MVMatrixID, 1, GL_FALSE/*TRANSPOSE*/, MV);
 
 
 
@@ -169,6 +179,7 @@ int doTiledDiffDrawing(
                        GLuint tileSizeX,
                        GLuint tileSizeY,
                        GLuint MVPMatrixID ,
+                       GLuint MVMatrixID ,
                        GLuint cubeVao,
                        unsigned int cubeTriangleCount,
                        GLuint pyramidVao,
@@ -252,6 +263,7 @@ int doTiledDiffDrawing(
                   programID,
                   cubeVao,
                   MVPMatrixID,
+                  MVMatrixID,
                   cubeTriangleCount,
                   x-400,
                   y,
@@ -269,9 +281,10 @@ int doTiledDiffDrawing(
                   programID,
                   pyramidVao,
                   MVPMatrixID,
+                  MVMatrixID,
                   pyramidTriangleCount,
 
-                  25.37,-87.19,2665.56,
+                  25.37,-87.19,2565.56,
                   euler[0],
                   euler[1],
                   euler[2],
@@ -359,6 +372,7 @@ int doDrawing()
 
  	// Get a handle for our "MVP" uniform
 	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
+	GLuint MVMatrixID  = glGetUniformLocation(programID, "MV");
 
 	// Use our shader
 	glUseProgram(programID);
@@ -462,6 +476,7 @@ int doDrawing()
                            tileSizeX,
                            tileSizeY,
                            MVPMatrixID,
+                           MVMatrixID,
                            cubeVAO,
                            cubeTriangleCount,
                            humanVAO,
@@ -526,11 +541,75 @@ int doDrawing()
 
 
 
+#define thirdByte 65536.0
+#define secondByte 256.0
+float packColor(float * colorRGB)
+{
+    return colorRGB[0]* 255 + (colorRGB[1]* 255 * secondByte) + (colorRGB[2]*255 * thirdByte);
+}
+
+void unpackColor(float * colorRGB , float f)
+{
+    float remaining=round(f);
+    fprintf(stderr,"rem(%0.2f)",remaining);
+    float calculation;
+
+    calculation = floor( (float) remaining / (thirdByte) );
+    remaining = remaining - calculation * (thirdByte);
+    fprintf(stderr,"calc2(%0.2f)",calculation);
+    fprintf(stderr,"rem2(%0.2f)",remaining);
+    colorRGB[2]=(float) calculation/255;
+
+    calculation = floor( (float) remaining / secondByte);
+    remaining = remaining - calculation * secondByte;
+    fprintf(stderr,"calc1(%0.2f)",calculation);
+    fprintf(stderr,"rem1(%0.2f)",remaining);
+    colorRGB[1]=(float) calculation/255;
+
+    fprintf(stderr,"rem0(%0.2f)",remaining);
+    colorRGB[0] = (float) remaining/255;
+    // now we have a vec3 with the 3 components in range [0..255]. Let's normalize it!
+
+
+}
+
+
+
+  void testPackUnpack()
+  {
+      unsigned int i=0;
+      float RGB[3]={0};
+      float depth=0.0,depth2=0.0;
+
+      for (i=0; i<65536; i++)
+      {
+          fprintf(stderr,"i=%u ",i);
+          depth = (float) i;
+          fprintf(stderr,"f1=%0.2f ",depth);
+          unpackColor(RGB,depth);
+
+          fprintf(stderr,"rgb( %0.2f %0.2f %0.2f ) => ",RGB[0],RGB[1],RGB[2]);
+
+          depth2 = packColor(RGB);
+          fprintf(stderr,"f2=%0.2f \n",depth2);
+
+          if (depth!=depth2)
+          {
+            fprintf(stderr,"ERROR\n");
+            exit(1);
+          }
+      }
+
+    exit(0);
+  }
+
 
 
 
 int main(int argc,const char **argv)
 {
+  //testPackUnpack();
+
   start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
 
   if (glewInit() != GLEW_OK)

@@ -68,16 +68,13 @@ vec4 reduce(sampler2D ch0, sampler2D ch1, int mi, vec2 c) {
 
 
 
-
-
-
-
-float packColor(vec3 color) 
+ 
+float packColorS(vec3 color) 
 {
     return color.r + color.g * 256.0 + color.b * 256.0 * 256.0;
 }
  
-vec3 unpackColor(float f) 
+vec3 unpackColorS(float f) 
 {
     vec3 color;
     color.b = floor(f / 256.0 / 256.0);
@@ -87,6 +84,29 @@ vec3 unpackColor(float f)
     return color / 255.0;
 }
 
+#define thirdByte 65536.0
+#define secondByte 256.0
+float packColor(vec3 color) 
+{
+    vec3 denorm = color * 255.0;
+    return denorm.r + (denorm.g * secondByte) + (denorm.b * thirdByte);
+}
+
+vec3 unpackColor(float f) 
+{   
+    vec3 color;
+    float remaining=round(f);
+    
+    color.b = floor(remaining / thirdByte );
+    remaining = remaining - color.b * thirdByte; 
+
+    color.g = floor(remaining / secondByte);
+    remaining = remaining - color.g * secondByte; 
+
+    color.r = remaining; 
+    // now we have a vec3 with the 3 components in range [0..255]. Let's normalize it!
+    return color / 255.0;
+}
 
 
 void main()
@@ -102,7 +122,7 @@ void main()
  
     
     //Difference calculation as Floats
-    float diffTextureDepth = texture( diffedTexture, verticalFlip ).x;
+    float diffTextureDepth = float(texture( diffedTexture, verticalFlip ).x);
     float renderTextureDepth = packColor(renderData); 
     float discrepancy = abs(renderTextureDepth - diffTextureDepth); 
    // float discrepancy = abs(renderTextureDepth ); 
@@ -114,7 +134,7 @@ void main()
       color.z = discrepancy;  
      }
      
-    if ( (int(renderTextureDepth)>0) && (int(diffTextureDepth)>0) )
+    if ( (int(renderTextureDepth)>0) &&(int(diffTextureDepth)>0) )
     { 
       color.y = 1.0; 
     } 

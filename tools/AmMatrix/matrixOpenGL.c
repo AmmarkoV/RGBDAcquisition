@@ -844,6 +844,7 @@ void glGetViewportMatrix(double * m , double startX,double startY, double width,
 
 
 
+
 void prepareRenderingMatrices(
                               double fx ,
                               double fy ,
@@ -862,15 +863,15 @@ void prepareRenderingMatrices(
 
      int viewport[4]={0};
      buildOpenGLProjectionForIntrinsics_OpenGLColumnMajorD(
-                                         projectionMatrixD ,
-                                         viewport ,
-                                         fx, fy,
-                                         skew,
-                                         cx,  cy,
-                                         windowWidth, windowHeight,
-                                         near,
-                                         far
-                                         );
+                                                           projectionMatrixD ,
+                                                           viewport ,
+                                                           fx, fy,
+                                                           skew,
+                                                           cx,  cy,
+                                                           windowWidth, windowHeight,
+                                                           near,
+                                                           far
+                                                          );
      transpose4x4MatrixD(projectionMatrixD); //We want our own Row Major format..
      //fprintf(stderr,"viewport(%u,%u,%u,%u)\n",viewport[0],viewport[1],viewport[2],viewport[3]);
      //glViewport(viewport[0],viewport[1],viewport[2],viewport[3]); //<--Does this do anything?
