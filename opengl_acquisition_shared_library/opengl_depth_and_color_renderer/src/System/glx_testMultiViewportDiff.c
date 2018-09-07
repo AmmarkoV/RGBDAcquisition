@@ -192,7 +192,6 @@ int doTiledDiffDrawing(
      // Bind our texture in Texture Unit 0
 	 glActiveTexture(GL_TEXTURE1);
 	 glBindTexture(GL_TEXTURE_2D, textureToDiff);
-
 	 // Set our "renderedTexture" sampler to use Texture Unit 0
 	 glUniform1i(textureDiffSampler, 1);
 
@@ -504,7 +503,7 @@ int doDrawing()
     #endif // USE_COMPUTE_SHADER
 
 
-    #define DO_SECOND_STAGE 1
+    #define DO_SECOND_STAGE 0
 
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
@@ -519,11 +518,6 @@ int doDrawing()
 	 GLuint texID2  = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
 	 GLuint timeID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iTime");
 	 GLuint resolutionID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iResolution");
-
-     // Render to our framebuffer
-     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
-	 glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-
 
 	//glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, 0);
@@ -546,7 +540,6 @@ int doDrawing()
 
     //We have accumulated all data on the framebuffer and will now draw it back..
     drawFramebufferToScreen(
-                            0,
                             finalFramebuffer->ProgramObject,
                             quad_vertexbuffer,
                             //renderedDepth,
@@ -558,10 +551,8 @@ int doDrawing()
                            );
      #else
           drawFramebufferToScreen(
-                                  0,
                                   programFrameBufferID,
                                   quad_vertexbuffer,
-                                  //renderedDepth,
                                   renderedTexture,
                                   texID,
                                   timeID,

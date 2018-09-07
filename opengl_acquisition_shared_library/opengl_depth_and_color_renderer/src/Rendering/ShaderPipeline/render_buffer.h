@@ -25,7 +25,7 @@ int drawFramebufferTexToTex(
                    );
 
 int drawFramebufferToScreen(
-                       GLuint FramebufferName,
+                      // GLuint FramebufferName,
                        GLuint programFrameBufferID,
                        GLuint quad_vertexbuffer,
                        GLuint renderedTexture,
@@ -36,25 +36,12 @@ int drawFramebufferToScreen(
                        unsigned int height
                    );
 
-int drawFramebufferFromTextureToTexture(
-                                        GLuint FramebufferName,
-                                        GLuint textureToDraw,
-                                        GLuint programFrameBufferID,
-                                        GLuint quad_vertexbuffer,
-                                        GLuint renderedTexture,
-                                        GLuint texID,
-                                        GLuint timeID,
-                                        GLuint resolutionID,
-                                        unsigned int width,
-                                        unsigned int height
-                                       );
 
 int drawFramebufferFromTexture(
                                GLuint FramebufferName,
                                GLuint textureToDraw,
                                GLuint programFrameBufferID,
                                GLuint quad_vertexbuffer,
-                               GLuint renderedTexture,
                                GLuint texID,
                                GLuint timeID,
                                GLuint resolutionID,
