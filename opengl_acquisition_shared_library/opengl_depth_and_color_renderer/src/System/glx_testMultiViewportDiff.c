@@ -52,7 +52,7 @@
 #define originalHEIGHT 480
 #define tilesToDoX 8
 #define tilesToDoY 8
-#define shrinkingFactor 4
+#define shrinkingFactor 8 //4
 //--------------------------------------------
 
 struct viewerSettings config={0};
@@ -504,8 +504,9 @@ int doDrawing()
         performComputeShaderOperation(diffComputer);
     #endif // USE_COMPUTE_SHADER
 
-        //We have accumulated all data on the framebuffer and will now draw it back..
+    //We have accumulated all data on the framebuffer and will now draw it back..
     drawFramebuffer(
+                    0,
                     programFrameBufferID,
                     quad_vertexbuffer,
                     //renderedDepth,
@@ -517,18 +518,41 @@ int doDrawing()
                    );
 
 
-/*
+     /*
+      ===========================================================================================
+      ===========================================================================================
+                                            FINAL STEP
+      ===========================================================================================
+      ===========================================================================================
+     */
+     /*
+     unsigned int finalWidth=320, finalHeight=240;
      GLuint FramebufferName2 = 1;
      GLuint renderedTexture2;
      GLuint renderedDepth2;
-     initializeFramebuffer(&FramebufferName2,&renderedTexture2,&renderedDepth2,WIDTH,HEIGHT);
+     initializeFramebuffer(&FramebufferName2,&renderedTexture2,&renderedDepth2,finalWidth,finalHeight);
+
+	 glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
+	 glViewport(0,0,finalWidth,finalHeight); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+
 	 // Create and compile our GLSL program from the shaders
 	 GLuint texID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
 
+	 // Create and compile our GLSL program from the shaders
+	 GLuint timeID = glGetUniformLocation(finalFramebuffer->ProgramObject, "iTime");
+	 GLuint resolutionID = glGetUniformLocation(finalFramebuffer->ProgramObject, "iResolution");
+
+
+     glUseProgram(finalFramebuffer->ProgramObject);
+     // Bind our texture in Texture Unit 0
+	 glActiveTexture(GL_TEXTURE0);
+	 glBindTexture(GL_TEXTURE_2D, texID2);
+
 	 glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
-	 glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+	 glViewport(0,0,finalWidth,finalHeight); // Render on the whole framebuffer, complete from the lower left corner to the upper right
      //Make everything smaller..
      drawFramebuffer(
+                        1,
                         finalFramebuffer->ProgramObject,
                         quad_vertexbuffer,
                         //renderedDepth,
@@ -536,15 +560,19 @@ int doDrawing()
                         texID2,
                         timeID,
                         resolutionID,
-                        WIDTH,HEIGHT
-                     );
-*/
+                        finalWidth,finalHeight
+                     );*/
+     /*
+      ===========================================================================================
+      ===========================================================================================
+      ===========================================================================================
+     */
 
 
 
-		// Swap buffers
-        glx3_endRedraw();
-       // usleep(1);
+
+	  // Swap buffers
+      glx3_endRedraw();
 
       //---------------------------------------------------------------
       //------------------- Calculate Framerate -----------------------
@@ -557,7 +585,6 @@ int doDrawing()
        //---------------------------------------------------------------
         ++framesRendered;
        //---------------------------------------------------------------
-
 	} // Check if the ESC key was pressed or the window was closed
 	while( 1 );
 
@@ -574,73 +601,10 @@ int doDrawing()
      unloadComputeShader(diffComputer);
     #endif // USE_COMPUTE_SHADER
 
-
   return 1;
 }
 
 
-/*
-
-#define thirdByte 65536.0
-#define secondByte 256.0
-float packColor(float * colorRGB)
-{
-    return colorRGB[0]* 255 + (colorRGB[1]* 255 * secondByte) + (colorRGB[2]*255 * thirdByte);
-}
-
-void unpackColor(float * colorRGB , float f)
-{
-    float remaining=round(f);
-    fprintf(stderr,"rem(%0.2f)",remaining);
-    float calculation;
-
-    calculation = floor( (float) remaining / (thirdByte) );
-    remaining = remaining - calculation * (thirdByte);
-    fprintf(stderr,"calc2(%0.2f)",calculation);
-    fprintf(stderr,"rem2(%0.2f)",remaining);
-    colorRGB[2]=(float) calculation/255;
-
-    calculation = floor( (float) remaining / secondByte);
-    remaining = remaining - calculation * secondByte;
-    fprintf(stderr,"calc1(%0.2f)",calculation);
-    fprintf(stderr,"rem1(%0.2f)",remaining);
-    colorRGB[1]=(float) calculation/255;
-
-    fprintf(stderr,"rem0(%0.2f)",remaining);
-    colorRGB[0] = (float) remaining/255;
-    // now we have a vec3 with the 3 components in range [0..255]. Let's normalize it!
-
-
-}
-
-  void testPackUnpack()
-  {
-      unsigned int i=0;
-      float RGB[3]={0};
-      float depth=0.0,depth2=0.0;
-
-      for (i=0; i<65536; i++)
-      {
-          fprintf(stderr,"i=%u ",i);
-          depth = (float) i;
-          fprintf(stderr,"f1=%0.2f ",depth);
-          unpackColor(RGB,depth);
-
-          fprintf(stderr,"rgb( %0.2f %0.2f %0.2f ) => ",RGB[0],RGB[1],RGB[2]);
-
-          depth2 = packColor(RGB);
-          fprintf(stderr,"f2=%0.2f \n",depth2);
-
-          if (depth!=depth2)
-          {
-            fprintf(stderr,"ERROR\n");
-            exit(1);
-          }
-      }
-
-    exit(0);
-  }
-*/
 
 
 

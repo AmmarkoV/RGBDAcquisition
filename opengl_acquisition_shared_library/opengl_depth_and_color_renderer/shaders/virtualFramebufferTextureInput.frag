@@ -12,6 +12,10 @@ void main()
 {   
     vec2 verticalFlip=UV;
     verticalFlip.y = 1.0f - verticalFlip.y;
-	color = texture( renderedTexture, verticalFlip ).xyz ; 
+	color = texture( renderedTexture2, verticalFlip ).xyz ; 
+    
+    color.y = color.x;
+    color.x=0;
+    color.z=1;
 }
  

@@ -13,6 +13,7 @@ int initializeFramebuffer(
                          );
 
 int drawFramebuffer(
+                       GLuint FramebufferName,
                        GLuint programFrameBufferID,
                        GLuint quad_vertexbuffer,
                        GLuint renderedTexture,
@@ -26,15 +27,16 @@ int drawFramebuffer(
 
 
 int drawFramebufferFromTexture(
+                               GLuint FramebufferName,
                                GLuint textureToDraw,
-                       GLuint programFrameBufferID,
-                       GLuint quad_vertexbuffer,
-                       GLuint renderedTexture,
-                       GLuint texID,
-                       GLuint timeID,
-                       GLuint resolutionID,
-                       unsigned int width,
-                       unsigned int height
-                   );
+                               GLuint programFrameBufferID,
+                               GLuint quad_vertexbuffer,
+                               GLuint renderedTexture,
+                               GLuint texID,
+                               GLuint timeID,
+                               GLuint resolutionID,
+                               unsigned int width,
+                               unsigned int height
+                              );
 
 #endif // RENDER_BUFFER_H_INCLUDED

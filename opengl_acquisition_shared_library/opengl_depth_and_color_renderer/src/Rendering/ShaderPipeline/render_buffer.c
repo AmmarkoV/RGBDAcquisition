@@ -89,6 +89,7 @@ int initializeFramebuffer(
 
 
 int drawFramebufferFromTexture(
+                               GLuint FramebufferName,
                                GLuint textureToDraw,
                                GLuint programFrameBufferID,
                                GLuint quad_vertexbuffer,
@@ -102,7 +103,7 @@ int drawFramebufferFromTexture(
 {
     #if USE_GLEW
 		// Render to the screen
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
         // Render on the whole framebuffer, complete from the lower left corner to the upper right
 		glViewport(0,0,width,height);
 
@@ -117,23 +118,20 @@ int drawFramebufferFromTexture(
 		glBindTexture(GL_TEXTURE_2D, textureToDraw);
 		// Set our "renderedTexture" sampler to use Texture Unit 0
 		glUniform1i(texID, 0);
-
 		glUniform1f(timeID, (float)(GetTickCountMilliseconds()/1000.0f) );
-
 		glUniform3f(resolutionID, width, height , 1);
-
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
 		glVertexAttribPointer(
-			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
+			                  0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			                  3,                  // size
+			                  GL_FLOAT,           // type
+			                  GL_FALSE,           // normalized?
+			                  0,                  // stride
+			                  (void*)0            // array buffer offset
+		                     );
 
 		// Draw the triangles !
 		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
@@ -149,6 +147,7 @@ int drawFramebufferFromTexture(
 
 
 int drawFramebuffer(
+                       GLuint FramebufferName,
                        GLuint programFrameBufferID,
                        GLuint quad_vertexbuffer,
                        GLuint renderedTexture,
@@ -160,6 +159,7 @@ int drawFramebuffer(
                    )
 {
  return drawFramebufferFromTexture(
+                                    FramebufferName,
                                     renderedTexture,
                                     programFrameBufferID,
                                     quad_vertexbuffer,
