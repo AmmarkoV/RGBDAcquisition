@@ -2,7 +2,7 @@
 
 in vec2 UV;
 out vec3 color;
-
+ 
 uniform sampler2D renderedTexture2; 
 
 uniform vec3 iResolution;
@@ -14,8 +14,8 @@ void main()
     verticalFlip.y = 1.0f - verticalFlip.y;
 	color = texture( renderedTexture2, verticalFlip ).xyz ; 
     
-    color.y = color.x;
-    color.x=0;
-    color.z=1;
+   // color.y = color.x;
+   // color.x=0;
+   //color.z=1;
 }
  

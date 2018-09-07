@@ -400,7 +400,8 @@ int doDrawing()
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
-    fprintf(stderr,"Ready to start pushing geometry  ");
+	//--------------------------------------------------------
+    //fprintf(stderr,"Ready to start pushing geometry  ");
 
 
     GLuint cubeVAO;
@@ -436,7 +437,7 @@ int doDrawing()
                            );
 //    fprintf(stderr,"Ready to render: ");
 
-     GLuint FramebufferName = 0;
+     GLuint FramebufferName;
      GLuint renderedTexture;
      //GLuint renderedDepth;
      initializeFramebuffer(&FramebufferName,&renderedTexture,0 /*&renderedDepth*/,WIDTH,HEIGHT);
@@ -503,57 +504,70 @@ int doDrawing()
     #endif // USE_COMPUTE_SHADER
 
 
-    #define DO_SECOND_STAGE 0
+    #define DO_SECOND_STAGE 1
 
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
 	// Use our shader
 	#if DO_SECOND_STAGE
-	glUseProgram(finalFramebuffer->ProgramObject);
+	 glUseProgram(finalFramebuffer->ProgramObject);
 
-     GLuint FramebufferName2 = 1;
+     GLuint FramebufferName2;
      GLuint renderedTexture2;
-     GLuint renderedDepth2;
-     initializeFramebuffer(&FramebufferName2,&renderedTexture2,&renderedDepth2,WIDTH,HEIGHT);
-	 GLuint texID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
-	 GLuint timeID2 = glGetUniformLocation(programFrameBufferID, "iTime");
-	 GLuint resolutionID2 = glGetUniformLocation(programFrameBufferID, "iResolution");
+     initializeFramebuffer(&FramebufferName2,&renderedTexture2,0/*depth*/,WIDTH,HEIGHT);
+	 GLuint texID2  = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
+	 GLuint timeID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iTime");
+	 GLuint resolutionID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iResolution");
 
      // Render to our framebuffer
      glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
 	 glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-	 #endif // DO_SECOND_STAGE
+
+
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
 
     //We have accumulated all data on the framebuffer and will now draw it back..
-    drawFramebuffer(
-                    0,
-                    programFrameBufferID,
-                    quad_vertexbuffer,
-                    //renderedDepth,
-                    renderedTexture,
-                    texID,
-                    timeID,
-                    resolutionID,
-                    WIDTH,HEIGHT
-                   );
+    drawFramebufferTexToTex(
+                            FramebufferName2,
+                            programFrameBufferID,
+                            quad_vertexbuffer,
+                            //renderedDepth,
+                            renderedTexture,
+                            texID,
+                            timeID,
+                            resolutionID,
+                            WIDTH,HEIGHT
+                           );
 
-	#if DO_SECOND_STAGE
     //We have accumulated all data on the framebuffer and will now draw it back..
-    drawFramebuffer(
-                    FramebufferName2,
-                    finalFramebuffer->ProgramObject,
-                    quad_vertexbuffer,
-                    //renderedDepth,
-                    renderedTexture2,
-                    texID2,
-                    timeID2,
-                    resolutionID2,
-                    WIDTH,HEIGHT
-                   );
+    drawFramebufferToScreen(
+                            0,
+                            finalFramebuffer->ProgramObject,
+                            quad_vertexbuffer,
+                            //renderedDepth,
+                            renderedTexture2,
+                            texID2,
+                            timeID2,
+                            resolutionID2,
+                            WIDTH,HEIGHT
+                           );
+     #else
+          drawFramebufferToScreen(
+                                  0,
+                                  programFrameBufferID,
+                                  quad_vertexbuffer,
+                                  //renderedDepth,
+                                  renderedTexture,
+                                  texID,
+                                  timeID,
+                                  resolutionID,
+                                  WIDTH,HEIGHT
+                                 );
 	 #endif // DO_SECOND_STAGE
 
 	  // Swap buffers

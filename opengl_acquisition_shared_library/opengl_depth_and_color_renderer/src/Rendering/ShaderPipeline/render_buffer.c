@@ -91,6 +91,61 @@ int initializeFramebuffer(
 
 
 
+int drawFramebufferFromTextureToTexture(
+                                        GLuint FramebufferName,
+                                        GLuint textureToDraw,
+                                        GLuint programFrameBufferID,
+                                        GLuint quad_vertexbuffer,
+                                        GLuint renderedTexture,
+                                        GLuint texID,
+                                        GLuint timeID,
+                                        GLuint resolutionID,
+                                        unsigned int width,
+                                        unsigned int height
+                                       )
+{
+    #if USE_GLEW
+		// Render to the screen
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+        //// Render on the whole framebuffer, complete from the lower left corner to the upper right
+		glViewport(0,0,width,height);
+
+		// Clear the screen
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Use our shader
+		glUseProgram(programFrameBufferID);
+
+		// Bind our texture in Texture Unit 0
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureToDraw);
+		// Set our "renderedTexture" sampler to use Texture Unit 0
+		glUniform1i(texID, 0);
+		glUniform1f(timeID, (float)(GetTickCountMilliseconds()/1000.0f) );
+		glUniform3f(resolutionID, width, height , 1);
+
+		// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+		glVertexAttribPointer(
+			                  0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			                  3,                  // size
+			                  GL_FLOAT,           // type
+			                  GL_FALSE,           // normalized?
+			                  0,                  // stride
+			                  (void*)0            // array buffer offset
+		                     );
+
+		// Draw the triangles !
+		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+
+		glDisableVertexAttribArray(0);
+  return 1;
+  #else
+   return 0;
+  #endif
+}
+
 
 int drawFramebufferFromTexture(
                                GLuint FramebufferName,
@@ -149,8 +204,33 @@ int drawFramebufferFromTexture(
 
 
 
+int drawFramebufferTexToTex(
+                       GLuint FramebufferName,
+                       GLuint programFrameBufferID,
+                       GLuint quad_vertexbuffer,
+                       GLuint renderedTexture,
+                       GLuint texID,
+                       GLuint timeID,
+                       GLuint resolutionID,
+                       unsigned int width,
+                       unsigned int height
+                   )
+{
+ return drawFramebufferFromTextureToTexture(
+                                            FramebufferName,
+                                            renderedTexture,
+                                            programFrameBufferID,
+                                            quad_vertexbuffer,
+                                            renderedTexture,
+                                            texID,
+                                            timeID,
+                                            resolutionID,
+                                            width,
+                                            height
+                                          );
+}
 
-int drawFramebuffer(
+int drawFramebufferToScreen(
                        GLuint FramebufferName,
                        GLuint programFrameBufferID,
                        GLuint quad_vertexbuffer,
@@ -163,7 +243,7 @@ int drawFramebuffer(
                    )
 {
  return drawFramebufferFromTexture(
-                                    FramebufferName,
+                                    0,//FramebufferName,
                                     renderedTexture,
                                     programFrameBufferID,
                                     quad_vertexbuffer,
