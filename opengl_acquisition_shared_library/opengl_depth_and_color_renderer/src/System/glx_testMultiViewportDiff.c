@@ -52,7 +52,7 @@
 #define originalHEIGHT 480
 #define tilesToDoX 8
 #define tilesToDoY 8
-#define shrinkingFactor 8 //4
+#define shrinkingFactor 4 //4
 //--------------------------------------------
 
 struct viewerSettings config={0};
@@ -434,14 +434,12 @@ int doDrawing()
                              triModel.colors  ,  triModel.header.numberOfColors  * sizeof(float) ,
                              0, 0 //Not Indexed..
                            );
-    fprintf(stderr,"Ready to render: ");
-
-
+//    fprintf(stderr,"Ready to render: ");
 
      GLuint FramebufferName = 0;
      GLuint renderedTexture;
-     GLuint renderedDepth;
-     initializeFramebuffer(&FramebufferName,&renderedTexture,&renderedDepth,WIDTH,HEIGHT);
+     //GLuint renderedDepth;
+     initializeFramebuffer(&FramebufferName,&renderedTexture,0 /*&renderedDepth*/,WIDTH,HEIGHT);
 
 	 GLuint quad_vertexbuffer;
 	 glGenBuffers(1, &quad_vertexbuffer);
@@ -504,6 +502,32 @@ int doDrawing()
         performComputeShaderOperation(diffComputer);
     #endif // USE_COMPUTE_SHADER
 
+
+    #define DO_SECOND_STAGE 0
+
+    //----------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------
+	// Use our shader
+	#if DO_SECOND_STAGE
+	glUseProgram(finalFramebuffer->ProgramObject);
+
+     GLuint FramebufferName2 = 1;
+     GLuint renderedTexture2;
+     GLuint renderedDepth2;
+     initializeFramebuffer(&FramebufferName2,&renderedTexture2,&renderedDepth2,WIDTH,HEIGHT);
+	 GLuint texID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
+	 GLuint timeID2 = glGetUniformLocation(programFrameBufferID, "iTime");
+	 GLuint resolutionID2 = glGetUniformLocation(programFrameBufferID, "iResolution");
+
+     // Render to our framebuffer
+     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
+	 glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+	 #endif // DO_SECOND_STAGE
+    //----------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------
+
     //We have accumulated all data on the framebuffer and will now draw it back..
     drawFramebuffer(
                     0,
@@ -517,59 +541,20 @@ int doDrawing()
                     WIDTH,HEIGHT
                    );
 
-
-     /*
-      ===========================================================================================
-      ===========================================================================================
-                                            FINAL STEP
-      ===========================================================================================
-      ===========================================================================================
-     */
-     /*
-     unsigned int finalWidth=320, finalHeight=240;
-     GLuint FramebufferName2 = 1;
-     GLuint renderedTexture2;
-     GLuint renderedDepth2;
-     initializeFramebuffer(&FramebufferName2,&renderedTexture2,&renderedDepth2,finalWidth,finalHeight);
-
-	 glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
-	 glViewport(0,0,finalWidth,finalHeight); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-
-	 // Create and compile our GLSL program from the shaders
-	 GLuint texID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
-
-	 // Create and compile our GLSL program from the shaders
-	 GLuint timeID = glGetUniformLocation(finalFramebuffer->ProgramObject, "iTime");
-	 GLuint resolutionID = glGetUniformLocation(finalFramebuffer->ProgramObject, "iResolution");
-
-
-     glUseProgram(finalFramebuffer->ProgramObject);
-     // Bind our texture in Texture Unit 0
-	 glActiveTexture(GL_TEXTURE0);
-	 glBindTexture(GL_TEXTURE_2D, texID2);
-
-	 glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
-	 glViewport(0,0,finalWidth,finalHeight); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-     //Make everything smaller..
-     drawFramebuffer(
-                        1,
-                        finalFramebuffer->ProgramObject,
-                        quad_vertexbuffer,
-                        //renderedDepth,
-                        renderedTexture2,
-                        texID2,
-                        timeID,
-                        resolutionID,
-                        finalWidth,finalHeight
-                     );*/
-     /*
-      ===========================================================================================
-      ===========================================================================================
-      ===========================================================================================
-     */
-
-
-
+	#if DO_SECOND_STAGE
+    //We have accumulated all data on the framebuffer and will now draw it back..
+    drawFramebuffer(
+                    FramebufferName2,
+                    finalFramebuffer->ProgramObject,
+                    quad_vertexbuffer,
+                    //renderedDepth,
+                    renderedTexture2,
+                    texID2,
+                    timeID2,
+                    resolutionID2,
+                    WIDTH,HEIGHT
+                   );
+	 #endif // DO_SECOND_STAGE
 
 	  // Swap buffers
       glx3_endRedraw();
