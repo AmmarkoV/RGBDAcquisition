@@ -3,7 +3,7 @@
 in vec2 UV;
 out vec3 color;
 
-uniform sampler2D renderedTexture; 
+uniform sampler2D renderedTexture2; 
 
 uniform vec3 iResolution;
 uniform float iTime;

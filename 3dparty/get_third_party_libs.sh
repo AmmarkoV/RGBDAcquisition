@@ -21,7 +21,6 @@ fi
 
 
 
-
 if [ -d AmmarServer ]
 then
 echo "AmmarServer appears to already exist .."
@@ -259,6 +258,39 @@ else
 
   fi
 fi
+
+
+
+
+
+
+if [ -d orbbec ]
+then
+echo "Orbbec appears to already exist .."
+else
+  echo "Do you want to download Orbec OpenNI2 ? " 
+  echo
+  echo -n " (Y/N)?"
+  read answer
+  if test "$answer" != "N" -a "$answer" != "n";
+  then 
+     sudo apt-get install libxmu-dev libxi-dev freeglut3-dev libusb-dev  libusb-1.0-0-dev  libudev-dev
+     cd "$DIR"
+     mkdir orbbec
+     cd orbbec  
+     git clone https://github.com/orbbec/OpenNI2
+     cd OpenNI2 
+     make
+     cd ../../../
+     #should be at 3dparty dir
+     cd 3dparty   
+  fi
+fi
+
+
+
+
+
 
 
 # ---------------------------------------------------------------------

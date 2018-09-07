@@ -259,11 +259,11 @@ static int initializeViewerSettingsFromArguments(struct viewerSettings * vs,int 
 
 
 static int acquisitionSaveFrames(
-                          struct viewerSettings * config,
-                          ModuleIdentifier moduleID,
-                          DeviceIdentifier devID,
-                          unsigned int framerate
-                         )
+                                 struct viewerSettings * config,
+                                 ModuleIdentifier moduleID,
+                                 DeviceIdentifier devID,
+                                 unsigned int framerate
+                                )
 {
  char outfilename[1024]={0};
     if (config->saveAsOriginalFrameNumber)
@@ -285,7 +285,7 @@ static int acquisitionSaveFrames(
                        acquisitionSaveDepthFrame(moduleID,devID,outfilename,config->compressOutput);
                       }
    ++config->savedFrameNum;
-  return 1;
+ return 1;
 }
 
 

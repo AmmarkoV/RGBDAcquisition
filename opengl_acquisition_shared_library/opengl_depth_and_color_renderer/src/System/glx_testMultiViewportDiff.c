@@ -222,7 +222,7 @@ int doTiledDiffDrawing(
      //-------------------------------------------------------------------
         double roll=0.0;//(double)  (rand()%90);
         double pitch=0.0;//(double) (rand()%90);
-        double yaw=0.0;//(double)   (rand()%90);
+//        double yaw=0.0;//(double)   (rand()%90);
 
 
         double quaternion[4]={-1.00,-0.13,-0.03,0.09};
@@ -230,9 +230,9 @@ int doTiledDiffDrawing(
         euler2Quaternions(quaternion,euler,qXqYqZqW);
 
         //25.37,-87.19,2665.56,-1.00,-0.13,-0.03,0.09,0.59,0.54,0.11,-0.90,0.18,0.21,-0.43,0.65,-0.53,-1.13,0.60,0.10,0.32,-0.17,-0.09,-0.34,0.30,-0.05,0.05,0.78,0.00,-1.91,0.68,-0.07,-0.01,4.00,0.11,1.92,-0.73
-        double x=-259.231f;//(double)  (1000-rand()%2000);
-        double y=-54.976f;//(double) (100-rand()%200);
-        double z=2699.735f;//(double)  (700+rand()%1000);
+//        double x=-259.231f;//(double)  (1000-rand()%2000);
+//        double y=-54.976f;//(double) (100-rand()%200);
+//        double z=2699.735f;//(double)  (700+rand()%1000);
      //-------------------------------------------------------------------
 
   unsigned int viewportWidth = (unsigned int) WIDTH / tilesX;
@@ -369,6 +369,11 @@ int doDrawing()
 	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebufferTextureDiff.vert", "../../shaders/virtualFramebufferTextureDiff.frag");
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
+
+	struct shaderObject * finalFramebuffer = loadShader("../../shaders/virtualFramebufferTextureInput.vert", "../../shaders/virtualFramebufferTextureInput.frag");
+    if (finalFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
+
+
     #if USE_COMPUTE_SHADER
     struct computeShaderObject  * diffComputer = loadComputeShader("../../shaders/virtualFramebufferTextureDiff.compute");
     if (diffComputer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
@@ -500,16 +505,41 @@ int doDrawing()
     #endif // USE_COMPUTE_SHADER
 
         //We have accumulated all data on the framebuffer and will now draw it back..
-        drawFramebuffer(
-                        programFrameBufferID,
+    drawFramebuffer(
+                    programFrameBufferID,
+                    quad_vertexbuffer,
+                    //renderedDepth,
+                    renderedTexture,
+                    texID,
+                    timeID,
+                    resolutionID,
+                    WIDTH,HEIGHT
+                   );
+
+
+/*
+     GLuint FramebufferName2 = 1;
+     GLuint renderedTexture2;
+     GLuint renderedDepth2;
+     initializeFramebuffer(&FramebufferName2,&renderedTexture2,&renderedDepth2,WIDTH,HEIGHT);
+	 // Create and compile our GLSL program from the shaders
+	 GLuint texID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
+
+	 glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
+	 glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+     //Make everything smaller..
+     drawFramebuffer(
+                        finalFramebuffer->ProgramObject,
                         quad_vertexbuffer,
                         //renderedDepth,
-                        renderedTexture,
-                        texID,
+                        renderedTexture2,
+                        texID2,
                         timeID,
                         resolutionID,
                         WIDTH,HEIGHT
-                       );
+                     );
+*/
+
 
 
 		// Swap buffers
@@ -538,6 +568,7 @@ int doDrawing()
 
 	unloadShader(sho);
 	unloadShader(textureFramebuffer);
+	unloadShader(finalFramebuffer);
 
 	#if USE_COMPUTE_SHADER
      unloadComputeShader(diffComputer);

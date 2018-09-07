@@ -100,9 +100,7 @@ int drawFramebufferFromTexture(
                                unsigned int height
                               )
 {
-
     #if USE_GLEW
-
 		// Render to the screen
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
         // Render on the whole framebuffer, complete from the lower left corner to the upper right
