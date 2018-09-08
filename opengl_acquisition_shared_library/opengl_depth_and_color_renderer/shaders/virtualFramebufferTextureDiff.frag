@@ -7,9 +7,7 @@ uniform int tileSizeX = 16;
 uniform int tileSizeY = 16;
 
 uniform vec3 iResolution;
-uniform sampler2D renderedTexture; 
-//This is for Color Textures
-//uniform sampler2D diffedTexture; 
+uniform sampler2D renderedTexture;  
 
 //This is for unsigned short textures
 #extension GL_EXT_gpu_shader4 : enable    //Include support for this extension, which defines usampler2D

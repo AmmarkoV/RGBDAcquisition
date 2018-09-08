@@ -6,12 +6,73 @@
 
 #include "render_buffer.h"
 
+#include <stdio.h>
 
 //#include <GL/gl.h>  //Also on header..
 #include <GL/glx.h>    /* this includes the necessary X headers */
 #include <GL/glu.h>
 
 #include "../../Tools/tools.h"  //for GetTickCountMilliseconds();
+
+
+
+int checkIfFrameBufferIsOk(GLuint framebufferName)
+{
+    #if USE_GLEW
+    GLenum res;
+
+    res = glCheckFramebufferStatus(GL_FRAMEBUFFER );
+    //res = glCheckNamedFramebufferStatus(GL_FRAMEBUFFER,framebufferName);
+    if (res==0) { return 1;}
+
+    switch (res)
+    {
+      case GL_FRAMEBUFFER_UNDEFINED :
+        fprintf(stderr,"is returned if the specified framebuffer is the default read or draw framebuffer, but the default framebuffer does not exist.\n");
+      break;
+
+      case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT :
+        fprintf(stderr," is returned if any of the framebuffer attachment points are framebuffer incomplete.\n");
+      break;
+
+      case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT :
+        fprintf(stderr," is returned if the framebuffer does not have at least one image attached to it.\n");
+      break;
+
+      case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER :
+        fprintf(stderr," is returned if the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for any color attachment point(s) named by GL_DRAW_BUFFERi.\n");
+      break;
+
+      case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER :
+        fprintf(stderr," is returned if GL_READ_BUFFER is not GL_NONE and the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for the color attachment point named by GL_READ_BUFFER.\n");
+      break;
+
+      case GL_FRAMEBUFFER_UNSUPPORTED :
+        fprintf(stderr," is returned if the combination of internal formats of the attached images violates an implementation-dependent set of restrictions.\n");
+      break;
+
+      case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE :
+        fprintf(stderr," is returned if the value of GL_RENDERBUFFER_SAMPLES is not the same for all attached renderbuffers; if the value of GL_TEXTURE_SAMPLES \
+        is the not same for all attached textures; or, if the attached images are a mix of renderbuffers and textures, the value of GL_RENDERBUFFER_SAMPLES does not match the value of GL_TEXTURE_SAMPLES.\n");
+
+        fprintf(stderr," is also returned if the value of GL_TEXTURE_FIXED_SAMPLE_LOCATIONS is not the same for all attached textures;\
+         or, if the attached images are a mix of renderbuffers and textures, the value of GL_TEXTURE_FIXED_SAMPLE_LOCATIONS is not GL_TRUE for all attached textures.\n");
+      break;
+
+      case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS :
+        fprintf(stderr," is returned if any framebuffer attachment is layered, and any populated attachment is not layered, or if all populated color attachments are not from textures of the same target.\n");
+      break;
+
+    };
+
+    return 0;
+  #else
+   return 1;
+  #endif
+}
+
+
+
 
 int initializeFramebuffer(
                           GLuint * FramebufferName,
@@ -104,6 +165,11 @@ int drawFramebufferFromTexture(
     #if USE_GLEW
 		// Render to the screen
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+
+		if (!checkIfFrameBufferIsOk(FramebufferName))
+        {
+
+        }
         // Render on the whole framebuffer, complete from the lower left corner to the upper right
 		glViewport(0,0,width,height);
 
