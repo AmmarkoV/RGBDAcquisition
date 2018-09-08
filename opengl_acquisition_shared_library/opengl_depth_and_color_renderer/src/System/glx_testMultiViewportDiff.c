@@ -479,7 +479,7 @@ int doDrawing()
                                                   config.devID
                                                 );
 
-
+        //We first want to draw using tiles to framebuffer ( FramebufferName )
         doTiledDiffDrawing(
                            programID,
                            programFrameBufferID,
@@ -512,8 +512,8 @@ int doDrawing()
 	#if DO_SECOND_STAGE
 	 glUseProgram(finalFramebuffer->ProgramObject);
 
-     GLuint FramebufferName2;
-     GLuint renderedTexture2;
+     GLuint FramebufferName2; // This framebuffer is the second framebuffer to use and will have renderedTexture2 assigned to it
+     GLuint renderedTexture2; // This texture will hold our result
      initializeFramebuffer(&FramebufferName2,&renderedTexture2,0/*depth*/,WIDTH,HEIGHT);
 	 GLuint texID2  = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
 	 GLuint timeID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iTime");
@@ -525,28 +525,31 @@ int doDrawing()
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
 
-    //We have accumulated all data on the framebuffer and will now draw it back..
+    //We first want to draw using the textureFramebuffer and store output to a new framebuffer
     drawFramebufferTexToTex(
-                            FramebufferName2,
-                            programFrameBufferID,
-                            quad_vertexbuffer,
-                            //renderedDepth,
-                            renderedTexture,
-                            texID,
+                            FramebufferName2,    //Target Framebuffer
+                            programFrameBufferID,//GLSL Shader to use
+                            quad_vertexbuffer,   //Rectangle that covers all the screen
+                            renderedTexture,     // Texture to Draw
+                            texID,               // Texture to Draw GLSL uniform location
+                            // Control variables that get auto populated
                             timeID,
                             resolutionID,
+                            //Resolution of our Rendered Texture
                             WIDTH,HEIGHT
                            );
-
+     //usleep(10000);
+	 //glFinish();
     //We have accumulated all data on the framebuffer and will now draw it back..
     drawFramebufferToScreen(
-                            finalFramebuffer->ProgramObject,
-                            quad_vertexbuffer,
-                            //renderedDepth,
-                            renderedTexture2,
-                            texID2,
+                            finalFramebuffer->ProgramObject, //GLSL Shader to use
+                            quad_vertexbuffer,//Rectangle that covers all the screen
+                            renderedTexture2, // Texture to Draw
+                            texID2,           // Texture to Draw GLSL uniform location
+                            // Control variables that get auto populated
                             timeID2,
                             resolutionID2,
+                            //Resolution of our Rendered Texture
                             WIDTH,HEIGHT
                            );
      #else
