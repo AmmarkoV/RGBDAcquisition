@@ -447,7 +447,7 @@ int doDrawing()
 	 glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 
 	 // Create and compile our GLSL program from the shaders
-	 GLuint texID = glGetUniformLocation(programFrameBufferID, "renderedTexture");
+	 GLuint renderedTextureGLSLName = glGetUniformLocation(programFrameBufferID, "renderedTexture");
 	 GLuint textureDiffSampler = glGetUniformLocation(programFrameBufferID, "diffedTexture");
 	 // Create and compile our GLSL program from the shaders
 	 GLuint timeID = glGetUniformLocation(programFrameBufferID, "iTime");
@@ -516,7 +516,7 @@ int doDrawing()
      GLuint FramebufferName2; // This framebuffer is the second framebuffer to use and will have renderedTexture2 assigned to it
      GLuint renderedTexture2; // This texture will hold our result
      initializeFramebuffer(&FramebufferName2,&renderedTexture2,0/*depth*/,WIDTH,HEIGHT);
-	 GLuint texID2  = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
+	 GLuint renderedTexture2GLSLName  = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
 	 GLuint timeID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iTime");
 	 GLuint resolutionID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iResolution");
 
@@ -526,9 +526,11 @@ int doDrawing()
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
 
-    glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
+    //glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
+    glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+
 
     //We first want to draw using the textureFramebuffer and store output to a new framebuffer
     drawFramebufferTexToTex(
@@ -536,7 +538,7 @@ int doDrawing()
                             programFrameBufferID,//GLSL Shader to use
                             quad_vertexbuffer,   //Rectangle that covers all the screen
                             renderedTexture,     // Texture to Draw
-                            texID,               // Texture to Draw GLSL uniform location
+                            renderedTextureGLSLName,               // Texture to Draw GLSL uniform location
                             // Control variables that get auto populated
                             timeID,
                             resolutionID,
@@ -545,6 +547,9 @@ int doDrawing()
                            );
       checkOpenGLError(__FILE__, __LINE__);
      glFlush();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 	//usleep(10000);
 	 //glFinish();
     //We have accumulated all data on the framebuffer and will now draw it back..
@@ -552,7 +557,7 @@ int doDrawing()
                             finalFramebuffer->ProgramObject, //GLSL Shader to use
                             quad_vertexbuffer,//Rectangle that covers all the screen
                             renderedTexture2, // Texture to Draw
-                            texID2,           // Texture to Draw GLSL uniform location
+                            renderedTexture2GLSLName,   // Texture to Draw GLSL uniform location
                             // Control variables that get auto populated
                             timeID2,
                             resolutionID2,
