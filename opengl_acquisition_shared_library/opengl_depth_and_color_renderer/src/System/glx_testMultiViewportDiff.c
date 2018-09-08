@@ -510,6 +510,7 @@ int doDrawing()
     //----------------------------------------------------------------------------------------
 	// Use our shader
 	#if DO_SECOND_STAGE
+	glFlush();
 	 glUseProgram(finalFramebuffer->ProgramObject);
 
      GLuint FramebufferName2; // This framebuffer is the second framebuffer to use and will have renderedTexture2 assigned to it
@@ -525,6 +526,10 @@ int doDrawing()
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
 
+    glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
+
     //We first want to draw using the textureFramebuffer and store output to a new framebuffer
     drawFramebufferTexToTex(
                             FramebufferName2,    //Target Framebuffer
@@ -538,7 +543,9 @@ int doDrawing()
                             //Resolution of our Rendered Texture
                             WIDTH,HEIGHT
                            );
-     //usleep(10000);
+      checkOpenGLError(__FILE__, __LINE__);
+     glFlush();
+	//usleep(10000);
 	 //glFinish();
     //We have accumulated all data on the framebuffer and will now draw it back..
     drawFramebufferToScreen(
@@ -552,7 +559,9 @@ int doDrawing()
                             //Resolution of our Rendered Texture
                             WIDTH,HEIGHT
                            );
-     #else
+      checkOpenGLError(__FILE__, __LINE__);
+    glFlush();
+	 #else
           drawFramebufferToScreen(
                                   programFrameBufferID,
                                   quad_vertexbuffer,

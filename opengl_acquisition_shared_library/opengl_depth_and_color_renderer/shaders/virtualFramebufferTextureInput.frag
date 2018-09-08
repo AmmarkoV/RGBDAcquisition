@@ -16,6 +16,6 @@ void main()
     
    // color.y = color.x;
    // color.x=0;
-    color.z+=0.1;
+   color.z=1.0;
 }
  

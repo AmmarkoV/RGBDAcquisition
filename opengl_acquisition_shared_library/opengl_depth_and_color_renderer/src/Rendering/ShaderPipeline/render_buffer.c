@@ -16,7 +16,7 @@
 
 
 
-int checkIfFrameBufferIsOk(GLuint framebufferName)
+int checkIfFrameBufferIsOk(const char * label, GLuint framebufferName)
 {
     #if USE_GLEW
     GLenum res;
@@ -24,35 +24,39 @@ int checkIfFrameBufferIsOk(GLuint framebufferName)
     res = glCheckFramebufferStatus(GL_FRAMEBUFFER );
     //res = glCheckNamedFramebufferStatus(GL_FRAMEBUFFER,framebufferName);
     if (res==0) { return 1;}
+    if (res==GL_FRAMEBUFFER_COMPLETE) { return 1; }
+
+
+    fprintf(stderr,"%s\n",label);
 
     switch (res)
     {
       case GL_FRAMEBUFFER_UNDEFINED :
-        fprintf(stderr,"is returned if the specified framebuffer is the default read or draw framebuffer, but the default framebuffer does not exist.\n");
+        fprintf(stderr," The specified framebuffer is the default read or draw framebuffer, but the default framebuffer does not exist.\n");
       break;
 
       case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT :
-        fprintf(stderr," is returned if any of the framebuffer attachment points are framebuffer incomplete.\n");
+        fprintf(stderr," Any of the framebuffer attachment points are framebuffer incomplete.\n");
       break;
 
       case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT :
-        fprintf(stderr," is returned if the framebuffer does not have at least one image attached to it.\n");
+        fprintf(stderr," The framebuffer does not have at least one image attached to it.\n");
       break;
 
       case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER :
-        fprintf(stderr," is returned if the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for any color attachment point(s) named by GL_DRAW_BUFFERi.\n");
+        fprintf(stderr," The value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for any color attachment point(s) named by GL_DRAW_BUFFERi.\n");
       break;
 
       case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER :
-        fprintf(stderr," is returned if GL_READ_BUFFER is not GL_NONE and the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for the color attachment point named by GL_READ_BUFFER.\n");
+        fprintf(stderr," GL_READ_BUFFER is not GL_NONE and the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for the color attachment point named by GL_READ_BUFFER.\n");
       break;
 
       case GL_FRAMEBUFFER_UNSUPPORTED :
-        fprintf(stderr," is returned if the combination of internal formats of the attached images violates an implementation-dependent set of restrictions.\n");
+        fprintf(stderr," The combination of internal formats of the attached images violates an implementation-dependent set of restrictions.\n");
       break;
 
       case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE :
-        fprintf(stderr," is returned if the value of GL_RENDERBUFFER_SAMPLES is not the same for all attached renderbuffers; if the value of GL_TEXTURE_SAMPLES \
+        fprintf(stderr," The value of GL_RENDERBUFFER_SAMPLES is not the same for all attached renderbuffers; if the value of GL_TEXTURE_SAMPLES \
         is the not same for all attached textures; or, if the attached images are a mix of renderbuffers and textures, the value of GL_RENDERBUFFER_SAMPLES does not match the value of GL_TEXTURE_SAMPLES.\n");
 
         fprintf(stderr," is also returned if the value of GL_TEXTURE_FIXED_SAMPLE_LOCATIONS is not the same for all attached textures;\
@@ -60,9 +64,16 @@ int checkIfFrameBufferIsOk(GLuint framebufferName)
       break;
 
       case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS :
-        fprintf(stderr," is returned if any framebuffer attachment is layered, and any populated attachment is not layered, or if all populated color attachments are not from textures of the same target.\n");
+        fprintf(stderr," Any framebuffer attachment is layered, and any populated attachment is not layered, or if all populated color attachments are not from textures of the same target.\n");
       break;
 
+      case GL_FRAMEBUFFER_COMPLETE :
+         return 1;
+      break;
+
+      default :
+        fprintf(stderr," Unknown error ( %u )\n",res);
+      break;
     };
 
     return 0;
@@ -90,6 +101,7 @@ int initializeFramebuffer(
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	glGenFramebuffers(1, FramebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, *FramebufferName);
+
 
 	// The texture we're going to render to
 	glGenTextures(1, renderedTexture);
@@ -137,6 +149,8 @@ int initializeFramebuffer(
 	GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
 	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
+	checkIfFrameBufferIsOk(" initializeFramebuffer : Checking framebuffer failed..", FramebufferName);
+
 	// Always check that our framebuffer is ok
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) { return 0; }
 
@@ -166,10 +180,7 @@ int drawFramebufferFromTexture(
 		// Render to the screen
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
-		if (!checkIfFrameBufferIsOk(FramebufferName))
-        {
-
-        }
+		checkIfFrameBufferIsOk("drawFramebufferFromTexture framebuffer error:",FramebufferName);
         // Render on the whole framebuffer, complete from the lower left corner to the upper right
 		glViewport(0,0,width,height);
 
