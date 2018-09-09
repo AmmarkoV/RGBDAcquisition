@@ -172,6 +172,7 @@ int drawObjectAT(GLuint programID,
 
 
 int doTiledDiffDrawing(
+                       GLuint FramebufferName,
                        int programID,
                        int programFrameBufferID,
                        GLuint textureToDiff,
@@ -185,9 +186,17 @@ int doTiledDiffDrawing(
                        GLuint pyramidVao,
                        unsigned int pyramidTriangleCount,
                        unsigned int tilesX,
-                       unsigned int tilesY
+                       unsigned int tilesY,
+                       unsigned int WIDTH,unsigned int HEIGHT
                     )
 {
+     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+	 glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+
+     glClearColor( 0, 0.0, 0, 1 );
+     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
+
+
      glUseProgram(programFrameBufferID);
      // Bind our texture in Texture Unit 0
 	 glActiveTexture(GL_TEXTURE1);
@@ -460,15 +469,12 @@ int doDrawing()
 	do
      {
         // Render to our framebuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+		//glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+		//glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
        //-----------------------------------------------
         if (framesRendered%10==0) { fprintf(stderr,"\r%0.2f FPS                                         \r", lastFramerate ); }
        //-----------------------------------------------
-
-        glClearColor( 0, 0.0, 0, 1 );
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
         //Get a new pair of frames and upload as texture..
         acquisitionSnapFrames(config.moduleID,config.devID);
@@ -481,6 +487,7 @@ int doDrawing()
 
         //We first want to draw using tiles to framebuffer ( FramebufferName )
         doTiledDiffDrawing(
+                           FramebufferName,
                            programID,
                            programFrameBufferID,
                            diffTexture,
@@ -494,7 +501,8 @@ int doDrawing()
                            humanVAO,
                            humanTriangleCount,
                            tilesToDoX,
-                           tilesToDoY
+                           tilesToDoY,
+                           WIDTH,HEIGHT
                           );
 
 
@@ -510,26 +518,19 @@ int doDrawing()
     //----------------------------------------------------------------------------------------
 	// Use our shader
 	#if DO_SECOND_STAGE
-	glFlush();
-	 glUseProgram(finalFramebuffer->ProgramObject);
 
      GLuint FramebufferName2; // This framebuffer is the second framebuffer to use and will have renderedTexture2 assigned to it
      GLuint renderedTexture2; // This texture will hold our result
      initializeFramebuffer(&FramebufferName2,&renderedTexture2,0/*depth*/,WIDTH,HEIGHT);
+
+	 glUseProgram(finalFramebuffer->ProgramObject);
 	 GLuint renderedTexture2GLSLName  = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
 	 GLuint timeID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iTime");
 	 GLuint resolutionID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iResolution");
 
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, 0);
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------
-
-    //glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
-    glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
 
     //We first want to draw using the textureFramebuffer and store output to a new framebuffer
@@ -548,9 +549,7 @@ int doDrawing()
       checkOpenGLError(__FILE__, __LINE__);
      glFlush();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0,0,WIDTH,HEIGHT); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-	//usleep(10000);
+	 //usleep(100000);
 	 //glFinish();
     //We have accumulated all data on the framebuffer and will now draw it back..
     drawFramebufferToScreen(

@@ -118,19 +118,19 @@ int initializeFramebuffer(
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	// The depth buffer
-	GLuint depthrenderbuffer;
-	glGenRenderbuffers(1, &depthrenderbuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
-
 	// Set "renderedTexture" as our colour attachement #0
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, *renderedTexture, 0);
 
 	//// Alternative : Depth texture. Slower, but you can sample it later in your shader
     if (depthTexture!=0)
     {
+	 // The depth buffer
+	 GLuint depthrenderbuffer;
+	 glGenRenderbuffers(1, &depthrenderbuffer);
+	 glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+	 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+	 glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+
 	 glGenTextures(1, depthTexture);
 	 glBindTexture(GL_TEXTURE_2D, *depthTexture);
 	 glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, width, height, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0); //GL_UNSIGNED_BYTE
@@ -149,12 +149,9 @@ int initializeFramebuffer(
 	GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
 	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
-	checkIfFrameBufferIsOk(" initializeFramebuffer : Checking framebuffer failed..", FramebufferName);
-
 	// Always check that our framebuffer is ok
-	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) { return 0; }
+	return checkIfFrameBufferIsOk(" initializeFramebuffer : Checking framebuffer failed..", FramebufferName);
 
-   return 1;
   #else
    return 0;
   #endif
@@ -179,13 +176,15 @@ int drawFramebufferFromTexture(
     #if USE_GLEW
 		// Render to the screen
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+	    glViewport(0,0,width,height); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+
+        glClearColor( 0, 0.0, 0, 1 );
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 		// Clear the screen
 
 		checkIfFrameBufferIsOk("drawFramebufferFromTexture framebuffer error:",FramebufferName);
         // Render on the whole framebuffer, complete from the lower left corner to the upper right
-		glViewport(0,0,width,height);
 
 		// Clear the screen
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Use our shader
 		glUseProgram(programFrameBufferID);
