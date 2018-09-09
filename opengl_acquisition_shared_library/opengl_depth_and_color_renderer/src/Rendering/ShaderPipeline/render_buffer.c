@@ -194,6 +194,9 @@ int drawFramebufferFromTexture(
 		glBindTexture(GL_TEXTURE_2D, textureToDraw);
 		// Set our "renderedTexture" sampler to use Texture Unit 0
 		glUniform1i(texID, 0);
+
+
+
 		glUniform1f(timeID, (float)(GetTickCountMilliseconds()/1000.0f) );
 		glUniform3f(resolutionID, width, height , 1);
 

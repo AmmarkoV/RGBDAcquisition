@@ -53,6 +53,7 @@
 #define tilesToDoX 8
 #define tilesToDoY 8
 #define shrinkingFactor 4 //4
+#define drawShrinkingFactor 4
 //--------------------------------------------
 
 struct viewerSettings config={0};
@@ -61,8 +62,7 @@ unsigned int diffTextureUploaded=0;
 GLuint diffTexture;
 GLuint colorTexGLSLId;
 
-unsigned int WIDTH=(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
-unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
+
 
 float lastFramerate = 60;
 unsigned long lastRenderingTime = 0;
@@ -288,9 +288,11 @@ int doTiledDiffDrawing(
                   viewMatrixD
                  );*/
 
-     float xDivergance = 300 - rand()%600;
-     float yDivergance = 300 - rand()%600;
-     float zDivergance = 300 - rand()%600;
+     unsigned int distance = 500;
+     unsigned int distanceMul2 = distance * 2;
+     float xDivergance = (float) distance - rand()%distanceMul2;
+     float yDivergance = (float) distance - rand()%distanceMul2;
+     float zDivergance = (float) distance - rand()%distanceMul2;
 
      drawObjectAT(
                   programID,
@@ -366,7 +368,8 @@ int uploadDepthImageAsTextureFromAcquisition(
 }
 
 
-int doDrawing()
+int doDrawing( unsigned int WIDTH, unsigned int HEIGHT ,
+               unsigned int drawWIDTH , unsigned int drawHEIGHT )
 {
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
@@ -524,9 +527,20 @@ int doDrawing()
     //----------------------------------------------------------------------------------------
 	// Use our shader
 	#if DO_SECOND_STAGE
-     glFlush();
+     //glFinish();
 
 	 glUseProgram(finalFramebuffer->ProgramObject);
+/*
+	 //------------------------
+	 GLuint renderedTextureGLSLName = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture"); //We want two buffers for this thing..
+     // Bind our texture in Texture Unit 0
+	 glActiveTexture(GL_TEXTURE1);
+	 glBindTexture(GL_TEXTURE_2D, renderedTexture);
+	 // Set our "renderedTexture" sampler to use Texture Unit 0
+     glUniform1i(renderedTextureGLSLName, 1);
+     //------------------------
+*/
+
 	 GLuint renderedTexture2GLSLName  = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
 	 GLuint timeID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iTime");
 	 GLuint resolutionID2 = glGetUniformLocation(finalFramebuffer->ProgramObject, "iResolution");
@@ -564,7 +578,7 @@ int doDrawing()
                             timeID2,
                             resolutionID2,
                             //Resolution of our Rendered Texture
-                            WIDTH,HEIGHT
+                            drawWIDTH,drawHEIGHT
                            );
       checkOpenGLError(__FILE__, __LINE__);
     glFlush();
@@ -576,7 +590,7 @@ int doDrawing()
                                   texID,
                                   timeID,
                                   resolutionID,
-                                  WIDTH,HEIGHT
+                                  drawWIDTH,drawHEIGHT
                                  );
 	 #endif // DO_SECOND_STAGE
 
@@ -620,8 +634,14 @@ int doDrawing()
 int main(int argc,const char **argv)
 {
   //testPackUnpack();
+  unsigned int WIDTH=(unsigned int) (tilesToDoX*originalWIDTH)/shrinkingFactor;
+  unsigned int HEIGHT=(unsigned int) (tilesToDoY*originalHEIGHT)/shrinkingFactor;
 
-  start_glx3_stuff(WIDTH,HEIGHT,1,argc,argv);
+  unsigned int drawWIDTH = WIDTH/drawShrinkingFactor;
+  unsigned int drawHEIGHT = HEIGHT/drawShrinkingFactor;
+
+
+  start_glx3_stuff(drawWIDTH,drawHEIGHT,1,argc,argv);
 
   if (glewInit() != GLEW_OK)
    {
@@ -663,7 +683,7 @@ int main(int argc,const char **argv)
   /* ------------------------------------------------------------------------------------------------*/
   /* ------------------------------------------------------------------------------------------------*/
 
-  doDrawing();
+  doDrawing(WIDTH,HEIGHT,drawWIDTH,drawHEIGHT);
 
 
   acquisitionDefaultTerminator(&config);

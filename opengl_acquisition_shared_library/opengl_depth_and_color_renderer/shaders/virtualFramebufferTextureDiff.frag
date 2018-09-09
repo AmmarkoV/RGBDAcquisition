@@ -109,7 +109,7 @@ void main()
     if (renderTextureDepth>0)
      {
 	  color.x = discrepancy/5000;
-      color.y = 0.0; 
+      color.y = 0.0;
       color.z = 0.0;   
      }
      
@@ -122,6 +122,12 @@ void main()
        }  
    }   
     
+    if ( renderTextureDepth>0 )
+    {  
+      color.z = 1.0;       
+
+    }   
+
    //If we want to repack everything .. ( we probably don't ) 
    // color = unpackColor(float(discrepancy));
 }
