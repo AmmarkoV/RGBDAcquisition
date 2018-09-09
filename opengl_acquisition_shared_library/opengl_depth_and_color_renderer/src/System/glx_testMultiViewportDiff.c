@@ -378,7 +378,7 @@ int doDrawing()
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
 
-	struct shaderObject * finalFramebuffer = loadShader("../../shaders/virtualFramebufferTextureInput.vert", "../../shaders/virtualFramebufferTextureInput.frag");
+	struct shaderObject * finalFramebuffer = loadShader("../../shaders/virtualFramebufferTextureInputNoFlip.vert", "../../shaders/virtualFramebufferTextureInputNoFlip.frag");
     if (finalFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
 
@@ -444,6 +444,12 @@ int doDrawing()
                              0, 0 //Not Indexed..
                            );
 //    fprintf(stderr,"Ready to render: ");
+
+
+     GLuint FramebufferName2; // This framebuffer is the second framebuffer to use and will have renderedTexture2 assigned to it
+     GLuint renderedTexture2; // This texture will hold our result
+     initializeFramebuffer(&FramebufferName2,&renderedTexture2,0/*depth*/,WIDTH,HEIGHT);
+
 
      GLuint FramebufferName;
      GLuint renderedTexture;
@@ -518,10 +524,7 @@ int doDrawing()
     //----------------------------------------------------------------------------------------
 	// Use our shader
 	#if DO_SECOND_STAGE
-
-     GLuint FramebufferName2; // This framebuffer is the second framebuffer to use and will have renderedTexture2 assigned to it
-     GLuint renderedTexture2; // This texture will hold our result
-     initializeFramebuffer(&FramebufferName2,&renderedTexture2,0/*depth*/,WIDTH,HEIGHT);
+     glFlush();
 
 	 glUseProgram(finalFramebuffer->ProgramObject);
 	 GLuint renderedTexture2GLSLName  = glGetUniformLocation(finalFramebuffer->ProgramObject, "renderedTexture2");
