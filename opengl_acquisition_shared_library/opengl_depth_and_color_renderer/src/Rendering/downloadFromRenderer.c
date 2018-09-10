@@ -28,7 +28,7 @@
 
 
 
-int downloadOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
+int downloadOpenGLColor(unsigned char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
   GLint ext_format, ext_type;
 
@@ -70,7 +70,7 @@ int downloadOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned in
 
 #warning "TODO : add Horizontal flipping  <- is the output mirrored ?"
 
-int downloadOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale)
+int downloadOpenGLZBuffer(unsigned short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale)
 {
     double depth_bias=0.0; double depth_scale=1.0;
     glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0
@@ -122,7 +122,7 @@ int downloadOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned
 
 
 
-int downloadOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale)
+int downloadOpenGLDepth(unsigned short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale)
 {
     double depth_bias=0.0; double depth_scale=1.0;
     glGetDoublev(GL_DEPTH_BIAS,  &depth_bias);  // Returns 0.0

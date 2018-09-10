@@ -84,34 +84,37 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 
 
-int calculateScoresForTile(char * data , unsigned int x1, unsigned int y1,unsigned int width, unsigned int height,unsigned int globalWidth,unsigned int globalHeight)
+unsigned int calculateScoresForTile(unsigned char * data , unsigned int x1, unsigned int y1,unsigned int width, unsigned int height,unsigned int globalWidth,unsigned int globalHeight)
 {
   unsigned int tX=0;
   unsigned int tY=0;
 
-  unsigned int sumR=0;
-  unsigned int sumG=0;
-  unsigned int sumB=0;
+  unsigned int sumDistance=0;
+  unsigned int sumCorrect=0;
+  unsigned int sumRendered=0;
 
-  char * ptr;
+  unsigned char * ptr;
+  //fprintf(stderr,"(%u,%u)=>(%u,%u)/(%u,%u) \n",x1,y1,x1+width,y1+height,globalWidth,globalHeight);
   for (tY=y1; tY<y1+height; tY++)
   {
    for (tX=x1; tX<x1+width; tX++)
    {
-     ptr = data[tY*globalWidth*3+tX*3];
-     sumR = * ptr; ptr++;
-     sumG = * ptr; ptr++;
-     sumB = * ptr; ptr++;
+     ptr = data+(tY*globalWidth*3+tX*3);
+     //fprintf(stderr,"(");
+     sumDistance += *ptr;                     /*fprintf(stderr,"%u ",(unsigned char) *ptr);*/ ptr++;
+     sumCorrect += (unsigned int) ((*ptr)>0); /*fprintf(stderr,"%u ",(unsigned char) *ptr);*/ ptr++;
+     sumRendered += (unsigned int) ((*ptr)>0); /*fprintf(stderr,"%u",(unsigned char) *ptr);*/ ptr++;
+     //fprintf(stderr,")");
    }
   }
 
-  fprintf(stderr,"Score(%u,%u)=%u %u %u\n",tX,tY,sumR,sumG,sumB);
+  //fprintf(stderr,"Score(%u,%u)=%u %u %u\n",tX,tY,sumDistance,sumCorrect,sumRendered);
 
   return 1;
 }
 
 
-int calculateScores(char * data , unsigned int tilesX, unsigned int tilesY,unsigned int width, unsigned int height)
+int calculateScores(unsigned char * data , unsigned int tilesX, unsigned int tilesY,unsigned int width, unsigned int height)
 {
   unsigned int tX=0;
   unsigned int tY=0;
@@ -122,6 +125,7 @@ int calculateScores(char * data , unsigned int tilesX, unsigned int tilesY,unsig
   {
    for (tX=0; tX<tilesX; tX++)
    {
+       //fprintf(stderr,"calculateScoresForTile(%u,%u) - ",tX,tY);
        calculateScoresForTile(data,tX*tWidth,tY*tHeight,tWidth,tHeight,width,height);
    }
   }
@@ -528,7 +532,7 @@ int doDrawing( unsigned int WIDTH, unsigned int HEIGHT ,
 
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
-     char * retrievedData = (char*) malloc(sizeof(char) * drawWIDTH * drawHEIGHT * 3 );
+     unsigned char * retrievedData = (unsigned char*) malloc(sizeof(unsigned char) * drawWIDTH * drawHEIGHT * 3 );
      if (retrievedData==0) { return 0;}
 
 	do

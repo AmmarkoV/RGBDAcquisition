@@ -6,11 +6,11 @@
 #define OGL_DOWNLOADFROMRENDERER_H_INCLUDED
 
 
-int downloadOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
+int downloadOpenGLColor(unsigned char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height);
 
-int downloadOpenGLZBuffer(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale);
+int downloadOpenGLZBuffer(unsigned short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale);
 
-int downloadOpenGLDepth(short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale);
+int downloadOpenGLDepth(unsigned short * depth , unsigned int x,unsigned int y,unsigned int width,unsigned int height,float depthScale);
 
 
 
