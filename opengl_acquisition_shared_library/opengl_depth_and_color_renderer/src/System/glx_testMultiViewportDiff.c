@@ -33,6 +33,7 @@
 #include "../Rendering/ShaderPipeline/render_buffer.h"
 #include "../Rendering/ShaderPipeline/uploadGeometry.h"
 #include "../Rendering/ShaderPipeline/uploadTextures.h"
+#include "../Rendering/downloadFromRenderer.h"
 
 
 #include "../../../../acquisition/Acquisition.h"
@@ -53,7 +54,7 @@
 #define tilesToDoX 8
 #define tilesToDoY 8
 #define shrinkingFactor 4 //4
-#define drawShrinkingFactor 4
+#define drawShrinkingFactor 16
 //--------------------------------------------
 
 struct viewerSettings config={0};
@@ -61,7 +62,6 @@ struct viewerSettings config={0};
 unsigned int diffTextureUploaded=0;
 GLuint diffTexture;
 GLuint colorTexGLSLId;
-
 
 
 float lastFramerate = 60;
@@ -80,6 +80,60 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
     return 0;
 }
+
+
+
+
+int calculateScoresForTile(char * data , unsigned int x1, unsigned int y1,unsigned int width, unsigned int height,unsigned int globalWidth,unsigned int globalHeight)
+{
+  unsigned int tX=0;
+  unsigned int tY=0;
+
+  unsigned int sumR=0;
+  unsigned int sumG=0;
+  unsigned int sumB=0;
+
+  char * ptr;
+  for (tY=y1; tY<y1+height; tY++)
+  {
+   for (tX=x1; tX<x1+width; tX++)
+   {
+     ptr = data[tY*globalWidth*3+tX*3];
+     sumR = * ptr; ptr++;
+     sumG = * ptr; ptr++;
+     sumB = * ptr; ptr++;
+   }
+  }
+
+  fprintf(stderr,"Score(%u,%u)=%u %u %u\n",tX,tY,sumR,sumG,sumB);
+
+  return 1;
+}
+
+
+int calculateScores(char * data , unsigned int tilesX, unsigned int tilesY,unsigned int width, unsigned int height)
+{
+  unsigned int tX=0;
+  unsigned int tY=0;
+  unsigned int tWidth=(unsigned int) width/tilesX;
+  unsigned int tHeight=(unsigned int) height/tilesY;
+
+  for (tY=0; tY<tilesY; tY++)
+  {
+   for (tX=0; tX<tilesX; tX++)
+   {
+       calculateScoresForTile(data,tX*tWidth,tY*tHeight,tWidth,tHeight,width,height);
+   }
+  }
+  return 1;
+}
+
+
+
+
+
+
+
 
 int drawObjectAT(GLuint programID,
                  GLuint vao,
@@ -474,6 +528,8 @@ int doDrawing( unsigned int WIDTH, unsigned int HEIGHT ,
 
 	 GLuint resolutionID = glGetUniformLocation(programFrameBufferID, "iResolution");
 
+     char * retrievedData = (char*) malloc(sizeof(char) * drawWIDTH * drawHEIGHT * 3 );
+     if (retrievedData==0) { return 0;}
 
 	do
      {
@@ -564,11 +620,18 @@ int doDrawing( unsigned int WIDTH, unsigned int HEIGHT ,
                             WIDTH,HEIGHT
                            );
       checkOpenGLError(__FILE__, __LINE__);
+
+     //We generate mipmaps to render to a really small
+     //Texture without destroying quality
      glFlush();
+     glBindTexture(GL_TEXTURE_2D, renderedTexture2);
+     glGenerateMipmap(GL_TEXTURE_2D);
+     glFlush();
+
 
 	 //usleep(100000);
 	 //glFinish();
-    //We have accumulated all data on the framebuffer and will now draw it back..
+     //We have accumulated all data on the framebuffer and will now draw it back..
     drawFramebufferToScreen(
                             finalFramebuffer->ProgramObject, //GLSL Shader to use
                             quad_vertexbuffer,//Rectangle that covers all the screen
@@ -580,8 +643,15 @@ int doDrawing( unsigned int WIDTH, unsigned int HEIGHT ,
                             //Resolution of our Rendered Texture
                             drawWIDTH,drawHEIGHT
                            );
+
+     if ( downloadOpenGLColor(retrievedData,0,0,drawWIDTH,drawHEIGHT) )
+     {
+         calculateScores(retrievedData,tilesToDoX,tilesToDoY,drawWIDTH,drawHEIGHT);
+         //saveRawImageToFileOGLR("retreivedData.pnm",retrievedData,drawWIDTH,drawHEIGHT,3,8);
+     }
+
       checkOpenGLError(__FILE__, __LINE__);
-    glFlush();
+      glFlush();
 	 #else
           drawFramebufferToScreen(
                                   programFrameBufferID,
