@@ -84,7 +84,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 
 
 
-unsigned int calculateScoresForTile(unsigned char * data , unsigned int x1, unsigned int y1,unsigned int width, unsigned int height,unsigned int globalWidth,unsigned int globalHeight)
+float calculateScoresForTile(unsigned char * data , unsigned int x1, unsigned int y1,unsigned int width, unsigned int height,unsigned int globalWidth,unsigned int globalHeight)
 {
   unsigned int tX=0;
   unsigned int tY=0;
@@ -109,8 +109,11 @@ unsigned int calculateScoresForTile(unsigned char * data , unsigned int x1, unsi
   }
 
   //fprintf(stderr,"Score(%u,%u)=%u %u %u\n",tX,tY,sumDistance,sumCorrect,sumRendered);
-
-  return 1;
+  if (sumRendered == 0 ) { sumRendered=1; }
+  //float returnValue = (float) sumDistance * ( (float) sumCorrect/sumRendered );
+  if (sumCorrect == 0 ) { sumCorrect=1; }
+  float returnValue = (float) sumDistance / sumCorrect;
+  return returnValue;
 }
 
 
@@ -121,14 +124,28 @@ int calculateScores(unsigned char * data , unsigned int tilesX, unsigned int til
   unsigned int tWidth=(unsigned int) width/tilesX;
   unsigned int tHeight=(unsigned int) height/tilesY;
 
+
+  unsigned int bestTileX=666,bestTileY=666;
+  float currentScore,bestScore=100000000;
+
   for (tY=0; tY<tilesY; tY++)
   {
    for (tX=0; tX<tilesX; tX++)
    {
        //fprintf(stderr,"calculateScoresForTile(%u,%u) - ",tX,tY);
-       calculateScoresForTile(data,tX*tWidth,tY*tHeight,tWidth,tHeight,width,height);
+       currentScore = calculateScoresForTile(data,tX*tWidth,tY*tHeight,tWidth,tHeight,width,height);
+
+       if (currentScore<=bestScore)
+       {
+          bestTileX=tX;
+          bestTileY=tY;
+          bestScore=currentScore;
+       }
    }
   }
+
+  fprintf(stderr,"Best Tile is %u,%u with %0.2f score \n",bestTileX,bestTileY,currentScore);
+
   return 1;
 }
 
