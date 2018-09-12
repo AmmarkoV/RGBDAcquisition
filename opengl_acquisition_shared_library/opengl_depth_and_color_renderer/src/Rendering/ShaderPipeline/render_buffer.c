@@ -97,22 +97,22 @@ int initializeFramebuffer(
     // ---------------------------------------------
 	// Render to Texture - specific code begins here
 	// ---------------------------------------------
-    fprintf(stderr," initializeFramebuffer running.. \n");
+    //fprintf(stderr," initializeFramebuffer running.. \n");
 
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	glGenFramebuffers(1, FramebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, *FramebufferName);
 
 
-    fprintf(stderr," glGenTextures.. \n");
+    //fprintf(stderr," glGenTextures.. \n");
 	// The texture we're going to render to
 	glGenTextures(1, renderedTexture);
 
-    fprintf(stderr," glBindTexture.. \n");
+    //fprintf(stderr," glBindTexture.. \n");
 	// "Bind" the newly created texture : all future texture functions will modify this texture
 	glBindTexture(GL_TEXTURE_2D, *renderedTexture);
 
-    fprintf(stderr," glTexImage2D.. \n");
+    //fprintf(stderr," glTexImage2D.. \n");
 	// Give an empty image to OpenGL ( the last "0" means "empty" )
 	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width, height, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
 
@@ -122,7 +122,7 @@ int initializeFramebuffer(
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    fprintf(stderr," glFramebufferTexture.. \n");
+    //fprintf(stderr," glFramebufferTexture.. \n");
 	// Set "renderedTexture" as our colour attachement #0
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D, *renderedTexture, 0);
 
@@ -149,7 +149,7 @@ int initializeFramebuffer(
     }
 
 
-    fprintf(stderr," ready to pass draw buffer..\n");
+    //fprintf(stderr," ready to pass draw buffer..\n");
 
 
 	// Set the list of draw buffers.

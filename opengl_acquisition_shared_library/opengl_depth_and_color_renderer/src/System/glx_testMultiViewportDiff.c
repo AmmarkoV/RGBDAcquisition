@@ -54,7 +54,7 @@
 #define tilesToDoX 8
 #define tilesToDoY 8
 #define shrinkingFactor 4 //4
-#define drawShrinkingFactor 16
+#define drawShrinkingFactor 4
 //--------------------------------------------
 
 struct viewerSettings config={0};
