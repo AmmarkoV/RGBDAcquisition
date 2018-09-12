@@ -1,4 +1,5 @@
 #version 130
+#extension GL_EXT_gpu_shader4 : enable    //Include support for this extension, which defines usampler2D
 
 in vec2 UV; 
 out vec3 color;
@@ -10,7 +11,6 @@ uniform vec3 iResolution;
 uniform sampler2D renderedTexture;  
 
 //This is for unsigned short textures
-#extension GL_EXT_gpu_shader4 : enable    //Include support for this extension, which defines usampler2D
 uniform usampler2D diffedTexture;
 
 uniform float iTime;

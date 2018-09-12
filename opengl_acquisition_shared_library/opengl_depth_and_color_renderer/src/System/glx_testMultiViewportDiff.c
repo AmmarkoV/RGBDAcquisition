@@ -465,6 +465,7 @@ int doDrawing( unsigned int WIDTH, unsigned int HEIGHT ,
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE);
 
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
@@ -509,6 +510,7 @@ int doDrawing( unsigned int WIDTH, unsigned int HEIGHT ,
 
      GLuint FramebufferName2; // This framebuffer is the second framebuffer to use and will have renderedTexture2 assigned to it
      GLuint renderedTexture2; // This texture will hold our result
+     fprintf(stderr,"Initializing framebuffers..\n");
      initializeFramebuffer(&FramebufferName2,&renderedTexture2,0/*depth*/,WIDTH,HEIGHT);
 
 
@@ -516,6 +518,7 @@ int doDrawing( unsigned int WIDTH, unsigned int HEIGHT ,
      GLuint renderedTexture;
      //GLuint renderedDepth;
      initializeFramebuffer(&FramebufferName,&renderedTexture,0 /*&renderedDepth*/,WIDTH,HEIGHT);
+     fprintf(stderr,"Done..\n");
 
 	 GLuint quad_vertexbuffer;
 	 glGenBuffers(1, &quad_vertexbuffer);
