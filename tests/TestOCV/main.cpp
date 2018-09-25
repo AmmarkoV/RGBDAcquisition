@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 
+using namespace cv;
 
 void drawLine( cv::Mat img,
                unsigned int x1,unsigned int y1,
@@ -32,6 +33,30 @@ void drawLine( cv::Mat img,
 }
 
 
+int webcamProgram()
+{
+
+
+    VideoCapture cap;
+    // open the default camera, use something different from 0 otherwise;
+    // Check VideoCapture documentation.
+    if(!cap.open(0))
+        return 0;
+    for(;;)
+    {
+          Mat frame;
+          cap >> frame;
+          if( frame.empty() ) break; // end of video stream
+          imshow("this is you, smile! :)", frame);
+          if( waitKey(10) == 27 ) break; // stop capturing by pressing ESC
+    }
+    // the camera will be closed automatically upon exit
+    // cap.close();
+
+
+}
+
+
 int main (int argc,const char *argv[])
 {
     cv::Mat image = cv::imread("lena.jpeg", CV_LOAD_IMAGE_COLOR);
@@ -39,6 +64,20 @@ int main (int argc,const char *argv[])
     drawLine(image,30,30,40,40 , 255,0,0 );
 
     cv::imshow("Test",image);
+
+
+
+
+
+
+
+    //webcamProgram();
+
+
+
+
+
+
 
     cv::waitKey(0);
 
