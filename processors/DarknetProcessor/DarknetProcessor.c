@@ -13,6 +13,7 @@
 #define GPU 1
 #include "../../3dparty/darknet/include/darknet.h"
 
+int mode=0; //0 = detector, 1=classifier
 int haveInitialization=0;
 int produceFileOutput=1;
 int produceRGBOutput=1;
@@ -128,7 +129,7 @@ int internalDarknetInitialization(
     //We can also parse the data file to load settings..
     if (datafile!=0)
     {
-     fprintf(stderr,"Data file %s is going to override parameters..");
+     fprintf(stderr,"Data file `%s` is going to override parameters..",datafile);
      list *options   = read_data_cfg(datafile);
      if (options!=0)
      {
@@ -199,6 +200,8 @@ int initArgs_DarknetProcessor(int argc, char *argv[])
    if (strstr(argv[i],"--payload")!=0)         { payload=argv[i+1]; } else
    if (strstr(argv[i],"--threshold")!=0)       { threshold=atof(argv[i+1]); } else
    if (strstr(argv[i],"--nms")!=0)             { nms=atof(argv[i+1]); } else
+   if (strstr(argv[i],"--detector")!=0)        { mode=0; } else
+   if (strstr(argv[i],"--classifier")!=0)      { mode=1; } else
    if (strstr(argv[i],"--noVisualization")!=0) { produceRGBOutput=0; } else
    if (strstr(argv[i],"--noFileOutput")!=0)    { produceFileOutput=0; } else
    if (strstr(argv[i],"--fast")!=0)            { produceFileOutput=0; produceRGBOutput=0; }
@@ -339,6 +342,139 @@ int receiveDetection(
 }
 
 
+
+
+
+
+
+int doDetector(image * im, layer * l ,  void * data, unsigned int width, unsigned int height)
+{
+  //We got back something which needs to be decoded
+
+  //This will hold the number of boxes
+     int nboxes = 0;
+
+     //We get back the detections as per the YOLO paper
+     dc.dets = get_network_boxes(dc.net, 1, 1, dc.threshold, 0, 0, 0, &nboxes);
+
+     //The detections are sorted and duplicates discarded
+     if (dc.nms) { do_nms_sort(dc.dets, l->w*l->h*l->n, l->classes, dc.nms); }
+
+     //Detections are detected..! :P
+     get_detection_detections(*l, 1 , 1 , dc.threshold, dc.dets);
+
+
+     //This is just to log time..
+     time_t clock = time(NULL);
+     struct tm * currentTime = gmtime ( &clock );
+
+
+     //Rectangles, labels etc are added to im
+     int num = l->side*l->side*l->n;
+     draw_detections(*im, dc.dets,num, dc.threshold, dc.names, dc.alphabet, l->classes);
+
+
+     //This is the directory we want to dump output ( plus the date )
+     char directoryToUse[1024];
+     snprintf(directoryToUse,1024,"%u_%02u_%02u", EPOCH_YEAR_IN_TM_YEAR+currentTime->tm_year, currentTime->tm_mon+1, currentTime->tm_mday);
+     useLoggingDirectory(directoryToUse);
+
+
+     //This surveilance.log will be appended with the last results
+     char logFile[1024];
+     snprintf(logFile,1024,"%s/surveilance.log",directoryToUse);
+
+     FILE * fp = startLogging(logFile);
+
+     //Go Through all detections
+     unsigned int i=0,j=0;
+     for(i = 0; i < nboxes; ++i)
+      {
+        for(j = 0; j < l->classes; ++j)
+        {
+            //If probability is not zero
+            if (dc.dets[i].prob[j])
+            {
+              //This detection is important and we need to consider it
+              receiveDetection(
+                              data, width, height ,
+                              im,
+                              //Detection Stuff
+                              j,                  //Class
+                              dc.dets[i].prob[j], //Probability
+                              dc.dets[i].bbox.x,  //X
+                              dc.dets[i].bbox.y,  //Y
+                              dc.dets[i].bbox.w,  //Width
+                              dc.dets[i].bbox.h,  //Height
+                              //System stuff
+                              fp,
+                              directoryToUse,
+                              currentTime,
+                              framesProcessed
+                            );
+            }
+        }
+    }
+
+    //Free Detections
+    free_detections(dc.dets,nboxes);
+
+    //Done with current frame
+    fflush(fp);
+    stopLogging(fp);
+
+    //If we have OpenCV enabled in Darknet build this will output a window
+    //show_image(*im, "predictions");
+
+
+
+}
+
+
+
+int doClassifier(image * im, layer * l ,  float *predictions, void * data, unsigned int width, unsigned int height)
+{
+
+
+#ifdef GPU
+        cuda_pull_array(l->output_gpu, l->output, l->outputs);
+#endif
+        unsigned int i;
+        /*
+        for(i = 0; i < l->outputs; ++i)
+        {
+            printf("%f\n", l->output[i]);
+        }*/
+        /*
+
+           printf("\n\nWeights\n");
+           for(i = 0; i < l.n*l.size*l.size*l.c; ++i){
+           printf("%f\n", l.filters[i]);
+           }
+
+           printf("\n\nBiases\n");
+           for(i = 0; i < l.n; ++i){
+           printf("%f\n", l.biases[i]);
+           }
+         */
+        int top=5;
+        int *indexes = calloc(top, sizeof(int));
+
+        top_predictions(dc.net, top, indexes);
+        printf("Predicted \n");
+        for(i = 0; i < top; ++i)
+        {
+            int index = indexes[i];
+            printf("%s: %f\n", dc.names[index], predictions[index]);
+        }
+
+        free(indexes);
+}
+
+
+
+
+
 int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel)
 {
  if (!haveInitialization)
@@ -372,83 +508,12 @@ int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned in
 
 
     if (prediction!=0)
-    {//We got back something which needs to be decoded
-
-
-     //This will hold the number of boxes
-     int nboxes = 0;
-
-     //We get back the detections as per the YOLO paper
-     dc.dets = get_network_boxes(dc.net, 1, 1, dc.threshold, 0, 0, 0, &nboxes);
-
-     //The detections are sorted and duplicates discarded
-     if (dc.nms) { do_nms_sort(dc.dets, l.w*l.h*l.n, l.classes, dc.nms); }
-
-     //Detections are detected..! :P
-     get_detection_detections(l, 1 , 1 , dc.threshold, dc.dets);
-
-
-     //This is just to log time..
-     time_t clock = time(NULL);
-     struct tm * currentTime = gmtime ( &clock );
-
-
-     //Rectangles, labels etc are added to im
-     int num = l.side*l.side*l.n;
-     draw_detections(im, dc.dets,num, dc.threshold, dc.names, dc.alphabet, l.classes);
-
-
-     //This is the directory we want to dump output ( plus the date )
-     char directoryToUse[1024];
-     snprintf(directoryToUse,1024,"%u_%02u_%02u", EPOCH_YEAR_IN_TM_YEAR+currentTime->tm_year, currentTime->tm_mon+1, currentTime->tm_mday);
-     useLoggingDirectory(directoryToUse);
-
-
-     //This surveilance.log will be appended with the last results
-     char logFile[1024];
-     snprintf(logFile,1024,"%s/surveilance.log",directoryToUse);
-
-     FILE * fp = startLogging(logFile);
-
-     //Go Through all detections
-     unsigned int i=0,j=0;
-     for(i = 0; i < nboxes; ++i)
+    {
+      switch (mode)
       {
-        for(j = 0; j < l.classes; ++j)
-        {
-            //If probability is not zero
-            if (dc.dets[i].prob[j])
-            {
-              //This detection is important and we need to consider it
-              receiveDetection(
-                              data, width, height ,
-                              &im,
-                              //Detection Stuff
-                              j,                  //Class
-                              dc.dets[i].prob[j], //Probability
-                              dc.dets[i].bbox.x,  //X
-                              dc.dets[i].bbox.y,  //Y
-                              dc.dets[i].bbox.w,  //Width
-                              dc.dets[i].bbox.h,  //Height
-                              //System stuff
-                              fp,
-                              directoryToUse,
-                              currentTime,
-                              framesProcessed
-                            );
-            }
-        }
-    }
-
-    //Free Detections
-    free_detections(dc.dets,nboxes);
-
-    //Done with current frame
-    fflush(fp);
-    stopLogging(fp);
-
-    //If we have OpenCV enabled in Darknet build this will output a window
-    //show_image(im, "predictions");
+        case 0: doDetector(&im,&l,data,width,height); break;
+        case 1: doClassifier(&im,&l,prediction,data,width,height); break;
+      }
     } else
     {
      fprintf(stderr,"Failed to run network ( prediction points to %p )..\n",prediction);
