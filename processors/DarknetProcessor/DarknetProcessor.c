@@ -18,6 +18,20 @@ int haveInitialization=0;
 int produceFileOutput=1;
 int produceRGBOutput=1;
 
+
+
+struct darknetDetectorResult
+{
+ char label[128];
+ float probability;
+};
+#define detectorReturnTopNResults 5
+struct darknetDetectorResult detectorResults[detectorReturnTopNResults]={0};
+
+
+
+
+
 //A structure that holds all the stuff
 struct darknetContext
 {
@@ -434,19 +448,15 @@ int doDetector(image * im, layer * l ,  void * data, unsigned int width, unsigne
 
 int doClassifier(image * im, layer * l ,  float *predictions, void * data, unsigned int width, unsigned int height)
 {
-
-
-#ifdef GPU
+ #ifdef GPU
         cuda_pull_array(l->output_gpu, l->output, l->outputs);
-#endif
+ #endif
         unsigned int i;
         /*
-        for(i = 0; i < l->outputs; ++i)
-        {
+           for(i = 0; i < l->outputs; ++i)
+           {
             printf("%f\n", l->output[i]);
-        }*/
-        /*
-
+           }
            printf("\n\nWeights\n");
            for(i = 0; i < l.n*l.size*l.size*l.c; ++i){
            printf("%f\n", l.filters[i]);
@@ -456,19 +466,35 @@ int doClassifier(image * im, layer * l ,  float *predictions, void * data, unsig
            for(i = 0; i < l.n; ++i){
            printf("%f\n", l.biases[i]);
            }
-         */
-        int top=5;
-        int *indexes = calloc(top, sizeof(int));
+       */
+        int *indexes = calloc(detectorReturnTopNResults, sizeof(int));
 
-        top_predictions(dc.net, top, indexes);
+        top_predictions(dc.net, detectorReturnTopNResults, indexes);
         printf("Predicted \n");
-        for(i = 0; i < top; ++i)
+        for(i = 0; i < detectorReturnTopNResults; ++i)
         {
             int index = indexes[i];
             printf("%s: %f\n", dc.names[index], predictions[index]);
+            snprintf(detectorResults[i].label,128,"%s",dc.names[index]);
+            detectorResults[i].probability = predictions[index];
         }
 
         free(indexes);
+}
+
+
+
+char * getDetectionLabel_DarknetProcessor(unsigned int detectionNumber)
+{
+  if (detectionNumber>=detectorReturnTopNResults) { return 0; }
+  return detectorResults[detectionNumber].label;
+}
+
+
+float getDetectionProbability_DarknetProcessor(unsigned int detectionNumber)
+{
+  if (detectionNumber>=detectorReturnTopNResults) { return 0.0; }
+  return detectorResults[detectionNumber].probability;
 }
 
 
@@ -580,6 +606,10 @@ int stop_DarknetProcessor()
 
 
 
+unsigned char * getDataOutput_DarknetProcessor(unsigned int stream , unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)
+{
+  return 0;
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -595,7 +625,6 @@ int stop_DarknetProcessor()
 // ---------------------------------------------------------------------------------------------------------
 int setConfigStr_DarknetProcessor(char * label,char * value) { return 0; }
 int setConfigInt_DarknetProcessor(char * label,int value)    { return 0; }
-unsigned char * getDataOutput_DarknetProcessor(unsigned int stream , unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel) { return 0; }
 int processData_DarknetProcessor() { return 0; }
 int cleanup_DarknetProcessor()     { return 0; }
 unsigned short * getDepth_DarknetProcessor(unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel)  { return 0; }

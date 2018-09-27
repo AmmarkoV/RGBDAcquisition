@@ -22,6 +22,9 @@ int setConfigStr_DarknetProcessor(char * label,char * value);
 int setConfigInt_DarknetProcessor(char * label,int value);
 
 
+char * getDetectionLabel_DarknetProcessor(unsigned int detectionNumber);
+float getDetectionProbability_DarknetProcessor(unsigned int detectionNumber);
+
 unsigned char * getDataOutput_DarknetProcessor(unsigned int stream , unsigned int * width, unsigned int * height,unsigned int * channels,unsigned int * bitsperpixel);
 int addDataInput_DarknetProcessor(unsigned int stream , void * data, unsigned int width, unsigned int height,unsigned int channels,unsigned int bitsperpixel);
 
