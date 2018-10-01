@@ -3,6 +3,15 @@
 FROMDATASET="$1"
 TODATASET="$2" 
 X=$3
+
+
+if (( $# != 3 )); then
+    echo "Please run giving the path to download and build"
+    echo "$0 \"DatasetNameSource\" \"DatasetNameTarget\" SplitDatasetAtXFrame " 
+   exit 0
+fi
+
+
 TOTAL_FRAMES=100000
 
 cd $FROMDATASET
