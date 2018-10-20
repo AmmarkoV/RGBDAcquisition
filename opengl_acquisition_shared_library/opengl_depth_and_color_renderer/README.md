@@ -17,7 +17,7 @@ make
 
 ## Running
 ------------------------------------------------------------------ 
-To run you basically feed the Renderer with a scene file and you get back an OpenGL window where you can see what is happening.
+To run you feed the Renderer with a scene file and you get back an OpenGL window where you can see what is happening.
 Editing the scene file updates results live on the Renderer 
 
 
