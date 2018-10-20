@@ -35,7 +35,14 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
-			<Add option="`wx-config --libs`" />
+			<Add option="`wx-config --libs`" /> 
+			<Add library="png" />
+			<Add library="jpeg" />
+			<Add library="GL" />
+			<Add library="GLU" />
+			<Add library="X11" />
+			<Add library="./libOGLRendererSandbox.so" />
+			<Add directory="../../" />
 		</Linker>
 		<Unit filename="ModelPoserApp.cpp" />
 		<Unit filename="ModelPoserApp.h" />
