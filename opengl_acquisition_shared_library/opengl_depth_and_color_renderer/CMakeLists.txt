@@ -27,7 +27,7 @@ ENDIF( ENABLE_AMMARSERVER )
 set(CODECS_DIRECTORY "../../tools/Codecs") 
 add_subdirectory ( ${CODECS_DIRECTORY} RGBDAcquisition/Codecs)
 
-add_subdirectory (src/)
+add_subdirectory (src/Library)
 
 
 IF( ENABLE_ASSIMP )

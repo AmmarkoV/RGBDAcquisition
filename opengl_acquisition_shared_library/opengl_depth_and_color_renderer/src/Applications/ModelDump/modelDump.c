@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "../../OGLRendererSandbox.h"
+#include "../../Library/OGLRendererSandbox.h"
 
 
 int main(int argc, char **argv)

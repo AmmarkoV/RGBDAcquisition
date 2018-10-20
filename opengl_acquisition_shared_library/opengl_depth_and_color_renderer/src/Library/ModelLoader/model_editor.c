@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../../tools/AmMatrix/matrixCalculations.h"
 
 int punchHoleThroughModel(
                           struct TRI_Model * triModel ,

@@ -12,7 +12,7 @@
 
 
 #if USE_CODECS_LIBRARY
- #include "../../../../tools/Codecs/codecs.h"
+ #include "../../../../../tools/Codecs/codecs.h"
 #else
  #warning "NOT USING CODECS LIBRARY MEANS NO TEXTURES LOADED"
 #endif // USE_CODECS_LIBRARY

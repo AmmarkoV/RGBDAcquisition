@@ -3,8 +3,8 @@
 #include "tiledRenderer.h"
 
 #include <stdio.h>
-#include "../../../../tools/AmMatrix/matrixOpenGL.h"
-#include "../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../../tools/AmMatrix/matrixOpenGL.h"
+#include "../../../../../tools/AmMatrix/matrixCalculations.h"
 
 #include "../TrajectoryParser/TrajectoryParser.h"
 

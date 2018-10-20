@@ -16,9 +16,9 @@
 #define YELLOW  "\033[33m"      /* Yellow */
 
 
-#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
-#include "../../../../tools/AmMatrix/matrixCalculations.h"
-#include "../../../../tools/AmMatrix/quaternions.h"
+#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../../tools/AmMatrix/quaternions.h"
 
 
 

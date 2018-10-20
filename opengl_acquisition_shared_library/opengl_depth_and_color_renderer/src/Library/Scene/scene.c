@@ -10,9 +10,9 @@
 
 #include "../Tools/tools.h"
 
-#include "../../../../tools/AmMatrix/matrixCalculations.h"
-#include "../../../../tools/AmMatrix/matrixOpenGL.h"
-#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../../tools/AmMatrix/matrixOpenGL.h"
+#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #include "../TrajectoryParser/TrajectoryCalculator.h"
 #include "../ModelLoader/model_loader.h"

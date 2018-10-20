@@ -37,9 +37,9 @@
 #include "Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h"
 #include "Rendering/tiledRenderer.h"
 
-#include "../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../tools/AmMatrix/matrixCalculations.h"
 
-#include "../../../tools/ImageOperations/imageOps.h"
+#include "../../../../tools/ImageOperations/imageOps.h"
 
 
 #include "OGLRendererSandbox.h"

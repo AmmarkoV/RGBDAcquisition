@@ -16,7 +16,7 @@
 #include "model_loader_obj.h"
 #include "../Tools/tools.h"
 
-#include "../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../../tools/AmMatrix/matrixCalculations.h"
 
 #define DISABLE_GL_CALL_LIST 0
 #if DISABLE_GL_CALL_LIST

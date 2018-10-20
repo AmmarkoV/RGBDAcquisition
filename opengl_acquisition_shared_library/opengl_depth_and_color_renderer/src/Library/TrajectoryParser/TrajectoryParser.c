@@ -28,8 +28,8 @@
 #include "TrajectoryPrimitives.h"
 
 #include "../ModelLoader/model_loader.h"
-#include "../../../../tools/AmMatrix/matrixCalculations.h"
-#include "../../../../tools/AmMatrix/quaternions.h"
+#include "../../../../../tools/AmMatrix/matrixCalculations.h"
+#include "../../../../../tools/AmMatrix/quaternions.h"
 //Using normalizeQuaternionsTJP #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include <stdio.h>
 #include <stdlib.h>

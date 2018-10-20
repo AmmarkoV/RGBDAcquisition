@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.h"
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/InputParser_C.h"
 
 int acquisitionExecuteString(struct InputParserC * ipc,struct acquisitionModuleStates * state, ModuleIdentifier moduleID,DeviceIdentifier devID,const char * command)
 {

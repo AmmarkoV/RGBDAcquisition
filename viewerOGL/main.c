@@ -37,12 +37,12 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
     return 0;
 }
 
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/System/glx3.h"
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/shader_loader.h"
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Tools/tools.h"
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/ModelLoader/hardcoded_shapes.h"
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/render_buffer.h"
-#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Rendering/ShaderPipeline/uploadGeometry.h"
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/System/glx3.h"
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Rendering/ShaderPipeline/shader_loader.h"
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Tools/tools.h"
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/hardcoded_shapes.h"
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Rendering/ShaderPipeline/render_buffer.h"
+#include "../opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Rendering/ShaderPipeline/uploadGeometry.h"
 
 #include "../tools/AmMatrix/matrix4x4Tools.h"
 #include "../tools/AmMatrix/matrixOpenGL.h"

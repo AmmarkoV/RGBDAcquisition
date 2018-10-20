@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "../../TrajectoryParser/InputParser_C.h"
+#include "../../Library/TrajectoryParser/InputParser_C.h"
 
 #define MAX_JOINTS 128
 

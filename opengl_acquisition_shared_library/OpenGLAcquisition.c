@@ -9,7 +9,7 @@
 #include "../acquisition/Acquisition.h"
 #include <string.h>
 
-#include "opengl_depth_and_color_renderer/src/OGLRendererSandbox.h"
+#include "opengl_depth_and_color_renderer/src/Library/OGLRendererSandbox.h"
 
 unsigned int openGL_WIDTH=640;
 unsigned int openGL_HEIGHT=480;
