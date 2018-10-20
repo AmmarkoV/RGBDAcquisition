@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "../OGLRendererSandbox.h"
+#include "../../OGLRendererSandbox.h"
 
 
 #include <GL/glx.h>    /* this includes the necessary X headers */
@@ -19,10 +19,10 @@
 #include <X11/X.h>    /* X11 constant (e.g. TrueColor) */
 #include <X11/keysym.h>
 
-#include "../System/glx.h"
-#include "../Scene/scene.h"
+#include "../../System/glx.h"
+#include "../../Scene/scene.h"
 
-#include "../TrajectoryParser/TrajectoryParserDataStructures.h"
+#include "../../TrajectoryParser/TrajectoryParserDataStructures.h"
 
 
 

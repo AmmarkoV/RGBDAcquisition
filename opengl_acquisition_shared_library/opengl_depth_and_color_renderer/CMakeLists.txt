@@ -36,14 +36,14 @@ ENDIF( ENABLE_ASSIMP )
 
 #First to make our handy tools
 IF( ENABLE_SHADERS )
-add_subdirectory (src/GameEngine/)
+add_subdirectory (src/Applications/GameEngine/)
 ENDIF( ENABLE_SHADERS )
 
 
-add_subdirectory (src/Renderer/)
-add_subdirectory (src/Comparer/)
-add_subdirectory (src/ModelDump/)
-add_subdirectory (src/ModelMotionAnalysis/)
+add_subdirectory (src/Applications/Renderer/)
+add_subdirectory (src/Applications/Comparer/)
+add_subdirectory (src/Applications/ModelDump/)
+add_subdirectory (src/Applications/ModelMotionAnalysis/)
  
  
 
