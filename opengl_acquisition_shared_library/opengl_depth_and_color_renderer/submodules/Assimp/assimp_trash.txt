@@ -2,10 +2,10 @@
 
 /*
 
-void readNodeHeirarchyNEW(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
+void readNodeHierarchyNEW(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
 {
     //Print out node tree with space seperated readable form
-    if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
+    if (recursionLevel==0)    { fprintf(stderr,"readNodeHierarchy : \n"); } else
                               { fprintf(stderr,"   "); }
     fprintf(stderr,"%s\n" , pNode->mName.data);
 
@@ -78,7 +78,7 @@ void readNodeHeirarchyNEW(const aiMesh * mesh , const aiNode* pNode,  struct bon
     bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
     for ( i = 0 ; i < pNode->mNumChildren ; i++)
     {
-        readNodeHeirarchyNEW(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+        readNodeHierarchyNEW(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
     }
 }
 

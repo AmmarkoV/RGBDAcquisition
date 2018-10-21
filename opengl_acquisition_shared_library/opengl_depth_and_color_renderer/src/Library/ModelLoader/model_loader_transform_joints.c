@@ -656,7 +656,7 @@ float * mallocModelTransformJointsEulerAnglesDegrees(
 
 
 /* This is direct setting of the joint data , overwriting default values */
-void recursiveJointHeirarchyTransformerDirect(
+void recursiveJointHierarchyTransformerDirect(
                                          struct TRI_Model * in  ,
                                          int curBone ,
                                          double * parentTransformUntouched ,
@@ -696,7 +696,7 @@ void recursiveJointHeirarchyTransformerDirect(
      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
       {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
-        recursiveJointHeirarchyTransformerDirect(
+        recursiveJointHierarchyTransformerDirect(
                                            in  ,
                                            curBoneChild ,
                                            globalTransformation ,
@@ -710,7 +710,7 @@ void recursiveJointHeirarchyTransformerDirect(
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
-        recursiveJointHeirarchyTransformerDirect(
+        recursiveJointHierarchyTransformerDirect(
                                            in  ,
                                            curBoneChild ,
                                            globalTransformation ,
@@ -728,7 +728,7 @@ void recursiveJointHeirarchyTransformerDirect(
 
 
 
-void recursiveJointHeirarchyTransformer(
+void recursiveJointHierarchyTransformer(
                                          struct TRI_Model * in  ,
                                          int curBone ,
                                          double * parentLocalTransformationUntouched ,
@@ -783,7 +783,7 @@ void recursiveJointHeirarchyTransformer(
      for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
       {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
-        recursiveJointHeirarchyTransformer(
+        recursiveJointHierarchyTransformer(
                                            in  ,
                                            curBoneChild ,
                                            globalTransformation ,
@@ -797,7 +797,7 @@ void recursiveJointHeirarchyTransformer(
       for ( i = 0 ; i < in->bones[curBone].info->numberOfBoneChildren; i++)
        {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
-        recursiveJointHeirarchyTransformer(
+        recursiveJointHierarchyTransformer(
                                            in  ,
                                            curBoneChild ,
                                            globalTransformation ,
@@ -947,10 +947,10 @@ int doModelTransform(
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   if (directSettingOfMatrices)
   {
-    recursiveJointHeirarchyTransformerDirect( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
+    recursiveJointHierarchyTransformerDirect( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
   } else
   {
-    recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
+    recursiveJointHierarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
   }
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

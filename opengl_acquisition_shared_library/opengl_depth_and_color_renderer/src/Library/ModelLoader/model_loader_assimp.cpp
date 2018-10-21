@@ -69,10 +69,10 @@ static float defaultJointsOffsetZXY[] = {
 
 /*
 
-void readNodeHeirarchyNEW(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
+void readNodeHierarchyNEW(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
 {
     //Print out node tree with space seperated readable form
-    if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
+    if (recursionLevel==0)    { fprintf(stderr,"readNodeHierarchy : \n"); } else
                               { fprintf(stderr,"   "); }
     fprintf(stderr,"%s\n" , pNode->mName.data);
 
@@ -145,7 +145,7 @@ void readNodeHeirarchyNEW(const aiMesh * mesh , const aiNode* pNode,  struct bon
     bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
     for ( i = 0 ; i < pNode->mNumChildren ; i++)
     {
-        readNodeHeirarchyNEW(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+        readNodeHierarchyNEW(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
     }
 }
 
@@ -374,10 +374,10 @@ void populateInternalRigState(struct aiScene *scene , int meshNumber, struct bon
 }
 
 
-void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
+void readNodeHierarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct boneState * bones , struct skeletonHuman * sk, aiMatrix4x4 & ParentTransform , unsigned int recursionLevel)
 {
 
-    if (recursionLevel==0)    { fprintf(stderr,"readNodeHeirarchy : \n"); } else
+    if (recursionLevel==0)    { fprintf(stderr,"readNodeHierarchy : \n"); } else
                               {  fprintf(stderr,"   "); }
     fprintf(stderr,"%s\n" , pNode->mName.data);
 
@@ -442,7 +442,7 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
     bones->bone[boneNumber].finalTransform = m_GlobalInverseTransform * GlobalTransformation * bones->bone[boneNumber].boneInverseBindTransform;
     for ( i = 0 ; i < pNode->mNumChildren ; i++)
     {
-        readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+        readNodeHierarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
     }
     } else
     {
@@ -450,7 +450,7 @@ void readNodeHeirarchyOLD(const aiMesh * mesh , const aiNode* pNode,  struct bon
       fprintf(stderr,"        <!%s!>\n",pNode->mName.data);
        for ( i = 0 ; i < pNode->mNumChildren ; i++)
        {
-         readNodeHeirarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
+         readNodeHierarchyOLD(mesh,pNode->mChildren[i],bones,sk,GlobalTransformation,recursionLevel+1);
        }
     }
 }
@@ -473,7 +473,7 @@ void transformMeshBasedOnSkeleton(struct aiScene *scene , int meshNumber , struc
     //After we have it we can now use it to read the node heirarchy
     aiMatrix4x4 Identity;
     aiMakeIdentity(&Identity);
-    readNodeHeirarchyOLD(mesh,scene->mRootNode,&modifiedSkeleton,sk,Identity,0);
+    readNodeHierarchyOLD(mesh,scene->mRootNode,&modifiedSkeleton,sk,Identity,0);
 
     //We NEED to clear the vertices and normals since they are added uppon , not having
     //the next two lines results in really weird and undebuggable visual behaviour
