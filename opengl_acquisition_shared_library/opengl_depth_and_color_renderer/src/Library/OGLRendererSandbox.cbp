@@ -156,6 +156,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ModelLoader/model_processor.h" />
+		<Unit filename="MotionCaptureLoader/bvh_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/bvh_loader.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c">
 			<Option compilerVar="CC" />
