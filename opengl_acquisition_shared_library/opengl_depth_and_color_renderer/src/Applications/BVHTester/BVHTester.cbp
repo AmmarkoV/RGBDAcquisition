@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../../BVHTester" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../BVHTester" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="./" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
@@ -20,7 +20,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="../../BVHTester" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../BVHTester" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="./" />
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
@@ -40,13 +40,19 @@
 		<Linker>
 			<Add library="png" />
 			<Add library="jpeg" />
-			<Add library="assimp" />
 			<Add library="GL" />
 			<Add library="GLU" />
 			<Add library="X11" />
-			<Add library="./libOGLRendererSandbox.so" />
 			<Add directory="../../" />
 		</Linker>
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_loader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_loader.h" />
+		<Unit filename="../../Library/TrajectoryParser/InputParser_C.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/TrajectoryParser/InputParser_C.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
