@@ -53,6 +53,9 @@ struct BVH_MotionCapture
 
 
   //Motion
+  unsigned int numberOfValuesPerFrame;
+  unsigned int motionValuesSize;
+  float * motionValues;
 
   //Internal Variables..
 

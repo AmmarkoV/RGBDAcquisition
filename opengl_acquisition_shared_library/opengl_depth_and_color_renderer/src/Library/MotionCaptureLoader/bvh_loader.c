@@ -7,6 +7,15 @@
 
 int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion , char * parameters)
 {
+   if (
+         (bvhMotion->motionValues==0) ||
+         (bvhMotion->motionValuesSize==0)
+      )
+   {
+     fprintf(stderr,"cannot pushNewBVHMotionState without space to store new information\n");
+     return 0;
+   }
+
    struct InputParserC * ipc = InputParser_Create(1024,5);
    if (ipc==0) { return 0; }
 
@@ -18,17 +27,26 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion , char * paramete
 
    unsigned int i=0;
    int numberOfParameters = InputParser_SeperateWords(ipc,parameters,1);
+   fprintf(stderr,"MOTION command has %u parameters\n",numberOfParameters);
 
    if (numberOfParameters>0)
    {
-       bvhMotion->numberOfFramesEncountered++;
-   }
+     if (numberOfParameters + bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame < bvhMotion->motionValuesSize+1)
+     {
+      fprintf(stderr,
+              "Filling from %u to %u \n",
+              bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame,
+              numberOfParameters+bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame
+             );
 
-   for (i=0; i<numberOfParameters; i++)
-   {
-       fprintf(stderr,"P%u=%0.2f ",i,InputParser_GetWordFloat(ipc,i));
+      for (i=0; i<numberOfParameters; i++)
+      {
+        //fprintf(stderr,"P%u=%0.2f ",i,InputParser_GetWordFloat(ipc,i));
+        bvhMotion->motionValues[i+bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame] = InputParser_GetWordFloat(ipc,i);
+      }
+     }
+     bvhMotion->numberOfFramesEncountered++;
    }
-
 
    InputParser_Destroy(ipc);
    return 1;
@@ -80,6 +98,13 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
          if (InputParser_WordCompareAuto(ipc,0,"Frames"))      { bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1); } else
          if (InputParser_WordCompareAuto(ipc,0,"Frame Time"))  { bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1); }      else
          {
+           if (bvhMotion->motionValues==0)
+           {
+             //If we haven't yet allocated a motionValues array we need to do so now..!
+             bvhMotion->motionValuesSize = bvhMotion->numberOfFrames * bvhMotion->numberOfValuesPerFrame;
+             bvhMotion->motionValues = (float*)  malloc(sizeof(float) * (1+bvhMotion->motionValuesSize));
+           }
+
            //This is motion input
            InputParser_GetWord(ipc,0,str,512);
            pushNewBVHMotionState(bvhMotion,str);
@@ -87,6 +112,8 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
          }
        }
     }
+
+   InputParser_Destroy(ipc);
   }
 
   fprintf(
@@ -103,7 +130,48 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
 int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 {
-  fprintf(stderr,"Skipping header for now..\n");
+  bvhMotion->numberOfValuesPerFrame = 57;
+
+
+
+  int atHeaderSection=0;
+  ssize_t read;
+  unsigned int frameNumber =0;
+
+  if (fd!=0)
+  {
+   struct InputParserC * ipc = InputParser_Create(1024,5);
+
+   InputParser_SetDelimeter(ipc,0,':');
+   InputParser_SetDelimeter(ipc,1,'[');
+   InputParser_SetDelimeter(ipc,2,',');
+   InputParser_SetDelimeter(ipc,3,']');
+   InputParser_SetDelimeter(ipc,4,'\n');
+
+    char str[512];
+    char * line = NULL;
+    size_t len = 0;
+
+    while ((read = getline(&line, &len, fd)) != -1)
+    {
+       printf("Retrieved line of length %zu :\n", read);
+       printf("%s", line);
+       int num = InputParser_SeperateWords(ipc,line,1);
+       if (!atHeaderSection)
+       {
+          if (InputParser_WordCompareAuto(ipc,0,"HIERARCHY"))      { atHeaderSection=1; }
+       } else
+       {
+         //TODO :
+
+       }
+    }
+
+   InputParser_Destroy(ipc);
+  }
+
+
+ return atHeaderSection;
 }
 
 
