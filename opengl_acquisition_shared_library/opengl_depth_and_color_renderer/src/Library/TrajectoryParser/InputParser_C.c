@@ -638,8 +638,9 @@ float InputParser_GetWordFloat(struct InputParserC * ipc,unsigned int num)
     */
     sscanf(string_segment,"%f",&return_value);
    #else
-    //fprintf(stderr,"Using atof to parse %s \n",string_segment);
+    //fprintf(stderr,"Using atof to parse `%s` \n",string_segment);
     return_value=atof(string_segment);
+    //fprintf(stderr,"Returns `%0.6f` \n",return_value);
    #endif // USE_SCANF
 
 

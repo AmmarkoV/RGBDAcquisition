@@ -44,7 +44,8 @@ struct BVH_MotionCapture
 {
   //Header
   unsigned int numberOfFrames;
-  unsigned int frameTime;
+  unsigned int numberOfFramesEncountered;
+  float frameTime;
 
 
   //Joint Hierarchy
