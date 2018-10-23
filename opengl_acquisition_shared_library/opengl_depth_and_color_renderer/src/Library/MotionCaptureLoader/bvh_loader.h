@@ -49,7 +49,9 @@ struct BVH_MotionCapture
 
 
   //Joint Hierarchy
-
+  unsigned int MAX_jointHierarchySize;
+  unsigned int jointHierarchySize;
+  struct BVH_Joint jointHierarchy[128];
 
 
   //Motion
