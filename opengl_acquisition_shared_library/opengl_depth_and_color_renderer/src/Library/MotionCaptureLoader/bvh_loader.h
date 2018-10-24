@@ -23,15 +23,32 @@
 enum CHANNEL_NAMES
 {
   BVH_POSITION_NONE=0,
-  BVH_POSITION_X,
-  BVH_POSITION_Y,
-  BVH_POSITION_Z,
   BVH_ROTATION_X,
   BVH_ROTATION_Y,
   BVH_ROTATION_Z,
+  BVH_POSITION_X,
+  BVH_POSITION_Y,
+  BVH_POSITION_Z,
   //--------------------
   BVH_VALID_CHANNEL_NAMES
 };
+
+
+static const char * channelNames[] =
+{
+    "Xrotation",
+    "Yrotation",
+    "Zrotation",
+    "Xposition",
+    "Yposition",
+    "Zposition",
+//=================
+    "End of Channel Names" ,
+    "Unknown"
+};
+
+typedef unsigned int BVHJointID;
+typedef unsigned int BVHFrameID;
 
 
 /**
@@ -95,10 +112,18 @@ struct BVH_MotionCapture
 * @param  C-String with path to BVH File
 * @param  pointer to an allocated BVH_MOtionCapture struct
 */
-int loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion);
+int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion);
 
 
+/**
+* @brief Resolve a C-String from a Joint name to a Joint ID
+* @ingroup BVH
+* @param  BVH Structure
+* @param  C-String with Joint Name
+* @param  Output Joint ID
+*/
+int bvh_getJointIDFromJointName( struct BVH_MotionCapture * bvhMotion , const char * jointName, BVHJointID * jID);
 
-int printBVH(struct BVH_MotionCapture * bvhMotion);
+void bvh_printBVH(struct BVH_MotionCapture * bvhMotion);
 
 #endif // BVH_LOADER_H_INCLUDED

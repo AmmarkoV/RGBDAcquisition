@@ -18,9 +18,9 @@ int main(int argc, char **argv)
 {
     struct BVH_MotionCapture bvhMotion={0};
 
-    loadBVH("Motions/example.bvh", &bvhMotion);
+    bvh_loadBVH("Motions/example.bvh", &bvhMotion);
 
-    printBVH(&bvhMotion);
+    bvh_printBVH(&bvhMotion);
 
     return 0;
 }

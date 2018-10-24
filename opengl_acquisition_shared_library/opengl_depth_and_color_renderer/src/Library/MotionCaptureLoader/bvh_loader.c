@@ -105,11 +105,9 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
    InputParser_SetDelimeter(ipcB,2,'\n');
 
     unsigned int i=0;
-    unsigned int channelNumber=0;
     unsigned int jNum=0; //this is used internally instead of jointHierarchySize to make code more readable
     unsigned int currentJoint=0; //this is used internally instead of jointHierarchySize to make code more readable
     unsigned int hierarchyLevel=0;
-    unsigned int channels[8]={0};
     char * line = NULL;
     size_t len = 0;
 
@@ -185,15 +183,15 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
               fprintf(stderr,"-C-");
 
               //Read number of Channels
-              channelNumber=InputParser_GetWordInt(ipcB,1);
-              fprintf(stderr,"-%u-",channelNumber);
+              bvhMotion->jointHierarchy[currentJoint].loadedChannels=InputParser_GetWordInt(ipcB,1);
+              fprintf(stderr,"-%u-",bvhMotion->jointHierarchy[currentJoint].loadedChannels);
               //Sum the number of channels for motion commands later..
-              bvhMotion->numberOfValuesPerFrame += channelNumber;
+              bvhMotion->numberOfValuesPerFrame += bvhMotion->jointHierarchy[currentJoint].loadedChannels;
               //Now to store the channel labels
-              for (i=0; i<channelNumber; i++)
+              for (i=0; i<bvhMotion->jointHierarchy[currentJoint].loadedChannels; i++)
                   { //For each declared channel we need to enumerate the label to a value
-                   channels[i]=enumerateInputParserChannel(ipcB,2+i);
-                   fprintf(stderr,"-%u-",channels[i]);
+                   bvhMotion->jointHierarchy[currentJoint].channelType[i]=enumerateInputParserChannel(ipcB,2+i);
+                   fprintf(stderr,"-%u-",bvhMotion->jointHierarchy[currentJoint].channelType[i]);
                   }
               //Done
               } else
@@ -229,7 +227,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                      //We have a parent joint..!
                      if ( bvhMotion->jointHierarchy[currentJoint].isEndSite)
                       { //If current joint is an EndSite we must inform parent joint that it has an End Site
-                       unsigned int parentID=bvhMotion->jointHierarchy[jNum].parentJoint;
+                       unsigned int parentID=bvhMotion->jointHierarchy[currentJoint].parentJoint;
                        bvhMotion->jointHierarchy[parentID].hasEndSite=1;
                       }
                    } else
@@ -445,7 +443,55 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
-int loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion)
+void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
+{
+  fprintf(stderr,"\n\n\nPrinting BVH file..\n");
+  int i=0,z=0;
+  for (i=0; i<bvhMotion->jointHierarchySize; i++)
+  {
+    fprintf(stderr,"___________________________________\n");
+    fprintf(stderr,"Joint %u - %s \n",i,bvhMotion->jointHierarchy[i].jointName);
+    fprintf(stderr,"___________________________________\n");
+    unsigned int parentID = bvhMotion->jointHierarchy[i].parentJoint;
+    fprintf(stderr,"Parent %u - %s \n",parentID,bvhMotion->jointHierarchy[parentID].jointName);
+    //===============================================================
+    if (bvhMotion->jointHierarchy[i].loadedChannels>0)
+    {
+     fprintf(stderr,"Has %u channels\n",bvhMotion->jointHierarchy[i].loadedChannels);
+     for (z=0; z<bvhMotion->jointHierarchy[i].loadedChannels; z++)
+      {
+        unsigned int cT = bvhMotion->jointHierarchy[i].channelType[z];
+        fprintf(stderr,"%s ",channelNames[cT]);
+      }
+     fprintf(stderr,"\n");
+    } else
+    {
+     fprintf(stderr,"Has no channels\n");
+    }
+    //===============================================================
+     fprintf(stderr,"Offset : ");
+     for (z=0; z<3; z++)
+      {
+        fprintf(stderr,"%0.5f ",bvhMotion->jointHierarchy[i].offset[z]);
+      }
+     fprintf(stderr,"\n");
+    //===============================================================
+    fprintf(stderr,"isRoot %u \n",bvhMotion->jointHierarchy[i].isRoot);
+    fprintf(stderr,"isEndSite %u \n",bvhMotion->jointHierarchy[i].isEndSite);
+    fprintf(stderr,"hasEndSite %u\n",bvhMotion->jointHierarchy[i].hasEndSite);
+    fprintf(stderr,"----------------------------------\n");
+  }
+
+
+  fprintf(stderr,"Motion data\n");
+  fprintf(stderr,"___________________________________\n");
+  fprintf(stderr,"loaded motion frames : %u \n",bvhMotion->numberOfFramesEncountered);
+  fprintf(stderr,"frame time : %0.8f \n",bvhMotion->frameTime);
+  fprintf(stderr,"___________________________________\n");
+}
+
+
+int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion)
 {
   int successfullRead=0;
   FILE *fd=0;
@@ -464,30 +510,35 @@ int loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion)
  return successfullRead;
 }
 
-
-
-
-int printBVH(struct BVH_MotionCapture * bvhMotion)
+int bvh_getJointIDFromJointName(
+                                 struct BVH_MotionCapture * bvhMotion ,
+                                 const char * jointName,
+                                 BVHJointID * jID
+                                )
 {
-  fprintf(stderr,"\n\n\nPrinting BVH file..\n");
-  int i=0;
-  for (i=0; i<bvhMotion->jointHierarchySize; i++)
-  {
-    fprintf(stderr,"___________________________________\n");
-    fprintf(stderr,"Joint %u - %s \n",i,bvhMotion->jointHierarchy[i].jointName);
-    fprintf(stderr,"___________________________________\n");
-    unsigned int parentID = bvhMotion->jointHierarchy[i].parentJoint;
-    fprintf(stderr,"Parent %u - %s \n",parentID,bvhMotion->jointHierarchy[parentID].jointName);
-    fprintf(stderr,"isRoot %u \n",bvhMotion->jointHierarchy[i].isRoot);
-    fprintf(stderr,"isEndSite %u \n",bvhMotion->jointHierarchy[i].isEndSite);
-    fprintf(stderr,"hasEndSite %u\n",bvhMotion->jointHierarchy[i].hasEndSite);
-    fprintf(stderr,"___________________________________\n");
-  }
+   unsigned int i=0;
+   for (i=0; i<bvhMotion->jointHierarchySize; i++)
+   {
+     if (strcmp(bvhMotion->jointHierarchy[i].jointName,jointName)==0)
+     {
+         *jID=i;
+         return 1;
+     }
+   }
+ return 0;
 }
 
 
+float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
+{
+   return bvhMotion->jointHierarchy[jID].offset;
+}
 
 
+float  bvh_getJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+   //return bvhMotion->jointHierarchy[jID].offset;
+}
 
 
 
