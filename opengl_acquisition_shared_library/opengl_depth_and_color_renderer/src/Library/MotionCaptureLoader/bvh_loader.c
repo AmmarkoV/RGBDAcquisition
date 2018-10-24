@@ -621,3 +621,24 @@ float  bvh_getJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJo
   return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_Z);
 }
 
+
+int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData)
+{
+  if (data == 0) { return 0; }
+  if (sizeOfData < sizeof(float)* 6) { return 0; }
+
+  data[0]=bvh_getJointPositionXAtFrame(bvhMotion,jID,fID);
+  data[1]=bvh_getJointPositionYAtFrame(bvhMotion,jID,fID);
+  data[2]=bvh_getJointPositionZAtFrame(bvhMotion,jID,fID);
+  data[3]=bvh_getJointRotationXAtFrame(bvhMotion,jID,fID);
+  data[4]=bvh_getJointRotationYAtFrame(bvhMotion,jID,fID);
+  data[5]=bvh_getJointRotationZAtFrame(bvhMotion,jID,fID);
+  return 1;
+}
+
+
+int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
+{
+    if (jID>bvhMotion->jointHierarchySize) { return 0; }
+    return (!bvhMotion->jointHierarchy[jID].isRoot);
+}

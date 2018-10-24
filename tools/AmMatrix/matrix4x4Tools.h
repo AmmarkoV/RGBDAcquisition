@@ -167,6 +167,7 @@ void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double
 * @param  Rotation Y in euler angles (0-360)
 * @param  Rotation Z in euler angles (0-360)
 * @bug This should probably not be used and maybe altogether removed, but kept for historical reasons :P
+       You probably want the create4x4MatrixFromEulerAnglesZYX variant of this call
 */
 void create4x4MatrixFromEulerAnglesXYZ(double * m ,double eulX, double eulY, double eulZ);
 
