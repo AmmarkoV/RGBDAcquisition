@@ -49,10 +49,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_loader.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_transform.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../Library/TrajectoryParser/InputParser_C.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/TrajectoryParser/InputParser_C.h" />
+		<Unit filename="bvh_transform.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
