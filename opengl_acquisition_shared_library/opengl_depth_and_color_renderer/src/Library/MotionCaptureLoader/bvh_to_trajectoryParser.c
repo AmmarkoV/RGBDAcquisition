@@ -210,9 +210,9 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
 
       fprintf(
               fp,"POS(s%u,%u,%0.4f,%0.4f,%0.4f,0,0,0,0)\n",jID,fID,
-              bvhTransform.joint[jID].finalVertexTransformation[3],
-              bvhTransform.joint[jID].finalVertexTransformation[7],
-              bvhTransform.joint[jID].finalVertexTransformation[11]
+              bvhTransform.joint[jID].pos[0],
+              bvhTransform.joint[jID].pos[1],
+              bvhTransform.joint[jID].pos[2]
              );
      }
      fprintf(fp,"\n");
