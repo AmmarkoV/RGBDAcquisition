@@ -20,6 +20,7 @@ int main(int argc, char **argv)
 
     loadBVH("Motions/example.bvh", &bvhMotion);
 
+    printBVH(&bvhMotion);
 
     return 0;
 }

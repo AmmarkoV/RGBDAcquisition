@@ -46,15 +46,48 @@ int enumerateInputParserChannel(struct InputParserC * ipc , unsigned int argumen
   return BVH_POSITION_NONE;
 }
 
-int getParentJoint(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint , unsigned int hierarchyLevel)
+int getParentJoint(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint , unsigned int hierarchyLevel , unsigned int * parentJoint)
 {
-  return 0;
+  if (currentJoint>=bvhMotion->MAX_jointHierarchySize)
+  {
+    fprintf(stderr,"getParentJoint: Incorrect currentJoint value\n");
+    return 0;
+  }
+
+  if (hierarchyLevel==0)
+  {
+   //Already at root level..
+   //No Parent joint..
+   *parentJoint = 0;
+   return 1;
+  }
+
+  unsigned int i = currentJoint;
+
+  while (i>0)
+  {
+    if (bvhMotion->jointHierarchy[i].hierarchyLevel==hierarchyLevel-1)
+    {
+      //Found Parent Joint..!
+      *parentJoint = i;
+      return 1;
+    }
+    --i;
+  }
+
+
+  //We did not find something better than the root joint..
+  *parentJoint = 0;
+  return 1;
+  //return 0;
 }
 
 int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 {
   bvhMotion->numberOfValuesPerFrame = 0;//57;
+  bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE;
 
+  int done=0;
   int atHeaderSection=0;
   ssize_t read;
 
@@ -80,9 +113,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
     char * line = NULL;
     size_t len = 0;
 
-    while ((read = getline(&line, &len, fd)) != -1)
+    while  ( (!done) && ((read = getline(&line, &len, fd)) != -1) )
     {
-       if (strcmp(line,"}\n")==0) { break; }
        //printf("Retrieved line of length %zu :\n", read);
        //printf("%s", line);
        int num = InputParser_SeperateWords(ipc,line,1);
@@ -178,13 +210,32 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
          if (InputParser_WordCompareAuto(ipcB,0,"{"))
              {
               //We reached an { so we need to finish our joint OR root declaration
-              fprintf(stderr,"-{-");
+              fprintf(stderr,"-{%u-",hierarchyLevel);
               if (
                   bvhMotion->jointHierarchy[currentJoint].hierarchyLevel == hierarchyLevel
                  )
                  {
                   bvhMotion->jointHierarchy[currentJoint].hasBrace=1;
-                  bvhMotion->jointHierarchy[currentJoint].parentJoint = getParentJoint(bvhMotion,currentJoint,hierarchyLevel);
+
+                  if (
+                      getParentJoint(
+                                     bvhMotion,
+                                     currentJoint,
+                                     hierarchyLevel,
+                                     &bvhMotion->jointHierarchy[currentJoint].parentJoint
+                                    )
+                      )
+                   {
+                     //We have a parent joint..!
+                     if ( bvhMotion->jointHierarchy[currentJoint].isEndSite)
+                      { //If current joint is an EndSite we must inform parent joint that it has an End Site
+                       unsigned int parentID=bvhMotion->jointHierarchy[jNum].parentJoint;
+                       bvhMotion->jointHierarchy[parentID].hasEndSite=1;
+                      }
+                   } else
+                   {
+                    fprintf(stderr,"Bug: could not find a parent joint..\n");
+                   }
                  } else
                  {
                   fprintf(stderr,"Bug: HierarchyLevel not set at braces..\n");
@@ -194,7 +245,6 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
          if (InputParser_WordCompareAuto(ipcB,0,"}"))
              {
               //We reached an } so we pop one hierarchyLevel
-              fprintf(stderr,"-}-");
               if (hierarchyLevel>0)
                  {
                   --hierarchyLevel;
@@ -202,6 +252,15 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                  {
                    fprintf(stderr,"Erroneous BVH hierarchy..\n");
                  }
+
+              if (hierarchyLevel==0)
+              {
+                //We are done..
+                done=1;
+              }
+
+              //-------------------------------------
+              fprintf(stderr,"-%u}-",hierarchyLevel);
              }
           else
          {
@@ -341,8 +400,8 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
           if (InputParser_WordCompareAuto(ipc,0,"MOTION"))      { atMotionSection=1; }
        } else
        {
-         if (InputParser_WordCompareAuto(ipc,0,"Frames"))      { bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1); } else
-         if (InputParser_WordCompareAuto(ipc,0,"Frame Time"))  { bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1); }      else
+         if (InputParser_WordCompareAuto(ipc,0,"Frames"))       { bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1); } else
+         if (InputParser_WordCompareAuto(ipc,0,"Frame Time"))   { bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1); }      else
          {
            if (bvhMotion->motionValues==0)
            {
@@ -404,3 +463,31 @@ int loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion)
     }
  return successfullRead;
 }
+
+
+
+
+int printBVH(struct BVH_MotionCapture * bvhMotion)
+{
+  fprintf(stderr,"\n\n\nPrinting BVH file..\n");
+  int i=0;
+  for (i=0; i<bvhMotion->jointHierarchySize; i++)
+  {
+    fprintf(stderr,"___________________________________\n");
+    fprintf(stderr,"Joint %u - %s \n",i,bvhMotion->jointHierarchy[i].jointName);
+    fprintf(stderr,"___________________________________\n");
+    unsigned int parentID = bvhMotion->jointHierarchy[i].parentJoint;
+    fprintf(stderr,"Parent %u - %s \n",parentID,bvhMotion->jointHierarchy[parentID].jointName);
+    fprintf(stderr,"isRoot %u \n",bvhMotion->jointHierarchy[i].isRoot);
+    fprintf(stderr,"isEndSite %u \n",bvhMotion->jointHierarchy[i].isEndSite);
+    fprintf(stderr,"hasEndSite %u\n",bvhMotion->jointHierarchy[i].hasEndSite);
+    fprintf(stderr,"___________________________________\n");
+  }
+}
+
+
+
+
+
+
+
