@@ -601,3 +601,23 @@ float  bvh_getJointRotationZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJo
 {
   return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_Z);
 }
+
+
+
+float  bvh_getJointPositionXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_X);
+}
+
+
+float  bvh_getJointPositionYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_Y);
+}
+
+
+float  bvh_getJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_Z);
+}
+
