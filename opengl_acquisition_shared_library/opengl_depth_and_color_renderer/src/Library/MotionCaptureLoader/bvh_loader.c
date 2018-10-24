@@ -1,7 +1,25 @@
+/*
+    Written by Ammar Qammaz a.k.a. AmmarkoV 2018
+    --
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include <stdio.h>
 #include "bvh_loader.h"
 #include "../TrajectoryParser/InputParser_C.h"
 
+//A very brief documentation of the BVH spec :
 //http://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html?fbclid=IwAR0BopXj4Kft_RAEE41VLblkkPGHVF8-mon3xSCBMZueRtyb9LCSZDZhXPA
 
 //----------------------------------------------------------------------------------------------------
@@ -28,7 +46,7 @@ int enumerateInputParserChannel(struct InputParserC * ipc , unsigned int argumen
   return BVH_POSITION_NONE;
 }
 
-int parseHierarchy(unsigned int previousNode)
+int getParentJoint(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint , unsigned int hierarchyLevel)
 {
   return 0;
 }
@@ -55,6 +73,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
     unsigned int i=0;
     unsigned int channelNumber=0;
+    unsigned int jNum=0; //this is used internally instead of jointHierarchySize to make code more readable
+    unsigned int currentJoint=0; //this is used internally instead of jointHierarchySize to make code more readable
     unsigned int hierarchyLevel=0;
     unsigned int channels[8]={0};
     char * line = NULL;
@@ -63,8 +83,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
     while ((read = getline(&line, &len, fd)) != -1)
     {
        if (strcmp(line,"}\n")==0) { break; }
-       printf("Retrieved line of length %zu :\n", read);
-       printf("%s", line);
+       //printf("Retrieved line of length %zu :\n", read);
+       //printf("%s", line);
        int num = InputParser_SeperateWords(ipc,line,1);
 
 
@@ -72,70 +92,136 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
       { //We have content..
        if (!atHeaderSection)
        {
+          //We won't start parsing unless we reach a HIERARCHY line
           if (InputParser_WordCompareAuto(ipc,0,"HIERARCHY"))  { atHeaderSection=1; }
        } else
        {
          int numB = InputParser_SeperateWords(ipcB,line,1);
          if (numB>0)
          {
-         if (InputParser_WordCompareAuto(ipcB,0,"JOINT"))      {
-                                                                  fprintf(stderr,"-J-");
-                                                                  //Store new Joint
-                                                                  InputParser_GetWord(ipcB,1, bvhMotion->jointHierarchy[bvhMotion->jointHierarchySize].jointName ,512);
-                                                                  fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[bvhMotion->jointHierarchySize].jointName);
+         if (InputParser_WordCompareAuto(ipcB,0,"ROOT"))
+              {
+               //We encountered something like |ROOT Hips|
+               fprintf(stderr,"-R-");
+               //Store new ROOT Joint Name
+               InputParser_GetWord(
+                                    ipcB,1,
+                                    bvhMotion->jointHierarchy[jNum].jointName ,
+                                    MAX_BVH_JOINT_NAME
+                                  );
+               fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);
+               //Store new Joint Hierarchy Level
+               //Rest of the information will be filled in when we reach an {
+               bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
+               bvhMotion->jointHierarchy[jNum].isRoot=1;
+               currentJoint=jNum;
+               ++jNum;
+             } else
+         if (InputParser_WordCompareAuto(ipcB,0,"JOINT"))
+              {
+               //We encountered something like |JOINT Chest|
+               fprintf(stderr,"-J-");
+               //Store new Joint Name
+               InputParser_GetWord(
+                                    ipcB,1,
+                                    bvhMotion->jointHierarchy[jNum].jointName ,
+                                    MAX_BVH_JOINT_NAME
+                                  );
+               fprintf(stderr,"-%s-",bvhMotion->jointHierarchy[jNum].jointName);
+               //Store new Joint Hierarchy Level
+               //Rest of the information will be filled in when we reach an {
+               bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
+               currentJoint=jNum;
+               ++jNum;
+             } else
+         if (InputParser_WordCompareAuto(ipcB,0,"End"))
+             {
+               //We encountered something like |End Site|
+              fprintf(stderr,"-E-");
+              if (InputParser_WordCompareAuto(ipcB,1,"Site"))
+                   {
+                    fprintf(stderr,"-S-");
+                    snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"End Site");
+                    bvhMotion->jointHierarchy[jNum].isEndSite=1;
+                    bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
+                    currentJoint=jNum;
+                    ++jNum;
+                   }
+              } else
+         if (InputParser_WordCompareAuto(ipcB,0,"CHANNELS"))
+             { //Reached something like  |CHANNELS 3 Zrotation Xrotation Yrotation| declaration
+              fprintf(stderr,"-C-");
 
-                                                                  ++bvhMotion->jointHierarchySize;
-                                                               } else
-         if (InputParser_WordCompareAuto(ipcB,0,"End"))        {
-                                                                 fprintf(stderr,"-E-");
-                                                                 if (InputParser_WordCompareAuto(ipcB,1,"Site"))
-                                                                  {
-                                                                    fprintf(stderr,"-S-");
+              //Read number of Channels
+              channelNumber=InputParser_GetWordInt(ipcB,1);
+              fprintf(stderr,"-%u-",channelNumber);
+              //Sum the number of channels for motion commands later..
+              bvhMotion->numberOfValuesPerFrame += channelNumber;
+              //Now to store the channel labels
+              for (i=0; i<channelNumber; i++)
+                  { //For each declared channel we need to enumerate the label to a value
+                   channels[i]=enumerateInputParserChannel(ipcB,2+i);
+                   fprintf(stderr,"-%u-",channels[i]);
+                  }
+              //Done
+              } else
+         if (InputParser_WordCompareAuto(ipcB,0,"OFFSET"))
+             {//Reached something like |OFFSET	 3.91	 0.00	 0.00|
+              fprintf(stderr,"-O-");
 
-                                                                    snprintf(bvhMotion->jointHierarchy[bvhMotion->jointHierarchySize].jointName,512,"End Site");
-                                                                    ++bvhMotion->jointHierarchySize;
-                                                                  }
-                                                               } else
-         if (InputParser_WordCompareAuto(ipcB,0,"CHANNELS"))   {
-                                                                 fprintf(stderr,"-C-");
-                                                                 channelNumber=InputParser_GetWordInt(ipcB,1);
-                                                                 bvhMotion->numberOfValuesPerFrame += channelNumber;
-                                                                 fprintf(stderr,"-%u-",channelNumber);
-                                                                 for (i=0; i<channelNumber; i++)
-                                                                     {
-                                                                       channels[i]=enumerateInputParserChannel(ipcB,2+i);
-                                                                       fprintf(stderr,"-%u-",channels[i]);
-                                                                     }
-                                                               } else
-         if (InputParser_WordCompareAuto(ipcB,0,"OFFSET"))     {
-                                                                 fprintf(stderr,"-O-");
-                                                                 bvhMotion->jointHierarchy[bvhMotion->jointHierarchySize].offset[0]=InputParser_GetWordFloat(ipcB,1);
-                                                                 bvhMotion->jointHierarchy[bvhMotion->jointHierarchySize].offset[1]=InputParser_GetWordFloat(ipcB,2);
-                                                                 bvhMotion->jointHierarchy[bvhMotion->jointHierarchySize].offset[2]=InputParser_GetWordFloat(ipcB,3);
-                                                               } else
-         if (InputParser_WordCompareAuto(ipcB,0,"{"))          {
-                                                                  fprintf(stderr,"-{-");
-                                                                  ++hierarchyLevel;
-                                                               } else
-         if (InputParser_WordCompareAuto(ipcB,0,"}"))          {
-                                                                  fprintf(stderr,"-}-");
-                                                                  if (hierarchyLevel>0)
-                                                                  {
-                                                                    --hierarchyLevel;
-                                                                  } else
-                                                                  {
-                                                                    fprintf(stderr,"Erroneous BVH hierarchy..\n");
-                                                                  }
-                                                               }
+              //Store offsets..
+              //TODO: could check numB to make sure all offsets are present..
+              bvhMotion->jointHierarchy[currentJoint].offset[0]=InputParser_GetWordFloat(ipcB,1);
+              bvhMotion->jointHierarchy[currentJoint].offset[1]=InputParser_GetWordFloat(ipcB,2);
+              bvhMotion->jointHierarchy[currentJoint].offset[2]=InputParser_GetWordFloat(ipcB,3);
+             } else
+         if (InputParser_WordCompareAuto(ipcB,0,"{"))
+             {
+              //We reached an { so we need to finish our joint OR root declaration
+              fprintf(stderr,"-{-");
+              if (
+                  bvhMotion->jointHierarchy[currentJoint].hierarchyLevel == hierarchyLevel
+                 )
+                 {
+                  bvhMotion->jointHierarchy[currentJoint].hasBrace=1;
+                  bvhMotion->jointHierarchy[currentJoint].parentJoint = getParentJoint(bvhMotion,currentJoint,hierarchyLevel);
+                 } else
+                 {
+                  fprintf(stderr,"Bug: HierarchyLevel not set at braces..\n");
+                 }
+               ++hierarchyLevel;
+              } else
+         if (InputParser_WordCompareAuto(ipcB,0,"}"))
+             {
+              //We reached an } so we pop one hierarchyLevel
+              fprintf(stderr,"-}-");
+              if (hierarchyLevel>0)
+                 {
+                  --hierarchyLevel;
+                 } else
+                 {
+                   fprintf(stderr,"Erroneous BVH hierarchy..\n");
+                 }
+             }
           else
          {
             //Unexpected input..
+            printf("Unexpected line of length %zu :\n", read);
+            printf("%s", line);
          }
 
          } // We have header content
        } // We are at header section
       } //We have content
     } //We have line input from file
+
+   if (hierarchyLevel!=0)
+   {
+     fprintf(stderr,"Missing } braces..\n");
+     atHeaderSection = 0;
+   }
+
+   bvhMotion->jointHierarchySize = jNum;
 
    InputParser_Destroy(ipc);
    InputParser_Destroy(ipcB);
@@ -300,7 +386,6 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
-
 int loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion)
 {
   int successfullRead=0;
