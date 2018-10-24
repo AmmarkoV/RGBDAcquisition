@@ -163,6 +163,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                //Store new Joint Hierarchy Level
                //Rest of the information will be filled in when we reach an {
                bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
+               bvhMotion->jointHierarchy[jNum].lookupID = bvhMotion->numberOfValuesPerFrame;
                currentJoint=jNum;
                ++jNum;
              } else
@@ -176,6 +177,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                     snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"End Site");
                     bvhMotion->jointHierarchy[jNum].isEndSite=1;
                     bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
+                    bvhMotion->jointHierarchy[jNum].lookupID = bvhMotion->numberOfValuesPerFrame;
                     currentJoint=jNum;
                     ++jNum;
                    }
@@ -550,11 +552,18 @@ float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID
 
 float  bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID)
 {
-   if (bvhMotion==0) { return 0; }
-   if (bvhMotion->jointHierarchySize<=jID) { return 0; }
-
+   if (bvhMotion==0) { return 0.0; }
+   if (bvhMotion->jointHierarchySize<=jID) { return 0.0; }
 
    unsigned int mID = fID * bvhMotion->numberOfValuesPerFrame + bvhMotion->jointHierarchy[jID].lookupID;
+
+
+   fprintf(stderr,"Joint %s -", bvhMotion->jointHierarchy[jID].jointName);
+   fprintf(stderr,"LookupID %u ", bvhMotion->jointHierarchy[jID].lookupID);
+   fprintf(stderr,"FrameID %u ", fID);
+   fprintf(stderr,"MotionID %u \n", mID);
+
+
 
    unsigned int i=0;
    for (i=0; i<BVH_VALID_CHANNEL_NAMES; i++)

@@ -11,6 +11,7 @@
 
 #include "../../Library/TrajectoryParser/TrajectoryParserDataStructures.h"
 #include "../../Library/MotionCaptureLoader/bvh_loader.h"
+#include "../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.h"
 
 
 
@@ -34,6 +35,8 @@ int main(int argc, char **argv)
          fprintf(stderr,"ZRotation:%0.2f\n",bvh_getJointRotationZAtFrame(&bvhMotion , jID ,  frameID));
        }
     }
+
+    dumpBVHToTrajectoryParser("Scenes/bvh.conf",&bvhMotion);
 
     return 0;
 }

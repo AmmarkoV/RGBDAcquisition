@@ -68,6 +68,7 @@ add_library(OGLRendererSandbox SHARED
             ModelLoader/model_editor.h
             #Motion Capture and how to load it
             MotionCaptureLoader/bvh_loader.c
+            MotionCaptureLoader/bvh_to_trajectoryParser.c
             #Textures and how to load them  
             TextureLoader/texture_loader.c
             TextureLoader/texture_loader.h
