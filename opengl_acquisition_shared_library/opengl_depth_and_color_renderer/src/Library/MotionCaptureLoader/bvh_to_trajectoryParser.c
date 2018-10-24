@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "bvh_to_trajectoryParser.h"
 
 
@@ -54,7 +55,7 @@ static const char * triName[] =
 
 int dumpBVHJointToTP(FILE*fp , struct BVH_MotionCapture * mc , unsigned int fID, unsigned int jID)
 {
-  char * label=0;
+  const char * label=0;
   unsigned int jName=0;
 
    for (jName=0; jName<17; jName++)
@@ -106,15 +107,6 @@ int dumpBVHToTrajectoryParserTRI(const char * filename , struct BVH_MotionCaptur
     fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/AmmarH.tri)\n");
     fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,10.0,10.0,10.0)\n\n");
 
-    for (jID=0; jID<mc->jointHierarchySize; jID++)
-    {
-      fprintf(fp,"OBJECT_TYPE(sT%u,sphere)\n",jID);
-      fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,10.0,10.0,10.0)\n",jID,jID);
-    }
-      fprintf(fp,"\n");
-
-
-
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
       fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)\n",fID);
@@ -163,21 +155,14 @@ POSE(human,0,JtSpineA,0.001,0.000,0.000)
 
 int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture * mc)
 {
-  unsigned int jID=0,fID;
+  unsigned int jID=0,fID=0;
   FILE * fp = fopen(filename,"w");
 
   if (fp!=0)
   {
-    fprintf(fp,"#INCLUDE(Scenes/renderLikeMBVRH.conf)\n");
     fprintf(fp,"#This is the way to render like the mbv renderer :)\n");
     fprintf(fp,"AUTOREFRESH(1500)\n");
     fprintf(fp,"BACKGROUND(0,0,0)\n");
-
-    fprintf(fp,"#Bring our world to the MBV coordinate system\n");
-    fprintf(fp,"SCALE_WORLD(-0.01,-0.01,0.01)\n");
-    fprintf(fp,"MAP_ROTATIONS(-1,-1,1,zxy)\n");
-    fprintf(fp,"OFFSET_ROTATIONS(0,0,0)\n");
-    fprintf(fp,"EMULATE_PROJECTION_MATRIX(535.423889 , 0.0 , 320.0 , 0.0 , 533.48468, 240.0 , 0 , 1)\n");
 
     fprintf(fp,"SILENT(1)\n");
     fprintf(fp,"RATE(100)\n");
@@ -187,16 +172,29 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
     for (jID=0; jID<mc->jointHierarchySize; jID++)
     {
       fprintf(fp,"OBJECT_TYPE(sT%u,sphere)\n",jID);
-      fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,10.0,10.0,10.0)\n",jID,jID);
+      fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,0.1,0.1,0.1)\n",jID,jID);
     }
-      fprintf(fp,"\n");
+    fprintf(fp,"\n");
+
+    for (fID=0; fID<mc->numberOfFrames; fID++)
+    {
+     fprintf(fp,"POS(camera,%u,   0.0,0.0, 22.0 , 0.0, 0.0,0.0,0.0 )\n",fID);
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+     {
+      fprintf(fp,"POS(s%u,%u,%0.4f,%0.4f,%0.4f,0,0,0,0)\n",jID,fID,
+              mc->jointHierarchy[jID].offset[0],
+              mc->jointHierarchy[jID].offset[1],
+              mc->jointHierarchy[jID].offset[2]);
+     }
+     fprintf(fp,"\n");
+    }
 
 
 
     //OBJECT(left_sph0,obj_type,0,255,0,0 ,0, 0.14,0.14,0.14)
 
-      fclose(fp);
-      return 1;
+    fclose(fp);
+    return 1;
   }
  return 0;
 }

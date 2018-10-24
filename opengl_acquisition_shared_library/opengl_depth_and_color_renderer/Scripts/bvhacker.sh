@@ -4,7 +4,7 @@
 #http://bvhacker.com/
 #wget http://www.bvhacker.com/downloads/latest/bvhacker_1.8.zip
 
-cd /home/ammar/.wine/drive_c/Program Files (x86)/bvhacker
+cd "/home/ammar/.wine/drive_c/Program Files (x86)/bvhacker"
 wine bvhacker.exe
 
 
