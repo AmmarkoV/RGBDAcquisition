@@ -8,7 +8,7 @@ int bvh_loadTransformForFrame(
                                struct BVH_Transform * transform
                              )
 {
-
+  unsigned int jID=0;
 
   return 0;
 }
