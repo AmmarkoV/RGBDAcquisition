@@ -64,6 +64,7 @@ struct BVH_Joint
   char hasEndSite;
   //--------------------
   char jointName[MAX_BVH_JOINT_NAME];
+  unsigned int lookupID;
   //--------------------
   unsigned int parentJoint;
   unsigned int endSiteJoint;
@@ -71,12 +72,24 @@ struct BVH_Joint
   //--------------------
   float offset[3];
   //--------------------
-  float channels[7];
-  char  channelType[7];
+  float channels[BVH_VALID_CHANNEL_NAMES];
+  char  channelType[BVH_VALID_CHANNEL_NAMES];
   char  loadedChannels;
   //--------------------
 };
 
+
+
+/**
+* @brief The lookup table has 1:1 correspondance to the given motions
+* @ingroup BVH
+*/
+struct BVH_JointLookupTable
+{
+  unsigned int jointID;
+  unsigned int parentID;
+  unsigned int channelID;
+};
 
 /**
 * @brief Each BVH Motion Capture file has a hierarchy of BVH_Joints and an array of motion values that should be accessed using
@@ -95,6 +108,8 @@ struct BVH_MotionCapture
   unsigned int MAX_jointHierarchySize;
   unsigned int jointHierarchySize;
   struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE];
+  struct BVH_JointLookupTable lookupTable[MAX_BVH_JOINT_HIERARCHY_SIZE*6];
+
 
 
   //Motion
@@ -107,10 +122,18 @@ struct BVH_MotionCapture
 
 
 /**
+* @brief Print BVH information on stderr
+* @ingroup BVH
+* @param  pointer to an allocated BVH_MotionCapture struct
+*/
+void bvh_printBVH(struct BVH_MotionCapture * bvhMotion);
+
+
+/**
 * @brief Load a BVH file by giving a filename and filling in a BVH_MotionCapture struct
 * @ingroup BVH
 * @param  C-String with path to BVH File
-* @param  pointer to an allocated BVH_MOtionCapture struct
+* @param  pointer to an allocated BVH_MotionCapture struct
 */
 int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion);
 
@@ -124,6 +147,10 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion);
 */
 int bvh_getJointIDFromJointName( struct BVH_MotionCapture * bvhMotion , const char * jointName, BVHJointID * jID);
 
-void bvh_printBVH(struct BVH_MotionCapture * bvhMotion);
+
+
+float  bvh_getJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
+float  bvh_getJointRotationYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
+float  bvh_getJointRotationZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
 
 #endif // BVH_LOADER_H_INCLUDED

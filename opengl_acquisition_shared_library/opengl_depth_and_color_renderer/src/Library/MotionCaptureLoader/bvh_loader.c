@@ -106,6 +106,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
     unsigned int i=0;
     unsigned int jNum=0; //this is used internally instead of jointHierarchySize to make code more readable
+    unsigned int lookupID=0;
     unsigned int currentJoint=0; //this is used internally instead of jointHierarchySize to make code more readable
     unsigned int hierarchyLevel=0;
     char * line = NULL;
@@ -144,6 +145,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                //Rest of the information will be filled in when we reach an {
                bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
                bvhMotion->jointHierarchy[jNum].isRoot=1;
+               bvhMotion->jointHierarchy[jNum].lookupID = bvhMotion->numberOfValuesPerFrame;
                currentJoint=jNum;
                ++jNum;
              } else
@@ -189,9 +191,16 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
               bvhMotion->numberOfValuesPerFrame += bvhMotion->jointHierarchy[currentJoint].loadedChannels;
               //Now to store the channel labels
               for (i=0; i<bvhMotion->jointHierarchy[currentJoint].loadedChannels; i++)
-                  { //For each declared channel we need to enumerate the label to a value
-                   bvhMotion->jointHierarchy[currentJoint].channelType[i]=enumerateInputParserChannel(ipcB,2+i);
+                  {
+                   //For each declared channel we need to enumerate the label to a value
+                   unsigned int channelID = enumerateInputParserChannel(ipcB,2+i);
+                   bvhMotion->jointHierarchy[currentJoint].channelType[i]=channelID;
                    fprintf(stderr,"-%u-",bvhMotion->jointHierarchy[currentJoint].channelType[i]);
+                   //Store at channel lookup table
+                   unsigned int parentID=bvhMotion->jointHierarchy[currentJoint].parentJoint;
+                   bvhMotion->lookupTable[lookupID].channelID = channelID;
+                   bvhMotion->lookupTable[lookupID].jointID   = currentJoint;
+                   bvhMotion->lookupTable[lookupID].parentID  = parentID;
                   }
               //Done
               } else
@@ -516,6 +525,7 @@ int bvh_getJointIDFromJointName(
                                  BVHJointID * jID
                                 )
 {
+   if (bvhMotion==0) { return 0; }
    unsigned int i=0;
    for (i=0; i<bvhMotion->jointHierarchySize; i++)
    {
@@ -531,14 +541,54 @@ int bvh_getJointIDFromJointName(
 
 float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
 {
+   if (bvhMotion==0) { return 0; }
+   if (bvhMotion->jointHierarchySize<=jID) { return 0; }
+
    return bvhMotion->jointHierarchy[jID].offset;
 }
 
 
-float  bvh_getJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+float  bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID)
 {
-   //return bvhMotion->jointHierarchy[jID].offset;
+   if (bvhMotion==0) { return 0; }
+   if (bvhMotion->jointHierarchySize<=jID) { return 0; }
+
+
+   unsigned int mID = fID * bvhMotion->numberOfValuesPerFrame + bvhMotion->jointHierarchy[jID].lookupID;
+
+   unsigned int i=0;
+   for (i=0; i<BVH_VALID_CHANNEL_NAMES; i++)
+   {
+       if ( bvhMotion->jointHierarchy[jID].channelType[i] == channelTypeID)
+       {
+         mID+=i;
+         break;
+       }
+   }
+
+   if (mID>=bvhMotion->motionValuesSize)
+   {
+     return 0.0;
+   }
+
+   return bvhMotion->motionValues[mID];
 }
 
 
 
+float  bvh_getJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_X);
+}
+
+
+float  bvh_getJointRotationYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_Y);
+}
+
+
+float  bvh_getJointRotationZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_Z);
+}
