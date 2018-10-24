@@ -5,7 +5,7 @@
 int bvh_loadTransformForFrame(
                                struct BVH_MotionCapture * bvhMotion ,
                                BVHFrameID fID ,
-                               struct BVH_Transform * transform
+                               struct BVH_Transform * bvhTransform
                              )
 {
   unsigned int jID=0;
@@ -13,13 +13,17 @@ int bvh_loadTransformForFrame(
   //First of all we need to clean the current transform
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-     create4x4IdentityMatrix(transform->joint[jID].localTransformation);
-     create4x4IdentityMatrix(transform->joint[jID].finalVertexTransformation);
+     create4x4IdentityMatrix(bvhTransform->joint[jID].localTransformation);
+     create4x4IdentityMatrix(bvhTransform->joint[jID].finalVertexTransformation);
   }
 
   //We will now apply all transformations
   double translationM[16]={0};
   double rotationM[16]={0};
+  double scalingM[16]={0};
+
+  create4x4IdentityMatrix(scalingM);
+  create4x4ScalingMatrix(scalingM,0.5,0.5,0.5);
 
   double posX,posY,posZ;
   double rotX,rotY,rotZ;
@@ -40,7 +44,20 @@ int bvh_loadTransformForFrame(
 
       create4x4TranslationMatrix(translationM,posX,posY,posZ);
       create4x4MatrixFromEulerAnglesZYX(rotationM,rotX,rotY,rotZ);
-      multiplyTwo4x4Matrices(transform->joint[jID].localTransformation,translationM,rotationM);
+
+      /*
+      multiplyTwo4x4Matrices(
+                               bvhTransform->joint[jID].localTransformation,
+                               translationM,
+                               rotationM
+                            );*/
+
+      multiplyThree4x4Matrices(
+                               bvhTransform->joint[jID].localTransformation,
+                               translationM,
+                               rotationM,
+                               scalingM
+                            );
   }
 
 
@@ -48,20 +65,22 @@ int bvh_loadTransformForFrame(
   {
      if (bhv_jointHasParent(bvhMotion,jID))
       {
+        unsigned int parentID = bvhMotion->jointHierarchy[jID].parentJoint;
         multiplyTwo4x4Matrices(
-                                transform->joint[jID].finalVertexTransformation ,
-                                transform->joint[jID].localTransformation,
-                                translationM,rotationM);
+                                bvhTransform->joint[jID].finalVertexTransformation ,
+                                bvhTransform->joint[parentID].finalVertexTransformation,
+                                bvhTransform->joint[jID].localTransformation
+                              );
       } else
       {
         copy4x4DMatrix(
-                       transform->joint[jID].finalVertexTransformation ,
-                       transform->joint[jID].localTransformation
+                       bvhTransform->joint[jID].finalVertexTransformation ,
+                       bvhTransform->joint[jID].localTransformation
                       );
       }
   }
 
-  return 0;
+  return 1;
 }
 
 

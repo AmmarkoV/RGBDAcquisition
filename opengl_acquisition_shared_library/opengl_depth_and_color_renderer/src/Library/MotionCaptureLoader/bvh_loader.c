@@ -558,11 +558,12 @@ float  bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJoint
    unsigned int mID = fID * bvhMotion->numberOfValuesPerFrame + bvhMotion->jointHierarchy[jID].lookupID;
 
 
-   fprintf(stderr,"Joint %s -", bvhMotion->jointHierarchy[jID].jointName);
+   /*
+   fprintf(stderr,"Joint %s - ", bvhMotion->jointHierarchy[jID].jointName);
    fprintf(stderr,"LookupID %u ", bvhMotion->jointHierarchy[jID].lookupID);
    fprintf(stderr,"FrameID %u ", fID);
    fprintf(stderr,"MotionID %u \n", mID);
-
+   */
 
 
    unsigned int i=0;

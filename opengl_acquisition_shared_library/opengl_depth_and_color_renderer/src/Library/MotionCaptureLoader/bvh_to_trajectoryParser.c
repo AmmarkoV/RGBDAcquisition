@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "bvh_to_trajectoryParser.h"
+#include "bvh_transform.h"
 
 
 static const char * bvhName[] =
@@ -158,6 +159,8 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
   unsigned int jID=0,fID=0;
   FILE * fp = fopen(filename,"w");
 
+  struct BVH_Transform bvhTransform;
+
   if (fp!=0)
   {
     fprintf(fp,"#This is the way to render like the mbv renderer :)\n");
@@ -171,20 +174,46 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
 
     for (jID=0; jID<mc->jointHierarchySize; jID++)
     {
-      fprintf(fp,"OBJECT_TYPE(sT%u,sphere)\n",jID);
-      fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,0.1,0.1,0.1)\n",jID,jID);
+      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"OBJECT_TYPE(sT%u,cube)\n",jID);   } else
+                                                { fprintf(fp,"OBJECT_TYPE(sT%u,sphere)\n",jID); }
+
+      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 0,255,0,0,0 ,0.5,0.5,0.5)\n",jID,jID);    } else
+      if ( mc->jointHierarchy[jID].isRoot )     { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,255,0,0,0 ,0.5,0.5,0.5)\n",jID,jID); } else
+                                                { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,0.5,0.5,0.5)\n",jID,jID); }
+
+
+      if (bhv_jointHasParent(mc,jID))
+      {
+        fprintf(fp,"CONNECTOR(s%u,s%u, 255,255,0, 1.0)\n",jID,mc->jointHierarchy[jID].parentJoint);
+      }
     }
     fprintf(fp,"\n");
 
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
-     fprintf(fp,"POS(camera,%u,   0.0,0.0, 22.0 , 0.0, 0.0,0.0,0.0 )\n",fID);
+      bvh_loadTransformForFrame(
+                                mc,
+                                fID ,
+                                &bvhTransform
+                               );
+
+     fprintf(fp,"POS(camera,%u,   0.0, 40.0, 122.0 , 0.0, 0.0,0.0,0.0 )\n",fID);
      for (jID=0; jID<mc->jointHierarchySize; jID++)
      {
-      fprintf(fp,"POS(s%u,%u,%0.4f,%0.4f,%0.4f,0,0,0,0)\n",jID,fID,
+     /*
+      fprintf(
+              fp,"POS(s%u,%u,%0.4f,%0.4f,%0.4f,0,0,0,0)\n",jID,fID,
               mc->jointHierarchy[jID].offset[0],
               mc->jointHierarchy[jID].offset[1],
-              mc->jointHierarchy[jID].offset[2]);
+              mc->jointHierarchy[jID].offset[2]
+             );*/
+
+      fprintf(
+              fp,"POS(s%u,%u,%0.4f,%0.4f,%0.4f,0,0,0,0)\n",jID,fID,
+              bvhTransform.joint[jID].finalVertexTransformation[3],
+              bvhTransform.joint[jID].finalVertexTransformation[7],
+              bvhTransform.joint[jID].finalVertexTransformation[11]
+             );
      }
      fprintf(fp,"\n");
     }

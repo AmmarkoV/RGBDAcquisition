@@ -43,6 +43,7 @@
 			<Add library="GL" />
 			<Add library="GLU" />
 			<Add library="X11" />
+			<Add library="../../../libOGLRendererSandbox.so" />
 			<Add directory="../../" />
 		</Linker>
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_loader.c">
@@ -56,11 +57,11 @@
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_transform.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_transform.h" />
 		<Unit filename="../../Library/TrajectoryParser/InputParser_C.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/TrajectoryParser/InputParser_C.h" />
-		<Unit filename="bvh_transform.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
