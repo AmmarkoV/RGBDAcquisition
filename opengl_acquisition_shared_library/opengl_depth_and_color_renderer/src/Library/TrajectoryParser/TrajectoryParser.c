@@ -172,6 +172,8 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                break;
 
 
+             case TRAJECTORYPRIMITIVES_NEAR_CLIP                         :  newstream->controls.nearPlane=InputParser_GetWordFloat(ipc,1); break;
+             case TRAJECTORYPRIMITIVES_FAR_CLIP                          :  newstream->controls.farPlane=InputParser_GetWordFloat(ipc,1); break;
              case TRAJECTORYPRIMITIVES_TIMESTAMP                         :  newstream->timestamp=InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_AUTOREFRESH                       :  newstream->autoRefresh = InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_INTERPOLATE_TIME                  :  newstream->ignoreTime = ( InputParser_GetWordInt(ipc,1) == 0 ); break;

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "bvh_transform.h"
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
@@ -7,13 +8,85 @@
 
 //TODO : Fix correct order..
 //http://www.dcs.shef.ac.uk/intranet/research/public/resmes/CS0111.pdf
+//https://github.com/duststorm/BVwHacker <- this is a good guide for the transform order..
 #define FLIP_ROTATION_ORDER 0
 
-#define USE_SCALING_MATRIX 0
+#define USE_BVH_SPECIFIC_ROTATIONS 1
 
 //Also find Center of Joint
 //We can skip the matrix multiplication by just grabbing the last column..
 #define FIND_FAST_CENTER 1
+
+
+#if USE_BVH_SPECIFIC_ROTATIONS
+/*
+   0  1  2  3
+   4  5  6  7
+   8  9 10 11
+  12 13 14 15
+*/
+
+/*
+   [0,0]  [1,0]  [2,0]  [3,0]
+   [0,1]  [1,1]  [2,1]  [3,1]
+   [0,2]  [1,2]  [2,2]  [3,2]
+   [0,3]  [1,3]  [2,3]  [3,3]
+*/
+//---------------------------------------------------------
+static double degrees_to_radBVH(double degrees)
+{
+    return degrees * (M_PI /180.0 );
+}
+//---------------------------------------------------------
+void create4x4RotationBVH_X(double * matrix,double degrees)
+{
+    double radians = degrees_to_radBVH(degrees);
+
+    create4x4IdentityMatrix(matrix);
+
+    double cosV = (double) cosf(radians);
+    double sinV = (double) sinf(radians);
+
+    // Rotate X formula.
+    matrix[5] =    cosV;
+    matrix[9] = -1*sinV;
+    matrix[6] =    sinV;
+    matrix[10] =   cosV;
+}
+//---------------------------------------------------------
+void create4x4RotationBVH_Y(double * matrix,double degrees)
+{
+    double radians = degrees_to_radBVH(degrees);
+
+    create4x4IdentityMatrix(matrix);
+
+    double cosV = (double) cosf(radians);
+    double sinV = (double) sinf(radians);
+
+    // Rotate Y formula.
+    matrix[0] =    cosV;
+    matrix[2] = -1*sinV;
+    matrix[8] =    sinV;
+    matrix[10] =   cosV;
+}
+//---------------------------------------------------------
+void create4x4RotationBVH_Z(double * matrix,double degrees)
+{
+    double radians = degrees_to_radBVH(degrees);
+
+    create4x4IdentityMatrix(matrix);
+
+    double cosV = (double) cosf(radians);
+    double sinV = (double) sinf(radians);
+
+    // Rotate Z formula.
+    matrix[0] =    cosV;
+    matrix[1] =    sinV;
+    matrix[4] = -1*sinV;
+    matrix[5] =    cosV;
+}
+//---------------------------------------------------------
+#endif // USE_BVH_SPECIFIC_ROTATIONS
 
 
 
@@ -33,9 +106,16 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
 
   //Assuming the rotation axis are correct
   //rX,rY,rZ should hold our rotation matrices
-  create4x4RotationX(rX,degreesX);
-  create4x4RotationX(rY,degreesY);
-  create4x4RotationX(rZ,degreesZ);
+
+  #if USE_BVH_SPECIFIC_ROTATIONS
+   create4x4RotationBVH_X(rX,degreesX);
+   create4x4RotationBVH_Y(rY,degreesY);
+   create4x4RotationBVH_Z(rZ,degreesZ);
+  #else
+   create4x4RotationX(rX,degreesX);
+   create4x4RotationY(rY,degreesY);
+   create4x4RotationZ(rZ,degreesZ);
+  #endif // USE_BVH_SPECIFIC_ROTATIONS
 
 
   #if FLIP_ROTATION_ORDER
@@ -108,23 +188,14 @@ int bvh_loadTransformForFrame(
      create4x4IdentityMatrix(bvhTransform->joint[jID].worldTransformation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].staticTransformation);
-     create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicTransformation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
   }
 
   //We need some space to store the intermediate
   //matrices..
-  double translationM[16]={0};
-  double rotationM[16]={0};
-  double scalingM[16]={0};
-
-  create4x4IdentityMatrix(scalingM);
-  create4x4ScalingMatrix(scalingM,0.5,0.5,0.5);
-
   double posX,posY,posZ;
   double rotX,rotY,rotZ;
-
   float data[8]={0};
 
 
@@ -160,43 +231,7 @@ int bvh_loadTransformForFrame(
                             rotY,
                             rotZ
                           );
-
-
-      #if USE_SCALING_MATRIX
-       multiplyThree4x4Matrices(
-                                bvhTransform->joint[jID].dynamicTransformation,
-                                bvhTransform->joint[jID].dynamicTranslation,
-                                bvhTransform->joint[jID].dynamicRotation,
-                                scalingM
-                               );
-      #else
-       multiplyTwo4x4Matrices(
-                               bvhTransform->joint[jID].dynamicTransformation,
-                               bvhTransform->joint[jID].dynamicTranslation,
-                               bvhTransform->joint[jID].dynamicRotation
-                            );
-      #endif // USE_SCALING_MATRIX
   }
-
-
-  /*
-    if self.parent:
-        self.localtoworld = dot(self.parent.trtr, self.stransmat)
-    else:
-        self.localtoworld = dot(self.stransmat, self.dtransmat)
-
-    # Add rotation of this joint to stack to use for determining children positions
-    # Note that position of this joint is not affected by its rotation
-    self.trtr = dot(self.localtoworld,self.drotmat)
-
-    # Position is the translation part of the mat (fourth column)
-    self.worldpos = array([ self.localtoworld[0,3],
-                            self.localtoworld[1,3],
-                            self.localtoworld[2,3],
-                            self.localtoworld[3,3] ])
-
-  */
-
 
   //We will now apply all transformations
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)

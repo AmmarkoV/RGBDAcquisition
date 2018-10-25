@@ -199,8 +199,28 @@ int getParentJoint(struct BVH_MotionCapture * bvhMotion , unsigned int currentJo
   //return 0;
 }
 
+int thisLineOnlyHasX(const char * line,const char x)
+{
+  unsigned int i=0;
+  for (i=0; i<strlen(line); i++)
+  {
+    if (line[i]==' ')  { } else
+    if (line[i]=='\t') { } else
+    if (line[i]==10) { } else
+    if (line[i]==13) { } else
+    if (line[i]==x)  { } else
+        {
+           fprintf(stderr,"Line Char %u is %u(%c)\n",i,(unsigned int) line[i],line[i]);
+           return 0;
+        }
+  }
+ return 1;
+}
+
+
 int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 {
+  bvhMotion->linesParsed=0;
   bvhMotion->numberOfValuesPerFrame = 0;//57;
   bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE;
 
@@ -210,16 +230,18 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
   if (fd!=0)
   {
-   struct InputParserC * ipc = InputParser_Create(1024,4);
+   struct InputParserC * ipc = InputParser_Create(4096,5);
    InputParser_SetDelimeter(ipc,0,':');
    InputParser_SetDelimeter(ipc,1,'[');
    InputParser_SetDelimeter(ipc,2,']');
-   InputParser_SetDelimeter(ipc,3,'\n');
+   InputParser_SetDelimeter(ipc,3,10);
+   InputParser_SetDelimeter(ipc,4,13);
 
-   struct InputParserC * ipcB = InputParser_Create(1024,3);
+   struct InputParserC * ipcB = InputParser_Create(4096,4);
    InputParser_SetDelimeter(ipcB,0,' ');
    InputParser_SetDelimeter(ipcB,1,'\t');
-   InputParser_SetDelimeter(ipcB,2,'\n');
+   InputParser_SetDelimeter(ipcB,2,10);
+   InputParser_SetDelimeter(ipcB,3,13);
 
     unsigned int i=0;
     unsigned int jNum=0; //this is used internally instead of jointHierarchySize to make code more readable
@@ -231,6 +253,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
     while  ( (!done) && ((read = getline(&line, &len, fd)) != -1) )
     {
+       ++bvhMotion->linesParsed;
        //printf("Retrieved line of length %zu :\n", read);
        //printf("%s", line);
        int num = InputParser_SeperateWords(ipc,line,1);
@@ -348,7 +371,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                  bvhMotion->jointHierarchy[currentJoint].offset[2]=0.0;
                 }
              } else
-         if (InputParser_WordCompareAuto(ipcB,0,"{"))
+         if ( (InputParser_WordCompareAuto(ipcB,0,"{")) || (thisLineOnlyHasX(line,'{')) )
              {
               //We reached an { so we need to finish our joint OR root declaration
               fprintf(stderr,"-{%u-",hierarchyLevel);
@@ -383,7 +406,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                  }
                ++hierarchyLevel;
               } else
-         if (InputParser_WordCompareAuto(ipcB,0,"}"))
+         if ( (InputParser_WordCompareAuto(ipcB,0,"}")) || (thisLineOnlyHasX(line,'}') ) )
              {
               //We reached an } so we pop one hierarchyLevel
               if (hierarchyLevel>0)
@@ -406,8 +429,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
           else
          {
             //Unexpected input..
-            printf("Unexpected line of length %zu :\n", read);
-            printf("%s", line);
+            fprintf(stderr,"Unexpected line num (%u) of length %zu :\n" , bvhMotion->linesParsed , read);
+            fprintf(stderr,"%s", line);
          }
 
          } // We have header content
@@ -425,6 +448,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
    InputParser_Destroy(ipc);
    InputParser_Destroy(ipcB);
+   //We need file to be open..!
   }
 
 
@@ -451,7 +475,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 
-int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion , char * parameters)
+int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * parameters)
 {
    if (
          (bvhMotion->motionValues==0) ||
@@ -468,22 +492,24 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion , char * paramete
    InputParser_SetDelimeter(ipc,0,' ');
    InputParser_SetDelimeter(ipc,1,'\t');
    InputParser_SetDelimeter(ipc,2,' ');
-   InputParser_SetDelimeter(ipc,3,' ');
-   InputParser_SetDelimeter(ipc,3,'\n');
+   InputParser_SetDelimeter(ipc,3,10);
+   InputParser_SetDelimeter(ipc,4,13);
 
    unsigned int i=0;
-   int numberOfParameters = InputParser_SeperateWords(ipc,parameters,1);
-   fprintf(stderr,"MOTION command has %u parameters\n",numberOfParameters);
+   int numberOfParameters = InputParser_SeperateWordsCC(ipc,parameters,1);
+   //fprintf(stderr,"MOTION command has %u parameters\n",numberOfParameters);
 
-   if (numberOfParameters>0)
+
+   if (numberOfParameters==bvhMotion->numberOfValuesPerFrame)
    {
      if (numberOfParameters + bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame < bvhMotion->motionValuesSize+1)
      {
+      /*
       fprintf(stderr,
               "Filling from %u to %u \n",
               bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame,
               numberOfParameters+bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame
-             );
+             );*/
 
       for (i=0; i<numberOfParameters; i++)
       {
@@ -492,6 +518,12 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion , char * paramete
       }
      }
      bvhMotion->numberOfFramesEncountered++;
+   } else
+   {
+    //Unexpected input..
+    fprintf(stderr,"Motion Expected had %u parameters we received %u\n",bvhMotion->numberOfValuesPerFrame,numberOfParameters);
+    fprintf(stderr,"Unexpected line num (%u)  :\n" , bvhMotion->linesParsed);
+    fprintf(stderr,"%s", parameters);
    }
 
    InputParser_Destroy(ipc);
@@ -510,24 +542,26 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
   if (fd!=0)
   {
-   struct InputParserC * ipc = InputParser_Create(1024,5);
+   struct InputParserC * ipc = InputParser_Create(2048,3);
 
    InputParser_SetDelimeter(ipc,0,':');
-   InputParser_SetDelimeter(ipc,1,'[');
-   InputParser_SetDelimeter(ipc,2,',');
-   InputParser_SetDelimeter(ipc,3,']');
-   InputParser_SetDelimeter(ipc,4,'\n');
+   InputParser_SetDelimeter(ipc,1,10);
+   InputParser_SetDelimeter(ipc,2,13);
 
-    char str[512];
+    char str[2048];
     char * line = NULL;
     size_t len = 0;
 
     while ((read = getline(&line, &len, fd)) != -1)
     {
-       printf("Retrieved line of length %zu :\n", read);
-       printf("%s", line);
+       ++bvhMotion->linesParsed;
+
+       //fprintf(stderr,"Retrieved line of length %zu :\n", read);
+       //fprintf(stderr,"%s", line);
+
        int num = InputParser_SeperateWords(ipc,line,1);
 
+       //fprintf(stderr,"Has %u arguments\n",num);
        //InputParser_GetWord(ipc,0,str,512);
        //fprintf(stderr,"Word0=`%s`",str);
        //InputParser_GetWord(ipc,1,str,512);
@@ -538,7 +572,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
       { //We have content..
        if (!atMotionSection)
        {
-          if (InputParser_WordCompareAuto(ipc,0,"MOTION"))      { atMotionSection=1; }
+          if (InputParser_WordCompareAuto(ipc,0,"MOTION"))      { fprintf(stderr,"Found Motion Section..\n"); atMotionSection=1; }
        } else
        {
          if (InputParser_WordCompareAuto(ipc,0,"Frames"))       { bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1); } else
@@ -552,7 +586,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
            }
 
            //This is motion input
-           InputParser_GetWord(ipc,0,str,512);
+           InputParser_GetWord(ipc,0,str,2048);
            pushNewBVHMotionState(bvhMotion,str);
            str[0]=0;//Clean up str
          }
@@ -652,6 +686,14 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion)
       fclose(fd);
     }
  return successfullRead;
+}
+
+
+int bvh_free(struct BVH_MotionCapture * bvhMotion)
+{
+  if ( bvhMotion==0 ) { return 0; }
+  if ( bvhMotion->motionValues!= 0 ) { free(bvhMotion->motionValues); }
+  return 1;
 }
 
 int bvh_getJointIDFromJointName(

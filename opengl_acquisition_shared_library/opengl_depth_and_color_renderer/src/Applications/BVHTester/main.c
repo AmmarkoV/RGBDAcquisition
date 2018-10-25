@@ -35,9 +35,26 @@ void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 
 int main(int argc, char **argv)
 {
+    const char * fromBVHFile="Motions/example.bvh";
+    const char * toSceneFile="Scenes/bvh.conf";
+
+
+    unsigned int i=0;
+    for (i=0; i<argc; i++)
+    {
+        if (strcmp(argv[i],"--from")==0)
+        {
+          fromBVHFile=argv[i+1];
+        } else
+        if (strcmp(argv[i],"--to")==0)
+        {
+          toSceneFile=argv[i+1];
+        }
+    }
+
     struct BVH_MotionCapture bvhMotion={0};
 
-    bvh_loadBVH("Motions/example.bvh", &bvhMotion);
+    bvh_loadBVH(fromBVHFile, &bvhMotion);
 
     //Test printout of all rotations of a specific joint..
     //testPrintout(&bvhMotion,"RightFoot");
@@ -45,7 +62,9 @@ int main(int argc, char **argv)
     bvh_printBVH(&bvhMotion);
 
 
-    dumpBVHToTrajectoryParser("Scenes/bvh.conf",&bvhMotion);
+    dumpBVHToTrajectoryParser(toSceneFile,&bvhMotion);
+
+    bvh_free(&bvhMotion);
 
     return 0;
 }

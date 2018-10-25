@@ -1,6 +1,6 @@
 
 /*                  
-This file was automatically generated @ 31-05-2018 19:47:50 using StringRecognizer                  
+This file was automatically generated @ 26-10-2018 01:27:18 using StringRecognizer                  
 https://github.com/AmmarkoV/AmmarServer/tree/master/src/StringRecognizer                 
 Please note that changes you make here may be automatically overwritten                  
 if the String Recognizer generator runs again..!              
@@ -82,6 +82,10 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
  break; 
  case 'F' : 
      switch (toupper(str[1])) { 
+     case 'A' : 
+         if (strLength<8) { return 0; } 
+         if ( strncasecmp(str,"FAR_CLIP",8) == 0 ) { return TRAJECTORYPRIMITIVES_FAR_CLIP; } 
+     break; 
      case 'O' : 
          if (strLength<3) { return 0; } 
          if ( strncasecmp(str,"FOG",3) == 0 ) { return TRAJECTORYPRIMITIVES_FOG; } 
@@ -136,6 +140,10 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
         }; 
      break; 
     }; 
+ break; 
+ case 'N' : 
+     if (strLength<9) { return 0; } 
+     if ( strncasecmp(str,"NEAR_CLIP",9) == 0 ) { return TRAJECTORYPRIMITIVES_NEAR_CLIP; } 
  break; 
  case 'O' : 
      switch (toupper(str[1])) { 

@@ -17,7 +17,7 @@
 * @brief MAX_BVH_JOINT_HIERARCHY_SIZE is the maximum number of Joints
 * @ingroup BVH
 */
-#define MAX_BVH_JOINT_HIERARCHY_SIZE 128
+#define MAX_BVH_JOINT_HIERARCHY_SIZE 256
 
 enum CHANNEL_NAMES
 {
@@ -123,6 +123,7 @@ struct BVH_MotionCapture
 
   //Internal Variables..
   char fileName[1024];
+  unsigned int linesParsed;
 };
 
 
@@ -142,6 +143,9 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion);
 */
 int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion);
 
+
+
+int bvh_free(struct BVH_MotionCapture * bvhMotion);
 
 /**
 * @brief Resolve a C-String from a Joint name to a Joint ID
