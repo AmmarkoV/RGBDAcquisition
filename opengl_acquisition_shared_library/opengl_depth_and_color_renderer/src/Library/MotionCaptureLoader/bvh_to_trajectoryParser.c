@@ -79,6 +79,8 @@ int dumpBVHJointToTP(FILE*fp , struct BVH_MotionCapture * mc , unsigned int fID,
           bvh_getJointRotationYAtFrame(mc,jID,fID),
           bvh_getJointRotationZAtFrame(mc,jID,fID)
          );
+
+   return 1;
 }
 
 

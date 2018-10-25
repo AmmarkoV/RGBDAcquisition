@@ -7,7 +7,7 @@
 //A straightforward way to create the rotation matrix is to create 3 separate rotation matrices, one for each axis of rotation. Then concatenate the matrices from left to right Y, X and Z.
 //
 //vR = vYXZ
-void create4x4RotationBVH(double * matrix,double degreesX,double degreesY,double degreesZ)
+void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,double degreesY,double degreesZ)
 {
   double rX[16]={0};
   double rY[16]={0};
@@ -19,12 +19,54 @@ void create4x4RotationBVH(double * matrix,double degreesX,double degreesY,double
 
   //TODO : Fix correct order..
   //http://www.dcs.shef.ac.uk/intranet/research/public/resmes/CS0111.pdf
-  multiplyThree4x4Matrices(
-                            matrix,
-                            rZ,
-                            rY,
-                            rX
-                          );
+  #define FLIP_ROTATION_ORDER 0
+
+  #if FLIP_ROTATION_ORDER
+  switch (rotationType)
+  {
+    case BVH_ROTATION_ORDER_XYZ :
+      multiplyThree4x4Matrices( matrix, rZ, rY, rX );
+    break;
+    case BVH_ROTATION_ORDER_XZY :
+      multiplyThree4x4Matrices( matrix, rY, rZ, rX );
+    break;
+    case BVH_ROTATION_ORDER_YXZ :
+      multiplyThree4x4Matrices( matrix, rZ, rX, rY );
+    break;
+    case BVH_ROTATION_ORDER_YZX :
+      multiplyThree4x4Matrices( matrix, rX, rZ, rY );
+    break;
+    case BVH_ROTATION_ORDER_ZXY :
+      multiplyThree4x4Matrices( matrix, rY, rX, rZ );
+    break;
+    case BVH_ROTATION_ORDER_ZYX :
+      multiplyThree4x4Matrices( matrix, rX, rY, rZ );
+    break;
+  };
+  #else
+  switch (rotationType)
+  {
+    case BVH_ROTATION_ORDER_XYZ :
+      multiplyThree4x4Matrices( matrix, rX, rY, rZ );
+    break;
+    case BVH_ROTATION_ORDER_XZY :
+      multiplyThree4x4Matrices( matrix, rX, rZ, rY );
+    break;
+    case BVH_ROTATION_ORDER_YXZ :
+      multiplyThree4x4Matrices( matrix, rY, rX, rZ );
+    break;
+    case BVH_ROTATION_ORDER_YZX :
+      multiplyThree4x4Matrices( matrix, rY, rZ, rX );
+    break;
+    case BVH_ROTATION_ORDER_ZXY :
+      multiplyThree4x4Matrices( matrix, rZ, rX, rY );
+    break;
+    case BVH_ROTATION_ORDER_ZYX :
+      multiplyThree4x4Matrices( matrix, rZ, rY, rX );
+    break;
+  };
+  #endif // FLIP_ROTATION_ORDER
+
 }
 
 
@@ -71,7 +113,13 @@ int bvh_loadTransformForFrame(
 
       create4x4TranslationMatrix(translationM,posX,posY,posZ);
       //create4x4MatrixFromEulerAnglesZYX(rotationM,rotY,rotX,rotZ);
-      create4x4RotationBVH(rotationM,rotX,rotY,rotZ);
+      create4x4RotationBVH(
+                            rotationM,
+                            bvhMotion->jointHierarchy[jID].channelRotationOrder,
+                            rotX,
+                            rotY,
+                            rotZ
+                          );
 
       /*
       multiplyTwo4x4Matrices(

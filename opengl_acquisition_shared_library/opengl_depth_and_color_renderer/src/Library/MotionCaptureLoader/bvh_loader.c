@@ -46,6 +46,74 @@ int enumerateInputParserChannel(struct InputParserC * ipc , unsigned int argumen
   return BVH_POSITION_NONE;
 }
 
+
+int enumerateChannelOrderFromTypes(char typeA,char typeB,char typeC)
+{
+  switch (typeA)
+  {
+    case BVH_ROTATION_X :
+         switch (typeB)
+         {
+           case BVH_ROTATION_Y :
+               if (typeC == BVH_ROTATION_Z) { return BVH_ROTATION_ORDER_XYZ; }
+           break;
+           case BVH_ROTATION_Z :
+               if (typeC == BVH_ROTATION_Y) { return BVH_ROTATION_ORDER_XZY; }
+           break;
+         };
+    break;
+
+    case BVH_ROTATION_Y :
+         switch (typeB)
+         {
+           case BVH_ROTATION_X :
+               if (typeC == BVH_ROTATION_Z) { return BVH_ROTATION_ORDER_YXZ; }
+           break;
+           case BVH_ROTATION_Z :
+               if (typeC == BVH_ROTATION_X) { return BVH_ROTATION_ORDER_YZX; }
+           break;
+         };
+    break;
+
+    case BVH_ROTATION_Z :
+         switch (typeB)
+         {
+           case BVH_ROTATION_X :
+               if (typeC == BVH_ROTATION_Y) { return BVH_ROTATION_ORDER_ZXY; }
+           break;
+           case BVH_ROTATION_Y :
+               if (typeC == BVH_ROTATION_X) { return BVH_ROTATION_ORDER_ZYX; }
+           break;
+         };
+    break;
+  }
+ return BVH_ROTATION_ORDER_NONE;
+}
+
+
+int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint)
+{
+  int channelOrder=enumerateChannelOrderFromTypes(
+                                                  bvhMotion->jointHierarchy[currentJoint].channelType[0],
+                                                  bvhMotion->jointHierarchy[currentJoint].channelType[1],
+                                                  bvhMotion->jointHierarchy[currentJoint].channelType[2]
+                                                 );
+
+  if (channelOrder==BVH_ROTATION_ORDER_NONE)
+  {
+      channelOrder=enumerateChannelOrderFromTypes(
+                                                  bvhMotion->jointHierarchy[currentJoint].channelType[3],
+                                                  bvhMotion->jointHierarchy[currentJoint].channelType[4],
+                                                  bvhMotion->jointHierarchy[currentJoint].channelType[5]
+                                                 );
+  }
+  if (channelOrder==BVH_ROTATION_ORDER_NONE)
+  {
+    fprintf(stderr,"BUG: Channel order still wrong, todo smarter channel order enumeration..\n");
+  }
+return channelOrder;
+}
+
 int getParentJoint(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint , unsigned int hierarchyLevel , unsigned int * parentJoint)
 {
   if (currentJoint>=bvhMotion->MAX_jointHierarchySize)
@@ -204,6 +272,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                    bvhMotion->lookupTable[lookupID].jointID   = currentJoint;
                    bvhMotion->lookupTable[lookupID].parentID  = parentID;
                   }
+
+               bvhMotion->jointHierarchy[currentJoint].channelRotationOrder =enumerateChannelOrder(bvhMotion,currentJoint);
               //Done
               } else
          if (InputParser_WordCompareAuto(ipcB,0,"OFFSET"))

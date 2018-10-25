@@ -33,6 +33,19 @@ enum CHANNEL_NAMES
   BVH_VALID_CHANNEL_NAMES
 };
 
+enum CHANNEL_ROTATION_ORDER
+{
+  BVH_ROTATION_ORDER_NONE=0,
+  BVH_ROTATION_ORDER_XYZ,
+  BVH_ROTATION_ORDER_XZY,
+  BVH_ROTATION_ORDER_YXZ,
+  BVH_ROTATION_ORDER_YZX,
+  BVH_ROTATION_ORDER_ZXY,
+  BVH_ROTATION_ORDER_ZYX,
+  //--------------------
+  BVH_VALID_ROTATION_ORDER_NAMES
+};
+
 
 static const char * channelNames[] =
 {
@@ -74,6 +87,7 @@ struct BVH_Joint
   //--------------------
   float channels[BVH_VALID_CHANNEL_NAMES];
   char  channelType[BVH_VALID_CHANNEL_NAMES];
+  char  channelRotationOrder;
   char  loadedChannels;
   //--------------------
 };
