@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "bvh_transform.h"
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
@@ -13,6 +14,11 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
   double rY[16]={0};
   double rZ[16]={0};
 
+  //Initialize rotation matrix..
+  create4x4IdentityMatrix(matrix);
+
+  //Assuming the rotation axis are correct
+  //rX,rY,rZ should hold our rotation matrices
   create4x4RotationX(rX,degreesX);
   create4x4RotationX(rY,degreesY);
   create4x4RotationX(rZ,degreesZ);
@@ -47,6 +53,7 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
   switch (rotationType)
   {
     case BVH_ROTATION_ORDER_XYZ :
+      //This is what happens with poser exported bvh files..
       multiplyThree4x4Matrices( matrix, rX, rY, rZ );
     break;
     case BVH_ROTATION_ORDER_XZY :
@@ -59,6 +66,7 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
       multiplyThree4x4Matrices( matrix, rY, rZ, rX );
     break;
     case BVH_ROTATION_ORDER_ZXY :
+      //This is what happens most of the time with bvh files..
       multiplyThree4x4Matrices( matrix, rZ, rX, rY );
     break;
     case BVH_ROTATION_ORDER_ZYX :
@@ -70,6 +78,11 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
 }
 
 
+double fToD(float in)
+{
+  return (double) in;
+}
+
 int bvh_loadTransformForFrame(
                                struct BVH_MotionCapture * bvhMotion ,
                                BVHFrameID fID ,
@@ -78,14 +91,15 @@ int bvh_loadTransformForFrame(
 {
   unsigned int jID=0;
 
-  //First of all we need to clean the current transform
+  //First of all we need to clean the BVH_Transform structure
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
      create4x4IdentityMatrix(bvhTransform->joint[jID].localTransformation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].finalVertexTransformation);
   }
 
-  //We will now apply all transformations
+  //We need some space to store the intermediate
+  //matrices..
   double translationM[16]={0};
   double rotationM[16]={0};
   double scalingM[16]={0};
@@ -98,18 +112,23 @@ int bvh_loadTransformForFrame(
   double rotX,rotY,rotZ;
 
   float data[8]={0};
+
+
+
+  //First of all we need to populate all local transformation in our chain
+  //-----------------------------------------------------------------------
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
       bhv_populatePosXYZRotXYZ(bvhMotion,jID,fID,data,sizeof(data));
       float * offset = bvh_getJointOffset(bvhMotion,jID);
 
-      posX = (double) offset[0] + (double) data[0];
-      posY = (double) offset[1] + (double) data[1];
-      posZ = (double) offset[2] + (double) data[2];
+      posX = fToD(offset[0] + data[0]);
+      posY = fToD(offset[1] + data[1]);
+      posZ = fToD(offset[2] + data[2]);
 
-      rotX = (double) data[3];
-      rotY = (double) data[4];
-      rotZ = (double) data[5];
+      rotX = fToD(data[3]);
+      rotY = fToD(data[4]);
+      rotZ = fToD(data[5]);
 
       create4x4TranslationMatrix(translationM,posX,posY,posZ);
       //create4x4MatrixFromEulerAnglesZYX(rotationM,rotY,rotX,rotZ);
@@ -121,22 +140,26 @@ int bvh_loadTransformForFrame(
                             rotZ
                           );
 
-      /*
-      multiplyTwo4x4Matrices(
+      #define USE_SCALING_MATRIX 0
+
+      #if USE_SCALING_MATRIX
+       multiplyThree4x4Matrices(
+                                bvhTransform->joint[jID].localTransformation,
+                                translationM,
+                                rotationM,
+                                scalingM
+                               );
+      #else
+       multiplyTwo4x4Matrices(
                                bvhTransform->joint[jID].localTransformation,
                                translationM,
                                rotationM
-                            );*/
-
-      multiplyThree4x4Matrices(
-                               bvhTransform->joint[jID].localTransformation,
-                               translationM,
-                               rotationM,
-                               scalingM
-                              );
+                            );
+      #endif // USE_SCALING_MATRIX
   }
 
 
+  //We will now apply all transformations
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
      if (bhv_jointHasParent(bvhMotion,jID))
@@ -157,8 +180,18 @@ int bvh_loadTransformForFrame(
                                               bvhTransform->joint[jID].finalVertexTransformation,
                                               centerPoint
                                             );
+
+       fprintf(stderr,"Frame %u/Joint : %u \n",fID,jID);
+       print4x4DMatrix(
+                        bvhMotion->jointHierarchy[jID].jointName,
+                        bvhTransform->joint[jID].localTransformation,
+                        1
+                      );
       } else
       {
+       //If we are the root node there is no parent..
+       //If there is no parent we will only set our position and copy to the final transform
+       /*
        bhv_populatePosXYZRotXYZ(bvhMotion,jID,fID,data,sizeof(data));
        float * offset = bvh_getJointOffset(bvhMotion,jID);
 
@@ -166,10 +199,26 @@ int bvh_loadTransformForFrame(
        bvhTransform->joint[jID].pos[1] = (double) offset[1] + (double) data[1];
        bvhTransform->joint[jID].pos[2] = (double) offset[2] + (double) data[2];
 
+       create4x4TranslationMatrix(
+                                  bvhTransform->joint[jID].localTransformation,
+                                  (double) bvhTransform->joint[jID].pos[0],
+                                  (double) bvhTransform->joint[jID].pos[1],
+                                  (double) bvhTransform->joint[jID].pos[2]
+                                 );*/
        copy4x4DMatrix(
                        bvhTransform->joint[jID].finalVertexTransformation ,
                        bvhTransform->joint[jID].localTransformation
                       );
+
+       fprintf(stderr,"Frame %u/Joint : %u \n",fID,jID);
+       fprintf(stderr,"Rotation Order : %s \n",rotationOrderNames[bvhMotion->jointHierarchy[jID].channelRotationOrder]);
+
+       print4x4DMatrix(
+                        bvhMotion->jointHierarchy[jID].jointName,
+                        bvhTransform->joint[jID].localTransformation,
+                        1
+                      );
+
       }
   }
 

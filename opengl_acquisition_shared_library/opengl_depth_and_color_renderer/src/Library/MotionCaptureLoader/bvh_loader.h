@@ -19,7 +19,6 @@
 */
 #define MAX_BVH_JOINT_HIERARCHY_SIZE 128
 
-
 enum CHANNEL_NAMES
 {
   BVH_POSITION_NONE=0,
@@ -32,6 +31,8 @@ enum CHANNEL_NAMES
   //--------------------
   BVH_VALID_CHANNEL_NAMES
 };
+
+extern const char * channelNames[];
 
 enum CHANNEL_ROTATION_ORDER
 {
@@ -47,18 +48,7 @@ enum CHANNEL_ROTATION_ORDER
 };
 
 
-static const char * channelNames[] =
-{
-    "Xrotation",
-    "Yrotation",
-    "Zrotation",
-    "Xposition",
-    "Yposition",
-    "Zposition",
-//=================
-    "End of Channel Names" ,
-    "Unknown"
-};
+extern const char * rotationOrderNames[];
 
 typedef unsigned int BVHJointID;
 typedef unsigned int BVHFrameID;
@@ -132,6 +122,7 @@ struct BVH_MotionCapture
   float * motionValues;
 
   //Internal Variables..
+  char fileName[1024];
 };
 
 

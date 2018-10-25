@@ -19,6 +19,36 @@
 #include "bvh_loader.h"
 #include "../TrajectoryParser/InputParser_C.h"
 
+
+const char * channelNames[] =
+{
+    "no rotation channel",
+    "Xrotation",
+    "Yrotation",
+    "Zrotation",
+    "Xposition",
+    "Yposition",
+    "Zposition",
+//=================
+    "End of Channel Names" ,
+    "Unknown"
+};
+
+const char * rotationOrderNames[] =
+{
+  "no rotation order",
+  "XYZ",
+  "XZY",
+  "YXZ",
+  "YZX",
+  "ZXY",
+  "ZYX",
+//=================
+    "End of Channel Rotation Orders" ,
+    "Unknown"
+};
+
+
 //A very brief documentation of the BVH spec :
 //http://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html?fbclid=IwAR0BopXj4Kft_RAEE41VLblkkPGHVF8-mon3xSCBMZueRtyb9LCSZDZhXPA
 
@@ -259,6 +289,10 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
               fprintf(stderr,"-%u-",bvhMotion->jointHierarchy[currentJoint].loadedChannels);
               //Sum the number of channels for motion commands later..
               bvhMotion->numberOfValuesPerFrame += bvhMotion->jointHierarchy[currentJoint].loadedChannels;
+
+              //First to wipe channels to make sure they are clean
+              memset(bvhMotion->jointHierarchy[currentJoint].channels,0,sizeof(float) * BVH_VALID_CHANNEL_NAMES);
+              memset(bvhMotion->jointHierarchy[currentJoint].channelType,0,sizeof(char) * BVH_VALID_CHANNEL_NAMES);
               //Now to store the channel labels
               for (i=0; i<bvhMotion->jointHierarchy[currentJoint].loadedChannels; i++)
                   {
@@ -539,6 +573,7 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
     if (bvhMotion->jointHierarchy[i].loadedChannels>0)
     {
      fprintf(stderr,"Has %u channels\n",bvhMotion->jointHierarchy[i].loadedChannels);
+     fprintf(stderr,"Rotation Order: %s \n",rotationOrderNames[(unsigned int) bvhMotion->jointHierarchy[i].channelRotationOrder]);
      for (z=0; z<bvhMotion->jointHierarchy[i].loadedChannels; z++)
       {
         unsigned int cT = bvhMotion->jointHierarchy[i].channelType[z];
@@ -579,6 +614,7 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion)
   fd = fopen(filename,"r");
   if (fd!=0)
     {
+      snprintf(bvhMotion->fileName,1024,"%s",filename);
       if (readBVHHeader(bvhMotion,fd))
       {
        if (readBVHMotion(bvhMotion,fd))
