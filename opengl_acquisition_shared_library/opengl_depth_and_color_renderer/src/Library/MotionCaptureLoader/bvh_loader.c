@@ -20,6 +20,25 @@
 #include "../TrajectoryParser/InputParser_C.h"
 
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+#define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
+#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
+#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
+#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
+#define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
+#define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
+#define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
+#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
+
+
 const char * channelNames[] =
 {
     "no rotation channel",
@@ -316,9 +335,18 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
               //Store offsets..
               //TODO: could check numB to make sure all offsets are present..
-              bvhMotion->jointHierarchy[currentJoint].offset[0]=InputParser_GetWordFloat(ipcB,1);
-              bvhMotion->jointHierarchy[currentJoint].offset[1]=InputParser_GetWordFloat(ipcB,2);
-              bvhMotion->jointHierarchy[currentJoint].offset[2]=InputParser_GetWordFloat(ipcB,3);
+              if (numB==4)
+                {
+                 bvhMotion->jointHierarchy[currentJoint].offset[0]=InputParser_GetWordFloat(ipcB,1);
+                 bvhMotion->jointHierarchy[currentJoint].offset[1]=InputParser_GetWordFloat(ipcB,2);
+                 bvhMotion->jointHierarchy[currentJoint].offset[2]=InputParser_GetWordFloat(ipcB,3);
+                } else
+                {
+                 fprintf(stderr,"Incorrect number of offset arguments..\n");
+                 bvhMotion->jointHierarchy[currentJoint].offset[0]=0.0;
+                 bvhMotion->jointHierarchy[currentJoint].offset[1]=0.0;
+                 bvhMotion->jointHierarchy[currentJoint].offset[2]=0.0;
+                }
              } else
          if (InputParser_WordCompareAuto(ipcB,0,"{"))
              {
@@ -565,8 +593,7 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
   for (i=0; i<bvhMotion->jointHierarchySize; i++)
   {
     fprintf(stderr,"___________________________________\n");
-    fprintf(stderr,"Joint %u - %s \n",i,bvhMotion->jointHierarchy[i].jointName);
-    fprintf(stderr,"___________________________________\n");
+    fprintf(stderr,GREEN "Joint %u - %s \n" NORMAL ,i,bvhMotion->jointHierarchy[i].jointName);
     unsigned int parentID = bvhMotion->jointHierarchy[i].parentJoint;
     fprintf(stderr,"Parent %u - %s \n",parentID,bvhMotion->jointHierarchy[parentID].jointName);
     //===============================================================

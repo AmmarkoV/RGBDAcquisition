@@ -3,6 +3,20 @@
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
+
+
+//TODO : Fix correct order..
+//http://www.dcs.shef.ac.uk/intranet/research/public/resmes/CS0111.pdf
+#define FLIP_ROTATION_ORDER 0
+
+#define USE_SCALING_MATRIX 0
+
+//Also find Center of Joint
+//We can skip the matrix multiplication by just grabbing the last column..
+#define FIND_FAST_CENTER 1
+
+
+
 //As http://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html?fbclid=IwAR0Hq96gIhAq-6mvi8OAfMJid2qkv7ZIGNxNMna4vBNngILoceulshvxMfc states
 //To calculate the position of a segment you first create a transformation matrix from the local translation and rotation information for that segment. For any joint segment the translation information will simply be the offset as defined in the hierarchy section. The rotation data comes from the motion section. For the root object, the translation data will be the sum of the offset data and the translation data from the motion section. The BVH format doesn't account for scales so it isn't necessary to worry about including a scale factor calculation.
 //A straightforward way to create the rotation matrix is to create 3 separate rotation matrices, one for each axis of rotation. Then concatenate the matrices from left to right Y, X and Z.
@@ -23,9 +37,6 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
   create4x4RotationX(rY,degreesY);
   create4x4RotationX(rZ,degreesZ);
 
-  //TODO : Fix correct order..
-  //http://www.dcs.shef.ac.uk/intranet/research/public/resmes/CS0111.pdf
-  #define FLIP_ROTATION_ORDER 0
 
   #if FLIP_ROTATION_ORDER
   switch (rotationType)
@@ -103,7 +114,6 @@ int bvh_loadTransformForFrame(
   double translationM[16]={0};
   double rotationM[16]={0};
   double scalingM[16]={0};
-  double centerPoint[4]={0.0,0.0,0.0,1.0};
 
   create4x4IdentityMatrix(scalingM);
   create4x4ScalingMatrix(scalingM,0.5,0.5,0.5);
@@ -140,7 +150,6 @@ int bvh_loadTransformForFrame(
                             rotZ
                           );
 
-      #define USE_SCALING_MATRIX 0
 
       #if USE_SCALING_MATRIX
        multiplyThree4x4Matrices(
@@ -159,11 +168,30 @@ int bvh_loadTransformForFrame(
   }
 
 
+  /*
+    if self.parent:
+        self.localtoworld = dot(self.parent.trtr, self.stransmat)
+    else:
+        self.localtoworld = dot(self.stransmat, self.dtransmat)
+
+    # Add rotation of this joint to stack to use for determining children positions
+    # Note that position of this joint is not affected by its rotation
+    self.trtr = dot(self.localtoworld,self.drotmat)
+
+    # Position is the translation part of the mat (fourth column)
+    self.worldpos = array([ self.localtoworld[0,3],
+                            self.localtoworld[1,3],
+                            self.localtoworld[2,3],
+                            self.localtoworld[3,3] ])
+
+  */
+
+
   //We will now apply all transformations
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
      if (bhv_jointHasParent(bvhMotion,jID))
-      {
+      {//If joint is not Root joint
         unsigned int parentID = bvhMotion->jointHierarchy[jID].parentJoint;
         multiplyTwo4x4Matrices(
                                 //Output
@@ -174,12 +202,20 @@ int bvh_loadTransformForFrame(
                                 bvhTransform->joint[jID].localTransformation
                               );
 
-        //Also find Center of Joint
-        transform3DPointVectorUsing4x4Matrix(
+
+        #if FIND_FAST_CENTER
+          bvhTransform->joint[jID].pos[0]= bvhTransform->joint[jID].finalVertexTransformation[3];
+          bvhTransform->joint[jID].pos[1]= bvhTransform->joint[jID].finalVertexTransformation[7];
+          bvhTransform->joint[jID].pos[2]= bvhTransform->joint[jID].finalVertexTransformation[11];
+          bvhTransform->joint[jID].pos[3]= 1.0;
+        #else
+         double centerPoint[4]={0.0,0.0,0.0,1.0};
+         transform3DPointVectorUsing4x4Matrix(
                                               bvhTransform->joint[jID].pos,
                                               bvhTransform->joint[jID].finalVertexTransformation,
                                               centerPoint
-                                            );
+                                             );
+        #endif // FIND_FAST_CENTER
 
        fprintf(stderr,"Frame %u/Joint : %u \n",fID,jID);
        print4x4DMatrix(
@@ -188,23 +224,8 @@ int bvh_loadTransformForFrame(
                         1
                       );
       } else
-      {
-       //If we are the root node there is no parent..
+      {//If we are the root node there is no parent..
        //If there is no parent we will only set our position and copy to the final transform
-       /*
-       bhv_populatePosXYZRotXYZ(bvhMotion,jID,fID,data,sizeof(data));
-       float * offset = bvh_getJointOffset(bvhMotion,jID);
-
-       bvhTransform->joint[jID].pos[0] = (double) offset[0] + (double) data[0];
-       bvhTransform->joint[jID].pos[1] = (double) offset[1] + (double) data[1];
-       bvhTransform->joint[jID].pos[2] = (double) offset[2] + (double) data[2];
-
-       create4x4TranslationMatrix(
-                                  bvhTransform->joint[jID].localTransformation,
-                                  (double) bvhTransform->joint[jID].pos[0],
-                                  (double) bvhTransform->joint[jID].pos[1],
-                                  (double) bvhTransform->joint[jID].pos[2]
-                                 );*/
        copy4x4DMatrix(
                        bvhTransform->joint[jID].finalVertexTransformation ,
                        bvhTransform->joint[jID].localTransformation

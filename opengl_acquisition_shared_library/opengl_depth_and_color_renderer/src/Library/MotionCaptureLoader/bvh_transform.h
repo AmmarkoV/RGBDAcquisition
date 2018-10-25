@@ -14,6 +14,8 @@ struct BVH_TransformedJoint
 {
   double finalVertexTransformation[16]; //What we will use in the end
   double localTransformation[16]; // or node->mTransformation
+  double staticTransformation[16];
+  double dynamicTransformation[16];
   double pos[4];
 };
 

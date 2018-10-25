@@ -13,6 +13,24 @@
 #include "../../Library/MotionCaptureLoader/bvh_loader.h"
 #include "../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.h"
 
+void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
+{
+    //Test getting rotations for a joint..
+    BVHFrameID frameID = 0;
+    BVHJointID jID=0;
+   fprintf(stderr,"\nJoint %s \n",bvhMotion->jointHierarchy[jID].jointName);
+    if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
+    {
+      for (frameID=0; frameID<bvhMotion->numberOfFrames; frameID++)
+       {
+         fprintf(stderr,"Frame %u \n",frameID);
+         fprintf(stderr,"XRotation:%0.2f ",bvh_getJointRotationXAtFrame(bvhMotion , jID ,  frameID));
+         fprintf(stderr,"YRotation:%0.2f ",bvh_getJointRotationYAtFrame(bvhMotion , jID ,  frameID));
+         fprintf(stderr,"ZRotation:%0.2f\n",bvh_getJointRotationZAtFrame(bvhMotion , jID ,  frameID));
+       }
+    }
+}
+
 
 
 int main(int argc, char **argv)
@@ -21,21 +39,11 @@ int main(int argc, char **argv)
 
     bvh_loadBVH("Motions/example.bvh", &bvhMotion);
 
+    //Test printout of all rotations of a specific joint..
+    //testPrintout(&bvhMotion,"RightFoot");
+
     bvh_printBVH(&bvhMotion);
 
-    //Test getting rotations for a joint..
-    BVHFrameID frameID = 0;
-    BVHJointID jID=0;
-    if ( bvh_getJointIDFromJointName(&bvhMotion ,"RightFoot",&jID) )
-    {
-      for (frameID=0; frameID<bvhMotion.numberOfFrames; frameID++)
-       {
-         fprintf(stderr,"Joint %s \n",bvhMotion.jointHierarchy[jID].jointName);
-         fprintf(stderr,"XRotation:%0.2f ",bvh_getJointRotationXAtFrame(&bvhMotion , jID ,  frameID));
-         fprintf(stderr,"YRotation:%0.2f ",bvh_getJointRotationYAtFrame(&bvhMotion , jID ,  frameID));
-         fprintf(stderr,"ZRotation:%0.2f\n",bvh_getJointRotationZAtFrame(&bvhMotion , jID ,  frameID));
-       }
-    }
 
     dumpBVHToTrajectoryParser("Scenes/bvh.conf",&bvhMotion);
 
