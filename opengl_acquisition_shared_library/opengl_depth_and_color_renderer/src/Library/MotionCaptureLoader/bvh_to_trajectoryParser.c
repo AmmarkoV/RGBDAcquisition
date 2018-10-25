@@ -174,8 +174,8 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
     fprintf(fp,"NEAR_CLIP(0.1)\n");
     fprintf(fp,"FAR_CLIP(1000)\n");
     fprintf(fp,"SILENT(1)\n");
-    fprintf(fp,"RATE(100)\n");
-    fprintf(fp,"INTERPOLATE_TIME(0)\n");
+    fprintf(fp,"RATE(1000)\n");
+    fprintf(fp,"INTERPOLATE_TIME(1)\n");
     fprintf(fp,"MOVE_VIEW(1)\n\n");
 
     //Instantiate objects that will draw our skeleton
