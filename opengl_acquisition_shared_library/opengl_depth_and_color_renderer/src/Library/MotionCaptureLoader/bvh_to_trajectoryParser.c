@@ -168,7 +168,7 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
     fprintf(fp,"#Auto generated using BVHTester to render file : %s to scene : %s\n",mc->fileName,filename);
     fprintf(fp,"#https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer\n");
     fprintf(fp,"AUTOREFRESH(1500)\n");
-    fprintf(fp,"BACKGROUND(0,0,0)\n");
+    fprintf(fp,"BACKGROUND(63,114,182)\n");
 
 
     //fprintf(fp,"SCALE_WORLD(-1,1,1)\n");
