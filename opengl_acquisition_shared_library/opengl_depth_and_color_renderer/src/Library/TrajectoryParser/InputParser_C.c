@@ -293,7 +293,7 @@ void InputParser_Destroy(struct InputParserC * ipc)
     if ( ipc->delimeters != 0 )
     {
      free(ipc->delimeters);
-     /*ipc->delimeters=0;*/
+     ipc->delimeters=0;
     }
     ipc->cur_delimeter_count=0;
     ipc->max_delimeter_count=0;
@@ -317,7 +317,7 @@ void InputParser_Destroy(struct InputParserC * ipc)
     if ( ipc->tokenlist != 0 )
      {
       free(ipc->tokenlist);
-      /*ipc->tokenlist=0;*/
+      ipc->tokenlist=0;
      }
     ipc->tokens_max=0;
     ipc->tokens_count=0;

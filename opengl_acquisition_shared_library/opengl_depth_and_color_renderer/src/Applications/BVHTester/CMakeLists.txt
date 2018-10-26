@@ -31,8 +31,17 @@ IF( ENABLE_SHADERS )
  add_definitions(-DUSE_GLEW)
 ENDIF( ENABLE_SHADERS )
 
-add_executable(BVHTester main.c ) 
-target_link_libraries(BVHTester rt m GL GLU X11 OGLRendererSandbox Codecs  ${PNG_Libs} ${JPG_Libs}  ${GLEW_Libs}  ) 
+add_executable( 
+               BVHTester 
+               main.c 
+              ../../Library/MotionCaptureLoader/bvh_loader.c
+              ../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.c
+              ../../Library/MotionCaptureLoader/bvh_transform.c
+              ../../Library/TrajectoryParser/InputParser_C.c
+              ../../../../../tools/AmMatrix/matrix4x4Tools.c
+              )
+ 
+target_link_libraries(BVHTester rt m  ) 
 add_dependencies(BVHTester OGLRendererSandbox)  
        
  

@@ -31,8 +31,6 @@ void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
     }
 }
 
-
-
 int main(int argc, char **argv)
 {
     const char * fromBVHFile="Motions/example.bvh";

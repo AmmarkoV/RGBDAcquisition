@@ -38,14 +38,12 @@
 			<Add directory="../../" />
 		</Compiler>
 		<Linker>
-			<Add library="png" />
-			<Add library="jpeg" />
-			<Add library="GL" />
-			<Add library="GLU" />
-			<Add library="X11" />
-			<Add library="../../../libOGLRendererSandbox.so" />
 			<Add directory="../../" />
 		</Linker>
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

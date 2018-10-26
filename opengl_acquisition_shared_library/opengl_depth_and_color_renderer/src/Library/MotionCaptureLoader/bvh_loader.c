@@ -262,9 +262,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
    InputParser_SetDelimeter(ipcB,2,10);
    InputParser_SetDelimeter(ipcB,3,13);
 
-    unsigned int i=0;
     unsigned int jNum=0; //this is used internally instead of jointHierarchySize to make code more readable
-    unsigned int lookupID=0;
     unsigned int currentJoint=0; //this is used internally instead of jointHierarchySize to make code more readable
     unsigned int hierarchyLevel=0;
     char * line = NULL;
@@ -474,6 +472,9 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
       } //We have content
     } //We have line input from file
 
+   //Free incoming line buffer..
+   if (line) { free(line); }
+
    if (hierarchyLevel!=0)
    {
      fprintf(stderr,RED "Missing } braces..\n" NORMAL);
@@ -631,6 +632,9 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
        }
     }
 
+   //Free incoming line buffer..
+   if (line) { free(line); }
+
    InputParser_Destroy(ipc);
   }
 
@@ -736,7 +740,7 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
 
 
 
-
+/*
 int bvh_InternalCheck(struct BVH_MotionCapture * bvhMotion)
 {
     unsigned int mID=0,jID=0,fID=0,cType=0;
@@ -745,7 +749,7 @@ int bvh_InternalCheck(struct BVH_MotionCapture * bvhMotion)
        // struct BVH_MotionCapture * bvhMotion
        //TODO:
     }
-}
+}*/
 
 
 int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion)
