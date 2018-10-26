@@ -73,6 +73,7 @@ struct BVH_Joint
   unsigned int hierarchyLevel;
   //--------------------
   float offset[3];
+  double staticTransformation[16];
   //--------------------
   char  channelType[BVH_VALID_CHANNEL_NAMES];
   char  channelRotationOrder;
@@ -116,7 +117,6 @@ struct BVH_MotionCapture
   unsigned int numberOfFramesEncountered;
   float frameTime;
 
-
   //Joint Hierarchy
   unsigned int MAX_jointHierarchySize;
   unsigned int jointHierarchySize;
@@ -125,8 +125,6 @@ struct BVH_MotionCapture
   //Lookup Tables..
   struct BVH_JointToMotion_LookupTable jointToMotionLookup[MAX_BVH_JOINT_HIERARCHY_SIZE];
   struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_HIERARCHY_SIZE*6];
-
-
 
   //Motion
   unsigned int numberOfValuesPerFrame;

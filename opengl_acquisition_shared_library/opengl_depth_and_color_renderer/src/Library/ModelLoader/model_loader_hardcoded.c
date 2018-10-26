@@ -427,6 +427,7 @@ int drawConnector(
                   float * R , float * G , float * B , float * Alpha )
 {
  glPushMatrix();
+   //fprintf(stderr,"CONNECTOR SIZE %0.2f\n",*scale);
     glLineWidth(*scale);
     glColor3f(*R,*G,*B); //Alpha not used ?
      glBegin(GL_LINES);

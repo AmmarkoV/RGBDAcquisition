@@ -503,7 +503,7 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
   //This is actually the only visible console output..
   if (scene->ticks%10==0)
   {
-    fprintf(stderr,"\r%0.2f FPS - Playback  %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",
+    fprintf(stderr,"\r%0.2f FPS - @ %0.2f sec ( %u ticks * %u microseconds [ rate %0.2f ] ) \r",
             scene->controls.lastFramerate,
             (float) timestampToUse/1000,
             scene->ticks,

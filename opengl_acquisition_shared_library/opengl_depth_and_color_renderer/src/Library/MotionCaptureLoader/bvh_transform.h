@@ -12,9 +12,8 @@
 
 struct BVH_TransformedJoint
 {
-  double localToWorldTransformation[16]; // or node->mTransformation
+  double localToWorldTransformation[16];
   double chainTransformation[16];
-  double staticTransformation[16];
   double dynamicTranslation[16];
   double dynamicRotation[16];
 

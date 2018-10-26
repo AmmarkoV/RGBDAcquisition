@@ -397,12 +397,24 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                  bvhMotion->jointHierarchy[currentJoint].offset[0]=InputParser_GetWordFloat(ipcB,1);
                  bvhMotion->jointHierarchy[currentJoint].offset[1]=InputParser_GetWordFloat(ipcB,2);
                  bvhMotion->jointHierarchy[currentJoint].offset[2]=InputParser_GetWordFloat(ipcB,3);
+
+                 double * m = bvhMotion->jointHierarchy[currentJoint].staticTransformation;
+                 m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (double) bvhMotion->jointHierarchy[currentJoint].offset[0];
+                 m[4] =0.0;  m[5] =1.0;  m[6] =0.0;  m[7] = (double) bvhMotion->jointHierarchy[currentJoint].offset[1];
+                 m[8] =0.0;  m[9] =0.0;  m[10]=1.0;  m[11]= (double) bvhMotion->jointHierarchy[currentJoint].offset[2];
+                 m[12]=0.0;  m[13]=0.0;  m[14]=0.0;  m[15]=1.0;
                 } else
                 {
                  fprintf(stderr,RED "Incorrect number of offset arguments..\n" NORMAL);
                  bvhMotion->jointHierarchy[currentJoint].offset[0]=0.0;
                  bvhMotion->jointHierarchy[currentJoint].offset[1]=0.0;
                  bvhMotion->jointHierarchy[currentJoint].offset[2]=0.0;
+
+                 double * m = bvhMotion->jointHierarchy[currentJoint].staticTransformation;
+                 m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] =0.0;
+                 m[4] =0.0;  m[5] =1.0;  m[6] =0.0;  m[7] =0.0;
+                 m[8] =0.0;  m[9] =0.0;  m[10]=1.0;  m[11]=0.0;
+                 m[12]=0.0;  m[13]=0.0;  m[14]=0.0;  m[15]=1.0;
                 }
              } else
          if ( (InputParser_WordCompareAuto(ipcB,0,"{")) || (thisLineOnlyHasX(line,'{')) )
@@ -668,13 +680,13 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
   for (i=0; i<bvhMotion->jointHierarchySize; i++)
   {
     fprintf(stderr,"___________________________________\n");
-    fprintf(stderr,GREEN "Joint %u - %s \n" NORMAL ,i,bvhMotion->jointHierarchy[i].jointName);
+    fprintf(stderr,GREEN "Joint %u - %s " NORMAL ,i,bvhMotion->jointHierarchy[i].jointName);
     unsigned int parentID = bvhMotion->jointHierarchy[i].parentJoint;
-    fprintf(stderr,"Parent %u - %s \n",parentID,bvhMotion->jointHierarchy[parentID].jointName);
+    fprintf(stderr," | Parent %u - %s \n",parentID,bvhMotion->jointHierarchy[parentID].jointName);
     //===============================================================
     if (bvhMotion->jointHierarchy[i].loadedChannels>0)
     {
-     fprintf(stderr,"Has %u channels\n",bvhMotion->jointHierarchy[i].loadedChannels);
+     fprintf(stderr,"Has %u channels - ",bvhMotion->jointHierarchy[i].loadedChannels);
      if ( bvhMotion->jointHierarchy[i].channelRotationOrder==0 ) { fprintf(stderr,RED "!");}
      fprintf(stderr,"Rotation Order: %s \n" NORMAL,rotationOrderNames[(unsigned int) bvhMotion->jointHierarchy[i].channelRotationOrder]);
      for (z=0; z<bvhMotion->jointHierarchy[i].loadedChannels; z++)
@@ -695,8 +707,8 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
       }
      fprintf(stderr,"\n");
     //===============================================================
-    fprintf(stderr,"isRoot %u \n",bvhMotion->jointHierarchy[i].isRoot);
-    fprintf(stderr,"isEndSite %u \n",bvhMotion->jointHierarchy[i].isEndSite);
+    fprintf(stderr,"isRoot %u - ",bvhMotion->jointHierarchy[i].isRoot);
+    fprintf(stderr,"isEndSite %u - ",bvhMotion->jointHierarchy[i].isEndSite);
     fprintf(stderr,"hasEndSite %u\n",bvhMotion->jointHierarchy[i].hasEndSite);
     fprintf(stderr,"----------------------------------\n");
   }

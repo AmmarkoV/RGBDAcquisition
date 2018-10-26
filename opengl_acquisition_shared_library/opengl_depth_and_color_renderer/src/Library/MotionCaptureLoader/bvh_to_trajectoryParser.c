@@ -174,7 +174,7 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
     fprintf(fp,"NEAR_CLIP(0.1)\n");
     fprintf(fp,"FAR_CLIP(1000)\n");
     fprintf(fp,"SILENT(1)\n");
-    fprintf(fp,"RATE(1000)\n");
+    fprintf(fp,"RATE(1200)\n");
     fprintf(fp,"INTERPOLATE_TIME(1)\n");
     fprintf(fp,"MOVE_VIEW(1)\n\n");
 
@@ -185,14 +185,14 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
       if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"OBJECT_TYPE(sT%u,cube)\n",jID);   } else
                                                 { fprintf(fp,"OBJECT_TYPE(sT%u,sphere)\n",jID); }
 
-      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 0,255,0,0,0 ,1.5,1.5,1.5)\n",jID,jID);   } else
-      if ( mc->jointHierarchy[jID].isRoot )     { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,255,0,0,0,2.5,2.5,2.5)\n",jID,jID); } else
-                                                { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,1.5,1.5,1.5)\n",jID,jID);   }
+      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 0,255,0,0,0 ,3.0,3.0,3.0)\n",jID,jID);   } else
+      if ( mc->jointHierarchy[jID].isRoot )     { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,255,0,0,0,4.5,4.5,4.5)\n",jID,jID); } else
+                                                { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,2.5,2.5,2.5)\n",jID,jID);   }
 
 
       if (bhv_jointHasParent(mc,jID))
       {
-        fprintf(fp,"CONNECTOR(s%u,s%u, 255,255,0, 1.0)\n",jID,mc->jointHierarchy[jID].parentJoint);
+        fprintf(fp,"CONNECTOR(s%u,s%u, 255,255,0,100, 3.5)\n",jID,mc->jointHierarchy[jID].parentJoint);
       }
     }
     fprintf(fp,"\n");

@@ -185,7 +185,6 @@ int bvh_loadTransformForFrame(
                              )
 {
   unsigned int jID=0;
-
   //First of all we need to clean the BVH_Transform structure
 
   if (fID==0)
@@ -196,38 +195,29 @@ int bvh_loadTransformForFrame(
      create4x4IdentityMatrix(bvhTransform->joint[jID].chainTransformation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
      //---
-     create4x4IdentityMatrix(bvhTransform->joint[jID].staticTransformation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
      //---
    }
   }
 
-  //We need some space to store the intermediate
-  //matrices..
-  double posX,posY,posZ;
-  double rotX,rotY,rotZ;
+  //We need some space to store values
+  double posX=0.0,posY=0.0,posZ=0.0;
+  double rotX=0.0,rotY=0.0,rotZ=0.0;
   float data[8]={0};
-
-
 
   //First of all we need to populate all local transformation in our chain
   //-----------------------------------------------------------------------
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-      //Setup static transformation
-      float * offset = bvh_getJointOffset(bvhMotion,jID);
-      posX = fToD(offset[0]);
-      posY = fToD(offset[1]);
-      posZ = fToD(offset[2]);
-      create4x4TranslationMatrix(bvhTransform->joint[jID].staticTransformation,posX,posY,posZ);
-
       //Setup dynamic transformation
-       //Get values from our bvhMotion structure
+      //Get values from our bvhMotion structure
       if (!bhv_populatePosXYZRotXYZ(bvhMotion,jID,fID,data,sizeof(data)))
       {
         fprintf(stderr,"Error extracting dynamic transformation for jID=%u @ fID=%u\n",jID,fID);
       }
+
+
       posX = fToD(data[0]);
       posY = fToD(data[1]);
       posZ = fToD(data[2]);
@@ -247,6 +237,7 @@ int bvh_loadTransformForFrame(
   }
 
   //We will now apply all transformations
+  //-----------------------------------------------------------------------
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
      if (bhv_jointHasParent(bvhMotion,jID))
@@ -259,16 +250,7 @@ int bvh_loadTransformForFrame(
                                 //Parent Output A
                                 bvhTransform->joint[parentID].chainTransformation,
                                 //This Transform B
-                                bvhTransform->joint[jID].staticTransformation
-                              );
-
-        multiplyTwo4x4Matrices(
-                                //Output AxB
-                                bvhTransform->joint[jID].chainTransformation ,
-                                //A
-                                bvhTransform->joint[jID].localToWorldTransformation,
-                                //B
-                                bvhTransform->joint[jID].dynamicRotation
+                                bvhMotion->jointHierarchy[jID].staticTransformation
                               );
       } else
       {
@@ -276,37 +258,38 @@ int bvh_loadTransformForFrame(
        //If there is no parent we will only set our position and copy to the final transform
         #if FAST_OFFSET_TRANSLATION
          create4x4IdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
-         bvhTransform->joint[jID].localToWorldTransformation[3]=bvhTransform->joint[jID].staticTransformation[3] +bvhTransform->joint[jID].dynamicTranslation[3];
-         bvhTransform->joint[jID].localToWorldTransformation[7]=bvhTransform->joint[jID].staticTransformation[7] +bvhTransform->joint[jID].dynamicTranslation[7];
-         bvhTransform->joint[jID].localToWorldTransformation[11]=bvhTransform->joint[jID].staticTransformation[11] +bvhTransform->joint[jID].dynamicTranslation[11];
+         bvhTransform->joint[jID].localToWorldTransformation[3] =bvhMotion->jointHierarchy[jID].staticTransformation[3]  + bvhTransform->joint[jID].dynamicTranslation[3];
+         bvhTransform->joint[jID].localToWorldTransformation[7] =bvhMotion->jointHierarchy[jID].staticTransformation[7]  + bvhTransform->joint[jID].dynamicTranslation[7];
+         bvhTransform->joint[jID].localToWorldTransformation[11]=bvhMotion->jointHierarchy[jID].staticTransformation[11] + bvhTransform->joint[jID].dynamicTranslation[11];
+         bvhTransform->joint[jID].localToWorldTransformation[15]=1.0;//bvhTransform->joint[jID].staticTransformation[15] + bvhTransform->joint[jID].dynamicTranslation[15];
         #else
          multiplyTwo4x4Matrices(
                                 //Output AxB
                                 bvhTransform->joint[jID].localToWorldTransformation ,
                                 //A
-                                bvhTransform->joint[jID].staticTransformation,
+                                bvhMotion->jointHierarchy[jID].staticTransformation,
                                 //B
                                 bvhTransform->joint[jID].dynamicTranslation
                               );
         #endif // FAST_OFFSET_TRANSLATION
-
-        multiplyTwo4x4Matrices(
-                                //Output AxB
-                                bvhTransform->joint[jID].chainTransformation ,
-                                //A
-                                bvhTransform->joint[jID].localToWorldTransformation,
-                                //B
-                                bvhTransform->joint[jID].dynamicRotation
-                              );
       }
 
 
+  multiplyTwo4x4Matrices(
+                         //Output AxB
+                         bvhTransform->joint[jID].chainTransformation ,
+                         //A
+                         bvhTransform->joint[jID].localToWorldTransformation,
+                         //B
+                         bvhTransform->joint[jID].dynamicRotation
+                        );
 
   #if FIND_FAST_CENTER
    bvhTransform->joint[jID].pos[0]= bvhTransform->joint[jID].localToWorldTransformation[3];
    bvhTransform->joint[jID].pos[1]= bvhTransform->joint[jID].localToWorldTransformation[7];
    bvhTransform->joint[jID].pos[2]= bvhTransform->joint[jID].localToWorldTransformation[11];
-   bvhTransform->joint[jID].pos[3]= 1.0;
+   bvhTransform->joint[jID].pos[3]= bvhTransform->joint[jID].localToWorldTransformation[15];
+   normalize3DPointVector(bvhTransform->joint[jID].pos);
   #else
    double centerPoint[4]={0.0,0.0,0.0,1.0};
    transform3DPointVectorUsing4x4Matrix(
@@ -314,20 +297,8 @@ int bvh_loadTransformForFrame(
                                         bvhTransform->joint[jID].localToWorldTransformation,
                                         centerPoint
                                        );
+   normalize3DPointVector(bvhTransform->joint[jID].pos);
   #endif // FIND_FAST_CENTER
-
-
-
-  /*
-       fprintf(stderr,"Frame %u/Joint : %u \n",fID,jID);
-       fprintf(stderr,"Rotation Order : %s \n",rotationOrderNames[bvhMotion->jointHierarchy[jID].channelRotationOrder]);
-       print4x4DMatrix(
-                        bvhMotion->jointHierarchy[jID].jointName,
-                        bvhTransform->joint[jID].localTransformation,
-                        1
-                      );
-  */
-
   }
 
   return 1;
