@@ -207,7 +207,7 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
                                 &bvhTransform
                                );
 
-     fprintf(fp,"POS(camera,%u,   0.0, 40.0, 252.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
+     fprintf(fp,"POS(camera,%u,   60.0, 60.0, 252.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
      for (jID=0; jID<mc->jointHierarchySize; jID++)
      {
       fprintf(
