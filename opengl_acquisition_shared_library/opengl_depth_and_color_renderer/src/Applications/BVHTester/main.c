@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     //testPrintout(&bvhMotion,"RightFoot");
 
     bvh_printBVH(&bvhMotion);
-
+    bvh_printBVHJointToMotionLookupTable(&bvhMotion);
 
     dumpBVHToTrajectoryParser(toSceneFile,&bvhMotion);
 

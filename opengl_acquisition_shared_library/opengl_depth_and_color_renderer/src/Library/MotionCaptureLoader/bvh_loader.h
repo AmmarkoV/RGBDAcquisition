@@ -67,7 +67,6 @@ struct BVH_Joint
   char hasEndSite;
   //--------------------
   char jointName[MAX_BVH_JOINT_NAME];
-  unsigned int lookupID;
   //--------------------
   unsigned int parentJoint;
   unsigned int endSiteJoint;
@@ -75,25 +74,35 @@ struct BVH_Joint
   //--------------------
   float offset[3];
   //--------------------
-  float channels[BVH_VALID_CHANNEL_NAMES];
   char  channelType[BVH_VALID_CHANNEL_NAMES];
   char  channelRotationOrder;
-  char  loadedChannels;
+  unsigned int loadedChannels;
   //--------------------
 };
 
 
 
 /**
-* @brief The lookup table has 1:1 correspondance to the given motions
+* @brief The lookup table has 1:1 correspondance from joints to the given motions
 * @ingroup BVH
 */
-struct BVH_JointLookupTable
+struct BVH_JointToMotion_LookupTable
+{
+  unsigned int jointMotionOffset;
+  unsigned int channelIDMotionOffset[BVH_VALID_CHANNEL_NAMES];
+};
+
+/**
+* @brief The lookup table has 1:1 correspondance from motions to the given joints
+* @ingroup BVH
+*/
+struct BVH_MotionToJoint_LookupTable
 {
   unsigned int jointID;
   unsigned int parentID;
   unsigned int channelID;
 };
+
 
 /**
 * @brief Each BVH Motion Capture file has a hierarchy of BVH_Joints and an array of motion values that should be accessed using
@@ -112,7 +121,10 @@ struct BVH_MotionCapture
   unsigned int MAX_jointHierarchySize;
   unsigned int jointHierarchySize;
   struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE];
-  struct BVH_JointLookupTable lookupTable[MAX_BVH_JOINT_HIERARCHY_SIZE*6];
+
+  //Lookup Tables..
+  struct BVH_JointToMotion_LookupTable jointToMotionLookup[MAX_BVH_JOINT_HIERARCHY_SIZE];
+  struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_HIERARCHY_SIZE*6];
 
 
 
@@ -133,6 +145,8 @@ struct BVH_MotionCapture
 * @param  pointer to an allocated BVH_MotionCapture struct
 */
 void bvh_printBVH(struct BVH_MotionCapture * bvhMotion);
+
+void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion);
 
 
 /**

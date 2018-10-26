@@ -185,9 +185,9 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
       if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"OBJECT_TYPE(sT%u,cube)\n",jID);   } else
                                                 { fprintf(fp,"OBJECT_TYPE(sT%u,sphere)\n",jID); }
 
-      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 0,255,0,0,0 ,0.5,0.5,0.5)\n",jID,jID);   } else
-      if ( mc->jointHierarchy[jID].isRoot )     { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,255,0,0,0 ,0.5,0.5,0.5)\n",jID,jID); } else
-                                                { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,0.5,0.5,0.5)\n",jID,jID);   }
+      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 0,255,0,0,0 ,1.5,1.5,1.5)\n",jID,jID);   } else
+      if ( mc->jointHierarchy[jID].isRoot )     { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,255,0,0,0,2.5,2.5,2.5)\n",jID,jID); } else
+                                                { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,1.5,1.5,1.5)\n",jID,jID);   }
 
 
       if (bhv_jointHasParent(mc,jID))
@@ -206,7 +206,7 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
                                 &bvhTransform
                                );
 
-     fprintf(fp,"POS(camera,%u,   0.0, 40.0, 152.0 , 0.0, 0.0, 90.0,0.0 )\n",fID);
+     fprintf(fp,"POS(camera,%u,   0.0, 40.0, 252.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
      for (jID=0; jID<mc->jointHierarchySize; jID++)
      {
       fprintf(

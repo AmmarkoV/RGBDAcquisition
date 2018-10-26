@@ -684,6 +684,15 @@ int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB
   return 1;
 }
 
+int multiplyTwo4x4MatricesBuffered(double * result , double * matrixA , double * matrixB)
+{
+  double bufA[16];
+   copy4x4DMatrix(bufA,matrixA);
+  double bufB[16];
+   copy4x4DMatrix(bufB,matrixB);
+  return  multiplyTwo4x4Matrices(result,bufA,bufB);
+}
+
 
 int multiplyThree4x4Matrices(double * result , double * matrixA , double * matrixB , double * matrixC)
 {

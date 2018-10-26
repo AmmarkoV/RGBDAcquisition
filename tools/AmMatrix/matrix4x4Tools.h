@@ -248,6 +248,9 @@ int transpose4x4MatrixD(double * mat) ;
 */
 int multiplyTwo4x4Matrices(double * result , double * matrixA , double * matrixB);
 
+
+int multiplyTwo4x4MatricesBuffered(double * result , double * matrixA , double * matrixB);
+
 int multiplyThree4x4Matrices(double * result , double * matrixA , double * matrixB , double * matrixC);
 
 /**
