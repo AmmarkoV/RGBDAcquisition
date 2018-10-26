@@ -634,7 +634,8 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
     if (bvhMotion->jointHierarchy[i].loadedChannels>0)
     {
      fprintf(stderr,"Has %u channels\n",bvhMotion->jointHierarchy[i].loadedChannels);
-     fprintf(stderr,"Rotation Order: %s \n",rotationOrderNames[(unsigned int) bvhMotion->jointHierarchy[i].channelRotationOrder]);
+     if ( bvhMotion->jointHierarchy[i].channelRotationOrder==0 ) { fprintf(stderr,RED "!");}
+     fprintf(stderr,"Rotation Order: %s \n" NORMAL,rotationOrderNames[(unsigned int) bvhMotion->jointHierarchy[i].channelRotationOrder]);
      for (z=0; z<bvhMotion->jointHierarchy[i].loadedChannels; z++)
       {
         unsigned int cT = bvhMotion->jointHierarchy[i].channelType[z];
@@ -815,6 +816,16 @@ int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID j
 
 int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
 {
-    if (jID>bvhMotion->jointHierarchySize) { return 0; }
-    return (!bvhMotion->jointHierarchy[jID].isRoot);
+ if (jID>bvhMotion->jointHierarchySize) { return 0; }
+ return (!bvhMotion->jointHierarchy[jID].isRoot);
 }
+
+int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
+{
+ if (jID>bvhMotion->jointHierarchySize) { return 0; }
+ return (
+          (bvhMotion->jointHierarchy[jID].loadedChannels>0) &&
+          (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0) &&
+        );
+}
+

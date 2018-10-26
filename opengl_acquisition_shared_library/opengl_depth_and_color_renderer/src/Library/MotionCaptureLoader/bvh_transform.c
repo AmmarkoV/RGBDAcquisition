@@ -104,9 +104,14 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
   //Initialize rotation matrix..
   create4x4IdentityMatrix(matrix);
 
+  if (rotationType==0)
+  {
+    //No rotation type, get's you back an Identity Matrix..
+    return;
+  }
+
   //Assuming the rotation axis are correct
   //rX,rY,rZ should hold our rotation matrices
-
   #if USE_BVH_SPECIFIC_ROTATIONS
    create4x4RotationBVH_X(rX,degreesX);
    create4x4RotationBVH_Y(rY,degreesY);
@@ -139,6 +144,9 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
     case BVH_ROTATION_ORDER_ZYX :
       multiplyThree4x4Matrices( matrix, rX, rY, rZ );
     break;
+    default :
+      fprintf(stderr,"Error, Incorrect rotation type %u\n",rotationType);
+    break;
   };
   #else
   switch (rotationType)
@@ -163,6 +171,9 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
     case BVH_ROTATION_ORDER_ZYX :
       multiplyThree4x4Matrices( matrix, rZ, rY, rX );
     break;
+    default :
+      fprintf(stderr,"Error, Incorrect rotation type %u\n",rotationType);
+    break;
   };
   #endif // FLIP_ROTATION_ORDER
 
@@ -185,7 +196,7 @@ int bvh_loadTransformForFrame(
   //First of all we need to clean the BVH_Transform structure
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
-     create4x4IdentityMatrix(bvhTransform->joint[jID].worldTransformation);
+     create4x4IdentityMatrix(bvhTransform->joint[jID].chainTransformation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].staticTransformation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
@@ -237,20 +248,21 @@ int bvh_loadTransformForFrame(
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
   {
      if (bhv_jointHasParent(bvhMotion,jID))
-      {//If joint is not Root joint
+      {
+        //If joint is not Root joint
         unsigned int parentID = bvhMotion->jointHierarchy[jID].parentJoint;
         multiplyTwo4x4Matrices(
                                 //Output AxB
                                 bvhTransform->joint[jID].localToWorldTransformation ,
                                 //Parent Output A
-                                bvhTransform->joint[parentID].trtrTransformation,
+                                bvhTransform->joint[parentID].chainTransformation,
                                 //This Transform B
                                 bvhTransform->joint[jID].staticTransformation
                               );
 
         multiplyTwo4x4Matrices(
                                 //Output AxB
-                                bvhTransform->joint[jID].trtrTransformation ,
+                                bvhTransform->joint[jID].chainTransformation ,
                                 //A
                                 bvhTransform->joint[jID].localToWorldTransformation,
                                 //B
@@ -258,7 +270,8 @@ int bvh_loadTransformForFrame(
                               );
 
       } else
-      {//If we are the root node there is no parent..
+      {
+       //If we are the root node there is no parent..
        //If there is no parent we will only set our position and copy to the final transform
         multiplyTwo4x4Matrices(
                                 //Output AxB
@@ -269,10 +282,9 @@ int bvh_loadTransformForFrame(
                                 bvhTransform->joint[jID].dynamicTranslation
                               );
 
-
         multiplyTwo4x4Matrices(
                                 //Output AxB
-                                bvhTransform->joint[jID].trtrTransformation ,
+                                bvhTransform->joint[jID].chainTransformation ,
                                 //A
                                 bvhTransform->joint[jID].localToWorldTransformation,
                                 //B
