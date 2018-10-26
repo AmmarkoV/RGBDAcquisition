@@ -228,9 +228,9 @@ int bvh_loadTransformForFrame(
       create4x4RotationBVH(
                             bvhTransform->joint[jID].dynamicRotation,
                             bvhMotion->jointHierarchy[jID].channelRotationOrder,
-                            rotX,
-                            rotY,
-                            rotZ
+                            -1*rotX,
+                            -1*rotY,
+                            -1*rotZ
                           );
   }
 
