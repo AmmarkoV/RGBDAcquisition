@@ -4,7 +4,6 @@
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
-
 #define USE_BVH_SPECIFIC_ROTATIONS 1
 
 //Also find Center of Joint
@@ -108,8 +107,8 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
     return;
   }
 
-  //Assuming the rotation axis are correct
-  //rX,rY,rZ should hold our rotation matrices
+//Assuming the rotation axis are correct
+//rX,rY,rZ should hold our rotation matrices
   #if USE_BVH_SPECIFIC_ROTATIONS
    create4x4RotationBVH_X(rX,degreesX);
    create4x4RotationBVH_Y(rY,degreesY);
@@ -192,8 +191,8 @@ int bvh_loadTransformForFrame(
    for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
      //---
-     create4x4IdentityMatrix(bvhTransform->joint[jID].chainTransformation);
-     create4x4IdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
+      create4x4IdentityMatrix(bvhTransform->joint[jID].chainTransformation);
+      create4x4IdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
      //---
      create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
      create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
@@ -274,14 +273,14 @@ int bvh_loadTransformForFrame(
       }
 
 
-  multiplyTwo4x4Matrices(
-                         //Output AxB
-                         bvhTransform->joint[jID].chainTransformation ,
-                         //A
-                         bvhTransform->joint[jID].localToWorldTransformation,
-                         //B
-                         bvhTransform->joint[jID].dynamicRotation
-                        );
+    multiplyTwo4x4Matrices(
+                           //Output AxB
+                           bvhTransform->joint[jID].chainTransformation ,
+                           //A
+                           bvhTransform->joint[jID].localToWorldTransformation,
+                           //B
+                           bvhTransform->joint[jID].dynamicRotation
+                          );
 
   #if FIND_FAST_CENTER
    bvhTransform->joint[jID].pos[0]= bvhTransform->joint[jID].localToWorldTransformation[3];
