@@ -584,7 +584,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
    InputParser_SetDelimeter(ipc,1,10);
    InputParser_SetDelimeter(ipc,2,13);
 
-    char str[2048];
+    char str[2048]={0};
     char * line = NULL;
     size_t len = 0;
 
@@ -604,6 +604,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
        //fprintf(stderr,"Word1=`%s`",str);
        //InputParser_GetWord(ipc,2,str,512);
        //fprintf(stderr,"Word2=`%s`",str);
+
       if (num>0)
       { //We have content..
        if (!atMotionSection)
@@ -742,8 +743,8 @@ int bvh_InternalCheck(struct BVH_MotionCapture * bvhMotion)
     for (mID=0; mID<10000; mID++)
     {
        // struct BVH_MotionCapture * bvhMotion
+       //TODO:
     }
-
 }
 
 

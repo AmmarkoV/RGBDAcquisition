@@ -24,7 +24,7 @@
 int warningsAboutIncorrectlyAllocatedStackIssued = 0;
 
 
-char _ipc_ver[]=" 0.359\0";  //26/4/2017
+char _ipc_ver[]=" 0.360\0";  //26/4/2017
 
 
 /*
@@ -602,6 +602,7 @@ float InputParser_GetWordFloat(struct InputParserC * ipc,unsigned int num)
    if (!isLocallyAllocated)
     {
      string_segment = (char*) malloc( (tokenLength+1) * sizeof(char) );
+     //memset(string_segment,0,(tokenLength+1) * sizeof(char));
      if (string_segment==0)
       {
         fprintf(stderr,"InputParser_GetWordFloat could not allocate memory to return float value , returning NaN \n");
@@ -717,6 +718,7 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
                             }
                           }
                           ipc->str = (char * ) malloc( sizeof(char) * (STRING_END+1) );
+                          memset(ipc->str,0,sizeof(char) * (STRING_END+1));
                           ipc->local_allocation = 1;
                           strncpy( ipc->str , inpt , STRING_END ) ;
                        } else
