@@ -405,20 +405,6 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                  bvhMotion->jointHierarchy[currentJoint].offset[2]=0.0;
                 }
 
-                 bvhMotion->jointHierarchy[currentJoint].globalOffset[0] = bvhMotion->jointHierarchy[currentJoint].offset[0];
-                 bvhMotion->jointHierarchy[currentJoint].globalOffset[1] = bvhMotion->jointHierarchy[currentJoint].offset[1];
-                 bvhMotion->jointHierarchy[currentJoint].globalOffset[2] = bvhMotion->jointHierarchy[currentJoint].offset[2];
-
-                 if(!bvhMotion->jointHierarchy[currentJoint].isRoot)
-                 {
-                    unsigned int parentID = bvhMotion->jointHierarchy[currentJoint].parentJoint;
-                    bvhMotion->jointHierarchy[currentJoint].globalOffset[0] += bvhMotion->jointHierarchy[parentID].globalOffset[0];
-                    bvhMotion->jointHierarchy[currentJoint].globalOffset[1] += bvhMotion->jointHierarchy[parentID].globalOffset[1];
-                    bvhMotion->jointHierarchy[currentJoint].globalOffset[2] += bvhMotion->jointHierarchy[parentID].globalOffset[2];
-                 }
-
-
-
                  double * m = bvhMotion->jointHierarchy[currentJoint].staticTransformation;
                  m[0] =1.0;  m[1] =0.0;  m[2] =0.0;  m[3] = (double) bvhMotion->jointHierarchy[currentJoint].offset[0];
                  m[4] =0.0;  m[5] =1.0;  m[6] =0.0;  m[7] = (double) bvhMotion->jointHierarchy[currentJoint].offset[1];
