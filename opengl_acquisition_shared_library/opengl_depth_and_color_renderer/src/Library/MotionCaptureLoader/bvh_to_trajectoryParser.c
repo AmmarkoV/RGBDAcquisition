@@ -179,6 +179,9 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
     fprintf(fp,"INTERPOLATE_TIME(1)\n");
     fprintf(fp,"MOVE_VIEW(1)\n\n");
 
+
+    fprintf(fp,"OBJECT_TYPE(floorType,grid)\n");
+    fprintf(fp,"OBJECT(floor,floorType,0,255,0,0 ,0, 10.0,10.0,10.0)\n");
     //Instantiate objects that will draw our skeleton
     //------------------------------------------------------------------------------------------------------------------------------
     for (jID=0; jID<mc->jointHierarchySize; jID++)
@@ -208,6 +211,7 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
                                );
 
      fprintf(fp,"POS(camera,%u,   60.0, 60.0, 252.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
+     fprintf(fp,"POS(floor,%u,00.0,00.0,0.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
      for (jID=0; jID<mc->jointHierarchySize; jID++)
      {
       fprintf(
