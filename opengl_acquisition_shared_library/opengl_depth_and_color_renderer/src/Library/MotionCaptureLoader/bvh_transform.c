@@ -251,6 +251,7 @@ int bvh_loadTransformForFrame(
                                 bvhMotion->jointHierarchy[jID].staticTransformation
                               );
       } else
+      if ( bvhMotion->jointHierarchy[jID].isRoot)
       {
        //If we are the root node there is no parent..
        //If there is no parent we will only set our position and copy to the final transform

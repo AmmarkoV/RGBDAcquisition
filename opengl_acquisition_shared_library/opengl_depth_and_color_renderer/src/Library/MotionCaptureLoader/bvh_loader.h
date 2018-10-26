@@ -73,6 +73,7 @@ struct BVH_Joint
   unsigned int hierarchyLevel;
   //--------------------
   float offset[3];
+  float globalOffset[3]; //Useless
   double staticTransformation[16];
   //--------------------
   char  channelType[BVH_VALID_CHANNEL_NAMES];
