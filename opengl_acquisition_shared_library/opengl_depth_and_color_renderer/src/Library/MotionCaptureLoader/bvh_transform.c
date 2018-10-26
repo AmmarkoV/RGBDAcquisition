@@ -33,7 +33,7 @@
 //---------------------------------------------------------
 double degrees_to_radBVH(double degrees)
 {
-    return degrees * (M_PI /180.0 );
+    return (double) degrees * ( (double)  M_PI /180.0);
 }
 //---------------------------------------------------------
 void create4x4RotationBVH_X(double * matrix,double degrees)
@@ -46,10 +46,10 @@ void create4x4RotationBVH_X(double * matrix,double degrees)
     double sinV = (double) sinf((float)radians);
 
     // Rotate X formula.
-    matrix[5] =    cosV;
-    matrix[9] = -1*sinV;
-    matrix[6] =    sinV;
-    matrix[10] =   cosV;
+    matrix[5] =    cosV; // [1,1]
+    matrix[9] = -1*sinV; // [1,2]
+    matrix[6] =    sinV; // [2,1]
+    matrix[10] =   cosV; // [2,2]
 }
 //---------------------------------------------------------
 void create4x4RotationBVH_Y(double * matrix,double degrees)
@@ -62,26 +62,26 @@ void create4x4RotationBVH_Y(double * matrix,double degrees)
     double sinV = (double) sinf((float)radians);
 
     // Rotate Y formula.
-    matrix[0] =    cosV;
-    matrix[2] = -1*sinV;
-    matrix[8] =    sinV;
-    matrix[10] =   cosV;
+    matrix[0] =    cosV; // [0,0]
+    matrix[2] = -1*sinV; // [2,0]
+    matrix[8] =    sinV; // [0,2]
+    matrix[10] =   cosV; // [2,2]
 }
 //---------------------------------------------------------
-void create4x4RotationBVH_Z(double * matrix,double degrees)
+void create4x4RotationBVH_Z(double * m,double degrees)
 {
     double radians = degrees_to_radBVH(degrees);
 
-    create4x4IdentityMatrix(matrix);
+    create4x4IdentityMatrix(m);
 
     double cosV = (double) cosf((float)radians);
     double sinV = (double) sinf((float)radians);
 
     // Rotate Z formula.
-    matrix[0] =    cosV;
-    matrix[1] =    sinV;
-    matrix[4] = -1*sinV;
-    matrix[5] =    cosV;
+    m[0] =    cosV;  // [0,0]
+    m[1] =    sinV;  // [1,0]
+    m[4] = -1*sinV;  // [0,1]
+    m[5] =    cosV;  // [1,1]
 }
 //---------------------------------------------------------
 #endif // USE_BVH_SPECIFIC_ROTATIONS
@@ -216,7 +216,6 @@ int bvh_loadTransformForFrame(
       {
         fprintf(stderr,"Error extracting dynamic transformation for jID=%u @ fID=%u\n",jID,fID);
       }
-
 
       posX = fToD(data[0]);
       posY = fToD(data[1]);

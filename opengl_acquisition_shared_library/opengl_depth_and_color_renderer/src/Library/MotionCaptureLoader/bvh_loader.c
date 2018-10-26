@@ -728,7 +728,7 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
   fprintf(stderr,"\n\n\nPrinting BVH JointToMotion lookup table..\n");
   fprintf(stderr,"_______________________________________________\n");
   int jID=0,fID=0,channelNumber;
-  for (fID=0; fID<2; fID++)
+  for (fID=0; fID<bvhMotion->numberOfFrames; fID++)
   {
    for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
     {
@@ -737,11 +737,12 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
          unsigned int channelTypeID = bvhMotion->jointHierarchy[jID].channelType[channelNumber];
          unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
 
-         fprintf(stderr,"f[%u].%s.%s=>%u " ,
+         fprintf(stderr,"f[%u].%s.%s(%u)=%0.2f " ,
                  fID,
                  bvhMotion->jointHierarchy[jID].jointName,
                  channelNames[channelTypeID],
-                 mID
+                 mID,
+                 bvh_getMotionValue(bvhMotion,mID)
                  );
      }
     }
@@ -889,6 +890,13 @@ int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID j
   data[5]=bvh_getJointRotationZAtFrame(bvhMotion,jID,fID);
   return 1;
 }
+
+float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID)
+{
+  return bvhMotion->motionValues[mID];
+}
+
+
 
 
 int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
