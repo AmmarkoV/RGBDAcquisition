@@ -68,6 +68,112 @@ const char * rotationOrderNames[] =
 };
 
 
+void lowercase(char *a)
+{
+    for (;; a++)
+        {
+         *a = tolower((unsigned char)*a);
+        }
+}
+
+void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion)
+{
+  unsigned int jID=0;
+
+  for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+     char * jN = bvhMotion->jointHierarchy[jID].jointName;
+
+     lowercase(jN);
+
+     //-------------------------------------------------------------------------------------------------
+     if  ( (strcmp(jN,"hip")==0) || (strcmp(jN,"hips")==0) )
+           { snprintf(jN,MAX_BVH_JOINT_NAME,"hip"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"abdomen")==0) || (strcmp(jN,"spine")==0) || (strcmp(jN,"torso")==0)  || (strcmp(jN,"waist")==0)
+          )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"abdomen"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"chest")==0) || (strcmp(jN,"chest2")==0) || (strcmp(jN,"spine1")==0)  || (strcmp(jN,"spine2")==0) || (strcmp(jN,"torso2")==0)
+          )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"chest"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"lefthip")==0) || (strcmp(jN,"leftupleg")==0) || (strcmp(jN,"lthigh")==0)  || (strcmp(jN,"leftupperLeg")==0)
+          )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"lthigh"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"leftknee")==0) || (strcmp(jN,"leftlowleg")==0) || (strcmp(jN,"leftleg")==0)  || (strcmp(jN,"lshin")==0) || (strcmp(jN,"leftlowerleg")==0)
+          )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"lknee"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"leftankle")==0) || (strcmp(jN,"leftfoot")==0)
+          )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"lfoot"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"righthip")==0) || (strcmp(jN,"rightupleg")==0) || (strcmp(jN,"rthigh")==0)  || (strcmp(jN,"rightupperleg")==0)
+          )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"rthigh"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"rightknee")==0) || (strcmp(jN,"rightlowleg")==0) || (strcmp(jN,"rightleg")==0)  || (strcmp(jN,"rshin")==0) || (strcmp(jN,"rightlowerleg")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"rknee"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"rightankle")==0) || (strcmp(jN,"rightfoot")==0) || (strcmp(jN,"rfoot")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"rfoot"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"leftcollar")==0) || (strcmp(jN,"lcollar")==0) || (strcmp(jN,"leftshoulder")==0)  || (strcmp(jN,"lcolr")==0) || (strcmp(jN,"rightlowerleg")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"lcollar"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"leftuparm")==0) || (strcmp(jN,"leftarm")==0) || (strcmp(jN,"lshldr")==0)  || (strcmp(jN,"leftshoulder")==0) || (strcmp(jN,"leftupperarm")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"lshoulder"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"leftelbow")==0) || (strcmp(jN,"leftlowarm")==0) || (strcmp(jN,"leftforearm")==0)  || (strcmp(jN,"lforearm")==0) || (strcmp(jN,"leftlowerarm")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"lelbow"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"leftwrist")==0) || (strcmp(jN,"lefthand")==0) || (strcmp(jN,"lhand")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"lhand"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"rightcollar")==0) || (strcmp(jN,"rcollar")==0) || (strcmp(jN,"rightshoulder")==0)  || (strcmp(jN,"rcolr")==0) || (strcmp(jN,"rightlowerleg")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"rcollar"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"rightuparm")==0) || (strcmp(jN,"rightarm")==0) || (strcmp(jN,"rshldr")==0)  || (strcmp(jN,"rightshoulder")==0) || (strcmp(jN,"rightupperarm")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"rshoulder"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"rightelbow")==0) || (strcmp(jN,"rightlowarm")==0) || (strcmp(jN,"rightforearm")==0)  || (strcmp(jN,"rforearm")==0) || (strcmp(jN,"rightlowerarm")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"relbow"); }
+     //-------------------------------------------------------------------------------------------------
+     if  (
+           (strcmp(jN,"rightwrist")==0) || (strcmp(jN,"righthand")==0) || (strcmp(jN,"rhand")==0)
+         )
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"rhand"); }
+     //-------------------------------------------------------------------------------------------------
+   }
+}
+
+
 //A very brief documentation of the BVH spec :
 //http://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html?fbclid=IwAR0BopXj4Kft_RAEE41VLblkkPGHVF8-mon3xSCBMZueRtyb9LCSZDZhXPA
 
@@ -541,7 +647,7 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
    InputParser_SetDelimeter(ipc,4,13);
 
    unsigned int i=0;
-   int numberOfParameters = InputParser_SeperateWordsCC(ipc,parameters,1);
+   unsigned int numberOfParameters = InputParser_SeperateWordsCC(ipc,parameters,1);
    //fprintf(stderr,"MOTION command has %u parameters\n",numberOfParameters);
 
 
@@ -672,7 +778,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
 {
   fprintf(stderr,"\n\n\nPrinting BVH file..\n");
-  int i=0,z=0;
+  unsigned int i=0,z=0;
   for (i=0; i<bvhMotion->jointHierarchySize; i++)
   {
     fprintf(stderr,"___________________________________\n");
@@ -723,7 +829,7 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
 {
   fprintf(stderr,"\n\n\nPrinting BVH JointToMotion lookup table..\n");
   fprintf(stderr,"_______________________________________________\n");
-  int jID=0,fID=0,channelNumber;
+  unsigned int jID=0,fID=0,channelNumber;
   for (fID=0; fID<bvhMotion->numberOfFrames; fID++)
   {
    for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
