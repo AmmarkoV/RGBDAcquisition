@@ -36,7 +36,8 @@ add_executable(
                main.c 
               ../../Library/MotionCaptureLoader/bvh_loader.c
               ../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.c
-              ../../Library/MotionCaptureLoader/bvh_transform.c
+              ../../Library/MotionCaptureLoader/bvh_transform.c 
+              ../../Library/MotionCaptureLoader/bvh_to_tri_pose.c
               ../../Library/TrajectoryParser/InputParser_C.c
               ../../../../../tools/AmMatrix/matrix4x4Tools.c
               )
