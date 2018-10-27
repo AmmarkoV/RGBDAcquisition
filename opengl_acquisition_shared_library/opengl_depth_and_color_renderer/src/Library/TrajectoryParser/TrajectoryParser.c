@@ -157,6 +157,9 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
      }
 
 
+  //Initialize this so renderer does not explode..!
+  newstream->controls.lastTickMillisecond = GetTickCountMilliseconds();
+
   switch (label)
   {
              case TRAJECTORYPRIMITIVES_COMMENT : /*Comment , don't spam console etc*/ break;
@@ -181,7 +184,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
              case TRAJECTORYPRIMITIVES_FRAME_RESET                       :   newstream->timestamp=0;     break;
              case TRAJECTORYPRIMITIVES_FRAME                             :   newstream->timestamp+=100;  break;
-             case TRAJECTORYPRIMITIVES_RATE                              :   newstream->rate=InputParser_GetWordFloat(ipc,1);  break;
+             case TRAJECTORYPRIMITIVES_RATE                              :   newstream->rate=InputParser_GetWordFloat(ipc,1);  newstream->forceRateRegardlessOfGPUSpeed=1; break;
              case TRAJECTORYPRIMITIVES_MOVE_VIEW                         :   newstream->userCanMoveCameraOnHisOwn=InputParser_GetWordInt(ipc,1); break;
              case TRAJECTORYPRIMITIVES_SMOOTH                            :   smoothTrajectories(newstream); break;
              case TRAJECTORYPRIMITIVES_OBJ_OFFSET                        :   newstream->objDeclarationsOffset = InputParser_GetWordInt(ipc,1);   break;

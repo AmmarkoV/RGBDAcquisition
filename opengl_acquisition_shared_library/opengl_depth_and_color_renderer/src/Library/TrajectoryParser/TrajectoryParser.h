@@ -227,6 +227,9 @@ struct VirtualStreamControls
 
   unsigned int tickUSleepTime;
   unsigned int pauseTicking;
+  unsigned int lastTickMillisecond;
+
+
   float farPlane; //<--be aware that this has an effect on the depth maps generated
   float nearPlane; //<--this also
   float fieldOfView;
@@ -348,7 +351,9 @@ struct VirtualStream
 
     unsigned int userCanMoveCameraOnHisOwn;
     unsigned int playback;
+
     float rate;
+    unsigned int forceRateRegardlessOfGPUSpeed;
 
     unsigned int autoRefresh;
     unsigned int autoRefreshForce;
@@ -366,7 +371,14 @@ struct VirtualStream
     char renderWireframe;
 
     unsigned int objDeclarationsOffset;
+
+    //TicksF is only used when we have set a specific rate
+    //to ensure that we can progress frames even on incredibly fast
+    //framerates or very slow rendering speeds..
+    float ticksF;
+    //Timestamp is the timestamp of our Rendering
     unsigned int timestamp;
+    //Ticks is internal renderer clock..
     unsigned int ticks;
 
     char filename[MAX_PATH+1];

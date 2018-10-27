@@ -319,11 +319,60 @@ int tickScene(unsigned int framerate)
 
   //Object 0 is camera  lets calculate its position
 
-   unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
+  unsigned int timestampToUse = 0;
+
+  //There are two ways to render, the first is regardless of GPU we try to enforce a specific framerate..
+  //The rate is controled using the RATE(x) script command. If we get a rate of 100 it means that we will
+  //try to playback a stream captured at 100 frames per second..!
+    if(scene->forceRateRegardlessOfGPUSpeed)
+    {
+        unsigned int thisTickMillisecond = GetTickCountMilliseconds();
+        unsigned int millisecondDiff=thisTickMillisecond - scene->controls.lastTickMillisecond;
+        float ticksPerMillisecond = (float) scene->rate / 1000;
+
+        //Even if we have incredibly slow or very fast animations we want to be able to progress..
+        scene->ticksF += ticksPerMillisecond * millisecondDiff;
+
+        scene->ticks = (unsigned int) scene->ticksF;
+        scene->controls.lastTickMillisecond = thisTickMillisecond ;
+
+        timestampToUse = scene->ticks;
+
+        //We have managed to use the correct timestamp regardless of framerate,
+        //But if our framerate is larger than the target rate let's sleep a little to
+        //conserve our GPU resources..
+
+        //Our Framerate is  scene->controls.lastFramerate
+        //Our desired framerate is scene->rate
+        if (scene->controls.lastFramerate>scene->rate)
+        {
+          float framesToSkip = scene->controls.lastFramerate - scene->rate;
+          float sleepTime = (float) 1000*1000/framesToSkip;
+
+          //Sleep less time to ensure rendering without intermissions
+          sleepTime/=3;
+
+          //fprintf(stderr,"sleepTime:%0.2f\n",sleepTime );
+          usleep((unsigned int) sleepTime);
+        }
+    } else
+    //The second way to render is as fast as possible..!
+    //We can manually adjust tickUSleepTime using keyboard if we want..
+    {
+        timestampToUse = scene->ticks;//*((unsigned int) 100/scene->rate);
+        if (framerate>0)
+         {
+          if (scene->controls.tickUSleepTime>0)
+              { usleep(scene->controls.tickUSleepTime); }
+         }
+        ++scene->ticks;
+    }
+
+
+
+
+
    calculateVirtualStreamPos(scene,0,timestampToUse,pos,0,&scaleX,&scaleY,&scaleZ);
-
-
-
    scene->cameraPose.posX = scene->cameraUserDelta.posX + pos[0];
    scene->cameraPose.posY = scene->cameraUserDelta.posY + pos[1];
    scene->cameraPose.posZ = scene->cameraUserDelta.posZ + pos[2];
@@ -332,16 +381,6 @@ int tickScene(unsigned int framerate)
    scene->cameraPose.angleY = scene->cameraUserDelta.angleY + pos[4];
    scene->cameraPose.angleZ = scene->cameraUserDelta.angleZ + pos[5];
 
-   if (framerate>0)
-   {
-    //if (lastFramerate>)
-    //TODO: sleep enough time for framerate to succeed
-    if (scene->controls.tickUSleepTime>0)
-              { usleep(scene->controls.tickUSleepTime); }
-   }
-
-
-   ++scene->ticks;
    return 1;
 }
 
