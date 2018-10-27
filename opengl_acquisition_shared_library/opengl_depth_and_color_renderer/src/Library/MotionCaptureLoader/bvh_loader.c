@@ -70,10 +70,7 @@ const char * rotationOrderNames[] =
 
 void lowercase(char *a)
 {
-    for (;; a++)
-        {
-         *a = tolower((unsigned char)*a);
-        }
+   while (*a!=0) { *a = tolower(*a); ++a; }
 }
 
 void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion)
@@ -86,6 +83,8 @@ void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion)
 
      lowercase(jN);
 
+     //-------------------------------------------------------------------------------------------------
+     //------------------------------------------TORSO--------------------------------------------------
      //-------------------------------------------------------------------------------------------------
      if  ( (strcmp(jN,"hip")==0) || (strcmp(jN,"hips")==0) )
            { snprintf(jN,MAX_BVH_JOINT_NAME,"hip"); }
@@ -100,10 +99,15 @@ void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion)
           )
             { snprintf(jN,MAX_BVH_JOINT_NAME,"chest"); }
      //-------------------------------------------------------------------------------------------------
+
+
+     //-------------------------------------------------------------------------------------------------
+     //---------------------------------------LEFT FOOT------------------------------------------------
+     //-------------------------------------------------------------------------------------------------
      if  (
            (strcmp(jN,"lefthip")==0) || (strcmp(jN,"leftupleg")==0) || (strcmp(jN,"lthigh")==0)  || (strcmp(jN,"leftupperLeg")==0)
           )
-            { snprintf(jN,MAX_BVH_JOINT_NAME,"lthigh"); }
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"lhip"); }
      //-------------------------------------------------------------------------------------------------
      if  (
            (strcmp(jN,"leftknee")==0) || (strcmp(jN,"leftlowleg")==0) || (strcmp(jN,"leftleg")==0)  || (strcmp(jN,"lshin")==0) || (strcmp(jN,"leftlowerleg")==0)
@@ -115,10 +119,15 @@ void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion)
           )
             { snprintf(jN,MAX_BVH_JOINT_NAME,"lfoot"); }
      //-------------------------------------------------------------------------------------------------
+
+
+     //-------------------------------------------------------------------------------------------------
+     //---------------------------------------RIGHT FOOT------------------------------------------------
+     //-------------------------------------------------------------------------------------------------
      if  (
            (strcmp(jN,"righthip")==0) || (strcmp(jN,"rightupleg")==0) || (strcmp(jN,"rthigh")==0)  || (strcmp(jN,"rightupperleg")==0)
           )
-            { snprintf(jN,MAX_BVH_JOINT_NAME,"rthigh"); }
+            { snprintf(jN,MAX_BVH_JOINT_NAME,"rhip"); }
      //-------------------------------------------------------------------------------------------------
      if  (
            (strcmp(jN,"rightknee")==0) || (strcmp(jN,"rightlowleg")==0) || (strcmp(jN,"rightleg")==0)  || (strcmp(jN,"rshin")==0) || (strcmp(jN,"rightlowerleg")==0)
@@ -130,8 +139,13 @@ void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion)
          )
             { snprintf(jN,MAX_BVH_JOINT_NAME,"rfoot"); }
      //-------------------------------------------------------------------------------------------------
+
+
+     //-------------------------------------------------------------------------------------------------
+     //---------------------------------------LEFT HAND------------------------------------------------
+     //-------------------------------------------------------------------------------------------------
      if  (
-           (strcmp(jN,"leftcollar")==0) || (strcmp(jN,"lcollar")==0) || (strcmp(jN,"leftshoulder")==0)  || (strcmp(jN,"lcolr")==0) || (strcmp(jN,"rightlowerleg")==0)
+           (strcmp(jN,"leftcollar")==0) || (strcmp(jN,"lcollar")==0) || (strcmp(jN,"leftshoulder")==0)  || (strcmp(jN,"lcolr")==0)
          )
             { snprintf(jN,MAX_BVH_JOINT_NAME,"lcollar"); }
      //-------------------------------------------------------------------------------------------------
@@ -149,9 +163,13 @@ void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion)
            (strcmp(jN,"leftwrist")==0) || (strcmp(jN,"lefthand")==0) || (strcmp(jN,"lhand")==0)
          )
             { snprintf(jN,MAX_BVH_JOINT_NAME,"lhand"); }
+
+
+     //-------------------------------------------------------------------------------------------------
+     //---------------------------------------RIGHT HAND------------------------------------------------
      //-------------------------------------------------------------------------------------------------
      if  (
-           (strcmp(jN,"rightcollar")==0) || (strcmp(jN,"rcollar")==0) || (strcmp(jN,"rightshoulder")==0)  || (strcmp(jN,"rcolr")==0) || (strcmp(jN,"rightlowerleg")==0)
+           (strcmp(jN,"rightcollar")==0) || (strcmp(jN,"rcollar")==0) || (strcmp(jN,"rightshoulder")==0)  || (strcmp(jN,"rcolr")==0)
          )
             { snprintf(jN,MAX_BVH_JOINT_NAME,"rcollar"); }
      //-------------------------------------------------------------------------------------------------

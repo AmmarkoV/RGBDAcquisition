@@ -54,6 +54,9 @@ int main(int argc, char **argv)
 
     bvh_loadBVH(fromBVHFile, &bvhMotion);
 
+    //Change joint names..
+    bvh_renameJoints(&bvhMotion);
+
     //Test printout of all rotations of a specific joint..
     //testPrintout(&bvhMotion,"RightFoot");
 

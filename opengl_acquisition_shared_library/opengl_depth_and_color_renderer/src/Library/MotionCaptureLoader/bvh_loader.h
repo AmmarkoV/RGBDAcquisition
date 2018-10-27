@@ -137,6 +137,9 @@ struct BVH_MotionCapture
 };
 
 
+
+void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion);
+
 /**
 * @brief Print BVH information on stderr
 * @ingroup BVH
