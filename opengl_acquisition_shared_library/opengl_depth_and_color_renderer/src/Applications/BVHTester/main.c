@@ -12,6 +12,7 @@
 #include "../../Library/TrajectoryParser/TrajectoryParserDataStructures.h"
 #include "../../Library/MotionCaptureLoader/bvh_loader.h"
 #include "../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.h"
+#include "../../Library/MotionCaptureLoader/bvh_to_tri_pose.h"
 
 void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 {
@@ -62,6 +63,9 @@ int main(int argc, char **argv)
 
     bvh_printBVH(&bvhMotion);
     //bvh_printBVHJointToMotionLookupTable(&bvhMotion);
+
+    struct bvhToTRI bvhtri={0};
+    bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri);
 
     dumpBVHToTrajectoryParser(toSceneFile,&bvhMotion);
 

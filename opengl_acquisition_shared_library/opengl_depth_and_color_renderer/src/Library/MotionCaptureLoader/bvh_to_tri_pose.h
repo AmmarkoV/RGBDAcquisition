@@ -14,4 +14,7 @@ struct bvhToTRI
  struct BVH_JointAssocation * jointAssociation[MAX_BVH_JOINT_HIERARCHY_SIZE];
 };
 
+
+int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri);
+
 #endif // BVH_TO_TRI_POSE_H_INCLUDED
