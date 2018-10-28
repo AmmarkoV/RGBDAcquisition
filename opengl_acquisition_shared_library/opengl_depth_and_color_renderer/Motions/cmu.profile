@@ -1,0 +1,4 @@
+#BVH to TRI
+JOINT_ASSOCIATION(neck,)
+JOINT_ROTATION(neck,-x,-y,-z)
+JOINT_OFFSET(neck,0,0,0)
