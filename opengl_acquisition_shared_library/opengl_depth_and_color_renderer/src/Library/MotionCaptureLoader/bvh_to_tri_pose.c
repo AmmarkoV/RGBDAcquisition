@@ -4,6 +4,22 @@
 
 #include "../TrajectoryParser/InputParser_C.h"
 
+unsigned int bvh_resolveBVHToTRIJoint(struct bvhToTRI * bvhtri,const char * jName)
+{
+  unsigned int jID=0;
+
+  for (jID=0; jID<bvhtri->numberOfJointAssociations; jID++)
+  {
+    if (strcmp(jName,bvhtri->jointAssociation[jID].bvhJointName)==0)
+    {
+      return jID;
+    }
+  }
+ return 0;
+}
+
+
+
 int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
 {
   FILE * fp = fopen(filename,"r");
@@ -61,18 +77,24 @@ int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
         if (InputParser_WordCompareAuto(ipc,0,"JOINT_ROTATION_ORDER"))
          {
            InputParser_GetWord(ipc,1,nameA,512);
-           InputParser_GetWord(ipc,2,rotA,512);
-           InputParser_GetWord(ipc,3,rotB,512);
-           InputParser_GetWord(ipc,4,rotC,512);
-           fprintf(stderr,"RotationOrder %s(%s,%s,%s)\n",nameA,rotA,rotB,rotC);
+           jID = bvh_resolveBVHToTRIJoint(bvhtri,nameA);
+           InputParser_GetWord(ipc,2,bvhtri->jointAssociation[jID].rotationOrder[0].label,64);
+           InputParser_GetWord(ipc,3,bvhtri->jointAssociation[jID].rotationOrder[1].label,64);
+           InputParser_GetWord(ipc,4,bvhtri->jointAssociation[jID].rotationOrder[2].label,64);
+
+           fprintf(stderr,"RotationOrder %s(%s,%s,%s)\n",nameA,
+                     bvhtri->jointAssociation[jID].rotationOrder[0].label,
+                     bvhtri->jointAssociation[jID].rotationOrder[1].label,
+                     bvhtri->jointAssociation[jID].rotationOrder[2].label);
          } else
         if (InputParser_WordCompareAuto(ipc,0,"JOINT_OFFSET"))
         {
           InputParser_GetWord(ipc,1,nameA,512);
-          offsetA = InputParser_GetWordFloat(ipc,2);
-          offsetB = InputParser_GetWordFloat(ipc,3);
-          offsetC = InputParser_GetWordFloat(ipc,4);
-          fprintf(stderr,"Offset %s(%0.2f,%0.2f,%0.2f)\n",nameA,offsetA,offsetB,offsetC);
+          jID = bvh_resolveBVHToTRIJoint(bvhtri,nameA);
+          bvhtri->jointAssociation[jID].offset[0] = InputParser_GetWordFloat(ipc,2);
+          bvhtri->jointAssociation[jID].offset[1] = InputParser_GetWordFloat(ipc,3);
+          bvhtri->jointAssociation[jID].offset[2] = InputParser_GetWordFloat(ipc,4);
+          fprintf(stderr,"Offset %s #%u (%0.2f,%0.2f,%0.2f)\n",nameA,jID,offsetA,offsetB,offsetC);
         }
        }
     }

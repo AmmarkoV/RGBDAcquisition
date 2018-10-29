@@ -3,11 +3,21 @@
 
 #include "bvh_loader.h"
 
+struct BVH_RotationOrder
+{
+  char label[64];
+  float sign;
+};
+
 struct BVH_JointAssocation
 {
   char bvhJointName[MAX_BVH_JOINT_NAME];
   char triJointName[MAX_BVH_JOINT_NAME];
   int useJoint;
+
+  struct BVH_RotationOrder rotationOrder[3];
+
+  float offset[3];
 };
 
 struct bvhToTRI

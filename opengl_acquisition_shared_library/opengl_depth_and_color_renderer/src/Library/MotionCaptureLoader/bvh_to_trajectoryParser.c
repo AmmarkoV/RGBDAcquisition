@@ -4,7 +4,7 @@
 #include "bvh_transform.h"
 
 
-static const char * bvhName[] =
+const char * bvhName[] =
 {
     "Hips",
     "Chest",
@@ -28,7 +28,7 @@ static const char * bvhName[] =
     "Unknown"
 };
 
-static const char * triName[] =
+const char * triName[] =
 {
     "JtSpineA",
     "Chest",
@@ -280,7 +280,6 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
                     );
      }
     }
-
 
     fclose(fp);
     return 1;
