@@ -36,6 +36,7 @@ int main(int argc, char **argv)
 {
     const char * fromBVHFile="Motions/example.bvh";
     const char * toSceneFile="Scenes/bvh.conf";
+    const char * toSceneFileTRI="Scenes/bvhTRI.conf";
 
 
     unsigned int i=0;
@@ -67,6 +68,7 @@ int main(int argc, char **argv)
     struct bvhToTRI bvhtri={0};
     bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri);
 
+    dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri);
     dumpBVHToTrajectoryParser(toSceneFile,&bvhMotion);
 
     bvh_free(&bvhMotion);

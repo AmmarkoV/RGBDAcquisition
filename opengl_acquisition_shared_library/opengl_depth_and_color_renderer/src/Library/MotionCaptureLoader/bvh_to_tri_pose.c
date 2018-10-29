@@ -24,7 +24,6 @@ int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
     size_t len = 0;
 
     char nameA[512]={0};
-    char nameB[512]={0};
 
     char rotA[512]={0};
     char rotB[512]={0};
@@ -34,6 +33,8 @@ int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
     float offsetB=0.0;
     float offsetC=0.0;
 
+    bvhtri->numberOfJointAssociations=0;
+    unsigned int jID=0;
 
     while  ((read = getline(&line, &len, fp)) != -1)
     {
@@ -43,9 +44,19 @@ int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
        {
         if (InputParser_WordCompareAuto(ipc,0,"JOINT_ASSOCIATION"))
          {
-           InputParser_GetWord(ipc,1,nameA,512);
-           InputParser_GetWord(ipc,2,nameB,512);
-           fprintf(stderr,"Associated `%s` => `%s` \n",nameA,nameB);
+           jID=bvhtri->numberOfJointAssociations;
+           InputParser_GetWord(ipc,1,bvhtri->jointAssociation[jID].bvhJointName,MAX_BVH_JOINT_NAME);
+           InputParser_GetWord(ipc,2,bvhtri->jointAssociation[jID].triJointName,MAX_BVH_JOINT_NAME);
+           //--------------------------------------------------
+           fprintf(
+                   stderr,"Associated #%u `%s` => `%s` \n",
+                   jID,
+                   bvhtri->jointAssociation[jID].bvhJointName,
+                   bvhtri->jointAssociation[jID].triJointName
+                  );
+
+           bvhtri->jointAssociation[jID].useJoint=1;
+           ++bvhtri->numberOfJointAssociations;
          } else
         if (InputParser_WordCompareAuto(ipc,0,"JOINT_ROTATION_ORDER"))
          {
@@ -61,10 +72,13 @@ int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
           offsetA = InputParser_GetWordFloat(ipc,2);
           offsetB = InputParser_GetWordFloat(ipc,3);
           offsetC = InputParser_GetWordFloat(ipc,4);
-           fprintf(stderr,"Offset %s(%0.2f,%0.2f,%0.2f)\n",nameA,offsetA,offsetB,offsetC);
+          fprintf(stderr,"Offset %s(%0.2f,%0.2f,%0.2f)\n",nameA,offsetA,offsetB,offsetC);
         }
        }
     }
+
+    fprintf( stderr,"%u Associations\n", bvhtri->numberOfJointAssociations );
+
 
     if (line) { free(line); }
 

@@ -5,13 +5,15 @@
 
 struct BVH_JointAssocation
 {
-  const char * bvhJointName[MAX_BVH_JOINT_NAME];
-  const char * triJointName[MAX_BVH_JOINT_NAME];
+  char bvhJointName[MAX_BVH_JOINT_NAME];
+  char triJointName[MAX_BVH_JOINT_NAME];
+  int useJoint;
 };
 
 struct bvhToTRI
 {
- struct BVH_JointAssocation * jointAssociation[MAX_BVH_JOINT_HIERARCHY_SIZE];
+ unsigned int numberOfJointAssociations;
+ struct BVH_JointAssocation jointAssociation[MAX_BVH_JOINT_HIERARCHY_SIZE];
 };
 
 

@@ -54,37 +54,51 @@ static const char * triName[] =
 
 
 
-int dumpBVHJointToTP(FILE*fp , struct BVH_MotionCapture * mc , unsigned int fID, unsigned int jID)
+int dumpBVHJointToTP(
+                      FILE*fp ,
+                      struct BVH_MotionCapture * mc,
+                      struct bvhToTRI * bvhtri,
+                      unsigned int fID
+                    )
 {
-  const char * label=0;
-  unsigned int jName=0;
+  unsigned int jID=0;
+  unsigned int jAssociationID=0;
 
-   for (jName=0; jName<17; jName++)
+  for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
+  {
+    if (
+        (bvhtri->jointAssociation[jAssociationID].useJoint) &&
+        (
+         bvh_getJointIDFromJointName(
+                                      mc,
+                                      bvhtri->jointAssociation[jAssociationID].bvhJointName,
+                                      &jID
+                                     )
+        )
+       )
     {
-      if ( strcmp(mc->jointHierarchy[jID].jointName,bvhName[jName]) == 0 )
-      {
-        label=triName[jName];
-        break;
-      }
+     if (strlen(bvhtri->jointAssociation[jAssociationID].triJointName)>0)
+       {
+         fprintf(
+                 fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
+                 fID,
+                 bvhtri->jointAssociation[jAssociationID].triJointName,
+                 -1*bvh_getJointRotationXAtFrame(mc,jID,fID),
+                 -1*bvh_getJointRotationYAtFrame(mc,jID,fID),
+                 -1*bvh_getJointRotationZAtFrame(mc,jID,fID)
+                );
+       } else
+       { fprintf(fp,"#BVH joint `%s` has no TRI name associated\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
     }
+   else
+    { fprintf(fp,"#BVH joint `%s` not used/associated\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
+  }
 
-  if (label==0) { return 0; }
-
-
-  fprintf(
-          fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
-          fID,
-          label,
-          bvh_getJointRotationXAtFrame(mc,jID,fID),
-          bvh_getJointRotationYAtFrame(mc,jID,fID),
-          bvh_getJointRotationZAtFrame(mc,jID,fID)
-         );
-
-   return 1;
+ return 1;
 }
 
 
-int dumpBVHToTrajectoryParserTRI(const char * filename , struct BVH_MotionCapture * mc)
+int dumpBVHToTrajectoryParserTRI(const char * filename , struct BVH_MotionCapture * mc,struct bvhToTRI * bvhtri)
 {
   unsigned int jID=0,fID;
   FILE * fp = fopen(filename,"w");
@@ -103,7 +117,7 @@ int dumpBVHToTrajectoryParserTRI(const char * filename , struct BVH_MotionCaptur
     fprintf(fp,"EMULATE_PROJECTION_MATRIX(535.423889 , 0.0 , 320.0 , 0.0 , 533.48468, 240.0 , 0 , 1)\n");
 
     fprintf(fp,"SILENT(1)\n");
-    fprintf(fp,"RATE(100)\n");
+    fprintf(fp,"RATE(120)\n");
     fprintf(fp,"INTERPOLATE_TIME(1)\n");
     fprintf(fp,"MOVE_VIEW(1)\n");
 
@@ -113,31 +127,12 @@ int dumpBVHToTrajectoryParserTRI(const char * filename , struct BVH_MotionCaptur
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
       fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)\n",fID);
-      for (jID=0; jID<mc->jointHierarchySize; jID++)
-      {
-        dumpBVHJointToTP(fp , mc , fID, jID);
-      }
-      fprintf(fp,"\n");
+      dumpBVHJointToTP(fp, mc, bvhtri, fID);
+      fprintf(fp,"\n\n");
     }
 
-
-
-
-/*
-fprintf(fp,"POSE(human,0,JtKneeRt,-5.591,0.655,0.000)\n");
-POSE(human,0,JtShoulderLf,0.275,0.867,18.693)
-POSE(human,0,JtShoulderRt,0.520,0.892,8.911)
-POSE(human,0,JtElbowLf,-0.637,0.064,0.000)
-POSE(human,0,JtElbowRt,0.196,0.915,0.000)
-POSE(human,0,JtHipLf,-0.000,0.000,0.000)
-POSE(human,0,JtHipRt,0.000,0.000,0.000)
-POSE(human,0,JtNeckB,-0.901,-0.605,0.286)
-POSE(human,0,JtSpineA,0.001,0.000,0.000)
-*/
-
-
-      fclose(fp);
-      return 1;
+    fclose(fp);
+   return 1;
   }
  return 0;
 }

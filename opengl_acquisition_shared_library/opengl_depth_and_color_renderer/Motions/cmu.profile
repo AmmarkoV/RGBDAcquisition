@@ -9,7 +9,7 @@ JOINT_ASSOCIATION(hip,JtSpineA)
 
 #Right Foot
 JOINT_ASSOCIATION(rhip,JtHipRt)
-JOINT_ASSOCIATION(rkneeJtKneeRt)
+JOINT_ASSOCIATION(rknee,JtKneeRt)
 JOINT_ASSOCIATION(rfoot,JtAnkleRt)
 
 #Left Foot
@@ -19,7 +19,7 @@ JOINT_ASSOCIATION(lfoot,JtAnkleLf)
 
 #Right Hand
 JOINT_ASSOCIATION(rcollar,JtClavicleRt)
-JOINT_ASSOCIATION(rshoulder,JtShoulderRt) 
+JOINT_ASSOCIATION(rshoulder,JtShoulderRt)
 JOINT_ASSOCIATION(relbow,JtElbowRt)
 JOINT_ASSOCIATION(rhand,JtWristRt)
 JOINT_ASSOCIATION(rthumb1,JtThumbARt)
