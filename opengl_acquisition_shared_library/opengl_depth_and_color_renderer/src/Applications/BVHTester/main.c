@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     struct bvhToTRI bvhtri={0};
     bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri);
 
-    dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri);
+    dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,0);
     dumpBVHToTrajectoryParser(toSceneFile,&bvhMotion);
 
     bvh_free(&bvhMotion);

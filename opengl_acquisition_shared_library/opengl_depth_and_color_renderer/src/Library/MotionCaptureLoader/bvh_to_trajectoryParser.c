@@ -98,17 +98,85 @@ int dumpBVHJointToTP(
 }
 
 
-int dumpBVHToTrajectoryParserTRI(const char * filename , struct BVH_MotionCapture * mc,struct bvhToTRI * bvhtri)
+
+
+
+
+void dumpSphereHeader(struct BVH_MotionCapture * mc,FILE *fp)
 {
-  unsigned int jID=0,fID;
+ unsigned int jID;
+    for (jID=0; jID<mc->jointHierarchySize; jID++)
+    {
+      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"OBJECT_TYPE(sT%u,cube)\n",jID);   } else
+                                                { fprintf(fp,"OBJECT_TYPE(sT%u,sphere)\n",jID); }
+
+      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 0,255,0,0,0 ,3.0,3.0,3.0)\n",jID,jID);   } else
+      if ( mc->jointHierarchy[jID].isRoot )     { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,255,0,0,0,4.5,4.5,4.5)\n",jID,jID); } else
+                                                { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,2.5,2.5,2.5)\n",jID,jID);   }
+
+
+      if (bhv_jointHasParent(mc,jID))
+      {
+        fprintf(fp,"CONNECTOR(s%u,s%u, 255,255,0,100, 3.5)\n",jID,mc->jointHierarchy[jID].parentJoint);
+      }
+    }
+    fprintf(fp,"\n");
+}
+
+
+void dumpSphereBody(
+                    struct BVH_MotionCapture * mc,
+                    struct BVH_Transform * bvhTransform,
+                    FILE *fp ,
+                    unsigned int jID,
+                    unsigned int fID
+                   )
+{
+      bvh_loadTransformForFrame(
+                                mc,
+                                fID ,
+                                bvhTransform
+                               );
+
+     fprintf(fp,"POS(camera,%u,   60.0, 60.0, 252.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
+     fprintf(fp,"POS(floor,%u,00.0,00.0,0.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+     {
+      fprintf(
+              fp,"POS(s%u,%u,%0.4f,%0.4f,%0.4f,0,0,0,0)\n",jID,fID,
+              bvhTransform->joint[jID].pos[0],
+              bvhTransform->joint[jID].pos[1],
+              bvhTransform->joint[jID].pos[2]
+             );
+     }
+     fprintf(fp,"\n");
+}
+
+
+
+int dumpBVHToTrajectoryParserTRI(
+                                  const char * filename ,
+                                  struct BVH_MotionCapture * mc,
+                                  struct bvhToTRI * bvhtri ,
+                                  unsigned int includeSpheres
+                                )
+{
+  struct BVH_Transform bvhTransform={0};
+  unsigned int jID=0,fID=0;
   FILE * fp = fopen(filename,"w");
 
   if (fp!=0)
   {
+    fprintf(fp,"#Auto generated using BVHTester to render file : %s to scene : %s\n",mc->fileName,filename);
+    fprintf(fp,"#https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer\n");
+    fprintf(fp,"BACKGROUND(63,114,182)\n");
+
     fprintf(fp,"#INCLUDE(Scenes/renderLikeMBVRH.conf)\n");
     fprintf(fp,"#This is the way to render like the mbv renderer :)\n");
     fprintf(fp,"AUTOREFRESH(1500)\n");
-    fprintf(fp,"BACKGROUND(0,0,0)\n");
+
+    fprintf(fp,"NEAR_CLIP(0.1)\n");
+    fprintf(fp,"FAR_CLIP(1000)\n");
 
     fprintf(fp,"#Bring our world to the MBV coordinate system\n");
     fprintf(fp,"SCALE_WORLD(-0.01,-0.01,0.01)\n");
@@ -121,6 +189,16 @@ int dumpBVHToTrajectoryParserTRI(const char * filename , struct BVH_MotionCaptur
     fprintf(fp,"INTERPOLATE_TIME(1)\n");
     fprintf(fp,"MOVE_VIEW(1)\n");
 
+    if (includeSpheres)
+    {
+    fprintf(fp,"OBJECT_TYPE(floorType,grid)\n");
+    fprintf(fp,"OBJECT(floor,floorType,0,255,0,0 ,0, 10.0,10.0,10.0)\n");
+    //Instantiate objects that will draw our skeleton
+    //------------------------------------------------
+     dumpSphereHeader(mc,fp);
+    //------------------------------------------------
+    }
+
     fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/AmmarH.tri)\n");
     fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,10.0,10.0,10.0)\n\n");
 
@@ -129,6 +207,20 @@ int dumpBVHToTrajectoryParserTRI(const char * filename , struct BVH_MotionCaptur
       fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)\n",fID);
       dumpBVHJointToTP(fp, mc, bvhtri, fID);
       fprintf(fp,"\n\n");
+
+     if (includeSpheres)
+      {
+       for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+        dumpSphereBody(
+                      mc,
+                      &bvhTransform,
+                      fp ,
+                      jID,
+                      fID
+                     );
+       }
+      }
     }
 
     fclose(fp);
@@ -136,13 +228,6 @@ int dumpBVHToTrajectoryParserTRI(const char * filename , struct BVH_MotionCaptur
   }
  return 0;
 }
-
-
-
-
-
-
-
 
 
 
@@ -178,45 +263,22 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
     fprintf(fp,"OBJECT_TYPE(floorType,grid)\n");
     fprintf(fp,"OBJECT(floor,floorType,0,255,0,0 ,0, 10.0,10.0,10.0)\n");
     //Instantiate objects that will draw our skeleton
-    //------------------------------------------------------------------------------------------------------------------------------
-    for (jID=0; jID<mc->jointHierarchySize; jID++)
-    {
-      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"OBJECT_TYPE(sT%u,cube)\n",jID);   } else
-                                                { fprintf(fp,"OBJECT_TYPE(sT%u,sphere)\n",jID); }
-
-      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 0,255,0,0,0 ,3.0,3.0,3.0)\n",jID,jID);   } else
-      if ( mc->jointHierarchy[jID].isRoot )     { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,255,0,0,0,4.5,4.5,4.5)\n",jID,jID); } else
-                                                { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,2.5,2.5,2.5)\n",jID,jID);   }
-
-
-      if (bhv_jointHasParent(mc,jID))
-      {
-        fprintf(fp,"CONNECTOR(s%u,s%u, 255,255,0,100, 3.5)\n",jID,mc->jointHierarchy[jID].parentJoint);
-      }
-    }
-    fprintf(fp,"\n");
-    //------------------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------
+      dumpSphereHeader(mc,fp);
+    //------------------------------------------------
 
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
-      bvh_loadTransformForFrame(
-                                mc,
-                                fID ,
-                                &bvhTransform
-                               );
-
-     fprintf(fp,"POS(camera,%u,   60.0, 60.0, 252.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
-     fprintf(fp,"POS(floor,%u,00.0,00.0,0.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
      for (jID=0; jID<mc->jointHierarchySize; jID++)
      {
-      fprintf(
-              fp,"POS(s%u,%u,%0.4f,%0.4f,%0.4f,0,0,0,0)\n",jID,fID,
-              bvhTransform.joint[jID].pos[0],
-              bvhTransform.joint[jID].pos[1],
-              bvhTransform.joint[jID].pos[2]
-             );
+      dumpSphereBody(
+                     mc,
+                     &bvhTransform,
+                     fp ,
+                     jID,
+                     fID
+                    );
      }
-     fprintf(fp,"\n");
     }
 
 
