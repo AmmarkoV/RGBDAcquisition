@@ -38,6 +38,7 @@ int main(int argc, char **argv)
     const char * toSceneFile="Scenes/bvh.conf";
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
 
+    unsigned int onlyFirstFrame=0;
 
     unsigned int i=0;
     for (i=0; i<argc; i++)
@@ -49,6 +50,10 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--to")==0)
         {
           toSceneFile=argv[i+1];
+        } else
+        if (strcmp(argv[i],"--onlyFirstFrame")==0)
+        {
+          onlyFirstFrame=1;
         }
     }
 
@@ -68,7 +73,13 @@ int main(int argc, char **argv)
     struct bvhToTRI bvhtri={0};
     bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri);
 
-    bvhMotion.numberOfFrames=1;
+    if (onlyFirstFrame)
+    {
+     bvh_copyMotionFrame(&bvhMotion, 0, 1 );
+     bvhMotion.numberOfFrames=2; //Just Render one frame..
+    }
+
+
     dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,0);
     dumpBVHToTrajectoryParser(toSceneFile,&bvhMotion);
 

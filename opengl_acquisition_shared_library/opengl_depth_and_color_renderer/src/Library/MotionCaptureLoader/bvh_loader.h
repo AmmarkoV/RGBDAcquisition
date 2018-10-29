@@ -171,7 +171,11 @@ int bvh_free(struct BVH_MotionCapture * bvhMotion);
 */
 int bvh_getJointIDFromJointName( struct BVH_MotionCapture * bvhMotion , const char * jointName, BVHJointID * jID);
 
-
+int bvh_copyMotionFrame(
+                         struct BVH_MotionCapture * bvhMotion,
+                         BVHFrameID tofID,
+                         BVHFrameID fromfID
+                        );
 
 float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
 

@@ -41,14 +41,6 @@ int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
 
     char nameA[512]={0};
 
-    char rotA[512]={0};
-    char rotB[512]={0};
-    char rotC[512]={0};
-
-    float offsetA=0.0;
-    float offsetB=0.0;
-    float offsetC=0.0;
-
     bvhtri->numberOfJointAssociations=0;
     unsigned int jID=0;
 
@@ -94,7 +86,12 @@ int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
           bvhtri->jointAssociation[jID].offset[0] = InputParser_GetWordFloat(ipc,2);
           bvhtri->jointAssociation[jID].offset[1] = InputParser_GetWordFloat(ipc,3);
           bvhtri->jointAssociation[jID].offset[2] = InputParser_GetWordFloat(ipc,4);
-          fprintf(stderr,"Offset %s #%u (%0.2f,%0.2f,%0.2f)\n",nameA,jID,offsetA,offsetB,offsetC);
+          fprintf(
+                  stderr,"Offset %s #%u (%0.2f,%0.2f,%0.2f)\n",nameA,jID,
+                  bvhtri->jointAssociation[jID].offset[0],
+                  bvhtri->jointAssociation[jID].offset[1],
+                  bvhtri->jointAssociation[jID].offset[2]
+                 );
         }
        }
     }

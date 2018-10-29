@@ -43,4 +43,7 @@ JOINT_ASSOCIATION(lpinky1,JtLittleALf)
 JOINT_ROTATION_ORDER(neck,-x,-y,-z)
 JOINT_OFFSET(neck,0,0,0)
 
+JOINT_OFFSET(lshoulder,0,40,70)
+JOINT_OFFSET(rshoulder,0,-40,-70)
+
 

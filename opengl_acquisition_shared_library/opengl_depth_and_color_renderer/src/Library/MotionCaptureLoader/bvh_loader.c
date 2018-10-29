@@ -1016,7 +1016,25 @@ float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID
   return bvhMotion->motionValues[mID];
 }
 
-
+int bvh_copyMotionFrame(
+                         struct BVH_MotionCapture * bvhMotion,
+                         BVHFrameID tofID,
+                         BVHFrameID fromfID
+                        )
+{
+   if (
+         (tofID<bvhMotion->numberOfFrames ) && (fromfID<bvhMotion->numberOfFrames )
+      )
+   {
+     memcpy(
+             &bvhMotion->motionValues[tofID * bvhMotion->numberOfValuesPerFrame],
+             &bvhMotion->motionValues[fromfID * bvhMotion->numberOfValuesPerFrame],
+             bvhMotion->numberOfValuesPerFrame * sizeof(float)
+           );
+     return 1;
+   }
+ return 0;
+}
 
 
 int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )

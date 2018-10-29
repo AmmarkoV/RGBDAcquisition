@@ -83,9 +83,9 @@ int dumpBVHJointToTP(
                  fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
                  fID,
                  bvhtri->jointAssociation[jAssociationID].triJointName,
-                 -1*bvh_getJointRotationXAtFrame(mc,jID,fID),
-                 -1*bvh_getJointRotationYAtFrame(mc,jID,fID),
-                 -1*bvh_getJointRotationZAtFrame(mc,jID,fID)
+                 -1*bvh_getJointRotationXAtFrame(mc,jID,fID) + bvhtri->jointAssociation[jAssociationID].offset[0],
+                 -1*bvh_getJointRotationYAtFrame(mc,jID,fID) + bvhtri->jointAssociation[jAssociationID].offset[1],
+                 -1*bvh_getJointRotationZAtFrame(mc,jID,fID) + bvhtri->jointAssociation[jAssociationID].offset[2]
                 );
        } else
        { fprintf(fp,"#BVH joint `%s` has no TRI name associated\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
@@ -128,10 +128,10 @@ void dumpSphereBody(
                     struct BVH_MotionCapture * mc,
                     struct BVH_Transform * bvhTransform,
                     FILE *fp ,
-                    unsigned int jID,
                     unsigned int fID
                    )
 {
+      unsigned int jID=0;
       bvh_loadTransformForFrame(
                                 mc,
                                 fID ,
@@ -216,7 +216,6 @@ int dumpBVHToTrajectoryParserTRI(
                       mc,
                       &bvhTransform,
                       fp ,
-                      jID,
                       fID
                      );
        }
@@ -238,7 +237,7 @@ int dumpBVHToTrajectoryParserTRI(
 
 int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture * mc)
 {
-  unsigned int jID=0,fID=0;
+  unsigned int fID=0;
   FILE * fp = fopen(filename,"w");
 
   struct BVH_Transform bvhTransform={0};
@@ -269,16 +268,12 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
 
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
-     {
       dumpSphereBody(
                      mc,
                      &bvhTransform,
                      fp ,
-                     jID,
                      fID
                     );
-     }
     }
 
     fclose(fp);
