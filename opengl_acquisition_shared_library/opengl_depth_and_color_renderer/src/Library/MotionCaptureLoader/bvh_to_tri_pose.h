@@ -9,7 +9,7 @@ struct BVH_RotationOrder
 {
   char label[64];
   float sign;
-  char  name;
+  char  rotID;
 };
 
 struct BVH_JointAssocation

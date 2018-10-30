@@ -40,10 +40,18 @@ JOINT_ASSOCIATION(lring1,JtRingALf)
 JOINT_ASSOCIATION(lpinky1,JtLittleALf)
  
 
-JOINT_ROTATION_ORDER(neck,-x,-y,z)
 JOINT_OFFSET(neck,0,0,0)
 
+#Shoulder
+JOINT_ROTATION_ORDER(lshoulder,-x,-y,z)
+JOINT_ROTATION_ORDER(rshoulder,-x,-y,z)
 JOINT_OFFSET(lshoulder,0,40,70)
 JOINT_OFFSET(rshoulder,0,-40,-70)
+
+
+JOINT_ROTATION_ORDER(lknee,x,y,-z)
+JOINT_ROTATION_ORDER(rknee,x,y,-z)
+JOINT_OFFSET(lknee,40,0,0)
+JOINT_OFFSET(rknee,40,0,0)
 
 

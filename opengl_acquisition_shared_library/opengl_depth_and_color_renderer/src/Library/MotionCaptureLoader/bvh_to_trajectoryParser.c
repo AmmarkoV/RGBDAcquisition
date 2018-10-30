@@ -79,14 +79,39 @@ int dumpBVHJointToTP(
     {
      if (strlen(bvhtri->jointAssociation[jAssociationID].triJointName)>0)
        {
-         fprintf(
-                 fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
-                 fID,
-                 bvhtri->jointAssociation[jAssociationID].triJointName,
-                 -1*bvh_getJointRotationXAtFrame(mc,jID,fID) + bvhtri->jointAssociation[jAssociationID].offset[0],
-                 -1*bvh_getJointRotationYAtFrame(mc,jID,fID) + bvhtri->jointAssociation[jAssociationID].offset[1],
-                 -1*bvh_getJointRotationZAtFrame(mc,jID,fID) + bvhtri->jointAssociation[jAssociationID].offset[2]
-                );
+        //---------------------------------------------------------------------------------------------------
+        float X = (bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign *
+        bvh_getJointChannelAtFrame(
+                                   mc,
+                                   jID,
+                                   fID,
+                                   bvhtri->jointAssociation[jAssociationID].rotationOrder[0].rotID
+                                  ))
+         + bvhtri->jointAssociation[jAssociationID].offset[0];
+        //---------------------------------------------------------------------------------------------------
+        float Y = (bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign *
+        bvh_getJointChannelAtFrame(
+                                   mc,
+                                   jID,
+                                   fID,
+                                   bvhtri->jointAssociation[jAssociationID].rotationOrder[1].rotID
+                                  ))
+        + bvhtri->jointAssociation[jAssociationID].offset[1];
+        //---------------------------------------------------------------------------------------------------
+        float Z = (bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign *
+        bvh_getJointChannelAtFrame(
+                                   mc,
+                                   jID,
+                                   fID,
+                                   bvhtri->jointAssociation[jAssociationID].rotationOrder[2].rotID
+                                  ))
+        + bvhtri->jointAssociation[jAssociationID].offset[2];
+        //---------------------------------------------------------------------------------------------------
+
+        fprintf(
+                fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
+                fID, bvhtri->jointAssociation[jAssociationID].triJointName, X, Y, Z
+               );
        } else
        { fprintf(fp,"#BVH joint `%s` has no TRI name associated\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
     }
