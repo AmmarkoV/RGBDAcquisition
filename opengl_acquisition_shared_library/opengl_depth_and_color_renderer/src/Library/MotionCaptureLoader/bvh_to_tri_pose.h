@@ -30,6 +30,10 @@ struct bvhToTRI
 };
 
 
-int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri);
+int bvh_loadBVHToTRI(
+                     const char * filename ,
+                     struct bvhToTRI * bvhtri,
+                     struct BVH_MotionCapture * mc
+                    );
 
 #endif // BVH_TO_TRI_POSE_H_INCLUDED

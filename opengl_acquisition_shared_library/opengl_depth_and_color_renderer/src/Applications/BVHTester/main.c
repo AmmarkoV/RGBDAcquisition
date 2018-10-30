@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     //bvh_printBVHJointToMotionLookupTable(&bvhMotion);
 
     struct bvhToTRI bvhtri={0};
-    bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri);
+    bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri,&bvhMotion);
 
     if (onlyFirstFrame)
     {

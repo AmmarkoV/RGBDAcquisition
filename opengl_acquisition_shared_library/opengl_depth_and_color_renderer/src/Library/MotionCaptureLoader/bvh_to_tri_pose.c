@@ -79,7 +79,94 @@ void bvh_offsetLabelsToSigns(
 }
 
 
-int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
+
+
+int parseJointAssociation(
+                           struct bvhToTRI * bvhtri,
+                           struct BVH_MotionCapture * mc,
+                           struct InputParserC * ipc
+                         )
+{
+ unsigned int jID=bvhtri->numberOfJointAssociations;
+ unsigned int realJID=0;
+
+ //--------------------------------------------------
+ InputParser_GetWord(ipc,1,bvhtri->jointAssociation[jID].bvhJointName,MAX_BVH_JOINT_NAME);
+ InputParser_GetWord(ipc,2,bvhtri->jointAssociation[jID].triJointName,MAX_BVH_JOINT_NAME);
+ //--------------------------------------------------
+
+ if ( bvh_getJointIDFromJointName(mc,bvhtri->jointAssociation[jID].bvhJointName,&realJID) )
+    {
+           fprintf(
+                   stderr,"Associated #%u `%s` => `%s` \n",
+                   jID,
+                   bvhtri->jointAssociation[jID].bvhJointName,
+                   bvhtri->jointAssociation[jID].triJointName
+                  );
+           bvhtri->jointAssociation[jID].offset[0]=0.0;
+           bvhtri->jointAssociation[jID].offset[1]=0.0;
+           bvhtri->jointAssociation[jID].offset[2]=0.0;
+           //------------------------------------------------------
+           bvhtri->jointAssociation[jID].rotationOrder[0].sign=1.0;
+           bvhtri->jointAssociation[jID].rotationOrder[1].sign=1.0;
+           bvhtri->jointAssociation[jID].rotationOrder[2].sign=1.0;
+           //-------------------------------------------------------
+           switch (mc->jointHierarchy[realJID].channelRotationOrder)
+           {
+             case  BVH_ROTATION_ORDER_XYZ :
+               bvhtri->jointAssociation[jID].rotationOrder[0].rotID=BVH_ROTATION_X;
+               bvhtri->jointAssociation[jID].rotationOrder[1].rotID=BVH_ROTATION_Y;
+               bvhtri->jointAssociation[jID].rotationOrder[2].rotID=BVH_ROTATION_Z;
+             break;
+             case  BVH_ROTATION_ORDER_XZY :
+               bvhtri->jointAssociation[jID].rotationOrder[0].rotID=BVH_ROTATION_X;
+               bvhtri->jointAssociation[jID].rotationOrder[1].rotID=BVH_ROTATION_Z;
+               bvhtri->jointAssociation[jID].rotationOrder[2].rotID=BVH_ROTATION_Y;
+             break;
+             case  BVH_ROTATION_ORDER_YXZ :
+               bvhtri->jointAssociation[jID].rotationOrder[0].rotID=BVH_ROTATION_Y;
+               bvhtri->jointAssociation[jID].rotationOrder[1].rotID=BVH_ROTATION_X;
+               bvhtri->jointAssociation[jID].rotationOrder[2].rotID=BVH_ROTATION_Z;
+             break;
+             case  BVH_ROTATION_ORDER_YZX :
+               bvhtri->jointAssociation[jID].rotationOrder[0].rotID=BVH_ROTATION_Y;
+               bvhtri->jointAssociation[jID].rotationOrder[1].rotID=BVH_ROTATION_Z;
+               bvhtri->jointAssociation[jID].rotationOrder[2].rotID=BVH_ROTATION_X;
+             break;
+             case  BVH_ROTATION_ORDER_ZXY :
+               bvhtri->jointAssociation[jID].rotationOrder[0].rotID=BVH_ROTATION_Z;
+               bvhtri->jointAssociation[jID].rotationOrder[1].rotID=BVH_ROTATION_X;
+               bvhtri->jointAssociation[jID].rotationOrder[2].rotID=BVH_ROTATION_Y;
+             break;
+             case  BVH_ROTATION_ORDER_ZYX :
+               bvhtri->jointAssociation[jID].rotationOrder[0].rotID=BVH_ROTATION_Z;
+               bvhtri->jointAssociation[jID].rotationOrder[1].rotID=BVH_ROTATION_Y;
+               bvhtri->jointAssociation[jID].rotationOrder[2].rotID=BVH_ROTATION_X;
+             break;
+           }
+           //-------------------------------------------------------
+           bvhtri->jointAssociation[jID].useJoint=1;
+           ++bvhtri->numberOfJointAssociations;
+      return 1;
+    }
+ return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+int bvh_loadBVHToTRI(
+                     const char * filename ,
+                     struct bvhToTRI * bvhtri,
+                     struct BVH_MotionCapture * mc
+                    )
 {
   FILE * fp = fopen(filename,"r");
   if (fp!=0)
@@ -111,30 +198,11 @@ int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
        {
         if (InputParser_WordCompareAuto(ipc,0,"JOINT_ASSOCIATION"))
          {
-           jID=bvhtri->numberOfJointAssociations;
-           InputParser_GetWord(ipc,1,bvhtri->jointAssociation[jID].bvhJointName,MAX_BVH_JOINT_NAME);
-           InputParser_GetWord(ipc,2,bvhtri->jointAssociation[jID].triJointName,MAX_BVH_JOINT_NAME);
-           //--------------------------------------------------
-           fprintf(
-                   stderr,"Associated #%u `%s` => `%s` \n",
-                   jID,
-                   bvhtri->jointAssociation[jID].bvhJointName,
-                   bvhtri->jointAssociation[jID].triJointName
-                  );
-           bvhtri->jointAssociation[jID].offset[0]=0.0;
-           bvhtri->jointAssociation[jID].offset[1]=0.0;
-           bvhtri->jointAssociation[jID].offset[2]=0.0;
-           //------------------------------------------------------
-           bvhtri->jointAssociation[jID].rotationOrder[0].sign=1.0;
-           bvhtri->jointAssociation[jID].rotationOrder[1].sign=1.0;
-           bvhtri->jointAssociation[jID].rotationOrder[2].sign=1.0;
-           //-------------------------------------------------------
-           bvhtri->jointAssociation[jID].rotationOrder[0].rotID=BVH_ROTATION_X;
-           bvhtri->jointAssociation[jID].rotationOrder[1].rotID=BVH_ROTATION_Y;
-           bvhtri->jointAssociation[jID].rotationOrder[2].rotID=BVH_ROTATION_Z;
-           //-------------------------------------------------------
-           bvhtri->jointAssociation[jID].useJoint=1;
-           ++bvhtri->numberOfJointAssociations;
+           parseJointAssociation(
+                                  bvhtri,
+                                  mc,
+                                  ipc
+                                );
          } else
         if (InputParser_WordCompareAuto(ipc,0,"JOINT_ROTATION_ORDER"))
          {
