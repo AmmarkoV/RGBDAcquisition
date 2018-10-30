@@ -175,7 +175,7 @@ int dumpBVHToTrajectoryParserTRI(
     //------------------------------------------------
     }
 
-    fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/AmmarH.tri)\n");
+    fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/Ammar.tri,http://ammar.gr/models/Ammar.tri)\n");
     fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,10.0,10.0,10.0)\n\n");
 
     for (fID=0; fID<mc->numberOfFrames; fID++)
