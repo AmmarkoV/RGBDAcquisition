@@ -40,7 +40,7 @@ JOINT_ASSOCIATION(lring1,JtRingALf)
 JOINT_ASSOCIATION(lpinky1,JtLittleALf)
  
 
-JOINT_ROTATION_ORDER(neck,-x,-y,-z)
+JOINT_ROTATION_ORDER(neck,-x,-y,z)
 JOINT_OFFSET(neck,0,0,0)
 
 JOINT_OFFSET(lshoulder,0,40,70)

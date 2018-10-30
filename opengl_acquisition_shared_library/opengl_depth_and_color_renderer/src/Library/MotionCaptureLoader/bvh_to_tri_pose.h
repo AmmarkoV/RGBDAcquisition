@@ -3,10 +3,13 @@
 
 #include "bvh_loader.h"
 
+
+
 struct BVH_RotationOrder
 {
   char label[64];
   float sign;
+  char  name;
 };
 
 struct BVH_JointAssocation

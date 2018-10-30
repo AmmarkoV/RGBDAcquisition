@@ -18,6 +18,64 @@ unsigned int bvh_resolveBVHToTRIJoint(struct bvhToTRI * bvhtri,const char * jNam
  return 0;
 }
 
+char bvh_setRotationName(char name)
+{
+ switch (name)
+   {
+     case 'x' :
+     case 'X' :
+       return BVH_ROTATION_X;
+     break;
+
+     case 'y' :
+     case 'Y' :
+       return BVH_ROTATION_Y;
+     break;
+
+     case 'z' :
+     case 'Z' :
+       return BVH_ROTATION_Z;
+     break;
+   }
+ return 0;
+}
+
+
+void bvh_offsetLabelsToSigns(
+                              struct bvhToTRI * bvhtri,
+                              unsigned int jID,
+                              char *oX,
+                              char *oY,
+                              char *oZ
+                            )
+{
+  fprintf(stderr,"RotationOrderWithSign %u(%s,%s,%s)\n",jID,oX,oY,oZ);
+
+  bvhtri->jointAssociation[jID].rotationOrder[0].sign=1.0;
+  if (oX[0]=='+') { ++oX; } else
+  if (oX[0]=='-') { ++oX; bvhtri->jointAssociation[jID].rotationOrder[0].sign=-1.0; }
+
+  bvhtri->jointAssociation[jID].rotationOrder[1].sign=1.0;
+  if (oY[0]=='+') { ++oY; } else
+  if (oY[0]=='-') { ++oY; bvhtri->jointAssociation[jID].rotationOrder[1].sign=-1.0; }
+
+  bvhtri->jointAssociation[jID].rotationOrder[2].sign=1.0;
+  if (oZ[0]=='+') { ++oZ; } else
+  if (oZ[0]=='-') { ++oZ; bvhtri->jointAssociation[jID].rotationOrder[2].sign=-1.0; }
+
+  fprintf(
+           stderr,"RotationSign %u(%0.2f,%0.2f,%0.2f)\n",jID,
+           bvhtri->jointAssociation[jID].rotationOrder[0].sign,
+           bvhtri->jointAssociation[jID].rotationOrder[1].sign,
+           bvhtri->jointAssociation[jID].rotationOrder[2].sign
+         );
+
+   bvhtri->jointAssociation[jID].rotationOrder[0].name = bvh_setRotationName(*oX);
+   bvhtri->jointAssociation[jID].rotationOrder[1].name = bvh_setRotationName(*oY);
+   bvhtri->jointAssociation[jID].rotationOrder[2].name = bvh_setRotationName(*oZ);
+
+  fprintf(stderr,"RotationOrder %u(%s,%s,%s)\n",jID,oX,oY,oZ);
+}
 
 
 int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
@@ -74,10 +132,13 @@ int bvh_loadBVHToTRI(const char * filename , struct bvhToTRI * bvhtri)
            InputParser_GetWord(ipc,3,bvhtri->jointAssociation[jID].rotationOrder[1].label,64);
            InputParser_GetWord(ipc,4,bvhtri->jointAssociation[jID].rotationOrder[2].label,64);
 
-           fprintf(stderr,"RotationOrder %s(%s,%s,%s)\n",nameA,
-                     bvhtri->jointAssociation[jID].rotationOrder[0].label,
-                     bvhtri->jointAssociation[jID].rotationOrder[1].label,
-                     bvhtri->jointAssociation[jID].rotationOrder[2].label);
+           bvh_offsetLabelsToSigns(
+                                   bvhtri,
+                                   jID,
+                                   bvhtri->jointAssociation[jID].rotationOrder[0].label,
+                                   bvhtri->jointAssociation[jID].rotationOrder[1].label,
+                                   bvhtri->jointAssociation[jID].rotationOrder[2].label
+                                  );
          } else
         if (InputParser_WordCompareAuto(ipc,0,"JOINT_OFFSET"))
         {
