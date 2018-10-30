@@ -4,55 +4,6 @@
 #include "bvh_transform.h"
 
 
-const char * bvhName[] =
-{
-    "Hips",
-    "Chest",
-    "Neck",
-    "Head",
-    "LeftCollar",
-    "LeftUpArm",
-    "LeftLowArm",
-    "LeftHand",
-    "RightCollar",
-    "RightUpArm",
-    "RightLowArm",
-    "RightHand",
-    "LeftUpLeg",
-    "LeftLowLeg",
-    "LeftFoot",
-    "RightUpLeg",
-    "RightLowLeg",
-    "RightFoot",
-//=================
-    "Unknown"
-};
-
-const char * triName[] =
-{
-    "JtSpineA",
-    "Chest",
-    "JtNeckB",
-    "Head",
-    "LeftCollar",
-    "JtShoulderLf",
-    "JtElbowLf",
-    "LeftHand",
-    "RightCollar",
-    "RightUpArm",
-    "JtShoulderRt",
-    "RightHand",
-    "JtHipLf",
-    "JtKneeLf",
-    "LeftFoot",
-    "JtHipRt",
-    "JtKneeRt",
-    "RightFoot",
-//=================
-    "Unknown"
-};
-
-
 
 int dumpBVHJointToTP(
                       FILE*fp ,
@@ -214,10 +165,10 @@ int dumpBVHToTrajectoryParserTRI(
     fprintf(fp,"INTERPOLATE_TIME(1)\n");
     fprintf(fp,"MOVE_VIEW(1)\n");
 
+    fprintf(fp,"OBJECT_TYPE(floorType,grid)\n");
+    fprintf(fp,"OBJECT(floor,floorType,0,255,0,0 ,0, 1.0,1.0,1.0)\n");
     if (includeSpheres)
     {
-    fprintf(fp,"OBJECT_TYPE(floorType,grid)\n");
-    fprintf(fp,"OBJECT(floor,floorType,0,255,0,0 ,0, 10.0,10.0,10.0)\n");
     //Instantiate objects that will draw our skeleton
     //------------------------------------------------
      dumpSphereHeader(mc,fp);
@@ -229,6 +180,7 @@ int dumpBVHToTrajectoryParserTRI(
 
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
+      fprintf(fp,"MOVE(floor,%u,  -19.231, 784.976,,2699.735 , 00.0,0.0,0.0,0.0)\n",fID);
       fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)\n",fID);
       dumpBVHJointToTP(fp, mc, bvhtri, fID);
       fprintf(fp,"\n\n");
