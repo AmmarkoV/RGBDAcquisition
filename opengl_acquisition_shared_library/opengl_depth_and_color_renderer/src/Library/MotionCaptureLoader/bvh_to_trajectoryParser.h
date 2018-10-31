@@ -8,7 +8,8 @@
 int dumpBVHToTrajectoryParserTRI(
                                   const char * filename ,
                                   struct BVH_MotionCapture * mc,
-                                  struct bvhToTRI * bvhtri,
+                                  struct bvhToTRI * bvhtri ,
+                                  unsigned int usePosition,
                                   unsigned int includeSpheres
                                 );
 

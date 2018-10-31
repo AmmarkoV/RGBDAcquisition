@@ -3,6 +3,8 @@
 #include "bvh_to_trajectoryParser.h"
 #include "bvh_transform.h"
 
+#include "../../../../../tools/AmMatrix/quaternions.h"
+
 
 
 int dumpBVHJointToTP(
@@ -134,6 +136,7 @@ int dumpBVHToTrajectoryParserTRI(
                                   const char * filename ,
                                   struct BVH_MotionCapture * mc,
                                   struct bvhToTRI * bvhtri ,
+                                  unsigned int usePosition,
                                   unsigned int includeSpheres
                                 )
 {
@@ -178,10 +181,36 @@ int dumpBVHToTrajectoryParserTRI(
     fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/Ammar.tri,http://ammar.gr/models/Ammar.tri)\n");
     fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,10.0,10.0,10.0)\n\n");
 
+
+
+
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
-      fprintf(fp,"MOVE(floor,%u,  -19.231, 784.976,,2699.735 , 00.0,0.0,0.0,0.0)\n",fID);
-      fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)\n",fID);
+      fprintf(fp,"MOVE(floor,%u,  -19.231, 1784.976,2699.735 , 00.0,0.0,0.0,0.0)\n",fID);
+
+      float dataPos[3];
+      float dataRot[3];
+
+      if ( ( bhv_getRootDynamicPosition(mc,fID,dataPos,sizeof(float)*3) ) && (usePosition) )
+      {
+
+        bhv_getRootDynamicRotation(mc,fID,dataRot,sizeof(float)*3);
+        double euler[3];
+        euler[0]=(double) dataRot[0];
+        euler[1]=(double) dataRot[1];
+        euler[2]=270+(double) dataRot[2];
+        double quaternions[4];
+
+        euler2Quaternions(quaternions,euler,qXqYqZqW);
+
+        fprintf(fp,"MOVE(human,%u,%0.2f,%0.2f,%0.2f,%0.5f,%0.5f,%0.5f,%0.5f)\n",fID,
+                10*dataPos[0],10*dataPos[1],10*dataPos[2]+3600,
+                quaternions[0],quaternions[1],quaternions[2],quaternions[3]);
+      } else
+      {
+        fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)\n",fID);
+      }
+
       dumpBVHJointToTP(fp, mc, bvhtri, fID);
       fprintf(fp,"\n\n");
 

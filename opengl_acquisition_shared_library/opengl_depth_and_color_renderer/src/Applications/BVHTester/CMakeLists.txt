@@ -40,6 +40,7 @@ add_executable(
               ../../Library/MotionCaptureLoader/bvh_to_tri_pose.c
               ../../Library/TrajectoryParser/InputParser_C.c
               ../../../../../tools/AmMatrix/matrix4x4Tools.c
+              ../../../../../tools/AmMatrix/quaternions.c
               )
  
 target_link_libraries(BVHTester rt m  ) 

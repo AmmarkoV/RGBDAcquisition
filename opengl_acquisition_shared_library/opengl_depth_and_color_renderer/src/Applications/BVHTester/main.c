@@ -39,6 +39,7 @@ int main(int argc, char **argv)
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
 
     unsigned int onlyFirstFrame=0;
+    unsigned int usePosition=0;
 
     unsigned int i=0;
     for (i=0; i<argc; i++)
@@ -54,6 +55,10 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--onlyFirstFrame")==0)
         {
           onlyFirstFrame=1;
+        } else
+        if (strcmp(argv[i],"--usePosition")==0)
+        {
+          usePosition=1;
         }
     }
 
@@ -80,7 +85,7 @@ int main(int argc, char **argv)
     }
 
 
-    dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,0);
+    dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,usePosition,0);
     dumpBVHToTrajectoryParser(toSceneFile,&bvhMotion);
 
     bvh_free(&bvhMotion);
