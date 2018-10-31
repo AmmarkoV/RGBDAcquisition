@@ -165,7 +165,7 @@ int dumpBVHToTrajectoryParserTRI(
 
     fprintf(fp,"SILENT(1)\n");
     fprintf(fp,"RATE(120)\n");
-    fprintf(fp,"INTERPOLATE_TIME(1)\n");
+    fprintf(fp,"INTERPOLATE_TIME(0)\n");
     fprintf(fp,"MOVE_VIEW(1)\n");
 
     fprintf(fp,"OBJECT_TYPE(floorType,grid)\n");
@@ -261,7 +261,7 @@ int dumpBVHToTrajectoryParser(const char * filename , struct BVH_MotionCapture *
     fprintf(fp,"FAR_CLIP(1000)\n");
     fprintf(fp,"SILENT(1)\n");
     fprintf(fp,"RATE(120)\n");
-    fprintf(fp,"INTERPOLATE_TIME(1)\n");
+    fprintf(fp,"INTERPOLATE_TIME(0)\n");
     fprintf(fp,"MOVE_VIEW(1)\n\n");
 
 

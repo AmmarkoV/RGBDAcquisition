@@ -283,13 +283,52 @@ void create4x4RotationMatrix(double * m , double angle, double x, double y, doub
 
 
 
-static double degrees_to_rad(double degrees)
+double degrees_to_rad(double degrees)
 {
-    return degrees * (M_PI /180.0 );
+    return degrees * ( M_PI / 180.0 );
+}
+
+void create4x4RotationX(double * matrix,double degrees)
+{
+    double radians = degrees_to_rad(degrees);
+
+    create4x4IdentityMatrix(matrix);
+
+    // Rotate X formula.
+    matrix[5] = cosf(radians);
+    matrix[6] = -sinf(radians);
+    matrix[9] = -matrix[6];
+    matrix[10] = matrix[5];
+}
+
+void create4x4RotationY(double * matrix,double degrees)
+{
+    double radians = degrees_to_rad(degrees);
+
+    create4x4IdentityMatrix(matrix);
+
+    // Rotate Y formula.
+    matrix[0] = cosf(radians);
+    matrix[2] = sinf(radians);
+    matrix[8] = -matrix[2];
+    matrix[10] = matrix[0];
+}
+
+void create4x4RotationZ(double * matrix,double degrees)
+{
+    double radians = degrees_to_rad(degrees);
+
+    create4x4IdentityMatrix(matrix);
+
+    // Rotate Z formula.
+    matrix[0] = cosf(radians);
+    matrix[1] = sinf(radians);
+    matrix[4] = -matrix[1];
+    matrix[5] = matrix[0];
 }
 
 
-void create4x4MatrixFromEulerAnglesXYZ(double * m ,double eulX, double eulY, double eulZ)
+void create4x4MatrixFromEulerAnglesXYZAllInOne(double * m ,double eulX, double eulY, double eulZ)
 {
     double x = degrees_to_rad(eulX);
     double y = degrees_to_rad(eulY);
@@ -329,6 +368,30 @@ void create4x4MatrixFromEulerAnglesXYZ(double * m ,double eulX, double eulY, dou
 }
 
 
+#define USE_OPTIMIZED_ROTATION_STEPS 1
+void create4x4MatrixFromEulerAnglesXYZ(double * m ,double eulX, double eulY, double eulZ)
+{
+   #if USE_OPTIMIZED_ROTATION_STEPS
+    create4x4MatrixFromEulerAnglesXYZAllInOne(m,eulX,eulY,eulZ);
+   #else
+    double degreesX = eulX;
+    double degreesY = eulY;
+    double degreesZ = eulZ;
+    double rX[16]={0};
+    double rY[16]={0};
+    double rZ[16]={0};
+
+    create4x4RotationX(rX,degreesX);
+    create4x4RotationY(rY,degreesY);
+    create4x4RotationZ(rZ,degreesZ);
+
+    create4x4IdentityMatrix(m);
+
+    multiplyTwo4x4MatricesBuffered(m,m,rX);
+    multiplyTwo4x4MatricesBuffered(m,m,rY);
+    multiplyTwo4x4MatricesBuffered(m,m,rZ);
+   #endif // USE_OPTIMIZED_ROTATION_STEPS
+}
 
 void create4x4MatrixFromEulerAnglesZYX(double * m ,double eulX, double eulY, double eulZ)
 {
@@ -369,6 +432,7 @@ void create4x4MatrixFromEulerAnglesZYX(double * m ,double eulX, double eulY, dou
 	m[14] = 0;
 	m[15] = 1;
 }
+
 
 
 void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double qW)
@@ -422,46 +486,6 @@ void create4x4ScalingMatrix(double * matrix , double scaleX, double scaleY, doub
     create4x4IdentityMatrix(matrix);
     // Scale slots.
     matrix[0] = scaleX; matrix[5] = scaleY; matrix[10] = scaleZ;
-}
-
-
-void create4x4RotationX(double * matrix,double degrees)
-{
-    double radians = degrees_to_rad(degrees);
-
-    create4x4IdentityMatrix(matrix);
-
-    // Rotate X formula.
-    matrix[5] = cosf(radians);
-    matrix[6] = -sinf(radians);
-    matrix[9] = -matrix[6];
-    matrix[10] = matrix[5];
-}
-
-void create4x4RotationY(double * matrix,double degrees)
-{
-    double radians = degrees_to_rad(degrees);
-
-    create4x4IdentityMatrix(matrix);
-
-    // Rotate Y formula.
-    matrix[0] = cosf(radians);
-    matrix[2] = sinf(radians);
-    matrix[8] = -matrix[2];
-    matrix[10] = matrix[0];
-}
-
-void create4x4RotationZ(double * matrix,double degrees)
-{
-    double radians = degrees_to_rad(degrees);
-
-    create4x4IdentityMatrix(matrix);
-
-    // Rotate Z formula.
-    matrix[0] = cosf(radians);
-    matrix[1] = sinf(radians);
-    matrix[4] = -matrix[1];
-    matrix[5] = matrix[0];
 }
 
 double det4x4Matrix(double * mat)

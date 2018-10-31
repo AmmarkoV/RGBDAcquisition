@@ -45,13 +45,13 @@ JOINT_OFFSET(neck,0,0,0)
 #Shoulder
 JOINT_ROTATION_ORDER(lshoulder,z,-x,-y)
 JOINT_ROTATION_ORDER(rshoulder,z,-x,-y)
-JOINT_OFFSET(lshoulder,0,40,70)
-JOINT_OFFSET(rshoulder,0,-40,-70)
+#JOINT_OFFSET(lshoulder,0,40,70)
+#JOINT_OFFSET(rshoulder,0,-40,-70)
 
 
-JOINT_ROTATION_ORDER(lknee,z,x,y)
-JOINT_ROTATION_ORDER(rknee,z,x,y)
-#JOINT_OFFSET(lknee,40,0,0)
-#JOINT_OFFSET(rknee,40,0,0)
+JOINT_ROTATION_ORDER(lknee,z,-x,-y)
+JOINT_ROTATION_ORDER(rknee,z,-x,-y)
+#JOINT_OFFSET(lknee,0,0,0)
+#JOINT_OFFSET(rknee,0,0,0)
 
 
