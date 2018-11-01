@@ -17,6 +17,15 @@ int dumpBVHJointToTP(
   unsigned int jID=0;
   unsigned int jAssociationID=0;
 
+
+  struct BVH_Transform bvhTransform={0};
+
+  bvh_loadTransformForFrame(
+                            mc,
+                            fID ,
+                            &bvhTransform
+                           );
+
   for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
   {
     if (
@@ -61,10 +70,50 @@ int dumpBVHJointToTP(
         + bvhtri->jointAssociation[jAssociationID].offset[2];
         //---------------------------------------------------------------------------------------------------
 
+        /*
+        if (strcmp("lknee",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0)
+        {
+          fprintf(stderr,"%s offset(%0.4f,%0.4f,%0.4f)\n", bvhtri->jointAssociation[jAssociationID].triJointName,
+                  bvhtri->jointAssociation[jAssociationID].offset[0],
+                  bvhtri->jointAssociation[jAssociationID].offset[1],
+                  bvhtri->jointAssociation[jAssociationID].offset[2] );
+
+          fprintf(stderr,"%s(%u->%0.4f,%0.4f,%0.4f)\n", bvhtri->jointAssociation[jAssociationID].triJointName, fID, X, Y, Z );
+        }
+        */
+
+
+
+        if (
+             (strcmp("lhip",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0) ||
+             (strcmp("rhip",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0) ||
+             (strcmp("lknee",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0) ||
+             (strcmp("rknee",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0)
+            )
+        {
+        /*fprintf(
+                fp,"POSE(human,%u,%s,%0.4f,0,0)\n",
+                fID, bvhtri->jointAssociation[jAssociationID].triJointName, X, Y, Z
+               );*/
+        }
+
+        #define USE4X4MAT 1
+
+        #if USE4X4MAT
+        fprintf( fp,"POSE4X4(human,%u,%s,", fID, bvhtri->jointAssociation[jAssociationID].triJointName );
+        for (unsigned int i=0; i<16; i++)
+        {
+           fprintf(fp,"%0.4f,",bvhTransform.joint[jID].dynamicRotation[i]);
+        }
+        fprintf(fp,"\n");
+        #else
         fprintf(
                 fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
                 fID, bvhtri->jointAssociation[jAssociationID].triJointName, X, Y, Z
                );
+        #endif
+
+
        } else
        { fprintf(fp,"#BVH joint `%s` has no TRI name associated\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
     }

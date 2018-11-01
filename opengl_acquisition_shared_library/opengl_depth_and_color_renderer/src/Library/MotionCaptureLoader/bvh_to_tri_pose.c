@@ -107,10 +107,11 @@ int parseJointAssociation(
            bvhtri->jointAssociation[jID].offset[1]=0.0;
            bvhtri->jointAssociation[jID].offset[2]=0.0;
            //------------------------------------------------------
-           bvhtri->jointAssociation[jID].rotationOrder[0].sign=1.0;
-           bvhtri->jointAssociation[jID].rotationOrder[1].sign=1.0;
-           bvhtri->jointAssociation[jID].rotationOrder[2].sign=1.0;
+           bvhtri->jointAssociation[jID].rotationOrder[0].sign=-1.0;
+           bvhtri->jointAssociation[jID].rotationOrder[1].sign=-1.0;
+           bvhtri->jointAssociation[jID].rotationOrder[2].sign=-1.0;
            //-------------------------------------------------------
+
            switch (mc->jointHierarchy[realJID].channelRotationOrder)
            {
              case  BVH_ROTATION_ORDER_XYZ :

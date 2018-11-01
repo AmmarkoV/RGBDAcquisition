@@ -697,12 +697,12 @@ void recursiveJointHeirarchyTransformerDirect(
       {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
         recursiveJointHeirarchyTransformerDirect(
-                                           in  ,
-                                           curBoneChild ,
-                                           globalTransformation ,
-                                           jointData , jointDataSize ,
-                                           recursionLevel+1
-                                         );
+                                                 in  ,
+                                                 curBoneChild ,
+                                                 globalTransformation ,
+                                                 jointData , jointDataSize ,
+                                                 recursionLevel+1
+                                                );
       }
     } else
     {
@@ -711,12 +711,12 @@ void recursiveJointHeirarchyTransformerDirect(
        {
         unsigned int curBoneChild=in->bones[curBone].boneChild[i];
         recursiveJointHeirarchyTransformerDirect(
-                                           in  ,
-                                           curBoneChild ,
-                                           globalTransformation ,
-                                           jointData , jointDataSize ,
-                                           recursionLevel+1
-                                         );
+                                                 in  ,
+                                                 curBoneChild ,
+                                                 globalTransformation ,
+                                                 jointData , jointDataSize ,
+                                                 recursionLevel+1
+                                                );
        }
     }
 }
@@ -947,10 +947,24 @@ int doModelTransform(
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   if (directSettingOfMatrices)
   {
-    recursiveJointHeirarchyTransformerDirect( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
+    recursiveJointHeirarchyTransformerDirect(
+                                              triModelIn ,
+                                              triModelIn->header.rootBone  ,
+                                              initialParentTransform ,
+                                              jointData ,
+                                              jointDataSize ,
+                                              0 /*First call 0 recursion*/
+                                             );
   } else
   {
-    recursiveJointHeirarchyTransformer( triModelIn , triModelIn->header.rootBone  , initialParentTransform , jointData , jointDataSize , 0 /*First call 0 recursion*/ );
+    recursiveJointHeirarchyTransformer(
+                                        triModelIn ,
+                                        triModelIn->header.rootBone  ,
+                                        initialParentTransform ,
+                                        jointData ,
+                                        jointDataSize ,
+                                        0 /*First call 0 recursion*/
+                                      );
   }
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
