@@ -383,7 +383,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
 
           case TRAJECTORYPRIMITIVES_POSEQ :
-              InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
                time = InputParser_GetWordInt(ipc,2);
                InputParser_GetWord(ipc,3,nameB,MAX_PATH);
 
@@ -405,6 +405,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                pos[0] = InputParser_GetWordFloat(ipc,4);
                pos[1] = InputParser_GetWordFloat(ipc,5);
                pos[2] = InputParser_GetWordFloat(ipc,6);
+               pos[3] = 0.0;
                coordLength=3;
 
                //if (newstream->rotationsOverride)
@@ -427,7 +428,6 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                                          typeStr
                                         );
                 fprintf(stderr,"survived\n");
-
           break;
 
           case TRAJECTORYPRIMITIVES_MOVE :

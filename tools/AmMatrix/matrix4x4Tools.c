@@ -437,6 +437,7 @@ void create4x4MatrixFromEulerAnglesWithRotationOrder(double * m ,double eulX, do
   if (rotationOrder==0)
   {
     //No rotation type, get's you back an Identity Matrix..
+    fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrder: No rotation order given, returning identity..\n");
     return;
   }
 

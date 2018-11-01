@@ -1,6 +1,6 @@
 
 /*                  
-This file was automatically generated @ 01-11-2018 12:35:01 using StringRecognizer                  
+This file was automatically generated @ 01-11-2018 13:09:20 using StringRecognizer                  
 https://github.com/AmmarkoV/AmmarServer/tree/master/src/StringRecognizer                 
 Please note that changes you make here may be automatically overwritten                  
 if the String Recognizer generator runs again..!              
@@ -169,11 +169,11 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
      case 'O' : 
          switch (toupper(str[2])) { 
          case 'S' : 
-             if ( (strLength >= 7 )&& ( strncasecmp(str,"POSERAW",7) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSERAW; } 
+             if ( (strLength >= 19 )&& ( strncasecmp(str,"POSE_ROTATION_ORDER",19) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER; } 
+             else  if ( (strLength >= 7 )&& ( strncasecmp(str,"POSERAW",7) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSERAW; } 
              else  if ( (strLength >= 7 )&& ( strncasecmp(str,"POSE4x4",7) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSE4X4; } 
              else  if ( (strLength >= 5 )&& ( strncasecmp(str,"POSEQ",5) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSEQ; } 
              else  if ( (strLength >= 4 )&& ( strncasecmp(str,"POSE",4) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSE; } 
-             else  if ( (strLength >= 19 )&& ( strncasecmp(str,"POSE_ROTATION_ORDER",19) == 0 ) ) { return TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER; } 
              else  if ( (strLength >= 3 )&& ( strncasecmp(str,"POS",3) == 0 ) ) { return TRAJECTORYPRIMITIVES_POS; } 
          break; 
         }; 
