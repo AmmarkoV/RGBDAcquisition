@@ -585,6 +585,7 @@ int setTRIJointRotationOrder(
 
   if ( jointToChange < in->header.numberOfBones )
   {
+    fprintf(stderr,"setTRIJointRotationOrder : joint=%u -> order=%u \n",jointToChange,rotationOrder);
     in->bones[jointToChange].info->eulerRotationOrder = rotationOrder;
     return 1;
   }

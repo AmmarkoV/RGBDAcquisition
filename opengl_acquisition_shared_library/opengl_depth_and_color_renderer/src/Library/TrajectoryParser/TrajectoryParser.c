@@ -415,10 +415,10 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
 
           case TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER :
-               fprintf(stderr,"TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER recvd\n");
+               //fprintf(stderr,"TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER recvd\n");
                InputParser_GetWord(ipc,1,name,MAX_PATH);
                InputParser_GetWord(ipc,2,nameB,MAX_PATH);
-               InputParser_GetWord(ipc,3,typeStr,MAX_PATH);
+               InputParser_GetLowercaseWord(ipc,3,typeStr,MAX_PATH);
 
                changeModelRotationOrder(
                                          newstream ,
@@ -427,7 +427,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                                          nameB,
                                          typeStr
                                         );
-                fprintf(stderr,"survived\n");
+                //fprintf(stderr,"survived\n");
           break;
 
           case TRAJECTORYPRIMITIVES_MOVE :

@@ -48,8 +48,8 @@ int dumpBVHJointToTP(
                                    jID,
                                    fID,
                                    bvhtri->jointAssociation[jAssociationID].rotationOrder[0].rotID
-                                  ))
-         + bvhtri->jointAssociation[jAssociationID].offset[0];
+                                  ));
+         X+= bvhtri->jointAssociation[jAssociationID].offset[0];
         //---------------------------------------------------------------------------------------------------
         float Y = (bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign *
         bvh_getJointChannelAtFrame(
@@ -57,8 +57,8 @@ int dumpBVHJointToTP(
                                    jID,
                                    fID,
                                    bvhtri->jointAssociation[jAssociationID].rotationOrder[1].rotID
-                                  ))
-        + bvhtri->jointAssociation[jAssociationID].offset[1];
+                                  ));
+        Y+= bvhtri->jointAssociation[jAssociationID].offset[1];
         //---------------------------------------------------------------------------------------------------
         float Z = (bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign *
         bvh_getJointChannelAtFrame(
@@ -66,40 +66,27 @@ int dumpBVHJointToTP(
                                    jID,
                                    fID,
                                    bvhtri->jointAssociation[jAssociationID].rotationOrder[2].rotID
-                                  ))
-        + bvhtri->jointAssociation[jAssociationID].offset[2];
+                                  ));
+        Z+= bvhtri->jointAssociation[jAssociationID].offset[2];
         //---------------------------------------------------------------------------------------------------
 
-        /*
-        if (strcmp("lknee",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0)
-        {
-          fprintf(stderr,"%s offset(%0.4f,%0.4f,%0.4f)\n", bvhtri->jointAssociation[jAssociationID].triJointName,
-                  bvhtri->jointAssociation[jAssociationID].offset[0],
-                  bvhtri->jointAssociation[jAssociationID].offset[1],
-                  bvhtri->jointAssociation[jAssociationID].offset[2] );
-
-          fprintf(stderr,"%s(%u->%0.4f,%0.4f,%0.4f)\n", bvhtri->jointAssociation[jAssociationID].triJointName, fID, X, Y, Z );
-        }
-        */
 
 
         #define USE4X4MAT 0
 
         #if USE4X4MAT
-        fprintf( fp,"POSE4X4(human,%u,%s,", fID, bvhtri->jointAssociation[jAssociationID].triJointName );
-        for (unsigned int i=0; i<16; i++)
-        {
+         fprintf( fp,"POSE4X4(human,%u,%s,", fID, bvhtri->jointAssociation[jAssociationID].triJointName );
+         for (unsigned int i=0; i<16; i++)
+         {
            fprintf(fp,"%0.4f,",bvhTransform.joint[jID].dynamicRotation[i]);
-        }
-        fprintf(fp,"\n");
+         }
+         fprintf(fp,"\n");
         #else
-        fprintf(
-                fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
-                fID, bvhtri->jointAssociation[jAssociationID].triJointName, X, Y, Z
-               );
+         fprintf(
+                 fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
+                 fID, bvhtri->jointAssociation[jAssociationID].triJointName, X, Y, Z
+                );
         #endif
-
-
        } else
        { fprintf(fp,"#BVH joint `%s` has no TRI name associated\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
     }
@@ -251,9 +238,10 @@ int dumpBVHToTrajectoryParserTRI(
       {
         bhv_getRootDynamicRotation(mc,fID,dataRot,sizeof(float)*3);
         double euler[3];
+
         euler[0]=(double) dataRot[0];
         euler[1]=(double) dataRot[1];
-        euler[2]=270+(double) dataRot[2];
+        euler[2]=270+(double) dataRot[2]; //To correct orientation of body
         double quaternions[4];
 
         euler2Quaternions(quaternions,euler,qXqYqZqW);

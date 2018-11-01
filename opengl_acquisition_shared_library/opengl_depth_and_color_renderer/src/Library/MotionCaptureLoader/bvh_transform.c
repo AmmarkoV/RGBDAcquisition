@@ -4,7 +4,7 @@
 
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
-#define USE_BVH_SPECIFIC_ROTATIONS 1
+#define USE_BVH_SPECIFIC_ROTATIONS 0
 
 //Also find Center of Joint
 //We can skip the matrix multiplication by just grabbing the last column..
@@ -83,7 +83,6 @@ void create4x4RotationBVH_Z(double * m,double degrees)
     m[5] =    cosV;  // [1,1]
 }
 //---------------------------------------------------------
-#endif // USE_BVH_SPECIFIC_ROTATIONS
 
 
 
@@ -109,15 +108,9 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
 
 //Assuming the rotation axis are correct
 //rX,rY,rZ should hold our rotation matrices
-  #if USE_BVH_SPECIFIC_ROTATIONS
    create4x4RotationBVH_X(rX,degreesX);
    create4x4RotationBVH_Y(rY,degreesY);
    create4x4RotationBVH_Z(rZ,degreesZ);
-  #else
-   create4x4RotationX(rX,degreesX);
-   create4x4RotationY(rY,degreesY);
-   create4x4RotationZ(rZ,degreesZ);
-  #endif // USE_BVH_SPECIFIC_ROTATIONS
 
 
 //TODO : Fix correct order..
@@ -170,6 +163,7 @@ void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,doubl
   };
 
 }
+#endif // USE_BVH_SPECIFIC_ROTATIONS
 
 
 double fToD(float in)
@@ -194,8 +188,8 @@ int bvh_loadTransformForFrame(
       create4x4IdentityMatrix(bvhTransform->joint[jID].chainTransformation);
       create4x4IdentityMatrix(bvhTransform->joint[jID].localToWorldTransformation);
      //---
-     create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
-     create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
+      create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicTranslation);
+      create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
      //---
    }
   }
@@ -224,14 +218,30 @@ int bvh_loadTransformForFrame(
       rotZ = fToD(data[5]);
 
       create4x4TranslationMatrix(bvhTransform->joint[jID].dynamicTranslation,posX,posY,posZ);
-      //create4x4MatrixFromEulerAnglesZYX(rotationM,rotY,rotX,rotZ);
-      create4x4RotationBVH(
+
+
+     if (bvhMotion->jointHierarchy[jID].channelRotationOrder==0)
+     {
+        fprintf(stderr,"No channel rotation order for joint jID=%u jointName=%s\n",jID,bvhMotion->jointHierarchy[jID].jointName);
+     }
+
+      #if USE_BVH_SPECIFIC_ROTATIONS
+       create4x4RotationBVH(
                             bvhTransform->joint[jID].dynamicRotation,
                             bvhMotion->jointHierarchy[jID].channelRotationOrder,
                             -1*rotX,
                             -1*rotY,
                             -1*rotZ
-                          );
+                           );
+      #else
+       create4x4MatrixFromEulerAnglesWithRotationOrder(
+                                                       bvhTransform->joint[jID].dynamicRotation,
+                                                       -1*rotX,
+                                                       -1*rotY,
+                                                       -1*rotZ,
+                                                       (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
+                                                      );
+      #endif // USE_BVH_SPECIFIC_ROTATIONS
   }
 
   //We will now apply all transformations

@@ -144,6 +144,9 @@ int parseJointAssociation(
                bvhtri->jointAssociation[jID].rotationOrder[1].rotID=BVH_ROTATION_Y;
                bvhtri->jointAssociation[jID].rotationOrder[2].rotID=BVH_ROTATION_X;
              break;
+             default :
+               fprintf(stderr,"parseJointAssociation: incorrect rotation order %u\n",mc->jointHierarchy[realJID].channelRotationOrder);
+             break;
            }
            //-------------------------------------------------------
            bvhtri->jointAssociation[jID].useJoint=1;

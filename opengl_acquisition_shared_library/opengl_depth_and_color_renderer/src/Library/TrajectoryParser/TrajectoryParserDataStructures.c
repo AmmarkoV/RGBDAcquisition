@@ -463,27 +463,35 @@ int changeModelRotationOrder(
 {
  unsigned int boneIDResult;
  unsigned int objFound = 0;
+ unsigned int objTypeFound = 0;
  unsigned int objID = getObjectID(stream,name,&objFound);
 
 
+ if(modelStorage!=0)
+ {
  if (objFound)
  {
-  struct Model *mod = &modelStorage->models[objID];
-  if (mod->type==TRI_MODEL)
+  unsigned int objTypeID = getObjectTypeID(stream,stream->object[objID].typeStr,&objTypeFound );
+  if (objTypeFound)
   {
-   struct TRI_Model * triM = (struct TRI_Model * ) mod->modelInternalData;
-   if ( findTRIBoneWithName(triM,jointName,&boneIDResult) )
+   unsigned int modelID = stream->objectTypes[objTypeID].modelListArrayNumber;
+   struct Model *mod = &modelStorage->models[modelID];
+   if (mod->type==TRI_MODEL)
    {
-    unsigned int rotationOrder=0;
+    struct TRI_Model * triM = (struct TRI_Model * ) mod->modelInternalData;
 
-    if (strcmp(modelOrder,"xyz")==0) { rotationOrder=ROTATION_ORDER_XYZ; } else
-    if (strcmp(modelOrder,"xzy")==0) { rotationOrder=ROTATION_ORDER_XZY; } else
-    if (strcmp(modelOrder,"yxz")==0) { rotationOrder=ROTATION_ORDER_YXZ; } else
-    if (strcmp(modelOrder,"yzx")==0) { rotationOrder=ROTATION_ORDER_YZX; } else
-    if (strcmp(modelOrder,"zxy")==0) { rotationOrder=ROTATION_ORDER_ZXY; } else
-    if (strcmp(modelOrder,"zyx")==0) { rotationOrder=ROTATION_ORDER_ZYX; }
+    if ( findTRIBoneWithName(triM,jointName,&boneIDResult) )
+    {
+     unsigned int rotationOrder=0;
 
-    if (
+     if (strcmp(modelOrder,"xyz")==0) { rotationOrder=ROTATION_ORDER_XYZ; } else
+     if (strcmp(modelOrder,"xzy")==0) { rotationOrder=ROTATION_ORDER_XZY; } else
+     if (strcmp(modelOrder,"yxz")==0) { rotationOrder=ROTATION_ORDER_YXZ; } else
+     if (strcmp(modelOrder,"yzx")==0) { rotationOrder=ROTATION_ORDER_YZX; } else
+     if (strcmp(modelOrder,"zxy")==0) { rotationOrder=ROTATION_ORDER_ZXY; } else
+     if (strcmp(modelOrder,"zyx")==0) { rotationOrder=ROTATION_ORDER_ZYX; }
+
+     if (
          setTRIJointRotationOrder(
                                   triM,
                                   boneIDResult,
@@ -492,14 +500,17 @@ int changeModelRotationOrder(
         )
      {
 
-      return 1;
+        return 1;
 
      } else { fprintf(stderr,"changeModelRotationOrder: could not find a correct joint ..\n"); }
-   } else { fprintf(stderr,"changeModelRotationOrder: could not find joint..\n"); }
-  } else { fprintf(stderr,"changeModelRotationOrder: cannot change model rotation order on non TRI models, (mod->type=%u) ..\n",mod->type); }
+    } else { fprintf(stderr,"changeModelRotationOrder: could not find joint..\n"); }
+   } else { fprintf(stderr,"changeModelRotationOrder: cannot change model rotation order on non TRI models, (objid=%u / objtype=%u / mod->type=%u) ..\n",objID,objTypeID,mod->type); }
+  } else  { fprintf(stderr,"changeModelRotationOrder: Could not find object type..\n"); }
  } else { fprintf(stderr,"changeModelRotationOrder: Could not find object..\n"); }
+ } else { fprintf(stderr,"changeModelRotationOrder: No model storage allocated\n"); }
 
-  return 0;
+
+ return 0;
 }
 
 
@@ -567,7 +578,8 @@ int addPoseToObjectState(
             //By default the euler rotation order will be ZYX but this can be changed using the POSE_ROTATION_ORDER command
             stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=getModelBoneRotationOrderFromBoneName(mod,boneID);
 
-            fprintf(stderr,"bone %u => rotation order %u \n",boneID,stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder);
+            if (stream->debug)
+                { fprintf(stderr,"bone %u => rotation order %u \n",boneID,stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder); }
 
             if (stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder==0)
             {
@@ -907,6 +919,7 @@ int addObjectToVirtualStream(
    hashMap_AddULong(stream->objectHash,name,pos);
    #endif // USE_HASHMAPS
 
+   fprintf(stderr,GREEN "ObjectID %u has name %s and type %s \n" NORMAL,pos,name,type);
    strcpy(stream->object[pos].name,name);
    strcpy(stream->object[pos].typeStr,type);
    stream->object[pos].R = (float) R/255;
