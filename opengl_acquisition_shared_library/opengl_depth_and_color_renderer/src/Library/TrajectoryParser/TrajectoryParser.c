@@ -413,7 +413,22 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
           break;
 
 
+          case TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER :
+               fprintf(stderr,"TRAJECTORYPRIMITIVES_POSE_ROTATION_ORDER recvd\n");
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetWord(ipc,2,nameB,MAX_PATH);
+               InputParser_GetWord(ipc,3,typeStr,MAX_PATH);
 
+               changeModelRotationOrder(
+                                         newstream ,
+                                         modelStorage,
+                                         name  ,
+                                         nameB,
+                                         typeStr
+                                        );
+                fprintf(stderr,"survived\n");
+
+          break;
 
           case TRAJECTORYPRIMITIVES_MOVE :
           case TRAJECTORYPRIMITIVES_POS :

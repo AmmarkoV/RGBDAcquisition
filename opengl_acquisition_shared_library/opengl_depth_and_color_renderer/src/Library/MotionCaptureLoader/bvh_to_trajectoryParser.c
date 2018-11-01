@@ -83,21 +83,7 @@ int dumpBVHJointToTP(
         */
 
 
-
-        if (
-             (strcmp("lhip",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0) ||
-             (strcmp("rhip",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0) ||
-             (strcmp("lknee",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0) ||
-             (strcmp("rknee",bvhtri->jointAssociation[jAssociationID].bvhJointName)==0)
-            )
-        {
-        /*fprintf(
-                fp,"POSE(human,%u,%s,%0.4f,0,0)\n",
-                fID, bvhtri->jointAssociation[jAssociationID].triJointName, X, Y, Z
-               );*/
-        }
-
-        #define USE4X4MAT 1
+        #define USE4X4MAT 0
 
         #if USE4X4MAT
         fprintf( fp,"POSE4X4(human,%u,%s,", fID, bvhtri->jointAssociation[jAssociationID].triJointName );
@@ -165,8 +151,8 @@ void dumpSphereBody(
                                 bvhTransform
                                );
 
-     fprintf(fp,"POS(camera,%u,   60.0, 60.0, 252.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
-     fprintf(fp,"POS(floor,%u,00.0,00.0,0.0 , 0.0, 0.0, 0.0,0.0 )\n",fID);
+     fprintf(fp,"POS(camera,%u,60.0,60.0,252.0,0.0,0.0,0.0,0.0)\n",fID);
+     fprintf(fp,"POS(floor,%u,0.0,0.0,0.0,0.0,0.0,0.0,0.0)\n",fID);
      for (jID=0; jID<mc->jointHierarchySize; jID++)
      {
       fprintf(
@@ -230,19 +216,39 @@ int dumpBVHToTrajectoryParserTRI(
     fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/Ammar.tri,http://ammar.gr/models/Ammar.tri)\n");
     fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,10.0,10.0,10.0)\n\n");
 
-
+    //-----------------------------------------------------------------------------------------
+    unsigned int jAssociationID=0;
+    for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
+       {
+         if (
+              bvh_getJointIDFromJointName(
+                                           mc,
+                                           bvhtri->jointAssociation[jAssociationID].bvhJointName,
+                                           &jID
+                                          )
+             )
+             {
+               unsigned int channelRotationOrder = mc->jointHierarchy[jID].channelRotationOrder;
+               fprintf(
+                       fp,"POSE_ROTATION_ORDER(human,%s,%s)\n",
+                       bvhtri->jointAssociation[jAssociationID].triJointName,
+                       rotationOrderNames[channelRotationOrder]
+                      );
+             }
+       }
+    fprintf(fp,"\n\n");
+    //-----------------------------------------------------------------------------------------
 
 
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
-      fprintf(fp,"MOVE(floor,%u,  -19.231, 1784.976,2699.735 , 00.0,0.0,0.0,0.0)\n",fID);
+      fprintf(fp,"MOVE(floor,%u,-19.231,1784.976,2699.735,0.0,0.0,0.0,0.0)\n",fID);
 
       float dataPos[3];
       float dataRot[3];
 
       if ( ( bhv_getRootDynamicPosition(mc,fID,dataPos,sizeof(float)*3) ) && (usePosition) )
       {
-
         bhv_getRootDynamicRotation(mc,fID,dataRot,sizeof(float)*3);
         double euler[3];
         euler[0]=(double) dataRot[0];

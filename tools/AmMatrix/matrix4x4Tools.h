@@ -104,6 +104,7 @@ void convert4x4MatrixToRPY(double *m ,double *roll,double *pitch,double *yaw);
 
 
 
+
 /**
 * @brief Convert an allocated 4x4 matrix to a homogeneous Translation rotation
 * @ingroup AmMatrix
@@ -159,18 +160,30 @@ void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double
 
 
 
+enum ROTATION_ORDER
+{
+  ROTATION_ORDER_NONE=0,
+  ROTATION_ORDER_XYZ,
+  ROTATION_ORDER_XZY,
+  ROTATION_ORDER_YXZ,
+  ROTATION_ORDER_YZX,
+  ROTATION_ORDER_ZXY,
+  ROTATION_ORDER_ZYX,
+  //--------------------
+  ROTATION_ORDER_NAMES
+};
+
+
 /**
-* @brief Convert a quaternion to 4x4 matrix XYZ convention ( weird )
+* @brief Convert euler angles in degrees to a 4x4 rotation matrix using any rotation order wanted
 * @ingroup AmMatrix
 * @param  Output already allocated 4x4 Matrix
 * @param  Rotation X in euler angles (0-360)
 * @param  Rotation Y in euler angles (0-360)
 * @param  Rotation Z in euler angles (0-360)
-* @bug This should probably not be used and maybe altogether removed, but kept for historical reasons :P
-       You probably want the create4x4MatrixFromEulerAnglesZYX variant of this call
+* @param  Rotation order given by enum ROTATION_ORDER, typically ROTATION_ORDER_ZYX or ROTATION_ORDER_XYZ
 */
-void create4x4MatrixFromEulerAnglesXYZ(double * m ,double eulX, double eulY, double eulZ);
-
+void create4x4MatrixFromEulerAnglesWithRotationOrder(double * m ,double eulX, double eulY, double eulZ,unsigned int rotationOrder);
 
 
 /**

@@ -35,36 +35,36 @@ double degrees_to_radBVH(double degrees)
     return (double) degrees * ( (double)  M_PI /180.0);
 }
 //---------------------------------------------------------
-void create4x4RotationBVH_X(double * matrix,double degrees)
+void create4x4RotationBVH_X(double * m,double degrees)
 {
     double radians = degrees_to_radBVH(degrees);
 
-    create4x4IdentityMatrix(matrix);
+    create4x4IdentityMatrix(m);
 
     double cosV = (double) cosf((float)radians);
     double sinV = (double) sinf((float)radians);
 
     // Rotate X formula.
-    matrix[5] =    cosV; // [1,1]
-    matrix[9] = -1*sinV; // [1,2]
-    matrix[6] =    sinV; // [2,1]
-    matrix[10] =   cosV; // [2,2]
+    m[5] =    cosV; // [1,1]
+    m[9] = -1*sinV; // [1,2]
+    m[6] =    sinV; // [2,1]
+    m[10] =   cosV; // [2,2]
 }
 //---------------------------------------------------------
-void create4x4RotationBVH_Y(double * matrix,double degrees)
+void create4x4RotationBVH_Y(double * m,double degrees)
 {
     double radians = degrees_to_radBVH(degrees);
 
-    create4x4IdentityMatrix(matrix);
+    create4x4IdentityMatrix(m);
 
     double cosV = (double) cosf((float)radians);
     double sinV = (double) sinf((float)radians);
 
     // Rotate Y formula.
-    matrix[0] =    cosV; // [0,0]
-    matrix[2] = -1*sinV; // [2,0]
-    matrix[8] =    sinV; // [0,2]
-    matrix[10] =   cosV; // [2,2]
+    m[0] =    cosV; // [0,0]
+    m[2] = -1*sinV; // [2,0]
+    m[8] =    sinV; // [0,2]
+    m[10] =   cosV; // [2,2]
 }
 //---------------------------------------------------------
 void create4x4RotationBVH_Z(double * m,double degrees)

@@ -28,6 +28,7 @@ struct BVH_Transform
   struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
 };
 
+void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,double degreesY,double degreesZ);
 
 
 int bvh_loadTransformForFrame(

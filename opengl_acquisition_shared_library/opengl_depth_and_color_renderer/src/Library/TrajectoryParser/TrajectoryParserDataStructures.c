@@ -7,6 +7,7 @@
 #include "TrajectoryCalculator.h"
 
 #include "../ModelLoader/model_loader_hardcoded.h"
+#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -452,6 +453,19 @@ int addStateToObjectMini(
 }
 
 
+int changeModelRotationOrder(
+                             struct VirtualStream * stream ,
+                              struct ModelList * modelStorage,
+                              char * name  ,
+                              char * jointName,
+                              char * modelOrder
+                            )
+{
+  fprintf(stderr,"TODO: changeModelRotationOrder\n" );
+  return 0;
+}
+
+
 int addPoseToObjectState(
                               struct VirtualStream * stream ,
                               struct ModelList * modelStorage,
@@ -501,7 +515,7 @@ int addPoseToObjectState(
            stream->object[ObjID].frame[pos].hasNonDefaultJointList = 1;  //Whatever we set it is now set..!
            stream->object[ObjID].frame[pos].jointList->numberOfJoints = mod->numberOfBones;
 
-
+           stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useQuaternion=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useMatrix4x4=0;
@@ -512,6 +526,8 @@ int addPoseToObjectState(
             if (stream->debug)
                 { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms euler angle (%0.2f %0.2f %0.2f) \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2]); }
             stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=1;
+            //By default the euler rotation order will be ZYX but this can be changed using the POSE_ROTATION_ORDER command
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=ROTATION_ORDER_ZYX;
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];

@@ -63,6 +63,7 @@ struct Joint
   char altered;
   float x , y , z , scaleX ,scaleY, scaleZ;
   char useEulerRotation;
+  char eulerRotationOrder;
   char useQuaternion;
   float rot1 , rot2 , rot3 , rot4;
   char useMatrix4x4;
