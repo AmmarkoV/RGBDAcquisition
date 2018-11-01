@@ -31,14 +31,15 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add option="-std=gnu++0x" />
 		</Compiler>
 		<Linker>
 			<Add library="assimp" />
 		</Linker>
-		<Unit filename="../../src/ModelLoader/model_loader_tri.c">
+		<Unit filename="../../src/Library/ModelLoader/model_loader_tri.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../src/ModelLoader/model_loader_tri.h" />
+		<Unit filename="../../src/Library/ModelLoader/model_loader_tri.h" />
 		<Unit filename="assimp_bvh.cpp" />
 		<Unit filename="assimp_bvh.h" />
 		<Unit filename="assimp_loader.cpp" />

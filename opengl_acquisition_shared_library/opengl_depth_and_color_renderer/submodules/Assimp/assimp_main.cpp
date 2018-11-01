@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../src/ModelLoader/model_loader_tri.h"
+#include "../../src/Library/ModelLoader/model_loader_tri.h"
 
 #include "assimp_loader.h"
 #include "assimp_bvh.h"

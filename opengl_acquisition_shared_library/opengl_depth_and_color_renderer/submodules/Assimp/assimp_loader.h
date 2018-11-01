@@ -2,7 +2,7 @@
 #define ASSIMP_LOADER_H_INCLUDED
 
 
-#include "../../src/ModelLoader/model_loader_tri.h"
+#include "../../src/Library/ModelLoader/model_loader_tri.h"
 
 unsigned int countNumberOfNodes(struct aiScene *scene  , struct aiMesh * mesh );
 
