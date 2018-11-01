@@ -17,14 +17,10 @@ int dumpBVHJointToTP(
   unsigned int jID=0;
   unsigned int jAssociationID=0;
 
+  float data[8]={0};
 
   struct BVH_Transform bvhTransform={0};
 
-  bvh_loadTransformForFrame(
-                            mc,
-                            fID ,
-                            &bvhTransform
-                           );
 
   for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
   {
@@ -41,32 +37,19 @@ int dumpBVHJointToTP(
     {
      if (strlen(bvhtri->jointAssociation[jAssociationID].triJointName)>0)
        {
+        if (!bhv_populatePosXYZRotXYZ(mc,jID,fID,data,sizeof(data)))
+          {
+           fprintf(stderr,"Error extracting dynamic transformation for jID=%u @ fID=%u\n",jID,fID);
+          }
+
         //---------------------------------------------------------------------------------------------------
-        float X = (bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign *
-        bvh_getJointChannelAtFrame(
-                                   mc,
-                                   jID,
-                                   fID,
-                                   bvhtri->jointAssociation[jAssociationID].rotationOrder[0].rotID
-                                  ));
+        float X = bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * data[3];;
          X+= bvhtri->jointAssociation[jAssociationID].offset[0];
         //---------------------------------------------------------------------------------------------------
-        float Y = (bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign *
-        bvh_getJointChannelAtFrame(
-                                   mc,
-                                   jID,
-                                   fID,
-                                   bvhtri->jointAssociation[jAssociationID].rotationOrder[1].rotID
-                                  ));
+        float Y = bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign * data[4];
         Y+= bvhtri->jointAssociation[jAssociationID].offset[1];
         //---------------------------------------------------------------------------------------------------
-        float Z = (bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign *
-        bvh_getJointChannelAtFrame(
-                                   mc,
-                                   jID,
-                                   fID,
-                                   bvhtri->jointAssociation[jAssociationID].rotationOrder[2].rotID
-                                  ));
+        float Z = bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign * data[5];
         Z+= bvhtri->jointAssociation[jAssociationID].offset[2];
         //---------------------------------------------------------------------------------------------------
 
@@ -75,6 +58,11 @@ int dumpBVHJointToTP(
         #define USE4X4MAT 0
 
         #if USE4X4MAT
+        bvh_loadTransformForFrame(
+                                  mc,
+                                  fID ,
+                                  &bvhTransform
+                                  );
          fprintf( fp,"POSE4X4(human,%u,%s,", fID, bvhtri->jointAssociation[jAssociationID].triJointName );
          for (unsigned int i=0; i<16; i++)
          {
@@ -84,7 +72,9 @@ int dumpBVHJointToTP(
         #else
          fprintf(
                  fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
-                 fID, bvhtri->jointAssociation[jAssociationID].triJointName, X, Y, Z
+                 fID,
+                 bvhtri->jointAssociation[jAssociationID].triJointName,
+                 X, Y, Z
                 );
         #endif
        } else
