@@ -45,8 +45,8 @@ JOINT_ASSOCIATION(lpinky1,JtLittleALf)
 #Shoulder
 #JOINT_ROTATION_ORDER(lshoulder,x,y,z)
 #JOINT_ROTATION_ORDER(rshoulder,x,y,z)
-#JOINT_OFFSET(lshoulder,0,40,70)
-#JOINT_OFFSET(rshoulder,0,-40,-70)
+JOINT_OFFSET(lshoulder,30,40,-140)
+JOINT_OFFSET(rshoulder,30,-40,140)
 
 
 #JOINT_ROTATION_ORDER(lknee,x,y,z)

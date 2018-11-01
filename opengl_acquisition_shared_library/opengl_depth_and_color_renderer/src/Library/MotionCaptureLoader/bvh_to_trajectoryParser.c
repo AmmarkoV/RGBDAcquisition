@@ -43,7 +43,7 @@ int dumpBVHJointToTP(
           }
 
         //---------------------------------------------------------------------------------------------------
-        float X = bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * data[3];;
+        float X = bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * data[3];
          X+= bvhtri->jointAssociation[jAssociationID].offset[0];
         //---------------------------------------------------------------------------------------------------
         float Y = bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign * data[4];
