@@ -144,7 +144,7 @@ int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int conne
 
 
 
-int dummy_strcasecmp_internal(char * input1, char * input2)
+int dummy_strcasecmp_internal(const char * input1,const char * input2)
 {
   #if CASE_SENSITIVE_OBJECT_NAMES
     return strcmp(input1,input2);
@@ -461,7 +461,44 @@ int changeModelRotationOrder(
                               char * modelOrder
                             )
 {
-  fprintf(stderr,"TODO: changeModelRotationOrder\n" );
+ unsigned int boneIDResult;
+ unsigned int objFound = 0;
+ unsigned int objID = getObjectID(stream,name,&objFound);
+
+
+ if (objFound)
+ {
+  struct Model *mod = &modelStorage->models[objID];
+  if (mod->type==TRI_MODEL)
+  {
+   struct TRI_Model * triM = (struct TRI_Model * ) mod->modelInternalData;
+   if ( findTRIBoneWithName(triM,jointName,&boneIDResult) )
+   {
+    unsigned int rotationOrder=0;
+
+    if (strcmp(modelOrder,"xyz")==0) { rotationOrder=ROTATION_ORDER_XYZ; } else
+    if (strcmp(modelOrder,"xzy")==0) { rotationOrder=ROTATION_ORDER_XZY; } else
+    if (strcmp(modelOrder,"yxz")==0) { rotationOrder=ROTATION_ORDER_YXZ; } else
+    if (strcmp(modelOrder,"yzx")==0) { rotationOrder=ROTATION_ORDER_YZX; } else
+    if (strcmp(modelOrder,"zxy")==0) { rotationOrder=ROTATION_ORDER_ZXY; } else
+    if (strcmp(modelOrder,"zyx")==0) { rotationOrder=ROTATION_ORDER_ZYX; }
+
+    if (
+         setTRIJointRotationOrder(
+                                  triM,
+                                  boneIDResult,
+                                  rotationOrder
+                                 )
+        )
+     {
+
+      return 1;
+
+     } else { fprintf(stderr,"changeModelRotationOrder: could not find a correct joint ..\n"); }
+   } else { fprintf(stderr,"changeModelRotationOrder: could not find joint..\n"); }
+  } else { fprintf(stderr,"changeModelRotationOrder: cannot change model rotation order on non TRI models, (mod->type=%u) ..\n",mod->type); }
+ } else { fprintf(stderr,"changeModelRotationOrder: Could not find object..\n"); }
+
   return 0;
 }
 
@@ -526,8 +563,17 @@ int addPoseToObjectState(
             if (stream->debug)
                 { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms euler angle (%0.2f %0.2f %0.2f) \n",ObjID,pos,boneID,timeMilliseconds,coord[0],coord[1],coord[2]); }
             stream->object[ObjID].frame[pos].jointList->joint[boneID].useEulerRotation=1;
+
             //By default the euler rotation order will be ZYX but this can be changed using the POSE_ROTATION_ORDER command
-            stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=ROTATION_ORDER_ZYX;
+            stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=getModelBoneRotationOrderFromBoneName(mod,boneID);
+
+            fprintf(stderr,"bone %u => rotation order %u \n",boneID,stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder);
+
+            if (stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder==0)
+            {
+              stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=ROTATION_ORDER_ZYX;
+            }
+
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot1=coord[0];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot2=coord[1];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];

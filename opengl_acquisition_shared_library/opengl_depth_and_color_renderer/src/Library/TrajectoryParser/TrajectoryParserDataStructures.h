@@ -18,7 +18,7 @@ int growVirtualStreamConnectors(struct VirtualStream * stream,unsigned int conne
 
 
 
-int dummy_strcasecmp_internal(char * input1, char * input2);
+int dummy_strcasecmp_internal(const char * input1,const char * input2);
 
 void listAllObjectTypeID(struct VirtualStream * stream);
 

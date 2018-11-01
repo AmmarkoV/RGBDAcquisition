@@ -573,6 +573,48 @@ void colorCodeBones(struct TRI_Model * in)
 
 
 
+
+int setTRIJointRotationOrder(
+                                 struct TRI_Model * in ,
+                                 unsigned int jointToChange ,
+                                 unsigned int rotationOrder
+                               )
+{
+  if (in==0)        { return 0; }
+  if (in->bones==0) { return 0; }
+
+  if ( jointToChange < in->header.numberOfBones )
+  {
+    in->bones[jointToChange].info->eulerRotationOrder = rotationOrder;
+    return 1;
+  }
+ return 0;
+}
+
+
+
+int getTRIJointRotationOrder(
+                              struct TRI_Model * in ,
+                              unsigned int jointToChange ,
+                              unsigned int rotationOrder
+                            )
+{
+  if (in==0)        { return 0; }
+  if (in->bones==0) { return 0; }
+
+  unsigned char val =  in->bones[jointToChange].info->eulerRotationOrder;
+
+  return (int) val;
+}
+
+
+
+
+
+
+
+
+
 void transformTRIJoint(
                                  struct TRI_Model * in ,
                                  float * jointData ,

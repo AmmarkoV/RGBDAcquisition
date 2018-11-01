@@ -743,9 +743,38 @@ if (mod->initialized!=1)
    }
  } else
  {
-  fprintf(stderr,"Unsupported model type\n");
+  fprintf(stderr,"getModelBoneIDFromBoneName: Unsupported model type\n");
  }
 
   fprintf(stderr,"Searching model %s for a bone named %s , could not find it\n",mod->pathOfModel , boneName);
+ return 0;
+}
+
+
+
+int getModelBoneRotationOrderFromBoneName(struct Model *mod,unsigned int boneID)
+{
+ if (mod==0)   { return 0; }
+ if (mod->initialized!=1)
+ {
+  fprintf(stderr,"model is not initialized not doing getModelBoneRotationOrderFromBoneName(boneID=%u)\n",boneID);
+  return 0;
+ }
+
+ if (mod->type==TRI_MODEL)
+ {
+  struct TRI_Model * triM = (struct TRI_Model * ) mod->modelInternalData;
+  if ((triM!=0) && (triM->bones!=0) )
+   {
+     if (boneID<triM->header.numberOfBones)
+     {
+        return  triM->bones[boneID].info->eulerRotationOrder;
+     }
+   }
+ } else
+ {
+  fprintf(stderr,"getModelBoneRotationOrderFromBoneName: Unsupported model type\n");
+ }
+
  return 0;
 }

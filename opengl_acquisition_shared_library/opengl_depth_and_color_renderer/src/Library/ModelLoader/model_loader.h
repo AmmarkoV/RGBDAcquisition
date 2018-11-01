@@ -242,4 +242,7 @@ int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNum
 //TODO Add explanation here
 int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found);
 
+
+int getModelBoneRotationOrderFromBoneName(struct Model *mod,unsigned int boneID);
+
 #endif // MODEL_LOADER_H_INCLUDED

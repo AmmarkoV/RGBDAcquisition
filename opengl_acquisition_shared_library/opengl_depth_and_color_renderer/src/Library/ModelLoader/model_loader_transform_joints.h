@@ -86,6 +86,17 @@ unsigned int  * getClosestVertexToJointPosition(struct TRI_Model * in , float * 
 
 
 
+int setTRIJointRotationOrder(
+                              struct TRI_Model * in ,
+                              unsigned int jointToChange ,
+                              unsigned int rotationOrder
+                             );
+
+int getTRIJointRotationOrder(
+                             struct TRI_Model * in ,
+                             unsigned int jointToChange ,
+                             unsigned int rotationOrder
+                            );
 
 
 
