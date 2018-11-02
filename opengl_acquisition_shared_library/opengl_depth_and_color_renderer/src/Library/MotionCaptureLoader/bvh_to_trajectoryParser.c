@@ -58,7 +58,7 @@ int get_jID_From_jAssociationID(
 }
 
 
-int getAssociatedPositionRotationsForJointID(
+int getAssociatedPositionsAndRotationsForJointID(
                                              struct BVH_MotionCapture * mc,
                                              struct bvhToTRI * bvhtri,
                                              unsigned int jID,
@@ -106,7 +106,7 @@ int getAssociatedPositionRotationsForJointID(
 }
 
 
-int getAssociatedRotationsForJointAssociation(
+int getAssociatedPositionsAndRotationsForJointAssociation(
                                               struct BVH_MotionCapture * mc,
                                               struct bvhToTRI * bvhtri,
                                               unsigned int jAssociationID,
@@ -132,7 +132,7 @@ int getAssociatedRotationsForJointAssociation(
       )
        {
         if (
-            getAssociatedPositionRotationsForJointID(
+            getAssociatedPositionsAndRotationsForJointID(
                                                      mc,
                                                      bvhtri,
                                                      jID,
@@ -183,19 +183,19 @@ int dumpBVHJointToTP(
        {
         float posX,posY,posZ,rotX,rotY,rotZ;
         if (
-            !getAssociatedPositionRotationsForJointID(
-                                                      mc,
-                                                      bvhtri,
-                                                      jID,
-                                                      jAssociationID,
-                                                      fID,
-                                                      &posX,
-                                                      &posY,
-                                                      &posZ,
-                                                      &rotX,
-                                                      &rotY,
-                                                      &rotZ
-                                                      )
+            !getAssociatedPositionsAndRotationsForJointID(
+                                                          mc,
+                                                          bvhtri,
+                                                          jID,
+                                                          jAssociationID,
+                                                          fID,
+                                                          &posX,
+                                                          &posY,
+                                                          &posZ,
+                                                          &rotX,
+                                                          &rotY,
+                                                          &rotZ
+                                                         )
            )
         {
            fprintf(stderr,"getAssociatedRotationsForJointID error for jID=%u and Frame=%u\n",jID,fID);
@@ -397,35 +397,36 @@ int dumpBVHToTrajectoryParserTRI(
       {
         fprintf(fp,"#Root joint euler angle order %s\n",rotationOrderNames[(unsigned int)mc->jointHierarchy[rootJID].channelRotationOrder]);
 
+        unsigned int rootjAssociationID=0;
         if (
             //We need to find the correct jAssociationID for the rootJID
             get_jAssociationID_From_jID(
                                          mc,
                                          bvhtri,
                                          rootJID,
-                                         &jAssociationID
+                                         &rootjAssociationID
                                         )
            )
         {
          if (
-            //We have the correct jAssociationID and rootJID, so we retrieve positions and rotations for frame with id fID
-             getAssociatedPositionRotationsForJointID(
-                                                      mc,
-                                                      bvhtri,
-                                                      rootJID,
-                                                      jAssociationID,
-                                                      fID,
-                                                      &posX, &posY, &posZ,
-                                                      &rotX, &rotY, &rotZ
-                                                      )
+            //We have the correct rootjAssociationID and rootJID, so we retrieve positions and rotations for frame with id fID
+             getAssociatedPositionsAndRotationsForJointID(
+                                                          mc,
+                                                          bvhtri,
+                                                          rootJID,
+                                                          rootjAssociationID,
+                                                           fID,
+                                                          &posX, &posY, &posZ,
+                                                          &rotX, &rotY, &rotZ
+                                                         )
            )
            {
             //Great, we have everything so we write it down to our output..
             fprintf(
                     fp,"MOVE(human,%u,%0.2f,%0.2f,%0.2f,%0.5f,%0.5f,%0.5f)\n",
                     fID,
-                    10*posX, 10*posY, 10*posZ+3600,
-                    -1*rotX+90 ,-1*rotY, -1*rotZ
+                    10*posX, 10*posY, 10*posZ+4000,
+                    rotX ,rotY, rotZ
                     );
              producedDynamicRotationForRootJoint=1;
            } else { fprintf(stderr,"getAssociatedRotationsForJointID error for RootJID=%u and Frame=%u\n",rootJID,fID); }

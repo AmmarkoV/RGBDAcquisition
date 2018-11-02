@@ -633,53 +633,98 @@ int drawModel(struct Model * mod)
                         mod->x,
                         mod->y,
                         mod->z,
-                        mod->heading,
-                        mod->pitch,
-                        mod->roll,
+                        mod->rotationX, //heading
+                        mod->rotationY, //pitch
+                        mod->rotationZ, //roll
                         mod->rotationOrder
                        );
 }
 
-int addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
+
+void printBasicModelState(struct Model * mod)
+{
+  fprintf(stderr,"Model(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f (rotOrder %u))\n",mod->x,mod->y,mod->z,mod->rotationX,mod->rotationY,mod->rotationZ,mod->rotationOrder);
+}
+
+
+int addToModelCoordinates(
+                            struct Model * mod,
+                            float x,
+                            float y,
+                            float z,
+                            float rotationX, //heading,
+                            float rotationY, //pitch,
+                            float rotationZ  //roll
+                         )
 {
   if (mod==0) { return 0; }
   mod->x+=x; mod->y+=y; mod->z+=z;
 
-  mod->heading+=heading; mod->pitch+=pitch; mod->roll+=roll;
-  fprintf(stderr,"Model(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+  mod->rotationX+=rotationX;  //heading
+  mod->rotationY+=rotationY;  //pitch
+  mod->rotationZ+=rotationZ;  //roll
+
+  printBasicModelState(mod);
   return 1;
 }
 
-int addToModelCoordinatesNoSTACK(struct Model * mod,float *x,float *y,float *z,float *heading,float *pitch,float *roll)
+int addToModelCoordinatesNoSTACK(
+                                  struct Model * mod,
+                                  float *x,
+                                  float *y,
+                                  float *z,
+                                  float *rotationX,
+                                  float *rotationY,
+                                  float *rotationZ
+                                )
 {
   if (mod==0) { return 0; }
   mod->x+=*x; mod->y+=*y; mod->z+=*z;
 
-  mod->heading+=*heading; mod->pitch+=*pitch; mod->roll+=*roll;
-  fprintf(stderr,"Model(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+  mod->rotationX+=*rotationX;  //heading
+  mod->rotationY+=*rotationY;  //pitch
+  mod->rotationZ+=*rotationZ;  //roll
+
+  printBasicModelState(mod);
   return 1;
 }
 
-int setModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
+int setModelCoordinates(
+                         struct Model * mod,
+                         float x,
+                         float y,
+                         float z,
+                         float rotationX, //heading,
+                         float rotationY, //pitch,
+                         float rotationZ  //roll
+                       )
 {
   if (mod==0) { return 0; }
-  fprintf(stderr,"Model SET Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",x,y,z,heading,pitch,roll);
+  fprintf(stderr,"Model SET Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",x,y,z,rotationX,rotationY,rotationZ);
 
   mod->x=x; mod->y=y; mod->z=z;
 
-  mod->heading=heading; mod->pitch=pitch; mod->roll=roll;
-  fprintf(stderr,"Model SET (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+  mod->rotationX=rotationX; mod->rotationY=rotationY; mod->rotationZ=rotationZ;
+  fprintf(stderr,"Model SET (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->rotationX,mod->rotationY,mod->rotationZ);
   return 1;
 }
 
-int setModelCoordinatesNoSTACK(struct Model * mod,float * x,float* y,float *z,float *heading,float *pitch,float* roll)
+int setModelCoordinatesNoSTACK(
+                                  struct Model * mod,
+                                  float *x,
+                                  float *y,
+                                  float *z,
+                                  float *rotationX,
+                                  float *rotationY,
+                                  float *rotationZ
+                              )
 {
   if (mod==0) { return 0; }
   //fprintf(stderr,"Model SET NoSTACK Got params(%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",*x,*y,*z,*heading,*pitch,*roll);
 
   mod->x=*x; mod->y=*y; mod->z=*z;
 
-  mod->heading=*heading; mod->pitch=*pitch; mod->roll=*roll;
+  mod->rotationX=*rotationX; mod->rotationY=*rotationY; mod->rotationZ=*rotationZ;
   //fprintf(stderr,"Model SET NoSTACK (%0.2f %0.2f %0.2f - %0.4f %0.4f %0.4f)\n",mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
   return 1;
 }
