@@ -625,13 +625,13 @@ int fillPosWithFrame(
 
     if ( (joints!=0) && (stream->object[ObjID].frame[FrameIDToReturn].jointList!=0) )
     {
-        /*
+      /*
        fprintf(stderr,
                "Populating non interpolated joints for frame %u  ( %u joints ) \n",
                FrameIDToReturn ,
                stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints
               );
-*/
+       */
        unsigned int numberOfJoints = stream->object[ObjID].frame[FrameIDToReturn].jointList->numberOfJoints;
 
        double rotCur[4]={0};

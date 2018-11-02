@@ -5,7 +5,7 @@ JOINT_ASSOCIATION(head,JtUpperFaceParent)
 JOINT_ASSOCIATION(abdomen,JtSpineB)
 JOINT_ASSOCIATION(chest,JtNeckA)
 JOINT_ASSOCIATION(neck,JtNeckB)
-JOINT_ASSOCIATION(hip,JtSpineA)
+JOINT_ASSOCIATION(hip,JtRoot)
 
 #Right Foot
 JOINT_ASSOCIATION(rhip,JtHipRt)
@@ -39,14 +39,14 @@ JOINT_ASSOCIATION(lmid1,JtMiddleALf)
 JOINT_ASSOCIATION(lring1,JtRingALf)
 JOINT_ASSOCIATION(lpinky1,JtLittleALf)
  
-
-#JOINT_OFFSET(neck,0,0,0)
+#JOINT_OFFSET(hip,-90,0,0)
+#JOINT_ROTATION_ORDER(hip,z,y,x)
 
 #Shoulder
-#JOINT_ROTATION_ORDER(lshoulder,x,y,z)
-#JOINT_ROTATION_ORDER(rshoulder,x,y,z)
-JOINT_OFFSET(lshoulder,30,40,-140)
-JOINT_OFFSET(rshoulder,30,-40,140)
+#JOINT_ROTATION_ORDER(lshoulder,y,x,z)
+#JOINT_ROTATION_ORDER(rshoulder,y,x,z)
+JOINT_OFFSET(lshoulder,20,-30,-80)
+JOINT_OFFSET(rshoulder,20,30,80)
 
 
 #JOINT_ROTATION_ORDER(lknee,x,y,z)

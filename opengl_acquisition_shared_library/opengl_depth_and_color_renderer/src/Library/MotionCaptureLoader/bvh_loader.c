@@ -1011,7 +1011,7 @@ int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID j
   return 1;
 }
 
-
+/*
 int bhv_getRootDynamicPosition(struct BVH_MotionCapture * bvhMotion ,  BVHFrameID fID , float * data , unsigned int sizeOfData)
 {
   if (data == 0) { return 0; }
@@ -1048,6 +1048,25 @@ int bhv_getRootDynamicRotation(struct BVH_MotionCapture * bvhMotion ,  BVHFrameI
       return 1;
     }
   }
+ return 0;
+}*/
+
+int bvh_getRootJointID(
+                       struct BVH_MotionCapture * bvhMotion ,
+                       BVHJointID * jID
+                      )
+{
+   if (bvhMotion==0) { return 0; }
+
+   unsigned int i=0;
+   for (i=0; i<bvhMotion->jointHierarchySize; i++)
+   {
+     if (bvhMotion->jointHierarchy[i].isRoot)
+     {
+         *jID=i;
+         return 1;
+     }
+   }
  return 0;
 }
 

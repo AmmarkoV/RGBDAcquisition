@@ -6,6 +6,154 @@
 #include "../../../../../tools/AmMatrix/quaternions.h"
 
 
+int get_jAssociationID_From_jID(
+                                struct BVH_MotionCapture * mc,
+                                struct bvhToTRI * bvhtri,
+                                unsigned int jID,
+                                unsigned int *jAssociationIDResult
+                               )
+{
+  unsigned int jAssociationID=0;
+  for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
+  {
+    if (
+        strcmp(
+                 bvhtri->jointAssociation[jAssociationID].bvhJointName ,
+                 mc->jointHierarchy[jID].jointName
+              ) ==0
+        )
+    {
+      *jAssociationIDResult=jAssociationID;
+      return 1;
+    }
+  }
+
+ return 0;
+}
+
+
+int get_jID_From_jAssociationID(
+                                struct BVH_MotionCapture * mc,
+                                struct bvhToTRI * bvhtri,
+                                unsigned int jAssociationID,
+                                unsigned int *jIDResult
+                               )
+{
+  unsigned int jID=0;
+  for (jID=0; jID<mc->jointHierarchySize; jID++)
+  {
+    if (
+        strcmp(
+                 bvhtri->jointAssociation[jAssociationID].bvhJointName ,
+                 mc->jointHierarchy[jID].jointName
+              ) ==0
+        )
+    {
+      *jIDResult=jID;
+      return 1;
+    }
+  }
+
+ return 0;
+}
+
+
+int getAssociatedPositionRotationsForJointID(
+                                             struct BVH_MotionCapture * mc,
+                                             struct bvhToTRI * bvhtri,
+                                             unsigned int jID,
+                                             unsigned int jAssociationID,
+                                             unsigned int fID,
+                                             float *posX,
+                                             float *posY,
+                                             float *posZ,
+                                             float *rotX,
+                                             float *rotY,
+                                             float *rotZ
+                                   )
+{
+  if (strcmp(mc->jointHierarchy[jID].jointName,bvhtri->jointAssociation[jAssociationID].bvhJointName)!=0)
+        {
+          fprintf(
+                  stderr,"getAssociatedPositionRotationsForJointID : Error Root joint association (%s) does not have the same name as root joint (%s)..\n",
+                  bvhtri->jointAssociation[jAssociationID].bvhJointName,
+                  mc->jointHierarchy[jID].jointName
+                 );
+          return 0;
+        }
+
+  float data[8]={0};
+  if (bhv_populatePosXYZRotXYZ(mc,jID,fID,data,sizeof(data)))
+         {
+           *posX=data[0];
+           *posY=data[1];
+           *posZ=data[2];
+
+          //---------------------------------------------------------------------------------------------------
+           *rotX = bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * data[3];
+           *rotX+= bvhtri->jointAssociation[jAssociationID].offset[0];
+          //---------------------------------------------------------------------------------------------------
+           *rotY = bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign * data[4];
+           *rotY+= bvhtri->jointAssociation[jAssociationID].offset[1];
+          //---------------------------------------------------------------------------------------------------
+           *rotZ = bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign * data[5];
+           *rotZ+= bvhtri->jointAssociation[jAssociationID].offset[2];
+          //---------------------------------------------------------------------------------------------------
+          return 1;
+         }
+
+  return 0;
+}
+
+
+int getAssociatedRotationsForJointAssociation(
+                                              struct BVH_MotionCapture * mc,
+                                              struct bvhToTRI * bvhtri,
+                                              unsigned int jAssociationID,
+                                              unsigned int fID,
+                                              float *posX,
+                                              float *posY,
+                                              float *posZ,
+                                              float *rotX,
+                                              float *rotY,
+                                              float *rotZ
+                                             )
+{
+  unsigned int jID=0;
+  if (
+      (bvhtri->jointAssociation[jAssociationID].useJoint) &&
+        (
+         bvh_getJointIDFromJointName(
+                                      mc,
+                                      bvhtri->jointAssociation[jAssociationID].bvhJointName,
+                                      &jID
+                                     )
+        )
+      )
+       {
+        if (
+            getAssociatedPositionRotationsForJointID(
+                                                     mc,
+                                                     bvhtri,
+                                                     jID,
+                                                     jAssociationID,
+                                                     fID,
+                                                     posX,
+                                                     posY,
+                                                     posZ,
+                                                     rotX,
+                                                     rotY,
+                                                     rotZ
+                                                    )
+            )
+         {
+           return 1;
+         }
+         else { fprintf(stderr,"Error getAssociatedRotationsForJointID jID=%u @ fID=%u\n",jID,fID); }
+       } else { fprintf(stderr,"Error extracting getting joind id for joint name `%s`\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
+  return 0;
+}
+
 
 int dumpBVHJointToTP(
                       FILE*fp ,
@@ -17,9 +165,7 @@ int dumpBVHJointToTP(
   unsigned int jID=0;
   unsigned int jAssociationID=0;
 
-  float data[8]={0};
 
-  struct BVH_Transform bvhTransform={0};
 
 
   for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
@@ -27,37 +173,58 @@ int dumpBVHJointToTP(
     if (
         (bvhtri->jointAssociation[jAssociationID].useJoint) &&
         (
+         get_jID_From_jAssociationID(
+                                     mc,
+                                     bvhtri,
+                                     jAssociationID,
+                                     &jID
+                                    )
+/*
          bvh_getJointIDFromJointName(
                                       mc,
                                       bvhtri->jointAssociation[jAssociationID].bvhJointName,
                                       &jID
-                                     )
+                                     )*/
         )
        )
     {
      if (strlen(bvhtri->jointAssociation[jAssociationID].triJointName)>0)
        {
-        if (!bhv_populatePosXYZRotXYZ(mc,jID,fID,data,sizeof(data)))
-          {
-           fprintf(stderr,"Error extracting dynamic transformation for jID=%u @ fID=%u\n",jID,fID);
-          }
-
-        //---------------------------------------------------------------------------------------------------
-        float X = bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * data[3];
-         X+= bvhtri->jointAssociation[jAssociationID].offset[0];
-        //---------------------------------------------------------------------------------------------------
-        float Y = bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign * data[4];
-        Y+= bvhtri->jointAssociation[jAssociationID].offset[1];
-        //---------------------------------------------------------------------------------------------------
-        float Z = bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign * data[5];
-        Z+= bvhtri->jointAssociation[jAssociationID].offset[2];
-        //---------------------------------------------------------------------------------------------------
-
-
+        float posX,posY,posZ,rotX,rotY,rotZ;
+        if (
+            !getAssociatedPositionRotationsForJointID(
+                                                      mc,
+                                                      bvhtri,
+                                                      jID,
+                                                      jAssociationID,
+                                                      fID,
+                                                      &posX,
+                                                      &posY,
+                                                      &posZ,
+                                                      &rotX,
+                                                      &rotY,
+                                                      &rotZ
+                                                      )
+           )
+        {
+           fprintf(stderr,"getAssociatedRotationsForJointID error for jID=%u and Frame=%u\n",jID,fID);
+        }
 
         #define USE4X4MAT 0
 
+
+        if (mc->jointHierarchy[jID].isRoot)
+        {
+         fprintf(
+                 fp,"#ALREADY SET POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
+                 fID,
+                 bvhtri->jointAssociation[jAssociationID].triJointName,
+                 rotX,rotY,rotZ
+                );
+        } else
+        {
         #if USE4X4MAT
+        struct BVH_Transform bvhTransform={0};
         bvh_loadTransformForFrame(
                                   mc,
                                   fID ,
@@ -74,9 +241,10 @@ int dumpBVHJointToTP(
                  fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
                  fID,
                  bvhtri->jointAssociation[jAssociationID].triJointName,
-                 X, Y, Z
+                 rotX, rotY, rotZ
                 );
         #endif
+        }
        } else
        { fprintf(fp,"#BVH joint `%s` has no TRI name associated\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
     }
@@ -216,32 +384,57 @@ int dumpBVHToTrajectoryParserTRI(
     fprintf(fp,"\n\n");
     //-----------------------------------------------------------------------------------------
 
-
+    BVHJointID rootJID=0;
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
       fprintf(fp,"MOVE(floor,%u,-19.231,1784.976,2699.735,0.0,0.0,0.0,0.0)\n",fID);
 
-      float dataPos[3];
-      float dataRot[3];
 
-      if ( ( bhv_getRootDynamicPosition(mc,fID,dataPos,sizeof(float)*3) ) && (usePosition) )
+      if ( ( bvh_getRootJointID(mc,&rootJID) )  && (usePosition) )
       {
-        bhv_getRootDynamicRotation(mc,fID,dataRot,sizeof(float)*3);
-        double euler[3];
+        fprintf(fp,"#Root joint euler angle order %s\n",rotationOrderNames[(unsigned int)mc->jointHierarchy[rootJID].channelRotationOrder]);
 
-        euler[0]=(double) dataRot[0];
-        euler[1]=(double) dataRot[1];
-        euler[2]=270+(double) dataRot[2]; //To correct orientation of body
-        double quaternions[4];
+        if (
+            !get_jAssociationID_From_jID(
+                                         mc,
+                                         bvhtri,
+                                         rootJID,
+                                         &jAssociationID
+                                        )
+           )
+        {
+         fprintf( fp,"Error : get_jAssociationID_From_jID could not get root association..\n" );
+         return 0;
+        }
 
-        euler2Quaternions(quaternions,euler,qXqYqZqW);
 
-        fprintf(fp,"MOVE(human,%u,%0.2f,%0.2f,%0.2f,%0.5f,%0.5f,%0.5f,%0.5f)\n",fID,
-                10*dataPos[0],10*dataPos[1],10*dataPos[2]+3600,
-                quaternions[0],quaternions[1],quaternions[2],quaternions[3]);
+
+        float posX,posY,posZ,rotX,rotY,rotZ;
+        if (
+            !getAssociatedPositionRotationsForJointID(
+                                                      mc,
+                                                      bvhtri,
+                                                      rootJID,
+                                                      jAssociationID,
+                                                      fID,
+                                                      &posX, &posY, &posZ,
+                                                      &rotX, &rotY, &rotZ
+                                                      )
+           ) { fprintf(stderr,"getAssociatedRotationsForJointID error for RootJID=%u and Frame=%u\n",rootJID,fID); }
+
+
+        fprintf(fp,"MOVE(human,%u,%0.2f,%0.2f,%0.2f,%0.5f,%0.5f,%0.5f)\n",
+                fID,
+                10*posX,
+                10*posY,
+                10*posZ+3600,
+                rotX,
+                rotY,
+                rotZ
+               );
       } else
       {
-        fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.000000,0.0)\n",fID);
+        fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.0,0.0)\n",fID);
       }
 
       dumpBVHJointToTP(fp, mc, bvhtri, fID);

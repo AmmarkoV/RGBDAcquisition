@@ -220,11 +220,13 @@ int bvh_loadTransformForFrame(
       create4x4TranslationMatrix(bvhTransform->joint[jID].dynamicTranslation,posX,posY,posZ);
 
 
-     if (bvhMotion->jointHierarchy[jID].channelRotationOrder==0)
+     if ( (bvhMotion->jointHierarchy[jID].channelRotationOrder==0)  )
      {
-        fprintf(stderr,"No channel rotation order for joint jID=%u jointName=%s\n",jID,bvhMotion->jointHierarchy[jID].jointName);
-     }
-
+        if (!bvhMotion->jointHierarchy[jID].isEndSite)
+              { fprintf(stderr,"No channel rotation order for joint jID=%u jointName=%s, using identity matrix\n",jID,bvhMotion->jointHierarchy[jID].jointName); }
+        create4x4IdentityMatrix(bvhTransform->joint[jID].dynamicRotation);
+     } else
+     {
       #if USE_BVH_SPECIFIC_ROTATIONS
        create4x4RotationBVH(
                             bvhTransform->joint[jID].dynamicRotation,
@@ -242,6 +244,7 @@ int bvh_loadTransformForFrame(
                                                        (unsigned int) bvhMotion->jointHierarchy[jID].channelRotationOrder
                                                       );
       #endif // USE_BVH_SPECIFIC_ROTATIONS
+     }
   }
 
   //We will now apply all transformations

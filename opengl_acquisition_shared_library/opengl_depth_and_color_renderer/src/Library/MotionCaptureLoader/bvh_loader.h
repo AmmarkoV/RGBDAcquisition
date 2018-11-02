@@ -192,11 +192,17 @@ float  bvh_getJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJo
 
 int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData);
 
-
+/*
 int bhv_getRootDynamicPosition(struct BVH_MotionCapture * bvhMotion ,  BVHFrameID fID , float * data , unsigned int sizeOfData);
 
 
 int bhv_getRootDynamicRotation(struct BVH_MotionCapture * bvhMotion ,  BVHFrameID fID , float * data , unsigned int sizeOfData);
+*/
+
+int bvh_getRootJointID(
+                       struct BVH_MotionCapture * bvhMotion ,
+                       BVHJointID * jID
+                      );
 
 float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID);
 int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
