@@ -28,6 +28,8 @@ struct Model
     float bbox2D[4]; //The 2D rendering output bounding box of the specific model
 
     float x , y , z , heading , pitch , roll , scaleX , scaleY ,scaleZ;
+    unsigned int rotationOrder;
+
     float minX,minY,minZ,maxX,maxY,maxZ;
 
     //Color
@@ -118,7 +120,16 @@ void unloadModel(struct Model * mod);
 * @param roll of model
 * @retval 0=Error , 1=Success
 */
-int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll);
+int drawModelAt(
+                 struct Model * mod,
+                 float positionX,
+                 float positionY,
+                 float positionZ,
+                 float rotationX,//heading,
+                 float rotationY,//pitch,
+                 float rotationZ,//roll,
+                 unsigned int rotationOrder
+                );
 
 /**
 * @brief Draw a Model at current position

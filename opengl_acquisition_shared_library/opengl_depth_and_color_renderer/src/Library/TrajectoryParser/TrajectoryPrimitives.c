@@ -1,6 +1,6 @@
 
 /*                  
-This file was automatically generated @ 02-11-2018 15:50:53 using StringRecognizer                  
+This file was automatically generated @ 02-11-2018 18:57:20 using StringRecognizer                  
 https://github.com/AmmarkoV/AmmarServer/tree/master/src/StringRecognizer                 
 Please note that changes you make here may be automatically overwritten                  
 if the String Recognizer generator runs again..!              
@@ -134,8 +134,7 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
              if ( (strLength >= 16 )&& ( strncasecmp(str,"MODELVIEW_MATRIX",16) == 0 ) ) { return TRAJECTORYPRIMITIVES_MODELVIEW_MATRIX; } 
          break; 
          case 'V' : 
-             if ( (strLength >= 19 )&& ( strncasecmp(str,"MOVE_ROTATION_ORDER",19) == 0 ) ) { return TRAJECTORYPRIMITIVES_MOVE_ROTATION_ORDER; } 
-             else  if ( (strLength >= 9 )&& ( strncasecmp(str,"MOVE_VIEW",9) == 0 ) ) { return TRAJECTORYPRIMITIVES_MOVE_VIEW; } 
+             if ( (strLength >= 9 )&& ( strncasecmp(str,"MOVE_VIEW",9) == 0 ) ) { return TRAJECTORYPRIMITIVES_MOVE_VIEW; } 
              else  if ( (strLength >= 4 )&& ( strncasecmp(str,"MOVE",4) == 0 ) ) { return TRAJECTORYPRIMITIVES_MOVE; } 
          break; 
         }; 
@@ -151,7 +150,8 @@ int scanFor_TrajectoryPrimitives(const char * str,unsigned int strLength)
      case 'B' : 
          switch (toupper(str[2])) { 
          case 'J' : 
-             if ( (strLength >= 11 )&& ( strncasecmp(str,"OBJECT_TYPE",11) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECT_TYPE; } 
+             if ( (strLength >= 21 )&& ( strncasecmp(str,"OBJECT_ROTATION_ORDER",21) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECT_ROTATION_ORDER; } 
+             else  if ( (strLength >= 11 )&& ( strncasecmp(str,"OBJECT_TYPE",11) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECT_TYPE; } 
              else  if ( (strLength >= 10 )&& ( strncasecmp(str,"OBJECTTYPE",10) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECTTYPE; } 
              else  if ( (strLength >= 6 )&& ( strncasecmp(str,"OBJECT",6) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJECT; } 
              else  if ( (strLength >= 10 )&& ( strncasecmp(str,"OBJ_OFFSET",10) == 0 ) ) { return TRAJECTORYPRIMITIVES_OBJ_OFFSET; } 

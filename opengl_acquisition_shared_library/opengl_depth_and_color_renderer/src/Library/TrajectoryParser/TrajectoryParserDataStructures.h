@@ -82,13 +82,20 @@ int addStateToObjectMini(
                        );
 
 
-int changeModelRotationOrder(
-                             struct VirtualStream * stream ,
-                              struct ModelList * modelStorage,
-                              char * name  ,
-                              char * jointName,
-                              char * modelOrder
-                            );
+int changeObjectRotationOrder(
+                                  struct VirtualStream * stream ,
+                                  struct ModelList * modelStorage,
+                                  char * name  ,
+                                  char * rotationOrderStr
+                                );
+
+int changeModelJointRotationOrder(
+                                  struct VirtualStream * stream ,
+                                  struct ModelList * modelStorage,
+                                  char * name  ,
+                                  char * jointName,
+                                  char * modelOrder
+                                 );
 
 int addPoseToObjectState(
                               struct VirtualStream * stream ,

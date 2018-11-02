@@ -986,12 +986,36 @@ int normalize3DPointVector(double * vec)
 }
 
 
+void doRPYTransformation(
+                         double *m,
+                         double rollInDegrees,
+                         double pitchInDegrees,
+                         double yawInDegrees
+                        )
+{
+    double intermediateMatrixPitch[16];
+    double intermediateMatrixHeading[16];
+    double intermediateMatrixRoll[16];
+    create4x4RotationMatrix(  intermediateMatrixRoll   , rollInDegrees,      0.0,   0.0,   1.0);
+    create4x4RotationMatrix(  intermediateMatrixHeading, yawInDegrees,       0.0,   1.0,   0.0);
+    create4x4RotationMatrix(  intermediateMatrixPitch  , pitchInDegrees,     1.0,   0.0,   0.0);
+
+    multiplyThree4x4Matrices(
+                              m ,
+                              intermediateMatrixRoll ,
+                              intermediateMatrixHeading ,
+                              intermediateMatrixPitch
+                            );
+}
+
+
 void create4x4ModelTransformation(
                                   double * m ,
                                   //Rotation Component
-                                  double rollInDegrees,
-                                  double pitchInDegrees,
-                                  double yawInDegrees,
+                                  double rotationX,//heading
+                                  double rotationY,//pitch
+                                  double rotationZ,//roll
+                                  unsigned int rotationOrder,
                                   //Translation Component
                                   double x, double y, double z ,
                                   double scaleX, double scaleY, double scaleZ
@@ -1013,22 +1037,28 @@ void create4x4ModelTransformation(
                               );
 
 
-    double intermediateMatrixPitch[16];
-    double intermediateMatrixHeading[16];
-    double intermediateMatrixRoll[16];
-    create4x4RotationMatrix(  intermediateMatrixRoll   , rollInDegrees,      0.0,   0.0,   1.0);
-    create4x4RotationMatrix(  intermediateMatrixHeading, yawInDegrees,       0.0,   1.0,   0.0);
-    create4x4RotationMatrix(  intermediateMatrixPitch  , pitchInDegrees,     1.0,   0.0,   0.0);
-
     double intermediateMatrixRotation[16];
-    multiplyThree4x4Matrices(
-                              intermediateMatrixRotation ,
-                              intermediateMatrixRoll ,
-                              intermediateMatrixHeading ,
-                              intermediateMatrixPitch
-                            );
 
-
+    if (rotationOrder==ROTATION_ORDER_RPY)
+    {
+     //This is the old way to do this rotation
+     doRPYTransformation(
+                         intermediateMatrixRotation,
+                         rotationZ,//roll,
+                         rotationY,//pitch
+                         rotationX//heading
+                        );
+    } else
+    {
+     //fprintf(stderr,"Using new model transform code\n");
+     create4x4MatrixFromEulerAnglesWithRotationOrder(
+                                                     intermediateMatrixRotation ,
+                                                     rotationX,
+                                                     rotationY,
+                                                     rotationZ,
+                                                     rotationOrder
+                                                    );
+    }
 
 
   if ( (scaleX!=1.0) || (scaleY!=1.0) || (scaleZ!=1.0) )

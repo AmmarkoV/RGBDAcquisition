@@ -86,8 +86,9 @@ struct KeyFrame
    float x , y , z , scaleX ,scaleY, scaleZ;
    float rot1 , rot2 , rot3 , rot4;
    unsigned char isQuaternion;
-   unsignedchar  isEulerRotation;
-   unsigned char eulerRotationOrder;
+   unsigned char isEulerRotation;
+   //Rotation order is set for each model not for each keyframe..
+   //unsigned char eulerRotationOrder;
 
    float R , G , B , Alpha ;
    unsigned char hasColor;

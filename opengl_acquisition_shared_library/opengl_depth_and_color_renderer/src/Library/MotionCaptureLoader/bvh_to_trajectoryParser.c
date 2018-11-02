@@ -351,7 +351,16 @@ int dumpBVHToTrajectoryParserTRI(
 
     fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/Ammar.tri,http://ammar.gr/models/Ammar.tri)\n");
     fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,10.0,10.0,10.0)\n\n");
-    fprintf(fp,"MOVE_ROTATION_ORDER(human,ZYX) TODO\n");
+
+
+    BVHJointID rootJID=0;
+     if ( bvh_getRootJointID(mc,&rootJID) )
+      {
+       fprintf(fp,"OBJECT_ROTATION_ORDER(human,%s)\n",rotationOrderNames[mc->jointHierarchy[jID].channelRotationOrder]);
+      } else
+      {
+       fprintf(fp,"#OBJECT_ROTATION_ORDER(human,cannot be set because we can't find root bone)\n");
+      }
 
     //-----------------------------------------------------------------------------------------
     unsigned int jAssociationID=0;
@@ -377,7 +386,6 @@ int dumpBVHToTrajectoryParserTRI(
     //-----------------------------------------------------------------------------------------
 
     float posX,posY,posZ,rotX,rotY,rotZ;
-    BVHJointID rootJID=0;
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
       fprintf(fp,"MOVE(floor,%u,-19.231,1784.976,2699.735,0.0,0.0,0.0,0.0)\n",fID);
@@ -417,7 +425,7 @@ int dumpBVHToTrajectoryParserTRI(
                     fp,"MOVE(human,%u,%0.2f,%0.2f,%0.2f,%0.5f,%0.5f,%0.5f)\n",
                     fID,
                     10*posX, 10*posY, 10*posZ+3600,
-                    rotX ,rotY, rotZ
+                    -1*rotX+90 ,-1*rotY, -1*rotZ
                     );
              producedDynamicRotationForRootJoint=1;
            } else { fprintf(stderr,"getAssociatedRotationsForJointID error for RootJID=%u and Frame=%u\n",rootJID,fID); }

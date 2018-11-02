@@ -226,7 +226,8 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                    drawModelAt(
                                 mod,
                                 pos[POS_X],pos[POS_Y],pos[POS_Z],
-                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ]
+                                pos[POS_ANGLEX],pos[POS_ANGLEY],pos[POS_ANGLEZ],
+                                mod->rotationOrder
                               );
                 }
             }

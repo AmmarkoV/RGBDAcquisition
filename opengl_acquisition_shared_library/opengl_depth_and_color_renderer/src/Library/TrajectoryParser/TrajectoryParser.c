@@ -27,9 +27,12 @@
 #include "TrajectoryCalculator.h"
 #include "TrajectoryPrimitives.h"
 
+#include "../OGLRendererSandbox.h"
 #include "../ModelLoader/model_loader.h"
 #include "../../../../../tools/AmMatrix/matrixCalculations.h"
 #include "../../../../../tools/AmMatrix/quaternions.h"
+#include "../Tools/tools.h"
+
 //Using normalizeQuaternionsTJP #include "../../../../tools/AmMatrix/matrixCalculations.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -420,14 +423,29 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                InputParser_GetWord(ipc,2,nameB,MAX_PATH);
                InputParser_GetLowercaseWord(ipc,3,typeStr,MAX_PATH);
 
-               changeModelRotationOrder(
+               changeModelJointRotationOrder(
+                                             newstream ,
+                                             modelStorage,
+                                             name  ,
+                                             nameB,
+                                             typeStr
+                                            );
+                //fprintf(stderr,"survived\n");
+          break;
+
+
+          case TRAJECTORYPRIMITIVES_OBJECT_ROTATION_ORDER:
+               //fprintf(stderr,"TRAJECTORYPRIMITIVES_OBJECT_ROTATION_ORDER recvd\n");
+               InputParser_GetWord(ipc,1,name,MAX_PATH);
+               InputParser_GetLowercaseWord(ipc,2,typeStr,MAX_PATH);
+
+               changeObjectRotationOrder(
                                          newstream ,
                                          modelStorage,
                                          name  ,
-                                         nameB,
                                          typeStr
                                         );
-                //fprintf(stderr,"survived\n");
+                 //fprintf(stderr,"survived\n");
           break;
 
           case TRAJECTORYPRIMITIVES_MOVE :
@@ -457,7 +475,7 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                unsigned int numberOfArguments = InputParser_GetNumberOfArguments(ipc);
 
 
-               fprintf(stderr,"TODO : TRAJECTORYPRIMITIVES_MOVE should ultimately just supply a 4x4 matrix to the levels below or offer an orientation order..");
+               //fprintf(stderr,"TODO : TRAJECTORYPRIMITIVES_MOVE should ultimately just supply a 4x4 matrix to the levels below or offer an orientation order..");
 
                if (numberOfArguments==9)
                {

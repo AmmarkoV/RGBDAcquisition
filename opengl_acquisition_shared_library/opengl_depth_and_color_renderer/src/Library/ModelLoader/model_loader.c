@@ -243,7 +243,13 @@ return 0;
 
 
 
-unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoadModel , const char * directory,const char * modelname , const char * extension )
+unsigned int loadModel(
+                        struct ModelList* modelStorage ,
+                        unsigned int whereToLoadModel ,
+                        const char * directory,
+                        const char * modelname ,
+                        const char * extension
+                      )
 {
   fprintf(stderr,"loadModel ..  \n");
   if ( (directory==0) || (modelname==0) )
@@ -266,6 +272,11 @@ unsigned int loadModel(struct ModelList* modelStorage , unsigned int whereToLoad
   if ( mod == 0 )  { fprintf(stderr,"Could not allocate enough space for model %s \n",modelname);  return 0; }
   memset(mod , 0 , sizeof(struct Model));
 
+
+  //By default any new model will have the old RPY rotation order
+  //This can be changed later however..
+  //This only has to do with the base rotation, each joint can have a different rotation order..
+  mod->rotationOrder = ROTATION_ORDER_RPY;
 
   snprintf(mod->pathOfModel,MAX_MODEL_PATHS,"%s",fullPathToFile);
 
@@ -475,11 +486,20 @@ int drawOBJModel(struct VirtualStream * scene ,struct Model * mod)
 
 
 
-int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)
+int drawModelAt(
+                 struct Model * mod,
+                 float positionX,
+                 float positionY,
+                 float positionZ,
+                 float rotationX,//heading,
+                 float rotationY,//pitch,
+                 float rotationZ,//roll,
+                 unsigned int rotationOrder
+                )
 {
  if (mod==0)
   {
-    fprintf(stderr,"Cannot draw model at position %0.2f %0.2f %0.2f , it doesnt exist \n",x,y,z);
+    fprintf(stderr,"Cannot draw model at position %0.2f %0.2f %0.2f , it doesnt exist \n",positionX,positionY,positionZ);
     return 0;
   }
 
@@ -503,18 +523,19 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
   if (mod->nocull) { glDisable(GL_CULL_FACE); }
 
 
-
+   //fprintf(stderr,"drawModelAt: %s -> %u \n", mod->pathOfModel , rotationOrder);
    double modelTransformation[16];
    create4x4ModelTransformation(
                                   modelTransformation,
                                   //Rotation Component
-                                  (double) roll,
-                                  (double) pitch,
-                                  (double) heading,
+                                  (double) rotationX,//heading,
+                                  (double) rotationY,//pitch,
+                                  (double) rotationZ,//roll,
+                                           rotationOrder,
                                   //Translation Component
-                                  (double) x,
-                                  (double) y,
-                                  (double) z ,
+                                  (double) positionX,
+                                  (double) positionY,
+                                  (double) positionZ ,
                                   //Scale Component
                                   (double) mod->scaleX,
                                   (double) mod->scaleY,
@@ -607,7 +628,16 @@ int drawModelAt(struct Model * mod,float x,float y,float z,float heading,float p
 int drawModel(struct Model * mod)
 {
     if (mod == 0) { fprintf(stderr,"Cannot draw model , it doesnt exist \n"); return 0; } //If mod = 0 accesing the fields below will lead in crashing..
-    return drawModelAt(mod,mod->x,mod->y,mod->z,mod->heading,mod->pitch,mod->roll);
+    return drawModelAt(
+                        mod,
+                        mod->x,
+                        mod->y,
+                        mod->z,
+                        mod->heading,
+                        mod->pitch,
+                        mod->roll,
+                        mod->rotationOrder
+                       );
 }
 
 int addToModelCoordinates(struct Model * mod,float x,float y,float z,float heading,float pitch,float roll)

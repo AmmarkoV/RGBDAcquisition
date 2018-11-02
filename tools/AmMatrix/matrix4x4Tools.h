@@ -163,12 +163,13 @@ void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double
 enum ROTATION_ORDER
 {
   ROTATION_ORDER_NONE=0,
-  ROTATION_ORDER_XYZ,
-  ROTATION_ORDER_XZY,
-  ROTATION_ORDER_YXZ,
-  ROTATION_ORDER_YZX,
-  ROTATION_ORDER_ZXY,
-  ROTATION_ORDER_ZYX,
+  ROTATION_ORDER_XYZ,//1
+  ROTATION_ORDER_XZY,//2
+  ROTATION_ORDER_YXZ,//3
+  ROTATION_ORDER_YZX,//4
+  ROTATION_ORDER_ZXY,//5
+  ROTATION_ORDER_ZYX,//6
+  ROTATION_ORDER_RPY,//7
   //--------------------
   ROTATION_ORDER_NAMES
 };
@@ -336,9 +337,10 @@ int normalize3DPointVector(double * vec);
 void create4x4ModelTransformation(
                                   double * m ,
                                   //Rotation Component
-                                  double rollInDegrees,
-                                  double pitchInDegrees,
-                                  double yawInDegrees,
+                                  double rotationX,//heading
+                                  double rotationY,//pitch
+                                  double rotationZ,//roll
+                                  unsigned int rotationOrder,
                                   //Translation Component
                                   double x, double y, double z ,
                                   double scaleX, double scaleY, double scaleZ

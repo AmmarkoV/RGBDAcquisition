@@ -359,6 +359,7 @@ int addStateToObjectID(
   // 1 is object name
   stream->object[ObjID].frame[pos].time = timeMilliseconds;
   stream->object[ObjID].frame[pos].isQuaternion = 0;
+  stream->object[ObjID].frame[pos].isEulerRotation = 0;
 
   stream->object[ObjID].frame[pos].scaleX = scaleX;
   stream->object[ObjID].frame[pos].scaleY = scaleY;
@@ -375,11 +376,14 @@ int addStateToObjectID(
   if (coordLength > 1 ) {  stream->object[ObjID].frame[pos].y = coord[1]; }
   if (coordLength > 2 ) {  stream->object[ObjID].frame[pos].z = coord[2]; }
 
-  if (coordLength > 3 ) {stream->object[ObjID].frame[pos].rot1 = coord[3]; }
-  if (coordLength > 4 ) {stream->object[ObjID].frame[pos].rot2 = coord[4]; }
-  if (coordLength > 5 ) {stream->object[ObjID].frame[pos].rot3 = coord[5]; }
-  if (coordLength > 6 ) {stream->object[ObjID].frame[pos].rot4 = coord[6]; }
-  if (coordLength==7)   { stream->object[ObjID].frame[pos].isQuaternion = 1; }
+  if (coordLength > 3 ) {  stream->object[ObjID].frame[pos].rot1 = coord[3];     }
+  if (coordLength > 4 ) {  stream->object[ObjID].frame[pos].rot2 = coord[4];     }
+  if (coordLength > 5 ) {  stream->object[ObjID].frame[pos].rot3 = coord[5];     }
+  if (coordLength > 6 ) {  stream->object[ObjID].frame[pos].rot4 = coord[6];     }
+
+  if (coordLength==6)   {  stream->object[ObjID].frame[pos].isEulerRotation = 1; } else
+  if (coordLength==7)   {  stream->object[ObjID].frame[pos].isQuaternion = 1;    } else
+                        {  fprintf(stderr,"addStateToObjectID: ObjID=%u frame[%u] incorrect rotation component..\n",ObjID,pos); }
 
   if (stream->object[ObjID].MAX_timeOfFrames <= stream->object[ObjID].frame[pos].time)
     {
@@ -453,13 +457,78 @@ int addStateToObjectMini(
 }
 
 
-int changeModelRotationOrder(
-                             struct VirtualStream * stream ,
-                              struct ModelList * modelStorage,
-                              char * name  ,
-                              char * jointName,
-                              char * modelOrder
-                            )
+
+
+int getRotationOrderFromString(const char * rotationOrderStr)
+{
+ unsigned int rotationOrder=0;
+
+ if (strcmp(rotationOrderStr,"xyz")==0) { rotationOrder=ROTATION_ORDER_XYZ; } else
+ if (strcmp(rotationOrderStr,"xzy")==0) { rotationOrder=ROTATION_ORDER_XZY; } else
+ if (strcmp(rotationOrderStr,"yxz")==0) { rotationOrder=ROTATION_ORDER_YXZ; } else
+ if (strcmp(rotationOrderStr,"yzx")==0) { rotationOrder=ROTATION_ORDER_YZX; } else
+ if (strcmp(rotationOrderStr,"zxy")==0) { rotationOrder=ROTATION_ORDER_ZXY; } else
+ if (strcmp(rotationOrderStr,"zyx")==0) { rotationOrder=ROTATION_ORDER_ZYX; } else
+ if (strcmp(rotationOrderStr,"rpy")==0) { rotationOrder=ROTATION_ORDER_RPY; }
+
+ return rotationOrder;
+}
+
+
+int changeObjectRotationOrder(
+                                  struct VirtualStream * stream ,
+                                  struct ModelList * modelStorage,
+                                  char * name  ,
+                                  char * rotationOrderStr
+                                )
+{
+ unsigned int boneIDResult;
+ unsigned int objFound = 0;
+ unsigned int objTypeFound = 0;
+ unsigned int objID = getObjectID(stream,name,&objFound);
+
+
+ if(modelStorage!=0)
+ {
+ if (objFound)
+ {
+  unsigned int objTypeID = getObjectTypeID(stream,stream->object[objID].typeStr,&objTypeFound );
+  if (objTypeFound)
+  {
+    unsigned int modelID = stream->objectTypes[objTypeID].modelListArrayNumber;
+    struct Model *mod = &modelStorage->models[modelID];
+    mod->rotationOrder=getRotationOrderFromString(rotationOrderStr);
+    fprintf(stderr,"Setting rotation order %u for model %s \n",mod->rotationOrder,mod->pathOfModel);
+    return 1;
+  } else  { fprintf(stderr,"changeModelRotationOrder: Could not find object type..\n"); }
+ } else { fprintf(stderr,"changeModelRotationOrder: Could not find object..\n"); }
+ } else { fprintf(stderr,"changeModelRotationOrder: No model storage allocated\n"); }
+
+
+ return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int changeModelJointRotationOrder(
+                                  struct VirtualStream * stream ,
+                                  struct ModelList * modelStorage,
+                                  char * name  ,
+                                  char * jointName,
+                                  char * modelOrder
+                                )
 {
  unsigned int boneIDResult;
  unsigned int objFound = 0;
@@ -482,14 +551,7 @@ int changeModelRotationOrder(
 
     if ( findTRIBoneWithName(triM,jointName,&boneIDResult) )
     {
-     unsigned int rotationOrder=0;
-
-     if (strcmp(modelOrder,"xyz")==0) { rotationOrder=ROTATION_ORDER_XYZ; } else
-     if (strcmp(modelOrder,"xzy")==0) { rotationOrder=ROTATION_ORDER_XZY; } else
-     if (strcmp(modelOrder,"yxz")==0) { rotationOrder=ROTATION_ORDER_YXZ; } else
-     if (strcmp(modelOrder,"yzx")==0) { rotationOrder=ROTATION_ORDER_YZX; } else
-     if (strcmp(modelOrder,"zxy")==0) { rotationOrder=ROTATION_ORDER_ZXY; } else
-     if (strcmp(modelOrder,"zyx")==0) { rotationOrder=ROTATION_ORDER_ZYX; }
+     unsigned int rotationOrder=getRotationOrderFromString(modelOrder);
 
      if (
          setTRIJointRotationOrder(
@@ -1087,7 +1149,6 @@ int addObjectTypeToVirtualStream(
 
      if (downloadModel(model,webLink))
       {
-
        #if USE_HASHMAPS
          hashMap_AddULong(stream->objectTypesHash,type,pos);
        #endif // USE_HASHMAPS
@@ -1096,13 +1157,17 @@ int addObjectTypeToVirtualStream(
        strcpy(stream->objectTypes[pos].model,model);
 
        fprintf(stderr,"addedObjectType(%s,%s) with ID %u , now to load model \n",type,model,pos);
-       if (loadObjectTypeModelForVirtualStream(
-                                              stream ,
-                                              model ,
-                                              pos
-                                             ) )
-       { ++stream->numberOfObjectTypes;
-         return 1; }
+       if (
+           loadObjectTypeModelForVirtualStream(
+                                               stream ,
+                                               model ,
+                                               pos
+                                             )
+          )
+          {
+            ++stream->numberOfObjectTypes;
+            return 1;
+          }
       } else
       { fprintf(stderr,"Could not find model\n"); }
 

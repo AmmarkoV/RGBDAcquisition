@@ -652,7 +652,8 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
 
             mod->modelInternalData = (void*) &triModelOut;
             // - - - -
-            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
+            //                       pX     pY     pZ      rX     rY    rZ
+            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],mod->rotationOrder) )
               { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
             // - - - -
 
@@ -662,7 +663,8 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
            } else
            {
             //Regular <fast> drawing of model
-            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]) )
+            //                       pX     pY     pZ      rX     rY    rZ
+            if (! drawModelAt(mod,pos[0],pos[1],pos[2],pos[3],pos[4],pos[5],mod->rotationOrder) )
                { fprintf(stderr,RED "Could not draw object %u , type %u \n" NORMAL ,i , objectType_WhichModelToDraw  ); }
            }
 
