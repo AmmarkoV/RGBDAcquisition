@@ -348,14 +348,11 @@ int addStateToObjectID(
                        )
 {
   //Todo check timeMilliseconds is our new state actually a replacement for an old one ?
-
-
   if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { growVirtualStreamFrames(&stream->object[ObjID],FRAMES_TO_ADD_STEP); }
   //Now we should definately have enough space for our new frame
   if (stream->object[ObjID].MAX_numberOfFrames<=stream->object[ObjID].numberOfFrames+1) { fprintf(stderr,"Cannot add new POS instruction to Object %u \n",ObjID); return 0; }
 
   //We have the space so lets fill our new frame spot ..!
-
   unsigned int pos = stream->object[ObjID].numberOfFrames;
   ++stream->object[ObjID].numberOfFrames;
 
@@ -400,7 +397,7 @@ int addStateToObjectID(
    stream->object[ObjID].frame[pos].rot1 , stream->object[ObjID].frame[pos].rot2 , stream->object[ObjID].frame[pos].rot3 , stream->object[ObjID].frame[pos].rot4 );
   #endif
 
-  return 1;
+ return 1;
 }
 
 
