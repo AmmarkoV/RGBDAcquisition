@@ -338,13 +338,13 @@ struct JointState * allocateEnoughJointSpaceForStateOfObjectID(
 
 
 int addStateToObjectID(
-                               struct VirtualStream * stream ,
-                               unsigned int ObjID  ,
-                               unsigned int timeMilliseconds ,
-                               float * coord ,
-                               unsigned int coordLength ,
-                               float scaleX , float scaleY ,float scaleZ ,
-                               float R , float G , float B , float Alpha
+                        struct VirtualStream * stream ,
+                        unsigned int ObjID  ,
+                        unsigned int timeMilliseconds ,
+                        float * coord ,
+                        unsigned int coordLength ,
+                        float scaleX , float scaleY ,float scaleZ ,
+                        float R , float G , float B , float Alpha
                        )
 {
   //Todo check timeMilliseconds is our new state actually a replacement for an old one ?
@@ -382,7 +382,7 @@ int addStateToObjectID(
   if (coordLength > 4 ) {stream->object[ObjID].frame[pos].rot2 = coord[4]; }
   if (coordLength > 5 ) {stream->object[ObjID].frame[pos].rot3 = coord[5]; }
   if (coordLength > 6 ) {stream->object[ObjID].frame[pos].rot4 = coord[6]; }
-  if (coordLength==7) { stream->object[ObjID].frame[pos].isQuaternion = 1; }
+  if (coordLength==7)   { stream->object[ObjID].frame[pos].isQuaternion = 1; }
 
   if (stream->object[ObjID].MAX_timeOfFrames <= stream->object[ObjID].frame[pos].time)
     {
@@ -439,16 +439,19 @@ int addStateToObjectMini(
  //fprintf(stderr,"addStateToObjectMini(%s,id=%u,found=%u)\n",name,ObjID,ObjFound);
  if (ObjFound)
   {
-     return addStateToObjectID(stream,ObjID,timeMilliseconds,coord,coordLength,
-                                    stream->object[ObjID].scaleX,
-                                    stream->object[ObjID].scaleY,
-                                    stream->object[ObjID].scaleZ,
-                                    stream->object[ObjID].R,
-                                    stream->object[ObjID].G,
-                                    stream->object[ObjID].B,
-                                    stream->object[ObjID].Transparency );
+     return addStateToObjectID(
+                               stream,ObjID,timeMilliseconds,
+                               coord,coordLength,
+                               stream->object[ObjID].scaleX,
+                               stream->object[ObjID].scaleY,
+                               stream->object[ObjID].scaleZ,
+                               stream->object[ObjID].R,
+                               stream->object[ObjID].G,
+                               stream->object[ObjID].B,
+                               stream->object[ObjID].Transparency
+                              );
   }
-  fprintf(stderr,"Could not Find object %s \n",name);
+  fprintf(stderr,"addStateToObjectMini: Could not Find object `%s`\n",name);
   return 0;
 }
 

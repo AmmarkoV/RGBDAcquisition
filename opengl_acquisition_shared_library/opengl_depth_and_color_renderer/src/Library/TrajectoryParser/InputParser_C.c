@@ -24,7 +24,7 @@
 int warningsAboutIncorrectlyAllocatedStackIssued = 0;
 
 
-char _ipc_ver[]=" 0.360\0";  //26/4/2017
+char _ipc_ver[]=" 0.361\0";  //2/10/2018
 
 
 /*
@@ -404,6 +404,12 @@ unsigned char CheckWordNumOk(struct InputParserC * ipc,unsigned int num)
   return 1;
 }
 
+
+unsigned int InputParser_GetNumberOfArguments(struct InputParserC * ipc)
+{
+  if ( CheckIPCOk(ipc)==0) { return 0; }
+  return ipc->tokens_count;
+}
 
 /*
    InputParser_GetWord..

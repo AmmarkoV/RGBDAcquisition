@@ -165,9 +165,6 @@ int dumpBVHJointToTP(
   unsigned int jID=0;
   unsigned int jAssociationID=0;
 
-
-
-
   for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
   {
     if (
@@ -179,12 +176,6 @@ int dumpBVHJointToTP(
                                      jAssociationID,
                                      &jID
                                     )
-/*
-         bvh_getJointIDFromJointName(
-                                      mc,
-                                      bvhtri->jointAssociation[jAssociationID].bvhJointName,
-                                      &jID
-                                     )*/
         )
        )
     {
@@ -384,18 +375,22 @@ int dumpBVHToTrajectoryParserTRI(
     fprintf(fp,"\n\n");
     //-----------------------------------------------------------------------------------------
 
+    float posX,posY,posZ,rotX,rotY,rotZ;
     BVHJointID rootJID=0;
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
       fprintf(fp,"MOVE(floor,%u,-19.231,1784.976,2699.735,0.0,0.0,0.0,0.0)\n",fID);
 
 
+      unsigned int producedDynamicRotationForRootJoint = 0;
+
       if ( ( bvh_getRootJointID(mc,&rootJID) )  && (usePosition) )
       {
         fprintf(fp,"#Root joint euler angle order %s\n",rotationOrderNames[(unsigned int)mc->jointHierarchy[rootJID].channelRotationOrder]);
 
         if (
-            !get_jAssociationID_From_jID(
+            //We need to find the correct jAssociationID for the rootJID
+            get_jAssociationID_From_jID(
                                          mc,
                                          bvhtri,
                                          rootJID,
@@ -403,15 +398,9 @@ int dumpBVHToTrajectoryParserTRI(
                                         )
            )
         {
-         fprintf( fp,"Error : get_jAssociationID_From_jID could not get root association..\n" );
-         return 0;
-        }
-
-
-
-        float posX,posY,posZ,rotX,rotY,rotZ;
-        if (
-            !getAssociatedPositionRotationsForJointID(
+         if (
+            //We have the correct jAssociationID and rootJID, so we retrieve positions and rotations for frame with id fID
+             getAssociatedPositionRotationsForJointID(
                                                       mc,
                                                       bvhtri,
                                                       rootJID,
@@ -420,22 +409,27 @@ int dumpBVHToTrajectoryParserTRI(
                                                       &posX, &posY, &posZ,
                                                       &rotX, &rotY, &rotZ
                                                       )
-           ) { fprintf(stderr,"getAssociatedRotationsForJointID error for RootJID=%u and Frame=%u\n",rootJID,fID); }
+           )
+           {
+            //Great, we have everything so we write it down to our output..
+            fprintf(
+                    fp,"MOVE(human,%u,%0.2f,%0.2f,%0.2f,%0.5f,%0.5f,%0.5f)\n",
+                    fID,
+                    10*posX, 10*posY, 10*posZ+3600,
+                    rotX ,rotY, rotZ
+                    );
+             producedDynamicRotationForRootJoint=1;
+           } else { fprintf(stderr,"getAssociatedRotationsForJointID error for RootJID=%u and Frame=%u\n",rootJID,fID); }
+        }  else { fprintf( stderr,"Error : get_jAssociationID_From_jID could not get root association..\n" ); }
+      }
 
-
-        fprintf(fp,"MOVE(human,%u,%0.2f,%0.2f,%0.2f,%0.5f,%0.5f,%0.5f)\n",
-                fID,
-                10*posX,
-                10*posY,
-                10*posZ+3600,
-                rotX,
-                rotY,
-                rotZ
-               );
-      } else
+      //If we did not produce a root dynamic root joint for any reason we will just emmit a static one..
+      if (!producedDynamicRotationForRootJoint)
       {
         fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.0,0.0)\n",fID);
       }
+
+
 
       dumpBVHJointToTP(fp, mc, bvhtri, fID);
       fprintf(fp,"\n\n");

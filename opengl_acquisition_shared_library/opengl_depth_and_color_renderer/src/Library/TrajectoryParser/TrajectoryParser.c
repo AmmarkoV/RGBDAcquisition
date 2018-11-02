@@ -454,11 +454,29 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
                if (newstream->rotationsOverride)
                      { flipRotationAxis(&pos[3],&pos[4],&pos[5], newstream->rotationsXYZ[0] , newstream->rotationsXYZ[1] , newstream->rotationsXYZ[2]); }
 */
+               unsigned int numberOfArguments = InputParser_GetNumberOfArguments(ipc);
 
-               coordLength=6;
-               quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
-               convertQuaternionsToEulerAngles(newstream,euler,quaternions);
-               pos[3]=euler[0]; pos[4]=euler[1];  pos[5]=euler[2]; pos[6]=0.0;
+
+               fprintf(stderr,"TODO : TRAJECTORYPRIMITIVES_MOVE should ultimately just supply a 4x4 matrix to the levels below or offer an orientation order..");
+
+               if (numberOfArguments==9)
+               {
+                 //We have received an euler angle rotation..
+                 if (newstream->debug) { fprintf(stderr,"Rotation for object `%s` @ time %u is euler angles\n",name,time);}
+                 coordLength=6;
+               } else
+               if (numberOfArguments==10)
+               {
+                 //We have received a quaternion rotation..
+                 if (newstream->debug) { fprintf(stderr,"Rotation for object `%s` @ time %u is quaternion but converted to euler angles\n",name,time);}
+                 coordLength=6;
+                 quaternions[0]=pos[3]; quaternions[1]=pos[4]; quaternions[2]=pos[5]; quaternions[3]=pos[6];
+                 convertQuaternionsToEulerAngles(newstream,euler,quaternions);
+                 pos[3]=euler[0]; pos[4]=euler[1];  pos[5]=euler[2]; pos[6]=0.0;
+               } else
+               {
+                fprintf(stderr,"Movement command for object `%s` has %u arguments and don't know its rotation order\n",name,InputParser_GetNumberOfArguments(ipc));
+               }
 
                 //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
                 addStateToObjectMini( newstream , name  , time , (float*) pos , coordLength );

@@ -39,7 +39,7 @@ JOINT_ASSOCIATION(lmid1,JtMiddleALf)
 JOINT_ASSOCIATION(lring1,JtRingALf)
 JOINT_ASSOCIATION(lpinky1,JtLittleALf)
  
-#JOINT_OFFSET(hip,-90,0,0)
+#JOINT_OFFSET(hip,0,0,0)
 #JOINT_ROTATION_ORDER(hip,z,y,x)
 
 #Shoulder
