@@ -351,6 +351,7 @@ int dumpBVHToTrajectoryParserTRI(
 
     fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/Ammar.tri,http://ammar.gr/models/Ammar.tri)\n");
     fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,10.0,10.0,10.0)\n\n");
+    fprintf(fp,"MOVE_ROTATION_ORDER(human,ZYX) TODO\n");
 
     //-----------------------------------------------------------------------------------------
     unsigned int jAssociationID=0;
