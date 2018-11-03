@@ -50,6 +50,8 @@ int main(int argc, char **argv)
     unsigned int onlyFirstFrame=0;
     unsigned int usePosition=0;
 
+    float scaleWorld=1.0;
+
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
@@ -68,6 +70,11 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--usePosition")==0)
         {
           usePosition=1;
+        } else
+        if (strcmp(argv[i],"--scale")==0)
+        {
+          scaleWorld=atof(argv[i+1]);
+          //TODO: Use this..
         }
     }
 
