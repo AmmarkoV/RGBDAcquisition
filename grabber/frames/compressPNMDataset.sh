@@ -3,6 +3,24 @@
 
 CURDIR=`pwd`
 
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPTDIR"
+
+cd ../../../tools/DepthImagesConverter/
+cd ../../tools/DepthImagesConverter/
+DEPTHTOOLDIR=`pwd`
+
+if [ -e $DEPTHTOOLDIR/DepthImagesConverter ]
+then
+ echo "Found Depth Image Converter.. Good to go.!"
+else
+ echo "Could not find depth image converter please compile RGBDAcquisition..!" 
+ exit 0
+fi
+
+cd $CURDIR
+
 echo "$@"
 for inputDataset in $@
 do
@@ -10,7 +28,7 @@ do
 echo "Doing $inputDataset" 
 cd $CURDIR
 
-MAXRUNJOBS=11
+MAXRUNJOBS=12
 
 INITIALSIZE=`du -hs $inputDataset | cut -f1`
 
@@ -40,12 +58,11 @@ then
 echo "Looks $inputDataset is an uncompressed dataset ($COLORFILENUM pnm color files , $DEPTHFILENUM pnm depth files ) will try to compress it now "
 
 
-mkdir ../$CONVNAME
+mkdir $SCRIPTDIR/$CONVNAME
 
-cp color.calib ../$CONVNAME/color.calib
-cp depth.calib ../$CONVNAME/depth.calib
-cp ./*.sh ../$CONVNAME/
-cp ./*.mp4 ../$CONVNAME/
+cp *.calib $SCRIPTDIR/$CONVNAME/
+cp ./*.sh $SCRIPTDIR/$CONVNAME/
+cp ./*.mp4 $SCRIPTDIR/$CONVNAME/
 
 echo "Converting Color Files"
 
@@ -63,7 +80,7 @@ do
   done 
 
  TARGETNAME=`basename $f .pnm`
- convert $f ../$CONVNAME/$TARGETNAME.jpg&
+ convert $f $SCRIPTDIR/$CONVNAME/$TARGETNAME.jpg&
  echo -n "."
 done
 
@@ -84,7 +101,7 @@ do
 
 
  TARGETNAME=`basename $f .pnm`
- ../../../tools/DepthImagesConverter/DepthImagesConverter "$f" "../$CONVNAME/$TARGETNAME.png"&
+ $DEPTHTOOLDIR/DepthImagesConverter "$f" "$SCRIPTDIR/$CONVNAME/$TARGETNAME.png"&
 done
 
 cd ..
@@ -92,7 +109,7 @@ cd ..
 sleep 1
 clear
 
-FINALSIZE=`du -hs $CONVNAME| cut -f1`
+FINALSIZE=`du -hs $SCRIPTDIR/$CONVNAME| cut -f1`
   echo
   echo   
 echo "Compressed $inputDataset from $INITIALSIZE to $FINALSIZE"
@@ -103,16 +120,16 @@ echo "Overwrite old dataset ?"
   echo   
   echo ""
   echo
-  echo -n "            (Y/N)?"
+  echo -n "            (Y/N)? : "
   read answer
   if test "$answer" != "Y" -a "$answer" != "y";
   then 
-   echo "Naming the compressed dataset $inputDataset-Compressed.." 
-   mv $CONVNAME "$inputDataset-Compressed" 
+   echo "Naming the compressed dataset $CURDIR/$inputDataset-Compressed.." 
+   mv $SCRIPTDIR/$CONVNAME "$CURDIR/$inputDataset-Compressed" 
 else
    echo "Overwriting.." 
-   rm -rf $inputDataset
-   mv $CONVNAME $inputDataset 
+   rm -rf $CURDIR/$inputDataset
+   mv $SCRIPTDIR/$CONVNAME $CURDIR/$inputDataset 
 fi
 
 fi
