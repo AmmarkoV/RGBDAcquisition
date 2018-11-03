@@ -112,6 +112,8 @@ struct BVH_MotionToJoint_LookupTable
 */
 struct BVH_MotionCapture
 {
+  float scaleWorld;
+
   //Header
   unsigned int numberOfFrames;
   unsigned int numberOfFramesEncountered;
@@ -156,7 +158,7 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion);
 * @param  C-String with path to BVH File
 * @param  pointer to an allocated BVH_MotionCapture struct
 */
-int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion);
+int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, float scaleWorld);
 
 
 

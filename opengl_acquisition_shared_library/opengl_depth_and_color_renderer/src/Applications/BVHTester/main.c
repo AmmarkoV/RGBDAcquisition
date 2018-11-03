@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     struct BVH_MotionCapture bvhMotion={0};
 
-    bvh_loadBVH(fromBVHFile, &bvhMotion);
+    bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
 
     //Change joint names..
     bvh_renameJoints(&bvhMotion);

@@ -885,8 +885,9 @@ int bvh_InternalCheck(struct BVH_MotionCapture * bvhMotion)
 }*/
 
 
-int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion)
+int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, float scaleWorld)
 {
+ bvhMotion->scaleWorld=scaleWorld;
   int successfullRead=0;
   FILE *fd=0;
   fd = fopen(filename,"r");
