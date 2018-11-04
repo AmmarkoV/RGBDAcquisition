@@ -297,19 +297,19 @@ int bvh_loadTransformForFrame(
                           );
 
   #if FIND_FAST_CENTER
-   bvhTransform->joint[jID].pos[0]= bvhTransform->joint[jID].localToWorldTransformation[3];
-   bvhTransform->joint[jID].pos[1]= bvhTransform->joint[jID].localToWorldTransformation[7];
-   bvhTransform->joint[jID].pos[2]= bvhTransform->joint[jID].localToWorldTransformation[11];
-   bvhTransform->joint[jID].pos[3]= bvhTransform->joint[jID].localToWorldTransformation[15];
-   normalize3DPointVector(bvhTransform->joint[jID].pos);
+   bvhTransform->joint[jID].pos3D[0]= bvhTransform->joint[jID].localToWorldTransformation[3];
+   bvhTransform->joint[jID].pos3D[1]= bvhTransform->joint[jID].localToWorldTransformation[7];
+   bvhTransform->joint[jID].pos3D[2]= bvhTransform->joint[jID].localToWorldTransformation[11];
+   bvhTransform->joint[jID].pos3D[3]= bvhTransform->joint[jID].localToWorldTransformation[15];
+   normalize3DPointVector(bvhTransform->joint[jID].pos3D);
   #else
    double centerPoint[4]={0.0,0.0,0.0,1.0};
    transform3DPointVectorUsing4x4Matrix(
-                                        bvhTransform->joint[jID].pos,
+                                        bvhTransform->joint[jID].pos3D,
                                         bvhTransform->joint[jID].localToWorldTransformation,
                                         centerPoint
                                        );
-   normalize3DPointVector(bvhTransform->joint[jID].pos);
+   normalize3DPointVector(bvhTransform->joint[jID].pos3D);
   #endif // FIND_FAST_CENTER
   }
 

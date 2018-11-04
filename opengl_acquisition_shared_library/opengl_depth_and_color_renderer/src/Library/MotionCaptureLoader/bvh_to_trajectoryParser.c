@@ -293,9 +293,9 @@ void dumpSphereBody(
      {
       fprintf(
               fp,"POS(s%u,%u,%0.4f,%0.4f,%0.4f,0,0,0,0)\n",jID,fID,
-              bvhTransform->joint[jID].pos[0],
-              bvhTransform->joint[jID].pos[1],
-              bvhTransform->joint[jID].pos[2]
+              bvhTransform->joint[jID].pos3D[0],
+              bvhTransform->joint[jID].pos3D[1],
+              bvhTransform->joint[jID].pos3D[2]
              );
      }
      fprintf(fp,"\n");

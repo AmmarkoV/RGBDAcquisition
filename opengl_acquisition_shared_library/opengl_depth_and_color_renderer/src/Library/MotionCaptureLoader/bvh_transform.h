@@ -19,7 +19,9 @@ struct BVH_TransformedJoint
 
   //Position as X,Y,Z
   //-----------------
-  double pos[4];
+  double pos3D[4];
+
+
 };
 
 
