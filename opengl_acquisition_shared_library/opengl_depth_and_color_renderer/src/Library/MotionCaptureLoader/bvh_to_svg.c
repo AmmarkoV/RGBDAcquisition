@@ -44,15 +44,13 @@ int dumpBVHToSVGFile(
           fprintf(stderr,"bvh_loadTransformForFrame location for joint %u not normalized..\n",jID);
         }
 
-           float position3DX = bvhTransform->joint[jID].pos3D[0];
-           float position3DY = bvhTransform->joint[jID].pos3D[1];
-           float position3DZ = bvhTransform->joint[jID].pos3D[2];
-
+           float pos3DFloat[3];
+           pos3DFloat[0]=(float)bvhTransform->joint[jID].pos3D[0];
+           pos3DFloat[1]=(float)bvhTransform->joint[jID].pos3D[1];
+           pos3DFloat[2]=(float)bvhTransform->joint[jID].pos3D[2];
            simpleRendererRender(
                                  renderer ,
-                                 position3DX,
-                                 position3DY,
-                                 position3DZ,
+                                 pos3DFloat,
                                  &position2DX,
                                  &position2DY
                                 );

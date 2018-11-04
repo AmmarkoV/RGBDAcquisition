@@ -396,7 +396,11 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
       float modelview[16];
       float projection[16];
 
-      float posX = x3D , posY = y3D , posZ = z3D;
+      float pos3DF[3];
+      pos3DF[0]=x3D;
+      pos3DF[1]=y3D;
+      pos3DF[2]=z3D;
+
       float win[3]={0};
 
       glGetFloatv( GL_MODELVIEW_MATRIX, modelview );
@@ -404,7 +408,7 @@ int print3DPoint2DWindowPosition(int objID , float x3D , float y3D , float z3D)
       glGetIntegerv( GL_VIEWPORT, viewport );
 
       #warning "All the functions that use gluProject / unproject should be moved in a seperate compartment"
-      _glhProjectf( posX, posY, posZ , modelview, projection, viewport, win );
+      _glhProjectf( pos3DF , modelview, projection, viewport, win );
 
       if  (
             (win[0] < 0) || (win[0] >= WIDTH) ||

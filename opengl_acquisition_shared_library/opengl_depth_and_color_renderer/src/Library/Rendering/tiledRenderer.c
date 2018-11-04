@@ -44,9 +44,12 @@ int tiledRenderer_get2DCenter(void * trConf ,
 
       float x3D , y3D , z3D , angleX , angleY , angleZ;
       tiledRenderer_get3DCenterForTile(trConf , column, row ,&x3D , &y3D , &z3D , &angleX , &angleY , &angleZ);
-      float posX = x3D , posY = y3D , posZ = z3D;
+      float pos3DF[3];
+      pos3DF[0]=x3D;
+      pos3DF[1]=y3D;
+      pos3DF[2]=z3D;
 
-      _glhProjectf( posX, posY, posZ , modelview, projection, viewport, win);
+      _glhProjectf(pos3DF, modelview, projection, viewport, win);
 
       fprintf(stderr,"Column/Row %u/%u ( %0.2f,%0.2f,%0.2f ) -> %0.2f %0.2f %0.2f\n",column,row , x3D , y3D , z3D , win[0] , win[1] , win[2]);
 

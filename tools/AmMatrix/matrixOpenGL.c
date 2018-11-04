@@ -695,8 +695,11 @@ void lookAt(
 
 
 
-int _glhProjectf(float objx, float objy, float objz, float *modelview, float *projection, int *viewport, float *windowCoordinate)
+int _glhProjectf(float * position3D, float *modelview, float *projection, int *viewport, float *windowCoordinate)
   {
+      float objx=position3D[0];
+      float objy=position3D[1];
+      float objz=position3D[2];
       //Transformation vectors
       float fTempo[8];
       //Modelview transform

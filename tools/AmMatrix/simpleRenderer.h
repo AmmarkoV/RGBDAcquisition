@@ -20,17 +20,14 @@ struct simpleRenderer
   float projectionMatrix[16];
   float viewMatrix[16];
   float modelMatrix[16];
-  float viewportMatrix[16];
-
+  float modelViewMatrix[16];
   int   viewport[4];
 };
 
 
 int simpleRendererRender(
                          struct simpleRenderer * sr ,
-                         float position3DX,
-                         float position3DY,
-                         float position3DZ,
+                         float * position3D,
                          float * output2DX,
                          float * output2DY
                         );
