@@ -11,7 +11,6 @@ int dumpBVHToSVGFile(
                      struct BVH_Transform * bvhTransform,
                      unsigned int fID,
                      ///The rest are matrices to do projections..
-                     float cameraX,float cameraY,float cameraZ,
                      float * viewMatrix,
                      float * projectionMatrix,
                      int * viewport
@@ -29,7 +28,6 @@ int dumpBVHToSVGFile(
       fprintf(fp,"<svg width=\"%u\" height=\"%u\">\n",width,height);
       fprintf(fp,"<rect width=\"%u\" height=\"%u\" style=\"fill:rgb(255,255,255);stroke-width:3;stroke:rgb(255,255,255)\" />\n",width,height);
       fprintf(fp,"<text x=\"10\" y=\"40\">Frame %u</text>\n",fID);
-      fprintf(fp,"<text x=\"10\" y=\"60\">Camera Position(%0.2f,%0.2f,%0.2f)</text>\n",cameraX,cameraY,cameraZ);
 
 
       //First load the 3D positions of each joint..
@@ -48,42 +46,45 @@ int dumpBVHToSVGFile(
           fprintf(stderr,"bvh_loadTransformForFrame location for joint %u not normalized..\n",jID);
         }
 
-           float positionX = bvhTransform->joint[jID].pos3D[0];
-           float positionY = bvhTransform->joint[jID].pos3D[1];
-           float positionZ = bvhTransform->joint[jID].pos3D[2];
+           float position3DX = bvhTransform->joint[jID].pos3D[0];
+           float position3DY = bvhTransform->joint[jID].pos3D[1];
+           float position3DZ = bvhTransform->joint[jID].pos3D[2];
 
-            double modelTransformation[16];
+            double modelTransformationD[16];
             float  modelTransformationF[16];
             create4x4ModelTransformation(
-                                           modelTransformation,
+                                           modelTransformationD,
                                            //Rotation Component
                                            (double) 0.0,//heading,
                                            (double) 0.0,//pitch,
                                            (double) 0.0,//roll,
                                            ROTATION_ORDER_RPY,
                                            //Translation Component
-                                           (double) positionX,
-                                           (double) positionY,
-                                           (double) positionZ ,
+                                           (double) position3DX,
+                                           (double) position3DY,
+                                           (double) position3DZ,
                                            //Scale Component
                                            (double) 1.0,
                                            (double) 1.0,
                                            (double) 1.0
                                          );
-         copy4x4DMatrixToF(modelTransformationF,modelTransformation);
-         multiplyTwo4x4FMatrices(modelViewMatrix,modelTransformationF,viewMatrix);
+         copy4x4DMatrixToF(modelTransformationF,modelTransformationD);
+         multiplyTwo4x4FMatrices(modelViewMatrix,viewMatrix,modelTransformationF);
+
 
          _glhProjectf(
-                      bvhTransform->joint[jID].pos3D[0],
-                      bvhTransform->joint[jID].pos3D[1],
-                      bvhTransform->joint[jID].pos3D[2],
+                      position3DX,
+                      position3DX,
+                      position3DZ,
                       modelViewMatrix,
                       projectionMatrix,
                       viewport,
                       windowCoordinates
                      );
 
-        fprintf(fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"8.00\" stroke=\"rgb(135,135,0)\" stroke-width=\"3\" fill=\"rgb(255,255,0)\" />\n",windowCoordinates[0],windowCoordinates[1]);
+        fprintf(fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"8.00\" stroke=\"rgb(135,135,0)\" stroke-width=\"3\" fill=\"rgb(255,255,0)\" />\n",
+                  windowCoordinates[0],
+                  windowCoordinates[1]);
       }
 
 
@@ -114,7 +115,7 @@ int dumpBVHToSVG(
 
 
  float projectionMatrix[16];
- float modelViewMatrix[16];
+ float viewMatrix[16];
  int   viewport[4]={0};
  viewport[2]=width;
  viewport[3]=height;
@@ -152,25 +153,12 @@ int dumpBVHToSVG(
                    1000//zfar
                   );*/
 
-   float cameraX = 60;
-   float cameraY = -60;
-   float cameraZ = 4300;
+   double viewMatrixD[16];
+   create4x4ScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
+   copy4x4DMatrixToF(viewMatrix,viewMatrixD);
 
-   create4x4IdentityMatrixF(modelViewMatrix);
-   create4x4FTranslationMatrix(
-                               modelViewMatrix,
-                               cameraX,
-                               cameraY,
-                               cameraZ
-                               );
-   fprintf(stderr,"dumpBVHToSVG: Camera location (%0.2f,%0.2f,%0.2f)\n",cameraX,cameraY,cameraZ);
-
-
-
-
-     create4x4ScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
-
-     glGetViewportMatrix(viewportMatrixD, viewport[0],viewport[1],viewport[2],viewport[3],near,far);
+   double viewportMatrixD[16];
+   glGetViewportMatrix(viewportMatrixD, viewport[0],viewport[1],viewport[2],viewport[3],(double) near,(double) far);
 
 
 
@@ -184,8 +172,7 @@ int dumpBVHToSVG(
                                      mc,
                                      &bvhTransform,
                                      fID,
-                                     cameraX,cameraY,cameraZ,
-                                     modelViewMatrix,
+                                     viewMatrix,
                                      projectionMatrix,
                                      viewport
                                     );

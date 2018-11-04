@@ -44,10 +44,22 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.h" />
+		<Unit filename="../../../../../tools/AmMatrix/simpleRenderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../tools/AmMatrix/simpleRenderer.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_loader.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_to_svg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_to_svg.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.c">
 			<Option compilerVar="CC" />
 		</Unit>

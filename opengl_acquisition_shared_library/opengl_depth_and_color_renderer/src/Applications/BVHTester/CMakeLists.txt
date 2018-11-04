@@ -43,6 +43,7 @@ add_executable(
               ../../../../../tools/AmMatrix/matrix4x4Tools.c
               ../../../../../tools/AmMatrix/matrixOpenGL.c
               ../../../../../tools/AmMatrix/quaternions.c
+              ../../../../../tools/AmMatrix/simpleRenderer.c
               )
  
 target_link_libraries(BVHTester rt m  ) 

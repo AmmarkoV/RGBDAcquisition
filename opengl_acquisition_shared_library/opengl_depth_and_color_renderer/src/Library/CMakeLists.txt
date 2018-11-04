@@ -105,20 +105,15 @@ add_library(OGLRendererSandbox SHARED
             Scene/photoShootingScene.h
             Scene/photoShootingScene.c
             #AmMatrix dependencies 
-            ../../../../tools/AmMatrix/matrix3x3Tools.c
-            ../../../../tools/AmMatrix/matrix3x3Tools.h
-            ../../../../tools/AmMatrix/matrix4x4Tools.c
-            ../../../../tools/AmMatrix/matrix4x4Tools.h
-            ../../../../tools/AmMatrix/quaternions.c
-            ../../../../tools/AmMatrix/quaternions.h
+            ../../../../tools/AmMatrix/matrix3x3Tools.c 
+            ../../../../tools/AmMatrix/matrix4x4Tools.c 
+            ../../../../tools/AmMatrix/quaternions.c 
             #../../../../tools/AmMatrix/matrixProject.c
             #../../../../tools/AmMatrix/matrixProject.c
-            ../../../../tools/AmMatrix/matrixCalculations.c
-            ../../../../tools/AmMatrix/matrixCalculations.h
-            ../../../../tools/AmMatrix/matrixOpenGL.c
-            ../../../../tools/AmMatrix/matrixOpenGL.h
-            ../../../../tools/AmMatrix/solveLinearSystemGJ.c
-            ../../../../tools/AmMatrix/solveLinearSystemGJ.h
+            ../../../../tools/AmMatrix/matrixCalculations.c 
+            ../../../../tools/AmMatrix/matrixOpenGL.c 
+            ../../../../tools/AmMatrix/solveLinearSystemGJ.c 
+            ../../../../tools/AmMatrix/simpleRenderer.c 
             #ImageOperations dependencies
             ../../../../tools/ImageOperations/depthClassifier.c
             ../../../../tools/ImageOperations/convolutionFilter.c

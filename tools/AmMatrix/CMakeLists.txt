@@ -15,6 +15,7 @@ add_library(
             ocvStaging.h
             solveHomography.c
             solveLinearSystemGJ.c 
+            simpleRenderer.c
            )
 target_link_libraries(AmMatrix m rt )
 
