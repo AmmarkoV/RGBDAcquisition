@@ -95,5 +95,6 @@ int simpleRendererInitialize(struct simpleRenderer * sr)
    create4x4ScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
    copy4x4DMatrixToF(sr->viewMatrix,viewMatrixD);
 
+   //create4x4IdentityMatrixF(sr->viewMatrix);
  return 0;
 }
