@@ -41,6 +41,7 @@ add_executable(
               ../../Library/MotionCaptureLoader/bvh_to_svg.c
               ../../Library/TrajectoryParser/InputParser_C.c
               ../../../../../tools/AmMatrix/matrix4x4Tools.c
+              ../../../../../tools/AmMatrix/matrixOpenGL.c
               ../../../../../tools/AmMatrix/quaternions.c
               )
  

@@ -13,6 +13,7 @@
 #include "../../Library/MotionCaptureLoader/bvh_loader.h"
 #include "../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.h"
 #include "../../Library/MotionCaptureLoader/bvh_to_tri_pose.h"
+#include "../../Library/MotionCaptureLoader/bvh_to_svg.h"
 
 void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 {
@@ -46,6 +47,8 @@ int main(int argc, char **argv)
     const char * fromBVHFile="Motions/example.bvh";
     const char * toSceneFile="Scenes/bvh.conf";
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
+    const char * toSVGFile="tmp/";
+    unsigned int convertToSVG=0;
 
     unsigned int onlyFirstFrame=0;
     unsigned int usePosition=0;
@@ -62,6 +65,11 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--to")==0)
         {
           toSceneFile=argv[i+1];
+        } else
+        if (strcmp(argv[i],"--svg")==0)
+        {
+          toSVGFile=argv[i+1];
+          convertToSVG=1;
         } else
         if (strcmp(argv[i],"--onlyFirstFrame")==0)
         {
@@ -81,6 +89,17 @@ int main(int argc, char **argv)
     struct BVH_MotionCapture bvhMotion={0};
 
     bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
+
+    if (convertToSVG)
+    {
+     dumpBVHToSVG(
+                  toSVGFile,
+                  &bvhMotion,
+                  640,
+                  480
+                 );
+      return 0;
+    }
 
     //Change joint names..
     bvh_renameJoints(&bvhMotion);

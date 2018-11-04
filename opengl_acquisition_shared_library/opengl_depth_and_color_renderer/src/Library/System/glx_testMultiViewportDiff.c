@@ -24,9 +24,9 @@
 
 #include "glx3.h"
 
-#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
-#include "../../../../tools/AmMatrix/matrixOpenGL.h"
-#include "../../../../tools/AmMatrix/quaternions.h"
+#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../../tools/AmMatrix/matrixOpenGL.h"
+#include "../../../../../tools/AmMatrix/quaternions.h"
 
 #include "../Rendering/ShaderPipeline/computeShader.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
@@ -36,9 +36,9 @@
 #include "../Rendering/downloadFromRenderer.h"
 
 
-#include "../../../../acquisition/Acquisition.h"
-#include "../../../../tools/Calibration/calibration.h"
-#include "../../../../tools/Common/viewerSettings.h"
+#include "../../../../../acquisition/Acquisition.h"
+#include "../../../../../tools/Calibration/calibration.h"
+#include "../../../../../tools/Common/viewerSettings.h"
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -191,6 +191,7 @@ int drawObjectAT(GLuint programID,
                                     roll,//roll
                                     pitch ,//pitch
                                     yaw ,//yaw
+                                    ROTATION_ORDER_RPY,
 
                                     //Translation Component (XYZ)
                                     (double) x/100,
@@ -449,14 +450,14 @@ int doDrawing( unsigned int WIDTH, unsigned int HEIGHT ,
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
 	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
-	struct shaderObject * sho = loadShader("../../shaders/simpleDepth.vert", "../../shaders/simpleDepth.frag");
+	struct shaderObject * sho = loadShader("../../../shaders/simpleDepth.vert", "../../../shaders/simpleDepth.frag");
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
-	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebufferTextureDiff.vert", "../../shaders/virtualFramebufferTextureDiff.frag");
+	struct shaderObject * textureFramebuffer = loadShader("../../../shaders/virtualFramebufferTextureDiff.vert", "../../../shaders/virtualFramebufferTextureDiff.frag");
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
 
-	struct shaderObject * finalFramebuffer = loadShader("../../shaders/virtualFramebufferTextureInputNoFlip.vert", "../../shaders/virtualFramebufferTextureInputNoFlip.frag");
+	struct shaderObject * finalFramebuffer = loadShader("../../../shaders/virtualFramebufferTextureInputNoFlip.vert", "../../../shaders/virtualFramebufferTextureInputNoFlip.frag");
     if (finalFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
 
@@ -743,8 +744,8 @@ int main(int argc,const char **argv)
 	 	return 1;
    }
 
-   #define modelToLoad "../../Models/Ammar.tri"
-   //#define modelToLoad "../../submodules/Assimp/Ammar_1k.tri"
+   #define modelToLoad "../../../Models/Ammar.tri"
+   //#define modelToLoad "../../../submodules/Assimp/Ammar_1k.tri"
 
 
    if (!loadModelTri(modelToLoad, &indexedTriModel ) )

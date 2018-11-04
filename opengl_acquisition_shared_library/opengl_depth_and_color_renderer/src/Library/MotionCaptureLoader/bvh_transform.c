@@ -317,3 +317,24 @@ int bvh_loadTransformForFrame(
 }
 
 
+
+
+
+
+
+
+
+int bvh_loadTransformForFrameProjectTo2D(
+                                         struct BVH_MotionCapture * bvhMotion ,
+                                         struct BVH_Transform * bvhTransform
+                                        )
+{
+
+}
+
+
+
+
+
+
+

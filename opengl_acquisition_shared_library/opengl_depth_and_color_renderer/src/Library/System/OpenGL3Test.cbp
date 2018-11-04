@@ -36,14 +36,14 @@
 			<Add option="-lX11" />
 			<Add option="-lGLEW" />
 		</Linker>
-		<Unit filename="../../../../tools/AmMatrix/matrix4x4Tools.c">
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../tools/AmMatrix/matrix4x4Tools.h" />
-		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.c">
+		<Unit filename="../../../../../tools/AmMatrix/matrix4x4Tools.h" />
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../tools/AmMatrix/matrixOpenGL.h" />
+		<Unit filename="../../../../../tools/AmMatrix/matrixOpenGL.h" />
 		<Unit filename="../Rendering/ShaderPipeline/shader_loader.c">
 			<Option compilerVar="CC" />
 		</Unit>

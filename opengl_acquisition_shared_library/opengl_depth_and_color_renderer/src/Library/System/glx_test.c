@@ -14,8 +14,8 @@
 
 #include "glx3.h"
 
-#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
-#include "../../../../tools/AmMatrix/matrixOpenGL.h"
+#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../../tools/AmMatrix/matrixOpenGL.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
 #define U 0.5
@@ -405,6 +405,7 @@ int drawObjectAT(GLuint programID,
                                     (double) x/100,
                                     (double) y/100,
                                     (double) z/100,
+                                    ROTATION_ORDER_RPY,
 
                                     10.0,//scaleX,
                                     10.0,//scaleY,
@@ -470,8 +471,8 @@ int doDrawing()
 
 
 	// Create and compile our GLSL program from the shaders
-	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
-	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
+	//struct shaderObject * sho = loadShader("../../../shaders/TransformVertexShader.vertexshader", "../../../shaders/ColorFragmentShader.fragmentshader");
+	struct shaderObject * sho = loadShader("../../../shaders/simple.vert", "../../../shaders/simple.frag");
     if (sho==0) { fprintf(stderr,"Could not load..\n"); exit(1); }
     GLuint programID = sho->ProgramObject;
 

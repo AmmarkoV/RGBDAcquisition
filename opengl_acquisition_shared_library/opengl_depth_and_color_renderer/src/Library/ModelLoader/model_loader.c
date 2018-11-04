@@ -541,7 +541,7 @@ int drawModelAt(
                                   (double) mod->scaleY,
                                   (double) mod->scaleZ
                                  );
-  transpose4x4MatrixD(modelTransformation);
+  transpose4x4MatrixD(modelTransformation); //Because we want to use this in OpenGL
   glMultMatrixd(modelTransformation);
 
 

@@ -216,6 +216,8 @@ void buildOpenGLProjectionForIntrinsics   (
    multiplyTwo4x4FMatrices(finalFrutstrum,identMat,frustum);
    copy4x4FMatrix(frustum,finalFrutstrum);
 
+   //This should produce our own Row Major Format
+   transpose4x4Matrix(finalFrutstrum);
 }
 
 

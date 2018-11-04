@@ -19,8 +19,8 @@
 
 #include "glx3.h"
 
-#include "../../../../tools/AmMatrix/matrix4x4Tools.h"
-#include "../../../../tools/AmMatrix/matrixOpenGL.h"
+#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../../tools/AmMatrix/matrixOpenGL.h"
 #include "../Rendering/ShaderPipeline/shader_loader.h"
 
 #define U 0.5
@@ -384,6 +384,7 @@ int drawObjectAT(GLuint programID,
                                     roll,//roll
                                     pitch ,//pitch
                                     yaw ,//yaw
+                                    ROTATION_ORDER_RPY,
 
                                     //Translation Component (XYZ)
                                     (double) x/100,
@@ -564,11 +565,11 @@ int doDrawing()
 {
    fprintf(stderr," doDrawing \n");
 	// Create and compile our GLSL program from the shaders
-	//struct shaderObject * sho = loadShader("../../shaders/TransformVertexShader.vertexshader", "../../shaders/ColorFragmentShader.fragmentshader");
-	struct shaderObject * sho = loadShader("../../shaders/simple.vert", "../../shaders/simple.frag");
+	//struct shaderObject * sho = loadShader("../../../shaders/TransformVertexShader.vertexshader", "../../../shaders/ColorFragmentShader.fragmentshader");
+	struct shaderObject * sho = loadShader("../../../shaders/simple.vert", "../../../shaders/simple.frag");
 	if (sho==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
-	struct shaderObject * textureFramebuffer = loadShader("../../shaders/virtualFramebuffer.vert", "../../shaders/virtualFramebufferSea.frag");
+	struct shaderObject * textureFramebuffer = loadShader("../../../shaders/virtualFramebuffer.vert", "../../../shaders/virtualFramebufferSea.frag");
     if (textureFramebuffer==0) {  checkOpenGLError(__FILE__, __LINE__); exit(1); }
 
     GLuint programID = sho->ProgramObject;

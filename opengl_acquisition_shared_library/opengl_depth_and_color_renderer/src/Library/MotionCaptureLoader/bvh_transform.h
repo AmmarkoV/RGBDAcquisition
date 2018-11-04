@@ -20,8 +20,6 @@ struct BVH_TransformedJoint
   //Position as X,Y,Z
   //-----------------
   double pos3D[4];
-
-
 };
 
 
@@ -38,5 +36,11 @@ int bvh_loadTransformForFrame(
                                BVHFrameID fID ,
                                struct BVH_Transform * bvhTransform
                              );
+
+
+int bvh_loadTransformForFrameProjectTo2D(
+                                         struct BVH_MotionCapture * bvhMotion ,
+                                         struct BVH_Transform * bvhTransform
+                                        );
 
 #endif // BVH_TRANSFORM_H_INCLUDED

@@ -192,7 +192,7 @@ void doOGLGenericDrawCalllist(
                               float * mvpMatrix ,
                               //-------------------------------------------------------
                               float * vertices ,       unsigned int numberOfVertices ,
-                              float * normals ,         unsigned int numberOfNormals ,
+                              float * normals ,        unsigned int numberOfNormals ,
                               float * textureCoords ,  unsigned int numberOfTextureCoords ,
                               float * colors ,         unsigned int numberOfColors ,
                               unsigned int * indices , unsigned int numberOfIndices
