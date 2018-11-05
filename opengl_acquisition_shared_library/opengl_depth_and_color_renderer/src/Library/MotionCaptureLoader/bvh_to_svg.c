@@ -5,14 +5,147 @@
 
 #include "../../../../../tools/AmMatrix/simpleRenderer.h"
 
+int dumpBVHToCSVHeader(
+                       struct BVH_MotionCapture * mc,
+                       struct simpleRenderer * renderer,
+                       const char * filename
+                      )
+{
+   FILE * fp = fopen(filename,"w");
+   if (fp!=0)
+   {
+     //fprintf(fp,"positionX,positionY,positionZ,roll,pitch,yaw,");
+     fprintf(fp,"positionX=%0.2f|positionY=%0.2f|positionZ=%0.2f|roll=%0.2f|pitch=%0.2f|yaw=%0.2f|frameNumber=%u,",
+                 renderer->cameraOffsetPosition[0],
+                 renderer->cameraOffsetPosition[1],
+                 renderer->cameraOffsetPosition[2],
+                 renderer->cameraOffsetRotation[2],
+                 renderer->cameraOffsetRotation[1],
+                 renderer->cameraOffsetRotation[0],
+                 mc->numberOfFrames
+                 );
+
+
+     unsigned int jID=0;
+     //2D Positions
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+          fprintf(fp,"2DX_%s,2DY_%s,",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
+         }
+       }
+
+     //3D Positions
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+           fprintf(fp,"3DX_%s,3DY_%s,3DZ_%s,",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
+         }
+       }
+
+     //3D Positions
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+           fprintf(fp,"%s_%s,%s_%s,%s_%s,",
+                   channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[0]],
+                   mc->jointHierarchy[jID].jointName,
+                   channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[1]],
+                   mc->jointHierarchy[jID].jointName,
+                   channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[2]],
+                   mc->jointHierarchy[jID].jointName);
+         }
+       }
+     fprintf(fp,"frameID\n");
+
+     fclose(fp);
+     return 1;
+   }
+ return 0;
+}
+
+
+
+
+int dumpBVHToCSVBody(
+                       struct BVH_MotionCapture * mc,
+                       struct BVH_Transform * bvhTransform,
+                       struct simpleRenderer * renderer,
+                       float * objectRotationOffset,
+                       unsigned int fID,
+                       const char * filename
+                      )
+{
+   FILE * fp = fopen(filename,"a");
+   if (fp!=0)
+   {
+     fprintf(fp,"!,");
+
+     unsigned int jID=0;
+     //2D Positions
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+          fprintf(
+                  fp,"%0.2f,%0.2f,",
+                  bvhTransform->joint[jID].pos2D[0],
+                  bvhTransform->joint[jID].pos2D[1]
+                 );
+         }
+       }
+
+     //3D Positions
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+          fprintf(
+                  fp,"%0.2f,%0.2f,%0.2f,",
+                  bvhTransform->joint[jID].pos3D[0],
+                  bvhTransform->joint[jID].pos3D[1],
+                  bvhTransform->joint[jID].pos3D[2]
+                 );
+         }
+       }
+
+     //3D Positions
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+           fprintf(
+                   fp,"%0.2f,%0.2f,%0.2f,",
+                   bvh_getJointChannelAtFrame(mc,jID,fID,(unsigned int) mc->jointHierarchy[jID].channelType[0]),
+                   bvh_getJointChannelAtFrame(mc,jID,fID,(unsigned int) mc->jointHierarchy[jID].channelType[1]),
+                   bvh_getJointChannelAtFrame(mc,jID,fID,(unsigned int) mc->jointHierarchy[jID].channelType[2])
+                   );
+         }
+       }
+
+     fprintf(fp,"%u\n",fID);
+
+     fclose(fp);
+     return 1;
+   }
+ return 0;
+}
+
+
+
+
 int dumpBVHToSVGFrame(
-                     const char * filename,
-                     struct BVH_MotionCapture * mc,
-                     struct BVH_Transform * bvhTransform,
-                     unsigned int fID,
-                     struct simpleRenderer * renderer,
-                     float * objectRotationOffset
-                    )
+                      const char * svgFilename,
+                      const char * csvFilename,
+                      struct BVH_MotionCapture * mc,
+                      struct BVH_Transform * bvhTransform,
+                      unsigned int fID,
+                      struct simpleRenderer * renderer,
+                      float * objectRotationOffset
+                     )
 {
    unsigned int width = renderer->width;
    unsigned int height = renderer->height;
@@ -20,7 +153,7 @@ int dumpBVHToSVGFrame(
    unsigned int parentJID=0;
 
 
-   FILE * fp = fopen(filename,"w");
+   FILE * fp = fopen(svgFilename,"w");
    if (fp!=0)
    {
       fprintf(fp,"<svg width=\"%u\" height=\"%u\">\n",width,height);
@@ -46,11 +179,14 @@ int dumpBVHToSVGFrame(
                      );
       //----------------------------------------------------------
 
-
-
-
-
-
+      dumpBVHToCSVBody(
+                       mc,
+                       bvhTransform,
+                       renderer,
+                       objectRotationOffset,
+                       fID,
+                       csvFilename
+                      );
 
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
@@ -78,6 +214,7 @@ int dumpBVHToSVGFrame(
 
 
       fprintf(fp,"</svg>\n");
+      fclose(fp);
      return 1;
    }
  return 0;
@@ -100,7 +237,8 @@ int dumpBVHToSVG(
                  )
 {
   struct BVH_Transform bvhTransform;
-  char filename[512];
+  char svgFilename[512];
+  char csvFilename[512];
 
   unsigned int framesDumped=0;
   unsigned int fID=0;
@@ -131,12 +269,22 @@ int dumpBVHToSVG(
 
   simpleRendererInitialize(&renderer);
 
+
+  snprintf(csvFilename,512,"%s/data.csv",directory);
+  dumpBVHToCSVHeader(
+                      mc,
+                      &renderer,
+                      csvFilename
+                     );
+
+
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
-   snprintf(filename,512,"%s/%06u.svg",directory,fID);
+   snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
 
    framesDumped +=  dumpBVHToSVGFrame(
-                                       filename,
+                                       svgFilename,
+                                       csvFilename,
                                        mc,
                                        &bvhTransform,
                                        fID,

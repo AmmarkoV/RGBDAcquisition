@@ -10,6 +10,11 @@ int simpleRendererRender(
                          float * position3D,
                          float * center3D,
                          float * objectRotation,
+                         ///---------------
+                         float * output3DX,
+                         float * output3DY,
+                         float * output3DZ,
+                         ///---------------
                          float * output2DX,
                          float * output2DY
                         )
