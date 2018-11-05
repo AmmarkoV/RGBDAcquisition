@@ -267,6 +267,8 @@ int multiplyTwo4x4MatricesBuffered(double * result , double * matrixA , double *
 
 int multiplyThree4x4Matrices(double * result , double * matrixA , double * matrixB , double * matrixC);
 
+int multiplyFour4x4Matrices(double * result , double * matrixA , double * matrixB , double * matrixC , double * matrixD);
+
 /**
 * @brief Multiply 2x 4x4 Float matrices ( A * B )
 * @ingroup AmMatrix
@@ -310,6 +312,12 @@ int transform3DNormalVectorUsing3x3PartOf4x4Matrix(double * resultPoint3D, doubl
 int normalize3DPointVector(double * vec);
 
 
+void doRPYTransformation(
+                         double *m,
+                         double rollInDegrees,
+                         double pitchInDegrees,
+                         double yawInDegrees
+                        );
 /*
 */
 

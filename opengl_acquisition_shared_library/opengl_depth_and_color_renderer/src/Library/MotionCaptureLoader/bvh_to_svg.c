@@ -1,31 +1,29 @@
 #include <stdio.h>
 #include "bvh_to_svg.h"
-#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
-#include "../../../../../tools/AmMatrix/matrixOpenGL.h"
+
+#include "bvh_project.h"
+
 #include "../../../../../tools/AmMatrix/simpleRenderer.h"
 
-
-
-int dumpBVHToSVGFile(
+int dumpBVHToSVGFrame(
                      const char * filename,
                      struct BVH_MotionCapture * mc,
                      struct BVH_Transform * bvhTransform,
                      unsigned int fID,
-                     struct simpleRenderer * renderer,
-                     float * positionOffset
+                     struct simpleRenderer * renderer
                     )
 {
    unsigned int width = renderer->width;
    unsigned int height = renderer->height;
+   unsigned int jID=0;
+   unsigned int parentJID=0;
 
-   float position2DX;
-   float position2DY;
 
    FILE * fp = fopen(filename,"w");
    if (fp!=0)
    {
       fprintf(fp,"<svg width=\"%u\" height=\"%u\">\n",width,height);
-      fprintf(fp,"<rect width=\"%u\" height=\"%u\" style=\"fill:rgb(255,255,255);stroke-width:3;stroke:rgb(255,255,255)\" />\n",width,height);
+      fprintf(fp,"<rect width=\"%u\" height=\"%u\" style=\"fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)\" />\n",width,height);
       fprintf(fp,"<text x=\"10\" y=\"40\">Frame %u</text>\n",fID);
 
 
@@ -34,33 +32,45 @@ int dumpBVHToSVGFile(
                                 mc,
                                 fID ,
                                 bvhTransform
+                                //positionOffset,
+                                //rotationOffset
                                );
       //Then project 3D positions on 2D frame and save results..
-      unsigned int jID=0;
+      bvh_projectTo2D(
+                      mc,
+                      bvhTransform,
+                      renderer
+                     );
+      //----------------------------------------------------------
+
+
+
+
+
+
+
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
+        parentJID = mc->jointHierarchy[jID].parentJoint;
 
-        if (bvhTransform->joint[jID].pos3D[3]!=1.0)
-        {
-          fprintf(stderr,"bvh_loadTransformForFrame location for joint %u not normalized..\n",jID);
-        }
-
-           float pos3DFloat[4];
-           pos3DFloat[0]=(float)bvhTransform->joint[jID].pos3D[0]+positionOffset[0];
-           pos3DFloat[1]=(float)bvhTransform->joint[jID].pos3D[1]+positionOffset[1];
-           pos3DFloat[2]=(float)bvhTransform->joint[jID].pos3D[2]+positionOffset[2];
-           pos3DFloat[3]=0.0;
-           simpleRendererRender(
-                                 renderer ,
-                                 pos3DFloat,
-                                 &position2DX,
-                                 &position2DY
-                                );
+        fprintf(
+                fp,"<line x1=\"%0.2f\" y1=\"%0.2f\" x2=\"%0.2f\" y2=\"%0.2f\" style=\"stroke:rgb(255,255,0);stroke-width:2;stroke-dasharray:10,10\" />\n",
+                bvhTransform->joint[parentJID].pos2D[0],
+                bvhTransform->joint[parentJID].pos2D[1],
+                bvhTransform->joint[jID].pos2D[0],
+                bvhTransform->joint[jID].pos2D[1]
+               );
+      }
 
 
-        fprintf(fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"8.00\" stroke=\"rgb(135,135,0)\" stroke-width=\"3\" fill=\"rgb(255,255,0)\" />\n",
-                  position2DX,
-                  position2DY);
+
+      for (jID=0; jID<mc->jointHierarchySize; jID++)
+      {
+        fprintf(
+                fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"3.00\" stroke=\"rgb(135,135,0)\" stroke-width=\"3\" fill=\"rgb(255,255,0)\" />\n",
+                bvhTransform->joint[jID].pos2D[0],
+                bvhTransform->joint[jID].pos2D[1]
+               );
       }
 
 
@@ -81,7 +91,8 @@ int dumpBVHToSVG(
                  struct BVH_MotionCapture * mc,
                  unsigned int width,
                  unsigned int height,
-                 float * positionOffset
+                 float * positionOffset,
+                 float * rotationOffset
                  )
 {
   struct BVH_Transform bvhTransform;
@@ -102,6 +113,15 @@ int dumpBVHToSVG(
   renderer.near = 1.0;
   renderer.far = 1000.0;
 
+  renderer.objectOffsetPosition[0]=positionOffset[0];
+  renderer.objectOffsetPosition[1]=positionOffset[1];
+  renderer.objectOffsetPosition[2]=positionOffset[2];
+  renderer.objectOffsetPosition[3]=0.0;
+
+  renderer.objectOffsetRotation[0]=rotationOffset[0];
+  renderer.objectOffsetRotation[1]=rotationOffset[1];
+  renderer.objectOffsetRotation[2]=rotationOffset[2];
+  renderer.objectOffsetRotation[3]=0.0;
 
   simpleRendererInitialize(&renderer);
 
@@ -109,14 +129,13 @@ int dumpBVHToSVG(
   {
    snprintf(filename,512,"%s/%06u.svg",directory,fID);
 
-   framesDumped +=  dumpBVHToSVGFile(
-                                     filename,
-                                     mc,
-                                     &bvhTransform,
-                                     fID,
-                                     &renderer,
-                                      positionOffset
-                                     );
+   framesDumped +=  dumpBVHToSVGFrame(
+                                       filename,
+                                       mc,
+                                       &bvhTransform,
+                                       fID,
+                                       &renderer
+                                      );
   }
 
  return (framesDumped==mc->numberOfFrames);

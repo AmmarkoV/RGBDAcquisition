@@ -20,12 +20,18 @@ struct BVH_TransformedJoint
   //Position as X,Y,Z
   //-----------------
   double pos3D[4];
+
+  //Position as 2D X,Y
+  //-----------------
+  char pos2DCalculated;
+  double pos2D[2];
 };
 
 
 struct BVH_Transform
 {
   struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
+  double centerPosition[3];
 };
 
 void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,double degreesY,double degreesZ);
@@ -35,6 +41,8 @@ int bvh_loadTransformForFrame(
                                struct BVH_MotionCapture * bvhMotion ,
                                BVHFrameID fID ,
                                struct BVH_Transform * bvhTransform
+                               //float * positionOffset,
+                               //float * rotationOffset
                              );
 
 

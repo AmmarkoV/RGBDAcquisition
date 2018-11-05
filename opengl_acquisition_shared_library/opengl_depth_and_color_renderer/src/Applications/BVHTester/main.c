@@ -62,8 +62,7 @@ int main(int argc, char **argv)
 
     float scaleWorld=1.0;
     float positionOffset[3]={0};
-    positionOffset[1]=-60.0;
-    positionOffset[2]=400.0;
+    float rotationOffset[3]={0};
 
     unsigned int i=0;
     for (i=0; i<argc; i++)
@@ -104,7 +103,13 @@ int main(int argc, char **argv)
           positionOffset[0]=atof(argv[i+1]);
           positionOffset[1]=atof(argv[i+2]);
           positionOffset[2]=atof(argv[i+3]);
-          //TODO: Use this..
+        } else
+        if (strcmp(argv[i],"--rot")==0)
+        {
+          if (i+3>=argc)  { incorrectArguments(); }
+          rotationOffset[0]=atof(argv[i+1]);
+          rotationOffset[1]=atof(argv[i+2]);
+          rotationOffset[2]=atof(argv[i+3]);
         }
     }
 
@@ -120,7 +125,8 @@ int main(int argc, char **argv)
                   &bvhMotion,
                   640,
                   480,
-                  positionOffset
+                  positionOffset,
+                  rotationOffset
                  );
       return 0;
     }

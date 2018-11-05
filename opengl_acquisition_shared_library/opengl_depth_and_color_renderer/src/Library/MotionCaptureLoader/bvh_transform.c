@@ -175,8 +175,16 @@ int bvh_loadTransformForFrame(
                                struct BVH_MotionCapture * bvhMotion ,
                                BVHFrameID fID ,
                                struct BVH_Transform * bvhTransform
+                               //float * positionOffset,
+                               //float * rotationOffset
                              )
 {
+   //We can use this to change root joint
+   //But this gets unreasonably complicated so it is best not to change anything here..
+   float positionOffset[4]={0};
+   float rotationOffset[4]={0};
+
+
   unsigned int jID=0;
   //First of all we need to clean the BVH_Transform structure
 
@@ -216,6 +224,16 @@ int bvh_loadTransformForFrame(
       rotX = fToD(data[3]);
       rotY = fToD(data[4]);
       rotZ = fToD(data[5]);
+
+      if (bvhMotion->jointHierarchy[jID].isRoot)
+      {
+         posX+=positionOffset[0];
+         posY+=positionOffset[1];
+         posZ+=positionOffset[2];
+         rotX+=rotationOffset[0];
+         rotY+=rotationOffset[1];
+         rotZ+=rotationOffset[2];
+      }
 
       create4x4TranslationMatrix(bvhTransform->joint[jID].dynamicTranslation,posX,posY,posZ);
 
@@ -311,26 +329,20 @@ int bvh_loadTransformForFrame(
                                        );
    normalize3DPointVector(bvhTransform->joint[jID].pos3D);
   #endif // FIND_FAST_CENTER
+
+
+  if ( bvhMotion->jointHierarchy[jID].isRoot)
+      {
+       bvhTransform->centerPosition[0]=bvhTransform->joint[jID].pos3D[0];
+       bvhTransform->centerPosition[1]=bvhTransform->joint[jID].pos3D[1];
+       bvhTransform->centerPosition[2]=bvhTransform->joint[jID].pos3D[2];
+      }
+
   }
 
   return 1;
 }
 
-
-
-
-
-
-
-
-
-int bvh_loadTransformForFrameProjectTo2D(
-                                         struct BVH_MotionCapture * bvhMotion ,
-                                         struct BVH_Transform * bvhTransform
-                                        )
-{
-
-}
 
 
 

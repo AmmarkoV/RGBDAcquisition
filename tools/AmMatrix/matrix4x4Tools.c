@@ -827,6 +827,20 @@ int multiplyThree4x4Matrices(double * result , double * matrixA , double * matri
   return (i==2);
 }
 
+int multiplyFour4x4Matrices(double * result , double * matrixA , double * matrixB , double * matrixC , double * matrixD)
+{
+  if ( (matrixA==0) || (matrixB==0) || (matrixC==0) || (matrixD==0) || (result==0) ) { return 0; }
+
+  int i=0;
+  double tmpA[16];
+  double tmpB[16];
+  i+=multiplyTwo4x4Matrices(tmpA,matrixC,matrixD);
+  i+=multiplyTwo4x4Matrices(tmpB , matrixB , tmpA);
+  i+=multiplyTwo4x4Matrices(result , matrixA , tmpB);
+
+  return (i==3);
+}
+
 
 int multiplyTwo4x4FMatrices(float * result , float * matrixA , float * matrixB)
 {

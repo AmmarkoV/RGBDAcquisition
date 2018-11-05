@@ -15,6 +15,8 @@ struct simpleRenderer
   float width;
   float height;
 
+  float objectOffsetPosition[4];
+  float objectOffsetRotation[4];
 
 
   float projectionMatrix[16];
@@ -28,6 +30,7 @@ struct simpleRenderer
 int simpleRendererRender(
                          struct simpleRenderer * sr ,
                          float * position3D,
+                         float * center3D,
                          float * output2DX,
                          float * output2DY
                         );
