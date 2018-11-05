@@ -175,8 +175,7 @@ int bvh_loadTransformForFrame(
                                struct BVH_MotionCapture * bvhMotion ,
                                BVHFrameID fID ,
                                struct BVH_Transform * bvhTransform
-                               //float * positionOffset,
-                               //float * rotationOffset
+                               //,float * rotationOffset
                              )
 {
    //We can use this to change root joint

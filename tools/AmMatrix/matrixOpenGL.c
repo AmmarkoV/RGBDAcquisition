@@ -715,7 +715,7 @@ int _glhProjectf(float * position3D, float *modelview, float *projection, int *v
       fTempo[7]=-fTempo[2];
       //The result normalizes between -1 and 1
       if(fTempo[7]==0.0)	//The w value
-         return 0;
+         { return 0; }
       fTempo[7]=1.0/fTempo[7];
       //Perspective division
       fTempo[4]*=fTempo[7];

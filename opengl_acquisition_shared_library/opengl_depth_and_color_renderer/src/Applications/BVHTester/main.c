@@ -61,8 +61,9 @@ int main(int argc, char **argv)
     unsigned int usePosition=0;
 
     float scaleWorld=1.0;
-    float positionOffset[3]={0};
-    float rotationOffset[3]={0};
+    float cameraPositionOffset[3]={0};
+    float cameraRotationOffset[3]={0};
+    float objectRotationOffset[3]={0};
 
     unsigned int i=0;
     for (i=0; i<argc; i++)
@@ -97,19 +98,26 @@ int main(int argc, char **argv)
           scaleWorld=atof(argv[i+1]);
           //TODO: Use this..
         } else
-        if (strcmp(argv[i],"--pos")==0)
+        if (strcmp(argv[i],"--cameraPosition")==0)
         {
           if (i+3>=argc)  { incorrectArguments(); }
-          positionOffset[0]=atof(argv[i+1]);
-          positionOffset[1]=atof(argv[i+2]);
-          positionOffset[2]=atof(argv[i+3]);
+          cameraPositionOffset[0]=atof(argv[i+1])/10;
+          cameraPositionOffset[1]=atof(argv[i+2])/10;
+          cameraPositionOffset[2]=atof(argv[i+3])/10;
         } else
-        if (strcmp(argv[i],"--rot")==0)
+        if (strcmp(argv[i],"--cameraRotation")==0)
         {
           if (i+3>=argc)  { incorrectArguments(); }
-          rotationOffset[0]=atof(argv[i+1]);
-          rotationOffset[1]=atof(argv[i+2]);
-          rotationOffset[2]=atof(argv[i+3]);
+          cameraRotationOffset[0]=atof(argv[i+1]);
+          cameraRotationOffset[1]=atof(argv[i+2]);
+          cameraRotationOffset[2]=atof(argv[i+3]);
+        } else
+        if (strcmp(argv[i],"--objectRotation")==0)
+        {
+          if (i+3>=argc)  { incorrectArguments(); }
+          objectRotationOffset[0]=atof(argv[i+1]);
+          objectRotationOffset[1]=atof(argv[i+2]);
+          objectRotationOffset[2]=atof(argv[i+3]);
         }
     }
 
@@ -125,8 +133,9 @@ int main(int argc, char **argv)
                   &bvhMotion,
                   640,
                   480,
-                  positionOffset,
-                  rotationOffset
+                  cameraPositionOffset,
+                  cameraRotationOffset,
+                  objectRotationOffset
                  );
       return 0;
     }

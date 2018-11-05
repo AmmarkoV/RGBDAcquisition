@@ -150,10 +150,10 @@ void gldPerspective(
 
 
 
-int _glhProjectf(float * position3D, float *modelview, float *projection, int *viewport, float *windowCoordinate);
+  int _glhProjectf(float * position3D, float *modelview, float *projection, int *viewport, float *windowCoordinate);
 
 
-int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *projection, int *viewport, float *objectCoordinate);
+  int _glhUnProjectf(float winx, float winy, float winz, float *modelview, float *projection, int *viewport, float *objectCoordinate);
 
 
 

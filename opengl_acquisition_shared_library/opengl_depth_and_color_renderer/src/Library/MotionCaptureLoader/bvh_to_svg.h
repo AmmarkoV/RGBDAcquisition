@@ -10,8 +10,9 @@ int dumpBVHToSVG(
                  struct BVH_MotionCapture * mc,
                  unsigned int width,
                  unsigned int height,
-                 float * positionOffset,
-                 float * rotationOffset
+                 float * cameraPositionOffset,
+                 float * cameraRotationOffset,
+                 float * objectRotationOffset
                  );
 
 #endif // BVH_TO_SVG_H_INCLUDED

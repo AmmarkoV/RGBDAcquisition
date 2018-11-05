@@ -10,7 +10,8 @@ int dumpBVHToSVGFrame(
                      struct BVH_MotionCapture * mc,
                      struct BVH_Transform * bvhTransform,
                      unsigned int fID,
-                     struct simpleRenderer * renderer
+                     struct simpleRenderer * renderer,
+                     float * objectRotationOffset
                     )
 {
    unsigned int width = renderer->width;
@@ -23,7 +24,7 @@ int dumpBVHToSVGFrame(
    if (fp!=0)
    {
       fprintf(fp,"<svg width=\"%u\" height=\"%u\">\n",width,height);
-      fprintf(fp,"<rect width=\"%u\" height=\"%u\" style=\"fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)\" />\n",width,height);
+      fprintf(fp,"<rect width=\"%u\" height=\"%u\" style=\"fill:rgb(100,100,100);stroke-width:3;stroke:rgb(100,100,100)\" />\n",width,height);
       fprintf(fp,"<text x=\"10\" y=\"40\">Frame %u</text>\n",fID);
 
 
@@ -32,14 +33,13 @@ int dumpBVHToSVGFrame(
                                 mc,
                                 fID ,
                                 bvhTransform
-                                //positionOffset,
-                                //rotationOffset
                                );
       //Then project 3D positions on 2D frame and save results..
       bvh_projectTo2D(
                       mc,
                       bvhTransform,
-                      renderer
+                      renderer,
+                      objectRotationOffset
                      );
       //----------------------------------------------------------
 
@@ -91,8 +91,9 @@ int dumpBVHToSVG(
                  struct BVH_MotionCapture * mc,
                  unsigned int width,
                  unsigned int height,
-                 float * positionOffset,
-                 float * rotationOffset
+                 float * cameraPositionOffset,
+                 float * cameraRotationOffset,
+                 float * objectRotationOffset
                  )
 {
   struct BVH_Transform bvhTransform;
@@ -113,15 +114,17 @@ int dumpBVHToSVG(
   renderer.near = 1.0;
   renderer.far = 1000.0;
 
-  renderer.objectOffsetPosition[0]=positionOffset[0];
-  renderer.objectOffsetPosition[1]=positionOffset[1];
-  renderer.objectOffsetPosition[2]=positionOffset[2];
-  renderer.objectOffsetPosition[3]=0.0;
+  renderer.cameraOffsetPosition[0]=cameraPositionOffset[0];
+  renderer.cameraOffsetPosition[1]=cameraPositionOffset[1];
+  renderer.cameraOffsetPosition[2]=cameraPositionOffset[2];
+  renderer.cameraOffsetPosition[3]=0.0;
 
-  renderer.objectOffsetRotation[0]=rotationOffset[0];
-  renderer.objectOffsetRotation[1]=rotationOffset[1];
-  renderer.objectOffsetRotation[2]=rotationOffset[2];
-  renderer.objectOffsetRotation[3]=0.0;
+  renderer.removeObjectPosition=1;
+
+  renderer.cameraOffsetRotation[0]=cameraRotationOffset[0];
+  renderer.cameraOffsetRotation[1]=cameraRotationOffset[1];
+  renderer.cameraOffsetRotation[2]=cameraRotationOffset[2];
+  renderer.cameraOffsetRotation[3]=0.0;
 
   simpleRendererInitialize(&renderer);
 
@@ -134,7 +137,8 @@ int dumpBVHToSVG(
                                        mc,
                                        &bvhTransform,
                                        fID,
-                                       &renderer
+                                       &renderer,
+                                       objectRotationOffset
                                       );
   }
 
