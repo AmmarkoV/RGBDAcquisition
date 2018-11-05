@@ -82,6 +82,10 @@ int main(int argc, char **argv)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           toSVGFile=argv[i+1];
+
+          char removeOldSVGFilesCommand[512];
+          snprintf(removeOldSVGFilesCommand,512,"rm %s/*.svg",toSVGFile);
+          int res = system(removeOldSVGFilesCommand);
           convertToSVG=1;
         } else
         if (strcmp(argv[i],"--onlyFirstFrame")==0)
@@ -101,7 +105,7 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--cameraPosition")==0)
         {
           if (i+3>=argc)  { incorrectArguments(); }
-          cameraPositionOffset[0]=atof(argv[i+1])/10;
+          cameraPositionOffset[0]=-1*atof(argv[i+1])/10;
           cameraPositionOffset[1]=atof(argv[i+2])/10;
           cameraPositionOffset[2]=atof(argv[i+3])/10;
         } else

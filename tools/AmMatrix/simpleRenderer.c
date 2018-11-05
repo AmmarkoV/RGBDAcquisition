@@ -52,8 +52,8 @@ int simpleRendererRender(
   double objectMatrixRotation[16];
   doRPYTransformation(
                       objectMatrixRotation,
-                      (double) objectRotation[2],
-                      (double) objectRotation[1],
+                      (double) -1*objectRotation[2],
+                      (double) -1*objectRotation[1],
                       (double) objectRotation[0]
                      );
 

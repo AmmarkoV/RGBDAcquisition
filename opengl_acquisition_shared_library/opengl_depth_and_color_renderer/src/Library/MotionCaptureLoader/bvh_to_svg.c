@@ -25,8 +25,11 @@ int dumpBVHToSVGFrame(
    {
       fprintf(fp,"<svg width=\"%u\" height=\"%u\">\n",width,height);
       fprintf(fp,"<rect width=\"%u\" height=\"%u\" style=\"fill:rgb(100,100,100);stroke-width:3;stroke:rgb(100,100,100)\" />\n",width,height);
-      fprintf(fp,"<text x=\"10\" y=\"40\">Frame %u</text>\n",fID);
-
+      fprintf(fp,"<text x=\"10\" y=\"15\">Frame %u</text>\n",fID);
+      fprintf(fp,"<text x=\"10\" y=\"30\">Model Position %0.2f,%0.2f,%0.2f</text>\n",
+              renderer->cameraOffsetPosition[0]*10,renderer->cameraOffsetPosition[1]*10,renderer->cameraOffsetPosition[2]*10);
+      fprintf(fp,"<text x=\"10\" y=\"45\">Model Euler Rotation %0.2f,%0.2f,%0.2f</text>\n",
+              objectRotationOffset[0],objectRotationOffset[1],objectRotationOffset[2]);
 
       //First load the 3D positions of each joint..
       bvh_loadTransformForFrame(
