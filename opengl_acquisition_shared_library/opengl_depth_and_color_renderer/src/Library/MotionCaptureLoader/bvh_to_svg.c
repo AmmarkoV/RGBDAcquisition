@@ -14,16 +14,7 @@ int dumpBVHToCSVHeader(
    FILE * fp = fopen(filename,"w");
    if (fp!=0)
    {
-     //fprintf(fp,"positionX,positionY,positionZ,roll,pitch,yaw,");
-     fprintf(fp,"positionX=%0.2f|positionY=%0.2f|positionZ=%0.2f|roll=%0.2f|pitch=%0.2f|yaw=%0.2f|frameNumber=%u,",
-                 renderer->cameraOffsetPosition[0],
-                 renderer->cameraOffsetPosition[1],
-                 renderer->cameraOffsetPosition[2],
-                 renderer->cameraOffsetRotation[2],
-                 renderer->cameraOffsetRotation[1],
-                 renderer->cameraOffsetRotation[0],
-                 mc->numberOfFrames
-                 );
+     fprintf(fp,"positionX,positionY,positionZ,roll,pitch,yaw,");
 
 
      unsigned int jID=0;
@@ -82,7 +73,16 @@ int dumpBVHToCSVBody(
    FILE * fp = fopen(filename,"a");
    if (fp!=0)
    {
-     fprintf(fp,"!,");
+
+    fprintf(fp,"%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,",
+                 renderer->cameraOffsetPosition[0],
+                 renderer->cameraOffsetPosition[1],
+                 renderer->cameraOffsetPosition[2],
+                 objectRotationOffset[2],
+                 objectRotationOffset[1],
+                 objectRotationOffset[0]
+                 );
+
 
      unsigned int jID=0;
      //2D Positions
