@@ -42,6 +42,13 @@ void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
     }
 }
 
+void incorrectArguments()
+{
+  fprintf(stderr,"Incorrect number of arguments.. \n");
+  exit(1);
+}
+
+
 int main(int argc, char **argv)
 {
     const char * fromBVHFile="Motions/example.bvh";
@@ -54,20 +61,26 @@ int main(int argc, char **argv)
     unsigned int usePosition=0;
 
     float scaleWorld=1.0;
+    float positionOffset[3]={0};
+    positionOffset[1]=-60.0;
+    positionOffset[2]=400.0;
 
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
         if (strcmp(argv[i],"--from")==0)
         {
+          if (i+1>=argc)  { incorrectArguments();}
           fromBVHFile=argv[i+1];
         } else
         if (strcmp(argv[i],"--to")==0)
         {
+          if (i+1>=argc)  { incorrectArguments(); }
           toSceneFile=argv[i+1];
         } else
         if (strcmp(argv[i],"--svg")==0)
         {
+          if (i+1>=argc)  { incorrectArguments(); }
           toSVGFile=argv[i+1];
           convertToSVG=1;
         } else
@@ -81,7 +94,16 @@ int main(int argc, char **argv)
         } else
         if (strcmp(argv[i],"--scale")==0)
         {
+          if (i+1>=argc)  { incorrectArguments(); }
           scaleWorld=atof(argv[i+1]);
+          //TODO: Use this..
+        } else
+        if (strcmp(argv[i],"--pos")==0)
+        {
+          if (i+3>=argc)  { incorrectArguments(); }
+          positionOffset[0]=atof(argv[i+1]);
+          positionOffset[1]=atof(argv[i+2]);
+          positionOffset[2]=atof(argv[i+3]);
           //TODO: Use this..
         }
     }
@@ -90,13 +112,15 @@ int main(int argc, char **argv)
 
     bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
 
+
     if (convertToSVG)
     {
      dumpBVHToSVG(
                   toSVGFile,
                   &bvhMotion,
                   640,
-                  480
+                  480,
+                  positionOffset
                  );
       return 0;
     }

@@ -11,7 +11,8 @@ int dumpBVHToSVGFile(
                      struct BVH_MotionCapture * mc,
                      struct BVH_Transform * bvhTransform,
                      unsigned int fID,
-                     struct simpleRenderer * renderer
+                     struct simpleRenderer * renderer,
+                     float * positionOffset
                     )
 {
    unsigned int width = renderer->width;
@@ -44,10 +45,11 @@ int dumpBVHToSVGFile(
           fprintf(stderr,"bvh_loadTransformForFrame location for joint %u not normalized..\n",jID);
         }
 
-           float pos3DFloat[3];
-           pos3DFloat[0]=(float)bvhTransform->joint[jID].pos3D[0];
-           pos3DFloat[1]=(float)bvhTransform->joint[jID].pos3D[1];
-           pos3DFloat[2]=(float)bvhTransform->joint[jID].pos3D[2];
+           float pos3DFloat[4];
+           pos3DFloat[0]=(float)bvhTransform->joint[jID].pos3D[0]+positionOffset[0];
+           pos3DFloat[1]=(float)bvhTransform->joint[jID].pos3D[1]+positionOffset[1];
+           pos3DFloat[2]=(float)bvhTransform->joint[jID].pos3D[2]+positionOffset[2];
+           pos3DFloat[3]=0.0;
            simpleRendererRender(
                                  renderer ,
                                  pos3DFloat,
@@ -78,7 +80,8 @@ int dumpBVHToSVG(
                  const char * directory ,
                  struct BVH_MotionCapture * mc,
                  unsigned int width,
-                 unsigned int height
+                 unsigned int height,
+                 float * positionOffset
                  )
 {
   struct BVH_Transform bvhTransform;
@@ -111,7 +114,8 @@ int dumpBVHToSVG(
                                      mc,
                                      &bvhTransform,
                                      fID,
-                                     &renderer
+                                     &renderer,
+                                      positionOffset
                                      );
   }
 

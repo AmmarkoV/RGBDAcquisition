@@ -9,7 +9,8 @@ int dumpBVHToSVG(
                  const char * directory ,
                  struct BVH_MotionCapture * mc,
                  unsigned int width,
-                 unsigned int height
+                 unsigned int height,
+                 float * positionOffset
                  );
 
 #endif // BVH_TO_SVG_H_INCLUDED

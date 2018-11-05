@@ -13,6 +13,7 @@ int simpleRendererRender(
 {
  double modelTransformationD[16];
  float  modelTransformationF[16];
+
  double position3DX = position3D[0];
  double position3DY = position3D[1];
  double position3DZ = position3D[2];
@@ -40,6 +41,7 @@ int simpleRendererRender(
 
  ///--------------------------------------------------------------------
   float windowCoordinates[3]={0};
+
   _glhProjectf(
                 position3D,
                 sr->modelViewMatrix,
