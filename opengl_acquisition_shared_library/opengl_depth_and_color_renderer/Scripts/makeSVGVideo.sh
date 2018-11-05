@@ -2,7 +2,7 @@
  
 
 
-ffmpeg -i %06d.svg -y -r 20 -threads 8 -b 30000k -s 640x480  ./visualization.mp4 
+ffmpeg -i %06d.svg -y -r 25 -threads 8 -b 30000k -s 640x480  ./visualization.mp4 
 exit 0
 
 
