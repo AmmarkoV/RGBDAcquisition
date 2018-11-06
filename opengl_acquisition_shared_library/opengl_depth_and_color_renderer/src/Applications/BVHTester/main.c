@@ -83,11 +83,6 @@ int main(int argc, char **argv)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           toSVGDirectory=argv[i+1];
-
-          char removeOldSVGFilesCommand[512];
-          snprintf(removeOldSVGFilesCommand,512,"rm %s/*.svg",toSVGDirectory);
-          int res = system(removeOldSVGFilesCommand);
-          if (res!=0) { fprintf(stderr,"Could not clean svg files in %s",toSVGDirectory); }
           convertToCSV=1;
         } else
         if (strcmp(argv[i],"--svg")==0)
