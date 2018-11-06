@@ -5,7 +5,7 @@
 
 #include "../../../../../tools/AmMatrix/simpleRenderer.h"
 
-
+#define DUMP_3D_POSITIONS 0
 
 int fileExists(const char * filename)
 {
@@ -41,6 +41,7 @@ int dumpBVHToCSVHeader(
          }
        }
 
+     #if DUMP_3D_POSITIONS
      //3D Positions
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -49,6 +50,8 @@ int dumpBVHToCSVHeader(
            fprintf(fp,"3DX_%s,3DY_%s,3DZ_%s,",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
          }
        }
+     #endif // DUMP_3D_POSITIONS
+
 
      //3D Positions
      for (jID=0; jID<mc->jointHierarchySize; jID++)
@@ -117,6 +120,7 @@ int dumpBVHToCSVBody(
          }
        }
 
+     #if DUMP_3D_POSITIONS
      //3D Positions
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -130,8 +134,9 @@ int dumpBVHToCSVBody(
                  );
          }
        }
+     #endif // DUMP_3D_POSITIONS
 
-     //3D Positions
+     //Joint Configuration
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
          if (!mc->jointHierarchy[jID].isEndSite)
