@@ -142,7 +142,6 @@ int main(int argc, char **argv)
 
     bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
 
-
     if ( (convertToSVG) || (convertToCSV) )
     {
      dumpBVHToSVG(
