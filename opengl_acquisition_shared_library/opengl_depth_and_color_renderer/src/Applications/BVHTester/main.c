@@ -156,6 +156,7 @@ int main(int argc, char **argv)
         }
       }
 
+    //SVG or CSV output ..
     if ( (convertToSVG) || (convertToCSV) )
     {
      dumpBVHToSVG(
