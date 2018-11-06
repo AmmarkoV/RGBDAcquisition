@@ -54,8 +54,9 @@ int main(int argc, char **argv)
     const char * fromBVHFile="Motions/example.bvh";
     const char * toSceneFile="Scenes/bvh.conf";
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
-    const char * toSVGFile="tmp/";
+    const char * toSVGDirectory="tmp/";
     unsigned int convertToSVG=0;
+    unsigned int convertToCSV=0;
 
     unsigned int onlyFirstFrame=0;
     unsigned int usePosition=0;
@@ -78,14 +79,26 @@ int main(int argc, char **argv)
           if (i+1>=argc)  { incorrectArguments(); }
           toSceneFile=argv[i+1];
         } else
+        if (strcmp(argv[i],"--csv")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          toSVGDirectory=argv[i+1];
+
+          char removeOldSVGFilesCommand[512];
+          snprintf(removeOldSVGFilesCommand,512,"rm %s/*.svg",toSVGDirectory);
+          int res = system(removeOldSVGFilesCommand);
+          if (res!=0) { fprintf(stderr,"Could not clean svg files in %s",toSVGDirectory); }
+          convertToCSV=1;
+        } else
         if (strcmp(argv[i],"--svg")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
-          toSVGFile=argv[i+1];
+          toSVGDirectory=argv[i+1];
 
           char removeOldSVGFilesCommand[512];
-          snprintf(removeOldSVGFilesCommand,512,"rm %s/*.svg",toSVGFile);
+          snprintf(removeOldSVGFilesCommand,512,"rm %s/*.svg",toSVGDirectory);
           int res = system(removeOldSVGFilesCommand);
+          if (res!=0) { fprintf(stderr,"Could not clean svg files in %s",toSVGDirectory); }
           convertToSVG=1;
         } else
         if (strcmp(argv[i],"--onlyFirstFrame")==0)
@@ -130,10 +143,12 @@ int main(int argc, char **argv)
     bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
 
 
-    if (convertToSVG)
+    if ( (convertToSVG) || (convertToCSV) )
     {
      dumpBVHToSVG(
-                  toSVGFile,
+                  toSVGDirectory,
+                  convertToSVG,
+                  convertToCSV,
                   &bvhMotion,
                   640,
                   480,

@@ -7,6 +7,8 @@
 
 int dumpBVHToSVG(
                  const char * directory ,
+                 int convertToSVG,
+                 int convertToCSV,
                  struct BVH_MotionCapture * mc,
                  unsigned int width,
                  unsigned int height,

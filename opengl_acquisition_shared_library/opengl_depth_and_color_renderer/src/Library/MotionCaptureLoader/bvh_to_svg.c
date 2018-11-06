@@ -158,7 +158,6 @@ int dumpBVHToCSVBody(
 
 int dumpBVHToSVGFrame(
                       const char * svgFilename,
-                      const char * csvFilename,
                       struct BVH_MotionCapture * mc,
                       struct BVH_Transform * bvhTransform,
                       unsigned int fID,
@@ -183,29 +182,7 @@ int dumpBVHToSVGFrame(
       fprintf(fp,"<text x=\"10\" y=\"45\">Model Euler Rotation %0.2f,%0.2f,%0.2f</text>\n",
               objectRotationOffset[0],objectRotationOffset[1],objectRotationOffset[2]);
 
-      //First load the 3D positions of each joint..
-      bvh_loadTransformForFrame(
-                                mc,
-                                fID ,
-                                bvhTransform
-                               );
-      //Then project 3D positions on 2D frame and save results..
-      bvh_projectTo2D(
-                      mc,
-                      bvhTransform,
-                      renderer,
-                      objectRotationOffset
-                     );
-      //----------------------------------------------------------
 
-      dumpBVHToCSVBody(
-                       mc,
-                       bvhTransform,
-                       renderer,
-                       objectRotationOffset,
-                       fID,
-                       csvFilename
-                      );
 
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
@@ -241,12 +218,37 @@ int dumpBVHToSVGFrame(
 
 
 
-
+int performPointProjections(
+                             struct BVH_MotionCapture * mc,
+                             struct BVH_Transform * bvhTransform,
+                             unsigned int fID,
+                             struct simpleRenderer * renderer,
+                             float * objectRotationOffset
+                            )
+{
+  //First load the 3D positions of each joint..
+      bvh_loadTransformForFrame(
+                                mc,
+                                fID ,
+                                bvhTransform
+                               );
+      //Then project 3D positions on 2D frame and save results..
+      bvh_projectTo2D(
+                      mc,
+                      bvhTransform,
+                      renderer,
+                      objectRotationOffset
+                     );
+      //----------------------------------------------------------
+      return 1;
+}
 
 
 
 int dumpBVHToSVG(
-                 const char * directory ,
+                 const char * directory,
+                 int convertToSVG,
+                 int convertToCSV,
                  struct BVH_MotionCapture * mc,
                  unsigned int width,
                  unsigned int height,
@@ -290,26 +292,52 @@ int dumpBVHToSVG(
 
 
   snprintf(csvFilename,512,"%s/data.csv",directory);
-  dumpBVHToCSVHeader(
-                      mc,
-                      &renderer,
-                      csvFilename
-                     );
-
+  if (convertToCSV)
+   {
+    dumpBVHToCSVHeader(
+                        mc,
+                        &renderer,
+                        csvFilename
+                       );
+   }
 
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
 
+   performPointProjections(
+                           mc,
+                           &bvhTransform,
+                           fID,
+                           &renderer,
+                           objectRotationOffset
+                          );
+
+   if (convertToCSV)
+   {
+      dumpBVHToCSVBody(
+                       mc,
+                       &bvhTransform,
+                       &renderer,
+                       objectRotationOffset,
+                       fID,
+                       csvFilename
+                      );
+   }
+
+
+   if (convertToSVG)
+   {
    framesDumped +=  dumpBVHToSVGFrame(
                                        svgFilename,
-                                       csvFilename,
                                        mc,
                                        &bvhTransform,
                                        fID,
                                        &renderer,
                                        objectRotationOffset
                                       );
+   }
+
   }
 
  return (framesDumped==mc->numberOfFrames);
