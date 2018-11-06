@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     const char * toSVGDirectory="tmp/";
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
-
+    unsigned int maxFrames = 0;
     unsigned int onlyFirstFrame=0;
     unsigned int usePosition=0;
 
@@ -69,6 +69,11 @@ int main(int argc, char **argv)
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
+        if (strcmp(argv[i],"--maxFrames")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments();}
+          maxFrames=atoi(argv[i+1]);
+        } else
         if (strcmp(argv[i],"--from")==0)
         {
           if (i+1>=argc)  { incorrectArguments();}
@@ -135,7 +140,21 @@ int main(int argc, char **argv)
 
     struct BVH_MotionCapture bvhMotion={0};
 
+    //First of all we need to load the BVH file
     bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
+
+    //Change joint names..
+    bvh_renameJoints(&bvhMotion);
+
+    //We can limit the number of frames
+    if (maxFrames!=0)
+      {
+        //Only reducing number of frames
+        if (bvhMotion.numberOfFrames>maxFrames)
+        {
+          bvhMotion.numberOfFrames = maxFrames;
+        }
+      }
 
     if ( (convertToSVG) || (convertToCSV) )
     {
@@ -153,8 +172,7 @@ int main(int argc, char **argv)
       return 0;
     }
 
-    //Change joint names..
-    bvh_renameJoints(&bvhMotion);
+
 
 
     bvh_printBVH(&bvhMotion);
