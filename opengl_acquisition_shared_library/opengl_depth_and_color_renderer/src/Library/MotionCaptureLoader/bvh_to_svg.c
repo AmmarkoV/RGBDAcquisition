@@ -5,13 +5,27 @@
 
 #include "../../../../../tools/AmMatrix/simpleRenderer.h"
 
+
+
+int fileExists(const char * filename)
+{
+ FILE *fp = fopen(filename,"r");
+ if( fp ) { /* exists */ fclose(fp); return 1; }
+ return 0;
+}
+
+
+
 int dumpBVHToCSVHeader(
                        struct BVH_MotionCapture * mc,
                        struct simpleRenderer * renderer,
                        const char * filename
                       )
 {
-   FILE * fp = fopen(filename,"w");
+   if (!fileExists(filename))
+   {
+     FILE * fp =fopen(filename,"w");
+
    if (fp!=0)
    {
      fprintf(fp,"positionX,positionY,positionZ,roll,pitch,yaw,");
@@ -55,6 +69,11 @@ int dumpBVHToCSVHeader(
      fclose(fp);
      return 1;
    }
+  } else
+  {
+   fprintf(stderr,"We don't need to regenerate the CSV header, it already exists\n");
+   return 1;
+  }
  return 0;
 }
 
@@ -75,9 +94,9 @@ int dumpBVHToCSVBody(
    {
 
     fprintf(fp,"%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,",
-                 renderer->cameraOffsetPosition[0],
-                 renderer->cameraOffsetPosition[1],
-                 renderer->cameraOffsetPosition[2],
+                 renderer->cameraOffsetPosition[0]*10,
+                 renderer->cameraOffsetPosition[1]*10,
+                 renderer->cameraOffsetPosition[2]*10,
                  objectRotationOffset[2],
                  objectRotationOffset[1],
                  objectRotationOffset[0]
