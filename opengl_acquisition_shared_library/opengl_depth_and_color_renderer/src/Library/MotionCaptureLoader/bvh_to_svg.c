@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "bvh_to_svg.h"
 
 #include "bvh_project.h"
@@ -221,31 +222,58 @@ int dumpBVHToSVGFrame(
  return 0;
 }
 
-
+float randomFloat( float min, float max )
+{
+    float scale = rand() / (float) RAND_MAX; /* [0, 1.0] */
+    return min + scale * ( max - min );      /* [min, max] */
+}
 
 int performPointProjections(
                              struct BVH_MotionCapture * mc,
                              struct BVH_Transform * bvhTransform,
                              unsigned int fID,
                              struct simpleRenderer * renderer,
-                             float * objectRotationOffset
+                             float * objectRotationOffset,
+
+                             unsigned int randomizePoses,
+                             float * minimumObjectPositionValue,
+                             float * maximumObjectPositionValue,
+                             float * minimumObjectRotationValue,
+                             float * maximumObjectRotationValue
                             )
 {
+  float objectRotationOffsetCopy[3];
+  objectRotationOffsetCopy[0]=objectRotationOffset[0];
+  objectRotationOffsetCopy[1]=objectRotationOffset[1];
+  objectRotationOffsetCopy[2]=objectRotationOffset[2];
+
+  if (randomizePoses)
+  {
+   renderer->cameraOffsetPosition[0]=randomFloat(minimumObjectPositionValue[0],maximumObjectPositionValue[0]);
+   renderer->cameraOffsetPosition[1]=randomFloat(minimumObjectPositionValue[1],maximumObjectPositionValue[1]);
+   renderer->cameraOffsetPosition[2]=randomFloat(minimumObjectPositionValue[2],maximumObjectPositionValue[2]);
+
+   objectRotationOffsetCopy[0]=randomFloat(minimumObjectRotationValue[0],maximumObjectRotationValue[0]);
+   objectRotationOffsetCopy[1]=randomFloat(minimumObjectRotationValue[1],maximumObjectRotationValue[1]);
+   objectRotationOffsetCopy[2]=randomFloat(minimumObjectRotationValue[2],maximumObjectRotationValue[2]);
+  }
+
   //First load the 3D positions of each joint..
-      bvh_loadTransformForFrame(
-                                mc,
-                                fID ,
-                                bvhTransform
-                               );
-      //Then project 3D positions on 2D frame and save results..
-      bvh_projectTo2D(
-                      mc,
-                      bvhTransform,
-                      renderer,
-                      objectRotationOffset
-                     );
-      //----------------------------------------------------------
-      return 1;
+  bvh_loadTransformForFrame(
+                            mc,
+                            fID ,
+                            bvhTransform
+                           );
+  //Then project 3D positions on 2D frame and save results..
+  bvh_projectTo2D(
+                  mc,
+                  bvhTransform,
+                  renderer,
+                  objectRotationOffsetCopy
+                 );
+   //----------------------------------------------------------
+
+ return 1;
 }
 
 
@@ -259,7 +287,13 @@ int dumpBVHToSVG(
                  unsigned int height,
                  float * cameraPositionOffset,
                  float * cameraRotationOffset,
-                 float * objectRotationOffset
+                 float * objectRotationOffset,
+
+                 unsigned int randomizePoses,
+                 float * minimumObjectPositionValue,
+                 float * maximumObjectPositionValue,
+                 float * minimumObjectRotationValue,
+                 float * maximumObjectRotationValue
                  )
 {
   struct BVH_Transform bvhTransform;
@@ -315,7 +349,13 @@ int dumpBVHToSVG(
                            &bvhTransform,
                            fID,
                            &renderer,
-                           objectRotationOffset
+                           objectRotationOffset,
+
+                           randomizePoses,
+                           minimumObjectPositionValue,
+                           maximumObjectPositionValue,
+                           minimumObjectRotationValue,
+                           maximumObjectRotationValue
                           );
 
    if (convertToCSV)

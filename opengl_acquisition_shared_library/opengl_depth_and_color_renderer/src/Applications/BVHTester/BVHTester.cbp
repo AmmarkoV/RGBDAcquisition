@@ -56,6 +56,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_loader.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_project.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/bvh_project.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_to_svg.c">
 			<Option compilerVar="CC" />
 		</Unit>

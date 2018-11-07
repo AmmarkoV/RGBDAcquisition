@@ -14,7 +14,13 @@ int dumpBVHToSVG(
                  unsigned int height,
                  float * cameraPositionOffset,
                  float * cameraRotationOffset,
-                 float * objectRotationOffset
+                 float * objectRotationOffset,
+
+                 unsigned int randomizePoses,
+                 float * minimumObjectPositionValue,
+                 float * maximumObjectPositionValue,
+                 float * minimumObjectRotationValue,
+                 float * maximumObjectRotationValue
                  );
 
 #endif // BVH_TO_SVG_H_INCLUDED

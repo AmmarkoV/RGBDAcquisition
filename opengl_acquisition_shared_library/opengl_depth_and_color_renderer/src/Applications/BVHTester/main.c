@@ -168,7 +168,9 @@ int main(int argc, char **argv)
                   480,
                   cameraPositionOffset,
                   cameraRotationOffset,
-                  objectRotationOffset
+                  objectRotationOffset,
+                  //Don't care randomize
+                  0,0,0,0,0
                  );
       return 0;
     }
