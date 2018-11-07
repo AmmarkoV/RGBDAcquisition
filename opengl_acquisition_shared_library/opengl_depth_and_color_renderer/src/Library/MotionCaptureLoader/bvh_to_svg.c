@@ -241,30 +241,10 @@ int performPointProjections(
                              struct BVH_Transform * bvhTransform,
                              unsigned int fID,
                              struct simpleRenderer * renderer,
-                             float * objectRotationOffset,
-
-                             unsigned int randomizePoses,
-                             float * minimumObjectPositionValue,
-                             float * maximumObjectPositionValue,
-                             float * minimumObjectRotationValue,
-                             float * maximumObjectRotationValue
+                             float * objectRotationOffset
                             )
 {
-  float objectRotationOffsetCopy[3];
-  objectRotationOffsetCopy[0]=objectRotationOffset[0];
-  objectRotationOffsetCopy[1]=objectRotationOffset[1];
-  objectRotationOffsetCopy[2]=objectRotationOffset[2];
 
-  if (randomizePoses)
-  {
-   renderer->cameraOffsetPosition[0]=randomFloat(minimumObjectPositionValue[0],maximumObjectPositionValue[0]);
-   renderer->cameraOffsetPosition[1]=randomFloat(minimumObjectPositionValue[1],maximumObjectPositionValue[1]);
-   renderer->cameraOffsetPosition[2]=randomFloat(minimumObjectPositionValue[2],maximumObjectPositionValue[2]);
-
-   objectRotationOffsetCopy[0]=randomFloat(minimumObjectRotationValue[0],maximumObjectRotationValue[0]);
-   objectRotationOffsetCopy[1]=randomFloat(minimumObjectRotationValue[1],maximumObjectRotationValue[1]);
-   objectRotationOffsetCopy[2]=randomFloat(minimumObjectRotationValue[2],maximumObjectRotationValue[2]);
-  }
 
   //First load the 3D positions of each joint..
   bvh_loadTransformForFrame(
@@ -277,7 +257,7 @@ int performPointProjections(
                   mc,
                   bvhTransform,
                   renderer,
-                  objectRotationOffsetCopy
+                  objectRotationOffset
                  );
    //----------------------------------------------------------
 
@@ -352,18 +332,30 @@ int dumpBVHToSVG(
   {
    snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
 
+
+    float objectRotationOffsetCopy[3];
+    objectRotationOffsetCopy[0]=objectRotationOffset[0];
+    objectRotationOffsetCopy[1]=objectRotationOffset[1];
+    objectRotationOffsetCopy[2]=objectRotationOffset[2];
+
+
+    if (randomizePoses)
+    {
+      renderer.cameraOffsetPosition[0]=randomFloat(minimumObjectPositionValue[0],maximumObjectPositionValue[0]);
+      renderer.cameraOffsetPosition[1]=randomFloat(minimumObjectPositionValue[1],maximumObjectPositionValue[1]);
+      renderer.cameraOffsetPosition[2]=randomFloat(minimumObjectPositionValue[2],maximumObjectPositionValue[2]);
+
+      objectRotationOffsetCopy[0]=randomFloat(minimumObjectRotationValue[0],maximumObjectRotationValue[0]);
+      objectRotationOffsetCopy[1]=randomFloat(minimumObjectRotationValue[1],maximumObjectRotationValue[1]);
+      objectRotationOffsetCopy[2]=randomFloat(minimumObjectRotationValue[2],maximumObjectRotationValue[2]);
+   }
+
    performPointProjections(
                            mc,
                            &bvhTransform,
                            fID,
                            &renderer,
-                           objectRotationOffset,
-
-                           randomizePoses,
-                           minimumObjectPositionValue,
-                           maximumObjectPositionValue,
-                           minimumObjectRotationValue,
-                           maximumObjectRotationValue
+                           objectRotationOffsetCopy
                           );
 
    if (convertToCSV)
@@ -372,7 +364,7 @@ int dumpBVHToSVG(
                        mc,
                        &bvhTransform,
                        &renderer,
-                       objectRotationOffset,
+                       objectRotationOffsetCopy,
                        fID,
                        csvFilename
                       );
@@ -387,7 +379,7 @@ int dumpBVHToSVG(
                                        &bvhTransform,
                                        fID,
                                        &renderer,
-                                       objectRotationOffset
+                                       objectRotationOffsetCopy
                                       );
    }
 
