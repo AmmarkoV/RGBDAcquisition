@@ -225,7 +225,15 @@ int dumpBVHToSVGFrame(
 float randomFloat( float min, float max )
 {
     float scale = rand() / (float) RAND_MAX; /* [0, 1.0] */
-    return min + scale * ( max - min );      /* [min, max] */
+
+    float absoluteRandom = scale * (max - min);      /* [min, max] */
+
+    float value = max-absoluteRandom;
+
+    if (value<min) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO SMALL\n",min,max,value); }
+    if (value>max) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO BIG\n",min,max,value); }
+
+    return value;
 }
 
 int performPointProjections(
