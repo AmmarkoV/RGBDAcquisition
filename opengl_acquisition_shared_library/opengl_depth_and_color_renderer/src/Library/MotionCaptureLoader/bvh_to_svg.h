@@ -12,6 +12,8 @@ int dumpBVHToSVG(
                  struct BVH_MotionCapture * mc,
                  unsigned int width,
                  unsigned int height,
+
+                 unsigned int useOriginalPositionsRotations,
                  float * cameraPositionOffset,
                  float * cameraRotationOffset,
                  float * objectRotationOffset,

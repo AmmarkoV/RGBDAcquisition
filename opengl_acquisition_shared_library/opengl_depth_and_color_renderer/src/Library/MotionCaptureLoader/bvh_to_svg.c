@@ -273,6 +273,8 @@ int dumpBVHToSVG(
                  struct BVH_MotionCapture * mc,
                  unsigned int width,
                  unsigned int height,
+
+                 unsigned int useOriginalPositionsRotations,
                  float * cameraPositionOffset,
                  float * cameraRotationOffset,
                  float * objectRotationOffset,
@@ -284,6 +286,15 @@ int dumpBVHToSVG(
                  float * maximumObjectRotationValue
                  )
 {
+  if (
+       (useOriginalPositionsRotations) &&
+       (randomizePoses)
+     )
+  {
+   fprintf(stderr,"RandomizePoses wins over original positions rotations..!");
+   useOriginalPositionsRotations=0;
+  }
+
   struct BVH_Transform bvhTransform;
   char svgFilename[512];
   char csvFilename[512];
@@ -338,7 +349,18 @@ int dumpBVHToSVG(
     objectRotationOffsetCopy[1]=objectRotationOffset[1];
     objectRotationOffsetCopy[2]=objectRotationOffset[2];
 
-
+    if (useOriginalPositionsRotations)
+    {/*
+      BVHJointID rootJID;
+      bvh_getRootJointID( mc, &rootJID );
+      float * data = bvh_getMotionValue( mc , rootJID);
+      renderer.cameraOffsetPosition[0]=data[0];
+      renderer.cameraOffsetPosition[1]=data[1];
+      renderer.cameraOffsetPosition[2]=data[2];
+      objectRotationOffsetCopy[0]=data[3];
+      objectRotationOffsetCopy[1]=data[4];
+      objectRotationOffsetCopy[2]=data[5];*/
+    } else
     if (randomizePoses)
     {
       renderer.cameraOffsetPosition[0]=randomFloat(minimumObjectPositionValue[0],maximumObjectPositionValue[0]);
