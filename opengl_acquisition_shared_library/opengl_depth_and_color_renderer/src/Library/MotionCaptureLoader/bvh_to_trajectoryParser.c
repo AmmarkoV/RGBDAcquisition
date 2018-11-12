@@ -436,7 +436,7 @@ int dumpBVHToTrajectoryParserTRI(
       //If we did not produce a root dynamic root joint for any reason we will just emmit a static one..
       if (!producedDynamicRotationForRootJoint)
       {
-        fprintf(fp,"MOVE(human,%u,-19.231,-54.976,2299.735,0.707107,0.707107,0.0,0.0)\n",fID);
+        fprintf(fp,"MOVE(human,%u,58.44,848.85,2105.70,90.00,0.00,0.00)\n",fID);
       }
 
 

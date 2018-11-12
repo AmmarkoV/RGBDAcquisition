@@ -266,6 +266,7 @@ int performPointProjections(
 
 
 
+
 int dumpBVHToSVG(
                  const char * directory,
                  int convertToSVG,
@@ -339,6 +340,11 @@ int dumpBVHToSVG(
                        );
    }
 
+  BVHJointID rootJID;
+  bvh_getRootJointID( mc, &rootJID );
+
+
+
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
@@ -350,16 +356,18 @@ int dumpBVHToSVG(
     objectRotationOffsetCopy[2]=objectRotationOffset[2];
 
     if (useOriginalPositionsRotations)
-    {/*
-      BVHJointID rootJID;
-      bvh_getRootJointID( mc, &rootJID );
-      float * data = bvh_getMotionValue( mc , rootJID);
-      renderer.cameraOffsetPosition[0]=data[0];
-      renderer.cameraOffsetPosition[1]=data[1];
-      renderer.cameraOffsetPosition[2]=data[2];
-      objectRotationOffsetCopy[0]=data[3];
-      objectRotationOffsetCopy[1]=data[4];
-      objectRotationOffsetCopy[2]=data[5];*/
+    {
+
+     float data[8]={0};
+     if (bhv_populatePosXYZRotXYZ(mc,rootJID,fID,data,sizeof(data)))
+         {
+            renderer.cameraOffsetPosition[0]=data[0];
+            renderer.cameraOffsetPosition[1]=data[1];
+            renderer.cameraOffsetPosition[2]=data[2];
+            objectRotationOffsetCopy[0]=data[3];
+            objectRotationOffsetCopy[1]=data[4];
+            objectRotationOffsetCopy[2]=data[5];
+         }
     } else
     if (randomizePoses)
     {

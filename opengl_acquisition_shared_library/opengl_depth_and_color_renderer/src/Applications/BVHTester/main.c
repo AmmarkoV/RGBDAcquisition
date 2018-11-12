@@ -166,6 +166,7 @@ int main(int argc, char **argv)
                   &bvhMotion,
                   640,
                   480,
+                  usePosition,
                   cameraPositionOffset,
                   cameraRotationOffset,
                   objectRotationOffset,
