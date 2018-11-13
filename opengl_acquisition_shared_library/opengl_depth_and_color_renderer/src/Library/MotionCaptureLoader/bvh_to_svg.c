@@ -288,11 +288,10 @@ int dumpBVHToSVG(
                  )
 {
   if (
-       (useOriginalPositionsRotations) &&
-       (randomizePoses)
+       (useOriginalPositionsRotations) && (randomizePoses)
      )
   {
-   fprintf(stderr,"RandomizePoses wins over original positions rotations..!");
+   fprintf(stderr,"RandomizePoses wins over use original positions rotations..!");
    useOriginalPositionsRotations=0;
   }
 
@@ -357,7 +356,6 @@ int dumpBVHToSVG(
 
     if (useOriginalPositionsRotations)
     {
-
      float data[8]={0};
      if (bhv_populatePosXYZRotXYZ(mc,rootJID,fID,data,sizeof(data)))
          {

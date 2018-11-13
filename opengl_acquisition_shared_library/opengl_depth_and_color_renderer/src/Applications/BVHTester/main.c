@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     unsigned int convertToCSV=0;
     unsigned int maxFrames = 0;
     unsigned int onlyFirstFrame=0;
-    unsigned int usePosition=0;
+    unsigned int useOriginalPosition=0;
 
     float scaleWorld=1.0;
     float cameraPositionOffset[3]={0};
@@ -105,9 +105,9 @@ int main(int argc, char **argv)
         {
           onlyFirstFrame=1;
         } else
-        if (strcmp(argv[i],"--usePosition")==0)
+        if (strcmp(argv[i],"--useOriginalPosition")==0)
         {
-          usePosition=1;
+          useOriginalPosition=1;
         } else
         if (strcmp(argv[i],"--scale")==0)
         {
@@ -166,7 +166,7 @@ int main(int argc, char **argv)
                   &bvhMotion,
                   640,
                   480,
-                  usePosition,
+                  useOriginalPosition,
                   cameraPositionOffset,
                   cameraRotationOffset,
                   objectRotationOffset,
@@ -193,7 +193,7 @@ int main(int argc, char **argv)
 
 
 
-    dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,usePosition,0);
+    dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,useOriginalPosition,0);
     dumpBVHToTrajectoryParser(toSceneFile,&bvhMotion);
 
     //Test printout of all rotations of a specific joint..
