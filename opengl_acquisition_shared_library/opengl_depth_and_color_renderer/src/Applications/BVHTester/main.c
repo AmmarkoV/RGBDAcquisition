@@ -175,6 +175,7 @@ int main(int argc, char **argv)
                      0,0,0,0,0,
                      //
                      1,//Filter out all poses where even one joint is behind camera
+                     1,//Filter out all poses where even one joint is outside of 2D frame
                      0//We don't want to convert to radians
                  );
       return 0;

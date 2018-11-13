@@ -100,6 +100,7 @@ int dumpBVHToCSVBody(
                        unsigned int fID,
                        const char * filename,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                       unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                        unsigned int encodeRotationsAsRadians
                       )
 {
@@ -130,6 +131,27 @@ int dumpBVHToCSVBody(
          }
        }
    }//-----------------------------------------------
+
+
+   //-------------------------------------------------
+   if (filterOutSkeletonsWithAnyLimbsOutOfImage)
+   {
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+        float x = bvhTransform->joint[jID].pos2D[0];
+        float y = bvhTransform->joint[jID].pos2D[1];
+
+        if (
+             (0.0<x) && (0.0<y) && (x<renderer->width) && (y<renderer->height)
+           )
+        {
+           ++filteredOutCSVPoses;
+           //Just counting to reduce spam..
+           return 0;
+        }
+       }
+   }//-----------------------------------------------
+
 
    //-------------------------------------------------
    if (encodeRotationsAsRadians)
