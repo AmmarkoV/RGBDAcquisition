@@ -14,7 +14,7 @@
 #include "../../Library/MotionCaptureLoader/bvh_to_tri_pose.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h"
-#include "../../Library/MotionCaptureLoader/export/bvh_to_svgcsv.h"
+#include "../../Library/MotionCaptureLoader/export/bvh_export.h"
 
 void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 {
@@ -145,7 +145,7 @@ int main(int argc, char **argv)
     bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
 
     //Change joint names..
-    bvh_renameJoints(&bvhMotion);
+    bvh_renameJointsForCompatibility(&bvhMotion);
 
     //We can limit the number of frames
     if (maxFrames!=0)
@@ -160,7 +160,7 @@ int main(int argc, char **argv)
     //SVG or CSV output ..
     if ( (convertToSVG) || (convertToCSV) )
     {
-     dumpBVHToSVG(
+     dumpBVHToSVGCSV(
                   toSVGDirectory,
                   convertToSVG,
                   convertToCSV,

@@ -1,11 +1,11 @@
-#ifndef BVH_TO_SVG_H_INCLUDED
-#define BVH_TO_SVG_H_INCLUDED
+#ifndef BVH_EXPORT_H_INCLUDED
+#define BVH_EXPORT_H_INCLUDED
 
 
 #include "../bvh_loader.h"
 #include "../bvh_transform.h"
 
-int dumpBVHToSVG(
+int dumpBVHToSVGCSV(
                  const char * directory ,
                  int convertToSVG,
                  int convertToCSV,
@@ -25,4 +25,5 @@ int dumpBVHToSVG(
                  float * maximumObjectRotationValue
                  );
 
-#endif // BVH_TO_SVG_H_INCLUDED
+
+#endif // BVH_EXPORT_H_INCLUDED

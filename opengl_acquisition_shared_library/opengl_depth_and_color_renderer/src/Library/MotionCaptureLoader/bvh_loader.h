@@ -2,6 +2,7 @@
  *  @brief  BVH file parser
             part of  https://github.com/AmmarkoV/RGBDAcquisition/tree/master/opengl_acquisition_shared_library/opengl_depth_and_color_renderer
             This is a very clean-cut parser of bvh file that will load a struct BVH_MotionCapture using the loadBVH command
+            This part of the code does not perform any transformations on the loaded file, if you want to check transformations see bvh_transform.h
  *  @author Ammar Qammaz (AmmarkoV)
  */
 #ifndef BVH_LOADER_H_INCLUDED
@@ -140,7 +141,196 @@ struct BVH_MotionCapture
 
 
 
-void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion);
+/**
+* @brief Different motion capture systems produce different types of joint names. For example lhip can be named lefthip,leftupleg,lthigh,leftupperLeg etc.
+*        This call renames them in order to ensure better compatibility with various different motion capture files..
+* @ingroup BVH
+* @param  BVH Structure
+*/
+void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion);
+
+
+/**
+* @brief Load a BVH file by giving a filename and filling in a BVH_MotionCapture struct
+* @ingroup BVH
+* @param  C-String with path to BVH File
+* @param  pointer to an allocated BVH_MotionCapture struct
+* @param  the scale of the world
+*/
+int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, float scaleWorld);
+
+
+/**
+* @brief Free the space allocated by a BVH_MotionCapture file
+* @ingroup BVH
+* @param  BVH Structure
+* @return 1=Success/0=Failure
+*/
+int bvh_free(struct BVH_MotionCapture * bvhMotion);
+
+
+/**
+* @brief Ask if joint has a parent.
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint ID we want to query
+* @return 1=HasParent/0=NoParent-Error
+*/
+int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
+
+
+/**
+* @brief Ask if joint has rotational component.
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint ID we want to query
+* @return 1=HasRotation/0=NoRotation-Error
+*/
+int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
+
+/**
+* @brief Resolve a C-String from a Joint name to a Joint ID
+* @ingroup BVH
+* @param  BVH Structure
+* @param  C-String with Joint Name
+* @param  Output Joint ID
+* @return 1=Found/0=NotFound
+*/
+int bvh_getJointIDFromJointName( struct BVH_MotionCapture * bvhMotion , const char * jointName, BVHJointID * jID);
+
+
+/**
+* @brief Get the root joint of a BVH_MotionCapture file
+* @ingroup BVH
+* @param   BVH Structure
+* @param   Output Root Joint ID
+* @return  1=Found/0=NotFound
+*/
+int bvh_getRootJointID(
+                       struct BVH_MotionCapture * bvhMotion ,
+                       BVHJointID * jID
+                      );
+
+/**
+* @brief Copy a motion frame of a BVH_MotionCapture file
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Target frame we want to populate with source
+* @param  Source frame we want to copy
+* @return 1=Success/0=Failure
+*/
+int bvh_copyMotionFrame(
+                         struct BVH_MotionCapture * bvhMotion,
+                         BVHFrameID tofID,
+                         BVHFrameID fromfID
+                        );
+
+
+//float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
+
+
+/**
+* @brief Request a specific motion channel of a specific joint at a specific frame
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint we want to access ( if we just have the name we can retrieve jID using bvh_getJointIDFromJointName )
+* @param  Frame we want to access
+* @param  Type of channel we want to access ( see enum CHANNEL_NAMES )
+* @return Value of channel for specific joint at specific frame
+*/
+float bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID);
+
+
+
+/**
+* @brief Request X Rotation of a specific joint at a specific frame
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint we want to access ( if we just have the name we can retrieve jID using bvh_getJointIDFromJointName )
+* @param  Frame we want to access
+* @return X Rotation for specific joint at specific frame
+*/
+float  bvh_getJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
+
+/**
+* @brief Request Y Rotation of a specific joint at a specific frame
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint we want to access ( if we just have the name we can retrieve jID using bvh_getJointIDFromJointName )
+* @param  Frame we want to access
+* @return Y Rotation for specific joint at specific frame
+*/
+float  bvh_getJointRotationYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
+
+/**
+* @brief Request Z Rotation of a specific joint at a specific frame
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint we want to access ( if we just have the name we can retrieve jID using bvh_getJointIDFromJointName )
+* @param  Frame we want to access
+* @return Z Rotation for specific joint at specific frame
+*/
+float  bvh_getJointRotationZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
+
+/**
+* @brief Request X Position of a specific joint at a specific frame
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint we want to access ( if we just have the name we can retrieve jID using bvh_getJointIDFromJointName )
+* @param  Frame we want to access
+* @return X Position for specific joint at specific frame
+*/
+float  bvh_getJointPositionXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
+
+/**
+* @brief Request Y Position of a specific joint at a specific frame
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint we want to access ( if we just have the name we can retrieve jID using bvh_getJointIDFromJointName )
+* @param  Frame we want to access
+* @return Y Position for specific joint at specific frame
+*/
+float  bvh_getJointPositionYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
+
+/**
+* @brief Request Z Position of a specific joint at a specific frame
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint we want to access ( if we just have the name we can retrieve jID using bvh_getJointIDFromJointName )
+* @param  Frame we want to access
+* @return Z Position for specific joint at specific frame
+*/
+float  bvh_getJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
+
+
+
+/**
+* @brief Request XYZ positions and XYZ rotations that will be written on a float data[6] array
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint we want to access ( if we just have the name we can retrieve jID using bvh_getJointIDFromJointName )
+* @param  Frame we want to access
+* @param  Output float array that will hold the results
+* @param  Size of the output float array that should hold at least 6 floats
+* @return 1=Success/0=Failure
+*/
+int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData);
+
+
+
+/**
+* @brief Direct access to the motion data, without Joint hierarchy,Frame separation etc, should not be used unless you really know what you are doing..
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Motion element we want to read
+* @return Motion Value
+*/
+float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID);
+
+
+
+
+
 
 /**
 * @brief Print BVH information on stderr
@@ -152,61 +342,7 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion);
 void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion);
 
 
-/**
-* @brief Load a BVH file by giving a filename and filling in a BVH_MotionCapture struct
-* @ingroup BVH
-* @param  C-String with path to BVH File
-* @param  pointer to an allocated BVH_MotionCapture struct
-*/
-int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, float scaleWorld);
 
 
 
-int bvh_free(struct BVH_MotionCapture * bvhMotion);
-
-/**
-* @brief Resolve a C-String from a Joint name to a Joint ID
-* @ingroup BVH
-* @param  BVH Structure
-* @param  C-String with Joint Name
-* @param  Output Joint ID
-*/
-int bvh_getJointIDFromJointName( struct BVH_MotionCapture * bvhMotion , const char * jointName, BVHJointID * jID);
-
-int bvh_copyMotionFrame(
-                         struct BVH_MotionCapture * bvhMotion,
-                         BVHFrameID tofID,
-                         BVHFrameID fromfID
-                        );
-
-float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
-
-
-float bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID);
-
-float  bvh_getJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
-float  bvh_getJointRotationYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
-float  bvh_getJointRotationZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
-
-float  bvh_getJointPositionXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
-float  bvh_getJointPositionYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
-float  bvh_getJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID);
-
-int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData);
-
-/*
-int bhv_getRootDynamicPosition(struct BVH_MotionCapture * bvhMotion ,  BVHFrameID fID , float * data , unsigned int sizeOfData);
-
-
-int bhv_getRootDynamicRotation(struct BVH_MotionCapture * bvhMotion ,  BVHFrameID fID , float * data , unsigned int sizeOfData);
-*/
-
-int bvh_getRootJointID(
-                       struct BVH_MotionCapture * bvhMotion ,
-                       BVHJointID * jID
-                      );
-
-float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID);
-int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
-int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
 #endif // BVH_LOADER_H_INCLUDED

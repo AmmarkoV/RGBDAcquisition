@@ -73,7 +73,7 @@ void lowercase(char *a)
    while (*a!=0) { *a = tolower(*a); ++a; }
 }
 
-void bvh_renameJoints(struct BVH_MotionCapture * bvhMotion)
+void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
 {
   unsigned int jID=0;
 
@@ -784,12 +784,216 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 }
 
 
+
+//----------------------------------------------------------------------------------------------------
+int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, float scaleWorld)
+{
+ bvhMotion->scaleWorld=scaleWorld;
+  int successfullRead=0;
+  FILE *fd=0;
+  fd = fopen(filename,"r");
+  if (fd!=0)
+    {
+      snprintf(bvhMotion->fileName,1024,"%s",filename);
+      if (readBVHHeader(bvhMotion,fd))
+      {
+       if (readBVHMotion(bvhMotion,fd))
+       {
+         successfullRead=1;
+       }
+      }
+      fclose(fd);
+    }
+ return successfullRead;
+}
+
+
+int bvh_free(struct BVH_MotionCapture * bvhMotion)
+{
+  if ( bvhMotion==0 ) { return 0; }
+  if ( bvhMotion->motionValues!= 0 ) { free(bvhMotion->motionValues); }
+  return 1;
+}
+//----------------------------------------------------------------------------------------------------
+
+
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 ///                                        ACCESSORS
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
+{
+ if (jID>bvhMotion->jointHierarchySize) { return 0; }
+ return (!bvhMotion->jointHierarchy[jID].isRoot);
+}
+
+int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
+{
+ if (jID>bvhMotion->jointHierarchySize) { return 0; }
+ return (
+          (bvhMotion->jointHierarchy[jID].loadedChannels>0) &&
+          (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)
+        );
+}
+
+
+
+
+
+
+
+
+int bvh_getJointIDFromJointName(
+                                 struct BVH_MotionCapture * bvhMotion ,
+                                 const char * jointName,
+                                 BVHJointID * jID
+                                )
+{
+   if (bvhMotion==0) { return 0; }
+   unsigned int i=0;
+   for (i=0; i<bvhMotion->jointHierarchySize; i++)
+   {
+     if (strcmp(bvhMotion->jointHierarchy[i].jointName,jointName)==0)
+     {
+         *jID=i;
+         return 1;
+     }
+   }
+ return 0;
+}
+
+
+int bvh_getRootJointID(
+                       struct BVH_MotionCapture * bvhMotion ,
+                       BVHJointID * jID
+                      )
+{
+   if (bvhMotion==0) { return 0; }
+
+   unsigned int i=0;
+   for (i=0; i<bvhMotion->jointHierarchySize; i++)
+   {
+     if (bvhMotion->jointHierarchy[i].isRoot)
+     {
+         *jID=i;
+         return 1;
+     }
+   }
+ return 0;
+}
+
+
+
+float bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID)
+{
+   if (bvhMotion==0) { return 0.0; }
+   if (bvhMotion->jointHierarchySize<=jID) { return 0.0; }
+
+   unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
+
+   if (mID>=bvhMotion->motionValuesSize)
+   {
+     fprintf(stderr,RED "bvh_getJointChannelAtFrame overflowed..\n" NORMAL);
+     return 0.0;
+   }
+
+   return bvhMotion->motionValues[mID];
+}
+
+
+
+float  bvh_getJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_X);
+}
+
+
+float  bvh_getJointRotationYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_Y);
+}
+
+
+float  bvh_getJointRotationZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_Z);
+}
+
+
+
+float  bvh_getJointPositionXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_X);
+}
+
+
+float  bvh_getJointPositionYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_Y);
+}
+
+
+float  bvh_getJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
+{
+  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_Z);
+}
+
+
+int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData)
+{
+  if (data == 0) { return 0; }
+  if (sizeOfData < sizeof(float)* 6) { return 0; }
+
+  data[0]=bvh_getJointPositionXAtFrame(bvhMotion,jID,fID);
+  data[1]=bvh_getJointPositionYAtFrame(bvhMotion,jID,fID);
+  data[2]=bvh_getJointPositionZAtFrame(bvhMotion,jID,fID);
+  data[3]=bvh_getJointRotationXAtFrame(bvhMotion,jID,fID);
+  data[4]=bvh_getJointRotationYAtFrame(bvhMotion,jID,fID);
+  data[5]=bvh_getJointRotationZAtFrame(bvhMotion,jID,fID);
+  return 1;
+}
+
+
+
+float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID)
+{
+  return bvhMotion->motionValues[mID];
+}
+
+int bvh_copyMotionFrame(
+                         struct BVH_MotionCapture * bvhMotion,
+                         BVHFrameID tofID,
+                         BVHFrameID fromfID
+                        )
+{
+   if (
+         (tofID<bvhMotion->numberOfFrames ) && (fromfID<bvhMotion->numberOfFrames )
+      )
+   {
+     memcpy(
+             &bvhMotion->motionValues[tofID * bvhMotion->numberOfValuesPerFrame],
+             &bvhMotion->motionValues[fromfID * bvhMotion->numberOfValuesPerFrame],
+             bvhMotion->numberOfValuesPerFrame * sizeof(float)
+           );
+     return 1;
+   }
+ return 0;
+}
+
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+///                                        PRINT STATE
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
@@ -871,248 +1075,5 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
    fprintf(stderr,"\n\n");
   }
   fprintf(stderr,"_______________________________________________\n");
-}
-
-
-
-/*
-int bvh_InternalCheck(struct BVH_MotionCapture * bvhMotion)
-{
-    unsigned int mID=0,jID=0,fID=0,cType=0;
-    for (mID=0; mID<10000; mID++)
-    {
-       // struct BVH_MotionCapture * bvhMotion
-       //TODO:
-    }
-}*/
-
-
-int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, float scaleWorld)
-{
- bvhMotion->scaleWorld=scaleWorld;
-  int successfullRead=0;
-  FILE *fd=0;
-  fd = fopen(filename,"r");
-  if (fd!=0)
-    {
-      snprintf(bvhMotion->fileName,1024,"%s",filename);
-      if (readBVHHeader(bvhMotion,fd))
-      {
-       if (readBVHMotion(bvhMotion,fd))
-       {
-         successfullRead=1;
-       }
-      }
-      fclose(fd);
-    }
- return successfullRead;
-}
-
-
-int bvh_free(struct BVH_MotionCapture * bvhMotion)
-{
-  if ( bvhMotion==0 ) { return 0; }
-  if ( bvhMotion->motionValues!= 0 ) { free(bvhMotion->motionValues); }
-  return 1;
-}
-
-int bvh_getJointIDFromJointName(
-                                 struct BVH_MotionCapture * bvhMotion ,
-                                 const char * jointName,
-                                 BVHJointID * jID
-                                )
-{
-   if (bvhMotion==0) { return 0; }
-   unsigned int i=0;
-   for (i=0; i<bvhMotion->jointHierarchySize; i++)
-   {
-     if (strcmp(bvhMotion->jointHierarchy[i].jointName,jointName)==0)
-     {
-         *jID=i;
-         return 1;
-     }
-   }
- return 0;
-}
-
-
-float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
-{
-   if (bvhMotion==0) { return 0; }
-   if (bvhMotion->jointHierarchySize<=jID) { return 0; }
-
-   return bvhMotion->jointHierarchy[jID].offset;
-}
-
-
-float bvh_getJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID)
-{
-   if (bvhMotion==0) { return 0.0; }
-   if (bvhMotion->jointHierarchySize<=jID) { return 0.0; }
-
-   unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
-
-   if (mID>=bvhMotion->motionValuesSize)
-   {
-     fprintf(stderr,RED "bvh_getJointChannelAtFrame overflowed..\n" NORMAL);
-     return 0.0;
-   }
-
-   return bvhMotion->motionValues[mID];
-}
-
-
-
-float  bvh_getJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
-{
-  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_X);
-}
-
-
-float  bvh_getJointRotationYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
-{
-  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_Y);
-}
-
-
-float  bvh_getJointRotationZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
-{
-  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_Z);
-}
-
-
-
-float  bvh_getJointPositionXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
-{
-  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_X);
-}
-
-
-float  bvh_getJointPositionYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
-{
-  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_Y);
-}
-
-
-float  bvh_getJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID)
-{
-  return bvh_getJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_Z);
-}
-
-
-int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData)
-{
-  if (data == 0) { return 0; }
-  if (sizeOfData < sizeof(float)* 6) { return 0; }
-
-  data[0]=bvh_getJointPositionXAtFrame(bvhMotion,jID,fID);
-  data[1]=bvh_getJointPositionYAtFrame(bvhMotion,jID,fID);
-  data[2]=bvh_getJointPositionZAtFrame(bvhMotion,jID,fID);
-  data[3]=bvh_getJointRotationXAtFrame(bvhMotion,jID,fID);
-  data[4]=bvh_getJointRotationYAtFrame(bvhMotion,jID,fID);
-  data[5]=bvh_getJointRotationZAtFrame(bvhMotion,jID,fID);
-  return 1;
-}
-
-/*
-int bhv_getRootDynamicPosition(struct BVH_MotionCapture * bvhMotion ,  BVHFrameID fID , float * data , unsigned int sizeOfData)
-{
-  if (data == 0) { return 0; }
-  if (sizeOfData < sizeof(float)* 3) { return 0; }
-
-  BVHJointID jID=0;
-  for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
-  {
-    if ( bvhMotion->jointHierarchy[jID].isRoot )
-    {
-      data[0]=bvh_getJointPositionXAtFrame(bvhMotion,jID,fID);
-      data[1]=bvh_getJointPositionYAtFrame(bvhMotion,jID,fID);
-      data[2]=bvh_getJointPositionZAtFrame(bvhMotion,jID,fID);
-      return 1;
-    }
-  }
- return 0;
-}
-
-
-int bhv_getRootDynamicRotation(struct BVH_MotionCapture * bvhMotion ,  BVHFrameID fID , float * data , unsigned int sizeOfData)
-{
-  if (data == 0) { return 0; }
-  if (sizeOfData < sizeof(float)* 3) { return 0; }
-
-  BVHJointID jID=0;
-  for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
-  {
-    if ( bvhMotion->jointHierarchy[jID].isRoot )
-    {
-      data[0]=bvh_getJointRotationXAtFrame(bvhMotion,jID,fID);
-      data[1]=bvh_getJointRotationYAtFrame(bvhMotion,jID,fID);
-      data[2]=bvh_getJointRotationZAtFrame(bvhMotion,jID,fID);
-      return 1;
-    }
-  }
- return 0;
-}*/
-
-int bvh_getRootJointID(
-                       struct BVH_MotionCapture * bvhMotion ,
-                       BVHJointID * jID
-                      )
-{
-   if (bvhMotion==0) { return 0; }
-
-   unsigned int i=0;
-   for (i=0; i<bvhMotion->jointHierarchySize; i++)
-   {
-     if (bvhMotion->jointHierarchy[i].isRoot)
-     {
-         *jID=i;
-         return 1;
-     }
-   }
- return 0;
-}
-
-
-
-float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID)
-{
-  return bvhMotion->motionValues[mID];
-}
-
-int bvh_copyMotionFrame(
-                         struct BVH_MotionCapture * bvhMotion,
-                         BVHFrameID tofID,
-                         BVHFrameID fromfID
-                        )
-{
-   if (
-         (tofID<bvhMotion->numberOfFrames ) && (fromfID<bvhMotion->numberOfFrames )
-      )
-   {
-     memcpy(
-             &bvhMotion->motionValues[tofID * bvhMotion->numberOfValuesPerFrame],
-             &bvhMotion->motionValues[fromfID * bvhMotion->numberOfValuesPerFrame],
-             bvhMotion->numberOfValuesPerFrame * sizeof(float)
-           );
-     return 1;
-   }
- return 0;
-}
-
-
-int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
-{
- if (jID>bvhMotion->jointHierarchySize) { return 0; }
- return (!bvhMotion->jointHierarchy[jID].isRoot);
-}
-
-int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
-{
- if (jID>bvhMotion->jointHierarchySize) { return 0; }
- return (
-          (bvhMotion->jointHierarchy[jID].loadedChannels>0) &&
-          (bvhMotion->jointHierarchy[jID].channelRotationOrder!=0)
-        );
 }
 

@@ -160,10 +160,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="MotionCaptureLoader/bvh_loader.h" />
-		<Unit filename="MotionCaptureLoader/bvh_to_trajectoryParser.c">
+		<Unit filename="MotionCaptureLoader/bvh_project.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="MotionCaptureLoader/bvh_to_trajectoryParser.h" />
+		<Unit filename="MotionCaptureLoader/bvh_project.h" />
 		<Unit filename="MotionCaptureLoader/bvh_to_tri_pose.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -172,6 +172,26 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="MotionCaptureLoader/bvh_transform.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_export.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_export.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_to_csv.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_to_csv.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_to_svg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_to_svg.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h" />
+		<Unit filename="MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h" />
 		<Unit filename="OGLRendererSandbox.h" />
 		<Unit filename="Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.c">
 			<Option compilerVar="CC" />

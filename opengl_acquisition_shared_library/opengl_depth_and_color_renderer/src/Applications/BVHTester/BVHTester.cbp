@@ -68,10 +68,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_transform.h" />
-		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_svgcsv.c">
+		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_export.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_svgcsv.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_export.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_csv.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_csv.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_svg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_svg.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c">
 			<Option compilerVar="CC" />
 		</Unit>
