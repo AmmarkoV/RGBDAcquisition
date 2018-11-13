@@ -22,7 +22,9 @@ int dumpBVHToSVGCSV(
                  float * minimumObjectPositionValue,
                  float * maximumObjectPositionValue,
                  float * minimumObjectRotationValue,
-                 float * maximumObjectRotationValue
+                 float * maximumObjectRotationValue,
+
+                 unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera
                  );
 
 

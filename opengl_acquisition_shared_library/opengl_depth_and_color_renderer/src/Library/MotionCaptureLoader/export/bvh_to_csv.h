@@ -8,7 +8,6 @@
 
 int dumpBVHToCSVHeader(
                        struct BVH_MotionCapture * mc,
-                       struct simpleRenderer * renderer,
                        const char * filename
                       );
 
@@ -19,7 +18,8 @@ int dumpBVHToCSVBody(
                        struct simpleRenderer * renderer,
                        float * objectRotationOffset,
                        unsigned int fID,
-                       const char * filename
+                       const char * filename,
+                       unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera
                       );
 
 #endif // BVH_TO_SVG_H_INCLUDED

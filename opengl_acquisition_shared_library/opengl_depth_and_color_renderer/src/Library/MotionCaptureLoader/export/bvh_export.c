@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "bvh_export.h"
 #include "bvh_to_csv.h"
 #include "bvh_to_svg.h"
@@ -54,24 +55,26 @@ int performPointProjections(
 
 
 int dumpBVHToSVGCSV(
-                 const char * directory,
-                 int convertToSVG,
-                 int convertToCSV,
-                 struct BVH_MotionCapture * mc,
-                 unsigned int width,
-                 unsigned int height,
+                    const char * directory,
+                    int convertToSVG,
+                    int convertToCSV,
+                    struct BVH_MotionCapture * mc,
+                    unsigned int width,
+                    unsigned int height,
 
-                 unsigned int useOriginalPositionsRotations,
-                 float * cameraPositionOffset,
-                 float * cameraRotationOffset,
-                 float * objectRotationOffset,
+                    unsigned int useOriginalPositionsRotations,
+                    float * cameraPositionOffset,
+                    float * cameraRotationOffset,
+                    float * objectRotationOffset,
 
-                 unsigned int randomizePoses,
-                 float * minimumObjectPositionValue,
-                 float * maximumObjectPositionValue,
-                 float * minimumObjectRotationValue,
-                 float * maximumObjectRotationValue
-                 )
+                    unsigned int randomizePoses,
+                    float * minimumObjectPositionValue,
+                    float * maximumObjectPositionValue,
+                    float * minimumObjectRotationValue,
+                    float * maximumObjectRotationValue,
+
+                    unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera
+                   )
 {
   if (
        (useOriginalPositionsRotations) && (randomizePoses)
@@ -84,9 +87,6 @@ int dumpBVHToSVGCSV(
   struct BVH_Transform bvhTransform;
   char svgFilename[512];
   char csvFilename[512];
-
-  unsigned int framesDumped=0;
-  unsigned int fID=0;
 
 
   struct simpleRenderer renderer={0};
@@ -120,7 +120,6 @@ int dumpBVHToSVGCSV(
    {
     dumpBVHToCSVHeader(
                         mc,
-                        &renderer,
                         csvFilename
                        );
    }
@@ -130,6 +129,8 @@ int dumpBVHToSVGCSV(
 
 
 
+  unsigned int framesDumped=0;
+  unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
@@ -146,9 +147,9 @@ int dumpBVHToSVGCSV(
      if (bhv_populatePosXYZRotXYZ(mc,rootJID,fID,data,sizeof(data)))
          {
             renderer.cameraOffsetPosition[0]=data[0];
-            renderer.cameraOffsetPosition[1]=data[1];
-            renderer.cameraOffsetPosition[2]=data[2];
-            objectRotationOffsetCopy[0]=data[3];
+            renderer.cameraOffsetPosition[1]=data[1]-80;
+            renderer.cameraOffsetPosition[2]=data[2]+300;
+            objectRotationOffsetCopy[0]=data[3]+0;
             objectRotationOffsetCopy[1]=data[4];
             objectRotationOffsetCopy[2]=data[5];
          }
@@ -180,7 +181,8 @@ int dumpBVHToSVGCSV(
                        &renderer,
                        objectRotationOffsetCopy,
                        fID,
-                       csvFilename
+                       csvFilename,
+                       filterOutSkeletonsWithAnyLimbsBehindTheCamera
                       );
    }
 

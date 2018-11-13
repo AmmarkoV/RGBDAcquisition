@@ -161,18 +161,20 @@ int main(int argc, char **argv)
     if ( (convertToSVG) || (convertToCSV) )
     {
      dumpBVHToSVGCSV(
-                  toSVGDirectory,
-                  convertToSVG,
-                  convertToCSV,
-                  &bvhMotion,
-                  640,
-                  480,
-                  useOriginalPosition,
-                  cameraPositionOffset,
-                  cameraRotationOffset,
-                  objectRotationOffset,
-                  //Don't care about randomization
-                  0,0,0,0,0
+                     toSVGDirectory,
+                     convertToSVG,
+                     convertToCSV,
+                     &bvhMotion,
+                     640,
+                     480,
+                     useOriginalPosition,
+                     cameraPositionOffset,
+                     cameraRotationOffset,
+                     objectRotationOffset,
+                     //Don't care about randomization
+                     0,0,0,0,0,
+                     //
+                     1//Filter out all poses where even one joint is behind camera
                  );
       return 0;
     }

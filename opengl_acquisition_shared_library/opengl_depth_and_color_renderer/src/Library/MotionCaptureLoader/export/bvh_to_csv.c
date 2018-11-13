@@ -18,7 +18,6 @@ int fileExists(const char * filename)
 
 int dumpBVHToCSVHeader(
                        struct BVH_MotionCapture * mc,
-                       struct simpleRenderer * renderer,
                        const char * filename
                       )
 {
@@ -89,13 +88,39 @@ int dumpBVHToCSVBody(
                        struct simpleRenderer * renderer,
                        float * objectRotationOffset,
                        unsigned int fID,
-                       const char * filename
+                       const char * filename,
+                       unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera
                       )
 {
+   unsigned int jID=0;
+
+   //-------------------------------------------------
+   if (filterOutSkeletonsWithAnyLimbsBehindTheCamera)
+   {
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (bvhTransform->joint[jID].isBehindCamera)
+         {
+           fprintf(
+                   stderr,"Filtering out %0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f because joint %s is behind camera\n",
+                   renderer->cameraOffsetPosition[0]*10,
+                   renderer->cameraOffsetPosition[1]*10,
+                   renderer->cameraOffsetPosition[2]*10,
+                   objectRotationOffset[2],
+                   objectRotationOffset[1],
+                   objectRotationOffset[0],
+                   mc->jointHierarchy[jID].jointName
+                  );
+           return 0;
+         }
+       }
+   }//-----------------------------------------------
+
+
+
    FILE * fp = fopen(filename,"a");
    if (fp!=0)
    {
-
     fprintf(fp,"%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,",
                  renderer->cameraOffsetPosition[0]*10,
                  renderer->cameraOffsetPosition[1]*10,
@@ -106,7 +131,6 @@ int dumpBVHToCSVBody(
                  );
 
 
-     unsigned int jID=0;
      //2D Positions
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
