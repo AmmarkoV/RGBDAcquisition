@@ -73,7 +73,8 @@ int dumpBVHToSVGCSV(
                     float * minimumObjectRotationValue,
                     float * maximumObjectRotationValue,
 
-                    unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera
+                    unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                    unsigned int encodeRotationsAsRadians
                    )
 {
   if (
@@ -182,7 +183,8 @@ int dumpBVHToSVGCSV(
                        objectRotationOffsetCopy,
                        fID,
                        csvFilename,
-                       filterOutSkeletonsWithAnyLimbsBehindTheCamera
+                       filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                       encodeRotationsAsRadians
                       );
    }
 
@@ -200,6 +202,8 @@ int dumpBVHToSVGCSV(
    }
 
   }
+  fprintf(stderr,"Filtered out CSV poses : %u\n",filteredOutCSVPoses);
+
 
  return (framesDumped==mc->numberOfFrames);
 }

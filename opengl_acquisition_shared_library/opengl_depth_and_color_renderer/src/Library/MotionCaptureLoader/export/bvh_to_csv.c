@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "bvh_to_csv.h"
 
 #include "../bvh_project.h"
 
-
+#define CONVERT_EULER_TO_RADIANS M_PI/180.0
 #define DUMP_3D_POSITIONS 0
+
+unsigned int filteredOutCSVPoses=0;
 
 int fileExists(const char * filename)
 {
@@ -80,7 +83,14 @@ int dumpBVHToCSVHeader(
 }
 
 
-
+float eulerAngleToRadiansIfNeeded( float eulerAngle , unsigned int isItNeeded)
+{
+  if (isItNeeded)
+  {
+    return eulerAngle*CONVERT_EULER_TO_RADIANS;
+  }
+ return eulerAngle;
+}
 
 int dumpBVHToCSVBody(
                        struct BVH_MotionCapture * mc,
@@ -89,7 +99,8 @@ int dumpBVHToCSVBody(
                        float * objectRotationOffset,
                        unsigned int fID,
                        const char * filename,
-                       unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera
+                       unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                       unsigned int encodeRotationsAsRadians
                       )
 {
    unsigned int jID=0;
@@ -101,8 +112,11 @@ int dumpBVHToCSVBody(
        {
          if (bvhTransform->joint[jID].isBehindCamera)
          {
+           ++filteredOutCSVPoses;
+           //Just counting to reduce spam..
+           /*
            fprintf(
-                   stderr,"Filtering out %0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f because joint %s is behind camera\n",
+                   stderr,"Filtering out %0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f, joint %s is behind camera\n",
                    renderer->cameraOffsetPosition[0]*10,
                    renderer->cameraOffsetPosition[1]*10,
                    renderer->cameraOffsetPosition[2]*10,
@@ -111,12 +125,18 @@ int dumpBVHToCSVBody(
                    objectRotationOffset[0],
                    mc->jointHierarchy[jID].jointName
                   );
+           */
            return 0;
          }
        }
    }//-----------------------------------------------
 
-
+   //-------------------------------------------------
+   if (encodeRotationsAsRadians)
+   {
+    fprintf(stderr,"encodeRotationsAsRadians not implemented, please switch it off\n");
+    exit(0);
+   }//-----------------------------------------------
 
    FILE * fp = fopen(filename,"a");
    if (fp!=0)

@@ -174,7 +174,8 @@ int main(int argc, char **argv)
                      //Don't care about randomization
                      0,0,0,0,0,
                      //
-                     1//Filter out all poses where even one joint is behind camera
+                     1,//Filter out all poses where even one joint is behind camera
+                     0//We don't want to convert to radians
                  );
       return 0;
     }
