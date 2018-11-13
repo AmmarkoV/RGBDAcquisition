@@ -11,9 +11,10 @@
 
 #include "../../Library/TrajectoryParser/TrajectoryParserDataStructures.h"
 #include "../../Library/MotionCaptureLoader/bvh_loader.h"
-#include "../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.h"
 #include "../../Library/MotionCaptureLoader/bvh_to_tri_pose.h"
-#include "../../Library/MotionCaptureLoader/bvh_to_svg.h"
+#include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h"
+#include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h"
+#include "../../Library/MotionCaptureLoader/export/bvh_to_svgcsv.h"
 
 void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 {
@@ -191,13 +192,11 @@ int main(int argc, char **argv)
      bvhMotion.numberOfFrames=2; //Just Render one frame..
     }
 
-
-
     dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,useOriginalPosition,0);
-    dumpBVHToTrajectoryParser(toSceneFile,&bvhMotion);
+    dumpBVHToTrajectoryParserPrimitives(toSceneFile,&bvhMotion);
 
     //Test printout of all rotations of a specific joint..
-    testPrintout(&bvhMotion,"rknee");
+    //testPrintout(&bvhMotion,"rknee");
 
 
     bvh_free(&bvhMotion);

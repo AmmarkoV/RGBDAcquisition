@@ -70,9 +70,10 @@ add_library(OGLRendererSandbox SHARED
             MotionCaptureLoader/bvh_loader.c
             MotionCaptureLoader/bvh_transform.c
             MotionCaptureLoader/bvh_project.c
-            MotionCaptureLoader/bvh_to_trajectoryParser.c
             MotionCaptureLoader/bvh_to_tri_pose.c
-            MotionCaptureLoader/bvh_to_svg.c
+            MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c
+            MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c
+            MotionCaptureLoader/export/bvh_to_svgcsv.c
             #Textures and how to load them  
             TextureLoader/texture_loader.c
             TextureLoader/texture_loader.h

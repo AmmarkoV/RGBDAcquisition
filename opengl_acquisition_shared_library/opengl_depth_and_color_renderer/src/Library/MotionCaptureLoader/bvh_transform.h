@@ -24,6 +24,7 @@ struct BVH_TransformedJoint
   //Position as 2D X,Y
   //-----------------
   char pos2DCalculated;
+  char isBehindCamera;
   double pos2D[2];
 };
 

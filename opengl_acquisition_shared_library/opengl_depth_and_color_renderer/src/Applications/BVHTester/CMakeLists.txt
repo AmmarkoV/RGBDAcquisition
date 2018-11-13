@@ -35,11 +35,12 @@ add_executable(
                BVHTester 
                main.c 
               ../../Library/MotionCaptureLoader/bvh_loader.c
-              ../../Library/MotionCaptureLoader/bvh_to_trajectoryParser.c
               ../../Library/MotionCaptureLoader/bvh_transform.c 
               ../../Library/MotionCaptureLoader/bvh_project.c 
               ../../Library/MotionCaptureLoader/bvh_to_tri_pose.c
-              ../../Library/MotionCaptureLoader/bvh_to_svg.c
+              ../../Library/MotionCaptureLoader/export/bvh_to_svgcsv.c
+              ../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c
+              ../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c
               ../../Library/TrajectoryParser/InputParser_C.c
               ../../../../../tools/AmMatrix/matrix4x4Tools.c
               ../../../../../tools/AmMatrix/matrixOpenGL.c

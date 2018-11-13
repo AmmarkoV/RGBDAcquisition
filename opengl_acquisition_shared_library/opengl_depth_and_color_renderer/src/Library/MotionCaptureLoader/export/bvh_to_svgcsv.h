@@ -2,8 +2,8 @@
 #define BVH_TO_SVG_H_INCLUDED
 
 
-#include "bvh_loader.h"
-#include "bvh_transform.h"
+#include "../bvh_loader.h"
+#include "../bvh_transform.h"
 
 int dumpBVHToSVG(
                  const char * directory ,

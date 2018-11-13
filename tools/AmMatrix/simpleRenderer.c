@@ -16,7 +16,8 @@ int simpleRendererRender(
                          float * output3DZ,
                          ///---------------
                          float * output2DX,
-                         float * output2DY
+                         float * output2DY,
+                         float * output2DW
                         )
 {
  double modelTransformationD[16];
@@ -117,6 +118,7 @@ int simpleRendererRender(
  ///--------------------------------------------------------------------
   *output2DX = windowCoordinates[0];//windowCoordinates[2];
   *output2DY = windowCoordinates[1];//windowCoordinates[2];
+  *output2DW = windowCoordinates[2];
   return 1;
 }
 

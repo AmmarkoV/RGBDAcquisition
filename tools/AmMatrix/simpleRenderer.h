@@ -39,7 +39,8 @@ int simpleRendererRender(
                          float * output3DZ,
                          ///---------------
                          float * output2DX,
-                         float * output2DY
+                         float * output2DY,
+                         float * output2DW
                         );
 
 int simpleRendererInitialize(struct simpleRenderer * sr);

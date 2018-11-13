@@ -12,6 +12,7 @@ int bvh_projectTo2D(
       unsigned int pointsDumped=0;
       float position2DX;
       float position2DY;
+      float position2DW;
 
       //Then project 3D positions on 2D frame and save results..
       unsigned int jID=0;
@@ -41,17 +42,29 @@ int bvh_projectTo2D(
                                  &pos3DCenterFloat[1],
                                  &pos3DCenterFloat[2],
                                  &position2DX,
-                                 &position2DY
+                                 &position2DY,
+                                 &position2DW
                                 );
 
-           bvhTransform->joint[jID].pos3D[0] = (double) pos3DCenterFloat[0];
-           bvhTransform->joint[jID].pos3D[1] = (double) pos3DCenterFloat[1];
-           bvhTransform->joint[jID].pos3D[2] = (double) pos3DCenterFloat[2];
+            //Should this only happen when position2DW>=0.0
+            bvhTransform->joint[jID].pos3D[0] = (double) pos3DCenterFloat[0];
+            bvhTransform->joint[jID].pos3D[1] = (double) pos3DCenterFloat[1];
+            bvhTransform->joint[jID].pos3D[2] = (double) pos3DCenterFloat[2];
 
-           bvhTransform->joint[jID].pos2D[0] = (double) position2DX;
-           bvhTransform->joint[jID].pos2D[1] = (double) position2DY;
-           bvhTransform->joint[jID].pos2DCalculated=1;
-           ++pointsDumped;
+
+           if (position2DW<0.0)
+           {
+              bvhTransform->joint[jID].pos2D[0] = 0.0;
+              bvhTransform->joint[jID].pos2D[1] = 0.0;
+              bvhTransform->joint[jID].isBehindCamera=1;
+           } else
+           {
+              bvhTransform->joint[jID].pos2D[0] = (double) position2DX;
+              bvhTransform->joint[jID].pos2D[1] = (double) position2DY;
+              bvhTransform->joint[jID].pos2DCalculated=1;
+           }
+
+        ++pointsDumped;
       } //Joint Loop
 
 

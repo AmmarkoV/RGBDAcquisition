@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "bvh_to_svg.h"
+#include "bvh_to_svgcsv.h"
 
-#include "bvh_project.h"
+#include "../bvh_project.h"
 
-#include "../../../../../tools/AmMatrix/simpleRenderer.h"
+#include "../../../../../../tools/AmMatrix/simpleRenderer.h"
 
 #define DUMP_3D_POSITIONS 0
 
