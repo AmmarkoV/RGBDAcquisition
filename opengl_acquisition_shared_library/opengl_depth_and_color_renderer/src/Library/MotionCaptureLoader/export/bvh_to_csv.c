@@ -142,7 +142,7 @@ int dumpBVHToCSVBody(
         float y = bvhTransform->joint[jID].pos2D[1];
 
         if (
-             (0.0<x) && (0.0<y) && (x<renderer->width) && (y<renderer->height)
+             (x<0.0) || (y<0.0) || (renderer->width<x) || (renderer->height<y)
            )
         {
            ++filteredOutCSVPoses;
