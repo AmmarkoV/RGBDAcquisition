@@ -7,13 +7,9 @@
 #include "../../../../../../tools/AmMatrix/simpleRenderer.h"
 
 int dumpBVHToBVH(
-                      const char * svgFilename,
-                      struct BVH_MotionCapture * mc,
-                      struct BVH_Transform * bvhTransform,
-                      unsigned int fID,
-                      struct simpleRenderer * renderer,
-                      float * objectRotationOffset
-                     );
+                  const char * bvhFilename,
+                  struct BVH_MotionCapture * mc
+                );
 
 
 #endif // BVH_TO_BVH_H_INCLUDED

@@ -4,15 +4,123 @@
 
 #include "../bvh_project.h"
 
-int dumpBVHToBVH(
-                  const char * svgFilename,
-                  struct BVH_MotionCapture * mc,
-                  struct BVH_Transform * bvhTransform,
-                  unsigned int fID,
-                  struct simpleRenderer * renderer,
-                  float * objectRotationOffset
-                 )
+
+void indent(FILE * fp , unsigned int indentation)
 {
+  unsigned int i=0;
+  for (i=0; i<indentation*2; i++)
+  {
+   fprintf(fp," ");
+  }
+}
+
+
+void writeBVHHierarchyClosingSection(
+                                     FILE * fp ,
+                                     struct BVH_MotionCapture * mc,
+                                     unsigned int hierarchyLevelStart,
+                                     unsigned int hierarchyLevelEnd
+                                   )
+{
+  unsigned int hierarchyLevel=0;
+
+  for (hierarchyLevel=hierarchyLevelEnd; hierarchyLevel>hierarchyLevelStart; hierarchyLevel--)
+  {
+   indent(fp,hierarchyLevel);  fprintf(fp,"}\n");
+  }
+}
+
+
+int writeBVHHierarchyOpenningSection(
+                                     FILE * fp ,
+                                     struct BVH_MotionCapture * mc,
+                                     BVHJointID jID
+                                    )
+{
+  unsigned int in=mc->jointHierarchy[jID].hierarchyLevel;
+
+  indent(fp,in);
+  fprintf(
+          fp,"OFFSET %0.2f %0.2f %0.2f\n",
+          mc->jointHierarchy[jID].offset[0],
+          mc->jointHierarchy[jID].offset[1],
+          mc->jointHierarchy[jID].offset[2]
+         );
+
+
+  if (mc->jointHierarchy[jID].isEndSite)
+  {
+    indent(fp,in);
+    fprintf(fp,"End Site\n");
+  } else
+  {//----------------------------------------------------------------------------------------------
+   indent(fp,in);
+   fprintf(
+           fp,"CHANNELS %u ",
+           mc->jointHierarchy[jID].loadedChannels
+          );
+
+   unsigned int channelID=0;
+   for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+   {
+     fprintf(fp,"%s ",channelNames[(unsigned int)mc->jointHierarchy[jID].channelType[channelID]]);
+   }
+   fprintf(fp,"\n");
+   indent(fp,in); fprintf(fp,"JOINT %s\n",mc->jointHierarchy[jID].jointName);
+   indent(fp,in); fprintf(fp,"{\n");
+  }//----------------------------------------------------------------------------------------------
+ return 1;
+}
+
+
+
+int dumpBVHToBVH(
+                  const char * bvhFilename,
+                  struct BVH_MotionCapture * mc
+                )
+{
+  BVHJointID rootJID;
+  BVHJointID jID;
+
+  if (!bvh_getRootJointID(mc,&rootJID)) { return 0;}
+
+  FILE * fp = fopen(bvhFilename,"w");
+   if (fp!=0)
+   {
+     fprintf(fp,"HIERARCHY\n");
+     fprintf(fp,"ROOT %s\n",mc->jointHierarchy[rootJID].jointName);
+     fprintf(fp," OFFSET 0 0 0\n");
+     fprintf(fp," CHANNELS 6 Xposition Yposition Zposition Zrotation Yrotation Xrotation\n");
+     fprintf(fp," OFFSET 0 0 0\n");
+     fprintf(fp,"{\n");
+     unsigned int previousHierarchyLevel = 0;
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+        {
+          writeBVHHierarchyOpenningSection(
+                                            fp ,
+                                            mc,
+                                            jID
+                                          );
+
+
+         if (previousHierarchyLevel>mc->jointHierarchy[jID].hierarchyLevel)
+         {
+          writeBVHHierarchyClosingSection(
+                                           fp ,
+                                           mc,
+                                           previousHierarchyLevel,
+                                           mc->jointHierarchy[jID].hierarchyLevel
+                                         );
+         }
+
+         previousHierarchyLevel = mc->jointHierarchy[jID].hierarchyLevel;
+        }
+     fprintf(fp,"}\n");
+
+     fclose(fp);
+     return 1;
+   }
+
  return 0;
 }
 

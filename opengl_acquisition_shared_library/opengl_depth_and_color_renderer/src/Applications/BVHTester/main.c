@@ -15,6 +15,7 @@
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_export.h"
+#include "../../Library/MotionCaptureLoader/export/bvh_to_bvh.h"
 
 void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 {
@@ -53,9 +54,11 @@ void incorrectArguments()
 int main(int argc, char **argv)
 {
     const char * fromBVHFile="Motions/example.bvh";
+    const char * toBVHFile="Motions/bvh.bvh";
     const char * toSceneFile="Scenes/bvh.conf";
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
     const char * toSVGDirectory="tmp/";
+    unsigned int convertToBVH=0;
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
     unsigned int maxFrames = 0;
@@ -84,6 +87,12 @@ int main(int argc, char **argv)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           toSceneFile=argv[i+1];
+        } else
+        if (strcmp(argv[i],"--bvh")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          toBVHFile=argv[i+1];
+          convertToBVH=1;
         } else
         if (strcmp(argv[i],"--csv")==0)
         {
@@ -157,6 +166,17 @@ int main(int argc, char **argv)
         }
       }
 
+
+    if (convertToBVH)
+    {
+       dumpBVHToBVH(
+                     toBVHFile,
+                     &bvhMotion
+                   );
+      return 0;
+    }
+
+
     //SVG or CSV output ..
     if ( (convertToSVG) || (convertToCSV) )
     {
@@ -180,8 +200,6 @@ int main(int argc, char **argv)
                  );
       return 0;
     }
-
-
 
 
     bvh_printBVH(&bvhMotion);
