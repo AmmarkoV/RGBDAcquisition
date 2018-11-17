@@ -72,6 +72,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_export.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_bvh.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_bvh.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_csv.c">
 			<Option compilerVar="CC" />
 		</Unit>
