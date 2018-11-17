@@ -25,8 +25,8 @@ void writeBVHHierarchyClosingSection(
   unsigned int hierarchyLevel=0;
 
 
-  fprintf(stderr,"Close Sections from %u->%u :",hierarchyLevelEnd,hierarchyLevelStart);
-  for (hierarchyLevel=hierarchyLevelEnd; hierarchyLevel>hierarchyLevelStart; hierarchyLevel--)
+  fprintf(stderr,"Close Sections from %u->%u : ",hierarchyLevelEnd,hierarchyLevelStart);
+  for (hierarchyLevel=hierarchyLevelEnd; hierarchyLevel>=hierarchyLevelStart; hierarchyLevel--)
   {
    fprintf(stderr,"%u ",hierarchyLevel);
    indent(fp,hierarchyLevel);  fprintf(fp,"}\n");
@@ -44,6 +44,18 @@ int writeBVHHierarchyOpenningSection(
 {
   unsigned int in=mc->jointHierarchy[jID].hierarchyLevel;
 
+
+   if (mc->jointHierarchy[jID].isRoot)
+        { indent(fp,in); fprintf(fp,"ROOT %s\n",mc->jointHierarchy[jID].jointName); }
+        else
+   if (mc->jointHierarchy[jID].isEndSite)
+        { indent(fp,in); fprintf(fp,"End Site\n"); }
+        else
+        { indent(fp,in); fprintf(fp,"JOINT %s\n",mc->jointHierarchy[jID].jointName); }
+
+  indent(fp,in); fprintf(fp,"{\n");
+
+  ++in;
   indent(fp,in);
   fprintf(
           fp,"OFFSET %0.2f %0.2f %0.2f\n",
@@ -53,11 +65,7 @@ int writeBVHHierarchyOpenningSection(
          );
 
 
-  if (mc->jointHierarchy[jID].isEndSite)
-  {
-    indent(fp,in);
-    fprintf(fp,"End Site\n");
-  } else
+  if (!mc->jointHierarchy[jID].isEndSite)
   {//----------------------------------------------------------------------------------------------
    indent(fp,in);
    fprintf(
@@ -72,10 +80,14 @@ int writeBVHHierarchyOpenningSection(
    }
    fprintf(fp,"\n");
 
-   if (!mc->jointHierarchy[jID].isRoot)
-        { indent(fp,in); fprintf(fp,"JOINT %s\n",mc->jointHierarchy[jID].jointName); }
-   indent(fp,in); fprintf(fp,"{\n");
   }//----------------------------------------------------------------------------------------------
+   else
+  {
+   --in;
+  // indent(fp,in); fprintf(fp,"}\n");
+  }
+
+
  return 1;
 }
 
@@ -95,10 +107,6 @@ int dumpBVHToBVH(
    if (fp!=0)
    {
      fprintf(fp,"HIERARCHY\n");
-     fprintf(fp,"ROOT %s\n",mc->jointHierarchy[rootJID].jointName);
-     fprintf(fp,"{\n");
-     //fprintf(fp," OFFSET 0 0 0\n");
-     //fprintf(fp," CHANNELS 6 Xposition Yposition Zposition Zrotation Yrotation Xrotation\n");
      unsigned int previousHierarchyLevel = 0;
      for (jID=0; jID<mc->jointHierarchySize; jID++)
         {
@@ -121,7 +129,7 @@ int dumpBVHToBVH(
 
          previousHierarchyLevel = mc->jointHierarchy[jID].hierarchyLevel;
         }
-     fprintf(fp,"}\n");
+     //fprintf(fp,"}\n");
 
      fclose(fp);
      return 1;
