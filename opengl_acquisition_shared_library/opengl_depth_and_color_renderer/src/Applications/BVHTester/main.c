@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
+#include <time.h>
 
 #include "../../Library/TrajectoryParser/TrajectoryParserDataStructures.h"
 #include "../../Library/MotionCaptureLoader/bvh_loader.h"
@@ -61,12 +63,7 @@ int main(int argc, char **argv)
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
     unsigned int maxFrames = 0;
-    unsigned int useOriginalPosition=0;
-
     float scaleWorld=1.0;
-    float cameraPositionOffset[3]={0};
-    float cameraRotationOffset[3]={0};
-    float objectRotationOffset[3]={0};
 
 
     struct BVH_MotionCapture bvhMotion={0};
@@ -74,6 +71,11 @@ int main(int argc, char **argv)
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--print")==0)
+        {
+          bvh_printBVH(&bvhMotion);
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--scale")==0)
         {
@@ -112,17 +114,13 @@ int main(int argc, char **argv)
           bvh_renameJointsForCompatibility(&bvhMotion);
         } else
         //-----------------------------------------------------
-        if (strcmp(argv[i],"--print")==0)
-        {
-          bvh_printBVH(&bvhMotion);
-        } else
         if (strcmp(argv[i],"--to")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           toSceneFile=argv[i+1];
            struct bvhToTRI bvhtri={0};
            bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri,&bvhMotion);
-           dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,useOriginalPosition,0);
+           dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,1/*USE Irugubak oisutuib*/,0);
            dumpBVHToTrajectoryParserPrimitives(toSceneFile,&bvhMotion);
         } else
         //-----------------------------------------------------
@@ -165,6 +163,9 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--setPositionRotation")==0)
         {
+          float cameraPositionOffset[3];
+          float cameraRotationOffset[3];
+
           cameraPositionOffset[0]=-1*atof(argv[i+1])/10;
           cameraPositionOffset[1]=atof(argv[i+2])/10;
           cameraPositionOffset[2]=atof(argv[i+3])/10;
@@ -181,6 +182,9 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--randomize")==0)
         {
           if (i+12>=argc)  { incorrectArguments(); }
+
+          srand(time(NULL));
+
           float minimumPosition[3];
           float minimumRotation[3];
           float maximumPosition[3];
@@ -211,35 +215,6 @@ int main(int argc, char **argv)
                                          maximumPosition,
                                          maximumRotation
                                        );
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--useOriginalPosition")==0)
-        {
-          useOriginalPosition=1;
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--cameraPosition")==0)
-        {
-          if (i+3>=argc)  { incorrectArguments(); }
-          cameraPositionOffset[0]=-1*atof(argv[i+1])/10;
-          cameraPositionOffset[1]=atof(argv[i+2])/10;
-          cameraPositionOffset[2]=atof(argv[i+3])/10;
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--cameraRotation")==0)
-        {
-          if (i+3>=argc)  { incorrectArguments(); }
-          cameraRotationOffset[0]=atof(argv[i+1]);
-          cameraRotationOffset[1]=atof(argv[i+2]);
-          cameraRotationOffset[2]=atof(argv[i+3]);
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--objectRotation")==0)
-        {
-          if (i+3>=argc)  { incorrectArguments(); }
-          objectRotationOffset[0]=atof(argv[i+1]);
-          objectRotationOffset[1]=atof(argv[i+2]);
-          objectRotationOffset[2]=atof(argv[i+3]);
         }
         //-----------------------------------------------------
     }
@@ -259,13 +234,6 @@ int main(int argc, char **argv)
                      &bvhMotion,
                      640,
                      480,
-                     useOriginalPosition,
-                     cameraPositionOffset,
-                     cameraRotationOffset,
-                     objectRotationOffset,
-                     //Don't care about randomization
-                     0,0,0,0,0,
-                     //
                      1,//Filter out all poses where even one joint is behind camera
                      1,//Filter out all poses where even one joint is outside of 2D frame
                      0//We don't want to convert to radians

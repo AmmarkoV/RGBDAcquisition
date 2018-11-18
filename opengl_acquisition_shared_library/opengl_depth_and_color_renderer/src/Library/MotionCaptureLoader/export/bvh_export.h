@@ -12,18 +12,6 @@ int dumpBVHToSVGCSV(
                     struct BVH_MotionCapture * mc,
                     unsigned int width,
                     unsigned int height,
-
-                    unsigned int useOriginalPositionsRotations,
-                    float * cameraPositionOffset,
-                    float * cameraRotationOffset,
-                    float * objectRotationOffset,
-
-                    unsigned int randomizePoses,
-                    float * minimumObjectPositionValue,
-                    float * maximumObjectPositionValue,
-                    float * minimumObjectRotationValue,
-                    float * maximumObjectRotationValue,
-
                     unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                     unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                     unsigned int encodeRotationsAsRadians

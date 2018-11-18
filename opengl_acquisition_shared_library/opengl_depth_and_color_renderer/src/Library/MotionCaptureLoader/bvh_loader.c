@@ -16,6 +16,7 @@
 */
 
 #include <stdio.h>
+#include <math.h>
 #include "bvh_loader.h"
 #include "../TrajectoryParser/InputParser_C.h"
 
@@ -885,9 +886,10 @@ int bvh_GrowMocapFileByCopyingExistingMotions(
                                               unsigned int timesToRepeat
                                              )
 {
-  if (timesToRepeat==0)   { return 0; }
+  if (timesToRepeat==0)   { fprintf(stderr,"No times to repeat\n"); return 0; }
   float * newMotionValues = (float*) malloc(sizeof(float) * mc->motionValuesSize * (timesToRepeat+1) );
-  if (newMotionValues==0) { return 0; }
+  if (newMotionValues==0) { fprintf(stderr,"No new motion values\n"); return 0; }
+
   float * oldMotionValues = mc->motionValues;
   float * ptr=newMotionValues;
 
@@ -898,7 +900,8 @@ int bvh_GrowMocapFileByCopyingExistingMotions(
     ptr+=mc->motionValuesSize;
   }
 
-
+ mc->numberOfFrames+=mc->numberOfFrames*timesToRepeat;
+ mc->numberOfFramesEncountered+=mc->numberOfFrames;
  mc->motionValuesSize+=mc->motionValuesSize*timesToRepeat;
  mc->motionValues = newMotionValues;
  free(oldMotionValues);
