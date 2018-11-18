@@ -34,7 +34,7 @@ void writeBVHHierarchyClosingSection(
   for (hierarchyLevel=hierarchyLevelEnd+1; hierarchyLevel>hierarchyLevelStart; hierarchyLevel--)
   {
    fprintf(stderr,"%u ",hierarchyLevel);
-   indent(fp,hierarchyLevel);  fprintf(fp,"}\n");
+   indent(fp,hierarchyLevel-1);  fprintf(fp,"}\n");
   }
 
   fprintf(stderr,"done \n");
@@ -86,12 +86,6 @@ int writeBVHHierarchyOpenningSection(
    fprintf(fp,"\n");
 
   }//----------------------------------------------------------------------------------------------
-   else
-  {
-   --in;
-  // indent(fp,in); fprintf(fp,"}\n");
-  }
-
 
  return 1;
 }

@@ -817,6 +817,62 @@ int bvh_free(struct BVH_MotionCapture * bvhMotion)
 //----------------------------------------------------------------------------------------------------
 
 
+
+
+
+
+float randomFloatA( float min, float max )
+{
+    float scale = rand() / (float) RAND_MAX; /* [0, 1.0] */
+
+    float absoluteRandom = scale * (max - min);      /* [min, max] */
+
+    float value = max-absoluteRandom;
+
+    if (value<min) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO SMALL\n",min,max,value); }
+    if (value>max) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO BIG\n",min,max,value); }
+
+    return value;
+}
+
+
+int bvh_RandomizePositionRotation(
+                                  struct BVH_MotionCapture * mc,
+                                  float * minimumPosition,
+                                  float * minimumRotation,
+                                  float * maximumPosition,
+                                  float * maximumRotation
+                                 )
+{
+  unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+   unsigned int mID=fID*mc->numberOfValuesPerFrame;
+   mc->motionValues[mID+0]=randomFloatA(minimumPosition[0],maximumPosition[0]);
+   mc->motionValues[mID+1]=randomFloatA(minimumPosition[1],maximumPosition[1]);
+   mc->motionValues[mID+2]=randomFloatA(minimumPosition[2],maximumPosition[2]);
+   mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
+   mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
+   mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
+  }
+ return 1;
+}
+
+
+
+int bvh_GrowFile(
+                 struct BVH_MotionCapture * mc,
+                 unsigned int timesToRepeat
+                )
+{
+ return 0;
+}
+
+
+
+
+
+
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------

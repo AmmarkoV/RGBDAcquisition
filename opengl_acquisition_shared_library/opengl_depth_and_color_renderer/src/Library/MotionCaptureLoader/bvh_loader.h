@@ -169,6 +169,21 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 int bvh_free(struct BVH_MotionCapture * bvhMotion);
 
 
+int bvh_RandomizePositionRotation(
+                                  struct BVH_MotionCapture * mc,
+                                  float * minimumPosition,
+                                  float * minimumRotation,
+                                  float * maximumPosition,
+                                  float * maximumRotation
+                                 );
+
+
+int bvh_GrowFile(
+                 struct BVH_MotionCapture * mc,
+                 unsigned int timesToRepeat
+                );
+
+
 /**
 * @brief Ask if joint has a parent.
 * @ingroup BVH
