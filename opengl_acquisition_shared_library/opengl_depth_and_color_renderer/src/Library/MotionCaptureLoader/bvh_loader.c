@@ -822,16 +822,23 @@ int bvh_free(struct BVH_MotionCapture * bvhMotion)
 
 
 
-float randomFloatA( float min, float max )
+float randomFloatA( float minVal, float maxVal )
 {
+    if (maxVal<minVal)
+    {
+      float buf = minVal;
+      minVal = maxVal;
+      maxVal = buf;
+    }
+
     float scale = rand() / (float) RAND_MAX; /* [0, 1.0] */
 
-    float absoluteRandom = scale * (max - min);      /* [min, max] */
+    float absoluteRandom = scale * (maxVal - minVal);      /* [min, max] */
 
-    float value = max-absoluteRandom;
+    float value = maxVal-absoluteRandom;
 
-    if (value<min) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO SMALL\n",min,max,value); }
-    if (value>max) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO BIG\n",min,max,value); }
+    if (value<minVal) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO SMALL\n",minVal,maxVal,value); } else
+    if (value>maxVal) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO BIG\n",minVal,maxVal,value); }
 
     return value;
 }
@@ -845,6 +852,13 @@ int bvh_RandomizePositionRotation(
                                   float * maximumRotation
                                  )
 {
+  fprintf(stderr,"Randomizing %u frames \n",mc->numberOfFrames);
+  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f,",minimumPosition[0],minimumPosition[1],minimumPosition[2]);
+  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",minimumRotation[0],minimumRotation[1],minimumRotation[2]);
+  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f,",maximumPosition[0],maximumPosition[1],maximumPosition[2]);
+  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",maximumRotation[0],maximumRotation[1],maximumRotation[2]);
+
+
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {

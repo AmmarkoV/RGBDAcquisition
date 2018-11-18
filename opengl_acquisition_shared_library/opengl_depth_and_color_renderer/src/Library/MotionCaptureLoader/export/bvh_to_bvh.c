@@ -165,10 +165,3 @@ int dumpBVHToBVH(
  return 0;
 }
 
-
-
-
-
-
-
-

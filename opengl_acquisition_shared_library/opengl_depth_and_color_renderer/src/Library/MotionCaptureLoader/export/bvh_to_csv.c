@@ -115,18 +115,6 @@ int dumpBVHToCSVBody(
          {
            ++filteredOutCSVPoses;
            //Just counting to reduce spam..
-           /*
-           fprintf(
-                   stderr,"Filtering out %0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f, joint %s is behind camera\n",
-                   renderer->cameraOffsetPosition[0]*10,
-                   renderer->cameraOffsetPosition[1]*10,
-                   renderer->cameraOffsetPosition[2]*10,
-                   objectRotationOffset[2],
-                   objectRotationOffset[1],
-                   objectRotationOffset[0],
-                   mc->jointHierarchy[jID].jointName
-                  );
-           */
            return 0;
          }
        }
