@@ -169,6 +169,7 @@ int main(int argc, char **argv)
 
     if (convertToBVH)
     {
+       bvh_printBVH(&bvhMotion);
        dumpBVHToBVH(
                      toBVHFile,
                      &bvhMotion

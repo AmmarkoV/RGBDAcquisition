@@ -1036,6 +1036,7 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
     fprintf(stderr,"isRoot %u - ",bvhMotion->jointHierarchy[i].isRoot);
     fprintf(stderr,"isEndSite %u - ",bvhMotion->jointHierarchy[i].isEndSite);
     fprintf(stderr,"hasEndSite %u\n",bvhMotion->jointHierarchy[i].hasEndSite);
+    fprintf(stderr,"level %u\n",bvhMotion->jointHierarchy[i].hierarchyLevel );
     fprintf(stderr,"----------------------------------\n");
   }
 

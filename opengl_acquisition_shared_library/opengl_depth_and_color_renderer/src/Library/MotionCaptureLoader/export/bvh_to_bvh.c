@@ -15,6 +15,12 @@ void indent(FILE * fp , unsigned int indentation)
 }
 
 
+int valueIsZero(float val)
+{
+  if ((-0.00001<val) && (val<0.00001) ) { return 1; }
+  return 0;
+}
+
 void writeBVHHierarchyClosingSection(
                                      FILE * fp ,
                                      struct BVH_MotionCapture * mc,
@@ -24,9 +30,8 @@ void writeBVHHierarchyClosingSection(
 {
   unsigned int hierarchyLevel=0;
 
-
   fprintf(stderr,"Close Sections from %u->%u : ",hierarchyLevelEnd,hierarchyLevelStart);
-  for (hierarchyLevel=hierarchyLevelEnd; hierarchyLevel>=hierarchyLevelStart; hierarchyLevel--)
+  for (hierarchyLevel=hierarchyLevelEnd+1; hierarchyLevel>hierarchyLevelStart; hierarchyLevel--)
   {
    fprintf(stderr,"%u ",hierarchyLevel);
    indent(fp,hierarchyLevel);  fprintf(fp,"}\n");
@@ -58,7 +63,7 @@ int writeBVHHierarchyOpenningSection(
   ++in;
   indent(fp,in);
   fprintf(
-          fp,"OFFSET %0.2f %0.2f %0.2f\n",
+          fp,"OFFSET %f %f %f\n",
           mc->jointHierarchy[jID].offset[0],
           mc->jointHierarchy[jID].offset[1],
           mc->jointHierarchy[jID].offset[2]
@@ -107,34 +112,69 @@ int dumpBVHToBVH(
    if (fp!=0)
    {
      fprintf(fp,"HIERARCHY\n");
-     unsigned int previousHierarchyLevel = 0;
+     //--------------------------------------------------------------------------------------
+     unsigned int currentHierarchyLevel  = 0;
+     unsigned int nextHierarchyLevel = 0;
+     unsigned int hasNext=0;
      for (jID=0; jID<mc->jointHierarchySize; jID++)
         {
+          currentHierarchyLevel = mc->jointHierarchy[jID].hierarchyLevel;
+
+          if (jID+1<mc->jointHierarchySize) { hasNext=1; }
+
+          if (hasNext) { nextHierarchyLevel=mc->jointHierarchy[jID+1].hierarchyLevel; } else
+                       { nextHierarchyLevel=0; }
+
           writeBVHHierarchyOpenningSection(
-                                            fp ,
-                                            mc,
-                                            jID
+                                            fp, mc, jID
                                           );
 
 
-         if (previousHierarchyLevel>mc->jointHierarchy[jID].hierarchyLevel)
-         {
-          writeBVHHierarchyClosingSection(
-                                           fp ,
-                                           mc,
-                                           mc->jointHierarchy[jID].hierarchyLevel,
-                                           previousHierarchyLevel
-                                         );
-         }
-
-         previousHierarchyLevel = mc->jointHierarchy[jID].hierarchyLevel;
+          if (
+               nextHierarchyLevel < currentHierarchyLevel
+             )
+          {
+           writeBVHHierarchyClosingSection(
+                                            fp ,
+                                            mc,
+                                            nextHierarchyLevel,
+                                            currentHierarchyLevel
+                                          );
+          }
         }
-     //fprintf(fp,"}\n");
 
+      fprintf(fp,"MOTION\n");
+      //--------------------------------------------------------------------------------------
+      fprintf(fp,"Frames: %u\n",mc->numberOfFrames);
+      fprintf(fp,"Frame Time: %0.8f\n",mc->frameTime);
+
+      unsigned int fID=0;
+      unsigned int mID=0;
+      for (fID=0; fID<mc->numberOfFrames; fID++)
+      {
+        for ( mID=fID*mc->numberOfValuesPerFrame; mID<(fID+1)*mc->numberOfValuesPerFrame; mID++)
+         {
+           if (valueIsZero(mc->motionValues[mID]))
+           {
+            fprintf(fp,"0 ");
+           } else
+           {
+            fprintf(fp,"%f ",mc->motionValues[mID]);
+           }
+         }
+        fprintf(fp,"\n");
+      }
      fclose(fp);
      return 1;
    }
 
  return 0;
 }
+
+
+
+
+
+
+
 
