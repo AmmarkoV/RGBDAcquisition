@@ -70,6 +70,9 @@ int main(int argc, char **argv)
     float cameraRotationOffset[3]={0};
     float objectRotationOffset[3]={0};
 
+
+    struct BVH_MotionCapture bvhMotion={0};
+
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
@@ -115,6 +118,13 @@ int main(int argc, char **argv)
         {
           onlyFirstFrame=1;
         } else
+        if (strcmp(argv[i],"--repeat")==0)
+        {
+          bvh_GrowMocapFileByCopyingExistingMotions(
+                                                     &bvhMotion,
+                                                     atoi(argv[i+1])
+                                                   );
+        } else
         if (strcmp(argv[i],"--useOriginalPosition")==0)
         {
           useOriginalPosition=1;
@@ -148,7 +158,6 @@ int main(int argc, char **argv)
         }
     }
 
-    struct BVH_MotionCapture bvhMotion={0};
 
     //First of all we need to load the BVH file
     bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);

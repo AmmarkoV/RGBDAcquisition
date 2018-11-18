@@ -872,7 +872,7 @@ int bvh_GrowMocapFileByCopyingExistingMotions(
   float * ptr=newMotionValues;
 
   unsigned int r=0;
-  for (r=0; r<timesToRepeat; r++)
+  for (r=0; r<timesToRepeat+1; r++)
   {
     memcpy(ptr,oldMotionValues,sizeof(float) * mc->motionValuesSize);
     ptr+=mc->motionValuesSize;
