@@ -860,12 +860,30 @@ int bvh_RandomizePositionRotation(
 
 
 
-int bvh_GrowFile(
-                 struct BVH_MotionCapture * mc,
-                 unsigned int timesToRepeat
-                )
+int bvh_GrowMocapFileByCopyingExistingMotions(
+                                              struct BVH_MotionCapture * mc,
+                                              unsigned int timesToRepeat
+                                             )
 {
- return 0;
+  if (timesToRepeat==0)   { return 0; }
+  float * newMotionValues = (float*) malloc(sizeof(float) * mc->motionValuesSize * (timesToRepeat+1) );
+  if (newMotionValues==0) { return 0; }
+  float * oldMotionValues = mc->motionValues;
+  float * ptr=newMotionValues;
+
+  unsigned int r=0;
+  for (r=0; r<timesToRepeat; r++)
+  {
+    memcpy(ptr,oldMotionValues,sizeof(float) * mc->motionValuesSize);
+    ptr+=mc->motionValuesSize;
+  }
+
+
+ mc->motionValuesSize+=mc->motionValuesSize*timesToRepeat;
+ mc->motionValues = newMotionValues;
+ free(oldMotionValues);
+
+ return 1;
 }
 
 

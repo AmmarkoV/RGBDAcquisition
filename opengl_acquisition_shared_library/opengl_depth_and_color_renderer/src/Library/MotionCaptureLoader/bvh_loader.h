@@ -178,10 +178,10 @@ int bvh_RandomizePositionRotation(
                                  );
 
 
-int bvh_GrowFile(
-                 struct BVH_MotionCapture * mc,
-                 unsigned int timesToRepeat
-                );
+int bvh_GrowMocapFileByCopyingExistingMotions(
+                                              struct BVH_MotionCapture * mc,
+                                              unsigned int timesToRepeat
+                                             );
 
 
 /**

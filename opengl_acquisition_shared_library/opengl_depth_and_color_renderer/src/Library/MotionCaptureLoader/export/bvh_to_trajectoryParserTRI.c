@@ -306,7 +306,7 @@ int dumpBVHToTrajectoryParserTRI(
     BVHJointID rootJID=0;
      if ( bvh_getRootJointID(mc,&rootJID) )
       {
-       fprintf(fp,"OBJECT_ROTATION_ORDER(human,%s)\n",rotationOrderNames[mc->jointHierarchy[jID].channelRotationOrder]);
+       fprintf(fp,"OBJECT_ROTATION_ORDER(human,%s)\n",rotationOrderNames[(unsigned int)mc->jointHierarchy[jID].channelRotationOrder]);
       } else
       {
        fprintf(fp,"#OBJECT_ROTATION_ORDER(human,cannot be set because we can't find root bone)\n");
