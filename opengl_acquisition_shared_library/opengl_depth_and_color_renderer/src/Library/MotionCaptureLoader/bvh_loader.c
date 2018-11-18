@@ -859,6 +859,26 @@ int bvh_RandomizePositionRotation(
 }
 
 
+int bvh_SetPositionRotation(
+                             struct BVH_MotionCapture * mc,
+                             float * position,
+                             float * rotation
+                            )
+{
+unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+   unsigned int mID=fID*mc->numberOfValuesPerFrame;
+   mc->motionValues[mID+0]=position[0];
+   mc->motionValues[mID+1]=position[1];
+   mc->motionValues[mID+2]=position[2];
+   mc->motionValues[mID+3]=rotation[0];
+   mc->motionValues[mID+4]=rotation[1];
+   mc->motionValues[mID+5]=rotation[2];
+  }
+ return 1;
+}
+
 
 int bvh_GrowMocapFileByCopyingExistingMotions(
                                               struct BVH_MotionCapture * mc,

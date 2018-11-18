@@ -177,6 +177,11 @@ int bvh_RandomizePositionRotation(
                                   float * maximumRotation
                                  );
 
+int bvh_SetPositionRotation(
+                            struct BVH_MotionCapture * mc,
+                            float * position,
+                            float * rotation
+                           );
 
 int bvh_GrowMocapFileByCopyingExistingMotions(
                                               struct BVH_MotionCapture * mc,

@@ -58,11 +58,9 @@ int main(int argc, char **argv)
     const char * toSceneFile="Scenes/bvh.conf";
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
     const char * toSVGDirectory="tmp/";
-    unsigned int convertToBVH=0;
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
     unsigned int maxFrames = 0;
-    unsigned int onlyFirstFrame=0;
     unsigned int useOriginalPosition=0;
 
     float scaleWorld=1.0;
@@ -76,33 +74,75 @@ int main(int argc, char **argv)
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--scale")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          scaleWorld=atof(argv[i+1]);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--onlyFirstFrame")==0)
+        {
+          bvh_copyMotionFrame(&bvhMotion, 0, 1 );
+          bvhMotion.numberOfFrames=2; //Just Render one frame..
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--maxFrames")==0)
         {
           if (i+1>=argc)  { incorrectArguments();}
           maxFrames=atoi(argv[i+1]);
+          //We can limit the number of frames
+          if (maxFrames!=0)
+            {
+             //Only reducing number of frames
+             if (bvhMotion.numberOfFrames>maxFrames)
+               {
+                 bvhMotion.numberOfFrames = maxFrames;
+               }
+            }
         } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--from")==0)
         {
           if (i+1>=argc)  { incorrectArguments();}
           fromBVHFile=argv[i+1];
+          //First of all we need to load the BVH file
+          bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
+          //Change joint names..
+          bvh_renameJointsForCompatibility(&bvhMotion);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--print")==0)
+        {
+          bvh_printBVH(&bvhMotion);
         } else
         if (strcmp(argv[i],"--to")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           toSceneFile=argv[i+1];
+           struct bvhToTRI bvhtri={0};
+           bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri,&bvhMotion);
+           dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,useOriginalPosition,0);
+           dumpBVHToTrajectoryParserPrimitives(toSceneFile,&bvhMotion);
         } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--bvh")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           toBVHFile=argv[i+1];
-          convertToBVH=1;
+          dumpBVHToBVH(
+                        toBVHFile,
+                        &bvhMotion
+                      );
         } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--csv")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           toSVGDirectory=argv[i+1];
           convertToCSV=1;
         } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--svg")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
@@ -114,10 +154,7 @@ int main(int argc, char **argv)
           if (res!=0) { fprintf(stderr,"Could not clean svg files in %s",toSVGDirectory); }
           convertToSVG=1;
         } else
-        if (strcmp(argv[i],"--onlyFirstFrame")==0)
-        {
-          onlyFirstFrame=1;
-        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--repeat")==0)
         {
           bvh_GrowMocapFileByCopyingExistingMotions(
@@ -125,16 +162,62 @@ int main(int argc, char **argv)
                                                      atoi(argv[i+1])
                                                    );
         } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--setPositionRotation")==0)
+        {
+          cameraPositionOffset[0]=-1*atof(argv[i+1])/10;
+          cameraPositionOffset[1]=atof(argv[i+2])/10;
+          cameraPositionOffset[2]=atof(argv[i+3])/10;
+          cameraRotationOffset[0]=atof(argv[i+1]);
+          cameraRotationOffset[1]=atof(argv[i+2]);
+          cameraRotationOffset[2]=atof(argv[i+3]);
+          bvh_SetPositionRotation(
+                                  &bvhMotion,
+                                  cameraPositionOffset,
+                                  cameraRotationOffset
+                                 );
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--randomize")==0)
+        {
+          if (i+12>=argc)  { incorrectArguments(); }
+          float minimumPosition[3];
+          float minimumRotation[3];
+          float maximumPosition[3];
+          float maximumRotation[3];
+
+          //----
+          minimumPosition[0]=-1*atof(argv[i+1])/10;
+          minimumPosition[1]=atof(argv[i+2])/10;
+          minimumPosition[2]=atof(argv[i+3])/10;
+          //----
+          minimumRotation[0]=atof(argv[i+4]);
+          minimumRotation[1]=atof(argv[i+5]);
+          minimumRotation[2]=atof(argv[i+6]);
+          //----
+          maximumPosition[0]=-1*atof(argv[i+7])/10;
+          maximumPosition[1]=atof(argv[i+8])/10;
+          maximumPosition[2]=atof(argv[i+9])/10;
+          //----
+          maximumRotation[0]=atof(argv[i+10]);
+          maximumRotation[1]=atof(argv[i+11]);
+          maximumRotation[2]=atof(argv[i+12]);
+
+
+          bvh_RandomizePositionRotation(
+                                         &bvhMotion,
+                                         minimumPosition,
+                                         minimumRotation,
+                                         maximumPosition,
+                                         maximumRotation
+                                       );
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--useOriginalPosition")==0)
         {
           useOriginalPosition=1;
         } else
-        if (strcmp(argv[i],"--scale")==0)
-        {
-          if (i+1>=argc)  { incorrectArguments(); }
-          scaleWorld=atof(argv[i+1]);
-          //TODO: Use this..
-        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--cameraPosition")==0)
         {
           if (i+3>=argc)  { incorrectArguments(); }
@@ -142,6 +225,7 @@ int main(int argc, char **argv)
           cameraPositionOffset[1]=atof(argv[i+2])/10;
           cameraPositionOffset[2]=atof(argv[i+3])/10;
         } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--cameraRotation")==0)
         {
           if (i+3>=argc)  { incorrectArguments(); }
@@ -149,6 +233,7 @@ int main(int argc, char **argv)
           cameraRotationOffset[1]=atof(argv[i+2]);
           cameraRotationOffset[2]=atof(argv[i+3]);
         } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--objectRotation")==0)
         {
           if (i+3>=argc)  { incorrectArguments(); }
@@ -156,35 +241,12 @@ int main(int argc, char **argv)
           objectRotationOffset[1]=atof(argv[i+2]);
           objectRotationOffset[2]=atof(argv[i+3]);
         }
+        //-----------------------------------------------------
     }
 
 
-    //First of all we need to load the BVH file
-    bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
-
-    //Change joint names..
-    bvh_renameJointsForCompatibility(&bvhMotion);
-
-    //We can limit the number of frames
-    if (maxFrames!=0)
-      {
-        //Only reducing number of frames
-        if (bvhMotion.numberOfFrames>maxFrames)
-        {
-          bvhMotion.numberOfFrames = maxFrames;
-        }
-      }
 
 
-    if (convertToBVH)
-    {
-       bvh_printBVH(&bvhMotion);
-       dumpBVHToBVH(
-                     toBVHFile,
-                     &bvhMotion
-                   );
-      return 0;
-    }
 
 
     //SVG or CSV output ..
@@ -210,25 +272,6 @@ int main(int argc, char **argv)
                  );
       return 0;
     }
-
-
-    bvh_printBVH(&bvhMotion);
-    //bvh_printBVHJointToMotionLookupTable(&bvhMotion);
-
-    struct bvhToTRI bvhtri={0};
-    bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri,&bvhMotion);
-
-    if (onlyFirstFrame)
-    {
-     bvh_copyMotionFrame(&bvhMotion, 0, 1 );
-     bvhMotion.numberOfFrames=2; //Just Render one frame..
-    }
-
-    dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,useOriginalPosition,0);
-    dumpBVHToTrajectoryParserPrimitives(toSceneFile,&bvhMotion);
-
-    //Test printout of all rotations of a specific joint..
-    //testPrintout(&bvhMotion,"rknee");
 
 
     bvh_free(&bvhMotion);
