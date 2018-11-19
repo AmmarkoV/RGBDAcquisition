@@ -14,6 +14,7 @@ int dumpBVHToSVGCSV(
                     unsigned int height,
                     unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                     unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
+                    unsigned int filterWeirdSkeletons,
                     unsigned int encodeRotationsAsRadians
                    );
 

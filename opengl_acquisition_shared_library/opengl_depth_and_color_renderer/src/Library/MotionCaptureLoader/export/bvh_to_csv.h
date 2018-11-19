@@ -23,6 +23,7 @@ int dumpBVHToCSVBody(
                        const char * filename,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
+                       unsigned int filterWeirdSkeletons,
                        unsigned int encodeRotationsAsRadians
                       );
 

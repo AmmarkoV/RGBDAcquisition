@@ -181,6 +181,25 @@ int main(int argc, char **argv)
                                  );
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--offsetPositionRotation")==0)
+        {
+          if (i+6>=argc)  { incorrectArguments(); }
+          float cameraPositionOffset[3];
+          float cameraRotationOffset[3];
+
+          cameraPositionOffset[0]=-1*atof(argv[i+1])/10;
+          cameraPositionOffset[1]=atof(argv[i+2])/10;
+          cameraPositionOffset[2]=atof(argv[i+3])/10;
+          cameraRotationOffset[0]=atof(argv[i+4]);
+          cameraRotationOffset[1]=atof(argv[i+5]);
+          cameraRotationOffset[2]=atof(argv[i+6]);
+          bvh_OffsetPositionRotation(
+                                     &bvhMotion,
+                                     cameraPositionOffset,
+                                     cameraRotationOffset
+                                    );
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
         {
           if (i+12>=argc)  { incorrectArguments(); }
@@ -237,6 +256,7 @@ int main(int argc, char **argv)
                      480,
                      1,//Filter out all poses where even one joint is behind camera
                      1,//Filter out all poses where even one joint is outside of 2D frame
+                     1,//Filter top left weird random skelingtons ( skeletons )
                      0//We don't want to convert to radians
                  );
       return 0;

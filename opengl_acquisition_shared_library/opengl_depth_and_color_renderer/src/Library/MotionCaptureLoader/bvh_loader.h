@@ -183,6 +183,13 @@ int bvh_SetPositionRotation(
                             float * rotation
                            );
 
+
+int bvh_OffsetPositionRotation(
+                               struct BVH_MotionCapture * mc,
+                               float * position,
+                               float * rotation
+                              );
+
 int bvh_GrowMocapFileByCopyingExistingMotions(
                                               struct BVH_MotionCapture * mc,
                                               unsigned int timesToRepeat
