@@ -38,6 +38,7 @@ int bvh_projectTo2D(
                                  pos3DFloat,
                                  pos3DCenterFloat,
                                  objectRotation,
+                                 mc->jointHierarchy[jID].channelRotationOrder,
                                  &pos3DCenterFloat[0],
                                  &pos3DCenterFloat[1],
                                  &pos3DCenterFloat[2],

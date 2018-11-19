@@ -10,6 +10,7 @@ int simpleRendererRender(
                          float * position3D,
                          float * center3D,
                          float * objectRotation,
+                         unsigned int rotationOrder,
                          ///---------------
                          float * output3DX,
                          float * output3DY,
@@ -56,12 +57,27 @@ int simpleRendererRender(
  ///                       OBJECT MATRICES ETC
  ///--------------------------------------------------------------------
   double objectMatrixRotation[16];
-  doRPYTransformation(
-                      objectMatrixRotation,
-                      (double) -1*objectRotation[2],
-                      (double) -1*objectRotation[1],
-                      (double) objectRotation[0]
-                     );
+  if (rotationOrder==ROTATION_ORDER_RPY)
+    {
+     //This is the old way to do this rotation
+     doRPYTransformation(
+                         objectMatrixRotation,
+                        (double) -1*objectRotation[2],
+                        (double) -1*objectRotation[1],
+                        (double) objectRotation[0]
+                       );
+    } else
+    {
+     //fprintf(stderr,"Using new model transform code\n");
+     create4x4MatrixFromEulerAnglesWithRotationOrder(
+                                                     objectMatrixRotation ,
+                                                     (double) -1*objectRotation[2],
+                                                     (double) -1*objectRotation[1],
+                                                     (double) objectRotation[0],
+                                                     rotationOrder
+                                                    );
+    }
+
 
 
    double point3D[4];
