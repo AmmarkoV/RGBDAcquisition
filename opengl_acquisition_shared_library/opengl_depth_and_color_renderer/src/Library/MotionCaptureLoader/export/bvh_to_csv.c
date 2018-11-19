@@ -6,6 +6,7 @@
 #include "../bvh_project.h"
 
 #define CONVERT_EULER_TO_RADIANS M_PI/180.0
+#define DUMP_SEPERATED_POS_ROT 0
 #define DUMP_3D_POSITIONS 0
 
 unsigned int filteredOutCSVPoses=0;
@@ -30,8 +31,9 @@ int dumpBVHToCSVHeader(
 
    if (fp!=0)
    {
+     #if DUMP_SEPERATED_POS_ROT
      fprintf(fp,"positionX,positionY,positionZ,roll,pitch,yaw,");
-
+     #endif // DUMP_SEPERATED_POS_ROT
 
      unsigned int jID=0;
      //2D Positions
@@ -55,20 +57,25 @@ int dumpBVHToCSVHeader(
      #endif // DUMP_3D_POSITIONS
 
 
-     //3D Positions
+     //Model Configuration
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
          if (!mc->jointHierarchy[jID].isEndSite)
          {
-           fprintf(fp,"%s_%s,%s_%s,%s_%s,",
-                   channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[0]],
-                   mc->jointHierarchy[jID].jointName,
-                   channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[1]],
-                   mc->jointHierarchy[jID].jointName,
-                   channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[2]],
-                   mc->jointHierarchy[jID].jointName);
+           unsigned int channelID=0;
+           for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+           {
+            fprintf(
+                    fp,"%s_%s,",
+                    mc->jointHierarchy[jID].jointName,
+                    channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
+                   );
+           }
          }
        }
+
+
+     //Append Frame ID
      fprintf(fp,"frameID\n");
 
      fclose(fp);
@@ -151,6 +158,7 @@ int dumpBVHToCSVBody(
    FILE * fp = fopen(filename,"a");
    if (fp!=0)
    {
+    #if DUMP_SEPERATED_POS_ROT
     fprintf(fp,"%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,",
                  renderer->cameraOffsetPosition[0]*10,
                  renderer->cameraOffsetPosition[1]*10,
@@ -159,7 +167,7 @@ int dumpBVHToCSVBody(
                  objectRotationOffset[1],
                  objectRotationOffset[0]
                  );
-
+     #endif // DUMP_SEPERATED_POS_ROT
 
      //2D Positions
      for (jID=0; jID<mc->jointHierarchySize; jID++)
@@ -195,15 +203,19 @@ int dumpBVHToCSVBody(
        {
          if (!mc->jointHierarchy[jID].isEndSite)
          {
-           fprintf(
-                   fp,"%0.2f,%0.2f,%0.2f,",
-                   bvh_getJointChannelAtFrame(mc,jID,fID,(unsigned int) mc->jointHierarchy[jID].channelType[0]),
-                   bvh_getJointChannelAtFrame(mc,jID,fID,(unsigned int) mc->jointHierarchy[jID].channelType[1]),
-                   bvh_getJointChannelAtFrame(mc,jID,fID,(unsigned int) mc->jointHierarchy[jID].channelType[2])
-                   );
+           unsigned int channelID=0;
+           for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+           {
+             unsigned int channelType =  mc->jointHierarchy[jID].channelType[channelID];
+             fprintf(
+                     fp,"%0.2f,",
+                     bvh_getJointChannelAtFrame(mc,jID,fID,channelType)
+                    );
+           }
          }
        }
 
+     //Append Frame ID
      fprintf(fp,"%u\n",fID);
 
      fclose(fp);
