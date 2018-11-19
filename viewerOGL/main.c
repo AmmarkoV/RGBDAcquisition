@@ -105,6 +105,7 @@ int drawObjectAT(GLuint programID,
                                     roll,//roll
                                     pitch ,//pitch
                                     yaw ,//yaw
+                                    ROTATION_ORDER_RPY,
 
                                     //Translation Component (XYZ)
                                     (double) x/100,
