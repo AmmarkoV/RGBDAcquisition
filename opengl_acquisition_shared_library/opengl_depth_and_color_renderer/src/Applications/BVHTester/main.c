@@ -60,6 +60,7 @@ int main(int argc, char **argv)
     const char * toSceneFile="Scenes/bvh.conf";
     const char * toSceneFileTRI="Scenes/bvhTRI.conf";
     const char * toSVGDirectory="tmp/";
+    const char * toCSVFilename="data.csv";
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
     unsigned int maxFrames = 0;
@@ -138,6 +139,7 @@ int main(int argc, char **argv)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           toSVGDirectory=argv[i+1];
+          toCSVFilename=argv[i+2];
           convertToCSV=1;
         } else
         //-----------------------------------------------------
@@ -249,6 +251,7 @@ int main(int argc, char **argv)
     {
      dumpBVHToSVGCSV(
                      toSVGDirectory,
+                     toCSVFilename,
                      convertToSVG,
                      convertToCSV,
                      &bvhMotion,

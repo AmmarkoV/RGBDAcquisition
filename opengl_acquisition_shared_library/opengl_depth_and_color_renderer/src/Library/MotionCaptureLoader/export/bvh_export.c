@@ -40,6 +40,7 @@ int performPointProjections(
 
 int dumpBVHToSVGCSV(
                     const char * directory,
+                    const char * filename,
                     int convertToSVG,
                     int convertToCSV,
                     struct BVH_MotionCapture * mc,
@@ -82,7 +83,7 @@ int dumpBVHToSVGCSV(
   simpleRendererInitialize(&renderer);
 
 
-  snprintf(csvFilename,512,"%s/data.csv",directory);
+  snprintf(csvFilename,512,"%s/%s",directory,filename);
   if (convertToCSV)
    {
     dumpBVHToCSVHeader(

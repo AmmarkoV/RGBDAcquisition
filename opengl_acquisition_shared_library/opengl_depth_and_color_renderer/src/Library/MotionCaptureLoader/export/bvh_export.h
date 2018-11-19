@@ -7,6 +7,7 @@
 
 int dumpBVHToSVGCSV(
                     const char * directory ,
+                    const char * filename,
                     int convertToSVG,
                     int convertToCSV,
                     struct BVH_MotionCapture * mc,
