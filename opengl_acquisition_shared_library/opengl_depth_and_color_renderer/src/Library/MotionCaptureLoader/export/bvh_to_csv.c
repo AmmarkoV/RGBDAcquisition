@@ -208,7 +208,7 @@ int dumpBVHToCSVBody(
            {
              unsigned int channelType =  mc->jointHierarchy[jID].channelType[channelID];
              fprintf(
-                     fp,"%0.2f,",
+                     fp,"%0.4f,",
                      bvh_getJointChannelAtFrame(mc,jID,fID,channelType)
                     );
            }
