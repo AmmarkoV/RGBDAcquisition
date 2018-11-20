@@ -9,6 +9,8 @@
 #define DUMP_SEPERATED_POS_ROT 0
 #define DUMP_3D_POSITIONS 0
 
+unsigned int filteredOutCSVBehindPoses=0;
+unsigned int filteredOutCSVOutPoses=0;
 unsigned int filteredOutCSVPoses=0;
 
 int fileExists(const char * filename)
@@ -121,6 +123,7 @@ int dumpBVHToCSVBody(
          if (bvhTransform->joint[jID].isBehindCamera)
          {
            ++filteredOutCSVPoses;
+           ++filteredOutCSVBehindPoses;
            //Just counting to reduce spam..
            return 0;
          }
@@ -141,6 +144,7 @@ int dumpBVHToCSVBody(
            )
         {
            ++filteredOutCSVPoses;
+           ++filteredOutCSVOutPoses;
            //Just counting to reduce spam..
            return 0;
         }

@@ -5,6 +5,10 @@
 #include "../bvh_loader.h"
 #include "../bvh_transform.h"
 
+extern unsigned int filteredOutCSVBehindPoses;
+extern unsigned int filteredOutCSVOutPoses;
+
+
 int dumpBVHToSVGCSV(
                     const char * directory ,
                     const char * filename,
