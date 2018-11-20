@@ -27,8 +27,38 @@ int dumpBVHToSVGFrame(
       fprintf(fp,"<text x=\"10\" y=\"30\">Model Position %0.2f,%0.2f,%0.2f</text>\n",
               renderer->cameraOffsetPosition[0]*10,renderer->cameraOffsetPosition[1]*10,renderer->cameraOffsetPosition[2]*10);
 
+      unsigned int x=10;
+      float * m = renderer->projectionMatrix;
+      fprintf(fp,"<text x=\"%u\" y=\"45\">Projection Matrix</text>\n",x);
+      fprintf(fp,"<text x=\"%u\" y=\"60\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[0],m[1],m[2],m[3]);
+      fprintf(fp,"<text x=\"%u\" y=\"75\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[4],m[5],m[6],m[7]);
+      fprintf(fp,"<text x=\"%u\" y=\"90\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[8],m[9],m[10],m[11]);
+      fprintf(fp,"<text x=\"%u\" y=\"105\">%0.2f %0.2f %0.2f %0.2f</text>\n",x,m[12],m[13],m[14],m[15]);
 
 
+      x=150;
+      m = renderer->modelViewMatrix;
+      fprintf(fp,"<text x=\"%u\" y=\"45\">ModelView Matrix</text>\n",x);
+      fprintf(fp,"<text x=\"%u\" y=\"60\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[0],m[1],m[2],m[3]);
+      fprintf(fp,"<text x=\"%u\" y=\"75\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[4],m[5],m[6],m[7]);
+      fprintf(fp,"<text x=\"%u\" y=\"90\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[8],m[9],m[10],m[11]);
+      fprintf(fp,"<text x=\"%u\" y=\"105\">%0.2f %0.2f %0.2f %0.2f</text>\n",x,m[12],m[13],m[14],m[15]);
+
+      x=300;
+      m = renderer->viewMatrix;
+      fprintf(fp,"<text x=\"%u\" y=\"45\">View Matrix</text>\n",x);
+      fprintf(fp,"<text x=\"%u\" y=\"60\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[0],m[1],m[2],m[3]);
+      fprintf(fp,"<text x=\"%u\" y=\"75\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[4],m[5],m[6],m[7]);
+      fprintf(fp,"<text x=\"%u\" y=\"90\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[8],m[9],m[10],m[11]);
+      fprintf(fp,"<text x=\"%u\" y=\"105\">%0.2f %0.2f %0.2f %0.2f</text>\n",x,m[12],m[13],m[14],m[15]);
+
+      x=450;
+      m = renderer->modelMatrix;
+      fprintf(fp,"<text x=\"%u\" y=\"45\">Model Matrix</text>\n",x);
+      fprintf(fp,"<text x=\"%u\" y=\"60\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[0],m[1],m[2],m[3]);
+      fprintf(fp,"<text x=\"%u\" y=\"75\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[4],m[5],m[6],m[7]);
+      fprintf(fp,"<text x=\"%u\" y=\"90\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[8],m[9],m[10],m[11]);
+      fprintf(fp,"<text x=\"%u\" y=\"105\">%0.2f %0.2f %0.2f %0.2f</text>\n",x,m[12],m[13],m[14],m[15]);
 
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
@@ -51,6 +81,22 @@ int dumpBVHToSVGFrame(
                 fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"3.00\" stroke=\"rgb(135,135,0)\" stroke-width=\"3\" fill=\"rgb(255,255,0)\" />\n",
                 bvhTransform->joint[jID].pos2D[0],
                 bvhTransform->joint[jID].pos2D[1]
+               );
+/*
+        fprintf(
+                fp,"<text x=\"%0.2f\" y=\"%0.2f\">%0.2f,%0.2f,%0.2f</text>\n",
+                bvhTransform->joint[jID].pos2D[0]+10,
+                bvhTransform->joint[jID].pos2D[1],
+                bvhTransform->joint[jID].pos3D[0],
+                bvhTransform->joint[jID].pos3D[1],
+                bvhTransform->joint[jID].pos3D[2]
+               );
+*/
+        fprintf(
+                fp,"<!-- x=\"%0.2f\" y=\"%0.2f\" z=\"%0.2f\" -->\n",
+                bvhTransform->joint[jID].pos3D[0],
+                bvhTransform->joint[jID].pos3D[1],
+                bvhTransform->joint[jID].pos3D[2]
                );
       }
 

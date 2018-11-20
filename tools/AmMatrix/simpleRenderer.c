@@ -210,9 +210,9 @@ int simpleRendererInitialize(struct simpleRenderer * sr)
                                      );
 
    double viewMatrixD[16];
-   //create4x4IdentityMatrix(viewMatrixD);
+   create4x4IdentityMatrix(viewMatrixD);
 
-   create4x4ScalingMatrix(viewMatrixD,1.0,1.0,1.0);
+   //create4x4ScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
    copy4x4DMatrixToF(sr->viewMatrix,viewMatrixD);
 
    //Initialization of matrices not yet used

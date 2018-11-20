@@ -34,6 +34,12 @@ int performPointProjections(
            {
              return 1;
            }
+       }  else
+       {
+           bvh_cleanTransform(
+                              mc,
+                              bvhTransform
+                             );
        }
    //----------------------------------------------------------
  return 0;

@@ -3,6 +3,27 @@
 #include "bvh_loader.h"
 #include "bvh_project.h"
 
+void bvh_cleanTransform(
+                       struct BVH_MotionCapture * mc,
+                       struct BVH_Transform     * bvhTransform
+                      )
+{
+ unsigned int jID=0;
+ for (jID=0; jID<mc->jointHierarchySize; jID++)
+         {
+          bvhTransform->joint[jID].pos3D[0]=0.0;
+          bvhTransform->joint[jID].pos3D[1]=0.0;
+          bvhTransform->joint[jID].pos3D[2]=0.0;
+
+          bvhTransform->joint[jID].pos2DCalculated=0;
+          bvhTransform->joint[jID].isBehindCamera=0;
+
+          bvhTransform->joint[jID].pos2D[0]=0.0;
+          bvhTransform->joint[jID].pos2D[1]=0.0;
+         }
+}
+
+
 int bvh_projectTo2D(
                      struct BVH_MotionCapture * mc,
                      struct BVH_Transform     * bvhTransform,

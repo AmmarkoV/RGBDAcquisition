@@ -7,6 +7,11 @@
 
 #include "../../../../../tools/AmMatrix/simpleRenderer.h"
 
+void bvh_cleanTransform(
+                       struct BVH_MotionCapture * mc,
+                       struct BVH_Transform     * bvhTransform
+                      );
+
 int bvh_projectTo2D(
                      struct BVH_MotionCapture * mc,
                      struct BVH_Transform     * bvhTransform,
