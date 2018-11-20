@@ -203,9 +203,9 @@ int dumpBVHToCSVBody(
          if (!mc->jointHierarchy[jID].isEndSite)
          {
           fprintf(
-                  fp,"%0.2f,%0.2f,",
-                  bvhTransform->joint[jID].pos2D[0],
-                  bvhTransform->joint[jID].pos2D[1]
+                  fp,"%0.4f,%0.4f,",
+                  (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
+                  (float) bvhTransform->joint[jID].pos2D[1]/renderer->height
                  );
          }
        }
