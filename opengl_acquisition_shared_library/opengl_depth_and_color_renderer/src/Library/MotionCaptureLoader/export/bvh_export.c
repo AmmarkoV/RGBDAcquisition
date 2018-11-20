@@ -11,28 +11,32 @@ int performPointProjections(
                              struct BVH_MotionCapture * mc,
                              struct BVH_Transform * bvhTransform,
                              unsigned int fID,
-                             struct simpleRenderer * renderer,
-                             float * objectRotationOffset
+                             struct simpleRenderer * renderer
                             )
 {
-
-
   //First load the 3D positions of each joint..
-  bvh_loadTransformForFrame(
+  if (
+       bvh_loadTransformForFrame(
+                                 mc,
+                                 fID ,
+                                 bvhTransform
+                                )
+      )
+       {
+        //Then project 3D positions on 2D frame and save results..
+        if (
+            bvh_projectTo2D(
                             mc,
-                            fID ,
-                            bvhTransform
-                           );
-  //Then project 3D positions on 2D frame and save results..
-  bvh_projectTo2D(
-                  mc,
-                  bvhTransform,
-                  renderer,
-                  objectRotationOffset
-                 );
+                            bvhTransform,
+                            renderer
+                           )
+           )
+           {
+             return 1;
+           }
+       }
    //----------------------------------------------------------
-
- return 1;
+ return 0;
 }
 
 
@@ -92,41 +96,23 @@ int dumpBVHToSVGCSV(
                        );
    }
 
-  BVHJointID rootJID;
-  bvh_getRootJointID( mc, &rootJID );
-
-
 
   unsigned int framesDumped=0;
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
-
-
-    float objectRotationOffsetCopy[3]={0};
-
-
-    float data[8]={0};
-    if (bhv_populatePosXYZRotXYZ(mc,rootJID,fID,data,sizeof(data)))
-         {
-            renderer.cameraOffsetPosition[0]=data[0];
-            renderer.cameraOffsetPosition[1]=data[1]-80;
-            renderer.cameraOffsetPosition[2]=data[2]+300;
-            renderer.cameraOffsetPosition[3]=0.0;
-            objectRotationOffsetCopy[0]=data[3]+0;
-            objectRotationOffsetCopy[1]=data[4];
-            objectRotationOffsetCopy[2]=data[5];
-            renderer.cameraOffsetRotation[3]=0.0;
-         }
-
-   performPointProjections(
-                           mc,
-                           &bvhTransform,
-                           fID,
-                           &renderer,
-                           objectRotationOffsetCopy
-                          );
+   if (
+       !performPointProjections(
+                                mc,
+                                &bvhTransform,
+                                fID,
+                                &renderer
+                               )
+       )
+   {
+       fprintf(stderr,"Could not perform projection for frame %u\n",fID);
+   }
 
    if (convertToCSV)
    {
@@ -134,7 +120,6 @@ int dumpBVHToSVGCSV(
                        mc,
                        &bvhTransform,
                        &renderer,
-                       objectRotationOffsetCopy,
                        fID,
                        csvFilename,
                        filterOutSkeletonsWithAnyLimbsBehindTheCamera,
@@ -152,8 +137,7 @@ int dumpBVHToSVGCSV(
                                        mc,
                                        &bvhTransform,
                                        fID,
-                                       &renderer,
-                                       objectRotationOffsetCopy
+                                       &renderer
                                       );
    }
 

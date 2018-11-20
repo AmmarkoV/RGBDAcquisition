@@ -18,7 +18,6 @@ int dumpBVHToCSVBody(
                        struct BVH_MotionCapture * mc,
                        struct BVH_Transform * bvhTransform,
                        struct simpleRenderer * renderer,
-                       float * objectRotationOffset,
                        unsigned int fID,
                        const char * filename,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,

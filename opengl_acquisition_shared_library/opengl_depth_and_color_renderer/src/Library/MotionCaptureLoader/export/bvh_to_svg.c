@@ -9,8 +9,7 @@ int dumpBVHToSVGFrame(
                       struct BVH_MotionCapture * mc,
                       struct BVH_Transform * bvhTransform,
                       unsigned int fID,
-                      struct simpleRenderer * renderer,
-                      float * objectRotationOffset
+                      struct simpleRenderer * renderer
                      )
 {
    unsigned int width = renderer->width;
@@ -27,8 +26,7 @@ int dumpBVHToSVGFrame(
       fprintf(fp,"<text x=\"10\" y=\"15\">Frame %u</text>\n",fID);
       fprintf(fp,"<text x=\"10\" y=\"30\">Model Position %0.2f,%0.2f,%0.2f</text>\n",
               renderer->cameraOffsetPosition[0]*10,renderer->cameraOffsetPosition[1]*10,renderer->cameraOffsetPosition[2]*10);
-      fprintf(fp,"<text x=\"10\" y=\"45\">Model Euler Rotation %0.2f,%0.2f,%0.2f</text>\n",
-              objectRotationOffset[0],objectRotationOffset[1],objectRotationOffset[2]);
+
 
 
 

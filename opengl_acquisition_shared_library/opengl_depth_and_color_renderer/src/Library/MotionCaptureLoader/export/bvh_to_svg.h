@@ -11,8 +11,7 @@ int dumpBVHToSVGFrame(
                       struct BVH_MotionCapture * mc,
                       struct BVH_Transform * bvhTransform,
                       unsigned int fID,
-                      struct simpleRenderer * renderer,
-                      float * objectRotationOffset
+                      struct simpleRenderer * renderer
                      );
 
 

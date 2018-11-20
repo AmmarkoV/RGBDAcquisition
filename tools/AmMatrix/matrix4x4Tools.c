@@ -1053,6 +1053,11 @@ void create4x4ModelTransformation(
 
     double intermediateMatrixRotation[16];
 
+
+    if ( (x==0) && (y==0) && (z==0) )
+    {
+      create4x4IdentityMatrix(intermediateMatrixRotation);
+    } else
     if (rotationOrder==ROTATION_ORDER_RPY)
     {
      //This is the old way to do this rotation

@@ -10,8 +10,7 @@
 int bvh_projectTo2D(
                      struct BVH_MotionCapture * mc,
                      struct BVH_Transform     * bvhTransform,
-                     struct simpleRenderer    * renderer,
-                     float * objectRotation
+                     struct simpleRenderer    * renderer
                    );
 
 #endif // BVH_PROJECT_H_INCLUDED

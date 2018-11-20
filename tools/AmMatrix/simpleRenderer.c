@@ -5,6 +5,7 @@
 
 
 
+
 int simpleRendererRender(
                          struct simpleRenderer * sr ,
                          float * position3D,
@@ -57,23 +58,32 @@ int simpleRendererRender(
  ///                       OBJECT MATRICES ETC
  ///--------------------------------------------------------------------
   double objectMatrixRotation[16];
+
+  if (objectRotation==0)
+    {
+      create4x4IdentityMatrix(objectMatrixRotation);
+    } else
+  if ( (objectRotation[0]==0) && (objectRotation[1]==0) && (objectRotation[2]==0) )
+    {
+      create4x4IdentityMatrix(objectMatrixRotation);
+    } else
   if (rotationOrder==ROTATION_ORDER_RPY)
     {
      //This is the old way to do this rotation
      doRPYTransformation(
                          objectMatrixRotation,
-                        (double) -1*objectRotation[2],
-                        (double) -1*objectRotation[1],
-                        (double) objectRotation[0]
+                        (double) objectRotation[0],
+                        (double) objectRotation[1],
+                        (double) objectRotation[2]
                        );
     } else
     {
      //fprintf(stderr,"Using new model transform code\n");
      create4x4MatrixFromEulerAnglesWithRotationOrder(
                                                      objectMatrixRotation ,
-                                                     (double) -1*objectRotation[2],
-                                                     (double) -1*objectRotation[1],
                                                      (double) objectRotation[0],
+                                                     (double) objectRotation[1],
+                                                     (double) objectRotation[2],
                                                      rotationOrder
                                                     );
     }
@@ -141,6 +151,41 @@ int simpleRendererRender(
 
 
 
+int deadSimpleRendererRender(
+                             struct simpleRenderer * sr ,
+                             float * position3D,
+                             ///---------------
+                             float * output2DX,
+                             float * output2DY,
+                             float * output2DW
+                            )
+{
+ ///--------------------------------------------------------------------
+ ///                         FINAL PROJECTION
+ ///--------------------------------------------------------------------
+  float windowCoordinates[3]={0};
+
+  create4x4IdentityMatrixF(sr->modelViewMatrix);
+
+  if (
+       !_glhProjectf(
+                     position3D,
+                     sr->modelViewMatrix,
+                     sr->projectionMatrix,
+                     sr->viewport,
+                     windowCoordinates
+                    )
+     )
+     { fprintf(stderr,"Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",position3D[0],position3D[1],position3D[2]); }
+ ///--------------------------------------------------------------------
+  *output2DX = windowCoordinates[0];//windowCoordinates[2];
+  *output2DY = windowCoordinates[1];//windowCoordinates[2];
+  *output2DW = windowCoordinates[2];
+  return 1;
+}
+
+
+
 
 
 int simpleRendererInitialize(struct simpleRenderer * sr)
@@ -165,7 +210,9 @@ int simpleRendererInitialize(struct simpleRenderer * sr)
                                      );
 
    double viewMatrixD[16];
-   create4x4ScalingMatrix(viewMatrixD,-1.0,1.0,1.0);
+   //create4x4IdentityMatrix(viewMatrixD);
+
+   create4x4ScalingMatrix(viewMatrixD,1.0,1.0,1.0);
    copy4x4DMatrixToF(sr->viewMatrix,viewMatrixD);
 
    //Initialization of matrices not yet used

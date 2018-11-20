@@ -141,6 +141,10 @@ struct BVH_MotionCapture
 
 
 
+int enumerateChannelOrderFromTypes(char typeA,char typeB,char typeC);
+
+int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint);
+
 /**
 * @brief Different motion capture systems produce different types of joint names. For example lhip can be named lefthip,leftupleg,lthigh,leftupperLeg etc.
 *        This call renames them in order to ensure better compatibility with various different motion capture files..
