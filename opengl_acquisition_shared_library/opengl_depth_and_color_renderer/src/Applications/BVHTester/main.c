@@ -172,7 +172,7 @@ int main(int argc, char **argv)
 
           cameraPositionOffset[0]=-1*atof(argv[i+1])/10;
           cameraPositionOffset[1]=-1*atof(argv[i+2])/10;
-          cameraPositionOffset[2]=atof(argv[i+3])/10;
+          cameraPositionOffset[2]=-1*atof(argv[i+3])/10;
           cameraRotationOffset[0]=atof(argv[i+4]);
           cameraRotationOffset[1]=atof(argv[i+5]);
           cameraRotationOffset[2]=atof(argv[i+6]);
@@ -191,7 +191,7 @@ int main(int argc, char **argv)
 
           cameraPositionOffset[0]=-1*atof(argv[i+1])/10;
           cameraPositionOffset[1]=-1*atof(argv[i+2])/10;
-          cameraPositionOffset[2]=atof(argv[i+3])/10;
+          cameraPositionOffset[2]=-1*atof(argv[i+3])/10;
           cameraRotationOffset[0]=atof(argv[i+4]);
           cameraRotationOffset[1]=atof(argv[i+5]);
           cameraRotationOffset[2]=atof(argv[i+6]);
@@ -215,7 +215,7 @@ int main(int argc, char **argv)
           //----
           minimumPosition[0]=-1*atof(argv[i+1])/10;
           minimumPosition[1]=-1*atof(argv[i+2])/10;
-          minimumPosition[2]=atof(argv[i+3])/10;
+          minimumPosition[2]=-1*atof(argv[i+3])/10;
           //----
           minimumRotation[0]=atof(argv[i+4]);
           minimumRotation[1]=atof(argv[i+5]);
@@ -223,7 +223,7 @@ int main(int argc, char **argv)
           //----
           maximumPosition[0]=-1*atof(argv[i+7])/10;
           maximumPosition[1]=-1*atof(argv[i+8])/10;
-          maximumPosition[2]=atof(argv[i+9])/10;
+          maximumPosition[2]=-1*atof(argv[i+9])/10;
           //----
           maximumRotation[0]=atof(argv[i+10]);
           maximumRotation[1]=atof(argv[i+11]);
