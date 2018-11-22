@@ -152,7 +152,10 @@ int dumpBVHToSVGCSV(
   fprintf(stderr,"Filtered out CSV poses : %u\n",filteredOutCSVPoses);
   fprintf(stderr,"Filtered behind camera : %u\n",filteredOutCSVBehindPoses);
   fprintf(stderr,"Filtered out of camera frame : %u\n",filteredOutCSVOutPoses);
-  fprintf(stderr,"Used %0.2f%% of dataset\n",(float) 100*(mc->numberOfFrames-filteredOutCSVPoses)/mc->numberOfFrames);
+  if (mc->numberOfFrames!=0)
+  {
+   fprintf(stderr,"Used %0.2f%% of dataset\n",(float) 100*(mc->numberOfFrames-filteredOutCSVPoses)/mc->numberOfFrames);
+  }
 
 
  return (framesDumped==mc->numberOfFrames);
