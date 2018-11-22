@@ -20,6 +20,23 @@
 #include "bvh_loader.h"
 #include "../TrajectoryParser/InputParser_C.h"
 
+double bvh_constrainAngleCentered180(double angle)
+{
+   angle = fmod(angle,360.0);
+   if (angle<0.0)
+     { angle+=360.0; }
+   return angle;
+}
+
+double bvh_constrainAngleCentered0(double angle)
+{
+   angle = fmod(angle+180.0,360.0);
+   if (angle<0.0)
+     { angle+=360.0; }
+   return angle-180.0;
+}
+
+
 
 #define NORMAL   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -901,7 +918,7 @@ int bvh_OffsetPositionRotation(
                                float * rotation
                               )
 {
-unsigned int fID=0;
+  unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
@@ -915,7 +932,28 @@ unsigned int fID=0;
  return 1;
 }
 
+int bvh_ConstrainRotations(struct BVH_MotionCapture * mc)
+{
+  unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+   unsigned int mID=fID*mc->numberOfValuesPerFrame;
 
+   double buffer = (double) mc->motionValues[mID+3];
+   buffer = bvh_constrainAngleCentered0(buffer);
+   mc->motionValues[mID+3] = (float) buffer;
+
+   buffer = (double) mc->motionValues[mID+4];
+   buffer = bvh_constrainAngleCentered0(buffer);
+   mc->motionValues[mID+4] = (float) buffer;
+
+   buffer = (double) mc->motionValues[mID+5];
+   buffer = bvh_constrainAngleCentered0(buffer);
+   mc->motionValues[mID+5] = (float) buffer;
+  }
+ return 1;
+
+}
 
 int bvh_GrowMocapFileByCopyingExistingMotions(
                                               struct BVH_MotionCapture * mc,

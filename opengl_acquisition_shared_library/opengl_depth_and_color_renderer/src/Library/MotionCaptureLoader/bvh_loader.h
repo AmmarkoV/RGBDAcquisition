@@ -194,6 +194,9 @@ int bvh_OffsetPositionRotation(
                                float * rotation
                               );
 
+
+int bvh_ConstrainRotations(struct BVH_MotionCapture * mc);
+
 int bvh_GrowMocapFileByCopyingExistingMotions(
                                               struct BVH_MotionCapture * mc,
                                               unsigned int timesToRepeat

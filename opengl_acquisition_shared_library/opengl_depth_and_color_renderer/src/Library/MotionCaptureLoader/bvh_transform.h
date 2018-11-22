@@ -35,6 +35,8 @@ struct BVH_Transform
   double centerPosition[3];
 };
 
+
+
 void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,double degreesY,double degreesZ);
 
 

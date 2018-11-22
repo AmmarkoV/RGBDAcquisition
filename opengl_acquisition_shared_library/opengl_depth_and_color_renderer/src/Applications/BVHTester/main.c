@@ -113,6 +113,7 @@ int main(int argc, char **argv)
           bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
           //Change joint names..
           bvh_renameJointsForCompatibility(&bvhMotion);
+          bvh_ConstrainRotations(&bvhMotion);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--to")==0)
@@ -181,6 +182,7 @@ int main(int argc, char **argv)
                                   cameraPositionOffset,
                                   cameraRotationOffset
                                  );
+          bvh_ConstrainRotations(&bvhMotion);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--offsetPositionRotation")==0)
@@ -200,6 +202,7 @@ int main(int argc, char **argv)
                                      cameraPositionOffset,
                                      cameraRotationOffset
                                     );
+          bvh_ConstrainRotations(&bvhMotion);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
@@ -237,6 +240,7 @@ int main(int argc, char **argv)
                                          maximumPosition,
                                          maximumRotation
                                        );
+          bvh_ConstrainRotations(&bvhMotion);
         }
         //-----------------------------------------------------
     }
