@@ -44,10 +44,11 @@ int dumpBVHToCSVHeader(
          if (!mc->jointHierarchy[jID].isEndSite)
          {
           fprintf(fp,"2DX_%s,2DY_%s,",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
-         } else
+         }
+         else
          {
           unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
-          fprintf(fp,"2DX_EndSite%s,2DY_EndSite%s,",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
+          fprintf(fp,"2DX_EndSite_%s,2DY_EndSite_%s,",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
          }
        }
      //--------------------------------------------------------------------------------------------------------------------------
@@ -212,7 +213,8 @@ int dumpBVHToCSVBody(
                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                   (float) bvhTransform->joint[jID].pos2D[1]/renderer->height
                  );
-         }else
+         }
+         else
          {
           unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
           fprintf(
