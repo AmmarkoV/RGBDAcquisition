@@ -38,14 +38,19 @@ int dumpBVHToCSVHeader(
      #endif // DUMP_SEPERATED_POS_ROT
 
      unsigned int jID=0;
-     //2D Positions
+     //2D Positions -------------------------------------------------------------------------------------------------------------
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
          if (!mc->jointHierarchy[jID].isEndSite)
          {
           fprintf(fp,"2DX_%s,2DY_%s,",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
+         } else
+         {
+          unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+          fprintf(fp,"2DX_EndSite%s,2DY_EndSite%s,",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
          }
        }
+     //--------------------------------------------------------------------------------------------------------------------------
 
      #if DUMP_3D_POSITIONS
      //3D Positions
@@ -197,7 +202,7 @@ int dumpBVHToCSVBody(
                  );
      #endif // DUMP_SEPERATED_POS_ROT
 
-     //2D Positions
+     //2D Positions -------------------------------------------------------------------------------------------------------------
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
          if (!mc->jointHierarchy[jID].isEndSite)
@@ -207,8 +212,17 @@ int dumpBVHToCSVBody(
                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                   (float) bvhTransform->joint[jID].pos2D[1]/renderer->height
                  );
+         }else
+         {
+          unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+          fprintf(
+                  fp,"%0.4f,%0.4f,",
+                  (float) bvhTransform->joint[parentID].pos2D[0]/renderer->width,
+                  (float) bvhTransform->joint[parentID].pos2D[1]/renderer->height
+                 );
          }
        }
+     //-----------------------------------------------------------------------------------------------------------------------------
 
      #if DUMP_3D_POSITIONS
      //3D Positions
