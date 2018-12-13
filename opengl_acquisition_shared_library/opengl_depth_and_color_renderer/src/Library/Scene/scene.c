@@ -311,6 +311,7 @@ int tickScene(unsigned int framerate)
        return 0;
    }
 
+
    //ALL positions should be calculated here!
    //i dont like the way this is working now
    float posStack[7]={0};
@@ -321,6 +322,14 @@ int tickScene(unsigned int framerate)
 
   unsigned int timestampToUse = 0;
 
+
+   if (scene->ignoreTime)
+   {
+     timestampToUse = scene->ticks;
+     ++scene->ticks;
+     scene->ticksF = (float) scene->ticks;
+     scene->controls.lastTickMillisecond =   scene->ticks;
+   } else
   //There are two ways to render, the first is regardless of GPU we try to enforce a specific framerate..
   //The rate is controled using the RATE(x) script command. If we get a rate of 100 it means that we will
   //try to playback a stream captured at 100 frames per second..!
