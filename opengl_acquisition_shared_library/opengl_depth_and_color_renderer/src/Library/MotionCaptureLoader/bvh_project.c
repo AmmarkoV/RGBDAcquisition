@@ -27,7 +27,8 @@ void bvh_cleanTransform(
 int bvh_projectTo2D(
                      struct BVH_MotionCapture * mc,
                      struct BVH_Transform     * bvhTransform,
-                     struct simpleRenderer    * renderer
+                     struct simpleRenderer    * renderer,
+                     unsigned int               occlusions
                    )
 {
       unsigned int pointsDumped=0;
@@ -101,5 +102,29 @@ int bvh_projectTo2D(
         ++pointsDumped;
       } //Joint Loop
 
+
+ /*
+ if (occlusions)
+     {
+       //bvhTransform->joint[jID].isOccluded=0;
+       unsigned int jID2=0;
+       for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+        if (bvhTransform->joint[jID].pos2DCalculated)
+        {
+         for (jID2=0; jID2<mc->jointHierarchySize; jID2++)
+          {
+           if (jID2!=jID)
+           {
+            if (bvhTransform->joint[jID2].pos2DCalculated)
+             {
+             //
+             }
+           }
+          }
+        }
+       }
+     }
+*/
  return (pointsDumped==mc->jointHierarchySize);
 }

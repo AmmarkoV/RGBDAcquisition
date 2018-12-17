@@ -11,7 +11,8 @@ int performPointProjections(
                              struct BVH_MotionCapture * mc,
                              struct BVH_Transform * bvhTransform,
                              unsigned int fID,
-                             struct simpleRenderer * renderer
+                             struct simpleRenderer * renderer,
+                             unsigned int occlusions
                             )
 {
   //First load the 3D positions of each joint..
@@ -28,7 +29,8 @@ int performPointProjections(
             bvh_projectTo2D(
                             mc,
                             bvhTransform,
-                            renderer
+                            renderer,
+                            occlusions
                            )
            )
            {
@@ -114,7 +116,8 @@ int dumpBVHToSVGCSV(
                                 mc,
                                 &bvhTransform,
                                 fID,
-                                &renderer
+                                &renderer,
+                                occlusions
                                )
        )
    {

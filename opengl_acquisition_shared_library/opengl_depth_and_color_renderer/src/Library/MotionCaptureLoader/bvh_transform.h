@@ -25,6 +25,7 @@ struct BVH_TransformedJoint
   //-----------------
   char pos2DCalculated;
   char isBehindCamera;
+  char isOccluded;
   double pos2D[2];
 };
 
