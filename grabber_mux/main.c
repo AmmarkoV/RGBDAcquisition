@@ -237,6 +237,15 @@ int main(int argc, char *argv[])
                                            makepath(outputfoldername);
                                            fprintf(stderr,"OutputPath , set to %s  \n",outputfoldername);
                                          }
+  else
+    if (
+        (strcmp(argv[i],"-resolution")==0)
+       )
+                                         {
+                                           defaultWidth=atoi(argv[i+1]);
+                                           defaultHeight=atoi(argv[i+2]);
+                                           fprintf(stderr,"Resolution, set to %u x %u  \n",defaultWidth,defaultHeight);
+                                         }
   }
 
   if (moduleID_1==SCRIPTED_ACQUISITION_MODULE)

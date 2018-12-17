@@ -64,6 +64,7 @@ int main(int argc, char **argv)
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
     unsigned int maxFrames = 0;
+    unsigned int occlusions = 0;
     float scaleWorld=1.0;
 
 
@@ -72,6 +73,11 @@ int main(int argc, char **argv)
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--occlusions")==0)
+        {
+          occlusions=1;
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--print")==0)
         {
@@ -261,6 +267,7 @@ int main(int argc, char **argv)
                      &bvhMotion,
                      640,
                      480,
+                     occlusions,
                      1,//Filter out all poses where even one joint is behind camera
                      1,//Filter out all poses where even one joint is outside of 2D frame
                      1,//Filter top left weird random skelingtons ( skeletons )

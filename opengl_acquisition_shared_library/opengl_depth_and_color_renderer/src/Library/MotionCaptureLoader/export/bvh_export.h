@@ -17,6 +17,7 @@ int dumpBVHToSVGCSV(
                     struct BVH_MotionCapture * mc,
                     unsigned int width,
                     unsigned int height,
+                    unsigned int occlusions,
                     unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                     unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                     unsigned int filterWeirdSkeletons,
