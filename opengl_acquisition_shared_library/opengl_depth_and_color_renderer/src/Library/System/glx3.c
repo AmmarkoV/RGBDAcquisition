@@ -13,6 +13,7 @@
 
 #include "../Scene/scene.h"
 
+GLXDrawable whatToSwap=0;
 GLboolean  doubleBufferGLX3 = GL_TRUE;
 static int dblBuf[]  = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None};
 
@@ -188,6 +189,8 @@ int start_glx3_stuffWindowed(int WIDTH,int HEIGHT,int argc,const char **argv)
     return 0;
   }
 
+  whatToSwap = win;
+
   // Done with the visual info data
   XFree( vi );
 
@@ -306,12 +309,6 @@ int start_glx3_stuffWindowed(int WIDTH,int HEIGHT,int argc,const char **argv)
 
 
 
-
-
-
-
-
-
 int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc,const char **argv)
 {
   if (viewWindow==0)
@@ -383,6 +380,7 @@ int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc,const char **a
   int pbufferAttribs[]={
                            GLX_PBUFFER_WIDTH, w,
                            GLX_PBUFFER_HEIGHT, h,
+                           GLX_PRESERVED_CONTENTS, True,
                            GLX_NONE
                           };
 
@@ -480,17 +478,22 @@ int start_glx3_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc,const char **a
 
   printf( "Making context current\n" );
 
+  whatToSwap=pbuffer;
   if ( !glXMakeContextCurrent( display, pbuffer, pbuffer, ctx ) )
       {
-        fatalErrorGLX3(RED "Could not start rendering to pbuffer fbo" NORMAL);
+        fatalErrorGLX3(RED "glXMakeContextCurrent: Could not start rendering to pbuffer fbo" NORMAL);
         return 0;
       }
 
+   if (!glXGetCurrentDrawable())
+   {
+    fatalErrorGLX3(RED "No drawable selected (pbuffer fbo)\n" NORMAL);
 
+   }
 
    glClearColor( 0, 0.0, 0, 1 );
    glClear( GL_COLOR_BUFFER_BIT );
-   glXSwapBuffers ( display, win );
+   glXSwapBuffers ( display, whatToSwap );
 
   printf( "GLX3.0 windowless context ready..\n" );
   return 1;
@@ -528,7 +531,7 @@ int stop_glx3_stuff()
 
 int glx3_endRedraw()
 {
-  if (doubleBufferGLX3) glXSwapBuffers(display, win);/* buffer swap does implicit glFlush */
+  if (doubleBufferGLX3) glXSwapBuffers(display, whatToSwap);/* buffer swap does implicit glFlush */
   else glFlush();  /* explicit flush for single buffered case */
   return 1;
 }
