@@ -88,7 +88,7 @@ int dumpBVHToTrajectoryParserPrimitives(const char * filename , struct BVH_Motio
     fprintf(fp,"MOVE_VIEW(1)\n\n");
 
 
-    fprintf(fp,"OBJECT_TYPE(floorType,grid)\n");
+    fprintf(fp,"OBJECT_TYPE(floorType,cube)\n");
     fprintf(fp,"OBJECT(floor,floorType,0,255,0,0 ,0, 10.0,10.0,10.0)\n");
     //Instantiate objects that will draw our skeleton
     //------------------------------------------------
