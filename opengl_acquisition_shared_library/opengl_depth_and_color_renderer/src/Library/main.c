@@ -198,7 +198,7 @@ int startOGLRendererSandbox(int argc, char *argv[],unsigned int width,unsigned i
   snapsPerformed=0;
 
   char ** testP=0;
-  fprintf(stderr,"trying to start glx code with a window request ( %ux%u , viewWindow=%u ).. ",width,height,viewWindow);
+  fprintf(stderr,"trying to start glx code with configuration ( %ux%u , viewWindow=%u )..\n",width,height,viewWindow);
    if ( !start_glx_stuff(width,height,openGLVersion,viewWindow,0,testP) )
    {
      return 0;

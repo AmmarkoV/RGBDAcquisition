@@ -39,6 +39,7 @@ static Bool WaitForNotify( Display *dpy, XEvent *event, XPointer arg )
 
 int start_glx2_stuff(int WIDTH,int HEIGHT,int viewWindow,int argc, char **argv)
 {
+  fprintf(stderr,"start_glx2_stuff\n");
   XVisualInfo         *vi;
   Colormap             cmap;
   XSetWindowAttributes swa;

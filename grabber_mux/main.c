@@ -315,9 +315,11 @@ int main(int argc, char *argv[])
   if (strlen(inputname2)<1) { devName2=0; }
 
     //Initialize Every OpenNI Device
+    fprintf(stderr,"Initializing device 1 @ %ux%u:%u\n",defaultWidth,defaultHeight,defaultFramerate);
     acquisitionOpenDevice(moduleID_1,devID_1,devName1,defaultWidth,defaultHeight,defaultFramerate);
     acquisitionMapDepthToRGB(moduleID_1,devID_1);
 
+    fprintf(stderr,"Initializing device 2 @ %ux%u:%u\n",defaultWidth,defaultHeight,defaultFramerate);
     acquisitionOpenDevice(moduleID_2,devID_2,devName2,defaultWidth,defaultHeight,defaultFramerate);
     acquisitionMapDepthToRGB(moduleID_2,devID_2);
 
