@@ -93,6 +93,11 @@ unsigned int getOpenGLHeight()
     return HEIGHT;
 }
 
+unsigned int getOpenGLTimestamp()
+{
+    return getLoadedScene()->timestampToUse;
+}
+
 int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
    return downloadOpenGLColor(color,x,y,width,height);

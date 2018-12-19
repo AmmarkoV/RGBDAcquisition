@@ -100,6 +100,7 @@ int seekOpenGLFrame(int devID,unsigned int seekFrame) {  return seekOGLRendererS
 int snapOpenGLFrames(int devID) { return snapOGLRendererSandbox(openGL_Framerate); }
 
 //Color Frame getters
+unsigned long getLastOpenGLColorTimestamp(int devID) { return getOpenGLTimestamp(); }
 int getOpenGLColorWidth(int devID) { return openGL_WIDTH; }
 int getOpenGLColorHeight(int devID) { return openGL_HEIGHT; }
 int getOpenGLColorDataSize(int devID) { return openGL_HEIGHT*openGL_WIDTH * 3; }
@@ -189,6 +190,7 @@ int setOpenGLDepthCalibration(int devID,struct calibration * calib)
 
 
    //Depth Frame getters
+unsigned long getLastOpenGLDepthTimestamp(int devID) { return getOpenGLTimestamp(); }
 int getOpenGLDepthWidth(int devID)    {  return openGL_WIDTH; }
 int getOpenGLDepthHeight(int devID)   { return openGL_HEIGHT; }
 int getOpenGLDepthDataSize(int devID) { return openGL_WIDTH*openGL_HEIGHT; }

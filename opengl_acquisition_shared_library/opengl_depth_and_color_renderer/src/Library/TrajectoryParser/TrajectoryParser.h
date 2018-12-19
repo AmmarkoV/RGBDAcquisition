@@ -384,6 +384,7 @@ struct VirtualStream
     unsigned int timestamp;
     //Ticks is internal renderer clock..
     unsigned int ticks;
+    unsigned int timestampToUse;
 
     char filename[MAX_PATH+1];
 };

@@ -319,7 +319,6 @@ int tickScene(unsigned int framerate)
    float scaleX = 1.0 , scaleY = 1.0 , scaleZ = 1.0;
 
   //Object 0 is camera  lets calculate its position
-
   unsigned int timestampToUse = 0;
 
 
@@ -378,10 +377,10 @@ int tickScene(unsigned int framerate)
     }
 
 
+   scene->timestampToUse = timestampToUse;
 
 
-
-   calculateVirtualStreamPos(scene,0,timestampToUse,pos,0,&scaleX,&scaleY,&scaleZ);
+   calculateVirtualStreamPos(scene,0,scene->timestampToUse,pos,0,&scaleX,&scaleY,&scaleZ);
    scene->cameraPose.posX = scene->cameraUserDelta.posX + pos[0];
    scene->cameraPose.posY = scene->cameraUserDelta.posY + pos[1];
    scene->cameraPose.posZ = scene->cameraUserDelta.posZ + pos[2];
@@ -496,8 +495,8 @@ int drawAllConnectors(struct VirtualStream * scene,unsigned int timestampToUse, 
   for (i=0; i<scene->numberOfConnectors; i++)
   {
     if (
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,0,&scaleX,&scaleY,&scaleZ) ) &&
-        ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,0,&scaleX,&scaleY,&scaleZ) )
+         ( calculateVirtualStreamPos(scene,scene->connector[i].objID_A,timestampToUse,pos1,0,&scaleX,&scaleY,&scaleZ) ) &&
+         ( calculateVirtualStreamPos(scene,scene->connector[i].objID_B,timestampToUse,pos2,0,&scaleX,&scaleY,&scaleZ) )
         )
        {
         /*
@@ -529,8 +528,8 @@ int drawAllSceneObjectsAtPositionsFromTrajectoryParser(struct VirtualStream * sc
 
 
 
- unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
-
+ //unsigned int timestampToUse = scene->ticks*((unsigned int) 100/scene->rate);
+ unsigned int timestampToUse = scene->timestampToUse;
 
 
   unsigned int i;

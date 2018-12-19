@@ -50,6 +50,7 @@ int setOpenGLIntrinsicCalibration(double * camera);
 int setOpenGLExtrinsicCalibration(double * rodriguez,double * translation , double scaleToDepthUnit);
 
 
+unsigned int getOpenGLTimestamp();
 
 /**
 * @brief Get 2D Width Of OpenGL Rendering Surface

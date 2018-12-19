@@ -1071,11 +1071,8 @@ int calculateVirtualStreamPos(
    } else
    if  ( (stream->ignoreTime) || (stream->object[ObjID].MAX_numberOfFrames == 1 ) || ((stream->alwaysShowLastFrame)) )
    {
-
     //We might want to ignore time and just return frame after frame on each call!
     //Also if we only got one frame for the object there is no point in trying to interpolate time etc.. so just handle things here..
-
-
     if ( stream->object[ObjID].lastFrame +1 >= stream->object[ObjID].MAX_numberOfFrames ) { stream->object[ObjID].lastFrame  = 0; }
     FrameIDToReturn = stream->object[ObjID].lastFrame;
     ++stream->object[ObjID].lastFrame;

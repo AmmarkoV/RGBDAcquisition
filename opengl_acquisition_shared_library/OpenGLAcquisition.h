@@ -40,6 +40,7 @@ int seekOpenGLFrame(int devID,unsigned int seekFrame);
 int snapOpenGLFrames(int devID) ;
 
 //Color Frame getters
+unsigned long getLastOpenGLColorTimestamp(int devID);
 int getOpenGLColorWidth(int devID) ;
 int getOpenGLColorHeight(int devID) ;
 int getOpenGLColorDataSize(int devID);
@@ -58,7 +59,8 @@ int getOpenGLDepthCalibration(int devID,struct calibration * calib);
 int setOpenGLColorCalibration(int devID,struct calibration * calib);
 int setOpenGLDepthCalibration(int devID,struct calibration * calib);
 
-   //Depth Frame getters
+//Depth Frame getters
+unsigned long getLastOpenGLDepthTimestamp(int devID);
 int getOpenGLDepthWidth(int devID) ;
 int getOpenGLDepthHeight(int devID) ;
 int getOpenGLDepthDataSize(int devID) ;
