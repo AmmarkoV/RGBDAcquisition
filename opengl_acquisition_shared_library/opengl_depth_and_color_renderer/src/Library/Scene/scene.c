@@ -376,7 +376,6 @@ int tickScene(unsigned int framerate)
         ++scene->ticks;
     }
 
-
    scene->timestampToUse = timestampToUse;
 
 
@@ -491,6 +490,7 @@ int drawAllConnectors(struct VirtualStream * scene,unsigned int timestampToUse, 
   float * pos1 = (float*) &posStackA;
   float * pos2 = (float*) &posStackB;
 
+
   unsigned int i=0;
   for (i=0; i<scene->numberOfConnectors; i++)
   {
@@ -505,13 +505,15 @@ int drawAllConnectors(struct VirtualStream * scene,unsigned int timestampToUse, 
                        scene->connector[i].objID_B , pos2[0],pos2[1],pos2[2]);*/
         float scale = (float) scene->connector[i].scale;
 
-        drawConnector(pos1,
+        drawConnector(
+                      pos1,
                       pos2,
                       &scale ,
                       &scene->connector[i].R ,
                       &scene->connector[i].G ,
                       &scene->connector[i].B ,
-                      &scene->connector[i].Transparency );
+                      &scene->connector[i].Transparency
+                     );
        } else
        {
          fprintf(stderr,YELLOW "Could not determine position of objects for connector %u\n" NORMAL,i);

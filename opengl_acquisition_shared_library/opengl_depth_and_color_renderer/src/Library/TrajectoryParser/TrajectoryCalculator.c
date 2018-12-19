@@ -1019,6 +1019,9 @@ int calculateVirtualStreamPos(
                                float * scaleZ
                              )
 {
+   //-----------------------------------------------------------------------------------------------------------------------------------------------
+   //First job, check if everything is ok..!
+   //-----------------------------------------------------------------------------------------------------------------------------------------------
    if (stream==0) { fprintf(stderr,"calculateVirtualStreamPos called with null stream\n"); return 0; }
    if (stream->object==0) { fprintf(stderr,"calculateVirtualStreamPos called with null object array\n"); return 0; }
    if (stream->numberOfObjects<=ObjID) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u is out of bounds (%u)\n",ObjID,stream->numberOfObjects); return 0; }
@@ -1031,7 +1034,7 @@ int calculateVirtualStreamPos(
    if ( (ObjID==0) && (stream->object[ObjID].numberOfFrames == 0 )  ) { /*Special case with non declared cameras , it is ok , dont spam for every frame..! */ return 0; }
     else
    if (stream->object[ObjID].numberOfFrames == 0 ) { fprintf(stderr,"calculateVirtualStreamPos ObjID %u has 0 frames\n",ObjID); return 0; }
-
+   //-----------------------------------------------------------------------------------------------------------------------------------------------
 
    if (
         (stream->autoRefresh != 0 ) ||
@@ -1076,6 +1079,11 @@ int calculateVirtualStreamPos(
     if ( stream->object[ObjID].lastFrame +1 >= stream->object[ObjID].MAX_numberOfFrames ) { stream->object[ObjID].lastFrame  = 0; }
     FrameIDToReturn = stream->object[ObjID].lastFrame;
     ++stream->object[ObjID].lastFrame;
+
+
+    //OK new rules.. ------------------------------------------------------
+    // If we ignore time we suppose that the time given is the frame number so we use this ..!
+    FrameIDToReturn = timeAbsMilliseconds;
 
 
     if (stream->alwaysShowLastFrame)
