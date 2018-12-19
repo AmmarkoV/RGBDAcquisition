@@ -114,9 +114,9 @@ int mux2RGBAndDepthFramesColorNonTrans( unsigned char * rgbBase, unsigned char *
            if (transG>transThreshold) { minTransG=transG-transThreshold; } else { minTransG=0; }
            if (transB>transThreshold) { minTransB=transB-transThreshold; } else { minTransG=0; }
 
-           if (255-transR<transThreshold) { maxTransR=transR+transThreshold; } else { maxTransR=255; }
-           if (255-transG<transThreshold) { maxTransG=transG+transThreshold; } else { maxTransG=255; }
-           if (255-transB<transThreshold) { maxTransB=transB+transThreshold; } else { maxTransB=255; }
+           if (255-transR>transThreshold) { maxTransR=transR+transThreshold; } else { maxTransR=255; }
+           if (255-transG>transThreshold) { maxTransG=transG+transThreshold; } else { maxTransG=255; }
+           if (255-transB>transThreshold) { maxTransB=transB+transThreshold; } else { maxTransB=255; }
         }
 
    #warning "MUXer needs work on performance.."
