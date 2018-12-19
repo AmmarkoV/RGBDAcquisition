@@ -1002,7 +1002,7 @@ int  EditorFrame::refreshAllOverlays()
          mux2RGBAndDepthFrames(
                                 rgbFrame    , overlayRGB , rgbOut ,
                                 depthFrame  , overlayDepth , depthOut ,
-                                trR,trG,trB,
+                                trR,trG,trB,0,
                                 shiftX,shiftY,
                                 width , height ,
                                 (unsigned int) OverlaySlider->GetValue() ,

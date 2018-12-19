@@ -74,7 +74,7 @@ int saveMuxImageToFile(char * filename,unsigned char * pixels , unsigned int wid
 
 int mux2RGBAndDepthFramesColorNonTrans( unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                                    unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
-                                   unsigned char transR, unsigned char transG, unsigned char transB ,
+                                   unsigned char transR, unsigned char transG, unsigned char transB , unsigned char transThreshold,
                                    signed int shiftX,signed int shiftY,
                                    unsigned int width , unsigned int height , unsigned int rgbTransparency , unsigned int mux_type)
 {
@@ -106,6 +106,19 @@ int mux2RGBAndDepthFramesColorNonTrans( unsigned char * rgbBase, unsigned char *
    unsigned char *gOverlay;
    unsigned char *bOverlay;
 
+   unsigned char minTransR=transR,minTransG=transG,minTransB=transB;
+   unsigned char maxTransR=transR,maxTransG=transG,maxTransB=transB;
+   if (transThreshold!=0)
+        {
+           if (transR>transThreshold) { minTransR=transR-transThreshold; } else { minTransR=0; }
+           if (transG>transThreshold) { minTransG=transG-transThreshold; } else { minTransG=0; }
+           if (transB>transThreshold) { minTransB=transB-transThreshold; } else { minTransG=0; }
+
+           if (255-transR<transThreshold) { maxTransR=transR+transThreshold; } else { maxTransR=255; }
+           if (255-transG<transThreshold) { maxTransG=transG+transThreshold; } else { maxTransG=255; }
+           if (255-transB<transThreshold) { maxTransB=transB+transThreshold; } else { maxTransB=255; }
+        }
+
    #warning "MUXer needs work on performance.."
    while (rgb_pOut<rgb_pOut_limit)
     {
@@ -113,8 +126,27 @@ int mux2RGBAndDepthFramesColorNonTrans( unsigned char * rgbBase, unsigned char *
         gOverlay = rgb_pOverlay++;
         bOverlay = rgb_pOverlay++;
 
-        //If overlay has transparent color it means we only keep our base rgb/depth values
+        int isTransparent=0;
+        if (transThreshold==0)
+        {
         if ( (transR==*rOverlay) && (transG==*gOverlay) && (transB==*bOverlay)  )
+             {
+               isTransparent=1;
+             }
+        } else
+        {
+          if (
+               ( (minTransR<=*rOverlay) && (*rOverlay<=maxTransR) ) &&
+               ( (minTransG<=*gOverlay) && (*gOverlay<=maxTransG) ) &&
+               ( (minTransB<=*bOverlay) && (*bOverlay<=maxTransB) )
+             )
+             {
+               isTransparent=1;
+             }
+        }
+
+        //If overlay has transparent color it means we only keep our base rgb/depth values
+        if (isTransparent)
         {
            //Just Copy RGB Value
            *rgb_pOut = *rgb_pBase;  ++rgb_pOut; ++rgb_pBase;
@@ -164,7 +196,7 @@ int mux2RGBAndDepthFramesColorNonTrans( unsigned char * rgbBase, unsigned char *
 
 int mux2RGBAndDepthFramesBasedOnDepth( unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                                        unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
-                                       unsigned char transR, unsigned char transG, unsigned char transB ,
+                                       unsigned char transR, unsigned char transG, unsigned char transB ,unsigned char transThreshold,
                                        signed int shiftX,signed int shiftY,
                                        unsigned int width , unsigned int height , unsigned int rgbTransparency , unsigned int mux_type)
 {
@@ -232,7 +264,7 @@ int mux2RGBAndDepthFramesBasedOnDepth( unsigned char * rgbBase, unsigned char * 
 int mux2RGBAndDepthFrames(
                            unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                            unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
-                           unsigned char transR, unsigned char transG, unsigned char transB ,
+                           unsigned char transR, unsigned char transG, unsigned char transB ,unsigned char transThreshold,
                            signed int shiftX,signed int shiftY,
                            unsigned int width , unsigned int height , unsigned int rgbTransparency ,
                            unsigned int mux_type
@@ -243,7 +275,7 @@ int mux2RGBAndDepthFrames(
      case COLOR_MUXING :
               return mux2RGBAndDepthFramesColorNonTrans(rgbBase,rgbOverlay,rgbOut,
                                                    depthBase,depthOverlay,depthOut ,
-                                                   transR,transG,transB,
+                                                   transR,transG,transB,transThreshold,
                                                    shiftX,shiftY,
                                                    width,height,rgbTransparency,mux_type);
               break;
@@ -251,7 +283,7 @@ int mux2RGBAndDepthFrames(
      case DEPTH_MUXING :
                return mux2RGBAndDepthFramesBasedOnDepth(rgbBase,rgbOverlay,rgbOut,
                                                         depthBase,depthOverlay,depthOut ,
-                                                        transR,transG,transB,
+                                                        transR,transG,transB,transThreshold,
                                                         shiftX,shiftY,
                                                         width,height,rgbTransparency,mux_type);
                break;

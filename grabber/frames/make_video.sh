@@ -21,8 +21,8 @@ echo "Dataset is $DATASET and extension is $EXTENSION"
  
 THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"` 
 
-cd $DATASET
-ffmpeg -i colorFrame_0_%05d.$EXTENSION -y -r 20 -threads 8 -b 30000k -s 640x480  ../outHD-$DATASET-$THEDATETAG.mp4 
+cd $DATASET 
+ffmpeg -i colorFrame_0_%05d.$EXTENSION -y -r 20 -threads 8 -b 30000k  ../outHD-$DATASET-$THEDATETAG.mp4  #-s 640x480 
 cd ..
 
 cd $STARTDIR 

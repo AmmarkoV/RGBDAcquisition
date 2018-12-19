@@ -65,7 +65,7 @@ typedef unsigned int AcquisitionMultiplexerIdentifier;
 int mux2RGBAndDepthFrames(
                            unsigned char * rgbBase, unsigned char * rgbOverlay , unsigned char * rgbOut ,
                            unsigned short * depthBase, unsigned short * depthOverlay , unsigned short * depthOut ,
-                           unsigned char transR, unsigned char transG, unsigned char transB ,
+                           unsigned char transR, unsigned char transG, unsigned char transB ,unsigned char transThreshold,
                            signed int shiftX,signed int shiftY,
                            unsigned int width , unsigned int height , unsigned int rgbTransparency ,
                            unsigned int mux_type
