@@ -103,9 +103,9 @@ int bvh_projectTo2D(
       } //Joint Loop
 
 
- /*
  if (occlusions)
      {
+       #define OCCLUSION_THRESHOLD 5 // pixels
        //bvhTransform->joint[jID].isOccluded=0;
        unsigned int jID2=0;
        for (jID=0; jID<mc->jointHierarchySize; jID++)
@@ -118,13 +118,25 @@ int bvh_projectTo2D(
            {
             if (bvhTransform->joint[jID2].pos2DCalculated)
              {
-             //
+               //We check if these two joints are very close together
+               float diffA=bvhTransform->joint[jID].pos2D[0]-bvhTransform->joint[jID2].pos2D[0];
+               float diffB=bvhTransform->joint[jID].pos2D[1]-bvhTransform->joint[jID2].pos2D[1];
+               float distance=sqrt((diffA*diffA)+(diffB*diffB));
+               if (distance<OCCLUSION_THRESHOLD)
+                {
+                  //If they are close together and joint jID2 is in front of jID
+                  if (bvhTransform->joint[jID].pos3D[2]<bvhTransform->joint[jID2].pos3D[2])
+                  {
+                    //then jID is occluded..!
+                    bvhTransform->joint[jID].isOccluded=1;
+                  }
+                }
              }
            }
           }
         }
        }
      }
-*/
+
  return (pointsDumped==mc->jointHierarchySize);
 }

@@ -43,12 +43,22 @@ int dumpBVHToCSVHeader(
        {
          if (!mc->jointHierarchy[jID].isEndSite)
          {
-          fprintf(fp,"2DX_%s,2DY_%s,",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
+          fprintf(
+                  fp,"2DX_%s,2DY_%s,visible_%s,",
+                  mc->jointHierarchy[jID].jointName,
+                  mc->jointHierarchy[jID].jointName,
+                  mc->jointHierarchy[jID].jointName
+                 );
          }
          else
          {
           unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
-          fprintf(fp,"2DX_EndSite_%s,2DY_EndSite_%s,",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
+          fprintf(
+                  fp,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s,",
+                  mc->jointHierarchy[parentID].jointName,
+                  mc->jointHierarchy[parentID].jointName,
+                  mc->jointHierarchy[parentID].jointName
+                 );
          }
        }
      //--------------------------------------------------------------------------------------------------------------------------
@@ -209,18 +219,20 @@ int dumpBVHToCSVBody(
          if (!mc->jointHierarchy[jID].isEndSite)
          {
           fprintf(
-                  fp,"%0.4f,%0.4f,",
+                  fp,"%0.4f,%0.4f,%u,",
                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
-                  (float) bvhTransform->joint[jID].pos2D[1]/renderer->height
+                  (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
+                  (bvhTransform->joint[jID].isOccluded==0)
                  );
          }
          else
          {
           unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
           fprintf(
-                  fp,"%0.4f,%0.4f,",
+                  fp,"%0.4f,%0.4f,%u,",
                   (float) bvhTransform->joint[parentID].pos2D[0]/renderer->width,
-                  (float) bvhTransform->joint[parentID].pos2D[1]/renderer->height
+                  (float) bvhTransform->joint[parentID].pos2D[1]/renderer->height,
+                  (bvhTransform->joint[jID].isOccluded==0)
                  );
          }
        }
