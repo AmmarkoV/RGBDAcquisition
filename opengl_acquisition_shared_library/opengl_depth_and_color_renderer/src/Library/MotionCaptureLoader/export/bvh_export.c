@@ -81,7 +81,7 @@ int dumpBVHToSVGCSV(
   renderer.cx = (float) width/2;
   renderer.cy = (float) height/2;
   renderer.near = 1.0;
-  renderer.far = 1000.0;
+  renderer.far = 10000.0;
 
   //-----------------------------------
   renderer.cameraOffsetPosition[0]=0.0;
