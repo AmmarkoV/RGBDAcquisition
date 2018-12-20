@@ -58,6 +58,8 @@ int dumpBVHToSVGCSV(
                     struct BVH_MotionCapture * mc,
                     unsigned int width,
                     unsigned int height,
+                    float fX,
+                    float fY,
                     unsigned int occlusions,
                     unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                     unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
@@ -73,8 +75,8 @@ int dumpBVHToSVGCSV(
   struct simpleRenderer renderer={0};
   renderer.width=width;
   renderer.height=height;
-  renderer.fx = 575.816;
-  renderer.fy = 575.816;
+  renderer.fx = fX;
+  renderer.fy = fY;
   renderer.skew = 0.0;
   renderer.cx = (float) width/2;
   renderer.cy = (float) height/2;

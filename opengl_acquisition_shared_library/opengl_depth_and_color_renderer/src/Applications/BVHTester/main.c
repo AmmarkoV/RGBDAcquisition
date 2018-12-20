@@ -265,8 +265,8 @@ int main(int argc, char **argv)
                      convertToSVG,
                      convertToCSV,
                      &bvhMotion,
-                     640,
-                     480,
+                     //640,480 , 575.57 , 575.57, //Kinect
+                     1920, 1080, 118.2, 69.5, // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
                      occlusions,
                      1,//Filter out all poses where even one joint is behind camera
                      1,//Filter out all poses where even one joint is outside of 2D frame
