@@ -153,6 +153,9 @@ int dumpBVHToSVGCSV(
 
   }
 
+  fprintf(stderr,"Joints : %u invisible / %u visible ",invisibleJoints,visibleJoints);
+  if (occlusions) { fprintf(stderr,"(occlusions enabled)\n"); } else
+                  { fprintf(stderr,"(occlusions disabled)\n");      }
   fprintf(stderr,"Filtered out CSV poses : %u\n",filteredOutCSVPoses);
   fprintf(stderr,"Filtered behind camera : %u\n",filteredOutCSVBehindPoses);
   fprintf(stderr,"Filtered out of camera frame : %u\n",filteredOutCSVOutPoses);

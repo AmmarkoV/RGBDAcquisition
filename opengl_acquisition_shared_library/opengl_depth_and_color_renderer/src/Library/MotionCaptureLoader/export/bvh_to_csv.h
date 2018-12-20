@@ -6,6 +6,10 @@
 #include "../bvh_transform.h"
 #include "../../../../../../tools/AmMatrix/simpleRenderer.h"
 
+extern unsigned int invisibleJoints;
+extern unsigned int   visibleJoints;
+extern unsigned int filteredOutCSVBehindPoses;
+extern unsigned int filteredOutCSVOutPoses;
 extern unsigned int filteredOutCSVPoses;
 
 int dumpBVHToCSVHeader(

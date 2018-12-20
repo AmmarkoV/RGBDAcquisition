@@ -34,6 +34,7 @@ struct BVH_Transform
 {
   struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
   double centerPosition[3];
+  unsigned int jointsOccludedIn2DProjection;
 };
 
 

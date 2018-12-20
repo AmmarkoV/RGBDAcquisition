@@ -9,6 +9,8 @@
 #define DUMP_SEPERATED_POS_ROT 0
 #define DUMP_3D_POSITIONS 0
 
+unsigned int invisibleJoints=0;
+unsigned int   visibleJoints=0;
 unsigned int filteredOutCSVBehindPoses=0;
 unsigned int filteredOutCSVOutPoses=0;
 unsigned int filteredOutCSVPoses=0;
@@ -216,6 +218,8 @@ int dumpBVHToCSVBody(
      //2D Positions -------------------------------------------------------------------------------------------------------------
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
+         if (bvhTransform->joint[jID].isOccluded) { ++invisibleJoints; } else { ++visibleJoints; }
+
          if (!mc->jointHierarchy[jID].isEndSite)
          {
           fprintf(

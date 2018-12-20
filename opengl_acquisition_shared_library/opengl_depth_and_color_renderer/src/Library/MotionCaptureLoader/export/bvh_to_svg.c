@@ -77,11 +77,18 @@ int dumpBVHToSVGFrame(
 
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
-        fprintf(
-                fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"3.00\" stroke=\"rgb(135,135,0)\" stroke-width=\"3\" fill=\"rgb(255,255,0)\" />\n",
-                bvhTransform->joint[jID].pos2D[0],
-                bvhTransform->joint[jID].pos2D[1]
-               );
+
+        if (bvhTransform->joint[jID].isOccluded)
+        {
+
+        } else
+        {
+          fprintf(
+                  fp,"<circle cx=\"%0.2f\" cy=\"%0.2f\" r=\"3.00\" stroke=\"rgb(135,135,0)\" stroke-width=\"3\" fill=\"rgb(255,255,0)\" />\n",
+                  bvhTransform->joint[jID].pos2D[0],
+                  bvhTransform->joint[jID].pos2D[1]
+                 );
+        }
 /*
         fprintf(
                 fp,"<text x=\"%0.2f\" y=\"%0.2f\">%0.2f,%0.2f,%0.2f</text>\n",

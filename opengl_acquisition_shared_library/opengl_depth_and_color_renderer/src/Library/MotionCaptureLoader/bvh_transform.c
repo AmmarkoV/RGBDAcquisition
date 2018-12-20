@@ -187,6 +187,8 @@ int bvh_loadTransformForFrame(
   unsigned int jID=0;
   //First of all we need to clean the BVH_Transform structure
 
+  bvhTransform->jointsOccludedIn2DProjection=0;
+
   if (fID==0)
   {
    for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 #include "bvh_loader.h"
 #include "bvh_project.h"
@@ -8,6 +9,8 @@ void bvh_cleanTransform(
                        struct BVH_Transform     * bvhTransform
                       )
 {
+ bvhTransform->jointsOccludedIn2DProjection=0;
+
  unsigned int jID=0;
  for (jID=0; jID<mc->jointHierarchySize; jID++)
          {
@@ -31,6 +34,7 @@ int bvh_projectTo2D(
                      unsigned int               occlusions
                    )
 {
+      bvhTransform->jointsOccludedIn2DProjection=0;
       unsigned int pointsDumped=0;
       float position2DX;
       float position2DY;
@@ -105,7 +109,16 @@ int bvh_projectTo2D(
 
  if (occlusions)
      {
-       #define OCCLUSION_THRESHOLD 5 // pixels
+       for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         bvhTransform->joint[jID].isOccluded=0;
+       }
+
+
+
+
+      // fprintf(stderr,"Occlusion checking..\n");
+       #define OCCLUSION_THRESHOLD 2 // pixels
        //bvhTransform->joint[jID].isOccluded=0;
        unsigned int jID2=0;
        for (jID=0; jID<mc->jointHierarchySize; jID++)
@@ -125,10 +138,12 @@ int bvh_projectTo2D(
                if (distance<OCCLUSION_THRESHOLD)
                 {
                   //If they are close together and joint jID2 is in front of jID
-                  if (bvhTransform->joint[jID].pos3D[2]<bvhTransform->joint[jID2].pos3D[2])
+                  if (bvhTransform->joint[jID].pos3D[2]>=bvhTransform->joint[jID2].pos3D[2])
                   {
+                    //fprintf(stderr," %0.2f",distance);
                     //then jID is occluded..!
                     bvhTransform->joint[jID].isOccluded=1;
+                    ++bvhTransform->jointsOccludedIn2DProjection;
                   }
                 }
              }
