@@ -220,25 +220,43 @@ int dumpBVHToCSVBody(
        {
          if (bvhTransform->joint[jID].isOccluded) { ++invisibleJoints; } else { ++visibleJoints; }
 
+         ///=================================================
          if (!mc->jointHierarchy[jID].isEndSite)
          {
+             /*
+          if (bvhTransform->joint[jID].isOccluded)
+          {
+           fprintf(fp,"0,0,0,");
+          } else*/
+          {
           fprintf(
                   fp,"%0.4f,%0.4f,%u,",
                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                   (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                   (bvhTransform->joint[jID].isOccluded==0)
                  );
+          }
          }
+         ///=================================================
          else
          {
           unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+          /*
+          if (bvhTransform->joint[jID].isOccluded)
+          {
+           fprintf(fp,"0,0,0,");
+          } else*/
+          {
+              //jID parentID
           fprintf(
                   fp,"%0.4f,%0.4f,%u,",
-                  (float) bvhTransform->joint[parentID].pos2D[0]/renderer->width,
-                  (float) bvhTransform->joint[parentID].pos2D[1]/renderer->height,
+                  (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
+                  (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                   (bvhTransform->joint[jID].isOccluded==0)
                  );
+          }
          }
+         ///=================================================
        }
      //-----------------------------------------------------------------------------------------------------------------------------
 
