@@ -153,6 +153,11 @@ int dumpBVHToSVGCSV(
 
   }
 
+  if (visibleJoints!=0)
+  {
+    fprintf(stderr,"Joint Visibility = %0.2f %%\n",(float) 100*invisibleJoints/visibleJoints);
+  }
+
   fprintf(stderr,"Joints : %u invisible / %u visible ",invisibleJoints,visibleJoints);
   if (occlusions) { fprintf(stderr,"(occlusions enabled)\n"); } else
                   { fprintf(stderr,"(occlusions disabled)\n");      }
