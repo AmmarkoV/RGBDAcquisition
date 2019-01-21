@@ -891,6 +891,8 @@ int bvh_RandomizePositionRotation(
 }
 
 
+
+
 int bvh_SetPositionRotation(
                              struct BVH_MotionCapture * mc,
                              float * position,
@@ -984,6 +986,39 @@ int bvh_GrowMocapFileByCopyingExistingMotions(
 }
 
 
+
+
+int bvh_GrowMocapFileByMirroringJointAndItsChildren(
+                                                     struct BVH_MotionCapture * mc,
+                                                     const char * jointNameA,
+                                                     const char * jointNameB
+                                                   )
+{
+  fprintf(stderr,"bvh_GrowMocapFileByMirroringJointAndItsChildren");
+  fprintf(stderr,"Initially had %u frames\n",mc->numberOfFrames);
+  if (
+      bvh_GrowMocapFileByCopyingExistingMotions(
+                                                mc,
+                                                2
+                                               )
+     )
+ {
+  fprintf(stderr,"We now have %u frames\n",mc->numberOfFrames);
+
+  BVHJointID jIDA,jIDB;
+  if (
+       (bvh_getJointIDFromJointName(mc,jointNameA,&jIDA)) &&
+       (bvh_getJointIDFromJointName(mc,jointNameB,&jIDB))
+     )
+  {
+   fprintf(stderr,"We have resolved %s to %u and %s to %u\n",jointNameA,jIDA,jointNameB,jIDB);
+
+   return 1;
+  }
+ }
+
+ return 0;
+}
 
 
 

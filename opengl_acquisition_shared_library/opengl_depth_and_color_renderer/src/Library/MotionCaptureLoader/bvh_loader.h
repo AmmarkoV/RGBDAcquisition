@@ -203,6 +203,14 @@ int bvh_GrowMocapFileByCopyingExistingMotions(
                                              );
 
 
+
+
+int bvh_GrowMocapFileByMirroringJointAndItsChildren(
+                                                     struct BVH_MotionCapture * mc,
+                                                     const char * jointNameA,
+                                                     const char * jointNameB
+                                                   );
+
 /**
 * @brief Ask if joint has a parent.
 * @ingroup BVH
