@@ -474,7 +474,7 @@ int doDrawing()
       #endif // DO_MULTI
 
         //We have accumulated all data on the framebuffer and will now draw it back..
-        drawFramebuffer(
+        drawFramebufferToScreen(
                         programFrameBufferID,
                         quad_vertexbuffer,
                         //renderedDepth,
