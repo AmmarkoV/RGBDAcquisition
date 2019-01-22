@@ -77,6 +77,7 @@ add_library(OGLRendererSandbox SHARED
             MotionCaptureLoader/export/bvh_to_csv.c
             MotionCaptureLoader/export/bvh_to_bvh.c
             MotionCaptureLoader/export/bvh_export.c 
+            MotionCaptureLoader/edit/bvh_cut_paste.c 
             #Textures and how to load them  
             TextureLoader/texture_loader.c
             TextureLoader/texture_loader.h

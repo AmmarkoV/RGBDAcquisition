@@ -44,6 +44,7 @@ add_executable(
               ../../Library/MotionCaptureLoader/export/bvh_to_csv.c
               ../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c
               ../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c
+              ../../Library/MotionCaptureLoader/edit/bvh_cut_paste.c 
               ../../Library/TrajectoryParser/InputParser_C.c
               ../../../../../tools/AmMatrix/matrix4x4Tools.c
               ../../../../../tools/AmMatrix/matrixOpenGL.c
