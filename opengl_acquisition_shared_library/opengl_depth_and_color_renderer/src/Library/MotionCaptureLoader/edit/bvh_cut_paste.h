@@ -24,4 +24,5 @@ int copyBufferToJointAndChildren(
                                  struct BVH_MotionCapture * mc,
                                  BVHJointID jID
                                 );
+
 #endif
