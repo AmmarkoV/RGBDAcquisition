@@ -998,9 +998,9 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
                                                    )
 {
   if (
-       (strlen(jointNameAInitial)>MAX_BVH_JOINT_NAME)
+       (strlen(jointNameAInitial)>=MAX_BVH_JOINT_NAME)
          ||
-       (strlen(jointNameBInitial)>MAX_BVH_JOINT_NAME)
+       (strlen(jointNameBInitial)>=MAX_BVH_JOINT_NAME)
       )
        {
           fprintf(stderr,"bvh_GrowMocapFileByMirroringJointAndItsChildren failed because of very long joint names..");
@@ -1018,6 +1018,8 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
 
   BVHJointID jIDA,jIDB;
   unsigned int rangeOfJIDA,rangeOfJIDB;
+  unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
+
   if (
        (bvh_getJointIDFromJointName(mc,jointNameA,&jIDA)) &&
        (bvh_getJointIDFromJointName(mc,jointNameB,&jIDB))
@@ -1031,7 +1033,9 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
                                           jIDA,
                                           jIDB,
                                           &rangeOfJIDA,
-                                          &rangeOfJIDB
+                                          &rangeOfJIDB,
+                                          &numberOfChannelsContainedJIDA,
+                                          &numberOfChannelsContainedJIDB
                                          )
       )
     {
@@ -1041,44 +1045,36 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
      if (
          bvh_GrowMocapFileByCopyingExistingMotions(
                                                    mc,
-                                                   2
+                                                   1
                                                   )
         )
       {
        fprintf(stderr,"We now have %u frames\n",mc->numberOfFrames);
-       float * temporaryMotionBuffer = allocateBufferThatCanContainJointAndChildren( mc, jIDA /*or jIDB they have same graph outline*/ );
-       if (temporaryMotionBuffer!=0)
+       float * temporaryMotionBufferA = allocateBufferThatCanContainJointAndChildren( mc, jIDA );
+       float * temporaryMotionBufferB = allocateBufferThatCanContainJointAndChildren( mc, jIDB );
+       if ( (temporaryMotionBufferA!=0) && (temporaryMotionBufferA!=0) )
        {
-        unsigned int mID=0;
-        for (mID=0; mID<mc->numberOfFrames; mID++)
+        BVHFrameID fID=0;
+        for (fID=0; fID<mc->numberOfFrames; fID++)
          {
             if (
-                 copyJointAndChildrenToBuffer(
-                                              mc,
-                                              temporaryMotionBuffer,
-                                              jIDA,
-                                              rangeOfJIDA,
-                                              mID
-                                             )
-                )
+                (copyJointAndChildrenToBuffer(mc,temporaryMotionBufferA,jIDA,numberOfChannelsContainedJIDA,fID)) &&
+                (copyJointAndChildrenToBuffer(mc,temporaryMotionBufferB,jIDB,numberOfChannelsContainedJIDB,fID))
+               )
                 {
                   if (
-                        copyBufferToJointAndChildren(
-                                                      mc,
-                                                      temporaryMotionBuffer,
-                                                      jIDB,
-                                                      rangeOfJIDB,
-                                                      mID
-                                                    )
+                      (copyBufferToJointAndChildren(mc,temporaryMotionBufferA,jIDA,numberOfChannelsContainedJIDA,fID)) &&
+                      (copyBufferToJointAndChildren(mc,temporaryMotionBufferB,jIDB,numberOfChannelsContainedJIDB,fID))
                      )
                      {
                       //Success for mID
                      } else
-                     { fprintf(stderr,"Error accessing and copying bufferback to joint %s at frame %u\n",jointNameB,mID); }
+                     { fprintf(stderr,"Error accessing and copying buffers back to joints %s/%s at frame %u\n",jointNameA,jointNameB,fID); }
                 } else
-                { fprintf(stderr,"Error accessing and copying joint %s at frame %u to buffer\n",jointNameA,mID); }
+                { fprintf(stderr,"Error accessing and copying joints %s/%s at frame %u to buffers\n",jointNameA,jointNameB,fID); }
          }
-        free(temporaryMotionBuffer);
+        free(temporaryMotionBufferA);
+        free(temporaryMotionBufferB);
         return 1;
        } else
        { fprintf(stderr,"Could not allocate temporary buffer\n");  }

@@ -1,31 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "bvh_cut_paste.h"
 
 
 int scanJointHierarchyUntilThisGroupEnds(
                                          struct BVH_MotionCapture * mc,
                                          BVHJointID jID,
-                                         BVHJointID * jIDLastGroupJoint
+                                         BVHJointID * jIDLastGroupJoint,
+                                         unsigned int * numberOfChannelsContained
                                         )
 {
   fprintf(stderr,"scanJointHierarchyUntilThisGroupEnds(%s): contains ",mc->jointHierarchy[jID].jointName);
 
   *jIDLastGroupJoint=jID;
   unsigned int targetHierarchyLevel=mc->jointHierarchy[jID].hierarchyLevel;
+  *numberOfChannelsContained = mc->jointHierarchy[jID].loadedChannels;
+
+  ++jID;//Start from the next joint..
   while (jID<mc->numberOfFrames)
   {
     if (targetHierarchyLevel>=mc->jointHierarchy[jID].hierarchyLevel)
     {
-       fprintf(stderr,"(%s) ",mc->jointHierarchy[jID].jointName);
+      fprintf(stderr,"\n");
       //We have reached the end..!
       *jIDLastGroupJoint=jID;
       return 1;
     } else
     {
+      *numberOfChannelsContained+=mc->jointHierarchy[jID].loadedChannels;
+      fprintf(stderr,"(%s) ",mc->jointHierarchy[jID].jointName);
       jID++;
     }
   }
+
+ fprintf(stderr,"\n");
  return 0;
 }
 
@@ -36,7 +45,9 @@ int checkIfJointsHaveSameGraphOutline(
                                        BVHJointID jIDA,
                                        BVHJointID jIDB,
                                        unsigned int * rangeOfJIDA,
-                                       unsigned int * rangeOfJIDB
+                                       unsigned int * rangeOfJIDB,
+                                       unsigned int * numberOfChannelsContainedJIDA,
+                                       unsigned int * numberOfChannelsContainedJIDB
                                      )
 {
   //We assume jIDA is before jIDB if now we fix it
@@ -56,14 +67,16 @@ int checkIfJointsHaveSameGraphOutline(
         scanJointHierarchyUntilThisGroupEnds(
                                               mc,
                                               jIDA,
-                                              &jIDALastJoint
+                                              &jIDALastJoint,
+                                              numberOfChannelsContainedJIDA
                                             )
       ) &&
       (
         scanJointHierarchyUntilThisGroupEnds(
                                               mc,
                                               jIDB,
-                                              &jIDBLastJoint
+                                              &jIDBLastJoint,
+                                              numberOfChannelsContainedJIDB
                                             )
       )
      )
@@ -88,16 +101,18 @@ float * allocateBufferThatCanContainJointAndChildren(
                                                       BVHJointID jID
                                                     )
 {
+  unsigned int numberOfChannels=0;
   BVHJointID jIDLastJoint;
   if  (
         scanJointHierarchyUntilThisGroupEnds(
                                               mc,
                                               jID,
-                                              &jIDLastJoint
+                                              &jIDLastJoint,
+                                              &numberOfChannels
                                             )
       )
       {
-        float * buffer = (float *) malloc(sizeof(float) * (jIDLastJoint-jID));
+        float * buffer = (float *) malloc(sizeof(float) * (numberOfChannels));
         return buffer;
       }
   return 0;
@@ -110,10 +125,17 @@ int copyJointAndChildrenToBuffer(
                                  float * buffer,
                                  BVHJointID jID,
                                  unsigned int rangeNumber,
-                                 unsigned int mID
+                                 BVHFrameID  fID
                                 )
 {
-  return 0;
+  unsigned int mID = (fID * mc->numberOfValuesPerFrame) + mc->jointToMotionLookup[jID].jointMotionOffset;
+  memcpy(
+         buffer ,
+         &mc->motionValues[mID],
+         rangeNumber * sizeof(float)
+        );
+
+ return 1;
 }
 
 int copyBufferToJointAndChildren(
@@ -121,8 +143,15 @@ int copyBufferToJointAndChildren(
                                  float * buffer,
                                  BVHJointID jID,
                                  unsigned int rangeNumber,
-                                 unsigned int mID
+                                 BVHFrameID  fID
                                 )
 {
-  return 0;
+  unsigned int mID = (fID * mc->numberOfValuesPerFrame) + mc->jointToMotionLookup[jID].jointMotionOffset;
+  memcpy(
+         &mc->motionValues[mID],
+         buffer ,
+         rangeNumber * sizeof(float)
+        );
+
+ return 1;
 }

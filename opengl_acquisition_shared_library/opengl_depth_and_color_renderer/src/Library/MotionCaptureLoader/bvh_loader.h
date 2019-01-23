@@ -67,7 +67,7 @@ struct BVH_Joint
   char isEndSite;
   char hasEndSite;
   //--------------------
-  char jointName[MAX_BVH_JOINT_NAME];
+  char jointName[MAX_BVH_JOINT_NAME+1];
   //--------------------
   unsigned int parentJoint;
   unsigned int endSiteJoint;

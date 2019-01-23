@@ -9,7 +9,9 @@ int checkIfJointsHaveSameGraphOutline(
                                        BVHJointID jIDA,
                                        BVHJointID jIDB,
                                        unsigned int * rangeOfJIDA,
-                                       unsigned int * rangeOfJIDB
+                                       unsigned int * rangeOfJIDB,
+                                       unsigned int * numberOfChannelsContainedJIDA,
+                                       unsigned int * numberOfChannelsContainedJIDB
                                      );
 
 float * allocateBufferThatCanContainJointAndChildren(
@@ -22,7 +24,7 @@ int copyJointAndChildrenToBuffer(
                                  float * buffer,
                                  BVHJointID jID,
                                  unsigned int rangeNumber,
-                                 unsigned int mID
+                                 BVHFrameID fID
                                 );
 
 int copyBufferToJointAndChildren(
@@ -30,7 +32,7 @@ int copyBufferToJointAndChildren(
                                  float * buffer,
                                  BVHJointID jID,
                                  unsigned int rangeNumber,
-                                 unsigned int mID
+                                 BVHFrameID  fID
                                 );
 
 #endif
