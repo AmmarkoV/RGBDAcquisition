@@ -89,7 +89,7 @@ int checkIfJointsHaveSameGraphOutline(
        if (rangeOfJIDB!=0) { *rangeOfJIDB = rB; }
 
        //If they are the same we can copy paste one to the other
-       return ((rA==rB) && (numberOfChannelsContainedJIDA==numberOfChannelsContainedJIDB));
+       return ((rA==rB) && (*numberOfChannelsContainedJIDA==*numberOfChannelsContainedJIDB));
      }
 
   return 0;
@@ -112,8 +112,7 @@ float * allocateBufferThatCanContainJointAndChildren(
                                             )
       )
       {
-        float * buffer = (float *) malloc(sizeof(float) * (numberOfChannels));
-        return buffer;
+        return (float *) malloc(sizeof(float) * (numberOfChannels));
       }
   return 0;
 }

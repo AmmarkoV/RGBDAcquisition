@@ -1008,8 +1008,8 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
        }
 
   //-------------------------------------------------------------
-  char jointNameA[MAX_BVH_JOINT_NAME+1];
-  char jointNameB[MAX_BVH_JOINT_NAME+1];
+  char jointNameA[MAX_BVH_JOINT_NAME+1]={0};
+  char jointNameB[MAX_BVH_JOINT_NAME+1]={0};
   snprintf(jointNameA,MAX_BVH_JOINT_NAME,"%s",jointNameAInitial);
   snprintf(jointNameB,MAX_BVH_JOINT_NAME,"%s",jointNameBInitial);
   lowercase(jointNameA);
@@ -1041,7 +1041,8 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
     {
 
      fprintf(stderr,"bvh_GrowMocapFileByMirroringJointAndItsChildren");
-     fprintf(stderr,"Initially had %u frames\n",mc->numberOfFrames);
+     unsigned int initialNumberOfFrames = mc->numberOfFrames;
+     fprintf(stderr,"Initially had %u frames\n",initialNumberOfFrames);
      if (
          bvh_GrowMocapFileByCopyingExistingMotions(
                                                    mc,
@@ -1055,7 +1056,7 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
        if ( (temporaryMotionBufferA!=0) && (temporaryMotionBufferA!=0) )
        {
         BVHFrameID fID=0;
-        for (fID=0; fID<mc->numberOfFrames; fID++)
+        for (fID=0; fID<initialNumberOfFrames; fID++)
          {
             if (
                 (copyJointAndChildrenToBuffer(mc,temporaryMotionBufferA,jIDA,numberOfChannelsContainedJIDA,fID)) &&
