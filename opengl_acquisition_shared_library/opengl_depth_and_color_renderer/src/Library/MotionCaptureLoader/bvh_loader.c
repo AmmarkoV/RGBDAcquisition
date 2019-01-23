@@ -20,6 +20,9 @@
 #include "bvh_loader.h"
 #include "../TrajectoryParser/InputParser_C.h"
 
+
+#include "edit/bvh_cut_paste.h"
+
 double bvh_constrainAngleCentered180(double angle)
 {
    angle = fmod(angle,360.0);
@@ -990,22 +993,31 @@ int bvh_GrowMocapFileByCopyingExistingMotions(
 
 int bvh_GrowMocapFileByMirroringJointAndItsChildren(
                                                      struct BVH_MotionCapture * mc,
-                                                     const char * jointNameA,
-                                                     const char * jointNameB
+                                                     const char * jointNameAInitial,
+                                                     const char * jointNameBInitial
                                                    )
 {
-  fprintf(stderr,"bvh_GrowMocapFileByMirroringJointAndItsChildren");
-  fprintf(stderr,"Initially had %u frames\n",mc->numberOfFrames);
   if (
-      bvh_GrowMocapFileByCopyingExistingMotions(
-                                                mc,
-                                                2
-                                               )
-     )
- {
-  fprintf(stderr,"We now have %u frames\n",mc->numberOfFrames);
+       (strlen(jointNameAInitial)>MAX_BVH_JOINT_NAME)
+         ||
+       (strlen(jointNameBInitial)>MAX_BVH_JOINT_NAME)
+      )
+       {
+          fprintf(stderr,"bvh_GrowMocapFileByMirroringJointAndItsChildren failed because of very long joint names..");
+          return 0;
+       }
+
+  //-------------------------------------------------------------
+  char jointNameA[MAX_BVH_JOINT_NAME+1];
+  char jointNameB[MAX_BVH_JOINT_NAME+1];
+  snprintf(jointNameA,MAX_BVH_JOINT_NAME,"%s",jointNameAInitial);
+  snprintf(jointNameB,MAX_BVH_JOINT_NAME,"%s",jointNameBInitial);
+  lowercase(jointNameA);
+  lowercase(jointNameB);
+  //---------------------
 
   BVHJointID jIDA,jIDB;
+  unsigned int rangeOfJIDA,rangeOfJIDB;
   if (
        (bvh_getJointIDFromJointName(mc,jointNameA,&jIDA)) &&
        (bvh_getJointIDFromJointName(mc,jointNameB,&jIDB))
@@ -1013,10 +1025,79 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
   {
    fprintf(stderr,"We have resolved %s to %u and %s to %u\n",jointNameA,jIDA,jointNameB,jIDB);
 
-   return 1;
-  }
- }
+   if (
+        checkIfJointsHaveSameGraphOutline(
+                                          mc,
+                                          jIDA,
+                                          jIDB,
+                                          &rangeOfJIDA,
+                                          &rangeOfJIDB
+                                         )
+      )
+    {
 
+     fprintf(stderr,"bvh_GrowMocapFileByMirroringJointAndItsChildren");
+     fprintf(stderr,"Initially had %u frames\n",mc->numberOfFrames);
+     if (
+         bvh_GrowMocapFileByCopyingExistingMotions(
+                                                   mc,
+                                                   2
+                                                  )
+        )
+      {
+       fprintf(stderr,"We now have %u frames\n",mc->numberOfFrames);
+       float * temporaryMotionBuffer = allocateBufferThatCanContainJointAndChildren( mc, jIDA /*or jIDB they have same graph outline*/ );
+       if (temporaryMotionBuffer!=0)
+       {
+        unsigned int mID=0;
+        for (mID=0; mID<mc->numberOfFrames; mID++)
+         {
+            if (
+                 copyJointAndChildrenToBuffer(
+                                              mc,
+                                              temporaryMotionBuffer,
+                                              jIDA,
+                                              rangeOfJIDA,
+                                              mID
+                                             )
+                )
+                {
+                  if (
+                        copyBufferToJointAndChildren(
+                                                      mc,
+                                                      temporaryMotionBuffer,
+                                                      jIDB,
+                                                      rangeOfJIDB,
+                                                      mID
+                                                    )
+                     )
+                     {
+                      //Success for mID
+                     } else
+                     { fprintf(stderr,"Error accessing and copying bufferback to joint %s at frame %u\n",jointNameB,mID); }
+                } else
+                { fprintf(stderr,"Error accessing and copying joint %s at frame %u to buffer\n",jointNameA,mID); }
+         }
+        free(temporaryMotionBuffer);
+        return 1;
+       } else
+       { fprintf(stderr,"Could not allocate temporary buffer\n");  }
+      } else
+      { fprintf(stderr,"Could not grow our movement buffer to facilitate swapping\n");  }
+    } else
+    { fprintf(stderr,"Joints %s and %s do not have the same hierarchy graph outline and therefore cannot be swapped\n",jointNameA,jointNameB); }
+  } else
+  {
+    fprintf(stderr,"Could not resolve %s and %s , maybe they got internally renamed?\n",jointNameA,jointNameB);
+    fprintf(stderr,"Full list of joints is : \n");
+    unsigned int jID=0;
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+      {
+        fprintf(stderr,"   joint %u = %s\n",jID,mc->jointHierarchy[jID].jointName);
+      }
+  }
+
+ fprintf(stderr,"Errors occured during bvh_GrowMocapFileByMirroringJointAndItsChildren\n");
  return 0;
 }
 

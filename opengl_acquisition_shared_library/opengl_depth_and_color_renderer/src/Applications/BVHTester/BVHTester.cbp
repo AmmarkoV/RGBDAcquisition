@@ -68,6 +68,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_transform.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_cut_paste.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_cut_paste.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_export.c">
 			<Option compilerVar="CC" />
 		</Unit>

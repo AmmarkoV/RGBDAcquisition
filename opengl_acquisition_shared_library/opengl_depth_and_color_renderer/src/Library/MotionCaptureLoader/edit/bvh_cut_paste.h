@@ -7,22 +7,30 @@
 int checkIfJointsHaveSameGraphOutline(
                                        struct BVH_MotionCapture * mc,
                                        BVHJointID jIDA,
-                                       BVHJointID jIDB
+                                       BVHJointID jIDB,
+                                       unsigned int * rangeOfJIDA,
+                                       unsigned int * rangeOfJIDB
                                      );
 
-int allocateBufferThatCanContainJointAndChildren(
+float * allocateBufferThatCanContainJointAndChildren(
                                                   struct BVH_MotionCapture * mc,
                                                   BVHJointID jID
                                                  );
 
 int copyJointAndChildrenToBuffer(
                                  struct BVH_MotionCapture * mc,
-                                 BVHJointID jID
+                                 float * buffer,
+                                 BVHJointID jID,
+                                 unsigned int rangeNumber,
+                                 unsigned int mID
                                 );
 
 int copyBufferToJointAndChildren(
                                  struct BVH_MotionCapture * mc,
-                                 BVHJointID jID
+                                 float * buffer,
+                                 BVHJointID jID,
+                                 unsigned int rangeNumber,
+                                 unsigned int mID
                                 );
 
 #endif
