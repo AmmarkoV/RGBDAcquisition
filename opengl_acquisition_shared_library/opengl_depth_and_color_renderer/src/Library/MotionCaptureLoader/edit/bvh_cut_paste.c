@@ -22,14 +22,14 @@ int scanJointHierarchyUntilThisGroupEnds(
   {
     if (targetHierarchyLevel>=mc->jointHierarchy[jID].hierarchyLevel)
     {
-      fprintf(stderr,"\n");
+      fprintf(stderr,"all of them are %u \n",*numberOfChannelsContained);
       //We have reached the end..!
       *jIDLastGroupJoint=jID;
       return 1;
     } else
     {
       *numberOfChannelsContained+=mc->jointHierarchy[jID].loadedChannels;
-      fprintf(stderr,"(%s) ",mc->jointHierarchy[jID].jointName);
+      fprintf(stderr,"(%s-%u) ",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].loadedChannels);
       jID++;
     }
   }
@@ -89,7 +89,7 @@ int checkIfJointsHaveSameGraphOutline(
        if (rangeOfJIDB!=0) { *rangeOfJIDB = rB; }
 
        //If they are the same we can copy paste one to the other
-       return (rA==rB);
+       return ((rA==rB) && (numberOfChannelsContainedJIDA==numberOfChannelsContainedJIDB));
      }
 
   return 0;
