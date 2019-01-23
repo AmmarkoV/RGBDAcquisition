@@ -1063,8 +1063,8 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
                )
                 {
                   if (
-                      (copyBufferToJointAndChildren(mc,temporaryMotionBufferA,jIDA,numberOfChannelsContainedJIDA,fID)) &&
-                      (copyBufferToJointAndChildren(mc,temporaryMotionBufferB,jIDB,numberOfChannelsContainedJIDB,fID))
+                      (copyBufferToJointAndChildren(mc,temporaryMotionBufferB,jIDA,numberOfChannelsContainedJIDA,fID)) &&
+                      (copyBufferToJointAndChildren(mc,temporaryMotionBufferA,jIDB,numberOfChannelsContainedJIDB,fID))
                      )
                      {
                       //Success for mID
