@@ -44,7 +44,12 @@ int bvh_MirrorJointsThroughIK(
        (!bvh_getJointIDFromJointNameNocase(mc,jointNameB,&jIDB))
      )
   {
-    fprintf(stderr,"bvh_MirrorJointsThroughIK error resolving joints ( %s , %s ) \n",jointNameA,jointNameB);
+    fprintf(stderr,"bvh_MirrorJointsThroughIK error resolving joints (%s,%s) \n",jointNameA,jointNameB);fprintf(stderr,"Full list of joints is : \n");
+    unsigned int jID=0;
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+      {
+        fprintf(stderr,"   joint %u = %s\n",jID,mc->jointHierarchy[jID].jointName);
+      }
     return 0;
   }
 
