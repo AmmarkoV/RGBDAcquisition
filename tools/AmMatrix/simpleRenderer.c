@@ -185,7 +185,36 @@ int deadSimpleRendererRender(
 }
 
 
+int simpleRendererDefaults(
+                            struct simpleRenderer * sr,
+                            unsigned int width,
+                            unsigned int height,
+                            float fX,
+                            float fY
+                            )
+{
+  sr->width=width;
+  sr->height=height;
+  sr->fx = fX;
+  sr->fy = fY;
+  sr->skew = 0.0;
+  sr->cx = (float) width/2;
+  sr->cy = (float) height/2;
+  sr->near = 1.0;
+  sr->far = 10000.0;
 
+  //-----------------------------------
+  sr->cameraOffsetPosition[0]=0.0;
+  sr->cameraOffsetPosition[1]=0.0;
+  sr->cameraOffsetPosition[2]=0.0;
+  sr->cameraOffsetPosition[3]=0.0;
+  //-----------------------------------
+  sr->cameraOffsetRotation[0]=0.0;
+  sr->cameraOffsetRotation[1]=0.0;
+  sr->cameraOffsetRotation[2]=0.0;
+  sr->cameraOffsetRotation[3]=0.0;
+  //-----------------------------------
+}
 
 
 int simpleRendererInitialize(struct simpleRenderer * sr)

@@ -54,6 +54,15 @@ int simpleRendererRender(
                          float * output2DW
                         );
 
+
+int simpleRendererDefaults(
+                            struct simpleRenderer * sr,
+                            unsigned int width,
+                            unsigned int height,
+                            float fX,
+                            float fY
+                          );
+
 int simpleRendererInitialize(struct simpleRenderer * sr);
 
 #endif // SIMPLERENDERER_H_INCLUDED

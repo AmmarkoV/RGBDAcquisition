@@ -991,38 +991,20 @@ int bvh_GrowMocapFileByCopyingExistingMotions(
 
 
 
-int bvh_GrowMocapFileByMirroringJointAndItsChildren(
+int bvh_GrowMocapFileBySwappingJointAndItsChildren(
                                                      struct BVH_MotionCapture * mc,
-                                                     const char * jointNameAInitial,
-                                                     const char * jointNameBInitial
+                                                     const char * jointNameA,
+                                                     const char * jointNameB,
+                                                     int alsoIncludeOriginalMotion
                                                    )
 {
-  if (
-       (strlen(jointNameAInitial)>=MAX_BVH_JOINT_NAME)
-         ||
-       (strlen(jointNameBInitial)>=MAX_BVH_JOINT_NAME)
-      )
-       {
-          fprintf(stderr,"bvh_GrowMocapFileByMirroringJointAndItsChildren failed because of very long joint names..");
-          return 0;
-       }
-
-  //-------------------------------------------------------------
-  char jointNameA[MAX_BVH_JOINT_NAME+1]={0};
-  char jointNameB[MAX_BVH_JOINT_NAME+1]={0};
-  snprintf(jointNameA,MAX_BVH_JOINT_NAME,"%s",jointNameAInitial);
-  snprintf(jointNameB,MAX_BVH_JOINT_NAME,"%s",jointNameBInitial);
-  lowercase(jointNameA);
-  lowercase(jointNameB);
-  //---------------------
-
   BVHJointID jIDA,jIDB;
   unsigned int rangeOfJIDA,rangeOfJIDB;
   unsigned int numberOfChannelsContainedJIDA,numberOfChannelsContainedJIDB;
 
   if (
-       (bvh_getJointIDFromJointName(mc,jointNameA,&jIDA)) &&
-       (bvh_getJointIDFromJointName(mc,jointNameB,&jIDB))
+       (bvh_getJointIDFromJointNameNocase(mc,jointNameA,&jIDA)) &&
+       (bvh_getJointIDFromJointNameNocase(mc,jointNameB,&jIDB))
      )
   {
    fprintf(stderr,"We have resolved %s to %u and %s to %u\n",jointNameA,jIDA,jointNameB,jIDB);
@@ -1040,16 +1022,31 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
       )
     {
 
-     fprintf(stderr,"bvh_GrowMocapFileByMirroringJointAndItsChildren");
+     fprintf(stderr,"bvh_GrowMocapFileBySwappingJointAndItsChildren");
      unsigned int initialNumberOfFrames = mc->numberOfFrames;
      fprintf(stderr,"Initially had %u frames\n",initialNumberOfFrames);
-     if (
+
+     //----------------------------------------------------------------
+     if (alsoIncludeOriginalMotion)
+     {
+      fprintf(stderr,"And we where asked to double them\n");
+      if (
          bvh_GrowMocapFileByCopyingExistingMotions(
                                                    mc,
                                                    1
                                                   )
         )
       {
+          //Successfully Grew buffer to alsoIncludeOriginalMotion
+      } else
+      {
+        fprintf(stderr,"Could not grow our movement buffer to facilitate swapping\n");
+        return 0;
+      }
+     }
+     //----------------------------------------------------------------
+
+
        fprintf(stderr,"We now have %u frames\n",mc->numberOfFrames);
        float * temporaryMotionBufferA = allocateBufferThatCanContainJointAndChildren( mc, jIDA );
        float * temporaryMotionBufferB = allocateBufferThatCanContainJointAndChildren( mc, jIDB );
@@ -1079,8 +1076,6 @@ int bvh_GrowMocapFileByMirroringJointAndItsChildren(
         return 1;
        } else
        { fprintf(stderr,"Could not allocate temporary buffer\n");  }
-      } else
-      { fprintf(stderr,"Could not grow our movement buffer to facilitate swapping\n");  }
     } else
     { fprintf(stderr,"Joints %s and %s do not have the same hierarchy graph outline and therefore cannot be swapped\n",jointNameA,jointNameB); }
   } else
@@ -1152,6 +1147,36 @@ int bvh_getJointIDFromJointName(
    }
  return 0;
 }
+
+
+int bvh_getJointIDFromJointNameNocase(
+                                      struct BVH_MotionCapture * bvhMotion ,
+                                      const char * jointName,
+                                      BVHJointID * jID
+                                     )
+{
+  if (bvhMotion==0) { return 0; }
+  if (strlen(jointName)>=MAX_BVH_JOINT_NAME)
+     {
+       fprintf(stderr,"bvh_getJointIDFromJointNameNocase failed because of very long joint names..");
+       return 0;
+     }
+
+   char jointNameLowercase[MAX_BVH_JOINT_NAME+1]={0};
+   snprintf(jointNameLowercase,MAX_BVH_JOINT_NAME,"%s",jointName);
+   lowercase(jointNameLowercase);
+
+   return bvh_getJointIDFromJointName(
+                                      bvhMotion ,
+                                      jointNameLowercase,
+                                      jID
+                                     );
+}
+
+
+
+
+
 
 
 int bvh_getRootJointID(

@@ -14,10 +14,13 @@
 #include "../../Library/TrajectoryParser/TrajectoryParserDataStructures.h"
 #include "../../Library/MotionCaptureLoader/bvh_loader.h"
 #include "../../Library/MotionCaptureLoader/bvh_to_tri_pose.h"
+
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_export.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_bvh.h"
+
+#include "../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h"
 
 void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 {
@@ -163,14 +166,28 @@ int main(int argc, char **argv)
         } else
 
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--swap")==0)
+        {
+          if (i+2>=argc)  { incorrectArguments(); }
+          bvh_GrowMocapFileBySwappingJointAndItsChildren(
+                                                          &bvhMotion,
+                                                          argv[i+1],
+                                                          argv[i+2],
+                                                          0
+                                                         );
+        } else
+        //-----------------------------------------------------
+
+
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--mirror")==0)
         {
           if (i+2>=argc)  { incorrectArguments(); }
-          bvh_GrowMocapFileByMirroringJointAndItsChildren(
-                                                          &bvhMotion,
-                                                          argv[i+1],
-                                                          argv[i+2]
-                                                         );
+          bvh_MirrorJointsThroughIK(
+                                    &bvhMotion,
+                                    argv[i+1],
+                                    argv[i+2]
+                                  );
         } else
         //-----------------------------------------------------
 

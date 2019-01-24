@@ -4,7 +4,6 @@
 #include "bvh_to_csv.h"
 #include "bvh_to_svg.h"
 
-#include "../bvh_project.h"
 
 
 int performPointProjections(
@@ -73,28 +72,8 @@ int dumpBVHToSVGCSV(
 
 
   struct simpleRenderer renderer={0};
-  renderer.width=width;
-  renderer.height=height;
-  renderer.fx = fX;
-  renderer.fy = fY;
-  renderer.skew = 0.0;
-  renderer.cx = (float) width/2;
-  renderer.cy = (float) height/2;
-  renderer.near = 1.0;
-  renderer.far = 10000.0;
 
-  //-----------------------------------
-  renderer.cameraOffsetPosition[0]=0.0;
-  renderer.cameraOffsetPosition[1]=0.0;
-  renderer.cameraOffsetPosition[2]=0.0;
-  renderer.cameraOffsetPosition[3]=0.0;
-  //-----------------------------------
-  renderer.cameraOffsetRotation[0]=0.0;
-  renderer.cameraOffsetRotation[1]=0.0;
-  renderer.cameraOffsetRotation[2]=0.0;
-  renderer.cameraOffsetRotation[3]=0.0;
-  //-----------------------------------
-
+  simpleRendererDefaults(&renderer,width,height,fX,fY);
   simpleRendererInitialize(&renderer);
 
 

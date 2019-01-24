@@ -4,9 +4,20 @@
 
 #include "../bvh_loader.h"
 #include "../bvh_transform.h"
+#include "../bvh_project.h"
 
 extern unsigned int filteredOutCSVBehindPoses;
 extern unsigned int filteredOutCSVOutPoses;
+
+
+
+int performPointProjections(
+                             struct BVH_MotionCapture * mc,
+                             struct BVH_Transform * bvhTransform,
+                             unsigned int fID,
+                             struct simpleRenderer * renderer,
+                             unsigned int occlusions
+                            );
 
 
 int dumpBVHToSVGCSV(
