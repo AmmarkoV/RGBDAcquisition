@@ -18,10 +18,23 @@ int mirrorBVHThroughIK(
 {
   if ( performPointProjections(mc,bvhTransform,fID,renderer,0) )
      {
-
         fprintf(stderr,"Todo: mirrorBVHThroughIK %u \n",fID);
 
+        fprintf(stderr,"%u=>%0.2f,%0.2f,%0.2f,%0.2f",
+                jIDA,
+                bvhTransform->joint[jIDA].pos3D[0],
+                bvhTransform->joint[jIDA].pos3D[1],
+                bvhTransform->joint[jIDA].pos3D[2],
+                bvhTransform->joint[jIDA].pos3D[3]
+                );
 
+        fprintf(stderr,"  %u=>%0.2f,%0.2f,%0.2f,%0.2f\n",
+                jIDB,
+                bvhTransform->joint[jIDB].pos3D[0],
+                bvhTransform->joint[jIDB].pos3D[1],
+                bvhTransform->joint[jIDB].pos3D[2],
+                bvhTransform->joint[jIDB].pos3D[3]
+                );
 
 
      }
