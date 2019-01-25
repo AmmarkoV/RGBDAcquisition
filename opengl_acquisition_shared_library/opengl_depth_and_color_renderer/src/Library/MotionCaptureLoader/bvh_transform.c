@@ -171,6 +171,7 @@ double fToD(float in)
   return (double) in;
 }
 
+
 int bvh_loadTransformForFrame(
                                struct BVH_MotionCapture * bvhMotion ,
                                BVHFrameID fID ,
@@ -343,7 +344,6 @@ int bvh_loadTransformForFrame(
 
   return 1;
 }
-
 
 
 

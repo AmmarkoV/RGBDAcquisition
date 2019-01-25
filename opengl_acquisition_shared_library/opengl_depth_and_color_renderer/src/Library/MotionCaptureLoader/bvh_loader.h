@@ -364,7 +364,7 @@ float  bvh_getJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJo
 */
 int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData);
 
-
+int bhv_populatePosXYZRotXYZFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , float * motionBuffer, float * data, unsigned int sizeOfData);
 
 /**
 * @brief Direct access to the motion data, without Joint hierarchy,Frame separation etc, should not be used unless you really know what you are doing..
