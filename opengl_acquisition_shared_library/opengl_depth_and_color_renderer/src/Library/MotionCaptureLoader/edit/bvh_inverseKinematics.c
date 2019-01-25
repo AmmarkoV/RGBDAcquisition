@@ -16,7 +16,15 @@ int mirrorBVHThroughIK(
                        BVHJointID jIDB
                       )
 {
-  if ( performPointProjections(mc,bvhTransform,fID,renderer,0) )
+  float * motionBuffer;
+
+   bvh_loadTransformForMotionBuffer(
+                                     mc,
+                                     motionBuffer,
+                                     bvhTransform
+                                   );
+
+  if ( performPointProjectionsForFrame(mc,bvhTransform,fID,renderer,0) )
      {
         fprintf(stderr,"Todo: mirrorBVHThroughIK %u \n",fID);
 

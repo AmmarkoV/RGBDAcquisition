@@ -6,24 +6,14 @@
 
 
 
-int performPointProjections(
-                             struct BVH_MotionCapture * mc,
-                             struct BVH_Transform * bvhTransform,
-                             unsigned int fID,
-                             struct simpleRenderer * renderer,
-                             unsigned int occlusions
-                            )
+int actuallyPerformPointProjections(
+                                    struct BVH_MotionCapture * mc,
+                                    struct BVH_Transform * bvhTransform,
+                                    struct simpleRenderer * renderer,
+                                    unsigned int occlusions
+                                   )
 {
-  //First load the 3D positions of each joint..
-  if (
-       bvh_loadTransformForFrame(
-                                 mc,
-                                 fID ,
-                                 bvhTransform
-                                )
-      )
-       {
-        //Then project 3D positions on 2D frame and save results..
+  //Then project 3D positions on 2D frame and save results..
         if (
             bvh_projectTo2D(
                             mc,
@@ -35,6 +25,31 @@ int performPointProjections(
            {
              return 1;
            }
+
+   //----------------------------------------------------------
+ return 0;
+}
+
+
+int performPointProjectionsForFrame(
+                                     struct BVH_MotionCapture * mc,
+                                     struct BVH_Transform * bvhTransform,
+                                     unsigned int fID,
+                                     struct simpleRenderer * renderer,
+                                     unsigned int occlusions
+                                    )
+{
+  //First load the 3D positions of each joint..
+   if (
+       bvh_loadTransformForFrame(
+                                 mc,
+                                 fID ,
+                                 bvhTransform
+                                )
+       )
+       {
+        //Then project 3D positions on 2D frame and save results..
+         return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions);
        }  else
        {
            bvh_cleanTransform(
@@ -47,6 +62,36 @@ int performPointProjections(
 }
 
 
+
+int performPointProjectionsForMotionBuffer(
+                                            struct BVH_MotionCapture * mc,
+                                            struct BVH_Transform * bvhTransform,
+                                            float * motionBuffer,
+                                            struct simpleRenderer * renderer,
+                                            unsigned int occlusions
+                                           )
+{
+  //First load the 3D positions of each joint..
+  if (
+       bvh_loadTransformForMotionBuffer(
+                                        mc ,
+                                        motionBuffer,
+                                        bvhTransform
+                                       )
+      )
+       {
+        //Then project 3D positions on 2D frame and save results..
+         return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions);
+       }  else
+       {
+           bvh_cleanTransform(
+                              mc,
+                              bvhTransform
+                             );
+       }
+   //----------------------------------------------------------
+ return 0;
+}
 
 
 int dumpBVHToSVGCSV(
@@ -93,7 +138,7 @@ int dumpBVHToSVGCSV(
   {
    snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
    if (
-       !performPointProjections(
+       !performPointProjectionsForFrame(
                                 mc,
                                 &bvhTransform,
                                 fID,

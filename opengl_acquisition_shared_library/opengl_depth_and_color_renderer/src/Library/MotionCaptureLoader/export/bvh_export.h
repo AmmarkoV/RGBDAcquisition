@@ -11,14 +11,21 @@ extern unsigned int filteredOutCSVOutPoses;
 
 
 
-int performPointProjections(
-                             struct BVH_MotionCapture * mc,
-                             struct BVH_Transform * bvhTransform,
-                             unsigned int fID,
-                             struct simpleRenderer * renderer,
-                             unsigned int occlusions
-                            );
+int performPointProjectionsForFrame(
+                                    struct BVH_MotionCapture * mc,
+                                    struct BVH_Transform * bvhTransform,
+                                    unsigned int fID,
+                                    struct simpleRenderer * renderer,
+                                    unsigned int occlusions
+                                   );
 
+int performPointProjectionsForMotionBuffer(
+                                            struct BVH_MotionCapture * mc,
+                                            struct BVH_Transform * bvhTransform,
+                                            float * motionBuffer,
+                                            struct simpleRenderer * renderer,
+                                            unsigned int occlusions
+                                           );
 
 int dumpBVHToSVGCSV(
                     const char * directory ,
