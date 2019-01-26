@@ -214,6 +214,7 @@ int simpleRendererDefaults(
   sr->cameraOffsetRotation[2]=0.0;
   sr->cameraOffsetRotation[3]=0.0;
   //-----------------------------------
+  return 1;
 }
 
 
