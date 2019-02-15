@@ -23,93 +23,6 @@ int fileExists(const char * filename)
 }
 
 
-
-int dumpBVHToCSVHeader(
-                       struct BVH_MotionCapture * mc,
-                       const char * filename
-                      )
-{
-   if (!fileExists(filename))
-   {
-     FILE * fp =fopen(filename,"w");
-
-   if (fp!=0)
-   {
-     #if DUMP_SEPERATED_POS_ROT
-     fprintf(fp,"positionX,positionY,positionZ,roll,pitch,yaw,");
-     #endif // DUMP_SEPERATED_POS_ROT
-
-     unsigned int jID=0;
-     //2D Positions -------------------------------------------------------------------------------------------------------------
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-         if (!mc->jointHierarchy[jID].isEndSite)
-         {
-          fprintf(
-                  fp,"2DX_%s,2DY_%s,visible_%s,",
-                  mc->jointHierarchy[jID].jointName,
-                  mc->jointHierarchy[jID].jointName,
-                  mc->jointHierarchy[jID].jointName
-                 );
-         }
-         else
-         {
-          unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
-          fprintf(
-                  fp,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s,",
-                  mc->jointHierarchy[parentID].jointName,
-                  mc->jointHierarchy[parentID].jointName,
-                  mc->jointHierarchy[parentID].jointName
-                 );
-         }
-       }
-     //--------------------------------------------------------------------------------------------------------------------------
-
-     #if DUMP_3D_POSITIONS
-     //3D Positions
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-         if (!mc->jointHierarchy[jID].isEndSite)
-         {
-           fprintf(fp,"3DX_%s,3DY_%s,3DZ_%s,",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
-         }
-       }
-     #endif // DUMP_3D_POSITIONS
-
-
-     //Model Configuration
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-         if (!mc->jointHierarchy[jID].isEndSite)
-         {
-           unsigned int channelID=0;
-           for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
-           {
-            fprintf(
-                    fp,"%s_%s,",
-                    mc->jointHierarchy[jID].jointName,
-                    channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
-                   );
-           }
-         }
-       }
-
-
-     //Append Frame ID
-     fprintf(fp,"frameID\n");
-
-     fclose(fp);
-     return 1;
-   }
-  } else
-  {
-   fprintf(stderr,"We don't need to regenerate the CSV header, it already exists\n");
-   return 1;
-  }
- return 0;
-}
-
-
 float eulerAngleToRadiansIfNeeded( float eulerAngle , unsigned int isItNeeded)
 {
   if (isItNeeded)
@@ -119,17 +32,16 @@ float eulerAngleToRadiansIfNeeded( float eulerAngle , unsigned int isItNeeded)
  return eulerAngle;
 }
 
-int dumpBVHToCSVBody(
+
+
+int csvSkeletonFilter(
                        struct BVH_MotionCapture * mc,
                        struct BVH_Transform * bvhTransform,
                        struct simpleRenderer * renderer,
-                       unsigned int fID,
-                       const char * filename,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
-                       unsigned int filterWeirdSkeletons,
-                       unsigned int encodeRotationsAsRadians
-                      )
+                       unsigned int filterWeirdSkeletons
+                     )
 {
    unsigned int jID=0;
 
@@ -194,6 +106,151 @@ int dumpBVHToCSVBody(
         }
    }//-----------------------------------------------
 
+ return 1;
+}
+
+
+
+int dumpBVHToCSVHeader(
+                       struct BVH_MotionCapture * mc,
+                       const char * filename2D,
+                       const char * filename3D,
+                       const char * filenameBVH
+                      )
+{
+   unsigned int jID=0;
+
+   if (!fileExists(filename2D))
+   {
+    FILE * fp2D = fopen(filename2D,"a");
+
+    if (fp2D!=0)
+    {
+     //2D Positions -------------------------------------------------------------------------------------------------------------
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+          fprintf(
+                  fp2D,"2DX_%s,2DY_%s,visible_%s,",
+                  mc->jointHierarchy[jID].jointName,
+                  mc->jointHierarchy[jID].jointName,
+                  mc->jointHierarchy[jID].jointName
+                 );
+         }
+         else
+         {
+          unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+          fprintf(
+                  fp2D,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s,",
+                  mc->jointHierarchy[parentID].jointName,
+                  mc->jointHierarchy[parentID].jointName,
+                  mc->jointHierarchy[parentID].jointName
+                 );
+         }
+       }
+     //--------------------------------------------------------------------------------------------------------------------------
+     fprintf(fp2D,"\n");
+     fclose(fp2D);
+   }
+  }else
+    {
+     fprintf(stderr,"We don't need to regenerate the CSV 2D header, it already exists\n");
+    }
+
+
+
+   //3D Positions -------------------------------------------------------------------------------------------------------------
+   if (!fileExists(filename3D))
+   {
+     FILE * fp3D = fopen(filename3D,"a");
+     if (fp3D!=0)
+     {
+      for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+           fprintf(fp3D,"3DX_%s,3DY_%s,3DZ_%s,",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
+         }
+       }
+      fclose(fp3D);
+     }
+   } else
+    {
+     fprintf(stderr,"We don't need to regenerate the CSV 3D header, it already exists\n");
+    }
+   //--------------------------------------------------------------------------------------------------------------------------
+
+
+
+   if (!fileExists(filenameBVH))
+   {
+     FILE * fpBVH = fopen(filenameBVH,"a");
+     if (fpBVH!=0)
+     {
+     //Model Configuration
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+           unsigned int channelID=0;
+           for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+           {
+            fprintf(
+                    fpBVH,"%s_%s,",
+                    mc->jointHierarchy[jID].jointName,
+                    channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
+                   );
+           }
+         }
+       }
+      //Append Frame ID
+      fprintf(fpBVH,"\n");
+      fclose(fpBVH);
+     }
+    } else
+    {
+     fprintf(stderr,"We don't need to regenerate the CSV header, it already exists\n");
+    }
+   //--------------------------------------------------------------------------------------------------------------------------
+
+
+
+ return 1;
+}
+
+
+
+int dumpBVHToCSVBody(
+                       struct BVH_MotionCapture * mc,
+                       struct BVH_Transform * bvhTransform,
+                       struct simpleRenderer * renderer,
+                       unsigned int fID,
+                       const char * filename2D,
+                       const char * filename3D,
+                       const char * filenameBVH,
+                       unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                       unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
+                       unsigned int filterWeirdSkeletons,
+                       unsigned int encodeRotationsAsRadians
+                      )
+{
+   unsigned int jID=0;
+
+   if (
+       !csvSkeletonFilter(
+                           mc,
+                           bvhTransform,
+                           renderer,
+                           filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                           filterOutSkeletonsWithAnyLimbsOutOfImage,
+                           filterWeirdSkeletons
+                         )
+       )
+   {
+     return 0;
+   }
+
    //-------------------------------------------------
    if (encodeRotationsAsRadians)
    {
@@ -201,21 +258,17 @@ int dumpBVHToCSVBody(
     exit(0);
    }//-----------------------------------------------
 
-   FILE * fp = fopen(filename,"a");
-   if (fp!=0)
-   {
-    #if DUMP_SEPERATED_POS_ROT
-    fprintf(fp,"%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,",
-                 renderer->cameraOffsetPosition[0]*10,
-                 renderer->cameraOffsetPosition[1]*10,
-                 renderer->cameraOffsetPosition[2]*10,
-                 objectRotationOffset[2],
-                 objectRotationOffset[1],
-                 objectRotationOffset[0]
-                 );
-     #endif // DUMP_SEPERATED_POS_ROT
+   FILE * fp2D = fopen(filename2D,"a");
+   FILE * fp3D = fopen(filename3D,"a");
+   FILE * fpBVH = fopen(filenameBVH,"a");
+
+   unsigned int dumped=0;
+
+
 
      //2D Positions -------------------------------------------------------------------------------------------------------------
+     if (fp2D!=0)
+     {
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
          if (bvhTransform->joint[jID].isOccluded) { ++invisibleJoints; } else { ++visibleJoints; }
@@ -230,7 +283,7 @@ int dumpBVHToCSVBody(
           } else*/
           {
           fprintf(
-                  fp,"%0.4f,%0.4f,%u,",
+                  fp2D,"%0.4f,%0.4f,%u\n",
                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                   (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                   (bvhTransform->joint[jID].isOccluded==0)
@@ -249,7 +302,7 @@ int dumpBVHToCSVBody(
           {
               //jID parentID
           fprintf(
-                  fp,"%0.4f,%0.4f,%u,",
+                  fp2D,"%0.4f,%0.4f,%u\n",
                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                   (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                   (bvhTransform->joint[jID].isOccluded==0)
@@ -258,25 +311,36 @@ int dumpBVHToCSVBody(
          }
          ///=================================================
        }
+     fclose(fp2D);
+     ++dumped;
+     }
      //-----------------------------------------------------------------------------------------------------------------------------
 
-     #if DUMP_3D_POSITIONS
-     //3D Positions
+
+   //3D Positions -------------------------------------------
+   if (fp3D!=0)
+   {
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
          if (!mc->jointHierarchy[jID].isEndSite)
          {
           fprintf(
-                  fp,"%0.2f,%0.2f,%0.2f,",
+                  fp3D,"%0.2f,%0.2f,%0.2f\n",
                   bvhTransform->joint[jID].pos3D[0],
                   bvhTransform->joint[jID].pos3D[1],
                   bvhTransform->joint[jID].pos3D[2]
                  );
          }
        }
-     #endif // DUMP_3D_POSITIONS
+     fclose(fp3D);
+     ++dumped;
+   }
+   //-------------------------------------------------------------------
+
 
      //Joint Configuration
+   if (fpBVH!=0)
+   {
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
          if (!mc->jointHierarchy[jID].isEndSite)
@@ -286,21 +350,18 @@ int dumpBVHToCSVBody(
            {
              unsigned int channelType =  mc->jointHierarchy[jID].channelType[channelID];
              fprintf(
-                     fp,"%0.4f,",
+                     fpBVH,"%0.4f,",
                      bvh_getJointChannelAtFrame(mc,jID,fID,channelType)
                     );
            }
          }
        }
+     fprintf(fpBVH,"\n",fID);
+     //-------------------------------------------------------------------
+     fclose(fpBVH);
+     ++dumped;
+  }
 
-     //Append Frame ID
-     fprintf(fp,"%u\n",fID);
-
-     fclose(fp);
-     return 1;
-   }
- return 0;
+ return (dumped==3);
 }
-
-
 

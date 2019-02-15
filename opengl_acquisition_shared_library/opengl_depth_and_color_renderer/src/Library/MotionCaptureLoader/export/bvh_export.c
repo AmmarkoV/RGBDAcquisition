@@ -113,7 +113,10 @@ int dumpBVHToSVGCSV(
 {
   struct BVH_Transform bvhTransform;
   char svgFilename[512];
-  char csvFilename[512];
+  char csvFilename2D[512];
+  char csvFilename3D[512];
+  char csvFilenameBVH[512];
+
 
 
   struct simpleRenderer renderer={0};
@@ -122,12 +125,16 @@ int dumpBVHToSVGCSV(
   simpleRendererInitialize(&renderer);
 
 
-  snprintf(csvFilename,512,"%s/%s",directory,filename);
+  snprintf(csvFilename2D,512,"%s/2d_%s",directory,filename);
+  snprintf(csvFilename3D,512,"%s/3d_%s",directory,filename);
+  snprintf(csvFilenameBVH,512,"%s/bvh_%s",directory,filename);
   if (convertToCSV)
    {
     dumpBVHToCSVHeader(
                         mc,
-                        csvFilename
+                        csvFilename2D,
+                        csvFilename3D,
+                        csvFilenameBVH
                        );
    }
 
@@ -157,7 +164,9 @@ int dumpBVHToSVGCSV(
                        &bvhTransform,
                        &renderer,
                        fID,
-                       csvFilename,
+                       csvFilename2D,
+                       csvFilename3D,
+                       csvFilenameBVH,
                        filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        filterOutSkeletonsWithAnyLimbsOutOfImage,
                        filterWeirdSkeletons,

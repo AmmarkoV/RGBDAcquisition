@@ -14,7 +14,9 @@ extern unsigned int filteredOutCSVPoses;
 
 int dumpBVHToCSVHeader(
                        struct BVH_MotionCapture * mc,
-                       const char * filename
+                       const char * filename2D,
+                       const char * filename3D,
+                       const char * filenameBVH
                       );
 
 
@@ -23,7 +25,9 @@ int dumpBVHToCSVBody(
                        struct BVH_Transform * bvhTransform,
                        struct simpleRenderer * renderer,
                        unsigned int fID,
-                       const char * filename,
+                       const char * filename2D,
+                       const char * filename3D,
+                       const char * filenameBVH,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                        unsigned int filterWeirdSkeletons,
