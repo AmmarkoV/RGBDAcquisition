@@ -173,6 +173,7 @@ int dumpBVHToCSVHeader(
            fprintf(fp3D,"3DX_%s,3DY_%s,3DZ_%s,",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
          }
        }
+      fprintf(fp3D,"\n");
       fclose(fp3D);
      }
    } else
@@ -283,7 +284,7 @@ int dumpBVHToCSVBody(
           } else*/
           {
           fprintf(
-                  fp2D,"%0.4f,%0.4f,%u\n",
+                  fp2D,"%0.4f,%0.4f,%u,",
                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                   (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                   (bvhTransform->joint[jID].isOccluded==0)
@@ -302,7 +303,7 @@ int dumpBVHToCSVBody(
           {
               //jID parentID
           fprintf(
-                  fp2D,"%0.4f,%0.4f,%u\n",
+                  fp2D,"%0.4f,%0.4f,%u,",
                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                   (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                   (bvhTransform->joint[jID].isOccluded==0)
@@ -311,6 +312,7 @@ int dumpBVHToCSVBody(
          }
          ///=================================================
        }
+     fprintf(fp2D,"\n");
      fclose(fp2D);
      ++dumped;
      }
@@ -325,13 +327,14 @@ int dumpBVHToCSVBody(
          if (!mc->jointHierarchy[jID].isEndSite)
          {
           fprintf(
-                  fp3D,"%0.2f,%0.2f,%0.2f\n",
+                  fp3D,"%0.2f,%0.2f,%0.2f,",
                   bvhTransform->joint[jID].pos3D[0],
                   bvhTransform->joint[jID].pos3D[1],
                   bvhTransform->joint[jID].pos3D[2]
                  );
          }
        }
+     fprintf(fp3D,"\n");
      fclose(fp3D);
      ++dumped;
    }
@@ -356,7 +359,7 @@ int dumpBVHToCSVBody(
            }
          }
        }
-     fprintf(fpBVH,"\n",fID);
+     fprintf(fpBVH,"\n");
      //-------------------------------------------------------------------
      fclose(fpBVH);
      ++dumped;
