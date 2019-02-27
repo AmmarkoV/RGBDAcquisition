@@ -37,13 +37,13 @@ sed -i 's/lRing1/finger4-1.L/g' $TARGET
 sed -i 's/lRing2/finger4-3.L/g' $TARGET
 sed -i 's/lPinky1/finger5-1.L/g' $TARGET
 sed -i 's/lPinky2/finger5-3.L/g' $TARGET
-sed -i 's/rButtock/LHip/g' $TARGET
-sed -i 's/rThigh/LeftUpLeg/g' $TARGET
-sed -i 's/rShin/LeftLeg/g' $TARGET
-sed -i 's/rFoot/LeftFoot/g' $TARGET
-sed -i 's/lButtock/RHip/g' $TARGET
-sed -i 's/lThigh/RightUpLeg/g' $TARGET
-sed -i 's/lShin/RightLeg/g' $TARGET
-sed -i 's/lFoot/RightFoot/g' $TARGET
+sed -i 's/lButtock/LHipJoint/g' $TARGET
+sed -i 's/lThigh/LeftUpLeg/g' $TARGET
+sed -i 's/lShin/LeftLeg/g' $TARGET
+sed -i 's/lFoot/LeftFoot/g' $TARGET
+sed -i 's/rButtock/RHipJoint/g' $TARGET
+sed -i 's/rThigh/RightUpLeg/g' $TARGET
+sed -i 's/rShin/RightLeg/g' $TARGET
+sed -i 's/rFoot/RightFoot/g' $TARGET
   
 

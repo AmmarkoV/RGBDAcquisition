@@ -43,7 +43,7 @@ void dumpSphereBody(
                                  )
        )
     {
-     fprintf(fp,"POS(camera,%u,60.0,60.0,252.0,0.0,0.0,0.0,0.0)\n",fID);
+     fprintf(fp,"POS(camera,%u,60.0,0.0,252.0,0.0,0.0,0.0,0.0)\n",fID);
      fprintf(fp,"POS(floor,%u,0.0,0.0,0.0,0.0,0.0,0.0,0.0)\n",fID);
 
      unsigned int jID=0;
