@@ -277,8 +277,72 @@ int main(int argc, char **argv)
                                          maximumRotation
                                        );
           bvh_ConstrainRotations(&bvhMotion);
-        }
+        } else
         //-----------------------------------------------------
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--randomizeranges")==0)
+        {
+          if (i+24>=argc)  { incorrectArguments(); }
+          srand(time(NULL));
+
+          float minimumPositionRangeA[3];
+          float minimumRotationRangeA[3];
+          float maximumPositionRangeA[3];
+          float maximumRotationRangeA[3];
+
+          float minimumPositionRangeB[3];
+          float minimumRotationRangeB[3];
+          float maximumPositionRangeB[3];
+          float maximumRotationRangeB[3];
+
+          //----
+          minimumPositionRangeA[0]=-1*atof(argv[i+1])/10;
+          minimumPositionRangeA[1]=-1*atof(argv[i+2])/10;
+          minimumPositionRangeA[2]=-1*atof(argv[i+3])/10;
+          //----
+          minimumRotationRangeA[0]=atof(argv[i+4]);
+          minimumRotationRangeA[1]=atof(argv[i+5]);
+          minimumRotationRangeA[2]=atof(argv[i+6]);
+          //----
+          maximumPositionRangeA[0]=-1*atof(argv[i+7])/10;
+          maximumPositionRangeA[1]=-1*atof(argv[i+8])/10;
+          maximumPositionRangeA[2]=-1*atof(argv[i+9])/10;
+          //----
+          maximumRotationRangeA[0]=atof(argv[i+10]);
+          maximumRotationRangeA[1]=atof(argv[i+11]);
+          maximumRotationRangeA[2]=atof(argv[i+12]);
+
+          //----
+          minimumPositionRangeB[0]=-1*atof(argv[i+13])/10;
+          minimumPositionRangeB[1]=-1*atof(argv[i+14])/10;
+          minimumPositionRangeB[2]=-1*atof(argv[i+15])/10;
+          //----
+          minimumRotationRangeB[0]=atof(argv[i+16]);
+          minimumRotationRangeB[1]=atof(argv[i+17]);
+          minimumRotationRangeB[2]=atof(argv[i+18]);
+          //----
+          maximumPositionRangeB[0]=-1*atof(argv[i+19])/10;
+          maximumPositionRangeB[1]=-1*atof(argv[i+20])/10;
+          maximumPositionRangeB[2]=-1*atof(argv[i+21])/10;
+          //----
+          maximumRotationRangeB[0]=atof(argv[i+22]);
+          maximumRotationRangeB[1]=atof(argv[i+23]);
+          maximumRotationRangeB[2]=atof(argv[i+24]);
+
+          bvh_RandomizePositionRotation2Ranges(
+                                                &bvhMotion,
+                                                minimumPositionRangeA,
+                                                minimumRotationRangeA,
+                                                maximumPositionRangeA,
+                                                maximumRotationRangeA,
+                                                minimumPositionRangeB,
+                                                minimumRotationRangeB,
+                                                maximumPositionRangeB,
+                                                maximumRotationRangeB
+                                              );
+
+          bvh_ConstrainRotations(&bvhMotion);
+        }
     }
 
 

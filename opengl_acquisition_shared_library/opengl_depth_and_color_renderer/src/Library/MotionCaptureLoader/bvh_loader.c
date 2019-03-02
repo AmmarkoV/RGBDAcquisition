@@ -895,6 +895,58 @@ int bvh_RandomizePositionRotation(
 
 
 
+int bvh_RandomizePositionRotation2Ranges(
+                                         struct BVH_MotionCapture * mc,
+                                         float * minimumPositionRangeA,
+                                         float * minimumRotationRangeA,
+                                         float * maximumPositionRangeA,
+                                         float * maximumRotationRangeA,
+                                         float * minimumPositionRangeB,
+                                         float * minimumRotationRangeB,
+                                         float * maximumPositionRangeB,
+                                         float * maximumRotationRangeB
+                                        )
+{
+  fprintf(stderr,"Randomizing %u frames at two ranges\n",mc->numberOfFrames);
+  fprintf(stderr,"Range A\n");
+  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f,",minimumPositionRangeA[0],minimumPositionRangeA[1],minimumPositionRangeA[2]);
+  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",minimumRotationRangeA[0],minimumRotationRangeA[1],minimumRotationRangeA[2]);
+  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f,",maximumPositionRangeA[0],maximumPositionRangeA[1],maximumPositionRangeA[2]);
+  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",maximumRotationRangeA[0],maximumRotationRangeA[1],maximumRotationRangeA[2]);
+  fprintf(stderr,"Range B\n");
+  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f,",minimumPositionRangeB[0],minimumPositionRangeB[1],minimumPositionRangeB[2]);
+  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",minimumRotationRangeB[0],minimumRotationRangeB[1],minimumRotationRangeB[2]);
+  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f,",maximumPositionRangeB[0],maximumPositionRangeB[1],maximumPositionRangeB[2]);
+  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",maximumRotationRangeB[0],maximumRotationRangeB[1],maximumRotationRangeB[2]);
+
+
+  unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+   unsigned int mID=fID*mc->numberOfValuesPerFrame;
+   float whichHalf = rand() / (float) RAND_MAX; /* [0, 1.0] */
+
+   if (whichHalf<0.5)
+           {
+              mc->motionValues[mID+0]=randomFloatA(minimumPositionRangeA[0],maximumPositionRangeA[0]);
+              mc->motionValues[mID+1]=randomFloatA(minimumPositionRangeA[1],maximumPositionRangeA[1]);
+              mc->motionValues[mID+2]=randomFloatA(minimumPositionRangeA[2],maximumPositionRangeA[2]);
+              mc->motionValues[mID+3]=randomFloatA(minimumPositionRangeA[0],maximumPositionRangeA[0]);
+              mc->motionValues[mID+4]=randomFloatA(minimumPositionRangeA[1],maximumPositionRangeA[1]);
+              mc->motionValues[mID+5]=randomFloatA(minimumPositionRangeA[2],maximumPositionRangeA[2]);
+           } else
+           {
+              mc->motionValues[mID+0]=randomFloatA(minimumPositionRangeB[0],maximumPositionRangeB[0]);
+              mc->motionValues[mID+1]=randomFloatA(minimumPositionRangeB[1],maximumPositionRangeB[1]);
+              mc->motionValues[mID+2]=randomFloatA(minimumPositionRangeB[2],maximumPositionRangeB[2]);
+              mc->motionValues[mID+3]=randomFloatA(minimumPositionRangeB[0],maximumPositionRangeB[0]);
+              mc->motionValues[mID+4]=randomFloatA(minimumPositionRangeB[1],maximumPositionRangeB[1]);
+              mc->motionValues[mID+5]=randomFloatA(minimumPositionRangeB[2],maximumPositionRangeB[2]);
+           }
+  }
+ return 1;
+}
+
 
 int bvh_SetPositionRotation(
                              struct BVH_MotionCapture * mc,

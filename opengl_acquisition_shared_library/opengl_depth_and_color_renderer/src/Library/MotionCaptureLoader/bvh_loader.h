@@ -181,6 +181,19 @@ int bvh_RandomizePositionRotation(
                                   float * maximumRotation
                                  );
 
+int bvh_RandomizePositionRotation2Ranges(
+                                         struct BVH_MotionCapture * mc,
+                                         float * minimumPositionRangeA,
+                                         float * minimumRotationRangeA,
+                                         float * maximumPositionRangeA,
+                                         float * maximumRotationRangeA,
+                                         float * minimumPositionRangeB,
+                                         float * minimumRotationRangeB,
+                                         float * maximumPositionRangeB,
+                                         float * maximumRotationRangeB
+                                        );
+
+
 int bvh_SetPositionRotation(
                             struct BVH_MotionCapture * mc,
                             float * position,
