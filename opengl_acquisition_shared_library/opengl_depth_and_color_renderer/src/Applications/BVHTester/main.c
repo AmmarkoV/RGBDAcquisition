@@ -77,6 +77,12 @@ int main(int argc, char **argv)
     for (i=0; i<argc; i++)
     {
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--test")==0)
+        {
+          bvh_testConstrainRotations();
+          exit(0);
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--occlusions")==0)
         {
           occlusions=1;

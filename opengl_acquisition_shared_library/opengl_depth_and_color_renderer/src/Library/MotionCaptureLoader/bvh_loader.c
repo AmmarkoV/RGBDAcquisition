@@ -1009,7 +1009,24 @@ int bvh_ConstrainRotations(struct BVH_MotionCapture * mc)
    mc->motionValues[mID+5] = (float) buffer;
   }
  return 1;
+}
 
+
+int bvh_testConstrainRotations()
+{
+  fprintf(stderr,"Testing bvh_rotation constraint\n");
+  unsigned int i=0;
+  double angle = -720;
+  for (i=0; i<1440; i++)
+  {
+    fprintf(stderr,"| Angle:%0.2f | Centered at 0:%0.2f | Centered at 180:%0.2f  |\n",
+    angle,
+    bvh_constrainAngleCentered0(angle),
+    bvh_constrainAngleCentered180(angle)
+    );
+    angle=angle+1.0;
+  }
+ return 0;
 }
 
 int bvh_GrowMocapFileByCopyingExistingMotions(
