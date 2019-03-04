@@ -890,11 +890,11 @@ float randomFloatA( float minVal, float maxVal )
       maxVal = buf;
     }
 
+    float magnitude=maxVal-minVal;
     float scale = rand() / (float) RAND_MAX; /* [0, 1.0] */
-
-    float absoluteRandom = scale * (maxVal - minVal);      /* [min, max] */
-
+    float absoluteRandom = scale * magnitude;      /* [min, max] */
     float value = maxVal-absoluteRandom;
+    //float value = minVal+absoluteRandom; <- same thing as above
 
     if (value<minVal) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO SMALL\n",minVal,maxVal,value); } else
     if (value>maxVal) { fprintf(stderr,"randomFloat(%0.2f,%0.2f)=>%0.2f TOO BIG\n",minVal,maxVal,value); }
@@ -948,16 +948,18 @@ int bvh_RandomizePositionRotation2Ranges(
 {
   fprintf(stderr,"Randomizing %u frames at two ranges\n",mc->numberOfFrames);
   fprintf(stderr,"Range A\n");
-  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f,",minimumPositionRangeA[0],minimumPositionRangeA[1],minimumPositionRangeA[2]);
-  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",minimumRotationRangeA[0],minimumRotationRangeA[1],minimumRotationRangeA[2]);
-  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f,",maximumPositionRangeA[0],maximumPositionRangeA[1],maximumPositionRangeA[2]);
-  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",maximumRotationRangeA[0],maximumRotationRangeA[1],maximumRotationRangeA[2]);
+  fprintf(stderr,"min(Pos[%0.2f,%0.2f,%0.2f],",minimumPositionRangeA[0],minimumPositionRangeA[1],minimumPositionRangeA[2]);
+  fprintf(stderr,"Rot[%0.2f,%0.2f,%0.2f])\n",minimumRotationRangeA[0],minimumRotationRangeA[1],minimumRotationRangeA[2]);
+  fprintf(stderr,"max(Pos[%0.2f,%0.2f,%0.2f],",maximumPositionRangeA[0],maximumPositionRangeA[1],maximumPositionRangeA[2]);
+  fprintf(stderr,"Rot[%0.2f,%0.2f,%0.2f])\n",maximumRotationRangeA[0],maximumRotationRangeA[1],maximumRotationRangeA[2]);
   fprintf(stderr,"Range B\n");
-  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f,",minimumPositionRangeB[0],minimumPositionRangeB[1],minimumPositionRangeB[2]);
-  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",minimumRotationRangeB[0],minimumRotationRangeB[1],minimumRotationRangeB[2]);
-  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f,",maximumPositionRangeB[0],maximumPositionRangeB[1],maximumPositionRangeB[2]);
-  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",maximumRotationRangeB[0],maximumRotationRangeB[1],maximumRotationRangeB[2]);
+  fprintf(stderr,"min(Pos[%0.2f,%0.2f,%0.2f],",minimumPositionRangeB[0],minimumPositionRangeB[1],minimumPositionRangeB[2]);
+  fprintf(stderr,"Rot[%0.2f,%0.2f,%0.2f])\n",minimumRotationRangeB[0],minimumRotationRangeB[1],minimumRotationRangeB[2]);
+  fprintf(stderr,"max(Pos[%0.2f,%0.2f,%0.2f],",maximumPositionRangeB[0],maximumPositionRangeB[1],maximumPositionRangeB[2]);
+  fprintf(stderr,"Rot[%0.2f,%0.2f,%0.2f])\n",maximumRotationRangeB[0],maximumRotationRangeB[1],maximumRotationRangeB[2]);
 
+  //fprintf(stderr,"Exiting\n");
+  //exit(0);
 
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
@@ -970,17 +972,17 @@ int bvh_RandomizePositionRotation2Ranges(
               mc->motionValues[mID+0]=randomFloatA(minimumPositionRangeA[0],maximumPositionRangeA[0]);
               mc->motionValues[mID+1]=randomFloatA(minimumPositionRangeA[1],maximumPositionRangeA[1]);
               mc->motionValues[mID+2]=randomFloatA(minimumPositionRangeA[2],maximumPositionRangeA[2]);
-              mc->motionValues[mID+3]=randomFloatA(minimumPositionRangeA[0],maximumPositionRangeA[0]);
-              mc->motionValues[mID+4]=randomFloatA(minimumPositionRangeA[1],maximumPositionRangeA[1]);
-              mc->motionValues[mID+5]=randomFloatA(minimumPositionRangeA[2],maximumPositionRangeA[2]);
+              mc->motionValues[mID+3]=randomFloatA(minimumRotationRangeA[0],maximumRotationRangeA[0]);
+              mc->motionValues[mID+4]=randomFloatA(minimumRotationRangeA[1],maximumRotationRangeA[1]);
+              mc->motionValues[mID+5]=randomFloatA(minimumRotationRangeA[2],maximumRotationRangeA[2]);
            } else
            {
               mc->motionValues[mID+0]=randomFloatA(minimumPositionRangeB[0],maximumPositionRangeB[0]);
               mc->motionValues[mID+1]=randomFloatA(minimumPositionRangeB[1],maximumPositionRangeB[1]);
               mc->motionValues[mID+2]=randomFloatA(minimumPositionRangeB[2],maximumPositionRangeB[2]);
-              mc->motionValues[mID+3]=randomFloatA(minimumPositionRangeB[0],maximumPositionRangeB[0]);
-              mc->motionValues[mID+4]=randomFloatA(minimumPositionRangeB[1],maximumPositionRangeB[1]);
-              mc->motionValues[mID+5]=randomFloatA(minimumPositionRangeB[2],maximumPositionRangeB[2]);
+              mc->motionValues[mID+3]=randomFloatA(minimumRotationRangeB[0],maximumRotationRangeB[0]);
+              mc->motionValues[mID+4]=randomFloatA(minimumRotationRangeB[1],maximumRotationRangeB[1]);
+              mc->motionValues[mID+5]=randomFloatA(minimumRotationRangeB[2],maximumRotationRangeB[2]);
            }
   }
  return 1;
