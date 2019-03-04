@@ -22,7 +22,8 @@
 
 
 #include "edit/bvh_cut_paste.h"
-
+/*
+//THIS IS NOT USED ANYWHERE
 double bvh_constrainAngleCentered180(double angle)
 {
    angle = fmod(angle,360.0);
@@ -30,13 +31,51 @@ double bvh_constrainAngleCentered180(double angle)
      { angle+=360.0; }
    return angle;
 }
+*/
 
+
+// We have circles A , B and C and we are trying to map circles A and B to circle C
+// Because neural networks get confused when coordinates jump from 0 to 360
+//
+//                                -360 A 0
+//
+//                                   0 B 360
+//
+//                                -180 C 180
+//
+//
+//      -270A . 90B . -90C             *                 90C  270B  -90A
+//
+//
+//                                  -1 C 1
+//
+//                                 179 B 181
+//
+//                                -181 C -179
+//
+//
+//We want to add 180 degrees to the model so 0 is oriented towards us..!
 double bvh_constrainAngleCentered0(double angle)
 {
-   angle = fmod(angle+180.0,360.0);
-   if (angle<0.0)
-     { angle+=360.0; }
-   return angle-180.0;
+    double angleFrom_minus360_to_plus360;
+    double angleRotated = angle+180;
+
+    if (angleRotated<0.0)
+    {
+      angleFrom_minus360_to_plus360 = (-1*fmod(-1*(angleRotated),360.0))+180;
+
+    } else
+    {
+      angleFrom_minus360_to_plus360 = (fmod((angleRotated),360.0))-180;
+    }
+
+   return angleFrom_minus360_to_plus360;
+
+//Why?
+//   angle = fmod(angle+180.0,360.0);
+//   if (angle<0.0)
+//     { angle+=360.0; }
+//   return angle-180.0;
 }
 
 
@@ -1019,10 +1058,10 @@ int bvh_testConstrainRotations()
   double angle = -720;
   for (i=0; i<1440; i++)
   {
-    fprintf(stderr,"| Angle:%0.2f | Centered at 0:%0.2f | Centered at 180:%0.2f  |\n",
+    fprintf(stderr,"| Angle:%0.2f | Centered at 0:%0.2f |\n", //| Centered at 180:%0.2f
     angle,
-    bvh_constrainAngleCentered0(angle),
-    bvh_constrainAngleCentered180(angle)
+    bvh_constrainAngleCentered0(angle)
+    //bvh_constrainAngleCentered180(angle)
     );
     angle=angle+1.0;
   }
