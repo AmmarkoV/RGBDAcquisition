@@ -247,6 +247,10 @@ int main(int argc, char **argv)
           bvh_ConstrainRotations(&bvhMotion);
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--flipOrientationForRandomization")==0)
+        {
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
         {
           if (i+12>=argc)  { incorrectArguments(); }
