@@ -10,6 +10,7 @@ void bvh_cleanTransform(
                       )
 {
  bvhTransform->jointsOccludedIn2DProjection=0;
+ bvhTransform->torso.exists=0;
 
  unsigned int jID=0;
  for (jID=0; jID<mc->jointHierarchySize; jID++)
@@ -109,22 +110,56 @@ int bvh_projectTo2D(
 
  if (occlusions)
      {
+       //First set all points as unoccluded..!
        for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
          bvhTransform->joint[jID].isOccluded=0;
        }
 
 
+       //Second test occlusions with torso..!
+       float torsoAverageDepth=0.0;
+
+       if ( bvhTransform->torso.exists )
+         {
+            torsoAverageDepth=(
+                                bvhTransform->joint[bvhTransform->torso.jID[0]].pos3D[2]+
+                                bvhTransform->joint[bvhTransform->torso.jID[1]].pos3D[2]+
+                                bvhTransform->joint[bvhTransform->torso.jID[2]].pos3D[2]+
+                                bvhTransform->joint[bvhTransform->torso.jID[3]].pos3D[2]
+                              ) /4;
+         }
+       //-------------------------------------------------------------
+
+
+
 
 
       // fprintf(stderr,"Occlusion checking..\n");
-       #define OCCLUSION_THRESHOLD 5 // pixels
+       #define OCCLUSION_THRESHOLD 6 // pixels
        //bvhTransform->joint[jID].isOccluded=0;
        unsigned int jID2=0;
        for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
         if (bvhTransform->joint[jID].pos2DCalculated)
         {
+
+         //If we have a torso ----------------------------------
+         if (bvhTransform->torso.exists)
+         {
+           if (bvhTransform->joint[jID].pos3D[2]>torsoAverageDepth)
+           {
+             bvhTransform->joint[jID].isOccluded=1;
+             fprintf(stderr,"TORSO OCCLUSION\n");
+             ++bvhTransform->jointsOccludedIn2DProjection;
+           }
+         }
+
+         //If the joint is still not occluded then do extra checks, otherwise conserve our CPU
+         if (!bvhTransform->joint[jID].isOccluded)
+         {
+         //Check Joint for occlusion with all other joints that may be in front of it
+         //------------------------------------------------------------------------------------------
          for (jID2=0; jID2<mc->jointHierarchySize; jID2++)
           {
            if (jID2!=jID)
@@ -149,8 +184,16 @@ int bvh_projectTo2D(
              }
            }
           }
+          //------------------------------------------------------------------------------------------
+         }
+
+
         }
        }
+
+
+
+
      }
 
  return (pointsDumped==mc->jointHierarchySize);

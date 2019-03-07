@@ -10,6 +10,23 @@
   12 13 14 15
 */
 
+struct rectangle3DPointsArea
+{
+  int allPointsExist,point1Exists,point2Exists,point3Exists,point4Exists;
+  float x1,y1,z1;
+  float x2,y2,z2;
+  float x3,y3,z3;
+  float x4,y4,z4;
+};
+
+struct rectangleArea
+{
+  int exists;
+  float x,y,width,height;
+  int jID[4];
+};
+
+
 struct BVH_TransformedJoint
 {
   double localToWorldTransformation[16];
@@ -32,6 +49,7 @@ struct BVH_TransformedJoint
 
 struct BVH_Transform
 {
+  struct rectangleArea torso;
   struct BVH_TransformedJoint joint[MAX_BVH_JOINT_HIERARCHY_SIZE];
   double centerPosition[3];
   unsigned int jointsOccludedIn2DProjection;

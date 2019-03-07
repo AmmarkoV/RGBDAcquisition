@@ -172,6 +172,99 @@ double fToD(float in)
 }
 
 
+float max(float a,float b)
+{
+  if (a>b) {return a;}
+  return b;
+}
+
+float min(float a,float b)
+{
+  if (a<b) {return a;}
+  return b;
+}
+
+
+int bvh_populateTorsoFromTransform(
+                                    struct BVH_MotionCapture * mc ,
+                                    struct BVH_Transform * bvhTransform
+                                  )
+{
+ bvhTransform->torso.exists=0;
+
+ unsigned int jID=0;
+ //Second test occlusions with torso..!
+ struct rectangle3DPointsArea torso={0};
+       //-------------------------------------------------------------
+       if ( bvh_getJointIDFromJointName(mc,"lshoulder",&jID) )
+       {
+         if (bvhTransform->joint[jID].pos2DCalculated)
+          {
+           torso.point1Exists=1;
+           torso.x1=bvhTransform->joint[jID].pos3D[0];
+           torso.y1=bvhTransform->joint[jID].pos3D[1];
+           torso.z1=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torso.jID[0]=jID;
+          }
+       }
+       if ( bvh_getJointIDFromJointName(mc,"rshoulder",&jID) )
+       {
+         if (bvhTransform->joint[jID].pos2DCalculated)
+          {
+           torso.point2Exists=1;
+           torso.x2=bvhTransform->joint[jID].pos3D[0];
+           torso.y2=bvhTransform->joint[jID].pos3D[1];
+           torso.z2=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torso.jID[1]=jID;
+          }
+       }
+       if ( bvh_getJointIDFromJointName(mc,"rhip",&jID) )
+       {
+         if (bvhTransform->joint[jID].pos2DCalculated)
+          {
+           torso.point3Exists=1;
+           torso.x3=bvhTransform->joint[jID].pos3D[0];
+           torso.y3=bvhTransform->joint[jID].pos3D[1];
+           torso.z3=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torso.jID[2]=jID;
+          }
+       }
+       if ( bvh_getJointIDFromJointName(mc,"lhip",&jID) )
+       {
+         if (bvhTransform->joint[jID].pos2DCalculated)
+          {
+           torso.point4Exists=1;
+           torso.x4=bvhTransform->joint[jID].pos3D[0];
+           torso.y4=bvhTransform->joint[jID].pos3D[1];
+           torso.z4=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torso.jID[3]=jID;
+          }
+       }
+
+       if ( (torso.point1Exists) && (torso.point2Exists) && (torso.point3Exists) && (torso.point4Exists) )
+         {
+            torso.allPointsExist=1;
+            float minimumX=min(torso.x1,min(torso.x2,min(torso.x3,torso.x4)));
+            float minimumY=min(torso.y1,min(torso.y2,min(torso.y3,torso.y4)));
+            float maximumX=max(torso.x1,min(torso.x2,min(torso.x3,torso.x4)));
+            float maximumY=max(torso.y1,min(torso.y2,min(torso.y3,torso.y4)));
+            bvhTransform->torso.exists=1;
+            bvhTransform->torso.x=minimumX;
+            bvhTransform->torso.y=minimumY;
+            bvhTransform->torso.width=maximumX-minimumX;
+            bvhTransform->torso.height=maximumY-minimumY;
+            return 1;
+         }
+       //-------------------------------------------------------------
+  return 0;
+}
+
+
+
+
+
+
+
 int bvh_loadTransformForFrame(
                                struct BVH_MotionCapture * bvhMotion ,
                                BVHFrameID fID ,
@@ -188,6 +281,7 @@ int bvh_loadTransformForFrame(
   unsigned int jID=0;
   //First of all we need to clean the BVH_Transform structure
 
+  bvhTransform->torso.exists=0;//Torso does not exist yet..
   bvhTransform->jointsOccludedIn2DProjection=0;
 
   if (fID==0)
@@ -509,12 +603,17 @@ int bvh_loadTransformForMotionBuffer(
   #endif // FIND_FAST_CENTER
 
 
-  if ( bvhMotion->jointHierarchy[jID].isRoot)
+   if ( bvhMotion->jointHierarchy[jID].isRoot)
       {
        bvhTransform->centerPosition[0]=bvhTransform->joint[jID].pos3D[0];
        bvhTransform->centerPosition[1]=bvhTransform->joint[jID].pos3D[1];
        bvhTransform->centerPosition[2]=bvhTransform->joint[jID].pos3D[2];
       }
+
+   if (!bvh_populateTorsoFromTransform(bvhMotion,bvhTransform))
+   {
+     fprintf(stderr,"Could not calculate torso\n");
+   }
 
   }
 
