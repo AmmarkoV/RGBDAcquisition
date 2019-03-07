@@ -68,10 +68,13 @@ double bvh_constrainAngleCentered0(double angle,unsigned int flipOrientation)
        angleFrom_minus360_to_plus360 = (fmod((angleRotated),360.0))-180;
      }
 
+    //If we want to flip orientation we just add or subtract 180 depending on the case
+    //To retrieve correct orientatiation we do the opposite
     if (flipOrientation)
     {
-      if (angleFrom_minus360_to_plus360<0.0) { angleFrom_minus360_to_plus360+=360.0; } else
-      if (angleFrom_minus360_to_plus360>=0.0) { angleFrom_minus360_to_plus360-=180.0; }
+      if (angleFrom_minus360_to_plus360<0.0) { angleFrom_minus360_to_plus360+=180.0; } else
+      if (angleFrom_minus360_to_plus360>0.0) { angleFrom_minus360_to_plus360-=180.0; } else
+                                             { angleFrom_minus360_to_plus360=180.0;  }
     }
 
    return angleFrom_minus360_to_plus360;
