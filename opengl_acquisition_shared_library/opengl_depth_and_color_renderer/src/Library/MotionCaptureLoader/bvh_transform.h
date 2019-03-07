@@ -12,18 +12,32 @@
 
 struct rectangle3DPointsArea
 {
-  int allPointsExist,point1Exists,point2Exists,point3Exists,point4Exists;
   float x1,y1,z1;
   float x2,y2,z2;
   float x3,y3,z3;
   float x4,y4,z4;
 };
 
+
+struct rectangle2DPointsArea
+{
+  char calculated;
+  float x1,y1;
+  float x2,y2;
+  float x3,y3;
+  float x4,y4;
+
+  float x,y,width,height;
+};
+
+
 struct rectangleArea
 {
-  int exists;
-  float x,y,width,height;
+  char exists,point1Exists,point2Exists,point3Exists,point4Exists;
   int jID[4];
+  float averageDepth;
+  struct rectangle2DPointsArea rectangle2D;
+  struct rectangle3DPointsArea rectangle3D;
 };
 
 
@@ -67,6 +81,11 @@ int bvh_loadTransformForFrame(
                                //,float * rotationOffset
                              );
 
+int bvh_populateRectangle2DFromProjections(
+                                           struct BVH_MotionCapture * mc ,
+                                           struct BVH_Transform * bvhTransform,
+                                           struct rectangleArea * area
+                                          );
 
 int bvh_loadTransformForMotionBuffer(
                                      struct BVH_MotionCapture * bvhMotion ,

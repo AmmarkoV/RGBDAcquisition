@@ -185,74 +185,71 @@ float min(float a,float b)
 }
 
 
-int bvh_populateTorsoFromTransform(
-                                    struct BVH_MotionCapture * mc ,
-                                    struct BVH_Transform * bvhTransform
-                                  )
+int bvh_populateTorso3DFromTransform(
+                                      struct BVH_MotionCapture * mc ,
+                                      struct BVH_Transform * bvhTransform
+                                    )
 {
  bvhTransform->torso.exists=0;
+ bvhTransform->torso.rectangle2D.calculated=0;
+
 
  unsigned int jID=0;
  //Second test occlusions with torso..!
- struct rectangle3DPointsArea torso={0};
        //-------------------------------------------------------------
        if ( bvh_getJointIDFromJointName(mc,"lshoulder",&jID) )
        {
-         if (bvhTransform->joint[jID].pos2DCalculated)
           {
-           torso.point1Exists=1;
-           torso.x1=bvhTransform->joint[jID].pos3D[0];
-           torso.y1=bvhTransform->joint[jID].pos3D[1];
-           torso.z1=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torso.point1Exists=1;
+           bvhTransform->torso.rectangle3D.x1=bvhTransform->joint[jID].pos3D[0];
+           bvhTransform->torso.rectangle3D.y1=bvhTransform->joint[jID].pos3D[1];
+           bvhTransform->torso.rectangle3D.z1=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[0]=jID;
           }
        }
        if ( bvh_getJointIDFromJointName(mc,"rshoulder",&jID) )
        {
-         if (bvhTransform->joint[jID].pos2DCalculated)
           {
-           torso.point2Exists=1;
-           torso.x2=bvhTransform->joint[jID].pos3D[0];
-           torso.y2=bvhTransform->joint[jID].pos3D[1];
-           torso.z2=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torso.point2Exists=1;
+           bvhTransform->torso.rectangle3D.x2=bvhTransform->joint[jID].pos3D[0];
+           bvhTransform->torso.rectangle3D.y2=bvhTransform->joint[jID].pos3D[1];
+           bvhTransform->torso.rectangle3D.z2=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[1]=jID;
           }
        }
        if ( bvh_getJointIDFromJointName(mc,"rhip",&jID) )
        {
-         if (bvhTransform->joint[jID].pos2DCalculated)
           {
-           torso.point3Exists=1;
-           torso.x3=bvhTransform->joint[jID].pos3D[0];
-           torso.y3=bvhTransform->joint[jID].pos3D[1];
-           torso.z3=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torso.point3Exists=1;
+           bvhTransform->torso.rectangle3D.x3=bvhTransform->joint[jID].pos3D[0];
+           bvhTransform->torso.rectangle3D.y3=bvhTransform->joint[jID].pos3D[1];
+           bvhTransform->torso.rectangle3D.z3=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[2]=jID;
           }
        }
        if ( bvh_getJointIDFromJointName(mc,"lhip",&jID) )
        {
-         if (bvhTransform->joint[jID].pos2DCalculated)
           {
-           torso.point4Exists=1;
-           torso.x4=bvhTransform->joint[jID].pos3D[0];
-           torso.y4=bvhTransform->joint[jID].pos3D[1];
-           torso.z4=bvhTransform->joint[jID].pos3D[2];
+           bvhTransform->torso.point4Exists=1;
+           bvhTransform->torso.rectangle3D.x4=bvhTransform->joint[jID].pos3D[0];
+           bvhTransform->torso.rectangle3D.y4=bvhTransform->joint[jID].pos3D[1];
+           bvhTransform->torso.rectangle3D.z4=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[3]=jID;
           }
        }
 
-       if ( (torso.point1Exists) && (torso.point2Exists) && (torso.point3Exists) && (torso.point4Exists) )
+       if (
+            (bvhTransform->torso.point1Exists) &&
+            (bvhTransform->torso.point2Exists) &&
+            (bvhTransform->torso.point3Exists) &&
+            (bvhTransform->torso.point4Exists)
+          )
          {
-            torso.allPointsExist=1;
-            float minimumX=min(torso.x1,min(torso.x2,min(torso.x3,torso.x4)));
-            float minimumY=min(torso.y1,min(torso.y2,min(torso.y3,torso.y4)));
-            float maximumX=max(torso.x1,min(torso.x2,min(torso.x3,torso.x4)));
-            float maximumY=max(torso.y1,min(torso.y2,min(torso.y3,torso.y4)));
             bvhTransform->torso.exists=1;
-            bvhTransform->torso.x=minimumX;
-            bvhTransform->torso.y=minimumY;
-            bvhTransform->torso.width=maximumX-minimumX;
-            bvhTransform->torso.height=maximumY-minimumY;
+            bvhTransform->torso.averageDepth = ( bvhTransform->torso.rectangle3D.z1 +
+                                                 bvhTransform->torso.rectangle3D.z2 +
+                                                 bvhTransform->torso.rectangle3D.z3 +
+                                                 bvhTransform->torso.rectangle3D.z4 ) / 4;
             return 1;
          }
        //-------------------------------------------------------------
@@ -262,6 +259,76 @@ int bvh_populateTorsoFromTransform(
 
 
 
+int bvh_populateRectangle2DFromProjections(
+                                           struct BVH_MotionCapture * mc ,
+                                           struct BVH_Transform * bvhTransform,
+                                           struct rectangleArea * area
+                                          )
+{
+  unsigned int existing2DPoints=0;
+  unsigned int jID=0;
+
+  if (area->exists)
+  {
+    //-----------------------------------------------------------
+    jID=area->jID[0];
+    if (bvhTransform->joint[jID].pos2DCalculated)
+    {
+        area->rectangle2D.x1=bvhTransform->joint[jID].pos2D[0];
+        area->rectangle2D.y1=bvhTransform->joint[jID].pos2D[1];
+        ++existing2DPoints;
+    }
+    //-----------------------------------------------------------
+    jID=area->jID[1];
+    if (bvhTransform->joint[jID].pos2DCalculated)
+    {
+        area->rectangle2D.x2=bvhTransform->joint[jID].pos2D[0];
+        area->rectangle2D.y2=bvhTransform->joint[jID].pos2D[1];
+        ++existing2DPoints;
+    }
+
+    //-----------------------------------------------------------
+    jID=area->jID[2];
+    if (bvhTransform->joint[jID].pos2DCalculated)
+    {
+        area->rectangle2D.x3=bvhTransform->joint[jID].pos2D[0];
+        area->rectangle2D.y3=bvhTransform->joint[jID].pos2D[1];
+        ++existing2DPoints;
+    }
+
+    //-----------------------------------------------------------
+    jID=area->jID[3];
+    if (bvhTransform->joint[jID].pos2DCalculated)
+    {
+        area->rectangle2D.x4=bvhTransform->joint[jID].pos2D[0];
+        area->rectangle2D.y4=bvhTransform->joint[jID].pos2D[1];
+        ++existing2DPoints;
+    }
+
+    if ( existing2DPoints == 4 )
+    {
+      area->rectangle2D.calculated=1;
+
+      float minimumX=min(area->rectangle2D.x1,min(area->rectangle2D.x2,min(area->rectangle2D.x3,area->rectangle2D.x4)));
+      float minimumY=min(area->rectangle2D.y1,min(area->rectangle2D.y2,min(area->rectangle2D.y3,area->rectangle2D.y4)));
+      float maximumX=max(area->rectangle2D.x1,min(area->rectangle2D.x2,min(area->rectangle2D.x3,area->rectangle2D.x4)));
+      float maximumY=max(area->rectangle2D.y1,min(area->rectangle2D.y2,min(area->rectangle2D.y3,area->rectangle2D.y4)));
+      area->rectangle2D.x=minimumX;
+      area->rectangle2D.y=minimumY;
+      area->rectangle2D.width=maximumX-minimumX;
+      area->rectangle2D.height=maximumY-minimumY;
+      return 1;
+    } else
+    {
+        fprintf(stderr,"Only found %u joints \n",existing2DPoints);
+    }
+  } else
+  {
+   fprintf(stderr,"Area does not exist, why get 2D positions?\n");
+  }
+
+ return 0;
+}
 
 
 
@@ -436,6 +503,12 @@ int bvh_loadTransformForFrame(
 
   }
 
+  if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
+   {
+     fprintf(stderr,"Could not calculate torso\n");
+   }
+
+
   return 1;
 }
 
@@ -609,13 +682,13 @@ int bvh_loadTransformForMotionBuffer(
        bvhTransform->centerPosition[1]=bvhTransform->joint[jID].pos3D[1];
        bvhTransform->centerPosition[2]=bvhTransform->joint[jID].pos3D[2];
       }
+  }
 
-   if (!bvh_populateTorsoFromTransform(bvhMotion,bvhTransform))
+if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
    {
      fprintf(stderr,"Could not calculate torso\n");
    }
 
-  }
 
   return 1;
 }

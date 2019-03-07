@@ -108,6 +108,13 @@ int bvh_projectTo2D(
       } //Joint Loop
 
 
+    //Also project our Torso coordinates..
+    bvh_populateRectangle2DFromProjections(
+                                           mc,
+                                           bvhTransform,
+                                           &bvhTransform->torso
+                                           );
+
  if (occlusions)
      {
        //First set all points as unoccluded..!
@@ -117,25 +124,8 @@ int bvh_projectTo2D(
        }
 
 
-       //Second test occlusions with torso..!
-       float torsoAverageDepth=0.0;
-
-       if ( bvhTransform->torso.exists )
-         {
-            torsoAverageDepth=(
-                                bvhTransform->joint[bvhTransform->torso.jID[0]].pos3D[2]+
-                                bvhTransform->joint[bvhTransform->torso.jID[1]].pos3D[2]+
-                                bvhTransform->joint[bvhTransform->torso.jID[2]].pos3D[2]+
-                                bvhTransform->joint[bvhTransform->torso.jID[3]].pos3D[2]
-                              ) /4;
-         }
-       //-------------------------------------------------------------
-
-
-
-
-
-      // fprintf(stderr,"Occlusion checking..\n");
+       //fprintf(stderr,"Occlusion checking..\n");
+       #define DEBUG_TORSO_OCCLUSIONS 0
        #define OCCLUSION_THRESHOLD 6 // pixels
        //bvhTransform->joint[jID].isOccluded=0;
        unsigned int jID2=0;
@@ -147,12 +137,49 @@ int bvh_projectTo2D(
          //If we have a torso ----------------------------------
          if (bvhTransform->torso.exists)
          {
-           if (bvhTransform->joint[jID].pos3D[2]>torsoAverageDepth)
+           //If the point is behind torso (which is a fast check) ----------------------------------
+           if (bvhTransform->joint[jID].pos3D[2]>bvhTransform->torso.averageDepth)
            {
+            //If the point is inside the 2D rectangle of the torso ----------------------------------
+            if (
+                 (bvhTransform->torso.rectangle2D.x < bvhTransform->joint[jID].pos2D[0]) &&
+                 (bvhTransform->joint[jID].pos2D[0] < bvhTransform->torso.rectangle2D.x + bvhTransform->torso.rectangle2D.width ) &&
+                 (bvhTransform->torso.rectangle2D.y < bvhTransform->joint[jID].pos2D[1]) &&
+                 (bvhTransform->joint[jID].pos2D[1] < bvhTransform->torso.rectangle2D.y + bvhTransform->torso.rectangle2D.height )
+              )
+            {
              bvhTransform->joint[jID].isOccluded=1;
-             fprintf(stderr,"TORSO OCCLUSION\n");
              ++bvhTransform->jointsOccludedIn2DProjection;
+
+             #if DEBUG_TORSO_OCCLUSIONS
+             fprintf(stderr,"TORSO OCCLUSION\n");
+             fprintf(
+                     stderr,"Point @ %0.2f,%0.2f -> box %0.2f,%0.2f (%0.2fx%0.2f)\n",
+                     bvhTransform->joint[jID].pos2D[0],
+                     bvhTransform->joint[jID].pos2D[1],
+                     bvhTransform->torso.rectangle2D.x,
+                     bvhTransform->torso.rectangle2D.y,
+                     bvhTransform->torso.rectangle2D.width,
+                     bvhTransform->torso.rectangle2D.height
+                    );
+              #endif // DEBUG_TORSO_OCCLUSIONS
+
+            }
+            //------
            }
+           #if DEBUG_TORSO_OCCLUSIONS
+            else
+           {
+               fprintf(
+                       stderr,"Point %s is behind torso (%0.2f < %0.2f )\n",
+                        mc->jointHierarchy[jID].jointName,
+                        bvhTransform->joint[jID].pos3D[2],
+                        bvhTransform->torso.averageDepth
+                       );
+           }
+           #endif // DEBUG_TORSO_OCCLUSIONS
+
+          //------
          }
 
          //If the joint is still not occluded then do extra checks, otherwise conserve our CPU
