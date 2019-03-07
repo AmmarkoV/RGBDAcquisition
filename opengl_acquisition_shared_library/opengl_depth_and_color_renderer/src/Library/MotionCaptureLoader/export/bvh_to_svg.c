@@ -17,6 +17,7 @@ int dumpBVHToSVGFrame(
    unsigned int jID=0;
    unsigned int parentJID=0;
 
+   unsigned int occludedListY=130;
 
    FILE * fp = fopen(svgFilename,"w");
    if (fp!=0)
@@ -80,6 +81,15 @@ int dumpBVHToSVGFrame(
 
         if (bvhTransform->joint[jID].isOccluded)
         {
+        parentJID = mc->jointHierarchy[jID].parentJoint;
+           occludedListY+=15;
+           fprintf(
+                   fp,
+                   "<text x=\"50\" y=\"%u\">Occluded %s/%s</text>\n",
+                   occludedListY,
+                   mc->jointHierarchy[parentJID].jointName,
+                   mc->jointHierarchy[jID].jointName
+                   );
 
         } else
         {

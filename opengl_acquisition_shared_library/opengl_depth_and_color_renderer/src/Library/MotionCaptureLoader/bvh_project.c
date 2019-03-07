@@ -123,17 +123,23 @@ int bvh_projectTo2D(
          bvhTransform->joint[jID].isOccluded=0;
        }
 
-
-       //fprintf(stderr,"Occlusion checking..\n");
+       #define USE_TORSO_OCCLUSIONS 0
        #define DEBUG_TORSO_OCCLUSIONS 0
        #define OCCLUSION_THRESHOLD 6 // pixels
        //bvhTransform->joint[jID].isOccluded=0;
+
+       #if DEBUG_TORSO_OCCLUSIONS
+        fprintf(stderr,"Occlusion checking..\n");
+       #endif // DEBUG_TORSO_OCCLUSIONS
+
        unsigned int jID2=0;
        for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
         if (bvhTransform->joint[jID].pos2DCalculated)
         {
 
+
+         #if USE_TORSO_OCCLUSIONS
          //If we have a torso ----------------------------------
          if (bvhTransform->torso.exists)
          {
@@ -166,6 +172,7 @@ int bvh_projectTo2D(
 
             }
             //------
+
            }
            #if DEBUG_TORSO_OCCLUSIONS
             else
@@ -181,6 +188,8 @@ int bvh_projectTo2D(
 
           //------
          }
+         #endif // USE_TORSO_OCCLUSIONS
+
 
          //If the joint is still not occluded then do extra checks, otherwise conserve our CPU
          if (!bvhTransform->joint[jID].isOccluded)
