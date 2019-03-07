@@ -55,27 +55,26 @@ double bvh_constrainAngleCentered180(double angle)
 //
 //
 //We want to add 180 degrees to the model so 0 is oriented towards us..!
-double bvh_constrainAngleCentered0(double angle)
+double bvh_constrainAngleCentered0(double angle,unsigned int flipOrientation)
 {
     double angleFrom_minus360_to_plus360;
     double angleRotated = angle+180;
 
-    if (angleRotated<0.0)
-    {
-      angleFrom_minus360_to_plus360 = (-1*fmod(-1*(angleRotated),360.0))+180;
+     if (angleRotated<0.0)
+     {
+       angleFrom_minus360_to_plus360 = (-1*fmod(-1*(angleRotated),360.0))+180;
+     } else
+     {
+       angleFrom_minus360_to_plus360 = (fmod((angleRotated),360.0))-180;
+     }
 
-    } else
+    if (flipOrientation)
     {
-      angleFrom_minus360_to_plus360 = (fmod((angleRotated),360.0))-180;
+      if (angleFrom_minus360_to_plus360<0.0) { angleFrom_minus360_to_plus360+=360.0; } else
+      if (angleFrom_minus360_to_plus360>=0.0) { angleFrom_minus360_to_plus360-=180.0; }
     }
 
    return angleFrom_minus360_to_plus360;
-
-//Why?
-//   angle = fmod(angle+180.0,360.0);
-//   if (angle<0.0)
-//     { angle+=360.0; }
-//   return angle-180.0;
 }
 
 
@@ -1030,7 +1029,7 @@ int bvh_OffsetPositionRotation(
  return 1;
 }
 
-int bvh_ConstrainRotations(struct BVH_MotionCapture * mc)
+int bvh_ConstrainRotations(struct BVH_MotionCapture * mc,unsigned int flipOrientation)
 {
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
@@ -1038,15 +1037,15 @@ int bvh_ConstrainRotations(struct BVH_MotionCapture * mc)
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
 
    double buffer = (double) mc->motionValues[mID+3];
-   buffer = bvh_constrainAngleCentered0(buffer);
+   buffer = bvh_constrainAngleCentered0(buffer,0);
    mc->motionValues[mID+3] = (float) buffer;
 
    buffer = (double) mc->motionValues[mID+4];
-   buffer = bvh_constrainAngleCentered0(buffer);
+   buffer = bvh_constrainAngleCentered0(buffer,flipOrientation);
    mc->motionValues[mID+4] = (float) buffer;
 
    buffer = (double) mc->motionValues[mID+5];
-   buffer = bvh_constrainAngleCentered0(buffer);
+   buffer = bvh_constrainAngleCentered0(buffer,0);
    mc->motionValues[mID+5] = (float) buffer;
   }
  return 1;
@@ -1060,9 +1059,10 @@ int bvh_testConstrainRotations()
   double angle = -720;
   for (i=0; i<1440; i++)
   {
-    fprintf(stderr,"| Angle:%0.2f | Centered at 0:%0.2f |\n", //| Centered at 180:%0.2f
+    fprintf(stderr,"| Angle:%0.2f | Centered at 0:%0.2f | Flipped at 0:%0.2f\n", //| Centered at 180:%0.2f
     angle,
-    bvh_constrainAngleCentered0(angle)
+    bvh_constrainAngleCentered0(angle,0),
+    bvh_constrainAngleCentered0(angle,1)
     //bvh_constrainAngleCentered180(angle)
     );
     angle=angle+1.0;

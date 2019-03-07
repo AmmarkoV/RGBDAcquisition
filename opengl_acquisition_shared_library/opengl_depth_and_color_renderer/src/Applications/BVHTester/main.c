@@ -69,7 +69,8 @@ int main(int argc, char **argv)
     unsigned int maxFrames = 0;
     unsigned int occlusions = 0;
     float scaleWorld=1.0;
-
+    unsigned int flipOrientation = 0;
+    unsigned int flipRandomizationOrientation = 0;
 
     struct BVH_MotionCapture bvhMotion={0};
 
@@ -128,7 +129,7 @@ int main(int argc, char **argv)
           bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
           //Change joint names..
           bvh_renameJointsForCompatibility(&bvhMotion);
-          bvh_ConstrainRotations(&bvhMotion);
+          bvh_ConstrainRotations(&bvhMotion,flipOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--to")==0)
@@ -224,7 +225,7 @@ int main(int argc, char **argv)
                                   cameraPositionOffset,
                                   cameraRotationOffset
                                  );
-          bvh_ConstrainRotations(&bvhMotion);
+          bvh_ConstrainRotations(&bvhMotion,flipOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--offsetPositionRotation")==0)
@@ -244,11 +245,12 @@ int main(int argc, char **argv)
                                      cameraPositionOffset,
                                      cameraRotationOffset
                                     );
-          bvh_ConstrainRotations(&bvhMotion);
+          bvh_ConstrainRotations(&bvhMotion,flipOrientation);
         } else
         //-----------------------------------------------------
-        if (strcmp(argv[i],"--flipOrientationForRandomization")==0)
+        if (strcmp(argv[i],"--flipRandomizationOrientation")==0)
         {
+             flipRandomizationOrientation=1;
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
@@ -286,7 +288,8 @@ int main(int argc, char **argv)
                                          maximumPosition,
                                          maximumRotation
                                        );
-          bvh_ConstrainRotations(&bvhMotion);
+
+          bvh_ConstrainRotations(&bvhMotion,flipRandomizationOrientation);
         } else
         //-----------------------------------------------------
         //-----------------------------------------------------
@@ -351,7 +354,7 @@ int main(int argc, char **argv)
                                                 maximumRotationRangeB
                                               );
 
-          bvh_ConstrainRotations(&bvhMotion);
+          bvh_ConstrainRotations(&bvhMotion,flipRandomizationOrientation);
         }
     }
 
