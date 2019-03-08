@@ -75,6 +75,19 @@ int dumpBVHToSVGFrame(
       }
 
 
+      //TORSO highlight
+      fprintf(
+              fp,
+              "<rect x=\"%0.2f\" y=\"%0.2f\" width=\"%0.2f\" height=\"%0.2f\" style=\"fill:blue;stroke:pink;stroke-width:5;fill-opacity:0.1;stroke-opacity:0.9\" />\n",
+              bvhTransform->torso.rectangle2D.x,
+              bvhTransform->torso.rectangle2D.y,
+              bvhTransform->torso.rectangle2D.width,
+              bvhTransform->torso.rectangle2D.height
+             );
+
+
+
+
 
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {

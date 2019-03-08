@@ -123,9 +123,9 @@ int bvh_projectTo2D(
          bvhTransform->joint[jID].isOccluded=0;
        }
 
-       #define USE_TORSO_OCCLUSIONS 0
+       #define USE_TORSO_OCCLUSIONS 1
        #define DEBUG_TORSO_OCCLUSIONS 0
-       #define OCCLUSION_THRESHOLD 6 // pixels
+       #define OCCLUSION_THRESHOLD 5 // pixels
        //bvhTransform->joint[jID].isOccluded=0;
 
        #if DEBUG_TORSO_OCCLUSIONS
@@ -138,13 +138,12 @@ int bvh_projectTo2D(
         if (bvhTransform->joint[jID].pos2DCalculated)
         {
 
-
          #if USE_TORSO_OCCLUSIONS
          //If we have a torso ----------------------------------
-         if (bvhTransform->torso.exists)
+         if ((bvhTransform->torso.exists) && (!mc->jointHierarchy[jID].isImmuneToTorsoOcclusions))
          {
            //If the point is behind torso (which is a fast check) ----------------------------------
-           if (bvhTransform->joint[jID].pos3D[2]>bvhTransform->torso.averageDepth)
+           if (bvhTransform->joint[jID].pos3D[2]<bvhTransform->torso.averageDepth)
            {
             //If the point is inside the 2D rectangle of the torso ----------------------------------
             if (
@@ -198,7 +197,7 @@ int bvh_projectTo2D(
          //------------------------------------------------------------------------------------------
          for (jID2=0; jID2<mc->jointHierarchySize; jID2++)
           {
-           if (jID2!=jID)
+           if ( (jID2!=jID)  )
            {
             if (bvhTransform->joint[jID2].pos2DCalculated)
              {

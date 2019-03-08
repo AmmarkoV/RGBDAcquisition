@@ -62,6 +62,8 @@ typedef unsigned int BVHFrameID;
 struct BVH_Joint
 {
   //--------------------
+  char isImmuneToTorsoOcclusions;
+  //--------------------
   char isRoot;
   char hasBrace;
   char isEndSite;

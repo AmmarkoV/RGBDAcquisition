@@ -135,6 +135,38 @@ void lowercase(char *a)
    while (*a!=0) { *a = tolower(*a); ++a; }
 }
 
+
+void bvh_setTorsoImmunityForJoints(struct BVH_MotionCapture * bvhMotion)
+{
+ unsigned int jID;
+ for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+      char * jN = bvhMotion->jointHierarchy[jID].jointName;
+      if (
+           (strcmp(jN,"abdomen")==0) ||
+           (strcmp(jN,"chest")==0) ||
+           (strcmp(jN,"neck")==0) ||
+           (strcmp(jN,"lcollar")==0) ||
+           (strcmp(jN,"rcollar")==0) ||
+           (strcmp(jN,"lshoulder")==0) ||
+           (strcmp(jN,"rshoulder")==0) ||
+           (strcmp(jN,"rbuttock")==0) ||
+           (strcmp(jN,"rhip")==0) ||
+           (strcmp(jN,"lbuttock")==0) ||
+           (strcmp(jN,"lhip")==0) ||
+           (strcmp(jN,"hip")==0)
+         )
+      {
+        bvhMotion->jointHierarchy[jID].isImmuneToTorsoOcclusions=1;
+      } else
+      {
+        bvhMotion->jointHierarchy[jID].isImmuneToTorsoOcclusions=0;
+      }
+   }
+}
+
+
+
 void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
 {
   unsigned int jID=0;
@@ -251,6 +283,9 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
             { snprintf(jN,MAX_BVH_JOINT_NAME,"rhand"); }
      //-------------------------------------------------------------------------------------------------
    }
+
+
+  bvh_setTorsoImmunityForJoints(bvhMotion);
 }
 
 

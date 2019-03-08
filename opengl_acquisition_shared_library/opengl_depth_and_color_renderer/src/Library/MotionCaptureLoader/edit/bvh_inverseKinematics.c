@@ -18,7 +18,7 @@ int mirrorBVHThroughIK(
                        BVHJointID jIDB
                       )
 {
-  float * motionBuffer;
+   float * motionBuffer=0;
 
    bvh_loadTransformForMotionBuffer(
                                      mc,
