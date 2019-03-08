@@ -1032,7 +1032,7 @@ int bvh_SetPositionRotation(
                              float * rotation
                             )
 {
-unsigned int fID=0;
+  unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
