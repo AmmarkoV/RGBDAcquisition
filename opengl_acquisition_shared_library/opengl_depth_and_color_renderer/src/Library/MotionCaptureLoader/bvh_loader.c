@@ -1108,6 +1108,28 @@ int bvh_testConstrainRotations()
  return 0;
 }
 
+int bvh_InterpolateMotion(
+                           struct BVH_MotionCapture * mc
+                         )
+{
+  if (mc==0) { return 0; }
+
+  return 0;
+
+  float * newMotionValues = (float*) malloc(sizeof(float) * mc->motionValuesSize * 2 );
+
+  float * oldMotionValues = mc->motionValues;x
+  mc->numberOfFrames=mc->numberOfFrames*2;
+  mc->numberOfFramesEncountered=mc->numberOfFrames;
+  mc->motionValuesSize+=mc->motionValuesSize*2;
+  mc->motionValues = newMotionValues;
+  free(oldMotionValues);
+
+  return 1;
+}
+
+
+
 int bvh_GrowMocapFileByCopyingExistingMotions(
                                               struct BVH_MotionCapture * mc,
                                               unsigned int timesToRepeat

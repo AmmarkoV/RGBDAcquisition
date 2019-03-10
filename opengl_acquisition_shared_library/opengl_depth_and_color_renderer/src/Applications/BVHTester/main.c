@@ -199,6 +199,16 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
 
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--interpolate")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          bvh_InterpolateMotion(
+                                &bvhMotion
+                               );
+        } else
+        //-----------------------------------------------------
+
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--repeat")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
