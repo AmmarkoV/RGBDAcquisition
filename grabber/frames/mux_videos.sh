@@ -25,7 +25,7 @@ THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"`
 #FILTER=' -filter_complex "overlay" ' 
 
 
-ffmpeg -framerate 30 -i $DATASET_A/$PATTERN_A -framerate 30 -i $DATASET_B/$PATTERN_B  -filter_complex "[1]split[m][a]; [a]geq='if(gt(lum(X,Y),24),255,0)',hue=s=0[al]; [m][al]alphamerge[ovr]; [0][ovr]overlay" -strict -2 -y -r 30 -threads 8 -crf 10 -pix_fmt yuv420p ./muxHD-$DATASET-$THEDATETAG.webm
+ffmpeg -framerate 30 -i $DATASET_A/$PATTERN_A -framerate 30 -i $DATASET_B/$PATTERN_B  -filter_complex "[1]split[m][a]; [a]geq='if(gt(lum(X,Y),32),255,0)',hue=s=0[al]; [m][al]alphamerge[ovr]; [0][ovr]overlay" -strict -2 -y -r 30 -threads 8 -crf 9 -pix_fmt yuv420p ./muxHD-$DATASET-$THEDATETAG.webm
  
 #./mux_videos.sh GOPR3229.MP4-data visualization/colorFrame_0_%05d_rendered.png bvhRendering_GOPR3229.MP4-data colorFrame_0_%05d.jpg
 
