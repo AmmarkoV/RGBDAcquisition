@@ -135,6 +135,63 @@ void lowercase(char *a)
    while (*a!=0) { *a = tolower(*a); ++a; }
 }
 
+void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
+{
+ unsigned int pJID;
+ unsigned int jID;
+ for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+    pJID=bvhMotion->jointHierarchy[jID].parentJoint;
+    char * jPN = bvhMotion->jointHierarchy[pJID].jointName;
+    char * jN = bvhMotion->jointHierarchy[jID].jointName;
+
+    //----------------------------------------------------------------
+    if (
+        (strcmp(jN,"abdomen")==0) || (strcmp(jPN,"abdomen")==0) || (strcmp(jN,"chest")==0) || (strcmp(jPN,"chest")==0) || (strcmp(jN,"neck")==0) || (strcmp(jPN,"neck")==0)
+        || (strcmp(jN,"hip")==0) || (strcmp(jPN,"hip")==0)
+       )
+       {
+        bvhMotion->jointHierarchy[jID].isAPartOfTorso=1;
+       } else
+    //----------------------------------------------------------------
+    if (
+        (strcmp(jN,"neck")==0) || (strcmp(jPN,"neck")==0) || (strcmp(jN,"nose")==0) || (strcmp(jPN,"nose")==0) || (strcmp(jN,"head")==0) || (strcmp(jPN,"head")==0)
+       )
+       {
+        bvhMotion->jointHierarchy[jID].isAPartOfHead=1;
+       } else
+    //----------------------------------------------------------------
+    if (
+        (strcmp(jN,"rshoulder")==0) || (strcmp(jPN,"rshoulder")==0) || (strcmp(jN,"relbow")==0) || (strcmp(jPN,"relbow")==0) || (strcmp(jN,"rhand")==0)
+       )
+       {
+        bvhMotion->jointHierarchy[jID].isAPartOfRightArm=1;
+       }
+    //----------------------------------------------------------------
+    if (
+        (strcmp(jN,"lshoulder")==0) || (strcmp(jPN,"lshoulder")==0) || (strcmp(jN,"lelbow")==0) || (strcmp(jPN,"lelbow")==0) || (strcmp(jN,"lhand")==0)
+       )
+       {
+        bvhMotion->jointHierarchy[jID].isAPartOfLeftArm=1;
+       }
+    //----------------------------------------------------------------
+    if (
+        (strcmp(jN,"rhip")==0) || (strcmp(jN,"rknee")==0) || (strcmp(jN,"rfoot")==0) || (strcmp(jPN,"rfoot")==0)
+        )
+       {
+        bvhMotion->jointHierarchy[jID].isAPartOfRightFoot=1;
+       }
+      //----------------------------------------------------------------
+      if (
+          (strcmp(jN,"lhip")==0) || (strcmp(jN,"lknee")==0) || (strcmp(jN,"lfoot")==0) || (strcmp(jPN,"lfoot")==0)
+         )
+         {
+            bvhMotion->jointHierarchy[jID].isAPartOfLeftFoot=1;
+         }
+     //----------------------------------------------------------------
+   }
+ }
+
 
 void bvh_setTorsoImmunityForJoints(struct BVH_MotionCapture * bvhMotion)
 {
@@ -285,8 +342,13 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
    }
 
 
+  bvh_setLimbFlags(bvhMotion);
   bvh_setTorsoImmunityForJoints(bvhMotion);
 }
+
+
+
+
 
 
 //A very brief documentation of the BVH spec :

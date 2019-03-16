@@ -64,8 +64,12 @@ struct BVH_Joint
   //--------------------
   char isImmuneToTorsoOcclusions;
   //--------------------
-   char isAPartOfFeet;
-   char isAPartOfHands;
+   char isAPartOfLeftFoot;
+   char isAPartOfRightFoot;
+   char isAPartOfLeftArm;
+   char isAPartOfRightArm;
+   char isAPartOfLeftHand;
+   char isAPartOfRightHand;
    char isAPartOfHead;
    char isAPartOfTorso;
   //--------------------

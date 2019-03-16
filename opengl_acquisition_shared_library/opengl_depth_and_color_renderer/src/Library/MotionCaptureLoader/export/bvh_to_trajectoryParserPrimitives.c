@@ -16,12 +16,19 @@ void dumpSphereHeader(struct BVH_MotionCapture * mc,FILE *fp)
       if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"OBJECT_TYPE(sT%u,cube)\n",jID);   } else
                                                 { fprintf(fp,"OBJECT_TYPE(sT%u,sphere)\n",jID); }
 
-      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 0,255,0,0,0 ,3.0,3.0,3.0)\n",jID,jID);   } else
+      if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 0,248,138,35,0 ,3.0,3.0,3.0)\n",jID,jID);   } else
       if ( mc->jointHierarchy[jID].isRoot )     { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,255,0,0,0,4.5,4.5,4.5)\n",jID,jID); } else
-                                                { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,2.5,2.5,2.5)\n",jID,jID);   }
+                                                { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 205,35,240,0,0 ,2.5,2.5,2.5)\n",jID,jID);   }
 
 
       connectorColorR=255; connectorColorG=255; connectorColorB=0;
+      if ( mc->jointHierarchy[jID].isAPartOfRightFoot ) { connectorColorR=0; connectorColorG=255; connectorColorB=0; } else
+      if ( mc->jointHierarchy[jID].isAPartOfRightArm )  { connectorColorR=0; connectorColorG=255; connectorColorB=0; } else
+      if ( mc->jointHierarchy[jID].isAPartOfLeftFoot )  { connectorColorR=255; connectorColorG=0; connectorColorB=0; } else
+      if ( mc->jointHierarchy[jID].isAPartOfLeftArm )   { connectorColorR=255; connectorColorG=0; connectorColorB=0; } else
+      if ( mc->jointHierarchy[jID].isAPartOfHead)       { connectorColorR=0; connectorColorG=0; connectorColorB=255; } else
+      if ( mc->jointHierarchy[jID].isAPartOfTorso )     { connectorColorR=0; connectorColorG=0; connectorColorB=255; }
+
 
       if (bhv_jointHasParent(mc,jID))
       {
@@ -48,7 +55,7 @@ void dumpSphereBody(
        )
     {
      fprintf(fp,"POS(camera,%u,60.0,0.0,252.0,0.0,0.0,0.0,0.0)\n",fID);
-     fprintf(fp,"POS(floor,%u,0.0,0.0,0.0,0.0,0.0,0.0,0.0)\n",fID);
+     //fprintf(fp,"POS(floor,%u,0.0,0.0,0.0,0.0,0.0,0.0,0.0)\n",fID);
 
      unsigned int jID=0;
      for (jID=0; jID<mc->jointHierarchySize; jID++)
@@ -93,8 +100,8 @@ int dumpBVHToTrajectoryParserPrimitives(const char * filename , struct BVH_Motio
     fprintf(fp,"MOVE_VIEW(1)\n\n");
 
 
-    fprintf(fp,"OBJECT_TYPE(floorType,cube)\n");
-    fprintf(fp,"OBJECT(floor,floorType,0,255,0,0 ,0, 10.0,10.0,10.0)\n");
+    //fprintf(fp,"OBJECT_TYPE(floorType,grid)\n");
+    //fprintf(fp,"OBJECT(floor,floorType,0,255,0,0 ,0, 10.0,10.0,10.0)\n");
     //Instantiate objects that will draw our skeleton
     //------------------------------------------------
       dumpSphereHeader(mc,fp);
