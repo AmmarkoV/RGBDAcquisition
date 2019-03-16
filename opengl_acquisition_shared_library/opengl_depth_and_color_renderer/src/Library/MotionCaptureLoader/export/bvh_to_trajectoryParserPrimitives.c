@@ -9,6 +9,8 @@
 void dumpSphereHeader(struct BVH_MotionCapture * mc,FILE *fp)
 {
  unsigned int jID;
+ unsigned int connectorColorR=255,connectorColorG=255,connectorColorB=0;
+
     for (jID=0; jID<mc->jointHierarchySize; jID++)
     {
       if ( mc->jointHierarchy[jID].isEndSite )  { fprintf(fp,"OBJECT_TYPE(sT%u,cube)\n",jID);   } else
@@ -19,9 +21,11 @@ void dumpSphereHeader(struct BVH_MotionCapture * mc,FILE *fp)
                                                 { fprintf(fp,"RIGID_OBJECT(s%u,sT%u, 255,0,0,0,0 ,2.5,2.5,2.5)\n",jID,jID);   }
 
 
+      connectorColorR=255; connectorColorG=255; connectorColorB=0;
+
       if (bhv_jointHasParent(mc,jID))
       {
-        fprintf(fp,"CONNECTOR(s%u,s%u, 255,255,0,100, 3.5)\n",jID,mc->jointHierarchy[jID].parentJoint);
+        fprintf(fp,"CONNECTOR(s%u,s%u,%u,%u,%u,100, 3.5)\n",jID,mc->jointHierarchy[jID].parentJoint,connectorColorR,connectorColorG,connectorColorB);
       }
     }
     fprintf(fp,"\n");
