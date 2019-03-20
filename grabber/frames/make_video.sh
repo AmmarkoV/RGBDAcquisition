@@ -23,7 +23,7 @@ THEDATETAG=`date +"%y-%m-%d_%H-%M-%S"`
 
 cd $DATASET 
 #-crf 0 is lossless -crf 51 is terrible quality
-ffmpeg -framerate 30 -i colorFrame_0_%05d.$EXTENSION -y -r 30 -threads 8 -crf 11 -pix_fmt yuv420p  ../outHD-$DATASET-$THEDATETAG.webm  # -b:v 30000k  -s 640x480 
+ffmpeg -framerate 30 -i colorFrame_0_%05d.$EXTENSION -y -r 30 -threads 8 -crf 9 -pix_fmt yuv420p  ../outHD-$DATASET-$THEDATETAG.webm  # -b:v 30000k  -s 640x480 
 cd ..
 
 cd $STARTDIR 
