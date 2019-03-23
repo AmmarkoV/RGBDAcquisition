@@ -81,7 +81,30 @@ int dumpBVHToSVGCSV(
 
   if (renderConfig->isDefined)
   {
+    renderer.fx=renderConfig->fX;
+    renderer.fy=renderConfig->fY;
+    renderer.skew=1.0;
+    renderer.cx=renderConfig->cX;
+    renderer.cy=renderConfig->cY;
+    renderer.near=1.0;
+    renderer.far=10000.0;
+    renderer.width=renderConfig->width;
+    renderer.height=renderConfig->height;
+
+    //renderer.cameraOffsetPosition[4];
+    //renderer.cameraOffsetRotation[4];
+    //renderer.removeObjectPosition;
+
+
+    //renderer.projectionMatrix[16];
+    //renderer.viewMatrix[16];
+    //renderer.modelMatrix[16];
+    //renderer.modelViewMatrix[16];
+    //renderer.viewport[4];
+
     simpleRendererInitializeFromExplicitConfiguration(&renderer);
+    fprintf(stderr,"Direct Rendering is not implemented yet, please don't use it..\n");
+    exit(1);
   } else
   {
    //This is the normal rendering where we just simulate our camera center
@@ -185,7 +208,9 @@ int dumpBVHToSVGCSV(
   //------------------------------------------------------------------------------------------
   fprintf(stderr,"Joints : %u invisible / %u visible ",invisibleJoints,visibleJoints);
   if (occlusions) { fprintf(stderr,"(occlusions enabled)\n"); } else
-                  { fprintf(stderr,"(occlusions disabled)\n");      }
+                  { fprintf(stderr,"(occlusions disabled)\n");}
+  if (renderConfig->isDefined)  { fprintf(stderr,"External Renderer Configuration\n");  } else
+                                { fprintf(stderr,"Regular camera position rendering\n");}
   fprintf(stderr,"Filtered out CSV poses : %u\n",filteredOutCSVPoses);
   fprintf(stderr,"Filtered behind camera : %u\n",filteredOutCSVBehindPoses);
   fprintf(stderr,"Filtered out of camera frame : %u\n",filteredOutCSVOutPoses);

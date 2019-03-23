@@ -4,7 +4,6 @@
 
 struct simpleRenderer
 {
-
   float fx;
   float fy;
   float skew;
