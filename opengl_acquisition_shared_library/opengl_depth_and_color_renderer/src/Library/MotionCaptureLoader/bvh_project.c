@@ -187,9 +187,11 @@ int bvh_projectTo2D(
            pos3DFloat[2]=(float)bvhTransform->joint[jID].pos3D[2];
            pos3DFloat[3]=0.0;
 
-   //#define DO_TEST 0
-
-   #if DO_TEST
+    //Two cases here , we either want to directly render using the matrices in our simplerenderer
+    //-------------------------------------------------------------------------------------------
+    if (directRendering)
+          {
+           fprintf(stderr,"DIRECT RENDER ");
            simpleRendererRenderUsingPrecalculatedMatrices(
                                                           renderer,
                                                           pos3DFloat,
@@ -197,7 +199,13 @@ int bvh_projectTo2D(
                                                           &position2DY,
                                                           &position2DW
                                                          );
-   #else
+          }
+    //-------------------------------------------------------------------------------------------
+    //Or we want to render using our camera position where we have to do some extra matrix operations
+    //to recenter our mesh and transform it accordingly
+    //-------------------------------------------------------------------------------------------
+        else
+          {
            float pos3DCenterFloat[4];
            pos3DCenterFloat[0]=(float)bvhTransform->centerPosition[0];
            pos3DCenterFloat[1]=(float)bvhTransform->centerPosition[1];
@@ -216,13 +224,14 @@ int bvh_projectTo2D(
                                  &position2DX,
                                  &position2DY,
                                  &position2DW
-                                );
+                               );
 
             //Should this only happen when position2DW>=0.0
             //bvhTransform->joint[jID].pos3D[0] = (double) pos3DCenterFloat[0];
             //bvhTransform->joint[jID].pos3D[1] = (double) pos3DCenterFloat[1];
-            //bvhTransform->joint[jID].pos3D[2] = (double) pos3DCenterFloat[2];
-    #endif // DO_TEST
+            //bvhTransform->joint[jID].pos3D[2] = (double) pos3DCenterFloat[2];               );
+           }
+    //-------------------------------------------------------------------------------------------
 
            if (position2DW<0.0)
            {
@@ -237,7 +246,7 @@ int bvh_projectTo2D(
            }
 
         ++pointsDumped;
-      } //Joint Loop
+      } //Joint Loop , render all joint points..
 
 
     //Also project our Torso coordinates..
@@ -248,8 +257,8 @@ int bvh_projectTo2D(
                                           );
 
 
-//------------------------------------------------------------------------------------------
- if (occlusions)
+    //------------------------------------------------------------------------------------------
+    if (occlusions)
      {
        bvh_projectTo2DHandleOcclusions(
                                        mc,
