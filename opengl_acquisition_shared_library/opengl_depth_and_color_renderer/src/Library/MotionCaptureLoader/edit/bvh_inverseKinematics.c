@@ -8,7 +8,6 @@
 //https://www.gamasutra.com/blogs/LuisBermudez/20170804/303066/3_Simple_Steps_to_Implement_Inverse_Kinematics.php
 //https://groups.csail.mit.edu/drl/journal_club/papers/033005/buss-2004.pdf
 //https://simtk-confluence.stanford.edu/display/OpenSim/How+Inverse+Kinematics+Works
-
 int mirrorBVHThroughIK(
                        struct BVH_MotionCapture * mc,
                        struct BVH_Transform * bvhTransform,
@@ -26,9 +25,9 @@ int mirrorBVHThroughIK(
                                      bvhTransform
                                    );
 
-  if ( performPointProjectionsForFrame(mc,bvhTransform,fID,renderer,0) )
+  if ( performPointProjectionsForFrame(mc,bvhTransform,fID,renderer,0,0) )
      {
-        fprintf(stderr,"Todo: mirrorBVHThroughIK %u \n",fID);
+        fprintf(stderr,"Not Implemented, Todo: mirrorBVHThroughIK %u \n",fID);
 
         fprintf(stderr,"%u=>%0.2f,%0.2f,%0.2f,%0.2f",
                 jIDA,

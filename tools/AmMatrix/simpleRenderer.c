@@ -3,9 +3,6 @@
 #include "matrixOpenGL.h"
 #include <stdio.h>
 
-
-
-
 int simpleRendererRender(
                          struct simpleRenderer * sr ,
                          float * position3D,
@@ -28,26 +25,24 @@ int simpleRendererRender(
  ///                       CAMERA MATRICES ETC
  ///--------------------------------------------------------------------
  create4x4ModelTransformation(
-                                                        modelTransformationD,
-                                                        //Rotation Component
-                                                        (double) sr->cameraOffsetRotation[0],//heading,
-                                                        (double) sr->cameraOffsetRotation[1],//pitch,
-                                                        (double) sr->cameraOffsetRotation[2],//roll,
-                                                        ROTATION_ORDER_RPY,
-                                                        //Translation Component
-                                                        (double) sr->cameraOffsetPosition[0],
-                                                        (double) sr->cameraOffsetPosition[1],
-                                                        (double) sr->cameraOffsetPosition[2],
-                                                        //Scale Component
-                                                        (double) 1.0,
-                                                        (double) 1.0,
-                                                        (double) 1.0
-                              );
+                              modelTransformationD,
+                              //Rotation Component
+                              (double) sr->cameraOffsetRotation[0],//heading,
+                              (double) sr->cameraOffsetRotation[1],//pitch,
+                              (double) sr->cameraOffsetRotation[2],//roll,
+                              ROTATION_ORDER_RPY,
+                              //Translation Component
+                              (double) sr->cameraOffsetPosition[0],
+                              (double) sr->cameraOffsetPosition[1],
+                              (double) sr->cameraOffsetPosition[2],
+                              //Scale Component
+                              (double) 1.0,
+                              (double) 1.0,
+                              (double) 1.0
+                             );
  ///--------------------------------------------------------------------
  copy4x4DMatrixToF(modelTransformationF,modelTransformationD);
  multiplyTwo4x4FMatrices(sr->modelViewMatrix,sr->viewMatrix,modelTransformationF);
-
-
  ///--------------------------------------------------------------------
 
 
@@ -72,10 +67,10 @@ int simpleRendererRender(
      //This is the old way to do this rotation
      doRPYTransformation(
                          objectMatrixRotation,
-                        (double) objectRotation[0],
-                        (double) objectRotation[1],
-                        (double) objectRotation[2]
-                       );
+                         (double) objectRotation[0],
+                         (double) objectRotation[1],
+                         (double) objectRotation[2]
+                        );
     } else
     {
      //fprintf(stderr,"Using new model transform code\n");
@@ -94,33 +89,33 @@ int simpleRendererRender(
    double resultPoint3D[4];
 
 
- point3D[0]=(double) (position3D[0]-center3D[0]);
- point3D[1]=(double) (position3D[1]-center3D[1]);
- point3D[2]=(double) (position3D[2]-center3D[2]);
- point3D[3]=(double) (1.0);
+  point3D[0]=(double) (position3D[0]-center3D[0]);
+  point3D[1]=(double) (position3D[1]-center3D[1]);
+  point3D[2]=(double) (position3D[2]-center3D[2]);
+  point3D[3]=(double) (1.0);
 
 
- transform3DPointVectorUsing4x4Matrix(
+  transform3DPointVectorUsing4x4Matrix(
                                        resultPoint3D,
                                        objectMatrixRotation,
                                        point3D
-                                     );
+                                      );
 
 
- float final3DPosition[4];
+  float final3DPosition[4];
 
- if (sr->removeObjectPosition)
-  {
-   final3DPosition[0]=(float) resultPoint3D[0]+sr->cameraOffsetPosition[0];
-   final3DPosition[1]=(float) resultPoint3D[1]+sr->cameraOffsetPosition[1];
-   final3DPosition[2]=(float) resultPoint3D[2]+sr->cameraOffsetPosition[2];
-  } else
-  {
-   final3DPosition[0]=(float) resultPoint3D[0]+center3D[0]+sr->cameraOffsetPosition[0];
-   final3DPosition[1]=(float) resultPoint3D[1]+center3D[1]+sr->cameraOffsetPosition[1];
-   final3DPosition[2]=(float) resultPoint3D[2]+center3D[2]+sr->cameraOffsetPosition[2];
-  }
- final3DPosition[3]=(float) 0.0;//resultPoint3D[3];
+  if (sr->removeObjectPosition)
+   {
+    final3DPosition[0]=(float) resultPoint3D[0]+sr->cameraOffsetPosition[0];
+    final3DPosition[1]=(float) resultPoint3D[1]+sr->cameraOffsetPosition[1];
+    final3DPosition[2]=(float) resultPoint3D[2]+sr->cameraOffsetPosition[2];
+   } else
+   {
+    final3DPosition[0]=(float) resultPoint3D[0]+center3D[0]+sr->cameraOffsetPosition[0];
+    final3DPosition[1]=(float) resultPoint3D[1]+center3D[1]+sr->cameraOffsetPosition[1];
+    final3DPosition[2]=(float) resultPoint3D[2]+center3D[2]+sr->cameraOffsetPosition[2];
+   }
+  final3DPosition[3]=(float) 0.0;//resultPoint3D[3];
  ///--------------------------------------------------------------------
 
 
@@ -151,14 +146,14 @@ int simpleRendererRender(
 
 
 
-int deadSimpleRendererRender(
-                             struct simpleRenderer * sr ,
-                             float * position3D,
-                             ///---------------
-                             float * output2DX,
-                             float * output2DY,
-                             float * output2DW
-                            )
+int simpleRendererRenderUsingPrecalculatedMatrices(
+                                                    struct simpleRenderer * sr ,
+                                                    float * position3D,
+                                                    ///---------------
+                                                    float * output2DX,
+                                                    float * output2DY,
+                                                    float * output2DW
+                                                  )
 {
  ///--------------------------------------------------------------------
  ///                         FINAL PROJECTION

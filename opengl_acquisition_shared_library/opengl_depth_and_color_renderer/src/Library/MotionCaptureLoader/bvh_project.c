@@ -163,7 +163,8 @@ int bvh_projectTo2D(
                      struct BVH_MotionCapture * mc,
                      struct BVH_Transform     * bvhTransform,
                      struct simpleRenderer    * renderer,
-                     unsigned int               occlusions
+                     unsigned int               occlusions,
+                     unsigned int               directRendering
                    )
 {
       bvhTransform->jointsOccludedIn2DProjection=0;
@@ -189,13 +190,13 @@ int bvh_projectTo2D(
    //#define DO_TEST 0
 
    #if DO_TEST
-           deadSimpleRendererRender(
-                                     renderer,
-                                     pos3DFloat,
-                                     &position2DX,
-                                     &position2DY,
-                                     &position2DW
-                                   );
+           simpleRendererRenderUsingPrecalculatedMatrices(
+                                                          renderer,
+                                                          pos3DFloat,
+                                                          &position2DX,
+                                                          &position2DY,
+                                                          &position2DW
+                                                         );
    #else
            float pos3DCenterFloat[4];
            pos3DCenterFloat[0]=(float)bvhTransform->centerPosition[0];

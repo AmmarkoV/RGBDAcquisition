@@ -16,7 +16,8 @@ int performPointProjectionsForFrame(
                                     struct BVH_Transform * bvhTransform,
                                     unsigned int fID,
                                     struct simpleRenderer * renderer,
-                                    unsigned int occlusions
+                                    unsigned int occlusions,
+                                    unsigned int directRendering
                                    );
 
 int performPointProjectionsForMotionBuffer(
@@ -24,7 +25,8 @@ int performPointProjectionsForMotionBuffer(
                                             struct BVH_Transform * bvhTransform,
                                             float * motionBuffer,
                                             struct simpleRenderer * renderer,
-                                            unsigned int occlusions
+                                            unsigned int occlusions,
+                                            unsigned int directRendering
                                            );
 
 int dumpBVHToSVGCSV(
@@ -33,10 +35,7 @@ int dumpBVHToSVGCSV(
                     int convertToSVG,
                     int convertToCSV,
                     struct BVH_MotionCapture * mc,
-                    unsigned int width,
-                    unsigned int height,
-                    float fX,
-                    float fY,
+                    struct BVH_RendererConfiguration * renderConfig,
                     unsigned int occlusions,
                     unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                     unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,

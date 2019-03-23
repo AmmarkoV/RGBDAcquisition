@@ -23,12 +23,12 @@
 #include "../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h"
 
 #include  "../../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include  "../../../../../tools/AmMatrix/matrixOpenGL.h"
+
 
 void prepareHuman36MRotationMatrix(float * rotationMatrix,float rX,float rY,float rZ)
 {
-    double rXM[9];
-    double rYM[9];
-    double rZM[9];
+    double rXM[9],rYM[9],rZM[9];
     double intermediateR[9];
 
     //R1x=np.matrix([[1,0,0],    [0,np.cos(Rx),-np.sin(Rx)], [0,np.sin(Rx),np.cos(Rx)] ]) #[1 0 0; 0 cos(obj.Params(1)) -sin(obj.Params(1)); 0 sin(obj.Params(1)) cos(obj.Params(1))]
@@ -108,7 +108,17 @@ int main(int argc, char **argv)
     unsigned int flipRandomizationOrientation = 0;
 
     struct BVH_MotionCapture bvhMotion={0};
+
     struct BVH_RendererConfiguration renderingConfiguration={0};
+
+    // Emulate GoPro by default..
+    // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
+    renderingConfiguration.width=1920;
+    renderingConfiguration.height=1080;
+    renderingConfiguration.fX=582.18394;
+    renderingConfiguration.fY=582.52915;
+    //640,480 , 575.57 , 575.57, //Kinect
+    //-------------------------------------------------------------------------------------
 
     unsigned int i=0;
     for (i=0; i<argc; i++)
@@ -117,6 +127,7 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--renderingConfiguration")==0)
         {
           if (i+17>=argc)  { incorrectArguments(); }
+          //-----------------------------------------
           float rX=atof(argv[i+1]);
           float rY=atof(argv[i+2]);
           float rZ=atof(argv[i+3]);
@@ -132,27 +143,43 @@ int main(int argc, char **argv)
           renderingConfiguration.k3=atof(argv[i+13]);
           renderingConfiguration.p1=atof(argv[i+14]);
           renderingConfiguration.p2=atof(argv[i+15]);
-          float width=atof(argv[i+16]);
-          float height=atof(argv[i+17]);
-          //----------
+          unsigned int width=atoi(argv[i+16]);
+          unsigned int height=atoi(argv[i+17]);
+          //-------------------------------------------------------------------------------
           prepareHuman36MRotationMatrix(renderingConfiguration.R,rX,rY,rZ);
-          copy3x3FMatrixTo4x4F(renderingConfiguration.View,renderingConfiguration.R);
+          copy3x3FMatrixTo4x4F(renderingConfiguration.viewMatrix,renderingConfiguration.R);
 
           // 0  1  2  3
           // 4  5  6  7
           // 8  9  10 11
           // 12 13 14 15
-          renderingConfiguration.View[3] =renderingConfiguration.T[0];
-          renderingConfiguration.View[7] =renderingConfiguration.T[1];
-          renderingConfiguration.View[11]=renderingConfiguration.T[2];
-
-
+          //----------------------------------------------------------------
+          renderingConfiguration.viewMatrix[3] =renderingConfiguration.T[0];
+          renderingConfiguration.viewMatrix[7] =renderingConfiguration.T[1];
+          renderingConfiguration.viewMatrix[11]=renderingConfiguration.T[2];
+          //----------------------------------------
           renderingConfiguration.viewport[0]=0;
           renderingConfiguration.viewport[1]=0;
           renderingConfiguration.viewport[2]=width;
           renderingConfiguration.viewport[3]=height;
-          //float projection[16];
-          //float viewport[4];
+          renderingConfiguration.width=width;
+          renderingConfiguration.height=height;
+          //----------------------------------------
+          buildOpenGLProjectionForIntrinsics(
+                                             renderingConfiguration.projection ,
+                                             renderingConfiguration.viewport ,
+                                             renderingConfiguration.fX,
+                                             renderingConfiguration.fY,
+                                             1.0,//sr->skew,
+                                             renderingConfiguration.cX,
+                                             renderingConfiguration.cY,
+                                             width,
+                                             height,
+                                             1.0, //Near
+                                             10000.0 //Far
+                                            );
+          //----------------------------------------
+          renderingConfiguration.isDefined=1;
           exit(0);
         } else
         //-----------------------------------------------------
@@ -232,7 +259,7 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--csv")==0)
         {
-          if (i+1>=argc)  { incorrectArguments(); }
+          if (i+2>=argc)  { incorrectArguments(); }
           toSVGDirectory=argv[i+1];
           toCSVFilename=argv[i+2];
           convertToCSV=1;
@@ -459,8 +486,7 @@ int main(int argc, char **argv)
                      convertToSVG,
                      convertToCSV,
                      &bvhMotion,
-                     //640,480 , 575.57 , 575.57, //Kinect
-                     1920, 1080, 582.18394,   582.52915, // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
+                     &renderingConfiguration,
                      occlusions,
                      1,//Filter out all poses where even one joint is behind camera
                      1,//Filter out all poses where even one joint is outside of 2D frame

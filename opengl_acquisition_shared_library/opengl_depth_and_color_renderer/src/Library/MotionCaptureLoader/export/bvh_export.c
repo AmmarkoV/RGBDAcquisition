@@ -10,7 +10,8 @@ int actuallyPerformPointProjections(
                                     struct BVH_MotionCapture * mc,
                                     struct BVH_Transform * bvhTransform,
                                     struct simpleRenderer * renderer,
-                                    unsigned int occlusions
+                                    unsigned int occlusions,
+                                    unsigned int directRendering
                                    )
 {
   //Then project 3D positions on 2D frame and save results..
@@ -19,7 +20,8 @@ int actuallyPerformPointProjections(
                             mc,
                             bvhTransform,
                             renderer,
-                            occlusions
+                            occlusions,
+                            directRendering
                            )
            )
            {
@@ -36,7 +38,8 @@ int performPointProjectionsForFrame(
                                      struct BVH_Transform * bvhTransform,
                                      unsigned int fID,
                                      struct simpleRenderer * renderer,
-                                     unsigned int occlusions
+                                     unsigned int occlusions,
+                                     unsigned int directRendering
                                     )
 {
   //First load the 3D positions of each joint..
@@ -49,7 +52,7 @@ int performPointProjectionsForFrame(
        )
        {
         //Then project 3D positions on 2D frame and save results..
-         return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions);
+         return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions,directRendering);
        }  else
        {
            bvh_cleanTransform(
@@ -68,7 +71,8 @@ int performPointProjectionsForMotionBuffer(
                                             struct BVH_Transform * bvhTransform,
                                             float * motionBuffer,
                                             struct simpleRenderer * renderer,
-                                            unsigned int occlusions
+                                            unsigned int occlusions,
+                                            unsigned int directRendering
                                            )
 {
   //First load the 3D positions of each joint..
@@ -81,7 +85,7 @@ int performPointProjectionsForMotionBuffer(
       )
        {
         //Then project 3D positions on 2D frame and save results..
-         return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions);
+         return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions,directRendering);
        }  else
        {
            bvh_cleanTransform(
@@ -100,10 +104,7 @@ int dumpBVHToSVGCSV(
                     int convertToSVG,
                     int convertToCSV,
                     struct BVH_MotionCapture * mc,
-                    unsigned int width,
-                    unsigned int height,
-                    float fX,
-                    float fY,
+                    struct BVH_RendererConfiguration * renderConfig,
                     unsigned int occlusions,
                     unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                     unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
@@ -121,7 +122,13 @@ int dumpBVHToSVGCSV(
 
   struct simpleRenderer renderer={0};
 
-  simpleRendererDefaults(&renderer,width,height,fX,fY);
+  simpleRendererDefaults(
+                         &renderer,
+                         renderConfig->width,
+                         renderConfig->height,
+                         renderConfig->fX,
+                         renderConfig->fY
+                        );
   simpleRendererInitialize(&renderer);
 
 
@@ -150,7 +157,8 @@ int dumpBVHToSVGCSV(
                                 &bvhTransform,
                                 fID,
                                 &renderer,
-                                occlusions
+                                occlusions,
+                                renderConfig->isDefined
                                )
        )
    {

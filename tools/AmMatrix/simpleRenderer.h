@@ -28,14 +28,14 @@ struct simpleRenderer
 };
 
 
-int deadSimpleRendererRender(
-                             struct simpleRenderer * sr ,
-                             float * position3D,
-                             ///---------------
-                             float * output2DX,
-                             float * output2DY,
-                             float * output2DW
-                            );
+int simpleRendererRenderUsingPrecalculatedMatrices(
+                                                    struct simpleRenderer * sr ,
+                                                    float * position3D,
+                                                    ///---------------
+                                                    float * output2DX,
+                                                    float * output2DY,
+                                                    float * output2DW
+                                                  );
 
 
 int simpleRendererRender(
