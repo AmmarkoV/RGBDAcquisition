@@ -4,33 +4,6 @@
 #include "bvh_to_csv.h"
 #include "bvh_to_svg.h"
 
-int actuallyPerformPointProjections(
-                                    struct BVH_MotionCapture * mc,
-                                    struct BVH_Transform * bvhTransform,
-                                    struct simpleRenderer * renderer,
-                                    unsigned int occlusions,
-                                    unsigned int directRendering
-                                   )
-{
-  //Then project 3D positions on 2D frame and save results..
-        if (
-            bvh_projectTo2D(
-                            mc,
-                            bvhTransform,
-                            renderer,
-                            occlusions,
-                            directRendering
-                           )
-           )
-           {
-             return 1;
-           }
-
-   //----------------------------------------------------------
- return 0;
-}
-
-
 int performPointProjectionsForFrame(
                                      struct BVH_MotionCapture * mc,
                                      struct BVH_Transform * bvhTransform,
@@ -45,15 +18,13 @@ int performPointProjectionsForFrame(
        {
         //If we succeed then we can perform the point projections to 2D..
         //Project 3D positions on 2D frame and save results..
-        return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions,directRendering);
+        return bvh_projectTo2D(mc,bvhTransform,renderer,occlusions,directRendering);
        } else
        //If we fail to load transform , then we can't do any projections and need to clean up
        { bvh_cleanTransform(mc,bvhTransform); }
    //----------------------------------------------------------
  return 0;
 }
-
-
 
 int performPointProjectionsForMotionBuffer(
                                             struct BVH_MotionCapture * mc,
@@ -69,7 +40,7 @@ int performPointProjectionsForMotionBuffer(
        {
         //If we succeed then we can perform the point projections to 2D..
         //Project 3D positions on 2D frame and save results..
-         return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions,directRendering);
+         return bvh_projectTo2D(mc,bvhTransform,renderer,occlusions,directRendering);
        } else
        //If we fail to load transform , then we can't do any projections and need to clean up
        { bvh_cleanTransform(mc,bvhTransform); }
@@ -95,7 +66,7 @@ int dumpBVHToSVGCSV(
   struct BVH_Transform bvhTransform;
 
   char svgFilename[512];
-  //Declare and populate csv output files..
+  //Declare and populate csv output files, we have 2D,3D and BVH files...
   char csvFilename2D[512];
   char csvFilename3D[512];
   char csvFilenameBVH[512];
@@ -125,6 +96,8 @@ int dumpBVHToSVGCSV(
   }
 
 
+
+  //If we are dumping to CSV  we need to populate the header, this happens only one time for the file
   if (convertToCSV)
    {
     dumpBVHToCSVHeader(
@@ -136,6 +109,11 @@ int dumpBVHToSVGCSV(
    }
 
 
+
+
+  //------------------------------------------------------------------------------------------
+  //                                    For every frame
+  //------------------------------------------------------------------------------------------
   unsigned int framesDumped=0;
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
@@ -192,7 +170,8 @@ int dumpBVHToSVGCSV(
                                       );
    }
   //------------------------------------------------------------------------------------------
-  } //For every frame..
+  } //For every frame.. ----------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------
 
 
 
