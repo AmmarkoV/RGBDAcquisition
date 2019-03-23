@@ -256,8 +256,9 @@ int simpleRendererInitialize(struct simpleRenderer * sr)
 
 int simpleRendererInitializeFromExplicitConfiguration(struct simpleRenderer * sr)
 {
-  return 0;
-
+  //We basically have to do nothing to initialize this way since we have an explicit configuration populating our struct
+  //This call is made to basically track when we try to use an explicit configuration
+  return 1;
 }
 
 

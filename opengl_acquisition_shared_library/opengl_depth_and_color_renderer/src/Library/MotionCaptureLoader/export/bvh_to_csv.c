@@ -120,7 +120,7 @@ int dumpBVHToCSVHeader(
 {
    unsigned int jID=0;
 
-   if (!fileExists(filename2D))
+   if ( (filename2D!=0) && (filename2D[0]!=0) && (!fileExists(filename2D)) )
    {
     FILE * fp2D = fopen(filename2D,"a");
 
@@ -161,7 +161,7 @@ int dumpBVHToCSVHeader(
 
 
    //3D Positions -------------------------------------------------------------------------------------------------------------
-   if (!fileExists(filename3D))
+   if ( (filename3D!=0) && (filename3D[0]!=0) && (!fileExists(filename3D)) )
    {
      FILE * fp3D = fopen(filename3D,"a");
      if (fp3D!=0)
@@ -184,7 +184,8 @@ int dumpBVHToCSVHeader(
 
 
 
-   if (!fileExists(filenameBVH))
+
+   if ( (filenameBVH!=0) && (filenameBVH[0]!=0) && (!fileExists(filenameBVH)) )
    {
      FILE * fpBVH = fopen(filenameBVH,"a");
      if (fpBVH!=0)
@@ -259,12 +260,16 @@ int dumpBVHToCSVBody(
     exit(0);
    }//-----------------------------------------------
 
-   FILE * fp2D = fopen(filename2D,"a");
-   FILE * fp3D = fopen(filename3D,"a");
-   FILE * fpBVH = fopen(filenameBVH,"a");
 
    unsigned int dumped=0;
+   unsigned int requestedToDump=0;
+   FILE * fp2D = 0;
+   FILE * fp3D = 0;
+   FILE * fpBVH = 0;
 
+   if ( (filename2D!=0) && (filename2D[0]!=0) )   { fp2D = fopen(filename2D,"a");   ++requestedToDump; }
+   if ( (filename3D!=0) && (filename3D[0]!=0) )   { fp3D = fopen(filename3D,"a");   ++requestedToDump; }
+   if ( (filenameBVH!=0) && (filenameBVH[0]!=0) ) { fpBVH = fopen(filenameBVH,"a"); ++requestedToDump; }
 
 
      //2D Positions -------------------------------------------------------------------------------------------------------------
@@ -358,7 +363,8 @@ int dumpBVHToCSVBody(
      fclose(fpBVH);
      ++dumped;
   }
+   //-------------------------------------------------------------------
 
- return (dumped==3);
+ return (dumped==requestedToDump);
 }
 

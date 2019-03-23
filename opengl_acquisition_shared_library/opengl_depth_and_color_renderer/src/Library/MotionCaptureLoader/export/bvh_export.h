@@ -33,7 +33,7 @@ int dumpBVHToSVGCSV(
                     const char * directory ,
                     const char * filename,
                     int convertToSVG,
-                    int convertToCSV,
+                    int convertToCSV,int useCSV_2D_Output,int useCSV_3D_Output,int useCSV_BVH_Output,
                     struct BVH_MotionCapture * mc,
                     struct BVH_RendererConfiguration * renderConfig,
                     unsigned int occlusions,

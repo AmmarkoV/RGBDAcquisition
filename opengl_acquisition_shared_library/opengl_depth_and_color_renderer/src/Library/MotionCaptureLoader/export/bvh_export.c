@@ -53,7 +53,7 @@ int dumpBVHToSVGCSV(
                     const char * directory,
                     const char * filename,
                     int convertToSVG,
-                    int convertToCSV,
+                    int convertToCSV,int useCSV_2D_Output,int useCSV_3D_Output,int useCSV_BVH_Output,
                     struct BVH_MotionCapture * mc,
                     struct BVH_RendererConfiguration * renderConfig,
                     unsigned int occlusions,
@@ -67,14 +67,12 @@ int dumpBVHToSVGCSV(
 
   char svgFilename[512];
   //Declare and populate csv output files, we have 2D,3D and BVH files...
-  char csvFilename2D[512];
-  char csvFilename3D[512];
-  char csvFilenameBVH[512];
-  snprintf(csvFilename2D,512,"%s/2d_%s",directory,filename);
-  snprintf(csvFilename3D,512,"%s/3d_%s",directory,filename);
-  snprintf(csvFilenameBVH,512,"%s/bvh_%s",directory,filename);
-
-
+  char csvFilename2D[512]={0};
+  char csvFilename3D[512]={0};
+  char csvFilenameBVH[512]={0};
+  if (useCSV_2D_Output)  { snprintf(csvFilename2D,512,"%s/2d_%s",directory,filename);  }
+  if (useCSV_3D_Output)  { snprintf(csvFilename3D,512,"%s/3d_%s",directory,filename);  }
+  if (useCSV_BVH_Output) { snprintf(csvFilenameBVH,512,"%s/bvh_%s",directory,filename);}
 
   struct simpleRenderer renderer={0};
   //Declare and populate the simpleRenderer that will project our 3D points
@@ -205,6 +203,7 @@ int dumpBVHToSVGCSV(
   {
     fprintf(stderr,"Joint Visibility = %0.2f %%\n",(float) 100*invisibleJoints/visibleJoints);
   }
+  fprintf(stderr,"CSV Outputs: 2D:%u, 3D:%u, BVH:%u\n",useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output);
   //------------------------------------------------------------------------------------------
   fprintf(stderr,"Joints : %u invisible / %u visible ",invisibleJoints,visibleJoints);
   if (occlusions) { fprintf(stderr,"(occlusions enabled)\n"); } else

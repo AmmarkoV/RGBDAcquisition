@@ -101,6 +101,7 @@ int main(int argc, char **argv)
     const char * toCSVFilename="data.csv";
     unsigned int convertToSVG=0;
     unsigned int convertToCSV=0;
+    unsigned int useCSV_2D_Output=1,useCSV_3D_Output=1,useCSV_BVH_Output=1;
     unsigned int maxFrames = 0;
     unsigned int occlusions = 0;
     float scaleWorld=1.0;
@@ -259,10 +260,15 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--csv")==0)
         {
-          if (i+2>=argc)  { incorrectArguments(); }
+          if (i+3>=argc)  { incorrectArguments(); }
           toSVGDirectory=argv[i+1];
           toCSVFilename=argv[i+2];
           convertToCSV=1;
+          if (strcmp(argv[i+3],"2d+bvh") ) { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+          if (strcmp(argv[i+3],"2d") )     { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"3d") )     { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"bvh") )    { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+                                           { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--svg")==0)
@@ -484,7 +490,7 @@ int main(int argc, char **argv)
                      toSVGDirectory,
                      toCSVFilename,
                      convertToSVG,
-                     convertToCSV,
+                     convertToCSV,useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
                      &bvhMotion,
                      &renderingConfiguration,
                      occlusions,
