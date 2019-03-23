@@ -264,11 +264,11 @@ int main(int argc, char **argv)
           toSVGDirectory=argv[i+1];
           toCSVFilename=argv[i+2];
           convertToCSV=1;
-          if (strcmp(argv[i+3],"2d+bvh") ) { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
-          if (strcmp(argv[i+3],"2d") )     { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
-          if (strcmp(argv[i+3],"3d") )     { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
-          if (strcmp(argv[i+3],"bvh") )    { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
-                                           { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
+          if (strcmp(argv[i+3],"2d+bvh")==0 ) { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+          if (strcmp(argv[i+3],"2d")==0 )     { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"3d")==0 )     { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"bvh")==0 )    { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+                                              { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--svg")==0)
