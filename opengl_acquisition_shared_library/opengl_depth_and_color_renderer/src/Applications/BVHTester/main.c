@@ -73,10 +73,39 @@ int main(int argc, char **argv)
     unsigned int flipRandomizationOrientation = 0;
 
     struct BVH_MotionCapture bvhMotion={0};
+    struct BVH_RendererConfiguration renderingConfiguration={0};
 
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--renderingConfiguration")==0)
+        {
+          if (i+15>=argc)  { incorrectArguments(); }
+          float rX=atof(argv[i+1]);
+          float rY=atof(argv[i+2]);
+          float rZ=atof(argv[i+3]);
+          renderingConfiguration.T[0]=atof(argv[i+4]);
+          renderingConfiguration.T[1]=atof(argv[i+5]);
+          renderingConfiguration.T[2]=atof(argv[i+6]);
+          renderingConfiguration.fX=atof(argv[i+7]);
+          renderingConfiguration.fY=atof(argv[i+8]);
+          renderingConfiguration.cX=atof(argv[i+9]);
+          renderingConfiguration.cY=atof(argv[i+10]);
+          renderingConfiguration.k1=atof(argv[i+11]);
+          renderingConfiguration.k2=atof(argv[i+12]);
+          renderingConfiguration.k3=atof(argv[i+13]);
+          renderingConfiguration.p1=atof(argv[i+14]);
+          renderingConfiguration.p2=atof(argv[i+15]);
+          //----------
+          renderingConfiguration.R[0]=1.0;          renderingConfiguration.R[1]=0.0;          renderingConfiguration.R[2]=0.0;
+          renderingConfiguration.R[3]=0.0;          renderingConfiguration.R[4]=1.0;          renderingConfiguration.R[5]=0.0;
+          renderingConfiguration.R[6]=0.0;          renderingConfiguration.R[7]=0.0;          renderingConfiguration.R[8]=1.0;
+
+          //float projection[16];
+          //float viewport[4];
+          exit(0);
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--test")==0)
         {
