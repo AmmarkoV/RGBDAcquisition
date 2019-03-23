@@ -22,6 +22,40 @@
 
 #include "../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h"
 
+
+void prepareHuman36MRotationMatrix(float * rotationMatrix,float rX,float rY,float rZ)
+{
+    double rXM[9];
+    double rYM[9];
+    double rZM[9];
+    double intermadiateR[9];
+
+    //R1x=np.matrix([[1,0,0],    [0,np.cos(Rx),-np.sin(Rx)], [0,np.sin(Rx),np.cos(Rx)] ]) #[1 0 0; 0 cos(obj.Params(1)) -sin(obj.Params(1)); 0 sin(obj.Params(1)) cos(obj.Params(1))]
+    rXM[0]=1.0; rXM[1]=0.0;     rXM[2]=0.0;
+    rXM[3]=0.0; rXM[4]=cos(rX); rXM[5]=-sin(rX);
+    rXM[6]=0.0; rXM[7]=sin(rX); rXM[8]=cos(rX);
+
+    //R1y=np.matrix([[np.cos(Ry),0,np.sin(Ry)], [0,1,0], [-np.sin(Ry),0,np.cos(Ry)]])     #[cos(obj.Params(2)) 0 sin(obj.Params(2)); 0 1 0; -sin(obj.Params(2)) 0 cos(obj.Params(2))]
+    rYM[0]=cos(rY);  rYM[1]=0.0; rYM[2]=sin(rY);
+    rYM[3]=0.0;      rYM[4]=1.0; rYM[5]=0.0;
+    rYM[6]=-sin(rY); rYM[7]=0.0; rYM[8]=cos(rY);
+
+    //R1z=np.matrix([[np.cos(Rz),-np.sin(Rz),0], [np.sin(Rz),np.cos(Rz),0], [0,0,1]])     #[cos(obj.Params(3)) -sin(obj.Params(3)) 0; sin(obj.Params(3)) cos(obj.Params(3)) 0; 0 0 1]
+    rZM[0]=cos(rZ); rZM[1]=-sin(rZ); rZM[2]=0.0;
+    rZM[3]=sin(rZ); rZM[4]=cos(rZ);  rZM[5]=0.0;
+    rZM[6]=0.0;     rZM[7]=0.0;      rZM[8]=1.0;
+
+    multiplyThree4x4Matrices(
+                              intermadiateR ,
+                              rXM ,
+                              rYM,
+                              rZM
+                            );
+
+     copy4x4DMatrixToF(rotationMatrix,intermadiateR);
+}
+
+
 void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 {
     //Test getting rotations for a joint..
@@ -98,9 +132,16 @@ int main(int argc, char **argv)
           renderingConfiguration.p1=atof(argv[i+14]);
           renderingConfiguration.p2=atof(argv[i+15]);
           //----------
-          renderingConfiguration.R[0]=1.0;          renderingConfiguration.R[1]=0.0;          renderingConfiguration.R[2]=0.0;
-          renderingConfiguration.R[3]=0.0;          renderingConfiguration.R[4]=1.0;          renderingConfiguration.R[5]=0.0;
-          renderingConfiguration.R[6]=0.0;          renderingConfiguration.R[7]=0.0;          renderingConfiguration.R[8]=1.0;
+          prepareHuman36MRotationMatrix(renderingConfiguration.R,rX,rY,rZ);
+          copy3x3FMatrixTo4x4F(renderingConfiguration.View,renderingConfiguration.R);
+
+          // 0  1  2  3
+          // 4  5  6  7
+          // 8  9  10 11
+          // 12 13 14 15
+          renderingConfiguration.View[3] =renderingConfiguration.T[0];
+          renderingConfiguration.View[7] =renderingConfiguration.T[1];
+          renderingConfiguration.View[11]=renderingConfiguration.T[2];
 
           //float projection[16];
           //float viewport[4];

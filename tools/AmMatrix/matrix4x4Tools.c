@@ -106,6 +106,16 @@ void print4x4DMathematicaMatrix(const char * str , double * matrix3x3)
   #endif // PRINT_MATRIX_DEBUGGING
 }
 
+
+
+void copy3x3FMatrixTo4x4F(float * out,float * in)
+{
+  out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=0.0;
+  out[4]=in[3];   out[5]=in[4];   out[6]=in[5];   out[7]=0.0;
+  out[8]=in[6];   out[9]=in[7];   out[10]=in[8]; out[11]=0.0;
+  out[12]=0.0; out[13]=0.0; out[14]=0.0; out[15]=1.0;
+}
+
 void copy4x4FMatrix(float * out,float * in)
 {
   out[0]=in[0];   out[1]=in[1];   out[2]=in[2];   out[3]=in[3];
