@@ -65,4 +65,7 @@ int simpleRendererDefaults(
 
 int simpleRendererInitialize(struct simpleRenderer * sr);
 
+
+int simpleRendererInitializeFromExplicitConfiguration(struct simpleRenderer * sr);
+
 #endif // SIMPLERENDERER_H_INCLUDED

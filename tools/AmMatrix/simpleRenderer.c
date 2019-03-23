@@ -246,3 +246,24 @@ int simpleRendererInitialize(struct simpleRenderer * sr)
 
  return 1;
 }
+
+
+
+
+
+
+
+
+int simpleRendererInitializeFromExplicitConfiguration(struct simpleRenderer * sr)
+{
+  return 0;
+
+}
+
+
+
+
+
+
+
+

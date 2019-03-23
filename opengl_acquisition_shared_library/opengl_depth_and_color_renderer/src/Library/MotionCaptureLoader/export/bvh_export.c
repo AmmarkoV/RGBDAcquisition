@@ -4,8 +4,6 @@
 #include "bvh_to_csv.h"
 #include "bvh_to_svg.h"
 
-
-
 int actuallyPerformPointProjections(
                                     struct BVH_MotionCapture * mc,
                                     struct BVH_Transform * bvhTransform,
@@ -42,24 +40,15 @@ int performPointProjectionsForFrame(
                                      unsigned int directRendering
                                     )
 {
-  //First load the 3D positions of each joint..
-   if (
-       bvh_loadTransformForFrame(
-                                 mc,
-                                 fID ,
-                                 bvhTransform
-                                )
-       )
+  //Try to load the 3D positions of each joint for this particular frame..
+   if (bvh_loadTransformForFrame(mc,fID,bvhTransform))
        {
-        //Then project 3D positions on 2D frame and save results..
-         return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions,directRendering);
-       }  else
-       {
-           bvh_cleanTransform(
-                              mc,
-                              bvhTransform
-                             );
-       }
+        //If we succeed then we can perform the point projections to 2D..
+        //Project 3D positions on 2D frame and save results..
+        return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions,directRendering);
+       } else
+       //If we fail to load transform , then we can't do any projections and need to clean up
+       { bvh_cleanTransform(mc,bvhTransform); }
    //----------------------------------------------------------
  return 0;
 }
@@ -75,24 +64,15 @@ int performPointProjectionsForMotionBuffer(
                                             unsigned int directRendering
                                            )
 {
-  //First load the 3D positions of each joint..
-  if (
-       bvh_loadTransformForMotionBuffer(
-                                        mc ,
-                                        motionBuffer,
-                                        bvhTransform
-                                       )
-      )
+  //First load the 3D positions of each joint from a motion buffer (instead of a frame [see performPointProjectionsForFrame]..
+  if (bvh_loadTransformForMotionBuffer(mc,motionBuffer,bvhTransform))
        {
-        //Then project 3D positions on 2D frame and save results..
+        //If we succeed then we can perform the point projections to 2D..
+        //Project 3D positions on 2D frame and save results..
          return actuallyPerformPointProjections(mc,bvhTransform,renderer,occlusions,directRendering);
-       }  else
-       {
-           bvh_cleanTransform(
-                              mc,
-                              bvhTransform
-                             );
-       }
+       } else
+       //If we fail to load transform , then we can't do any projections and need to clean up
+       { bvh_cleanTransform(mc,bvhTransform); }
    //----------------------------------------------------------
  return 0;
 }
@@ -113,28 +93,38 @@ int dumpBVHToSVGCSV(
                    )
 {
   struct BVH_Transform bvhTransform;
+
   char svgFilename[512];
+  //Declare and populate csv output files..
   char csvFilename2D[512];
   char csvFilename3D[512];
   char csvFilenameBVH[512];
+  snprintf(csvFilename2D,512,"%s/2d_%s",directory,filename);
+  snprintf(csvFilename3D,512,"%s/3d_%s",directory,filename);
+  snprintf(csvFilenameBVH,512,"%s/bvh_%s",directory,filename);
 
 
 
   struct simpleRenderer renderer={0};
+  //Declare and populate the simpleRenderer that will project our 3D points
 
-  simpleRendererDefaults(
-                         &renderer,
-                         renderConfig->width,
-                         renderConfig->height,
-                         renderConfig->fX,
-                         renderConfig->fY
-                        );
-  simpleRendererInitialize(&renderer);
+  if (renderConfig->isDefined)
+  {
+    simpleRendererInitializeFromExplicitConfiguration(&renderer);
+  } else
+  {
+   //This is the normal rendering where we just simulate our camera center
+   simpleRendererDefaults(
+                          &renderer,
+                          renderConfig->width,
+                          renderConfig->height,
+                          renderConfig->fX,
+                          renderConfig->fY
+                         );
+    simpleRendererInitialize(&renderer);
+  }
 
 
-  snprintf(csvFilename2D,512,"%s/2d_%s",directory,filename);
-  snprintf(csvFilename3D,512,"%s/3d_%s",directory,filename);
-  snprintf(csvFilenameBVH,512,"%s/bvh_%s",directory,filename);
   if (convertToCSV)
    {
     dumpBVHToCSVHeader(
@@ -142,7 +132,7 @@ int dumpBVHToSVGCSV(
                         csvFilename2D,
                         csvFilename3D,
                         csvFilenameBVH
-                       );
+                      );
    }
 
 
@@ -150,21 +140,25 @@ int dumpBVHToSVGCSV(
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
-   snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
    if (
        !performPointProjectionsForFrame(
-                                mc,
-                                &bvhTransform,
-                                fID,
-                                &renderer,
-                                occlusions,
-                                renderConfig->isDefined
-                               )
+                                        mc,
+                                        &bvhTransform,
+                                        fID,
+                                        &renderer,
+                                        occlusions,
+                                        renderConfig->isDefined
+                                       )
        )
    {
        fprintf(stderr,"Could not perform projection for frame %u\n",fID);
    }
 
+
+  //Having projected our BVH data to 3D points using our simpleRenderer Configuration we can store our output to CSV or SVG files..
+
+  //CSV output
+  //------------------------------------------------------------------------------------------
    if (convertToCSV)
    {
       dumpBVHToCSVBody(
@@ -181,11 +175,15 @@ int dumpBVHToSVGCSV(
                        encodeRotationsAsRadians
                       );
    }
+  //------------------------------------------------------------------------------------------
 
 
+  //SVG output
+  //------------------------------------------------------------------------------------------
    if (convertToSVG)
    {
-    framesDumped +=  dumpBVHToSVGFrame(
+     snprintf(svgFilename,512,"%s/%06u.svg",directory,fID);
+     framesDumped +=  dumpBVHToSVGFrame(
                                        svgFilename,
                                        mc,
                                        &bvhTransform,
@@ -193,14 +191,19 @@ int dumpBVHToSVGCSV(
                                        &renderer
                                       );
    }
+  //------------------------------------------------------------------------------------------
+  } //For every frame..
 
-  }
 
+
+  //------------------------------------------------------------------------------------------
+  //                            GIVE FINAL CONSOLE OUTPUT HERE
+  //------------------------------------------------------------------------------------------
   if (visibleJoints!=0)
   {
     fprintf(stderr,"Joint Visibility = %0.2f %%\n",(float) 100*invisibleJoints/visibleJoints);
   }
-
+  //------------------------------------------------------------------------------------------
   fprintf(stderr,"Joints : %u invisible / %u visible ",invisibleJoints,visibleJoints);
   if (occlusions) { fprintf(stderr,"(occlusions enabled)\n"); } else
                   { fprintf(stderr,"(occlusions disabled)\n");      }
@@ -211,6 +214,8 @@ int dumpBVHToSVGCSV(
   {
    fprintf(stderr,"Used %0.2f%% of dataset\n",(float) 100*(mc->numberOfFrames-filteredOutCSVPoses)/mc->numberOfFrames);
   }
+  //------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------
 
 
  return (framesDumped==mc->numberOfFrames);
