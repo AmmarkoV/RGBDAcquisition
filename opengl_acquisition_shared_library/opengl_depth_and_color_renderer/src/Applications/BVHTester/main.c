@@ -22,13 +22,14 @@
 
 #include "../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h"
 
+#include  "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 void prepareHuman36MRotationMatrix(float * rotationMatrix,float rX,float rY,float rZ)
 {
     double rXM[9];
     double rYM[9];
     double rZM[9];
-    double intermadiateR[9];
+    double intermediateR[9];
 
     //R1x=np.matrix([[1,0,0],    [0,np.cos(Rx),-np.sin(Rx)], [0,np.sin(Rx),np.cos(Rx)] ]) #[1 0 0; 0 cos(obj.Params(1)) -sin(obj.Params(1)); 0 sin(obj.Params(1)) cos(obj.Params(1))]
     rXM[0]=1.0; rXM[1]=0.0;     rXM[2]=0.0;
@@ -46,13 +47,13 @@ void prepareHuman36MRotationMatrix(float * rotationMatrix,float rX,float rY,floa
     rZM[6]=0.0;     rZM[7]=0.0;      rZM[8]=1.0;
 
     multiplyThree4x4Matrices(
-                              intermadiateR ,
+                              intermediateR ,
                               rXM ,
                               rYM,
                               rZM
                             );
 
-     copy4x4DMatrixToF(rotationMatrix,intermadiateR);
+     copy4x4DMatrixToF(rotationMatrix,intermediateR);
 }
 
 
@@ -115,7 +116,7 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--renderingConfiguration")==0)
         {
-          if (i+15>=argc)  { incorrectArguments(); }
+          if (i+17>=argc)  { incorrectArguments(); }
           float rX=atof(argv[i+1]);
           float rY=atof(argv[i+2]);
           float rZ=atof(argv[i+3]);
@@ -131,6 +132,8 @@ int main(int argc, char **argv)
           renderingConfiguration.k3=atof(argv[i+13]);
           renderingConfiguration.p1=atof(argv[i+14]);
           renderingConfiguration.p2=atof(argv[i+15]);
+          float width=atof(argv[i+16]);
+          float height=atof(argv[i+17]);
           //----------
           prepareHuman36MRotationMatrix(renderingConfiguration.R,rX,rY,rZ);
           copy3x3FMatrixTo4x4F(renderingConfiguration.View,renderingConfiguration.R);
@@ -143,6 +146,11 @@ int main(int argc, char **argv)
           renderingConfiguration.View[7] =renderingConfiguration.T[1];
           renderingConfiguration.View[11]=renderingConfiguration.T[2];
 
+
+          renderingConfiguration.viewport[0]=0;
+          renderingConfiguration.viewport[1]=0;
+          renderingConfiguration.viewport[2]=width;
+          renderingConfiguration.viewport[3]=height;
           //float projection[16];
           //float viewport[4];
           exit(0);

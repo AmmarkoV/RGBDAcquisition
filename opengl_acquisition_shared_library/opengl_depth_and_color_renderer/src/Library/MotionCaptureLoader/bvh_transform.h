@@ -71,22 +71,6 @@ struct BVH_Transform
 
 
 
-struct BVH_RendererConfiguration
-{
-  //Intrinsics
-  float fX,fY,cX,cY;
-  //Distortion
-  float k1,k2,k3,p1,p2;
-  //----------
-  float View[16];
-  float R[9];
-  float T[3];
-  float projection[16];
-  float viewport[4];
-};
-
-
-
 void create4x4RotationBVH(double * matrix,int rotationType,double degreesX,double degreesY,double degreesZ);
 
 
