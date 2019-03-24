@@ -108,6 +108,10 @@ int main(int argc, char **argv)
     unsigned int flipOrientation = 0;
     unsigned int flipRandomizationOrientation = 0;
 
+    unsigned int filterBehindCamera=1;
+    unsigned int filterIfAnyJointOutsideof2DFrame=1;
+    unsigned int filterTopWeirdRandomSkeletons=1;
+
     struct BVH_MotionCapture bvhMotion={0};
 
     struct BVH_RendererConfiguration renderingConfiguration={0};
@@ -124,6 +128,13 @@ int main(int argc, char **argv)
     unsigned int i=0;
     for (i=0; i<argc; i++)
     {
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--nofilter")==0)
+        {
+          filterBehindCamera=0;
+          filterIfAnyJointOutsideof2DFrame=0;
+          filterTopWeirdRandomSkeletons=0;
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--renderingConfiguration")==0)
         {
@@ -480,9 +491,6 @@ int main(int argc, char **argv)
 
 
 
-
-
-
     //SVG or CSV output ..
     if ( (convertToSVG) || (convertToCSV) )
     {
@@ -494,9 +502,9 @@ int main(int argc, char **argv)
                      &bvhMotion,
                      &renderingConfiguration,
                      occlusions,
-                     1,//Filter out all poses where even one joint is behind camera
-                     1,//Filter out all poses where even one joint is outside of 2D frame
-                     1,//Filter top left weird random skelingtons ( skeletons )
+                     filterBehindCamera,//Filter out all poses where even one joint is behind camera
+                     filterIfAnyJointOutsideof2DFrame,//Filter out all poses where even one joint is outside of 2D frame
+                     filterTopWeirdRandomSkeletons,//Filter top left weird random skelingtons ( skeletons )
                      0//We don't want to convert to radians
                  );
       return 0;
