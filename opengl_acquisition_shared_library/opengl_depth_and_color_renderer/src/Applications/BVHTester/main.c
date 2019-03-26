@@ -400,7 +400,7 @@ int main(int argc, char **argv)
                                      i+2
                                     );
             }
-            exit(0);
+            //exit(0);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
