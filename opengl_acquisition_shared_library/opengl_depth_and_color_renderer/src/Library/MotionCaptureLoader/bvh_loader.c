@@ -1009,16 +1009,17 @@ int bvh_PerturbJointAngles(
                            unsigned int iplus2
                           )
 {
-  fprintf(stderr,"Asked to randomize %u Joint Angles using a %0.2f (+- %0.2f)deviation\n",numberOfValues,deviation,(float) deviation/2);
+  fprintf(stderr,"Asked to randomize %u Joint Angles using a %0.2f (+- %0.2f) deviation\n",numberOfValues,deviation,(float) deviation/2);
   int i=0;
   unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
   if (selectedJoints!=0)
   {
     memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
     BVHJointID jID=0;
+    fprintf(stderr,"Randomizing : ");
     for (i=iplus2; i<=iplus2+numberOfValues; i++)
      {
-      fprintf(stderr,"Randomize %s : ",argv[i]);
+      fprintf(stderr,"%s ",argv[i]);
       if (
            bvh_getJointIDFromJointName(
                                        mc,
@@ -1028,6 +1029,7 @@ int bvh_PerturbJointAngles(
          )
          { selectedJoints[i]=1; }
      }
+    fprintf(stderr,"\n");
 
      unsigned int fID=0;
      for (fID=0; fID<mc->numberOfFrames; fID++)
@@ -1044,7 +1046,6 @@ int bvh_PerturbJointAngles(
          }
       }
 
-    fprintf(stderr,"\n");
 
     free(selectedJoints);
     return 1;
