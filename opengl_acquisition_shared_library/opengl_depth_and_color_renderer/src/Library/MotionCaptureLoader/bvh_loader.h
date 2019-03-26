@@ -184,6 +184,16 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 int bvh_free(struct BVH_MotionCapture * bvhMotion);
 
 
+
+int bvh_PerturbJointAngles(
+                           struct BVH_MotionCapture * mc,
+                           unsigned int numberOfValues,
+                           float  deviation,
+                           char **argv,
+                           unsigned int iplus2
+                          );
+
+
 int bvh_RandomizePositionRotation(
                                   struct BVH_MotionCapture * mc,
                                   float * minimumPosition,

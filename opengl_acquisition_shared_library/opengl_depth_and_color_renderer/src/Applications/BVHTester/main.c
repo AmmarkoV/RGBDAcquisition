@@ -384,6 +384,25 @@ int main(int argc, char **argv)
              flipRandomizationOrientation=1;
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--perturbJointAngles")==0)
+        {
+          if (i+2>=argc)  { incorrectArguments(); }
+          unsigned int numberOfValues=atoi(argv[i+1]);
+          float deviation=atof(argv[i+2]);
+          srand(time(NULL));
+          if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
+            {
+              bvh_PerturbJointAngles(
+                                     &bvhMotion,
+                                     numberOfValues,
+                                     deviation,
+                                     argv,
+                                     i+2
+                                    );
+            }
+            exit(0);
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
         {
           if (i+12>=argc)  { incorrectArguments(); }

@@ -1001,6 +1001,58 @@ float randomFloatA( float minVal, float maxVal )
     return value;
 }
 
+int bvh_PerturbJointAngles(
+                           struct BVH_MotionCapture * mc,
+                           unsigned int numberOfValues,
+                           float  deviation,
+                           char **argv,
+                           unsigned int iplus2
+                          )
+{
+  fprintf(stderr,"Asked to randomize %u Joint Angles using a %0.2f (+- %0.2f)deviation\n",numberOfValues,deviation,(float) deviation/2);
+  int i=0;
+  unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+  if (selectedJoints!=0)
+  {
+    memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
+    BVHJointID jID=0;
+    for (i=iplus2; i<=iplus2+numberOfValues; i++)
+     {
+      fprintf(stderr,"Randomize %s : ",argv[i]);
+      if (
+           bvh_getJointIDFromJointName(
+                                       mc,
+                                       argv[i],
+                                       &jID
+                                      )
+         )
+         { selectedJoints[i]=1; }
+     }
+
+     unsigned int fID=0;
+     for (fID=0; fID<mc->numberOfFrames; fID++)
+      {
+       unsigned int mID=fID*mc->numberOfValuesPerFrame;
+       for (jID=0; jID<mc->numberOfValuesPerFrame; jID++)
+         {
+           if (selectedJoints[jID])
+           {
+             //fprintf(stderr,"Was %0.2f ",mc->motionValues[mID+jID]);
+             mc->motionValues[mID+jID]+=randomFloatA((float) -1*deviation/2,(float) deviation/2);
+             //fprintf(stderr,"Is %0.2f ",mc->motionValues[mID+jID]);
+           }
+         }
+      }
+
+    fprintf(stderr,"\n");
+
+    free(selectedJoints);
+    return 1;
+  }
+
+  return 0;
+}
+
 
 int bvh_RandomizePositionRotation(
                                   struct BVH_MotionCapture * mc,
