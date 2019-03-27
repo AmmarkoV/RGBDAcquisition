@@ -1016,6 +1016,7 @@ int bvh_PerturbJointAngles(
   {
     memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
     BVHJointID jID=0;
+    unsigned int mID=0;
     fprintf(stderr,"Randomizing : ");
     for (i=iplus2; i<=iplus2+numberOfValues; i++)
      {
@@ -1027,20 +1028,30 @@ int bvh_PerturbJointAngles(
                                        &jID
                                       )
          )
-         { selectedJoints[i]=1; }
+         {
+           for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+           {
+               if ( mc->motionToJointLookup[mID].jointID == jID )
+               {
+                selectedJoints[mID]=1;
+               }
+           }
+
+         }
      }
     fprintf(stderr,"\n");
 
      unsigned int fID=0;
      for (fID=0; fID<mc->numberOfFrames; fID++)
       {
-       unsigned int mID=fID*mc->numberOfValuesPerFrame;
-       for (jID=0; jID<mc->numberOfValuesPerFrame; jID++)
+       unsigned int mIDStart=fID*mc->numberOfValuesPerFrame;
+       unsigned int mIDEnd=mIDStart+mc->numberOfValuesPerFrame;
+       for (mID=mIDStart; mID<mIDEnd; mID++)
          {
-           if (selectedJoints[jID])
+           if (selectedJoints[mID])
            {
              //fprintf(stderr,"Was %0.2f ",mc->motionValues[mID+jID]);
-             mc->motionValues[mID+jID]+=randomFloatA((float) -1*deviation/2,(float) deviation/2);
+             mc->motionValues[mID]+=randomFloatA((float) -1*deviation/2,(float) deviation/2);
              //fprintf(stderr,"Is %0.2f ",mc->motionValues[mID+jID]);
            }
          }
