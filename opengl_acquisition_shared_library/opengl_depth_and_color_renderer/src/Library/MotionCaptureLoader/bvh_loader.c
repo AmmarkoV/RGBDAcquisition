@@ -1034,6 +1034,7 @@ int bvh_PerturbJointAngles(
                if ( mc->motionToJointLookup[mID].jointID == jID )
                {
                 selectedJoints[mID]=1;
+                fprintf(stderr,"%u ",mID);
                }
            }
 
@@ -1048,7 +1049,7 @@ int bvh_PerturbJointAngles(
        unsigned int mIDEnd=mIDStart+mc->numberOfValuesPerFrame;
        for (mID=mIDStart; mID<mIDEnd; mID++)
          {
-           if (selectedJoints[mID])
+           if (selectedJoints[mID-mIDStart])
            {
              //fprintf(stderr,"Was %0.2f ",mc->motionValues[mID+jID]);
              mc->motionValues[mID]+=randomFloatA((float) -1*deviation/2,(float) deviation/2);
