@@ -178,3 +178,24 @@ int bvh_RandomizePositionRotation2Ranges(
   }
  return 1;
 }
+
+
+
+
+
+
+int bvh_TestRandomizationLimitsXYZ(
+                                   struct BVH_MotionCapture * mc,
+                                   float * minimumPosition,
+                                   float * maximumPosition
+                                  )
+{
+
+}
+
+
+
+
+
+
+

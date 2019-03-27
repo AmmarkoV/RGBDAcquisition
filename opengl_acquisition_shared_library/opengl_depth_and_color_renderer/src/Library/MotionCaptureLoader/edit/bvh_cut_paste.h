@@ -35,4 +35,18 @@ int copyBufferToJointAndChildren(
                                  BVHFrameID  fID
                                 );
 
+
+
+int bvh_GrowMocapFileByCopyingExistingMotions(
+                                              struct BVH_MotionCapture * mc,
+                                              unsigned int timesToRepeat
+                                             );
+
+int bvh_GrowMocapFileBySwappingJointAndItsChildren(
+                                                     struct BVH_MotionCapture * mc,
+                                                     const char * jointNameA,
+                                                     const char * jointNameB,
+                                                     int alsoIncludeOriginalMotion
+                                                   );
+
 #endif

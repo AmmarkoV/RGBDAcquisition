@@ -37,4 +37,10 @@ int bvh_RandomizePositionRotation2Ranges(
                                          float * maximumRotationRangeB
                                         );
 
+int bvh_TestRandomizationLimitsXYZ(
+                                   struct BVH_MotionCapture * mc,
+                                   float * minimumPosition,
+                                   float * maximumPosition
+                                  );
+
 #endif

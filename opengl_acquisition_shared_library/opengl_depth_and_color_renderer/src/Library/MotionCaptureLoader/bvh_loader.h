@@ -197,21 +197,6 @@ int bvh_InterpolateMotion(
                          );
 
 
-int bvh_GrowMocapFileByCopyingExistingMotions(
-                                              struct BVH_MotionCapture * mc,
-                                              unsigned int timesToRepeat
-                                             );
-
-
-
-
-int bvh_GrowMocapFileBySwappingJointAndItsChildren(
-                                                     struct BVH_MotionCapture * mc,
-                                                     const char * jointNameAInitial,
-                                                     const char * jointNameBInitial,
-                                                     int alsoIncludeOriginalMotion
-                                                   );
-
 /**
 * @brief Ask if joint has a parent.
 * @ingroup BVH

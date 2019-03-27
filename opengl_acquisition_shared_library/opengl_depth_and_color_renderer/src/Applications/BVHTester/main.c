@@ -20,6 +20,7 @@
 #include "../../Library/MotionCaptureLoader/export/bvh_export.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_bvh.h"
 
+#include "../../Library/MotionCaptureLoader/edit/bvh_cut_paste.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_randomize.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_rename.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h"
@@ -403,6 +404,29 @@ int main(int argc, char **argv)
                                     );
             }
             //exit(0);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--testRandomizationLimits")==0)
+        {
+          if (i+6>=argc)  { incorrectArguments(); }
+          float minimumPositionTest[3];
+          float maximumPositionTest[3];
+          //----
+          minimumPositionTest[0]=-1*atof(argv[i+1])/10;
+          minimumPositionTest[1]=-1*atof(argv[i+2])/10;
+          minimumPositionTest[2]=-1*atof(argv[i+3])/10;
+          //----
+          maximumPositionTest[0]=-1*atof(argv[i+4])/10;
+          maximumPositionTest[1]=-1*atof(argv[i+5])/10;
+          maximumPositionTest[2]=-1*atof(argv[i+6])/10;
+
+          bvh_TestRandomizationLimitsXYZ(
+                                         &bvhMotion,
+                                         minimumPositionTest,
+                                         maximumPositionTest
+                                        );
+
+          bvh_ConstrainRotations(&bvhMotion,flipRandomizationOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
