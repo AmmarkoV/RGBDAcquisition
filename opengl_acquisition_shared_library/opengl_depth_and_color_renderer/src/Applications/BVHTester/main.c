@@ -123,6 +123,8 @@ int main(int argc, char **argv)
     // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
     renderingConfiguration.width=1920;
     renderingConfiguration.height=1080;
+    renderingConfiguration.cX=(float)renderingConfiguration.width/2;
+    renderingConfiguration.cY=(float)renderingConfiguration.height/2;
     renderingConfiguration.fX=582.18394;
     renderingConfiguration.fY=582.52915;
     //640,480 , 575.57 , 575.57, //Kinect
@@ -408,6 +410,7 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--testRandomizationLimits")==0)
         {
+          // ./BVHTester --from Motions/02_03.bvh --testRandomizationLimits -1400 -300 1000 1400 300 5000 --svg tmp/
           if (i+6>=argc)  { incorrectArguments(); }
           float minimumPositionTest[3];
           float maximumPositionTest[3];
@@ -425,6 +428,44 @@ int main(int argc, char **argv)
                                          minimumPositionTest,
                                          maximumPositionTest
                                         );
+
+          bvh_ConstrainRotations(&bvhMotion,flipRandomizationOrientation);
+        } else
+         //-----------------------------------------------------
+        if (strcmp(argv[i],"--randomize2D")==0)
+        {
+          // ./BVHTester --from Motions/02_03.bvh --randomize2D 1400 5000 -35 -90 -35 35 90 35 --occlusions --svg tmp/
+          if (i+8>=argc)  { incorrectArguments(); }
+          float minimumRotation[3];
+          float maximumRotation[3];
+          float minimumDepth=0.0;
+          float maximumDepth=0.0;
+
+          minimumDepth=-1*atof(argv[i+1])/10;
+          maximumDepth=-1*atof(argv[i+2])/10;
+          //----
+          minimumRotation[0]=atof(argv[i+3]);
+          minimumRotation[1]=atof(argv[i+4]);
+          minimumRotation[2]=atof(argv[i+5]);
+          //----
+          maximumRotation[0]=atof(argv[i+6]);
+          maximumRotation[1]=atof(argv[i+7]);
+          maximumRotation[2]=atof(argv[i+8]);
+          //----
+
+          bvh_RandomizePositionFrom2D(
+                                      &bvhMotion,
+                                      minimumRotation,
+                                      maximumRotation,
+                                      minimumDepth,
+                                      maximumDepth,
+                                      renderingConfiguration.fX,
+                                      renderingConfiguration.fY,
+                                      renderingConfiguration.cX,
+                                      renderingConfiguration.cY,
+                                      renderingConfiguration.width,
+                                      renderingConfiguration.height
+                                     );
 
           bvh_ConstrainRotations(&bvhMotion,flipRandomizationOrientation);
         } else
@@ -467,7 +508,56 @@ int main(int argc, char **argv)
 
           bvh_ConstrainRotations(&bvhMotion,flipRandomizationOrientation);
         } else
-        //-----------------------------------------------------
+         //-----------------------------------------------------
+        if (strcmp(argv[i],"--randomize2Dranges")==0)
+        {
+          // ./BVHTester --from Motions/02_03.bvh --randomize2Dranges 1400 5000 -35 -179.999999 -35 35 -90 35 -35 90 -35 35 180 35 --occlusions --svg tmp/
+          if (i+14>=argc)  { incorrectArguments(); }
+          float minimumRotationRangeA[3];
+          float maximumRotationRangeA[3];
+          float minimumRotationRangeB[3];
+          float maximumRotationRangeB[3];
+          float minimumDepth=0.0;
+          float maximumDepth=0.0;
+
+          minimumDepth=-1*atof(argv[i+1])/10;
+          maximumDepth=-1*atof(argv[i+2])/10;
+          //----
+          minimumRotationRangeA[0]=atof(argv[i+3]);
+          minimumRotationRangeA[1]=atof(argv[i+4]);
+          minimumRotationRangeA[2]=atof(argv[i+5]);
+          //----
+          maximumRotationRangeA[0]=atof(argv[i+6]);
+          maximumRotationRangeA[1]=atof(argv[i+7]);
+          maximumRotationRangeA[2]=atof(argv[i+8]);
+          //----
+          minimumRotationRangeB[0]=atof(argv[i+9]);
+          minimumRotationRangeB[1]=atof(argv[i+10]);
+          minimumRotationRangeB[2]=atof(argv[i+11]);
+          //----
+          maximumRotationRangeB[0]=atof(argv[i+12]);
+          maximumRotationRangeB[1]=atof(argv[i+13]);
+          maximumRotationRangeB[2]=atof(argv[i+14]);
+          //----
+
+          bvh_RandomizePositionFrom2DRotation2Ranges(
+                                      &bvhMotion,
+                                      minimumRotationRangeA,
+                                      maximumRotationRangeA,
+                                      minimumRotationRangeB,
+                                      maximumRotationRangeB,
+                                      minimumDepth,
+                                      maximumDepth,
+                                      renderingConfiguration.fX,
+                                      renderingConfiguration.fY,
+                                      renderingConfiguration.cX,
+                                      renderingConfiguration.cY,
+                                      renderingConfiguration.width,
+                                      renderingConfiguration.height
+                                     );
+
+          bvh_ConstrainRotations(&bvhMotion,flipRandomizationOrientation);
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeranges")==0)
         {

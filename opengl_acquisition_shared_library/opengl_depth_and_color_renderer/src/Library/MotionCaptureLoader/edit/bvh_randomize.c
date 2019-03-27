@@ -94,6 +94,50 @@ int bvh_PerturbJointAngles(
 }
 
 
+int bvh_RandomizePositionsBasedOn3D(
+                                     struct BVH_MotionCapture * mc,
+                                     float * minimumPosition,
+                                     float * maximumPosition
+                                    )
+{
+  fprintf(stderr,"Randomizing Positions of %u frames based on 3D coordinates\n",mc->numberOfFrames);
+  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f)",minimumPosition[0],minimumPosition[1],minimumPosition[2]);
+  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f)",maximumPosition[0],maximumPosition[1],maximumPosition[2]);
+  unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+   unsigned int mID=fID*mc->numberOfValuesPerFrame;
+   mc->motionValues[mID+0]=randomFloatA(minimumPosition[0],maximumPosition[0]);
+   mc->motionValues[mID+1]=randomFloatA(minimumPosition[1],maximumPosition[1]);
+   mc->motionValues[mID+2]=randomFloatA(minimumPosition[2],maximumPosition[2]);
+  }
+ return 1;
+}
+
+
+int bvh_RandomizeRotationsBasedOn3D(
+                                     struct BVH_MotionCapture * mc,
+                                     float * minimumRotation,
+                                     float * maximumRotation
+                                    )
+{
+  fprintf(stderr,"Randomizing Rotations of %u frames based on 3D coordinates\n",mc->numberOfFrames);
+  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f)",minimumRotation[0],minimumRotation[1],minimumRotation[2]);
+  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f)",maximumRotation[0],maximumRotation[1],maximumRotation[2]);
+  unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+   unsigned int mID=fID*mc->numberOfValuesPerFrame;
+   mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
+   mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
+   mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
+  }
+ return 1;
+}
+
+
+
+
 int bvh_RandomizePositionRotation(
                                   struct BVH_MotionCapture * mc,
                                   float * minimumPosition,
@@ -102,25 +146,8 @@ int bvh_RandomizePositionRotation(
                                   float * maximumRotation
                                  )
 {
-  fprintf(stderr,"Randomizing %u frames \n",mc->numberOfFrames);
-  fprintf(stderr,"min(%0.2f,%0.2f,%0.2f,",minimumPosition[0],minimumPosition[1],minimumPosition[2]);
-  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",minimumRotation[0],minimumRotation[1],minimumRotation[2]);
-  fprintf(stderr,"max(%0.2f,%0.2f,%0.2f,",maximumPosition[0],maximumPosition[1],maximumPosition[2]);
-  fprintf(stderr,"%0.2f,%0.2f,%0.2f)\n",maximumRotation[0],maximumRotation[1],maximumRotation[2]);
-
-
-  unsigned int fID=0;
-  for (fID=0; fID<mc->numberOfFrames; fID++)
-  {
-   unsigned int mID=fID*mc->numberOfValuesPerFrame;
-   mc->motionValues[mID+0]=randomFloatA(minimumPosition[0],maximumPosition[0]);
-   mc->motionValues[mID+1]=randomFloatA(minimumPosition[1],maximumPosition[1]);
-   mc->motionValues[mID+2]=randomFloatA(minimumPosition[2],maximumPosition[2]);
-   mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
-   mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
-   mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
-  }
- return 1;
+  return ( (bvh_RandomizePositionsBasedOn3D(mc,minimumPosition,maximumPosition)) &&
+            (bvh_RandomizeRotationsBasedOn3D(mc,minimumPosition,maximumPosition)) );
 }
 
 
@@ -181,6 +208,94 @@ int bvh_RandomizePositionRotation2Ranges(
 
 
 
+void transform2DFProjectedPointTo3DPoint(float fX,float fY,float cX,float cY,unsigned int width,unsigned int height,
+                                        float x2D , float y2D  , float depthValue ,
+                                        float * x3D , float * y3D)
+{
+ *x3D = (float) (x2D - cX) * (depthValue / fX);
+ *y3D = (float) (y2D - cY) * (depthValue / fY);
+}
+
+
+
+
+
+
+int bvh_RandomizePositionFrom2D(
+                                 struct BVH_MotionCapture * mc,
+                                 float * minimumRotation,
+                                 float * maximumRotation,
+                                 float minimumDepth,float maximumDepth,
+                                 float fX,float fY,float cX,float cY,unsigned int width,unsigned int height
+                                )
+{
+  fprintf(stderr,"Randomizing %u frames  using 2D randomizations \n",mc->numberOfFrames);
+
+  unsigned int borderX=width/8;
+  unsigned int borderY=height/5;
+
+  unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+   unsigned int mID=fID*mc->numberOfValuesPerFrame;
+
+   mc->motionValues[mID+2]=randomFloatA(minimumDepth,maximumDepth);
+   unsigned int x2D = borderX+ rand()%(width-borderX*2);
+   unsigned int y2D = borderY+ rand()%(height-borderY*2);
+   transform2DFProjectedPointTo3DPoint(fX,fY,cX,cY,width,height,(float) x2D,(float) y2D,mc->motionValues[mID+2],&mc->motionValues[mID+0],&mc->motionValues[mID+1]);
+
+   mc->motionValues[mID+3]=randomFloatA(minimumRotation[0],maximumRotation[0]);
+   mc->motionValues[mID+4]=randomFloatA(minimumRotation[1],maximumRotation[1]);
+   mc->motionValues[mID+5]=randomFloatA(minimumRotation[2],maximumRotation[2]);
+  }
+ return 1;
+}
+
+
+int bvh_RandomizePositionFrom2DRotation2Ranges(
+                                               struct BVH_MotionCapture * mc,
+                                               float * minimumRotationRangeA,
+                                               float * maximumRotationRangeA,
+                                               float * minimumRotationRangeB,
+                                               float * maximumRotationRangeB,
+                                               float minimumDepth,float maximumDepth,
+                                               float fX,float fY,float cX,float cY,unsigned int width,unsigned int height
+                                              )
+{
+  fprintf(stderr,"Randomizing %u frames at two ranges\n",mc->numberOfFrames);
+
+  //Randomize Positions using same codepath as bvh_RandomizePositionFrom2D (we also overwrite rotations but will get randomized again anyway)
+  bvh_RandomizePositionFrom2D(
+                               mc,
+                               minimumRotationRangeA,
+                               maximumRotationRangeA,
+                               minimumDepth,maximumDepth,
+                               fX,fY,cX,cY,width,height
+                              );
+
+  //Just Randomize Rotations like bvh_RandomizePositionRotation2Ranges
+  unsigned int fID=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+   unsigned int mID=fID*mc->numberOfValuesPerFrame;
+   float whichHalf = rand() / (float) RAND_MAX; /* [0, 1.0] */
+
+   if (whichHalf<0.5)
+           {
+              mc->motionValues[mID+3]=randomFloatA(minimumRotationRangeA[0],maximumRotationRangeA[0]);
+              mc->motionValues[mID+4]=randomFloatA(minimumRotationRangeA[1],maximumRotationRangeA[1]);
+              mc->motionValues[mID+5]=randomFloatA(minimumRotationRangeA[2],maximumRotationRangeA[2]);
+           } else
+           {
+              mc->motionValues[mID+3]=randomFloatA(minimumRotationRangeB[0],maximumRotationRangeB[0]);
+              mc->motionValues[mID+4]=randomFloatA(minimumRotationRangeB[1],maximumRotationRangeB[1]);
+              mc->motionValues[mID+5]=randomFloatA(minimumRotationRangeB[2],maximumRotationRangeB[2]);
+           }
+  }
+ return 1;
+}
+
+
 
 
 
@@ -190,10 +305,37 @@ int bvh_TestRandomizationLimitsXYZ(
                                    float * maximumPosition
                                   )
 {
-  if (mc->numberOfFrames<4)
+  if (mc->numberOfFrames<8)
   {
     return 0;
   }
+  mc->numberOfFrames=8;
+
+  unsigned int fID,mID;
+  //----------------------------------------
+  fID=0; mID=fID*mc->numberOfValuesPerFrame;
+  mc->motionValues[mID+0]=minimumPosition[0];  mc->motionValues[mID+1]=minimumPosition[1]; mc->motionValues[mID+2]=minimumPosition[2]; //Minimum X , Minimum Y , Minimum Z
+  //----------------------------------------
+  ++fID; mID=fID*mc->numberOfValuesPerFrame;
+  mc->motionValues[mID+0]=minimumPosition[0]; mc->motionValues[mID+1]=minimumPosition[1];  mc->motionValues[mID+2]=maximumPosition[2];
+  //----------------------------------------
+  ++fID; mID=fID*mc->numberOfValuesPerFrame;
+  mc->motionValues[mID+0]=minimumPosition[0]; mc->motionValues[mID+1]=maximumPosition[1];  mc->motionValues[mID+2]=minimumPosition[2];
+  //----------------------------------------
+  ++fID; mID=fID*mc->numberOfValuesPerFrame;
+  mc->motionValues[mID+0]=minimumPosition[0]; mc->motionValues[mID+1]=maximumPosition[1];  mc->motionValues[mID+2]=maximumPosition[2];
+  //----------------------------------------
+  ++fID; mID=fID*mc->numberOfValuesPerFrame;
+  mc->motionValues[mID+0]=maximumPosition[0]; mc->motionValues[mID+1]=minimumPosition[1];  mc->motionValues[mID+2]=minimumPosition[2];
+  //----------------------------------------
+  ++fID; mID=fID*mc->numberOfValuesPerFrame;
+  mc->motionValues[mID+0]=maximumPosition[0]; mc->motionValues[mID+1]=minimumPosition[1];  mc->motionValues[mID+2]=maximumPosition[2];
+  //----------------------------------------
+  ++fID; mID=fID*mc->numberOfValuesPerFrame;
+  mc->motionValues[mID+0]=maximumPosition[0]; mc->motionValues[mID+1]=maximumPosition[1];  mc->motionValues[mID+2]=minimumPosition[2];
+  //----------------------------------------
+  ++fID; mID=fID*mc->numberOfValuesPerFrame;
+  mc->motionValues[mID+0]=maximumPosition[0]; mc->motionValues[mID+1]=maximumPosition[1];  mc->motionValues[mID+2]=maximumPosition[2]; //Maximum X , Maximum Y, Maximum Z
 
 
   return 1;

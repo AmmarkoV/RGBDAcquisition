@@ -37,6 +37,25 @@ int bvh_RandomizePositionRotation2Ranges(
                                          float * maximumRotationRangeB
                                         );
 
+
+int bvh_RandomizePositionFrom2DRotation2Ranges(
+                                               struct BVH_MotionCapture * mc,
+                                               float * minimumRotationRangeA,
+                                               float * maximumRotationRangeA,
+                                               float * minimumRotationRangeB,
+                                               float * maximumRotationRangeB,
+                                               float minimumDepth,float maximumDepth,
+                                               float fX,float fY,float cX,float cY,unsigned int width,unsigned int height
+                                              );
+
+int bvh_RandomizePositionFrom2D(
+                                 struct BVH_MotionCapture * mc,
+                                 float * minimumRotation,
+                                 float * maximumRotation,
+                                 float minimumDepth,float maximumDepth,
+                                 float fX,float fY,float cX,float cY,unsigned int width,unsigned int height
+                                );
+
 int bvh_TestRandomizationLimitsXYZ(
                                    struct BVH_MotionCapture * mc,
                                    float * minimumPosition,
