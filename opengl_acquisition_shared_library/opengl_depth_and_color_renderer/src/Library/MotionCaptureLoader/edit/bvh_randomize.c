@@ -190,7 +190,13 @@ int bvh_TestRandomizationLimitsXYZ(
                                    float * maximumPosition
                                   )
 {
+  if (mc->numberOfFrames<4)
+  {
+    return 0;
+  }
 
+
+  return 1;
 }
 
 
