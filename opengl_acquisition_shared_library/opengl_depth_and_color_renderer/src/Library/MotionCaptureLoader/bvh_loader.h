@@ -157,15 +157,6 @@ int enumerateChannelOrderFromTypes(char typeA,char typeB,char typeC);
 int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint);
 
 /**
-* @brief Different motion capture systems produce different types of joint names. For example lhip can be named lefthip,leftupleg,lthigh,leftupperLeg etc.
-*        This call renames them in order to ensure better compatibility with various different motion capture files..
-* @ingroup BVH
-* @param  BVH Structure
-*/
-void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion);
-
-
-/**
 * @brief Load a BVH file by giving a filename and filling in a BVH_MotionCapture struct
 * @ingroup BVH
 * @param  C-String with path to BVH File
@@ -182,37 +173,6 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 * @return 1=Success/0=Failure
 */
 int bvh_free(struct BVH_MotionCapture * bvhMotion);
-
-
-
-int bvh_PerturbJointAngles(
-                           struct BVH_MotionCapture * mc,
-                           unsigned int numberOfValues,
-                           float  deviation,
-                           char **argv,
-                           unsigned int iplus2
-                          );
-
-
-int bvh_RandomizePositionRotation(
-                                  struct BVH_MotionCapture * mc,
-                                  float * minimumPosition,
-                                  float * minimumRotation,
-                                  float * maximumPosition,
-                                  float * maximumRotation
-                                 );
-
-int bvh_RandomizePositionRotation2Ranges(
-                                         struct BVH_MotionCapture * mc,
-                                         float * minimumPositionRangeA,
-                                         float * minimumRotationRangeA,
-                                         float * maximumPositionRangeA,
-                                         float * maximumRotationRangeA,
-                                         float * minimumPositionRangeB,
-                                         float * minimumRotationRangeB,
-                                         float * maximumPositionRangeB,
-                                         float * maximumRotationRangeB
-                                        );
 
 
 int bvh_SetPositionRotation(

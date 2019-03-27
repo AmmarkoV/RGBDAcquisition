@@ -20,6 +20,8 @@
 #include "../../Library/MotionCaptureLoader/export/bvh_export.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_bvh.h"
 
+#include "../../Library/MotionCaptureLoader/edit/bvh_randomize.h"
+#include "../../Library/MotionCaptureLoader/edit/bvh_rename.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h"
 
 #include  "../../../../../tools/AmMatrix/matrix4x4Tools.h"

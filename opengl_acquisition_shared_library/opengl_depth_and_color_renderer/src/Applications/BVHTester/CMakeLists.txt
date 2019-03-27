@@ -44,6 +44,8 @@ add_executable(
               ../../Library/MotionCaptureLoader/export/bvh_to_csv.c
               ../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c
               ../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c
+              ../../Library/MotionCaptureLoader/edit/bvh_randomize.c 
+              ../../Library/MotionCaptureLoader/edit/bvh_rename.c 
               ../../Library/MotionCaptureLoader/edit/bvh_cut_paste.c 
               ../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.c 
               ../../Library/TrajectoryParser/InputParser_C.c
