@@ -76,6 +76,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_randomize.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_randomize.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_rename.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_rename.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_export.c">
 			<Option compilerVar="CC" />
 		</Unit>
