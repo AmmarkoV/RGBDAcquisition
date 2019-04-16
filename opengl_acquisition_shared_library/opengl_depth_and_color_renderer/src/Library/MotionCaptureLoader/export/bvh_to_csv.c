@@ -286,7 +286,7 @@ int dumpBVHToCSVBody(
           //if (bvhTransform->joint[jID].isOccluded) { fprintf(fp,"0,0,0,"); } else
           {
            fprintf(
-                   fp2D,"%0.4f,%0.4f,%u,",
+                   fp2D,"%0.6f,%0.6f,%u,",
                    (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                    (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                    (bvhTransform->joint[jID].isOccluded==0)
@@ -302,7 +302,7 @@ int dumpBVHToCSVBody(
           {
               //jID parentID
            fprintf(
-                   fp2D,"%0.4f,%0.4f,%u,",
+                   fp2D,"%0.6f,%0.6f,%u,",
                    (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                    (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                    (bvhTransform->joint[jID].isOccluded==0)
@@ -326,7 +326,7 @@ int dumpBVHToCSVBody(
          if (!mc->jointHierarchy[jID].isEndSite)
          {
           fprintf(
-                  fp3D,"%0.2f,%0.2f,%0.2f,",
+                  fp3D,"%0.4f,%0.4f,%0.4f,",
                   bvhTransform->joint[jID].pos3D[0],
                   bvhTransform->joint[jID].pos3D[1],
                   bvhTransform->joint[jID].pos3D[2]
@@ -352,7 +352,7 @@ int dumpBVHToCSVBody(
            {
              unsigned int channelType =  mc->jointHierarchy[jID].channelType[channelID];
              fprintf(
-                     fpBVH,"%0.4f,",
+                     fpBVH,"%0.6f,",
                      bvh_getJointChannelAtFrame(mc,jID,fID,channelType)
                     );
            }
