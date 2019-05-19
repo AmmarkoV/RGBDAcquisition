@@ -44,7 +44,7 @@
 			<Add library="../acquisitionSegment/libAcquisitionSegment.a" />
 			<Add library="../acquisition_mux/libAcquisitionMux.a" />
 			<Add library="../processors/ViewpointChange/libViewpointChange.a" />
-			<Add library="../../../RGBDAcquisition/processors/BlobDetector/libBlobDetector.so" />
+			<Add library="../processors/BlobDetector/libBlobDetector.so" />
 		</Linker>
 		<Unit filename="AddNewElement.cpp" />
 		<Unit filename="AddNewElement.h" />

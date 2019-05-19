@@ -70,6 +70,7 @@ class EditorFrame: public wxFrame
         void OnOpenModule(wxCommandEvent& event);
         void OnSavePair(wxCommandEvent& event);
         void OnSavePCD(wxCommandEvent& event);
+        void OnSaveFB(wxCommandEvent& event);
         void OnSaveDepth(wxCommandEvent& event);
         void OpenOverlayEditor(wxCommandEvent& event);
 
@@ -165,6 +166,7 @@ class EditorFrame: public wxFrame
         static const long ID_CHOICE1;
         static const long ID_MENUOPENMODULE;
         static const long ID_MENUSAVEPAIR;
+        static const long ID_MENUSAVEFB;
         static const long ID_MENUSAVEDEPTH;
         static const long ID_MENUSAVEPCD;
         static const long ID_MENUSCANHUMAN;
@@ -186,6 +188,7 @@ class EditorFrame: public wxFrame
         wxButton* ButtonPlusRotZ;
         wxButton* ButtonPlusRotY;
         wxSlider* OverlaySlider;
+        wxMenuItem* MenuItem12;
         wxChoice* ChoiceProcessor;
         wxButton* buttonRecord;
         wxButton* ButtonMinusPosX;

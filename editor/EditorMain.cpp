@@ -213,6 +213,7 @@ const long EditorFrame::ID_BUTTON27 = wxNewId();
 const long EditorFrame::ID_CHOICE1 = wxNewId();
 const long EditorFrame::ID_MENUOPENMODULE = wxNewId();
 const long EditorFrame::ID_MENUSAVEPAIR = wxNewId();
+const long EditorFrame::ID_MENUSAVEFB = wxNewId();
 const long EditorFrame::ID_MENUSAVEDEPTH = wxNewId();
 const long EditorFrame::ID_MENUSAVEPCD = wxNewId();
 const long EditorFrame::ID_MENUSCANHUMAN = wxNewId();
@@ -311,6 +312,8 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     Menu1->Append(MenuItem6);
     MenuItem9 = new wxMenuItem(Menu1, ID_MENUSAVEPAIR, _("Save Pair"), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(MenuItem9);
+    MenuItem12 = new wxMenuItem(Menu1, ID_MENUSAVEFB, _("Save Pair for FB"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem12);
     MenuItem5 = new wxMenuItem(Menu1, ID_MENUSAVEDEPTH, _("Save Depth Frame"), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(MenuItem5);
     MenuItem5->Enable(false);
@@ -384,6 +387,7 @@ EditorFrame::EditorFrame(wxWindow* parent,wxWindowID id)
     //Connect menu stuff
     Connect(ID_MENUSAVEPAIR,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSavePair);
     Connect(ID_MENUSAVEPCD,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSavePCD);
+    Connect(ID_MENUSAVEFB,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSaveFB);
     Connect(ID_MENUSAVEDEPTH,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnSaveDepth);
     Connect(ID_MENUOPENMODULE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnOpenModule);
     Connect(ID_MENUSEGMENTATION,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorFrame::OnButtonSegmentationClick);
@@ -694,6 +698,15 @@ void EditorFrame::OnSavePair(wxCommandEvent& event)
     acquisitionSaveDepthFrame(moduleID,devID,filename,compressRecordingOutput);
  }
 
+
+void EditorFrame::OnSaveFB(wxCommandEvent& event)
+{
+    char filename[512];
+    sprintf(filename,"image",lastFrameDrawn);
+    acquisitionSaveColorFrame(moduleID,devID,filename,1);
+    sprintf(filename,"image_depth",lastFrameDrawn);
+    acquisitionSaveDepthFrame(moduleID,devID,filename,1);
+}
 
 void EditorFrame::OnSavePCD(wxCommandEvent& event)
  {

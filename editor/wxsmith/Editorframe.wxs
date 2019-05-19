@@ -277,6 +277,9 @@
 				<object class="wxMenuItem" name="ID_MENUSAVEPAIR" variable="MenuItem9" member="yes">
 					<label>Save Pair</label>
 				</object>
+				<object class="wxMenuItem" name="ID_MENUSAVEFB" variable="MenuItem12" member="yes">
+					<label>Save Pair for FB</label>
+				</object>
 				<object class="wxMenuItem" name="ID_MENUSAVEDEPTH" variable="MenuItem5" member="yes">
 					<label>Save Depth Frame</label>
 					<enabled>0</enabled>
