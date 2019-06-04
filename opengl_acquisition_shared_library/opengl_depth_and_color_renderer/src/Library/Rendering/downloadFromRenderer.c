@@ -96,6 +96,7 @@ int downloadOpenGLZBuffer(unsigned short * depth , unsigned int x,unsigned int y
          for ( i =0 ; i < (width-x); i ++ )
             {
               //float tmpF=zbuffer[(height-1-yp)*stride+i];
+              //tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) * 65534.0;
               tmpF  = (1.0f - zbuffer[(height-1-yp)*stride+i]) * 65534.0;
               unsigned short tmp = (unsigned short) tmpF;
               depth[yp*stride+i]= tmp ;

@@ -200,6 +200,7 @@ int dumpBVHToCSVHeader(
      if (fpBVH!=0)
      {
 
+     //----------------------------------------------
      unsigned int lastElement=0;
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -208,11 +209,11 @@ int dumpBVHToCSVHeader(
            lastElement=jID;
          }
        }
+     //----------------------------------------------
 
 
 
       char comma=',';
-
       //Model Configuration
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -352,6 +353,7 @@ int dumpBVHToCSVBody(
    if (fpBVH!=0)
    {
 
+     //----------------------------------------------
      unsigned int lastElement=0;
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -360,6 +362,7 @@ int dumpBVHToCSVBody(
            lastElement=jID;
          }
        }
+     //----------------------------------------------
 
 
      char comma=',';

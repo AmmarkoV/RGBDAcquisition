@@ -96,7 +96,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
              writeOpenGLDepth("depth.pnm",0,0,WIDTH,HEIGHT);
              fprintf(stderr,"Convert to jpg\n");
              system("convert color.pnm image.jpg");
-             system("convert depth.pnm image_depth.jpg");  
+             system("convert depth.pnm image_depth.png");
             return 1;
         break;
 
