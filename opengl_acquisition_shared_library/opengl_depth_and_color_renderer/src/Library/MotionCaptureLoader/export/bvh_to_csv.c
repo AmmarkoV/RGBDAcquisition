@@ -391,7 +391,7 @@ int dumpBVHToCSVBody(
                      bvh_getJointChannelAtFrame(mc,jID,fID,channelType)
                     );
 
-             if ((comma!=',')&&(channelID==mc->jointHierarchy[jID].loadedChannels-1)) {  } else  { fprintf(fpBVH,",");  }
+             if ( (comma!=',') && (channelID==mc->jointHierarchy[jID].loadedChannels-1) ) {  } else  { fprintf(fpBVH,",");  }
            }
          }
        }
