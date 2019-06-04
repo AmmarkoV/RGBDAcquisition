@@ -199,12 +199,24 @@ int dumpBVHToCSVHeader(
      FILE * fpBVH = fopen(filenameBVH,"a");
      if (fpBVH!=0)
      {
+
+     unsigned int lastElement=0;
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+           lastElement=jID;
+         }
+       }
+
+
+
       char comma=',';
 
       //Model Configuration
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-         if (jID==mc->jointHierarchySize-1) { comma=' '; }
+         if (jID==lastElement) { comma=' '; }
 
          if (!mc->jointHierarchy[jID].isEndSite)
          {
@@ -296,39 +308,13 @@ int dumpBVHToCSVBody(
 
          if (jID==mc->jointHierarchySize-1) { comma=' '; }
 
-         ///=================================================
-         if (!mc->jointHierarchy[jID].isEndSite)
-         {
-          //If uncommented we will not just set the visible flag but also send zeros
-          //if (bvhTransform->joint[jID].isOccluded) { fprintf(fp,"0,0,0,"); } else
-          {
-           fprintf(
-                   fp2D,"%0.6f,%0.6f,%u%c",
-                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
-                   (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
-                   (bvhTransform->joint[jID].isOccluded==0),
-                   comma
-                  );
-          }
-         }
-         ///=================================================
-         else
-         {
-          //unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
-          //If uncommented we will not just set the visible flag but also send zeros
-          //if (bvhTransform->joint[jID].isOccluded) { fprintf(fp,"0,0,0,"); } else
-          {
-              //jID parentID
-           fprintf(
-                   fp2D,"%0.6f,%0.6f,%u%c",
-                   (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
-                   (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
-                   (bvhTransform->joint[jID].isOccluded==0),
-                   comma
-                  );
-          }
-         }
-         ///=================================================
+         fprintf(
+                 fp2D,"%0.6f,%0.6f,%u%c",
+                 (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
+                 (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
+                 (bvhTransform->joint[jID].isOccluded==0),
+                 comma
+                );
        }
      fprintf(fp2D,"\n");
      fclose(fp2D);
@@ -365,11 +351,22 @@ int dumpBVHToCSVBody(
    //Joint Configuration
    if (fpBVH!=0)
    {
+
+     unsigned int lastElement=0;
+     for (jID=0; jID<mc->jointHierarchySize; jID++)
+       {
+         if (!mc->jointHierarchy[jID].isEndSite)
+         {
+           lastElement=jID;
+         }
+       }
+
+
      char comma=',';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
 
-         if (jID==mc->jointHierarchySize-1) { comma=' '; }
+         if (jID==lastElement) { comma=' '; }
 
          if (!mc->jointHierarchy[jID].isEndSite)
          {
