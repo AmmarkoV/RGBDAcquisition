@@ -11,7 +11,7 @@
 
 #include <GL/gl.h>
 #include <GL/glx.h>
-#include <GL/glext.h>
+//#include <GL/glext.h>
 
 #include "shader_loader.h"
 #include "../../Tools/tools.h"
