@@ -7,14 +7,16 @@
 #if USE_GLEW
 // Include GLEW
 #include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
 #else
  #warning "USE_GLEW not defined , shader code is useless.."
+#include <GL/gl.h>
+#include <GL/glx.h>
+#include <GL/glext.h>
 #endif // USE_GLEW
 
 
-#include <GL/gl.h>
-#include <GL/glx.h>
-//#include <GL/glext.h>
 
 
 
