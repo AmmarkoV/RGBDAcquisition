@@ -3,6 +3,12 @@
 
 #include "bvh_loader.h"
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /*
    0  1  2  3
    4  5  6  7
@@ -97,5 +103,13 @@ int bvh_loadTransformForFrameProjectTo2D(
                                          struct BVH_MotionCapture * bvhMotion ,
                                          struct BVH_Transform * bvhTransform
                                         );
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif // BVH_TRANSFORM_H_INCLUDED

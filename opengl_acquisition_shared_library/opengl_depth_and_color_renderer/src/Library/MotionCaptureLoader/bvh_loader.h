@@ -8,6 +8,12 @@
 #ifndef BVH_LOADER_H_INCLUDED
 #define BVH_LOADER_H_INCLUDED
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /**
 * @brief MAX_BVH_JOINT_NAME is the maximum label size for Joint names
 * @ingroup BVH
@@ -374,6 +380,10 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion);
 
 void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 
 
