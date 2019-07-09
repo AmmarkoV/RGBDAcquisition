@@ -989,6 +989,16 @@ int bvh_getRootJointID(
 }
 
 
+int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
+{
+   if (bvhMotion==0) { return 0; }
+   if (bvhMotion->jointHierarchySize>jID)
+     {
+       return bvhMotion->jointHierarchy[jID].parentJoint;
+     }
+   return 0;
+}
+
 
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------

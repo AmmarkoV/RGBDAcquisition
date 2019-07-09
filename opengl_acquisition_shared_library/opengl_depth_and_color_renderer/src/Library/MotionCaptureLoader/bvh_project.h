@@ -8,6 +8,11 @@
 #include "../../../../../tools/AmMatrix/simpleRenderer.h"
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 
 struct BVH_RendererConfiguration
 {
@@ -43,5 +48,12 @@ int bvh_projectTo2D(
                      unsigned int               occlusions,
                      unsigned int               directRendering
                    );
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif // BVH_PROJECT_H_INCLUDED

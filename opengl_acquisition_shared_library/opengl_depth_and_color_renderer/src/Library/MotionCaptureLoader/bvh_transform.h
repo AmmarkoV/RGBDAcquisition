@@ -98,12 +98,12 @@ int bvh_loadTransformForMotionBuffer(
                                      float * motionBuffer,
                                      struct BVH_Transform * bvhTransform
                                     );
-
+/*
 int bvh_loadTransformForFrameProjectTo2D(
                                          struct BVH_MotionCapture * bvhMotion ,
                                          struct BVH_Transform * bvhTransform
                                         );
-
+*/
 
 
 #ifdef __cplusplus

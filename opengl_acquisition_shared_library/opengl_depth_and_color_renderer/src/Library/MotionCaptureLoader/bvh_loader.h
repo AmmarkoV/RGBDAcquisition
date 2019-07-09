@@ -204,6 +204,17 @@ int bvh_InterpolateMotion(
 
 
 /**
+* @brief Get Parent joint .
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Joint ID we want to query
+* @return 1=HasParent/0=NoParent-Error
+*/
+int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
+
+
+
+/**
 * @brief Ask if joint has a parent.
 * @ingroup BVH
 * @param  BVH Structure

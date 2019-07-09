@@ -2,6 +2,12 @@
 #define SIMPLERENDERER_H_INCLUDED
 
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 struct simpleRenderer
 {
   float fx;
@@ -66,5 +72,12 @@ int simpleRendererInitialize(struct simpleRenderer * sr);
 
 
 int simpleRendererInitializeFromExplicitConfiguration(struct simpleRenderer * sr);
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // SIMPLERENDERER_H_INCLUDED
