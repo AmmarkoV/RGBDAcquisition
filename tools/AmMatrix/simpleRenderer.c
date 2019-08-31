@@ -135,7 +135,9 @@ int simpleRendererRender(
                      windowCoordinates
                     )
      )
-     { fprintf(stderr,"Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",final3DPosition[0],final3DPosition[1],final3DPosition[2]); }
+     { 
+       // fprintf(stderr,"simpleRendererRender: Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",final3DPosition[0],final3DPosition[1],final3DPosition[2]); 
+     }
  ///--------------------------------------------------------------------
   *output2DX = windowCoordinates[0];//windowCoordinates[2];
   *output2DY = windowCoordinates[1];//windowCoordinates[2];
@@ -171,7 +173,9 @@ int simpleRendererRenderUsingPrecalculatedMatrices(
                      windowCoordinates
                     )
      )
-     { fprintf(stderr,"Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",position3D[0],position3D[1],position3D[2]); }
+     { 
+         //fprintf(stderr,"simpleRendererRenderUsingPrecalculatedMatrices: Could not project 3D Point (%0.2f,%0.2f,%0.2f)\n",position3D[0],position3D[1],position3D[2]); 
+     }
  ///--------------------------------------------------------------------
   *output2DX = windowCoordinates[0];//windowCoordinates[2];
   *output2DY = windowCoordinates[1];//windowCoordinates[2];
