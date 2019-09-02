@@ -159,18 +159,18 @@ int convertRodriguezAndTranslationToOpenGL4x4DProjectionMatrix(double * result4x
 
 
 void buildOpenGLProjectionForIntrinsics   (
-                                             float * frustum,
-                                             int * viewport ,
-                                             float fx,
-                                             float fy,
-                                             float skew,
-                                             float cx, float cy,
-                                             unsigned int imageWidth, unsigned int imageHeight,
-                                             float nearPlane,
-                                             float farPlane
-                                           )
+                                                                                              float * frustum,
+                                                                                              int * viewport ,
+                                                                                              float fx,
+                                                                                              float fy,
+                                                                                              float skew,
+                                                                                              float cx, float cy,
+                                                                                              unsigned int imageWidth, unsigned int imageHeight,
+                                                                                              float nearPlane,
+                                                                                              float farPlane
+                                                                                            )
 {
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsics using old Ammar code Image(%ux%u)\n",imageWidth,imageHeight);
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsics: Size(%ux%u) ",imageWidth,imageHeight);
    fprintf(stderr,"fx %0.2f, fy %0.2f, cx %0.2f, cy %0.2f, skew %0.2f, ",fx,fy,cx,cy,skew);
    fprintf(stderr,"Near %0.2f, Far %0.2f\n",nearPlane,farPlane);
 
