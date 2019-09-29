@@ -27,8 +27,8 @@
 #define RED     "\033[31m"      /* Red */
 
 
-  int WIDTH=640;
-  int HEIGHT=480;
+int WIDTH=640;
+int HEIGHT=480;
 
 
 static const float cubeCoords[]=
@@ -185,6 +185,9 @@ float pyramidCoords[]={ //X  Y  Z       W
                      -U, -U, -U, //1.0,  // bottom left
                       U, -U, -U  //, 1.0 // bottom right
                     };
+
+
+
 float pyramidNormals[]={ //X  Y  Z  W
                       0.0,0.4472,-0.8944,
                       0.0,0.4472,0.8944,
@@ -400,12 +403,12 @@ int drawObjectAT(GLuint programID,
                                     roll,//roll
                                     pitch ,//pitch
                                     yaw ,//yaw
+                                    ROTATION_ORDER_RPY,
 
                                     //Translation Component (XYZ)
                                     (double) x/100,
                                     (double) y/100,
                                     (double) z/100,
-                                    ROTATION_ORDER_RPY,
 
                                     10.0,//scaleX,
                                     10.0,//scaleY,

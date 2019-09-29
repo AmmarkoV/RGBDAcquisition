@@ -498,8 +498,11 @@ void create4x4MatrixFromEulerAnglesWithRotationOrder(double * m ,double eulX, do
       multiplyTwo4x4MatricesBuffered(m,m,rY);
       multiplyTwo4x4MatricesBuffered(m,m,rX);
     break;
+    case ROTATION_ORDER_RPY:
+      fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrder can't handle RPY\n");
+    break;
     default :
-      fprintf(stderr,"Error, Incorrect rotation type %u\n",rotationOrder);
+      fprintf(stderr,"create4x4MatrixFromEulerAnglesWithRotationOrder: Error, Incorrect rotation type %u\n",rotationOrder);
     break;
   };
 
@@ -1052,7 +1055,7 @@ void create4x4ModelTransformation(
     //fprintf(stderr,"scaled(%0.2f,%0.2f,%0.2f)\n",scaleX,scaleY,scaleZ);
 
 
-    double intermediateMatrixTranslation[16];
+    double intermediateMatrixTranslation[16]={0};
     create4x4TranslationMatrix(
                                intermediateMatrixTranslation,
                                x,
@@ -1067,6 +1070,10 @@ void create4x4ModelTransformation(
     if ( (x==0) && (y==0) && (z==0) )
     {
       create4x4IdentityMatrix(intermediateMatrixRotation);
+    } else
+    if (rotationOrder>=ROTATION_ORDER_NAMES)
+    {
+      fprintf(stderr,"create4x4ModelTransformation: wrong rotationOrder(%u)\n",rotationOrder);
     } else
     if (rotationOrder==ROTATION_ORDER_RPY)
     {
