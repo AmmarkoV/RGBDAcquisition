@@ -20,9 +20,15 @@ short * openGLDepthFrame = 0;
 struct calibration calibRGB;
 struct calibration calibDepth;
 
+int tryStartingWithoutWindow=1;
+
 
 int startOpenGLModule(unsigned int max_devs,const char * settings)
 {
+    if (strstr(settings,"safe")!=0)
+    {
+        tryStartingWithoutWindow=0;
+    }
   return 1;
 }
 
@@ -53,7 +59,16 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
                           { openGLDepthFrame = (short*)  malloc(sizeof(short) * openGL_WIDTH*openGL_HEIGHT*1); }
 
 
-   if (!startOGLRendererSandbox(0,0,openGL_WIDTH,openGL_HEIGHT,0 /*View Window*/,devName) )
+    if (!tryStartingWithoutWindow)
+    {
+       if (!startOGLRendererSandbox(0,0,openGL_WIDTH,openGL_HEIGHT,1 /*View Window*/,devName) )
+      {
+        return 0;
+        //return ((openGLColorFrame!=0) && (openGLDepthFrame!=0)) ;
+      }
+    }
+    else
+   if  (!startOGLRendererSandbox(0,0,openGL_WIDTH,openGL_HEIGHT,0 /*View Window*/,devName) )
    {
      fprintf(stderr,"Could not start openGL context with a p-buffer..");
      fprintf(stderr,"Will now try to start it with a visible window..");
