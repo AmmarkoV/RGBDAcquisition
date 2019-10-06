@@ -1042,26 +1042,53 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
       for (int frameID=0; frameID<bvhMotion->numberOfFramesEncountered; frameID++)
        {
          //fprintf(stderr,"FrameNumber %u\n",frameID); 
+         for (int mID=0; mID<bvhMotion->numberOfValuesPerFrame; mID++)
+         {
+             
+             jointID = bvhMotion->motionToJointLookup[mID].jointID;
+             int isMIDProtected=0;
+            
+             for (int aJ=0; aJ<numberOfArguments; aJ++)
+              {
+               if (successJoints[aJ])
+                {
+                   if (jointID==activeJoints[aJ])
+                   {
+                     isMIDProtected=1;  
+                   }
+                }
+              }
+              
+            if (!isMIDProtected)
+            {
+              mID_Initial=mID;  
+              mID_Target=frameID * bvhMotion->numberOfValuesPerFrame + mID;
+              bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial]; 
+            }  
+              
+         }
+             
+         /* This does the inverse
          for (int aJ=0; aJ<numberOfArguments; aJ++)
          {
            if (successJoints[aJ])
            {
-           jointID = activeJoints[aJ];
+            jointID = activeJoints[aJ];
            
-           mID_Initial = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,firstFrame,BVH_ROTATION_X);  
-           mID_Target = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,frameID,BVH_ROTATION_X);  
-           bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial]; 
+            mID_Initial = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,firstFrame,BVH_ROTATION_X);  
+            mID_Target = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,frameID,BVH_ROTATION_X);  
+            bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial]; 
+ 
+            mID_Initial = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,firstFrame,BVH_ROTATION_Y);  
+            mID_Target = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,frameID,BVH_ROTATION_Y);  
+            bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial]; 
 
-           mID_Initial = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,firstFrame,BVH_ROTATION_Y);  
-           mID_Target = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,frameID,BVH_ROTATION_Y);  
-           bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial]; 
-
-           mID_Initial = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,firstFrame,BVH_ROTATION_Z);  
-           mID_Target = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,frameID,BVH_ROTATION_Z);  
-           bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial];  
-               
+            mID_Initial = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,firstFrame,BVH_ROTATION_Z);  
+            mID_Target = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,frameID,BVH_ROTATION_Z);  
+            bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial];   
            }  
          }
+         */
        }
       free(successJoints); 
       free(activeJoints);   
