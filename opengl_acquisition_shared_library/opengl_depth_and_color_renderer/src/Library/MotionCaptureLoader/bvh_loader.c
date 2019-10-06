@@ -999,6 +999,58 @@ int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
    return 0;
 }
 
+int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int numberOfArguments,char **argv)
+{
+    fprintf(stderr,"bvh_onlyAnimateGivenJoints with %u arguments\n",numberOfArguments);
+    
+    
+    char * activeJoints = (char*) malloc(sizeof(char) * bvhMotion->numberOfValuesPerFrame);
+    memset(activeJoints,0,sizeof(char) * bvhMotion->numberOfValuesPerFrame);
+
+    if (activeJoints!=0)
+    { 
+
+    for (int i=0; i<numberOfArguments; i++)
+    {
+      BVHJointID jID=0;
+      
+      if (
+           bvh_getJointIDFromJointName(
+                                       bvhMotion ,
+                                       argv[i],
+                                       &jID
+                                      )
+         )
+         {
+           fprintf(stderr,"Joint Activated %u = %s\n",i,argv[i]);
+           activeJoints[jID]=1;   
+         } else
+         {
+           fprintf(stderr,"Joint Failed to Activate %u = %s\n",i,argv[i]); 
+         }
+    }
+    
+        
+      unsigned int firstFrame=0;                          
+      for (int frameID=0; frameID<bvhMotion->numberOfFramesEncountered; frameID++)
+       {
+         //fprintf(stderr,"FrameNumber %u\n",frameID); 
+         for (int jointID=0; jointID<bvhMotion->numberOfValuesPerFrame; jointID++)
+         {
+           //fprintf(stderr,"JointNumber %u\n",jointID); 
+           if (!activeJoints[jointID])
+           {
+             bvhMotion->motionValues[frameID*bvhMotion->numberOfValuesPerFrame + jointID] = bvhMotion->motionValues[firstFrame*bvhMotion->numberOfValuesPerFrame + jointID];
+           }
+         }
+       }
+      free(activeJoints);   
+      return 1;
+    }   
+    
+  return 0;
+}
+
 
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------

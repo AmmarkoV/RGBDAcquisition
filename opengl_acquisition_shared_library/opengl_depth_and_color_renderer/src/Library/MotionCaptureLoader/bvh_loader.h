@@ -214,6 +214,8 @@ int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
 
 
 
+int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int numberOfArguments,char **argv);
+
 /**
 * @brief Ask if joint has a parent.
 * @ingroup BVH

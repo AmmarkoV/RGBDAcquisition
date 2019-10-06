@@ -215,6 +215,13 @@ int main(int argc, char **argv)
         {
           bvh_printBVH(&bvhMotion);
         } else
+        //----------------------------------------------------- 
+        if (strcmp(argv[i],"--onlyAnimateGivenJoints")==0)
+        {
+          unsigned int numberOfArguments=atoi(argv[i+1]);  
+          bvh_onlyAnimateGivenJoints(&bvhMotion,numberOfArguments,argv+i+2);
+          //  
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--scale")==0)
         {
