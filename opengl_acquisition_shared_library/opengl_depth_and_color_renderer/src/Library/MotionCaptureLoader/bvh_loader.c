@@ -1001,13 +1001,17 @@ int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
 
 int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int numberOfArguments,char **argv)
 {
+    bvh_printBVH(bvhMotion);
     fprintf(stderr,"bvh_onlyAnimateGivenJoints with %u arguments\n",numberOfArguments);
     
+    BVHJointID * activeJoints = (BVHJointID*) malloc(sizeof(BVHJointID) * numberOfArguments);
+    memset(activeJoints,0,sizeof(BVHJointID) * numberOfArguments);
     
-    char * activeJoints = (char*) malloc(sizeof(char) * bvhMotion->numberOfValuesPerFrame);
-    memset(activeJoints,0,sizeof(char) * bvhMotion->numberOfValuesPerFrame);
-
-    if (activeJoints!=0)
+    char * successJoints = (char *) malloc(sizeof(char) * numberOfArguments);
+    memset(successJoints,0,sizeof(char) * numberOfArguments);
+    
+    
+    if ((activeJoints!=0) && (successJoints!=0))
     { 
 
     for (int i=0; i<numberOfArguments; i++)
@@ -1015,35 +1019,51 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
       BVHJointID jID=0;
       
       if (
-           bvh_getJointIDFromJointName(
-                                       bvhMotion ,
-                                       argv[i],
-                                       &jID
-                                      )
+           bvh_getJointIDFromJointNameNocase(
+                                             bvhMotion ,
+                                             argv[i],
+                                             &jID
+                                            )
          )
          {
-           fprintf(stderr,"Joint Activated %u = %s\n",i,argv[i]);
-           activeJoints[jID]=1;   
+           fprintf(stderr,GREEN "Joint Activated %u = %s -> jID=%u\n" NORMAL,i,argv[i],jID);
+           activeJoints[i]=jID;   
+           successJoints[i]=1;
          } else
          {
-           fprintf(stderr,"Joint Failed to Activate %u = %s\n",i,argv[i]); 
+           fprintf(stderr,RED "Joint Failed to Activate %u = %s\n" NORMAL,i,argv[i]); 
+           fprintf(stderr,RED "Check the list above to find correct joint names..\n" NORMAL); 
          }
     }
     
         
-      unsigned int firstFrame=0;                          
+      unsigned int firstFrame=0,jointID=0;             
+      unsigned int mID_Initial,mID_Target;             
       for (int frameID=0; frameID<bvhMotion->numberOfFramesEncountered; frameID++)
        {
          //fprintf(stderr,"FrameNumber %u\n",frameID); 
-         for (int jointID=0; jointID<bvhMotion->numberOfValuesPerFrame; jointID++)
+         for (int aJ=0; aJ<numberOfArguments; aJ++)
          {
-           //fprintf(stderr,"JointNumber %u\n",jointID); 
-           if (!activeJoints[jointID])
+           if (successJoints[aJ])
            {
-             bvhMotion->motionValues[frameID*bvhMotion->numberOfValuesPerFrame + jointID] = bvhMotion->motionValues[firstFrame*bvhMotion->numberOfValuesPerFrame + jointID];
-           }
+           jointID = activeJoints[aJ];
+           
+           mID_Initial = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,firstFrame,BVH_ROTATION_X);  
+           mID_Target = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,frameID,BVH_ROTATION_X);  
+           bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial]; 
+
+           mID_Initial = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,firstFrame,BVH_ROTATION_Y);  
+           mID_Target = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,frameID,BVH_ROTATION_Y);  
+           bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial]; 
+
+           mID_Initial = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,firstFrame,BVH_ROTATION_Z);  
+           mID_Target = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jointID,frameID,BVH_ROTATION_Z);  
+           bvhMotion->motionValues[mID_Target] = bvhMotion->motionValues[mID_Initial];  
+               
+           }  
          }
        }
+      free(successJoints); 
       free(activeJoints);   
       return 1;
     }   
