@@ -405,6 +405,16 @@ int main(int argc, char **argv)
              flipRandomizationOrientation=1;
         } else
         //-----------------------------------------------------
+        
+        if (strcmp(argv[i],"--orientation")==0)
+        {
+             //flipRandomizationOrientation=1;
+             if (strcmp("front",argv[i+1])==0) { } else
+             if (strcmp("back",argv[i+1])==0)  { } else
+             if (strcmp("left",argv[i+1])==0)  { } else
+             if (strcmp("right",argv[i+1])==0) { }  
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--remapOrientation")==0)
         {
              doRandomizationMapping=1;
