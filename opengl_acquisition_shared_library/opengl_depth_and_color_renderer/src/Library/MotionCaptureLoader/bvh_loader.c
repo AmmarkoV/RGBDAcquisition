@@ -863,6 +863,7 @@ int bvh_ConstrainRotations(
 
 int bvh_testConstrainRotations()
 {
+  /*  
   fprintf(stderr,"Testing bvh_rotation constraint\n");
   unsigned int i=0;
   double angle = -720;
@@ -876,6 +877,65 @@ int bvh_testConstrainRotations()
     );
     angle=angle+1.0;
   }
+  
+  */
+  
+
+  fprintf(stderr,"Testing bvh_rotation front constraint\n");
+  unsigned int i=0;
+  double angle = -180;
+  for (i=0; i<360; i++)
+  {
+    fprintf(stderr,"| Angle:%0.2f | Front Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
+    angle,
+    bvh_RemapAngleCentered0(angle,1,-180,180,-180,180)
+    );
+    angle=angle+1.0;
+  } 
+   
+
+  fprintf(stderr,"Testing bvh_rotation back constraint\n");
+  i=0;
+  angle = -180;
+  for (i=0; i<360; i++)
+  {
+    fprintf(stderr,"| Angle:%0.2f | Back Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
+    angle,
+    //bvh_RemapAngleCentered0(angle,1,-180,180,-180,180) 
+    bvh_constrainAngleCentered0(angle,1)
+    );
+    angle=angle+1.0;
+  } 
+   
+
+  fprintf(stderr,"Testing bvh_rotation right constraint\n");
+  i=0;
+  angle = -180;
+  for (i=0; i<360; i++)
+  {
+    fprintf(stderr,"| Angle:%0.2f | Right Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
+    angle,
+    //bvh_RemapAngleCentered0(angle,1,-180,180,-180,180) 
+    bvh_constrainAngleCentered0(angle+90,1)
+    );
+    angle=angle+1.0;
+  } 
+
+
+  fprintf(stderr,"Testing bvh_rotation left constraint\n");
+  i=0;
+  angle = -180;
+  for (i=0; i<360; i++)
+  {
+    fprintf(stderr,"| Angle:%0.2f | Left Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
+    angle,
+    //bvh_RemapAngleCentered0(angle,1,-180,180,-180,180) 
+    bvh_constrainAngleCentered0(angle+90,0)
+    );
+    angle=angle+1.0;
+  } 
+   
+  
  return 0;
 }
 
