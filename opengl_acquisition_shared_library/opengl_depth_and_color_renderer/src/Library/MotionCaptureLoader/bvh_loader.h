@@ -195,7 +195,17 @@ int bvh_OffsetPositionRotation(
                               );
 
 
-int bvh_ConstrainRotations(struct BVH_MotionCapture * mc,unsigned int flipOrientation);
+int bvh_ConstrainRotations(
+                           struct BVH_MotionCapture * mc,
+                           unsigned int doMapping,
+                           float sourceMinimum,
+                           float sourceMaximum,
+                           float targetMinimum,
+                           float targetMaximum
+                          );
+
+
+
 int bvh_testConstrainRotations();
 
 int bvh_InterpolateMotion(
