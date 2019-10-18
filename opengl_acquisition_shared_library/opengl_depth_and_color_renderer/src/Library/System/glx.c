@@ -9,9 +9,11 @@
 #include <GL/gl.h>
 
 #include "glx.h"
+#include "glx2.h"
+#include "glx3.h"
 
 
-int start_glx_stuff(int WIDTH,int HEIGHT,int openGLVersion,int viewWindow,int argc, char **argv)
+int start_glx_stuff(int WIDTH,int HEIGHT,int openGLVersion,int viewWindow,int argc,const char **argv)
 {
   switch (openGLVersion)
   {
@@ -50,6 +52,7 @@ int glx_endRedraw(int openGLVersion)
 
 int glx_checkEvents(int openGLVersion)
 {
+   //fprintf(stderr,"glx_checkEvents version %u",openGLVersion);  
   switch (openGLVersion)
   {
     case 1:

@@ -55,6 +55,21 @@ enum CHANNEL_ROTATION_ORDER
 };
 
 
+
+
+enum ORIENTATION_ENFORCER_IDS
+{
+  BVH_ENFORCE_NO_ORIENTATION=0,
+  BVH_ENFORCE_FRONT_ORIENTATION,
+  BVH_ENFORCE_BACK_ORIENTATION,
+  BVH_ENFORCE_LEFT_ORIENTATION,
+  BVH_ENFORCE_RIGHT_ORIENTATION, 
+  //--------------------
+  BVH_VALID_ENFORCED_ORIENTATION_NAMES
+};
+
+
+
 extern const char * rotationOrderNames[];
 
 typedef unsigned int BVHJointID;
@@ -197,11 +212,7 @@ int bvh_OffsetPositionRotation(
 
 int bvh_ConstrainRotations(
                            struct BVH_MotionCapture * mc,
-                           unsigned int doMapping,
-                           float sourceMinimum,
-                           float sourceMaximum,
-                           float targetMinimum,
-                           float targetMaximum
+                           unsigned int constrainOrientation
                           );
 
 

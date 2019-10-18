@@ -83,29 +83,19 @@ double bvh_constrainAngleCentered0(double angle,unsigned int flipOrientation)
 
 
 
-double bvh_RemapAngleCentered0(
-                               double angle,
-                               unsigned int doMapping,
-                               double sourceMinimum,
-                               double sourceMaximum,
-                               double targetMinimum,
-                               double targetMaximum
-                              )
+double bvh_RemapAngleCentered0( double angle, unsigned int constrainOrientation )
 {
-//We want to add 180 degrees to the model so 0 is oriented towards us..!
-    double angleFrom_minus360_to_plus360;
-    double angleRotated = angle+180;
+   //We want to add 180 degrees to the model so 0 is oriented towards us..! 
+   switch (constrainOrientation)
+   {
+      case BVH_ENFORCE_NO_ORIENTATION :         return bvh_constrainAngleCentered0(angle,0);             break;      
+      case BVH_ENFORCE_FRONT_ORIENTATION : return bvh_constrainAngleCentered0(angle,0);             break;      
+      case BVH_ENFORCE_BACK_ORIENTATION :    return bvh_constrainAngleCentered0(angle,1);             break;      
+      case BVH_ENFORCE_LEFT_ORIENTATION :      return bvh_constrainAngleCentered0(angle+90.0,0); break;      
+      case BVH_ENFORCE_RIGHT_ORIENTATION :   return bvh_constrainAngleCentered0(angle+90,1);     break; 
+   };
 
-     if (angleRotated<0.0)
-     {
-       angleFrom_minus360_to_plus360 = (-1*fmod(-1*(angleRotated),360.0))+180;
-     } else
-     {
-       angleFrom_minus360_to_plus360 = (fmod((angleRotated),360.0))-180;
-     }
-
-
-   //TODO
+   fprintf(stderr,"Did not change angle, due to incorrect BVH_ENFORCE_XX constrain..\n");
   return angle;
 }
 
@@ -832,12 +822,8 @@ int bvh_OffsetPositionRotation(
 
 
 int bvh_ConstrainRotations(
-                           struct BVH_MotionCapture * mc,
-                           unsigned int doMapping,
-                           float sourceMinimum,
-                           float sourceMaximum,
-                           float targetMinimum,
-                           float targetMaximum
+                           struct BVH_MotionCapture * mc,  
+                           unsigned int constrainOrientation
                           )
 {
   unsigned int fID=0;
@@ -846,15 +832,15 @@ int bvh_ConstrainRotations(
    unsigned int mID=fID*mc->numberOfValuesPerFrame;
 
    double buffer = (double) mc->motionValues[mID+3];
-   buffer = bvh_RemapAngleCentered0(buffer,0,0.0,0.0,0.0,0.0);
+   buffer = bvh_RemapAngleCentered0(buffer,constrainOrientation);
    mc->motionValues[mID+3] = (float) buffer;
 
    buffer = (double) mc->motionValues[mID+4];
-   buffer = bvh_RemapAngleCentered0(buffer,doMapping,sourceMinimum,sourceMaximum,targetMinimum,targetMaximum);
+   buffer = bvh_RemapAngleCentered0(buffer,constrainOrientation);
    mc->motionValues[mID+4] = (float) buffer;
 
    buffer = (double) mc->motionValues[mID+5];
-   buffer = bvh_RemapAngleCentered0(buffer,0,0.0,0.0,0.0,0.0);
+   buffer = bvh_RemapAngleCentered0(buffer,constrainOrientation);
    mc->motionValues[mID+5] = (float) buffer;
   }
  return 1;
@@ -888,7 +874,7 @@ int bvh_testConstrainRotations()
   {
     fprintf(stderr,"| Angle:%0.2f | Front Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
     angle,
-    bvh_RemapAngleCentered0(angle,1,-180,180,-180,180)
+    bvh_RemapAngleCentered0(angle,BVH_ENFORCE_FRONT_ORIENTATION)
     );
     angle=angle+1.0;
   } 
@@ -901,8 +887,7 @@ int bvh_testConstrainRotations()
   {
     fprintf(stderr,"| Angle:%0.2f | Back Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
     angle,
-    //bvh_RemapAngleCentered0(angle,1,-180,180,-180,180) 
-    bvh_constrainAngleCentered0(angle,1)
+    bvh_RemapAngleCentered0(angle,BVH_ENFORCE_BACK_ORIENTATION)
     );
     angle=angle+1.0;
   } 
@@ -915,8 +900,7 @@ int bvh_testConstrainRotations()
   {
     fprintf(stderr,"| Angle:%0.2f | Right Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
     angle,
-    //bvh_RemapAngleCentered0(angle,1,-180,180,-180,180) 
-    bvh_constrainAngleCentered0(angle+90,1)
+    bvh_RemapAngleCentered0(angle,BVH_ENFORCE_RIGHT_ORIENTATION)
     );
     angle=angle+1.0;
   } 
@@ -929,8 +913,7 @@ int bvh_testConstrainRotations()
   {
     fprintf(stderr,"| Angle:%0.2f | Left Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
     angle,
-    //bvh_RemapAngleCentered0(angle,1,-180,180,-180,180) 
-    bvh_constrainAngleCentered0(angle+90,0)
+    bvh_RemapAngleCentered0(angle,BVH_ENFORCE_LEFT_ORIENTATION)
     );
     angle=angle+1.0;
   } 

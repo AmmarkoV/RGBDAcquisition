@@ -505,7 +505,7 @@ int bvh_loadTransformForFrame(
 
   if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
    {
-     fprintf(stderr,"Could not calculate torso\n");
+     fprintf(stderr,"Could not populate torso information from 3D transform\n");
    }
 
 
@@ -518,10 +518,10 @@ int bvh_loadTransformForFrame(
   TODO : merge the two codebases
 */
 int bvh_loadTransformForMotionBuffer(
-                                     struct BVH_MotionCapture * bvhMotion ,
-                                     float * motionBuffer,
-                                     struct BVH_Transform * bvhTransform
-                                    )
+                                                                                          struct BVH_MotionCapture * bvhMotion ,
+                                                                                          float * motionBuffer,
+                                                                                          struct BVH_Transform * bvhTransform
+                                                                                        )
 {
    //We can use this to change root joint
    //But this gets unreasonably complicated so it is best not to change anything here..
@@ -686,7 +686,7 @@ int bvh_loadTransformForMotionBuffer(
 
 if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
    {
-     fprintf(stderr,"Could not calculate torso\n");
+     fprintf(stderr,"Could not populate torso information from 3D transform\n");
    }
 
 

@@ -111,13 +111,9 @@ int main(int argc, char **argv)
     unsigned int flipOrientation = 0;
     unsigned int flipRandomizationOrientation = 0;
 
-
-    unsigned int doMapping=0;
-    float sourceMinimum=0.0f,sourceMaximum=0.0f,targetMinimum=-180.0f,targetMaximum=180.0f;
-
-    unsigned int doRandomizationMapping=0;
-    float sourceRandomizationMinimum=0.0f,sourceRandomizationMaximum=0.0f,targetRandomizationMinimum=-180.0f,targetRandomizationMaximum=180.0f;
-
+  
+    unsigned int regularOrientation = BVH_ENFORCE_NO_ORIENTATION;
+    unsigned int randomizedOrientation =   BVH_ENFORCE_NO_ORIENTATION; 
     unsigned int filterBehindCamera=1;
     unsigned int filterIfAnyJointOutsideof2DFrame=1;
     unsigned int filterTopWeirdRandomSkeletons=1;
@@ -265,7 +261,7 @@ int main(int argc, char **argv)
           bvh_loadBVH(fromBVHFile, &bvhMotion, scaleWorld);
           //Change joint names..
           bvh_renameJointsForCompatibility(&bvhMotion);
-          bvh_ConstrainRotations(&bvhMotion,doMapping,sourceMinimum,sourceMaximum,targetMinimum,targetMaximum);
+          bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--to")==0)
@@ -376,7 +372,7 @@ int main(int argc, char **argv)
                                   cameraRotationOffset
                                  );
 
-          bvh_ConstrainRotations(&bvhMotion,doMapping,sourceMinimum,sourceMaximum,targetMinimum,targetMaximum);
+          bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--offsetPositionRotation")==0)
@@ -397,7 +393,7 @@ int main(int argc, char **argv)
                                      cameraRotationOffset
                                     );
 
-          bvh_ConstrainRotations(&bvhMotion,doMapping,sourceMinimum,sourceMaximum,targetMinimum,targetMaximum);
+          bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--flipRandomizationOrientation")==0)
@@ -408,28 +404,12 @@ int main(int argc, char **argv)
         
         if (strcmp(argv[i],"--orientation")==0)
         {
-             //flipRandomizationOrientation=1;
-             if (strcmp("front",argv[i+1])==0) { } else
-             if (strcmp("back",argv[i+1])==0)  { } else
-             if (strcmp("left",argv[i+1])==0)  { } else
-             if (strcmp("right",argv[i+1])==0) { }  
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--remapOrientation")==0)
-        {
-             doRandomizationMapping=1;
-             sourceRandomizationMinimum=atof(argv[i+1]);
-             sourceRandomizationMaximum=atof(argv[i+2]);
-             targetRandomizationMinimum=atof(argv[i+3]);
-             targetRandomizationMaximum=atof(argv[i+4]);
-
-             fprintf(
-                     stderr,"Orientations will be remapped from (%0.2f,%0.2f) to (%0.2f,%0.2f)\n",
-                     sourceRandomizationMinimum,
-                     sourceRandomizationMaximum,
-                     targetRandomizationMinimum,
-                     targetRandomizationMaximum
-                    );
+             //flipRandomizationOrientation=1; 
+             
+             if (strcmp("front",argv[i+1])==0) {  randomizedOrientation=BVH_ENFORCE_FRONT_ORIENTATION;  } else
+             if (strcmp("back",argv[i+1])==0)  {  randomizedOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
+             if (strcmp("left",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_LEFT_ORIENTATION;       } else
+             if (strcmp("right",argv[i+1])==0) {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    }  
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--perturbJointAngles")==0)
@@ -472,7 +452,7 @@ int main(int argc, char **argv)
                                          maximumPositionTest
                                         );
 
-          bvh_ConstrainRotations(&bvhMotion,doRandomizationMapping,sourceMinimum,sourceMaximum,targetMinimum,targetMaximum);
+          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
          //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize2D")==0)
@@ -510,7 +490,7 @@ int main(int argc, char **argv)
                                       renderingConfiguration.height
                                      );
 
-          bvh_ConstrainRotations(&bvhMotion,doRandomizationMapping,sourceMinimum,sourceMaximum,targetMinimum,targetMaximum);
+          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize")==0)
@@ -549,7 +529,7 @@ int main(int argc, char **argv)
                                          maximumRotation
                                        );
 
-          bvh_ConstrainRotations(&bvhMotion,doRandomizationMapping,sourceMinimum,sourceMaximum,targetMinimum,targetMaximum);
+          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
          //-----------------------------------------------------
         if (strcmp(argv[i],"--randomize2Dranges")==0)
@@ -599,7 +579,7 @@ int main(int argc, char **argv)
                                       renderingConfiguration.height
                                      );
 
-          bvh_ConstrainRotations(&bvhMotion,doRandomizationMapping,sourceMinimum,sourceMaximum,targetMinimum,targetMaximum);
+          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeranges")==0)
@@ -663,7 +643,7 @@ int main(int argc, char **argv)
                                                 maximumRotationRangeB
                                               );
 
-          bvh_ConstrainRotations(&bvhMotion,doRandomizationMapping,sourceMinimum,sourceMaximum,targetMinimum,targetMaximum);;
+          bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         }
     }
 

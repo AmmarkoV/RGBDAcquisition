@@ -30,14 +30,20 @@
 
 int downloadOpenGLColor(unsigned char * color , unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
+   if (color==0) { return 0; }  
+   if (width==0) { return 0; }  
+   if (height==0) { return 0; }  
+   
   GLint ext_format, ext_type;
-
+  
+  //fprintf(stderr,"glGetIntegerv..\n");
   #warning "GL_IMPLEMENTATION_COLOR_READ_TYPE manually declared .."
   #define GL_IMPLEMENTATION_COLOR_READ_TYPE   		0x8B9A
   #define GL_IMPLEMENTATION_COLOR_READ_FORMAT 		0x8B9B
   glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &ext_format);
   glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &ext_type);
 
+  //fprintf(stderr,"glReadPixels..\n");
     #if FLIP_OPEN_GL_IMAGES
        char * inverter = (char *) malloc(3*(width-x)*(height-y)*sizeof(char));
        if (inverter==0) { fprintf(stderr,"Could not allocate a buffer to read inverted color\n"); return 0; }
@@ -62,6 +68,7 @@ int downloadOpenGLColor(unsigned char * color , unsigned int x,unsigned int y,un
     #endif
 
 
+  //fprintf(stderr,"done..\n");
    if (checkOpenGLError(__FILE__, __LINE__))
       { fprintf(stderr,"OpenGL error after getOpenGLColor() \n"); }
 
