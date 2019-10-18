@@ -402,7 +402,7 @@ int main(int argc, char **argv)
         } else
         //-----------------------------------------------------
         
-        if (strcmp(argv[i],"--orientation")==0)
+        if (strcmp(argv[i],"--randomizedOrientation")==0)
         {
              //flipRandomizationOrientation=1; 
              

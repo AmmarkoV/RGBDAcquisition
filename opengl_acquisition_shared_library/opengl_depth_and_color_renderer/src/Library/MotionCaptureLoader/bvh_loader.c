@@ -869,8 +869,8 @@ int bvh_testConstrainRotations()
 
   fprintf(stderr,"Testing bvh_rotation front constraint\n");
   unsigned int i=0;
-  double angle = -180;
-  for (i=0; i<360; i++)
+  double angle = -45;
+  for (i=0; i<90; i++)
   {
     fprintf(stderr,"| Angle:%0.2f | Front Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
     angle,
@@ -882,8 +882,8 @@ int bvh_testConstrainRotations()
 
   fprintf(stderr,"Testing bvh_rotation back constraint\n");
   i=0;
-  angle = -180;
-  for (i=0; i<360; i++)
+  angle = 135;
+  for (i=0; i<90; i++)
   {
     fprintf(stderr,"| Angle:%0.2f | Back Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
     angle,
@@ -895,8 +895,8 @@ int bvh_testConstrainRotations()
 
   fprintf(stderr,"Testing bvh_rotation right constraint\n");
   i=0;
-  angle = -180;
-  for (i=0; i<360; i++)
+  angle = 45;
+  for (i=0; i<90; i++)
   {
     fprintf(stderr,"| Angle:%0.2f | Right Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
     angle,
@@ -908,8 +908,8 @@ int bvh_testConstrainRotations()
 
   fprintf(stderr,"Testing bvh_rotation left constraint\n");
   i=0;
-  angle = -180;
-  for (i=0; i<360; i++)
+  angle = -135;
+  for (i=0; i<90; i++)
   {
     fprintf(stderr,"| Angle:%0.2f | Left Centered at 0 :%0.2f\n", //| Centered at 180:%0.2f
     angle,
