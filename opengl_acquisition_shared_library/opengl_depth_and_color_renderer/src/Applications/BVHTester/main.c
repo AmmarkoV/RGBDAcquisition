@@ -108,12 +108,13 @@ int main(int argc, char **argv)
     unsigned int maxFrames = 0;
     unsigned int occlusions = 0;
     float scaleWorld=1.0;
-    unsigned int flipOrientation = 0;
-    unsigned int flipRandomizationOrientation = 0;
+    //unsigned int flipOrientation = 0;
+    //unsigned int flipRandomizationOrientation = 0;
 
   
     unsigned int regularOrientation = BVH_ENFORCE_NO_ORIENTATION;
     unsigned int randomizedOrientation =   BVH_ENFORCE_NO_ORIENTATION; 
+    unsigned int csvOrientation = BVH_ENFORCE_NO_ORIENTATION;
     unsigned int filterBehindCamera=1;
     unsigned int filterIfAnyJointOutsideof2DFrame=1;
     unsigned int filterTopWeirdRandomSkeletons=1;
@@ -395,21 +396,25 @@ int main(int argc, char **argv)
 
           bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--flipRandomizationOrientation")==0)
-        {
-             flipRandomizationOrientation=1;
-        } else
-        //-----------------------------------------------------
-        
+        //----------------------------------------------------- 
         if (strcmp(argv[i],"--randomizedOrientation")==0)
         {
              //flipRandomizationOrientation=1; 
              
-             if (strcmp("front",argv[i+1])==0) {  randomizedOrientation=BVH_ENFORCE_FRONT_ORIENTATION;  } else
-             if (strcmp("back",argv[i+1])==0)  {  randomizedOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
-             if (strcmp("left",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_LEFT_ORIENTATION;       } else
-             if (strcmp("right",argv[i+1])==0) {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    }  
+             if (strcmp("front",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_FRONT_ORIENTATION;    } else
+             if (strcmp("back",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
+             if (strcmp("left",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_LEFT_ORIENTATION;     } else
+             if (strcmp("right",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    }  
+        } else
+        //----------------------------------------------------- 
+        if (strcmp(argv[i],"--csvOrientation")==0)
+        {
+             //flipRandomizationOrientation=1; 
+             
+             if (strcmp("front",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_FRONT_ORIENTATION;    } else
+             if (strcmp("back",argv[i+1])==0)    {  csvOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
+             if (strcmp("left",argv[i+1])==0)    {  csvOrientation=BVH_ENFORCE_LEFT_ORIENTATION;     } else
+             if (strcmp("right",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    }  
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--perturbJointAngles")==0)
@@ -658,6 +663,7 @@ int main(int argc, char **argv)
                      convertToSVG,
                      convertToCSV,useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output,
                      &bvhMotion,
+                     csvOrientation,
                      &renderingConfiguration,
                      occlusions,
                      filterBehindCamera,//Filter out all poses where even one joint is behind camera

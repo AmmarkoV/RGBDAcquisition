@@ -28,6 +28,7 @@ int dumpBVHToCSVBody(
                        const char * filename2D,
                        const char * filename3D,
                        const char * filenameBVH,
+                       unsigned int csvOrientation,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                        unsigned int filterWeirdSkeletons,
