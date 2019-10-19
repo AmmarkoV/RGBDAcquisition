@@ -382,7 +382,9 @@ int dumpBVHToCSVBody(
          if (!mc->jointHierarchy[jID].isEndSite)
          {
            if (jID==lastElement) { comma=' '; }
-
+           
+           //TODO: add here a check for hip Y rotation and perform orientation change..
+           
            unsigned int channelID=0;
            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
            {
