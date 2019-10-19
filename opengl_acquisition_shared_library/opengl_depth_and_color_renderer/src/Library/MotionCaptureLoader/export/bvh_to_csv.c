@@ -383,15 +383,18 @@ int dumpBVHToCSVBody(
          {
            if (jID==lastElement) { comma=' '; }
            
-           //TODO: add here a check for hip Y rotation and perform orientation change..
            
            unsigned int channelID=0;
            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
            {
              unsigned int channelType =  mc->jointHierarchy[jID].channelType[channelID];
+             
+             float value = bvh_getJointChannelAtFrame(mc,jID,fID,channelType);
+             //TODO: add here a check for hip Y rotation and perform orientation change..
+             
              fprintf(
                      fpBVH,"%0.6f",
-                     bvh_getJointChannelAtFrame(mc,jID,fID,channelType)
+                     value
                     );
 
              if ( (comma!=',') && (channelID==mc->jointHierarchy[jID].loadedChannels-1) ) {  } else  { fprintf(fpBVH,",");  }
