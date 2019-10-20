@@ -402,8 +402,8 @@ int dumpBVHToCSVBody(
                   //Test using : 
                   //./BVHTester --from Motions/MotionCapture/01/01_02.bvh  --repeat 0 --csvOrientation right --randomize2D 1000 5000 -35 45 -35 35 135 35 --occlusions --csv tmp test.csv 2d+bvh 
                   //value=666; <- highlight the correct 
-                  value=(float) bvh_constrainAngleCentered0((double) value,0);
-                  //value=(float) bvh_RemapAngleCentered0((double) value,csvOrientation);
+                  //value=(float) bvh_constrainAngleCentered0((double) value,0);
+                  value=(float) bvh_RemapAngleCentered0((double) value,csvOrientation);
               }
              }
              
