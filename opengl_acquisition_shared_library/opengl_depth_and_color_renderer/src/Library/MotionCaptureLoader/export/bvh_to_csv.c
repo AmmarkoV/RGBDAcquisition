@@ -3,6 +3,8 @@
 #include <math.h>
 #include "bvh_to_csv.h"
 
+#include "../bvh_loader.h"
+
 #include "../bvh_project.h"
 
 #define CONVERT_EULER_TO_RADIANS M_PI/180.0
@@ -398,9 +400,10 @@ int dumpBVHToCSVBody(
               if ( (jID==0) && (channelID==BVH_POSITION_X) ) //BVH_ROTATION_X
               {   
                   //Test using : 
-                  //./BVHTester --from Motions/MotionCapture/01/01_02.bvh  --repeat 0 --csvOrientation testright --randomize2D 1000 5000 -35 45 -35 35 135 35 --occlusions --csv tmp test.csv 2d+bvh 
+                  //./BVHTester --from Motions/MotionCapture/01/01_02.bvh  --repeat 0 --csvOrientation right --randomize2D 1000 5000 -35 45 -35 35 135 35 --occlusions --csv tmp test.csv 2d+bvh 
                   //value=666; <- highlight the correct 
-                  value=bvh_RemapAngleCentered0(value,csvOrientation);
+                  value=(float) bvh_constrainAngleCentered0((double) value,0);
+                  //value=(float) bvh_RemapAngleCentered0((double) value,csvOrientation);
               }
              }
              
