@@ -390,7 +390,19 @@ int dumpBVHToCSVBody(
              unsigned int channelType =  mc->jointHierarchy[jID].channelType[channelID];
              
              float value = bvh_getJointChannelAtFrame(mc,jID,fID,channelType);
-             //TODO: add here a check for hip Y rotation and perform orientation change..
+             
+             //Due to the particular requirements of MocapNET we need to be able to split orientations in CSV files..
+             if (csvOrientation!=BVH_ENFORCE_NO_ORIENTATION)
+             {
+              //TODO: add here a check for hip Y rotation and perform orientation change..
+              if ( (jID==0) && (channelID==BVH_POSITION_X) ) //BVH_ROTATION_X
+              {   
+                  //Test using : 
+                  //./BVHTester --from Motions/MotionCapture/01/01_02.bvh  --repeat 0 --csvOrientation testright --randomize2D 1000 5000 -35 45 -35 35 135 35 --occlusions --csv tmp test.csv 2d+bvh 
+                  //value=666; <- highlight the correct 
+                  value=bvh_RemapAngleCentered0(value,csvOrientation);
+              }
+             }
              
              fprintf(
                      fpBVH,"%0.6f",
