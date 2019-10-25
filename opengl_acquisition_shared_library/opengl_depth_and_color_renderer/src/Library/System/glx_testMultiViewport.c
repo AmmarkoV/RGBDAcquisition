@@ -527,8 +527,22 @@ int main(int argc, char **argv)
 	 	return 1;
    }
 
-   #define modelToLoad "../../../Models/Ammar.tri"
-   //#define modelToLoad "../../../submodules/Assimp/Ammar_1k.tri"
+   #define defaultModelToLoad "../../../Models/Ammar.tri" 
+   const char * modelToLoad = defaultModelToLoad;
+   
+
+    for (int i=0; i<argc; i++)
+        {
+           if (strcmp(argv[i],"--from")==0)
+                    {
+                        if (argc>i+1)
+                            {
+                                modelToLoad = argv[i+1];
+                            }
+                    }
+
+        }  
+   
 
 
    if (!loadModelTri(modelToLoad, &indexedTriModel ) )
