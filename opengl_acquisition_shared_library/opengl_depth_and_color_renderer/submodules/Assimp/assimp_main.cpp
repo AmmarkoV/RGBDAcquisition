@@ -36,8 +36,22 @@ int main (int argc, char *argv[])
 
 
  convertAssimpToTRI(argv[2],flatModel,originalModel,selectMesh);
- saveModelTri(argv[3], originalModel);
 
+
+    for (int i=0; i<argc; i++)
+        {
+           if (strcmp(argv[i],"--paint")==0)
+            {
+               paintTRI(
+                        originalModel,
+                        atoi(argv[i+1]),
+                        atoi(argv[i+2]),
+                        atoi(argv[i+3])
+                       );
+            }
+        }
+
+ saveModelTri(argv[3], originalModel);
 
 
    if (strcmp(argv[1],"--test")==0)

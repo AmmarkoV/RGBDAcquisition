@@ -247,6 +247,19 @@ void deallocInternalsOfModelTri(struct TRI_Model * triModel);
 int loadModelTri(const char * filename , struct TRI_Model * triModel);
 
 
+
+
+/**
+* @brief  Force a specific color on all vertices of TRI file
+* @ingroup TRI
+* @param  input TRI structure with mesh we want to color
+* @param  R channel value ( 0-255 )
+* @param  G channel value ( 0-255 )
+* @param  B channel value ( 0-255 )
+* @retval 0=Failure,1=Success
+*/
+int paintTRI(struct TRI_Model * triModel,char r, char g, char b);
+
 /**
 * @brief  Save TRI model to a file
 * @ingroup TRI

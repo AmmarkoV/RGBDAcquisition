@@ -402,9 +402,9 @@ int main(int argc, char **argv)
              //flipRandomizationOrientation=1; 
              
              if (strcmp("front",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_FRONT_ORIENTATION;    } else
-             if (strcmp("back",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
-             if (strcmp("left",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_LEFT_ORIENTATION;     } else
-             if (strcmp("right",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    }  
+             if (strcmp("back",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_BACK_ORIENTATION;       } else
+             if (strcmp("left",argv[i+1])==0)      {  randomizedOrientation=BVH_ENFORCE_LEFT_ORIENTATION;         } else
+             if (strcmp("right",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;      }  
         } else
         //----------------------------------------------------- 
         if (strcmp(argv[i],"--csvOrientation")==0)

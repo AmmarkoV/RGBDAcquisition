@@ -627,7 +627,36 @@ if ( (triModel->header.numberOfBones) && (triModel->bones!=0) )
  return 0;
 }
 
+int paintTRI(struct TRI_Model * triModel,char r, char g, char b)
+{
+  if (triModel!=0)
+  {
+    if (triModel->header.numberOfColors>0 )
+    {
+       if (triModel->colors!=0)
+       {
+         float rP = (float) r/255;
+         float gP = (float) g/255;
+         float bP = (float) b/255;
+         float * clr = triModel->colors;
+         float * clrLimit = triModel->colors + triModel->header.numberOfColors;
 
+         while (clr<clrLimit)
+         {
+           *clr = rP; ++clr;
+           *clr = gP; ++clr;
+           *clr = bP; ++clr;
+         }
+
+         return 1;
+       }
+    }
+  }
+
+
+  fprintf(stderr,"Failed to paint TRI file..\n");
+  return 0;
+}
 
 int saveModelTri(const char * filename , struct TRI_Model * triModel)
 {

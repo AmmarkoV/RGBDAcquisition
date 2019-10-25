@@ -317,6 +317,10 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     fprintf(stderr," \n");
 
     fprintf(stderr,"Preparing mesh %u with %u colors \n",meshNumber,mesh->mNumFaces);
+    if(!mesh->HasVertexColors(colourSet))
+         {
+          fprintf(stderr,"  Mesh has no vertex colors..!\n");
+         }
 	//xxxmesh->texture = loadmaterial(scene->mMaterials[mesh->mMaterialIndex]);
 
     unsigned int verticesSize,normalsSize,textureCoordsSize,colorSize,indexSize;
@@ -365,7 +369,33 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
     memset(triModel->colors, 0 , colorSize );
     memset(triModel->indices, 0 , indexSize );
 
-    unsigned int i=0,k=0;
+
+
+    unsigned int i=0;
+
+    #define DO_COLOR_RANGE_CHECK 0
+
+    #if DO_COLOR_RANGE_CHECK
+    //-----------------------------------------------------------------------------------------
+    fprintf(stderr,"Checking color range.. ");
+    float maximum=0;
+    for (i = 0; i < mesh->mNumVertices; i++)
+    {
+      if(mesh->HasVertexColors(colourSet))
+         {
+          if (maximum<mesh->mColors[colourSet][i].r) { maximum=mesh->mColors[colourSet][i].r; }
+          if (maximum<mesh->mColors[colourSet][i].r) { maximum=mesh->mColors[colourSet][i].g; }
+          if (maximum<mesh->mColors[colourSet][i].r) { maximum=mesh->mColors[colourSet][i].b; }
+         }
+    }
+    fprintf(stderr," 0.00 - %0.2f\n",maximum);
+    if (maximum==0.0)
+    {
+      fprintf(stderr," Color provided is black everywhere..\n");
+    }
+    //-----------------------------------------------------------------------------------------
+    #endif // DO_COLOR_RANGE_CHECK
+
 	for (i = 0; i < mesh->mNumVertices; i++)
     {
 	    triModel->vertices[(i*3)+0] = mesh->mVertices[i].x;
@@ -387,7 +417,7 @@ void prepareMesh(struct aiScene *scene , int meshNumber , struct TRI_Model * tri
         unsigned int colourSet = 0;
         //for (colourSet = 0; colourSet< AI_MAX_NUMBER_OF_COLOR_SETS; colourSet++)
         {
-          if(mesh->HasVertexColors(colourSet))
+         if(mesh->HasVertexColors(colourSet))
          {
           triModel->colors[(i*3)+0] = mesh->mColors[colourSet][i].r;
           triModel->colors[(i*3)+1] = mesh->mColors[colourSet][i].g;
