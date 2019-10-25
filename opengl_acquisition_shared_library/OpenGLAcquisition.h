@@ -18,6 +18,21 @@ extern "C"
 #endif
 
 
+enum OPENGL_ACQUISITION_CONTROLS
+{
+  OPENGL_ACQUISITION_NOCONTROL=0,        //0
+  OPENGL_ACQUISITION_POSITION_X,         //1
+  OPENGL_ACQUISITION_POSITION_Y,         //2
+  OPENGL_ACQUISITION_POSITION_Z,         //3
+  OPENGL_ACQUISITION_ROTATION_X,         //1
+  OPENGL_ACQUISITION_ROTATION_Y,         //2
+  OPENGL_ACQUISITION_ROTATION_Z,         //3
+  OPENGL_ACQUISITION_COLOR_R,        //0
+  OPENGL_ACQUISITION_COLOR_G,      //1
+  OPENGL_ACQUISITION_COLOR_B,        //2
+};
+
+
 #include "../acquisition/acquisition_setup.h"
 
 
@@ -28,6 +43,9 @@ int getOpenGLNumberOfDevices() ;
 int stopOpenGLModule() ;
 int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigned int height,unsigned int framerate) ;
 int destroyOpenGLDevice(int devID) ;
+
+
+int controlOpenGLScene(const char * name,const char * variable,int control,float value);
 
 
 int passUserCommandOpenGL(const char * command,const char * value);

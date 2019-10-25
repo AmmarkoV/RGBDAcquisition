@@ -394,6 +394,7 @@ int dumpBVHToCSVBody(
              float value = bvh_getJointChannelAtFrame(mc,jID,fID,channelType);
              
              //Due to the particular requirements of MocapNET we need to be able to split orientations in CSV files..
+             //We want the neural network to only work with values normalized and centered around 0 
              if (csvOrientation!=BVH_ENFORCE_NO_ORIENTATION)
              {
               //TODO: add here a check for hip Y rotation and perform orientation change..

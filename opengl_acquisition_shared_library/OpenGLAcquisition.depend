@@ -464,41 +464,41 @@
 
 1458492977 /home/ammar/Documents/Programming/FORTH/input_acquisition/tools/Primitives/image.h
 
-1438258174 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/collisions.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/collisions.c
 	"collisions.h"
 	<stdio.h>
 	<stdlib.h>
 
-1422530486 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/collisions.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/collisions.h
 
-1528109129 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix3x3Tools.c
+1528105660 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix3x3Tools.c
 	"matrix3x3Tools.h"
 	"matrixTools.h"
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
 
-1528109129 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix3x3Tools.h
+1528105660 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix3x3Tools.h
 
-1422530486 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixTools.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixTools.h
 
-1542674466 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix4x4Tools.c
+1569776376 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix4x4Tools.c
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
 	"matrix4x4Tools.h"
 
-1541429139 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix4x4Tools.h
+1553336011 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrix4x4Tools.h
 
-1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/ocvStaging.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/ocvStaging.c
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
 	"ocvStaging.h"
 
-1403179476 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/ocvStaging.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/ocvStaging.h
 
-1475480703 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveHomography.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveHomography.c
 	"solveHomography.h"
 	<stdio.h>
 	<stdlib.h>
@@ -508,9 +508,9 @@
 	"matrix3x3Tools.h"
 	"matrix4x4Tools.h"
 
-1403179476 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveHomography.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveHomography.h
 
-1436529754 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveLinearSystemGJ.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveLinearSystemGJ.c
 	"solveLinearSystemGJ.h"
 	<stdio.h>
 	<stdlib.h>
@@ -520,56 +520,56 @@
 	"matrix4x4Tools.h"
 	"solveHomography.h"
 
-1403179476 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveLinearSystemGJ.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/solveLinearSystemGJ.h
 
-1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/convolutionFilter.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/convolutionFilter.c
 	"convolutionFilter.h"
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
 
-1454931753 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/convolutionFilter.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/convolutionFilter.h
 
-1423141180 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/depthClassifier.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/depthClassifier.c
 	"depthClassifier.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 
-1423141180 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/depthClassifier.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/depthClassifier.h
 
-1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageFilters.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageFilters.c
 	"imageFilters.h"
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
 
-1455564556 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageFilters.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageFilters.h
 	"../Primitives/image.h"
 
-1460647486 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Primitives/image.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Primitives/image.h
 
-1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageOps.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageOps.c
 	"imageOps.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<math.h>
 
-1453705997 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageOps.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/imageOps.h
 
-1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/patchComparison.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/patchComparison.c
 	"patchComparison.h"
 	<stdio.h>
 
-1385981940 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/patchComparison.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/patchComparison.h
 
-1486913139 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/resize.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/resize.c
 	"resize.h"
 	<stdio.h>
 	<stdlib.h>
 
-1416393090 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/resize.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/ImageOperations/resize.h
 
 1473421078 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.c
 	<X11/X.h>
@@ -585,7 +585,7 @@
 
 1389863812 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/glx.h
 
-1529328434 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixCalculations.c
+1529592228 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixCalculations.c
 	"matrixCalculations.h"
 	<stdio.h>
 	<stdlib.h>
@@ -597,11 +597,11 @@
 	"solveLinearSystemGJ.h"
 	"solveHomography.h"
 
-1529328434 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixCalculations.h
+1529592228 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixCalculations.h
 
-1498561298 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/quaternions.h
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/quaternions.h
 
-1498562163 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/quaternions.c
+1501717825 source:/home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/quaternions.c
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
@@ -649,7 +649,7 @@
 	"texture_loader.h"
 	"../../../../tools/Codecs/codecs.h"
 
-1467405290 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Codecs/codecs.h
+1525729965 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Codecs/codecs.h
 	"../Primitives/image.h"
 
 1493212867 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/TrajectoryParser/InputParser_C.c
@@ -717,4 +717,274 @@
 	<string.h>
 	<ctype.h>
 	"TrajectoryPrimitives.h"
+
+1545240567 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	<GL/glx.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<X11/X.h>
+	<X11/keysym.h>
+	"System/glx.h"
+	"ModelLoader/model_loader_hardcoded.h"
+	"ModelLoader/model_loader_obj.h"
+	"ModelLoader/model_loader_tri.h"
+	"ModelLoader/model_converter.h"
+	"Scene/scene.h"
+	"Rendering/downloadFromRenderer.h"
+	"Tools/tools.h"
+	"Tools/save_to_file.h"
+	"TrajectoryParser/TrajectoryParserDataStructures.h"
+	"TrajectoryParser/TrajectoryCalculator.h"
+	"Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h"
+	"Rendering/tiledRenderer.h"
+	"../../../../tools/AmMatrix/matrixCalculations.h"
+	"../../../../tools/ImageOperations/imageOps.h"
+	"OGLRendererSandbox.h"
+
+1571477599 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/System/glx.h
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader_hardcoded.h
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader_obj.h
+	<GL/gl.h>
+	<GL/glx.h>
+	"model_loader.h"
+
+1541360145 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader.h
+
+1572016167 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader_tri.h
+	"model_loader_setup.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader_setup.h
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_converter.h
+	"model_loader_obj.h"
+	"model_loader_tri.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Scene/scene.h
+	"../TrajectoryParser/TrajectoryParser.h"
+
+1545240567 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParser.h
+	"../ModelLoader/model_loader.h"
+	"hashmap.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/hashmap.h
+	<pthread.h>
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Rendering/downloadFromRenderer.h
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Tools/tools.h
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Tools/save_to_file.h
+
+1541360145 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParserDataStructures.h
+	"TrajectoryParser.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryCalculator.h
+	"TrajectoryParser.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Rendering/ShaderPipeline/ogl_shader_pipeline_renderer.h
+	"../ogl_rendering.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Rendering/ogl_rendering.h
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Rendering/tiledRenderer.h
+	"../TrajectoryParser/TrajectoryParser.h"
+	"../ModelLoader/model_loader.h"
+	"../Scene/scene.h"
+
+1545240567 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/OGLRendererSandbox.h
+
+1541360145 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	"../Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h"
+	"../Rendering/ogl_rendering.h"
+	"../../../../../tools/AmMatrix/matrixOpenGL.h"
+	"../../../../../tools/AmMatrix/matrix4x4Tools.h"
+	"model_loader.h"
+	"model_loader_hardcoded.h"
+	"model_loader_obj.h"
+	"model_loader_tri.h"
+	"model_loader_transform_joints.h"
+	"model_editor.h"
+	"../Tools/tools.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Rendering/FixedPipeline/ogl_fixed_pipeline_renderer.h
+	"../ogl_rendering.h"
+
+1541449612 /home/ammar/Documents/Programming/RGBDAcquisition/tools/AmMatrix/matrixOpenGL.h
+
+1541171400 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader_transform_joints.h
+	"model_loader_tri.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_editor.h
+	"model_loader_tri.h"
+
+1540076732 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader_obj.c
+	"model_loader_obj.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"../TextureLoader/texture_loader.h"
+	"../Tools/tools.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TextureLoader/texture_loader.h
+
+1545240567 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Scene/scene.c
+	<GL/gl.h>
+	<GL/glx.h>
+	<GL/glu.h>
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	<math.h>
+	"../Tools/tools.h"
+	"../../../../../tools/AmMatrix/matrixCalculations.h"
+	"../../../../../tools/AmMatrix/matrixOpenGL.h"
+	"../../../../../tools/AmMatrix/matrix4x4Tools.h"
+	"../TrajectoryParser/TrajectoryCalculator.h"
+	"../ModelLoader/model_loader.h"
+	"../ModelLoader/model_loader_hardcoded.h"
+	"../ModelLoader/model_loader_tri.h"
+	"../ModelLoader/model_loader_transform_joints.h"
+	"scene.h"
+	"../Rendering/ogl_rendering.h"
+	"../Rendering/tiledRenderer.h"
+	"../OGLRendererSandbox.h"
+
+1571477599 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/System/glx.c
+	<X11/X.h>
+	<X11/keysym.h>
+	<stdio.h>
+	<stdlib.h>
+	<GL/glx.h>
+	<GL/gl.h>
+	"glx.h"
+	"glx2.h"
+	"glx3.h"
+
+1571477599 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/System/glx2.h
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/System/glx3.h
+
+1540076732 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TextureLoader/ppm.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"ppm.h"
+
+1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TextureLoader/ppm.h
+
+1540076732 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TextureLoader/texture_loader.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	"../ModelLoader/model_loader.h"
+	"texture_loader.h"
+	"../../../../../tools/Codecs/codecs.h"
+
+1540076732 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Tools/save_to_file.c
+	"save_to_file.h"
+	<stdio.h>
+	<stdlib.h>
+
+1540076732 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Tools/tools.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<GL/gl.h>
+	"tools.h"
+	<sys/time.h>
+	<unistd.h>
+	<time.h>
+
+1541171400 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/InputParser_C.c
+	"InputParser_C.h"
+	<math.h>
+	<stdio.h>
+
+1541171400 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/InputParser_C.h
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+
+1545240567 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryCalculator.c
+	"TrajectoryCalculator.h"
+	"TrajectoryParserDataStructures.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"../../../../../tools/AmMatrix/matrix4x4Tools.h"
+	"../../../../../tools/AmMatrix/matrixCalculations.h"
+	"../../../../../tools/AmMatrix/quaternions.h"
+
+1541360145 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParser.c
+	"TrajectoryParser.h"
+	"TrajectoryParserDataStructures.h"
+	"TrajectoryCalculator.h"
+	"TrajectoryPrimitives.h"
+	"../OGLRendererSandbox.h"
+	"../ModelLoader/model_loader.h"
+	"../../../../../tools/AmMatrix/matrixCalculations.h"
+	"../../../../../tools/AmMatrix/quaternions.h"
+	"../Tools/tools.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<math.h>
+	"InputParser_C.h"
+
+1541360145 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryPrimitives.h
+
+1541360145 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParserDataStructures.c
+	"TrajectoryParserDataStructures.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"TrajectoryCalculator.h"
+	"../ModelLoader/model_loader_hardcoded.h"
+	"../../../../../tools/AmMatrix/matrix4x4Tools.h"
+
+1541360145 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryPrimitives.c
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+	"TrajectoryPrimitives.h"
+
+1572018297 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/OpenGLAcquisition.c
+	<stdio.h>
+	<stdlib.h>
+	"OpenGLAcquisition.h"
+	"../acquisition/Acquisition.h"
+	<string.h>
+	"opengl_depth_and_color_renderer/src/Library/OGLRendererSandbox.h"
+
+1572020968 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/OpenGLAcquisition.h
+	"../tools/Calibration/calibration.h"
+	"../acquisition/acquisition_setup.h"
+
+1525729965 /home/ammar/Documents/Programming/RGBDAcquisition/tools/Calibration/calibration.h
+
+1501717825 /home/ammar/Documents/Programming/RGBDAcquisition/acquisition/acquisition_setup.h
+
+1525729965 /home/ammar/Documents/Programming/RGBDAcquisition/acquisition/Acquisition.h
+	<tools/Calibration/calibration.h>
+	"calibration.h"
+	"../tools/Calibration/calibration.h"
 
