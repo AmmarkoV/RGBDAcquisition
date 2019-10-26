@@ -73,9 +73,9 @@ GLuint      vao=0;
 GLuint      bufferVao=0;
 GLuint      bufferSkyboxVao=0;
 
- GLuint vPosition , vNormal , vColor , vTexture , lightPositionLocation  , materialColorLocation;
- GLuint fogLocation  , modelViewMatrixLocation  , modelViewProjectionMatrixLocation  , normalTransformationLocation;
- GLuint lightColorLocation , hdrColorLocation , lightMaterialsLocation , texture1Location , normalTextureLocation , skyboxLocation , textureStrengthLocation ;
+GLuint vPosition , vNormal , vColor , vTexture , lightPositionLocation  , materialColorLocation;
+GLuint fogLocation  , modelViewMatrixLocation  , modelViewProjectionMatrixLocation  , normalTransformationLocation;
+GLuint lightColorLocation , hdrColorLocation , lightMaterialsLocation , texture1Location , normalTextureLocation , skyboxLocation , textureStrengthLocation;
 
 
 
@@ -232,21 +232,17 @@ void doOGLShaderBoneDrawCalllist( float * pos , unsigned int * parentNode ,  uns
 
 
 
-
-
-
-
 void doOGLShaderDrawCalllist(
-                              float * projectionMatrix ,
-                              float * viewMatrix ,
-                              float * modelMatrix ,
-                              float * mvpMatrix ,
+                              const float * projectionMatrix ,
+                              const float * viewMatrix ,
+                              const float * modelMatrix ,
+                              const float * mvpMatrix ,
                               //-----------------------------------------------------
-                              float * vertices ,       unsigned int numberOfVertices ,
-                              float * normals ,        unsigned int numberOfNormals ,
-                              float * textureCoords ,  unsigned int numberOfTextureCoords ,
-                              float * colors ,         unsigned int numberOfColors ,
-                              unsigned int * indices , unsigned int numberOfIndices
+                              const float * vertices ,       unsigned int numberOfVertices ,
+                              const float * normals ,        unsigned int numberOfNormals ,
+                              const float * textureCoords ,  unsigned int numberOfTextureCoords ,
+                              const float * colors ,         unsigned int numberOfColors ,
+                              const unsigned int * indices , unsigned int numberOfIndices
                              )
 {
   fprintf(stderr,"doOGLShaderDrawCalllist\n");
@@ -260,7 +256,7 @@ void doOGLShaderDrawCalllist(
 
     verticeCount+=(unsigned int ) numberOfVertices/(3*sizeof(float));
     fprintf(stderr,GREEN "Will DrawArray(GL_TRIANGLES,0,%u) - %u \n" NORMAL ,verticeCount,numberOfVertices);
-    fprintf(stderr,GREEN "Pushing %u vertices (%u bytes) and %u normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,numberOfVertices/sizeof(float),numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
+    fprintf(stderr,GREEN "Pushing %lu vertices (%u bytes) and %lu normals (%u bytes) and %u colors and %u texture coords as our object \n" NORMAL ,numberOfVertices/sizeof(float),numberOfVertices,numberOfNormals/sizeof(float),numberOfNormals,numberOfColors,numberOfTextureCoords);
 
 
   int generateNewBuffer=1;

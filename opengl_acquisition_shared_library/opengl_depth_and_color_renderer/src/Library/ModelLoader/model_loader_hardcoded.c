@@ -16,6 +16,7 @@
 #include "model_loader_obj.h"
 #include "../Tools/tools.h"
 
+#include "../Rendering/ogl_rendering.h"
 #include "../../../../../tools/AmMatrix/matrixCalculations.h"
 
 #define DISABLE_GL_CALL_LIST 0
@@ -45,7 +46,7 @@ float sphereNormals[SPHERE_QUALITY*SPHERE_QUALITY*3]={0};
 
 
 
-int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
+int calculateGenericTriangleNormals(const float * coords , unsigned int coordLength)
 {
  if (coords==0) { return 0; }
    //fprintf(stderr,"float xNormals[]={ //X  Y  Z  W\n");
@@ -72,7 +73,7 @@ int calculateGenericTriangleNormals(float * coords , unsigned int coordLength)
 }
 
 
-int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coordLength)
+int drawGenericTriangleMesh(const float * coords ,const float * normals, unsigned int coordLength)
 {
     #if USE_GLEW
     return  renderOGL(
@@ -107,7 +108,7 @@ int drawGenericTriangleMesh(float * coords , float * normals, unsigned int coord
     return 1;
 }
 
-int drawGenericTriangleMeshTranslatedScaled(float * coords , float * normals, unsigned int coordLength,float dx,float dy,float dz,float scale)
+int drawGenericTriangleMeshTranslatedScaled(const float * coords ,const float * normals, unsigned int coordLength,float dx,float dy,float dz,float scale)
 {
     glBegin(GL_TRIANGLES);
       unsigned int i=0,z=0;
@@ -127,7 +128,12 @@ int drawGenericTriangleMeshTranslatedScaled(float * coords , float * normals, un
 }
 
 
-int drawAxis(float x, float y , float z, float scale)
+int drawAxis(
+             const float x,
+             const float y,
+             const float z, 
+             const float scale
+            )
 {
  glLineWidth(6.0);
  glBegin(GL_LINES);
@@ -249,7 +255,17 @@ int drawQuestion()
  return 1;
 }
 
-int drawBoundingBox(float x,float y,float z ,float minX,float minY,float minZ,float maxX,float maxY,float maxZ)
+int drawBoundingBox(
+                    const float x,
+                    const float y,
+                    const float z,
+                    const float minX,
+                    const float minY,
+                    const float minZ,
+                    const float maxX,
+                    const float maxY,
+                    const float maxZ
+                   )
 {
  //fprintf(stderr,"drawBoundingBox( pos %0.2f %0.2f %0.2f min %0.2f %0.2f %0.2f  max %0.2f %0.2f %0.2f \n",x,y,z ,minX,minY,minZ,maxX,maxY,maxZ);
 
