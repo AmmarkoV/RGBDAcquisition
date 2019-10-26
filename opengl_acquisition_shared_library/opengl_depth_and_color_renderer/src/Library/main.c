@@ -195,7 +195,9 @@ int controlScene(const char * name,const char * variable,int control,float value
                               unsigned int coordLength
                         )
 */
- return 0;
+ float coords[4]={valueA,valueB,valueC,0.0};
+
+ return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
 }
 
 int passUserCommand(const char * command,const char * value)

@@ -108,6 +108,16 @@ int addPoseToObjectState(
                        );
 
 
+int changeAllPosesInObjectState(
+                                struct VirtualStream * stream ,
+                                struct ModelList * modelStorage,
+                                char * name  ,
+                                char * jointName,
+                                unsigned int timeMilliseconds ,
+                                float * coord ,
+                                unsigned int coordLength
+                               );
+
 int addConnectorToVirtualStream(
                                  struct VirtualStream * stream ,
                                  char * firstObject , char * secondObject ,
