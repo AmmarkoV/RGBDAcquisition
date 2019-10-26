@@ -74,7 +74,7 @@ int renderPhotoshoot( void * context );
 * @param String with a path to a configuration file
 * @retval 1=Success , 0=Failure
 */
-int initScene(int argc, char *argv[],char * confFile);
+int initScene(int argc,const char *argv[],const char * confFile);
 
 /**
 * @brief Tick time so that model positions in the scene are updated

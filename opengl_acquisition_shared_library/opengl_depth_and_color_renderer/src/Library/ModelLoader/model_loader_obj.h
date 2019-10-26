@@ -162,7 +162,7 @@ GLuint getObjOGLList(struct OBJ_Model * obj);
 
 
 
-int saveOBJ(struct OBJ_Model * obj , char * filename);
+int saveOBJ(struct OBJ_Model * obj ,const char * filename);
 
 /**
 * @brief Load an Object (.OBJ) file

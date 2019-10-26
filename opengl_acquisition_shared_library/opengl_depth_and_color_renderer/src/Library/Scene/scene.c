@@ -243,7 +243,7 @@ int windowSizeUpdated(unsigned int newWidth , unsigned int newHeight)
    return 1;
 }
 
-int initScene(int argc, char *argv[],char * confFile)
+int initScene(int argc,const char *argv[],const char * confFile)
 {
   fprintf(stderr,"Initializing Scene\n");
 
