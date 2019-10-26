@@ -173,7 +173,21 @@ double getOpenGLPixelSize()
  return 2/WIDTH;
 }
 
-
+int controlScene(const char * name,const char * variable,int control,float value)
+{
+ //TODO:
+ /* Na kanw alter pantou to pose state me vasi to ti erxetai
+ int addPoseToObjectState(
+                              struct VirtualStream * stream ,
+                              struct ModelList * modelStorage,
+                              char * name  ,
+                              char * jointName,
+                              unsigned int timeMilliseconds ,
+                              float * coord ,
+                              unsigned int coordLength
+                        )
+*/
+}
 
 int passUserCommand(const char * command,const char * value)
 {

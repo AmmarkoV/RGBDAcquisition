@@ -67,6 +67,7 @@ unsigned int getOpenGLWidth();
 unsigned int getOpenGLHeight();
 
 
+int controlScene(const char * name,const char * variable,int control,float value);
 
 int passUserCommand(const char * command,const char * value);
 int passUserInput(char key,int state,unsigned int x, unsigned int y);
