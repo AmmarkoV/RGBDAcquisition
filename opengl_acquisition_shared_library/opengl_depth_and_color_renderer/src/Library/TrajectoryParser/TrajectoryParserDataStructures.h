@@ -100,8 +100,8 @@ int changeModelJointRotationOrder(
 int addPoseToObjectState(
                               struct VirtualStream * stream ,
                               struct ModelList * modelStorage,
-                              char * name  ,
-                              char * jointName,
+                              const char * name  ,
+                              const char * jointName,
                               unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength
@@ -111,8 +111,8 @@ int addPoseToObjectState(
 int changeAllPosesInObjectState(
                                 struct VirtualStream * stream ,
                                 struct ModelList * modelStorage,
-                                char * name  ,
-                                char * jointName,
+                                const char * name  ,
+                                const char * jointName,
                                 unsigned int timeMilliseconds ,
                                 float * coord ,
                                 unsigned int coordLength

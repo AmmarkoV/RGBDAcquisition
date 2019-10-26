@@ -780,7 +780,7 @@ int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNum
   return modelStorage->models[modelNumber].numberOfBones;
 }
 
-int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found)
+int getModelBoneIDFromBoneName(struct Model *mod,const char * boneName,int * found)
 {
 //fprintf(stderr,"getModelBoneIDFromBoneName(boneName=%s)\n",boneName);
 if (found==0) { return 0; }

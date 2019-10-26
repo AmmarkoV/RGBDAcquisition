@@ -279,7 +279,7 @@ int drawCube();
 int getModelListBoneNumber(struct ModelList * modelStorage,unsigned int modelNumber);
 
 //TODO Add explanation here
-int getModelBoneIDFromBoneName(struct Model *mod,char * boneName,int * found);
+int getModelBoneIDFromBoneName(struct Model *mod,const char * boneName,int * found);
 
 
 int getModelBoneRotationOrderFromBoneName(struct Model *mod,unsigned int boneID);

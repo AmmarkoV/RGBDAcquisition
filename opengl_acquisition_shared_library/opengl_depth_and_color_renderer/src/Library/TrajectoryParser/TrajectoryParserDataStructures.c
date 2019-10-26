@@ -7,6 +7,9 @@
 #include "TrajectoryCalculator.h"
 
 #include "../ModelLoader/model_loader_hardcoded.h"
+#include "../ModelLoader/model_loader_tri.h"
+#include "../ModelLoader/model_loader_transform_joints.h"
+
 #include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #define NORMAL   "\033[0m"
@@ -482,7 +485,6 @@ int changeObjectRotationOrder(
                                   char * rotationOrderStr
                                 )
 {
- unsigned int boneIDResult;
  unsigned int objFound = 0;
  unsigned int objTypeFound = 0;
  unsigned int objID = getObjectID(stream,name,&objFound);
@@ -579,8 +581,8 @@ int changeModelJointRotationOrder(
 int addPoseToObjectState(
                               struct VirtualStream * stream ,
                               struct ModelList * modelStorage,
-                              char * name  ,
-                              char * jointName,
+                              const char * name  ,
+                              const char * jointName,
                               unsigned int timeMilliseconds ,
                               float * coord ,
                               unsigned int coordLength
@@ -664,7 +666,7 @@ int addPoseToObjectState(
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
            } else
-           if (coordLength=16)
+           if (coordLength==16)
            {
             if (stream->debug)
                  { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n",ObjID,pos,boneID,timeMilliseconds); }
@@ -699,8 +701,8 @@ int addPoseToObjectState(
 int changeAllPosesInObjectState(
                                 struct VirtualStream * stream ,
                                 struct ModelList * modelStorage,
-                                char * name  ,
-                                char * jointName,
+                                const char * name  ,
+                                const char * jointName,
                                 unsigned int timeMilliseconds ,
                                 float * coord ,
                                 unsigned int coordLength
@@ -784,7 +786,7 @@ int changeAllPosesInObjectState(
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
            } else
-           if (coordLength=16)
+           if (coordLength==16)
            {
             if (stream->debug)
                  { fprintf(stderr,"Set obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n",ObjID,pos,boneID,timeMilliseconds); }
@@ -960,7 +962,7 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
    strcpy(filename,inputFilename); //strcpy also copies null terminator
    extension[0]=0;
    unsigned int inputFilenameLength=strlen(inputFilename);
-   unsigned int extensionStart = inputFilenameLength , filenameStart = inputFilenameLength  ,filenameSpan = 0, directoryStart = inputFilenameLength , directorySpan = 0;
+   unsigned int extensionStart = inputFilenameLength , filenameStart = inputFilenameLength  ,filenameSpan = 0,  directorySpan = 0; //directoryStart = inputFilenameLength ,
 
 
    if (inputFilenameLength==0) { return 0; }
@@ -1020,7 +1022,7 @@ int splitRawFilenameToDirectoryFilenameAndExtension(
 
   //If we reached this place we have a directory(!)
 
-   directoryStart  = i;
+   //directoryStart  = i;
    const char * startOfDirectory = &inputFilename[0]; // do not include . ( dot )
    directorySpan = filenameStart;
    strncpy(directory,startOfDirectory,directorySpan);

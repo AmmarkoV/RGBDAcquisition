@@ -718,7 +718,7 @@
 	<ctype.h>
 	"TrajectoryPrimitives.h"
 
-1572124860 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/main.c
+1572126028 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -755,7 +755,7 @@
 	<GL/glx.h>
 	"model_loader.h"
 
-1541360145 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader.h
+1572126259 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader.h
 
 1572016167 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader_tri.h
 	"model_loader_setup.h"
@@ -782,7 +782,7 @@
 
 1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/Tools/save_to_file.h
 
-1572125494 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParserDataStructures.h
+1572126098 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryParserDataStructures.h
 	"TrajectoryParser.h"
 
 1540076732 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/TrajectoryParser/TrajectoryCalculator.h
@@ -800,7 +800,7 @@
 
 1572124883 /home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/OGLRendererSandbox.h
 
-1541360145 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader.c
+1572126276 source:/home/ammar/Documents/Programming/RGBDAcquisition/opengl_acquisition_shared_library/opengl_depth_and_color_renderer/src/Library/ModelLoader/model_loader.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
