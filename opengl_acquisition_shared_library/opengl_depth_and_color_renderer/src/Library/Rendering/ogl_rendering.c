@@ -28,7 +28,7 @@ int resetRendererOptions()
 }
 
 
-int enableShaders(char * vertShaderFilename , char * fragShaderFilename)
+int enableShaders(const char * vertShaderFilename ,const char * fragShaderFilename)
 {
   strncpy(
            rendererOptions.fragmentShaderFile ,

@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include "../../Library/OGLRendererSandbox.h"
+#include "../../Library/Scene/scene.h"
 
 
 #include <GL/glx.h>    /* this includes the necessary X headers */
@@ -79,7 +80,7 @@ int reallyFastCheckForLinuxGPUWithoutPBuffer()
 
 
 
-int main(int argc, char **argv)
+int main(int argc,const char **argv)
 {
 
     double * rodriguez = (double*) malloc(sizeof(double) * 3 );

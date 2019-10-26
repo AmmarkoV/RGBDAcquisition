@@ -88,7 +88,7 @@ int setKeyboardControl(int val);
 * @param Fragment Shader Filename
 * @retval 0=Failure,1=Success
 */
-int enableShaders(char * vertShaderFilename , char * fragShaderFilename );
+int enableShaders(const char * vertShaderFilename ,const char * fragShaderFilename );
 
 
 /**
