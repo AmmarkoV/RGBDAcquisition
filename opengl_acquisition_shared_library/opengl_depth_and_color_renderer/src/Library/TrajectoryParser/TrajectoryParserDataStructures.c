@@ -578,15 +578,15 @@ int changeModelJointRotationOrder(
 }
 
 
-int addPoseToObjectState(
-                              struct VirtualStream * stream ,
-                              struct ModelList * modelStorage,
-                              const char * name  ,
-                              const char * jointName,
-                              unsigned int timeMilliseconds ,
-                              float * coord ,
-                              unsigned int coordLength
-                        )
+int changeAllPosesInObjectState(
+                                struct VirtualStream * stream ,
+                                struct ModelList * modelStorage,
+                                const char * name  ,
+                                const char * jointName,
+                                unsigned int timeMilliseconds ,
+                                float * coord ,
+                                unsigned int coordLength
+                               )
 {
  if (stream==0)                                     {   fprintf(stderr,"Invalid stream \n"); return 0; }
  if (modelStorage==0)                               {   fprintf(stderr,"Invalid model storage \n"); return 0; }
@@ -603,10 +603,13 @@ int addPoseToObjectState(
     unsigned int pos=0;
     if ( stream->object[ObjID].frame[pos].jointList !=0 )
     {
-       pos = getExactStreamPosFromTimestamp(stream,ObjID,timeMilliseconds,&foundExactTimestamp);
-
-       if(foundExactTimestamp)
+       //pos = getExactStreamPosFromTimestamp(stream,ObjID,timeMilliseconds,&foundExactTimestamp); 
+       if(stream->object[ObjID].numberOfFrames>0)
        {
+        for (pos=0; pos<stream->object[ObjID].numberOfFrames; pos++)
+        {
+           
+        
         unsigned int objectTypeID = stream->object[ObjID].type;
 
         unsigned int modelID = stream->objectTypes[objectTypeID].modelListArrayNumber;
@@ -684,7 +687,8 @@ int addPoseToObjectState(
         } else { fprintf(stderr,"Could not find exact bone %u for %s \n",boneID,name); }
         } else { fprintf(stderr,"Could not find data of model %u for %s \n",modelID,name); }
         } else { fprintf(stderr,"Could not find exact model %u for %s \n",modelID,name); }
-       } else  { fprintf(stderr,"Could not find exact timestamp %u for %s \n",timeMilliseconds, name); }
+        } 
+       } else  { fprintf(stderr,"Could not find any timestamp for %s \n", name); }
     } else     { fprintf(stderr,"Could not Find a joint list for %s ( model not loaded? )\n",name); }
   } else       { fprintf(stderr,"Could not Find object %s \n",name); }
 
@@ -698,15 +702,16 @@ int addPoseToObjectState(
 
 
 
-int changeAllPosesInObjectState(
-                                struct VirtualStream * stream ,
-                                struct ModelList * modelStorage,
-                                const char * name  ,
-                                const char * jointName,
-                                unsigned int timeMilliseconds ,
-                                float * coord ,
-                                unsigned int coordLength
-                               )
+
+int addPoseToObjectState(
+                              struct VirtualStream * stream ,
+                              struct ModelList * modelStorage,
+                              const char * name  ,
+                              const char * jointName,
+                              unsigned int timeMilliseconds ,
+                              float * coord ,
+                              unsigned int coordLength
+                        )
 {
  if (stream==0)                                     {   fprintf(stderr,"Invalid stream \n"); return 0; }
  if (modelStorage==0)                               {   fprintf(stderr,"Invalid model storage \n"); return 0; }
