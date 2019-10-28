@@ -96,7 +96,7 @@ int dumpBVHToTrajectoryParserPrimitives(const char * filename , struct BVH_Motio
     fprintf(fp,"FAR_CLIP(1000)\n");
     fprintf(fp,"SILENT(1)\n");
     fprintf(fp,"RATE(120)\n");
-    fprintf(fp,"INTERPOLATE_TIME(0)\n");
+    fprintf(fp,"INTERPOLATE_TIME(1)\n");
     fprintf(fp,"MOVE_VIEW(1)\n\n");
 
 

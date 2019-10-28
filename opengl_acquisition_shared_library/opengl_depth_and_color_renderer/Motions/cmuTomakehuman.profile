@@ -238,7 +238,17 @@ JOINT_ASSOCIATION(rhip,RightUpLeg)
 JOINT_ASSOCIATION(rknee,RightLeg)
 JOINT_ASSOCIATION(rfoot,RightFoot)
 
+#JOINT_OFFSET(hip,0,180,0)
+JOINT_ROTATION_ORDER(lshoulder,z,y,x)
+JOINT_ROTATION_ORDER(rshoulder,z,y,x)
+JOINT_OFFSET(lshoulder,0,45,90)
+JOINT_OFFSET(rshoulder,0,-45,-90)
 
+#JOINT_ROTATION_ORDER(hip,z,y,x)
+JOINT_ROTATION_ORDER(lelbow,z,y,x)
+JOINT_ROTATION_ORDER(relbow,z,y,x)
+JOINT_OFFSET(lelbow,0,0,90)
+JOINT_OFFSET(relbow,0,0,-90)
 
 
 
