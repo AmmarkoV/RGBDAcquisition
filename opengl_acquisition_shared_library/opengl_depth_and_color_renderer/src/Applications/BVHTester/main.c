@@ -267,9 +267,10 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--to")==0)
         {
+          //./BVHTester --from Motions/02_03.bvh --to Motions/cmuTomakehuman.profile test.conf   
           if (i+2>=argc)  { incorrectArguments(); }
-          toSceneFile=argv[i+1];
-          char * retargetProfile=argv[i+2];//"Motions/cmu.profile";
+          char * retargetProfile=argv[i+1];//"Motions/cmu.profile";
+          toSceneFile=argv[i+2];
           
            struct bvhToTRI bvhtri={0};
            bvh_loadBVHToTRI(retargetProfile,&bvhtri,&bvhMotion);
