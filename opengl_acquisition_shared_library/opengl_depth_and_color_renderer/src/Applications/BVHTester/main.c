@@ -267,10 +267,12 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--to")==0)
         {
-          if (i+1>=argc)  { incorrectArguments(); }
+          if (i+2>=argc)  { incorrectArguments(); }
           toSceneFile=argv[i+1];
+          char * retargetProfile=argv[i+2];//"Motions/cmu.profile";
+          
            struct bvhToTRI bvhtri={0};
-           bvh_loadBVHToTRI("Motions/cmu.profile",&bvhtri,&bvhMotion);
+           bvh_loadBVHToTRI(retargetProfile,&bvhtri,&bvhMotion);
            dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,1/*USE Irugubak oisutuib*/,0);
            dumpBVHToTrajectoryParserPrimitives(toSceneFile,&bvhMotion);
         } else
