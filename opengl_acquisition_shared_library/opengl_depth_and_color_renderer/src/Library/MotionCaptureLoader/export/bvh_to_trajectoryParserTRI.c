@@ -299,8 +299,9 @@ int dumpBVHToTrajectoryParserTRI(
     //------------------------------------------------
     }*/
 
-    fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/Ammar.tri,http://ammar.gr/models/Ammar.tri)\n");
-    fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,10.0,10.0,10.0)\n\n");
+    //fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/Ammar.tri,http://ammar.gr/models/Ammar.tri)\n");
+    fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/makehuman.tri,http://ammar.gr/mocapnet/makehuman.tri)\n");
+    fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,1.0,1.0,1.0)\n\n");
 
 
     BVHJointID rootJID=0;

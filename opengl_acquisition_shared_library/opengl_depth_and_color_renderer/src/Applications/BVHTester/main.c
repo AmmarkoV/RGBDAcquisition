@@ -271,6 +271,7 @@ int main(int argc, char **argv)
           if (i+2>=argc)  { incorrectArguments(); }
           char * retargetProfile=argv[i+1];//"Motions/cmu.profile";
           toSceneFile=argv[i+2];
+          //toSceneFileTRI
           
            struct bvhToTRI bvhtri={0};
            bvh_loadBVHToTRI(retargetProfile,&bvhtri,&bvhMotion);
