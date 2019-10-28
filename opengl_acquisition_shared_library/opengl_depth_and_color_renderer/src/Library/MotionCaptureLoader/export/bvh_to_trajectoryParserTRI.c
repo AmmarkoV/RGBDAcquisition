@@ -284,7 +284,7 @@ int dumpBVHToTrajectoryParserTRI(
 
     fprintf(fp,"SILENT(1)\n");
     fprintf(fp,"RATE(120)\n");
-    fprintf(fp,"INTERPOLATE_TIME(0)\n");
+    fprintf(fp,"INTERPOLATE_TIME(1)\n");
     fprintf(fp,"MOVE_VIEW(1)\n");
 
     fprintf(fp,"OBJECT_TYPE(floorType,grid)\n");
@@ -301,7 +301,7 @@ int dumpBVHToTrajectoryParserTRI(
 
     //fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/Ammar.tri,http://ammar.gr/models/Ammar.tri)\n");
     fprintf(fp,"\nOBJECT_TYPE(humanMesh,Models/makehuman.tri,http://ammar.gr/mocapnet/makehuman.tri)\n");
-    fprintf(fp,"RIGID_OBJECT(human,humanMesh, 255,0,0,0,0 ,1.0,1.0,1.0)\n\n");
+    fprintf(fp,"RIGID_OBJECT(human,humanMesh,255,0,0,0,0,1.0,1.0,1.0)\n\n");
 
 
     BVHJointID rootJID=0;
