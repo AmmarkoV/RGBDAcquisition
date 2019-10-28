@@ -237,6 +237,20 @@ int bvh_loadBVHToTRI(
                   bvhtri->jointAssociation[jID].offset[1],
                   bvhtri->jointAssociation[jID].offset[2]
                  );
+        } else
+         if (InputParser_WordCompareAuto(ipc,0,"JOINT_SIGN"))
+        {
+          InputParser_GetWord(ipc,1,nameA,512);
+          jID = bvh_resolveBVHToTRIJoint(bvhtri,nameA);
+          bvhtri->jointAssociation[jID].rotationOrder[0].sign = InputParser_GetWordFloat(ipc,2);
+          bvhtri->jointAssociation[jID].rotationOrder[1].sign = InputParser_GetWordFloat(ipc,3);
+          bvhtri->jointAssociation[jID].rotationOrder[2].sign = InputParser_GetWordFloat(ipc,4);
+          fprintf(
+                  stderr,"Sign %s #%u (%0.2f,%0.2f,%0.2f)\n",nameA,jID,
+                  bvhtri->jointAssociation[jID].rotationOrder[0].sign,
+                  bvhtri->jointAssociation[jID].rotationOrder[1].sign,
+                  bvhtri->jointAssociation[jID].rotationOrder[2].sign
+                 );
         }
        }
     }

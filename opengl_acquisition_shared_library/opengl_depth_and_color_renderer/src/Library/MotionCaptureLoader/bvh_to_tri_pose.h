@@ -19,8 +19,7 @@ struct BVH_JointAssocation
   int useJoint;
 
   struct BVH_RotationOrder rotationOrder[3];
-  
-  float sign[3];
+   
   float offset[3];
 };
 
