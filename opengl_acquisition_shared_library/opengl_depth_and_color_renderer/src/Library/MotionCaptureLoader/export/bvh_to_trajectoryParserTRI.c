@@ -378,10 +378,13 @@ int dumpBVHToTrajectoryParserTRI(
     fprintf(fp,"\n\n");
     //-----------------------------------------------------------------------------------------
 
+    float yOffset=1700;
+    float zOffset=4000;
+
     float posX,posY,posZ,rotX,rotY,rotZ;
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
-      fprintf(fp,"MOVE(floor,%u,-19.231,1784.976,2699.735,0.0,0.0,0.0,0.0)\n",fID);
+      fprintf(fp,"MOVE(floor,%u,-19.231,%0.2f,2699.735,0.0,0.0,0.0,0.0)\n",fID,yOffset);
 
 
       unsigned int producedDynamicRotationForRootJoint = 0;
@@ -414,11 +417,12 @@ int dumpBVHToTrajectoryParserTRI(
                                                          )
            )
            {
+
             //Great, we have everything so we write it down to our output..
             fprintf(
                     fp,"MOVE(human,%u,%0.2f,%0.2f,%0.2f,%0.5f,%0.5f,%0.5f)\n",
                     fID,
-                    10*posX, 10*posY, 10*posZ+4000,
+                    10*posX*-1,(10*posY*-1)+yOffset,(10*posZ)+zOffset,
                     rotX ,rotY, rotZ
                     );
              producedDynamicRotationForRootJoint=1;
