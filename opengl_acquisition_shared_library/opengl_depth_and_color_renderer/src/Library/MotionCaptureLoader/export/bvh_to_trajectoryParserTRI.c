@@ -13,9 +13,23 @@ int get_jAssociationID_From_jID(
                                 unsigned int *jAssociationIDResult
                                )
 {
+   if (mc == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH structure..\n"); return 0; }  
+   if (bvhtri == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH to TRI structure..\n"); return 0; }  
+   if (jAssociationIDResult == 0) {   fprintf(stderr,"get_jAssociationID_From_jID needs a pointer for result \n"); return 0; }  
+   //--   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   
+   
+   if (jID>=mc->jointHierarchySize)
+   {
+       fprintf(stderr,"get_jAssociationID_From_jID from incorrect joint ( %u )\n",jID);
+       return 0;
+   }
+    
   unsigned int jAssociationID=0;
   for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
   {
+    if  (  ( bvhtri->jointAssociation[jAssociationID].bvhJointName !=0 )  && ( mc->jointHierarchy[jID].jointName!=0 ) )
+    {
+      //------------------------------  
     if (
         strcmp(
                  bvhtri->jointAssociation[jAssociationID].bvhJointName ,
@@ -25,6 +39,8 @@ int get_jAssociationID_From_jID(
     {
       *jAssociationIDResult=jAssociationID;
       return 1;
+    }
+    //------------------------------ 
     }
   }
 
@@ -39,6 +55,12 @@ int get_jID_From_jAssociationID(
                                 unsigned int *jIDResult
                                )
 {
+   if (mc == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH structure..\n"); return 0; }  
+   if (bvhtri == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH to TRI structure..\n"); return 0; }  
+   if (jIDResult == 0) {   fprintf(stderr,"get_jAssociationID_From_jID needs a pointer for result \n"); return 0; }  
+   //--   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --       
+    
+    
   unsigned int jID=0;
   for (jID=0; jID<mc->jointHierarchySize; jID++)
   {
@@ -215,6 +237,7 @@ int dumpBVHJointToTP(
         } else
         {
         #if USE4X4MAT
+        //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    
         struct BVH_Transform bvhTransform={0};
         bvh_loadTransformForFrame(
                                   mc,
@@ -227,19 +250,22 @@ int dumpBVHJointToTP(
            fprintf(fp,"%0.4f,",bvhTransform.joint[jID].dynamicRotation[i]);
          }
          fprintf(fp,"\n");
+        //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    
         #else
          fprintf(
                  fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
                  fID,
                  bvhtri->jointAssociation[jAssociationID].triJointName,
-                 rotX, rotY, rotZ
+                 bvhtri->jointAssociation[jAssociationID].offset[0] + bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * rotX,
+                 bvhtri->jointAssociation[jAssociationID].offset[1] + bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign * rotY,
+                 bvhtri->jointAssociation[jAssociationID].offset[2] + bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign * rotZ
                 );
+         //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    --- 
         #endif
         }
        } else
        { fprintf(fp,"#BVH joint `%s` has no TRI name associated\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
-    }
-   else
+    } else
     { fprintf(fp,"#BVH joint `%s` not used/associated\n",bvhtri->jointAssociation[jAssociationID].bvhJointName); }
   }
 
@@ -394,8 +420,9 @@ int dumpBVHToTrajectoryParserTRI(
 
       dumpBVHJointToTP(fp, mc, bvhtri, fID);
       fprintf(fp,"\n\n");
-
-/*
+ 
+    //=================================
+    /*
      if (includeSpheres)
       {
        for (jID=0; jID<mc->jointHierarchySize; jID++)
@@ -407,7 +434,9 @@ int dumpBVHToTrajectoryParserTRI(
                       fID
                      );
        }
-      }*/
+      } 
+     */
+    //=================================
 
     }
 

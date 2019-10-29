@@ -758,6 +758,7 @@ int addPoseToObjectState(
            stream->object[ObjID].frame[pos].jointList->joint[boneID].useMatrix4x4=0;
            stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=0;
 
+            //---    ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---     
            if (coordLength==3)
            {
             if (stream->debug)
@@ -768,7 +769,13 @@ int addPoseToObjectState(
             stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder=getModelBoneRotationOrderFromBoneName(mod,boneID);
 
             if (stream->debug)
-                { fprintf(stderr,"bone %u => rotation order %u \n",boneID,stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder); }
+                {
+                    fprintf(stderr,"bone %u => rotation order %u %s \n",
+                                     boneID,
+                                     stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder,
+                                     ROTATION_ORDER_NAMESA[stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder]
+                                    ); 
+                }
 
             if (stream->object[ObjID].frame[pos].jointList->joint[boneID].eulerRotationOrder==0)
             {
@@ -780,6 +787,7 @@ int addPoseToObjectState(
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot3=coord[2];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
            } else
+            //---    ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---     
            if (coordLength==4)
            {
             if (stream->debug)
@@ -791,6 +799,7 @@ int addPoseToObjectState(
             stream->object[ObjID].frame[pos].jointList->joint[boneID].rot4=coord[3];
             stream->object[ObjID].frame[pos].jointList->joint[boneID].altered=1;
            } else
+            //---    ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---     
            if (coordLength==16)
            {
             if (stream->debug)
@@ -801,6 +810,7 @@ int addPoseToObjectState(
             for (z=0; z<16; z++)
               { stream->object[ObjID].frame[pos].jointList->joint[boneID].m[z]=coord[z]; }
            } else
+            //---    ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---   ---     
            {
              fprintf(stderr,RED "Unknown coordinate length ( %u )  obj=%u pos=%u bone=%u @ %u ms Matrix4x4 \n" NORMAL,coordLength,ObjID,pos,boneID,timeMilliseconds);
            }

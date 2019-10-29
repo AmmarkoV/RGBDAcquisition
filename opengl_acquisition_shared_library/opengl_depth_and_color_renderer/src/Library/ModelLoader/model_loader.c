@@ -843,7 +843,7 @@ int getModelBoneRotationOrderFromBoneName(struct Model *mod,unsigned int boneID)
    {
      if (boneID<triM->header.numberOfBones)
      {
-        return  triM->bones[boneID].info->eulerRotationOrder;
+        return (int)  triM->bones[boneID].info->eulerRotationOrder;
      }
    }
  } else

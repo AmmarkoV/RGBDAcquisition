@@ -105,7 +105,6 @@ int getOpenGLColor(char * color , unsigned int x,unsigned int y,unsigned int wid
    return downloadOpenGLColor((unsigned char*) color,x,y,width,height);
 }
 
-
 void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {
 
@@ -118,8 +117,6 @@ void writeOpenGLColor(char * colorfile,unsigned int x,unsigned int y,unsigned in
     if (rgb!=0) { free(rgb); rgb=0; }
     return ;
 }
-
-
 
 void writeOpenGLDepth(char * depthfile,unsigned int x,unsigned int y,unsigned int width,unsigned int height)
 {

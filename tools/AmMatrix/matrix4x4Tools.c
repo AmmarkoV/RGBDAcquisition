@@ -1071,7 +1071,7 @@ void create4x4ModelTransformation(
     {
       create4x4IdentityMatrix(intermediateMatrixRotation);
     } else
-    if (rotationOrder>=ROTATION_ORDER_NAMES)
+    if (rotationOrder>=ROTATION_ORDER_NUMBER_OF_NAMES)
     {
       fprintf(stderr,"create4x4ModelTransformation: wrong rotationOrder(%u)\n",rotationOrder);
     } else

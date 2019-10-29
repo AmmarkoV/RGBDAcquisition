@@ -143,7 +143,7 @@ const char * rotationOrderNames[] =
   "YXZ",
   "YZX",
   "ZXY",
-  "ZYX",
+  "ZYX", 
 //=================
     "End of Channel Rotation Orders" ,
     "Unknown"

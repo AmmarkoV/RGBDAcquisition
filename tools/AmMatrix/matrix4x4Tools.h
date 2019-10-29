@@ -164,6 +164,25 @@ void create4x4QuaternionMatrix(double * m , double qX,double qY,double qZ,double
 
 
 
+
+//This should be ROTATION_ORDER_NAMESA but it isn't to avoid bugs
+//Since this used to be a variable in some points of the code..
+static const char * ROTATION_ORDER_NAMESA[] =
+{
+  "ROTATION_ORDER_NONE", //0
+  "ROTATION_ORDER_XYZ",//1 
+  "ROTATION_ORDER_XZY",//2
+  "ROTATION_ORDER_YXZ",//3
+  "ROTATION_ORDER_YZX",//4
+  "ROTATION_ORDER_ZXY",//5
+  "ROTATION_ORDER_ZYX",//6
+  "ROTATION_ORDER_RPY",//7
+  //--------------------
+  "INVALID_ROTATION_ORDER"
+};
+ 
+ 
+
 enum ROTATION_ORDER
 {
   ROTATION_ORDER_NONE=0,
@@ -175,7 +194,7 @@ enum ROTATION_ORDER
   ROTATION_ORDER_ZYX,//6
   ROTATION_ORDER_RPY,//7
   //--------------------
-  ROTATION_ORDER_NAMES
+  ROTATION_ORDER_NUMBER_OF_NAMES
 };
 
 
