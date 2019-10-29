@@ -13,23 +13,23 @@ int get_jAssociationID_From_jID(
                                 unsigned int *jAssociationIDResult
                                )
 {
-   if (mc == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH structure..\n"); return 0; }  
-   if (bvhtri == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH to TRI structure..\n"); return 0; }  
-   if (jAssociationIDResult == 0) {   fprintf(stderr,"get_jAssociationID_From_jID needs a pointer for result \n"); return 0; }  
-   //--   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   
-   
+   if (mc == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH structure..\n"); return 0; }
+   if (bvhtri == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH to TRI structure..\n"); return 0; }
+   if (jAssociationIDResult == 0) {   fprintf(stderr,"get_jAssociationID_From_jID needs a pointer for result \n"); return 0; }
+   //--   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --
+
    if (jID>=mc->jointHierarchySize)
    {
        fprintf(stderr,"get_jAssociationID_From_jID from incorrect joint ( %u )\n",jID);
        return 0;
    }
-    
+
   unsigned int jAssociationID=0;
   for (jAssociationID=0; jAssociationID<bvhtri->numberOfJointAssociations; jAssociationID++)
   {
     if  (  ( bvhtri->jointAssociation[jAssociationID].bvhJointName !=0 )  && ( mc->jointHierarchy[jID].jointName!=0 ) )
     {
-      //------------------------------  
+      //------------------------------
     if (
         strcmp(
                  bvhtri->jointAssociation[jAssociationID].bvhJointName ,
@@ -40,7 +40,7 @@ int get_jAssociationID_From_jID(
       *jAssociationIDResult=jAssociationID;
       return 1;
     }
-    //------------------------------ 
+    //------------------------------
     }
   }
 
@@ -55,12 +55,12 @@ int get_jID_From_jAssociationID(
                                 unsigned int *jIDResult
                                )
 {
-   if (mc == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH structure..\n"); return 0; }  
-   if (bvhtri == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH to TRI structure..\n"); return 0; }  
-   if (jIDResult == 0) {   fprintf(stderr,"get_jAssociationID_From_jID needs a pointer for result \n"); return 0; }  
-   //--   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --       
-    
-    
+   if (mc == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH structure..\n"); return 0; }
+   if (bvhtri == 0) {   fprintf(stderr,"get_jAssociationID_From_jID with incorrect BVH to TRI structure..\n"); return 0; }
+   if (jIDResult == 0) {   fprintf(stderr,"get_jAssociationID_From_jID needs a pointer for result \n"); return 0; }
+   //--   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --   --
+
+
   unsigned int jID=0;
   for (jID=0; jID<mc->jointHierarchySize; jID++)
   {
@@ -110,6 +110,22 @@ int getAssociatedPositionsAndRotationsForJointID(
            *posX=data[0];
            *posY=data[1];
            *posZ=data[2];
+
+           #define INVERT_ANGLES 0
+
+           #if INVERT_ANGLES
+            data[3]=data[3]*-1;
+            data[4]=data[4]*-1;
+            data[5]=data[5]*-1;
+           #endif // INVERT_ANGLES
+
+           /*
+           switch (bvhtri->jointAssociation[jAssociationID].rotationOrder[0].rotID)
+           {
+
+           };
+           */
+
 
           //---------------------------------------------------------------------------------------------------
            *rotX = bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * data[3];
@@ -237,7 +253,7 @@ int dumpBVHJointToTP(
         } else
         {
         #if USE4X4MAT
-        //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    
+        //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---
         struct BVH_Transform bvhTransform={0};
         bvh_loadTransformForFrame(
                                   mc,
@@ -250,17 +266,17 @@ int dumpBVHJointToTP(
            fprintf(fp,"%0.4f,",bvhTransform.joint[jID].dynamicRotation[i]);
          }
          fprintf(fp,"\n");
-        //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    
+        //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---
         #else
          fprintf(
                  fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
                  fID,
                  bvhtri->jointAssociation[jAssociationID].triJointName,
-                 bvhtri->jointAssociation[jAssociationID].offset[0] + bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * rotX,
-                 bvhtri->jointAssociation[jAssociationID].offset[1] + bvhtri->jointAssociation[jAssociationID].rotationOrder[1].sign * rotY,
-                 bvhtri->jointAssociation[jAssociationID].offset[2] + bvhtri->jointAssociation[jAssociationID].rotationOrder[2].sign * rotZ
+                 rotX, //getAssociatedPositionsAndRotationsForJointID takes care of offsets and signs
+                 rotY, //getAssociatedPositionsAndRotationsForJointID takes care of offsets and signs
+                 rotZ  //getAssociatedPositionsAndRotationsForJointID takes care of offsets and signs
                 );
-         //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    --- 
+         //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---
         #endif
         }
        } else
@@ -420,7 +436,7 @@ int dumpBVHToTrajectoryParserTRI(
 
       dumpBVHJointToTP(fp, mc, bvhtri, fID);
       fprintf(fp,"\n\n");
- 
+
     //=================================
     /*
      if (includeSpheres)
@@ -434,7 +450,7 @@ int dumpBVHToTrajectoryParserTRI(
                       fID
                      );
        }
-      } 
+      }
      */
     //=================================
 

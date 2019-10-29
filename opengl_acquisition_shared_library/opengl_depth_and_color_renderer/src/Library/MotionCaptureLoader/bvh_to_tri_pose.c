@@ -166,11 +166,11 @@ int parseJointAssociation(
 
 
 
-int bvh_loadBVHToTRI(
-                     const char * filename ,
-                     struct bvhToTRI * bvhtri,
-                     struct BVH_MotionCapture * mc
-                    )
+int bvh_loadBVHToTRIAssociationFile(
+                                    const char * filename ,
+                                    struct bvhToTRI * bvhtri,
+                                    struct BVH_MotionCapture * mc
+                                   )
 {
   FILE * fp = fopen(filename,"r");
   if (fp!=0)

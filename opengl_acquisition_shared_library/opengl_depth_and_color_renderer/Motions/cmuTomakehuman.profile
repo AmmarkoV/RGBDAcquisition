@@ -238,21 +238,32 @@ JOINT_ASSOCIATION(rhip,RightUpLeg)
 JOINT_ASSOCIATION(rknee,RightLeg)
 JOINT_ASSOCIATION(rfoot,RightFoot)
 
-JOINT_SIGN(hip,1,1,1)
+#JOINT_SIGN(hip,1,1,1)
 JOINT_OFFSET(hip,0,0,0)
 
  
 
-JOINT_ROTATION_ORDER(lshoulder,z,x,y)
-JOINT_ROTATION_ORDER(rshoulder,z,x,y)
-JOINT_OFFSET(lshoulder,0,45,90)
-JOINT_OFFSET(rshoulder,0,-45,-90) 
+#JOINT_ROTATION_ORDER(lshoulder,z,y,x)
+#JOINT_ROTATION_ORDER(rshoulder,z,y,x)
+#JOINT_OFFSET(lshoulder,0,45,90)
+#JOINT_OFFSET(rshoulder,0,-45,-90) 
 
 #JOINT_ROTATION_ORDER(hip,z,y,x)
-JOINT_ROTATION_ORDER(lelbow,z,x,y)
-JOINT_ROTATION_ORDER(relbow,z,x,y)
-JOINT_OFFSET(lelbow,0,0,90)
-JOINT_OFFSET(relbow,0,0,-90)
+#JOINT_ROTATION_ORDER(lelbow,z,x,y)
+#JOINT_ROTATION_ORDER(relbow,z,x,y)
+JOINT_OFFSET(lelbow,0,0,-90)
+JOINT_OFFSET(relbow,0,0,90)
+
+#JOINT_SIGN(lelbow,-1,-1,-1)
+#JOINT_SIGN(relbow,-1,-1,-1)
+#JOINT_SIGN(lshoulder,-1,-1,-1)
+#JOINT_SIGN(rshoulder,-1,-1,-1)
+
+
+#JOINT_SIGN(lknee,-1,-1,-1)
+#JOINT_SIGN(rknee,-1,-1,-1)
+#JOINT_SIGN(lhip,-1,-1,-1)
+#JOINT_SIGN(rhip,-1,-1,-1)
 
 
 

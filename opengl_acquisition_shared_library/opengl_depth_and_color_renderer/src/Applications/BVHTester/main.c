@@ -111,9 +111,9 @@ int main(int argc, char **argv)
     //unsigned int flipOrientation = 0;
     //unsigned int flipRandomizationOrientation = 0;
 
-  
+
     unsigned int regularOrientation = BVH_ENFORCE_NO_ORIENTATION;
-    unsigned int randomizedOrientation =   BVH_ENFORCE_NO_ORIENTATION; 
+    unsigned int randomizedOrientation =   BVH_ENFORCE_NO_ORIENTATION;
     unsigned int csvOrientation = BVH_ENFORCE_NO_ORIENTATION;
     unsigned int filterBehindCamera=1;
     unsigned int filterIfAnyJointOutsideof2DFrame=1;
@@ -267,14 +267,14 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--to")==0)
         {
-          //./BVHTester --from Motions/02_03.bvh --to Motions/cmuTomakehuman.profile test.conf   
+          //./BVHTester --from Motions/02_03.bvh --to Motions/cmuTomakehuman.profile test.conf
           if (i+2>=argc)  { incorrectArguments(); }
           char * retargetProfile=argv[i+1];//"Motions/cmu.profile";
           toSceneFile=argv[i+2];
           //toSceneFileTRI
-          
+
            struct bvhToTRI bvhtri={0};
-           bvh_loadBVHToTRI(retargetProfile,&bvhtri,&bvhMotion);
+           bvh_loadBVHToTRIAssociationFile(retargetProfile,&bvhtri,&bvhMotion);
            dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,1/*USE Irugubak oisutuib*/,0);
            dumpBVHToTrajectoryParserPrimitives(toSceneFile,&bvhMotion);
         } else
@@ -400,25 +400,25 @@ int main(int argc, char **argv)
 
           bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
-        //----------------------------------------------------- 
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizedOrientation")==0)
         {
-             //flipRandomizationOrientation=1; 
-             
+             //flipRandomizationOrientation=1;
+
              if (strcmp("front",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_FRONT_ORIENTATION;    } else
              if (strcmp("back",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_BACK_ORIENTATION;       } else
              if (strcmp("left",argv[i+1])==0)      {  randomizedOrientation=BVH_ENFORCE_LEFT_ORIENTATION;         } else
-             if (strcmp("right",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;      }  
+             if (strcmp("right",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;      }
         } else
-        //----------------------------------------------------- 
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--csvOrientation")==0)
         {
-             //flipRandomizationOrientation=1; 
-             
+             //flipRandomizationOrientation=1;
+
              if (strcmp("front",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_FRONT_ORIENTATION;    } else
              if (strcmp("back",argv[i+1])==0)    {  csvOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
              if (strcmp("left",argv[i+1])==0)    {  csvOrientation=BVH_ENFORCE_LEFT_ORIENTATION;     } else
-             if (strcmp("right",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    }  
+             if (strcmp("right",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--perturbJointAngles")==0)

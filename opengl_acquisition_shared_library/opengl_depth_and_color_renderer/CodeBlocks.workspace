@@ -6,5 +6,6 @@
 		<Project filename="src/Applications/Comparer/Comparer.cbp" />
 		<Project filename="src/Applications/ModelDump/ModelDump.cbp" />
 		<Project filename="src/Applications/GameEngine/GameEngine.cbp" />
+		<Project filename="src/Applications/BVHTester/BVHTester.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

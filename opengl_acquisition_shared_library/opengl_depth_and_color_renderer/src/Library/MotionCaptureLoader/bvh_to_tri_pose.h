@@ -19,7 +19,7 @@ struct BVH_JointAssocation
   int useJoint;
 
   struct BVH_RotationOrder rotationOrder[3];
-   
+
   float offset[3];
 };
 
@@ -30,10 +30,10 @@ struct bvhToTRI
 };
 
 
-int bvh_loadBVHToTRI(
-                     const char * filename ,
-                     struct bvhToTRI * bvhtri,
-                     struct BVH_MotionCapture * mc
-                    );
+int bvh_loadBVHToTRIAssociationFile(
+                                    const char * filename ,
+                                    struct bvhToTRI * bvhtri,
+                                    struct BVH_MotionCapture * mc
+                                  );
 
 #endif // BVH_TO_TRI_POSE_H_INCLUDED
