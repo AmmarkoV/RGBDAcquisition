@@ -192,9 +192,19 @@ int controlScene(const char * name,const char * variable,int control,float value
                               unsigned int coordLength
                         )
 */
- float coords[4]={valueA,valueB,valueC,0.0};
+ if (control==3)
+  {
+    float coords[4]={valueA,valueB,valueC,0.0};
+    return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
+  } else
+ if (control==4)
+  {
+    float coords[4]={valueC,valueA,valueB,0.0};
+    return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
+  }
 
- return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
+ fprintf(stderr,"Unhandled control for controlScene\n");
+ return 0;
 }
 
 int passUserCommand(const char * command,const char * value)

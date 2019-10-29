@@ -90,7 +90,7 @@ int createOpenGLDevice(int devID,const char * devName,unsigned int width,unsigne
 
 int controlOpenGLScene(const char * name,const char * variable,int control,float valueA,float valueB,float valueC)
 {
- fprintf(stderr,"Object %s -> variable %s[%u] is set to %0.2f \n",name,variable,control,valueA,valueB,valueC);
+ fprintf(stderr,"Object %s -> variable %s[%u] is set to %0.2f/%0.2f/%0.2f \n",name,variable,control,valueA,valueB,valueC);
  return controlScene(name,variable,control,valueA,valueB,valueC);
 }
 
