@@ -119,13 +119,6 @@ int getAssociatedPositionsAndRotationsForJointID(
             data[5]=data[5]*-1;
            #endif // INVERT_ANGLES
 
-           /*
-           switch (bvhtri->jointAssociation[jAssociationID].rotationOrder[0].rotID)
-           {
-
-           };
-           */
-
 
           //---------------------------------------------------------------------------------------------------
            *rotX = bvhtri->jointAssociation[jAssociationID].rotationOrder[0].sign * data[3];
@@ -268,14 +261,14 @@ int dumpBVHJointToTP(
          fprintf(fp,"\n");
         //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---
         #else
-         fprintf(
-                 fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
-                 fID,
-                 bvhtri->jointAssociation[jAssociationID].triJointName,
-                 rotX, //getAssociatedPositionsAndRotationsForJointID takes care of offsets and signs
-                 rotY, //getAssociatedPositionsAndRotationsForJointID takes care of offsets and signs
-                 rotZ  //getAssociatedPositionsAndRotationsForJointID takes care of offsets and signs
-                );
+              fprintf(
+                      fp,"POSE(human,%u,%s,%0.4f,%0.4f,%0.4f)\n",
+                      fID,
+                      bvhtri->jointAssociation[jAssociationID].triJointName,
+                      rotX, //getAssociatedPositionsAndRotationsForJointID takes care of offsets and signs
+                      rotY, //getAssociatedPositionsAndRotationsForJointID takes care of offsets and signs
+                      rotZ  //getAssociatedPositionsAndRotationsForJointID takes care of offsets and signs
+                     );
          //---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---    ---
         #endif
         }

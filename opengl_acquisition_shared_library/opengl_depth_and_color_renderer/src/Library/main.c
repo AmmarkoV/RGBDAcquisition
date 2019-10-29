@@ -175,26 +175,42 @@ double getOpenGLPixelSize()
 int controlScene(const char * name,const char * variable,int control,float valueA,float valueB,float valueC)
 {
  //TODO:
- /* Na kanw alter pantou to pose state me vasi to ti erxetai
-
-
-  OPENGL_ACQUISITION_JOINT_ROTATION_X,   //7
-  OPENGL_ACQUISITION_JOINT_ROTATION_Y,   //8
-  OPENGL_ACQUISITION_JOINT_ROTATION_Z,   //9
+ /* THIS SHOULD BE THE SAME AS OpenGLAcquisition.h
+  OPENGL_ACQUISITION_NOCONTROL=0,          //0
+  OPENGL_ACQUISITION_POSITION_XYZ,         //1
+  OPENGL_ACQUISITION_ROTATION_XYZ,         //2
+  OPENGL_ACQUISITION_JOINT_ROTATION_XYZ,   //3
+  OPENGL_ACQUISITION_JOINT_ROTATION_ZXY,   //4
+  OPENGL_ACQUISITION_JOINT_ROTATION_TEST,  //5
+  OPENGL_ACQUISITION_COLOR_RGB,            //6
 */
+ float coords[4]={0};
+ 
+ 
+
  if (control==3)
   {
-    float coords[4]={valueA,valueB,valueC,0.0};
-    return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
+    coords[0]=valueA;
+    coords[1]=valueB;
+    coords[2]=valueC; 
   } else
  if (control==4)
   {
-    float coords[4]={valueC,valueA,valueB,0.0};
-    return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
+    coords[0]=valueC;
+    coords[1]=valueA;
+    coords[2]=valueB; 
+  } else
+ if (control==5)
+  {
+    coords[0]=-1*valueA;
+    coords[1]=-1*valueB;
+    coords[2]=-1*valueC; 
+  } else
+  {
+    fprintf(stderr,"Unhandled control for controlScene\n");    
   }
 
- fprintf(stderr,"Unhandled control for controlScene\n");
- return 0;
+ return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
 }
 
 int passUserCommand(const char * command,const char * value)

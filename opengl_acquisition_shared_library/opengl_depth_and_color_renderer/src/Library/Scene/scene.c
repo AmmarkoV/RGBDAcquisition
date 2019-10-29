@@ -41,7 +41,6 @@ int WIDTH=640;
 int HEIGHT=480;
 
 
-#define USE_LIGHTS 1
 const GLfloat light_ambient[]  = { 0.2f, 0.2f, 0.2f, 1.0f };
 const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
