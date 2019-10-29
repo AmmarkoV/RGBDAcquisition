@@ -42,11 +42,16 @@ int main (int argc, char *argv[])
         {
            if (strcmp(argv[i],"--paint")==0)
             {
+               int r = atoi(argv[i+1]);
+               int g = atoi(argv[i+2]);
+               int b = atoi(argv[i+3]);
+
+               fprintf(stderr,"Will paint mesh (RGB) (%u/%u/%u) \n",r,g,b);
                paintTRI(
                         originalModel,
-                        atoi(argv[i+1]),
-                        atoi(argv[i+2]),
-                        atoi(argv[i+3])
+                        r,
+                        g,
+                        b
                        );
             }
         }
