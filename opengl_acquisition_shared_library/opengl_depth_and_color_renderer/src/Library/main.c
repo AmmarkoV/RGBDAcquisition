@@ -181,16 +181,6 @@ int controlScene(const char * name,const char * variable,int control,float value
   OPENGL_ACQUISITION_JOINT_ROTATION_X,   //7
   OPENGL_ACQUISITION_JOINT_ROTATION_Y,   //8
   OPENGL_ACQUISITION_JOINT_ROTATION_Z,   //9
-
- int addPoseToObjectState(
-                              struct VirtualStream * stream ,
-                              struct ModelList * modelStorage,
-                              char * name  ,
-                              char * jointName,
-                              unsigned int timeMilliseconds ,
-                              float * coord ,
-                              unsigned int coordLength
-                        )
 */
  if (control==3)
   {
