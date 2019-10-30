@@ -22,6 +22,7 @@ char * selectedVertexShader;
 struct shaderObject * loadedShader;
 int useShaders;
 int useLighting;
+float lightPos[3];
 //--------------------------------------
 
 int doCulling;

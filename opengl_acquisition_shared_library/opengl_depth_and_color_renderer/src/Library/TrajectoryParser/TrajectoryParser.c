@@ -501,8 +501,11 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
           break; 
 
          case TRAJECTORYPRIMITIVES_LIGHT :
-           fprintf(stderr,"Enabling lights..\n");
+           fprintf(stderr,"Enabling light..\n");
            newstream->useLightingSystem=1;
+           newstream->lightPosition[0]=InputParser_GetWordFloat(ipc,1);
+           newstream->lightPosition[1]=InputParser_GetWordFloat(ipc,2);
+           newstream->lightPosition[2]=InputParser_GetWordFloat(ipc,3);
          break;
 
           case TRAJECTORYPRIMITIVES_EVENT :

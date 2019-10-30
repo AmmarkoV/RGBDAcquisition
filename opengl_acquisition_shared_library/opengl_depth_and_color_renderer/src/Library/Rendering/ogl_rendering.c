@@ -76,6 +76,9 @@ int startOGLRendering()
 int renderOGLLight( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
 {
   rendererOptions.useLighting=1; //if we want light we need to use lighting..
+  rendererOptions.lightPos[0]=pos[0];
+  rendererOptions.lightPos[1]=pos[1];
+  rendererOptions.lightPos[2]=pos[2];
   
   switch (rendererOptions.useShaders)
   {

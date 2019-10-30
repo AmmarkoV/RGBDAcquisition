@@ -373,7 +373,9 @@ struct VirtualStream
 
 
     char renderWireframe;
+    
     char useLightingSystem;
+    float lightPosition[3];
 
     unsigned int objDeclarationsOffset;
 

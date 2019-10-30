@@ -785,7 +785,11 @@ int renderScene()
   //Lighting
   if (scene->useLightingSystem)
   {
-     renderOGLLight(0,0,0);    
+     renderOGLLight(
+                                          scene->lightPosition,
+                                          0,
+                                          0
+                                        );    
   }
   
   setupSceneCameraBeforeRendering(scene);
