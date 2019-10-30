@@ -93,7 +93,7 @@ int  shaderOGLLighting(struct rendererConfiguration * config)
   #if USE_LIGHTS
    if (config->useLighting)
    {
-      GLfloat light_position[] = { 0.0, 0.0, 1000.0, 1.0 };
+      GLfloat light_position[] = { config->lightPos[0], config->lightPos[1], config->lightPos[2] , 1.0 };
       GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
       GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
       GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0 };
