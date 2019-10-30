@@ -82,6 +82,50 @@ GLuint lightColorLocation , hdrColorLocation , lightMaterialsLocation , texture1
 //Just to make codeblocks display the function without the grayout
 //#define USE_GLEW 1
 
+int  shaderOGLLighting(struct rendererConfiguration * config)
+{ 
+  #warning "GL_COLOR does not even exist"
+  //glEnable(GL_COLOR);
+  //if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color \n"); }
+  glEnable(GL_COLOR_MATERIAL);
+  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color material\n"); }
+
+  #if USE_LIGHTS
+   if (config->useLighting)
+   {
+      GLfloat light_position[] = { 0.0, 0.0, 1000.0, 1.0 };
+      GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+      GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+      GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0 };
+  
+      GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 0.0 };
+      GLfloat mat_diffuse[] = { 1.0, 1.0, 1.0, 0.0 };
+      GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 0.0 };
+      GLfloat mat_shininess[] = { 50.0 };
+  
+  
+      glEnable(GL_LIGHT0);
+      glEnable(GL_LIGHTING);
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling lighting\n"); }
+      glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+      glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+      glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+      glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
+
+      GLenum faces=GL_FRONT_AND_BACK; //GL_FRONT;//
+      glMaterialfv(faces, GL_AMBIENT,    mat_ambient);
+      glMaterialfv(faces, GL_DIFFUSE,    mat_diffuse);
+      glMaterialfv(faces, GL_SPECULAR,   mat_specular);
+      glMaterialfv(faces, GL_SHININESS,   mat_shininess); // <- this was glMateriali
+      if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up Front/Back lights\n"); }  
+      return 1;
+   }
+  #else
+   fprintf(stderr,"Please note that lighting is disabled via the USE_LIGHTS precompiler define\n");
+   return 0; 
+  #endif // USE_LIGHTS
+}
 
 
 int startOGLShaderPipeline(struct rendererConfiguration * config)
@@ -153,33 +197,7 @@ int startOGLShaderPipeline(struct rendererConfiguration * config)
   /* establish initial viewport */
   /* pedantic, full window size is default viewport */
 
-
-  #warning "GL_COLOR does not even exist"
-  //glEnable(GL_COLOR);
-  //if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color \n"); }
-  glEnable(GL_COLOR_MATERIAL);
-  if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling color material\n"); }
-
-  #if USE_LIGHTS
-   glEnable(GL_LIGHT0);
-   glEnable(GL_LIGHTING);
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after enabling lighting\n"); }
-   glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-   glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
-
-   GLenum faces=GL_FRONT;//GL_FRONT_AND_BACK;
-   glMaterialfv(faces, GL_AMBIENT,    mat_ambient);
-   glMaterialfv(faces, GL_DIFFUSE,    mat_diffuse);
-   glMaterialfv(faces, GL_SPECULAR,   mat_specular);
-   glMaterialfv(faces, GL_SHININESS,   mat_shininess); // <- this was glMateriali
-   if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up Front/Back lights\n"); }
-  #else
-   fprintf(stderr,"Please note that lighting is disabled via the USE_LIGHTS precompiler define\n");
-  #endif // USE_LIGHTS
-
+ shaderOGLLighting(&config);
 
   //This is not needed -> :P  glCullFace(GL_FRONT_AND_BACK);
   //Enable Culling
