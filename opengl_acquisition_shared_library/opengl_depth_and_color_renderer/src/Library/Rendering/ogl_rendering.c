@@ -73,6 +73,23 @@ int startOGLRendering()
 
 
 
+int renderOGLLight( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
+{
+  rendererOptions.useLighting=1; //if we want light we need to use lighting..
+  
+  switch (rendererOptions.useShaders)
+  {
+    case 0 :
+          fixedOGLLighting(&rendererOptions);
+    break;
+
+    case 1 :
+         fprintf(stderr,"No Shader lighting support yet..!\n");
+    break;
+  };
+  return 1;
+}
+
 
 int renderOGLBones( float * pos , unsigned int * parentNode ,  unsigned int boneSizes)
 {

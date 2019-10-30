@@ -39,7 +39,7 @@ int resetRendererOptions();
 */
 int startOGLRendering();
 
-
+int renderOGLLight( float * pos , unsigned int * parentNode ,  unsigned int boneSizes);
 
 int renderOGLBones(
                  float * pos ,

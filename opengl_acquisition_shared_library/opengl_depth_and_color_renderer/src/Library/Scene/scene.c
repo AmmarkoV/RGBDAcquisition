@@ -781,7 +781,13 @@ int renderScene()
   glEnable (GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW );
-
+  
+  //Lighting
+  if (scene->useLightingSystem)
+  {
+     renderOGLLight(0,0,0);    
+  }
+  
   setupSceneCameraBeforeRendering(scene);
 
   drawAllSceneObjectsAtPositionsFromTrajectoryParser(scene);

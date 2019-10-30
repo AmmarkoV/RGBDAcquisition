@@ -24,14 +24,14 @@ int  fixedOGLLighting(struct rendererConfiguration * config)
   #if USE_LIGHTS
    if (config->useLighting)
    {
-      GLfloat light_position[] = { 0.0, 0.0, 0.0, 0.0 };
-      GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 0.0 };
-      GLfloat light_diffuse[] = { 0.0, 0.0, 0.0, 0.0 };
-      GLfloat light_specular[] = { 0.0, 0.0, 0.0, 0.0 };
+      GLfloat light_position[] = { 0.0, 0.0, 1000.0, 1.0 };
+      GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+      GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+      GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0 };
   
-      GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
-      GLfloat mat_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-      GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+      GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 0.0 };
+      GLfloat mat_diffuse[] = { 1.0, 1.0, 1.0, 0.0 };
+      GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 0.0 };
       GLfloat mat_shininess[] = { 50.0 };
   
   
@@ -44,7 +44,7 @@ int  fixedOGLLighting(struct rendererConfiguration * config)
       glLightfv(GL_LIGHT0, GL_POSITION, light_position);
       if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
 
-      GLenum faces=GL_FRONT;//GL_FRONT_AND_BACK;
+      GLenum faces=GL_FRONT_AND_BACK; //GL_FRONT;//
       glMaterialfv(faces, GL_AMBIENT,    mat_ambient);
       glMaterialfv(faces, GL_DIFFUSE,    mat_diffuse);
       glMaterialfv(faces, GL_SPECULAR,   mat_specular);
