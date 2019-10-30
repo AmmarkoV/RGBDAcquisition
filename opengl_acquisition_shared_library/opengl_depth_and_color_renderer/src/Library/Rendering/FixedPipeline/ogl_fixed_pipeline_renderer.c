@@ -44,7 +44,7 @@ int  fixedOGLLighting(struct rendererConfiguration * config)
       glLightfv(GL_LIGHT0, GL_POSITION, light_position);
       if (checkOpenGLError(__FILE__, __LINE__)) { fprintf(stderr,"OpenGL error after setting up lights\n"); }
 
-      GLenum faces=GL_FRONT_AND_BACK; //GL_FRONT;//
+      GLenum faces=GL_FRONT; //GL_FRONT_AND_BACK;//
       glMaterialfv(faces, GL_AMBIENT,    mat_ambient);
       glMaterialfv(faces, GL_DIFFUSE,    mat_diffuse);
       glMaterialfv(faces, GL_SPECULAR,   mat_specular);
