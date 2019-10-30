@@ -498,8 +498,12 @@ int processCommand( struct VirtualStream * newstream , struct ModelList * modelS
 
                 //fprintf(stderr,"Tracker POS OBJ( %f %f %f ,  %f %f %f )\n",pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
                 addStateToObjectMini( newstream , name  , time , (float*) pos , coordLength );
-          break;
+          break; 
 
+         case TRAJECTORYPRIMITIVES_LIGHT :
+           fprintf(stderr,"Enabling lights..\n");
+           newstream->useLightingSystem=1;
+         break;
 
           case TRAJECTORYPRIMITIVES_EVENT :
               if (InputParser_WordCompareNoCase(ipc,1,(char*)"INTERSECTS",10)==1)

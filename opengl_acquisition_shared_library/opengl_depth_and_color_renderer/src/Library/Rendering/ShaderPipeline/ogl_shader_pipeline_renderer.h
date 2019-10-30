@@ -11,9 +11,6 @@
 
 #include "../ogl_rendering.h"
 
-//Master Switch for lighting..
-#define USE_LIGHTS 0
-
 
 int startOGLShaderPipeline(struct rendererConfiguration * config);
 

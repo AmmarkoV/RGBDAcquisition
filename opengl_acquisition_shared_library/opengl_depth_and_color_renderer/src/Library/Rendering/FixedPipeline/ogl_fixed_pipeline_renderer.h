@@ -8,6 +8,9 @@
 
 #include "../ogl_rendering.h"
 
+
+int  fixedOGLLighting(struct rendererConfiguration * config);
+
 int startFixedOGLRendering(struct rendererConfiguration * config);
 int stopOGLFixedRendering(struct rendererConfiguration * config);
 

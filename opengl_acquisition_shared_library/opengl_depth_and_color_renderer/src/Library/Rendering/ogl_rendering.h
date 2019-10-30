@@ -6,6 +6,10 @@
 #define OGL_RENDERING_H_INCLUDED
 
 
+//Master Switch for lighting..
+#define USE_LIGHTS 1
+
+
 #define MAX_SHADER_FILENAMES 512
 
 struct rendererConfiguration
@@ -17,6 +21,7 @@ char vertexShaderFile[MAX_SHADER_FILENAMES];
 char * selectedVertexShader;
 struct shaderObject * loadedShader;
 int useShaders;
+int useLighting;
 //--------------------------------------
 
 int doCulling;
