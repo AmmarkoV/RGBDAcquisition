@@ -192,28 +192,31 @@ int bvh_GrowMocapFileByCopyingExistingMotions(
 
 
 int bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
-                                                                                                                                                 struct BVH_MotionCapture * mc,
-                                                                                                                                                 unsigned int poseNumber
-                                                                                                                                              )
+                                                          struct BVH_MotionCapture * mc,
+                                                          unsigned int poseNumber
+                                                         )
 {
     if (mc==0) { return 0; }
-    if (mc->motionValues==0) { return 0; } 
+    if (mc->motionValues==0) { return 0; }
     if (poseNumber>=mc->numberOfFramesEncountered) { return 0; }
-    
+
     fprintf(stderr,"bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(mc,%u)\n",poseNumber);
-    
+
     float * valuesThatWillBeCopied = (float * ) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
-    
+
     if (valuesThatWillBeCopied!=0)
     {
-          memcpy(
-                              valuesThatWillBeCopied,
-                           &mc->motionValues[poseNumber * mc->numberOfValuesPerFrame],
-                              mc->numberOfValuesPerFrame * sizeof(float)
-                            );      
+      memcpy(
+             valuesThatWillBeCopied,
+             &mc->motionValues[poseNumber * mc->numberOfValuesPerFrame],
+             mc->numberOfValuesPerFrame * sizeof(float)
+            );
+
+      valuesThatWillBeCopied[0]=0.0;
+      valuesThatWillBeCopied[1]=0.0;
 
       if ( mc->numberOfFrames <360 )
-      { 
+      {
          float * newMotionValues = (float*) malloc(sizeof(float) * mc->numberOfValuesPerFrame * (360) );
          free(mc->motionValues);
         mc->motionValues=newMotionValues;
@@ -221,31 +224,31 @@ int bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
         mc->numberOfFramesEncountered=mc->numberOfFrames;
         mc->motionValuesSize=mc->numberOfValuesPerFrame* mc->numberOfFrames;
       }
-   
-   
-        
+
+
+
       if ( mc->numberOfFrames >= 360 )
       {
          for (int fID=0; fID<360; fID++)
           {
               //Change Y coordinate only
               valuesThatWillBeCopied[4]=(float) fID;
-              
+
              memcpy(
                                  &mc->motionValues[fID * mc->numberOfValuesPerFrame],
                                  valuesThatWillBeCopied,
                                  mc->numberOfValuesPerFrame * sizeof(float)
                                 );
 
-      
+
           }
           mc->numberOfFramesEncountered=360;
       }
-    
+
       free(valuesThatWillBeCopied);
       return 1;
     }
-   return 0; 
+   return 0;
 }
 
 
