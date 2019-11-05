@@ -328,7 +328,7 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--360")==0)
         {
-          if (i+2>=argc)  { incorrectArguments(); }
+          if (i+1>=argc)  { incorrectArguments(); }
           
           bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
                                                                                                                                                   &bvhMotion,
