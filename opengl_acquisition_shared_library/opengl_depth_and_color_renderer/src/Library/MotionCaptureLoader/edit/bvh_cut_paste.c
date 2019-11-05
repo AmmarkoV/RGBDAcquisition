@@ -235,14 +235,15 @@ int bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
               valuesThatWillBeCopied[4]=(float) fID;
 
              memcpy(
-                                 &mc->motionValues[fID * mc->numberOfValuesPerFrame],
-                                 valuesThatWillBeCopied,
-                                 mc->numberOfValuesPerFrame * sizeof(float)
-                                );
+                     &mc->motionValues[fID * mc->numberOfValuesPerFrame],
+                     valuesThatWillBeCopied,
+                     mc->numberOfValuesPerFrame * sizeof(float)
+                    );
 
 
           }
           mc->numberOfFramesEncountered=360;
+          mc->numberOfFrames=360;
       }
 
       free(valuesThatWillBeCopied);
