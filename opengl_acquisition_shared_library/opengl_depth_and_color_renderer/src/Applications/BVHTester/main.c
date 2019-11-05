@@ -296,10 +296,10 @@ int main(int argc, char **argv)
           toCSVFilename=argv[i+2];
           convertToCSV=1;
           if (strcmp(argv[i+3],"2d+bvh")==0 ) { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
-          if (strcmp(argv[i+3],"2d")==0 )     { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
-          if (strcmp(argv[i+3],"3d")==0 )     { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
-          if (strcmp(argv[i+3],"bvh")==0 )    { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
-                                              { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
+          if (strcmp(argv[i+3],"2d")==0 )           { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"3d")==0 )           { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"bvh")==0 )         { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+                                                                                      { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--svg")==0)
@@ -326,8 +326,15 @@ int main(int argc, char **argv)
                                                          );
         } else
         //-----------------------------------------------------
-
-
+        if (strcmp(argv[i],"--360")==0)
+        {
+          if (i+2>=argc)  { incorrectArguments(); }
+          
+          bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
+                                                                                                                                                  &bvhMotion,
+                                                                                                                                                  atoi(argv[i+1])
+                                                                                                                                                ); 
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--mirror")==0)
         {
