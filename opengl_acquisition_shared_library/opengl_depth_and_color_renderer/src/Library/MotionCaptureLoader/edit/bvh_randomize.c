@@ -335,8 +335,8 @@ int bvh_RandomizePositionFrom2D(
 {
   fprintf(stderr,"Randomizing %u frames  using 2D randomizations \n",mc->numberOfFrames);
 
-  unsigned int borderX=width/8;
-  unsigned int borderY=height/5;
+  unsigned int borderX=width/7; //8
+  unsigned int borderY=height/4;//5
 
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
