@@ -999,7 +999,7 @@ int bhv_jointGetEndSiteChild(struct BVH_MotionCapture * bvhMotion,BVHJointID jID
      {
           if (bvhMotion->jointHierarchy[jointID].parentJoint==jID)
           {
-              *jChildID=jID;
+              *jChildID=jointID;
               return 1;
           }
      }

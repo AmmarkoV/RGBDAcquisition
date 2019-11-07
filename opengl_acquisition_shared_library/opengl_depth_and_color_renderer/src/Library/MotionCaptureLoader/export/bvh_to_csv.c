@@ -317,12 +317,18 @@ int dumpBVHToCSVBody(
 
          if (jID==mc->jointHierarchySize-1) { comma=' '; }
 
+         if (mc->jointHierarchy[jID].erase2DCoordinates)
+         {
+          fprintf(fp2D,"0,0,0");
+         } else
+         {
          fprintf(
                  fp2D,"%0.6f,%0.6f,%u",
                  (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                  (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
                  (bvhTransform->joint[jID].isOccluded==0)
                 );
+         }
 
         if (comma==',')
                   { fprintf(fp2D,",");  }
@@ -384,30 +390,30 @@ int dumpBVHToCSVBody(
          if (!mc->jointHierarchy[jID].isEndSite)
          {
            if (jID==lastElement) { comma=' '; }
-           
-           
+
+
            unsigned int channelID=0;
            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
            {
              unsigned int channelType =  mc->jointHierarchy[jID].channelType[channelID];
-             
+
              float value = bvh_getJointChannelAtFrame(mc,jID,fID,channelType);
-             
+
              //Due to the particular requirements of MocapNET we need to be able to split orientations in CSV files..
-             //We want the neural network to only work with values normalized and centered around 0 
+             //We want the neural network to only work with values normalized and centered around 0
              if (csvOrientation!=BVH_ENFORCE_NO_ORIENTATION)
              {
               //TODO: add here a check for hip Y rotation and perform orientation change..
               if ( (jID==0) && (channelID==BVH_POSITION_X) ) //BVH_ROTATION_X
-              {   
-                  //Test using : 
-                  //./BVHTester --from Motions/MotionCapture/01/01_02.bvh  --repeat 0 --csvOrientation right --randomize2D 1000 5000 -35 45 -35 35 135 35 --occlusions --csv tmp test.csv 2d+bvh 
-                  //value=666; <- highlight the correct 
+              {
+                  //Test using :
+                  //./BVHTester --from Motions/MotionCapture/01/01_02.bvh  --repeat 0 --csvOrientation right --randomize2D 1000 5000 -35 45 -35 35 135 35 --occlusions --csv tmp test.csv 2d+bvh
+                  //value=666; <- highlight the correct
                   //value=(float) bvh_constrainAngleCentered0((double) value,0);
                   value=(float) bvh_RemapAngleCentered0((double) value,csvOrientation);
               }
              }
-             
+
              fprintf(
                      fpBVH,"%0.6f",
                      value

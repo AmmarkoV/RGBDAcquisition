@@ -94,6 +94,7 @@ struct BVH_Joint
    char isAPartOfHead;
    char isAPartOfTorso;
   //--------------------
+  char erase2DCoordinates;
   char isRoot;
   char hasBrace;
   char isEndSite;
