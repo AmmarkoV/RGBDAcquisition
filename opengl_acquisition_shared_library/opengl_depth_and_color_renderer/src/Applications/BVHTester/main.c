@@ -453,7 +453,12 @@ int main(int argc, char **argv)
           unsigned int numberOfValues=atoi(argv[i+1]);
           if (i+1+numberOfValues>=argc)  { incorrectArguments(); } else
             {
-              //todo:
+              bvh_eraseJoints(
+                              &bvhMotion,
+                              numberOfValues,
+                              argv,
+                              i+1
+                             );
             }
             //exit(0);
         } else

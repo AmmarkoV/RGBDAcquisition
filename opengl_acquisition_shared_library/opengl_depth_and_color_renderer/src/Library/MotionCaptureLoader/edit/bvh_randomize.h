@@ -16,6 +16,13 @@ int bvh_PerturbJointAngles(
                            unsigned int iplus2
                           );
 
+int bvh_eraseJoints(
+                    struct BVH_MotionCapture * mc,
+                    unsigned int numberOfValues,
+                    char **argv,
+                    unsigned int iplus1
+                   );
+
 int bvh_RandomizePositionRotation(
                                   struct BVH_MotionCapture * mc,
                                   float * minimumPosition,

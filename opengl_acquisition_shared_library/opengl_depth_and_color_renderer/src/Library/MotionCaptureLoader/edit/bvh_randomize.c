@@ -94,6 +94,77 @@ int bvh_PerturbJointAngles(
 }
 
 
+
+
+
+
+int bvh_eraseJoints(
+                    struct BVH_MotionCapture * mc,
+                    unsigned int numberOfValues,
+                    char **argv,
+                    unsigned int iplus1
+                   )
+{
+  fprintf(stderr,"Asked to erase %u Joint Angles\n",numberOfValues);
+  int i=0;
+  unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+  if (selectedJoints!=0)
+  {
+    memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
+    BVHJointID jID=0;
+    unsigned int mID=0;
+    fprintf(stderr,"Erasing : ");
+    for (i=iplus1; i<=iplus1+numberOfValues; i++)
+     {
+      fprintf(stderr,"%s ",argv[i]);
+      if (
+           bvh_getJointIDFromJointName(
+                                       mc,
+                                       argv[i],
+                                       &jID
+                                      )
+         )
+         {
+           for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+           {
+               if ( mc->motionToJointLookup[mID].jointID == jID )
+               {
+                selectedJoints[mID]=1;
+                fprintf(stderr,"%u ",mID);
+               }
+           }
+
+         }
+     }
+    fprintf(stderr,"\n");
+
+     unsigned int fID=0;
+     for (fID=0; fID<mc->numberOfFrames; fID++)
+      {
+       unsigned int mIDStart=fID*mc->numberOfValuesPerFrame;
+       unsigned int mIDEnd=mIDStart+mc->numberOfValuesPerFrame;
+       for (mID=mIDStart; mID<mIDEnd; mID++)
+         {
+           if (selectedJoints[mID-mIDStart])
+           {
+             //fprintf(stderr,"Was %0.2f ",mc->motionValues[mID+jID]);
+             mc->motionValues[mID]=0.0;
+             //fprintf(stderr,"Is %0.2f ",mc->motionValues[mID+jID]);
+           }
+         }
+      }
+
+
+    free(selectedJoints);
+    return 1;
+  }
+
+  return 0;
+}
+
+
+
+
 int bvh_RandomizePositionsBasedOn3D(
                                      struct BVH_MotionCapture * mc,
                                      float * minimumPosition,
