@@ -85,15 +85,15 @@ double bvh_constrainAngleCentered0(double angle,unsigned int flipOrientation)
 
 double bvh_RemapAngleCentered0(double angle, unsigned int constrainOrientation)
 {
-   double angleShifted = angle; 
-   //We want to add 180 degrees to the model so 0 is oriented towards us..! 
+   double angleShifted = angle;
+   //We want to add 180 degrees to the model so 0 is oriented towards us..!
    switch (constrainOrientation)
    {
-      case BVH_ENFORCE_NO_ORIENTATION :                          return bvh_constrainAngleCentered0(angleShifted,0); break;      
-      case BVH_ENFORCE_FRONT_ORIENTATION :                       return bvh_constrainAngleCentered0(angleShifted,0); break;      
-      case BVH_ENFORCE_BACK_ORIENTATION :                        return bvh_constrainAngleCentered0(angleShifted,1); break;      
-      case BVH_ENFORCE_LEFT_ORIENTATION :    angleShifted+=90.0; return bvh_constrainAngleCentered0(angleShifted,0); break;      
-      case BVH_ENFORCE_RIGHT_ORIENTATION :   angleShifted+=90.0; return bvh_constrainAngleCentered0(angleShifted,1); break; 
+      case BVH_ENFORCE_NO_ORIENTATION :                          return bvh_constrainAngleCentered0(angleShifted,0); break;
+      case BVH_ENFORCE_FRONT_ORIENTATION :                       return bvh_constrainAngleCentered0(angleShifted,0); break;
+      case BVH_ENFORCE_BACK_ORIENTATION :                        return bvh_constrainAngleCentered0(angleShifted,1); break;
+      case BVH_ENFORCE_LEFT_ORIENTATION :    angleShifted+=90.0; return bvh_constrainAngleCentered0(angleShifted,0); break;
+      case BVH_ENFORCE_RIGHT_ORIENTATION :   angleShifted+=90.0; return bvh_constrainAngleCentered0(angleShifted,1); break;
    };
 
    fprintf(stderr,"Did not change angle, due to incorrect BVH_ENFORCE_XX constrain..\n");
@@ -143,7 +143,7 @@ const char * rotationOrderNames[] =
   "YXZ",
   "YZX",
   "ZXY",
-  "ZYX", 
+  "ZYX",
 //=================
     "End of Channel Rotation Orders" ,
     "Unknown"
@@ -823,7 +823,7 @@ int bvh_OffsetPositionRotation(
 
 
 int bvh_ConstrainRotations(
-                           struct BVH_MotionCapture * mc,  
+                           struct BVH_MotionCapture * mc,
                            unsigned int constrainOrientation
                           )
 {
@@ -850,7 +850,7 @@ int bvh_ConstrainRotations(
 
 int bvh_testConstrainRotations()
 {
-  /*  
+  /*
   fprintf(stderr,"Testing bvh_rotation constraint\n");
   unsigned int i=0;
   double angle = -720;
@@ -864,9 +864,9 @@ int bvh_testConstrainRotations()
     );
     angle=angle+1.0;
   }
-  
+
   */
-  
+
 
   fprintf(stderr,"Testing bvh_rotation front constraint\n");
   unsigned int i=0;
@@ -878,8 +878,8 @@ int bvh_testConstrainRotations()
     bvh_RemapAngleCentered0(angle,BVH_ENFORCE_FRONT_ORIENTATION)
     );
     angle=angle+1.0;
-  } 
-   
+  }
+
 
   fprintf(stderr,"Testing bvh_rotation back constraint\n");
   i=0;
@@ -891,8 +891,8 @@ int bvh_testConstrainRotations()
     bvh_RemapAngleCentered0(angle,BVH_ENFORCE_BACK_ORIENTATION)
     );
     angle=angle+1.0;
-  } 
-   
+  }
+
 
   fprintf(stderr,"Testing bvh_rotation right constraint\n");
   i=0;
@@ -904,7 +904,7 @@ int bvh_testConstrainRotations()
     bvh_RemapAngleCentered0(angle,BVH_ENFORCE_RIGHT_ORIENTATION)
     );
     angle=angle+1.0;
-  } 
+  }
 
 
   fprintf(stderr,"Testing bvh_rotation left constraint\n");
@@ -917,9 +917,9 @@ int bvh_testConstrainRotations()
     bvh_RemapAngleCentered0(angle,BVH_ENFORCE_LEFT_ORIENTATION)
     );
     angle=angle+1.0;
-  } 
-   
-  
+  }
+
+
  return 0;
 }
 
@@ -983,6 +983,26 @@ int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
  if (jID>bvhMotion->jointHierarchySize) { return 0; }
  return (!bvhMotion->jointHierarchy[jID].isRoot);
 }
+
+int bhv_jointGetEndsiteChild(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
+{/*
+  if (bvhMotion->jointHierarchy[jID].isEndSite)
+  {
+  unsigned int jointID=0;
+  for (jointID=0; jointID<bvhMotion->jointHierarchySize; jointID++)
+  {
+    if (bvhMotion->jointHierarchy[jointID].hasEndSite)
+    {
+      if (bvhMotion->jointHierarchy[jointID].hasParent)
+      {
+          //TODO: mc->jointHierarchy[jID].parentJoint;
+      }
+    }
+  }
+  }*/
+ return 0;
+}
+
 
 int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
 {

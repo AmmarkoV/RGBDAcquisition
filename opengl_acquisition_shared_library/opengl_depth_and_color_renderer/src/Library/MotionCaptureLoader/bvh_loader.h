@@ -63,7 +63,7 @@ enum ORIENTATION_ENFORCER_IDS
   BVH_ENFORCE_FRONT_ORIENTATION,
   BVH_ENFORCE_BACK_ORIENTATION,
   BVH_ENFORCE_LEFT_ORIENTATION,
-  BVH_ENFORCE_RIGHT_ORIENTATION, 
+  BVH_ENFORCE_RIGHT_ORIENTATION,
   //--------------------
   BVH_VALID_ENFORCED_ORIENTATION_NAMES
 };
@@ -251,6 +251,10 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
 * @return 1=HasParent/0=NoParent-Error
 */
 int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
+
+
+
+int bhv_jointHasEndsiteChild(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
 
 
 /**
