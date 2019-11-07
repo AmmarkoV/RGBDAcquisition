@@ -984,22 +984,27 @@ int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
  return (!bvhMotion->jointHierarchy[jID].isRoot);
 }
 
-int bhv_jointGetEndsiteChild(struct BVH_MotionCapture * bvhMotion , BVHJointID jID )
-{/*
-  if (bvhMotion->jointHierarchy[jID].isEndSite)
+int bhv_jointGetEndSiteChild(struct BVH_MotionCapture * bvhMotion,BVHJointID jID,BVHJointID * jChildID)
+{
+  //fprintf(stderr," bhv_jointGetEndSiteChild ");
+  if (bvhMotion==0) { return 0; }
+
+  if (bvhMotion->jointHierarchy[jID].hasEndSite)
   {
-  unsigned int jointID=0;
-  for (jointID=0; jointID<bvhMotion->jointHierarchySize; jointID++)
-  {
-    if (bvhMotion->jointHierarchy[jointID].hasEndSite)
-    {
-      if (bvhMotion->jointHierarchy[jointID].hasParent)
-      {
-          //TODO: mc->jointHierarchy[jID].parentJoint;
-      }
-    }
+   unsigned int jointID=0;
+   for (jointID=0; jointID<bvhMotion->jointHierarchySize; jointID++)
+   {
+     //fprintf(stderr,"joint[%u]=%s ",jointID,bvhMotion->jointHierarchy[jointID].jointName);
+     if (bvhMotion->jointHierarchy[jointID].isEndSite)
+     {
+          if (bvhMotion->jointHierarchy[jointID].parentJoint==jID)
+          {
+              *jChildID=jID;
+              return 1;
+          }
+     }
+   }
   }
-  }*/
  return 0;
 }
 

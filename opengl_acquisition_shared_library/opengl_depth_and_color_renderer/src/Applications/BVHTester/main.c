@@ -456,6 +456,7 @@ int main(int argc, char **argv)
               bvh_eraseJoints(
                               &bvhMotion,
                               numberOfValues,
+                              1,//include End Joints
                               argv,
                               i+1
                              );

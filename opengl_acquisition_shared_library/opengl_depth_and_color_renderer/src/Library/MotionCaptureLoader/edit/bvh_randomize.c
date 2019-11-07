@@ -7,6 +7,13 @@
 
 
 
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+
 float randomFloatA( float minVal, float maxVal )
 {
     if (maxVal<minVal)
@@ -96,11 +103,10 @@ int bvh_PerturbJointAngles(
 
 
 
-
-
 int bvh_eraseJoints(
                     struct BVH_MotionCapture * mc,
                     unsigned int numberOfValues,
+                    unsigned int includeEndSites,
                     char **argv,
                     unsigned int iplus1
                    )
@@ -114,9 +120,8 @@ int bvh_eraseJoints(
     BVHJointID jID=0;
     unsigned int mID=0;
     fprintf(stderr,"Erasing : ");
-    for (i=iplus1; i<=iplus1+numberOfValues; i++)
+    for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
-      fprintf(stderr,"%s ",argv[i]);
       if (
            bvh_getJointIDFromJointName(
                                        mc,
@@ -125,15 +130,39 @@ int bvh_eraseJoints(
                                       )
          )
          {
+           fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
+
            for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
            {
-               if ( mc->motionToJointLookup[mID].jointID == jID )
+               if (mc->motionToJointLookup[mID].jointID == jID)
                {
                 selectedJoints[mID]=1;
                 fprintf(stderr,"%u ",mID);
                }
            }
+           //-------------------------------------------------
 
+           if(includeEndSites)
+           {
+             BVHJointID jIDES=jID;
+             if (bhv_jointGetEndSiteChild(mc,jID,&jIDES))
+               {
+                 fprintf(stderr,GREEN "%s_EndSite " NORMAL,argv[i]);
+
+                 for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+                   {
+                      if (mc->motionToJointLookup[mID].jointID == jIDES)
+                         {
+                           selectedJoints[mID]=1;
+                           fprintf(stderr,"%u ",mID);
+                         }
+                  }
+               }
+           }
+
+         } else
+         {
+           fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
          }
      }
     fprintf(stderr,"\n");
