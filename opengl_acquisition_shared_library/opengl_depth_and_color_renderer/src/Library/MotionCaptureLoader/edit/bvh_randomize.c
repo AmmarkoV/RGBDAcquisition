@@ -52,7 +52,7 @@ int bvh_PerturbJointAngles(
     BVHJointID jID=0;
     unsigned int mID=0;
     fprintf(stderr,"Randomizing : ");
-    for (i=iplus2; i<=iplus2+numberOfValues; i++)
+    for (i=iplus2+1; i<=iplus2+numberOfValues; i++)
      {
       fprintf(stderr,"%s ",argv[i]);
       if (
