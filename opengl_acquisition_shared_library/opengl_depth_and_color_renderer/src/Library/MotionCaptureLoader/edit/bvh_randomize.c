@@ -54,7 +54,7 @@ int bvh_PerturbJointAngles(
     fprintf(stderr,"Randomizing : ");
     for (i=iplus2+1; i<=iplus2+numberOfValues; i++)
      {
-      fprintf(stderr,"%s ",argv[i]);
+      fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
       if (
            bvh_getJointIDFromJointName(
                                        mc,
@@ -71,7 +71,9 @@ int bvh_PerturbJointAngles(
                 fprintf(stderr,"%u ",mID);
                }
            }
-
+         } else
+         {
+           fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
          }
      }
     fprintf(stderr,"\n");
