@@ -704,7 +704,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
       { //We have content..
        if (!atMotionSection)
        {
-          if (InputParser_WordCompareAuto(ipc,0,"MOTION"))      { fprintf(stderr,"Found Motion Section..\n"); atMotionSection=1; }
+          if (InputParser_WordCompareAuto(ipc,0,"MOTION"))      { /*fprintf(stderr,"Found Motion Section..\n");*/ atMotionSection=1; }
        } else
        {
          if (InputParser_WordCompareAuto(ipc,0,"Frames"))       { bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1); } else
