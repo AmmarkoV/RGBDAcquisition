@@ -1205,15 +1205,26 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
 }
 
 
-bvh_changeJointDimensions(
-                                                                 struct BVH_MotionCapture * bvhMotion,
-                                                                 char * jointName,
-                                                                 float xPercent,
-                                                                 float yPercent,
-                                                                 float zPercent
-                                                                )
+int bvh_changeJointDimensions(
+                                                                       struct BVH_MotionCapture * bvhMotion,
+                                                                       char * jointName,
+                                                                       float xPercent,
+                                                                       float yPercent,
+                                                                       float zPercent
+                                                                    )
 {
-
+   if (bvhMotion==0) { return 0; }
+   
+    BVHJointID jID=0;
+   if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
+   {
+       
+       
+       
+       
+       return 1;
+   }
+ return 0;
 }
 
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
