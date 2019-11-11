@@ -314,6 +314,15 @@ int bvh_copyMotionFrame(
 //float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
 
 
+int bvh_changeJointDimensions(
+                                                                       struct BVH_MotionCapture * bvhMotion,
+                                                                      char * jointName,
+                                                                      float xPercent,
+                                                                      float yPercent,
+                                                                      float zPercent
+                                                                     );
+
+
 /**
 * @brief Request a specific motion channel of a specific joint at a specific frame
 * @ingroup BVH

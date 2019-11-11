@@ -219,6 +219,18 @@ int main(int argc, char **argv)
         {
           bvh_printBVH(&bvhMotion);
         } else
+        //----------------------------------------------------- 
+        if (strcmp(argv[i],"--changeJointDImensions")==0)
+        {
+          if (i+4>=argc)  { incorrectArguments(); }
+          bvh_changeJointDimensions(
+                                                                          &bvhMotion,
+                                                                          argv[i+1],
+                                                                          atof(argv[i+2]),
+                                                                          atof(argv[i+3]),
+                                                                          atof(argv[i+4])
+                                                                       );
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--onlyAnimateGivenJoints")==0)
         {
