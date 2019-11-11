@@ -248,9 +248,11 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--scaleOffsets")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
+          float scaleRatio = atof(argv[i+1]);
+          fprintf(stderr,"Offset scaling ratio = %0.2f \n",scaleRatio);
           bvh_scaleAllOffsets(
                               &bvhMotion,
-                              atof(argv[i+1])
+                              scaleRatio
                               );
         } else
         //-----------------------------------------------------
