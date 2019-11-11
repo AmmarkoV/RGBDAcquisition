@@ -219,17 +219,17 @@ int main(int argc, char **argv)
         {
           bvh_printBVH(&bvhMotion);
         } else
-        //----------------------------------------------------- 
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--changeJointDimensions")==0)
         {
           if (i+4>=argc)  { incorrectArguments(); }
           bvh_changeJointDimensions(
-                                                                          &bvhMotion,
-                                                                          argv[i+1],
-                                                                          atof(argv[i+2]),
-                                                                          atof(argv[i+3]),
-                                                                          atof(argv[i+4])
-                                                                       );
+                                    &bvhMotion,
+                                    argv[i+1],
+                                    atof(argv[i+2]),
+                                    atof(argv[i+3]),
+                                    atof(argv[i+4])
+                                   );
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--onlyAnimateGivenJoints")==0)
@@ -243,6 +243,15 @@ int main(int argc, char **argv)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           scaleWorld=atof(argv[i+1]);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--scaleOffset")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          bvh_scaleAllOffsets(
+                              &bvhMotion,
+                              atof(argv[i+1])
+                              );
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--onlyFirstFrame")==0)

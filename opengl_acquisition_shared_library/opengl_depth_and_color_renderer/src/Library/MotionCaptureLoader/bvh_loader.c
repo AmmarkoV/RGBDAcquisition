@@ -1214,22 +1214,43 @@ int bvh_changeJointDimensions(
                                                                     )
 {
    if (bvhMotion==0) { return 0; }
-   
+
     BVHJointID jID=0;
    if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
    {
        float xChange =  (float) (bvhMotion->jointHierarchy[jID].offset[0]*xPercent)/100 ;
        float yChange =  (float) (bvhMotion->jointHierarchy[jID].offset[1]*yPercent)/100 ;
        float zChange =  (float) (bvhMotion->jointHierarchy[jID].offset[2]*zPercent)/100 ;
-       
+
        bvhMotion->jointHierarchy[jID].offset[0] += xChange;
        bvhMotion->jointHierarchy[jID].offset[1] += yChange;
        bvhMotion->jointHierarchy[jID].offset[2] += zChange;
-       
+
        return 1;
    }
  return 0;
 }
+
+
+
+int bvh_scaleAllOffsets(
+                        struct BVH_MotionCapture * bvhMotion,
+                        float scalingRatio
+                       )
+{
+   if (bvhMotion==0) { return 0; }
+
+    BVHJointID jID=0;
+    for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+    {
+      bvhMotion->jointHierarchy[jID].offset[0] = bvhMotion->jointHierarchy[jID].offset[0] * scalingRatio;
+      bvhMotion->jointHierarchy[jID].offset[1] = bvhMotion->jointHierarchy[jID].offset[1] * scalingRatio;
+      bvhMotion->jointHierarchy[jID].offset[2] = bvhMotion->jointHierarchy[jID].offset[2] * scalingRatio;
+    }
+
+ return 1;
+}
+
 
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------

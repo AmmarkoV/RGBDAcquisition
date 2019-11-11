@@ -323,6 +323,11 @@ int bvh_changeJointDimensions(
                                                                      );
 
 
+int bvh_scaleAllOffsets(
+                        struct BVH_MotionCapture * bvhMotion,
+                        float scalingRatio
+                       );
+
 /**
 * @brief Request a specific motion channel of a specific joint at a specific frame
 * @ingroup BVH
