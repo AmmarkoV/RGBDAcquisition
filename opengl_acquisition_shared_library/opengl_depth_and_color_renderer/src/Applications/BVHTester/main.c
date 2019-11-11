@@ -245,7 +245,7 @@ int main(int argc, char **argv)
           scaleWorld=atof(argv[i+1]);
         } else
         //-----------------------------------------------------
-        if (strcmp(argv[i],"--scaleOffset")==0)
+        if (strcmp(argv[i],"--scaleOffsets")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }
           bvh_scaleAllOffsets(
