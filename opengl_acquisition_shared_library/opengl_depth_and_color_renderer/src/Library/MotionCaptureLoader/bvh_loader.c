@@ -1218,9 +1218,13 @@ int bvh_changeJointDimensions(
     BVHJointID jID=0;
    if ( bvh_getJointIDFromJointNameNocase(bvhMotion ,jointName,&jID) )
    {
+       float xChange =  (float) (bvhMotion->jointHierarchy[jID].offset[0]*xPercent)/100 ;
+       float yChange =  (float) (bvhMotion->jointHierarchy[jID].offset[1]*yPercent)/100 ;
+       float zChange =  (float) (bvhMotion->jointHierarchy[jID].offset[2]*zPercent)/100 ;
        
-       
-       
+       bvhMotion->jointHierarchy[jID].offset[0] += xChange;
+       bvhMotion->jointHierarchy[jID].offset[1] += yChange;
+       bvhMotion->jointHierarchy[jID].offset[2] += zChange;
        
        return 1;
    }
