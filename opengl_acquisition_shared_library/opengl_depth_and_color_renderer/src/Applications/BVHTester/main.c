@@ -220,7 +220,7 @@ int main(int argc, char **argv)
           bvh_printBVH(&bvhMotion);
         } else
         //----------------------------------------------------- 
-        if (strcmp(argv[i],"--changeJointDImensions")==0)
+        if (strcmp(argv[i],"--changeJointDimensions")==0)
         {
           if (i+4>=argc)  { incorrectArguments(); }
           bvh_changeJointDimensions(
