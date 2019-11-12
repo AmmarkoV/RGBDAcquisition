@@ -79,6 +79,7 @@ add_library(OGLRendererSandbox SHARED
             MotionCaptureLoader/export/bvh_export.c 
             MotionCaptureLoader/edit/bvh_randomize.c 
             MotionCaptureLoader/edit/bvh_rename.c 
+            MotionCaptureLoader/edit/bvh_merge.c 
             MotionCaptureLoader/edit/bvh_cut_paste.c 
             MotionCaptureLoader/edit/bvh_inverseKinematics.c
             #Textures and how to load them  

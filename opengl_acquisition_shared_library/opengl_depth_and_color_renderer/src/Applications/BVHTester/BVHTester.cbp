@@ -76,6 +76,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_merge.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_merge.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_randomize.c">
 			<Option compilerVar="CC" />
 		</Unit>
