@@ -151,45 +151,35 @@ Joint 36 - rthumb  | Parent 32 - rhand
 Joint 37 - end site  | Parent 36 - rthumb 
 
 
-  JOINT abdomen
-    JOINT chest
-      JOINT neck
-        JOINT head
-          JOINT leftEye
-          JOINT rightEye
-      JOINT rCollar
-        JOINT rShldr
-          JOINT rForeArm
-            JOINT rHand
-              JOINT rThumb1
-                JOINT rThumb2
-              JOINT rIndex1
-                JOINT rIndex2
-              JOINT rMid1
-                JOINT rMid2
-              JOINT rRing1
-                JOINT rRing2
-              JOINT rPinky1
-                JOINT rPinky2
-      JOINT lCollar
-        JOINT lShldr
-          JOINT lForeArm
-            JOINT lHand
-              JOINT lThumb1
-                JOINT lThumb2
-              JOINT lIndex1
-                JOINT lIndex2
-              JOINT lMid1
-                JOINT lMid2
-              JOINT lRing1
-                JOINT lRing2
-              JOINT lPinky1
-                JOINT lPinky2
-  JOINT rButtock
-    JOINT rThigh
-      JOINT rShin
-        JOINT rFoot
-  JOINT lButtock
-    JOINT lThigh
-      JOINT lShin
+JOINT LHipJoint
+		JOINT LeftUpLeg
+			JOINT LeftLeg
+				JOINT LeftFoot
+					JOINT LeftToeBase
+	JOINT RHipJoint
+		JOINT RightUpLeg
+			JOINT RightLeg
+				JOINT RightFoot
+					JOINT RightToeBase
+	JOINT LowerBack
+		JOINT Spine
+			JOINT Spine1
+				JOINT Neck
+					JOINT Neck1
+						JOINT Head
+				JOINT LeftShoulder
+					JOINT LeftArm
+						JOINT LeftForeArm
+							JOINT LeftHand
+								JOINT LeftFingerBase
+									JOINT LeftHandIndex1
+								JOINT LThumb
+				JOINT RightShoulder
+					JOINT RightArm
+						JOINT RightForeArm
+							JOINT RightHand
+								JOINT RightFingerBase
+									JOINT RightHandIndex1
+								JOINT RThumb
+
 
