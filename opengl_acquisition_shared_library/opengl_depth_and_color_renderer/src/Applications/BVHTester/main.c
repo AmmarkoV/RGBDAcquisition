@@ -23,6 +23,7 @@
 #include "../../Library/MotionCaptureLoader/edit/bvh_cut_paste.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_randomize.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_rename.h"
+#include "../../Library/MotionCaptureLoader/edit/bvh_merge.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h"
 
 #include  "../../../../../tools/AmMatrix/matrix4x4Tools.h"
@@ -288,6 +289,32 @@ int main(int argc, char **argv)
           bvh_ConstrainRotations(&bvhMotion,regularOrientation);
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--merge")==0)
+        {
+          if (i+2>=argc)  { incorrectArguments();}
+          const char * BVHPathToFileToMerge = argv[i+1];
+          const char * pathToMergeRules = argv[i+2];
+
+          struct BVH_MotionCapture bvhMotionToMerge={0};
+          if ( bvh_loadBVH(BVHPathToFileToMerge, &bvhMotionToMerge, scaleWorld) )
+          {
+            if (
+                !bvh_mergeWith(
+                               &bvhMotion,
+                               &bvhMotionToMerge,
+                               pathToMergeRules
+                              )
+               )
+               {
+                 fprintf(stderr,"Failed to merge files (%s and %s)..\n",fromBVHFile,BVHPathToFileToMerge);
+               }
+          } else
+          {
+            fprintf(stderr,"Could not open BVH file that was requested to be merged (%s)..\n",BVHPathToFileToMerge);
+          }
+        } else
+
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--to")==0)
         {
           //./BVHTester --from Motions/02_03.bvh --to Motions/cmuTomakehuman.profile test.conf
@@ -319,10 +346,10 @@ int main(int argc, char **argv)
           toCSVFilename=argv[i+2];
           convertToCSV=1;
           if (strcmp(argv[i+3],"2d+bvh")==0 ) { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
-          if (strcmp(argv[i+3],"2d")==0 )           { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
-          if (strcmp(argv[i+3],"3d")==0 )           { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
-          if (strcmp(argv[i+3],"bvh")==0 )         { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
-                                                                                      { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
+          if (strcmp(argv[i+3],"2d")==0 )     { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"3d")==0 )     { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"bvh")==0 )    { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+                                              { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--svg")==0)
@@ -354,9 +381,9 @@ int main(int argc, char **argv)
           if (i+1>=argc)  { incorrectArguments(); }
 
           bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
-                                                                                                                                                  &bvhMotion,
-                                                                                                                                                  atoi(argv[i+1])
-                                                                                                                                                );
+                                                                &bvhMotion,
+                                                                atoi(argv[i+1])
+                                                               );
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--mirror")==0)
