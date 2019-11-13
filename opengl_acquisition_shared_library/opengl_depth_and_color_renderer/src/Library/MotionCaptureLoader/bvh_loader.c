@@ -1383,59 +1383,59 @@ int bvh_copyMotionFrame(
 //----------------------------------------------------------------------------------------------------
 void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
 {
-  fprintf(stderr,"\n\n\nPrinting BVH file..\n");
+  fprintf(stdout,"\n\n\nPrinting BVH file..\n");
   unsigned int i=0,z=0;
   for (i=0; i<bvhMotion->jointHierarchySize; i++)
   {
-    fprintf(stderr,"___________________________________\n");
-    fprintf(stderr,GREEN "Joint %u - %s " NORMAL ,i,bvhMotion->jointHierarchy[i].jointName);
+    fprintf(stdout,"___________________________________\n");
+    fprintf(stdout,GREEN "Joint %u - %s " NORMAL ,i,bvhMotion->jointHierarchy[i].jointName);
     unsigned int parentID = bvhMotion->jointHierarchy[i].parentJoint;
-    fprintf(stderr," | Parent %u - %s \n",parentID,bvhMotion->jointHierarchy[parentID].jointName);
+    fprintf(stdout," | Parent %u - %s \n",parentID,bvhMotion->jointHierarchy[parentID].jointName);
     //===============================================================
     if (bvhMotion->jointHierarchy[i].loadedChannels>0)
     {
-     fprintf(stderr,"Has %u channels - ",bvhMotion->jointHierarchy[i].loadedChannels);
-     if ( bvhMotion->jointHierarchy[i].channelRotationOrder==0 ) { fprintf(stderr,RED "!");}
-     fprintf(stderr,"Rotation Order: %s \n" NORMAL,rotationOrderNames[(unsigned int) bvhMotion->jointHierarchy[i].channelRotationOrder]);
+     fprintf(stdout,"Has %u channels - ",bvhMotion->jointHierarchy[i].loadedChannels);
+     if ( bvhMotion->jointHierarchy[i].channelRotationOrder==0 ) { fprintf(stdout,RED "!");}
+     fprintf(stdout,"Rotation Order: %s \n" NORMAL,rotationOrderNames[(unsigned int) bvhMotion->jointHierarchy[i].channelRotationOrder]);
      for (z=0; z<bvhMotion->jointHierarchy[i].loadedChannels; z++)
       {
         unsigned int cT = bvhMotion->jointHierarchy[i].channelType[z];
-        fprintf(stderr,"%s ",channelNames[cT]);
+        fprintf(stdout,"%s ",channelNames[cT]);
       }
-     fprintf(stderr,"\n");
+     fprintf(stdout,"\n");
     } else
     {
-     fprintf(stderr,"Has no channels\n");
+     fprintf(stdout,"Has no channels\n");
     }
     //===============================================================
-     fprintf(stderr,"Offset : ");
+     fprintf(stdout,"Offset : ");
      for (z=0; z<3; z++)
       {
-        fprintf(stderr,"%0.5f ",bvhMotion->jointHierarchy[i].offset[z]);
+        fprintf(stdout,"%0.5f ",bvhMotion->jointHierarchy[i].offset[z]);
       }
-     fprintf(stderr,"\n");
+     fprintf(stdout,"\n");
     //===============================================================
-    fprintf(stderr,"isRoot %u - ",bvhMotion->jointHierarchy[i].isRoot);
-    fprintf(stderr,"isEndSite %u - ",bvhMotion->jointHierarchy[i].isEndSite);
-    fprintf(stderr,"hasEndSite %u\n",bvhMotion->jointHierarchy[i].hasEndSite);
-    fprintf(stderr,"level %u\n",bvhMotion->jointHierarchy[i].hierarchyLevel );
-    fprintf(stderr,"----------------------------------\n");
+    fprintf(stdout,"isRoot %u - ",bvhMotion->jointHierarchy[i].isRoot);
+    fprintf(stdout,"isEndSite %u - ",bvhMotion->jointHierarchy[i].isEndSite);
+    fprintf(stdout,"hasEndSite %u\n",bvhMotion->jointHierarchy[i].hasEndSite);
+    fprintf(stdout,"level %u\n",bvhMotion->jointHierarchy[i].hierarchyLevel );
+    fprintf(stdout,"----------------------------------\n");
   }
 
 
-  fprintf(stderr,"Motion data\n");
-  fprintf(stderr,"___________________________________\n");
-  fprintf(stderr,"Number of values per frame : %u \n",bvhMotion->numberOfValuesPerFrame);
-  fprintf(stderr,"Loaded motion frames : %u \n",bvhMotion->numberOfFramesEncountered);
-  fprintf(stderr,"Frame time : %0.8f \n",bvhMotion->frameTime);
-  fprintf(stderr,"___________________________________\n");
+  fprintf(stdout,"Motion data\n");
+  fprintf(stdout,"___________________________________\n");
+  fprintf(stdout,"Number of values per frame : %u \n",bvhMotion->numberOfValuesPerFrame);
+  fprintf(stdout,"Loaded motion frames : %u \n",bvhMotion->numberOfFramesEncountered);
+  fprintf(stdout,"Frame time : %0.8f \n",bvhMotion->frameTime);
+  fprintf(stdout,"___________________________________\n");
 }
 
 
 void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
 {
-  fprintf(stderr,"\n\n\nPrinting BVH JointToMotion lookup table..\n");
-  fprintf(stderr,"_______________________________________________\n");
+  fprintf(stdout,"\n\n\nPrinting BVH JointToMotion lookup table..\n");
+  fprintf(stdout,"_______________________________________________\n");
   unsigned int jID=0,fID=0,channelNumber;
   for (fID=0; fID<bvhMotion->numberOfFrames; fID++)
   {
@@ -1446,7 +1446,7 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
          unsigned int channelTypeID = bvhMotion->jointHierarchy[jID].channelType[channelNumber];
          unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
 
-         fprintf(stderr,"f[%u].%s.%s(%u)=%0.2f " ,
+         fprintf(stdout,"f[%u].%s.%s(%u)=%0.2f " ,
                  fID,
                  bvhMotion->jointHierarchy[jID].jointName,
                  channelNames[channelTypeID],
@@ -1455,8 +1455,8 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
                  );
      }
     }
-   fprintf(stderr,"\n\n");
+   fprintf(stdout,"\n\n");
   }
-  fprintf(stderr,"_______________________________________________\n");
+  fprintf(stdout,"_______________________________________________\n");
 }
 
