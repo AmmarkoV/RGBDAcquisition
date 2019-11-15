@@ -99,6 +99,43 @@ void bvh_setTorsoImmunityForJoints(struct BVH_MotionCapture * bvhMotion)
 
 
 
+/*! djb2
+This algorithm (k=33) was first reported by dan bernstein many years ago in comp.lang.c.
+another version of this algorithm (now favored by bernstein) uses xor: hash(i) = hash(i - 1) * 33 ^ str[i];
+the magic of number 33 (why it works better than many other constants, prime or not) has never been adequately explained.
+Needless to say , this is our hash function..!
+*/
+unsigned long hashFunctionJoints(const char *str)
+{
+ if (str==0) return 0;
+ if (str[0]==0) return 0;
+
+ unsigned long hash = 5381; //<- magic
+ int c=1;
+
+ while (c != 0)
+        {
+            c = *str++;
+            hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+        }
+
+ return hash;
+}
+
+
+
+void bvh_updateJointNameHashes(struct BVH_MotionCapture * bvhMotion)
+{
+ unsigned int jID=0;
+
+  for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+   {
+   bvhMotion->jointHierarchy[jID].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jID].jointName);
+   }
+
+}
+
+
 void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
 {
   unsigned int jID=0;
@@ -219,6 +256,7 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
 
   bvh_setLimbFlags(bvhMotion);
   bvh_setTorsoImmunityForJoints(bvhMotion);
+  bvh_updateJointNameHashes(bvhMotion);
 }
 
 

@@ -101,6 +101,7 @@ struct BVH_Joint
   char hasEndSite;
   //--------------------
   char jointName[MAX_BVH_JOINT_NAME+1];
+  unsigned int jointNameHash;
   //--------------------
   unsigned int parentJoint;
   unsigned int endSiteJoint;

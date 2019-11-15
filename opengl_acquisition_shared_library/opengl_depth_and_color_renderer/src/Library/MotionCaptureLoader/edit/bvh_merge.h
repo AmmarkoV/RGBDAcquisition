@@ -14,13 +14,11 @@ struct BVH_MergeAssociations
 
 };
 
-
 int bvh_mergeWith(
-                   struct BVH_MotionCapture * mc,
-                   struct BVH_MotionCapture * mcToMerge,
+                   struct BVH_MotionCapture * targetMC,
+                   struct BVH_MotionCapture * sourceMC,
                    const char * pathToMergeRules
                  );
-
 
 
 #endif
