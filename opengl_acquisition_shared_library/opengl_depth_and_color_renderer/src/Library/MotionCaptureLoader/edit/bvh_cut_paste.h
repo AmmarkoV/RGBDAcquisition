@@ -37,23 +37,29 @@ int copyBufferToJointAndChildren(
 
 
 
+
+int bvh_EraseAndAllocateSpaceForNumberOfFrames(
+                                               struct BVH_MotionCapture * mc,
+                                               unsigned int targetNumberOfFrames
+                                              );
+
 int bvh_GrowMocapFileByCopyingExistingMotions(
-                                                                                                                struct BVH_MotionCapture * mc,
-                                                                                                                unsigned int timesToRepeat
-                                                                                                              );
+                                              struct BVH_MotionCapture * mc,
+                                              unsigned int timesToRepeat
+                                             );
 
 
 int bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
-                                                                                                                                               struct BVH_MotionCapture * mc,
-                                                                                                                                               unsigned int poseNumber
-                                                                                                                                              );
+                                                          struct BVH_MotionCapture * mc,
+                                                          unsigned int poseNumber
+                                                         );
 
 
 int bvh_GrowMocapFileBySwappingJointAndItsChildren(
-                                                                                                                           struct BVH_MotionCapture * mc,
-                                                                                                                           const char * jointNameA,
-                                                                                                                           const char * jointNameB,
-                                                                                                                           int alsoIncludeOriginalMotion
-                                                                                                                         );
+                                                   struct BVH_MotionCapture * mc,
+                                                   const char * jointNameA,
+                                                   const char * jointNameB,
+                                                   int alsoIncludeOriginalMotion
+                                                  );
 
 #endif

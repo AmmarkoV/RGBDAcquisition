@@ -363,7 +363,6 @@ int main(int argc, char **argv)
           if (res!=0) { fprintf(stderr,"Could not clean svg files in %s",toSVGDirectory); }
           convertToSVG=1;
         } else
-
         //-----------------------------------------------------
         if (strcmp(argv[i],"--swap")==0)
         {

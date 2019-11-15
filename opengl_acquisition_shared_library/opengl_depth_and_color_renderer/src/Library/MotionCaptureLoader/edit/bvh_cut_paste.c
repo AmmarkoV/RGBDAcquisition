@@ -157,7 +157,34 @@ int copyBufferToJointAndChildren(
 
 
 
+int bvh_EraseAndAllocateSpaceForNumberOfFrames(struct BVH_MotionCapture * mc,unsigned int targetNumberOfFrames)
+{
+  if (mc==0) { return 0; }
 
+  //Erased
+  if ( mc->motionValues !=0 )
+  {
+    free(mc->motionValues);
+    mc->motionValues=0;
+    mc->numberOfFrames=0;
+    mc->numberOfFramesEncountered=0;
+    mc->motionValuesSize=0;
+  }
+
+  mc->motionValues  = (float*) malloc(sizeof(float) * mc->numberOfValuesPerFrame * targetNumberOfFrames );
+  if (mc->motionValues!=0)
+  {
+    //Also erased new motion value block
+    memset(mc->motionValues,0,sizeof(float) * targetNumberOfFrames *  mc->numberOfValuesPerFrame);
+    //Record keeping for the new buffer
+    mc->numberOfFrames=targetNumberOfFrames;
+    mc->numberOfFramesEncountered=0;
+    mc->motionValuesSize=mc->numberOfValuesPerFrame* mc->numberOfFrames;
+    return 1;
+  }
+
+ return 0;
+}
 
 
 
