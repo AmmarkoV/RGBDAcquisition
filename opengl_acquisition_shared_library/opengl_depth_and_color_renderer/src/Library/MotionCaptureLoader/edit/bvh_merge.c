@@ -32,6 +32,8 @@ int bvh_mergeWith(
       fprintf(stderr,"CodeBug: we don't have enough space to write\n");
      }
 
+     struct BVH_MergeAssociations rules; //<- TODO populate this
+
      unsigned int frameID=0;
      for (frameID=0; frameID<mcToMerge->numberOfFrames; frameID++)
      {
