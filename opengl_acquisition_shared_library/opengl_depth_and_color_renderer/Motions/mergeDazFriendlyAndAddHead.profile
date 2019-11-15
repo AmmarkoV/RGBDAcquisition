@@ -111,75 +111,48 @@ Joint 56 - end site  | Parent 55 - lfoot
 #------------------------------------------------------
 #------------------------------------------------------
 
-Joint 0 - hip  | Parent 0 - hip 
-Joint 1 - lhipjoint  | Parent 0 - hip 
-Joint 2 - lhip  | Parent 1 - lhipjoint 
-Joint 3 - lknee  | Parent 2 - lhip 
-Joint 4 - lfoot  | Parent 3 - lknee 
-Joint 5 - lefttoebase  | Parent 4 - lfoot 
-Joint 6 - end site  | Parent 5 - lefttoebase 
-Joint 7 - rhipjoint  | Parent 0 - hip 
-Joint 8 - rhip  | Parent 7 - rhipjoint 
-Joint 9 - rknee  | Parent 8 - rhip 
-Joint 10 - rfoot  | Parent 9 - rknee 
-Joint 11 - righttoebase  | Parent 10 - rfoot 
-Joint 12 - end site  | Parent 11 - righttoebase 
-Joint 13 - lowerback  | Parent 0 - hip 
-Joint 14 - abdomen  | Parent 13 - lowerback 
-Joint 15 - chest  | Parent 14 - abdomen 
-Joint 16 - neck  | Parent 15 - chest 
-Joint 17 - neck1  | Parent 16 - neck 
-Joint 18 - head  | Parent 17 - neck1 
-Joint 19 - end site  | Parent 18 - head 
-Joint 20 - lcollar  | Parent 15 - chest 
-Joint 21 - lshoulder  | Parent 20 - lcollar 
-Joint 22 - lelbow  | Parent 21 - lshoulder 
-Joint 23 - lhand  | Parent 22 - lelbow 
-Joint 24 - leftfingerbase  | Parent 23 - lhand 
-Joint 25 - lefthandindex1  | Parent 24 - leftfingerbase 
-Joint 26 - end site  | Parent 25 - lefthandindex1 
-Joint 27 - lthumb  | Parent 23 - lhand 
-Joint 28 - end site  | Parent 27 - lthumb 
-Joint 29 - rcollar  | Parent 15 - chest 
-Joint 30 - rshoulder  | Parent 29 - rcollar 
-Joint 31 - relbow  | Parent 30 - rshoulder 
-Joint 32 - rhand  | Parent 31 - relbow 
-Joint 33 - rightfingerbase  | Parent 32 - rhand 
-Joint 34 - righthandindex1  | Parent 33 - rightfingerbase 
-Joint 35 - end site  | Parent 34 - righthandindex1 
-Joint 36 - rthumb  | Parent 32 - rhand 
-Joint 37 - end site  | Parent 36 - rthumb 
+#This is basically the same with just added joints so it is very easy to merge
 
-
-JOINT LHipJoint
-		JOINT LeftUpLeg
-			JOINT LeftLeg
-				JOINT LeftFoot
-					JOINT LeftToeBase
-	JOINT RHipJoint
-		JOINT RightUpLeg
-			JOINT RightLeg
-				JOINT RightFoot
-					JOINT RightToeBase
-	JOINT LowerBack
-		JOINT Spine
-			JOINT Spine1
-				JOINT Neck
-					JOINT Neck1
-						JOINT Head
-				JOINT LeftShoulder
-					JOINT LeftArm
-						JOINT LeftForeArm
-							JOINT LeftHand
-								JOINT LeftFingerBase
-									JOINT LeftHandIndex1
-								JOINT LThumb
-				JOINT RightShoulder
-					JOINT RightArm
-						JOINT RightForeArm
-							JOINT RightHand
-								JOINT RightFingerBase
-									JOINT RightHandIndex1
-								JOINT RThumb
-
-
+JOINT_ASSOCIATION_SAME(hip)
+JOINT_ASSOCIATION_SAME(abdomen)
+JOINT_ASSOCIATION_SAME(chest)
+JOINT_ASSOCIATION_SAME(neck)
+JOINT_ASSOCIATION_SAME(head)
+JOINT_ASSOCIATION(lefteye,eye.l)
+JOINT_ASSOCIATION(righteye,eye.r)
+JOINT_ASSOCIATION_SAME(rcollar)
+JOINT_ASSOCIATION_SAME(rshoulder)
+JOINT_ASSOCIATION_SAME(relbow)
+JOINT_ASSOCIATION_SAME(rhand)
+JOINT_ASSOCIATION_SAME(rthumb1)
+JOINT_ASSOCIATION_SAME(rthumb2)
+JOINT_ASSOCIATION_SAME(rindex1)
+JOINT_ASSOCIATION_SAME(rindex2)
+JOINT_ASSOCIATION_SAME(rmid1)
+JOINT_ASSOCIATION_SAME(rmid2)
+JOINT_ASSOCIATION_SAME(rring1)
+JOINT_ASSOCIATION_SAME(rring2)
+JOINT_ASSOCIATION_SAME(rpinky1)
+JOINT_ASSOCIATION_SAME(rpinky2)
+JOINT_ASSOCIATION_SAME(lcollar)
+JOINT_ASSOCIATION_SAME(lshoulder)
+JOINT_ASSOCIATION_SAME(lelbow)
+JOINT_ASSOCIATION_SAME(lhand)
+JOINT_ASSOCIATION_SAME(lthumb1)
+JOINT_ASSOCIATION_SAME(lthumb2)
+JOINT_ASSOCIATION_SAME(lindex1)
+JOINT_ASSOCIATION_SAME(lindex2)
+JOINT_ASSOCIATION_SAME(lmid1)
+JOINT_ASSOCIATION_SAME(lmid2)
+JOINT_ASSOCIATION_SAME(lring1)
+JOINT_ASSOCIATION_SAME(lring2)
+JOINT_ASSOCIATION_SAME(lpinky1)
+JOINT_ASSOCIATION_SAME(lpinky2)
+JOINT_ASSOCIATION_SAME(rbuttock)
+JOINT_ASSOCIATION_SAME(rhip)
+JOINT_ASSOCIATION_SAME(rknee)
+JOINT_ASSOCIATION_SAME(rfoot)
+JOINT_ASSOCIATION_SAME(lbuttock)
+JOINT_ASSOCIATION_SAME(lhip)
+JOINT_ASSOCIATION_SAME(lknee)
+JOINT_ASSOCIATION_SAME(lfoot)  

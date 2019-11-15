@@ -4,6 +4,13 @@
 
 #include "../TrajectoryParser/InputParser_C.h"
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
 unsigned int bvh_resolveBVHToTRIJoint(struct bvhToTRI * bvhtri,const char * jName)
 {
   unsigned int jID=0;
@@ -84,25 +91,17 @@ void bvh_offsetLabelsToSigns(
 int parseJointAssociation(
                            struct bvhToTRI * bvhtri,
                            struct BVH_MotionCapture * mc,
-                           struct InputParserC * ipc
+                           const char * originalName,
+                           const char * associatedName
                          )
 {
  unsigned int jID=bvhtri->numberOfJointAssociations;
  unsigned int realJID=0;
 
- //--------------------------------------------------
- InputParser_GetWord(ipc,1,bvhtri->jointAssociation[jID].bvhJointName,MAX_BVH_JOINT_NAME);
- InputParser_GetWord(ipc,2,bvhtri->jointAssociation[jID].triJointName,MAX_BVH_JOINT_NAME);
- //--------------------------------------------------
-
- if ( bvh_getJointIDFromJointName(mc,bvhtri->jointAssociation[jID].bvhJointName,&realJID) )
+ if ( bvh_getJointIDFromJointNameNocase(mc,originalName,&realJID) )
     {
-           fprintf(
-                   stderr,"Associated #%u `%s` => `%s` \n",
-                   jID,
-                   bvhtri->jointAssociation[jID].bvhJointName,
-                   bvhtri->jointAssociation[jID].triJointName
-                  );
+           fprintf(stderr,"Associating #%u `%s` => `%s` \n", jID, originalName, associatedName);
+           //------------------------------------------------------
            bvhtri->jointAssociation[jID].offset[0]=0.0;
            bvhtri->jointAssociation[jID].offset[1]=0.0;
            bvhtri->jointAssociation[jID].offset[2]=0.0;
@@ -153,6 +152,9 @@ int parseJointAssociation(
            ++bvhtri->numberOfJointAssociations;
       return 1;
     }
+
+
+ fprintf(stderr,RED "Failed creating association rule #%u `%s` => `%s` \n" NORMAL,jID,originalName,associatedName);
  return 0;
 }
 
@@ -202,10 +204,24 @@ int bvh_loadBVHToTRIAssociationFile(
        {
         if (InputParser_WordCompareAuto(ipc,0,"JOINT_ASSOCIATION"))
          {
+           InputParser_GetWord(ipc,1,bvhtri->jointAssociation[jID].bvhJointName,MAX_BVH_JOINT_NAME);
+           InputParser_GetWord(ipc,2,bvhtri->jointAssociation[jID].triJointName,MAX_BVH_JOINT_NAME);
            parseJointAssociation(
                                   bvhtri,
                                   mc,
-                                  ipc
+                                  bvhtri->jointAssociation[jID].bvhJointName,
+                                  bvhtri->jointAssociation[jID].triJointName
+                                );
+         } else
+        if (InputParser_WordCompareAuto(ipc,0,"JOINT_ASSOCIATION_SAME"))
+         {
+           InputParser_GetWord(ipc,1,bvhtri->jointAssociation[jID].bvhJointName,MAX_BVH_JOINT_NAME);
+           InputParser_GetWord(ipc,1,bvhtri->jointAssociation[jID].triJointName,MAX_BVH_JOINT_NAME);
+           parseJointAssociation(
+                                  bvhtri,
+                                  mc,
+                                  bvhtri->jointAssociation[jID].bvhJointName,
+                                  bvhtri->jointAssociation[jID].triJointName
                                 );
          } else
         if (InputParser_WordCompareAuto(ipc,0,"JOINT_ROTATION_ORDER"))

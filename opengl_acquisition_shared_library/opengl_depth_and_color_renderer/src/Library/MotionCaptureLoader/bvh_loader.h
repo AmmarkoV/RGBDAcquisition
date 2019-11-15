@@ -279,10 +279,10 @@ int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
 int bvh_getJointIDFromJointName( struct BVH_MotionCapture * bvhMotion , const char * jointName, BVHJointID * jID);
 
 int bvh_getJointIDFromJointNameNocase(
-                                 struct BVH_MotionCapture * bvhMotion ,
-                                 const char * jointName,
-                                 BVHJointID * jID
-                                );
+                                      struct BVH_MotionCapture * bvhMotion ,
+                                      const char * jointName,
+                                      BVHJointID * jID
+                                     );
 
 /**
 * @brief Get the root joint of a BVH_MotionCapture file
