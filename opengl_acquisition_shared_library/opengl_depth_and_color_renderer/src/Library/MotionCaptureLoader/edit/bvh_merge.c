@@ -33,14 +33,36 @@ int bvh_mergeWith(
       fprintf(stderr,"CodeBug: we don't have enough space to write\n");
      }
 
-     struct BVH_MergeAssociations rules; //<- TODO populate this
+     struct BVH_MergeAssociations rules;
 
-     unsigned int frameID=0;
+     unsigned int sourceJID=0,targetJID=0;
+     if ( (sourceMC->jointHierarchySize>=MAX_BVH_JOINT_HIERARCHY_SIZE) || (targetMC->jointHierarchySize>=MAX_BVH_JOINT_HIERARCHY_SIZE) )
+     {
+     for (sourceJID=0; sourceJID<sourceMC->jointHierarchySize; sourceJID++)
+     {
+      for (targetJID=0; targetJID<targetMC->jointHierarchySize; targetJID++)
+      {
+        if (sourceMC->jointHierarchy[sourceJID].jointNameHash == targetMC->jointHierarchy[targetJID].jointNameHash )
+        {
+         rules.jointAssociationSourceToTarget[sourceJID]=targetJID;
+         rules.jointAssociationTargetToSource[targetJID]=sourceJID;
+        }
+       }
+      }
+     } else
+     {
+       fprintf(stderr,"Joint hierarchy is too big..\n");
+     }
+
+     unsigned int frameID=0,sourceMID=0;
      for (frameID=0; frameID<sourceMC->numberOfFrames; frameID++)
      {
+       for (sourceMID=0; sourceMID<sourceMC->numberOfValuesPerFrame; sourceMID++)
+       {
 
 
 
+       }
      }
 
      return 0;
