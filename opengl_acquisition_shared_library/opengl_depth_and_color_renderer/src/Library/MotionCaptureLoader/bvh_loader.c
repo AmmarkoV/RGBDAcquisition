@@ -1023,11 +1023,6 @@ int bhv_jointHasRotation(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
 
 
 
-
-
-
-
-
 int bvh_getJointIDFromJointName(
                                  struct BVH_MotionCapture * bvhMotion ,
                                  const char * jointName,
@@ -1363,10 +1358,10 @@ int bvh_copyMotionFrame(
       )
    {
      memcpy(
-                        &bvhMotion->motionValues[tofID * bvhMotion->numberOfValuesPerFrame],
-                        &bvhMotion->motionValues[fromfID * bvhMotion->numberOfValuesPerFrame],
-                           bvhMotion->numberOfValuesPerFrame * sizeof(float)
-                      );
+             &bvhMotion->motionValues[tofID * bvhMotion->numberOfValuesPerFrame],
+             &bvhMotion->motionValues[fromfID * bvhMotion->numberOfValuesPerFrame],
+             bvhMotion->numberOfValuesPerFrame * sizeof(float)
+           );
      return 1;
    }
  return 0;

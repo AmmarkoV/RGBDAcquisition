@@ -278,6 +278,7 @@ int bvh_loadBVHToTRIAssociationFile(
 
     fclose(fp);
     InputParser_Destroy(ipc);
+    return 1;
   }
 return 0;
 }

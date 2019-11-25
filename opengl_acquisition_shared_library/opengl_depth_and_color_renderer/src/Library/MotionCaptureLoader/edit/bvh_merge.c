@@ -54,18 +54,20 @@ int bvh_mergeWith(
        fprintf(stderr,"Joint hierarchy is too big..\n");
      }
 
-     unsigned int frameID=0,sourceMID=0;
-     for (frameID=0; frameID<sourceMC->numberOfFrames; frameID++)
+     fprintf(stderr,"Will copy %u frames from source to target",targetMC->numberOfFrames);
+     unsigned int frameID=0,sourceMID=0,targetMID=0;
+     for (frameID=0; frameID<targetMC->numberOfFrames; frameID++)
      {
        for (sourceMID=0; sourceMID<sourceMC->numberOfValuesPerFrame; sourceMID++)
        {
-
-
-
+             targetMID=rules.jointAssociationSourceToTarget[sourceJID];
+             targetMC->motionValues[(frameID)*targetMC->numberOfValuesPerFrame + targetMID] = sourceMC->motionValues[(frameID)*sourceMC->numberOfValuesPerFrame + sourceMID];
        }
      }
 
-     return 0;
+     targetMC->numberOfFramesEncountered = sourceMC->numberOfFramesEncountered;
+
+     return 1;
    } else
    { fprintf(stderr,"Could not allocate enough space to hold the merged motion buffers..\n"); }
  } else
