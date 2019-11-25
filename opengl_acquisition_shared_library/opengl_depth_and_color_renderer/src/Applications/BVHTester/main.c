@@ -298,6 +298,7 @@ int main(int argc, char **argv)
           struct BVH_MotionCapture bvhMotionToMerge={0};
           if ( bvh_loadBVH(BVHPathToFileToMerge, &bvhMotionToMerge, scaleWorld) )
           {
+            bvh_renameJointsForCompatibility(&bvhMotionToMerge);
             if (
                 !bvh_mergeWith(
                                &bvhMotion,

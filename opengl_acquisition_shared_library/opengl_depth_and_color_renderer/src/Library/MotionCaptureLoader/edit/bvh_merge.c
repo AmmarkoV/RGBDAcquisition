@@ -2,9 +2,14 @@
 #include "../bvh_to_tri_pose.h"
 #include "bvh_cut_paste.h"
 
-
 #include <stdio.h>
 #include <stdlib.h>
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
 
 // ./BVHTester --from Motions/DAZFriendlyCMUPlusHead.bvh --merge Motions/49_04.bvh Motions/mergeDazFriendlyMoreThan19.profile --bvh testMerge.bvh
 // ./BVHTester --from Motions/DAZFriendlyCMUPlusHead.bvh --print --merge Motions/02_03.bvh Motions/mergeDazFriendlyAndAddHead.profile --bvh testMerge.bvh
@@ -33,35 +38,55 @@ int bvh_mergeWith(
       fprintf(stderr,"CodeBug: we don't have enough space to write\n");
      }
 
-     struct BVH_MergeAssociations rules;
+     struct BVH_MergeAssociations rules={0};
 
      unsigned int sourceJID=0,targetJID=0;
-     if ( (sourceMC->jointHierarchySize>=MAX_BVH_JOINT_HIERARCHY_SIZE) || (targetMC->jointHierarchySize>=MAX_BVH_JOINT_HIERARCHY_SIZE) )
+     if ( (sourceMC->jointHierarchySize<MAX_BVH_JOINT_HIERARCHY_SIZE) && (targetMC->jointHierarchySize<MAX_BVH_JOINT_HIERARCHY_SIZE) )
      {
-     for (sourceJID=0; sourceJID<sourceMC->jointHierarchySize; sourceJID++)
-     {
+      for (sourceJID=0; sourceJID<sourceMC->jointHierarchySize; sourceJID++)
+      {
       for (targetJID=0; targetJID<targetMC->jointHierarchySize; targetJID++)
       {
+       if (!sourceMC->jointHierarchy[sourceJID].isEndSite)
+       {
         if (sourceMC->jointHierarchy[sourceJID].jointNameHash == targetMC->jointHierarchy[targetJID].jointNameHash )
         {
+         rules.jointAssociationSourceToTargetExists[sourceJID]=1;
          rules.jointAssociationSourceToTarget[sourceJID]=targetJID;
+         rules.jointAssociationTargetToSourceExists[targetJID]=1;
          rules.jointAssociationTargetToSource[targetJID]=sourceJID;
+         fprintf(
+                 stderr,GREEN "Correspondace of source(%s/%u)/target(%s/%u) ..\n" NORMAL,
+                 sourceMC->jointHierarchy[sourceJID].jointName,sourceJID,
+                 targetMC->jointHierarchy[targetJID].jointName,targetJID
+                );
         }
        }
       }
+      }
      } else
      {
-       fprintf(stderr,"Joint hierarchy is too big..\n");
+       fprintf(stderr,RED "Joint hierarchy is too big..\n" NORMAL);
+       fprintf(stderr,"Source Joint Hierarchy has a size of %u ( max is %u )\n",sourceMC->jointHierarchySize,MAX_BVH_JOINT_HIERARCHY_SIZE);
+       fprintf(stderr,"Target Joint Hierarchy has a size of %u ( max is %u )\n",targetMC->jointHierarchySize,MAX_BVH_JOINT_HIERARCHY_SIZE);
      }
 
      fprintf(stderr,"Will copy %u frames from source to target",targetMC->numberOfFrames);
-     unsigned int frameID=0,sourceMID=0,targetMID=0;
+
+     unsigned int frameID=0,sourceMID=0,targetMID=0,channel=0;
      for (frameID=0; frameID<targetMC->numberOfFrames; frameID++)
      {
        for (sourceMID=0; sourceMID<sourceMC->numberOfValuesPerFrame; sourceMID++)
        {
-             targetMID=rules.jointAssociationSourceToTarget[sourceJID];
+         sourceJID=sourceMC->motionToJointLookup[sourceMID].jointID;// channelIDMotionOffset
+         channel=sourceMC->motionToJointLookup[sourceMID].channelID;
+         if (rules.jointAssociationSourceToTargetExists[sourceJID])
+         {
+             targetJID=rules.jointAssociationSourceToTarget[sourceJID];
+             //targetMID=targetMC->jointToMotionLookup[targetJID].jointMotionOffset+channel;
+             targetMID=targetMC->jointToMotionLookup[targetJID].channelIDMotionOffset[channel];
              targetMC->motionValues[(frameID)*targetMC->numberOfValuesPerFrame + targetMID] = sourceMC->motionValues[(frameID)*sourceMC->numberOfValuesPerFrame + sourceMID];
+         }
        }
      }
 
@@ -69,9 +94,9 @@ int bvh_mergeWith(
 
      return 1;
    } else
-   { fprintf(stderr,"Could not allocate enough space to hold the merged motion buffers..\n"); }
+   { fprintf(stderr,RED "Could not allocate enough space to hold the merged motion buffers..\n" NORMAL); }
  } else
- { fprintf(stderr,"Could not parse rule file (%s) that contains the merge mapping\n",pathToMergeRules); }
+ { fprintf(stderr,RED "Could not parse rule file (%s) that contains the merge mapping\n" NORMAL,pathToMergeRules); }
 
  return 0;
 }
