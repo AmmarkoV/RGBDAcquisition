@@ -5,6 +5,65 @@
 #include "bvh_cut_paste.h"
 
 
+
+
+
+int BVHTestIK(
+              struct BVH_MotionCapture * mc,
+              struct simpleRenderer * renderer,
+              unsigned int fIDSource,
+              unsigned int fIDTarget
+             )
+{
+  struct BVH_Transform bvhSourceTransform={0};
+  struct BVH_Transform bvhTargetTransform={0};
+
+  if (
+       ( bvh_loadTransformForFrame(mc,fIDSource,&bvhSourceTransform) )
+        &&
+       ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
+     )
+     {
+
+        return 1;
+     }
+
+   return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //https://www.gamasutra.com/blogs/LuisBermudez/20170804/303066/3_Simple_Steps_to_Implement_Inverse_Kinematics.php
 //https://groups.csail.mit.edu/drl/journal_club/papers/033005/buss-2004.pdf
 //https://simtk-confluence.stanford.edu/display/OpenSim/How+Inverse+Kinematics+Works
