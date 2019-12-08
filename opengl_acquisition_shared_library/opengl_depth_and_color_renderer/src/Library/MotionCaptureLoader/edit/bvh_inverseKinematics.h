@@ -6,7 +6,11 @@
 
 #include "../export/bvh_export.h"
 
-
+int BVHTestIK(
+              struct BVH_MotionCapture * mc,
+              unsigned int fIDSource,
+              unsigned int fIDTarget
+             );
 
 int bvh_MirrorJointsThroughIK(
                                struct BVH_MotionCapture * mc,

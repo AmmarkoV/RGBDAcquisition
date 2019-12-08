@@ -1,15 +1,53 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "bvh_inverseKinematics.h"
 #include "bvh_cut_paste.h"
 
 
 
-float BVH2DDistace(struct simpleRenderer *renderer,struct BVH_Transform * bvhSourceTransform,struct BVH_Transform * bvhTargetTransform)
+float get2DPointDistance(float aX,float aY,float bX,float bY)
+{
+  float diffX = (float) aX-bX;
+  float diffY = (float) aY-bY;
+    //We calculate the distance here..!
+  return sqrt((diffX*diffX)+(diffY*diffY));
+}
+
+float BVH2DDistace(
+                   struct BVH_MotionCapture * mc,
+                   struct simpleRenderer *renderer,
+                   struct BVH_Transform * bvhSourceTransform,
+                   struct BVH_Transform * bvhTargetTransform
+                  )
 {
 
-
+   if ( 
+        (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0)) &&
+        (bvh_projectTo2D(mc,bvhTargetTransform,renderer,0,0)) 
+      )
+      {
+       //-----------------
+       float sumOf2DDistances=0.0;
+       unsigned int numberOfSamples=0;
+       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+            {
+              numberOfSamples+=1;
+              sumOf2DDistances+=get2DPointDistance(
+                                                   (float) bvhSourceTransform->joint[jID].pos2D[0],
+                                                   (float) bvhSourceTransform->joint[jID].pos2D[1],
+                                                   (float) bvhTargetTransform->joint[jID].pos2D[0],
+                                                   (float) bvhTargetTransform->joint[jID].pos2D[1]
+                                                  ); 
+            }
+            
+       if (numberOfSamples>0)
+       {
+         return (float)  sumOf2DDistances/numberOfSamples;
+       }     
+     } //-----------------
+    
  return 0.0;
 }
 
@@ -38,7 +76,7 @@ int BVHTestIK(
        ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
      )
      {
-        float distance2D = BVH2DDistace(&renderer,&bvhSourceTransform,&bvhTargetTransform);
+        float distance2D = BVH2DDistace(mc,&renderer,&bvhSourceTransform,&bvhTargetTransform);
 
         fprintf(stderr,"2D Distance is %0.2f\n",distance2D);
         return 1;
