@@ -211,6 +211,17 @@ int main(int argc, char **argv)
           exit(0);
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--testIK")==0)
+        { 
+           BVHTestIK(
+                      &bvhMotion,
+                      atoi(argv[i+1]),
+                      atoi(argv[i+2])
+                    );
+                    
+          exit(0);
+        } else            
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--occlusions")==0)
         {
           occlusions=1;
