@@ -1458,3 +1458,111 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
   fprintf(stdout,"_______________________________________________\n");
 }
 
+ 
+
+void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
+{
+    
+  fprintf(stdout,"/**\n");
+  fprintf(stdout," * @brief An array with BVH string labels\n");
+  fprintf(stdout," */\n");
+  fprintf(stdout,"static const char * BVHOutputArrayNames[] =\n");
+  fprintf(stdout,"{\n");
+  char comma=',';
+  char coord='X';
+  unsigned int i=0,z=0,countOfChannels=0;
+  for (i=0; i<bvhMotion->jointHierarchySize; i++)
+  {
+    if (i==0) 
+        {
+           coord='X'; fprintf(stdout,"\"%s_%cposition\"%c // 0\n",bvhMotion->jointHierarchy[i].jointName,coord,comma); 
+           coord='Y'; fprintf(stdout,"\"%s_%cposition\"%c // 1\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
+           coord='Z'; fprintf(stdout,"\"%s_%cposition\"%c // 2\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
+           coord='X'; fprintf(stdout,"\"%s_%crotation\"%c // 3\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
+           coord='Y'; fprintf(stdout,"\"%s_%crotation\"%c // 4\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
+           coord='Z'; fprintf(stdout,"\"%s_%crotation\"%c // 5\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
+           countOfChannels+=5;
+        } else  
+    {
+     if (!bvhMotion->jointHierarchy[i].isEndSite)
+        {
+            for (z=0; z<bvhMotion->jointHierarchy[i].loadedChannels; z++)
+                {
+                  ++countOfChannels;
+                  if (countOfChannels+1>=bvhMotion->numberOfValuesPerFrame)
+                  { 
+                      comma=' ';
+                  }
+                  
+                  unsigned int cT = bvhMotion->jointHierarchy[i].channelType[z];
+                  fprintf(stdout,"\"%s_%s\"%c // %u\n ",bvhMotion->jointHierarchy[i].jointName,channelNames[cT],comma,countOfChannels);
+                }
+            
+        } 
+    }
+  }
+  fprintf(stdout,"};\n\n\n\n");
+       
+       
+  char label[513]={0};
+  comma=',';
+  coord='X';
+  countOfChannels=0;
+  
+  fprintf(stdout,"/**\n");
+  fprintf(stdout," * @brief This is a programmer friendly enumerator of joint output extracted from the BVH file.\n");
+  fprintf(stdout," */\n");
+  fprintf(stdout,"enum BVH_Output_Joints\n");
+  fprintf(stdout,"{\n");
+  for (i=0; i<bvhMotion->jointHierarchySize; i++)
+  {
+    if (i==0) 
+        {
+           coord='X'; snprintf(label,512,"%s_%cposition",bvhMotion->jointHierarchy[i].jointName,coord);
+           uppercase(label);
+           fprintf(stdout,"BVH_MOTION_%s = 0,\n",label); 
+           
+           coord='Y'; snprintf(label,512,"%s_%cposition",bvhMotion->jointHierarchy[i].jointName,coord);
+           uppercase(label);
+           fprintf(stdout,"BVH_MOTION_%s,//1 \n",label); 
+           
+           coord='Z'; snprintf(label,512,"%s_%cposition",bvhMotion->jointHierarchy[i].jointName,coord);
+           uppercase(label);
+           fprintf(stdout,"BVH_MOTION_%s,//2 \n",label); 
+           
+           coord='X'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
+           uppercase(label);
+           fprintf(stdout,"BVH_MOTION_%s,//3 \n",label); 
+           
+           coord='Y'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
+           uppercase(label);
+           fprintf(stdout,"BVH_MOTION_%s,//4 \n",label); 
+           
+           coord='Z'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
+           uppercase(label);
+           fprintf(stdout,"BVH_MOTION_%s,//5 \n",label); 
+           
+           countOfChannels+=5;
+        } else  
+        {
+         if (!bvhMotion->jointHierarchy[i].isEndSite)
+          {
+            for (z=0; z<bvhMotion->jointHierarchy[i].loadedChannels; z++)
+                {
+                  ++countOfChannels;
+                  if (countOfChannels+1>=bvhMotion->numberOfValuesPerFrame)
+                  { 
+                      comma=' ';
+                  }
+                  
+                  unsigned int cT = bvhMotion->jointHierarchy[i].channelType[z];
+                  snprintf(label,512,"%s_%s",bvhMotion->jointHierarchy[i].jointName,channelNames[cT]);
+                  uppercase(label);
+                  fprintf(stdout,"BVH_MOTION_%s%c//%u \n",label,comma,countOfChannels); 
+                }
+          } 
+        }
+  }
+  fprintf(stdout,"};\n\n\n");
+
+}

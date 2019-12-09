@@ -10,6 +10,12 @@ void lowercase(char *a)
    while (*a!=0) { *a = tolower(*a); ++a; }
 }
 
+
+void uppercase(char *a)
+{
+   while (*a!=0) { *a = toupper(*a); ++a; }
+}
+
 void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
 {
  unsigned int pJID;

@@ -29,17 +29,21 @@ float BVH2DDistace(
       )
       {
        //-----------------
+       float this2DDistance=0.0;
        float sumOf2DDistances=0.0;
        unsigned int numberOfSamples=0;
        for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
             {
-              numberOfSamples+=1;
-              sumOf2DDistances+=get2DPointDistance(
+              this2DDistance=get2DPointDistance(
                                                    (float) bvhSourceTransform->joint[jID].pos2D[0],
                                                    (float) bvhSourceTransform->joint[jID].pos2D[1],
                                                    (float) bvhTargetTransform->joint[jID].pos2D[0],
                                                    (float) bvhTargetTransform->joint[jID].pos2D[1]
                                                   ); 
+              fprintf(stderr,"Joint %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
+
+              numberOfSamples+=1;
+              sumOf2DDistances+=this2DDistance; 
             }
             
        if (numberOfSamples>0)

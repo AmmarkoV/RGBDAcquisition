@@ -231,6 +231,10 @@ int main(int argc, char **argv)
         {
           bvh_printBVH(&bvhMotion);
         } else
+        if (strcmp(argv[i],"--printc")==0)
+        {
+          bvh_print_C_Header(&bvhMotion);
+        } else 
         //-----------------------------------------------------
         if (strcmp(argv[i],"--changeJointDimensions")==0)
         {
