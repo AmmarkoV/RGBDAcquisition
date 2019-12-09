@@ -1478,9 +1478,9 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
            coord='X'; fprintf(stdout,"\"%s_%cposition\"%c // 0\n",bvhMotion->jointHierarchy[i].jointName,coord,comma); 
            coord='Y'; fprintf(stdout,"\"%s_%cposition\"%c // 1\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Z'; fprintf(stdout,"\"%s_%cposition\"%c // 2\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
-           coord='X'; fprintf(stdout,"\"%s_%crotation\"%c // 3\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
+           coord='Z'; fprintf(stdout,"\"%s_%crotation\"%c // 3\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Y'; fprintf(stdout,"\"%s_%crotation\"%c // 4\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
-           coord='Z'; fprintf(stdout,"\"%s_%crotation\"%c // 5\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
+           coord='X'; fprintf(stdout,"\"%s_%crotation\"%c // 5\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            countOfChannels+=5;
         } else  
     {
@@ -1530,7 +1530,7 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
            uppercase(label);
            fprintf(stdout,"BVH_MOTION_%s,//2 \n",label); 
            
-           coord='X'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
+           coord='Z'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
            fprintf(stdout,"BVH_MOTION_%s,//3 \n",label); 
            
@@ -1538,7 +1538,7 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
            uppercase(label);
            fprintf(stdout,"BVH_MOTION_%s,//4 \n",label); 
            
-           coord='Z'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
+           coord='X'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
            fprintf(stdout,"BVH_MOTION_%s,//5 \n",label); 
            
