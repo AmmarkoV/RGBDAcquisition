@@ -330,7 +330,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
   int done=0;
   int atHeaderSection=0;
   ssize_t read;
-
+   
+    
   int debug=0;
 
   if (fd!=0)
@@ -420,7 +421,13 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
               if (InputParser_WordCompareAuto(ipcB,1,"Site"))
                    {
                     if (debug) fprintf(stderr,"-S-");
-                    snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"End Site");
+                    if (jNum>0)
+                    {
+                      snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite_%s",bvhMotion->jointHierarchy[jNum-1].jointName);                         
+                    } else
+                    {
+                      snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite");
+                    }
                     bvhMotion->jointHierarchy[jNum].isEndSite=1;
                     bvhMotion->jointHierarchy[jNum].hierarchyLevel = hierarchyLevel;
                     //Update lookup table to remember ordering
