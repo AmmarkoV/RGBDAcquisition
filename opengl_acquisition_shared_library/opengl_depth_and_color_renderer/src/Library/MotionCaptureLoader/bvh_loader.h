@@ -26,6 +26,16 @@ extern "C"
 */
 #define MAX_BVH_JOINT_HIERARCHY_SIZE 256
 
+
+/**
+* @brief MAX_BVH_FILE_LINE_SIZE is the maximum number of a valid line in an incoming  BVH file 
+* @ingroup BVH
+*/
+#define MAX_BVH_FILE_LINE_SIZE 10000
+
+
+
+
 enum CHANNEL_NAMES
 {
   BVH_POSITION_NONE=0,

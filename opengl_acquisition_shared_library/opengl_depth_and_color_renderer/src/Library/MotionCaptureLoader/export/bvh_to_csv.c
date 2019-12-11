@@ -11,6 +11,13 @@
 #define DUMP_SEPERATED_POS_ROT 0
 #define DUMP_3D_POSITIONS 0
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
 unsigned int invisibleJoints=0;
 unsigned int   visibleJoints=0;
 unsigned int filteredOutCSVBehindPoses=0;
@@ -115,8 +122,8 @@ int csvSkeletonFilter(
 void considerIfJointIsSelected(
                                              struct BVH_MotionCapture * mc,
                                              unsigned int jID,
-                                             unsigned int * isJointSelected,
-                                             unsigned int * isJointEndSiteSelected 
+                                             int * isJointSelected,
+                                             int * isJointEndSiteSelected 
                                             )
 {
      *isJointSelected=1; 
@@ -129,8 +136,15 @@ void considerIfJointIsSelected(
                if (!mc->selectedJoints[jID]) { *isJointSelected=0; }
               *isJointEndSiteSelected=*isJointSelected;
               if (!mc->selectionIncludesEndSites) { *isJointEndSiteSelected=0; }
-           }
+           } 
+           //else {
+           //  fprintf(stderr,GREEN "ALL JOINTS SELECTED  " NORMAL );
+          // }
     
+    //if (*isJointSelected)
+   //{
+   //     fprintf(stderr,GREEN "joint %s is selected , " NORMAL ,  mc->jointHierarchy[jID].jointName);
+   // }
 }
 
 
@@ -143,6 +157,8 @@ int dumpBVHToCSVHeader(
                       )
 {
    unsigned int jID=0;
+   int isJointSelected=1; 
+   int isJointEndSiteSelected=1; 
 
    if ( (filename2D!=0) && (filename2D[0]!=0) && (!fileExists(filename2D)) )
    {
@@ -153,9 +169,7 @@ int dumpBVHToCSVHeader(
      char comma=',';
      //2D Positions -------------------------------------------------------------------------------------------------------------
      for (jID=0; jID<mc->jointHierarchySize; jID++)
-       { 
-           int isJointSelected=1; 
-           int isJointEndSiteSelected=1; 
+       {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
            
           if (jID==mc->jointHierarchySize-1) { comma=' '; }
@@ -167,6 +181,14 @@ int dumpBVHToCSVHeader(
                 fprintf(fp2D,"2DX_%s,2DY_%s,visible_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
                 if (comma==',') { fprintf(fp2D,",");  }
             } 
+            
+            
+            if ( (isJointEndSiteSelected) && (mc->jointHierarchy[jID].hasEndSite) )
+            {
+               unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+               fprintf(fp2D,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
+               if (comma==',') { fprintf(fp2D,",");  }
+            }
          }
          else
          {
@@ -198,9 +220,7 @@ int dumpBVHToCSVHeader(
       char comma=',';
 
       for (jID=0; jID<mc->jointHierarchySize; jID++)
-       { 
-          int isJointSelected=1; 
-          int isJointEndSiteSelected=1; 
+       {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
            
          if (jID==mc->jointHierarchySize-1) { comma=' '; }
@@ -256,8 +276,6 @@ int dumpBVHToCSVHeader(
       //Model Configuration
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-           int isJointSelected=1; 
-           int isJointEndSiteSelected=1; 
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
            
            
@@ -317,6 +335,8 @@ int dumpBVHToCSVBody(
                       )
 {
    unsigned int jID=0;
+   int isJointSelected=1; 
+   int isJointEndSiteSelected=1; 
 
    if (
        !csvSkeletonFilter(
@@ -357,8 +377,6 @@ int dumpBVHToCSVBody(
       char comma=',';
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-           int isJointSelected=1; 
-           int isJointEndSiteSelected=1; 
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
            
            
@@ -397,8 +415,6 @@ int dumpBVHToCSVBody(
      char comma=',';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-           int isJointSelected=1; 
-           int isJointEndSiteSelected=1; 
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
           
           
@@ -451,9 +467,6 @@ int dumpBVHToCSVBody(
      char comma=',';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-          
-           int isJointSelected=1; 
-           int isJointEndSiteSelected=1; 
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected); 
            
            

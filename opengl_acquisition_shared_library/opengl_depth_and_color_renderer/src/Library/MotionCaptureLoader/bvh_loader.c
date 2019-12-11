@@ -617,7 +617,7 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
      return 0;
    }
 
-   struct InputParserC * ipc = InputParser_Create(10000,5);
+   struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,5);
    if (ipc==0) { return 0; }
 
    InputParser_SetDelimeter(ipc,0,' ');
@@ -673,13 +673,13 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
   if (fd!=0)
   {
-   struct InputParserC * ipc = InputParser_Create(10000,3);
+   struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,3);
 
    InputParser_SetDelimeter(ipc,0,':');
    InputParser_SetDelimeter(ipc,1,10);
    InputParser_SetDelimeter(ipc,2,13);
 
-    char str[10000]={0};
+    char str[MAX_BVH_FILE_LINE_SIZE+1]={0};
     char * line = NULL;
     size_t len = 0;
 
@@ -718,7 +718,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
            }
 
            //This is motion input
-           InputParser_GetWord(ipc,0,str,10000);
+           InputParser_GetWord(ipc,0,str,MAX_BVH_FILE_LINE_SIZE);
            pushNewBVHMotionState(bvhMotion,str);
            str[0]=0;//Clean up str
          }

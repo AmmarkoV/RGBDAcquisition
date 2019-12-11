@@ -127,47 +127,28 @@ int bvh_selectJoints(
   mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
   if (mc->selectedJoints!=0)
   {
-    memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
-    BVHJointID jID=0;
-    unsigned int mID=0;
+    memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
+    BVHJointID jID=0; 
     fprintf(stderr,"Selecting : ");
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
       if (
-           bvh_getJointIDFromJointName(mc,argv[i],&jID)
+              bvh_getJointIDFromJointName(mc,argv[i],&jID)
            )
          {
-           fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
-           mc->jointHierarchy[jID].erase2DCoordinates=1;
-
-           for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
-           {
-               if (mc->motionToJointLookup[mID].jointID == jID)
-               {
-                mc->selectedJoints[mID]=1;
-                fprintf(stderr,"%u ",mID);
-               }
-           }
-           //-------------------------------------------------
-
+           fprintf(stderr,GREEN "%s " NORMAL,argv[i]); 
+           
+           mc->selectedJoints[jID]=1;
+           fprintf(stderr,"%u ",jID);
+                
            if(includeEndSites)
-           {
-             BVHJointID jIDES=jID;
-             if (bhv_jointGetEndSiteChild(mc,jID,&jIDES))
-               {
-                 mc->jointHierarchy[jIDES].erase2DCoordinates=1;
-                 fprintf(stderr,GREEN "%s_EndSite " NORMAL,argv[i]);
-
-                 for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
                    {
-                      if (mc->motionToJointLookup[mID].jointID == jIDES)
-                         {
-                           mc->selectedJoints[mID]=1;
-                           fprintf(stderr,"%u ",mID);
-                         }
-                  }
-               }
-           }
+                       if (mc->jointHierarchy[jID].hasEndSite)
+                       {
+                            fprintf(stderr,GREEN "EndSite_%s  " NORMAL,argv[i]); 
+                       }
+                   }
+           //------------------------------------------------- 
 
          } else
          {
