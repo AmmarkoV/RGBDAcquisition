@@ -113,7 +113,7 @@ int bvh_selectJoints(
                     unsigned int iplus1
                    )
 {
-  fprintf(stderr,"Asked to erase %u Joint Angles\n",numberOfValues);
+  fprintf(stderr,"Asked to select %u Joints\n",numberOfValues);
   int i=0;
   
   mc->selectionIncludesEndSites=includeEndSites;
