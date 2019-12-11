@@ -159,6 +159,10 @@ struct BVH_MotionCapture
   unsigned int jointHierarchySize;
   struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE];
 
+  //We may want to only work with specific selected joints..! 
+  unsigned int numberOfJointsWeWantToSelect;
+  unsigned int * selectedJoints;
+  
   //Lookup Tables..
   struct BVH_JointToMotion_LookupTable jointToMotionLookup[MAX_BVH_JOINT_HIERARCHY_SIZE];
   struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_HIERARCHY_SIZE*6];

@@ -16,6 +16,16 @@ int bvh_PerturbJointAngles(
                            unsigned int iplus2
                           );
 
+
+int bvh_selectJoints(
+                    struct BVH_MotionCapture * mc,
+                    unsigned int numberOfValues,
+                    unsigned int includeEndSites,
+                    char **argv,
+                    unsigned int iplus1
+                   );
+
+
 int bvh_eraseJoints(
                     struct BVH_MotionCapture * mc,
                     unsigned int numberOfValues,

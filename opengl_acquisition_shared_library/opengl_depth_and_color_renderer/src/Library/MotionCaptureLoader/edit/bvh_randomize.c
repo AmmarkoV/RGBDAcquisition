@@ -105,6 +105,96 @@ int bvh_PerturbJointAngles(
 
 
 
+int bvh_selectJoints(
+                    struct BVH_MotionCapture * mc,
+                    unsigned int numberOfValues,
+                    unsigned int includeEndSites,
+                    char **argv,
+                    unsigned int iplus1
+                   )
+{
+  fprintf(stderr,"Asked to erase %u Joint Angles\n",numberOfValues);
+  int i=0;
+  
+  mc->numberOfJointsWeWantToSelect=0;
+  if (mc->selectedJoints!=0)
+  {
+      free(mc->selectedJoints);
+  }
+
+  
+  mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+  if (mc->selectedJoints!=0)
+  {
+    memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
+    BVHJointID jID=0;
+    unsigned int mID=0;
+    fprintf(stderr,"Selecting : ");
+    for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
+     {
+      if (
+           bvh_getJointIDFromJointName(mc,argv[i],&jID)
+           )
+         {
+           fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
+           mc->jointHierarchy[jID].erase2DCoordinates=1;
+
+           for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+           {
+               if (mc->motionToJointLookup[mID].jointID == jID)
+               {
+                mc->selectedJoints[mID]=1;
+                fprintf(stderr,"%u ",mID);
+               }
+           }
+           //-------------------------------------------------
+
+           if(includeEndSites)
+           {
+             BVHJointID jIDES=jID;
+             if (bhv_jointGetEndSiteChild(mc,jID,&jIDES))
+               {
+                 mc->jointHierarchy[jIDES].erase2DCoordinates=1;
+                 fprintf(stderr,GREEN "%s_EndSite " NORMAL,argv[i]);
+
+                 for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
+                   {
+                      if (mc->motionToJointLookup[mID].jointID == jIDES)
+                         {
+                           mc->selectedJoints[mID]=1;
+                           fprintf(stderr,"%u ",mID);
+                         }
+                  }
+               }
+           }
+
+         } else
+         {
+           fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
+         }
+     }
+    fprintf(stderr,"\n");
+ 
+ 
+    return 1;
+  }
+
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int bvh_eraseJoints(
                     struct BVH_MotionCapture * mc,
                     unsigned int numberOfValues,

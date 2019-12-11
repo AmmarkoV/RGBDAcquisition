@@ -510,7 +510,24 @@ int main(int argc, char **argv)
                                     );
             }
             //exit(0);
-        } else
+        } else 
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--selectJoints")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          unsigned int numberOfValues=atoi(argv[i+1]);
+          if (i+1+numberOfValues>=argc)  { incorrectArguments(); } else
+            {
+              bvh_selectJoints(
+                              &bvhMotion,
+                              numberOfValues,
+                              1,//include End Joints
+                              argv,
+                              i+1
+                             );
+            }
+            //exit(0);
+        } else 
         //-----------------------------------------------------
         if (strcmp(argv[i],"--eraseJoints")==0)
         {
