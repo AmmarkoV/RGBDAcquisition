@@ -112,6 +112,28 @@ int csvSkeletonFilter(
 }
 
 
+void considerIfJointIsSelected(
+                                             struct BVH_MotionCapture * mc,
+                                             unsigned int jID,
+                                             unsigned int * isJointSelected,
+                                             unsigned int * isJointEndSiteSelected 
+                                            )
+{
+     *isJointSelected=1; 
+     *isJointEndSiteSelected=1; 
+           
+       //We now check if this joint is selected..
+           //-------------------------------------------------------------
+           if (mc->selectedJoints)
+           { //If there is a selection declared then let's consider if the joint is selected..
+               if (!mc->selectedJoints[jID]) { *isJointSelected=0; }
+              *isJointEndSiteSelected=*isJointSelected;
+              if (!mc->selectionIncludesEndSites) { *isJointEndSiteSelected=0; }
+           }
+    
+}
+
+
 
 int dumpBVHToCSVHeader(
                        struct BVH_MotionCapture * mc,
@@ -131,31 +153,29 @@ int dumpBVHToCSVHeader(
      char comma=',';
      //2D Positions -------------------------------------------------------------------------------------------------------------
      for (jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-         if (jID==mc->jointHierarchySize-1) { comma=' '; }
+       { 
+           int isJointSelected=1; 
+           int isJointEndSiteSelected=1; 
+          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+           
+          if (jID==mc->jointHierarchySize-1) { comma=' '; }
 
          if (!mc->jointHierarchy[jID].isEndSite)
          {
-          fprintf(
-                  fp2D,"2DX_%s,2DY_%s,visible_%s",
-                  mc->jointHierarchy[jID].jointName,
-                  mc->jointHierarchy[jID].jointName,
-                  mc->jointHierarchy[jID].jointName
-                 );
-          if (comma==',')
-                  { fprintf(fp2D,",");  }
+            if (isJointSelected)
+            {
+                fprintf(fp2D,"2DX_%s,2DY_%s,visible_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
+                if (comma==',') { fprintf(fp2D,",");  }
+            } 
          }
          else
          {
-          unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
-          fprintf(
-                  fp2D,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s",
-                  mc->jointHierarchy[parentID].jointName,
-                  mc->jointHierarchy[parentID].jointName,
-                  mc->jointHierarchy[parentID].jointName
-                 );
-           if (comma==',')
-                  { fprintf(fp2D,",");  }
+            if (isJointEndSiteSelected)
+            {
+               unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+               fprintf(fp2D,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
+               if (comma==',') { fprintf(fp2D,",");  }
+            }
          }
        }
      //--------------------------------------------------------------------------------------------------------------------------
@@ -164,7 +184,7 @@ int dumpBVHToCSVHeader(
    }
   }else
     {
-     fprintf(stderr,"We don't need to regenerate the CSV 2D header, it already exists\n");
+     fprintf(stderr,"We don't need to regenerate the CSV  header for 2D points, it already exists\n");
     }
 
 
@@ -178,14 +198,27 @@ int dumpBVHToCSVHeader(
       char comma=',';
 
       for (jID=0; jID<mc->jointHierarchySize; jID++)
-       {
+       { 
+          int isJointSelected=1; 
+          int isJointEndSiteSelected=1; 
+          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+           
          if (jID==mc->jointHierarchySize-1) { comma=' '; }
 
          if (!mc->jointHierarchy[jID].isEndSite)
+         { 
+            if (isJointSelected)
+            {
+                fprintf(fp3D,"3DX_%s,3DY_%s,3DZ_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName); 
+                if (comma==',') { fprintf(fp3D,","); }
+            }
+         } else
          {
-           fprintf(fp3D,"3DX_%s,3DY_%s,3DZ_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
-
-           if (comma==',') { fprintf(fp3D,","); }
+            if (isJointEndSiteSelected)
+            {
+             unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+              fprintf(fp3D,"3DX_EndSite_%s,3DY_EndSite_%s,3DZ_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
+            }
          }
        }
       fprintf(fp3D,"\n");
@@ -193,7 +226,7 @@ int dumpBVHToCSVHeader(
      }
    } else
     {
-     fprintf(stderr,"We don't need to regenerate the CSV 3D header, it already exists\n");
+     fprintf(stderr,"We don't need to regenerate the CSV header for 3D Points, it already exists\n");
     }
    //--------------------------------------------------------------------------------------------------------------------------
 
@@ -223,22 +256,33 @@ int dumpBVHToCSVHeader(
       //Model Configuration
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
+           int isJointSelected=1; 
+           int isJointEndSiteSelected=1; 
+          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+           
+           
          if (!mc->jointHierarchy[jID].isEndSite)
          {
-           if (jID==lastElement) { comma=' '; }
+            if (isJointSelected) 
+            {
+                if (jID==lastElement) { comma=' '; }
 
-           unsigned int channelID=0;
-           for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
-           {
-            fprintf(
-                    fpBVH,"%s_%s",
-                    mc->jointHierarchy[jID].jointName,
-                    channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
-                   );
-
-             if ((comma!=',')&&(channelID==mc->jointHierarchy[jID].loadedChannels-1)) {  } else  { fprintf(fpBVH,",");  }
-           }
-         }
+                unsigned int channelID=0;
+                for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
+                 {
+                    fprintf(
+                                    fpBVH,"%s_%s",
+                                    mc->jointHierarchy[jID].jointName,
+                                   channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
+                                  ); 
+                              
+                     if ((comma!=',')&&(channelID==mc->jointHierarchy[jID].loadedChannels-1)) {  } else  { fprintf(fpBVH,",");  }
+                 }
+            }
+         } 
+         //else
+         //End Sites have no motion fields so they are not present here..
+         
        }
       //Append Frame ID
       fprintf(fpBVH,"\n");
@@ -246,7 +290,7 @@ int dumpBVHToCSVHeader(
      }
     } else
     {
-     fprintf(stderr,"We don't need to regenerate the CSV header, it already exists\n");
+     fprintf(stderr,"We don't need to regenerate the CSV header for BVH motions, it already exists\n");
     }
    //--------------------------------------------------------------------------------------------------------------------------
 
@@ -313,25 +357,32 @@ int dumpBVHToCSVBody(
       char comma=',';
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-         if (bvhTransform->joint[jID].isOccluded) { ++invisibleJoints; } else { ++visibleJoints; }
+           int isJointSelected=1; 
+           int isJointEndSiteSelected=1; 
+          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+           
+           
+          if(isJointSelected)
+          {
+                if (bvhTransform->joint[jID].isOccluded) { ++invisibleJoints; } else { ++visibleJoints; }
 
-         if (jID==mc->jointHierarchySize-1) { comma=' '; }
+                if (jID==mc->jointHierarchySize-1) { comma=' '; }
 
-         if (mc->jointHierarchy[jID].erase2DCoordinates)
-         {
-          fprintf(fp2D,"0,0,0");
-         } else
-         {
-         fprintf(
-                 fp2D,"%0.6f,%0.6f,%u",
-                 (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
-                 (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
-                 (bvhTransform->joint[jID].isOccluded==0)
-                );
-         }
+                if (mc->jointHierarchy[jID].erase2DCoordinates)
+                    {
+                       fprintf(fp2D,"0,0,0");
+                    } else
+                   {
+                       fprintf(
+                                        fp2D,"%0.6f,%0.6f,%u",
+                                        (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
+                                        (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
+                                       (bvhTransform->joint[jID].isOccluded==0)
+                                      );
+                    }
 
-        if (comma==',')
-                  { fprintf(fp2D,",");  }
+                  if (comma==',') { fprintf(fp2D,",");  }
+          }        
        }
      fprintf(fp2D,"\n");
      fclose(fp2D);
@@ -346,18 +397,31 @@ int dumpBVHToCSVBody(
      char comma=',';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
+           int isJointSelected=1; 
+           int isJointEndSiteSelected=1; 
+          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+          
+          
          if (jID==mc->jointHierarchySize-1) { comma=' '; }
 
          if (!mc->jointHierarchy[jID].isEndSite)
          {
-          fprintf(
-                  fp3D,"%0.4f,%0.4f,%0.4f",
-                  bvhTransform->joint[jID].pos3D[0],
-                  bvhTransform->joint[jID].pos3D[1],
-                  bvhTransform->joint[jID].pos3D[2]
-                 );
-          if (comma==',')
-                  { fprintf(fp3D,",");  }
+             if (isJointSelected)
+             {
+               fprintf( 
+                                fp3D,"%0.4f,%0.4f,%0.4f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
+                              );
+                 if (comma==',') { fprintf(fp3D,",");  } 
+             }
+         } else
+         {
+             if (isJointEndSiteSelected)
+             {
+               fprintf( 
+                                fp3D,"%0.4f,%0.4f,%0.4f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
+                              );
+                 if (comma==',') { fprintf(fp3D,",");  }
+             }
          }
        }
      fprintf(fp3D,"\n");
@@ -387,7 +451,13 @@ int dumpBVHToCSVBody(
      char comma=',';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-         if (!mc->jointHierarchy[jID].isEndSite)
+          
+           int isJointSelected=1; 
+           int isJointEndSiteSelected=1; 
+          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected); 
+           
+           
+         if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
          {
            if (jID==lastElement) { comma=' '; }
 
@@ -407,21 +477,21 @@ int dumpBVHToCSVBody(
               if ( (jID==0) && (channelID==BVH_POSITION_X) ) //BVH_ROTATION_X
               {
                   //Test using :
-                  //./BVHTester --from Motions/MotionCapture/01/01_02.bvh  --repeat 0 --csvOrientation right --randomize2D 1000 5000 -35 45 -35 35 135 35 --occlusions --csv tmp test.csv 2d+bvh
+                  //./BVHTester --from Motions/MotionCapture/01/01_02.bvh  --repeat 0 --selectJoints 17 hip abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot --csvOrientation right --randomize2D 1000 5000 -35 45 -35 35 135 35 --occlusions --csv tmp test.csv 2d+bvh
                   //value=666; <- highlight the correct
                   //value=(float) bvh_constrainAngleCentered0((double) value,0);
                   value=(float) bvh_RemapAngleCentered0((double) value,csvOrientation);
               }
              }
 
-             fprintf(
-                     fpBVH,"%0.6f",
-                     value
-                    );
+             fprintf(fpBVH,"%0.5f",value);
 
              if ( (comma!=',') && (channelID==mc->jointHierarchy[jID].loadedChannels-1) ) {  } else  { fprintf(fpBVH,",");  }
            }
          }
+         //else 
+         //BVH End Sites have no motion parameters so they dont need to be considered here..
+         
        }
      fprintf(fpBVH,"\n");
      //-------------------------------------------------------------------

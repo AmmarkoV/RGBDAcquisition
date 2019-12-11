@@ -116,7 +116,8 @@ int bvh_selectJoints(
   fprintf(stderr,"Asked to erase %u Joint Angles\n",numberOfValues);
   int i=0;
   
-  mc->numberOfJointsWeWantToSelect=0;
+  mc->selectionIncludesEndSites=includeEndSites;
+  mc->numberOfJointsWeWantToSelect=numberOfValues;
   if (mc->selectedJoints!=0)
   {
       free(mc->selectedJoints);

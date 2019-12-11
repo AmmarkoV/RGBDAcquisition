@@ -543,7 +543,6 @@ int main(int argc, char **argv)
                               i+1
                              );
             }
-            //exit(0);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--testRandomizationLimits")==0)

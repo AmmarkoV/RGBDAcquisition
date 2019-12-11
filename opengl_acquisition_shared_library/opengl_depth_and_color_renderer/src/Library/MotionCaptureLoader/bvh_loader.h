@@ -160,6 +160,7 @@ struct BVH_MotionCapture
   struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE];
 
   //We may want to only work with specific selected joints..! 
+  unsigned int selectionIncludesEndSites;
   unsigned int numberOfJointsWeWantToSelect;
   unsigned int * selectedJoints;
   
