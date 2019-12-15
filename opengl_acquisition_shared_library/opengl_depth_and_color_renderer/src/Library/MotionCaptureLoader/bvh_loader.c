@@ -1375,6 +1375,66 @@ int bvh_copyMotionFrame(
 }
 
 
+int bvh_selectJoints(
+                    struct BVH_MotionCapture * mc,
+                    unsigned int numberOfValues,
+                    unsigned int includeEndSites,
+                    char **argv,
+                    unsigned int iplus1
+                   )
+{
+  fprintf(stderr,"Asked to select %u Joints\n",numberOfValues);
+  int i=0;
+  
+  mc->selectionIncludesEndSites=includeEndSites;
+  mc->numberOfJointsWeWantToSelect=numberOfValues;
+  if (mc->selectedJoints!=0)
+  {
+      free(mc->selectedJoints);
+  }
+
+  
+  mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+  if (mc->selectedJoints!=0)
+  {
+    memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
+    BVHJointID jID=0; 
+    fprintf(stderr,"Selecting : ");
+    for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
+     {
+      if (
+              bvh_getJointIDFromJointName(mc,argv[i],&jID)
+           )
+         {
+           fprintf(stderr,GREEN "%s " NORMAL,argv[i]); 
+           
+           mc->selectedJoints[jID]=1;
+           fprintf(stderr,"%u ",jID);
+                
+           if(includeEndSites)
+                   {
+                       if (mc->jointHierarchy[jID].hasEndSite)
+                       {
+                            fprintf(stderr,GREEN "EndSite_%s  " NORMAL,argv[i]); 
+                       }
+                   }
+           //------------------------------------------------- 
+
+         } else
+         {
+           fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
+         }
+     }
+    fprintf(stderr,"\n");
+ 
+ 
+    return 1;
+  }
+
+  return 0;
+}
+
+
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------

@@ -167,7 +167,7 @@ struct BVH_MotionCapture
   //Joint Hierarchy
   unsigned int MAX_jointHierarchySize;
   unsigned int jointHierarchySize;
-  struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE];
+  struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE+32]; //End Joints need extra space so lets give them +32 bytes
 
   //We may want to only work with specific selected joints..! 
   unsigned int selectionIncludesEndSites;
@@ -444,7 +444,13 @@ float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID
 
 
 
-
+int bvh_selectJoints(
+                    struct BVH_MotionCapture * mc,
+                    unsigned int numberOfValues,
+                    unsigned int includeEndSites,
+                    char **argv,
+                    unsigned int iplus1
+                   );
 
 
 /**
