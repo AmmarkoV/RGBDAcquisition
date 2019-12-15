@@ -115,9 +115,11 @@ int bvh_projectTo2DHandleOcclusions(
          //------------------------------------------------------------------------------------------
          for (jID2=0; jID2<mc->jointHierarchySize; jID2++)
           {
-           if ( (jID2!=jID)  )
+           if ( (mc->selectedJoints==0) || (mc->selectedJoints[jID2]) )
            {
-            if (bvhTransform->joint[jID2].pos2DCalculated)
+            if ( (jID2!=jID)  )
+            {
+             if (bvhTransform->joint[jID2].pos2DCalculated)
              {
                //We check if these two joints are very close together
                float diffA=bvhTransform->joint[jID].pos2D[0]-bvhTransform->joint[jID2].pos2D[0];
@@ -136,6 +138,7 @@ int bvh_projectTo2DHandleOcclusions(
                 } //If it is closer than the minimum distance required by OCCLUSION_THRESHOLD
              } //Only if we have 2D position calculated
            } //Excluding occlusions with itself
+          }
           } // Compare to all other joints
           //------------------------------------------------------------------------------------------
          }//If joint not already occluded
