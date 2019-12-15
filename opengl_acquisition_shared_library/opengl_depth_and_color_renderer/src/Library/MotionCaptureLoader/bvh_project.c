@@ -43,7 +43,7 @@ int bvh_projectTo2DHandleOcclusions(
 
        #define USE_TORSO_OCCLUSIONS 1
        #define DEBUG_TORSO_OCCLUSIONS 0
-       #define OCCLUSION_THRESHOLD 5 // pixels
+       #define OCCLUSION_THRESHOLD 6 // pixels
        //bvhTransform->joint[jID].isOccluded=0;
 
        #if DEBUG_TORSO_OCCLUSIONS
@@ -138,7 +138,7 @@ int bvh_projectTo2DHandleOcclusions(
                 } //If it is closer than the minimum distance required by OCCLUSION_THRESHOLD
              } //Only if we have 2D position calculated
            } //Excluding occlusions with itself
-          }
+          } //Only occlude with selected joints, ignore all else
           } // Compare to all other joints
           //------------------------------------------------------------------------------------------
          }//If joint not already occluded
