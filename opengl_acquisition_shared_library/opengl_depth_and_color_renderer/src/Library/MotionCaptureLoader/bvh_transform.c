@@ -320,7 +320,7 @@ int bvh_populateRectangle2DFromProjections(
       return 1;
     } else
     {
-        fprintf(stderr,"Only found %u joints \n",existing2DPoints);
+        fprintf(stderr,"Only found %u/4 of the joints needed to get a rectangle \n",existing2DPoints);
     }
   } else
   {
