@@ -514,10 +514,13 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeJointAngles")==0)
         {
+          // ./BVHTester --from Motions/DAZFriendlyCMUPlusHeadAndHandsAndFeet.bvh --repeat 100 --randomizeJointAngles 15 -65 0 1 finger5-1.l finger5-2.l finger5-3.l finger4-1.l finger4-2.l finger4-3.l finger3-1.l finger3-2.l finger3-3.l finger2-1.l finger2-2.l finger2-3.l finger1-1.l finger1-2.l finger1-3.l --randomizeJointAngles 5 -90 0 1 finger5-1.l finger4-1.l finger3-1.l finger2-1.l finger1-1.l --randomizeJointAngles 2 -75 75 2 finger1-1.l finger1-2.l --randomizeJointAngles 1 -45 0 3 finger1-1.l --bvh restR.bvh
+          // ./BVHTester --from Motions/DAZFriendlyCMUPlusHeadAndHandsAndFeet.bvh --repeat 100 --randomizeJointAngles 15 0 65 1 finger5-1.r finger5-2.r finger5-3.r finger4-1.r finger4-2.r finger4-3.r finger3-1.r finger3-2.r finger3-3.r finger2-1.r finger2-2.r finger2-3.r finger1-1.r finger1-2.r finger1-3.r --randomizeJointAngles 5 0 90 1 finger5-1.r finger4-1.r finger3-1.r finger2-1.r finger1-1.r --randomizeJointAngles 2 -75 75 2 finger1-1.r finger1-2.r --randomizeJointAngles 1 0 45 3 finger1-1.r --bvh restR.bvh
           if (i+2>=argc)  { incorrectArguments(); }
           unsigned int numberOfValues=atoi(argv[i+1]);
           float startOfRandomization=atof(argv[i+2]);
           float endOfRandomization=atof(argv[i+3]);
+          unsigned int specificChannelRandomization=atoi(argv[i+4]);
           srand(time(NULL));
           if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
@@ -526,8 +529,9 @@ int main(int argc, char **argv)
                                      numberOfValues,
                                      startOfRandomization,
                                      endOfRandomization,
+                                     specificChannelRandomization,
                                      argv,
-                                     i+3
+                                     i+4
                                     );
             }
             //exit(0);

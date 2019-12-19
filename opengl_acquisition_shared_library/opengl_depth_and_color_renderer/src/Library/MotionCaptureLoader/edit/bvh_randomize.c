@@ -37,9 +37,10 @@ float randomFloatA( float minVal, float maxVal )
 
 int bvh_PerturbJointAnglesRange(
                            struct BVH_MotionCapture * mc,
-                           unsigned int numberOfValues,
+                           unsigned int numberOfValues, 
                            float  start,
                            float  end,
+                           unsigned int specificChannel,
                            char **argv,
                            unsigned int iplus2
                           )
@@ -64,12 +65,24 @@ int bvh_PerturbJointAnglesRange(
                                       )
          )
          {
+           unsigned int channelsEncountered=0;  
            for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
            {
                if ( mc->motionToJointLookup[mID].jointID == jID )
                {
-                selectedJoints[mID]=1;
-                fprintf(stderr,"%u ",mID);
+                 ++channelsEncountered;
+                 if (specificChannel)
+                 {
+                   if (specificChannel==channelsEncountered)
+                   {
+                    selectedJoints[mID]=1;
+                    fprintf(stderr,"Specific(%u) ",mID); 
+                   }  
+                 }  else
+                 { 
+                   selectedJoints[mID]=1;
+                   fprintf(stderr,"%u ",mID);
+                 }
                }
            }
          } else
@@ -84,6 +97,7 @@ int bvh_PerturbJointAnglesRange(
       {
        unsigned int mIDStart=fID*mc->numberOfValuesPerFrame;
        unsigned int mIDEnd=mIDStart+mc->numberOfValuesPerFrame;
+       
        for (mID=mIDStart; mID<mIDEnd; mID++)
          {
            if (selectedJoints[mID-mIDStart])
@@ -121,6 +135,7 @@ int bvh_PerturbJointAngles(
                                      numberOfValues,
                                      (float) -1*deviation/2,
                                      (float) deviation/2,
+                                     0,
                                      argv,
                                      iplus2
                                     );
