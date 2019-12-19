@@ -517,7 +517,7 @@ int main(int argc, char **argv)
           if (i+2>=argc)  { incorrectArguments(); }
           unsigned int numberOfValues=atoi(argv[i+1]);
           float startOfRandomization=atof(argv[i+2]);
-          float endOfRandomization=atof(argv[i+2]);
+          float endOfRandomization=atof(argv[i+3]);
           srand(time(NULL));
           if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
@@ -527,7 +527,7 @@ int main(int argc, char **argv)
                                      startOfRandomization,
                                      endOfRandomization,
                                      argv,
-                                     i+2
+                                     i+3
                                     );
             }
             //exit(0);
