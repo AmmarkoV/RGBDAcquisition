@@ -35,15 +35,16 @@ float randomFloatA( float minVal, float maxVal )
     return value;
 }
 
-int bvh_PerturbJointAngles(
+int bvh_PerturbJointAnglesRange(
                            struct BVH_MotionCapture * mc,
                            unsigned int numberOfValues,
-                           float  deviation,
+                           float  start,
+                           float  end,
                            char **argv,
                            unsigned int iplus2
                           )
 {
-  fprintf(stderr,"Asked to randomize %u Joint Angles using a %0.2f (+- %0.2f) deviation\n",numberOfValues,deviation,(float) deviation/2);
+  fprintf(stderr,"Asked to randomize %u Joint Angles in the range [%0.2f,%0.2f] deviation\n",numberOfValues,start,end);
   int i=0;
   unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
   if (selectedJoints!=0)
@@ -88,7 +89,7 @@ int bvh_PerturbJointAngles(
            if (selectedJoints[mID-mIDStart])
            {
              //fprintf(stderr,"Was %0.2f ",mc->motionValues[mID+jID]);
-             mc->motionValues[mID]+=randomFloatA((float) -1*deviation/2,(float) deviation/2);
+             mc->motionValues[mID]+=randomFloatA(start,end);
              //fprintf(stderr,"Is %0.2f ",mc->motionValues[mID+jID]);
            }
          }
@@ -106,7 +107,24 @@ int bvh_PerturbJointAngles(
 
 
 
-
+int bvh_PerturbJointAngles(
+                           struct BVH_MotionCapture * mc,
+                           unsigned int numberOfValues,
+                           float  deviation,
+                           char **argv,
+                           unsigned int iplus2
+                          )
+{
+  fprintf(stderr,"Asked to randomize %u Joint Angles using a %0.2f (+- %0.2f) deviation\n",numberOfValues,deviation,(float) deviation/2);
+  return bvh_PerturbJointAnglesRange(
+                                     mc,
+                                     numberOfValues,
+                                     (float) -1*deviation/2,
+                                     (float) deviation/2,
+                                     argv,
+                                     iplus2
+                                    );
+}
 
 
 

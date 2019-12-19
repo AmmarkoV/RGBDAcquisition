@@ -808,7 +808,7 @@ ROOT hip
         JOINT rFoot
         {
          
-							OFFSET -1.905000 -20.277000 -0.734901
+							OFFSET 0.73152 -45.1104 -5.12064
 							CHANNELS 3 Zrotation Xrotation Yrotation
 							JOINT toe1-1.R
 							{
@@ -919,7 +919,7 @@ ROOT hip
         JOINT lFoot
         { 
 
-							OFFSET 1.905000 -20.277000 -0.734901
+							OFFSET -0.73152 -45.1104 -5.12064
 							CHANNELS 3 Zrotation Xrotation Yrotation
 							JOINT toe1-1.L
 							{

@@ -512,6 +512,27 @@ int main(int argc, char **argv)
             //exit(0);
         } else 
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--randomizeJointAngles")==0)
+        {
+          if (i+2>=argc)  { incorrectArguments(); }
+          unsigned int numberOfValues=atoi(argv[i+1]);
+          float startOfRandomization=atof(argv[i+2]);
+          float endOfRandomization=atof(argv[i+2]);
+          srand(time(NULL));
+          if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
+            {
+              bvh_PerturbJointAnglesRange(
+                                     &bvhMotion,
+                                     numberOfValues,
+                                     startOfRandomization,
+                                     endOfRandomization,
+                                     argv,
+                                     i+2
+                                    );
+            }
+            //exit(0);
+        } else             
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--selectJoints")==0)
         {
           if (i+1>=argc)  { incorrectArguments(); }

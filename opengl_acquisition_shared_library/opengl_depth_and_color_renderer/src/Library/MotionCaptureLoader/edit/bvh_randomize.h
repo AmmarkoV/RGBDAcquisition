@@ -7,6 +7,15 @@
 
 float randomFloatA( float minVal, float maxVal );
 
+ int bvh_PerturbJointAnglesRange(
+                           struct BVH_MotionCapture * mc,
+                           unsigned int numberOfValues,
+                           float  start,
+                           float  end,
+                           char **argv,
+                           unsigned int iplus2
+                          );
+
 
 int bvh_PerturbJointAngles(
                            struct BVH_MotionCapture * mc,
@@ -16,7 +25,6 @@ int bvh_PerturbJointAngles(
                            unsigned int iplus2
                           );
 
- 
 
 int bvh_eraseJoints(
                     struct BVH_MotionCapture * mc,
