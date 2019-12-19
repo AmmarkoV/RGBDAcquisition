@@ -179,7 +179,7 @@ int dumpBVHToCSVHeader(
 
     if (fp2D!=0)
     {
-     char comma=',';
+     char comma=' ';
      //2D Positions -------------------------------------------------------------------------------------------------------------
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -191,8 +191,8 @@ int dumpBVHToCSVHeader(
          {
             if (isJointSelected)
             {
+                if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
                 fprintf(fp2D,"2DX_%s,2DY_%s,visible_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
-                if (comma==',') { fprintf(fp2D,",");  }
             }
          }
          else
@@ -200,8 +200,8 @@ int dumpBVHToCSVHeader(
             if (isJointEndSiteSelected)
             {
                unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
+               if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
                fprintf(fp2D,"2DX_EndSite_%s,2DY_EndSite_%s,visible_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
-               if (comma==',') { fprintf(fp2D,",");  }
             }
          }
        }
@@ -222,7 +222,7 @@ int dumpBVHToCSVHeader(
      FILE * fp3D = fopen(filename3D,"a");
      if (fp3D!=0)
      {
-      char comma=',';
+      char comma=' ';
 
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -234,15 +234,16 @@ int dumpBVHToCSVHeader(
          {
             if (isJointSelected)
             {
-                fprintf(fp3D,"3DX_%s,3DY_%s,3DZ_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName); 
-                if (comma==',') { fprintf(fp3D,","); }
+                if (comma==',') { fprintf(fp3D,","); } else { comma=','; }
+                fprintf(fp3D,"3DX_%s,3DY_%s,3DZ_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);  
             }
          } else
          {
             if (isJointEndSiteSelected)
             {
              unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
-              fprintf(fp3D,"3DX_EndSite_%s,3DY_EndSite_%s,3DZ_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
+             if (comma==',') { fprintf(fp3D,","); } else { comma=','; }
+             fprintf(fp3D,"3DX_EndSite_%s,3DY_EndSite_%s,3DZ_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName); 
             }
          }
        }
@@ -277,7 +278,7 @@ int dumpBVHToCSVHeader(
 
 
 
-      char comma=',';
+      char comma=' ';
       //Model Configuration
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -293,13 +294,12 @@ int dumpBVHToCSVHeader(
                 unsigned int channelID=0;
                 for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
                  {
+                    if (comma==',') { fprintf(fpBVH,",");  } else { comma=','; }
                     fprintf(
                                     fpBVH,"%s_%s",
                                     mc->jointHierarchy[jID].jointName,
                                    channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
                                   ); 
-                              
-                     if ((comma!=',')&&(channelID==mc->jointHierarchy[jID].loadedChannels-1)) {  } else  { fprintf(fpBVH,",");  }
                  }
             }
          } 
@@ -381,7 +381,7 @@ int dumpBVHToCSVBody(
      //--------------------------------------------------------------------------------------------------------------------------
      if (fp2D!=0)
      {
-      char comma=',';
+      char comma=' ';
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
@@ -400,15 +400,16 @@ int dumpBVHToCSVBody(
 
                 if (mc->jointHierarchy[jID].erase2DCoordinates)
                     {
-                       fprintf(fp2D,"0,0,0%c",comma);
+                       if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
+                        fprintf(fp2D,"0,0,0");
                     } else
                     {
+                       if (comma==',') { fprintf(fp2D,",");  } else { comma=','; } 
                        fprintf(
-                               fp2D,"%0.6f,%0.6f,%u%c",
+                               fp2D,"%0.6f,%0.6f,%u",
                                (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
                                (float) bvhTransform->joint[jID].pos2D[1]/renderer->height,
-                               (bvhTransform->joint[jID].isOccluded==0),
-                               comma
+                               (bvhTransform->joint[jID].isOccluded==0)
                                );
                     }
          }
@@ -425,7 +426,7 @@ int dumpBVHToCSVBody(
    //3D Positions -------------------------------------------
    if (fp3D!=0)
    {
-     char comma=',';
+     char comma=' ';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
@@ -437,19 +438,19 @@ int dumpBVHToCSVBody(
          {
              if (isJointSelected)
              {
-               fprintf( 
-                                fp3D,"%0.4f,%0.4f,%0.4f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
-                              );
-                 if (comma==',') { fprintf(fp3D,",");  } 
+               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; } 
+                       fprintf( 
+                                       fp3D,"%0.4f,%0.4f,%0.4f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
+                                      );
              }
          } else
          {
              if (isJointEndSiteSelected)
              {
-               fprintf( 
+               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; } 
+                fprintf( 
                                 fp3D,"%0.4f,%0.4f,%0.4f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
                               );
-                 if (comma==',') { fprintf(fp3D,",");  }
              }
          }
        }
@@ -477,16 +478,14 @@ int dumpBVHToCSVBody(
      //----------------------------------------------
 
 
-     char comma=',';
+     char comma=' ';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected); 
            
            
          if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
-         {
-           if (jID==lastElement) { comma=' '; }
-
+         { 
 
            unsigned int channelID=0;
            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
@@ -509,10 +508,9 @@ int dumpBVHToCSVBody(
                   value=(float) bvh_RemapAngleCentered0((double) value,csvOrientation);
               }
              }
-
-             fprintf(fpBVH,"%0.5f",value);
-
-             if ( (comma!=',') && (channelID==mc->jointHierarchy[jID].loadedChannels-1) ) {  } else  { fprintf(fpBVH,",");  }
+            
+             if (comma==',') { fprintf(fpBVH,",");  } else { comma=','; }           
+             fprintf(fpBVH,"%0.5f",value); 
            }
          }
          //else 
