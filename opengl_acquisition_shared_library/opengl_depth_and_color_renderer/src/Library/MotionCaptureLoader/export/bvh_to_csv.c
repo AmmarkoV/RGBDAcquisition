@@ -120,44 +120,44 @@ int csvSkeletonFilter(
 
 
 void considerIfJointIsSelected(
-                                             struct BVH_MotionCapture * mc,
-                                             unsigned int jID,
-                                             int * isJointSelected,
-                                             int * isJointEndSiteSelected 
-                                            )
+                                struct BVH_MotionCapture * mc,
+                                unsigned int jID,
+                                int * isJointSelected,
+                                int * isJointEndSiteSelected
+                               )
 {
-     *isJointSelected=1; 
-     *isJointEndSiteSelected=1; 
-     
+     *isJointSelected=1;
+     *isJointEndSiteSelected=1;
+
      //First of all, if no joint selections have occured then everything is selected..
-     if (!mc->selectedJoints) { return; }      
-      else 
-    {      
+     if (!mc->selectedJoints) { return; }
+      else
+    {
      //If we reached this far it means there is a selection active..
      //We consider everything unselected unless proven otherwise..
-     *isJointSelected=0; 
-     *isJointEndSiteSelected=0; 
-        
-        
+     *isJointSelected=0;
+     *isJointEndSiteSelected=0;
+
+
      //We now check if this joint is selected..
      //-------------------------------------------------------------
      //If there is a selection declared then let's consider if the joint is selected..
-     
+
      if (mc->jointHierarchy[jID].isEndSite)
      {
-       //If we are talking about an endsite we will have to check with it's parent joint..  
+       //If we are talking about an endsite we will have to check with it's parent joint..
        unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
        if ( (mc->selectedJoints[parentID]) && (mc->selectionIncludesEndSites) )
                   { *isJointEndSiteSelected=1; }
      } else
      {
-       //This is a regular joint..   
-       if (mc->selectedJoints[jID]) 
+       //This is a regular joint..
+       if (mc->selectedJoints[jID])
                   { *isJointSelected=1; }
      }
-      
-    } 
-      
+
+    }
+
 }
 
 
@@ -170,8 +170,8 @@ int dumpBVHToCSVHeader(
                       )
 {
    unsigned int jID=0;
-   int isJointSelected=1; 
-   int isJointEndSiteSelected=1; 
+   int isJointSelected=1;
+   int isJointEndSiteSelected=1;
 
    if ( (filename2D!=0) && (filename2D[0]!=0) && (!fileExists(filename2D)) )
    {
@@ -184,7 +184,15 @@ int dumpBVHToCSVHeader(
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-           
+
+          //----------------------------------
+          //If we have hidden joints declared only the 2D part will be hidden..
+          if (mc->hideSelectedJoints!=0)
+            {  //If we want to hide the specific joint then it is not selected..
+               if (mc->hideSelectedJoints[jID]) {isJointSelected=0; isJointEndSiteSelected=0; }
+            }
+          //----------------------------------
+
           if (jID==mc->jointHierarchySize-1) { comma=' '; }
 
          if (!mc->jointHierarchy[jID].isEndSite)
@@ -227,7 +235,7 @@ int dumpBVHToCSVHeader(
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-           
+
          if (jID==mc->jointHierarchySize-1) { comma=' '; }
 
          if (!mc->jointHierarchy[jID].isEndSite)
@@ -235,7 +243,7 @@ int dumpBVHToCSVHeader(
             if (isJointSelected)
             {
                 if (comma==',') { fprintf(fp3D,","); } else { comma=','; }
-                fprintf(fp3D,"3DX_%s,3DY_%s,3DZ_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);  
+                fprintf(fp3D,"3DX_%s,3DY_%s,3DZ_%s",mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName,mc->jointHierarchy[jID].jointName);
             }
          } else
          {
@@ -243,7 +251,7 @@ int dumpBVHToCSVHeader(
             {
              unsigned int parentID=mc->jointHierarchy[jID].parentJoint;
              if (comma==',') { fprintf(fp3D,","); } else { comma=','; }
-             fprintf(fp3D,"3DX_EndSite_%s,3DY_EndSite_%s,3DZ_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName); 
+             fprintf(fp3D,"3DX_EndSite_%s,3DY_EndSite_%s,3DZ_EndSite_%s",mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName,mc->jointHierarchy[parentID].jointName);
             }
          }
        }
@@ -283,11 +291,11 @@ int dumpBVHToCSVHeader(
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-           
-           
+
+
          if (!mc->jointHierarchy[jID].isEndSite)
          {
-            if (isJointSelected) 
+            if (isJointSelected)
             {
                 if (jID==lastElement) { comma=' '; }
 
@@ -299,13 +307,13 @@ int dumpBVHToCSVHeader(
                                     fpBVH,"%s_%s",
                                     mc->jointHierarchy[jID].jointName,
                                    channelNames[(unsigned int) mc->jointHierarchy[jID].channelType[channelID]]
-                                  ); 
+                                  );
                  }
             }
-         } 
+         }
          //else
          //End Sites have no motion fields so they are not present here..
-         
+
        }
       //Append Frame ID
       fprintf(fpBVH,"\n");
@@ -340,8 +348,8 @@ int dumpBVHToCSVBody(
                       )
 {
    unsigned int jID=0;
-   int isJointSelected=1; 
-   int isJointEndSiteSelected=1; 
+   int isJointSelected=1;
+   int isJointEndSiteSelected=1;
 
    if (
        !csvSkeletonFilter(
@@ -385,12 +393,19 @@ int dumpBVHToCSVBody(
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-           
+          //----------------------------------
+          //If we have hidden joints declared only the 2D part will be hidden..
+          if (mc->hideSelectedJoints!=0)
+            {  //If we want to hide the specific joint then it is not selected..
+               if (mc->hideSelectedJoints[jID]) {isJointSelected=0; isJointEndSiteSelected=0; }
+            }
+          //----------------------------------
+
          if (
                //If this a regular joint and regular joints are enabled
-               ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )  
+               ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
                     ||
-               //OR if this is an end joint and end joints are enabled..     
+               //OR if this is an end joint and end joints are enabled..
                ( (mc->jointHierarchy[jID].isEndSite) && (isJointEndSiteSelected) )
             )
           {
@@ -404,7 +419,7 @@ int dumpBVHToCSVBody(
                         fprintf(fp2D,"0,0,0");
                     } else
                     {
-                       if (comma==',') { fprintf(fp2D,",");  } else { comma=','; } 
+                       if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
                        fprintf(
                                fp2D,"%0.6f,%0.6f,%u",
                                (float) bvhTransform->joint[jID].pos2D[0]/renderer->width,
@@ -430,16 +445,16 @@ int dumpBVHToCSVBody(
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
           considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-          
-          
+
+
          if (jID==mc->jointHierarchySize-1) { comma=' '; }
 
          if (!mc->jointHierarchy[jID].isEndSite)
          {
              if (isJointSelected)
              {
-               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; } 
-                       fprintf( 
+               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
+                       fprintf(
                                        fp3D,"%0.4f,%0.4f,%0.4f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
                                       );
              }
@@ -447,8 +462,8 @@ int dumpBVHToCSVBody(
          {
              if (isJointEndSiteSelected)
              {
-               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; } 
-                fprintf( 
+               if (comma==',') { fprintf(fp3D,",");  } else { comma=','; }
+                fprintf(
                                 fp3D,"%0.4f,%0.4f,%0.4f",bvhTransform->joint[jID].pos3D[0],bvhTransform->joint[jID].pos3D[1],bvhTransform->joint[jID].pos3D[2]
                               );
              }
@@ -481,11 +496,11 @@ int dumpBVHToCSVBody(
      char comma=' ';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected); 
-           
-           
+          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
+
+
          if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
-         { 
+         {
 
            unsigned int channelID=0;
            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
@@ -508,14 +523,14 @@ int dumpBVHToCSVBody(
                   value=(float) bvh_RemapAngleCentered0((double) value,csvOrientation);
               }
              }
-            
-             if (comma==',') { fprintf(fpBVH,",");  } else { comma=','; }           
-             fprintf(fpBVH,"%0.5f",value); 
+
+             if (comma==',') { fprintf(fpBVH,",");  } else { comma=','; }
+             fprintf(fpBVH,"%0.5f",value);
            }
          }
-         //else 
+         //else
          //BVH End Sites have no motion parameters so they dont need to be considered here..
-         
+
        }
      fprintf(fpBVH,"\n");
      //-------------------------------------------------------------------

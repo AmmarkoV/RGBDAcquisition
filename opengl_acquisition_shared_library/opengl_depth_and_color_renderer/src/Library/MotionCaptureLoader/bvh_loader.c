@@ -330,8 +330,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
   int done=0;
   int atHeaderSection=0;
   ssize_t read;
-   
-    
+
+
   int debug=0;
 
   if (fd!=0)
@@ -423,7 +423,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                     if (debug) fprintf(stderr,"-S-");
                     if (jNum>0)
                     {
-                      snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite_%s",bvhMotion->jointHierarchy[jNum-1].jointName);                         
+                      snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite_%s",bvhMotion->jointHierarchy[jNum-1].jointName);
                     } else
                     {
                       snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite");
@@ -1385,20 +1385,20 @@ int bvh_selectJoints(
 {
   fprintf(stderr,"Asked to select %u Joints\n",numberOfValues);
   int i=0;
-  
+
   mc->selectionIncludesEndSites=includeEndSites;
   mc->numberOfJointsWeWantToSelect=numberOfValues;
-  if (mc->selectedJoints!=0)
-  {
-      free(mc->selectedJoints);
-  }
+  if (mc->selectedJoints!=0) { free(mc->selectedJoints); mc->selectedJoints=0; }
+  if (mc->hideSelectedJoints!=0) { free(mc->hideSelectedJoints); mc->hideSelectedJoints=0; }
 
-  
   mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
-  if (mc->selectedJoints!=0)
+  mc->hideSelectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+
+  if ( (mc->selectedJoints!=0) && (mc->hideSelectedJoints!=0) )
   {
     memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
-    BVHJointID jID=0; 
+    memset(mc->hideSelectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
+    BVHJointID jID=0;
     fprintf(stderr,"Selecting : ");
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
@@ -1406,19 +1406,20 @@ int bvh_selectJoints(
               bvh_getJointIDFromJointName(mc,argv[i],&jID)
            )
          {
-           fprintf(stderr,GREEN "%s " NORMAL,argv[i]); 
-           
+           fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
+
            mc->selectedJoints[jID]=1;
+           mc->hideSelectedJoints[jID]=0;
            fprintf(stderr,"%u ",jID);
-                
+
            if(includeEndSites)
                    {
                        if (mc->jointHierarchy[jID].hasEndSite)
                        {
-                            fprintf(stderr,GREEN "EndSite_%s  " NORMAL,argv[i]); 
+                            fprintf(stderr,GREEN "EndSite_%s  " NORMAL,argv[i]);
                        }
                    }
-           //------------------------------------------------- 
+           //-------------------------------------------------
 
          } else
          {
@@ -1426,14 +1427,63 @@ int bvh_selectJoints(
          }
      }
     fprintf(stderr,"\n");
- 
- 
+
+
     return 1;
   }
+
+  //We failed to allocate both so deallocate everything..
+  mc->selectionIncludesEndSites=0;
+  mc->numberOfJointsWeWantToSelect=0;
+  if (mc->selectedJoints!=0) { free(mc->selectedJoints); mc->selectedJoints=0; }
+  if (mc->hideSelectedJoints!=0) { free(mc->hideSelectedJoints); mc->hideSelectedJoints=0; }
 
   return 0;
 }
 
+
+int bvh_selectJointsToHide2D(
+                             struct BVH_MotionCapture * mc,
+                             unsigned int numberOfValues,
+                             char **argv,
+                             unsigned int iplus1
+                            )
+{
+  if ( (mc->selectedJoints!=0) && (mc->hideSelectedJoints!=0) )
+  {
+    int i=0;
+    BVHJointID jID=0;
+    fprintf(stderr,"Hiding 2D Coordinates : ");
+    for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
+     {
+      if (
+              bvh_getJointIDFromJointName(mc,argv[i],&jID)
+           )
+         {
+           fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
+           mc->hideSelectedJoints[jID]=1;
+           fprintf(stderr,"%u ",jID);
+
+           if(mc->selectionIncludesEndSites)
+                   {
+                       if (mc->jointHierarchy[jID].hasEndSite)
+                       {
+                            fprintf(stderr,GREEN "EndSite_%s  " NORMAL,argv[i]);
+                       }
+                   }
+           //-------------------------------------------------
+
+         } else
+         {
+           fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
+         }
+     }
+    return 1;
+  }
+
+ fprintf(stderr,"");
+ return 0;
+}
 
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
@@ -1525,11 +1575,11 @@ void bvh_printBVHJointToMotionLookupTable(struct BVH_MotionCapture * bvhMotion)
   fprintf(stdout,"_______________________________________________\n");
 }
 
- 
+
 
 void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
 {
-    
+
   fprintf(stdout,"/**\n");
   fprintf(stdout," * @brief An array with BVH string labels\n");
   fprintf(stdout," */\n");
@@ -1540,16 +1590,16 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
   unsigned int i=0,z=0,countOfChannels=0;
   for (i=0; i<bvhMotion->jointHierarchySize; i++)
   {
-    if (i==0) 
+    if (i==0)
         {
-           coord='X'; fprintf(stdout,"\"%s_%cposition\"%c // 0\n",bvhMotion->jointHierarchy[i].jointName,coord,comma); 
+           coord='X'; fprintf(stdout,"\"%s_%cposition\"%c // 0\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Y'; fprintf(stdout,"\"%s_%cposition\"%c // 1\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Z'; fprintf(stdout,"\"%s_%cposition\"%c // 2\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Z'; fprintf(stdout,"\"%s_%crotation\"%c // 3\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='Y'; fprintf(stdout,"\"%s_%crotation\"%c // 4\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            coord='X'; fprintf(stdout,"\"%s_%crotation\"%c // 5\n",bvhMotion->jointHierarchy[i].jointName,coord,comma);
            countOfChannels+=5;
-        } else  
+        } else
     {
      if (!bvhMotion->jointHierarchy[i].isEndSite)
         {
@@ -1557,25 +1607,25 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
                 {
                   ++countOfChannels;
                   if (countOfChannels+1>=bvhMotion->numberOfValuesPerFrame)
-                  { 
+                  {
                       comma=' ';
                   }
-                  
+
                   unsigned int cT = bvhMotion->jointHierarchy[i].channelType[z];
                   fprintf(stdout,"\"%s_%s\"%c // %u\n ",bvhMotion->jointHierarchy[i].jointName,channelNames[cT],comma,countOfChannels);
                 }
-            
-        } 
+
+        }
     }
   }
   fprintf(stdout,"};\n\n\n\n");
-       
-       
+
+
   char label[513]={0};
   comma=',';
   coord='X';
   countOfChannels=0;
-  
+
   fprintf(stdout,"/**\n");
   fprintf(stdout," * @brief This is a programmer friendly enumerator of joint output extracted from the BVH file.\n");
   fprintf(stdout," */\n");
@@ -1583,34 +1633,34 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
   fprintf(stdout,"{\n");
   for (i=0; i<bvhMotion->jointHierarchySize; i++)
   {
-    if (i==0) 
+    if (i==0)
         {
            coord='X'; snprintf(label,512,"%s_%cposition",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
-           fprintf(stdout,"BVH_MOTION_%s = 0,\n",label); 
-           
+           fprintf(stdout,"BVH_MOTION_%s = 0,\n",label);
+
            coord='Y'; snprintf(label,512,"%s_%cposition",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
-           fprintf(stdout,"BVH_MOTION_%s,//1 \n",label); 
-           
+           fprintf(stdout,"BVH_MOTION_%s,//1 \n",label);
+
            coord='Z'; snprintf(label,512,"%s_%cposition",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
-           fprintf(stdout,"BVH_MOTION_%s,//2 \n",label); 
-           
+           fprintf(stdout,"BVH_MOTION_%s,//2 \n",label);
+
            coord='Z'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
-           fprintf(stdout,"BVH_MOTION_%s,//3 \n",label); 
-           
+           fprintf(stdout,"BVH_MOTION_%s,//3 \n",label);
+
            coord='Y'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
-           fprintf(stdout,"BVH_MOTION_%s,//4 \n",label); 
-           
+           fprintf(stdout,"BVH_MOTION_%s,//4 \n",label);
+
            coord='X'; snprintf(label,512,"%s_%crotation",bvhMotion->jointHierarchy[i].jointName,coord);
            uppercase(label);
-           fprintf(stdout,"BVH_MOTION_%s,//5 \n",label); 
-           
+           fprintf(stdout,"BVH_MOTION_%s,//5 \n",label);
+
            countOfChannels+=5;
-        } else  
+        } else
         {
          if (!bvhMotion->jointHierarchy[i].isEndSite)
           {
@@ -1618,16 +1668,16 @@ void bvh_print_C_Header(struct BVH_MotionCapture * bvhMotion)
                 {
                   ++countOfChannels;
                   if (countOfChannels+1>=bvhMotion->numberOfValuesPerFrame)
-                  { 
+                  {
                       comma=' ';
                   }
-                  
+
                   unsigned int cT = bvhMotion->jointHierarchy[i].channelType[z];
                   snprintf(label,512,"%s_%s",bvhMotion->jointHierarchy[i].jointName,channelNames[cT]);
                   uppercase(label);
-                  fprintf(stdout,"BVH_MOTION_%s%c//%u \n",label,comma,countOfChannels); 
+                  fprintf(stdout,"BVH_MOTION_%s%c//%u \n",label,comma,countOfChannels);
                 }
-          } 
+          }
         }
   }
   fprintf(stdout,"};\n\n\n");

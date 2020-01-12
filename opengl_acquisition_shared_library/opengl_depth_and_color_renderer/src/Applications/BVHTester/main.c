@@ -212,15 +212,15 @@ int main(int argc, char **argv)
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--testIK")==0)
-        { 
+        {
            BVHTestIK(
                       &bvhMotion,
                       atoi(argv[i+1]),
                       atoi(argv[i+2])
                     );
-                    
+
           exit(0);
-        } else            
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--occlusions")==0)
         {
@@ -234,7 +234,7 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--printc")==0)
         {
           bvh_print_C_Header(&bvhMotion);
-        } else 
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--changeJointDimensions")==0)
         {
@@ -510,7 +510,7 @@ int main(int argc, char **argv)
                                     );
             }
             //exit(0);
-        } else 
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--randomizeJointAngles")==0)
         {
@@ -535,7 +535,7 @@ int main(int argc, char **argv)
                                     );
             }
             //exit(0);
-        } else             
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--selectJoints")==0)
         {
@@ -552,7 +552,24 @@ int main(int argc, char **argv)
                              );
             }
             //exit(0);
-        } else 
+        } else
+        //-----------------------------------------------------
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--hide2DLocationOfJoints")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          unsigned int numberOfValues=atoi(argv[i+1]);
+          if (i+1+numberOfValues>=argc)  { incorrectArguments(); } else
+            {
+              bvh_selectJointsToHide2D(
+                                       &bvhMotion,
+                                       numberOfValues,
+                                       argv,
+                                       i+1
+                                      );
+            }
+            //exit(0);
+        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--eraseJoints")==0)
         {

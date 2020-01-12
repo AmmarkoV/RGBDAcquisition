@@ -28,7 +28,7 @@ extern "C"
 
 
 /**
-* @brief MAX_BVH_FILE_LINE_SIZE is the maximum number of a valid line in an incoming  BVH file 
+* @brief MAX_BVH_FILE_LINE_SIZE is the maximum number of a valid line in an incoming  BVH file
 * @ingroup BVH
 */
 #define MAX_BVH_FILE_LINE_SIZE 10000
@@ -169,11 +169,12 @@ struct BVH_MotionCapture
   unsigned int jointHierarchySize;
   struct BVH_Joint jointHierarchy[MAX_BVH_JOINT_HIERARCHY_SIZE+32]; //End Joints need extra space so lets give them +32 bytes
 
-  //We may want to only work with specific selected joints..! 
+  //We may want to only work with specific selected joints..!
   unsigned int selectionIncludesEndSites;
   unsigned int numberOfJointsWeWantToSelect;
   unsigned int * selectedJoints;
-  
+  unsigned int * hideSelectedJoints;
+
   //Lookup Tables..
   struct BVH_JointToMotion_LookupTable jointToMotionLookup[MAX_BVH_JOINT_HIERARCHY_SIZE];
   struct BVH_MotionToJoint_LookupTable motionToJointLookup[MAX_BVH_JOINT_HIERARCHY_SIZE*6];
@@ -451,6 +452,15 @@ int bvh_selectJoints(
                     char **argv,
                     unsigned int iplus1
                    );
+
+
+
+int bvh_selectJointsToHide2D(
+                             struct BVH_MotionCapture * mc,
+                             unsigned int numberOfValues,
+                             char **argv,
+                             unsigned int iplus1
+                            );
 
 
 /**
