@@ -1478,10 +1478,11 @@ int bvh_selectJointsToHide2D(
            fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
          }
      }
+    fprintf(stderr,"\n");
     return 1;
   }
 
- fprintf(stderr,"");
+ fprintf(stderr,RED "bvh_selectJointsToHide2D cannot work without a prior bvh_selectJoints call..\n" NORMAL);
  return 0;
 }
 
