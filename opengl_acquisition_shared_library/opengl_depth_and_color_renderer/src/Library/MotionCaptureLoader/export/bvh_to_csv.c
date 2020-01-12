@@ -192,9 +192,6 @@ int dumpBVHToCSVHeader(
                if (mc->hideSelectedJoints[jID]) {isJointSelected=0; isJointEndSiteSelected=0; }
             }
           //----------------------------------
-
-          if (jID==mc->jointHierarchySize-1) { comma=' '; }
-
          if (!mc->jointHierarchy[jID].isEndSite)
          {
             if (isJointSelected)
@@ -234,9 +231,7 @@ int dumpBVHToCSVHeader(
 
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-
-         if (jID==mc->jointHierarchySize-1) { comma=' '; }
+         considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
          if (!mc->jointHierarchy[jID].isEndSite)
          {
@@ -297,8 +292,6 @@ int dumpBVHToCSVHeader(
          {
             if (isJointSelected)
             {
-                if (jID==lastElement) { comma=' '; }
-
                 unsigned int channelID=0;
                 for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
                  {
@@ -411,8 +404,6 @@ int dumpBVHToCSVBody(
           {
                 if (bvhTransform->joint[jID].isOccluded) { ++invisibleJoints; } else { ++visibleJoints; }
 
-                if (jID==mc->jointHierarchySize-1) { comma=' '; }
-
                 if (mc->jointHierarchy[jID].erase2DCoordinates)
                     {
                        if (comma==',') { fprintf(fp2D,",");  } else { comma=','; }
@@ -444,10 +435,7 @@ int dumpBVHToCSVBody(
      char comma=' ';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
-          considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
-
-
-         if (jID==mc->jointHierarchySize-1) { comma=' '; }
+         considerIfJointIsSelected(mc,jID,&isJointSelected,&isJointEndSiteSelected);
 
          if (!mc->jointHierarchy[jID].isEndSite)
          {
