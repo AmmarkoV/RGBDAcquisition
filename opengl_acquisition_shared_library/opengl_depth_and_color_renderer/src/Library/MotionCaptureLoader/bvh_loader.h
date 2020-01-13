@@ -458,6 +458,7 @@ int bvh_selectJoints(
 int bvh_selectJointsToHide2D(
                              struct BVH_MotionCapture * mc,
                              unsigned int numberOfValues,
+                             unsigned int includeEndSites,
                              char **argv,
                              unsigned int iplus1
                             );

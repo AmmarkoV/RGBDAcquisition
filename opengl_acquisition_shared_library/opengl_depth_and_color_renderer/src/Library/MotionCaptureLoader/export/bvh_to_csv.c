@@ -189,7 +189,11 @@ int dumpBVHToCSVHeader(
           //If we have hidden joints declared only the 2D part will be hidden..
           if (mc->hideSelectedJoints!=0)
             {  //If we want to hide the specific joint then it is not selected..
-               if (mc->hideSelectedJoints[jID]) {isJointSelected=0; isJointEndSiteSelected=0; }
+               if (mc->hideSelectedJoints[jID])
+                  {
+                     isJointSelected=0;
+                     if (mc->hideSelectedJoints[jID]!=2) { isJointEndSiteSelected=0; }
+                  }
             }
           //----------------------------------
          if (!mc->jointHierarchy[jID].isEndSite)
@@ -390,7 +394,11 @@ int dumpBVHToCSVBody(
           //If we have hidden joints declared only the 2D part will be hidden..
           if (mc->hideSelectedJoints!=0)
             {  //If we want to hide the specific joint then it is not selected..
-               if (mc->hideSelectedJoints[jID]) {isJointSelected=0; isJointEndSiteSelected=0; }
+               if (mc->hideSelectedJoints[jID])
+                {
+                  isJointSelected=0;
+                  if (mc->hideSelectedJoints[jID]!=2) { isJointEndSiteSelected=0; }
+                }
             }
           //----------------------------------
 

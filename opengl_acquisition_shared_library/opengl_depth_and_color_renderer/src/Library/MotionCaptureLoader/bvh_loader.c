@@ -424,6 +424,8 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                     if (jNum>0)
                     {
                       snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite_%s",bvhMotion->jointHierarchy[jNum-1].jointName);
+                      //This emmits a warning, which kind of makes sense
+                      // note: ‘snprintf’ output between 9 and 137 bytes into a destination of size 119
                     } else
                     {
                       snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite");
@@ -1445,6 +1447,7 @@ int bvh_selectJoints(
 int bvh_selectJointsToHide2D(
                              struct BVH_MotionCapture * mc,
                              unsigned int numberOfValues,
+                             unsigned int includeEndSites,
                              char **argv,
                              unsigned int iplus1
                             )
@@ -1464,12 +1467,22 @@ int bvh_selectJointsToHide2D(
            mc->hideSelectedJoints[jID]=1;
            fprintf(stderr,"%u ",jID);
 
-           if(mc->selectionIncludesEndSites)
+           if(includeEndSites)
                    {
-                       if (mc->jointHierarchy[jID].hasEndSite)
-                       {
-                            fprintf(stderr,GREEN "EndSite_%s  " NORMAL,argv[i]);
-                       }
+                     if(mc->selectionIncludesEndSites)
+                          {
+                              if (mc->jointHierarchy[jID].hasEndSite)
+                                {
+                                  fprintf(stderr,GREEN "EndSite_%s  " NORMAL,argv[i]);
+                                }
+                          }
+                   } else
+                   {
+                    if (mc->jointHierarchy[jID].hasEndSite)
+                                {
+                                  fprintf(stderr,YELLOW "EndSite_%s(protected) " NORMAL,argv[i]);
+                                  mc->hideSelectedJoints[jID]=2;
+                                }
                    }
            //-------------------------------------------------
 

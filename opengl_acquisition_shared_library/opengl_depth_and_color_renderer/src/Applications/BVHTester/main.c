@@ -539,16 +539,17 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--selectJoints")==0)
         {
-          if (i+1>=argc)  { incorrectArguments(); }
-          unsigned int numberOfValues=atoi(argv[i+1]);
-          if (i+1+numberOfValues>=argc)  { incorrectArguments(); } else
+          if (i+2>=argc)  { incorrectArguments(); }
+          unsigned int includeEndJoints=atoi(argv[i+1]);
+          unsigned int numberOfValues=atoi(argv[i+2]);
+          if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
               bvh_selectJoints(
                               &bvhMotion,
                               numberOfValues,
-                              1,//include End Joints
+                              includeEndJoints,//include End Joints
                               argv,
-                              i+1
+                              i+2
                              );
             }
             //exit(0);
@@ -557,15 +558,17 @@ int main(int argc, char **argv)
         //-----------------------------------------------------
         if (strcmp(argv[i],"--hide2DLocationOfJoints")==0)
         {
-          if (i+1>=argc)  { incorrectArguments(); }
-          unsigned int numberOfValues=atoi(argv[i+1]);
-          if (i+1+numberOfValues>=argc)  { incorrectArguments(); } else
+          if (i+2>=argc)  { incorrectArguments(); }
+          unsigned int includeEndJoints=atoi(argv[i+1]);
+          unsigned int numberOfValues=atoi(argv[i+2]);
+          if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
               bvh_selectJointsToHide2D(
                                        &bvhMotion,
                                        numberOfValues,
+                                       includeEndJoints,
                                        argv,
-                                       i+1
+                                       i+2
                                       );
             }
             //exit(0);
