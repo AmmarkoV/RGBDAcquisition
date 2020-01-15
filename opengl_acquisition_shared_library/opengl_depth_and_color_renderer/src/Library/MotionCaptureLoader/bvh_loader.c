@@ -327,11 +327,10 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
   bvhMotion->numberOfValuesPerFrame = 0;//57;
   bvhMotion->MAX_jointHierarchySize = MAX_BVH_JOINT_HIERARCHY_SIZE;
 
-  int done=0;
   int atHeaderSection=0;
 
 
-  int debug=0;
+  int debug=bvhMotion->debug;
 
   if (fd!=0)
   {
@@ -355,6 +354,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
     size_t len = 0;
     ssize_t read;
 
+    int done=0;
     while  ( (!done) && ((read = getline(&line, &len, fd)) != -1) )
     {
        ++bvhMotion->linesParsed;

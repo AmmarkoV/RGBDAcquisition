@@ -187,6 +187,9 @@ struct BVH_MotionCapture
   //Internal Variables..
   char fileName[1024];
   unsigned int linesParsed;
+  
+  //---------
+  char debug;
 };
 
 

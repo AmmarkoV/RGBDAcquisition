@@ -13,10 +13,8 @@ int dumpBVHToSVGFrame(
                      )
 {
    unsigned int width = renderer->width;
-   unsigned int height = renderer->height;
-   unsigned int parentJID=0;
+   unsigned int height = renderer->height; 
 
-   unsigned int occludedListY=130;
 
    FILE * fp = fopen(svgFilename,"w");
    if (fp!=0)
@@ -63,7 +61,7 @@ int dumpBVHToSVGFrame(
       unsigned int jID=0;
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
-        parentJID = mc->jointHierarchy[jID].parentJoint;
+        unsigned int parentJID = mc->jointHierarchy[jID].parentJoint;
 
         fprintf(
                 fp,"<line x1=\"%0.2f\" y1=\"%0.2f\" x2=\"%0.2f\" y2=\"%0.2f\" style=\"stroke:rgb(255,255,0);stroke-width:2;stroke-dasharray:10,10\" />\n",
@@ -89,12 +87,13 @@ int dumpBVHToSVGFrame(
 
 
 
+      unsigned int occludedListY=130;
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
 
         if (bvhTransform->joint[jID].isOccluded)
         {
-        parentJID = mc->jointHierarchy[jID].parentJoint;
+           unsigned int parentJID = mc->jointHierarchy[jID].parentJoint;
            occludedListY+=15;
            fprintf(
                    fp,

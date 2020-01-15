@@ -169,6 +169,11 @@ int main(int argc, char **argv)
     for (i=0; i<argc; i++)
     {
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--debug")==0)
+        {
+          bvhMotion.debug=1;
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--haltonerror")==0)
         {
           immediatelyHaltOnError=1;
