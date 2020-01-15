@@ -1385,6 +1385,7 @@ int bvh_selectJoints(
                     unsigned int iplus1
                    )
 {
+  unsigned int success=1;
   fprintf(stderr,"Asked to select %u Joints\n",numberOfValues);
   int i=0;
 
@@ -1426,12 +1427,13 @@ int bvh_selectJoints(
          } else
          {
            fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
+           success=0;
          }
      }
     fprintf(stderr,"\n");
 
 
-    return 1;
+    return success;
   }
 
   //We failed to allocate both so deallocate everything..
@@ -1452,6 +1454,7 @@ int bvh_selectJointsToHide2D(
                              unsigned int iplus1
                             )
 {
+  unsigned int success=1;
   if ( (mc->selectedJoints!=0) && (mc->hideSelectedJoints!=0) )
   {
     int i=0;
@@ -1489,10 +1492,11 @@ int bvh_selectJointsToHide2D(
          } else
          {
            fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
+           success=0;
          }
      }
     fprintf(stderr,"\n");
-    return 1;
+    return success;
   }
 
  fprintf(stderr,RED "bvh_selectJointsToHide2D cannot work without a prior bvh_selectJoints call..\n" NORMAL);

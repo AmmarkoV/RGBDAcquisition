@@ -46,7 +46,7 @@
 #define WHITE   "\033[37m"      /* White */
 
 #define MAX_RECORDED_FRAMES 10000
-#define USE_NONDEFAULT_CALIBRATIONS 1
+#define USE_NONDEFAULT_CALIBRATIONS 0
 
 //Initial Frame name , will be overwritten by launch file..!
 char tfRoot[512]={"map"};
