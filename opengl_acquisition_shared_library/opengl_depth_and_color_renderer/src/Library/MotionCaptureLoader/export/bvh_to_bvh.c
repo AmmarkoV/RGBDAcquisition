@@ -97,12 +97,12 @@ int dumpBVHToBVH(
                   struct BVH_MotionCapture * mc
                 )
 {
-  BVHJointID rootJID;
-  BVHJointID jID;
+   BVHJointID rootJID;
+   BVHJointID jID;
 
-  if (!bvh_getRootJointID(mc,&rootJID)) { return 0;}
+   if (!bvh_getRootJointID(mc,&rootJID)) { return 0;}
 
-  FILE * fp = fopen(bvhFilename,"w");
+   FILE * fp = fopen(bvhFilename,"w");
    if (fp!=0)
    {
      fprintf(fp,"HIERARCHY\n");
@@ -119,14 +119,9 @@ int dumpBVHToBVH(
           if (hasNext) { nextHierarchyLevel=mc->jointHierarchy[jID+1].hierarchyLevel; } else
                        { nextHierarchyLevel=0; }
 
-          writeBVHHierarchyOpenningSection(
-                                            fp, mc, jID
-                                          );
+          writeBVHHierarchyOpenningSection(fp,mc,jID);
 
-
-          if (
-               nextHierarchyLevel < currentHierarchyLevel
-             )
+          if (nextHierarchyLevel < currentHierarchyLevel)
           {
            writeBVHHierarchyClosingSection(
                                             fp ,

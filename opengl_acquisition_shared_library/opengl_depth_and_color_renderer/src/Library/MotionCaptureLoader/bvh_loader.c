@@ -942,8 +942,11 @@ int bvh_InterpolateMotion(
   if (mc==0) { return 0; }
 
   float * newMotionValues = (float*) malloc(sizeof(float) * mc->motionValuesSize * 2 );
-  unsigned int i,z,target=0;
-  for (i=0; i<mc->numberOfFrames-1; i++)
+
+  if (newMotionValues!=0)
+  {
+   unsigned int i,z,target=0;
+   for (i=0; i<mc->numberOfFrames-1; i++)
     {
       //First copy frame
       for (z=0; z<mc->numberOfValuesPerFrame; z++)
@@ -955,12 +958,12 @@ int bvh_InterpolateMotion(
       target++;
     }
 
- //Copy last two frames
- i=mc->numberOfFrames-1;
- for (z=0; z<mc->numberOfValuesPerFrame; z++)
+  //Copy last two frames
+  i=mc->numberOfFrames-1;
+  for (z=0; z<mc->numberOfValuesPerFrame; z++)
       { newMotionValues[target*mc->numberOfValuesPerFrame + z] = mc->motionValues[(i)*mc->numberOfValuesPerFrame + z]; }
-  target++;
- for (z=0; z<mc->numberOfValuesPerFrame; z++)
+   target++;
+  for (z=0; z<mc->numberOfValuesPerFrame; z++)
       { newMotionValues[target*mc->numberOfValuesPerFrame + z] = mc->motionValues[(i)*mc->numberOfValuesPerFrame + z]; }
 
 
@@ -973,6 +976,9 @@ int bvh_InterpolateMotion(
   free(oldMotionValues);
 
   return 1;
+  }
+
+ return 0;
 }
 
 

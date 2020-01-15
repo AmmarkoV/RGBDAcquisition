@@ -45,6 +45,8 @@ int bvh_PerturbJointAnglesRange(
                            unsigned int iplus2
                           )
 {
+  int success=1;
+
   fprintf(stderr,"Asked to randomize %u Joint Angles in the range [%0.2f,%0.2f] deviation\n",numberOfValues,start,end);
   int i=0;
   unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
@@ -88,6 +90,7 @@ int bvh_PerturbJointAnglesRange(
          } else
          {
            fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
+           success=0;
          }
      }
     fprintf(stderr,"\n");
@@ -111,7 +114,7 @@ int bvh_PerturbJointAnglesRange(
 
 
     free(selectedJoints);
-    return 1;
+    return success;
   }
 
   return 0;

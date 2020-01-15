@@ -174,6 +174,37 @@ int main(int argc, char **argv)
           immediatelyHaltOnError=1;
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--occlusions")==0)
+        {
+          occlusions=1;
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--print")==0)
+        {
+          bvh_printBVH(&bvhMotion);
+        } else
+        if (strcmp(argv[i],"--printc")==0)
+        {
+          bvh_print_C_Header(&bvhMotion);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--test")==0)
+        {
+          bvh_testConstrainRotations();
+          exit(0);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--testIK")==0)
+        {
+           BVHTestIK(
+                      &bvhMotion,
+                      atoi(argv[i+1]),
+                      atoi(argv[i+2])
+                    );
+
+          exit(0);
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--nofilter")==0)
         {
           filterBehindCamera=0;
@@ -238,37 +269,6 @@ int main(int argc, char **argv)
           //----------------------------------------
           renderingConfiguration.isDefined=1;
           exit(0);
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--test")==0)
-        {
-          bvh_testConstrainRotations();
-          exit(0);
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--testIK")==0)
-        {
-           BVHTestIK(
-                      &bvhMotion,
-                      atoi(argv[i+1]),
-                      atoi(argv[i+2])
-                    );
-
-          exit(0);
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--occlusions")==0)
-        {
-          occlusions=1;
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--print")==0)
-        {
-          bvh_printBVH(&bvhMotion);
-        } else
-        if (strcmp(argv[i],"--printc")==0)
-        {
-          bvh_print_C_Header(&bvhMotion);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--changeJointDimensions")==0)
@@ -364,56 +364,6 @@ int main(int argc, char **argv)
             fprintf(stderr,"Could not open BVH file that was requested to be merged (%s)..\n",BVHPathToFileToMerge);
           }
         } else
-
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--to")==0)
-        {
-          //./BVHTester --from Motions/02_03.bvh --to Motions/cmuTomakehuman.profile test.conf
-          if (i+2>=argc)  { incorrectArguments(); }
-          char * retargetProfile=argv[i+1];//"Motions/cmu.profile";
-          toSceneFile=argv[i+2];
-          //toSceneFileTRI
-
-           struct bvhToTRI bvhtri={0};
-           bvh_loadBVHToTRIAssociationFile(retargetProfile,&bvhtri,&bvhMotion);
-           dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,1/*USE Irugubak oisutuib*/,0);
-           dumpBVHToTrajectoryParserPrimitives(toSceneFile,&bvhMotion);
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--bvh")==0)
-        {
-          if (i+1>=argc)  { incorrectArguments(); }
-          toBVHFile=argv[i+1];
-          dumpBVHToBVH(
-                        toBVHFile,
-                        &bvhMotion
-                      );
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--csv")==0)
-        {
-          if (i+3>=argc)  { incorrectArguments(); }
-          toSVGDirectory=argv[i+1];
-          toCSVFilename=argv[i+2];
-          convertToCSV=1;
-          if (strcmp(argv[i+3],"2d+bvh")==0 ) { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
-          if (strcmp(argv[i+3],"2d")==0 )     { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
-          if (strcmp(argv[i+3],"3d")==0 )     { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
-          if (strcmp(argv[i+3],"bvh")==0 )    { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
-                                              { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
-        } else
-        //-----------------------------------------------------
-        if (strcmp(argv[i],"--svg")==0)
-        {
-          if (i+1>=argc)  { incorrectArguments(); }
-          toSVGDirectory=argv[i+1];
-
-          char removeOldSVGFilesCommand[512];
-          snprintf(removeOldSVGFilesCommand,512,"rm %s/*.svg",toSVGDirectory);
-          int res = system(removeOldSVGFilesCommand);
-          if (res!=0) { fprintf(stderr,"Could not clean svg files in %s",toSVGDirectory); }
-          convertToSVG=1;
-        } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--swap")==0)
         {
@@ -436,15 +386,16 @@ int main(int argc, char **argv)
                                                                );
         } else
         //-----------------------------------------------------
-        if (strcmp(argv[i],"--mirror")==0)
-        {
-          if (i+2>=argc)  { incorrectArguments(); }
-          bvh_MirrorJointsThroughIK(
-                                    &bvhMotion,
-                                    argv[i+1],
-                                    argv[i+2]
-                                  );
-        } else
+        //     This does not work..
+        //if (strcmp(argv[i],"--mirror")==0)
+        //{
+        //  if (i+2>=argc)  { incorrectArguments(); }
+        //  bvh_MirrorJointsThroughIK(
+        //                            &bvhMotion,
+        //                            argv[i+1],
+        //                            argv[i+2]
+        //                          );
+        //} else
         //-----------------------------------------------------
 
         //-----------------------------------------------------
@@ -511,21 +462,21 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--randomizedOrientation")==0)
         {
              //flipRandomizationOrientation=1;
-
              if (strcmp("front",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_FRONT_ORIENTATION;    } else
              if (strcmp("back",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
              if (strcmp("left",argv[i+1])==0)    {  randomizedOrientation=BVH_ENFORCE_LEFT_ORIENTATION;     } else
-             if (strcmp("right",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    }
+             if (strcmp("right",argv[i+1])==0)   {  randomizedOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    } else
+                                                 {  haltOnError(immediatelyHaltOnError,"Randomized Orientation offered is wrong "); }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--csvOrientation")==0)
         {
              //flipRandomizationOrientation=1;
-
              if (strcmp("front",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_FRONT_ORIENTATION;    } else
              if (strcmp("back",argv[i+1])==0)    {  csvOrientation=BVH_ENFORCE_BACK_ORIENTATION;     } else
              if (strcmp("left",argv[i+1])==0)    {  csvOrientation=BVH_ENFORCE_LEFT_ORIENTATION;     } else
-             if (strcmp("right",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    }
+             if (strcmp("right",argv[i+1])==0)   {  csvOrientation=BVH_ENFORCE_RIGHT_ORIENTATION;    } else
+                                                 {  haltOnError(immediatelyHaltOnError,"CSV Orientation offered is wrong "); }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--perturbJointAngles")==0)
@@ -536,13 +487,16 @@ int main(int argc, char **argv)
           srand(time(NULL));
           if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
-              bvh_PerturbJointAngles(
+
+              if (
+                   !bvh_PerturbJointAngles(
                                      &bvhMotion,
                                      numberOfValues,
                                      deviation,
                                      argv,
                                      i+2
-                                    );
+                                    )
+                 )  { haltOnError(immediatelyHaltOnError,"Error while perturbing joint angles"); }
             }
             //exit(0);
         } else
@@ -559,15 +513,17 @@ int main(int argc, char **argv)
           srand(time(NULL));
           if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
-              bvh_PerturbJointAnglesRange(
-                                     &bvhMotion,
-                                     numberOfValues,
-                                     startOfRandomization,
-                                     endOfRandomization,
-                                     specificChannelRandomization,
-                                     argv,
-                                     i+4
-                                    );
+              if (
+                   !bvh_PerturbJointAnglesRange(
+                                                &bvhMotion,
+                                                numberOfValues,
+                                                startOfRandomization,
+                                                endOfRandomization,
+                                                specificChannelRandomization,
+                                                argv,
+                                                i+4
+                                               )
+                 )  { haltOnError(immediatelyHaltOnError,"Error while randomizing joint angles"); }
             }
             //exit(0);
         } else
@@ -844,6 +800,57 @@ int main(int argc, char **argv)
                                               );
 
           bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
+        }  else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--to")==0)
+        {
+          //./BVHTester --from Motions/02_03.bvh --to Motions/cmuTomakehuman.profile test.conf
+          if (i+2>=argc)  { incorrectArguments(); }
+          char * retargetProfile=argv[i+1];//"Motions/cmu.profile";
+          toSceneFile=argv[i+2];
+          //toSceneFileTRI
+
+           struct bvhToTRI bvhtri={0};
+           bvh_loadBVHToTRIAssociationFile(retargetProfile,&bvhtri,&bvhMotion);
+           dumpBVHToTrajectoryParserTRI(toSceneFileTRI,&bvhMotion,&bvhtri,1/*USE Irugubak oisutuib*/,0);
+           dumpBVHToTrajectoryParserPrimitives(toSceneFile,&bvhMotion);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--bvh")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          toBVHFile=argv[i+1];
+          if (
+               !dumpBVHToBVH(
+                             toBVHFile,
+                             &bvhMotion
+                            )
+             ) { haltOnError(immediatelyHaltOnError,"Error while outputing a BVH file.."); }
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--csv")==0)
+        {
+          if (i+3>=argc)  { incorrectArguments(); }
+          toSVGDirectory=argv[i+1];
+          toCSVFilename=argv[i+2];
+          convertToCSV=1;
+          if (strcmp(argv[i+3],"2d+bvh")==0 ) { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+          if (strcmp(argv[i+3],"2d")==0 )     { useCSV_2D_Output=1; useCSV_3D_Output=0; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"3d")==0 )     { useCSV_2D_Output=0; useCSV_3D_Output=1; useCSV_BVH_Output=0; } else
+          if (strcmp(argv[i+3],"bvh")==0 )    { useCSV_2D_Output=0; useCSV_3D_Output=0; useCSV_BVH_Output=1; } else
+                                              { useCSV_2D_Output=1; useCSV_3D_Output=1; useCSV_BVH_Output=1; }
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--svg")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          toSVGDirectory=argv[i+1];
+
+          char removeOldSVGFilesCommand[512];
+          snprintf(removeOldSVGFilesCommand,512,"rm %s/*.svg",toSVGDirectory);
+          int res = system(removeOldSVGFilesCommand);
+          if (res!=0) { fprintf(stderr,"Could not clean svg files in %s",toSVGDirectory); }
+          convertToSVG=1;
         }
     }
 
@@ -864,7 +871,6 @@ int main(int argc, char **argv)
                      filterTopWeirdRandomSkeletons,//Filter top left weird random skelingtons ( skeletons )
                      0//We don't want to convert to radians
                  );
-      return 0;
     }
 
 
