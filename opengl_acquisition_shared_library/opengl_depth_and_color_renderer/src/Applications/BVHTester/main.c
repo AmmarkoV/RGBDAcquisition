@@ -99,7 +99,7 @@ void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
     }
 }
 
-void haltOnError(const char * message,unsigned int haltingSwitch)
+void haltOnError(unsigned int haltingSwitch,const char * message)
 {
   fprintf(stderr,RED "=======================================\n");
   fprintf(stderr,"=======================================\n");
@@ -579,13 +579,15 @@ int main(int argc, char **argv)
           unsigned int numberOfValues=atoi(argv[i+2]);
           if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
-              bvh_selectJoints(
-                              &bvhMotion,
-                              numberOfValues,
-                              includeEndJoints,//include End Joints
-                              argv,
-                              i+2
-                             );
+              if (
+                   !bvh_selectJoints(
+                                     &bvhMotion,
+                                     numberOfValues,
+                                     includeEndJoints,//include End Joints
+                                     argv,
+                                     i+2
+                                    )
+                 ) { haltOnError(immediatelyHaltOnError,"Error while selecting Joints"); }
             }
             //exit(0);
         } else
@@ -598,13 +600,15 @@ int main(int argc, char **argv)
           unsigned int numberOfValues=atoi(argv[i+2]);
           if (i+2+numberOfValues>=argc)  { incorrectArguments(); } else
             {
-              bvh_selectJointsToHide2D(
-                                       &bvhMotion,
-                                       numberOfValues,
-                                       includeEndJoints,
-                                       argv,
-                                       i+2
-                                      );
+               if (
+                   !bvh_selectJointsToHide2D(
+                                             &bvhMotion,
+                                             numberOfValues,
+                                             includeEndJoints,
+                                             argv,
+                                             i+2
+                                            )
+                 ) { haltOnError(immediatelyHaltOnError,"Error while selecting 2D Joints"); }
             }
             //exit(0);
         } else
@@ -615,13 +619,15 @@ int main(int argc, char **argv)
           unsigned int numberOfValues=atoi(argv[i+1]);
           if (i+1+numberOfValues>=argc)  { incorrectArguments(); } else
             {
-              bvh_eraseJoints(
+              if (
+                   !bvh_eraseJoints(
                               &bvhMotion,
                               numberOfValues,
                               1,//include End Joints
                               argv,
                               i+1
-                             );
+                             )
+                 ) { haltOnError(immediatelyHaltOnError,"Error while selecting joints to erase"); }
             }
         } else
         //-----------------------------------------------------
@@ -840,8 +846,6 @@ int main(int argc, char **argv)
           bvh_ConstrainRotations(&bvhMotion,randomizedOrientation);
         }
     }
-
-
 
     //SVG or CSV output ..
     if ( (convertToSVG) || (convertToCSV) )

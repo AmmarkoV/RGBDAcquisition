@@ -37,7 +37,7 @@ float randomFloatA( float minVal, float maxVal )
 
 int bvh_PerturbJointAnglesRange(
                            struct BVH_MotionCapture * mc,
-                           unsigned int numberOfValues, 
+                           unsigned int numberOfValues,
                            float  start,
                            float  end,
                            unsigned int specificChannel,
@@ -65,7 +65,7 @@ int bvh_PerturbJointAnglesRange(
                                       )
          )
          {
-           unsigned int channelsEncountered=0;  
+           unsigned int channelsEncountered=0;
            for (mID=0; mID<mc->numberOfValuesPerFrame; mID++)
            {
                if ( mc->motionToJointLookup[mID].jointID == jID )
@@ -76,10 +76,10 @@ int bvh_PerturbJointAnglesRange(
                    if (specificChannel==channelsEncountered)
                    {
                     selectedJoints[mID]=1;
-                    fprintf(stderr,"Specific(%u) ",mID); 
-                   }  
+                    fprintf(stderr,"Specific(%u) ",mID);
+                   }
                  }  else
-                 { 
+                 {
                    selectedJoints[mID]=1;
                    fprintf(stderr,"%u ",mID);
                  }
@@ -97,7 +97,7 @@ int bvh_PerturbJointAnglesRange(
       {
        unsigned int mIDStart=fID*mc->numberOfValuesPerFrame;
        unsigned int mIDEnd=mIDStart+mc->numberOfValuesPerFrame;
-       
+
        for (mID=mIDStart; mID<mIDEnd; mID++)
          {
            if (selectedJoints[mID-mIDStart])
@@ -160,6 +160,8 @@ int bvh_eraseJoints(
                     unsigned int iplus1
                    )
 {
+  unsigned int success=1;
+  //---------------------
   fprintf(stderr,"Asked to erase %u Joint Angles\n",numberOfValues);
   int i=0;
   unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
@@ -214,6 +216,7 @@ int bvh_eraseJoints(
          } else
          {
            fprintf(stderr,RED "%s(not found) " NORMAL,argv[i]);
+           success=0;
          }
      }
     fprintf(stderr,"\n");
@@ -236,7 +239,7 @@ int bvh_eraseJoints(
 
 
     free(selectedJoints);
-    return 1;
+    return success;
   }
 
   return 0;
