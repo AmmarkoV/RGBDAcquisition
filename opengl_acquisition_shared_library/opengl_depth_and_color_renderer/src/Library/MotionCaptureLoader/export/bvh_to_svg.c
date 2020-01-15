@@ -14,7 +14,6 @@ int dumpBVHToSVGFrame(
 {
    unsigned int width = renderer->width;
    unsigned int height = renderer->height;
-   unsigned int jID=0;
    unsigned int parentJID=0;
 
    unsigned int occludedListY=130;
@@ -61,6 +60,7 @@ int dumpBVHToSVGFrame(
       fprintf(fp,"<text x=\"%u\" y=\"90\">%0.2f %0.2f %0.2f %0.2f</text>\n" ,x,m[8],m[9],m[10],m[11]);
       fprintf(fp,"<text x=\"%u\" y=\"105\">%0.2f %0.2f %0.2f %0.2f</text>\n",x,m[12],m[13],m[14],m[15]);
 
+      unsigned int jID=0;
       for (jID=0; jID<mc->jointHierarchySize; jID++)
       {
         parentJID = mc->jointHierarchy[jID].parentJoint;

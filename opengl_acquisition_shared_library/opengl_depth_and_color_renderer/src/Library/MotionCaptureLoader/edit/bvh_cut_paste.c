@@ -341,7 +341,7 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
        fprintf(stderr,"We now have %u frames\n",mc->numberOfFrames);
        float * temporaryMotionBufferA = allocateBufferThatCanContainJointAndChildren( mc, jIDA );
        float * temporaryMotionBufferB = allocateBufferThatCanContainJointAndChildren( mc, jIDB );
-       if ( (temporaryMotionBufferA!=0) && (temporaryMotionBufferA!=0) )
+       if ( (temporaryMotionBufferA!=0) && (temporaryMotionBufferB!=0) )
        {
         BVHFrameID fID=0;
         for (fID=0; fID<initialNumberOfFrames; fID++)

@@ -295,7 +295,7 @@ int dumpBVHToTrajectoryParserTRI(
                                 )
 {
   //struct BVH_Transform bvhTransform={0};
-  unsigned int jID=0,fID=0;
+  unsigned int jID=0;
   FILE * fp = fopen(filename,"w");
 
   if (fp!=0)
@@ -375,6 +375,8 @@ int dumpBVHToTrajectoryParserTRI(
     float zOffset=4000;
 
     float posX,posY,posZ,rotX,rotY,rotZ;
+    
+    unsigned int fID=0;
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
       fprintf(fp,"MOVE(floor,%u,-19.231,%0.2f,2699.735,0.0,0.0,0.0,0.0)\n",fID,yOffset);

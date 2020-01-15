@@ -326,7 +326,6 @@ void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double *
     m[3][0] = matrix4x4[m3_0];    m[0][1] = matrix4x4[m3_1];    m[0][2] = matrix4x4[m3_2];    m[0][3] = matrix4x4[m3_3];
 
     float  tr, s, q[4];
-    int    i, j, k;
     int nxt[3] = {1, 2, 0};
     tr = m[0][0] + m[1][1] + m[2][2];
 // check the diagonal
@@ -341,6 +340,7 @@ void matrix4x42Quaternion(double * quaternions,int quaternionConvention,double *
     }
     else
     {
+        int i, j, k;
 // diagonal is negative
         i = 0;
         if (m[1][1] > m[0][0]) i = 1;

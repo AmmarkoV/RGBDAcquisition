@@ -75,7 +75,6 @@ void prepareHuman36MRotationMatrix(float * rotationMatrix,float rX,float rY,floa
 void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
 {
     //Test getting rotations for a joint..
-    BVHFrameID frameID = 0;
     BVHJointID jID=0;
     if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
     {
@@ -88,6 +87,7 @@ void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
               bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[BVH_ROTATION_Z]
              );
 
+       BVHFrameID frameID = 0;
        for (frameID=0; frameID<bvhMotion->numberOfFrames; frameID++)
        {
 
@@ -616,12 +616,10 @@ int main(int argc, char **argv)
           // ./BVHTester --from Motions/02_03.bvh --randomize2D 1400 5000 -35 -90 -35 35 90 35 --occlusions --svg tmp/
           if (i+8>=argc)  { incorrectArguments(); }
           float minimumRotation[3];
-          float maximumRotation[3];
-          float minimumDepth=0.0;
-          float maximumDepth=0.0;
+          float maximumRotation[3]; 
 
-          minimumDepth=-1*atof(argv[i+1])/10;
-          maximumDepth=-1*atof(argv[i+2])/10;
+          float minimumDepth=-1*atof(argv[i+1])/10;
+          float maximumDepth=-1*atof(argv[i+2])/10;
           //----
           minimumRotation[0]=atof(argv[i+3]);
           minimumRotation[1]=atof(argv[i+4]);
@@ -696,11 +694,9 @@ int main(int argc, char **argv)
           float maximumRotationRangeA[3];
           float minimumRotationRangeB[3];
           float maximumRotationRangeB[3];
-          float minimumDepth=0.0;
-          float maximumDepth=0.0;
 
-          minimumDepth=-1*atof(argv[i+1])/10;
-          maximumDepth=-1*atof(argv[i+2])/10;
+          float minimumDepth=-1*atof(argv[i+1])/10;
+          float maximumDepth=-1*atof(argv[i+2])/10;
           //----
           minimumRotationRangeA[0]=atof(argv[i+3]);
           minimumRotationRangeA[1]=atof(argv[i+4]);

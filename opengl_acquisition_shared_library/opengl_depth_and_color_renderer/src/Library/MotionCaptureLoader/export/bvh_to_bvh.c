@@ -98,7 +98,6 @@ int dumpBVHToBVH(
                 )
 {
    BVHJointID rootJID;
-   BVHJointID jID;
 
    if (!bvh_getRootJointID(mc,&rootJID)) { return 0;}
 
@@ -106,13 +105,14 @@ int dumpBVHToBVH(
    if (fp!=0)
    {
      fprintf(fp,"HIERARCHY\n");
-     //--------------------------------------------------------------------------------------
-     unsigned int currentHierarchyLevel  = 0;
+     //-------------------------------------------------------------------------------------- 
      unsigned int nextHierarchyLevel = 0;
      unsigned int hasNext=0;
+     
+     BVHJointID jID;
      for (jID=0; jID<mc->jointHierarchySize; jID++)
         {
-          currentHierarchyLevel = mc->jointHierarchy[jID].hierarchyLevel;
+          unsigned int currentHierarchyLevel = mc->jointHierarchy[jID].hierarchyLevel;
 
           if (jID+1<mc->jointHierarchySize) { hasNext=1; }
 

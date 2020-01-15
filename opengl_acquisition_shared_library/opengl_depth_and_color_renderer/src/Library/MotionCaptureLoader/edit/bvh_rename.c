@@ -18,11 +18,10 @@ void uppercase(char *a)
 
 void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
 {
- unsigned int pJID;
  unsigned int jID;
  for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
-    pJID=bvhMotion->jointHierarchy[jID].parentJoint;
+    unsigned int pJID=bvhMotion->jointHierarchy[jID].parentJoint;
     char * jPN = bvhMotion->jointHierarchy[pJID].jointName;
     char * jN = bvhMotion->jointHierarchy[jID].jointName;
 

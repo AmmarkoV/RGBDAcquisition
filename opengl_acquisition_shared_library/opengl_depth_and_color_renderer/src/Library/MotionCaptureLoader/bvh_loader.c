@@ -329,7 +329,6 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
   int done=0;
   int atHeaderSection=0;
-  ssize_t read;
 
 
   int debug=0;
@@ -354,6 +353,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
     unsigned int hierarchyLevel=0;
     char * line = NULL;
     size_t len = 0;
+    ssize_t read;
 
     while  ( (!done) && ((read = getline(&line, &len, fd)) != -1) )
     {
@@ -566,7 +566,7 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
           else
          {
             //Unexpected input..
-            fprintf(stderr,"Unexpected line num (%u) of length %zu :\n" , bvhMotion->linesParsed , read);
+            fprintf(stderr,"Unexpected line num (%u) of length %zd :\n" , bvhMotion->linesParsed , read);
             fprintf(stderr,"%s", line);
          }
 
@@ -635,7 +635,7 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
    InputParser_SetDelimeter(ipc,3,10);
    InputParser_SetDelimeter(ipc,4,13);
 
-   unsigned int i=0;
+   //unsigned int i=0;
    unsigned int numberOfParameters = InputParser_SeperateWordsCC(ipc,parameters,1);
    //fprintf(stderr,"MOTION command has %u parameters\n",numberOfParameters);
 
@@ -651,7 +651,7 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
               numberOfParameters+bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame
              );*/
 
-      for (i=0; i<numberOfParameters; i++)
+      for (unsigned int i=0; i<numberOfParameters; i++)
       {
         //fprintf(stderr,"P%u=%0.2f ",i,InputParser_GetWordFloat(ipc,i));
         bvhMotion->motionValues[i+bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame] = InputParser_GetWordFloat(ipc,i);
@@ -678,7 +678,6 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
 int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 {
   int atMotionSection=0;
-  ssize_t read;
 
   if (fd!=0)
   {
@@ -691,6 +690,7 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
     char str[MAX_BVH_FILE_LINE_SIZE+1]={0};
     char * line = NULL;
     size_t len = 0;
+    ssize_t read;
 
     while ((read = getline(&line, &len, fd)) != -1)
     {
@@ -1124,16 +1124,34 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
     fprintf(stderr,"bvh_onlyAnimateGivenJoints with %u arguments\n",numberOfArguments);
 
     BVHJointID * activeJoints = (BVHJointID*) malloc(sizeof(BVHJointID) * numberOfArguments);
-    memset(activeJoints,0,sizeof(BVHJointID) * numberOfArguments);
+    //-----------------------------------------------------------------------------------------------
+    if (activeJoints==0)
+    {
+      fprintf(stderr,"bvh_onlyAnimateGivenJoints failed to allocate space for %u arguments\n",numberOfArguments);
+      return 0; 
+    } else
+    {
+      memset(activeJoints,0,sizeof(BVHJointID) * numberOfArguments);
+    }
+    
+    
 
     char * successJoints = (char *) malloc(sizeof(char) * numberOfArguments);
-    memset(successJoints,0,sizeof(char) * numberOfArguments);
-
+    //-----------------------------------------------------------------------------------------------
+    if (successJoints==0)
+    {
+      fprintf(stderr,"bvh_onlyAnimateGivenJoints failed to allocate space for %u arguments\n",numberOfArguments);
+      free(activeJoints);
+      return 0; 
+    } else
+    {
+     memset(successJoints,0,sizeof(char) * numberOfArguments);
+    }
 
     if ((activeJoints!=0) && (successJoints!=0))
     {
 
-    for (int i=0; i<numberOfArguments; i++)
+    for (unsigned int i=0; i<numberOfArguments; i++)
     {
       BVHJointID jID=0;
 
@@ -1156,7 +1174,7 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
     }
 
 
-      unsigned int firstFrame=0,jointID=0;
+      unsigned int jointID=0;
       unsigned int mID_Initial,mID_Target;
       for (int frameID=0; frameID<bvhMotion->numberOfFramesEncountered; frameID++)
        {
@@ -1188,6 +1206,7 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
          }
 
          /* This does the inverse
+         unsigned int firstFrame=0;
          for (int aJ=0; aJ<numberOfArguments; aJ++)
          {
            if (successJoints[aJ])
@@ -1391,9 +1410,7 @@ int bvh_selectJoints(
                     unsigned int iplus1
                    )
 {
-  unsigned int success=1;
   fprintf(stderr,"Asked to select %u Joints\n",numberOfValues);
-  int i=0;
 
   mc->selectionIncludesEndSites=includeEndSites;
   mc->numberOfJointsWeWantToSelect=numberOfValues;
@@ -1401,14 +1418,22 @@ int bvh_selectJoints(
   if (mc->hideSelectedJoints!=0) { free(mc->hideSelectedJoints); mc->hideSelectedJoints=0; }
 
   mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+  if (mc->selectedJoints!=0) { fprintf(stderr,"bvh_selectJoints failed to allocate selectedJoints\n"); return 0; }
+  
   mc->hideSelectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+  if (mc->hideSelectedJoints!=0) { fprintf(stderr,"bvh_selectJoints failed to allocate hideSelectedJoints\n"); free(mc->selectedJoints); return 0; }
+
 
   if ( (mc->selectedJoints!=0) && (mc->hideSelectedJoints!=0) )
-  {
+  {   
+    unsigned int success=1;
+  
     memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
     memset(mc->hideSelectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
     BVHJointID jID=0;
     fprintf(stderr,"Selecting : ");
+    
+    unsigned int i=0;
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
       if (
@@ -1460,10 +1485,11 @@ int bvh_selectJointsToHide2D(
                              unsigned int iplus1
                             )
 {
-  unsigned int success=1;
   if ( (mc->selectedJoints!=0) && (mc->hideSelectedJoints!=0) )
   {
-    int i=0;
+    unsigned int success=1;
+  
+    unsigned int i=0;
     BVHJointID jID=0;
     fprintf(stderr,"Hiding 2D Coordinates : ");
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
@@ -1554,9 +1580,9 @@ void bvh_printBVH(struct BVH_MotionCapture * bvhMotion)
       }
      fprintf(stdout,"\n");
     //===============================================================
-    fprintf(stdout,"isRoot %u - ",bvhMotion->jointHierarchy[i].isRoot);
-    fprintf(stdout,"isEndSite %u - ",bvhMotion->jointHierarchy[i].isEndSite);
-    fprintf(stdout,"hasEndSite %u\n",bvhMotion->jointHierarchy[i].hasEndSite);
+    fprintf(stdout,"isRoot %u - ",(unsigned int) bvhMotion->jointHierarchy[i].isRoot);
+    fprintf(stdout,"isEndSite %u - ",(unsigned int) bvhMotion->jointHierarchy[i].isEndSite);
+    fprintf(stdout,"hasEndSite %u\n",(unsigned int) bvhMotion->jointHierarchy[i].hasEndSite);
     fprintf(stdout,"level %u\n",bvhMotion->jointHierarchy[i].hierarchyLevel );
     fprintf(stdout,"----------------------------------\n");
   }

@@ -205,7 +205,7 @@ int dumpBVHToSVGCSV(
   {
     fprintf(stderr,"Joint Visibility = %0.2f %%\n",(float) 100*invisibleJoints/visibleJoints);
   }
-  fprintf(stderr,"CSV Outputs: 2D:%u, 3D:%u, BVH:%u\n",useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output);
+  fprintf(stderr,"CSV Outputs: 2D:%d, 3D:%d, BVH:%d\n",useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output);
   //------------------------------------------------------------------------------------------
   fprintf(stderr,"Joints : %u invisible / %u visible ",invisibleJoints,visibleJoints);
   if (occlusions) { fprintf(stderr,"(occlusions enabled)\n"); } else

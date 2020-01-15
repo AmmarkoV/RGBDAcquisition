@@ -45,17 +45,18 @@ int bvh_PerturbJointAnglesRange(
                            unsigned int iplus2
                           )
 {
-  int success=1;
 
   fprintf(stderr,"Asked to randomize %u Joint Angles in the range [%0.2f,%0.2f] deviation\n",numberOfValues,start,end);
-  int i=0;
   unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
   if (selectedJoints!=0)
   {
+    int success=1;
+   
     memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
     BVHJointID jID=0;
     unsigned int mID=0;
     fprintf(stderr,"Randomizing : ");
+    unsigned int i=0;
     for (i=iplus2+1; i<=iplus2+numberOfValues; i++)
      {
       fprintf(stderr,GREEN "%s " NORMAL,argv[i]);
@@ -163,17 +164,17 @@ int bvh_eraseJoints(
                     unsigned int iplus1
                    )
 {
-  unsigned int success=1;
   //---------------------
   fprintf(stderr,"Asked to erase %u Joint Angles\n",numberOfValues);
-  int i=0;
   unsigned int * selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
   if (selectedJoints!=0)
   {
+    unsigned int success=1;
     memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
     BVHJointID jID=0;
     unsigned int mID=0;
     fprintf(stderr,"Erasing : ");
+    unsigned int i=0; 
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
       if (

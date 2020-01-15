@@ -273,6 +273,7 @@ int dumpBVHToCSVHeader(
      {
 
       //----------------------------------------------
+      /*             IS THIS NEEDED ?
       unsigned int lastElement=0;
       for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -280,7 +281,7 @@ int dumpBVHToCSVHeader(
          {
            lastElement=jID;
          }
-       }
+       }*/
       //----------------------------------------------
 
 
@@ -478,6 +479,7 @@ int dumpBVHToCSVBody(
 
      //----------------------------------------------
      //This is inneficient
+     /* WHY IS THIS NEEDED?
      unsigned int lastElement=0;
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -486,6 +488,7 @@ int dumpBVHToCSVBody(
            lastElement=jID;
          }
        }
+        * */
      //----------------------------------------------
 
 

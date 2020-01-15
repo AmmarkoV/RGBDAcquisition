@@ -689,6 +689,8 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
       #if WARN_ABOUT_INCORRECTLY_ALLOCATED_STACK_STRINGS
        if (warningsAboutIncorrectlyAllocatedStackIssued==0)
         {
+         fprintf(stderr,"InputParser %s \n\n\n",InputParserC_Version());   
+            
          fprintf(stderr,"Please note that feeding input parser with strings allocated on the stack it is generally a good idea to enable keepcopy\n");
          fprintf(stderr,"For example passing here a string allocated as  char* hello = \"hello!\"; might lead to a segFault ( i.e. when calling InputParser_GetWordFloat ) \n");
          fprintf(stderr,"The correct way for allocating a string with in place processing is char hello[] = \"hello!\"; \n");
@@ -707,8 +709,8 @@ int InputParser_SeperateWords(struct InputParserC * ipc,char * inpt,char keepcop
   if (CheckIPCOk(ipc)==0) { return 0; }
   if  ( inpt == 0 ) return 0; /* NULL INPUT -> NULL OUTPUT*/
 
-  unsigned int   STRING_END = strlen(inpt) ;
-  int WORDS_SEPERATED = 0 , NEXT_SHOULD_NOT_BE_A_DELIMITER=1 , FOUND_DELIMETER ; /* Ignores starting ,,,,,string,etc*/
+  unsigned int STRING_END = strlen(inpt) ;
+  unsigned int WORDS_SEPERATED = 0 , NEXT_SHOULD_NOT_BE_A_DELIMITER=1 , FOUND_DELIMETER=0; /* Ignores starting ,,,,,string,etc*/
 
   if ( STRING_END == 0 ) { return 0; } /* NULL INPUT -> NULL OUTPUT pt 2*/
 

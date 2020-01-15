@@ -77,7 +77,6 @@ void dumpSphereBody(
 
 int dumpBVHToTrajectoryParserPrimitives(const char * filename , struct BVH_MotionCapture * mc)
 {
-  unsigned int fID=0;
   FILE * fp = fopen(filename,"w");
 
   struct BVH_Transform bvhTransform={0};
@@ -107,6 +106,7 @@ int dumpBVHToTrajectoryParserPrimitives(const char * filename , struct BVH_Motio
       dumpSphereHeader(mc,fp);
     //------------------------------------------------
 
+    unsigned int fID=0;
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {
       dumpSphereBody(

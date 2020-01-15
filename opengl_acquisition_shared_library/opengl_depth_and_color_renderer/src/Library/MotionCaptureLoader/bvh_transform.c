@@ -265,11 +265,11 @@ int bvh_populateRectangle2DFromProjections(
                                            struct rectangleArea * area
                                           )
 {
-  unsigned int existing2DPoints=0;
-  unsigned int jID=0;
-
   if (area->exists)
   {
+    unsigned int jID=0;
+    unsigned int existing2DPoints=0;
+  
     //-----------------------------------------------------------
     jID=area->jID[0];
     if (bvhTransform->joint[jID].pos2DCalculated)
@@ -366,8 +366,8 @@ int bvh_loadTransformForFrame(
   }
 
   //We need some space to store values
-  double posX=0.0,posY=0.0,posZ=0.0;
-  double rotX=0.0,rotY=0.0,rotZ=0.0;
+  //double posX=0.0,posY=0.0,posZ=0.0;
+  //double rotX=0.0,rotY=0.0,rotZ=0.0;
   float data[8]={0};
 
   //First of all we need to populate all local transformation in our chain
@@ -381,12 +381,12 @@ int bvh_loadTransformForFrame(
         fprintf(stderr,"Error extracting dynamic transformation for jID=%u @ fID=%u\n",jID,fID);
       }
 
-      posX = fToD(data[0]);
-      posY = fToD(data[1]);
-      posZ = fToD(data[2]);
-      rotX = fToD(data[3]);
-      rotY = fToD(data[4]);
-      rotZ = fToD(data[5]);
+      double posX = fToD(data[0]);
+      double posY = fToD(data[1]);
+      double posZ = fToD(data[2]);
+      double rotX = fToD(data[3]);
+      double rotY = fToD(data[4]);
+      double rotZ = fToD(data[5]);
 
       if (bvhMotion->jointHierarchy[jID].isRoot)
       {
@@ -548,8 +548,8 @@ int bvh_loadTransformForMotionBuffer(
 
 
   //We need some space to store values
-  double posX=0.0,posY=0.0,posZ=0.0;
-  double rotX=0.0,rotY=0.0,rotZ=0.0;
+  //double posX=0.0,posY=0.0,posZ=0.0;
+  //double rotX=0.0,rotY=0.0,rotZ=0.0;
   float data[8]={0};
 
   //First of all we need to populate all local transformation in our chain
@@ -563,12 +563,12 @@ int bvh_loadTransformForMotionBuffer(
         fprintf(stderr,"Error extracting dynamic transformation for jID=%u and a motionBuffer\n",jID);
       }
 
-      posX = fToD(data[0]);
-      posY = fToD(data[1]);
-      posZ = fToD(data[2]);
-      rotX = fToD(data[3]);
-      rotY = fToD(data[4]);
-      rotZ = fToD(data[5]);
+      double posX = fToD(data[0]);
+      double posY = fToD(data[1]);
+      double posZ = fToD(data[2]);
+      double rotX = fToD(data[3]);
+      double rotY = fToD(data[4]);
+      double rotZ = fToD(data[5]);
 
       if (bvhMotion->jointHierarchy[jID].isRoot)
       {
