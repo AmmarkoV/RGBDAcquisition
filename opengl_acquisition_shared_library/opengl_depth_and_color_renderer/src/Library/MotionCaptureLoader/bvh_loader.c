@@ -724,6 +724,10 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
              //If we haven't yet allocated a motionValues array we need to do so now..!
              bvhMotion->motionValuesSize = bvhMotion->numberOfFrames * bvhMotion->numberOfValuesPerFrame;
              bvhMotion->motionValues = (float*)  malloc(sizeof(float) * (1+bvhMotion->motionValuesSize));
+             if (bvhMotion->motionValues==0)
+             {
+               fprintf(stderr,"Failed to allocate enough memory for motion values..\n");
+             }
            }
 
            //This is motion input
@@ -1128,13 +1132,13 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
     if (activeJoints==0)
     {
       fprintf(stderr,"bvh_onlyAnimateGivenJoints failed to allocate space for %u arguments\n",numberOfArguments);
-      return 0; 
+      return 0;
     } else
     {
       memset(activeJoints,0,sizeof(BVHJointID) * numberOfArguments);
     }
-    
-    
+
+
 
     char * successJoints = (char *) malloc(sizeof(char) * numberOfArguments);
     //-----------------------------------------------------------------------------------------------
@@ -1142,7 +1146,7 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
     {
       fprintf(stderr,"bvh_onlyAnimateGivenJoints failed to allocate space for %u arguments\n",numberOfArguments);
       free(activeJoints);
-      return 0; 
+      return 0;
     } else
     {
      memset(successJoints,0,sizeof(char) * numberOfArguments);
@@ -1418,21 +1422,21 @@ int bvh_selectJoints(
   if (mc->hideSelectedJoints!=0) { free(mc->hideSelectedJoints); mc->hideSelectedJoints=0; }
 
   mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
-  if (mc->selectedJoints!=0) { fprintf(stderr,"bvh_selectJoints failed to allocate selectedJoints\n"); return 0; }
-  
+  if (mc->selectedJoints==0) { fprintf(stderr,"bvh_selectJoints failed to allocate selectedJoints\n"); return 0; }
+
   mc->hideSelectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
-  if (mc->hideSelectedJoints!=0) { fprintf(stderr,"bvh_selectJoints failed to allocate hideSelectedJoints\n"); free(mc->selectedJoints); return 0; }
+  if (mc->hideSelectedJoints==0) { fprintf(stderr,"bvh_selectJoints failed to allocate hideSelectedJoints\n"); free(mc->selectedJoints); return 0; }
 
 
   if ( (mc->selectedJoints!=0) && (mc->hideSelectedJoints!=0) )
-  {   
+  {
     unsigned int success=1;
-  
+
     memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
     memset(mc->hideSelectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
     BVHJointID jID=0;
     fprintf(stderr,"Selecting : ");
-    
+
     unsigned int i=0;
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
@@ -1488,7 +1492,7 @@ int bvh_selectJointsToHide2D(
   if ( (mc->selectedJoints!=0) && (mc->hideSelectedJoints!=0) )
   {
     unsigned int success=1;
-  
+
     unsigned int i=0;
     BVHJointID jID=0;
     fprintf(stderr,"Hiding 2D Coordinates : ");

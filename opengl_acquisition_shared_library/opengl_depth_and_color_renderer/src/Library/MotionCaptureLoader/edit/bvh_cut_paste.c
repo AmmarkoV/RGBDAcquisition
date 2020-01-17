@@ -230,7 +230,6 @@ int bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
     fprintf(stderr,"bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(mc,%u)\n",poseNumber);
 
     float * valuesThatWillBeCopied = (float * ) malloc(sizeof(float) * mc->numberOfValuesPerFrame);
-
     if (valuesThatWillBeCopied!=0)
     {
       memcpy(
@@ -245,11 +244,18 @@ int bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
       if ( mc->numberOfFrames <360 )
       {
          float * newMotionValues = (float*) malloc(sizeof(float) * mc->numberOfValuesPerFrame * (360) );
-         free(mc->motionValues);
-        mc->motionValues=newMotionValues;
-        mc->numberOfFrames=360;
-        mc->numberOfFramesEncountered=mc->numberOfFrames;
-        mc->motionValuesSize=mc->numberOfValuesPerFrame* mc->numberOfFrames;
+         if (newMotionValues!=0)
+         {
+           free(mc->motionValues);
+           mc->motionValues=newMotionValues;
+           mc->numberOfFrames=360;
+           mc->numberOfFramesEncountered=mc->numberOfFrames;
+           mc->motionValuesSize=mc->numberOfValuesPerFrame* mc->numberOfFrames; 
+         } else
+         {
+           fprintf(stderr,"Failed to allocate memory for new motion values\n");
+           return 0;
+         }
       }
 
 
