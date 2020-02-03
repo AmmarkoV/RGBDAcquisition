@@ -4,6 +4,11 @@
 
 #include "../bvh_loader.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 int checkIfJointsHaveSameGraphOutline(
                                        struct BVH_MotionCapture * mc,
                                        BVHJointID jIDA,
@@ -61,5 +66,9 @@ int bvh_GrowMocapFileBySwappingJointAndItsChildren(
                                                    const char * jointNameB,
                                                    int alsoIncludeOriginalMotion
                                                   );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

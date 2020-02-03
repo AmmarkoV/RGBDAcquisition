@@ -4,6 +4,10 @@
 #include "../bvh_loader.h"
 #include "../bvh_to_tri_pose.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 int dumpBVHToTrajectoryParserTRI(
                                   const char * filename ,
@@ -13,5 +17,8 @@ int dumpBVHToTrajectoryParserTRI(
                                   unsigned int includeSpheres
                                 );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BVH_TO_TRAJECTORYPARSER_H_INCLUDED

@@ -4,12 +4,17 @@
 
 #include "../bvh_loader.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 
 float randomFloatA( float minVal, float maxVal );
 
 int bvh_PerturbJointAnglesRange(
                            struct BVH_MotionCapture * mc,
-                           unsigned int numberOfValues, 
+                           unsigned int numberOfValues,
                            float  start,
                            float  end,
                            unsigned int specificChannel,
@@ -80,5 +85,11 @@ int bvh_TestRandomizationLimitsXYZ(
                                    float * minimumPosition,
                                    float * maximumPosition
                                   );
+
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

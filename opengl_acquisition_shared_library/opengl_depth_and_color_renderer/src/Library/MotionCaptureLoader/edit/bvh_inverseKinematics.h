@@ -6,6 +6,12 @@
 
 #include "../export/bvh_export.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 int BVHTestIK(
               struct BVH_MotionCapture * mc,
               unsigned int fIDSource,
@@ -17,5 +23,9 @@ int bvh_MirrorJointsThroughIK(
                                const char * jointNameA,
                                const char * jointNameB
                              );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

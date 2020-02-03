@@ -6,6 +6,11 @@
 #include "../bvh_transform.h"
 #include "../../../../../../tools/AmMatrix/simpleRenderer.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 extern unsigned int invisibleJoints;
 extern unsigned int   visibleJoints;
 extern unsigned int filteredOutCSVBehindPoses;
@@ -34,5 +39,10 @@ int dumpBVHToCSVBody(
                        unsigned int filterWeirdSkeletons,
                        unsigned int encodeRotationsAsRadians
                       );
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BVH_TO_SVG_H_INCLUDED

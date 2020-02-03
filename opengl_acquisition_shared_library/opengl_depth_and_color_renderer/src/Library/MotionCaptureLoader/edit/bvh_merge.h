@@ -5,6 +5,10 @@
 
 #include "../bvh_loader.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 struct BVH_MergeAssociations
 {
@@ -22,5 +26,8 @@ int bvh_mergeWith(
                    const char * pathToMergeRules
                  );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

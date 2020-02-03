@@ -3,6 +3,10 @@
 
 #include "bvh_loader.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 
 struct BVH_RotationOrder
@@ -35,5 +39,10 @@ int bvh_loadBVHToTRIAssociationFile(
                                     struct bvhToTRI * bvhtri,
                                     struct BVH_MotionCapture * mc
                                   );
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BVH_TO_TRI_POSE_H_INCLUDED

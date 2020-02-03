@@ -6,6 +6,11 @@
 #include "../bvh_transform.h"
 #include "../bvh_project.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 extern unsigned int filteredOutCSVBehindPoses;
 extern unsigned int filteredOutCSVOutPoses;
 
@@ -44,5 +49,8 @@ int dumpBVHToSVGCSV(
                     unsigned int encodeRotationsAsRadians
                    );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BVH_EXPORT_H_INCLUDED

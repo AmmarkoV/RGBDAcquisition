@@ -4,6 +4,10 @@
 
 #include "../bvh_loader.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 void lowercase(char *a);
 
@@ -19,5 +23,12 @@ void bvh_updateJointNameHashes(struct BVH_MotionCapture * bvhMotion);
 * @param  BVH Structure
 */
 void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif
