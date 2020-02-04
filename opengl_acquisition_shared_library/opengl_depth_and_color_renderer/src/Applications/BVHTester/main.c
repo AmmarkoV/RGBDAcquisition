@@ -122,6 +122,54 @@ void incorrectArguments()
 }
 
 
+int testMultipleLoad(const char * filename)
+{
+ struct BVH_MotionCapture bvhMotion={0};
+
+ ssize_t read;
+ FILE * fp = fopen(filename,"r");
+    if (fp!=0)
+        {
+            char * line = NULL;
+            size_t len = 0;
+
+            while ((read = getline(&line, &len, fp)) != -1)
+                {
+                  if (line!=0)
+                  {
+                    int lineLength = strlen(line);
+                    if (lineLength>=1)
+                    {
+                      if (line[lineLength-1]==10) { line[lineLength-1]=0; }
+                      if (line[lineLength-1]==13) { line[lineLength-1]=0; }
+                    }
+                    if (lineLength>=2)
+                    {
+                      if (line[lineLength-2]==10) { line[lineLength-2]=0; }
+                      if (line[lineLength-2]==13) { line[lineLength-2]=0; }
+                    }
+
+                  fprintf(stderr,"Next file is `%s`\n",line);
+                  if ( bvh_loadBVH(line, &bvhMotion, 1.0) )
+                   {
+                      fprintf(stderr,"Loaded file `%s`\n",line);
+                      //Change joint names..
+                      bvh_renameJointsForCompatibility(&bvhMotion);
+                      fprintf(stderr,"Did rename `%s`\n",line);
+                      bvh_free(&bvhMotion);
+                      fprintf(stderr,"Freed file `%s`\n",line);
+                   }
+                  }
+                }
+
+          if (line!=0) { free(line); }
+          fclose(fp);
+          return 1;
+        }
+  return 0;
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -196,6 +244,13 @@ int main(int argc, char **argv)
         if (strcmp(argv[i],"--test")==0)
         {
           bvh_testConstrainRotations();
+          exit(0);
+        } else
+        //-----------------------------------------------------
+        if (strcmp(argv[i],"--testmultiple")==0)
+        {
+          if (i+1>=argc)  { incorrectArguments(); }
+          testMultipleLoad(argv[i+1]);
           exit(0);
         } else
         //-----------------------------------------------------
@@ -621,7 +676,7 @@ int main(int argc, char **argv)
           // ./BVHTester --from Motions/02_03.bvh --randomize2D 1400 5000 -35 -90 -35 35 90 35 --occlusions --svg tmp/
           if (i+8>=argc)  { incorrectArguments(); }
           float minimumRotation[3];
-          float maximumRotation[3]; 
+          float maximumRotation[3];
 
           float minimumDepth=-1*atof(argv[i+1])/10;
           float maximumDepth=-1*atof(argv[i+2])/10;
