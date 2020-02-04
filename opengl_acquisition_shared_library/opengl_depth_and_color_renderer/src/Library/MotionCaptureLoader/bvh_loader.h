@@ -185,7 +185,7 @@ struct BVH_MotionCapture
   float * motionValues;
 
   //Internal Variables..
-  char fileName[1024];
+  char fileName[2048];
   unsigned int linesParsed;
   
   //---------

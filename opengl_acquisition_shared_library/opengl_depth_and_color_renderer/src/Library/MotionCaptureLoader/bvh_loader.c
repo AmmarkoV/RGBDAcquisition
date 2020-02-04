@@ -767,7 +767,7 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
   fd = fopen(filename,"r");
   if (fd!=0)
     {
-      snprintf(bvhMotion->fileName,1024,"%s",filename);
+      snprintf(bvhMotion->fileName,2047,"%s",filename);
       if (readBVHHeader(bvhMotion,fd))
       {
        //If we have the header let's update the hashes
