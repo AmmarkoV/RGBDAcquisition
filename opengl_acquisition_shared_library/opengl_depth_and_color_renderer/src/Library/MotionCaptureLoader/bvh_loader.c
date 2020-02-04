@@ -393,6 +393,12 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame;
 
                currentJoint=jNum;
+               
+               if (currentJoint>=MAX_BVH_JOINT_HIERARCHY_SIZE)
+               {
+                 fprintf(stderr,"We have run out of space for our joint hierarchy..\n");
+               }
+               
                ++jNum;
              } else
          if (InputParser_WordCompareAuto(ipcB,0,"JOINT"))

@@ -199,43 +199,35 @@ int bvh_populateTorso3DFromTransform(
        //-------------------------------------------------------------
        if ( bvh_getJointIDFromJointName(mc,"lshoulder",&jID) )
        {
-          {
            bvhTransform->torso.point1Exists=1;
            bvhTransform->torso.rectangle3D.x1=bvhTransform->joint[jID].pos3D[0];
            bvhTransform->torso.rectangle3D.y1=bvhTransform->joint[jID].pos3D[1];
            bvhTransform->torso.rectangle3D.z1=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[0]=jID;
-          }
        }
        if ( bvh_getJointIDFromJointName(mc,"rshoulder",&jID) )
        {
-          {
            bvhTransform->torso.point2Exists=1;
            bvhTransform->torso.rectangle3D.x2=bvhTransform->joint[jID].pos3D[0];
            bvhTransform->torso.rectangle3D.y2=bvhTransform->joint[jID].pos3D[1];
            bvhTransform->torso.rectangle3D.z2=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[1]=jID;
-          }
        }
        if ( bvh_getJointIDFromJointName(mc,"rhip",&jID) )
        {
-          {
            bvhTransform->torso.point3Exists=1;
            bvhTransform->torso.rectangle3D.x3=bvhTransform->joint[jID].pos3D[0];
            bvhTransform->torso.rectangle3D.y3=bvhTransform->joint[jID].pos3D[1];
            bvhTransform->torso.rectangle3D.z3=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[2]=jID;
-          }
        }
        if ( bvh_getJointIDFromJointName(mc,"lhip",&jID) )
        {
-          {
            bvhTransform->torso.point4Exists=1;
            bvhTransform->torso.rectangle3D.x4=bvhTransform->joint[jID].pos3D[0];
            bvhTransform->torso.rectangle3D.y4=bvhTransform->joint[jID].pos3D[1];
            bvhTransform->torso.rectangle3D.z4=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[3]=jID;
-          }
        }
 
        if (
@@ -324,7 +316,7 @@ int bvh_populateRectangle2DFromProjections(
     }
   } else
   {
-   fprintf(stderr,"Area does not exist, why get 2D positions?\n");
+   fprintf(stderr,"bvh_populateRectangle2DFromProjections: Area does not exist..\n");
   }
 
  return 0;

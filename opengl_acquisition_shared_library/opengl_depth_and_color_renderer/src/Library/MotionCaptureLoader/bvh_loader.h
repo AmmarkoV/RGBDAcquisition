@@ -24,7 +24,7 @@ extern "C"
 * @brief MAX_BVH_JOINT_HIERARCHY_SIZE is the maximum number of Joints
 * @ingroup BVH
 */
-#define MAX_BVH_JOINT_HIERARCHY_SIZE 256
+#define MAX_BVH_JOINT_HIERARCHY_SIZE 1024
 
 
 /**

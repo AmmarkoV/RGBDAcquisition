@@ -251,18 +251,18 @@ int bvh_projectTo2D(
         ++pointsDumped;
       } //Joint Loop , render all joint points..
 
-
-    //Also project our Torso coordinates..
-    bvh_populateRectangle2DFromProjections(
-                                           mc,
-                                           bvhTransform,
-                                           &bvhTransform->torso
-                                          );
-
-
     //------------------------------------------------------------------------------------------
     if (occlusions)
      {
+      //Also project our Torso coordinates..
+      bvh_populateRectangle2DFromProjections(
+                                             mc,
+                                             bvhTransform,
+                                             &bvhTransform->torso
+                                            );
+
+
+
        bvh_projectTo2DHandleOcclusions(
                                        mc,
                                        bvhTransform
