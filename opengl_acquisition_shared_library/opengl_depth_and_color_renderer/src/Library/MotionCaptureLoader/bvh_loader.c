@@ -786,26 +786,13 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 
 int bvh_free(struct BVH_MotionCapture * bvhMotion)
 {
-  if ( bvhMotion==0 ) { return 0; }
-  if ( bvhMotion->motionValues!= 0 )            {  free(bvhMotion->motionValues);  bvhMotion->motionValues=0;  } 
-  if (bvhMotion->selectedJoints!=0)            {  free(bvhMotion->selectedJoints); bvhMotion->selectedJoints=0;  } 
-  if (bvhMotion->hideSelectedJoints!=0)  {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  } 
+  if (bvhMotion==0) { return 0; }
+  if (bvhMotion->motionValues!=0)               {  free(bvhMotion->motionValues);       bvhMotion->motionValues=0;  } 
+  if (bvhMotion->selectedJoints!=0)             {  free(bvhMotion->selectedJoints);     bvhMotion->selectedJoints=0;  } 
+  if (bvhMotion->hideSelectedJoints!=0)         {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  } 
         
-  bvhMotion->numberOfFrames=0;
-  bvhMotion->numberOfFramesEncountered=0;
-  bvhMotion->frameTime=0;
+  memset(bvhMotion,0,sizeof(struct BVH_MotionCapture));
 
-  //Joint Hierarchy
-  bvhMotion->MAX_jointHierarchySize=0;
-  bvhMotion->jointHierarchySize=0;
-
-  //We may want to only work with specific selected joints..!
-  bvhMotion->selectionIncludesEndSites=0;
-  bvhMotion->numberOfJointsWeWantToSelect=0;
-   
-  bvhMotion->numberOfValuesPerFrame=0;
-  bvhMotion->motionValuesSize=0;        
-        
   return 1;
 }
 //----------------------------------------------------------------------------------------------------
