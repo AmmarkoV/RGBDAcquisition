@@ -7,12 +7,14 @@
 
 void lowercase(char *a)
 {
+   if (a==0) { return; } 
    while (*a!=0) { *a = tolower(*a); ++a; }
 }
 
 
 void uppercase(char *a)
 {
+   if (a==0) { return; } 
    while (*a!=0) { *a = toupper(*a); ++a; }
 }
 
@@ -143,12 +145,17 @@ void bvh_updateJointNameHashes(struct BVH_MotionCapture * bvhMotion)
 
 void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
 {
+  if (bvhMotion==0)  { fprintf(stderr,"Cannot rename joints of NULL bvh file\n"); return ; }  
+  if (bvhMotion->jointHierarchy==0)  { fprintf(stderr,"Cannot rename joints of NULL bvh hierarchy \n"); return ; }  
+  if (bvhMotion->jointHierarchySize==0)  { fprintf(stderr,"Cannot rename joints of empty bvh hierarchy\n"); return ; }  
+    
   unsigned int jID=0;
 
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
      char * jN = bvhMotion->jointHierarchy[jID].jointName;
-
+     if (jN!=0)
+     {
      lowercase(jN);
 
      //-------------------------------------------------------------------------------------------------
@@ -256,6 +263,7 @@ void bvh_renameJointsForCompatibility(struct BVH_MotionCapture * bvhMotion)
          )
             { snprintf(jN,MAX_BVH_JOINT_NAME,"rhand"); }
      //-------------------------------------------------------------------------------------------------
+   }
    }
 
 
