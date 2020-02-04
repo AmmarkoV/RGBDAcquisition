@@ -648,7 +648,8 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
 
    if (numberOfParameters==bvhMotion->numberOfValuesPerFrame)
    {
-     if (numberOfParameters + bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame < bvhMotion->motionValuesSize+1)
+     unsigned int finalMemoryLocation = (numberOfParameters-1) + (bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame);
+     if (finalMemoryLocation < bvhMotion->motionValuesSize)
      {
       /*
       fprintf(stderr,
@@ -660,7 +661,8 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
       for (unsigned int i=0; i<numberOfParameters; i++)
       {
         //fprintf(stderr,"P%u=%0.2f ",i,InputParser_GetWordFloat(ipc,i));
-        bvhMotion->motionValues[i+bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame] = InputParser_GetWordFloat(ipc,i);
+        unsigned int thisMemoryLocation = i+(bvhMotion->numberOfFramesEncountered * bvhMotion->numberOfValuesPerFrame);
+        bvhMotion->motionValues[thisMemoryLocation] = InputParser_GetWordFloat(ipc,i);
       }
      }
      bvhMotion->numberOfFramesEncountered++;
