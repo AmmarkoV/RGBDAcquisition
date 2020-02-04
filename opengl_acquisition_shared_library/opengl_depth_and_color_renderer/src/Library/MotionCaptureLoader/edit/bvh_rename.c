@@ -94,6 +94,8 @@ void bvh_setTorsoImmunityForJoints(struct BVH_MotionCapture * bvhMotion)
  for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
       char * jN = bvhMotion->jointHierarchy[jID].jointName;
+     if (jN!=0)   
+         {
       if (
            (strcmp(jN,"abdomen")==0) ||
            (strcmp(jN,"chest")==0) ||
@@ -114,6 +116,7 @@ void bvh_setTorsoImmunityForJoints(struct BVH_MotionCapture * bvhMotion)
       {
         bvhMotion->jointHierarchy[jID].isImmuneToTorsoOcclusions=0;
       }
+    }
    }
 }
 
@@ -150,7 +153,7 @@ void bvh_updateJointNameHashes(struct BVH_MotionCapture * bvhMotion)
 
   for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
-   bvhMotion->jointHierarchy[jID].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jID].jointName);
+       bvhMotion->jointHierarchy[jID].jointNameHash = hashFunctionJoints(bvhMotion->jointHierarchy[jID].jointName);
    }
 
 }

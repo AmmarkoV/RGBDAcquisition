@@ -788,8 +788,8 @@ int bvh_free(struct BVH_MotionCapture * bvhMotion)
 {
   if ( bvhMotion==0 ) { return 0; }
   if ( bvhMotion->motionValues!= 0 )            {  free(bvhMotion->motionValues);  bvhMotion->motionValues=0;  } 
-  if (bvhMotion->selectedJoints==0)            {  free(bvhMotion->selectedJoints); bvhMotion->selectedJoints=0;  } 
-  if (bvhMotion->hideSelectedJoints==0)  {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  } 
+  if (bvhMotion->selectedJoints!=0)            {  free(bvhMotion->selectedJoints); bvhMotion->selectedJoints=0;  } 
+  if (bvhMotion->hideSelectedJoints!=0)  {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  } 
         
   bvhMotion->numberOfFrames=0;
   bvhMotion->numberOfFramesEncountered=0;
