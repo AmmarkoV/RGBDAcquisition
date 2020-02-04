@@ -197,7 +197,11 @@ int bvh_populateTorso3DFromTransform(
  unsigned int jID=0;
  //Second test occlusions with torso..!
        //-------------------------------------------------------------
-       if ( bvh_getJointIDFromJointName(mc,"lshoulder",&jID) )
+       int found=0;
+       if ( bvh_getJointIDFromJointName(mc,"lshoulder",&jID) ) { found=1; } else
+       if ( bvh_getJointIDFromJointName(mc,"lShldr",&jID) )    { found=1; }
+       
+       if (found)
        {
            bvhTransform->torso.point1Exists=1;
            bvhTransform->torso.rectangle3D.x1=bvhTransform->joint[jID].pos3D[0];
@@ -205,7 +209,14 @@ int bvh_populateTorso3DFromTransform(
            bvhTransform->torso.rectangle3D.z1=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[0]=jID;
        }
-       if ( bvh_getJointIDFromJointName(mc,"rshoulder",&jID) )
+       
+       //---
+       
+       found=0;
+       if ( bvh_getJointIDFromJointName(mc,"rshoulder",&jID) ) { found=1; } else
+       if ( bvh_getJointIDFromJointName(mc,"rShldr",&jID) )    { found=1; }
+           
+       if (found)
        {
            bvhTransform->torso.point2Exists=1;
            bvhTransform->torso.rectangle3D.x2=bvhTransform->joint[jID].pos3D[0];
@@ -213,7 +224,14 @@ int bvh_populateTorso3DFromTransform(
            bvhTransform->torso.rectangle3D.z2=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[1]=jID;
        }
-       if ( bvh_getJointIDFromJointName(mc,"rhip",&jID) )
+
+       //---
+
+       found=0;
+       if ( bvh_getJointIDFromJointName(mc,"rhip",&jID) )      { found=1; } else
+       if ( bvh_getJointIDFromJointName(mc,"rThigh",&jID) )    { found=1; }
+       
+       if (found)
        {
            bvhTransform->torso.point3Exists=1;
            bvhTransform->torso.rectangle3D.x3=bvhTransform->joint[jID].pos3D[0];
@@ -221,7 +239,14 @@ int bvh_populateTorso3DFromTransform(
            bvhTransform->torso.rectangle3D.z3=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[2]=jID;
        }
-       if ( bvh_getJointIDFromJointName(mc,"lhip",&jID) )
+       
+       //---
+       
+       found=0;
+       if ( bvh_getJointIDFromJointName(mc,"lhip",&jID) )      { found=1; } else
+       if ( bvh_getJointIDFromJointName(mc,"lThigh",&jID) )    { found=1; }
+           
+       if (found)
        {
            bvhTransform->torso.point4Exists=1;
            bvhTransform->torso.rectangle3D.x4=bvhTransform->joint[jID].pos3D[0];
@@ -245,6 +270,8 @@ int bvh_populateTorso3DFromTransform(
             return 1;
          }
        //-------------------------------------------------------------
+       
+  fprintf(stderr,"%u %u %u %u\n",bvhTransform->torso.point1Exists,bvhTransform->torso.point2Exists,bvhTransform->torso.point3Exists,bvhTransform->torso.point4Exists);     
   return 0;
 }
 
