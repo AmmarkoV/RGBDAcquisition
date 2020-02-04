@@ -20,13 +20,23 @@ void uppercase(char *a)
 
 void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
 {
+  if (bvhMotion==0)  { fprintf(stderr,"Cannot set limb flags joints of NULL bvh file\n"); return ; }  
+  if (bvhMotion->jointHierarchy==0)  { fprintf(stderr,"Cannot set limb flag of NULL bvh hierarchy \n"); return ; }  
+  if (bvhMotion->jointHierarchySize==0)  { fprintf(stderr,"Cannot set limb flag of empty bvh hierarchy\n"); return ; }  
+    
  unsigned int jID;
  for (jID=0; jID<bvhMotion->jointHierarchySize; jID++)
    {
     unsigned int pJID=bvhMotion->jointHierarchy[jID].parentJoint;
-    char * jPN = bvhMotion->jointHierarchy[pJID].jointName;
+    char * jPN = 0;
+     if (pJID<bvhMotion->jointHierarchySize)
+     {
+          jPN = bvhMotion->jointHierarchy[pJID].jointName;
+     }
     char * jN = bvhMotion->jointHierarchy[jID].jointName;
-
+    
+    if ( (jN!=0) && (jPN!=0) )
+    {
     //----------------------------------------------------------------
     if (
         (strcmp(jN,"abdomen")==0) || (strcmp(jPN,"abdomen")==0) || (strcmp(jN,"chest")==0) || (strcmp(jPN,"chest")==0) || (strcmp(jN,"neck")==0) || (strcmp(jPN,"neck")==0)
@@ -71,6 +81,9 @@ void bvh_setLimbFlags(struct BVH_MotionCapture * bvhMotion)
             bvhMotion->jointHierarchy[jID].isAPartOfLeftFoot=1;
          }
      //----------------------------------------------------------------
+     
+        
+    }
    }
  }
 
