@@ -41,7 +41,7 @@ int bvh_PerturbJointAnglesRange(
                            float  start,
                            float  end,
                            unsigned int specificChannel,
-                           char **argv,
+                           const char **argv,
                            unsigned int iplus2
                           )
 {
@@ -51,7 +51,7 @@ int bvh_PerturbJointAnglesRange(
   if (selectedJoints!=0)
   {
     int success=1;
-   
+
     memset(selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
     BVHJointID jID=0;
     unsigned int mID=0;
@@ -129,7 +129,7 @@ int bvh_PerturbJointAngles(
                            struct BVH_MotionCapture * mc,
                            unsigned int numberOfValues,
                            float  deviation,
-                           char **argv,
+                           const char **argv,
                            unsigned int iplus2
                           )
 {
@@ -174,7 +174,7 @@ int bvh_eraseJoints(
     BVHJointID jID=0;
     unsigned int mID=0;
     fprintf(stderr,"Erasing : ");
-    unsigned int i=0; 
+    unsigned int i=0;
     for (i=iplus1+1; i<=iplus1+numberOfValues; i++)
      {
       if (

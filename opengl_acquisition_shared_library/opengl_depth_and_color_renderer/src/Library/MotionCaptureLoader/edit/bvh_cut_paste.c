@@ -250,10 +250,10 @@ int bvh_GrowMocapFileByGeneratingPoseFromAllViewingAngles(
            mc->motionValues=newMotionValues;
            mc->numberOfFrames=360;
            mc->numberOfFramesEncountered=mc->numberOfFrames;
-           mc->motionValuesSize=mc->numberOfValuesPerFrame* mc->numberOfFrames; 
+           mc->motionValuesSize=mc->numberOfValuesPerFrame* mc->numberOfFrames;
          } else
          {
-            free(valuesThatWillBeCopied); 
+            free(valuesThatWillBeCopied);
            fprintf(stderr,"Failed to allocate memory for new motion values\n");
            return 0;
          }

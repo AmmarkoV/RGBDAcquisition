@@ -18,7 +18,7 @@ int bvh_PerturbJointAnglesRange(
                            float  start,
                            float  end,
                            unsigned int specificChannel,
-                           char **argv,
+                           const char **argv,
                            unsigned int iplus2
                           );
 
@@ -27,7 +27,7 @@ int bvh_PerturbJointAngles(
                            struct BVH_MotionCapture * mc,
                            unsigned int numberOfValues,
                            float  deviation,
-                           char **argv,
+                           const char **argv,
                            unsigned int iplus2
                           );
 
