@@ -176,7 +176,7 @@ int testMultipleLoad(const char * filename)
 
 
 
-int main(int argc, char **argv)
+int main(int argc,const char **argv)
 {
     unsigned int immediatelyHaltOnError=0;
     //----------------------------------------------
@@ -867,7 +867,7 @@ int main(int argc, char **argv)
         {
           //./BVHTester --from Motions/02_03.bvh --to Motions/cmuTomakehuman.profile test.conf
           if (i+2>=argc)  { incorrectArguments(); }
-          char * retargetProfile=argv[i+1];//"Motions/cmu.profile";
+          const char * retargetProfile=argv[i+1];//"Motions/cmu.profile";
           toSceneFile=argv[i+2];
           //toSceneFileTRI
 

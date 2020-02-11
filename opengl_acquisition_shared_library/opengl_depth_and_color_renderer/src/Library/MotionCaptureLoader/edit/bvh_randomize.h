@@ -36,7 +36,7 @@ int bvh_eraseJoints(
                     struct BVH_MotionCapture * mc,
                     unsigned int numberOfValues,
                     unsigned int includeEndSites,
-                    char **argv,
+                    const char **argv,
                     unsigned int iplus1
                    );
 
