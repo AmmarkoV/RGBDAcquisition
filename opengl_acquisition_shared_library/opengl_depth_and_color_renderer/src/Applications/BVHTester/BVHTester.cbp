@@ -72,6 +72,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_cut_paste.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_filter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_filter.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.c">
 			<Option compilerVar="CC" />
 		</Unit>
