@@ -393,12 +393,12 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                bvhMotion->jointToMotionLookup[jNum].jointMotionOffset  = bvhMotion->numberOfValuesPerFrame;
 
                currentJoint=jNum;
-               
+
                if (currentJoint>=MAX_BVH_JOINT_HIERARCHY_SIZE)
                {
                  fprintf(stderr,"We have run out of space for our joint hierarchy..\n");
                }
-               
+
                ++jNum;
              } else
          if (InputParser_WordCompareAuto(ipcB,0,"JOINT"))
@@ -795,10 +795,10 @@ int bvh_loadBVH(const char * filename , struct BVH_MotionCapture * bvhMotion, fl
 int bvh_free(struct BVH_MotionCapture * bvhMotion)
 {
   if (bvhMotion==0) { return 0; }
-  if (bvhMotion->motionValues!=0)               {  free(bvhMotion->motionValues);       bvhMotion->motionValues=0;  } 
-  if (bvhMotion->selectedJoints!=0)             {  free(bvhMotion->selectedJoints);     bvhMotion->selectedJoints=0;  } 
-  if (bvhMotion->hideSelectedJoints!=0)         {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  } 
-        
+  if (bvhMotion->motionValues!=0)               {  free(bvhMotion->motionValues);       bvhMotion->motionValues=0;  }
+  if (bvhMotion->selectedJoints!=0)             {  free(bvhMotion->selectedJoints);     bvhMotion->selectedJoints=0;  }
+  if (bvhMotion->hideSelectedJoints!=0)         {  free(bvhMotion->hideSelectedJoints); bvhMotion->hideSelectedJoints=0;  }
+
   memset(bvhMotion,0,sizeof(struct BVH_MotionCapture));
 
   return 1;
@@ -1255,12 +1255,12 @@ int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int
 
 
 int bvh_changeJointDimensions(
-                                                                       struct BVH_MotionCapture * bvhMotion,
-                                                                       char * jointName,
-                                                                       float xPercent,
-                                                                       float yPercent,
-                                                                       float zPercent
-                                                                    )
+                              struct BVH_MotionCapture * bvhMotion,
+                              const char * jointName,
+                              float xPercent,
+                              float yPercent,
+                              float zPercent
+                             )
 {
    if (bvhMotion==0) { return 0; }
 

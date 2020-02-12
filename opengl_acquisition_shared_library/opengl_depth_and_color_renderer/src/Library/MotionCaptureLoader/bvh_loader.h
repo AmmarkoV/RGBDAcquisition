@@ -187,7 +187,7 @@ struct BVH_MotionCapture
   //Internal Variables..
   char fileName[2048];
   unsigned int linesParsed;
-  
+
   //---------
   char debug;
 };
@@ -335,12 +335,12 @@ int bvh_copyMotionFrame(
 
 
 int bvh_changeJointDimensions(
-                                                                       struct BVH_MotionCapture * bvhMotion,
-                                                                      char * jointName,
-                                                                      float xPercent,
-                                                                      float yPercent,
-                                                                      float zPercent
-                                                                     );
+                               struct BVH_MotionCapture * bvhMotion,
+                               const char * jointName,
+                               float xPercent,
+                               float yPercent,
+                               float zPercent
+                             );
 
 
 int bvh_scaleAllOffsets(

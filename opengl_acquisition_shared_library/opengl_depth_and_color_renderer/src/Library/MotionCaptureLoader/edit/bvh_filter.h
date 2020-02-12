@@ -11,6 +11,8 @@ extern "C"
 {
 #endif
 
+int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * bvhMotion,int argc,const char **argv);
+
 
 #ifdef __cplusplus
 }

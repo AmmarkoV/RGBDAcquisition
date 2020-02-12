@@ -22,6 +22,7 @@
 
 #include "../../Library/MotionCaptureLoader/edit/bvh_cut_paste.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_randomize.h"
+#include "../../Library/MotionCaptureLoader/edit/bvh_filter.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_rename.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_merge.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h"
@@ -274,7 +275,7 @@ int main(int argc,const char **argv)
         {
           //Filter using 2D rules
           //--filterout 1920 1080 570.7 570.3 3 rwrist lhip 10 12 rwrist rhip 5 8 rwrist lwrist 20 25
-
+          filterOutPosesThatAreCloseToRules(&bvhMotion,argc-i,&argv[i+1]);
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--nofilter")==0)
