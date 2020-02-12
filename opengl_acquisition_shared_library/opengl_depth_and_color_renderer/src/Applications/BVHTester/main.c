@@ -270,6 +270,13 @@ int main(int argc,const char **argv)
           exit(0);
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--filterout")==0)
+        {
+          //Filter using 2D rules
+          //--filterout 1920 1080 570.7 570.3 3 rwrist lhip 10 12 rwrist rhip 5 8 rwrist lwrist 20 25
+
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--nofilter")==0)
         {
           filterBehindCamera=0;
