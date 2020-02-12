@@ -262,7 +262,7 @@ int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
 
 
 
-int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int numberOfArguments,char **argv);
+int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int numberOfArguments,const char **argv);
 
 /**
 * @brief Ask if joint has a parent.
@@ -452,7 +452,7 @@ int bvh_selectJoints(
                     struct BVH_MotionCapture * mc,
                     unsigned int numberOfValues,
                     unsigned int includeEndSites,
-                    char **argv,
+                    const char **argv,
                     unsigned int iplus1
                    );
 
@@ -462,7 +462,7 @@ int bvh_selectJointsToHide2D(
                              struct BVH_MotionCapture * mc,
                              unsigned int numberOfValues,
                              unsigned int includeEndSites,
-                             char **argv,
+                             const char **argv,
                              unsigned int iplus1
                             );
 

@@ -429,9 +429,12 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
                     if (debug) fprintf(stderr,"-S-");
                     if (jNum>0)
                     {
-                      snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite_%s",bvhMotion->jointHierarchy[jNum-1].jointName);
-                      //This emmits a warning, which kind of makes sense
-                      // note: ‘snprintf’ output between 9 and 137 bytes into a destination of size 119
+                      int ret = snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite_%s",bvhMotion->jointHierarchy[jNum-1].jointName);
+
+                      if (ret < 0)
+                       {
+                         fprintf(stderr,RED "A huge joint name was encountered please note that this might mean the joint names are not correct..\n" NORMAL );
+                       }
                     } else
                     {
                       snprintf(bvhMotion->jointHierarchy[jNum].jointName,MAX_BVH_JOINT_NAME,"EndSite");
@@ -1135,7 +1138,7 @@ int bhv_getJointParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID)
    return 0;
 }
 
-int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int numberOfArguments,char **argv)
+int bvh_onlyAnimateGivenJoints(struct BVH_MotionCapture * bvhMotion,unsigned int numberOfArguments,const char **argv)
 {
     bvh_printBVH(bvhMotion);
     fprintf(stderr,"bvh_onlyAnimateGivenJoints with %u arguments\n",numberOfArguments);
@@ -1423,7 +1426,7 @@ int bvh_selectJoints(
                     struct BVH_MotionCapture * mc,
                     unsigned int numberOfValues,
                     unsigned int includeEndSites,
-                    char **argv,
+                    const char **argv,
                     unsigned int iplus1
                    )
 {
@@ -1498,7 +1501,7 @@ int bvh_selectJointsToHide2D(
                              struct BVH_MotionCapture * mc,
                              unsigned int numberOfValues,
                              unsigned int includeEndSites,
-                             char **argv,
+                             const char **argv,
                              unsigned int iplus1
                             )
 {
