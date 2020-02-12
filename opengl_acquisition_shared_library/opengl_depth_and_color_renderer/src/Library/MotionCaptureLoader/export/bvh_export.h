@@ -14,7 +14,16 @@ extern "C"
 extern unsigned int filteredOutCSVBehindPoses;
 extern unsigned int filteredOutCSVOutPoses;
 
-
+int performPointProjectionsForFrameForcingPositionAndRotation(
+                                                              struct BVH_MotionCapture * mc,
+                                                              struct BVH_Transform * bvhTransform,
+                                                              unsigned int fID,
+                                                              struct simpleRenderer * renderer,
+                                                              float * forcePosition,
+                                                              float * forceRotation,
+                                                              unsigned int occlusions,
+                                                              unsigned int directRendering
+                                                             );
 
 int performPointProjectionsForFrame(
                                     struct BVH_MotionCapture * mc,

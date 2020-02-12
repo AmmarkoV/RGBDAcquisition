@@ -15,6 +15,39 @@
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
+
+
+int performPointProjectionsForFrameForcingPositionAndRotation(
+                                                              struct BVH_MotionCapture * mc,
+                                                              struct BVH_Transform * bvhTransform,
+                                                              unsigned int fID,
+                                                              struct simpleRenderer * renderer,
+                                                              float * forcePosition,
+                                                              float * forceRotation,
+                                                              unsigned int occlusions,
+                                                              unsigned int directRendering
+                                                             )
+{
+  // bvhTransform->
+   //TODO :
+   fprintf(stderr,"performPointProjectionsForFrameForcingPositionAndRotation not implemented yet");
+   return 0;
+
+  //Try to load the 3D positions of each joint for this particular frame..
+   if (bvh_loadTransformForFrame(mc,fID,bvhTransform))
+       {
+        //If we succeed then we can perform the point projections to 2D..
+        //Project 3D positions on 2D frame and save results..
+        return bvh_projectTo2D(mc,bvhTransform,renderer,occlusions,directRendering);
+       } else
+       //If we fail to load transform , then we can't do any projections and need to clean up
+       { bvh_cleanTransform(mc,bvhTransform); }
+   //----------------------------------------------------------
+ return 0;
+}
+
+
+
 int performPointProjectionsForFrame(
                                      struct BVH_MotionCapture * mc,
                                      struct BVH_Transform * bvhTransform,
