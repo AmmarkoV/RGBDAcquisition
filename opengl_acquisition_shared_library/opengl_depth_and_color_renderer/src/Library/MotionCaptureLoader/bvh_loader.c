@@ -1628,15 +1628,17 @@ int bvh_selectJointsToHide2D(
  {
    if ( (bvhMotion==0)||(framesToRemove==0) ) { return 0; }
 
-   unsigned int framesEliminated=0;
-   int copyingEngaged=0;
    unsigned int offsetMID=0;
+   unsigned int copyingEngaged=0;
+   unsigned int framesEliminated=0;
+   //---------------------------------------------------
    for (int fID=0; fID<bvhMotion->numberOfFrames; fID++)
    {
      if (framesToRemove[fID])
      {
         copyingEngaged=1;
         offsetMID+=bvhMotion->numberOfValuesPerFrame;
+        ++framesEliminated;
      }
 
      if (copyingEngaged)
@@ -1648,15 +1650,17 @@ int bvh_selectJointsToHide2D(
        {
           //Done erasing..
           break;
+          //--------------
        }  else
        {
-        for (int mID=mIDStart; mID<mIDEnd; mID++)
+        for (unsigned int mID=mIDStart; mID<mIDEnd; mID++)
           {
             bvhMotion->motionValues[mID]=bvhMotion->motionValues[mID+offsetMID];
           }
        }
      }
    }
+   //---------------------------------------------------
 
    bvhMotion->numberOfFramesEncountered=bvhMotion->numberOfFramesEncountered-framesEliminated;
    bvhMotion->numberOfFrames=bvhMotion->numberOfFrames-framesEliminated;
