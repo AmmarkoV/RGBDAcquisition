@@ -23,11 +23,12 @@ float getDistanceBetweenJoints(struct BVH_Transform * bvhTransform,BVHJointID * 
 
 int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,const char **argv)
 {
+/*
  for (int i=0; i<argc; i++)
  {
    fprintf(stderr,"%02u| %s \n",i,argv[i]);
  }
-
+*/
  if (argc<11)
  {
    fprintf(stderr,"filterOutPosesThatAreCloseToRules: Too few arguments..\n");
