@@ -172,7 +172,9 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
   } else
   {
     fprintf(stderr,GREEN "%u/%u (%0.2f%%) frames match rules and will be hidden..\n" NORMAL,framesThatWillBeHidden,mc->numberOfFrames,(float) (framesThatWillBeHidden*100)/mc->numberOfFrames);
+    fprintf(stderr,GREEN "BVH had %u frames and now " NORMAL,mc->numberOfFrames);
     bvh_removeSelectedFrames(mc,framesToRemove);
+    fprintf(stderr,GREEN "it has %u frames \n" NORMAL,mc->numberOfFrames);
   }
 
 
