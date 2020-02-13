@@ -289,8 +289,25 @@ int probeForFilterRules(struct BVH_MotionCapture * mc,int argc,const char **argv
          {
            float value = getDistanceBetweenJoints(&bvhTransform,&jIDA,&jIDB);
            fprintf(stderr,"Frame %u -> Distance(%s,%s) = %0.2f pixels\n",fID,jointA,jointB,value);
+
+           if (
+                (minimumDistance<value) &&
+                (value<maximumDistance)
+              )
+               {
+                 ++rulesThatApplyForFrame;
+                 //fprintf(stderr,"Partial hit for Frame %u\n",fID);
+               }
+
          }
      } //Apply each rule
+
+     if (rulesThatApplyForFrame==numberOfRules)
+     {
+       //Frame matches our rules so we must hide it..!
+       fprintf(stderr,GREEN "Frame %u Matches..\n" NORMAL,fID);
+     }
+
   } //Transform correctly calculated..
  } //End of loop for every BVH frame
 
