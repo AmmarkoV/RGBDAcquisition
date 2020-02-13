@@ -170,8 +170,8 @@ void buildOpenGLProjectionForIntrinsics   (
                                                                                               float farPlane
                                                                                             )
 {
-   fprintf(stderr,"buildOpenGLProjectionForIntrinsics: Size(%ux%u) ",imageWidth,imageHeight);
-   fprintf(stderr,"fx %0.2f, fy %0.2f, cx %0.2f, cy %0.2f ",fx,fy,cx,cy);
+   fprintf(stderr,"buildOpenGLProjectionForIntrinsics: img(%ux%u) ",imageWidth,imageHeight);
+   fprintf(stderr,"fx %0.2f, fy %0.2f, cx %0.2f, cy %0.2f\n",fx,fy,cx,cy);
    //fprintf(stderr,"skew %0.2f, Near %0.2f, Far %0.2f\n",skew,nearPlane,farPlane);
 
    if (farPlane==0.0)
