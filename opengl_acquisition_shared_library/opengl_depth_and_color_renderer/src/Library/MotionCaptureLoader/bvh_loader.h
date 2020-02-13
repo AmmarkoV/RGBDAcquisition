@@ -482,6 +482,10 @@ int bvh_selectJointsToHide2D(
                             );
 
 
+
+ int bvh_removeSelectedFrames(struct BVH_MotionCapture * bvhMotion,unsigned int * framesToRemove);
+
+
 /**
 * @brief Print BVH information on stderr
 * @ingroup BVH

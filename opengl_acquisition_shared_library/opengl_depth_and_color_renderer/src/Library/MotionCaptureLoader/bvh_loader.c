@@ -1598,6 +1598,86 @@ int bvh_selectJointsToHide2D(
  return 0;
 }
 
+
+
+
+
+
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+///                                        PRINT STATE
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+
+ int bvh_removeSelectedFrames(struct BVH_MotionCapture * bvhMotion,unsigned int * framesToRemove)
+ {
+   if ( (bvhMotion==0)||(framesToRemove==0) ) { return 0; }
+
+   unsigned int framesEliminated=0;
+   int copyingEngaged=0;
+   unsigned int offsetMID=0;
+   for (int fID=0; fID<bvhMotion->numberOfFrames; fID++)
+   {
+     if (framesToRemove[fID])
+     {
+        copyingEngaged=1;
+        offsetMID+=bvhMotion->numberOfValuesPerFrame;
+     }
+
+     if (copyingEngaged)
+     {
+       unsigned int mIDStart = fID * bvhMotion->numberOfValuesPerFrame;
+       unsigned int mIDEnd   = (fID+1) * bvhMotion->numberOfValuesPerFrame;
+
+       if (mIDEnd+offsetMID>=bvhMotion->numberOfFrames * bvhMotion->numberOfValuesPerFrame)
+       {
+          //Done erasing..
+          break;
+       }  else
+       {
+        for (int mID=mIDStart; mID<mIDEnd; mID++)
+          {
+            bvhMotion->motionValues[mID]=bvhMotion->motionValues[mID+offsetMID];
+          }
+       }
+     }
+   }
+
+   bvhMotion->numberOfFramesEncountered=bvhMotion->numberOfFramesEncountered-framesEliminated;
+   bvhMotion->numberOfFrames=bvhMotion->numberOfFrames-framesEliminated;
+
+   return 1;
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
