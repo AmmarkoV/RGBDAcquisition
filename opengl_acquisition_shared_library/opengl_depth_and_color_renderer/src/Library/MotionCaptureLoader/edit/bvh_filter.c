@@ -65,20 +65,24 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
 
 
 
+   float forcePosition[3]={0.0,0.0,-130.0};
+   float forceRotation[3]={0.0,0.0,0.0};
 
   struct BVH_Transform bvhTransform;
   unsigned int fID=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    if (
-        performPointProjectionsForFrame(
-                                        mc,
-                                        &bvhTransform,
-                                        fID,
-                                        &renderer,
-                                        0,//Occlusions
-                                        0 //Direct Rendering
-                                       )
+           performPointProjectionsForFrameForcingPositionAndRotation(
+                                                                     mc,
+                                                                     &bvhTransform,
+                                                                     fID,
+                                                                     &renderer,
+                                                                     forcePosition,
+                                                                     forceRotation,
+                                                                     0,//Occlusions
+                                                                     0//Direct Rendering
+                                                                    )
        )
    {
     int rulesThatApplyForFrame=0;
@@ -185,18 +189,10 @@ int probeForFilterRules(struct BVH_MotionCapture * mc,int argc,const char **argv
                          );
    simpleRendererInitialize(&renderer);
 
-/*
-performPointProjectionsForFrameForcingPositionAndRotation(
-                                                              struct BVH_MotionCapture * mc,
-                                                              struct BVH_Transform * bvhTransform,
-                                                              unsigned int fID,
-                                                              struct simpleRenderer * renderer,
-                                                              float * forcePosition,
-                                                              float * forceRotation,
-                                                              unsigned int occlusions,
-                                                              unsigned int directRendering
-                                                             );
-*/
+
+   float forcePosition[3]={0.0,0.0,-130.0};
+   float forceRotation[3]={0.0,0.0,0.0};
+
 
 
   struct BVH_Transform bvhTransform;
@@ -204,14 +200,16 @@ performPointProjectionsForFrameForcingPositionAndRotation(
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    if (
-        performPointProjectionsForFrame(
-                                        mc,
-                                        &bvhTransform,
-                                        fID,
-                                        &renderer,
-                                        0,//Occlusions
-                                        0 //Direct Rendering
-                                       )
+           performPointProjectionsForFrameForcingPositionAndRotation(
+                                                                     mc,
+                                                                     &bvhTransform,
+                                                                     fID,
+                                                                     &renderer,
+                                                                     forcePosition,
+                                                                     forceRotation,
+                                                                     0,//Occlusions
+                                                                     0//Direct Rendering
+                                                                    )
        )
    {
     int rulesThatApplyForFrame=0;

@@ -28,16 +28,52 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
                                                               unsigned int directRendering
                                                              )
 {
-  // bvhTransform->
-   //TODO :
-   fprintf(stderr,"performPointProjectionsForFrameForcingPositionAndRotation not implemented yet");
-   return 0;
+   BVHJointID rootJoint=0;
+
+   if (
+        !bvh_getRootJointID(
+                             mc,
+                             &rootJoint
+                           )
+      )
+   {
+        fprintf(stderr,"Error accessing root joint for frame %u\n",fID);
+        return 0;
+   }
+
+   float dataOriginal[6]={0};
+   if (!bhv_populatePosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
+      {
+        fprintf(stderr,"Error accessing original position/rotation data for frame %u\n",fID);
+        return 0;
+      }
+
+   float dataOur[6]={0};
+   dataOur[0]=forcePosition[0];
+   dataOur[1]=forcePosition[1];
+   dataOur[2]=forcePosition[2];
+   dataOur[3]=forceRotation[0];
+   dataOur[4]=forceRotation[1];
+   dataOur[5]=forceRotation[2];
+
+   if (!bhv_setPosXYZRotXYZ(mc,rootJoint,fID,dataOur,sizeof(dataOur)))
+      {
+        fprintf(stderr,"Error adjusting position/rotation data for frame %u\n",fID);
+        return 0;
+      }
 
   //Try to load the 3D positions of each joint for this particular frame..
    if (bvh_loadTransformForFrame(mc,fID,bvhTransform))
        {
         //If we succeed then we can perform the point projections to 2D..
         //Project 3D positions on 2D frame and save results..
+
+        if (!bhv_setPosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
+        {
+         fprintf(stderr,"Error restoring original data for frame %u\n",fID);
+         return 0;
+        }
+
         return bvh_projectTo2D(mc,bvhTransform,renderer,occlusions,directRendering);
        } else
        //If we fail to load transform , then we can't do any projections and need to clean up

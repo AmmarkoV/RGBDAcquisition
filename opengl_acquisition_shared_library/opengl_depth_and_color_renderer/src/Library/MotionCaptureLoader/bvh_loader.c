@@ -1349,6 +1349,49 @@ int bhv_populatePosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID j
 
 
 
+//------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
+//------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
+//------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
+int bvh_setJointChannelAtFrame(struct BVH_MotionCapture * bvhMotion, BVHJointID jID, BVHFrameID fID, unsigned int channelTypeID,float value)
+{
+   if (bvhMotion==0) { return 0.0; }
+   if (bvhMotion->jointHierarchySize<=jID) { return 0.0; }
+
+   unsigned int mID = bvh_resolveFrameAndJointAndChannelToMotionID(bvhMotion,jID,fID,channelTypeID);
+
+   if (mID>=bvhMotion->motionValuesSize)
+   {
+     fprintf(stderr,RED "bvh_setJointChannelAtFrame overflowed..\n" NORMAL);
+     return 0;
+   }
+
+    bvhMotion->motionValues[mID]=value;
+
+    return 1;
+}
+
+int bvh_setJointRotationXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID,float value) { return bvh_setJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_X,value); }
+int bvh_setJointRotationYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID,float value) { return bvh_setJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_Y,value); }
+int bvh_setJointRotationZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID,float value) { return bvh_setJointChannelAtFrame(bvhMotion,jID,fID,BVH_ROTATION_Z,value); }
+int bvh_setJointPositionXAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID,float value) { return bvh_setJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_X,value); }
+int bvh_setJointPositionYAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID,float value) { return bvh_setJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_Y,value); }
+int bvh_setJointPositionZAtFrame(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID,float value) { return bvh_setJointChannelAtFrame(bvhMotion,jID,fID,BVH_POSITION_Z,value); }
+
+
+int bhv_setPosXYZRotXYZ(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , BVHFrameID fID , float * data , unsigned int sizeOfData)
+{
+  if (data == 0) { return 0; }
+  if (sizeOfData < sizeof(float)* 6) { return 0; }
+
+  int successfulStores=0;
+  successfulStores+=bvh_setJointPositionXAtFrame(bvhMotion,jID,fID,data[0]);
+  successfulStores+=bvh_setJointPositionYAtFrame(bvhMotion,jID,fID,data[1]);
+  successfulStores+=bvh_setJointPositionZAtFrame(bvhMotion,jID,fID,data[2]);
+  successfulStores+=bvh_setJointRotationXAtFrame(bvhMotion,jID,fID,data[3]);
+  successfulStores+=bvh_setJointRotationYAtFrame(bvhMotion,jID,fID,data[4]);
+  successfulStores+=bvh_setJointRotationZAtFrame(bvhMotion,jID,fID,data[5]);
+  return (successfulStores==6);
+}
 
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------

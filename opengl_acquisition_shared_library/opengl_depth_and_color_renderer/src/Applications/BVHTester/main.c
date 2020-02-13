@@ -274,7 +274,7 @@ int main(int argc,const char **argv)
         if (strcmp(argv[i],"--probefilter")==0)
         {
           //Filter using 2D rules
-          //./BVHTester --from Motions/05_01.bvh --filterout 1920 1080 570.7 570.3 3 rhand lhip 10 12 rhand rhip 5 8 rhand lhand 20 25
+          //./BVHTester --from Motions/05_01.bvh --probefilter 1920 1080 570.7 570.3 3 rhand lhip 10 12 rhand rhip 5 8 rhand lhand 20 25
           probeForFilterRules(&bvhMotion,argc-i-1,&argv[i+1]);
         } else
         //-----------------------------------------------------
