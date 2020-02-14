@@ -282,7 +282,11 @@ int main(int argc,const char **argv)
         {
           //Filter using 2D rules
           //./BVHTester --from Motions/05_01.bvh --filterout 0 0 -130.0 0 0 0 1920 1080 570.7 570.3 3 rhand lhip 140.0 145.0 rhand rhip 65 70 rhand lhand 190 205
-          filterOutPosesThatAreCloseToRules(&bvhMotion,argc-i-1,&argv[i+1]);
+
+          if (!filterOutPosesThatAreCloseToRules(&bvhMotion,argc-i-1,&argv[i+1]))
+            {
+              haltOnError(immediatelyHaltOnError,"Error while filtering out joints..");
+            }
         } else
         //-----------------------------------------------------
         if (strcmp(argv[i],"--nofilter")==0)
