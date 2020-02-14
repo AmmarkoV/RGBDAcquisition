@@ -94,22 +94,22 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
   forceRotation[1]=atof(argv[4]);
   forceRotation[2]=atof(argv[5]);
 
-  struct BVH_Transform bvhTransform;
+  struct BVH_Transform bvhTransform={0};
   unsigned int fID=0;
   unsigned int framesThatWillBeHidden=0;
   for (fID=0; fID<mc->numberOfFrames; fID++)
   {
    if (
-           performPointProjectionsForFrameForcingPositionAndRotation(
-                                                                     mc,
-                                                                     &bvhTransform,
-                                                                     fID,
-                                                                     &renderer,
-                                                                     forcePosition,
-                                                                     forceRotation,
-                                                                     0,//Occlusions
-                                                                     0//Direct Rendering
-                                                                    )
+        performPointProjectionsForFrameForcingPositionAndRotation(
+                                                                  mc,
+                                                                  &bvhTransform,
+                                                                  fID,
+                                                                  &renderer,
+                                                                  forcePosition,
+                                                                  forceRotation,
+                                                                  0,//Occlusions
+                                                                  0//Direct Rendering
+                                                                 )
        )
    {
     int rulesThatApplyForFrame=0;
@@ -142,7 +142,6 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
          )
          {
            //fprintf(stderr,"Frame %u ||| %s -> %s =|> min(%0.2f) max(%0.2f)\n",fID,jointA,jointB,minimumDistance,maximumDistance);
-
            float value = getDistanceBetweenJoints(&bvhTransform,&jIDA,&jIDB);
 
            if (
@@ -163,6 +162,8 @@ int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,con
        framesToRemove[fID]=1;
        ++framesThatWillBeHidden;
      }
+
+      bvh_cleanTransform(mc,&bvhTransform);
   }
  }
 

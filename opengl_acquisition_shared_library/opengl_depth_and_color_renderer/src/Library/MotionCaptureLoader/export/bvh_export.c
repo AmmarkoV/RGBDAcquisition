@@ -36,10 +36,10 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
                              &rootJoint
                            )
       )
-   {
+      {
         fprintf(stderr,"Error accessing root joint for frame %u\n",fID);
         return 0;
-   }
+      }
 
    float dataOriginal[6]={0};
    if (!bhv_populatePosXYZRotXYZ(mc,rootJoint,fID,dataOriginal,sizeof(dataOriginal)))
@@ -55,6 +55,7 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
    dataOur[3]=forceRotation[0];
    dataOur[4]=forceRotation[1];
    dataOur[5]=forceRotation[2];
+
 
    if (!bhv_setPosXYZRotXYZ(mc,rootJoint,fID,dataOur,sizeof(dataOur)))
       {
@@ -297,7 +298,11 @@ int dumpBVHToSVGCSV(
   fprintf(stderr,"Filtered out of camera frame : %u\n",filteredOutCSVOutPoses);
   if (mc->numberOfFrames!=0)
   {
-   fprintf(stderr,"Used %0.2f%% of dataset\n",(float) 100*(mc->numberOfFrames-filteredOutCSVPoses)/mc->numberOfFrames);
+   float usedPercentage = (float) 100*(mc->numberOfFrames-filteredOutCSVPoses)/mc->numberOfFrames;
+   if (usedPercentage==0.0) { fprintf(stderr,RED "----------------\n----------------\n----------------\n"); }
+   fprintf(stderr,"Used %0.2f%% of dataset\n",usedPercentage);
+   if (usedPercentage==0.0) { fprintf(stderr, "----------------\n----------------\n----------------\n" NORMAL); }
+
   }
   //------------------------------------------------------------------------------------------
   //------------------------------------------------------------------------------------------

@@ -54,6 +54,11 @@ int csvSkeletonFilter(
 {
    unsigned int jID=0;
 
+   filteredOutCSVBehindPoses=0;
+   filteredOutCSVOutPoses=0;
+   filteredOutCSVPoses=0;
+
+
    //-------------------------------------------------
    if (filterOutSkeletonsWithAnyLimbsBehindTheCamera)
    {
