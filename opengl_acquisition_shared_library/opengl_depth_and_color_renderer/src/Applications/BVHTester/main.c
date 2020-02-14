@@ -223,6 +223,17 @@ int main(int argc,const char **argv)
     for (i=0; i<argc; i++)
     {
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--printparams")==0)
+        {
+           fprintf(stderr,"Utility was called using following parameters :\n");
+           unsigned int z=0;
+           for (z=0; z<argc; z++)
+            {
+              fprintf(stderr," %s",argv[z]);
+            }
+           fprintf(stderr,"\n");
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--debug")==0)
         {
           bvhMotion.debug=1;
