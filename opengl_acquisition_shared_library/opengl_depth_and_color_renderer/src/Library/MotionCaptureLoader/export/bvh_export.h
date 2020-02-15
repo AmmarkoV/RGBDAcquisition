@@ -11,8 +11,20 @@ extern "C"
 {
 #endif
 
+
+struct filteringResults
+{
+ unsigned int invisibleJoints;
+ unsigned int visibleJoints;
+ unsigned int filteredOutCSVBehindPoses;
+ unsigned int filteredOutCSVOutPoses;
+ unsigned int filteredOutCSVPoses;
+};
+
+/*
 extern unsigned int filteredOutCSVBehindPoses;
 extern unsigned int filteredOutCSVOutPoses;
+*/
 
 int performPointProjectionsForFrameForcingPositionAndRotation(
                                                               struct BVH_MotionCapture * mc,
@@ -51,6 +63,7 @@ int dumpBVHToSVGCSV(
                     struct BVH_MotionCapture * mc,
                     unsigned int csvOrientation,
                     struct BVH_RendererConfiguration * renderConfig,
+                    struct filteringResults * filterStats,
                     unsigned int occlusions,
                     unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                     unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,

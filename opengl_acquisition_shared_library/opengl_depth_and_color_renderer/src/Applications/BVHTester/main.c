@@ -948,6 +948,8 @@ int main(int argc,const char **argv)
     //SVG or CSV output ..
     if ( (convertToSVG) || (convertToCSV) )
     {
+     struct filteringResults filterStats={0};
+
      dumpBVHToSVGCSV(
                      toSVGDirectory,
                      toCSVFilename,
@@ -956,6 +958,7 @@ int main(int argc,const char **argv)
                      &bvhMotion,
                      csvOrientation,
                      &renderingConfiguration,
+                     &filterStats,
                      occlusions,
                      filterBehindCamera,//Filter out all poses where even one joint is behind camera
                      filterIfAnyJointOutsideof2DFrame,//Filter out all poses where even one joint is outside of 2D frame

@@ -138,6 +138,7 @@ int dumpBVHToSVGCSV(
                     struct BVH_MotionCapture * mc,
                     unsigned int csvOrientation,
                     struct BVH_RendererConfiguration * renderConfig,
+                    struct filteringResults * filterStats,
                     unsigned int occlusions,
                     unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                     unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
@@ -251,6 +252,7 @@ int dumpBVHToSVGCSV(
                        csvFilename3D,
                        csvFilenameBVH,
                        csvOrientation,
+                       filterStats,
                        filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        filterOutSkeletonsWithAnyLimbsOutOfImage,
                        filterWeirdSkeletons,
@@ -282,23 +284,23 @@ int dumpBVHToSVGCSV(
   //------------------------------------------------------------------------------------------
   //                            GIVE FINAL CONSOLE OUTPUT HERE
   //------------------------------------------------------------------------------------------
-  if (visibleJoints!=0)
+  if (filterStats->visibleJoints!=0)
   {
-    fprintf(stderr,"Joint Visibility = %0.2f %%\n",(float) 100*invisibleJoints/visibleJoints);
+    fprintf(stderr,"Joint Visibility = %0.2f %%\n",(float) 100*filterStats->invisibleJoints/filterStats->visibleJoints);
   }
   fprintf(stderr,"CSV Outputs: 2D:%d, 3D:%d, BVH:%d\n",useCSV_2D_Output,useCSV_3D_Output,useCSV_BVH_Output);
   //------------------------------------------------------------------------------------------
-  fprintf(stderr,"Joints : %u invisible / %u visible ",invisibleJoints,visibleJoints);
+  fprintf(stderr,"Joints : %u invisible / %u visible ",filterStats->invisibleJoints,filterStats->visibleJoints);
   if (occlusions) { fprintf(stderr,"(occlusions enabled)\n"); } else
                   { fprintf(stderr,"(occlusions disabled)\n");}
   if (renderConfig->isDefined)  { fprintf(stderr,"External Renderer Configuration\n");  } else
                                 { fprintf(stderr,"Regular camera position rendering\n");}
-  fprintf(stderr,"Filtered out CSV poses : %u\n",filteredOutCSVPoses);
-  fprintf(stderr,"Filtered behind camera : %u\n",filteredOutCSVBehindPoses);
-  fprintf(stderr,"Filtered out of camera frame : %u\n",filteredOutCSVOutPoses);
+  fprintf(stderr,"Filtered out CSV poses : %u\n",filterStats->filteredOutCSVPoses);
+  fprintf(stderr,"Filtered behind camera : %u\n",filterStats->filteredOutCSVBehindPoses);
+  fprintf(stderr,"Filtered out of camera frame : %u\n",filterStats->filteredOutCSVOutPoses);
   if (mc->numberOfFrames!=0)
   {
-   float usedPercentage = (float) 100*(mc->numberOfFrames-filteredOutCSVPoses)/mc->numberOfFrames;
+   float usedPercentage = (float) 100*(mc->numberOfFrames-filterStats->filteredOutCSVPoses)/mc->numberOfFrames;
    if (usedPercentage==0.0) { fprintf(stderr,RED "----------------\n----------------\n----------------\n"); }
    fprintf(stderr,"Used %0.2f%% of dataset\n",usedPercentage);
    if (usedPercentage==0.0) { fprintf(stderr, "----------------\n----------------\n----------------\n" NORMAL); }

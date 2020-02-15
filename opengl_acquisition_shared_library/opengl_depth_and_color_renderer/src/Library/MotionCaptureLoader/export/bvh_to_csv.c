@@ -3,6 +3,8 @@
 #include <math.h>
 #include "bvh_to_csv.h"
 
+#include "bvh_export.h"
+
 #include "../bvh_loader.h"
 
 #include "../bvh_project.h"
@@ -18,11 +20,12 @@
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
+/*
 unsigned int invisibleJoints=0;
 unsigned int   visibleJoints=0;
 unsigned int filteredOutCSVBehindPoses=0;
 unsigned int filteredOutCSVOutPoses=0;
-unsigned int filteredOutCSVPoses=0;
+unsigned int filteredOutCSVPoses=0;*/
 
 int fileExists(const char * filename)
 {
@@ -47,6 +50,7 @@ int csvSkeletonFilter(
                        struct BVH_MotionCapture * mc,
                        struct BVH_Transform * bvhTransform,
                        struct simpleRenderer * renderer,
+                       struct filteringResults * filterStats,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                        unsigned int filterWeirdSkeletons
@@ -54,9 +58,9 @@ int csvSkeletonFilter(
 {
    unsigned int jID=0;
 
-   filteredOutCSVBehindPoses=0;
-   filteredOutCSVOutPoses=0;
-   filteredOutCSVPoses=0;
+   filterStats->filteredOutCSVBehindPoses=0;
+   filterStats->filteredOutCSVOutPoses=0;
+   filterStats->filteredOutCSVPoses=0;
 
 
    //-------------------------------------------------
@@ -66,8 +70,8 @@ int csvSkeletonFilter(
        {
          if (bvhTransform->joint[jID].isBehindCamera)
          {
-           ++filteredOutCSVPoses;
-           ++filteredOutCSVBehindPoses;
+           ++filterStats->filteredOutCSVPoses;
+           ++filterStats->filteredOutCSVBehindPoses;
            //Just counting to reduce spam..
            return 0;
          }
@@ -87,8 +91,8 @@ int csvSkeletonFilter(
              (x<0.0) || (y<0.0) || (renderer->width<x) || (renderer->height<y)
            )
         {
-           ++filteredOutCSVPoses;
-           ++filteredOutCSVOutPoses;
+           ++filterStats->filteredOutCSVPoses;
+           ++filterStats->filteredOutCSVOutPoses;
            //Just counting to reduce spam..
            return 0;
         }
@@ -115,7 +119,7 @@ int csvSkeletonFilter(
 
         if (jointCount==jointsInWeirdPositionCount)
         {
-           ++filteredOutCSVPoses;
+           ++filterStats->filteredOutCSVPoses;
            return 0;
         }
    }//-----------------------------------------------
@@ -344,6 +348,7 @@ int dumpBVHToCSVBody(
                        const char * filename3D,
                        const char * filenameBVH,
                        unsigned int csvOrientation,
+                       struct filteringResults * filterStats,
                        unsigned int filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                        unsigned int filterOutSkeletonsWithAnyLimbsOutOfImage,
                        unsigned int filterWeirdSkeletons,
@@ -359,6 +364,7 @@ int dumpBVHToCSVBody(
                            mc,
                            bvhTransform,
                            renderer,
+                           filterStats,
                            filterOutSkeletonsWithAnyLimbsBehindTheCamera,
                            filterOutSkeletonsWithAnyLimbsOutOfImage,
                            filterWeirdSkeletons
@@ -416,7 +422,7 @@ int dumpBVHToCSVBody(
                ( (mc->jointHierarchy[jID].isEndSite) && (isJointEndSiteSelected) )
             )
           {
-                if (bvhTransform->joint[jID].isOccluded) { ++invisibleJoints; } else { ++visibleJoints; }
+                if (bvhTransform->joint[jID].isOccluded) { ++filterStats->invisibleJoints; } else { ++filterStats->visibleJoints; }
 
                 if (mc->jointHierarchy[jID].erase2DCoordinates)
                     {
