@@ -58,11 +58,6 @@ int csvSkeletonFilter(
 {
    unsigned int jID=0;
 
-   filterStats->filteredOutCSVBehindPoses=0;
-   filterStats->filteredOutCSVOutPoses=0;
-   filterStats->filteredOutCSVPoses=0;
-
-
    //-------------------------------------------------
    if (filterOutSkeletonsWithAnyLimbsBehindTheCamera)
    {
@@ -73,6 +68,7 @@ int csvSkeletonFilter(
            ++filterStats->filteredOutCSVPoses;
            ++filterStats->filteredOutCSVBehindPoses;
            //Just counting to reduce spam..
+           //fprintf(stderr,"Filtered because of being behind camera..\n");
            return 0;
          }
        }
@@ -94,6 +90,7 @@ int csvSkeletonFilter(
            ++filterStats->filteredOutCSVPoses;
            ++filterStats->filteredOutCSVOutPoses;
            //Just counting to reduce spam..
+           //fprintf(stderr,"Filtered because of being limbs out of camera..\n");
            return 0;
         }
        }
@@ -162,7 +159,7 @@ void considerIfJointIsSelected(
      {
        //This is a regular joint..
        if (mc->selectedJoints[jID])
-                  { *isJointSelected=1; }
+                          { *isJointSelected=1; }
      }
 
     }
@@ -227,10 +224,10 @@ int dumpBVHToCSVHeader(
      fprintf(fp2D,"\n");
      fclose(fp2D);
    }
-  }else
-    {
+  } else
+  {
      fprintf(stderr,"We don't need to regenerate the CSV  header for 2D points, it already exists\n");
-    }
+  }
 
 
 
@@ -371,6 +368,7 @@ int dumpBVHToCSVBody(
                          )
        )
    {
+     //fprintf(stderr,"csvSkeletonFilter discarded frame %u\n",fID);
      return 0;
    }
 
@@ -487,22 +485,6 @@ int dumpBVHToCSVBody(
    //Joint Configuration
    if (fpBVH!=0)
    {
-
-     //----------------------------------------------
-     //This is inneficient
-     /* WHY IS THIS NEEDED?
-     unsigned int lastElement=0;
-     for (jID=0; jID<mc->jointHierarchySize; jID++)
-       {
-         if (!mc->jointHierarchy[jID].isEndSite)
-         {
-           lastElement=jID;
-         }
-       }
-        * */
-     //----------------------------------------------
-
-
      char comma=' ';
      for (jID=0; jID<mc->jointHierarchySize; jID++)
        {
@@ -511,7 +493,6 @@ int dumpBVHToCSVBody(
 
          if ( (!mc->jointHierarchy[jID].isEndSite) && (isJointSelected) )
          {
-
            unsigned int channelID=0;
            for (channelID=0; channelID<mc->jointHierarchy[jID].loadedChannels; channelID++)
            {
@@ -549,6 +530,7 @@ int dumpBVHToCSVBody(
   }
    //-------------------------------------------------------------------
 
+ //fprintf(stderr,"Dumped %u , Requested to Dump %u \n",dumped,requestedToDump);
  return (dumped==requestedToDump);
 }
 

@@ -78,7 +78,9 @@ int performPointProjectionsForFrameForcingPositionAndRotation(
         return bvh_projectTo2D(mc,bvhTransform,renderer,occlusions,directRendering);
        } else
        //If we fail to load transform , then we can't do any projections and need to clean up
-       { bvh_cleanTransform(mc,bvhTransform); }
+       {
+         bvh_cleanTransform(mc,bvhTransform);
+       }
    //----------------------------------------------------------
  return 0;
 }
@@ -146,7 +148,7 @@ int dumpBVHToSVGCSV(
                     unsigned int encodeRotationsAsRadians
                    )
 {
-  struct BVH_Transform bvhTransform;
+  struct BVH_Transform bvhTransform={0};
 
   char svgFilename[512];
   //Declare and populate csv output files, we have 2D,3D and BVH files...
@@ -243,21 +245,21 @@ int dumpBVHToSVGCSV(
   //------------------------------------------------------------------------------------------
    if (convertToCSV)
    {
-      dumpBVHToCSVBody(
-                       mc,
-                       &bvhTransform,
-                       &renderer,
-                       fID,
-                       csvFilename2D,
-                       csvFilename3D,
-                       csvFilenameBVH,
-                       csvOrientation,
-                       filterStats,
-                       filterOutSkeletonsWithAnyLimbsBehindTheCamera,
-                       filterOutSkeletonsWithAnyLimbsOutOfImage,
-                       filterWeirdSkeletons,
-                       encodeRotationsAsRadians
-                      );
+            dumpBVHToCSVBody(
+                             mc,
+                             &bvhTransform,
+                             &renderer,
+                             fID,
+                             csvFilename2D,
+                             csvFilename3D,
+                             csvFilenameBVH,
+                             csvOrientation,
+                             filterStats,
+                             filterOutSkeletonsWithAnyLimbsBehindTheCamera,
+                             filterOutSkeletonsWithAnyLimbsOutOfImage,
+                             filterWeirdSkeletons,
+                             encodeRotationsAsRadians
+                            );
    }
   //------------------------------------------------------------------------------------------
 

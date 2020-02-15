@@ -293,6 +293,7 @@ int main(int argc,const char **argv)
         {
           //Filter using 2D rules
           //./BVHTester --from Motions/05_01.bvh --filterout 0 0 -130.0 0 0 0 1920 1080 570.7 570.3 3 rhand lhip 140.0 145.0 rhand rhip 65 70 rhand lhand 190 205
+          //./BVHTester --printparams --haltonerror --from Motions/05_01.bvh --selectJoints 1 13 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand --hide2DLocationOfJoints 0 4 abdomen chest eye.r eye.l --perturbJointAngles 4 38.0 rshoulder lshoulder rhip lhip --perturbJointAngles 8 10.0 rhand relbow lelbow lhand lknee rknee lfoot rfoot --repeat 0 --filterout 0 0 -130.0 0 90 0 1920 1080 570.7 570.3 6 rhand lhip 0 120 rhand rhip 0 120 rhand lhand 0 150 lhand rhip 0 120 lhand lhip 0 120 lhand rhand 0 150 --randomize2D 1000 4000 -35 -179.999999 -35 35 180 35 --occlusions --csv ./ upperbody_all.csv 2d+bvh
 
           if (!filterOutPosesThatAreCloseToRules(&bvhMotion,argc-i-1,&argv[i+1]))
             {
