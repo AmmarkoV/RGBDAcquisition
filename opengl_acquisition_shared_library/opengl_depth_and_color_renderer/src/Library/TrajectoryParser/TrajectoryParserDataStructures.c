@@ -588,9 +588,9 @@ int changeAllPosesInObjectState(
                                 unsigned int coordLength
                                )
 {
- if (stream==0)                                     {   fprintf(stderr,"Invalid stream \n"); return 0; }
- if (modelStorage==0)                               {   fprintf(stderr,"Invalid model storage \n"); return 0; }
- if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"Invalid values to add as a pose \n"); return 0; }
+ if (stream==0)                                     {   fprintf(stderr,"changeAllPosesInObjectState: Invalid stream \n"); return 0; }
+ if (modelStorage==0)                               {   fprintf(stderr,"changeAllPosesInObjectState: Invalid model storage \n"); return 0; }
+ if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"changeAllPosesInObjectState: Invalid values to add as a pose \n"); return 0; }
 
  int foundExactTimestamp=0;
  unsigned int ObjFound = 0;
@@ -704,15 +704,14 @@ int moveAllPosesInObjectState(
                                 struct VirtualStream * stream ,
                                 struct ModelList * modelStorage,
                                 const char * name  ,
-                                const char * jointName,
                                 unsigned int timeMilliseconds ,
                                 float * coord ,
                                 unsigned int coordLength
                                )
 {
- if (stream==0)                                     {   fprintf(stderr,"Invalid stream \n"); return 0; }
- if (modelStorage==0)                               {   fprintf(stderr,"Invalid model storage \n"); return 0; }
- if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"Invalid values to add as a pose \n"); return 0; }
+ if (stream==0)                     {   fprintf(stderr,"moveAllPosesInObjectState: Invalid stream \n"); return 0; }
+ if (modelStorage==0)               {   fprintf(stderr,"moveAllPosesInObjectState: Invalid model storage \n"); return 0; }
+ if ( (name==0)||(coord==0) )       {   fprintf(stderr,"moveAllPosesInObjectState: Invalid values to add as a pose \n"); return 0; }
 
  int foundExactTimestamp=0;
  unsigned int ObjFound = 0;
@@ -769,9 +768,9 @@ int addPoseToObjectState(
                               unsigned int coordLength
                         )
 {
- if (stream==0)                                     {   fprintf(stderr,"Invalid stream \n"); return 0; }
- if (modelStorage==0)                               {   fprintf(stderr,"Invalid model storage \n"); return 0; }
- if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"Invalid values to add as a pose \n"); return 0; }
+ if (stream==0)                                     {   fprintf(stderr,"addPoseToObjectState: Invalid stream \n"); return 0; }
+ if (modelStorage==0)                               {   fprintf(stderr,"addPoseToObjectState: Invalid model storage \n"); return 0; }
+ if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"addPoseToObjectState: Invalid values to add as a pose \n"); return 0; }
 
  int foundExactTimestamp=0;
  unsigned int ObjFound = 0;

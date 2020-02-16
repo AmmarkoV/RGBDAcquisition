@@ -121,8 +121,7 @@ int changeAllPosesInObjectState(
 int moveAllPosesInObjectState(
                                 struct VirtualStream * stream ,
                                 struct ModelList * modelStorage,
-                                const char * name  ,
-                                const char * jointName,
+                                const char * name,
                                 unsigned int timeMilliseconds ,
                                 float * coord ,
                                 unsigned int coordLength

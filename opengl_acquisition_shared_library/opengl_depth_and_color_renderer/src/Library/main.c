@@ -174,6 +174,8 @@ double getOpenGLPixelSize()
 
 int controlScene(const char * name,const char * variable,int control,float valueA,float valueB,float valueC)
 {
+ if (name==0) { return 0; }
+ if (variable==0) { return 0; }
  //TODO:
  /* THIS SHOULD BE THE SAME AS OpenGLAcquisition.h
   OPENGL_ACQUISITION_NOCONTROL=0,          //0
@@ -192,8 +194,7 @@ int controlScene(const char * name,const char * variable,int control,float value
     coords[0]=valueA;
     coords[1]=valueB;
     coords[2]=valueC;
-
-    return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
+    return moveAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,0,coords,3);
  }
 
  if (control==3)
