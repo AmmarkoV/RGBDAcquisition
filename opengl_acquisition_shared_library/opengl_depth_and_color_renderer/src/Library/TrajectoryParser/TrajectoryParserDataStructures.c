@@ -700,6 +700,61 @@ int changeAllPosesInObjectState(
 
 
 
+int moveAllPosesInObjectState(
+                                struct VirtualStream * stream ,
+                                struct ModelList * modelStorage,
+                                const char * name  ,
+                                const char * jointName,
+                                unsigned int timeMilliseconds ,
+                                float * coord ,
+                                unsigned int coordLength
+                               )
+{
+ if (stream==0)                                     {   fprintf(stderr,"Invalid stream \n"); return 0; }
+ if (modelStorage==0)                               {   fprintf(stderr,"Invalid model storage \n"); return 0; }
+ if ( (name==0)||(jointName==0)||(coord==0) )       {   fprintf(stderr,"Invalid values to add as a pose \n"); return 0; }
+
+ int foundExactTimestamp=0;
+ unsigned int ObjFound = 0;
+ //fprintf(stderr,"Adding pose to object %s \n",name);
+ unsigned int ObjID = getObjectID(stream,name,&ObjFound);
+
+ //fprintf(stderr,"Object Found = %u , Object ID = %u \n",ObjFound,ObjID);
+ if (ObjFound)
+  {
+    unsigned int pos=0;
+    if ( stream->object[ObjID].frame[pos].jointList !=0 )
+    {
+       //pos = getExactStreamPosFromTimestamp(stream,ObjID,timeMilliseconds,&foundExactTimestamp);
+       if(stream->object[ObjID].numberOfFrames>0)
+       {
+        for (pos=0; pos<stream->object[ObjID].numberOfFrames; pos++)
+        {
+
+
+        unsigned int objectTypeID = stream->object[ObjID].type;
+
+        unsigned int modelID = stream->objectTypes[objectTypeID].modelListArrayNumber;
+        //fprintf(stderr,"Accessing model %u/%u\n", modelID,modelStorage->currentNumberOfModels);
+        if (modelID<modelStorage->currentNumberOfModels)
+        {
+        struct Model * mod = (struct Model *) &modelStorage->models[modelID];
+        if (mod!=0)
+        {
+           stream->object[ObjID].frame[pos].x=coord[0];
+           stream->object[ObjID].frame[pos].y=coord[1];
+           stream->object[ObjID].frame[pos].z=coord[2];
+        } else { fprintf(stderr,"Could not find data of model %u for %s \n",modelID,name); return 0; }
+        } else { fprintf(stderr,"Could not find exact model %u for %s \n",modelID,name); return 0; }
+        }
+        return 1;
+       } else  { fprintf(stderr,"Could not find any timestamp for %s \n", name); }
+    } else     { fprintf(stderr,"Could not Find a joint list for %s ( model not loaded? )\n",name); }
+  } else       { fprintf(stderr,"Could not Find object %s \n",name); }
+
+  return 0;
+}
+
 
 
 

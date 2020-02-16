@@ -185,29 +185,37 @@ int controlScene(const char * name,const char * variable,int control,float value
   OPENGL_ACQUISITION_COLOR_RGB,            //6
 */
  float coords[4]={0};
- 
- 
+
+
+ if (control==1)
+ {
+    coords[0]=valueA;
+    coords[1]=valueB;
+    coords[2]=valueC;
+
+    return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);
+ }
 
  if (control==3)
   {
     coords[0]=valueA;
     coords[1]=valueB;
-    coords[2]=valueC; 
+    coords[2]=valueC;
   } else
  if (control==4)
   {
     coords[0]=valueC;
     coords[1]=valueA;
-    coords[2]=valueB; 
+    coords[2]=valueB;
   } else
  if (control==5)
   {
     coords[0]=-1*valueA;
     coords[1]=-1*valueB;
-    coords[2]=-1*valueC; 
+    coords[2]=-1*valueC;
   } else
   {
-    fprintf(stderr,"Unhandled control for controlScene\n");    
+    fprintf(stderr,"Unhandled control for controlScene\n");
   }
 
  return changeAllPosesInObjectState(getLoadedScene(),getLoadedModelStorage(),name,variable,0,coords,3);

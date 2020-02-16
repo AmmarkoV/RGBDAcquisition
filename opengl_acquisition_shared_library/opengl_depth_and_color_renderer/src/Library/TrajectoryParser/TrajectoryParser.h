@@ -257,7 +257,6 @@ struct VirtualStreamControls
 */
 struct VirtualStream
 {
-
     //--------------------------------------------------------
     // These are the matrices actively used by OpenGL
     // to render the scene
@@ -268,7 +267,6 @@ struct VirtualStream
      double activeNormalTransformation[16];
     //--------------------------------------------------------
     //--------------------------------------------------------
-
 
     //--------------------------------------------------------
     // These are matrices declared on the scene file that
@@ -373,7 +371,7 @@ struct VirtualStream
 
 
     char renderWireframe;
-    
+
     char useLightingSystem;
     float lightPosition[3];
 
