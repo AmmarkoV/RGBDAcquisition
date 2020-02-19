@@ -200,7 +200,7 @@ int bvh_populateTorso3DFromTransform(
        int found=0;
        if ( bvh_getJointIDFromJointName(mc,"lshoulder",&jID) ) { found=1; } else
        if ( bvh_getJointIDFromJointName(mc,"lShldr",&jID) )    { found=1; }
-       
+
        if (found)
        {
            bvhTransform->torso.point1Exists=1;
@@ -209,13 +209,13 @@ int bvh_populateTorso3DFromTransform(
            bvhTransform->torso.rectangle3D.z1=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[0]=jID;
        }
-       
+
        //---
-       
+
        found=0;
        if ( bvh_getJointIDFromJointName(mc,"rshoulder",&jID) ) { found=1; } else
        if ( bvh_getJointIDFromJointName(mc,"rShldr",&jID) )    { found=1; }
-           
+
        if (found)
        {
            bvhTransform->torso.point2Exists=1;
@@ -230,7 +230,7 @@ int bvh_populateTorso3DFromTransform(
        found=0;
        if ( bvh_getJointIDFromJointName(mc,"rhip",&jID) )      { found=1; } else
        if ( bvh_getJointIDFromJointName(mc,"rThigh",&jID) )    { found=1; }
-       
+
        if (found)
        {
            bvhTransform->torso.point3Exists=1;
@@ -239,13 +239,13 @@ int bvh_populateTorso3DFromTransform(
            bvhTransform->torso.rectangle3D.z3=bvhTransform->joint[jID].pos3D[2];
            bvhTransform->torso.jID[2]=jID;
        }
-       
+
        //---
-       
+
        found=0;
        if ( bvh_getJointIDFromJointName(mc,"lhip",&jID) )      { found=1; } else
        if ( bvh_getJointIDFromJointName(mc,"lThigh",&jID) )    { found=1; }
-           
+
        if (found)
        {
            bvhTransform->torso.point4Exists=1;
@@ -270,8 +270,8 @@ int bvh_populateTorso3DFromTransform(
             return 1;
          }
        //-------------------------------------------------------------
-       
-  fprintf(stderr,"%u %u %u %u\n",bvhTransform->torso.point1Exists,bvhTransform->torso.point2Exists,bvhTransform->torso.point3Exists,bvhTransform->torso.point4Exists);     
+
+  //fprintf(stderr,"%u %u %u %u\n",bvhTransform->torso.point1Exists,bvhTransform->torso.point2Exists,bvhTransform->torso.point3Exists,bvhTransform->torso.point4Exists);
   return 0;
 }
 
@@ -288,7 +288,7 @@ int bvh_populateRectangle2DFromProjections(
   {
     unsigned int jID=0;
     unsigned int existing2DPoints=0;
-  
+
     //-----------------------------------------------------------
     jID=area->jID[0];
     if (bvhTransform->joint[jID].pos2DCalculated)
@@ -524,7 +524,7 @@ int bvh_loadTransformForFrame(
 
   if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
    {
-     fprintf(stderr,"Could not populate torso information from 3D transform\n");
+     //fprintf(stderr,"bvh_loadTransformForFrame: Could not populate torso information from 3D transform\n");
    }
 
 
@@ -705,7 +705,7 @@ int bvh_loadTransformForMotionBuffer(
 
 if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
    {
-     fprintf(stderr,"Could not populate torso information from 3D transform\n");
+     //fprintf(stderr,"bvh_loadTransformForMotionBuffer: Could not populate torso information from 3D transform\n");
    }
 
 
