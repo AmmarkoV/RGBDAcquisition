@@ -1477,14 +1477,39 @@ int bvh_selectJoints(
 
   mc->selectionIncludesEndSites=includeEndSites;
   mc->numberOfJointsWeWantToSelect=numberOfValues;
-  if (mc->selectedJoints!=0) { free(mc->selectedJoints); mc->selectedJoints=0; }
-  if (mc->hideSelectedJoints!=0) { free(mc->hideSelectedJoints); mc->hideSelectedJoints=0; }
+  
+  //Uncomment to force each call to selectJoints to invalidade previous calls..
+  //if (mc->selectedJoints!=0) { free(mc->selectedJoints); mc->selectedJoints=0; }
+  if (mc->selectedJoints!=0) {
+                               fprintf(stderr,"Multiple selection of joints taking place..\n"); 
+                             } else
+                             {
+                              mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+                              if (mc->selectedJoints==0) 
+                                   { 
+                                     fprintf(stderr,"bvh_selectJoints failed to allocate selectedJoints\n"); 
+                                     return 0; 
+                                   }
+                             }
+                             
+  
+  //if (mc->hideSelectedJoints!=0) { free(mc->hideSelectedJoints); mc->hideSelectedJoints=0; }
+   if (mc->hideSelectedJoints!=0) {
+                                    fprintf(stderr,"Multiple selection of hidden joints taking place..\n"); 
+                                  } else
+                                  {
+                                     mc->hideSelectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
+                                     if (mc->hideSelectedJoints==0) 
+                                          { 
+                                            fprintf(stderr,"bvh_selectJoints failed to allocate hideSelectedJoints\n"); 
+                                            free(mc->selectedJoints);
+                                            mc->selectedJoints=0; 
+                                            return 0; 
+                                          }
+                                      
+                                  }
+  
 
-  mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
-  if (mc->selectedJoints==0) { fprintf(stderr,"bvh_selectJoints failed to allocate selectedJoints\n"); return 0; }
-
-  mc->hideSelectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
-  if (mc->hideSelectedJoints==0) { fprintf(stderr,"bvh_selectJoints failed to allocate hideSelectedJoints\n"); free(mc->selectedJoints); return 0; }
 
 
   if ( (mc->selectedJoints!=0) && (mc->hideSelectedJoints!=0) )
