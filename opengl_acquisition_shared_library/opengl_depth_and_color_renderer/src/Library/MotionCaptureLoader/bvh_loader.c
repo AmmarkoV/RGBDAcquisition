@@ -1489,6 +1489,9 @@ int bvh_selectJoints(
                                    { 
                                      fprintf(stderr,"bvh_selectJoints failed to allocate selectedJoints\n"); 
                                      return 0; 
+                                   } else
+                                   {
+                                      memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
                                    }
                              }
                              
@@ -1505,6 +1508,9 @@ int bvh_selectJoints(
                                             free(mc->selectedJoints);
                                             mc->selectedJoints=0; 
                                             return 0; 
+                                          } else
+                                          {
+                                             memset(mc->hideSelectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame); 
                                           }
                                       
                                   }
@@ -1516,8 +1522,6 @@ int bvh_selectJoints(
   {
     unsigned int success=1;
 
-    memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
-    memset(mc->hideSelectedJoints,0,sizeof(unsigned int)* mc->jointHierarchySize);
     BVHJointID jID=0;
     fprintf(stderr,"Selecting : ");
 
