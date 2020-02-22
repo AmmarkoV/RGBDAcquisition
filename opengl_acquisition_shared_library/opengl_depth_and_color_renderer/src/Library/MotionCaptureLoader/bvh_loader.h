@@ -35,6 +35,20 @@ extern "C"
 
 
 
+static const char * channelNames[] =
+{
+    "no rotation channel",
+    "Xrotation",
+    "Yrotation",
+    "Zrotation",
+    "Xposition",
+    "Yposition",
+    "Zposition",
+//=================
+    "End of Channel Names" ,
+    "Unknown"
+};
+
 
 enum CHANNEL_NAMES
 {
@@ -49,7 +63,22 @@ enum CHANNEL_NAMES
   BVH_VALID_CHANNEL_NAMES
 };
 
-extern const char * channelNames[];
+
+
+static const char * rotationOrderNames[] =
+{
+  "no rotation order",
+  "XYZ",
+  "XZY",
+  "YXZ",
+  "YZX",
+  "ZXY",
+  "ZYX",
+//=================
+    "End of Channel Rotation Orders" ,
+    "Unknown"
+};
+
 
 enum CHANNEL_ROTATION_ORDER
 {
@@ -84,6 +113,7 @@ extern const char * rotationOrderNames[];
 
 typedef unsigned int BVHJointID;
 typedef unsigned int BVHFrameID;
+typedef unsigned int BVHMotionChannelID;
 
 
 /**
@@ -347,6 +377,9 @@ int bvh_scaleAllOffsets(
                         struct BVH_MotionCapture * bvhMotion,
                         float scalingRatio
                        );
+
+
+int bvh_getMotionChannelName(struct BVH_MotionCapture * bvhMotion,BVHMotionChannelID mID,char * target,unsigned int targetLength);
 
 /**
 * @brief Request a specific motion channel of a specific joint at a specific frame

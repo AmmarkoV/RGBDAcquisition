@@ -121,34 +121,6 @@ double bvh_RemapAngleCentered0(double angle, unsigned int constrainOrientation)
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
 
-const char * channelNames[] =
-{
-    "no rotation channel",
-    "Xrotation",
-    "Yrotation",
-    "Zrotation",
-    "Xposition",
-    "Yposition",
-    "Zposition",
-//=================
-    "End of Channel Names" ,
-    "Unknown"
-};
-
-const char * rotationOrderNames[] =
-{
-  "no rotation order",
-  "XYZ",
-  "XZY",
-  "YXZ",
-  "YZX",
-  "ZXY",
-  "ZYX",
-//=================
-    "End of Channel Rotation Orders" ,
-    "Unknown"
-};
-
 
 
 
@@ -1304,6 +1276,36 @@ int bvh_scaleAllOffsets(
 }
 
 
+
+
+int bvh_getMotionChannelName(struct BVH_MotionCapture * bvhMotion,BVHMotionChannelID mID,char * target,unsigned int targetLength)
+{
+ if (mID<bvhMotion->numberOfValuesPerFrame)
+ {
+   BVHJointID jID = bvhMotion->motionToJointLookup[mID].jointID;
+   unsigned int channelID = bvhMotion->motionToJointLookup[mID].channelID;
+   if ( (jID<bvhMotion->jointHierarchySize) && (channelID<BVH_VALID_CHANNEL_NAMES) )
+   {
+      char * jointLabel = bvhMotion->jointHierarchy[jID].jointName;
+
+      int i = snprintf(target,targetLength,"%s_%s",jointLabel,channelNames[channelID]);
+      if (i<0)
+      {
+         fprintf(stderr,"Not enough space to hold motion channel name for mID=%u\n",mID);
+         return 0;
+      }
+   }
+ }
+ return 0;
+}
+
+
+
+
+
+
+
+
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
 //------------------ ------------------ ------------------ ------------------ ------------------ ------------------ ------------------
@@ -1477,44 +1479,44 @@ int bvh_selectJoints(
 
   mc->selectionIncludesEndSites=includeEndSites;
   mc->numberOfJointsWeWantToSelect=numberOfValues;
-  
+
   //Uncomment to force each call to selectJoints to invalidade previous calls..
   //if (mc->selectedJoints!=0) { free(mc->selectedJoints); mc->selectedJoints=0; }
   if (mc->selectedJoints!=0) {
-                               fprintf(stderr,"Multiple selection of joints taking place..\n"); 
+                               fprintf(stderr,YELLOW "Multiple selection of joints taking place..\n" NORMAL);
                              } else
                              {
                               mc->selectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
-                              if (mc->selectedJoints==0) 
-                                   { 
-                                     fprintf(stderr,"bvh_selectJoints failed to allocate selectedJoints\n"); 
-                                     return 0; 
+                              if (mc->selectedJoints==0)
+                                   {
+                                     fprintf(stderr,RED "bvh_selectJoints failed to allocate selectedJoints\n" NORMAL);
+                                     return 0;
                                    } else
                                    {
                                       memset(mc->selectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
                                    }
                              }
-                             
-  
+
+
   //if (mc->hideSelectedJoints!=0) { free(mc->hideSelectedJoints); mc->hideSelectedJoints=0; }
    if (mc->hideSelectedJoints!=0) {
-                                    fprintf(stderr,"Multiple selection of hidden joints taking place..\n"); 
+                                    fprintf(stderr,YELLOW "Multiple selection of hidden joints taking place..\n" NORMAL);
                                   } else
                                   {
                                      mc->hideSelectedJoints = (unsigned int *) malloc(sizeof(unsigned int) * mc->numberOfValuesPerFrame);
-                                     if (mc->hideSelectedJoints==0) 
-                                          { 
-                                            fprintf(stderr,"bvh_selectJoints failed to allocate hideSelectedJoints\n"); 
+                                     if (mc->hideSelectedJoints==0)
+                                          {
+                                            fprintf(stderr,RED "bvh_selectJoints failed to allocate hideSelectedJoints\n" NORMAL);
                                             free(mc->selectedJoints);
-                                            mc->selectedJoints=0; 
-                                            return 0; 
+                                            mc->selectedJoints=0;
+                                            return 0;
                                           } else
                                           {
-                                             memset(mc->hideSelectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame); 
+                                             memset(mc->hideSelectedJoints,0,sizeof(unsigned int)* mc->numberOfValuesPerFrame);
                                           }
-                                      
+
                                   }
-  
+
 
 
 
