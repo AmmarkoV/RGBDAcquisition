@@ -547,8 +547,9 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
           else
          {
             //Unexpected input..
-            fprintf(stderr,"Unexpected line num (%u) of length %zd :\n" , bvhMotion->linesParsed , read);
-            fprintf(stderr,"%s", line);
+            fprintf(stderr,"BVH Header, Unexpected line num (%u) of length %zd :\n" , bvhMotion->linesParsed , read);
+            fprintf(stderr,"%s\n", line);
+            //exit(0);
          }
 
          } // We have header content
@@ -598,12 +599,15 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
 int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * parameters)
 {
+   if (bvhMotion==0)  { return 0; }
+   if (parameters==0)  { return 0; }
+ 
    if (
          (bvhMotion->motionValues==0) ||
          (bvhMotion->motionValuesSize==0)
       )
    {
-     fprintf(stderr,"cannot pushNewBVHMotionState without space to store new information\n");
+     fprintf(stderr,"Cannot pushNewBVHMotionState without space to store new information\n");
      return 0;
    }
 
@@ -618,12 +622,12 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
 
    //unsigned int i=0;
    unsigned int numberOfParameters = InputParser_SeperateWordsCC(ipc,parameters,1);
-   //fprintf(stderr,"MOTION command has %u parameters\n",numberOfParameters);
+   //fprintf(stderr,"MOTION command (%s) has %u parameters\n",parameters,numberOfParameters);
 
 
    if (numberOfParameters==bvhMotion->numberOfValuesPerFrame)
    {
-     unsigned int finalMemoryLocation = (numberOfParameters-1) + (bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame);
+     unsigned int finalMemoryLocation = (numberOfParameters-1) + (bvhMotion->numberOfFramesEncountered * bvhMotion->numberOfValuesPerFrame);
      if (finalMemoryLocation < bvhMotion->motionValuesSize)
      {
       /*
@@ -646,7 +650,8 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
     //Unexpected input..
     fprintf(stderr,"Motion Expected had %u parameters we received %u\n",bvhMotion->numberOfValuesPerFrame,numberOfParameters);
     fprintf(stderr,"Unexpected line num (%u)  :\n" , bvhMotion->linesParsed);
-    fprintf(stderr,"%s", parameters);
+    fprintf(stderr,"%s\n", parameters);
+    //exit(0);
    }
 
    InputParser_Destroy(ipc);
@@ -664,11 +669,12 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
 
   if (fd!=0)
   {
-   struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,3);
+   struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,4);
 
    InputParser_SetDelimeter(ipc,0,':');
    InputParser_SetDelimeter(ipc,1,10);
    InputParser_SetDelimeter(ipc,2,13);
+   InputParser_SetDelimeter(ipc,3,0);
 
     char str[MAX_BVH_FILE_LINE_SIZE+1]={0};
     char * line = NULL;
@@ -696,11 +702,23 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
       { //We have content..
        if (!atMotionSection)
        {
-          if (InputParser_WordCompareAuto(ipc,0,"MOTION"))      { /*fprintf(stderr,"Found Motion Section..\n");*/ atMotionSection=1; }
+          if (InputParser_WordCompareAuto(ipc,0,"MOTION"))      
+               { 
+                //fprintf(stderr,"Found Motion Section (%s)..\n",line); 
+                atMotionSection=1; 
+               }
        } else
        {
-         if (InputParser_WordCompareAuto(ipc,0,"Frames"))       { bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1); } else
-         if (InputParser_WordCompareAuto(ipc,0,"Frame Time"))   { bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1); }      else
+         if (InputParser_WordCompareAuto(ipc,0,"Frames"))       
+              { 
+                //fprintf(stderr,"Frames (%s)..\n",line); 
+                bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1); 
+                //fprintf(stderr,"Frames number (%u)..\n",bvhMotion->numberOfFrames); 
+              } else
+         if (InputParser_WordCompareAuto(ipc,0,"Frame Time"))   
+             { 
+                bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1); 
+             }  else
          {
            if (bvhMotion->motionValues==0)
            {
