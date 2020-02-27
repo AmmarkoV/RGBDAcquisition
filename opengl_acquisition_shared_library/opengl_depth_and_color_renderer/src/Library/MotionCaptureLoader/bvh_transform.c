@@ -343,7 +343,8 @@ int bvh_populateRectangle2DFromProjections(
     }
   } else
   {
-   fprintf(stderr,"bvh_populateRectangle2DFromProjections: Area does not exist..\n");
+    //Less spam..
+   //fprintf(stderr,"bvh_populateRectangle2DFromProjections: Area does not exist..\n");
   }
 
  return 0;
