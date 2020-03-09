@@ -86,17 +86,26 @@ int rotateObject(unsigned objToMove , float X , float Y , float Z , float angleD
 int handleUserInput(char key,int state,unsigned int x, unsigned int y)
 {
   struct VirtualStream * scene = getLoadedScene();
+  int result=0;
 
   switch (key)
     {
+        case 0:
+             fprintf(stderr,"Mouse key click @ %u,%u\n",x,y);
+
+
+
+        break;
         case 'o' :
         case 'O' :
              fprintf(stderr,"Writing \n");
              writeOpenGLColor("color.pnm",0,0,WIDTH,HEIGHT);
              writeOpenGLDepth("depth.pnm",0,0,WIDTH,HEIGHT);
              fprintf(stderr,"Convert to jpg\n");
-             system("convert color.pnm image.jpg");
-             system("convert depth.pnm image_depth.png");
+             result=system("convert color.pnm image.jpg");
+             if (result!=0) { fprintf(stderr,"Failed to convert color to image file..\n"); }
+             result=system("convert depth.pnm image_depth.png");
+             if (result!=0) { fprintf(stderr,"Failed to convert depth to image file..\n"); }
             return 1;
         break;
 
