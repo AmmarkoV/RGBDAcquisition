@@ -105,7 +105,7 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
     fprintf(stderr,GREEN "No frames matches our gimbal check rules ( 90 +- %0.2f )\n" NORMAL,threshold);
   } else
   {
-    fprintf(stderr,GREEN "%u/%u (%0.2f%%) frames match gimbal check rules and will be hidden..\n" NORMAL,framesThatWillBeHidden,mc->numberOfFrames,(float) (framesThatWillBeHidden*100)/mc->numberOfFrames);
+    fprintf(stderr,YELLOW "%u/%u (%0.2f%%) frames match gimbal check rules and will be hidden..\n" NORMAL,framesThatWillBeHidden,mc->numberOfFrames,(float) (framesThatWillBeHidden*100)/mc->numberOfFrames);
     fprintf(stderr,GREEN "BVH had %u frames and now " NORMAL,mc->numberOfFrames);
     bvh_removeSelectedFrames(mc,framesToRemove);
     fprintf(stderr,GREEN "it has %u frames \n" NORMAL,mc->numberOfFrames);
