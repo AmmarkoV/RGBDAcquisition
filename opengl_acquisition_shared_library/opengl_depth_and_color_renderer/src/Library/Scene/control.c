@@ -266,7 +266,7 @@ int handleUserInput(char key,int state,unsigned int x, unsigned int y)
        break;
 
        default :
-        fprintf(stderr,"handleUserInput called for key %c ( %u ) \n",key,key);
+        fprintf(stderr,"handleUserInput called for key %c ( %u ) \n",key,(unsigned int) key);
        break;
 
     }

@@ -79,7 +79,7 @@ int renderOGLLight( float * pos , unsigned int * parentNode ,  unsigned int bone
   rendererOptions.lightPos[0]=pos[0];
   rendererOptions.lightPos[1]=pos[1];
   rendererOptions.lightPos[2]=pos[2];
-  
+
   switch (rendererOptions.useShaders)
   {
     case 0 :
@@ -143,7 +143,7 @@ int renderOGL(
 
     case 1 :
       fprintf(stderr,"shader draw is under construction please deactivate shaders from CMake..\n");
-      fprintf(stderr,"renderOGL => rendererOptions.useShaders=%u\n",rendererOptions.useShaders);
+      fprintf(stderr,"renderOGL => rendererOptions.useShaders=%d\n",rendererOptions.useShaders);
       useShader(rendererOptions.loadedShader);
       doOGLShaderDrawCalllist(
                               projectionMatrix ,

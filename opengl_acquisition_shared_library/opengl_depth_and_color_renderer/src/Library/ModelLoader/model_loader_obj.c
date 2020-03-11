@@ -10,6 +10,8 @@
 
 #define reallocationStep 500
 
+#warning "The .OBJ Wavefront loader code is ancient, triggers various CPPCheck warnings and needs maintenance"
+
 #define CALCULATE_3D_BOUNDING_BOX 1
 #ifndef CALCULATE_3D_BOUNDING_BOX
   #warning "3D bounding boxes not getting calculated"

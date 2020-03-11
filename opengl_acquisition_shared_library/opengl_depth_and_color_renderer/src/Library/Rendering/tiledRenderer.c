@@ -126,19 +126,18 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
   struct ModelList * modelstorage = ( struct ModelList* ) trConf->modelStoragePTR;
   if (modelstorage->models==0) { fprintf(stderr,"ModelList not properly allocated..\n"); return 0; }
 
+  if (scene==0) { fprintf(stderr,"Scene not properly allocated..\n"); return 0; }
+  if (scene->object==0) { fprintf(stderr,"Object List not properly allocated..\n"); return 0; }
 
   fprintf(stderr,"Photoshooting Object %u -> %s \n",trConf->objID,scene->object[trConf->objID].name);
   fprintf(stderr,"Rows/Cols %u/%u  Distance %0.2f , Angles %0.2f %0.2f %0.2f\n",trConf->rows,trConf->columns,trConf->distance,trConf->angleX,trConf->angleY,trConf->angleZ);
   fprintf(stderr,"Angle Variance %0.2f %0.2f %0.2f\n",trConf->angXVariance,trConf->angYVariance,trConf->angZVariance);
 
 
-  if (scene!=0) { setupTiledRendererOGL((float)scene->backgroundR,(float)scene->backgroundG,(float)scene->backgroundB); } else
-                { setupTiledRendererOGL(0.0,0.0,0.0); }
-
-
   fprintf(stderr,"setupTiledRendererOGL done \n");
   if (scene!=0)
     {
+       setupTiledRendererOGL((float)scene->backgroundR,(float)scene->backgroundG,(float)scene->backgroundB);
        unsigned char noColor=0;
        float posStack[POS_COORD_LENGTH]={0};
        float R=1.0f , G=1.0f ,  B=0.0f , trans=0.0f;
@@ -247,6 +246,9 @@ int tiledRenderer_Render( struct tiledRendererConfiguration * trConf)
                     pos[POS_ANGLEY],
                     pos[POS_ANGLEZ]
               );
+    } else
+    {
+      fprintf(stderr,"Scene not declared..\n");
     }
 
    glPopMatrix();

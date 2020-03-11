@@ -37,8 +37,8 @@
 struct VirtualStream * scene = 0;
 struct ModelList * modelStorage;
 
-int WIDTH=640;
-int HEIGHT=480;
+unsigned int WIDTH=640;
+unsigned int HEIGHT=480;
 
 
 const GLfloat light_ambient[]  = { 0.2f, 0.2f, 0.2f, 1.0f };
@@ -151,7 +151,7 @@ int sceneSetOpenGLIntrinsicCalibration(struct VirtualStream * scene,double * cam
 
 int updateProjectionMatrix()
 {
-  fprintf(stderr,"updateProjectionMatrix called ( %u x %u )  \n",WIDTH,HEIGHT);
+  fprintf(stderr,"updateProjectionMatrix called ( %d x %d )  \n",WIDTH,HEIGHT);
   if (scene==0) { fprintf(stderr,"No Scene declared yet , don't know how to update proj matrix\n"); return 0; }
   if ( scene->emulateProjectionMatrixDeclared)
   {
@@ -728,7 +728,7 @@ int setupSceneCameraBeforeRendering(struct VirtualStream * scene)
    return 1;
   }
 
-  if (scene->useCustomModelViewMatrix)
+  if ( (scene!=0) && (scene->useCustomModelViewMatrix) )
   {
     //We load the matrix produced by convertRodriguezAndTranslationToOpenGL4x4DMatrix
     copy4x4DMatrix(scene->activeModelViewMatrix , scene->customModelViewMatrix);
@@ -781,7 +781,7 @@ int renderScene()
   glEnable (GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW );
-  
+
   //Lighting
   if (scene->useLightingSystem)
   {
@@ -789,9 +789,9 @@ int renderScene()
                                           scene->lightPosition,
                                           0,
                                           0
-                                        );    
+                                        );
   }
-  
+
   setupSceneCameraBeforeRendering(scene);
 
   drawAllSceneObjectsAtPositionsFromTrajectoryParser(scene);

@@ -9,8 +9,8 @@
 
 #include "../TrajectoryParser/TrajectoryParser.h"
 
-extern int WIDTH;
-extern int HEIGHT;
+extern unsigned int WIDTH;
+extern unsigned int HEIGHT;
 
 struct VirtualStream *  getLoadedScene();
 struct ModelList *  getLoadedModelStorage();
