@@ -86,7 +86,7 @@ int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float thresh
                 (value>45.0) && ( ( modValue <= minThreshold) || (maxThreshold <= modValue) )
               )
          {
-          fprintf(stderr,"Value %0.2f offends gimbal rules\n",value);
+          //fprintf(stderr,"Value %0.2f offends gimbal rules\n",value);
           framesToRemove[fID]=1;
           ++framesThatWillBeHidden;
           break;
