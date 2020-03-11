@@ -11,6 +11,8 @@ extern "C"
 {
 #endif
 
+int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float threshold);
+
 int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * bvhMotion,int argc,const char **argv);
 
 

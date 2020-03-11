@@ -32,6 +32,75 @@ float getDistanceBetweenJoints(struct BVH_Transform * bvhTransform,BVHJointID * 
 }
 
 
+
+
+
+
+int filterOutPosesThatAreGimbalLocked(struct BVH_MotionCapture * mc,float threshold)
+{
+  unsigned int * framesToRemove = (unsigned int * ) malloc(sizeof(unsigned int) * mc->numberOfFrames);
+
+  if (framesToRemove==0)
+  {
+    fprintf(stderr,"filterOutPosesThatAreGimbalLocked: Could not allocate space to accomodate poses..\n");
+    return 0;
+  }
+
+  memset(framesToRemove,0,sizeof(unsigned int) * mc->numberOfFrames);
+
+  unsigned int fID=0,mID=0;
+  unsigned int framesThatWillBeHidden=0;
+  for (fID=0; fID<mc->numberOfFrames; fID++)
+  {
+     unsigned int mIDOffset = fID * mc->numberOfValuesPerFrame;
+
+     //Ignore initial xyz..
+     for (mID=6; mID<mc->numberOfValuesPerFrame; mID++)
+     {
+        if  (
+               (90-threshold < mc->motionValues[mIDOffset + mID] ) && (mc->motionValues[mIDOffset + mID] < 90+threshold )
+            )
+         {
+          framesToRemove[fID]=1;
+          ++framesThatWillBeHidden;
+         }
+     }
+
+  }
+
+ if (framesThatWillBeHidden==0)
+  {
+    fprintf(stderr,GREEN "No frames matches our gimbal check rules\n" NORMAL);
+  } else
+  {
+    fprintf(stderr,GREEN "%u/%u (%0.2f%%) frames match gimbal check rules and will be hidden..\n" NORMAL,framesThatWillBeHidden,mc->numberOfFrames,(float) (framesThatWillBeHidden*100)/mc->numberOfFrames);
+    fprintf(stderr,GREEN "BVH had %u frames and now " NORMAL,mc->numberOfFrames);
+    bvh_removeSelectedFrames(mc,framesToRemove);
+    fprintf(stderr,GREEN "it has %u frames \n" NORMAL,mc->numberOfFrames);
+  }
+
+ //Free temporary space required to select correct frames..
+ free(framesToRemove);
+
+ return 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int filterOutPosesThatAreCloseToRules(struct BVH_MotionCapture * mc,int argc,const char **argv)
 {
 /*

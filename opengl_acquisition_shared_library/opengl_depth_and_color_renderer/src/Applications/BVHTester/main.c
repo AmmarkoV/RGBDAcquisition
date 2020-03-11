@@ -239,6 +239,12 @@ int main(int argc,const char **argv)
           bvhMotion.debug=1;
         } else
         //-----------------------------------------------------
+        if (strcmp(argv[i],"--filtergimballocks")==0)
+        {
+           if (i+1>=argc)  { incorrectArguments(); }
+           filterOutPosesThatAreGimbalLocked(&bvhMotion,atof(argv[i+1]));
+        } else
+        //-----------------------------------------------------
         if (strcmp(argv[i],"--haltonerror")==0)
         {
           immediatelyHaltOnError=1;
