@@ -22,10 +22,9 @@ float BVH2DDistace(
                    struct BVH_Transform * bvhTargetTransform
                   )
 {
-
-   if ( 
+   if (
         (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0)) &&
-        (bvh_projectTo2D(mc,bvhTargetTransform,renderer,0,0)) 
+        (bvh_projectTo2D(mc,bvhTargetTransform,renderer,0,0))
       )
       {
        //-----------------
@@ -33,28 +32,61 @@ float BVH2DDistace(
        unsigned int numberOfSamples=0;
        for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
             {
-              float this2DDistance=get2DPointDistance(
+              int isSelected = 1;
+
+              if (mc->selectedJoints!=0)
+              {
+                if (!mc->selectedJoints[jID])
+                {
+                  isSelected=0;
+                }
+              }
+
+               if (isSelected)
+               {
+                float this2DDistance=get2DPointDistance(
                                                       (float) bvhSourceTransform->joint[jID].pos2D[0],
                                                       (float) bvhSourceTransform->joint[jID].pos2D[1],
                                                       (float) bvhTargetTransform->joint[jID].pos2D[0],
                                                       (float) bvhTargetTransform->joint[jID].pos2D[1]
-                                                     ); 
-              fprintf(stderr,"Joint %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
+                                                     );
+               fprintf(stderr,"Joint %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
 
-              numberOfSamples+=1;
-              sumOf2DDistances+=this2DDistance; 
+               numberOfSamples+=1;
+               sumOf2DDistances+=this2DDistance;
+              }
             }
-            
+
        if (numberOfSamples>0)
        {
          return (float)  sumOf2DDistances/numberOfSamples;
-       }     
+       }
      } //-----------------
-    
+
  return 0.0;
 }
 
 
+
+
+float approximateTargetPose(
+                            struct BVH_MotionCapture * mc,
+                            struct simpleRenderer *renderer,
+                            struct BVH_Transform * bvhSourceTransform,
+                            struct BVH_Transform * bvhTargetTransform
+                           )
+{
+  return  BVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
+}
+
+
+
+
+
+
+
+
+//./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
 
 
 int BVHTestIK(
@@ -79,7 +111,7 @@ int BVHTestIK(
        ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
      )
      {
-        float distance2D = BVH2DDistace(mc,&renderer,&bvhSourceTransform,&bvhTargetTransform);
+        float distance2D = approximateTargetPose(mc,&renderer,&bvhSourceTransform,&bvhTargetTransform);
 
         fprintf(stderr,"2D Distance is %0.2f\n",distance2D);
         return 1;

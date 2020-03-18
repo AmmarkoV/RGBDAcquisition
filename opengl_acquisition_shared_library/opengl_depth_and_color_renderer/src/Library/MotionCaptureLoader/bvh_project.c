@@ -172,9 +172,9 @@ int bvh_projectTo2D(
 {
       bvhTransform->jointsOccludedIn2DProjection=0;
       unsigned int pointsDumped=0;
-      float position2DX;
-      float position2DY;
-      float position2DW;
+      float position2DX=0.0;
+      float position2DY=0.0;
+      float position2DW=0.0;
 
 
       //Then project 3D positions on 2D frame and save results..
