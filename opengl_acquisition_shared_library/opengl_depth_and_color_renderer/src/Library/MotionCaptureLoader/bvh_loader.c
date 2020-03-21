@@ -1442,6 +1442,7 @@ float  bvh_getJointPositionZAtMotionBuffer(struct BVH_MotionCapture * bvhMotion,
 
 int bhv_populatePosXYZRotXYZFromMotionBuffer(struct BVH_MotionCapture * bvhMotion , BVHJointID jID , float * motionBuffer, float * data, unsigned int sizeOfData)
 {
+  if (motionBuffer==0) { return 0; }
   if (data == 0) { return 0; }
   if (sizeOfData < sizeof(float)* 6) { return 0; }
 

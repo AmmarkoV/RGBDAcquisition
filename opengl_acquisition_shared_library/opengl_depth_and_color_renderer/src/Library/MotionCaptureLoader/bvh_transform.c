@@ -545,6 +545,11 @@ int bvh_loadTransformForMotionBuffer(
                                      struct BVH_Transform * bvhTransform
                                    )
 {
+   if (bvhMotion==0) { return 0; }
+   if (motionBuffer==0) { return 0; }
+   if (bvhTransform==0) { return 0; }
+
+
    //We can use this to change root joint
    //But this gets unreasonably complicated so it is best not to change anything here..
    float positionOffset[4]={0};
@@ -580,10 +585,12 @@ int bvh_loadTransformForMotionBuffer(
   {
       //Setup dynamic transformation
       //Get values from our bvhMotion structure
+      fprintf(stderr,"bhv_populatePosXYZRotXYZFromMotionBuffer ");
       if (!bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
       {
         fprintf(stderr,"Error extracting dynamic transformation for jID=%u and a motionBuffer\n",jID);
       }
+      fprintf(stderr,"ok \n ");
 
       double posX = fToD(data[0]);
       double posY = fToD(data[1]);

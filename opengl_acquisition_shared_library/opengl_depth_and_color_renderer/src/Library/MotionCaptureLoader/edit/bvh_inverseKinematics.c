@@ -69,27 +69,25 @@ float BVH2DDistace(
 
 
 
-float approximateTargetPose(
-                            struct BVH_MotionCapture * mc,
-                            struct simpleRenderer *renderer,
-                            struct BVH_Transform * bvhSourceTransform,
-                            struct BVH_Transform * bvhTargetTransform
-                           )
-{
-  return  BVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
-}
-
-
-
 float approximateTargetFromMotionBuffer(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
-                                         float * sourceMotionBuffer,
-                                         unsigned int sourceMotionBufferLength,
+                                         struct MotionBuffer * solution,
                                          struct BVH_Transform * bvhTargetTransform
                                         )
 {
+  struct BVH_Transform bvhSourceTransform={0};
 
+  if (
+       bvh_loadTransformForMotionBuffer(
+                                        mc,
+                                        solution->motion,
+                                        &bvhSourceTransform
+                                       )
+     )
+     {
+       return BVH2DDistace(mc,renderer,&bvhSourceTransform,bvhTargetTransform);
+     }
 
  return 0.0;
 }
@@ -103,7 +101,8 @@ int BVHTestIK(
               unsigned int fIDTarget
              )
 {
-  struct BVH_Transform bvhSourceTransform={0};
+  int result=0;
+
   struct BVH_Transform bvhTargetTransform={0};
 
   struct simpleRenderer renderer={0};
@@ -113,27 +112,32 @@ int BVHTestIK(
                         );
   simpleRendererInitialize(&renderer);
 
-/*
-  float * motionBuffer=0;
-  int bvh_loadTransformForMotionBuffer(
-                                       mc,
-                                       motionBuffer,
-                                     struct BVH_Transform * bvhTransform
-                                    );*/
 
-  if (
-       ( bvh_loadTransformForFrame(mc,fIDSource,&bvhSourceTransform) )
-        &&
-       ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
-     )
-     {
-        float distance2D = approximateTargetPose(mc,&renderer,&bvhSourceTransform,&bvhTargetTransform);
+  struct MotionBuffer solution={0};
+  solution.bufferSize = mc->numberOfValuesPerFrame;
+  solution.motion = (float *) malloc(sizeof(float) * (solution.bufferSize+1));
 
-        fprintf(stderr,"2D Distance is %0.2f\n",distance2D);
-        return 1;
-     }
+  if (solution.motion!=0)
+  {
+    if ( bvh_copyMotionFrameToMotionBuffer(mc,&solution,fIDSource) )
+    {
+      if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
+      {
+       float error2D = approximateTargetFromMotionBuffer(
+                                                         mc,
+                                                         &renderer,
+                                                         &solution,
+                                                         &bvhTargetTransform
+                                                        );
 
-   return 0;
+        fprintf(stderr,"2D Distance is %0.2f\n",error2D);
+        result=1;
+      }
+    }
+    free(solution.motion);
+  }
+
+ return result;
 }
 
 
@@ -147,6 +151,20 @@ int BVHTestIK(
 
 
 //./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
+
+
+
+
+float approximateTargetPose(
+                            struct BVH_MotionCapture * mc,
+                            struct simpleRenderer *renderer,
+                            struct BVH_Transform * bvhSourceTransform,
+                            struct BVH_Transform * bvhTargetTransform
+                           )
+{
+  return  BVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
+}
+
 
 
 int BVHTestIKOLD(
