@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "bvh_to_trajectoryParserTRI.h"
-#include "../bvh_transform.h"
+#include "../calculate/bvh_transform.h"
 
 #include "../../../../../../tools/AmMatrix/quaternions.h"
 
@@ -375,7 +375,7 @@ int dumpBVHToTrajectoryParserTRI(
     float zOffset=4000;
 
     float posX,posY,posZ,rotX,rotY,rotZ;
-    
+
     unsigned int fID=0;
     for (fID=0; fID<mc->numberOfFrames; fID++)
     {

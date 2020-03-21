@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "bvh_to_tri_pose.h"
 
-#include "../TrajectoryParser/InputParser_C.h"
+#include "../../TrajectoryParser/InputParser_C.h"
 
 
 #define NORMAL   "\033[0m"

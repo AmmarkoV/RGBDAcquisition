@@ -2,7 +2,7 @@
 #include <math.h>
 #include "bvh_transform.h"
 
-#include "../../../../../tools/AmMatrix/matrix4x4Tools.h"
+#include "../../../../../../tools/AmMatrix/matrix4x4Tools.h"
 
 #define USE_BVH_SPECIFIC_ROTATIONS 0
 

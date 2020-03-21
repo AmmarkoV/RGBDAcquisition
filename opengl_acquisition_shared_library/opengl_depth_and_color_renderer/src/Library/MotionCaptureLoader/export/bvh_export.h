@@ -3,8 +3,8 @@
 
 
 #include "../bvh_loader.h"
-#include "../bvh_transform.h"
-#include "../bvh_project.h"
+#include "../calculate/bvh_transform.h"
+#include "../calculate/bvh_project.h"
 
 #ifdef __cplusplus
 extern "C"

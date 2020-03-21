@@ -2,7 +2,7 @@
 #define BVH_TO_TRAJECTORYPARSERTRI_H_INCLUDED
 
 #include "../bvh_loader.h"
-#include "../bvh_to_tri_pose.h"
+#include "../calculate/bvh_to_tri_pose.h"
 
 #ifdef __cplusplus
 extern "C"

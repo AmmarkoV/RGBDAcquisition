@@ -35,9 +35,10 @@ add_executable(
                BVHTester 
                main.c 
               ../../Library/MotionCaptureLoader/bvh_loader.c
-              ../../Library/MotionCaptureLoader/bvh_transform.c 
-              ../../Library/MotionCaptureLoader/bvh_project.c 
-              ../../Library/MotionCaptureLoader/bvh_to_tri_pose.c
+              ../../Library/MotionCaptureLoader/calculate/bvh_transform.c 
+              ../../Library/MotionCaptureLoader/calculate/bvh_project.c 
+              ../../Library/MotionCaptureLoader/calculate/bvh_to_tri_pose.c
+              ../../Library/MotionCaptureLoader/import/fromBVH.c
               ../../Library/MotionCaptureLoader/export/bvh_export.c
               ../../Library/MotionCaptureLoader/export/bvh_to_bvh.c
               ../../Library/MotionCaptureLoader/export/bvh_to_svg.c
@@ -46,10 +47,13 @@ add_executable(
               ../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c
               ../../Library/MotionCaptureLoader/edit/bvh_randomize.c 
               ../../Library/MotionCaptureLoader/edit/bvh_rename.c 
+              ../../Library/MotionCaptureLoader/edit/bvh_remapangles.c 
+              ../../Library/MotionCaptureLoader/edit/bvh_interpolate.c 
               ../../Library/MotionCaptureLoader/edit/bvh_merge.c 
               ../../Library/MotionCaptureLoader/edit/bvh_filter.c 
               ../../Library/MotionCaptureLoader/edit/bvh_cut_paste.c 
               ../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.c 
+              ../../Library/MotionCaptureLoader/tests/test.c
               ../../Library/TrajectoryParser/InputParser_C.c
               ../../../../../tools/AmMatrix/matrix4x4Tools.c
               ../../../../../tools/AmMatrix/matrixOpenGL.c

@@ -3,7 +3,7 @@
 
 
 #include "../bvh_loader.h"
-#include "../bvh_transform.h"
+#include "../calculate/bvh_transform.h"
 #include "../../../../../../tools/AmMatrix/simpleRenderer.h"
 #include "bvh_export.h"
 

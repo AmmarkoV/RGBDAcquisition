@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "bvh_loader.h"
+#include "../bvh_loader.h"
 #include "bvh_project.h"
 
 void bvh_cleanTransform(

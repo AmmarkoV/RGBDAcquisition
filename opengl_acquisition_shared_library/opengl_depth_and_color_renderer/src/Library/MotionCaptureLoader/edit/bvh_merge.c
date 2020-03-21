@@ -1,5 +1,5 @@
 #include "bvh_merge.h"
-#include "../bvh_to_tri_pose.h"
+#include "../calculate/bvh_to_tri_pose.h"
 #include "bvh_cut_paste.h"
 
 #include <stdio.h>

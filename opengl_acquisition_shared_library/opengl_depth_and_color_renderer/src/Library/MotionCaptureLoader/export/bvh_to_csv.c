@@ -7,7 +7,7 @@
 
 #include "../bvh_loader.h"
 
-#include "../bvh_project.h"
+#include "../calculate/bvh_project.h"
 
 #define CONVERT_EULER_TO_RADIANS M_PI/180.0
 #define DUMP_SEPERATED_POS_ROT 0

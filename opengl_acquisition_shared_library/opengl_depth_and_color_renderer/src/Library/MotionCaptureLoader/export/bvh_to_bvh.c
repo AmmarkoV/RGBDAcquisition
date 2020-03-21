@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "bvh_to_bvh.h"
 
-#include "../bvh_project.h"
+#include "../calculate/bvh_project.h"
 
 
 void indent(FILE * fp , unsigned int indentation)
@@ -105,10 +105,10 @@ int dumpBVHToBVH(
    if (fp!=0)
    {
      fprintf(fp,"HIERARCHY\n");
-     //-------------------------------------------------------------------------------------- 
+     //--------------------------------------------------------------------------------------
      unsigned int nextHierarchyLevel = 0;
      unsigned int hasNext=0;
-     
+
      BVHJointID jID;
      for (jID=0; jID<mc->jointHierarchySize; jID++)
         {

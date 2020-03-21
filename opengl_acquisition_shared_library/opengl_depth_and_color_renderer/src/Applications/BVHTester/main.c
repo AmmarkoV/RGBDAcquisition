@@ -1,7 +1,7 @@
 /** @file main.c
- *  @brief  A minimal binary that parses BVH scenes using OGLRendererSandbox s
- *          X86 compilation: gcc -o -L/usr/X11/lib   main main.c -lGL -lX11 -lpng -ljpeg
- *          X64 compilation: gcc -o -L/usr/X11/lib64 main main.c -lGL -lX11 -lpng -ljpeg
+ *  @brief  A library that can parse BVH files and perform various processing options as a commandline tool
+ *          X86 compilation: gcc -o -L/usr/X11/lib   main main.c
+ *          X64 compilation: gcc -o -L/usr/X11/lib64 main main.c
  *  @author Ammar Qammaz (AmmarkoV)
  */
 
@@ -13,7 +13,7 @@
 
 #include "../../Library/TrajectoryParser/TrajectoryParserDataStructures.h"
 #include "../../Library/MotionCaptureLoader/bvh_loader.h"
-#include "../../Library/MotionCaptureLoader/bvh_to_tri_pose.h"
+#include "../../Library/MotionCaptureLoader/calculate/bvh_to_tri_pose.h"
 
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h"
 #include "../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.h"

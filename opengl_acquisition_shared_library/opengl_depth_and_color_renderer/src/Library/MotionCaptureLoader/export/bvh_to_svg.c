@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "bvh_to_svg.h"
 
-#include "../bvh_project.h"
+#include "../calculate/bvh_project.h"
 
 int dumpBVHToSVGFrame(
                       const char * svgFilename,
@@ -13,7 +13,7 @@ int dumpBVHToSVGFrame(
                      )
 {
    unsigned int width = renderer->width;
-   unsigned int height = renderer->height; 
+   unsigned int height = renderer->height;
 
 
    FILE * fp = fopen(svgFilename,"w");

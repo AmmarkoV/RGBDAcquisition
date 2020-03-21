@@ -1,7 +1,7 @@
 #ifndef BVH_TO_TRI_POSE_H_INCLUDED
 #define BVH_TO_TRI_POSE_H_INCLUDED
 
-#include "bvh_loader.h"
+#include "../bvh_loader.h"
 
 #ifdef __cplusplus
 extern "C"

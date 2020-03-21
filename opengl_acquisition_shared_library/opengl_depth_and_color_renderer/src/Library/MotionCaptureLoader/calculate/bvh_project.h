@@ -1,11 +1,11 @@
 #ifndef BVH_PROJECT_H_INCLUDED
 #define BVH_PROJECT_H_INCLUDED
 
-#include "bvh_loader.h"
+#include "../bvh_loader.h"
 #include "bvh_transform.h"
 
 
-#include "../../../../../tools/AmMatrix/simpleRenderer.h"
+#include "../../../../../../tools/AmMatrix/simpleRenderer.h"
 
 
 #ifdef __cplusplus

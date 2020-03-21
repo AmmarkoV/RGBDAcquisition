@@ -228,13 +228,6 @@ struct BVH_MotionCapture
 };
 
 
-
-
-double bvh_constrainAngleCentered0(double angle,unsigned int flipOrientation);
-
-double bvh_RemapAngleCentered0(double angle, unsigned int constrainOrientation);
-
-
 int enumerateChannelOrderFromTypes(char typeA,char typeB,char typeC);
 
 int enumerateChannelOrder(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint);
@@ -277,13 +270,6 @@ int bvh_ConstrainRotations(
                            unsigned int constrainOrientation
                           );
 
-
-
-int bvh_testConstrainRotations();
-
-int bvh_InterpolateMotion(
-                           struct BVH_MotionCapture * mc
-                         );
 
 
 /**

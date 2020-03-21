@@ -56,18 +56,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/bvh_loader.h" />
-		<Unit filename="../../Library/MotionCaptureLoader/bvh_project.c">
+		<Unit filename="../../Library/MotionCaptureLoader/calculate/bvh_project.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../Library/MotionCaptureLoader/bvh_project.h" />
-		<Unit filename="../../Library/MotionCaptureLoader/bvh_to_tri_pose.c">
+		<Unit filename="../../Library/MotionCaptureLoader/calculate/bvh_project.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/calculate/bvh_to_tri_pose.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../Library/MotionCaptureLoader/bvh_to_tri_pose.h" />
-		<Unit filename="../../Library/MotionCaptureLoader/bvh_transform.c">
+		<Unit filename="../../Library/MotionCaptureLoader/calculate/bvh_to_tri_pose.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/calculate/bvh_transform.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../Library/MotionCaptureLoader/bvh_transform.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/calculate/bvh_transform.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_cut_paste.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -76,6 +76,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_filter.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_interpolate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_interpolate.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -116,6 +120,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/import/fromBVH.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/import/fromBVH.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/tests/test.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/tests/test.h" />
 		<Unit filename="../../Library/TrajectoryParser/InputParser_C.c">
 			<Option compilerVar="CC" />
 		</Unit>

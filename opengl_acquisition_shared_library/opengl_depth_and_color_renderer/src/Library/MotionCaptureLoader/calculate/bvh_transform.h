@@ -1,7 +1,7 @@
 #ifndef BVH_TRANSFORM_H_INCLUDED
 #define BVH_TRANSFORM_H_INCLUDED
 
-#include "bvh_loader.h"
+#include "../bvh_loader.h"
 
 
 #ifdef __cplusplus

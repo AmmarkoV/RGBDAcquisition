@@ -68,9 +68,10 @@ add_library(OGLRendererSandbox SHARED
             ModelLoader/model_editor.h
             #Motion Capture and how to load it
             MotionCaptureLoader/bvh_loader.c
-            MotionCaptureLoader/bvh_transform.c
-            MotionCaptureLoader/bvh_project.c
-            MotionCaptureLoader/bvh_to_tri_pose.c
+            MotionCaptureLoader/calculate/bvh_transform.c
+            MotionCaptureLoader/calculate/bvh_project.c
+            MotionCaptureLoader/calculate/bvh_to_tri_pose.c
+            MotionCaptureLoader/import/fromBVH.c
             MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.c
             MotionCaptureLoader/export/bvh_to_trajectoryParserPrimitives.c
             MotionCaptureLoader/export/bvh_to_svg.c
@@ -79,10 +80,13 @@ add_library(OGLRendererSandbox SHARED
             MotionCaptureLoader/export/bvh_export.c 
             MotionCaptureLoader/edit/bvh_randomize.c 
             MotionCaptureLoader/edit/bvh_rename.c 
+            MotionCaptureLoader/edit/bvh_remapangles.c 
+            MotionCaptureLoader/edit/bvh_interpolate.c 
             MotionCaptureLoader/edit/bvh_filter.c 
             MotionCaptureLoader/edit/bvh_merge.c 
             MotionCaptureLoader/edit/bvh_cut_paste.c 
             MotionCaptureLoader/edit/bvh_inverseKinematics.c
+            MotionCaptureLoader/tests/test.c
             #Textures and how to load them  
             TextureLoader/texture_loader.c
             TextureLoader/texture_loader.h
