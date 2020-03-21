@@ -14,6 +14,10 @@ extern "C"
 {
 #endif
 
+//BVH Code version
+static const char FULLVERSION_STRING [] = "0.4";
+
+
 /**
 * @brief MAX_BVH_JOINT_NAME is the maximum label size for Joint names
 * @ingroup BVH
