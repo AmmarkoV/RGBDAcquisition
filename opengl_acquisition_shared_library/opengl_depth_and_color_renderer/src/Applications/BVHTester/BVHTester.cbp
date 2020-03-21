@@ -16,6 +16,7 @@
 				<Option host_application="/home/ammar/Documents/Programming/FORTH/opengl_depth_and_color_renderer/BVHTester" />
 				<Option run_host_application_in_terminal="1" />
 				<Compiler>
+					<Add option="-pedantic" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
@@ -92,6 +93,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_randomize.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_remapangles.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_remapangles.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_rename.c">
 			<Option compilerVar="CC" />
 		</Unit>

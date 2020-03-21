@@ -1,6 +1,7 @@
 #include "bvh_interpolate.h"
 
-
+#include <stdio.h>
+#include <stdlib.h>
 
 
 int bvh_InterpolateMotion(struct BVH_MotionCapture * mc)

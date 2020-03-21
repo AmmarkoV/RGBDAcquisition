@@ -25,7 +25,11 @@
 #include "../../Library/MotionCaptureLoader/edit/bvh_filter.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_rename.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_merge.h"
+#include "../../Library/MotionCaptureLoader/edit/bvh_interpolate.h"
 #include "../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h"
+
+#include "../../Library/MotionCaptureLoader/tests/test.h"
+
 
 #include  "../../../../../tools/AmMatrix/matrix4x4Tools.h"
 #include  "../../../../../tools/AmMatrix/matrixOpenGL.h"
@@ -73,32 +77,6 @@ void prepareHuman36MRotationMatrix(float * rotationMatrix,float rX,float rY,floa
 }
 
 
-void testPrintout(struct BVH_MotionCapture * bvhMotion,const char * jointName)
-{
-    //Test getting rotations for a joint..
-    BVHJointID jID=0;
-    if ( bvh_getJointIDFromJointName(bvhMotion ,jointName,&jID) )
-    {
-      fprintf(stderr,"\nJoint %s (#%u) \n",bvhMotion->jointHierarchy[jID].jointName,jID);
-
-      fprintf(
-              stderr,"Channels ( %u,%u,%u )\n",
-              bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[BVH_ROTATION_X],
-              bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[BVH_ROTATION_Y],
-              bvhMotion->jointToMotionLookup[jID].channelIDMotionOffset[BVH_ROTATION_Z]
-             );
-
-       BVHFrameID frameID = 0;
-       for (frameID=0; frameID<bvhMotion->numberOfFrames; frameID++)
-       {
-
-         fprintf(stderr,"Frame %u \n",frameID);
-         fprintf(stderr,"XRotation:%0.2f " ,bvh_getJointRotationXAtFrame(bvhMotion , jID ,  frameID));
-         fprintf(stderr,"YRotation:%0.2f " ,bvh_getJointRotationYAtFrame(bvhMotion , jID ,  frameID));
-         fprintf(stderr,"ZRotation:%0.2f\n",bvh_getJointRotationZAtFrame(bvhMotion , jID ,  frameID));
-       }
-    }
-}
 
 void haltOnError(unsigned int haltingSwitch,const char * message)
 {
