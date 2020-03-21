@@ -15,7 +15,7 @@ extern "C"
 #endif
 
 //BVH Code version
-static const char FULLVERSION_STRING [] = "0.4";
+static const char BVH_LOADER_VERSION_STRING [] = "0.4";
 
 
 /**
