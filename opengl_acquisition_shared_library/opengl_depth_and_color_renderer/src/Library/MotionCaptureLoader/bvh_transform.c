@@ -540,10 +540,10 @@ int bvh_loadTransformForFrame(
   TODO : merge the two codebases
 */
 int bvh_loadTransformForMotionBuffer(
-                                                                                          struct BVH_MotionCapture * bvhMotion ,
-                                                                                          float * motionBuffer,
-                                                                                          struct BVH_Transform * bvhTransform
-                                                                                        )
+                                     struct BVH_MotionCapture * bvhMotion ,
+                                     float * motionBuffer,
+                                     struct BVH_Transform * bvhTransform
+                                   )
 {
    //We can use this to change root joint
    //But this gets unreasonably complicated so it is best not to change anything here..

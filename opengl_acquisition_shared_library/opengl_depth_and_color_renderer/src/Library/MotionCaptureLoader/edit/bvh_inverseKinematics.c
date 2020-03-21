@@ -81,12 +81,20 @@ float approximateTargetPose(
 
 
 
+float approximateTargetFromMotionBuffer(
+                                         struct BVH_MotionCapture * mc,
+                                         struct simpleRenderer *renderer,
+                                         float * sourceMotionBuffer,
+                                         unsigned int sourceMotionBufferLength,
+                                         struct BVH_Transform * bvhTargetTransform
+                                        )
+{
 
 
+ return 0.0;
+}
 
 
-
-//./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
 
 
 int BVHTestIK(
@@ -104,6 +112,66 @@ int BVHTestIK(
                          1920, 1080, 582.18394,   582.52915 // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
                         );
   simpleRendererInitialize(&renderer);
+
+/*
+  float * motionBuffer=0;
+  int bvh_loadTransformForMotionBuffer(
+                                       mc,
+                                       motionBuffer,
+                                     struct BVH_Transform * bvhTransform
+                                    );*/
+
+  if (
+       ( bvh_loadTransformForFrame(mc,fIDSource,&bvhSourceTransform) )
+        &&
+       ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
+     )
+     {
+        float distance2D = approximateTargetPose(mc,&renderer,&bvhSourceTransform,&bvhTargetTransform);
+
+        fprintf(stderr,"2D Distance is %0.2f\n",distance2D);
+        return 1;
+     }
+
+   return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+//./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
+
+
+int BVHTestIKOLD(
+              struct BVH_MotionCapture * mc,
+              unsigned int fIDSource,
+              unsigned int fIDTarget
+             )
+{
+  struct BVH_Transform bvhSourceTransform={0};
+  struct BVH_Transform bvhTargetTransform={0};
+
+  struct simpleRenderer renderer={0};
+  simpleRendererDefaults(
+                         &renderer,
+                         1920, 1080, 582.18394,   582.52915 // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
+                        );
+  simpleRendererInitialize(&renderer);
+
+/*
+  float * motionBuffer=0;
+  int bvh_loadTransformForMotionBuffer(
+                                       mc,
+                                       motionBuffer,
+                                     struct BVH_Transform * bvhTransform
+                                    );*/
 
   if (
        ( bvh_loadTransformForFrame(mc,fIDSource,&bvhSourceTransform) )

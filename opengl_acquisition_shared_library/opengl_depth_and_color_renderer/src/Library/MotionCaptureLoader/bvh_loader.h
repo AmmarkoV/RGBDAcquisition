@@ -115,6 +115,11 @@ typedef unsigned int BVHJointID;
 typedef unsigned int BVHFrameID;
 typedef unsigned int BVHMotionChannelID;
 
+struct MotionBuffer
+{
+  float * motion;
+  unsigned int bufferSize;
+};
 
 /**
 * @brief Each BVH Joint has a number of properties,offsets and channels that are modeled using this structure
@@ -360,6 +365,20 @@ int bvh_copyMotionFrame(
                          BVHFrameID fromfID
                         );
 
+
+/**
+* @brief Copy a motion frame to a buffer
+* @ingroup BVH
+* @param  BVH Structure
+* @param  Target frame we want to populate with source
+* @param  Source frame we want to copy
+* @return 1=Success/0=Failure
+*/
+int bvh_copyMotionFrameToMotionBuffer(
+                                      struct BVH_MotionCapture * bvhMotion,
+                                      struct MotionBuffer * motionBuffer,
+                                      BVHFrameID fromfID
+                                     );
 
 //float * bvh_getJointOffset(struct BVH_MotionCapture * bvhMotion , BVHJointID jID);
 

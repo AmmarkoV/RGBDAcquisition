@@ -601,7 +601,7 @@ int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * par
 {
    if (bvhMotion==0)  { return 0; }
    if (parameters==0)  { return 0; }
- 
+
    if (
          (bvhMotion->motionValues==0) ||
          (bvhMotion->motionValuesSize==0)
@@ -702,22 +702,22 @@ int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
       { //We have content..
        if (!atMotionSection)
        {
-          if (InputParser_WordCompareAuto(ipc,0,"MOTION"))      
-               { 
-                //fprintf(stderr,"Found Motion Section (%s)..\n",line); 
-                atMotionSection=1; 
+          if (InputParser_WordCompareAuto(ipc,0,"MOTION"))
+               {
+                //fprintf(stderr,"Found Motion Section (%s)..\n",line);
+                atMotionSection=1;
                }
        } else
        {
-         if (InputParser_WordCompareAuto(ipc,0,"Frames"))       
-              { 
-                //fprintf(stderr,"Frames (%s)..\n",line); 
-                bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1); 
-                //fprintf(stderr,"Frames number (%u)..\n",bvhMotion->numberOfFrames); 
+         if (InputParser_WordCompareAuto(ipc,0,"Frames"))
+              {
+                //fprintf(stderr,"Frames (%s)..\n",line);
+                bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1);
+                //fprintf(stderr,"Frames number (%u)..\n",bvhMotion->numberOfFrames);
               } else
-         if (InputParser_WordCompareAuto(ipc,0,"Frame Time"))   
-             { 
-                bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1); 
+         if (InputParser_WordCompareAuto(ipc,0,"Frame Time"))
+             {
+                bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1);
              }  else
          {
            if (bvhMotion->motionValues==0)
@@ -1463,6 +1463,36 @@ float bvh_getMotionValue(struct BVH_MotionCapture * bvhMotion , unsigned int mID
 {
   return bvhMotion->motionValues[mID];
 }
+
+
+
+int bvh_copyMotionFrameToMotionBuffer(
+                                       struct BVH_MotionCapture * bvhMotion,
+                                       struct MotionBuffer * motionBuffer,
+                                       BVHFrameID fromfID
+                                     )
+{
+   if (motionBuffer==0) { return 0; }
+   if (motionBuffer->motion==0) { return 0; }
+   if (motionBuffer->bufferSize < bvhMotion->numberOfValuesPerFrame) { return 0; }
+
+   if ( fromfID < bvhMotion->numberOfFrames )
+   {
+     memcpy(
+             &motionBuffer->motion,
+             &bvhMotion->motionValues[fromfID * bvhMotion->numberOfValuesPerFrame],
+             bvhMotion->numberOfValuesPerFrame * sizeof(float)
+           );
+     return 1;
+   }
+ return 0;
+}
+
+
+
+
+
+
 
 int bvh_copyMotionFrame(
                          struct BVH_MotionCapture * bvhMotion,
