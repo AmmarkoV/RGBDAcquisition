@@ -1284,7 +1284,7 @@ int bvh_copyMotionFrameToMotionBuffer(
    if ( fromfID < bvhMotion->numberOfFrames )
    {
      memcpy(
-             &motionBuffer->motion,
+             motionBuffer->motion,
              &bvhMotion->motionValues[fromfID * bvhMotion->numberOfValuesPerFrame],
              bvhMotion->numberOfValuesPerFrame * sizeof(float)
            );

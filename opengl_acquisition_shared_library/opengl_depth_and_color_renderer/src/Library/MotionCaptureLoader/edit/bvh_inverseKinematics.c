@@ -6,7 +6,6 @@
 #include "bvh_cut_paste.h"
 
 
-
 float get2DPointDistance(float aX,float aY,float bX,float bY)
 {
   float diffX = (float) aX-bX;
@@ -112,7 +111,7 @@ int BVHTestIK(
                         );
   simpleRendererInitialize(&renderer);
 
-
+  fprintf(stderr,"BVH file has motion files with %u elements\n",mc->numberOfValuesPerFrame);
   struct MotionBuffer solution={0};
   solution.bufferSize = mc->numberOfValuesPerFrame;
   solution.motion = (float *) malloc(sizeof(float) * (solution.bufferSize+1));
