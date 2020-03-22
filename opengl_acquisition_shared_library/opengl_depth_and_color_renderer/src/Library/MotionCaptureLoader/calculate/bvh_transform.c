@@ -724,6 +724,14 @@ if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
 
 
 
+int bvh_removeTranslationFromTransform(
+                          struct BVH_MotionCapture * bvhMotion ,
+                          struct BVH_Transform * bvhTransform
+                         )
+{
 
+
+
+}
 
 

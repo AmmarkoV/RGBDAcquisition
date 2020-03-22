@@ -85,6 +85,12 @@ float approximateTargetFromMotionBuffer(
                                        )
      )
      {
+               bvh_removeTranslationFromTransform(
+                                            mc,
+                                            &bvhSourceTransform
+                                          );
+
+
        return BVH2DDistace(mc,renderer,&bvhSourceTransform,bvhTargetTransform);
      }
 
@@ -122,6 +128,11 @@ int BVHTestIK(
     {
       if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
       {
+        bvh_removeTranslationFromTransform(
+                                            mc,
+                                            &bvhTargetTransform
+                                          );
+
        float error2D = approximateTargetFromMotionBuffer(
                                                          mc,
                                                          &renderer,
