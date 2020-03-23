@@ -5,6 +5,13 @@
 #include "bvh_inverseKinematics.h"
 #include "bvh_cut_paste.h"
 
+float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
+{
+  float diffX = (float) aX-bX;
+  float diffY = (float) aY-bY;
+    //We calculate the distance here..!
+  return (diffX*diffX)+(diffY*diffY);
+}
 
 float get2DPointDistance(float aX,float aY,float bX,float bY)
 {
@@ -43,16 +50,16 @@ float BVH2DDistace(
 
                if (isSelected)
                {
-                float this2DDistance=get2DPointDistance(
-                                                      (float) bvhSourceTransform->joint[jID].pos2D[0],
-                                                      (float) bvhSourceTransform->joint[jID].pos2D[1],
-                                                      (float) bvhTargetTransform->joint[jID].pos2D[0],
-                                                      (float) bvhTargetTransform->joint[jID].pos2D[1]
-                                                     );
-               fprintf(stderr,"Joint %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,this2DDistance);
+                float thisSquared2DDistance=getSquared2DPointDistance(
+                                                                      (float) bvhSourceTransform->joint[jID].pos2D[0],
+                                                                      (float) bvhSourceTransform->joint[jID].pos2D[1],
+                                                                      (float) bvhTargetTransform->joint[jID].pos2D[0],
+                                                                      (float) bvhTargetTransform->joint[jID].pos2D[1]
+                                                                     );
+               fprintf(stderr,"Joint squared %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,thisSquared2DDistance);
 
                numberOfSamples+=1;
-               sumOf2DDistances+=this2DDistance;
+               sumOf2DDistances+=thisSquared2DDistance;
               }
             }
 
@@ -85,7 +92,7 @@ float approximateTargetFromMotionBuffer(
                                        )
      )
      {
-               bvh_removeTranslationFromTransform(
+        bvh_removeTranslationFromTransform(
                                             mc,
                                             &bvhSourceTransform
                                           );

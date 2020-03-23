@@ -585,12 +585,12 @@ int bvh_loadTransformForMotionBuffer(
   {
       //Setup dynamic transformation
       //Get values from our bvhMotion structure
-      fprintf(stderr,"bhv_populatePosXYZRotXYZFromMotionBuffer ");
+      //fprintf(stderr,"bhv_populatePosXYZRotXYZFromMotionBuffer ");
       if (!bhv_populatePosXYZRotXYZFromMotionBuffer(bvhMotion,jID,motionBuffer,data,sizeof(data)))
       {
         fprintf(stderr,"Error extracting dynamic transformation for jID=%u and a motionBuffer\n",jID);
       }
-      fprintf(stderr,"ok \n ");
+      //fprintf(stderr,"ok \n ");
 
       double posX = fToD(data[0]);
       double posY = fToD(data[1]);
