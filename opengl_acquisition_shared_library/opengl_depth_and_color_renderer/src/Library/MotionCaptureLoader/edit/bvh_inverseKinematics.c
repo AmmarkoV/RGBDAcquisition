@@ -2,6 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+
+#include <time.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <unistd.h>
+
+
+#include "bvh_cut_paste.h"
 #include "bvh_inverseKinematics.h"
 #include "bvh_cut_paste.h"
 
@@ -75,6 +84,62 @@ float BVH2DDistace(
 
 
 
+void clear_line()
+{
+  fputs("\033[A\033[2K\033[A\033[2K",stdout);
+  rewind(stdout);
+  int i=ftruncate(1,0);
+  if (i!=0) { /*fprintf(stderr,"Error with ftruncate\n");*/ }
+}
+
+
+int bruteForceChange(
+                     struct BVH_MotionCapture * mc,
+                     struct simpleRenderer *renderer,
+                     struct MotionBuffer * solution,
+                     unsigned int fromElement,
+                     unsigned int toElement,
+                     unsigned int budget,
+                     struct BVH_Transform * bvhTargetTransform
+                    )
+{
+  unsigned int degreesOfFreedomForTheProblem = toElement - fromElement + 1;
+  unsigned int budgetPerDoF=(unsigned int) budget/degreesOfFreedomForTheProblem;
+  fprintf(stdout,"Trying to solve a %u D.o.F. problem with a budget of %u tries..\n",degreesOfFreedomForTheProblem,budget);
+
+
+  char jointName[256]={0};
+
+  for (BVHMotionChannelID mID=fromElement; mID<toElement+1; mID++)
+  {
+    if (bvh_getMotionChannelName(mc,mID,jointName,256))
+    {
+     fprintf(stdout,"%s ",jointName);
+    } else
+    {
+     fprintf(stdout,"mID=%u ",mID);
+    }
+  }
+  fprintf(stdout,"\n______________________\n");
+
+
+  for (BVHMotionChannelID mID=fromElement; mID<toElement+1; mID++)
+  {
+    for (int i=0; i<budgetPerDoF; i++)
+    {
+
+    }
+  }
+
+
+ return 1;
+}
+
+
+
+
+
+
 
 float approximateTargetFromMotionBuffer(
                                          struct BVH_MotionCapture * mc,
@@ -98,6 +163,15 @@ float approximateTargetFromMotionBuffer(
                                             &bvhSourceTransform
                                           );
 
+        bruteForceChange(
+                          mc,
+                          renderer,
+                          solution,
+                          3,
+                          5,
+                          100,
+                          bvhTargetTransform
+                        );
 
        return BVH2DDistace(mc,renderer,&bvhSourceTransform,bvhTargetTransform);
      }
@@ -141,7 +215,7 @@ int BVHTestIK(
                                             &bvhTargetTransform
                                           );
 
-       float error2D = approximateTargetFromMotionBuffer(
+        float error2D = approximateTargetFromMotionBuffer(
                                                          mc,
                                                          &renderer,
                                                          &solution,
