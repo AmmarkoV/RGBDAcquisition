@@ -26,12 +26,12 @@
 /* set parameters required by levmarq() to default values */
 void levmarq_init(LMstat *lmstat)
 {
-  lmstat->verbose = 0;
-  lmstat->max_it = 10000;
-  lmstat->init_lambda = 0.1;
-  lmstat->up_factor = 10;
-  lmstat->down_factor = 10;
-  lmstat->target_derr = 0.01;
+    lmstat->verbose = 0;
+    lmstat->max_it = 10000;
+    lmstat->init_lambda = 0.1;
+    lmstat->up_factor = 10;
+    lmstat->down_factor = 10;
+    lmstat->target_derr = 0.01;
 }
 
 
@@ -53,117 +53,140 @@ void levmarq_init(LMstat *lmstat)
    Before calling levmarq, several of the parameters in lmstat must be set.
    For default values, call levmarq_init(lmstat).
  */
-int levmarq(int npar, double *par, int ny, double *y, double *dysq,
-	    double (*func)(double *, int, void *),
-	    void (*grad)(double *, double *, int, void *),
-	    void *fdata, LMstat *lmstat)
+int levmarq(
+    int npar,
+    double *par,
+    int ny,
+    double *y,
+    double *dysq,
+    double (*func)(double *, int, void *),
+    void (*grad)(double *, double *, int, void *),
+    void *fdata,
+    LMstat *lmstat
+)
 {
-  int x,i,j,it,nit,ill,verbose;
-  double lambda,up,down,mult,weight,err,newerr,derr,target_derr;
-  double h[npar][npar],ch[npar][npar];
-  double g[npar],d[npar],delta[npar],newpar[npar];
+    int x,i,j,it,nit,ill,verbose;
+    double lambda,up,down,mult,weight,err,newerr,derr,target_derr;
+    double h[npar][npar],ch[npar][npar];
+    double g[npar],d[npar],delta[npar],newpar[npar];
 
-  verbose = lmstat->verbose;
-  nit = lmstat->max_it;
-  lambda = lmstat->init_lambda;
-  up = lmstat->up_factor;
-  down = 1/lmstat->down_factor;
-  target_derr = lmstat->target_derr;
-  weight = 1;
-  derr = newerr = 0; /* to avoid compiler warnings */
+    verbose = lmstat->verbose;
+    nit = lmstat->max_it;
+    lambda = lmstat->init_lambda;
+    up = lmstat->up_factor;
+    down = 1/lmstat->down_factor;
+    target_derr = lmstat->target_derr;
+    weight = 1;
+    derr = newerr = 0; /* to avoid compiler warnings */
 
-  /* calculate the initial error ("chi-squared") */
-  err = error_func(par, ny, y, dysq, func, fdata);
+    /* calculate the initial error ("chi-squared") */
+    err = error_func(par, ny, y, dysq, func, fdata);
 
-  /* main iteration */
-  for (it=0; it<nit; it++) {
-
-    /* calculate the approximation to the Hessian and the "derivative" d */
-    for (i=0; i<npar; i++) {
-      d[i] = 0;
-      for (j=0; j<=i; j++)
-	h[i][j] = 0;
-    }
-    for (x=0; x<ny; x++) {
-      if (dysq) weight = 1/dysq[x]; /* for weighted least-squares */
-      grad(g, par, x, fdata);
-      for (i=0; i<npar; i++) {
-	d[i] += (y[x] - func(par, x, fdata))*g[i]*weight;
-	for (j=0; j<=i; j++)
-	  h[i][j] += g[i]*g[j]*weight;
-      }
-    }
-
-    /*  make a step "delta."  If the step is rejected, increase
-       lambda and try again */
-    mult = 1 + lambda;
-    ill = 1; /* ill-conditioned? */
-    while (ill && (it<nit)) {
-      for (i=0; i<npar; i++)
-	h[i][i] = h[i][i]*mult;
-
-      ill = cholesky_decomp(npar, ch, h);
-
-      if (!ill) {
-	solve_axb_cholesky(npar, ch, delta, d);
-	for (i=0; i<npar; i++)
-	  newpar[i] = par[i] + delta[i];
-	newerr = error_func(newpar, ny, y, dysq, func, fdata);
-	derr = newerr - err;
-	ill = (derr > 0);
-      } 
-      if (verbose) printf("it = %4d,   lambda = %10g,   err = %10g,   "
-			  "derr = %10g\n", it, lambda, err, derr);
-      if (ill) {
-	mult = (1 + lambda*up)/(1 + lambda);
-	lambda *= up;
-	it++;
-      }
-    }
-    for (i=0; i<npar; i++)
-      par[i] = newpar[i];
-    err = newerr;
-    lambda *= down;  
-#ifdef PRINT_DEBUG
-    printf("Iteration %d: ", it);
-    for (i = 0; i < npar; i++)
+    /* main iteration */
+    for (it=0; it<nit; it++)
     {
-        printf("%f:",par[i]);
-    }
-    printf("Error: %f\n", derr);
-#endif
-    if ((!ill)&&(-derr<target_derr))
-    {
+
+        /* calculate the approximation to the Hessian and the "derivative" d */
+        for (i=0; i<npar; i++)
+        {
+            d[i] = 0;
+            for (j=0; j<=i; j++)
+                h[i][j] = 0;
+        }
+        for (x=0; x<ny; x++)
+        {
+            if (dysq)
+                weight = 1/dysq[x]; /* for weighted least-squares */
+            grad(g, par, x, fdata);
+            for (i=0; i<npar; i++)
+            {
+                d[i] += (y[x] - func(par, x, fdata))*g[i]*weight;
+                for (j=0; j<=i; j++)
+                    h[i][j] += g[i]*g[j]*weight;
+            }
+        }
+
+        /*  make a step "delta."  If the step is rejected, increase
+           lambda and try again */
+        mult = 1 + lambda;
+        ill = 1; /* ill-conditioned? */
+        while (ill && (it<nit))
+        {
+            for (i=0; i<npar; i++)
+                h[i][i] = h[i][i]*mult;
+
+            ill = cholesky_decomp(npar, ch, h);
+
+            if (!ill)
+            {
+                solve_axb_cholesky(npar, ch, delta, d);
+                for (i=0; i<npar; i++)
+                    newpar[i] = par[i] + delta[i];
+                newerr = error_func(newpar, ny, y, dysq, func, fdata);
+                derr = newerr - err;
+                ill = (derr > 0);
+            }
+            if (verbose)
+                printf("it = %4d,   lambda = %10g,   err = %10g,   "
+                       "derr = %10g\n", it, lambda, err, derr);
+            if (ill)
+            {
+                mult = (1 + lambda*up)/(1 + lambda);
+                lambda *= up;
+                it++;
+            }
+        }
+        for (i=0; i<npar; i++)
+            par[i] = newpar[i];
+        err = newerr;
+        lambda *= down;
 #ifdef PRINT_DEBUG
-        printf("Converge after: %d cycles, final error: %f\n", it, derr);
+        printf("Iteration %d: ", it);
+        for (i = 0; i < npar; i++)
+        {
+            printf("%f:",par[i]);
+        }
+        printf("Error: %f\n", derr);
 #endif
-        break;
+        if ((!ill)&&(-derr<target_derr))
+        {
+#ifdef PRINT_DEBUG
+            printf("Converge after: %d cycles, final error: %f\n", it, derr);
+#endif
+            break;
+        }
     }
-  }
 
-  lmstat->final_it = it;
-  lmstat->final_err = err;
-  lmstat->final_derr = derr;
+    lmstat->final_it = it;
+    lmstat->final_err = err;
+    lmstat->final_derr = derr;
 
-  return it;
+    return it;
 }
 
 
 /* calculate the error function (chi-squared) */
-double error_func(double *par, int ny, double *y, double *dysq,
-		  double (*func)(double *, int, void *), void *fdata)
+double error_func(
+    double *par,
+    int ny,
+    double *y,
+    double *dysq,
+    double (*func)(double *, int, void *),
+    void *fdata
+)
 {
-  int x;
-  double res,e=0;
+    int x;
+    double res,e=0;
 
-  for (x=0; x<ny; x++) {
-    res = func(par, x, fdata) - y[x];
-    if (dysq)  /* weighted least-squares */
-      e += res*res/dysq[x];
-    else
-      e += res*res;
-  }
-  return e;
+    for (x=0; x<ny; x++)
+    {
+        res = func(par, x, fdata) - y[x];
+        if (dysq)  /* weighted least-squares */
+            e += res*res/dysq[x];
+        else
+            e += res*res;
+    }
+    return e;
 }
 
 
@@ -173,26 +196,28 @@ double error_func(double *par, int ny, double *y, double *dysq,
 */
 void solve_axb_cholesky(int n, double l[n][n], double x[n], double b[n])
 {
-  int i,j;
-  double sum;
+    int i,j;
+    double sum;
 
-  /* solve L*y = b for y (where x[] is used to store y) */
+    /* solve L*y = b for y (where x[] is used to store y) */
 
-  for (i=0; i<n; i++) {
-    sum = 0;
-    for (j=0; j<i; j++)
-      sum += l[i][j] * x[j];
-    x[i] = (b[i] - sum)/l[i][i];      
-  }
+    for (i=0; i<n; i++)
+    {
+        sum = 0;
+        for (j=0; j<i; j++)
+            sum += l[i][j] * x[j];
+        x[i] = (b[i] - sum)/l[i][i];
+    }
 
-  /* solve L^T*x = y for x (where x[] is used to store both y and x) */
+    /* solve L^T*x = y for x (where x[] is used to store both y and x) */
 
-  for (i=n-1; i>=0; i--) {
-    sum = 0;
-    for (j=i+1; j<n; j++)
-      sum += l[j][i] * x[j];
-    x[i] = (x[i] - sum)/l[i][i];      
-  }
+    for (i=n-1; i>=0; i--)
+    {
+        sum = 0;
+        for (j=i+1; j<n; j++)
+            sum += l[j][i] * x[j];
+        x[i] = (x[i] - sum)/l[i][i];
+    }
 }
 
 
@@ -203,24 +228,27 @@ void solve_axb_cholesky(int n, double l[n][n], double x[n], double b[n])
 */
 int cholesky_decomp(int n, double l[n][n], double a[n][n])
 {
-  int i,j,k;
-  double sum;
+    int i,j,k;
+    double sum;
 
-  for (i=0; i<n; i++) {
-    for (j=0; j<i; j++) {
-      sum = 0;
-      for (k=0; k<j; k++)
-	sum += l[i][k] * l[j][k];
-      l[i][j] = (a[i][j] - sum)/l[j][j];
+    for (i=0; i<n; i++)
+    {
+        for (j=0; j<i; j++)
+        {
+            sum = 0;
+            for (k=0; k<j; k++)
+                sum += l[i][k] * l[j][k];
+            l[i][j] = (a[i][j] - sum)/l[j][j];
+        }
+
+        sum = 0;
+        for (k=0; k<i; k++)
+            sum += l[i][k] * l[i][k];
+        sum = a[i][i] - sum;
+        if (sum<TOL)
+            return 1; /* not positive-definite */
+        l[i][i] = sqrt(sum);
     }
-
-    sum = 0;
-    for (k=0; k<i; k++)
-      sum += l[i][k] * l[i][k];
-    sum = a[i][i] - sum;
-    if (sum<TOL) return 1; /* not positive-definite */
-    l[i][i] = sqrt(sum);
-  }
-  return 0;
+    return 0;
 }
 
