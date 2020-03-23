@@ -1,12 +1,17 @@
 #ifndef BVH_IMPORTFROMBVH_H_INCLUDED
 #define BVH_IMPORTFROMBVH_H_INCLUDED
 
+#include "../bvh_loader.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+
+int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd );
 
 
 #ifdef __cplusplus
