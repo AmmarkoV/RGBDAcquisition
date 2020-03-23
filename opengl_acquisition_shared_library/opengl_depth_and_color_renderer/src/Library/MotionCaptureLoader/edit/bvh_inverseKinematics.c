@@ -56,6 +56,7 @@ float BVH2DDistace(
                                                                       (float) bvhTargetTransform->joint[jID].pos2D[0],
                                                                       (float) bvhTargetTransform->joint[jID].pos2D[1]
                                                                      );
+               fprintf(stderr,"%0.2f,%0.2f -> %0.2f,%0.2f : ",bvhSourceTransform->joint[jID].pos2D[0],bvhSourceTransform->joint[jID].pos2D[1],bvhTargetTransform->joint[jID].pos2D[0],bvhTargetTransform->joint[jID].pos2D[1]);
                fprintf(stderr,"Joint squared %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,thisSquared2DDistance);
 
                numberOfSamples+=1;

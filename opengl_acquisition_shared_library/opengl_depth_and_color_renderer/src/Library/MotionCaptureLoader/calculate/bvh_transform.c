@@ -725,11 +725,21 @@ if (!bvh_populateTorso3DFromTransform(bvhMotion,bvhTransform))
 
 
 int bvh_removeTranslationFromTransform(
-                          struct BVH_MotionCapture * bvhMotion ,
-                          struct BVH_Transform * bvhTransform
-                         )
+                                       struct BVH_MotionCapture * bvhMotion ,
+                                       struct BVH_Transform * bvhTransform
+                                      )
 {
+  BVHJointID rootJID=0;
 
+  if ( bvh_getRootJointID(bvhMotion,&rootJID) )
+  {
+   for (BVHJointID jID=0; jID<bvhMotion->jointHierarchySize; jID++)
+    {
+     bvhTransform->joint[jID].pos3D[0]=bvhTransform->joint[jID].pos3D[0]-bvhTransform->joint[rootJID].pos3D[0];
+     bvhTransform->joint[jID].pos3D[1]=bvhTransform->joint[jID].pos3D[1]-bvhTransform->joint[rootJID].pos3D[1];
+     bvhTransform->joint[jID].pos3D[2]=bvhTransform->joint[jID].pos3D[2]-bvhTransform->joint[rootJID].pos3D[2];
+    }
+  }
 
   return 0;
 }
