@@ -97,6 +97,7 @@ int bruteForceChange(
                      struct BVH_MotionCapture * mc,
                      struct simpleRenderer *renderer,
                      struct MotionBuffer * solution,
+                     float * averageError,
                      unsigned int fromElement,
                      unsigned int toElement,
                      unsigned int budget,
@@ -145,6 +146,7 @@ float approximateTargetFromMotionBuffer(
                                          struct BVH_MotionCapture * mc,
                                          struct simpleRenderer *renderer,
                                          struct MotionBuffer * solution,
+                                         float * averageError,
                                          struct BVH_Transform * bvhTargetTransform
                                         )
 {
@@ -167,6 +169,7 @@ float approximateTargetFromMotionBuffer(
                           mc,
                           renderer,
                           solution,
+                          averageError,
                           3,
                           5,
                           100,
@@ -204,7 +207,9 @@ int BVHTestIK(
   solution.bufferSize = mc->numberOfValuesPerFrame;
   solution.motion = (float *) malloc(sizeof(float) * (solution.bufferSize+1));
 
-  if (solution.motion!=0)
+  float * averageError = (float *) malloc(sizeof(float) * (solution.bufferSize+1));
+
+  if ( (averageError!=0) && (solution.motion!=0) )
   {
     if ( bvh_copyMotionFrameToMotionBuffer(mc,&solution,fIDSource) )
     {
@@ -219,6 +224,7 @@ int BVHTestIK(
                                                          mc,
                                                          &renderer,
                                                          &solution,
+                                                         averageError,
                                                          &bvhTargetTransform
                                                         );
 
