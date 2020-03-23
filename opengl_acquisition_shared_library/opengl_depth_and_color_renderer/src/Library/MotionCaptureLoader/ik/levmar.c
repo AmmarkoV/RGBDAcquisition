@@ -23,15 +23,17 @@
 #define TOL 1e-30 /* smallest value allowed in cholesky_decomp() */
 
 
-/* set parameters required by levmarq() to default values */
-void levmarq_init(LMstat *lmstat)
+/* set parameters required by levmar_solve to default values */
+int levmar_initialize(struct LMstat *lmstat)
 {
+    if (lmstat==0) { return 0; }
     lmstat->verbose = 0;
     lmstat->max_it = 10000;
     lmstat->init_lambda = 0.1;
     lmstat->up_factor = 10;
     lmstat->down_factor = 10;
     lmstat->target_derr = 0.01;
+    return 1;
 }
 
 
@@ -53,7 +55,7 @@ void levmarq_init(LMstat *lmstat)
    Before calling levmarq, several of the parameters in lmstat must be set.
    For default values, call levmarq_init(lmstat).
  */
-int levmarq(
+int levmar_solve(
     int npar,
     double *par,
     int ny,
@@ -62,7 +64,7 @@ int levmarq(
     double (*func)(double *, int, void *),
     void (*grad)(double *, double *, int, void *),
     void *fdata,
-    LMstat *lmstat
+    struct LMstat *lmstat
 )
 {
     int x,i,j,it,nit,ill,verbose;
@@ -80,7 +82,7 @@ int levmarq(
     derr = newerr = 0; /* to avoid compiler warnings */
 
     /* calculate the initial error ("chi-squared") */
-    err = error_func(par, ny, y, dysq, func, fdata);
+    err = levmar_errorFunction(par, ny, y, dysq, func, fdata);
 
     /* main iteration */
     for (it=0; it<nit; it++)
@@ -115,14 +117,14 @@ int levmarq(
             for (i=0; i<npar; i++)
                 h[i][i] = h[i][i]*mult;
 
-            ill = cholesky_decomp(npar, ch, h);
+            ill = levmar_choleskyDecomposition(npar, ch, h);
 
             if (!ill)
             {
-                solve_axb_cholesky(npar, ch, delta, d);
+                levmar_solveAXBUsingCholesky(npar, ch, delta, d);
                 for (i=0; i<npar; i++)
                     newpar[i] = par[i] + delta[i];
-                newerr = error_func(newpar, ny, y, dysq, func, fdata);
+                newerr = levmar_errorFunction(newpar, ny, y, dysq, func, fdata);
                 derr = newerr - err;
                 ill = (derr > 0);
             }
@@ -166,7 +168,7 @@ int levmarq(
 
 
 /* calculate the error function (chi-squared) */
-double error_func(
+double levmar_errorFunction(
     double *par,
     int ny,
     double *y,
@@ -192,9 +194,8 @@ double error_func(
 
 /* solve the equation Ax=b for a symmetric positive-definite matrix A,
    using the Cholesky decomposition A=LL^T.  The matrix L is passed in "l".
-   Elements above the diagonal are ignored.
-*/
-void solve_axb_cholesky(int n, double l[n][n], double x[n], double b[n])
+   Elements above the diagonal are ignored. */
+void levmar_solveAXBUsingCholesky(int n, double l[n][n], double x[n], double b[n])
 {
     int i,j;
     double sum;
@@ -224,9 +225,8 @@ void solve_axb_cholesky(int n, double l[n][n], double x[n], double b[n])
 /* This function takes a symmetric, positive-definite matrix "a" and returns
    its (lower-triangular) Cholesky factor in "l".  Elements above the
    diagonal are neither used nor modified.  The same array may be passed
-   as both l and a, in which case the decomposition is performed in place.
-*/
-int cholesky_decomp(int n, double l[n][n], double a[n][n])
+   as both l and a, in which case the decomposition is performed in place.*/
+int levmar_choleskyDecomposition(int n, double l[n][n], double a[n][n])
 {
     int i,j,k;
     double sum;

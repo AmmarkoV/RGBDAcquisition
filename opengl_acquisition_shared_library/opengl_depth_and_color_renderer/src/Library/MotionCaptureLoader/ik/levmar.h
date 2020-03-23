@@ -37,7 +37,11 @@ extern "C"
 #endif
 
 
-typedef struct
+/**
+* @brief LMstat Levenberg Marquardt solver context
+* @ingroup Levmar
+*/
+struct LMstat
 {
     int verbose;
     int max_it;
@@ -48,11 +52,34 @@ typedef struct
     int final_it;
     double final_err;
     double final_derr;
-} LMstat;
+} ;
 
-void levmarq_init(LMstat *lmstat);
 
-int levmarq(
+/**
+* @brief Initialize a Levenberg Marquardt solver
+* @ingroup Levmar
+* @param  LMstat Structure that will hold the solving session
+* @return 1=Success/0=Failure
+*/
+int levmar_initialize(struct LMstat *lmstat);
+
+
+
+/**
+* @brief Perform least-squares minimization using the Levenberg-Marquardt algorithm.
+* @ingroup Levmar
+* @param npar number of parameters
+* @param par array of parameters to be varied
+* @param ny number of measurements to be fit
+* @param y array of measurements
+* @param dysq array of error in measurements, squared (set dysq=NULL for unweighted least-squares)
+* @param func function to be fit
+* @param grad gradient of "func" with respect to the input parameters
+* @param fdata pointer to any additional data required by the function
+* @param lmstat pointer to the "status" structure, where minimization parameters are set and the final status is returned.
+* @return 1=Success/0=Failure
+*/
+int levmar_solve(
     int npar,
     double *par,
     int ny,
@@ -61,10 +88,22 @@ int levmarq(
     double (*func) (double *, int, void *),
     void (*grad)(double *, double *, int, void *),
     void *fdata,
-    LMstat *lmstat
+    struct LMstat *lmstat
 );
 
-double error_func(
+
+/**
+* @brief Calculate the error function (chi-squared)
+* @ingroup Levmar
+* @param par array of parameters to be varied
+* @param ny number of measurements to be fit
+* @param y array of measurements
+* @param dysq array of error in measurements, squared (set dysq=NULL for unweighted least-squares)
+* @param func function to be fit
+* @param fdata pointer to any additional data required by the function
+* @return Error function
+*/
+double levmar_errorFunction(
     double *par,
     int ny,
     double *y,
@@ -73,9 +112,32 @@ double error_func(
     void *fdata
 );
 
-void solve_axb_cholesky(int n, double l[n][n], double x[n], double b[n]);
 
-int cholesky_decomp(int n, double l[n][n], double a[n][n]);
+/**
+* @brief Solve the equation Ax=b for a symmetric positive-definite matrix A,
+*        using the Cholesky decomposition A=LL^T.  The matrix L is passed in "l".
+*        Elements above the diagonal are ignored.
+* @ingroup Levmar
+* @param  n matrix dimension
+* @param  lower diagonal matrix l[n][n]
+* @param  symmetric positive-definite matrix a[n][n]
+* @return 0=Success/1=Failure
+*/
+void levmar_solveAXBUsingCholesky(int n, double l[n][n], double x[n], double b[n]);
+
+
+/**
+* @brief This function takes a symmetric, positive-definite matrix "a" and returns
+*         its (lower-triangular) Cholesky factor in "l".  Elements above the
+*         diagonal are neither used nor modified.  The same array may be passed
+*         as both l and a, in which case the decomposition is performed in place.
+* @ingroup Levmar
+* @param  n matrix dimension
+* @param  lower diagonal matrix l[n][n]
+* @param  symmetric positive-definite matrix a[n][n]
+* @return 0=Success/1=Failure
+*/
+int levmar_choleskyDecomposition(int n, double l[n][n], double a[n][n]);
 
 #ifdef __cplusplus
 }
