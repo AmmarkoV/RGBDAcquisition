@@ -81,10 +81,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_interpolate.h" />
-		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_inverseKinematics.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/edit/bvh_merge.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -125,6 +121,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Library/MotionCaptureLoader/export/bvh_to_trajectoryParserTRI.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/ik/bvh_inverseKinematics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/ik/bvh_inverseKinematics.h" />
+		<Unit filename="../../Library/MotionCaptureLoader/ik/levmar.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Library/MotionCaptureLoader/ik/levmar.h" />
 		<Unit filename="../../Library/MotionCaptureLoader/import/fromBVH.c">
 			<Option compilerVar="CC" />
 		</Unit>

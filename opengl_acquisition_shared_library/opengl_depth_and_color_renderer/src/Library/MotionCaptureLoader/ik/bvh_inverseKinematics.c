@@ -10,9 +10,9 @@
 #include <unistd.h>
 
 
-#include "bvh_cut_paste.h"
 #include "bvh_inverseKinematics.h"
-#include "bvh_cut_paste.h"
+
+#include "../edit/bvh_cut_paste.h"
 
 float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
 {
@@ -211,6 +211,11 @@ int BVHTestIK(
 
   if ( (averageError!=0) && (solution.motion!=0) )
   {
+    memset(averageError,0,sizeof(float) * solution.bufferSize);
+    averageError[3]=12.0;
+    averageError[4]=12.0;
+    averageError[5]=12.0;
+
     if ( bvh_copyMotionFrameToMotionBuffer(mc,&solution,fIDSource) )
     {
       if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
@@ -233,6 +238,7 @@ int BVHTestIK(
       }
     }
     free(solution.motion);
+    free(averageError);
   }
 
  return result;
