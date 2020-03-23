@@ -23,6 +23,43 @@
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
 
+
+int getParentJoint(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint , unsigned int hierarchyLevel , unsigned int * parentJoint)
+{
+  if (currentJoint>=bvhMotion->MAX_jointHierarchySize)
+  {
+    fprintf(stderr,"getParentJoint: Incorrect currentJoint value\n");
+    return 0;
+  }
+
+  if (hierarchyLevel==0)
+  {
+   //Already at root level..
+   //No Parent joint..
+   *parentJoint = 0;
+   return 1;
+  }
+
+  unsigned int i = currentJoint;
+
+  while (i>0)
+  {
+    if (bvhMotion->jointHierarchy[i].hierarchyLevel==hierarchyLevel-1)
+    {
+      //Found Parent Joint..!
+      *parentJoint = i;
+      return 1;
+    }
+    --i;
+  }
+
+
+  //We did not find something better than the root joint..
+  *parentJoint = 0;
+  return 1;
+  //return 0;
+}
+
 int enumerateInputParserChannel(struct InputParserC * ipc , unsigned int argumentNumber)
 {
   if ( InputParser_WordCompareNoCaseAuto(ipc,argumentNumber,"Xrotation") ) {return BVH_ROTATION_X; } else
@@ -54,6 +91,72 @@ int thisLineOnlyHasX(const char * line,const char x)
   }
  return 1;
 }
+
+
+int pushNewBVHMotionState(struct BVH_MotionCapture * bvhMotion ,const char * parameters)
+{
+   if (bvhMotion==0)  { return 0; }
+   if (parameters==0)  { return 0; }
+
+   if (
+         (bvhMotion->motionValues==0) ||
+         (bvhMotion->motionValuesSize==0)
+      )
+   {
+     fprintf(stderr,"Cannot pushNewBVHMotionState without space to store new information\n");
+     return 0;
+   }
+
+   struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,5);
+   if (ipc==0) { return 0; }
+
+   InputParser_SetDelimeter(ipc,0,' ');
+   InputParser_SetDelimeter(ipc,1,'\t');
+   InputParser_SetDelimeter(ipc,2,' ');
+   InputParser_SetDelimeter(ipc,3,10);
+   InputParser_SetDelimeter(ipc,4,13);
+
+   //unsigned int i=0;
+   unsigned int numberOfParameters = InputParser_SeperateWordsCC(ipc,parameters,1);
+   //fprintf(stderr,"MOTION command (%s) has %u parameters\n",parameters,numberOfParameters);
+
+
+   if (numberOfParameters==bvhMotion->numberOfValuesPerFrame)
+   {
+     unsigned int finalMemoryLocation = (numberOfParameters-1) + (bvhMotion->numberOfFramesEncountered * bvhMotion->numberOfValuesPerFrame);
+     if (finalMemoryLocation < bvhMotion->motionValuesSize)
+     {
+      /*
+      fprintf(stderr,
+              "Filling from %u to %u \n",
+              bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame,
+              numberOfParameters+bvhMotion->numberOfFramesEncountered  * bvhMotion->numberOfValuesPerFrame
+             );*/
+
+      for (unsigned int i=0; i<numberOfParameters; i++)
+      {
+        //fprintf(stderr,"P%u=%0.2f ",i,InputParser_GetWordFloat(ipc,i));
+        unsigned int thisMemoryLocation = i+(bvhMotion->numberOfFramesEncountered * bvhMotion->numberOfValuesPerFrame);
+        bvhMotion->motionValues[thisMemoryLocation] = InputParser_GetWordFloat(ipc,i);
+      }
+     }
+     bvhMotion->numberOfFramesEncountered++;
+   } else
+   {
+    //Unexpected input..
+    fprintf(stderr,"Motion Expected had %u parameters we received %u\n",bvhMotion->numberOfValuesPerFrame,numberOfParameters);
+    fprintf(stderr,"Unexpected line num (%u)  :\n" , bvhMotion->linesParsed);
+    fprintf(stderr,"%s\n", parameters);
+    //exit(0);
+   }
+
+   InputParser_Destroy(ipc);
+   return 1;
+}
+
+
+
+
 
 
 int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
@@ -344,5 +447,103 @@ int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd )
           );
 
  return atHeaderSection;
+}
+
+
+
+
+
+int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd )
+{
+  int atMotionSection=0;
+
+  if (fd!=0)
+  {
+   struct InputParserC * ipc = InputParser_Create(MAX_BVH_FILE_LINE_SIZE,4);
+
+   InputParser_SetDelimeter(ipc,0,':');
+   InputParser_SetDelimeter(ipc,1,10);
+   InputParser_SetDelimeter(ipc,2,13);
+   InputParser_SetDelimeter(ipc,3,0);
+
+    char str[MAX_BVH_FILE_LINE_SIZE+1]={0};
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = getline(&line, &len, fd)) != -1)
+    {
+       ++bvhMotion->linesParsed;
+
+       //fprintf(stderr,"Retrieved line of length %zu :\n", read);
+       //fprintf(stderr,"%s", line);
+
+       int num = InputParser_SeperateWords(ipc,line,1);
+
+       //fprintf(stderr,"Has %u arguments\n",num);
+       //InputParser_GetWord(ipc,0,str,512);
+       //fprintf(stderr,"Word0=`%s`",str);
+       //InputParser_GetWord(ipc,1,str,512);
+       //fprintf(stderr,"Word1=`%s`",str);
+       //InputParser_GetWord(ipc,2,str,512);
+       //fprintf(stderr,"Word2=`%s`",str);
+
+      if (num>0)
+      { //We have content..
+       if (!atMotionSection)
+       {
+          if (InputParser_WordCompareAuto(ipc,0,"MOTION"))
+               {
+                //fprintf(stderr,"Found Motion Section (%s)..\n",line);
+                atMotionSection=1;
+               }
+       } else
+       {
+         if (InputParser_WordCompareAuto(ipc,0,"Frames"))
+              {
+                //fprintf(stderr,"Frames (%s)..\n",line);
+                bvhMotion->numberOfFrames = InputParser_GetWordInt(ipc,1);
+                //fprintf(stderr,"Frames number (%u)..\n",bvhMotion->numberOfFrames);
+              } else
+         if (InputParser_WordCompareAuto(ipc,0,"Frame Time"))
+             {
+                bvhMotion->frameTime = InputParser_GetWordFloat(ipc,1);
+             }  else
+         {
+           if (bvhMotion->motionValues==0)
+           {
+             //If we haven't yet allocated a motionValues array we need to do so now..!
+             bvhMotion->motionValuesSize = bvhMotion->numberOfFrames * bvhMotion->numberOfValuesPerFrame;
+             bvhMotion->motionValues = (float*)  malloc(sizeof(float) * (1+bvhMotion->motionValuesSize));
+             if (bvhMotion->motionValues==0)
+             {
+               fprintf(stderr,"Failed to allocate enough memory for motion values..\n");
+             }
+           }
+
+           //This is motion input
+           InputParser_GetWord(ipc,0,str,MAX_BVH_FILE_LINE_SIZE);
+           pushNewBVHMotionState(bvhMotion,str);
+           str[0]=0;//Clean up str
+         }
+       }
+       }
+    }
+
+   //Free incoming line buffer..
+   if (line) { free(line); }
+
+   InputParser_Destroy(ipc);
+  }
+
+  fprintf(
+           stderr,
+           "Frames: %u(%u) / Frame Time : %0.4f\n",
+           bvhMotion->numberOfFrames,
+           bvhMotion->numberOfFramesEncountered,
+           bvhMotion->frameTime
+          );
+
+  return (atMotionSection);
 }
 

@@ -14,6 +14,8 @@ extern "C"
 int readBVHHeader(struct BVH_MotionCapture * bvhMotion , FILE * fd );
 
 
+int readBVHMotion(struct BVH_MotionCapture * bvhMotion , FILE * fd );
+
 #ifdef __cplusplus
 }
 #endif

@@ -731,7 +731,7 @@ int bvh_removeTranslationFromTransform(
 {
 
 
-
+  return 0;
 }
 
 

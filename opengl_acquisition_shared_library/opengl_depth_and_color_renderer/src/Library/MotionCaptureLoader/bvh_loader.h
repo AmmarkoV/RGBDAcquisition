@@ -301,6 +301,7 @@ int bhv_jointHasParent(struct BVH_MotionCapture * bvhMotion , BVHJointID jID );
 
 
 
+
 int bhv_jointGetEndSiteChild(struct BVH_MotionCapture * bvhMotion,BVHJointID jID,BVHJointID * jChildID);
 
 
@@ -342,8 +343,6 @@ int bvh_getRootJointID(
                       );
 
 
-
-int getParentJoint(struct BVH_MotionCapture * bvhMotion , unsigned int currentJoint , unsigned int hierarchyLevel , unsigned int * parentJoint);
 
 /**
 * @brief Copy a motion frame of a BVH_MotionCapture file
