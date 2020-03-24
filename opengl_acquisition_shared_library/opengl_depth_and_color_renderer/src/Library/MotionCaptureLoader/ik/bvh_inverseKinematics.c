@@ -11,6 +11,7 @@
 
 
 #include "bvh_inverseKinematics.h"
+#include "levmar.h"
 
 #include "../edit/bvh_cut_paste.h"
 
@@ -136,6 +137,106 @@ int bruteForceChange(
  return 1;
 }
 
+unsigned int countSelectedJoints(struct BVH_MotionCapture * mc)
+{
+  unsigned int selectedJoints=0;
+  if(mc->selectedJoints==0) { return mc->jointHierarchySize; }
+
+  for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+            {
+              int isSelected = 1;
+
+              if (mc->selectedJoints!=0)
+              {
+                if (!mc->selectedJoints[jID])
+                {
+                  isSelected=0;
+                }
+              }
+
+               if (isSelected)
+               {
+                 ++selectedJoints;
+               }
+            }
+    return selectedJoints;
+}
+
+
+double objectiveFunction(double *par, int x, void *fdata)
+{
+    return 0.0;
+}
+
+void gradientFunction(double *g, double *par, int x, void *fdata)
+{
+  //  g[0] =
+  //  g[1] =
+  //  g[2] =
+}
+
+
+int levmarIKSolution(
+                     struct BVH_MotionCapture * mc,
+                     struct simpleRenderer *renderer,
+                     struct MotionBuffer * solution,
+                     float * averageError,
+                     unsigned int fromElement,
+                     unsigned int toElement,
+                     unsigned int budget,
+                     struct BVH_Transform * bvhTargetTransform
+                    )
+{
+  unsigned int degreesOfFreedomForTheProblem = toElement - fromElement + 1;
+  unsigned int budgetPerDoF=(unsigned int) budget/degreesOfFreedomForTheProblem;
+  fprintf(stdout,"Trying to solve a %u D.o.F. problem with a budget of %u tries using levmar..\n",degreesOfFreedomForTheProblem,budget);
+
+  struct LMstat lm;
+  if (levmar_initialize(&lm))
+  {
+    double parameters[toElement-fromElement+1];
+    for (BVHMotionChannelID mID=fromElement; mID<toElement+1; mID++)
+      {
+        parameters[mID-fromElement] = (double) solution->motion[mID];
+      }
+
+    unsigned int numberOfParameters = degreesOfFreedomForTheProblem;
+
+
+
+    unsigned int numberOfMeasurements = countSelectedJoints(mc);
+    double data[numberOfMeasurements];
+
+    int iterationsExecuted = levmar_solve(
+                                          numberOfParameters,
+                                          parameters,
+                                          numberOfMeasurements,
+                                          data,
+                                          NULL,
+                                          &objectiveFunction,
+                                          &gradientFunction,
+                                          NULL,
+                                          &lm
+                                         );
+    printf("**************** End of calculation ***********************\n");
+    printf("Executed Iterations: %d\n", iterationsExecuted);
+    printf("Final Solution: ");
+    for (unsigned int pID=0; pID<numberOfParameters; pID++)
+      {
+        printf("%f ", parameters[pID]);
+      }
+    printf("T_heater: %f, T_0: %f, k: %f\n",parameters[0], parameters[1], parameters[2]);
+
+    return 0;
+
+
+  }
+
+
+
+
+ return 0;
+}
 
 
 
@@ -164,6 +265,8 @@ float approximateTargetFromMotionBuffer(
                                             mc,
                                             &bvhSourceTransform
                                           );
+
+
 
         bruteForceChange(
                           mc,

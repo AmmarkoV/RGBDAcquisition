@@ -22,6 +22,66 @@
 
 #define TOL 1e-30 /* smallest value allowed in cholesky_decomp() */
 
+/* solve the equation Ax=b for a symmetric positive-definite matrix A,
+   using the Cholesky decomposition A=LL^T.  The matrix L is passed in "l".
+   Elements above the diagonal are ignored. */
+void levmar_solveAXBUsingCholesky(int n, double l[n][n], double x[n], double b[n])
+{
+    int i,j;
+    double sum;
+
+    /* solve L*y = b for y (where x[] is used to store y) */
+
+    for (i=0; i<n; i++)
+    {
+        sum = 0;
+        for (j=0; j<i; j++)
+            sum += l[i][j] * x[j];
+        x[i] = (b[i] - sum)/l[i][i];
+    }
+
+    /* solve L^T*x = y for x (where x[] is used to store both y and x) */
+
+    for (i=n-1; i>=0; i--)
+    {
+        sum = 0;
+        for (j=i+1; j<n; j++)
+            sum += l[j][i] * x[j];
+        x[i] = (x[i] - sum)/l[i][i];
+    }
+}
+
+
+/* This function takes a symmetric, positive-definite matrix "a" and returns
+   its (lower-triangular) Cholesky factor in "l".  Elements above the
+   diagonal are neither used nor modified.  The same array may be passed
+   as both l and a, in which case the decomposition is performed in place.*/
+int levmar_choleskyDecomposition(int n, double l[n][n], double a[n][n])
+{
+    int i,j,k;
+    double sum;
+
+    for (i=0; i<n; i++)
+    {
+        for (j=0; j<i; j++)
+        {
+            sum = 0;
+            for (k=0; k<j; k++)
+                sum += l[i][k] * l[j][k];
+            l[i][j] = (a[i][j] - sum)/l[j][j];
+        }
+
+        sum = 0;
+        for (k=0; k<i; k++)
+            sum += l[i][k] * l[i][k];
+        sum = a[i][i] - sum;
+        if (sum<TOL)
+            return 1; /* not positive-definite */
+        l[i][i] = sqrt(sum);
+    }
+    return 0;
+}
+
 
 /* set parameters required by levmar_solve to default values */
 int levmar_initialize(struct LMstat *lmstat)
@@ -56,16 +116,16 @@ int levmar_initialize(struct LMstat *lmstat)
    For default values, call levmarq_init(lmstat).
  */
 int levmar_solve(
-    int npar,
-    double *par,
-    int ny,
-    double *y,
-    double *dysq,
-    double (*func)(double *, int, void *),
-    void (*grad)(double *, double *, int, void *),
-    void *fdata,
-    struct LMstat *lmstat
-)
+                 int npar,
+                 double *par,
+                 int ny,
+                 double *y,
+                 double *dysq,
+                 double (*func)(double *, int, void *),
+                 void (*grad)(double *, double *, int, void *),
+                 void *fdata,
+                 struct LMstat *lmstat
+                )
 {
     int x,i,j,it,nit,ill,verbose;
     double lambda,up,down,mult,weight,err,newerr,derr,target_derr;
@@ -169,13 +229,13 @@ int levmar_solve(
 
 /* calculate the error function (chi-squared) */
 double levmar_errorFunction(
-    double *par,
-    int ny,
-    double *y,
-    double *dysq,
-    double (*func)(double *, int, void *),
-    void *fdata
-)
+                            double *par,
+                            int ny,
+                            double *y,
+                            double *dysq,
+                            double (*func)(double *, int, void *),
+                            void *fdata
+                           )
 {
     int x;
     double res,e=0;
@@ -191,64 +251,4 @@ double levmar_errorFunction(
     return e;
 }
 
-
-/* solve the equation Ax=b for a symmetric positive-definite matrix A,
-   using the Cholesky decomposition A=LL^T.  The matrix L is passed in "l".
-   Elements above the diagonal are ignored. */
-void levmar_solveAXBUsingCholesky(int n, double l[n][n], double x[n], double b[n])
-{
-    int i,j;
-    double sum;
-
-    /* solve L*y = b for y (where x[] is used to store y) */
-
-    for (i=0; i<n; i++)
-    {
-        sum = 0;
-        for (j=0; j<i; j++)
-            sum += l[i][j] * x[j];
-        x[i] = (b[i] - sum)/l[i][i];
-    }
-
-    /* solve L^T*x = y for x (where x[] is used to store both y and x) */
-
-    for (i=n-1; i>=0; i--)
-    {
-        sum = 0;
-        for (j=i+1; j<n; j++)
-            sum += l[j][i] * x[j];
-        x[i] = (x[i] - sum)/l[i][i];
-    }
-}
-
-
-/* This function takes a symmetric, positive-definite matrix "a" and returns
-   its (lower-triangular) Cholesky factor in "l".  Elements above the
-   diagonal are neither used nor modified.  The same array may be passed
-   as both l and a, in which case the decomposition is performed in place.*/
-int levmar_choleskyDecomposition(int n, double l[n][n], double a[n][n])
-{
-    int i,j,k;
-    double sum;
-
-    for (i=0; i<n; i++)
-    {
-        for (j=0; j<i; j++)
-        {
-            sum = 0;
-            for (k=0; k<j; k++)
-                sum += l[i][k] * l[j][k];
-            l[i][j] = (a[i][j] - sum)/l[j][j];
-        }
-
-        sum = 0;
-        for (k=0; k<i; k++)
-            sum += l[i][k] * l[i][k];
-        sum = a[i][i] - sum;
-        if (sum<TOL)
-            return 1; /* not positive-definite */
-        l[i][i] = sqrt(sum);
-    }
-    return 0;
-}
 
