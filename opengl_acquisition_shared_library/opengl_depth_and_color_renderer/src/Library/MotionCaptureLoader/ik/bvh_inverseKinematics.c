@@ -15,6 +15,14 @@
 
 #include "../edit/bvh_cut_paste.h"
 
+struct iKSolutionContext
+{
+ struct BVH_MotionCapture * mc;
+ struct simpleRenderer *renderer;
+ struct MotionBuffer * solution;
+};
+
+
 float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
 {
   float diffX = (float) aX-bX;
@@ -31,7 +39,7 @@ float get2DPointDistance(float aX,float aY,float bX,float bY)
   return sqrt((diffX*diffX)+(diffY*diffY));
 }
 
-float BVH2DDistace(
+float meanSquaredBVH2DDistace(
                    struct BVH_MotionCapture * mc,
                    struct simpleRenderer *renderer,
                    struct BVH_Transform * bvhSourceTransform,
@@ -84,6 +92,62 @@ float BVH2DDistace(
 }
 
 
+int gatherBVH2DDistaces(
+                        double * result,
+                        unsigned int resultSize,
+                        struct BVH_MotionCapture * mc,
+                        struct simpleRenderer *renderer,
+                        struct BVH_Transform * bvhSourceTransform,
+                        struct BVH_Transform * bvhTargetTransform
+                       )
+{
+   unsigned int numberOfSamples=0;
+
+   if (
+        (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0)) &&
+        (bvh_projectTo2D(mc,bvhTargetTransform,renderer,0,0))
+      )
+      {
+       //-----------------
+       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
+            {
+              int isSelected = 1;
+
+              if (mc->selectedJoints!=0)
+              {
+                if (!mc->selectedJoints[jID])
+                {
+                  isSelected=0;
+                }
+              }
+
+               if (isSelected)
+               {
+                float thisSquared2DDistance=getSquared2DPointDistance(
+                                                                      (float) bvhSourceTransform->joint[jID].pos2D[0],
+                                                                      (float) bvhSourceTransform->joint[jID].pos2D[1],
+                                                                      (float) bvhTargetTransform->joint[jID].pos2D[0],
+                                                                      (float) bvhTargetTransform->joint[jID].pos2D[1]
+                                                                     );
+
+               if (numberOfSamples<resultSize)
+               {
+                 result[numberOfSamples]= (double) thisSquared2DDistance;
+               } else
+               {
+                 fprintf(stderr,"gatherBVH2DDistaces: overflow..\n");
+                 return 0;
+               }
+
+               numberOfSamples+=1;
+              }
+            }
+
+     } //-----------------
+
+ return  (numberOfSamples>0);
+}
+
 
 void clear_line()
 {
@@ -102,6 +166,7 @@ int bruteForceChange(
                      unsigned int fromElement,
                      unsigned int toElement,
                      unsigned int budget,
+                     struct BVH_Transform * bvhSourceTransform,
                      struct BVH_Transform * bvhTargetTransform
                     )
 {
@@ -184,9 +249,18 @@ int levmarIKSolution(
                      unsigned int fromElement,
                      unsigned int toElement,
                      unsigned int budget,
+                     struct BVH_Transform * bvhSourceTransform,
                      struct BVH_Transform * bvhTargetTransform
                     )
 {
+  //--------------------------
+  struct iKSolutionContext context;
+  context.mc = mc;
+  context.renderer = renderer;
+  context.solution = solution;
+  //--------------------------
+
+
   unsigned int degreesOfFreedomForTheProblem = toElement - fromElement + 1;
   unsigned int budgetPerDoF=(unsigned int) budget/degreesOfFreedomForTheProblem;
   fprintf(stdout,"Trying to solve a %u D.o.F. problem with a budget of %u tries using levmar..\n",degreesOfFreedomForTheProblem,budget);
@@ -207,6 +281,15 @@ int levmarIKSolution(
     unsigned int numberOfMeasurements = countSelectedJoints(mc);
     double data[numberOfMeasurements];
 
+    gatherBVH2DDistaces(
+                        data,
+                        numberOfMeasurements,
+                        mc,
+                        renderer,
+                        bvhSourceTransform,
+                        bvhTargetTransform
+                       );
+
     int iterationsExecuted = levmar_solve(
                                           numberOfParameters,
                                           parameters,
@@ -215,9 +298,10 @@ int levmarIKSolution(
                                           NULL,
                                           &objectiveFunction,
                                           &gradientFunction,
-                                          NULL,
+                                          (void *) &context,
                                           &lm
                                          );
+
     printf("**************** End of calculation ***********************\n");
     printf("Executed Iterations: %d\n", iterationsExecuted);
     printf("Final Solution: ");
@@ -225,9 +309,15 @@ int levmarIKSolution(
       {
         printf("%f ", parameters[pID]);
       }
-    printf("T_heater: %f, T_0: %f, k: %f\n",parameters[0], parameters[1], parameters[2]);
+    printf("\n");
 
-    return 0;
+    for (BVHMotionChannelID mID=fromElement; mID<toElement+1; mID++)
+      {
+        solution->motion[mID] = (float) parameters[mID-fromElement];
+      }
+
+
+    return 1;
 
 
   }
@@ -267,7 +357,7 @@ float approximateTargetFromMotionBuffer(
                                           );
 
 
-
+/*
         bruteForceChange(
                           mc,
                           renderer,
@@ -276,10 +366,23 @@ float approximateTargetFromMotionBuffer(
                           3,
                           5,
                           100,
+                          &bvhSourceTransform,
+                          bvhTargetTransform
+                        );*/
+
+        levmarIKSolution(
+                          mc,
+                          renderer,
+                          solution,
+                          averageError,
+                          3,
+                          5,
+                          100,
+                          &bvhSourceTransform,
                           bvhTargetTransform
                         );
 
-       return BVH2DDistace(mc,renderer,&bvhSourceTransform,bvhTargetTransform);
+       return meanSquaredBVH2DDistace(mc,renderer,&bvhSourceTransform,bvhTargetTransform);
      }
 
  return 0.0;
@@ -369,7 +472,7 @@ float approximateTargetPose(
                             struct BVH_Transform * bvhTargetTransform
                            )
 {
-  return  BVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
+  return  meanSquaredBVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
 }
 
 
