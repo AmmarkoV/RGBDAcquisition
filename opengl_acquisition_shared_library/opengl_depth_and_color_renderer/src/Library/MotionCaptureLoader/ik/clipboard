@@ -335,7 +335,6 @@ int levmarIKSolution(
     unsigned int numberOfMeasurements = countSelectedJoints(mc);
     double data[numberOfMeasurements];
 
-    /*
     gatherBVH2DDistaces(
                         data,
                         numberOfMeasurements,
@@ -343,7 +342,7 @@ int levmarIKSolution(
                         renderer,
                         bvhSourceTransform,
                         bvhTargetTransform
-                       );*/
+                       );
 
     int iterationsExecuted = levmar_solve(
                                           numberOfParameters,
@@ -437,7 +436,7 @@ float approximateTargetFromMotionBuffer(
                           bvhTargetTransform
                         );
 
-       //return meanSquaredBVH2DDistace(mc,renderer,&bvhSourceTransform,bvhTargetTransform);
+       return meanSquaredBVH2DDistace(mc,renderer,&bvhSourceTransform,bvhTargetTransform);
      }
 
  return 0.0;
@@ -527,8 +526,7 @@ float approximateTargetPose(
                             struct BVH_Transform * bvhTargetTransform
                            )
 {
-  // return  meanSquaredBVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
-  return 0.0;
+  return  meanSquaredBVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
 }
 
 
@@ -704,3 +702,4 @@ int bvh_MirrorJointsThroughIK(
 
  return 1;
 }
+
