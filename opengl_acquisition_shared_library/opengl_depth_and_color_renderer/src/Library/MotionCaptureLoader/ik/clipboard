@@ -47,6 +47,7 @@ float get2DPointDistance(float aX,float aY,float bX,float bY)
 float meanSquaredBVH2DDistace(
                               struct BVH_MotionCapture * mc,
                               struct simpleRenderer *renderer,
+                              int useAllJoints,
                               BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
                               struct BVH_Transform * bvhSourceTransform,
                               struct BVH_Transform * bvhTargetTransform
@@ -72,7 +73,7 @@ float meanSquaredBVH2DDistace(
                 }
               }
 
-               if ( (isSelected) && (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) )
+               if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
                {
                 float thisSquared2DDistance=getSquared2DPointDistance(
                                                                       (float) bvhSourceTransform->joint[jID].pos2D[0],
@@ -159,6 +160,7 @@ int gatherBVH2DDistaces(
                         unsigned int resultSize,
                         struct BVH_MotionCapture * mc,
                         struct simpleRenderer *renderer,
+                        int useAllJoints,
                         BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
                         struct BVH_Transform * bvhSourceTransform,
                         struct BVH_Transform * bvhTargetTransform
@@ -184,7 +186,7 @@ int gatherBVH2DDistaces(
                 }
               }
 
-               if ( (isSelected) && (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) )
+               if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
                {
                 float thisSquared2DDistance=getSquared2DPointDistance(
                                                                       (float) bvhSourceTransform->joint[jID].pos2D[0],
@@ -266,6 +268,7 @@ double objectiveFunction(double *parameters, int sampleNumber, void *contextData
     return meanSquaredBVH2DDistace(
                                  context->mc,
                                  context->renderer,
+                                 0, //Only use affected joints..
                                  context->affectedJoint,
                                  context->bvhSourceTransform,
                                  context->bvhTargetTransform
@@ -310,6 +313,7 @@ int levmarIKSolution(
   context.solution = solution;
   context.bvhSourceTransform = bvhSourceTransform;
   context.bvhTargetTransform = bvhTargetTransform;
+  bvh_getRootJointID(mc,&context.affectedJoint);
   context.fromElement=fromElement;
   context.toElement=toElement;
   //--------------------------
@@ -335,11 +339,14 @@ int levmarIKSolution(
     unsigned int numberOfMeasurements = countSelectedJoints(mc);
     double data[numberOfMeasurements];
 
+
     gatherBVH2DDistaces(
                         data,
                         numberOfMeasurements,
                         mc,
                         renderer,
+                        0,//Dont gather all distances..
+                        context.affectedJoint,
                         bvhSourceTransform,
                         bvhTargetTransform
                        );
@@ -436,7 +443,7 @@ float approximateTargetFromMotionBuffer(
                           bvhTargetTransform
                         );
 
-       return meanSquaredBVH2DDistace(mc,renderer,&bvhSourceTransform,bvhTargetTransform);
+       return meanSquaredBVH2DDistace(mc,renderer,1,0,&bvhSourceTransform,bvhTargetTransform);
      }
 
  return 0.0;
@@ -526,7 +533,8 @@ float approximateTargetPose(
                             struct BVH_Transform * bvhTargetTransform
                            )
 {
-  return  meanSquaredBVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
+  // return  meanSquaredBVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
+  return 0.0;
 }
 
 
@@ -702,4 +710,3 @@ int bvh_MirrorJointsThroughIK(
 
  return 1;
 }
-
