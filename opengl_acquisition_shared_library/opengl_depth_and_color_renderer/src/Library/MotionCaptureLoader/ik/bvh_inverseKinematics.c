@@ -23,7 +23,8 @@ struct ikChainParts
  BVHJointID jID;
  BVHMotionChannelID mIDStart;
  BVHMotionChannelID mIDEnd;
-  char evaluated;
+ char evaluated;
+ char endEffector;
 };
 
 struct ikChain
@@ -341,6 +342,8 @@ int prepareProblem(
   //----------------------------------------------------------
   //----------------------------------------------------------
   //----------------------------------------------------------
+  unsigned int groupID=0;
+  unsigned int jobID=0;
   unsigned int chainID=0;
   unsigned int partID=0;
   BVHJointID thisJID=0;
@@ -348,8 +351,8 @@ int prepareProblem(
 
   //Chain 0 is the Hip and all of the rigid torso
   //----------------------------------------------------------
-  problem.chain[chainID].groupID=0;
-  problem.chain[chainID].jobID=0;
+  problem.chain[chainID].groupID=groupID;
+  problem.chain[chainID].jobID=jobID;
 
   if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
   {
@@ -364,8 +367,7 @@ int prepareProblem(
   {
    problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem.chain[chainID].part[partID].jID=thisJID;
-   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   problem.chain[chainID].part[partID].endEffector=1;
    ++partID;
   }
 
@@ -373,8 +375,7 @@ int prepareProblem(
   {
    problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem.chain[chainID].part[partID].jID=thisJID;
-   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   problem.chain[chainID].part[partID].endEffector=1;
    ++partID;
   }
 
@@ -382,8 +383,7 @@ int prepareProblem(
   {
    problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem.chain[chainID].part[partID].jID=thisJID;
-   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   problem.chain[chainID].part[partID].endEffector=1;
    ++partID;
   }
 
@@ -391,8 +391,7 @@ int prepareProblem(
   {
    problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem.chain[chainID].part[partID].jID=thisJID;
-   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   problem.chain[chainID].part[partID].endEffector=1;
    ++partID;
   }
 
@@ -400,58 +399,205 @@ int prepareProblem(
   {
    problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem.chain[chainID].part[partID].jID=thisJID;
-   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   problem.chain[chainID].part[partID].endEffector=1;
+
    ++partID;
   }
 
  problem.chain[chainID].numberOfParts=partID;
 
- //-----------------------
  ++chainID;
+ ++groupID;
   //----------------------------------------------------------
   //----------------------------------------------------------
   //----------------------------------------------------------
 
 
-  //Chain 0 is the Hip and all of the rigid torso
+  //Chain 1 is the Right Arm
+  //----------------------------------------------------------
+  //----------------------------------------------------------
   //----------------------------------------------------------
   partID=0;
-  problem.chain[chainID].groupID=0;
-  problem.chain[chainID].jobID=0;
-
-  if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
-  {
-   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem.chain[chainID].part[partID].jID=thisJID;
-   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   ++partID;
-  }
+  problem.chain[chainID].groupID=groupID;
+  problem.chain[chainID].jobID=jobID;
 
   if (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) )
   {
    problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].endEffector=0;
    problem.chain[chainID].part[partID].jID=thisJID;
    problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
    ++partID;
   }
 
-  if (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) )
+  if (bvh_getJointIDFromJointName(mc,"relbow",&thisJID) )
   {
    problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].endEffector=0;
    problem.chain[chainID].part[partID].jID=thisJID;
    problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
    problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].endEffector=1;
    ++partID;
   }
 
  problem.chain[chainID].numberOfParts=partID;
+ ++chainID;
+ ++jobID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
 
 
 
- return 0;
+
+
+  //Chain 2 is the Left Arm
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  partID=0;
+  problem.chain[chainID].groupID=groupID;
+  problem.chain[chainID].jobID=jobID;
+
+  if (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].endEffector=0;
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lelbow",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].endEffector=0;
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lhand",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+ problem.chain[chainID].numberOfParts=partID;
+ ++chainID;
+ ++jobID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
+
+
+
+
+  //Chain 3 is the Right Leg
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  partID=0;
+  problem.chain[chainID].groupID=groupID;
+  problem.chain[chainID].jobID=jobID;
+
+  if (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].endEffector=0;
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"rknee",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].endEffector=0;
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+ problem.chain[chainID].numberOfParts=partID;
+ ++chainID;
+ ++jobID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
+
+
+
+  //Chain 4 is the Left Leg
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  partID=0;
+  problem.chain[chainID].groupID=groupID;
+  problem.chain[chainID].jobID=jobID;
+
+  if (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].endEffector=0;
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lknee",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].endEffector=0;
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem.chain[chainID].part[partID].mIDEnd=problem.chain[0].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lfoot",&thisJID) )
+  {
+   problem.chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem.chain[chainID].part[partID].jID=thisJID;
+   problem.chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+ problem.chain[chainID].numberOfParts=partID;
+ ++chainID;
+ ++jobID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
+
+ return 1;
 }
 
 float approximateTargetFromMotionBuffer(
