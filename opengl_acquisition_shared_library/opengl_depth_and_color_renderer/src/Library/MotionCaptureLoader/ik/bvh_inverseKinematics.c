@@ -15,18 +15,89 @@
 
 #include "../edit/bvh_cut_paste.h"
 
-struct iKSolutionContext
+#define MAXIMUM_CHAINS 10
+#define MAXIMUM_PARTS_OF_CHAIN 10
+
+struct ikChainParts
 {
- struct BVH_MotionCapture * mc;
- struct simpleRenderer *renderer;
- struct MotionBuffer * solution;
- struct BVH_Transform * bvhSourceTransform;
- struct BVH_Transform * bvhTargetTransform;
- BVHMotionChannelID affectedJoint;
- BVHMotionChannelID fromElement;
- BVHMotionChannelID toElement;
+ BVHJointID jID;
+ BVHMotionChannelID mIDStart;
+ BVHMotionChannelID mIDEnd;
 };
 
+struct ikChain
+{
+  unsigned int jobID;
+  unsigned int groupID;
+
+  unsigned int numberOfParts;
+  struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN];
+
+  float initialError;
+  float previousError;
+  float currentError;
+};
+
+struct ikProblem
+{
+ //BVH file that reflects our problem
+ struct BVH_MotionCapture * mc;
+ //Renderer that handles 3D projections
+ struct simpleRenderer *renderer;
+
+
+ //Initial solution
+ struct MotionBuffer * initialSolution;
+ //Current solution
+ struct MotionBuffer * currentSolution;
+
+ //2D Projections Targeted
+ struct BVH_Transform * bvhTargetTransform;
+
+ //Chain of subproblems that need to be solved
+ unsigned int numberOfChains;
+ struct ikChain chain[MAXIMUM_CHAINS];
+};
+
+
+void freeSolutionBuffer(struct MotionBuffer * mb)
+{
+ if (mb!=0)
+ {
+  if(mb->motion!=0)
+   {
+     free(mb->motion);
+     mb->motion=0;
+   }
+  free(mb);
+ }
+}
+
+
+struct MotionBuffer * mallocNewSolutionBuffer(struct BVH_MotionCapture * mc)
+{
+  struct MotionBuffer * newBuffer = (struct MotionBuffer *)  malloc(sizeof(struct MotionBuffer));
+  if (newBuffer!=0)
+  {
+    newBuffer->bufferSize = mc->numberOfValuesPerFrame;
+    newBuffer->motion = (float *) malloc(sizeof(float) * newBuffer->bufferSize);
+    if (newBuffer->motion!=0)
+    {
+      memset(newBuffer->motion,0,sizeof(float) * newBuffer->bufferSize);
+    }
+  }
+
+  return newBuffer;
+}
+
+
+void clear_line()
+{
+  fputs("\033[A\033[2K\033[A\033[2K",stdout);
+  rewind(stdout);
+  int i=ftruncate(1,0);
+  if (i!=0) { /*fprintf(stderr,"Error with ftruncate\n");*/ }
+}
 
 float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
 {
@@ -36,13 +107,12 @@ float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
   return (diffX*diffX)+(diffY*diffY);
 }
 
+
 float get2DPointDistance(float aX,float aY,float bX,float bY)
 {
-  float diffX = (float) aX-bX;
-  float diffY = (float) aY-bY;
-    //We calculate the distance here..!
-  return sqrt((diffX*diffX)+(diffY*diffY));
+  return sqrt(getSquared2DPointDistance(aX,aY,bX,bY));
 }
+
 
 float meanSquaredBVH2DDistace(
                               struct BVH_MotionCapture * mc,
@@ -99,15 +169,6 @@ float meanSquaredBVH2DDistace(
 }
 
 
-
-
-void clear_line()
-{
-  fputs("\033[A\033[2K\033[A\033[2K",stdout);
-  rewind(stdout);
-  int i=ftruncate(1,0);
-  if (i!=0) { /*fprintf(stderr,"Error with ftruncate\n");*/ }
-}
 
 
 int bruteForceChange(
@@ -214,7 +275,7 @@ int gatherBVH2DDistaces(
 }
 
 
-unsigned int countSelectedJoints(struct BVH_MotionCapture * mc)
+unsigned int countSelectedJoints(struct BVH_MotionCapture * mc,int useAllJoints,BVHMotionChannelID onlyConsiderChildrenOfThisJoint)
 {
   unsigned int selectedJoints=0;
   if(mc->selectedJoints==0) { return mc->jointHierarchySize; }
@@ -231,7 +292,7 @@ unsigned int countSelectedJoints(struct BVH_MotionCapture * mc)
                 }
               }
 
-               if (isSelected)
+               if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
                {
                  ++selectedJoints;
                }
@@ -240,159 +301,40 @@ unsigned int countSelectedJoints(struct BVH_MotionCapture * mc)
 }
 
 
-double objectiveFunction(double *parameters, int sampleNumber, void *contextData)
+
+int prepareProblem(
+                   struct BVH_MotionCapture * mc,
+                   struct simpleRenderer *renderer,
+                   struct MotionBuffer * solution,
+                   float * averageError,
+                   struct BVH_Transform * bvhTargetTransform
+                  )
 {
-  struct iKSolutionContext * context =  (struct iKSolutionContext *) contextData;
-
-  fprintf(stderr,"Testing : ");
-  for (BVHMotionChannelID mID=context->fromElement; mID<context->toElement+1; mID++)
-      {
-        context->solution->motion[mID] = (float) parameters[mID-context->fromElement];
-        fprintf(stderr,"%f ",context->solution->motion[mID]);
-      }
-  fprintf(stderr,"\n");
-
-    if (
-       bvh_loadTransformForMotionBuffer(
-                                        context->mc,
-                                        context->solution->motion,
-                                        context->bvhSourceTransform
-                                       )
-       )
-     {
-        bvh_removeTranslationFromTransform(
-                                            context->mc,
-                                            context->bvhSourceTransform
-                                          );
-
-    return meanSquaredBVH2DDistace(
-                                 context->mc,
-                                 context->renderer,
-                                 0, //Only use affected joints..
-                                 context->affectedJoint,
-                                 context->bvhSourceTransform,
-                                 context->bvhTargetTransform
-                                );
-     }
-    return 0.0;
-}
-
-void gradientFunction(double *g, double *parameters, int sampleNumber, void *contextData)
-{
-  struct iKSolutionContext * context =  (struct iKSolutionContext *) contextData;
-
-  for (BVHMotionChannelID mID=context->fromElement; mID<context->toElement+1; mID++)
-      {
-       // g[mID-fromElement] =
-
-        context->solution->motion[mID] = (float) parameters[mID-context->fromElement];
-        fprintf(stderr,"%f ",context->solution->motion[mID]);
-      }
-  //  g[0] =
-  //  g[1] =
-  //  g[2] =
-}
+  fprintf(stderr,"The problem we want to solve has %u joints ",countSelectedJoints(mc,1,0));
 
 
-int levmarIKSolution(
-                     struct BVH_MotionCapture * mc,
-                     struct simpleRenderer *renderer,
-                     struct MotionBuffer * solution,
-                     float * averageError,
-                     unsigned int fromElement,
-                     unsigned int toElement,
-                     unsigned int budget,
-                     struct BVH_Transform * bvhSourceTransform,
-                     struct BVH_Transform * bvhTargetTransform
-                    )
-{
-  //--------------------------
-  struct iKSolutionContext context;
-  context.mc = mc;
-  context.renderer = renderer;
-  context.solution = solution;
-  context.bvhSourceTransform = bvhSourceTransform;
-  context.bvhTargetTransform = bvhTargetTransform;
-  bvh_getRootJointID(mc,&context.affectedJoint);
-  context.fromElement=fromElement;
-  context.toElement=toElement;
-  //--------------------------
+  struct ikProblem problem={0};
 
+  problem.mc = mc;
+  problem.renderer = renderer;
+  problem.initialSolution = solution ;
 
-  unsigned int degreesOfFreedomForTheProblem = toElement - fromElement + 1;
-  unsigned int budgetPerDoF=(unsigned int) budget/degreesOfFreedomForTheProblem;
-  fprintf(stdout,"Trying to solve a %u D.o.F. problem with a budget of %u tries using levmar..\n",degreesOfFreedomForTheProblem,budget);
+  /*problem.currentSolution =
 
-  struct LMstat lm;
-  if (levmar_initialize(&lm))
-  {
-    double parameters[toElement-fromElement+1];
-    for (BVHMotionChannelID mID=fromElement; mID<toElement+1; mID++)
-      {
-        parameters[mID-fromElement] = (double) solution->motion[mID];
-      }
+ //Initial solution
+ struct MotionBuffer * initialSolution;
+ //Current solution
+ struct MotionBuffer * currentSolution;
 
-    unsigned int numberOfParameters = degreesOfFreedomForTheProblem;
+ //2D Projections Targeted
+ struct BVH_Transform * bvhTargetTransform;
 
-
-
-    unsigned int numberOfMeasurements = countSelectedJoints(mc);
-    double data[numberOfMeasurements];
-
-
-    gatherBVH2DDistaces(
-                        data,
-                        numberOfMeasurements,
-                        mc,
-                        renderer,
-                        0,//Dont gather all distances..
-                        context.affectedJoint,
-                        bvhSourceTransform,
-                        bvhTargetTransform
-                       );
-
-    int iterationsExecuted = levmar_solve(
-                                          numberOfParameters,
-                                          parameters,
-                                          numberOfMeasurements,
-                                          data,
-                                          NULL,
-                                          &objectiveFunction,
-                                          &gradientFunction,
-                                          (void *) &context,
-                                          &lm
-                                         );
-
-    printf("**************** End of calculation ***********************\n");
-    printf("Executed Iterations: %d\n", iterationsExecuted);
-    printf("Final Solution: ");
-    for (unsigned int pID=0; pID<numberOfParameters; pID++)
-      {
-        printf("%f ", parameters[pID]);
-      }
-    printf("\n");
-
-    for (BVHMotionChannelID mID=fromElement; mID<toElement+1; mID++)
-      {
-        solution->motion[mID] = (float) parameters[mID-fromElement];
-      }
-
-
-    return 1;
-
-
-  }
-
-
-
+ //Chain of subproblems that need to be solved
+ unsigned int numberOfChains;
+ struct ikChain chain[MAXIMUM_CHAINS];*/
 
  return 0;
 }
-
-
-
-
-
 
 float approximateTargetFromMotionBuffer(
                                          struct BVH_MotionCapture * mc,
@@ -418,20 +360,8 @@ float approximateTargetFromMotionBuffer(
                                           );
 
 
-/*
-        bruteForceChange(
-                          mc,
-                          renderer,
-                          solution,
-                          averageError,
-                          3,
-                          5,
-                          100,
-                          &bvhSourceTransform,
-                          bvhTargetTransform
-                        );*/
 
-        levmarIKSolution(
+        bruteForceChange(
                           mc,
                           renderer,
                           solution,
@@ -443,6 +373,7 @@ float approximateTargetFromMotionBuffer(
                           bvhTargetTransform
                         );
 
+
        return meanSquaredBVH2DDistace(mc,renderer,1,0,&bvhSourceTransform,bvhTargetTransform);
      }
 
@@ -451,6 +382,8 @@ float approximateTargetFromMotionBuffer(
 
 
 
+
+//./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
 
 int BVHTestIK(
               struct BVH_MotionCapture * mc,
@@ -470,20 +403,12 @@ int BVHTestIK(
   simpleRendererInitialize(&renderer);
 
   fprintf(stderr,"BVH file has motion files with %u elements\n",mc->numberOfValuesPerFrame);
-  struct MotionBuffer solution={0};
-  solution.bufferSize = mc->numberOfValuesPerFrame;
-  solution.motion = (float *) malloc(sizeof(float) * (solution.bufferSize+1));
 
-  float * averageError = (float *) malloc(sizeof(float) * (solution.bufferSize+1));
+  struct MotionBuffer * solution = mallocNewSolutionBuffer(mc);
 
-  if ( (averageError!=0) && (solution.motion!=0) )
+  if (  (solution!=0) )
   {
-    memset(averageError,0,sizeof(float) * solution.bufferSize);
-    averageError[3]=12.0;
-    averageError[4]=12.0;
-    averageError[5]=12.0;
-
-    if ( bvh_copyMotionFrameToMotionBuffer(mc,&solution,fIDSource) )
+    if ( bvh_copyMotionFrameToMotionBuffer(mc,solution,fIDSource) )
     {
       if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
       {
@@ -495,8 +420,8 @@ int BVHTestIK(
         float error2D = approximateTargetFromMotionBuffer(
                                                          mc,
                                                          &renderer,
-                                                         &solution,
-                                                         averageError,
+                                                         solution,
+                                                         0,
                                                          &bvhTargetTransform
                                                         );
 
@@ -504,78 +429,10 @@ int BVHTestIK(
         result=1;
       }
     }
-    free(solution.motion);
-    free(averageError);
+    freeSolutionBuffer(solution);
   }
 
  return result;
-}
-
-
-
-
-
-
-
-
-
-
-
-//./BVHTester --from Motions/05_01.bvh --selectJoints 0 23 hip eye.r eye.l abdomen chest neck head rshoulder relbow rhand lshoulder lelbow lhand rhip rknee rfoot lhip lknee lfoot toe1-2.r toe5-3.r toe1-2.l toe5-3.l --testIK 4 100
-
-
-
-
-float approximateTargetPose(
-                            struct BVH_MotionCapture * mc,
-                            struct simpleRenderer *renderer,
-                            struct BVH_Transform * bvhSourceTransform,
-                            struct BVH_Transform * bvhTargetTransform
-                           )
-{
-  // return  meanSquaredBVH2DDistace(mc,renderer,bvhSourceTransform,bvhTargetTransform);
-  return 0.0;
-}
-
-
-
-int BVHTestIKOLD(
-              struct BVH_MotionCapture * mc,
-              unsigned int fIDSource,
-              unsigned int fIDTarget
-             )
-{
-  struct BVH_Transform bvhSourceTransform={0};
-  struct BVH_Transform bvhTargetTransform={0};
-
-  struct simpleRenderer renderer={0};
-  simpleRendererDefaults(
-                         &renderer,
-                         1920, 1080, 582.18394,   582.52915 // https://gopro.com/help/articles/Question_Answer/HERO4-Field-of-View-FOV-Information
-                        );
-  simpleRendererInitialize(&renderer);
-
-/*
-  float * motionBuffer=0;
-  int bvh_loadTransformForMotionBuffer(
-                                       mc,
-                                       motionBuffer,
-                                     struct BVH_Transform * bvhTransform
-                                    );*/
-
-  if (
-       ( bvh_loadTransformForFrame(mc,fIDSource,&bvhSourceTransform) )
-        &&
-       ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
-     )
-     {
-        float distance2D = approximateTargetPose(mc,&renderer,&bvhSourceTransform,&bvhTargetTransform);
-
-        fprintf(stderr,"2D Distance is %0.2f\n",distance2D);
-        return 1;
-     }
-
-   return 0;
 }
 
 
@@ -623,40 +480,8 @@ int mirrorBVHThroughIK(
                        BVHJointID jIDB
                       )
 {
-   float * motionBuffer=0;
-
-   bvh_loadTransformForMotionBuffer(
-                                     mc,
-                                     motionBuffer,
-                                     bvhTransform
-                                   );
-
-
-  //TODO : TODO: TODO:
-  //TODO: add here..
-
-  if ( performPointProjectionsForFrame(mc,bvhTransform,fID,renderer,0,0) )
-     {
-        fprintf(stderr,"Not Implemented, Todo: mirrorBVHThroughIK %u \n",fID);
-
-        fprintf(stderr,"%u=>%0.2f,%0.2f,%0.2f,%0.2f",
-                jIDA,
-                bvhTransform->joint[jIDA].pos3D[0],
-                bvhTransform->joint[jIDA].pos3D[1],
-                bvhTransform->joint[jIDA].pos3D[2],
-                bvhTransform->joint[jIDA].pos3D[3]
-                );
-
-        fprintf(stderr,"  %u=>%0.2f,%0.2f,%0.2f,%0.2f\n",
-                jIDB,
-                bvhTransform->joint[jIDB].pos3D[0],
-                bvhTransform->joint[jIDB].pos3D[1],
-                bvhTransform->joint[jIDB].pos3D[2],
-                bvhTransform->joint[jIDB].pos3D[3]
-                );
-
-
-     }
+  fprintf(stderr,"NOT IMPLEMENTED YET..");
+  //Todo mirror 2D points in 2D and then perform IK..
   return 0;
 }
 
