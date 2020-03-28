@@ -748,47 +748,12 @@ float approximateTargetFromMotionBuffer(
               &problem
              );
 
-  calculateChainLoss(
-                     &problem,
-                     0
-                    );
+  float loss;
+
+  loss=calculateChainLoss( &problem, 0 );
 
 
-                    /*
-  struct BVH_Transform bvhSourceTransform={0};
-
-  if (
-       bvh_loadTransformForMotionBuffer(
-                                        mc,
-                                        solution->motion,
-                                        &bvhSourceTransform
-                                       )
-     )
-     {
-        bvh_removeTranslationFromTransform(
-                                            mc,
-                                            &bvhSourceTransform
-                                          );
-
-
-
-        bruteForceChange(
-                          mc,
-                          renderer,
-                          solution,
-                          averageError,
-                          3,
-                          5,
-                          100,
-                          &bvhSourceTransform,
-                          bvhTargetTransform
-                        );
-
-
-       return meanSquaredBVH2DDistace(mc,renderer,1,0,&bvhSourceTransform,bvhTargetTransform);
-     }
-*/
- return 0.0;
+ return loss;
 }
 
 
