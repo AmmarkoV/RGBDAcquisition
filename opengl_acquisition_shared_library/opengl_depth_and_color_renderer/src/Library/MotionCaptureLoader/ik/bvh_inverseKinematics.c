@@ -615,6 +615,28 @@ float calculateChainLoss(
 }
 
 
+float iterateChainLoss(
+                         struct ikProblem * problem,
+                         unsigned int chainID
+                        )
+{
+ unsigned int mIDS[3];
+ mIDS[0]= problem->chain[chainID].part[0].mIDStart;
+ mIDS[1]= problem->chain[chainID].part[0].mIDStart+1;
+ mIDS[2]= problem->chain[chainID].part[0].mIDStart+2;
+ float originalValues[3]={0};
+ float delta[3]={0};
+
+ originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
+ originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
+ originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
+
+
+
+
+}
+
+
 int bruteForceChange(
                      struct BVH_MotionCapture * mc,
                      struct simpleRenderer *renderer,
