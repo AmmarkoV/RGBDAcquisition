@@ -26,6 +26,9 @@ struct ikChainParts
  char evaluated;
  char endEffector;
 };
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 struct ikChain
 {
@@ -42,6 +45,9 @@ struct ikChain
   float previousError;
   float currentError;
 };
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 struct ikProblem
 {
@@ -66,7 +72,9 @@ struct ikProblem
 
  struct ikChain chain[MAXIMUM_CHAINS];
 };
-
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 void freeSolutionBuffer(struct MotionBuffer * mb)
 {
@@ -80,6 +88,7 @@ void freeSolutionBuffer(struct MotionBuffer * mb)
   free(mb);
  }
 }
+//---------------------------------------------------------
 
 
 struct MotionBuffer * mallocNewSolutionBuffer(struct BVH_MotionCapture * mc)
@@ -97,6 +106,29 @@ struct MotionBuffer * mallocNewSolutionBuffer(struct BVH_MotionCapture * mc)
 
   return newBuffer;
 }
+//---------------------------------------------------------
+
+
+struct MotionBuffer * mallocNewSolutionBufferAndCopy(struct BVH_MotionCapture * mc,struct MotionBuffer * whatToCopy)
+{
+  struct MotionBuffer * newBuffer = (struct MotionBuffer *)  malloc(sizeof(struct MotionBuffer));
+  if (newBuffer!=0)
+  {
+    newBuffer->bufferSize = mc->numberOfValuesPerFrame;
+    newBuffer->motion = (float *) malloc(sizeof(float) * newBuffer->bufferSize);
+    if (newBuffer->motion!=0)
+    {
+      for (unsigned int i=0; i<newBuffer->bufferSize; i++)
+      {
+        newBuffer->motion[i]=whatToCopy->motion[i];
+      }
+    }
+  }
+
+  return newBuffer;
+}
+//---------------------------------------------------------
+
 
 
 void clear_line()
@@ -119,6 +151,350 @@ float getSquared2DPointDistance(float aX,float aY,float bX,float bY)
 float get2DPointDistance(float aX,float aY,float bX,float bY)
 {
   return sqrt(getSquared2DPointDistance(aX,aY,bX,bY));
+}
+
+
+
+int prepareProblem(
+                   struct ikProblem * problem,
+                   struct BVH_MotionCapture * mc,
+                   struct simpleRenderer *renderer,
+                   struct MotionBuffer * solution,
+                   float * averageError,
+                   struct BVH_Transform * bvhTargetTransform
+                  )
+{
+  problem->mc = mc;
+  problem->renderer = renderer;
+  problem->initialSolution = solution ;
+
+  problem->currentSolution = mallocNewSolutionBuffer(mc);
+
+  //2D Projections Targeted
+  //----------------------------------------------------------
+  problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
+
+ //Chain of subproblems that need to be solved
+  //----------------------------------------------------------
+  problem->numberOfChains = 5;
+  problem->numberOfGroups = 2;
+  problem->numberOfJobsPerGroup = 6;
+
+
+
+  //Chain #0 is Joint Hip-> to all its children
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  unsigned int groupID=0;
+  unsigned int jobID=0;
+  unsigned int chainID=0;
+  unsigned int partID=0;
+  BVHJointID thisJID=0;
+  //----------------------------------------------------------
+
+  //Chain 0 is the Hip and all of the rigid torso
+  //----------------------------------------------------------
+  problem->chain[chainID].groupID=groupID;
+  problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+
+  if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=5; //First Rotation
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+
+   ++partID;
+  }
+
+ problem->chain[chainID].numberOfParts=partID;
+
+ ++chainID;
+ ++groupID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
+
+  //Chain 1 is the Right Arm
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  partID=0;
+  problem->chain[chainID].groupID=groupID;
+  problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+
+
+
+  if (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"relbow",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+ problem->chain[chainID].numberOfParts=partID;
+ ++chainID;
+ ++jobID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
+
+
+
+
+  //Chain 2 is the Left Arm
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  partID=0;
+  problem->chain[chainID].groupID=groupID;
+  problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+
+
+
+  if (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lelbow",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lhand",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+ problem->chain[chainID].numberOfParts=partID;
+ ++chainID;
+ ++jobID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
+
+
+
+
+  //Chain 3 is the Right Leg
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  partID=0;
+  problem->chain[chainID].groupID=groupID;
+  problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+
+
+  if (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"rknee",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+ problem->chain[chainID].numberOfParts=partID;
+ ++chainID;
+ ++jobID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
+
+
+
+  //Chain 4 is the Left Leg
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  partID=0;
+  problem->chain[chainID].groupID=groupID;
+  problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+
+  if (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lknee",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].endEffector=0;
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
+   ++partID;
+  }
+
+  if (bvh_getJointIDFromJointName(mc,"lfoot",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].endEffector=1;
+   ++partID;
+  }
+
+ problem->chain[chainID].numberOfParts=partID;
+ ++chainID;
+ ++jobID;
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  ++groupID;
+
+  problem->numberOfChains = chainID;
+  problem->numberOfGroups = groupID;
+
+ return 1;
+}
+
+
+int viewProblem(
+                struct ikProblem * problem
+               )
+{
+ fprintf(stderr,"The IK problem we want to solve has %u groups of subproblems\n",problem->numberOfGroups);
+ fprintf(stderr,"It is also ultimately divided into %u kinematic chains\n",problem->numberOfChains);
+
+ for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
+ {
+   fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
+   for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
+   {
+     unsigned int jID=problem->chain[chainID].part[partID].jID;
+
+     if (problem->chain[chainID].part[partID].endEffector)
+     {
+      fprintf(
+              stderr,"jID(%s/%u)->EndEffector ",
+              problem->mc->jointHierarchy[jID].jointName,
+              jID
+             );
+     } else
+     {
+     fprintf(
+             stderr,"jID(%s/%u)->mID(%u to %u) ",
+             problem->mc->jointHierarchy[jID].jointName,
+             jID,
+             problem->chain[chainID].part[partID].mIDStart,
+             problem->chain[chainID].part[partID].mIDEnd
+             );
+
+     }
+   }
+   fprintf(stderr,"\n");
+ }
+
+ return 1;
 }
 
 
@@ -193,7 +569,7 @@ float calculateChainLoss(
      if (
          bvh_loadTransformForMotionBuffer(
                                           problem->mc,
-                                          problem->chain[chainID].currentSolution,
+                                          problem->chain[chainID].currentSolution->motion,
                                           &problem->chain[chainID].current2DProjectionTransform
                                          )
         )
@@ -203,24 +579,39 @@ float calculateChainLoss(
                                             &problem->chain[chainID].current2DProjectionTransform
                                           );
 
-
+      if (
+          (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0)) &&
+          (bvh_projectTo2D(problem->mc,problem->bvhTarget2DProjectionTransform,problem->renderer,0,0))
+         )
+      {
        for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
        {
          unsigned int jID=problem->chain[chainID].part[partID].jID;
          float thisSquared2DDistance=getSquared2DPointDistance(
                                                                 (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0],
                                                                 (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1],
-                                                                (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0],
-                                                                (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1]
+                                                                (float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0],
+                                                                (float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1]
                                                                );
+         fprintf(stderr,"%0.2f,%0.2f -> %0.2f,%0.2f : ",
+         problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0],
+         problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1],
+         problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0],
+         problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1]
+         );
+         fprintf(stderr,"Joint squared %s distance is %0.2f\n",problem->mc->jointHierarchy[jID].jointName,thisSquared2DDistance);
+         loss+=thisSquared2DDistance;
          ++numberOfSamples;
        }
+     }
 
       } //Have a valid 2D transform
  } //Have a valid chain
 
  //I have left 0/0 on purpose to cause NaNs when projection errors occur
- return (float) loss/numberOfSamples;
+  loss = (float) loss/numberOfSamples;
+  fprintf(stderr,"loss %0.2f\n",loss);
+  return loss;
 }
 
 
@@ -328,378 +719,6 @@ int gatherBVH2DDistaces(
 }
 
 
-unsigned int countSelectedJoints(struct BVH_MotionCapture * mc,int useAllJoints,BVHMotionChannelID onlyConsiderChildrenOfThisJoint)
-{
-  unsigned int selectedJoints=0;
-  if(mc->selectedJoints==0) { return mc->jointHierarchySize; }
-
-  for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-            {
-              int isSelected = 1;
-
-              if (mc->selectedJoints!=0)
-              {
-                if (!mc->selectedJoints[jID])
-                {
-                  isSelected=0;
-                }
-              }
-
-               if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
-               {
-                 ++selectedJoints;
-               }
-            }
-    return selectedJoints;
-}
-
-
-
-int prepareProblem(
-                   struct ikProblem * problem,
-                   struct BVH_MotionCapture * mc,
-                   struct simpleRenderer *renderer,
-                   struct MotionBuffer * solution,
-                   float * averageError,
-                   struct BVH_Transform * bvhTargetTransform
-                  )
-{
-  fprintf(stderr,"The problem we want to solve has %u joints ",countSelectedJoints(mc,1,0));
-
-  problem->mc = mc;
-  problem->renderer = renderer;
-  problem->initialSolution = solution ;
-
-  problem->currentSolution = mallocNewSolutionBuffer(mc);
-
-  //2D Projections Targeted
-  //----------------------------------------------------------
-  problem->bvhTarget2DProjectionTransform = bvhTargetTransform;
-
- //Chain of subproblems that need to be solved
-  //----------------------------------------------------------
-  problem->numberOfChains = 5;
-  problem->numberOfGroups = 2;
-  problem->numberOfJobsPerGroup = 6;
-
-
-
-  //Chain #0 is Joint Hip-> to all its children
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  unsigned int groupID=0;
-  unsigned int jobID=0;
-  unsigned int chainID=0;
-  unsigned int partID=0;
-  BVHJointID thisJID=0;
-  //----------------------------------------------------------
-
-  //Chain 0 is the Hip and all of the rigid torso
-  //----------------------------------------------------------
-  problem->chain[chainID].groupID=groupID;
-  problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
-
-  if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=5; //First Rotation
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"neck",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
-
-   ++partID;
-  }
-
- problem->chain[chainID].numberOfParts=partID;
-
- ++chainID;
- ++groupID;
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-
-
-  //Chain 1 is the Right Arm
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  partID=0;
-  problem->chain[chainID].groupID=groupID;
-  problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
-
-
-  if (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"relbow",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"rhand",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
-   ++partID;
-  }
-
- problem->chain[chainID].numberOfParts=partID;
- ++chainID;
- ++jobID;
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-
-
-
-
-
-  //Chain 2 is the Left Arm
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  partID=0;
-  problem->chain[chainID].groupID=groupID;
-  problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
-
-
-  if (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"lelbow",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"lhand",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
-   ++partID;
-  }
-
- problem->chain[chainID].numberOfParts=partID;
- ++chainID;
- ++jobID;
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-
-
-
-
-
-  //Chain 3 is the Right Leg
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  partID=0;
-  problem->chain[chainID].groupID=groupID;
-  problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
-
-
-  if (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"rknee",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"rfoot",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
-   ++partID;
-  }
-
- problem->chain[chainID].numberOfParts=partID;
- ++chainID;
- ++jobID;
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-
-
-
-
-  //Chain 4 is the Left Leg
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  partID=0;
-  problem->chain[chainID].groupID=groupID;
-  problem->chain[chainID].jobID=jobID;
-  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
-
-  if (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"lknee",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].endEffector=0;
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].mIDStart=mc->jointToMotionLookup[thisJID].jointMotionOffset; //First Rotation
-   problem->chain[chainID].part[partID].mIDEnd=problem->chain[chainID].part[partID].mIDStart + mc->jointHierarchy[thisJID].loadedChannels-1;
-   ++partID;
-  }
-
-  if (bvh_getJointIDFromJointName(mc,"lfoot",&thisJID) )
-  {
-   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
-   problem->chain[chainID].part[partID].jID=thisJID;
-   problem->chain[chainID].part[partID].endEffector=1;
-   ++partID;
-  }
-
- problem->chain[chainID].numberOfParts=partID;
- ++chainID;
- ++jobID;
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  //----------------------------------------------------------
-  ++groupID;
-
-  problem->numberOfChains = chainID;
-  problem->numberOfGroups = groupID;
-
- return 1;
-}
-
-
-int viewProblem(
-                struct ikProblem * problem
-               )
-{
- fprintf(stderr,"The IK problem we want to solve has %u groups of subproblems\n",problem->numberOfGroups);
- fprintf(stderr,"It is also ultimately divided into %u kinematic chains\n",problem->numberOfChains);
-
- for (unsigned int chainID=0; chainID<problem->numberOfChains; chainID++)
- {
-   fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
-   for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
-   {
-     unsigned int jID=problem->chain[chainID].part[partID].jID;
-
-     if (problem->chain[chainID].part[partID].endEffector)
-     {
-      fprintf(
-              stderr,"jID(%s/%u)->EndEffector ",
-              problem->mc->jointHierarchy[jID].jointName,
-              jID
-             );
-     } else
-     {
-     fprintf(
-             stderr,"jID(%s/%u)->mID(%u to %u) ",
-             problem->mc->jointHierarchy[jID].jointName,
-             jID,
-             problem->chain[chainID].part[partID].mIDStart,
-             problem->chain[chainID].part[partID].mIDEnd
-             );
-
-     }
-   }
-   fprintf(stderr,"\n");
- }
-
- return 1;
-}
-
-
-
-
 
 
 
@@ -729,6 +748,13 @@ float approximateTargetFromMotionBuffer(
               &problem
              );
 
+  calculateChainLoss(
+                     &problem,
+                     0
+                    );
+
+
+                    /*
   struct BVH_Transform bvhSourceTransform={0};
 
   if (
@@ -761,7 +787,7 @@ float approximateTargetFromMotionBuffer(
 
        return meanSquaredBVH2DDistace(mc,renderer,1,0,&bvhSourceTransform,bvhTargetTransform);
      }
-
+*/
  return 0.0;
 }
 
@@ -819,6 +845,31 @@ int BVHTestIK(
 
  return result;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
