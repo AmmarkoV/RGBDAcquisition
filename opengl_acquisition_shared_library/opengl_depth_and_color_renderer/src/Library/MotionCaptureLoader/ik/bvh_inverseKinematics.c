@@ -35,6 +35,9 @@ struct ikChain
   unsigned int numberOfParts;
   struct ikChainParts part[MAXIMUM_PARTS_OF_CHAIN];
 
+  struct MotionBuffer * currentSolution;
+  struct BVH_Transform current2DProjectionTransform;
+
   float initialError;
   float previousError;
   float currentError;
@@ -174,6 +177,51 @@ float meanSquaredBVH2DDistace(
 }
 
 
+
+
+float calculateChainLoss(
+                         struct ikProblem * problem,
+                         unsigned int chainID
+                        )
+{
+  unsigned int numberOfSamples=0;
+  float loss=0;
+  if (chainID<problem->numberOfChains)
+  {
+   fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
+
+     if (
+         bvh_loadTransformForMotionBuffer(
+                                          problem->mc,
+                                          problem->chain[chainID].currentSolution,
+                                          &problem->chain[chainID].current2DProjectionTransform
+                                         )
+        )
+      {
+        bvh_removeTranslationFromTransform(
+                                            problem->mc,
+                                            &problem->chain[chainID].current2DProjectionTransform
+                                          );
+
+
+       for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
+       {
+         unsigned int jID=problem->chain[chainID].part[partID].jID;
+         float thisSquared2DDistance=getSquared2DPointDistance(
+                                                                (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0],
+                                                                (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1],
+                                                                (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0],
+                                                                (float) problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1]
+                                                               );
+         ++numberOfSamples;
+       }
+
+      } //Have a valid 2D transform
+ } //Have a valid chain
+
+ //I have left 0/0 on purpose to cause NaNs when projection errors occur
+ return (float) loss/numberOfSamples;
+}
 
 
 int bruteForceChange(
@@ -351,13 +399,14 @@ int prepareProblem(
   //----------------------------------------------------------
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
 
   if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
   {
    problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
    problem->chain[chainID].part[partID].jID=thisJID;
    problem->chain[chainID].part[partID].mIDStart=3; //First Rotation
-   problem->chain[chainID].part[partID].mIDStart=5; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=5; //First Rotation
    ++partID;
   }
 
@@ -418,6 +467,8 @@ int prepareProblem(
   partID=0;
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
+
 
   if (bvh_getJointIDFromJointName(mc,"rshoulder",&thisJID) )
   {
@@ -465,6 +516,8 @@ int prepareProblem(
   partID=0;
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
+
 
   if (bvh_getJointIDFromJointName(mc,"lshoulder",&thisJID) )
   {
@@ -512,6 +565,8 @@ int prepareProblem(
   partID=0;
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
+
 
   if (bvh_getJointIDFromJointName(mc,"rhip",&thisJID) )
   {
@@ -558,6 +613,7 @@ int prepareProblem(
   partID=0;
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
+  problem->chain[chainID].currentSolution=mallocNewSolutionBuffer(mc);
 
   if (bvh_getJointIDFromJointName(mc,"lhip",&thisJID) )
   {
@@ -615,6 +671,16 @@ int viewProblem(
    for (unsigned int partID=0; partID<problem->chain[chainID].numberOfParts; partID++)
    {
      unsigned int jID=problem->chain[chainID].part[partID].jID;
+
+     if (problem->chain[chainID].part[partID].endEffector)
+     {
+      fprintf(
+              stderr,"jID(%s/%u)->EndEffector ",
+              problem->mc->jointHierarchy[jID].jointName,
+              jID
+             );
+     } else
+     {
      fprintf(
              stderr,"jID(%s/%u)->mID(%u to %u) ",
              problem->mc->jointHierarchy[jID].jointName,
@@ -623,10 +689,12 @@ int viewProblem(
              problem->chain[chainID].part[partID].mIDEnd
              );
 
+     }
    }
    fprintf(stderr,"\n");
  }
 
+ return 1;
 }
 
 
