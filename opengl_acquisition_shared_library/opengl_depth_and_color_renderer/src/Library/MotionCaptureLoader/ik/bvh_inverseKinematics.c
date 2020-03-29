@@ -18,6 +18,17 @@
 #define MAXIMUM_CHAINS 10
 #define MAXIMUM_PARTS_OF_CHAIN 10
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
 struct ikChainParts
 {
  BVHJointID jID;
@@ -564,7 +575,7 @@ float calculateChainLoss(
   float loss=0;
   if (chainID<problem->numberOfChains)
   {
-   fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
+   //fprintf(stderr,"Chain %u has %u parts : ",chainID,problem->chain[chainID].numberOfParts);
 
      if (
          bvh_loadTransformForMotionBuffer(
@@ -593,13 +604,14 @@ float calculateChainLoss(
                                                                 (float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0],
                                                                 (float) problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1]
                                                                );
+                                                               /*
          fprintf(stderr,"%0.2f,%0.2f -> %0.2f,%0.2f : ",
          problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[0],
          problem->chain[chainID].current2DProjectionTransform.joint[jID].pos2D[1],
          problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[0],
          problem->bvhTarget2DProjectionTransform->joint[jID].pos2D[1]
          );
-         fprintf(stderr,"Joint squared %s distance is %0.2f\n",problem->mc->jointHierarchy[jID].jointName,thisSquared2DDistance);
+         fprintf(stderr,"Joint squared %s distance is %0.2f\n",problem->mc->jointHierarchy[jID].jointName,thisSquared2DDistance);*/
          loss+=thisSquared2DDistance;
          ++numberOfSamples;
        }
@@ -610,7 +622,7 @@ float calculateChainLoss(
 
  //I have left 0/0 on purpose to cause NaNs when projection errors occur
   loss = (float) loss/numberOfSamples;
-  fprintf(stderr,"loss %0.2f\n",loss);
+  //fprintf(stderr,"loss %0.2f\n",loss);
   return loss;
 }
 
@@ -620,6 +632,7 @@ float iterateChainLoss(
                          unsigned int chainID
                         )
 {
+ unsigned int consecutiveBadSteps=0;
  unsigned int mIDS[3];
  mIDS[0]= problem->chain[chainID].part[0].mIDStart;
  mIDS[1]= problem->chain[chainID].part[0].mIDStart+1;
@@ -633,34 +646,79 @@ float iterateChainLoss(
  originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
  originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
 
+ float currentValues[3]={0};
+ currentValues[0] = originalValues[0];
+ currentValues[1] = originalValues[1];
+ currentValues[2] = originalValues[2];
+
 
  float bestLoss = calculateChainLoss(problem,chainID);
  //Random
- float loss=0.0;
+ float loss=bestLoss;
 
+ float d=0.5;
+
+ delta[0] = d;
+ delta[1] = d;
+ delta[2] = d;
+
+ fprintf(stderr,"  State |   loss   | rX  |  rY  |  rZ \n");
+ fprintf(stderr,"Initial | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",loss,originalValues[0],originalValues[1],originalValues[2]);
+
+
+ float losses[3];
  for (unsigned int i=0; i<1000; i++)
  {
-   delta[0] = 3.0 - (float) (6*(rand()) / (float) RAND_MAX);
-   delta[1] = 3.0 - (float) (6*(rand()) / (float) RAND_MAX);
-   delta[2] = 3.0 - (float) (6*(rand()) / (float) RAND_MAX);
+ //-------------------
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0] + delta[0];
+   losses[0]=calculateChainLoss(problem,chainID);
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
+ //-------------------
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1] + delta[1];
+   losses[1]=calculateChainLoss(problem,chainID);
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
+ //-------------------
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2] + delta[2];
+   losses[2]=calculateChainLoss(problem,chainID);
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
+ //-------------------
 
-   problem->chain[chainID].currentSolution->motion[mIDS[0]] = originalValues[0] + delta[0];
-   problem->chain[chainID].currentSolution->motion[mIDS[1]] = originalValues[1] + delta[1];
-   problem->chain[chainID].currentSolution->motion[mIDS[2]] = originalValues[2] + delta[2];
+   if (loss!=losses[0]) { delta[0] = (float) delta[0] / ( loss - losses[0]); } else
+                        { delta[0] = 0; }
 
-   loss=calculateChainLoss(
-                           problem,
-                           chainID
-                          );
+   if (loss!=losses[1]) { delta[1] = (float) delta[1] / ( loss - losses[1]); } else
+                        { delta[1] = 0; }
+
+   if (loss!=losses[2]) { delta[2] = (float) delta[2] / ( loss - losses[2]); } else
+                        { delta[2] = 0; }
+
+
+   currentValues[0]+=delta[0];
+   currentValues[1]+=delta[1];
+   currentValues[2]+=delta[2];
+
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
+   loss=calculateChainLoss(problem,chainID);
+
+
    if (loss<bestLoss)
    {
      bestLoss=loss;
      bestDelta[0]=delta[0];
      bestDelta[1]=delta[1];
      bestDelta[2]=delta[2];
+     consecutiveBadSteps=0;
+     fprintf(stderr,"%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n",i,loss,currentValues[0],currentValues[1],currentValues[2]);
+   } else
+   {
+     ++consecutiveBadSteps;
+     fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]);
    }
- }
 
+   if (consecutiveBadSteps>4) { break; }
+ }
 
 
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = originalValues[0] + bestDelta[0];
