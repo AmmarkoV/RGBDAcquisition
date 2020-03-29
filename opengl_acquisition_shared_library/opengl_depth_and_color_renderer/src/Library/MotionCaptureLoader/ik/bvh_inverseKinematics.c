@@ -626,13 +626,48 @@ float iterateChainLoss(
  mIDS[2]= problem->chain[chainID].part[0].mIDStart+2;
  float originalValues[3]={0};
  float delta[3]={0};
+ float bestDelta[3]={0};
+ float originalLoss = calculateChainLoss(problem,chainID);
 
  originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
  originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
  originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
 
 
+ float bestLoss = calculateChainLoss(problem,chainID);
+ //Random
+ float loss=0.0;
 
+ for (unsigned int i=0; i<1000; i++)
+ {
+   delta[0] = 3.0 - (float) (6*(rand()) / (float) RAND_MAX);
+   delta[1] = 3.0 - (float) (6*(rand()) / (float) RAND_MAX);
+   delta[2] = 3.0 - (float) (6*(rand()) / (float) RAND_MAX);
+
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = originalValues[0] + delta[0];
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = originalValues[1] + delta[1];
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = originalValues[2] + delta[2];
+
+   loss=calculateChainLoss(
+                           problem,
+                           chainID
+                          );
+   if (loss<bestLoss)
+   {
+     bestLoss=loss;
+     bestDelta[0]=delta[0];
+     bestDelta[1]=delta[1];
+     bestDelta[2]=delta[2];
+   }
+ }
+
+
+
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = originalValues[0] + bestDelta[0];
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = originalValues[1] + bestDelta[1];
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = originalValues[2] + bestDelta[2];
+
+  return bestLoss;
 
 }
 
@@ -773,6 +808,12 @@ float approximateTargetFromMotionBuffer(
   float loss;
 
   loss=calculateChainLoss( &problem, 0 );
+
+
+  loss = iterateChainLoss(
+                          &problem,
+                          0
+                         );
 
 
  return loss;
