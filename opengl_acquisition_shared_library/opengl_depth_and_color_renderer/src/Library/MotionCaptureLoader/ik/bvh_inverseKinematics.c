@@ -244,8 +244,11 @@ void compareTwoMotionBuffers(const char * msg,struct MotionBuffer * guessA,struc
     float diffA=fabs(groundTruth->motion[i] - guessA->motion[i]);
     float diffB=fabs(groundTruth->motion[i] - guessB->motion[i]);
     if ( (diffA==0.0) && (diffA==diffB) ) { fprintf(stderr,BLUE  "%0.2f ",diffA-diffB); } else
-    if (diffA>=diffB)                     { fprintf(stderr,GREEN "%0.2f ",diffA-diffB); } else
-                                          { fprintf(stderr,RED   "%0.2f ",diffB-diffA); }
+    {
+     if (diffA>=diffB)                     { fprintf(stderr,GREEN "%0.2f ",diffA-diffB); } else
+                                           { fprintf(stderr,RED   "%0.2f ",diffB-diffA); }
+     fprintf(stderr,NORMAL "(%0.2f->%0.2f/%0.2f) ",guessA->motion[i],guessB->motion[i],groundTruth->motion[i]);
+    }
   }
   fprintf(stderr,NORMAL "\n___________\n");
 }
@@ -318,6 +321,15 @@ int prepareProblem(
   problem->chain[chainID].groupID=groupID;
   problem->chain[chainID].jobID=jobID;
   problem->chain[chainID].currentSolution=mallocNewSolutionBufferAndCopy(mc,problem->initialSolution);
+
+  if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
+  {
+   problem->chain[chainID].part[partID].evaluated=0; //Not evaluated yet
+   problem->chain[chainID].part[partID].jID=thisJID;
+   problem->chain[chainID].part[partID].mIDStart=0; //First Rotation
+   problem->chain[chainID].part[partID].mIDEnd=2; //First Rotation
+   ++partID;
+  }
 
   if (bvh_getJointIDFromJointName(mc,"hip",&thisJID) )
   {
@@ -618,61 +630,6 @@ int viewProblem(
 }
 
 
-float meanSquaredBVH2DDistace(
-                              struct BVH_MotionCapture * mc,
-                              struct simpleRenderer *renderer,
-                              int useAllJoints,
-                              BVHMotionChannelID onlyConsiderChildrenOfThisJoint,
-                              struct BVH_Transform * bvhSourceTransform,
-                              struct BVH_Transform * bvhTargetTransform
-                             )
-{
-   if (
-        (bvh_projectTo2D(mc,bvhSourceTransform,renderer,0,0)) &&
-        (bvh_projectTo2D(mc,bvhTargetTransform,renderer,0,0))
-      )
-      {
-       //-----------------
-       float sumOf2DDistances=0.0;
-       unsigned int numberOfSamples=0;
-       for (unsigned int jID=0; jID<mc->jointHierarchySize; jID++)
-            {
-              int isSelected = 1;
-
-              if (mc->selectedJoints!=0)
-              {
-                if (!mc->selectedJoints[jID])
-                {
-                  isSelected=0;
-                }
-              }
-
-               if ( (isSelected) && ( (useAllJoints) || (mc->jointHierarchy[jID].parentJoint == onlyConsiderChildrenOfThisJoint) ) )
-               {
-                float thisSquared2DDistance=getSquared2DPointDistance(
-                                                                      (float) bvhSourceTransform->joint[jID].pos2D[0],
-                                                                      (float) bvhSourceTransform->joint[jID].pos2D[1],
-                                                                      (float) bvhTargetTransform->joint[jID].pos2D[0],
-                                                                      (float) bvhTargetTransform->joint[jID].pos2D[1]
-                                                                     );
-               fprintf(stderr,"%0.2f,%0.2f -> %0.2f,%0.2f : ",bvhSourceTransform->joint[jID].pos2D[0],bvhSourceTransform->joint[jID].pos2D[1],bvhTargetTransform->joint[jID].pos2D[0],bvhTargetTransform->joint[jID].pos2D[1]);
-               fprintf(stderr,"Joint squared %s distance is %0.2f\n",mc->jointHierarchy[jID].jointName,thisSquared2DDistance);
-
-               numberOfSamples+=1;
-               sumOf2DDistances+=thisSquared2DDistance;
-              }
-            }
-
-       if (numberOfSamples>0)
-       {
-         return (float)  sumOf2DDistances/numberOfSamples;
-       }
-     } //-----------------
-
- return 0.0;
-}
-
-
 
 
 float calculateChainLoss(
@@ -694,11 +651,12 @@ float calculateChainLoss(
                                          )
         )
       {
+      /*
         bvh_removeTranslationFromTransform(
                                             problem->mc,
                                             &problem->chain[chainID].current2DProjectionTransform
                                           );
-
+     */
       if (
           (bvh_projectTo2D(problem->mc,&problem->chain[chainID].current2DProjectionTransform,problem->renderer,0,0)) &&
           (bvh_projectTo2D(problem->mc,problem->bvhTarget2DProjectionTransform,problem->renderer,0,0))
@@ -748,21 +706,20 @@ float iteratePartLoss(
  mIDS[0]= problem->chain[chainID].part[partID].mIDStart;
  mIDS[1]= problem->chain[chainID].part[partID].mIDStart+1;
  mIDS[2]= problem->chain[chainID].part[partID].mIDStart+2;
- float originalValues[3]={0};
- float delta[3]={0};
- float bestDelta[3]={0};
+
  float originalLoss = calculateChainLoss(problem,chainID);
 
+ float originalValues[3];
  originalValues[0] = problem->chain[chainID].currentSolution->motion[mIDS[0]];
  originalValues[1] = problem->chain[chainID].currentSolution->motion[mIDS[1]];
  originalValues[2] = problem->chain[chainID].currentSolution->motion[mIDS[2]];
 
- float currentValues[3]={0};
+ float currentValues[3];
  currentValues[0] = originalValues[0];
  currentValues[1] = originalValues[1];
  currentValues[2] = originalValues[2];
 
- float bestValues[3]={0};
+ float bestValues[3];
  bestValues[0] = originalValues[0];
  bestValues[1] = originalValues[1];
  bestValues[2] = originalValues[2];
@@ -772,9 +729,13 @@ float iteratePartLoss(
  float bestLoss = initialLoss;
  float loss=initialLoss;
 
- float d=0.2;
- float lambda=5.5;
+ float maxD=5.0;
+ float d=0.1;
+ float lambda=1.0;
+ float gradient;
 
+ float bestDelta[3]={0};
+ float delta[3]={0};
  delta[0] = d;
  delta[1] = d;
  delta[2] = d;
@@ -795,8 +756,34 @@ float iteratePartLoss(
  unsigned long startTime = GetTickCountMicrosecondsIK();
 
  float losses[3];
- for (unsigned int i=0; i<iterations; i++)
+ for (unsigned int i=0; i<iterations+1000; i++)
  {
+/*
+   if (lambda>1.0)
+   {
+     lambda=lambda/2;
+   } else
+   {
+    lambda=1.0;
+   }*/
+
+ #define SHARE_LOSS 0
+
+ #if SHARE_LOSS
+ //-------------------
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0] + delta[0];
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1] + delta[1];
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2] + delta[2];
+ //-------------------
+   losses[0]=calculateChainLoss(problem,chainID);
+   losses[1]=losses[0];
+   losses[2]=losses[0];
+ //-------------------
+   problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0];
+   problem->chain[chainID].currentSolution->motion[mIDS[1]] = currentValues[1];
+   problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
+ //-------------------
+ #else
  //-------------------
    problem->chain[chainID].currentSolution->motion[mIDS[0]] = currentValues[0] + delta[0];
    losses[0]=calculateChainLoss(problem,chainID);
@@ -810,15 +797,37 @@ float iteratePartLoss(
    losses[2]=calculateChainLoss(problem,chainID);
    problem->chain[chainID].currentSolution->motion[mIDS[2]] = currentValues[2];
  //-------------------
+ #endif
 
-   if (loss!=losses[0]) { delta[0] = (float) lambda * delta[0] / ( loss - losses[0]); } else
+
+
+   gradient = (float)  (loss - losses[0]);
+   if (loss!=losses[0]) { delta[0] = (float) lambda * delta[0] * gradient; } else
                         { delta[0] = 0; }
 
-   if (loss!=losses[1]) { delta[1] = (float) lambda * delta[1] / ( loss - losses[1]); } else
+   gradient = (float)   (loss - losses[1]);
+   if (loss!=losses[1]) { delta[1] = (float) lambda * delta[1] * gradient; } else
                         { delta[1] = 0; }
 
-   if (loss!=losses[2]) { delta[2] = (float) lambda * delta[2] / ( loss - losses[2]); } else
+   gradient = (float)   (loss - losses[2]);
+   if (loss!=losses[2]) { delta[2] = (float) lambda * delta[2] * gradient; } else
                         { delta[2] = 0; }
+
+   if (delta[0]<-1 * maxD) { delta[0]=-1 * maxD; } else
+   if (delta[0]>maxD) { delta[0]=maxD; }
+   if (delta[1]<-1 * maxD) { delta[1]=-1 * maxD; } else
+   if (delta[1]>maxD) { delta[1]=maxD; }
+   if (delta[2]<-1 * maxD) { delta[2]=-1 * maxD; } else
+   if (delta[2]>maxD) { delta[2]=maxD; }
+
+   //Keep optimization from getting stuck..
+   if (delta[0]==0) { delta[0]=0.001; }
+   if (delta[1]==0) { delta[1]=0.001; }
+   if (delta[2]==0) { delta[2]=0.001; }
+
+   delta[0]*=0.98;
+   delta[1]*=0.98;
+   delta[2]*=0.98;
 
 
    currentValues[0]+=delta[0];
@@ -849,13 +858,9 @@ float iteratePartLoss(
      fprintf(stderr,YELLOW "%07u | %0.1f | %0.2f  |  %0.2f  |  %0.2f \n" NORMAL,i,loss,currentValues[0],currentValues[1],currentValues[2]);
    }
 
-   //Keep optimization from getting stuck..
-   if (delta[0]==0) { delta[0]=0.1; }
-   if (delta[1]==0) { delta[1]=0.1; }
-   if (delta[2]==0) { delta[2]=0.1; }
 
 
-   if (consecutiveBadSteps>4) { fprintf(stderr,"Early Stopping\n"); break; }
+   if (consecutiveBadSteps>4) { fprintf(stderr,YELLOW "Early Stopping\n" NORMAL); break; }
  }
  unsigned long endTime = GetTickCountMicrosecondsIK();
 
@@ -992,9 +997,7 @@ float approximateTargetFromMotionBuffer(
                  bvhTargetTransform
                 );
 
-  viewProblem(
-              &problem
-             );
+  viewProblem(&problem);
 
 
   unsigned int maximumIterations=1000;
@@ -1078,11 +1081,12 @@ int BVHTestIK(
       {
         if ( bvh_loadTransformForFrame(mc,fIDTarget,&bvhTargetTransform) )
          {
+         /*
             bvh_removeTranslationFromTransform(
                                                 mc,
                                                 &bvhTargetTransform
                                               );
-
+         */
             float error2D = approximateTargetFromMotionBuffer(
                                                               mc,
                                                               &renderer,
@@ -1096,8 +1100,8 @@ int BVHTestIK(
 
 
             //-------------------------------------------------------------------------------------------------------------
-            compareMotionBuffers("The problem we want to solve compared to the initial state",initialSolution,groundTruth);
-            compareMotionBuffers("The solution we proposed compared to ground truth",solution,groundTruth);
+            //compareMotionBuffers("The problem we want to solve compared to the initial state",initialSolution,groundTruth);
+            //compareMotionBuffers("The solution we proposed compared to ground truth",solution,groundTruth);
             //-------------------------------------------------------------------------------------------------------------
             compareTwoMotionBuffers("Improvement",initialSolution,solution,groundTruth);
          }
